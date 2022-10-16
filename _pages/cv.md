@@ -11,21 +11,24 @@ redirect_from:
 
 Education
 ======
-* B.S. in GitHub, GitHub University, 2012
-* M.S. in Jekyll, GitHub University, 2014
-* Ph.D in Version Control Theory, GitHub University, 2018 (expected)
+
+* Ph.D in Computer Engineering, Karadeniz Technical University, 2022
+* M.S. in Information Systems, Hacettepe University, 2010
+* B.S. in Computer Engineering, Hacettepe University, 2006
 
 Work experience
 ======
-* Summer 2015: Research Assistant
-  * Github University
-  * Duties included: Tagging issues
-  * Supervisor: Professor Git
+* 2015-Present: Teaching Assistant
+  * Giresun University
 
-* Fall 2015: Research Assistant
-  * Github University
-  * Duties included: Merging pull requests
-  * Supervisor: Professor Hub
+* 2011-2015 Leader Software Engineer
+  * SDT Space and Defence Technologies 
+
+* 2008-2011 Senior Software Engineer
+  * SDT Space and Defence Technologies 
+
+* 2005-2008 Software Engineer
+  * SDT Space and Defence Technologies 
   
 Skills
 ======
