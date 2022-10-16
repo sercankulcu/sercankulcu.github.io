@@ -14,4 +14,4 @@ Interested in; low-power wireless communication (6TiSCH, LoRaWAN, Bluetooth Low-
 
 Also, I've been giving OOP and Java courses since 2015. 
 
-
+<img src="http://sercankulcu.github.io/images/linuxquote.jpg">
