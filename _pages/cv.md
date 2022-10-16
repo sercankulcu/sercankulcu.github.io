@@ -9,15 +9,14 @@ redirect_from:
 
 {% include base_path %}
 
-Education
-======
+## Education
 
 * Ph.D in Computer Engineering, Karadeniz Technical University, 2022
 * M.S. in Information Systems, Hacettepe University, 2010
 * B.S. in Computer Engineering, Hacettepe University, 2006
 
-Work experience
-======
+## Work experience
+
 * 2015-Present: Teaching Assistant
   * Giresun University
 
@@ -31,14 +30,14 @@ Work experience
   * SDT Space and Defence Technologies 
 
 
-Projects
-======
+## Projects
+
 * 2007-2012, TUBİTAK 1007, SAVS016
 * 2018-2021, TÜBİTAK 1001, Ayarlanabilir Akıllı Anten Tabanlı Yeni Nesil Nesnelerin İnterneti Ağı Çözümü
 
   
-Skills
-======
+## Skills
+
 * Low-power wireless communication
   * 6TiSCH
 * Embedded and real-time operating systems
