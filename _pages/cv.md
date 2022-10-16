@@ -32,12 +32,12 @@ Work experience
   
 Skills
 ======
-* Skill 1
-* Skill 2
-  * Sub-skill 2.1
-  * Sub-skill 2.2
-  * Sub-skill 2.3
-* Skill 3
+* Low-power wireless communication
+  * 6TiSCH
+* Embedded and real-time operating systems
+  * ContikiOS
+* C/C++ programming
+* Machine learning
 
 Publications
 ======
