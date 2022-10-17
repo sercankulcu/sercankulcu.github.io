@@ -1,11 +1,11 @@
 ---
-title: "Teaching experience 2"
+title: "Professional Math"
 collection: teaching
-type: "Workshop"
-permalink: /teaching/2015-spring-teaching-1
-venue: "University 1, Department"
-date: 2015-01-01
-location: "City, Country"
+type: "Undergraduate course"
+permalink: /teaching/2022-spring-teaching-2
+venue: "University of Giresun, Department of Computer Programming"
+date: 2022-01-01
+location: "Giresun, Turkey"
 ---
 
 This is a description of a teaching experience. You can use markdown like any other post.
