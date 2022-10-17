@@ -5,6 +5,16 @@ permalink: /publications/
 author_profile: true
 ---
 
+{% if author.googlescholar %}
+  You can also find my articles on <u><a href="{{author.googlescholar}}">my Google Scholar profile</a>.</u>
+{% endif %}
+
+{% include base_path %}
+
+{% for post in site.publications reversed %}
+  {% include archive-single.html %}
+{% endfor %}
+
 ## SCI Journals
 
 Kulcu, S., Gormus, S., & Jin, Y. (2021). Integration of Steerable Smart Antennas to IETF 6TiSCH Protocol for High Reliability Wireless IoT Networks. IEEE Access, 9, 147780-147790.
