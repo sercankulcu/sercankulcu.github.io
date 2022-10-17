@@ -4,7 +4,7 @@ collection: publications
 permalink: /publication/2016-01-01-a-survey-number-2
 excerpt: ''
 date: 2016-11-05
-venue: 'Journal 1'
+venue: 'IEEE'
 paperurl: ''
 #citation: ''
 ---
