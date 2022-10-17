@@ -35,13 +35,3 @@ redirect_from:
 * 2007-2012, TUBİTAK 1007, SAVS016
 * 2018-2021, TÜBİTAK 1001, Ayarlanabilir Akıllı Anten Tabanlı Yeni Nesil Nesnelerin İnterneti Ağı Çözümü
 
-  
-## Skills
-
-* Low-power wireless communication
-  * 6TiSCH
-* Embedded and real-time operating systems
-  * ContikiOS
-* C/C++ programming
-* Machine learning
-
