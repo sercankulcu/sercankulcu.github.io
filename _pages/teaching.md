@@ -5,12 +5,8 @@ permalink: /teaching/
 author_profile: true
 ---
 
-## Object Oriented Programming I
+{% include base_path %}
 
-## Object Oriented Programming II
-
-## Professional English
-
-## Professional Mathmatics
-
-## Wireless Sensor Networks
+{% for post in site.teaching reversed %}
+  {% include archive-single.html %}
+{% endfor %}
