@@ -12,4 +12,4 @@ This paper is about the number 3. The number 4 is left for future work.
 
 [Download paper here](http://academicpages.github.io/files/paper3.pdf)
 
-Recommended citation: Your Name, You. (2015). "Paper Title Number 3." <i>Journal 1</i>. 1(3).
+Recommended citation: Görmüş, S., & Külcü, S. (2019). Enabling space time division multiple access in IETF 6TiSCH protocol. Turkish Journal of Electrical Engineering and Computer Sciences, 27(6), 4151-4166.
