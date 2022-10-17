@@ -6,7 +6,7 @@ excerpt: ''
 date: 2016-03-24
 venue: 'IEEE'
 paperurl: ''
-citation: ''
+#citation: ''
 ---
 We present a framework for sentiment analysis on tweets related to news items. Given a set of tweets and news items, our framework classifies tweets as positive or negative and links them to the related news items. For the classification of tweets we use three of the most used machine learning methods, namely Naive Bayes, Complementary Naive Bayes, and Logistic Regression, and for linking tweets to news items, Natural Language Processing (NLP) techniques are used, including Zemberek NLP library for stemming and morphological analysis and then bag-of-words method for mapping.
 
