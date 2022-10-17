@@ -5,7 +5,7 @@ permalink: /publication/2016-01-01-a-survey-number-2
 excerpt: ''
 date: 2016-11-05
 venue: 'IEEE'
-paperurl: ''
+#paperurl: ''
 #citation: ''
 ---
 Social Network Analysis (SNA) has become a very important and increasingly popular topic among researchers in recent years especially after emerging Semantic Web and Big Data technologies. This survey focuses on recently developed systems for SNA and summarizes the state-of-the-art technologies used by them and points out to future research directions.
