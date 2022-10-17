@@ -2,14 +2,14 @@
 title: "A survey on semantic Web and big data technologies for social network analysis"
 collection: publications
 permalink: /publication/2016-01-01-a-survey-number-2
-excerpt: 'This paper is about the number 2. The number 3 is left for future work.'
-date: 2010-10-01
+excerpt: ''
+date: 2016-11-05
 venue: 'Journal 1'
-paperurl: 'http://academicpages.github.io/files/paper2.pdf'
-citation: 'Your Name, You. (2010). &quot;Paper Title Number 2.&quot; <i>Journal 1</i>. 1(2).'
+paperurl: ''
+#citation: ''
 ---
-This paper is about the number 2. The number 3 is left for future work.
+Social Network Analysis (SNA) has become a very important and increasingly popular topic among researchers in recent years especially after emerging Semantic Web and Big Data technologies. This survey focuses on recently developed systems for SNA and summarizes the state-of-the-art technologies used by them and points out to future research directions.
 
-[Download paper here](http://academicpages.github.io/files/paper2.pdf)
+[Download paper here](https://ieeexplore.ieee.org/document/7840792)
 
 Recommended citation: Kulcu, S., Dogdu, E., & Ozbayoglu, A. M. (2016, December). A survey on semantic web and big data technologies for social network analysis. In 2016 IEEE International Conference on Big Data (Big Data) (pp. 1768-1777). IEEE.
