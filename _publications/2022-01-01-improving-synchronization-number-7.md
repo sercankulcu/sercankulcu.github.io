@@ -1,7 +1,7 @@
 ---
-title: "Paper Title Number 3"
+title: "Improving Synchronization Time in 6TiSCH Networks with Smart Antennas"
 collection: publications
-permalink: /publication/2015-10-01-paper-title-number-3
+permalink: /publication/2022-01-01-improving-synchronization-number-7
 excerpt: 'This paper is about the number 3. The number 4 is left for future work.'
 date: 2015-10-01
 venue: 'Journal 1'
