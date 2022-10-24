@@ -8,7 +8,7 @@ redirect_from:
   - /about.html
 ---
 
-I am an assistant professor of computer science in Giresun University. My research interests are Computer Networks and Embedded Systems.
+I am an assistant professor of computer science in Giresun University. My research interests are computer networks and embedded systems.
 
 Hands-on software engineer since 2005. Holds a PhD degree in wireless communication.
 
