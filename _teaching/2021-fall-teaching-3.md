@@ -1,5 +1,5 @@
 ---
-title: "Object Oriented Programming 2"
+title: "Object Oriented Programming II"
 collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/2021-fall-teaching-3

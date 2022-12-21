@@ -24,6 +24,7 @@ Overall, a course on operating systems provides a comprehensive understanding of
 
 The prerequisites
 ======
+You can find the prerequisites for taking the course here.
 
 Introduction to operating systems: 
 ======
