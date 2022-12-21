@@ -1,5 +1,5 @@
 ---
-title: "Object Oriented Programming 1"
+title: "Object Oriented Programming I"
 collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/2022-spring-teaching-1
