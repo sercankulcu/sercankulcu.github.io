@@ -22,7 +22,7 @@ In addition to these technical topics, students will also learn about the histor
 
 Overall, a course on operating systems provides a comprehensive understanding of the underlying mechanisms that make modern computing possible. It is an essential course for anyone interested in computer science or a related field, and a valuable addition to any IT professional's skill set.
 
-<a href="/os/0 The prerequisities.pdf">The prerequisites</a>
+<a href="/os/0_The_prerequisities.pdf">The prerequisites</a>
 ======
 You can find the prerequisites for taking the course here.
 
