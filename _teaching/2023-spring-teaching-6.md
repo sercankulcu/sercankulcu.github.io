@@ -26,39 +26,39 @@ Overall, a course on operating systems provides a comprehensive understanding of
 ======
 You can find the prerequisites for taking the course here.
 
-Introduction to operating systems: 
+<a href="http://sercankulcu.github.io/assets/teaching/os/1_Introduction.pdf">Introduction to operating systems: </a>
 ======
 This chapter could provide an overview of what an operating system is and its role in a computer system, as well as a brief history of the development of operating systems.
 
-Processes and threads: 
+<a href="http://sercankulcu.github.io/assets/teaching/os/2_Processes.pdf">Processes and threads: </a>
 ======
 This chapter could cover the concepts of processes and threads, including how they are created and managed by the operating system, and how they interact with the CPU and memory.
 
-Memory management: 
+<a href="http://sercankulcu.github.io/assets/teaching/os/3_Memory.pdf">Memory management: </a>
 ======
 This chapter could delve into the various techniques and algorithms used by operating systems to manage the memory of a computer system, including virtual memory and paging.
 
-File systems: 
+<a href="http://sercankulcu.github.io/assets/teaching/os/4_File.pdf">File systems: </a>
 ======
 
 This chapter could discuss the different types of file systems that are used by operating systems and how they are used to store, organize, and access files on a computer.
 
-Input/output: 
+<a href="http://sercankulcu.github.io/assets/teaching/os/5_Input.pdf">Input/output: </a>
 ======
 This chapter could cover the principles of input/output (I/O) and how operating systems manage and coordinate I/O operations between the various hardware devices in a computer system.
 
-Security: 
+<a href="http://sercankulcu.github.io/assets/teaching/os/6_Security.pdf">Security: </a>
 ======
 This chapter could discuss the various security measures that are implemented in modern operating systems, including access controls, authentication, and encryption.
 
-Networking: 
+<a href="http://sercankulcu.github.io/assets/teaching/os/7_Networking.pdf">Networking: </a>
 ======
 This chapter could cover the fundamental concepts of computer networking and how operating systems support network communication.
 
-Operating system design: 
+<a href="http://sercankulcu.github.io/assets/teaching/os/8_Design.pdf">Operating system design: </a>
 ======
 This chapter could delve into the various design considerations and trade-offs that must be made when designing an operating system, including scalability, reliability, and performance.
 
-Case studies: 
+<a href="http://sercankulcu.github.io/assets/teaching/os/9_Case.pdf">Case studies: </a>
 ======
 This chapter could provide examples of different operating systems and their key features and characteristics, such as Windows, Linux, and macOS.
