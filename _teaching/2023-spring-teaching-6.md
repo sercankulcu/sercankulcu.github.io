@@ -22,11 +22,11 @@ In addition to these technical topics, students will also learn about the histor
 
 Overall, a course on operating systems provides a comprehensive understanding of the underlying mechanisms that make modern computing possible. It is an essential course for anyone interested in computer science or a related field, and a valuable addition to any IT professional's skill set.
 
-The prerequisites<a href="http://sercankulcu.github.io/assets/teaching/os/0_The_prerequisites.pdf">pdf</a>
+The prerequisites<a href="http://sercankulcu.github.io/assets/teaching/os/0_The_prerequisites.pdf">[pdf]</a>
 ======
 You can find the prerequisites for taking the course here.
 
-Introduction to operating systems:<a href="http://sercankulcu.github.io/assets/teaching/os/1_Introduction.pdf">pdf</a>
+Introduction to operating systems:<a href="http://sercankulcu.github.io/assets/teaching/os/1_Introduction.pdf">[pdf]</a>
 ======
 This chapter could provide an overview of what an operating system is and its role in a computer system, as well as a brief history of the development of operating systems.
 
