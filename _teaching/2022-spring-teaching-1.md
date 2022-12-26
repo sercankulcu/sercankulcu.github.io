@@ -28,6 +28,8 @@ Chapter 5: Arrays and Collections: <a href="http://sercankulcu.github.io/assets/
 Chapter 6: Exception Handling: <a href="http://sercankulcu.github.io/assets/teaching/java/6_Exception.pdf">[pdf]</a>
 -----
 
+<b>Interview Exception Handling</b> <a href="http://sercankulcu.github.io/assets/teaching/java/Interview_Exception_Handling.pdf">[pdf]</a>
+
 Chapter 7: Working with Files and Input/Output: <a href="http://sercankulcu.github.io/assets/teaching/java/7_Files.pdf">[pdf]</a>
 -----
 
