@@ -49,6 +49,8 @@ Chapter 12: Testing and Debugging: <a href="http://sercankulcu.github.io/assets/
 Chapter 13: Advanced Topics: <a href="http://sercankulcu.github.io/assets/teaching/java/13_Advanced.pdf">[pdf]</a>
 -----
 
+<b>Interview Garbage Collectors</b> <a href="http://sercankulcu.github.io/assets/teaching/java/Interview_Garbage_Collectors.pdf">[pdf]</a>
+
 Chapter 14: Next Steps: <a href="http://sercankulcu.github.io/assets/teaching/java/14_Next.pdf">[pdf]</a>
 -----
 
