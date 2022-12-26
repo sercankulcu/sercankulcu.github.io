@@ -36,6 +36,8 @@ Chapter 7: Working with Files and Input/Output: <a href="http://sercankulcu.gith
 Chapter 8: Working with GUI Applications: <a href="http://sercankulcu.github.io/assets/teaching/java/8_GUI.pdf">[pdf]</a>
 -----
 
+<b>Interview Swing</b> <a href="http://sercankulcu.github.io/assets/teaching/java/Interview_Swing.pdf">[pdf]</a>
+
 Chapter 9: Concurrency and Multithreading: <a href="http://sercankulcu.github.io/assets/teaching/java/9_Concurrency.pdf">[pdf]</a>
 -----
 
