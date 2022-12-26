@@ -58,4 +58,6 @@ Chapter 13: Advanced Topics: <a href="http://sercankulcu.github.io/assets/teachi
 Chapter 14: Next Steps: <a href="http://sercankulcu.github.io/assets/teaching/java/14_Next.pdf">[pdf]</a>
 -----
 
-<b>Interview_Questions</b> <a href="http://sercankulcu.github.io/assets/teaching/java/Interview_Questions.pdf">[pdf]</a>
+<b>Design Patterns</b> <a href="http://sercankulcu.github.io/assets/teaching/design_pattern/Design_Patterns.pdf">[pdf]</a>
+
+<b>Interview Questions</b> <a href="http://sercankulcu.github.io/assets/teaching/java/Interview_Questions.pdf">[pdf]</a>
