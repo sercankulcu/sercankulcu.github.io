@@ -55,4 +55,3 @@ Chapter 14: Next Steps: <a href="http://sercankulcu.github.io/assets/teaching/ja
 -----
 
 <b>Interview_Questions</b> <a href="http://sercankulcu.github.io/assets/teaching/java/Interview_Questions.pdf">[pdf]</a>
------
