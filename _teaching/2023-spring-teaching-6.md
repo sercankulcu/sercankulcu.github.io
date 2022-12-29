@@ -47,18 +47,30 @@ Chapter 5: Input/output: <a href="http://sercankulcu.github.io/assets/teaching/o
 ======
 This chapter could cover the principles of input/output (I/O) and how operating systems manage and coordinate I/O operations between the various hardware devices in a computer system.
 
-Chapter 6: Security: <a href="http://sercankulcu.github.io/assets/teaching/os/6_Security.pdf">[pdf]</a>
+Chapter 6: Deadlocks: <a href="http://sercankulcu.github.io/assets/teaching/os/6_Deadlocks.pdf">[pdf]</a>
+======
+This chapter could cover the principles of input/output (I/O) and how operating systems manage and coordinate I/O operations between the various hardware devices in a computer system.
+
+Chapter 7: Virtualization and cloud: <a href="http://sercankulcu.github.io/assets/teaching/os/7_Virtualization.pdf">[pdf]</a>
 ======
 This chapter could discuss the various security measures that are implemented in modern operating systems, including access controls, authentication, and encryption.
 
-Chapter 7: Networking: <a href="http://sercankulcu.github.io/assets/teaching/os/7_Networking.pdf">[pdf]</a>
+Chapter 8: Multiple processor systems: <a href="http://sercankulcu.github.io/assets/teaching/os/8_Multiple_Processor.pdf">[pdf]</a>
 ======
-This chapter could cover the fundamental concepts of computer networking and how operating systems support network communication.
+This chapter could discuss the various security measures that are implemented in modern operating systems, including access controls, authentication, and encryption.
 
-Chapter 8: Operating system design: <a href="http://sercankulcu.github.io/assets/teaching/os/8_Design.pdf">[pdf]</a>
+Chapter 9: Security: <a href="http://sercankulcu.github.io/assets/teaching/os/9_Security.pdf">[pdf]</a>
+======
+This chapter could discuss the various security measures that are implemented in modern operating systems, including access controls, authentication, and encryption.
+
+Chapter 10: Operating system design: <a href="http://sercankulcu.github.io/assets/teaching/os/10_Design.pdf">[pdf]</a>
 ======
 This chapter could delve into the various design considerations and trade-offs that must be made when designing an operating system, including scalability, reliability, and performance.
 
-Chapter 9: Case studies: <a href="http://sercankulcu.github.io/assets/teaching/os/9_Case.pdf">[pdf]</a>
+Chapter 11: Networking: <a href="http://sercankulcu.github.io/assets/teaching/os/11_Networking.pdf">[pdf]</a>
+======
+This chapter could cover the fundamental concepts of computer networking and how operating systems support network communication.
+
+Chapter 12: Case studies: <a href="http://sercankulcu.github.io/assets/teaching/os/12_Case.pdf">[pdf]</a>
 ======
 This chapter could provide examples of different operating systems and their key features and characteristics, such as Windows, Linux, and macOS.
