@@ -25,8 +25,9 @@ Overall, a course on operating systems provides a comprehensive understanding of
 The prerequisites: 
 ======
 You can find the prerequisites for taking the course here.
-The prerequisities<a href="http://sercankulcu.github.io/assets/teaching/os/0_The_prerequisites.pdf">[pdf]</a>
-Important people <a href="http://sercankulcu.github.io/assets/teaching/os/0_Important_people.pdf">[pdf]</a>
+
+* The prerequisities<a href="http://sercankulcu.github.io/assets/teaching/os/0_The_prerequisites.pdf">[pdf]</a>
+* Important people <a href="http://sercankulcu.github.io/assets/teaching/os/0_Important_people.pdf">[pdf]</a>
 
 Chapter 1: Introduction to operating systems: <a href="http://sercankulcu.github.io/assets/teaching/os/1_Introduction.pdf">[pdf]</a>
 ======
