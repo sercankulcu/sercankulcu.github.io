@@ -4,7 +4,7 @@ collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/2022-spring-object-oriented-programming-i
 venue: "University of Giresun, Department of Computer Programming"
-date: 2022-01-01
+date: 2023-01-02
 location: "Giresun, Turkey"
 ---
 
