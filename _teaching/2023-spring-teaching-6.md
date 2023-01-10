@@ -2,7 +2,7 @@
 title: "Operating Systems"
 collection: teaching
 type: "Undergraduate course"
-permalink: /teaching/2023-spring-teaching-6
+permalink: /teaching/2023-spring-operating-systems
 venue: "University of Giresun, Department of Computer Engineering"
 date: 2023-01-01
 location: "Giresun, Turkey"
