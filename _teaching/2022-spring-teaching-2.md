@@ -4,7 +4,7 @@ collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/2022-spring-professional-math
 venue: "University of Giresun, Department of Computer Programming"
-date: 2022-01-01
+date: 2021-01-01
 location: "Giresun, Turkey"
 ---
 
