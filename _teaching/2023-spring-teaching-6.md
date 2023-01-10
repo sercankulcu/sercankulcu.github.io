@@ -33,6 +33,8 @@ Chapter 1: Introduction to operating systems: <a href="http://sercankulcu.github
 ======
 This chapter could provide an overview of what an operating system is and its role in a computer system, as well as a brief history of the development of operating systems.
 
+* Questions & Answers from OSTEP <a href="http://sercankulcu.github.io/assets/teaching/os/1_QA_from_OSTEP.pdf">[pdf]</a>
+
 Chapter 2: Processes and threads: <a href="http://sercankulcu.github.io/assets/teaching/os/2_Processes.pdf">[pdf]</a>
 ======
 This chapter could cover the concepts of processes and threads, including how they are created and managed by the operating system, and how they interact with the CPU and memory.
