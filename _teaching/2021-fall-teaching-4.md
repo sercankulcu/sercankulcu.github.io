@@ -8,13 +8,7 @@ date: 2021-02-02
 location: "Giresun, Turkey"
 ---
 
-This is a description of a teaching experience. You can use markdown like any other post.
+This course is designed to help computer science students and professionals improve their language skills. Each chapter includes reading passages on a variety of topics to help you develop your reading ability. There is a small glossary below the reading passage. The terms from the reading material are used in the example sentences to demonstrate their usage.
 
-Heading 1
------
-
-Heading 2
------
-
-Heading 3
+Course book <a href="http://sercankulcu.github.io/assets/teaching/pro_eng/Professional_English.pdf">[pdf]</a>
 -----
