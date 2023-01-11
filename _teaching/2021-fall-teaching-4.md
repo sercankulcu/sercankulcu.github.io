@@ -14,8 +14,8 @@ Vocabulary
 -----
 
 * Reading <a href="http://sercankulcu.github.io/assets/teaching/pro_eng/Professional_English.pdf">[pdf]</a>
-* Dictionary <a href="http://sercankulcu.github.io/assets/teaching/pro_eng/Professional_English.pdf">[pdf]</a>
-* Wordlist <a href="http://sercankulcu.github.io/assets/teaching/pro_eng/Professional_English.pdf">[pdf]</a>
+* Dictionary <a href="http://sercankulcu.github.io/assets/teaching/pro_eng/dictionary.pdf">[pdf]</a>
+* Wordlist <a href="http://sercankulcu.github.io/assets/teaching/pro_eng/wordlist.pdf">[pdf]</a>
 
 Grammar
 -----
