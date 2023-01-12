@@ -17,10 +17,12 @@ You can find the prerequisites for taking the course here.
 * The prerequisities<a href="http://sercankulcu.github.io/assets/teaching/os/0_The_prerequisites.pdf">[pdf]</a>
 * Important people <a href="http://sercankulcu.github.io/assets/teaching/os/0_Important_people.pdf">[pdf]</a>
 
-Chapter 1: Introduction to operating systems: <a href="http://sercankulcu.github.io/assets/teaching/os/1_Introduction.pdf">[pdf]</a>
+Chapter 1: Introduction to operating systems: 
 -----
 This chapter could provide an overview of what an operating system is and its role in a computer system, as well as a brief history of the development of operating systems.
 
+* Slides [TR] <a href="http://sercankulcu.github.io/assets/teaching/os/1_Bolum_1_Giris.pdf">[pdf]</a>
+* Notes [ENG] <a href="http://sercankulcu.github.io/assets/teaching/os/1_Introduction.pdf">[pdf]</a>
 * Questions & Answers from OSTEP <a href="http://sercankulcu.github.io/assets/teaching/os/1_QA_from_OSTEP.pdf">[pdf]</a>
 
 Chapter 2: Processes and threads: <a href="http://sercankulcu.github.io/assets/teaching/os/2_Processes.pdf">[pdf]</a>
