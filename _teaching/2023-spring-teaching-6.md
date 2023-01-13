@@ -16,8 +16,7 @@ You can find the prerequisites for taking the course here.
 
 * The prerequisities<a href="http://sercankulcu.github.io/assets/teaching/os/0_The_prerequisites.pdf">[pdf]</a>
 * Important people <a href="http://sercankulcu.github.io/assets/teaching/os/0_Important_people.pdf">[pdf]</a>
-* You can download the books <a href="https://csc-knu.github.io/sys-prog/books/">here</a>.
-
+<!---  * You can download the books <a href="https://csc-knu.github.io/sys-prog/books/">here</a>.--->
 Chapter 1: Introduction to operating systems: 
 -----
 This chapter could provide an overview of what an operating system is and its role in a computer system, as well as a brief history of the development of operating systems.
