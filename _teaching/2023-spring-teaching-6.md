@@ -29,7 +29,7 @@ Chapter 2: Processes and threads:
 -----
 This chapter could cover the concepts of processes and threads, including how they are created and managed by the operating system, and how they interact with the CPU and memory.
 
-* Slides [TR] <a href="http://sercankulcu.github.io/assets/teaching/os/2_Processes.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/assets/teaching/os/2_Bolum_2_Surecler.pdf">[pdf]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/assets/teaching/os/2_Processes.pdf">[pdf]</a>
 
 Chapter 3: Memory management: 
