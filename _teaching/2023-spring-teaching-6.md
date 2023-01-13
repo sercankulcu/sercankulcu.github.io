@@ -25,47 +25,80 @@ This chapter could provide an overview of what an operating system is and its ro
 * Notes [ENG] <a href="http://sercankulcu.github.io/assets/teaching/os/1_Introduction.pdf">[pdf]</a>
 * Questions & Answers from OSTEP <a href="http://sercankulcu.github.io/assets/teaching/os/1_QA_from_OSTEP.pdf">[pdf]</a>
 
-Chapter 2: Processes and threads: <a href="http://sercankulcu.github.io/assets/teaching/os/2_Processes.pdf">[pdf]</a>
+Chapter 2: Processes and threads: 
 -----
 This chapter could cover the concepts of processes and threads, including how they are created and managed by the operating system, and how they interact with the CPU and memory.
 
-Chapter 3: Memory management: <a href="http://sercankulcu.github.io/assets/teaching/os/3_Memory.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/assets/teaching/os/2_Processes.pdf">[pdf]</a>
+* Notes [ENG] <a href="http://sercankulcu.github.io/assets/teaching/os/2_Processes.pdf">[pdf]</a>
+
+Chapter 3: Memory management: 
 -----
 This chapter could delve into the various techniques and algorithms used by operating systems to manage the memory of a computer system, including virtual memory and paging.
 
-Chapter 4: File systems: <a href="http://sercankulcu.github.io/assets/teaching/os/4_File.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/assets/teaching/os/3_Memory.pdf">[pdf]</a>
+* Notes [ENG] <a href="http://sercankulcu.github.io/assets/teaching/os/3_Memory.pdf">[pdf]</a>
+
+Chapter 4: File systems: 
 -----
 
 This chapter could discuss the different types of file systems that are used by operating systems and how they are used to store, organize, and access files on a computer.
 
-Chapter 5: Input/output: <a href="http://sercankulcu.github.io/assets/teaching/os/5_Input.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/assets/teaching/os/4_File.pdf">[pdf]</a>
+* Notes [ENG] <a href="http://sercankulcu.github.io/assets/teaching/os/4_File.pdf">[pdf]</a>
+
+Chapter 5: Input/output: 
 -----
 This chapter could cover the principles of input/output (I/O) and how operating systems manage and coordinate I/O operations between the various hardware devices in a computer system.
 
-Chapter 6: Deadlocks: <a href="http://sercankulcu.github.io/assets/teaching/os/6_Deadlocks.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/assets/teaching/os/5_Input.pdf">[pdf]</a>
+* Notes [ENG] <a href="http://sercankulcu.github.io/assets/teaching/os/5_Input.pdf">[pdf]</a>
+
+Chapter 6: Deadlocks: 
 -----
 This chapter could cover the principles of input/output (I/O) and how operating systems manage and coordinate I/O operations between the various hardware devices in a computer system.
 
-Chapter 7: Virtualization and cloud: <a href="http://sercankulcu.github.io/assets/teaching/os/7_Virtualization.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/assets/teaching/os/6_Deadlocks.pdf">[pdf]</a>
+* Notes [ENG] <a href="http://sercankulcu.github.io/assets/teaching/os/6_Deadlocks.pdf">[pdf]</a>
+
+Chapter 7: Virtualization and cloud: 
 -----
 This chapter could discuss the various security measures that are implemented in modern operating systems, including access controls, authentication, and encryption.
 
-Chapter 8: Multiple processor systems: <a href="http://sercankulcu.github.io/assets/teaching/os/8_Multiple_Processor.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/assets/teaching/os/7_Virtualization.pdf">[pdf]</a>
+* Notes [ENG] <a href="http://sercankulcu.github.io/assets/teaching/os/7_Virtualization.pdf">[pdf]</a>
+
+Chapter 8: Multiple processor systems: 
 -----
 This chapter could discuss the various security measures that are implemented in modern operating systems, including access controls, authentication, and encryption.
 
-Chapter 9: Security: <a href="http://sercankulcu.github.io/assets/teaching/os/9_Security.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/assets/teaching/os/8_Multiple_Processor.pdf">[pdf]</a>
+* Notes [ENG] <a href="http://sercankulcu.github.io/assets/teaching/os/8_Multiple_Processor.pdf">[pdf]</a>
+
+Chapter 9: Security: 
 -----
 This chapter could discuss the various security measures that are implemented in modern operating systems, including access controls, authentication, and encryption.
 
-Chapter 10: Operating system design: <a href="http://sercankulcu.github.io/assets/teaching/os/10_Design.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/assets/teaching/os/9_Security.pdf">[pdf]</a>
+* Notes [ENG] <a href="http://sercankulcu.github.io/assets/teaching/os/9_Security.pdf">[pdf]</a>
+
+Chapter 10: Operating system design: 
 -----
 This chapter could delve into the various design considerations and trade-offs that must be made when designing an operating system, including scalability, reliability, and performance.
 
-Chapter 11: Networking: <a href="http://sercankulcu.github.io/assets/teaching/os/11_Networking.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/assets/teaching/os/10_Design.pdf">[pdf]</a>
+* Notes [ENG] <a href="http://sercankulcu.github.io/assets/teaching/os/10_Design.pdf">[pdf]</a>
+
+Chapter 11: Networking: 
 -----
 This chapter could cover the fundamental concepts of computer networking and how operating systems support network communication.
 
-Chapter 12: Case studies: <a href="http://sercankulcu.github.io/assets/teaching/os/12_Case.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/assets/teaching/os/11_Networking.pdf">[pdf]</a>
+* Notes [ENG] <a href="http://sercankulcu.github.io/assets/teaching/os/11_Networking.pdf">[pdf]</a>
+
+Chapter 12: Case studies: 
 -----
 This chapter could provide examples of different operating systems and their key features and characteristics, such as Windows, Linux, and macOS.
+
+* Slides [TR] <a href="http://sercankulcu.github.io/assets/teaching/os/12_Case.pdf">[pdf]</a>
+* Notes [ENG] <a href="http://sercankulcu.github.io/assets/teaching/os/12_Case.pdf">[pdf]</a>
