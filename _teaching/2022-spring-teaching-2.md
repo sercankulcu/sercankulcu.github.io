@@ -13,11 +13,16 @@ The course covers a variety of mathematical topics such as Calculus, Linear Alge
 Chapter 1: Review of Calculus: functions, limits, derivatives, integrals
 -----
 
+* Functions [ENG] <a href="http://sercankulcu.github.io/files/pro_math/1_functions.pdf">[pdf]</a>
+* Limits [ENG] <a href="http://sercankulcu.github.io/files/pro_math/1_limits.pdf">[pdf]</a>
+
 Chapter 2: Linear Algebra: vectors, matrices, systems of linear equations, eigenvalues and eigenvectors
 -----
 
 Chapter 3: Discrete Math: logic, set theory, counting principles, graph theory, relations and functions
 -----
+
+* Logic [ENG] <a href="http://sercankulcu.github.io/files/pro_math/3_logic.pdf">[pdf]</a>
 
 Chapter 4: Number theory and Cryptography
 -----
