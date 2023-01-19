@@ -36,7 +36,7 @@ Chapter 3: Memory management:
 -----
 This chapter could delve into the various techniques and algorithms used by operating systems to manage the memory of a computer system, including virtual memory and paging.
 
-* Slides [TR] <a href="http://sercankulcu.github.io/files/os/3_Memory.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/files/os/3_Bolum_3_Bellek.pdf">[pdf]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/files/os/3_Memory.pdf">[pdf]</a>
 
 Chapter 4: File systems: 
