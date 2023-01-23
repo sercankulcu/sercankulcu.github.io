@@ -44,7 +44,7 @@ Chapter 4: File systems:
 
 This chapter could discuss the different types of file systems that are used by operating systems and how they are used to store, organize, and access files on a computer.
 
-* Slides [TR] <a href="http://sercankulcu.github.io/files/os/4_File.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/files/os/4_Bolum_4_Dosya.pdf">[pdf]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/files/os/4_File.pdf">[pdf]</a>
 
 Chapter 5: Input/output: 
