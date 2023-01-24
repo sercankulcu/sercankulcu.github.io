@@ -51,7 +51,7 @@ Chapter 5: Input/output:
 -----
 This chapter could cover the principles of input/output (I/O) and how operating systems manage and coordinate I/O operations between the various hardware devices in a computer system.
 
-* Slides [TR] <a href="http://sercankulcu.github.io/files/os/5_Input.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/files/os/5_Bolum_5_Giris.pdf">[pdf]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/files/os/5_Input.pdf">[pdf]</a>
 
 Chapter 6: Deadlocks: 
