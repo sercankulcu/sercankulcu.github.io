@@ -71,7 +71,7 @@ Chapter 8: Multiple processor systems:
 -----
 This chapter could discuss the various security measures that are implemented in modern operating systems, including access controls, authentication, and encryption.
 
-* Slides [TR] <a href="http://sercankulcu.github.io/files/os/8_Multiple_Processor.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/files/os/8_Bolum_8_Cok_Islemcili_Sistemler.pdf">[pdf]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/files/os/8_Multiple_Processor.pdf">[pdf]</a>
 
 Chapter 9: Security: 
