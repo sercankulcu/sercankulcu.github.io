@@ -78,7 +78,7 @@ Chapter 9: Security:
 -----
 This chapter could discuss the various security measures that are implemented in modern operating systems, including access controls, authentication, and encryption.
 
-* Slides [TR] <a href="http://sercankulcu.github.io/files/os/9_Security.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/files/os/9_Bolum_9_Guvenlik.pdf">[pdf]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/files/os/9_Security.pdf">[pdf]</a>
 
 Chapter 10: Operating system design: 
