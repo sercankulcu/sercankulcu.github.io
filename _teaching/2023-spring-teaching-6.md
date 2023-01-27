@@ -85,17 +85,10 @@ Chapter 10: Operating system design:
 -----
 This chapter could delve into the various design considerations and trade-offs that must be made when designing an operating system, including scalability, reliability, and performance.
 
-* Slides [TR] <a href="http://sercankulcu.github.io/files/os/10_Design.pdf">[pdf]</a>
+* Slides [TR] <a href="http://sercankulcu.github.io/files/os/10_Bolum_10_Isletim_Sistemi_Tasarimi.pdf">[pdf]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/files/os/10_Design.pdf">[pdf]</a>
 
-Chapter 11: Networking: 
------
-This chapter could cover the fundamental concepts of computer networking and how operating systems support network communication.
-
-* Slides [TR] <a href="http://sercankulcu.github.io/files/os/11_Networking.pdf">[pdf]</a>
-* Notes [ENG] <a href="http://sercankulcu.github.io/files/os/11_Networking.pdf">[pdf]</a>
-
-Chapter 12: Case studies: 
+Chapter 11: Case studies (UNIX):
 -----
 This chapter could provide examples of different operating systems and their key features and characteristics, such as Windows, Linux, and macOS.
 
