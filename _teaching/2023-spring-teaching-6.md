@@ -88,9 +88,22 @@ This chapter could delve into the various design considerations and trade-offs t
 * Slides [TR] <a href="http://sercankulcu.github.io/files/os/10_Bolum_10_Isletim_Sistemi_Tasarimi.pdf">[pdf]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/files/os/10_Design.pdf">[pdf]</a>
 
-Chapter 11: Case studies (UNIX):
+Chapter 11: Case studies:
 -----
-This chapter could provide examples of different operating systems and their key features and characteristics, such as Windows, Linux, and macOS.
+This chapter could provide examples of different operating systems and their key features and characteristics.
 
-* Slides [TR] <a href="http://sercankulcu.github.io/files/os/12_Case.pdf">[pdf]</a>
+<b>UNIX - Linux</b>
+* Slides [TR] <a href="http://sercankulcu.github.io/files/os/11_Bolum_11_Linux.pdf">[pdf]</a>
+* Notes [ENG] <a href="http://sercankulcu.github.io/files/os/12_Case.pdf">[pdf]</a>
+
+<b>Windows Vista</b>
+* Slides [TR] <a href="http://sercankulcu.github.io/files/os/11_Bolum_11_Linux.pdf">[pdf]</a>
+* Notes [ENG] <a href="http://sercankulcu.github.io/files/os/12_Case.pdf">[pdf]</a>
+
+<b>Windows 2000</b>
+* Slides [TR] <a href="http://sercankulcu.github.io/files/os/11_Bolum_11_Linux.pdf">[pdf]</a>
+* Notes [ENG] <a href="http://sercankulcu.github.io/files/os/12_Case.pdf">[pdf]</a>
+
+<b>Symbian</b>
+* Slides [TR] <a href="http://sercankulcu.github.io/files/os/11_Bolum_11_Linux.pdf">[pdf]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/files/os/12_Case.pdf">[pdf]</a>
