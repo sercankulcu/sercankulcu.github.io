@@ -95,15 +95,3 @@ This chapter could provide examples of different operating systems and their key
 <b>UNIX - Linux</b>
 * Slides [TR] <a href="http://sercankulcu.github.io/files/os/11_Bolum_11_Linux.pdf">[pdf]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/files/os/12_Case.pdf">[pdf]</a>
-
-<b>Windows Vista</b>
-* Slides [TR] <a href="http://sercankulcu.github.io/files/os/11_Bolum_11_Linux.pdf">[pdf]</a>
-* Notes [ENG] <a href="http://sercankulcu.github.io/files/os/12_Case.pdf">[pdf]</a>
-
-<b>Windows 2000</b>
-* Slides [TR] <a href="http://sercankulcu.github.io/files/os/11_Bolum_11_Linux.pdf">[pdf]</a>
-* Notes [ENG] <a href="http://sercankulcu.github.io/files/os/12_Case.pdf">[pdf]</a>
-
-<b>Symbian</b>
-* Slides [TR] <a href="http://sercankulcu.github.io/files/os/11_Bolum_11_Linux.pdf">[pdf]</a>
-* Notes [ENG] <a href="http://sercankulcu.github.io/files/os/12_Case.pdf">[pdf]</a>
