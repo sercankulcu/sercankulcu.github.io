@@ -14,6 +14,10 @@ The prerequisites:
 -----
 You can find the prerequisites for taking the course here.
 
+* Operating System Concepts <a href="https://www.os-book.com/OS10/index.html">[book]</a>
+* Modern Operating Systems <a href="https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X">[book]</a>
+* Operating Systems: Three Easy Pieces <a href="https://pages.cs.wisc.edu/~remzi/OSTEP/">[book]</a>
+
 * The prerequisities<a href="http://sercankulcu.github.io/files/os/0_The_prerequisites.pdf">[pdf]</a>
 * Important people <a href="http://sercankulcu.github.io/files/os/0_Important_people.pdf">[pdf]</a>
 
