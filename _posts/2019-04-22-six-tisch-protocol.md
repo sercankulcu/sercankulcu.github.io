@@ -1,7 +1,7 @@
 ---
 title: '6TiSCH protocol'
 date: 2019-04-22
-permalink: /posts/2019/04/6TiSCH-protocol/
+permalink: /posts/2019/04/six-tisch-protocol/
 tags:
   - software
   - career
