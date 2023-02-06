@@ -8,4 +8,5 @@ redirect_from:
 ---
 
 *  <a href="https://chat.openai.com/">[ChatGPT]</a>
+*  <a href="https://translate.google.com/">[Google Translate]</a>
 
