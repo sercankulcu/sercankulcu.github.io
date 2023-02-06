@@ -16,6 +16,7 @@ The resources:
 * Operating System Concepts <a href="https://www.os-book.com/OS10/index.html">[e-book]</a>
 * Modern Operating Systems <a href="https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X">[book]</a>
 * Operating Systems: Three Easy Pieces <a href="https://pages.cs.wisc.edu/~remzi/OSTEP/">[e-book]</a>
+* Bilgisayar İşletim Sistemleri <a href="http://sercankulcu.github.io/files/os/book_os_ali_saatci.pdf">[pdf]</a>
 
 The prerequisites: 
 -----
