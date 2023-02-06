@@ -7,6 +7,7 @@ redirect_from:
   - /bookmarks.html
 ---
 
-* a chatbot launched by OpenAI <a href="https://chat.openai.com/">[ChatGPT]</a>
-* a multilingual neural machine translation service <a href="https://translate.google.com/">[Google Translate]</a>
-
+* <a href="https://chat.openai.com/">[ChatGPT]</a> a chatbot launched by OpenAI 
+* <a href="https://translate.google.com/">[Google Translate]</a> a multilingual neural machine translation service
+* <a href="https://terimler.org/">[Terimler]</a> akademik bilim terimleri sözlüğü
+ 
