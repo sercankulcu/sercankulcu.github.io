@@ -3,7 +3,7 @@ permalink: /bookmarks/
 title: "Bookmarks"
 author_profile: true
 redirect_from: 
-  - /bookmarks/
+  - /bookmark/
   - /bookmarks.html
 ---
 
