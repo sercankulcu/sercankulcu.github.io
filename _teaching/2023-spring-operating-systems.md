@@ -31,6 +31,8 @@ This chapter could provide an overview of what an operating system is and its ro
 
 * Slides [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_01_Giris.pdf">[pdf]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/files/os/1_Introduction.pdf">[pdf]</a>
+* Prof. Dr. Kemal Bıçakcı [TR] <a href="https://www.youtube.com/watch?v=sqtkwd09KXs">[youtube]</a>
+
 * Questions & Answers from OSTEP <a href="http://sercankulcu.github.io/files/os/1_QA_from_OSTEP.pdf">[pdf]</a>
 
 Chapter 2: Processes and threads: 
