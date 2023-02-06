@@ -7,6 +7,6 @@ redirect_from:
   - /bookmarks.html
 ---
 
-*  <a href="https://chat.openai.com/">[ChatGPT]</a>
-*  <a href="https://translate.google.com/">[Google Translate]</a>
+* a chatbot launched by OpenAI <a href="https://chat.openai.com/">[ChatGPT]</a>
+* a multilingual neural machine translation service <a href="https://translate.google.com/">[Google Translate]</a>
 
