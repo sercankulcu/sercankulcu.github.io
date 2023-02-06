@@ -29,7 +29,8 @@ Chapter 1: Introduction to operating systems:
 -----
 This chapter could provide an overview of what an operating system is and its role in a computer system, as well as a brief history of the development of operating systems.
 
-* Slides [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_01_Giris.pdf">[pdf]</a>
+* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_01_Giris.pdf">[pdf]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders1.pdf">[pdf]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/files/os/1_Introduction.pdf">[pdf]</a>
 * Prof. Dr. Kemal Bıçakcı [TR] <a href="https://www.youtube.com/watch?v=sqtkwd09KXs">[youtube]</a>
 
