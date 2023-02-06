@@ -41,7 +41,7 @@ Chapter 2: Processes and threads:
 This chapter could cover the concepts of processes and threads, including how they are created and managed by the operating system, and how they interact with the CPU and memory.
 
 * Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Surecler_Is_Parcaciklari.pdf">[pdf2]</a>
-* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders3.pdf">[pdf3]
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders3.pdf">[pdf3]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders4.pdf">[pdf4]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders5.pdf">[pdf5]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders6a.pdf">[pdf6a]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders6b.pdf">[pdf6b]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/files/os/2_Processes.pdf">[pdf]</a>
 
 Chapter 3: Memory management: 
@@ -49,6 +49,7 @@ Chapter 3: Memory management:
 This chapter could delve into the various techniques and algorithms used by operating systems to manage the memory of a computer system, including virtual memory and paging.
 
 * Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_03_Bellek_Yonetimi.pdf">[pdf3]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders8.pdf">[pdf8]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders9.pdf">[pdf9]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/files/os/3_Memory.pdf">[pdf]</a>
 
 Chapter 4: File systems: 
@@ -57,6 +58,7 @@ Chapter 4: File systems:
 This chapter could discuss the different types of file systems that are used by operating systems and how they are used to store, organize, and access files on a computer.
 
 * Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_04_Dosya_Sistemi.pdf">[pdf4]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders10.pdf">[pdf10]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders11.pdf">[pdf11]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders12.pdf">[pdf12]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/files/os/4_File.pdf">[pdf]</a>
 
 Chapter 5: Input/output: 
@@ -71,6 +73,7 @@ Chapter 6: Deadlocks:
 This chapter could cover the principles of input/output (I/O) and how operating systems manage and coordinate I/O operations between the various hardware devices in a computer system.
 
 * Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_06_Kilitlenme.pdf">[pdf6]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders7.pdf">[pdf7]</a>
 * Notes [ENG] <a href="http://sercankulcu.github.io/files/os/6_Deadlocks.pdf">[pdf]</a>
 
 Chapter 7: Multimedia Operating Systems: 
