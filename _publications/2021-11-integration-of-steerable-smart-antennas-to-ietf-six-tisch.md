@@ -1,7 +1,7 @@
 ---
 title: "Integration of Steerable Smart Antennas to IETF 6TiSCH Protocol for High Reliability Wireless IoT Networks"
 collection: publications
-permalink: /publication/2021-01-01-integration-of-number-5
+permalink: /publication/2021/11/integration-of-steerable-smart-antennas-to-ietf-six-tisch
 excerpt: ''
 date: 2021-11-02
 venue: 'IEEE'
