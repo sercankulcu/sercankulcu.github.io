@@ -1,7 +1,7 @@
 ---
 title: "Improving Synchronization Time in 6TiSCH Networks with Smart Antennas"
 collection: publications
-permalink: /publication/2022-01-01-improving-synchronization-number-7
+permalink: /publication/2022/05/improving-synchronization-time-in-six-tisch-networks
 excerpt: ''
 date: 2022-05-15
 venue: 'IEEE'

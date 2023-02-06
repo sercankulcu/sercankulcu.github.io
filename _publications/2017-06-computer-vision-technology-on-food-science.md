@@ -1,7 +1,7 @@
 ---
 title: "Computer Vision Technology On Food Science"
 collection: publications
-permalink: /publication/2018-01-01-computer-vision-number-3
+permalink: /publication/2017/06/computer-vision-technology-on-food-science
 excerpt: ''
 date: 2017-06-11
 venue: 'Karaelmas'
