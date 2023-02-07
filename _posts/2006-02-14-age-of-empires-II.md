@@ -10,6 +10,8 @@ tags:
 
 Age of Empires II is a popular real-time strategy game that was released in 1999. It is set in the Middle Ages and allows players to build and control a civilization, train and manage armies, and engage in combat with other civilizations. Age of Empires II has received numerous expansions and updates since its release, and it remains popular to this day. The game has been praised for its depth, historical accuracy, and playability, and it has won several awards.
 
+<img src='/images/posts/thinking-mechanically.png'> 
+
 There are several things that made Age of Empires II special and contributed to its lasting popularity. Some of these include:
 
 * A wide variety of civilizations to choose from, each with its own unique strengths and abilities
