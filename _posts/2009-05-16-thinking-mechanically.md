@@ -1,5 +1,6 @@
 ---
 title: 'Thinking mechanically'
+excerpt: "Thinking mechanically<br/><img src='/images/thinking-mechanically.png'>"
 date: 2009-05-16
 permalink: /posts/2009/04/thinking-mechanically/
 tags:

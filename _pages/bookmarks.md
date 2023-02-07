@@ -16,3 +16,7 @@ redirect_from:
 * <a href="https://snappify.com/editor">[Snappify]</a> create beautiful code snippets with ease
 * <a href="https://eksisozluk.com/">[Ekşi Sözlük]</a> kutsal bilgi kaynağı
 * <a href="https://scholar.google.com/">[Google Scholar]</a> search engine for academic resources
+* <a href="https://www.notion.so/">[Notion]</a> manage and organize everything in one place
+* <a href="https://gumroad.com/">[Gumroad]</a> sell physical or digital products
+* <a href="https://www.producthunt.com/">[Producthunt]</a> introduce your product to the world
+
