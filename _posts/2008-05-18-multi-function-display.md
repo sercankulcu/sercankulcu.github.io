@@ -9,6 +9,8 @@ tags:
 
 As a pilot, one of the most important pieces of equipment in the cockpit is the Multi-Function Display (MFD). The MFD is a high-resolution display that can display a variety of information, including maps, weather radar, and flight information. It's typically located in the center of the instrument panel, between the primary flight display (PFD) and the navigation display (ND). The MFD is usually controlled by a cursor control device (CCD) which is a joystick or trackball that allows the pilot to navigate through the different pages of information on the display.
 
+<img src='/images/posts/multi-function-display.png'>
+
 One of the main functions of the MFD is navigation. The MFD can display a variety of navigation information, including a moving map, which shows the aircraft's position relative to the surrounding terrain and airspace. The MFD can also display information from the aircraft's navigation databases, such as waypoints, airways, and airports. This allows the pilot to easily plan a flight, and to quickly see the aircraft's position and track relative to the intended flight plan.
 
 Another important function of the MFD is weather information. The MFD can display weather radar information, which provides the pilot with an up-to-date picture of the weather conditions along the flight path. This information is crucial for avoiding thunderstorms and other severe weather conditions. Additionally, the MFD can also display weather information from other sources, such as weather forecasts and meteorological reports, which can be used to plan a flight and make in-flight decisions.
