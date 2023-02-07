@@ -1,6 +1,5 @@
 ---
 title: 'Thinking mechanically'
-excerpt: "Thinking mechanically<br/><img src='/images/thinking-mechanically.png'>"
 date: 2009-05-16
 permalink: /posts/2009/04/thinking-mechanically/
 tags:
@@ -9,6 +8,8 @@ tags:
 ---
 
 The concept of "thinking mechanically" refers to the idea that our thoughts, actions, and behavior are determined by a set of predetermined rules and principles. In other words, it suggests that our minds operate like a machine, following a set of predetermined patterns and processes.
+
+<img src='/images/thinking-mechanically.png'>
 
 This concept has its roots in the mechanistic philosophy that emerged during the Scientific Revolution of the 17th century. This philosophy posited that the universe and all its phenomena could be explained by the laws of physics and mechanics. Similarly, it was suggested that human beings and their behavior could also be understood in terms of mechanical principles.
 
