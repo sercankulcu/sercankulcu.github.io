@@ -19,5 +19,6 @@ redirect_from:
 * <a href="https://www.notion.so/">[Notion]</a> manage and organize everything in one place
 * <a href="https://gumroad.com/">[Gumroad]</a> sell physical or digital products
 * <a href="https://www.producthunt.com/">[Producthunt]</a> introduce your product to the world
+* <a href="https://replit.com/">[Replit]</a> platform for creating and sharing software
 
 <img src='/images/posts/owl-1.png'>
