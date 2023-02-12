@@ -9,6 +9,8 @@ tags:
 
 We have all heard the saying, "haste makes waste." This statement is particularly true when it comes to achieving our goals and aspirations. The story of a butterfly whose cocoon was prematurely torn open by impatient crows serves as a powerful metaphor for the consequences of being in a hurry.
 
+<img src='/images/posts/haste-makes-waste.png'>
+
 Like the butterfly, we too may have our own "cocoons" that we are trying to break out of. Whether it be a job we dislike, a relationship that is holding us back, or a personal limitation, we all have something we are trying to transcend. However, in our haste to break free, we may end up causing more harm than good.
 
 In the story, the butterfly's wings were torn, leaving it unable to fly. Similarly, when we rush things, we may end up with false wings, illusions that we have succeeded when in reality, we have not. These false wings may even lead us to believe that we have achieved our goal, when in reality, we are still stuck in our cocoon.
