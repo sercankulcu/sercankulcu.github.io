@@ -22,6 +22,8 @@ The zodiac is a system of astrology that divides the sky into 12 sections, known
 * Aquarius (January 20 - February 18)
 * Pisces (February 19 - March 20)
 
+<img src='/images/posts/zodiac-signs-compatibility.png'>
+
 Each zodiac sign is thought to be influenced by the characteristics and traits of the associated element (fire, earth, air, or water) and planet. Astrologers use the positions of the planets and other celestial bodies at the time of a person's birth to create a natal chart, which is believed to provide insight into a person's personality and future.
 
 Aries (March 21 - April 19)
