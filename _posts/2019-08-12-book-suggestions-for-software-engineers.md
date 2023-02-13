@@ -1,7 +1,7 @@
 ---
-title: 'Daily life of a software engineer'
-date: 2019-08-14
-permalink: /posts/2019/08/daily-life-of-a-software-engineer/
+title: 'Book suggestions for software engineers'
+date: 2019-08-12
+permalink: /posts/2019/08/book-suggestions-for-software-engineers/
 tags:
   - personal development
   - self-improvement
@@ -12,6 +12,8 @@ Here are some information about "How does a software engineer live?".
 
 Book suggestions for software engineers
 -----
+
+<img src='/images/posts/book-suggestions-for-software-engineers.png'>
 
 "The Art of Racing in the Rain" by Garth Stein - This novel is told from the perspective of a dog named Enzo, who is the loyal companion of a race car driver. It is a heartwarming and thought-provoking story about life, love, and the human-animal bond.
 
