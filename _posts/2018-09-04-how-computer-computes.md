@@ -17,6 +17,8 @@ Peripheral devices, such as a keyboard or mouse, are connected to the computer t
 
 The CPU uses a set of registers to hold data and perform calculations. Registers are small, fast storage locations within the CPU that can be accessed and modified quickly. The CPU also uses an arithmetic logic unit (ALU) to perform mathematical and logical operations on the data stored in the registers. The CPU also has a control unit that coordinates the fetching and execution of instructions, and manages the flow of data between the registers, memory, and peripheral devices.
 
+<img src='/images/posts/how-computer-computes.png'>
+
 Addition
 ---
 
