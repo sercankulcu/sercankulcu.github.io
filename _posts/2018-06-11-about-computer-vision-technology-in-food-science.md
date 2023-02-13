@@ -9,6 +9,8 @@ tags:
 
 Computer vision technology is a field of study that involves the development of algorithms and systems that enable computers to interpret and understand visual data. This includes the ability to analyze and understand images and videos, and to extract meaning and information from them. Computer vision technology is used in a wide range of applications, including robotics, image and video analysis, and machine learning. It is based on techniques from fields such as computer science, engineering, and mathematics, and involves the use of machine learning algorithms, image processing techniques, and other advanced methods to analyze and interpret visual data.
 
+<img src='/images/posts/about-computer-vision-technology-in-food-science.png'>
+
 Computer vision technology is used in food science to analyze and interpret images and videos of food products and processes. This includes applications such as the automatic inspection of food products for quality and safety, the analysis of food processing operations to improve efficiency and yield, and the development of systems for automating the sorting and grading of food products. In these and other applications, computer vision technology is used to extract meaningful information from images and videos of food products, such as the size, shape, color, and texture of the products. This information is then used to inform decision-making and improve the quality and efficiency of food production and processing.
 
 There are several benefits to using computer vision technology in food science, including:
