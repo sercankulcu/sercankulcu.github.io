@@ -8,6 +8,8 @@ tags:
 
 The landing of the Mars Pathfinder spacecraft on July 4, 1997, was a major achievement for NASA and the scientific community. The mission's primary goal was to demonstrate the feasibility of delivering a set of science instruments to the surface of Mars, and to return data to Earth. The landing itself was flawless, with the spacecraft successfully touching down on the Martian surface and transmitting data back to Earth.
 
+<img src='/images/posts/software-bug-of-pathfinder.png'>
+
 However, days after the successful landing, the Pathfinder spacecraft began to experience a series of system resets, which caused significant data loss. The system resets were caused by a software bug in the operating system of the spacecraft, which was known as VxWorks.
 
 VxWorks is a real-time operating system (RTOS) that provides preemptive priority scheduling of threads. This means that tasks on the spacecraft are executed as threads, and each thread is assigned a priority level based on the relative urgency of the task. The higher the priority level, the more quickly the task will be executed by the system.
