@@ -9,6 +9,8 @@ tags:
 
 Semantic web technologies are a set of tools and standards for representing and sharing data on the World Wide Web in a way that allows machines to understand and process the data. The goal of the semantic web is to create a common framework that allows data to be shared and reused across different applications and domains, enabling more intelligent and efficient access to information. The semantic web relies on the use of explicit and standardized definitions of the meanings of data elements, known as "ontologies," which provide a common vocabulary for describing and organizing data. This allows machines to understand the relationships between different data elements and to process and analyze the data in a more meaningful way.
 
+<img src='/images/posts/about-semantic-web-technologies.png'>
+
 Semantic web technologies work by representing data in a structured and standardized way, using ontologies to provide a common vocabulary for describing and organizing the data. This structured data can then be published on the web and accessed by machines, which are able to understand and process the data based on its meaning and context. One of the key technologies used in the semantic web is the Resource Description Framework (RDF), which is a standard for representing data in a machine-readable form. RDF data consists of a series of "triples," which are made up of a subject, predicate, and object, and can be used to represent any type of data, including information about people, events, and relationships. Other technologies used in the semantic web include the Web Ontology Language (OWL) and the SPARQL query language, which are used to define and query ontologies and RDF data.
 
 There are several benefits to using semantic web technologies, including:
@@ -34,6 +36,8 @@ There are several challenges and limitations to the adoption and use of semantic
 * Privacy and security concerns: The sharing of data on the semantic web raises concerns about privacy and security, as the data is more easily accessible and interpretable by machines.
 
 * Limited support for complex data: While the semantic web is well-suited for representing simple and structured data, it may not be as effective for representing more complex and unstructured data.
+
+<img src='/images/posts/about-semantic-web-technologies-2.png'>
 
 There are many examples of the use of semantic web technologies in a variety of applications and domains. Some examples include:
 
