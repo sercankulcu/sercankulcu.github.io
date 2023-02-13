@@ -8,7 +8,7 @@ tags:
 
 Agnosticism is a philosophical viewpoint that the existence of God or any ultimate reality is unknown and possibly unknowable. Agnostics do not claim to know whether there is a God, or if there is an ultimate reality, and they do not deny the existence of God or ultimate reality. They maintain that the existence of God or ultimate reality is a matter of personal belief, and that there is no way to prove or disprove it.
 
-<img src='/images/posts/agnosticism-1.png'>
+<img src='/images/posts/agnosticism.png'>
 
 Agnostics may also hold the belief that it is impossible to know whether God or any ultimate reality exists, and that any claims to know for certain are unjustified. They may also maintain that the question of the existence of God or ultimate reality is unimportant or irrelevant to their lives, and that they are more focused on understanding the natural world and living a moral life.
 
