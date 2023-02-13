@@ -134,19 +134,19 @@ Programming languages are used to write the code that is used to create software
 
 There are many factors to consider when choosing a programming language for a software development project, such as the requirements of the project, the skills and expertise of the development team, and the availability of resources and support.
 
-<ul>
-<li>Some programming languages are more suited to certain types of software development tasks, such as low-level systems programming or web development.</li>
 
-<li>Many programming languages have a large and active community of developers, who contribute to the language's development and provide support and resources for users.</li>
+* Some programming languages are more suited to certain types of software development tasks, such as low-level systems programming or web development.
 
-<li>Some programming languages are more popular than others, and this can be an important consideration for software developers who are looking for job opportunities or want to work on projects with a large user base.</li>
+* Many programming languages have a large and active community of developers, who contribute to the language's development and provide support and resources for users.
 
-<li>Some programming languages are designed to be easy to learn and use, while others are more complex and require a deeper understanding of computer science concepts.</li>
+* Some programming languages are more popular than others, and this can be an important consideration for software developers who are looking for job opportunities or want to work on projects with a large user base.
 
-<li>Some programming languages are open-source, which means that their source code is available for anyone to use, modify, and distribute. This can be a major advantage for software developers who want to build on existing tools and resources.</li>
+* Some programming languages are designed to be easy to learn and use, while others are more complex and require a deeper understanding of computer science concepts.
+
+* Some programming languages are open-source, which means that their source code is available for anyone to use, modify, and distribute. This can be a major advantage for software developers who want to build on existing tools and resources.
 
 Programming languages are constantly evolving, with new languages being developed and existing languages being updated and improved. Software developers need to stay up-to-date with the latest developments in the field in order to choose the right programming language for their projects.
-</ul>
+
 Some of the most popular programming languages used in software development include:
 
 <b>C:</b> This is a high-level programming language that is widely used in software development. It is fast, powerful, and versatile, and it is commonly used to create operating systems, web browsers, and other system-level software.
@@ -204,21 +204,21 @@ What is the role of a software engineer?
 Software engineering is a field that involves the design, development, and maintenance of software systems. Software engineers are responsible for creating and maintaining software that is reliable, efficient, and effective.
 
 The role of a software engineer includes a variety of tasks and responsibilities, such as:
-<ul>
-<li>Analyzing user requirements and defining the scope and objectives of software development projects.</li>
 
-<li>Designing and developing software solutions using programming languages and frameworks.</li>
+* Analyzing user requirements and defining the scope and objectives of software development projects.
 
-<li>Testing and debugging software to ensure it is reliable and free of defects.</li>
+* Designing and developing software solutions using programming languages and frameworks.
 
-<li>Collaborating with other team members and stakeholders to ensure that software development projects are delivered on time and meet the needs of users.</li>
+* Testing and debugging software to ensure it is reliable and free of defects.
 
-<li>Maintaining and updating software to fix bugs, add new features, and improve performance.</li>
+* Collaborating with other team members and stakeholders to ensure that software development projects are delivered on time and meet the needs of users.
 
-<li>Documenting software design, architecture, and functionality for future reference and maintenance.</li>
+* Maintaining and updating software to fix bugs, add new features, and improve performance.
 
-<li>Staying up-to-date with the latest developments in software engineering and staying abreast of new technologies and trends.</li>
-</ul>
+* Documenting software design, architecture, and functionality for future reference and maintenance.
+
+* Staying up-to-date with the latest developments in software engineering and staying abreast of new technologies and trends.
+
 Software engineers play a vital role in the development and maintenance of software systems. They are responsible for creating high-quality software that meets the needs of users and contributes to the success of organizations.
 
 What are some common problems faced during software development?
