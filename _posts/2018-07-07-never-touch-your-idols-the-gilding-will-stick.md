@@ -9,6 +9,8 @@ tags:
 
 The phrase "Never touch your idols - the gilding will stick" is a powerful reminder that the people we idolize and look up to are not perfect and their flaws will inevitably be exposed. It suggests that by holding these individuals to such high standards, we risk being disappointed when we inevitably find out that they are not who we thought they were.
 
+<img src='/images/posts/never-touch-your-idols-the-gilding-will-stick.png'>
+
 However, it is not only about the idols that we admire, but also the way we perceive and understand the world around us. The phrase also highlights the importance of being realistic and understanding that there is no such thing as a perfect person or situation. When we idolize someone or something, we tend to see only the good, the beauty and the success, and ignore the truth, essence and essence of the events.
 
 This idea of not touching the idols also applies to our own self-perception. We often put ourselves under pressure to live up to the ideals we see in others, but this can lead to disappointment and dissatisfaction when we inevitably fall short. It is important to remember that everyone has their own flaws and imperfections, and it is unrealistic to expect ourselves to be perfect.
