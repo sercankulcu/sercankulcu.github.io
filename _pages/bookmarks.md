@@ -21,5 +21,15 @@ redirect_from:
 * <a href="https://www.producthunt.com/">[Producthunt]</a> introduce your product to the world
 * <a href="https://replit.com/">[Replit]</a> platform for creating and sharing software
 * <a href="https://www.buymeacoffee.com/">[Buy Me a Coffee]</a> accept donations
+* <a href="https://huggingface.co/">[Hugging Face]</a> AI community building the future
+* <a href="https://you.com/">[You]</a> AI Search Engine You Control
+* <a href="https://stackoverflow.com/">[Stack Overflow]</a> community-driven platform where you can ask and answer technical questions
+* <a href="https://github.com/">[GitHub]</a> web-based platform that offers version control
+* <a href="https://www.hackerrank.com/">[HackerRank]</a> website that provides coding challenges and competitions
+* <a href="https://leetcode.com/">[LeetCode]</a> platform that offers a collection of coding challenges
+* <a href="https://youtube.com/">[YouTube]</a> video-sharing platform
+* <a href="https://twitter.com/">[Twitter]</a> microblogging platform 
+* <a href="https://linkedin.com/">[LinkedIn]</a> professional networking platform 
+* <a href="https://reddit.com/">[Reddit]</a> social news and discussion platform 
 
 <img src='/images/posts/owl-1.png'>
