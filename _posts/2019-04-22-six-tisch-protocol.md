@@ -16,6 +16,8 @@ What is the 6TiSCH protocol?
 
 The 6TiSCH protocol is designed to provide a reliable and secure communication layer for IoT devices that need to communicate with each other and with the wider Internet. It is particularly well-suited for use in industrial, agricultural, and other environments where low-power, low-bandwidth communication is required.
 
+<img src='/images/posts/six-tisch-protocol.png'>
+
 One of the key features of the 6TiSCH protocol is its support for time-slotted channel hopping (TSCH), which allows devices to communicate with each other over a series of predefined radio channels in a coordinated manner. This helps to improve the reliability and efficiency of the communication, as it allows devices to avoid interference and collision with other devices that may be transmitting on the same channel.
 
 Another important feature of the 6TiSCH protocol is its support for IPv6, the latest version of the Internet Protocol (IP). This allows devices that use the 6TiSCH protocol to communicate directly with each other and with the wider Internet using standard IP addresses, enabling seamless integration with the existing Internet infrastructure.
