@@ -10,6 +10,8 @@ tags:
 
 Vim is a text editor that is widely used by programmers and users who prefer to use a command-line interface (CLI). It is known for its powerful features and efficiency, and is often used as a replacement for the standard terminal text editor, vi. Vim is available on most Unix-like operating systems, as well as on Windows. Some of the features of Vim include syntax highlighting, support for multiple programming languages, and the ability to use multiple windows and buffers for editing files. One of the key features of Vim is its mode-based interface, which allows the user to perform different actions depending on the mode that Vim is in. For example, in normal mode, the user can navigate through the text and make basic edits, while in insert mode, the user can insert new text into the file.
 
+<img src='/images/posts/vim-a-powerful-text-editor-1.png'>
+
 Motto
 -----
 
@@ -29,6 +31,8 @@ There are several reasons why you might want to use Vim as your text editor:
 * Community support: Vim has a large and active community of users, which means that you can find a lot of resources online to help you learn how to use the editor and troubleshoot any issues you might encounter.
 
 * Versatility: Vim can be used for a wide range of tasks, from simple text editing to complex programming projects. It is particularly well-suited for editing code and working with configuration files.
+
+<img src='/images/posts/vim-a-powerful-text-editor-2.png'>
 
 History
 -----
