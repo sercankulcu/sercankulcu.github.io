@@ -32,4 +32,6 @@ redirect_from:
 * <a href="https://linkedin.com/">[LinkedIn]</a> professional networking platform 
 * <a href="https://reddit.com/">[Reddit]</a> social news and discussion platform 
 
-<img src='/images/posts/owl-1.png'>
+[//]: # (This may be the most platform independent comment)
+[//]: # (<img src='/images/posts/owl-1.png'>)
+![](images/posts/owl-1.png)
