@@ -1,5 +1,5 @@
 ---
-title: 'The Hilbert's Paradox'
+title: 'The Hilberts Paradox'
 date: 2012-02-12
 permalink: /posts/2012/02/the-hilbert-s-paradox/
 tags:

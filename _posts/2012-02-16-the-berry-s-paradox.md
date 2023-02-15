@@ -1,5 +1,5 @@
 ---
-title: 'The Berry's Paradox'
+title: 'The Berrys Paradox'
 date: 2012-02-16
 permalink: /posts/2012/02/the-berry-s-paradox/
 tags:
