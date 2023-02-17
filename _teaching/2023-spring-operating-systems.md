@@ -26,7 +26,7 @@ You can find the prerequisites for taking the course here.
 * Important people <a href="http://sercankulcu.github.io/files/os/Important_people.pdf">[pdf]</a>
 * Questions & Answers from OSTEP <a href="http://sercankulcu.github.io/files/os/QA_from_OSTEP.pdf">[pdf]</a>
 
-Chapter 1: Introduction to operating systems: 
+Chapter 1: Introduction: 
 -----
 This chapter could provide an overview of what an operating system is and its role in a computer system, as well as a brief history of the development of operating systems.
 
@@ -38,7 +38,10 @@ This chapter could provide an overview of what an operating system is and its ro
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
 
-Chapter 2: Processes and threads: 
+Chapter 2: Operating System Structures: 
+-----
+
+Chapter 3: Processes: 
 -----
 This chapter could cover the concepts of processes and threads, including how they are created and managed by the operating system, and how they interact with the CPU and memory.
 
@@ -49,7 +52,28 @@ This chapter could cover the concepts of processes and threads, including how th
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
 
-Chapter 3: Memory management: 
+Chapter 4: Threads: 
+-----
+
+Chapter 5: Scheduling: 
+-----
+
+Chapter 6: Synchronization: 
+-----
+
+Chapter 7: Deadlocks: 
+-----
+This chapter could cover the principles of input/output (I/O) and how operating systems manage and coordinate I/O operations between the various hardware devices in a computer system.
+
+* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_06_Kilitlenme.pdf">[pdf6]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders7.pdf">[pdf7]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch7.pdf">[pdf7]</a>
+
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
+
+
+Chapter 8: Memory management: 
 -----
 This chapter could delve into the various techniques and algorithms used by operating systems to manage the memory of a computer system, including virtual memory and paging.
 
@@ -60,7 +84,7 @@ This chapter could delve into the various techniques and algorithms used by oper
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
 
-Chapter 4: File systems: 
+Chapter 9: File systems: 
 -----
 
 This chapter could discuss the different types of file systems that are used by operating systems and how they are used to store, organize, and access files on a computer.
@@ -72,7 +96,7 @@ This chapter could discuss the different types of file systems that are used by 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
 
-Chapter 5: Input/output: 
+Chapter 10: Input/output: 
 -----
 This chapter could cover the principles of input/output (I/O) and how operating systems manage and coordinate I/O operations between the various hardware devices in a computer system.
 
@@ -83,18 +107,8 @@ This chapter could cover the principles of input/output (I/O) and how operating 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
 
-Chapter 6: Deadlocks: 
------
-This chapter could cover the principles of input/output (I/O) and how operating systems manage and coordinate I/O operations between the various hardware devices in a computer system.
 
-* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_06_Kilitlenme.pdf">[pdf6]</a>
-* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders7.pdf">[pdf7]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch7.pdf">[pdf7]</a>
-
-* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
-
-Chapter 7: Multimedia Operating Systems: 
+Chapter 11: Multimedia Operating Systems: 
 -----
 
 * Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_07_Coklu_Ortam_Isletim_Sistemi.pdf">[pdf7]</a>
@@ -102,7 +116,7 @@ Chapter 7: Multimedia Operating Systems:
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
 
-Chapter 8: Multiple processor systems: 
+Chapter 12: Multiple processor systems: 
 -----
 This chapter could discuss the various security measures that are implemented in modern operating systems, including access controls, authentication, and encryption.
 
@@ -112,7 +126,7 @@ This chapter could discuss the various security measures that are implemented in
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
 
-Chapter 9: Security: 
+Chapter 13: Security: 
 -----
 This chapter could discuss the various security measures that are implemented in modern operating systems, including access controls, authentication, and encryption.
 
@@ -122,7 +136,7 @@ This chapter could discuss the various security measures that are implemented in
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
 
-Chapter 10: Operating system design: 
+Chapter 14: Operating system design: 
 -----
 This chapter could delve into the various design considerations and trade-offs that must be made when designing an operating system, including scalability, reliability, and performance.
 
@@ -131,7 +145,7 @@ This chapter could delve into the various design considerations and trade-offs t
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
 
-Chapter 11: Case studies:
+Chapter 15: Case studies:
 -----
 This chapter could provide examples of different operating systems and their key features and characteristics.
 
