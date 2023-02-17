@@ -18,9 +18,8 @@ The resources:
 * Operating Systems: Three Easy Pieces <a href="https://pages.cs.wisc.edu/~remzi/OSTEP/">[e-book]</a>
 * Bilgisayar İşletim Sistemleri <a href="http://sercankulcu.github.io/files/os/book_os_ali_saatci.pdf">[pdf]</a>
 
-The prerequisites: 
+Preface: 
 -----
-You can find the prerequisites for taking the course here.
 
 * The prerequisities<a href="http://sercankulcu.github.io/files/os/The_prerequisites.pdf">[pdf]</a>
 * Important people <a href="http://sercankulcu.github.io/files/os/Important_people.pdf">[pdf]</a>
@@ -28,7 +27,6 @@ You can find the prerequisites for taking the course here.
 
 Chapter 1: Introduction: 
 -----
-This chapter could provide an overview of what an operating system is and its role in a computer system, as well as a brief history of the development of operating systems.
 
 * **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_01_Giris.pdf">[pdf1]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders1.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders2.pdf">[pdf2]</a>
@@ -43,7 +41,6 @@ Chapter 2: Operating System Structures:
 
 Chapter 3: Processes: 
 -----
-This chapter could cover the concepts of processes and threads, including how they are created and managed by the operating system, and how they interact with the CPU and memory.
 
 * **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Surecler_Is_Parcaciklari.pdf">[pdf2]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders3.pdf">[pdf3]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders4.pdf">[pdf4]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders5.pdf">[pdf5]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders6a.pdf">[pdf6a]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders6b.pdf">[pdf6b]</a>
@@ -63,9 +60,8 @@ Chapter 6: Synchronization:
 
 Chapter 7: Deadlocks: 
 -----
-This chapter could cover the principles of input/output (I/O) and how operating systems manage and coordinate I/O operations between the various hardware devices in a computer system.
 
-* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_06_Kilitlenme.pdf">[pdf6]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_06_Kilitlenme.pdf">[pdf6]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders7.pdf">[pdf7]</a>
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch7.pdf">[pdf7]</a>
 
@@ -75,9 +71,8 @@ This chapter could cover the principles of input/output (I/O) and how operating 
 
 Chapter 8: Memory management: 
 -----
-This chapter could delve into the various techniques and algorithms used by operating systems to manage the memory of a computer system, including virtual memory and paging.
 
-* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_03_Bellek_Yonetimi.pdf">[pdf3]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_03_Bellek_Yonetimi.pdf">[pdf3]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders8.pdf">[pdf8]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders9.pdf">[pdf9]</a>
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch8.pdf">[pdf8]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch9.pdf">[pdf9]</a>
 
@@ -87,9 +82,7 @@ This chapter could delve into the various techniques and algorithms used by oper
 Chapter 9: File systems: 
 -----
 
-This chapter could discuss the different types of file systems that are used by operating systems and how they are used to store, organize, and access files on a computer.
-
-* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_04_Dosya_Sistemi.pdf">[pdf4]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_04_Dosya_Sistemi.pdf">[pdf4]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders10.pdf">[pdf10]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders11.pdf">[pdf11]</a>
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch11.pdf">[pdf11]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch12.pdf">[pdf12]</a>
 
@@ -98,9 +91,8 @@ This chapter could discuss the different types of file systems that are used by 
 
 Chapter 10: Input/output: 
 -----
-This chapter could cover the principles of input/output (I/O) and how operating systems manage and coordinate I/O operations between the various hardware devices in a computer system.
 
-* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_05_Giris_Cikis.pdf">[pdf5]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_05_Giris_Cikis.pdf">[pdf5]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders12.pdf">[pdf12]</a>
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch10.pdf">[pdf10]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch13.pdf">[pdf13]</a>
 
@@ -118,9 +110,8 @@ Chapter 11: Multimedia Operating Systems:
 
 Chapter 12: Multiple processor systems: 
 -----
-This chapter could discuss the various security measures that are implemented in modern operating systems, including access controls, authentication, and encryption.
 
-* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_08_Cok_Islemcili_Sistemler.pdf">[pdf8]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_08_Cok_Islemcili_Sistemler.pdf">[pdf8]</a>
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch16.pdf">[pdf16]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch17.pdf">[pdf17]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
@@ -128,9 +119,8 @@ This chapter could discuss the various security measures that are implemented in
 
 Chapter 13: Security: 
 -----
-This chapter could discuss the various security measures that are implemented in modern operating systems, including access controls, authentication, and encryption.
 
-* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_09_Guvenlik.pdf">[pdf9]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_09_Guvenlik.pdf">[pdf9]</a>
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch14.pdf">[pdf14]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch15.pdf">[pdf15]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
@@ -138,27 +128,25 @@ This chapter could discuss the various security measures that are implemented in
 
 Chapter 14: Operating system design: 
 -----
-This chapter could delve into the various design considerations and trade-offs that must be made when designing an operating system, including scalability, reliability, and performance.
 
-* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_10_Isletim_Sistemi_Tasarimi.pdf">[pdf10]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_10_Isletim_Sistemi_Tasarimi.pdf">[pdf10]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
 
 Chapter 15: Case studies:
 -----
-This chapter could provide examples of different operating systems and their key features and characteristics.
 
-<b>UNIX - Linux</b>
-* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_11_Linux.pdf">[pdf11]</a>
+**UNIX - Linux**
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_11_Linux.pdf">[pdf11]</a>
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch18.pdf">[pdf18]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
 
-<b>Windows 7</b>
+**Windows 7**
 
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch19.pdf">[pdf19]</a>
 
-<b>Free BSD</b>
+**Free BSD**
 
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/appA.pdf">[pdf20]</a>
