@@ -30,7 +30,7 @@ Chapter 1: Introduction:
 -----
 This chapter could provide an overview of what an operating system is and its role in a computer system, as well as a brief history of the development of operating systems.
 
-* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_01_Giris.pdf">[pdf1]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_01_Giris.pdf">[pdf1]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders1.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders2.pdf">[pdf2]</a>
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch1.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch2.pdf">[pdf2]</a>
 * Prof. Dr. Kemal Bıçakcı [TR] <a href="https://www.youtube.com/watch?v=sqtkwd09KXs">[youtube]</a>
@@ -45,7 +45,7 @@ Chapter 3: Processes:
 -----
 This chapter could cover the concepts of processes and threads, including how they are created and managed by the operating system, and how they interact with the CPU and memory.
 
-* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Surecler_Is_Parcaciklari.pdf">[pdf2]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Surecler_Is_Parcaciklari.pdf">[pdf2]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders3.pdf">[pdf3]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders4.pdf">[pdf4]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders5.pdf">[pdf5]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders6a.pdf">[pdf6a]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders6b.pdf">[pdf6b]</a>
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch3.pdf">[pdf3]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch4.pdf">[pdf4]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch5.pdf">[pdf5]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch6.pdf">[pdf6]</a>
 
