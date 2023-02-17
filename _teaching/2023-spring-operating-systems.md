@@ -28,9 +28,9 @@ Preface:
 Chapter 1: Introduction: 
 -----
 
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_01_Giris.pdf">[pdf1]</a>
-* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders1.pdf">[pdf1]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch1.pdf">[pdf1]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_01_Giris.pdf">[pdf]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders1.pdf">[pdf]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch1.pdf">[pdf]</a>
 * Prof. Dr. Kemal Bıçakcı [TR] <a href="https://www.youtube.com/watch?v=sqtkwd09KXs">[youtube]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
@@ -39,9 +39,9 @@ Chapter 1: Introduction:
 Chapter 2: Operating System Structures: 
 -----
 
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_01_Giris.pdf">[pdf2]</a>
-* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders2.pdf">[pdf2]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch2.pdf">[pdf2]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_01_Giris.pdf">[pdf]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders2.pdf">[pdf]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch2.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_02.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_02.pdf">[pdf]</a>
@@ -49,9 +49,9 @@ Chapter 2: Operating System Structures:
 Chapter 3: Processes: 
 -----
 
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Surecler_Is_Parcaciklari.pdf">[pdf3]</a>
-* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders3.pdf">[pdf3]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch3.pdf">[pdf3]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Surecler_Is_Parcaciklari.pdf">[pdf]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders3.pdf">[pdf]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch3.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_03.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_03.pdf">[pdf]</a>
@@ -59,9 +59,9 @@ Chapter 3: Processes:
 Chapter 4: Threads: 
 -----
 
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Surecler_Is_Parcaciklari.pdf">[pdf4]</a>
-* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders4.pdf">[pdf4]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch4.pdf">[pdf4]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Surecler_Is_Parcaciklari.pdf">[pdf]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders4.pdf">[pdf]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch4.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_04.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_04.pdf">[pdf]</a>
@@ -69,9 +69,9 @@ Chapter 4: Threads:
 Chapter 5: Scheduling: 
 -----
 
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Surecler_Is_Parcaciklari.pdf">[pdf5]</a>
-* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders5.pdf">[pdf5]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch5.pdf">[pdf5]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Surecler_Is_Parcaciklari.pdf">[pdf]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders5.pdf">[pdf]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch5.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_05.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_05.pdf">[pdf]</a>
@@ -131,7 +131,7 @@ Chapter 10: Input/output:
 Chapter 11: Multimedia Operating Systems: 
 -----
 
-* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_07_Coklu_Ortam_Isletim_Sistemi.pdf">[pdf]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_07_Coklu_Ortam_Isletim_Sistemi.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_11.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_11.pdf">[pdf]</a>
