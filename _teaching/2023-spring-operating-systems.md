@@ -29,8 +29,8 @@ Chapter 1: Introduction:
 -----
 
 * **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_01_Giris.pdf">[pdf1]</a>
-* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders1.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders2.pdf">[pdf2]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch1.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch2.pdf">[pdf2]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders1.pdf">[pdf1]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch1.pdf">[pdf1]</a>
 * Prof. Dr. Kemal Bıçakcı [TR] <a href="https://www.youtube.com/watch?v=sqtkwd09KXs">[youtube]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
@@ -39,114 +39,142 @@ Chapter 1: Introduction:
 Chapter 2: Operating System Structures: 
 -----
 
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_01_Giris.pdf">[pdf2]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders2.pdf">[pdf2]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch2.pdf">[pdf2]</a>
+
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_02.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_02.pdf">[pdf]</a>
+
 Chapter 3: Processes: 
 -----
 
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Surecler_Is_Parcaciklari.pdf">[pdf2]</a>
-* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders3.pdf">[pdf3]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders4.pdf">[pdf4]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders5.pdf">[pdf5]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders6a.pdf">[pdf6a]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders6b.pdf">[pdf6b]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch3.pdf">[pdf3]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch4.pdf">[pdf4]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch5.pdf">[pdf5]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch6.pdf">[pdf6]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Surecler_Is_Parcaciklari.pdf">[pdf3]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders3.pdf">[pdf3]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch3.pdf">[pdf3]</a>
 
-* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_03.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_03.pdf">[pdf]</a>
 
 Chapter 4: Threads: 
 -----
 
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Surecler_Is_Parcaciklari.pdf">[pdf4]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders4.pdf">[pdf4]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch4.pdf">[pdf4]</a>
+
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_04.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_04.pdf">[pdf]</a>
+
 Chapter 5: Scheduling: 
 -----
+
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Surecler_Is_Parcaciklari.pdf">[pdf5]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders5.pdf">[pdf5]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch5.pdf">[pdf5]</a>
+
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_05.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_05.pdf">[pdf]</a>
 
 Chapter 6: Synchronization: 
 -----
 
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Surecler_Is_Parcaciklari.pdf">[pdf]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders6a.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders6b.pdf">[pdf2]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch6.pdf">[pdf]</a>
+
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_06.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_06.pdf">[pdf]</a>
+
 Chapter 7: Deadlocks: 
 -----
 
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_06_Kilitlenme.pdf">[pdf6]</a>
-* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders7.pdf">[pdf7]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch7.pdf">[pdf7]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_06_Kilitlenme.pdf">[pdf]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders7.pdf">[pdf]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch7.pdf">[pdf]</a>
 
-* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_07.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_07.pdf">[pdf]</a>
 
 
 Chapter 8: Memory management: 
 -----
 
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_03_Bellek_Yonetimi.pdf">[pdf3]</a>
-* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders8.pdf">[pdf8]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders9.pdf">[pdf9]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch8.pdf">[pdf8]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch9.pdf">[pdf9]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_03_Bellek_Yonetimi.pdf">[pdf]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders8.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders9.pdf">[pdf2]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch8.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch9.pdf">[pdf2]</a>
 
-* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_08.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_08.pdf">[pdf]</a>
 
 Chapter 9: File systems: 
 -----
 
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_04_Dosya_Sistemi.pdf">[pdf4]</a>
-* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders10.pdf">[pdf10]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders11.pdf">[pdf11]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch11.pdf">[pdf11]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch12.pdf">[pdf12]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_04_Dosya_Sistemi.pdf">[pdf]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders10.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders11.pdf">[pdf2]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch11.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch12.pdf">[pdf2]</a>
 
-* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_09.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_09.pdf">[pdf]</a>
 
 Chapter 10: Input/output: 
 -----
 
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_05_Giris_Cikis.pdf">[pdf5]</a>
-* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders12.pdf">[pdf12]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch10.pdf">[pdf10]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch13.pdf">[pdf13]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_05_Giris_Cikis.pdf">[pdf]</a>
+* Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders12.pdf">[pdf]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch10.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch13.pdf">[pdf2]</a>
 
-* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_10.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_10.pdf">[pdf]</a>
 
 
 Chapter 11: Multimedia Operating Systems: 
 -----
 
-* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_07_Coklu_Ortam_Isletim_Sistemi.pdf">[pdf7]</a>
+* Slides MOS [TR] <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_07_Coklu_Ortam_Isletim_Sistemi.pdf">[pdf]</a>
 
-* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_11.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_11.pdf">[pdf]</a>
 
 Chapter 12: Multiple processor systems: 
 -----
 
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_08_Cok_Islemcili_Sistemler.pdf">[pdf8]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch16.pdf">[pdf16]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch17.pdf">[pdf17]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_08_Cok_Islemcili_Sistemler.pdf">[pdf]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch16.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch17.pdf">[pdf2]</a>
 
-* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_12.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_12.pdf">[pdf]</a>
 
 Chapter 13: Security: 
 -----
 
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_09_Guvenlik.pdf">[pdf9]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch14.pdf">[pdf14]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch15.pdf">[pdf15]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_09_Guvenlik.pdf">[pdf]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch14.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch15.pdf">[pdf2]</a>
 
-* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_13.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_13.pdf">[pdf]</a>
 
 Chapter 14: Operating system design: 
 -----
 
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_10_Isletim_Sistemi_Tasarimi.pdf">[pdf10]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_10_Isletim_Sistemi_Tasarimi.pdf">[pdf]</a>
 
-* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_14.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_14.pdf">[pdf]</a>
 
 Chapter 15: Case studies:
 -----
 
 **UNIX - Linux**
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_11_Linux.pdf">[pdf11]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch18.pdf">[pdf18]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_11_Linux.pdf">[pdf]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch18.pdf">[pdf]</a>
 
-* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_15.pdf">[pdf]</a>
 
 **Windows 7**
 
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch19.pdf">[pdf19]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch19.pdf">[pdf]</a>
 
 **Free BSD**
 
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/appA.pdf">[pdf20]</a>
+* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/appA.pdf">[pdf]</a>
