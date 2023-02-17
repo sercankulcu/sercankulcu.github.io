@@ -128,31 +128,32 @@ Chapter 10: Input/output:
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_10.pdf">[pdf]</a>
 
 
-Chapter 11: Multimedia Operating Systems: 
------
-
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_07_Coklu_Ortam_Isletim_Sistemi.pdf">[pdf]</a>
-
-* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_11.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_11.pdf">[pdf]</a>
-
-Chapter 12: Multiple processor systems: 
+Chapter 11: Multiple processor systems: 
 -----
 
 * **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_08_Cok_Islemcili_Sistemler.pdf">[pdf]</a>
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch16.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch17.pdf">[pdf2]</a>
 
-* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_12.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_12.pdf">[pdf]</a>
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_11.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_11.pdf">[pdf]</a>
 
-Chapter 13: Security: 
+Chapter 12: Security: 
 -----
 
 * **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_09_Guvenlik.pdf">[pdf]</a>
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch14.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch15.pdf">[pdf2]</a>
 
+* Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_12.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_12.pdf">[pdf]</a>
+
+Chapter 13: Multimedia: 
+-----
+
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_07_Coklu_Ortam_Isletim_Sistemi.pdf">[pdf]</a>
+
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_13.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_13.pdf">[pdf]</a>
+
 
 Chapter 14: Operating system design: 
 -----
