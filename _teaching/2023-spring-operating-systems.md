@@ -36,10 +36,10 @@ Chapter 1: Introduction:
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
 
-Chapter 2: Operating System Structures: 
+Chapter 2: Structures: 
 -----
 
-* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_01_Giris.pdf">[pdf]</a>
+* **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Yapilar.pdf">[pdf]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders2.pdf">[pdf]</a>
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch2.pdf">[pdf]</a>
 
