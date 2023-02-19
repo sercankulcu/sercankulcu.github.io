@@ -17,6 +17,7 @@ The resources:
 * Modern Operating Systems <a href="https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X">[book]</a>
 * Operating Systems: Three Easy Pieces <a href="https://pages.cs.wisc.edu/~remzi/OSTEP/">[e-book]</a>
 * Bilgisayar İşletim Sistemleri <a href="http://sercankulcu.github.io/files/os/book_os_ali_saatci.pdf">[pdf]</a>
+* Operating System Development <a href="https://wiki.osdev.org/Main_Page">[website]</a>
 
 Preface: 
 -----
