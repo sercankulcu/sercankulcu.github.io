@@ -13,6 +13,7 @@ redirect_from:
 * <a href="https://eski.tbd.org.tr/index.php?sayfa=sozluk&mi1">[Bilişim Sözlüğü]</a> türkiye bilişim derneği bilişim terimleri karşılıklar sözlüğü
 * <a href="https://quillbot.com/">[Quillbot]</a> paraphrasing tool
 * <a href="https://www.imagetotext.info/">[Image To Text]</a> image to text converter
+* <a href="https://www.remove.bg/">[Removebg]</a> remove image background
 * <a href="https://snappify.com/editor">[Snappify]</a> create beautiful code snippets with ease
 * <a href="https://eksisozluk.com/">[Ekşi Sözlük]</a> kutsal bilgi kaynağı
 * <a href="https://scholar.google.com/">[Google Scholar]</a> search engine for academic resources
