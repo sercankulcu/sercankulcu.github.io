@@ -108,7 +108,7 @@ Chapter 8: Memory management:
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_08.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_08.pdf">[pdf]</a>
 
-Chapter 9: Virtual Memory management: 
+Chapter 9: Virtual memory: 
 -----
 
 * **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_09_Sanal_Bellek.pdf">[pdf]</a>
