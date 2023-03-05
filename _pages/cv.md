@@ -11,7 +11,7 @@ redirect_from:
 
 ## Education
 
-* Ph.D in Computer Engineering, <img src="/images/logo-ktu.png" alt="KTU" height="40"> Karadeniz Technical University, 2022
+* Ph.D in Computer Engineering, <img src="/images/logo-ktu.png" alt="KTU" width="40" height="40"> Karadeniz Technical University, 2022
 * M.S. in Information Systems, <img src="/images/logo-hacettepe.png" alt="Hacettepe" height="40"> Hacettepe University, 2010
 * B.S. in Computer Engineering, <img src="/images/logo-hacettepe.png" alt="Hacettepe" height="40"> Hacettepe University, 2006
 
