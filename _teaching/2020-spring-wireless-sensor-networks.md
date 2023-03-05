@@ -13,49 +13,69 @@ This course provides an introduction to the fundamental concepts, technologies, 
 Chapter 1: Introduction
 -----
 
-* Notes [ENG] <a href="http://sercankulcu.github.io/files/wsn/1_Introduction.pdf">[pdf]</a>
+In this chapter, we will provide an overview of what wireless sensor networks are, their applications, and the challenges associated with designing and deploying such networks.
+
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/1_Introduction.pdf">[pdf]</a>
 
 Chapter 2: Physical layer and wireless communication technologies
 -----
 
-* Notes [ENG] <a href="http://sercankulcu.github.io/files/wsn/2_Physical.pdf">[pdf]</a>
+The physical layer is an essential component of wireless sensor networks that handles the transmission and reception of data packets through the use of wireless communication technologies, such as radio waves and infrared signals.
+
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/2_Physical.pdf">[pdf]</a>
 
 Chapter 3: MAC layer protocols and medium access control
 -----
 
-* Notes [ENG] <a href="http://sercankulcu.github.io/files/wsn/3_Mac.pdf">[pdf]</a>
+The Medium Access Control (MAC) layer is a crucial component in wireless sensor networks that manages communication between nodes, controls access to the shared communication medium, and ensures reliable data transmission. In this chapter, we will explore the fundamental concepts and protocols of the MAC layer in wireless sensor networks.
+
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/3_Mac.pdf">[pdf]</a>
 
 Chapter 4: Routing protocols and network topologies
 -----
 
-* Notes [ENG] <a href="http://sercankulcu.github.io/files/wsn/4_Routing.pdf">[pdf]</a>
+The routing layer plays a crucial role in the performance and efficiency of wireless sensor networks, as it is responsible for selecting the optimal path for data transmission among nodes with limited resources and energy constraints.
+
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/4_Routing.pdf">[pdf]</a>
 
 Chapter 5: Data management and storage
 -----
 
-* Notes [ENG] <a href="http://sercankulcu.github.io/files/wsn/5_Data.pdf">[pdf]</a>
+In wireless sensor networks, collecting, storing, and processing data efficiently is a crucial aspect to ensure the proper functioning of the network. The data management chapter explores the different techniques and strategies for managing data in wireless sensor networks.
+
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/5_Data.pdf">[pdf]</a>
 
 Chapter 6: Power management and energy efficiency
 -----
 
-* Notes [ENG] <a href="http://sercankulcu.github.io/files/wsn/6_Power.pdf">[pdf]</a>
+The power management chapter of wireless sensor network course introduces the techniques and strategies for managing the energy consumption of sensor nodes, which is critical for the operation and longevity of the network.
+
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/6_Power.pdf">[pdf]</a>
 
 Chapter 7: Security and attacks
 -----
 
-* Notes [ENG] <a href="http://sercankulcu.github.io/files/wsn/7_Security.pdf">[pdf]</a>
+The security of wireless sensor networks is a major concern as these networks are used in critical applications such as military, healthcare, and infrastructure monitoring. Therefore, this chapter will focus on the different security threats and challenges in wireless sensor networks, as well as various security mechanisms and protocols that can be employed to ensure the integrity, confidentiality, and availability of data in these networks.
+
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/7_Security.pdf">[pdf]</a>
 
 Chapter 8: Applications and case studies
 -----
 
-* Notes [ENG] <a href="http://sercankulcu.github.io/files/wsn/8_Applications.pdf">[pdf]</a>
+In this chapter, we will explore the various applications and case studies of wireless sensor networks, including but not limited to healthcare, agriculture, environmental monitoring, and smart cities.
+
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/8_Applications.pdf">[pdf]</a>
 
 Chapter 9: Current research trends and future directions
 -----
 
-* Notes [ENG] <a href="http://sercankulcu.github.io/files/wsn/9_Trends.pdf">[pdf]</a>
+In this chapter, we will explore the current research trends and future directions of wireless sensor networks, including emerging technologies, applications, and challenges. We will also discuss the potential future developments in the field and their impact on the industry and society as a whole.
+
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/9_Trends.pdf">[pdf]</a>
 
 Chapter 10: Hands-on experience with WSN simulation and implementation
 -----
 
-* Notes [ENG] <a href="http://sercankulcu.github.io/files/wsn/10_Handson.pdf">[pdf]</a>
+Through hands-on exercises, students will learn how to program and deploy sensors, collect data, and analyze results using various simulation tools and hardware platforms.
+
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/10_Handson.pdf">[pdf]</a>
