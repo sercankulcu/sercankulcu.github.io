@@ -12,4 +12,4 @@ We present a framework for sentiment analysis on tweets related to news items. G
 
 [Download paper here](https://ieeexplore.ieee.org/document/7439388)
 
-Recommended citation: Kulcu, S., & Dogdu, E. (2016, February). A scalable approach for sentiment analysis of Turkish tweets and linking tweets to news. In 2016 IEEE Tenth International Conference on Semantic Computing (ICSC) (pp. 471-476). IEEE.
+<b>Recommended citation:</b> Kulcu, S., & Dogdu, E. (2016, February). A scalable approach for sentiment analysis of Turkish tweets and linking tweets to news. In 2016 IEEE Tenth International Conference on Semantic Computing (ICSC) (pp. 471-476). IEEE.

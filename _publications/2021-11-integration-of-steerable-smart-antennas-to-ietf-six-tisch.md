@@ -12,4 +12,4 @@ This study presents mechanisms for integrating low complexity smart antenna solu
 
 [Download paper here](https://ieeexplore.ieee.org/abstract/document/9599684)
 
-Recommended citation: Kulcu, S., Gormus, S., & Jin, Y. (2021). Integration of Steerable Smart Antennas to IETF 6TiSCH Protocol for High Reliability Wireless IoT Networks. IEEE Access, 9, 147780-147790.
+<b>Recommended citation:</b> Kulcu, S., Gormus, S., & Jin, Y. (2021). Integration of Steerable Smart Antennas to IETF 6TiSCH Protocol for High Reliability Wireless IoT Networks. IEEE Access, 9, 147780-147790.

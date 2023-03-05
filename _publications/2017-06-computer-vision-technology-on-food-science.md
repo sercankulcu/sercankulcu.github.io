@@ -12,4 +12,4 @@ Computer vision is a science that extracts useful information about an object fr
 
 [Download paper here](https://dergipark.org.tr/en/download/article-file/1329197)
 
-Recommended citation: Külcü, D. B., & Külcü, S. (2018). Computer vision technology on food science. Karaelmas Fen ve Mühendislik Dergisi, 8(1), 403-409.
+<b>Recommended citation:</b> Külcü, D. B., & Külcü, S. (2018). Computer vision technology on food science. Karaelmas Fen ve Mühendislik Dergisi, 8(1), 403-409.

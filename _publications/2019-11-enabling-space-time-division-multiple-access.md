@@ -12,4 +12,4 @@ Here the integration of a low-complexity directional antenna system with IETF 6T
 
 [Download paper here](https://journals.tubitak.gov.tr/elektrik/vol27/iss6/9/)
 
-Recommended citation: Görmüş, S., & Külcü, S. (2019). Enabling space time division multiple access in IETF 6TiSCH protocol. Turkish Journal of Electrical Engineering and Computer Sciences, 27(6), 4151-4166.
+<b>Recommended citation:</b> Görmüş, S., & Külcü, S. (2019). Enabling space time division multiple access in IETF 6TiSCH protocol. Turkish Journal of Electrical Engineering and Computer Sciences, 27(6), 4151-4166.
