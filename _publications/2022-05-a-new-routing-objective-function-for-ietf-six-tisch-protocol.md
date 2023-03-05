@@ -12,4 +12,4 @@ In this paper; A new parent selection function is proposed for RPL running on to
 
 [Download paper here](https://ieeexplore.ieee.org/document/9864711)
 
-Recommended citation: Aydın, B., Görmüş, S., Aydın, H., & Külcü, S. (2022, May). A New Routing Objective Function for IETF 6TiSCH Protocol. In 2022 30th Signal Processing and Communications Applications Conference (SIU) (pp. 1-4). IEEE.
+<b>Recommended citation:</b> Aydın, B., Görmüş, S., Aydın, H., & Külcü, S. (2022, May). A New Routing Objective Function for IETF 6TiSCH Protocol. In 2022 30th Signal Processing and Communications Applications Conference (SIU) (pp. 1-4). IEEE.

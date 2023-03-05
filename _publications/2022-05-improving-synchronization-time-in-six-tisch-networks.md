@@ -12,4 +12,4 @@ In this study, a new message packet is defined for the 6TiSCH protocol and a mec
 
 [Download paper here](https://ieeexplore.ieee.org/document/9864879)
 
-Recommended citation: Külcü, S., & Görmüş, S. (2022, May). Improving Synchronization Time in 6TiSCH Networks with Smart Antennas. In 2022 30th Signal Processing and Communications Applications Conference (SIU) (pp. 1-4). IEEE.
+<b>Recommended citation:</b> Külcü, S., & Görmüş, S. (2022, May). Improving Synchronization Time in 6TiSCH Networks with Smart Antennas. In 2022 30th Signal Processing and Communications Applications Conference (SIU) (pp. 1-4). IEEE.
