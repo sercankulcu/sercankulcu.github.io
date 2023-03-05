@@ -11,16 +11,16 @@ redirect_from:
 
 ## Education
 
-* Ph.D in Computer Engineering, ![KTU](/images/logo-ktu.png "KTU") Karadeniz Technical University, 2022
-* M.S. in Information Systems, ![Hacettepe](/images/logo-hacettepe.png "Hacettepe") Hacettepe University, 2010
-* B.S. in Computer Engineering, ![Hacettepe](/images/logo-hacettepe.png "Hacettepe") Hacettepe University, 2006
+* Ph.D in Computer Engineering, <img src="/images/logo-ktu.png" alt="KTU" height=40> Karadeniz Technical University, 2022
+* M.S. in Information Systems, <img src="/images/logo-hacettepe.png" alt="Hacettepe" height=40> Hacettepe University, 2010
+* B.S. in Computer Engineering, <img src="/images/logo-hacettepe.png" alt="Hacettepe" height=40> Hacettepe University, 2006
 
 ## Work experience
 
-* 2015-Present: Teaching Assistant, ![GRU](/images/logo-giresun.png "GRU") Giresun University
+* 2015-Present: Teaching Assistant, <img src="/images/logo-giresun.png" alt="GRU" height=40> Giresun University
 
-* 2011-2015 Leader Software Engineer, ![SDT](/images/logo-sdt.png "SDT") SDT Space and Defence Technologies 
+* 2011-2015 Leader Software Engineer, <img src="/images/logo-sdt.png" alt="SDT" height=40> SDT Space and Defence Technologies 
 
-* 2008-2011 Senior Software Engineer, ![SDT](/images/logo-sdt.png "SDT") SDT Space and Defence Technologies 
+* 2008-2011 Senior Software Engineer, <img src="/images/logo-sdt.png" alt="SDT" height=40> SDT Space and Defence Technologies 
 
-* 2005-2008 Software Engineer, ![SDT](/images/logo-sdt.png "SDT") SDT Space and Defence Technologies 
+* 2005-2008 Software Engineer, <img src="/images/logo-sdt.png" alt="SDT" height=40> SDT Space and Defence Technologies 
