@@ -12,4 +12,4 @@ Social Network Analysis (SNA) has become a very important and increasingly popul
 
 [Download paper here](https://ieeexplore.ieee.org/document/7840792)
 
-<b>Recommended citation:</b> Kulcu, S., Dogdu, E., & Ozbayoglu, A. M. (2016, December). A survey on semantic web and big data technologies for social network analysis. In 2016 IEEE International Conference on Big Data (Big Data) (pp. 1768-1777). IEEE.
+<b>Recommended citation:</b> *Kulcu, S., Dogdu, E., & Ozbayoglu, A. M. (2016, December). A survey on semantic web and big data technologies for social network analysis. In 2016 IEEE International Conference on Big Data (Big Data) (pp. 1768-1777). IEEE.*
