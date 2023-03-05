@@ -19,8 +19,8 @@ redirect_from:
 
 * <img src="/images/logo-giresun.png" alt="GRU" width="40" height="40"> 2015-Present: Teaching Assistant, Giresun University
 
-* <img src="/images/logo-sdt.png" alt="SDT" width="120" height="40"> 2011-2015 Leader Software Engineer, SDT Space and Defence Technologies 
+* <img src="/images/logo-sdt.png" alt="SDT" width="80" height="40"> 2011-2015 Leader Software Engineer, SDT Space and Defence Technologies 
 
-* <img src="/images/logo-sdt.png" alt="SDT" width="120" height="40"> 2008-2011 Senior Software Engineer, SDT Space and Defence Technologies 
+* <img src="/images/logo-sdt.png" alt="SDT" width="80" height="40"> 2008-2011 Senior Software Engineer, SDT Space and Defence Technologies 
 
-* <img src="/images/logo-sdt.png" alt="SDT" width="120" height="40"> 2005-2008 Software Engineer, SDT Space and Defence Technologies 
+* <img src="/images/logo-sdt.png" alt="SDT" width="80" height="40"> 2005-2008 Software Engineer, SDT Space and Defence Technologies 
