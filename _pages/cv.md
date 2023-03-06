@@ -10,9 +10,13 @@ redirect_from:
 ## Education
 
 ### <img src="/images/logo-ktu.png" alt="KTU" width="50" height="50"> Ph.D in Computer Engineering, Karadeniz Technical University, 2022
+  * Developed a simulation framework using the Cooja simulator that includes the Steerable Smart Antennas model, the 6TiSCH Protocol, and a traffic generator. Designed and implemented the Steerable Smart Antennas model based on the IEEE 802.11 standard and the 6TiSCH Protocol requirements. Evaluated the performance of the Steerable Smart Antennas model in terms of network throughput, energy consumption, and reliability by measuring the packet delivery ratio, end-to-end delay, and network lifetime.
+  * Conducted research on the application of computer vision technology in food science. Developed algorithms for image processing and analysis of food images using Python and OpenCV. Designed and implemented a system for detecting and classifying food items based on their visual characteristics such as color, texture, and shape.
 
 ### <img src="/images/logo-hacettepe.png" alt="Hacettepe" width="50" height="50"> M.S. in Information Systems, Hacettepe University, 2010
   * Developed a web-based dictionary platform inspired by the popular Turkish platform Eksisozluk using HTML, CSS, and JavaScript.
+  * Developed a sentiment analysis tool for social media using Python and natural language processing (NLP) techniques. The tool was designed to analyze the sentiment and topic of tweets and posts on social media platforms such as Twitter and Facebook.
+  * Developed a social network analysis tool using semantic web and big data technologies. Designed and implemented a scalable architecture for the tool that includes a data ingestion layer, a data modeling layer, a query and analysis layer, and a visualization layer.
 
 ### <img src="/images/logo-hacettepe.png" alt="Hacettepe" width="50" height="50"> B.S. in Computer Engineering, Hacettepe University, 2006
   * Developed a Tetris game using assembly language and interrupts. Interrupts are used for random number generation, and keyboard interaction. The game was designed to run on an x86 PC platform.
