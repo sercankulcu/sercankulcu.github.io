@@ -26,3 +26,8 @@ redirect_from:
 * <img src="/images/logo-sdt.png" alt="SDT" width="125" height="50"> 2008-2011 Senior Software Engineer, SDT Space and Defence Technologies 
 
 * <img src="/images/logo-sdt.png" alt="SDT" width="125" height="50"> 2005-2008 Software Engineer, SDT Space and Defence Technologies 
+  * Collaborated with cross-functional teams to develop and implement a tactical environment simulation software that met client needs
+  * Designed and developed software for Linux operating system
+  * Implemented software testing procedures to ensure quality and reliability of software solutions
+  * Integrated software with various protocols including High-Level Architecture (HLA) Protocol and Distributed Interactive Simulation (DIS) Protocol
+  * Participated in all phases of the software development cycle, from planning to maintenance
