@@ -22,6 +22,9 @@ redirect_from:
 * <img src="/images/logo-giresun.png" alt="GRU" width="50" height="50"> 2015-Present: Teaching Assistant, Giresun University
 
 * <img src="/images/logo-sdt.png" alt="SDT" width="125" height="50"> 2011-2015 Leader Software Engineer, SDT Space and Defence Technologies 
+  * Contributed to the development of digital data recorder projects using real-time Linux distributions
+  * Integrated software with various data buses including MIL-STD-1553B, ARINC429, CAN, and Ethernet
+  * Compiled kernels to meet specific needs and requirements, utilizing expertise in kernel configuration and optimization
 
 * <img src="/images/logo-sdt.png" alt="SDT" width="125" height="50"> 2008-2011 Senior Software Engineer, SDT Space and Defence Technologies 
   * Contributed to the development of an embedded simulation software using VxWorks
