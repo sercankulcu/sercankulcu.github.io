@@ -12,6 +12,7 @@ redirect_from:
 ### <img src="/images/logo-ktu.png" alt="KTU" width="50" height="50"> Ph.D in Computer Engineering, Karadeniz Technical University, 2022
 
 ### <img src="/images/logo-hacettepe.png" alt="Hacettepe" width="50" height="50"> M.S. in Information Systems, Hacettepe University, 2010
+  * Developed a web-based dictionary platform inspired by the popular Turkish platform Eksisozluk using HTML, CSS, and JavaScript.
 
 ### <img src="/images/logo-hacettepe.png" alt="Hacettepe" width="50" height="50"> B.S. in Computer Engineering, Hacettepe University, 2006
   * Developed a Tetris game using assembly language and interrupts. Interrupts are used for random number generation, and keyboard interaction. The game was designed to run on an x86 PC platform.
