@@ -7,6 +7,8 @@ redirect_from:
   - /resume
 ---
 
+As a hands-on software engineer with over 15 years of experience, I am a versatile and driven professional with a PhD in wireless communication. I am highly skilled in low-power wireless communication, embedded and real-time operating systems, C/C++ programming, and machine learning applications. In addition, I have been sharing my expertise by teaching OOP and Java courses since 2015.
+
 ## Education
 
 ### <img src="/images/logo-ktu.png" alt="KTU" width="50" height="50"> Ph.D in Computer Engineering, Karadeniz Technical University, 2022
