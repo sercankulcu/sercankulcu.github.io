@@ -2,7 +2,7 @@
 layout: archive
 title: "CV"
 permalink: /cv/
-author_profile: false
+author_profile: true
 redirect_from:
   - /resume
 ---
@@ -14,7 +14,7 @@ redirect_from:
   * Conducted research on the application of computer vision technology in food science. Developed algorithms for image processing and analysis of food images using Python and OpenCV. Designed and implemented a system for detecting and classifying food items based on their visual characteristics such as color, texture, and shape.
 
 ### <img src="/images/logo-hacettepe.png" alt="Hacettepe" width="50" height="50"> M.S. in Information Systems, Hacettepe University, 2010
-  * Developed a web-based dictionary platform inspired by the popular Turkish platform Eksisozluk using HTML, CSS, and JavaScript.
+  * Developed a web-based dictionary platform inspired by the popular Turkish platform Eksisozluk using Php and MySQL.
   * Developed a sentiment analysis tool for social media using Python and natural language processing (NLP) techniques. The tool was designed to analyze the sentiment and topic of tweets and posts on social media platforms such as Twitter and Facebook.
   * Developed a social network analysis tool using semantic web and big data technologies. Designed and implemented a scalable architecture for the tool that includes a data ingestion layer, a data modeling layer, a query and analysis layer, and a visualization layer.
 
