@@ -2,18 +2,18 @@
 layout: archive
 title: "CV"
 permalink: /cv/
-author_profile: true
+author_profile: false
 redirect_from:
   - /resume
 ---
 
 ## Education
 
-* <img src="/images/logo-ktu.png" alt="KTU" width="50" height="50"> Ph.D in Computer Engineering, Karadeniz Technical University, 2022
+### <img src="/images/logo-ktu.png" alt="KTU" width="50" height="50"> Ph.D in Computer Engineering, Karadeniz Technical University, 2022
 
-* <img src="/images/logo-hacettepe.png" alt="Hacettepe" width="50" height="50"> M.S. in Information Systems, Hacettepe University, 2010
+### <img src="/images/logo-hacettepe.png" alt="Hacettepe" width="50" height="50"> M.S. in Information Systems, Hacettepe University, 2010
 
-* <img src="/images/logo-hacettepe.png" alt="Hacettepe" width="50" height="50"> B.S. in Computer Engineering, Hacettepe University, 2006
+### <img src="/images/logo-hacettepe.png" alt="Hacettepe" width="50" height="50"> B.S. in Computer Engineering, Hacettepe University, 2006
 
 ## Work experience
 
@@ -22,18 +22,18 @@ redirect_from:
   * Conducted tutorials and lab sessions to assist students in understanding the course materials
   * Graded exams, assignments, and provided feedback to students to enhance their academic performance
 
-### <img src="/images/logo-sdt.png" alt="SDT" width="50" height="50"> 2011-2015 Leader Software Engineer, SDT Space and Defence Technologies 
+### <img src="/images/logo-sdt.png" alt="SDT" width="50" height="50"> 2011-2015: Leader Software Engineer, SDT Space and Defence Technologies 
   * Contributed to the development of digital data recorder projects using real-time Linux distributions
   * Integrated software with various data buses including MIL-STD-1553B, ARINC429, CAN, and Ethernet
   * Compiled kernels to meet specific needs and requirements, utilizing expertise in kernel configuration and optimization
 
-### <img src="/images/logo-sdt.png" alt="SDT" width="50" height="50"> 2008-2011 Senior Software Engineer, SDT Space and Defence Technologies 
+### <img src="/images/logo-sdt.png" alt="SDT" width="50" height="50"> 2008-2011: Senior Software Engineer, SDT Space and Defence Technologies 
   * Contributed to the development of an embedded simulation software using VxWorks
   * Conducted extensive research on guidance and control systems to ensure the accuracy and effectiveness of the simulations
   * Modeled missile systems with respect to simulation, guidance and control issues, utilizing advanced mathematical modeling techniques to create accurate simulations
   * Designed and developed software for embedded systems using C and C++
 
-### <img src="/images/logo-sdt.png" alt="SDT" width="50" height="50"> 2005-2008 Software Engineer, SDT Space and Defence Technologies 
+### <img src="/images/logo-sdt.png" alt="SDT" width="50" height="50"> 2005-2008: Software Engineer, SDT Space and Defence Technologies 
   * Collaborated with cross-functional teams to develop and implement a tactical environment simulation software that met client needs
   * Designed and developed software for Linux operating system
   * Implemented software testing procedures to ensure quality and reliability of software solutions
