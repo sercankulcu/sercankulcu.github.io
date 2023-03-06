@@ -3,7 +3,6 @@ permalink: /ataturk/
 title: "Atatürk"
 author_profile: true
 redirect_from: 
-  - /ataturk/
   - /ataturk.html
 ---
 
