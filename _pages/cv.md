@@ -20,6 +20,9 @@ redirect_from:
 ## Work experience
 
 * <img src="/images/logo-giresun.png" alt="GRU" width="50" height="50"> 2015-Present: Teaching Assistant, Giresun University
+  * Teaching and developing course materials and lecture plans for Object-Oriented Programming using Java language, Professional Math, and Professional English courses
+  * Conducted tutorials and lab sessions to assist students in understanding the course materials
+  * Graded exams, assignments, and provided feedback to students to enhance their academic performance
 
 * <img src="/images/logo-sdt.png" alt="SDT" width="50" height="50"> 2011-2015 Leader Software Engineer, SDT Space and Defence Technologies 
   * Contributed to the development of digital data recorder projects using real-time Linux distributions
