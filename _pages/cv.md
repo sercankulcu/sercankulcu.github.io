@@ -24,6 +24,11 @@ redirect_from:
 * <img src="/images/logo-sdt.png" alt="SDT" width="125" height="50"> 2011-2015 Leader Software Engineer, SDT Space and Defence Technologies 
 
 * <img src="/images/logo-sdt.png" alt="SDT" width="125" height="50"> 2008-2011 Senior Software Engineer, SDT Space and Defence Technologies 
+  * Contributed to the development of an embedded simulation software using VxWorks
+  * Conducted extensive research on guidance and control systems to ensure the accuracy and effectiveness of the simulations
+  * Modeled missile systems with respect to simulation, guidance and control issues, utilizing advanced mathematical modeling techniques to create accurate simulations
+  * Designed and developed software for embedded systems using C and C++
+
 
 * <img src="/images/logo-sdt.png" alt="SDT" width="125" height="50"> 2005-2008 Software Engineer, SDT Space and Defence Technologies 
   * Collaborated with cross-functional teams to develop and implement a tactical environment simulation software that met client needs
