@@ -80,6 +80,7 @@ Chapter 8: Advanced Topics in Data Structures
 * Distributed Data Structures
 
 Chapter 9: Applications of Data Structures
+---
 
 * Database Management Systems
 * Compilers
@@ -88,6 +89,7 @@ Chapter 9: Applications of Data Structures
 * Cryptography
 
 Chapter 10: Conclusion
+---
 
 * Recap of the course
 * Importance of advanced data structures in computer engineering
