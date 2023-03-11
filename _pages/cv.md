@@ -28,7 +28,12 @@ As a hands-on software engineer with over 15 years of experience, I am a versati
 
 ## Work experience
 
-### <img src="/images/logo-giresun.png" alt="GRU" width="50" height="50"> 2015-Present: Teaching Assistant, Giresun University
+### <img src="/images/logo-giresun.png" alt="GRU" width="50" height="50"> 2023-Present: Assistant Professor, Giresun University
+  * Teaching and developing course materials for Operating Systems and Data Sturectures using Java language courses
+  * Conducted tutorials and lab sessions to assist students in understanding the course materials
+  * Graded exams, assignments, and provided feedback to students to enhance their academic performance
+
+### <img src="/images/logo-giresun.png" alt="GRU" width="50" height="50"> 2015-2023: Teaching Assistant, Giresun University
   * Teaching and developing course materials for Object-Oriented Programming using Java language, Professional Math, and Professional English courses
   * Conducted tutorials and lab sessions to assist students in understanding the course materials
   * Graded exams, assignments, and provided feedback to students to enhance their academic performance
