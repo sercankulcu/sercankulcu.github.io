@@ -15,9 +15,11 @@ The resources:
 
 * Operating System Concepts <a href="https://www.os-book.com/OS10/index.html">[e-book]</a>
 * Modern Operating Systems <a href="https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X">[book]</a>
-* Operating Systems: Three Easy Pieces <a href="https://pages.cs.wisc.edu/~remzi/OSTEP/">[e-book]</a>
-* Bilgisayar İşletim Sistemleri <a href="http://sercankulcu.github.io/files/os/book_os_ali_saatci.pdf">[pdf]</a>
+* Operating Systems: Three Easy Pieces <a href="http://sercankulcu.github.io/files/os/Book_Operating_Systems_Three_Easy_Pieces.pdf">[pdf]</a>
+* Bilgisayar İşletim Sistemleri <a href="http://sercankulcu.github.io/files/os/Book_Bilgisayar_İsletim_Sistemleri.pdf">[pdf]</a>
 * Operating System Development <a href="https://wiki.osdev.org/Main_Page">[website]</a>
+* Operating Systems From 0 to 1 <a href="http://sercankulcu.github.io/files/os/Book_Operating_Systems_From_0_to_1.pdf">[pdf]</a>
+* Prof. Dr. Kemal Bıçakcı [TR] <a href="https://www.youtube.com/watch?v=8FryT68aDZU&list=PLmPsb7nQhv7NLRWdIiDVNBDCMOtuUn6WZ">[youtube]</a>
 
 Preface: 
 -----
@@ -36,7 +38,6 @@ As the bridge between hardware and software, operating systems serve as the foun
 * **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_01_Giris.pdf">[pdf]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders1.pdf">[pdf]</a>
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch1.pdf">[pdf]</a>
-* Prof. Dr. Kemal Bıçakcı [TR] <a href="https://www.youtube.com/watch?v=sqtkwd09KXs">[youtube]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
