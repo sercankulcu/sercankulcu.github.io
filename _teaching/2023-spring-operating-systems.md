@@ -19,7 +19,7 @@ The resources:
 * Bilgisayar İşletim Sistemleri <a href="http://sercankulcu.github.io/files/os/Book_Bilgisayar_İsletim_Sistemleri.pdf">[pdf]</a>
 * Operating System Development <a href="https://wiki.osdev.org/Main_Page">[website]</a>
 * Operating Systems From 0 to 1 <a href="http://sercankulcu.github.io/files/os/Book_Operating_Systems_From_0_to_1.pdf">[pdf]</a>
-* Prof. Dr. Kemal Bıçakcı [TR] <a href="https://www.youtube.com/watch?v=8FryT68aDZU&list=PLmPsb7nQhv7NLRWdIiDVNBDCMOtuUn6WZ">[youtube]</a>
+* Prof. Dr. Kemal Bıçakcı [TR] <a href="https://www.youtube.com/watch?v=sqtkwd09KXs&list=PLmPsb7nQhv7NLRWdIiDVNBDCMOtuUn6WZ">[youtube]</a>
 
 Preface: 
 -----
