@@ -40,7 +40,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch1.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_01.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_1_Introduction.txt">[txt]</a>
 
 Chapter 2: Structures: 
 -----
@@ -52,7 +52,7 @@ The design and organization of an operating system's internal components and mec
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch2.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_02.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_02.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_2_Structures.txt">[txt]</a>
 
 Chapter 3: Processes: 
 -----
@@ -64,7 +64,7 @@ In the world of operating systems, processes serve as the cornerstone of multi-t
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch3.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_03.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_03.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_3_Processes.txt">[txt]</a>
 
 Chapter 4: Threads: 
 -----
@@ -76,7 +76,7 @@ Threads, as lightweight execution units within a process, provide a powerful mec
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch4.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_04.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_04.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_4_Threads.txt">[txt]</a>
 
 Chapter 5: Scheduling: 
 -----
@@ -88,7 +88,7 @@ CPU scheduling is a critical component of any operating system, responsible for 
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch5.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_05.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_05.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_5_Scheduling.txt">[txt]</a>
 
 Chapter 6: Synchronization: 
 -----
@@ -100,7 +100,7 @@ In a multi-threaded or multi-process environment, synchronization mechanisms pro
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch6.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_06.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_06.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_6_Synchronization.txt">[txt]</a>
 
 Chapter 7: Deadlocks: 
 -----
@@ -112,7 +112,7 @@ Deadlocks, which occur when multiple processes or threads are blocked and unable
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch7.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_07.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_07.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_7_Deadlocks.txt">[txt]</a>
 
 
 Chapter 8: Memory management: 
@@ -125,7 +125,7 @@ Memory management, which involves the allocation, monitoring, and protection of 
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch8.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_08.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_08.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_8_Memory_management.txt">[txt]</a>
 
 Chapter 9: Virtual memory: 
 ----- 
@@ -137,7 +137,7 @@ Virtual memory, a key technique used by modern operating systems to manage memor
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch9.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_09.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_09.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_9_Virtual_memory.txt">[txt]</a>
 
 Chapter 10: File systems: 
 -----
@@ -149,7 +149,7 @@ File systems, which provide a hierarchical organization and management scheme fo
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch11.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch12.pdf">[pdf2]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_10.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_10.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_10_File_systems.txt">[txt]</a>
 
 Chapter 11: Input/output: 
 -----
@@ -161,7 +161,7 @@ IO operations, which involve the movement of data between a computer and externa
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch10.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch13.pdf">[pdf2]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_11.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_11.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_11_Input_output.txt">[txt]</a>
 
 
 Chapter 12: Multiple processor systems: 
@@ -173,7 +173,7 @@ As multi-core processors and distributed computing systems become increasingly p
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch16.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch17.pdf">[pdf2]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_12.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_12.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_12_Multiple_processor_systems.txt">[txt]</a>
 
 Chapter 13: Security: 
 -----
@@ -184,7 +184,7 @@ Security is a critical concern in modern computing environments, and operating s
 * Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch14.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch15.pdf">[pdf2]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_13.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_13.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_13_Security.txt">[txt]</a>
 
 Chapter 14: Multimedia: 
 -----
@@ -194,7 +194,7 @@ With the growing demand for multimedia applications such as audio and video play
 * **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_14_Coklu_Ortam.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_14.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_14.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_14_Multimedia.txt">[txt]</a>
 
 
 Chapter 15: Operating system design: 
@@ -205,7 +205,7 @@ Operating system design involves the careful consideration of a wide range of fa
 * **Slides MOS [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_15_Isletim_Sistemi_Tasarimi.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_15.pdf">[pdf]</a>
-* Question & answers <a href="http://sercankulcu.github.io/files/os/qas/QA_15.pdf">[pdf]</a>
+* Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_15_Operating_system_design.txt">[txt]</a>
 
 Chapter 16: Case studies:
 -----
