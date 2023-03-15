@@ -37,7 +37,6 @@ As the bridge between hardware and software, operating systems serve as the foun
 
 * **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_01_Giris.pdf">[pdf]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders1.pdf">[pdf]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch1.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_01.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_1_Introduction.txt">[txt]</a>
@@ -49,7 +48,6 @@ The design and organization of an operating system's internal components and mec
 
 * **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_02_Yapilar.pdf">[pdf]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders2.pdf">[pdf]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch2.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_02.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_2_Structures.txt">[txt]</a>
@@ -61,7 +59,6 @@ In the world of operating systems, processes serve as the cornerstone of multi-t
 
 * **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_03_Surecler.pdf">[pdf]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders3.pdf">[pdf]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch3.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_03.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_3_Processes.txt">[txt]</a>
@@ -73,7 +70,6 @@ Threads, as lightweight execution units within a process, provide a powerful mec
 
 * **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_04_Is_Parcaciklari.pdf">[pdf]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders4.pdf">[pdf]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch4.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_04.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_4_Threads.txt">[txt]</a>
@@ -85,7 +81,6 @@ CPU scheduling is a critical component of any operating system, responsible for 
 
 * **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_05_Cizelgeleme.pdf">[pdf]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders5.pdf">[pdf]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch5.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_05.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_5_Scheduling.txt">[txt]</a>
@@ -97,7 +92,6 @@ In a multi-threaded or multi-process environment, synchronization mechanisms pro
 
 * **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_06_Senkronizasyon.pdf">[pdf]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders6a.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders6b.pdf">[pdf2]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch6.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_06.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_6_Synchronization.txt">[txt]</a>
@@ -109,7 +103,6 @@ Deadlocks, which occur when multiple processes or threads are blocked and unable
 
 * **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_07_Kilitlenme.pdf">[pdf]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders7.pdf">[pdf]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch7.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_07.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_7_Deadlocks.txt">[txt]</a>
@@ -122,7 +115,6 @@ Memory management, which involves the allocation, monitoring, and protection of 
 
 * **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_08_Bellek_Yonetimi.pdf">[pdf]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders8.pdf">[pdf]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch8.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_08.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_8_Memory_management.txt">[txt]</a>
@@ -134,7 +126,6 @@ Virtual memory, a key technique used by modern operating systems to manage memor
 
 * **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_09_Sanal_Bellek.pdf">[pdf]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders9.pdf">[pdf]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch9.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_09.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_9_Virtual_memory.txt">[txt]</a>
@@ -146,7 +137,6 @@ File systems, which provide a hierarchical organization and management scheme fo
 
 * **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_10_Dosya_Sistemleri.pdf">[pdf]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders10.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders11.pdf">[pdf2]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch11.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch12.pdf">[pdf2]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_10.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_10_File_systems.txt">[txt]</a>
@@ -158,7 +148,6 @@ IO operations, which involve the movement of data between a computer and externa
 
 * **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_11_Giris_Cikis.pdf">[pdf]</a>
 * Slides OSTEP [TR] <a href="http://sercankulcu.github.io/files/os/slides_ostep_tr/ders12.pdf">[pdf]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch10.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch13.pdf">[pdf2]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_11.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_11_Input_output.txt">[txt]</a>
@@ -170,7 +159,6 @@ Chapter 12: Multiple processor systems:
 As multi-core processors and distributed computing systems become increasingly prevalent, the design and implementation of operating systems for multiple processor systems presents unique challenges and opportunities, requiring careful consideration of issues such as process and thread scheduling, memory management, and communication and synchronization mechanisms.
 
 * **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_12_Cok_Islemcili_Sistemler.pdf">[pdf]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch16.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch17.pdf">[pdf2]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_12.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_12_Multiple_processor_systems.txt">[txt]</a>
@@ -181,7 +169,6 @@ Chapter 13: Security:
 Security is a critical concern in modern computing environments, and operating systems play a central role in providing the necessary mechanisms and policies to protect system resources, data, and applications from unauthorized access, modification, and other forms of attack.
 
 * **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_13_Guvenlik.pdf">[pdf]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch14.pdf">[pdf1]</a><a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch15.pdf">[pdf2]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_13.pdf">[pdf]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_13_Security.txt">[txt]</a>
@@ -212,14 +199,5 @@ Chapter 16: Case studies:
 
 **UNIX - Linux**
 * **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides_mos_tr/Bolum_16_Linux.pdf">[pdf]</a>
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch18.pdf">[pdf]</a>
 
 * Notes <a href="http://sercankulcu.github.io/files/os/notes/Notes_16.pdf">[pdf]</a>
-
-**Windows 7**
-
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/ch19.pdf">[pdf]</a>
-
-**Free BSD**
-
-* Slides OSTEP <a href="http://sercankulcu.github.io/files/os/slides_ostep_eng/appA.pdf">[pdf]</a>
