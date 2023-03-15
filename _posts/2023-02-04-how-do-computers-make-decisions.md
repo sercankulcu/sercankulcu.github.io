@@ -46,21 +46,8 @@ At the heart of logic gates are transistors, which are tiny electronic switches 
 
 The arrangement of transistors, connected to inputs and outputs, can create a circuit that performs logical operations. When an electrical current is applied to the input of the circuit, the transistors either allow the current to flow or block it based on their on or off state, resulting in the output. In other words, the output is the result of a logical operation performed on the input based on the configuration of the transistors.
 
-Each type of logic gate has a unique truth table that defines the relationship between its inputs and outputs. For example, an AND gate only produces a logical "1" output if both of its inputs are logical "1". The truth table for an AND gate shows the output for all possible combinations of inputs, as shown below:
-
-Input A	Input B	Output
-0	    0	      0
-0	    1	      0
-1	    0	      0
-1	    1	      1
-
-The truth table for an OR gate, on the other hand, shows that the output is "1" if either input is "1":
-
-Input A	Input B	Output
-0	    0	      0
-0	   	1       1
-1	    0	      1
-1	    1	      1
+Each type of logic gate has a unique truth table that defines the relationship between its inputs and outputs. For example, an AND gate only produces a logical "1" output if both of its inputs are logical "1". 
+The truth table for an OR gate, on the other hand, shows that the output is "1" if either input is "1".
 
 The combination of different types of logic gates can create complex circuits that perform more complex operations. These circuits are used in a variety of applications, including arithmetic operations, memory circuits, and control systems.
 
