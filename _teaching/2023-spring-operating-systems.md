@@ -16,7 +16,7 @@ The resources:
 * Modern Operating Systems, Andrew S. Tanenbaum <a href="https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X">[book]</a>
 * Operating System Concepts, A. SilberSchatz, P. Galvin, and G. Gagne <a href="https://www.os-book.com/OS10/index.html">[e-book]</a>
 * Operating Systems: Three Easy Pieces <a href="https://pages.cs.wisc.edu/~remzi/OSTEP">[e-book]</a>
-* İşletim Sistemleri, Prof. Dr. Kemal Bıçakcı [TR] <a href="https://www.youtube.com/watch?v=sqtkwd09KXs&list=PLmPsb7nQhv7NLRWdIiDVNBDCMOtuUn6WZ">[youtube]</a>
+* İşletim Sistemleri, Prof. Dr. Kemal Bıçakcı <a href="https://www.youtube.com/watch?v=sqtkwd09KXs&list=PLmPsb7nQhv7NLRWdIiDVNBDCMOtuUn6WZ">[youtube]</a>
 * Bilgisayar İşletim Sistemleri, Prof. Dr. Ali Saatçi, 2. Baskı.
 * Operating System Development <a href="https://wiki.osdev.org/Main_Page">[website]</a>
 * Operating Systems From 0 to 1 <a href="http://sercankulcu.github.io/files/os/Book_Operating_Systems_From_0_to_1.pdf">[pdf]</a>
