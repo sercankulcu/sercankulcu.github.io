@@ -13,8 +13,8 @@ Operating systems are the foundation of modern computing. They manage the hardwa
 The resources: 
 -----
 
-* Operating System Concepts, A. SilberSchatz, P. Galvin, and G. Gagne, 10th Ed. <a href="https://www.os-book.com/OS10/index.html">[e-book]</a>
-* Modern Operating Systems, Andrew S. Tanenbaum, 4th Ed., Pearson. <a href="https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X">[book]</a>
+* Operating System Concepts, A. SilberSchatz, P. Galvin, and G. Gagne <a href="https://www.os-book.com/OS10/index.html">[e-book]</a>
+* Modern Operating Systems, Andrew S. Tanenbaum <a href="https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X">[book]</a>
 * Operating Systems: Three Easy Pieces <a href="https://pages.cs.wisc.edu/~remzi/OSTEP">[e-book]</a>
 * Bilgisayar İşletim Sistemleri, Ali Saatçi, 2. Baskı.
 * Operating System Development <a href="https://wiki.osdev.org/Main_Page">[website]</a>
