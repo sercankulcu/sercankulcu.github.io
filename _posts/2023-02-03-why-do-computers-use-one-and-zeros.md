@@ -7,11 +7,11 @@ tags:
   - software
 ---
 
-* Binary is a number system that uses only two digits to represent a quantitative value, 0 and 1.
-* Computers rely on binary, a system of counting using only two digits: 0 and 1.
-* Binary is more efficient than tally marks and has an exponential increase in the amount of things it can represent compared to base 10, which uses ten digits.
-* The rules we use to count in the decimal number system still apply to binary, making it easy to understand.
-* Binary is essential to computers because it is based on micro transistors, tiny switches that can be on or off with a weak electrical charge.
+Binary is a number system that uses only two digits to represent a quantitative value, 0 and 1. Computers rely on binary because it is based on micro transistors, which are tiny electronic switches that can be on or off with a weak electrical charge. These switches are arranged in logical circuits to perform calculations, store data, and control operations in a computer.
+
+Binary is more efficient than tally marks and has an exponential increase in the amount of things it can represent compared to base 10, which uses ten digits. In base 10, each digit represents a power of 10, and as the value of the number increases, the number of digits required to represent it also increases. However, in binary, each digit represents a power of 2, so the number of digits required to represent a value grows exponentially.
+
+The rules we use to count in the decimal number system still apply to binary, making it easy to understand. For example, adding a binary number is similar to adding a decimal number, except that we carry over to the next place value when the sum of two digits is 2. Subtracting a binary number is also similar to subtracting a decimal number, except that we borrow from the next place value when the minuend is smaller than the subtrahend.
 
 What is Binary?:
 ---
@@ -62,10 +62,3 @@ Transistors and Binary:
 * With only 255 representable values, binary was limiting for computers.
 * 16-bit systems, which use two bytes to represent one number, expanded the range of representable numbers from 0 to 65535.
 * A 16-bit system doesn't necessarily mean it is exponentially more powerful than an 8-bit system, but it does increase the range of representable numbers.
-
-..
-
-* Binary is an essential concept for computers, allowing them to use transistors to represent information and perform operations.
-* With the use of 16-bit systems, computers can represent even more numbers and perform even more complex operations.
-* While binary may seem complicated, it is actually a simple and efficient way of counting that has revolutionized the world of computing.
-* Understanding binary is important for anyone working with computers or digital systems.
