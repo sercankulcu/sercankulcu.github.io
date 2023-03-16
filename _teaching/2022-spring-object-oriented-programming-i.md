@@ -8,7 +8,7 @@ date: 2023-01-02
 location: "Giresun, Turkey"
 ---
 
-Welcome to the world of programming! Here, you will be introduced to the basic concepts of computer science and the Java programming language. 
+<img align="left" width="200" alt="object oriented programming" src="/images/teaching/object-oriented-course-i.png"> Welcome to the world of programming! Here, you will be introduced to the basic concepts of computer science and the Java programming language. 
 
 Chapter 1: Introduction to Programming and Java: 
 -----
