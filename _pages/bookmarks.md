@@ -7,7 +7,7 @@ redirect_from:
   - /bookmarks.html
 ---
 
-<img align="right" width="100" height="100" alt="owl on brach" src="/images/owl-on-branch.png">
+<img align="right" width="150" height="150" alt="owl on brach" src="/images/owl-on-branch.png">
 
 * <a href="https://chat.openai.com/">[ChatGPT]</a> a chatbot launched by OpenAI 
 * <a href="https://translate.google.com/">[Google Translate]</a> a multilingual neural machine translation service
