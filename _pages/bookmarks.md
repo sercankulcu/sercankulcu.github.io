@@ -1,4 +1,5 @@
 ---
+layout: archive
 permalink: /bookmarks/
 title: "Bookmarks"
 author_profile: true
