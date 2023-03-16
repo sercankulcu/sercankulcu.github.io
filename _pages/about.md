@@ -13,7 +13,7 @@ redirect_from:
   - /welcome/
 ---
 
-<img align="right" width="150" height="150" alt="owl coffee beans" src="/images/owl-coffee-beans.png">
+<img align="right" width="150" alt="owl coffee beans" src="/images/owl-coffee-beans.png">
 
 Hello..
 
