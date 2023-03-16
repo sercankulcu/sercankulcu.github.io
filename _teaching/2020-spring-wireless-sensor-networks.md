@@ -8,7 +8,7 @@ date: 2020-01-01
 location: "Giresun, Turkey"
 ---
 
-This course provides an introduction to the fundamental concepts, technologies, and design principles of wireless sensor networks. Students will learn about the different types of sensors and communication technologies used in WSNs, as well as the various challenges that need to be addressed in the design and implementation of these networks. Topics such as medium access control, routing protocols, data management, power management, security, and applications of WSNs will be discussed in depth. By the end of the course, students will have a solid understanding of the key concepts and technologies involved in wireless sensor networks, as well as hands-on experience with programming and simulation tools.
+<img align="left" width="200" alt="wireless sensor network" src="/images/teaching/wireless-sensor-network-course.png"> This course provides an introduction to the fundamental concepts, technologies, and design principles of wireless sensor networks. Students will learn about the different types of sensors and communication technologies used in WSNs, as well as the various challenges that need to be addressed in the design and implementation of these networks. Topics such as medium access control, routing protocols, data management, power management, security, and applications of WSNs will be discussed in depth. By the end of the course, students will have a solid understanding of the key concepts and technologies involved in wireless sensor networks, as well as hands-on experience with programming and simulation tools.
 
 Chapter 1: Introduction
 -----
