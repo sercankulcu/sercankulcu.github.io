@@ -7,9 +7,9 @@ redirect_from:
   - /resume
 ---
 
-As a hands-on software engineer with over 15 years of experience, I am a versatile and driven professional with a PhD in wireless communication. I am highly skilled in low-power wireless communication, embedded and real-time operating systems, C/C++ programming, and machine learning applications. In addition, I have been sharing my expertise by teaching OOP and Java courses since 2015.
-
 <img align="right" width="150" height="150" alt="owl on book" src="/images/owl-on-book.png">
+
+As a hands-on software engineer with over 15 years of experience, I am a versatile and driven professional with a PhD in wireless communication. I am highly skilled in low-power wireless communication, embedded and real-time operating systems, C/C++ programming, and machine learning applications. In addition, I have been sharing my expertise by teaching OOP and Java courses since 2015.
 
 ## Education
 

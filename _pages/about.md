@@ -12,9 +12,9 @@ redirect_from:
   - /welcome/
 ---
 
-Hello..
+<img align="right" width="150" height="150" alt="owl coffee beans" src="/images/owl-coffee-beans.png">
 
-<img align="right" width="150" height="150" alt="owl coffee beans" src="/images/owl-coffee-bean.png">
+Hello..
 
 Welcome to my personal website. My name is Sercan Külcü, and I am an assistant professor in computer science at Giresun University. I am interested in computer networks and embedded systems, and I am always looking for new ways to apply my skills and knowledge to solve challenging problems in these areas. I am also a hands-on software engineer since 2005 and have a PhD in wireless communications.
 
