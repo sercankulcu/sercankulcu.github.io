@@ -8,7 +8,7 @@ date: 2021-02-02
 location: "Giresun, Turkey"
 ---
 
-The course is intended for computer science students as well as professionals working in IT or related fields. It contains reading passages on a broad range of subjects to help you improve your reading skills. After each reading passage, there is a small glossary to help you rapidly learn the definitions of technical terms. The course is well-organized, with different lectures and plenty of study materials.
+<img align="left" width="200" alt="professional english" src="/images/teaching/professional-english-course.png"> The course is intended for computer science students as well as professionals working in IT or related fields. It contains reading passages on a broad range of subjects to help you improve your reading skills. After each reading passage, there is a small glossary to help you rapidly learn the definitions of technical terms. The course is well-organized, with different lectures and plenty of study materials.
 
 Chapter 1: Vocabulary
 -----
