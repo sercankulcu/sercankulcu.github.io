@@ -7,6 +7,10 @@ redirect_from:
   - /bookmarks.html
 ---
 
+[//]: # (This may be the most platform independent comment)
+[//]: # (<img src='/images/posts/owl-1.png'>)
+![Owl >](/images/owl-on-branch.png "owl")
+
 * <a href="https://chat.openai.com/">[ChatGPT]</a> a chatbot launched by OpenAI 
 * <a href="https://translate.google.com/">[Google Translate]</a> a multilingual neural machine translation service
 * <a href="https://terimler.org/">[Terimler]</a> akademik bilim terimleri sözlüğü
@@ -32,7 +36,3 @@ redirect_from:
 * <a href="https://twitter.com/">[Twitter]</a> microblogging platform 
 * <a href="https://linkedin.com/">[LinkedIn]</a> professional networking platform 
 * <a href="https://reddit.com/">[Reddit]</a> social news and discussion platform 
-
-[//]: # (This may be the most platform independent comment)
-[//]: # (<img src='/images/posts/owl-1.png'>)
-![Owl](/images/posts/owl-1.png "owl")
