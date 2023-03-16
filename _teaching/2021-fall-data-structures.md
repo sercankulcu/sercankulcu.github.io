@@ -8,7 +8,7 @@ date: 2021-02-02
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="data structure" src="/images/teaching/data-structures-course.png"> Data structures are the building blocks of any computer program, and they play a critical role in the design and efficiency of software systems. As computer engineering becomes increasingly complex, understanding and implementing advanced data structures has become a key skill for computer engineers.
+<img align="left" width="200" alt="data structure" src="/images/teaching/data-structures-course.jpg"> Data structures are the building blocks of any computer program, and they play a critical role in the design and efficiency of software systems. As computer engineering becomes increasingly complex, understanding and implementing advanced data structures has become a key skill for computer engineers.
 
 Chapter 1: Introduction to Data Structures
 ---
