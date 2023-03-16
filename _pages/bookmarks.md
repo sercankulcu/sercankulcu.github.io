@@ -7,9 +7,7 @@ redirect_from:
   - /bookmarks.html
 ---
 
-[//]: # (This may be the most platform independent comment)
-[//]: # (<img src='/images/posts/owl-1.png'>)
-![Owl >](/images/owl-on-branch.png "owl")
+<img align="right" width="100" height="100" alt="owl on brach" src="/images/owl-on-branch.png">
 
 * <a href="https://chat.openai.com/">[ChatGPT]</a> a chatbot launched by OpenAI 
 * <a href="https://translate.google.com/">[Google Translate]</a> a multilingual neural machine translation service
