@@ -17,6 +17,9 @@ redirect_from:
 * <a href="https://quillbot.com/">[Quillbot]</a> paraphrasing tool
 * <a href="https://www.imagetotext.info/">[Image To Text]</a> image to text converter
 * <a href="https://www.remove.bg/">[Removebg]</a> remove image background
+
+<img align="right" width="150" alt="owl on apple" src="/images/owl-on-apple.png">
+
 * <a href="https://snappify.com/editor">[Snappify]</a> create beautiful code snippets with ease
 * <a href="https://eksisozluk.com/">[Ekşi Sözlük]</a> kutsal bilgi kaynağı
 * <a href="https://scholar.google.com/">[Google Scholar]</a> search engine for academic resources
@@ -27,6 +30,9 @@ redirect_from:
 * <a href="https://www.buymeacoffee.com/">[Buy Me a Coffee]</a> accept donations
 * <a href="https://huggingface.co/">[Hugging Face]</a> AI community building the future
 * <a href="https://you.com/">[You]</a> AI Search Engine You Control
+
+<img align="right" width="150" alt="owl at night" src="/images/owl-at-night.png">
+
 * <a href="https://stackoverflow.com/">[Stack Overflow]</a> community-driven platform where you can ask and answer technical questions
 * <a href="https://github.com/">[GitHub]</a> web-based platform that offers version control
 * <a href="https://www.hackerrank.com/">[HackerRank]</a> website that provides coding challenges and competitions
