@@ -8,9 +8,9 @@ date: 2021-02-02
 location: "Giresun, Turkey"
 ---
 
-Algorithms are at the heart of computer science and play a crucial role in many applications, from machine learning and computational biology to cryptography and network routing. In this course, we will cover a wide range of topics, including sorting and searching algorithms, graph algorithms, dynamic programming, advanced data structures, algorithm design techniques, and the practical implementation of algorithms.
+<img align="left" width="150" alt="algorithms" src="/images/teaching/algorithms-course.png">
 
-<img align="right" width="150" alt="algorithms" src="/images/teaching/algorithms-course.png">
+Algorithms are at the heart of computer science and play a crucial role in many applications, from machine learning and computational biology to cryptography and network routing. In this course, we will cover a wide range of topics, including sorting and searching algorithms, graph algorithms, dynamic programming, advanced data structures, algorithm design techniques, and the practical implementation of algorithms.
 
 Chapter 1: Introduction to Algorithms
 ---
