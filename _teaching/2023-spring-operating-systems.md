@@ -8,7 +8,7 @@ date: 2023-02-02
 location: "Giresun, Turkey"
 ---
 
-Operating systems are the foundation of modern computing. They manage the hardware and software resources of a computer, providing a platform for other programs to run on. Without an operating system, a computer would be nothing more than a collection of hardware components.
+<img align="left" width="200" alt="operating systems" src="/images/teaching/operating-systems-course.jpg"> Operating systems are the foundation of modern computing. They manage the hardware and software resources of a computer, providing a platform for other programs to run on. Without an operating system, a computer would be nothing more than a collection of hardware components.
 
 The resources: 
 -----
