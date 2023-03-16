@@ -30,9 +30,9 @@ redirect_from:
 * <a href="https://stackoverflow.com/">[Stack Overflow]</a> community-driven platform where you can ask and answer technical questions
 * <a href="https://github.com/">[GitHub]</a> web-based platform that offers version control
 * <a href="https://www.hackerrank.com/">[HackerRank]</a> website that provides coding challenges and competitions
-<img align="right" width="200" alt="owl on apple" src="/images/owl-on-apple.png">
 * <a href="https://leetcode.com/">[LeetCode]</a> platform that offers a collection of coding challenges
 * <a href="https://youtube.com/">[YouTube]</a> video-sharing platform
+<img align="right" width="200" alt="owl on apple" src="/images/owl-on-apple.png">
 * <a href="https://twitter.com/">[Twitter]</a> microblogging platform 
 * <a href="https://linkedin.com/">[LinkedIn]</a> professional networking platform 
 * <a href="https://reddit.com/">[Reddit]</a> social news and discussion platform 
