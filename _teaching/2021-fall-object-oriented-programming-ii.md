@@ -8,7 +8,7 @@ date: 2023-01-01
 location: "Giresun, Turkey"
 ---
 
-Welcome to the world of programming! Here, you will be introduced to the advanced concepts of the Java programming language. 
+<img align="left" width="200" alt="object oriented programming" src="/images/teaching/object-oriented-course-ii.png"> Welcome to the world of programming! Here, you will be introduced to the advanced concepts of the Java programming language. 
 
 Chapter 1: Introduction to advanced Java concepts and best practices 
 -----
