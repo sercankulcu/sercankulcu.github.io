@@ -3,8 +3,8 @@ title: "Professional Math"
 collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/2022-spring-professional-math
-venue: "University of Giresun, Department of Computer Programming"
-date: 2021-01-01
+venue: "University of Giresun, Department of Computer Engineering"
+date: 2020-01-01
 location: "Giresun, Turkey"
 ---
 

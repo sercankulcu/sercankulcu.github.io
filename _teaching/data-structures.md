@@ -3,8 +3,8 @@ title: "Data Structures"
 collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/2022-fall-data-structures
-venue: "University of Giresun, Department of Computer Programming"
-date: 2022-02-02
+venue: "University of Giresun, Department of Computer Engineering"
+date: 2022-08-08
 location: "Giresun, Turkey"
 ---
 

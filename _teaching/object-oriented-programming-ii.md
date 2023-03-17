@@ -3,8 +3,8 @@ title: "Object Oriented Programming II"
 collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/2021-fall-object-oriented-programming-ii
-venue: "University of Giresun, Department of Computer Programming"
-date: 2023-01-01
+venue: "University of Giresun, Department of Computer Engineering"
+date: 2021-07-07
 location: "Giresun, Turkey"
 ---
 
