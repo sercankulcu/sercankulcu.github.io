@@ -7,7 +7,7 @@ tags:
   - self-improvement
 ---
 
-<img align="left" width="150" alt="jean de la bruyere" src="/images/posts/jean-de-la-bruyere.png" style=”margin: 10px;”> Jean de La Bruyère was born on August 16, 1645 in Paris, France. He studied law and classical literature at the University of Orleans, and later in Paris. In 1668, he began working as a private tutor, and in 1670, he became a tutor to the sons of Jean-Baptiste Colbert, who was the powerful minister of finance under King Louis XIV. He held this position for several years, and it gave him access to the French court and the aristocracy, which provided him with material for his later writings.
+<img align="left" width="150" alt="jean de la bruyere" src="/images/posts/jean-de-la-bruyere.png"> Jean de La Bruyère was born on August 16, 1645 in Paris, France. He studied law and classical literature at the University of Orleans, and later in Paris. In 1668, he began working as a private tutor, and in 1670, he became a tutor to the sons of Jean-Baptiste Colbert, who was the powerful minister of finance under King Louis XIV. He held this position for several years, and it gave him access to the French court and the aristocracy, which provided him with material for his later writings.
 
 In 1683, he published his first book, "Les Oeuvres diverses" (Various Works), which included poetry, literary criticism, and translations. In 1688, he published his most famous work, "Les Caractères de Théophraste traduits du grec avec les caractères ou les moeurs de ce siècle" (The Characters of Theophrastus Translated from Greek with the Characters or Manners of this Century), which was a collection of moral reflections and character sketches of the society of his time.
 
