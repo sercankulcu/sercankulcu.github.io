@@ -7,7 +7,7 @@ tags:
   - software
 ---
 
-Binary is a number system that uses only two digits to represent a quantitative value, 0 and 1. Computers rely on binary because it is based on micro transistors, which are tiny electronic switches that can be on or off with a weak electrical charge. These switches are arranged in logical circuits to perform calculations, store data, and control operations in a computer.
+<img width="150" alt="leonardo da vinci" src="/images/posts/why-do-computers-use-one-and-zeros.png" style="float: left; margin-right: 10px;" /> Binary is a number system that uses only two digits to represent a quantitative value, 0 and 1. Computers rely on binary because it is based on micro transistors, which are tiny electronic switches that can be on or off with a weak electrical charge. These switches are arranged in logical circuits to perform calculations, store data, and control operations in a computer.
 
 Binary is more efficient than tally marks and has an exponential increase in the amount of things it can represent compared to base 10, which uses ten digits. In base 10, each digit represents a power of 10, and as the value of the number increases, the number of digits required to represent it also increases. However, in binary, each digit represents a power of 2, so the number of digits required to represent a value grows exponentially.
 
