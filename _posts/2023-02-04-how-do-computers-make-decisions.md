@@ -7,7 +7,7 @@ tags:
   - software
 ---
 
-<img width="150" alt="leonardo da vinci" src="/images/posts/how-do-computers-make-decisions.png" style="float: left; margin-right: 10px;" /> How computers make decisions with logic gates, which is the fundamental building block for how computers operate. 
+<img width="150" alt="logic gates" src="/images/posts/how-do-computers-make-decisions.png" style="float: left; margin-right: 10px;" /> How computers make decisions with logic gates, which is the fundamental building block for how computers operate. 
 
 What are Logic Gates?
 ---
