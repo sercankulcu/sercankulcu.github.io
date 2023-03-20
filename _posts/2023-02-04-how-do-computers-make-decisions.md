@@ -1,5 +1,5 @@
 ---
-title: 'How Do Computers Make Decisions?'
+title: 'How do computers make decisions?'
 date: 2023-02-04
 permalink: /posts/2023/02/how-do-computers-make-decisions/
 tags:

@@ -1,5 +1,5 @@
 ---
-title: 'Leonardo da Vinci: The Man Beyond the Mona Lisa'
+title: 'Leonardo da vinci: the man beyond the mona lisa'
 date: 2023-02-07
 permalink: /posts/2023/02/leonardo-da-vinci-the-man-beyond-the-mona-lisa/
 tags:
