@@ -8,12 +8,7 @@ tags:
   - time management
 ---
 
-Here are some information about "How does a software engineer live?".
-
-Book suggestions for software engineers
------
-
-<img src='/images/posts/book-suggestions-for-software-engineers.png'>
+<img width="150" alt="jean de la bruyere" src="/images/posts/book-suggestions-for-software-engineers.png" style="float: left; margin-right: 10px;" /> The daily routine of a software engineer can differ based on the company or project they work on, but it typically includes several hours of working on a computer, attending meetings, and collaborating with team members. In addition to these tasks, many software engineers engage in professional development activities such as attending conferences or taking online courses to stay current with industry trends and emerging technologies. If looking to ease their mind and find comfort during busy workdays, software engineers can refer to various book suggestions. Overall, these books offer valuable insights and practical advice to software engineers of all levels.
 
 "The Art of Racing in the Rain" by Garth Stein - This novel is told from the perspective of a dog named Enzo, who is the loyal companion of a race car driver. It is a heartwarming and thought-provoking story about life, love, and the human-animal bond.
 
