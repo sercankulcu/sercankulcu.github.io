@@ -1,5 +1,5 @@
 ---
-title: 'Why we need operating systems'
+title: 'Why we need operating systems?'
 date: 2023-02-02
 permalink: /posts/2023/02/why-we-need-operating-systems/
 tags:
