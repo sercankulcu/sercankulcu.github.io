@@ -7,7 +7,7 @@ tags:
   - software
 ---
 
-<img width="150" alt="logic gates" src="/images/posts/how-do-computers-make-decisions.png" style="float: left; margin-right: 10px;" /> How computers make decisions with logic gates, which is the fundamental building block for how computers operate. 
+<img width="150" alt="logic gates" src="/images/posts/how-do-computers-make-decisions.png" style="float: left; margin-right: 10px;" /> How computers make decisions with logic gates, which is the fundamental building block for how computers operate? Computers make decisions using logic gates, which are the fundamental building blocks of all digital circuits. A logic gate is a basic electronic component that takes one or more binary inputs and produces a binary output based on a logical operation. The basic logic gates are AND, OR and NOT gates. These gates can be combined to create more complex circuits that can perform more advanced logical operations.
 
 What are Logic Gates?
 ---
