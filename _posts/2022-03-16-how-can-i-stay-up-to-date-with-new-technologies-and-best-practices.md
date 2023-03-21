@@ -150,6 +150,7 @@ By participating in online courses and training programs, software developers ca
 
 Joining a user group:
 -----
+
 Joining a user group is a great way for software developers to connect with others in their field and learn about new technologies and best practices. User groups are typically made up of individuals who have an interest in a specific area of software development, such as a particular programming language, tool, or platform.
 
 User groups usually meet in person at regular intervals, such as once a month or once a quarter. At these meetings, members can discuss their work, share knowledge and expertise, and learn about new technologies and best practices. Some user groups also invite guest speakers to present on topics of interest to their members.
@@ -172,6 +173,7 @@ Joining a user group is a great way for software developers to connect with othe
 
 Experimenting and building your own projects:
 -----
+
 Experimenting and building your own projects is a great way for software developers to learn new skills and technologies, and to apply their knowledge in a practical setting. By building your own projects, you can learn by doing, and you can get hands-on experience with different tools, technologies, and best practices.
 
 There are many different types of projects that software developers can build, ranging from simple programs and scripts, to complex applications and systems. 
