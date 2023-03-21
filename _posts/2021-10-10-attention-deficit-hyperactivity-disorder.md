@@ -7,9 +7,7 @@ tags:
   - productivity
 ---
 
-Attention Deficit Hyperactivity Disorder (ADHD) is a complex and often misunderstood condition that affects both children and adults. It is characterized by symptoms such as difficulty focusing, impulsivity, and hyperactivity.
-
-As a philosopher, I believe that ADHD is not just a medical condition, but also a social and cultural construct. Society tends to view ADHD as a deficit, a failure to conform to the norm of being able to sit still, focus and pay attention. However, ADHD is not a deficit but a difference. People with ADHD often have unique strengths, such as creativity, impulsivity, and the ability to think outside of the box.
+<img width="150" alt="cat" src="/images/posts/attention-deficit-hyperactivity-disorder.png" style="float: left; margin-right: 10px;" /> Attention Deficit Hyperactivity Disorder (ADHD) is a complex and often misunderstood condition that affects both children and adults. It is characterized by symptoms such as difficulty focusing, impulsivity, and hyperactivity. I believe that ADHD is not just a medical condition, but also a social and cultural construct. Society tends to view ADHD as a deficit, a failure to conform to the norm of being able to sit still, focus and pay attention. However, ADHD is not a deficit but a difference. People with ADHD often have unique strengths, such as creativity, impulsivity, and the ability to think outside of the box.
 
 It is important to understand that ADHD is not just a problem for the individual with the condition, but also for the society. Society's rigid and narrow definition of what is considered "normal" or "acceptable" behavior can make it difficult for individuals with ADHD to fully participate and contribute to society. Society should be more inclusive and accommodate for different types of individuals, rather than expecting everyone to conform to the same standard.
 
