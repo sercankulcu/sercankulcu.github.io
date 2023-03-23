@@ -6,7 +6,7 @@ tags:
   - career
 ---
 
-Smart antennas are a type of antenna that are used in wireless communication systems to improve the performance of the communication. They are called "smart" because they use advanced algorithms and techniques to adapt the radiation pattern of the antenna in real-time based on the communication environment and the specific needs of the system. Smart antennas are used in a wide range of applications, including cellular communication systems, satellite communication systems, and radar systems.
+<img width="150" alt="smart antenna" src="/images/posts/smart-antenna.png" style="float: left; margin-right: 10px;" /> Smart antennas are a type of antenna that are used in wireless communication systems to improve the performance of the communication. They are called "smart" because they use advanced algorithms and techniques to adapt the radiation pattern of the antenna in real-time based on the communication environment and the specific needs of the system. Smart antennas are used in a wide range of applications, including cellular communication systems, satellite communication systems, and radar systems.
 
 There are several types of smart antenna technologies, including adaptive array antennas, switched beam antennas, and beamforming antennas. Adaptive array antennas use multiple antenna elements that can be independently controlled to form a beam that is directed towards the desired communication direction. Switched beam antennas use a fixed array of antenna elements that can be switched between different beam patterns to form a beam in the desired direction. Beamforming antennas use multiple antenna elements and sophisticated signal processing techniques to form a beam that is directed towards the desired direction.
 
