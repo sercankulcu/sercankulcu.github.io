@@ -7,7 +7,7 @@ tags:
   - fun
 ---
 
-<img width="150" alt="fire" src="/images/posts/exploring-the-connection-between-evidence-and-belief.jpg" style="float: left; margin-right: 10px;" /> When it comes to understanding the world around us, we often rely on our beliefs and what we want to believe. But have you ever thought about the connection between our beliefs and the standards of evidence we use to support them? It turns out, the two are closely related, and it's a topic that has been explored by philosophers for centuries.
+<img width="150" alt="hammer" src="/images/posts/exploring-the-connection-between-evidence-and-belief.jpg" style="float: left; margin-right: 10px;" /> When it comes to understanding the world around us, we often rely on our beliefs and what we want to believe. But have you ever thought about the connection between our beliefs and the standards of evidence we use to support them? It turns out, the two are closely related, and it's a topic that has been explored by philosophers for centuries.
 
 One key insight is that the lower our standard for evidence, the stronger our desire to believe something must be. In other words, if we're willing to accept weak or questionable evidence to support our beliefs, it's likely that we have a strong desire to believe those things.
 
