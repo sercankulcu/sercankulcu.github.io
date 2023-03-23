@@ -8,7 +8,7 @@ tags:
   - career
 ---
 
-<img width="150" alt="sign" src="/images/posts/what-is-quantum-computing.png" style="float: left; margin-right: 10px;" /> Quantum computing is a type of computing that uses the principles of quantum mechanics to store and process information. In contrast to classical computers, which use bits to store and process information, quantum computers use quantum bits, or qubits. Qubits are quantum systems that can represent a 0, a 1, or both values at the same time, a property known as superposition. 
+<img width="150" alt="sign" src="/images/posts/what-is-quantum-computing.png" style="float: left; margin-right: 10px;" /> Quantum computing is a cutting-edge computing technology that holds the potential to revolutionize the way we process and store information. It utilizes the principles of quantum mechanics to enable faster and more efficient computing. Unlike classical computers, which use bits to store and process information, quantum computers use quantum bits or qubits. Qubits have the ability to represent multiple values at the same time, including both 0 and 1, a property known as superposition. This unique characteristic of qubits allows them to perform complex operations faster than classical computers, such as factoring large numbers and solving complex optimization problems.
 
 How does quantum computing work?
 ------
