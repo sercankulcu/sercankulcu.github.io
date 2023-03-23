@@ -8,15 +8,12 @@ tags:
   - network
 ---
 
-
-The 6TiSCH protocol is a networking protocol for low-power, low-rate wireless networks, designed for use in Internet of Things (IoT) applications. It is based on the IEEE 802.15.4e standard, which is a wireless standard for low-rate wireless personal area networks (LR-WPANs).
+<img width="150" alt="6tisch" src="/images/posts/six-tisch-protocol.png" style="float: left; margin-right: 10px;" /> The 6TiSCH protocol is a popular networking protocol that is specifically tailored to low-power and low-rate wireless networks. This protocol has been designed to facilitate the development of wireless networks for IoT applications. This protocol is based on the IEEE 802.15.4e standard, which is a wireless standard that operates on low-rate wireless personal area networks. The standardization of 6TiSCH ensures that developers can leverage and extend the technology to develop interoperable devices and applications, which will ultimately drive innovation in the IoT space.
 
 What is the 6TiSCH protocol?
 -----
 
 The 6TiSCH protocol is designed to provide a reliable and secure communication layer for IoT devices that need to communicate with each other and with the wider Internet. It is particularly well-suited for use in industrial, agricultural, and other environments where low-power, low-bandwidth communication is required.
-
-<img src='/images/posts/six-tisch-protocol.png'>
 
 One of the key features of the 6TiSCH protocol is its support for time-slotted channel hopping (TSCH), which allows devices to communicate with each other over a series of predefined radio channels in a coordinated manner. This helps to improve the reliability and efficiency of the communication, as it allows devices to avoid interference and collision with other devices that may be transmitting on the same channel.
 
