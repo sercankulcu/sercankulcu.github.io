@@ -7,10 +7,7 @@ tags:
   - career
 ---
 
-Here are the quotes from famous computer scientists
-
-Quotes from famous computer scientists
-------
+<img width="150" alt="sign" src="/images/posts/quotes-from-famous-computer-scientists.jpg" style="float: left; margin-right: 10px;" /> There are many great quotes from famous computer scientists that reflect their passion and dedication to the field of computer science. Some of these quotes include Grace Hopper's famous saying "The most damaging phrase in the language is 'We've always done it this way'", Alan Turing's insight that "We can only see a short distance ahead, but we can see plenty there that needs to be done", and Bill Gates' quote "I think it's fair to say that personal computers have become the most empowering tool we've ever created". These quotes inspire and remind us of the importance of computer science and the role it plays in shaping the future.
 
 "The only way to do great work is to love what you do." - Steve Jobs
 
