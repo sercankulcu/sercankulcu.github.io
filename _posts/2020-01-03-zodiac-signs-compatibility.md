@@ -7,7 +7,7 @@ tags:
   - fun
 ---
 
-The zodiac is a system of astrology that divides the sky into 12 sections, known as zodiac signs. Each sign is associated with a particular date range, and is associated with certain characteristics, traits, and tendencies. The 12 zodiac signs are:
+<img width="150" alt="zodiac signs" src="/images/posts/zodiac-signs-compatibility.png" style="float: left; margin-right: 10px;" /> The zodiac is a system of astrology that divides the sky into 12 sections, known as zodiac signs. Each sign is associated with a particular date range, and is associated with certain characteristics, traits, and tendencies. The 12 zodiac signs are:
 
 * Aries (March 21 - April 19)
 * Taurus (April 20 - May 20)
@@ -21,8 +21,6 @@ The zodiac is a system of astrology that divides the sky into 12 sections, known
 * Capricorn (December 22 - January 19)
 * Aquarius (January 20 - February 18)
 * Pisces (February 19 - March 20)
-
-<img src='/images/posts/zodiac-signs-compatibility.png'>
 
 Each zodiac sign is thought to be influenced by the characteristics and traits of the associated element (fire, earth, air, or water) and planet. Astrologers use the positions of the planets and other celestial bodies at the time of a person's birth to create a natal chart, which is believed to provide insight into a person's personality and future.
 
