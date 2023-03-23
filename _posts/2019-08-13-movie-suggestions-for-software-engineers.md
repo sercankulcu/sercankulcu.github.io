@@ -8,12 +8,7 @@ tags:
   - time management
 ---
 
-Here are some information about "How does a software engineer live?".
-
-Movie suggestions for software engineers:
------
-
-<img src='/images/posts/movie-suggestions-for-software-engineers.png'>
+<img width="150" alt="theatre" src="/images/posts/movie-suggestions-for-software-engineers.png" style="float: left; margin-right: 10px;" /> Software engineers typically live a busy lifestyle, especially during the workweek, as they spend a significant amount of time in front of their computers, designing, coding, and testing software applications. Because technology is constantly evolving, software engineers often have to keep their skills up to date and stay informed about the latest trends in the industry. Regarding movie suggestions, some films that may be of interest to software engineers include The Social Network, which chronicles the creation and rise of Facebook; WarGames, a classic '80s movie about hacking and cybersecurity; and Ex Machina, a thought-provoking film about artificial intelligence and its ethical implications.
 
 "The Social Network" - This movie tells the story of the founding of Facebook and the development of the social media platform. It is a great movie for software engineers interested in the startup world and the creation of new technologies.
 
