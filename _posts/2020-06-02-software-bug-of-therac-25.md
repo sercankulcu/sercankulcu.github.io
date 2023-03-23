@@ -6,9 +6,7 @@ tags:
   - self-improvement
 ---
 
-Therac-25 is a medical linear accelerator developed in the 1980s by the Canadian company Atomic Energy of Canada Limited (AECL). The machine was designed to deliver high-energy radiation to treat cancer patients, and it was used in several medical facilities throughout the world. However, the Therac-25 was also responsible for several radiation overdose accidents due to a software bug known as a "race condition" associated with its command screen, which resulted in severe injury and even death.
-
-<img src='/images/posts/software-bug-of-therac-25.png'>
+<img width="150" alt="Therac-25" src="/images/posts/software-bug-of-therac-25.png" style="float: left; margin-right: 10px;" /> Therac-25 is a medical linear accelerator developed in the 1980s by the Canadian company Atomic Energy of Canada Limited (AECL). The machine was designed to deliver high-energy radiation to treat cancer patients, and it was used in several medical facilities throughout the world. However, the Therac-25 was also responsible for several radiation overdose accidents due to a software bug known as a "race condition" associated with its command screen, which resulted in severe injury and even death.
 
 The Therac-25 was an advanced machine that used computer technology to control the delivery of radiation to patients. However, due to a number of software bugs, the machine was prone to errors. A race condition occurs when multiple processes are trying to access and modify the same shared resource at the same time, leading to unpredictable and incorrect behavior. In the case of the Therac-25, the race condition was caused by a bug in the software that controlled the command screen. This bug caused the machine to incorrectly interpret commands, resulting in radiation overdoses. The most significant of these errors occurred when the machine was set to deliver a low dose of radiation, but instead delivered a much higher dose. This resulted in several cases of radiation overdose, which caused severe injury and even death.
 
