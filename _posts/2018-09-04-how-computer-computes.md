@@ -7,17 +7,13 @@ tags:
   - self-improvement
 ---
 
-Computers run on a combination of hardware and software. The hardware, or physical components, include the central processing unit (CPU), memory (RAM), storage (hard drive or solid state drive), and various peripheral devices such as a keyboard and monitor.
-
-The CPU, also known as the "brain" of the computer, is responsible for executing instructions, or code, that make up a program. Programs are written in various programming languages, such as C++, Python, or Java, and are then compiled or interpreted into machine code, which the CPU can understand and execute.
+<img width="150" alt="schema" src="/images/posts/how-computer-computes.png" style="float: left; margin-right: 10px;" /> Computers run on a combination of hardware and software. The hardware, or physical components, include the central processing unit (CPU), memory (RAM), storage (hard drive or solid state drive), and various peripheral devices such as a keyboard and monitor. The CPU, also known as the "brain" of the computer, is responsible for executing instructions, or code, that make up a program. Programs are written in various programming languages, such as C++, Python, or Java, and are then compiled or interpreted into machine code, which the CPU can understand and execute.
 
 The CPU retrieves instructions from memory (RAM) and stores any necessary data in memory as well. RAM is a type of memory that is faster and more temporary than storage, and is used to hold data and instructions that the CPU is currently using or processing. Storage, such as a hard drive or SSD, is used to hold more permanent data such as the operating system and installed programs.
 
 Peripheral devices, such as a keyboard or mouse, are connected to the computer through ports, and allow for user input. The monitor displays output from the computer. Overall, the computer uses the hardware and software to receive input, process data, and provide output in order to perform various tasks such as running programs, browsing the internet, or storing files.
 
 The CPU uses a set of registers to hold data and perform calculations. Registers are small, fast storage locations within the CPU that can be accessed and modified quickly. The CPU also uses an arithmetic logic unit (ALU) to perform mathematical and logical operations on the data stored in the registers. The CPU also has a control unit that coordinates the fetching and execution of instructions, and manages the flow of data between the registers, memory, and peripheral devices.
-
-<img src='/images/posts/how-computer-computes.png'>
 
 Addition
 ---
