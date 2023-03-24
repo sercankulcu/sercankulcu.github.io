@@ -7,9 +7,7 @@ tags:
   - fun
 ---
 
-Once upon a time, there was a man who I used to hang out with all the time. One day, he turned to me and said, "Why are we always just hanging out and wasting our time?" I thought about it and realized that he was right. From that day on, we stopped just hanging out and wasting our time.
-
-<img src='/images/posts/a-black-browed-black-eyed-person.png'>
+<img width="150" alt="black-browed black-eyed person" src="/images/posts/a-black-browed-black-eyed-person.png" style="float: left; margin-right: 10px;" /> Once upon a time, there was a man who I used to hang out with all the time. One day, he turned to me and said, "Why are we always just hanging out and wasting our time?" I thought about it and realized that he was right. From that day on, we stopped just hanging out and wasting our time.
 
 He never knew how to play chess. Well, actually he did know how to play but he would never admit it. He was such a shameless man. He would say that he knew how to play but he didn't, just to avoid playing with me. Oh my goodness, it was so frustrating. He would take hours to make a move and the outcome was always the same. I gave up trying to play with him.
 
