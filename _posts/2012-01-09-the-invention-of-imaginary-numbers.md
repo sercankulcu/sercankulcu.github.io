@@ -7,7 +7,7 @@ tags:
   - self-development
 ---
 
-<img width="150" alt="imaginary numbers" src="/images/posts/the-invention-of-imaginary-numbers.jpg" style="float: left; margin-right: 10px;" /> Mathematics began as a way to quantify our world, to measure land, predict the motions of planets, and keep track of commerce. But there was a problem that was considered impossible to solve. The secret to solving it was to separate math from the real world, to split algebra from geometry, and to invent new numbers so fanciful they are called imaginary. In this post, we will explore how imaginary numbers were invented and their relevance today.
+<img width="150" alt="imaginary numbers" src="/images/posts/the-invention-of-imaginary-numbers.png" style="float: left; margin-right: 10px;" /> Mathematics began as a way to quantify our world, to measure land, predict the motions of planets, and keep track of commerce. But there was a problem that was considered impossible to solve. The secret to solving it was to separate math from the real world, to split algebra from geometry, and to invent new numbers so fanciful they are called imaginary. In this post, we will explore how imaginary numbers were invented and their relevance today.
 
 In 1494, Luca Pacioli, who was Leonardo da Vinci's math teacher, published Summa de Arithmetica, a comprehensive summary of all mathematics known in Renaissance Italy at the time. In it, there was a section on the cubic, any equation that today we would write as ax cubed plus bx squared plus cx plus d equals zero. People had been trying to find a general solution to the cubic for at least 4,000 years, but each ancient civilization that encountered it - the Babylonians, Greeks, Chinese, Indians, Egyptians, and Persians - all came up empty-handed.
 
