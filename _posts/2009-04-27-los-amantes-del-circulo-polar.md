@@ -7,9 +7,7 @@ tags:
    - personal development
 ---
 
-"Los Amantes del Círculo Polar" (The Lovers of the Arctic Circle) is a Spanish film directed by Julio Medem, starring Najwa Nimri and Fele Martínez. The film is known for its striking imagery and deep symbolism, which are used to tell the story of two childhood friends, Otto and Ana, whose lives become intertwined as they grow older.
-
-<img src='/images/posts/los-amantes-del-circulo-polar.png'>
+<img width="150" alt="polar" src="/images/posts/los-amantes-del-circulo-polar.png" style="float: left; margin-right: 10px;" /> "Los Amantes del Círculo Polar" (The Lovers of the Arctic Circle) is a Spanish film directed by Julio Medem, starring Najwa Nimri and Fele Martínez. The film is known for its striking imagery and deep symbolism, which are used to tell the story of two childhood friends, Otto and Ana, whose lives become intertwined as they grow older.
 
 The film begins with the two main characters as children, and follows them through their teenage years and into adulthood. It tells the story of their love for each other, which is complicated by the fact that they are both in relationships with other people. As the story progresses, the audience is taken on a journey of self-discovery as the characters navigate their complex emotions and relationships.
 
