@@ -7,9 +7,7 @@ tags:
    - fun
 ---
 
-<img width="150" alt="jeux-d-enfants" src="/images/posts/jeux-d-enfants.png" style="float: left; margin-right: 10px;" /> Last night, I stumbled upon a movie that I had never heard of before. I was feeling a bit restless and decided to give it a chance, and ended up watching it for the entire duration without getting up from my seat. I was completely absorbed in the story, lighting one cigarette after another as I watched.
-
-As the movie came to an end, I found myself in tears. It had touched something deep inside of me, reminding me of my childhood and a person who had been very important to me: Sophie. I had lived with Sophie until the age of 11, when my father's job required us to move away. I don't know where Sophie is now, and the thought of never seeing her again fills me with a sense of loss and sadness.
+<img width="150" alt="jeux-d-enfants" src="/images/posts/jeux-d-enfants.png" style="float: left; margin-right: 10px;" /> Last night, I stumbled upon a movie that I had never heard of before. I was feeling a bit restless and decided to give it a chance, and ended up watching it for the entire duration without getting up from my seat. I was completely absorbed in the story, lighting one cigarette after another as I watched. As the movie came to an end, I found myself in tears. It had touched something deep inside of me, reminding me of my childhood and a person who had been very important to me: Sophie. I had lived with Sophie until the age of 11, when my father's job required us to move away. I don't know where Sophie is now, and the thought of never seeing her again fills me with a sense of loss and sadness.
 
 The movie had such a profound impact on me that I ended up deleting it from my watch list, not wanting to accidentally re-watch it and have to go through those emotions again. But I can't shake the feeling that it was somehow meant for me to watch, and that it was a reminder of a time in my life that I will always hold dear.
 
