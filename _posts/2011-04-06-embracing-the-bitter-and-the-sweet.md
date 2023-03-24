@@ -7,9 +7,9 @@ tags:
    - philosophy
 ---
 
-<img width="150" alt="bitter" src="/images/posts/embracing-the-bitter-and-the-sweet.png" style="float: left; margin-right: 10px;" /> My dear, People occasionally ponder the purpose of life. I think about that from time to time as well. Until I met you, that is. I remembered a joke that says peppers are bitter because life isn't as terrible and unpleasant as it appears. However, all peppers are sweet. Because life is not as harsh as it appears.
+<img width="150" alt="bitter" src="/images/posts/embracing-the-bitter-and-the-sweet.png" style="float: left; margin-right: 10px;" /> My dear, People occasionally ponder the purpose of life. I think about that from time to time as well. Until I met you, that is. I remembered a joke that says peppers are bitter because life isn't as terrible and unpleasant as it appears. However, all peppers are sweet. Because life is not as harsh as it appears. You must taste life as you choose to live it. Without regard for what others may say. Because no one will help you if you die with what you did not live. 
 
-You must taste life as you choose to live it. Without regard for what others may say. Because no one will help you if you die with what you did not live. Allow yourself to be free and do anything you want. Most people, like myself, do what needs to be done and let their emotions flow like rivers. Don't look back on holding the hand of someone you care about and thinking that what you're doing is bad; instead, let that love rock your entire soul.
+Allow yourself to be free and do anything you want. Most people, like myself, do what needs to be done and let their emotions flow like rivers. Don't look back on holding the hand of someone you care about and thinking that what you're doing is bad; instead, let that love rock your entire soul.
 
 If you honestly feel that person is what you're seeking for, hang on to them, live with them, and never let them go. Perhaps one day you'll realize how much you loved, how much you can love, how much you were loved, and how much you can love. But by then, it may be too late; your partner, the one who loves you, may have left you. That is when you should be sad. Crying for no apparent cause. That's when you turn to others and ask, "What should I do now?".
 
