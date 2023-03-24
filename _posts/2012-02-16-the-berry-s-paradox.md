@@ -7,7 +7,7 @@ tags:
   - self-development
 ---
 
-Berry's Paradox is a curious and thought-provoking paradox in mathematics and philosophy that challenges our understanding of truth, reference, and meaning. The paradox was first proposed by the philosopher Bertrand Russell's student G. G. Berry in the early 20th century, and it has important implications for our understanding of language, semantics, and the nature of mathematical reasoning.
+<img width="150" alt="brain" src="/images/posts/the-berry-s-paradox.png" style="float: left; margin-right: 10px;" /> Berry's Paradox is a curious and thought-provoking paradox in mathematics and philosophy that challenges our understanding of truth, reference, and meaning. The paradox was first proposed by the philosopher Bertrand Russell's student G. G. Berry in the early 20th century, and it has important implications for our understanding of language, semantics, and the nature of mathematical reasoning.
 
 The paradox goes as follows: consider the following sentence, "The smallest positive integer not definable in fewer than eleven words." This sentence appears to describe a well-defined mathematical object, namely, the smallest positive integer that cannot be described in fewer than eleven words. However, if we try to define this object using fewer than eleven words, we run into a contradiction: any definition of the object in fewer than eleven words would in fact define the object, thereby contradicting the original sentence.
 
