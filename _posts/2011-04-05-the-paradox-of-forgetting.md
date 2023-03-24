@@ -7,9 +7,7 @@ tags:
    - philosophy
 ---
 
-Forgetting is a strange phenomenon. We often think of it as a negative thing, something that we should try to avoid. However, in certain situations, forgetting can also be a blessing. The metaphor of a door that has stuck and can no longer be opened serves as a powerful reminder of the complexities of forgetting.
-
-<img src='/images/posts/the-paradox-of-forgetting.png'>
+<img width="150" alt="man" src="/images/posts/the-paradox-of-forgetting.png" style="float: left; margin-right: 10px;" /> Forgetting is a strange phenomenon. We often think of it as a negative thing, something that we should try to avoid. However, in certain situations, forgetting can also be a blessing. The metaphor of a door that has stuck and can no longer be opened serves as a powerful reminder of the complexities of forgetting.
 
 On one hand, forgetting can be a way of letting go of the past and moving on. When a door is stuck, we may try to force it open, but eventually, we must accept that it cannot be opened and move on. Similarly, when we hold onto memories that cause us pain, we may try to force ourselves to remember, but eventually, we must accept that they cannot be changed and let them go.
 
