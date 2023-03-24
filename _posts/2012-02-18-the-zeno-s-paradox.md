@@ -7,7 +7,7 @@ tags:
   - self-development
 ---
 
-Zeno's Paradox is a classic thought experiment in mathematics and philosophy that challenges our understanding of infinity, motion, and the nature of reality. The paradox was first proposed by the ancient Greek philosopher Zeno of Elea in the 5th century BCE, and it has since been the subject of much debate and discussion in the fields of mathematics and philosophy.
+<img width="150" alt="athlete" src="/images/posts/the-zeno-s-paradox.jpg" style="float: left; margin-right: 10px;" /> Zeno's Paradox is a classic thought experiment in mathematics and philosophy that challenges our understanding of infinity, motion, and the nature of reality. The paradox was first proposed by the ancient Greek philosopher Zeno of Elea in the 5th century BCE, and it has since been the subject of much debate and discussion in the fields of mathematics and philosophy.
 
 The paradox goes as follows: imagine a runner who must travel a certain distance, say 100 meters, to reach the finish line. In order to reach the finish line, the runner must first cover half the distance, or 50 meters. However, in order to cover the 50 meters, the runner must first cover half of that distance, or 25 meters. This process continues infinitely, with the runner always needing to cover half the remaining distance before reaching the finish line. According to Zeno, this means that the runner can never actually reach the finish line, as there are an infinite number of tasks to be completed before reaching the end.
 
