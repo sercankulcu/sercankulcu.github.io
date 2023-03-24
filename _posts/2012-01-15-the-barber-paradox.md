@@ -7,7 +7,7 @@ tags:
   - self-development
 ---
 
-The Barber Paradox is a classic example of a self-referential paradox, which was first introduced by the British logician Bertrand Russell in 1901. The paradox has been a subject of much discussion and debate among philosophers and logicians, as it raises important questions about the nature of language and meaning.
+<img width="150" alt="haircut" src="/images/posts/the-barber-paradox.png" style="float: left; margin-right: 10px;" /> The Barber Paradox is a classic example of a self-referential paradox, which was first introduced by the British logician Bertrand Russell in 1901. The paradox has been a subject of much discussion and debate among philosophers and logicians, as it raises important questions about the nature of language and meaning.
 
 The Barber Paradox goes as follows: In a small town, there is a barber who shaves all men in the town who do not shave themselves. The question is, who shaves the barber?
 

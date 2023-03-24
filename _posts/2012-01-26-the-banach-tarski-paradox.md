@@ -7,7 +7,7 @@ tags:
   - self-development
 ---
 
-The Banach-Tarski Paradox is a remarkable theorem in mathematics that was discovered by Stefan Banach and Alfred Tarski in the 1920s. The paradox challenges our intuition about the nature of space and the way that we measure geometric objects. In this post, we will explore the Banach-Tarski Paradox and its implications for mathematics and the philosophy of science.
+<img width="150" alt="ball" src="/images/posts/the-banach-tarski-paradox.png" style="float: left; margin-right: 10px;" /> The Banach-Tarski Paradox is a remarkable theorem in mathematics that was discovered by Stefan Banach and Alfred Tarski in the 1920s. The paradox challenges our intuition about the nature of space and the way that we measure geometric objects. In this post, we will explore the Banach-Tarski Paradox and its implications for mathematics and the philosophy of science.
 
 The Banach-Tarski Paradox asserts that it is possible to decompose a solid ball in three-dimensional space into a finite number of disjoint subsets, and then rearrange these subsets in such a way that two new solid balls of the same size as the original are formed. In other words, the paradox shows that one can divide a sphere into a finite number of pieces and then put them back together to form two identical copies of the original sphere.
 
