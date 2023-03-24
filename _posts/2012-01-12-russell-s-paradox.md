@@ -7,7 +7,7 @@ tags:
   - self-development
 ---
 
-Russell's Paradox is one of the most famous paradoxes in the field of mathematics and logic. It was first identified by the British philosopher and logician Bertrand Russell in 1901, and it is still considered a significant challenge for many modern approaches to set theory.
+<img width="150" alt="tea set" src="/images/posts/russell-s-paradox.jpg" style="float: left; margin-right: 10px;" /> Russell's Paradox is one of the most famous paradoxes in the field of mathematics and logic. It was first identified by the British philosopher and logician Bertrand Russell in 1901, and it is still considered a significant challenge for many modern approaches to set theory.
 
 At its core, Russell's Paradox deals with the concept of a set that contains all sets that do not contain themselves. This may sound like a straightforward concept at first, but it leads to a logical contradiction that has puzzled mathematicians and logicians for over a century.
 

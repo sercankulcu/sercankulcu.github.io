@@ -7,7 +7,7 @@ tags:
    - fun
 ---
 
-Here are popular oil paintings with their respective artists:
+<img width="150" alt="art" src="/images/posts/popular-oil-paintings.jpg" style="float: left; margin-right: 10px;" /> Here are popular oil paintings with their respective artists:
 
 * "Mona Lisa" by Leonardo da Vinci
 

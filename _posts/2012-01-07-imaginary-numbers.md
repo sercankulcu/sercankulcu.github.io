@@ -7,7 +7,7 @@ tags:
   - self-development
 ---
 
-The concept of imaginary numbers is an essential part of mathematics that has many applications in science and engineering. But where did this idea come from, and how did it develop over time?
+<img width="150" alt="imaginary numbers" src="/images/posts/imaginary-numbers.png" style="float: left; margin-right: 10px;" /> The concept of imaginary numbers is an essential part of mathematics that has many applications in science and engineering. But where did this idea come from, and how did it develop over time?
 
 The idea of "imaginary" or "unreal" numbers first arose when mathematicians encountered equations that had no solutions in the real number system. For example, the equation x^2 + 1 = 0 has no solutions in the real numbers, since the square of any real number is non-negative. However, it was noticed that if we introduce a new number, denoted by the symbol "i", such that i^2 = -1, then the equation x^2 + 1 = 0 has two solutions, namely x = i and x = -i.
 
