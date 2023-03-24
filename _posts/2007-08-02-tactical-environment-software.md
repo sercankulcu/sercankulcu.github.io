@@ -7,7 +7,7 @@ tags:
    - career
 ---
 
-Tactical Environment software refers to computer programs or software systems that are specifically designed for military or tactical operations. This type of software provides real-time information and data to help military personnel make informed decisions and respond quickly to changing conditions on the ground.
+<img width="150" alt="war" src="/images/posts/tactical-environment-software.jpg" style="float: left; margin-right: 10px;" /> Tactical Environment software refers to computer programs or software systems that are specifically designed for military or tactical operations. This type of software provides real-time information and data to help military personnel make informed decisions and respond quickly to changing conditions on the ground.
 
 Tactical Environment software typically includes capabilities for geographic information systems (GIS), mapping and imagery, meteorology, air and ground surveillance, and communications. The software can be used in a variety of situations, including military training exercises, reconnaissance missions, and combat operations. It is designed to be highly scalable, configurable, and interoperable, allowing military personnel to use the software in a wide range of environments and situations.
 
