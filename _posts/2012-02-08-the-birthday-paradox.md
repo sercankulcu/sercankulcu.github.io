@@ -1,5 +1,5 @@
 ---
-title: 'The Birthday Paradox'
+title: 'The birthday paradox'
 date: 2012-02-08
 permalink: /posts/2012/02/the-birthday-paradox/
 tags:

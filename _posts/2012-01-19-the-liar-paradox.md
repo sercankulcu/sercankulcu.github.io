@@ -1,5 +1,5 @@
 ---
-title: 'The Liar Paradox'
+title: 'The liar paradox'
 date: 2012-01-19
 permalink: /posts/2012/01/the-liar-paradox/
 tags:

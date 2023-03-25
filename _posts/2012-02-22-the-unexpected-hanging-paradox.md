@@ -1,5 +1,5 @@
 ---
-title: 'The Unexpected Hanging Paradox'
+title: 'The unexpected hanging paradox'
 date: 2012-02-22
 permalink: /posts/2012/02/the-unexpected-hanging-paradox/
 tags:
