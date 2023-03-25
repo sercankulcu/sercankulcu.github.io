@@ -1,5 +1,5 @@
 ---
-title: 'Russells Paradox'
+title: 'Russells paradox'
 date: 2012-01-12
 permalink: /posts/2012/01/russell-s-paradox/
 tags:

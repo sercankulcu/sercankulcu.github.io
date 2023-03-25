@@ -1,5 +1,5 @@
 ---
-title: 'Imaginary Numbers'
+title: 'Imaginary numbers'
 date: 2012-01-07
 permalink: /posts/2012/01/imaginary-numbers/
 tags:

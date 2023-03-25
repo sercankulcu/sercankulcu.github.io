@@ -1,5 +1,5 @@
 ---
-title: 'The Banach-Tarski Paradox'
+title: 'The banach-tarski paradox'
 date: 2012-01-26
 permalink: /posts/2012/01/the-banach-tarski-paradox/
 tags:

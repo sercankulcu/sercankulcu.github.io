@@ -1,5 +1,5 @@
 ---
-title: 'The Barber Paradox'
+title: 'The barber paradox'
 date: 2012-01-15
 permalink: /posts/2012/01/the-barber-paradox/
 tags:

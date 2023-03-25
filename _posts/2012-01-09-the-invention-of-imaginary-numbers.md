@@ -1,5 +1,5 @@
 ---
-title: 'The Invention of Imaginary Numbers: Separating Math from Reality'
+title: 'The invention of imaginary numbers: separating math from reality'
 date: 2012-01-09
 permalink: /posts/2012/01/the-invention-of-imaginary-numbers/
 tags:

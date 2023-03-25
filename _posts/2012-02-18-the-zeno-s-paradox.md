@@ -1,5 +1,5 @@
 ---
-title: 'The Zenos Paradox'
+title: 'The zenos paradox'
 date: 2012-02-18
 permalink: /posts/2012/02/the-zeno-s-paradox/
 tags:
