@@ -34,6 +34,39 @@ kabahat senin,
 demeğe de dilim varmıyor ama
 kabahatın çoğu senin, canım kardeşim!
 
+Anlayamadım / Menderes Samancılar
+---
+
+ben mi anlayamadım, sonbalar mı götürdü
+yıldırım mı düşmüş bahçeme
+tomurcuk güllerim mi yanmış
+önce yapraklar mı tutuşmuş
+anlayamadım
+saçlarım mı ağarmış, düşüyor muyum
+öl diyorsunuz, ölmüyor muyum
+beni anladınız mı
+anlayamadım
+
+Ayışığı / Ahmet Muhip Dıranas
+---
+
+Yüzün beyaz, abajur yeşil, gece mor;
+Esrimiş kalbim, şarkısını söylüyor.
+Her yanın avuçlarıma dökülüyor
+Çeşmeden akan suyun berraklığında.
+
+Dolaşan bir dudak mı var saçlarını?
+Ay tırmanıyor zeytin ağaçlarını.
+Sürü bulutlar gece yamaçlarını
+Otlayıp yayılıyor gök kırlığında.
+
+Üzerinden örtüyü mü çekti bir el?
+Gece ayaklarından akıp giden sel;
+Seyrine doyulmuyor ruhunun, güzel
+Bu manzara gibi, bu ayışığında...
+
+Yeniden yarattı seni gizli bir el!
+
 Böyle bir sevmek / Attila İlhan
 ---
 
@@ -61,7 +94,7 @@ böyle bir sevmek görülmemiştir
 Eski bir kadınsın sen / Cezmi Ersöz
 ---
 
-Eski bir kadınsın sen,
+Eski bir kadınsın sen, 
 aşkı öğretmek için tekrar tekrar dirilen...
 
 Ölümünü bekletiyor şimdi seninle
