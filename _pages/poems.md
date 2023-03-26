@@ -6,21 +6,6 @@ redirect_from:
   - /poems.html
 ---
 
-HÜZZAM / Emre Ekinci
----
-
-Mehtab, ruhumla meşk diler belli.
-Makamı bir garib Hüzzam...
-
-Sordum, bir dem ise hayat,
-Neden ki bu kavgam?
-
-Yürek yangın yeri,
-Dilek aşka vuslat...
-
-Kaçılmaz bilirim..!
-Sonumuz, kuru bir toprak...
-
 Akrep gibisin kardeşim / Nazım Hikmet RAN
 ---
 
@@ -49,7 +34,64 @@ kabahat senin,
 demeğe de dilim varmıyor ama
 kabahatın çoğu senin, canım kardeşim!
 
-Mutlu Olma Şansı / Yılmaz Güney
+Böyle bir sevmek / Attila İlhan
+---
+
+ne kadınlar sevdim zaten yoktular
+yağmur giyerlerdi sonbaharla bir
+azıcık okşasam sanki çocuktular
+bıraksam korkudan gözleri sislenir
+ne kadınlar sevdim zaten yoktular
+böyle bir sevmek görülmemiştir
+
+hayır sanmayın ki beni unuttular
+hâlâ arasıra mektupları gelir
+gerçek değildiler birer umuttular
+eski bir şarkı belki bir şiir
+ne kadınlar sevdim zaten yoktular
+böyle bir sevmek görülmemiştir
+
+yalnızlıklarımda elimden tuttular
+uzak fısıltıları içimi ürpertir
+sanki gökyüzünde bir buluttular
+nereye kayboldular şimdi kimbilir
+ne kadınlar sevdim zaten yoktular
+böyle bir sevmek görülmemiştir
+
+Eski bir kadınsın sen / Cezmi Ersöz
+---
+
+Eski bir kadınsın sen,
+aşkı öğretmek için tekrar tekrar dirilen...
+
+Ölümünü bekletiyor şimdi seninle
+sevdası yarım kalmış ömürler.
+
+Boğulmuş ve kanla karışmış yüzü denizin
+sevginle duruluyor...
+
+Aşk, unutulmuş bir sanat gibi,
+ağırbaşlı bir çileyle öğreniliyor şimdi
+
+Eski bir kadınsın sen,
+aşkı öğretmek için celladını tekrar tekrar dirilten...
+
+Hüzzam / Emre Ekinci
+---
+
+Mehtab, ruhumla meşk diler belli.
+Makamı bir garib Hüzzam...
+
+Sordum, bir dem ise hayat,
+Neden ki bu kavgam?
+
+Yürek yangın yeri,
+Dilek aşka vuslat...
+
+Kaçılmaz bilirim..!
+Sonumuz, kuru bir toprak...
+
+Mutlu olma şansı / Yılmaz Güney
 ---
 
 Hayat bize mutlu olma şansı vermedi
