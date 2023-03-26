@@ -151,3 +151,10 @@ Sevinerek, severek, sevilerek,
 Düşünerek...
 Ve o vazgeçilmez sancılarını duyarak hayatın
 
+.. / tcd
+---
+
+güneşi geceye verdim yine düşünerek seni,
+dumanlar arasında bir gün daha sensiz...
+dalgın bakışlarıyla ay çıka geldi pencereme,
+yine öksürdüm ve yine yalnız üşüdüm...
