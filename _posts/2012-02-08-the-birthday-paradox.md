@@ -7,7 +7,7 @@ tags:
   - self-development
 ---
 
-<img width="200" alt="birthday" src="/images/posts/the-birthday-paradox.jpg" style="float: left; margin-right: 10px;" /> The Birthday Paradox is a classic problem in probability theory that demonstrates how seemingly unlikely events can actually be quite common. The paradox is named after the fact that it is based on the probability of two people in a room sharing the same birthday, but it has implications for a wide range of fields, from cryptography to computer science.
+<img width="200" alt="birthday" src="/images/posts/the-birthday-paradox.jpg" style="float: left; margin-right: 10px;" /> The Birthday Paradox is a fascinating concept in probability theory that may seem counterintuitive at first. The paradox arises from the fact that the probability of two people in a room sharing the same birthday increases much more rapidly than one might expect as the number of people in the room grows. This phenomenon can be explained by the fact that there are many more possible pairs of people as the number of people in the room increases. The Birthday Paradox has important implications for many fields, including cryptography, where it is used to calculate the probability of a collision between two hash values.
 
 The paradox goes as follows: if there are 23 people in a room, what is the probability that two of them share the same birthday? Intuitively, it might seem that the probability is low, since there are 365 days in a year and the chance of two people being born on the same day is only about 1/365. However, the actual probability is much higher: about 50%.
 

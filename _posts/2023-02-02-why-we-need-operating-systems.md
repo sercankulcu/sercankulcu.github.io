@@ -7,7 +7,7 @@ tags:
   - software
 ---
 
-<img width="200" alt="operating system" src="/images/posts/why-we-need-operating-systems.png" style="float: left; margin-right: 10px;" /> In the early days of computing, computers were massive, expensive machines that could only run one program at a time. Programming was done on punch cards, and the operator would manually feed the programming into the computer. The computer would then run the program, output some results, and wait for the next program to be fed in. This process was tedious, time-consuming, and not efficient.
+<img width="150" alt="operating system" src="/images/posts/why-we-need-operating-systems.png" style="float: left; margin-right: 10px;" /> In the early days of computing, computers were massive, expensive machines that could only run one program at a time. Programming was done on punch cards, and the operator would manually feed the programming into the computer. The computer would then run the program, output some results, and wait for the next program to be fed in. This process was tedious, time-consuming, and not efficient.
 
 To improve this process, operating systems were created to help computers operate themselves. Operating systems are programs that have special privileges on the hardware and can run and manage other programs. They are typically the first programs to start when a computer is turned on. The first OSs were created in the 1950s to handle the manual tasks of loading programs by hand.
 
