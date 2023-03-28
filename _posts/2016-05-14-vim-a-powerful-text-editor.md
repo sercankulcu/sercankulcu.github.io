@@ -8,7 +8,7 @@ tags:
   - productivity
 ---
 
-<img width="150" alt="vim" src="/images/posts/vim-a-powerful-text-editor-1.png" style="float: left; margin-right: 10px;" /> Vim is a text editor that is widely used by programmers and users who prefer to use a command-line interface (CLI). It is known for its powerful features and efficiency, and is often used as a replacement for the standard terminal text editor, vi. Vim is available on most Unix-like operating systems, as well as on Windows. Some of the features of Vim include syntax highlighting, support for multiple programming languages, and the ability to use multiple windows and buffers for editing files. One of the key features of Vim is its mode-based interface, which allows the user to perform different actions depending on the mode that Vim is in. For example, in normal mode, the user can navigate through the text and make basic edits, while in insert mode, the user can insert new text into the file.
+<img width="200" alt="vim" src="/images/posts/vim-a-powerful-text-editor-1.png" style="float: left; margin-right: 10px;" /> Vim is a text editor that is widely used by programmers and users who prefer to use a command-line interface (CLI). It is known for its powerful features and efficiency, and is often used as a replacement for the standard terminal text editor, vi. Vim is available on most Unix-like operating systems, as well as on Windows. Some of the features of Vim include syntax highlighting, support for multiple programming languages, and the ability to use multiple windows and buffers for editing files. One of the key features of Vim is its mode-based interface, which allows the user to perform different actions depending on the mode that Vim is in. For example, in normal mode, the user can navigate through the text and make basic edits, while in insert mode, the user can insert new text into the file.
 
 Motto
 -----
@@ -33,7 +33,7 @@ There are several reasons why you might want to use Vim as your text editor:
 History
 -----
 
-<img width="150" alt="vim" src="/images/posts/vim-a-powerful-text-editor-2.png" style="float: left; margin-right: 10px;" /> Vim (Vi Improved) is a fork of the original vi text editor, which was developed by Bill Joy in the 1970s for the Unix operating system. Vim was created by Bram Moolenaar in 1991, and has since become one of the most popular text editors in the world.
+<img width="200" alt="vim" src="/images/posts/vim-a-powerful-text-editor-2.png" style="float: left; margin-right: 10px;" /> Vim (Vi Improved) is a fork of the original vi text editor, which was developed by Bill Joy in the 1970s for the Unix operating system. Vim was created by Bram Moolenaar in 1991, and has since become one of the most popular text editors in the world.
 
 One of the key features that set Vim apart from other text editors is its mode-based interface, which allows the user to perform different actions depending on the mode that Vim is in. For example, in normal mode, the user can navigate through the text and make basic edits, while in insert mode, the user can insert new text into the file.
 

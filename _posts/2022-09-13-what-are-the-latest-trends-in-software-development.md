@@ -8,7 +8,7 @@ tags:
   - software
 ---
 
-<img width="150" alt="software developer" src="/images/posts/what-are-the-latest-trends-in-software-development.png" style="float: left; margin-right: 10px;" /> New tools, frameworks, and programming languages are emerging every day, and developers need to keep up with these changes to stay relevant in the industry. The rise of artificial intelligence and machine learning is creating new opportunities for software developers, while also presenting unique challenges that require new skills and knowledge. The demand for software applications is increasing in almost every industry sector, from healthcare to finance to education, creating an urgent need for professionals who can develop high-quality and innovative software solutions. 
+<img width="200" alt="software developer" src="/images/posts/what-are-the-latest-trends-in-software-development.png" style="float: left; margin-right: 10px;" /> New tools, frameworks, and programming languages are emerging every day, and developers need to keep up with these changes to stay relevant in the industry. The rise of artificial intelligence and machine learning is creating new opportunities for software developers, while also presenting unique challenges that require new skills and knowledge. The demand for software applications is increasing in almost every industry sector, from healthcare to finance to education, creating an urgent need for professionals who can develop high-quality and innovative software solutions. 
 
 Here are five of the latest trends in software development that are worth paying attention to:
 

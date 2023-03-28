@@ -7,7 +7,7 @@ tags:
   - history
 ---
 
-<img width="150" alt="computer" src="/images/posts/the-story-of-computing.jpg" style="float: left; margin-right: 10px;" /> The story of computing is inextricably linked to the story of humanity. From the earliest days of civilization, we have been driven by a deep-seated desire to push beyond our physical and mental limitations. We have always sought new ways to understand the world around us, to communicate with one another, and to harness the power of technology to make our lives easier and more fulfilling.
+<img width="200" alt="computer" src="/images/posts/the-story-of-computing.jpg" style="float: left; margin-right: 10px;" /> The story of computing is inextricably linked to the story of humanity. From the earliest days of civilization, we have been driven by a deep-seated desire to push beyond our physical and mental limitations. We have always sought new ways to understand the world around us, to communicate with one another, and to harness the power of technology to make our lives easier and more fulfilling.
 
 At the heart of this story is ambition. Our ancestors were driven by a burning desire to accomplish great things, to explore new frontiers, and to leave a lasting legacy for future generations. They built the pyramids, charted the stars, and developed writing systems to record their knowledge and ideas. And as technology advanced, so did our ambitions. We dreamed of flying, of traveling to the moon, and of building machines that could think and learn on their own.
 

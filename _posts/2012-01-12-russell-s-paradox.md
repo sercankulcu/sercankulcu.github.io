@@ -7,7 +7,7 @@ tags:
   - self-development
 ---
 
-<img width="150" alt="tea set" src="/images/posts/russell-s-paradox.png" style="float: left; margin-right: 10px;" /> Russell’s Paradox is one of the most notable paradoxes in mathematics and logic. It was first identified by Bertrand Russell, an English philosopher and logician, in 1901. The paradox arises when considering the set of all sets that do not contain themselves as members. The paradox is considered a significant challenge for many modern approaches to set theory, and has contributed significantly to the development of the philosophy of language, logic and mathematics. 
+<img width="200" alt="tea set" src="/images/posts/russell-s-paradox.png" style="float: left; margin-right: 10px;" /> Russell’s Paradox is one of the most notable paradoxes in mathematics and logic. It was first identified by Bertrand Russell, an English philosopher and logician, in 1901. The paradox arises when considering the set of all sets that do not contain themselves as members. The paradox is considered a significant challenge for many modern approaches to set theory, and has contributed significantly to the development of the philosophy of language, logic and mathematics. 
 
 At its core, Russell's Paradox deals with the concept of a set that contains all sets that do not contain themselves. This may sound like a straightforward concept at first, but it leads to a logical contradiction that has puzzled mathematicians and logicians for over a century.
 

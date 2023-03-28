@@ -7,7 +7,7 @@ tags:
   - education
 ---
 
-<img width="150" alt="team" src="/images/posts/the-importance-of-active-and-collaborative-education.jpg" style="float: left; margin-right: 10px;" /> The traditional education system often encourages passive learning, where students are expected to simply memorize information for tests and exams. However, this approach does not foster critical thinking or deep understanding of the material. A better approach is to provide students with opportunities for active and collaborative learning, where they can engage with the material in a meaningful way. One of the best ways to do this is by incorporating seminars into each class.
+<img width="200" alt="team" src="/images/posts/the-importance-of-active-and-collaborative-education.jpg" style="float: left; margin-right: 10px;" /> The traditional education system often encourages passive learning, where students are expected to simply memorize information for tests and exams. However, this approach does not foster critical thinking or deep understanding of the material. A better approach is to provide students with opportunities for active and collaborative learning, where they can engage with the material in a meaningful way. One of the best ways to do this is by incorporating seminars into each class.
 
 Seminars are interactive sessions where students can discuss and analyze the material in a group setting. They provide an opportunity for students to share their own perspectives and engage in critical thinking, rather than just passively listening to a lecture. By participating in seminars, students can develop their analytical, critical and communicational skills, which are essential for success in their future careers.
 
