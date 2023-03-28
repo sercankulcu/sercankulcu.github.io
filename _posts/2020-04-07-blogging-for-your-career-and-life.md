@@ -7,7 +7,7 @@ tags:
   - personal development
 ---
 
-<img width="150" alt="girl" src="/images/posts/blogging-for-your-career-and-life.jpg" style="float: left; margin-right: 10px;" /> Blogging has become an incredibly popular activity in recent years with increasing numbers of people starting blogs for various reasons. One of the main reasons why blogging has become so popular is the numerous benefits it offers. It's a platform that enables personal development, providing a space for people to share their thoughts and ideas with a wider audience. Blogging can also be beneficial professionally, as it can serve as a way to showcase skills and knowledge and attract potential employers or business collaborations.
+<img width="200" alt="girl" src="/images/posts/blogging-for-your-career-and-life.jpg" style="float: left; margin-right: 10px;" /> Blogging has become an incredibly popular activity in recent years with increasing numbers of people starting blogs for various reasons. One of the main reasons why blogging has become so popular is the numerous benefits it offers. It's a platform that enables personal development, providing a space for people to share their thoughts and ideas with a wider audience. Blogging can also be beneficial professionally, as it can serve as a way to showcase skills and knowledge and attract potential employers or business collaborations.
 
 <b>Self-expression and creativity:</b> A blog is a great platform for sharing your thoughts, ideas, and creative work with a wide audience. Whether you're writing about your personal experiences, sharing your art or photography, or discussing a particular topic you're passionate about, a blog gives you the freedom to express yourself in a way that is unique to you.
 

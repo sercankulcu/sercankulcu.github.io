@@ -7,7 +7,7 @@ tags:
   - self-development
 ---
 
-<img width="150" alt="hotel" src="/images/posts/the-hilbert-s-paradox.jpg" style="float: left; margin-right: 10px;" /> Hilbert's Paradox is a thought experiment in mathematics which was first proposed by the renowned mathematician David Hilbert in the early 20th century. The paradox challenges our intuition and understanding of the concept of infinity. It has important implications for our understanding of the nature of mathematical objects and the limits of human knowledge. Hilbert's Paradox is a prime example of a problem that highlights the counterintuitive nature of infinity and the challenges that arise when dealing with infinite sets. 
+<img width="200" alt="hotel" src="/images/posts/the-hilbert-s-paradox.jpg" style="float: left; margin-right: 10px;" /> Hilbert's Paradox is a thought experiment in mathematics which was first proposed by the renowned mathematician David Hilbert in the early 20th century. The paradox challenges our intuition and understanding of the concept of infinity. It has important implications for our understanding of the nature of mathematical objects and the limits of human knowledge. Hilbert's Paradox is a prime example of a problem that highlights the counterintuitive nature of infinity and the challenges that arise when dealing with infinite sets. 
 
 The paradox goes as follows: imagine a hotel with an infinite number of rooms, each of which is occupied by a guest. Now imagine that a new guest arrives and asks for a room. Since the hotel has an infinite number of rooms, the manager can simply ask each guest to move to the next room, and the new guest can occupy room 1. Now suppose that an infinite number of new guests arrive. Can the manager find a way to accommodate them all?
 

@@ -7,7 +7,7 @@ tags:
   - career
 ---
 
-<img width="150" alt="donkey" src="/images/posts/the-donkey-is-still-a-donkey.jpg" style="float: left; margin-right: 10px;" />  The phrase "They dressed the donkey with a golden saddle, the donkey is still a donkey" is a powerful metaphor that speaks to the idea that external appearances do not change the inherent nature of a person. This concept is especially relevant when considering the value of humanity and how it relates to positions of power and privilege.
+<img width="200" alt="donkey" src="/images/posts/the-donkey-is-still-a-donkey.jpg" style="float: left; margin-right: 10px;" />  The phrase "They dressed the donkey with a golden saddle, the donkey is still a donkey" is a powerful metaphor that speaks to the idea that external appearances do not change the inherent nature of a person. This concept is especially relevant when considering the value of humanity and how it relates to positions of power and privilege.
 
 It's all too common for individuals in positions of authority to believe that their status or wealth automatically imbues them with greater worth than those around them. They may dress themselves up in fancy clothes, surround themselves with luxury, and demand respect and admiration from others. However, despite all of this, they may still lack the fundamental values of empathy, compassion, and respect for others that define our humanity.
 

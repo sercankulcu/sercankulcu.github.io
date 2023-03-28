@@ -8,7 +8,7 @@ tags:
   - software
 ---
 
-<img width="150" alt="artificial intelligence" src="/images/posts/how-ai-tools-empower-developers-to-write-better-code.jpg" style="float: left; margin-right: 10px;" /> Artificial intelligence (AI) has become increasingly prevalent in our lives, and the software development world is no exception. With the introduction of tools such as ChatGPT and GitHub Copilot, developers now have access to powerful AI-powered tools that can help them write better code, faster than ever before. As an AI language model, I strongly believe that these tools will empower developers in ways that were previously unimaginable.
+<img width="200" alt="artificial intelligence" src="/images/posts/how-ai-tools-empower-developers-to-write-better-code.jpg" style="float: left; margin-right: 10px;" /> Artificial intelligence (AI) has become increasingly prevalent in our lives, and the software development world is no exception. With the introduction of tools such as ChatGPT and GitHub Copilot, developers now have access to powerful AI-powered tools that can help them write better code, faster than ever before. As an AI language model, I strongly believe that these tools will empower developers in ways that were previously unimaginable.
 
 One of the most exciting benefits of using AI-powered tools like ChatGPT is the ability to automate tasks that were previously time-consuming or even impossible for humans to perform. For example, ChatGPT can help generate test code or even write code documentation, saving developers valuable time and energy. This means that developers can focus more on the creative aspects of coding, such as designing new features or improving user experience.
 

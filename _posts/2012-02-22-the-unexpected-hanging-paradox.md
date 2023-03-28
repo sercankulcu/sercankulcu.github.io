@@ -7,7 +7,7 @@ tags:
   - self-development
 ---
 
-<img width="150" alt="gallows" src="/images/posts/the-unexpected-hanging-paradox.png" style="float: left; margin-right: 10px;" /> The Unexpected Hanging Paradox is a thought experiment that has perplexed philosophers, mathematicians, and logicians for decades. The paradox was first proposed by Raymond Smullyan in 1979, and it has since been the subject of much discussion and debate in the fields of logic and philosophy.
+<img width="200" alt="gallows" src="/images/posts/the-unexpected-hanging-paradox.png" style="float: left; margin-right: 10px;" /> The Unexpected Hanging Paradox is a thought experiment that has perplexed philosophers, mathematicians, and logicians for decades. The paradox was first proposed by Raymond Smullyan in 1979, and it has since been the subject of much discussion and debate in the fields of logic and philosophy.
 
 The paradox goes as follows: a prisoner is sentenced to be hanged, and the executioner informs the prisoner that he will be hanged on a day between Monday and Friday, and that the hanging will be unexpected. The prisoner reasons that he cannot be hanged on Friday, since if he is still alive on Thursday, he will know that he will be hanged the next day, which would make the hanging expected. Similarly, he cannot be hanged on Thursday, since if he is still alive on Wednesday, he will know that he will be hanged the next day, which would make the hanging expected. The prisoner continues to reason in this way until he concludes that he cannot be hanged on any day, since he will always be able to anticipate the hanging.
 

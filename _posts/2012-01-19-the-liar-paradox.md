@@ -7,7 +7,7 @@ tags:
   - self-development
 ---
 
-<img width="150" alt="liar" src="/images/posts/the-liar-paradox.png" style="float: left; margin-right: 10px;" /> The Liar Paradox is a classic paradox in logic and philosophy that has perplexed scholars for centuries. The paradox arises from a self-referential statement that leads to a contradiction, challenging our assumptions about truth and meaning. Numerous solutions have been proposed, but the paradox continues to spark debates and discussions among scholars, making it an essential topic for anyone interested in the foundations of logic and the nature of truth.
+<img width="200" alt="liar" src="/images/posts/the-liar-paradox.png" style="float: left; margin-right: 10px;" /> The Liar Paradox is a classic paradox in logic and philosophy that has perplexed scholars for centuries. The paradox arises from a self-referential statement that leads to a contradiction, challenging our assumptions about truth and meaning. Numerous solutions have been proposed, but the paradox continues to spark debates and discussions among scholars, making it an essential topic for anyone interested in the foundations of logic and the nature of truth.
 
 The Liar Paradox goes as follows: "This statement is false." At first glance, this seems like a simple statement. But upon closer examination, it becomes clear that the statement leads to a contradiction. If the statement is true, then it must be false, because it claims to be false. On the other hand, if the statement is false, then it must be true, because it claims to be false. This creates a paradoxical situation where the statement is both true and false at the same time.
 

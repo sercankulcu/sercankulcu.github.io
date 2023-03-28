@@ -6,7 +6,7 @@ tags:
   - self-improvement
 ---
 
-<img width="150" alt="frog" src="/images/posts/do-not-judge-people-who-leave-without-saying-goodbye.jpg" style="float: left; margin-right: 10px;" />  There are times in our lives when someone we care about disappears without a word. It can leave us feeling hurt, confused, and even angry. However, before we jump to conclusions and judge the person for their actions, it's important to consider the many reasons why they may have left without saying goodbye.
+<img width="200" alt="frog" src="/images/posts/do-not-judge-people-who-leave-without-saying-goodbye.jpg" style="float: left; margin-right: 10px;" />  There are times in our lives when someone we care about disappears without a word. It can leave us feeling hurt, confused, and even angry. However, before we jump to conclusions and judge the person for their actions, it's important to consider the many reasons why they may have left without saying goodbye.
 
 Perhaps they don't like goodbyes or don't see the point in emphasizing something that can't be changed. Maybe they're going through personal issues that they don't feel comfortable sharing, or struggling with their mental health. Whatever the reason, it's essential to recognize that everyone has their own reasons for doing things, and we should try to understand and respect their decision.
 

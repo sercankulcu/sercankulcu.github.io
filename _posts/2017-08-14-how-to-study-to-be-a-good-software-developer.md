@@ -8,7 +8,7 @@ tags:
   - time management
 ---
 
-<img width="150" alt="meeting" src="/images/posts/how-to-study-to-be-a-good-software-developer.png" style="float: left; margin-right: 10px;" /> To become a good software developer, it is important to have a solid foundation in computer science concepts and programming principles, and to be able to apply this knowledge to solve real-world problems. Here are a few suggestions for how to study effectively to become a good software developer:
+<img width="200" alt="meeting" src="/images/posts/how-to-study-to-be-a-good-software-developer.png" style="float: left; margin-right: 10px;" /> To become a good software developer, it is important to have a solid foundation in computer science concepts and programming principles, and to be able to apply this knowledge to solve real-world problems. Here are a few suggestions for how to study effectively to become a good software developer:
 
 <b>Start with the basics:</b> If you are new to software development, it is important to start by learning the fundamentals of computer science and programming. This might include topics such as data structures, algorithms, and programming languages.
 

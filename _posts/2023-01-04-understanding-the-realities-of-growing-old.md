@@ -7,7 +7,7 @@ tags:
   - philosophy
 ---
 
-<img width="150" alt="watch" src="/images/posts/understanding-the-realities-of-growing-old.jpg" style="float: left; margin-right: 10px;" /> As we journey through life, there comes a point when we begin to realize that we are getting older. For some, this realization may come gradually, while for others, it may be a sudden and jarring wake-up call. Regardless of how it presents itself, the acceptance of aging is a natural and inevitable part of the human experience.
+<img width="200" alt="watch" src="/images/posts/understanding-the-realities-of-growing-old.jpg" style="float: left; margin-right: 10px;" /> As we journey through life, there comes a point when we begin to realize that we are getting older. For some, this realization may come gradually, while for others, it may be a sudden and jarring wake-up call. Regardless of how it presents itself, the acceptance of aging is a natural and inevitable part of the human experience.
 
 One of the most significant indications of aging is the physical changes that occur in our bodies. As we age, our skin loses elasticity, wrinkles and age spots begin to appear, and our hair turns gray. These physical changes can be difficult to accept, especially for those who have always placed a high value on their appearance. However, it is important to remember that these changes are a natural part of the aging process and should be embraced rather than fought against.
 
