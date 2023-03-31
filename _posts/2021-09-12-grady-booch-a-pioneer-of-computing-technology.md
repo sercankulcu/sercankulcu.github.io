@@ -7,7 +7,7 @@ tags:
   - software
 ---
 
-<img width="200" alt="grady booch" src="/images/posts/grady-booch-a-pioneer-of-computing-technology.jpg" style="float: left; margin-right: 10px;" /> Grady Booch is a name that is synonymous with object-oriented design and unified modeling language. He is one of the most renowned computer scientists and software engineers in the world, having made significant contributions to the development of computing technology. His research and work have helped shape how we use computers today, from basic programming to complex applications. In this blog post, we will explore the life and career of Grady Booch, and the impact that he has had on the world of computing.
+<img width="200" alt="grady booch" src="/images/posts/grady-booch-a-pioneer-of-computing-technology.jpg" style="float: left; margin-right: 10px;" /> Grady Booch's impact on the world of computing cannot be overstated. He is widely recognized as a leading authority on object-oriented design and has played a significant role in the development of the unified modeling language. His work has helped shape how we use computers today, from basic programming to complex applications. Grady's contributions to the field of computing have been immense, and he has inspired countless software engineers and computer scientists with his passion and dedication to the field.
 
 Grady Booch was born in California in 1955. As a child, he developed an early interest in computers, which eventually led him to pursue a career in computer science. He obtained a Bachelor's degree from the University of California at Davis, followed by a Master's degree and a Ph.D. from Stanford University.
 
