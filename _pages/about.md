@@ -23,8 +23,6 @@ My research interests include low-power wireless communications (e.g., 6TiSCH, L
 
 In addition to my work as a researcher and lecturer, I have also been teaching OOP and Java courses since 2015. I have experience teaching a variety of topics related to software engineering, including object-oriented programming, design patterns, data structures, and algorithms.
 
-On this website, you will find information about my research and teaching activities, as well as my publications and other professional work. I am also available for consulting services in the areas of computer networks and embedded systems. Please feel free to contact me if you have any questions or inquiries.
-
 Thank you for visiting my website!
 
 **Note:** If any licensed content is found on the website, please don't hesitate to contact me via the links on the left-hand side. You can be sure that any related content will be quickly removed within 24 hours.
