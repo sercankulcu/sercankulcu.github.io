@@ -21,7 +21,7 @@ Welcome to my personal website. My name is Sercan Külcü, and I am an assistant
 
 My research interests include low-power wireless communications (e.g., 6TiSCH, LoRaWAN, and Bluetooth Low-Energy), embedded and real-time operating systems (e.g., ContikiOS, RIOT, and TinyOS), machine learning applications (using tools such as WEKA, TensorFlow, and Apache Mahout), and C/C++ programming. I am also interested in Internet of Things (IoT) applications and its integration with existing technologies.
 
-In addition to my work as a researcher and lecturer, I have also been teaching OOP and Java courses since 2015. I have experience teaching a variety of topics related to software engineering, including object-oriented programming, design patterns, data structures, and algorithms.
+In addition to my work as a researcher, I have also been teaching OOP and Java courses since 2015. I have experience teaching a variety of topics related to software engineering, including object-oriented programming, design patterns, data structures, and algorithms.
 
 Thank you for visiting my website!
 
