@@ -176,7 +176,7 @@ With the growing demand for multimedia applications such as audio and video play
 Chapter 15: Operating system design: 
 -----
 
-Operating system design involves the careful consideration of a wide range of factors, including performance, reliability, security, compatibility, and usability, and requires a deep understanding of the underlying hardware and software components, as well as the needs and expectations of end-users and developers.
+Operating system design involves the careful consideration of a wide range of factors, including performance, reliability, security, compatibility, and usability, and requires a deep understanding of the underlying hardware and software components, as well as the needs and expectations of end-users and developers. 
 
 * **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides/Bolum_15_Isletim_Sistemi_Tasarimi.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/os/notes/Chapter_15_Operating_system_design.pdf">[pdf]</a>
