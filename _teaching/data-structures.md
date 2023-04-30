@@ -27,9 +27,22 @@ Chapter 2: Basic Data Structures
 
 In this chapter, we will cover the arrays, linked lists, stacks, queues, and hash tables. We will discuss the implementation and operation of each of these data structures, as well as their relative strengths and weaknesses. 
 
-* Arrays and Linked Lists
-* Stacks and Queues
+* Arrays
+* Singly Linked Lists
+* Circularly Linked Lists
+* Doubly Linked Lists
+* Stacks
+* Queues
+* Deques
+* List
+* Array Lists
+* Positional Lists
+* Maps
+* Sorted Maps
 * Hash Tables
+* Set
+* Multiset
+* Multimap
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_01_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture01">[link]</a>
@@ -41,6 +54,8 @@ Trees are a widely used data structure in computer science, providing a powerful
 
 * Introduction to trees
 * Binary Trees
+* Binary Search Trees
+* Balanced Search Trees
 * AVL Trees
 * B-Trees
 * Red-Black Trees
@@ -59,6 +74,7 @@ Graphs are a fundamental data structure used to model relationships between obje
 * Minimum Spanning Trees
 * Shortest Path Algorithms
 * Network Flow
+* Directed Acyclic Graphs
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_01_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture01">[link]</a>
@@ -68,11 +84,12 @@ Chapter 5: Heaps and Priority Queues
 
 In this chapter, we will dive into the world of heap data structures and priority queues. These structures are used to efficiently maintain a collection of items that must be processed in a specific order. We will explore the implementation and operation of binary heaps, Fibonacci heaps, skew heaps, and binomial heaps. We will also discuss the practical applications of these structures in fields such as operating systems, networking, and distributed systems.
 
-* Introduction to Heaps and Priority Queues
+* Heaps 
 * Binary Heaps
 * Fibonacci Heaps
 * Skew Heaps
 * Binomial Heaps
+* Priority Queue
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_01_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture01">[link]</a>
