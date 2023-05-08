@@ -25,7 +25,7 @@ Data structures are the backbone of computer science, providing a means of organ
 Chapter 2: Arrays, Linked Lists
 ---
 
-In this chapter, we will cover the arrays, linked lists, stacks, queues, and hash tables. We will discuss the implementation and operation of each of these data structures, as well as their relative strengths and weaknesses. 
+In this chapter, we will cover the arrays, and linked lists. We will discuss the implementation and operation of each of these data structures, as well as their relative strengths and weaknesses. 
 
 * Arrays
 * Singly Linked Lists
@@ -38,7 +38,7 @@ In this chapter, we will cover the arrays, linked lists, stacks, queues, and has
 Chapter 3: Stacks, Queues, Deques
 ---
 
-In this chapter, we will cover the arrays, linked lists, stacks, queues, and hash tables. We will discuss the implementation and operation of each of these data structures, as well as their relative strengths and weaknesses. 
+In this chapter, we will cover the stacks, queues, and deques. We will discuss the implementation and operation of each of these data structures, as well as their relative strengths and weaknesses. 
 
 * Stacks
 * Queues
@@ -50,7 +50,7 @@ In this chapter, we will cover the arrays, linked lists, stacks, queues, and has
 Chapter 4: Lists
 ---
 
-In this chapter, we will cover the arrays, linked lists, stacks, queues, and hash tables. We will discuss the implementation and operation of each of these data structures, as well as their relative strengths and weaknesses. 
+In this chapter, we will cover the lists and array lists. We will discuss the implementation and operation of each of these data structures, as well as their relative strengths and weaknesses. 
 
 * List
 * Array Lists
@@ -62,7 +62,7 @@ In this chapter, we will cover the arrays, linked lists, stacks, queues, and has
 Chapter 5: Maps, Hash Tables, Sets
 ---
 
-In this chapter, we will cover the arrays, linked lists, stacks, queues, and hash tables. We will discuss the implementation and operation of each of these data structures, as well as their relative strengths and weaknesses. 
+In this chapter, we will cover the maps, sets and hash tables. We will discuss the implementation and operation of each of these data structures, as well as their relative strengths and weaknesses. 
 
 * Maps
 * Sorted Maps
