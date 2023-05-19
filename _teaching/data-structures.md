@@ -97,10 +97,9 @@ Chapter 7: Graphs
 Graphs are a fundamental data structure used to model relationships between objects or entities. In this chapter, we will introduce the concepts of graph data structures, including graph traversal, minimum spanning trees, shortest path algorithms, and network flow. We will discuss the implementation and operation of these algorithms, as well as their practical applications in fields such as network analysis, social network analysis, and recommendation systems.
 
 * Introduction to Graphs
-* Graph Traversal
+* Weighted Graphs
+* Multigraphs
 * Minimum Spanning Trees
-* Shortest Path Algorithms
-* Network Flow
 * Directed Acyclic Graphs
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
