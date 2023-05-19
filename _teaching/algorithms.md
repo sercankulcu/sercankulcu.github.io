@@ -27,10 +27,13 @@ In this chapter, we will cover the fundamentals of algorithms and their importan
 Chapter 2: Sorting Algorithms
 ---
 
-Sorting is fundamental operation in computer science and are essential in solving many real-world problems. In this chapter, we will cover various sorting algorithms, including Bubble Sort, Insertion Sort, Selection Sort, Merge Sort, and Quick Sort. 
+Sorting algorithms are a fundamental part of computer science. They are used to organize data in a meaningful way, such as by increasing or decreasing order. Sorting algorithms are used in a wide variety of applications, such as searching, data compression, and statistical analysis.
 
-* Bubble Sort, Insertion Sort, and Selection Sort
-* Merge Sort and Quick Sort
+* Bubble Sort
+* Insertion Sort
+* Selection Sort
+* Merge Sort
+* Quick Sort
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
@@ -39,10 +42,12 @@ Sorting is fundamental operation in computer science and are essential in solvin
 Chapter 3: Searching Algorithms
 ---
 
-Searching is in fundamental operations in computer science and are essential in solving many real-world problems. We will explore search algorithms, such as binary search, and its variants, and hashing techniques.
+Searching algorithms are a fundamental part of computer science. They are used to find a specific value in a data set. Searching algorithms are used in a wide variety of applications, such as finding a file on a computer, finding a customer in a database, and finding a word in a document.
 
-* Binary Search and its variants
-* Hashing and its applications in search algorithms
+* Linear search
+* Binary search
+* Jump search
+* Interpolation search
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
@@ -51,12 +56,12 @@ Searching is in fundamental operations in computer science and are essential in 
 Chapter 4: Graph Algorithms
 ---
 
-Graph algorithms are essential in solving many practical problems such as route planning, social network analysis, and circuit design. In this chapter, we will cover graph representation, traversal algorithms, shortest path algorithms, minimum spanning tree algorithms, and network flow algorithms.
+Graph algorithms are a fundamental part of computer science. They are used to solve a wide variety of problems, such as finding the shortest path between two nodes, finding the connected components of a graph, and finding the maximum flow in a network.
 
-* Representation of graphs and graph traversal algorithms
-* Shortest path algorithms: Dijkstra's Algorithm and Bellman-Ford Algorithm
-* Minimum Spanning Tree algorithms: Prim's Algorithm and Kruskal's Algorithm
-* Network flow algorithms: Ford-Fulkerson Algorithm and Edmonds-Karp Algorithm
+* Graph traversal algorithms: Breadth-first search (BFS), Depth-first search (DFS)
+* Shortest path algorithms: Dijkstra's Algorithm, Bellman-Ford Algorithm
+* Minimum Spanning Tree algorithms: Prim's Algorithm, Kruskal's Algorithm
+* Network flow algorithms: Ford-Fulkerson Algorithm, Edmonds-Karp Algorithm
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
@@ -79,7 +84,11 @@ Dynamic programming is a powerful technique for solving optimization problems by
 Chapter 6: Approximation algorithms
 ---
 
-In this chapter, we will cover some advanced topics in algorithms such as approximation algorithms, randomized algorithms, online algorithms, and parallel algorithms. We will explore the applications of these techniques in solving practical problems and discuss the benefits and challenges associated with each.
+Approximation algorithms are a type of algorithm that provides a solution to a problem that is not necessarily optimal, but is guaranteed to be within a certain factor of the optimal solution. Approximation algorithms are often used to solve problems that are NP-hard, which means that there is no known polynomial-time algorithm that can find the optimal solution.
+
+* Greedy algorithms
+* Heuristic algorithms
+* Metaheuristic algorithms
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
@@ -88,7 +97,11 @@ In this chapter, we will cover some advanced topics in algorithms such as approx
 Chapter 7: Randomized algorithms
 ---
 
-In this chapter, we will cover some advanced topics in algorithms such as approximation algorithms, randomized algorithms, online algorithms, and parallel algorithms. We will explore the applications of these techniques in solving practical problems and discuss the benefits and challenges associated with each.
+Randomized algorithms are a type of algorithm that uses randomness to improve its performance. Randomized algorithms are often used to solve problems that are difficult or impossible to solve using deterministic algorithms.
+
+* The quicksort algorithm
+* The randomized primality test
+* The Monte Carlo algorithm
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
@@ -97,7 +110,11 @@ In this chapter, we will cover some advanced topics in algorithms such as approx
 Chapter 8: Online algorithms
 ---
 
-In this chapter, we will cover some advanced topics in algorithms such as approximation algorithms, randomized algorithms, online algorithms, and parallel algorithms. We will explore the applications of these techniques in solving practical problems and discuss the benefits and challenges associated with each.
+Online algorithms are a type of algorithm that makes decisions without knowing the complete input. Online algorithms are often used to solve problems in real time, where the input is not known in advance.
+
+* The greedy algorithm
+* The myopic algorithm
+* The adaptive algorithm
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
@@ -106,7 +123,11 @@ In this chapter, we will cover some advanced topics in algorithms such as approx
 Chapter 9: Parallel algorithms
 ---
 
-In this chapter, we will cover some advanced topics in algorithms such as approximation algorithms, randomized algorithms, online algorithms, and parallel algorithms. We will explore the applications of these techniques in solving practical problems and discuss the benefits and challenges associated with each.
+Parallel algorithms are a type of algorithm that can be executed on multiple processors or cores simultaneously. Parallel algorithms are often used to solve problems that are too large or too complex to be solved on a single processor.
+
+* Divide-and-conquer algorithms
+* MapReduce algorithms
+* Data parallel algorithms
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
@@ -115,7 +136,7 @@ In this chapter, we will cover some advanced topics in algorithms such as approx
 Chapter 10: Divide-and-Conquer paradigm
 ---
 
-Algorithm design techniques are essential in developing efficient algorithms for solving complex problems. In this chapter, we will explore various algorithm design techniques such as divide-and-conquer, greedy algorithms, backtracking algorithms, and branch-and-bound algorithms.
+The divide-and-conquer paradigm is an algorithmic design paradigm that breaks down a problem into smaller subproblems of the same or related type, until these become simple enough to be solved directly. The solutions to the sub-problems are then combined to give a solution to the original problem.
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
@@ -124,7 +145,11 @@ Algorithm design techniques are essential in developing efficient algorithms for
 Chapter 11: Greedy algorithms
 ---
 
-Algorithm design techniques are essential in developing efficient algorithms for solving complex problems. In this chapter, we will explore various algorithm design techniques such as divide-and-conquer, greedy algorithms, backtracking algorithms, and branch-and-bound algorithms.
+Greedy algorithms are a type of algorithm that makes decisions at each step based on the current state of the problem. Greedy algorithms are often used to solve problems that can be broken down into a sequence of decisions.
+
+* Finding the maximum weight independent set in a graph
+* Finding the minimum spanning tree in a graph
+* Finding the shortest path between two nodes in a graph
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
@@ -133,7 +158,11 @@ Algorithm design techniques are essential in developing efficient algorithms for
 Chapter 12: Backtracking algorithms
 ---
 
-Algorithm design techniques are essential in developing efficient algorithms for solving complex problems. In this chapter, we will explore various algorithm design techniques such as divide-and-conquer, greedy algorithms, backtracking algorithms, and branch-and-bound algorithms.
+Backtracking algorithms are a type of algorithm that solves problems by exploring all possible solutions and backtracking when a solution is found to be invalid. Backtracking algorithms are often used to solve problems that can be broken down into a tree of possible solutions.
+
+* N-queens problem
+* Sudoku puzzle
+* Knight's tour problem
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
@@ -142,7 +171,11 @@ Algorithm design techniques are essential in developing efficient algorithms for
 Chapter 13: Branch-and-Bound algorithms
 ---
 
-Algorithm design techniques are essential in developing efficient algorithms for solving complex problems. In this chapter, we will explore various algorithm design techniques such as divide-and-conquer, greedy algorithms, backtracking algorithms, and branch-and-bound algorithms.
+Branch and bound algorithms are a type of algorithm that solves optimization problems by breaking them down into smaller subproblems and using a bounding function to eliminate subproblems that cannot contain the optimal solution. It is an algorithm design paradigm for discrete and combinatorial optimization problems, as well as mathematical optimization. 
+
+* Traveling salesman problem
+* Knapsack problem
+* Bin packing problem
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
