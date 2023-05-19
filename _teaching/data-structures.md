@@ -19,7 +19,7 @@ Data structures are the backbone of computer science, providing a means of organ
 * What are data structures and why are they important?
 * Comparison of basic and advanced data structures
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_01_.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_01_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture01">[link]</a>
 
 Chapter 2: Arrays, Linked Lists
@@ -32,7 +32,7 @@ In this chapter, we will cover the arrays, and linked lists. We will discuss the
 * Circularly Linked Lists
 * Doubly Linked Lists
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_02_.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture02">[link]</a>
 
 Chapter 3: Stacks, Queues, Deques
@@ -44,7 +44,7 @@ In this chapter, we will cover the stacks, queues, and deques. We will discuss t
 * Queues
 * Deques
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_03_.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture03">[link]</a>
 
 Chapter 4: Lists
@@ -56,7 +56,7 @@ In this chapter, we will cover the lists and array lists. We will discuss the im
 * Array Lists
 * Positional Lists
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_04_.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_04_Lists.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture04">[link]</a>
 
 Chapter 5: Maps, Hash Tables, Sets
@@ -71,7 +71,7 @@ In this chapter, we will cover the maps, sets and hash tables. We will discuss t
 * Multiset
 * Multimap
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_05_.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture05">[link]</a>
 
 Chapter 6: Trees
@@ -88,7 +88,7 @@ Trees are a widely used data structure in computer science, providing a powerful
 * Red-Black Trees
 * Splay Trees
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_06_.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture06">[link]</a>
 
 Chapter 7: Graphs
@@ -103,7 +103,7 @@ Graphs are a fundamental data structure used to model relationships between obje
 * Network Flow
 * Directed Acyclic Graphs
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_07_.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture07">[link]</a>
 
 Chapter 8: Heaps, Priority Queues
@@ -118,7 +118,7 @@ In this chapter, we will dive into the world of heap data structures and priorit
 * Binomial Heaps
 * Priority Queue
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_08_.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_08_Heaps_Priority_Queues.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture08">[link]</a>
 
 Chapter 9: Advanced Data Structures
@@ -134,22 +134,10 @@ In this chapter, we will cover advanced data structures such as interval trees, 
 * Treaps
 * Link-Cut Trees
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_09_.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_09_Advanced_Data_Structures.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture09">[link]</a>
 
-Chapter 10: Algorithmic Techniques
----
-
-In this chapter, we will explore a range of algorithmic techniques that can be used to solve complex programming challenges efficiently. These techniques include divide and conquer, greedy algorithms, and dynamic programming. We will discuss the theoretical underpinnings of each of these techniques, as well as their practical applications in fields such as machine learning, optimization, and data analysis.
-
-* Divide and Conquer
-* Greedy Algorithms
-* Dynamic Programming
-
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_10_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture10">[link]</a>
-
-Chapter 11: Advanced Topics in Data Structures
+Chapter 10: Advanced Topics in Data Structures
 ---
 
 This chapter will examine cutting-edge research in data structures, including persistent data structures, external memory data structures, multi-dimensional data structures, randomized data structures, and distributed data structures. These structures are used to solve complex programming challenges in a range of fields, from data storage and retrieval to machine learning and artificial intelligence.
@@ -160,10 +148,10 @@ This chapter will examine cutting-edge research in data structures, including pe
 * Randomized Data Structures
 * Distributed Data Structures
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_11_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture11">[link]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_10_Advanced_Topics.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture10">[link]</a>
 
-Chapter 12: Applications of Data Structures
+Chapter 11: Applications of Data Structures
 ---
 
 In this chapter, we will explore a range of practical applications of data structures in fields such as database management systems, compilers, computational geometry, text processing, and more. We will discuss how data structures are used in these applications, and explore some of the challenges and opportunities associated with building software systems that rely on sophisticated data structures. 
@@ -174,17 +162,6 @@ In this chapter, we will explore a range of practical applications of data struc
 * Text Processing
 * Cryptography
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_12_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture12">[link]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_11_Applications.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture11">[link]</a>
 
-Chapter 13: Conclusion
----
-
-In this final chapter, we will review the key concepts covered in the course and discuss future directions in the field of data structures. We will explore emerging trends in data structures research, including the increasing use of machine learning and artificial intelligence techniques to build more sophisticated data structures, and discuss some of the open questions and challenges that remain in the field. 
-
-* Recap of the course
-* Importance of advanced data structures in computer engineering
-* Future directions in data structures research.
-
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_13_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture13">[link]</a>
