@@ -20,7 +20,7 @@ In this chapter, we will cover the fundamentals of algorithms and their importan
 * Asymptotic analysis and algorithmic complexity
 * Big-O notation and its significance in analyzing algorithm efficiency
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
 
 
@@ -35,8 +35,8 @@ Sorting algorithms are a fundamental part of computer science. They are used to 
 * Merge Sort
 * Quick Sort
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_02_Sorting.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture02">[link]</a>
 
 
 Chapter 3: Searching Algorithms
@@ -49,8 +49,8 @@ Searching algorithms are a fundamental part of computer science. They are used t
 * Jump search
 * Interpolation search
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_03_Searching.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture03">[link]</a>
 
 
 Chapter 4: Graph Algorithms
@@ -63,8 +63,8 @@ Graph algorithms are a fundamental part of computer science. They are used to so
 * Minimum Spanning Tree algorithms: Prim's Algorithm, Kruskal's Algorithm
 * Network flow algorithms: Ford-Fulkerson Algorithm, Edmonds-Karp Algorithm
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_04_Graph.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture04">[link]</a>
 
 
 Chapter 5: Dynamic Programming
@@ -77,8 +77,8 @@ Dynamic programming is a powerful technique for solving optimization problems by
 * Memoization and Tabulation techniques
 * Applications of dynamic programming in solving optimization problems
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_05_Dynamic.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture05">[link]</a>
 
 
 Chapter 6: Approximation algorithms
@@ -90,8 +90,8 @@ Approximation algorithms are a type of algorithm that provides a solution to a p
 * Heuristic algorithms
 * Metaheuristic algorithms
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_06_Approximation.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture06">[link]</a>
 
 
 Chapter 7: Randomized algorithms
@@ -103,8 +103,8 @@ Randomized algorithms are a type of algorithm that uses randomness to improve it
 * The randomized primality test
 * The Monte Carlo algorithm
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_07_Randomized.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture07">[link]</a>
 
 
 Chapter 8: Online algorithms
@@ -116,8 +116,8 @@ Online algorithms are a type of algorithm that makes decisions without knowing t
 * The myopic algorithm
 * The adaptive algorithm
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_08_Online.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture08">[link]</a>
 
 
 Chapter 9: Parallel algorithms
@@ -129,8 +129,8 @@ Parallel algorithms are a type of algorithm that can be executed on multiple pro
 * MapReduce algorithms
 * Data parallel algorithms
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_09_Parallel.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture09">[link]</a>
 
 
 Chapter 10: Divide-and-Conquer paradigm
@@ -138,8 +138,8 @@ Chapter 10: Divide-and-Conquer paradigm
 
 The divide-and-conquer paradigm is an algorithmic design paradigm that breaks down a problem into smaller subproblems of the same or related type, until these become simple enough to be solved directly. The solutions to the sub-problems are then combined to give a solution to the original problem.
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_10_Divide_and_Conquer.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture10">[link]</a>
 
 
 Chapter 11: Greedy algorithms
@@ -151,8 +151,8 @@ Greedy algorithms are a type of algorithm that makes decisions at each step base
 * Finding the minimum spanning tree in a graph
 * Finding the shortest path between two nodes in a graph
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_11_Greedy.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture11">[link]</a>
 
 
 Chapter 12: Backtracking algorithms
@@ -164,8 +164,8 @@ Backtracking algorithms are a type of algorithm that solves problems by explorin
 * Sudoku puzzle
 * Knight's tour problem
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_12_Backtracking.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture12">[link]</a>
 
 
 Chapter 13: Branch-and-Bound algorithms
@@ -177,8 +177,8 @@ Branch and bound algorithms are a type of algorithm that solves optimization pro
 * Knapsack problem
 * Bin packing problem
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_13_Branch_and_Bound.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture13">[link]</a>
 
 
 Chapter 14: Applications of Algorithms
@@ -190,6 +190,6 @@ In this chapter, we will explore the applications of algorithms in various field
 * Case studies of successful algorithmic implementations in real-world scenarios
 * Ethical considerations and implications of algorithmic decision making
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_01_.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/algorithms/Chapter_14_Applications.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture14">[link]</a>
 
