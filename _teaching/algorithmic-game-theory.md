@@ -10,7 +10,7 @@ location: "Giresun, Turkey"
 
 <img align="left" width="200" alt="algorithmic game theory" src="/images/teaching/algorithmic-game-theory-course.jpg" style="float: left; margin-right: 10px;"> This course aims to explore the intersection of game theory and computer science, focusing on the algorithmic aspects of strategic decision-making in multi-agent environments. Game theory provides a powerful framework for analyzing the behavior of rational agents, while algorithms enable us to design intelligent systems that can reason, strategize, and interact in complex game scenarios. Throughout this course, we will delve into fundamental concepts such as Nash equilibrium, mechanism design, and auction theory, examining how they can be applied in various real-world domains including economics, social networks, and online platforms. 
 
-Chapter 1: Introduction to Algorithmic Game Theory 
+Chapter 1: Game Theory Fundamentals
 -----
 
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
@@ -18,7 +18,8 @@ As the bridge between hardware and software, operating systems serve as the foun
 * Lecture Notes <a href="http://sercankulcu.github.io/files/agt/notes/Chapter_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/agt/tree/main/Chapter">[link]</a>
 
-Chapter 2: Game Theory Fundamentals
+
+Chapter 2: Introduction to Algorithmic Game Theory 
 -----
 
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
