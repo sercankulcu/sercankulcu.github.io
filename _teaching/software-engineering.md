@@ -8,7 +8,7 @@ date: 2020-08-08
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="software engineering" src="/images/teaching/software-engineering-course.png"> Software engineering 
+<img align="left" width="200" alt="software engineering" src="/images/teaching/software-engineering-course.jpg"> Software engineering 
 
 Chapter 1: Design Patterns: 
 -----
