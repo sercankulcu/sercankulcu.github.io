@@ -4,11 +4,11 @@ collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/2023-fall-algorithmic-game-theory
 venue: "University of Giresun, Department of Computer Engineering"
-date: 2023-09-09
+date: 2023-06-06
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="algorithmic game theory" src="/images/teaching/algorithmic-game-theory-course.jpg"> Operating systems are an essential part of modern computing, serving as the foundation of any computer system. They are responsible for managing the hardware and software resources of a computer and providing a platform for other programs to run on. An operating system acts as an intermediary between the computer hardware and the software applications that users interact with, providing a uniform interface that applications can use to communicate with the hardware. Without an operating system, a computer would be nothing more than a collection of hardware components that could not be easily controlled or utilized by users.
+<img align="left" width="200" alt="algorithmic game theory" src="/images/teaching/algorithmic-game-theory-course.jpg"> This course aims to explore the intersection of game theory and computer science, focusing on the algorithmic aspects of strategic decision-making in multi-agent environments. Game theory provides a powerful framework for analyzing the behavior of rational agents, while algorithms enable us to design intelligent systems that can reason, strategize, and interact in complex game scenarios. Throughout this course, we will delve into fundamental concepts such as Nash equilibrium, mechanism design, and auction theory, examining how they can be applied in various real-world domains including economics, social networks, and online platforms. 
 
 Chapter 1: Introduction to Algorithmic Game Theory 
 -----
