@@ -115,7 +115,8 @@ As the bridge between hardware and software, operating systems serve as the foun
 * Lecture Notes <a href="http://sercankulcu.github.io/files/agt/notes/Chapter_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/agt/tree/main/Chapter">[link]</a>
 
-Chapter 14: Recent Advances and Future Directions in Algorithmic Game Theory-----
+Chapter 14: Recent Advances and Future Directions in Algorithmic Game Theory
+-----
 
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
 
