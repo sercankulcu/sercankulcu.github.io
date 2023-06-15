@@ -59,7 +59,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 * Lecture Notes <a href="http://sercankulcu.github.io/files/agt/notes/Chapter_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/agt/tree/main/Chapter">[link]</a>
 
-Chapter 7: Algorithmic Fairness and Ethics in Games
+Chapter 7: Algorithmic Fairness and Ethics
 -----
 
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
@@ -67,7 +67,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 * Lecture Notes <a href="http://sercankulcu.github.io/files/agt/notes/Chapter_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/agt/tree/main/Chapter">[link]</a>
 
-Chapter 8: Game Theory in Network Design and Routing
+Chapter 8: Network Design and Routing
 -----
 
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
@@ -75,7 +75,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 * Lecture Notes <a href="http://sercankulcu.github.io/files/agt/notes/Chapter_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/agt/tree/main/Chapter">[link]</a>
 
-Chapter 9: Price of Anarchy and Efficiency in Games
+Chapter 9: Price of Anarchy and Efficiency
 -----
 
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
@@ -83,7 +83,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 * Lecture Notes <a href="http://sercankulcu.github.io/files/agt/notes/Chapter_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/agt/tree/main/Chapter">[link]</a>
 
-Chapter 10: Learning and Adaptation in Game-Theoretic Environments
+Chapter 10: Learning and Adaptation
 -----
 
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
@@ -91,7 +91,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 * Lecture Notes <a href="http://sercankulcu.github.io/files/agt/notes/Chapter_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/agt/tree/main/Chapter">[link]</a>
 
-Chapter 11: Game-Theoretic Analysis of Online Platforms
+Chapter 11: Online Platforms
 -----
 
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
@@ -99,7 +99,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 * Lecture Notes <a href="http://sercankulcu.github.io/files/agt/notes/Chapter_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/agt/tree/main/Chapter">[link]</a>
 
-Chapter 12: Game Theory in Algorithmic Decision-Making
+Chapter 12: Decision-Making
 -----
 
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
@@ -107,7 +107,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 * Lecture Notes <a href="http://sercankulcu.github.io/files/agt/notes/Chapter_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/agt/tree/main/Chapter">[link]</a>
 
-Chapter 13: Algorithmic Game Theory in Multi-Agent Systems
+Chapter 13: Multi-Agent Systems
 -----
 
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
@@ -115,7 +115,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 * Lecture Notes <a href="http://sercankulcu.github.io/files/agt/notes/Chapter_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/agt/tree/main/Chapter">[link]</a>
 
-Chapter 14: Recent Advances and Future Directions in Algorithmic Game Theory
+Chapter 14: Future Directions
 -----
 
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
