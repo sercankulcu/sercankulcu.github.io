@@ -8,7 +8,7 @@ date: 2020-08-08
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="software engineering" src="/images/teaching/software-engineering-course.jpg"> Software engineering plays a critical role in our modern digital age, where software applications are ubiquitous and have a profound impact on various aspects of our lives. Throughout this course, you will explore the entire software development life cycle, from requirements gathering and analysis to design, implementation, testing, and maintenance. You will delve into topics such as software architecture, software project management, quality assurance, and software maintenance.  
+<img align="left" width="200" alt="software engineering" src="/images/teaching/software-engineering-course.jpg" style="float: left; margin-right: 10px;"> Software engineering plays a critical role in our modern digital age, where software applications are ubiquitous and have a profound impact on various aspects of our lives. Throughout this course, you will explore the entire software development life cycle, from requirements gathering and analysis to design, implementation, testing, and maintenance. You will delve into topics such as software architecture, software project management, quality assurance, and software maintenance.  
 
 Chapter 1: Design Patterns: 
 -----
