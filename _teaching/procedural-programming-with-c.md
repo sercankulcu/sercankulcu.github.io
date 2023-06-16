@@ -1,0 +1,121 @@
+---
+title: "Procedural Programming with C"
+collection: teaching
+type: "Undergraduate course"
+permalink: /teaching/2022-spring-procedural-programming-with-c
+venue: "University of Giresun, Department of Computer Engineering"
+date: 2023-04-04
+location: "Giresun, Turkey"
+---
+
+<img align="left" width="200" alt="procedural programming with c" src="/images/teaching/procedural-programming-with-c.png" style="float: left; margin-right: 10px;"> This course is designed to introduce you to the fundamentals of C programming, one of the most influential and widely used programming languages in the field. Whether you are a beginner taking your first steps in the world of coding or an experienced programmer looking to enhance your skills, this course will provide you with a solid foundation in C programming concepts and techniques.  
+
+Chapter 1: Introduction to C Programming
+-----
+
+* Course introduction and overview
+* Basic structure of a C program
+* Variables, data types, and operators
+* Input and output functions
+
+Chapter 2: Control Flow
+-----
+
+* Decision-making statements (if, else if, switch)
+* Looping statements (for, while, do-while)
+* Break and continue statements
+
+Chapter 3: Arrays and Strings
+-----
+
+* Introduction to arrays
+* Array manipulation and traversal
+* Introduction to strings
+* String manipulation and string library functions
+
+Chapter 4: Functions
+-----
+
+* Introduction to functions
+* Function declaration, definition, and calling
+* Function parameters and return values
+* Recursive functions
+
+Chapter 5: Pointers
+-----
+
+* Understanding pointers and memory addresses
+* Pointer declaration and initialization
+* Pointer arithmetic
+* Dynamic memory allocation (malloc, calloc, free)
+
+Chapter 6: Structures and Unions
+-----
+
+* Introduction to structures and unions
+* Structure declaration and initialization
+* Accessing structure members
+* Nested structures and arrays of structures
+
+Chapter 7: File Handling
+-----
+
+* Working with files in C
+* Opening, reading, and writing files
+* File positioning and error handling
+* File I/O using standard libraries
+
+Chapter 8: Advanced Data Types
+-----
+
+* Enumerations and typedef
+* Bitwise operators and bit manipulation
+* Bit fields
+* Introduction to unions
+
+Chapter 9: Preprocessor Directives
+-----
+
+* Macros and their usage
+* Conditional compilation
+* File inclusion and header files
+* Debugging using preprocessor directives
+
+Chapter 10: Advanced Concepts - Part 1
+-----
+
+* Memory management techniques
+* Function pointers and callbacks
+* Introduction to recursion
+* Understanding static and dynamic libraries
+
+Chapter 11: Advanced Concepts - Part 2
+-----
+
+* Introduction to data structures (linked lists, stacks, queues)
+* Implementation and usage of data structures
+* Introduction to algorithms (sorting, searching)
+* Time and space complexity analysis
+
+Chapter 12: Error Handling and Debugging
+-----
+
+* Common C programming errors
+* Debugging techniques and tools
+* Exception handling with try-catch blocks
+* Defensive programming and error handling strategies
+
+Chapter 13: Introduction to C++ (Optional)
+-----
+
+* Basic differences between C and C++
+* Introduction to object-oriented programming
+* Classes, objects, and constructors
+* Basic input/output in C++
+
+Chapter 14: Project and Review
+-----
+
+* Individual or group project using C programming concepts
+* Review of key concepts and topics covered throughout the course
+* Q&A session and final assessment
