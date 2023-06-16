@@ -10,6 +10,12 @@ location: "Giresun, Turkey"
 
 <img align="left" width="200" alt="algorithmic game theory" src="/images/teaching/algorithmic-game-theory-course.jpg" style="float: left; margin-right: 10px;"> This course aims to explore the intersection of game theory and computer science, focusing on the algorithmic aspects of strategic decision-making in multi-agent environments. Game theory provides a powerful framework for analyzing the behavior of rational agents, while algorithms enable us to design intelligent systems that can reason, strategize, and interact in complex game scenarios. Throughout this course, we will delve into fundamental concepts such as Nash equilibrium, mechanism design, and auction theory, examining how they can be applied in various real-world domains including economics, social networks, and online platforms. 
 
+The resources: 
+-----
+
+* GAMUT is a suite of game generators designated for testing game-theoretic algorithms. <a href="http://gamut.stanford.edu/">[website]</a>
+* Gambit is an open-source collection of tools for doing computation in game theory. <a href="https://gambit.sourceforge.net/">[website]</a>
+
 Chapter 1: Game Theory Fundamentals
 -----
 
