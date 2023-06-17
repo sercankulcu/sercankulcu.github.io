@@ -14,9 +14,13 @@ Chapter 1: Introduction to C Programming
 -----
 
 * Course introduction and overview
+* Origins and evolution of the C language
+* Features and benefits of using C
+* Setting up a development environment
 * Basic structure of a C program
 * Variables, data types, and operators
 * Input and output functions
+* Compilation process and execution
 
 Chapter 2: Control Flow
 -----
@@ -29,7 +33,8 @@ Chapter 3: Arrays and Strings
 -----
 
 * Introduction to arrays
-* Array manipulation and traversal
+* Declaring and initializing arrays
+* Manipulating arrays: accessing, modifying, and traversing
 * Introduction to strings
 * String manipulation and string library functions
 
@@ -96,6 +101,9 @@ Chapter 11: Advanced Concepts - Part 2
 * Implementation and usage of data structures
 * Introduction to algorithms (sorting, searching)
 * Time and space complexity analysis
+* Recursion: principles and applications
+* Function pointers
+* Variadic functions
 
 Chapter 12: Error Handling and Debugging
 -----
