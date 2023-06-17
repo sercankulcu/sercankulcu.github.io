@@ -13,7 +13,6 @@ location: "Giresun, Turkey"
 Chapter 1: Introduction to C Programming
 -----
 
-* Course introduction and overview
 * Origins and evolution of the C language
 * Features and benefits of using C
 * Setting up a development environment
@@ -32,16 +31,13 @@ Chapter 2: Control Flow
 Chapter 3: Arrays and Strings
 -----
 
-* Introduction to arrays
 * Declaring and initializing arrays
 * Manipulating arrays: accessing, modifying, and traversing
-* Introduction to strings
 * String manipulation and string library functions
 
 Chapter 4: Functions
 -----
 
-* Introduction to functions
 * Function declaration, definition, and calling
 * Function parameters and return values
 * Recursive functions
@@ -54,10 +50,9 @@ Chapter 5: Pointers
 * Pointer arithmetic
 * Dynamic memory allocation (malloc, calloc, free)
 
-Chapter 6: Structures and Unions
+Chapter 6: Structures
 -----
 
-* Introduction to structures and unions
 * Structure declaration and initialization
 * Accessing structure members
 * Nested structures and arrays of structures
@@ -76,7 +71,7 @@ Chapter 8: Advanced Data Types
 * Enumerations and typedef
 * Bitwise operators and bit manipulation
 * Bit fields
-* Introduction to unions
+* Unions
 
 Chapter 9: Preprocessor Directives
 -----
@@ -91,8 +86,8 @@ Chapter 10: Advanced Concepts - Part 1
 
 * Memory management techniques
 * Function pointers and callbacks
-* Introduction to recursion
 * Understanding static and dynamic libraries
+* Recursion: principles and applications
 
 Chapter 11: Advanced Concepts - Part 2
 -----
@@ -101,8 +96,6 @@ Chapter 11: Advanced Concepts - Part 2
 * Implementation and usage of data structures
 * Introduction to algorithms (sorting, searching)
 * Time and space complexity analysis
-* Recursion: principles and applications
-* Function pointers
 * Variadic functions
 
 Chapter 12: Error Handling and Debugging
