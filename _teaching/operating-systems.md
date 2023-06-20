@@ -27,7 +27,7 @@ Preface:
 Welcome to the world of operating systems, where we delve into the fundamental concepts, design principles, and implementation techniques that form the basis of modern computing systems.
 
 * The prerequisities <a href="http://sercankulcu.github.io/files/os/The_prerequisites.pdf">[pdf]</a>
-* Important people <a href="http://sercankulcu.github.io/files/os/Important_people.pdf">[pdf]</a>
+* Key figures <a href="http://sercankulcu.github.io/files/os/Important_people.pdf">[pdf]</a>
 * Questions & Answers from OSTEP <a href="http://sercankulcu.github.io/files/os/QA_from_OSTEP.pdf">[pdf]</a>
 
 Chapter 1: Introduction: 
