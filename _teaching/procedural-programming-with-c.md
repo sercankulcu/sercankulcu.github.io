@@ -146,3 +146,7 @@ Chapter 14: Project and Review
 * Individual or group project using C programming concepts
 * Review of key concepts and topics covered throughout the course
 * Q&A session and final assessment
+
+* Sample projects <a href="http://sercankulcu.github.io/files/c/Chapter_14_Sample_Projects.pdf">[pdf]</a>
+* Questions and answers <a href="http://sercankulcu.github.io/files/c/Chapter_14_Questions_and_Answers.pdf">[pdf]</a>
+* Multiple choice questions <a href="http://sercankulcu.github.io/files/c/Chapter_14_Multiple_Choice_Questions.pdf">[pdf]</a>
