@@ -17,7 +17,7 @@ Chapter 1: Introduction to Wireless Sensor Networks
 * Key Concepts and Terminology in Wireless Sensor Networks
 * Understanding the Unique Characteristics and Challenges of Wireless Sensor Networks
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/1_Introduction.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/Chapter_01_Introduction_to_WSN.pdf">[pdf]</a>
 
 Chapter 2: Wireless Sensor Network Architectures
 -----
