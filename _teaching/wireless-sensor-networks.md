@@ -8,74 +8,103 @@ date: 2019-01-01
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="wireless sensor network" src="/images/teaching/wireless-sensor-network-course.png"> This course provides an introduction to the fundamental concepts, technologies, and design principles of wireless sensor networks. Students will learn about the different types of sensors and communication technologies used in WSNs, as well as the various challenges that need to be addressed in the design and implementation of these networks. Topics such as medium access control, routing protocols, data management, power management, security, and applications of WSNs will be discussed in depth. By the end of the course, students will have a solid understanding of the key concepts and technologies involved in wireless sensor networks, as well as hands-on experience with programming and simulation tools.
+<img align="left" width="200" alt="wireless sensor network" src="/images/teaching/wireless-sensor-network-course.png" style="float: left; margin-right: 10px;"> This course provides an introduction to the fundamental concepts, technologies, and design principles of wireless sensor networks. Students will learn about the different types of sensors and communication technologies used in WSNs, as well as the various challenges that need to be addressed in the design and implementation of these networks. Topics such as medium access control, routing protocols, data management, power management, security, and applications of WSNs will be discussed in depth. By the end of the course, students will have a solid understanding of the key concepts and technologies involved in wireless sensor networks, as well as hands-on experience with programming and simulation tools.
 
-Chapter 1: Introduction
+Chapter 1: Introduction to Wireless Sensor Networks
 -----
 
-In this chapter, we will provide an overview of what wireless sensor networks are, their applications, and the challenges associated with designing and deploying such networks.
+* The Evolution of Sensor Networks and their Importance in Modern Applications
+* Key Concepts and Terminology in Wireless Sensor Networks
+* Understanding the Unique Characteristics and Challenges of Wireless Sensor Networks
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/1_Introduction.pdf">[pdf]</a>
 
-Chapter 2: Physical layer and wireless communication technologies
+Chapter 2: Wireless Sensor Network Architectures
 -----
 
-The physical layer is an essential component of wireless sensor networks that handles the transmission and reception of data packets through the use of wireless communication technologies, such as radio waves and infrared signals.
+* Overview of Different Architectures: Hierarchical, Flat, and Cluster-based
+* Evaluating the Pros and Cons of Various Wireless Sensor Network Architectures
+* Design Considerations and Trade-offs in Architectural Choices
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/2_Physical.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/Chapter_02_WSN_Architectures.pdf">[pdf]</a>
 
-Chapter 3: MAC layer protocols and medium access control
+Chapter 3: Sensor Nodes and Hardware Components
 -----
 
-The Medium Access Control (MAC) layer is a crucial component in wireless sensor networks that manages communication between nodes, controls access to the shared communication medium, and ensures reliable data transmission. In this chapter, we will explore the fundamental concepts and protocols of the MAC layer in wireless sensor networks.
+* Introduction to Sensor Nodes: Components, Sensors, and Power Sources
+* Exploring the Various Types of Sensors and Their Applications
+* Evaluating Hardware Options for Sensor Nodes: Performance, Cost, and Power Efficiency
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/3_Mac.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/Chapter_03_Sensor_Nodes_and_Hardware_Components.pdf">[pdf]</a>
 
-Chapter 4: Routing protocols and network topologies
+Chapter 4: Communication Protocols in Wireless Sensor Networks
 -----
 
-The routing layer plays a crucial role in the performance and efficiency of wireless sensor networks, as it is responsible for selecting the optimal path for data transmission among nodes with limited resources and energy constraints.
+* Introduction to Communication Protocols: MAC, Routing, and Transport Layers
+* Evaluating Popular Protocols: Zigbee, Bluetooth, Wi-Fi, and LoRaWAN
+* Designing Efficient and Reliable Communication Protocols for Sensor Networks
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/4_Routing.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/Chapter_04_Communication_Protocols.pdf">[pdf]</a>
 
-Chapter 5: Data management and storage
+Chapter 5: Energy Management and Power Efficiency
 -----
 
-In wireless sensor networks, collecting, storing, and processing data efficiently is a crucial aspect to ensure the proper functioning of the network. The data management chapter explores the different techniques and strategies for managing data in wireless sensor networks.
+* Understanding Energy Constraints in Wireless Sensor Networks
+* Energy Harvesting Techniques for Prolonging Network Lifetime
+* Power Optimization Strategies: Sleep Scheduling, Duty Cycling, and Data Aggregation
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/5_Data.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/Chapter_05_Energy_Management_and_Power_Efficiency.pdf">[pdf]</a>
 
-Chapter 6: Power management and energy efficiency
+Chapter 6: Data Aggregation and Fusion in Wireless Sensor Networks
 -----
 
-The power management chapter of wireless sensor network course introduces the techniques and strategies for managing the energy consumption of sensor nodes, which is critical for the operation and longevity of the network.
+* Introduction to Data Aggregation and Fusion Techniques
+* Collaborative and Distributed Data Processing Approaches
+* Quality of Information (QoI) Metrics and Algorithms for Data Fusion
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/6_Power.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/Chapter_06_Data_Aggregation_and_Fusion.pdf">[pdf]</a>
 
-Chapter 7: Security and attacks
+Chapter 7: Localization and Tracking in Wireless Sensor Networks
 -----
 
-The security of wireless sensor networks is a major concern as these networks are used in critical applications such as military, healthcare, and infrastructure monitoring. Therefore, this chapter will focus on the different security threats and challenges in wireless sensor networks, as well as various security mechanisms and protocols that can be employed to ensure the integrity, confidentiality, and availability of data in these networks.
+* Techniques for Node Localization and Positioning in Sensor Networks
+* Tracking and Object Localization Applications: Challenges and Solutions
+* Fusion of Localization and Sensing Data for Enhanced Tracking Accuracy
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/7_Security.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/Chapter_07_Localization_and_Tracking.pdf">[pdf]</a>
 
-Chapter 8: Applications and case studies
+Chapter 8: Security and Privacy in Wireless Sensor Networks
 -----
 
-In this chapter, we will explore the various applications and case studies of wireless sensor networks, including but not limited to healthcare, agriculture, environmental monitoring, and smart cities.
+* Security Threats and Vulnerabilities in Sensor Networks
+* Authentication, Encryption, and Key Management in Wireless Sensor Networks
+* Privacy-preserving Techniques and Anonymity in Sensor Data Collection
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/8_Applications.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/Chapter_08_Security_and_Privacy.pdf">[pdf]</a>
 
-Chapter 9: Current research trends and future directions
+Chapter 9: Data Management and Storage in Wireless Sensor Networks
 -----
 
-In this chapter, we will explore the current research trends and future directions of wireless sensor networks, including emerging technologies, applications, and challenges. We will also discuss the potential future developments in the field and their impact on the industry and society as a whole.
+* Data Storage and Retrieval Architectures for Sensor Networks
+* Query Processing and Optimization in Resource-constrained Environments
+* Data Aggregation and Compression Techniques for Efficient Storage
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/9_Trends.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/Chapter_09_Data_Management_and_Storage.pdf">[pdf]</a>
 
-Chapter 10: Hands-on experience with WSN simulation and implementation
+Chapter 10: Applications of Wireless Sensor Networks
 -----
 
-Through hands-on exercises, students will learn how to program and deploy sensors, collect data, and analyze results using various simulation tools and hardware platforms.
+* Environmental Monitoring and Conservation Applications
+* Smart Cities and Urban Sensing Applications
+* Healthcare, Industrial Automation, and Agricultural Applications
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/10_Handson.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/Chapter_10_Applications.pdf">[pdf]</a>
+
+Chapter 11: Emerging Trends and Future Directions
+-----
+
+* Advances in Wireless Sensor Networks: Internet of Things (IoT), Edge Computing, and Fog Computing
+* Machine Learning and Artificial Intelligence in Sensor Networks
+* Challenges and Opportunities in the Future of Wireless Sensor Networks
+
+* Lecture Notes <a href="http://sercankulcu.github.io/files/wsn/Chapter_11_Emerging_Trends_and_Future_Directions.pdf">[pdf]</a>
