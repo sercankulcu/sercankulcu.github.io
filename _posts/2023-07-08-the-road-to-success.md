@@ -7,7 +7,7 @@ tags:
   - career
 ---
 
-<img width="200" alt="road to success" src="/images/posts/the-road-to-success.png" style="float: left; margin-right: 10px;" />  We often find ourselves admiring successful individuals, wishing we could achieve similar feats. It's easy to assume that success magically materializes overnight, but in reality, it's the result of relentless hard work, patience, sacrifice, consistency, discipline, and self-confidence. In this blog post, we'll delve into the essential ingredients for success, shedding light on the journey that paves the way to reaching our goals.
+<img width="200" alt="road to success" src="/images/posts/the-road-to-success.png" style="float: left; margin-right: 20px;" />  We often find ourselves admiring successful individuals, wishing we could achieve similar feats. It's easy to assume that success magically materializes overnight, but in reality, it's the result of relentless hard work, patience, sacrifice, consistency, discipline, and self-confidence. In this blog post, we'll delve into the essential ingredients for success, shedding light on the journey that paves the way to reaching our goals.
 
 * Hard Work - The Foundation of Success
 
