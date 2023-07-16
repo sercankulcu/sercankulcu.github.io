@@ -17,7 +17,7 @@ redirect_from:
 
 Hello..
 
-Welcome to my personal website. My name is Sercan Külcü, and I am an assistant professor in computer science at Giresun University. I am interested in computer networks and embedded systems, and I am always looking for new ways to apply my skills and knowledge to solve challenging problems in these areas. I am also a hands-on software engineer since 2005 and have a PhD in wireless communications.
+Welcome to my personal website. My name is Sercan Külcü, and I am currently an assistant professor in computer science at Giresun University. I am interested in computer networks and embedded systems, and I am always looking for new ways to apply my skills and knowledge to solve challenging problems in these areas. I am also a hands-on software engineer since 2005 and have a PhD in wireless communications.
 
 My research interests include low-power wireless communications (e.g., 6TiSCH, LoRaWAN, and Bluetooth Low-Energy), embedded and real-time operating systems (e.g., ContikiOS, RIOT, and TinyOS), machine learning applications (using tools such as WEKA, TensorFlow, and Apache Mahout), and C/C++ programming. I am also interested in Internet of Things (IoT) applications and its integration with existing technologies.
 
