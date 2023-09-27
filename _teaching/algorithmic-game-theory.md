@@ -13,6 +13,8 @@ location: "Giresun, Turkey"
 The resources: 
 -----
 
+* Toronto CSC304 <a href="https://www.cs.toronto.edu/~nisarg/teaching/304f19/">[website]</a>
+
 * GAMUT is a suite of game generators designated for testing game-theoretic algorithms. <a href="http://gamut.stanford.edu/">[website]</a>
 * Gambit is an open-source collection of tools for doing computation in game theory. <a href="https://gambit.sourceforge.net/">[website]</a>
 
