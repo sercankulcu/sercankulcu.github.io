@@ -31,6 +31,7 @@ Chapter 1: Game Theory Fundamentals
 
 Game theory is a mathematical framework used to analyze and understand strategic interactions between rational decision-makers. It provides a systematic way of studying situations where the outcome of one person's decision depends on the actions of others.
 
+* Slides <a href="http://sercankulcu.github.io/files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/agt/Chapter_01_Game_Theory_Fundamentals.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/agt/tree/main/Chapter">[link]</a>
 
