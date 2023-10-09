@@ -15,6 +15,8 @@ Chapter 1: Introduction to Programming and Java:
 
 As a versatile and widely-used programming language, Java provides a powerful toolset for developing a diverse range of applications, from desktop and mobile apps to web-based services and enterprise software systems.
 
+* Slides <a href="http://sercankulcu.github.io/files/java/slides/Bolum_01_Giris.pdf">[pdf]</a>
+
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_01_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture01">[link]</a>
 
