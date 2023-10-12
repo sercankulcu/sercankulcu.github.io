@@ -33,6 +33,8 @@ In this chapter, we will cover the arrays, and linked lists. We will discuss the
 * Circularly Linked Lists
 * Doubly Linked Lists
 
+* Slides <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_02_Diziler.pdf">[pdf]</a>
+
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture02">[link]</a>
 
