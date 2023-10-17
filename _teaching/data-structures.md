@@ -21,7 +21,7 @@ Data structures are the backbone of computer science, providing a means of organ
 
 * Sunum-Giriş <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_01_Giris.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_01_Introduction.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture01">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture01">[link]</a>
 
 Chapter 2: Arrays, Linked Lists
 ---
@@ -37,7 +37,7 @@ In this chapter, we will cover the arrays, and linked lists. We will discuss the
 * Sunum-Bağlı-Liste <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_02_Bagli_Liste.pdf">[pdf]</a>
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture02">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture02">[link]</a>
 
 Chapter 3: Stacks, Queues, Deques
 ---
@@ -49,7 +49,7 @@ In this chapter, we will cover the stacks, queues, and deques. We will discuss t
 * Deques
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture03">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture03">[link]</a>
 
 Chapter 4: Lists
 ---
@@ -61,7 +61,7 @@ In this chapter, we will cover the lists and array lists. We will discuss the im
 * Positional Lists
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_04_Lists.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture04">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture04">[link]</a>
 
 Chapter 5: Maps, Hash Tables, Sets
 ---
@@ -76,7 +76,7 @@ In this chapter, we will cover the maps, sets and hash tables. We will discuss t
 * Multimap
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture05">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture05">[link]</a>
 
 Chapter 6: Trees
 ---
@@ -93,7 +93,7 @@ Trees are a widely used data structure in computer science, providing a powerful
 * Splay Trees
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture06">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture06">[link]</a>
 
 Chapter 7: Graphs
 ---
@@ -107,7 +107,7 @@ Graphs are a fundamental data structure used to model relationships between obje
 * Directed Acyclic Graphs
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture07">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture07">[link]</a>
 
 Chapter 8: Heaps, Priority Queues
 ---
@@ -122,7 +122,7 @@ In this chapter, we will dive into the world of heap data structures and priorit
 * Priority Queue
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_08_Heaps_Priority_Queues.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture08">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture08">[link]</a>
 
 Chapter 9: Advanced Data Structures
 ---
@@ -138,7 +138,7 @@ In this chapter, we will cover advanced data structures such as interval trees, 
 * Link-Cut Trees
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_09_Advanced_Data_Structures.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture09">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture09">[link]</a>
 
 Chapter 10: Advanced Topics in Data Structures
 ---
@@ -152,7 +152,7 @@ This chapter will examine cutting-edge research in data structures, including pe
 * Distributed Data Structures
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_10_Advanced_Topics.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture10">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture10">[link]</a>
 
 Chapter 11: Applications of Data Structures
 ---
@@ -166,5 +166,5 @@ In this chapter, we will explore a range of practical applications of data struc
 * Cryptography
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_11_Applications.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures/tree/main/Lecture11">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture11">[link]</a>
 
