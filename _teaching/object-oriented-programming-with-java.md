@@ -15,8 +15,9 @@ Chapter 1: Introduction to Programming and Java:
 
 As a versatile and widely-used programming language, Java provides a powerful toolset for developing a diverse range of applications, from desktop and mobile apps to web-based services and enterprise software systems.
 
-* Slides <a href="http://sercankulcu.github.io/files/java/slides/Bolum_01_Giris.pdf">[pdf]</a>
-* Slides <a href="http://sercankulcu.github.io/files/java/slides/Bolum_01_Giris2.pdf">[pdf]</a>
+* Sunum - Hesaplama <a href="http://sercankulcu.github.io/files/java/slides/Bolum_01_Hesaplama_Hesaplamali_Dusunme.pdf">[pdf]</a>
+* Sunum - Algoritmalar <a href="http://sercankulcu.github.io/files/java/slides/Bolum_01_Algoritmalar.pdf">[pdf]</a>
+* Sunum - Bilgisayarlar <a href="http://sercankulcu.github.io/files/java/slides/Bolum_01_Bilgisayarlar.pdf">[pdf]</a> 
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_01_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture01">[link]</a>
@@ -25,6 +26,8 @@ Chapter 2: Basic Syntax and Data Types:
 -----
 
 Understanding the fundamental syntax and data types of Java is essential for building effective and efficient software systems, as it provides the building blocks for defining program logic, manipulating data, and communicating with external resources.
+
+* Sunum - Söz Dizimi <a href="http://sercankulcu.github.io/files/java/slides/Bolum_02_Soz_Dizimi_Kurallari.pdf">[pdf]</a> 
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_02_Basic_Syntax_and_Data_Types.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture02">[link]</a>
