@@ -28,7 +28,7 @@ In the realm of data structures, two foundational concepts take center stage: ar
 * Sunum-Bağlı-Liste <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_02_Bagli_Liste.pdf">[pdf]</a>
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture02">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture02">[link]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders02">[tr]</a>
 
 Chapter 3: Stacks, Queues, Deques
 ---
