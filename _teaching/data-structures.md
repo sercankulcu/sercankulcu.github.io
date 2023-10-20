@@ -33,7 +33,7 @@ Chapter 3: Linked Lists
 
 In the realm of data structures, two foundational concepts take center stage: arrays and linked lists. Arrays provide a straightforward means of organizing data, offering constant-time access to elements through their index. They are a powerful choice for storing a fixed number of elements with a uniform data type. In contrast, linked lists offer flexibility, with elements arranged in a chain-like fashion, connected by pointers. This dynamic structure allows for efficient insertion and deletion operations, making linked lists a versatile choice for managing varying data sizes. 
 
-* Sunum-Bağlı-Liste <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_02_Bagli_Liste.pdf">[pdf]</a>
+* Sunum-Bağlı-Liste <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_03_Bagli_Liste.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture02">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders02">[tr]</a>
 
