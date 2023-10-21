@@ -17,19 +17,19 @@ Absolutely, it's normal! Even the greatest visionaries experienced moments of bo
 Advice from the Guru of Innovation:
 -----
 
-* Stay Hungry, Stay Curious: Jobs believed in staying insatiably curious. When boredom knocks on your door, see it as an invitation to dig deeper. Ask yourself why you're bored. Is it the content, the presentation, or your mindset? There's a world of knowledge waiting to be uncovered.
+<b> Stay Hungry, Stay Curious:</b> Jobs believed in staying insatiably curious. When boredom knocks on your door, see it as an invitation to dig deeper. Ask yourself why you're bored. Is it the content, the presentation, or your mindset? There's a world of knowledge waiting to be uncovered.
 
-* Think Differently: In the world of computer science, there's always room for innovation. Instead of passively absorbing the material, challenge yourself to think differently. How can you apply what you're learning in new and exciting ways?
+<b> Think Differently:</b> In the world of computer science, there's always room for innovation. Instead of passively absorbing the material, challenge yourself to think differently. How can you apply what you're learning in new and exciting ways?
 
-* Find Your Passion: Jobs famously said, "The only way to do great work is to love what you do." If a specific aspect of computer science ignites your passion, explore it further. Dive into side projects or research areas that truly excite you.
+<b> Find Your Passion:</b> Jobs famously said, "The only way to do great work is to love what you do." If a specific aspect of computer science ignites your passion, explore it further. Dive into side projects or research areas that truly excite you.
 
-* Connect the Dots: Seek the bigger picture. Explore how what you're learning fits into the grand scheme of technology. Computer science isn't just about code; it's about solving real-world problems. Find the connections that make it meaningful to you.
+<b> Connect the Dots:</b> Seek the bigger picture. Explore how what you're learning fits into the grand scheme of technology. Computer science isn't just about code; it's about solving real-world problems. Find the connections that make it meaningful to you.
 
-* Share Your Ideas: Just like Jobs co-founded Apple, you can co-create knowledge. Engage with your instructors and classmates. Don't hesitate to ask questions, express your thoughts, and challenge ideas. Collaboration fuels innovation.
+<b> Share Your Ideas:</b> Just like Jobs co-founded Apple, you can co-create knowledge. Engage with your instructors and classmates. Don't hesitate to ask questions, express your thoughts, and challenge ideas. Collaboration fuels innovation.
 
-* Think of Learning as a Journey: Jobs compared life to a bicycle journey; to keep your balance, you must keep moving. In the same way, your learning is a journey. Keep progressing, even during the mundane moments.
+<b> Think of Learning as a Journey:</b> Jobs compared life to a bicycle journey; to keep your balance, you must keep moving. In the same way, your learning is a journey. Keep progressing, even during the mundane moments.
 
-* Stay Creative: Sometimes, a touch of creativity can keep you engaged. Take notes with colorful markers, doodle your thoughts, or build visual representations of complex concepts.
+<b> Stay Creative:</b> Sometimes, a touch of creativity can keep you engaged. Take notes with colorful markers, doodle your thoughts, or build visual representations of complex concepts.
 
 In the Spirit of Innovation:
 -----
