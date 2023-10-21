@@ -10,7 +10,7 @@ location: "Giresun, Turkey"
 
 <img align="left" width="200" alt="data structure" src="/images/teaching/data-structures-course.png"> Data structures are fundamental components of computer programs that store and organize data in a specific way. They are the building blocks of any computer program and play a crucial role in the design and efficiency of software systems. As the complexity of computer engineering has increased over time, the need for advanced data structures has also grown. Implementing advanced data structures allows software engineers to manage large and complex datasets efficiently, reducing the time and resources required to process data. 
 
-Chapter 1: Introduction to Data Structures
+Chapter 1: Introduction
 ---
 
 Data structures are the backbone of computer science, providing a fundamental framework for organizing and manipulating data in efficient and effective ways. These structures serve as the architectural blueprints that underpin the development of algorithms and software applications. By carefully selecting and implementing appropriate data structures, we can optimize the storage, retrieval, and processing of data, ultimately improving the performance and functionality of our programs. 
