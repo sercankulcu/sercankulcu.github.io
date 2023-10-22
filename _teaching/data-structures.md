@@ -38,6 +38,15 @@ In the realm of data structures, two foundational concepts take center stage: ar
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture03">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders03">[tr]</a>
 
 
+Chapter 4: Stacks
+---
+
+In the realm of data structures, three essential components - Stacks, Queues, and Deques - play a pivotal role in various computing applications. Stacks are a linear data structure that follows the Last-In-First-Out (LIFO) principle, making them ideal for managing tasks that require tracking elements in a specific order, such as undo operations in text editors. 
+
+* Sunum-Yığın <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_04_Yigin.pdf">[pdf]</a>
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture04">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders04">[tr]</a>
+
 Chapter 3: Stacks, Queues, Deques
 ---
 
@@ -45,6 +54,7 @@ In the realm of data structures, three essential components - Stacks, Queues, an
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture03">[link]</a>
+
 
 Chapter 4: Lists
 ---
