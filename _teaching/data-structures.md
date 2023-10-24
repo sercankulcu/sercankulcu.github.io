@@ -47,16 +47,18 @@ In the realm of data structures, three essential components - Stacks, Queues, an
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture04">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders04">[tr]</a>
 
-Chapter 3: Stacks, Queues, Deques
+
+Chapter 5: Queues
 ---
 
-In the realm of data structures, three essential components - Stacks, Queues, and Deques - play a pivotal role in various computing applications. Stacks are a linear data structure that follows the Last-In-First-Out (LIFO) principle, making them ideal for managing tasks that require tracking elements in a specific order, such as undo operations in text editors. Queues, on the other hand, adhere to the First-In-First-Out (FIFO) concept, making them excellent for tasks like managing tasks in a printer queue or scheduling processes in an operating system. Deques, which stands for Double-Ended Queues, offer a versatile approach, allowing elements to be added or removed from both ends, making them adaptable for a wide range of scenarios, from real-time messaging systems to managing sliding window data in algorithms. 
+In the realm of data structures, three essential components - Stacks, Queues, and Deques - play a pivotal role in various computing applications. Queues, on the other hand, adhere to the First-In-First-Out (FIFO) concept, making them excellent for tasks like managing tasks in a printer queue or scheduling processes in an operating system. Deques, which stands for Double-Ended Queues, offer a versatile approach, allowing elements to be added or removed from both ends, making them adaptable for a wide range of scenarios, from real-time messaging systems to managing sliding window data in algorithms. 
 
+* Sunum-Kuyruk <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_05_Kuyruk.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture03">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture05">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders05">[tr]</a>
 
 
-Chapter 4: Lists
+Chapter 6: Lists
 ---
 
 In the realm of data structures, lists, array lists, and positional lists are fundamental tools that provide us with versatile means of managing and manipulating collections of data. Lists, as the most basic structure, allow us to organize data in a linear, ordered fashion. Array lists, on the other hand, build upon this concept by implementing lists using arrays, offering dynamic resizing and efficient access to elements, which is particularly valuable when you need to frequently append or insert elements. Positional lists take it a step further, allowing us to access and manipulate elements by their position in the list, enabling operations like swapping or reordering elements with ease.
