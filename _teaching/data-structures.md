@@ -63,10 +63,12 @@ Chapter 6: Lists
 
 In the realm of data structures, lists, array lists, and positional lists are fundamental tools that provide us with versatile means of managing and manipulating collections of data. Lists, as the most basic structure, allow us to organize data in a linear, ordered fashion. Array lists, on the other hand, build upon this concept by implementing lists using arrays, offering dynamic resizing and efficient access to elements, which is particularly valuable when you need to frequently append or insert elements. Positional lists take it a step further, allowing us to access and manipulate elements by their position in the list, enabling operations like swapping or reordering elements with ease.
 
+* Sunum-Liste <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_06_Liste.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_04_Lists.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture04">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture06">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders06">[tr]</a>
 
-Chapter 5: Maps, Hash Tables, Sets
+
+Chapter 7: Maps, Hash Tables, Sets
 ---
 
 In the landscape of data structures, maps, hash tables, and sets stand as essential components, providing sophisticated means for data organization and retrieval. Maps allow us to associate key-value pairs, facilitating the storage and retrieval of data through a unique key, which is invaluable in applications ranging from database systems to efficient caching mechanisms. Hash tables, a cornerstone of data structure design, utilize hash functions to optimize data retrieval by mapping keys to specific memory locations. Their efficiency in search and insertion operations makes them a crucial tool for building data storage and indexing systems. Sets, in turn, enable us to manage collections of unique elements efficiently, supporting operations like intersection, union, and difference.
