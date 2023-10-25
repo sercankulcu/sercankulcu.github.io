@@ -38,6 +38,8 @@ Chapter 3: Control Structures:
 
 Control structures, which include conditional statements and loops, provide a powerful mechanism for controlling the flow of execution in a Java program, enabling developers to create complex, dynamic behaviors and respond to a wide range of inputs and events.
 
+* Sunum - Kontrol Yapıları <a href="http://sercankulcu.github.io/files/java/slides/Bolum_03_Kontrol_Yapilari.pdf">[pdf]</a> 
+
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_03_Control_Structures.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture03">[link]</a>
 
