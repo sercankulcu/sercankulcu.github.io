@@ -27,6 +27,7 @@ Chapter 2: Basic Syntax and Data Types:
 
 Understanding the fundamental syntax and data types of Java is essential for building effective and efficient software systems, as it provides the building blocks for defining program logic, manipulating data, and communicating with external resources.
 
+* Sunum - Programlama <a href="http://sercankulcu.github.io/files/java/slides/Bolum_02_Programlama.pdf">[pdf]</a> 
 * Sunum - Söz Dizimi <a href="http://sercankulcu.github.io/files/java/slides/Bolum_02_Soz_Dizimi_Kurallari.pdf">[pdf]</a> 
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_02_Basic_Syntax_and_Data_Types.pdf">[pdf]</a>
