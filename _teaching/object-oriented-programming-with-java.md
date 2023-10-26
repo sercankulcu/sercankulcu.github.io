@@ -20,7 +20,7 @@ As a versatile and widely-used programming language, Java provides a powerful to
 * Sunum - Bilgisayarlar <a href="http://sercankulcu.github.io/files/java/slides/Bolum_01_Bilgisayarlar.pdf">[pdf]</a> 
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_01_Introduction.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture01">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture01">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders01">[tr]</a>
 
 Chapter 2: Basic Syntax and Data Types: 
 -----
