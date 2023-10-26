@@ -31,7 +31,7 @@ Understanding the fundamental syntax and data types of Java is essential for bui
 * Sunum - Söz Dizimi <a href="http://sercankulcu.github.io/files/java/slides/Bolum_02_Soz_Dizimi_Kurallari.pdf">[pdf]</a> 
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_02_Basic_Syntax_and_Data_Types.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture02">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture02">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders02">[tr]</a>
 
 Chapter 3: Control Structures: 
 -----
