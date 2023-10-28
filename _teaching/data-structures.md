@@ -68,15 +68,7 @@ In the realm of data structures, lists, array lists, and positional lists are fu
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture06">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders06">[tr]</a>
 
 
-Chapter 7: Maps, Hash Tables, Sets
----
-
-In the landscape of data structures, maps, hash tables, and sets stand as essential components, providing sophisticated means for data organization and retrieval. Maps allow us to associate key-value pairs, facilitating the storage and retrieval of data through a unique key, which is invaluable in applications ranging from database systems to efficient caching mechanisms. Hash tables, a cornerstone of data structure design, utilize hash functions to optimize data retrieval by mapping keys to specific memory locations. Their efficiency in search and insertion operations makes them a crucial tool for building data storage and indexing systems. Sets, in turn, enable us to manage collections of unique elements efficiently, supporting operations like intersection, union, and difference.
-
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture05">[link]</a>
-
-Chapter 6: Trees
+Chapter 7: Trees
 ---
 
 In the realm of data structures, trees, binary trees, and B-trees form the backbone of hierarchical data organization, enabling us to manage and retrieve structured data efficiently. Trees, a fundamental structure, represent data hierarchically, with a root node at the top and branches leading to child nodes, making them ideal for tasks like representing family relationships, organizing file systems, or implementing search and sorting algorithms. Binary trees take this concept a step further by limiting each node to have at most two child nodes, optimizing search and insertion operations in various applications such as binary search trees and expression evaluation. B-trees, on the other hand, are engineered for high-performance storage and retrieval in large datasets, utilizing a balanced multiway branching structure that ensures efficient access times even with vast amounts of data.
@@ -84,13 +76,6 @@ In the realm of data structures, trees, binary trees, and B-trees form the backb
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture06">[link]</a>
 
-Chapter 7: Graphs
----
-
-In the domain of data structures, graphs, weighted graphs, minimum spanning trees, and directed acyclic graphs (DAGs) are indispensable tools for representing and solving complex relationships and optimization problems. Graphs, the most versatile of these structures, model connections and dependencies among data elements, making them essential for applications ranging from social networks to route planning and network design. Weighted graphs augment this concept by assigning weights to edges, facilitating the representation of costs or distances in various scenarios, such as finding the shortest path in a transportation network or optimizing resource allocation. Minimum spanning trees are a specialized graph construct used in network design and clustering, providing a tree-like subgraph that connects all nodes with the minimum total edge weight. Directed acyclic graphs, on the other hand, offer a specialized structure to represent data flow and dependencies without cycles, serving as the backbone for scheduling tasks and optimizing processes.
-
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture07">[link]</a>
 
 Chapter 8: Heaps, Priority Queues
 ---
@@ -100,7 +85,35 @@ In the realm of data structures, heaps and priority queues play a pivotal role i
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_08_Heaps_Priority_Queues.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture08">[link]</a>
 
-Chapter 9: Advanced Data Structures
+
+Chapter 9: Maps, Hash Tables, Sets
+---
+
+In the landscape of data structures, maps, hash tables, and sets stand as essential components, providing sophisticated means for data organization and retrieval. Maps allow us to associate key-value pairs, facilitating the storage and retrieval of data through a unique key, which is invaluable in applications ranging from database systems to efficient caching mechanisms. Hash tables, a cornerstone of data structure design, utilize hash functions to optimize data retrieval by mapping keys to specific memory locations. Their efficiency in search and insertion operations makes them a crucial tool for building data storage and indexing systems. Sets, in turn, enable us to manage collections of unique elements efficiently, supporting operations like intersection, union, and difference.
+
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture05">[link]</a>
+
+
+Chapter 10: Search Trees
+---
+
+In the realm of data structures, trees, binary trees, and B-trees form the backbone of hierarchical data organization, enabling us to manage and retrieve structured data efficiently. Trees, a fundamental structure, represent data hierarchically, with a root node at the top and branches leading to child nodes, making them ideal for tasks like representing family relationships, organizing file systems, or implementing search and sorting algorithms. Binary trees take this concept a step further by limiting each node to have at most two child nodes, optimizing search and insertion operations in various applications such as binary search trees and expression evaluation. B-trees, on the other hand, are engineered for high-performance storage and retrieval in large datasets, utilizing a balanced multiway branching structure that ensures efficient access times even with vast amounts of data.
+
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture06">[link]</a>
+
+
+Chapter 11: Graphs
+---
+
+In the domain of data structures, graphs, weighted graphs, minimum spanning trees, and directed acyclic graphs (DAGs) are indispensable tools for representing and solving complex relationships and optimization problems. Graphs, the most versatile of these structures, model connections and dependencies among data elements, making them essential for applications ranging from social networks to route planning and network design. Weighted graphs augment this concept by assigning weights to edges, facilitating the representation of costs or distances in various scenarios, such as finding the shortest path in a transportation network or optimizing resource allocation. Minimum spanning trees are a specialized graph construct used in network design and clustering, providing a tree-like subgraph that connects all nodes with the minimum total edge weight. Directed acyclic graphs, on the other hand, offer a specialized structure to represent data flow and dependencies without cycles, serving as the backbone for scheduling tasks and optimizing processes.
+
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture07">[link]</a>
+
+
+Chapter 12: Advanced Data Structures
 ---
 
 In the diverse landscape of data structures, Interval Trees, Trie Data Structures, Suffix Trees, Bloom Filters, and Skip Lists represent a rich tapestry of specialized tools for addressing a wide range of computational challenges. Interval Trees are custom-tailored for the efficient storage and retrieval of intervals or ranges, making them essential for applications like scheduling tasks and optimizing resource allocation. Trie data structures are optimal for the representation and retrieval of strings and sequences, with applications in spell-checking, text indexing, and information retrieval systems. Suffix Trees, on the other hand, offer an invaluable resource for string matching and pattern searching, forming the foundation for DNA sequence alignment and full-text indexing in search engines. Bloom Filters provide probabilistic data storage for fast membership queries, minimizing false negatives in applications like caching, spell-checking, and duplicate detection. Skip Lists offer a versatile structure for efficient sorted data storage, with characteristics that allow for rapid search and insertion, making them ideal for database indexing and more.
@@ -108,19 +121,11 @@ In the diverse landscape of data structures, Interval Trees, Trie Data Structure
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_09_Advanced_Data_Structures.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture09">[link]</a>
 
-Chapter 10: Advanced Topics in Data Structures
+
+Chapter 13: Advanced Topics in Data Structures
 ---
 
 In the dynamic world of data structures, several specialized variants, including Persistent Data Structures, External Memory Data Structures, Multi-dimensional Data Structures, Randomized Data Structures, and Distributed Data Structures, offer sophisticated solutions for a multitude of advanced computing scenarios. Persistent Data Structures allow for the efficient retrieval of previous versions of data, making them valuable for applications like version control systems and time-traveling databases. External Memory Data Structures focus on optimizing I/O operations, making them essential in managing vast datasets that exceed the main memory capacity, such as in databases and file systems. Multi-dimensional Data Structures excel in organizing data with multiple dimensions, playing a crucial role in fields like geographic information systems and image processing. Randomized Data Structures employ probabilistic algorithms to achieve efficient data management, offering a balance between performance and simplicity, while Distributed Data Structures are engineered for distributed systems, addressing the unique challenges of data synchronization, consistency, and fault tolerance in cloud computing and networked environments.
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_10_Advanced_Topics.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture10">[link]</a>
-
-Chapter 11: Applications of Data Structures
----
-
-The practical applications of data structures span a wide array of critical domains in computer science and software engineering. In the realm of Database Management Systems, data structures are the building blocks for efficient data storage, indexing, and retrieval, ensuring the seamless functioning of large-scale data repositories and supporting functionalities such as searching and sorting. Compilers utilize data structures to parse and manage the structure of source code, facilitating the conversion of high-level programming languages into machine code. In Computational Geometry, data structures play a pivotal role in solving complex geometric problems, enabling tasks like polygon triangulation and convex hull calculations. Text Processing leverages data structures for operations like searching, indexing, and text compression, enhancing the speed and efficiency of search engines, document processing, and information retrieval systems. In the realm of Cryptography, data structures are fundamental for securing data through encryption and decryption algorithms, ensuring the confidentiality and integrity of sensitive information. 
-
-* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_11_Applications.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture11">[link]</a>
-
