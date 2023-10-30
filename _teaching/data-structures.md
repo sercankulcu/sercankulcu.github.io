@@ -73,9 +73,9 @@ Chapter 7: Trees
 
 In the realm of data structures, trees, binary trees, and B-trees form the backbone of hierarchical data organization, enabling us to manage and retrieve structured data efficiently. Trees, a fundamental structure, represent data hierarchically, with a root node at the top and branches leading to child nodes, making them ideal for tasks like representing family relationships, organizing file systems, or implementing search and sorting algorithms. Binary trees take this concept a step further by limiting each node to have at most two child nodes, optimizing search and insertion operations in various applications such as binary search trees and expression evaluation. B-trees, on the other hand, are engineered for high-performance storage and retrieval in large datasets, utilizing a balanced multiway branching structure that ensures efficient access times even with vast amounts of data.
 
+* Sunum-Ağaç <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_07_Agac.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture06">[link]</a>
-
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture07">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders07">[tr]</a>
 
 Chapter 8: Heaps, Priority Queues
 ---
