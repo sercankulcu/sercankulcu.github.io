@@ -10,7 +10,9 @@ location: "Giresun, Turkey"
 
 <img align="left" width="200" alt="data structure" src="/images/teaching/data-structures-course.png"> Data structures are fundamental components of computer programs that store and organize data in a specific way. They are the building blocks of any computer program and play a crucial role in the design and efficiency of software systems. As the complexity of computer engineering has increased over time, the need for advanced data structures has also grown. Implementing advanced data structures allows software engineers to manage large and complex datasets efficiently, reducing the time and resources required to process data. 
 
-<b>Book:</b> Data Structures and Algorithms in Java 6th Edition by Michael T. Goodrich, Roberto Tamassia, Michael H. Goldwasser <a href="https://www.amazon.com/Data-Structures-Algorithms-Michael-Goodrich/dp/1118771338">[link]</a>
+<b>Book:</b> Data Structures and Algorithms in Java 6th Edition by Michael T. Goodrich, Roberto Tamassia, Michael H. Goldwasser <a href="https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635">[link]</a>
+
+<b>CENG213 - Data Structures</b> course page <a href="https://user.ceng.metu.edu.tr/~ys/ceng213-ds">[link]</a>
 
 Chapter 1: Introduction
 ---
