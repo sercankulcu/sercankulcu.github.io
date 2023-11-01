@@ -14,6 +14,7 @@ location: "Giresun, Turkey"
 
 <b>CENG213 - Data Structures</b> course page <a href="https://user.ceng.metu.edu.tr/~ys/ceng213-ds">[link]</a>
 
+
 Chapter 1: Introduction
 ---
 
@@ -23,6 +24,7 @@ Data structures are the backbone of computer science, providing a fundamental fr
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_01_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture01">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders01">[tr]</a>
 
+
 Chapter 2: Arrays
 ---
 
@@ -31,6 +33,7 @@ In the realm of data structures, two foundational concepts take center stage: ar
 * Sunum-Diziler <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_02_Diziler.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture02">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders02">[tr]</a>
+
 
 Chapter 3: Linked Lists
 ---
@@ -81,7 +84,8 @@ In the realm of data structures, trees, binary trees, and B-trees form the backb
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture07">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders07">[tr]</a>
 
-Chapter 8: Heaps, Priority Queues
+
+Chapter 8: Priority Queues, Heaps
 ---
 
 In the realm of data structures, heaps and priority queues play a pivotal role in efficient data management and optimization. Heaps, a specialized form of tree structure, are designed to facilitate the rapid retrieval of the maximum or minimum element, making them ideal for tasks like implementing priority queues, sorting algorithms, and scheduling processes. Priority queues, on the other hand, are abstract data types that provide a way to organize elements with associated priorities, ensuring that the highest-priority item is readily accessible. These structures are invaluable in a wide array of applications, from task scheduling in operating systems to solving complex optimization problems in algorithms and artificial intelligence. 
@@ -91,10 +95,10 @@ In the realm of data structures, heaps and priority queues play a pivotal role i
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture08">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders08">[tr]</a>
 
 
-Chapter 9: Maps, Hash Tables, Sets
+Chapter 9: Maps, Hash Tables
 ---
 
-In the landscape of data structures, maps, hash tables, and sets stand as essential components, providing sophisticated means for data organization and retrieval. Maps allow us to associate key-value pairs, facilitating the storage and retrieval of data through a unique key, which is invaluable in applications ranging from database systems to efficient caching mechanisms. Hash tables, a cornerstone of data structure design, utilize hash functions to optimize data retrieval by mapping keys to specific memory locations. Their efficiency in search and insertion operations makes them a crucial tool for building data storage and indexing systems. Sets, in turn, enable us to manage collections of unique elements efficiently, supporting operations like intersection, union, and difference.
+In the landscape of data structures, maps, hash tables, and sets stand as essential components, providing sophisticated means for data organization and retrieval. Maps allow us to associate key-value pairs, facilitating the storage and retrieval of data through a unique key, which is invaluable in applications ranging from database systems to efficient caching mechanisms. Hash tables, a cornerstone of data structure design, utilize hash functions to optimize data retrieval by mapping keys to specific memory locations. Their efficiency in search and insertion operations makes them a crucial tool for building data storage and indexing systems. 
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture05">[link]</a>
@@ -118,7 +122,16 @@ In the domain of data structures, graphs, weighted graphs, minimum spanning tree
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture07">[link]</a>
 
 
-Chapter 12: Advanced Data Structures
+Chapter 12: Sets
+---
+
+Sets, in turn, enable us to manage collections of unique elements efficiently, supporting operations like intersection, union, and difference.
+
+* Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture07">[link]</a>
+
+
+Chapter 13: Advanced Data Structures
 ---
 
 In the diverse landscape of data structures, Interval Trees, Trie Data Structures, Suffix Trees, Bloom Filters, and Skip Lists represent a rich tapestry of specialized tools for addressing a wide range of computational challenges. Interval Trees are custom-tailored for the efficient storage and retrieval of intervals or ranges, making them essential for applications like scheduling tasks and optimizing resource allocation. Trie data structures are optimal for the representation and retrieval of strings and sequences, with applications in spell-checking, text indexing, and information retrieval systems. Suffix Trees, on the other hand, offer an invaluable resource for string matching and pattern searching, forming the foundation for DNA sequence alignment and full-text indexing in search engines. Bloom Filters provide probabilistic data storage for fast membership queries, minimizing false negatives in applications like caching, spell-checking, and duplicate detection. Skip Lists offer a versatile structure for efficient sorted data storage, with characteristics that allow for rapid search and insertion, making them ideal for database indexing and more.
@@ -127,7 +140,7 @@ In the diverse landscape of data structures, Interval Trees, Trie Data Structure
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture09">[link]</a>
 
 
-Chapter 13: Advanced Topics in Data Structures
+Chapter 14: Advanced Topics in Data Structures
 ---
 
 In the dynamic world of data structures, several specialized variants, including Persistent Data Structures, External Memory Data Structures, Multi-dimensional Data Structures, Randomized Data Structures, and Distributed Data Structures, offer sophisticated solutions for a multitude of advanced computing scenarios. Persistent Data Structures allow for the efficient retrieval of previous versions of data, making them valuable for applications like version control systems and time-traveling databases. External Memory Data Structures focus on optimizing I/O operations, making them essential in managing vast datasets that exceed the main memory capacity, such as in databases and file systems. Multi-dimensional Data Structures excel in organizing data with multiple dimensions, playing a crucial role in fields like geographic information systems and image processing. Randomized Data Structures employ probabilistic algorithms to achieve efficient data management, offering a balance between performance and simplicity, while Distributed Data Structures are engineered for distributed systems, addressing the unique challenges of data synchronization, consistency, and fault tolerance in cloud computing and networked environments.
