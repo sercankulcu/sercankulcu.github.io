@@ -92,7 +92,7 @@ Chapter 8: Priority Queues, Heaps
 
 In the realm of data structures, heaps and priority queues play a pivotal role in efficient data management and optimization. Heaps, a specialized form of tree structure, are designed to facilitate the rapid retrieval of the maximum or minimum element, making them ideal for tasks like implementing priority queues, sorting algorithms, and scheduling processes. Priority queues, on the other hand, are abstract data types that provide a way to organize elements with associated priorities, ensuring that the highest-priority item is readily accessible. These structures are invaluable in a wide array of applications, from task scheduling in operating systems to solving complex optimization problems in algorithms and artificial intelligence. 
 
-* Sunum-Öncelikli Kuyruk <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_07_Agac.pdf">[pdf]</a>
+* Sunum-Öncelikli Kuyruk <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_08_Heaps_Priority_Queues.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture08">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders08">[tr]</a>
 
@@ -102,8 +102,9 @@ Chapter 9: Maps, Hash Tables
 
 In the landscape of data structures, maps, hash tables, and sets stand as essential components, providing sophisticated means for data organization and retrieval. Maps allow us to associate key-value pairs, facilitating the storage and retrieval of data through a unique key, which is invaluable in applications ranging from database systems to efficient caching mechanisms. Hash tables, a cornerstone of data structure design, utilize hash functions to optimize data retrieval by mapping keys to specific memory locations. Their efficiency in search and insertion operations makes them a crucial tool for building data storage and indexing systems. 
 
+* Sunum-Hash Tabloları <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_09_Hash_Tablosu.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture05">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture09">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders09">[tr]</a>
 
 
 Chapter 10: Search Trees
