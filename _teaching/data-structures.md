@@ -122,8 +122,9 @@ Chapter 11: Graphs
 
 In the domain of data structures, graphs, weighted graphs, minimum spanning trees, and directed acyclic graphs (DAGs) are indispensable tools for representing and solving complex relationships and optimization problems. Graphs, the most versatile of these structures, model connections and dependencies among data elements, making them essential for applications ranging from social networks to route planning and network design. Weighted graphs augment this concept by assigning weights to edges, facilitating the representation of costs or distances in various scenarios, such as finding the shortest path in a transportation network or optimizing resource allocation. Minimum spanning trees are a specialized graph construct used in network design and clustering, providing a tree-like subgraph that connects all nodes with the minimum total edge weight. Directed acyclic graphs, on the other hand, offer a specialized structure to represent data flow and dependencies without cycles, serving as the backbone for scheduling tasks and optimizing processes.
 
+* Sunum-Çizge <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_11_Cizge.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture07">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture11">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders11">[tr]</a>
 
 
 Chapter 12: Sets
