@@ -15,7 +15,7 @@ The resources:
 
 * Data Structures and Algorithms in Java 6th Edition by Michael T. Goodrich, Roberto Tamassia, Michael H. Goldwasser <a href="https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635">[book]</a>
 * CENG213 - Data Structures course page <a href="https://user.ceng.metu.edu.tr/~ys/ceng213-ds">[website]</a>
-
+* Data Structures Easy to Advanced Course <a href="https://www.youtube.com/watch?v=RBSGKlAvoiM">[youtube]</a>
 
 Chapter 1: Introduction
 ---
