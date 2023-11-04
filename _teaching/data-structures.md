@@ -132,8 +132,9 @@ Chapter 12: Sets
 
 Sets, in turn, enable us to manage collections of unique elements efficiently, supporting operations like intersection, union, and difference.
 
+* Sunum-Kümeler <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_12_Kumeler.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture07">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture12">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders12">[tr]</a>
 
 
 Chapter 13: Advanced Data Structures
