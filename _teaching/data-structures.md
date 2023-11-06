@@ -17,6 +17,7 @@ The resources:
 * CS-61B: Data Structures course page <a href="https://sp23.datastructur.es/">[website]</a>
 * CENG-213: Data Structures course page <a href="https://user.ceng.metu.edu.tr/~ys/ceng213-ds">[website]</a>
 * Data Structures Easy to Advanced Course <a href="https://www.youtube.com/watch?v=RBSGKlAvoiM">[youtube]</a>
+* Veri Yapıları ve Algoritmalar, Ders Notları, Mustafa Ege.
 
 Chapter 1: Introduction
 ---
