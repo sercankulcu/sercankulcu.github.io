@@ -8,20 +8,20 @@ date: 2023-10-05
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="data structure" src="/images/teaching/data-structures-course.png"> Data structures are fundamental components of computer programs that store and organize data in a specific way. They are the building blocks of any computer program and play a crucial role in the design and efficiency of software systems. As the complexity of computer engineering has increased over time, the need for advanced data structures has also grown. Implementing advanced data structures allows software engineers to manage large and complex datasets efficiently, reducing the time and resources required to process data. 
+<img align="left" width="200" alt="data structure" src="/images/teaching/data-structures-course.png"> Our journey through the world of data structures has been nothing short of enlightening. These fundamental concepts are the cornerstone of computer science and programming, and a deep understanding of them empowers us to write more efficient, organized, and robust code. I hope this exploration has ignited your curiosity and passion for data structures, as they are the key to unlocking the limitless possibilities of the digital world. Happy coding!
 
 The resources:
 ---
 
 * Data Structures and Algorithms in Java 6th Edition by Michael T. Goodrich, Roberto Tamassia, Michael H. Goldwasser <a href="https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635">[book]</a>
-* CS 61B Data Structures course page <a href="https://sp23.datastructur.es/">[website]</a>
-* CENG213 - Data Structures course page <a href="https://user.ceng.metu.edu.tr/~ys/ceng213-ds">[website]</a>
+* CS-61B: Data Structures course page <a href="https://sp23.datastructur.es/">[website]</a>
+* CENG-213: Data Structures course page <a href="https://user.ceng.metu.edu.tr/~ys/ceng213-ds">[website]</a>
 * Data Structures Easy to Advanced Course <a href="https://www.youtube.com/watch?v=RBSGKlAvoiM">[youtube]</a>
 
 Chapter 1: Introduction
 ---
 
-Data structures are the backbone of computer science, providing a fundamental framework for organizing and manipulating data in efficient and effective ways. These structures serve as the architectural blueprints that underpin the development of algorithms and software applications. By carefully selecting and implementing appropriate data structures, we can optimize the storage, retrieval, and processing of data, ultimately improving the performance and functionality of our programs. 
+Data structures are the backbone of computer science, serving as the fundamental building blocks that enable us to efficiently store, organize, and manipulate data. Here, we will explore a comprehensive spectrum of data structures, from the foundational concepts like arrays and linked lists to advanced topics that propel us into the future of computing.
 
 * Sunum-Giriş <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_01_Giris.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_01_Introduction.pdf">[pdf]</a>
@@ -31,7 +31,7 @@ Data structures are the backbone of computer science, providing a fundamental fr
 Chapter 2: Arrays
 ---
 
-In the realm of data structures, two foundational concepts take center stage: arrays and linked lists. Arrays provide a straightforward means of organizing data, offering constant-time access to elements through their index. They are a powerful choice for storing a fixed number of elements with a uniform data type. In contrast, linked lists offer flexibility, with elements arranged in a chain-like fashion, connected by pointers. This dynamic structure allows for efficient insertion and deletion operations, making linked lists a versatile choice for managing varying data sizes. 
+Arrays are like the bread and butter of programming. They allow us to store a collection of elements of the same data type in contiguous memory locations, making it efficient to access and manipulate individual elements. Arrays are the building blocks upon which we construct more complex data structures, and understanding them is a crucial first step.
 
 * Sunum-Diziler <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_02_Diziler.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf">[pdf]</a>
@@ -41,7 +41,7 @@ In the realm of data structures, two foundational concepts take center stage: ar
 Chapter 3: Linked Lists
 ---
 
-In the realm of data structures, two foundational concepts take center stage: arrays and linked lists. Arrays provide a straightforward means of organizing data, offering constant-time access to elements through their index. They are a powerful choice for storing a fixed number of elements with a uniform data type. In contrast, linked lists offer flexibility, with elements arranged in a chain-like fashion, connected by pointers. This dynamic structure allows for efficient insertion and deletion operations, making linked lists a versatile choice for managing varying data sizes. 
+Linked lists are dynamic and flexible data structures that consist of nodes connected through pointers. Unlike arrays, linked lists don't require contiguous memory, making them ideal for scenarios where data needs to be dynamically allocated or deallocated. Linked lists are foundational to understanding data organization and serve as the basis for more advanced structures.
 
 * Sunum-Bağlı-Liste <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_03_Bagli_Liste.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf">[pdf]</a>
@@ -51,7 +51,7 @@ In the realm of data structures, two foundational concepts take center stage: ar
 Chapter 4: Stacks
 ---
 
-In the realm of data structures, three essential components - Stacks, Queues, and Deques - play a pivotal role in various computing applications. Stacks are a linear data structure that follows the Last-In-First-Out (LIFO) principle, making them ideal for managing tasks that require tracking elements in a specific order, such as undo operations in text editors. 
+Our journey continues with stacks, which follow the Last-In-First-Out (LIFO) principle. Stacks are versatile and used in a myriad of applications, from managing function calls to evaluating expressions. Mastering stacks is essential for writing efficient and well-organized code, especially in situations where we need to keep track of data in a disciplined manner.
 
 * Sunum-Yığın <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_04_Yigin.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
@@ -61,7 +61,7 @@ In the realm of data structures, three essential components - Stacks, Queues, an
 Chapter 5: Queues
 ---
 
-In the realm of data structures, three essential components - Stacks, Queues, and Deques - play a pivotal role in various computing applications. Queues, on the other hand, adhere to the First-In-First-Out (FIFO) concept, making them excellent for tasks like managing tasks in a printer queue or scheduling processes in an operating system. Deques, which stands for Double-Ended Queues, offer a versatile approach, allowing elements to be added or removed from both ends, making them adaptable for a wide range of scenarios, from real-time messaging systems to managing sliding window data in algorithms. 
+Next up are queues, adhering to the First-In-First-Out (FIFO) principle. They play a pivotal role in scenarios such as task scheduling and resource management. Understanding queues is essential for ensuring tasks are executed systematically and fairly.
 
 * Sunum-Kuyruk <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_05_Kuyruk.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
@@ -71,7 +71,7 @@ In the realm of data structures, three essential components - Stacks, Queues, an
 Chapter 6: Lists
 ---
 
-In the realm of data structures, lists, array lists, and positional lists are fundamental tools that provide us with versatile means of managing and manipulating collections of data. Lists, as the most basic structure, allow us to organize data in a linear, ordered fashion. Array lists, on the other hand, build upon this concept by implementing lists using arrays, offering dynamic resizing and efficient access to elements, which is particularly valuable when you need to frequently append or insert elements. Positional lists take it a step further, allowing us to access and manipulate elements by their position in the list, enabling operations like swapping or reordering elements with ease.
+Lists offer a more generalized approach to data storage, providing dynamic resizing and adaptability. They are instrumental in managing collections of data elements, and as programmers, we often rely on them for various tasks.
 
 * Sunum-Liste <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_06_Liste.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_04_Lists.pdf">[pdf]</a>
@@ -81,7 +81,7 @@ In the realm of data structures, lists, array lists, and positional lists are fu
 Chapter 7: Trees
 ---
 
-In the realm of data structures, trees, binary trees, and B-trees form the backbone of hierarchical data organization, enabling us to manage and retrieve structured data efficiently. Trees, a fundamental structure, represent data hierarchically, with a root node at the top and branches leading to child nodes, making them ideal for tasks like representing family relationships, organizing file systems, or implementing search and sorting algorithms. Binary trees take this concept a step further by limiting each node to have at most two child nodes, optimizing search and insertion operations in various applications such as binary search trees and expression evaluation. B-trees, on the other hand, are engineered for high-performance storage and retrieval in large datasets, utilizing a balanced multiway branching structure that ensures efficient access times even with vast amounts of data.
+Trees, one of the most intriguing and versatile data structures, take center stage in our journey. Trees consist of nodes connected in a hierarchical and branched structure, allowing us to represent complex relationships between data elements. Concepts like binary trees and tree traversal are essential for understanding how hierarchical data is organized.
 
 * Sunum-Ağaç <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_07_Agac.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
@@ -91,7 +91,7 @@ In the realm of data structures, trees, binary trees, and B-trees form the backb
 Chapter 8: Priority Queues, Heaps
 ---
 
-In the realm of data structures, heaps and priority queues play a pivotal role in efficient data management and optimization. Heaps, a specialized form of tree structure, are designed to facilitate the rapid retrieval of the maximum or minimum element, making them ideal for tasks like implementing priority queues, sorting algorithms, and scheduling processes. Priority queues, on the other hand, are abstract data types that provide a way to organize elements with associated priorities, ensuring that the highest-priority item is readily accessible. These structures are invaluable in a wide array of applications, from task scheduling in operating systems to solving complex optimization problems in algorithms and artificial intelligence. 
+Heaps are specialized tree structures that enable efficient priority-based operations. They are instrumental in sorting algorithms and are used in applications where rapid access to high or low-priority elements is paramount.
 
 * Sunum-Öncelikli Kuyruk <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_08_Heaps_Priority_Queues.pdf">[pdf]</a>
@@ -101,7 +101,7 @@ In the realm of data structures, heaps and priority queues play a pivotal role i
 Chapter 9: Maps, Hash Tables
 ---
 
-In the landscape of data structures, maps, hash tables, and sets stand as essential components, providing sophisticated means for data organization and retrieval. Maps allow us to associate key-value pairs, facilitating the storage and retrieval of data through a unique key, which is invaluable in applications ranging from database systems to efficient caching mechanisms. Hash tables, a cornerstone of data structure design, utilize hash functions to optimize data retrieval by mapping keys to specific memory locations. Their efficiency in search and insertion operations makes them a crucial tool for building data storage and indexing systems. 
+Our journey then takes us to hash tables, which use hash functions to map keys to specific values, ensuring rapid data retrieval. Understanding hash tables is vital for efficient data storage and retrieval, especially when dealing with large datasets.
 
 * Sunum-Hash Tabloları <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_09_Hash_Tablosu.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf">[pdf]</a>
@@ -111,7 +111,7 @@ In the landscape of data structures, maps, hash tables, and sets stand as essent
 Chapter 10: Search Trees
 ---
 
-In the realm of data structures, trees, binary trees, and B-trees form the backbone of hierarchical data organization, enabling us to manage and retrieve structured data efficiently. Trees, a fundamental structure, represent data hierarchically, with a root node at the top and branches leading to child nodes, making them ideal for tasks like representing family relationships, organizing file systems, or implementing search and sorting algorithms. Binary trees take this concept a step further by limiting each node to have at most two child nodes, optimizing search and insertion operations in various applications such as binary search trees and expression evaluation. B-trees, on the other hand, are engineered for high-performance storage and retrieval in large datasets, utilizing a balanced multiway branching structure that ensures efficient access times even with vast amounts of data.
+Search trees, including binary search trees and AVL trees, are pivotal in maintaining ordered data. They underpin many searching and sorting algorithms, making them indispensable for computer scientists and programmers alike.
 
 * Sunum-Arama Ağaçları <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_10_Arama_Agaclari.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
@@ -121,7 +121,7 @@ In the realm of data structures, trees, binary trees, and B-trees form the backb
 Chapter 11: Graphs
 ---
 
-In the domain of data structures, graphs, weighted graphs, minimum spanning trees, and directed acyclic graphs (DAGs) are indispensable tools for representing and solving complex relationships and optimization problems. Graphs, the most versatile of these structures, model connections and dependencies among data elements, making them essential for applications ranging from social networks to route planning and network design. Weighted graphs augment this concept by assigning weights to edges, facilitating the representation of costs or distances in various scenarios, such as finding the shortest path in a transportation network or optimizing resource allocation. Minimum spanning trees are a specialized graph construct used in network design and clustering, providing a tree-like subgraph that connects all nodes with the minimum total edge weight. Directed acyclic graphs, on the other hand, offer a specialized structure to represent data flow and dependencies without cycles, serving as the backbone for scheduling tasks and optimizing processes.
+Graphs, with their intricate web of connections, offer a versatile way to model relationships between data elements. They are invaluable in applications ranging from social networks to routing and optimization problems. Understanding graph theory and traversal algorithms is essential for solving complex problems.
 
 * Sunum-Çizge <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_11_Cizge.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
@@ -131,7 +131,7 @@ In the domain of data structures, graphs, weighted graphs, minimum spanning tree
 Chapter 12: Sets
 ---
 
-Sets, in turn, enable us to manage collections of unique elements efficiently, supporting operations like intersection, union, and difference.
+Sets represent collections of unique elements and are essential for ensuring data uniqueness. They come into play in problem-solving scenarios where distinct data elements are required.
 
 * Sunum-Kümeler <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_12_Kumeler.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
@@ -141,16 +141,18 @@ Sets, in turn, enable us to manage collections of unique elements efficiently, s
 Chapter 13: Advanced Data Structures
 ---
 
-In the diverse landscape of data structures, Interval Trees, Trie Data Structures, Suffix Trees, Bloom Filters, and Skip Lists represent a rich tapestry of specialized tools for addressing a wide range of computational challenges. Interval Trees are custom-tailored for the efficient storage and retrieval of intervals or ranges, making them essential for applications like scheduling tasks and optimizing resource allocation. Trie data structures are optimal for the representation and retrieval of strings and sequences, with applications in spell-checking, text indexing, and information retrieval systems. Suffix Trees, on the other hand, offer an invaluable resource for string matching and pattern searching, forming the foundation for DNA sequence alignment and full-text indexing in search engines. Bloom Filters provide probabilistic data storage for fast membership queries, minimizing false negatives in applications like caching, spell-checking, and duplicate detection. Skip Lists offer a versatile structure for efficient sorted data storage, with characteristics that allow for rapid search and insertion, making them ideal for database indexing and more.
+As we venture further into our journey, we encounter advanced data structures such as B-trees, red-black trees, and splay trees. These structures offer sophisticated solutions to specific problems and are commonly found in database management systems and file systems.
 
+* Sunum-Gelişmiş Veri Yapıları <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_12_Kumeler.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_09_Advanced_Data_Structures.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture09">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture13">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders13">[tr]</a>
 
 
 Chapter 14: Advanced Topics in Data Structures
 ---
 
-In the dynamic world of data structures, several specialized variants, including Persistent Data Structures, External Memory Data Structures, Multi-dimensional Data Structures, Randomized Data Structures, and Distributed Data Structures, offer sophisticated solutions for a multitude of advanced computing scenarios. Persistent Data Structures allow for the efficient retrieval of previous versions of data, making them valuable for applications like version control systems and time-traveling databases. External Memory Data Structures focus on optimizing I/O operations, making them essential in managing vast datasets that exceed the main memory capacity, such as in databases and file systems. Multi-dimensional Data Structures excel in organizing data with multiple dimensions, playing a crucial role in fields like geographic information systems and image processing. Randomized Data Structures employ probabilistic algorithms to achieve efficient data management, offering a balance between performance and simplicity, while Distributed Data Structures are engineered for distributed systems, addressing the unique challenges of data synchronization, consistency, and fault tolerance in cloud computing and networked environments.
+Our journey concludes with a glimpse into advanced topics within data structures, including concurrent data structures, memory management, and data compression. These topics are at the cutting edge of data structure research, propelling us into the future of advanced computing and system-level programming.
 
+* Sunum-İleri Konular <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_12_Kumeler.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_10_Advanced_Topics.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture10">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture14">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders14">[tr]</a>
