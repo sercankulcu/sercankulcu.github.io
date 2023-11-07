@@ -105,37 +105,10 @@ Working with databases is a fundamental aspect of Java programming, providing a 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_10_Working_With_Databases.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture10">[link]</a>
 
-Chapter 11: Web Applications with Servlets and JSP: 
------
-
-Building web applications is a crucial aspect of modern software development, and Java provides a robust set of tools and frameworks for creating dynamic, scalable web applications using technologies such as servlets and JavaServer Pages (JSP), enabling developers to build sophisticated, interactive web-based services with rich functionality and high performance.
-
-* Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_11_Web_Applications_With_Servlets_And_JSP.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture11">[link]</a>
-
-Chapter 12: Testing and Debugging: 
+Chapter 11: Testing and Debugging: 
 -----
 
 Testing and debugging are critical aspects of Java programming, providing a powerful mechanism for ensuring that software applications are robust, reliable, and free from errors or bugs that can cause unexpected behavior or crashes, and enabling developers to identify and correct issues efficiently and effectively throughout the software development lifecycle.
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_12_Testing_And_Debugging.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture12">[link]</a>
-
-Chapter 13: Advanced Topics: 
------
-
-The advanced topics of Java programming provide developers with a deeper understanding of the language, its features, and its potential applications, enabling them to build more sophisticated, complex applications and systems, optimize performance, and stay up-to-date with the latest developments and best practices in the field.
-
-* Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_13_Advanced_Topics.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture13">[link]</a>
-* Interview Garbage Collectors <a href="http://sercankulcu.github.io/files/java/Chapter_13_Interview_Garbage_Collectors.pdf">[pdf]</a>
-
-Chapter 14: Next Steps: 
------
-
-The next steps chapter in the Java programming course provides guidance and resources for further learning, enabling students to deepen their understanding of the language, explore new topics, and expand their skill sets, and encouraging them to continue on their path of growth and development as Java programmers.
-
-* Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_14_Next_Steps.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture14">[link]</a>
-* Design Patterns <a href="http://sercankulcu.github.io/files/design_pattern/Design_Patterns.pdf">[pdf]</a>
-* Interview Questions <a href="http://sercankulcu.github.io/files/java/Chapter_14_Interview_Questions.pdf">[pdf]</a>
