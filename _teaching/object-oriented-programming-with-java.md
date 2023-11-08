@@ -47,7 +47,7 @@ Control structures, which include conditional statements and loops, provide a po
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture03">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03">[tr]</a>
 
 
-Chapter 4: Object Oriented Programming: 
+Chapter 4: Object and Classes: 
 -----
 
 Object-oriented programming (OOP) is a powerful paradigm for structuring and organizing software systems, and is a cornerstone of Java programming, providing a flexible and modular approach to designing, implementing, and maintaining complex applications.
