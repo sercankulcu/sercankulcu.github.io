@@ -52,8 +52,10 @@ Chapter 4: Object and Classes:
 
 Object-oriented programming (OOP) is a powerful paradigm for structuring and organizing software systems, and is a cornerstone of Java programming, providing a flexible and modular approach to designing, implementing, and maintaining complex applications.
 
+* Sunum - Nesne ve Sınıflar <a href="http://sercankulcu.github.io/files/java/slides/Bolum_04_Nesne_Sinif.pdf">[pdf]</a> 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_04_Object_Oriented_Programming.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture04">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture04">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders04">[tr]</a>
+
 
 Chapter 5: Arrays and Collections: 
 -----
