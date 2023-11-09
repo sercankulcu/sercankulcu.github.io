@@ -12,6 +12,13 @@ location: "Giresun, Turkey"
 
 * Ders Öğretim Planı <a href="http://sercankulcu.github.io/files/java/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
+
+The resources:
+---
+
+Java ile Nesneye Yönelik Programlama, Oğuz Aslantürk <a href="https://web.cs.hacettepe.edu.tr/~bbm102/misc/java_notes_by_oa.pdf">[pdf]</a>
+
+
 Chapter 1: Introduction to Programming and Java: 
 -----
 
