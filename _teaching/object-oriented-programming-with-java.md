@@ -16,7 +16,8 @@ location: "Giresun, Turkey"
 The resources:
 ---
 
-Java ile Nesneye Yönelik Programlama, Oğuz Aslantürk <a href="https://web.cs.hacettepe.edu.tr/~bbm102/misc/java_notes_by_oa.pdf">[pdf]</a>
+* The Java™ Tutorials <a href="https://docs.oracle.com/javase/tutorial/">[website]</a>
+* Java ile Nesneye Yönelik Programlama, Oğuz Aslantürk <a href="https://web.cs.hacettepe.edu.tr/~bbm102/misc/java_notes_by_oa.pdf">[pdf]</a>
 
 
 Chapter 1: Introduction to Programming and Java: 
