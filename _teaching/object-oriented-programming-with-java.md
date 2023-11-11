@@ -13,14 +13,14 @@ location: "Giresun, Turkey"
 * Ders Öğretim Planı <a href="http://sercankulcu.github.io/files/java/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
 
-The resources:
+The resources
 ---
 
 * The Java™ Tutorials <a href="https://docs.oracle.com/javase/tutorial/">[website]</a>
 * Java ile Nesneye Yönelik Programlama, Oğuz Aslantürk <a href="https://web.cs.hacettepe.edu.tr/~bbm102/misc/java_notes_by_oa.pdf">[pdf]</a>
 
 
-Chapter 1: Introduction to Programming and Java: 
+Chapter 1: Introduction to Programming and Java
 -----
 
 As a versatile and widely-used programming language, Java provides a powerful toolset for developing a diverse range of applications, from desktop and mobile apps to web-based services and enterprise software systems.
@@ -33,7 +33,7 @@ As a versatile and widely-used programming language, Java provides a powerful to
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_01_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture01">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders01">[tr]</a>
 
-Chapter 2: Basic Syntax and Data Types: 
+Chapter 2: Basic Syntax and Data Types
 -----
 
 Understanding the fundamental syntax and data types of Java is essential for building effective and efficient software systems, as it provides the building blocks for defining program logic, manipulating data, and communicating with external resources.
@@ -44,7 +44,7 @@ Understanding the fundamental syntax and data types of Java is essential for bui
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_02_Basic_Syntax_and_Data_Types.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture02">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders02">[tr]</a>
 
-Chapter 3: Control Structures: 
+Chapter 3: Control Structures
 -----
 
 Control structures, which include conditional statements and loops, provide a powerful mechanism for controlling the flow of execution in a Java program, enabling developers to create complex, dynamic behaviors and respond to a wide range of inputs and events.
@@ -56,7 +56,7 @@ Control structures, which include conditional statements and loops, provide a po
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture03">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03">[tr]</a>
 
 
-Chapter 4: Object and Classes: 
+Chapter 4: Object and Classes
 -----
 
 Object-oriented programming (OOP) is a powerful paradigm for structuring and organizing software systems, and is a cornerstone of Java programming, providing a flexible and modular approach to designing, implementing, and maintaining complex applications.
@@ -66,7 +66,7 @@ Object-oriented programming (OOP) is a powerful paradigm for structuring and org
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture04">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders04">[tr]</a>
 
 
-Chapter 5: Arrays and Collections: 
+Chapter 5: Arrays and Collections
 -----
 
 Arrays and collections are essential data structures in Java programming, providing a powerful mechanism for storing and manipulating large sets of data efficiently and flexibly, and enabling developers to build complex algorithms and data-driven applications.
@@ -74,7 +74,7 @@ Arrays and collections are essential data structures in Java programming, provid
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_05_Arrays_And_Collections.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture05">[link]</a>
 
-Chapter 6: Exception Handling: 
+Chapter 6: Exception Handling
 -----
 
 Exception handling is a critical aspect of Java programming, providing a powerful mechanism for detecting and responding to errors and exceptional conditions in a program, and ensuring that applications remain robust and reliable even in the face of unexpected inputs or events.
@@ -83,7 +83,7 @@ Exception handling is a critical aspect of Java programming, providing a powerfu
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture06">[link]</a>
 * Interview Exception Handling <a href="http://sercankulcu.github.io/files/java/Interview_Exception_Handling.pdf">[pdf]</a>
 
-Chapter 7: Working with Files and Input/Output: 
+Chapter 7: Working with Files and Input/Output
 -----
 
 Working with files and input/output (I/O) operations is a fundamental aspect of Java programming, providing a powerful mechanism for reading and writing data from a wide range of sources, including local files, remote servers, and user input, and enabling developers to build a wide range of applications with sophisticated data processing capabilities.
@@ -91,7 +91,7 @@ Working with files and input/output (I/O) operations is a fundamental aspect of 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_07_Working_With_Files_And_Input_Output.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture07">[link]</a>
 
-Chapter 8: Working with GUI Applications: 
+Chapter 8: Working with GUI Applications
 -----
 
 Graphical user interfaces (GUIs) are a ubiquitous feature of modern software applications, and Java provides a powerful set of tools and frameworks for building sophisticated, interactive GUIs with rich visual and behavioral features, enabling developers to create compelling user experiences and enhance the usability of their software systems.
@@ -100,7 +100,7 @@ Graphical user interfaces (GUIs) are a ubiquitous feature of modern software app
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture08">[link]</a>
 * Interview Swing <a href="http://sercankulcu.github.io/files/java/Chapter_08_Interview_Swing.pdf">[pdf]</a>
 
-Chapter 9: Concurrency and Multithreading: 
+Chapter 9: Concurrency and Multithreading
 -----
 
 Concurrency and multithreading are essential concepts in Java programming, providing a powerful mechanism for building responsive, scalable applications that can execute multiple tasks concurrently and take advantage of modern hardware architectures to maximize performance and efficiency.
@@ -108,7 +108,7 @@ Concurrency and multithreading are essential concepts in Java programming, provi
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_09_Concurrency_And_Multithreading.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture09">[link]</a>
 
-Chapter 10: Working with Databases: 
+Chapter 10: Working with Databases
 -----
 
 Working with databases is a fundamental aspect of Java programming, providing a powerful mechanism for storing, retrieving, and manipulating large sets of structured data efficiently and flexibly, and enabling developers to build a wide range of applications with sophisticated data management capabilities.
@@ -116,7 +116,7 @@ Working with databases is a fundamental aspect of Java programming, providing a 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_10_Working_With_Databases.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture10">[link]</a>
 
-Chapter 11: Testing and Debugging: 
+Chapter 11: Testing and Debugging
 -----
 
 Testing and debugging are critical aspects of Java programming, providing a powerful mechanism for ensuring that software applications are robust, reliable, and free from errors or bugs that can cause unexpected behavior or crashes, and enabling developers to identify and correct issues efficiently and effectively throughout the software development lifecycle.
