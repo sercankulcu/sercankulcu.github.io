@@ -17,8 +17,9 @@ The resources
 ---
 
 * Dev Java <a href="https://dev.java/learn/">[website]</a>
+* Java Youtube <a href="https://www.youtube.com/java">[youtube]</a>
 * Download Eclipse <a href="https://www.eclipse.org/downloads/packages/installer">[website]</a>
-* The Java™ Tutorials <a href="https://docs.oracle.com/javase/tutorial/">[website]</a>
+* Oracle Java Tutorials <a href="https://docs.oracle.com/javase/tutorial/">[website]</a>
 * Java ile Nesneye Yönelik Programlama, Oğuz Aslantürk <a href="https://web.cs.hacettepe.edu.tr/~bbm102/misc/java_notes_by_oa.pdf">[pdf]</a>
 
 
