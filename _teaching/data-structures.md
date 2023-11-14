@@ -80,6 +80,7 @@ Lists offer a more generalized approach to data storage, providing dynamic resiz
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_04_Lists.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture06">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders06">[tr]</a>
 
+* Sunum-Sorular <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_06_Sorular.pdf">[pdf]</a>
 
 Chapter 7: Trees
 ---
