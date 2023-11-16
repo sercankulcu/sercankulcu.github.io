@@ -82,6 +82,8 @@ Lists offer a more generalized approach to data storage, providing dynamic resiz
 
 * Sunum-Sorular <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_06_Sorular.pdf">[pdf]</a>
 
+* Ödev sonuçlar <a href="http://sercankulcu.github.io/files/data_structures/slides/bilmodevler.htm">[pdf]</a>
+
 Chapter 7: Trees
 ---
 
