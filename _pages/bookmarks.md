@@ -10,6 +10,7 @@ redirect_from:
 
 <img align="right" width="150" alt="owl on brach" src="/images/owl-on-branch.png">
 * <a href="https://chat.openai.com/">[ChatGPT]</a> a chatbot launched by OpenAI 
+* <a href="https://bard.google.com/chat">[Bard]</a> Google's helpful collaboration chat tool 
 * <a href="https://translate.google.com/">[Google Translate]</a> a multilingual neural machine translation service
 * <a href="https://terimler.org/">[Terimler]</a> akademik bilim terimleri sözlüğü
 * <a href="https://eski.tbd.org.tr/index.php?sayfa=sozluk&mi1">[Bilişim Sözlüğü]</a> türkiye bilişim derneği bilişim terimleri karşılıklar sözlüğü
@@ -36,3 +37,4 @@ redirect_from:
 * <a href="https://twitter.com/">[Twitter]</a> microblogging platform 
 * <a href="https://linkedin.com/">[LinkedIn]</a> professional networking platform 
 * <a href="https://reddit.com/">[Reddit]</a> social news and discussion platform 
+* <a href="http://www.flowgorithm.org/">[Flowgorithm]</a> a graphical authoring tool which allows users to write and execute programs using flowcharts
