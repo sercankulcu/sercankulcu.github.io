@@ -7,7 +7,7 @@ tags:
   - career
 ---
 
-<img width="150" alt="road to success" src="/images/posts/the-road-to-success.png" style="float: left; margin-right: 20px;" /> Hey there, tech pioneers! If you've ever found yourself dozing off in your computer science class, you're not alone. It's a common journey that many great minds have embarked upon. But let's not waste these moments; let's turn them into opportunities for growth and inspiration. In the words of Steve Jobs, "Your work is going to fill a large part of your life, and the only way to be truly satisfied is to do what you believe is great work. And the only way to do great work is to love what you do." So, let's discuss how to love your computer science classes.
+<img width="150" alt="staying engaged" src="/images/posts/staying-engaged-in-computer-science-classes.jpg" style="float: left; margin-right: 20px;" /> Hey there, tech pioneers! If you've ever found yourself dozing off in your computer science class, you're not alone. It's a common journey that many great minds have embarked upon. But let's not waste these moments; let's turn them into opportunities for growth and inspiration. In the words of Steve Jobs, "Your work is going to fill a large part of your life, and the only way to be truly satisfied is to do what you believe is great work. And the only way to do great work is to love what you do." So, let's discuss how to love your computer science classes.
 
 Is It Normal to Feel Bored in Class?
 -----
