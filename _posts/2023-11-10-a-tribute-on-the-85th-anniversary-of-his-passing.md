@@ -7,7 +7,7 @@ tags:
   - career
 ---
 
-<img width="150" alt="road to success" src="/images/posts/a-tribute-on-the-85th-anniversary-of-his-passing.png" style="float: left; margin-right: 20px;" /> Today marks the 85th anniversary of the passing of Mustafa Kemal Atatürk, the visionary leader and founding father of the Republic of Turkey. As we reflect on his enduring legacy, we are reminded not only of the profound impact he had on the Turkish nation but also of the timeless wisdom encapsulated in his words.
+<img width="150" alt="road to success" src="/images/posts/a-tribute-on-the-85th-anniversary-of-his-passing.png" style="float: left; margin-right: 20px;" /> Today marks the 85th anniversary of the passing of Mustafa Kemal Atatürk, the visionary leader and founding father of the Republic of Turkey. As we reflect on his enduring legacy, we are reminded not only of the profound impact he had on the Turkish nation but also of the timeless wisdom encapsulated in his words. Atatürk's influence extended far beyond the borders of his beloved country, shaping its destiny in ways that continue to resonate today.
 
 Atatürk, a man of remarkable foresight and unwavering determination, played a pivotal role in shaping Turkey's destiny. His visionary leadership during the tumultuous years following World War I transformed a crumbling Ottoman Empire into a modern and secular republic. His legacy is etched not only in the political landscape but also in the hearts of those who cherish the principles of democracy, equality, and progress.
 
