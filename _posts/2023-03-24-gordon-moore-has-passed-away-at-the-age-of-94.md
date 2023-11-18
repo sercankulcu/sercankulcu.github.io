@@ -7,7 +7,7 @@ tags:
   - career
 ---
 
-<img width="180" alt="gordon moore" src="/images/posts/gordon-moore-has-passed-away-at-the-age-of-94.jpg" style="float: left; margin-right: 10px;" />  In the world of technology, the name Gordon E. Moore is synonymous with innovation, vision, and a groundbreaking idea that would go on to transform the computer industry forever. As the co-founder of Intel Corp., Moore was a central figure in the history of electronics and his contributions to the design and manufacture of semiconductor chips helped launch Silicon Valley and set the stage for the computer to become the ubiquitous , defining tool of modern life.
+<img width="180" alt="gordon moore" src="/images/posts/gordon-moore-has-passed-away-at-the-age-of-94.png" style="float: left; margin-right: 10px;" />  In the world of technology, the name Gordon E. Moore is synonymous with innovation, vision, and a groundbreaking idea that would go on to transform the computer industry forever. As the co-founder of Intel Corp., Moore was a central figure in the history of electronics and his contributions to the design and manufacture of semiconductor chips helped launch Silicon Valley and set the stage for the computer to become the ubiquitous , defining tool of modern life.
 
 Moore passed away on March 24, 2023, at his home in Hawaii, at the age of 94, leaving behind an incredible legacy that has touched the lives of millions, if not billions, of people across the world.
 
