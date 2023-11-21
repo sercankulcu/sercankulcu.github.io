@@ -70,6 +70,7 @@ Object-oriented programming (OOP) is a powerful paradigm for structuring and org
 
 * Sunum - Sorular <a href="http://sercankulcu.github.io/files/java/slides/Bolum_04_Sorular.pdf">[pdf]</a> 
 * Ödev sonuçlar <a href="http://sercankulcu.github.io/files/java/slides/eemodevler.htm">[pdf]</a>
+* Vize cevaplar <a href="http://sercankulcu.github.io/files/java/slides/vize_cevaplar.pdf">[pdf]</a>
 
 
 Chapter 5: Arrays and Collections
