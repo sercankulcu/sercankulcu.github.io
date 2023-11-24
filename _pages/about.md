@@ -2,7 +2,7 @@
 layout: archive
 permalink: /
 title: "About me"
-excerpt: "Greetings"
+excerpt: "About me"
 author_profile: true
 redirect_from: 
   - /about/
@@ -10,6 +10,8 @@ redirect_from:
 ---
 
 <img align="right" width="150" alt="owl coffee beans" src="/images/owl-coffee-beans.png">
+
+Greetings,
 
 I'm Sercan Külcü, an assistant professor in the computer science department at Giresun University. I am also a passionate software engineer and have a Ph.D. in wireless communications. In addition to my research, I have been teaching OOP and Java courses since 2015. I also have experience teaching a variety of software engineering topics, including object-oriented programming, design patterns, data structures, and algorithms.
 
