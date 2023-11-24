@@ -22,7 +22,3 @@ Warm regards,
 <!--
 <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="sercankulc" data-description="Support me on Buy me a coffee!" data-message="Thank you for visiting!" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
 -->
-
-<!--
-<a width="100%" height="600px" class="twitter-timeline" href="https://twitter.com/sercandev?ref_src=twsrc%5Etfw">Tweets by Sercan Külcü</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
--->
