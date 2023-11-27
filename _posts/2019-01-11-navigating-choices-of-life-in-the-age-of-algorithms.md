@@ -1,7 +1,7 @@
 ---
-title: 'Navigating Life's Choices in the Age of Algorithms'
+title: 'Navigating Choices of Life in the Age of Algorithms'
 date: 2019-01-11
-permalink: /posts/2019/01/navigating-lifes-choices-in-the-age-of-algorithms/
+permalink: /posts/2019/01/navigating-choices-of-life-in-the-age-of-algorithms/
 tags:
   - career
 ---
