@@ -3,7 +3,7 @@ title: 'How computer computes?'
 date: 2018-09-04
 permalink: /posts/2018/09/how-computer-computes/
 tags:
-  - general
+  - career
   - self-improvement
 ---
 

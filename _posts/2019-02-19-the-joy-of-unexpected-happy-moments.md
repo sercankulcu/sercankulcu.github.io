@@ -4,6 +4,8 @@ date: 2019-02-19
 permalink: /posts/2019/02/the-joy-of-unexpected-happy-moments/
 tags:
   - career
+  - critics
+  - philosophy
 ---
 
 Have you ever experienced a delightful moment that came out of the blue, catching you by surprise and bringing a smile to your face? That's serendipity for you – the magic of happy occurrences that happen entirely by accident, without any prior expectations. Let's explore the beauty of serendipity and why it adds a special touch to our lives.

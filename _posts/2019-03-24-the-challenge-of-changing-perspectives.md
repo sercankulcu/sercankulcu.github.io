@@ -3,7 +3,8 @@ title: 'The Challenge of Changing Perspectives'
 date: 2019-03-24
 permalink: /posts/2019/03/the-challenge-of-changing-perspectives/
 tags:
-  - career
+  - philosophy
+  - self-improvement
 ---
 
 Humans are creatures of habit. We find comfort in routine and familiarity. So, why should we bother changing our perspectives when we're already comfortable with what we have? Let's delve into the reasons why embracing change can be beneficial.

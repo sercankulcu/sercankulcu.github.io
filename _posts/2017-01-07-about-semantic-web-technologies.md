@@ -3,8 +3,8 @@ title: 'About semantic web technologies'
 date: 2017-01-07
 permalink: /posts/2017/01/about-semantic-web-technologies/
 tags:
-  - software
   - career
+  - software
 ---
 
 <img width="200" alt="semantic web" src="/images/posts/about-semantic-web-technologies.png" style="float: left; margin-right: 10px;" /> Semantic web technologies are a set of tools and standards for representing and sharing data on the World Wide Web in a way that allows machines to understand and process the data. The goal of the semantic web is to create a common framework that allows data to be shared and reused across different applications and domains, enabling more intelligent and efficient access to information. The semantic web relies on the use of explicit and standardized definitions of the meanings of data elements, known as "ontologies," which provide a common vocabulary for describing and organizing data. This allows machines to understand the relationships between different data elements and to process and analyze the data in a more meaningful way.

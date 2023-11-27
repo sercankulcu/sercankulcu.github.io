@@ -4,6 +4,7 @@ date: 2019-02-07
 permalink: /posts/2019/02/how-emotions-can-transfer-between-people/
 tags:
   - career
+  - self-improvement
 ---
 
 Have you ever noticed how a friend's laughter can be contagious, instantly lifting your spirits? Or how a somber atmosphere in a room can influence your mood, even without a single word being spoken? Turns out, emotions have the remarkable ability to transfer from one person to another, creating a ripple effect in our social interactions.

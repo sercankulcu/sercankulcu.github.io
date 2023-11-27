@@ -3,9 +3,10 @@ title: 'John left his beloved work, so why did he do that?'
 date: 2015-10-06
 permalink: /posts/2015/10/john-left-his-beloved-work-so-why-did-he-do-that/
 tags:
-  - parenting
   - career
-  - personal development
+  - critics
+  - essays
+  - self-improvement
 ---
 
 <img width="200" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-1.png" style="float: left; margin-right: 10px;" /> John was a middle-aged man with a drive to succeed. He had always been passionate about technology, and that passion fueled his dreams of working in the defence industry. From a young age, he knew that he wanted to make a difference in the world, and he worked tirelessly to achieve his goals. John's hard work paid off when he was accepted into a prestigious engineering programme at a top university. He threw himself into his studies and quickly became a standout student. After his first year, John landed an internship with a defence company, and his career began to take shape. He was on the path to success, and nothing could stop him.

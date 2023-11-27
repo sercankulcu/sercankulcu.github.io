@@ -3,7 +3,9 @@ title: 'Rome Was not Built in a Day'
 date: 2015-10-06
 permalink: /posts/2015/10/rome-was-not-built-in-a-day/
 tags:
-  - self-development
+  - critics
+  - philosophy
+  - self-improvement
 ---
 
 In the fast-paced world we inhabit, where instant gratification often takes center stage, the age-old saying "Rome wasn't built in a day" serves as a timeless reminder of the virtue of patience. This adage encapsulates the profound truth that anything worth building or achieving requires time, dedication, and a steadfast commitment to the journey.

@@ -3,7 +3,8 @@ title: 'Balancing Priorities for Financial and Emotional Well-Being'
 date: 2018-10-06
 permalink: /posts/2018/10/balancing-priorities-for-financial-and-emotional-well-being/
 tags:
-  - self-development
+  - critics
+  - self-improvement
 ---
 
 In the hustle and bustle of our lives, it's not uncommon to feel pulled in various directions by the needs and expectations of others. However, there's a notion that suggests a counterintuitive approach – that the less you invest in caring about others, the more time you have to focus on yourself. Surprisingly, this approach can be beneficial, both financially and emotionally.

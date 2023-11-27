@@ -3,7 +3,8 @@ title: 'We can all become better individuals'
 date: 2014-07-07
 permalink: /posts/2014/07/we-can-all-become-better-individuals/
 tags:
-  - self-development
+  - critics
+  - self-improvement
 ---
 
 <img width="200" alt="pigeon" src="/images/posts/we-can-all-become-better-individuals.jpg" style="float: left; margin-right: 10px;" /> In today's world, we tend to look at a person's skills and knowledge before we judge them. However, these qualities don't necessarily reflect a person's true character. A person may be highly talented, but if they don't keep their promises, lack loyalty, or fail to uphold their word, then all their skills and knowledge are meaningless. In this context, it's essential to evaluate people based on their moral values and ethics rather than their abilities. If someone is truthful, keeps their promises, and is loyal, then they are worthy of praise and admiration, no matter what their skills or knowledge may be. Such people are rare, and they possess a quality that is far more superior than mere talent.

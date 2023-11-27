@@ -3,8 +3,8 @@ title: 'Vim a powerful text editor'
 date: 2016-05-14
 permalink: /posts/2016/05/vim-a-powerful-text-editor/
 tags:
-  - software
   - editor
+  - software
   - productivity
 ---
 

@@ -3,7 +3,9 @@ title: 'Embracing Lottery of Life'
 date: 2019-03-22
 permalink: /posts/2019/03/embracing-lottery-of-life/
 tags:
-  - career
+  - critics
+  - essays
+  - self-improvement
 ---
 
 Have you ever stopped to think about the things you didn't get to choose in life? We're born into a particular place, to parents we didn't select, and often attend schools based on circumstances beyond our control. The truth is, many aspects of our lives are shaped by chance rather than choice.
