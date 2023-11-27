@@ -1,7 +1,7 @@
 ---
-title: 'Embracing Life's Lottery'
+title: 'Embracing Lottery of Life'
 date: 2019-03-22
-permalink: /posts/2019/03/embracing-lifes-lottery/
+permalink: /posts/2019/03/embracing-lottery-of-life/
 tags:
   - career
 ---
