@@ -4,7 +4,8 @@ date: 2012-01-15
 permalink: /posts/2012/01/the-barber-paradox/
 tags:
   - math
-  - self-development
+  - paradox
+  - self-improvement
 ---
 
 <img width="200" alt="haircut" src="/images/posts/the-barber-paradox.png" style="float: left; margin-right: 10px;" /> The Barber Paradox is a classic example of a self-referential paradox, which was first introduced by the British logician Bertrand Russell in 1901. The Barber Paradox involves a barber who shaves all men who do not shave themselves. This paradox is self-contradictory and challenges our understanding of language and meaning. The Barber Paradox has been a subject of much discussion and debate among philosophers and logicians, and it has contributed significantly to the development of the foundations of mathematics and the philosophy of language.

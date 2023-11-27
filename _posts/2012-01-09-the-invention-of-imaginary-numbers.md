@@ -4,7 +4,7 @@ date: 2012-01-09
 permalink: /posts/2012/01/the-invention-of-imaginary-numbers/
 tags:
   - math
-  - self-development
+  - self-improvement
 ---
 
 <img width="150" alt="imaginary numbers" src="/images/posts/the-invention-of-imaginary-numbers.png" style="float: left; margin-right: 10px;" /> Mathematics began as a way to quantify our world, to measure land, predict the motions of planets, and keep track of commerce. But there was a problem that was considered impossible to solve. The secret to solving it was to separate math from the real world, to split algebra from geometry, and to invent new numbers so fanciful they are called imaginary. In this post, we will explore how imaginary numbers were invented and their relevance today.

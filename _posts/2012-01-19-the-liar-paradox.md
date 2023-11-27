@@ -4,7 +4,8 @@ date: 2012-01-19
 permalink: /posts/2012/01/the-liar-paradox/
 tags:
   - math
-  - self-development
+  - paradox
+  - self-improvement
 ---
 
 <img width="150" alt="liar" src="/images/posts/the-liar-paradox.png" style="float: left; margin-right: 10px;" /> The Liar Paradox is a classic paradox in logic and philosophy that has perplexed scholars for centuries. The paradox arises from a self-referential statement that leads to a contradiction, challenging our assumptions about truth and meaning. Numerous solutions have been proposed, but the paradox continues to spark debates and discussions among scholars, making it an essential topic for anyone interested in the foundations of logic and the nature of truth.

@@ -3,8 +3,9 @@ title: 'Popular oil paintings'
 date: 2011-05-05
 permalink: /posts/2011/05/popular-oil-paintings/
 tags:
-   - story
+   - critics
    - fun
+   - self-improvement
 ---
 
 <img width="200" alt="art" src="/images/posts/popular-oil-paintings.jpg" style="float: left; margin-right: 10px;" /> Oil paintings have held a special place in the world of art for centuries, admired for their beauty and ability to captivate viewers. There are numerous iconic oil paintings that have graced the walls of galleries and museums around the world, created by famous artists like Vincent Van Gogh, Leonardo da Vinci, and Georgia O'Keeffe. Some of the most famous oil paintings include Van Gogh's "Starry Night," da Vinci's "Mona Lisa," and O'Keeffe's "Black Iris." These works of art continue to inspire and awe audiences with their masterful use of color, composition, and technique.

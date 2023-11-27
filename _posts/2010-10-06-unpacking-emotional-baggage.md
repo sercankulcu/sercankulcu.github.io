@@ -3,7 +3,8 @@ title: 'Unpacking Emotional Baggage'
 date: 2011-10-06
 permalink: /posts/2011/10/unpacking-emotional-baggage/
 tags:
-  - self-development
+  - philosophy
+  - self-improvement
 ---
 
 In the intricate dance of life, each of us carries a unique set of baggage, a collection of experiences, beliefs, and influences bestowed upon us by our families, friends, and the broader cultural milieu. This baggage shapes our perceptions, behaviors, and responses to the world around us. Yet, amidst this complexity, a crucial question arises—how often do we assess, maintain, or replace our emotional baggage?

@@ -1,5 +1,5 @@
 ---
-title: 'Haste-makes-waste'
+title: 'Haste makes waste'
 date: 2011-04-04
 permalink: /posts/2011/04/haste-makes-waste/
 tags:

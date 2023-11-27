@@ -3,8 +3,8 @@ title: 'A genius and visionary Nicola Tesla'
 date: 2013-05-21
 permalink: /posts/2013/05/a-genius-and-visionary-nicola-tesla/
 tags:
-  - math
-  - self-development
+  - physics
+  - self-improvement
 ---
 
 <img width="200" alt="gallows" src="/images/posts/a-genius-and-visionary-nicola-tesla.jpg" style="float: left; margin-right: 10px;" /> A Genius and Visionary Nicola Tesla was one of the most brilliant inventors and scientists of his time. Born in 1856 in Croatia, Tesla moved to America in 1884 to pursue his passion for electrical engineering. He is best-known for his ground-breaking work in the field of electrical power and magnetism, which led to the development of the AC (alternating current) system that we use to this day.

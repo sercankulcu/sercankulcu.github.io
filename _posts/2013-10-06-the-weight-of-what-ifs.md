@@ -3,7 +3,8 @@ title: 'The Weight of What Ifs'
 date: 2013-10-06
 permalink: /posts/2013/10/the-weight-of-what-ifs/
 tags:
-  - self-development
+  - philospohy
+  - self-improvement
 ---
 
 In the intricate dance of life, the question "What if?" can be both a powerful motivator and a paralyzing force. The fear of the unknown, the worry about potential outcomes, and the anxiety surrounding what might be can cast a shadow on our journey. Let's delve into the common "What ifs" that plague our thoughts and explore the wisdom in embracing uncertainty.

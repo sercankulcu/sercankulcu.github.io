@@ -4,7 +4,8 @@ date: 2012-02-22
 permalink: /posts/2012/02/the-unexpected-hanging-paradox/
 tags:
   - math
-  - self-development
+  - paradox
+  - self-improvement
 ---
 
 <img width="200" alt="gallows" src="/images/posts/the-unexpected-hanging-paradox.png" style="float: left; margin-right: 10px;" /> The Unexpected Hanging Paradox is a fascinating thought experiment that has puzzled many great minds in the fields of philosophy, mathematics, and logic. The paradox was first introduced by Raymond Smullyan in 1979 and has since captured the attention of many curious minds. This paradox raises many interesting questions about logic and reasoning, and it's a great example of how philosophy can challenge our assumptions and push us to think in new ways.
