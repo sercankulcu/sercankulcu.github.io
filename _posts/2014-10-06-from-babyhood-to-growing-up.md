@@ -3,7 +3,8 @@ title: 'From Babyhood to Growing Up'
 date: 2014-10-06
 permalink: /posts/2014/10/from-babyhood-to-growing-up/
 tags:
-  - self-development
+  - critics
+  - self-improvement
 ---
 
 Babies, in their earliest stages of life, operate on a simple yet effective communication system: crying. When they desire food or a clean diaper, they express their needs through this universal language. Parents or caregivers promptly respond, addressing their immediate requirements. However, as children grow and develop, a fascinating shift occurs in the dynamics of their desires and actions.

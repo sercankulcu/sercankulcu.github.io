@@ -3,8 +3,8 @@ title: 'How to study to be a good software developer'
 date: 2017-08-14
 permalink: /posts/2017/08/how-to-study-to-be-a-good-software-developer/
 tags:
-  - self-improvement
   - career
+  - self-improvement
   - time management
 ---
 

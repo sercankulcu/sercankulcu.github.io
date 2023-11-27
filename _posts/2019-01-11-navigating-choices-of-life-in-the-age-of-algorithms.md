@@ -4,6 +4,7 @@ date: 2019-01-11
 permalink: /posts/2019/01/navigating-choices-of-life-in-the-age-of-algorithms/
 tags:
   - career
+  - philosophy
 ---
 
 In a world brimming with choices, the quest for options has become an integral part of our daily lives. From deciding where to live and which school to send our kids, to pondering the people we surround ourselves with, the constant pursuit of alternatives seems to be a common theme. But why do we find ourselves perpetually searching for something more, and is there a way to break free from the chains of routine dictated by algorithms?

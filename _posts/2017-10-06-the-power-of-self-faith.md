@@ -3,7 +3,8 @@ title: 'The Power of Self-Faith'
 date: 2017-10-06
 permalink: /posts/2017/10/the-power-of-self-faith/
 tags:
-  - self-development
+  - critics
+  - self-improvement
 ---
 
 In the journey of life, facing uncertainties and challenges is inevitable. However, a fundamental truth remains – if you have good faith in yourself, you will be fine. The concept of self-faith acts as a guiding light, offering comfort and resilience in the face of life's trials.

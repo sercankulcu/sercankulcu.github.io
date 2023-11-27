@@ -3,9 +3,9 @@ title: 'How to be a good software developer'
 date: 2016-08-14
 permalink: /posts/2016/08/how-to-be-a-good-software-developer/
 tags:
-  - self-improvement
   - career
   - productivity
+  - self-improvement
 ---
 
 

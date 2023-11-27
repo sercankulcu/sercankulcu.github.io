@@ -3,8 +3,9 @@ title: 'Never touch your idols - the gilding will stick'
 date: 2018-07-07
 permalink: /posts/2018/08/never-touch-your-idols-the-gilding-will-stick/
 tags:
-  - self-improvement
+  - critics
   - philosophy
+  - self-improvement
 ---
 
 <img width="200" alt="matrix" src="/images/posts/never-touch-your-idols-the-gilding-will-stick.png" style="float: left; margin-right: 10px;" /> The phrase "Never touch your idols - the gilding will stick" serves as a powerful reminder that the individuals we idolize and look up to are not perfect. It suggests that by placing these individuals on a pedestal and holding them to such high standards, we run the risk of being disappointed when we ultimately learn of their flaws and shortcomings. While it is natural and even healthy to find inspiration and motivation from others, the phrase cautions against placing individuals on an unreachable pedestal, instead encouraging us to embrace our own imperfections and to recognize that nobody is infallible.
