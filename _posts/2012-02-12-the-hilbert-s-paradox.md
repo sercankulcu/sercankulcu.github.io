@@ -4,7 +4,8 @@ date: 2012-02-12
 permalink: /posts/2012/02/the-hilbert-s-paradox/
 tags:
   - math
-  - self-development
+  - paradox
+  - self-improvement
 ---
 
 <img width="150" alt="hotel" src="/images/posts/the-hilbert-s-paradox.jpg" style="float: left; margin-right: 10px;" /> Hilbert's Paradox is a thought experiment in mathematics which was first proposed by the renowned mathematician David Hilbert in the early 20th century. The paradox challenges our intuition and understanding of the concept of infinity. It has important implications for our understanding of the nature of mathematical objects and the limits of human knowledge. Hilbert's Paradox is a prime example of a problem that highlights the counterintuitive nature of infinity and the challenges that arise when dealing with infinite sets. 

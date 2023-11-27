@@ -4,7 +4,8 @@ date: 2012-02-08
 permalink: /posts/2012/02/the-birthday-paradox/
 tags:
   - math
-  - self-development
+  - paradox
+  - self-improvement
 ---
 
 <img width="200" alt="birthday" src="/images/posts/the-birthday-paradox.jpg" style="float: left; margin-right: 10px;" /> The Birthday Paradox is a fascinating concept in probability theory that may seem counterintuitive at first. The paradox arises from the fact that the probability of two people in a room sharing the same birthday increases much more rapidly than one might expect as the number of people in the room grows. This phenomenon can be explained by the fact that there are many more possible pairs of people as the number of people in the room increases. The Birthday Paradox has important implications for many fields, including cryptography, where it is used to calculate the probability of a collision between two hash values.

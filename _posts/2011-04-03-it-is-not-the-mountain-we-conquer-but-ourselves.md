@@ -3,8 +3,8 @@ title: 'It is not the mountain we conquer, but ourselves'
 date: 2011-04-03
 permalink: /posts/2011/04/it-is-not-the-mountain-we-conquer-but-ourselves/
 tags:
-   - self-improvement
    - philosophy
+   - self-improvement
 ---
 
 <img width="200" alt="bird" src="/images/posts/it-is-not-the-mountain-we-conquer-but-ourselves-1.png" style="float: left; margin-right: 10px;" /> When we think of birds, one of the first things that comes to mind is their ability to fly. The sight of a bird gracefully soaring through the sky is truly breathtaking. But have you ever stopped to think about what it takes for a bird to fly? One of the most important things is that each wing must remain independent from the other. In order for a bird to take flight, both wings must work together in harmony. However, each wing must also maintain its own independence. If the wings were to touch or overlap, the bird would not be able to fly as efficiently. The same can be said for us as individuals. In order for us to reach our full potential, we must also maintain a sense of independence.

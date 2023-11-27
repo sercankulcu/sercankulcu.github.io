@@ -4,7 +4,8 @@ date: 2012-02-18
 permalink: /posts/2012/02/the-zeno-s-paradox/
 tags:
   - math
-  - self-development
+  - paradox
+  - self-improvement
 ---
 
 <img width="200" alt="athlete" src="/images/posts/the-zeno-s-paradox.jpg" style="float: left; margin-right: 10px;" /> Zeno's Paradox is a classic thought experiment in mathematics and philosophy that challenges our understanding of infinity, motion, and the nature of reality. The paradox was first proposed by the ancient Greek philosopher Zeno of Elea in the 5th century BCE, and it has since been the subject of much debate and discussion in the fields of mathematics and philosophy.

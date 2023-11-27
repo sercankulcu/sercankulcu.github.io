@@ -3,8 +3,9 @@ title: 'Imaginary numbers'
 date: 2012-01-07
 permalink: /posts/2012/01/imaginary-numbers/
 tags:
+  - career
   - math
-  - self-development
+  - self-improvement
 ---
 
 <img width="200" alt="imaginary numbers" src="/images/posts/imaginary-numbers.png" style="float: left; margin-right: 10px;" /> The idea of "imaginary" or "unreal" numbers first arose when mathematicians encountered equations that had no solutions in the real number system. For example, the equation x^2 + 1 = 0 has no solutions in the real numbers, since the square of any real number is non-negative. However, it was noticed that if we introduce a new number, denoted by the symbol "i", such that i^2 = -1, then the equation x^2 + 1 = 0 has two solutions, namely x = i and x = -i.

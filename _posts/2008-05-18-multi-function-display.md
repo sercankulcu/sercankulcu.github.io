@@ -3,8 +3,9 @@ title: 'Multi-Function Display'
 date: 2008-05-18
 permalink: /posts/2008/05/multi-function-display/
 tags:
+   - career
    - military
-   - personal development
+   - self-improvement
 ---
 
 <img width="200" alt="mfd" src="/images/posts/multi-function-display.png" style="float: left; margin-right: 10px;" /> As a pilot, one of the most important pieces of equipment in the cockpit is the Multi-Function Display (MFD). The MFD is a high-resolution display that can display a variety of information, including maps, weather radar, and flight information. It's typically located in the center of the instrument panel, between the primary flight display (PFD) and the navigation display (ND). The MFD is usually controlled by a cursor control device (CCD) which is a joystick or trackball that allows the pilot to navigate through the different pages of information on the display.

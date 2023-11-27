@@ -3,8 +3,9 @@ title: 'Ninja turtles'
 date: 2008-03-03
 permalink: /posts/2008/03/ninja-turtles/
 tags:
-   - story
+   - childhood
    - fun
+   - story
 ---
 
 <img width="200" alt="ninja turtles" src="/images/posts/ninja-turtles.png" style="float: left; margin-right: 10px;" /> The Ninja Turtles, also known as Leonardo, Donatello, Raphael, and Michelangelo, are a group of four mutant turtles who are trained in the art of ninjutsu by their sensei, Splinter. They live in the sewers of New York City and work to protect the city from various villains and threats. April O'Neil is a human ally of the Ninja Turtles, and serves as their primary contact to the outside world. She is a strong and capable young woman, and helps the turtles with various tasks and missions. Splinter is the Ninja Turtles' sensei and adoptive father. He is a mutant rat who was once a pet of the turtles' biological father, Hamato Yoshi. Splinter learned the art of ninjutsu from Yoshi and passed it on to his adopted sons.

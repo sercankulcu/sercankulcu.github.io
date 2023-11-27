@@ -4,7 +4,8 @@ date: 2012-01-26
 permalink: /posts/2012/01/the-banach-tarski-paradox/
 tags:
   - math
-  - self-development
+  - paradox
+  - self-improvement
 ---
 
 <img width="200" alt="ball" src="/images/posts/the-banach-tarski-paradox.png" style="float: left; margin-right: 10px;" /> The Banach-Tarski Paradox is an incredible theorem in mathematics discovered by Stefan Banach and Alfred Tarski in the 1920s. The paradox challenges our intuition about the nature of space and the way we measure geometric objects. The paradox has major implications for several areas of mathematics and the philosophy of science, including the concept of infinity, set theory, and the foundations of mathematics itself. Its unexpected findings have fascinated mathematicians and philosophers for almost a century, and the Banach-Tarski Paradox remains one of the most intriguing and intensely studied topics in the field of mathematics to this day.

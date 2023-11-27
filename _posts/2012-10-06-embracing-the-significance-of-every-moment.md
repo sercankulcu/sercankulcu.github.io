@@ -3,7 +3,8 @@ title: 'Embracing the Significance of Every Moment'
 date: 2012-10-06
 permalink: /posts/2012/10/embracing-the-significance-of-every-moment/
 tags:
-  - self-development
+  - essay
+  - self-improvement
 ---
 
 In the vast expanse of time, the reality echoes—no matter who we are or what we do, the memory of our existence fades with the passing years. This is an intrinsic part of the human experience, prompting reflections on the transient nature of legacy and the imperative to cherish every moment we have.
