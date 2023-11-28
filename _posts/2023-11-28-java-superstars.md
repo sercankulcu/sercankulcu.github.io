@@ -1,6 +1,6 @@
 ---
 title: 'Java Superstars'
-date: 2023-11-29
+date: 2023-11-28
 permalink: /posts/2023/11/java-superstars/
 tags:
   - self-improvement
