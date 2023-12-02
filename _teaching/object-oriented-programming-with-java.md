@@ -69,7 +69,6 @@ Object-oriented programming (OOP) is a powerful paradigm for structuring and org
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture04">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders04">[tr]</a>
 
 * Sunum - Sorular <a href="http://sercankulcu.github.io/files/java/slides/Bolum_04_Sorular.pdf">[pdf]</a> 
-* Ödev sonuçlar <a href="http://sercankulcu.github.io/files/java/slides/eemodevler.htm">[pdf]</a>
 * Vize cevaplar <a href="http://sercankulcu.github.io/files/java/slides/vize_cevaplar.pdf">[pdf]</a>
 
 
@@ -81,6 +80,8 @@ Arrays and collections are essential data structures in Java programming, provid
 * Sunum - Diziler <a href="http://sercankulcu.github.io/files/java/slides/Bolum_05_Diziler.pdf">[pdf]</a> 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_05_Arrays_And_Collections.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture05">[link]</a>
+
+* Vize sonuçlar <a href="http://sercankulcu.github.io/files/java/slides/eemodevler.htm">[pdf]</a>
 
 Chapter 6: Exception Handling
 -----
