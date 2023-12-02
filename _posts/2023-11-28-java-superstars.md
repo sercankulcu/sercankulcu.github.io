@@ -7,7 +7,7 @@ tags:
   - career
 ---
 
-Ever wondered who the superheroes of the Java world are? Enter the "Java Champions" – a special group of folks who are like the MVPs (Most Valuable Players) of the Java community. Among the many accolades within this ecosystem, one group stands out as a beacon of expertise and leadership – the Java Champions.
+<img width="150" alt="java champions" src="/images/posts/java-superstars.png" style="float: left; margin-right: 20px;" /> Ever wondered who the superheroes of the Java world are? Enter the "Java Champions" – a special group of folks who are like the MVPs (Most Valuable Players) of the Java community. Among the many accolades within this ecosystem, one group stands out as a beacon of expertise and leadership – the Java Champions.
 
 ### What Are Java Champions?
 
