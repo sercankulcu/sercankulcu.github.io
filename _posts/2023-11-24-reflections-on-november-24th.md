@@ -7,9 +7,7 @@ tags:
   - career
 ---
 
-<img width="150" alt="24 november" src="/images/posts/reflections-on-november-24th.jpg" style="float: left; margin-right: 20px;" /> On November 24th, we commemorate Teachers' Day in Turkey, a day that holds a special place in our hearts and echoes the profound significance of education in our society. As we reflect on this occasion, let us delve into the words of Mustafa Kemal Atatürk, the visionary leader and founder of the Turkish Republic, who bestowed upon us the essence of this celebration.
-
-Mustafa Kemal Atatürk, a military genius and statesman, understood the transformative power of education in shaping the destiny of a nation. He recognized that a society's progress and prosperity were intricately linked to the quality of its education system. Atatürk firmly believed that a well-educated and enlightened citizenry was the foundation for a modern, democratic, and forward-thinking nation.
+<img width="150" alt="24 november" src="/images/posts/reflections-on-november-24th.jpg" style="float: left; margin-right: 20px;" /> On November 24th, we commemorate Teachers' Day in Turkey, a day that holds a special place in our hearts and echoes the profound significance of education in our society. Mustafa Kemal Atatürk, a military genius and statesman, understood the transformative power of education in shaping the destiny of a nation. He recognized that a society's progress and prosperity were intricately linked to the quality of its education system. Atatürk firmly believed that a well-educated and enlightened citizenry was the foundation for a modern, democratic, and forward-thinking nation.
 
 The choice of November 24th to commemorate Teachers' Day is not arbitrary; it is steeped in historical significance. It was on this day in 1928 that Atatürk, as a symbolic gesture, was granted the title of "Head Teacher." This act was a testament to his commitment to education and his belief in the pivotal role teachers play in nurturing young minds. Atatürk's foresight laid the groundwork for a day dedicated to honoring the educators who contribute to the intellectual development of the nation.
 
