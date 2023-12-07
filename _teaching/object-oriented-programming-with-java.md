@@ -89,6 +89,7 @@ Chapter 6: Exception Handling
 
 Exception handling is a critical aspect of Java programming, providing a powerful mechanism for detecting and responding to errors and exceptional conditions in a program, and ensuring that applications remain robust and reliable even in the face of unexpected inputs or events.
 
+* Sunum - Hata Ayıklama <a href="http://sercankulcu.github.io/files/java/slides/Bolum_06_Hata_Ayiklama.pdf">[pdf]</a> 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_06_Exception_Handling.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture06">[link]</a>
 * Interview Exception Handling <a href="http://sercankulcu.github.io/files/java/Interview_Exception_Handling.pdf">[pdf]</a>
