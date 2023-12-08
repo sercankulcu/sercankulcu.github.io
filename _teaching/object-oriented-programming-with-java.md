@@ -80,7 +80,7 @@ Arrays and collections are essential data structures in Java programming, provid
 * Sunum - Diziler <a href="http://sercankulcu.github.io/files/java/slides/Bolum_05_Diziler.pdf">[pdf]</a> 
 * Sunum - Koleksiyonlar <a href="http://sercankulcu.github.io/files/java/slides/Bolum_05_Koleksiyonlar.pdf">[pdf]</a> 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_05_Arrays_And_Collections.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture05">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture05">[link]</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders05">[tr]</a>
 
 * Vize sonuçlar <a href="http://sercankulcu.github.io/files/java/slides/eemodevler.htm">[pdf]</a>
 
