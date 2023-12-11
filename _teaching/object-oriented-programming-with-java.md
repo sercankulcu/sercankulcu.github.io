@@ -99,6 +99,7 @@ Chapter 7: Working with Files and Input/Output
 
 Working with files and input/output (I/O) operations is a fundamental aspect of Java programming, providing a powerful mechanism for reading and writing data from a wide range of sources, including local files, remote servers, and user input, and enabling developers to build a wide range of applications with sophisticated data processing capabilities.
 
+* Sunum - Giriş Çıkış <a href="http://sercankulcu.github.io/files/java/slides/Bolum_07_Giris_Cikis.pdf">[pdf]</a> 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_07_Working_With_Files_And_Input_Output.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture07">[link]</a>
 
