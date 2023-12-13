@@ -77,11 +77,13 @@ Chapter 6: Lists
 Lists offer a more generalized approach to data storage, providing dynamic resizing and adaptability. They are instrumental in managing collections of data elements, and as programmers, we often rely on them for various tasks.
 
 * Sunum-Liste <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_06_Liste.pdf">[pdf]</a>
+* Sunum-Sorular <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_06_Sorular.pdf">[pdf]</a>
+* Vize cevaplar <a href="http://sercankulcu.github.io/files/data_structures/slides/vize_cevaplar.pdf">[pdf]</a>
+
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_04_Lists.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture06">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders06">[tr]</a>
 
-* Sunum-Sorular <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_06_Sorular.pdf">[pdf]</a>
-* Vize cevaplar <a href="http://sercankulcu.github.io/files/data_structures/slides/vize_cevaplar.pdf">[pdf]</a>
+
 
 Chapter 7: Trees
 ---
@@ -91,7 +93,8 @@ Trees, one of the most intriguing and versatile data structures, take center sta
 * Sunum-Ağaç <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_07_Agac.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture07">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders07">[tr]</a>
-* Vize sonuçlar <a href="http://sercankulcu.github.io/files/data_structures/slides/bilmodevler.htm">[pdf]</a>
+
+* Vize ve Ödev sonuçlar <a href="http://sercankulcu.github.io/files/data_structures/slides/bilmodevler.htm">[pdf]</a>
 
 Chapter 8: Priority Queues, Heaps
 ---
