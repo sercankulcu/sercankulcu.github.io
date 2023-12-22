@@ -84,6 +84,7 @@ Arrays and collections are essential data structures in Java programming, provid
 
 * Vize ve Ödev sonuçlar <a href="http://sercankulcu.github.io/files/java/slides/eemodevler.htm">[pdf]</a>
 * Ödev 4 verildi <a href="http://sercankulcu.github.io/files/java/slides/odev4.html">[html]</a>
+* Ödev 5 verildi <a href="http://sercankulcu.github.io/files/java/slides/odev5.html">[html]</a>
 
 Chapter 6: Exception Handling
 -----
