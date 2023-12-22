@@ -113,6 +113,8 @@ Chapter 9: Maps, Hash Tables
 
 Our journey then takes us to hash tables, which use hash functions to map keys to specific values, ensuring rapid data retrieval. Understanding hash tables is vital for efficient data storage and retrieval, especially when dealing with large datasets.
 
+* Ödev 6 verildi <a href="http://sercankulcu.github.io/files/data_structures/slides/odev6.html">[html]</a>
+
 * Sunum-Hash Tabloları <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_09_Hash_Tablosu.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture09">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders09">[tr]</a>
