@@ -90,6 +90,8 @@ Chapter 7: Trees
 
 Trees, one of the most intriguing and versatile data structures, take center stage in our journey. Trees consist of nodes connected in a hierarchical and branched structure, allowing us to represent complex relationships between data elements. Concepts like binary trees and tree traversal are essential for understanding how hierarchical data is organized.
 
+* Ödev 4 verildi <a href="http://sercankulcu.github.io/files/data_structures/slides/odev4.html">[html]</a>
+
 * Sunum-Ağaç <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_07_Agac.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture07">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders07">[tr]</a>
