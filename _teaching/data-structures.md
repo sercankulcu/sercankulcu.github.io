@@ -96,7 +96,6 @@ Trees, one of the most intriguing and versatile data structures, take center sta
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture07">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders07">[tr]</a>
 
-* Vize ve Ödev sonuçlar <a href="http://sercankulcu.github.io/files/data_structures/slides/bilmodevler.htm">[pdf]</a>
 
 Chapter 8: Priority Queues, Heaps
 ---
@@ -127,6 +126,7 @@ Chapter 10: Search Trees
 
 Search trees, including binary search trees and AVL trees, are pivotal in maintaining ordered data. They underpin many searching and sorting algorithms, making them indispensable for computer scientists and programmers alike.
 
+* Vize ve Ödev sonuçlar <a href="http://sercankulcu.github.io/files/data_structures/slides/bilmodevler.htm">[pdf]</a>
 * Ödev 7 verildi <a href="http://sercankulcu.github.io/files/data_structures/slides/odev7.html">[html]</a>
 * Sunum-Arama Ağaçları <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_10_Arama_Agaclari.pdf" target="_blank">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
