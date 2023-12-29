@@ -6,7 +6,7 @@ tags:
   - essay
 ---
 
-<img width="150" alt="four leaf clover" src="/images/posts/2023-a-year-of-challenges-and-achievements.png" style="float: left; margin-right: 20px;" /> The year 2023 unfolded as a tapestry of diverse experiences, marked by personal and professional milestones. As I embraced the role of an Assistant Professor, the journey took unexpected turns, including a significant surgery, family health challenges, the launch of a website, and newfound hobbies. This post offers a candid overview of the highs and lows that defined my year.
+<img width="150" alt="four leaf clover" src="/images/posts/2023-a-year-of-challenges-and-achievements.png" style="float: left; margin-right: 20px;" /> The year 2023 unfolded as a tapestry of diverse experiences, marked by personal and professional milestones. As I embraced the role of an Assistant Professor, the journey took unexpected turns, including a significant surgery, family health challenges, the launch of a website, and newfound hobbies. This post offers a candid overview of the highs and lows that defined my year. The bedrock of all aspects of life is undeniably health. In its absence, the grandest achievements and the most intricate plans can falter. Health is the silent architect of our endeavors, underpinning our daily pursuits, professional ambitions, and personal relationships.
 
 One of the defining moments of 2023 was the attainment of the title of Assistant Professor. This academic milestone marked the recognition of my dedication to teaching and research, opening new avenues for professional growth and contribution to the academic community.
 
