@@ -115,6 +115,7 @@ Chapter 8: Working with GUI Applications
 
 Graphical user interfaces (GUIs) are a ubiquitous feature of modern software applications, and Java provides a powerful set of tools and frameworks for building sophisticated, interactive GUIs with rich visual and behavioral features, enabling developers to create compelling user experiences and enhance the usability of their software systems.
 
+* Sunum - Grafikler <a href="http://sercankulcu.github.io/files/java/slides/Bolum_08_Grafikler.pdf">[pdf]</a> 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_08_Working_With_GUI_Applications.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture08">[link]</a>
 * Interview Swing <a href="http://sercankulcu.github.io/files/java/Chapter_08_Interview_Swing.pdf">[pdf]</a>
