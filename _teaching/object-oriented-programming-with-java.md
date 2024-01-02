@@ -125,6 +125,7 @@ Chapter 9: Concurrency and Multithreading
 
 Concurrency and multithreading are essential concepts in Java programming, providing a powerful mechanism for building responsive, scalable applications that can execute multiple tasks concurrently and take advantage of modern hardware architectures to maximize performance and efficiency.
 
+* Sunum - İş Parçacıkları <a href="http://sercankulcu.github.io/files/java/slides/Bolum_09_Is_Parcaciklari.pdf">[pdf]</a> 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_09_Concurrency_And_Multithreading.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture09">[link]</a>
 
