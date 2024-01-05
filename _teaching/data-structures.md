@@ -126,7 +126,6 @@ Chapter 10: Search Trees
 
 Search trees, including binary search trees and AVL trees, are pivotal in maintaining ordered data. They underpin many searching and sorting algorithms, making them indispensable for computer scientists and programmers alike.
 
-* Vize ve Ödev sonuçlar <a href="http://sercankulcu.github.io/files/data_structures/slides/bilmodevler.htm">[pdf]</a>
 * Ödev 7 verildi <a href="http://sercankulcu.github.io/files/data_structures/slides/odev7.html">[html]</a>
 * Sunum-Arama Ağaçları <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_10_Arama_Agaclari.pdf" target="_blank">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
@@ -138,6 +137,7 @@ Chapter 11: Graphs
 
 Graphs, with their intricate web of connections, offer a versatile way to model relationships between data elements. They are invaluable in applications ranging from social networks to routing and optimization problems. Understanding graph theory and traversal algorithms is essential for solving complex problems.
 
+* Vize ve Ödev sonuçlar <a href="http://sercankulcu.github.io/files/data_structures/slides/bilmodevler.htm">[pdf]</a>
 * Sunum-Çizge <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_11_Cizge.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture11">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders11">[tr]</a>
