@@ -3,7 +3,7 @@ title: "Object Oriented Programming with Java"
 collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/2023-fall-object-oriented-programming-with-java
-venue: "University of Giresun, Department of Computer Engineering"
+venue: "University of Giresun, Department of Electrical Electronics Engineering"
 date: 2023-10-04
 location: "Giresun, Turkey"
 ---
