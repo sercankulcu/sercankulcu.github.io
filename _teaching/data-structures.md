@@ -11,6 +11,9 @@ location: "Giresun, Turkey"
 <img align="left" width="200" alt="data structure" src="/images/teaching/data-structures-course.png"> Our journey through the world of data structures has been nothing short of enlightening. These fundamental concepts are the cornerstone of computer science and programming, and a deep understanding of them empowers us to write more efficient, organized, and robust code. I hope this exploration has ignited your curiosity and passion for data structures, as they are the key to unlocking the limitless possibilities of the digital world. Happy coding!
 
 * Ders Öğretim Planı <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
+* Vize cevaplar <a href="http://sercankulcu.github.io/files/data_structures/slides/2023-2024-vize-cevaplar.pdf">[pdf]</a>
+* Final cevaplar <a href="http://sercankulcu.github.io/files/data_structures/slides/2023-2024-final-cevaplar.pdf">[pdf]</a>
+* Vize Final ve Ödev sonuçlar <a href="http://sercankulcu.github.io/files/data_structures/slides/bilmodevler.htm">[pdf]</a>
 
 The resources:
 ---
@@ -78,7 +81,6 @@ Lists offer a more generalized approach to data storage, providing dynamic resiz
 
 * Sunum-Liste <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_06_Liste.pdf">[pdf]</a>
 * Sunum-Sorular <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_06_Sorular.pdf">[pdf]</a>
-* Vize cevaplar <a href="http://sercankulcu.github.io/files/data_structures/slides/vize_cevaplar.pdf">[pdf]</a>
 
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_04_Lists.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture06">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders06">[tr]</a>
@@ -137,7 +139,7 @@ Chapter 11: Graphs
 
 Graphs, with their intricate web of connections, offer a versatile way to model relationships between data elements. They are invaluable in applications ranging from social networks to routing and optimization problems. Understanding graph theory and traversal algorithms is essential for solving complex problems.
 
-* Vize ve Ödev sonuçlar <a href="http://sercankulcu.github.io/files/data_structures/slides/bilmodevler.htm">[pdf]</a>
+
 * Sunum-Çizge <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_11_Cizge.pdf">[pdf]</a>
 * Lecture Notes <a href="http://sercankulcu.github.io/files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture11">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders11">[tr]</a>
