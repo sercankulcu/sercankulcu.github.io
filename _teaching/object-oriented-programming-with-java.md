@@ -22,6 +22,10 @@ The resources
 * Oracle Java Tutorials <a href="https://docs.oracle.com/javase/tutorial/">[website]</a>
 * Java ile Nesneye Yönelik Programlama, Oğuz Aslantürk <a href="https://web.cs.hacettepe.edu.tr/~bbm102/misc/java_notes_by_oa.pdf">[pdf]</a>
 
+* Vize cevaplar <a href="http://sercankulcu.github.io/files/java/slides/2023-2024-vize_cevaplar.pdf">[pdf]</a>
+* Telafi cevaplar <a href="http://sercankulcu.github.io/files/java/slides/2023-2024-telafi_cevaplar.pdf">[pdf]</a>
+* Final cevaplar <a href="http://sercankulcu.github.io/files/java/slides/2023-2024-final_cevaplar.pdf">[pdf]</a>
+* Vize Final ve Ödev sonuçlar <a href="http://sercankulcu.github.io/files/java/slides/eemodevler.htm">[pdf]</a>
 
 Chapter 1: Introduction to Programming and Java
 -----
@@ -74,7 +78,6 @@ Object-oriented programming (OOP) is a powerful paradigm for structuring and org
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture04">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders04">[tr]</a>
 
 * Sunum - Sorular <a href="http://sercankulcu.github.io/files/java/slides/Bolum_04_Sorular.pdf">[pdf]</a> 
-* Vize cevaplar <a href="http://sercankulcu.github.io/files/java/slides/vize_cevaplar.pdf">[pdf]</a>
 
 
 Chapter 5: Arrays and Collections
@@ -88,7 +91,6 @@ Arrays and collections are essential data structures in Java programming, provid
 * Lecture Notes <a href="http://sercankulcu.github.io/files/java/Chapter_05_Arrays_And_Collections.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture05">[link]</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders05">[tr]</a>
 
-* Vize ve Ödev sonuçlar <a href="http://sercankulcu.github.io/files/java/slides/eemodevler.htm">[pdf]</a>
 * Ödev 4 verildi <a href="http://sercankulcu.github.io/files/java/slides/odev4.html">[html]</a>
 * Ödev 5 verildi <a href="http://sercankulcu.github.io/files/java/slides/odev5.html">[html]</a>
 
