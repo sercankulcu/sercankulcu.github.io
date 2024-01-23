@@ -22,9 +22,9 @@ The resources
 * Oracle Java Tutorials <a href="https://docs.oracle.com/javase/tutorial/">[website]</a>
 * Java ile Nesneye Yönelik Programlama, Oğuz Aslantürk <a href="https://web.cs.hacettepe.edu.tr/~bbm102/misc/java_notes_by_oa.pdf">[pdf]</a>
 
-* Vize cevaplar <a href="http://sercankulcu.github.io/files/java/slides/2023-2024-vize_cevaplar.pdf">[pdf]</a>
-* Telafi cevaplar <a href="http://sercankulcu.github.io/files/java/slides/2023-2024-telafi_cevaplar.pdf">[pdf]</a>
-* Final cevaplar <a href="http://sercankulcu.github.io/files/java/slides/2023-2024-final_cevaplar.pdf">[pdf]</a>
+* Vize cevaplar <a href="http://sercankulcu.github.io/files/java/slides/2023-2024-vize-cevaplar.pdf">[pdf]</a>
+* Telafi cevaplar <a href="http://sercankulcu.github.io/files/java/slides/2023-2024-telafi-cevaplar.pdf">[pdf]</a>
+* Final cevaplar <a href="http://sercankulcu.github.io/files/java/slides/2023-2024-final-cevaplar.pdf">[pdf]</a>
 * Vize Final ve Ödev sonuçlar <a href="http://sercankulcu.github.io/files/java/slides/eemodevler.htm">[pdf]</a>
 
 Chapter 1: Introduction to Programming and Java
