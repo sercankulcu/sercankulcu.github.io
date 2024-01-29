@@ -13,7 +13,7 @@ location: "Giresun, Turkey"
 * Ders Öğretim Planı <a href="http://sercankulcu.github.io/files/data_structures/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 * Vize cevaplar <a href="http://sercankulcu.github.io/files/data_structures/slides/2023-2024-vize-cevaplar.pdf">[pdf]</a>
 * Final cevaplar <a href="http://sercankulcu.github.io/files/data_structures/slides/2023-2024-final-cevaplar.pdf">[pdf]</a>
-* Vize Final ve Ödev sonuçlar <a href="http://sercankulcu.github.io/files/data_structures/slides/bilmodevler.htm">[pdf]</a>
+* Bütünleme cevaplar <a href="http://sercankulcu.github.io/files/data_structures/slides/2023-2024-butunleme-cevaplar.pdf">[pdf]</a>
 
 The resources:
 ---

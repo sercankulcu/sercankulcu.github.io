@@ -11,7 +11,10 @@ location: "Giresun, Turkey"
 <img align="left" width="200" alt="object oriented programming" src="/images/teaching/object-oriented-course-i.png"> Java is one of the most popular programming languages in use today, and it is widely used in many areas such as web development, mobile app development, and game development. This course is designed to introduce you to the core concepts of object-oriented programming in Java, including classes, objects, inheritance, polymorphism, encapsulation, and abstraction. Throughout the course, you will gain hands-on experience in writing Java code and building applications using OOP principles. 
 
 * Ders Öğretim Planı <a href="http://sercankulcu.github.io/files/java/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
-
+* Vize cevaplar <a href="http://sercankulcu.github.io/files/java/slides/2023-2024-vize-cevaplar.pdf">[pdf]</a>
+* Telafi cevaplar <a href="http://sercankulcu.github.io/files/java/slides/2023-2024-telafi-cevaplar.pdf">[pdf]</a>
+* Final cevaplar <a href="http://sercankulcu.github.io/files/java/slides/2023-2024-final-cevaplar.pdf">[pdf]</a>
+* Vize Final ve Ödev sonuçlar <a href="http://sercankulcu.github.io/files/java/slides/eemodevler.htm">[pdf]</a>
 
 The resources
 ---
@@ -21,11 +24,6 @@ The resources
 * Download Eclipse <a href="https://www.eclipse.org/downloads/packages/installer">[website]</a>
 * Oracle Java Tutorials <a href="https://docs.oracle.com/javase/tutorial/">[website]</a>
 * Java ile Nesneye Yönelik Programlama, Oğuz Aslantürk <a href="https://web.cs.hacettepe.edu.tr/~bbm102/misc/java_notes_by_oa.pdf">[pdf]</a>
-
-* Vize cevaplar <a href="http://sercankulcu.github.io/files/java/slides/2023-2024-vize-cevaplar.pdf">[pdf]</a>
-* Telafi cevaplar <a href="http://sercankulcu.github.io/files/java/slides/2023-2024-telafi-cevaplar.pdf">[pdf]</a>
-* Final cevaplar <a href="http://sercankulcu.github.io/files/java/slides/2023-2024-final-cevaplar.pdf">[pdf]</a>
-* Vize Final ve Ödev sonuçlar <a href="http://sercankulcu.github.io/files/java/slides/eemodevler.htm">[pdf]</a>
 
 Chapter 1: Introduction to Programming and Java
 -----
