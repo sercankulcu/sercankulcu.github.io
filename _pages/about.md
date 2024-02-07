@@ -13,7 +13,7 @@ redirect_from:
 
 Greetings,
 
-I'm Sercan Külcü, an assistant professor in the computer science department at Giresun University. I am also a passionate software engineer with a Ph.D. in wireless communications. In addition to my research, I have been teaching OOP and Java courses since 2015. I also have experience teaching a variety of software engineering topics, including object-oriented programming, design patterns, data structures, and algorithms.
+I'm Sercan Külcü, an assistant professor in the computer science department at Giresun University. As a hands-on software engineer with over 15 years of experience, I am a versatile and driven professional with a PhD in wireless communication. I am highly skilled in low-power wireless communication, embedded and real-time operating systems, C/C++ programming, and machine learning applications. In addition, I have been sharing my expertise by teaching OOP and Java courses since 2015.
 
 Warm regards,
 
