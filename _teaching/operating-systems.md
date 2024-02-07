@@ -35,8 +35,8 @@ Chapter 1: Introduction:
 
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
 
-* **Slides [TR]** <a href="http://sercankulcu.github.io/files/os/slides/Bolum_01_Giris.pdf">[pdf]</a>
-* Lecture Notes <a href="http://sercankulcu.github.io/files/os/notes/Chapter_1_Introduction.pdf">[pdf]</a>
+* **Slides [TR]** <a href="../files/os/slides/Bolum_01_Giris.pdf">[pdf]</a>
+* Lecture Notes <a href="../../files/os/notes/Chapter_1_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter1">[link]</a>
 * Question & answers <a href="http://sercankulcu.github.io/files/os/questions/Chapter_1_Introduction.pdf">[pdf]</a>
 
