@@ -40,13 +40,6 @@ As the bridge between hardware and software, operating systems serve as the foun
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter1">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_1_Introduction.pdf">[pdf]</a>
 
-<embed
-	src="../files/os/slides/Bolum_01_Giris.pdf"
-	type="application/pdf"
-	width="100%"
-	height="100%"
-/>
-
 Chapter 2: Structures: 
 -----
 
