@@ -21,7 +21,7 @@ Chapter 1: Introduction to C Programming
 * Input and output functions
 * Compilation process and execution
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/c/Chapter_01_Introduction_to_C_Programming.pdf">[pdf]</a>
+* Lecture Notes <a href="../files/c/Chapter_01_Introduction_to_C_Programming.pdf">[pdf]</a>
 
 Chapter 2: Control Flow
 -----
@@ -30,7 +30,7 @@ Chapter 2: Control Flow
 * Looping statements (for, while, do-while)
 * Break and continue statements
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/c/Chapter_02_Control_Flow.pdf">[pdf]</a>
+* Lecture Notes <a href="../files/c/Chapter_02_Control_Flow.pdf">[pdf]</a>
 
 Chapter 3: Arrays and Strings
 -----
@@ -39,7 +39,7 @@ Chapter 3: Arrays and Strings
 * Manipulating arrays: accessing, modifying, and traversing
 * String manipulation and string library functions
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/c/Chapter_03_Arrays_and_Strings.pdf">[pdf]</a>
+* Lecture Notes <a href="../files/c/Chapter_03_Arrays_and_Strings.pdf">[pdf]</a>
 
 Chapter 4: Functions
 -----
@@ -48,7 +48,7 @@ Chapter 4: Functions
 * Function parameters and return values
 * Recursive functions
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/c/Chapter_04_Functions.pdf">[pdf]</a>
+* Lecture Notes <a href="../files/c/Chapter_04_Functions.pdf">[pdf]</a>
 
 Chapter 5: Pointers
 -----
@@ -58,7 +58,7 @@ Chapter 5: Pointers
 * Pointer arithmetic
 * Dynamic memory allocation (malloc, calloc, free)
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/c/Chapter_05_Pointers.pdf">[pdf]</a>
+* Lecture Notes <a href="../files/c/Chapter_05_Pointers.pdf">[pdf]</a>
 
 Chapter 6: Structures
 -----
@@ -67,7 +67,7 @@ Chapter 6: Structures
 * Accessing structure members
 * Nested structures and arrays of structures
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/c/Chapter_06_Structures.pdf">[pdf]</a>
+* Lecture Notes <a href="../files/c/Chapter_06_Structures.pdf">[pdf]</a>
 
 Chapter 7: File Handling
 -----
@@ -77,7 +77,7 @@ Chapter 7: File Handling
 * File positioning and error handling
 * File I/O using standard libraries
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/c/Chapter_07_File_Handling.pdf">[pdf]</a>
+* Lecture Notes <a href="../files/c/Chapter_07_File_Handling.pdf">[pdf]</a>
 
 Chapter 8: Advanced Data Types
 -----
@@ -87,7 +87,7 @@ Chapter 8: Advanced Data Types
 * Bit fields
 * Unions
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/c/Chapter_08_Advanced_Data_Types.pdf">[pdf]</a>
+* Lecture Notes <a href="../files/c/Chapter_08_Advanced_Data_Types.pdf">[pdf]</a>
 
 Chapter 9: Preprocessor Directives
 -----
@@ -97,7 +97,7 @@ Chapter 9: Preprocessor Directives
 * File inclusion and header files
 * Debugging using preprocessor directives
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/c/Chapter_09_Preprocessor_Directives.pdf">[pdf]</a>
+* Lecture Notes <a href="../files/c/Chapter_09_Preprocessor_Directives.pdf">[pdf]</a>
 
 Chapter 10: Advanced Concepts - Part 1
 -----
@@ -107,7 +107,7 @@ Chapter 10: Advanced Concepts - Part 1
 * Understanding static and dynamic libraries
 * Recursion: principles and applications
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/c/Chapter_10_Advanced_Concepts_1.pdf">[pdf]</a>
+* Lecture Notes <a href="../files/c/Chapter_10_Advanced_Concepts_1.pdf">[pdf]</a>
 
 Chapter 11: Advanced Concepts - Part 2
 -----
@@ -118,7 +118,7 @@ Chapter 11: Advanced Concepts - Part 2
 * Time and space complexity analysis
 * Variadic functions
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/c/Chapter_11_Advanced_Concepts_2.pdf">[pdf]</a>
+* Lecture Notes <a href="../files/c/Chapter_11_Advanced_Concepts_2.pdf">[pdf]</a>
 
 Chapter 12: Error Handling and Debugging
 -----
@@ -128,7 +128,7 @@ Chapter 12: Error Handling and Debugging
 * Exception handling with try-catch blocks
 * Defensive programming and error handling strategies
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/c/Chapter_12_Error_Handling_and_Debugging.pdf">[pdf]</a>
+* Lecture Notes <a href="../files/c/Chapter_12_Error_Handling_and_Debugging.pdf">[pdf]</a>
 
 Chapter 13: Introduction to C++ (Optional)
 -----
@@ -138,7 +138,7 @@ Chapter 13: Introduction to C++ (Optional)
 * Classes, objects, and constructors
 * Basic input/output in C++
 
-* Lecture Notes <a href="http://sercankulcu.github.io/files/c/Chapter_13_Introduction_to_C++.pdf">[pdf]</a>
+* Lecture Notes <a href="../files/c/Chapter_13_Introduction_to_C++.pdf">[pdf]</a>
 
 Chapter 14: Project and Review
 -----
@@ -147,6 +147,6 @@ Chapter 14: Project and Review
 * Review of key concepts and topics covered throughout the course
 * Q&A session and final assessment
 
-* Sample projects <a href="http://sercankulcu.github.io/files/c/Chapter_14_Sample_Projects.pdf">[pdf]</a>
-* Questions and answers <a href="http://sercankulcu.github.io/files/c/Chapter_14_Questions_and_Answers.pdf">[pdf]</a>
-* Multiple choice questions <a href="http://sercankulcu.github.io/files/c/Chapter_14_Multiple_Choice_Questions.pdf">[pdf]</a>
+* Sample projects <a href="../files/c/Chapter_14_Sample_Projects.pdf">[pdf]</a>
+* Questions and answers <a href="../files/c/Chapter_14_Questions_and_Answers.pdf">[pdf]</a>
+* Multiple choice questions <a href="../files/c/Chapter_14_Multiple_Choice_Questions.pdf">[pdf]</a>
