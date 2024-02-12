@@ -20,7 +20,7 @@ The resources:
 
 Chapter 1: Introduction, 8086 Architecture
 ---
-
+ 
 * Sunum- <a href="../files/microprocessors/slides/Bolum_01_Giris.pdf">[pdf]</a>
 * Sunum- <a href="../files/microprocessors/slides/Bolum_01_8086_Mimarisi.pdf">[pdf]</a>
 
