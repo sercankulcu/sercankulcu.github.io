@@ -10,7 +10,7 @@ location: "Giresun, Turkey"
 
 <img align="left" width="200" alt="microprocessor" src="/images/teaching/microprocessor-course.png"> Microprocessors serve as the heartbeat of modern computing systems, executing a myriad of tasks with remarkable speed and precision. The x86 architecture, renowned for its versatility and widespread adoption in personal computers and servers, lays the groundwork for understanding the inner workings of contemporary processors. Our journey will commence with an overview of microprocessor architecture, delving into the core components that make these tiny yet powerful devices the driving force behind computation. As we navigate through the intricacies of the x86 instruction set, we will explore the fundamentals of assembly language programming – a low-level language that allows us to communicate directly with the microprocessor. Throughout this lecture, we will demystify the binary world, deciphering the symbolic language of assembly to manipulate registers, control flow, and interact with memory. 
 
-* Ders Öğretim Planı <a href="../files/data_structures/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
+* Ders Öğretim Planı <a href="../files/microprocessors/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
 The resources:
 ---
