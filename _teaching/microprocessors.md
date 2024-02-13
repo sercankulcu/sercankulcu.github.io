@@ -4,7 +4,7 @@ collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/2024-spring-microprocessors
 venue: "University of Giresun, Department of Electrical Electronics Engineering"
-date: 2024-01-05
+date: 2025-01-05
 location: "Giresun, Turkey"
 ---
 
