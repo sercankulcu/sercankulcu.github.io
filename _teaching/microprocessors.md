@@ -21,15 +21,15 @@ The resources:
 Chapter 1: Introduction, 8086 Architecture
 ---
  
-* Sunum- <a href="../files/microprocessors/slides/Bolum_01_Giris.pdf">[pdf]</a>
-* Sunum- <a href="../files/microprocessors/slides/Bolum_01_8086_Mimarisi.pdf">[pdf]</a>
+* Sunum-Giriş <a href="../files/microprocessors/slides/Bolum_01_Giris.pdf">[pdf]</a>
+* Sunum-Mimari <a href="../files/microprocessors/slides/Bolum_01_8086_Mimarisi.pdf">[pdf]</a>
 
 
 Chapter 2: 8086 Registers, Pins
 ---
 
-* Sunum- <a href="../files/microprocessors/slides/Bolum_02_8086_Pinler.pdf">[pdf]</a>
-* Sunum- <a href="../files/microprocessors/slides/Bolum_02_8086_Yazmaclar.pdf">[pdf]</a>
+* Sunum-Pinler <a href="../files/microprocessors/slides/Bolum_02_8086_Pinler.pdf">[pdf]</a>
+* Sunum-Yazmaçlar <a href="../files/microprocessors/slides/Bolum_02_8086_Yazmaclar.pdf">[pdf]</a>
 
 Chapter 3: Numbering systems, What is assembly language?
 ---
