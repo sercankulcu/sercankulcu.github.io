@@ -2,7 +2,6 @@
 title: "A survey on semantic Web and big data technologies for social network analysis"
 collection: publications
 permalink: /publication/2016/11/a-survey-on-semantic-web-and-big-data
-excerpt: ''
 date: 2016-11-05
 venue: 'IEEE'
 #paperurl: ''

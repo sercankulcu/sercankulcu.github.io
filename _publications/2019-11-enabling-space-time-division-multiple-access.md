@@ -2,7 +2,6 @@
 title: "Enabling space time division multiple access in IETF 6TiSCH protocol"
 collection: publications
 permalink: /publication/2019/11/enabling-space-time-division-multiple-access
-excerpt: ''
 date: 2019-11-26
 venue: 'TUBITAK'
 #paperurl: 'http://academicpages.github.io/files/paper3.pdf'

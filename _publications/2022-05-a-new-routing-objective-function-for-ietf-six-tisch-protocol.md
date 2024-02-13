@@ -2,7 +2,6 @@
 title: "A New Routing Objective Function for IETF 6TiSCH Protocol"
 collection: publications
 permalink: /publication/2022/05/a-new-routing-objective-function-for-ietf-six-tisch-protocol
-excerpt: ''
 date: 2022-05-15
 venue: 'IEEE'
 #paperurl: 'http://academicpages.github.io/files/paper3.pdf'

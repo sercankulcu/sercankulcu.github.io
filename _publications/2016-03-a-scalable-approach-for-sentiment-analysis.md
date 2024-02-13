@@ -2,7 +2,6 @@
 title: "A Scalable Approach for Sentiment Analysis of Turkish Tweets and Linking Tweets to News"
 collection: publications
 permalink: /publication/2016/03/a-scalable-approach-for-sentiment-analysis
-excerpt: ''
 date: 2016-03-24
 venue: 'IEEE'
 #paperurl: ''

@@ -2,7 +2,6 @@
 title: "Computer Vision Technology On Food Science"
 collection: publications
 permalink: /publication/2017/06/computer-vision-technology-on-food-science
-excerpt: ''
 date: 2017-06-11
 venue: 'Karaelmas'
 #paperurl: 'http://academicpages.github.io/files/paper3.pdf'
