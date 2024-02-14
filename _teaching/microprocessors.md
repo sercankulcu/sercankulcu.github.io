@@ -83,7 +83,7 @@ Chapter 9: Controlling external devices
 
 This chapter navigates through the critical aspect of controlling external devices, elucidating the methods and protocols for interfacing with peripheral hardware. 
 
-* Sunum- <a href="../files/microprocessors/slides/Bolum_0.pdf">[pdf]</a>
+* Sunum-Aygıt Kontrolü <a href="../files/microprocessors/slides/Bolum_09_Aygit_Kontrolu.pdf">[pdf]</a>
 
 Chapter 10: 8086 Instruction Set
 ---
