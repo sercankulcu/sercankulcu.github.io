@@ -4,7 +4,7 @@ collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/2023-spring-operating-systems
 venue: "University of Giresun, Department of Computer Engineering"
-date: 2023-02-02
+date: 2024-01-06
 location: "Giresun, Turkey"
 ---
 
