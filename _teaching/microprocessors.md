@@ -90,11 +90,11 @@ Chapter 10: 8086 Instruction Set
 
 As the foundation of x86 architecture, the 8086 instruction set defines the repertoire of operations that the microprocessor can execute. This chapter systematically dissects the instructions available, covering their classifications, formats, and practical applications in assembly language programming. 
 
-* Sunum- <a href="../files/microprocessors/slides/Bolum_0.pdf">[pdf]</a>
+* Sunum-Komut Kümesi <a href="../files/microprocessors/slides/Bolum_10_Komut_Kumesi.pdf">[pdf]</a>
 
 Chapter 11: 8086 Interrupt Functions 
 ---
 
 Interrupts, fundamental to microprocessor operations, enable the system to respond promptly to external events and prioritize certain tasks. This chapter systematically dissects the diverse interrupt functions of the 8086 architecture, examining their classifications, vectors, and practical implementations in assembly language programming.
 
-* Sunum- <a href="../files/microprocessors/slides/Bolum_0.pdf">[pdf]</a>
+* Sunum-Kesme Fonksiyonları <a href="../files/microprocessors/slides/Bolum_11_Kesme_Fonksiyonlari.pdf">[pdf]</a>
