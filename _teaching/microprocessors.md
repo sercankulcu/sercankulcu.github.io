@@ -75,7 +75,7 @@ Chapter 8: Stack, Macros
 
 The stack, a dynamic data structure, plays a fundamental role in facilitating subroutine calls, parameter passing, and local variable storage. This chapter systematically dissects the mechanisms and functionalities associated with stack operations, shedding light on its significance in the context of assembly language programming. Concurrently, the discussion extends to macros, which offer a means of encapsulating and reusing code segments.
 
-* Sunum-Yığın <a href="../files/microprocessors/slides/Bolum_08_Yığın.pdf">[pdf]</a>
+* Sunum-Yığın <a href="../files/microprocessors/slides/Bolum_08_Yigin.pdf">[pdf]</a>
 * Sunum-Makrolar <a href="../files/microprocessors/slides/Bolum_08_Makrolar.pdf">[pdf]</a>
 
 Chapter 9: Controlling external devices
