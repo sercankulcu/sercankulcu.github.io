@@ -78,7 +78,7 @@ Birbirini vurdu millet yumruk kadar, simsiyah bir tayın için \
 Şimdi serbestledi yine, fakat esmer ve tatsız \
 Ben içeri düştüğüm sene, ikincisi başlamamıştı henüz \
 Daha kampında fırınlar yakılmamış \
-Atom bombası atılmamıştı Hiroşima'ya \ 
+Atom bombası atılmamıştı Hiroşima'ya \
 Boğazlanan bir çocuğun kanı gibi aktı zaman \
 Sonra kapandı resmen o fasıl \
 Şimdi üçüncüden bahsediyor Amerikan doları \
@@ -196,7 +196,7 @@ Elimize değen ölür...
 Badem gözlüm, beni unut. \
 Bu gemi bir kara tabut, \
 lumbarından giren ölür. \
-Üstümüzden geçti bulut. \ 
+Üstümüzden geçti bulut. \
 Boynuma sarılma, gülüm, \
 benden sana geçer ölüm.
 
