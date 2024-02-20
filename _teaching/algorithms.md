@@ -15,6 +15,7 @@ location: "Giresun, Turkey"
 * Algorithms Yong Danielli <a href="https://yongdanielliang.github.io/animation/animation.html">[website]</a>
 * Algorithms USFCA <a href="https://www.cs.usfca.edu/~galles/visualization/Algorithms.html">[website]</a>
 * Algorithms Anim IDE <a href="https://anim.ide.sk/">[website]</a>
+* Algorithms DSALGO Visualizer <a href="https://github.com/jhabarsingh/DSALGO-VISUALIZER">[website]</a>
 
 Chapter 1: Introduction to Algorithms
 ---
