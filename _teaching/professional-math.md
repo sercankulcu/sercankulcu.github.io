@@ -2,7 +2,7 @@
 title: "Professional Math"
 collection: teaching
 type: "Undergraduate course"
-permalink: /teaching/2022-spring-professional-math
+permalink: /teaching/professional-math
 venue: "University of Giresun, Department of Computer Engineering"
 date: 2020-01-01
 location: "Giresun, Turkey"

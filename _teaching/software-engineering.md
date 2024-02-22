@@ -2,7 +2,7 @@
 title: "Software Engineering"
 collection: teaching
 type: "Undergraduate course"
-permalink: /teaching/2020-spring-software-engineering
+permalink: /teaching/software-engineering
 venue: "University of Giresun, Department of Computer Engineering"
 date: 2020-08-08
 location: "Giresun, Turkey"

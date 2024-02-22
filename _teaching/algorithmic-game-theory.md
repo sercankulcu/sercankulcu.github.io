@@ -2,7 +2,7 @@
 title: "Algorithmic Game Theory"
 collection: teaching
 type: "Undergraduate course"
-permalink: /teaching/2023-fall-algorithmic-game-theory
+permalink: /teaching/algorithmic-game-theory
 venue: "University of Giresun, Department of Computer Engineering"
 date: 2023-10-03
 location: "Giresun, Turkey"

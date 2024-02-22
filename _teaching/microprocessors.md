@@ -2,7 +2,7 @@
 title: "Microprocessors"
 collection: teaching
 type: "Undergraduate course"
-permalink: /teaching/2024-spring-microprocessors
+permalink: /teaching/microprocessors
 venue: "University of Giresun, Department of Electrical Electronics Engineering"
 date: 2024-01-05
 location: "Giresun, Turkey"
