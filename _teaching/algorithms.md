@@ -27,6 +27,7 @@ In this chapter, we will cover the fundamentals of algorithms and their importan
 * Asymptotic analysis and algorithmic complexity
 * Big-O notation and its significance in analyzing algorithm efficiency
 
+* Sunum-Giriş <a href="../files/algorithms/slides/Bolum_01_Giris.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_01_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
 
@@ -42,6 +43,7 @@ Sorting algorithms are a fundamental part of computer science. They are used to 
 * Merge Sort
 * Quick Sort
 
+* Sunum-Sıralama Algoritmaları <a href="../files/algorithms/slides/Bolum_02_Siralama.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_02_Sorting.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture02">[link]</a>
 
