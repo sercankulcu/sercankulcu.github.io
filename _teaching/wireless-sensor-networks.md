@@ -2,7 +2,7 @@
 title: "Wireless Sensor Networks"
 collection: teaching
 type: "Undergraduate course"
-permalink: /teaching/2020-spring-wireless-sensor-networks
+permalink: /teaching/wireless-sensor-networks
 venue: "University of Giresun, Department of Computer Engineering"
 date: 2019-01-01
 location: "Giresun, Turkey"

@@ -2,7 +2,7 @@
 title: "Algorithms"
 collection: teaching
 type: "Undergraduate course"
-permalink: /teaching/2023-spring-algorithms
+permalink: /teaching/algorithms
 venue: "University of Giresun, Department of Computer Engineering"
 date: 2024-01-07
 location: "Giresun, Turkey"
