@@ -17,6 +17,9 @@ The resources:
 
 * Barry B. Brey, The Intel Microprocessors, Pearson.
 * Topaloğlu, Nurettin, “X86 Tabanlı Mikroişlemci Mimarisi ve Assembly Dili”, Seçkin Yayınevi.
+* Mikroişlemcilere Giriş Assembler ile Yazılım ve Arayüz Mehmet Bodur <a href="../files/microprocessors/Mikroislemcilere_giris.pdf">[pdf]</a>
+* Intel 8086 ile Mikroişlemci Programlamaya Giriş Şadi Çağatay Öztürk <a href="../files/microprocessors/Intel_8086_ile.pdf">[pdf]</a>
+
 
 Chapter 1: Introduction, 8086 Architecture
 ---
