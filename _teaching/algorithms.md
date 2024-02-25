@@ -10,6 +10,8 @@ location: "Giresun, Turkey"
 
 <img align="left" width="200" alt="algorithms" src="/images/teaching/algorithms-course.png"> Algorithms are at the heart of computer science and play a crucial role in many applications, from machine learning and computational biology to cryptography and network routing. In this course, we will cover a wide range of topics, including sorting and searching algorithms, graph algorithms, dynamic programming, advanced data structures, algorithm design techniques, and the practical implementation of algorithms. Understanding these topics is critical to developing efficient and effective software systems.
 
+* Ders Öğretim Planı <a href="../files/algorithms//slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
+
 * Algorithms Visual Algo <a href="https://visualgo.net/en">[website]</a>
 * Algorithms Algoanim <a href="http://www.algoanim.ide.sk/">[website]</a>
 * Algorithms Yong Danielli <a href="https://yongdanielliang.github.io/animation/animation.html">[website]</a>
