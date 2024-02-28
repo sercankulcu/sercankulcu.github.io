@@ -14,7 +14,6 @@ location: "Giresun, Turkey"
 * Vize cevaplar <a href="../files/java/slides/2023-2024-vize-cevaplar.pdf">[pdf]</a>
 * Telafi cevaplar <a href="../files/java/slides/2023-2024-telafi-cevaplar.pdf">[pdf]</a>
 * Final cevaplar <a href="../files/java/slides/2023-2024-final-cevaplar.pdf">[pdf]</a>
-* Vize Final ve Ödev sonuçlar <a href="../files/java/slides/eemodevler.htm">[pdf]</a>
 
 The resources
 ---
@@ -57,6 +56,7 @@ Control structures, which include conditional statements and loops, provide a po
 * Sunum - Kontrol Yapıları <a href="../files/java/slides/Bolum_03_Kontrol_Yapilari.pdf">[pdf]</a> 
 * Sunum - Fonksiyonlar <a href="../files/java/slides/Bolum_03_Fonksiyonlar.pdf">[pdf]</a> 
 * Sunum - Özyineleme <a href="../files/java/slides/Bolum_03_Ozyineleme.pdf">[pdf]</a> 
+
 * Lecture Notes <a href="../files/java/Chapter_03_Control_Structures.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture03">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03">[tr]</a>
 
@@ -75,8 +75,6 @@ Object-oriented programming (OOP) is a powerful paradigm for structuring and org
 * Lecture Notes <a href="../files/java/Chapter_04_Object_Oriented_Programming.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture04">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders04">[tr]</a>
 
-* Sunum - Sorular <a href="../files/java/slides/Bolum_04_Sorular.pdf">[pdf]</a> 
-
 
 Chapter 5: Arrays and Collections
 -----
@@ -86,11 +84,10 @@ Arrays and collections are essential data structures in Java programming, provid
 * Sunum - Diziler <a href="../files/java/slides/Bolum_05_Diziler.pdf">[pdf]</a> 
 * Sunum - Koleksiyonlar <a href="../files/java/slides/Bolum_05_Koleksiyonlar.pdf">[pdf]</a> 
 * Sunum - Dizgi <a href="../files/java/slides/Bolum_05_Dizgi.pdf">[pdf]</a> 
+
 * Lecture Notes <a href="../files/java/Chapter_05_Arrays_And_Collections.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture05">[link]</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders05">[tr]</a>
 
-* Ödev 4 verildi <a href="../files/java/slides/odev4.html">[html]</a>
-* Ödev 5 verildi <a href="../files/java/slides/odev5.html">[html]</a>
 
 Chapter 6: Exception Handling
 -----
@@ -98,6 +95,7 @@ Chapter 6: Exception Handling
 Exception handling is a critical aspect of Java programming, providing a powerful mechanism for detecting and responding to errors and exceptional conditions in a program, and ensuring that applications remain robust and reliable even in the face of unexpected inputs or events.
 
 * Sunum - Hata Ayıklama <a href="../files/java/slides/Bolum_06_Hata_Ayiklama.pdf">[pdf]</a> 
+
 * Lecture Notes <a href="../files/java/Chapter_06_Exception_Handling.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture06">[link]</a>
 * Interview Exception Handling <a href="../files/java/Interview_Exception_Handling.pdf">[pdf]</a>
@@ -108,6 +106,7 @@ Chapter 7: Working with Files and Input/Output
 Working with files and input/output (I/O) operations is a fundamental aspect of Java programming, providing a powerful mechanism for reading and writing data from a wide range of sources, including local files, remote servers, and user input, and enabling developers to build a wide range of applications with sophisticated data processing capabilities.
 
 * Sunum - Giriş Çıkış <a href="../files/java/slides/Bolum_07_Giris_Cikis.pdf">[pdf]</a> 
+
 * Lecture Notes <a href="../files/java/Chapter_07_Working_With_Files_And_Input_Output.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture07">[link]</a>
 
@@ -117,6 +116,7 @@ Chapter 8: Working with GUI Applications
 Graphical user interfaces (GUIs) are a ubiquitous feature of modern software applications, and Java provides a powerful set of tools and frameworks for building sophisticated, interactive GUIs with rich visual and behavioral features, enabling developers to create compelling user experiences and enhance the usability of their software systems.
 
 * Sunum - Grafikler <a href="../files/java/slides/Bolum_08_Grafikler.pdf">[pdf]</a> 
+
 * Lecture Notes <a href="../files/java/Chapter_08_Working_With_GUI_Applications.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture08">[link]</a>
 * Interview Swing <a href="../files/java/Chapter_08_Interview_Swing.pdf">[pdf]</a>
@@ -127,6 +127,7 @@ Chapter 9: Concurrency and Multithreading
 Concurrency and multithreading are essential concepts in Java programming, providing a powerful mechanism for building responsive, scalable applications that can execute multiple tasks concurrently and take advantage of modern hardware architectures to maximize performance and efficiency.
 
 * Sunum - İş Parçacıkları <a href="../files/java/slides/Bolum_09_Is_Parcaciklari.pdf">[pdf]</a> 
+
 * Lecture Notes <a href="../files/java/Chapter_09_Concurrency_And_Multithreading.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture09">[link]</a>
 
