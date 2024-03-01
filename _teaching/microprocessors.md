@@ -16,6 +16,7 @@ The resources:
 ---
 
 * Emu8086 Microprocessor Emulator <a href="https://emu8086-microprocessor-emulator.en.softonic.com/">[website]</a>
+* CPU Emulator <a href="https://www.cmpe.boun.edu.tr/~tugcu/animations/cpu-simulator/cpu-simulator.html">[website]</a>
 * Barry B. Brey, The Intel Microprocessors, Pearson.
 * Topaloğlu, Nurettin, “X86 Tabanlı Mikroişlemci Mimarisi ve Assembly Dili”, Seçkin Yayınevi.
 * Mikroişlemcilere Giriş Assembler ile Yazılım ve Arayüz Mehmet Bodur <a href="../files/microprocessors/Mikroislemcilere_giris.pdf">[pdf]</a>
