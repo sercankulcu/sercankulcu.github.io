@@ -30,6 +30,7 @@ This chapter provides a foundational overview of microprocessor basics. It intro
 
 * Sunum-Giriş <a href="../files/microprocessors/slides/Bolum_01_Giris.pdf">[pdf]</a>
 * Sunum-Mimari <a href="../files/microprocessors/slides/Bolum_01_8086_Mimarisi.pdf">[pdf]</a>
+* Sunum-Programlama Dilleri <a href="../files/microprocessors/slides/Bolum_01_Programlama_Dilleri.pdf">[pdf]</a>
 
 Chapter 2: 8086 Registers, Pins
 ---
