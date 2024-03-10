@@ -38,3 +38,6 @@ redirect_from:
 * <a href="https://linkedin.com/">[LinkedIn]</a> professional networking platform 
 * <a href="https://reddit.com/">[Reddit]</a> social news and discussion platform 
 * <a href="http://www.flowgorithm.org/">[Flowgorithm]</a> a graphical authoring tool which allows users to write and execute programs using flowcharts
+* <a href="https://tikz.net/">[TikZ]</a> graphics with TikZ in LaTeX
+* <a href="https://www.overleaf.com/">[Overleaf]</a> online LaTeX editor
+
