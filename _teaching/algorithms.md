@@ -34,7 +34,7 @@ In this chapter, we will cover the fundamentals of algorithms and their importan
 
 * Sunum-Giriş <a href="../files/algorithms/slides/Bolum_01_Giris.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_01_Introduction.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture01">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter1">[link]</a>
 
 
 Chapter 2: Sorting Algorithms
