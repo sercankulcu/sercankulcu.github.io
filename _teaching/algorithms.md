@@ -56,7 +56,7 @@ Sorting algorithms are a fundamental part of computer science. They are used to 
 
 * Sunum-Sıralama Algoritmaları <a href="../files/algorithms/slides/Bolum_02_Siralama.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_02_Sorting.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture02">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter2">[link]</a>
 
 
 Chapter 3: Searching Algorithms
@@ -70,7 +70,7 @@ Searching algorithms are a fundamental part of computer science. They are used t
 * Interpolation search
 
 * Lecture Notes <a href="../files/algorithms/Chapter_03_Searching.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture03">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter3">[link]</a>
 
 
 Chapter 4: Graph Algorithms
@@ -84,10 +84,19 @@ Graph algorithms are a fundamental part of computer science. They are used to so
 * Network flow algorithms: Ford-Fulkerson Algorithm, Edmonds-Karp Algorithm
 
 * Lecture Notes <a href="../files/algorithms/Chapter_04_Graph.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture04">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter4">[link]</a>
 
 
-Chapter 5: Dynamic Programming
+Chapter 5: String Algorithms
+---
+
+Have you ever wondered how your computer or smartphone handles text so efficiently? Whether you're searching for a specific word in a document, analyzing DNA sequences, or even just sending a text message, string algorithms are working behind the scenes to make it happen smoothly. In this chapter, we're going to dive into the world of string algorithms, exploring how they work and why they're so important in our daily lives. 
+
+* Lecture Notes <a href="../files/algorithms/Chapter_05_.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter5">[link]</a>
+
+
+Chapter 6: Dynamic Programming
 ---
 
 Dynamic programming is a powerful technique for solving optimization problems by breaking them down into smaller subproblems. In this chapter, we will cover the principle of optimality and Bellman's Equation, which forms the foundation of dynamic programming. We will also introduce memoization and tabulation techniques and explore various applications of dynamic programming in solving optimization problems.
@@ -98,10 +107,10 @@ Dynamic programming is a powerful technique for solving optimization problems by
 * Applications of dynamic programming in solving optimization problems
 
 * Lecture Notes <a href="../files/algorithms/Chapter_05_Dynamic.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture05">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter6">[link]</a>
 
 
-Chapter 6: Approximation algorithms
+Chapter 7: Approximation algorithms
 ---
 
 Approximation algorithms are a type of algorithm that provides a solution to a problem that is not necessarily optimal, but is guaranteed to be within a certain factor of the optimal solution. Approximation algorithms are often used to solve problems that are NP-hard, which means that there is no known polynomial-time algorithm that can find the optimal solution.
@@ -111,10 +120,10 @@ Approximation algorithms are a type of algorithm that provides a solution to a p
 * Metaheuristic algorithms
 
 * Lecture Notes <a href="../files/algorithms/Chapter_06_Approximation.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture06">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter7">[link]</a>
 
 
-Chapter 7: Randomized algorithms
+Chapter 8: Randomized algorithms
 ---
 
 Randomized algorithms are a type of algorithm that uses randomness to improve its performance. Randomized algorithms are often used to solve problems that are difficult or impossible to solve using deterministic algorithms.
@@ -124,10 +133,10 @@ Randomized algorithms are a type of algorithm that uses randomness to improve it
 * The Monte Carlo algorithm
 
 * Lecture Notes <a href="../files/algorithms/Chapter_07_Randomized.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture07">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter8">[link]</a>
 
 
-Chapter 8: Online algorithms
+Chapter 9: Online algorithms
 ---
 
 Online algorithms are a type of algorithm that makes decisions without knowing the complete input. Online algorithms are often used to solve problems in real time, where the input is not known in advance.
@@ -137,10 +146,10 @@ Online algorithms are a type of algorithm that makes decisions without knowing t
 * The adaptive algorithm
 
 * Lecture Notes <a href="../files/algorithms/Chapter_08_Online.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture08">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter9">[link]</a>
 
 
-Chapter 9: Parallel algorithms
+Chapter 10: Parallel algorithms
 ---
 
 Parallel algorithms are a type of algorithm that can be executed on multiple processors or cores simultaneously. Parallel algorithms are often used to solve problems that are too large or too complex to be solved on a single processor.
@@ -150,19 +159,19 @@ Parallel algorithms are a type of algorithm that can be executed on multiple pro
 * Data parallel algorithms
 
 * Lecture Notes <a href="../files/algorithms/Chapter_09_Parallel.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture09">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter10">[link]</a>
 
 
-Chapter 10: Divide-and-Conquer paradigm
+Chapter 11: Divide-and-Conquer paradigm
 ---
 
 The divide-and-conquer paradigm is an algorithmic design paradigm that breaks down a problem into smaller subproblems of the same or related type, until these become simple enough to be solved directly. The solutions to the sub-problems are then combined to give a solution to the original problem.
 
 * Lecture Notes <a href="../files/algorithms/Chapter_10_Divide_and_Conquer.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture10">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter11">[link]</a>
 
 
-Chapter 11: Greedy algorithms
+Chapter 12: Greedy algorithms
 ---
 
 Greedy algorithms are a type of algorithm that makes decisions at each step based on the current state of the problem. Greedy algorithms are often used to solve problems that can be broken down into a sequence of decisions.
@@ -172,10 +181,10 @@ Greedy algorithms are a type of algorithm that makes decisions at each step base
 * Finding the shortest path between two nodes in a graph
 
 * Lecture Notes <a href="../files/algorithms/Chapter_11_Greedy.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture11">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter12">[link]</a>
 
 
-Chapter 12: Backtracking algorithms
+Chapter 13: Backtracking algorithms
 ---
 
 Backtracking algorithms are a type of algorithm that solves problems by exploring all possible solutions and backtracking when a solution is found to be invalid. Backtracking algorithms are often used to solve problems that can be broken down into a tree of possible solutions.
@@ -185,10 +194,10 @@ Backtracking algorithms are a type of algorithm that solves problems by explorin
 * Knight's tour problem
 
 * Lecture Notes <a href="../files/algorithms/Chapter_12_Backtracking.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture12">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter13">[link]</a>
 
 
-Chapter 13: Branch-and-Bound algorithms
+Chapter 14: Branch-and-Bound algorithms
 ---
 
 Branch and bound algorithms are a type of algorithm that solves optimization problems by breaking them down into smaller subproblems and using a bounding function to eliminate subproblems that cannot contain the optimal solution. It is an algorithm design paradigm for discrete and combinatorial optimization problems, as well as mathematical optimization. 
@@ -198,18 +207,4 @@ Branch and bound algorithms are a type of algorithm that solves optimization pro
 * Bin packing problem
 
 * Lecture Notes <a href="../files/algorithms/Chapter_13_Branch_and_Bound.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture13">[link]</a>
-
-
-Chapter 14: Applications of Algorithms
----
-
-In this chapter, we will explore the applications of algorithms in various fields, such as machine learning, computational biology, and cryptography. We will discuss the challenges and opportunities associated with each application and highlight the benefits of using algorithms to solve practical problems.
-
-* Applications of algorithms in various fields, such as machine learning, computational biology, and cryptography
-* Case studies of successful algorithmic implementations in real-world scenarios
-* Ethical considerations and implications of algorithmic decision making
-
-* Lecture Notes <a href="../files/algorithms/Chapter_14_Applications.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Lecture14">[link]</a>
-
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter14">[link]</a>
