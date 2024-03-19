@@ -22,6 +22,7 @@ The resources:
 -----
 
 * Algorithms Visual Algo <a href="https://visualgo.net/en">[website]</a>
+* Algorithms Visual Algo Code <a href="https://github.com/stevenhalim/cpbook-code/tree/master/">[github]</a>
 * Algorithms Algoanim <a href="http://www.algoanim.ide.sk/">[website]</a>
 * Algorithms Yong Danielli <a href="https://yongdanielliang.github.io/animation/animation.html">[website]</a>
 * Algorithms USFCA <a href="https://www.cs.usfca.edu/~galles/visualization/Algorithms.html">[website]</a>
