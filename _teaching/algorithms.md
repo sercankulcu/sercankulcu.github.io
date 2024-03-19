@@ -70,6 +70,7 @@ Searching algorithms are a fundamental part of computer science. They are used t
 * Jump search
 * Interpolation search
 
+* Sunum-Arama Algoritmaları <a href="../files/algorithms/slides/Bolum_03_Arama.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_03_Searching.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter3">[link]</a>
 
@@ -84,6 +85,7 @@ Graph algorithms are a fundamental part of computer science. They are used to so
 * Minimum Spanning Tree algorithms: Prim's Algorithm, Kruskal's Algorithm
 * Network flow algorithms: Ford-Fulkerson Algorithm, Edmonds-Karp Algorithm
 
+* Sunum-Çizge Algoritmaları <a href="../files/algorithms/slides/Bolum_04_Cizge.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_04_Graph.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter4">[link]</a>
 
@@ -93,6 +95,7 @@ Chapter 5: String Algorithms
 
 Have you ever wondered how your computer or smartphone handles text so efficiently? Whether you're searching for a specific word in a document, analyzing DNA sequences, or even just sending a text message, string algorithms are working behind the scenes to make it happen smoothly. In this chapter, we're going to dive into the world of string algorithms, exploring how they work and why they're so important in our daily lives. 
 
+* Sunum-Dizge Algoritmaları <a href="../files/algorithms/slides/Bolum_05_Dizge.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_05_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter5">[link]</a>
 
@@ -107,6 +110,7 @@ Dynamic programming is a powerful technique for solving optimization problems by
 * Memoization and Tabulation techniques
 * Applications of dynamic programming in solving optimization problems
 
+* Sunum-Dinamik Programlama <a href="../files/algorithms/slides/Bolum_06_Dinamik.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_05_Dynamic.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter6">[link]</a>
 
@@ -120,6 +124,7 @@ Approximation algorithms are a type of algorithm that provides a solution to a p
 * Heuristic algorithms
 * Metaheuristic algorithms
 
+* Sunum-Yakınsama Algoritmaları <a href="../files/algorithms/slides/Bolum_07_Yakinsama.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_06_Approximation.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter7">[link]</a>
 
@@ -133,6 +138,7 @@ Randomized algorithms are a type of algorithm that uses randomness to improve it
 * The randomized primality test
 * The Monte Carlo algorithm
 
+* Sunum-Rastgele Algoritmalar <a href="../files/algorithms/slides/Bolum_08_Rastgele.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_07_Randomized.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter8">[link]</a>
 
@@ -146,6 +152,7 @@ Online algorithms are a type of algorithm that makes decisions without knowing t
 * The myopic algorithm
 * The adaptive algorithm
 
+* Sunum-Çevrimiçi Algoritmalar <a href="../files/algorithms/slides/Bolum_09_Cevrimici.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_08_Online.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter9">[link]</a>
 
@@ -159,6 +166,7 @@ Parallel algorithms are a type of algorithm that can be executed on multiple pro
 * MapReduce algorithms
 * Data parallel algorithms
 
+* Sunum-Paralel Algoritmalar <a href="../files/algorithms/slides/Bolum_10_Paralel.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_09_Parallel.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter10">[link]</a>
 
@@ -168,6 +176,7 @@ Chapter 11: Divide-and-Conquer paradigm
 
 The divide-and-conquer paradigm is an algorithmic design paradigm that breaks down a problem into smaller subproblems of the same or related type, until these become simple enough to be solved directly. The solutions to the sub-problems are then combined to give a solution to the original problem.
 
+* Sunum-Böl Fethet Yaklaşımı <a href="../files/algorithms/slides/Bolum_11_Bol_Fethet.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_10_Divide_and_Conquer.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter11">[link]</a>
 
@@ -181,6 +190,7 @@ Greedy algorithms are a type of algorithm that makes decisions at each step base
 * Finding the minimum spanning tree in a graph
 * Finding the shortest path between two nodes in a graph
 
+* Sunum-Açgözlü Algoritmalar <a href="../files/algorithms/slides/Bolum_12_Acgozlu.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_11_Greedy.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter12">[link]</a>
 
@@ -194,6 +204,7 @@ Backtracking algorithms are a type of algorithm that solves problems by explorin
 * Sudoku puzzle
 * Knight's tour problem
 
+* Sunum-Geri Dönüşlü Algoritmalar <a href="../files/algorithms/slides/Bolum_13_Geri_Donuslu.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_12_Backtracking.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter13">[link]</a>
 
@@ -207,5 +218,6 @@ Branch and bound algorithms are a type of algorithm that solves optimization pro
 * Knapsack problem
 * Bin packing problem
 
+* Sunum-Dal Sınır Algoritmaları <a href="../files/algorithms/slides/Bolum_14_Dal_Sinir.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_13_Branch_and_Bound.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter14">[link]</a>
