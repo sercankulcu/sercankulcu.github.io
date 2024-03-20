@@ -21,7 +21,7 @@ Warm regards,
 <script>
         if ('serviceWorker' in navigator) {
          window.addEventListener('load', function () {
-          navigator.serviceWorker.register('service-worker.js').then(function (registration) {
+          navigator.serviceWorker.register('/assets/js/service-worker.js').then(function (registration) {
            console.log('Registered!');
           }, function (err) {
            console.log('ServiceWorker registration failed: ', err);
