@@ -1,6 +1,6 @@
 // Define a unique version for the cache
 const CACHE_VERSION = 'v1';
-const CACHE_NAME = 'my-pwa-cache-' + CACHE_VERSION;
+const CACHE_NAME = 'my-pwa-library-cache-' + CACHE_VERSION;
 
 // List of URLs to cache
 const urlsToCache = [
