@@ -16,8 +16,6 @@ I'm Sercan Külcü, an assistant professor in the computer science department at
 
 Warm regards,
 
-<!-- HTML !-->
-/* CSS */
 <style>
   button-32 {
   background-color: #fff000;
