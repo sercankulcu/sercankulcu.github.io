@@ -18,7 +18,8 @@ Warm regards,
 
 <!-- HTML !-->
 /* CSS */
-.button-32 {
+<style>
+  button-32 {
   background-color: #fff000;
   border-radius: 12px;
   color: #000;
@@ -36,18 +37,19 @@ Warm regards,
   touch-action: manipulation;
 }
 
-.button-32:not(:disabled):hover,
-.button-32:not(:disabled):focus {
+ button-32:not(:disabled):hover,
+ button-32:not(:disabled):focus {
   outline: 0;
   background: #f4e603;
   box-shadow: 0 0 0 2px rgba(0,0,0,.2), 0 3px 8px 0 rgba(0,0,0,.15);
 }
 
-.button-32:disabled {
+button-32:disabled {
   filter: saturate(0.2) opacity(0.5);
   -webkit-filter: saturate(0.2) opacity(0.5);
   cursor: not-allowed;
 }
+</style>
 
 <button class="button-32" role="button" onclick="window.location.href = 'mantra/index.html';">Mantra App</button>
 
