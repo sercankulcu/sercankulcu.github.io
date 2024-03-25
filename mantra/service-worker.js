@@ -1,10 +1,10 @@
 // Define a unique version for the cache
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const CACHE_NAME = 'my-pwa-mantra-cache-' + CACHE_VERSION;
 
 // List of URLs to cache
 const urlsToCache = [
-  //'/',
+  '/mantra/',
   '/mantra/index.html',
   '/mantra/styles.css',
   '/mantra/script.js',
