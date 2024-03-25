@@ -15,18 +15,25 @@ function changeLanguage(language) {
 
 // İçerik güncelleme fonksiyonu
 function updateContent() {
-    if(currentStep == 0) {
-        let music = new Audio("assets/media/please-calm-my-mind.mp3");
-        music.play();  
-    }
+    
     if(currentStep < 5) {
         document.getElementById('message-heading').innerText = data[currentStep].heading;
         document.getElementById('message-text').innerText = data[currentStep].text;
         currentStep++
+        if(currentStep == 0) {
+            let music = new Audio("assets/media/please-calm-my-mind.mp3");
+            music.play();  
+        }
     }
     else {
         document.getElementById('message-heading').innerText = "Mantra of the Day";
-        document.getElementById('message-text').innerText = mantras[Math.floor(Math.random() * mantras.length)].text;
+        let original = mantras[Math.floor(Math.random() * mantras.length)].text;
+        for (let i = 0; i < original.length / 7; i++) {
+            let indexToUpperCase = Math.floor(Math.random() * original.length); 
+            let upperCaseCharacter = original.charAt(indexToUpperCase).toUpperCase();
+            original = original.substring(0, indexToUpperCase) + upperCaseCharacter + original.substring(indexToUpperCase + 1);
+        }
+        document.getElementById('message-text').innerText = original;
     }
 }
 
