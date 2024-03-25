@@ -26,14 +26,15 @@ function updateContent() {
         currentStep++
     }
     else {
+        let random = Math.floor(Math.random() * mantras.length);
         document.getElementById('message-heading').innerText = "Mantra of the Day";
-        let original = mantras[Math.floor(Math.random() * mantras.length)].text;
+        let original = mantras[random].text;
         for (let i = 0; i < original.length / 7; i++) {
             let indexToUpperCase = Math.floor(Math.random() * original.length); 
             let upperCaseCharacter = original.charAt(indexToUpperCase).toUpperCase();
             original = original.substring(0, indexToUpperCase) + upperCaseCharacter + original.substring(indexToUpperCase + 1);
         }
-        document.getElementById('message-text').innerText = original;
+        document.getElementById('message-text').innerText = mantras[random].text_original + String.fromCharCode(13) + original;
     }
 }
 

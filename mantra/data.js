@@ -24,32 +24,42 @@ const data = [
 const mantras = [
     {
         text: "I am worthy of love and abundance.",
+        text_original: "अहं प्रेम एवं प्रचुरतायां योग्यः अस्मि।",
     },
     {
         text: "I embrace change and welcome growth.",
+        text_original: "आदित्यत्यागं ग्रहणामि च वृद्धिं।",
     },
     {
         text: "I trust in the journey of my life.",
+        text_original: "आत्मनः जीवनस्य विश्वासं करोमि।",
     },
     {
         text: "I release all that does not serve me.",
+        text_original: "सर्वं यत् न मां सेवते त्यजामि।",
     },
     {
         text: "I am grateful for this moment and all it brings.",
+        text_original: "इदं क्षणं च सर्वं यत् आनयति च आनन्दयामि।",
     },
     {
         text: "I attract positivity and repel negativity.",
+        text_original: "सत्त्वं आकर्षामि रजस् च निवर्तयामि।",
     },
     {
         text: "I am capable of achieving my dreams.",
+        text_original: "मे स्वप्नान् सिद्धुं शक्तः अस्मि।",
     },
     {
         text: "I forgive myself and others, and let go of resentment.",
+        text_original: "मा आत्मानं और परों क्षमामि, विवादस्य अपहारिणीयः।",
     },
     {
         text: "I radiate confidence, strength, and inner peace.",
+        text_original: "आत्मविश्वासं, शक्ति और आंतरिक शांति को चिित्रत करता हूँ।",
     },
     {
         text: "I am a magnet for miracles and blessings.",
+        text_original: "महान् चमत्कारान् और आशीर्वादों का आकर्षक हूँ।",
     },
 ];
