@@ -3,6 +3,9 @@ const userLanguage = navigator.language || navigator.userLanguage;
 
 // Varsayılan dil
 let currentLanguage = userLanguage.startsWith('en') ? 'en' : 'tr';
+const textInput = document.getElementById("textInput");
+const nextButton = document.getElementById("nextButton");
+let currentMantra = "";
 
 let currentStep = 0
 
@@ -34,9 +37,40 @@ function updateContent() {
             let upperCaseCharacter = original.charAt(indexToUpperCase).toUpperCase();
             original = original.substring(0, indexToUpperCase) + upperCaseCharacter + original.substring(indexToUpperCase + 1);
         }
+        currentMantra = original;
         document.getElementById('message-text').innerText = mantras[random].text_original + String.fromCharCode(13) + original;
+        textInput.style.display = "block";
+        nextButton.disabled = true;
+          textInput.value = "";
+          textInput.placeholder = "Write here";
     }
 }
+
+
+textInput.addEventListener("input", function(event) {
+      const inputText = event.target.value.trim();
+
+      let comparisonResult = true;
+
+      for (let i = 0; i < inputText.length; i++) {
+        if (inputText[i] !== currentMantra[i]) {
+          comparisonResult = false;
+          break;
+        }
+      }
+
+      if(comparisonResult == false) {
+          textInput.style.borderColor = "red";
+      } else {
+          textInput.style.borderColor = "blue";
+      }
+
+      if (inputText === currentMantra) {
+          nextButton.disabled = false;
+      } else {
+
+      }
+    });
 
 // Sayfa yüklendiğinde içeriği güncelle
 window.onload = updateContent;
