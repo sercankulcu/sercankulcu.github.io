@@ -5,8 +5,8 @@ const CACHE_NAME = 'my-pwa-mantra-cache-' + CACHE_VERSION;
 // List of URLs to cache
 const urlsToCache = [
   //'/',
-  '/index.html',
-  '/styles.css',
+  '/mantra/index.html',
+  '/mantra/styles.css',
   //'/script.js',
   //'/data.js',
   //'/assets/media/please-calm-my-mind.mp3',
