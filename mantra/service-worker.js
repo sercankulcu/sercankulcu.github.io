@@ -9,7 +9,7 @@ const urlsToCache = [
   //'/styles.css',
   //'/script.js',
   //'/data.js',
-  //'/assets/media/please-calm-my-mind.mp3',
+  '/assets/media/please-calm-my-mind.mp3',
   //'/assets/icons/icon-512.png'
   // Add more URLs to cache as needed
 ];
