@@ -10,7 +10,7 @@ const urlsToCache = [
   '/script.js',
   '/data.js',
   '/assets/media/please-calm-my-mind.mp3',
-  '/icon-512.png'
+  '/assets/icons/icon-512.png'
   // Add more URLs to cache as needed
 ];
 
