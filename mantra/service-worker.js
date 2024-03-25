@@ -7,10 +7,10 @@ const urlsToCache = [
   //'/',
   '/mantra/index.html',
   '/mantra/styles.css',
-  //'/script.js',
-  //'/data.js',
-  //'/assets/media/please-calm-my-mind.mp3',
-  //'/assets/icons/icon-512.png'
+  '/mantra/script.js',
+  '/mantra/data.js',
+  '/mantra/assets/media/please-calm-my-mind.mp3',
+  '/mantra/assets/icons/icon-512.png'
   // Add more URLs to cache as needed
 ];
 
