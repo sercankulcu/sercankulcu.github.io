@@ -1,5 +1,5 @@
 // Define a unique version for the cache
-const CACHE_VERSION = 'v1.01';
+const CACHE_VERSION = 'v1-02';
 const CACHE_NAME = 'my-pwa-mantra-cache-' + CACHE_VERSION;
 
 // List of URLs to cache
