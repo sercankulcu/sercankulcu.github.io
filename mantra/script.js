@@ -38,7 +38,7 @@ function updateContent() {
             original = original.substring(0, indexToUpperCase) + upperCaseCharacter + original.substring(indexToUpperCase + 1);
         }
         currentMantra = original;
-        document.getElementById('message-text').innerText = mantras[random].text_original + String.fromCharCode(13) + original;
+        document.getElementById('message-text').innerText = mantras[random].text_original + String.fromCharCode(13) + String.fromCharCode(13) + original;
         textInput.style.display = "block";
         nextButton.disabled = true;
           textInput.value = "";
