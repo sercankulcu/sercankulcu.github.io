@@ -20,3 +20,36 @@ const data = [
         text: "Meditation with mantras provides a key to meet yourself. Quietly observe your thoughts, find your rhythm, and explore the beauty of meditation. Each repetition brings you a step closer to your inner peace.",
     },
 ];
+
+const mantras = [
+    {
+        text: "I am worthy of love and abundance.",
+    },
+    {
+        text: "I embrace change and welcome growth.",
+    },
+    {
+        text: "I trust in the journey of my life.",
+    },
+    {
+        text: "I release all that does not serve me.",
+    },
+    {
+        text: "I am grateful for this moment and all it brings.",
+    },
+    {
+        text: "I attract positivity and repel negativity.",
+    },
+    {
+        text: "I am capable of achieving my dreams.",
+    },
+    {
+        text: "I forgive myself and others, and let go of resentment.",
+    },
+    {
+        text: "I radiate confidence, strength, and inner peace.",
+    },
+    {
+        text: "I am a magnet for miracles and blessings.",
+    },
+];
