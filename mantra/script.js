@@ -60,15 +60,15 @@ textInput.addEventListener("input", function(event) {
       }
 
       if(comparisonResult == false) {
-          textInput.style.borderColor = "red";
+          textInput.style.border = "solid 3px red";
       } else {
-          textInput.style.borderColor = "blue";
+          textInput.style.border = "solid 3px green";
       }
 
       if (inputText === currentMantra) {
           nextButton.disabled = false;
       } else {
-
+          nextButton.disabled = true;
       }
     });
 
