@@ -17,13 +17,13 @@ function changeLanguage(language) {
 function updateContent() {
     
     if(currentStep < 5) {
-        document.getElementById('message-heading').innerText = data[currentStep].heading;
-        document.getElementById('message-text').innerText = data[currentStep].text;
-        currentStep++
-        if(currentStep == 0) {
+        if(currentStep == 1) {
             let music = new Audio("assets/media/please-calm-my-mind.mp3");
             music.play();  
         }
+        document.getElementById('message-heading').innerText = data[currentStep].heading;
+        document.getElementById('message-text').innerText = data[currentStep].text;
+        currentStep++
     }
     else {
         document.getElementById('message-heading').innerText = "Mantra of the Day";
