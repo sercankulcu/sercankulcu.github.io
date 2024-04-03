@@ -1,5 +1,5 @@
 ---
-title: 2023 A Year of Challenges and Achievements
+title: '2023 A Year of Challenges and Achievements'
 date: {}
 permalink: /posts/2023/12/2023-a-year-of-challenges-and-achievements/
 tags:
