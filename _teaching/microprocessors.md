@@ -12,6 +12,8 @@ location: "Giresun, Turkey"
 
 * Ders Öğretim Planı <a href="../files/microprocessors/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
+* Soru-Cevap <a href="../files/microprocessors/slides/Bolum_12_Soru_Cevap.pdf">[pdf]</a>
+
 The resources:
 ---
 
