@@ -12,6 +12,7 @@ location: "Giresun, Turkey"
 
 * Ders Öğretim Planı <a href="../files/os/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
+* Vize Soru Cevap <a href="../files/os/slides/Bolum_17_Soru_Cevap.pdf">[pdf]</a>
 * MCQ Midterm <a href="../files/os/slides/midterm_mcq.txt">[txt]</a>
 
 
