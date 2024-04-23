@@ -15,6 +15,9 @@ location: "Giresun, Turkey"
 * Vize Soru Cevap <a href="../files/os/slides/Bolum_17_Soru_Cevap.pdf">[pdf]</a>
 * MCQ Midterm <a href="../files/os/slides/midterm_mcq.txt">[txt]</a>
 
+* 2022-2023 Vize <a href="../files/os/slides/2022-2023-vize_cevaplar.pdf">[pdf]</a>
+* 2022-2023 Final <a href="../files/os/slides/2022-2023-final_cevaplar.pdf">[pdf]</a>
+
 
 The resources: 
 -----
