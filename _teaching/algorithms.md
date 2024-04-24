@@ -19,6 +19,9 @@ Duyurular
 * Vize Soru Cevap <a href="../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf">[pdf]</a>
 * Final Soru Cevap <a href="../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf">[pdf]</a>
 
+* 2023-2024 Vize <a href="../files/algorithms/slides/2023-2024-vize-cevap.pdf">[pdf]</a>
+
+
 The resources: 
 -----
 
