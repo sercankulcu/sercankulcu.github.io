@@ -14,6 +14,8 @@ location: "Giresun, Turkey"
 
 * Soru-Cevap <a href="../files/microprocessors/slides/Bolum_12_Soru_Cevap.pdf">[pdf]</a>
 
+* 2023-2024 Vize <a href="../files/microprocessors/slides/2023-2024-vize-cevap.pdf">[pdf]</a>
+
 The resources:
 ---
 
