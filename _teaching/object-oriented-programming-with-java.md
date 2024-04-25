@@ -14,7 +14,7 @@ location: "Giresun, Turkey"
 * 2022-2023 Vize <a href="../files/java/slides/2022-2023-vize-cevaplar.pdf">[pdf]</a>
 * 2022-2023 Telafi <a href="../files/java/slides/2022-2023-telafi-cevaplar.pdf">[pdf]</a>
 * 2022-2023 Final <a href="../files/java/slides/2022-2023-final-cevaplar.pdf">[pdf]</a>
-* 2023-2024 Vize <a href="../files/java/slides/2023-2024-vize-cevaplar.pdf">[pdf]</a>
+* 2023-2024 Vize <a href="../files/java/slides/2023-2024-vize-cevap.pdf">[pdf]</a>
 
 The resources
 ---
