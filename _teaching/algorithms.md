@@ -15,6 +15,8 @@ location: "Giresun, Turkey"
 Duyurular
 ---
 
+
+* Vize sonuçları <a href="../files/algorithms/slides/algoritmalarsonuc.htm">[html]</a>
 * ödev 1 verildi <a href="../files/algorithms/slides/odev1.html">[pdf]</a>
 * Vize Soru Cevap <a href="../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf">[pdf]</a>
 * Final Soru Cevap <a href="../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf">[pdf]</a>
