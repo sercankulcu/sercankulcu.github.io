@@ -15,6 +15,7 @@ location: "Giresun, Turkey"
 * Vize sonuçları <a href="../files/os/slides/isletimsistemleri.htm">[html]</a>
 
 * Vize Soru Cevap <a href="../files/os/slides/Bolum_17_Soru_Cevap.pdf">[pdf]</a>
+* Final Soru Cevap <a href="../files/os/slides/Bolum_18_Soru_Cevap.pdf">[pdf]</a>
 * MCQ Midterm <a href="../files/os/slides/midterm_mcq.txt">[txt]</a>
 * MCQ Final <a href="../files/os/slides/final_mcq.txt">[txt]</a>
 
