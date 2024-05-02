@@ -16,6 +16,11 @@ location: "Giresun, Turkey"
 * 2022-2023 Final <a href="../files/java/slides/2022-2023-final-cevaplar.pdf">[pdf]</a>
 * 2023-2024 Vize <a href="../files/java/slides/2023-2024-vize-cevap.pdf">[pdf]</a>
 
+Duyurular
+---
+
+* Vize sonuçları <a href="../files/java/slides/programlama.htm">[html]</a>
+
 The resources
 ---
 
