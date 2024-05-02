@@ -16,6 +16,11 @@ location: "Giresun, Turkey"
 
 * 2023-2024 Vize <a href="../files/microprocessors/slides/2023-2024-vize-cevap.pdf">[pdf]</a>
 
+Duyurular
+---
+
+* Vize sonuçları <a href="../files/microprocessors/slides/mikroislemciler.htm">[html]</a>
+
 The resources:
 ---
 
