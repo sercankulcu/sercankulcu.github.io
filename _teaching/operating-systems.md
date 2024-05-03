@@ -10,23 +10,21 @@ location: "Giresun, Turkey"
 
 <img align="left" width="200" alt="operating systems" src="/images/teaching/operating-systems-course.png"> Operating systems are an essential part of modern computing, serving as the foundation of any computer system. They are responsible for managing the hardware and software resources of a computer and providing a platform for other programs to run on. An operating system acts as an intermediary between the computer hardware and the software applications that users interact with, providing a uniform interface that applications can use to communicate with the hardware. Without an operating system, a computer would be nothing more than a collection of hardware components that could not be easily controlled or utilized by users.
 
-* Ders Öğretim Planı <a href="../files/os/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
+Duyurular
+-----
 
 * Vize sonuçları <a href="../files/os/slides/isletimsistemleri.htm">[html]</a>
 
-* Vize Soru Cevap <a href="../files/os/slides/Bolum_17_Soru_Cevap.pdf">[pdf]</a>
-* Final Soru Cevap <a href="../files/os/slides/Bolum_18_Soru_Cevap.pdf">[pdf]</a>
-* MCQ Midterm <a href="../files/os/slides/midterm_mcq.txt">[txt]</a>
-* MCQ Final <a href="../files/os/slides/final_mcq.txt">[txt]</a>
 
-* 2022-2023 Vize <a href="../files/os/slides/2022-2023-vize_cevaplar.pdf">[pdf]</a>
-* 2022-2023 Final <a href="../files/os/slides/2022-2023-final_cevaplar.pdf">[pdf]</a>
-* 2023-2024 Vize <a href="../files/os/slides/2023-2024-vize-cevap.pdf">[pdf]</a>
-
+* Ders Öğretim Planı <a href="../files/os/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
 The resources: 
 -----
 
+* Vize Soru Cevap <a href="../files/os/slides/Bolum_17_Soru_Cevap.pdf">[pdf]</a> Final Soru Cevap <a href="../files/os/slides/Bolum_18_Soru_Cevap.pdf">[pdf]</a>
+* MCQ Midterm <a href="../files/os/slides/midterm_mcq.txt">[txt]</a> MCQ Final <a href="../files/os/slides/final_mcq.txt">[txt]</a>
+* 2022-2023 Vize <a href="../files/os/slides/2022-2023-vize_cevaplar.pdf">[pdf]</a> Final <a href="../files/os/slides/2022-2023-final_cevaplar.pdf">[pdf]</a>
+* 2023-2024 Vize <a href="../files/os/slides/2023-2024-vize-cevap.pdf">[pdf]</a>
 * Modern Operating Systems, Andrew S. Tanenbaum <a href="https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X">[book]</a>
 * Operating System Concepts, A. SilberSchatz, P. Galvin, and G. Gagne <a href="https://www.os-book.com/OS10/index.html">[e-book]</a>
 * Operating Systems: Three Easy Pieces <a href="https://pages.cs.wisc.edu/~remzi/OSTEP">[e-book]</a>
