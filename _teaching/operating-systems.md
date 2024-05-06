@@ -50,6 +50,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 * **Slides [TR]** <a href="../files/os/slides/Bolum_01_Giris.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_1_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter1">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab1">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_1_Introduction.pdf">[pdf]</a>
 
 Chapter 2: Structures: 
@@ -60,6 +61,7 @@ The design and organization of an operating system's internal components and mec
 * **Slides [TR]** <a href="../files/os/slides/Bolum_02_Yapilar.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_2_Structures.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter2">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab2">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_2_Structures.pdf">[pdf]</a>
 
 Chapter 3: Processes: 
@@ -70,6 +72,7 @@ In the world of operating systems, processes serve as the cornerstone of multi-t
 * **Slides [TR]** <a href="../files/os/slides/Bolum_03_Surecler.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_3_Processes.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter3">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab3">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_3_Processes.pdf">[pdf]</a>
 
 Chapter 4: Threads: 
@@ -80,6 +83,7 @@ Threads, as lightweight execution units within a process, provide a powerful mec
 * **Slides [TR]** <a href="../files/os/slides/Bolum_04_Is_Parcaciklari.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_4_Threads.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter4">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab4">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_4_Threads.pdf">[pdf]</a>
 
 Chapter 5: Scheduling: 
@@ -90,6 +94,7 @@ CPU scheduling is a critical component of any operating system, responsible for 
 * **Slides [TR]** <a href="../files/os/slides/Bolum_05_Cizelgeleme.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_5_Scheduling.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter5">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab5">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_5_Scheduling.pdf">[pdf]</a>
 
 Chapter 6: Synchronization: 
@@ -100,6 +105,7 @@ In a multi-threaded or multi-process environment, synchronization mechanisms pro
 * **Slides [TR]** <a href="../files/os/slides/Bolum_06_Senkronizasyon.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_6_Synchronization.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter6">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab6">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_6_Synchronization.pdf">[pdf]</a>
 
 Chapter 7: Deadlocks: 
@@ -110,6 +116,7 @@ Deadlocks, which occur when multiple processes or threads are blocked and unable
 * **Slides [TR]** <a href="../files/os/slides/Bolum_07_Kilitlenme.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_7_Deadlocks.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter7">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab7">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_7_Deadlocks.pdf">[pdf]</a>
 
 
