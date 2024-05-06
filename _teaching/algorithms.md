@@ -70,7 +70,10 @@ Chapter 4: Graph Algorithms
 
 Graphs, composed of nodes and edges, are ubiquitous in various domains, including social networks, transportation systems, and computational biology. Graph algorithms enable us to explore, analyze, and manipulate these complex structures efficiently. Graph traversal algorithms like Breadth-first search (BFS) and Depth-first search (DFS) enable us to explore the intricacies of graphs, uncovering their structure and connections. When it comes to finding the shortest path between nodes, Dijkstra's Algorithm and Bellman-Ford Algorithm come to the rescue, efficiently navigating through the labyrinth of edges and vertices. Minimum Spanning Tree algorithms, such as Prim's Algorithm and Kruskal's Algorithm, help us identify the most cost-effective way to connect all nodes in a graph. And when tackling network flow problems, like determining the maximum flow in a network, Ford-Fulkerson Algorithm and Edmonds-Karp Algorithm offer ingenious solutions, optimizing resource utilization and enhancing efficiency. 
 
-* Sunum-Çizge Algoritmaları <a href="../files/algorithms/slides/Bolum_04_Cizge.pdf">[pdf]</a>
+* Sunum-Çizge Gezinme <a href="../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.pdf">[pdf]</a>
+* Sunum-Çizge En Kısa Yol <a href="../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.pdf">[pdf]</a>
+* Sunum-Çizge Minimum Yayılım <a href="../files/algorithms/slides/Bolum_04_03_Min_Yayilim.pdf">[pdf]</a>
+* Sunum-Çizge Ağ Akış <a href="../files/algorithms/slides/Bolum_04_04_Ag_Akis.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_04_Graph.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter4">[link]</a>
 
