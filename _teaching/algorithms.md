@@ -72,7 +72,7 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
 
 * Sunum-Çizge Gezinme <a href="../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.pdf">[pdf]</a>
 * Sunum-Çizge En Kısa Yol <a href="../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.pdf">[pdf]</a>
-* Sunum-Çizge Minimum Yayılım <a href="../files/algorithms/slides/Bolum_04_03_Min_Yayilim.pdf">[pdf]</a>
+* Sunum-Çizge Minimum Kapsayan <a href="../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.pdf">[pdf]</a>
 * Sunum-Çizge Ağ Akış <a href="../files/algorithms/slides/Bolum_04_04_Ag_Akis.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_04_Graph.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter4">[link]</a>
