@@ -15,18 +15,15 @@ location: "Giresun, Turkey"
 Duyurular
 ---
 
-
+* ödev 2 verildi <a href="../files/algorithms/slides/odev2.html">[html]</a>
 * Vize sonuçları <a href="../files/algorithms/slides/algoritmalarsonuc.htm">[html]</a>
-* ödev 1 verildi <a href="../files/algorithms/slides/odev1.html">[pdf]</a>
-* Vize Soru Cevap <a href="../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf">[pdf]</a>
-* Final Soru Cevap <a href="../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf">[pdf]</a>
-
-* 2023-2024 Vize <a href="../files/algorithms/slides/2023-2024-vize-cevap.pdf">[pdf]</a>
-
+* ödev 1 verildi <a href="../files/algorithms/slides/odev1.html">[html]</a>
 
 The resources: 
 -----
 
+* Vize Soru Cevap <a href="../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf">[pdf]</a> Final Soru Cevap <a href="../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf">[pdf]</a>
+* 2023-2024 Vize <a href="../files/algorithms/slides/2023-2024-vize-cevap.pdf">[pdf]</a>
 * Algorithms Visual Algo <a href="https://visualgo.net/en">[website]</a>
 * Algorithms Visual Algo Code <a href="https://github.com/stevenhalim/cpbook-code/tree/master/">[github]</a>
 * Algorithms Algoanim <a href="http://www.algoanim.ide.sk/">[website]</a>
