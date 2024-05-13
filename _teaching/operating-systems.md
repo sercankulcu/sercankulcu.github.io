@@ -51,7 +51,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 * **Slides [TR]** <a href="../files/os/slides/Bolum_01_Giris.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_1_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter1">[link]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab1">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_1_Introduction.pdf">[pdf]</a>
 
 Chapter 2: Structures: 
@@ -62,7 +62,7 @@ The design and organization of an operating system's internal components and mec
 * **Slides [TR]** <a href="../files/os/slides/Bolum_02_Yapilar.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_2_Structures.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter2">[link]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab2">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab02">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_2_Structures.pdf">[pdf]</a>
 
 Chapter 3: Processes: 
@@ -73,7 +73,7 @@ In the world of operating systems, processes serve as the cornerstone of multi-t
 * **Slides [TR]** <a href="../files/os/slides/Bolum_03_Surecler.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_3_Processes.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter3">[link]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab3">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab03">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_3_Processes.pdf">[pdf]</a>
 
 Chapter 4: Threads: 
@@ -84,7 +84,7 @@ Threads, as lightweight execution units within a process, provide a powerful mec
 * **Slides [TR]** <a href="../files/os/slides/Bolum_04_Is_Parcaciklari.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_4_Threads.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter4">[link]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab4">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab04">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_4_Threads.pdf">[pdf]</a>
 
 Chapter 5: Scheduling: 
@@ -95,7 +95,7 @@ CPU scheduling is a critical component of any operating system, responsible for 
 * **Slides [TR]** <a href="../files/os/slides/Bolum_05_Cizelgeleme.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_5_Scheduling.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter5">[link]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab5">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab05">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_5_Scheduling.pdf">[pdf]</a>
 
 Chapter 6: Synchronization: 
@@ -106,7 +106,7 @@ In a multi-threaded or multi-process environment, synchronization mechanisms pro
 * **Slides [TR]** <a href="../files/os/slides/Bolum_06_Senkronizasyon.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_6_Synchronization.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter6">[link]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab6">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab06">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_6_Synchronization.pdf">[pdf]</a>
 
 Chapter 7: Deadlocks: 
@@ -117,7 +117,7 @@ Deadlocks, which occur when multiple processes or threads are blocked and unable
 * **Slides [TR]** <a href="../files/os/slides/Bolum_07_Kilitlenme.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_7_Deadlocks.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter7">[link]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab7">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab07">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_7_Deadlocks.pdf">[pdf]</a>
 
 
@@ -129,6 +129,7 @@ Memory management, which involves the allocation, monitoring, and protection of 
 * **Slides [TR]** <a href="../files/os/slides/Bolum_08_Bellek_Yonetimi.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_8_Memory_management.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter8">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab08">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_8_Memory_management.pdf">[pdf]</a>
 
 Chapter 9: Virtual memory: 
@@ -139,6 +140,7 @@ Virtual memory, a key technique used by modern operating systems to manage memor
 * **Slides [TR]** <a href="../files/os/slides/Bolum_09_Sanal_Bellek.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_9_Virtual_memory.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter9">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab09">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_9_Virtual_memory.pdf">[pdf]</a>
 
 Chapter 10: File systems: 
@@ -149,6 +151,7 @@ File systems, which provide a hierarchical organization and management scheme fo
 * **Slides [TR]** <a href="../files/os/slides/Bolum_10_Dosya_Sistemleri.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_10_File_systems.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter10">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab10">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_10_File_systems.pdf">[pdf]</a>
 
 Chapter 11: Input/output: 
@@ -159,6 +162,7 @@ IO operations, which involve the movement of data between a computer and externa
 * **Slides [TR]** <a href="../files/os/slides/Bolum_11_Giris_Cikis.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_11_Input_output.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter11">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab11">[link]</a>
 * Question & answers <a href="../files/os/questions/Chapter_11_Input_output.pdf">[pdf]</a>
 
 
