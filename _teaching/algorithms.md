@@ -80,7 +80,12 @@ Chapter 5: String Algorithms
 
 Have you ever wondered how your computer or smartphone handles text so efficiently? Whether you're searching for a specific word in a document, analyzing DNA sequences, or even just sending a text message, string algorithms are working behind the scenes to make it happen smoothly. String algorithms enable us to manipulate and analyze text data effectively. From searching for specific patterns within a string to comparing and modifying strings, these algorithms are incredibly versatile and find applications in various fields, including natural language processing, bioinformatics, and data processing. Whether it's finding the occurrence of a substring within a larger string, determining the longest common subsequence between two strings, or performing efficient string matching operations, string algorithms offer efficient and elegant solutions to a myriad of problems.
 
-* Sunum-Dizge Algoritmaları <a href="../files/algorithms/slides/Bolum_05_Dizge.pdf">[pdf]</a>
+* Sunum-Dizgi Eşleme <a href="../files/algorithms/slides/Bolum_05_01_Dizgi_Esleme.pdf">[pdf]</a>
+* Sunum-Dizgi Sıkıştırma <a href="../files/algorithms/slides/Bolum_05_02_Dizgi_Sikistirma.pdf">[pdf]</a>
+* Sunum-Dizgi Sıralama <a href="../files/algorithms/slides/Bolum_05_03_Dizgi_Siralama.pdf">[pdf]</a>
+* Sunum-Dizgi Ayrıştırma <a href="../files/algorithms/slides/Bolum_05_04_Dizgi_Ayristirma.pdf">[pdf]</a>
+* Sunum-Dizgi Düzenleme <a href="../files/algorithms/slides/Bolum_05_05_Dizgi_Duzenleme_Mesafe.pdf">[pdf]</a>
+* Sunum-Dizgi Dönüştürme <a href="../files/algorithms/slides/Bolum_05_06_Dizgi_Donusturme.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_05_.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter5">[link]</a>
 
