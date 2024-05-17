@@ -8,9 +8,10 @@ date: 2024-01-07
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="algorithms" src="/images/teaching/algorithms-course.png"> Algorithms are at the heart of computer science and play a crucial role in many applications, from machine learning and computational biology to cryptography and network routing. This course covers a wide range of topics, including sorting and searching algorithms, graph algorithms, dynamic programming, advanced data structures, algorithm design techniques, and the practical implementation of algorithms. Understanding these topics is critical to developing efficient and effective software systems.
+<img align="left" width="200" alt="algorithms" src="/images/teaching/algorithms-course.png"> An algorithm is a set of well-defined instructions for carrying out a particular task. Think of it as a recipe in a cookbook that guides you step by step to make a delicious dish. In the world of computing, algorithms are the backbone that powers programs and applications. They are logical sequences that tell a computer exactly what steps to take to solve a problem or achieve a goal. From simple tasks like sorting a list of numbers to complex operations like image processing or running search engines, algorithms are everywhere.
 
 * Ders Öğretim Planı <a href="../files/algorithms/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
+
 
 Duyurular
 ---
@@ -18,6 +19,7 @@ Duyurular
 * ödev 2 verildi <a href="../files/algorithms/slides/odev2.html">[html]</a>
 * Vize sonuçları <a href="../files/algorithms/slides/algoritmalarsonuc.htm">[html]</a>
 * ödev 1 verildi <a href="../files/algorithms/slides/odev1.html">[html]</a>
+
 
 The resources: 
 -----
@@ -32,10 +34,11 @@ The resources:
 * Algorithms Anim IDE <a href="https://anim.ide.sk/">[website]</a>
 * Algorithms DSALGO Visualizer <a href="https://github.com/jhabarsingh/DSALGO-VISUALIZER">[website]</a>
 
+
 Chapter 1: Introduction to Algorithms
 ---
 
-Algorithms serve as the fundamental building blocks of computer engineering, defining step-by-step procedures to solve computational problems. Their importance lies in their ability to streamline processes, optimize resource utilization, and facilitate efficient problem-solving in various domains. Algorithms come in diverse types, ranging from sorting and searching to graph traversal and machine learning. These algorithms are classified based on their functionality, complexity, and problem-solving approach. Asymptotic analysis is crucial in evaluating algorithm performance, offering insights into their efficiency and scalability as input size grows. It involves assessing algorithmic complexity, which quantifies the resources, such as time and space, required for execution. Big-O notation emerges as a standardized way to express algorithmic complexity, providing a concise representation of an algorithm's worst-case scenario and enabling comparisons between different algorithms to determine their efficiency and suitability for specific tasks.
+Algorithms are the step-by-step procedures that form the core of computer science, guiding computers through the maze of processing data. They are like the DNA of software, encoding the essence of problem-solving. Complexity, on the other hand, measures how an algorithm’s resource needs (like time and storage) grow as the input size increases. It’s a way to rate the efficiency of an algorithm, ensuring it can handle large amounts of data without breaking a sweat.
 
 * Sunum-Giriş <a href="../files/algorithms/slides/Bolum_01_Giris.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_01_Introduction.pdf">[pdf]</a>
@@ -45,7 +48,7 @@ Algorithms serve as the fundamental building blocks of computer engineering, def
 Chapter 2: Sorting Algorithms
 ---
 
-Sorting algorithms are used to organize data in a meaningful way, such as by increasing or decreasing order. They are used in a wide variety of applications, such as searching, data compression, and statistical analysis. Bubble Sort, though simple, works by repeatedly swapping adjacent elements until the entire list is sorted. Insertion Sort, on the other hand, is like sorting a deck of cards, one card at a time, inserting each card into its correct position among the already sorted cards. Selection Sort is like finding the smallest (or largest) card from an unsorted deck and placing it in its proper position in the sorted deck. Merge Sort employs a divide-and-conquer strategy, breaking the list into smaller parts, sorting them, and then merging them back together. Finally, Quick Sort is known for its speed, sorting the list by repeatedly dividing it based on a chosen pivot element. 
+Sorting algorithms are the architects of order, meticulously organizing data into a specific sequence, such as ascending or descending. They are fundamental tools in computer science, used to manage and retrieve data with efficiency and precision. There’s a variety of sorting methods, each with its own strategy and performance nuances.
 
 * Sunum-Sıralama Algoritmaları <a href="../files/algorithms/slides/Bolum_02_Siralama.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_02_Sorting.pdf">[pdf]</a>
@@ -55,7 +58,7 @@ Sorting algorithms are used to organize data in a meaningful way, such as by inc
 Chapter 3: Searching Algorithms
 ---
 
-Searching algorithms are used to find a specific value in a dataset. They are used in a wide variety of applications, such as finding a file on a computer, finding a customer in a database, and finding a word in a document. Linear search, although basic, traverses the dataset sequentially until it finds the desired value. Binary search, renowned for its efficiency with sorted arrays, repeatedly divides the dataset in half, narrowing down the search space until the value is found. Jump search optimizes linear search by jumping ahead in fixed-size steps, reducing the number of comparisons needed. Interpolation search, on the other hand, leverages the distribution of data to predict the probable location of the target value, making it especially efficient for uniformly distributed datasets.
+Searching algorithms are the detectives of the data world, designed to track down information with speed and accuracy. They are used in a wide variety of applications, such as finding a file on a computer, a customer in a database, and a word in a document. They come in various forms, each suited to different scenarios.
 
 * Sunum-Arama Algoritmaları <a href="../files/algorithms/slides/Bolum_03_Arama.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_03_Searching.pdf">[pdf]</a>
@@ -65,7 +68,7 @@ Searching algorithms are used to find a specific value in a dataset. They are us
 Chapter 4: Graph Algorithms
 ---
 
-Graphs, composed of nodes and edges, are ubiquitous in various domains, including social networks, transportation systems, and computational biology. Graph algorithms enable us to explore, analyze, and manipulate these complex structures efficiently. Graph traversal algorithms like Breadth-first search (BFS) and Depth-first search (DFS) enable us to explore the intricacies of graphs, uncovering their structure and connections. When it comes to finding the shortest path between nodes, Dijkstra's Algorithm and Bellman-Ford Algorithm come to the rescue, efficiently navigating through the labyrinth of edges and vertices. Minimum Spanning Tree algorithms, such as Prim's Algorithm and Kruskal's Algorithm, help us identify the most cost-effective way to connect all nodes in a graph. And when tackling network flow problems, like determining the maximum flow in a network, Ford-Fulkerson Algorithm and Edmonds-Karp Algorithm offer ingenious solutions, optimizing resource utilization and enhancing efficiency. 
+Graphs, composed of nodes and edges, are ubiquitous in various domains, including social networks, transportation systems, and computational biology. Graph algorithms are the masterminds behind the scenes of network analysis, adept at solving puzzles that involve points and connections. They help us navigate through complex networks, from social media graphs to city maps. Graph algorithms enable us to explore, analyze, and manipulate these complex structures efficiently. 
 
 * Sunum-Çizge Gezinme <a href="../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.pdf">[pdf]</a>
 * Sunum-Çizge En Kısa Yol <a href="../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.pdf">[pdf]</a>
@@ -78,7 +81,7 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
 Chapter 5: String Algorithms
 ---
 
-Have you ever wondered how your computer or smartphone handles text so efficiently? Whether you're searching for a specific word in a document, analyzing DNA sequences, or even just sending a text message, string algorithms are working behind the scenes to make it happen smoothly. String algorithms enable us to manipulate and analyze text data effectively. From searching for specific patterns within a string to comparing and modifying strings, these algorithms are incredibly versatile and find applications in various fields, including natural language processing, bioinformatics, and data processing. Whether it's finding the occurrence of a substring within a larger string, determining the longest common subsequence between two strings, or performing efficient string matching operations, string algorithms offer efficient and elegant solutions to a myriad of problems.
+Have you ever wondered how your computer or smartphone handles text so efficiently? String algorithms are the craftsmen of text processing, weaving through characters to perform tasks like searching, sorting, and editing text. They are crucial in fields like computational biology for DNA sequencing, in search engines for matching queries, or even in text editors for find-and-replace functions. 
 
 * Sunum-Dizgi Eşleme <a href="../files/algorithms/slides/Bolum_05_01_Dizgi_Esleme.pdf">[pdf]</a>
 * Sunum-Dizgi Sıkıştırma <a href="../files/algorithms/slides/Bolum_05_02_Dizgi_Sikistirma.pdf">[pdf]</a>
