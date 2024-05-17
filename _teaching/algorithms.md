@@ -8,7 +8,7 @@ date: 2024-01-07
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="algorithms" src="/images/teaching/algorithms-course.png"> Algorithms are at the heart of computer science and play a crucial role in many applications, from machine learning and computational biology to cryptography and network routing. In this course, we will cover a wide range of topics, including sorting and searching algorithms, graph algorithms, dynamic programming, advanced data structures, algorithm design techniques, and the practical implementation of algorithms. Understanding these topics is critical to developing efficient and effective software systems.
+<img align="left" width="200" alt="algorithms" src="/images/teaching/algorithms-course.png"> Algorithms are at the heart of computer science and play a crucial role in many applications, from machine learning and computational biology to cryptography and network routing. This course covers a wide range of topics, including sorting and searching algorithms, graph algorithms, dynamic programming, advanced data structures, algorithm design techniques, and the practical implementation of algorithms. Understanding these topics is critical to developing efficient and effective software systems.
 
 * Ders Öğretim Planı <a href="../files/algorithms/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
@@ -22,7 +22,7 @@ Duyurular
 The resources: 
 -----
 
-* Vize Soru Cevap <a href="../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf">[pdf]</a> Final Soru Cevap <a href="../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf">[pdf]</a>
+* Soru Cevap <a href="../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf">[Vize]</a> <a href="../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf">[Final]</a>
 * 2023-2024 Vize <a href="../files/algorithms/slides/2023-2024-vize-cevap.pdf">[pdf]</a>
 * Algorithms Visual Algo <a href="https://visualgo.net/en">[website]</a>
 * Algorithms Visual Algo Code <a href="https://github.com/stevenhalim/cpbook-code/tree/master/">[github]</a>
