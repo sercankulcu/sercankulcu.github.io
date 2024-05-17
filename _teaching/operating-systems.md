@@ -22,10 +22,11 @@ Duyurular
 The resources: 
 -----
 
-* Vize Soru Cevap <a href="../files/os/slides/Bolum_17_Soru_Cevap.pdf">[pdf]</a> Final Soru Cevap <a href="../files/os/slides/Bolum_18_Soru_Cevap.pdf">[pdf]</a>
-* MCQ Midterm <a href="../files/os/slides/midterm_mcq.txt">[txt]</a> MCQ Final <a href="../files/os/slides/final_mcq.txt">[txt]</a>
-* 2022-2023 Vize <a href="../files/os/slides/2022-2023-vize_cevaplar.pdf">[pdf]</a> Final <a href="../files/os/slides/2022-2023-final_cevaplar.pdf">[pdf]</a>
-* 2023-2024 Vize <a href="../files/os/slides/2023-2024-vize-cevap.pdf">[pdf]</a>
+* Soru Cevap <a href="../files/os/slides/Bolum_17_Soru_Cevap.pdf">[Vize]</a> <a href="../files/os/slides/Bolum_18_Soru_Cevap.pdf">[Final]</a>
+* MCQ  <a href="../files/os/slides/midterm_mcq.txt">[Midterm]</a> <a href="../files/os/slides/final_mcq.txt">[Final]</a>
+* 2022-2023 <a href="../files/os/slides/2022-2023-vize_cevaplar.pdf">[Vize]</a> <a href="../files/os/slides/2022-2023-final_cevaplar.pdf">[Final]</a>
+* 2023-2024 <a href="../files/os/slides/2023-2024-vize-cevap.pdf">[Vize]</a>
+
 * Modern Operating Systems, Andrew S. Tanenbaum <a href="https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X">[book]</a>
 * Operating System Concepts, A. SilberSchatz, P. Galvin, and G. Gagne <a href="https://www.os-book.com/OS10/index.html">[e-book]</a>
 * Operating Systems: Three Easy Pieces <a href="https://pages.cs.wisc.edu/~remzi/OSTEP">[e-book]</a>
@@ -50,8 +51,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 
 * **Slides [TR]** <a href="../files/os/slides/Bolum_01_Giris.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_1_Introduction.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter1">[link]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01">[link]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter1">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01">[c]</a>
 * Question & answers <a href="../files/os/questions/Chapter_1_Introduction.pdf">[pdf]</a>
 
 Chapter 2: Structures: 
