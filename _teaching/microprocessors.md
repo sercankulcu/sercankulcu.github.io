@@ -12,7 +12,7 @@ location: "Giresun, Turkey"
 
 * Ders Öğretim Planı <a href="../files/microprocessors/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
-* Soru-Cevap <a href="../files/microprocessors/slides/Bolum_12_Soru_Cevap.pdf">[pdf]</a>
+* Soru-Cevap <a href="../files/microprocessors/slides/Bolum_12_Soru_Cevap.pdf">[Vize]</a><a href="../files/microprocessors/slides/Bolum_13_Soru_Cevap.pdf">[Final]</a>
 
 * 2023-2024 Vize <a href="../files/microprocessors/slides/2023-2024-vize-cevap.pdf">[pdf]</a>
 
