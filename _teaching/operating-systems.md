@@ -51,7 +51,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 
 * **Slides [TR]** <a href="../files/os/slides/Bolum_01_Giris.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_1_Introduction.pdf">[pdf]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter1/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01">[c]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter01/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01">[c]</a>
 * Question & answers <a href="../files/os/questions/Chapter_1_Introduction.pdf">[pdf]</a>
 
 Chapter 2: Structures: 
@@ -61,7 +61,7 @@ The design and organization of an operating system's internal components and mec
 
 * **Slides [TR]** <a href="../files/os/slides/Bolum_02_Yapilar.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_2_Structures.pdf">[pdf]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter2/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab02">[c]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter02/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab02">[c]</a>
 * Question & answers <a href="../files/os/questions/Chapter_2_Structures.pdf">[pdf]</a>
 
 Chapter 3: Processes: 
@@ -71,7 +71,7 @@ In the world of operating systems, processes serve as the cornerstone of multi-t
 
 * **Slides [TR]** <a href="../files/os/slides/Bolum_03_Surecler.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_3_Processes.pdf">[pdf]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter3/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab03">[c]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter03/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab03">[c]</a>
 * Question & answers <a href="../files/os/questions/Chapter_3_Processes.pdf">[pdf]</a>
 
 Chapter 4: Threads: 
@@ -81,7 +81,7 @@ Threads, as lightweight execution units within a process, provide a powerful mec
 
 * **Slides [TR]** <a href="../files/os/slides/Bolum_04_Is_Parcaciklari.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_4_Threads.pdf">[pdf]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter4/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab04">[c]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter04/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab04">[c]</a>
 * Question & answers <a href="../files/os/questions/Chapter_4_Threads.pdf">[pdf]</a>
 
 Chapter 5: Scheduling: 
@@ -91,7 +91,7 @@ CPU scheduling is a critical component of any operating system, responsible for 
 
 * **Slides [TR]** <a href="../files/os/slides/Bolum_05_Cizelgeleme.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_5_Scheduling.pdf">[pdf]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter5/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab05">[c]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter05/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab05">[c]</a>
 * Question & answers <a href="../files/os/questions/Chapter_5_Scheduling.pdf">[pdf]</a>
 
 Chapter 6: Synchronization: 
@@ -101,7 +101,7 @@ In a multi-threaded or multi-process environment, synchronization mechanisms pro
 
 * **Slides [TR]** <a href="../files/os/slides/Bolum_06_Senkronizasyon.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_6_Synchronization.pdf">[pdf]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter6/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab06">[c]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter06/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab06">[c]</a>
 * Question & answers <a href="../files/os/questions/Chapter_6_Synchronization.pdf">[pdf]</a>
 
 Chapter 7: Deadlocks: 
@@ -111,7 +111,7 @@ Deadlocks, which occur when multiple processes or threads are blocked and unable
 
 * **Slides [TR]** <a href="../files/os/slides/Bolum_07_Kilitlenme.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_7_Deadlocks.pdf">[pdf]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter7/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab07">[c]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter07/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab07">[c]</a>
 * Question & answers <a href="../files/os/questions/Chapter_7_Deadlocks.pdf">[pdf]</a>
 
 
@@ -122,7 +122,7 @@ Memory management, which involves the allocation, monitoring, and protection of 
 
 * **Slides [TR]** <a href="../files/os/slides/Bolum_08_Bellek_Yonetimi.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_8_Memory_management.pdf">[pdf]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter8/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab08">[c]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter08/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab08">[c]</a>
 * Question & answers <a href="../files/os/questions/Chapter_8_Memory_management.pdf">[pdf]</a>
 
 Chapter 9: Virtual memory: 
@@ -132,7 +132,7 @@ Virtual memory, a key technique used by modern operating systems to manage memor
 
 * **Slides [TR]** <a href="../files/os/slides/Bolum_09_Sanal_Bellek.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_9_Virtual_memory.pdf">[pdf]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter9/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab09">[c]</a>
+* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter09/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab09">[c]</a>
 * Question & answers <a href="../files/os/questions/Chapter_9_Virtual_memory.pdf">[pdf]</a>
 
 Chapter 10: File systems: 
