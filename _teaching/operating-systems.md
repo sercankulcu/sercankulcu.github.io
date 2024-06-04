@@ -25,7 +25,7 @@ The resources:
 * Soru Cevap <a href="../files/os/slides/Bolum_17_Soru_Cevap.pdf">[Vize]</a> <a href="../files/os/slides/Bolum_18_Soru_Cevap.pdf">[Final]</a>
 * MCQ  <a href="../files/os/slides/midterm_mcq.txt">[Midterm]</a> <a href="../files/os/slides/final_mcq.txt">[Final]</a>
 * 2022-2023 <a href="../files/os/slides/2022-2023-vize_cevaplar.pdf">[Vize]</a> <a href="../files/os/slides/2022-2023-final_cevaplar.pdf">[Final]</a>
-* 2023-2024 <a href="../files/os/slides/2023-2024-vize-cevap.pdf">[Vize]</a>
+* 2023-2024 <a href="../files/os/slides/2023-2024-vize-cevap.pdf">[Vize]</a> <a href="../files/os/slides/2023-2024-telafi_cevaplar.pdf">[Telafi]</a>
 
 * Modern Operating Systems, Andrew S. Tanenbaum <a href="https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X">[book]</a>
 * Operating System Concepts, A. SilberSchatz, P. Galvin, and G. Gagne <a href="https://www.os-book.com/OS10/index.html">[e-book]</a>
