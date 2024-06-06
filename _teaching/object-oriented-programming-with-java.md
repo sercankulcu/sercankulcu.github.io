@@ -11,10 +11,8 @@ location: "Giresun, Turkey"
 <img align="left" width="200" alt="object oriented programming" src="/images/teaching/object-oriented-course-i.png"> Java is one of the most popular programming languages in use today, and it is widely used in many areas such as web development, mobile app development, and game development. This course is designed to introduce you to the core concepts of object-oriented programming in Java, including classes, objects, inheritance, polymorphism, encapsulation, and abstraction. Throughout the course, you will gain hands-on experience in writing Java code and building applications using OOP principles. 
 
 * Ders Öğretim Planı <a href="../files/java/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
-* 2022-2023 Vize <a href="../files/java/slides/2022-2023-vize-cevaplar.pdf">[pdf]</a>
-* 2022-2023 Telafi <a href="../files/java/slides/2022-2023-telafi-cevaplar.pdf">[pdf]</a>
-* 2022-2023 Final <a href="../files/java/slides/2022-2023-final-cevaplar.pdf">[pdf]</a>
-* 2023-2024 Vize <a href="../files/java/slides/2023-2024-vize-cevap.pdf">[pdf]</a>
+* 2022-2023 <a href="../files/java/slides/2022-2023-vize-cevaplar.pdf">[vize]</a> <a href="../files/java/slides/2022-2023-telafi-cevaplar.pdf">[telafi]</a> <a href="../files/java/slides/2022-2023-final-cevaplar.pdf">[final]</a>
+* 2023-2024 <a href="../files/java/slides/2023-2024-vize-cevap.pdf">[vize]</a> <a href="../files/java/slides/2023-2024-telafi-cevap.pdf">[telafi]</a>
 
 Duyurular
 ---
