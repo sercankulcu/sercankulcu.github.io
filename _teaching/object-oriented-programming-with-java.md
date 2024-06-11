@@ -102,7 +102,7 @@ Exception handling is a critical aspect of Java programming, providing a powerfu
 
 * Lecture Notes <a href="../files/java/Chapter_06_Exception_Handling.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders06/src">[java]</a>
-* Interview Exception Handling <a href="../files/java/Interview_Exception_Handling.pdf">[pdf]</a>
+* Interview Exception Handling <a href="../files/java/Chapter_06_Interview_Exception_Handling.pdf">[pdf]</a>
 
 Chapter 7: Working with Files and Input/Output
 -----
@@ -150,3 +150,7 @@ Testing and debugging are critical aspects of Java programming, providing a powe
 
 * Lecture Notes <a href="../files/java/Chapter_12_Testing_And_Debugging.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders11/src">[java]</a>
+
+
+* Interview <a href="../files/java/Interview_Garbage_Collectors.pdf">[pdf]</a>
+* Interview <a href="../files/java/Interview_Questions.pdf">[pdf]</a>
