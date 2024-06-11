@@ -41,7 +41,8 @@ Chapter 1: Introduction to Algorithms
 
 Algorithms are the step-by-step procedures that form the core of computer science, guiding computers through the maze of processing data. They are like the DNA of software, encoding the essence of problem-solving. Complexity, on the other hand, measures how an algorithm’s resource needs (like time and storage) grow as the input size increases. It’s a way to rate the efficiency of an algorithm, ensuring it can handle large amounts of data without breaking a sweat.
 
-* Sunum-Giriş <a href="../files/algorithms/slides/Bolum_01_Giris.pdf">[pdf]</a>
+* Sunum-Giriş <a href="../files/algorithms/slides/Bolum_01_01_Giris.pdf">[pdf]</a>
+* Sunum-Karmaşıklık <a href="../files/algorithms/slides/Bolum_01_02_Karmasiklik.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_01_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter1">[link]</a>
 
