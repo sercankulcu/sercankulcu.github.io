@@ -8,7 +8,7 @@ date: 2023-09-04
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="object oriented programming" src="/images/teaching/computer-and-programming.jpg" style="float: left; margin-right: 20px;"> This course is designed to provide a comprehensive understanding of fundamental concepts in computer science and information technology. Covering essential topics such as Basic Computer Knowledge, Word Processing with Microsoft Word, Spreadsheet Software using Excel, Presentation Skills with PowerPoint, Computer Arithmetic, Hardware and Software fundamentals, Introduction to Algorithms, Pseudo Code, Flowcharts, and Basic Java Programming. This course aims to equip with the necessary skills to navigate the digital landscape.  
+<img align="left" width="200" alt="object oriented programming" src="/images/teaching/computer-and-programming.jpg" style="float: left; margin-right: 10px;"> This course is designed to provide a comprehensive understanding of fundamental concepts in computer science and information technology. Covering essential topics such as Basic Computer Knowledge, Word Processing with Microsoft Word, Spreadsheet Software using Excel, Presentation Skills with PowerPoint, Computer Arithmetic, Hardware and Software fundamentals, Introduction to Algorithms, Pseudo Code, Flowcharts, and Basic Java Programming. This course aims to equip with the necessary skills to navigate the digital landscape.  
 
 * Ders Öğretim Planı <a href="../files/computer/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 

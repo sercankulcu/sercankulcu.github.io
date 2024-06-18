@@ -8,7 +8,7 @@ date: 2023-10-05
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="data structure" src="/images/teaching/data-structures-course.png"> Our journey through the world of data structures has been nothing short of enlightening. These fundamental concepts are the cornerstone of computer science and programming, and a deep understanding of them empowers us to write more efficient, organized, and robust code. I hope this exploration has ignited your curiosity and passion for data structures, as they are the key to unlocking the limitless possibilities of the digital world. Happy coding!
+<img align="left" width="200" alt="data structure" src="/images/teaching/data-structures-course.png" style="float: left; margin-right: 10px;"> Our journey through the world of data structures has been nothing short of enlightening. These fundamental concepts are the cornerstone of computer science and programming, and a deep understanding of them empowers us to write more efficient, organized, and robust code. I hope this exploration has ignited your curiosity and passion for data structures, as they are the key to unlocking the limitless possibilities of the digital world. Happy coding!
 
 * Ders Öğretim Planı <a href="../files/data_structures/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 * Vize cevaplar <a href="../files/data_structures/slides/2023-2024-vize-cevaplar.pdf">[pdf]</a>
