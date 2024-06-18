@@ -8,7 +8,7 @@ date: 2023-04-04
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="procedural programming with c" src="/images/teaching/procedural-programming-with-c.png" style="float: left; margin-right: 10px;"> C is a powerful and versatile programming language that is used in a wide variety of applications. It is a low-level language, which means that it gives you a lot of control over your programs. This makes it ideal for performance-critical applications. C is also a portable language, which means that your programs can be easily ported to different platforms. This course will teach you the fundamentals of C programming. 
+<img align="left" width="200" alt="procedural programming with c" src="/images/teaching/procedural-programming-with-c.png" style="float: left; margin-right: 10px;"> C is a robust and flexible programming language employed in numerous applications, ranging from operating systems and embedded systems to game development and high-performance computing. As a low-level language, it offers significant control over hardware and memory management, enabling developers to write highly efficient and optimized code. This level of control makes it perfect for performance-critical tasks where speed and resource management are paramount. Its influence is also seen in many modern languages, which have adopted its syntax and features, solidifying C's role as a foundational language in computer science and software development.
 
 Chapter 1: Introduction to C Programming
 -----
