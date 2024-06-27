@@ -16,11 +16,7 @@ location: "Giresun, Turkey"
 Duyurular
 ---
 
-* ödev 3 verildi <a href="../files/algorithms/slides/odev3.html">[html]</a>
-* ödev 2 verildi <a href="../files/algorithms/slides/odev2.html">[html]</a>
-* Vize sonuçları <a href="../files/algorithms/slides/algoritmalarsonuc.htm">[html]</a>
-* ödev 1 verildi <a href="../files/algorithms/slides/odev1.html">[html]</a>
-
+* Final sonuçları <a href="../files/algorithms/slides/algoritmalarsonuc.htm">[html]</a>
 
 The resources: 
 -----
