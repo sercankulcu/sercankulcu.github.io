@@ -16,8 +16,7 @@ location: "Giresun, Turkey"
 Duyurular
 -----
 
-* ödev 1 verildi <a href="../files/os/slides/odev1.html">[html]</a>
-* Vize sonuçları <a href="../files/os/slides/isletimsistemleri.htm">[html]</a>
+* Final sonuçları <a href="../files/os/slides/isletimsistemleri.htm">[html]</a>
 
 The resources: 
 -----
