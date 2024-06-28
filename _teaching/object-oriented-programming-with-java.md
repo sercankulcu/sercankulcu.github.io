@@ -17,7 +17,7 @@ location: "Giresun, Turkey"
 Duyurular
 ---
 
-* Vize sonuçları <a href="../files/java/slides/programlama.htm">[html]</a>
+* Final sonuçları <a href="../files/java/slides/programlama.htm">[html]</a>
 
 The resources
 ---
