@@ -19,7 +19,7 @@ location: "Giresun, Turkey"
 Duyurular
 ---
 
-* Vize sonuçları <a href="../files/microprocessors/slides/mikroislemciler.htm">[html]</a>
+* Final sonuçları <a href="../files/microprocessors/slides/mikroislemciler.htm">[html]</a>
 
 The resources:
 ---
