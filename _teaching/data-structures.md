@@ -11,13 +11,11 @@ location: "Giresun, Turkey"
 <img align="left" width="200" alt="data structure" src="/images/teaching/data-structures-course.png" style="float: left; margin-right: 10px;"> Data structures are fundamental components in computer science, serving as the building blocks for organizing, managing, and storing data efficiently. They enable the systematic arrangement of data to facilitate various operations such as searching, sorting, inserting, and deleting. Common data structures include arrays, linked lists, stacks, queues, trees, and graphs, each with unique properties and use cases. These fundamental concepts are the cornerstone of computer science and programming, and a deep understanding of them empowers us to write more efficient, organized, and robust code.
 
 * Ders Öğretim Planı <a href="../files/data_structures/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
-* Vize cevaplar <a href="../files/data_structures/slides/2023-2024-vize-cevaplar.pdf">[pdf]</a>
-* Final cevaplar <a href="../files/data_structures/slides/2023-2024-final-cevaplar.pdf">[pdf]</a>
-* Bütünleme cevaplar <a href="../files/data_structures/slides/2023-2024-butunleme-cevaplar.pdf">[pdf]</a>
 
 The resources:
 ---
 
+* 2023-2024 <a href="../files/data_structures/slides/2023-2024-vize-cevaplar.pdf">[vize]</a> <a href="../files/data_structures/slides/2023-2024-final-cevaplar.pdf">[final]</a> <a href="../files/data_structures/slides/2023-2024-butunleme-cevaplar.pdf">[bütünleme]</a>
 * Data Structures and Algorithms in Java 6th Edition by Michael T. Goodrich, Roberto Tamassia, Michael H. Goldwasser <a href="https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635">[book]</a>
 * CS-61B: Data Structures course page <a href="https://sp23.datastructur.es/">[website]</a>
 * CENG-213: Data Structures course page <a href="https://user.ceng.metu.edu.tr/~ys/ceng213-ds">[website]</a>
