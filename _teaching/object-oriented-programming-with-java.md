@@ -11,17 +11,15 @@ location: "Giresun, Turkey"
 <img align="left" width="200" alt="object oriented programming" src="/images/teaching/object-oriented-course-i.png" style="float: left; margin-right: 10px;"> Java is one of the most popular programming languages, extensively used in various fields such as web development, mobile app development, and game development. It encompasses key concepts like classes, objects, inheritance, polymorphism, encapsulation, and abstraction, which form the foundation of its Object-Oriented Programming (OOP) paradigm. These principles enable developers to create modular, reusable, and efficient code, fostering better software design and maintainability. Java's platform independence, achieved through the Java Virtual Machine (JVM), allows applications to run on any device equipped with a JVM, making it a versatile choice for cross-platform development. Additionally, Java's extensive standard library provides a wide range of tools and functionalities, simplifying many common programming tasks and enhancing productivity.
 
 * Ders Öğretim Planı <a href="../files/java/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
-* 2022-2023 <a href="../files/java/slides/2022-2023-vize-cevaplar.pdf">[vize]</a> <a href="../files/java/slides/2022-2023-telafi-cevaplar.pdf">[telafi]</a> <a href="../files/java/slides/2022-2023-final-cevaplar.pdf">[final]</a>
-* 2023-2024 <a href="../files/java/slides/2023-2024-vize-cevap.pdf">[vize]</a> <a href="../files/java/slides/2023-2024-telafi-cevap.pdf">[telafi]</a>
 
 Duyurular
 ---
 
-* Final sonuçları <a href="../files/java/slides/programlama.htm">[html]</a>
-
 The resources
 ---
 
+* 2022-2023 <a href="../files/java/slides/2022-2023-vize-cevaplar.pdf">[vize]</a> <a href="../files/java/slides/2022-2023-telafi-cevaplar.pdf">[telafi]</a> <a href="../files/java/slides/2022-2023-final-cevaplar.pdf">[final]</a>
+* 2023-2024 <a href="../files/java/slides/2023-2024-vize-cevap.pdf">[vize]</a> <a href="../files/java/slides/2023-2024-telafi-cevap.pdf">[telafi]</a>
 * Dev Java <a href="https://dev.java/learn/">[website]</a>
 * Java Youtube <a href="https://www.youtube.com/java">[youtube]</a>
 * Download Eclipse <a href="https://www.eclipse.org/downloads/packages/installer">[website]</a>

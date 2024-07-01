@@ -12,11 +12,8 @@ location: "Giresun, Turkey"
 
 * Ders Öğretim Planı <a href="../files/algorithms/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
-
 Duyurular
 ---
-
-* Final sonuçları <a href="../files/algorithms/slides/algoritmalarsonuc.htm">[html]</a>
 
 The resources: 
 -----

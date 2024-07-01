@@ -19,8 +19,6 @@ location: "Giresun, Turkey"
 Duyurular
 ---
 
-* Final sonuçları <a href="../files/microprocessors/slides/mikroislemciler.htm">[html]</a>
-
 The resources:
 ---
 
