@@ -16,8 +16,6 @@ location: "Giresun, Turkey"
 Duyurular
 -----
 
-* Final sonuçları <a href="../files/os/slides/isletimsistemleri.htm">[html]</a>
-
 The resources: 
 -----
 
