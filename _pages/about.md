@@ -12,6 +12,8 @@ redirect_from:
 
 I am Sercan Külcü, an assistant professor in the Computer Science Department at Giresun University. With a solid background of over 15 years in software engineering, I hold a PhD in wireless communication. My expertise includes low-power wireless communication, embedded and real-time operating systems, C/C++ programming, and machine learning applications. I have also been teaching courses in Object-Oriented Programming and Java since 2015.
 
+<a href="../game/2D-Car-Race.html">[2D car race]</a>
+
 **Note:** If any licensed content is found on the website, please don't hesitate to contact me via the links on the left-hand side. You can be sure that any related content will be quickly removed within 24 hours.
 
 

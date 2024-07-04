@@ -1,0 +1,190 @@
+<html><head>
+<title>2D Araba Yarışı</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+  }
+  #gameCanvas {
+    border: 2px solid #000;
+  }
+  #scoreboard {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 10px;
+    border-radius: 5px;
+  }
+  #gameOver {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    display: none;
+  }
+</style>
+</head>
+<body>
+<div id="scoreboard">Skor: <span id="score">0</span></div>
+<canvas id="gameCanvas" width="400" height="600"></canvas>
+<div id="gameOver">
+  <h2>Oyun Bitti!</h2>
+  <p>Skorunuz: <span id="finalScore"></span></p>
+  <h3>En Yüksek 5 Skor:</h3>
+  <ol id="highScores"></ol>
+  <button onclick="startGame()">Tekrar Oyna</button>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const scoreElement = document.getElementById('score');
+const gameOverElement = document.getElementById('gameOver');
+const finalScoreElement = document.getElementById('finalScore');
+const highScoresElement = document.getElementById('highScores');
+
+let car = { x: canvas.width / 2 - 15, y: canvas.height - 50, width: 30, height: 50 };
+let obstacles = [];
+let score = 0;
+let gameLoopInterval;
+let lastObstacleTime = 0;
+let speed = 2;
+let laneWidth = canvas.width / 3;
+
+function drawCar() {
+  ctx.fillStyle = 'red';
+  ctx.fillRect(car.x, car.y, car.width, car.height);
+}
+
+function drawObstacles() {
+  ctx.fillStyle = 'blue';
+  for (let obstacle of obstacles) {
+    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+  }
+}
+
+function drawRoad() {
+  ctx.fillStyle = '#888';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  ctx.strokeStyle = '#fff';
+  ctx.setLineDash([20, 20]);
+  ctx.beginPath();
+  ctx.moveTo(laneWidth, 0);
+  ctx.lineTo(laneWidth, canvas.height);
+  ctx.moveTo(laneWidth * 2, 0);
+  ctx.lineTo(laneWidth * 2, canvas.height);
+  ctx.stroke();
+}
+
+function updateObstacles() {
+  for (let obstacle of obstacles) {
+    obstacle.y += speed;
+  }
+  obstacles = obstacles.filter(obs => obs.y < canvas.height);
+  
+  if (Date.now() - lastObstacleTime > 1000) {
+    let lane = Math.floor(Math.random() * 9);
+    obstacles.push({
+      x: lane * laneWidth / 3,
+      y: -laneWidth / 2,
+      width: laneWidth / 3,
+      height: laneWidth / 2
+    });
+    lastObstacleTime = Date.now();
+  }
+}
+
+function checkCollision() {
+  for (let obstacle of obstacles) {
+    if (
+      car.x < obstacle.x + obstacle.width &&
+      car.x + car.width > obstacle.x &&
+      car.y < obstacle.y + obstacle.height &&
+      car.y + car.height > obstacle.y
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function updateScore() {
+  score++;
+  scoreElement.textContent = score;
+  if (score % 100 === 0) {
+    speed += 0.5;
+  }
+}
+
+function gameLoop() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  drawRoad();
+  drawCar();
+  drawObstacles();
+  updateObstacles();
+  updateScore();
+  
+  if (checkCollision()) {
+    endGame();
+  }
+}
+
+function startGame() {
+  car = { x: canvas.width / 2 - 15, y: canvas.height - 50, width: 30, height: 50 };
+  obstacles = [];
+  score = 0;
+  speed = 2;
+  lastObstacleTime = 0;
+  gameOverElement.style.display = 'none';
+  gameLoopInterval = setInterval(gameLoop, 1000 / 60);
+}
+
+function endGame() {
+  clearInterval(gameLoopInterval);
+  saveScore(score);
+  displayHighScores();
+  gameOverElement.style.display = 'block';
+  finalScoreElement.textContent = score;
+}
+
+function saveScore(score) {
+  let scores = JSON.parse(localStorage.getItem('highScores')) || [];
+  scores.push({score: score, date: new Date().toLocaleString()});
+  scores.sort((a, b) => b.score - a.score);
+  scores = scores.slice(0, 5);
+  localStorage.setItem('highScores', JSON.stringify(scores));
+}
+
+function displayHighScores() {
+  let scores = JSON.parse(localStorage.getItem('highScores')) || [];
+  highScoresElement.innerHTML = '';
+  for (let score of scores) {
+    let li = document.createElement('li');
+    li.textContent = `${score.score} puan - ${score.date}`;
+    highScoresElement.appendChild(li);
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft' && car.x > 0) {
+    car.x -= laneWidth / 3;
+  } else if (e.key === 'ArrowRight' && car.x < canvas.width - car.width) {
+    car.x += laneWidth / 3;
+  }
+});
+
+startGame();
+</script>
+</body></html>
