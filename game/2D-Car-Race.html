@@ -2,14 +2,15 @@
 <meta charset="UTF-8">
 <title>Retro Araba Yarışı</title>
 <style>
-  body {
+  body, html {
     margin: 0;
     padding: 0;
+    height: 100%;
+    overflow: hidden;
     background-color: #222;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     font-family: 'Press Start 2P', cursive;
     color: #fff;
   }
@@ -19,8 +20,9 @@
   #gameInfo {
     position: absolute;
     top: 10px;
-    left: 10px;
+    left: 50% - 40px;
     font-size: 16px;
+    z-index: 10;
   }
   #gameOver {
     display: none;
@@ -29,6 +31,7 @@
     padding: 20px;
     border-radius: 10px;
     text-align: center;
+    z-index: 20;
   }
   button {
     background: #0f0;
@@ -52,7 +55,7 @@
 </style>
 </head>
 <body>
-<canvas id="gameCanvas" width="300" height="600"></canvas>
+<canvas id="gameCanvas"></canvas>
 <div id="gameInfo">
   <div id="score">Score: 0</div>
   <div id="speed">Speed: 1x</div>
@@ -77,22 +80,38 @@ const finalScoreElement = document.getElementById('finalScore');
 const restartButton = document.getElementById('restartButton');
 const highScoresList = document.getElementById('highScoresList');
 
-const ROAD_WIDTH = canvas.width;
-const ROAD_HEIGHT = canvas.height;
-const LANE_COUNT = 3;
-const LANE_WIDTH = ROAD_WIDTH / LANE_COUNT;
-const CAR_WIDTH = 40;
-const CAR_HEIGHT = 60;
-const OBSTACLE_WIDTH = 40;
-const OBSTACLE_HEIGHT = 60;
-const INITIAL_SPEED = 2;
+// Set canvas dimensions
+function setCanvasDimensions() {
+  canvas.height = window.innerHeight;
+  canvas.width = window.innerHeight / 2;
+}
+
+setCanvasDimensions();
+window.addEventListener('resize', setCanvasDimensions);
+
+let ROAD_WIDTH, ROAD_HEIGHT, LANE_WIDTH, CAR_WIDTH, CAR_HEIGHT, OBSTACLE_WIDTH, OBSTACLE_HEIGHT;
+
+function updateDimensions() {
+  ROAD_WIDTH = canvas.width;
+  ROAD_HEIGHT = canvas.height;
+  LANE_COUNT = 3;
+  LANE_WIDTH = ROAD_WIDTH / LANE_COUNT;
+  CAR_WIDTH = ROAD_WIDTH * 0.13;
+  CAR_HEIGHT = ROAD_HEIGHT * 0.1;
+  OBSTACLE_WIDTH = ROAD_WIDTH * 0.13;
+  OBSTACLE_HEIGHT = ROAD_HEIGHT * 0.1;
+}
+
+updateDimensions();
+
+const INITIAL_SPEED = 3;
 const SPEED_INCREASE = 0.0001;
 const MAX_SPEED = 10;
-const OBSTACLE_SPAWN_RATE = 0.005; // Reduced from 0.02 to 0.005
+const OBSTACLE_SPAWN_RATE = 0.005;
 
 let car = {
-  x: ROAD_WIDTH / 2 - CAR_WIDTH / 2,
-  y: ROAD_HEIGHT - CAR_HEIGHT - 20,
+  x: 0,
+  y: 0,
   lane: 1
 };
 
@@ -102,12 +121,18 @@ let gameSpeed = INITIAL_SPEED;
 let isGameOver = false;
 let animationId;
 
+function resetCarPosition() {
+  car.lane = 1;
+  car.x = car.lane * LANE_WIDTH + (LANE_WIDTH - CAR_WIDTH) / 2;
+  car.y = ROAD_HEIGHT - CAR_HEIGHT - 20;
+}
+
 function drawRoad() {
   ctx.fillStyle = '#333';
   ctx.fillRect(0, 0, ROAD_WIDTH, ROAD_HEIGHT);
   
   ctx.strokeStyle = '#fff';
-  ctx.setLineDash([20, 20]);
+  ctx.setLineDash([ROAD_HEIGHT * 0.03, ROAD_HEIGHT * 0.03]);
   for (let i = 1; i < LANE_COUNT; i++) {
     ctx.beginPath();
     ctx.moveTo(i * LANE_WIDTH, 0);
@@ -122,9 +147,9 @@ function drawCar() {
   
   // Add some details to the car
   ctx.fillStyle = '#000';
-  ctx.fillRect(car.x + 5, car.y + 5, 10, 10); // Left window
-  ctx.fillRect(car.x + CAR_WIDTH - 15, car.y + 5, 10, 10); // Right window
-  ctx.fillRect(car.x + 5, car.y + CAR_HEIGHT - 15, CAR_WIDTH - 10, 10); // Rear window
+  ctx.fillRect(car.x + CAR_WIDTH * 0.1, car.y + CAR_HEIGHT * 0.1, CAR_WIDTH * 0.3, CAR_HEIGHT * 0.2); // Left window
+  ctx.fillRect(car.x + CAR_WIDTH * 0.6, car.y + CAR_HEIGHT * 0.1, CAR_WIDTH * 0.3, CAR_HEIGHT * 0.2); // Right window
+  ctx.fillRect(car.x + CAR_WIDTH * 0.1, car.y + CAR_HEIGHT * 0.7, CAR_WIDTH * 0.8, CAR_HEIGHT * 0.2); // Rear window
 }
 
 function drawObstacles() {
@@ -134,9 +159,9 @@ function drawObstacles() {
     
     // Add some details to the obstacles
     ctx.fillStyle = '#000';
-    ctx.fillRect(obstacle.x + 5, obstacle.y + 5, 10, 10); // Left window
-    ctx.fillRect(obstacle.x + OBSTACLE_WIDTH - 15, obstacle.y + 5, 10, 10); // Right window
-    ctx.fillRect(obstacle.x + 5, obstacle.y + OBSTACLE_HEIGHT - 15, OBSTACLE_WIDTH - 10, 10); // Rear window
+    ctx.fillRect(obstacle.x + OBSTACLE_WIDTH * 0.1, obstacle.y + OBSTACLE_HEIGHT * 0.1, OBSTACLE_WIDTH * 0.3, OBSTACLE_HEIGHT * 0.2); // Left window
+    ctx.fillRect(obstacle.x + OBSTACLE_WIDTH * 0.6, obstacle.y + OBSTACLE_HEIGHT * 0.1, OBSTACLE_WIDTH * 0.3, OBSTACLE_HEIGHT * 0.2); // Right window
+    ctx.fillRect(obstacle.x + OBSTACLE_WIDTH * 0.1, obstacle.y + OBSTACLE_HEIGHT * 0.7, OBSTACLE_WIDTH * 0.8, OBSTACLE_HEIGHT * 0.2); // Rear window
   });
 }
 
@@ -225,8 +250,8 @@ function displayHighScores() {
 }
 
 function resetGame() {
-  car.lane = 1;
-  car.x = car.lane * LANE_WIDTH + (LANE_WIDTH - CAR_WIDTH) / 2;
+  updateDimensions();
+  resetCarPosition();
   obstacles = [];
   score = 0;
   gameSpeed = INITIAL_SPEED;
@@ -253,6 +278,7 @@ canvas.addEventListener('click', (e) => {
 
 restartButton.addEventListener('click', resetGame);
 
+resetCarPosition();
 gameLoop();
 </script>
 </body></html>
