@@ -34,10 +34,10 @@ Chapter 1: Introduction to Algorithms
 
 Algorithms are the step-by-step procedures that form the core of computer science, guiding computers through the maze of processing data. They are like the DNA of software, encoding the essence of problem-solving. Complexity, on the other hand, measures how an algorithm’s resource needs (like time and storage) grow as the input size increases. It’s a way to rate the efficiency of an algorithm, ensuring it can handle large amounts of data without breaking a sweat.
 
-* Run time analysis <a href="../files/algorithms/slides/ComplexityGraph.html">[click]</a>
-
 * Sunum-Giriş <a href="../files/algorithms/slides/Bolum_01_01_Giris.pdf">[pdf]</a>
 * Sunum-Karmaşıklık <a href="../files/algorithms/slides/Bolum_01_02_Karmasiklik.pdf">[pdf]</a>
+* Run time analysis <a href="../files/algorithms/slides/Bolum_01_02_Karmasiklik.html">[click]</a>
+
 * Lecture Notes <a href="../files/algorithms/Chapter_01_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter1">[link]</a>
 
@@ -68,9 +68,11 @@ Chapter 4: Graph Algorithms
 Graphs, composed of nodes and edges, are ubiquitous in various domains, including social networks, transportation systems, and computational biology. Graph algorithms are the masterminds behind the scenes of network analysis, adept at solving puzzles that involve points and connections. They help us navigate through complex networks, from social media graphs to city maps. Graph algorithms enable us to explore, analyze, and manipulate these complex structures efficiently. 
 
 * Sunum-Çizge Gezinme <a href="../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.pdf">[pdf]</a>
+* BFS DFS <a href="../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.html">[click]</a>
 * Sunum-Çizge En Kısa Yol <a href="../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.pdf">[pdf]</a>
 * Sunum-Çizge Minimum Kapsayan <a href="../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.pdf">[pdf]</a>
 * Sunum-Çizge Ağ Akış <a href="../files/algorithms/slides/Bolum_04_04_Ag_Akis.pdf">[pdf]</a>
+
 * Lecture Notes <a href="../files/algorithms/Chapter_04_Graph.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter4">[link]</a>
 
