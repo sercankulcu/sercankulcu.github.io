@@ -18,8 +18,8 @@ Duyurular
 The resources: 
 -----
 
-* Soru Cevap <a href="../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf">[Vize]</a> <a href="../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf">[Final]</a>
-* 2023-2024 Vize <a href="../files/algorithms/slides/2023-2024-vize-cevap.pdf">[pdf]</a>
+* Soru Cevap <a href="../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf">[vize]</a> <a href="../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf">[final]</a>
+* 2023-2024 <a href="../files/algorithms/slides/2023-2024-vize-cevap.pdf">[vize]</a><a href="../files/algorithms/slides/2023-2024-final-a-cevap.pdf">[final-a]</a><a href="../files/algorithms/slides/2023-2024-final-b-cevap.pdf">[final-b]</a><a href="../files/algorithms/slides/2023-2024-butunleme-cevap.pdf">[bütünleme]</a>
 * Algorithms Visual Algo <a href="https://visualgo.net/en">[website]</a>
 * Algorithms Visual Algo Code <a href="https://github.com/stevenhalim/cpbook-code/tree/master/">[github]</a>
 * Algorithms Algoanim <a href="http://www.algoanim.ide.sk/">[website]</a>
