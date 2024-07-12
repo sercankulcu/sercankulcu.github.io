@@ -12,15 +12,14 @@ location: "Giresun, Turkey"
 
 * Ders Öğretim Planı <a href="../files/microprocessors/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
-* Soru-Cevap <a href="../files/microprocessors/slides/Bolum_12_Soru_Cevap.pdf">[Vize]</a><a href="../files/microprocessors/slides/Bolum_13_Soru_Cevap.pdf">[Final]</a>
-
-* 2023-2024 Vize <a href="../files/microprocessors/slides/2023-2024-vize-cevap.pdf">[pdf]</a>
-
 Duyurular
 ---
 
 The resources:
 ---
+
+* Soru-Cevap <a href="../files/microprocessors/slides/Bolum_12_Soru_Cevap.pdf">[Vize]</a><a href="../files/microprocessors/slides/Bolum_13_Soru_Cevap.pdf">[Final]</a>
+* 2023-2024 <a href="../files/microprocessors/slides/2023-2024-vize-cevap.pdf">[vize]</a><a href="../files/microprocessors/slides/2023-2024-final-cevap.pdf">[final]</a><a href="../files/microprocessors/slides/2023-2024-butunleme-cevap.pdf">[bütünleme]</a>
 
 * Emu8086 Microprocessor Emulator <a href="https://emu8086-microprocessor-emulator.en.softonic.com/">[website]</a>
 * CPU Emulator <a href="https://www.cmpe.boun.edu.tr/~tugcu/animations/cpu-simulator/cpu-simulator.html">[website]</a>
