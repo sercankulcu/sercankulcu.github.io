@@ -38,6 +38,7 @@ Chapter 2: Arrays
 Arrays are like the bread and butter of programming. They allow us to store a collection of elements of the same data type in contiguous memory locations, making it efficient to access and manipulate individual elements. Arrays are the building blocks upon which we construct more complex data structures, and understanding them is a crucial first step.
 
 * Sunum-Diziler <a href="../files/data_structures/slides/Bolum_02_Diziler.pdf">[pdf]</a>
+* Array Simulator <a href="../files/data_structures/slides/Bolum_02_Diziler.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture02">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders02">[tr]</a>
 
@@ -48,6 +49,7 @@ Chapter 3: Linked Lists
 Linked lists are dynamic and flexible data structures that consist of nodes connected through pointers. Unlike arrays, linked lists don't require contiguous memory, making them ideal for scenarios where data needs to be dynamically allocated or deallocated. Linked lists are foundational to understanding data organization and serve as the basis for more advanced structures.
 
 * Sunum-Bağlı-Liste <a href="../files/data_structures/slides/Bolum_03_Bagli_Liste.pdf">[pdf]</a>
+* Linked List Simulator <a href="../files/data_structures/slides/Bolum_03_Bagli_Liste.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture03">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders03">[tr]</a>
 
