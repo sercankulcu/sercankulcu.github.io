@@ -60,6 +60,7 @@ Chapter 4: Stacks
 Our journey continues with stacks, which follow the Last-In-First-Out (LIFO) principle. Stacks are versatile and used in a myriad of applications, from managing function calls to evaluating expressions. Mastering stacks is essential for writing efficient and well-organized code, especially in situations where we need to keep track of data in a disciplined manner.
 
 * Sunum-Yığın <a href="../files/data_structures/slides/Bolum_04_Yigin.pdf">[pdf]</a>
+* Stack Simulator <a href="../files/data_structures/slides/Bolum_04_Yigin.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture04">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders04">[tr]</a>
 
@@ -70,6 +71,7 @@ Chapter 5: Queues
 Next up are queues, adhering to the First-In-First-Out (FIFO) principle. They play a pivotal role in scenarios such as task scheduling and resource management. Understanding queues is essential for ensuring tasks are executed systematically and fairly.
 
 * Sunum-Kuyruk <a href="../files/data_structures/slides/Bolum_05_Kuyruk.pdf">[pdf]</a>
+* Queue Simulator <a href="../files/data_structures/slides/Bolum_05_Kuyruk.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture05">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders05">[tr]</a>
 
@@ -95,6 +97,7 @@ Trees, one of the most intriguing and versatile data structures, take center sta
 * Ödev 4 verildi <a href="../files/data_structures/slides/odev4.html">[html]</a>
 
 * Sunum-Ağaç <a href="../files/data_structures/slides/Bolum_07_Agac.pdf">[pdf]</a>
+* Binary Tree Simulator <a href="../files/data_structures/slides/Bolum_07_Agac.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture07">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders07">[tr]</a>
 
