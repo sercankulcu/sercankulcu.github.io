@@ -1,0 +1,304 @@
+<html><head>
+<title>Red-Black Tree Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+	margin: 0 auto;
+    padding: 2vh;
+    background-color: #f0f0f0;
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #tree-container {
+    width: 100vh;
+    height: 50vh;
+    border: 1px solid #ccc;
+    margin-bottom: 2vh;
+    background-color: white;
+  }
+  .node {
+    stroke-width: 2px;
+    stroke: #333;
+  }
+  .node.red {
+    fill: #ff6b6b;
+  }
+  .node.black {
+    fill: #4d4d4d;
+  }
+  .link {
+    fill: none;
+    stroke: #555;
+    stroke-width: 2px;
+  }
+  #controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 2vh;
+  }
+  button, input {
+    padding: 1vh;
+    font-size: 2vh;
+  }
+  #info {
+    width: 96vh;
+    background-color: white;
+    padding: 2vh;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+</style>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <h1>Red-Black Tree Simulator</h1>
+  <div id="tree-container"></div>
+  <div id="controls">
+    <input type="number" id="insert-value" placeholder="Enter a number">
+    <button onclick="insertNode()">Insert</button>
+    <button onclick="deleteNode()">Delete</button>
+    <button onclick="resetTree()">Reset Tree</button>
+  </div>
+  <div id="info">
+    <h2>Red-Black Tree Properties:</h2>
+    <ul>
+      <li>Every node is either red or black.</li>
+      <li>The root is always black.</li>
+      <li>Every leaf (NIL) is black.</li>
+      <li>If a node is red, then both its children are black.</li>
+      <li>For each node, all paths from the node to descendant leaves contain the same number of black nodes.</li>
+    </ul>
+  </div>
+
+<script>
+class Node {
+  constructor(value) {
+    this.value = value;
+    this.color = 'red';
+    this.left = null;
+    this.right = null;
+    this.parent = null;
+  }
+}
+
+class RedBlackTree {
+  constructor() {
+    this.root = null;
+  }
+
+  insert(value) {
+    let newNode = new Node(value);
+    if (this.root === null) {
+      this.root = newNode;
+      this.root.color = 'black';
+    } else {
+      this.insertNode(this.root, newNode);
+      this.fixInsert(newNode);
+    }
+  }
+
+  insertNode(node, newNode) {
+    if (newNode.value < node.value) {
+      if (node.left === null) {
+        node.left = newNode;
+        newNode.parent = node;
+      } else {
+        this.insertNode(node.left, newNode);
+      }
+    } else {
+      if (node.right === null) {
+        node.right = newNode;
+        newNode.parent = node;
+      } else {
+        this.insertNode(node.right, newNode);
+      }
+    }
+  }
+
+  fixInsert(node) {
+    while (node.parent && node.parent.color === 'red') {
+      let uncle;
+      if (node.parent === node.parent.parent.left) {
+        uncle = node.parent.parent.right;
+        if (uncle && uncle.color === 'red') {
+          node.parent.color = 'black';
+          uncle.color = 'black';
+          node.parent.parent.color = 'red';
+          node = node.parent.parent;
+        } else {
+          if (node === node.parent.right) {
+            node = node.parent;
+            this.rotateLeft(node);
+          }
+          node.parent.color = 'black';
+          node.parent.parent.color = 'red';
+          this.rotateRight(node.parent.parent);
+        }
+      } else {
+        uncle = node.parent.parent.left;
+        if (uncle && uncle.color === 'red') {
+          node.parent.color = 'black';
+          uncle.color = 'black';
+          node.parent.parent.color = 'red';
+          node = node.parent.parent;
+        } else {
+          if (node === node.parent.left) {
+            node = node.parent;
+            this.rotateRight(node);
+          }
+          node.parent.color = 'black';
+          node.parent.parent.color = 'red';
+          this.rotateLeft(node.parent.parent);
+        }
+      }
+    }
+    this.root.color = 'black';
+  }
+
+  rotateLeft(node) {
+    let rightChild = node.right;
+    node.right = rightChild.left;
+    if (rightChild.left) {
+      rightChild.left.parent = node;
+    }
+    rightChild.parent = node.parent;
+    if (!node.parent) {
+      this.root = rightChild;
+    } else if (node === node.parent.left) {
+      node.parent.left = rightChild;
+    } else {
+      node.parent.right = rightChild;
+    }
+    rightChild.left = node;
+    node.parent = rightChild;
+  }
+
+  rotateRight(node) {
+    let leftChild = node.left;
+    node.left = leftChild.right;
+    if (leftChild.right) {
+      leftChild.right.parent = node;
+    }
+    leftChild.parent = node.parent;
+    if (!node.parent) {
+      this.root = leftChild;
+    } else if (node === node.parent.right) {
+      node.parent.right = leftChild;
+    } else {
+      node.parent.left = leftChild;
+    }
+    leftChild.right = node;
+    node.parent = leftChild;
+  }
+
+  delete(value) {
+    this.deleteNode(this.root, value);
+  }
+
+  deleteNode(node, value) {
+    if (!node) return null;
+    if (value < node.value) {
+      node.left = this.deleteNode(node.left, value);
+    } else if (value > node.value) {
+      node.right = this.deleteNode(node.right, value);
+    } else {
+      if (!node.left) return node.right;
+      if (!node.right) return node.left;
+      let temp = this.minValueNode(node.right);
+      node.value = temp.value;
+      node.right = this.deleteNode(node.right, temp.value);
+    }
+    return node;
+  }
+
+  minValueNode(node) {
+    let current = node;
+    while (current.left) {
+      current = current.left;
+    }
+    return current;
+  }
+}
+
+const tree = new RedBlackTree();
+let svg, g;
+
+function initializeTree() {
+  d3.select("#tree-container").selectAll("*").remove();
+  svg = d3.select("#tree-container")
+    .append("svg")
+    .attr("width", "100%")
+    .attr("height", "100%");
+  g = svg.append("g")
+    .attr("transform", "translate(50,50)");
+}
+
+function updateTree() {
+  g.selectAll("*").remove();
+  if (tree.root) drawTree(tree.root, 300, 50, 150);
+}
+
+function drawTree(node, x, y, horizontalSpacing) {
+  if (!node) return;
+
+  g.append("circle")
+    .attr("cx", x)
+    .attr("cy", y)
+    .attr("r", 20)
+    .attr("class", `node ${node.color}`);
+
+  g.append("text")
+    .attr("x", x)
+    .attr("y", y)
+    .attr("dy", "0.35em")
+    .attr("text-anchor", "middle")
+    .attr("fill", "white")
+    .text(node.value);
+
+  if (node.left) {
+    g.append("line")
+      .attr("class", "link")
+      .attr("x1", x-5)
+      .attr("y1", y)
+      .attr("x2", x - horizontalSpacing)
+      .attr("y2", y + 50);
+    drawTree(node.left, x - horizontalSpacing, y + 50, horizontalSpacing / 2);
+  }
+
+  if (node.right) {
+    g.append("line")
+      .attr("class", "link")
+      .attr("x1", x+5)
+      .attr("y1", y)
+      .attr("x2", x + horizontalSpacing)
+      .attr("y2", y + 50);
+    drawTree(node.right, x + horizontalSpacing, y + 50, horizontalSpacing / 2);
+  }
+}
+
+function insertNode() {
+  const value = parseInt(document.getElementById("insert-value").value);
+  if (!isNaN(value)) {
+    tree.insert(value);
+    updateTree();
+  }
+}
+
+function deleteNode() {
+  const value = parseInt(document.getElementById("insert-value").value);
+  if (!isNaN(value)) {
+    tree.delete(value);
+    updateTree();
+  }
+}
+
+function resetTree() {
+  tree = new RedBlackTree();
+  updateTree();
+}
+
+initializeTree();
+</script>
+</body></html>
