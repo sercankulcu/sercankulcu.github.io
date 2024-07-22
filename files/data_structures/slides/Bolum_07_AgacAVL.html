@@ -1,0 +1,273 @@
+<html><head>
+<title>AVL Tree Simulator</title><style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #f0f0f0;
+    }
+    #container {
+        width: 100vh;
+        height: 80vh;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        margin: 2vh;
+        padding: 2vh;
+    }
+    #controls {
+        margin-bottom: 2vh;
+    }
+    #tree-container {
+        width: 100%;
+        height: 75vh;
+        border: 1px solid #ccc;
+        position: relative;
+    }
+    .node {
+        width: 6vh;
+        height: 6vh;
+        background-color: #4CAF50;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-weight: bold;
+        position: absolute;
+        transition: all 0.5s ease;
+    }
+    .link {
+        position: absolute;
+        background-color: #333;
+        height: 2px;
+        transition: all 0.5s ease;
+    }
+</style></head><body>
+    <h1>AVL Tree Simulator</h1>
+    <div id="container">
+        <div id="controls">
+            <input type="number" id="value-input" placeholder="Enter a number">
+            <button onclick="insertValue()">Insert</button>
+            <button onclick="deleteValue()">Delete</button>
+            <button onclick="resetTree()">Reset</button>
+        </div>
+        <div id="tree-container"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script>
+        class AVLNode {
+            constructor(value) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+                this.height = 1;
+            }
+        }
+
+        class AVLTree {
+            constructor() {
+                this.root = null;
+            }
+
+            height(node) {
+                return node ? node.height : 0;
+            }
+
+            updateHeight(node) {
+                node.height = 1 + Math.max(this.height(node.left), this.height(node.right));
+            }
+
+            balanceFactor(node) {
+                return this.height(node.left) - this.height(node.right);
+            }
+
+            rotateRight(y) {
+                let x = y.left;
+                let T2 = x.right;
+                x.right = y;
+                y.left = T2;
+                this.updateHeight(y);
+                this.updateHeight(x);
+                return x;
+            }
+
+            rotateLeft(x) {
+                let y = x.right;
+                let T2 = y.left;
+                y.left = x;
+                x.right = T2;
+                this.updateHeight(x);
+                this.updateHeight(y);
+                return y;
+            }
+
+            insert(value) {
+                this.root = this._insert(this.root, value);
+                updateTreeView();
+            }
+
+            _insert(node, value) {
+                if (!node) return new AVLNode(value);
+                if (value < node.value) node.left = this._insert(node.left, value);
+                else if (value > node.value) node.right = this._insert(node.right, value);
+                else return node;
+
+                this.updateHeight(node);
+                let balance = this.balanceFactor(node);
+
+                if (balance > 1) {
+                    if (value < node.left.value) {
+                        return this.rotateRight(node);
+                    } else {
+                        node.left = this.rotateLeft(node.left);
+                        return this.rotateRight(node);
+                    }
+                }
+                if (balance < -1) {
+                    if (value > node.right.value) {
+                        return this.rotateLeft(node);
+                    } else {
+                        node.right = this.rotateRight(node.right);
+                        return this.rotateLeft(node);
+                    }
+                }
+                return node;
+            }
+
+            delete(value) {
+                this.root = this._delete(this.root, value);
+                updateTreeView();
+            }
+
+            _delete(node, value) {
+                if (!node) return node;
+                if (value < node.value) node.left = this._delete(node.left, value);
+                else if (value > node.value) node.right = this._delete(node.right, value);
+                else {
+                    if (!node.left || !node.right) {
+                        let temp = node.left ? node.left : node.right;
+                        if (!temp) {
+                            temp = node;
+                            node = null;
+                        } else {
+                            node = temp;
+                        }
+                    } else {
+                        let temp = this.minValueNode(node.right);
+                        node.value = temp.value;
+                        node.right = this._delete(node.right, temp.value);
+                    }
+                }
+
+                if (!node) return node;
+
+                this.updateHeight(node);
+                let balance = this.balanceFactor(node);
+
+                if (balance > 1) {
+                    if (this.balanceFactor(node.left) >= 0) {
+                        return this.rotateRight(node);
+                    } else {
+                        node.left = this.rotateLeft(node.left);
+                        return this.rotateRight(node);
+                    }
+                }
+                if (balance < -1) {
+                    if (this.balanceFactor(node.right) <= 0) {
+                        return this.rotateLeft(node);
+                    } else {
+                        node.right = this.rotateRight(node.right);
+                        return this.rotateLeft(node);
+                    }
+                }
+                return node;
+            }
+
+            minValueNode(node) {
+                let current = node;
+                while (current.left) {
+                    current = current.left;
+                }
+                return current;
+            }
+        }
+
+        const tree = new AVLTree();
+        const treeContainer = document.getElementById('tree-container');
+
+        function updateTreeView() {
+            const containerHeight = treeContainer.clientHeight;
+            const containerWidth = treeContainer.clientWidth;
+            treeContainer.innerHTML = '';
+            if (tree.root) {
+                const queue = [{node: tree.root, x: containerWidth / 2, y: containerHeight * 0.05, level: 0}];
+                while (queue.length > 0) {
+                    const {node, x, y, level} = queue.shift();
+                    createNodeElement(node, x, y);
+                    if (node.left) {
+                        const newX = x - containerWidth / 2 / (Math.pow(2, level + 1));
+                        const newY = y + containerHeight * 0.1;
+                        queue.push({node: node.left, x: newX, y: newY, level: level + 1});
+                        createLinkElement(x + 20, y + 10, newX + 20, newY + 10);
+                    }
+                    if (node.right) {
+                        const newX = x + containerWidth / 2 / (Math.pow(2, level + 1));
+                        const newY = y + containerHeight * 0.1;
+                        queue.push({node: node.right, x: newX, y: newY, level: level + 1});
+                        createLinkElement(x + 20, y + 10, newX + 20, newY + 10);
+                    }
+                }
+            }
+        }
+
+        function createNodeElement(node, x, y) {
+            const nodeElement = document.createElement('div');
+            nodeElement.className = 'node';
+            nodeElement.style.left = `${x}px`;
+            nodeElement.style.top = `${y}px`;
+            nodeElement.textContent = node.value;
+            treeContainer.appendChild(nodeElement);
+        }
+
+        function createLinkElement(x1, y1, x2, y2) {
+            const link = document.createElement('div');
+            link.className = 'link';
+            const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+            link.style.width = `${length}px`;
+            link.style.left = `${x1}px`;
+            link.style.top = `${y1 + 20}px`;
+            link.style.transform = `rotate(${angle}deg)`;
+            link.style.transformOrigin = '0 0';
+            treeContainer.appendChild(link);
+        }
+
+        function insertValue() {
+            const value = parseInt(document.getElementById('value-input').value);
+            if (!isNaN(value)) {
+                tree.insert(value);
+                document.getElementById('value-input').value = '';
+            }
+        }
+
+        function deleteValue() {
+            const value = parseInt(document.getElementById('value-input').value);
+            if (!isNaN(value)) {
+                tree.delete(value);
+                document.getElementById('value-input').value = '';
+            }
+        }
+
+        function resetTree() {
+            tree.root = null;
+            updateTreeView();
+        }
+
+        // Initialize with some values
+        [10, 20, 30, 40, 50, 25].forEach(value => tree.insert(value));
+        updateTreeView();
+    </script>
+</body></html>
