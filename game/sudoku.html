@@ -1,0 +1,290 @@
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sudoku Challenge</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+		height: 100vh;
+        background-color: #f0f0f0;
+    }
+    .container {
+        max-width: 500px;
+        width: 95%;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        padding: 1vh;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    #sudoku-grid {
+        display: grid;
+        grid-template-columns: repeat(9, 6vh);
+        gap: 2px;
+        margin-bottom: 2vh;
+		        padding-left: 6vh;
+
+    }
+    .cell {
+        aspect-ratio: 1 / 1;
+        border: 1px solid #ccc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 3vh;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .cell:nth-child(3n) {
+        border-right: 1px solid #999;
+    }
+    .cell:nth-child(9n) {
+        border-right: 1px solid #ccc;
+    }
+    .row:nth-child(3n) .cell {
+        border-bottom: 2px solid #999;
+    }
+    .fixed {
+        background-color: #f0f0f0;
+        cursor: not-allowed;
+    }
+    .selected {
+        background-color: #e6f3ff;
+    }
+    .error {
+        color: red;
+    }
+    .controls {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1vh;
+    }
+    button {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 1vh 1.5vh;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 2.5vh;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 5px;
+		width: 20vh;
+    }
+    #number-pad {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+    }
+    #number-pad button {
+        background-color: #008CBA;
+    }
+    @media (max-width: 480px) {
+        .cell {
+            font-size: 16px;
+        }
+        button {
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Sudoku Challenge</h1>
+    <div class="controls">
+        <button id="new-game">New Game</button>
+        <button id="check">Check Solution</button>
+    </div>
+    <div id="sudoku-grid"></div>
+    <div id="number-pad">
+        <button>1</button>
+        <button>2</button>
+        <button>3</button>
+        <button>4</button>
+        <button>5</button>
+        <button>6</button>
+        <button>7</button>
+        <button>8</button>
+        <button>9</button>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+<script>
+    const grid = document.getElementById('sudoku-grid');
+    const newGameBtn = document.getElementById('new-game');
+    const checkBtn = document.getElementById('check');
+    const numberPad = document.getElementById('number-pad');
+    
+    let selectedCell = null;
+    let puzzle = [];
+
+    function createGrid() {
+        grid.innerHTML = '';
+        for (let i = 0; i < 9; i++) {
+            for (let j = 0; j < 9; j++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.row = i;
+                cell.dataset.col = j;
+                cell.addEventListener('click', selectCell);
+                grid.appendChild(cell);
+            }
+        }
+    }
+
+    function selectCell(e) {
+        if (selectedCell) {
+            selectedCell.classList.remove('selected');
+        }
+        selectedCell = e.target;
+        selectedCell.classList.add('selected');
+    }
+
+    function fillNumber(e) {
+        if (selectedCell && !selectedCell.classList.contains('fixed')) {
+            selectedCell.textContent = e.target.textContent;
+            selectedCell.classList.remove('error');
+			const row = selectedCell.dataset.row;
+            const col = selectedCell.dataset.col;
+            // Update puzzle array with the new number
+            puzzle[row][col] = parseInt(selectedCell.textContent);
+        }
+    }
+
+    function generatePuzzle() {
+        // This is a simplified puzzle generation.
+        // In a real app, you'd want a more sophisticated algorithm.
+        const base = _.shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        puzzle = Array(9).fill().map(() => Array(9).fill(0));
+        
+        // Fill the diagonal of the puzzle
+        for (let i = 0; i < 9; i += 3) {
+            fillBox(i, i);
+        }
+        
+        solveSudoku(puzzle);
+        
+        // Remove some numbers to create the puzzle
+        for (let i = 0; i < 5; i++) {
+            let row = Math.floor(Math.random() * 9);
+            let col = Math.floor(Math.random() * 9);
+            puzzle[row][col] = 0;
+        }
+    }
+
+    function fillBox(row, col) {
+        let num;
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                do {
+                    num = Math.floor(Math.random() * 9) + 1;
+                } while (!isValid(puzzle, row + i, col + j, num));
+                puzzle[row + i][col + j] = num;
+            }
+        }
+    }
+
+    function isValid(board, row, col, num) {
+        for (let x = 0; x < 9; x++) {
+            if (x != col && board[row][x] == num) {
+				return false;
+			}
+            if (x != row && board[x][col] == num) {
+				return false;
+			}
+        }
+        
+        let startRow = row - row % 3,
+            startCol = col - col % 3;
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if ((row != i + startRow) && (col != j + startCol) && board[i + startRow][j + startCol] == num) {
+					return false;
+				}
+			}
+		}
+        
+        return true;
+    }
+
+    function solveSudoku(board) {
+        for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+                if (board[row][col] === 0) {
+                    for (let num = 1; num <= 9; num++) {
+                        if (isValid(board, row, col, num)) {
+                            board[row][col] = num;
+                            if (solveSudoku(board)) {
+                                return true;
+                            } else {
+                                board[row][col] = 0;
+                            }
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function displayPuzzle() {
+        const cells = document.querySelectorAll('.cell');
+        cells.forEach((cell, index) => {
+            const row = Math.floor(index / 9);
+            const col = index % 9;
+            const value = puzzle[row][col];
+            cell.textContent = value || '';
+            cell.classList.toggle('fixed', value !== 0);
+        });
+    }
+
+    function checkSolution() {
+        const cells = document.querySelectorAll('.cell');
+        let correct = true;
+        cells.forEach((cell, index) => {
+            const row = Math.floor(index / 9);
+            const col = index % 9;
+            const value = parseInt(cell.textContent) || 0;
+            if (!isValid(puzzle, row, col, value)) {
+                cell.classList.add('error');
+                correct = false;
+				alert(row + " " + col + " " + value + "not valid");
+            } else {
+                cell.classList.remove('error');
+            }
+        });
+        if (correct) {
+            alert('Congratulations! You solved the puzzle!');
+        }
+    }
+
+    function newGame() {
+        createGrid();
+        generatePuzzle();
+        displayPuzzle();
+    }
+
+    newGameBtn.addEventListener('click', newGame);
+    checkBtn.addEventListener('click', checkSolution);
+    numberPad.addEventListener('click', fillNumber);
+
+    // Initialize the game
+    newGame();
+</script>
+</body>
+</html>
