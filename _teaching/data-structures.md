@@ -94,8 +94,6 @@ Chapter 7: Trees
 
 Trees, one of the most intriguing and versatile data structures, take center stage in our journey. Trees consist of nodes connected in a hierarchical and branched structure, allowing us to represent complex relationships between data elements. Concepts like binary trees and tree traversal are essential for understanding how hierarchical data is organized.
 
-* Ödev 4 verildi <a href="../files/data_structures/slides/odev4.html">[html]</a>
-
 * Sunum-Ağaç <a href="../files/data_structures/slides/Bolum_07_Agac.pdf">[pdf]</a>
 * Binary Tree Simulator <a href="../files/data_structures/slides/Bolum_07_Agac.html">[html]</a>
 * Red Black Tree Simulator <a href="../files/data_structures/slides/Bolum_07_AgacRB.html">[html]</a>
@@ -109,8 +107,6 @@ Chapter 8: Priority Queues, Heaps
 
 Heaps are specialized tree structures that enable efficient priority-based operations. They are instrumental in sorting algorithms and are used in applications where rapid access to high or low-priority elements is paramount.
 
-* Ödev 5 verildi <a href="../files/data_structures/slides/odev5.html">[html]</a>
-
 * Sunum-Öncelikli Kuyruk <a href="../files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk.pdf">[pdf]</a>
 * Priority Queue Simulator <a href="../files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk_PQ.html">[pdf]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_08_Heaps_Priority_Queues.pdf">[pdf]</a>
@@ -121,8 +117,6 @@ Chapter 9: Maps, Hash Tables
 ---
 
 Our journey then takes us to hash tables, which use hash functions to map keys to specific values, ensuring rapid data retrieval. Understanding hash tables is vital for efficient data storage and retrieval, especially when dealing with large datasets.
-
-* Ödev 6 verildi <a href="../files/data_structures/slides/odev6.html">[html]</a>
 
 * Sunum-Hash Tabloları <a href="../files/data_structures/slides/Bolum_09_Hash_Tablosu.pdf">[pdf]</a>
 * Hash Table Simulator <a href="../files/data_structures/slides/Bolum_09_Hash_Tablosu.html">[pdf]</a>
@@ -135,7 +129,6 @@ Chapter 10: Search Trees
 
 Search trees, including binary search trees and AVL trees, are pivotal in maintaining ordered data. They underpin many searching and sorting algorithms, making them indispensable for computer scientists and programmers alike.
 
-* Ödev 7 verildi <a href="../files/data_structures/slides/odev7.html">[html]</a>
 * Sunum-Arama Ağaçları <a href="../files/data_structures/slides/Bolum_10_Arama_Agaclari.pdf" target="_blank">[pdf]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture10">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders10">[tr]</a>
