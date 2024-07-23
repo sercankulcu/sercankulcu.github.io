@@ -112,6 +112,7 @@ Heaps are specialized tree structures that enable efficient priority-based opera
 * Ödev 5 verildi <a href="../files/data_structures/slides/odev5.html">[html]</a>
 
 * Sunum-Öncelikli Kuyruk <a href="../files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk.pdf">[pdf]</a>
+* Priority Queue Simulator <a href="../files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk_PQ.html">[pdf]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_08_Heaps_Priority_Queues.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture08">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders08">[tr]</a>
 
@@ -124,6 +125,7 @@ Our journey then takes us to hash tables, which use hash functions to map keys t
 * Ödev 6 verildi <a href="../files/data_structures/slides/odev6.html">[html]</a>
 
 * Sunum-Hash Tabloları <a href="../files/data_structures/slides/Bolum_09_Hash_Tablosu.pdf">[pdf]</a>
+* Hash Table Simulator <a href="../files/data_structures/slides/Bolum_09_Hash_Tablosu.html">[pdf]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture09">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders09">[tr]</a>
 
