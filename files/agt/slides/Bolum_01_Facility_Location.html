@@ -1,0 +1,247 @@
+<html><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facility Location Simulator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    #map {
+      width: 100%;
+      height: 400px;
+      background-color: #e0e0e0;
+      margin-bottom: 20px;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .control-group {
+      flex-basis: 48%;
+      margin-bottom: 10px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="number"], select {
+      width: 100%;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    #results {
+      background-color: white;
+      padding: 20px;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Facility Location Simulator</h1>
+    <div id="map"></div>
+    <div class="controls">
+      <div class="control-group">
+        <label for="numFacilities">Number of Facilities:</label>
+        <input type="number" id="numFacilities" min="1" max="10" value="5">
+      </div>
+      <div class="control-group">
+        <label for="numCustomers">Number of Customers:</label>
+        <input type="number" id="numCustomers" min="10" max="100" value="10">
+      </div>
+      <div class="control-group">
+        <label for="algorithm">Algorithm:</label>
+        <select id="algorithm">
+          <option value="random">Random Placement</option>
+          <option value="kmeans">K-Means Clustering</option>
+          <option value="greedy">Greedy Heuristic</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <button id="runSimulation">Run Simulation</button>
+      </div>
+    </div>
+    <div id="results">
+      <h2>Simulation Results</h2>
+      <p>Run a simulation to see the results.</p>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.4/d3.min.js"></script>
+  <script>
+    // Simulation logic
+    const width = 800;
+    const height = 400;
+    let facilities = [];
+    let customers = [];
+
+    // Create SVG
+    const svg = d3.select("#map")
+      .append("svg")
+      .attr("width", "100%")
+      .attr("height", "100%")
+      .attr("viewBox", `0 0 ${width} ${height}`);
+
+    function generateRandomPoints(n, type) {
+      return Array.from({length: n}, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        type: type
+      }));
+    }
+
+    function distance(a, b) {
+      return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+    }
+
+    function runSimulation() {
+      const numFacilities = parseInt(document.getElementById("numFacilities").value);
+      const numCustomers = parseInt(document.getElementById("numCustomers").value);
+      const algorithm = document.getElementById("algorithm").value;
+
+      customers = generateRandomPoints(numCustomers, "customer");
+
+      switch (algorithm) {
+        case "random":
+          facilities = generateRandomPoints(numFacilities, "facility");
+          break;
+        case "kmeans":
+          facilities = kMeans(customers, numFacilities);
+          break;
+        case "greedy":
+          facilities = greedyHeuristic(customers, numFacilities);
+          break;
+      }
+
+      updateVisualization();
+      calculateResults();
+    }
+
+    function kMeans(points, k) {
+      // Simplified k-means implementation
+      let centroids = generateRandomPoints(k, "facility");
+      for (let i = 0; i < 10; i++) {
+        let clusters = Array.from({length: k}, () => []);
+        points.forEach(point => {
+          let minDist = Infinity;
+          let closestCentroid = 0;
+          centroids.forEach((centroid, j) => {
+            let dist = distance(point, centroid);
+            if (dist < minDist) {
+              minDist = dist;
+              closestCentroid = j;
+            }
+          });
+          clusters[closestCentroid].push(point);
+        });
+        centroids = clusters.map(cluster => ({
+          x: d3.mean(cluster, d => d.x),
+          y: d3.mean(cluster, d => d.y),
+          type: "facility"
+        }));
+      }
+      return centroids;
+    }
+
+    function greedyHeuristic(points, k) {
+      let facilities = [points[Math.floor(Math.random() * points.length)]];
+      facilities[0].type = "facility";
+
+      while (facilities.length < k) {
+        let maxMinDist = -Infinity;
+        let bestPoint = null;
+
+        points.forEach(point => {
+          let minDist = Math.min(...facilities.map(f => distance(point, f)));
+          if (minDist > maxMinDist) {
+            maxMinDist = minDist;
+            bestPoint = point;
+          }
+        });
+
+        bestPoint.type = "facility";
+        facilities.push(bestPoint);
+      }
+
+      return facilities;
+    }
+
+    function updateVisualization() {
+      svg.selectAll("*").remove();
+
+      svg.selectAll("circle.customer")
+        .data(customers)
+        .enter()
+        .append("circle")
+        .attr("class", "customer")
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .attr("r", 3)
+        .attr("fill", "blue");
+
+      svg.selectAll("circle.facility")
+        .data(facilities)
+        .enter()
+        .append("circle")
+        .attr("class", "facility")
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .attr("r", 6)
+        .attr("fill", "red");
+    }
+
+    function calculateResults() {
+      let totalDistance = 0;
+      let maxDistance = -Infinity;
+
+      customers.forEach(customer => {
+        let minDist = Math.min(...facilities.map(f => distance(customer, f)));
+        totalDistance += minDist;
+        maxDistance = Math.max(maxDistance, minDist);
+      });
+
+      const avgDistance = totalDistance / customers.length;
+
+      document.getElementById("results").innerHTML = `
+        <h2>Simulation Results</h2>
+        <p>Average distance to nearest facility: ${avgDistance.toFixed(2)}</p>
+        <p>Maximum distance to nearest facility: ${maxDistance.toFixed(2)}</p>
+      `;
+    }
+
+    document.getElementById("runSimulation").addEventListener("click", runSimulation);
+
+    // Initial simulation
+    runSimulation();
+  </script>
+</body>
+</html>
