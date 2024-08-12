@@ -8,13 +8,12 @@ date: 2023-10-03
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="algorithmic game theory" src="/images/teaching/algorithmic-game-theory-course.jpg" style="float: left; margin-right: 10px;"> This course aims to explore the intersection of game theory and computer science, focusing on the algorithmic aspects of strategic decision-making in multi-agent environments. Game theory provides a powerful framework for analyzing the behavior of rational agents, while algorithms enable us to design intelligent systems that can reason, strategize, and interact in complex game scenarios. Throughout this course, we will delve into fundamental concepts such as Nash equilibrium, mechanism design, and auction theory, examining how they can be applied in various real-world domains including economics, social networks, and online platforms. 
+<img align="left" width="200" alt="algorithmic game theory" src="/images/teaching/algorithmic-game-theory-course.jpg" style="float: left; margin-right: 10px;"> Algorithmic Game Theory is an interdisciplinary field that blends the mathematical rigor of game theory with the practical, problem-solving techniques of computer science. This area of study focuses on designing and analyzing algorithms for solving games and game-like scenarios, where multiple players with potentially conflicting interests interact. It encompasses a wide range of topics, including the computation of equilibria, the efficiency and fairness of various algorithmic mechanisms, and the strategic behavior of rational agents in competitive environments. By leveraging computational methods, algorithmic game theory provides valuable insights into complex systems, from economic markets to networked environments, thereby bridging the gap between theoretical foundations and real-world applications.
 
 The resources: 
 -----
 
 * Toronto CSC304 <a href="https://www.cs.toronto.edu/~nisarg/teaching/304f19/">[website]</a>
-
 
 * Game Theory, Alive <a href="https://homes.cs.washington.edu/~karlin/GameTheoryBook.pdf">[pdf]</a>
 * Algorithmic Game Theory <a href="http://www.cs.cmu.edu/~sandholm/cs15-892F13/algorithmic-game-theory.pdf">[pdf]</a>
@@ -32,6 +31,8 @@ Chapter 1: Game Theory Fundamentals
 Game theory is a mathematical framework used to analyze and understand strategic interactions between rational decision-makers. It provides a systematic way of studying situations where the outcome of one person's decision depends on the actions of others.
 
 * Slides <a href="../files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri.pdf">[pdf]</a>
+* Prisoner's Dilemma <a href="../files/agt/slides/Bolum_01_Prisoners_Dilemma.html">[click]</a>
+* Facility Location <a href="../files/agt/slides/Bolum_01_Facility_Location.html">[click]</a>
 * Lecture Notes <a href="../files/agt/Chapter_01_Game_Theory_Fundamentals.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/agt/tree/main/Chapter">[link]</a>
 
