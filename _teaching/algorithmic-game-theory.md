@@ -14,6 +14,7 @@ The resources:
 -----
 
 * Toronto CSC304 <a href="https://www.cs.toronto.edu/~nisarg/teaching/304f19/">[website]</a>
+* Michael Dinitz 601.436/636 <a href="https://www.cs.jhu.edu/~mdinitz/classes/AGT/Spring2022/">[website]</a>
 
 * Game Theory, Alive <a href="https://homes.cs.washington.edu/~karlin/GameTheoryBook.pdf">[pdf]</a>
 * Algorithmic Game Theory <a href="http://www.cs.cmu.edu/~sandholm/cs15-892F13/algorithmic-game-theory.pdf">[pdf]</a>
