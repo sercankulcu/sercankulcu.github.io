@@ -32,6 +32,8 @@ Chapter 1: Game Theory Fundamentals
 Game theory is a mathematical framework used to analyze and understand strategic interactions between rational decision-makers. It provides a systematic way of studying situations where the outcome of one person's decision depends on the actions of others.
 
 * Slides <a href="../files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri.pdf">[pdf]</a>
+* Rock Scissors Paper game <a href="../files/agt/slides/Bolum_01_Rock_Scissors_Paper.html">[click]</a>
+* Monopoly game <a href="../files/agt/slides/Bolum_01_Monopoly/index.html">[click]</a>
 * Prisoner's Dilemma <a href="../files/agt/slides/Bolum_01_Prisoners_Dilemma.html">[click]</a>
 * Facility Location <a href="../files/agt/slides/Bolum_01_Facility_Location.html">[click]</a>
 * Lecture Notes <a href="../files/agt/Chapter_01_Game_Theory_Fundamentals.pdf">[pdf]</a>
