@@ -34,6 +34,8 @@ Game theory is a mathematical framework used to analyze and understand strategic
 * Slides <a href="../files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri.pdf">[pdf]</a>
 * Rock Scissors Paper game <a href="../files/agt/slides/Bolum_01_Rock_Scissors_Paper.html">[click]</a>
 * Monopoly game <a href="../files/agt/slides/Bolum_01_Monopoly/index.html">[click]</a>
+* Poker game <a href="../files/agt/slides/Bolum_01_Poker/poker.html">[click]</a>
+* Traffic lights simulator <a href="../files/agt/slides/Bolum_01_Traffic_Lights.html">[click]</a>
 * Prisoner's Dilemma <a href="../files/agt/slides/Bolum_01_Prisoners_Dilemma.html">[click]</a>
 * Facility Location <a href="../files/agt/slides/Bolum_01_Facility_Location.html">[click]</a>
 * Lecture Notes <a href="../files/agt/Chapter_01_Game_Theory_Fundamentals.pdf">[pdf]</a>
