@@ -39,6 +39,8 @@ Game theory is a mathematical framework used to analyze and understand strategic
 * Chess game <a href="../files/agt/slides/Bolum_01_Chess.html">[click]</a>
 * Prisoner's Dilemma <a href="../files/agt/slides/Bolum_01_Prisoners_Dilemma.html">[click]</a>
 * Facility Location <a href="../files/agt/slides/Bolum_01_Facility_Location.html">[click]</a>
+* Guess game <a href="../files/agt/slides/Bolum_01_Guess_Avarage.html">[click]</a>
+
 * Lecture Notes <a href="../files/agt/Chapter_01_Game_Theory_Fundamentals.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/agt/tree/main/Chapter">[link]</a>
 
