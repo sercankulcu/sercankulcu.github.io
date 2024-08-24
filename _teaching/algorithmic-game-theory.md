@@ -50,6 +50,8 @@ Chapter 2: Introduction to Algorithmic Game Theory
 
 Algorithmic game theory is an interdisciplinary field that combines concepts from game theory and computer science. It focuses on the study of strategic interactions in computational settings and aims to design efficient algorithms and computational models for analyzing and solving games.
 
+* Slides <a href="../files/agt/slides/Bolum_02_Oyun_Kuramina_Giris.pdf">[pdf]</a>
+
 * Lecture Notes <a href="../files/agt/Chapter_02_Introduction_to_Algorithmic_Game_Theory.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/agt/tree/main/Chapter">[link]</a>
 
