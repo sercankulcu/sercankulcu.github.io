@@ -6,7 +6,7 @@ tags:
   - essay
 ---
 
-<img width="150" alt="four leaf clover" src="/images/posts/2023-a-year-of-challenges-and-achievements.png" style="float: left; margin-right: 20px;" /> The saying "If you’ve become arrogant, you no longer need another enemy.", carries profound wisdom about the dangers of arrogance and how it can become a person’s greatest adversary. When we allow arrogance to take hold, we sabotage our own success, relationships, and personal growth, making external enemies unnecessary—our worst enemy becomes ourselves.
+<img width="150" alt="four leaf clover" src="/images/posts/your-greatest-enemy-is-within.png" style="float: left; margin-right: 20px;" /> The saying "If you’ve become arrogant, you no longer need another enemy.", carries profound wisdom about the dangers of arrogance and how it can become a person’s greatest adversary. When we allow arrogance to take hold, we sabotage our own success, relationships, and personal growth, making external enemies unnecessary—our worst enemy becomes ourselves.
 
 Arrogance, or an inflated sense of self-importance, is a subtle but destructive force. It often arises when we experience success, gain recognition, or accumulate power. In moderation, confidence is healthy and necessary for progress, but arrogance takes this confidence to an extreme, leading us to overestimate our abilities and undervalue others. What makes arrogance so dangerous is that it blinds us to our weaknesses. When we become arrogant, we stop listening to others, ignore feedback, and believe that we’re always right. This attitude makes us more prone to making mistakes, misjudging situations, and alienating the people around us.
 
