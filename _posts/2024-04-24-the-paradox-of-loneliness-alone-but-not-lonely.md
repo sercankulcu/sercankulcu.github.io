@@ -6,7 +6,7 @@ tags:
   - essay
 ---
 
-<img width="150" alt="four leaf clover" src="/images/posts/2023-a-year-of-challenges-and-achievements.png" style="float: left; margin-right: 20px;" /> Have you ever felt completely isolated, even when you're surrounded by friends and family? Or felt perfectly content and connected when you're by yourself? It's a curious thing—having a spouse, kids, or even a pet can keep you from being alone, but they might not cure that deep sense of loneliness.
+<img width="150" alt="four leaf clover" src="/images/posts/the-paradox-of-loneliness-alone-but-not-lonely.png" style="float: left; margin-right: 20px;" /> Have you ever felt completely isolated, even when you're surrounded by friends and family? Or felt perfectly content and connected when you're by yourself? It's a curious thing—having a spouse, kids, or even a pet can keep you from being alone, but they might not cure that deep sense of loneliness.
 
 <svg class="road-svg" viewBox="0 0 1000 200">
             <defs>
