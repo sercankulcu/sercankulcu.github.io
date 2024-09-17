@@ -4,7 +4,7 @@ collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/data-structures
 venue: "University of Giresun, Department of Computer Engineering"
-date: 2023-10-05
+date: 2024-10-05
 location: "Giresun, Turkey"
 ---
 
