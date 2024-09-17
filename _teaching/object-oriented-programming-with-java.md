@@ -4,7 +4,7 @@ collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/object-oriented-programming-with-java
 venue: "University of Giresun, Department of Electrical Electronics Engineering"
-date: 2024-01-04
+date: 2024-09-04
 location: "Giresun, Turkey"
 ---
 
