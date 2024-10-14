@@ -73,6 +73,7 @@ Next up are queues, adhering to the First-In-First-Out (FIFO) principle. They pl
 
 * Sunum-Kuyruk <a href="../files/data_structures/slides/Bolum_05_Kuyruk.pdf">[pdf]</a>
 * Queue Simulator <a href="../files/data_structures/slides/Bolum_05_Kuyruk.html">[html]</a>
+* <a href="../files/data_structures/slides/Bolum_05_Scheduler.html">[Scheduler]</a><a href="../files/data_structures/slides/Bolum_05_Priority_Scheduler.html">[Priority Scheduler]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture05">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders05">[tr]</a>
 
