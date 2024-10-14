@@ -61,6 +61,7 @@ Our journey continues with stacks, which follow the Last-In-First-Out (LIFO) pri
 
 * Sunum-Yığın <a href="../files/data_structures/slides/Bolum_04_Yigin.pdf">[pdf]</a>
 * Stack Simulator <a href="../files/data_structures/slides/Bolum_04_Yigin.html">[html]</a>
+* <a href="../files/data_structures/slides/Bolum_04_Tower_of_Hanoi.html">[Hanoi Towers]</a><a href="../files/data_structures/slides/Bolum_04_Stock_Span.html.html">[Stock Span]</a><a href="../files/data_structures/slides/Bolum_04_Infix_to_Prefix.html">[İnfix to Prefix]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture04">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders04">[tr]</a>
 

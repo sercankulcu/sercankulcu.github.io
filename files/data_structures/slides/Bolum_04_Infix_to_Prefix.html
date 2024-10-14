@@ -1,0 +1,309 @@
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infix to Prefix Converter</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: #f0f0f0;
+  }
+  h1, h2 {
+    color: #333;
+    text-align: center;
+  }
+  #converter, #stackView, #stepByStepView {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  }
+  #converter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  textarea, input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  textarea {
+    width: 40%;
+    resize: vertical;
+  }
+  input[type="text"] {
+    width: 40%;
+  }
+  button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    height: 40px;
+  }
+  button:hover {
+    background-color: #45a049;
+  }
+  #steps {
+    margin-top: 20px;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+  }
+  .step {
+    background-color: #e9e9e9;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+  }
+  .stack-container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+  }
+  .stack {
+    width: 100px;
+    min-height: 200px;
+    border: 2px solid #333;
+    display: flex;
+    flex-direction: column-reverse;
+    overflow-y: auto;
+  }
+  .stack-item {
+    padding: 5px;
+    text-align: center;
+    border-top: 1px solid #ddd;
+    background-color: #f9f9f9;
+  }
+  .stack-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  #stepControls {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  #stepControls button {
+    margin: 0 10px;
+  }
+  #currentStep {
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+  <h1>Infix to Prefix Converter</h1>
+  <div id="converter">
+    <textarea id="input" rows="1" placeholder="Enter infix expression (e.g., A + B * C)"></textarea>
+    <button onclick="convert()">Convert</button>
+    <input type="text" id="output" readonly placeholder="Prefix expression will appear here">
+  </div>
+  
+  <div id="stackView">
+    <h2>Stack View</h2>
+    <div class="stack-container">
+      <div>
+        <div class="stack-label">Operators Stack</div>
+        <div id="operatorsStack" class="stack"></div>
+      </div>
+      <div>
+        <div class="stack-label">Operands Stack</div>
+        <div id="operandsStack" class="stack"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="stepByStepView">
+    <div id="currentStep"></div>
+    <div id="stepControls">
+      <button onclick="prevStep()" id="prevBtn" disabled>Previous</button>
+      <button onclick="nextStep()" id="nextBtn" disabled>Next</button>
+    </div>
+  </div>
+
+  <script>
+    let steps = [];
+    let currentStepIndex = -1;
+
+    function convert() {
+      const input = document.getElementById('input').value.trim();
+      const output = document.getElementById('output');
+      
+      if (!input) {
+        alert('Please enter an infix expression');
+        return;
+      }
+      
+      const result = infixToPrefix(input);
+      output.value = result.prefix;
+      
+      steps = result.steps;
+      currentStepIndex = -1;
+      updateStepView();
+    }
+
+    function updateStepView() {
+      const currentStepDiv = document.getElementById('currentStep');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      
+      if (currentStepIndex === -1) {
+        currentStepDiv.textContent = 'Click "Next" to start the step-by-step process.';
+        prevBtn.disabled = true;
+        nextBtn.disabled = false;
+      } else {
+        const step = steps[currentStepIndex];
+        currentStepDiv.textContent = `Step ${currentStepIndex + 1}: ${step.description}`;
+        updateStackView(step.operators, step.operands);
+        
+        prevBtn.disabled = currentStepIndex === 0;
+        nextBtn.disabled = currentStepIndex === steps.length - 1;
+      }
+    }
+
+    function prevStep() {
+      if (currentStepIndex > 0) {
+        currentStepIndex--;
+        updateStepView();
+      }
+    }
+
+    function nextStep() {
+      if (currentStepIndex < steps.length - 1) {
+        currentStepIndex++;
+        updateStepView();
+      }
+    }
+
+    function updateStackView(operators, operands) {
+      const operatorsStackDiv = document.getElementById('operatorsStack');
+      const operandsStackDiv = document.getElementById('operandsStack');
+      
+      operatorsStackDiv.innerHTML = '';
+      operandsStackDiv.innerHTML = '';
+      
+      operators.forEach(op => {
+        const opDiv = document.createElement('div');
+        opDiv.className = 'stack-item';
+        opDiv.textContent = op;
+        operatorsStackDiv.appendChild(opDiv);
+      });
+      
+      operands.forEach(operand => {
+        const operandDiv = document.createElement('div');
+        operandDiv.className = 'stack-item';
+        operandDiv.textContent = operand;
+        operandsStackDiv.appendChild(operandDiv);
+      });
+    }
+
+    function infixToPrefix(infix) {
+      const steps = [];
+      const operators = [];
+      const operands = [];
+      const precedence = {'+': 1, '-': 1, '*': 2, '/': 2, '^': 3};
+      
+      // Reverse the infix expression
+      const reversedInfix = infix.split('').reverse().join('');
+      steps.push({
+        description: `Reversed infix: ${reversedInfix}`,
+        operators: [...operators],
+        operands: [...operands]
+      });
+      
+      for (let char of reversedInfix) {
+        if (char === ' ') continue;
+        
+        if (char === ')') {
+          operators.push(char);
+          steps.push({
+            description: `Push ) to operators stack`,
+            operators: [...operators],
+            operands: [...operands]
+          });
+        } else if (char === '(') {
+          while (operators.length > 0 && operators[operators.length - 1] !== ')') {
+            const op = operators.pop();
+            const b = operands.pop();
+            const a = operands.pop();
+            operands.push(op + a + b);
+            steps.push({
+              description: `Pop ${op} and apply to ${a} and ${b}: ${operands[operands.length - 1]}`,
+              operators: [...operators],
+              operands: [...operands]
+            });
+          }
+          if (operators.length > 0 && operators[operators.length - 1] === ')') {
+            operators.pop();
+            steps.push({
+              description: `Pop matching ) from operators stack`,
+              operators: [...operators],
+              operands: [...operands]
+            });
+          }
+        } else if (precedence[char]) {
+          while (
+            operators.length > 0 &&
+            operators[operators.length - 1] !== ')' &&
+            precedence[operators[operators.length - 1]] > precedence[char]
+          ) {
+            const op = operators.pop();
+            const b = operands.pop();
+            const a = operands.pop();
+            operands.push(op + a + b);
+            steps.push({
+              description: `Pop ${op} and apply to ${a} and ${b}: ${operands[operands.length - 1]}`,
+              operators: [...operators],
+              operands: [...operands]
+            });
+          }
+          operators.push(char);
+          steps.push({
+            description: `Push ${char} to operators stack`,
+            operators: [...operators],
+            operands: [...operands]
+          });
+        } else {
+          operands.push(char);
+          steps.push({
+            description: `Push ${char} to operands stack`,
+            operators: [...operators],
+            operands: [...operands]
+          });
+        }
+      }
+      
+      while (operators.length > 0) {
+        const op = operators.pop();
+        const b = operands.pop();
+        const a = operands.pop();
+        operands.push(op + a + b);
+        steps.push({
+          description: `Pop ${op} and apply to ${a} and ${b}: ${operands[operands.length - 1]}`,
+          operators: [...operators],
+          operands: [...operands]
+        });
+      }
+      
+      const prefix = operands[0];
+      steps.push({
+        description: `Final prefix expression: ${prefix}`,
+        operators: [...operators],
+        operands: [...operands]
+      });
+      
+      return { prefix, steps };
+    }
+  </script>
+</body>
+</html>
