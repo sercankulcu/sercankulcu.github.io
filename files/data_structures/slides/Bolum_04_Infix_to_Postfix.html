@@ -1,0 +1,307 @@
+<html><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infix to Postfix Converter</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: #f0f0f0;
+  }
+  h1, h2 {
+    color: #333;
+    text-align: center;
+  }
+  #converter, #stackView, #stepByStepView {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  }
+  #converter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  textarea, input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  textarea {
+    width: 40%;
+    resize: vertical;
+  }
+  input[type="text"] {
+    width: 40%;
+  }
+  button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    height: 40px;
+  }
+  button:hover {
+    background-color: #45a049;
+  }
+  #steps {
+    margin-top: 20px;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+  }
+  .step {
+    background-color: #e9e9e9;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+  }
+  .stack-container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+  }
+  .stack {
+    width: 100px;
+    min-height: 200px;
+    border: 2px solid #333;
+    display: flex;
+    flex-direction: column-reverse;
+    overflow-y: auto;
+  }
+  .stack-item {
+    padding: 5px;
+    text-align: center;
+    border-top: 1px solid #ddd;
+    background-color: #f9f9f9;
+  }
+  .stack-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  #stepControls {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  #stepControls button {
+    margin: 0 10px;
+  }
+  #currentStep {
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+  }
+  #outputView {
+    margin-top: 20px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #outputView .stack-label {
+    margin-right: 10px;
+    margin-bottom: 0;
+  }
+  #outputView input {
+    width: 60%;
+    padding: 10px;
+    font-size: 16px;
+  }
+</style>
+</head>
+<body>
+  <h1>Infix to Postfix Converter</h1>
+  <div id="converter">
+    <textarea id="input" rows="1" placeholder="Enter infix expression (e.g., A + B * C)"></textarea>
+    <button onclick="convert()">Convert</button>
+    <input type="text" id="output" readonly placeholder="Postfix expression will appear here">
+  </div>
+  
+  <div id="stackView">
+    <div class="stack-container">
+      <div>
+        <div class="stack-label">Operators Stack</div>
+        <div id="operatorsStack" class="stack"></div>
+      </div>
+    </div>
+    <div id="outputView">
+      <div class="stack-label">Current Output:</div>
+      <input type="text" id="currentOutput" readonly>
+    </div>
+  </div>
+  
+  <div id="stepByStepView">
+    <div id="currentStep"></div>
+    <div id="stepControls">
+      <button onclick="prevStep()" id="prevBtn" disabled>Previous</button>
+      <button onclick="nextStep()" id="nextBtn" disabled>Next</button>
+    </div>
+  </div>
+
+  <script>
+    let steps = [];
+    let currentStepIndex = -1;
+
+    function convert() {
+      const input = document.getElementById('input').value.trim();
+      const output = document.getElementById('output');
+      
+      if (!input) {
+        alert('Please enter an infix expression');
+        return;
+      }
+      
+      const result = infixToPostfix(input);
+      output.value = result.postfix;
+      
+      steps = result.steps;
+      currentStepIndex = -1;
+      updateStepView();
+    }
+
+    function updateStepView() {
+      const currentStepDiv = document.getElementById('currentStep');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      
+      if (currentStepIndex === -1) {
+        currentStepDiv.textContent = 'Click "Next" to start the step-by-step process.';
+        prevBtn.disabled = true;
+        nextBtn.disabled = false;
+        updateStackView([], '');
+      } else {
+        const step = steps[currentStepIndex];
+        currentStepDiv.textContent = `Step ${currentStepIndex + 1}: ${step.description}`;
+        updateStackView(step.operators, step.output);
+        
+        prevBtn.disabled = currentStepIndex === 0;
+        nextBtn.disabled = currentStepIndex === steps.length - 1;
+      }
+    }
+
+    function prevStep() {
+      if (currentStepIndex > 0) {
+        currentStepIndex--;
+        updateStepView();
+      }
+    }
+
+    function nextStep() {
+      if (currentStepIndex < steps.length - 1) {
+        currentStepIndex++;
+        updateStepView();
+      }
+    }
+
+    function updateStackView(operators, output) {
+      const operatorsStackDiv = document.getElementById('operatorsStack');
+      const currentOutputField = document.getElementById('currentOutput');
+      
+      operatorsStackDiv.innerHTML = '';
+      
+      operators.forEach(op => {
+        const opDiv = document.createElement('div');
+        opDiv.className = 'stack-item';
+        opDiv.textContent = op;
+        operatorsStackDiv.appendChild(opDiv);
+      });
+      
+      currentOutputField.value = output;
+    }
+
+    function infixToPostfix(infix) {
+      const steps = [];
+      const operators = [];
+      let output = "";
+      const precedence = {'+': 1, '-': 1, '*': 2, '/': 2, '^': 3};
+      
+      steps.push({
+        description: `Initial infix expression: ${infix}`,
+        operators: [...operators],
+        output: output
+      });
+      
+      for (let char of infix) {
+        if (char === ' ') continue;
+        
+        if (char === '(') {
+          operators.push(char);
+          steps.push({
+            description: `Push ( to operators stack`,
+            operators: [...operators],
+            output: output
+          });
+        } else if (char === ')') {
+          while (operators.length > 0 && operators[operators.length - 1] !== '(') {
+            output += operators.pop();
+            steps.push({
+              description: `Pop ${output[output.length - 1]} from operators stack and add to output`,
+              operators: [...operators],
+              output: output
+            });
+          }
+          if (operators.length > 0 && operators[operators.length - 1] === '(') {
+            operators.pop();
+            steps.push({
+              description: `Pop ( from operators stack`,
+              operators: [...operators],
+              output: output
+            });
+          }
+        } else if (precedence[char]) {
+          while (
+            operators.length > 0 &&
+            operators[operators.length - 1] !== '(' &&
+            precedence[operators[operators.length - 1]] >= precedence[char]
+          ) {
+            output += operators.pop();
+            steps.push({
+              description: `Pop ${output[output.length - 1]} from operators stack and add to output`,
+              operators: [...operators],
+              output: output
+            });
+          }
+          operators.push(char);
+          steps.push({
+            description: `Push ${char} to operators stack`,
+            operators: [...operators],
+            output: output
+          });
+        } else {
+          output += char;
+          steps.push({
+            description: `Add ${char} to output`,
+            operators: [...operators],
+            output: output
+          });
+        }
+      }
+      
+      while (operators.length > 0) {
+        output += operators.pop();
+        steps.push({
+          description: `Pop ${output[output.length - 1]} from operators stack and add to output`,
+          operators: [...operators],
+          output: output
+        });
+      }
+      
+      steps.push({
+        description: `Final postfix expression: ${output}`,
+        operators: [...operators],
+        output: output
+      });
+      
+      return { postfix: output, steps };
+    }
+  </script>
+</body>
+</html>
