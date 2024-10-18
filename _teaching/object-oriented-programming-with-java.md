@@ -36,6 +36,8 @@ As a versatile and widely-used programming language, Java provides a powerful to
 * Sunum - Algoritmalar <a href="../files/java/slides/Bolum_01_Algoritmalar.pdf">[pdf]</a>
 * Sunum - Akış Diyagramları <a href="../files/java/slides/Bolum_01_Akis_Diyagramlari.pdf">[pdf]</a>
 
+<a href="../files/java/slides/Bolum_01_Ascii_Table.html">[Ascii Table]</a>
+
 * Lecture Notes <a href="../files/java/Chapter_01_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders01/src">[java]</a>
 
