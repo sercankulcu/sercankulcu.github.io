@@ -21,6 +21,7 @@ The resources
 * 2022-2023 <a href="../files/java/slides/2022-2023-vize-cevaplar.pdf">[vize]</a> <a href="../files/java/slides/2022-2023-telafi-cevaplar.pdf">[telafi]</a> <a href="../files/java/slides/2022-2023-final-cevaplar.pdf">[final]</a>
 * 2023-2024 <a href="../files/java/slides/2023-2024-vize-cevap.pdf">[vize]</a> <a href="../files/java/slides/2023-2024-telafi-cevap.pdf">[telafi]</a><a href="../files/java/slides/2023-2024-final-a-cevap.pdf">[final-a]</a><a href="../files/java/slides/2023-2024-final-b-cevap.pdf">[final-b]</a><a href="../files/java/slides/2023-2024-final-c-cevap.pdf">[final-c]</a><a href="../files/java/slides/2023-2024-final-d-cevap.pdf">[final-d]</a><a href="../files/java/slides/2023-2024-butunleme-a-cevap.pdf">[butunleme-a]</a><a href="../files/java/slides/2023-2024-butunleme-b-cevap.pdf">[butunleme-b]</a><a href="../files/java/slides/2023-2024-butunleme-c-cevap.pdf">[butunleme-c]</a><a href="../files/java/slides/2023-2024-butunleme-d-cevap.pdf">[butunleme-d]</a>
 * Dev Java <a href="https://dev.java/learn/">[website]</a>
+* Cody <a href="https://f.eba.gov.tr/cody/">[website]</a>, Blockly <a href="https://blockly.games/">[website]</a>
 * Java Youtube <a href="https://www.youtube.com/java">[youtube]</a>
 * Download Eclipse <a href="https://www.eclipse.org/downloads/packages/installer">[website]</a>
 * Oracle Java Tutorials <a href="https://docs.oracle.com/javase/tutorial/">[website]</a>
