@@ -15,6 +15,7 @@ location: "Giresun, Turkey"
 The resources:
 ---
 
+* 2024-2025 <a href="../files/data_structures/slides/2024-2025-vize-a-cevaplar.pdf">[vize a]</a> <a href="../files/data_structures/slides/2024-2025-vize-b-cevaplar.pdf">[vize b]</a> 
 * 2023-2024 <a href="../files/data_structures/slides/2023-2024-vize-cevaplar.pdf">[vize]</a> <a href="../files/data_structures/slides/2023-2024-final-cevaplar.pdf">[final]</a> <a href="../files/data_structures/slides/2023-2024-butunleme-cevaplar.pdf">[bütünleme]</a>
 * Data Structures and Algorithms in Java 6th Edition by Michael T. Goodrich, Roberto Tamassia, Michael H. Goldwasser <a href="https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635">[book]</a>
 * CS-61B: Data Structures course page <a href="https://sp23.datastructur.es/">[website]</a>
