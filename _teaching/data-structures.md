@@ -36,8 +36,7 @@ Data structures are the backbone of computer science, serving as the fundamental
 
 * Sunum-Giriş <a href="../files/data_structures/slides/Bolum_01_Giris.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_01_Introduction.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture01">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders01">[tr]</a>
-
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src">[link]</a>
 
 Chapter 2: Arrays
 ---
@@ -47,8 +46,7 @@ Arrays are like the bread and butter of programming. They allow us to store a co
 * Sunum-Diziler <a href="../files/data_structures/slides/Bolum_02_Diziler.pdf">[pdf]</a>
 * Array Simulator <a href="../files/data_structures/slides/Bolum_02_Diziler.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture02">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders02">[tr]</a>
-
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders02/src">[link]</a>
 
 Chapter 3: Linked Lists
 ---
@@ -58,8 +56,7 @@ Linked lists are dynamic and flexible data structures that consist of nodes conn
 * Sunum-Bağlı-Liste <a href="../files/data_structures/slides/Bolum_03_Bagli_Liste.pdf">[pdf]</a>
 * Linked List Simulator <a href="../files/data_structures/slides/Bolum_03_Bagli_Liste.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture03">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders03">[tr]</a>
-
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders03/src">[link]</a>
 
 Chapter 4: Stacks
 ---
@@ -70,8 +67,7 @@ Our journey continues with stacks, which follow the Last-In-First-Out (LIFO) pri
 * Stack Simulator <a href="../files/data_structures/slides/Bolum_04_Yigin.html">[html]</a>
 * <a href="../files/data_structures/slides/Bolum_04_Tower_of_Hanoi.html">[Hanoi Towers]</a><a href="../files/data_structures/slides/Bolum_04_Stock_Span.html">[Stock Span]</a><a href="../files/data_structures/slides/Bolum_04_Infix_to_Prefix.html">[Infix to Prefix]</a><a href="../files/data_structures/slides/Bolum_04_Infix_to_Postfix.html">[Infix to Postfix]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture04">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders04">[tr]</a>
-
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders04/src">[link]</a>
 
 Chapter 5: Queues
 ---
@@ -82,8 +78,7 @@ Next up are queues, adhering to the First-In-First-Out (FIFO) principle. They pl
 * Queue Simulator <a href="../files/data_structures/slides/Bolum_05_Kuyruk.html">[html]</a>
 * <a href="../files/data_structures/slides/Bolum_05_Scheduler.html">[Scheduler]</a><a href="../files/data_structures/slides/Bolum_05_Priority_Scheduler.html">[Priority Scheduler]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture05">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders05">[tr]</a>
-
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders05/src">[link]</a>
 
 Chapter 6: Lists
 ---
@@ -92,11 +87,8 @@ Lists offer a more generalized approach to data storage, providing dynamic resiz
 
 * Sunum-Liste <a href="../files/data_structures/slides/Bolum_06_Liste.pdf">[pdf]</a>
 * Sunum-Sorular <a href="../files/data_structures/slides/Bolum_06_Sorular.pdf">[pdf]</a>
-
 * Lecture Notes <a href="../files/data_structures/Chapter_04_Lists.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture06">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders06">[tr]</a>
-
-
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders06/src">[link]</a>
 
 Chapter 7: Trees
 ---
@@ -108,8 +100,7 @@ Trees, one of the most intriguing and versatile data structures, take center sta
 * Red Black Tree Simulator <a href="../files/data_structures/slides/Bolum_07_AgacRB.html">[html]</a>
 * AVL Tree Simulator <a href="../files/data_structures/slides/Bolum_07_AgacAVL.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture07">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders07">[tr]</a>
-
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders07/src">[link]</a>
 
 Chapter 8: Priority Queues, Heaps
 ---
@@ -120,8 +111,7 @@ Heaps are specialized tree structures that enable efficient priority-based opera
 * Priority Queue Simulator <a href="../files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk_PQ.html">[html]</a>
 * Heap Simulator <a href="../files/data_structures/slides/Bolum_08_Heap.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_08_Heaps_Priority_Queues.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture08">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders08">[tr]</a>
-
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders08/src">[link]</a>
 
 Chapter 9: Maps, Hash Tables
 ---
@@ -132,8 +122,7 @@ Our journey then takes us to hash tables, which use hash functions to map keys t
 * Hash Table Simulator <a href="../files/data_structures/slides/Bolum_09_Hash_Tablosu.html">[html]</a>
 * Map Simulator <a href="../files/data_structures/slides/Bolum_09_Map.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture09">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders09">[tr]</a>
-
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders09/src">[link]</a>
 
 Chapter 10: Search Trees
 ---
@@ -142,8 +131,7 @@ Search trees, including binary search trees and AVL trees, are pivotal in mainta
 
 * Sunum-Arama Ağaçları <a href="../files/data_structures/slides/Bolum_10_Arama_Agaclari.pdf" target="_blank">[pdf]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture10">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders10">[tr]</a>
-
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders10/src">[link]</a>
 
 Chapter 11: Graphs
 ---
@@ -153,8 +141,7 @@ Graphs, with their intricate web of connections, offer a versatile way to model 
 
 * Sunum-Çizge <a href="../files/data_structures/slides/Bolum_11_Cizge.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture11">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders11">[tr]</a>
-
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders11/src">[link]</a>
 
 Chapter 12: Sets
 ---
@@ -163,24 +150,4 @@ Sets represent collections of unique elements and are essential for ensuring dat
 
 * Sunum-Kümeler <a href="../files/data_structures/slides/Bolum_12_Kumeler.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture12">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders12">[tr]</a>
-
-
-Chapter 13: Advanced Data Structures
----
-
-As we venture further into our journey, we encounter advanced data structures such as B-trees, red-black trees, and splay trees. These structures offer sophisticated solutions to specific problems and are commonly found in database management systems and file systems.
-
-* Sunum-Gelişmiş Veri Yapıları <a href="../files/data_structures/slides/Bolum_12_Kumeler.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/data_structures/Chapter_09_Advanced_Data_Structures.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture13">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders13">[tr]</a>
-
-
-Chapter 14: Advanced Topics in Data Structures
----
-
-Our journey concludes with a glimpse into advanced topics within data structures, including concurrent data structures, memory management, and data compression. These topics are at the cutting edge of data structure research, propelling us into the future of advanced computing and system-level programming.
-
-* Sunum-İleri Konular <a href="../files/data_structures/slides/Bolum_12_Kumeler.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/data_structures/Chapter_10_Advanced_Topics.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Lecture14">[eng]</a><a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders14">[tr]</a>
+* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src">[link]</a>
