@@ -15,6 +15,8 @@ location: "Giresun, Turkey"
 Duyurular
 ---
 
+* Ödev 1 verildi <a href="../files/java/slides/odev1.html">[tıkla]</a>
+
 The resources
 ---
 
