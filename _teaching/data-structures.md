@@ -99,6 +99,7 @@ Trees, one of the most intriguing and versatile data structures, take center sta
 * Binary Tree Simulator <a href="../files/data_structures/slides/Bolum_07_Agac.html">[html]</a>
 * Red Black Tree Simulator <a href="../files/data_structures/slides/Bolum_07_AgacRB.html">[html]</a>
 * AVL Tree Simulator <a href="../files/data_structures/slides/Bolum_07_AgacAVL.html">[html]</a>
+* BTrees Simulator <a href="../files/data_structures/slides/Bolum_07_AgacBTree.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders07/src">[link]</a>
 
