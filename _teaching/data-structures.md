@@ -35,6 +35,7 @@ Chapter 1: Introduction
 Data structures are the backbone of computer science, serving as the fundamental building blocks that enable us to efficiently store, organize, and manipulate data. Here, we will explore a comprehensive spectrum of data structures, from the foundational concepts like arrays and linked lists to advanced topics that propel us into the future of computing.
 
 * Sunum-Giriş <a href="../files/data_structures/slides/Bolum_01_Giris.pdf">[pdf]</a>
+* Data Structures <a href="../files/data_structures/slides/Bolum_01_Intro.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_01_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src">[link]</a>
 
