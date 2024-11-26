@@ -148,6 +148,7 @@ Graphs, with their intricate web of connections, offer a versatile way to model 
 
 
 * Sunum-Çizge <a href="../files/data_structures/slides/Bolum_11_Cizge.pdf">[pdf]</a>
+* Graph Simulator <a href="../files/data_structures/slides/Bolum_11_Graph.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders11/src">[link]</a>
 
