@@ -135,7 +135,8 @@ Chapter 10: Search Trees
 
 Search trees, including binary search trees and AVL trees, are pivotal in maintaining ordered data. They underpin many searching and sorting algorithms, making them indispensable for computer scientists and programmers alike.
 
-* Sunum-Arama Ağaçları <a href="../files/data_structures/slides/Bolum_10_Arama_Agaclari.pdf" target="_blank">[pdf]</a>
+* Sunum-Arama Ağaçları <a href="../files/data_structures/slides/Bolum_10_Arama_Agaclari.pdf">[pdf]</a>
+* BST Simulator <a href="../files/data_structures/slides/Bolum_10_BST.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders10/src">[link]</a>
 
