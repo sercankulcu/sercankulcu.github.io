@@ -109,7 +109,7 @@ Heaps are specialized tree structures that enable efficient priority-based opera
 
 * Sunum-Öncelikli Kuyruk <a href="../files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk.pdf">[pdf]</a>
 * Heap Simulator <a href="../files/data_structures/slides/Bolum_08_Heap.html">[html]</a>
-* Priority Queue Simulator <a href="../files/data_structures/slides/Bolum_08_Priority_Queue.html_">[html]</a>
+* Priority Queue Simulator <a href="../files/data_structures/slides/Bolum_08_Priority_Queue.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_08_Heaps_Priority_Queues.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders08/src">[link]</a>
 
