@@ -96,10 +96,11 @@ Chapter 7: Trees
 Trees, one of the most intriguing and versatile data structures, take center stage in our journey. Trees consist of nodes connected in a hierarchical and branched structure, allowing us to represent complex relationships between data elements. Concepts like binary trees and tree traversal are essential for understanding how hierarchical data is organized.
 
 * Sunum-Ağaç <a href="../files/data_structures/slides/Bolum_07_Agac.pdf">[pdf]</a>
-* Binary Tree Simulator <a href="../files/data_structures/slides/Bolum_07_Agac.html">[html]</a>
-* Red Black Tree Simulator <a href="../files/data_structures/slides/Bolum_07_AgacRB.html">[html]</a>
-* AVL Tree Simulator <a href="../files/data_structures/slides/Bolum_07_AgacAVL.html">[html]</a>
-* BTrees Simulator <a href="../files/data_structures/slides/Bolum_07_AgacBTree.html">[html]</a>
+* Simulators <a href="../files/data_structures/slides/Bolum_07_Agac.html">[Binary Tree]</a> 
+<a href="../files/data_structures/slides/Bolum_07_AgacRB.html">[Red Black Tree]</a> 
+<a href="../files/data_structures/slides/Bolum_07_AgacAVL.html">[AVL Tree]</a>
+<a href="../files/data_structures/slides/Bolum_07_AgacBTree.html">[BTrees]</a> 
+<a href="../files/data_structures/slides/Bolum_07_AgacSplay.html">[Splay Tree]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders07/src">[link]</a>
 
