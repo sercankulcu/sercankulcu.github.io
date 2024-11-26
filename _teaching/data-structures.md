@@ -65,7 +65,10 @@ Our journey continues with stacks, which follow the Last-In-First-Out (LIFO) pri
 
 * Sunum-Yığın <a href="../files/data_structures/slides/Bolum_04_Yigin.pdf">[pdf]</a>
 * Stack Simulator <a href="../files/data_structures/slides/Bolum_04_Yigin.html">[html]</a>
-* <a href="../files/data_structures/slides/Bolum_04_Tower_of_Hanoi.html">[Hanoi Towers]</a><a href="../files/data_structures/slides/Bolum_04_Stock_Span.html">[Stock Span]</a><a href="../files/data_structures/slides/Bolum_04_Infix_to_Prefix.html">[Infix to Prefix]</a><a href="../files/data_structures/slides/Bolum_04_Infix_to_Postfix.html">[Infix to Postfix]</a>
+* Applications <a href="../files/data_structures/slides/Bolum_04_Tower_of_Hanoi.html">[Hanoi Towers]</a>
+<a href="../files/data_structures/slides/Bolum_04_Stock_Span.html">[Stock Span]</a>
+<a href="../files/data_structures/slides/Bolum_04_Infix_to_Prefix.html">[Infix to Prefix]</a>
+<a href="../files/data_structures/slides/Bolum_04_Infix_to_Postfix.html">[Infix to Postfix]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders04/src">[link]</a>
 
@@ -76,7 +79,8 @@ Next up are queues, adhering to the First-In-First-Out (FIFO) principle. They pl
 
 * Sunum-Kuyruk <a href="../files/data_structures/slides/Bolum_05_Kuyruk.pdf">[pdf]</a>
 * Queue Simulator <a href="../files/data_structures/slides/Bolum_05_Kuyruk.html">[html]</a>
-* <a href="../files/data_structures/slides/Bolum_05_Scheduler.html">[Scheduler]</a><a href="../files/data_structures/slides/Bolum_05_Priority_Scheduler.html">[Priority Scheduler]</a>
+* Applications <a href="../files/data_structures/slides/Bolum_05_Scheduler.html">[Scheduler]</a>
+<a href="../files/data_structures/slides/Bolum_05_Priority_Scheduler.html">[Priority Scheduler]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders05/src">[link]</a>
 
