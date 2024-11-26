@@ -158,5 +158,6 @@ Chapter 12: Sets
 Sets represent collections of unique elements and are essential for ensuring data uniqueness. They come into play in problem-solving scenarios where distinct data elements are required.
 
 * Sunum-Kümeler <a href="../files/data_structures/slides/Bolum_12_Kumeler.pdf">[pdf]</a>
+* Sets Simulator <a href="../files/data_structures/slides/Bolum_12_Sets.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src">[link]</a>
