@@ -1,0 +1,305 @@
+<html><head><base href="." /><title>Splay Tree Simulator</title>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f4f8;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.controls {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+#treeCanvas {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+button {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #45a049;
+}
+
+input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.message {
+  margin-top: 10px;
+  color: #666;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="controls">
+    <input type="number" id="valueInput" placeholder="Enter a number">
+    <button onclick="insertValue()">Insert</button>
+    <button onclick="searchValue()">Search</button>
+    <button onclick="deleteValue()">Delete</button>
+    <button onclick="clearTree()">Clear Tree</button>
+    <div class="message" id="message"></div>
+  </div>
+  <canvas id="treeCanvas"></canvas>
+</div>
+
+<script>
+class Node {
+    constructor(value) {
+        this.value = value;
+        this.left = null;
+        this.right = null;
+        this.parent = null;
+    }
+}
+
+class SplayTree {
+    constructor() {
+        this.root = null;
+    }
+
+    rightRotate(x) {
+        let y = x.left;
+        if (y) {
+            x.left = y.right;
+            if (y.right) y.right.parent = x;
+            y.parent = x.parent;
+        }
+        
+        if (!x.parent) this.root = y;
+        else if (x === x.parent.right) x.parent.right = y;
+        else x.parent.left = y;
+        
+        if (y) y.right = x;
+        x.parent = y;
+    }
+
+    leftRotate(x) {
+        let y = x.right;
+        if (y) {
+            x.right = y.left;
+            if (y.left) y.left.parent = x;
+            y.parent = x.parent;
+        }
+        
+        if (!x.parent) this.root = y;
+        else if (x === x.parent.left) x.parent.left = y;
+        else x.parent.right = y;
+        
+        if (y) y.left = x;
+        x.parent = y;
+    }
+
+    splay(x) {
+        while (x.parent) {
+            if (!x.parent.parent) {
+                if (x === x.parent.left) this.rightRotate(x.parent);
+                else this.leftRotate(x.parent);
+            } else if (x === x.parent.left && x.parent === x.parent.parent.left) {
+                this.rightRotate(x.parent.parent);
+                this.rightRotate(x.parent);
+            } else if (x === x.parent.right && x.parent === x.parent.parent.right) {
+                this.leftRotate(x.parent.parent);
+                this.leftRotate(x.parent);
+            } else if (x === x.parent.right && x.parent === x.parent.parent.left) {
+                this.leftRotate(x.parent);
+                this.rightRotate(x.parent);
+            } else {
+                this.rightRotate(x.parent);
+                this.leftRotate(x.parent);
+            }
+        }
+    }
+
+    insert(value) {
+        let node = new Node(value);
+        if (!this.root) {
+            this.root = node;
+            return;
+        }
+
+        let current = this.root;
+        let parent = null;
+
+        while (current) {
+            parent = current;
+            if (value < current.value) current = current.left;
+            else current = current.right;
+        }
+
+        node.parent = parent;
+        if (value < parent.value) parent.left = node;
+        else parent.right = node;
+
+        this.splay(node);
+    }
+
+    search(value) {
+        let current = this.root;
+        while (current) {
+            if (value === current.value) {
+                this.splay(current);
+                return current;
+            }
+            if (value < current.value) current = current.left;
+            else current = current.right;
+        }
+        return null;
+    }
+
+    delete(value) {
+        let node = this.search(value);
+        if (!node) return false;
+
+        if (!node.left) {
+            if (node.right) node.right.parent = null;
+            this.root = node.right;
+        } else {
+            let leftSubtree = node.left;
+            leftSubtree.parent = null;
+            if (node.right) {
+                this.root = node.right;
+                this.root.parent = null;
+                let current = this.root;
+                while (current.left) current = current.left;
+                current.left = leftSubtree;
+                leftSubtree.parent = current;
+            } else {
+                this.root = leftSubtree;
+            }
+        }
+        return true;
+    }
+}
+
+const canvas = document.getElementById('treeCanvas');
+const ctx = canvas.getContext('2d');
+const tree = new SplayTree();
+
+function resizeCanvas() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = window.innerHeight - 200;
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function drawTree() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (!tree.root) return;
+
+    const nodeRadius = 20;
+    const levelHeight = 60;
+    
+    function drawNode(node, x, y, level, maxWidth) {
+        ctx.beginPath();
+        ctx.arc(x, y, nodeRadius, 0, 2 * Math.PI);
+        ctx.fillStyle = '#4CAF50';
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = '14px Arial';
+        ctx.fillText(node.value, x, y);
+
+        if (node.left) {
+            const childX = x - maxWidth / Math.pow(2, level + 1);
+            const childY = y + levelHeight;
+            ctx.beginPath();
+            ctx.moveTo(x - nodeRadius * Math.cos(Math.PI/4), y + nodeRadius * Math.sin(Math.PI/4));
+            ctx.lineTo(childX + nodeRadius * Math.cos(Math.PI/4), childY - nodeRadius * Math.sin(Math.PI/4));
+            ctx.stroke();
+            drawNode(node.left, childX, childY, level + 1, maxWidth);
+        }
+
+        if (node.right) {
+            const childX = x + maxWidth / Math.pow(2, level + 1);
+            const childY = y + levelHeight;
+            ctx.beginPath();
+            ctx.moveTo(x + nodeRadius * Math.cos(Math.PI/4), y + nodeRadius * Math.sin(Math.PI/4));
+            ctx.lineTo(childX - nodeRadius * Math.cos(Math.PI/4), childY - nodeRadius * Math.sin(Math.PI/4));
+            ctx.stroke();
+            drawNode(node.right, childX, childY, level + 1, maxWidth);
+        }
+    }
+
+    drawNode(tree.root, canvas.width/2, 50, 1, canvas.width - 100);
+}
+
+function insertValue() {
+    const value = parseInt(document.getElementById('valueInput').value);
+    if (isNaN(value)) {
+        document.getElementById('message').textContent = 'Please enter a valid number';
+        return;
+    }
+    tree.insert(value);
+    drawTree();
+    document.getElementById('message').textContent = `Inserted ${value}`;
+    document.getElementById('valueInput').value = '';
+}
+
+function searchValue() {
+    const value = parseInt(document.getElementById('valueInput').value);
+    if (isNaN(value)) {
+        document.getElementById('message').textContent = 'Please enter a valid number';
+        return;
+    }
+    const found = tree.search(value);
+    drawTree();
+    document.getElementById('message').textContent = found ? 
+        `Found ${value}` : `${value} not found`;
+    document.getElementById('valueInput').value = '';
+}
+
+function deleteValue() {
+    const value = parseInt(document.getElementById('valueInput').value);
+    if (isNaN(value)) {
+        document.getElementById('message').textContent = 'Please enter a valid number';
+        return;
+    }
+    const deleted = tree.delete(value);
+    drawTree();
+    document.getElementById('message').textContent = deleted ? 
+        `Deleted ${value}` : `${value} not found`;
+    document.getElementById('valueInput').value = '';
+}
+
+function clearTree() {
+    tree.root = null;
+    drawTree();
+    document.getElementById('message').textContent = 'Tree cleared';
+    document.getElementById('valueInput').value = '';
+}
+</script>
+</body></html>
