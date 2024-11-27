@@ -6,7 +6,7 @@ tags:
   - essay
 ---
 
-<img width="150" alt="four leaf clover" src="/images/posts/the-paradox-of-loneliness-alone-but-not-lonely.png" style="float: left; margin-right: 20px;" /> Have you ever felt completely isolated, even when you're surrounded by friends and family? Or felt perfectly content and connected when you're by yourself? It's a curious thing—having a spouse, kids, or even a pet can keep you from being alone, but they might not cure that deep sense of loneliness.
+<img width="150" alt="four leaf clover" src="/images/posts/the-paradox-of-loneliness-alone-but-not-lonely.png" style="float: left; margin-right: 20px;" /> Have you ever felt completely isolated, even when you're surrounded by friends and family? Or felt perfectly content and connected when you're by yourself? It's a curious thing—having a spouse, kids, or even a pet can keep you from being alone, but they might not cure that deep sense of loneliness. True connection isn’t just about physical presence; it’s about feeling seen, understood, and valued on a deeper level. Sometimes, the most profound loneliness comes from being unable to share your authentic self with those around you.
 
 <svg class="road-svg" viewBox="0 0 1000 200">
             <defs>
