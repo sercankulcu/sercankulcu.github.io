@@ -1,14 +1,14 @@
 ---
-title: "Computer and Programming with Java"
+title: "Computer and Introduction to Programming"
 collection: teaching
 type: "Undergraduate course"
-permalink: /teaching/computer-and-programming-with-java
+permalink: /teaching/computer-and-introduction-to-programming
 venue: "University of Giresun, Department of Electrical Electronics Engineering"
-date: 2023-09-04
+date: 2024-11-04
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="computer and programming" src="/images/teaching/computer-and-programming.jpg" style="float: left; margin-right: 10px;"> This course is designed to provide a comprehensive understanding of fundamental concepts in computer science and information technology. Covering essential topics such as Basic Computer Knowledge, Word Processing with Microsoft Word, Spreadsheet Software using Excel, Presentation Skills with PowerPoint, Computer Arithmetic, Hardware and Software fundamentals, Introduction to Algorithms, Pseudo Code, Flowcharts, and Basic Java Programming. This course aims to equip with the necessary skills to navigate the digital landscape.  
+<img align="left" width="200" alt="computer and programming" src="/images/teaching/computer-and-programming.jpg" style="float: left; margin-right: 10px;"> Modern computing encompasses a vast ecosystem of interconnected technologies and tools that have become integral to our daily lives. At its foundation, computers are sophisticated electronic devices managed by operating systems like Windows, macOS, or Linux, which serve as the crucial interface between hardware and software. The Internet has transformed these individual machines into a global network, enabling instantaneous communication and access to an unlimited wealth of information and services. In our professional lives, we regularly interact with office programs such as word processors, spreadsheets, and presentation software, which have digitized and streamlined traditional workplace tasks. Behind all these tools lies the art of programming - the fundamental skill of creating software by writing precise instructions in various programming languages. 
 
 * Ders Öğretim Planı <a href="../files/computer/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
@@ -23,9 +23,13 @@ The resources
 * 2024-2025 <a href="../files/computer/2024-2025-vize-a-cevaplar.pdf">[vize a]</a> <a href="../files/computer/2024-2025-vize-b-cevaplar.pdf">[vize b]</a>
 * 2023-2024 <a href="../files/computer/2023-2024-vize-cevaplar.pdf">[vize]</a> <a href="../files/computer/2023-2024-telafi-cevaplar.pdf">[telafi]</a> <a href="../files/computer/2023-2024-final-cevaplar.pdf">[final]</a>
 * Çukurova Üniversitesi -  Enformatik Bölümü <a href="https://enformatik.cu.edu.tr/cu/Dersler/compulsory-courses/temel-bilgi-teknolojileri-kullanimi/">[website]</a>
+* Cody <a href="https://f.eba.gov.tr/cody/">[website]</a>, Blockly <a href="https://blockly.games/">[website]</a>
+* Download Eclipse <a href="https://www.eclipse.org/downloads/packages/installer">[website]</a>
 
 Chapter 1: Basic Concepts
 ---
+
+A computer is a remarkable electronic device that has revolutionized the way we live, work, and communicate. At its core, it's a machine that processes information using a series of precise instructions called programs. Programming is the art and science of creating these instructions, allowing us to harness the computer's incredible power to solve problems, automate tasks, and create innovative solutions. Through programming languages - which act as bridges between human thinking and machine operations - we can command computers to perform complex calculations, manage vast amounts of data, and create everything from mobile apps to artificial intelligence systems. This fascinating field combines logical thinking, creativity, and problem-solving skills, making it both challenging and incredibly rewarding for those who venture into it.
 
 * Sunum - Temel Kavramlar <a href="../files/computer/Bolum_01_Temel_kavramlar.pdf">[pdf]</a>
 * Sunum - İnternet <a href="../files/computer/Bolum_01_Internet.pdf">[pdf]</a>
@@ -34,10 +38,15 @@ Chapter 1: Basic Concepts
 Chapter 2: Operating Systems
 ---
 
+Operating systems serve as the fundamental backbone of modern computing, acting as a sophisticated intermediary between computer hardware and software applications. Systems like Windows, macOS, and Linux provide essential services that manage computer resources, including memory allocation, process scheduling, file system operations, and device control. They create a user-friendly interface that allows people to interact with their computers through graphical elements rather than complex command lines. Additionally, operating systems handle critical security features, maintaining user permissions and protecting against unauthorized access. Through their multi-tasking capabilities, they enable users to run multiple applications simultaneously while ensuring stable performance and efficient resource utilization.
+
 * Sunum - İşletim Sistemleri <a href="../files/computer/Bolum_02_İsletim_sistemleri.pdf">[pdf]</a>
 * Sunum - Windows <a href="../files/computer/Bolum_02_Windows.pdf">[pdf]</a>
 
 Chapter 3: Office Programs
+---
+
+Office programs have revolutionized workplace productivity by providing digital tools that streamline traditional business tasks. Applications like Microsoft Word, Excel, and PowerPoint have become industry standards, offering powerful features for document creation, data analysis, and presentation design. Word processors enable sophisticated text formatting, collaboration tools, and document tracking capabilities. Spreadsheet programs provide robust calculation engines, data visualization tools, and complex analytical functions that transform raw data into meaningful insights. Presentation software allows users to create engaging slideshows with multimedia elements, animations, and interactive features. These programs continue to evolve with cloud integration, real-time collaboration features, and artificial intelligence-powered assistance, making them indispensable in modern professional environments.
 
 * Sunum - Word <a href="../files/computer/Bolum_03_Word.pdf">[pdf]</a>
 * Sunum - Excel <a href="../files/computer/Bolum_03_Excel.pdf">[pdf]</a>
@@ -45,5 +54,7 @@ Chapter 3: Office Programs
 
 Chapter 4: Introduction to Programming and Java
 -----
+
+Programming is the art and science of instructing computers to perform specific tasks through carefully crafted sets of instructions called code. It serves as the foundation for all software development, from simple mobile apps to complex enterprise systems. Programming languages like Python, Java, and JavaScript provide different approaches to solving computational problems, each with its own syntax and capabilities. The field encompasses fundamental concepts such as variables, control structures, data types, and algorithms, which combine to create powerful software solutions. Learning to program develops critical thinking skills, problem-solving abilities, and logical reasoning, while opening doors to careers in software development, data science, artificial intelligence, and many other technology-driven fields. Modern programming emphasizes not just writing code, but also understanding best practices, debugging techniques, and collaborative development methodologies.
 
 * Sunum - Programlama <a href="../files/computer/Bolum_04_Programlama.pdf">[pdf]</a>
