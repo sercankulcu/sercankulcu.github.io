@@ -4,7 +4,7 @@ collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/object-oriented-programming-with-java
 venue: "University of Giresun, Department of Electrical Electronics Engineering"
-date: 2024-09-04
+date: 2024-01-04
 location: "Giresun, Turkey"
 ---
 
@@ -32,8 +32,7 @@ As a versatile and widely-used programming language, Java provides a powerful to
 * Sunum - Hesaplama <a href="../files/java/slides/Bolum_01_Hesaplama_Hesaplamali_Dusunme.pdf">[pdf]</a>
 * Sunum - Algoritmalar <a href="../files/java/slides/Bolum_01_Algoritmalar.pdf">[pdf]</a>
 * Sunum - Akış Diyagramları <a href="../files/java/slides/Bolum_01_Akis_Diyagramlari.pdf">[pdf]</a>
-
-<a href="../files/java/slides/Bolum_01_Ascii_Table.html">[Ascii Table]</a>
+* Ascii Table <a href="../files/java/slides/Bolum_01_Ascii_Table.html">[Ascii Table]</a>
 
 * Lecture Notes <a href="../files/java/Chapter_01_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders01/src">[java]</a>
