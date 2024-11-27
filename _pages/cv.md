@@ -30,12 +30,12 @@ With 20+ years of experience and a PhD in wireless communication, I specialize i
 ### <img src="/images/logo-giresun.png" alt="GRU" width="50" height="50"> 2015-2023: Teaching Assistant, Giresun University
   I have taught and developed course materials for Object-Oriented Programming in Java, as well as Professional Math and Professional English. My responsibilities included leading tutorials and lab sessions to reinforce understanding, evaluating student performance through exams and assignments, and providing constructive feedback to support their academic growth.
 
-### <img src="/images/logo-sdt.png" alt="SDT" width="75" height="40"> 2011-2015: Leader Software Engineer, SDT Space and Defence Technologies 
+### <img src="/images/logo-sdt.png" alt="SDT" width="50" height="50"> 2011-2015: Leader Software Engineer, SDT Space and Defence Technologies 
   I contributed to the development of digital data recorder projects leveraging real-time Linux distributions. My role involved integrating software with diverse data buses such as MIL-STD-1553B, ARINC429, CAN, and Ethernet. Additionally, I customized and optimized Linux kernels to meet project-specific requirements, ensuring performance and functionality.
 
-### <img src="/images/logo-sdt.png" alt="SDT" width="75" height="40"> 2008-2011: Senior Software Engineer, SDT Space and Defence Technologies 
+### <img src="/images/logo-sdt.png" alt="SDT" width="50" height="50"> 2008-2011: Senior Software Engineer, SDT Space and Defence Technologies 
   I contributed to the development of embedded simulation software using VxWorks, conducting in-depth research on guidance and control systems to ensure simulation accuracy and reliability. This included modeling missile systems with a focus on simulation, guidance, and control, applying advanced mathematical techniques for precision. Additionally, I designed and implemented embedded system software using C and C++.
 
-### <img src="/images/logo-sdt.png" alt="SDT" width="75" height="40"> 2005-2008: Software Engineer, SDT Space and Defence Technologies 
+### <img src="/images/logo-sdt.png" alt="SDT" width="50" height="50"> 2005-2008: Software Engineer, SDT Space and Defence Technologies 
   I collaborated with cross-functional teams to design and implement tactical environment simulation software tailored to client requirements. My responsibilities included developing software for the Linux operating system, integrating it with protocols such as High-Level Architecture (HLA) and Distributed Interactive Simulation (DIS). I also established testing procedures to ensure quality and reliability and actively participated in all stages of the software development lifecycle, from planning to maintenance.
   
