@@ -34,6 +34,8 @@ A computer is a remarkable electronic device that has revolutionized the way we 
 * Sunum - Temel Kavramlar <a href="../files/computer/Bolum_01_Temel_kavramlar.pdf">[pdf]</a>
 * Sunum - İnternet <a href="../files/computer/Bolum_01_Internet.pdf">[pdf]</a>
 * Sunum - Donanım <a href="../files/computer/Bolum_01_Donanim.pdf">[pdf]</a>
+* Sunum - Bilgisayarlar <a href="../files/java/slides/Bolum_01_Bilgisayarlar.pdf">[pdf]</a> 
+* Sunum - Hesaplama <a href="../files/java/slides/Bolum_01_Hesaplama_Hesaplamali_Dusunme.pdf">[pdf]</a>
 
 Chapter 2: Operating Systems
 ---
@@ -58,3 +60,43 @@ Chapter 4: Introduction to Programming and Java
 Programming is the art and science of instructing computers to perform specific tasks through carefully crafted sets of instructions. It serves as the foundation for all software development, from simple mobile apps to complex enterprise systems. Programming languages like Python, Java, and JavaScript provide different approaches to solving computational problems, each with its own syntax and capabilities. The field encompasses fundamental concepts such as variables, control structures, data types, and algorithms, which combine to create powerful software solutions. Learning to program develops critical thinking skills, problem-solving abilities, and logical reasoning, while opening doors to careers in software development, data science, artificial intelligence, and many other technology-driven fields. 
 
 * Sunum - Programlama <a href="../files/computer/Bolum_04_Programlama.pdf">[pdf]</a>
+* Sunum - Algoritmalar <a href="../files/java/slides/Bolum_01_Algoritmalar.pdf">[pdf]</a>
+* Sunum - Akış Diyagramları <a href="../files/java/slides/Bolum_01_Akis_Diyagramlari.pdf">[pdf]</a>
+
+* Lecture Notes <a href="../files/java/Chapter_01_Introduction.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders01/src">[java]</a>
+
+Chapter 5: Basic Syntax and Data Types
+-----
+
+Understanding the fundamental syntax and data types of Java is essential for building effective and efficient software systems, as it provides the building blocks for defining program logic, manipulating data, and communicating with external resources.
+
+* Sunum - Programlama <a href="../files/java/slides/Bolum_02_Programlama.pdf">[pdf]</a> 
+* Sunum - Söz Dizimi <a href="../files/java/slides/Bolum_02_Soz_Dizimi_Kurallari.pdf">[pdf]</a> 
+
+* Lecture Notes <a href="../files/java/Chapter_02_Basic_Syntax_and_Data_Types.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders02/src">[java]</a>
+
+Chapter 6: Control Structures
+-----
+
+Control structures, which include conditional statements and loops, provide a powerful mechanism for controlling the flow of execution in a Java program, enabling developers to create complex, dynamic behaviors and respond to a wide range of inputs and events.
+
+* Sunum - Kontrol Yapıları <a href="../files/java/slides/Bolum_03_Kontrol_Yapilari.pdf">[pdf]</a> 
+* Sunum - Örnek Uygulamalar <a href="../files/java/slides/Bolum_03_Ornekler.pdf">[pdf]</a> 
+* Sunum - Örnek Fonksiyonlar <a href="../files/java/slides/Bolum_03_Ornek_Fonksiyonlar.pdf">[pdf]</a> 
+* Sunum - Örnek Çıktılar <a href="../files/java/slides/Bolum_03_Ornek_Ciktilar.pdf">[pdf]</a> 
+
+* Lecture Notes <a href="../files/java/Chapter_03_Control_Structures.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src">[java]</a>
+
+Chapter 7: Functions
+-----
+
+Functions are fundamental building blocks that allow developers to encapsulate a set of instructions into reusable units. They help improve code organization, readability, and maintainability by enabling modular design. A function typically takes input, called parameters, performs a specific task, and may return a result. Functions also promote abstraction, allowing developers to use complex operations without needing to understand their internal implementation. 
+
+* Sunum - Fonksiyonlar <a href="../files/java/slides/Bolum_03_Fonksiyonlar.pdf">[pdf]</a> 
+* Sunum - Özyineleme <a href="../files/java/slides/Bolum_03_Ozyineleme.pdf">[pdf]</a> 
+
+* Lecture Notes <a href="../files/java/Chapter_03_Control_Structures.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src">[java]</a>
