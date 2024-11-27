@@ -8,21 +8,19 @@ date: 2023-09-04
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="object oriented programming" src="/images/teaching/computer-and-programming.jpg" style="float: left; margin-right: 10px;"> This course is designed to provide a comprehensive understanding of fundamental concepts in computer science and information technology. Covering essential topics such as Basic Computer Knowledge, Word Processing with Microsoft Word, Spreadsheet Software using Excel, Presentation Skills with PowerPoint, Computer Arithmetic, Hardware and Software fundamentals, Introduction to Algorithms, Pseudo Code, Flowcharts, and Basic Java Programming. This course aims to equip with the necessary skills to navigate the digital landscape.  
+<img align="left" width="200" alt="computer and programming" src="/images/teaching/computer-and-programming.jpg" style="float: left; margin-right: 10px;"> This course is designed to provide a comprehensive understanding of fundamental concepts in computer science and information technology. Covering essential topics such as Basic Computer Knowledge, Word Processing with Microsoft Word, Spreadsheet Software using Excel, Presentation Skills with PowerPoint, Computer Arithmetic, Hardware and Software fundamentals, Introduction to Algorithms, Pseudo Code, Flowcharts, and Basic Java Programming. This course aims to equip with the necessary skills to navigate the digital landscape.  
 
 * Ders Öğretim Planı <a href="../files/computer/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
 The resources
 ---
 
-* Dev Java <a href="https://dev.java/learn/">[website]</a>
-* Java Youtube <a href="https://www.youtube.com/java">[youtube]</a>
-* Download Eclipse <a href="https://www.eclipse.org/downloads/packages/installer">[website]</a>
-* Oracle Java Tutorials <a href="https://docs.oracle.com/javase/tutorial/">[website]</a>
-* Java ile Nesneye Yönelik Programlama, Oğuz Aslantürk <a href="https://web.cs.hacettepe.edu.tr/~bbm102/misc/java_notes_by_oa.pdf">[pdf]</a>
+* Çukurova Üniversitesi -  Enformatik Bölümü <a href="https://enformatik.cu.edu.tr/cu/Dersler/compulsory-courses/temel-bilgi-teknolojileri-kullanimi/">[website]</a>
 
-Chapter 1: Microsoft Word
+Chapter 1: Basic Concepts
 ---
+
+* Sunum - Temel Kavramlar <a href="../files/computer/Bolum_01_Temel_kavramlar.pdf">[pdf]</a>
 
 Chapter 2: Microsoft Excel
 ---
