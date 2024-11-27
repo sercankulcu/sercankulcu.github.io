@@ -31,29 +31,17 @@ As a hands-on software engineer with over 15 years of experience, I am a versati
 ## Work experience
 
 ### <img src="/images/logo-giresun.png" alt="GRU" width="50" height="50"> 2023-Present: Assistant Professor, Giresun University
-  * Teaching and developing course materials for Operating Systems and Data Structures using Java language
-  * Conducted tutorials and lab sessions to assist students in understanding the course materials
-  * Graded exams, assignments, and provided feedback to students to enhance their academic performance
+  I teach and develop course materials for Operating Systems, Data Structures and Algorithms, and Introduction to Programming using Java, combining lectures with hands-on tutorials and lab sessions to ensure students grasp both theory and practice. I also evaluate their progress through exams and assignments, offering constructive feedback to support their learning.
 
 ### <img src="/images/logo-giresun.png" alt="GRU" width="50" height="50"> 2015-2023: Teaching Assistant, Giresun University
-  * Teaching and developing course materials for Object-Oriented Programming using Java language, Professional Math, and Professional English courses
-  * Conducted tutorials and lab sessions to assist students in understanding the course materials
-  * Graded exams, assignments, and provided feedback to students to enhance their academic performance
+  I have taught and developed course materials for Object-Oriented Programming in Java, as well as Professional Math and Professional English. My responsibilities included leading tutorials and lab sessions to reinforce understanding, evaluating student performance through exams and assignments, and providing constructive feedback to support their academic growth.
 
 ### <img src="/images/logo-sdt.png" alt="SDT" width="50" height="50"> 2011-2015: Leader Software Engineer, SDT Space and Defence Technologies 
-  * Contributed to the development of digital data recorder projects using real-time Linux distributions
-  * Integrated software with various data buses including MIL-STD-1553B, ARINC429, CAN, and Ethernet
-  * Compiled kernels to meet specific needs and requirements, utilizing expertise in kernel configuration and optimization
+  I contributed to the development of digital data recorder projects leveraging real-time Linux distributions. My role involved integrating software with diverse data buses such as MIL-STD-1553B, ARINC429, CAN, and Ethernet. Additionally, I customized and optimized Linux kernels to meet project-specific requirements, ensuring performance and functionality.
 
 ### <img src="/images/logo-sdt.png" alt="SDT" width="50" height="50"> 2008-2011: Senior Software Engineer, SDT Space and Defence Technologies 
-  * Contributed to the development of an embedded simulation software using VxWorks
-  * Conducted extensive research on guidance and control systems to ensure the accuracy and effectiveness of the simulations
-  * Modeled missile systems with respect to simulation, guidance and control issues, utilizing advanced mathematical modeling techniques to create accurate simulations
-  * Designed and developed software for embedded systems using C and C++
+  I contributed to the development of embedded simulation software using VxWorks, conducting in-depth research on guidance and control systems to ensure simulation accuracy and reliability. This included modeling missile systems with a focus on simulation, guidance, and control, applying advanced mathematical techniques for precision. Additionally, I designed and implemented embedded system software using C and C++.
 
 ### <img src="/images/logo-sdt.png" alt="SDT" width="50" height="50"> 2005-2008: Software Engineer, SDT Space and Defence Technologies 
-  * Collaborated with cross-functional teams to develop and implement a tactical environment simulation software that met client needs
-  * Designed and developed software for Linux operating system
-  * Implemented software testing procedures to ensure quality and reliability of software solutions
-  * Integrated software with various protocols including High-Level Architecture (HLA) Protocol and Distributed Interactive Simulation (DIS) Protocol
-  * Participated in all phases of the software development cycle, from planning to maintenance
+  I collaborated with cross-functional teams to design and implement tactical environment simulation software tailored to client requirements. My responsibilities included developing software for the Linux operating system, integrating it with protocols such as High-Level Architecture (HLA) and Distributed Interactive Simulation (DIS). I also established testing procedures to ensure quality and reliability and actively participated in all stages of the software development lifecycle, from planning to maintenance.
+  
