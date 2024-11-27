@@ -22,52 +22,21 @@ Chapter 1: Basic Concepts
 
 * Sunum - Temel Kavramlar <a href="../files/computer/Bolum_01_Temel_kavramlar.pdf">[pdf]</a>
 * Sunum - İnternet <a href="../files/computer/Bolum_01_Internet.pdf">[pdf]</a>
+* Sunum - Donanım <a href="../files/computer/Bolum_01_Donanim.pdf">[pdf]</a>
 
-Chapter 2: Computer Hardware
+Chapter 2: Operating Systems
 ---
 
-* Sunum - Donanım <a href="../files/computer/Bolum_02_Donanim.pdf">[pdf]</a>
+* Sunum - İşletim Sistemleri <a href="../files/computer/Bolum_02_İsletim_sistemleri.pdf">[pdf]</a>
+* Sunum - Windows <a href="../files/computer/Bolum_02_Windows.pdf">[pdf]</a>
 
-Chapter 3: Operating Systems
----
+Chapter 3: Office Programs
 
-* Sunum - İşletim Sistemleri <a href="../files/computer/Bolum_03_İsletim_sistemleri.pdf">[pdf]</a>
-* Sunum - Windows <a href="../files/computer/Bolum_03_Windows.pdf">[pdf]</a>
+* Sunum - Word <a href="../files/computer/Bolum_03_Word.pdf">[pdf]</a>
+* Sunum - Excel <a href="../files/computer/Bolum_03_Excel.pdf">[pdf]</a>
+* Sunum - PowerPoint <a href="../files/computer/Bolum_03_PowerPoint.pdf">[pdf]</a>
 
 Chapter 4: Introduction to Programming and Java
 -----
 
-As a versatile and widely-used programming language, Java provides a powerful toolset for developing a diverse range of applications, from desktop and mobile apps to web-based services and enterprise software systems.
-
 * Sunum - Programlama <a href="../files/computer/Bolum_04_Programlama.pdf">[pdf]</a>
-* Sunum - Hesaplama <a href="../files/java/slides/Bolum_01_Hesaplama_Hesaplamali_Dusunme.pdf">[pdf]</a>
-* Sunum - Akış Diyagramları <a href="../files/java/slides/Bolum_01_Akis_Diyagramlari.pdf">[pdf]</a>
-* Sunum - Algoritmalar <a href="../files/java/slides/Bolum_01_Algoritmalar.pdf">[pdf]</a>
-* Sunum - Bilgisayarlar <a href="../files/java/slides/Bolum_01_Bilgisayarlar.pdf">[pdf]</a> 
-
-* Lecture Notes <a href="../files/java/Chapter_01_Introduction.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture01">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders01">[tr]</a>
-
-Chapter 5: Basic Syntax and Data Types
------
-
-Understanding the fundamental syntax and data types of Java is essential for building effective and efficient software systems, as it provides the building blocks for defining program logic, manipulating data, and communicating with external resources.
-
-* Sunum - Programlama <a href="../files/java/slides/Bolum_02_Programlama.pdf">[pdf]</a> 
-* Sunum - Söz Dizimi <a href="../files/java/slides/Bolum_02_Soz_Dizimi_Kurallari.pdf">[pdf]</a> 
-
-* Lecture Notes <a href="../files/java/Chapter_02_Basic_Syntax_and_Data_Types.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture02">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders02">[tr]</a>
-
-Chapter 6: Control Structures
------
-
-Control structures, which include conditional statements and loops, provide a powerful mechanism for controlling the flow of execution in a Java program, enabling developers to create complex, dynamic behaviors and respond to a wide range of inputs and events.
-
-* Sunum - Kontrol Yapıları <a href="../files/java/slides/Bolum_03_Kontrol_Yapilari.pdf">[pdf]</a> 
-* Sunum - Fonksiyonlar <a href="../files/java/slides/Bolum_03_Fonksiyonlar.pdf">[pdf]</a> 
-* Sunum - Özyineleme <a href="../files/java/slides/Bolum_03_Ozyineleme.pdf">[pdf]</a> 
-
-* Lecture Notes <a href="../files/java/Chapter_03_Control_Structures.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture03">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03">[tr]</a>
-
