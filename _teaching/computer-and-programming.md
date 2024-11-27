@@ -12,9 +12,16 @@ location: "Giresun, Turkey"
 
 * Ders Öğretim Planı <a href="../files/computer/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
+Duyurular
+---
+
+* Ödev 1 verildi <a href="../files/computer/odev1.html">[tıkla]</a>
+
 The resources
 ---
 
+* 2024-2025 <a href="../files/computer/2024-2025-vize-a-cevaplar.pdf">[vize a]</a> <a href="../files/computer/2024-2025-vize-b-cevaplar.pdf">[vize b]</a>
+* 2023-2024 <a href="../files/computer/2023-2024-vize-cevaplar.pdf">[vize]</a> <a href="../files/computer/2023-2024-telafi-cevaplar.pdf">[telafi]</a> <a href="../files/computer/2023-2024-final-cevaplar.pdf">[final]</a>
 * Çukurova Üniversitesi -  Enformatik Bölümü <a href="https://enformatik.cu.edu.tr/cu/Dersler/compulsory-courses/temel-bilgi-teknolojileri-kullanimi/">[website]</a>
 
 Chapter 1: Basic Concepts
