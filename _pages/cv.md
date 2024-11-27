@@ -22,7 +22,7 @@ With 20+ years of experience and a PhD in wireless communication, I specialize i
 ### <img src="/images/logo-hacettepe.png" alt="Hacettepe" width="50" height="50"> B.S. in Computer Engineering, Hacettepe University, 2006
   I developed a Tetris game using assembly language and interrupts for random number generation and keyboard interaction, designed to run on an x86 PC platform. Additionally, I created a file system utilizing the B+ tree data structure in C++ for efficient file storage, retrieval, allocation, deletion, and searching. I also built a Java Swing-based chat application with a client-server architecture using sockets, enabling local network communication through a user-friendly GUI. Furthermore, I developed an image processing application using computer vision techniques to detect license plates and estimate the speed of moving vehicles.
 
-## Work experience
+## Professional Experience
 
 ### <img src="/images/logo-giresun.png" alt="GRU" width="50" height="50"> 2023-Present: Assistant Professor, Giresun University
   I teach and develop course materials for Operating Systems, Data Structures and Algorithms, and Introduction to Programming using Java, combining lectures with hands-on tutorials and lab sessions to ensure students grasp both theory and practice. I also evaluate their progress through exams and assignments, offering constructive feedback to support their learning.
