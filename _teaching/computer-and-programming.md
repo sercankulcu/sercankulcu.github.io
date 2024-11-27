@@ -100,3 +100,17 @@ Functions are fundamental building blocks that allow developers to encapsulate a
 
 * Lecture Notes <a href="../files/java/Chapter_03_Control_Structures.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src">[java]</a>
+
+Chapter 8: Object and Classes
+-----
+
+Object-oriented programming (OOP) is a powerful paradigm for structuring and organizing software systems, and is a cornerstone of Java programming, providing a flexible and modular approach to designing, implementing, and maintaining complex applications.
+
+* Sunum - Nesne ve Sınıflar <a href="../files/java/slides/Bolum_04_Nesne_Sinif.pdf">[pdf]</a> 
+* Sunum - Sarmalama <a href="../files/java/slides/Bolum_04_Sarmalama.pdf">[pdf]</a> 
+* Sunum - Kalıtım <a href="../files/java/slides/Bolum_04_Kalitim.pdf">[pdf]</a> 
+* Sunum - Çok Biçimlilik <a href="../files/java/slides/Bolum_04_Cok_Bicimlilik.pdf">[pdf]</a> 
+* Sunum - Soyut Sınıflar <a href="../files/java/slides/Bolum_04_Soyut_Siniflar.pdf">[pdf]</a> 
+
+* Lecture Notes <a href="../files/java/Chapter_04_Object_Oriented_Programming.pdf">[pdf]</a>
+* Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders04/src">[java]</a>
