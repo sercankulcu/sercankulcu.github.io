@@ -22,11 +22,15 @@ Chapter 1: Basic Concepts
 
 * Sunum - Temel Kavramlar <a href="../files/computer/Bolum_01_Temel_kavramlar.pdf">[pdf]</a>
 
-Chapter 2: Microsoft Excel
+Chapter 2: Computer Hardware
 ---
 
-Chapter 3: Microsoft Powerpoint
+* Sunum - Donanım <a href="../files/computer/Bolum_02_Donanim.pdf">[pdf]</a>
+
+Chapter 3: Operating Systems
 ---
+
+* Sunum - İşletim Sistemleri <a href="../files/computer/Bolum_03_İsletim_sistemleri.pdf">[pdf]</a>
 
 Chapter 4: Introduction to Programming and Java
 -----
