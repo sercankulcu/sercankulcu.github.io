@@ -21,6 +21,7 @@ Chapter 1: Basic Concepts
 ---
 
 * Sunum - Temel Kavramlar <a href="../files/computer/Bolum_01_Temel_kavramlar.pdf">[pdf]</a>
+* Sunum - İnternet <a href="../files/computer/Bolum_01_Internet.pdf">[pdf]</a>
 
 Chapter 2: Computer Hardware
 ---
@@ -31,12 +32,14 @@ Chapter 3: Operating Systems
 ---
 
 * Sunum - İşletim Sistemleri <a href="../files/computer/Bolum_03_İsletim_sistemleri.pdf">[pdf]</a>
+* Sunum - Windows <a href="../files/computer/Bolum_03_Windows.pdf">[pdf]</a>
 
 Chapter 4: Introduction to Programming and Java
 -----
 
 As a versatile and widely-used programming language, Java provides a powerful toolset for developing a diverse range of applications, from desktop and mobile apps to web-based services and enterprise software systems.
 
+* Sunum - Programlama <a href="../files/computer/Bolum_04_Programlama.pdf">[pdf]</a>
 * Sunum - Hesaplama <a href="../files/java/slides/Bolum_01_Hesaplama_Hesaplamali_Dusunme.pdf">[pdf]</a>
 * Sunum - Akış Diyagramları <a href="../files/java/slides/Bolum_01_Akis_Diyagramlari.pdf">[pdf]</a>
 * Sunum - Algoritmalar <a href="../files/java/slides/Bolum_01_Algoritmalar.pdf">[pdf]</a>
@@ -67,3 +70,4 @@ Control structures, which include conditional statements and loops, provide a po
 
 * Lecture Notes <a href="../files/java/Chapter_03_Control_Structures.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Lecture03">[eng]-</a><a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03">[tr]</a>
+
