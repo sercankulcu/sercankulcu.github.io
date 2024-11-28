@@ -7,7 +7,7 @@ tags:
   - career
 ---
 
-<img width="150" alt="29 october" src="/images/posts/a-century-of-resilience.png" style="float: left; margin-right: 20px;" /> As the nation stands at the threshold of the 100th anniversary of Turkish Republic Day, a profound sense of pride and reflection envelops the hearts of every citizen. On this momentous occasion, we celebrate not only a century of independence but also the unwavering spirit that has defined the Turkish people through triumphs and challenges alike.
+<img width="150" alt="29 october" src="/images/posts/a-century-of-resilience.png" style="float: left; margin-right: 20px;" /> As the nation stands at the threshold of the 100th anniversary of Turkish Republic Day, a profound sense of pride and reflection envelops the hearts of every citizen. On this momentous occasion, we celebrate not only a century of independence but also the unwavering spirit that has defined the Turkish people through triumphs and challenges alike. This milestone serves as a testament to the enduring vision of Mustafa Kemal Atatürk and the collective determination of a nation to build a brighter future.
 
 A hundred years ago, on October 29, 1923, the Republic of Turkey was officially declared, signaling the dawn of a new era. Mustafa Kemal Atatürk, the visionary leader and architect of modern Turkey, spearheaded a revolutionary journey that transformed the nation's destiny. Today, as an author, I find myself compelled to delve into the significance of this remarkable centenary.
 
