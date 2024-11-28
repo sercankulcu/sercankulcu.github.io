@@ -7,7 +7,7 @@ tags:
   - career
 ---
 
-In the journey of life and pursuits, the wisdom shared by thought leaders often serves as a guiding light. One such piece of advice comes from Seth Godin, who encourages us never to abandon something with great long-term potential merely due to the stress of the moment. It's a call to embrace resilience and see beyond the challenges of the present.
+<img width="200" alt="wisdom" src="/images/posts/the-wisdom-of-seth-godin-and-jerzy-gregorek.png" style="float: left; margin-right: 10px;" /> In the journey of life and pursuits, the wisdom shared by thought leaders often serves as a guiding light. One such piece of advice comes from Seth Godin, who encourages us never to abandon something with great long-term potential merely due to the stress of the moment. It's a call to embrace resilience and see beyond the challenges of the present. This perspective reminds us that temporary discomfort is often the price of meaningful progress, urging us to stay committed to our deeper goals. By shifting our focus to the bigger picture, we cultivate the patience and determination needed for lasting success.
 
 Godin's insight echoes the sentiment expressed by Jerzy Gregorek: "Easy Choices, Hard Life. Hard Choices, Easy Life." This profound statement urges us to consider the consequences of our choices. Opting for the easy way out might provide temporary relief, but it can lead to enduring difficulties in the long run. Conversely, making the hard choices and persevering through challenges can pave the way for a more comfortable and fulfilling life in the future.
 
