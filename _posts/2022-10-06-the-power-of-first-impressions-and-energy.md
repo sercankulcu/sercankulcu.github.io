@@ -6,7 +6,7 @@ tags:
   - self-development
 ---
 
-<img width="200" alt="artificial intelligence" src="/images/posts/the-power-of-first-impressions-and-energy.jpg" style="float: left; margin-right: 10px;" /> Have you ever met someone and immediately had a gut feeling about whether they were a good or bad fit for your life? That intuitive sense, often felt from the first day of meeting someone, is a fascinating interplay of the energy they project and your internal judgment models, shaped by past experiences.
+<img width="200" alt="first impressions" src="/images/posts/the-power-of-first-impressions-and-energy.jpg" style="float: left; margin-right: 10px;" /> Have you ever met someone and immediately had a gut feeling about whether they were a good or bad fit for your life? That intuitive sense, often felt from the first day of meeting someone, is a fascinating interplay of the energy they project and your internal judgment models, shaped by past experiences.
 
 1. The Power of First Impressions:
 First impressions are powerful and are often formed within seconds of meeting someone. These impressions can influence our perceptions and guide our initial feelings about an individual.

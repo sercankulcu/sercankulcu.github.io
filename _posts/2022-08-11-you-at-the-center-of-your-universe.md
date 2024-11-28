@@ -7,7 +7,7 @@ tags:
   - career
 ---
 
-In the grand scheme of things, we often like to believe that we are the center of the universe – that our presence is as significant to others as it is to ourselves. But let's take a moment to consider a sobering truth: in reality, we might not be as important as we think.
+<img width="200" alt="self-importance" src="/images/posts/you-at-the-center-of-your-universe.png" style="float: left; margin-right: 10px;" /> In the grand scheme of things, we often like to believe that we are the center of the universe – that our presence is as significant to others as it is to ourselves. But let's take a moment to consider a sobering truth: in reality, we might not be as important as we think.
 
 Life is a transient journey, a journey that we're all just passing through, each of us navigating our own time in this vast universe. The control we have over the duration of our journey is limited; time ticks away, and we can't halt its relentless progression.
 
