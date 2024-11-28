@@ -7,7 +7,7 @@ tags:
   - career
 ---
 
-Self-talk, the internal dialogue we have with ourselves, is a powerful and often underestimated aspect of our daily lives. This internal conversation plays a crucial role in shaping our thoughts, emotions, and ultimately, our actions. Understanding the dynamics of self-talk can unlock a range of benefits for our mental well-being.
+<img width="200" alt="peacock" src="/images/posts/the-art-of-self-talk.png" style="float: left; margin-right: 10px;" /> Self-talk, the internal dialogue we have with ourselves, is a powerful and often underestimated aspect of our daily lives. This internal conversation plays a crucial role in shaping our thoughts, emotions, and ultimately, our actions. Understanding the dynamics of self-talk can unlock a range of benefits for our mental well-being. Positive self-talk can boost confidence, reduce stress, and help cultivate a more resilient mindset in the face of challenges. On the other hand, negative self-talk can reinforce self-doubt and hinder personal growth, making it essential to cultivate awareness and mindfulness in our internal dialogue.
 
 At its core, self-talk is the ongoing stream of thoughts, affirmations, and reflections that we engage in within our minds. It's the voice inside our heads that accompanies us throughout the day, influencing our perceptions and responses to various situations.
 
