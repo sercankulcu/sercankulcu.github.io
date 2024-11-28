@@ -6,7 +6,7 @@ tags:
   - self-development
 ---
 
-<img width="150" alt="path journey" src="/images/posts/embracing-the-beauty-of-the-journey.jpg" style="float: left; margin-right: 20px;" /> "If the path is beautiful, let us not ask where it leads." These words by Anatole France encapsulate a profound perspective on life's journey, encouraging us to appreciate the beauty of the present without fixating on the destination. While the concept may initially seem challenging to digest, it unveils a rich wisdom that invites us to focus on the journey itself.
+<img width="150" alt="path journey" src="/images/posts/embracing-the-beauty-of-the-journey.jpg" style="float: left; margin-right: 20px;" /> “If the path is beautiful, let us not ask where it leads.” These words by Anatole France encapsulate a profound perspective on life’s journey, encouraging us to appreciate the beauty of the present without fixating on the destination. While the concept may initially seem challenging to digest, it unveils a rich wisdom that invites us to focus on the journey itself. By embracing this mindset, we learn to find joy and meaning in each moment, rather than deferring happiness to an uncertain future.
 
 1. Savoring the Beauty of the Path:
 The metaphorical path represents the journey of life, filled with experiences, challenges, and moments of joy. Anatole France invites us to appreciate the inherent beauty in the process rather than fixating solely on the end goal.
