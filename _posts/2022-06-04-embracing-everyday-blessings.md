@@ -7,7 +7,7 @@ tags:
   - career
 ---
 
-In the hustle and bustle of our daily lives, it's easy to overlook the simple truth that today is great, and tomorrow holds the promise of being even better. Each day is a gift, a true blessing that deserves recognition and gratitude.
+<img width="200" alt="pain" src="/images/posts/embracing-everyday-blessings.png" style="float: left; margin-right: 10px;" /> In the hustle and bustle of our daily lives, it’s easy to overlook the simple truth that today is great, and tomorrow holds the promise of being even better. Each day is a gift, a true blessing that deserves recognition and gratitude. Taking a moment to appreciate the present allows us to find joy in the small things and build a mindset of positivity. By doing so, we open ourselves to the limitless possibilities that tomorrow may bring.
 
 How can we cultivate a mindset that appreciates the beauty of every moment?
 
