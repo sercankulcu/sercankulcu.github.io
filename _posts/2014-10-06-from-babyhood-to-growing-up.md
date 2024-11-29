@@ -7,7 +7,7 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="childhood" src="/images/posts/from-babyhood-to-growing-up.jpg" style="float: left; margin-right: 10px;" /> Babies, in their earliest stages of life, operate on a simple yet effective communication system: crying. When they desire food or a clean diaper, they express their needs through this universal language. Parents or caregivers promptly respond, addressing their immediate requirements. However, as children grow and develop, a fascinating shift occurs in the dynamics of their desires and actions.
+<img width="200" alt="childhood" src="/images/posts/from-babyhood-to-growing-up.jpg" style="float: left; margin-right: 10px;" /> Babies, in their earliest stages of life, operate on a simple yet effective communication system: crying. When they desire food or a clean diaper, they express their needs through this universal language. Parents or caregivers promptly respond, addressing their immediate requirements. However, as children grow and develop, a fascinating shift occurs in the dynamics of their desires and actions. Their communication evolves into more complex forms, such as gestures and speech, allowing for richer interactions and deeper connections with those around them.
 
 1. The Language of Crying:
 In infancy, babies communicate their needs through crying. It's a straightforward mechanism that prompts caregivers to attend to their requirements, ensuring their basic needs are met promptly.
