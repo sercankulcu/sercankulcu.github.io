@@ -7,7 +7,7 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="clock deadline" src="/images/posts/ignorance-lead-to-sinking.jpg" style="float: left; margin-right: 10px;" /> We all have deadlines – those crucial due dates that hang over us like a looming cloud. Ignoring them might seem like a temporary relief, but the truth is, deadlines don't disappear on their own. Here's a reminder about the significance of facing due dates and not letting ignorance lead to sinking.
+<img width="200" alt="clock deadline" src="/images/posts/ignorance-lead-to-sinking.png" style="float: left; margin-right: 10px;" /> We all have deadlines – those crucial due dates that hang over us like a looming cloud. Ignoring them might seem like a temporary relief, but the truth is, deadlines don't disappear on their own. Here's a reminder about the significance of facing due dates and not letting ignorance lead to sinking.
 
 ### When is the Due Date?
 The due date is that looming point in the future when a task, project, or obligation needs to be completed. It's a timeline that demands our attention and action. Knowing the due date is the first step in navigating the challenges ahead.
