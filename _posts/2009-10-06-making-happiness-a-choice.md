@@ -6,7 +6,7 @@ tags:
   - self-improvement
 ---
 
-Have you ever tried to make someone happy and found that despite your best efforts, their mood remained unchanged? It's a common realization that happiness, to a large extent, is a personal choice. The simple truth is, you cannot make others happy unless they, themselves, choose to embrace happiness.
+<img width="200" alt="happiness" src="/images/posts/making-happiness-a-choice.jpg" style="float: left; margin-right: 10px;" /> Have you ever gone out of your way to brighten someone’s day, only to realize that no matter how much effort you put in, their mood stayed the same? It can be a challenging and eye-opening experience that highlights an important truth about happiness: it is deeply personal and often a matter of individual choice. While kind gestures, words of encouragement, and thoughtful actions can provide support and comfort, the reality is that lasting happiness comes from within. No matter how much you want to help someone feel better, true contentment and joy are only possible when that person decides to embrace positivity and take steps to cultivate happiness in their own life.
 
 ### The Personal Nature of Happiness:
 Happiness is a deeply personal and subjective experience. What brings joy to one person may not necessarily have the same effect on another. Recognizing this individuality is crucial in understanding that external efforts alone may not be sufficient to change someone's emotional state.
