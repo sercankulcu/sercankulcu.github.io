@@ -88,7 +88,7 @@ Have you ever wondered how your computer or smartphone handles text so efficient
 * Sunum-Dizgi Ayrıştırma <a href="../files/algorithms/slides/Bolum_05_04_Dizgi_Ayristirma.pdf">[pdf]</a>
 * Sunum-Dizgi Düzenleme <a href="../files/algorithms/slides/Bolum_05_05_Dizgi_Duzenleme_Mesafe.pdf">[pdf]</a>
 * Sunum-Dizgi Dönüştürme <a href="../files/algorithms/slides/Bolum_05_06_Dizgi_Donusturme.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/algorithms/Chapter_05_.pdf">[pdf]</a>
+* Lecture Notes <a href="../files/algorithms/Chapter_05_Dynamic.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter5">[link]</a>
 
 
