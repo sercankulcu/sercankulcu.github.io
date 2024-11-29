@@ -7,7 +7,7 @@ tags:
   - self-improvement
 ---
 
-Have you ever noticed how a friend's laughter can be contagious, instantly lifting your spirits? Or how a somber atmosphere in a room can influence your mood, even without a single word being spoken? Turns out, emotions have the remarkable ability to transfer from one person to another, creating a ripple effect in our social interactions.
+<img width="200" alt="dog smile" src="/images/posts/how-emotions-can-transfer-between-people.jpg" style="float: left; margin-right: 10px;" /> Have you ever noticed how a friend's laughter can be contagious, instantly lifting your spirits? Or how a somber atmosphere in a room can influence your mood, even without a single word being spoken? Turns out, emotions have the remarkable ability to transfer from one person to another, creating a ripple effect in our social interactions.
 
 ### Mirror Neurons:
 Scientists believe that mirror neurons play a key role in the transfer of emotions between individuals. These neurons fire both when we experience an emotion and when we observe someone else experiencing the same emotion. It's like an emotional echo that connects us on a deeper level.
