@@ -8,7 +8,7 @@ tags:
   - philosophy
 ---
 
-Have you ever experienced a delightful moment that came out of the blue, catching you by surprise and bringing a smile to your face? That's serendipity for you – the magic of happy occurrences that happen entirely by accident, without any prior expectations. Let's explore the beauty of serendipity and why it adds a special touch to our lives.
+<img width="200" alt="happy tiger" src="/images/posts/the-joy-of-unexpected-happy-moments.jpg" style="float: left; margin-right: 10px;" /> Have you ever experienced a delightful moment that came out of the blue, catching you by surprise and bringing a smile to your face? That's serendipity for you – the magic of happy occurrences that happen entirely by accident, without any prior expectations. Let's explore the beauty of serendipity and why it adds a special touch to our lives.
 
 ### Unplanned Happiness:
 Serendipity is all about stumbling upon joy when you least expect it. It's like finding a hidden treasure in the midst of your daily routine, making those moments even more precious.
