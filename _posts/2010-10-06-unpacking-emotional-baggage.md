@@ -7,7 +7,7 @@ tags:
   - self-improvement
 ---
 
-In the intricate dance of life, each of us carries a unique set of baggage, a collection of experiences, beliefs, and influences bestowed upon us by our families, friends, and the broader cultural milieu. This baggage shapes our perceptions, behaviors, and responses to the world around us. Yet, amidst this complexity, a crucial question arises—how often do we assess, maintain, or replace our emotional baggage?
+<img width="200" alt="baggage" src="/images/posts/unpacking-emotional-baggage.png" style="float: left; margin-right: 10px;" /> In the intricate dance of life, each of us carries a unique set of baggage, a collection of experiences, beliefs, and influences bestowed upon us by our families, friends, and the broader cultural milieu. This baggage shapes our perceptions, behaviors, and responses to the world around us. Yet, amidst this complexity, a crucial question arises—how often do we assess, maintain, or replace our emotional baggage?
 
 1. The Weight of Collective Influence:
 Our emotional baggage is not solely a product of our individual experiences; it's a composite of the collective influences we inherit from our families, friends, and cultural context. Unraveling the threads of personal versus shared baggage can be a nuanced endeavor.
