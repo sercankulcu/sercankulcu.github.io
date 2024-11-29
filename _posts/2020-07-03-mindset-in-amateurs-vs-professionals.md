@@ -6,7 +6,7 @@ tags:
   - career
 ---
 
-<img width="200" alt="sword" src="/images/posts/mindset-in-amateurs-vs-professionals.png" style="float: left; margin-right: 20px;" /> In the realm of achievement, whether in sports, business, or any pursuit, a crucial distinction emerges between amateurs and professionals. Beyond skill levels and experience, the differentiating factor often boils down to one fundamental aspect: mindset. The crux of this disparity lies in the approach to the endeavor – professionals focus on building a system, while amateurs are goal-oriented. This system-driven mindset enables professionals to sustain consistent progress, adapt to challenges, and prioritize long-term growth over fleeting successes.
+<img width="180" alt="sword" src="/images/posts/mindset-in-amateurs-vs-professionals.png" style="float: left; margin-right: 20px;" /> In the realm of achievement, whether in sports, business, or any pursuit, a crucial distinction emerges between amateurs and professionals. Beyond skill levels and experience, the differentiating factor often boils down to one fundamental aspect: mindset. The crux of this disparity lies in the approach to the endeavor – professionals focus on building a system, while amateurs are goal-oriented. This system-driven mindset enables professionals to sustain consistent progress, adapt to challenges, and prioritize long-term growth over fleeting successes.
 
 Amateurs are characterized by their goal-oriented approach. Their focus is predominantly on specific outcomes or achievements. While setting goals is undoubtedly essential, the amateur mindset may lack the broader perspective of how these goals fit into a larger, more sustainable framework.
 
