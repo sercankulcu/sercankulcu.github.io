@@ -7,7 +7,7 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="money" src="/images/posts/balancing-priorities-for-financial-and-emotional-well-being.jpg" style="float: left; margin-right: 10px;" /> In the hustle and bustle of our lives, it's not uncommon to feel pulled in various directions by the needs and expectations of others. However, there's a notion that suggests a counterintuitive approach – that the less you invest in caring about others, the more time you have to focus on yourself. Surprisingly, this approach can be beneficial, both financially and emotionally.
+<img width="200" alt="money" src="/images/posts/balancing-priorities-for-financial-and-emotional-well-being.png" style="float: left; margin-right: 10px;" /> In the hustle and bustle of our lives, it's not uncommon to feel pulled in various directions by the needs and expectations of others. However, there's a notion that suggests a counterintuitive approach – that the less you invest in caring about others, the more time you have to focus on yourself. Surprisingly, this approach can be beneficial, both financially and emotionally.
 
 1. Time for Self-Reflection:
 When we prioritize ourselves over constantly worrying about others, it opens up a valuable space for self-reflection. This time allows us to understand our own needs, desires, and aspirations without external pressures influencing our thoughts.
