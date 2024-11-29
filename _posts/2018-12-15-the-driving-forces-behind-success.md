@@ -7,7 +7,7 @@ tags:
   - self-improvement
 ---
 
-Success, a sought-after destination, is often fueled by a combination of factors. Passion, vision, and knowledge each play crucial roles in the journey toward achievement, but one catalyst stands out as the ultimate driving force – Discipline.
+<img width="200" alt="success" src="/images/posts/the-driving-forces-behind-success.jpg" style="float: left; margin-right: 10px;" /> Success, a sought-after destination, is often fueled by a combination of factors. Passion, vision, and knowledge each play crucial roles in the journey toward achievement, but one catalyst stands out as the ultimate driving force – Discipline.
 
 ### Passion:
 Passion ignites the flame of motivation. It's the fuel that propels individuals to pursue their goals with enthusiasm and unwavering dedication. When you love what you do, the challenges become stepping stones rather than obstacles.
