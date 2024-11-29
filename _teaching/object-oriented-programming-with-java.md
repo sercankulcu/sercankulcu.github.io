@@ -147,7 +147,7 @@ Chapter 11: Testing and Debugging
 
 Testing and debugging are critical aspects of Java programming, providing a powerful mechanism for ensuring that software applications are robust, reliable, and free from errors or bugs that can cause unexpected behavior or crashes, and enabling developers to identify and correct issues efficiently and effectively throughout the software development lifecycle.
 
-* Lecture Notes <a href="../files/java/Chapter_12_Testing_And_Debugging.pdf">[pdf]</a>
+* Lecture Notes <a href="../files/java/Chapter_11_Testing_And_Debugging.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders11/src">[java]</a>
 
 
