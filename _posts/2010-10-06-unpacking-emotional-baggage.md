@@ -1,7 +1,7 @@
 ---
 title: 'Unpacking Emotional Baggage'
-date: 2011-10-06
-permalink: /posts/2011/10/unpacking-emotional-baggage/
+date: 2010-10-06
+permalink: /posts/2010/10/unpacking-emotional-baggage/
 tags:
   - philosophy
   - self-improvement
