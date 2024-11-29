@@ -7,7 +7,7 @@ tags:
   - self-improvement
 ---
 
-In a world inundated with information, the illusion of knowledge can be a slippery slope. According to cognitive scientist Steven Sloman, our perception of understanding may be more of an illusion than we realize. This phenomenon, known as the knowledge illusion, suggests that we often believe we comprehend a subject merely because those around us seem to understand it. Here's a closer look at this cognitive quirk and its implications, especially in the realm of politics.
+<img width="200" alt="owl knowledge" src="/images/posts/the-knowledge-illusion.png" style="float: left; margin-right: 10px;" /> In a world inundated with information, the illusion of knowledge can be a slippery slope. According to cognitive scientist Steven Sloman, our perception of understanding may be more of an illusion than we realize. This phenomenon, known as the knowledge illusion, suggests that we often believe we comprehend a subject merely because those around us seem to understand it. Here's a closer look at this cognitive quirk and its implications, especially in the realm of politics.
 
 ### Understanding by Association:
 The knowledge illusion operates on the premise that if we surround ourselves with individuals who appear to grasp a topic, we may falsely assume that we understand it as well. This association-based understanding can be particularly potent in areas where complexity reigns, such as political discourse.
