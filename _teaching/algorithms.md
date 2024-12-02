@@ -12,22 +12,25 @@ location: "Giresun, Turkey"
 
 * Ders Öğretim Planı <a href="../files/algorithms/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
-Duyurular
+Announcements:
 ---
 
 The resources: 
 -----
 
+* Visual Algo <a href="https://visualgo.net/en">[website]</a>
+* Visual Algo Code <a href="https://github.com/stevenhalim/cpbook-code/tree/master/">[github]</a>
+* Algoanim <a href="http://www.algoanim.ide.sk/">[website]</a>
+* Yong Danielli <a href="https://yongdanielliang.github.io/animation/animation.html">[website]</a>
+* USFCA <a href="https://www.cs.usfca.edu/~galles/visualization/Algorithms.html">[website]</a>
+* Anim IDE <a href="https://anim.ide.sk/">[website]</a>
+* DSALGO Visualizer <a href="https://github.com/jhabarsingh/DSALGO-VISUALIZER">[website]</a>
+
+Past Exams:
+---
+
 * Soru Cevap <a href="../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf">[vize]</a> <a href="../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf">[final]</a>
 * 2023-2024 <a href="../files/algorithms/slides/2023-2024-vize-cevap.pdf">[vize]</a><a href="../files/algorithms/slides/2023-2024-final-a-cevap.pdf">[final-a]</a><a href="../files/algorithms/slides/2023-2024-final-b-cevap.pdf">[final-b]</a><a href="../files/algorithms/slides/2023-2024-butunleme-cevap.pdf">[bütünleme]</a>
-* Algorithms Visual Algo <a href="https://visualgo.net/en">[website]</a>
-* Algorithms Visual Algo Code <a href="https://github.com/stevenhalim/cpbook-code/tree/master/">[github]</a>
-* Algorithms Algoanim <a href="http://www.algoanim.ide.sk/">[website]</a>
-* Algorithms Yong Danielli <a href="https://yongdanielliang.github.io/animation/animation.html">[website]</a>
-* Algorithms USFCA <a href="https://www.cs.usfca.edu/~galles/visualization/Algorithms.html">[website]</a>
-* Algorithms Anim IDE <a href="https://anim.ide.sk/">[website]</a>
-* Algorithms DSALGO Visualizer <a href="https://github.com/jhabarsingh/DSALGO-VISUALIZER">[website]</a>
-
 
 Chapter 1: Introduction to Algorithms
 ---
