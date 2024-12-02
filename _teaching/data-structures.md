@@ -12,7 +12,7 @@ location: "Giresun, Turkey"
 
 * Ders Öğretim Planı <a href="../files/data_structures/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
-Duyurular:
+Announcements:
 ---
 
 * Ödev 1 verildi <a href="../files/data_structures/slides/odev1.html">[tıkla]</a>
@@ -20,13 +20,17 @@ Duyurular:
 The resources:
 ---
 
-* 2024-2025 <a href="../files/data_structures/slides/2024-2025-vize-a-cevaplar.pdf">[vize a]</a> <a href="../files/data_structures/slides/2024-2025-vize-b-cevaplar.pdf">[vize b]</a> 
-* 2023-2024 <a href="../files/data_structures/slides/2023-2024-vize-cevaplar.pdf">[vize]</a> <a href="../files/data_structures/slides/2023-2024-final-cevaplar.pdf">[final]</a> <a href="../files/data_structures/slides/2023-2024-butunleme-cevaplar.pdf">[bütünleme]</a>
 * Data Structures and Algorithms in Java 6th Edition by Michael T. Goodrich, Roberto Tamassia, Michael H. Goldwasser <a href="https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635">[book]</a>
 * CS-61B: Data Structures course page <a href="https://sp23.datastructur.es/">[website]</a>
 * CENG-213: Data Structures course page <a href="https://user.ceng.metu.edu.tr/~ys/ceng213-ds">[website]</a>
 * Data Structures Easy to Advanced Course <a href="https://www.youtube.com/watch?v=RBSGKlAvoiM">[youtube]</a>
 * Veri Yapıları ve Algoritmalar, Ders Notları, Mustafa Ege.
+
+Past Exams:
+---
+
+* 2024-2025 <a href="../files/data_structures/slides/2024-2025-vize-a-cevaplar.pdf">[vize a]</a> <a href="../files/data_structures/slides/2024-2025-vize-b-cevaplar.pdf">[vize b]</a> 
+* 2023-2024 <a href="../files/data_structures/slides/2023-2024-vize-cevaplar.pdf">[vize]</a> <a href="../files/data_structures/slides/2023-2024-final-cevaplar.pdf">[final]</a> <a href="../files/data_structures/slides/2023-2024-butunleme-cevaplar.pdf">[bütünleme]</a>
 * Çalışma Soruları <a href="../files/data_structures/slides/vize_calisma.txt">[vize]</a> <a href="../files/data_structures/slides/final_calisma.txt">[final]</a>
 
 Chapter 1: Introduction
