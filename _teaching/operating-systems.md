@@ -13,16 +13,11 @@ location: "Giresun, Turkey"
 * Ders Öğretim Planı <a href="../files/os/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 
 
-Duyurular
+Announcements:
 -----
 
 The resources: 
 -----
-
-* Soru Cevap <a href="../files/os/slides/Bolum_17_Soru_Cevap.pdf">[Vize]</a> <a href="../files/os/slides/Bolum_18_Soru_Cevap.pdf">[Final]</a>
-* MCQ  <a href="../files/os/slides/midterm_mcq.txt">[Midterm]</a> <a href="../files/os/slides/final_mcq.txt">[Final]</a>
-* 2022-2023 <a href="../files/os/slides/2022-2023-vize_cevaplar.pdf">[Vize]</a> <a href="../files/os/slides/2022-2023-final_cevaplar.pdf">[Final]</a>
-* 2023-2024 <a href="../files/os/slides/2023-2024-vize-cevap.pdf">[Vize]</a> <a href="../files/os/slides/2023-2024-telafi_cevaplar.pdf">[Telafi]</a><a href="../files/os/slides/2023-2024-final-a-cevaplar.pdf">[final-a]</a><a href="../files/os/slides/2023-2024-final-b-cevaplar.pdf">[final-b]</a><a href="../files/os/slides/2023-2024-butunleme-cevap.pdf">[bütünleme]</a>
 
 * Modern Operating Systems, Andrew S. Tanenbaum <a href="https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X">[book]</a>
 * Operating System Concepts, A. SilberSchatz, P. Galvin, and G. Gagne <a href="https://www.os-book.com/OS10/index.html">[e-book]</a>
@@ -31,6 +26,14 @@ The resources:
 * Bilgisayar İşletim Sistemleri, Prof. Dr. Ali Saatçi, 2. Baskı.
 * Operating System Development <a href="https://wiki.osdev.org/Main_Page">[website]</a>
 * Operating Systems From 0 to 1 <a href="../files/os/Book_Operating_Systems_From_0_to_1.pdf">[pdf]</a>
+
+Past Exams:
+---
+
+* 2023-2024 <a href="../files/os/slides/2023-2024-vize-cevap.pdf">[vize]</a> <a href="../files/os/slides/2023-2024-telafi_cevaplar.pdf">[telafi]</a><a href="../files/os/slides/2023-2024-final-a-cevaplar.pdf">[final-a]</a><a href="../files/os/slides/2023-2024-final-b-cevaplar.pdf">[final-b]</a><a href="../files/os/slides/2023-2024-butunleme-cevap.pdf">[bütünleme]</a>
+* 2022-2023 <a href="../files/os/slides/2022-2023-vize_cevaplar.pdf">[vize]</a> <a href="../files/os/slides/2022-2023-final_cevaplar.pdf">[final]</a>
+* Soru Cevap <a href="../files/os/slides/Bolum_17_Soru_Cevap.pdf">[vize]</a> <a href="../files/os/slides/Bolum_18_Soru_Cevap.pdf">[final]</a>
+* Multiple Choice Questions <a href="../files/os/slides/midterm_mcq.txt">[vize]</a> <a href="../files/os/slides/final_mcq.txt">[final]</a>
 
 Preface: 
 -----
