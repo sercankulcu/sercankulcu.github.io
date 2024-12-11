@@ -146,6 +146,8 @@ Chapter 10: Working with Databases
 
 Working with databases is a fundamental aspect of Java programming, providing a powerful mechanism for storing, retrieving, and manipulating large sets of structured data efficiently and flexibly, and enabling developers to build a wide range of applications with sophisticated data management capabilities.
 
+* Sunum - Veri Tabanı <a href="../files/java/slides/Bolum_10_Veri_Tabani.pdf">[pdf]</a> 
+
 * Lecture Notes <a href="../files/java/Chapter_10_Working_With_Databases.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders10/src">[java]</a>
 
