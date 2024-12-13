@@ -25,6 +25,7 @@ The resources:
 * CENG-213: Data Structures course page <a href="https://user.ceng.metu.edu.tr/~ys/ceng213-ds">[website]</a>
 * Data Structures Easy to Advanced Course <a href="https://www.youtube.com/watch?v=RBSGKlAvoiM">[youtube]</a>
 * Veri Yapıları ve Algoritmalar, Ders Notları, Mustafa Ege.
+* The Algorithms Github project <a href="https://github.com/TheAlgorithms/Java">[website]</a>
 
 Past Exams:
 ---

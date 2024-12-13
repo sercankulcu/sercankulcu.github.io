@@ -25,6 +25,7 @@ The resources:
 * USFCA <a href="https://www.cs.usfca.edu/~galles/visualization/Algorithms.html">[website]</a>
 * Anim IDE <a href="https://anim.ide.sk/">[website]</a>
 * DSALGO Visualizer <a href="https://github.com/jhabarsingh/DSALGO-VISUALIZER">[website]</a>
+* The Algorithms Github project <a href="https://github.com/TheAlgorithms/Java">[website]</a>
 
 Past Exams:
 ---
