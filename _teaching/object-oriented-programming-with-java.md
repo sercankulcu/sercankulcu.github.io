@@ -151,6 +151,8 @@ Working with databases is a fundamental aspect of Java programming, providing a 
 * Lecture Notes <a href="../files/java/Chapter_10_Working_With_Databases.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders10/src">[java]</a>
 
+* Student Management <a href="https://github.com/sercankulcu/StudentManagement">[java]</a>
+
 Chapter 11: Testing and Debugging
 -----
 
