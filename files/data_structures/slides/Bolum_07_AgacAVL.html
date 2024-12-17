@@ -1,62 +1,110 @@
-<html><head>
-<title>Data Structures Course: AVL Tree Simulator</title><style>
-    body {
-        font-family: Arial, sans-serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background-color: #f0f0f0;
-    }
-    #container {
-        width: 100vh;
-        height: 80vh;
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        margin: 2vh;
-        padding: 2vh;
-    }
-    #controls {
-        margin-bottom: 2vh;
-    }
-    #tree-container {
-        width: 100%;
-        height: 75vh;
-        border: 1px solid #ccc;
-        position: relative;
-    }
-    .node {
-        width: 6vh;
-        height: 6vh;
-        background-color: #4CAF50;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        font-weight: bold;
-        position: absolute;
-        transition: all 0.5s ease;
-    }
-    .link {
-        position: absolute;
-        background-color: #333;
-        height: 2px;
-        transition: all 0.5s ease;
-    }
-</style></head><body>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Structures Course: AVL Tree Simulator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            margin: 20px 0;
+            color: #333;
+            font-size: 2.5rem;
+            text-align: center;
+        }
+
+        #container {
+            width: 80vw;
+            height: 80vh;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin: 2vh;
+            padding: 2vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        #controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2vh;
+            align-items: center;
+        }
+
+        #controls input,
+        #controls button {
+            font-size: 1rem;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin: 5px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        #controls input:focus,
+        #controls button:hover {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+            cursor: pointer;
+        }
+
+        #tree-container {
+            width: 100%;
+            height: 75vh;
+            border: 1px solid #ccc;
+            position: relative;
+            border-radius: 12px;
+            background-color: #f9f9f9;
+        }
+
+        .node {
+            width: 6vh;
+            height: 6vh;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            position: absolute;
+            transition: all 0.5s ease;
+        }
+
+        .link {
+            position: absolute;
+            background-color: #333;
+            height: 2px;
+            transition: all 0.5s ease;
+        }
+    </style>
+</head>
+<body>
     <h1>AVL Tree Simulator</h1>
     <div id="container">
         <div id="controls">
-            <input type="number" id="value-input" placeholder="Enter a number">
-            <button onclick="insertValue()">Insert</button>
-            <button onclick="deleteValue()">Delete</button>
-            <button onclick="resetTree()">Reset</button>
-        </div>
+    <input type="number" id="value-input" placeholder="Enter a number">
+    <button onclick="insertValue()">Insert</button>
+    <button onclick="deleteValue()">Delete</button>
+    <button onclick="searchValue()">Search</button>
+	<button onclick="resetTree()">Reset</button>
+    
+</div>
+
         <div id="tree-container"></div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
     <script>
         class AVLNode {
             constructor(value) {
@@ -116,25 +164,7 @@
                 else return node;
 
                 this.updateHeight(node);
-                let balance = this.balanceFactor(node);
-
-                if (balance > 1) {
-                    if (value < node.left.value) {
-                        return this.rotateRight(node);
-                    } else {
-                        node.left = this.rotateLeft(node.left);
-                        return this.rotateRight(node);
-                    }
-                }
-                if (balance < -1) {
-                    if (value > node.right.value) {
-                        return this.rotateLeft(node);
-                    } else {
-                        node.right = this.rotateRight(node.right);
-                        return this.rotateLeft(node);
-                    }
-                }
-                return node;
+                return this.rebalance(node, value);
             }
 
             delete(value) {
@@ -143,18 +173,13 @@
             }
 
             _delete(node, value) {
-                if (!node) return node;
+                if (!node) return null;
+
                 if (value < node.value) node.left = this._delete(node.left, value);
                 else if (value > node.value) node.right = this._delete(node.right, value);
                 else {
                     if (!node.left || !node.right) {
-                        let temp = node.left ? node.left : node.right;
-                        if (!temp) {
-                            temp = node;
-                            node = null;
-                        } else {
-                            node = temp;
-                        }
+                        return node.left || node.right;
                     } else {
                         let temp = this.minValueNode(node.right);
                         node.value = temp.value;
@@ -162,36 +187,38 @@
                     }
                 }
 
-                if (!node) return node;
-
                 this.updateHeight(node);
+                return this.rebalance(node);
+            }
+
+            rebalance(node, value = null) {
                 let balance = this.balanceFactor(node);
 
+                // Left heavy
                 if (balance > 1) {
-                    if (this.balanceFactor(node.left) >= 0) {
+                    if (value !== null && value < node.left.value) {
                         return this.rotateRight(node);
                     } else {
                         node.left = this.rotateLeft(node.left);
                         return this.rotateRight(node);
                     }
                 }
+                // Right heavy
                 if (balance < -1) {
-                    if (this.balanceFactor(node.right) <= 0) {
+                    if (value !== null && value > node.right.value) {
                         return this.rotateLeft(node);
                     } else {
                         node.right = this.rotateRight(node.right);
                         return this.rotateLeft(node);
                     }
                 }
+
                 return node;
             }
 
             minValueNode(node) {
-                let current = node;
-                while (current.left) {
-                    current = current.left;
-                }
-                return current;
+                while (node.left) node = node.left;
+                return node;
             }
         }
 
@@ -199,75 +226,117 @@
         const treeContainer = document.getElementById('tree-container');
 
         function updateTreeView() {
-            const containerHeight = treeContainer.clientHeight;
-            const containerWidth = treeContainer.clientWidth;
             treeContainer.innerHTML = '';
-            if (tree.root) {
-                const queue = [{node: tree.root, x: containerWidth / 2, y: containerHeight * 0.05, level: 0}];
-                while (queue.length > 0) {
-                    const {node, x, y, level} = queue.shift();
-                    createNodeElement(node, x, y);
-                    if (node.left) {
-                        const newX = x - containerWidth / 2 / (Math.pow(2, level + 1));
-                        const newY = y + containerHeight * 0.1;
-                        queue.push({node: node.left, x: newX, y: newY, level: level + 1});
-                        createLinkElement(x + 20, y + 10, newX + 20, newY + 10);
-                    }
-                    if (node.right) {
-                        const newX = x + containerWidth / 2 / (Math.pow(2, level + 1));
-                        const newY = y + containerHeight * 0.1;
-                        queue.push({node: node.right, x: newX, y: newY, level: level + 1});
-                        createLinkElement(x + 20, y + 10, newX + 20, newY + 10);
-                    }
-                }
-            }
+            drawTree(tree.root, treeContainer.clientWidth / 2, 20, treeContainer.clientWidth / 4);
         }
 
-        function createNodeElement(node, x, y) {
-            const nodeElement = document.createElement('div');
-            nodeElement.className = 'node';
-            nodeElement.style.left = `${x}px`;
-            nodeElement.style.top = `${y}px`;
-            nodeElement.textContent = node.value;
-            treeContainer.appendChild(nodeElement);
-        }
+        function drawTree(node, x, y, offset) {
+    if (!node) return;
 
-        function createLinkElement(x1, y1, x2, y2) {
-            const link = document.createElement('div');
-            link.className = 'link';
-            const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-            const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
-            link.style.width = `${length}px`;
-            link.style.left = `${x1}px`;
-            link.style.top = `${y1 + 20}px`;
-            link.style.transform = `rotate(${angle}deg)`;
-            link.style.transformOrigin = '0 0';
-            treeContainer.appendChild(link);
-        }
+    // Mevcut düğüm için bir div oluştur
+    const nodeDiv = document.createElement('div');
+    nodeDiv.className = 'node';
+    nodeDiv.style.left = `${x - 30}px`; // Düğümün sol kenarına göre hizalama
+    nodeDiv.style.top = `${y}px`;
+    nodeDiv.textContent = node.value;
+    treeContainer.appendChild(nodeDiv);
+
+    // Sol çocuk düğüm çizimi
+    if (node.left) {
+        const childX = x - offset;
+        const childY = y + 80;
+        drawLine(x, y, childX, childY);
+        drawTree(node.left, childX, childY, offset / 2);
+    }
+
+    // Sağ çocuk düğüm çizimi
+    if (node.right) {
+        const childX = x + offset;
+        const childY = y + 80;
+        drawLine(x, y, childX, childY);
+        drawTree(node.right, childX, childY, offset / 2);
+    }
+}
+
+function drawLine(x1, y1, x2, y2) {
+    const line = document.createElement('div');
+    line.className = 'link';
+
+    // Çizginin uzunluğu ve açısını hesapla
+    const length = Math.hypot(x2 - x1, y2 - y1);
+    const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+
+    // Çizginin başlangıç noktasını düzelt
+    line.style.width = `${length}px`;
+    line.style.left = `${x1}px`;
+    line.style.top = `${y1 + 30}px`; // Çizginin düğümün ortasından başlamasını sağla
+    line.style.transformOrigin = "0 0"; // Dönüş noktası sol üst köşe
+    line.style.transform = `rotate(${angle}deg)`;
+    treeContainer.appendChild(line);
+}
+
 
         function insertValue() {
             const value = parseInt(document.getElementById('value-input').value);
-            if (!isNaN(value)) {
-                tree.insert(value);
-                document.getElementById('value-input').value = '';
-            }
+            if (!isNaN(value)) tree.insert(value);
         }
 
         function deleteValue() {
             const value = parseInt(document.getElementById('value-input').value);
-            if (!isNaN(value)) {
-                tree.delete(value);
-                document.getElementById('value-input').value = '';
-            }
+            if (!isNaN(value)) tree.delete(value);
         }
+		
+		// Function to search for a value in the tree and highlight the node
+function searchValue() {
+    const searchValue = parseInt(document.getElementById('value-input').value);
+    if (!isNaN(searchValue)) {
+        const resultNode = searchNode(tree.root, searchValue);
+        if (resultNode) {
+            highlightNode(resultNode);
+        } else {
+            alert("Value not found in the tree.");
+        }
+    }
+}
+
+// Helper function to search for a value in the tree
+function searchNode(node, value) {
+    if (!node) return null;
+    if (node.value === value) return node;
+    if (value < node.value) return searchNode(node.left, value);
+    return searchNode(node.right, value);
+}
+
+// Function to highlight the found node
+function highlightNode(node) {
+    const nodes = document.querySelectorAll('.node');
+    nodes.forEach(n => {
+        if (n.textContent == node.value) {
+            n.style.backgroundColor = '#FF6347'; // Change to a highlighted color (Tomato)
+            n.style.color = 'white';
+        } else {
+            n.style.backgroundColor = '#4CAF50'; // Default color
+            n.style.color = 'white';
+        }
+    });
+}
+
 
         function resetTree() {
             tree.root = null;
             updateTreeView();
+            generateRandomTree();
         }
 
-        // Initialize with some values
-        [10, 20, 30, 40, 50, 25].forEach(value => tree.insert(value));
-        updateTreeView();
+        function generateRandomTree() {
+            for (let i = 0; i < 10; i++) {
+                const randomValue = Math.floor(Math.random() * 100);
+                tree.insert(randomValue);
+            }
+        }
+
+        // Başlangıçta rastgele ağaç oluştur
+        generateRandomTree();
     </script>
-</body></html>
+</body>
+</html>
