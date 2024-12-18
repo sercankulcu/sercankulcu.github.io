@@ -1,364 +1,345 @@
-<html><head><base href="/">
-<meta charset="UTF-8">
-<title>Dijkstra Algoritması Simulatörü</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background-color: #f0f2f5;
-    }
-
-    .container {
-        max-width: 1000px;
-        margin: 20px;
-    }
-
-    #graphCanvas {
-        border: 2px solid #333;
-        background: white;
-        border-radius: 8px;
-        margin: 20px 0;
-        cursor: move;
-    }
-
-    .controls {
-        margin: 20px 0;
-        padding: 20px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    button {
-        padding: 10px 20px;
-        margin: 5px;
-        border: none;
-        border-radius: 4px;
-        background-color: #4CAF50;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    button:hover {
-        background-color: #45a049;
-    }
-
-    .info {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-top: 20px;
-    }
-
-    #result {
-        margin-top: 20px;
-        font-family: monospace;
-    }
-
-    .highlight {
-        animation: highlight 1s ease-in-out;
-    }
-
-    @keyframes highlight {
-        0% { stroke: #ffeb3b; stroke-width: 4px; }
-        100% { stroke: #333; stroke-width: 1px; }
-    }
-
-    .processing {
-        background-color: #ffeb3b;
-        transition: background-color 0.5s;
-    }
-</style>
-</head>
-<body>
-    <div class="container">
-        <h1>Dijkstra Algoritması Simulatörü</h1>
-        <div class="controls">
-            <button onclick="addNode()">Düğüm Ekle</button>
-            <button onclick="startEdgeMode()">Kenar Ekle</button>
-            <button onclick="startAlgorithm()">Algoritmayı Başlat</button>
-            <button onclick="resetGraph()">Sıfırla</button>
+<html><head>
+    <meta charset="UTF-8">
+    <title>Dijkstra Algorithm Simulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f2f5;
+        }
+    
+        .container {
+            max-width: 1000px;
+            margin: 20px;
+        }
+    
+        #graphCanvas {
+            border: 2px solid #333;
+            background: white;
+            border-radius: 8px;
+            margin: 20px 0;
+            cursor: move;
+        }
+    
+        .controls {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+    
+        button:hover {
+            background-color: #45a049;
+        }
+    
+        #result {
+            margin-top: 20px;
+        }
+    
+        .highlight {
+            animation: highlight 1s ease-in-out;
+        }
+    
+        @keyframes highlight {
+            0% { stroke: #ffeb3b; stroke-width: 4px; }
+            100% { stroke: #333; stroke-width: 1px; }
+        }
+    
+        .processing {
+            background-color: #ffeb3b;
+            transition: background-color 0.5s;
+        }
+    </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Dijkstra Algorithm Simulator</h1>
+            <div class="controls">
+                <button onclick="addNode()">Add Node</button>
+                <button onclick="startEdgeMode()">Add Edge</button>
+                <button onclick="startAlgorithm()">Start Algorithm</button>
+                <button onclick="resetGraph()">Reset</button>
+            </div>
+            <canvas id="graphCanvas" width="800" height="400"></canvas>
+            <div id="result"></div>
+            <div id="stepDescription"></div>
         </div>
-        <canvas id="graphCanvas" width="800" height="400"></canvas>
-        <div class="info">
-            <h3>Kullanım:</h3>
-            <ol>
-                <li>Düğüm eklemek için "Düğüm Ekle" butonuna tıklayın</li>
-                <li>Kenar eklemek için "Kenar Ekle" butonuna tıklayın ve iki düğümü seçin</li>
-                <li>Düğümleri taşımak için sürükleyip bırakın</li>
-                <li>Algoritmayı başlatmak için başlangıç düğümünü seçin</li>
-            </ol>
-        </div>
-        <div id="result"></div>
-        <div id="stepDescription"></div>
-    </div>
-
-<script>
-const canvas = document.getElementById('graphCanvas');
-const ctx = canvas.getContext('2d');
-let nodes = [];
-let edges = [];
-let isEdgeMode = false;
-let selectedNode = null;
-let startNode = null;
-let isDragging = false;
-let draggedNode = null;
-let animationSpeed = 1000;
-
-class Node {
-    constructor(x, y, id) {
-        this.x = x;
-        this.y = y;
-        this.id = id;
-        this.distance = Infinity;
-        this.visited = false;
-        this.previous = null;
-        this.processing = false;
-    }
-
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, 25, 0, 2 * Math.PI);
-        ctx.fillStyle = this.processing ? '#ffeb3b' : this.visited ? '#4CAF50' : 'white';
-        ctx.fill();
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        ctx.lineWidth = 1;
-
-        ctx.font = 'bold 16px Arial';
-        ctx.fillStyle = 'black';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(this.id, this.x, this.y);
-
-        if (this.distance !== Infinity) {
+    
+    <script>
+    const canvas = document.getElementById('graphCanvas');
+    const ctx = canvas.getContext('2d');
+    let nodes = [];
+    let edges = [];
+    let isEdgeMode = false;
+    let selectedNode = null;
+    let startNode = null;
+    let isDragging = false;
+    let draggedNode = null;
+    let animationSpeed = 1000;
+    
+    class Node {
+        constructor(x, y, id) {
+            this.x = x;
+            this.y = y;
+            this.id = id;
+            this.distance = Infinity;
+            this.visited = false;
+            this.previous = null;
+            this.processing = false;
+        }
+    
+        draw() {
             ctx.beginPath();
-            ctx.arc(this.x, this.y + 35, 18, 0, 2 * Math.PI);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.arc(this.x, this.y, 25, 0, 2 * Math.PI);
+            ctx.fillStyle = this.processing ? '#ffeb3b' : this.visited ? '#4CAF50' : 'white';
+            ctx.fill();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.lineWidth = 1;
+    
+            ctx.font = 'bold 16px Arial';
+            ctx.fillStyle = 'black';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(this.id, this.x, this.y);
+    
+            if (this.distance !== Infinity) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y + 35, 18, 0, 2 * Math.PI);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.fill();
+                ctx.strokeStyle = '#666';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+    
+                ctx.font = 'bold 14px Arial';
+                ctx.fillStyle = '#333';
+                ctx.fillText(this.distance, this.x, this.y + 35);
+            }
+        }
+    
+        isInside(x, y) {
+            return Math.sqrt((x - this.x) ** 2 + (y - this.y) ** 2) < 25;
+        }
+    }
+    
+    class Edge {
+        constructor(node1, node2) {
+            this.node1 = node1;
+            this.node2 = node2;
+            this.weight = Math.floor(Math.random() * 9) + 1;
+            this.highlighted = false;
+        }
+    
+        draw() {
+            ctx.beginPath();
+            ctx.moveTo(this.node1.x, this.node1.y);
+            ctx.lineTo(this.node2.x, this.node2.y);
+            ctx.strokeStyle = this.highlighted ? '#ffeb3b' : '#666';
+            ctx.lineWidth = this.highlighted ? 4 : 2;
+            ctx.stroke();
+            ctx.lineWidth = 1;
+            
+            let midX = (this.node1.x + this.node2.x) / 2;
+            let midY = (this.node1.y + this.node2.y) / 2;
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(midX, midY, 15, 0, 2 * Math.PI);
             ctx.fill();
             ctx.strokeStyle = '#666';
-            ctx.lineWidth = 1;
             ctx.stroke();
-
+    
             ctx.font = 'bold 14px Arial';
-            ctx.fillStyle = '#333';
-            ctx.fillText(this.distance, this.x, this.y + 35);
+            ctx.fillStyle = '#444';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(this.weight, midX, midY);
         }
     }
-
-    isInside(x, y) {
-        return Math.sqrt((x - this.x) ** 2 + (y - this.y) ** 2) < 25;
+    
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
-}
-
-class Edge {
-    constructor(node1, node2) {
-        this.node1 = node1;
-        this.node2 = node2;
-        this.weight = Math.floor(Math.random() * 9) + 1;
-        this.highlighted = false;
-    }
-
-    draw() {
-        ctx.beginPath();
-        ctx.moveTo(this.node1.x, this.node1.y);
-        ctx.lineTo(this.node2.x, this.node2.y);
-        ctx.strokeStyle = this.highlighted ? '#ffeb3b' : '#666';
-        ctx.lineWidth = this.highlighted ? 4 : 2;
-        ctx.stroke();
-        ctx.lineWidth = 1;
+    
+    async function startAlgorithm() {
+        if (nodes.length === 0) return;
         
-        let midX = (this.node1.x + this.node2.x) / 2;
-        let midY = (this.node1.y + this.node2.y) / 2;
-        ctx.fillStyle = 'white';
-        ctx.beginPath();
-        ctx.arc(midX, midY, 15, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.strokeStyle = '#666';
-        ctx.stroke();
-
-        ctx.font = 'bold 14px Arial';
-        ctx.fillStyle = '#444';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(this.weight, midX, midY);
-    }
-}
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function startAlgorithm() {
-    if (nodes.length === 0) return;
-    
-    nodes.forEach(node => {
-        node.distance = Infinity;
-        node.visited = false;
-        node.previous = null;
-        node.processing = false;
-    });
-
-    startNode = nodes[0];
-    startNode.distance = 0;
-    
-    await dijkstra();
-}
-
-async function dijkstra() {
-    const descriptionDiv = document.getElementById('stepDescription');
-    
-    while (true) {
-        let minDistance = Infinity;
-        let current = null;
-        
-        descriptionDiv.innerHTML = "En kısa mesafeli ziyaret edilmemiş düğüm aranıyor...";
-        await sleep(animationSpeed);
-
         nodes.forEach(node => {
-            if (!node.visited && node.distance < minDistance) {
-                minDistance = node.distance;
-                current = node;
-            }
+            node.distance = Infinity;
+            node.visited = false;
+            node.previous = null;
+            node.processing = false;
         });
+    
+        startNode = nodes[0];
+        startNode.distance = 0;
         
-        if (!current) break;
+        await dijkstra();
+    }
+    
+    async function dijkstra() {
+        const descriptionDiv = document.getElementById('stepDescription');
         
-        current.processing = true;
-        drawGraph();
-        descriptionDiv.innerHTML = `Düğüm ${current.id} işleniyor...`;
-        await sleep(animationSpeed);
-        
-        current.visited = true;
-        current.processing = false;
-        
-        for (let edge of edges) {
-            let neighbor = null;
-            if (edge.node1 === current) neighbor = edge.node2;
-            if (edge.node2 === current) neighbor = edge.node1;
+        while (true) {
+            let minDistance = Infinity;
+            let current = null;
             
-            if (neighbor && !neighbor.visited) {
-                edge.highlighted = true;
-                drawGraph();
-                descriptionDiv.innerHTML = `Düğüm ${current.id}'den Düğüm ${neighbor.id}'ye olan mesafe hesaplanıyor...`;
-                await sleep(animationSpeed);
-                
-                const distance = current.distance + edge.weight;
-                if (distance < neighbor.distance) {
-                    neighbor.distance = distance;
-                    neighbor.previous = current;
-                    descriptionDiv.innerHTML = `Düğüm ${neighbor.id} için yeni en kısa mesafe bulundu: ${distance}`;
-                    await sleep(animationSpeed);
+            descriptionDiv.innerHTML = "Searching for the unvisited node with the shortest distance...";
+            await sleep(animationSpeed);
+    
+            nodes.forEach(node => {
+                if (!node.visited && node.distance < minDistance) {
+                    minDistance = node.distance;
+                    current = node;
                 }
-                edge.highlighted = false;
+            });
+            
+            if (!current) break;
+            
+            current.processing = true;
+            drawGraph();
+            descriptionDiv.innerHTML = `Processing Node ${current.id}...`;
+            await sleep(animationSpeed);
+            
+            current.visited = true;
+            current.processing = false;
+            
+            for (let edge of edges) {
+                let neighbor = null;
+                if (edge.node1 === current) neighbor = edge.node2;
+                if (edge.node2 === current) neighbor = edge.node1;
+                
+                if (neighbor && !neighbor.visited) {
+                    edge.highlighted = true;
+                    drawGraph();
+                    descriptionDiv.innerHTML = `Calculating distance from Node ${current.id} to Node ${neighbor.id}...`;
+                    await sleep(animationSpeed);
+                    
+                    const distance = current.distance + edge.weight;
+                    if (distance < neighbor.distance) {
+                        neighbor.distance = distance;
+                        neighbor.previous = current;
+                        descriptionDiv.innerHTML = `New shortest distance found for Node ${neighbor.id}: ${distance}`;
+                        await sleep(animationSpeed);
+                    }
+                    edge.highlighted = false;
+                }
             }
+            
+            drawGraph();
+            await sleep(animationSpeed);
         }
         
-        drawGraph();
-        await sleep(animationSpeed);
+        descriptionDiv.innerHTML = "";
+        displayResults();
     }
     
-    descriptionDiv.innerHTML = "Algoritma tamamlandı!";
-    displayResults();
-}
-
-function displayResults() {
-    const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = '<h3>En Kısa Yol Mesafeleri:</h3>';
-    nodes.forEach(node => {
-        resultDiv.innerHTML += `Düğüm ${node.id}: ${node.distance}<br>`;
-    });
-}
-
-function addNode() {
-    const x = Math.random() * (canvas.width - 100) + 50;
-    const y = Math.random() * (canvas.height - 100) + 50;
-    const node = new Node(x, y, nodes.length);
-    nodes.push(node);
-    drawGraph();
-}
-
-function startEdgeMode() {
-    isEdgeMode = true;
-    selectedNode = null;
-    canvas.style.cursor = 'pointer';
-}
-
-function resetGraph() {
-    nodes = [];
-    edges = [];
-    isEdgeMode = false;
-    selectedNode = null;
-    startNode = null;
-    drawGraph();
-    document.getElementById('result').innerHTML = '';
-    document.getElementById('stepDescription').innerHTML = '';
-}
-
-canvas.addEventListener('mousedown', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    function displayResults() {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = '<h3>Shortest Path Distances:</h3>';
+        nodes.forEach(node => {
+            resultDiv.innerHTML += `Node ${node.id}: ${node.distance}<br>`;
+        });
+    }
     
-    nodes.forEach(node => {
-        if (node.isInside(x, y)) {
-            if (isEdgeMode) {
-                if (!selectedNode) {
-                    selectedNode = node;
-                    drawGraph();
-                }
-            } else {
-                isDragging = true;
-                draggedNode = node;
-                canvas.style.cursor = 'grabbing';
-            }
-        }
-    });
-});
-
-canvas.addEventListener('mousemove', (e) => {
-    if (isDragging && draggedNode) {
-        const rect = canvas.getBoundingClientRect();
-        draggedNode.x = e.clientX - rect.left;
-        draggedNode.y = e.clientY - rect.top;
+    function addNode() {
+        const x = Math.random() * (canvas.width - 100) + 50;
+        const y = Math.random() * (canvas.height - 100) + 50;
+        const node = new Node(x, y, nodes.length);
+        nodes.push(node);
         drawGraph();
     }
-});
-
-canvas.addEventListener('mouseup', (e) => {
-    if (isDragging) {
-        isDragging = false;
-        draggedNode = null;
-        canvas.style.cursor = 'move';
-    } else if (isEdgeMode && selectedNode) {
+    
+    function startEdgeMode() {
+        isEdgeMode = true;
+        selectedNode = null;
+        canvas.style.cursor = 'pointer';
+    }
+    
+    function resetGraph() {
+        nodes = [];
+        edges = [];
+        isEdgeMode = false;
+        selectedNode = null;
+        startNode = null;
+        drawGraph();
+        document.getElementById('result').innerHTML = '';
+        document.getElementById('stepDescription').innerHTML = '';
+    }
+    
+    canvas.addEventListener('mousedown', (e) => {
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         
         nodes.forEach(node => {
-            if (node.isInside(x, y) && node !== selectedNode) {
-                edges.push(new Edge(selectedNode, node));
-                selectedNode = null;
-                isEdgeMode = false;
-                canvas.style.cursor = 'default';
-                drawGraph();
+            if (node.isInside(x, y)) {
+                if (isEdgeMode) {
+                    if (!selectedNode) {
+                        selectedNode = node;
+                        drawGraph();
+                    }
+                } else {
+                    isDragging = true;
+                    draggedNode = node;
+                    canvas.style.cursor = 'grabbing';
+                }
             }
         });
+    });
+    
+    canvas.addEventListener('mousemove', (e) => {
+        if (isDragging && draggedNode) {
+            const rect = canvas.getBoundingClientRect();
+            draggedNode.x = e.clientX - rect.left;
+            draggedNode.y = e.clientY - rect.top;
+            drawGraph();
+        }
+    });
+    
+    canvas.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            draggedNode = null;
+            canvas.style.cursor = 'default';
+        } else if (isEdgeMode && selectedNode) {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            nodes.forEach(node => {
+                if (node.isInside(x, y) && node !== selectedNode) {
+                    const edge = new Edge(selectedNode, node);
+                    edges.push(edge);
+                    selectedNode = null;
+                    isEdgeMode = false;
+                    canvas.style.cursor = 'default';
+                    drawGraph();
+                }
+            });
+        }
+    });
+    
+    function drawGraph() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        edges.forEach(edge => edge.draw());
+        nodes.forEach(node => node.draw());
     }
-});
-
-function drawGraph() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    edges.forEach(edge => edge.draw());
-    nodes.forEach(node => node.draw());
-}
-
-// Initialize
-drawGraph();
-</script>
-</body></html>
+    </script>
+    </body></html>
+    
