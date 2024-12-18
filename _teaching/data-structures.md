@@ -154,6 +154,7 @@ A graph is a versatile data structure consisting of vertices (or nodes) connecte
 
 * Sunum-Çizge <a href="../files/data_structures/slides/Bolum_11_Cizge.pdf">[pdf]</a>
 * Graph Simulator <a href="../files/data_structures/slides/Bolum_11_Graph.html">[html]</a>
+* Dijkstra Simulator <a href="../files/data_structures/slides/Bolum_11_Dijkstra.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders11/src">[link]</a>
 
