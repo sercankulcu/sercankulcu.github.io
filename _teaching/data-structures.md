@@ -139,7 +139,7 @@ Chapter 10: Search Trees
 A search tree, particularly a Binary Search Tree (BST), is a binary tree data structure where each node's left subtree contains only nodes with keys less than the node's key, and the right subtree contains only nodes with keys greater than the node's key. This property makes them extremely efficient for searching, inserting, and deleting elements, typically in O(log n) time when balanced. They're fundamental in implementing databases, file systems, and for maintaining sorted data in a dynamic setting. They underpin many searching and sorting algorithms, making them indispensable for computer scientists and programmers alike.
 
 * Sunum-Arama Ağaçları <a href="../files/data_structures/slides/Bolum_10_Arama_Agaclari.pdf">[pdf]</a>
-* BST Simulator <a href="../files/data_structures/slides/Bolum_10_BST.html">[html]</a>
+* Simulators <a href="../files/data_structures/slides/Bolum_10_BST.html">[BST]</a>
 <a href="../files/data_structures/slides/Bolum_10_AgacRB.html">[Red Black Tree]</a> 
 <a href="../files/data_structures/slides/Bolum_10_AgacAVL.html">[AVL Tree]</a>
 <a href="../files/data_structures/slides/Bolum_10_AgacSplay.html">[Splay Tree]</a>
