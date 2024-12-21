@@ -140,9 +140,9 @@ A search tree, particularly a Binary Search Tree (BST), is a binary tree data st
 
 * Sunum-Arama Ağaçları <a href="../files/data_structures/slides/Bolum_10_Arama_Agaclari.pdf">[pdf]</a>
 * BST Simulator <a href="../files/data_structures/slides/Bolum_10_BST.html">[html]</a>
-<a href="../files/data_structures/slides/Bolum_07_AgacRB.html">[Red Black Tree]</a> 
-<a href="../files/data_structures/slides/Bolum_07_AgacAVL.html">[AVL Tree]</a>
-<a href="../files/data_structures/slides/Bolum_07_AgacSplay.html">[Splay Tree]</a>
+<a href="../files/data_structures/slides/Bolum_10_AgacRB.html">[Red Black Tree]</a> 
+<a href="../files/data_structures/slides/Bolum_10_AgacAVL.html">[AVL Tree]</a>
+<a href="../files/data_structures/slides/Bolum_10_AgacSplay.html">[Splay Tree]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders10/src">[link]</a>
 
