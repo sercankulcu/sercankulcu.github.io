@@ -169,35 +169,34 @@
       }
 
       insert(value) {
-        const newNode = new Node(value);
+    const newNode = new Node(value);
 
-        if (!this.root) {
-          this.root = newNode;
-          return;
-        }
+    if (!this.root) {
+      this.root = newNode;
+      return true; // Yeni düğüm başarıyla eklendi
+    }
 
-        let current = this.root;
-        while (true) {
-          // If value already exists, do nothing
-          if (value === current.value) {
-            return; // End function to avoid duplicate values
-          }
-
-          if (value < current.value) {
-            if (!current.left) {
-              current.left = newNode;
-              break;
-            }
-            current = current.left;
-          } else {
-            if (!current.right) {
-              current.right = newNode;
-              break;
-            }
-            current = current.right;
-          }
-        }
+    let current = this.root;
+    while (true) {
+      if (value === current.value) {
+        return false; // Mevcut bir düğüm eklendiğinde false döndür
       }
+
+      if (value < current.value) {
+        if (!current.left) {
+          current.left = newNode;
+          return true; // Yeni düğüm başarıyla eklendi
+        }
+        current = current.left;
+      } else {
+        if (!current.right) {
+          current.right = newNode;
+          return true; // Yeni düğüm başarıyla eklendi
+        }
+        current = current.right;
+      }
+    }
+  }
 
       search(value) {
         let current = this.root;
@@ -343,46 +342,107 @@
       allNodes.forEach(node => treeContainer.appendChild(node));
     }
 
-    function insertValue() {
-      const valueInput = document.getElementById('value-input');
-      const value = parseInt(valueInput.value);
-      if (!isNaN(value)) {
-        bst.insert(value);
-        renderTree();
-        showMessage(`Value ${value} inserted successfully.`);
-      } else {
-        showMessage('Please enter a valid number.');
+    function highlightPath(path, callback) {
+  let index = 0;
+  const interval = setInterval(() => {
+    if (index < path.length) {
+      const node = path[index];
+      const nodeElement = document.querySelector(`.node[data-value="${node.value}"]`);
+      if (nodeElement) {
+        nodeElement.classList.add('highlight');
       }
+      index++;
+    } else {
+      clearInterval(interval);
+      if (callback) callback();
+    }
+  }, 500); // 500ms delay between highlights
+}
+
+function insertValue() {
+  const valueInput = document.getElementById('value-input');
+  const value = parseInt(valueInput.value);
+
+  if (!isNaN(value)) {
+    
+	const path = [];
+    let current = bst.root;
+    while (current) {
+      path.push(current);
+      if (value === current.value) break;
+      if (value < current.value) current = current.left;
+      else current = current.right;
     }
 
-    function searchValue() {
-      const valueInput = document.getElementById('value-input');
-      const value = parseInt(valueInput.value);
-      if (!isNaN(value)) {
-        const path = bst.search(value);
-        renderTree();
-        if (path) {
-          highlightNode(path[path.length - 1]);
-          showMessage(`Value ${value} found.`);
-        } else {
-          showMessage(`Value ${value} not found.`);
-        }
-      } else {
-        showMessage('Please enter a valid number.');
-      }
+    // Eğer yol boşsa veya son düğüm aranan değere eşit değilse, düğüm bulunamamıştır
+    if (path.length === 0 || path[path.length - 1].value !== value) {
+      showMessage(`Value ${value} inserted successfully.`);
+    } else {
+	showMessage(`Value ${value} already exists in the tree.`);
+	}
+	
+	highlightPath(path, () => {
+	  bst.insert(value);
+      renderTree();
+    });
+	
+  } else {
+    showMessage('Please enter a valid number.');
+  }
+}
+
+function searchValue() {
+  const valueInput = document.getElementById('value-input');
+  const value = parseInt(valueInput.value);
+  if (!isNaN(value)) {
+    const path = bst.search(value);
+    renderTree();
+    if (path) {
+      highlightPath(path, () => {
+	  renderTree();
+        showMessage(`Value ${value} found.`);
+      });
+    } else {
+      showMessage(`Value ${value} not found.`);
+    }
+  } else {
+    showMessage('Please enter a valid number.');
+  }
+}
+
+function deleteValue() {
+  const valueInput = document.getElementById('value-input');
+  const value = parseInt(valueInput.value);
+
+  if (!isNaN(value)) {
+    // Arama sırasında yolu takip et
+    const path = [];
+    let current = bst.root;
+    while (current) {
+      path.push(current);
+      if (value === current.value) break;
+      if (value < current.value) current = current.left;
+      else current = current.right;
     }
 
-    function deleteValue() {
-      const valueInput = document.getElementById('value-input');
-      const value = parseInt(valueInput.value);
-      if (!isNaN(value)) {
-        bst.delete(value);
-        renderTree();
-        showMessage(`Value ${value} deleted successfully.`);
-      } else {
-        showMessage('Please enter a valid number.');
-      }
+    // Eğer yol boşsa veya son düğüm aranan değere eşit değilse, düğüm bulunamamıştır
+    if (path.length === 0 || path[path.length - 1].value !== value) {
+      showMessage(`Value ${value} not found. Deletion failed.`);
+      return;
     }
+
+    // Silmeden önce yolu vurgula
+    highlightPath(path, () => {
+      bst.delete(value);
+      renderTree();
+      showMessage(`Value ${value} deleted successfully.`);
+    });
+  } else {
+    showMessage('Please enter a valid number.');
+  }
+}
+
+
 
     function resetTree() {
       bst = new BinarySearchTree();
