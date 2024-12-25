@@ -10,7 +10,7 @@ redirect_from:
 
 <img align="right" width="150" alt="owl coffee beans" src="/images/owl-coffee-beans.png">
 
-I am Sercan Külcü, an Assistant Professor in the Computer Science Department at Giresun University. With over 20 years of professional experience in software engineering, I hold a PhD specializing in low-power wireless communication technologies. My expertise spans embedded and real-time operating systems, programming in C, C++, and Java, as well as the application of machine learning techniques.
+I am Sercan Külcü, an Assistant Professor in the Computer Science Department at Giresun University. With over 20 years of professional experience in software engineering, I hold a PhD specializing in low-power wireless communication technologies. My expertise spans embedded and real-time operating systems, programming in C, C++, and Java, as well as the application of machine learning techniques. Recently, I have also enjoyed developing small applications with JavaScript.
 
 * <a href="../game/car-race.html">[car race]</a>
 * <a href="../game/mobile-car-race.html">[mobile car race]</a>
