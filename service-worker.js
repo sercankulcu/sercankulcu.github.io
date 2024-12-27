@@ -1,5 +1,5 @@
 // Define a unique version for the cache
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const CACHE_NAME = 'my-pwa-sercan-cache-' + CACHE_VERSION;
 
 // List of URLs to cache
