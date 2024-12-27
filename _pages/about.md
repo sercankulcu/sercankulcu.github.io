@@ -8,6 +8,24 @@ redirect_from:
   - /about.html
 ---
 
+<link rel="manifest" href="manifest.json" />
+
+<script>
+        if ('serviceWorker' in navigator) {
+         window.addEventListener('load', function () {
+          navigator.serviceWorker.register('service-worker.js').then(function (registration) {
+           console.log('Registered!');
+          }, function (err) {
+           console.log('ServiceWorker registration failed: ', err);
+          }).catch(function (err) {
+           console.log(err);
+          });
+         });
+        } else {
+         console.log('service worker is not supported');
+        }
+       </script>
+
 <img align="right" width="150" alt="owl coffee beans" src="/images/owl-coffee-beans.png">
 
 I am Sercan Külcü, an Assistant Professor in the Computer Science Department at Giresun University. With over 20 years of professional experience in software engineering, I hold a PhD specializing in low-power wireless communication technologies. My expertise spans embedded and real-time operating systems, programming in C, C++, and Java, as well as the application of machine learning techniques. Recently, I have also enjoyed developing small applications with JavaScript.
