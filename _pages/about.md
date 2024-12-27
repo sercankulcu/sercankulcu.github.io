@@ -13,7 +13,7 @@ redirect_from:
 <script>
         if ('serviceWorker' in navigator) {
          window.addEventListener('load', function () {
-          navigator.serviceWorker.register('service-worker1.js').then(function (registration) {
+          navigator.serviceWorker.register('service-worker.js').then(function (registration) {
            console.log('Registered Sercan PWA!');
           }, function (err) {
            console.log('ServiceWorker registration Sercan PWA failed: ', err);
