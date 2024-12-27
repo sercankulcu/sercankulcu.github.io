@@ -8,7 +8,23 @@ redirect_from:
   - /about.html
 ---
 
+<link rel="manifest" href="/manifest.json" />
 
+<script>
+        if ('serviceWorker' in navigator) {
+         window.addEventListener('load', function () {
+          navigator.serviceWorker.register('service-worker1.js').then(function (registration) {
+           console.log('Registered Sercan PWA!');
+          }, function (err) {
+           console.log('ServiceWorker registration Sercan PWA failed: ', err);
+          }).catch(function (err) {
+           console.log(err);
+          });
+         });
+        } else {
+         console.log('service worker Sercan PWA is not supported');
+        }
+       </script>
 
 <img align="right" width="150" alt="owl coffee beans" src="/images/owl-coffee-beans.png">
 
