@@ -7,7 +7,6 @@ redirect_from:
   - /resume
 ---
 
-<img align="right" width="150" alt="owl on book" src="/images/owl-on-book.png">
 
 With 20+ years of experience and a PhD in wireless communication, I specialize in low-power wireless communication, embedded systems, real-time OS, C/C++ programming, and machine learning. Since 2015, I have also taught Object-Oriented Programming and Java courses.
 
