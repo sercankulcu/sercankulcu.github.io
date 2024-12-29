@@ -8,7 +8,6 @@ redirect_from:
   - /bookmarks.html
 ---
 
-<img align="right" width="150" alt="owl on brach" src="/images/owl-on-branch.png">
 * <a href="https://chat.openai.com/">[ChatGPT]</a> a chatbot launched by OpenAI 
 * <a href="https://bard.google.com/chat">[Bard]</a> Google's helpful collaboration chat tool 
 * <a href="https://translate.google.com/">[Google Translate]</a> a multilingual neural machine translation service
@@ -21,7 +20,7 @@ redirect_from:
 * <a href="https://eksisozluk.com/">[Ekşi Sözlük]</a> kutsal bilgi kaynağı
 * <a href="https://scholar.google.com/">[Google Scholar]</a> search engine for academic resources
 * <a href="https://www.notion.so/">[Notion]</a> manage and organize everything in one place
-<img align="right" width="150" alt="owl at night" src="/images/owl-at-night.png">
+
 * <a href="https://gumroad.com/">[Gumroad]</a> sell physical or digital products
 * <a href="https://www.producthunt.com/">[Producthunt]</a> introduce your product to the world
 * <a href="https://replit.com/">[Replit]</a> platform for creating and sharing software
@@ -33,7 +32,7 @@ redirect_from:
 * <a href="https://www.hackerrank.com/">[HackerRank]</a> website that provides coding challenges and competitions
 * <a href="https://leetcode.com/">[LeetCode]</a> platform that offers a collection of coding challenges
 * <a href="https://youtube.com/">[YouTube]</a> video-sharing platform
-<img align="right" width="200" alt="owl on apple" src="/images/owl-on-apple.png">
+
 * <a href="https://twitter.com/">[Twitter]</a> microblogging platform 
 * <a href="https://linkedin.com/">[LinkedIn]</a> professional networking platform 
 * <a href="https://reddit.com/">[Reddit]</a> social news and discussion platform 
