@@ -8,7 +8,7 @@ redirect_from:
 ---
 
 
-With 20+ years of experience and a PhD in wireless communication, I specialize in low-power wireless communication, embedded systems, real-time OS, C/C++ programming, and machine learning. Since 2015, I have also taught Object-Oriented Programming and Java courses.
+With over 20 years of professional experience in software engineering, I hold a PhD specializing in low-power wireless communication technologies. My expertise spans embedded and real-time operating systems, programming in C, C++, and Java, as well as the application of machine learning techniques. Recently, I have also enjoyed developing small applications with JavaScript.
 
 ## Education
 
