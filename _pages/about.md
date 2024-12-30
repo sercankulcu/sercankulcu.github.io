@@ -24,6 +24,8 @@ I am Sercan Külcü, an Assistant Professor in the Computer Science Department a
 <br><a href="../game/connectfour.html">[🔴🟡 connect4 🔵🟢]</a>
 <br><a href="../game/anunnaki.html">[👽✨ anunnaki 🌌]</a>
 <br><a href="../game/sudoku.html">[🧩🔢 sudoku 🟦]</a>
+<br><a href="../game/iqtest.html">[🧠 iq test 💯]</a>
+<br><a href="../game/mantra.html">[🧘 mantra 🙏]</a>
 
 **Note:** If any licensed content is found on the website, please don't hesitate to contact me via the links on the left-hand side. You can be sure that any related content will be quickly removed within 24 hours.
 
