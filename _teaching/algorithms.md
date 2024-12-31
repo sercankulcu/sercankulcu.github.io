@@ -43,7 +43,7 @@ Algorithms are the step-by-step procedures that form the core of computer scienc
 * Run time analysis <a href="../files/algorithms/slides/Bolum_01_02_Karmasiklik.html">[click]</a>
 
 * Lecture Notes <a href="../files/algorithms/Chapter_01_Introduction.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter1">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter1/src">[link]</a>
 
 
 Chapter 2: Sorting Algorithms
@@ -53,7 +53,7 @@ Sorting algorithms are the architects of order, meticulously organizing data int
 
 * Sunum-Sıralama Algoritmaları <a href="../files/algorithms/slides/Bolum_02_Siralama.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_02_Sorting.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter2">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter2/src">[link]</a>
 
 
 Chapter 3: Searching Algorithms
@@ -63,7 +63,7 @@ Searching algorithms are the detectives of the data world, designed to track dow
 
 * Sunum-Arama Algoritmaları <a href="../files/algorithms/slides/Bolum_03_Arama.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_03_Searching.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter3">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter3/src">[link]</a>
 
 
 Chapter 4: Graph Algorithms
@@ -78,7 +78,7 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
 * Sunum-Çizge Ağ Akış <a href="../files/algorithms/slides/Bolum_04_04_Ag_Akis.pdf">[pdf]</a>
 
 * Lecture Notes <a href="../files/algorithms/Chapter_04_Graph.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter4">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter4/src">[link]</a>
 
 
 Chapter 5: String Algorithms
@@ -93,7 +93,7 @@ Have you ever wondered how your computer or smartphone handles text so efficient
 * Sunum-Dizgi Düzenleme <a href="../files/algorithms/slides/Bolum_05_05_Dizgi_Duzenleme_Mesafe.pdf">[pdf]</a>
 * Sunum-Dizgi Dönüştürme <a href="../files/algorithms/slides/Bolum_05_06_Dizgi_Donusturme.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_05_Dynamic.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter5">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter5/src">[link]</a>
 
 
 Chapter 6: Dynamic Programming
@@ -103,7 +103,7 @@ Dynamic programming is a powerful technique for solving optimization problems by
 
 * Sunum-Dinamik Programlama <a href="../files/algorithms/slides/Bolum_06_Dinamik.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_05_Dynamic.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter6">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter6/src">[link]</a>
 
 
 Chapter 7: Approximation algorithms
@@ -113,7 +113,7 @@ Approximation algorithms are a type of algorithm that provides a solution to a p
 
 * Sunum-Yakınsama Algoritmaları <a href="../files/algorithms/slides/Bolum_07_Yakinsama.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_06_Approximation.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter7">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter7/src">[link]</a>
 
 
 Chapter 8: Randomized algorithms
@@ -123,7 +123,7 @@ Randomized algorithms are a type of algorithm that uses randomness to improve it
 
 * Sunum-Rastgele Algoritmalar <a href="../files/algorithms/slides/Bolum_08_Rastgele.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_07_Randomized.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter8">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter8/src">[link]</a>
 
 
 Chapter 9: Online algorithms
@@ -133,7 +133,7 @@ Online algorithms are a type of algorithm that makes decisions without knowing t
 
 * Sunum-Çevrimiçi Algoritmalar <a href="../files/algorithms/slides/Bolum_09_Cevrimici.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_08_Online.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter9">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter9/src">[link]</a>
 
 
 Chapter 10: Parallel algorithms
@@ -143,7 +143,7 @@ Parallel algorithms are a type of algorithm that can be executed on multiple pro
 
 * Sunum-Paralel Algoritmalar <a href="../files/algorithms/slides/Bolum_10_Paralel.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_09_Parallel.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter10">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter10/src">[link]</a>
 
 
 Chapter 11: Divide-and-Conquer paradigm
@@ -153,7 +153,7 @@ The divide-and-conquer paradigm is an algorithmic design paradigm that breaks do
 
 * Sunum-Böl Fethet Yaklaşımı <a href="../files/algorithms/slides/Bolum_11_Bol_Fethet.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_10_Divide_and_Conquer.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter11">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter11/src">[link]</a>
 
 
 Chapter 12: Greedy algorithms
@@ -163,7 +163,7 @@ Greedy algorithms are a type of algorithm that makes decisions at each step base
 
 * Sunum-Açgözlü Algoritmalar <a href="../files/algorithms/slides/Bolum_12_Acgozlu.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_11_Greedy.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter12">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter12/src">[link]</a>
 
 
 Chapter 13: Backtracking algorithms
@@ -173,7 +173,7 @@ Backtracking algorithms are a type of algorithm that solves problems by explorin
 
 * Sunum-Geri Dönüşlü Algoritmalar <a href="../files/algorithms/slides/Bolum_13_Geri_Donuslu.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_12_Backtracking.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter13">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter13/src">[link]</a>
 
 
 Chapter 14: Branch-and-Bound algorithms
@@ -183,4 +183,4 @@ Branch and bound algorithms are a type of algorithm that solves optimization pro
 
 * Sunum-Dal Sınır Algoritmaları <a href="../files/algorithms/slides/Bolum_14_Dal_Sinir.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_13_Branch_and_Bound.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter14">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter14/srcs">[link]</a>
