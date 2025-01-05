@@ -23,7 +23,6 @@ The resources:
 * Cambridge CS 364 <a href="https://timroughgarden.org/notes.html">[notes]</a>
 * CMU 15-896 <a href="https://www.cs.cmu.edu/~arielpro/15896s16/schedule.html">[notes]</a>
 
-* GAMUT is a suite of game generators designated for testing game-theoretic algorithms. <a href="https://gamut.stanford.edu/">[website]</a>
 * Gambit is an open-source collection of tools for doing computation in game theory. <a href="https://gambit.sourceforge.net/">[website]</a>
 
 Chapter 1: Game Theory Fundamentals
