@@ -15,7 +15,6 @@ location: "Giresun, Turkey"
 Announcements:
 ---
 
-* Ödev 1 verildi <a href="../files/data_structures/slides/odev1.html">[tıkla]</a>
 
 The resources:
 ---
