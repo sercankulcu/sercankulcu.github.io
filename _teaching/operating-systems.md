@@ -194,7 +194,6 @@ Operating system design involves the careful consideration of a wide range of fa
 
 * **Slides [TR]** <a href="../files/os/slides/Bolum_15_Isletim_Sistemi_Tasarimi.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/os/notes/Chapter_15_Operating_system_design.pdf">[pdf]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter15/src">[java]</a>
 * Question & answers <a href="../files/os/questions/Chapter_15_Operating_system_design.pdf">[pdf]</a>
 
 Chapter 16: Case studies:
@@ -202,4 +201,3 @@ Chapter 16: Case studies:
 
 **UNIX - Linux**
 * **Slides [TR]** <a href="../files/os/slides/Bolum_16_Linux.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/os/notes/Notes_16.pdf">[pdf]</a>

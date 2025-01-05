@@ -183,4 +183,4 @@ Branch and bound algorithms are a type of algorithm that solves optimization pro
 
 * Sunum-Dal Sınır Algoritmaları <a href="../files/algorithms/slides/Bolum_14_Dal_Sinir.pdf">[pdf]</a>
 * Lecture Notes <a href="../files/algorithms/Chapter_13_Branch_and_Bound.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter14/srcs">[link]</a>
+* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter14/src">[link]</a>
