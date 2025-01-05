@@ -17,13 +17,13 @@ The resources:
 * Michael Dinitz 601.436/636 <a href="https://www.cs.jhu.edu/~mdinitz/classes/AGT/Spring2022/">[website]</a>
 
 * Game Theory, Alive <a href="https://homes.cs.washington.edu/~karlin/GameTheoryBook.pdf">[pdf]</a>
-* Algorithmic Game Theory <a href="http://www.cs.cmu.edu/~sandholm/cs15-892F13/algorithmic-game-theory.pdf">[pdf]</a>
-* Networks, Crowds, and Markets <a href="http://www.cs.cornell.edu/home/kleinber/networks-book/networks-book.pdf">[pdf]</a>
+* Algorithmic Game Theory <a href="https://www.cs.cmu.edu/~sandholm/cs15-892F13/algorithmic-game-theory.pdf">[pdf]</a>
+* Networks, Crowds, and Markets <a href="https://www.cs.cornell.edu/home/kleinber/networks-book/networks-book.pdf">[pdf]</a>
 
-* Cambridge CS 364 <a href="http://timroughgarden.org/notes.html">[notes]</a>
-* CMU 15-896 <a href="http://www.cs.cmu.edu/~arielpro/15896s16/schedule.html">[notes]</a>
+* Cambridge CS 364 <a href="https://timroughgarden.org/notes.html">[notes]</a>
+* CMU 15-896 <a href="https://www.cs.cmu.edu/~arielpro/15896s16/schedule.html">[notes]</a>
 
-* GAMUT is a suite of game generators designated for testing game-theoretic algorithms. <a href="http://gamut.stanford.edu/">[website]</a>
+* GAMUT is a suite of game generators designated for testing game-theoretic algorithms. <a href="https://gamut.stanford.edu/">[website]</a>
 * Gambit is an open-source collection of tools for doing computation in game theory. <a href="https://gambit.sourceforge.net/">[website]</a>
 
 Chapter 1: Game Theory Fundamentals

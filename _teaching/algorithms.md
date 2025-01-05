@@ -20,7 +20,7 @@ The resources:
 
 * Visual Algo <a href="https://visualgo.net/en">[website]</a>
 * Visual Algo Code <a href="https://github.com/stevenhalim/cpbook-code/tree/master/">[github]</a>
-* Algoanim <a href="http://www.algoanim.ide.sk/">[website]</a>
+* Algoanim <a href="https://www.algoanim.ide.sk/">[website]</a>
 * Yong Danielli <a href="https://yongdanielliang.github.io/animation/animation.html">[website]</a>
 * USFCA <a href="https://www.cs.usfca.edu/~galles/visualization/Algorithms.html">[website]</a>
 * Anim IDE <a href="https://anim.ide.sk/">[website]</a>
