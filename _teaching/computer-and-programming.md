@@ -26,7 +26,7 @@ The resources
 Past Exams:
 ---
 
-* 2024-2025 <a href="../files/computer/2024-2025-vize-a-cevaplar.pdf">[vize a]</a> <a href="../files/computer/2024-2025-vize-b-cevaplar.pdf">[vize b]</a>
+* 2024-2025 <a href="../files/computer/2024-2025-vize-a-cevaplar.pdf">[vize a]</a> <a href="../files/computer/2024-2025-vize-b-cevaplar.pdf">[vize b]</a> <a href="../files/computer/2024-2025-final-a-cevaplar.pdf">[final a]</a> <a href="../files/computer/2024-2025-final-b-cevaplar.pdf">[final b]</a>
 * 2023-2024 <a href="../files/computer/2023-2024-vize-cevaplar.pdf">[vize]</a> <a href="../files/computer/2023-2024-telafi-cevaplar.pdf">[telafi]</a> <a href="../files/computer/2023-2024-final-cevaplar.pdf">[final]</a>
 
 Chapter 1: Basic Concepts
