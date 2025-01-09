@@ -20,7 +20,7 @@ The resources:
 * Algorithmic Game Theory <a href="https://www.cs.cmu.edu/~sandholm/cs15-892F13/algorithmic-game-theory.pdf">[pdf]</a>
 * Networks, Crowds, and Markets <a href="https://www.cs.cornell.edu/home/kleinber/networks-book/networks-book.pdf">[pdf]</a>
 
-* Cambridge CS 364 <a href="https://timroughgarden.org/notes.html">[notes]</a>
+* Cambridge CS 364 <a href="https://timroughgarden.org/f13/f13.html">[notes]</a>
 * CMU 15-896 <a href="https://www.cs.cmu.edu/~arielpro/15896s16/schedule.html">[notes]</a>
 
 * Gambit is an open-source collection of tools for doing computation in game theory. <a href="https://gambit.sourceforge.net/">[website]</a>

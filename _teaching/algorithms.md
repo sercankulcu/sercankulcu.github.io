@@ -18,6 +18,8 @@ Announcements:
 The resources: 
 -----
 
+* Algorithms Illuminated <a href="https://www.algorithmsilluminated.org">[book]</a>
+* Stanford CS 161 <a href="https://stanford-cs161.github.io/winter2024/lectures">[website]</a>
 * Visual Algo <a href="https://visualgo.net/en">[website]</a>
 * Visual Algo Code <a href="https://github.com/stevenhalim/cpbook-code/tree/master/">[github]</a>
 * Algoanim <a href="https://www.algoanim.ide.sk/">[website]</a>
