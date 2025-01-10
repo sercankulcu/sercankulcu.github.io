@@ -166,3 +166,10 @@ A set is a collection of distinct elements where order doesn't matter and duplic
 * Sets Simulator <a href="../files/data_structures/slides/Bolum_12_Sets.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src">[link]</a>
+
+Lecture Notes:
+---
+
+* Advanced Data Structures <a href="../files/data_structures/Chapter_09_Advanced_Data_Structures.pdf">[pdf]</a>
+* Advanced Topics <a href="../files/data_structures/Chapter_10_Advanced_Topics.pdf">[pdf]</a>
+* Applications <a href="../files/data_structures/Chapter_11_Applications.pdf">[pdf]</a>
