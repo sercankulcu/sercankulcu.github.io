@@ -13,6 +13,9 @@ location: "Giresun, Turkey"
 The resources: 
 -----
 
+* React js games <a href="https://reactjsexample.com/tag/games/">[website]</a>
+
+* Game Theory 101 <a href="https://www.youtube.com/watch?v=IotsMu1J8fA&list=PL102B69CCA6049B6C">[youtube]</a>
 * Toronto CSC304 <a href="https://www.cs.toronto.edu/~nisarg/teaching/304f19/">[website]</a>
 * Michael Dinitz 601.436/636 <a href="https://www.cs.jhu.edu/~mdinitz/classes/AGT/Spring2022/">[website]</a>
 
@@ -20,6 +23,7 @@ The resources:
 * Algorithmic Game Theory <a href="https://www.cs.cmu.edu/~sandholm/cs15-892F13/algorithmic-game-theory.pdf">[pdf]</a>
 * Networks, Crowds, and Markets <a href="https://www.cs.cornell.edu/home/kleinber/networks-book/networks-book.pdf">[pdf]</a>
 
+* Goethe Uni AGT course <a href="https://algo.cs.uni-frankfurt.de/lehre/agt/winter2223/agt2223.shtml">[notes]</a>
 * Cambridge CS 364 <a href="https://timroughgarden.org/f13/f13.html">[notes]</a>
 * CMU 15-896 <a href="https://www.cs.cmu.edu/~arielpro/15896s16/schedule.html">[notes]</a>
 

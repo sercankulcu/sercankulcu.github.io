@@ -23,6 +23,9 @@ The resources:
 * Operating System Concepts, A. SilberSchatz, P. Galvin, and G. Gagne <a href="https://www.os-book.com/OS10/index.html">[e-book]</a>
 * Operating Systems: Three Easy Pieces <a href="https://pages.cs.wisc.edu/~remzi/OSTEP">[e-book]</a>
 * Youtube <a href="https://www.youtube.com/watch?v=sqtkwd09KXs&list=PLmPsb7nQhv7NLRWdIiDVNBDCMOtuUn6WZ">[Prof. Dr. Kemal Bıçakcı]</a> <a href="https://www.youtube.com/watch?v=r2q_XRKrqHQ&list=PLh9ECzBB8tJO9eiwfQbcA2ThMbUSkbOWf">[Prof. Dr. Sadi Evren Şeker]</a>
+
+* CSCI-UA.202 Operating Systems <a href="https://cs.nyu.edu/~gottlieb/courses/os202/class-notes.html">[website]</a>
+
 * Bilgisayar İşletim Sistemleri, Prof. Dr. Ali Saatçi, 2. Baskı.
 * Operating System Development <a href="https://wiki.osdev.org/Main_Page">[website]</a>
 * Operating Systems From 0 to 1 <a href="../files/os/Book_Operating_Systems_From_0_to_1.pdf">[pdf]</a>
