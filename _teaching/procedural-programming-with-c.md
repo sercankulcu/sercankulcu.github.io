@@ -10,6 +10,9 @@ location: "Giresun, Turkey"
 
 <img align="left" width="200" alt="procedural programming with c" src="/images/teaching/procedural-programming-with-c.png" style="float: left; margin-right: 10px;"> C is a robust and flexible programming language employed in numerous applications, ranging from operating systems and embedded systems to game development and high-performance computing. As a low-level language, it offers significant control over hardware and memory management, enabling developers to write highly efficient and optimized code. This level of control makes it perfect for performance-critical tasks where speed and resource management are paramount. Its influence is also seen in many modern languages, which have adopted its syntax and features, solidifying C's role as a foundational language in computer science and software development.
 
+* V22.0201 Computer Systems Organization <a href="https://cs.nyu.edu/~gottlieb/courses/cso/class-notes.html">[course]</a>
+
+
 Chapter 1: Introduction to C Programming
 -----
 
