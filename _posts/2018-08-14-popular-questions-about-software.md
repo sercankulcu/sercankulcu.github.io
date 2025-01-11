@@ -7,7 +7,7 @@ tags:
   - software
 ---
 
-<img width="200" alt="matrix" src="/images/posts/popular-questions-about-software.jpg" style="float: left; margin-right: 10px;" /> Software is a collection of instructions and data that tell a computer what to do and how to do it. It is the non-tangible component of a computer system, as opposed to the hardware, which is the tangible physical component. Software is the foundation upon which computer systems are built. It is the set of programs, procedures, algorithms, and data that tell a computer what to do and how to do it. Without software, a computer is just a collection of electronic components that cannot perform any useful tasks.
+<img width="200" alt="matrix" src="/images/posts/popular-questions-about-software.webp" style="float: left; margin-right: 10px;" /> Software is a collection of instructions and data that tell a computer what to do and how to do it. It is the non-tangible component of a computer system, as opposed to the hardware, which is the tangible physical component. Software is the foundation upon which computer systems are built. It is the set of programs, procedures, algorithms, and data that tell a computer what to do and how to do it. Without software, a computer is just a collection of electronic components that cannot perform any useful tasks.
 
 There are many different types of software, each designed for a specific purpose. Some common types of software include:
 

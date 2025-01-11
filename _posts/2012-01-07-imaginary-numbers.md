@@ -8,7 +8,7 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="imaginary numbers" src="/images/posts/imaginary-numbers.png" style="float: left; margin-right: 10px;" /> The idea of "imaginary" or "unreal" numbers first arose when mathematicians encountered equations that had no solutions in the real number system. For example, the equation x^2 + 1 = 0 has no solutions in the real numbers, since the square of any real number is non-negative. However, it was noticed that if we introduce a new number, denoted by the symbol "i", such that i^2 = -1, then the equation x^2 + 1 = 0 has two solutions, namely x = i and x = -i.
+<img width="200" alt="imaginary numbers" src="/images/posts/imaginary-numbers.webp" style="float: left; margin-right: 10px;" /> The idea of "imaginary" or "unreal" numbers first arose when mathematicians encountered equations that had no solutions in the real number system. For example, the equation x^2 + 1 = 0 has no solutions in the real numbers, since the square of any real number is non-negative. However, it was noticed that if we introduce a new number, denoted by the symbol "i", such that i^2 = -1, then the equation x^2 + 1 = 0 has two solutions, namely x = i and x = -i.
 
 The concept of imaginary numbers was initially met with skepticism and resistance by some mathematicians, who regarded them as a mathematical curiosity or even as absurd. For example, the mathematician and philosopher René Descartes expressed doubt about the reality of imaginary numbers, stating that "I do not conceive how there can be a quantity that is the square of minus one."
 

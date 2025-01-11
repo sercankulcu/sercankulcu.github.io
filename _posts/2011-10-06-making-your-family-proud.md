@@ -7,7 +7,7 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="bird proud" src="/images/posts/making-your-family-proud.jpg" style="float: left; margin-right: 10px;" /> The desire to make your family proud is a deeply noble and heartfelt aspiration, rooted in love, respect, and gratitude for those who have supported you throughout your life. It reflects a longing to honor their sacrifices, repay their kindness, and show them that their belief in you was not misplaced. However, this journey is far from easy; it is a path often filled with obstacles, pressures, and emotional complexities.
+<img width="200" alt="bird proud" src="/images/posts/making-your-family-proud.webp" style="float: left; margin-right: 10px;" /> The desire to make your family proud is a deeply noble and heartfelt aspiration, rooted in love, respect, and gratitude for those who have supported you throughout your life. It reflects a longing to honor their sacrifices, repay their kindness, and show them that their belief in you was not misplaced. However, this journey is far from easy; it is a path often filled with obstacles, pressures, and emotional complexities.
 
 One of the most significant challenges is balancing your own dreams and desires with the expectations of your family. While their pride in you may be a driving force, it’s important to ensure that your goals align with your own sense of purpose and identity. The weight of meeting high expectations can be daunting, and at times, the fear of failure can overshadow the joy of progress. It’s also common to feel torn between pursuing traditional paths that are familiar to your family and venturing into uncharted territory that resonates more with your personal aspirations.
 

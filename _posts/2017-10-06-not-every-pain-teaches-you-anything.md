@@ -7,7 +7,7 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="meeting" src="/images/posts/not-every-pain-teaches-you-anything.jpg" style="float: left; margin-right: 10px;" /> "Her acı insana bi şey öğretmez. Çoğu kez sadece acı çekersin." (Not every pain teaches you anything. Most of the time you just suffer.) These words, spoken by Turkish poet and writer Ataol Behramoğlu, hold a great deal of truth. It's easy to think that every negative experience we go through must have a lesson for us to learn, but the reality is often quite different. Sometimes, life is simply hard, and we suffer because of it.
+<img width="200" alt="meeting" src="/images/posts/not-every-pain-teaches-you-anything.webp" style="float: left; margin-right: 10px;" /> "Her acı insana bi şey öğretmez. Çoğu kez sadece acı çekersin." (Not every pain teaches you anything. Most of the time you just suffer.) These words, spoken by Turkish poet and writer Ataol Behramoğlu, hold a great deal of truth. It's easy to think that every negative experience we go through must have a lesson for us to learn, but the reality is often quite different. Sometimes, life is simply hard, and we suffer because of it.
 
 That's not to say that we can never learn from pain. Often, our struggles can help us grow and become stronger. But it's important to remember that not all pain is transformative. Sometimes, we simply have to endure it and come out the other side.
 

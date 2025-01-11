@@ -7,7 +7,7 @@ tags:
   - philosophy
 ---
 
-<img width="200" alt="decision choice" src="/images/posts/navigating-choices-of-life-in-the-age-of-algorithms.jpg" style="float: left; margin-right: 10px;" /> In a world brimming with choices, the quest for options has become an integral part of our daily lives. From deciding where to live and which school to send our kids, to pondering the people we surround ourselves with, the constant pursuit of alternatives seems to be a common theme. But why do we find ourselves perpetually searching for something more, and is there a way to break free from the chains of routine dictated by algorithms?
+<img width="200" alt="decision choice" src="/images/posts/navigating-choices-of-life-in-the-age-of-algorithms.webp" style="float: left; margin-right: 10px;" /> In a world brimming with choices, the quest for options has become an integral part of our daily lives. From deciding where to live and which school to send our kids, to pondering the people we surround ourselves with, the constant pursuit of alternatives seems to be a common theme. But why do we find ourselves perpetually searching for something more, and is there a way to break free from the chains of routine dictated by algorithms?
 
 ### The Paradox of Choice:
 Psychologists have long studied the paradox of choice – the idea that while options offer freedom, an excess of choices can lead to decision paralysis and dissatisfaction. In a world where options are seemingly endless, the quest for something better can leave us perpetually unsatisfied with what we have.

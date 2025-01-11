@@ -7,7 +7,7 @@ tags:
   - career
 ---
 
-<img width="200" alt="dijkstra" src="/images/posts/edsger-wybe-dijkstra-1.png" style="float: left; margin-right: 10px;" /> Edsger Wybe Dijkstra was a Dutch computer scientist and mathematician who made significant contributions to the field of computer science. He was born on May 11, 1930 in Rotterdam, Netherlands. In 1951, Dijkstra began studying theoretical physics at the University of Leiden. However, he soon switched to mathematics and theoretical physics at the University of Amsterdam. He graduated in 1954.
+<img width="200" alt="dijkstra" src="/images/posts/edsger-wybe-dijkstra-1.webp" style="float: left; margin-right: 10px;" /> Edsger Wybe Dijkstra was a Dutch computer scientist and mathematician who made significant contributions to the field of computer science. He was born on May 11, 1930 in Rotterdam, Netherlands. In 1951, Dijkstra began studying theoretical physics at the University of Leiden. However, he soon switched to mathematics and theoretical physics at the University of Amsterdam. He graduated in 1954.
 
 In 1956, Dijkstra began working as a programmer at the Mathematical Center in Amsterdam. It was here that he first became interested in computer science and began working on his early research in the field.
 
@@ -15,7 +15,7 @@ In 1959, Dijkstra was appointed as an assistant professor at the Eindhoven Unive
 
 In 1968, Dijkstra published a paper on a shortest path algorithm, which later became known as Dijkstra's algorithm. This algorithm is widely used to find the shortest path between two points in a graph and is considered to be one of the most important algorithms in computer science.
 
-<img width="200" alt="dijkstra" src="/images/posts/edsger-wybe-dijkstra-2.png" style="float: left; margin-right: 10px;" /> In 1972, Dijkstra was appointed as a professor of computer science at the University of Texas at Austin in the United States. He held this position until his retirement in 1999. During this time, he continued to work on a variety of research projects in the field of computer science, including automated theorem proving and concurrent programming.
+<img width="200" alt="dijkstra" src="/images/posts/edsger-wybe-dijkstra-2.webp" style="float: left; margin-right: 10px;" /> In 1972, Dijkstra was appointed as a professor of computer science at the University of Texas at Austin in the United States. He held this position until his retirement in 1999. During this time, he continued to work on a variety of research projects in the field of computer science, including automated theorem proving and concurrent programming.
 
 One of Dijkstra's most notable contributions to the field of computer science was his work on the shortest path algorithm, also known as Dijkstra's algorithm. This algorithm is used to find the shortest path between two points in a graph, and it is widely used in various fields such as transportation, networking, and logistics. Dijkstra's algorithm is considered to be one of the most important algorithms in computer science and is still widely used today.
 
