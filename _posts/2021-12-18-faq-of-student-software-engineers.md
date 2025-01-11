@@ -7,7 +7,7 @@ tags:
   - software
 ---
 
-<img width="200" alt="faq" src="/images/posts/faq-of-student-software-engineers.jpg" style="float: left; margin-right: 10px;" /> To become a software engineer, it is generally recommended to study computer science or a related field, such as computer engineering or software engineering. This typically involves taking courses in programming, data structures, algorithms, computer systems, and other technical topics. In addition, it can be helpful to gain practical experience through internships or co-op programs, or by participating in hackathons or other programming competitions. Here are frequently asked questions of student software engineers.
+<img width="200" alt="faq" src="/images/posts/faq-of-student-software-engineers.webp" style="float: left; margin-right: 10px;" /> To become a software engineer, it is generally recommended to study computer science or a related field, such as computer engineering or software engineering. This typically involves taking courses in programming, data structures, algorithms, computer systems, and other technical topics. In addition, it can be helpful to gain practical experience through internships or co-op programs, or by participating in hackathons or other programming competitions. Here are frequently asked questions of student software engineers.
 
 How do I gain practical experience in software development?
 -----
