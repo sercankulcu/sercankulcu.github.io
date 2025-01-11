@@ -8,7 +8,7 @@ date: 2024-01-07
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="algorithms" src="/images/teaching/algorithms-course.png" style="float: left; margin-right: 10px;"> An algorithm is a set of well-defined instructions for carrying out a particular task. Think of it as a recipe in a cookbook that guides you step by step to make a delicious dish. In the world of computing, algorithms are the backbone that powers programs and applications. They are logical sequences that tell a computer exactly what steps to take to solve a problem or achieve a goal. From simple tasks like sorting a list of numbers to complex operations like image processing or running search engines, algorithms are everywhere.
+<img align="left" width="200" alt="algorithms" src="/images/teaching/algorithms-course.webp" style="float: left; margin-right: 10px;"> An algorithm is a set of well-defined instructions for carrying out a particular task. Think of it as a recipe in a cookbook that guides you step by step to make a delicious dish. In the world of computing, algorithms are the backbone that powers programs and applications. They are logical sequences that tell a computer exactly what steps to take to solve a problem or achieve a goal. From simple tasks like sorting a list of numbers to complex operations like image processing or running search engines, algorithms are everywhere.
 
 * Ders Öğretim Planı <a href="../files/algorithms/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
 

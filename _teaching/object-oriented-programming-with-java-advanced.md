@@ -8,7 +8,7 @@ date: 2021-07-07
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="object oriented programming" src="/images/teaching/object-oriented-course-ii.png" style="float: left; margin-right: 10px;"> This course is designed to take your Java programming skills to the next level by exploring advanced topics and concepts in object-oriented design. In this course, you will learn how to implement complex data structures, design patterns, and advanced OOP principles such as interfaces, generics, and nested classes. You will also learn how to leverage Java's powerful features such as streams and lambdas to write clean and concise code. Throughout the course, you will work on challenging assignments and projects that will help you apply the concepts you have learned in real-world scenarios. 
+<img align="left" width="200" alt="object oriented programming" src="/images/teaching/object-oriented-course-ii.webp" style="float: left; margin-right: 10px;"> This course is designed to take your Java programming skills to the next level by exploring advanced topics and concepts in object-oriented design. In this course, you will learn how to implement complex data structures, design patterns, and advanced OOP principles such as interfaces, generics, and nested classes. You will also learn how to leverage Java's powerful features such as streams and lambdas to write clean and concise code. Throughout the course, you will work on challenging assignments and projects that will help you apply the concepts you have learned in real-world scenarios. 
 
 Chapter 1: Introduction to advanced Java concepts and best practices 
 -----
