@@ -1,12 +1,12 @@
 ---
 layout: archive
 permalink: /data-structure-arrays/
-title: "Arrays"
+title: "Array Simulator"
 author_profile: true
 redirect_from: 
 ---
 
-```html
+``
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -110,7 +110,6 @@ redirect_from:
 </head>
 <body>
     <header>
-        <h1>Array Simulator</h1>
         <p>Interactive learning tool for data structures</p>
     </header>
 
