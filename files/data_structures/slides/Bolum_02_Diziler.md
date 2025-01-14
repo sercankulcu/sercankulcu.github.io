@@ -7,7 +7,11 @@ redirect_from:
 ---
 
 ``
-<iframe
-  src="https://sercankulcu.github.io/files/data_structures/slides/Bolum_02_Diziler.html"
-  style="width:100%; height:600px;"
-></iframe>
+<iframe id="dynamic-iframe" src="https://sercankulcu.github.io/files/data_structures/slides/Bolum_02_Diziler.html" width="100%" style="border: none;"></iframe>
+
+<script>
+  const iframe = document.getElementById('dynamic-iframe');
+  iframe.onload = () => {
+    iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+  };
+</script>
