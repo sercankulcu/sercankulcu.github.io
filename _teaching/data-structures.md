@@ -49,7 +49,7 @@ Chapter 2: Arrays
 Arrays are like the bread and butter of programming. An array is the most fundamental data structure, consisting of a collection of elements stored in contiguous memory locations. Think of it as a row of boxes, each containing a value, where you can instantly access any element using its index number. Arrays excel at random access operations and are perfect for situations where you know the size of your data in advance. However, they can be inefficient when it comes to insertions and deletions, as these operations might require shifting many elements.
 
 * Sunum-Diziler <a href="../files/data_structures/slides/Bolum_02_Diziler.pdf">[pdf]</a>
-* Array Simulator <a href="./data-structures/array-simulator">[html]</a>
+* Array Simulator <a href="./teaching/data-structures/array-simulator">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders02/src">[link]</a>
 
