@@ -6,19 +6,9 @@ author_profile: true
 redirect_from: 
   - /max-heap.html
 ---
-<html lang="en">
+
 <head>
 <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            color: #333;
-            text-align: center;
-            margin: 0 auto;
-            padding: 1vw;
-            max-width: 800px;
-            box-sizing: border-box;
-        }
         .container {
             background: white;
             border-radius: 8px;
@@ -287,4 +277,4 @@ function resizeSVG() {
 updateVisualization();
 </script>
 
-</body></html>
+</body>
