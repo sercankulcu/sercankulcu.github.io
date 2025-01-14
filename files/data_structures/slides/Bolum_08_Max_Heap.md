@@ -83,8 +83,7 @@ redirect_from:
             }
         }
     </style>
-</head>
-<body>
+
     <header>
         <h1>Heap Simulator</h1>
         <p>Learn and interact with a Max Heap data structure through this interactive visualization.</p>
@@ -276,5 +275,3 @@ function resizeSVG() {
 
 updateVisualization();
 </script>
-
-</body>
