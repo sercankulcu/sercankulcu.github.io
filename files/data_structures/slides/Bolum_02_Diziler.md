@@ -7,9 +7,6 @@ redirect_from:
 ---
 
 ``
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
     <style>
 
         .controls {
@@ -100,7 +97,6 @@ redirect_from:
             }
         }
     </style>
-</head>
 <body>
     <header>
         <p>Interactive learning tool for data structures</p>
