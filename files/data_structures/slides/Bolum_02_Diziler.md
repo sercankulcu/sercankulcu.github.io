@@ -6,12 +6,7 @@ author_profile: true
 redirect_from: 
 ---
 
-# Data Structures Course: Array Simulator
-
-The following HTML file represents an interactive Array Simulator for learning data structures.
-
 ```html
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -23,16 +18,6 @@ The following HTML file represents an interactive Array Simulator for learning d
     <meta property="og:description" content="Interactive Array Simulator for Data Structures. Learn and visualize array operations such as creation, setting values, searching, traversing, and sorting.">
     <title>Data Structures Course: Array Simulator</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            color: #333;
-            text-align: center;
-            margin: 0 auto;
-            padding: 2vw;
-            max-width: 800px;
-            box-sizing: border-box;
-        }
 
         .controls {
             display: flex;
