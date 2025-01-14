@@ -33,7 +33,7 @@ Past Exams:
 ---
 
 * Soru Cevap <a href="../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf">[vize]</a> <a href="../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf">[final]</a>
-* 2023-2024 <a href="../files/algorithms/slides/2023-2024-vize-cevap.pdf">[vize]</a><a href="../files/algorithms/slides/2023-2024-final-a-cevap.pdf">[final-a]</a><a href="../files/algorithms/slides/2023-2024-final-b-cevap.pdf">[final-b]</a><a href="../files/algorithms/slides/2023-2024-butunleme-cevap.pdf">[bütünleme]</a>
+* 2023-2024 <a href="../files/algorithms/slides/2023-2024-algorithms-vize-cevap.pdf">[vize]</a><a href="../files/algorithms/slides/2023-2024-algorithms-final-a-cevap.pdf">[final-a]</a><a href="../files/algorithms/slides/2023-2024-algorithms-final-b-cevap.pdf">[final-b]</a><a href="../files/algorithms/slides/2023-2024-algorithms-butunleme-cevap.pdf">[bütünleme]</a>
 
 Chapter 1: Introduction to Algorithms
 ---
