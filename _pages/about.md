@@ -12,6 +12,9 @@ redirect_from:
 
 I am Sercan Külcü, an Assistant Professor in the Computer Science Department at Giresun University. With over 20 years of professional experience in software engineering, I hold a PhD specializing in low-power wireless communication technologies. My expertise spans embedded and real-time operating systems, programming in C, C++, and Java, as well as the application of machine learning techniques. Recently, I have also enjoyed developing small applications with JavaScript.
 
+**Note:** If any licensed content is found on the website, please don't hesitate to contact me via the links on the left-hand side. You can be sure that any related content will be quickly removed within 24 hours.
+
+
 <br><a href="../game/car-race.html">[🏎️💨 car race 🏁]</a>
 <br><a href="../game/mobile-car-race.html">[📱🏎️💨 mobile car race 🏁]</a>
 <br><a href="../game/minesweeper.html">[💣⬜ minesweeper ⚠️]</a>
@@ -27,7 +30,6 @@ I am Sercan Külcü, an Assistant Professor in the Computer Science Department a
 <br><a href="../game/iqtest.html">[🧠 iq test 💯]</a>
 <br><a href="../game/mantra.html">[🧘 mantra 🙏]</a>
 
-**Note:** If any licensed content is found on the website, please don't hesitate to contact me via the links on the left-hand side. You can be sure that any related content will be quickly removed within 24 hours.
 
 <!--
 <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="sercankulc" data-description="Support me on Buy me a coffee!" data-message="Thank you for visiting!" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
