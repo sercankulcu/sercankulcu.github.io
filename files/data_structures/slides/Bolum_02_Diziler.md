@@ -1,6 +1,6 @@
 ---
 layout: archive
-permalink: /teaching/data-structures/array-simulator
+permalink: /data-structures/array-simulator
 title: "Array Simulator"
 author_profile: true
 redirect_from: 
