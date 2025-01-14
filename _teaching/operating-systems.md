@@ -33,8 +33,8 @@ The resources:
 Past Exams:
 ---
 
-* 2023-2024 <a href="../files/os/slides/2023-2024-vize-cevap.pdf">[vize]</a> <a href="../files/os/slides/2023-2024-telafi_cevaplar.pdf">[telafi]</a><a href="../files/os/slides/2023-2024-final-a-cevaplar.pdf">[final-a]</a><a href="../files/os/slides/2023-2024-final-b-cevaplar.pdf">[final-b]</a><a href="../files/os/slides/2023-2024-butunleme-cevap.pdf">[bütünleme]</a>
-* 2022-2023 <a href="../files/os/slides/2022-2023-vize_cevaplar.pdf">[vize]</a> <a href="../files/os/slides/2022-2023-final_cevaplar.pdf">[final]</a>
+* 2023-2024 <a href="../files/os/slides/2023-2024-os-vize-cevap.pdf">[vize]</a> <a href="../files/os/slides/2023-2024-os-telafi_cevaplar.pdf">[telafi]</a><a href="../files/os/slides/2023-2024-os-final-a-cevaplar.pdf">[final-a]</a><a href="../files/os/slides/2023-2024-os-final-b-cevaplar.pdf">[final-b]</a><a href="../files/os/slides/2023-2024-os-butunleme-cevap.pdf">[bütünleme]</a>
+* 2022-2023 <a href="../files/os/slides/2022-2023-os-vize_cevaplar.pdf">[vize]</a> <a href="../files/os/slides/2022-2023-os-final_cevaplar.pdf">[final]</a>
 * Soru Cevap <a href="../files/os/slides/Bolum_17_Soru_Cevap.pdf">[vize]</a> <a href="../files/os/slides/Bolum_18_Soru_Cevap.pdf">[final]</a>
 * Multiple Choice Questions <a href="../files/os/slides/midterm_mcq.txt">[vize]</a> <a href="../files/os/slides/final_mcq.txt">[final]</a>
 
