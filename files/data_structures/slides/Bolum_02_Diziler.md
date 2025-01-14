@@ -1,12 +1,12 @@
 ---
 layout: archive
-permalink: /data-structures/array-simulator
+permalink: /teaching/data-structures/array-simulator
 title: "Array Simulator"
 author_profile: true
 redirect_from: 
 ---
 
-<iframe id="dynamic-iframe" src="../files/data_structures/slides/Bolum_02_Diziler.html" width="100%" style="border: none;"></iframe>
+<iframe id="dynamic-iframe" src="../../../files/data_structures/slides/Bolum_02_Diziler.html" width="100%" style="border: none;"></iframe>
 
 <script>
   const iframe = document.getElementById('dynamic-iframe');
