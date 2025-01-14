@@ -116,7 +116,8 @@ Chapter 8: Priority Queues, Heaps
 A heap is a specialized tree-based data structure that satisfies the heap property - in a max heap, for any given node, the parent's value is greater than or equal to its children's values (or less than or equal to in a min heap). Heaps are particularly efficient for implementing priority queues and finding the maximum/minimum element quickly. They're commonly used in algorithms like heap sort and in systems where you need to repeatedly find and remove the highest (or lowest) priority item.
 
 * Sunum-Öncelikli Kuyruk <a href="../files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk.pdf">[pdf]</a>
-* Heap Simulator <a href="../files/data_structures/slides/Bolum_08_Heap.html">[html]</a>
+* Max-Heap Simulator <a href="../files/data_structures/slides/Bolum_08_Heap.html">[html]</a>
+* Min-Heap Simulator <a href="../files/data_structures/slides/Bolum_08_Min_Heap.html">[html]</a>
 * Priority Queue Simulator <a href="../files/data_structures/slides/Bolum_08_Priority_Queue.html">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_08_Heaps_Priority_Queues.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders08/src">[link]</a>
