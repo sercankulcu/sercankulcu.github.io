@@ -29,7 +29,7 @@ Past Exams:
 ---
 
 * Soru-Cevap <a href="../files/microprocessors/slides/Bolum_12_Soru_Cevap.pdf">[vize]</a><a href="../files/microprocessors/slides/Bolum_13_Soru_Cevap.pdf">[final]</a>
-* 2023-2024 <a href="../files/microprocessors/slides/2023-2024-vize-cevap.pdf">[vize]</a><a href="../files/microprocessors/slides/2023-2024-final-cevap.pdf">[final]</a><a href="../files/microprocessors/slides/2023-2024-butunleme-cevap.pdf">[bütünleme]</a>
+* 2023-2024 <a href="../files/microprocessors/slides/2023-2024-microprocessor-vize-cevap.pdf">[vize]</a><a href="../files/microprocessors/slides/2023-2024-microprocessor-final-cevap.pdf">[final]</a><a href="../files/microprocessors/slides/2023-2024-microprocessor-butunleme-cevap.pdf">[bütünleme]</a>
 
 Chapter 1: Introduction, 8086 Architecture
 ---
