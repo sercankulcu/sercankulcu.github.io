@@ -1,5 +1,5 @@
 // Define a unique version for the cache
-const CACHE_VERSION = 'v18';
+const CACHE_VERSION = 'v19';
 const CACHE_NAME = 'my-pwa-sercan-cache-' + CACHE_VERSION;
 
 // List of URLs to cache
@@ -39,7 +39,7 @@ self.addEventListener('fetch', event => {
     caches.match(event.request).then(response => {
       // Cache hit - return the cached response
       if (response) {
-        return response;
+        //return response;
       }
 
       // Clone the request since it's a one-time use
