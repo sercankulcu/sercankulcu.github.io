@@ -6,7 +6,8 @@ author_profile: true
 redirect_from: 
   - /max-heap.html
 ---
-
+<html lang="en">
+<head>
 <style>
         body {
             font-family: Arial, sans-serif;
@@ -92,9 +93,13 @@ redirect_from:
             }
         }
     </style>
-
+</head>
+<body>
+    <header>
         <h1>Heap Simulator</h1>
         <p>Learn and interact with a Max Heap data structure through this interactive visualization.</p>
+    </header>
+    <main>
         <div class="container">
             <div class="controls">
                 <input type="number" id="insert-value" placeholder="Enter a value" aria-label="Value input">
@@ -104,6 +109,10 @@ redirect_from:
             </div>
             <svg id="heap-visual" aria-label="Heap Visualization"></svg>
         </div>
+    </main>
+    <footer>
+        <p>Created by Your Name | © 2024</p>
+    </footer>
     <script src="https://d3js.org/d3.v7.min.js"></script>
    
 <script>
@@ -277,3 +286,5 @@ function resizeSVG() {
 
 updateVisualization();
 </script>
+
+</body></html>
