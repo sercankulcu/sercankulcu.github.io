@@ -29,8 +29,8 @@ The resources:
 Past Exams:
 ---
 
-* 2024-2025 <a href="../files/data_structures/slides/2024-2025-vize-a-cevaplar.pdf">[vize a]</a> <a href="../files/data_structures/slides/2024-2025-vize-b-cevaplar.pdf">[vize b]</a> <a href="../files/data_structures/slides/2024-2025-telafi-cevaplar.pdf">[telafi]</a> 
-* 2023-2024 <a href="../files/data_structures/slides/2023-2024-vize-cevaplar.pdf">[vize]</a> <a href="../files/data_structures/slides/2023-2024-final-cevaplar.pdf">[final]</a> <a href="../files/data_structures/slides/2023-2024-butunleme-cevaplar.pdf">[bütünleme]</a>
+* 2024-2025 <a href="../files/data_structures/slides/2024-2025-data-vize-a-cevaplar.pdf">[vize a]</a> <a href="../files/data_structures/slides/2024-2025-data-vize-b-cevaplar.pdf">[vize b]</a> <a href="../files/data_structures/slides/2024-2025-data-telafi-cevaplar.pdf">[telafi]</a> 
+* 2023-2024 <a href="../files/data_structures/slides/2023-2024-data-vize-cevaplar.pdf">[vize]</a> <a href="../files/data_structures/slides/2023-2024-data-final-cevaplar.pdf">[final]</a> <a href="../files/data_structures/slides/2023-2024-data-butunleme-cevaplar.pdf">[bütünleme]</a>
 * Çalışma Soruları <a href="../files/data_structures/slides/vize_calisma.txt">[vize]</a> <a href="../files/data_structures/slides/final_calisma.txt">[final]</a>
 
 Chapter 1: Introduction
