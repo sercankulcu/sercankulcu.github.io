@@ -10,13 +10,6 @@ redirect_from:
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Interactive Array Simulator for Data Structures. Learn and visualize array operations such as creation, setting values, searching, traversing, and sorting.">
-    <meta name="keywords" content="Array Simulator, Data Structures, Interactive Learning, Sorting, Searching, Traversing Arrays">
-    <meta name="author" content="Sercan Kulcu">
-    <meta property="og:title" content="Data Structures Course: Array Simulator">
-    <meta property="og:description" content="Interactive Array Simulator for Data Structures. Learn and visualize array operations such as creation, setting values, searching, traversing, and sorting.">
-    <title>Data Structures Course: Array Simulator</title>
     <style>
 
         .controls {
@@ -132,10 +125,6 @@ redirect_from:
         <div id="arrayContainer" class="array-container"></div>
         <div id="output">Operations result will appear here.</div>
     </main>
-
-    <footer>
-        <p>&copy; 2024 Data Structures Course | All rights reserved</p>
-    </footer>
 
     <script>
         let array = [];
