@@ -6,7 +6,6 @@ author_profile: true
 redirect_from: 
 ---
 
-``
 <iframe id="dynamic-iframe" src="../files/data_structures/slides/Bolum_02_Diziler.html" width="100%" style="border: none;"></iframe>
 
 <script>
