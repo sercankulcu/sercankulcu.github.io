@@ -59,7 +59,7 @@ Chapter 3: Linked Lists
 Linked lists are dynamic and flexible data structures that consist of nodes connected through pointers. A linked list is like a chain of connected nodes, where each node contains both data and a reference (or link) to the next node in the sequence. Unlike arrays, linked lists don't require contiguous memory allocation, making them more flexible for insertions and deletions. They're particularly useful when you need to frequently add or remove elements from the middle of the data structure. However, they sacrifice random access capability, as you must traverse from the beginning to reach any particular element. 
 
 * Sunum-Bağlı-Liste <a href="../files/data_structures/slides/Bolum_03_Bagli_Liste.pdf">[pdf]</a>
-* Linked List Simulator <a href="../files/data_structures/slides/Bolum_03_Bagli_Liste.html">[html]</a>
+* Linked List Simulator <a href="../teaching/data-structures/linked-list-simulator">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders03/src">[link]</a>
 
