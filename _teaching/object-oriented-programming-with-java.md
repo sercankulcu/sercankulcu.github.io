@@ -28,7 +28,7 @@ The resources:
 Past Exams:
 ---
 
-* 2023-2024 <a href="../files/java/slides/2023-2024-vize-cevap.pdf">[vize]</a> <a href="../files/java/slides/2023-2024-telafi-cevap.pdf">[telafi]</a><a href="../files/java/slides/2023-2024-final-a-cevap.pdf">[final-a]</a><a href="../files/java/slides/2023-2024-final-b-cevap.pdf">[final-b]</a><a href="../files/java/slides/2023-2024-final-c-cevap.pdf">[final-c]</a><a href="../files/java/slides/2023-2024-final-d-cevap.pdf">[final-d]</a><a href="../files/java/slides/2023-2024-butunleme-a-cevap.pdf">[butunleme-a]</a><a href="../files/java/slides/2023-2024-butunleme-b-cevap.pdf">[butunleme-b]</a><a href="../files/java/slides/2023-2024-butunleme-c-cevap.pdf">[butunleme-c]</a><a href="../files/java/slides/2023-2024-butunleme-d-cevap.pdf">[butunleme-d]</a>
+* 2023-2024 <a href="../files/java/slides/2023-2024-java-vize-cevap.pdf">[vize]</a> <a href="../files/java/slides/2023-2024-java-telafi-cevap.pdf">[telafi]</a><a href="../files/java/slides/2023-2024-java-final-a-cevap.pdf">[final-a]</a><a href="../files/java/slides/2023-2024-java-final-b-cevap.pdf">[final-b]</a><a href="../files/java/slides/2023-2024-java-final-c-cevap.pdf">[final-c]</a><a href="../files/java/slides/2023-2024-java-final-d-cevap.pdf">[final-d]</a><a href="../files/java/slides/2023-2024-java-butunleme-a-cevap.pdf">[butunleme-a]</a><a href="../files/java/slides/2023-2024-java-butunleme-b-cevap.pdf">[butunleme-b]</a><a href="../files/java/slides/2023-2024-java-butunleme-c-cevap.pdf">[butunleme-c]</a><a href="../files/java/slides/2023-2024-java-butunleme-d-cevap.pdf">[butunleme-d]</a>
 
 Chapter 1: Introduction to Programming and Java
 -----
