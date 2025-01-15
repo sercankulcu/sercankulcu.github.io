@@ -69,11 +69,11 @@ Chapter 4: Stacks
 A stack operates on the Last-In-First-Out (LIFO) principle, much like a stack of plates where you can only add or remove from the top. This data structure is fundamental in programming for managing function calls, handling undo operations, or parsing expressions. The key operations - push (add) and pop (remove) - make it perfect for tracking state or handling recursion. Think of browsing history in a web browser, where each new page is pushed onto the stack, and hitting the back button pops the most recent page.
 
 * Sunum-Yığın <a href="../files/data_structures/slides/Bolum_04_Yigin.pdf">[pdf]</a>
-* Stack Simulator <a href="../files/data_structures/slides/Bolum_04_Yigin.html">[html]</a>
-* Applications <a href="../files/data_structures/slides/Bolum_04_Tower_of_Hanoi.html">[Hanoi Towers]</a>
-<a href="../files/data_structures/slides/Bolum_04_Stock_Span.html">[Stock Span]</a>
-<a href="../files/data_structures/slides/Bolum_04_Infix_to_Prefix.html">[Infix to Prefix]</a>
-<a href="../files/data_structures/slides/Bolum_04_Infix_to_Postfix.html">[Infix to Postfix]</a>
+* Stack Simulator <a href="../teaching/data-structures/stack-simulator">[html]</a>
+* Applications <a href="../teaching/data-structures/hanoi-towers-game">[Hanoi Towers]</a>
+<a href="../teaching/data-structures/stock-span_problem">[Stock Span]</a>
+<a href="../teaching/data-structures/infix-to-prefix-converter">[Infix to Prefix]</a>
+<a href="../teaching/data-structures/infix-to-postfix-converter">[Infix to Postfix]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders04/src">[link]</a>
 
