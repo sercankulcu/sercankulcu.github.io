@@ -39,7 +39,7 @@ Chapter 1: Introduction
 Data structures are the backbone of computer science, serving as the fundamental building blocks that enable us to efficiently store, organize, and manipulate data. Each data structure has its own unique characteristics, advantages, and trade-offs, making them suitable for different scenarios and requirements. Understanding these structures is crucial for writing efficient code and solving complex computational problems.
 
 * Sunum-Giriş <a href="../files/data_structures/slides/Bolum_01_Giris.pdf">[pdf]</a>
-* Data Structures <a href="../files/data_structures/slides/Bolum_01_Intro.html">[html]</a>
+* Data Structures <a href="../teaching/data-structures/intro-simulator">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_01_Introduction.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src">[link]</a>
 
