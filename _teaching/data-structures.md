@@ -29,7 +29,7 @@ The resources:
 Past Exams:
 ---
 
-* 2024-2025 <a href="../files/data_structures/slides/2024-2025-data-vize-a-cevaplar.pdf">[vize a]</a> <a href="../files/data_structures/slides/2024-2025-data-vize-b-cevaplar.pdf">[vize b]</a> <a href="../files/data_structures/slides/2024-2025-data-telafi-cevaplar.pdf">[telafi]</a> 
+* 2024-2025 <a href="../files/data_structures/slides/2024-2025-data-vize-a-cevaplar.pdf">[vize a]</a> <a href="../files/data_structures/slides/2024-2025-data-vize-b-cevaplar.pdf">[vize b]</a> <a href="../files/data_structures/slides/2024-2025-data-telafi-cevaplar.pdf">[telafi]</a> <a href="../files/data_structures/slides/2024-2025-data-final-cevaplar.pdf">[final]</a> <a href="../files/data_structures/slides/2024-2025-data-butunleme-cevaplar.pdf">[bütünleme]</a> 
 * 2023-2024 <a href="../files/data_structures/slides/2023-2024-data-vize-cevaplar.pdf">[vize]</a> <a href="../files/data_structures/slides/2023-2024-data-final-cevaplar.pdf">[final]</a> <a href="../files/data_structures/slides/2023-2024-data-butunleme-cevaplar.pdf">[bütünleme]</a>
 * Çalışma Soruları <a href="../files/data_structures/slides/vize_calisma.txt">[vize]</a> <a href="../files/data_structures/slides/final_calisma.txt">[final]</a>
 
@@ -128,8 +128,8 @@ Chapter 9: Maps, Hash Tables
 A hash table is a data structure that implements an associative array abstract data type, a structure that can map keys to values. Using a hash function to compute an index into an array of buckets or slots, hash tables provide rapid data access - typically O(1) time complexity for insertions, deletions, and lookups. They're widely used in database indexing, caches, and implementing sets. However, they must handle collisions (when different keys hash to the same index) and may require resizing as they grow.
 
 * Sunum-Hash Tabloları <a href="../files/data_structures/slides/Bolum_09_Hash_Tablosu.pdf">[pdf]</a>
-* Hash Table Simulator <a href="../files/data_structures/slides/Bolum_09_Hash_Tablosu.html">[html]</a>
-* Map Simulator <a href="../files/data_structures/slides/Bolum_09_Map.html">[html]</a>
+* Hash Table Simulator <a href="../teaching/data-structures/hash-table-simulator">[html]</a>
+* Map Simulator <a href="../teaching/data-structures/map-simulator">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders09/src">[link]</a>
 
@@ -139,10 +139,10 @@ Chapter 10: Search Trees
 A search tree, particularly a Binary Search Tree (BST), is a binary tree data structure where each node's left subtree contains only nodes with keys less than the node's key, and the right subtree contains only nodes with keys greater than the node's key. This property makes them extremely efficient for searching, inserting, and deleting elements, typically in O(log n) time when balanced. They're fundamental in implementing databases, file systems, and for maintaining sorted data in a dynamic setting. They underpin many searching and sorting algorithms, making them indispensable for computer scientists and programmers alike.
 
 * Sunum-Arama Ağaçları <a href="../files/data_structures/slides/Bolum_10_Arama_Agaclari.pdf">[pdf]</a>
-* Simulators <a href="../files/data_structures/slides/Bolum_10_BST.html">[BST]</a>
-<a href="../files/data_structures/slides/Bolum_10_AgacRB.html">[Red Black Tree]</a> 
-<a href="../files/data_structures/slides/Bolum_10_AgacAVL.html">[AVL Tree]</a>
-<a href="../files/data_structures/slides/Bolum_10_AgacSplay.html">[Splay Tree]</a>
+* Simulators <a href="../teaching/data-structures/binary-search-tree-simulator">[BST]</a>
+<a href="../teaching/data-structures/red-black-tree-simulator">[Red Black Tree]</a> 
+<a href="../teaching/data-structures/avl-tree-simulator">[AVL Tree]</a>
+<a href="../teaching/data-structures/splay-tree-simulator">[Splay Tree]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders10/src">[link]</a>
 
