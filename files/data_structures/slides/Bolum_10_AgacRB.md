@@ -11,6 +11,6 @@ redirect_from:
 <script>
   const iframe = document.getElementById('dynamic-iframe');
   iframe.onload = () => {
-    iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+    iframe.style.height = (4 * iframe.contentWindow.document.body.scrollHeight) + 'px';
   };
 </script>
