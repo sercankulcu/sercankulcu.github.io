@@ -71,7 +71,7 @@ A stack operates on the Last-In-First-Out (LIFO) principle, much like a stack of
 * Sunum-Yığın <a href="../files/data_structures/slides/Bolum_04_Yigin.pdf">[pdf]</a>
 * Stack Simulator <a href="../teaching/data-structures/stack-simulator">[html]</a>
 * Applications <a href="../teaching/data-structures/hanoi-towers-game">[Hanoi Towers]</a>
-<a href="../teaching/data-structures/stock-span_problem">[Stock Span]</a>
+<a href="../teaching/data-structures/stock-span-problem">[Stock Span]</a>
 <a href="../teaching/data-structures/infix-to-prefix-converter">[Infix to Prefix]</a>
 <a href="../teaching/data-structures/infix-to-postfix-converter">[Infix to Postfix]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
