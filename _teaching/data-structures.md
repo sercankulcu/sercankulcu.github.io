@@ -83,9 +83,9 @@ Chapter 5: Queues
 A queue follows the First-In-First-Out (FIFO) principle, similar to a line of people waiting for a service. Elements are added at one end (enqueue) and removed from the other end (dequeue), making it ideal for managing tasks that need to be processed in the order they were received. Queues are extensively used in scenarios like print job scheduling, handling requests in web servers, or managing any kind of service where maintaining order of arrival is important.
 
 * Sunum-Kuyruk <a href="../files/data_structures/slides/Bolum_05_Kuyruk.pdf">[pdf]</a>
-* Queue Simulator <a href="../files/data_structures/slides/Bolum_05_Kuyruk.html">[html]</a>
-* Applications <a href="../files/data_structures/slides/Bolum_05_Scheduler.html">[Scheduler]</a>
-<a href="../files/data_structures/slides/Bolum_05_Priority_Scheduler.html">[Priority Scheduler]</a>
+* Queue Simulator <a href="../teaching/data-structures/queue-simulator">[html]</a>
+* Applications <a href="../teaching/data-structures/process-scheduler">[Scheduler]</a>
+<a href="../teaching/data-structures/priority-queue-scheduler">[Priority Scheduler]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders05/src">[link]</a>
 
@@ -105,8 +105,8 @@ Chapter 7: Trees
 A tree is a hierarchical data structure composed of nodes connected by edges, similar to a family tree or organizational chart. Each node can have multiple children but only one parent, creating a branching structure that starts from a root node. Trees are invaluable for representing hierarchical relationships, such as file systems, HTML DOM, or category classifications. They provide efficient operations for insertion, deletion, and searching, particularly when balanced properly. Trees consist of nodes connected in a hierarchical and branched structure, allowing us to represent complex relationships between data elements. 
 
 * Sunum-Ağaç <a href="../files/data_structures/slides/Bolum_07_Agac.pdf">[pdf]</a>
-* Simulators <a href="../files/data_structures/slides/Bolum_07_Agac.html">[Binary Tree]</a> 
-<a href="../files/data_structures/slides/Bolum_07_AgacBTree.html">[BTrees]</a> 
+* Simulators <a href="../teaching/data-structures/binary-tree-simulator">[Binary Tree]</a> 
+<a href="../teaching/data-structures/b-tree-simulator">[BTrees]</a> 
 * Lecture Notes <a href="../files/data_structures/Chapter_06_Trees.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders07/src">[link]</a>
 
@@ -116,9 +116,9 @@ Chapter 8: Priority Queues, Heaps
 A heap is a specialized tree-based data structure that satisfies the heap property - in a max heap, for any given node, the parent's value is greater than or equal to its children's values (or less than or equal to in a min heap). Heaps are particularly efficient for implementing priority queues and finding the maximum/minimum element quickly. They're commonly used in algorithms like heap sort and in systems where you need to repeatedly find and remove the highest (or lowest) priority item.
 
 * Sunum-Öncelikli Kuyruk <a href="../files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk.pdf">[pdf]</a>
-* Max-Heap Simulator <a href="../files/data_structures/slides/Bolum_08_Heap.html">[html]</a>
-* Min-Heap Simulator <a href="../files/data_structures/slides/Bolum_08_Min_Heap.html">[html]</a>
-* Priority Queue Simulator <a href="../files/data_structures/slides/Bolum_08_Priority_Queue.html">[html]</a>
+* Max-Heap Simulator <a href="../teaching/data-structures/heap-simulator">[html]</a>
+* Min-Heap Simulator <a href="../teaching/data-structures/min-heap-simulator">[html]</a>
+* Priority Queue Simulator <a href="../teaching/data-structures/priority-queue-simulator">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_08_Heaps_Priority_Queues.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders08/src">[link]</a>
 
