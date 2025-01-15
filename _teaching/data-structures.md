@@ -153,8 +153,8 @@ A graph is a versatile data structure consisting of vertices (or nodes) connecte
 
 
 * Sunum-Çizge <a href="../files/data_structures/slides/Bolum_11_Cizge.pdf">[pdf]</a>
-* Graph Simulator <a href="../files/data_structures/slides/Bolum_11_Graph.html">[html]</a>
-* Dijkstra Simulator <a href="../files/data_structures/slides/Bolum_11_Dijkstra.html">[html]</a>
+* Graph Simulator <a href="../teaching/data-structures/graph-simulator">[html]</a>
+* Dijkstra Simulator <a href="../teaching/data-structures/dijkstra-algorithm-simulator">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders11/src">[link]</a>
 
@@ -164,7 +164,7 @@ Chapter 12: Sets
 A set is a collection of distinct elements where order doesn't matter and duplicates are not allowed. Think of it as a mathematical set, perfect for maintaining a unique collection of items. Sets support operations like union, intersection, and difference, making them invaluable for comparing collections of data or removing duplicates. They're typically implemented using hash tables underneath, providing fast lookup and insertion operations. Sets are extensively used in database queries, finding unique values, and checking for membership in a collection.
 
 * Sunum-Kümeler <a href="../files/data_structures/slides/Bolum_12_Kumeler.pdf">[pdf]</a>
-* Sets Simulator <a href="../files/data_structures/slides/Bolum_12_Sets.html">[html]</a>
+* Sets Simulator <a href="../teaching/data-structures/sets-simulator">[html]</a>
 * Lecture Notes <a href="../files/data_structures/Chapter_07_Graphs.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src">[link]</a>
 
