@@ -122,36 +122,50 @@ class SplayTree {
     }
 
     rightRotate(x) {
-        let y = x.left;
-        if (y) {
-            x.left = y.right;
-            if (y.right) y.right.parent = x;
-            y.parent = x.parent;
-        }
+    if (!x) return; // Ensure x is not null
 
-        if (!x.parent) this.root = y;
-        else if (x === x.parent.right) x.parent.right = y;
-        else x.parent.left = y;
-
-        if (y) y.right = x;
-        x.parent = y;
+    let y = x.left; // Get the left child
+    if (y) {
+        x.left = y.right; // Update x's left child
+        if (y.right) y.right.parent = x; // Update y.right's parent to x
+        y.parent = x.parent; // Update y's parent to x's parent
     }
 
-    leftRotate(x) {
-        let y = x.right;
-        if (y) {
-            x.right = y.left;
-            if (y.left) y.left.parent = x;
-            y.parent = x.parent;
-        }
-
-        if (!x.parent) this.root = y;
-        else if (x === x.parent.left) x.parent.left = y;
-        else x.parent.right = y;
-
-        if (y) y.left = x;
-        x.parent = y;
+    if (!x.parent) {
+        this.root = y; // If x was root, y becomes the new root
+    } else if (x === x.parent.right) {
+        x.parent.right = y; // Update parent's right child if x was a right child
+    } else {
+        x.parent.left = y; // Update parent's left child if x was a left child
     }
+
+    if (y) y.right = x; // Reassign x as y's right child
+    x.parent = y; // Update x's parent to y
+}
+
+
+leftRotate(x) {
+    if (!x) return; // Ensure x is not null
+
+    let y = x.right; // Get the right child
+    if (y) {
+        x.right = y.left; // Update x's right child
+        if (y.left) y.left.parent = x; // Update y.left's parent to x
+        y.parent = x.parent; // Update y's parent to x's parent
+    }
+
+    if (!x.parent) {
+        this.root = y; // If x was the root, y becomes the new root
+    } else if (x === x.parent.left) {
+        x.parent.left = y; // Update parent's left child if x was a left child
+    } else {
+        x.parent.right = y; // Update parent's right child if x was a right child
+    }
+
+    if (y) y.left = x; // Reassign x as y's left child
+    x.parent = y; // Update x's parent to y
+}
+
 
     splay(x) {
         while (x.parent) {
@@ -270,18 +284,26 @@ const tree = new SplayTree();
 
 function drawTree() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (!tree.root) return;
+    if (!tree || !tree.root) return;
 
-    const nodeRadius = Math.max(30, canvas.width / 50); // Dynamically adjust the radius based on the canvas width
-    const levelHeight = 80;
+    const nodeRadius = Math.max(30, canvas.width / 50);
+    const treeHeight = getTreeHeight(tree.root);
+    const levelHeight = Math.max(80, canvas.height / (treeHeight + 1));
+    const gapSizeBase = 4 * canvas.width / (Math.pow(2, treeHeight - 1) + 1);
 
-    function drawNode(node, x, y, gap) {
+    function getTreeHeight(node) {
+        if (!node) return 0;
+        return 1 + Math.max(getTreeHeight(node.left), getTreeHeight(node.right));
+    }
+
+    function drawNode(node, x, y, gapSize) {
         if (!node) return;
 
-        const gapSize = Math.max(50, canvas.width / 10); // Adjust gap dynamically
+        const childY = y + levelHeight;
+
+        // Draw left child
         if (node.left) {
             const childX = x - gapSize;
-            const childY = y + levelHeight;
             ctx.beginPath();
             ctx.moveTo(x, y);
             ctx.lineTo(childX, childY);
@@ -289,9 +311,9 @@ function drawTree() {
             drawNode(node.left, childX, childY, gapSize / 2);
         }
 
+        // Draw right child
         if (node.right) {
             const childX = x + gapSize;
-            const childY = y + levelHeight;
             ctx.beginPath();
             ctx.moveTo(x, y);
             ctx.lineTo(childX, childY);
@@ -299,23 +321,24 @@ function drawTree() {
             drawNode(node.right, childX, childY, gapSize / 2);
         }
 
+        // Draw node circle
         ctx.beginPath();
         ctx.arc(x, y, nodeRadius, 0, 2 * Math.PI);
-
-        // Highlight the node if it's the found one
         ctx.fillStyle = node.highlighted ? '#FF6347' : '#4CAF50';
         ctx.fill();
         ctx.stroke();
 
+        // Draw node value
         ctx.fillStyle = 'white';
-        ctx.font = '2rem Arial'; // Larger font
+        ctx.font = `${Math.min(2, nodeRadius / 2)}rem Arial`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(node.value, x, y);
     }
 
-    drawNode(tree.root, canvas.width / 2, 50, canvas.width / 4);
+    drawNode(tree.root, canvas.width / 2, 50, gapSizeBase);
 }
+
 
 function insertValue() {
     const value = parseInt(document.getElementById('valueInput').value);
@@ -354,9 +377,13 @@ function clearTree() {
 }
 
 function insertRandomValues() {
-    for (let i = 0; i < 10; i++) {
+    let added = 0;
+    while (added < 10) {
         const randomValue = Math.floor(Math.random() * 100);
-        tree.insert(randomValue);
+        if (!tree.search(randomValue)) {
+            tree.insert(randomValue);
+            added++;
+        }
     }
     drawTree();
 }
