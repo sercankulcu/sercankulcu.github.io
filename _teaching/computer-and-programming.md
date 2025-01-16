@@ -26,7 +26,7 @@ The resources
 Past Exams:
 ---
 
-* 2024-2025 <a href="../files/computer/2024-2025-computer-vize-a-cevaplar.pdf">[vize a]</a> <a href="../files/computer/2024-2025-computer-vize-b-cevaplar.pdf">[vize b]</a> <a href="../files/computer/2024-2025-computer-final-a-cevaplar.pdf">[final a]</a> <a href="../files/computer/2024-2025-computer-final-b-cevaplar.pdf">[final b]</a>
+* 2024-2025 <a href="../files/computer/2024-2025-computer-vize-a-cevaplar.pdf">[vize a]</a> <a href="../files/computer/2024-2025-computer-vize-b-cevaplar.pdf">[vize b]</a> <a href="../files/computer/2024-2025-computer-final-a-cevaplar.pdf">[final a]</a> <a href="../files/computer/2024-2025-computer-final-b-cevaplar.pdf">[final b]</a> <a href="../files/computer/2024-2025-computer-butunleme-a-cevaplar.pdf">[bütünleme a]</a> <a href="../files/computer/2024-2025-computer-butunleme-b-cevaplar.pdf">[bütünleme b]</a> <a href="../files/computer/2024-2025-computer-butunleme-c-cevaplar.pdf">[bütünleme c]</a> <a href="../files/computer/2024-2025-computer-butunleme-d-cevaplar.pdf">[bütünleme d]</a>
 * 2023-2024 <a href="../files/computer/2023-2024-computer-vize-cevaplar.pdf">[vize]</a> <a href="../files/computer/2023-2024-computer-telafi-cevaplar.pdf">[telafi]</a> <a href="../files/computer/2023-2024-computer-final-cevaplar.pdf">[final]</a>
 
 Chapter 1: Basic Concepts
