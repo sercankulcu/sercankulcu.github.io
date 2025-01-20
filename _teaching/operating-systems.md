@@ -63,19 +63,24 @@ Preface:
 
 Welcome to the world of operating systems, where we delve into the fundamental concepts, design principles, and implementation techniques that form the basis of modern computing systems.
 
-* The prerequisities <a href="../files/os/The_prerequisites.pdf">[pdf]</a>
-* Key figures <a href="../files/os/Important_people.pdf">[pdf]</a>
-* Questions & Answers from OSTEP <a href="../files/os/QA_from_OSTEP.pdf">[pdf]</a>
+* The prerequisities [pdf](../files/os/The_prerequisites.pdf)
+* Key figures [pdf](../files/os/Important_people.pdf)
+* Questions & Answers from OSTEP [pdf](../files/os/QA_from_OSTEP.pdf)
+
+---
 
 Chapter 1: Introduction: 
 -----
 
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
 
-* **Slides [TR]** <a href="../files/os/slides/Bolum_01_Giris.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/os/notes/Chapter_1_Introduction.pdf">[pdf]</a>
-* Lab <a href="https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter01/src">[java]</a> <a href="https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01">[c]</a>
-* Question & answers <a href="../files/os/questions/Chapter_1_Introduction.pdf">[pdf]</a>
+* Slides [TR] [pdf](../files/os/slides/Bolum_01_Giris.pdf)
+* Lecture Notes [pdf](../files/os/notes/Chapter_1_Introduction.pdf)
+* Lab 
+[java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter01/src) 
+[c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01)
+* Question & answers [pdf](../files/os/questions/Chapter_1_Introduction.pdf)
+
 
 Chapter 2: Structures: 
 -----
