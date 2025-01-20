@@ -1,10 +1,8 @@
 ---
 layout: archive
-permalink: /apps
+permalink: /apps/
 title: "Apps"
 author_profile: true
-redirect_from: 
-  - /apps.html
 ---
 
 <br><a href="../game/car-race.html">[🏎️💨 car race 🏁]</a>
