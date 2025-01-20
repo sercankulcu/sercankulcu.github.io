@@ -25,7 +25,9 @@ Operating systems are an essential part of modern computing, serving as the foun
 - Modern Operating Systems, Andrew S. Tanenbaum [book](https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X)
 - Operating System Concepts, A. SilberSchatz, P. Galvin, and G. Gagne [e-book](https://www.os-book.com/OS10/index.html)
 - Operating Systems: Three Easy Pieces [e-book](https://pages.cs.wisc.edu/~remzi/OSTEP)
-- Youtube [Prof. Dr. Kemal Bıçakcı](https://www.youtube.com/watch?v=sqtkwd09KXs&list=PLmPsb7nQhv7NLRWdIiDVNBDCMOtuUn6WZ) |  [Prof. Dr. Sadi Evren Şeker](https://www.youtube.com/watch?v=r2q_XRKrqHQ&list=PLh9ECzBB8tJO9eiwfQbcA2ThMbUSkbOWf)
+- Youtube 
+[Prof. Dr. Kemal Bıçakcı](https://www.youtube.com/watch?v=sqtkwd09KXs&list=PLmPsb7nQhv7NLRWdIiDVNBDCMOtuUn6WZ) | 
+[Prof. Dr. Sadi Evren Şeker](https://www.youtube.com/watch?v=r2q_XRKrqHQ&list=PLh9ECzBB8tJO9eiwfQbcA2ThMbUSkbOWf)
 - CSCI-UA.202 Operating Systems [website](https://cs.nyu.edu/~gottlieb/courses/os202/class-notes.html)
 - Bilgisayar İşletim Sistemleri, Prof. Dr. Ali Saatçi, 2. Baskı.
 - Operating System Development [website](https://wiki.osdev.org/Main_Page)
@@ -35,14 +37,14 @@ Operating systems are an essential part of modern computing, serving as the foun
 
 ## Past Exams  
 
-- **2023-2024** 
+- **2023-2024**  
   [vize](../files/os/slides/2023-2024-os-vize-cevap.pdf) | 
   [telafi](../files/os/slides/2023-2024-os-telafi_cevaplar.pdf) | 
   [final-a](../files/os/slides/2023-2024-os-final-a-cevaplar.pdf) | 
   [final-b](../files/os/slides/2023-2024-os-final-b-cevaplar.pdf) | 
   [bütünleme](../files/os/slides/2023-2024-os-butunleme-cevap.pdf)
 
-- **2022-2023** 
+- **2022-2023**  
   [vize](../files/os/slides/2022-2023-os-vize_cevaplar.pdf) | 
   [final](../files/os/slides/2022-2023-os-final_cevaplar.pdf)
 
@@ -50,7 +52,7 @@ Operating systems are an essential part of modern computing, serving as the foun
   [vize](../files/os/slides/Bolum_17_Soru_Cevap.pdf) | 
   [final](../files/os/slides/Bolum_18_Soru_Cevap.pdf)
 
-- **Multiple Choice Questions**
+- **Multiple Choice Questions**  
   [vize](../files/os/slides/midterm_mcq.txt) | 
   [final](../files/os/slides/final_mcq.txt)
 
