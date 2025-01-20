@@ -75,8 +75,8 @@ As the bridge between hardware and software, operating systems serve as the foun
 - Slides [TR] [pdf](../files/os/slides/Bolum_01_Giris.pdf)
 - Lecture Notes [pdf](../files/os/notes/Chapter_1_Introduction.pdf)
 - Lab:  
-  - [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter01/src)
-  - [c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01) 
+  - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter01/src)
+  - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01) 
 - Question & answers [pdf](../files/os/questions/Chapter_1_Introduction.pdf)
 
 ---
@@ -88,8 +88,8 @@ The design and organization of an operating system's internal components and mec
 - Slides [TR] [pdf](../files/os/slides/Bolum_02_Yapilar.pdf)
 - Lecture Notes [pdf](../files/os/notes/Chapter_2_Structures.pdf)
 - Lab:  
-  - [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter02/src)
-  - [c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab02) 
+  - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter02/src)
+  - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab02) 
 - Question & answers [pdf](../files/os/questions/Chapter_2_Structures.pdf)
 
 ---
@@ -101,8 +101,8 @@ In the world of operating systems, processes serve as the cornerstone of multi-t
 - Slides [TR] [pdf](../files/os/slides/Bolum_03_Surecler.pdf)
 - Lecture Notes [pdf](../files/os/notes/Chapter_3_Processes.pdf)
 - Lab:  
-  - [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter03/src)
-  - [c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab03) 
+  - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter03/src)
+  - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab03) 
 - Question & answers [pdf](../files/os/questions/Chapter_3_Processes.pdf)
 
 ---
@@ -114,8 +114,8 @@ Threads, as lightweight execution units within a process, provide a powerful mec
 - Slides [TR] [pdf](../files/os/slides/Bolum_04_Is_Parcaciklari.pdf)
 - Lecture Notes [pdf](../files/os/notes/Chapter_4_Threads.pdf)
 - Lab:  
-  - [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter04/src)
-  - [c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab04) 
+  - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter04/src)
+  - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab04) 
 - Question & answers [pdf](../files/os/questions/Chapter_4_Threads.pdf)
 
 ---
@@ -127,8 +127,8 @@ CPU scheduling is a critical component of any operating system, responsible for 
 - Slides [TR] [pdf](../files/os/slides/Bolum_05_Cizelgeleme.pdf)
 - Lecture Notes [pdf](../files/os/notes/Chapter_5_Scheduling.pdf)
 - Lab:  
-  - [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter05/src)
-  - [c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab05) 
+  - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter05/src)
+  - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab05) 
 - Question & answers [pdf](../files/os/questions/Chapter_5_Scheduling.pdf)
 
 ---
@@ -140,8 +140,8 @@ In a multi-threaded or multi-process environment, synchronization mechanisms pro
 - Slides [TR] [pdf](../files/os/slides/Bolum_06_Senkronizasyon.pdf)
 - Lecture Notes [pdf](../files/os/notes/Chapter_6_Synchronization.pdf)
 - Lab:  
-  - [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter06/src)
-  - [c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab06) 
+  - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter06/src)
+  - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab06) 
 - Question & answers [pdf](../files/os/questions/Chapter_6_Synchronization.pdf)
 
 ---
@@ -153,8 +153,8 @@ Deadlocks, which occur when multiple processes or threads are blocked and unable
 - Slides [TR] [pdf](../files/os/slides/Bolum_07_Kilitlenme.pdf)
 - Lecture Notes [pdf](../files/os/notes/Chapter_7_Deadlocks.pdf)
 - Lab:  
-  - [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter07/src)
-  - [c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab07) 
+  - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter07/src)
+  - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab07) 
 - Question & answers [pdf](../files/os/questions/Chapter_7_Deadlocks.pdf)
 
 ---
@@ -166,8 +166,8 @@ Memory management, which involves the allocation, monitoring, and protection of 
 - Slides [TR] [pdf](../files/os/slides/Bolum_08_Bellek_Yonetimi.pdf)
 - Lecture Notes [pdf](../files/os/notes/Chapter_8_Memory_management.pdf)
 - Lab:  
-  - [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter08/src)
-  - [c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab08) 
+  - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter08/src)
+  - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab08) 
 - Question & answers [pdf](../files/os/questions/Chapter_8_Memory_management.pdf)
 
 ---
@@ -179,8 +179,8 @@ Virtual memory, a key technique used by modern operating systems to manage memor
 - Slides [TR] [pdf](../files/os/slides/Bolum_09_Sanal_Bellek.pdf)
 - Lecture Notes [pdf](../files/os/notes/Chapter_9_Virtual_memory.pdf)
 - Lab:  
-  - [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter09/src)
-  - [c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab09) 
+  - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter09/src)
+  - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab09) 
 - Question & answers [pdf](../files/os/questions/Chapter_9_Virtual_memory.pdf)
 
 ---
@@ -192,8 +192,8 @@ File systems, which provide a hierarchical organization and management scheme fo
 - Slides [TR] [pdf](../files/os/slides/Bolum_10_Dosya_Sistemleri.pdf)
 - Lecture Notes [pdf](../files/os/notes/Chapter_10_File_systems.pdf)
 - Lab:  
-  - [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter10/src)
-  - [c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab10) 
+  - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter10/src)
+  - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab10) 
 - Question & answers [pdf](../files/os/questions/Chapter_10_File_systems.pdf)
 
 ---
@@ -205,8 +205,8 @@ IO operations, which involve the movement of data between a computer and externa
 - Slides [TR] [pdf](../files/os/slides/Bolum_11_Giris_Cikis.pdf)
 - Lecture Notes [pdf](../files/os/notes/Chapter_11_Input_output.pdf)
 - Lab:  
-  - [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter11/src)
-  - [c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab11) 
+  - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter11/src)
+  - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab11) 
 - Question & answers [pdf](../files/os/questions/Chapter_11_Input_output.pdf)
 
 ---
@@ -217,7 +217,7 @@ As multi-core processors and distributed computing systems become increasingly p
 
 - Slides [TR] [pdf](../files/os/slides/Bolum_12_Cok_Islemcili_Sistemler.pdf)
 - Lecture Notes [pdf](../files/os/notes/Chapter_12_Multiple_processor_systems.pdf)
-- Lab [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter12/src)
+- Lab [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter12/src)
 - Question & answers [pdf](../files/os/questions/Chapter_12_Multiple_processor_systems.pdf)
 
 ---
@@ -228,7 +228,7 @@ Security is a critical concern in modern computing environments, and operating s
 
 - Slides [TR] [pdf](../files/os/slides/Bolum_13_Guvenlik.pdf)
 - Lecture Notes [pdf](../files/os/notes/Chapter_13_Security.pdf)
-- Lab [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter13/src)
+- Lab [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter13/src)
 - Question & answers [pdf](../files/os/questions/Chapter_13_Security.pdf)
 
 ---
@@ -239,7 +239,7 @@ With the growing demand for multimedia applications such as audio and video play
 
 - Slides [TR] [pdf](../files/os/slides/Bolum_14_Coklu_Ortam.pdf)
 - Lecture Notes [pdf](../files/os/notes/Chapter_14_Multimedia.pdf)
-- Lab [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter14/src)
+- Lab [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter14/src)
 - Question & answers [pdf](../files/os/questions/Chapter_14_Multimedia.pdf)
 
 ---
