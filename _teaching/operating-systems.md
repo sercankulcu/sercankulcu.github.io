@@ -74,7 +74,9 @@ As the bridge between hardware and software, operating systems serve as the foun
 
 - Slides [TR] [pdf](../files/os/slides/Bolum_01_Giris.pdf)
 - Lecture Notes [pdf](../files/os/notes/Chapter_1_Introduction.pdf)
-- Lab [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter01/src) |  [c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01)
+- Lab 
+[java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter01/src) | 
+[c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01)
 - Question & answers [pdf](../files/os/questions/Chapter_1_Introduction.pdf)
 
 ---
@@ -85,7 +87,9 @@ The design and organization of an operating system's internal components and mec
 
 * Slides [TR] [pdf](../files/os/slides/Bolum_02_Yapilar.pdf)
 * Lecture Notes [pdf](../files/os/notes/Chapter_2_Structures.pdf)
-* Lab [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter02/src) |  [c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab02)
+* Lab 
+[java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter02/src) | 
+[c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab02)
 * Question & answers [pdf](../files/os/questions/Chapter_2_Structures.pdf)
 
 ---
