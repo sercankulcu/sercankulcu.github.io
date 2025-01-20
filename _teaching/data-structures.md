@@ -27,7 +27,7 @@ Data structures are fundamental components in computer science, serving as the b
 - CENG-213: Data Structures [(course page)](https://user.ceng.metu.edu.tr/~ys/ceng213-ds)
 - Data Structures Easy to Advanced Course [(youTube)](https://www.youtube.com/watch?v=RBSGKlAvoiM)
 - Veri Yapıları ve Algoritmalar, Ders Notları, Mustafa Ege.
-- The Algorithms [github project](https://github.com/TheAlgorithms/Java)
+- The Algorithms [(github project)](https://github.com/TheAlgorithms/Java)
 
 ---
 
