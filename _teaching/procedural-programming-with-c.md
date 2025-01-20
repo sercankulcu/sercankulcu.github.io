@@ -8,148 +8,121 @@ date: 2023-04-04
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="procedural programming with c" src="/images/teaching/procedural-programming-with-c.webp" style="float: left; margin-right: 10px;"> C is a robust and flexible programming language employed in numerous applications, ranging from operating systems and embedded systems to game development and high-performance computing. As a low-level language, it offers significant control over hardware and memory management, enabling developers to write highly efficient and optimized code. This level of control makes it perfect for performance-critical tasks where speed and resource management are paramount. Its influence is also seen in many modern languages, which have adopted its syntax and features, solidifying C's role as a foundational language in computer science and software development.
+![procedural programming with c]( /images/teaching/procedural-programming-with-c.webp){: width="200" style="float: left; margin-right: 10px;"}
 
-* V22.0201 Computer Systems Organization <a href="https://cs.nyu.edu/~gottlieb/courses/cso/class-notes.html">[course]</a>
+C is a robust and flexible programming language employed in numerous applications, ranging from operating systems and embedded systems to game development and high-performance computing. As a low-level language, it offers significant control over hardware and memory management, enabling developers to write highly efficient and optimized code. This level of control makes it perfect for performance-critical tasks where speed and resource management are paramount. Its influence is also seen in many modern languages, which have adopted its syntax and features, solidifying C's role as a foundational language in computer science and software development.
 
+* V22.0201 Computer Systems Organization [course](https://cs.nyu.edu/~gottlieb/courses/cso/class-notes.html)
 
-Chapter 1: Introduction to C Programming
------
+## Chapter 1: Introduction to C Programming
+- Origins and evolution of the C language
+- Features and benefits of using C
+- Setting up a development environment
+- Basic structure of a C program
+- Variables, data types, and operators
+- Input and output functions
+- Compilation process and execution
 
-* Origins and evolution of the C language
-* Features and benefits of using C
-* Setting up a development environment
-* Basic structure of a C program
-* Variables, data types, and operators
-* Input and output functions
-* Compilation process and execution
+[Lecture Notes](../files/c/Chapter_01_Introduction_to_C_Programming.pdf)
 
-* Lecture Notes <a href="../files/c/Chapter_01_Introduction_to_C_Programming.pdf">[pdf]</a>
+## Chapter 2: Control Flow
+- Decision-making statements (if, else if, switch)
+- Looping statements (for, while, do-while)
+- Break and continue statements
 
-Chapter 2: Control Flow
------
+[Lecture Notes](../files/c/Chapter_02_Control_Flow.pdf)
 
-* Decision-making statements (if, else if, switch)
-* Looping statements (for, while, do-while)
-* Break and continue statements
+## Chapter 3: Arrays and Strings
+- Declaring and initializing arrays
+- Manipulating arrays: accessing, modifying, and traversing
+- String manipulation and string library functions
 
-* Lecture Notes <a href="../files/c/Chapter_02_Control_Flow.pdf">[pdf]</a>
+[Lecture Notes](../files/c/Chapter_03_Arrays_and_Strings.pdf)
 
-Chapter 3: Arrays and Strings
------
+## Chapter 4: Functions
+- Function declaration, definition, and calling
+- Function parameters and return values
+- Recursive functions
 
-* Declaring and initializing arrays
-* Manipulating arrays: accessing, modifying, and traversing
-* String manipulation and string library functions
+[Lecture Notes](../files/c/Chapter_04_Functions.pdf)
 
-* Lecture Notes <a href="../files/c/Chapter_03_Arrays_and_Strings.pdf">[pdf]</a>
+## Chapter 5: Pointers
+- Understanding pointers and memory addresses
+- Pointer declaration and initialization
+- Pointer arithmetic
+- Dynamic memory allocation (malloc, calloc, free)
 
-Chapter 4: Functions
------
+[Lecture Notes](../files/c/Chapter_05_Pointers.pdf)
 
-* Function declaration, definition, and calling
-* Function parameters and return values
-* Recursive functions
+## Chapter 6: Structures
+- Structure declaration and initialization
+- Accessing structure members
+- Nested structures and arrays of structures
 
-* Lecture Notes <a href="../files/c/Chapter_04_Functions.pdf">[pdf]</a>
+[Lecture Notes](../files/c/Chapter_06_Structures.pdf)
 
-Chapter 5: Pointers
------
+## Chapter 7: File Handling
+- Working with files in C
+- Opening, reading, and writing files
+- File positioning and error handling
+- File I/O using standard libraries
 
-* Understanding pointers and memory addresses
-* Pointer declaration and initialization
-* Pointer arithmetic
-* Dynamic memory allocation (malloc, calloc, free)
+[Lecture Notes](../files/c/Chapter_07_File_Handling.pdf)
 
-* Lecture Notes <a href="../files/c/Chapter_05_Pointers.pdf">[pdf]</a>
+## Chapter 8: Advanced Data Types
+- Enumerations and typedef
+- Bitwise operators and bit manipulation
+- Bit fields
+- Unions
 
-Chapter 6: Structures
------
+[Lecture Notes](../files/c/Chapter_08_Advanced_Data_Types.pdf)
 
-* Structure declaration and initialization
-* Accessing structure members
-* Nested structures and arrays of structures
+## Chapter 9: Preprocessor Directives
+- Macros and their usage
+- Conditional compilation
+- File inclusion and header files
+- Debugging using preprocessor directives
 
-* Lecture Notes <a href="../files/c/Chapter_06_Structures.pdf">[pdf]</a>
+[Lecture Notes](../files/c/Chapter_09_Preprocessor_Directives.pdf)
 
-Chapter 7: File Handling
------
+## Chapter 10: Advanced Concepts - Part 1
+- Memory management techniques
+- Function pointers and callbacks
+- Understanding static and dynamic libraries
+- Recursion: principles and applications
 
-* Working with files in C
-* Opening, reading, and writing files
-* File positioning and error handling
-* File I/O using standard libraries
+[Lecture Notes](../files/c/Chapter_10_Advanced_Concepts_1.pdf)
 
-* Lecture Notes <a href="../files/c/Chapter_07_File_Handling.pdf">[pdf]</a>
+## Chapter 11: Advanced Concepts - Part 2
+- Introduction to data structures (linked lists, stacks, queues)
+- Implementation and usage of data structures
+- Introduction to algorithms (sorting, searching)
+- Time and space complexity analysis
+- Variadic functions
 
-Chapter 8: Advanced Data Types
------
+[Lecture Notes](../files/c/Chapter_11_Advanced_Concepts_2.pdf)
 
-* Enumerations and typedef
-* Bitwise operators and bit manipulation
-* Bit fields
-* Unions
+## Chapter 12: Error Handling and Debugging
+- Common C programming errors
+- Debugging techniques and tools
+- Exception handling with try-catch blocks
+- Defensive programming and error handling strategies
 
-* Lecture Notes <a href="../files/c/Chapter_08_Advanced_Data_Types.pdf">[pdf]</a>
+[Lecture Notes](../files/c/Chapter_12_Error_Handling_and_Debugging.pdf)
 
-Chapter 9: Preprocessor Directives
------
+## Chapter 13: Introduction to C++ (Optional)
+- Basic differences between C and C++
+- Introduction to object-oriented programming
+- Classes, objects, and constructors
+- Basic input/output in C++
 
-* Macros and their usage
-* Conditional compilation
-* File inclusion and header files
-* Debugging using preprocessor directives
+[Lecture Notes](../files/c/Chapter_13_Introduction_to_C++.pdf)
 
-* Lecture Notes <a href="../files/c/Chapter_09_Preprocessor_Directives.pdf">[pdf]</a>
+## Chapter 14: Project and Review
+- Individual or group project using C programming concepts
+- Review of key concepts and topics covered throughout the course
+- Q&A session and final assessment
 
-Chapter 10: Advanced Concepts - Part 1
------
-
-* Memory management techniques
-* Function pointers and callbacks
-* Understanding static and dynamic libraries
-* Recursion: principles and applications
-
-* Lecture Notes <a href="../files/c/Chapter_10_Advanced_Concepts_1.pdf">[pdf]</a>
-
-Chapter 11: Advanced Concepts - Part 2
------
-
-* Introduction to data structures (linked lists, stacks, queues)
-* Implementation and usage of data structures
-* Introduction to algorithms (sorting, searching)
-* Time and space complexity analysis
-* Variadic functions
-
-* Lecture Notes <a href="../files/c/Chapter_11_Advanced_Concepts_2.pdf">[pdf]</a>
-
-Chapter 12: Error Handling and Debugging
------
-
-* Common C programming errors
-* Debugging techniques and tools
-* Exception handling with try-catch blocks
-* Defensive programming and error handling strategies
-
-* Lecture Notes <a href="../files/c/Chapter_12_Error_Handling_and_Debugging.pdf">[pdf]</a>
-
-Chapter 13: Introduction to C++ (Optional)
------
-
-* Basic differences between C and C++
-* Introduction to object-oriented programming
-* Classes, objects, and constructors
-* Basic input/output in C++
-
-* Lecture Notes <a href="../files/c/Chapter_13_Introduction_to_C++.pdf">[pdf]</a>
-
-Chapter 14: Project and Review
------
-
-* Individual or group project using C programming concepts
-* Review of key concepts and topics covered throughout the course
-* Q&A session and final assessment
-
-* Sample projects <a href="../files/c/Chapter_14_Sample_Projects.pdf">[pdf]</a>
-* Questions and answers <a href="../files/c/Chapter_14_Questions_and_Answers.pdf">[pdf]</a>
-* Multiple choice questions <a href="../files/c/Chapter_14_Multiple_Choice_Questions.pdf">[pdf]</a>
+[Sample projects](../files/c/Chapter_14_Sample_Projects.pdf)  
+[Questions and answers](../files/c/Chapter_14_Questions_and_Answers.pdf)  
+[Multiple choice questions](../files/c/Chapter_14_Multiple_Choice_Questions.pdf)
