@@ -8,83 +8,93 @@ date: 2025-01-07
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="algorithms" src="/images/teaching/algorithms-course.webp" style="float: left; margin-right: 10px;"> An algorithm is a set of well-defined instructions for carrying out a particular task. Think of it as a recipe in a cookbook that guides you step by step to make a delicious dish. In the world of computing, algorithms are the backbone that powers programs and applications. They are logical sequences that tell a computer exactly what steps to take to solve a problem or achieve a goal. From simple tasks like sorting a list of numbers to complex operations like image processing or running search engines, algorithms are everywhere.
+![algorithms](/images/teaching/algorithms-course.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
+An algorithm is a set of well-defined instructions for carrying out a particular task. Think of it as a recipe in a cookbook that guides you step by step to make a delicious dish. In the world of computing, algorithms are the backbone that powers programs and applications. They are logical sequences that tell a computer exactly what steps to take to solve a problem or achieve a goal. From simple tasks like sorting a list of numbers to complex operations like image processing or running search engines, algorithms are everywhere.
 
-* Ders Öğretim Planı <a href="../files/algorithms/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
+## Ders Öğretim Planı
+[Ders Öğretim Planı (pdf)](../files/algorithms/slides/Bolum_00_Ders_Ogretim_Planı.pdf)
 
-Announcements:
 ---
 
-The resources: 
------
+## Announcements
 
-* Algorithms Illuminated <a href="https://www.algorithmsilluminated.org">[book]</a>
-* Stanford CS 161 <a href="https://stanford-cs161.github.io/winter2024/lectures">[website]</a>
-* Visual Algo <a href="https://visualgo.net/en">[website]</a>
-* Visual Algo Code <a href="https://github.com/stevenhalim/cpbook-code/tree/master/">[github]</a>
-* Algoanim <a href="https://www.algoanim.ide.sk/">[website]</a>
-* Yong Danielli <a href="https://yongdanielliang.github.io/animation/animation.html">[website]</a>
-* USFCA <a href="https://www.cs.usfca.edu/~galles/visualization/Algorithms.html">[website]</a>
-* Anim IDE <a href="https://anim.ide.sk/">[website]</a>
-* DSALGO Visualizer <a href="https://github.com/jhabarsingh/DSALGO-VISUALIZER">[website]</a>
-* The Algorithms Github project <a href="https://github.com/TheAlgorithms/Java">[website]</a>
-
-Past Exams:
 ---
 
-* 2023-2024 <a href="../files/algorithms/slides/2023-2024-algorithms-vize-cevap.pdf">[vize]</a><a href="../files/algorithms/slides/2023-2024-algorithms-final-a-cevap.pdf">[final-a]</a><a href="../files/algorithms/slides/2023-2024-algorithms-final-b-cevap.pdf">[final-b]</a><a href="../files/algorithms/slides/2023-2024-algorithms-butunleme-cevap.pdf">[bütünleme]</a>
-* Soru Cevap <a href="../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf">[vize]</a> <a href="../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf">[final]</a>
+## The resources
 
-Chapter 1: Introduction to Algorithms
+- Algorithms Illuminated [(book)](https://www.algorithmsilluminated.org)
+- Stanford CS 161 [(course webpage)](https://stanford-cs161.github.io/winter2024/lectures)
+- Visual Algo [(website)](https://visualgo.net/en) [(GitHub)](https://github.com/stevenhalim/cpbook-code/tree/master/)
+- Algoanim [(website)](https://www.algoanim.ide.sk/)
+- Yong Danielli [(website)](https://yongdanielliang.github.io/animation/animation.html)
+- USFCA [(website)](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html)
+- Anim IDE [(website)](https://anim.ide.sk/)
+- DSALGO Visualizer [(github)](https://github.com/jhabarsingh/DSALGO-VISUALIZER)
+- The Algorithms project [(github)](https://github.com/TheAlgorithms/Java)
+
 ---
+
+## Past Exams
+
+- 2023-2024: 
+  [Vize](../files/algorithms/slides/2023-2024-algorithms-vize-cevap.pdf) | 
+  [Final-A](../files/algorithms/slides/2023-2024-algorithms-final-a-cevap.pdf) |  
+  [Final-B](../files/algorithms/slides/2023-2024-algorithms-final-b-cevap.pdf) | 
+  [Bütünleme](../files/algorithms/slides/2023-2024-algorithms-butunleme-cevap.pdf)
+
+- Soru Cevap: 
+  [Vize](../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf) | 
+  [Final](../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf)
+
+---
+
+## Chapter 1: Introduction to Algorithms
 
 Algorithms are the step-by-step procedures that form the core of computer science, guiding computers through the maze of processing data. They are like the DNA of software, encoding the essence of problem-solving. Complexity, on the other hand, measures how an algorithm’s resource needs (like time and storage) grow as the input size increases. It’s a way to rate the efficiency of an algorithm, ensuring it can handle large amounts of data without breaking a sweat.
 
-* Sunum-Giriş <a href="../files/algorithms/slides/Bolum_01_01_Giris.pdf">[pdf]</a>
-* Sunum-Karmaşıklık <a href="../files/algorithms/slides/Bolum_01_02_Karmasiklik.pdf">[pdf]</a>
-* Run time analysis <a href="../files/algorithms/slides/Bolum_01_02_Karmasiklik.html">[click]</a>
+- [Sunum-Giriş (pdf)](../files/algorithms/slides/Bolum_01_01_Giris.pdf)
+- [Sunum-Karmaşıklık (pdf)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.pdf)
+- [Run time analysis (HTML)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.html)
+- [Lecture Notes (pdf)](../files/algorithms/Chapter_01_Introduction.pdf)
+- [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter01/src)
 
-* Lecture Notes <a href="../files/algorithms/Chapter_01_Introduction.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter01/src">[link]</a>
-
-
-Chapter 2: Sorting Algorithms
 ---
+
+## Chapter 2: Sorting Algorithms
 
 Sorting algorithms are the architects of order, meticulously organizing data into a specific sequence, such as ascending or descending. They are fundamental tools in computer science, used to manage and retrieve data with efficiency and precision. There’s a variety of sorting methods, each with its own strategy and performance nuances.
 
-* Sunum-Sıralama Algoritmaları <a href="../files/algorithms/slides/Bolum_02_Siralama.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/algorithms/Chapter_02_Sorting.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter02/src">[link]</a>
+- [Sunum-Sıralama Algoritmaları (pdf)](../files/algorithms/slides/Bolum_02_Siralama.pdf)
+- [Lecture Notes (pdf)](../files/algorithms/Chapter_02_Sorting.pdf)
+- [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter02/src)
 
-
-Chapter 3: Searching Algorithms
 ---
+
+## Chapter 3: Searching Algorithms
 
 Searching algorithms are the detectives of the data world, designed to track down information with speed and accuracy. They are used in a wide variety of applications, such as finding a file on a computer, a customer in a database, and a word in a document. They come in various forms, each suited to different scenarios.
 
-* Sunum-Arama Algoritmaları <a href="../files/algorithms/slides/Bolum_03_Arama.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/algorithms/Chapter_03_Searching.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter03/src">[link]</a>
+- [Sunum-Arama Algoritmaları (pdf)](../files/algorithms/slides/Bolum_03_Arama.pdf)
+- [Lecture Notes (pdf)](../files/algorithms/Chapter_03_Searching.pdf)
+- [Code Examples (link)](https://github.com/sercankulcu/algorithms/tree/main/Chapter03/src)
 
-
-Chapter 4: Graph Algorithms
 ---
+
+## Chapter 4: Graph Algorithms
 
 Graphs, composed of nodes and edges, are ubiquitous in various domains, including social networks, transportation systems, and computational biology. Graph algorithms are the masterminds behind the scenes of network analysis, adept at solving puzzles that involve points and connections. They help us navigate through complex networks, from social media graphs to city maps. Graph algorithms enable us to explore, analyze, and manipulate these complex structures efficiently. 
 
-* Sunum-Çizge Gezinme <a href="../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.pdf">[pdf]</a>
-* BFS DFS <a href="../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.html">[click]</a>
-* Sunum-Çizge En Kısa Yol <a href="../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.pdf">[pdf]</a>
-* Sunum-Çizge Minimum Kapsayan <a href="../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.pdf">[pdf]</a>
-* Sunum-Çizge Ağ Akış <a href="../files/algorithms/slides/Bolum_04_04_Ag_Akis.pdf">[pdf]</a>
+- [Sunum-Çizge Gezinme (pdf)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.pdf)
+- [BFS DFS (click)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.html)
+- [Sunum-Çizge En Kısa Yol (pdf)](../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.pdf)
+- [Sunum-Çizge Minimum Kapsayan (pdf)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.pdf)
+- [Sunum-Çizge Ağ Akış (pdf)](../files/algorithms/slides/Bolum_04_04_Ag_Akis.pdf)
+- [Lecture Notes (pdf)](../files/algorithms/Chapter_04_Graph.pdf)
+- [Code Examples (link)](https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src)
 
-* Lecture Notes <a href="../files/algorithms/Chapter_04_Graph.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src">[link]</a>
-
-
-Chapter 5: String Algorithms
 ---
+
+## Chapter 5: String Algorithms
 
 Have you ever wondered how your computer or smartphone handles text so efficiently? String algorithms are the craftsmen of text processing, weaving through characters to perform tasks like searching, sorting, and editing text. They are crucial in fields like computational biology for DNA sequencing, in search engines for matching queries, or even in text editors for find-and-replace functions. 
 
@@ -97,19 +107,19 @@ Have you ever wondered how your computer or smartphone handles text so efficient
 * Lecture Notes <a href="../files/algorithms/Chapter_05_Dynamic.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter05/src">[link]</a>
 
-
-Chapter 6: Dynamic Programming
 ---
+
+## Chapter 6: Dynamic Programming
 
 Dynamic programming is a powerful technique for solving optimization problems by breaking them down into smaller subproblems. At its core, dynamic programming involves breaking down daunting tasks into smaller, more manageable subproblems, allowing us to systematically find optimal solutions. 
 
-* Sunum-Dinamik Programlama <a href="../files/algorithms/slides/Bolum_06_Dinamik.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/algorithms/Chapter_05_Dynamic.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter06/src">[link]</a>
+- [Sunum-Dizgi Eşleme (pdf)](../files/algorithms/slides/Bolum_05_01_Dizgi_Esleme.pdf)
+- [Lecture Notes (pdf)](../files/algorithms/Chapter_05_Dynamic.pdf)
+- [Code Examples (link)](https://github.com/sercankulcu/algorithms/tree/main/Chapter05/src)
 
-
-Chapter 7: Approximation algorithms
 ---
+
+## Chapter 7: Approximation algorithms
 
 Approximation algorithms are a type of algorithm that provides a solution to a problem that is not necessarily optimal, but is guaranteed to be within a certain factor of the optimal solution. Approximation algorithms are often used to solve problems that are NP-hard, which means that there is no known polynomial-time algorithm that can find the optimal solution.
 
@@ -117,9 +127,9 @@ Approximation algorithms are a type of algorithm that provides a solution to a p
 * Lecture Notes <a href="../files/algorithms/Chapter_06_Approximation.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter07/src">[link]</a>
 
-
-Chapter 8: Randomized algorithms
 ---
+
+## Chapter 8: Randomized algorithms
 
 Randomized algorithms are a type of algorithm that uses randomness to improve its performance. Randomized algorithms are often used to solve problems that are difficult or impossible to solve using deterministic algorithms.
 
@@ -127,9 +137,9 @@ Randomized algorithms are a type of algorithm that uses randomness to improve it
 * Lecture Notes <a href="../files/algorithms/Chapter_07_Randomized.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter08/src">[link]</a>
 
-
-Chapter 9: Online algorithms
 ---
+
+## Chapter 9: Online algorithms
 
 Online algorithms are a type of algorithm that makes decisions without knowing the complete input. Online algorithms are often used to solve problems in real time, where the input is not known in advance.
 
@@ -137,9 +147,9 @@ Online algorithms are a type of algorithm that makes decisions without knowing t
 * Lecture Notes <a href="../files/algorithms/Chapter_08_Online.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter09/src">[link]</a>
 
-
-Chapter 10: Parallel algorithms
 ---
+
+## Chapter 10: Parallel algorithms
 
 Parallel algorithms are a type of algorithm that can be executed on multiple processors or cores simultaneously. Parallel algorithms are often used to solve problems that are too large or too complex to be solved on a single processor.
 
@@ -147,9 +157,9 @@ Parallel algorithms are a type of algorithm that can be executed on multiple pro
 * Lecture Notes <a href="../files/algorithms/Chapter_09_Parallel.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter10/src">[link]</a>
 
-
-Chapter 11: Divide-and-Conquer paradigm
 ---
+
+## Chapter 11: Divide-and-Conquer paradigm
 
 The divide-and-conquer paradigm is an algorithmic design paradigm that breaks down a problem into smaller subproblems of the same or related type, until these become simple enough to be solved directly. The solutions to the sub-problems are then combined to give a solution to the original problem.
 
@@ -157,9 +167,9 @@ The divide-and-conquer paradigm is an algorithmic design paradigm that breaks do
 * Lecture Notes <a href="../files/algorithms/Chapter_10_Divide_and_Conquer.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter11/src">[link]</a>
 
-
-Chapter 12: Greedy algorithms
 ---
+
+## Chapter 12: Greedy algorithms
 
 Greedy algorithms are a type of algorithm that makes decisions at each step based on the current state of the problem. Greedy algorithms are often used to solve problems that can be broken down into a sequence of decisions.
 
@@ -167,9 +177,9 @@ Greedy algorithms are a type of algorithm that makes decisions at each step base
 * Lecture Notes <a href="../files/algorithms/Chapter_11_Greedy.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter12/src">[link]</a>
 
-
-Chapter 13: Backtracking algorithms
 ---
+
+## Chapter 13: Backtracking algorithms
 
 Backtracking algorithms are a type of algorithm that solves problems by exploring all possible solutions and backtracking when a solution is found to be invalid. Backtracking algorithms are often used to solve problems that can be broken down into a tree of possible solutions.
 
@@ -177,9 +187,9 @@ Backtracking algorithms are a type of algorithm that solves problems by explorin
 * Lecture Notes <a href="../files/algorithms/Chapter_12_Backtracking.pdf">[pdf]</a>
 * Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter13/src">[link]</a>
 
-
-Chapter 14: Branch-and-Bound algorithms
 ---
+
+## Chapter 14: Branch-and-Bound algorithms
 
 Branch and bound algorithms are a type of algorithm that solves optimization problems by breaking them down into smaller subproblems and using a bounding function to eliminate subproblems that cannot contain the optimal solution. It is an algorithm design paradigm for discrete and combinatorial optimization problems, as well as mathematical optimization. 
 
