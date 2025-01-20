@@ -72,10 +72,10 @@ Welcome to the world of operating systems, where we delve into the fundamental c
 
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
 
-* Slides [TR] [pdf](../files/os/slides/Bolum_01_Giris.pdf)
-* Lecture Notes [pdf](../files/os/notes/Chapter_1_Introduction.pdf)
-* Lab [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter01/src) | [c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01)
-* Question & answers [pdf](../files/os/questions/Chapter_1_Introduction.pdf)
+- Slides [TR] [pdf](../files/os/slides/Bolum_01_Giris.pdf)
+- Lecture Notes [pdf](../files/os/notes/Chapter_1_Introduction.pdf)
+- Lab [java](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter01/src) | [c](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01)
+- Question & answers [pdf](../files/os/questions/Chapter_1_Introduction.pdf)
 
 ---
 
