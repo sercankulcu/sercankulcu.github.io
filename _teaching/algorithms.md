@@ -12,7 +12,7 @@ location: "Giresun, Turkey"
 An algorithm is a set of well-defined instructions for carrying out a particular task. Think of it as a recipe in a cookbook that guides you step by step to make a delicious dish. In the world of computing, algorithms are the backbone that powers programs and applications. They are logical sequences that tell a computer exactly what steps to take to solve a problem or achieve a goal. From simple tasks like sorting a list of numbers to complex operations like image processing or running search engines, algorithms are everywhere.
 
 ## Ders Öğretim Planı
-[Ders Öğretim Planı (pdf)](../files/algorithms/slides/Bolum_00_Ders_Ogretim_Planı.pdf)
+[Ders Öğretim Planı (PDF)](../files/algorithms/slides/Bolum_00_Ders_Ogretim_Planı.pdf)
 
 ---
 
@@ -52,10 +52,10 @@ An algorithm is a set of well-defined instructions for carrying out a particular
 
 Algorithms are the step-by-step procedures that form the core of computer science, guiding computers through the maze of processing data. They are like the DNA of software, encoding the essence of problem-solving. Complexity, on the other hand, measures how an algorithm’s resource needs (like time and storage) grow as the input size increases. It’s a way to rate the efficiency of an algorithm, ensuring it can handle large amounts of data without breaking a sweat.
 
-- [Sunum-Giriş (pdf)](../files/algorithms/slides/Bolum_01_01_Giris.pdf)
-- [Sunum-Karmaşıklık (pdf)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.pdf)
+- [Sunum-Giriş (PDF)](../files/algorithms/slides/Bolum_01_01_Giris.pdf)
+- [Sunum-Karmaşıklık (PDF)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.pdf)
 - [Run time analysis (HTML)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.html)
-- [Lecture Notes (pdf)](../files/algorithms/Chapter_01_Introduction.pdf)
+- [Lecture Notes (PDF)](../files/algorithms/Chapter_01_Introduction.pdf)
 - [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter01/src)
 
 ---
@@ -64,8 +64,8 @@ Algorithms are the step-by-step procedures that form the core of computer scienc
 
 Sorting algorithms are the architects of order, meticulously organizing data into a specific sequence, such as ascending or descending. They are fundamental tools in computer science, used to manage and retrieve data with efficiency and precision. There’s a variety of sorting methods, each with its own strategy and performance nuances.
 
-- [Sunum-Sıralama Algoritmaları (pdf)](../files/algorithms/slides/Bolum_02_Siralama.pdf)
-- [Lecture Notes (pdf)](../files/algorithms/Chapter_02_Sorting.pdf)
+- [Sunum-Sıralama Algoritmaları (PDF)](../files/algorithms/slides/Bolum_02_Siralama.pdf)
+- [Lecture Notes (PDF)](../files/algorithms/Chapter_02_Sorting.pdf)
 - [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter02/src)
 
 ---
@@ -74,8 +74,8 @@ Sorting algorithms are the architects of order, meticulously organizing data int
 
 Searching algorithms are the detectives of the data world, designed to track down information with speed and accuracy. They are used in a wide variety of applications, such as finding a file on a computer, a customer in a database, and a word in a document. They come in various forms, each suited to different scenarios.
 
-- [Sunum-Arama Algoritmaları (pdf)](../files/algorithms/slides/Bolum_03_Arama.pdf)
-- [Lecture Notes (pdf)](../files/algorithms/Chapter_03_Searching.pdf)
+- [Sunum-Arama Algoritmaları (PDF)](../files/algorithms/slides/Bolum_03_Arama.pdf)
+- [Lecture Notes (PDF)](../files/algorithms/Chapter_03_Searching.pdf)
 - [Code Examples (Github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter03/src)
 
 ---
@@ -84,12 +84,12 @@ Searching algorithms are the detectives of the data world, designed to track dow
 
 Graphs, composed of nodes and edges, are ubiquitous in various domains, including social networks, transportation systems, and computational biology. Graph algorithms are the masterminds behind the scenes of network analysis, adept at solving puzzles that involve points and connections. They help us navigate through complex networks, from social media graphs to city maps. Graph algorithms enable us to explore, analyze, and manipulate these complex structures efficiently. 
 
-- [Sunum-Çizge Gezinme (pdf)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.pdf)
+- [Sunum-Çizge Gezinme (PDF)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.pdf)
 - [BFS DFS (HTML)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.html)
-- [Sunum-Çizge En Kısa Yol (pdf)](../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.pdf)
-- [Sunum-Çizge Minimum Kapsayan (pdf)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.pdf)
-- [Sunum-Çizge Ağ Akış (pdf)](../files/algorithms/slides/Bolum_04_04_Ag_Akis.pdf)
-- [Lecture Notes (pdf)](../files/algorithms/Chapter_04_Graph.pdf)
+- [Sunum-Çizge En Kısa Yol (PDF)](../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.pdf)
+- [Sunum-Çizge Minimum Kapsayan (PDF)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.pdf)
+- [Sunum-Çizge Ağ Akış (PDF)](../files/algorithms/slides/Bolum_04_04_Ag_Akis.pdf)
+- [Lecture Notes (PDF)](../files/algorithms/Chapter_04_Graph.pdf)
 - [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src)
 
 ---
