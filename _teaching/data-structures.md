@@ -8,40 +8,55 @@ date: 2024-09-05
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="data structure" src="/images/teaching/data-structures-course.webp" style="float: left; margin-right: 10px;"> Data structures are fundamental components in computer science, serving as the building blocks for organizing, managing, and storing data efficiently. They enable the systematic arrangement of data to facilitate various operations such as searching, sorting, inserting, and deleting. Common data structures include arrays, linked lists, stacks, queues, trees, and graphs, each with unique properties and use cases. These fundamental concepts are the cornerstone of computer science and programming, and a deep understanding of them empowers us to write more efficient, organized, and robust code.
+![data structure](/images/teaching/data-structures-course.webp){: .align-left width="200" style="float: left; margin-right: 10px;"}  
+Data structures are fundamental components in computer science, serving as the building blocks for organizing, managing, and storing data efficiently. They enable the systematic arrangement of data to facilitate various operations such as searching, sorting, inserting, and deleting. Common data structures include arrays, linked lists, stacks, queues, trees, and graphs, each with unique properties and use cases. These fundamental concepts are the cornerstone of computer science and programming, and a deep understanding of them empowers us to write more efficient, organized, and robust code.
 
-* Ders Öğretim Planı <a href="../files/data_structures/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
+### Ders Öğretim Planı  
+[Ders Öğretim Planı (PDF)](../files/data_structures/slides/Bolum_00_Ders_Ogretim_Planı.pdf)
 
-Announcements:
+## Announcements  
+
 ---
 
+## The resources  
 
-The resources:
+- [Data Structures and Algorithms in Java 6th Edition by Michael T. Goodrich, Roberto Tamassia, Michael H. Goldwasser](https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635)
+- [CS-61B: Data Structures course page](https://sp23.datastructur.es/)
+- [CENG-213: Data Structures course page](https://user.ceng.metu.edu.tr/~ys/ceng213-ds)
+- [Data Structures Easy to Advanced Course (YouTube)](https://www.youtube.com/watch?v=RBSGKlAvoiM)
+- Veri Yapıları ve Algoritmalar, Ders Notları, Mustafa Ege.
+- [The Algorithms Github project](https://github.com/TheAlgorithms/Java)
+
+## Past Exams  
+
+- **2024-2025**  
+  [Vize A](../files/data_structures/slides/2024-2025-data-vize-a-cevaplar.pdf) | 
+  [Vize B](../files/data_structures/slides/2024-2025-data-vize-b-cevaplar.pdf) | 
+  [Telafi](../files/data_structures/slides/2024-2025-data-telafi-cevaplar.pdf) | 
+  [Final](../files/data_structures/slides/2024-2025-data-final-cevaplar.pdf) | 
+  [Bütünleme](../files/data_structures/slides/2024-2025-data-butunleme-cevaplar.pdf)
+
+- **2023-2024**  
+  [Vize](../files/data_structures/slides/2023-2024-data-vize-cevaplar.pdf) | 
+  [Final](../files/data_structures/slides/2023-2024-data-final-cevaplar.pdf) | 
+  [Bütünleme](../files/data_structures/slides/2023-2024-data-butunleme-cevaplar.pdf)
+
+- **Çalışma Soruları**  
+  [Vize Çalışma Soruları](../files/data_structures/slides/vize_calisma.txt) | 
+  [Final Çalışma Soruları](../files/data_structures/slides/final_calisma.txt)
+
 ---
 
-* Data Structures and Algorithms in Java 6th Edition by Michael T. Goodrich, Roberto Tamassia, Michael H. Goldwasser <a href="https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635">[book]</a>
-* CS-61B: Data Structures course page <a href="https://sp23.datastructur.es/">[website]</a>
-* CENG-213: Data Structures course page <a href="https://user.ceng.metu.edu.tr/~ys/ceng213-ds">[website]</a>
-* Data Structures Easy to Advanced Course <a href="https://www.youtube.com/watch?v=RBSGKlAvoiM">[youtube]</a>
-* Veri Yapıları ve Algoritmalar, Ders Notları, Mustafa Ege.
-* The Algorithms Github project <a href="https://github.com/TheAlgorithms/Java">[website]</a>
-
-Past Exams:
----
-
-* 2024-2025 <a href="../files/data_structures/slides/2024-2025-data-vize-a-cevaplar.pdf">[vize a]</a> <a href="../files/data_structures/slides/2024-2025-data-vize-b-cevaplar.pdf">[vize b]</a> <a href="../files/data_structures/slides/2024-2025-data-telafi-cevaplar.pdf">[telafi]</a> <a href="../files/data_structures/slides/2024-2025-data-final-cevaplar.pdf">[final]</a> <a href="../files/data_structures/slides/2024-2025-data-butunleme-cevaplar.pdf">[bütünleme]</a> 
-* 2023-2024 <a href="../files/data_structures/slides/2023-2024-data-vize-cevaplar.pdf">[vize]</a> <a href="../files/data_structures/slides/2023-2024-data-final-cevaplar.pdf">[final]</a> <a href="../files/data_structures/slides/2023-2024-data-butunleme-cevaplar.pdf">[bütünleme]</a>
-* Çalışma Soruları <a href="../files/data_structures/slides/vize_calisma.txt">[vize]</a> <a href="../files/data_structures/slides/final_calisma.txt">[final]</a>
-
-Chapter 1: Introduction
----
+### Chapter 1: Introduction  
 
 Data structures are the backbone of computer science, serving as the fundamental building blocks that enable us to efficiently store, organize, and manipulate data. Each data structure has its own unique characteristics, advantages, and trade-offs, making them suitable for different scenarios and requirements. Understanding these structures is crucial for writing efficient code and solving complex computational problems.
 
-* Sunum-Giriş <a href="../files/data_structures/slides/Bolum_01_Giris.pdf">[pdf]</a>
-* Data Structures <a href="../teaching/data-structures/intro-simulator">[html]</a>
-* Lecture Notes <a href="../files/data_structures/Chapter_01_Introduction.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src">[link]</a>
+- [Sunum-Giriş (PDF)](../files/data_structures/slides/Bolum_01_Giris.pdf)  
+- [Data Structures (HTML)](../teaching/data-structures/intro-simulator)  
+- [Lecture Notes (PDF)](../files/data_structures/Chapter_01_Introduction.pdf)  
+- [Code Examples](https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src)  
+
+---
 
 Chapter 2: Arrays
 ---
