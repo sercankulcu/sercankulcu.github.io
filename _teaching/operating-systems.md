@@ -4,7 +4,7 @@ collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/operating-systems
 venue: "University of Giresun, Department of Computer Engineering"
-date: 2024-01-06
+date: 2025-01-06
 location: "Giresun, Turkey"
 ---
 
