@@ -8,27 +8,30 @@ date: 2025-01-06
 location: "Giresun, Turkey"
 ---
 
-<img align="left" width="200" alt="operating systems" src="/images/teaching/operating-systems-course.webp" style="float: left; margin-right: 10px;"> Operating systems are an essential part of modern computing, serving as the foundation of any computer system. They are responsible for managing the hardware and software resources of a computer and providing a platform for other programs to run on. An operating system acts as an intermediary between the computer hardware and the software applications that users interact with, providing a uniform interface that applications can use to communicate with the hardware. Without an operating system, a computer would be nothing more than a collection of hardware components that could not be easily controlled or utilized by users.
+![operating systems](/images/teaching/operating-systems-course.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
+Operating systems are an essential part of modern computing, serving as the foundation of any computer system. They are responsible for managing the hardware and software resources of a computer and providing a platform for other programs to run on. An operating system acts as an intermediary between the computer hardware and the software applications that users interact with, providing a uniform interface that applications can use to communicate with the hardware. Without an operating system, a computer would be nothing more than a collection of hardware components that could not be easily controlled or utilized by users.
 
-* Ders Öğretim Planı <a href="../files/os/slides/Bolum_00_Ders_Ogretim_Planı.pdf">[pdf]</a>
+## Ders Öğretim Planı
+[Ders Öğretim Planı (PDF)](../files/os/slides/Bolum_00_Ders_Ogretim_Planı.pdf)
 
+---
 
-Announcements:
------
+## Announcements
 
-The resources: 
------
+---
 
-* Modern Operating Systems, Andrew S. Tanenbaum <a href="https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X">[book]</a>
-* Operating System Concepts, A. SilberSchatz, P. Galvin, and G. Gagne <a href="https://www.os-book.com/OS10/index.html">[e-book]</a>
-* Operating Systems: Three Easy Pieces <a href="https://pages.cs.wisc.edu/~remzi/OSTEP">[e-book]</a>
-* Youtube <a href="https://www.youtube.com/watch?v=sqtkwd09KXs&list=PLmPsb7nQhv7NLRWdIiDVNBDCMOtuUn6WZ">[Prof. Dr. Kemal Bıçakcı]</a> <a href="https://www.youtube.com/watch?v=r2q_XRKrqHQ&list=PLh9ECzBB8tJO9eiwfQbcA2ThMbUSkbOWf">[Prof. Dr. Sadi Evren Şeker]</a>
+## The resources:
 
-* CSCI-UA.202 Operating Systems <a href="https://cs.nyu.edu/~gottlieb/courses/os202/class-notes.html">[website]</a>
-
+* Modern Operating Systems, Andrew S. Tanenbaum [book](https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X)
+* Operating System Concepts, A. SilberSchatz, P. Galvin, and G. Gagne [e-book](https://www.os-book.com/OS10/index.html)
+* Operating Systems: Three Easy Pieces [e-book](https://pages.cs.wisc.edu/~remzi/OSTEP)
+* Youtube [Prof. Dr. Kemal Bıçakcı](https://www.youtube.com/watch?v=sqtkwd09KXs&list=PLmPsb7nQhv7NLRWdIiDVNBDCMOtuUn6WZ) [Prof. Dr. Sadi Evren Şeker](https://www.youtube.com/watch?v=r2q_XRKrqHQ&list=PLh9ECzBB8tJO9eiwfQbcA2ThMbUSkbOWf)
+* CSCI-UA.202 Operating Systems [website](https://cs.nyu.edu/~gottlieb/courses/os202/class-notes.html)
 * Bilgisayar İşletim Sistemleri, Prof. Dr. Ali Saatçi, 2. Baskı.
-* Operating System Development <a href="https://wiki.osdev.org/Main_Page">[website]</a>
-* Operating Systems From 0 to 1 <a href="../files/os/Book_Operating_Systems_From_0_to_1.pdf">[pdf]</a>
+* Operating System Development [website](https://wiki.osdev.org/Main_Page)
+* Operating Systems From 0 to 1 [pdf](../files/os/Book_Operating_Systems_From_0_to_1.pdf)
+
+---
 
 Past Exams:
 ---
