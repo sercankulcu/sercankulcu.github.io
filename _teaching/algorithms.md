@@ -34,17 +34,17 @@ An algorithm is a set of well-defined instructions for carrying out a particular
 
 ---
 
-## Past Exams
+## Past Exams  
 
-- 2023-2024: 
-  [Vize](../files/algorithms/slides/2023-2024-algorithms-vize-cevap.pdf) | 
-  [Final-A](../files/algorithms/slides/2023-2024-algorithms-final-a-cevap.pdf) |  
-  [Final-B](../files/algorithms/slides/2023-2024-algorithms-final-b-cevap.pdf) | 
-  [Bütünleme](../files/algorithms/slides/2023-2024-algorithms-butunleme-cevap.pdf)
+- **2024-2025**  
+  [vize](../files/algorithms/slides/2023-2024-algorithms-vize-cevap.pdf) | 
+  [final-A](../files/algorithms/slides/2023-2024-algorithms-final-a-cevap.pdf) |  
+  [final-B](../files/algorithms/slides/2023-2024-algorithms-final-b-cevap.pdf) | 
+  [bütünleme](../files/algorithms/slides/2023-2024-algorithms-butunleme-cevap.pdf)
 
-- Soru Cevap: 
-  [Vize](../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf) | 
-  [Final](../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf)
+- **Soru Cevap**  
+  [vize](../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf) | 
+  [final](../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf)
 
 ---
 
