@@ -6,7 +6,6 @@ author_profile: true
 ---
 
 - [car race 🏁🏎️💨](../game/car-race.html)  
-- [mobile car race 📱🏎️💨🏁](../game/mobile-car-race.html)  
 - [minesweeper 💣](../game/minesweeper.html)  
 - [mobile minesweeper 📱💣](../game/mobile-minesweeper.html)  
 - [fortune teller 🔮✨](../game/fortune-teller.html)  
