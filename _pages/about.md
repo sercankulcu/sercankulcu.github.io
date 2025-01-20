@@ -12,15 +12,15 @@ redirect_from:
 
 I am Sercan Külcü, an Assistant Professor in the Computer Science Department at Giresun University. With over 20 years of professional experience in software engineering, I hold a PhD specializing in low-power wireless communication technologies. My expertise spans embedded and real-time operating systems, programming in C, C++, and Java, as well as the application of machine learning techniques. Recently, I have also enjoyed developing small applications with JavaScript.
 
+Learn about my teaching experience, materials, and educational contributions. [Teaching](teaching)
+
+Check out the small apps and games I've developed with Javascript in my free time. [Apps](apps)
+
 Explore my CV to learn about my education, professional experience, and skills. [CV](cv)
 
 Discover my curated collection of bookmarks, featuring useful resources and interesting content. [Bookmark](bookmarks)
 
-Read my blog posts where I share insights, experiences, and ideas on various topics. [Blog Posts](blogs)
-
-Learn about my teaching experience, materials, and educational contributions. [Teaching](teaching)
-
-Check out the small apps and games I've developed with Javascript in my free time. [Apps](apps)
+Read my blog posts where I share insights, experiences, and ideas on various topics. [Blog Posts](posts)
 
 **Note:** If any licensed content is found on the website, please don't hesitate to contact me via the links on the left-hand side. You can be sure that any related content will be quickly removed within 24 hours.
 
