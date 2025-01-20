@@ -22,12 +22,12 @@ Data structures are fundamental components in computer science, serving as the b
 
 ## The resources  
 
-- [Data Structures and Algorithms in Java 6th Edition by Michael T. Goodrich, Roberto Tamassia, Michael H. Goldwasser](https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635)
-- [CS-61B: Data Structures course page](https://sp23.datastructur.es/)
-- [CENG-213: Data Structures course page](https://user.ceng.metu.edu.tr/~ys/ceng213-ds)
-- [Data Structures Easy to Advanced Course (YouTube)](https://www.youtube.com/watch?v=RBSGKlAvoiM)
+- Data Structures and Algorithms in Java 6th Edition by Michael T. Goodrich, Roberto Tamassia, Michael H. Goldwasser[Book](https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635)
+- CS-61B: Data Structures [course page](https://sp23.datastructur.es/)
+- CENG-213: Data Structures [course page](https://user.ceng.metu.edu.tr/~ys/ceng213-ds)
+- Data Structures Easy to Advanced Course [(YouTube)](https://www.youtube.com/watch?v=RBSGKlAvoiM)
 - Veri Yapıları ve Algoritmalar, Ders Notları, Mustafa Ege.
-- [The Algorithms Github project](https://github.com/TheAlgorithms/Java)
+- The Algorithms [Github project](https://github.com/TheAlgorithms/Java)
 
 ---
 
@@ -150,8 +150,6 @@ Heaps are specialized binary trees that maintain the heap property, where the pa
 
 ---
 
----
-
 ## Chapter 10: Search Trees  
 
 A search tree, particularly a Binary Search Tree (BST), is a binary tree data structure where each node's left subtree contains only nodes with keys less than the node's key, and the right subtree contains only nodes with keys greater than the node's key. This property makes them extremely efficient for searching, inserting, and deleting elements, typically in O(log n) time when balanced. They're fundamental in implementing databases, file systems, and for maintaining sorted data in a dynamic setting. They underpin many searching and sorting algorithms, making them indispensable for computer scientists and programmers alike.  
@@ -186,7 +184,7 @@ A set is a collection of distinct elements where order doesn't matter and duplic
 - [Sunum-Kümeler (PDF)](../files/data_structures/slides/Bolum_12_Kumeler.pdf)  
 - [Sets Simulator (HTML)](../teaching/data-structures/sets-simulator)  
 - [Lecture Notes (PDF)](../files/data_structures/Chapter_07_Graphs.pdf)  
-- [Code Examples (Github) (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src)  
+- [Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src)  
 
 ---
 
