@@ -22,32 +22,32 @@ Data structures are fundamental components in computer science, serving as the b
 
 ## The resources  
 
-- Data Structures and Algorithms in Java 6th Edition by Michael T. Goodrich, Roberto Tamassia, Michael H. Goldwasser[Book](https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635)
-- CS-61B: Data Structures [course page](https://sp23.datastructur.es/)
-- CENG-213: Data Structures [course page](https://user.ceng.metu.edu.tr/~ys/ceng213-ds)
-- Data Structures Easy to Advanced Course [(YouTube)](https://www.youtube.com/watch?v=RBSGKlAvoiM)
+- Data Structures and Algorithms in Java 6th Edition by Michael T. Goodrich, Roberto Tamassia, Michael H. Goldwasser [(book)](https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635)
+- CS-61B: Data Structures [(course page)](https://sp23.datastructur.es/)
+- CENG-213: Data Structures [(course page)](https://user.ceng.metu.edu.tr/~ys/ceng213-ds)
+- Data Structures Easy to Advanced Course [(youTube)](https://www.youtube.com/watch?v=RBSGKlAvoiM)
 - Veri Yapıları ve Algoritmalar, Ders Notları, Mustafa Ege.
-- The Algorithms [Github project](https://github.com/TheAlgorithms/Java)
+- The Algorithms [github project](https://github.com/TheAlgorithms/Java)
 
 ---
 
 ## Past Exams  
 
 - **2024-2025**  
-  [Vize A](../files/data_structures/slides/2024-2025-data-vize-a-cevaplar.pdf) | 
-  [Vize B](../files/data_structures/slides/2024-2025-data-vize-b-cevaplar.pdf) | 
-  [Telafi](../files/data_structures/slides/2024-2025-data-telafi-cevaplar.pdf) | 
-  [Final](../files/data_structures/slides/2024-2025-data-final-cevaplar.pdf) | 
-  [Bütünleme](../files/data_structures/slides/2024-2025-data-butunleme-cevaplar.pdf)
+  [vize A](../files/data_structures/slides/2024-2025-data-vize-a-cevaplar.pdf) | 
+  [vize B](../files/data_structures/slides/2024-2025-data-vize-b-cevaplar.pdf) | 
+  [telafi](../files/data_structures/slides/2024-2025-data-telafi-cevaplar.pdf) | 
+  [final](../files/data_structures/slides/2024-2025-data-final-cevaplar.pdf) | 
+  [bütünleme](../files/data_structures/slides/2024-2025-data-butunleme-cevaplar.pdf)
 
 - **2023-2024**  
-  [Vize](../files/data_structures/slides/2023-2024-data-vize-cevaplar.pdf) | 
-  [Final](../files/data_structures/slides/2023-2024-data-final-cevaplar.pdf) | 
-  [Bütünleme](../files/data_structures/slides/2023-2024-data-butunleme-cevaplar.pdf)
+  [vize](../files/data_structures/slides/2023-2024-data-vize-cevaplar.pdf) | 
+  [final](../files/data_structures/slides/2023-2024-data-final-cevaplar.pdf) | 
+  [bütünleme](../files/data_structures/slides/2023-2024-data-butunleme-cevaplar.pdf)
 
 - **Çalışma Soruları**  
-  [Vize](../files/data_structures/slides/vize_calisma.txt) | 
-  [Final](../files/data_structures/slides/final_calisma.txt)
+  [vize](../files/data_structures/slides/vize_calisma.txt) | 
+  [final](../files/data_structures/slides/final_calisma.txt)
 
 ---
 
