@@ -7,7 +7,6 @@ author_profile: true
 
 - [car race 🏁🏎️💨](../game/car-race.html)  
 - [minesweeper 💣](../game/minesweeper.html)  
-- [mobile minesweeper 📱💣](../game/mobile-minesweeper.html)  
 - [fortune teller 🔮✨](../game/fortune-teller.html)  
 - [tarot 🃏🔮](../game/tarot/tarot-reader.html)  
 - [matematusta 🧮](../game/matematusta.html)  
