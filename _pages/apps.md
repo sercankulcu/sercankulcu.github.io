@@ -5,18 +5,18 @@ title: "Apps"
 author_profile: true
 ---
 
-<br><a href="../game/car-race.html">[🏎️💨 car race 🏁]</a>
-<br><a href="../game/mobile-car-race.html">[📱🏎️💨 mobile car race 🏁]</a>
-<br><a href="../game/minesweeper.html">[💣⬜ minesweeper ⚠️]</a>
-<br><a href="../game/mobile-minesweeper.html">[📱💣⬜ mobile minesweeper ⚠️]</a>
-<br><a href="../game/fortune-teller.html">[🔮✨ fortune teller 🌙]</a>
-<br><a href="../game/tarot/tarot-reader.html">[🃏🔮 tarot ☀️]</a>
-<br><a href="../game/matematusta.html">[➗➕✖️ matematusta 🧮]</a>
-<br><a href="../game/yazitura.html">[🪙🤲 yazı tura 🎲]</a>
-<br><a href="../game/hangman/hangman.html">[😵🪢 adam asmaca 🪜]</a>
-<br><a href="../game/connectfour.html">[🔴🟡 connect4 🔵🟢]</a>
-<br><a href="../game/anunnaki.html">[👽✨ anunnaki 🌌]</a>
-<br><a href="../game/sudoku.html">[🧩🔢 sudoku 🟦]</a>
-<br><a href="../game/iqtest.html">[🧠 iq test 💯]</a>
-<br><a href="../game/mantra.html">[🧘 mantra 🙏]</a>
+- [🏎️💨 car race 🏁](../game/car-race.html)  
+- [📱🏎️💨 mobile car race 🏁](../game/mobile-car-race.html)  
+- [💣⬜ minesweeper ⚠️](../game/minesweeper.html)  
+- [📱💣⬜ mobile minesweeper ⚠️](../game/mobile-minesweeper.html)  
+- [🔮✨ fortune teller 🌙](../game/fortune-teller.html)  
+- [🃏🔮 tarot ☀️](../game/tarot/tarot-reader.html)  
+- [➗➕✖️ matematusta 🧮](../game/matematusta.html)  
+- [🪙🤲 yazı tura 🎲](../game/yazitura.html)  
+- [😵🪢 adam asmaca 🪜](../game/hangman/hangman.html)  
+- [🔴🟡 connect4 🔵🟢](../game/connectfour.html)  
+- [👽✨ anunnaki 🌌](../game/anunnaki.html)  
+- [🧩🔢 sudoku 🟦](../game/sudoku.html)  
+- [🧠 iq test 💯](../game/iqtest.html)  
+- [🧘 mantra 🙏](../game/mantra.html)
 

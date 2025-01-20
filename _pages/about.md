@@ -5,7 +5,6 @@ title: "About me"
 author_profile: true
 redirect_from: 
   - /about/
-  - /about.html
 ---
 
 <img align="right" width="150" alt="owl coffee beans" src="/images/owl-coffee-beans.webp">
