@@ -24,7 +24,7 @@ An algorithm is a set of well-defined instructions for carrying out a particular
 
 - Algorithms Illuminated [(book)](https://www.algorithmsilluminated.org)
 - Stanford CS 161 [(course webpage)](https://stanford-cs161.github.io/winter2024/lectures)
-- Visual Algo [(website)](https://visualgo.net/en) [(GitHub)](https://github.com/stevenhalim/cpbook-code/tree/master/)
+- Visual Algo [(website)](https://visualgo.net/en) [(github)](https://github.com/stevenhalim/cpbook-code/tree/master/)
 - Algoanim [(website)](https://www.algoanim.ide.sk/)
 - Yong Danielli [(website)](https://yongdanielliang.github.io/animation/animation.html)
 - USFCA [(website)](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html)
@@ -76,7 +76,7 @@ Searching algorithms are the detectives of the data world, designed to track dow
 
 - [Sunum-Arama Algoritmaları (pdf)](../files/algorithms/slides/Bolum_03_Arama.pdf)
 - [Lecture Notes (pdf)](../files/algorithms/Chapter_03_Searching.pdf)
-- [Code Examples (link)](https://github.com/sercankulcu/algorithms/tree/main/Chapter03/src)
+- [Code Examples (Github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter03/src)
 
 ---
 
@@ -85,12 +85,12 @@ Searching algorithms are the detectives of the data world, designed to track dow
 Graphs, composed of nodes and edges, are ubiquitous in various domains, including social networks, transportation systems, and computational biology. Graph algorithms are the masterminds behind the scenes of network analysis, adept at solving puzzles that involve points and connections. They help us navigate through complex networks, from social media graphs to city maps. Graph algorithms enable us to explore, analyze, and manipulate these complex structures efficiently. 
 
 - [Sunum-Çizge Gezinme (pdf)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.pdf)
-- [BFS DFS (click)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.html)
+- [BFS DFS (HTML)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.html)
 - [Sunum-Çizge En Kısa Yol (pdf)](../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.pdf)
 - [Sunum-Çizge Minimum Kapsayan (pdf)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.pdf)
 - [Sunum-Çizge Ağ Akış (pdf)](../files/algorithms/slides/Bolum_04_04_Ag_Akis.pdf)
 - [Lecture Notes (pdf)](../files/algorithms/Chapter_04_Graph.pdf)
-- [Code Examples (link)](https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src)
+- [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src)
 
 ---
 
@@ -98,14 +98,14 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
 
 Have you ever wondered how your computer or smartphone handles text so efficiently? String algorithms are the craftsmen of text processing, weaving through characters to perform tasks like searching, sorting, and editing text. They are crucial in fields like computational biology for DNA sequencing, in search engines for matching queries, or even in text editors for find-and-replace functions. 
 
-* Sunum-Dizgi Eşleme <a href="../files/algorithms/slides/Bolum_05_01_Dizgi_Esleme.pdf">[pdf]</a>
-* Sunum-Dizgi Sıkıştırma <a href="../files/algorithms/slides/Bolum_05_02_Dizgi_Sikistirma.pdf">[pdf]</a>
-* Sunum-Dizgi Sıralama <a href="../files/algorithms/slides/Bolum_05_03_Dizgi_Siralama.pdf">[pdf]</a>
-* Sunum-Dizgi Ayrıştırma <a href="../files/algorithms/slides/Bolum_05_04_Dizgi_Ayristirma.pdf">[pdf]</a>
-* Sunum-Dizgi Düzenleme <a href="../files/algorithms/slides/Bolum_05_05_Dizgi_Duzenleme_Mesafe.pdf">[pdf]</a>
-* Sunum-Dizgi Dönüştürme <a href="../files/algorithms/slides/Bolum_05_06_Dizgi_Donusturme.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/algorithms/Chapter_05_Dynamic.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter05/src">[link]</a>
+- [Sunum-Dizgi Eşleme (PDF)](../files/algorithms/slides/Bolum_05_01_Dizgi_Esleme.pdf)  
+- [Sunum-Dizgi Sıkıştırma (PDF)](../files/algorithms/slides/Bolum_05_02_Dizgi_Sikistirma.pdf)  
+- [Sunum-Dizgi Sıralama (PDF)](../files/algorithms/slides/Bolum_05_03_Dizgi_Siralama.pdf)  
+- [Sunum-Dizgi Ayrıştırma (PDF)](../files/algorithms/slides/Bolum_05_04_Dizgi_Ayristirma.pdf)  
+- [Sunum-Dizgi Düzenleme (PDF)](../files/algorithms/slides/Bolum_05_05_Dizgi_Duzenleme_Mesafe.pdf)  
+- [Sunum-Dizgi Dönüştürme (PDF)](../files/algorithms/slides/Bolum_05_06_Dizgi_Donusturme.pdf)  
+- [Lecture Notes (PDF)](../files/algorithms/Chapter_05_Dynamic.pdf)  
+- [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter05/src)
 
 ---
 
@@ -113,9 +113,9 @@ Have you ever wondered how your computer or smartphone handles text so efficient
 
 Dynamic programming is a powerful technique for solving optimization problems by breaking them down into smaller subproblems. At its core, dynamic programming involves breaking down daunting tasks into smaller, more manageable subproblems, allowing us to systematically find optimal solutions. 
 
-- [Sunum-Dizgi Eşleme (pdf)](../files/algorithms/slides/Bolum_05_01_Dizgi_Esleme.pdf)
-- [Lecture Notes (pdf)](../files/algorithms/Chapter_05_Dynamic.pdf)
-- [Code Examples (link)](https://github.com/sercankulcu/algorithms/tree/main/Chapter05/src)
+- [Sunum-Dinamik Programlama (PDF)](../files/algorithms/slides/Bolum_06_Dinamik.pdf)  
+- [Lecture Notes (PDF)](../files/algorithms/Chapter_05_Dynamic.pdf)  
+- [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter06/src)
 
 ---
 
@@ -123,9 +123,9 @@ Dynamic programming is a powerful technique for solving optimization problems by
 
 Approximation algorithms are a type of algorithm that provides a solution to a problem that is not necessarily optimal, but is guaranteed to be within a certain factor of the optimal solution. Approximation algorithms are often used to solve problems that are NP-hard, which means that there is no known polynomial-time algorithm that can find the optimal solution.
 
-* Sunum-Yakınsama Algoritmaları <a href="../files/algorithms/slides/Bolum_07_Yakinsama.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/algorithms/Chapter_06_Approximation.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter07/src">[link]</a>
+- [Sunum-Yakınsama Algoritmaları (PDF)](../files/algorithms/slides/Bolum_07_Yakinsama.pdf)  
+- [Lecture Notes (PDF)](../files/algorithms/Chapter_06_Approximation.pdf)  
+- [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter07/src)
 
 ---
 
@@ -133,9 +133,9 @@ Approximation algorithms are a type of algorithm that provides a solution to a p
 
 Randomized algorithms are a type of algorithm that uses randomness to improve its performance. Randomized algorithms are often used to solve problems that are difficult or impossible to solve using deterministic algorithms.
 
-* Sunum-Rastgele Algoritmalar <a href="../files/algorithms/slides/Bolum_08_Rastgele.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/algorithms/Chapter_07_Randomized.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter08/src">[link]</a>
+- [Sunum-Rastgele Algoritmalar (PDF)](../files/algorithms/slides/Bolum_08_Rastgele.pdf)  
+- [Lecture Notes (PDF)](../files/algorithms/Chapter_07_Randomized.pdf)  
+- [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter08/src)
 
 ---
 
@@ -143,9 +143,9 @@ Randomized algorithms are a type of algorithm that uses randomness to improve it
 
 Online algorithms are a type of algorithm that makes decisions without knowing the complete input. Online algorithms are often used to solve problems in real time, where the input is not known in advance.
 
-* Sunum-Çevrimiçi Algoritmalar <a href="../files/algorithms/slides/Bolum_09_Cevrimici.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/algorithms/Chapter_08_Online.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter09/src">[link]</a>
+- [Sunum-Çevrimiçi Algoritmalar (PDF)](../files/algorithms/slides/Bolum_09_Cevrimici.pdf)  
+- [Lecture Notes (PDF)](../files/algorithms/Chapter_08_Online.pdf)  
+- [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter09/src)
 
 ---
 
@@ -153,9 +153,9 @@ Online algorithms are a type of algorithm that makes decisions without knowing t
 
 Parallel algorithms are a type of algorithm that can be executed on multiple processors or cores simultaneously. Parallel algorithms are often used to solve problems that are too large or too complex to be solved on a single processor.
 
-* Sunum-Paralel Algoritmalar <a href="../files/algorithms/slides/Bolum_10_Paralel.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/algorithms/Chapter_09_Parallel.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter10/src">[link]</a>
+- [Sunum-Paralel Algoritmalar (PDF)](../files/algorithms/slides/Bolum_10_Paralel.pdf)  
+- [Lecture Notes (PDF)](../files/algorithms/Chapter_09_Parallel.pdf)  
+- [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter10/src)
 
 ---
 
@@ -163,9 +163,9 @@ Parallel algorithms are a type of algorithm that can be executed on multiple pro
 
 The divide-and-conquer paradigm is an algorithmic design paradigm that breaks down a problem into smaller subproblems of the same or related type, until these become simple enough to be solved directly. The solutions to the sub-problems are then combined to give a solution to the original problem.
 
-* Sunum-Böl Fethet Yaklaşımı <a href="../files/algorithms/slides/Bolum_11_Bol_Fethet.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/algorithms/Chapter_10_Divide_and_Conquer.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter11/src">[link]</a>
+- [Sunum-Böl Fethet Yaklaşımı (PDF)](../files/algorithms/slides/Bolum_11_Bol_Fethet.pdf)  
+- [Lecture Notes (PDF)](../files/algorithms/Chapter_10_Divide_and_Conquer.pdf)  
+- [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter11/src)
 
 ---
 
@@ -173,9 +173,9 @@ The divide-and-conquer paradigm is an algorithmic design paradigm that breaks do
 
 Greedy algorithms are a type of algorithm that makes decisions at each step based on the current state of the problem. Greedy algorithms are often used to solve problems that can be broken down into a sequence of decisions.
 
-* Sunum-Açgözlü Algoritmalar <a href="../files/algorithms/slides/Bolum_12_Acgozlu.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/algorithms/Chapter_11_Greedy.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter12/src">[link]</a>
+- [Sunum-Açgözlü Algoritmalar (PDF)](../files/algorithms/slides/Bolum_12_Acgozlu.pdf)  
+- [Lecture Notes (PDF)](../files/algorithms/Chapter_11_Greedy.pdf)  
+- [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter12/src)
 
 ---
 
@@ -183,9 +183,10 @@ Greedy algorithms are a type of algorithm that makes decisions at each step base
 
 Backtracking algorithms are a type of algorithm that solves problems by exploring all possible solutions and backtracking when a solution is found to be invalid. Backtracking algorithms are often used to solve problems that can be broken down into a tree of possible solutions.
 
-* Sunum-Geri Dönüşlü Algoritmalar <a href="../files/algorithms/slides/Bolum_13_Geri_Donuslu.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/algorithms/Chapter_12_Backtracking.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter13/src">[link]</a>
+- [Sunum-Geri Dönüşlü Algoritmalar (PDF)](../files/algorithms/slides/Bolum_13_Geri_Donuslu.pdf)  
+- [Lecture Notes (PDF)](../files/algorithms/Chapter_12_Backtracking.pdf)  
+- [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter13/src)
+
 
 ---
 
@@ -193,6 +194,6 @@ Backtracking algorithms are a type of algorithm that solves problems by explorin
 
 Branch and bound algorithms are a type of algorithm that solves optimization problems by breaking them down into smaller subproblems and using a bounding function to eliminate subproblems that cannot contain the optimal solution. It is an algorithm design paradigm for discrete and combinatorial optimization problems, as well as mathematical optimization. 
 
-* Sunum-Dal Sınır Algoritmaları <a href="../files/algorithms/slides/Bolum_14_Dal_Sinir.pdf">[pdf]</a>
-* Lecture Notes <a href="../files/algorithms/Chapter_13_Branch_and_Bound.pdf">[pdf]</a>
-* Code Examples <a href="https://github.com/sercankulcu/algorithms/tree/main/Chapter14/src">[link]</a>
+- [Sunum-Dal Sınır Algoritmaları (PDF)](../files/algorithms/slides/Bolum_14_Dal_Sinir.pdf)  
+- [Lecture Notes (PDF)](../files/algorithms/Chapter_13_Branch_and_Bound.pdf)  
+- [Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter14/src)
