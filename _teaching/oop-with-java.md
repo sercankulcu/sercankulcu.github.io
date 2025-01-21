@@ -120,7 +120,7 @@ Exception handling is a critical aspect of Java programming, providing a powerfu
 - [🖼️Sunum - Hata Ayıklama (pdf)](../files/java/slides/Bolum_06_Hata_Ayiklama.pdf)  
 - [🗒️Lecture Notes (pdf)](../files/java/Chapter_06_Exception_Handling.pdf)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders06/src)  
-- [Interview Exception Handling (pdf)](../files/java/Chapter_06_Interview_Exception_Handling.pdf)
+- [🖋️Interview Exception Handling (pdf)](../files/java/Chapter_06_Interview_Exception_Handling.pdf)
 
 ---
 
