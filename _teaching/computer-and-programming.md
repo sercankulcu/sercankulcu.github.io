@@ -52,11 +52,11 @@ Modern computing encompasses a vast ecosystem of interconnected technologies and
 
 A computer is a remarkable electronic device that has revolutionized the way we live, work, and communicate. At its core, it's a machine that processes information using a series of precise instructions called programs. Programming is the art and science of creating these instructions, allowing us to harness the computer's incredible power to solve problems, automate tasks, and create innovative solutions. Through programming languages - which act as bridges between human thinking and machine operations - we can command computers to perform complex calculations, manage vast amounts of data, and create everything from mobile apps to artificial intelligence systems. This fascinating field combines logical thinking, creativity, and problem-solving skills, making it both challenging and incredibly rewarding for those who venture into it.
 
-- [Sunum - Temel Kavramlar (pdf)](../files/computer/Bolum_01_Temel_kavramlar.pdf)
-- [Sunum - İnternet (pdf)](../files/computer/Bolum_01_Internet.pdf)
-- [Sunum - Donanım (pdf)](../files/computer/Bolum_01_Donanim.pdf)
-- [Sunum - Bilgisayarlar (pdf)](../files/java/slides/Bolum_01_Bilgisayarlar.pdf)
-- [Sunum - Hesaplama (pdf)](../files/java/slides/Bolum_01_Hesaplama_Hesaplamali_Dusunme.pdf)
+- [🖼️Sunum - Temel Kavramlar (pdf)](../files/computer/Bolum_01_Temel_kavramlar.pdf)
+- [🖼️Sunum - İnternet (pdf)](../files/computer/Bolum_01_Internet.pdf)
+- [🖼️Sunum - Donanım (pdf)](../files/computer/Bolum_01_Donanim.pdf)
+- [🖼️Sunum - Bilgisayarlar (pdf)](../files/java/slides/Bolum_01_Bilgisayarlar.pdf)
+- [🖼️Sunum - Hesaplama (pdf)](../files/java/slides/Bolum_01_Hesaplama_Hesaplamali_Dusunme.pdf)
 
 ---
 
@@ -64,8 +64,8 @@ A computer is a remarkable electronic device that has revolutionized the way we 
 
 Operating systems serve as the fundamental backbone of modern computing, acting as an intermediary between computer hardware and software applications. Systems like Windows, macOS, and Linux provide essential services that manage computer resources, including memory allocation, process scheduling, file system operations, and device control. They create a user-friendly interface that allows people to interact with their computers. Additionally, operating systems handle critical security features, maintaining user permissions and protecting against unauthorized access. Through their multi-tasking capabilities, they enable users to run multiple applications simultaneously while ensuring stable performance and efficient resource utilization.
 
-- [Sunum - İşletim Sistemleri (pdf)](../files/computer/Bolum_02_İsletim_sistemleri.pdf)
-- [Sunum - Windows (pdf)](../files/computer/Bolum_02_Windows.pdf)
+- [🖼️Sunum - İşletim Sistemleri (pdf)](../files/computer/Bolum_02_İsletim_sistemleri.pdf)
+- [🖼️Sunum - Windows (pdf)](../files/computer/Bolum_02_Windows.pdf)
 
 ---
 
@@ -73,9 +73,9 @@ Operating systems serve as the fundamental backbone of modern computing, acting 
 
 Office programs have revolutionized workplace productivity by providing digital tools that streamline traditional business tasks. Applications like Microsoft Word, Excel, and PowerPoint have become industry standards, offering powerful features for document creation, data analysis, and presentation design. Word processors enable text formatting, collaboration tools, and document tracking capabilities. Spreadsheet programs provide calculation engines, data visualization tools, and complex analytical functions that transform raw data into meaningful insights. Presentation software allows users to create slideshows with multimedia elements, animations, and interactive features. These programs continue to evolve with cloud integration, real-time collaboration features, and artificial intelligence-powered assistance.
 
-- [Sunum - Word (pdf)](../files/computer/Bolum_03_Word.pdf)
-- [Sunum - Excel (pdf)](../files/computer/Bolum_03_Excel.pdf)
-- [Sunum - PowerPoint (pdf)](../files/computer/Bolum_03_PowerPoint.pdf)
+- [🖼️Sunum - Word (pdf)](../files/computer/Bolum_03_Word.pdf)
+- [🖼️Sunum - Excel (pdf)](../files/computer/Bolum_03_Excel.pdf)
+- [🖼️Sunum - PowerPoint (pdf)](../files/computer/Bolum_03_PowerPoint.pdf)
 
 ---
 
@@ -83,11 +83,11 @@ Office programs have revolutionized workplace productivity by providing digital 
 
 Programming is the art and science of instructing computers to perform specific tasks through carefully crafted sets of instructions. It serves as the foundation for all software development, from simple mobile apps to complex enterprise systems. Programming languages like Python, Java, and JavaScript provide different approaches to solving computational problems, each with its own syntax and capabilities. The field encompasses fundamental concepts such as variables, control structures, data types, and algorithms, which combine to create powerful software solutions. Learning to program develops critical thinking skills, problem-solving abilities, and logical reasoning, while opening doors to careers in software development, data science, artificial intelligence, and many other technology-driven fields.
 
-- [Sunum - Programlama (pdf)](../files/computer/Bolum_04_Programlama.pdf)
-- [Sunum - Algoritmalar (pdf)](../files/java/slides/Bolum_01_Algoritmalar.pdf)
-- [Sunum - Akış Diyagramları (pdf)](../files/java/slides/Bolum_01_Akis_Diyagramlari.pdf)
-- [Lecture Notes (pdf)](../files/java/Chapter_01_Introduction.pdf)
-- [Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders01/src)
+- [🖼️Sunum - Programlama (pdf)](../files/computer/Bolum_04_Programlama.pdf)
+- [🖼️Sunum - Algoritmalar (pdf)](../files/java/slides/Bolum_01_Algoritmalar.pdf)
+- [🖼️Sunum - Akış Diyagramları (pdf)](../files/java/slides/Bolum_01_Akis_Diyagramlari.pdf)
+- [🗒️Lecture Notes (pdf)](../files/java/Chapter_01_Introduction.pdf)
+- [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders01/src)
 
 ---
 
@@ -95,10 +95,10 @@ Programming is the art and science of instructing computers to perform specific 
 
 Understanding the fundamental syntax and data types of Java is essential for building effective and efficient software systems, as it provides the building blocks for defining program logic, manipulating data, and communicating with external resources.
 
-- [Sunum - Programlama (pdf)](../files/java/slides/Bolum_02_Programlama.pdf)
-- [Sunum - Söz Dizimi (pdf)](../files/java/slides/Bolum_02_Soz_Dizimi_Kurallari.pdf)
-- [Lecture Notes (pdf)](../files/java/Chapter_02_Basic_Syntax_and_Data_Types.pdf)
-- [Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders02/src)
+- [🖼️Sunum - Programlama (pdf)](../files/java/slides/Bolum_02_Programlama.pdf)
+- [🖼️Sunum - Söz Dizimi (pdf)](../files/java/slides/Bolum_02_Soz_Dizimi_Kurallari.pdf)
+- [🗒️Lecture Notes (pdf)](../files/java/Chapter_02_Basic_Syntax_and_Data_Types.pdf)
+- [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders02/src)
 
 ---
 
@@ -106,12 +106,12 @@ Understanding the fundamental syntax and data types of Java is essential for bui
 
 Control structures, which include conditional statements and loops, provide a powerful mechanism for controlling the flow of execution in a Java program, enabling developers to create complex, dynamic behaviors and respond to a wide range of inputs and events.
 
-- [Sunum - Kontrol Yapıları (pdf)](../files/java/slides/Bolum_03_Kontrol_Yapilari.pdf)
-- [Sunum - Örnek Uygulamalar (pdf)](../files/java/slides/Bolum_03_Ornekler.pdf)
-- [Sunum - Örnek Fonksiyonlar (pdf)](../files/java/slides/Bolum_03_Ornek_Fonksiyonlar.pdf)
-- [Sunum - Örnek Çıktılar (pdf)](../files/java/slides/Bolum_03_Ornek_Ciktilar.pdf)
-- [Lecture Notes (pdf)](../files/java/Chapter_03_Control_Structures.pdf)
-- [Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src)
+- [🖼️Sunum - Kontrol Yapıları (pdf)](../files/java/slides/Bolum_03_Kontrol_Yapilari.pdf)
+- [🖼️Sunum - Örnek Uygulamalar (pdf)](../files/java/slides/Bolum_03_Ornekler.pdf)
+- [🖼️Sunum - Örnek Fonksiyonlar (pdf)](../files/java/slides/Bolum_03_Ornek_Fonksiyonlar.pdf)
+- [🖼️Sunum - Örnek Çıktılar (pdf)](../files/java/slides/Bolum_03_Ornek_Ciktilar.pdf)
+- [🗒️Lecture Notes (pdf)](../files/java/Chapter_03_Control_Structures.pdf)
+- [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src)
 
 ---
 
@@ -119,10 +119,10 @@ Control structures, which include conditional statements and loops, provide a po
 
 Functions are fundamental building blocks that allow developers to encapsulate a set of instructions into reusable units. They help improve code organization, readability, and maintainability by enabling modular design. A function typically takes input, called parameters, performs a specific task, and may return a result. Functions also promote abstraction, allowing developers to use complex operations without needing to understand their internal implementation. 
 
-- [Sunum - Fonksiyonlar (pdf)](../files/java/slides/Bolum_03_Fonksiyonlar.pdf)
-- [Sunum - Özyineleme (pdf)](../files/java/slides/Bolum_03_Ozyineleme.pdf)
-- [Lecture Notes (pdf)](../files/java/Chapter_03_Control_Structures.pdf)
-- [Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src)
+- [🖼️Sunum - Fonksiyonlar (pdf)](../files/java/slides/Bolum_03_Fonksiyonlar.pdf)
+- [🖼️Sunum - Özyineleme (pdf)](../files/java/slides/Bolum_03_Ozyineleme.pdf)
+- [🗒️Lecture Notes (pdf)](../files/java/Chapter_03_Control_Structures.pdf)
+- [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src)
 
 ---
 
@@ -130,7 +130,7 @@ Functions are fundamental building blocks that allow developers to encapsulate a
 
 Arrays are essential data structures in Java programming, providing a powerful mechanism for storing and manipulating large sets of data efficiently and flexibly, and enabling developers to build complex algorithms and data-driven applications.
 
-- [Sunum - Diziler (pdf)](../files/java/slides/Bolum_05_Diziler.pdf)
-- [Sunum - Dizgi (pdf)](../files/java/slides/Bolum_05_Dizgi.pdf)
-- [Lecture Notes (pdf)](../files/java/Chapter_05_Arrays_And_Collections.pdf)
-- [Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders05/src)
+- [🖼️Sunum - Diziler (pdf)](../files/java/slides/Bolum_05_Diziler.pdf)
+- [🖼️Sunum - Dizgi (pdf)](../files/java/slides/Bolum_05_Dizgi.pdf)
+- [🗒️Lecture Notes (pdf)](../files/java/Chapter_05_Arrays_And_Collections.pdf)
+- [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders05/src)
