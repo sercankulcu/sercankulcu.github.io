@@ -9,19 +9,42 @@ redirect_from:
 
 <img align="right" width="150" alt="owl coffee beans" src="/images/owl-coffee-beans.webp">
 
-I am <u>Sercan Külcü</u>, an Assistant Professor in the <u>Computer Science Department</u> at <u>Giresun University</u>. With over <u>20 years</u> of professional experience in <u>software engineering</u>, I hold a <u>PhD</u> specializing in <u>low-power wireless communication technologies</u>. My expertise spans <u>embedded</u> and <u>real-time operating systems</u>, programming in <u>C</u>, <u>C++</u>, and <u>Java</u>, as well as the application of <u>machine learning techniques</u>. Recently, I have also enjoyed developing small applications with <u>JavaScript</u>.
+<div id="typewriter"></div>
 
-Learn about my teaching experience, materials, and educational contributions. [Teaching](teaching)
+<script>
+  // Typewriter effect
+  const text = `
+    I am <u>Sercan Külcü</u>, an Assistant Professor in the <u>Computer Science Department</u> at <u>Giresun University</u>.
+    With over <u>20 years</u> of professional experience in <u>software engineering</u>, I hold a <u>PhD</u> specializing in
+    <u>low-power wireless communication technologies</u>. My expertise spans <u>embedded</u> and <u>real-time operating systems</u>,
+    programming in <u>C</u>, <u>C++</u>, and <u>Java</u>, as well as the application of <u>machine learning techniques</u>.
+    Recently, I have also enjoyed developing small applications with <u>JavaScript</u>.
 
-Check out the small apps and games I've developed with Javascript in my free time. [Apps](apps)
+    Learn about my teaching experience, materials, and educational contributions. <a href="teaching">Teaching</a>
+    Check out the small apps and games I've developed with Javascript in my free time. <a href="apps">Apps</a>
+    Explore my CV to learn about my education, professional experience, and skills. <a href="cv">CV</a>
+    Discover my curated collection of bookmarks, featuring useful resources and interesting content. <a href="bookmarks">Bookmark</a>
+    Read my blog posts where I share insights, experiences, and ideas on various topics. <a href="posts">Blog Posts</a>
 
-Explore my CV to learn about my education, professional experience, and skills. [CV](cv)
+    <strong>Note:</strong> If any licensed content is found on the website, please don't hesitate to contact me via the links on the left-hand side.
+    You can be sure that any related content will be quickly removed within 24 hours.
+  `;
 
-Discover my curated collection of bookmarks, featuring useful resources and interesting content. [Bookmark](bookmarks)
+  let i = 0;
+  const speed = 50; // Typing speed in milliseconds
+  const typewriterElement = document.getElementById("typewriter");
 
-Read my blog posts where I share insights, experiences, and ideas on various topics. [Blog Posts](posts)
+  function typeEffect() {
+    if (i < text.length) {
+      typewriterElement.innerHTML += text.charAt(i);
+      i++;
+      setTimeout(typeEffect, speed);
+    }
+  }
 
-**Note:** If any licensed content is found on the website, please don't hesitate to contact me via the links on the left-hand side. You can be sure that any related content will be quickly removed within 24 hours.
+  typeEffect();
+</script>
+
 
 <!--
 <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="sercankulc" data-description="Support me on Buy me a coffee!" data-message="Thank you for visiting!" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
