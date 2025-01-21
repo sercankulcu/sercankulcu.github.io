@@ -19,7 +19,7 @@ This course provides an introduction to the fundamental concepts, technologies, 
 - Key Concepts and Terminology in Wireless Sensor Networks
 - Understanding the Unique Characteristics and Challenges of Wireless Sensor Networks
 
-[Lecture Notes](../files/wsn/Chapter_01_Introduction_to_WSN.pdf)
+[🗒️Lecture Notes](../files/wsn/Chapter_01_Introduction_to_WSN.pdf)
 
 ---
 
@@ -29,7 +29,7 @@ This course provides an introduction to the fundamental concepts, technologies, 
 - Evaluating the Pros and Cons of Various Wireless Sensor Network Architectures
 - Design Considerations and Trade-offs in Architectural Choices
 
-[Lecture Notes](../files/wsn/Chapter_02_WSN_Architectures.pdf)
+[🗒️Lecture Notes](../files/wsn/Chapter_02_WSN_Architectures.pdf)
 
 ---
 
@@ -39,7 +39,7 @@ This course provides an introduction to the fundamental concepts, technologies, 
 - Exploring the Various Types of Sensors and Their Applications
 - Evaluating Hardware Options for Sensor Nodes: Performance, Cost, and Power Efficiency
 
-[Lecture Notes](../files/wsn/Chapter_03_Sensor_Nodes_and_Hardware_Components.pdf)
+[🗒️Lecture Notes](../files/wsn/Chapter_03_Sensor_Nodes_and_Hardware_Components.pdf)
 
 ---
 
@@ -49,7 +49,7 @@ This course provides an introduction to the fundamental concepts, technologies, 
 - Evaluating Popular Protocols: Zigbee, Bluetooth, Wi-Fi, and LoRaWAN
 - Designing Efficient and Reliable Communication Protocols for Sensor Networks
 
-[Lecture Notes](../files/wsn/Chapter_04_Communication_Protocols.pdf)
+[🗒️Lecture Notes](../files/wsn/Chapter_04_Communication_Protocols.pdf)
 
 ---
 
@@ -59,7 +59,7 @@ This course provides an introduction to the fundamental concepts, technologies, 
 - Energy Harvesting Techniques for Prolonging Network Lifetime
 - Power Optimization Strategies: Sleep Scheduling, Duty Cycling, and Data Aggregation
 
-[Lecture Notes](../files/wsn/Chapter_05_Energy_Management_and_Power_Efficiency.pdf)
+[🗒️Lecture Notes](../files/wsn/Chapter_05_Energy_Management_and_Power_Efficiency.pdf)
 
 ---
 
@@ -69,7 +69,7 @@ This course provides an introduction to the fundamental concepts, technologies, 
 - Collaborative and Distributed Data Processing Approaches
 - Quality of Information (QoI) Metrics and Algorithms for Data Fusion
 
-[Lecture Notes](../files/wsn/Chapter_06_Data_Aggregation_and_Fusion.pdf)
+[🗒️Lecture Notes](../files/wsn/Chapter_06_Data_Aggregation_and_Fusion.pdf)
 
 ---
 
@@ -79,7 +79,7 @@ This course provides an introduction to the fundamental concepts, technologies, 
 - Tracking and Object Localization Applications: Challenges and Solutions
 - Fusion of Localization and Sensing Data for Enhanced Tracking Accuracy
 
-[Lecture Notes](../files/wsn/Chapter_07_Localization_and_Tracking.pdf)
+[🗒️Lecture Notes](../files/wsn/Chapter_07_Localization_and_Tracking.pdf)
 
 ---
 
@@ -89,7 +89,7 @@ This course provides an introduction to the fundamental concepts, technologies, 
 - Authentication, Encryption, and Key Management in Wireless Sensor Networks
 - Privacy-preserving Techniques and Anonymity in Sensor Data Collection
 
-[Lecture Notes](../files/wsn/Chapter_08_Security_and_Privacy.pdf)
+[🗒️Lecture Notes](../files/wsn/Chapter_08_Security_and_Privacy.pdf)
 
 ---
 
@@ -99,7 +99,7 @@ This course provides an introduction to the fundamental concepts, technologies, 
 - Query Processing and Optimization in Resource-constrained Environments
 - Data Aggregation and Compression Techniques for Efficient Storage
 
-[Lecture Notes](../files/wsn/Chapter_09_Data_Management_and_Storage.pdf)
+[🗒️Lecture Notes](../files/wsn/Chapter_09_Data_Management_and_Storage.pdf)
 
 ---
 
@@ -109,7 +109,7 @@ This course provides an introduction to the fundamental concepts, technologies, 
 - Smart Cities and Urban Sensing Applications
 - Healthcare, Industrial Automation, and Agricultural Applications
 
-[Lecture Notes](../files/wsn/Chapter_10_Applications.pdf)
+[🗒️Lecture Notes](../files/wsn/Chapter_10_Applications.pdf)
 
 ---
 
@@ -119,4 +119,4 @@ This course provides an introduction to the fundamental concepts, technologies, 
 - Machine Learning and Artificial Intelligence in Sensor Networks
 - Challenges and Opportunities in the Future of Wireless Sensor Networks
 
-[Lecture Notes](../files/wsn/Chapter_11_Emerging_Trends_and_Future_Directions.pdf)
+[🗒️Lecture Notes](../files/wsn/Chapter_11_Emerging_Trends_and_Future_Directions.pdf)

@@ -48,9 +48,9 @@ Microprocessors act as the heartbeat of modern computing systems, executing nume
 
 This chapter provides a foundational overview of microprocessor basics. It introduces the fundamental concepts of microprocessors and explores the significance of the 8086 architecture in computer systems. The content focuses on essential principles, helping students grasp the core workings of microprocessors.
 
-- [Sunum - Giriş (pdf)](../files/microprocessors/slides/Bolum_01_Giris.pdf)
-- [Sunum - Mimari (pdf)](../files/microprocessors/slides/Bolum_01_8086_Mimarisi.pdf)
-- [Sunum - Programlama Dilleri (pdf)](../files/microprocessors/slides/Bolum_01_Programlama_Dilleri.pdf)
+- [🖼️Sunum - Giriş (pdf)](../files/microprocessors/slides/Bolum_01_Giris.pdf)
+- [🖼️Sunum - Mimari (pdf)](../files/microprocessors/slides/Bolum_01_8086_Mimarisi.pdf)
+- [🖼️Sunum - Programlama Dilleri (pdf)](../files/microprocessors/slides/Bolum_01_Programlama_Dilleri.pdf)
 
 ---
 
@@ -58,8 +58,8 @@ This chapter provides a foundational overview of microprocessor basics. It intro
 
 Registers, acting as small, fast storage locations, play a crucial role in executing instructions and temporarily storing data. This chapter also covers the essential pins that facilitate communication and data transfer within the microprocessor. Understanding the interplay between registers and pins is foundational for understanding the complex operations of the 8086 architecture.
 
-- [Sunum - Pinler (pdf)](../files/microprocessors/slides/Bolum_02_8086_Pinler.pdf)
-- [Sunum - Yazmaçlar (pdf)](../files/microprocessors/slides/Bolum_02_8086_Yazmaclar.pdf)
+- [🖼️Sunum - Pinler (pdf)](../files/microprocessors/slides/Bolum_02_8086_Pinler.pdf)
+- [🖼️Sunum - Yazmaçlar (pdf)](../files/microprocessors/slides/Bolum_02_8086_Yazmaclar.pdf)
 
 ---
 
@@ -67,8 +67,8 @@ Registers, acting as small, fast storage locations, play a crucial role in execu
 
 Understanding numbering systems, which include binary and hexadecimal, is crucial for effectively handling data in microprocessor contexts. At the same time, the section examines the characteristics and importance of assembly language, explaining its role as the bridge between human-readable code and machine-executable instructions.
 
-- [Sunum - Sayı Sistemleri (pdf)](../files/microprocessors/slides/Bolum_03_Sayi_Sistemleri.pdf)
-- [Sunum - Assembly Dili (pdf)](../files/microprocessors/slides/Bolum_03_Assembly.pdf)
+- [🖼️Sunum - Sayı Sistemleri (pdf)](../files/microprocessors/slides/Bolum_03_Sayi_Sistemleri.pdf)
+- [🖼️Sunum - Assembly Dili (pdf)](../files/microprocessors/slides/Bolum_03_Assembly.pdf)
 
 ---
 
@@ -76,8 +76,8 @@ Understanding numbering systems, which include binary and hexadecimal, is crucia
 
 Understanding the details of memory access is important, as it dictates how data is stored and retrieved. This chapter will systematically examine the mechanisms and principles controlling the memory operations in microprocessors. At the same time, this section covers the idea of variables, explaining how they work in storing and handling data.
 
-- [Sunum - Bellek Erişimi (pdf)](../files/microprocessors/slides/Bolum_04_Bellek_Erisimi.pdf)
-- [Sunum - Değişkenler (pdf)](../files/microprocessors/slides/Bolum_04_Degiskenler.pdf)
+- [🖼️Sunum - Bellek Erişimi (pdf)](../files/microprocessors/slides/Bolum_04_Bellek_Erisimi.pdf)
+- [🖼️Sunum - Değişkenler (pdf)](../files/microprocessors/slides/Bolum_04_Degiskenler.pdf)
 
 ---
 
@@ -85,8 +85,8 @@ Understanding the details of memory access is important, as it dictates how data
 
 Interrupts, as a pivotal mechanism, play a crucial role in managing the flow of execution and responding to external events. This chapter explores the concepts and functionalities associated with interrupts, and it covers common functions encapsulated in the emu8086.inc library.
 
-- [Sunum - Kesmeler (pdf)](../files/microprocessors/slides/Bolum_05_Kesmeler.pdf)
-- [Sunum - Kütüphane (pdf)](../files/microprocessors/slides/Bolum_05_Kutuphane.pdf)
+- [🖼️Sunum - Kesmeler (pdf)](../files/microprocessors/slides/Bolum_05_Kesmeler.pdf)
+- [🖼️Sunum - Kütüphane (pdf)](../files/microprocessors/slides/Bolum_05_Kutuphane.pdf)
 
 ---
 
@@ -94,7 +94,7 @@ Interrupts, as a pivotal mechanism, play a crucial role in managing the flow of 
 
 Arithmetic and logic instructions are essential for performing mathematical operations and logical comparisons. This chapter examines their operational mechanisms and practical applications in assembly language programming.
 
-- [Sunum - Aritmetik ve Mantıksal İşlemler (pdf)](../files/microprocessors/slides/Bolum_06_Aritmetik_Mantik.pdf)
+- [🖼️Sunum - Aritmetik ve Mantıksal İşlemler (pdf)](../files/microprocessors/slides/Bolum_06_Aritmetik_Mantik.pdf)
 
 ---
 
@@ -102,8 +102,8 @@ Arithmetic and logic instructions are essential for performing mathematical oper
 
 Flow control mechanisms determine the sequence of execution within a program. This chapter also covers procedures, modular and reusable code blocks fundamental for structured programming.
 
-- [Sunum - Akış Kontrolü (pdf)](../files/microprocessors/slides/Bolum_07_Akis_Kontrol.pdf)
-- [Sunum - Prosedürler (pdf)](../files/microprocessors/slides/Bolum_07_Prosedurler.pdf)
+- [🖼️Sunum - Akış Kontrolü (pdf)](../files/microprocessors/slides/Bolum_07_Akis_Kontrol.pdf)
+- [🖼️Sunum - Prosedürler (pdf)](../files/microprocessors/slides/Bolum_07_Prosedurler.pdf)
 
 ---
 
@@ -111,8 +111,8 @@ Flow control mechanisms determine the sequence of execution within a program. Th
 
 The stack facilitates subroutine calls, parameter passing, and local variable storage. Concurrently, macros encapsulate and reuse code blocks efficiently.
 
-- [Sunum - Yığın (pdf)](../files/microprocessors/slides/Bolum_08_Yigin.pdf)
-- [Sunum - Makrolar (pdf)](../files/microprocessors/slides/Bolum_08_Makrolar.pdf)
+- [🖼️Sunum - Yığın (pdf)](../files/microprocessors/slides/Bolum_08_Yigin.pdf)
+- [🖼️Sunum - Makrolar (pdf)](../files/microprocessors/slides/Bolum_08_Makrolar.pdf)
 
 ---
 
@@ -120,7 +120,7 @@ The stack facilitates subroutine calls, parameter passing, and local variable st
 
 This chapter navigates through controlling external devices, explaining methods and protocols for interfacing with peripheral hardware.
 
-- [Sunum - Aygıt Kontrolü (pdf)](../files/microprocessors/slides/Bolum_09_Aygit_Kontrolu.pdf)
+- [🖼️Sunum - Aygıt Kontrolü (pdf)](../files/microprocessors/slides/Bolum_09_Aygit_Kontrolu.pdf)
 
 ---
 
@@ -128,7 +128,7 @@ This chapter navigates through controlling external devices, explaining methods 
 
 The 8086 instruction set defines the operations the microprocessor can execute, covering their classifications, formats, and practical applications.
 
-- [Sunum - Komut Kümesi (pdf)](../files/microprocessors/slides/Bolum_10_Komut_Kumesi.pdf)
+- [🖼️Sunum - Komut Kümesi (pdf)](../files/microprocessors/slides/Bolum_10_Komut_Kumesi.pdf)
 
 ---
 
@@ -136,4 +136,4 @@ The 8086 instruction set defines the operations the microprocessor can execute, 
 
 Interrupts enable the system to respond promptly to external events and prioritize tasks. This chapter examines the diverse interrupt functions of the 8086 architecture.
 
-- [Sunum - Kesme Fonksiyonları (pdf)](../files/microprocessors/slides/Bolum_11_Kesme_Fonksiyonlari.pdf)
+- [🖼️Sunum - Kesme Fonksiyonları (pdf)](../files/microprocessors/slides/Bolum_11_Kesme_Fonksiyonlari.pdf)

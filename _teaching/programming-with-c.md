@@ -34,7 +34,7 @@ C is a robust and flexible programming language employed in numerous application
 - Input and output functions
 - Compilation process and execution
 
-[Lecture Notes](../files/c/Chapter_01_Introduction_to_C_Programming.pdf)
+[🗒️Lecture Notes](../files/c/Chapter_01_Introduction_to_C_Programming.pdf)
 
 ---
 
@@ -43,7 +43,7 @@ C is a robust and flexible programming language employed in numerous application
 - Looping statements (for, while, do-while)
 - Break and continue statements
 
-[Lecture Notes](../files/c/Chapter_02_Control_Flow.pdf)
+[🗒️Lecture Notes](../files/c/Chapter_02_Control_Flow.pdf)
 
 ---
 
@@ -52,7 +52,7 @@ C is a robust and flexible programming language employed in numerous application
 - Manipulating arrays: accessing, modifying, and traversing
 - String manipulation and string library functions
 
-[Lecture Notes](../files/c/Chapter_03_Arrays_and_Strings.pdf)
+[🗒️Lecture Notes](../files/c/Chapter_03_Arrays_and_Strings.pdf)
 
 ---
 
@@ -61,7 +61,7 @@ C is a robust and flexible programming language employed in numerous application
 - Function parameters and return values
 - Recursive functions
 
-[Lecture Notes](../files/c/Chapter_04_Functions.pdf)
+[🗒️Lecture Notes](../files/c/Chapter_04_Functions.pdf)
 
 ---
 
@@ -71,7 +71,7 @@ C is a robust and flexible programming language employed in numerous application
 - Pointer arithmetic
 - Dynamic memory allocation (malloc, calloc, free)
 
-[Lecture Notes](../files/c/Chapter_05_Pointers.pdf)
+[🗒️Lecture Notes](../files/c/Chapter_05_Pointers.pdf)
 
 ---
 
@@ -80,7 +80,7 @@ C is a robust and flexible programming language employed in numerous application
 - Accessing structure members
 - Nested structures and arrays of structures
 
-[Lecture Notes](../files/c/Chapter_06_Structures.pdf)
+[🗒️Lecture Notes](../files/c/Chapter_06_Structures.pdf)
 
 ---
 
@@ -90,7 +90,7 @@ C is a robust and flexible programming language employed in numerous application
 - File positioning and error handling
 - File I/O using standard libraries
 
-[Lecture Notes](../files/c/Chapter_07_File_Handling.pdf)
+[🗒️Lecture Notes](../files/c/Chapter_07_File_Handling.pdf)
 
 ---
 
@@ -100,7 +100,7 @@ C is a robust and flexible programming language employed in numerous application
 - Bit fields
 - Unions
 
-[Lecture Notes](../files/c/Chapter_08_Advanced_Data_Types.pdf)
+[🗒️Lecture Notes](../files/c/Chapter_08_Advanced_Data_Types.pdf)
 
 ---
 
@@ -110,7 +110,7 @@ C is a robust and flexible programming language employed in numerous application
 - File inclusion and header files
 - Debugging using preprocessor directives
 
-[Lecture Notes](../files/c/Chapter_09_Preprocessor_Directives.pdf)
+[🗒️Lecture Notes](../files/c/Chapter_09_Preprocessor_Directives.pdf)
 
 ---
 
@@ -120,7 +120,7 @@ C is a robust and flexible programming language employed in numerous application
 - Understanding static and dynamic libraries
 - Recursion: principles and applications
 
-[Lecture Notes](../files/c/Chapter_10_Advanced_Concepts_1.pdf)
+[🗒️Lecture Notes](../files/c/Chapter_10_Advanced_Concepts_1.pdf)
 
 ---
 
@@ -131,7 +131,7 @@ C is a robust and flexible programming language employed in numerous application
 - Time and space complexity analysis
 - Variadic functions
 
-[Lecture Notes](../files/c/Chapter_11_Advanced_Concepts_2.pdf)
+[🗒️Lecture Notes](../files/c/Chapter_11_Advanced_Concepts_2.pdf)
 
 ---
 
@@ -141,7 +141,7 @@ C is a robust and flexible programming language employed in numerous application
 - Exception handling with try-catch blocks
 - Defensive programming and error handling strategies
 
-[Lecture Notes](../files/c/Chapter_12_Error_Handling_and_Debugging.pdf)
+[🗒️Lecture Notes](../files/c/Chapter_12_Error_Handling_and_Debugging.pdf)
 
 ---
 
@@ -151,7 +151,7 @@ C is a robust and flexible programming language employed in numerous application
 - Classes, objects, and constructors
 - Basic input/output in C++
 
-[Lecture Notes](../files/c/Chapter_13_Introduction_to_C++.pdf)
+[🗒️Lecture Notes](../files/c/Chapter_13_Introduction_to_C++.pdf)
 
 ---
 
@@ -161,5 +161,5 @@ C is a robust and flexible programming language employed in numerous application
 - Q&A session and final assessment
 
 [Sample projects](../files/c/Chapter_14_Sample_Projects.pdf)  
-[Questions and answers](../files/c/Chapter_14_Questions_and_Answers.pdf)  
-[Multiple choice questions](../files/c/Chapter_14_Multiple_Choice_Questions.pdf)
+[🗒️Questions and answers](../files/c/Chapter_14_Questions_and_Answers.pdf)  
+[🗒️Multiple choice questions](../files/c/Chapter_14_Multiple_Choice_Questions.pdf)

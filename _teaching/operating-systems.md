@@ -72,12 +72,12 @@ Welcome to the world of operating systems, where we delve into the fundamental c
 
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
 
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_01_Giris.pdf)
-- [Lecture Notes (pdf)](../files/os/notes/Chapter_1_Introduction.pdf)
-- Lab:  
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_01_Giris.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_1_Introduction.pdf)
+- 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter01/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01) 
-- [Question & answers (pdf)](../files/os/questions/Chapter_1_Introduction.pdf)
+- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_1_Introduction.pdf)
 
 ---
 
@@ -85,12 +85,12 @@ As the bridge between hardware and software, operating systems serve as the foun
 
 The design and organization of an operating system's internal components and mechanisms, collectively referred to as its structure, play a critical role in determining its performance, reliability, and functionality.
 
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_02_Yapilar.pdf)
-- [Lecture Notes (pdf)](../files/os/notes/Chapter_2_Structures.pdf)
-- Lab:  
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_02_Yapilar.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_2_Structures.pdf)
+- 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter02/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab02) 
-- [Question & answers (pdf)](../files/os/questions/Chapter_2_Structures.pdf)
+- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_2_Structures.pdf)
 
 ---
 
@@ -98,12 +98,12 @@ The design and organization of an operating system's internal components and mec
 
 In the world of operating systems, processes serve as the cornerstone of multi-tasking and concurrency, enabling multiple applications to execute simultaneously while sharing resources efficiently and securely.
 
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_03_Surecler.pdf)
-- [Lecture Notes (pdf)](../files/os/notes/Chapter_3_Processes.pdf)
-- Lab:  
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_03_Surecler.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_3_Processes.pdf)
+- 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter03/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab03) 
-- [Question & answers (pdf)](../files/os/questions/Chapter_3_Processes.pdf)
+- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_3_Processes.pdf)
 
 ---
 
@@ -111,12 +111,12 @@ In the world of operating systems, processes serve as the cornerstone of multi-t
 
 Threads, as lightweight execution units within a process, provide a powerful mechanism for achieving concurrency and parallelism in modern operating systems, enabling applications to take full advantage of multi-core processors and other hardware resources.
 
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_04_Is_Parcaciklari.pdf)
-- [Lecture Notes (pdf)](../files/os/notes/Chapter_4_Threads.pdf)
-- Lab:  
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_04_Is_Parcaciklari.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_4_Threads.pdf)
+- 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter04/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab04) 
-- [Question & answers (pdf)](../files/os/questions/Chapter_4_Threads.pdf)
+- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_4_Threads.pdf)
 
 ---
 
@@ -124,12 +124,12 @@ Threads, as lightweight execution units within a process, provide a powerful mec
 
 CPU scheduling is a critical component of any operating system, responsible for determining which processes and threads should be executed by the CPU at any given time, in order to maximize system throughput, responsiveness, and fairness.
 
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_05_Cizelgeleme.pdf)
-- [Lecture Notes (pdf)](../files/os/notes/Chapter_5_Scheduling.pdf)
-- Lab:  
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_05_Cizelgeleme.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_5_Scheduling.pdf)
+- 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter05/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab05) 
-- [Question & answers (pdf)](../files/os/questions/Chapter_5_Scheduling.pdf)
+- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_5_Scheduling.pdf)
 
 ---
 
@@ -137,12 +137,12 @@ CPU scheduling is a critical component of any operating system, responsible for 
 
 In a multi-threaded or multi-process environment, synchronization mechanisms provide the means for coordinating access to shared resources and ensuring consistency and correctness in the face of concurrent access and modification.
 
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_06_Senkronizasyon.pdf)
-- [Lecture Notes (pdf)](../files/os/notes/Chapter_6_Synchronization.pdf)
-- Lab:  
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_06_Senkronizasyon.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_6_Synchronization.pdf)
+- 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter06/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab06) 
-- [Question & answers (pdf)](../files/os/questions/Chapter_6_Synchronization.pdf)
+- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_6_Synchronization.pdf)
 
 ---
 
@@ -150,12 +150,12 @@ In a multi-threaded or multi-process environment, synchronization mechanisms pro
 
 Deadlocks, which occur when multiple processes or threads are blocked and unable to proceed due to conflicting resource dependencies, are a common and challenging problem in operating system design and require careful consideration of resource allocation and scheduling policies to prevent and resolve.
 
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_07_Kilitlenme.pdf)
-- [Lecture Notes (pdf)](../files/os/notes/Chapter_7_Deadlocks.pdf)
-- Lab:  
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_07_Kilitlenme.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_7_Deadlocks.pdf)
+- 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter07/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab07) 
-- [Question & answers (pdf)](../files/os/questions/Chapter_7_Deadlocks.pdf)
+- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_7_Deadlocks.pdf)
 
 ---
 
@@ -163,12 +163,12 @@ Deadlocks, which occur when multiple processes or threads are blocked and unable
 
 Memory management, which involves the allocation, monitoring, and protection of a computer's physical memory resources, is a critical component of any operating system, providing the foundation for efficient and reliable application execution.
 
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_08_Bellek_Yonetimi.pdf)
-- [Lecture Notes (pdf)](../files/os/notes/Chapter_8_Memory_management.pdf)
-- Lab:  
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_08_Bellek_Yonetimi.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_8_Memory_management.pdf)
+- 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter08/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab08) 
-- [Question & answers (pdf)](../files/os/questions/Chapter_8_Memory_management.pdf)
+- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_8_Memory_management.pdf)
 
 ---
 
@@ -176,12 +176,12 @@ Memory management, which involves the allocation, monitoring, and protection of 
 
 Virtual memory, a key technique used by modern operating systems to manage memory resources, enables applications to access a larger, virtual address space than is physically available, providing a powerful mechanism for efficient memory allocation, protection, and sharing.
 
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_09_Sanal_Bellek.pdf)
-- [Lecture Notes (pdf)](../files/os/notes/Chapter_9_Virtual_memory.pdf)
-- Lab:  
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_09_Sanal_Bellek.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_9_Virtual_memory.pdf)
+- 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter09/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab09) 
-- [Question & answers (pdf)](../files/os/questions/Chapter_9_Virtual_memory.pdf)
+- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_9_Virtual_memory.pdf)
 
 ---
 
@@ -189,12 +189,12 @@ Virtual memory, a key technique used by modern operating systems to manage memor
 
 File systems, which provide a hierarchical organization and management scheme for data storage on disk or other persistent storage devices, are a fundamental component of any modern operating system, enabling applications to store and access data efficiently and reliably.
 
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_10_Dosya_Sistemleri.pdf)
-- [Lecture Notes (pdf)](../files/os/notes/Chapter_10_File_systems.pdf)
-- Lab:  
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_10_Dosya_Sistemleri.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_10_File_systems.pdf)
+- 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter10/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab10) 
-- [Question & answers (pdf)](../files/os/questions/Chapter_10_File_systems.pdf)
+- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_10_File_systems.pdf)
 
 ---
 
@@ -202,12 +202,12 @@ File systems, which provide a hierarchical organization and management scheme fo
 
 IO operations, which involve the movement of data between a computer and external devices, are a critical component of any operating system, providing the means for applications to interact with the physical world and enabling efficient and reliable data transfer.
 
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_11_Giris_Cikis.pdf)
-- [Lecture Notes (pdf)](../files/os/notes/Chapter_11_Input_output.pdf)
-- Lab:  
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_11_Giris_Cikis.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_11_Input_output.pdf)
+- 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter11/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab11) 
-- [Question & answers (pdf)](../files/os/questions/Chapter_11_Input_output.pdf)
+- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_11_Input_output.pdf)
 
 ---
 
@@ -215,10 +215,10 @@ IO operations, which involve the movement of data between a computer and externa
 
 As multi-core processors and distributed computing systems become increasingly prevalent, the design and implementation of operating systems for multiple processor systems presents unique challenges and opportunities, requiring careful consideration of issues such as process and thread scheduling, memory management, and communication and synchronization mechanisms.
 
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_12_Cok_Islemcili_Sistemler.pdf)
-- [Lecture Notes (pdf)](../files/os/notes/Chapter_12_Multiple_processor_systems.pdf)
-- Lab [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter12/src)
-- [Question & answers (pdf)](../files/os/questions/Chapter_12_Multiple_processor_systems.pdf)
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_12_Cok_Islemcili_Sistemler.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_12_Multiple_processor_systems.pdf)
+- 💻Lab [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter12/src)
+- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_12_Multiple_processor_systems.pdf)
 
 ---
 
@@ -226,10 +226,10 @@ As multi-core processors and distributed computing systems become increasingly p
 
 Security is a critical concern in modern computing environments, and operating systems play a central role in providing the necessary mechanisms and policies to protect system resources, data, and applications from unauthorized access, modification, and other forms of attack.
 
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_13_Guvenlik.pdf)
-- [Lecture Notes (pdf)](../files/os/notes/Chapter_13_Security.pdf)
-- Lab [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter13/src)
-- [Question & answers (pdf)](../files/os/questions/Chapter_13_Security.pdf)
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_13_Guvenlik.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_13_Security.pdf)
+- 💻Lab [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter13/src)
+- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_13_Security.pdf)
 
 ---
 
@@ -237,10 +237,10 @@ Security is a critical concern in modern computing environments, and operating s
 
 With the growing demand for multimedia applications such as audio and video playback, real-time communication, and graphical rendering, operating systems must provide specialized support and optimizations to ensure efficient and responsive performance on a diverse range of hardware platforms.
 
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_14_Coklu_Ortam.pdf)
-- [Lecture Notes (pdf)](../files/os/notes/Chapter_14_Multimedia.pdf)
-- Lab [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter14/src)
-- [Question & answers (pdf)](../files/os/questions/Chapter_14_Multimedia.pdf)
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_14_Coklu_Ortam.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_14_Multimedia.pdf)
+- 💻Lab [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter14/src)
+- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_14_Multimedia.pdf)
 
 ---
 
@@ -248,13 +248,13 @@ With the growing demand for multimedia applications such as audio and video play
 
 Operating system design involves the careful consideration of a wide range of factors, including performance, reliability, security, compatibility, and usability, and requires a deep understanding of the underlying hardware and software components, as well as the needs and expectations of end-users and developers. 
 
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_15_Isletim_Sistemi_Tasarimi.pdf)
-- [Lecture Notes (pdf)](../files/os/notes/Chapter_15_Operating_system_design.pdf)
-- [Question & answers (pdf)](../files/os/questions/Chapter_15_Operating_system_design.pdf)
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_15_Isletim_Sistemi_Tasarimi.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_15_Operating_system_design.pdf)
+- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_15_Operating_system_design.pdf)
 
 ---
 
 ## Chapter 16: Case studies:
 
 **UNIX - Linux**
-- [Slides [TR] (pdf)](../files/os/slides/Bolum_16_Linux.pdf)
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_16_Linux.pdf)
