@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/process-scheduler
 title: "Process Scheduler"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

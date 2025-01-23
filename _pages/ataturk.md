@@ -1,7 +1,7 @@
 ---
 permalink: /ataturk/
 title: "Atatürk"
-author_profile: true
+author_profile: false
 redirect_from: 
   - /ataturk.html
 ---

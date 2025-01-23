@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/dijkstra-algorithm-simulator
 title: "Dijkstra Algorithm Simulator"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

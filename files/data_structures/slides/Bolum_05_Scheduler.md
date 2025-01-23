@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/priority-queue-scheduler
 title: "Priority Queue Scheduler"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

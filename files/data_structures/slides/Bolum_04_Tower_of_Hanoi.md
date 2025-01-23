@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/hanoi-towers-game
 title: "Hanoi Towers Game"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

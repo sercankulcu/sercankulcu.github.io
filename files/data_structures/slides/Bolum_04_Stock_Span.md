@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/stock-span-problem
 title: "Stock Span Problem"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

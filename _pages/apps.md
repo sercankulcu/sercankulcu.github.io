@@ -2,7 +2,7 @@
 layout: archive
 permalink: /apps/
 title: "Apps"
-author_profile: true
+author_profile: false
 ---
 
 - [car race 🏁🏎️💨](../game/car-race.html)  

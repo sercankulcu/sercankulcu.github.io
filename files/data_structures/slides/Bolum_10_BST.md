@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/binary-search-tree-simulator
 title: "Binary Search Tree Simulator"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

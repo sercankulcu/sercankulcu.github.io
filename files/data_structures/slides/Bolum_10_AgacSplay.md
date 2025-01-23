@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/splay-tree-simulator
 title: "Splay Tree Simulator"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

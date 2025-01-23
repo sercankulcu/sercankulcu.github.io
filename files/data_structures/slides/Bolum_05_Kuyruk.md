@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/queue-simulator
 title: "Queue Simulator"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

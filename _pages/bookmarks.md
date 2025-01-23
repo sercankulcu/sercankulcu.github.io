@@ -2,7 +2,7 @@
 layout: archive
 permalink: /bookmarks/
 title: "Bookmarks"
-author_profile: true
+author_profile: false
 redirect_from: 
   - /bookmark/
   - /bookmarks.html

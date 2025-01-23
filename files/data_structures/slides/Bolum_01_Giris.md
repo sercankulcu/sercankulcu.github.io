@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/intro-simulator
 title: "Introduction"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

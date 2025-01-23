@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/map-simulator
 title: "Contact List with Map"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 
