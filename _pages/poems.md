@@ -1,7 +1,7 @@
 ---
 permalink: /poems/
 title: "Poems"
-author_profile: true
+author_profile: false
 redirect_from: 
   - /poems.html
 ---

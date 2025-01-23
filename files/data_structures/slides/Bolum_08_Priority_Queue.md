@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/priority-queue-simulator
 title: "Priority Queue Simulator"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

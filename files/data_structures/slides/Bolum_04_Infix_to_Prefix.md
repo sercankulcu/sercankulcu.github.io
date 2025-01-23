@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/infix-to-prefix-converter
 title: "Infix to Prefix Converter"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

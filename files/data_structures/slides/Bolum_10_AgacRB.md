@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/red-black-tree-simulator
 title: "Red Black Tree Simulator"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

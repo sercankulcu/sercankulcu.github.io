@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/avl-tree-simulator
 title: "AVL Tree Simulator"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

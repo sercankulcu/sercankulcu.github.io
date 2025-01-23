@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/hash-table-simulator
 title: "Hash Table Simulator"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

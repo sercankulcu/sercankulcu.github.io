@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/heap-simulator
 title: "Heap Simulator"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/linked-list-simulator
 title: "Linked List Simulator"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/b-tree-simulator
 title: "B-Tree Simulator"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 

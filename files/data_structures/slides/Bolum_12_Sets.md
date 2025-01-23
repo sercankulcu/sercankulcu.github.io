@@ -2,7 +2,7 @@
 layout: archive
 permalink: /teaching/data-structures/sets-simulator
 title: "Sets Simulator"
-author_profile: true
+author_profile: false
 redirect_from: 
 ---
 
