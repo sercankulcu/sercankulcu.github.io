@@ -8,7 +8,7 @@ date: 2024-09-04
 location: "Giresun, Turkey"
 ---
 
-![computer and programming](/images/teaching/computer-and-programming.webp){: .align-left width="200" style="float: left; margin-right: 10px;"}  
+![computer and programming](/images/teaching/computer-and-programming.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
 Modern computing encompasses a vast ecosystem of interconnected technologies and tools that have become integral to our daily lives. Computers are sophisticated electronic devices managed by operating systems, which serve as the interface between hardware and software. The Internet has transformed these individual machines into a global network, enabling instantaneous communication and access to an unlimited information and services. In our professional lives, we regularly interact with office programs such as word processors, spreadsheets, and presentation software, which have digitized and streamlined workplace tasks. Behind all these tools lies the art of programming - the fundamental skill of creating software by writing instructions in various programming languages. 
 
 ## Ders Öğretim Planı
