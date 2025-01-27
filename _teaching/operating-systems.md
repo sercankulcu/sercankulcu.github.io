@@ -9,7 +9,7 @@ location: "Giresun, Turkey"
 ---
 
 ![operating systems](/images/teaching/operating-systems-course.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
-Operating systems are an essential part of modern computing, serving as the foundation of any computer system. They are responsible for managing the hardware and software resources of a computer and providing a platform for other programs to run on. An operating system acts as an intermediary between the computer hardware and the software applications that users interact with, providing a uniform interface that applications can use to communicate with the hardware. Without an operating system, a computer would be nothing more than a collection of hardware components that could not be easily controlled or utilized by users.
+Operating systems are a fundamental part of modern computing. They form the foundation of every computer system. Their main role is to manage hardware and software resources efficiently. An operating system provides a platform for programs to run. It acts as a bridge between hardware and software applications. This ensures that applications can interact with hardware using a standardized interface. The operating system handles tasks like memory management, process scheduling, and input/output operations. Without it, a computer is just a collection of hardware components. These components cannot be controlled or used effectively by users. The operating system makes the computer functional and user-friendly.
 
 ## Ders Öğretim Planı
 [Ders Öğretim Planı (PDF)](../files/os/slides/Bolum_00_Ders_Ogretim_Planı.pdf)
@@ -60,10 +60,10 @@ Operating systems are an essential part of modern computing, serving as the foun
 
 ## Preface: 
 
-Welcome to the world of operating systems, where we delve into the fundamental concepts, design principles, and implementation techniques that form the basis of modern computing systems.
+The world of operating systems is introduced as a key aspect of modern computing. Fundamental concepts, design principles, and implementation techniques are explored to highlight how interaction between hardware and software is enabled.
 
-* The prerequisities [pdf](../files/os/The_prerequisites.pdf)
-* Key figures [pdf](../files/os/Important_people.pdf)
+* The prerequisities for preparation [pdf](../files/os/The_prerequisites.pdf)
+* Key figures who have shaped the field [pdf](../files/os/Important_people.pdf)
 * Questions & Answers from OSTEP [pdf](../files/os/QA_from_OSTEP.pdf)
 
 ---
@@ -96,7 +96,7 @@ The design and organization of an operating system's internal components and mec
 
 ## Chapter 3: Processes: 
 
-In the world of operating systems, processes serve as the cornerstone of multi-tasking and concurrency, enabling multiple applications to execute simultaneously while sharing resources efficiently and securely.
+Processes serve as the cornerstone of multi-tasking and concurrency, enabling multiple applications to execute simultaneously while sharing resources efficiently and securely.
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_03_Surecler.pdf)
 - [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_3_Processes.pdf)
@@ -200,7 +200,7 @@ File systems, which provide a hierarchical organization and management scheme fo
 
 ## Chapter 11: Input/output: 
 
-IO operations, which involve the movement of data between a computer and external devices, are a critical component of any operating system, providing the means for applications to interact with the physical world and enabling efficient and reliable data transfer.
+I/O operations, which involve the movement of data between a computer and external devices, are a critical component of any operating system, providing the means for applications to interact with the physical world and enabling efficient and reliable data transfer.
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_11_Giris_Cikis.pdf)
 - [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_11_Input_output.pdf)
