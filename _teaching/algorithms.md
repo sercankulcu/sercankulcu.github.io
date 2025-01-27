@@ -65,6 +65,7 @@ Algorithms are the step-by-step procedures that form the core of computer scienc
 Sorting algorithms are the architects of order, meticulously organizing data into a specific sequence, such as ascending or descending. They are fundamental tools in computer science, used to manage and retrieve data with efficiency and precision. There’s a variety of sorting methods, each with its own strategy and performance nuances.
 
 - [🖼️Sunum-Sıralama Algoritmaları (PDF)](../files/algorithms/slides/Bolum_02_Siralama.pdf)
+- [🕹️Sorting Algorithms (HTML)](../files/algorithms/slides/Bolum_02_Sorting.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_02_Sorting.pdf)
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter02/src)
 
