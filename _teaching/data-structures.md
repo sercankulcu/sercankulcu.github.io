@@ -8,7 +8,7 @@ date: 2024-09-05
 location: "Giresun, Turkey"
 ---
 
-![data structure](/images/teaching/data-structures-course.webp){: .align-left width="200" style="float: left; margin-right: 10px;"}  
+![data structure](/images/teaching/data-structures-course.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
 Data structures are fundamental components in computer science, serving as the building blocks for organizing, managing, and storing data efficiently. They enable the systematic arrangement of data to facilitate various operations such as searching, sorting, inserting, and deleting. Common data structures include arrays, linked lists, stacks, queues, trees, and graphs, each with unique properties and use cases. These fundamental concepts are the cornerstone of computer science and programming, and a deep understanding of them empowers us to write more efficient, organized, and robust code.
 
 ## Ders Öğretim Planı  
