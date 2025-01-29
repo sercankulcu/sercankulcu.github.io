@@ -5,6 +5,7 @@ title: "Apps"
 author_profile: false
 ---
 
+- [bir kelime 🔤](../game/birkelime.html)  
 - [car race 🏁🏎️💨](../game/car-race.html)  
 - [minesweeper 💣](../game/minesweeper.html)  
 - [fortune teller 🔮✨](../game/fortune-teller.html)  
