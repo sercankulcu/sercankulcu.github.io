@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelime Oyunu</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .letters-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .letter {
+            width: 40px;
+            height: 40px;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            font-size: 20px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        button:hover {
+            background-color: #1976D2;
+        }
+
+        .score-board {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #eee;
+            border-radius: 5px;
+        }
+
+        #timer {
+            text-align: center;
+            font-size: 20px;
+            color: #ff5722;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 480px) {
+            .letter {
+                width: 36px;
+                height: 36px;
+                font-size: 20px;
+            }
+            input {
+                font-size: 18px;
+                padding: 12px;
+            }
+            button {
+                font-size: 16px;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="score-board">
+            Toplam Puan: <span id="score">0</span>
+        </div>
+        <div id="timer">Kalan Süre: 30</div>
+        <div class="letters-container" id="letters"></div>
+        <input type="text" id="wordInput" placeholder="Kelimenizi yazın" maxlength="6">
+        <button onclick="checkWord()">Kontrol Et</button>
+        <button onclick="newGame()">Yeni Oyun</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        let score = 0;
+        let letters = [];
+        let timer;
+        let timeLeft = 30;
+
+        function generateLetters() {
+            const vowels = ['A', 'E', 'I', 'İ', 'O', 'Ö', 'U', 'Ü'];
+            const consonants = ['B', 'C', 'Ç', 'D', 'F', 'G', 'Ğ', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'Ş', 'T', 'V', 'Y', 'Z'];
+            
+            // 3 sesli + 3 sessiz harf
+            let newLetters = [
+                ...vowels.sort(() => 0.5 - Math.random()).slice(0, 2),
+                ...consonants.sort(() => 0.5 - Math.random()).slice(0, 4)
+            ].sort(() => 0.5 - Math.random());
+            
+            return newLetters;
+        }
+
+        function updateLetters() {
+            const container = document.getElementById('letters');
+            container.innerHTML = '';
+            letters.forEach(letter => {
+                const div = document.createElement('div');
+                div.className = 'letter';
+                div.textContent = letter;
+                container.appendChild(div);
+            });
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 30;
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = `Kalan Süre: ${timeLeft}`;
+                
+                if(timeLeft <= 0) {
+                    clearInterval(timer);
+                    letters = generateLetters();
+                    updateLetters();
+                    startTimer();
+                }
+            }, 1000);
+        }
+		
+		
+		let isValidTDK = true;
+		
+		function checkTDK(word) {
+		console.log(word);
+		
+		fetch("https://sozluk.gov.tr/gts?ara=" + word)
+.then((response)=>response.json())
+.then((json)=> { 
+if(json.length != undefined) 
+{
+isValidTDK = true;
+}
+else {
+isValidTDK = false; 
+} })
+.catch((err)=> console.log(err));
+}
+
+
+String.prototype.turkishToUpper = function(){
+    var string = this;
+    var letters = { "i": "İ", "ş": "Ş", "ğ": "Ğ", "ü": "Ü", "ö": "Ö", "ç": "Ç", "ı": "I" };
+    string = string.replace(/(([iışğüçö]))+/g, function(letter){ return letters[letter]; })
+    return string.toUpperCase();
+}
+
+        async function checkWord() { // async ekledik
+		
+		let isValid = true;
+    const input = document.getElementById('wordInput').value.turkishToUpper();
+    const tempLetters = [...letters];
+    
+    // Harf kontrolü
+    for(let char of input) {
+        const index = tempLetters.indexOf(char);
+        if(index === -1) {
+            isValid = false;
+            break;
+        }
+        tempLetters.splice(index, 1);
+    }
+	
+    // TDK kontrolü için await ekledik
+    if(isValid) {
+        try {
+		isValidTDK = true;
+            await checkTDK(input); // Küçük harfe çevir
+			await new Promise(resolve => setTimeout(resolve, 1000)); // 1 saniye bekle
+            console.log('TDK Sonucu:', isValidTDK);
+        } catch (error) {
+            isValidTDK = false;
+        }
+    }
+
+    if(isValidTDK && input.length >= 2) {
+        score += input.length * 10;
+        document.getElementById('score').textContent = score;
+        showMessage(`+${input.length * 10} puan kazandınız!`, 'green');
+    } else {
+        showMessage('Geçersiz kelime!', 'red');
+    }
+	document.getElementById('wordInput').value = '';
+}
+
+        function showMessage(text, color) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.style.color = color;
+            setTimeout(() => messageDiv.textContent = '', 2000);
+        }
+
+        function newGame() {
+            score = 0;
+            document.getElementById('score').textContent = '0';
+            letters = generateLetters();
+            updateLetters();
+            startTimer();
+            document.getElementById('wordInput').value = '';
+        }
+
+        // Input kontrolü
+        document.getElementById('wordInput').addEventListener('input', function(e) {
+            this.value = this.value;
+        });
+
+        // Oyunu başlat
+        newGame();
+    </script>
+</body>
+</html>
