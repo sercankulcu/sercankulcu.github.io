@@ -100,6 +100,7 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
 Have you ever wondered how your computer or smartphone handles text so efficiently? String algorithms are the craftsmen of text processing, weaving through characters to perform tasks like searching, sorting, and editing text. They are crucial in fields like computational biology for DNA sequencing, in search engines for matching queries, or even in text editors for find-and-replace functions. 
 
 - [🖼️Sunum-Dizgi Algoritmaları (PDF)](../files/algorithms/slides/Bolum_05_Dizgi.pdf)  
+- [🖼️Sunum-Trie (PDF)](../files/algorithms/slides/Bolum_05_Tries.pdf)  
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_05_Dynamic.pdf)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter05/src)
 
