@@ -99,12 +99,7 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
 
 Have you ever wondered how your computer or smartphone handles text so efficiently? String algorithms are the craftsmen of text processing, weaving through characters to perform tasks like searching, sorting, and editing text. They are crucial in fields like computational biology for DNA sequencing, in search engines for matching queries, or even in text editors for find-and-replace functions. 
 
-- [🖼️Sunum-Dizgi Eşleme (PDF)](../files/algorithms/slides/Bolum_05_01_Dizgi_Esleme.pdf)  
-- [🖼️Sunum-Dizgi Sıkıştırma (PDF)](../files/algorithms/slides/Bolum_05_02_Dizgi_Sikistirma.pdf)  
-- [🖼️Sunum-Dizgi Sıralama (PDF)](../files/algorithms/slides/Bolum_05_03_Dizgi_Siralama.pdf)  
-- [🖼️Sunum-Dizgi Ayrıştırma (PDF)](../files/algorithms/slides/Bolum_05_04_Dizgi_Ayristirma.pdf)  
-- [🖼️Sunum-Dizgi Düzenleme (PDF)](../files/algorithms/slides/Bolum_05_05_Dizgi_Duzenleme_Mesafe.pdf)  
-- [🖼️Sunum-Dizgi Dönüştürme (PDF)](../files/algorithms/slides/Bolum_05_06_Dizgi_Donusturme.pdf)  
+- [🖼️Sunum-Dizgi Algoritmaları (PDF)](../files/algorithms/slides/Bolum_05_Dizgi.pdf)  
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_05_Dynamic.pdf)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter05/src)
 
