@@ -5,17 +5,17 @@ title: "Apps"
 author_profile: false
 ---
 
-- [adam asmaca 😵🪜](../game/hangman/hangman.html)  
-- [bir kelime 🔤](../game/birkelime.html)  
-- [matematusta 🧮](../game/matematusta.html)  
-- [car race 🏁🏎️💨](../game/car-race.html)  
-- [yazı tura 🪙](../game/yazitura.html)  
-- [minesweeper 💣](../game/minesweeper.html)  
-- [fortune teller 🔮✨](../game/fortune-teller.html)  
-- [tarot 🃏🔮](../game/tarot/tarot-reader.html)  
-- [connect4 🔴🔵](../game/connectfour.html)  
-- [sudoku 🔢](../game/sudoku.html)  
-- [basketball 🏀](../game/basketball.html)  
-- [iq test 🧠](../game/iqtest.html)  
-- [mantra 🙏](../game/mantra.html)
-- [anunnaki 👽](../game/anunnaki.html)  
+<button onclick="location.href='../game/hangman/hangman.html'">😵🪜 ADAM ASMACA</button>
+<button onclick="location.href='../game/birkelime.html'">🔤 BİR KELİME</button>
+<button onclick="location.href='../game/matematusta.html'">🧮 MATEMATUSTA</button>
+<button onclick="location.href='../game/car-race.html'">🏁🏎️💨 CAR RACE</button>
+<button onclick="location.href='../game/yazitura.html'">🪙 YAZI TURA</button>
+<button onclick="location.href='../game/minesweeper.html'">💣 MINESWEEPER</button>
+<button onclick="location.href='../game/fortune-teller.html'">🔮✨ FORTUNE TELLER</button>
+<button onclick="location.href='../game/tarot/tarot-reader.html'">🃏🔮 TAROT</button>
+<button onclick="location.href='../game/connectfour.html'">🔴🔵 CONNECT4</button>
+<button onclick="location.href='../game/sudoku.html'">🔢 SUDOKU</button>
+<button onclick="location.href='../game/basketball.html'">🏀 BASKETBALL</button>
+<button onclick="location.href='../game/iqtest.html'">🧠 IQ TEST</button>
+<button onclick="location.href='../game/mantra.html'">🙏 MANTRA</button>
+<button onclick="location.href='../game/anunnaki.html'">👽 ANUNNAKI</button>
