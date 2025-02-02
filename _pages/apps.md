@@ -15,6 +15,7 @@ author_profile: false
 - [tarot 🃏🔮](../game/tarot/tarot-reader.html)  
 - [connect4 🔴🔵](../game/connectfour.html)  
 - [sudoku 🔢](../game/sudoku.html)  
+- [basketball 🏀](../game/basketball.html)  
 - [iq test 🧠](../game/iqtest.html)  
 - [mantra 🙏](../game/mantra.html)
 - [anunnaki 👽](../game/anunnaki.html)  
