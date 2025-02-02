@@ -35,16 +35,15 @@ window.addEventListener("appinstalled", () => {
 });
 </script>
 
-Learn about my teaching experience, materials, and educational contributions. 
-<button onclick="location.href=teaching"> 📚 Go to Teaching </button>
+Learn about my teaching experience, materials, and educational contributions. <button onclick="location.href='teaching'"> 📚 Go to Teaching </button>
 
-Check out the small apps and games I've developed with Javascript in my free time. [Apps](apps)
+Check out the small apps and games I've developed with Javascript in my free time. <button onclick="location.href='apps'">📱 Apps</button>
 
-Explore my CV to learn about my education, professional experience, and skills. [CV](cv)
+Explore my CV to learn about my education, professional experience, and skills. <button onclick="location.href='cv'">📄 Resume</button>
 
-Discover my curated collection of bookmarks, featuring useful resources and interesting content. [Bookmark](bookmarks)
+Discover my curated collection of bookmarks, featuring useful resources and interesting content. <button onclick="location.href='bookmarks'">🔖 Bookmarks</button>
 
-Read my blog posts where I share insights, experiences, and ideas on various topics. [Blog Posts](posts)
+Read my blog posts where I share insights, experiences, and ideas on various topics. <button onclick="location.href='posts'">📝 Blog Posts</button>
 
 **Note:** If any licensed content is found on the website, please don't hesitate to contact me via the links on the left-hand side. You can be sure that any related content will be quickly removed within 24 hours.
 
