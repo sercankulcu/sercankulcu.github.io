@@ -11,7 +11,10 @@ redirect_from:
 
 I am <u>Sercan Külcü</u>, an Assistant Professor in the <u>Computer Science Department</u> at <u>Giresun University</u>. With over <u>20 years</u> of professional experience in <u>software engineering</u>, I hold a <u>PhD</u> specializing in <u>low-power wireless communication technologies</u>. My expertise spans <u>embedded</u> and <u>real-time operating systems</u>, programming in <u>C</u>, <u>C++</u>, and <u>Java</u>, as well as the application of <u>machine learning techniques</u>. Recently, I have also enjoyed developing small applications with <u>JavaScript</u>.
 
-<button id="installPWA" style="display: none;"> 🚀 Click to Install App </button>
+<div class="install-container">
+    <span>Click to Install App</span>
+    <button id="installPWA" style="display: none;">🚀 Click to Install App</button>
+</div>
 
 <script>
 let deferredPrompt;
@@ -19,7 +22,7 @@ let deferredPrompt;
 window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     deferredPrompt = event;
-    document.getElementById("installPWA").style.display = "block";
+    document.getElementById("installPWA").style.display = "inline-block"; // Changed to inline-block for side by side
 });
 
 document.getElementById("installPWA").addEventListener("click", async () => {
@@ -34,6 +37,30 @@ window.addEventListener("appinstalled", () => {
     document.getElementById("installPWA").style.display = "none";
 });
 </script>
+
+<style>
+.install-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between text and button */
+}
+
+#installPWA {
+    padding: 12px 24px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+#installPWA:hover {
+    background-color: #45a049;
+}
+</style>
+
 
 Learn about my <button onclick="location.href='teaching'"> 📚 teaching </button> experience, materials, and educational contributions. 
 
