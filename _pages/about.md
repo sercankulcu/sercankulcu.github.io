@@ -11,7 +11,7 @@ redirect_from:
 
 I am <u>Sercan Külcü</u>, an Assistant Professor in the <u>Computer Science Department</u> at <u>Giresun University</u>. With over <u>20 years</u> of professional experience in <u>software engineering</u>, I hold a <u>PhD</u> specializing in <u>low-power wireless communication technologies</u>. My expertise spans <u>embedded</u> and <u>real-time operating systems</u>, programming in <u>C</u>, <u>C++</u>, and <u>Java</u>, as well as the application of <u>machine learning techniques</u>. Recently, I have also enjoyed developing small applications with <u>JavaScript</u>.
 
-Click the button to install the app: <button id="installPWA" style="display: none;"> 🚀 Install App </button>
+<button id="installPWA" style="display: none;"> 🚀 Click to Install App </button>
 
 <script>
 let deferredPrompt;
@@ -35,15 +35,15 @@ window.addEventListener("appinstalled", () => {
 });
 </script>
 
-Learn about my teaching experience, materials, and educational contributions. <button onclick="location.href='teaching'"> 📚 Go to Teaching </button>
+Learn about my <button onclick="location.href='teaching'"> 📚 teaching </button> experience, materials, and educational contributions. 
 
-Check out the small apps and games I've developed with Javascript in my free time. <button onclick="location.href='apps'">📱 Apps</button>
+Check out the small <button onclick="location.href='apps'">📱 apps</button> and games I've developed with Javascript in my free time. 
 
-Explore my CV to learn about my education, professional experience, and skills. <button onclick="location.href='cv'">📄 Resume</button>
+Explore my <button onclick="location.href='cv'">📄 resume</button> to learn about my education, professional experience, and skills. 
 
-Discover my curated collection of bookmarks, featuring useful resources and interesting content. <button onclick="location.href='bookmarks'">🔖 Bookmarks</button>
+Discover my curated collection of <button onclick="location.href='bookmarks'">🔖 bookmarks</button>, featuring useful resources and interesting content. 
 
-Read my blog posts where I share insights, experiences, and ideas on various topics. <button onclick="location.href='posts'">📝 Blog Posts</button>
+Read my <button onclick="location.href='posts'">📝 blog posts</button> where I share insights, experiences, and ideas on various topics. 
 
 **Note:** If any licensed content is found on the website, please don't hesitate to contact me via the links on the left-hand side. You can be sure that any related content will be quickly removed within 24 hours.
 
