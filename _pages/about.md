@@ -11,7 +11,7 @@ redirect_from:
 
 I am <u>Sercan Külcü</u>, an Assistant Professor in the <u>Computer Science Department</u> at <u>Giresun University</u>. With over <u>20 years</u> of professional experience in <u>software engineering</u>, I hold a <u>PhD</u> specializing in <u>low-power wireless communication technologies</u>. My expertise spans <u>embedded</u> and <u>real-time operating systems</u>, programming in <u>C</u>, <u>C++</u>, and <u>Java</u>, as well as the application of <u>machine learning techniques</u>. Recently, I have also enjoyed developing small applications with <u>JavaScript</u>.
 
-<button id="installPWA" style="display: none;"> 🚀 Install App </button>
+Click the button to install the app: <button id="installPWA" style="display: none;"> 🚀 Install App </button>
 
 <script>
 let deferredPrompt;
@@ -35,7 +35,8 @@ window.addEventListener("appinstalled", () => {
 });
 </script>
 
-Learn about my teaching experience, materials, and educational contributions. [Teaching](teaching)
+Learn about my teaching experience, materials, and educational contributions. 
+<button onclick="location.href=teaching"> 📚 Go to Teaching </button>
 
 Check out the small apps and games I've developed with Javascript in my free time. [Apps](apps)
 
