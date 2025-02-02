@@ -9,7 +9,40 @@ redirect_from:
 
 <img align="right" width="150" alt="owl coffee beans" src="/images/owl-coffee-beans.webp">
 
-<button id="installPWA" style="display: none;">Install App</button>
+I am <u>Sercan Külcü</u>, an Assistant Professor in the <u>Computer Science Department</u> at <u>Giresun University</u>. With over <u>20 years</u> of professional experience in <u>software engineering</u>, I hold a <u>PhD</u> specializing in <u>low-power wireless communication technologies</u>. My expertise spans <u>embedded</u> and <u>real-time operating systems</u>, programming in <u>C</u>, <u>C++</u>, and <u>Java</u>, as well as the application of <u>machine learning techniques</u>. Recently, I have also enjoyed developing small applications with <u>JavaScript</u>.
+
+# Install PWA
+
+Click the button below to install the app:
+
+<button id="installPWA" class="install-btn" style="display: none;">
+    🚀 Install App
+</button>
+
+<style>
+.install-btn {
+    background: linear-gradient(135deg, #ff7eb3, #ff758c);
+    color: white;
+    font-size: 18px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: bold;
+    outline: none;
+    box-shadow: 0px 4px 10px rgba(255, 118, 136, 0.5);
+}
+
+.install-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0px 6px 14px rgba(255, 118, 136, 0.7);
+}
+
+.install-btn:active {
+    transform: scale(0.95);
+}
+</style>
 
 <script>
 let deferredPrompt;
@@ -32,9 +65,6 @@ window.addEventListener("appinstalled", () => {
     document.getElementById("installPWA").style.display = "none";
 });
 </script>
-
-
-I am <u>Sercan Külcü</u>, an Assistant Professor in the <u>Computer Science Department</u> at <u>Giresun University</u>. With over <u>20 years</u> of professional experience in <u>software engineering</u>, I hold a <u>PhD</u> specializing in <u>low-power wireless communication technologies</u>. My expertise spans <u>embedded</u> and <u>real-time operating systems</u>, programming in <u>C</u>, <u>C++</u>, and <u>Java</u>, as well as the application of <u>machine learning techniques</u>. Recently, I have also enjoyed developing small applications with <u>JavaScript</u>.
 
 Learn about my teaching experience, materials, and educational contributions. [Teaching](teaching)
 
