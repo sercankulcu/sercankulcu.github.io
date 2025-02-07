@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Personality Test</title>
+    <style>
+        .container {
+            margin: 0 auto;
+            padding: 10px;
+            text-align: center;
+        }
+        .stage {
+			height: 90%;
+            display: none;
+        }
+        .active-stage {
+			height: 90%;
+            display: block;
+        }
+		.word-box {
+			position: relative;
+			width: 90%;
+			height: 90%;
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px;
+        }
+        .word-item {
+            background: #f0f0f0;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: all 2s;
+			position: absolute; /* Mutlak konumlandırma */
+			font-weight: bold;
+        }
+        .word-item:hover {
+            background: #e0e0e0;
+        }
+        .popped {
+            transform: scale(0);
+            opacity: 0;
+        }
+        .progress-bar {
+            height: 5px;
+            background: #eee;
+            margin: 10px 0;
+        }
+        .progress {
+            height: 100%;
+            background: #4CAF50;
+            transition: width 0.3s;
+        }
+		.progress-container-top {
+			position: fixed;
+			top: 11%; /* Biraz daha yukarıda olacak */
+			left: 50%;
+			transform: translateX(-50%);
+			width: 90%;
+			height: 5px;
+			background: #eee;
+			border-radius: 5px;
+			overflow: hidden;
+		}
+		.progress-container-bottom {
+			position: fixed;
+			bottom: 11%; /* Biraz daha yukarıda olacak */
+			left: 50%;
+			transform: translateX(-50%);
+			width: 90%;
+			height: 5px;
+			background: #eee;
+			border-radius: 5px;
+			overflow: hidden;
+		}
+		#nextBtn {
+			position: fixed;
+			bottom: 3%;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 200px;
+			padding: 12px 20px;
+			background: #4CAF50;
+			color: white;
+			border: none;
+			border-radius: 8px;
+			font-size: 16px;
+			cursor: pointer;
+		}
+
+		#nextBtn:disabled {
+			background: #ccc;
+			cursor: not-allowed;
+		}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="progress-container-top">
+				<div class="progress" style="width: 0%"></div>
+			</div>
+        <div id="stage1" class="stage active-stage">
+            <h2>Choose Words That DON'T Describe You</h2>
+			
+            <div class="word-box" data-trait-pair="Outgoing/Reserved"></div>
+        </div>
+        
+        <div id="stage2" class="stage">
+            <h2>Choose Words That DON'T Describe You</h2>
+            <div class="word-box" data-trait-pair="Creative/Practical"></div>
+        </div>
+        
+        <div id="stage3" class="stage">
+            <h2>Choose Words That DON'T Describe You</h2>
+            <div class="word-box" data-trait-pair="Objective/Subjective"></div>
+        </div>
+        
+        <div id="stage4" class="stage">
+            <h2>Choose Words That DON'T Describe You</h2>
+            <div class="word-box" data-trait-pair="Planned/Spontaneous"></div>
+        </div>
+        
+        <div id="stage5" class="stage">
+            <h2>Choose Words That DON'T Describe You</h2>
+            <div class="word-box" data-trait-pair="Confident/Sensitive"></div>
+        </div>
+        <div class="progress-container-bottom">
+				<div class="progress" style="width: 0%"></div>
+			</div>
+        <button id="nextBtn" onclick="nextStage()" disabled>Next</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const traits = {
+            "Outgoing/Reserved": {
+                Outgoing: ["Sociable", "Gregarious", "Interactive", "Engaging", "Expressive", "Enthusiastic", "Dynamic", "Vibrant", "Affable"],
+                Reserved: ["Reflective", "Introspective", "Quiet", "Contemplative", "Independent", "Self-Contained", "Thoughtful", "Calm", "Grounded"]
+            },
+            "Creative/Practical": {
+                Creative: ["Imaginative", "Visionary", "Conceptual", "Abstract", "Insightful", "Perceptive", "Innovative", "Future-Oriented", "Big-Picture Thinker"],
+                Practical: ["Detail-Oriented", "Realistic", "Sensory", "Fact-Based", "Grounded", "Present-Focused", "Attentive", "Analytical", "Methodical"]
+            },
+            "Objective/Subjective": {
+                Objective: ["Logical", "Rational", "Critical", "Problem-Solving", "Detached", "Impartial", "Strategic", "Decisive", "Analytical"],
+                Subjective: ["Empathetic", "Compassionate", "Caring", "Harmonious", "Cooperative", "Supportive", "Sensitive", "Passionate", "Value-Driven"]
+            },
+            "Planned/Spontaneous": {
+                Planned: ["Organized", "Structured", "Decisive", "Scheduled", "Methodical", "Disciplined", "Efficient", "Conscientious", "Goal-Oriented"],
+                Spontaneous: ["Flexible", "Adaptable", "Curious", "Open-Ended", "Exploratory", "Resourceful", "Adventurous", "Unstructured", "Options-Oriented"]
+            },
+            "Confident/Sensitive": {
+                Confident: ["Decisive", "Self-Assured", "Determined", "Independent", "Proactive", "Courageous", "Direct", "Forceful", "Resolute"],
+                Sensitive: ["Reactive", "Emotional", "Anxious", "Insecure", "Self-Conscious", "Perfectionistic", "Variable", "Concerned", "Reflective"]
+            }
+        };
+
+        let currentStage = 1;
+        let results = {};
+
+        const colorPalette = [
+			"#FF5733", "#33FF57", "#3357FF", "#FF33A8", "#A833FF",
+			"#FFD700", "#00FA9A", "#FF4500", "#6495ED", "#FF1493",
+			"#00CED1", "#DC143C", "#32CD32", "#8A2BE2", "#20B2AA"
+		];
+
+		function initializeTest() {
+			let colorIndex = 0;
+			Object.keys(traits).forEach((pair, index) => {
+				const words = [...traits[pair][pair.split('/')[0]], ...traits[pair][pair.split('/')[1]]];
+				const container = document.querySelectorAll('.word-box')[index];
+				
+				container.innerHTML = words.map(word => {
+					const color = colorPalette[colorIndex % colorPalette.length]; // Sırayla renk seç
+					colorIndex++;
+					return `<div class="word-item" onclick="toggleWord(this)" 
+								data-trait="${getTraitForWord(pair, word)}"
+								style="background: ${color};">
+								${word}
+							</div>`;
+				}).join('');
+			});
+		}
+
+        function getTraitForWord(pair, word) {
+            return Object.keys(traits[pair]).find(trait => traits[pair][trait].includes(word));
+        }
+
+        function toggleWord(element) {
+            element.classList.toggle('popped');
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function nextStage() {
+            const currentContainer = document.querySelector(`#stage${currentStage} .word-box`);
+            const remainingWords = Array.from(currentContainer.querySelectorAll('.word-item:not(.popped)'));
+            
+            const traitPair = currentContainer.dataset.traitPair.split('/');
+            const traitCounts = {
+                [traitPair[0]]: 0,
+                [traitPair[1]]: 0
+            };
+
+            remainingWords.forEach(word => {
+                const trait = word.dataset.trait;
+                traitCounts[trait]++;
+            });
+
+            const result = traitCounts[traitPair[0]] > traitCounts[traitPair[1]] ? traitPair[0] : traitPair[1];
+            results[currentStage] = result;
+
+            if(currentStage < 5) {
+                document.querySelector(`#stage${currentStage}`).classList.remove('active-stage');
+                currentStage++;
+                document.querySelector(`#stage${currentStage}`).classList.add('active-stage');
+                document.querySelector('.progress').style.width = `${(currentStage-1)*20}%`;
+                document.getElementById('nextBtn').disabled = true;
+            } else {
+				document.querySelector(`#stage${currentStage}`).classList.remove('active-stage');
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('nextBtn').style.display = 'none';
+            document.querySelector('.progress').style.width = '100%';
+
+            const resultHTML = `
+                <h2>Your Personality Type:</h2>
+				<h2>...</h2>
+                <p>${results[1]} | ${results[2]} | ${results[3]} | ${results[4]} | ${results[5]}</p>
+                <button onclick="location.reload()">Retake Test</button>
+            `;
+            
+            document.getElementById('result').innerHTML = resultHTML;
+        }
+
+        function randomizePositions() {
+			document.querySelectorAll('.word-box').forEach(box => {
+			const boxWidth = window.innerWidth * 0.9; // Sayfa genişliği
+			const boxHeight = window.innerHeight * 0.95; // Sayfa yüksekliği
+			const threshold = window.innerHeight * 0.25;
+
+			box.querySelectorAll('.word-item').forEach(item => {
+				const itemWidth = item.offsetWidth;
+				const itemHeight = item.offsetHeight + threshold;
+
+				let randomX, randomY, overlapping;
+				let attempts = 0;
+
+				do {
+					overlapping = false;
+					randomX = Math.random() * (boxWidth - itemWidth);
+					randomY = Math.random() * (boxHeight - itemHeight);
+
+					// Çakışma kontrolü
+					box.querySelectorAll('.word-item').forEach(otherItem => {
+						if (otherItem !== item) {
+							const otherX = parseFloat(otherItem.style.left || "0");
+							const otherY = parseFloat(otherItem.style.top || "0");
+
+							if (
+								randomX < otherX + otherItem.offsetWidth &&
+								randomX + itemWidth > otherX &&
+								randomY < otherY + otherItem.offsetHeight &&
+								randomY + itemHeight > otherY
+							) {
+								overlapping = true;
+							}
+						}
+					});
+
+					attempts++;
+				} while (overlapping && attempts < 100); // Maksimum deneme sayısı
+
+				item.style.left = `${randomX}px`;
+				item.style.top = `${randomY}px`;
+			});
+		});
+	}
+
+// Testi başlatırken ilk kez çağır
+initializeTest();
+setTimeout(randomizePositions, 100);
+
+// Her aşamada rastgele yerleştirme
+function nextStage() {
+    const currentContainer = document.querySelector(`#stage${currentStage} .word-box`);
+    const remainingWords = Array.from(currentContainer.querySelectorAll('.word-item:not(.popped)'));
+    
+    const traitPair = currentContainer.dataset.traitPair.split('/');
+    const traitCounts = {
+        [traitPair[0]]: 0,
+        [traitPair[1]]: 0
+    };
+
+    remainingWords.forEach(word => {
+        const trait = word.dataset.trait;
+        traitCounts[trait]++;
+    });
+
+    const result = traitCounts[traitPair[0]] > traitCounts[traitPair[1]] ? traitPair[0] : traitPair[1];
+    results[currentStage] = result;
+
+    if (currentStage < 5) {
+        document.querySelector(`#stage${currentStage}`).classList.remove('active-stage');
+        currentStage++;
+        document.querySelector(`#stage${currentStage}`).classList.add('active-stage');
+        document.querySelector('.progress').style.width = `${(currentStage - 1) * 20}%`;
+        document.getElementById('nextBtn').disabled = true;
+
+        // Yeni aşamada kelimeleri rastgele yerleştir
+        setTimeout(randomizePositions, 100);
+    } else {
+		document.querySelector(`#stage${currentStage}`).classList.remove('active-stage');
+        showResults();
+    }
+}
+
+    </script>
+</body>
+</html>

@@ -23,5 +23,6 @@ author_profile: false
 <button onclick="location.href='../game/sudoku.html'">🔢 SUDOKU</button> 
 <button onclick="location.href='../game/basketball.html'">🏀 BASKETBALL</button> 
 <button onclick="location.href='../game/iqtest.html'">🧠 IQ TEST</button> 
+<button onclick="location.href='../game/personality-test.html'">🌟 PERSONALITY TEST</button> 
 <button onclick="location.href='../game/mantra.html'">🙏 MANTRA</button> 
 <button onclick="location.href='../game/anunnaki.html'">👽 ANUNNAKI</button>  
