@@ -3,7 +3,6 @@ permalink: /poems/
 title: "Poems"
 author_profile: false
 redirect_from: 
-  - /poems.html
 ---
 
 Akrep gibisin kardeşim / Nazım Hikmet RAN
