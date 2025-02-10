@@ -4,8 +4,6 @@ permalink: /bookmarks/
 title: "Bookmarks"
 author_profile: false
 redirect_from: 
-  - /bookmark/
-  - /bookmarks.html
 ---
 
 * <a href="https://chat.openai.com/">[ChatGPT]</a> a chatbot launched by OpenAI 
