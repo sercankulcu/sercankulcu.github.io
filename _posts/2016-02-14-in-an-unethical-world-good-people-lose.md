@@ -40,4 +40,4 @@ Yes—but not alone. Miandji’s quote is a call to action, not despair. Solutio
 
 Miandji’s words are a mirror. They ask: Do we want a world where “winning” requires losing our morals? Or can we build systems where goodness thrives? The choice is ours. As he implies: Ethics aren’t the problem. Unethical environments are. Fix the soil, and the flower grows.
 
-> “The first step to change is seeing the game.” — A philosopher’s addendum to Miandji’s wisdom.
+> “The first step to change is seeing the game.” 
