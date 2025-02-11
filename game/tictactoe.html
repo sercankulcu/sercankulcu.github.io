@@ -72,7 +72,7 @@
         let currentPlayer = 'X';
         let gameBoard = Array(9).fill(null);
         
-        function checkWinner() {
+        function checkWinner(isFinalCheck = true) {
             const winPatterns = [
                 [0, 1, 2], [3, 4, 5], [6, 7, 8],
                 [0, 3, 6], [1, 4, 7], [2, 5, 8],
@@ -81,28 +81,87 @@
             for (let pattern of winPatterns) {
                 const [a, b, c] = pattern;
                 if (gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]) {
-                    status.textContent = `🎉 Player ${gameBoard[a]} Wins!`;
-                    board.removeEventListener('click', handleClick);
-                    return true;
+                    if (isFinalCheck) {
+                        status.textContent = `🎉 Player ${gameBoard[a]} Wins!`;
+                        board.removeEventListener('click', handleClick);
+                    }
+                    return gameBoard[a]; 
                 }
             }
             if (!gameBoard.includes(null)) {
-                status.textContent = "🤝 It's a Draw!";
-                return true;
+                if (isFinalCheck) status.textContent = "🤝 It's a Draw!";
+                return "draw";
             }
-            return false;
+            return null;
+        }
+
+        function minimaxCheckWinner(board) {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            for (let pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    return board[a]; 
+                }
+            }
+            if (!board.includes(null)) return "draw";
+            return null;
         }
 
         function handleClick(e) {
             const index = e.target.dataset.index;
-            if (!gameBoard[index]) {
+            if (!gameBoard[index] && currentPlayer === 'X') {
                 gameBoard[index] = currentPlayer;
                 e.target.textContent = currentPlayer;
                 if (!checkWinner()) {
-                    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-                    status.textContent = `Player ${currentPlayer}'s Turn`;
+                    currentPlayer = 'O';
+                    status.textContent = "Computer's Turn";
+                    setTimeout(computerMove, 500);
                 }
             }
+        }
+
+        function computerMove() {
+            let bestMove = minimax(gameBoard, 'O').index;
+            if (bestMove !== undefined) {
+                gameBoard[bestMove] = 'O';
+                document.querySelector(`[data-index='${bestMove}']`).textContent = 'O';
+                if (!checkWinner()) {
+                    currentPlayer = 'X';
+                    status.textContent = "Player X's Turn";
+                    board.addEventListener('click', handleClick); 
+                }
+            }
+        }
+
+        function minimax(newBoard, player) {
+            const availableSpots = newBoard.map((val, idx) => val === null ? idx : null).filter(val => val !== null);
+            
+            let winner = minimaxCheckWinner(newBoard);
+            if (winner === 'X') return { score: -10 };
+            if (winner === 'O') return { score: 10 };
+            if (winner === 'draw') return { score: 0 };
+            
+            let moves = [];
+            for (let i of availableSpots) {
+                let move = { index: i };
+                newBoard[i] = player;
+                
+                let result = minimax(newBoard, player === 'O' ? 'X' : 'O');
+                move.score = result.score;
+                
+                newBoard[i] = null;
+                moves.push(move);
+            }
+            
+            let bestMove = player === 'O'
+                ? moves.reduce((best, m) => (m.score > best.score ? m : best), { score: -Infinity })
+                : moves.reduce((best, m) => (m.score < best.score ? m : best), { score: Infinity });
+            
+            return bestMove;
         }
 
         function resetGame() {
