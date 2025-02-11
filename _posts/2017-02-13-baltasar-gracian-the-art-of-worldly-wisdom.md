@@ -14,21 +14,21 @@ Gracián was born in 1601 in Spain. He was a Jesuit priest and a deep thinker. H
 
 This book is a guide to life. It helps people understand the world. It teaches how to be smart, careful, and successful. Each lesson is short but deep. Gracián explains how to deal with people, make decisions, and avoid mistakes.
 
-### Key Lessons from the Book
+## Key Lessons from the Book
 
-* 1. Think Before You Speak: Words have power. Speak only when necessary. Silence is often better than talking too much.
+* Think Before You Speak: Words have power. Speak only when necessary. Silence is often better than talking too much.
 
-* 2. Choose Your Friends Wisely: The people around you shape your life. Stay close to the wise and avoid fools.
+* Choose Your Friends Wisely: The people around you shape your life. Stay close to the wise and avoid fools.
 
-* 3. Appearances Matter: People judge by what they see. Dress well and act with confidence. First impressions last.
+* Appearances Matter: People judge by what they see. Dress well and act with confidence. First impressions last.
 
-* 4. Be Patient and Wait for the Right Moment: Not every opportunity is good. Wait for the right time to act. Patience brings success.
+* Be Patient and Wait for the Right Moment: Not every opportunity is good. Wait for the right time to act. Patience brings success.
 
-* 5. Control Your Emotions: Anger and fear can lead to mistakes. Stay calm in difficult situations. A clear mind wins.
+* Control Your Emotions: Anger and fear can lead to mistakes. Stay calm in difficult situations. A clear mind wins.
 
-* 6. Learn from Others: Observe successful people. Imitate their good habits. Avoid their mistakes.
+* Learn from Others: Observe successful people. Imitate their good habits. Avoid their mistakes.
 
-* 7. Keep Some Things Private: Not everyone needs to know your plans. Some secrets protect your success.
+* Keep Some Things Private: Not everyone needs to know your plans. Some secrets protect your success.
 
 > Why Is This Book Important Today?
 
