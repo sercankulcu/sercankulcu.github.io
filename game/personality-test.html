@@ -1,493 +1,493 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Personality Test</title>
-    <style>
-        .container {
-            margin: 0 auto;
-            padding: 1vh 1vw;
-            text-align: center;
-        }
-        .stage {
-			height: 90%;
-            display: none;
-            text-align: center;
-        }
-        .active-stage {
-			height: 90%;
-            display: block;
-            font-size: max(1.8vh, 18px);
-        }
-		.word-box {
-			position: relative;
-			width: 90%;
-			height: 90%;
-            display: inline-flex;
-            flex-wrap: wrap;
-        }
-        .word-item {
-            background: #f0f0f0;
-            border: 2px solid #ccc;
-            border-radius: 1vh;
-            padding: 2vh 2vw;
-            cursor: pointer;
-            transition: all 2s;
-			position: absolute; /* Mutlak konumlandırma */
-            font-size: max(2vh, 24px);
-        }
-        .word-item:hover {
-            background: #e0e0e0;
-        }
-        .popped {
-            transform: scale(0);
-            opacity: 0;
-        }
-        .progress-bar {
-            height: 1vh;
-            background: #eee;
-            margin: 10px 0;
-        }
-        .progress {
-            height: 100%;
-            background: #4CAF50;
-            transition: width 0.3s;
-        }
-		.progress-container-top {
-			position: fixed;
-			top: 10vh; /* Biraz daha yukarıda olacak */
-			left: 50%;
-			transform: translateX(-50%);
-			width: 90%;
-			height: 1vh;
-			background: #eee;
-			border-radius: 5px;
-			overflow: hidden;
-		}
-		.progress-container-bottom {
-			position: fixed;
-			bottom: 10vh; /* Biraz daha yukarıda olacak */
-			left: 50%;
-			transform: translateX(-50%);
-			width: 90%;
-			height: 1vh;
-			background: #eee;
-			border-radius: 5px;
-			overflow: hidden;
-		}
-		#nextBtn {
-			position: fixed;
-			bottom: 3%;
-			left: 50%;
-			transform: translateX(-50%);
-			width: 20vh;
-			padding: 2vh 2vw;
-			background: #4CAF50;
-			color: white;
-			border: none;
-			border-radius: 8px;
-			font-size: 2vh;
-			cursor: pointer;
-		}
-		#nextBtn:disabled {
-			background: #ccc;
-			cursor: not-allowed;
-		}
-        #result {
-            text-align: center;
-            font-size: 2vh;
-        }
-        .welcome-popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.50);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: opacity 0.3s;
-        }
-        .popup-content {
-            text-align: center;
-            padding: 20px;
-            color: #000;
-            border: 2px solid #333;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            max-width: 80%;
-            font-size: 1.8vh;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="progress-container-top">
-            <div class="progress" style="width: 0%"></div>
-        </div>
-        
-        <!-- Stages with translated data-i18n attributes -->
-        <div id="stage1" class="stage active-stage">
-            <h2 data-i18n="title"></h2>
-            <div class="word-box" data-trait-pair="Outgoing/Reserved"></div>
-        </div>
-        
-        <div id="stage2" class="stage">
-            <h2 data-i18n="title"></h2>
-            <div class="word-box" data-trait-pair="Creative/Practical"></div>
-        </div>
-        
-        <div id="stage3" class="stage">
-            <h2 data-i18n="title"></h2>
-            <div class="word-box" data-trait-pair="Objective/Subjective"></div>
-        </div>
-        
-        <div id="stage4" class="stage">
-            <h2 data-i18n="title"></h2>
-            <div class="word-box" data-trait-pair="Planned/Spontaneous"></div>
-        </div>
-        
-        <div id="stage5" class="stage">
-            <h2 data-i18n="title"></h2>
-            <div class="word-box" data-trait-pair="Confident/Sensitive"></div>
-        </div>
-
-        <div class="progress-container-bottom">
-            <div class="progress" style="width: 0%"></div>
-        </div>
-        <button id="nextBtn" onclick="nextStage()" disabled data-i18n="nextButton"></button>
-        <div id="result"></div>
-    </div>
-    <div id="welcomePopup" class="welcome-popup">
-        <div class="popup-content">
-          <h2 data-i18n="welcome"></h2>
-          <h2 data-i18n="instruction"></h2>
-          <h2 data-i18n="message"></h2>
-        </div>
-      </div>
-
-    <script>
-        // Language detection and setup
-        const userLang = navigator.language || navigator.userLanguage;
-        const isTurkish = userLang.startsWith('tr');
-
-        // Trait pair translations
-        const pairTranslations = {
-            "Outgoing/Reserved": "Dışa Dönük/Çekingen",
-            "Creative/Practical": "Yaratıcı/Pratik",
-            "Objective/Subjective": "Tarafsız/Taraflı",
-            "Planned/Spontaneous": "Planlı/Plansız",
-            "Confident/Sensitive": "Kendinden Emin/Duyarlı"
-        };
-
-        // Update trait pairs in HTML if Turkish
-        if (isTurkish) {
-            document.querySelectorAll('.word-box').forEach(box => {
-                const englishPair = box.dataset.traitPair;
-                box.dataset.traitPair = pairTranslations[englishPair];
-            });
-        }
-
-        // Translation dictionary
-        const translations = {
-            en: {
-                title: "Personality Test",
-                instruction: '<br>The test consists of 5 sections. </br><br>In each section, choose the words that <span style="color: red; text-decoration: underline;">DON\'T</span> describe you to proceed. </br><br>In the final section, you can view your test result.</br>',
-                nextButton: "Next",
-                resultTitle: "Your Personality Type:",
-                retakeButton: "Retake Test",
-                welcome: "Welcome!",
-                message: "Click anywhere to start the test."
-            },
-            tr: {
-                title: "Kişilik Testi",
-                instruction: '<br>Test 5 bölümden oluşmaktadır. <br></br>Her bölümde sizi <span style="color: red; text-decoration: underline;">TANIMLAMAYAN</span> kelimeleri seçerek ilerleyin. <br></br>En son bölümde test sonucunuzu görebilirsiniz.</br>',
-                nextButton: "İleri",
-                resultTitle: "Kişilik Tipiniz:",
-                retakeButton: "Testi Tekrarla",
-                welcome: "Hoş Geldiniz!",
-                message: "Teste başlamak için herhangi bir yere tıklayın."
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Personality Test</title>
+        <style>
+            .container {
+                margin: 0 auto;
+                padding: 1vh 1vw;
+                text-align: center;
             }
-        };
-
-        // Set language for UI elements
-        function setLanguage(lang) {
-            document.documentElement.lang = lang;
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                //el.textContent = translations[lang][key];
-                el.innerHTML = translations[lang][key];
-            });
-        }
-        setLanguage(isTurkish ? 'tr' : 'en');
-
-        // Modified traits structure with translations
-             /*{
-  "Extraverted": 45%, 
-  "Introverted": 55%,
-  "Intuitive": 70%,
-  "Observant": 30%,
-  "Thinking": 60%,
-  "Feeling": 40%,
-  "Judging": 35%,
-  "Prospecting": 65%,
-  "Assertive": 50%,
-  "Turbulent": 50%,
-  "Final Personality": "INFP-T"
-}*/
-        const traits = {
-            en: {
-                "Outgoing/Reserved": {
-                    "Outgoing": ["Sociable", "Interactive", "Engaging", "Expressive", "Enthusiastic", "Dynamic", "Vibrant"],
-                    "Reserved": ["Quiet", "Introspective", "Independent", "Calm", "Self-Contained", "Thoughtful", "Grounded"]
-                },
-                "Creative/Practical": {
-                    "Creative": ["Imaginative", "Visionary", "Conceptual", "Future-Oriented", "Insightful", "Perceptive", "Innovative"],
-                    "Practical": ["Detail-Oriented", "Realistic", "Fact-Based", "Present-Focused", "Attentive", "Analytical", "Methodical"]
-                },
-                "Objective/Subjective": {
-                    "Objective": ["Logical", "Rational", "Critical", "Problem-Solving", "Strategic", "Decisive", "Analytical"],
-                    "Subjective": ["Empathetic", "Caring", "Cooperative", "Supportive", "Sensitive", "Passionate", "Value-Driven"]
-                },
-                "Planned/Spontaneous": {
-                    "Planned": ["Organized", "Decisive", "Scheduled", "Methodical", "Disciplined", "Efficient", "Goal-Oriented"],
-                    "Spontaneous": ["Flexible", "Adaptable", "Curious", "Open-Ended", "Exploratory", "Adventurous", "Options-Oriented"]
-                },
-                "Confident/Sensitive": {
-                    "Confident": ["Decisive", "Self-Assured", "Determined", "Independent", "Proactive", "Courageous", "Direct"],
-                    "Sensitive": ["Emotional", "Anxious", "Self-Conscious", "Insecure", "Perfectionistic", "Concerned", "Reflective"]
-                }
-            },
-            tr: {
-                "Dışa Dönük/Çekingen": {
-                    "Dışa Dönük": ["Sosyal", "Canayakın", "Etkileyici", "Hevesli", "Dinamik", "Enerjik", "Girişken"],
-                    "Çekingen": ["Düşünceli", "Sessiz", "İçe Dönük", "Bağımsız", "Sakin", "Kendine Yeten", "Temkinli"]
-                },
-                "Yaratıcı/Pratik": {
-                    "Yaratıcı": ["Hayalperest", "Vizyoner", "Gelecek Odaklı", "Anlayışlı", "Yenilikçi", "Soyut", "Büyük Resmi Gören"],
-                    "Pratik": ["Detay Odaklı", "Gerçekçi", "Pratik", "An'a Odaklı", "Dikkatli", "Analitik", "Metodik"]
-                },
-                "Tarafsız/Taraflı": {
-                    "Tarafsız": ["Mantıklı", "Rasyonel", "Eleştirici", "Problem Çözücü", "Stratejik", "Kararlı", "Analitik"],
-                    "Taraflı": ["Empati Kuran", "Şefkatli", "Merhametli", "Uyumlu", "İşbirlikçi", "Destekleyici", "Değer Odaklı"]
-                },
-                "Planlı/Plansız": {
-                    "Planlı": ["Organize", "Bilinçli", "Programlı", "Metodik", "Disiplinli", "Özenli", "Hedef Odaklı"],
-                    "Plansız": ["Esnek", "Meraklı", "Açık Fikirli", "Keşfedici", "Becerikli", "Maceraperest", "Seçenek Odaklı"]
-                },
-                "Kendinden Emin/Duyarlı": {
-                    "Kendinden Emin": ["Kararlı", "Kendinden Emin", "Azimli", "Bağımsız", "Cesur", "Güçlü", "Dik Duruşlu"],
-                    "Duyarlı": ["Duyarlı", "Duygusal", "Endişeli", "Güvensiz", "Mükemmeliyetçi", "Değişken", "Düşünceli"]
-                }
+            .stage {
+                height: 90%;
+                display: none;
+                text-align: center;
             }
-        };
-
-        // Rest of the JavaScript code remains similar with adjustments for language support
-        let currentStage = 1;
-        let results = {};
-        const colorPalette = [
-            "#FFCCCC", "#FF9999", "#FF6666", // Açık Kırmızı Tonları
-            "#FFDDC1", "#FFBB99", "#FFA07A", // Açık Turuncu Tonları
-            "#FFFF99", "#FFFF66", "#FFEE99", // Açık Sarı Tonları
-            "#CCFFFF", "#99FFFF", "#66FFFF", // Açık Camgöbeği Tonları
-            "#CCE5FF", "#99CCFF", "#66B3FF", // Açık Mavi Tonları
-            "#CCFFCC", "#99FF99", "#66FF66", // Açık Yeşil Tonları
-            "#E6E6FA", "#D8BFD8", "#DDA0DD", // Açık Mor Tonları
-            "#FFD9E6", "#FFB6C1", "#FFAEC9", // Açık Pembe Tonları
-            "#F5F5DC", "#FAEBD7", "#FFF8DC", // Açık Bej ve Krem Tonları
-            "#F0F8FF", "#E0FFFF", "#F0FFF0", // Açık Pastel Tonları
-            "#D3D3D3", "#C0C0C0", "#E8E8E8", // Açık Gri Tonları
-            "#FFF0F5", "#FFE4E1", "#FFFAF0", // Açık Şeftali ve Pudra Tonları
-            "#F8F8FF", "#F5FFFA", "#FFFFF0"  // Açık Nötr ve Beyaz Tonlar
-        ];
-
-        function initializeTest() {
-            const currentLang = isTurkish ? 'tr' : 'en';
-            const currentTraits = traits[currentLang];
-            let colorIndex = 0;
-
-            document.querySelectorAll('.word-box').forEach((container, index) => {
-                const pair = container.dataset.traitPair;
-                const traitData = currentTraits[pair];
-                const words = [...traitData[Object.keys(traitData)[0]], ...traitData[Object.keys(traitData)[1]]];
-                
-                container.innerHTML = words.map(word => {
-                    const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-                    colorIndex++;
-                    return `<div class="word-item" onclick="toggleWord(this)" 
-                                data-trait="${getTraitForWord(currentTraits, pair, word)}"
-                                style="background: ${color};">
-                                ${word}
-                            </div>`;
-                }).join('');
-            });
-
-            randomizePositions();
-        }
-
-        function getTraitForWord(currentTraits, pair, word) {
-            const traitPair = currentTraits[pair];
-            for (const trait of Object.keys(traitPair)) {
-                if (traitPair[trait].includes(word)) {
-                    return trait;
-                }
+            .active-stage {
+                height: 90%;
+                display: block;
+                font-size: max(1.8vh, 18px);
             }
-        }
-		
-		function toggleWord(element) {
-            element.classList.toggle('popped');
-            document.getElementById('nextBtn').disabled = false;
-        }
-
-        const boxWidth = window.innerWidth * 0.9; // Sayfa genişliği
-        const boxHeight = window.innerHeight * 0.75; // Sayfa yüksekliği
-		
-		/*function randomizePositions() {
-            document.querySelectorAll('.word-box').forEach(box => {
-                
-                let rows, cols;
-                if (boxHeight > boxWidth) {
-                    rows = 6;
-                    cols = 3;
-                } else {
-                    rows = 3;
-                    cols = 6;
-                }
-
-                const items = box.querySelectorAll('.word-item');
-                const itemWidth = boxWidth / cols;
-                const itemHeight = boxHeight / rows;
-
-                items.forEach((item, index) => {
-                    const row = Math.floor(index / cols);
-                    const col = index % cols;
-
-                    const x = col * itemWidth + (itemWidth - item.offsetWidth) / 2;
-                    const y = row * itemHeight + (itemHeight - item.offsetHeight) / 2;
-
-                    item.style.left = `${x}px`;
-                    item.style.top = `${y}px`;
-                });
-            });
-        }*/
-        function randomizePositions() {
-            const nextBtn = document.getElementById('nextBtn');
-            const btnRect = nextBtn.getBoundingClientRect(); // Butonun konumunu al
+            .word-box {
+                position: relative;
+                width: 90%;
+                height: 90%;
+                display: inline-flex;
+                flex-wrap: wrap;
+            }
+            .word-item {
+                background: #f0f0f0;
+                border: 2px solid #ccc;
+                border-radius: 1vh;
+                padding: 2vh 2vw;
+                cursor: pointer;
+                transition: all 2s;
+                position: absolute; /* Mutlak konumlandırma */
+                font-size: max(2vh, 24px);
+            }
+            .word-item:hover {
+                background: #e0e0e0;
+            }
+            .popped {
+                transform: scale(0);
+                opacity: 0;
+            }
+            .progress-bar {
+                height: 1vh;
+                background: #eee;
+                margin: 10px 0;
+            }
+            .progress {
+                height: 100%;
+                background: #4CAF50;
+                transition: width 0.3s;
+            }
+            .progress-container-top {
+                position: fixed;
+                top: 10vh; /* Biraz daha yukarıda olacak */
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90%;
+                height: 1vh;
+                background: #eee;
+                border-radius: 5px;
+                overflow: hidden;
+            }
+            .progress-container-bottom {
+                position: fixed;
+                bottom: 10vh; /* Biraz daha yukarıda olacak */
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90%;
+                height: 1vh;
+                background: #eee;
+                border-radius: 5px;
+                overflow: hidden;
+            }
+            #nextBtn {
+                position: fixed;
+                bottom: 3%;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 20vh;
+                padding: 2vh 2vw;
+                background: #4CAF50;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-size: 2vh;
+                cursor: pointer;
+            }
+            #nextBtn:disabled {
+                background: #ccc;
+                cursor: not-allowed;
+            }
+            #result {
+                text-align: center;
+                font-size: 2vh;
+            }
+            .welcome-popup {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(255, 255, 255, 0.50);
+                z-index: 9999;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                transition: opacity 0.3s;
+            }
+            .popup-content {
+                text-align: center;
+                padding: 20px;
+                color: #000;
+                border: 2px solid #333;
+                border-radius: 10px;
+                background: rgba(255, 255, 255, 0.9);
+                max-width: 80%;
+                font-size: 1.8vh;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="progress-container-top">
+                <div class="progress" style="width: 0%"></div>
+            </div>
             
-            document.querySelectorAll('.word-box').forEach(box => {
-
-                box.querySelectorAll('.word-item').forEach(item => {
-                    const itemWidth = item.offsetWidth;
-                    const itemHeight = item.offsetHeight;
-
-                    let randomX, randomY, overlapping;
-                    let attempts = 0;
-
-                    do {
-                        overlapping = false;
-                        randomX = Math.random() * (boxWidth - itemWidth);
-                        randomY = Math.random() * (boxHeight - itemHeight);
-
-                        // Çakışma kontrolü - Kelimelerin birbirine değmemesi için
-                        box.querySelectorAll('.word-item').forEach(otherItem => {
-                            if (otherItem !== item) {
-                                const otherX = parseFloat(otherItem.style.left || "0");
-                                const otherY = parseFloat(otherItem.style.top || "0");
-
-                                if (
-                                    randomX < otherX + otherItem.offsetWidth &&
-                                    randomX + itemWidth > otherX &&
-                                    randomY < otherY + otherItem.offsetHeight &&
-                                    randomY + itemHeight > otherY
-                                ) {
-                                    overlapping = true;
-                                }
-                            }
-                        });
-
-                        // **NEXT Butonu ile Çakışma Kontrolü**
-                        if (
-                            randomX < btnRect.left + nextBtn.offsetWidth &&
-                            randomX + itemWidth > btnRect.left &&
-                            randomY < btnRect.top + nextBtn.offsetHeight &&
-                            randomY + itemHeight > btnRect.top
-                        ) {
-                            overlapping = true;
-                        }
-
-                        attempts++;
-                    } while (overlapping && attempts < 100); // Maksimum deneme sayısı
-
-                    item.style.left = `${randomX}px`;
-                    item.style.top = `${randomY}px`;
-                });
-            });
-        }
-		
-		function nextStage() {
-            const currentContainer = document.querySelector(`#stage${currentStage} .word-box`);
-            const remainingWords = Array.from(currentContainer.querySelectorAll('.word-item:not(.popped)'));
+            <!-- Stages with translated data-i18n attributes -->
+            <div id="stage1" class="stage active-stage">
+                <h2 data-i18n="title"></h2>
+                <div class="word-box" data-trait-pair="Outgoing/Reserved"></div>
+            </div>
             
-            const traitPair = currentContainer.dataset.traitPair.split('/');
-            const traitCounts = {
-                [traitPair[0]]: 0,
-                [traitPair[1]]: 0
+            <div id="stage2" class="stage">
+                <h2 data-i18n="title"></h2>
+                <div class="word-box" data-trait-pair="Creative/Practical"></div>
+            </div>
+            
+            <div id="stage3" class="stage">
+                <h2 data-i18n="title"></h2>
+                <div class="word-box" data-trait-pair="Objective/Subjective"></div>
+            </div>
+            
+            <div id="stage4" class="stage">
+                <h2 data-i18n="title"></h2>
+                <div class="word-box" data-trait-pair="Planned/Spontaneous"></div>
+            </div>
+            
+            <div id="stage5" class="stage">
+                <h2 data-i18n="title"></h2>
+                <div class="word-box" data-trait-pair="Confident/Sensitive"></div>
+            </div>
+
+            <div class="progress-container-bottom">
+                <div class="progress" style="width: 0%"></div>
+            </div>
+            <button id="nextBtn" onclick="nextStage()" disabled data-i18n="nextButton"></button>
+            <div id="result"></div>
+        </div>
+        <div id="welcomePopup" class="welcome-popup">
+            <div class="popup-content">
+            <h2 data-i18n="welcome"></h2>
+            <h2 data-i18n="instruction"></h2>
+            <h2 data-i18n="message"></h2>
+            </div>
+        </div>
+
+        <script>
+            // Language detection and setup
+            const userLang = navigator.language || navigator.userLanguage;
+            const isTurkish = userLang.startsWith('tr');
+
+            // Trait pair translations
+            const pairTranslations = {
+                "Outgoing/Reserved": "Dışa Dönük/Çekingen",
+                "Creative/Practical": "Yaratıcı/Pratik",
+                "Objective/Subjective": "Tarafsız/Taraflı",
+                "Planned/Spontaneous": "Planlı/Plansız",
+                "Confident/Sensitive": "Kendinden Emin/Duyarlı"
             };
 
-            remainingWords.forEach(word => {
-                const trait = word.dataset.trait;
-                traitCounts[trait]++;
-            });
-
-            const result = traitCounts[traitPair[0]] > traitCounts[traitPair[1]] ? traitPair[0] : traitPair[1];
-            results[currentStage] = result;
-
-            if (currentStage < 5) {
-                document.querySelector(`#stage${currentStage}`).classList.remove('active-stage');
-                currentStage++;
-                document.querySelector(`#stage${currentStage}`).classList.add('active-stage');
-                document.querySelector('.progress').style.width = `${(currentStage - 1) * 20}%`;
-                document.getElementById('nextBtn').disabled = true;
-
-                // Yeni aşamada kelimeleri rastgele yerleştir
-                randomizePositions();
-            } else {
-                document.querySelector(`#stage${currentStage}`).classList.remove('active-stage');
-                showResults();
+            // Update trait pairs in HTML if Turkish
+            if (isTurkish) {
+                document.querySelectorAll('.word-box').forEach(box => {
+                    const englishPair = box.dataset.traitPair;
+                    box.dataset.traitPair = pairTranslations[englishPair];
+                });
             }
-        }
 
-        function showResults() {
-            const lang = isTurkish ? 'tr' : 'en';
-            document.getElementById('nextBtn').style.display = 'none';
-            document.querySelector('.progress').style.width = '100%';
+            // Translation dictionary
+            const translations = {
+                en: {
+                    title: "Personality Test",
+                    instruction: '<br>The test consists of 5 sections. </br><br>In each section, choose the words that <span style="color: red; text-decoration: underline;">DON\'T</span> describe you to proceed. </br><br>In the final section, you can view your test result.</br>',
+                    nextButton: "Next",
+                    resultTitle: "Your Personality Type:",
+                    retakeButton: "Retake Test",
+                    welcome: "Welcome!",
+                    message: "Click anywhere to start the test."
+                },
+                tr: {
+                    title: "Kişilik Testi",
+                    instruction: '<br>Test 5 bölümden oluşmaktadır. <br></br>Her bölümde sizi <span style="color: red; text-decoration: underline;">TANIMLAMAYAN</span> kelimeleri seçerek ilerleyin. <br></br>En son bölümde test sonucunuzu görebilirsiniz.</br>',
+                    nextButton: "İleri",
+                    resultTitle: "Kişilik Tipiniz:",
+                    retakeButton: "Testi Tekrarla",
+                    welcome: "Hoş Geldiniz!",
+                    message: "Teste başlamak için herhangi bir yere tıklayın."
+                }
+            };
 
-            const resultHTML = `
-                <h2>${translations[lang].resultTitle}</h2>
-                <h2>...</h2>
-                <p>${results[1]} | ${results[2]} | ${results[3]} | ${results[4]} | ${results[5]}</p>
-                <button id="nextBtn" onclick="location.reload()">${translations[lang].retakeButton}</button>
-            `;
-            
-            document.getElementById('result').innerHTML = resultHTML;
-        }
+            // Set language for UI elements
+            function setLanguage(lang) {
+                document.documentElement.lang = lang;
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    //el.textContent = translations[lang][key];
+                    el.innerHTML = translations[lang][key];
+                });
+            }
+            setLanguage(isTurkish ? 'tr' : 'en');
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const popup = document.getElementById('welcomePopup');
+            // Modified traits structure with translations
+                /*{
+    "Extraverted": 45%, 
+    "Introverted": 55%,
+    "Intuitive": 70%,
+    "Observant": 30%,
+    "Thinking": 60%,
+    "Feeling": 40%,
+    "Judging": 35%,
+    "Prospecting": 65%,
+    "Assertive": 50%,
+    "Turbulent": 50%,
+    "Final Personality": "INFP-T"
+    }*/
+            const traits = {
+                en: {
+                    "Outgoing/Reserved": {
+                        "Outgoing": ["Sociable", "Interactive", "Engaging", "Expressive", "Enthusiastic", "Dynamic", "Vibrant"],
+                        "Reserved": ["Quiet", "Introspective", "Independent", "Calm", "Self-Contained", "Thoughtful", "Grounded"]
+                    },
+                    "Creative/Practical": {
+                        "Creative": ["Imaginative", "Visionary", "Conceptual", "Future-Oriented", "Insightful", "Perceptive", "Innovative"],
+                        "Practical": ["Detail-Oriented", "Realistic", "Fact-Based", "Present-Focused", "Attentive", "Analytical", "Methodical"]
+                    },
+                    "Objective/Subjective": {
+                        "Objective": ["Logical", "Rational", "Critical", "Problem-Solving", "Strategic", "Decisive", "Analytical"],
+                        "Subjective": ["Empathetic", "Caring", "Cooperative", "Supportive", "Sensitive", "Passionate", "Value-Driven"]
+                    },
+                    "Planned/Spontaneous": {
+                        "Planned": ["Organized", "Decisive", "Scheduled", "Methodical", "Disciplined", "Efficient", "Goal-Oriented"],
+                        "Spontaneous": ["Flexible", "Adaptable", "Curious", "Open-Ended", "Exploratory", "Adventurous", "Options-Oriented"]
+                    },
+                    "Confident/Sensitive": {
+                        "Confident": ["Decisive", "Self-Assured", "Determined", "Independent", "Proactive", "Courageous", "Direct"],
+                        "Sensitive": ["Emotional", "Anxious", "Self-Conscious", "Insecure", "Perfectionistic", "Concerned", "Reflective"]
+                    }
+                },
+                tr: {
+                    "Dışa Dönük/Çekingen": {
+                        "Dışa Dönük": ["Sosyal", "Canayakın", "Etkileyici", "Hevesli", "Dinamik", "Enerjik", "Girişken"],
+                        "Çekingen": ["Düşünceli", "Sessiz", "İçe Dönük", "Bağımsız", "Sakin", "Kendine Yeten", "Temkinli"]
+                    },
+                    "Yaratıcı/Pratik": {
+                        "Yaratıcı": ["Hayalperest", "Vizyoner", "Gelecek Odaklı", "Anlayışlı", "Yenilikçi", "Soyut", "Büyük Resmi Gören"],
+                        "Pratik": ["Detay Odaklı", "Gerçekçi", "Pratik", "An'a Odaklı", "Dikkatli", "Analitik", "Metodik"]
+                    },
+                    "Tarafsız/Taraflı": {
+                        "Tarafsız": ["Mantıklı", "Rasyonel", "Eleştirici", "Problem Çözücü", "Stratejik", "Kararlı", "Analitik"],
+                        "Taraflı": ["Empati Kuran", "Şefkatli", "Merhametli", "Uyumlu", "İşbirlikçi", "Destekleyici", "Değer Odaklı"]
+                    },
+                    "Planlı/Plansız": {
+                        "Planlı": ["Organize", "Bilinçli", "Programlı", "Metodik", "Disiplinli", "Özenli", "Hedef Odaklı"],
+                        "Plansız": ["Esnek", "Meraklı", "Açık Fikirli", "Keşfedici", "Becerikli", "Maceraperest", "Seçenek Odaklı"]
+                    },
+                    "Kendinden Emin/Duyarlı": {
+                        "Kendinden Emin": ["Kararlı", "Kendinden Emin", "Azimli", "Bağımsız", "Cesur", "Güçlü", "Dik Duruşlu"],
+                        "Duyarlı": ["Duyarlı", "Duygusal", "Endişeli", "Güvensiz", "Mükemmeliyetçi", "Değişken", "Düşünceli"]
+                    }
+                }
+            };
+
+            // Rest of the JavaScript code remains similar with adjustments for language support
+            let currentStage = 1;
+            let results = {};
+            const colorPalette = [
+                "#FFCCCC", "#FF9999", "#FF6666", // Açık Kırmızı Tonları
+                "#FFDDC1", "#FFBB99", "#FFA07A", // Açık Turuncu Tonları
+                "#FFFF99", "#FFFF66", "#FFEE99", // Açık Sarı Tonları
+                "#CCFFFF", "#99FFFF", "#66FFFF", // Açık Camgöbeği Tonları
+                "#CCE5FF", "#99CCFF", "#66B3FF", // Açık Mavi Tonları
+                "#CCFFCC", "#99FF99", "#66FF66", // Açık Yeşil Tonları
+                "#E6E6FA", "#D8BFD8", "#DDA0DD", // Açık Mor Tonları
+                "#FFD9E6", "#FFB6C1", "#FFAEC9", // Açık Pembe Tonları
+                "#F5F5DC", "#FAEBD7", "#FFF8DC", // Açık Bej ve Krem Tonları
+                "#F0F8FF", "#E0FFFF", "#F0FFF0", // Açık Pastel Tonları
+                "#D3D3D3", "#C0C0C0", "#E8E8E8", // Açık Gri Tonları
+                "#FFF0F5", "#FFE4E1", "#FFFAF0", // Açık Şeftali ve Pudra Tonları
+                "#F8F8FF", "#F5FFFA", "#FFFFF0"  // Açık Nötr ve Beyaz Tonlar
+            ];
+
+            function initializeTest() {
+                const currentLang = isTurkish ? 'tr' : 'en';
+                const currentTraits = traits[currentLang];
+                let colorIndex = 0;
+
+                document.querySelectorAll('.word-box').forEach((container, index) => {
+                    const pair = container.dataset.traitPair;
+                    const traitData = currentTraits[pair];
+                    const words = [...traitData[Object.keys(traitData)[0]], ...traitData[Object.keys(traitData)[1]]];
+                    
+                    container.innerHTML = words.map(word => {
+                        const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+                        colorIndex++;
+                        return `<div class="word-item" onclick="toggleWord(this)" 
+                                    data-trait="${getTraitForWord(currentTraits, pair, word)}"
+                                    style="background: ${color};">
+                                    ${word}
+                                </div>`;
+                    }).join('');
+                });
+
+                randomizePositions();
+            }
+
+            function getTraitForWord(currentTraits, pair, word) {
+                const traitPair = currentTraits[pair];
+                for (const trait of Object.keys(traitPair)) {
+                    if (traitPair[trait].includes(word)) {
+                        return trait;
+                    }
+                }
+            }
             
-            popup.style.display = 'flex';
+            function toggleWord(element) {
+                element.classList.toggle('popped');
+                document.getElementById('nextBtn').disabled = false;
+            }
+
+            const boxWidth = window.innerWidth * 0.9; // Sayfa genişliği
+            const boxHeight = window.innerHeight * 0.75; // Sayfa yüksekliği
             
-            popup.addEventListener('click', function() {
-                popup.style.opacity = '0';
-                setTimeout(() => popup.style.display = 'none', 300);
+            /*function randomizePositions() {
+                document.querySelectorAll('.word-box').forEach(box => {
+                    
+                    let rows, cols;
+                    if (boxHeight > boxWidth) {
+                        rows = 6;
+                        cols = 3;
+                    } else {
+                        rows = 3;
+                        cols = 6;
+                    }
+
+                    const items = box.querySelectorAll('.word-item');
+                    const itemWidth = boxWidth / cols;
+                    const itemHeight = boxHeight / rows;
+
+                    items.forEach((item, index) => {
+                        const row = Math.floor(index / cols);
+                        const col = index % cols;
+
+                        const x = col * itemWidth + (itemWidth - item.offsetWidth) / 2;
+                        const y = row * itemHeight + (itemHeight - item.offsetHeight) / 2;
+
+                        item.style.left = `${x}px`;
+                        item.style.top = `${y}px`;
+                    });
+                });
+            }*/
+            function randomizePositions() {
+                const nextBtn = document.getElementById('nextBtn');
+                const btnRect = nextBtn.getBoundingClientRect(); // Butonun konumunu al
+                
+                document.querySelectorAll('.word-box').forEach(box => {
+
+                    box.querySelectorAll('.word-item').forEach(item => {
+                        const itemWidth = item.offsetWidth;
+                        const itemHeight = item.offsetHeight;
+
+                        let randomX, randomY, overlapping;
+                        let attempts = 0;
+
+                        do {
+                            overlapping = false;
+                            randomX = Math.random() * (boxWidth - itemWidth);
+                            randomY = Math.random() * (boxHeight - itemHeight);
+
+                            // Çakışma kontrolü - Kelimelerin birbirine değmemesi için
+                            box.querySelectorAll('.word-item').forEach(otherItem => {
+                                if (otherItem !== item) {
+                                    const otherX = parseFloat(otherItem.style.left || "0");
+                                    const otherY = parseFloat(otherItem.style.top || "0");
+
+                                    if (
+                                        randomX < otherX + otherItem.offsetWidth &&
+                                        randomX + itemWidth > otherX &&
+                                        randomY < otherY + otherItem.offsetHeight &&
+                                        randomY + itemHeight > otherY
+                                    ) {
+                                        overlapping = true;
+                                    }
+                                }
+                            });
+
+                            // **NEXT Butonu ile Çakışma Kontrolü**
+                            if (
+                                randomX < btnRect.left + nextBtn.offsetWidth &&
+                                randomX + itemWidth > btnRect.left &&
+                                randomY < btnRect.top + nextBtn.offsetHeight &&
+                                randomY + itemHeight > btnRect.top
+                            ) {
+                                overlapping = true;
+                            }
+
+                            attempts++;
+                        } while (overlapping && attempts < 100); // Maksimum deneme sayısı
+
+                        item.style.left = `${randomX}px`;
+                        item.style.top = `${randomY}px`;
+                    });
+                });
+            }
+            
+            function nextStage() {
+                const currentContainer = document.querySelector(`#stage${currentStage} .word-box`);
+                const remainingWords = Array.from(currentContainer.querySelectorAll('.word-item:not(.popped)'));
+                
+                const traitPair = currentContainer.dataset.traitPair.split('/');
+                const traitCounts = {
+                    [traitPair[0]]: 0,
+                    [traitPair[1]]: 0
+                };
+
+                remainingWords.forEach(word => {
+                    const trait = word.dataset.trait;
+                    traitCounts[trait]++;
+                });
+
+                const result = traitCounts[traitPair[0]] > traitCounts[traitPair[1]] ? traitPair[0] : traitPair[1];
+                results[currentStage] = result;
+
+                if (currentStage < 5) {
+                    document.querySelector(`#stage${currentStage}`).classList.remove('active-stage');
+                    currentStage++;
+                    document.querySelector(`#stage${currentStage}`).classList.add('active-stage');
+                    document.querySelector('.progress').style.width = `${(currentStage - 1) * 20}%`;
+                    document.getElementById('nextBtn').disabled = true;
+
+                    // Yeni aşamada kelimeleri rastgele yerleştir
+                    randomizePositions();
+                } else {
+                    document.querySelector(`#stage${currentStage}`).classList.remove('active-stage');
+                    showResults();
+                }
+            }
+
+            function showResults() {
+                const lang = isTurkish ? 'tr' : 'en';
+                document.getElementById('nextBtn').style.display = 'none';
+                document.querySelector('.progress').style.width = '100%';
+
+                const resultHTML = `
+                    <h2>${translations[lang].resultTitle}</h2>
+                    <h2>...</h2>
+                    <p>${results[1]} | ${results[2]} | ${results[3]} | ${results[4]} | ${results[5]}</p>
+                    <button id="nextBtn" onclick="location.reload()">${translations[lang].retakeButton}</button>
+                `;
+                
+                document.getElementById('result').innerHTML = resultHTML;
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const popup = document.getElementById('welcomePopup');
+                
+                popup.style.display = 'flex';
+                
+                popup.addEventListener('click', function() {
+                    popup.style.opacity = '0';
+                    setTimeout(() => popup.style.display = 'none', 300);
+                });
             });
-        });
 
-        // Initialize the test and positions
-        initializeTest();
-    </script>
-</body>
-</html>
+            // Initialize the test and positions
+            initializeTest();
+        </script>
+    </body>
+    </html>
