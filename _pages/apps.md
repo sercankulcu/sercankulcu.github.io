@@ -25,6 +25,7 @@ author_profile: false
 <button onclick="location.href='../game/iqtest.html'">🧠 IQ TEST</button> 
 <button onclick="location.href='../game/personality-test.html'">🌟 PERSONALITY TEST</button> 
 <button onclick="location.href='../game/milyoner.html'">💰 MILYONER</button> 
+<button onclick="location.href='../game/fastreflex.html'">⚡ HIZLI OL</button> 
 <button onclick="location.href='../game/tictactoe.html'">❌⭕❌ TIC TAC TOE</button> 
 <button onclick="location.href='../game/mantra.html'">🙏 MANTRA</button> 
 <button onclick="location.href='../game/anunnaki.html'">👽 ANUNNAKI</button>  
