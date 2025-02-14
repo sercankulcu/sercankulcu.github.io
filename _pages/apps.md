@@ -13,7 +13,9 @@ author_profile: false
 
 <button onclick="location.href='../game/hangman/hangman.html'">😵🪜 ADAM ASMACA</button> 
 <button onclick="location.href='../game/birkelime.html'">🔤 BİR KELİME</button> 
-<button onclick="location.href='../game/connections.html'">🔤 BAĞLANTI OYUNU</button> 
+<button onclick="location.href='../game/connections.html'">🔗 BAĞLANTI BUL</button> 
+<button onclick="location.href='../game/strands.html'">🔍 KELİME BUL</button> 
+<button onclick="location.href='../game/memory.html'">🎴 HAFIZA OYUNU</button> 
 <button onclick="location.href='../game/matematusta.html'">🧮 MATEMATUSTA</button> 
 <button onclick="location.href='../game/car-race.html'">🏁🏎️💨 CAR RACE</button> 
 <button onclick="location.href='../game/yazitura.html'">🪙 YAZI TURA</button> 
