@@ -1,41 +1,112 @@
 <!DOCTYPE html>
-<!-- Strands Unlimited, oyuncuların belirli bir tema etrafında gizlenmiş kelimeleri 6x8'lik bir harf 
- ızgarasında bulmalarını gerektiren bir kelime bulmaca oyunudur. Oyunun amacı, tema ile ilgili tüm kelimeleri 
- bulmak ve "spangram" adı verilen, ızgaranın iki zıt tarafını birleştiren özel kelimeyi keşfetmektir. 
- Doğru kelimeler mavi renkle vurgulanır ve oyuncular, üç ipucu kullanma hakkına sahiptir.-->
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <title>Strands Oyunu</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        .grid { display: grid; grid-template-columns: repeat(8, 50px); grid-gap: 5px; justify-content: center; margin-top: 20px; }
-        .cell { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background-color: #f0f0f0; cursor: pointer; }
-        .cell.selected { background-color: #a0c4ff; }
-        .cell.found { background-color: #bdb2ff; }
-        #message { margin-top: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: lightgray;
+        }
+
+        .grid {
+            width: 90%;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 5px;
+            padding: 10px;
+        }
+
+        .cell {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .cell.selected {
+            background-color: lightsalmon;
+        }
+
+        .cell.found {
+            background-color: lightgreen;
+        }
+
+        button {
+            display: inline-block;
+            background: white;
+            color: #4CAF50;
+            padding: 10px 10px;
+            border: 3px solid #4CAF50;
+            border-radius: 5px;
+            font-weight: bold;
+            background: #4CAF50;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
     </style>
 </head>
+
 <body>
     <h1>Strands Oyunu</h1>
     <div id="grid" class="grid"></div>
-    <button onclick="useHint()">İpucu Kullan (Kalan: <span id="hints">3</span>)</button>
-    <div id="message"></div>
+    <div id="winModal" class="modal" onclick="closeModal()">
+        <div class="modal-content">
+            <p id="winMessage"></p>
+            <button onclick="createGrid()">Yeni Oyun</button>
+        </div>
+    </div>
 
     <script>
-        const words = ['ELMA', 'ARMUT', 'MUZ', 'KİRAZ'];
+        const words = ['ELMA', 'ARMUT', 'MUZ', 'KİRAZ', 'ÜZÜM', 'İNCİR'];
         const spangram = 'MEYVELER';
         const gridLetters = [
             'E', 'L', 'M', 'A', 'X', 'X', 'X', 'X',
-            'X', 'X', 'X', 'X', 'A', 'R', 'M', 'U',
-            'X', 'X', 'X', 'X', 'X', 'M', 'X', 'Z',
-            'X', 'X', 'X', 'X', 'T', 'U', 'X', 'X',
-            'X', 'K', 'İ', 'R', 'A', 'Z', 'X', 'X',
-            'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X'
+            'X', 'X', 'X', 'A', 'R', 'M', 'U', 'T',
+            'Ü', 'X', 'X', 'X', 'X', 'X', 'M', 'X',
+            'Z', 'X', 'X', 'X', 'X', 'X', 'U', 'X',
+            'Ü', 'K', 'İ', 'R', 'A', 'Z', 'Z', 'X',
+            'M', 'X', 'X', 'İ', 'N', 'C', 'İ', 'R'
         ];
         let selectedCells = [];
         let foundWords = [];
-        let hintsLeft = 3;
 
         function createGrid() {
             const grid = document.getElementById('grid');
@@ -47,24 +118,48 @@
                 cell.addEventListener('click', () => selectCell(cell));
                 grid.appendChild(cell);
             });
+            selectedCells = [];
+            foundWords = [];
+            closeModal();
         }
 
+        // words dizisindeki en uzun kelimenin harf sayısını bul
+        const maxWordLength = Math.max(...words.map(word => word.length));
+
         function selectCell(cell) {
-            if (cell.classList.contains('found') || selectedCells.includes(cell)) return;
+            if (cell.classList.contains('found')) return;
+
+            if (selectedCells.includes(cell)) {
+                cell.classList.remove('selected');
+                selectedCells = selectedCells.filter(selectedCell => selectedCell !== cell);
+                return;
+            }
+
             cell.classList.add('selected');
             selectedCells.push(cell);
+
             if (selectedCells.length > 1) {
                 const lastIndex = parseInt(selectedCells[selectedCells.length - 2].dataset.index);
                 const currentIndex = parseInt(cell.dataset.index);
+
                 if (!isAdjacent(lastIndex, currentIndex)) {
                     clearSelection();
                     return;
                 }
             }
-            if (selectedCells.length >= 4) {
+
+            // Eğer minimum 5 harf seçilmişse kelimeyi kontrol et
+            if (selectedCells.length >= 3) {
                 checkSelection();
             }
+
+            // Seçili kelime sayısı, en uzun kelimenin harf sayısını geçerse sıfırla
+            if (selectedCells.length >= maxWordLength) {
+                clearSelection();
+                return;
+            }
         }
+
 
         function isAdjacent(index1, index2) {
             const x1 = index1 % 8;
@@ -82,13 +177,11 @@
                     cell.classList.remove('selected');
                     cell.classList.add('found');
                 });
+                selectedCells = [];
                 if (foundWords.length === words.length) {
-                    document.getElementById('message').textContent = 'Tebrikler! Tüm kelimeleri buldunuz.';
+                    showWinModal();
                 }
-            } else {
-                clearSelection();
-            }
-            selectedCells = [];
+            } 
         }
 
         function clearSelection() {
@@ -96,15 +189,17 @@
             selectedCells = [];
         }
 
-        function useHint() {
-            if (hintsLeft > 0) {
-                hintsLeft--;
-                document.getElementById('hints').textContent = hintsLeft;
-                // İpucu işlevselliği burada uygulanabilir
-            }
+        function showWinModal() {
+            document.getElementById("winMessage").textContent = 'Tebrikler! Tüm kelimeleri buldunuz.';
+            document.getElementById("winModal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("winModal").style.display = "none";
         }
 
         createGrid();
     </script>
 </body>
+
 </html>
