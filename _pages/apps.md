@@ -13,6 +13,7 @@ author_profile: false
 
 <button onclick="location.href='../game/hangman/hangman.html'">😵🪜 ADAM ASMACA</button> 
 <button onclick="location.href='../game/flagquiz.html'">🚩 FLAG QUIZ</button> 
+<button onclick="location.href='../game/wordlefive.html'">🚩 WORDLE-5</button> 
 <button onclick="location.href='../game/birkelime.html'">🔤 BİR KELİME</button> 
 <button onclick="location.href='../game/connections.html'">🔗 BAĞLANTI BUL</button> 
 <button onclick="location.href='../game/strands.html'">🔍 KELİME BUL</button> 
