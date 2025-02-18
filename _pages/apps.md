@@ -15,6 +15,7 @@ author_profile: false
 <button onclick="location.href='../game/flagquiz.html'">🚩 FLAG QUIZ</button> 
 <button onclick="location.href='../game/besharf.html'">🟩🟨🇹🇷 BEŞ HARF</button> 
 <button onclick="location.href='../game/altiharf.html'">🟩🟨🇹🇷 ALTI HARF</button> 
+<button onclick="location.href='../game/spellbee.html'">🐝 SPELL BEE</button> 
 <button onclick="location.href='../game/birkelime.html'">🔤 BİR KELİME</button> 
 <button onclick="location.href='../game/connections.html'">🔗 BAĞLANTI BUL</button> 
 <button onclick="location.href='../game/strands.html'">🔍 KELİME BUL</button> 
