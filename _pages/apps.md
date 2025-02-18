@@ -33,5 +33,6 @@ author_profile: false
 <button onclick="location.href='../game/milyoner.html'">💰 MILYONER</button> 
 <button onclick="location.href='../game/fastreflex.html'">⚡ HIZLI OL</button> 
 <button onclick="location.href='../game/tictactoe.html'">❌⭕❌ TIC TAC TOE</button> 
+<button onclick="location.href='../game/claw.html'">🕹️CLAW MACHINE</button> 
 <button onclick="location.href='../game/mantra.html'">🙏 MANTRA</button> 
 <button onclick="location.href='../game/fiveletters.html'">🟩🟨🇬🇧 FIVE LETTERS</button> 
