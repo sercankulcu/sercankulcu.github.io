@@ -1,4 +1,4 @@
-words = {
+const words = {
     tr: [
         'AĞAÇ', 'AİLE', 'AKIL', 'ALTIN', 'ARMUT', 'ASLAN', 'AYNA', 'BALIK', 'BALKON', 'BEBEK',
         'BİBER', 'BİLGE', 'BİNA', 'BULUT', 'CAM', 'CEP', 'ÇİÇEK', 'ÇOCUK', 'DEFTER', 'DOLAP',
