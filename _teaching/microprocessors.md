@@ -38,7 +38,7 @@ Microprocessors act as the heartbeat of modern computing systems, executing nume
   [final (pdf)](../files/microprocessors/slides/2023-2024-microprocessor-final-cevap.pdf) | 
   [bütünleme (pdf)](../files/microprocessors/slides/2023-2024-microprocessor-butunleme-cevap.pdf)
   
-- **Soru Cevap**
+- **Soru Cevap**  
   [vize (pdf)](../files/microprocessors/slides/Bolum_12_Soru_Cevap.pdf) | 
   [final (pdf)](../files/microprocessors/slides/Bolum_13_Soru_Cevap.pdf)
 
