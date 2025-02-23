@@ -23,7 +23,7 @@ Microprocessors act as the heartbeat of modern computing systems, executing nume
 ## The Resources
 
 - [Emu8086 Microprocessor Emulator](https://emu8086-microprocessor-emulator.en.softonic.com/)
-- [CPU Emulator](https://www.cmpe.boun.edu.tr/~tugcu/animations/cpu-simulator/cpu-simulator.html)
+- [CPU Emulator](../files/microprocessors/CPU_Emulator/emulator.html) copied [from](https://www.cmpe.boun.edu.tr/~tugcu/animations/cpu-simulator/cpu-simulator.html)
 - Barry B. Brey, *The Intel Microprocessors*, Pearson.
 - Topaloğlu, Nurettin, *X86 Tabanlı Mikroişlemci Mimarisi ve Assembly Dili*, Seçkin Yayınevi.
 - [Mikroişlemcilere Giriş Assembler ile Yazılım ve Arayüz - Mehmet Bodur (pdf)](../files/microprocessors/Mikroislemcilere_giris.pdf)
