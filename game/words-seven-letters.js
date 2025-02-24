@@ -1,4 +1,4 @@
-const words = [
+const wordsSevenLetters = [
     "ABARTMA",
     "ABLALIK",
     "ABONMAN",
@@ -1696,7 +1696,7 @@ const words = [
     "ZURNACI"
 ];
 
-const allwords = [
+const allwordsSevenLetters = [
     "ABANİLİ",
     "ABANMAK",
     "ABARTIK",
@@ -9617,4 +9617,4 @@ const allwords = [
     "ZÜPPECE"
 ];
 
-export { words, allwords };
+export { wordsSevenLetters, allwordsSevenLetters };
