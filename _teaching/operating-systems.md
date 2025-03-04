@@ -100,6 +100,7 @@ Processes serve as the cornerstone of multi-tasking and concurrency, enabling mu
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_03_Surecler.pdf)
 - [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_3_Processes.pdf)
+- [🖼️Concurrency (HTML)](../files/os/slides/Chapter_03_Concurrency.html)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter03/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab03) 
