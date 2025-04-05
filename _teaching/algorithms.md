@@ -29,9 +29,7 @@ An algorithm is a set of well-defined instructions for carrying out a particular
 
 - Visual Algo [(website)](https://visualgo.net/en) [(github)](https://github.com/stevenhalim/cpbook-code/tree/master/)
 - Algoanim [(website)](https://www.algoanim.ide.sk/)
-- Yong Danielli [(website)](https://yongdanielliang.github.io/animation/animation.html)
 - USFCA [(website)](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html)
-- Anim IDE [(website)](https://anim.ide.sk/)
 
 - DSALGO Visualizer [(github)](https://github.com/jhabarsingh/DSALGO-VISUALIZER)
 - The Algorithms project [(github)](https://github.com/TheAlgorithms/Java)
