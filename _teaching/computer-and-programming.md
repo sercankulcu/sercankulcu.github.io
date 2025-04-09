@@ -32,14 +32,14 @@ Modern computing encompasses a vast ecosystem of interconnected technologies and
 ## Past Exams  
 
 - **2024-2025**  
-  [vize A](../files/computer/2024-2025-computer-vize-a-cevaplar.pdf) | 
-  [vize B](../files/computer/2024-2025-computer-vize-b-cevaplar.pdf) | 
-  [final A](../files/computer/2024-2025-computer-final-a-cevaplar.pdf) | 
-  [final B](../files/computer/2024-2025-computer-final-b-cevaplar.pdf) | 
-  [bütünleme A](../files/computer/2024-2025-computer-butunleme-a-cevaplar.pdf) | 
-  [bütünleme B](../files/computer/2024-2025-computer-butunleme-b-cevaplar.pdf) | 
-  [bütünleme C](../files/computer/2024-2025-computer-butunleme-c-cevaplar.pdf) | 
-  [bütünleme D](../files/computer/2024-2025-computer-butunleme-d-cevaplar.pdf)
+  [vize-a](../files/computer/2024-2025-computer-vize-a-cevaplar.pdf) | 
+  [vize-b](../files/computer/2024-2025-computer-vize-b-cevaplar.pdf) | 
+  [final-a](../files/computer/2024-2025-computer-final-a-cevaplar.pdf) | 
+  [final-b](../files/computer/2024-2025-computer-final-b-cevaplar.pdf) | 
+  [but-a](../files/computer/2024-2025-computer-butunleme-a-cevaplar.pdf) | 
+  [but-b](../files/computer/2024-2025-computer-butunleme-b-cevaplar.pdf) | 
+  [but-c](../files/computer/2024-2025-computer-butunleme-c-cevaplar.pdf) | 
+  [but-d](../files/computer/2024-2025-computer-butunleme-d-cevaplar.pdf)
 
 - **2023-2024**  
   [vize](../files/computer/2023-2024-computer-vize-cevaplar.pdf) | 
