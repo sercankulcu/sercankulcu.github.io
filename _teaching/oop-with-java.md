@@ -43,10 +43,10 @@ Java is one of the most popular programming languages, extensively used in vario
   [final-b](../files/java/slides/2023-2024-java-final-b-cevap.pdf) | 
   [final-c](../files/java/slides/2023-2024-java-final-c-cevap.pdf) | 
   [final-d](../files/java/slides/2023-2024-java-final-d-cevap.pdf) | 
-  [butunleme-a](../files/java/slides/2023-2024-java-butunleme-a-cevap.pdf) | 
-  [butunleme-b](../files/java/slides/2023-2024-java-butunleme-b-cevap.pdf) | 
-  [butunleme-c](../files/java/slides/2023-2024-java-butunleme-c-cevap.pdf) | 
-  [butunleme-d](../files/java/slides/2023-2024-java-butunleme-d-cevap.pdf)
+  [but-a](../files/java/slides/2023-2024-java-butunleme-a-cevap.pdf) | 
+  [but-b](../files/java/slides/2023-2024-java-butunleme-b-cevap.pdf) | 
+  [but-c](../files/java/slides/2023-2024-java-butunleme-c-cevap.pdf) | 
+  [but-d](../files/java/slides/2023-2024-java-butunleme-d-cevap.pdf)
 
 ---
 
