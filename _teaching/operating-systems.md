@@ -27,7 +27,8 @@ Operating systems are a fundamental part of modern computing. They form the foun
 - Operating Systems: Three Easy Pieces [e-book](https://pages.cs.wisc.edu/~remzi/OSTEP)
 - Youtube 
 [Prof. Dr. Kemal Bıçakcı](https://www.youtube.com/watch?v=sqtkwd09KXs&list=PLmPsb7nQhv7NLRWdIiDVNBDCMOtuUn6WZ) | 
-[Prof. Dr. Sadi Evren Şeker](https://www.youtube.com/watch?v=r2q_XRKrqHQ&list=PLh9ECzBB8tJO9eiwfQbcA2ThMbUSkbOWf)
+[Prof. Dr. Sadi Evren Şeker](https://www.youtube.com/watch?v=r2q_XRKrqHQ&list=PLh9ECzBB8tJO9eiwfQbcA2ThMbUSkbOWf) | 
+[CS 162 Berkeley](https://www.youtube.com/playlist?list=PLF2K2xZjNEf97A_uBCwEl61sdxWVP7VWC)
 - CSCI-UA.202 Operating Systems [website](https://cs.nyu.edu/~gottlieb/courses/os202/class-notes.html)
 - Bilgisayar İşletim Sistemleri, Prof. Dr. Ali Saatçi, 2. Baskı.
 - Operating System Development [website](https://wiki.osdev.org/Main_Page)
