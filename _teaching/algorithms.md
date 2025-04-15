@@ -50,6 +50,7 @@ An algorithm is a set of well-defined instructions for carrying out a particular
 - **Soru Cevap**  
   [vize](../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf) | 
   [final](../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf)
+  [hw-sol](../files/algorithms/slides/homework-solutions.html)
 
 ---
 
