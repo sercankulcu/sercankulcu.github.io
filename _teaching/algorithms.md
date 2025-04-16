@@ -66,7 +66,7 @@ Algorithms are the step-by-step procedures that form the core of computer scienc
 - [🖼️Sunum-Giriş (PDF)](../files/algorithms/slides/Bolum_01_01_Giris.pdf)
 - [🖼️Sunum-Karmaşıklık (PDF)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.pdf)
 - [🕹️Run time analysis (HTML)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.html)
-- [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_01_Introduction.pdf)
+- [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_01_Introduction.pdf) | [Complexity](../files/algorithms/slides/complexity.pdf)
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter01/src)
 
 ---
