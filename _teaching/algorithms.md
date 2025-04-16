@@ -23,7 +23,7 @@ An algorithm is a set of well-defined instructions for carrying out a particular
 ## The resources
 
 - **course webpages**  
-  [Cambridge](https://www.cl.cam.ac.uk/teaching/2021/Algorithms/materials.html) |  
+  [Cambridge](https://www.cl.cam.ac.uk/teaching/2021/Algorithms/materials.html) | 
   [Stanford](https://stanford-cs161.github.io/winter2024/lectures)
 
 - **books**  
@@ -38,6 +38,7 @@ An algorithm is a set of well-defined instructions for carrying out a particular
   [DSALGO Visualizer](https://github.com/jhabarsingh/DSALGO-VISUALIZER) | 
   [The Algorithms](https://github.com/TheAlgorithms/Java) | 
   [Cpbook](https://github.com/stevenhalim/cpbook-code/tree/master/)
+
 ---
 
 ## Past Exams  
