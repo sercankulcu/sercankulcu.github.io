@@ -22,8 +22,9 @@ An algorithm is a set of well-defined instructions for carrying out a particular
 
 ## The resources
 
-- Cambridge Algorithm [(course webpage)](https://www.cl.cam.ac.uk/teaching/2021/Algorithms/materials.html)
-- Stanford CS 161 [(course webpage)](https://stanford-cs161.github.io/winter2024/lectures)
+- **Course webpages**
+  [Cambridge](https://www.cl.cam.ac.uk/teaching/2021/Algorithms/materials.html) |  
+  [Stanford](https://stanford-cs161.github.io/winter2024/lectures)
 
 - Algorithms Illuminated [(book)](https://www.algorithmsilluminated.org)
 
