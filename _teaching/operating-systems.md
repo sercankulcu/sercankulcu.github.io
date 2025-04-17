@@ -25,7 +25,7 @@ Operating systems are a fundamental part of modern computing. They form the foun
 - Modern Operating Systems, Andrew S. Tanenbaum [book](https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X)
 - Operating System Concepts, A. SilberSchatz, P. Galvin, and G. Gagne [e-book](https://www.os-book.com/OS10/index.html)
 - Operating Systems: Three Easy Pieces [e-book](https://pages.cs.wisc.edu/~remzi/OSTEP)
-- Bilgisayar İşletim Sistemleri, Prof. Dr. Ali Saatçi, 2. Baskı.
+- Bilgisayar İşletim Sistemleri, Prof. Dr. Ali Saatçi [pdf](../files/os/Book_Bilgisayar_İsletim_Sistemleri.pdf)
 
 - Youtube 
 [Prof. Dr. Kemal Bıçakcı](https://www.youtube.com/watch?v=sqtkwd09KXs&list=PLmPsb7nQhv7NLRWdIiDVNBDCMOtuUn6WZ) | 
