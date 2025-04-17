@@ -26,7 +26,7 @@ Operating systems are a fundamental part of modern computing. They form the foun
 - Operating System Concepts, A. SilberSchatz, P. Galvin, and G. Gagne [e-book](https://www.os-book.com/OS10/index.html)
 - Operating Systems: Three Easy Pieces [e-book](https://pages.cs.wisc.edu/~remzi/OSTEP)
 - Bilgisayar İşletim Sistemleri, Prof. Dr. Ali Saatçi [pdf](../files/os/Book_Bilgisayar_İsletim_Sistemleri.pdf)
-- İşletim Sistemleri, Prof. Dr. İbrahim Yürkoğlu [pdf](../files/os/Book_Firat_Isletim_Sistemleri.pdf) 
+- İşletim Sistemleri, Prof. Dr. İbrahim Türkoğlu [pdf](../files/os/Book_Firat_Isletim_Sistemleri.pdf) 
 
 - Youtube 
 [Prof. Dr. Kemal Bıçakcı](https://www.youtube.com/watch?v=sqtkwd09KXs&list=PLmPsb7nQhv7NLRWdIiDVNBDCMOtuUn6WZ) | 
