@@ -102,7 +102,8 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
 - [🖼️Sunum-Çizge En Kısa Yol (PDF)](../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.pdf)
 - [🖼️Sunum-Çizge Minimum Kapsayan (PDF)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.pdf)
 - [🖼️Sunum-Çizge Ağ Akış (PDF)](../files/algorithms/slides/Bolum_04_04_Ag_Akis.pdf)
-- [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_04_Graph.pdf)
+- [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_04_Graph.pdf) | 
+[Connect Four (HTML)](../files/algorithms/slides/connect-four-guide.html)
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src)
 
 ---
