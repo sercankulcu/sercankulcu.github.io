@@ -22,7 +22,7 @@ Operating systems are a fundamental part of modern computing. They form the foun
 
 ## The resources:
 
-- **ebook** 
+- **ebook**  
 [Modern Operating Systems, Andrew S. Tanenbaum](https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X) | 
 [Operating System Concepts, A. SilberSchatz](https://www.os-book.com/OS10/index.html) | 
 [Operating Systems: Three Easy Pieces](https://pages.cs.wisc.edu/~remzi/OSTEP)
