@@ -22,23 +22,23 @@ Operating systems are a fundamental part of modern computing. They form the foun
 
 ## The resources:
 
-- ebook 
+- **ebook** 
 [Modern Operating Systems, Andrew S. Tanenbaum](https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X) | 
 [Operating System Concepts, A. SilberSchatz](https://www.os-book.com/OS10/index.html) | 
 [Operating Systems: Three Easy Pieces](https://pages.cs.wisc.edu/~remzi/OSTEP)
 
-- pdf 
+- **pdf**  
 [Bilgisayar İşletim Sistemleri, Ali Saatçi](../files/os/Book_Bilgisayar_İsletim_Sistemleri.pdf) | 
 [İşletim Sistemleri, İbrahim Türkoğlu](../files/os/Book_Firat_Isletim_Sistemleri.pdf) | 
 [Operating Systems From 0 to 1](../files/os/Book_Operating_Systems_From_0_to_1.pdf)
 
-- youtube 
+- **youtube**  
 [Kemal Bıçakcı](https://www.youtube.com/watch?v=sqtkwd09KXs&list=PLmPsb7nQhv7NLRWdIiDVNBDCMOtuUn6WZ) | 
 [Sadi Evren Şeker](https://www.youtube.com/watch?v=r2q_XRKrqHQ&list=PLh9ECzBB8tJO9eiwfQbcA2ThMbUSkbOWf) | 
 [Tuna Tuğcu](https://www.youtube.com/playlist?list=PLtZND_ssWL-urkZYXn9k4OpQ-73a5t6Qn) | 
 [CS 162 Berkeley](https://www.youtube.com/playlist?list=PLF2K2xZjNEf97A_uBCwEl61sdxWVP7VWC)
 
-- website 
+- **website**  
 [CSCI-UA.202 Operating Systems](https://cs.nyu.edu/~gottlieb/courses/os202/class-notes.html) | 
 [Operating System Development](https://wiki.osdev.org/Main_Page)
 
