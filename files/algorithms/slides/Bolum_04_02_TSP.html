@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Visualize and solve the Traveling Salesman Problem using Nearest Neighbor and Brute Force algorithms.">
+    <meta name="keywords"
+        content="TSP, Traveling Salesman Problem, visualization, algorithm, Nearest Neighbor, Brute Force, JavaScript, canvas">
+
+    <title>TSP Solver</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            text-align: center;
+            margin: 0 auto;
+            padding: 1vw;
+            max-width: 800px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            gap: 1vw;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 1vw;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        input,
+        button {
+            width: calc((100% - (4 * 1vw)) / 4);
+            padding: 1vw;
+            margin: 0;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+
+        canvas {
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Travelling Salesman</h1>
+
+    <div class="container">
+        <div class="controls">
+            <input type="number" id="numCities" value="5" min="2">
+            <button onclick="generateCities()">Generate</button>
+            <button onclick="solveTSPAnimated()">Nearest Neighbor</button>
+            <button onclick="solveTSPBruteForce()">Brute Force</button>
+        </div>
+    </div>
+
+    <canvas id="tspCanvas" width="500" height="400"></canvas>
+
+    <div id="historyDiv">
+        <p id="historyList"></p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('tspCanvas');
+        const ctx = canvas.getContext('2d');
+        const numCitiesInput = document.getElementById('numCities');
+        const historyDiv = document.getElementById('historyDiv');
+        const historyList = document.getElementById('historyList');
+
+        let cities = [];
+        let animationInterval;
+        let currentStep = 0;
+        let currentTour = [];
+        let currentDistance = 0;
+        let bestDistance = Infinity;
+        let bestTour = [];
+        let unvisited = [];
+        let startCityIndex;
+        let currentCityIndex;
+        let possibleEdges = [];
+
+        function generateCities() {
+            const numCities = parseInt(numCitiesInput.value);
+            cities = [];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            clearInterval(animationInterval);
+            historyList.innerHTML = '';
+            bestDistance = Infinity;
+            bestTour = [];
+            possibleEdges = [];
+
+            for (let i = 0; i < numCities; i++) {
+                const x = Math.random() * (canvas.width - 20) + 10;
+                const y = Math.random() * (canvas.height - 20) + 10;
+                cities.push({ x, y, index: i });
+                drawCity(x, y);
+            }
+        }
+
+        function drawCity(x, y, color = 'blue') {
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        function drawPath(path, color = 'green', lineWidth = 2) {
+            if (path.length < 2) return;
+            ctx.beginPath();
+            ctx.moveTo(cities[path[0]].x, cities[path[0]].y);
+            for (let i = 1; i < path.length; i++) {
+                ctx.lineTo(cities[path[i]].x, cities[path[i]].y);
+            }
+            ctx.strokeStyle = color;
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+        }
+
+        function drawEdge(cityIndex1, cityIndex2, color = 'blue', lineWidth = 2) {
+            ctx.beginPath();
+            ctx.moveTo(cities[cityIndex1].x, cities[cityIndex1].y);
+            ctx.lineTo(cities[cityIndex2].x, cities[cityIndex2].y);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+        }
+
+        function distance(city1, city2) {
+            const dx = city2.x - city1.x;
+            const dy = city2.y - city1.y;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function startNearestNeighborAnimation() {
+            if (cities.length < 2) {
+                alert("Please generate at least two cities.");
+                return;
+            }
+
+            clearInterval(animationInterval);
+            currentStep = 0;
+            currentTour = [];
+            currentDistance = 0;
+            unvisited = Array.from({ length: cities.length }, (_, i) => i);
+            startCityIndex = Math.floor(Math.random() * cities.length);
+            currentCityIndex = startCityIndex;
+            currentTour.push(startCityIndex);
+            unvisited.splice(unvisited.indexOf(startCityIndex), 1);
+            possibleEdges = [];
+            bestDistance = Infinity;
+            bestTour = [];
+            historyList.innerHTML = '';
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            cities.forEach(city => drawCity(city.x, city.y));
+            drawPath([currentTour[0]], 'green');
+
+            animationInterval = setInterval(animateNearestNeighborStep, 1000);
+        }
+
+        function animateNearestNeighborStep() {
+            if (unvisited.length === 0) {
+                const lastCityIndex = currentTour[currentTour.length - 1];
+                const finalDistance = distance(cities[lastCityIndex], cities[startCityIndex]);
+                currentDistance += finalDistance;
+                currentTour.push(startCityIndex);
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                cities.forEach(city => drawCity(city.x, city.y));
+                drawPath(bestTour, 'red', 3);
+                drawPath(currentTour, 'purple', 2);
+
+                const listItem = document.createElement('p');
+                listItem.textContent = `Best Distance: ${currentDistance.toFixed(0)}`;
+                historyList.appendChild(listItem);
+
+                clearInterval(animationInterval);
+                return;
+            }
+
+            let nearestNeighborIndex = -1;
+            let minDistance = Infinity;
+            let nextNearestCity = null;
+
+            possibleEdges = [];
+
+            for (const neighborIndex of unvisited) {
+                const dist = distance(cities[currentCityIndex], cities[neighborIndex]);
+                possibleEdges.push({ from: currentCityIndex, to: neighborIndex });
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    nearestNeighborIndex = neighborIndex;
+                    nextNearestCity = cities[neighborIndex];
+                }
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            cities.forEach(city => drawCity(city.x, city.y));
+
+            possibleEdges.forEach(edge => drawEdge(edge.from, edge.to, 'blue', 1));
+
+            if (bestTour.length > 0) {
+                drawPath(bestTour, 'red', 3);
+            }
+
+            drawPath(currentTour, 'green', 2);
+
+            if (nearestNeighborIndex !== -1) {
+                currentTour.push(nearestNeighborIndex);
+                currentDistance += minDistance;
+                unvisited.splice(unvisited.indexOf(nearestNeighborIndex), 1);
+                currentCityIndex = nearestNeighborIndex;
+
+                if (currentDistance < bestDistance) {
+                    bestDistance = currentDistance;
+                    bestTour = [...currentTour];
+                    const listItem = document.createElement('p');
+                    historyList.appendChild(listItem);
+                }
+            } else {
+                clearInterval(animationInterval);
+                alert("Error: Could not find the next nearest neighbor.");
+            }
+        }
+
+        function solveTSPAnimated() {
+            startNearestNeighborAnimation();
+        }
+
+        function solveTSPBruteForce() {
+            startBruteForceAnimation();
+        }
+
+        function startBruteForceAnimation() {
+
+            clearInterval(animationInterval);
+            historyList.innerHTML = '';
+            bestDistance = Infinity;
+            bestTour = [];
+            currentPermutationIndex = 0;
+
+            const cityIndices = cities.map(city => city.index);
+            const startCity = cityIndices[0];
+            const otherCities = cityIndices.slice(1);
+
+            allPermutations = permute(otherCities);
+
+            animationInterval = setInterval(animateBruteForceStep, 500);
+        }
+
+        function animateBruteForceStep() {
+            if (currentPermutationIndex >= allPermutations.length) {
+                clearInterval(animationInterval);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                cities.forEach(city => drawCity(city.x, city.y));
+                drawPath(bestTour, 'red', 3);
+                return;
+            }
+
+            const currentPermutation = allPermutations[currentPermutationIndex];
+            const currentPathIndices = [cities[0].index, ...currentPermutation, cities[0].index];
+            let currentPermutationDistance = 0;
+            for (let i = 0; i < currentPathIndices.length - 1; i++) {
+                const city1Index = currentPathIndices[i];
+                const city2Index = currentPathIndices[i + 1];
+                currentPermutationDistance += distance(cities[city1Index], cities[city2Index]);
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            cities.forEach(city => drawCity(city.x, city.y));
+            if (bestTour.length > 0) {
+                drawPath(bestTour, 'red', 3);
+            }
+            drawPath(currentPathIndices, 'lightgreen', 1);
+
+            if (currentPermutationDistance < bestDistance) {
+                bestDistance = currentPermutationDistance;
+                bestTour = currentPathIndices;
+                const listItem = document.createElement('p');
+                listItem.textContent = `Best Distance: ${bestDistance.toFixed(0)}`;
+                historyList.appendChild(listItem);
+            }
+
+            currentPermutationIndex++;
+        }
+
+        function permute(arr) {
+            if (arr.length <= 1) {
+                return [arr];
+            }
+
+            const permutations = [];
+            for (let i = 0; i < arr.length; i++) {
+                const first = arr[i];
+                const rest = arr.slice(0, i).concat(arr.slice(i + 1));
+                const innerPermutations = permute(rest);
+                for (const perm of innerPermutations) {
+                    permutations.push([first, ...perm]);
+                }
+            }
+            return permutations;
+        }
+
+        generateCities();
+    </script>
+</body>
+
+</html>
