@@ -36,7 +36,7 @@ Data structures are fundamental components in computer science, serving as the b
 
 - **lecture notes**  
   [Mustafa Ege (1)](../files/data_structures/Veri_Yapilari_ve_Algoritmalar_1_Mustafa_Ege.pdf) | 
-  [Mustafa Ege (2)](../files/data_structures/Veri_Yapıları_ve_Algoritmalar_2_Mustafa_Ege.pdf) | 
+  [Mustafa Ege (2)](../files/data_structures/Veri_Yapilari_ve_Algoritmalar_2_Mustafa_Ege.pdf) | 
   [Aybars Uğur](../files/data_structures/Veri_Yapilari_Aybars_Ugur.pdf)
 
 - **github**  
