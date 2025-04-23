@@ -23,7 +23,9 @@ Data structures are fundamental components in computer science, serving as the b
 ## The resources  
 
 - **books**  
-  [Data Structures and Algorithms in Java by Goodrich](https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635)
+  [Data Structures and Algorithms in Java by Goodrich](https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635) | 
+  [Data Structures and Algorithms Made Easy](https://www.amazon.com/gp/product/819324527X) | 
+  [Algorithms Unlocked](https://www.amazon.com/gp/product/0262518805)
 
 - **course webpages**  
   [CS-61B](https://sp23.datastructur.es) | 
@@ -38,7 +40,9 @@ Data structures are fundamental components in computer science, serving as the b
   [Aybars Uğur](../files/data_structures/Veri_Yapilari_Aybars_Ugur.pdf)
 
 - **github**  
-  [The Algorithms](https://github.com/TheAlgorithms/Java)
+  [The Algorithms](https://github.com/TheAlgorithms/Java) | 
+  [DSA Bootcamp](https://github.com/kunal-kushwaha/DSA-Bootcamp-Java) | 
+  [Awesome leetcode resources](https://github.com/ashishps1/awesome-leetcode-resources)
 
 ---
 
