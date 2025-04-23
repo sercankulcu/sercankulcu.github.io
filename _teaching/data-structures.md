@@ -71,7 +71,7 @@ Data structures are fundamental components in computer science, serving as the b
 Data structures are the backbone of computer science, serving as the fundamental building blocks that enable us to efficiently store, organize, and manipulate data. Each data structure has its own unique characteristics, advantages, and trade-offs, making them suitable for different scenarios and requirements. Understanding these structures is crucial for writing efficient code and solving complex computational problems.
 
 - [🖼️Sunum-Giriş (PDF)](../files/data_structures/slides/Bolum_01_Giris.pdf)  
-- [🕹️Data Structures (HTML)](../files/data_structures/slides/Bolum_01_Giris.html)  
+- [🕹️Data Structures (HTML)](../files/data_structures/slides/Bolum_01_Intro.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_01_Introduction.pdf)  
 - [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src)  
 
@@ -82,7 +82,7 @@ Data structures are the backbone of computer science, serving as the fundamental
 Arrays are like the bread and butter of programming. An array is the most fundamental data structure, consisting of a collection of elements stored in contiguous memory locations. Think of it as a row of boxes, each containing a value, where you can instantly access any element using its index number. Arrays excel at random access operations and are perfect for situations where you know the size of your data in advance. However, they can be inefficient when it comes to insertions and deletions, as these operations might require shifting many elements.
 
 - [🖼️Sunum-Diziler (PDF)](../files/data_structures/slides/Bolum_02_Diziler.pdf)  
-- [🕹️Array Simulator (HTML)](../files/data_structures/slides/Bolum_02_Diziler.html)  
+- [🕹️Array Simulator (HTML)](../files/data_structures/slides/Bolum_02_Arrays.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf)  
 - [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders02/src)  
 
@@ -93,7 +93,7 @@ Arrays are like the bread and butter of programming. An array is the most fundam
 Linked lists are dynamic and flexible data structures that consist of nodes connected through pointers. A linked list is like a chain of connected nodes, where each node contains both data and a reference (or link) to the next node in the sequence. Unlike arrays, linked lists don't require contiguous memory allocation, making them more flexible for insertions and deletions. They're particularly useful when you need to frequently add or remove elements from the middle of the data structure. However, they sacrifice random access capability, as you must traverse from the beginning to reach any particular element. 
 
 - [🖼️Sunum-Bağlı-Liste (PDF)](../files/data_structures/slides/Bolum_03_Bagli_Liste.pdf)  
-- [🕹️Linked List Simulator (HTML)](../files/data_structures/slides/Bolum_03_Bagli_Liste.html)  
+- [🕹️Linked List Simulator (HTML)](../files/data_structures/slides/Bolum_03_Linked_List.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf)  
 - [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders03/src)  
 
@@ -104,7 +104,7 @@ Linked lists are dynamic and flexible data structures that consist of nodes conn
 A stack operates on the Last-In-First-Out (LIFO) principle, much like a stack of plates where you can only add or remove from the top. This data structure is fundamental in programming for managing function calls, handling undo operations, or parsing expressions. The key operations - push (add) and pop (remove) - make it perfect for tracking state or handling recursion. Think of browsing history in a web browser, where each new page is pushed onto the stack, and hitting the back button pops the most recent page.
 
 - [🖼️Sunum-Yığın (PDF)](../files/data_structures/slides/Bolum_04_Yigin.pdf)  
-- [🕹️Stack Simulator (HTML)](../files/data_structures/slides/Bolum_04_Yigin.html)  
+- [🕹️Stack Simulator (HTML)](../files/data_structures/slides/Bolum_04_Stack.html)  
 - 🕹️Applications:
   - [Hanoi Towers](../files/data_structures/slides/Bolum_04_Tower_of_Hanoi.html)
   - [Stock Span](../files/data_structures/slides/Bolum_04_Stock_Span.html)
@@ -120,7 +120,7 @@ A stack operates on the Last-In-First-Out (LIFO) principle, much like a stack of
 A queue follows the First-In-First-Out (FIFO) principle, similar to a line of people waiting for a service. Elements are added at one end (enqueue) and removed from the other end (dequeue), making it ideal for managing tasks that need to be processed in the order they were received. Queues are extensively used in scenarios like print job scheduling, handling requests in web servers, or managing any kind of service where maintaining order of arrival is important.
 
 - [🖼️Sunum-Kuyruk (PDF)](../files/data_structures/slides/Bolum_05_Kuyruk.pdf)  
-- [🕹️Queue Simulator (HTML)](../files/data_structures/slides/Bolum_05_Kuyruk.html)  
+- [🕹️Queue Simulator (HTML)](../files/data_structures/slides/Bolum_05_Queue.html)  
 - 🕹️Applications:
   - [Scheduler](../files/data_structures/slides/Bolum_05_Scheduler.html)
   - [Priority Scheduler](../files/data_structures/slides/Bolum_05_Priority_Scheduler.html)
@@ -146,8 +146,8 @@ A tree is a hierarchical data structure composed of nodes connected by edges, si
 
 - [🖼️Sunum-Ağaçlar (PDF)](../files/data_structures/slides/Bolum_07_Agac.pdf)  
 - 🕹️Simulators:
-  - [Binary Tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_Agac.html)  
-  - [Btrees Simulator (HTML)](../files/data_structures/slides/Bolum_07_AgacBTree.html)  
+  - [Binary Tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_Tree.html)  
+  - [Btrees Simulator (HTML)](../files/data_structures/slides/Bolum_07_BTree.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_06_Trees.pdf)  
 - [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders07/src)  
 
@@ -172,7 +172,7 @@ A heap is a specialized tree-based data structure that satisfies the heap proper
 A hash table is a data structure that implements an associative array abstract data type, a structure that can map keys to values. Using a hash function to compute an index into an array of buckets or slots, hash tables provide rapid data access - typically O(1) time complexity for insertions, deletions, and lookups. They're widely used in database indexing, caches, and implementing sets. However, they must handle collisions (when different keys hash to the same index) and may require resizing as they grow.
 
 - [🖼️Sunum-Hash Tabloları (PDF)](../files/data_structures/slides/Bolum_09_Hash_Tablosu.pdf)
-- [🕹️Hash Table Simulator (HTML)](../files/data_structures/slides/Bolum_09_Hash_Tablosu.html)
+- [🕹️Hash Table Simulator (HTML)](../files/data_structures/slides/Bolum_09_Hash_Table.html)
 - [🕹️Map Simulator (HTML)](../files/data_structures/slides/Bolum_09_Map.html)
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf)
 - [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders09/src)
@@ -186,9 +186,9 @@ A search tree, particularly a Binary Search Tree (BST), is a binary tree data st
 - [🖼️Sunum-Arama Ağaçları (PDF)](../files/data_structures/slides/Bolum_10_Arama_Agaclari.pdf)  
 - 🕹️Simulators:  
   - [BST Simulator (HTML)](../files/data_structures/slides/Bolum_10_BST.html)  
-  - [Red-Black Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_AgacRB.html)  
-  - [AVL Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_AgacAVL.html)  
-  - [Splay Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_AgacSplay.html)  
+  - [Red-Black Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_Red_Black.html)  
+  - [AVL Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_AVL.html)  
+  - [Splay Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_Splay.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_06_Trees.pdf)  
 - [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders10/src)  
 
