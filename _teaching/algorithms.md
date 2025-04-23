@@ -88,6 +88,7 @@ Sorting algorithms are the architects of order, meticulously organizing data int
 Searching algorithms are the detectives of the data world, designed to track down information with speed and accuracy. They are used in a wide variety of applications, such as finding a file on a computer, a customer in a database, and a word in a document. They come in various forms, each suited to different scenarios.
 
 - [🖼️Sunum-Arama Algoritmaları (PDF)](../files/algorithms/slides/Bolum_03_Arama.pdf)
+- [🕹️Search Algorithms (HTML)](../files/algorithms/slides/Bolum_03_Search.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_03_Searching.pdf)
 - [💻Code Examples (Github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter03/src)
 
