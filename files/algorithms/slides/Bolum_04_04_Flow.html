@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="An interactive network flow simulator visualizing the Ford-Fulkerson and Edmonds-Karp algorithms. Find the maximum flow step by step and learn how these algorithms work.">
+    <meta name="keywords"
+        content="Ford-Fulkerson, Edmonds-Karp, network flow, maximum flow, algorithm, simulator, visualization, graph theory, computer science, education">
+    
+        <title>Ford-Fulkerson and Edmonds-Karp Network Flow Simulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            text-align: center;
+            margin: 0 auto;
+            padding: 1vw;
+            max-width: 800px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            gap: 1vw;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 1vw;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        input,
+        button {
+            width: calc((100% - (4 * 1vw)) / 4);
+            padding: 1vw;
+            margin: 0;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #graphCanvas {
+            margin: 10px;
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            display: block;
+        }
+
+        .node {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: lightblue;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            cursor: default;
+        }
+
+        .edge {
+            position: absolute;
+            background-color: black;
+        }
+
+        .flow {
+            color: red;
+            font-size: 10px;
+            position: absolute;
+            background-color: white;
+            padding: 2px;
+            border-radius: 3px;
+        }
+
+        .step {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Network Flow Simulator</h1>
+
+    <div class="container">
+        <div class="controls">
+            <input type="number" id="numCities" value="7" min="2">
+            <button onclick="startFordFulkerson()">Ford-Fulkerson</button>
+            <button onclick="startEdmondsKarp()">Edmonds-Karp</button>
+            <button onclick="resetGraph()">Reset</button>
+        </div>
+    </div>
+
+    <canvas id="graphCanvas"></canvas>
+
+    <div id="steps"></div>
+
+    <script>
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        const stepsDiv = document.getElementById('steps');
+
+        let nodes = [];
+        let edges = [];
+        let adjacencyList = {};
+        const numNodesInput = document.getElementById('numCities');
+        let sourceNode = 0;
+        let animationInterval;
+        let maxFlow = 0;
+        let flow = {};
+
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateRandomGraph() {
+            nodes = [];
+            edges = [];
+            adjacencyList = {};
+            flow = {};
+            const numNodes = parseInt(numNodesInput.value);
+
+            // Create nodes
+            for (let i = 0; i < numNodes; i++) {
+                nodes.push({
+                    id: i,
+                    x: getRandomInt(50, 550),
+                    y: getRandomInt(50, 350)
+                });
+                adjacencyList[i] = [];
+            }
+
+            // Create random directed edges with capacities
+            for (let i = 0; i < numNodes; i++) {
+                for (let j = 0; j < numNodes; j++) {
+                    if (i !== j && Math.random() < 0.3) { // Probability of a directed edge
+                        const capacity = getRandomInt(5, 15);
+                        const existingEdge = edges.find(e => (e.from === i && e.to === j) || (e.from === j && e.to === i));
+                        if (!existingEdge) {
+                            edges.push({ from: i, to: j, capacity: capacity, flow: 0 });
+                            adjacencyList[i].push(j);
+                            if (!adjacencyList[j].includes(i)) { // For finding reverse paths
+                                adjacencyList[j].push(i);
+                            }
+                            flow[`${i}-${j}`] = 0;
+                        } else if (existingEdge.from === j && existingEdge.to === i) {
+                            // For simplicity, we'll keep the first direction's capacity
+                        }
+                    }
+                }
+            }
+            drawGraph();
+        }
+
+        function drawNode(node) {
+            const sinkNode = parseInt(numNodesInput.value) - 1;
+
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, 15, 0, 2 * Math.PI);
+            ctx.fillStyle = (node.id === sourceNode) ? 'green' : (node.id === sinkNode) ? 'red' : 'lightblue';
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = 'black';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(node.id, node.x, node.y);
+        }
+
+        function drawEdge(edge) {
+            const fromNode = nodes[edge.from];
+            const toNode = nodes[edge.to];
+
+            const angle = Math.atan2(toNode.y - fromNode.y, toNode.x - fromNode.x);
+            const arrowSize = 10;
+
+            ctx.beginPath();
+            ctx.moveTo(fromNode.x, fromNode.y);
+            ctx.lineTo(toNode.x, toNode.y);
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Arrowhead
+            ctx.beginPath();
+            ctx.moveTo(toNode.x, toNode.y);
+            ctx.lineTo(toNode.x - arrowSize * Math.cos(angle - Math.PI / 6), toNode.y - arrowSize * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toNode.x - arrowSize * Math.cos(angle + Math.PI / 6), toNode.y - arrowSize * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fillStyle = 'black';
+            ctx.fill();
+
+            // Display capacity
+            const midX = (fromNode.x + toNode.x) / 2;
+            const midY = (fromNode.y + toNode.y) / 2;
+            const offsetX = 15 * Math.sin(angle);
+            const offsetY = -15 * Math.cos(angle);
+            ctx.fillStyle = 'black';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(edge.capacity, midX + offsetX, midY + offsetY - 5);
+
+            // Display flow
+            if (edge.flow > 0) {
+                ctx.fillStyle = 'red';
+                ctx.fillText(edge.flow, midX - offsetX, midY - offsetY + 10);
+            }
+        }
+
+        function drawGraph() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            edges.forEach(drawEdge);
+            nodes.forEach(drawNode);
+        }
+
+        function findAugmentingPathDFS() {
+            const numNodes = parseInt(numNodesInput.value);
+            const sinkNode = numNodes - 1;
+
+            const visited = new Array(numNodes).fill(false);
+            const parent = new Array(numNodes).fill(null);
+            const path = new Array(numNodes).fill(null);
+            const stack = [sourceNode];
+            visited[sourceNode] = true;
+
+            while (stack.length > 0) {
+                const u = stack.pop();
+                if (u === sinkNode) {
+                    break;
+                }
+                for (const v of adjacencyList[u]) {
+                    if (!visited[v] && getResidualCapacity(u, v) > 0) {
+                        visited[v] = true;
+                        parent[v] = u;
+                        path[v] = { from: u, to: v };
+                        stack.push(v);
+                    }
+                }
+            }
+
+            if (!visited[sinkNode]) {
+                return null;
+            }
+
+            const augmentingPath = [];
+            let curr = sinkNode;
+            while (curr !== sourceNode) {
+                augmentingPath.unshift(path[curr]);
+                curr = parent[curr];
+            }
+            return augmentingPath;
+        }
+
+        function findAugmentingPathBFS() {
+            const numNodes = parseInt(numNodesInput.value);
+            const sinkNode = numNodes - 1;
+
+            const visited = new Array(numNodes).fill(false);
+            const parent = new Array(numNodes).fill(null);
+            const path = new Array(numNodes).fill(null);
+            const queue = [sourceNode];
+            visited[sourceNode] = true;
+
+            while (queue.length > 0) {
+                const u = queue.shift();
+                if (u === sinkNode) {
+                    break;
+                }
+                for (const v of adjacencyList[u]) {
+                    if (!visited[v] && getResidualCapacity(u, v) > 0) {
+                        visited[v] = true;
+                        parent[v] = u;
+                        path[v] = { from: u, to: v };
+                        queue.push(v);
+                    }
+                }
+            }
+
+            if (!visited[sinkNode]) {
+                return null;
+            }
+
+            const augmentingPath = [];
+            let curr = sinkNode;
+            while (curr !== sourceNode) {
+                augmentingPath.unshift(path[curr]);
+                curr = parent[curr];
+            }
+            return augmentingPath;
+        }
+
+        function getResidualCapacity(u, v) {
+            for (const edge of edges) {
+                if (edge.from === u && edge.to === v) {
+                    return edge.capacity - (flow[`${u}-${v}`] || 0);
+                } else if (edge.from === v && edge.to === u) {
+                    return (flow[`${v}-${u}`] || 0);
+                }
+            }
+            return 0;
+        }
+
+        async function augmentPath(path, algorithmName) {
+            let minCapacity = Infinity;
+            for (const segment of path) {
+                const capacity = getResidualCapacity(segment.from, segment.to);
+                minCapacity = Math.min(minCapacity, capacity);
+            }
+
+            stepsDiv.innerHTML += `<div class="step">Found augmenting path: ${path.map(s => `${s.from}-${s.to}`).join(', ')} with capacity ${minCapacity}</div>`;
+
+            for (const segment of path) {
+                const u = segment.from;
+                const v = segment.to;
+                for (const edge of edges) {
+                    if (edge.from === u && edge.to === v) {
+                        edge.flow += minCapacity;
+                        flow[`${u}-${v}`] = edge.flow;
+                    } else if (edge.from === v && edge.to === u) {
+                        flow[`${v}-${u}`] = (flow[`${v}-${u}`] || 0) - minCapacity;
+                    }
+                }
+                drawGraph();
+                await delay(500); // Visualize each step
+            }
+            maxFlow += minCapacity;
+            stepsDiv.innerHTML += `<div class="step">Augmented path. Current max flow: ${maxFlow}</div>`;
+        }
+
+        async function startFordFulkerson() {
+            stepsDiv.innerHTML = '';
+            maxFlow = 0;
+            flow = {};
+            for (const edge of edges) {
+                edge.flow = 0;
+            }
+            drawGraph();
+
+            let path;
+            while ((path = findAugmentingPathDFS())) { // Using DFS for Ford-Fulkerson
+                if (!path) break;
+                await augmentPath(path, 'Ford-Fulkerson (DFS)');
+                await delay(1000); // Pause between finding paths
+            }
+
+            stepsDiv.innerHTML += `<div class="step">Ford-Fulkerson finished. Total max flow: ${maxFlow}</div>`;
+        }
+
+        async function startEdmondsKarp() {
+            stepsDiv.innerHTML = '';
+            maxFlow = 0;
+            flow = {};
+            for (const edge of edges) {
+                edge.flow = 0;
+            }
+            drawGraph();
+
+            let path;
+            while ((path = findAugmentingPathBFS())) { // Using BFS for Edmonds-Karp
+                if (!path) break;
+                await augmentPath(path, 'Edmonds-Karp (BFS)');
+                await delay(1000); // Pause between finding paths
+            }
+
+            stepsDiv.innerHTML += `<div class="step">Edmonds-Karp finished. Total max flow: ${maxFlow}</div>`;
+        }
+
+        function resetGraph() {
+            clearInterval(animationInterval);
+            generateRandomGraph();
+            stepsDiv.innerHTML = '';
+            maxFlow = 0;
+            flow = {};
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function resizeCanvas() {
+            const maxWidth = 600;
+            canvas.width = Math.min(window.innerWidth, maxWidth);
+            canvas.height = canvas.width * 0.6; // Maintain a 16:10 aspect ratio (you can adjust)
+
+            // Initial graph generation
+            generateRandomGraph();
+
+            drawGraph();
+        }
+
+        // Initial canvas resizing
+        resizeCanvas();
+    </script>
+</body>
+
+</html>
