@@ -13,6 +13,7 @@ Algorithmic Game Theory is an interdisciplinary field that blends the mathematic
 
 ## Resources
 
+- [Games_Puzzles_and_Computation](../files/agt/Games_Puzzles_and_Computation.pdf)
 - [React js games (website)](https://reactjsexample.com/tag/games/)
 - [Game Theory 101 (YouTube)](https://www.youtube.com/watch?v=IotsMu1J8fA&list=PL102B69CCA6049B6C)
 - [Toronto CSC304 (website)](https://www.cs.toronto.edu/~nisarg/teaching/304f19/)
