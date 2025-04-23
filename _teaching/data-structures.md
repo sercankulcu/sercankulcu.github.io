@@ -22,12 +22,23 @@ Data structures are fundamental components in computer science, serving as the b
 
 ## The resources  
 
-- Data Structures and Algorithms in Java 6th Edition by Michael T. Goodrich, Roberto Tamassia, Michael H. Goldwasser [(book)](https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635)
-- CS-61B: Data Structures [(course page)](https://sp23.datastructur.es/)
-- CENG-213: Data Structures [(course page)](https://user.ceng.metu.edu.tr/~ys/ceng213-ds)
-- Data Structures Easy to Advanced Course [(youTube)](https://www.youtube.com/watch?v=RBSGKlAvoiM)
-- Veri Yapıları ve Algoritmalar, Ders Notları, Mustafa Ege.
-- The Algorithms [(github project)](https://github.com/TheAlgorithms/Java)
+- **books**  
+  [Data Structures and Algorithms in Java by Goodrich](https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635)
+
+- **course webpages**  
+  [CS-61B](https://sp23.datastructur.es) | 
+  [CENG-213](https://user.ceng.metu.edu.tr/~ys/ceng213-ds)
+
+- **youtube**  
+  [Data Structures Easy to Advanced Course](https://www.youtube.com/watch?v=RBSGKlAvoiM)
+
+- **lecture notes**  
+  [Mustafa Ege (1)](../files/data_structures/Veri_Yapilari_ve_Algoritmalar_1_Mustafa_Ege.pdf) | 
+  [Mustafa Ege (2)](../files/data_structures/Veri_Yapıları_ve_Algoritmalar_2_Mustafa_Ege.pdf) | 
+  [Aybars Uğur](../files/data_structures/Veri_Yapilari_Aybars_Ugur.pdf)
+
+- **github**  
+  [The Algorithms](https://github.com/TheAlgorithms/Java)
 
 ---
 
@@ -38,12 +49,12 @@ Data structures are fundamental components in computer science, serving as the b
   [vize B](../files/data_structures/slides/2024-2025-data-vize-b-cevaplar.pdf) | 
   [telafi](../files/data_structures/slides/2024-2025-data-telafi-cevaplar.pdf) | 
   [final](../files/data_structures/slides/2024-2025-data-final-cevaplar.pdf) | 
-  [bütünleme](../files/data_structures/slides/2024-2025-data-butunleme-cevaplar.pdf)
+  [but](../files/data_structures/slides/2024-2025-data-butunleme-cevaplar.pdf)
 
 - **2023-2024**  
   [vize](../files/data_structures/slides/2023-2024-data-vize-cevaplar.pdf) | 
   [final](../files/data_structures/slides/2023-2024-data-final-cevaplar.pdf) | 
-  [bütünleme](../files/data_structures/slides/2023-2024-data-butunleme-cevaplar.pdf)
+  [but](../files/data_structures/slides/2023-2024-data-butunleme-cevaplar.pdf)
 
 - **Çalışma Soruları**  
   [vize](../files/data_structures/slides/vize_calisma.txt) | 
