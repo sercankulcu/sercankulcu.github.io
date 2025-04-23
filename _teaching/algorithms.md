@@ -97,9 +97,12 @@ Searching algorithms are the detectives of the data world, designed to track dow
 
 Graphs, composed of nodes and edges, are ubiquitous in various domains, including social networks, transportation systems, and computational biology. Graph algorithms are the masterminds behind the scenes of network analysis, adept at solving puzzles that involve points and connections. They help us navigate through complex networks, from social media graphs to city maps. Graph algorithms enable us to explore, analyze, and manipulate these complex structures efficiently. 
 
-- [🖼️Sunum-Çizge Gezinme (PDF)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.pdf) | [🕹️BFS DFS (HTML)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.html)
-- [🖼️Sunum-Çizge En Kısa Yol (PDF)](../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.pdf) | [🕹️Travelling Salesman (HTML)](../files/algorithms/slides/Bolum_04_02_TSP.html)
-- [🖼️Sunum-Çizge Minimum Kapsayan (PDF)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.pdf) | [🕹️MST Simulator (HTML)](../files/algorithms/slides/Bolum_04_03_MST.html)
+- [🖼️Sunum-Çizge Gezinme (PDF)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.pdf) | 
+[🕹️BFS DFS (HTML)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.html)
+- [🖼️Sunum-Çizge En Kısa Yol (PDF)](../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.pdf) | 
+[🕹️Travelling Salesman (HTML)](../files/algorithms/slides/Bolum_04_02_TSP.html)
+- [🖼️Sunum-Çizge Minimum Kapsayan (PDF)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.pdf) | 
+[🕹️MST Simulator (HTML)](../files/algorithms/slides/Bolum_04_03_MST.html)
 - [🖼️Sunum-Çizge Ağ Akış (PDF)](../files/algorithms/slides/Bolum_04_04_Ag_Akis.pdf)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_04_Graph.pdf) | 
 [Connect Four (HTML)](../files/algorithms/slides/connect-four-guide.html)

@@ -1,241 +1,308 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-  <title>BFS ve DFS Algoritmaları</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graph Traversal Simulator: BFS and DFS Visualization</title>
+  <meta name="description"
+    content="Visualize Breadth-First Search (BFS) and Depth-First Search (DFS) graph traversal algorithms in a web-based simulator. Generate random graphs and observe the step-by-step animation.">
+  <meta name="keywords"
+    content="graph traversal, BFS, DFS, algorithm visualization, javascript, graph simulator, web development, data structures">
+
   <style>
     body {
       font-family: Arial, sans-serif;
-      line-height: 1.6;
+      background-color: #f0f0f0;
       color: #333;
-      max-width: 1200px;
+      text-align: center;
       margin: 0 auto;
-      padding: 20px;
-      background-color: #f4f4f4;
-    }
-
-    h1,
-    h2 {
-      color: #2c3e50;
+      padding: 1vw;
+      max-width: 800px;
+      box-sizing: border-box;
     }
 
     .container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
     }
 
-    #graph-container {
-      width: 60%;
-      height: 500px;
-      border: 1px solid #ddd;
-      background-color: white;
+    .controls {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      gap: 1vw;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 1vw;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    #controls {
-      width: 35%;
+    input,
+    button {
+      width: calc((100% - (4 * 1vw)) / 4);
+      padding: 1vw;
+      margin: 0;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
     }
 
     button {
-      background-color: #3498db;
+      background-color: #4CAF50;
       color: white;
-      border: none;
-      padding: 10px 20px;
-      margin: 5px;
       cursor: pointer;
-      font-size: 16px;
+      border: none;
     }
 
     button:hover {
-      background-color: #2980b9;
+      background-color: #45a049;
     }
 
-    #log {
-      margin-top: 20px;
-      padding: 10px;
-      background-color: #ecf0f1;
-      border: 1px solid #bdc3c7;
-      height: 200px;
-      overflow-y: scroll;
+
+    #graphCanvas {
+      margin: 10px;
+    }
+
+    .node {
+      position: absolute;
+      background-color: #eee;
+      border: 1px solid #000;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .edge {
+      position: absolute;
+      background-color: #000;
+    }
+
+    #outputDiv {
+      margin-top: 10px;
+      width: 80%;
+      max-height: 200px;
+      max-width: 800px;
+      overflow-y: auto;
+      white-space: pre-wrap;
     }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>
-  <h1>BFS ve DFS Algoritmaları</h1>
+  <h1>Graph Traversal Simulator</h1>
   <div class="container">
-    <div id="graph-container"></div>
-    <div id="controls">
-      <h2>Kontroller</h2>
-      <button onclick="addNode()">Düğüm Ekle</button>
-      <button onclick="addEdge()">Kenar Ekle</button>
-      <button onclick="startBFS()">BFS Başlat</button>
-      <button onclick="startDFS()">DFS Başlat</button>
-      <button onclick="nextStep()">Sonraki Adım</button>
-      <button onclick="resetGraph()">Sıfırla</button>
-      <div id="log"></div>
+    <div class="controls">
+      <input type="number" id="nodeCount" value="10">
+      <button id="generateButton">Generate Graph</button>
+      <button id="bfsButton">BFS</button>
+      <button id="dfsButton">DFS</button>
     </div>
   </div>
 
+  <canvas id="graphCanvas" width="600" height="400"></canvas>
+
+  <div id="outputDiv"></div>
+
   <script>
-    let nodes = new vis.DataSet([
-      { id: 1, label: '1' },
-      { id: 2, label: '2' },
-      { id: 3, label: '3' },
-      { id: 4, label: '4' },
-      { id: 5, label: '5' },
-      { id: 6, label: '6' },
-      { id: 7, label: '7' },
-      { id: 8, label: '8' },
-      { id: 9, label: '9' },
-      { id: 10, label: '10' },
-      { id: 11, label: '11' },
-      { id: 12, label: '12' }
-    ]);
+    const canvas = document.getElementById('graphCanvas');
+    const ctx = canvas.getContext('2d');
+    const nodeCountInput = document.getElementById('nodeCount');
+    const generateButton = document.getElementById('generateButton');
+    const bfsButton = document.getElementById('bfsButton');
+    const dfsButton = document.getElementById('dfsButton');
+    const outputDiv = document.getElementById('outputDiv');
 
-    let edges = new vis.DataSet([
-      { from: 1, to: 2 },
-      { from: 1, to: 3 },
-      { from: 2, to: 4 },
-      { from: 2, to: 5 },
-      { from: 3, to: 6 },
-      { from: 4, to: 7 },
-      { from: 5, to: 8 },
-      { from: 6, to: 9 },
-      { from: 9, to: 11 },
-      { from: 3, to: 12 },
-      { from: 4, to: 10 },
-      { from: 8, to: 11 }
-    ]);
+    let nodes = [];
+    let edges = [];
+    let adjacencyList = {};
 
-    let container = document.getElementById('graph-container');
-    let data = {
-      nodes: nodes,
-      edges: edges
-    };
-    let options = {};
-    let network = new vis.Network(container, data, options);
+    function generateGraph() {
+      const nodeCount = parseInt(nodeCountInput.value);
+      const nodeVisualSize = 30;
+      nodes = [];
+      edges = [];
+      adjacencyList = {};
 
-    let queue = [];
-    let stack = [];
-    let visited = new Set();
-    let currentStep = 0;
-    let currentAlgorithm = '';
-
-    function addNode() {
-      let newId = nodes.length + 1;
-      nodes.add({ id: newId, label: String(newId) });
-    }
-
-    function addEdge() {
-      let fromNode = prompt("Başlangıç düğümü:");
-      let toNode = prompt("Bitiş düğümü:");
-      if (fromNode && toNode) {
-        edges.add({ from: parseInt(fromNode), to: parseInt(toNode) });
-      }
-    }
-
-    function startBFS() {
-      resetGraph();
-      currentAlgorithm = 'BFS';
-      let startNode = parseInt(prompt("Başlangıç düğümünü girin:"));
-      if (startNode && nodes.get(startNode)) {
-        queue.push(startNode);
-        visited.add(startNode);
-        nodes.update({ id: startNode, color: { background: 'yellow' } });
-        log(`BFS başladı. Başlangıç düğümü: ${startNode}`);
-      } else {
-        log("Geçersiz başlangıç düğümü!");
-      }
-    }
-
-    function startDFS() {
-      resetGraph();
-      currentAlgorithm = 'DFS';
-      let startNode = parseInt(prompt("Başlangıç düğümünü girin:"));
-      if (startNode && nodes.get(startNode)) {
-        stack.push(startNode);
-        visited.add(startNode);
-        nodes.update({ id: startNode, color: { background: 'yellow' } });
-        log(`DFS başladı. Başlangıç düğümü: ${startNode}`);
-      } else {
-        log("Geçersiz başlangıç düğümü!");
-      }
-    }
-
-    function nextStep() {
-      if (currentAlgorithm === 'BFS') {
-        bfsStep();
-      } else if (currentAlgorithm === 'DFS') {
-        dfsStep();
-      } else {
-        log("Lütfen önce bir algoritma seçin!");
-      }
-    }
-
-    function bfsStep() {
-      if (queue.length === 0) {
-        log("BFS tamamlandı!");
-        return;
+      // Generate nodes
+      for (let i = 0; i < nodeCount; i++) {
+        const x = Math.random() * (canvas.width - nodeVisualSize);
+        const y = Math.random() * (canvas.height - nodeVisualSize);
+        nodes.push({ id: i, x, y, size: nodeVisualSize });
+        adjacencyList[i] = [];
       }
 
-      let currentNode = queue.shift();
-      nodes.update({ id: currentNode, color: { background: 'green' } });
-      log(`Ziyaret edilen düğüm: ${currentNode}`);
-
-      let connectedNodes = network.getConnectedNodes(currentNode);
-      for (let node of connectedNodes) {
-        if (!visited.has(node)) {
-          queue.push(node);
-          visited.add(node);
-          nodes.update({ id: node, color: { background: 'yellow' } });
-          log(`Kuyruğa eklenen düğüm: ${node}`);
+      // Generate some random edges (adjust probability as needed)
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          if (Math.random() < 0.3) { // 30% probability of an edge
+            edges.push({ from: i, to: j });
+            adjacencyList[i].push(j);
+            adjacencyList[j].push(i); // Assuming undirected graph
+          }
         }
       }
-
-      currentStep++;
+      clearOutput();
+      logOutput("Graph generated with " + nodeCount + " nodes and " + edges.length + " edges.");
+      drawGraph();
     }
 
-    function dfsStep() {
-      if (stack.length === 0) {
-        log("DFS tamamlandı!");
-        return;
-      }
+    function drawGraph() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      let currentNode = stack.pop();
-      nodes.update({ id: currentNode, color: { background: 'green' } });
-      log(`Ziyaret edilen düğüm: ${currentNode}`);
+      // Draw edges
+      edges.forEach(edge => {
+        const fromNode = nodes[edge.from];
+        const toNode = nodes[edge.to];
 
-      let connectedNodes = network.getConnectedNodes(currentNode);
-      for (let node of connectedNodes.reverse()) {
-        if (!visited.has(node)) {
-          stack.push(node);
-          visited.add(node);
-          nodes.update({ id: node, color: { background: 'yellow' } });
-          log(`Yığına eklenen düğüm: ${node}`);
-        }
-      }
-
-      currentStep++;
-    }
-
-    function resetGraph() {
-      queue = [];
-      stack = [];
-      visited = new Set();
-      currentStep = 0;
-      currentAlgorithm = '';
-      nodes.forEach((node) => {
-        nodes.update({ id: node.id, color: { background: 'white' } });
+        ctx.beginPath();
+        ctx.moveTo(fromNode.x + fromNode.size / 2, fromNode.y + fromNode.size / 2);
+        ctx.lineTo(toNode.x + toNode.size / 2, toNode.y + toNode.size / 2);
+        ctx.stroke();
       });
-      log("Graf sıfırlandı.");
+
+      // Draw nodes
+      nodes.forEach(node => {
+        ctx.beginPath();
+        ctx.arc(node.x + node.size / 2, node.y + node.size / 2, node.size / 2, 0, 2 * Math.PI);
+        ctx.fillStyle = '#eee';
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#000';
+        ctx.fillText(node.id, node.x + node.size / 2 - 5, node.y + node.size / 2 + 5);
+      });
     }
 
-    function log(message) {
-      let logElement = document.getElementById('log');
-      logElement.innerHTML += `<p>${message}</p>`;
-      logElement.scrollTop = logElement.scrollHeight;
+    async function bfs() {
+      if (nodes.length === 0) return;
+      clearOutput();
+      logOutput("Starting BFS from node 0.");
+
+      const startNodeId = 0; // Start BFS from the first node
+      const queue = [startNodeId];
+      const visited = new Set();
+      visited.add(startNodeId);
+
+      while (queue.length > 0) {
+        const currentNodeId = queue.shift();
+        logOutput("Visiting node: " + currentNodeId);
+        await highlightNode(currentNodeId, 'green'); // Highlight current node
+
+        for (const neighborId of adjacencyList[currentNodeId]) {
+          if (!visited.has(neighborId)) {
+            logOutput("Enqueuing neighbor: " + neighborId + " from " + currentNodeId);
+            queue.push(neighborId);
+            visited.add(neighborId);
+            await highlightEdge(currentNodeId, neighborId, 'green'); //Highlight edge
+          } else {
+            logOutput("Neighbor " + neighborId + " of " + currentNodeId + " already visited.");
+          }
+        }
+      }
+      logOutput("BFS finished.");
+      resetNodeColors();
+      resetEdgeColors();
     }
+
+    async function dfs() {
+      if (nodes.length === 0) return;
+      clearOutput();
+      logOutput("Starting DFS from node 0.");
+
+      const startNodeId = 0; // Start DFS from the first node
+      const stack = [startNodeId];
+      const visited = new Set();
+
+      while (stack.length > 0) {
+        const currentNodeId = stack.pop();
+
+        if (!visited.has(currentNodeId)) {
+          visited.add(currentNodeId);
+          logOutput("Visiting node: " + currentNodeId);
+          await highlightNode(currentNodeId, 'blue'); // Highlight current node
+
+          for (const neighborId of adjacencyList[currentNodeId]) {
+            if (!visited.has(neighborId)) {
+              logOutput("Pushing neighbor: " + neighborId + " onto stack from " + currentNodeId);
+              stack.push(neighborId);
+              await highlightEdge(currentNodeId, neighborId, 'blue'); //Highlight edge
+            } else {
+              logOutput("Neighbor " + neighborId + " of " + currentNodeId + " already visited.");
+            }
+          }
+        }
+      }
+      logOutput("DFS finished.");
+      resetNodeColors();
+      resetEdgeColors();
+    }
+
+    async function highlightNode(nodeId, color) {
+      const node = nodes[nodeId];
+      ctx.beginPath();
+      ctx.arc(node.x + node.size / 2, node.y + node.size / 2, node.size / 2, 0, 2 * Math.PI);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.stroke();
+      await delay(500); // Animation delay
+    }
+
+    async function highlightEdge(fromNodeId, toNodeId, color) {
+      const fromNode = nodes[fromNodeId];
+      const toNode = nodes[toNodeId];
+
+      ctx.beginPath();
+      ctx.moveTo(fromNode.x + fromNode.size / 2, fromNode.y + fromNode.size / 2);
+      ctx.lineTo(toNode.x + toNode.size / 2, toNode.y + toNode.size / 2);
+      ctx.strokeStyle = color;
+      ctx.stroke();
+      ctx.strokeStyle = '#000'; // Reset stroke color
+      await delay(500); // Animation delay
+    }
+
+    function resetNodeColors() {
+      nodes.forEach(node => {
+        ctx.beginPath();
+        ctx.arc(node.x + node.size / 2, node.y + node.size / 2, node.size / 2, 0, 2 * Math.PI);
+        ctx.fillStyle = '#eee';
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#000';
+        ctx.fillText(node.id, node.x + node.size / 2 - 5, node.y + node.size / 2 + 5);
+      });
+    }
+
+    function resetEdgeColors() {
+      drawGraph(); // Redraws the graph, effectively resetting edge colors
+    }
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function logOutput(message) {
+      outputDiv.textContent += message + "\n";
+      outputDiv.scrollTop = outputDiv.scrollHeight; // Auto scroll to bottom
+    }
+
+    function clearOutput() {
+      outputDiv.textContent = "";
+    }
+
+    generateButton.addEventListener('click', generateGraph);
+    bfsButton.addEventListener('click', bfs);
+    dfsButton.addEventListener('click', dfs);
+
+    // Initial graph generation
+    generateGraph();
   </script>
 </body>
 
