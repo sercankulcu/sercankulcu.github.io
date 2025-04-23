@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Visualize and simulate Minimum Spanning Tree algorithms like Prim's and Kruskal's. Understand how MSTs are constructed step-by-step on a graph.">
+    <meta name="keywords"
+        content="Minimum Spanning Tree, MST, Prim's algorithm, Kruskal's algorithm, graph algorithm, graph visualization, algorithm simulator, computer science education">
+
+    <title>Minimum Spanning Tree (MST) Simulator | Prim & Kruskal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            text-align: center;
+            margin: 0 auto;
+            padding: 1vw;
+            max-width: 800px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            gap: 1vw;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 1vw;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        input,
+        button {
+            width: calc((100% - (4 * 1vw)) / 4);
+            padding: 1vw;
+            margin: 0;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #graphCanvas {
+            margin: 20px;
+        }
+
+        #output {
+            margin-top: 20px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Minimum Spanning Tree</h1>
+
+    <div class="container">
+        <div class="controls">
+            <input type="number" id="numCities" value="10" min="2">
+            <button onclick="generateGraph()">Generate</button>
+            <button onclick="startPrim()">Prim's Algorithm</button>
+            <button onclick="startKruskal()">Kruskal's Algorithm</button>
+        </div>
+    </div>
+
+    <canvas id="graphCanvas" width="600" height="400"></canvas>
+
+    <div id="output"></div>
+
+    <script>
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        const outputDiv = document.getElementById('output');
+
+        let nodes = [];
+        let edges = [];
+        let adjMatrix = [];
+        const numNodesInput = document.getElementById('numCities');
+        const nodeRadius = 15;
+        const animationSpeed = 1000; // milliseconds
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateGraph() {
+            nodes = [];
+            edges = [];
+
+            const numNodes = parseInt(numNodesInput.value);
+            const minEdges = numNodes * 1.5;
+            const maxEdges = numNodes * 2.5;
+            adjMatrix = Array(numNodes).fill(null).map(() => Array(numNodes).fill(Infinity));
+
+            // Create nodes
+            for (let i = 0; i < numNodes; i++) {
+                let x, y;
+                let overlapping;
+                do {
+                    overlapping = false;
+                    x = getRandomInt(nodeRadius, canvas.width - nodeRadius);
+                    y = getRandomInt(nodeRadius, canvas.height - nodeRadius);
+                    for (const node of nodes) {
+                        const dx = x - node.x;
+                        const dy = y - node.y;
+                        if (Math.sqrt(dx * dx + dy * dy) < 2 * nodeRadius + 5) {
+                            overlapping = true;
+                            break;
+                        }
+                    }
+                } while (overlapping);
+                nodes.push({ id: i, x, y });
+            }
+
+            // Create edges
+            const numEdges = getRandomInt(minEdges, maxEdges);
+            let createdEdges = 0;
+            while (createdEdges < numEdges) {
+                const u = getRandomInt(0, numNodes - 1);
+                const v = getRandomInt(0, numNodes - 1);
+                if (u !== v && adjMatrix[u][v] === Infinity) {
+                    const weight = getRandomInt(1, 20);
+                    adjMatrix[u][v] = weight;
+                    adjMatrix[v][u] = weight;
+                    edges.push({ u, v, weight });
+                    createdEdges++;
+                }
+            }
+
+            drawGraph();
+        }
+
+        function drawGraph(highlightedEdges = [], algorithmStep = "") {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw edges
+            ctx.strokeStyle = 'gray';
+            ctx.lineWidth = 2;
+            edges.forEach(edge => {
+                const node1 = nodes.find(n => n.id === edge.u);
+                const node2 = nodes.find(n => n.id === edge.v);
+                ctx.beginPath();
+                ctx.moveTo(node1.x, node1.y);
+                ctx.lineTo(node2.x, node2.y);
+                const midX = (node1.x + node2.x) / 2;
+                const midY = (node1.y + node2.y) / 2;
+                ctx.stroke();
+
+                // Draw edge weight
+                ctx.fillStyle = '#000';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(edge.weight, midX, midY - 5);
+            });
+
+            // Highlighted edges
+            ctx.strokeStyle = 'green';
+            ctx.lineWidth = 4;
+            highlightedEdges.forEach(edge => {
+                const node1 = nodes.find(n => n.id === edge.u);
+                const node2 = nodes.find(n => n.id === edge.v);
+                ctx.beginPath();
+                ctx.moveTo(node1.x, node1.y);
+                ctx.lineTo(node2.x, node2.y);
+                ctx.stroke();
+            });
+
+            // Draw nodes
+            ctx.fillStyle = '#eee';
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            nodes.forEach(node => {
+                ctx.beginPath();
+                ctx.fillStyle = '#eee';
+                ctx.arc(node.x, node.y, nodeRadius, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = '#000';
+                ctx.font = '14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(node.id, node.x, node.y + 5);
+            });
+
+            outputDiv.innerText = algorithmStep + "\n" + outputDiv.innerText;
+        }
+
+        async function startPrim() {
+            if (nodes.length === 0) return;
+            outputDiv.innerText = "";
+
+            const mstEdges = [];
+            const numNodes = parseInt(numNodesInput.value);
+            const visited = new Array(numNodes).fill(false);
+            const edgeQueue = []; // { u, v, weight }
+            let current = 0; // Start from the first node
+
+            visited[current] = true;
+
+            while (mstEdges.length < numNodes - 1) {
+                for (let v = 0; v < numNodes; v++) {
+                    if (adjMatrix[current][v] !== Infinity && !visited[v]) {
+                        edgeQueue.push({ u: current, v, weight: adjMatrix[current][v] });
+                    }
+                }
+
+                edgeQueue.sort((a, b) => a.weight - b.weight);
+
+                if (edgeQueue.length === 0) break; // Disconnected graph
+
+                const nextEdge = edgeQueue.shift();
+                const nextNode = visited[nextEdge.u] ? nextEdge.v : nextEdge.u;
+
+                if (!visited[nextNode]) {
+                    mstEdges.push(nextEdge);
+                    visited[nextNode] = true;
+                    current = nextNode;
+                    drawGraph(mstEdges, `Added edge (${nextEdge.u}, ${nextEdge.v}) with weight ${nextEdge.weight}`);
+                    await new Promise(resolve => setTimeout(resolve, animationSpeed));
+                }
+            }
+
+            drawGraph(mstEdges, `Finished. Total weight: ${mstEdges.reduce((sum, edge) => sum + edge.weight, 0)}`);
+        }
+
+        async function startKruskal() {
+            if (nodes.length === 0) return;
+            outputDiv.innerText = "";
+
+            const mstEdges = [];
+            const sortedEdges = [...edges].sort((a, b) => a.weight - b.weight);
+            const numNodes = parseInt(numNodesInput.value);
+            const parent = Array(numNodes).fill(null).map((_, i) => i);
+
+            function find(i) {
+                if (parent[i] === i) return i;
+                return parent[i] = find(parent[i]);
+            }
+
+            function union(i, j) {
+                const rootI = find(i);
+                const rootJ = find(j);
+                if (rootI !== rootJ) {
+                    parent[rootI] = rootJ;
+                    return true;
+                }
+                return false;
+            }
+
+            for (const edge of sortedEdges) {
+                if (union(edge.u, edge.v)) {
+                    mstEdges.push(edge);
+                    drawGraph(mstEdges, `Added edge (${edge.u}, ${edge.v}) with weight ${edge.weight}`);
+                    await new Promise(resolve => setTimeout(resolve, animationSpeed));
+                }
+                if (mstEdges.length === numNodes - 1) break;
+            }
+
+            drawGraph(mstEdges, `Finished. Total weight: ${mstEdges.reduce((sum, edge) => sum + edge.weight, 0)}`);
+        }
+
+        // Initial graph generation
+        generateGraph();
+    </script>
+</body>
+
+</html>
