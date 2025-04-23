@@ -24,20 +24,26 @@ An algorithm is a set of well-defined instructions for carrying out a particular
 
 - **course webpages**  
   [Cambridge](https://www.cl.cam.ac.uk/teaching/2021/Algorithms/materials.html) | 
-  [Stanford](https://stanford-cs161.github.io/winter2024/lectures)
+  [Stanford](https://stanford-cs161.github.io/winter2024/lectures) | 
+  [MIT OpenCourseware](https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/)
 
 - **books**  
-  [Algorithms Illuminated](https://www.algorithmsilluminated.org)
+  [Algorithms Illuminated](https://www.algorithmsilluminated.org) | 
+  [Introduction to Algorithms by Cormen](https://mitpress.mit.edu/9780262046305/introduction-to-algorithms) | 
+  [Data Structures and Algorithms in Python by Goodrich](https://www.amazon.com/Structures-Algorithms-Python-Michael-Goodrich/dp/1118290275)
 
 - **websites**  
   [Visual Algo](https://visualgo.net/en) | 
-  [Algoanim](https://www.algoanim.ide.sk/) | 
-  [USFCA](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html)
+  [Algoanim](https://www.algoanim.ide.sk) | 
+  [USFCA](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html) | 
+  [LeetCode](https://leetcode.com) | 
+  [HackerRank](https://www.hackerrank.com)
 
 - **github**  
   [DSALGO Visualizer](https://github.com/jhabarsingh/DSALGO-VISUALIZER) | 
   [The Algorithms](https://github.com/TheAlgorithms/Java) | 
-  [Cpbook](https://github.com/stevenhalim/cpbook-code/tree/master/)
+  [Cpbook](https://github.com/stevenhalim/cpbook-code/tree/master) | 
+  [awesome-algorithms](https://github.com/tayllan/awesome-algorithms)
 
 ---
 
