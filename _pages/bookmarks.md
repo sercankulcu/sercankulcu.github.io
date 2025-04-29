@@ -6,8 +6,10 @@ author_profile: false
 redirect_from: 
 ---
 
-* <a href="https://chat.openai.com/">[ChatGPT]</a> a chatbot launched by OpenAI 
-* <a href="https://bard.google.com/chat">[Bard]</a> Google's helpful collaboration chat tool 
+* <a href="https://chatgpt.com/">[ChatGPT]</a> a chatbot launched by OpenAI 
+* <a href="https://gemini.google.com/app">[Gemini]</a> your personal AI assistant 
+* <a href="https://www.perplexity.ai/">[Perplexity]</a> a free AI-powered answer engine 
+* <a href="https://grok.com/">[Grok]</a> explore the universe with AI.
 * <a href="https://translate.google.com/">[Google Translate]</a> a multilingual neural machine translation service
 * <a href="https://terimler.org/">[Terimler]</a> akademik bilim terimleri sözlüğü
 * <a href="https://eski.tbd.org.tr/index.php?sayfa=sozluk&mi1">[Bilişim Sözlüğü]</a> türkiye bilişim derneği bilişim terimleri karşılıklar sözlüğü
