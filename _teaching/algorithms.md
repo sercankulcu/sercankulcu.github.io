@@ -115,7 +115,7 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
   - [🕹️MST Simulator (HTML)](../files/algorithms/slides/Bolum_04_03_MST.html)
   - [🕹️Network Flow (HTML)](../files/algorithms/slides/Bolum_04_04_Flow.html)
   - [Connect Four (HTML)](../files/algorithms/slides/connect-four-guide.html)
-- [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_04_Graph.pdf) | 
+- [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_04_Graph.pdf) 
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src)
 
 ---
