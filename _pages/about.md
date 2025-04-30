@@ -11,7 +11,7 @@ redirect_from:
 
 I am <u>Sercan Külcü</u>, an Assistant Professor in the <u>Computer Science Department</u> at <u>Giresun University</u>. With over <u>20 years</u> of professional experience in <u>software engineering</u>, I hold a <u>PhD</u> specializing in <u>low-power wireless communication technologies</u>. My expertise spans <u>embedded</u> and <u>real-time operating systems</u>, programming in <u>C</u>, <u>C++</u>, and <u>Java</u>, as well as the application of <u>machine learning techniques</u>. Recently, I have also enjoyed developing small applications with <u>JavaScript</u>.
 
-For a better mobile experience, you can also <button id="installPWA" style="display: none; display: inline;">🚀 click to install the app</button> and access everything directly from your home screen.
+For a better mobile experience, you can also <button id="installPWA" style="display: none;">🚀 click to install the app</button> and access everything directly from your home screen.
 
 <script>
 let deferredPrompt;
@@ -19,7 +19,7 @@ let deferredPrompt;
 window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     deferredPrompt = event;
-    document.getElementById("installPWA").style.display = "block";
+    document.getElementById("installPWA").style.display = "inline";
 });
 
 document.getElementById("installPWA").addEventListener("click", async () => {
