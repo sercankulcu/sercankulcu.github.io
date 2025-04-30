@@ -31,6 +31,7 @@ Operating systems are a fundamental part of modern computing. They form the foun
 [Bilgisayar İşletim Sistemleri, Ali Saatçi](../files/os/Book_Bilgisayar_İsletim_Sistemleri.pdf) | 
 [İşletim Sistemleri, İbrahim Türkoğlu](../files/os/Book_Firat_Isletim_Sistemleri.pdf) | 
 [Operating Systems, Bighnaraj Naik](../files/os/Book_Operating_Systems_Naik.pdf) | 
+[Putting the You in CPU](../files/os/Putting_the_You_in_CPU.pdf) | 
 [Operating Systems From 0 to 1](../files/os/Book_Operating_Systems_From_0_to_1.pdf)
 
 - **youtube**  
