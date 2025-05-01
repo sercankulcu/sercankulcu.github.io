@@ -87,7 +87,7 @@ The world of operating systems is introduced as a key aspect of modern computing
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_01_Giris.pdf), [Sunum (pdf)](../files/os/slides/kemal/Bolum_01_Giris_Bicakci.pdf)
-- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_1_Introduction.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_1_Introduction.pdf), [boot](../files/os/slides/Chapter_01_Boot_Process.html)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter01/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01) 
@@ -100,7 +100,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 The design and organization of an operating system's internal components and mechanisms, collectively referred to as its structure, play a critical role in determining its performance, reliability, and functionality.
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_02_Yapilar.pdf)
-- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_2_Structures.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_2_Structures.pdf), [device drivers](../files/os/slides/Chapter_02_Device_Drivers.html), [kernel user mode](../files/os/slides/Chapter_02_Kernel_and_User_Mode.html), [system calls](../files/os/slides/Chapter_02_System_Calls.html), [virtualization](../files/os/slides/Chapter_02_Virtualization.html)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter02/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab02) 
@@ -113,8 +113,7 @@ The design and organization of an operating system's internal components and mec
 Processes serve as the cornerstone of multi-tasking and concurrency, enabling multiple applications to execute simultaneously while sharing resources efficiently and securely.
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_03_Surecler.pdf), [Sunum (pdf)](../files/os/slides/kemal/Bolum_03_Surecler_Bicakci.pdf)
-- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_3_Processes.pdf)
-- [🖼️Concurrency (HTML)](../files/os/slides/Chapter_03_Concurrency.html)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_3_Processes.pdf), [Concurrency (HTML)](../files/os/slides/Chapter_03_Concurrency.html), [IPC](../files/os/slides/Chapter_03_IPC.html)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter03/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab03) 
@@ -205,7 +204,7 @@ Virtual memory, a key technique used by modern operating systems to manage memor
 File systems, which provide a hierarchical organization and management scheme for data storage on disk or other persistent storage devices, are a fundamental component of any modern operating system, enabling applications to store and access data efficiently and reliably.
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_10_Dosya_Sistemleri.pdf), [Sunum (pdf)](../files/os/slides/kemal/Bolum_10_01_Dosya_Sistemleri_Bicakci.pdf), [Sunum (pdf)](../files/os/slides/kemal/Bolum_10_02_Dosya_Sistemleri_Bicakci.pdf)
-- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_10_File_systems.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_10_File_systems.pdf), [fs implementation](../files/os/slides/Chapter_10_File_System_Implementation.html)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter10/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab10) 
@@ -264,7 +263,7 @@ With the growing demand for multimedia applications such as audio and video play
 Operating system design involves the careful consideration of a wide range of factors, including performance, reliability, security, compatibility, and usability, and requires a deep understanding of the underlying hardware and software components, as well as the needs and expectations of end-users and developers. 
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_15_Isletim_Sistemi_Tasarimi.pdf)
-- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_15_Operating_system_design.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_15_Operating_system_design.pdf), [rtos](../files/os/slides/Chapter_15_RTOS.html), [test debug](../files/os/slides/Chapter_15_Testing_Debugging.html)
 - [🖋️Question & answers (pdf)](../files/os/questions/Chapter_15_Operating_system_design.pdf)
 
 ---
