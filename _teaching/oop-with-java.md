@@ -22,12 +22,25 @@ Java is one of the most popular programming languages, extensively used in vario
 
 ## The resources:
 
-* Dev Java [website](https://dev.java/learn/)
-* Cody [website](https://f.eba.gov.tr/cody/), Blockly [website](https://blockly.games/)
-* Java Youtube [youtube](https://www.youtube.com/java)
-* Download Eclipse [website](https://www.eclipse.org/downloads/packages/installer)
-* Oracle Java Tutorials [website](https://docs.oracle.com/javase/tutorial/)
-* [Java Notlar, Oğuz Aslantürk (pdf)](../files/java/java_notes_by_oa.pdf)
+- **website**  
+  [Dev Java](https://dev.java/learn/) | 
+  [Oracle Java Tutorials](https://docs.oracle.com/javase/tutorial/) |  
+  [Reddit – r/learnjava](https://www.reddit.com/r/learnjava/)
+
+- **tools**  
+  [Eclipse IDE](https://www.eclipse.org/downloads/packages/) |  
+  [IntelliJ IDEA](https://www.jetbrains.com/idea/) |  
+  [Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack)
+
+- **youtube**
+  [Java Youtube](https://www.youtube.com/java) |  
+  [Kodlama Vakti](https://www.youtube.com/watch?v=zERL__bD4NI&list=PLEcJSEQK_cD5KHgg9sXumeg659hAr2j4W) |  
+  [Turkcell Geleceği Yazanlar](https://gelecegiyazanlar.turkcell.com.tr/konu/java) |  
+  [Patika.dev](https://app.patika.dev/)
+
+- **pdf**  
+  [Think Java (PDF)](https://greenteapress.com/wp/think-java-2e/) |  
+  [Java Notlar, Oğuz Aslantürk (pdf)](../files/java/java_notes_by_oa.pdf)
 
 ---
 
