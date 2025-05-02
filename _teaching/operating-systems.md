@@ -84,7 +84,7 @@ The world of operating systems is introduced as a key aspect of modern computing
 
 ## Chapter 1: Introduction: 
 
-As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms.
+As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms. 
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_01_Giris.pdf), [Sunum (pdf)](../files/os/slides/kemal/Bolum_01_Giris_Bicakci.pdf)
 - [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_1_Introduction.pdf), [Boot Process (HTML)](../files/os/slides/Chapter_01_Boot_Process.html)
