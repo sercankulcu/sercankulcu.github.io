@@ -98,7 +98,7 @@ Control structures, which include conditional statements and loops, provide a po
 - [🖼️Sunum - Örnek Çıktılar (pdf)](../files/java/slides/Bolum_03_Ornek_Ciktilar.pdf)  
 - [🖼️Sunum - Fonksiyonlar (pdf)](../files/java/slides/Bolum_03_Fonksiyonlar.pdf)  
 - [🖼️Sunum - Özyineleme (pdf)](../files/java/slides/Bolum_03_Ozyineleme.pdf)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_03_Control_Structures.pdf)  
+- [🗒️Lecture Notes (pdf)](../files/java/Chapter_03_Control_Structures.pdf), [Lambda](../files/java/slides/Chapter_03_Java_Lambda.html)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src)
 
 ---
@@ -112,7 +112,7 @@ Object-oriented programming (OOP) is a powerful paradigm for structuring and org
 - [🖼️Sunum - Kalıtım (pdf)](../files/java/slides/Bolum_04_Kalitim.pdf)  
 - [🖼️Sunum - Çok Biçimlilik (pdf)](../files/java/slides/Bolum_04_Cok_Bicimlilik.pdf)  
 - [🖼️Sunum - Soyut Sınıflar (pdf)](../files/java/slides/Bolum_04_Soyut_Siniflar.pdf)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_04_Object_Oriented_Programming.pdf)  
+- [🗒️Lecture Notes (pdf)](../files/java/Chapter_04_Object_Oriented_Programming.pdf), [Generics](../files/java/slides/Chapter_04_Generic_Programming.html), [Annotations](../files/java/slides/Chapter_04_Java_Annotations.html), [Interfaces](../files/java/slides/Chapter_04_Java_Interfaces.html)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders04/src)
 
 ---
@@ -124,7 +124,7 @@ Arrays and collections are essential data structures in Java programming, provid
 - [🖼️Sunum - Diziler (pdf)](../files/java/slides/Bolum_05_Diziler.pdf)  
 - [🖼️Sunum - Koleksiyonlar (pdf)](../files/java/slides/Bolum_05_Koleksiyonlar.pdf)  
 - [🖼️Sunum - Dizgi (pdf)](../files/java/slides/Bolum_05_Dizgi.pdf)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_05_Arrays_And_Collections.pdf)  
+- [🗒️Lecture Notes (pdf)](../files/java/Chapter_05_Arrays_And_Collections.pdf), [Collections](../files/java/slides/Chapter_05_Java_Collections.html)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders05/src)
 
 ---
@@ -145,7 +145,7 @@ Exception handling is a critical aspect of Java programming, providing a powerfu
 Working with files and input/output (I/O) operations is a fundamental aspect of Java programming, providing a powerful mechanism for reading and writing data from a wide range of sources, including local files, remote servers, and user input, and enabling developers to build a wide range of applications with sophisticated data processing capabilities.
 
 - [🖼️Sunum - Giriş Çıkış (pdf)](../files/java/slides/Bolum_07_Giris_Cikis.pdf)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_07_Working_With_Files_And_Input_Output.pdf)  
+- [🗒️Lecture Notes (pdf)](../files/java/Chapter_07_Working_With_Files_And_Input_Output.pdf), [Streams](../files/java/slides/Chapter_07_Java_Streams.html)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders07/src)
 
 ---
@@ -187,7 +187,7 @@ Working with databases is a fundamental aspect of Java programming, providing a 
 Testing and debugging are critical aspects of Java programming, providing a powerful mechanism for ensuring that software applications are robust, reliable, and free from errors or bugs that can cause unexpected behavior or crashes, and enabling developers to identify and correct issues efficiently and effectively throughout the software development lifecycle.
 
 - [🖼️Sunum - Test ve Hata Ayıklama (pdf)](../files/java/slides/Bolum_11_Test.pdf)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_11_Testing_And_Debugging.pdf)  
+- [🗒️Lecture Notes (pdf)](../files/java/Chapter_11_Testing_And_Debugging.pdf), [Unit Testing](../files/java/slides/Chapter_11_Unit_Testing.html), [Design Patterns](../files/java/slides/Chapter_11_Design_Patterns.html)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders11/src)  
 - [🖋️Interview Garbage Collectors (pdf)](../files/java/Interview_Garbage_Collectors.pdf)  
 - [🖋️Interview Questions (pdf)](../files/java/Interview_Questions.pdf)
