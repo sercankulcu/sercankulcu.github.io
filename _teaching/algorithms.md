@@ -61,7 +61,7 @@ An algorithm is a set of well-defined instructions for carrying out a particular
 - **Soru Cevap**  
   [vize](../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf) | 
   [final](../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf) | 
-  [hw-sol](../files/algorithms/slides/homework-solutions.html)
+  [hw-sol](../files/algorithms/slides/Chapter_00_Homework_Solutions.html)
 
 ---
 
@@ -73,7 +73,12 @@ Algorithms are the step-by-step procedures that form the core of computer scienc
 - [🖼️Sunum-Karmaşıklık (PDF)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.pdf)
 - [🕹️Run time analysis (HTML)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_01_Introduction.pdf) | 
-[Complexity (PDF)](../files/algorithms/slides/complexity.pdf)
+[Complexity (PDF)](../files/algorithms/slides/complexity.pdf) | 
+[Amortized Analysis (HTML)](../files/algorithms/slides/Chapter_01_Amortized_Analysis.html) | 
+[Bit Manipulation (HTML)](../files/algorithms/slides/Chapter_01_Bit_Manipulation.html) | 
+[Matrix Algorithms (HTML)](../files/algorithms/slides/Chapter_01_Matrix_Algorithms.html) | 
+[NP Completeness (HTML)](../files/algorithms/slides/Chapter_01_NP_Completeness.html) | 
+[Number Theoretic Algorithms (HTML)](../files/algorithms/slides/Chapter_01_Number_Theoretic_Algorithms.html) | 
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter01/src)
 
 ---
@@ -114,7 +119,7 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
   - [🕹️Travelling Salesman (HTML)](../files/algorithms/slides/Bolum_04_02_TSP.html)
   - [🕹️MST Simulator (HTML)](../files/algorithms/slides/Bolum_04_03_MST.html)
   - [🕹️Network Flow (HTML)](../files/algorithms/slides/Bolum_04_04_Flow.html)
-  - [Connect Four (HTML)](../files/algorithms/slides/connect-four-guide.html)
+  - [Connect Four (HTML)](../files/algorithms/slides/Chapter_04_Connect_Four.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_04_Graph.pdf) 
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src)
 
