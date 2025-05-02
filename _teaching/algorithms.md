@@ -72,7 +72,13 @@ Algorithms are the step-by-step procedures that form the core of computer scienc
 - [🖼️Sunum-Giriş (PDF)](../files/algorithms/slides/Bolum_01_01_Giris.pdf)
 - [🖼️Sunum-Karmaşıklık (PDF)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.pdf)
 - [🕹️Run time analysis (HTML)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.html)
-- [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_01_Introduction.pdf), [Complexity (PDF)](../files/algorithms/slides/Chapter_01_Complexity.pdf), [Amortized Analysis (HTML)](../files/algorithms/slides/Chapter_01_Amortized_Analysis.html), [Bit Manipulation (HTML)](../files/algorithms/slides/Chapter_01_Bit_Manipulation.html), [Matrix Algorithms (HTML)](../files/algorithms/slides/Chapter_01_Matrix_Algorithms.html), [NP Completeness (HTML)](../files/algorithms/slides/Chapter_01_NP_Completeness.html), [Number Theoretic Algorithms (HTML)](../files/algorithms/slides/Chapter_01_Number_Theoretic_Algorithms.html)
+- [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_01_Introduction.pdf) | 
+  [Complexity (PDF)](../files/algorithms/slides/Chapter_01_Complexity.pdf) | 
+  [Amortized Analysis (HTML)](../files/algorithms/slides/Chapter_01_Amortized_Analysis.html) | 
+  [Bit Manipulation (HTML)](../files/algorithms/slides/Chapter_01_Bit_Manipulation.html) | 
+  [Matrix Algorithms (HTML)](../files/algorithms/slides/Chapter_01_Matrix_Algorithms.html) | 
+  [NP Completeness (HTML)](../files/algorithms/slides/Chapter_01_NP_Completeness.html) | 
+  [Number Theoretic Algorithms (HTML)](../files/algorithms/slides/Chapter_01_Number_Theoretic_Algorithms.html)
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter01/src)
 
 ---
