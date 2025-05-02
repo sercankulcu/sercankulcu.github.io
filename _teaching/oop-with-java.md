@@ -27,7 +27,7 @@ Java is one of the most popular programming languages, extensively used in vario
 * Java Youtube [youtube](https://www.youtube.com/java)
 * Download Eclipse [website](https://www.eclipse.org/downloads/packages/installer)
 * Oracle Java Tutorials [website](https://docs.oracle.com/javase/tutorial/)
-* Java ile Nesneye Yönelik Programlama, Oğuz Aslantürk [(pdf)](https://web.cs.hacettepe.edu.tr/~bbm102/misc/java_notes_by_oa.pdf)
+* [Java Notlar, Oğuz Aslantürk (pdf)](../files/java/java_notes_by_oa.pdf)
 
 ---
 
