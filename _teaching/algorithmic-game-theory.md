@@ -146,6 +146,7 @@ Price of Anarchy (PoA) is a measure that quantifies the loss of efficiency in a 
 
 Learning and adaptation play a significant role in algorithmic game theory by addressing how self-interested agents can improve their decision-making strategies over time and adapt to changing environments.
 
+- [Reinforcement Learning](../files/agt/slides/Chapter_12_Reinforcement_Learning.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_10_Learning_and_Adaptation.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
