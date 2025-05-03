@@ -13,30 +13,26 @@ Algorithmic Game Theory is an interdisciplinary field that blends the mathematic
 
 ## Resources
 
-### 🌐 Websites & Courses
-
-- [📖 Nisarg Shah CSC304](https://www.cs.toronto.edu/~nisarg/teaching/304f19/) | 
+- **course webpages**  
+  [📖 Nisarg Shah CSC304](https://www.cs.toronto.edu/~nisarg/teaching/304f19/) | 
   [📖 Michael Dinitz 601.436/636](https://www.cs.jhu.edu/~mdinitz/classes/AGT/Spring2022/) | 
   [📄 Tim Roughgarden’s CS364](https://timroughgarden.org/f13/f13.html) | 
   [📄 Ariel Procaccia CMU 15-896](https://www.cs.cmu.edu/~arielpro/15896s16/schedule.html) | 
   [📄 Martin Hoefer AGT](https://algo.cs.uni-frankfurt.de/lehre/agt/winter2223/agt2223.shtml)
 
-### 📘 Books
-
-- [📕 Game Theory, Alive (PDF)](../files/agt/Game_Theory_Alive.pdf) | 
+- **books**  
+  [📕 Game Theory, Alive (PDF)](../files/agt/Game_Theory_Alive.pdf) | 
   [📕 Algorithmic Game Theory (PDF)](../files/agt/Algorithmic_Game_Theory_Cambridge.pdf) | 
   [📕 Networks, Crowds, and Markets (PDF)](../files/agt/Networks,_Crowds_and_Markets.pdf) | 
   [📕 Games_Puzzles_and_Computation](../files/agt/Games_Puzzles_and_Computation.pdf)
 
-### 🧰 Tools & Software
-
-- [🎮 React JS Games Gallery](https://reactjsexample.com/tag/games/) | 
+- **tools**  
+  [🎮 React JS Games Gallery](https://reactjsexample.com/tag/games/) | 
   [🔧 Gambit Project – Open-Source Tools](https://gambit.sourceforge.net/) | 
   [🧠 Nashpy – Python Library](https://nashpy.readthedocs.io/en/stable/)
 
-### Youtube
-
-- [🎥 Game Theory 101](https://www.youtube.com/watch?v=IotsMu1J8fA&list=PL102B69CCA6049B6C)
+- **youtube**  
+  [🎥 Game Theory 101](https://www.youtube.com/watch?v=IotsMu1J8fA&list=PL102B69CCA6049B6C)
 
 ---
 
