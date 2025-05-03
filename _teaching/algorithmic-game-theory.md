@@ -32,8 +32,6 @@ Algorithmic Game Theory is an interdisciplinary field that blends the mathematic
 
 Game theory is a mathematical framework used to analyze and understand strategic interactions between rational decision-makers. It provides a systematic way of studying situations where the outcome of one person's decision depends on the actions of others.
 
-[Real World Applications](../files/agt/slides/Chapter_01_Real_World_Applications.html) | [Gerçek Dünya Uygulamaları](../files/agt/slides/Bolum_01_Gercek_Dunya_Uygulamalari.html)
-
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri.pdf)
 - [🕹️Rock Scissors Paper game (HTML)](../files/agt/slides/Bolum_01_Rock_Scissors_Paper.html)
 - [🕹️Monopoly game (HTML)](../files/agt/slides/Bolum_01_Monopoly/index.html)
@@ -43,7 +41,9 @@ Game theory is a mathematical framework used to analyze and understand strategic
 - [🕹️Prisoner's Dilemma (HTML)](../files/agt/slides/Bolum_01_Prisoners_Dilemma.html)
 - [🕹️Facility Location (HTML)](../files/agt/slides/Bolum_01_Facility_Location.html)
 - [🕹️Guess game (HTML)](../files/agt/slides/Bolum_01_Guess_Avarage.html)
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_01_Game_Theory_Fundamentals.pdf)
+- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_01_Game_Theory_Fundamentals.pdf) | 
+  [Real World Applications](../files/agt/slides/Chapter_01_Real_World_Applications.html) | 
+  [Gerçek Dünya Uygulamaları](../files/agt/slides/Bolum_01_Gercek_Dunya_Uygulamalari.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
 ---
@@ -71,6 +71,7 @@ Nash equilibrium is a central concept in game theory that captures the notion of
 
 Mechanism design is a field of study within game theory and economics that focuses on designing rules or mechanisms to achieve desired outcomes in strategic settings. It involves designing incentive-compatible mechanisms that align the self-interests of individual participants with the desired collective goals.
 
+- [Bayesian Games](../files/agt/slides/Chapter_04_Bayesian_Games.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_04_Mechanism_Design_and_Incentives.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
