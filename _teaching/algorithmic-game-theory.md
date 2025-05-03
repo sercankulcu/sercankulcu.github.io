@@ -165,5 +165,6 @@ Decision-making is a central concept that focuses on how self-interested agents 
 
 Algorithmic game theory is a rapidly evolving field that continues to explore new directions and address emerging challenges.
 
+- [Student Projects](../files/agt/slides/Chapter_14_Student_Projects.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_14_Future_Directions.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
