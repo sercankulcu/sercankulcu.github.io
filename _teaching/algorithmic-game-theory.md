@@ -32,7 +32,7 @@ Algorithmic Game Theory is an interdisciplinary field that blends the mathematic
 
 Game theory is a mathematical framework used to analyze and understand strategic interactions between rational decision-makers. It provides a systematic way of studying situations where the outcome of one person's decision depends on the actions of others.
 
-[Real World Applications](../files/agt/slides/Chapter_01_Real_World_Applications.html)
+[Real World Applications](../files/agt/slides/Chapter_01_Real_World_Applications.html) | [Gerçek Dünya Uygulamaları](../files/agt/slides/Bolum_01_Gercek_Dunya_Uygulamalari.html)
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri.pdf)
 - [🕹️Rock Scissors Paper game (HTML)](../files/agt/slides/Bolum_01_Rock_Scissors_Paper.html)
