@@ -45,14 +45,7 @@ Algorithmic Game Theory is an interdisciplinary field that blends the mathematic
 Game theory is a mathematical framework used to analyze and understand strategic interactions between rational decision-makers. It provides a systematic way of studying situations where the outcome of one person's decision depends on the actions of others.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri.pdf)
-- [🕹️Rock Scissors Paper game (HTML)](../files/agt/slides/Bolum_01_Rock_Scissors_Paper.html)
-- [🕹️Monopoly game (HTML)](../files/agt/slides/Bolum_01_Monopoly/index.html)
-- [🕹️Poker game (HTML)](../files/agt/slides/Bolum_01_Poker/poker.html)
-- [🕹️Traffic lights simulator (HTML)](../files/agt/slides/Bolum_01_Traffic_Lights.html)
-- [🕹️Chess game (HTML)](../files/agt/slides/Bolum_01_Chess.html)
-- [🕹️Prisoner's Dilemma (HTML)](../files/agt/slides/Bolum_01_Prisoners_Dilemma.html)
-- [🕹️Facility Location (HTML)](../files/agt/slides/Bolum_01_Facility_Location.html)
-- [🕹️Guess game (HTML)](../files/agt/slides/Bolum_01_Guess_Avarage.html)
+- [🕹️Guess game (HTML)](../files/agt/slides/Chapter_01_Guess_Avarage.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_01_Game_Theory_Fundamentals.pdf) | 
   [Real World Applications](../files/agt/slides/Chapter_01_Real_World_Applications.html) | 
   [Gerçek Dünya Uygulamaları](../files/agt/slides/Bolum_01_Gercek_Dunya_Uygulamalari.html)
@@ -74,6 +67,9 @@ Algorithmic game theory is an interdisciplinary field that combines concepts fro
 
 Nash equilibrium is a central concept in game theory that captures the notion of strategic behavior and stable outcomes in games. It refers to a set of strategies, one for each player, where no player has an incentive to unilaterally deviate from their chosen strategy, assuming all other players stick to their strategies.
 
+- [🕹️Prisoner's Dilemma (HTML)](../files/agt/slides/Chapter_03_Prisoners_Dilemma.html)
+- [🕹️Rock Scissors Paper game (HTML)](../files/agt/slides/Chapter_03_Rock_Scissors_Paper.html)
+- [🕹️Chess game (HTML)](../files/agt/slides/Chapter_03_Chess.html)
 - [Computational Complexity of Equilibria](../files/agt/slides/Chapter_03_Computational_Complexity_of_Equilibria.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_03_Nash_Equilibrium_and_Strategic_Behavior.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
@@ -84,6 +80,7 @@ Nash equilibrium is a central concept in game theory that captures the notion of
 
 Mechanism design is a field of study within game theory and economics that focuses on designing rules or mechanisms to achieve desired outcomes in strategic settings. It involves designing incentive-compatible mechanisms that align the self-interests of individual participants with the desired collective goals.
 
+- [🕹️Poker game (HTML)](../files/agt/slides/Chapter_04_Poker/poker.html)
 - [Bayesian Games](../files/agt/slides/Chapter_04_Bayesian_Games.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_04_Mechanism_Design_and_Incentives.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
@@ -94,6 +91,7 @@ Mechanism design is a field of study within game theory and economics that focus
 
 Auctions and market design are closely related fields that utilize principles from economics, game theory, and mechanism design to study the allocation of goods, resources, and services in various settings. Both areas aim to create efficient and fair mechanisms for matching buyers and sellers, determining prices, and optimizing resource allocation.
 
+- [🕹️Monopoly game (HTML)](../files/agt/slides/Chapter_05_Monopoly/index.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_05_Auctions_and_Market_Design.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -103,6 +101,7 @@ Auctions and market design are closely related fields that utilize principles fr
 
 Social choice theory is a branch of economics and political science that studies methods for aggregating individual preferences or opinions into a collective choice. It explores the challenges and possibilities of making decisions on behalf of a group or society based on the preferences of its members. Voting systems are one of the key tools analyzed in social choice theory.
 
+- [🕹️Facility Location (HTML)](../files/agt/slides/Chapter_06_Facility_Location.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_06_Social_Choice_and_Voting_Systems.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -115,13 +114,13 @@ Multi-agent systems refer to scenarios where multiple self-interested agents int
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_13_Multi_Agent_Systems.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
-
 ---
 
 ## Chapter 8: Network Design and Routing
 
 In algorithmic game theory, network design and routing are studied with a focus on understanding the strategic behavior of self-interested agents and optimizing network efficiency and fairness.
 
+- [🕹️Traffic lights simulator (HTML)](../files/agt/slides/Chapter_08_Traffic_Lights.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_08_Network_Design_and_Routing.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -131,6 +130,7 @@ In algorithmic game theory, network design and routing are studied with a focus 
 
 In algorithmic game theory, online platforms are studied as environments where self-interested agents interact and make decisions in the pursuit of their own objectives. Online platforms encompass various digital platforms, such as e-commerce platforms, social media platforms, ride-sharing platforms, and online auctions.
 
+- [🕹️Monopoly game (HTML)](../files/agt/slides/Chapter_05_Monopoly/index.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_11_Online_Platforms.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
