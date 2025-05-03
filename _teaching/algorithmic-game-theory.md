@@ -62,6 +62,7 @@ Algorithmic game theory is an interdisciplinary field that combines concepts fro
 
 Nash equilibrium is a central concept in game theory that captures the notion of strategic behavior and stable outcomes in games. It refers to a set of strategies, one for each player, where no player has an incentive to unilaterally deviate from their chosen strategy, assuming all other players stick to their strategies.
 
+- [Computational Complexity of Equilibria](../files/agt/slides/Chapter_03_Computational_Complexity_of_Equilibria.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_03_Nash_Equilibrium_and_Strategic_Behavior.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
