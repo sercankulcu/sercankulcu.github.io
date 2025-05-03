@@ -22,28 +22,24 @@ An algorithm is a set of well-defined instructions for carrying out a particular
 
 ## The resources
 
-### Course webpages  
-
+- **course webpages**  
   [Cambridge](https://www.cl.cam.ac.uk/teaching/2021/Algorithms/materials.html) | 
   [Stanford](https://stanford-cs161.github.io/winter2024/lectures) | 
   [MIT OpenCourseware](https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/)
 
-### Books  
-
+- **books**  
   [Algorithms Illuminated](https://www.algorithmsilluminated.org) | 
   [Introduction to Algorithms by Cormen](https://mitpress.mit.edu/9780262046305/introduction-to-algorithms) | 
   [Data Structures and Algorithms in Python by Goodrich](https://www.amazon.com/Structures-Algorithms-Python-Michael-Goodrich/dp/1118290275)
 
-### Websites
-
+- **websites**  
   [Visual Algo](https://visualgo.net/en) | 
   [Algoanim](https://www.algoanim.ide.sk) | 
   [USFCA](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html) | 
   [LeetCode](https://leetcode.com) | 
   [HackerRank](https://www.hackerrank.com)
 
-### Github
-
+- **github**  
   [DSALGO Visualizer](https://github.com/jhabarsingh/DSALGO-VISUALIZER) | 
   [The Algorithms](https://github.com/TheAlgorithms/Java) | 
   [Cpbook](https://github.com/stevenhalim/cpbook-code/tree/master) | 
@@ -53,19 +49,16 @@ An algorithm is a set of well-defined instructions for carrying out a particular
 
 ## Past Exams  
 
-### 2024-2025
-
+- **2024-2025**  
   [vize](../files/algorithms/slides/2024-2025-algorithms-vize-cevaplar.pdf) | 
 
-### 2023-2024
-
+- **2023-2024**  
   [vize](../files/algorithms/slides/2023-2024-algorithms-vize-cevap.pdf) | 
   [final A](../files/algorithms/slides/2023-2024-algorithms-final-a-cevap.pdf) | 
   [final B](../files/algorithms/slides/2023-2024-algorithms-final-b-cevap.pdf) | 
   [bütünleme](../files/algorithms/slides/2023-2024-algorithms-butunleme-cevap.pdf)
 
-### Soru Cevap
-  
+- **Soru Cevap**  
   [vize](../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf) | 
   [final](../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf) | 
   [hw-sol](../files/algorithms/slides/Chapter_00_Homework_Solutions.html)
