@@ -13,18 +13,29 @@ Algorithmic Game Theory is an interdisciplinary field that blends the mathematic
 
 ## Resources
 
-- [Games_Puzzles_and_Computation](../files/agt/Games_Puzzles_and_Computation.pdf)
-- [React js games (website)](https://reactjsexample.com/tag/games/)
-- [Game Theory 101 (YouTube)](https://www.youtube.com/watch?v=IotsMu1J8fA&list=PL102B69CCA6049B6C)
-- [Toronto CSC304 (website)](https://www.cs.toronto.edu/~nisarg/teaching/304f19/)
-- [Michael Dinitz 601.436/636 (website)](https://www.cs.jhu.edu/~mdinitz/classes/AGT/Spring2022/)
-- [Game Theory, Alive (PDF)](https://homes.cs.washington.edu/~karlin/GameTheoryBook.pdf)
-- [Algorithmic Game Theory (PDF)](https://www.cs.cmu.edu/~sandholm/cs15-892F13/algorithmic-game-theory.pdf)
-- [Networks, Crowds, and Markets (PDF)](https://www.cs.cornell.edu/home/kleinber/networks-book/networks-book.pdf)
-- [Goethe Uni AGT course (notes)](https://algo.cs.uni-frankfurt.de/lehre/agt/winter2223/agt2223.shtml)
-- [Cambridge CS 364 (notes)](https://timroughgarden.org/f13/f13.html)
-- [CMU 15-896 (notes)](https://www.cs.cmu.edu/~arielpro/15896s16/schedule.html)
-- [Gambit (open-source tools)](https://gambit.sourceforge.net/)
+### 🌐 Websites & Courses
+
+- [📖 Toronto CSC304 - Algorithmic Game Theory (Nisarg Shah)](https://www.cs.toronto.edu/~nisarg/teaching/304f19/)
+- [📖 Michael Dinitz 601.436/636 - Johns Hopkins](https://www.cs.jhu.edu/~mdinitz/classes/AGT/Spring2022/)
+- [📄 Cambridge CS364 - Tim Roughgarden’s Course Notes](https://timroughgarden.org/f13/f13.html)
+- [📄 CMU 15-896 - Algorithmic Game Theory Course](https://www.cs.cmu.edu/~arielpro/15896s16/schedule.html)
+- [📄 Goethe Uni AGT Course (Winter 22/23)](https://algo.cs.uni-frankfurt.de/lehre/agt/winter2223/agt2223.shtml)
+- [🎥 Game Theory 101 - YouTube Playlist (Basic Concepts)](https://www.youtube.com/watch?v=IotsMu1J8fA&list=PL102B69CCA6049B6C)
+- [🎮 React JS Games Gallery (Fun Game Demos)](https://reactjsexample.com/tag/games/)
+- [📚 Stanford’s Online Game Theory Course (Coursera)](https://www.coursera.org/learn/game-theory)
+- [📚 Harvard’s CS 136: Economics and Computation](https://cs136.eecs.harvard.edu/)
+
+### 📘 Books
+
+- [📕 Game Theory, Alive (PDF)](https://homes.cs.washington.edu/~karlin/GameTheoryBook.pdf)
+- [📕 Algorithmic Game Theory (PDF)](https://www.cs.cmu.edu/~sandholm/cs15-892F13/algorithmic-game-theory.pdf)
+- [📕 Networks, Crowds, and Markets (PDF)](https://www.cs.cornell.edu/home/kleinber/networks-book/networks-book.pdf)
+- [📕 Games_Puzzles_and_Computation](../files/agt/Games_Puzzles_and_Computation.pdf)
+
+### 🧰 Tools & Software
+
+- [🔧 Gambit Project – Open-Source Tools](https://gambit.sourceforge.net/)
+- [🧠 Nashpy – Python Library](https://nashpy.readthedocs.io/en/stable/)
 
 ---
 
