@@ -32,6 +32,8 @@ Algorithmic Game Theory is an interdisciplinary field that blends the mathematic
 
 Game theory is a mathematical framework used to analyze and understand strategic interactions between rational decision-makers. It provides a systematic way of studying situations where the outcome of one person's decision depends on the actions of others.
 
+[Real World Applications](../files/agt/slides/Chapter_01_Real_World_Applications.html)
+
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri.pdf)
 - [🕹️Rock Scissors Paper game (HTML)](../files/agt/slides/Bolum_01_Rock_Scissors_Paper.html)
 - [🕹️Monopoly game (HTML)](../files/agt/slides/Bolum_01_Monopoly/index.html)
@@ -92,12 +94,13 @@ Social choice theory is a branch of economics and political science that studies
 
 ---
 
-## Chapter 7: Algorithmic Fairness and Ethics
+## Chapter 7: Multi-Agent Systems
 
-Algorithmic fairness and ethics play a crucial role in algorithmic game theory by addressing the potential biases, discrimination, and ethical implications that may arise in the design and deployment of algorithms within game-theoretic frameworks.
+Multi-agent systems refer to scenarios where multiple self-interested agents interact and make decisions in a shared environment. Multi-agent systems are analyzed to understand the strategic behavior of agents, optimize outcomes, and design mechanisms that align individual incentives with system objectives.
 
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_07_Algorithmic_Fairness_and_Ethics.pdf)
+- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_13_Multi_Agent_Systems.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
 
 ---
 
@@ -110,25 +113,7 @@ In algorithmic game theory, network design and routing are studied with a focus 
 
 ---
 
-## Chapter 9: Price of Anarchy and Efficiency
-
-Price of Anarchy (PoA) is a measure that quantifies the loss of efficiency in a system due to the selfish behavior of individual agents. It evaluates the impact of strategic decision-making on the overall performance or welfare of a system.
-
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_09_Price_of_Anarchy_and_Efficiency.pdf)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
-
----
-
-## Chapter 10: Learning and Adaptation
-
-Learning and adaptation play a significant role in algorithmic game theory by addressing how self-interested agents can improve their decision-making strategies over time and adapt to changing environments.
-
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_10_Learning_and_Adaptation.pdf)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
-
----
-
-## Chapter 11: Online Platforms
+## Chapter 9: Online Platforms
 
 In algorithmic game theory, online platforms are studied as environments where self-interested agents interact and make decisions in the pursuit of their own objectives. Online platforms encompass various digital platforms, such as e-commerce platforms, social media platforms, ride-sharing platforms, and online auctions.
 
@@ -137,20 +122,38 @@ In algorithmic game theory, online platforms are studied as environments where s
 
 ---
 
-## Chapter 12: Decision-Making
+## Chapter 10: Algorithmic Fairness and Ethics
 
-Decision-making is a central concept that focuses on how self-interested agents make choices or decisions in strategic situations. Decision-making in algorithmic game theory involves analyzing the strategic interactions among agents, understanding their preferences and objectives, and designing mechanisms and algorithms to optimize outcomes.
+Algorithmic fairness and ethics play a crucial role in algorithmic game theory by addressing the potential biases, discrimination, and ethical implications that may arise in the design and deployment of algorithms within game-theoretic frameworks.
 
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_12_Decision_Making.pdf)
+- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_07_Algorithmic_Fairness_and_Ethics.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
 ---
 
-## Chapter 13: Multi-Agent Systems
+## Chapter 11: Price of Anarchy and Efficiency
 
-Multi-agent systems refer to scenarios where multiple self-interested agents interact and make decisions in a shared environment. Multi-agent systems are analyzed to understand the strategic behavior of agents, optimize outcomes, and design mechanisms that align individual incentives with system objectives.
+Price of Anarchy (PoA) is a measure that quantifies the loss of efficiency in a system due to the selfish behavior of individual agents. It evaluates the impact of strategic decision-making on the overall performance or welfare of a system.
 
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_13_Multi_Agent_Systems.pdf)
+- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_09_Price_of_Anarchy_and_Efficiency.pdf)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+---
+
+## Chapter 12: Learning and Adaptation
+
+Learning and adaptation play a significant role in algorithmic game theory by addressing how self-interested agents can improve their decision-making strategies over time and adapt to changing environments.
+
+- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_10_Learning_and_Adaptation.pdf)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+---
+
+## Chapter 13: Decision-Making
+
+Decision-making is a central concept that focuses on how self-interested agents make choices or decisions in strategic situations. Decision-making in algorithmic game theory involves analyzing the strategic interactions among agents, understanding their preferences and objectives, and designing mechanisms and algorithms to optimize outcomes.
+
+- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_12_Decision_Making.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
 ---
