@@ -51,6 +51,7 @@ An algorithm is a set of well-defined instructions for carrying out a particular
 
 - **2024-2025**  
   [vize](../files/algorithms/slides/2024-2025-algorithms-vize-cevaplar.pdf) | 
+  [telafi](../files/algorithms/slides/2024-2025-algorithms-telafi-cevaplar.pdf)
 
 - **2023-2024**  
   [vize](../files/algorithms/slides/2023-2024-algorithms-vize-cevap.pdf) | 
