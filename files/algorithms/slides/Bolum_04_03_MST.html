@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
@@ -14,7 +13,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #fff;
             color: #333;
             text-align: center;
             margin: 0 auto;
@@ -103,7 +102,7 @@
 
 <body>
     <div class="header">
-        <a href="https://sercankulcu.github.io/teaching/algorithms" class="back-button">&larr; Back</a>
+        <a href="https://sercankulcu.github.io/teaching/algorithms" class="back-button">← Back</a>
         <h1>Minimum Spanning Tree</h1>
     </div>
 
@@ -131,6 +130,10 @@
         const numNodesInput = document.getElementById('numCities');
         const nodeRadius = 15;
         const animationSpeed = 1000; // milliseconds
+
+        // Dragging state
+        let selectedNode = null;
+        let isDragging = false;
 
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -183,6 +186,19 @@
             drawGraph();
         }
 
+        // Helper function to check if mouse is over a node
+        function getNodeAtPosition(mouseX, mouseY) {
+            for (const node of nodes) {
+                const dx = mouseX - node.x;
+                const dy = mouseY - node.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance <= nodeRadius) {
+                    return node;
+                }
+            }
+            return null;
+        }
+
         function drawGraph(highlightedEdges = [], algorithmStep = "") {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -201,9 +217,9 @@
 
                 // Draw edge weight
                 ctx.fillStyle = '#000';
-                ctx.font = '12px sans-serif';
+                ctx.font = '16px sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText(edge.weight, midX, midY - 5);
+                ctx.fillText(edge.weight, midX + 2, midY - 5);
             });
 
             // Highlighted edges
@@ -224,17 +240,17 @@
             ctx.lineWidth = 2;
             nodes.forEach(node => {
                 ctx.beginPath();
-                ctx.fillStyle = '#eee';
+                ctx.fillStyle = node === selectedNode && isDragging ? '#ddd' : '#eee'; // Highlight dragged node
                 ctx.arc(node.x, node.y, nodeRadius, 0, 2 * Math.PI);
                 ctx.fill();
                 ctx.stroke();
                 ctx.fillStyle = '#000';
-                ctx.font = '14px sans-serif';
+                ctx.font = '20px sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText(node.id, node.x, node.y + 5);
+                ctx.fillText(node.id, node.x, node.y + 7);
             });
 
-            outputDiv.innerText = algorithmStep + "\n" + outputDiv.innerText;
+            outputDiv.innerText = algorithmStep + outputDiv.innerText;
         }
 
         async function startPrim() {
@@ -267,14 +283,14 @@
                     mstEdges.push(nextEdge);
                     visited[nextNode] = true;
                     current = nextNode;
-                    drawGraph(mstEdges, `Added edge (${nextEdge.u}, ${nextEdge.v}) with weight ${nextEdge.weight}`);
+                    drawGraph(mstEdges, `Added edge (${nextEdge.u}, ${nextEdge.v}) with weight ${nextEdge.weight}`+ "\n");
                     await new Promise(resolve => setTimeout(resolve, animationSpeed));
                 } else {
-                    drawGraph(mstEdges, `Not added edge (${nextEdge.u}, ${nextEdge.v}) with weight ${nextEdge.weight}`);
+                    drawGraph(mstEdges, `Not added edge (${nextEdge.u}, ${nextEdge.v}) with weight ${nextEdge.weight}`+ "\n");
                 }
             }
 
-            drawGraph(mstEdges, `Finished. Total weight: ${mstEdges.reduce((sum, edge) => sum + edge.weight, 0)}`);
+            drawGraph(mstEdges, `Finished. Total weight: ${mstEdges.reduce((sum, edge) => sum + edge.weight, 0)}`+ "\n");
         }
 
         async function startKruskal() {
@@ -304,27 +320,67 @@
             for (const edge of sortedEdges) {
                 if (union(edge.u, edge.v)) {
                     mstEdges.push(edge);
-                    drawGraph(mstEdges, `Added edge (${edge.u}, ${edge.v}) with weight ${edge.weight}`);
+                    drawGraph(mstEdges, `Added edge (${edge.u}, ${edge.v}) with weight ${edge.weight}`+ "\n");
                     await new Promise(resolve => setTimeout(resolve, animationSpeed));
                 } else {
-                    drawGraph(mstEdges, `Not added edge (${edge.u}, ${edge.v}) with weight ${edge.weight}`);
+                    drawGraph(mstEdges, `Not added edge (${edge.u}, ${edge.v}) with weight ${edge.weight}`+ "\n");
                 }
                 if (mstEdges.length === numNodes - 1) break;
             }
 
-            drawGraph(mstEdges, `Finished. Total weight: ${mstEdges.reduce((sum, edge) => sum + edge.weight, 0)}`);
+            drawGraph(mstEdges, `Finished. Total weight: ${mstEdges.reduce((sum, edge) => sum + edge.weight, 0)}`+ "\n");
         }
 
         function resizeCanvas() {
             const maxWidth = 600;
             canvas.width = Math.min(window.innerWidth, maxWidth);
-            canvas.height = canvas.width * 0.6; // Maintain a 16:10 aspect ratio (you can adjust)
+            canvas.height = canvas.width * 0.6; // Maintain a 16:10 aspect ratio
 
             // Initial graph generation
             generateGraph();
 
             drawGraph();
         }
+
+        // Mouse event handlers for dragging
+        canvas.addEventListener('mousedown', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left;
+            const mouseY = event.clientY - rect.top;
+            selectedNode = getNodeAtPosition(mouseX, mouseY);
+            if (selectedNode) {
+                isDragging = true;
+                drawGraph();
+            }
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (isDragging && selectedNode) {
+                const rect = canvas.getBoundingClientRect();
+                let mouseX = event.clientX - rect.left;
+                let mouseY = event.clientY - rect.top;
+
+                // Keep node within canvas bounds
+                mouseX = Math.max(nodeRadius, Math.min(canvas.width - nodeRadius, mouseX));
+                mouseY = Math.max(nodeRadius, Math.min(canvas.height - nodeRadius, mouseY));
+
+                selectedNode.x = mouseX;
+                selectedNode.y = mouseY;
+                drawGraph();
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+            selectedNode = null;
+            drawGraph();
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isDragging = false;
+            selectedNode = null;
+            drawGraph();
+        });
 
         // Initial canvas resizing
         resizeCanvas();
