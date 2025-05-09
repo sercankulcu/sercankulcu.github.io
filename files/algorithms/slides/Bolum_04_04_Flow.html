@@ -175,6 +175,10 @@
             adjacencyList = {};
             flow = {};
             const numNodes = parseInt(numNodesInput.value);
+            if (numNodes < 4) {
+                stepsDiv.innerHTML = "Error: Number of nodes must be at least 4 to ensure source and sink have 3 edges.";
+                return;
+            }
             const sinkNode = numNodes - 1;
 
             // Create nodes
@@ -187,27 +191,152 @@
                 adjacencyList[i] = [];
             }
 
-            // Create random directed edges with capacities
+            // Create directed edges (from lower to higher node ID)
             for (let i = 0; i < numNodes; i++) {
-                for (let j = 0; j < numNodes; j++) {
-                    // Prevent direct edge from source (0) to sink (numNodes - 1)
-                    if (i === sourceNode && j === sinkNode) continue;
-                    if (i !== j && Math.random() < 0.4) { // Probability of a directed edge
+                for (let j = i + 1; j < numNodes; j++) { // Ensure i < j
+                    if (i === sourceNode && j === sinkNode) continue; // No direct source-to-sink
+                    if (Math.random() < 0.4) {
                         const capacity = getRandomInt(5, 15);
-                        const existingEdge = edges.find(e => (e.from === i && e.to === j) || (e.from === j && e.to === i));
-                        if (!existingEdge) {
-                            edges.push({ from: i, to: j, capacity: capacity, flow: 0 });
+                        edges.push({ from: i, to: j, originalCapacity: capacity, flow: 0 });
+                        adjacencyList[i].push(j);
+                        adjacencyList[j].push(i); // Add reverse edge for residual graph
+                        flow[`${i}-${j}`] = 0;
+                    }
+                }
+            }
+
+            const sourceEdges = edges.filter(e => e.from === sourceNode);
+            const sinkEdges = edges.filter(e => e.to === sinkNode);
+            if (sourceEdges.length < 3 || sinkEdges.length < 3) {
+                generateRandomGraph();
+            }
+
+            // Ensure at least one path from source to sink
+            if (!hasPathToSink()) {
+                // Create a path: 0 -> 1 -> 2 -> ... -> sink
+                for (let i = 0; i < numNodes - 1; i++) {
+                    if (i === sourceNode && i + 1 === sinkNode) continue; // Skip direct source-to-sink
+                    if (!edges.find(e => e.from === i && e.to === i + 1)) {
+                        edges.push({ from: i, to: i + 1, originalCapacity: getRandomInt(5, 15), flow: 0 });
+                        adjacencyList[i].push(i + 1);
+                        adjacencyList[i + 1].push(i); // Add reverse edge
+                        flow[`${i}-${i + 1}`] = 0;
+                    }
+                }
+            }
+
+            // Ensure connectivity (all nodes reachable from source)
+            if (!isConnected()) {
+                // Connect isolated nodes to the path
+                for (let i = 1; i < numNodes; i++) {
+                    if (i === sinkNode) continue;
+                    const hasIncoming = edges.some(e => e.to === i);
+                    const hasOutgoing = edges.some(e => e.from === i);
+                    if (!hasIncoming && !hasOutgoing) {
+                        // Connect to a random node with higher ID
+                        const j = getRandomInt(i + 1, numNodes - 1);
+                        if (j !== sinkNode) {
+                            edges.push({ from: i, to: j, originalCapacity: getRandomInt(5, 15), flow: 0 });
                             adjacencyList[i].push(j);
-                            if (!adjacencyList[j].includes(i)) { // For finding reverse paths
-                                adjacencyList[j].push(i);
-                            }
+                            adjacencyList[j].push(i); // Add reverse edge
                             flow[`${i}-${j}`] = 0;
                         }
                     }
                 }
             }
-            stepsDiv.innerHTML = "Graph generated with " + nodes.length + " nodes and " + edges.length + " edges.";
+
+            // Final connectivity check
+            if (!isConnected() || !hasPathToSink()) {
+                generateRandomGraph(); // Regenerate if not connected or no path
+                return;
+            }
+
+            stepsDiv.innerHTML = "Graph generated with " + nodes.length + " nodes and " + edges.length + " edges (DAG, connected, bidirectional residual).";
             drawGraph();
+        }
+
+        function hasPathToSink() {
+            const numNodes = parseInt(numNodesInput.value);
+            const sinkNode = numNodes - 1;
+            const visited = new Array(numNodes).fill(false);
+            const stack = [sourceNode];
+            visited[sourceNode] = true;
+
+            while (stack.length > 0) {
+                const u = stack.pop();
+                if (u === sinkNode) return true;
+                for (const v of adjacencyList[u]) {
+                    const edge = edges.find(e => e.from === u && e.to === v);
+                    if (edge && !visited[v]) {
+                        visited[v] = true;
+                        stack.push(v);
+                    }
+                }
+            }
+            return false;
+        }
+
+        function isConnected() {
+            const numNodes = parseInt(numNodesInput.value);
+            const visited = new Array(numNodes).fill(false);
+            const stack = [sourceNode];
+            visited[sourceNode] = true;
+
+            while (stack.length > 0) {
+                const u = stack.pop();
+                for (const v of adjacencyList[u]) {
+                    const edge = edges.find(e => e.from === u && e.to === v);
+                    if (edge && !visited[v]) {
+                        visited[v] = true;
+                        stack.push(v);
+                    }
+                }
+            }
+
+            return visited.every(v => v); // All nodes must be reachable
+        }
+
+        function getResidualCapacity(u, v) {
+            const edge = edges.find(e => e.from === u && e.to === v);
+            let result1 = 0;
+            let result2 = 0;
+            if (edge) {
+                result1 = edge.originalCapacity;
+            }
+            const reverseEdge = edges.find(e => e.from === v && e.to === u);
+            if (reverseEdge) {
+                result2 = reverseEdge.originalCapacity;
+            }
+            return Math.max(result1, result2) - (flow[`${u}-${v}`] || 0) - (flow[`${v}-${u}`] || 0);
+        }
+
+        async function augmentPath(path, algorithmName) {
+            let minCapacity = Infinity;
+            for (const segment of path) {
+                const capacity = getResidualCapacity(segment.from, segment.to);
+                minCapacity = Math.min(minCapacity, capacity);
+            }
+
+            stepsDiv.innerHTML += `<div class="step">Found augmenting path: ${path.map(s => `${s.from}-${s.to}`).join(', ')} with capacity ${minCapacity}</div>`;
+
+            for (const segment of path) {
+                const u = segment.from;
+                const v = segment.to;
+                const edge = edges.find(e => e.from === u && e.to === v);
+                if (edge) {
+                    edge.flow += minCapacity;
+                    flow[`${u}-${v}`] = (flow[`${u}-${v}`] || 0) + minCapacity;
+                } else {
+                    const reverseEdge = edges.find(e => e.from === v && e.to === u);
+                    if (reverseEdge) {
+                        flow[`${v}-${u}`] = (flow[`${v}-${u}`] || 0) - minCapacity;
+                    }
+                }
+                drawGraph();
+                await delay(500);
+            }
+            maxFlow += minCapacity;
+            stepsDiv.innerHTML += `<div class="step">Augmented path. Current max flow: ${maxFlow}</div>`;
         }
 
         function drawNode(node) {
@@ -226,6 +355,10 @@
         }
 
         function drawEdge(edge) {
+            // Use originalCapacity for drawing, but check residual capacity
+            const residualCapacity = edge.originalCapacity - (flow[`${edge.from}-${edge.to}`] || 0);
+            if (residualCapacity <= 0) return;
+
             const fromNode = nodes[edge.from];
             const toNode = nodes[edge.to];
 
@@ -255,12 +388,7 @@
             ctx.font = '16px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'bottom';
-            ctx.fillText(edge.capacity, midX + offsetX, midY + offsetY - 5);
-
-            if (edge.flow > 0) {
-                ctx.fillStyle = 'red';
-                ctx.fillText(edge.flow, midX - offsetX, midY - offsetY + 10);
-            }
+            ctx.fillText(residualCapacity, midX + offsetX, midY + offsetY - 5);
         }
 
         function drawGraph() {
@@ -345,57 +473,18 @@
             return augmentingPath;
         }
 
-        function getResidualCapacity(u, v) {
-            for (const edge of edges) {
-                if (edge.from === u && edge.to === v) {
-                    return edge.capacity - (flow[`${u}-${v}`] || 0);
-                } else if (edge.from === v && edge.to === u) {
-                    return (flow[`${v}-${u}`] || 0);
-                }
-            }
-            return 0;
-        }
-
-        async function augmentPath(path, algorithmName) {
-            let minCapacity = Infinity;
-            for (const segment of path) {
-                const capacity = getResidualCapacity(segment.from, segment.to);
-                minCapacity = Math.min(minCapacity, capacity);
-            }
-
-            stepsDiv.innerHTML += `<div class="step">Found augmenting path: ${path.map(s => `${s.from}-${s.to}`).join(', ')} with capacity ${minCapacity}</div>`;
-
-            for (const segment of path) {
-                const u = segment.from;
-                const v = segment.to;
-                for (const edge of edges) {
-                    if (edge.from === u && edge.to === v) {
-                        edge.flow += minCapacity;
-                        edge.capacity -= minCapacity; // Reduce the capacity of the forward edge
-                        flow[`${u}-${v}`] = edge.flow;
-                    } else if (edge.from === v && edge.to === u) {
-                        flow[`${v}-${u}`] = (flow[`${v}-${u}`] || 0) - minCapacity;
-                    }
-                }
-                drawGraph();
-                await delay(500);
-            }
-            maxFlow += minCapacity;
-            stepsDiv.innerHTML += `<div class="step">Augmented path. Current max flow: ${maxFlow}</div>`;
-        }
-
         async function startFordFulkerson() {
             stepsDiv.innerHTML = '';
             maxFlow = 0;
             flow = {};
             for (const edge of edges) {
                 edge.flow = 0;
+                flow[`${edge.from}-${edge.to}`] = 0;
             }
             drawGraph();
 
             let path;
-            while ((path = findAugmentingPathDFS())) {
-                if (!path) break;
+            while ((path = findAugmentingPathDFS()) !== null) {
                 await augmentPath(path, 'Ford-Fulkerson (DFS)');
                 await delay(1000);
             }
@@ -409,12 +498,12 @@
             flow = {};
             for (const edge of edges) {
                 edge.flow = 0;
+                flow[`${edge.from}-${edge.to}`] = 0;
             }
             drawGraph();
 
             let path;
-            while ((path = findAugmentingPathBFS())) {
-                if (!path) break;
+            while ((path = findAugmentingPathBFS()) !== null) {
                 await augmentPath(path, 'Edmonds-Karp (BFS)');
                 await delay(1000);
             }
@@ -425,7 +514,6 @@
         function resetGraph() {
             clearInterval(animationInterval);
             generateRandomGraph();
-            stepsDiv.innerHTML = '';
             maxFlow = 0;
             flow = {};
         }
