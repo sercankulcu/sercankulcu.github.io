@@ -2,19 +2,17 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
         content="An interactive network flow simulator visualizing the Ford-Fulkerson and Edmonds-Karp algorithms. Find the maximum flow step by step and learn how these algorithms work.">
     <meta name="keywords"
         content="Ford-Fulkerson, Edmonds-Karp, network flow, maximum flow, algorithm, simulator, visualization, graph theory, computer science, education">
-    
-        <title>Ford-Fulkerson and Edmonds-Karp Network Flow Simulator</title>
+    <title>Ford-Fulkerson and Edmonds-Karp Network Flow Simulator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #fff;
             color: #333;
             text-align: center;
             margin: 0 auto;
@@ -103,7 +101,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 12px;
+            font-size: 20px;
             cursor: default;
         }
 
@@ -114,7 +112,7 @@
 
         .flow {
             color: red;
-            font-size: 10px;
+            font-size: 20px;
             position: absolute;
             background-color: white;
             padding: 2px;
@@ -130,7 +128,7 @@
 
 <body>
     <div class="header">
-        <a href="https://sercankulcu.github.io/teaching/algorithms" class="back-button">&larr; Back</a>
+        <a href="https://sercankulcu.github.io/teaching/algorithms" class="back-button">← Back</a>
         <h1>Network Flow Simulator</h1>
     </div>
 
@@ -161,6 +159,10 @@
         let maxFlow = 0;
         let flow = {};
 
+        // Drag state
+        let selectedNode = null;
+        let isDragging = false;
+
         function getRandomInt(min, max) {
             min = Math.ceil(min);
             max = Math.floor(max);
@@ -173,6 +175,7 @@
             adjacencyList = {};
             flow = {};
             const numNodes = parseInt(numNodesInput.value);
+            const sinkNode = numNodes - 1;
 
             // Create nodes
             for (let i = 0; i < numNodes; i++) {
@@ -187,6 +190,8 @@
             // Create random directed edges with capacities
             for (let i = 0; i < numNodes; i++) {
                 for (let j = 0; j < numNodes; j++) {
+                    // Prevent direct edge from source (0) to sink (numNodes - 1)
+                    if (i === sourceNode && j === sinkNode) continue;
                     if (i !== j && Math.random() < 0.4) { // Probability of a directed edge
                         const capacity = getRandomInt(5, 15);
                         const existingEdge = edges.find(e => (e.from === i && e.to === j) || (e.from === j && e.to === i));
@@ -197,12 +202,11 @@
                                 adjacencyList[j].push(i);
                             }
                             flow[`${i}-${j}`] = 0;
-                        } else if (existingEdge.from === j && existingEdge.to === i) {
-                            // For simplicity, we'll keep the first direction's capacity
                         }
                     }
                 }
             }
+            stepsDiv.innerHTML = "Graph generated with " + nodes.length + " nodes and " + edges.length + " edges.";
             drawGraph();
         }
 
@@ -215,7 +219,7 @@
             ctx.fill();
             ctx.stroke();
             ctx.fillStyle = 'black';
-            ctx.font = '12px sans-serif';
+            ctx.font = '20px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(node.id, node.x, node.y);
@@ -235,7 +239,6 @@
             ctx.lineWidth = 1;
             ctx.stroke();
 
-            // Arrowhead
             ctx.beginPath();
             ctx.moveTo(toNode.x, toNode.y);
             ctx.lineTo(toNode.x - arrowSize * Math.cos(angle - Math.PI / 6), toNode.y - arrowSize * Math.sin(angle - Math.PI / 6));
@@ -244,18 +247,16 @@
             ctx.fillStyle = 'black';
             ctx.fill();
 
-            // Display capacity
             const midX = (fromNode.x + toNode.x) / 2;
             const midY = (fromNode.y + toNode.y) / 2;
-            const offsetX = 15 * Math.sin(angle);
-            const offsetY = -15 * Math.cos(angle);
+            const offsetX = 5 * Math.sin(angle);
+            const offsetY = -5 * Math.cos(angle);
             ctx.fillStyle = 'black';
-            ctx.font = '12px sans-serif';
+            ctx.font = '16px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'bottom';
             ctx.fillText(edge.capacity, midX + offsetX, midY + offsetY - 5);
 
-            // Display flow
             if (edge.flow > 0) {
                 ctx.fillStyle = 'red';
                 ctx.fillText(edge.flow, midX - offsetX, midY - offsetY + 10);
@@ -376,7 +377,7 @@
                     }
                 }
                 drawGraph();
-                await delay(500); // Visualize each step
+                await delay(500);
             }
             maxFlow += minCapacity;
             stepsDiv.innerHTML += `<div class="step">Augmented path. Current max flow: ${maxFlow}</div>`;
@@ -392,10 +393,10 @@
             drawGraph();
 
             let path;
-            while ((path = findAugmentingPathDFS())) { // Using DFS for Ford-Fulkerson
+            while ((path = findAugmentingPathDFS())) {
                 if (!path) break;
                 await augmentPath(path, 'Ford-Fulkerson (DFS)');
-                await delay(1000); // Pause between finding paths
+                await delay(1000);
             }
 
             stepsDiv.innerHTML += `<div class="step">Ford-Fulkerson finished. Total max flow: ${maxFlow}</div>`;
@@ -411,10 +412,10 @@
             drawGraph();
 
             let path;
-            while ((path = findAugmentingPathBFS())) { // Using BFS for Edmonds-Karp
+            while ((path = findAugmentingPathBFS())) {
                 if (!path) break;
                 await augmentPath(path, 'Edmonds-Karp (BFS)');
-                await delay(1000); // Pause between finding paths
+                await delay(1000);
             }
 
             stepsDiv.innerHTML += `<div class="step">Edmonds-Karp finished. Total max flow: ${maxFlow}</div>`;
@@ -435,13 +436,51 @@
         function resizeCanvas() {
             const maxWidth = 600;
             canvas.width = Math.min(window.innerWidth, maxWidth);
-            canvas.height = canvas.width * 0.6; // Maintain a 16:10 aspect ratio (you can adjust)
+            canvas.height = canvas.width * 0.6;
 
-            // Initial graph generation
             generateRandomGraph();
-
             drawGraph();
         }
+
+        // Drag functionality
+        function getNodeAtPosition(x, y) {
+            return nodes.find(node => {
+                const dx = x - node.x;
+                const dy = y - node.y;
+                return Math.sqrt(dx * dx + dy * dy) < 15;
+            });
+        }
+
+        canvas.addEventListener('mousedown', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            selectedNode = getNodeAtPosition(x, y);
+            if (selectedNode) {
+                isDragging = true;
+            }
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (isDragging && selectedNode) {
+                const rect = canvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                selectedNode.x = Math.max(15, Math.min(x, canvas.width - 15));
+                selectedNode.y = Math.max(15, Math.min(y, canvas.height - 15));
+                drawGraph();
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+            selectedNode = null;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isDragging = false;
+            selectedNode = null;
+        });
 
         // Initial canvas resizing
         resizeCanvas();
