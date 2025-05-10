@@ -72,7 +72,7 @@ Algorithms are the step-by-step procedures that form the core of computer scienc
 
 - [🖼️Sunum-Giriş (PDF)](../files/algorithms/slides/Bolum_01_01_Giris.pdf)
 - [🖼️Sunum-Karmaşıklık (PDF)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.pdf)
-- [🕹️Run time analysis (HTML)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.html)
+- [🕹️Run time analysis (HTML)](../files/algorithms/slides/Bolum_01_02_Complexity.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_01_Introduction.pdf) | 
   [Complexity (PDF)](../files/algorithms/slides/Chapter_01_Complexity.pdf) | 
   [Amortized Analysis (HTML)](../files/algorithms/slides/Chapter_01_Amortized_Analysis.html) | 
@@ -116,13 +116,13 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
   - [🖼️Sunum-Çizge Minimum Kapsayan (PDF)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.pdf) 
   - [🖼️Sunum-Çizge Ağ Akış (PDF)](../files/algorithms/slides/Bolum_04_04_Ag_Akis.pdf) 
 - 🕹️Applications:
-  - [🕹️BFS DFS (HTML)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.html)
-  - [🕹️Travelling Salesman (HTML)](../files/algorithms/slides/Bolum_04_02_TSP.html) | 
-    [🕹️A* Pathfinding (HTML)](../files/algorithms/slides/Bolum_04_02_AStar.html) | 
-    [🕹️Dijkstra (HTML)](../files/algorithms/slides/Bolum_04_02_Dijkstra.html)
+  - [🕹️BFS DFS (HTML)](../files/algorithms/slides/Bolum_04_01_Travelsal.html)
+  - [🕹️Travelling Salesman (HTML)](../files/algorithms/slides/Bolum_04_02_TSP.html)
+  - [🕹️A* Pathfinding (HTML)](../files/algorithms/slides/Bolum_04_02_AStar.html)
+  - [🕹️Dijkstra (HTML)](../files/algorithms/slides/Bolum_04_02_Shortest.html) 
   - [🕹️MST Simulator (HTML)](../files/algorithms/slides/Bolum_04_03_MST.html)
   - [🕹️Network Flow (HTML)](../files/algorithms/slides/Bolum_04_04_Flow.html)
-  - [Connect Four (HTML)](../files/algorithms/slides/Chapter_04_Connect_Four.html)
+  - [🕹️Connect Four (HTML)](../files/algorithms/slides/Chapter_04_Connect_Four.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_04_Graph.pdf) 
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src)
 
