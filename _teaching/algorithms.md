@@ -117,7 +117,8 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
   - [🖼️Sunum-Çizge Ağ Akış (PDF)](../files/algorithms/slides/Bolum_04_04_Ag_Akis.pdf) 
 - 🕹️Applications:
   - [🕹️BFS DFS (HTML)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.html)
-  - [🕹️Travelling Salesman (HTML)](../files/algorithms/slides/Bolum_04_02_TSP.html)
+  - [🕹️Travelling Salesman (HTML)](../files/algorithms/slides/Bolum_04_02_TSP.html) | 
+    [🕹️A* Pathfinding (HTML)](../files/algorithms/slides/Bolum_04_02_AStar.html)
   - [🕹️MST Simulator (HTML)](../files/algorithms/slides/Bolum_04_03_MST.html)
   - [🕹️Network Flow (HTML)](../files/algorithms/slides/Bolum_04_04_Flow.html)
   - [Connect Four (HTML)](../files/algorithms/slides/Chapter_04_Connect_Four.html)
