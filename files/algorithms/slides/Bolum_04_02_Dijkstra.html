@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dijkstra's Algorithm Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            color: #333;
+            text-align: center;
+            margin: 0 auto;
+            padding: 1vw;
+            max-width: 800px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1vw;
+        }
+
+        h1 {
+            margin: auto;
+        }
+
+        .back-button {
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            gap: 1vw;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 1vw;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        input,
+        button {
+            width: calc((100% - (4 * 1vw)) / 4);
+            padding: 1vw;
+            margin: 0;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        canvas {
+            margin-top: 20px;
+            border: 2px solid #333;
+            background-color: white;
+            cursor: grab;
+        }
+
+        #status {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <a href="https://sercankulcu.github.io/teaching/algorithms" class="back-button">← Back</a>
+        <h1>Dijkstra's Algorithm</h1>
+    </div>
+    <div class="container">
+        <div class="controls">
+            <input type="number" id="nodeCount" min="3" max="10" value="5">
+            <button onclick="generateGraph()">Generate Graph</button>
+            <button onclick="runDijkstra()">Run Dijkstra</button>
+        </div>
+    </div>
+
+    <canvas id="graphCanvas" width="600" height="400"></canvas>
+
+    <div id="status">Enter number of nodes and click 'Generate Graph'.</div>
+
+    <script>
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        const statusDiv = document.getElementById('status');
+        let nodes = [];
+        let distances = {};
+        let previous = {};
+        let visited = new Set();
+        let path = [];
+        let selectedNode = null;
+        let isDragging = false;
+
+        // Generate random graph
+        function generateGraph() {
+            const nodeCount = Math.min(Math.max(parseInt(document.getElementById('nodeCount').value), 3), 10);
+            nodes = [];
+            for (let i = 0; i < nodeCount; i++) {
+                nodes.push({
+                    x: Math.random() * (canvas.width - 60) + 30,
+                    y: Math.random() * (canvas.height - 60) + 30,
+                    id: String.fromCharCode(65 + i),
+                    edges: []
+                });
+            }
+
+            // Generate random edges (ensure connected graph)
+            for (let i = 0; i < nodeCount; i++) {
+                let edgeCount = Math.floor(Math.random() * 3) + 1; // 1 to 3 edges
+                while (nodes[i].edges.length < edgeCount && nodes[i].edges.length < nodeCount - 1) {
+                    const targetIdx = Math.floor(Math.random() * nodeCount);
+                    if (targetIdx !== i && !nodes[i].edges.some(e => e.to === nodes[targetIdx].id)) {
+                        const weight = Math.floor(Math.random() * 9) + 1; // Weight 1-9
+                        nodes[i].edges.push({ to: nodes[targetIdx].id, weight });
+                        nodes[targetIdx].edges.push({ to: nodes[i].id, weight });
+                    }
+                }
+            }
+
+            initialize();
+            statusDiv.textContent = "Click 'Run Dijkstra' to start or drag nodes to reposition.";
+        }
+
+        // Draw the graph
+        function drawGraph(highlightEdges = [], highlightNodes = []) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw edges
+            nodes.forEach(node => {
+                node.edges.forEach(edge => {
+                    const target = nodes.find(n => n.id === edge.to);
+                    ctx.beginPath();
+                    ctx.moveTo(node.x, node.y);
+                    ctx.lineTo(target.x, target.y);
+                    ctx.strokeStyle = highlightEdges.some(e => (e.from === node.id && e.to === edge.to) || (e.from === edge.to && e.to === node.id)) ? 'red' : 'black';
+                    ctx.lineWidth = highlightEdges.some(e => (e.from === node.id && e.to === edge.to) || (e.from === edge.to && e.to === node.id)) ? 3 : 1;
+                    ctx.stroke();
+
+                    // Draw weight
+                    const midX = (node.x + target.x) / 2;
+                    const midY = (node.y + target.y) / 2;
+                    ctx.fillStyle = 'black';
+                    ctx.font = '16px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(edge.weight, midX, midY);
+                });
+            });
+
+            // Draw nodes
+            nodes.forEach(node => {
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 20, 0, 2 * Math.PI);
+                ctx.fillStyle = highlightNodes.includes(node.id) ? 'yellow' : 'lightblue';
+                ctx.fill();
+                ctx.strokeStyle = 'black';
+                ctx.stroke();
+                ctx.fillStyle = 'black';
+                ctx.font = '20px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(node.id, node.x, node.y + 5);
+                if (distances[node.id] !== undefined) {
+                    ctx.fillText(distances[node.id], node.x - 10, node.y - 25);
+                }
+            });
+        }
+
+        // Initialize distances and previous
+        function initialize() {
+            distances = {};
+            previous = {};
+            visited = new Set();
+            path = [];
+            nodes.forEach(node => {
+                distances[node.id] = Infinity;
+                previous[node.id] = null;
+            });
+            if (nodes.length > 0) distances[nodes[0].id] = 0;
+            drawGraph();
+        }
+
+        // Find node with minimum distance
+        function getMinDistanceNode() {
+            let minDist = Infinity;
+            let minNode = null;
+            nodes.forEach(node => {
+                if (!visited.has(node.id) && distances[node.id] < minDist) {
+                    minDist = distances[node.id];
+                    minNode = node.id;
+                }
+            });
+            return minNode;
+        }
+
+        // Dijkstra's algorithm with animation
+        async function runDijkstra() {
+            if (nodes.length === 0) {
+                statusDiv.textContent = 'Please generate a graph first.';
+                return;
+            }
+            initialize();
+            statusDiv.textContent = 'Running Dijkstra...';
+            let highlightEdges = [];
+            let highlightNodes = [];
+
+            while (visited.size < nodes.length) {
+                const current = getMinDistanceNode();
+                if (!current) break;
+
+                visited.add(current);
+                highlightNodes = [current];
+
+                const currentNode = nodes.find(n => n.id === current);
+                for (let edge of currentNode.edges) {
+                    const neighbor = edge.to;
+                    if (!visited.has(neighbor)) {
+                        const newDist = distances[current] + edge.weight;
+                        if (newDist < distances[neighbor]) {
+                            distances[neighbor] = newDist;
+                            previous[neighbor] = current;
+                            highlightEdges = [{ from: current, to: neighbor }];
+                            drawGraph(highlightEdges, highlightNodes);
+                            statusDiv.textContent = `Updating distance to ${neighbor}: ${newDist}`;
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                        }
+                    }
+                }
+                drawGraph([], highlightNodes);
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            // Trace the shortest path to the last node
+            let current = nodes[nodes.length - 1].id;
+            while (current) {
+                path.unshift(current);
+                current = previous[current];
+            }
+
+            // Highlight the final path
+            highlightEdges = [];
+            for (let i = 0; i < path.length - 1; i++) {
+                highlightEdges.push({ from: path[i], to: path[i + 1] });
+            }
+            drawGraph(highlightEdges, path);
+            statusDiv.textContent = `Shortest path to ${nodes[nodes.length - 1].id}: ${path.join(' -> ')}, Distance: ${distances[nodes[nodes.length - 1].id]}`;
+        }
+
+        // Mouse event handlers for dragging
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            nodes.forEach(node => {
+                const dx = mouseX - node.x;
+                const dy = mouseY - node.y;
+                if (dx * dx + dy * dy < 20 * 20) {
+                    selectedNode = node;
+                    isDragging = true;
+                    canvas.style.cursor = 'grabbing';
+                }
+            });
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDragging && selectedNode) {
+                const rect = canvas.getBoundingClientRect();
+                selectedNode.x = Math.max(30, Math.min(canvas.width - 30, e.clientX - rect.left));
+                selectedNode.y = Math.max(30, Math.min(canvas.height - 30, e.clientY - rect.top));
+                drawGraph();
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+            selectedNode = null;
+            canvas.style.cursor = 'grab';
+        });
+
+        // Initial draw
+        generateGraph();
+    </script>
+</body>
+
+</html>
