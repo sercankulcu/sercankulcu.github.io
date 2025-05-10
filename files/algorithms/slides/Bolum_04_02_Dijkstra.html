@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -82,18 +81,14 @@
 
         canvas {
             margin-top: 20px;
-            border: 2px solid #333;
-            background-color: white;
             cursor: grab;
         }
 
         #status {
             margin-top: 10px;
-            font-weight: bold;
         }
     </style>
 </head>
-
 <body>
     <div class="header">
         <a href="https://sercankulcu.github.io/teaching/algorithms" class="back-button">← Back</a>
@@ -101,7 +96,7 @@
     </div>
     <div class="container">
         <div class="controls">
-            <input type="number" id="nodeCount" min="3" max="10" value="5">
+            <input type="number" id="nodeCount" min="5" max="10" value="7">
             <button onclick="generateGraph()">Generate Graph</button>
             <button onclick="runDijkstra()">Run Dijkstra</button>
         </div>
@@ -123,7 +118,7 @@
         let selectedNode = null;
         let isDragging = false;
 
-        // Generate random graph
+        // Generate random graph with no edge between first and last node
         function generateGraph() {
             const nodeCount = Math.min(Math.max(parseInt(document.getElementById('nodeCount').value), 3), 10);
             nodes = [];
@@ -136,12 +131,16 @@
                 });
             }
 
-            // Generate random edges (ensure connected graph)
+            // Generate random edges (ensure connected graph, no edge between first and last)
             for (let i = 0; i < nodeCount; i++) {
-                let edgeCount = Math.floor(Math.random() * 3) + 1; // 1 to 3 edges
+                let edgeCount = Math.floor(Math.random() * 3) + 2; // 1 to 3 edges
                 while (nodes[i].edges.length < edgeCount && nodes[i].edges.length < nodeCount - 1) {
                     const targetIdx = Math.floor(Math.random() * nodeCount);
-                    if (targetIdx !== i && !nodes[i].edges.some(e => e.to === nodes[targetIdx].id)) {
+                    // Prevent edge between first (i=0) and last (targetIdx = nodeCount-1) nodes
+                    if (targetIdx !== i && 
+                        !nodes[i].edges.some(e => e.to === nodes[targetIdx].id) &&
+                        !(i === 0 && targetIdx === nodeCount - 1) &&
+                        !(i === nodeCount - 1 && targetIdx === 0)) {
                         const weight = Math.floor(Math.random() * 9) + 1; // Weight 1-9
                         nodes[i].edges.push({ to: nodes[targetIdx].id, weight });
                         nodes[targetIdx].edges.push({ to: nodes[i].id, weight });
@@ -149,8 +148,36 @@
                 }
             }
 
+            // Ensure the graph is connected
+            if (!isGraphConnected()) {
+                generateGraph(); // Regenerate if not connected
+                return;
+            }
+
             initialize();
-            statusDiv.textContent = "Click 'Run Dijkstra' to start or drag nodes to reposition.";
+            let totalEdges = nodes.reduce((sum, node) => sum + node.edges.length, 0) / 2;
+            statusDiv.innerText = "Graph generated with " + nodes.length + " nodes and " + totalEdges + " edges.";
+        }
+
+        // Check if the graph is connected using BFS
+        function isGraphConnected() {
+            if (nodes.length === 0) return false;
+            const visited = new Set();
+            const queue = [nodes[0].id];
+            visited.add(nodes[0].id);
+
+            while (queue.length > 0) {
+                const current = queue.shift();
+                const currentNode = nodes.find(n => n.id === current);
+                currentNode.edges.forEach(edge => {
+                    if (!visited.has(edge.to)) {
+                        visited.add(edge.to);
+                        queue.push(edge.to);
+                    }
+                });
+            }
+
+            return visited.size === nodes.length;
         }
 
         // Draw the graph
@@ -174,7 +201,7 @@
                     ctx.fillStyle = 'black';
                     ctx.font = '16px sans-serif';
                     ctx.textAlign = 'center';
-                    ctx.fillText(edge.weight, midX, midY);
+                    ctx.fillText(edge.weight, midX - 5, midY - 5);
                 });
             });
 
@@ -191,7 +218,7 @@
                 ctx.textAlign = 'center';
                 ctx.fillText(node.id, node.x, node.y + 5);
                 if (distances[node.id] !== undefined) {
-                    ctx.fillText(distances[node.id], node.x - 10, node.y - 25);
+                    ctx.fillText(distances[node.id] === Infinity ? '∞' : distances[node.id], node.x - 10, node.y - 25);
                 }
             });
         }
@@ -251,7 +278,7 @@
                             previous[neighbor] = current;
                             highlightEdges = [{ from: current, to: neighbor }];
                             drawGraph(highlightEdges, highlightNodes);
-                            statusDiv.textContent = `Updating distance to ${neighbor}: ${newDist}`;
+                            statusDiv.innerHTML = `Updating distance to ${neighbor}: ${newDist}` + '<br>' + statusDiv.innerHTML;
                             await new Promise(resolve => setTimeout(resolve, 1000));
                         }
                     }
@@ -273,7 +300,7 @@
                 highlightEdges.push({ from: path[i], to: path[i + 1] });
             }
             drawGraph(highlightEdges, path);
-            statusDiv.textContent = `Shortest path to ${nodes[nodes.length - 1].id}: ${path.join(' -> ')}, Distance: ${distances[nodes[nodes.length - 1].id]}`;
+            statusDiv.innerHTML = `Shortest path to ${nodes[nodes.length - 1].id}: ${path.join(' -> ')}, Distance: ${distances[nodes[nodes.length - 1].id] === Infinity ? '∞' : distances[nodes[nodes.length - 1].id]}` + '<br>' + statusDiv.innerHTML;
         }
 
         // Mouse event handlers for dragging
@@ -312,5 +339,4 @@
         generateGraph();
     </script>
 </body>
-
 </html>
