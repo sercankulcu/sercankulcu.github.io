@@ -66,12 +66,10 @@ Operating systems are a fundamental part of modern computing. They form the foun
   [final (EN)](../files/os/slides/2022-2023-os-final-answers.html)
 
 - **Soru Cevap**  
-  [vize](../files/os/slides/Bolum_17_Soru_Cevap.pdf) | 
-  [final](../files/os/slides/Bolum_18_Soru_Cevap.pdf)
-
-- **Multiple Choice Questions**  
-  [vize](../files/os/slides/midterm_mcq.txt) | 
-  [final](../files/os/slides/final_mcq.txt)
+  [vize (TR)](../files/os/slides/Bolum_17_Soru_Cevap.pdf) | 
+  [final (TR)](../files/os/slides/Bolum_18_Soru_Cevap.pdf) | 
+  [midterm (ENG)](../files/os/slides/os_midterm_mcq.html) | 
+  [final (ENG)](../files/os/slides/os_final_mcq.html)
 
 ---
 
