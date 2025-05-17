@@ -57,7 +57,7 @@ Operating systems are a fundamental part of modern computing. They form the foun
   [telafi](../files/os/slides/2023-2024-os-telafi-cevaplar.pdf) | 
   [final-a](../files/os/slides/2023-2024-os-final-a-cevaplar.pdf) | 
   [final-b](../files/os/slides/2023-2024-os-final-b-cevaplar.pdf) | 
-  [bütünleme](../files/os/slides/2023-2024-os-butunleme-cevap.pdf)
+  [but](../files/os/slides/2023-2024-os-butunleme-cevap.pdf)
 
 - **2022-2023**  
   [vize](../files/os/slides/2022-2023-os-vize-cevaplar.pdf) | 
@@ -68,8 +68,8 @@ Operating systems are a fundamental part of modern computing. They form the foun
 - **Soru Cevap**  
   [vize (TR)](../files/os/slides/Bolum_17_Soru_Cevap.pdf) | 
   [final (TR)](../files/os/slides/Bolum_18_Soru_Cevap.pdf) | 
-  [midterm (ENG)](../files/os/slides/os_midterm_mcq.html) | 
-  [final (ENG)](../files/os/slides/os_final_mcq.html)
+  [midterm (EN)](../files/os/slides/os_midterm_mcq.html) | 
+  [final (EN)](../files/os/slides/os_final_mcq.html)
 
 ---
 
