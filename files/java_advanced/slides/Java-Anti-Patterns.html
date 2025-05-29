@@ -98,22 +98,51 @@
             <p><strong>Nasıl Önlenir?</strong> Singleton yerine bağımlılık enjeksiyonu kullanın veya durum yönetimini dikkatle yapın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
+import java.sql.Connection;
+
 public class DatabaseConnection {
     private static DatabaseConnection instance = new DatabaseConnection();
-    private DatabaseConnection() {}
-    public static DatabaseConnection getInstance() { return instance; }
-    // Bağlantı mantığı
+    private Connection conn;
+
+    private DatabaseConnection() {
+        // Bağlantı başlatma
+        try {
+            this.conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/mydb");
+        } catch (SQLException e) {
+            System.err.println("Bağlantı hatası: " + e.getMessage());
+        }
+    }
+
+    public static DatabaseConnection getInstance() {
+        return instance;
+    }
+
+    public Connection getConnection() {
+        return conn;
+    }
 }
+// Global durum nedeniyle test edilmesi zor
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
+import java.sql.Connection;
+
 public class DatabaseConnection {
     private Connection conn;
-    public DatabaseConnection(Connection conn) { this.conn = conn; }
-    // Bağlantı mantığı
+
+    public DatabaseConnection(Connection conn) {
+        this.conn = conn;
+    }
+
+    public Connection getConnection() {
+        return conn;
+    }
 }
+
 // Bağımlılık enjeksiyonu ile kullanım
-DatabaseConnection db = new DatabaseConnection(dataSource.getConnection());
+Connection conn = dataSource.getConnection(); // DataSource dışardan sağlanır
+DatabaseConnection db = new DatabaseConnection(conn);
+// Test için sahte bir Connection nesnesi kullanılabilir
             </code></pre>
         </div>
 
@@ -124,17 +153,51 @@ DatabaseConnection db = new DatabaseConnection(dataSource.getConnection());
             <p><strong>Nasıl Önlenir?</strong> Sorumlulukları ayırarak sınıfları daha küçük ve odaklanmış hale getirin.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
+import java.sql.Connection;
+
 public class UserManager {
-    public void authenticateUser() { /* ... */ }
-    public void saveToDatabase() { /* ... */ }
-    public void sendEmail() { /* ... */ }
+    public void authenticateUser(String username, String password) {
+        // Kullanıcı doğrulama mantığı
+        System.out.println("Kullanıcı doğrulanıyor: " + username);
+    }
+
+    public void saveToDatabase(Connection conn, String data) {
+        // Veritabanına kaydetme mantığı
+        System.out.println("Veri kaydediliyor: " + data);
+    }
+
+    public void sendEmail(String recipient, String message) {
+        // E-posta gönderme mantığı
+        System.out.println("E-posta gönderiliyor: " + recipient);
+    }
 }
+// Çok fazla sorumluluk tek sınıfta
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-public class AuthService { public void authenticateUser() { /* ... */ } }
-public class DatabaseService { public void saveToDatabase() { /* ... */ } }
-public class EmailService { public void sendEmail() { /* ... */ } }
+import java.sql.Connection;
+
+public class AuthService {
+    public void authenticateUser(String username, String password) {
+        // Kullanıcı doğrulama mantığı
+        System.out.println("Kullanıcı doğrulanıyor: " + username);
+    }
+}
+
+public class DatabaseService {
+    public void saveToDatabase(Connection conn, String data) {
+        // Veritabanına kaydetme mantığı
+        System.out.println("Veri kaydediliyor: " + data);
+    }
+}
+
+public class EmailService {
+    public void sendEmail(String recipient, String message) {
+        // E-posta gönderme mantığı
+        System.out.println("E-posta gönderiliyor: " + recipient);
+    }
+}
+// Sorumluluklar ayrıştırılmış
             </code></pre>
         </div>
 
@@ -145,18 +208,54 @@ public class EmailService { public void sendEmail() { /* ... */ } }
             <p><strong>Nasıl Önlenir?</strong> Kodunuzu modülerleştirin, yöntemleri ayırın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-public void process() {
-    if (condition) {
-        for (int i = 0; i < 10; i++) {
-            // Karmaşık mantık
+public class DataProcessor {
+    public void process() {
+        boolean condition = true;
+        if (condition) {
+            for (int i = 0; i < 10; i++) {
+                System.out.println("İşleniyor: " + i);
+                if (i % 2 == 0) {
+                    // Karmaşık mantık
+                    System.out.println("Çift sayı: " + i);
+                } else {
+                    // Daha fazla karmaşık mantık
+                    System.out.println("Tek sayı: " + i);
+                }
+            }
         }
     }
 }
+// Kodun yapısı karmaşık ve okunması zor
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-public void process() { if (condition) { processItems(); } }
-private void processItems() { for (int i = 0; i < 10; i++) { /* ... */ } }
+public class DataProcessor {
+    public void process() {
+        if (isConditionMet()) {
+            processItems();
+        }
+    }
+
+    private boolean isConditionMet() {
+        return true;
+    }
+
+    private void processItems() {
+        for (int i = 0; i < 10; i++) {
+            System.out.println("İşleniyor: " + i);
+            processItem(i);
+        }
+    }
+
+    private void processItem(int i) {
+        if (i % 2 == 0) {
+            System.out.println("Çift sayı: " + i);
+        } else {
+            System.out.println("Tek sayı: " + i);
+        }
+    }
+}
+// Kod modüler ve okunabilir
             </code></pre>
         </div>
 
@@ -167,12 +266,29 @@ private void processItems() { for (int i = 0; i < 10; i++) { /* ... */ } }
             <p><strong>Nasıl Önlenir?</strong> Sabitler için `static final` kullanın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-if (status == 42) { /* ... */ }
+public class StatusChecker {
+    public boolean isActive(int status) {
+        if (status == 42) {
+            return true;
+        }
+        return false;
+    }
+}
+// 42'nin ne anlama geldiği belirsiz
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-public static final int ACTIVE_STATUS = 42;
-if (status == ACTIVE_STATUS) { /* ... */ }
+public class StatusChecker {
+    public static final int ACTIVE_STATUS = 42;
+
+    public boolean isActive(int status) {
+        if (status == ACTIVE_STATUS) {
+            return true;
+        }
+        return false;
+    }
+}
+// Sabit anlamlı ve yeniden kullanılabilir
             </code></pre>
         </div>
 
@@ -183,11 +299,35 @@ if (status == ACTIVE_STATUS) { /* ... */ }
             <p><strong>Nasıl Önlenir?</strong> Performans sorunlarını profil araçlarıyla belirleyin.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-public void complexSort(List<String> list) { /* Karmaşık sıralama algoritması */ }
+import java.util.List;
+
+public class Sorter {
+    public void complexSort(List<String> list) {
+        // Gereksiz yere karmaşık bir sıralama algoritması
+        for (int i = 0; i < list.size(); i++) {
+            for (int j = i + 1; j < list.size(); j++) {
+                if (list.get(i).compareTo(list.get(j)) > 0) {
+                    String temp = list.get(i);
+                    list.set(i, list.get(j));
+                    list.set(j, temp);
+                }
+            }
+        }
+    }
+}
+// Performans sorunu doğrulanmadan karmaşık kod
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-public void sort(List<String> list) { Collections.sort(list); }
+import java.util.Collections;
+import java.util.List;
+
+public class Sorter {
+    public void sort(List<String> list) {
+        Collections.sort(list);
+        // Standart kütüphane kullanımı, optimize ve test edilmiş
+    }
+}
             </code></pre>
         </div>
 
@@ -198,11 +338,41 @@ public void sort(List<String> list) { Collections.sort(list); }
             <p><strong>Nasıl Önlenir?</strong> İstisnaları loglayın veya yeniden fırlatın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-try { doSomething(); } catch (Exception e) {}
+import java.io.IOException;
+
+public class FileReader {
+    public void readFile(String path) {
+        try {
+            // Dosya okuma işlemleri
+            Files.readAllBytes(Paths.get(path));
+        } catch (IOException e) {
+            // İstisna yutuluyor, hata gizleniyor
+        }
+    }
+}
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-try { doSomething(); } catch (Exception e) { log.error("Hata oluştu", e); }
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class FileReader {
+    private static final Logger log = LoggerFactory.getLogger(FileReader.class);
+
+    public void readFile(String path) {
+        try {
+            // Dosya okuma işlemleri
+            Files.readAllBytes(Paths.get(path));
+        } catch (IOException e) {
+            log.error("Dosya okuma hatası: {}", path, e);
+            throw new RuntimeException("Dosya okunamadı", e);
+        }
+    }
+}
+// Hata loglanıyor ve yeniden fırlatılıyor
             </code></pre>
         </div>
 
@@ -213,11 +383,36 @@ try { doSomething(); } catch (Exception e) { log.error("Hata oluştu", e); }
             <p><strong>Nasıl Önlenir?</strong> Kompozisyonu tercih edin.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-public class Dog extends Mammal { /* ... */ }
+public class Mammal {
+    public void move() { System.out.println("Hareket ediyor"); }
+}
+
+public class Dog extends Mammal {
+    public void bark() { System.out.println("Havlıyor"); }
+}
+// Miras sıkı bağımlılık yaratıyor
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-public class Dog { private MammalBehavior behavior; /* ... */ }
+public interface Behavior {
+    void move();
+}
+
+public class MammalBehavior implements Behavior {
+    public void move() { System.out.println("Hareket ediyor"); }
+}
+
+public class Dog {
+    private Behavior behavior;
+
+    public Dog(Behavior behavior) {
+        this.behavior = behavior;
+    }
+
+    public void move() { behavior.move(); }
+    public void bark() { System.out.println("Havlıyor"); }
+}
+// Kompozisyon esneklik sağlar
             </code></pre>
         </div>
 
@@ -228,14 +423,42 @@ public class Dog { private MammalBehavior behavior; /* ... */ }
             <p><strong>Nasıl Önlenir?</strong> Ortak kodu yöntemlere ayırın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-public void validateA() { /* Aynı doğrulama mantığı */ }
-public void validateB() { /* Aynı doğrulama mantığı */ }
+public class Validator {
+    public boolean validateA(String input) {
+        if (input != null && input.length() > 5) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean validateB(String input) {
+        if (input != null && input.length() > 5) {
+            return true;
+        }
+        return false;
+    }
+}
+// Aynı mantık tekrar ediyor
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-private void validate() { /* Doğrulama mantığı */ }
-public void validateA() { validate(); }
-public void validateB() { validate(); }
+public class Validator {
+    private boolean validate(String input) {
+        if (input != null && input.length() > 5) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean validateA(String input) {
+        return validate(input);
+    }
+
+    public boolean validateB(String input) {
+        return validate(input);
+    }
+}
+// Ortak mantık yeniden kullanılabilir
             </code></pre>
         </div>
 
@@ -246,11 +469,41 @@ public void validateB() { validate(); }
             <p><strong>Nasıl Önlenir?</strong> Yapılandırmaları özellik dosyalarına taşıyın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-String dbUrl = "jdbc:mysql://localhost:3306/mydb";
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+public class DatabaseConfig {
+    public Connection getConnection() {
+        String dbUrl = "jdbc:mysql://localhost:3306/mydb";
+        String user = "admin";
+        String password = "secret";
+        try {
+            return DriverManager.getConnection(dbUrl, user, password);
+        } catch (SQLException e) {
+            throw new RuntimeException("Bağlantı hatası", e);
+        }
+    }
+}
+// Yapılandırma sabit kodlanmış, değiştirilmesi zor
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-String dbUrl = System.getenv("DB_URL");
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+public class DatabaseConfig {
+    public Connection getConnection() {
+        String dbUrl = System.getenv("DB_URL");
+        String user = System.getenv("DB_USER");
+        String password = System.getenv("DB_PASSWORD");
+        try {
+            return DriverManager.getConnection(dbUrl, user, password);
+        } catch (SQLException e) {
+            throw new RuntimeException("Bağlantı hatası", e);
+        }
+    }
+}
+// Yapılandırma ortam değişkenlerinden alınıyor
             </code></pre>
         </div>
 
@@ -261,11 +514,31 @@ String dbUrl = System.getenv("DB_URL");
             <p><strong>Nasıl Önlenir?</strong> Yalnızca kritik bölümleri senkronize edin.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-public synchronized void update() { /* ... */ }
+public class Counter {
+    private int count = 0;
+
+    public synchronized void increment() {
+        // Gereksiz yere tüm yöntem senkronize
+        count++;
+        System.out.println("Sayaç: " + count);
+    }
+}
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-public void update() { synchronized(lock) { /* Kritik bölüm */ } }
+public class Counter {
+    private int count = 0;
+    private final Object lock = new Object();
+
+    public void increment() {
+        synchronized (lock) {
+            // Yalnızca kritik bölüm senkronize
+            count++;
+        }
+        System.out.println("Sayaç: " + count);
+    }
+}
+// Performans iyileştirildi
             </code></pre>
         </div>
 
@@ -276,11 +549,29 @@ public void update() { synchronized(lock) { /* Kritik bölüm */ } }
             <p><strong>Nasıl Önlenir?</strong> `Optional` kullanın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-if (obj != null && obj.getProperty() != null) { /* ... */ }
+public class UserService {
+    public String getUserName(User user) {
+        if (user != null && user.getProfile() != null && user.getProfile().getName() != null) {
+            return user.getProfile().getName();
+        }
+        return "Bilinmeyen";
+    }
+}
+// Çok fazla null kontrolü
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-Optional.ofNullable(obj).map(Obj::getProperty).ifPresent(p -> { /* ... */ });
+import java.util.Optional;
+
+public class UserService {
+    public String getUserName(User user) {
+        return Optional.ofNullable(user)
+                .map(User::getProfile)
+                .map(Profile::getName)
+                .orElse("Bilinmeyen");
+    }
+}
+// Optional ile temiz ve güvenli kod
             </code></pre>
         </div>
 
@@ -291,11 +582,32 @@ Optional.ofNullable(obj).map(Obj::getProperty).ifPresent(p -> { /* ... */ });
             <p><strong>Nasıl Önlenir?</strong> Katmanlar arasında veri modelleri kullanın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-public ResultSet getData() { /* SQL sonucu */ }
+import java.sql.ResultSet;
+
+public class DataAccess {
+    public ResultSet getData() {
+        // SQL sorgusu çalıştır
+        return connection.createStatement().executeQuery("SELECT * FROM users");
+    }
+}
+// Veritabanı detayları üst katmana sızıyor
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-public List<DataModel> getData() { /* Model listesi */ }
+import java.util.List;
+
+public class DataAccess {
+    public List<UserModel> getData() {
+        // SQL sorgusu çalıştır ve modeli dönüştür
+        ResultSet rs = connection.createStatement().executeQuery("SELECT * FROM users");
+        List<UserModel> users = new ArrayList<>();
+        while (rs.next()) {
+            users.add(new UserModel(rs.getString("name")));
+        }
+        return users;
+    }
+}
+// Katmanlar ayrıştırılmış, model kullanılıyor
             </code></pre>
         </div>
 
@@ -306,11 +618,49 @@ public List<DataModel> getData() { /* Model listesi */ }
             <p><strong>Nasıl Önlenir?</strong> `wait()`/`notify()` kullanın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-while (!isReady()) { Thread.sleep(100); }
+public class ResourceChecker {
+    private boolean ready = false;
+
+    public void waitForResource() {
+        while (!ready) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        System.out.println("Kaynak hazır");
+    }
+}
+// CPU'yu gereksiz yere tüketiyor
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-synchronized(lock) { while (!isReady()) lock.wait(); }
+public class ResourceChecker {
+    private boolean ready = false;
+    private final Object lock = new Object();
+
+    public void waitForResource() {
+        synchronized (lock) {
+            while (!ready) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+        System.out.println("Kaynak hazır");
+    }
+
+    public void setReady() {
+        synchronized (lock) {
+            ready = true;
+            lock.notify();
+        }
+    }
+}
+// CPU dostu bekleme
             </code></pre>
         </div>
 
@@ -321,11 +671,31 @@ synchronized(lock) { while (!isReady()) lock.wait(); }
             <p><strong>Nasıl Önlenir?</strong> YAGNI ilkesini takip edin.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-public class FactoryFactory { /* Karmaşık fabrika */ }
+public class FactoryFactory {
+    public AbstractFactory createFactory(String type) {
+        // Gereksiz yere karmaşık fabrika hiyerarşisi
+        if ("typeA".equals(type)) {
+            return new TypeAFactory();
+        } else {
+            return new TypeBFactory();
+        }
+    }
+}
+// Gereksiz karmaşıklık
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-public class SimpleFactory { /* Basit fabrika */ }
+public class SimpleFactory {
+    public Service createService(String type) {
+        // Basit ve yeterli çözüm
+        if ("typeA".equals(type)) {
+            return new TypeAService();
+        } else {
+            return new TypeBService();
+        }
+    }
+}
+// YAGNI ilkesine uygun
             </code></pre>
         </div>
 
@@ -378,14 +748,28 @@ public class FileProcessor {
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
 public class GenericProcessor<T extends Comparable<T>> {
-    public T process(T input) { /* Karmaşık genel mantık */ }
+    public T process(T input) {
+        // Karmaşık genel mantık
+        if (input != null) {
+            return input;
+        }
+        throw new IllegalArgumentException("Girdi null olamaz");
+    }
 }
+// Gereksiz genelleştirme
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
 public class StringProcessor {
-    public String process(String input) { /* Basit mantık */ }
+    public String process(String input) {
+        // Basit ve özel mantık
+        if (input != null) {
+            return input.trim();
+        }
+        throw new IllegalArgumentException("Girdi null olamaz");
+    }
 }
+// Soruna özel çözüm
             </code></pre>
         </div>
 
@@ -398,18 +782,35 @@ public class StringProcessor {
             <pre><code class="language-java">
 public class User {
     private String name;
+    private String email;
+
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 }
+// Yalnızca veri tutucu, davranış yok
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
 public class User {
     private String name;
+    private String email;
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
     public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public void sendWelcomeEmail() { /* E-posta gönderme mantığı */ }
+    public String getEmail() { return email; }
+
+    public void sendWelcomeEmail() {
+        // E-posta gönderme mantığı
+        System.out.println("Hoş geldiniz e-postası gönderildi: " + email);
+    }
 }
+// Veri ve davranış bir arada
             </code></pre>
         </div>
 
@@ -421,15 +822,27 @@ public class User {
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
 public class Processor {
-    // Anlamadan kopyalanmış karmaşık kod
-    public void process() { /* Gereksiz karmaşık mantık */ }
+    public void process() {
+        // Anlamadan kopyalanan karmaşık kod
+        Map<String, Object> context = new ConcurrentHashMap<>();
+        context.put("key", new Object());
+        synchronized (context) {
+            // Gereksiz senkronizasyon
+            System.out.println("İşleniyor: " + context.get("key"));
+        }
+    }
 }
+// Kodun amacı belirsiz, gereksiz karmaşık
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
 public class Processor {
-    public void process() { /* Amaca uygun basit mantık */ }
+    public void process(String data) {
+        // Amaca uygun basit mantık
+        System.out.println("İşleniyor: " + data);
+    }
 }
+// Kod açık ve anlaşılır
             </code></pre>
         </div>
 
@@ -440,16 +853,29 @@ public class Processor {
             <p><strong>Nasıl Önlenir?</strong> Bağımlılık enjeksiyonu çerçeveleri kullanın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-public class Service {
+public class UserService {
     private Database db = new Database();
+
+    public void saveUser(String username) {
+        db.save(username);
+    }
 }
+// Sabit bağımlılık, test etmek zor
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-public class Service {
-    private Database db;
-    public Service(Database db) { this.db = db; }
+public class UserService {
+    private final DatabaseService dbService;
+
+    public UserService(DatabaseService dbService) {
+        this.dbService = dbService;
+    }
+
+    public void saveUser(String username) {
+        dbService.save(username);
+    }
 }
+// Bağımlılık enjeksiyonu ile test edilebilir
             </code></pre>
         </div>
 
@@ -461,14 +887,30 @@ public class Service {
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
 public class SystemDesign {
-    // Tüm sistemi kapsayan karmaşık tasarım
+    public void initialize() {
+        // Tüm sistemin detaylı tasarımı
+        configureDatabase();
+        configureNetwork();
+        configureUI();
+        // ... yüzlerce diğer yapılandırma
+    }
 }
+// Aşırı tasarlanmış, esnek değil
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-public class Module {
-    // Küçük, çevik modül tasarımı
+public class ModuleService {
+    public void initialize() {
+        // Küçük, çevik modül tasarımı
+        configureModule();
+    }
+
+    private void configureModule() {
+        // Yalnızca gerekli yapılandırma
+        System.out.println("Modül başlatıldı");
+    }
 }
+// Çevik ve esnek
             </code></pre>
         </div>
 
@@ -479,13 +921,33 @@ public class Module {
             <p><strong>Nasıl Önlenir?</strong> Bağımlılıkları tek yönlü tutun.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-public class A { B b = new B(); }
-public class B { A a = new A(); }
+public class A {
+    private B b = new B();
+    public void process() { b.doSomething(); }
+}
+
+public class B {
+    private A a = new A();
+    public void doSomething() { a.process(); }
+}
+// Döngüsel bağımlılık
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-public class A { private Service service; }
-public class Service { /* Bağımsız mantık */ }
+public interface Service {
+    void doSomething();
+}
+
+public class A {
+    private Service service;
+    public A(Service svc) { this.service = svc; }
+    public void process() { service.doSomething(); }
+}
+
+public class ConcreteService implements Service {
+    public void doSomething() { System.out.println("Service çalışıyor"); }
+}
+// Bağımlılık tek yönlü
             </code></pre>
         </div>
 
@@ -496,12 +958,36 @@ public class Service { /* Bağımsız mantık */ }
             <p><strong>Nasıl Önlenir?</strong> Yansıma yerine doğrudan yaklaşımlar tercih edin.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-Field field = clazz.getDeclaredField("name");
-field.setAccessible(true);
+import java.lang.reflect.Field;
+
+public class DataUpdater {
+    public void updateField(Object obj, String fieldName, String value) {
+        try {
+            Field field = obj.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(obj, value);
+        } catch (Exception e) {
+            System.err.println("Hata: " + e.getMessage());
+        }
+    }
+}
+// Yansıma performansı düşürüyor
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-public class Data { public String getName() { return name; } }
+public class Data {
+    private String name;
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+}
+
+public class DataUpdater {
+    public void updateField(Data data, String value) {
+        data.setName(value);
+    }
+}
+// Doğrudan erişim, hızlı ve güvenli
             </code></pre>
         </div>
 
@@ -512,14 +998,38 @@ public class Data { public String getName() { return name; } }
             <p><strong>Nasıl Önlenir?</strong> Ortak mantığı yöntemlere ayırın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-public void method1() { /* Tekrar eden mantık */ }
-public void method2() { /* Aynı mantık */ }
+public class ReportGenerator {
+    public void generateUserReport() {
+        // Tekrar eden mantık
+        System.out.println("Rapor başlıyor");
+        System.out.println("Kullanıcı verileri işleniyor");
+    }
+
+    public void generateAdminReport() {
+        // Aynı mantık
+        System.out.println("Rapor başlıyor");
+        System.out.println("Kullanıcı verileri işleniyor");
+    }
+}
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-private void commonLogic() { /* Ortak mantık */ }
-public void method1() { commonLogic(); }
-public void method2() { commonLogic(); }
+public class ReportGenerator {
+    private void startReport() {
+        // Ortak mantık
+        System.out.println("Rapor başlıyor");
+        System.out.println("Kullanıcı verileri işleniyor");
+    }
+
+    public void generateUserReport() {
+        startReport();
+    }
+
+    public void generateAdminReport() {
+        startReport();
+    }
+}
+// Kod tekrarından kaçınıldı
             </code></pre>
         </div>
 
@@ -530,11 +1040,35 @@ public void method2() { commonLogic(); }
             <p><strong>Nasıl Önlenir?</strong> Spesifik istisnalar yakalayın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-try { /* Kod */ } catch (Exception e) { /* İşleme */ }
+import java.io.IOException;
+
+public class DataLoader {
+    public void loadData(String path) {
+        try {
+            Files.readString(Paths.get(path));
+        } catch (Exception e) {
+            System.err.println("Hata: " + e.getMessage());
+        }
+    }
+}
+// Genel istisna, hata türü belirsiz
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-try { /* Kod */ } catch (IOException e) { /* Spesifik işleme */ }
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+public class DataLoader {
+    public void loadData(String path) {
+        try {
+            Files.readString(Paths.get(path));
+        } catch (IOException e) {
+            System.err.println("Dosya okuma hatası: " + e.getMessage());
+        }
+    }
+}
+// Spesifik istisna yakalanıyor
             </code></pre>
         </div>
 
@@ -545,27 +1079,64 @@ try { /* Kod */ } catch (IOException e) { /* Spesifik işleme */ }
             <p><strong>Nasıl Önlenir?</strong> Dinamik hesaplamalar veya sabitler kullanın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-for (int i = 0; i < 100; i++) { /* ... */ }
+public class DataSampler {
+    public void sampleData(List<String> data) {
+        for (int i = 0; i < 100; i++) {
+            System.out.println("Veri: " + data.get(i));
+        }
+    }
+}
+// 100 sabit kodlanmış, değiştirilmesi zor
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-public static final int LIMIT = 100;
-for (int i = 0; i < LIMIT; i++) { /* ... */ }
+public class DataSampler {
+    public static final int SAMPLE_SIZE = 100;
+
+    public void sampleData(List<String> data) {
+        for (int i = 0; i < SAMPLE_SIZE; i++) {
+            System.out.println("Veri: " + data.get(i));
+        }
+    }
+}
+// Sabit değiştirilebilir ve anlamlı
             </code></pre>
         </div>
 
         <div class="anti-pattern">
             <h2>26. Aşırı Loglama</h2>
             <p>Gereksiz yere fazla veya yanlış seviyede loglama yapmak.</p>
-            <p><strong>Neden Sorunlu?</strong> Performansı düşürür, logları okunmaz hale getirir.</p>
+            <p><strong>Neden Sorunlu?</strong> Performansı düşürür, logları okunmaz hale getiririr.</p>
             <p><strong>Nasıl Önlenir?</strong> Log seviyelerini dikkatle seçin.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-log.info("Değişken: " + var);
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class DataProcessor {
+    private static final Logger logger = LoggerFactory.getLogger(DataProcessor.class);
+
+    public void process(String data) {
+        logger.info("Data işleniyor: " + data);
+        // Gereksiz yere her işlem için info logu
+    }
+}
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-if (log.isDebugEnabled()) { log.debug("Değişken: {}", var); }
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class DataProcessor {
+    private static final Logger logger = LoggerFactory.getLogger(DataProcessor.class);
+
+    public void process(String data) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Data işleniyor: {}", data);
+        }
+        // Debug düzeyinde loglama, performans dostu
+    }
+}
             </code></pre>
         </div>
 
@@ -576,11 +1147,29 @@ if (log.isDebugEnabled()) { log.debug("Değişken: {}", var); }
             <p><strong>Nasıl Önlenir?</strong> Statik değişkenleri yalnızca sabitler için kullanın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-public static String currentUser;
+public class UserContext {
+    public static String currentUser;
+
+    public void setUser(String user) {
+        currentUser = user;
+    }
+}
+// Statik değişken, eşzamanlılık sorunlarına açık
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-public class Session { private String currentUser; }
+public class UserSession {
+    private String currentUser;
+
+    public UserSession(String user) {
+        this.currentUser = user;
+    }
+
+    public String getCurrentUser() {
+        return currentUser;
+    }
+}
+// Örnek bazlı durum yönetimi
             </code></pre>
         </div>
 
@@ -591,31 +1180,77 @@ public class Session { private String currentUser; }
             <p><strong>Nasıl Önlenir?</strong> Yöntemleri küçük parçalara ayırın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-public void process() { /* 100 satırlık kod */ }
+public class ReportGenerator {
+    public void generateReport() {
+        // Uzun ve karmaşık yöntem
+        System.out.println("Rapor başlatılıyor");
+        List<String> data = loadData();
+        for (String item : data) {
+            System.out.println("Veri işleniyor: " + item);
+        }
+        System.out.println("Rapor tamamlandı");
+    }
+}
+// Çok fazla sorumluluk tek yöntemde
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
-public void process() { step1(); step2(); }
-private void step1() { /* ... */ }
-private void step2() { /* ... */ }
+public class ReportGenerator {
+    public void generateReport() {
+        startReport();
+        processData();
+        finishReport();
+    }
+
+    private void startReport() {
+        System.out.println("Rapor başlatılıyor");
+    }
+
+    private void processData() {
+        List<String> data = loadData();
+        for (String item : data) {
+            System.out.println("Veri işleniyor: " + item);
+        }
+    }
+
+    private void finishReport() {
+        System.out.println("Rapor tamamlandı");
+    }
+}
+// Yöntemler ayrıştırılmış ve okunabilir
             </code></pre>
         </div>
 
         <div class="anti-pattern">
             <h2>29. Aşırı Erişim Sağlama</h2>
-            <p>Gerektiğinden daha fazla erişim izni vermek (ör. her şeyi `public` yapmak).</p>
+            <p>Gerektiğinden fazla erişim izni vermek (ör. her şeyi `public` yapmak).</p>
             <p><strong>Neden Sorunlu?</strong> Kapsüllemeyi bozar.</p>
             <p><strong>Nasıl Önlenir?</strong> En kısıtlı erişim seviyesini kullanın.</p>
             <p><strong>Kötü Örnek:</strong></p>
             <pre><code class="language-java">
-public class Data { public String value; }
+public class Data {
+    public String value;
+
+    public Data(String value) {
+        this.value = value;
+    }
+}
+// Değişken doğrudan erişilebilir, kapsülleme yok
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
 public class Data {
     private String value;
-    public String getValue() { return value; }
+
+    public Data(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }
+// Kapsülleme sağlanıyor
             </code></pre>
         </div>
 
@@ -628,14 +1263,23 @@ public class Data {
             <pre><code class="language-java">
 public class Processor {
     private int temp;
-    public void process() { temp = 1; /* Kullanım */ }
+
+    public void process() {
+        temp = 1;
+        System.out.println("Geçici değer: " + temp);
+    }
 }
+// Gereksiz sınıf alanı
             </code></pre>
             <p><strong>İyi Örnek:</strong></p>
             <pre><code class="language-java">
 public class Processor {
-    public void process() { int temp = 1; /* Kullanım */ }
+    public void process() {
+        int temp = 1;
+        System.out.println("Geçici değer: " + temp);
+    }
 }
+// Yalnızca yerel değişken kullanılıyor
             </code></pre>
         </div>
 
