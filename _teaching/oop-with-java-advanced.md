@@ -17,6 +17,7 @@ This course is designed to take your Java programming skills to the next level b
 
 As developers become more experienced with Java, it's essential to understand the advanced concepts and best practices that can make their code more efficient, scalable, and maintainable.
 
+- [Anti Patterns](../files/java_advanced/slides/Java-Anti-Patterns.html)
 - [🗒️Lecture Notes (pdf)](../files/java_advanced/Chapter_01_Introduction_To_Advanced_Java_Concepts_And_Best_Practices.pdf)
 - [💻Code Examples (github)](https://github.com/sercankulcu/object-oriented-programming-java-ii/tree/main/Lecture01)
 
