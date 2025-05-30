@@ -50,7 +50,9 @@ Operating systems are a fundamental part of modern computing. They form the foun
 
 - **2024-2025**  
   [vize](../files/os/slides/2024-2025-os-vize-cevaplar.pdf) | 
-  [telafi](../files/os/slides/2024-2025-os-telafi-cevaplar.pdf)
+  [telafi](../files/os/slides/2024-2025-os-telafi-cevaplar.pdf) | 
+  [final](../files/os/slides/2024-2025-os-final-cevaplar.pdf) | 
+  [final (HTML)](../files/os/slides/2024-2025-os-final-cevaplar.html)
 
 - **2023-2024**  
   [vize](../files/os/slides/2023-2024-os-vize-cevap.pdf) | 
