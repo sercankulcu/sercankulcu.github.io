@@ -47,7 +47,8 @@ Java is one of the most popular programming languages, extensively used in vario
 ## Past Exams:
 
 - **2024-2025**  
-  [vize](../files/java/slides/2024-2025-java-vize-cevaplar.pdf)
+  [vize](../files/java/slides/2024-2025-java-vize-cevaplar.pdf) | 
+  [final](../files/java/slides/2024-2025-java-final-cevaplar.pdf)
 
 - **2023-2024**  
   [vize](../files/java/slides/2023-2024-java-vize-cevap.pdf) | 
