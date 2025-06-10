@@ -175,6 +175,7 @@ Graphical user interfaces (GUIs) are a ubiquitous feature of modern software app
 Concurrency and multithreading are essential concepts in Java programming, providing a powerful mechanism for building responsive, scalable applications that can execute multiple tasks concurrently and take advantage of modern hardware architectures to maximize performance and efficiency.
 
 - [🖼️Sunum - İş Parçacıkları (pdf)](../files/java/slides/Bolum_09_Is_Parcaciklari.pdf)  
+- [Çoklu İş Parçacığı ve Paralellik](../files/java/slides/Bolum_09_Coklu-is-parcacigi-paralellik.html)
 - [🗒️Lecture Notes (pdf)](../files/java/Chapter_09_Concurrency_And_Multithreading.pdf)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders09/src)
 

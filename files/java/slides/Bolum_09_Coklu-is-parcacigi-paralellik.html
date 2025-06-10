@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Çoklu İş Parçacığı ve Paralellik Kavramları</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .chapter {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        code {
+            background-color: #ecf0f1;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        pre {
+            background-color: #34495e;
+            color: #ecf0f1;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Çoklu İş Parçacığı ve Paralellik Kavramları</h1>
+
+    <div class="chapter">
+        <h2>Temel Kavramlar</h2>
+        <h3>1. İş Parçacığı (Thread)</h3>
+        <p>İş parçacığı, bir süreç içinde en küçük yürütme birimidir ve diğer iş parçacıklarıyla aynı bellek alanını paylaşır. Java'da <code>Thread</code> sınıfını genişleterek (extend) veya <code>Runnable</code> arayüzünü uygulayarak (implement) iş parçacıkları oluşturulur. Her iş parçacığı, kendi yığın (stack) alanına sahiptir ve bağımsız olarak çalışabilir.</p>
+        <pre>
+public class MyThread extends Thread {
+    public void run() {
+        System.out.println("İş parçacığı çalışıyor: " + Thread.currentThread().getName());
+    }
+    public static void main(String[] args) {
+        MyThread thread = new MyThread();
+        thread.start();
+    }
+}
+        </pre>
+
+        <h3>2. Süreç (Process)</h3>
+        <p>Süreç, işletim sistemi tarafından yönetilen ve kendi bellek alanına, dosya tanımlayıcılarına ve iş parçacıklarına sahip bağımsız bir programdır. Java'da süreçler <code>ProcessBuilder</code> veya <code>Runtime.exec()</code> ile oluşturulabilir. İş parçacıklarından farklı olarak, süreçler birbirleriyle bellek paylaşımı yapamaz.</p>
+        <pre>
+import java.io.IOException;
+public class ProcessExample {
+    public static void main(String[] args) throws IOException {
+        Process process = new ProcessBuilder("notepad.exe").start();
+    }
+}
+        </pre>
+
+        <h3>3. Eşzamanlılık (Concurrency)</h3>
+        <p>Eşzamanlılık, birden fazla görevin aynı anda ilerlemesidir, ancak bu görevler aynı anda çalışmak zorunda değildir (örneğin, zaman paylaşımı ile). Java'da <code>Thread</code> veya <code>ExecutorService</code> sınıfları ile eşzamanlılık sağlanır.</p>
+        <pre>
+Thread t1 = new Thread(() -> System.out.println("Görev 1: " + Thread.currentThread().getName()));
+Thread t2 = new Thread(() -> System.out.println("Görev 2: " + Thread.currentThread().getName()));
+t1.start(); 
+t2.start();
+        </pre>
+
+        <h3>4. Paralellik (Parallelism)</h3>
+        <p>Paralellik, birden fazla görevin aynı anda birden fazla CPU çekirdeği üzerinde eşzamanlı olarak yürütülmesidir. Java'da <code>ForkJoinPool</code> veya paralel akışlar (<code>parallelStream()</code>) ile gerçekleştirilir.</p>
+        <pre>
+import java.util.Arrays;
+public class ParallelExample {
+    public static void main(String[] args) {
+        Arrays.asList(1, 2, 3, 4).parallelStream().forEach(System.out::println);
+    }
+}
+        </pre>
+
+        <h3>5. Bağlam Anahtarlama (Context Switching)</h3>
+        <p>Bağlam anahtarlama, CPU'nun bir iş parçacığından diğerine geçiş yapmasıdır ve her geçişte CPU durumunu (yazmaçlar, yığın) kaydetmek/güncellemek ek yük (overhead) yaratır. Java'da bu, işletim sistemi tarafından yönetilir ve optimize edilmesi için iş parçacığı havuzları kullanılabilir.</p>
+
+        <h3>6. İş Parçacığı Havuzu (Thread Pool)</h3>
+        <p>İş parçacığı havuzu, sabit sayıda iş parçacığının yeniden kullanılarak birçok görevin verimli bir şekilde işlenmesini sağlar. Java'da <code>Executors</code> sınıfı ile oluşturulur.</p>
+        <pre>
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+public class ThreadPoolExample {
+    public static void main(String[] args) {
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        executor.submit(() -> System.out.println("Görev 1: " + Thread.currentThread().getName()));
+        executor.submit(() -> System.out.println("Görev 2: " + Thread.currentThread().getName()));
+        executor.shutdown();
+    }
+}
+        </pre>
+
+        <h3>7. Yarış Durumu (Race Condition)</h3>
+        <p>Yarış durumu, birden fazla iş parçacığının paylaşılan veriye güvenli olmayan bir sırayla erişmesiyle ortaya çıkan hatalı durumdur. Veri tutarsızlığına yol açabilir. Java'da senkronizasyon mekanizmalarıyla önlenir.</p>
+        <pre>
+public class RaceConditionExample {
+    private static int counter = 0;
+    public static void main(String[] args) {
+        Runnable task = () -> { for(int i = 0; i < 1000; i++) counter++; };
+        Thread t1 = new Thread(task); Thread t2 = new Thread(task);
+        t1.start(); t2.start(); try { t1.join(); t2.join(); } catch(Exception e) {}
+        System.out.println("Counter: " + counter); // Tutarsız sonuçlar mümkün
+    }
+}
+        </pre>
+
+        <h3>8. Karşılıklı Dışlama (Mutex - Mutual Exclusion)</h3>
+        <p>Mutex, bir kaynağa aynı anda yalnızca bir iş parçacığının erişmesini sağlamak için kullanılan kilit mekanizmasıdır. Java'da <code>ReentrantLock</code> veya <code>synchronized</code> ile uygulanır.</p>
+        <pre>
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+public class MutexExample {
+    private static int counter = 0;
+    private static Lock lock = new ReentrantLock();
+    public static void increment() {
+        lock.lock();
+        try { counter++; } finally { lock.unlock(); }
+    }
+    public static void main(String[] args) {
+        Runnable task = () -> { for(int i = 0; i < 1000; i++) increment(); };
+        Thread t1 = new Thread(task); Thread t2 = new Thread(task);
+        t1.start(); t2.start(); try { t1.join(); t2.join(); } catch(Exception e) {}
+        System.out.println("Counter: " + counter);
+    }
+}
+        </pre>
+
+        <h3>9. Kilitlenme (Deadlock)</h3>
+        <p>Kilitlenme, iki veya daha fazla iş parçacığının birbirinin kaynaklarını serbest bırakmasını beklemesiyle oluşan durumdur. Java'da dikkatli kaynak yönetimi ile önlenebilir.</p>
+        <pre>
+public class DeadlockExample {
+    public static void main(String[] args) {
+        String resource1 = "Resource 1"; String resource2 = "Resource 2";
+        Thread t1 = new Thread(() -> {
+            synchronized (resource1) { System.out.println("Thread 1: resource1'i aldı");
+                try { Thread.sleep(100); } catch(Exception e) {}
+                synchronized (resource2) { System.out.println("Thread 1: resource2'yi aldı"); }
+            }
+        });
+        Thread t2 = new Thread(() -> {
+            synchronized (resource2) { System.out.println("Thread 2: resource2'yi aldı");
+                try { Thread.sleep(100); } catch(Exception e) {}
+                synchronized (resource1) { System.out.println("Thread 2: resource1'i aldı"); }
+            }
+        });
+        t1.start(); 
+		t2.start();
+    }
+}
+        </pre>
+
+        <h3>10. Canlı Kilit (Livelock)</h3>
+        <p>Canlı kilit, iş parçacıklarının birbirine yanıt olarak durumlarını sürekli değiştirmesi, ancak ilerleme kaydedilememesidir. Deadlock'tan farklı olarak aktif bir bekleyiş içerir.</p>
+        <pre>
+public class LivelockExample {
+    static volatile boolean flag1 = true, flag2 = true;
+    public static void main(String[] args) {
+        Thread t1 = new Thread(() -> {
+            while (flag1) { if (flag2) { flag1 = false; System.out.println("T1 geri adım attı"); } }
+        });
+        Thread t2 = new Thread(() -> {
+            while (flag2) { if (flag1) { flag2 = false; System.out.println("T2 geri adım attı"); } }
+        });
+        t1.start(); 
+		t2.start();
+    }
+}
+        </pre>
+
+        <h3>11. Açlık (Starvation)</h3>
+        <p>Açlık, bir iş parçacığının diğerlerinin kaynakları tekelleştirmesi nedeniyle CPU süresine erişememesi durumudur. Java'da öncelik (priority) yönetimi ile azaltılabilir.</p>
+        <pre>
+public class StarvationExample {
+    public static void main(String[] args) {
+        Thread t1 = new Thread(() -> { while(true) { System.out.println("T1 çalışıyor"); } });
+        Thread t2 = new Thread(() -> { while(true) { System.out.println("T2 bekliyor"); } });
+        t1.setPriority(Thread.MAX_PRIORITY); t2.setPriority(Thread.MIN_PRIORITY);
+        t1.start(); 
+		t2.start();
+    }
+}
+        </pre>
+
+        <h3>12. Semafor (Semaphore)</h3>
+        <p>Semafor, bir kaynağa çoklu erişimi kontrol eden sinyal mekanizmasıdır. Java'da <code>Semaphore</code> sınıfı ile uygulanır.</p>
+        <pre>
+import java.util.concurrent.Semaphore;
+public class SemaphoreExample {
+    public static void main(String[] args) {
+        Semaphore semaphore = new Semaphore(2);
+        Runnable task = () -> {
+            try { semaphore.acquire();
+                System.out.println(Thread.currentThread().getName() + " erişim aldı");
+                Thread.sleep(1000); semaphore.release();
+            } catch (InterruptedException e) { e.printStackTrace(); }
+        };
+        new Thread(task).start(); 
+		new Thread(task).start();
+    }
+}
+        </pre>
+
+        <h3>13. Gözetleyici (Monitor)</h3>
+        <p>Monitör, karşılıklı dışlama ve koşul değişkeni kombinasyonuyla iş parçacığı koordinasyonu sağlar. Java'da <code>synchronized</code> bloklar ve <code>wait()/notify()</code> ile uygulanır.</p>
+        <pre>
+public class MonitorExample {
+    private final Object lock = new Object();
+    private boolean condition = false;
+    public void waitForCondition() {
+        synchronized (lock) { while (!condition) try { lock.wait(); } catch (InterruptedException e) {}
+            System.out.println("Koşul sağlandı");
+        }
+    }
+    public void setCondition() {
+        synchronized (lock) { condition = true; lock.notify(); }
+    }
+}
+        </pre>
+
+        <h3>14. Atomik İşlemler (Atomic Operation)</h3>
+        <p>Atomik işlem, tek bir adımda tamamlanan ve kesintiye uğramayan işlemdir. Java'da <code>java.util.concurrent.atomic</code> paketi ile desteklenir.</p>
+        <pre>
+import java.util.concurrent.atomic.AtomicInteger;
+public class AtomicExample {
+    public static void main(String[] args) {
+        AtomicInteger atomicInt = new AtomicInteger(0);
+        atomicInt.incrementAndGet();
+        System.out.println("Değer: " + atomicInt.get());
+    }
+}
+        </pre>
+
+        <h3>15. Uçucu Anahtar Kelime (Volatile Keyword)</h3>
+        <p><code>volatile</code>, değişkenlerin iş parçacıkları arasında görünürlüğünü garanti eder ve önbellek tutarsızlığını önler. Java'da bellek bariyeri oluşturur.</p>
+        <pre>
+public class VolatileExample {
+    private volatile boolean flag = false;
+    public void setFlag() { flag = true; }
+    public boolean getFlag() { return flag; }
+    public static void main(String[] args) throws InterruptedException {
+        VolatileExample example = new VolatileExample();
+        Thread t = new Thread(() -> { while (!example.getFlag()) {} System.out.println("Flag true oldu"); });
+        t.start(); 
+		Thread.sleep(1000); 
+		example.setFlag();
+    }
+}
+        </pre>
+
+        <h3>16. Bellek Bariyeri (Memory Barrier)</h3>
+        <p>Bellek bariyeri, CPU optimizasyonlarının talimat sırasını yeniden düzenlemesini engeller. Java'da <code>volatile</code> ve <code>synchronized</code> bu etkiyi sağlar.</p>
+
+        <h3>17. Yanlış Paylaşım (False Sharing)</h3>
+        <p>Yanlış paylaşım, farklı değişkenlerin aynı CPU önbellek satırında bulunması nedeniyle performans kaybı yaşanmasıdır. Java'da <code>@Contended</code> anotasyonu ile önlenebilir.</p>
+        <pre>
+import java.util.concurrent.atomic.AtomicLong;
+@Contended
+public class FalseSharingExample {
+    public volatile long value = 0L;
+    public static void main(String[] args) throws InterruptedException {
+        FalseSharingExample[] array = new FalseSharingExample[2];
+        array[0] = new FalseSharingExample(); array[1] = new FalseSharingExample();
+        Thread t1 = new Thread(() -> { for(int i = 0; i < 1000000; i++) array[0].value++; });
+        Thread t2 = new Thread(() -> { for(int i = 0; i < 1000000; i++) array[1].value++; });
+        t1.start(); t2.start(); t1.join(); t2.join();
+        System.out.println("Değerler: " + array[0].value + ", " + array[1].value);
+    }
+}
+        </pre>
+
+        <h3>18. İş-Parçacığı-Güvenli Kod (Thread-Safe Code)</h3>
+        <p>İş-parçacığı-güvenli kod, çoklu iş parçacığı tarafından güvenli bir şekilde erişilebilen koddur. Java'da senkronizasyon ve immutable nesneler ile sağlanır.</p>
+        <pre>
+public class ThreadSafeExample {
+    private int count = 0;
+    public synchronized int incrementAndGet() { return ++count; }
+    public static void main(String[] args) throws InterruptedException {
+        ThreadSafeExample example = new ThreadSafeExample();
+        Runnable task = () -> { for(int i = 0; i < 1000; i++) example.incrementAndGet(); };
+        Thread t1 = new Thread(task); Thread t2 = new Thread(task);
+        t1.start(); t2.start(); t1.join(); t2.join();
+        System.out.println("Sonuç: " + example.incrementAndGet());
+    }
+}
+        </pre>
+
+        <h3>19. Yeniden Girilebilir Fonksiyon (Reentrant Function)</h3>
+        <p>Yeniden girilebilir fonksiyon, önceki yürütme tamamlanmadan kesilip tekrar çağrılabilen fonksiyondur. Java'da <code>synchronized</code> metodlar genellikle yeniden girilebilir fonksiyonlardır.</p>
+        <pre>
+public class ReentrantExample {
+    public synchronized void method1() {
+        System.out.println("method1 çağrıldı");
+        method2();
+    }
+    public synchronized void method2() {
+        System.out.println("method2 çağrıldı");
+    }
+    public static void main(String[] args) {
+        ReentrantExample example = new ReentrantExample();
+        example.method1();
+    }
+}
+        </pre>
+
+        <h3>20. İş-Parçacığı-Yerel Depolama (Thread-local Storage)</h3>
+        <p>Her iş parçacığına kendi değişken kopyasını sağlar, böylece veri paylaşımı önlenir. Java'da <code>ThreadLocal</code> ile uygulanır.</p>
+        <pre>
+import java.lang.ThreadLocal;
+public class ThreadLocalExample {
+    private static ThreadLocal<Integer> threadLocal = ThreadLocal.withInitial(() -> 0);
+    public static void main(String[] args) {
+        Thread thread1 = new Thread(() -> {
+            threadLocal.set(1);
+            System.out.println("Thread 1: " + threadLocal.get());
+        });
+        Thread thread2 = new Thread(() -> {
+            threadLocal.set(2);
+            System.out.println("Thread 2: " + threadLocal.get());
+        });
+        thread1.start(); thread2.start();
+    }
+}
+        </pre>
+
+        <h3>21. Futures & Promises</h3>
+        <p>Futures, gelecekte kullanılabilir bir değeri temsil eder (asenkron yürütme için). Java'da <code>Future</code> ve <code>CompletableFuture</code> ile kullanılır.</p>
+        <pre>
+import java.util.concurrent.Future;
+import java.util.concurrent.Executors;
+public class FutureExample {
+    public static void main(String[] args) throws Exception {
+        var executor = Executors.newSingleThreadExecutor();
+        Future<Integer> future = executor.submit(() -> 42);
+        System.out.println("Sonuç: " + future.get());
+        executor.shutdown();
+    }
+}
+        </pre>
+
+        <h3>22. Asenkron/Await</h3>
+        <p>Asenkron, bloke etmeyen işlemleri yönetmek için kullanılır. Java'da <code>CompletableFuture</code> ile asenkron programlama desteklenir.</p>
+        <pre>
+import java.util.concurrent.CompletableFuture;
+public class AsyncExample {
+    public static void main(String[] args) {
+        CompletableFuture.supplyAsync(() -> "Merhaba")
+            .thenAccept(result -> System.out.println("Sonuç: " + result));
+    }
+}
+        </pre>
+
+        <h3>23. Fork-Join Modeli</h3>
+        <p>Görevlerin alt görevlere bölünmesi (fork) ve sonuçların birleştirilmesi (join) ile paralel işlem yapılır. Java'da <code>ForkJoinPool</code> sınıfı ile uygulanır.</p>
+        <pre>
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
+public class ForkJoinExample extends RecursiveTask<Integer> {
+    int start, end;
+    ForkJoinExample(int start, int end) { this.start = start; this.end = end; }
+    protected Integer compute() {
+        if (end - start <= 10) {
+            int sum = 0; for (int i = start; i <= end; i++) sum += i;
+            return sum;
+        }
+        int mid = (start + end) / 2;
+        ForkJoinExample left = new ForkJoinExample(start, mid);
+        ForkJoinExample right = new ForkJoinExample(mid + 1, end);
+        left.fork(); right.fork();
+        return left.join() + right.join();
+    }
+    public static void main(String[] args) {
+        ForkJoinPool pool = ForkJoinPool.commonPool();
+        System.out.println(pool.invoke(new ForkJoinExample(1, 100)));
+    }
+}
+        </pre>
+
+        <h3>24. Üretici-Tüketici Modeli (Producer-Consumer Pattern)</h3>
+        <p>Üreticilerin veri üretip tüketicilerin işlediği klasik çoklu iş parçacıklı modeldir. Java'da <code>BlockingQueue</code> ile uygulanır.</p>
+        <pre>
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+public class ProducerConsumer {
+    private static BlockingQueue<Integer> queue = new LinkedBlockingQueue<>(10);
+    public static void main(String[] args) {
+        Thread producer = new Thread(() -> {
+            while (true) try { queue.put(1); System.out.println("Üretildi, boyut: " + queue.size()); }
+                catch (InterruptedException e) {}
+        });
+        Thread consumer = new Thread(() -> {
+            while (true) try { queue.take(); System.out.println("Tüketildi, boyut: " + queue.size()); }
+                catch (InterruptedException e) {}
+        });
+        producer.start(); consumer.start();
+    }
+}
+        </pre>
+
+        <h3>25. İş Çalma (Work Stealing)</h3>
+        <p>Boşta olan iş parçacıklarının diğerlerinden görev çalarak iş yükünü dengelemesi yöntemidir. Java'da <code>ForkJoinPool</code> bu mekanizmayı otomatik olarak kullanır.</p>
+        <pre>
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
+public class WorkStealingExample extends RecursiveAction {
+    int start, end;
+    WorkStealingExample(int start, int end) { this.start = start; this.end = end; }
+    protected void compute() {
+        if (end - start <= 10) { for (int i = start; i <= end; i++) System.out.println("İşlem: " + i); }
+        else {
+            int mid = (start + end) / 2;
+            WorkStealingExample left = new WorkStealingExample(start, mid);
+            WorkStealingExample right = new WorkStealingExample(mid + 1, end);
+            left.fork(); right.compute(); left.join();
+        }
+    }
+    public static void main(String[] args) {
+        ForkJoinPool pool = new ForkJoinPool();
+        pool.invoke(new WorkStealingExample(1, 100));
+    }
+}
+        </pre>
+    </div>
+</body>
+</html>
