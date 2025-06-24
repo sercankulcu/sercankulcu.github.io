@@ -2,7 +2,7 @@
 layout: archive
 permalink: /apps/
 title: "Apps"
-author_profile: false
+author_profile: true
 ---
 
 <style>
