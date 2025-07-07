@@ -50,19 +50,19 @@ anlayamadım
 Aşk
 ---
 
-içerimde 3 kişi,  
-ben, asker ve bir çocuk..  
+içerimde üç kişi,  
+ben, asker ve bir çocuk.  
 
 çocuk uykusunda,  
 asker nöbetinde,  
-bense daha içerilerde..  
+bense daha içerilerde.  
 
-çocuk, ölü bir yetişkin kadar, korunmasız  
-asker, kafese konmuş aslan kadar, uysal  
+çocuk, ölü bir yetişkin kadar korunmasız,  
+asker, kafese konmuş aslan kadar uysal.  
 
 bense,  
 çocuk gibi çaresiz,  
-asker gibi kabullenmiş..  
+asker gibi kabullenmiş.  
 
 Ben içeri düştüğümden beri / Nazım Hikmet
 ---
