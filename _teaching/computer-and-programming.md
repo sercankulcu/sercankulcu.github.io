@@ -4,7 +4,7 @@ collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/computer-and-introduction-to-programming
 venue: "University of Giresun, Department of Electrical Electronics Engineering"
-date: 2025-09-14
+date: 2025-09-13
 location: "Giresun, Turkey"
 ---
 
