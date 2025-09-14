@@ -4,7 +4,7 @@ collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/algorithmic-game-theory
 venue: "University of Giresun, Department of Computer Engineering"
-date: 2023-10-03
+date: 2025-09-13
 location: "Giresun, Turkey"
 ---
 
