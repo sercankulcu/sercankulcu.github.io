@@ -9,5 +9,5 @@ venue: 'BZT Turan'
 ---
 This study proposes an automatic classification system for hazelnut fruit using deep learning, comparing the performance of ResNet-50 and ShuffleNet algorithms on a dataset of 15,770 hazelnut images. ShuffleNet, with its lower resource demands, is recommended for real-time analysis due to its comparable accuracy (99.94% in testing) to ResNet-50 (99.97% in testing).
 
-[Download paper here](../files/Comparison%20of%20the%20performance%20of%20resnet-50%20and%20shufflenet%20deep%20learning%20algorithm.pdf)
+[Download paper here](../../../files/Comparison%20of%20the%20performance%20of%20resnet-50%20and%20shufflenet%20deep%20learning%20algorithm.pdf)
 
