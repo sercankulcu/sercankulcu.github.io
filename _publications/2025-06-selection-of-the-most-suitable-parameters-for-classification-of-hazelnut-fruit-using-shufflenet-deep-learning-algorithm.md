@@ -9,5 +9,5 @@ venue: 'BZT Turan'
 ---
 This study investigates the use of the ShuffleNet deep learning algorithm to classify hazelnut fruits into good, bad, and inner categories, achieving high accuracy with a dataset of 15,770 images. Among the optimizers tested, ShuffleNet with ADAM demonstrated the best performance, with 99.89% training accuracy, 99.96% test accuracy, and superior metrics including 0.9997 precision, 1 specificity, and 0.9998 F1-score.
 
-[Download paper here](Selection%20of%20the%20most%20suitable%20parameters%20for%20classification%20of%20hazelnut%20using%20s.pdf)
+[Download paper here](../../Selection%20of%20the%20most%20suitable%20parameters%20for%20classification%20of%20hazelnut%20using%20s.pdf)
 
