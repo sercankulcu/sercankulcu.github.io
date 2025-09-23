@@ -24,7 +24,8 @@ Algorithmic Game Theory is an interdisciplinary field that blends the mathematic
   [📕 Game Theory, Alive (PDF)](../files/agt/Game_Theory_Alive.pdf) | 
   [📕 Algorithmic Game Theory (PDF)](../files/agt/Algorithmic_Game_Theory_Cambridge.pdf) | 
   [📕 Networks, Crowds, and Markets (PDF)](../files/agt/Networks,_Crowds_and_Markets.pdf) | 
-  [📕 Games_Puzzles_and_Computation](../files/agt/Games_Puzzles_and_Computation.pdf)
+  [📕 Games_Puzzles_and_Computation](../files/agt/Games_Puzzles_and_Computation.pdf) | 
+  [📕 Algoritmik Oyun Kuramı](https://iksadyayinevi.com/wp-content/uploads/2023/07/ALGORITMIK-OYUN-KURAMI.pdf)
 
 - **tools**  
   [🎮 React JS Games Gallery](https://reactjsexample.com/tag/games/) | 
@@ -33,6 +34,12 @@ Algorithmic Game Theory is an interdisciplinary field that blends the mathematic
 
 - **youtube**  
   [🎥 Game Theory 101](https://www.youtube.com/watch?v=IotsMu1J8fA&list=PL102B69CCA6049B6C)
+
+---
+
+## Announcements
+
+  [✍️ Vize & Final](../files/agt/slides/agt_odev.html)
 
 ---
 
