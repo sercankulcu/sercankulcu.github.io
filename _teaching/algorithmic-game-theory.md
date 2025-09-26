@@ -39,7 +39,8 @@ Algorithmic Game Theory is an interdisciplinary field that blends the mathematic
 
 ## Announcements
 
-  [✍️ Vize & Final](../files/agt/slides/agt_odev.html)
+  [✍️ Vize & Final](../files/agt/slides/agt_odev.html) | 
+  [Proje Listesi](../files/agt/slides/projeler.html)
 
 ---
 
