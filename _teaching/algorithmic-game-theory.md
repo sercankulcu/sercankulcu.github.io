@@ -71,6 +71,7 @@ Algorithmic game theory is an interdisciplinary field that combines concepts fro
 
 Nash equilibrium is a central concept in game theory that captures the notion of strategic behavior and stable outcomes in games. It refers to a set of strategies, one for each player, where no player has an incentive to unilaterally deviate from their chosen strategy, assuming all other players stick to their strategies.
 
+- [🖼️Slides (PDF)](../files/agt/slides/Bolum_03_Nash_Dengesi.pdf)
 - [🕹️Prisoner's Dilemma (HTML)](../files/agt/slides/Chapter_03_Prisoners_Dilemma.html)
 - [🕹️Rock Scissors Paper game (HTML)](../files/agt/slides/Chapter_03_Rock_Scissors_Paper.html)
 - [🕹️Chess game (HTML)](../files/agt/slides/Chapter_03_Chess.html)
@@ -84,6 +85,7 @@ Nash equilibrium is a central concept in game theory that captures the notion of
 
 Mechanism design is a field of study within game theory and economics that focuses on designing rules or mechanisms to achieve desired outcomes in strategic settings. It involves designing incentive-compatible mechanisms that align the self-interests of individual participants with the desired collective goals.
 
+- [🖼️Slides (PDF)](../files/agt/slides/Bolum_04_Mekanizma.pdf)
 - [🕹️Poker game (HTML)](../files/agt/slides/Chapter_04_Poker/poker.html)
 - [Bayesian Games](../files/agt/slides/Chapter_04_Bayesian_Games.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_04_Mechanism_Design_and_Incentives.pdf)
@@ -95,6 +97,7 @@ Mechanism design is a field of study within game theory and economics that focus
 
 Auctions and market design are closely related fields that utilize principles from economics, game theory, and mechanism design to study the allocation of goods, resources, and services in various settings. Both areas aim to create efficient and fair mechanisms for matching buyers and sellers, determining prices, and optimizing resource allocation.
 
+- [🖼️Slides (PDF)](../files/agt/slides/Bolum_05_Acik_Arttirma.pdf)
 - [🕹️Monopoly game (HTML)](../files/agt/slides/Chapter_05_Monopoly/index.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_05_Auctions_and_Market_Design.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
@@ -105,6 +108,7 @@ Auctions and market design are closely related fields that utilize principles fr
 
 Social choice theory is a branch of economics and political science that studies methods for aggregating individual preferences or opinions into a collective choice. It explores the challenges and possibilities of making decisions on behalf of a group or society based on the preferences of its members. Voting systems are one of the key tools analyzed in social choice theory.
 
+- [🖼️Slides (PDF)](../files/agt/slides/Bolum_06_Oylama.pdf)
 - [🕹️Facility Location (HTML)](../files/agt/slides/Chapter_06_Facility_Location.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_06_Social_Choice_and_Voting_Systems.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
