@@ -119,6 +119,7 @@ Social choice theory is a branch of economics and political science that studies
 
 Multi-agent systems refer to scenarios where multiple self-interested agents interact and make decisions in a shared environment. Multi-agent systems are analyzed to understand the strategic behavior of agents, optimize outcomes, and design mechanisms that align individual incentives with system objectives.
 
+- [🖼️Slides (PDF)](../files/agt/slides/Bolum_07_Coklu_Ajan.pdf)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_13_Multi_Agent_Systems.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -128,6 +129,7 @@ Multi-agent systems refer to scenarios where multiple self-interested agents int
 
 In algorithmic game theory, network design and routing are studied with a focus on understanding the strategic behavior of self-interested agents and optimizing network efficiency and fairness.
 
+- [🖼️Slides (PDF)](../files/agt/slides/Bolum_08_Ag_Tasarimi.pdf)
 - [🕹️Traffic lights simulator (HTML)](../files/agt/slides/Chapter_08_Traffic_Lights.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_08_Network_Design_and_Routing.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
@@ -138,6 +140,7 @@ In algorithmic game theory, network design and routing are studied with a focus 
 
 In algorithmic game theory, online platforms are studied as environments where self-interested agents interact and make decisions in the pursuit of their own objectives. Online platforms encompass various digital platforms, such as e-commerce platforms, social media platforms, ride-sharing platforms, and online auctions.
 
+- [🖼️Slides (PDF)](../files/agt/slides/Bolum_09_Cevrimici_Platform.pdf)
 - [🕹️Monopoly game (HTML)](../files/agt/slides/Chapter_05_Monopoly/index.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_11_Online_Platforms.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
@@ -148,6 +151,7 @@ In algorithmic game theory, online platforms are studied as environments where s
 
 Algorithmic fairness and ethics play a crucial role in algorithmic game theory by addressing the potential biases, discrimination, and ethical implications that may arise in the design and deployment of algorithms within game-theoretic frameworks.
 
+- [🖼️Slides (PDF)](../files/agt/slides/Bolum_10_Algoritmik_Etik.pdf)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_07_Algorithmic_Fairness_and_Ethics.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -157,6 +161,7 @@ Algorithmic fairness and ethics play a crucial role in algorithmic game theory b
 
 Price of Anarchy (PoA) is a measure that quantifies the loss of efficiency in a system due to the selfish behavior of individual agents. It evaluates the impact of strategic decision-making on the overall performance or welfare of a system.
 
+- [🖼️Slides (PDF)](../files/agt/slides/Bolum_11_Anarsi.pdf)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_09_Price_of_Anarchy_and_Efficiency.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -166,6 +171,7 @@ Price of Anarchy (PoA) is a measure that quantifies the loss of efficiency in a 
 
 Learning and adaptation play a significant role in algorithmic game theory by addressing how self-interested agents can improve their decision-making strategies over time and adapt to changing environments.
 
+- [🖼️Slides (PDF)](../files/agt/slides/Bolum_12_Ogrenme.pdf)
 - [Reinforcement Learning](../files/agt/slides/Chapter_12_Reinforcement_Learning.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_10_Learning_and_Adaptation.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
@@ -176,6 +182,7 @@ Learning and adaptation play a significant role in algorithmic game theory by ad
 
 Decision-making is a central concept that focuses on how self-interested agents make choices or decisions in strategic situations. Decision-making in algorithmic game theory involves analyzing the strategic interactions among agents, understanding their preferences and objectives, and designing mechanisms and algorithms to optimize outcomes.
 
+- [🖼️Slides (PDF)](../files/agt/slides/Bolum_13_Karar_Alma.pdf)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_12_Decision_Making.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -185,6 +192,7 @@ Decision-making is a central concept that focuses on how self-interested agents 
 
 Algorithmic game theory is a rapidly evolving field that continues to explore new directions and address emerging challenges.
 
+- [🖼️Slides (PDF)](../files/agt/slides/Bolum_14_Gelecek.pdf)
 - [Student Projects](../files/agt/slides/Chapter_14_Student_Projects.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_14_Future_Directions.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
