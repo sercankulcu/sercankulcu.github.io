@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Dama Oyunu</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+    #status {
+      margin-top: 10px;
+      font-family: Arial, sans-serif;
+      font-size: 18px;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    select {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameBoard" width="400" height="400"></canvas>
+  <div id="status">Sıra: Oyuncu (Siyah)</div>
+  <button onclick="startNewGame()">Yeni Oyun</button>
+  <select id="depthSelect" onchange="updateDepth()">
+    <option value="3">Kolay (Derinlik: 3)</option>
+    <option value="5">Orta (Derinlik: 5)</option>
+    <option value="7">Zor (Derinlik: 7)</option>
+    <option value="9">Çok Zor (Derinlik: 9)</option>
+  </select>
+  <script>
+    const canvas = document.getElementById('gameBoard');
+    const ctx = canvas.getContext('2d');
+    const status = document.getElementById('status');
+    const depthSelect = document.getElementById('depthSelect');
+    const boardSize = 8;
+    const cellSize = canvas.width / boardSize;
+    let board = [];
+    let currentPlayer = 'black';
+    let selectedPiece = null;
+    let minimaxDepth = 3;
+
+    function updateDepth() {
+      minimaxDepth = parseInt(depthSelect.value);
+    }
+
+    function initializeBoard() {
+      board = [];
+      for (let row = 0; row < boardSize; row++) {
+        board[row] = [];
+        for (let col = 0; col < boardSize; col++) {
+          if ((row + col) % 2 === 1) {
+            if (row < 3) board[row][col] = 'white';
+            else if (row > 4) board[row][col] = 'black';
+            else board[row][col] = null;
+          } else {
+            board[row][col] = null;
+          }
+        }
+      }
+      selectedPiece = null;
+      currentPlayer = 'black';
+      status.textContent = 'Sıra: Oyuncu (Siyah)';
+      drawBoard();
+    }
+
+    function drawBoard() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let row = 0; row < boardSize; row++) {
+        for (let col = 0; col < boardSize; col++) {
+          ctx.fillStyle = (row + col) % 2 === 0 ? '#fff' : '#ddd';
+          ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+          if (board[row][col]) {
+            ctx.fillStyle = board[row][col] === 'black' ? '#000' : '#f00';
+            ctx.beginPath();
+            ctx.arc(
+              col * cellSize + cellSize / 2,
+              row * cellSize + cellSize / 2,
+              cellSize / 3,
+              0,
+              Math.PI * 2
+            );
+            ctx.fill();
+            if (selectedPiece && selectedPiece.row === row && selectedPiece.col === col) {
+              ctx.strokeStyle = 'yellow';
+              ctx.lineWidth = 3;
+              ctx.stroke();
+            }
+          }
+        }
+      }
+    }
+
+    function getValidMoves(row, col) {
+      const moves = [];
+      const piece = board[row][col];
+      if (!piece) return moves;
+      const directions = piece === 'black' ? [[-1, -1], [-1, 1]] : [[1, -1], [1, 1]];
+      
+      for (let [dr, dc] of directions) {
+        const jumpRow = row + 2 * dr;
+        const jumpCol = col + 2 * dc;
+        const midRow = row + dr;
+        const midCol = col + dc;
+        if (
+          jumpRow >= 0 && jumpRow < boardSize &&
+          jumpCol >= 0 && jumpCol < boardSize &&
+          !board[jumpRow][jumpCol] &&
+          board[midRow][midCol] && board[midRow][midCol] !== piece
+        ) {
+          moves.push({ row: jumpRow, col: jumpCol, isCapture: true, captured: { row: midRow, col: midCol } });
+        }
+      }
+      if (moves.length === 0) {
+        for (let [dr, dc] of directions) {
+          const newRow = row + dr;
+          const newCol = col + dc;
+          if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize && !board[newRow][newCol]) {
+            moves.push({ row: newRow, col: newCol, isCapture: false });
+          }
+        }
+      }
+      return moves;
+    }
+
+    function getAllMoves(player) {
+      const pieces = [];
+      for (let row = 0; row < boardSize; row++) {
+        for (let col = 0; col < boardSize; col++) {
+          if (board[row][col] === player) {
+            const moves = getValidMoves(row, col);
+            if (moves.length > 0) {
+              pieces.push({ row, col, moves });
+            }
+          }
+        }
+      }
+      return pieces;
+    }
+
+    function evaluateBoard() {
+      let score = 0;
+      for (let row = 0; row < boardSize; row++) {
+        for (let col = 0; col < boardSize; col++) {
+          if (board[row][col] === 'white') score += 1;
+          if (board[row][col] === 'black') score -= 1;
+        }
+      }
+      return score;
+    }
+
+    function minimax(depth, isMaximizing, alpha, beta) {
+      if (depth === 0) {
+        return { score: evaluateBoard() };
+      }
+      const player = isMaximizing ? 'white' : 'black';
+      const pieces = getAllMoves(player);
+      if (pieces.length === 0) {
+        return { score: isMaximizing ? -Infinity : Infinity };
+      }
+
+      let bestMove = null;
+      if (isMaximizing) {
+        let maxEval = -Infinity;
+        for (const piece of pieces) {
+          for (const move of piece.moves) {
+            const originalPiece = board[piece.row][piece.col];
+            board[move.row][move.col] = originalPiece;
+            board[piece.row][piece.col] = null;
+            let capturedPiece = null;
+            if (move.isCapture) {
+              capturedPiece = board[move.captured.row][move.captured.col];
+              board[move.captured.row][move.captured.col] = null;
+            }
+            const evaluation = minimax(depth - 1, false, alpha, beta).score;
+            board[piece.row][piece.col] = originalPiece;
+            board[move.row][move.col] = null;
+            if (move.isCapture) {
+              board[move.captured.row][move.captured.col] = capturedPiece;
+            }
+            if (evaluation > maxEval) {
+              maxEval = evaluation;
+              bestMove = { piece, move };
+            }
+            alpha = Math.max(alpha, evaluation);
+            if (beta <= alpha) break;
+          }
+          if (beta <= alpha) break;
+        }
+        return { score: maxEval, move: bestMove };
+      } else {
+        let minEval = Infinity;
+        for (const piece of pieces) {
+          for (const move of piece.moves) {
+            const originalPiece = board[piece.row][piece.col];
+            board[move.row][move.col] = originalPiece;
+            board[piece.row][piece.col] = null;
+            let capturedPiece = null;
+            if (move.isCapture) {
+              capturedPiece = board[move.captured.row][move.captured.col];
+              board[move.captured.row][move.captured.col] = null;
+            }
+            const evaluation = minimax(depth - 1, true, alpha, beta).score;
+            board[piece.row][piece.col] = originalPiece;
+            board[move.row][move.col] = null;
+            if (move.isCapture) {
+              board[move.captured.row][move.captured.col] = capturedPiece;
+            }
+            if (evaluation < minEval) {
+              minEval = evaluation;
+              bestMove = { piece, move };
+            }
+            beta = Math.min(beta, evaluation);
+            if (beta <= alpha) break;
+          }
+          if (beta <= alpha) break;
+        }
+        return { score: minEval, move: bestMove };
+      }
+    }
+
+    function computerMove() {
+      const pieces = getAllMoves('white');
+      if (pieces.length === 0) {
+        status.textContent = 'Oyun Bitti: Oyuncu Kazandı!';
+        return;
+      }
+      const { move } = minimax(minimaxDepth, true, -Infinity, Infinity);
+      if (move) {
+        board[move.move.row][move.move.col] = board[move.piece.row][move.piece.col];
+        board[move.piece.row][move.piece.col] = null;
+        if (move.move.isCapture) {
+          board[move.move.captured.row][move.move.captured.col] = null;
+        }
+      }
+      currentPlayer = 'black';
+      status.textContent = 'Sıra: Oyuncu (Siyah)';
+      drawBoard();
+      checkGameEnd();
+    }
+
+    canvas.addEventListener('click', (e) => {
+      if (currentPlayer !== 'black') return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const col = Math.floor(x / cellSize);
+      const row = Math.floor(y / cellSize);
+
+      if (selectedPiece) {
+        const moves = getValidMoves(selectedPiece.row, selectedPiece.col);
+        const move = moves.find(m => m.row === row && m.col === col);
+        if (move) {
+          board[row][col] = board[selectedPiece.row][selectedPiece.col];
+          board[selectedPiece.row][selectedPiece.col] = null;
+          if (move.isCapture) {
+            board[move.captured.row][move.captured.col] = null;
+          }
+          selectedPiece = null;
+          currentPlayer = 'white';
+          status.textContent = 'Sıra: Bilgisayar (Kırmızı)';
+          drawBoard();
+          checkGameEnd();
+          if (currentPlayer === 'white') {
+            setTimeout(computerMove, 500);
+          }
+        } else {
+          selectedPiece = null;
+          drawBoard();
+        }
+      } else if (board[row][col] === 'black') {
+        selectedPiece = { row, col };
+        drawBoard();
+      }
+    });
+
+    function checkGameEnd() {
+      let blackPieces = 0, whitePieces = 0;
+      const blackMoves = getAllMoves('black');
+      const whiteMoves = getAllMoves('white');
+
+      for (let row = 0; row < boardSize; row++) {
+        for (let col = 0; col < boardSize; col++) {
+          if (board[row][col] === 'black') blackPieces++;
+          if (board[row][col] === 'white') whitePieces++;
+        }
+      }
+
+      if (blackPieces === 0 || blackMoves.length === 0) {
+        status.textContent = 'Oyun Bitti: Bilgisayar Kazandı!';
+        currentPlayer = null;
+      } else if (whitePieces === 0 || whiteMoves.length === 0) {
+        status.textContent = 'Oyun Bitti: Oyuncu Kazandı!';
+        currentPlayer = null;
+      }
+    }
+
+    function startNewGame() {
+      initializeBoard();
+    }
+
+    initializeBoard();
+  </script>
+</body>
+</html>
