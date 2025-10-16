@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Othello (Against Computer)</title>
+<style>
+  body {
+    background-color: #1e1e1e;
+    color: white;
+    text-align: center;
+    font-family: Arial, sans-serif;
+  }
+  h1 { margin-top: 20px; }
+  #board {
+    display: grid;
+    grid-template-columns: repeat(8, 60px);
+    grid-template-rows: repeat(8, 60px);
+    margin: 20px auto;
+    width: 480px;
+    border: 4px solid #333;
+  }
+  .cell {
+    width: 60px; height: 60px;
+    background-color: green;
+    border: 1px solid #003300;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+  }
+  .black, .white {
+    border-radius: 50%;
+    width: 48px; height: 48px;
+  }
+  .black { background-color: black; }
+  .white { background-color: white; }
+  .highlight::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 0, 0.6);
+  }
+  #status {
+    margin-top: 15px;
+    font-size: 18px;
+  }
+  button, select {
+    margin-top: 10px;
+    padding: 8px 16px;
+    border: none;
+    background-color: #4caf50;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  button:hover, select:hover { background-color: #45a049; }
+  select { margin-left: 10px; }
+</style>
+</head>
+<body>
+<h1>Othello (Against Computer)</h1>
+<div>
+  <label for="aiMode">AI Mode:</label>
+  <select id="aiMode">
+    <option value="simple">🧩 Simple (Heuristic)</option>
+    <option value="smart">🧠 Smart (Minimax + Alpha-Beta)</option>
+  </select>
+</div>
+<div id="board"></div>
+<div id="status"></div>
+<button onclick="resetGame()">Restart Game</button>
+
+<script>
+const SIZE = 8;
+let board = [];
+let currentPlayer = 'black';
+const directions = [
+  [1,0],[-1,0],[0,1],[0,-1],
+  [1,1],[1,-1],[-1,1],[-1,-1]
+];
+const DEPTH = 3;
+
+function createBoard() {
+  const boardDiv = document.getElementById("board");
+  boardDiv.innerHTML = '';
+  board = Array.from({ length: SIZE }, () => Array(SIZE).fill(null));
+
+  board[3][3] = 'white';
+  board[3][4] = 'black';
+  board[4][3] = 'black';
+  board[4][4] = 'white';
+
+  for (let r = 0; r < SIZE; r++) {
+    for (let c = 0; c < SIZE; c++) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.dataset.row = r;
+      cell.dataset.col = c;
+      cell.addEventListener("click", handleMove);
+      boardDiv.appendChild(cell);
+    }
+  }
+  updateBoard();
+  updateHighlights();
+  updateStatus();
+}
+
+function updateBoard() {
+  document.querySelectorAll(".cell").forEach(cell => {
+    const r = cell.dataset.row;
+    const c = cell.dataset.col;
+    cell.innerHTML = '';
+    cell.classList.remove("highlight");
+    if (board[r][c]) {
+      const piece = document.createElement("div");
+      piece.className = board[r][c];
+      cell.appendChild(piece);
+    }
+  });
+}
+
+function updateHighlights() {
+  document.querySelectorAll(".cell").forEach(cell => cell.classList.remove("highlight"));
+  if (currentPlayer === 'black') {
+    for (let r = 0; r < SIZE; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        if (isValidMove(board, r, c, currentPlayer)) {
+          document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`).classList.add("highlight");
+        }
+      }
+    }
+  }
+}
+
+function handleMove(e) {
+  if (currentPlayer !== 'black') return;
+  const r = parseInt(e.target.dataset.row);
+  const c = parseInt(e.target.dataset.col);
+  if (!isValidMove(board, r, c, currentPlayer)) return;
+  makeMove(board, r, c, currentPlayer);
+  currentPlayer = 'white';
+  updateBoard();
+  updateStatus();
+  setTimeout(aiMove, 400);
+}
+
+function aiMove() {
+  if (!hasValidMove(board, 'white')) {
+    currentPlayer = 'black';
+    if (!hasValidMove(board, 'black')) return endGame();
+    updateBoard();
+    updateHighlights();
+    updateStatus();
+    return;
+  }
+
+  const mode = document.getElementById("aiMode").value;
+  let move = mode === "simple"
+    ? bestHeuristicMove(board, 'white')
+    : bestMinimaxMove(board, DEPTH, 'white');
+
+  if (move) makeMove(board, move[0], move[1], 'white');
+
+  currentPlayer = 'black';
+  if (!hasValidMove(board, 'black')) {
+    currentPlayer = 'white';
+    if (!hasValidMove(board, 'white')) return endGame();
+  }
+
+  updateBoard();
+  updateHighlights();
+  updateStatus();
+}
+
+function bestHeuristicMove(b, player) {
+  let best = null, bestScore = -1;
+  for (let r = 0; r < SIZE; r++) {
+    for (let c = 0; c < SIZE; c++) {
+      if (isValidMove(b, r, c, player)) {
+        const score = countFlips(b, r, c, player);
+        if (score > bestScore) {
+          bestScore = score;
+          best = [r, c];
+        }
+      }
+    }
+  }
+  return best;
+}
+
+// ----- Minimax + Alpha-Beta -----
+function bestMinimaxMove(b, depth, player) {
+  let bestVal = -Infinity;
+  let bestMove = null;
+  for (let move of getValidMoves(b, player)) {
+    let newBoard = cloneBoard(b);
+    makeMove(newBoard, move[0], move[1], player);
+    let value = minimax(newBoard, depth - 1, false, -Infinity, Infinity, opposite(player));
+    if (value > bestVal) {
+      bestVal = value;
+      bestMove = move;
+    }
+  }
+  return bestMove;
+}
+
+function minimax(b, depth, maximizing, alpha, beta, player) {
+  if (depth === 0 || isGameOver(b)) return evaluateBoard(b);
+  const moves = getValidMoves(b, player);
+  if (moves.length === 0) return evaluateBoard(b);
+
+  if (maximizing) {
+    let maxEval = -Infinity;
+    for (let move of moves) {
+      let newBoard = cloneBoard(b);
+      makeMove(newBoard, move[0], move[1], player);
+      let eval = minimax(newBoard, depth - 1, false, alpha, beta, opposite(player));
+      maxEval = Math.max(maxEval, eval);
+      alpha = Math.max(alpha, eval);
+      if (beta <= alpha) break;
+    }
+    return maxEval;
+  } else {
+    let minEval = Infinity;
+    for (let move of moves) {
+      let newBoard = cloneBoard(b);
+      makeMove(newBoard, move[0], move[1], player);
+      let eval = minimax(newBoard, depth - 1, true, alpha, beta, opposite(player));
+      minEval = Math.min(minEval, eval);
+      beta = Math.min(beta, eval);
+      if (beta <= alpha) break;
+    }
+    return minEval;
+  }
+}
+
+function cloneBoard(b) {
+  return b.map(row => [...row]);
+}
+
+function evaluateBoard(b) {
+  const { black, white } = countPieces(b);
+  return white - black + cornerBonus(b, 'white') - cornerBonus(b, 'black');
+}
+
+function cornerBonus(b, player) {
+  const corners = [[0,0],[0,7],[7,0],[7,7]];
+  return corners.reduce((sum, [r,c]) => sum + (b[r][c] === player ? 5 : 0), 0);
+}
+
+function getValidMoves(b, player) {
+  const moves = [];
+  for (let r = 0; r < SIZE; r++)
+    for (let c = 0; c < SIZE; c++)
+      if (isValidMove(b, r, c, player)) moves.push([r, c]);
+  return moves;
+}
+
+function isValidMove(b, r, c, player) {
+  if (b[r][c]) return false;
+  for (let [dr, dc] of directions) {
+    let nr = r + dr, nc = c + dc, foundOpponent = false;
+    while (inBounds(nr, nc) && b[nr][nc] === opposite(player)) {
+      nr += dr; nc += dc; foundOpponent = true;
+    }
+    if (foundOpponent && inBounds(nr, nc) && b[nr][nc] === player)
+      return true;
+  }
+  return false;
+}
+
+function makeMove(b, r, c, player) {
+  b[r][c] = player;
+  for (let [dr, dc] of directions) {
+    let cellsToFlip = [];
+    let nr = r + dr, nc = c + dc;
+    while (inBounds(nr, nc) && b[nr][nc] === opposite(player)) {
+      cellsToFlip.push([nr, nc]);
+      nr += dr; nc += dc;
+    }
+    if (inBounds(nr, nc) && b[nr][nc] === player)
+      for (let [fr, fc] of cellsToFlip) b[fr][fc] = player;
+  }
+}
+
+function countFlips(b, r, c, player) {
+  let total = 0;
+  for (let [dr, dc] of directions) {
+    let nr = r + dr, nc = c + dc, count = 0;
+    while (inBounds(nr, nc) && b[nr][nc] === opposite(player)) {
+      count++; nr += dr; nc += dc;
+    }
+    if (inBounds(nr, nc) && b[nr][nc] === player) total += count;
+  }
+  return total;
+}
+
+function opposite(p) { return p === 'black' ? 'white' : 'black'; }
+function inBounds(r, c) { return r >= 0 && r < SIZE && c >= 0 && c < SIZE; }
+
+function hasValidMove(b, player) {
+  return getValidMoves(b, player).length > 0;
+}
+
+function countPieces(b) {
+  let black = 0, white = 0;
+  for (let r = 0; r < SIZE; r++)
+    for (let c = 0; c < SIZE; c++)
+      if (b[r][c] === 'black') black++;
+      else if (b[r][c] === 'white') white++;
+  return { black, white };
+}
+
+function isGameOver(b) {
+  return !hasValidMove(b, 'black') && !hasValidMove(b, 'white');
+}
+
+function updateStatus() {
+  const { black, white } = countPieces(board);
+  document.getElementById("status").textContent =
+    isGameOver(board)
+      ? `Game Over! Black: ${black}  White: ${white}`
+      : `Turn: ${currentPlayer === 'black' ? 'Black (You)' : 'White (Computer)'} | Black: ${black}  White: ${white}`;
+}
+
+function endGame() {
+  const { black, white } = countPieces(board);
+  let result = "It's a Tie!";
+  if (black > white) result = "You Win! 🎉";
+  else if (white > black) result = "Computer Wins 🤖";
+  document.getElementById("status").textContent = `Game Over! ${result}`;
+}
+
+function resetGame() {
+  currentPlayer = 'black';
+  createBoard();
+}
+
+createBoard();
+</script>
+</body>
+</html>
