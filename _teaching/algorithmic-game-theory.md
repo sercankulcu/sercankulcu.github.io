@@ -44,6 +44,12 @@ Algorithmic Game Theory is an interdisciplinary field that blends the mathematic
 
 ---
 
+## Games
+
+- [Othello](../files/agt/slides/OthelloAGT.pdf) | [Play](../files/agt/slides/othello.html)  
+
+---
+
 ## Chapter 1: Game Theory Fundamentals
 
 Game theory is a mathematical framework used to analyze and understand strategic interactions between rational decision-makers. It provides a systematic way of studying situations where the outcome of one person's decision depends on the actions of others.
