@@ -46,7 +46,7 @@ Algorithmic Game Theory is an interdisciplinary field that blends the mathematic
 
 ## Games
 
-  [Othello](../files/agt/slides/OthelloAGT.pdf) | [Play](../files/agt/slides/othello.html)  
+  [Othello](../files/agt/slides/OthelloAGT.pdf) [Play](../files/agt/slides/othello.html)  
 
 ---
 
