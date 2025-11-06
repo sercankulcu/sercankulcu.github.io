@@ -31,6 +31,9 @@ Modern computing encompasses a vast ecosystem of interconnected technologies and
 
 ## Past Exams  
 
+- **2025-2026**  
+  [vize](../files/computer/2025-2026-computer-vize-cevaplar.pdf) | 
+
 - **2024-2025**  
   [vize-a](../files/computer/2024-2025-computer-vize-a-cevaplar.pdf) | 
   [vize-b](../files/computer/2024-2025-computer-vize-b-cevaplar.pdf) | 
