@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Othello (Against Computer)</title>
+<title>Othello</title>
 <style>
   body {
     background-color: #1e1e1e;
@@ -29,6 +29,7 @@
     align-items: center;
     cursor: pointer;
     position: relative;
+    font-weight: bold;
   }
   .black, .white {
     border-radius: 50%;
@@ -36,13 +37,43 @@
   }
   .black { background-color: black; }
   .white { background-color: white; }
-  .highlight::after {
-    content: "";
-    position: absolute;
-    width: 20px;
-    height: 20px;
+  .highlight-move {
     border-radius: 50%;
-    background-color: rgba(255, 255, 0, 0.6);
+    width: 48px; height: 48px;
+    background: radial-gradient(circle, rgba(255,255,0,0.8) 0%, rgba(255,215,0,0.6) 70%, transparent 100%);
+    border: 3px solid #FFD700;
+    box-shadow: 0 0 10px rgba(255,215,0,0.8);
+    z-index: 5;
+  }
+  .score {
+    position: absolute;
+    color: #FFD700;
+    font-size: 16px !important;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px black;
+    z-index: 15;
+    pointer-events: all;
+    user-select: none;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.7);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .selected {
+    background-color: rgba(255, 215, 0, 0.4) !important;
+    border: 4px solid #FFD700 !important;
+    box-shadow: 0 0 15px rgba(255,215,0,1) !important;
+  }
+  .selected .highlight-move {
+    background: radial-gradient(circle, rgba(255,215,0,1) 0%, rgba(255,165,0,0.8) 70%, transparent 100%);
+    border: 4px solid #FF8C00;
+    box-shadow: 0 0 15px rgba(255,140,0,1);
   }
   #status {
     margin-top: 15px;
@@ -62,7 +93,7 @@
 </style>
 </head>
 <body>
-<h1>Othello (Against Computer)</h1>
+<h1>Othello</h1>
 <div>
   <label for="aiMode">AI Mode:</label>
   <select id="aiMode">
@@ -78,11 +109,12 @@
 const SIZE = 8;
 let board = [];
 let currentPlayer = 'black';
+let aiMode = 'simple';
 const directions = [
   [1,0],[-1,0],[0,1],[0,-1],
   [1,1],[1,-1],[-1,1],[-1,-1]
 ];
-const DEPTH = 3;
+const DEPTH = 5;
 
 function createBoard() {
   const boardDiv = document.getElementById("board");
@@ -114,7 +146,12 @@ function updateBoard() {
     const r = cell.dataset.row;
     const c = cell.dataset.col;
     cell.innerHTML = '';
-    cell.classList.remove("highlight");
+    cell.classList.remove("highlight", "selected");
+    const existingScore = cell.querySelector('.score');
+    const existingMove = cell.querySelector('.highlight-move');
+    if (existingScore) existingScore.remove();
+    if (existingMove) existingMove.remove();
+    
     if (board[r][c]) {
       const piece = document.createElement("div");
       piece.className = board[r][c];
@@ -124,23 +161,103 @@ function updateBoard() {
 }
 
 function updateHighlights() {
-  document.querySelectorAll(".cell").forEach(cell => cell.classList.remove("highlight"));
-  if (currentPlayer === 'black') {
-    for (let r = 0; r < SIZE; r++) {
-      for (let c = 0; c < SIZE; c++) {
-        if (isValidMove(board, r, c, currentPlayer)) {
-          document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`).classList.add("highlight");
-        }
-      }
+  document.querySelectorAll(".cell").forEach(cell => {
+    const r = parseInt(cell.dataset.row);
+    const c = parseInt(cell.dataset.col);
+    cell.classList.remove("selected");
+    const existingScore = cell.querySelector('.score');
+    const existingMove = cell.querySelector('.highlight-move');
+    if (existingScore) existingScore.remove();
+    if (existingMove) existingMove.remove();
+    
+    if (currentPlayer === 'black' && !board[r][c] && isValidMove(board, r, c, currentPlayer)) {
+      const moveIndicator = document.createElement("div");
+      moveIndicator.className = "highlight-move";
+      cell.appendChild(moveIndicator);
+      
+      const score = calculateMoveScore(board, r, c, currentPlayer);
+      const scoreDiv = document.createElement("div");
+      scoreDiv.className = "score";
+      scoreDiv.dataset.row = r;
+      scoreDiv.dataset.col = c;
+      scoreDiv.textContent = Math.max(0, score);
+      scoreDiv.addEventListener("click", function(e) {
+        e.stopPropagation();
+        handleMove({ target: cell });
+      });
+      cell.appendChild(scoreDiv);
     }
+  });
+}
+
+function isCornerNeighbor(r, c) {
+  const corners = [[0,0],[0,7],[7,0],[7,7]];
+  for (let [cr, cc] of corners) {
+    if ((Math.abs(r - cr) <= 1 && Math.abs(c - cc) <= 1) && !(r === cr && c === cc)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function calculateMoveScore(b, r, c, player) {
+  if (aiMode === 'simple') {
+    const flips = countFlips(b, r, c, player);
+    let bonus = 0;
+    let penalty = 0;
+    
+    let score = flips;
+    
+    if (isCornerNeighbor(r, c)) {
+      penalty -= 15; // Güçlendirildi
+    }
+    else if ((r === 0 || r === 7) && (c === 0 || c === 7)) {
+      bonus += 15; // Artırıldı
+    }
+    else if ((r === 0 || r === 7 || c === 0 || c === 7)) {
+      bonus += 5;
+    }
+    
+    return score + bonus + penalty;
+  } else {
+    const tempBoard = cloneBoard(b);
+    makeMove(tempBoard, r, c, player);
+    let rawScore = minimax(tempBoard, 2, false, -Infinity, Infinity, opposite(player));
+    
+    const allMoves = getValidMoves(b, player);
+    let minScore = Infinity;
+    for (let move of allMoves) {
+      let tempB = cloneBoard(b);
+      makeMove(tempB, move[0], move[1], player);
+      let moveScore = minimax(tempB, 2, false, -Infinity, Infinity, opposite(player));
+      if (moveScore < minScore) minScore = moveScore;
+    }
+    
+    let normalized = rawScore - minScore;
+    return Math.max(0, Math.round(normalized));
   }
 }
 
 function handleMove(e) {
   if (currentPlayer !== 'black') return;
-  const r = parseInt(e.target.dataset.row);
-  const c = parseInt(e.target.dataset.col);
+  
+  let targetCell;
+  if (e.target.classList.contains('score')) {
+    targetCell = e.target.parentElement;
+  } else {
+    targetCell = e.target;
+  }
+  
+  const r = parseInt(targetCell.dataset.row);
+  const c = parseInt(targetCell.dataset.col);
+  
   if (!isValidMove(board, r, c, currentPlayer)) return;
+  
+  document.querySelectorAll('.cell').forEach(cell => {
+    cell.classList.remove('selected');
+  });
+  targetCell.classList.add('selected');
+  
   makeMove(board, r, c, currentPlayer);
   currentPlayer = 'white';
   updateBoard();
@@ -159,6 +276,7 @@ function aiMove() {
   }
 
   const mode = document.getElementById("aiMode").value;
+  aiMode = mode;
   let move = mode === "simple"
     ? bestHeuristicMove(board, 'white')
     : bestMinimaxMove(board, DEPTH, 'white');
@@ -177,11 +295,11 @@ function aiMove() {
 }
 
 function bestHeuristicMove(b, player) {
-  let best = null, bestScore = -1;
+  let best = null, bestScore = -Infinity;
   for (let r = 0; r < SIZE; r++) {
     for (let c = 0; c < SIZE; c++) {
       if (isValidMove(b, r, c, player)) {
-        const score = countFlips(b, r, c, player);
+        const score = calculateMoveScore(b, r, c, player);
         if (score > bestScore) {
           bestScore = score;
           best = [r, c];
@@ -192,7 +310,6 @@ function bestHeuristicMove(b, player) {
   return best;
 }
 
-// ----- Minimax + Alpha-Beta -----
 function bestMinimaxMove(b, depth, player) {
   let bestVal = -Infinity;
   let bestMove = null;
@@ -244,12 +361,48 @@ function cloneBoard(b) {
 
 function evaluateBoard(b) {
   const { black, white } = countPieces(b);
-  return white - black + cornerBonus(b, 'white') - cornerBonus(b, 'black');
+  let score = white - black;
+  
+  score += cornerBonus(b, 'white') - cornerBonus(b, 'black');
+  score += edgeBonus(b, 'white') - edgeBonus(b, 'black');
+  score += mobilityBonus(b, 'white') - mobilityBonus(b, 'black');
+  score += cornerNeighborPenalty(b, 'white') - cornerNeighborPenalty(b, 'black');
+  
+  return score;
 }
 
 function cornerBonus(b, player) {
   const corners = [[0,0],[0,7],[7,0],[7,7]];
-  return corners.reduce((sum, [r,c]) => sum + (b[r][c] === player ? 5 : 0), 0);
+  return corners.reduce((sum, [r,c]) => sum + (b[r][c] === player ? 100 : 0), 0);
+}
+
+function edgeBonus(b, player) {
+  let score = 0;
+  for (let r = 0; r < SIZE; r++) {
+    if (b[0][r] === player && ![0,7].includes(r)) score += 15; // Artırıldı
+    if (b[7][r] === player && ![0,7].includes(r)) score += 15;
+  }
+  for (let c = 0; c < SIZE; c++) {
+    if (b[c][0] === player && ![0,7].includes(c)) score += 15;
+    if (b[c][7] === player && ![0,7].includes(c)) score += 15;
+  }
+  return score;
+}
+
+function mobilityBonus(b, player) {
+  return getValidMoves(b, player).length * 8; // Artırıldı
+}
+
+function cornerNeighborPenalty(b, player) {
+  let penalty = 0;
+  const neighbors = [
+    [0,1],[1,0],[1,1], [0,6],[1,7],[1,6],
+    [7,1],[6,0],[6,1], [7,6],[6,7],[6,6]
+  ];
+  for (let [r,c] of neighbors) {
+    if (b[r][c] === player) penalty += 50; // GÜÇLENDİRİLDİ (20 -> 50)
+  }
+  return -penalty;
 }
 
 function getValidMoves(b, player) {
@@ -337,8 +490,13 @@ function endGame() {
 
 function resetGame() {
   currentPlayer = 'black';
+  aiMode = 'simple';
   createBoard();
 }
+
+document.getElementById("aiMode").addEventListener("change", function() {
+  updateHighlights();
+});
 
 createBoard();
 </script>
