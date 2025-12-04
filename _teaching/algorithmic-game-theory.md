@@ -106,6 +106,10 @@ Mechanism design is a field of study within game theory and economics that focus
 Auctions and market design are closely related fields that utilize principles from economics, game theory, and mechanism design to study the allocation of goods, resources, and services in various settings. Both areas aim to create efficient and fair mechanisms for matching buyers and sellers, determining prices, and optimizing resource allocation.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_05_Acik_Arttirma.pdf)
+- [English](../files/agt/slides/Chapter_05_english-auction-simulator.html)
+- [Dutch](../files/agt/slides/Chapter_05_dutch-auction-simulator.html)
+- [First price](../files/agt/slides/Chapter_05_first-price-auction-simulator.html)
+- [Second price](../files/agt/slides/Chapter_05_second-price-sealed-bid-auction.html)
 - [🕹️Monopoly game (HTML)](../files/agt/slides/Chapter_05_Monopoly/index.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_05_Auctions_and_Market_Design.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)

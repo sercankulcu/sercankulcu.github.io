@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>English Auction (Open Ascending) Simulator</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 950px; margin: 30px auto; background: #f8f9fa; }
+  h1 { text-align: center; color: #2c3e50; }
+  .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .setup { margin-bottom: 30px; text-align: center; }
+  .bidders { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 25px 0; }
+  .bidder { border: 2px solid #ddd; padding: 15px; border-radius: 10px; background: #f8fffe; text-align: center; transition: all 0.3s; }
+  .bidder.active { border-color: #28a745; background: #d4edda; transform: scale(1.05); }
+  .bidder.out { border-color: #dc3545; background: #f8d7da; opacity: 0.7; }
+  .bidder h3 { margin: 0 0 10px; color: #495057; }
+  input { width: 90%; padding: 8px; font-size: 16px; border: 1px solid #aaa; border-radius: 4px; }
+  .controls { text-align: center; margin: 30px 0; }
+  button { padding: 12px 30px; font-size: 18px; margin: 0 10px; border: none; border-radius: 8px; cursor: pointer; }
+  #startBtn { background: #007bff; color: white; }
+  #nextBtn { background: #28a745; color: white; }
+  #resetBtn { background: #6c757d; color: white; }
+  button:disabled { background: #aaa; cursor: not-allowed; }
+  .auction-status { text-align: center; padding: 20px; background: #e9ecef; border-radius: 10px; font-size: 22px; margin: 20px 0; }
+  .current-price { font-size: 36px; font-weight: bold; color: #007bff; }
+  .history { margin-top: 20px; padding: 15px; background: #f1f3f5; border-radius: 8px; max-height: 200px; overflow-y: auto; }
+  .history p { margin: 5px 0; }
+  .winner-announce { font-size: 28px; color: #28a745; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>English Auction Simulator<br><small>Open Ascending-Bid Auction</small></h1>
+
+  <div class="setup">
+    <p>Bidders have private valuations. The auction starts at $0. In each round, active bidders decide whether to raise the current price or drop out.</p>
+    <p><strong>Rule:</strong> Last remaining bidder wins and pays the final price.</p>
+  </div>
+
+  <div class="bidders" id="biddersContainer"></div>
+
+  <div class="controls">
+    <button id="startBtn" onclick="startAuction()">Start Auction</button>
+    <button id="nextBtn" onclick="nextRound()" disabled>Next Round →</button>
+    <button id="resetBtn" onclick="resetAuction()">Reset</button>
+  </div>
+
+  <div class="auction-status" id="status">
+    Click <strong>Start Auction</strong> to begin.
+  </div>
+
+  <div class="history" id="history"></div>
+</div>
+
+<script>
+const bidderNames = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank", "Grace", "Hank"];
+let bidders = [];
+let currentPrice = 0;
+let round = 0;
+let activeCount = 0;
+
+function initBidders() {
+  bidders = bidderNames.slice(0, 6).map(name => ({
+    name,
+    valuation: Math.round((Math.random() * 120 + 30) * 100) / 100, // $30–$150 random
+    active: true
+  }));
+  
+  const container = document.getElementById("biddersContainer");
+  container.innerHTML = "";
+  
+  bidders.forEach((b, i) => {
+    const div = document.createElement("div");
+    div.className = "bidder";
+    div.id = "bidder" + i;
+    div.innerHTML = `
+      <h3>${b.name}</h3>
+      <p>Valuation: <strong>$${b.valuation.toFixed(2)}</strong></p>
+      <p>Status: <span class="status">Active</span></p>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function log(message) {
+  const h = document.getElementById("history");
+  h.innerHTML += `<p>${message}</p>`;
+  h.scrollTop = h.scrollHeight;
+}
+
+function startAuction() {
+  initBidders();
+  currentPrice = 0;
+  round = 0;
+  activeCount = bidders.filter(b => b.active).length;
+
+  document.getElementById("startBtn").disabled = true;
+  document.getElementById("nextBtn").disabled = false;
+  document.getElementById("history").innerHTML = "";
+  
+  log("<strong>Auction started!</strong> Initial price: $0.00");
+  updateStatus();
+}
+
+function nextRound() {
+  round++;
+  const increment = round <= 5 ? 5 : round <= 15 ? 10 : 15; // increasing steps
+  currentPrice += increment;
+
+  let droppedThisRound = [];
+
+  bidders.forEach((b, i) => {
+    if (b.active && currentPrice > b.valuation) {
+      b.active = false;
+      droppedThisRound.push(b.name);
+      document.getElementById("bidder" + i).classList.remove("active");
+      document.getElementById("bidder" + i).classList.add("out");
+      document.getElementById("bidder" + i).querySelector(".status").textContent = "Out";
+    } else if (b.active) {
+      document.getElementById("bidder" + i).classList.add("active");
+    }
+  });
+
+  activeCount = bidders.filter(b => b.active).length;
+
+  if (droppedThisRound.length > 0) {
+    log(`Round ${round} • Price → <strong>$${currentPrice.toFixed(2)}</strong> | Out: ${droppedThisRound.join(", ")}`);
+  } else {
+    log(`Round ${round} • Price → <strong>$${currentPrice.toFixed(2)}</strong> | Everyone still in`);
+  }
+
+  if (activeCount <= 1) {
+    endAuction();
+  } else {
+    updateStatus();
+  }
+}
+
+function endAuction() {
+  document.getElementById("nextBtn").disabled = true;
+
+  const winner = bidders.find(b => b.active);
+  if (winner) {
+    log(`<span class="winner-announce">Auction over! ${winner.name} wins!</span>`);
+    log(`Final price: <strong>$${currentPrice.toFixed(2)}</strong> (paid by ${winner.name})`);
+    log(`Seller revenue: <strong>$${currentPrice.toFixed(2)}</strong>`);
+    document.getElementById("status").innerHTML = `
+      <div class="winner-announce">${winner.name} WINS!</div>
+      <p>Pays <strong>$${currentPrice.toFixed(2)}</strong></p>
+      <p>(Their valuation was $${winner.valuation.toFixed(2)} → Surplus: $${(winner.valuation - currentPrice).toFixed(2)})</p>
+    `;
+    // Highlight winner
+    bidders.forEach((b, i) => {
+      const el = document.getElementById("bidder" + i);
+      if (b.active) el.style.borderColor = "#28a745"; el.style.background = "#d4edda";
+    });
+  } else {
+    document.getElementById("status").innerHTML = "<strong>No winner – all dropped out!</strong>";
+  }
+}
+
+function updateStatus() {
+  const activeNames = bidders.filter(b => b.active).map(b => b.name).join(", ") || "None";
+  document.getElementById("status").innerHTML = `
+    <div>Round ${round} • Current Price: <span class="current-price">$${currentPrice.toFixed(2)}</span></div>
+    <p>Active bidders: <strong>${activeCount}</strong> (${activeNames})</p>
+    <p>Click <strong>Next Round</strong> to raise the price...</p>
+  `;
+}
+
+function resetAuction() {
+  document.getElementById("startBtn").disabled = false;
+  document.getElementById("nextBtn").disabled = true;
+  document.getElementById("status").innerHTML = "Click <strong>Start Auction</strong> to begin.";
+  document.getElementById("history").innerHTML = "";
+  document.querySelectorAll(".bidder").forEach(el => {
+    el.className = "bidder";
+    el.querySelector(".status").textContent = "Active";
+  });
+}
+
+// Initialize
+initBidders();
+document.getElementById("nextBtn").disabled = true;
+</script>
+
+<footer style="text-align:center; margin-top:60px; color:#666; font-size:0.9em;">
+  English Auction Simulator • The dominant strategy is to stay in until the price exceeds your valuation.
+</footer>
+
+</body>
+</html>
