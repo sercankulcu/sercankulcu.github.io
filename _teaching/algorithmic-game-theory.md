@@ -44,20 +44,13 @@ Algorithmic Game Theory is an interdisciplinary field that blends the mathematic
 
 ---
 
-## Games
-
-  [Othello](../files/agt/slides/OthelloAGT.pdf) [Play](../files/agt/slides/othello.html)  
-  [Checkers](../files/agt/slides/CheckersAGT.pdf) [Play](../files/agt/slides/checkers.html)  
-  [Backgammon](../files/agt/slides/BackgammonAGT.pdf) [Play](../files/agt/slides/backgammon.html)  
-
----
-
 ## Chapter 1: Game Theory Fundamentals
 
 Game theory is a mathematical framework used to analyze and understand strategic interactions between rational decision-makers. It provides a systematic way of studying situations where the outcome of one person's decision depends on the actions of others.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri.pdf)
 - [🕹️Guess game (HTML)](../files/agt/slides/Chapter_01_Guess_Avarage.html)
+- [🕹️TicTacToe game (HTML)](../files/agt/slides/Chapter_01_TicTacToe.html) | [pdf](../files/agt/slides/Chapter_01_TicTacToe.pdf)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_01_Game_Theory_Fundamentals.pdf) | 
   [Real World Applications](../files/agt/slides/Chapter_01_Real_World_Applications.html) | 
   [Gerçek Dünya Uygulamaları](../files/agt/slides/Bolum_01_Gercek_Dunya_Uygulamalari.html)
@@ -70,6 +63,7 @@ Game theory is a mathematical framework used to analyze and understand strategic
 Algorithmic game theory is an interdisciplinary field that combines concepts from game theory and computer science. It focuses on the study of strategic interactions in computational settings and aims to design efficient algorithms and computational models for analyzing and solving games.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_02_Oyun_Kuramina_Giris.pdf)
+- [🕹️Othello game (HTML)](../files/agt/slides/Chapter_02_Othello.html) | [pdf](../files/agt/slides/Chapter_02_Othello.pdf)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_02_Introduction_to_Algorithmic_Game_Theory.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -132,6 +126,8 @@ Social choice theory is a branch of economics and political science that studies
 Multi-agent systems refer to scenarios where multiple self-interested agents interact and make decisions in a shared environment. Multi-agent systems are analyzed to understand the strategic behavior of agents, optimize outcomes, and design mechanisms that align individual incentives with system objectives.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_07_Coklu_Ajan.pdf)
+- [🕹️Checkers game (HTML)](../files/agt/slides/Chapter_07_Checkers.html) | [pdf](../files/agt/slides/Chapter_07_Checkers.pdf)
+- [Checkers](../files/agt/slides/CheckersAGT.pdf) [Play](../files/agt/slides/checkers.html)  
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_13_Multi_Agent_Systems.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -164,6 +160,7 @@ In algorithmic game theory, online platforms are studied as environments where s
 Algorithmic fairness and ethics play a crucial role in algorithmic game theory by addressing the potential biases, discrimination, and ethical implications that may arise in the design and deployment of algorithms within game-theoretic frameworks.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_10_Algoritmik_Etik.pdf)
+- [🕹️Backgammon game (HTML)](../files/agt/slides/Chapter_10_Backgammon.html) | [pdf](../files/agt/slides/Chapter_10_Backgammon.pdf)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_07_Algorithmic_Fairness_and_Ethics.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
