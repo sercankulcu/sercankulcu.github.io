@@ -4,40 +4,87 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interactive Chess Game</title>
+  <title>Modern Chess vs AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  
   <style>
-    * {
-      box-sizing: border-box;
+    :root {
+      --bg-color: #262421;
+      --board-border: #312e2b;
+      --white-square: #eeeed2;
+      --black-square: #769656;
+      --highlight-color: rgba(255, 255, 51, 0.5);
+      --valid-move-color: rgba(0, 0, 0, 0.15);
+      --valid-move-capture: rgba(0, 0, 0, 0.2);
+      --text-color: #fff;
     }
 
+    * { box-sizing: border-box; }
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      align-items: center;
+      font-family: 'Montserrat', sans-serif;
       margin: 0;
-      height: 100vh;
-      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+      min-height: 100vh;
+      background-color: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-color);
+      overflow: hidden;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    #status {
+      background: #3c3b39;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: #ccc;
+    }
+
+    .turn-w { background-color: #fff; border: 1px solid #000; }
+    .turn-b { background-color: #000; border: 1px solid #fff; }
+
+    .board-wrapper {
+      padding: 10px;
+      background-color: var(--board-border);
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      justify-content: center;
     }
 
     .board-container {
       width: 100%;
-      max-width: 800px;
-      aspect-ratio: 1 / 1;
-      padding: 10px;
+      aspect-ratio: 1 / 1; 
     }
-	
-	h1 {
-	  text-align: center;
-	}
 
     #chessboard {
       width: 100%;
       height: 100%;
       display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: repeat(8, 1fr);
-      border: 4px solid #333;
-      border-radius: 12px;
-      overflow: hidden;
+      grid-template-columns: repeat(8, 12.5%);
+      grid-template-rows: repeat(8, 12.5%);
+      user-select: none;
     }
 
     .square {
@@ -46,67 +93,206 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: calc(1.8vw + 1.5vh);
+      font-size: min(8vw, 60px); 
       cursor: pointer;
-      user-select: none;
+      position: relative;
+      overflow: hidden;
+      line-height: 0; 
     }
 
-    .white-square {
-      background-color: #f0d9b5;
+    @media (min-width: 600px) { .square { font-size: 3.5rem; } }
+
+    .white-square { background-color: var(--white-square); color: var(--black-square); }
+    .black-square { background-color: var(--black-square); color: var(--white-square); }
+
+    .selected { background-color: var(--highlight-color) !important; }
+
+    .valid-move::after {
+      content: '';
+      position: absolute;
+      width: 30%;
+      height: 30%;
+      background-color: var(--valid-move-color);
+      border-radius: 50%;
     }
 
-    .black-square {
-      background-color: #b58863;
+    .valid-move:has(.white-piece)::after,
+    .valid-move:has(.black-piece)::after {
+      background-color: transparent;
+      border: 4px solid var(--valid-move-capture);
+      width: 85%;
+      height: 85%;
     }
 
-    .selected {
-      background-color: #7fff00 !important;
+    .white-piece, .black-piece {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform-origin: center;
+      z-index: 2;
+      filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.6));
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .white-piece { color: #fff; }
+    .black-piece { color: #000; filter: drop-shadow(1px 2px 2px rgba(255,255,255,0.3)); }
+    
+    .square:hover .white-piece,
+    .square:hover .black-piece {
+      transform: scale(1.15);
+      cursor: grab;
     }
 
-    .valid-move {
-      background-color: rgba(127, 255, 0, 0.5) !important;
-    }
-
-    .white-piece {
+    .controls { margin-top: 20px; }
+    
+    button {
+      background-color: #769656;
       color: white;
-      text-shadow: 1px 1px 2px #000;
+      border: none;
+      padding: 10px 20px;
+      font-family: inherit;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #5c7542;
+      transition: all 0.1s;
     }
 
-    .black-piece {
-      color: black;
-      text-shadow: 1px 1px 2px #fff;
+    button:active {
+      transform: translateY(4px);
+      box-shadow: 0 0 0 #5c7542;
     }
 
-    @media (max-width: 600px) {
-      .square {
-        font-size: 6vw;
-      }
-    }
   </style>
 </head>
 
 <body>
-<h1>Chess</h1>
-  <div class="board-container">
-    <div id="chessboard"></div>
+
+  <h1>Modern Chess (vs AI)</h1>
+  
+  <div id="status">
+    <div id="turn-indicator" class="status-indicator turn-w"></div>
+    <span id="status-text">White to move</span>
+  </div>
+
+  <div class="board-wrapper">
+    <div class="board-container">
+      <div id="chessboard"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="resetGame()">New Game</button>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
   <script>
     const board = document.getElementById('chessboard');
+    const statusText = document.getElementById('status-text');
+    const turnIndicator = document.getElementById('turn-indicator');
     const game = new Chess();
     let selectedSquare = null;
+    let isAIThinking = false; // AI düşünürken hamle yapılmasını engellemek için
+
+    /* --- YAPAY ZEKA (AI) AYARLARI --- */
+    const SEARCH_DEPTH = 3; // Zorluk seviyesi (3: Hızlı ve orta seviye, 4: Yavaş ve zor)
+    
+    // Taş Değerleri
+    const pieceValues = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20000 };
+
+    // Konum Değerlendirme Tabloları (Piece-Square Tables)
+    // AI'ın taşları merkeze sürmesini teşvik eder.
+    const pawnEvalWhite = [
+        [0,  0,  0,  0,  0,  0,  0,  0],
+        [50, 50, 50, 50, 50, 50, 50, 50],
+        [10, 10, 20, 30, 30, 20, 10, 10],
+        [5,  5, 10, 25, 25, 10,  5,  5],
+        [0,  0,  0, 20, 20,  0,  0,  0],
+        [5, -5,-10,  0,  0,-10, -5,  5],
+        [5, 10, 10,-20,-20, 10, 10,  5],
+        [0,  0,  0,  0,  0,  0,  0,  0]
+    ];
+    const pawnEvalBlack = pawnEvalWhite.slice().reverse();
+
+    const knightEval = [
+        [-50,-40,-30,-30,-30,-30,-40,-50],
+        [-40,-20,  0,  0,  0,  0,-20,-40],
+        [-30,  0, 10, 15, 15, 10,  0,-30],
+        [-30,  5, 15, 20, 20, 15,  5,-30],
+        [-30,  0, 15, 20, 20, 15,  0,-30],
+        [-30,  5, 10, 15, 15, 10,  5,-30],
+        [-40,-20,  0,  5,  5,  0,-20,-40],
+        [-50,-40,-30,-30,-30,-30,-40,-50]
+    ];
+
+    const whiteBishopEval = [
+        [ -20,-10,-10,-10,-10,-10,-10,-20],
+        [ -10,  0,  0,  0,  0,  0,  0,-10],
+        [ -10,  0,  5, 10, 10,  5,  0,-10],
+        [ -10,  5,  5, 10, 10,  5,  5,-10],
+        [ -10,  0, 10, 10, 10, 10,  0,-10],
+        [ -10, 10, 10, 10, 10, 10, 10,-10],
+        [ -10,  5,  0,  0,  0,  0,  5,-10],
+        [ -20,-10,-10,-10,-10,-10,-10,-20]
+    ];
+    const blackBishopEval = whiteBishopEval.slice().reverse();
+
+    const whiteRookEval = [
+        [  0,  0,  0,  0,  0,  0,  0,  0],
+        [  5, 10, 10, 10, 10, 10, 10,  5],
+        [ -5,  0,  0,  0,  0,  0,  0, -5],
+        [ -5,  0,  0,  0,  0,  0,  0, -5],
+        [ -5,  0,  0,  0,  0,  0,  0, -5],
+        [ -5,  0,  0,  0,  0,  0,  0, -5],
+        [ -5,  0,  0,  0,  0,  0,  0, -5],
+        [  0,  0,  0,  5,  5,  0,  0,  0]
+    ];
+    const blackRookEval = whiteRookEval.slice().reverse();
+
+    const evalQueen = [
+        [ -20,-10,-10, -5, -5,-10,-10,-20],
+        [ -10,  0,  0,  0,  0,  0,  0,-10],
+        [ -10,  0,  5,  5,  5,  5,  0,-10],
+        [  -5,  0,  5,  5,  5,  5,  0, -5],
+        [   0,  0,  5,  5,  5,  5,  0, -5],
+        [ -10,  5,  5,  5,  5,  5,  0,-10],
+        [ -10,  0,  5,  0,  0,  0,  0,-10],
+        [ -20,-10,-10, -5, -5,-10,-10,-20]
+    ];
+
+    const whiteKingEval = [
+        [ -30,-40,-40,-50,-50,-40,-40,-30],
+        [ -30,-40,-40,-50,-50,-40,-40,-30],
+        [ -30,-40,-40,-50,-50,-40,-40,-30],
+        [ -30,-40,-40,-50,-50,-40,-40,-30],
+        [ -20,-30,-30,-40,-40,-30,-30,-20],
+        [ -10,-20,-20,-20,-20,-20,-20,-10],
+        [  20, 20,  0,  0,  0,  0, 20, 20],
+        [  20, 30, 10,  0,  0, 10, 30, 20]
+    ];
+    const blackKingEval = whiteKingEval.slice().reverse();
+
+    /* --- TEMEL OYUN FONKSİYONLARI --- */
 
     function createBoard() {
+      board.innerHTML = ''; 
       for (let i = 0; i < 64; i++) {
         const square = document.createElement('div');
+        const row = 8 - Math.floor(i / 8);
+        const col = i % 8;
+        const file = String.fromCharCode(97 + col); 
+        
         square.classList.add('square');
         square.classList.add((i + Math.floor(i / 8)) % 2 === 0 ? 'white-square' : 'black-square');
-        square.setAttribute('data-square', String.fromCharCode(97 + (i % 8)) + (8 - Math.floor(i / 8)));
+        square.setAttribute('data-square', file + row);
+        
         square.addEventListener('click', onSquareClick);
         board.appendChild(square);
       }
       updateBoard();
+      updateStatus();
     }
 
     function updateBoard() {
@@ -115,12 +301,15 @@
         for (let j = 0; j < 8; j++) {
           const square = board.children[i * 8 + j];
           const piece = position[i][j];
+          
+          square.innerHTML = ''; 
+          square.classList.remove('white-piece', 'black-piece'); 
+          
           if (piece) {
-            square.textContent = getPieceSymbol(piece);
-            square.classList.add(piece.color === 'w' ? 'white-piece' : 'black-piece');
-          } else {
-            square.textContent = '';
-            square.classList.remove('white-piece', 'black-piece');
+            const pieceSpan = document.createElement('span');
+            pieceSpan.textContent = getPieceSymbol(piece);
+            pieceSpan.classList.add(piece.color === 'w' ? 'white-piece' : 'black-piece');
+            square.appendChild(pieceSpan);
           }
         }
       }
@@ -129,37 +318,177 @@
     function getPieceSymbol(piece) {
       const symbols = {
         'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚',
-        'P': '♙', 'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔'
+        'P': '♟', 'R': '♜', 'N': '♞', 'B': '♝', 'Q': '♛', 'K': '♚'
       };
       return symbols[piece.type.toUpperCase()] || '';
     }
 
     function onSquareClick(event) {
-      const clickedSquare = event.target.getAttribute('data-square');
+      // Eğer oyun bittiyse veya sıra AI'da ise tıklamayı yoksay
+      if (game.game_over() || isAIThinking || game.turn() === 'b') return;
+
+      let target = event.target;
+      if (target.tagName === 'SPAN') target = target.parentElement;
+      if (!target.classList.contains('square')) target = target.closest('.square');
+      if (!target) return;
+
+      const clickedSquare = target.getAttribute('data-square');
 
       if (selectedSquare) {
         const move = game.move({
           from: selectedSquare,
           to: clickedSquare,
-          promotion: 'q' // Always promote to queen for simplicity
+          promotion: 'q'
         });
 
         if (move) {
           updateBoard();
           clearHighlights();
           selectedSquare = null;
+          updateStatus();
+          highlightSquare(move.from);
+          highlightSquare(move.to);
+
+          // Hamle yapıldıysa AI'yı tetikle
+          if (!game.game_over()) {
+            isAIThinking = true;
+            // 250ms gecikme ile AI hamlesi yap (İnsan görsün diye)
+            window.setTimeout(makeBestMove, 250);
+          }
+
         } else {
-          clearHighlights();
-          highlightSquare(clickedSquare);
-          showValidMoves(clickedSquare);
-          selectedSquare = clickedSquare;
+          const piece = game.get(clickedSquare);
+          if (piece && piece.color === game.turn()) {
+             clearHighlights();
+             selectedSquare = clickedSquare;
+             highlightSquare(clickedSquare);
+             showValidMoves(clickedSquare);
+          } else {
+            clearHighlights();
+            selectedSquare = null;
+          }
         }
       } else {
-        highlightSquare(clickedSquare);
-        showValidMoves(clickedSquare);
-        selectedSquare = clickedSquare;
+        const piece = game.get(clickedSquare);
+        if (piece && piece.color === game.turn()) {
+          clearHighlights();
+          selectedSquare = clickedSquare;
+          highlightSquare(clickedSquare);
+          showValidMoves(clickedSquare);
+        }
       }
     }
+
+    /* --- AI MANTIK (LOGIC) --- */
+
+    function makeBestMove() {
+      // Minimax algoritması ile en iyi hamleyi bul
+      const bestMove = minimaxRoot(SEARCH_DEPTH, game, true);
+      
+      game.move(bestMove);
+      updateBoard();
+      updateStatus();
+      
+      // Son hamleyi göster
+      clearHighlights();
+      highlightSquare(bestMove.from);
+      highlightSquare(bestMove.to);
+      
+      isAIThinking = false;
+    }
+
+    function minimaxRoot(depth, game, isMaximisingPlayer) {
+      const newGameMoves = game.moves({ verbose: true });
+      let bestMove = -9999;
+      let bestMoveFound;
+
+      // Hamleleri rastgele karıştır ki hep aynı oyunu oynamasın
+      newGameMoves.sort(() => Math.random() - 0.5);
+
+      for(let i = 0; i < newGameMoves.length; i++) {
+        const newGameMove = newGameMoves[i];
+        game.move(newGameMove);
+        const value = minimax(depth - 1, game, -10000, 10000, !isMaximisingPlayer);
+        game.undo();
+        if(value >= bestMove) {
+          bestMove = value;
+          bestMoveFound = newGameMove;
+        }
+      }
+      return bestMoveFound;
+    }
+
+    function minimax(depth, game, alpha, beta, isMaximisingPlayer) {
+      if (depth === 0) {
+        return -evaluateBoard(game.board());
+      }
+
+      const newGameMoves = game.moves();
+
+      if (isMaximisingPlayer) {
+        let bestMove = -9999;
+        for (let i = 0; i < newGameMoves.length; i++) {
+          game.move(newGameMoves[i]);
+          bestMove = Math.max(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer));
+          game.undo();
+          alpha = Math.max(alpha, bestMove);
+          if (beta <= alpha) {
+            return bestMove;
+          }
+        }
+        return bestMove;
+      } else {
+        let bestMove = 9999;
+        for (let i = 0; i < newGameMoves.length; i++) {
+          game.move(newGameMoves[i]);
+          bestMove = Math.min(bestMove, minimax(depth - 1, game, alpha, beta, !isMaximisingPlayer));
+          game.undo();
+          beta = Math.min(beta, bestMove);
+          if (beta <= alpha) {
+            return bestMove;
+          }
+        }
+        return bestMove;
+      }
+    }
+
+    function evaluateBoard(board) {
+      let totalEvaluation = 0;
+      for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+          totalEvaluation = totalEvaluation + getPieceValue(board[i][j], i, j);
+        }
+      }
+      return totalEvaluation;
+    }
+
+    function getPieceValue(piece, x, y) {
+      if (piece === null) {
+        return 0;
+      }
+      
+      const getAbsoluteValue = function (piece, isWhite, x ,y) {
+        if (piece.type === 'p') {
+          return 100 + (isWhite ? pawnEvalWhite[y][x] : pawnEvalBlack[y][x]);
+        } else if (piece.type === 'r') {
+          return 500 + (isWhite ? whiteRookEval[y][x] : blackRookEval[y][x]);
+        } else if (piece.type === 'n') {
+          return 320 + knightEval[y][x];
+        } else if (piece.type === 'b') {
+          return 330 + (isWhite ? whiteBishopEval[y][x] : blackBishopEval[y][x]);
+        } else if (piece.type === 'q') {
+          return 900 + evalQueen[y][x];
+        } else if (piece.type === 'k') {
+          return 20000 + (isWhite ? whiteKingEval[y][x] : blackKingEval[y][x]);
+        }
+        throw "Unknown piece type: " + piece.type;
+      };
+
+      const absoluteValue = getAbsoluteValue(piece, piece.color === 'w', x ,y);
+      return piece.color === 'w' ? absoluteValue : -absoluteValue;
+    }
+
+    /* --- YARDIMCI FONKSİYONLAR --- */
 
     function highlightSquare(square) {
       const squareElement = document.querySelector(`[data-square="${square}"]`);
@@ -178,6 +507,38 @@
       document.querySelectorAll('.square').forEach(square => {
         square.classList.remove('selected', 'valid-move');
       });
+    }
+
+    function updateStatus() {
+      let status = '';
+      
+      if (game.in_checkmate()) {
+        status = 'Game over. ' + (game.turn() === 'w' ? 'Black (AI)' : 'White') + ' wins!';
+      } else if (game.in_draw()) {
+        status = 'Game over, drawn position';
+      } else {
+        if (game.turn() === 'w') {
+           status = "Your Turn (White)";
+        } else {
+           status = "AI is thinking...";
+        }
+        
+        if (game.in_check()) {
+          status += ' (Check!)';
+        }
+      }
+      
+      statusText.innerText = status;
+      turnIndicator.className = 'status-indicator ' + (game.turn() === 'w' ? 'turn-w' : 'turn-b');
+    }
+    
+    function resetGame() {
+      game.reset();
+      selectedSquare = null;
+      isAIThinking = false;
+      clearHighlights();
+      updateBoard();
+      updateStatus();
     }
 
     createBoard();
