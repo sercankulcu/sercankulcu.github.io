@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Tic Tac Toe</title>
+<style>
+  body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #f4f4f4; }
+  h1 { margin-top: 10px; }
+  #board {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-gap: 5px;
+    justify-content: center;
+    margin-top: 30px;
+  }
+  .cell {
+    width: 100px; height: 100px;
+    background: white;
+    border: 2px solid #333;
+    font-size: 40px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.4s;
+  }
+  .exploring { background: #fff59d !important; }  /* sarı: inceleniyor */
+  .evaluated { background: #a5d6a7 !important; }  /* yeşil: değerlendirildi */
+  #commentary {
+    background: #fff; padding: 15px; width: 420px; margin: 20px auto;
+    border-radius: 10px; border: 1px solid #ccc; min-height: 60px;
+  }
+  #resetBtn {
+    padding: 10px 15px; font-size: 16px; border-radius: 8px;
+    cursor: pointer; background: #333; color: white; border: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>🎯 Minimax Karar Süreci - Tic Tac Toe</h1>
+<div id="board"></div>
+<div id="commentary">Senin sıran! Hamleni yap.</div>
+<button id="resetBtn">🔄 Yeni Oyun</button>
+
+<script>
+const boardEl = document.getElementById("board");
+const commentary = document.getElementById("commentary");
+const resetBtn = document.getElementById("resetBtn");
+
+let board = ["", "", "", "", "", "", "", "", ""];
+let gameOver = false;
+let animating = false;
+
+function drawBoard() {
+  boardEl.innerHTML = "";
+  board.forEach((val, i) => {
+    const cell = document.createElement("div");
+    cell.classList.add("cell");
+    cell.textContent = val;
+    cell.onclick = () => playerMove(i);
+    boardEl.appendChild(cell);
+  });
+}
+
+function checkWinner(b) {
+  const wins = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+  for (let w of wins) {
+    if (b[w[0]] && b[w[0]] === b[w[1]] && b[w[1]] === b[w[2]]) return b[w[0]];
+  }
+  if (b.every(c => c !== "")) return "draw";
+  return null;
+}
+
+function playerMove(i) {
+  if (gameOver || animating || board[i] !== "") return;
+  board[i] = "X";
+  drawBoard();
+  let res = checkWinner(board);
+  if (res) return endGame(res);
+  commentary.textContent = "🤖 AI düşünüyor...";
+  setTimeout(aiMove, 300);
+}
+
+// -------- AI (Minimax + Alpha–Beta + animasyon) --------
+
+async function aiMove() {
+  animating = true;
+  let bestScore = -Infinity;
+  let move;
+  for (let i = 0; i < 9; i++) {
+    if (board[i] === "") {
+      board[i] = "O";
+      let score = await minimax(board, 0, false, -Infinity, Infinity);
+      board[i] = "";
+      if (score > bestScore) {
+        bestScore = score;
+        move = i;
+      }
+    }
+  }
+  board[move] = "O";
+  drawBoard();
+  let res = checkWinner(board);
+  if (res) return endGame(res);
+  commentary.textContent = "Senin sıran!";
+  animating = false;
+}
+
+async function minimax(b, depth, isMax, alpha, beta) {
+  const result = checkWinner(b);
+  if (result === "X") return -10 + depth;
+  if (result === "O") return 10 - depth;
+  if (result === "draw") return 0;
+
+  const cells = document.querySelectorAll(".cell");
+  const animate = depth < 2; // sadece ilk 2 seviyede animasyon
+
+  if (isMax) {
+    let maxEval = -Infinity;
+    for (let i = 0; i < 9; i++) {
+      if (b[i] === "") {
+        if (animate) cells[i].classList.add("exploring");
+        b[i] = "O";
+        if (animate) await sleep(60);
+        const evalScore = await minimax(b, depth + 1, false, alpha, beta);
+        b[i] = "";
+        if (animate) {
+          cells[i].classList.remove("exploring");
+          cells[i].classList.add("evaluated");
+          commentary.textContent = `Pozisyon ${i + 1} → skor ${evalScore}`;
+          await sleep(60);
+        }
+        maxEval = Math.max(maxEval, evalScore);
+        alpha = Math.max(alpha, evalScore);
+        if (beta <= alpha) break; // pruning
+      }
+    }
+    return maxEval;
+  } else {
+    let minEval = Infinity;
+    for (let i = 0; i < 9; i++) {
+      if (b[i] === "") {
+        if (animate) cells[i].classList.add("exploring");
+        b[i] = "X";
+        if (animate) await sleep(60);
+        const evalScore = await minimax(b, depth + 1, true, alpha, beta);
+        b[i] = "";
+        if (animate) {
+          cells[i].classList.remove("exploring");
+          cells[i].classList.add("evaluated");
+          commentary.textContent = `Rakip ${i + 1} → skor ${evalScore}`;
+          await sleep(60);
+        }
+        minEval = Math.min(minEval, evalScore);
+        beta = Math.min(beta, evalScore);
+        if (beta <= alpha) break; // pruning
+      }
+    }
+    return minEval;
+  }
+}
+
+function sleep(ms) {
+  return new Promise(res => setTimeout(res, ms));
+}
+
+function endGame(result) {
+  gameOver = true;
+  animating = false;
+  if (result === "draw") commentary.textContent = "🤝 Berabere!";
+  else if (result === "X") commentary.textContent = "🏆 Kazandın!";
+  else commentary.textContent = "💀 Kaybettin! AI mükemmel oynadı.";
+}
+
+resetBtn.onclick = () => {
+  board = ["", "", "", "", "", "", "", "", ""];
+  gameOver = false;
+  animating = false;
+  commentary.textContent = "Senin sıran! Hamleni yap.";
+  drawBoard();
+};
+
+drawBoard();
+</script>
+</body>
+</html>
