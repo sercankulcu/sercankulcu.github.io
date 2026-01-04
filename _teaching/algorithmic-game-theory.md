@@ -11,6 +11,19 @@ location: "Giresun, Turkey"
 ![algorithmic game theory](/images/teaching/algorithmic-game-theory-course.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
 Algorithmic Game Theory is an interdisciplinary field that blends the mathematical rigor of game theory with the practical, problem-solving techniques of computer science. This area of study focuses on designing and analyzing algorithms for solving games and game-like scenarios, where multiple players with potentially conflicting interests interact. It encompasses a wide range of topics, including the computation of equilibria, the efficiency and fairness of various algorithmic mechanisms, and the strategic behavior of rational agents in competitive environments. By leveraging computational methods, algorithmic game theory provides valuable insights into complex systems, from economic markets to networked environments, thereby bridging the gap between theoretical foundations and real-world applications.
 
+## Ders Öğretim Planı  
+
+[Ders Öğretim Planı (PDF)](../files/agt/slides/Bolum_00_Ders_Ogretim_Planı.pdf)
+
+---
+
+## Announcements
+
+  [✍️ Vize & Final](../files/agt/slides/agt_odev.html) | 
+  [Proje Listesi](../files/agt/slides/projeler.html)
+
+---
+
 ## Resources
 
 - **course webpages**  
@@ -34,13 +47,6 @@ Algorithmic Game Theory is an interdisciplinary field that blends the mathematic
 
 - **youtube**  
   [🎥 Game Theory 101](https://www.youtube.com/watch?v=IotsMu1J8fA&list=PL102B69CCA6049B6C)
-
----
-
-## Announcements
-
-  [✍️ Vize & Final](../files/agt/slides/agt_odev.html) | 
-  [Proje Listesi](../files/agt/slides/projeler.html)
 
 ---
 
