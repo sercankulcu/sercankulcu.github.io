@@ -50,7 +50,8 @@ Data structures are fundamental components in computer science, serving as the b
 
 - **2025-2026**  
   [vize](../files/data_structures/slides/2025-2026-data-vize-cevaplar.pdf) | 
-  [final](../files/data_structures/slides/2025-2026-data-final-cevaplar.pdf)
+  [final](../files/data_structures/slides/2025-2026-data-final-cevaplar.pdf) | 
+  [but](../files/data_structures/slides/2025-2026-data-butunleme-cevaplar.pdf)
 
 - **2024-2025**  
   [vize A](../files/data_structures/slides/2024-2025-data-vize-a-cevaplar.pdf) | 
