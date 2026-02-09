@@ -4,7 +4,7 @@ collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/algorithms
 venue: "University of Giresun, Department of Computer Engineering"
-date: 2025-01-07
+date: 2026-01-07
 location: "Giresun, Turkey"
 ---
 
