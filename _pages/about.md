@@ -13,7 +13,7 @@ redirect_from:
     📚 Staj Bitiş Tarihimi Hesapla
 </button> 
 
-<button onclick="window.location.href='/files/Stajstajyonergesi.pdf'">
+<button onclick="window.location.href='/files/stajyonergesi.pdf'">
     📚 Staj Yönergesi
 </button> 
 
