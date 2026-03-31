@@ -48,6 +48,9 @@ Operating systems are a fundamental part of modern computing. They form the foun
 
 ## Past Exams  
 
+- **2025-2026**  
+  [vize](../files/os/slides/2025-2026-os-vize-cevaplar.pdf)
+
 - **2024-2025**  
   [vize](../files/os/slides/2024-2025-os-vize-cevaplar.pdf) | 
   [vize (HTML)](../files/os/slides/2024-2025-os-vize-cevaplar.html) | 
