@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>String Similarity - Levenshtein Distance</title>
+<style>
+:root {
+  --bg:#f5f7fb; --card:#ffffff; --ink:#172033; --muted:#667085;
+  --line:#d0d5dd; --accent:#2563eb; --soft:#eff6ff; --ok:#dcfce7; --warn:#fef3c7;
+}
+* { box-sizing:border-box; }
+body { margin:0; font-family:Arial, Helvetica, sans-serif; background:var(--bg); color:var(--ink); }
+header { padding:28px 36px; color:white; background:linear-gradient(135deg,#1e3a8a,#2563eb); }
+header h1 { margin:0 0 8px; font-size:30px; }
+header p { margin:0; max-width:1000px; line-height:1.5; }
+main { max-width:1160px; margin:24px auto; padding:0 20px 40px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:18px; box-shadow:0 8px 22px rgba(15,23,42,.06); }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+@media(max-width:850px){ .grid{ grid-template-columns:1fr; } }
+button { border:none; border-radius:10px; padding:11px 16px; background:var(--accent); color:white; font-weight:700; cursor:pointer; }
+button.secondary { background:#475569; }
+input, textarea { width:100%; border:1px solid var(--line); border-radius:10px; padding:10px; font-size:15px; }
+.controls { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; align-items:center; }
+pre { background:#0f172a; color:#e5e7eb; border-radius:12px; padding:14px; overflow-x:auto; min-height:90px; }
+.item { display:inline-block; padding:8px 10px; margin:4px; border:1px solid var(--line); border-radius:10px; background:white; font-family:Consolas, Monaco, monospace; }
+.active { outline:3px solid #f59e0b; background:#fffbeb; }
+.done { background:var(--ok); border-color:#86efac; }
+.badge { display:inline-block; margin:4px; padding:6px 10px; border-radius:999px; background:var(--soft); color:#1e40af; font-weight:700; font-family:Consolas, Monaco, monospace; }
+.small { color:var(--muted); font-size:14px; line-height:1.45; }
+.table-wrap { overflow-x:auto; }
+table { border-collapse:collapse; width:100%; background:white; }
+th, td { border:1px solid var(--line); padding:7px 9px; text-align:center; font-family:Consolas, Monaco, monospace; }
+th { background:#eff6ff; }
+.highlight { background:#fef3c7 !important; }
+.match { background:#dcfce7 !important; }
+.error { background:#fee2e2 !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>String Similarity: Levenshtein Distance</h1>
+  <p>This example computes the minimum number of insertions, deletions, and substitutions required to transform one string into another. The dynamic programming table is filled step by step.</p>
+</header>
+<main>
+<section class="card">
+  <h2>Sample Strings</h2>
+  <div class="grid">
+    <div><label>String A</label><input id="a" value="kitten"></div>
+    <div><label>String B</label><input id="b" value="sitting"></div>
+  </div>
+  <div class="controls">
+    <button onclick="init()">Build Matrix</button>
+    <button onclick="step()">Step Forward</button>
+    <button class="secondary" onclick="resetDemo()">Reset</button>
+  </div>
+</section>
+<section class="grid">
+  <div class="card"><h2>Dynamic Programming Table</h2><div class="table-wrap" id="matrix"></div></div>
+  <div class="card"><h2>Step Explanation</h2><pre id="log"></pre></div>
+</section>
+</main>
+<script>
+let A="",B="",dp=[],cells=[],idx=0,done=false,stepNo=0;
+function init(){
+  A=document.getElementById("a").value;
+  B=document.getElementById("b").value;
+  dp=Array.from({length:A.length+1},()=>Array(B.length+1).fill(""));
+  for(let i=0;i<=A.length;i++) dp[i][0]=i;
+  for(let j=0;j<=B.length;j++) dp[0][j]=j;
+  cells=[];
+  for(let i=1;i<=A.length;i++) for(let j=1;j<=B.length;j++) cells.push([i,j]);
+  idx=0; done=false; stepNo=0;
+  render("The first row and first column are initialized with edit distances from/to the empty string.");
+}
+function resetDemo(){ init(); }
+function render(msg,active=null){
+  let html="<table><tr><th></th><th>ε</th>";
+  for(const ch of B) html+=`<th>${ch}</th>`;
+  html+="</tr>";
+  for(let i=0;i<=A.length;i++){
+    html+=`<tr><th>${i===0?"ε":A[i-1]}</th>`;
+    for(let j=0;j<=B.length;j++){
+      const cls=active && active[0]===i && active[1]===j ? "highlight":"";
+      html+=`<td class="${cls}">${dp[i][j]}</td>`;
+    }
+    html+="</tr>";
+  }
+  html+="</table>";
+  document.getElementById("matrix").innerHTML=html;
+  document.getElementById("log").textContent=msg;
+}
+function step(){
+  if(done){ render("Computation is complete. Distance = " + dp[A.length][B.length]); return; }
+  if(idx>=cells.length){
+    done=true;
+    render("Finished. Levenshtein distance = " + dp[A.length][B.length]);
+    return;
+  }
+  stepNo++;
+  const [i,j]=cells[idx++];
+  const cost=A[i-1]===B[j-1] ? 0 : 1;
+  const deletion=dp[i-1][j]+1;
+  const insertion=dp[i][j-1]+1;
+  const substitution=dp[i-1][j-1]+cost;
+  dp[i][j]=Math.min(deletion,insertion,substitution);
+  render(`Step ${stepNo}: Compare A[${i-1}]='${A[i-1]}' with B[${j-1}]='${B[j-1]}'.\nDeletion = ${deletion}, insertion = ${insertion}, substitution/match = ${substitution}.\nChosen minimum = ${dp[i][j]}.`, [i,j]);
+}
+init();
+</script>
+</body>
+</html>
