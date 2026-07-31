@@ -3,7 +3,7 @@ title: "Procedural Programming with C"
 collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/procedural-programming-with-c
-venue: "University of Giresun, Department of Computer Engineering"
+venue: "Giresun University, Department of Computer Engineering"
 date: 2023-04-04
 location: "Giresun, Turkey"
 ---

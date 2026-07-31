@@ -12,7 +12,7 @@ With over 20 years of professional experience in software engineering, I hold a 
 
 ## Education
 
-### <img src="/images/logo-ktu.webp" alt="KTU" width="50" height="50"> Ph.D in Computer Engineering, Karadeniz Technical University, 2022
+### <img src="/images/logo-ktu.webp" alt="KTU" width="50" height="50"> Ph.D. in Computer Engineering, Karadeniz Technical University, 2022
   I developed a simulation framework using the Cooja simulator, incorporating the Steerable Smart Antennas model, the 6TiSCH Protocol, and a traffic generator. I evaluated the model's performance by analyzing network throughput, energy consumption, reliability, and metrics such as packet delivery ratio, end-to-end delay, and network lifetime. Additionally, I conducted research on applying computer vision to food science, creating algorithms in Python and OpenCV for processing and analyzing food images. I designed a system for detecting and classifying food items based on visual characteristics like color, texture, and shape.
 
 ### <img src="/images/logo-hacettepe.webp" alt="Hacettepe" width="50" height="50"> M.S. in Information Systems, Hacettepe University, 2010

@@ -3,7 +3,7 @@ title: "Algorithmic Game Theory"
 collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/algorithmic-game-theory
-venue: "University of Giresun, Department of Computer Engineering"
+venue: "Giresun University, Department of Computer Engineering"
 date: 2025-09-12
 location: "Giresun, Turkey"
 ---
