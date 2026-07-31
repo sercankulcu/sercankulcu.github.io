@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta id="metaDescription" name="description" content="PDF dosyalarını tarayıcınızda güvenli biçimde birleştirin." />
+  <title>PDF Birleştirici</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --card-soft: rgba(255, 255, 255, 0.72);
+      --text: #172033;
+      --muted: #697386;
+      --border: #dce2ed;
+      --primary: #3457d5;
+      --primary-hover: #2847bd;
+      --danger: #c23535;
+      --danger-bg: #fff1f1;
+      --success: #18794e;
+      --success-bg: #ecfdf3;
+      --shadow: 0 16px 45px rgba(25, 38, 73, 0.12);
+      --focus: 0 0 0 3px rgba(52, 87, 213, 0.18);
+    }
+
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #0f1420;
+      --card: #171d2b;
+      --card-soft: rgba(23, 29, 43, 0.78);
+      --text: #edf1fa;
+      --muted: #a9b2c4;
+      --border: #30394d;
+      --primary: #7895ff;
+      --primary-hover: #91a9ff;
+      --danger: #ff8585;
+      --danger-bg: rgba(194, 53, 53, 0.14);
+      --success: #75d7a6;
+      --success-bg: rgba(24, 121, 78, 0.18);
+      --shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+      --focus: 0 0 0 3px rgba(120, 149, 255, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px 16px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(52, 87, 213, 0.18), transparent 34%),
+        var(--bg);
+      color: var(--text);
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .app {
+      width: min(920px, 100%);
+      background: var(--card-soft);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 24px 0;
+      flex-wrap: wrap;
+    }
+
+    .setting {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .setting label {
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    select {
+      min-height: 40px;
+      padding: 8px 34px 8px 11px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      outline: none;
+    }
+
+    select:focus-visible {
+      border-color: var(--primary);
+      box-shadow: var(--focus);
+    }
+
+    .header {
+      padding: 20px 32px 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .content {
+      padding: 18px 32px 32px;
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 18px;
+      padding: 36px 20px;
+      text-align: center;
+      background: rgba(52, 87, 213, 0.035);
+      cursor: pointer;
+      transition: 0.2s ease;
+      outline: none;
+    }
+
+    .drop-zone:hover,
+    .drop-zone:focus-visible,
+    .drop-zone.dragover {
+      border-color: var(--primary);
+      background: rgba(52, 87, 213, 0.09);
+      transform: translateY(-1px);
+      box-shadow: var(--focus);
+    }
+
+    .drop-icon {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 14px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: rgba(52, 87, 213, 0.12);
+      color: var(--primary);
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .drop-zone strong {
+      display: block;
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+    }
+
+    .drop-zone span {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 22px 0 12px;
+      flex-wrap: wrap;
+    }
+
+    .summary {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .file-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .file-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--card);
+      transition: 0.15s ease;
+    }
+
+    .file-item.dragging {
+      opacity: 0.45;
+    }
+
+    .file-item.drag-target {
+      border-color: var(--primary);
+      box-shadow: var(--focus);
+    }
+
+    .drag-handle {
+      cursor: grab;
+      color: var(--muted);
+      user-select: none;
+      padding: 6px;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .file-info {
+      min-width: 0;
+    }
+
+    .file-name {
+      font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 11px;
+      padding: 11px 16px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.16s ease;
+    }
+
+    button:focus-visible {
+      outline: none;
+      box-shadow: var(--focus);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .icon-button {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .icon-button:hover:not(:disabled) {
+      background: rgba(52, 87, 213, 0.08);
+      border-color: var(--primary);
+    }
+
+    .icon-button.remove:hover:not(:disabled) {
+      color: var(--danger);
+      background: var(--danger-bg);
+      border-color: rgba(194, 53, 53, 0.28);
+    }
+
+    .footer-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .secondary {
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--border);
+    }
+
+    .secondary:hover:not(:disabled) {
+      background: rgba(105, 115, 134, 0.08);
+    }
+
+    .primary {
+      background: var(--primary);
+      color: white;
+      min-width: 180px;
+    }
+
+    html[data-theme="dark"] .primary {
+      color: #0e1630;
+    }
+
+    .primary:hover:not(:disabled) {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .status {
+      display: none;
+      margin-top: 18px;
+      padding: 13px 15px;
+      border-radius: 12px;
+      line-height: 1.45;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.info {
+      background: rgba(52, 87, 213, 0.09);
+      color: var(--primary);
+    }
+
+    .status.success {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .status.error {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .progress {
+      display: none;
+      height: 8px;
+      margin-top: 14px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(105, 115, 134, 0.18);
+    }
+
+    .progress.show {
+      display: block;
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--primary);
+      transition: width 0.2s ease;
+    }
+
+    .privacy {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      text-align: center;
+    }
+
+    html[dir="rtl"] .topbar,
+    html[dir="rtl"] .toolbar,
+    html[dir="rtl"] .footer-actions {
+      direction: rtl;
+    }
+
+    html[dir="rtl"] select {
+      padding: 8px 11px 8px 34px;
+    }
+
+    @media (max-width: 640px) {
+      .topbar {
+        justify-content: stretch;
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .setting {
+        flex: 1;
+        min-width: 150px;
+      }
+
+      .setting select {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .header,
+      .content {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .file-item {
+        grid-template-columns: auto minmax(0, 1fr);
+      }
+
+      .actions {
+        grid-column: 2;
+        justify-content: flex-end;
+      }
+
+      .footer-actions button {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="topbar">
+      <div class="setting">
+        <label id="languageLabel" for="languageSelect">Dil</label>
+        <select id="languageSelect" aria-label="Dil">
+          <option value="tr">Türkçe</option>
+          <option value="en">English</option>
+          <option value="de">Deutsch</option>
+          <option value="fr">Français</option>
+          <option value="es">Español</option>
+          <option value="it">Italiano</option>
+          <option value="pt">Português</option>
+          <option value="ar">العربية</option>
+        </select>
+      </div>
+
+      <div class="setting">
+        <label id="themeLabel" for="themeSelect">Tema</label>
+        <select id="themeSelect" aria-label="Tema">
+          <option id="themeSystemOption" value="system">Sistem</option>
+          <option id="themeLightOption" value="light">Açık</option>
+          <option id="themeDarkOption" value="dark">Koyu</option>
+        </select>
+      </div>
+    </div>
+
+    <header class="header">
+      <h1 id="title">PDF Birleştirici</h1>
+      <p id="subtitle" class="subtitle">
+        PDF dosyalarınızı ekleyin, sıralayın ve tek bir dosya olarak indirin.
+      </p>
+    </header>
+
+    <section class="content">
+      <div
+        id="dropZone"
+        class="drop-zone"
+        role="button"
+        tabindex="0"
+        aria-label="PDF dosyaları seç"
+      >
+        <div class="drop-icon">+</div>
+        <strong id="dropTitle">PDF dosyalarını buraya bırakın</strong>
+        <span id="dropSubtitle">veya dosya seçmek için tıklayın</span>
+      </div>
+
+      <input id="fileInput" type="file" accept="application/pdf,.pdf" multiple />
+
+      <div class="toolbar">
+        <div id="summary" class="summary">Henüz dosya eklenmedi.</div>
+        <button id="addMoreButton" class="secondary" type="button">Dosya Ekle</button>
+      </div>
+
+      <ul id="fileList" class="file-list" aria-live="polite"></ul>
+
+      <div id="progress" class="progress" aria-hidden="true">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+
+      <div class="footer-actions">
+        <button id="clearButton" class="secondary" type="button" disabled>
+          Listeyi Temizle
+        </button>
+        <button id="mergeButton" class="primary" type="button" disabled>
+          En Az 2 PDF Ekleyin
+        </button>
+      </div>
+
+      <p id="privacy" class="privacy">
+        Gizlilik: Dosyalarınız yalnızca tarayıcınızda işlenir ve herhangi bir sunucuya yüklenmez.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const { PDFDocument } = PDFLib;
+
+    const translations = {
+      tr: {
+        pageTitle: "PDF Birleştirici",
+        description: "PDF dosyalarını tarayıcınızda güvenli biçimde birleştirin.",
+        language: "Dil",
+        theme: "Tema",
+        system: "Sistem",
+        light: "Açık",
+        dark: "Koyu",
+        title: "PDF Birleştirici",
+        subtitle: "PDF dosyalarınızı ekleyin, sıralayın ve tek bir dosya olarak indirin.",
+        dropTitle: "PDF dosyalarını buraya bırakın",
+        dropSubtitle: "veya dosya seçmek için tıklayın",
+        selectFilesAria: "PDF dosyaları seç",
+        empty: "Henüz dosya eklenmedi.",
+        addFile: "Dosya Ekle",
+        clear: "Listeyi Temizle",
+        needTwo: "En Az 2 PDF Ekleyin",
+        mergeCount: "{count} PDF'yi Birleştir",
+        summary: "{count} PDF · Toplam {size}",
+        dragToSort: "Sürükleyerek sırala",
+        moveUp: "Yukarı taşı",
+        moveDown: "Aşağı taşı",
+        remove: "Dosyayı kaldır",
+        invalid: "{count} dosya PDF olmadığı için eklenmedi.",
+        needTwoError: "Birleştirmek için en az iki PDF dosyası ekleyin.",
+        merging: "PDF dosyaları birleştiriliyor…",
+        openError: "\"{name}\" açılamadı. Dosya bozuk veya parola korumalı olabilir.",
+        completed: "Birleştirme tamamlandı. {count} dosya tek PDF olarak indirildi.",
+        unexpected: "PDF'ler birleştirilirken beklenmeyen bir hata oluştu.",
+        privacy: "Gizlilik: Dosyalarınız yalnızca tarayıcınızda işlenir ve herhangi bir sunucuya yüklenmez.",
+        filePrefix: "birlesmis-pdf"
+      },
+      en: {
+        pageTitle: "PDF Merger",
+        description: "Merge PDF files securely in your browser.",
+        language: "Language",
+        theme: "Theme",
+        system: "System",
+        light: "Light",
+        dark: "Dark",
+        title: "PDF Merger",
+        subtitle: "Add, reorder and download your PDF files as a single document.",
+        dropTitle: "Drop PDF files here",
+        dropSubtitle: "or click to choose files",
+        selectFilesAria: "Select PDF files",
+        empty: "No files added yet.",
+        addFile: "Add Files",
+        clear: "Clear List",
+        needTwo: "Add At Least 2 PDFs",
+        mergeCount: "Merge {count} PDFs",
+        summary: "{count} PDFs · Total {size}",
+        dragToSort: "Drag to reorder",
+        moveUp: "Move up",
+        moveDown: "Move down",
+        remove: "Remove file",
+        invalid: "{count} file(s) were skipped because they are not PDFs.",
+        needTwoError: "Add at least two PDF files to merge.",
+        merging: "Merging PDF files…",
+        openError: "\"{name}\" could not be opened. It may be corrupted or password-protected.",
+        completed: "Merge completed. {count} files were downloaded as one PDF.",
+        unexpected: "An unexpected error occurred while merging the PDFs.",
+        privacy: "Privacy: Your files are processed only in your browser and are never uploaded to a server.",
+        filePrefix: "merged-pdf"
+      },
+      de: {
+        pageTitle: "PDF-Zusammenfüger",
+        description: "PDF-Dateien sicher im Browser zusammenführen.",
+        language: "Sprache",
+        theme: "Design",
+        system: "System",
+        light: "Hell",
+        dark: "Dunkel",
+        title: "PDF-Zusammenfüger",
+        subtitle: "PDF-Dateien hinzufügen, sortieren und als eine Datei herunterladen.",
+        dropTitle: "PDF-Dateien hier ablegen",
+        dropSubtitle: "oder klicken, um Dateien auszuwählen",
+        selectFilesAria: "PDF-Dateien auswählen",
+        empty: "Noch keine Dateien hinzugefügt.",
+        addFile: "Dateien hinzufügen",
+        clear: "Liste leeren",
+        needTwo: "Mindestens 2 PDFs hinzufügen",
+        mergeCount: "{count} PDFs zusammenführen",
+        summary: "{count} PDFs · Gesamt {size}",
+        dragToSort: "Zum Sortieren ziehen",
+        moveUp: "Nach oben",
+        moveDown: "Nach unten",
+        remove: "Datei entfernen",
+        invalid: "{count} Datei(en) wurden übersprungen, da sie keine PDFs sind.",
+        needTwoError: "Fügen Sie mindestens zwei PDF-Dateien hinzu.",
+        merging: "PDF-Dateien werden zusammengeführt…",
+        openError: "\"{name}\" konnte nicht geöffnet werden. Die Datei ist möglicherweise beschädigt oder passwortgeschützt.",
+        completed: "Zusammenführung abgeschlossen. {count} Dateien wurden als eine PDF heruntergeladen.",
+        unexpected: "Beim Zusammenführen ist ein unerwarteter Fehler aufgetreten.",
+        privacy: "Datenschutz: Ihre Dateien werden nur im Browser verarbeitet und nie auf einen Server hochgeladen.",
+        filePrefix: "zusammengefuegte-pdf"
+      },
+      fr: {
+        pageTitle: "Fusionneur PDF",
+        description: "Fusionnez des fichiers PDF en toute sécurité dans votre navigateur.",
+        language: "Langue",
+        theme: "Thème",
+        system: "Système",
+        light: "Clair",
+        dark: "Sombre",
+        title: "Fusionneur PDF",
+        subtitle: "Ajoutez, réorganisez et téléchargez vos PDF en un seul document.",
+        dropTitle: "Déposez les fichiers PDF ici",
+        dropSubtitle: "ou cliquez pour choisir des fichiers",
+        selectFilesAria: "Sélectionner des fichiers PDF",
+        empty: "Aucun fichier ajouté.",
+        addFile: "Ajouter des fichiers",
+        clear: "Vider la liste",
+        needTwo: "Ajoutez au moins 2 PDF",
+        mergeCount: "Fusionner {count} PDF",
+        summary: "{count} PDF · Total {size}",
+        dragToSort: "Faire glisser pour réorganiser",
+        moveUp: "Monter",
+        moveDown: "Descendre",
+        remove: "Supprimer le fichier",
+        invalid: "{count} fichier(s) ignoré(s), car ce ne sont pas des PDF.",
+        needTwoError: "Ajoutez au moins deux fichiers PDF à fusionner.",
+        merging: "Fusion des fichiers PDF…",
+        openError: "Impossible d’ouvrir « {name} ». Le fichier est peut-être endommagé ou protégé par mot de passe.",
+        completed: "Fusion terminée. {count} fichiers ont été téléchargés en un seul PDF.",
+        unexpected: "Une erreur inattendue s’est produite pendant la fusion.",
+        privacy: "Confidentialité : vos fichiers sont traités uniquement dans votre navigateur et ne sont jamais envoyés à un serveur.",
+        filePrefix: "pdf-fusionne"
+      },
+      es: {
+        pageTitle: "Unir PDF",
+        description: "Une archivos PDF de forma segura en tu navegador.",
+        language: "Idioma",
+        theme: "Tema",
+        system: "Sistema",
+        light: "Claro",
+        dark: "Oscuro",
+        title: "Unir PDF",
+        subtitle: "Añade, ordena y descarga tus archivos PDF como un solo documento.",
+        dropTitle: "Suelta aquí los archivos PDF",
+        dropSubtitle: "o haz clic para elegir archivos",
+        selectFilesAria: "Seleccionar archivos PDF",
+        empty: "Aún no se han añadido archivos.",
+        addFile: "Añadir archivos",
+        clear: "Limpiar lista",
+        needTwo: "Añade al menos 2 PDF",
+        mergeCount: "Unir {count} PDF",
+        summary: "{count} PDF · Total {size}",
+        dragToSort: "Arrastra para ordenar",
+        moveUp: "Subir",
+        moveDown: "Bajar",
+        remove: "Eliminar archivo",
+        invalid: "Se omitieron {count} archivo(s) porque no son PDF.",
+        needTwoError: "Añade al menos dos archivos PDF para unirlos.",
+        merging: "Uniendo archivos PDF…",
+        openError: "No se pudo abrir «{name}». Puede estar dañado o protegido con contraseña.",
+        completed: "Proceso completado. Se descargaron {count} archivos como un solo PDF.",
+        unexpected: "Ocurrió un error inesperado al unir los PDF.",
+        privacy: "Privacidad: tus archivos se procesan únicamente en el navegador y nunca se suben a un servidor.",
+        filePrefix: "pdf-unido"
+      },
+      it: {
+        pageTitle: "Unisci PDF",
+        description: "Unisci file PDF in modo sicuro nel browser.",
+        language: "Lingua",
+        theme: "Tema",
+        system: "Sistema",
+        light: "Chiaro",
+        dark: "Scuro",
+        title: "Unisci PDF",
+        subtitle: "Aggiungi, riordina e scarica i PDF come un unico documento.",
+        dropTitle: "Trascina qui i file PDF",
+        dropSubtitle: "oppure fai clic per scegliere i file",
+        selectFilesAria: "Seleziona file PDF",
+        empty: "Nessun file aggiunto.",
+        addFile: "Aggiungi file",
+        clear: "Svuota elenco",
+        needTwo: "Aggiungi almeno 2 PDF",
+        mergeCount: "Unisci {count} PDF",
+        summary: "{count} PDF · Totale {size}",
+        dragToSort: "Trascina per riordinare",
+        moveUp: "Sposta su",
+        moveDown: "Sposta giù",
+        remove: "Rimuovi file",
+        invalid: "{count} file ignorato/i perché non sono PDF.",
+        needTwoError: "Aggiungi almeno due file PDF da unire.",
+        merging: "Unione dei file PDF…",
+        openError: "Impossibile aprire «{name}». Il file potrebbe essere danneggiato o protetto da password.",
+        completed: "Unione completata. {count} file sono stati scaricati come un unico PDF.",
+        unexpected: "Si è verificato un errore imprevisto durante l’unione.",
+        privacy: "Privacy: i file vengono elaborati solo nel browser e non vengono mai caricati su un server.",
+        filePrefix: "pdf-unito"
+      },
+      pt: {
+        pageTitle: "Unir PDF",
+        description: "Una arquivos PDF com segurança no navegador.",
+        language: "Idioma",
+        theme: "Tema",
+        system: "Sistema",
+        light: "Claro",
+        dark: "Escuro",
+        title: "Unir PDF",
+        subtitle: "Adicione, reordene e baixe seus PDFs como um único documento.",
+        dropTitle: "Solte os arquivos PDF aqui",
+        dropSubtitle: "ou clique para escolher arquivos",
+        selectFilesAria: "Selecionar arquivos PDF",
+        empty: "Nenhum arquivo adicionado.",
+        addFile: "Adicionar arquivos",
+        clear: "Limpar lista",
+        needTwo: "Adicione pelo menos 2 PDFs",
+        mergeCount: "Unir {count} PDFs",
+        summary: "{count} PDFs · Total {size}",
+        dragToSort: "Arraste para reordenar",
+        moveUp: "Mover para cima",
+        moveDown: "Mover para baixo",
+        remove: "Remover arquivo",
+        invalid: "{count} arquivo(s) ignorado(s) porque não são PDFs.",
+        needTwoError: "Adicione pelo menos dois arquivos PDF para unir.",
+        merging: "Unindo arquivos PDF…",
+        openError: "Não foi possível abrir “{name}”. O arquivo pode estar corrompido ou protegido por senha.",
+        completed: "União concluída. {count} arquivos foram baixados como um único PDF.",
+        unexpected: "Ocorreu um erro inesperado ao unir os PDFs.",
+        privacy: "Privacidade: seus arquivos são processados apenas no navegador e nunca são enviados a um servidor.",
+        filePrefix: "pdf-unido"
+      },
+      ar: {
+        pageTitle: "دمج ملفات PDF",
+        description: "ادمج ملفات PDF بأمان داخل متصفحك.",
+        language: "اللغة",
+        theme: "المظهر",
+        system: "النظام",
+        light: "فاتح",
+        dark: "داكن",
+        title: "دمج ملفات PDF",
+        subtitle: "أضف ملفات PDF ورتّبها ثم نزّلها كملف واحد.",
+        dropTitle: "أفلت ملفات PDF هنا",
+        dropSubtitle: "أو انقر لاختيار الملفات",
+        selectFilesAria: "اختيار ملفات PDF",
+        empty: "لم تتم إضافة ملفات بعد.",
+        addFile: "إضافة ملفات",
+        clear: "مسح القائمة",
+        needTwo: "أضف ملفي PDF على الأقل",
+        mergeCount: "دمج {count} ملفات PDF",
+        summary: "{count} ملفات PDF · الإجمالي {size}",
+        dragToSort: "اسحب لإعادة الترتيب",
+        moveUp: "نقل للأعلى",
+        moveDown: "نقل للأسفل",
+        remove: "إزالة الملف",
+        invalid: "تم تجاهل {count} ملف لأنه ليس PDF.",
+        needTwoError: "أضف ملفي PDF على الأقل للدمج.",
+        merging: "جارٍ دمج ملفات PDF…",
+        openError: "تعذر فتح «{name}». قد يكون الملف تالفًا أو محميًا بكلمة مرور.",
+        completed: "اكتمل الدمج. تم تنزيل {count} ملفات كملف PDF واحد.",
+        unexpected: "حدث خطأ غير متوقع أثناء دمج ملفات PDF.",
+        privacy: "الخصوصية: تتم معالجة ملفاتك داخل المتصفح فقط ولا يتم رفعها إلى أي خادم.",
+        filePrefix: "pdf-merged"
+      }
+    };
+
+    const fileInput = document.getElementById("fileInput");
+    const dropZone = document.getElementById("dropZone");
+    const fileList = document.getElementById("fileList");
+    const summary = document.getElementById("summary");
+    const addMoreButton = document.getElementById("addMoreButton");
+    const clearButton = document.getElementById("clearButton");
+    const mergeButton = document.getElementById("mergeButton");
+    const statusBox = document.getElementById("status");
+    const progress = document.getElementById("progress");
+    const progressBar = document.getElementById("progressBar");
+    const languageSelect = document.getElementById("languageSelect");
+    const themeSelect = document.getElementById("themeSelect");
+    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+    let pdfFiles = [];
+    let draggedId = null;
+    let currentLanguage = "en";
+    let currentTheme = "system";
+    let currentStatus = null;
+
+    function t(key, variables = {}) {
+      const template =
+        translations[currentLanguage]?.[key] ??
+        translations.en[key] ??
+        key;
+
+      return Object.entries(variables).reduce(
+        (text, [name, value]) => text.replaceAll(`{${name}}`, String(value)),
+        template
+      );
+    }
+
+    function detectLanguage() {
+      const saved = localStorage.getItem("pdf-merger-language");
+      if (saved && translations[saved]) return saved;
+
+      const browserLanguages = navigator.languages?.length
+        ? navigator.languages
+        : [navigator.language || "en"];
+
+      for (const language of browserLanguages) {
+        const base = language.toLowerCase().split("-")[0];
+        if (translations[base]) return base;
+      }
+
+      return "en";
+    }
+
+    function applyLanguage(language) {
+      currentLanguage = translations[language] ? language : "en";
+      localStorage.setItem("pdf-merger-language", currentLanguage);
+
+      const isRtl = currentLanguage === "ar";
+      document.documentElement.lang = currentLanguage;
+      document.documentElement.dir = isRtl ? "rtl" : "ltr";
+      languageSelect.value = currentLanguage;
+
+      document.title = t("pageTitle");
+      document.getElementById("metaDescription").content = t("description");
+      document.getElementById("languageLabel").textContent = t("language");
+      document.getElementById("themeLabel").textContent = t("theme");
+      document.getElementById("themeSystemOption").textContent = t("system");
+      document.getElementById("themeLightOption").textContent = t("light");
+      document.getElementById("themeDarkOption").textContent = t("dark");
+      document.getElementById("title").textContent = t("title");
+      document.getElementById("subtitle").textContent = t("subtitle");
+      document.getElementById("dropTitle").textContent = t("dropTitle");
+      document.getElementById("dropSubtitle").textContent = t("dropSubtitle");
+      document.getElementById("privacy").textContent = t("privacy");
+      addMoreButton.textContent = t("addFile");
+      clearButton.textContent = t("clear");
+
+      languageSelect.setAttribute("aria-label", t("language"));
+      themeSelect.setAttribute("aria-label", t("theme"));
+      dropZone.setAttribute("aria-label", t("selectFilesAria"));
+
+      if (currentStatus) {
+        showStatus(currentStatus.key, currentStatus.type, currentStatus.variables);
+      }
+
+      renderFiles();
+    }
+
+    function resolveTheme(theme) {
+      if (theme === "system") {
+        return systemTheme.matches ? "dark" : "light";
+      }
+      return theme;
+    }
+
+    function applyTheme(theme) {
+      currentTheme = ["system", "light", "dark"].includes(theme) ? theme : "system";
+      localStorage.setItem("pdf-merger-theme", currentTheme);
+      themeSelect.value = currentTheme;
+      document.documentElement.dataset.theme = resolveTheme(currentTheme);
+    }
+
+    function createId() {
+      return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function formatBytes(bytes) {
+      if (bytes === 0) return "0 B";
+      const units = ["B", "KB", "MB", "GB"];
+      const index = Math.floor(Math.log(bytes) / Math.log(1024));
+      const formatter = new Intl.NumberFormat(currentLanguage, {
+        maximumFractionDigits: index ? 1 : 0
+      });
+
+      return `${formatter.format(bytes / Math.pow(1024, index))} ${units[index]}`;
+    }
+
+    function showStatus(key, type = "info", variables = {}) {
+      currentStatus = { key, type, variables };
+      statusBox.textContent = t(key, variables);
+      statusBox.className = `status show ${type}`;
+    }
+
+    function hideStatus() {
+      currentStatus = null;
+      statusBox.textContent = "";
+      statusBox.className = "status";
+    }
+
+    function setProgress(percent, visible = true) {
+      progress.classList.toggle("show", visible);
+      progress.setAttribute("aria-hidden", String(!visible));
+      progressBar.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+    }
+
+    function updateControls() {
+      const count = pdfFiles.length;
+      const totalSize = pdfFiles.reduce((sum, item) => sum + item.file.size, 0);
+
+      summary.textContent = count
+        ? t("summary", { count, size: formatBytes(totalSize) })
+        : t("empty");
+
+      clearButton.disabled = count === 0;
+      mergeButton.disabled = count < 2;
+      mergeButton.textContent = count < 2
+        ? t("needTwo")
+        : t("mergeCount", { count });
+    }
+
+    function renderFiles() {
+      fileList.innerHTML = "";
+
+      pdfFiles.forEach((item, index) => {
+        const li = document.createElement("li");
+        li.className = "file-item";
+        li.draggable = true;
+        li.dataset.id = item.id;
+
+        const handle = document.createElement("span");
+        handle.className = "drag-handle";
+        handle.title = t("dragToSort");
+        handle.setAttribute("aria-hidden", "true");
+        handle.textContent = "⋮⋮";
+
+        const info = document.createElement("div");
+        info.className = "file-info";
+
+        const name = document.createElement("div");
+        name.className = "file-name";
+        name.title = item.file.name;
+        name.textContent = `${index + 1}. ${item.file.name}`;
+
+        const meta = document.createElement("div");
+        meta.className = "file-meta";
+        meta.textContent = formatBytes(item.file.size);
+
+        info.append(name, meta);
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const upButton = createIconButton("↑", t("moveUp"), index === 0, () => {
+          moveFile(index, index - 1);
+        });
+
+        const downButton = createIconButton(
+          "↓",
+          t("moveDown"),
+          index === pdfFiles.length - 1,
+          () => moveFile(index, index + 1)
+        );
+
+        const removeButton = createIconButton("×", t("remove"), false, () => {
+          pdfFiles = pdfFiles.filter((file) => file.id !== item.id);
+          hideStatus();
+          renderFiles();
+        });
+        removeButton.classList.add("remove");
+
+        actions.append(upButton, downButton, removeButton);
+        li.append(handle, info, actions);
+
+        li.addEventListener("dragstart", () => {
+          draggedId = item.id;
+          li.classList.add("dragging");
+        });
+
+        li.addEventListener("dragend", () => {
+          draggedId = null;
+          li.classList.remove("dragging");
+          document
+            .querySelectorAll(".file-item")
+            .forEach((element) => element.classList.remove("drag-target"));
+        });
+
+        li.addEventListener("dragover", (event) => {
+          event.preventDefault();
+          if (draggedId && draggedId !== item.id) {
+            li.classList.add("drag-target");
+          }
+        });
+
+        li.addEventListener("dragleave", () => {
+          li.classList.remove("drag-target");
+        });
+
+        li.addEventListener("drop", (event) => {
+          event.preventDefault();
+          li.classList.remove("drag-target");
+
+          const fromIndex = pdfFiles.findIndex((file) => file.id === draggedId);
+          const toIndex = pdfFiles.findIndex((file) => file.id === item.id);
+
+          if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
+            moveFile(fromIndex, toIndex);
+          }
+        });
+
+        fileList.appendChild(li);
+      });
+
+      updateControls();
+    }
+
+    function createIconButton(text, label, disabled, handler) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "icon-button";
+      button.textContent = text;
+      button.title = label;
+      button.setAttribute("aria-label", label);
+      button.disabled = disabled;
+      button.addEventListener("click", handler);
+      return button;
+    }
+
+    function moveFile(fromIndex, toIndex) {
+      if (
+        fromIndex < 0 ||
+        toIndex < 0 ||
+        fromIndex >= pdfFiles.length ||
+        toIndex >= pdfFiles.length
+      ) {
+        return;
+      }
+
+      const [moved] = pdfFiles.splice(fromIndex, 1);
+      pdfFiles.splice(toIndex, 0, moved);
+      renderFiles();
+    }
+
+    function isPdf(file) {
+      return (
+        file.type === "application/pdf" ||
+        file.name.toLowerCase().endsWith(".pdf")
+      );
+    }
+
+    function addFiles(fileCollection) {
+      const incomingFiles = Array.from(fileCollection);
+      const validFiles = incomingFiles.filter(isPdf);
+      const invalidCount = incomingFiles.length - validFiles.length;
+
+      const newItems = validFiles.map((file) => ({
+        id: createId(),
+        file
+      }));
+
+      pdfFiles.push(...newItems);
+      fileInput.value = "";
+
+      if (invalidCount > 0) {
+        showStatus("invalid", "error", { count: invalidCount });
+      } else if (newItems.length > 0) {
+        hideStatus();
+      }
+
+      renderFiles();
+    }
+
+    async function mergePdfs() {
+      if (pdfFiles.length < 2) {
+        showStatus("needTwoError", "error");
+        return;
+      }
+
+      mergeButton.disabled = true;
+      clearButton.disabled = true;
+      addMoreButton.disabled = true;
+      fileInput.disabled = true;
+      showStatus("merging", "info");
+      setProgress(0);
+
+      try {
+        const mergedPdf = await PDFDocument.create();
+
+        for (let i = 0; i < pdfFiles.length; i++) {
+          const current = pdfFiles[i];
+          const bytes = await current.file.arrayBuffer();
+
+          let sourcePdf;
+          try {
+            sourcePdf = await PDFDocument.load(bytes, {
+              ignoreEncryption: false
+            });
+          } catch (error) {
+            const translatedError = new Error(
+              t("openError", { name: current.file.name })
+            );
+            translatedError.isTranslated = true;
+            throw translatedError;
+          }
+
+          const copiedPages = await mergedPdf.copyPages(
+            sourcePdf,
+            sourcePdf.getPageIndices()
+          );
+
+          copiedPages.forEach((page) => mergedPdf.addPage(page));
+          setProgress(((i + 1) / pdfFiles.length) * 90);
+        }
+
+        const mergedBytes = await mergedPdf.save();
+        setProgress(100);
+
+        const blob = new Blob([mergedBytes], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        const timestamp = new Date()
+          .toISOString()
+          .replace(/[:.]/g, "-")
+          .slice(0, 19);
+
+        link.href = url;
+        link.download = `${t("filePrefix")}-${timestamp}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+        showStatus("completed", "success", { count: pdfFiles.length });
+      } catch (error) {
+        console.error(error);
+
+        if (error?.isTranslated) {
+          currentStatus = null;
+          statusBox.textContent = error.message;
+          statusBox.className = "status show error";
+        } else {
+          showStatus("unexpected", "error");
+        }
+      } finally {
+        mergeButton.disabled = pdfFiles.length < 2;
+        clearButton.disabled = pdfFiles.length === 0;
+        addMoreButton.disabled = false;
+        fileInput.disabled = false;
+
+        window.setTimeout(() => {
+          setProgress(0, false);
+        }, 900);
+
+        updateControls();
+      }
+    }
+
+    languageSelect.addEventListener("change", (event) => {
+      applyLanguage(event.target.value);
+    });
+
+    themeSelect.addEventListener("change", (event) => {
+      applyTheme(event.target.value);
+    });
+
+    systemTheme.addEventListener("change", () => {
+      if (currentTheme === "system") {
+        document.documentElement.dataset.theme = resolveTheme("system");
+      }
+    });
+
+    dropZone.addEventListener("click", () => fileInput.click());
+
+    dropZone.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        fileInput.click();
+      }
+    });
+
+    addMoreButton.addEventListener("click", () => fileInput.click());
+
+    fileInput.addEventListener("change", (event) => {
+      addFiles(event.target.files);
+    });
+
+    ["dragenter", "dragover"].forEach((eventName) => {
+      dropZone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        dropZone.classList.add("dragover");
+      });
+    });
+
+    ["dragleave", "drop"].forEach((eventName) => {
+      dropZone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        dropZone.classList.remove("dragover");
+      });
+    });
+
+    dropZone.addEventListener("drop", (event) => {
+      addFiles(event.dataTransfer.files);
+    });
+
+    clearButton.addEventListener("click", () => {
+      pdfFiles = [];
+      hideStatus();
+      setProgress(0, false);
+      renderFiles();
+    });
+
+    mergeButton.addEventListener("click", mergePdfs);
+
+    currentTheme = localStorage.getItem("pdf-merger-theme") || "system";
+    applyTheme(currentTheme);
+    applyLanguage(detectLanguage());
+  </script>
+</body>
+</html>

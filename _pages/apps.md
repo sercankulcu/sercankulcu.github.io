@@ -11,6 +11,8 @@ author_profile: true
     }
   </style>
 
+
+<button onclick="location.href='../apps/pdf-merger.html'"> ✨ PDF MERGE</button> 
 <button onclick="location.href='https://dorukdayim.netlify.app'">🧠 DORUKDAYIM</button> 
 <button onclick="location.href='../game/car-race.html'">🏁🏎️💨 CAR RACE</button> 
 <button onclick="location.href='../game/yazitura.html'">🪙 YAZI TURA</button> 
