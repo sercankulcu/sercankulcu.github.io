@@ -3,7 +3,7 @@ title: "Microprocessors"
 collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/microprocessors
-venue: "University of Giresun, Department of Electrical Electronics Engineering"
+venue: "Giresun University, Department of Electrical Electronics Engineering"
 date: 2024-01-05
 location: "Giresun, Turkey"
 ---

@@ -3,7 +3,7 @@ title: "Object Oriented Programming with Java Advanced"
 collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/object-oriented-programming-with-java-advanced
-venue: "University of Giresun, Department of Computer Engineering"
+venue: "Giresun University, Department of Computer Engineering"
 date: 2021-07-07
 location: "Giresun, Turkey"
 ---

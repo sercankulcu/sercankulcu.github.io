@@ -3,7 +3,7 @@ title: "Wireless Sensor Networks"
 collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/wireless-sensor-networks
-venue: "University of Giresun, Department of Computer Engineering"
+venue: "Giresun University, Department of Computer Engineering"
 date: 2019-01-01
 location: "Giresun, Turkey"
 ---

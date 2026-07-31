@@ -3,7 +3,7 @@ title: "Operating Systems"
 collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/operating-systems
-venue: "University of Giresun, Department of Computer Engineering"
+venue: "Giresun University, Department of Computer Engineering"
 date: 2026-01-06
 location: "Giresun, Turkey"
 ---

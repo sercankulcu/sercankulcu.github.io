@@ -1,7 +1,7 @@
 ---
-title: 'How AI Shape the Future of Coding'
+title: 'How AI Shapes the Future of Coding'
 date: 2025-02-07
-permalink: /posts/2025/02/how-ai-shape-the-future-of-coding/
+permalink: /posts/2025/02/how-ai-shapes-the-future-of-coding/
 tags:
   - career
 ---
