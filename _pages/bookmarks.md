@@ -2,17 +2,9 @@
 layout: single
 permalink: /bookmarks/
 title: "Bookmarks"
-author_profile: false
+author_profile: true
 redirect_from: 
 ---
-
----
-
-layout: single
-permalink: /bookmarks/
-title: "Yer İmleri"
-author_profile: false
----------------------
 
 Sık kullandığım yapay zekâ, akademik araştırma, yazılım geliştirme, belge düzenleme ve üretkenlik araçları.
 
