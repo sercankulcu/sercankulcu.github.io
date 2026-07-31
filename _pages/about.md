@@ -35,9 +35,7 @@ window.addEventListener("appinstalled", () => {
 });
 </script>
 
-Learn about my <button onclick="location.href='teaching'"> 📚 teaching </button> experience, materials, and educational contributions. 
-
-Learn about my [📚 teaching](/teaching/) experience, materials, and educational contributions.
+Learn about my <button onclick="/teaching/"> 📚 teaching </button> experience, materials, and educational contributions. 
 
 Check out the small <button onclick="location.href='apps'">📱 apps</button> and <button onclick="location.href='https://dorukdayim.netlify.app'">🧠 games</button> I've developed with Javascript in my free time. 
 
