@@ -13,6 +13,7 @@ author_profile: true
 
 
 <button onclick="location.href='../apps/pdf-merger.html'"> ✨ PDF MERGE</button> 
+<button onclick="location.href='../apps/generate-track-changes.html'"> ✨ TRACK CHANGES (DOCX)</button> 
 <button onclick="location.href='https://dorukdayim.netlify.app'">🧠 DORUKDAYIM</button> 
 <button onclick="location.href='../game/car-race.html'">🏁🏎️💨 CAR RACE</button> 
 <button onclick="location.href='../game/yazitura.html'">🪙 YAZI TURA</button> 
