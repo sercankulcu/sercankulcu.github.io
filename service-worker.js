@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "my-pwa-sercan-cache-";
-const CACHE_VERSION = "v22";
+const CACHE_VERSION = "v23";
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
@@ -58,13 +58,13 @@ self.addEventListener("fetch", event => {
 
   const url = new URL(request.url);
 
-  // Sadece sitenin kendi kaynaklarını cache'le.
+  // Cache only resources from this website.
   if (url.origin !== self.location.origin) {
     return;
   }
 
-  // Tarayıcı gezinmeleri genellikle .html uzantısı içermez.
-  // Bu nedenle navigate isteklerini ayrıca yakalıyoruz.
+  // Browser navigation requests usually do not include the .html extension.
+  // Therefore, navigation requests are handled separately.
   if (request.mode === "navigate") {
     event.respondWith(networkFirstAndCache(request));
     return;
@@ -72,7 +72,7 @@ self.addEventListener("fetch", event => {
 
   const pathname = url.pathname.toLowerCase();
 
-  // Doğrudan istenen .html dosyaları da network-first olsun.
+  // Handle directly requested .html files with a network-first strategy.
   if (pathname.endsWith(".html")) {
     event.respondWith(networkFirstAndCache(request));
     return;
@@ -88,9 +88,9 @@ self.addEventListener("fetch", event => {
 });
 
 /**
- * Önce ağı dener.
- * Başarılı yanıtı cache'e kaydeder.
- * Ağ yoksa cache'deki HTML sayfasını döndürür.
+ * Tries the network first.
+ * Stores successful responses in the cache.
+ * Returns the cached HTML page when the network is unavailable.
  */
 async function networkFirstAndCache(request) {
   const cache = await caches.open(CACHE_NAME);
@@ -112,15 +112,15 @@ async function networkFirstAndCache(request) {
 
     return new Response(
       `<!doctype html>
-      <html lang="tr">
+      <html lang="en">
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1">
-          <title>Çevrimdışı</title>
+          <title>Offline</title>
         </head>
         <body>
-          <h1>İnternet bağlantısı bulunamadı</h1>
-          <p>Bu sayfa daha önce cache'e alınmamış.</p>
+          <h1>No internet connection</h1>
+          <p>This page has not been cached previously.</p>
         </body>
       </html>`,
       {
@@ -134,10 +134,11 @@ async function networkFirstAndCache(request) {
 }
 
 /**
- * Cache varsa hemen döndürür.
- * Aynı anda ağdan yeni sürümü indirip cache'i günceller.
+ * Returns the cached response immediately when available.
+ * At the same time, fetches the latest version from the network
+ * and updates the cache in the background.
  *
- * PDF, CSS, JavaScript, görsel ve fontlar için kullanılır.
+ * Used for PDF, CSS, JavaScript, image, and font files.
  */
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(CACHE_NAME);
@@ -163,7 +164,7 @@ async function staleWhileRevalidate(request) {
     return networkResponse;
   }
 
-  return new Response("Kaynak yüklenemedi.", {
+  return new Response("The requested resource could not be loaded.", {
     status: 503,
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
