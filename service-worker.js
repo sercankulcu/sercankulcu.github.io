@@ -1,9 +1,9 @@
 const CACHE_PREFIX = "my-pwa-sercan-cache-";
-const CACHE_VERSION = "v23";
+const CACHE_VERSION = "v24";
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
-  "/images/owl-coffee-beans.png",
+  "/images/owl-coffee-beans.webp",
 ];
 
 const CACHEABLE_EXTENSIONS = [
