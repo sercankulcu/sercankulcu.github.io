@@ -1,13 +1,14 @@
-const CACHE_VERSION = "v20";
-const CACHE_NAME = `my-pwa-sercan-cache-${CACHE_VERSION}`;
-const MAX_CACHE_ITEMS = 60;
+const CACHE_PREFIX = "my-pwa-sercan-cache-";
+const CACHE_VERSION = "v22";
+const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
   "/images/owl-coffee-beans.png",
 ];
 
-// Yalnızca bu dosya türleri runtime cache'e alınır.
 const CACHEABLE_EXTENSIONS = [
+  ".html",
+  ".pdf",
   ".css",
   ".js",
   ".png",
@@ -31,46 +32,54 @@ self.addEventListener("install", event => {
 
 self.addEventListener("activate", event => {
   event.waitUntil(
-    Promise.all([
-      // Eski cache sürümlerini temizle.
-      caches.keys().then(cacheNames =>
+    caches
+      .keys()
+      .then(cacheNames =>
         Promise.all(
           cacheNames
-            .filter(cacheName => cacheName !== CACHE_NAME)
+            .filter(
+              cacheName =>
+                cacheName.startsWith(CACHE_PREFIX) &&
+                cacheName !== CACHE_NAME
+            )
             .map(cacheName => caches.delete(cacheName))
         )
-      ),
-
-      // Yeni service worker'ı açık sekmelerde etkinleştir.
-      self.clients.claim(),
-    ])
+      )
+      .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener("fetch", event => {
   const request = event.request;
 
-  // POST, PUT vb. istekleri cache'leme.
   if (request.method !== "GET") {
     return;
   }
 
   const url = new URL(request.url);
 
-  // Üçüncü taraf kaynakları cache'leme.
+  // Sadece sitenin kendi kaynaklarını cache'le.
   if (url.origin !== self.location.origin) {
     return;
   }
 
-  // HTML ve sayfa gezinmelerinde network-first kullan.
+  // Tarayıcı gezinmeleri genellikle .html uzantısı içermez.
+  // Bu nedenle navigate isteklerini ayrıca yakalıyoruz.
   if (request.mode === "navigate") {
-    event.respondWith(networkFirst(request));
+    event.respondWith(networkFirstAndCache(request));
     return;
   }
 
-  // Yalnızca belirlenen statik dosya türlerini cache'le.
+  const pathname = url.pathname.toLowerCase();
+
+  // Doğrudan istenen .html dosyaları da network-first olsun.
+  if (pathname.endsWith(".html")) {
+    event.respondWith(networkFirstAndCache(request));
+    return;
+  }
+
   const shouldCache = CACHEABLE_EXTENSIONS.some(extension =>
-    url.pathname.toLowerCase().endsWith(extension)
+    pathname.endsWith(extension)
   );
 
   if (shouldCache) {
@@ -78,26 +87,58 @@ self.addEventListener("fetch", event => {
   }
 });
 
-async function networkFirst(request) {
+/**
+ * Önce ağı dener.
+ * Başarılı yanıtı cache'e kaydeder.
+ * Ağ yoksa cache'deki HTML sayfasını döndürür.
+ */
+async function networkFirstAndCache(request) {
+  const cache = await caches.open(CACHE_NAME);
+
   try {
-    return await fetch(request);
+    const networkResponse = await fetch(request);
+
+    if (isCacheableResponse(networkResponse)) {
+      await cache.put(request, networkResponse.clone());
+    }
+
+    return networkResponse;
   } catch {
-    // Ağ yoksa daha önce özellikle cache'lenmiş bir yanıtı kullan.
-    const cachedResponse = await caches.match(request);
+    const cachedResponse = await cache.match(request);
 
     if (cachedResponse) {
       return cachedResponse;
     }
 
-    return new Response("İnternet bağlantısı bulunamadı.", {
-      status: 503,
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-      },
-    });
+    return new Response(
+      `<!doctype html>
+      <html lang="tr">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Çevrimdışı</title>
+        </head>
+        <body>
+          <h1>İnternet bağlantısı bulunamadı</h1>
+          <p>Bu sayfa daha önce cache'e alınmamış.</p>
+        </body>
+      </html>`,
+      {
+        status: 503,
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+        },
+      }
+    );
   }
 }
 
+/**
+ * Cache varsa hemen döndürür.
+ * Aynı anda ağdan yeni sürümü indirip cache'i günceller.
+ *
+ * PDF, CSS, JavaScript, görsel ve fontlar için kullanılır.
+ */
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(CACHE_NAME);
   const cachedResponse = await cache.match(request);
@@ -106,14 +147,12 @@ async function staleWhileRevalidate(request) {
     .then(async response => {
       if (isCacheableResponse(response)) {
         await cache.put(request, response.clone());
-        await limitCacheSize(cache, MAX_CACHE_ITEMS);
       }
 
       return response;
     })
     .catch(() => null);
 
-  // Cache varsa hemen göster, arkada güncelle.
   if (cachedResponse) {
     return cachedResponse;
   }
@@ -138,13 +177,4 @@ function isCacheableResponse(response) {
     response.status === 200 &&
     response.type === "basic"
   );
-}
-
-async function limitCacheSize(cache, maxItems) {
-  const keys = await cache.keys();
-
-  while (keys.length > maxItems) {
-    const oldestRequest = keys.shift();
-    await cache.delete(oldestRequest);
-  }
 }
