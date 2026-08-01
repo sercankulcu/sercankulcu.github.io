@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "my-pwa-sercan-cache-";
-const CACHE_VERSION = "v25";
+const CACHE_VERSION = "v26";
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
