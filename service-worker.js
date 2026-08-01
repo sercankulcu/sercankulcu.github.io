@@ -1,66 +1,150 @@
-// Define a unique version for the cache
-const CACHE_VERSION = 'v19';
-const CACHE_NAME = 'my-pwa-sercan-cache-' + CACHE_VERSION;
+const CACHE_VERSION = "v20";
+const CACHE_NAME = `my-pwa-sercan-cache-${CACHE_VERSION}`;
+const MAX_CACHE_ITEMS = 60;
 
-// List of URLs to cache
-const urlsToCache = [
-  '/images/owl-coffee-beans.png',
-  // Add more URLs to cache as needed
+const PRECACHE_URLS = [
+  "/images/owl-coffee-beans.png",
 ];
 
-// Event: Install
-self.addEventListener('install', event => {
+// Yalnızca bu dosya türleri runtime cache'e alınır.
+const CACHEABLE_EXTENSIONS = [
+  ".css",
+  ".js",
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".webp",
+  ".svg",
+  ".gif",
+  ".woff",
+  ".woff2",
+];
+
+self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
+    caches
+      .open(CACHE_NAME)
+      .then(cache => cache.addAll(PRECACHE_URLS))
       .then(() => self.skipWaiting())
   );
 });
 
-// Event: Activate
-self.addEventListener('activate', event => {
+self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            // Delete outdated caches
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    Promise.all([
+      // Eski cache sürümlerini temizle.
+      caches.keys().then(cacheNames =>
+        Promise.all(
+          cacheNames
+            .filter(cacheName => cacheName !== CACHE_NAME)
+            .map(cacheName => caches.delete(cacheName))
+        )
+      ),
+
+      // Yeni service worker'ı açık sekmelerde etkinleştir.
+      self.clients.claim(),
+    ])
   );
 });
 
-// Event: Fetch
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      // Cache hit - return the cached response
-      if (response) {
-        //return response;
+self.addEventListener("fetch", event => {
+  const request = event.request;
+
+  // POST, PUT vb. istekleri cache'leme.
+  if (request.method !== "GET") {
+    return;
+  }
+
+  const url = new URL(request.url);
+
+  // Üçüncü taraf kaynakları cache'leme.
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
+  // HTML ve sayfa gezinmelerinde network-first kullan.
+  if (request.mode === "navigate") {
+    event.respondWith(networkFirst(request));
+    return;
+  }
+
+  // Yalnızca belirlenen statik dosya türlerini cache'le.
+  const shouldCache = CACHEABLE_EXTENSIONS.some(extension =>
+    url.pathname.toLowerCase().endsWith(extension)
+  );
+
+  if (shouldCache) {
+    event.respondWith(staleWhileRevalidate(request));
+  }
+});
+
+async function networkFirst(request) {
+  try {
+    return await fetch(request);
+  } catch {
+    // Ağ yoksa daha önce özellikle cache'lenmiş bir yanıtı kullan.
+    const cachedResponse = await caches.match(request);
+
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    return new Response("İnternet bağlantısı bulunamadı.", {
+      status: 503,
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+      },
+    });
+  }
+}
+
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cachedResponse = await cache.match(request);
+
+  const networkResponsePromise = fetch(request)
+    .then(async response => {
+      if (isCacheableResponse(response)) {
+        await cache.put(request, response.clone());
+        await limitCacheSize(cache, MAX_CACHE_ITEMS);
       }
 
-      // Clone the request since it's a one-time use
-      const fetchRequest = event.request.clone();
-
-      return fetch(fetchRequest).then(response => {
-        // Check if we received a valid response
-        if (!response || response.status !== 200 || response.type !== 'basic') {
-          return response;
-        }
-
-        // Clone the response since it's a one-time use
-        const responseToCache = response.clone();
-
-        // Open the cache and add the new response
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, responseToCache);
-        });
-
-        return response;
-      });
+      return response;
     })
+    .catch(() => null);
+
+  // Cache varsa hemen göster, arkada güncelle.
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+
+  const networkResponse = await networkResponsePromise;
+
+  if (networkResponse) {
+    return networkResponse;
+  }
+
+  return new Response("Kaynak yüklenemedi.", {
+    status: 503,
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+    },
+  });
+}
+
+function isCacheableResponse(response) {
+  return (
+    response &&
+    response.status === 200 &&
+    response.type === "basic"
   );
-});
+}
+
+async function limitCacheSize(cache, maxItems) {
+  const keys = await cache.keys();
+
+  while (keys.length > maxItems) {
+    const oldestRequest = keys.shift();
+    await cache.delete(oldestRequest);
+  }
+}
