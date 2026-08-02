@@ -39,21 +39,21 @@ Learn about my <a class="btn btn--inverse" href="/teaching/">
   📚 Teaching
 </a> experience, materials, and educational contributions. 
 
-Check out the small <a class="btn btn--light-outline" href="/apps/">
+Check out the small <a class="btn btn--inverse" href="/apps/">
   📱 apps
-</a> and <a class="btn btn--info" href="https://dorukdayim.netlify.app">
+</a> and <a class="btn btn--inverse" href="https://dorukdayim.netlify.app">
   🧠 games
 </a> I've developed with JavaScript in my free time. 
 
-Explore my <a class="btn btn--success" href="/cv/">
+Explore my <a class="btn btn--inverse" href="/cv/">
   📄 resume
 </a> to learn about my education, professional experience, and skills. 
 
-Discover my curated collection of <a class="btn btn--small" href="/bookmarks/">
+Discover my curated collection of <a class="btn btn--inverse" href="/bookmarks/">
   🔖 bookmarks
 </a>, featuring useful resources and interesting content. 
 
-Read my <a class="btn btn--primary" href="/posts/">
+Read my <a class="btn btn--inverse" href="/posts/">
   📝 blog posts
 </a> where I share insights, experiences, and ideas on various topics. 
 
