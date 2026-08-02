@@ -35,21 +35,21 @@ window.addEventListener("appinstalled", () => {
 });
 </script>
 
-Learn about my <a class="btn btn--primary" href="/teaching/">
+Learn about my <a class="btn btn--inverse" href="/teaching/">
   📚 Teaching
 </a> experience, materials, and educational contributions. 
 
-Check out the small <a class="btn btn--primary" href="/apps/">
+Check out the small <a class="btn btn--light-outline" href="/apps/">
   📱 apps
-</a> and <a class="btn btn--primary" href="https://dorukdayim.netlify.app">
+</a> and <a class="btn btn--info" href="https://dorukdayim.netlify.app">
   🧠 games
 </a> I've developed with JavaScript in my free time. 
 
-Explore my <a class="btn btn--primary" href="/cv/">
+Explore my <a class="btn btn--success" href="/cv/">
   📄 resume
 </a> to learn about my education, professional experience, and skills. 
 
-Discover my curated collection of <a class="btn btn--primary" href="/bookmarks/">
+Discover my curated collection of <a class="btn btn--small" href="/bookmarks/">
   🔖 bookmarks
 </a>, featuring useful resources and interesting content. 
 
