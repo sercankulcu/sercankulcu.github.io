@@ -37,6 +37,10 @@ window.addEventListener("appinstalled", () => {
 
 Learn about my <button onclick="location.href='teaching'"> 📚 teaching </button> experience, materials, and educational contributions. 
 
+<a class="btn btn--primary" href="/teaching/">
+  📚 Teaching
+</a>
+
 Check out the small <button onclick="location.href='apps'">📱 apps</button> and <button onclick="location.href='https://dorukdayim.netlify.app'">🧠 games</button> I've developed with JavaScript in my free time. 
 
 Explore my <button onclick="location.href='cv'">📄 resume</button> to learn about my education, professional experience, and skills. 
