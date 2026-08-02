@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "my-pwa-sercan-cache-";
-const CACHE_VERSION = "v27";
+const CACHE_VERSION = "v28";
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
@@ -57,6 +57,10 @@ self.addEventListener("fetch", event => {
   }
 
   const url = new URL(request.url);
+
+  if (url.pathname.includes("service-worker.js")) {
+    return; // Tarayıcının varsayılan güncelleme davranışına bırak.
+  }
 
   // Cache only resources from this website.
   if (url.origin !== self.location.origin) {
