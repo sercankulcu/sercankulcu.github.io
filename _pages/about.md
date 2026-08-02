@@ -35,19 +35,27 @@ window.addEventListener("appinstalled", () => {
 });
 </script>
 
-Learn about my <button onclick="location.href='teaching'"> 📚 teaching </button> experience, materials, and educational contributions. 
-
-<a class="btn btn--primary" href="/teaching/">
+Learn about my <a class="btn btn--primary" href="/teaching/">
   📚 Teaching
-</a>
+</a> experience, materials, and educational contributions. 
 
-Check out the small <button onclick="location.href='apps'">📱 apps</button> and <button onclick="location.href='https://dorukdayim.netlify.app'">🧠 games</button> I've developed with JavaScript in my free time. 
+Check out the small <a class="btn btn--primary" href="/apps/">
+  📱 apps
+</a> and <a class="btn btn--primary" href="https://dorukdayim.netlify.app">
+  🧠 games
+</a> I've developed with JavaScript in my free time. 
 
-Explore my <button onclick="location.href='cv'">📄 resume</button> to learn about my education, professional experience, and skills. 
+Explore my <a class="btn btn--primary" href="/cv/">
+  📄 resume
+</a> to learn about my education, professional experience, and skills. 
 
-Discover my curated collection of <button onclick="location.href='bookmarks'">🔖 bookmarks</button>, featuring useful resources and interesting content. 
+Discover my curated collection of <a class="btn btn--primary" href="/bookmarks/">
+  🔖 bookmarks
+</a>, featuring useful resources and interesting content. 
 
-Read my <button onclick="location.href='posts'">📝 blog posts</button> where I share insights, experiences, and ideas on various topics. 
+Read my <a class="btn btn--primary" href="/posts/">
+  📝 blog posts
+</a> where I share insights, experiences, and ideas on various topics. 
 
 **Note:** If any licensed content is found on the website, please don't hesitate to contact me via the links on the left-hand side. You can be sure that any related content will be quickly removed within 24 hours.
 
