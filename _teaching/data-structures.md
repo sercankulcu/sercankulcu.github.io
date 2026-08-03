@@ -4,12 +4,12 @@ collection: teaching
 type: "Undergraduate course"
 permalink: /teaching/data-structures
 venue: "Giresun University, Department of Computer Engineering"
-date: 2025-09-14
+date: 2026-09-14
 location: "Giresun, Turkey"
 ---
 
 ![data structure](/images/teaching/data-structures-course.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
-Data structures are fundamental components in computer science, serving as the building blocks for organizing, managing, and storing data efficiently. They enable the systematic arrangement of data to facilitate various operations such as searching, sorting, inserting, and deleting. Common data structures include arrays, linked lists, stacks, queues, trees, and graphs, each with unique properties and use cases. These fundamental concepts are the cornerstone of computer science and programming, and a deep understanding of them empowers us to write more efficient, organized, and robust code.
+Data structures provide systematic ways to organize, store, and access data. Choosing an appropriate structure directly affects the efficiency of operations such as searching, insertion, deletion, and traversal. This course examines arrays, linked structures, stacks, queues, trees, hash tables, graphs, and sets, with an emphasis on their implementations, complexity, and practical applications.
 
 ## Ders Öğretim Planı  
 [Ders Öğretim Planı (PDF)](../files/data_structures/slides/Bolum_00_Ders_Ogretim_Planı.pdf)
@@ -18,9 +18,11 @@ Data structures are fundamental components in computer science, serving as the b
 
 ## Announcements  
 
+There are currently no announcements.
+
 ---
 
-## The resources  
+## Course resources  
 
 - **books**  
   [Data Structures and Algorithms in Java by Goodrich](https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635) | 
@@ -78,7 +80,7 @@ Data structures are the backbone of computer science, serving as the fundamental
 - [🖼️Sunum-Giriş (PDF)](../files/data_structures/slides/Bolum_01_Giris.pdf)  
 - [🕹️Data Structures (HTML)](../files/data_structures/slides/Bolum_01_Intro.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_01_Introduction.pdf)  
-- [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src)  
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src)  
 
 ---
 
@@ -89,7 +91,7 @@ Arrays are like the bread and butter of programming. An array is the most fundam
 - [🖼️Sunum-Diziler (PDF)](../files/data_structures/slides/Bolum_02_Diziler.pdf)  
 - [🕹️Array Simulator (HTML)](../files/data_structures/slides/Bolum_02_Arrays.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf)  
-- [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders02/src)  
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders02/src)  
 
 ---
 
@@ -100,7 +102,7 @@ Linked lists are dynamic and flexible data structures that consist of nodes conn
 - [🖼️Sunum-Bağlı-Liste (PDF)](../files/data_structures/slides/Bolum_03_Bagli_Liste.pdf)  
 - [🕹️Linked List Simulator (HTML)](../files/data_structures/slides/Bolum_03_Linked_List.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_02_Arrays_Linked_Lists.pdf)  
-- [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders03/src)  
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders03/src)  
 
 ---
 
@@ -116,7 +118,7 @@ A stack operates on the Last-In-First-Out (LIFO) principle, much like a stack of
   - [Infix to Prefix](../files/data_structures/slides/Bolum_04_Infix_to_Prefix.html)
   - [Infix to Postfix](../files/data_structures/slides/Bolum_04_Infix_to_Postfix.html)
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf)  
-- [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders04/src)  
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders04/src)  
 
 ---
 
@@ -130,35 +132,35 @@ A queue follows the First-In-First-Out (FIFO) principle, similar to a line of pe
   - [Scheduler](../files/data_structures/slides/Bolum_05_Scheduler.html)
   - [Priority Scheduler](../files/data_structures/slides/Bolum_05_Priority_Scheduler.html)
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_03_Stacks_Queues_Deques.pdf)  
-- [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders05/src)  
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders05/src)  
 
 ---
 
-## Chapter 6: Lists
+## Chapter 6: The List ADT and Java List Implementations
 
-A list is a versatile data structure that can be implemented in various ways, typically as a dynamic array or linked list. Unlike fixed-size arrays, lists can grow or shrink as needed, making them extremely flexible for storing collections of data. They support operations like insertion, deletion, and traversal, and are particularly useful when you need a sequence of elements but don't know the size in advance. Most modern programming languages provide built-in list implementations with rich functionality.
+A list is a versatile data structure that can be implemented in various ways, typically as a dynamic array or linked list. Unlike fixed-size arrays, lists can grow or shrink as needed, making them extremely flexible for storing collections of data. They support operations like insertion, deletion, and traversal, and are particularly useful when you need a sequence of elements but don't know the size in advance. Most modern programming languages provide built-in list implementations with rich functionality. A list is an abstract data type representing an ordered sequence. It may be implemented using a dynamic array, linked structure, or another underlying representation. In Java, common implementations include ArrayList and LinkedList.
 
 - [🖼️Sunum-Liste (PDF)](../files/data_structures/slides/Bolum_06_Liste.pdf)
 - [🖼️Sunum-Sorular (PDF)](../files/data_structures/slides/Bolum_06_Sorular.pdf)
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_04_Lists.pdf)
-- [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders06/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders06/src)
 
 ---
 
 ## Chapter 7: Trees  
 
-A tree is a hierarchical data structure composed of nodes connected by edges, similar to a family tree or organizational chart. Each node can have multiple children but only one parent, creating a branching structure that starts from a root node. Trees are invaluable for representing hierarchical relationships, such as file systems, HTML DOM, or category classifications. They provide efficient operations for insertion, deletion, and searching, particularly when balanced properly. Trees consist of nodes connected in a hierarchical and branched structure, allowing us to represent complex relationships between data elements. 
+A tree is a hierarchical data structure composed of nodes connected by edges, similar to a family tree or organizational chart. Each node can have multiple children but only one parent, creating a branching structure that starts from a root node. Trees are invaluable for representing hierarchical relationships, such as file systems, HTML DOM, or category classifications. They provide efficient operations for insertion, deletion, and searching, particularly when balanced properly. The efficiency of tree operations depends heavily on the tree's height, making balance an important consideration in search-oriented tree structures.
 
 - [🖼️Sunum-Ağaçlar (PDF)](../files/data_structures/slides/Bolum_07_Agac.pdf)  
 - 🕹️Simulators:
   - [Binary Tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_Tree.html)  
-  - [Btrees Simulator (HTML)](../files/data_structures/slides/Bolum_07_BTree.html)  
+  - [B-tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_BTree.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_06_Trees.pdf)  
-- [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders07/src)  
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders07/src)  
 
 ---
 
-## Chapter 8: Priority Queues, Heaps
+## Chapter 8: Priority Queues and Heaps
 
 A heap is a specialized tree-based data structure that satisfies the heap property - in a max heap, for any given node, the parent's value is greater than or equal to its children's values (or less than or equal to in a min heap). Heaps are particularly efficient for implementing priority queues and finding the maximum/minimum element quickly. They're commonly used in algorithms like heap sort and in systems where you need to repeatedly find and remove the highest (or lowest) priority item.
 
@@ -168,25 +170,27 @@ A heap is a specialized tree-based data structure that satisfies the heap proper
   - [Min-Heap Simulator (HTML)](../files/data_structures/slides/Bolum_08_Min_Heap.html)
   - [Priority Queue Simulator (HTML)](../files/data_structures/slides/Bolum_08_Priority_Queue.html)
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_08_Heaps_Priority_Queues.pdf)
-- [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders08/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders08/src)
 
 ---
 
-## Chapter 9: Maps, Hash Tables
+## Chapter 9: Maps and Hash Tables
 
-A hash table is a data structure that implements an associative array abstract data type, a structure that can map keys to values. Using a hash function to compute an index into an array of buckets or slots, hash tables provide rapid data access - typically O(1) time complexity for insertions, deletions, and lookups. They're widely used in database indexing, caches, and implementing sets. However, they must handle collisions (when different keys hash to the same index) and may require resizing as they grow.
+A hash table is a data structure that implements an associative array abstract data type, a structure that can map keys to values. Using a hash function to compute an index into an array of buckets or slots, hash tables provide rapid data access. Hash tables provide O(1) average-case insertion, deletion, and lookup when the hash function distributes keys effectively. In the worst case, these operations may take O(n) time. They're widely used in database indexing, caches, and implementing sets. However, they must handle collisions (when different keys hash to the same index) and may require resizing as they grow.
+
 
 - [🖼️Sunum-Hash Tabloları (PDF)](../files/data_structures/slides/Bolum_09_Hash_Tablosu.pdf)
 - [🕹️Hash Table Simulator (HTML)](../files/data_structures/slides/Bolum_09_Hash_Table.html)
 - [🕹️Map Simulator (HTML)](../files/data_structures/slides/Bolum_09_Map.html)
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf)
-- [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders09/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders09/src)
 
 ---
 
 ## Chapter 10: Search Trees  
 
-A search tree, particularly a Binary Search Tree (BST), is a binary tree data structure where each node's left subtree contains only nodes with keys less than the node's key, and the right subtree contains only nodes with keys greater than the node's key. This property makes them extremely efficient for searching, inserting, and deleting elements, typically in O(log n) time when balanced. They're fundamental in implementing databases, file systems, and for maintaining sorted data in a dynamic setting. They underpin many searching and sorting algorithms, making them indispensable for computer scientists and programmers alike.
+A search tree, particularly a Binary Search Tree (BST), is a binary tree data structure where each node's left subtree contains only nodes with keys less than the node's key, and the right subtree contains only nodes with keys greater than the node's key. This property makes them extremely efficient. Search, insertion, and deletion take O(h) time, where h is the height of the tree. This becomes O(log n) in a balanced tree but may degrade to O(n) in the worst case. They're fundamental in implementing databases, file systems, and for maintaining sorted data in a dynamic setting. They underpin many searching and sorting algorithms, making them indispensable for computer scientists and programmers alike.
+
 
 - [🖼️Sunum-Arama Ağaçları (PDF)](../files/data_structures/slides/Bolum_10_Arama_Agaclari.pdf)  
 - 🕹️Simulators:  
@@ -195,7 +199,7 @@ A search tree, particularly a Binary Search Tree (BST), is a binary tree data st
   - [AVL Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_AVL.html)  
   - [Splay Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_Splay.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_06_Trees.pdf)  
-- [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders10/src)  
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders10/src)  
 
 ---
 
@@ -207,18 +211,18 @@ A graph is a versatile data structure consisting of vertices (or nodes) connecte
 - [🕹️Graph Simulator (HTML)](../files/data_structures/slides/Bolum_11_Graph.html)  
 - [🕹️Dijkstra Simulator (HTML)](../files/data_structures/slides/Bolum_11_Dijkstra.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_07_Graphs.pdf)  
-- [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders11/src)  
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders11/src)  
 
 ---
 
 ## Chapter 12: Sets  
 
-A set is a collection of distinct elements where order doesn't matter and duplicates are not allowed. Think of it as a mathematical set, perfect for maintaining a unique collection of items. Sets support operations like union, intersection, and difference, making them invaluable for comparing collections of data or removing duplicates. They're typically implemented using hash tables underneath, providing fast lookup and insertion operations. Sets are extensively used in database queries, finding unique values, and checking for membership in a collection.
+A set is a collection of distinct elements where order doesn't matter and duplicates are not allowed. Think of it as a mathematical set, perfect for maintaining a unique collection of items. Sets support operations like union, intersection, and difference, making them invaluable for comparing collections of data or removing duplicates. Sets are commonly implemented using hash tables for average-case constant-time operations or balanced search trees when sorted iteration and ordered operations are required. Sets are extensively used in database queries, finding unique values, and checking for membership in a collection.
 
 - [🖼️Sunum-Kümeler (PDF)](../files/data_structures/slides/Bolum_12_Kumeler.pdf)  
 - [🕹️Sets Simulator (HTML)](../files/data_structures/slides/Bolum_12_Sets.html)  
-- [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_07_Graphs.pdf)  
-- [💻Code Examples (Github)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src)  
+- [🗒️Lecture Notes (PDF)](/files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src)  
 
 ---
 
