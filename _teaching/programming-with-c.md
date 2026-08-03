@@ -8,8 +8,8 @@ date: 2023-04-04
 location: "Giresun, Turkey"
 ---
 
-![procedural programming with c]( /images/teaching/procedural-programming-with-c.webp){: width="200" style="float: left; margin-right: 10px;"}
-C is a robust and flexible programming language employed in numerous applications, ranging from operating systems and embedded systems to game development and high-performance computing. As a low-level language, it offers significant control over hardware and memory management, enabling developers to write highly efficient and optimized code. This level of control makes it perfect for performance-critical tasks where speed and resource management are paramount. Its influence is also seen in many modern languages, which have adopted its syntax and features, solidifying C's role as a foundational language in computer science and software development.
+![procedural programming with c](/images/teaching/procedural-programming-with-c.webp){: width="200" style="float: left; margin-right: 10px;"}
+C is a general-purpose programming language widely used in systems programming, embedded software, operating systems, compilers, and performance-sensitive applications. It combines portable high-level constructs with low-level access to memory and hardware-related operations. C gives programmers substantial control over data representation, memory allocation, and program execution. This control can enable efficient software, but it also requires careful handling of memory, types, and undefined behavior.
 
 ## Ders Öğretim Planı  
 
@@ -19,7 +19,7 @@ C is a robust and flexible programming language employed in numerous application
 
 ---
 
-## The resources  
+## Course resources  
 
 * V22.0201 Computer Systems Organization [course](https://cs.nyu.edu/~gottlieb/courses/cso/class-notes.html)
 
@@ -69,7 +69,10 @@ C is a robust and flexible programming language employed in numerous application
 - Understanding pointers and memory addresses
 - Pointer declaration and initialization
 - Pointer arithmetic
-- Dynamic memory allocation (malloc, calloc, free)
+- Dynamic memory allocation with `malloc`, `calloc`, `realloc`, and `free`
+- Checking allocation failures
+- Memory leaks, dangling pointers, and double-free errors
+- Ownership and lifetime of dynamically allocated memory
 
 [🗒️Lecture Notes](../files/c/Chapter_05_Pointers.pdf)
 
@@ -94,11 +97,13 @@ C is a robust and flexible programming language employed in numerous application
 
 ---
 
-## Chapter 8: Advanced Data Types
-- Enumerations and typedef
-- Bitwise operators and bit manipulation
-- Bit fields
+## Chapter 8: Enumerations, Unions, and Bit-Level Operations
+- Enumerated types
+- Type aliases with `typedef`
 - Unions
+- Bitwise operators
+- Bit masks and bit manipulation
+- Bit-fields and their portability limitations
 
 [🗒️Lecture Notes](../files/c/Chapter_08_Advanced_Data_Types.pdf)
 
@@ -107,8 +112,16 @@ C is a robust and flexible programming language employed in numerous application
 ## Chapter 9: Preprocessor Directives
 - Macros and their usage
 - Conditional compilation
-- File inclusion and header files
+- Separating declarations and definitions
+- Designing header and source files
+- Include guards
+- Avoiding multiple-definition errors
+- Building multi-file programs
 - Debugging using preprocessor directives
+- Scope and lifetime of variables
+- Local, global, and static variables
+- Internal and external linkage
+- The `const`, `static`, and `extern` qualifiers
 
 [🗒️Lecture Notes](../files/c/Chapter_09_Preprocessor_Directives.pdf)
 
@@ -119,6 +132,10 @@ C is a robust and flexible programming language employed in numerous application
 - Function pointers and callbacks
 - Understanding static and dynamic libraries
 - Recursion: principles and applications
+- Call stack behavior in recursive functions
+- Base cases and recursive cases
+- Recursion depth and stack overflow
+- Recursive versus iterative solutions
 
 [🗒️Lecture Notes](../files/c/Chapter_10_Advanced_Concepts_1.pdf)
 
@@ -130,16 +147,22 @@ C is a robust and flexible programming language employed in numerous application
 - Introduction to algorithms (sorting, searching)
 - Time and space complexity analysis
 - Variadic functions
+- Program arguments with `argc` and `argv`
+- Program termination and exit status
 
 [🗒️Lecture Notes](../files/c/Chapter_11_Advanced_Concepts_2.pdf)
 
 ---
 
 ## Chapter 12: Error Handling and Debugging
-- Common C programming errors
-- Debugging techniques and tools
-- Exception handling with try-catch blocks
-- Defensive programming and error handling strategies
+
+- Common compile-time, link-time, and runtime errors
+- Checking function return values
+- Error reporting with `errno`, `perror`, and `strerror`
+- Assertions with `assert`
+- Defensive programming techniques
+- Debugging with compiler warnings and debugging tools
+- Introduction to sanitizers and static analysis
 
 [🗒️Lecture Notes](../files/c/Chapter_12_Error_Handling_and_Debugging.pdf)
 
