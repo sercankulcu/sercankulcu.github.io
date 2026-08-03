@@ -9,7 +9,7 @@ location: "Giresun, Turkey"
 ---
 
 ![operating systems](/images/teaching/operating-systems-course.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
-Operating systems are a fundamental part of modern computing. They form the foundation of every computer system. Their main role is to manage hardware and software resources efficiently. An operating system provides a platform for programs to run. It acts as a bridge between hardware and software applications. This ensures that applications can interact with hardware using a standardized interface. The operating system handles tasks like memory management, process scheduling, and input/output operations. Without it, a computer is just a collection of hardware components. These components cannot be controlled or used effectively by users. The operating system makes the computer functional and user-friendly.
+Operating systems are a fundamental part of modern computing. Operating systems manage hardware resources and provide abstractions and services for application software. They coordinate processor time, memory, storage, devices, and communication while supporting protection, isolation, and controlled resource sharing. An operating system provides a platform for programs to run. It acts as a bridge between hardware and software applications. This ensures that applications can interact with hardware using a standardized interface. The operating system handles tasks like memory management, process scheduling, and input/output operations. Without it, a computer is just a collection of hardware components.
 
 ## Ders Öğretim Planı
 [Ders Öğretim Planı (PDF)](../files/os/slides/Bolum_00_Ders_Ogretim_Planı.pdf)
@@ -18,13 +18,15 @@ Operating systems are a fundamental part of modern computing. They form the foun
 
 ## Announcements
 
+No current announcements.
+
 ---
 
-## The resources:
+## Course resources:
 
 - **ebook**  
 [Modern Operating Systems, Andrew S. Tanenbaum](https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X) | 
-[Operating System Concepts, A. SilberSchatz](https://www.os-book.com/OS10/index.html) | 
+[Operating System Concepts — Abraham Silberschatz et al.](https://www.os-book.com/OS10/index.html) | 
 [Operating Systems: Three Easy Pieces](https://pages.cs.wisc.edu/~remzi/OSTEP)
 
 - **pdf**  
@@ -81,11 +83,11 @@ Operating systems are a fundamental part of modern computing. They form the foun
 
 ---
 
-## Preface: 
+## Preliminary Materials: 
 
 The world of operating systems is introduced as a key aspect of modern computing. Fundamental concepts, design principles, and implementation techniques are explored to highlight how interaction between hardware and software is enabled.
 
-* The prerequisities for preparation [pdf](../files/os/The_prerequisites.pdf)
+* Prerequisites for preparation [pdf](../files/os/The_prerequisites.pdf)
 * Key figures who have shaped the field [pdf](../files/os/Important_people.pdf)
 * Questions & Answers from OSTEP [pdf](../files/os/QA_from_OSTEP.pdf)
 
@@ -183,7 +185,7 @@ In a multi-threaded or multi-process environment, synchronization mechanisms pro
 
 ## Chapter 7: Deadlocks: 
 
-Deadlocks, which occur when multiple processes or threads are blocked and unable to proceed due to conflicting resource dependencies, are a common and challenging problem in operating system design and require careful consideration of resource allocation and scheduling policies to prevent and resolve.
+A deadlock occurs when a set of processes or threads waits indefinitely for resources held by one another. This chapter covers deadlock conditions, resource-allocation graphs, prevention, avoidance, detection, and recovery.
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_07_Kilitlenme.pdf) | 
   [Sunum (pdf)](../files/os/slides/kemal/Bolum_07_Kilitlenme_Bicakci.pdf)
@@ -200,8 +202,8 @@ Deadlocks, which occur when multiple processes or threads are blocked and unable
 Memory management, which involves the allocation, monitoring, and protection of a computer's physical memory resources, is a critical component of any operating system, providing the foundation for efficient and reliable application execution.
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_08_Bellek_Yonetimi.pdf) | 
-  [Sunum (pdf)](../files/os/slides/kemal/Bolum_08_01_Bellek_Yonetimi_Bicakci.pdf) | 
-  [Sunum (pdf)](../files/os/slides/kemal/Bolum_08_02_Bellek_Yonetimi_Bicakci.pdf)
+  [Sunum I (pdf)](../files/os/slides/kemal/Bolum_08_01_Bellek_Yonetimi_Bicakci.pdf) | 
+  [Sunum II (pdf)](../files/os/slides/kemal/Bolum_08_02_Bellek_Yonetimi_Bicakci.pdf)
 - [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_8_Memory_management.pdf)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter08/src)
@@ -212,7 +214,7 @@ Memory management, which involves the allocation, monitoring, and protection of 
 
 ## Chapter 9: Virtual memory: 
 
-Virtual memory, a key technique used by modern operating systems to manage memory resources, enables applications to access a larger, virtual address space than is physically available, providing a powerful mechanism for efficient memory allocation, protection, and sharing.
+Virtual memory gives each process an isolated virtual address space and maps virtual addresses to physical memory or secondary storage. It supports memory protection, controlled sharing, flexible allocation, and demand paging.
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_09_Sanal_Bellek.pdf) | 
   [Sunum (pdf)](../files/os/slides/kemal/Bolum_09_Sanal_Bellek_Bicakci.pdf)
@@ -226,11 +228,11 @@ Virtual memory, a key technique used by modern operating systems to manage memor
 
 ## Chapter 10: File systems: 
 
-File systems, which provide a hierarchical organization and management scheme for data storage on disk or other persistent storage devices, are a fundamental component of any modern operating system, enabling applications to store and access data efficiently and reliably.
+File systems organize named data and metadata and provide abstractions for storing, retrieving, protecting, and sharing information across persistent, networked, virtual, or memory-backed storage.
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_10_Dosya_Sistemleri.pdf) | 
-  [Sunum (pdf)](../files/os/slides/kemal/Bolum_10_01_Dosya_Sistemleri_Bicakci.pdf) | 
-  [Sunum (pdf)](../files/os/slides/kemal/Bolum_10_02_Dosya_Sistemleri_Bicakci.pdf)
+  [Sunum I (pdf)](../files/os/slides/kemal/Bolum_10_01_Dosya_Sistemleri_Bicakci.pdf) | 
+  [Sunum II (pdf)](../files/os/slides/kemal/Bolum_10_02_Dosya_Sistemleri_Bicakci.pdf)
 - [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_10_File_systems.pdf) | 
   [FS Implementation (HTML)](../files/os/slides/Chapter_10_File_System_Implementation.html)
 - 💻Lab:  
@@ -242,7 +244,7 @@ File systems, which provide a hierarchical organization and management scheme fo
 
 ## Chapter 11: Input/output: 
 
-I/O operations, which involve the movement of data between a computer and external devices, are a critical component of any operating system, providing the means for applications to interact with the physical world and enabling efficient and reliable data transfer.
+The operating system manages communication between applications and hardware or virtual devices through drivers, interrupts, buffering, caching, and device-independent I/O interfaces.
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_11_Giris_Cikis.pdf) | 
   [Sunum (pdf)](../files/os/slides/kemal/Bolum_11_Giris_Cikis_Bicakci.pdf)
@@ -254,13 +256,14 @@ I/O operations, which involve the movement of data between a computer and extern
 
 ---
 
-## Chapter 12: Multiple processor systems: 
+## Chapter 12: Multiprocessor Systems:
 
-As multi-core processors and distributed computing systems become increasingly prevalent, the design and implementation of operating systems for multiple processor systems presents unique challenges and opportunities, requiring careful consideration of issues such as process and thread scheduling, memory management, and communication and synchronization mechanisms.
+Multiprocessor systems introduce challenges involving parallel scheduling, cache coherence, synchronization, processor affinity, load balancing, and memory-access topology across multicore, SMP, and NUMA architectures.
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_12_Cok_Islemcili_Sistemler.pdf)
 - [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_12_Multiple_processor_systems.pdf)
-- 💻Lab [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter12/src)
+- 💻Lab:
+  - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter12/src)
 - [🖋️Question & answers (pdf)](../files/os/questions/Chapter_12_Multiple_processor_systems.pdf)
 
 ---
@@ -271,7 +274,8 @@ Security is a critical concern in modern computing environments, and operating s
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_13_Guvenlik.pdf)
 - [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_13_Security.pdf)
-- 💻Lab [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter13/src)
+- 💻Lab:
+  - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter13/src)
 - [🖋️Question & answers (pdf)](../files/os/questions/Chapter_13_Security.pdf)
 
 ---
@@ -282,7 +286,8 @@ With the growing demand for multimedia applications such as audio and video play
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_14_Coklu_Ortam.pdf)
 - [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_14_Multimedia.pdf)
-- 💻Lab [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter14/src)
+- 💻Lab:
+  - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter14/src)
 - [🖋️Question & answers (pdf)](../files/os/questions/Chapter_14_Multimedia.pdf)
 
 ---
