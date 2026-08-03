@@ -18,6 +18,8 @@ Microprocessors execute instructions, process data, and coordinate the operation
 
 ## Announcements
 
+There are currently no announcements.
+
 ---
 
 ## The Resources
