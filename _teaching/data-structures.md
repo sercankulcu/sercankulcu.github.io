@@ -108,7 +108,7 @@ Linked lists are dynamic and flexible data structures that consist of nodes conn
 
 ## Chapter 4: Stacks  
 
-A stack operates on the Last-In-First-Out (LIFO) principle, much like a stack of plates where you can only add or remove from the top. This data structure is fundamental in programming for managing function calls, handling undo operations, or parsing expressions. The key operations - push (add) and pop (remove) - make it perfect for tracking state or handling recursion. Think of browsing history in a web browser, where each new page is pushed onto the stack, and hitting the back button pops the most recent page.
+A stack operates on the Last-In-First-Out (LIFO) principle, much like a stack of plates where you can only add or remove from the top. This data structure is fundamental in programming for managing function calls, handling undo operations, or parsing expressions. The key operations, push (add) and pop (remove), make it perfect for tracking state or handling recursion. Think of browsing history in a web browser, where each new page is pushed onto the stack, and hitting the back button pops the most recent page.
 
 - [🖼️Sunum-Yığın (PDF)](../files/data_structures/slides/Bolum_04_Yigin.pdf)  
 - [🕹️Stack Simulator (HTML)](../files/data_structures/slides/Bolum_04_Stack.html)  
@@ -138,7 +138,7 @@ A queue follows the First-In-First-Out (FIFO) principle, similar to a line of pe
 
 ## Chapter 6: The List ADT and Java List Implementations
 
-A list is a versatile data structure that can be implemented in various ways, typically as a dynamic array or linked list. Unlike fixed-size arrays, lists can grow or shrink as needed, making them extremely flexible for storing collections of data. They support operations like insertion, deletion, and traversal, and are particularly useful when you need a sequence of elements but don't know the size in advance. Most modern programming languages provide built-in list implementations with rich functionality. A list is an abstract data type representing an ordered sequence. It may be implemented using a dynamic array, linked structure, or another underlying representation. In Java, common implementations include ArrayList and LinkedList.
+A list is an abstract data type representing an ordered sequence of elements. It can grow or shrink dynamically and supports operations such as insertion, deletion, access, and traversal. Lists may be implemented using dynamic arrays, linked structures, or other underlying representations. In Java, commonly used implementations include ArrayList and LinkedList, each offering different performance characteristics.
 
 - [🖼️Sunum-Liste (PDF)](../files/data_structures/slides/Bolum_06_Liste.pdf)
 - [🖼️Sunum-Sorular (PDF)](../files/data_structures/slides/Bolum_06_Sorular.pdf)
@@ -221,7 +221,7 @@ A set is a collection of distinct elements where order doesn't matter and duplic
 
 - [🖼️Sunum-Kümeler (PDF)](../files/data_structures/slides/Bolum_12_Kumeler.pdf)  
 - [🕹️Sets Simulator (HTML)](../files/data_structures/slides/Bolum_12_Sets.html)  
-- [🗒️Lecture Notes (PDF)](/files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf)
+- [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src)  
 
 ---
