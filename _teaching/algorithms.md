@@ -18,9 +18,11 @@ An algorithm is a set of well-defined instructions for carrying out a particular
 
 ## Announcements
 
+There are currently no announcements.
+
 ---
 
-## The resources
+## Course resources
 
 - **course webpages**  
   [Cambridge](https://www.cl.cam.ac.uk/teaching/2021/Algorithms/materials.html) | 
@@ -33,7 +35,7 @@ An algorithm is a set of well-defined instructions for carrying out a particular
   [Data Structures and Algorithms in Python by Goodrich](https://www.amazon.com/Structures-Algorithms-Python-Michael-Goodrich/dp/1118290275)
 
 - **websites**  
-  [Visual Algo](https://visualgo.net/en) | 
+  [VisuAlgo](https://visualgo.net/en) | 
   [Algoanim](https://www.algoanim.ide.sk) | 
   [USFCA](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html) | 
   [LeetCode](https://leetcode.com) | 
@@ -42,7 +44,7 @@ An algorithm is a set of well-defined instructions for carrying out a particular
 - **github**  
   [DSALGO Visualizer](https://github.com/jhabarsingh/DSALGO-VISUALIZER) | 
   [The Algorithms](https://github.com/TheAlgorithms/Java) | 
-  [Cpbook](https://github.com/stevenhalim/cpbook-code/tree/master) | 
+  [CP Book](https://github.com/stevenhalim/cpbook-code/tree/master) | 
   [awesome-algorithms](https://github.com/tayllan/awesome-algorithms)
 
 ---
@@ -80,12 +82,7 @@ Algorithms are the step-by-step procedures that form the core of computer scienc
 - [🖼️Sunum-Karmaşıklık (PDF)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.pdf)
 - [🕹️Run time analysis (HTML)](../files/algorithms/slides/Bolum_01_02_Complexity.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_01_Introduction.pdf) | 
-  [Complexity (PDF)](../files/algorithms/slides/Chapter_01_Complexity.pdf) | 
-  [Amortized Analysis (HTML)](../files/algorithms/slides/Chapter_01_Amortized_Analysis.html) | 
-  [Bit Manipulation (HTML)](../files/algorithms/slides/Chapter_01_Bit_Manipulation.html) | 
-  [Matrix Algorithms (HTML)](../files/algorithms/slides/Chapter_01_Matrix_Algorithms.html) | 
-  [NP Completeness (HTML)](../files/algorithms/slides/Chapter_01_NP_Completeness.html) | 
-  [Number Theoretic Algorithms (HTML)](../files/algorithms/slides/Chapter_01_Number_Theoretic_Algorithms.html)
+[Complexity (PDF)](../files/algorithms/slides/Chapter_01_Complexity.pdf) 
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter01/src)
 
 ---
@@ -122,13 +119,12 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
   - [🖼️Sunum-Çizge Minimum Kapsayan (PDF)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.pdf) 
   - [🖼️Sunum-Çizge Ağ Akış (PDF)](../files/algorithms/slides/Bolum_04_04_Ag_Akis.pdf) 
 - 🕹️Applications:
-  - [🕹️BFS DFS (HTML)](../files/algorithms/slides/Bolum_04_01_Travelsal.html)
+  - [🕹️BFS DFS (HTML)](../files/algorithms/slides/Bolum_04_01_Traversal.html)
   - [🕹️Travelling Salesman (HTML)](../files/algorithms/slides/Bolum_04_02_TSP.html)
   - [🕹️A* Pathfinding (HTML)](../files/algorithms/slides/Bolum_04_02_AStar.html)
   - [🕹️Shortest Path (HTML)](../files/algorithms/slides/Bolum_04_02_Shortest.html) 
   - [🕹️MST Simulator (HTML)](../files/algorithms/slides/Bolum_04_03_MST.html)
   - [🕹️Network Flow (HTML)](../files/algorithms/slides/Bolum_04_04_Flow.html)
-  - [🕹️Connect Four (HTML)](../files/algorithms/slides/Chapter_04_Connect_Four.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_04_Graph.pdf) 
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src)
 
@@ -164,9 +160,9 @@ Dynamic programming is a powerful technique for solving optimization problems by
 
 ## Chapter 7: Approximation algorithms
 
-Approximation algorithms are a type of algorithm that provides a solution to a problem that is not necessarily optimal, but is guaranteed to be within a certain factor of the optimal solution. Approximation algorithms are often used to solve problems that are NP-hard, which means that there is no known polynomial-time algorithm that can find the optimal solution.
+Approximation algorithms efficiently produce near-optimal solutions for optimization problems whose exact solutions may be computationally expensive. They are especially useful for NP-hard problems, for which no polynomial-time exact algorithm is currently known.
 
-- [🖼️Sunum-Yakınsama Algoritmaları (PDF)](../files/algorithms/slides/Bolum_07_Yakinsama.pdf)  
+- [🖼️Sunum-Yaklaştırma Algoritmaları (PDF)](../files/algorithms/slides/Bolum_07_Yakinsama.pdf)  
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_06_Approximation.pdf)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter07/src)
 
@@ -174,7 +170,7 @@ Approximation algorithms are a type of algorithm that provides a solution to a p
 
 ## Chapter 8: Randomized algorithms
 
-Randomized algorithms are a type of algorithm that uses randomness to improve its performance. Randomized algorithms are often used to solve problems that are difficult or impossible to solve using deterministic algorithms.
+Randomized algorithms incorporate random choices into their execution. Randomization may simplify an algorithm, improve its expected running time, or reduce sensitivity to adversarial inputs. Their guarantees may concern running time, correctness probability, or approximation quality.
 
 - [🖼️Sunum-Rastgele Algoritmalar (PDF)](../files/algorithms/slides/Bolum_08_Rastgele.pdf)  
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_07_Randomized.pdf)  
@@ -184,7 +180,7 @@ Randomized algorithms are a type of algorithm that uses randomness to improve it
 
 ## Chapter 9: Online algorithms
 
-Online algorithms are a type of algorithm that makes decisions without knowing the complete input. Online algorithms are often used to solve problems in real time, where the input is not known in advance.
+Online algorithms process input incrementally and make irrevocable decisions without knowing future requests. Their performance is commonly evaluated through competitive analysis, which compares an online algorithm with an optimal offline algorithm that knows the complete input in advance.
 
 - [🖼️Sunum-Çevrimiçi Algoritmalar (PDF)](../files/algorithms/slides/Bolum_09_Cevrimici.pdf)  
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_08_Online.pdf)  
@@ -194,7 +190,7 @@ Online algorithms are a type of algorithm that makes decisions without knowing t
 
 ## Chapter 10: Parallel algorithms
 
-Parallel algorithms are a type of algorithm that can be executed on multiple processors or cores simultaneously. Parallel algorithms are often used to solve problems that are too large or too complex to be solved on a single processor.
+Parallel algorithms divide computation among multiple processing units to reduce execution time, increase throughput, or process large datasets efficiently. Their design must consider dependencies, communication overhead, synchronization, workload balance, speedup, and scalability.
 
 - [🖼️Sunum-Paralel Algoritmalar (PDF)](../files/algorithms/slides/Bolum_10_Paralel.pdf)  
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_09_Parallel.pdf)  
@@ -214,7 +210,7 @@ The divide-and-conquer paradigm is an algorithmic design paradigm that breaks do
 
 ## Chapter 12: Greedy algorithms
 
-Greedy algorithms are a type of algorithm that makes decisions at each step based on the current state of the problem. Greedy algorithms are often used to solve problems that can be broken down into a sequence of decisions.
+Greedy algorithms build a solution incrementally by choosing the locally best available option at each step, without revisiting earlier decisions. They produce optimal solutions only when the problem satisfies suitable structural properties, such as the greedy-choice property and optimal substructure.
 
 - [🖼️Sunum-Açgözlü Algoritmalar (PDF)](../files/algorithms/slides/Bolum_12_Acgozlu.pdf)  
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_11_Greedy.pdf)  
@@ -224,7 +220,7 @@ Greedy algorithms are a type of algorithm that makes decisions at each step base
 
 ## Chapter 13: Backtracking algorithms
 
-Backtracking algorithms are a type of algorithm that solves problems by exploring all possible solutions and backtracking when a solution is found to be invalid. Backtracking algorithms are often used to solve problems that can be broken down into a tree of possible solutions.
+Backtracking systematically explores a search space by extending partial candidates. When a partial candidate can no longer lead to a valid solution, the algorithm abandons that branch and returns to an earlier decision point.
 
 - [🖼️Sunum-Geri Dönüşlü Algoritmalar (PDF)](../files/algorithms/slides/Bolum_13_Geri_Donuslu.pdf)  
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_12_Backtracking.pdf)  
@@ -240,3 +236,11 @@ Branch and bound algorithms are a type of algorithm that solves optimization pro
 - [🖼️Sunum-Dal Sınır Algoritmaları (PDF)](../files/algorithms/slides/Bolum_14_Dal_Sinir.pdf)  
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_13_Branch_and_Bound.pdf)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter14/src)
+
+## Supplementary Topics
+
+ - [Amortized Analysis (HTML)](../files/algorithms/slides/Chapter_01_Amortized_Analysis.html) | 
+ - [Bit Manipulation (HTML)](../files/algorithms/slides/Chapter_01_Bit_Manipulation.html) | 
+ - [Matrix Algorithms (HTML)](../files/algorithms/slides/Chapter_01_Matrix_Algorithms.html) | 
+ - [NP Completeness (HTML)](../files/algorithms/slides/Chapter_01_NP_Completeness.html) | 
+ - [Number Theoretic Algorithms (HTML)](../files/algorithms/slides/Chapter_01_Number_Theoretic_Algorithms.html)
