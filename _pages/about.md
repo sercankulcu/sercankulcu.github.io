@@ -40,21 +40,21 @@ Learn about my <a class="btn btn--inverse" href="/teaching/">
 </a> experience, materials, and educational contributions. 
 
 Check out the small <a class="btn btn--inverse" href="/apps/">
-  📱 apps
+  📱 Apps
 </a> and <a class="btn btn--inverse" href="https://dorukdayim.netlify.app">
-  🧠 games
+  🧠 Games
 </a> I've developed with JavaScript in my free time. 
 
 Explore my <a class="btn btn--inverse" href="/cv/">
-  📄 resume
+  📄 Resume
 </a> to learn about my education, professional experience, and skills. 
 
 Discover my curated collection of <a class="btn btn--inverse" href="/bookmarks/">
-  🔖 bookmarks
+  🔖 Bookmarks
 </a>, featuring useful resources and interesting content. 
 
 Read my <a class="btn btn--inverse" href="/posts/">
-  📝 blog posts
+  📝 Blog posts
 </a> where I share insights, experiences, and ideas on various topics. 
 
 **Note:** If any licensed content is found on the website, please don't hesitate to contact me via the links on the left-hand side. You can be sure that any related content will be quickly removed within 24 hours.
