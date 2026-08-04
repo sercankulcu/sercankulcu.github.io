@@ -155,6 +155,7 @@ A tree is a hierarchical data structure composed of nodes connected by edges, si
 - 🕹️Simulators:
   - [Binary Tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_Tree.html)  
   - [B-tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_BTree.html)  
+  - [B-plus-tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_BPlusTree.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_06_Trees.pdf)  
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders07/src)  
 
