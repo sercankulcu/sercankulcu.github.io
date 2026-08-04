@@ -1,303 +1,902 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Learn about process scheduling and queues with this interactive web-based scheduler demonstration. Perfect for students in data structures courses.">
-    <meta name="keywords"
-        content="data structures, queue, scheduler, process scheduling, interactive demo, programming, computer science">
+    <meta name="description" content="Interactive Round Robin process scheduler using a queue, with configurable time quantum, process metrics, and automatic execution.">
     <meta name="author" content="Sercan Kulcu">
-    <title>Data Structures Course: Scheduler using Queue</title>
+    <title>Round Robin Scheduler</title>
     <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --text: #1f2937;
+            --muted: #64748b;
+            --surface: #ffffff;
+            --surface-soft: #f8fafc;
+            --border: #cbd5e1;
+            --running: #fee2e2;
+            --running-border: #dc2626;
+            --done: #dcfce7;
+            --done-border: #15803d;
+            --danger: #b91c1c;
+            --success: #15803d;
+            --shadow: 0 12px 32px rgba(15, 23, 42, 0.10);
+        }
+
+        * { box-sizing: border-box; }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            color: #333;
-            text-align: center;
+            margin: 0;
+            padding: 16px;
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--text);
+            background: #eef2f7;
+            line-height: 1.55;
+        }
+
+        button, input { font: inherit; }
+
+        .page {
+            width: min(100%, 1160px);
             margin: 0 auto;
-            padding: 2vw;
-            max-width: 800px;
-            box-sizing: border-box;
+        }
+
+        .container {
+            overflow: hidden;
+            background: var(--surface);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
         }
 
         .header {
-            display: flex;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
             align-items: center;
-            justify-content: center;
-            padding: 1vw;
+            gap: 16px;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        h1 {
-            margin: auto;
+        .header h1 {
+            margin: 0;
+            text-align: center;
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
         }
 
         .back-button {
-            cursor: pointer;
+            color: var(--primary-dark);
+            font-weight: 700;
             text-decoration: none;
         }
 
-        .back-button:hover {
-            text-decoration: underline;
+        .back-button:hover { text-decoration: underline; }
+        .header-spacer { width: 54px; }
+
+        main { padding: 24px; }
+
+        .intro, .panel {
+            padding: 20px;
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            background: #eff6ff;
         }
 
-        #controls {
-            display: flex;
-            flex-wrap: nowrap;
-            justify-content: space-between;
-            gap: 1vw;
-            box-sizing: border-box;
-            padding: 1vw;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+        .intro h2, .panel h2 { margin-top: 0; }
 
-        #queue-container,
-        #current-process {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            min-height: 70px;
-            overflow-x: auto;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .metrics, .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 10px;
         }
 
-        .process {
-            width: 90px;
-            height: 60px;
-            background-color: #3498db;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .metrics { margin-top: 18px; }
+
+        .metric, .stat {
+            min-width: 0;
+            padding: 11px;
+            border: 1px solid #bfdbfe;
+            border-radius: 9px;
+            background: white;
+        }
+
+        .metric strong, .stat strong { display: block; }
+
+        .section-title {
+            margin: 28px 0 12px;
+            font-size: 1.2rem;
+        }
+
+        .control-panel {
+            display: grid;
+            gap: 14px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: var(--surface-soft);
+        }
+
+        .control-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            align-items: end;
+        }
+
+        .field {
+            display: grid;
+            gap: 5px;
+        }
+
+        .field label {
+            font-size: 0.92rem;
+            font-weight: 700;
+        }
+
+        input {
+            width: 100%;
+            min-height: 42px;
+            padding: 9px 10px;
+            color: var(--text);
+            background: white;
+            border: 1px solid var(--border);
             border-radius: 8px;
-            transition: all 0.3s ease;
-            font-size: 1em;
-            flex-direction: column;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .process.running {
-            background-color: #e74c3c;
-        }
-
-        input,
-        button {
-            width: calc((100% - (3 * 1vw)) / 3);
-            padding: 0.5vw;
-            margin: 0;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        input:focus,
-        button:hover {
-            border-color: #4CAF50;
-            box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
         }
 
         button {
-            background-color: #4CAF50;
+            min-height: 42px;
+            padding: 9px 13px;
             color: white;
+            background: var(--primary);
+            border: 0;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background 0.18s ease, transform 0.18s ease;
         }
 
-        button:active {
-            background-color: #45a049;
+        button:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
         }
 
-        #log {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #bdc3c7;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: left;
-            background-color: white;
+        button.secondary {
+            color: var(--text);
+            background: #e2e8f0;
         }
 
-        .log-entry {
+        button.secondary:hover:not(:disabled) { background: #cbd5e1; }
+        button.danger { background: var(--danger); }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+
+        button:focus-visible,
+        input:focus-visible,
+        .back-button:focus-visible {
+            outline: 3px solid #f59e0b;
+            outline-offset: 2px;
+        }
+
+        .speed-row {
+            display: grid;
+            grid-template-columns: minmax(120px, 1fr) minmax(180px, 3fr) auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .speed-row output {
+            min-width: 72px;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+            gap: 16px;
+            margin-top: 18px;
+        }
+
+        .queue-panel,
+        .current-panel {
+            min-width: 0;
+            padding: 18px;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            background: var(--surface-soft);
+        }
+
+        .queue-panel h3,
+        .current-panel h3 {
+            margin-top: 0;
+        }
+
+        .queue-labels {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 8px;
-            font-size: 1em;
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 700;
         }
 
-        @media (max-width: 768px) {
+        .queue-track {
+            min-height: 150px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            border: 4px solid var(--primary-dark);
+            border-left-width: 12px;
+            border-right-width: 12px;
+            border-radius: 12px;
+            background: #dbeafe;
+        }
 
-            input,
-            button {
-                font-size: 3vw;
-                padding: 2vw;
-                width: calc((100% - (3 * 2vw)) / 3);
+        .process-card {
+            flex: 0 0 112px;
+            min-height: 90px;
+            padding: 10px;
+            display: grid;
+            gap: 4px;
+            align-content: center;
+            border: 2px solid var(--primary-dark);
+            border-radius: 10px;
+            background: white;
+            text-align: center;
+            font-weight: 700;
+            transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .process-card small {
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .process-card.running {
+            background: var(--running);
+            border-color: var(--running-border);
+            transform: scale(1.04);
+        }
+
+        .process-card.completed {
+            background: var(--done);
+            border-color: var(--done-border);
+        }
+
+        .empty-state {
+            width: 100%;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .current-slot {
+            min-height: 150px;
+            display: grid;
+            place-items: center;
+            border: 2px dashed #94a3b8;
+            border-radius: 12px;
+            background: white;
+        }
+
+        .progress {
+            width: 100%;
+            height: 10px;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e2e8f0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background: var(--primary);
+            transition: width 0.25s ease;
+        }
+
+        .status {
+            min-height: 1.6em;
+            margin: 16px 0 0;
+            padding: 14px;
+            border: 1px solid #dbeafe;
+            border-radius: 10px;
+            background: white;
+            font-weight: 700;
+        }
+
+        .status.success { color: var(--success); }
+        .status.error { color: var(--danger); }
+        .stats { margin-top: 14px; }
+
+        .lower-grid {
+            display: grid;
+            grid-template-columns: minmax(320px, 1.2fr) minmax(280px, 0.8fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .table-panel,
+        .log-panel {
+            min-width: 0;
+            padding: 18px;
+            border: 1px solid #dbeafe;
+            border-radius: 12px;
+            background: white;
+        }
+
+        .table-panel h3,
+        .log-panel h3 { margin-top: 0; }
+
+        .table-scroll { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 9px;
+            text-align: left;
+            border: 1px solid #cbd5e1;
+        }
+
+        th { background: #e2e8f0; }
+
+        .log-list {
+            max-height: 300px;
+            margin: 0;
+            padding-left: 22px;
+            overflow-y: auto;
+        }
+
+        .log-list li { margin: 5px 0; }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .content-card {
+            min-width: 0;
+            padding: 18px;
+            border: 1px solid #dbeafe;
+            border-radius: 12px;
+            background: #eff6ff;
+        }
+
+        .content-card h3 { margin-top: 0; }
+
+        code {
+            padding: 2px 5px;
+            border-radius: 5px;
+            background: #e2e8f0;
+        }
+
+        @media (max-width: 850px) {
+            body { padding: 8px; }
+            main { padding: 14px; }
+
+            .header {
+                grid-template-columns: 1fr;
+                padding: 16px;
+            }
+
+            .back-button { justify-self: start; }
+            .header-spacer { display: none; }
+
+            .workspace, .lower-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics, .stats, .content-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .speed-row { grid-template-columns: 1fr; }
+            .speed-row output { text-align: left; }
+        }
+
+        @media (max-width: 520px) {
+            .metrics, .stats, .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
             }
         }
     </style>
 </head>
-
 <body>
+<div class="page">
+    <div class="container">
+        <header class="header">
+            <a class="back-button" href="https://sercankulcu.github.io/teaching/data-structures">&larr; Back</a>
+            <h1>Round Robin Scheduler</h1>
+            <span class="header-spacer" aria-hidden="true"></span>
+        </header>
 
-    <main>
-        <div class="header">
-            <a href="https://sercankulcu.github.io/teaching/data-structures" class="back-button">&larr; Back</a>
-            <h1>Process Scheduler</h1>
-        </div>
-        <section id="scheduler">
-            <div id="controls">
-                <button id="add-process">Add Process</button>
-                <button id="run-step">Run Step</button>
-                <button id="auto-run">Auto Run</button>
+        <main>
+            <section class="intro">
+                <h2>What is Round Robin Scheduling?</h2>
+                <p>
+                    Round Robin is a preemptive CPU scheduling algorithm. Processes wait in a FIFO ready queue.
+                    Each process receives at most one time quantum. If it does not finish, it returns to the rear
+                    of the queue.
+                </p>
+
+                <div class="metrics">
+                    <div class="metric"><strong>Scheduling structure</strong>FIFO queue</div>
+                    <div class="metric"><strong>Preemption</strong>After each quantum</div>
+                    <div class="metric"><strong>Fairness</strong>Every ready process gets CPU time</div>
+                    <div class="metric"><strong>Queue operation</strong>O(1)</div>
+                </div>
+            </section>
+
+            <h2 class="section-title">Scheduler controls</h2>
+            <section class="control-panel" aria-label="Scheduler controls">
+                <div class="control-group">
+                    <div class="field">
+                        <label for="burstInput">Burst time</label>
+                        <input id="burstInput" type="number" min="1" max="30" value="6" inputmode="numeric">
+                    </div>
+                    <div class="field">
+                        <label for="quantumInput">Time quantum</label>
+                        <input id="quantumInput" type="number" min="1" max="10" value="2" inputmode="numeric">
+                    </div>
+                    <button id="addButton" type="button">Add Process</button>
+                    <button id="randomButton" type="button">Add Random</button>
+                    <button id="stepButton" type="button">Run One Quantum</button>
+                </div>
+
+                <div class="control-group">
+                    <button id="autoButton" type="button">Auto Run</button>
+                    <button id="pauseButton" type="button" class="secondary">Pause</button>
+                    <button id="exampleButton" type="button">Load Example</button>
+                    <button id="resetButton" type="button" class="danger">Reset</button>
+                </div>
+
+                <div class="speed-row">
+                    <label for="speedInput"><strong>Auto-run speed</strong></label>
+                    <input id="speedInput" type="range" min="200" max="1500" step="100" value="700">
+                    <output id="speedOutput" for="speedInput">700 ms</output>
+                </div>
+            </section>
+
+            <div class="workspace">
+                <section class="queue-panel">
+                    <h3>Ready Queue</h3>
+                    <div class="queue-labels">
+                        <span>FRONT — next process</span>
+                        <span>REAR — returning processes</span>
+                    </div>
+                    <div id="queueTrack" class="queue-track" aria-label="Ready queue"></div>
+                </section>
+
+                <section class="current-panel">
+                    <h3>Current Process</h3>
+                    <div id="currentSlot" class="current-slot" aria-label="Current process"></div>
+                    <div class="progress" aria-label="Current process completion">
+                        <div id="progressBar" class="progress-bar"></div>
+                    </div>
+                </section>
             </div>
-            <h2>Process Queue</h2>
-            <div id="queue-container" aria-label="Process Queue"></div>
-            <h2>Current Process</h2>
-            <div id="current-process" aria-label="Current Process"></div>
-        </section>
-        <section id="log-section">
-            <h2>Execution Log</h2>
-            <div id="log" aria-label="Execution Log"></div>
-        </section>
-    </main>
 
-    <script>
-        class Process {
-            constructor(id, burstTime) {
-                this.id = id;
-                this.burstTime = burstTime;
-                this.remainingTime = burstTime;
-            }
+            <p id="status" class="status" role="status" aria-live="polite">
+                Add a process or load the example workload.
+            </p>
+
+            <div class="stats" aria-label="Scheduler statistics">
+                <div class="stat"><strong>Current time</strong><span id="timeStat">0</span></div>
+                <div class="stat"><strong>Ready processes</strong><span id="readyStat">0</span></div>
+                <div class="stat"><strong>Completed</strong><span id="completedStat">0</span></div>
+                <div class="stat"><strong>Context switches</strong><span id="switchStat">0</span></div>
+            </div>
+
+            <div class="lower-grid">
+                <section class="table-panel">
+                    <h3>Process metrics</h3>
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Process</th>
+                                <th>Burst</th>
+                                <th>Remaining</th>
+                                <th>Completion</th>
+                                <th>Turnaround</th>
+                                <th>Waiting</th>
+                            </tr>
+                            </thead>
+                            <tbody id="processBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section class="log-panel">
+                    <h3>Execution log</h3>
+                    <ol id="logList" class="log-list">
+                        <li>No scheduler events yet.</li>
+                    </ol>
+                </section>
+            </div>
+
+            <h2 class="section-title">Round Robin concepts</h2>
+            <div class="content-grid">
+                <article class="content-card">
+                    <h3>FIFO ready queue</h3>
+                    <p>
+                        A process enters at the rear and leaves from the front. An unfinished process returns to
+                        the rear after its quantum expires.
+                    </p>
+                </article>
+
+                <article class="content-card">
+                    <h3>Time quantum</h3>
+                    <p>
+                        A small quantum improves responsiveness but increases context-switch overhead. A large
+                        quantum makes Round Robin behave more like First-Come, First-Served.
+                    </p>
+                </article>
+
+                <article class="content-card">
+                    <h3>Turnaround time</h3>
+                    <p>
+                        Turnaround time is <code>completion time − arrival time</code>. In this simulator, all
+                        added processes arrive at the current scheduler time.
+                    </p>
+                </article>
+
+                <article class="content-card">
+                    <h3>Waiting time</h3>
+                    <p>
+                        Waiting time is <code>turnaround time − burst time</code>. It measures how long a process
+                        spent waiting rather than executing.
+                    </p>
+                </article>
+            </div>
+
+            <h2 class="section-title">Algorithm summary</h2>
+            <section class="panel">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Step</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr><td>1</td><td>Dequeue the process at the front of the ready queue.</td></tr>
+                    <tr><td>2</td><td>Execute it for <code>min(quantum, remaining time)</code>.</td></tr>
+                    <tr><td>3</td><td>If it finishes, record completion and timing metrics.</td></tr>
+                    <tr><td>4</td><td>Otherwise, enqueue it again at the rear.</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script>
+    "use strict";
+
+    const elements = {
+        burstInput: document.getElementById("burstInput"),
+        quantumInput: document.getElementById("quantumInput"),
+        speedInput: document.getElementById("speedInput"),
+        speedOutput: document.getElementById("speedOutput"),
+        queueTrack: document.getElementById("queueTrack"),
+        currentSlot: document.getElementById("currentSlot"),
+        progressBar: document.getElementById("progressBar"),
+        status: document.getElementById("status"),
+        timeStat: document.getElementById("timeStat"),
+        readyStat: document.getElementById("readyStat"),
+        completedStat: document.getElementById("completedStat"),
+        switchStat: document.getElementById("switchStat"),
+        processBody: document.getElementById("processBody"),
+        logList: document.getElementById("logList")
+    };
+
+    const buttons = {
+        add: document.getElementById("addButton"),
+        random: document.getElementById("randomButton"),
+        step: document.getElementById("stepButton"),
+        auto: document.getElementById("autoButton"),
+        pause: document.getElementById("pauseButton"),
+        example: document.getElementById("exampleButton"),
+        reset: document.getElementById("resetButton")
+    };
+
+    let readyQueue = [];
+    let allProcesses = [];
+    let currentProcess = null;
+    let nextId = 1;
+    let currentTime = 0;
+    let contextSwitches = 0;
+    let autoRunning = false;
+    let autoToken = 0;
+    let logs = [];
+
+    function readInteger(input, label, min, max) {
+        const raw = input.value.trim();
+        if (raw === "") throw new Error(`${label} is required.`);
+
+        const value = Number(raw);
+        if (!Number.isInteger(value) || value < min || value > max) {
+            throw new Error(`${label} must be an integer between ${min} and ${max}.`);
         }
+        return value;
+    }
 
-        class Queue {
-            constructor() {
-                this.items = [];
-            }
+    function createProcess(burst) {
+        const process = {
+            id: nextId++,
+            burst,
+            remaining: burst,
+            arrival: currentTime,
+            completion: null,
+            turnaround: null,
+            waiting: null
+        };
 
-            enqueue(element) {
-                this.items.push(element);
-            }
+        allProcesses.push(process);
+        readyQueue.push(process);
+        addLog(`P${process.id} arrived with burst time ${burst}.`);
+        render();
+    }
 
-            dequeue() {
-                if (this.isEmpty()) {
-                    return null;
-                }
-                return this.items.shift();
-            }
-
-            isEmpty() {
-                return this.items.length == 0;
-            }
+    function addProcess() {
+        try {
+            createProcess(readInteger(elements.burstInput, "Burst time", 1, 30));
+            setStatus("Process added to the ready queue.", "success");
+        } catch (error) {
+            setStatus(error.message, "error");
         }
+    }
 
-        const queue = new Queue();
-        let currentProcess = null;
-        let processIdCounter = 1;
-        let timeQuantum = 2;
-        let currentTime = 0;
+    function addRandomProcess() {
+        createProcess(Math.floor(Math.random() * 10) + 1);
+        setStatus("Random process added.", "success");
+    }
 
-        const queueContainer = document.getElementById('queue-container');
-        const currentProcessContainer = document.getElementById('current-process');
-        const addProcessBtn = document.getElementById('add-process');
-        const runStepBtn = document.getElementById('run-step');
-        const autoRunBtn = document.getElementById('auto-run');
-        const logContainer = document.getElementById('log');
+    function getQuantum() {
+        return readInteger(elements.quantumInput, "Time quantum", 1, 10);
+    }
 
-        function updateDisplay() {
-            queueContainer.innerHTML = '';
-            queue.items.forEach(process => {
-                const processElement = createProcessElement(process);
-                queueContainer.appendChild(processElement);
+    function addLog(message) {
+        logs.unshift(`[t=${currentTime}] ${message}`);
+        logs = logs.slice(0, 40);
+        elements.logList.innerHTML = logs.map((entry) => `<li>${escapeHtml(entry)}</li>`).join("");
+    }
+
+    function escapeHtml(value) {
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+    function setStatus(message, type = "") {
+        elements.status.textContent = message;
+        elements.status.className = `status ${type}`.trim();
+    }
+
+    function processCard(process, running = false) {
+        const card = document.createElement("div");
+        card.className = `process-card ${running ? "running" : ""}`.trim();
+        card.innerHTML = `
+            <span>P${process.id}</span>
+            <small>remaining ${process.remaining} / ${process.burst}</small>
+        `;
+        return card;
+    }
+
+    function render() {
+        elements.queueTrack.innerHTML = "";
+
+        if (readyQueue.length === 0) {
+            const empty = document.createElement("p");
+            empty.className = "empty-state";
+            empty.textContent = "The ready queue is empty.";
+            elements.queueTrack.appendChild(empty);
+        } else {
+            readyQueue.forEach((process) => {
+                elements.queueTrack.appendChild(processCard(process));
             });
+        }
 
-            currentProcessContainer.innerHTML = '';
-            if (currentProcess) {
-                const currentProcessElement = createProcessElement(currentProcess);
-                currentProcessElement.classList.add('running');
-                currentProcessContainer.appendChild(currentProcessElement);
+        elements.currentSlot.innerHTML = "";
+        if (currentProcess) {
+            elements.currentSlot.appendChild(processCard(currentProcess, true));
+            const completed = currentProcess.burst - currentProcess.remaining;
+            elements.progressBar.style.width = `${(completed / currentProcess.burst) * 100}%`;
+        } else {
+            elements.currentSlot.innerHTML = '<p class="empty-state">CPU is idle.</p>';
+            elements.progressBar.style.width = "0%";
+        }
+
+        elements.timeStat.textContent = String(currentTime);
+        elements.readyStat.textContent = String(readyQueue.length);
+        elements.completedStat.textContent = String(
+            allProcesses.filter((process) => process.completion !== null).length
+        );
+        elements.switchStat.textContent = String(contextSwitches);
+
+        elements.processBody.innerHTML = allProcesses.map((process) => `
+            <tr class="${process.completion !== null ? "completed-row" : ""}">
+                <td>P${process.id}</td>
+                <td>${process.burst}</td>
+                <td>${process.remaining}</td>
+                <td>${process.completion ?? "—"}</td>
+                <td>${process.turnaround ?? "—"}</td>
+                <td>${process.waiting ?? "—"}</td>
+            </tr>
+        `).join("");
+
+        updateButtons();
+    }
+
+    function updateButtons() {
+        const noWork = readyQueue.length === 0 && !currentProcess;
+        buttons.step.disabled = autoRunning || noWork;
+        buttons.auto.disabled = autoRunning || noWork;
+        buttons.pause.disabled = !autoRunning;
+        buttons.add.disabled = autoRunning;
+        buttons.random.disabled = autoRunning;
+        buttons.example.disabled = autoRunning;
+        elements.burstInput.disabled = autoRunning;
+        elements.quantumInput.disabled = autoRunning;
+    }
+
+    function runOneQuantum() {
+        try {
+            if (!currentProcess && readyQueue.length === 0) {
+                setStatus("No processes are ready to run.", "error");
+                return false;
             }
-        }
 
-        function createProcessElement(process) {
-            const processElement = document.createElement('div');
-            processElement.classList.add('process');
-            processElement.innerHTML = `
-                <div>P${process.id}</div>
-                <div>${process.remainingTime}/${process.burstTime}</div>
-            `;
-            return processElement;
-        }
-
-        function addProcess() {
-            const burstTime = Math.floor(Math.random() * 10) + 1;
-            const newProcess = new Process(processIdCounter++, burstTime);
-            queue.enqueue(newProcess);
-            updateDisplay();
-            log(`Process P${newProcess.id} added with burst time ${newProcess.burstTime}`);
-        }
-
-        function runStep() {
-            if (!currentProcess && queue.isEmpty()) {
-                log('No processes to run');
-                return;
-            }
+            const quantum = getQuantum();
 
             if (!currentProcess) {
-                currentProcess = queue.dequeue();
-                log(`Process P${currentProcess.id} started execution`);
+                currentProcess = readyQueue.shift();
+                contextSwitches += 1;
+                addLog(`P${currentProcess.id} entered the CPU.`);
             }
 
-            const executionTime = Math.min(timeQuantum, currentProcess.remainingTime);
-            currentProcess.remainingTime -= executionTime;
+            const executionTime = Math.min(quantum, currentProcess.remaining);
+            currentProcess.remaining -= executionTime;
             currentTime += executionTime;
 
-            log(`Process P${currentProcess.id} executed for ${executionTime} units. Remaining time: ${currentProcess.remainingTime}`);
-            updateDisplay();
+            addLog(
+                `P${currentProcess.id} executed for ${executionTime} unit(s); ` +
+                `${currentProcess.remaining} remaining.`
+            );
 
-            if (currentProcess.remainingTime === 0) {
-                log(`Process P${currentProcess.id} completed execution`);
+            if (currentProcess.remaining === 0) {
+                currentProcess.completion = currentTime;
+                currentProcess.turnaround = currentProcess.completion - currentProcess.arrival;
+                currentProcess.waiting = currentProcess.turnaround - currentProcess.burst;
+                addLog(`P${currentProcess.id} completed.`);
+                setStatus(`P${currentProcess.id} completed at time ${currentTime}.`, "success");
                 currentProcess = null;
-                updateDisplay();
             } else {
-                queue.enqueue(currentProcess);
-                log(`Process P${currentProcess.id} moved back to queue`);
+                readyQueue.push(currentProcess);
+                addLog(`P${currentProcess.id} returned to the rear of the ready queue.`);
+                setStatus(`Quantum expired; P${currentProcess.id} returned to the queue.`);
                 currentProcess = null;
             }
+
+            render();
+            return true;
+        } catch (error) {
+            setStatus(error.message, "error");
+            return false;
         }
+    }
 
-        function log(message) {
-            const logEntry = document.createElement('div');
-            logEntry.classList.add('log-entry');
-            logEntry.textContent = `[${currentTime}] ${message}`;
-            logContainer.prepend(logEntry); // Yeni log girişini en üst satıra ekler
-        }
+    function getAutoDelay() {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return 0;
+        return Number(elements.speedInput.value);
+    }
 
-
-        let autoRunInterval;
-
-        addProcessBtn.addEventListener('click', addProcess);
-        runStepBtn.addEventListener('click', runStep);
-        autoRunBtn.addEventListener('click', () => {
-            if (autoRunInterval) {
-                clearInterval(autoRunInterval);
-                autoRunInterval = null;
-                autoRunBtn.textContent = 'Auto Run';
-            } else {
-                autoRunInterval = setInterval(runStep, 1000);
-                autoRunBtn.textContent = 'Stop Auto Run';
-            }
+    function wait(milliseconds, token) {
+        return new Promise((resolve) => {
+            window.setTimeout(() => resolve(token === autoToken), milliseconds);
         });
+    }
 
-        // Initialize with some processes
-        for (let i = 0; i < 3; i++) {
+    async function autoRun() {
+        if (autoRunning || (readyQueue.length === 0 && !currentProcess)) return;
+
+        autoRunning = true;
+        const token = ++autoToken;
+        render();
+        setStatus("Automatic scheduling started.");
+
+        while (
+            token === autoToken &&
+            (readyQueue.length > 0 || currentProcess)
+        ) {
+            if (!runOneQuantum()) break;
+            if (!(await wait(getAutoDelay(), token))) break;
+        }
+
+        if (token === autoToken) {
+            autoRunning = false;
+            render();
+
+            if (readyQueue.length === 0 && !currentProcess) {
+                setStatus(`All processes completed at time ${currentTime}.`, "success");
+            }
+        }
+    }
+
+    function pauseAutoRun() {
+        if (!autoRunning) return;
+        autoToken += 1;
+        autoRunning = false;
+        render();
+        setStatus("Automatic scheduling paused.");
+    }
+
+    function loadExample() {
+        resetScheduler(false);
+        [5, 9, 3, 7].forEach((burst) => createProcess(burst));
+        setStatus("Loaded four example processes.", "success");
+    }
+
+    function resetScheduler(showMessage = true) {
+        autoToken += 1;
+        autoRunning = false;
+        readyQueue = [];
+        allProcesses = [];
+        currentProcess = null;
+        nextId = 1;
+        currentTime = 0;
+        contextSwitches = 0;
+        logs = [];
+        elements.logList.innerHTML = "<li>No scheduler events yet.</li>";
+        render();
+
+        if (showMessage) {
+            setStatus("Scheduler reset.");
+        }
+    }
+
+    elements.speedInput.addEventListener("input", () => {
+        elements.speedOutput.value = `${elements.speedInput.value} ms`;
+        elements.speedOutput.textContent = `${elements.speedInput.value} ms`;
+    });
+
+    elements.burstInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
             addProcess();
         }
-        updateDisplay();
-    </script>
-</body>
+    });
 
+    buttons.add.addEventListener("click", addProcess);
+    buttons.random.addEventListener("click", addRandomProcess);
+    buttons.step.addEventListener("click", runOneQuantum);
+    buttons.auto.addEventListener("click", autoRun);
+    buttons.pause.addEventListener("click", pauseAutoRun);
+    buttons.example.addEventListener("click", loadExample);
+    buttons.reset.addEventListener("click", () => resetScheduler(true));
+
+    render();
+</script>
+</body>
 </html>
