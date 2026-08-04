@@ -167,8 +167,7 @@ A heap is a specialized tree-based data structure that satisfies the heap proper
 
 - [🖼️Sunum-Öncelikli Kuyruk (PDF)](../files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk.pdf)
 - 🕹️Simulators:
-  - [Max-Heap Simulator (HTML)](../files/data_structures/slides/Bolum_08_Heap.html)
-  - [Min-Heap Simulator (HTML)](../files/data_structures/slides/Bolum_08_Min_Heap.html)
+  - [Heap Simulator (HTML)](../files/data_structures/slides/Bolum_08_Heap.html)
   - [Priority Queue Simulator (HTML)](../files/data_structures/slides/Bolum_08_Priority_Queue.html)
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_08_Heaps_Priority_Queues.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders08/src)
