@@ -85,6 +85,7 @@ Nash equilibrium is a central concept in game theory that captures the notion of
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_03_Nash_Dengesi.pdf)
 - [🕹️Prisoner's Dilemma (HTML)](../files/agt/slides/Chapter_03_Prisoners_Dilemma.html)
+- [🕹️Matrix Nash (HTML)](../files/agt/slides/Chapter_03_Matrix-Nash.html)
 - [🕹️Rock–Paper–Scissors Game (HTML)](../files/agt/slides/Chapter_03_Rock_Scissors_Paper.html)
 - [🕹️Chess game (HTML)](../files/agt/slides/Chapter_03_Chess.html)
 - [Computational Complexity of Equilibria](../files/agt/slides/Chapter_03_Computational_Complexity_of_Equilibria.html)
