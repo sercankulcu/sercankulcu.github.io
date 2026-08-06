@@ -148,6 +148,7 @@ In algorithmic game theory, network design and routing are studied with a focus 
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_08_Ag_Tasarimi.pdf)
 - [🕹️Traffic lights simulator (HTML)](../files/agt/slides/Chapter_08_Traffic_Lights.html)
+- [🕹️Selfish Routing (HTML)](../files/agt/slides/Chapter_08_Selfish-Routing.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_08_Network_Design_and_Routing.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -191,6 +192,7 @@ Learning and adaptation play a significant role in algorithmic game theory by ad
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_12_Ogrenme.pdf)
 - [Reinforcement Learning](../files/agt/slides/Chapter_12_Reinforcement_Learning.html)
+- [Multi Armed Bandit](../files/agt/slides/Chapter_12_Multi-Armed-Bandit.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_10_Learning_and_Adaptation.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
