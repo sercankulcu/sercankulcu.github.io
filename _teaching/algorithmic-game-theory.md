@@ -56,10 +56,8 @@ Game theory is a mathematical framework used to analyze and understand strategic
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri.pdf)
 - [🕹️Guess the Average Game (HTML)](../files/agt/slides/Chapter_01_Guess_Avarage.html)
-- [🕹️TicTacToe game (HTML)](../files/agt/slides/Chapter_01_TicTacToe.html) | 
-  [pdf](../files/agt/slides/Chapter_01_TicTacToe.pdf)
-- [🕹️Don't Say 21 Game (HTML)](../files/agt/slides/Chapter_01_Dontsay21.html) | 
-  [pdf](../files/agt/slides/Chapter_01_Dontsay21.pdf)
+- [🕹️TicTacToe game (HTML)](../files/agt/slides/Chapter_01_TicTacToe.html)
+- [🕹️Don't Say 21 Game (HTML)](../files/agt/slides/Chapter_01_Dontsay21.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_01_Game_Theory_Fundamentals.pdf) | 
   [Real World Applications](../files/agt/slides/Chapter_01_Real_World_Applications.html) | 
   [Gerçek Dünya Uygulamaları](../files/agt/slides/Bolum_01_Gercek_Dunya_Uygulamalari.html)
@@ -72,8 +70,7 @@ Game theory is a mathematical framework used to analyze and understand strategic
 Algorithmic game theory is an interdisciplinary field that combines concepts from game theory and computer science. It focuses on the study of strategic interactions in computational settings and aims to design efficient algorithms and computational models for analyzing and solving games.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_02_Oyun_Kuramina_Giris.pdf)
-- [🕹️Othello game (HTML)](../files/agt/slides/Chapter_02_Othello.html) | 
-  [pdf](../files/agt/slides/Chapter_02_Othello.pdf)
+- [🕹️Othello game (HTML)](../files/agt/slides/Chapter_02_Othello.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_02_Introduction_to_Algorithmic_Game_Theory.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -139,8 +136,7 @@ Social choice theory is a branch of economics and political science that studies
 Multi-agent systems refer to scenarios where multiple self-interested agents interact and make decisions in a shared environment. Multi-agent systems are analyzed to understand the strategic behavior of agents, optimize outcomes, and design mechanisms that align individual incentives with system objectives.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_07_Coklu_Ajan.pdf)
-- [🕹️Checkers game (HTML)](../files/agt/slides/Chapter_07_Checkers.html) | 
-  [pdf](../files/agt/slides/Chapter_07_Checkers.pdf)
+- [🕹️Checkers game (HTML)](../files/agt/slides/Chapter_07_Checkers.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_13_Multi_Agent_Systems.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
