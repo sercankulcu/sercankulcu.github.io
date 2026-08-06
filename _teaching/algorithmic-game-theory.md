@@ -172,8 +172,8 @@ In algorithmic game theory, online platforms are studied as environments where s
 Algorithmic fairness studies how decisions and resource allocations affect different individuals or groups. Algorithmic ethics considers the broader responsibilities, harms, transparency, accountability, and societal consequences of computational mechanisms.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_10_Algoritmik_Etik.pdf)
-- [🕹️Backgammon game (HTML)](../files/agt/slides/Chapter_10_Backgammon.html) | 
-  [pdf](../files/agt/slides/Chapter_10_Backgammon.pdf)
+- [🕹️Backgammon Game (HTML)](../files/agt/slides/Chapter_10_Backgammon.html)
+- [🕹️Fair Division Game (HTML)](../files/agt/slides/Chapter_10_Fair-Division-Game.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_07_Algorithmic_Fairness_and_Ethics.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
