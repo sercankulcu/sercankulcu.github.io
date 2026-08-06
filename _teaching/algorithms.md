@@ -9,7 +9,7 @@ location: "Giresun, Turkey"
 ---
 
 ![algorithms](/images/teaching/algorithms-course.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
-An algorithm is a set of well-defined instructions for carrying out a particular task. Think of it as a recipe in a cookbook that guides you step by step to make a delicious dish. In the world of computing, algorithms are the backbone that powers programs and applications. They are logical sequences that tell a computer exactly what steps to take to solve a problem or achieve a goal. From simple tasks like sorting a list of numbers to complex operations like image processing or running search engines, algorithms are everywhere.
+An algorithm is a finite and well-defined sequence of steps for solving a problem or performing a computation. Algorithms form the foundation of software systems and are used in tasks ranging from sorting and searching to graph processing, optimization, text analysis, and scientific computing. This course examines fundamental algorithm-design techniques, correctness, time and space complexity, and the practical trade-offs between alternative solutions.
 
 ## Ders Öğretim Planı
 [Ders Öğretim Planı (PDF)](../files/algorithms/slides/Bolum_00_Ders_Ogretim_Planı.pdf)
