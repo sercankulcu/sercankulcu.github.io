@@ -128,6 +128,7 @@ Social choice theory is a branch of economics and political science that studies
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_06_Oylama.pdf)
 - [🕹️Facility Location Mechanism (HTML)](../files/agt/slides/Chapter_06_Facility_Location.html)
+- [🕹️Voting Rules (HTML)](../files/agt/slides/Chapter_06_Voting-Rules.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_06_Social_Choice_and_Voting_Systems.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
