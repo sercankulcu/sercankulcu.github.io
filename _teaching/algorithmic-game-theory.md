@@ -115,6 +115,7 @@ Auctions and market design are closely related fields that utilize principles fr
   [Dutch Auction Simulator](../files/agt/slides/Chapter_05_dutch-auction-simulator.html) | 
   [First-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_first-price-auction-simulator.html) | 
   [Second-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_second-price-sealed-bid-auction.html)
+- [🕹️Double Auction Market (HTML)](../files/agt/slides/Chapter_05_Double-Auction-Market-Simulator.html)
 - [🕹️Monopoly game (HTML)](../files/agt/slides/Chapter_05_Monopoly/index.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_05_Auctions_and_Market_Design.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
@@ -167,6 +168,7 @@ In algorithmic game theory, online platforms are studied as environments where s
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_09_Cevrimici_Platform.pdf)
 - [🕹️Two Sided Platform Pricing (HTML)](../files/agt/slides/Chapter_09_Two-Sided-Platform-Pricing.html) 
+- [🕹️Sponsored Search Ad Auction (HTML)](../files/agt/slides/Chapter_09_Sponsored-Search-Ad-Auction-Game.html) 
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_11_Online_Platforms.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -189,6 +191,7 @@ Algorithmic fairness studies how decisions and resource allocations affect diffe
 Price of Anarchy (PoA) is a measure that quantifies the loss of efficiency in a system due to the selfish behavior of individual agents. It evaluates the impact of strategic decision-making on the overall performance or welfare of a system. The Price of Anarchy compares the social welfare or cost of the worst equilibrium with that of an optimal centrally coordinated outcome.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_11_Anarsi.pdf)
+- [🕹️Load Balancing Price of Anarchy (HTML)](../files/agt/slides/Chapter_11_Load-Balancing-Price-of-Anarchy-Game.html) 
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_09_Price_of_Anarchy_and_Efficiency.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -224,6 +227,7 @@ Decision-making is a central concept that focuses on how self-interested agents 
 Algorithmic game theory is a rapidly evolving field that continues to explore new directions and address emerging challenges.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_14_Gelecek.pdf)
+- [🕹️AI Agent Strategy Tournement (HTML)](../files/agt/slides/Chapter_14_Ai-Agent-Strategy-Tournament.html) 
 - [Student Projects](../files/agt/slides/Chapter_14_Student_Projects.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_14_Future_Directions.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
