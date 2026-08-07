@@ -161,6 +161,7 @@ In algorithmic game theory, network design and routing are studied with a focus 
 In algorithmic game theory, online platforms are studied as environments where self-interested agents interact and make decisions in the pursuit of their own objectives. Online platforms encompass various digital platforms, such as e-commerce platforms, social media platforms, ride-sharing platforms, and online auctions.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_09_Cevrimici_Platform.pdf)
+- [🕹️Two Sided Platform Pricing (HTML)](../files/agt/slides/Chapter_09_Two-Sided-Platform-Pricing.html) 
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_11_Online_Platforms.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
