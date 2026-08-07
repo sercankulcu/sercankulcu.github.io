@@ -128,6 +128,7 @@ Social choice theory is a branch of economics and political science that studies
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_06_Oylama.pdf)
 - [🕹️Facility Location Mechanism (HTML)](../files/agt/slides/Chapter_06_Facility_Location.html)
 - [🕹️Voting Rules (HTML)](../files/agt/slides/Chapter_06_Voting-Rules.html)
+- [🕹️Condorcet Voting (HTML)](../files/agt/slides/Chapter_06_Condorcet-Voting-Paradox.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_06_Social_Choice_and_Voting_Systems.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -154,6 +155,7 @@ In algorithmic game theory, network design and routing are studied with a focus 
 - [🕹️Traffic lights simulator (HTML)](../files/agt/slides/Chapter_08_Traffic_Lights.html)
 - [🕹️Selfish Routing (HTML)](../files/agt/slides/Chapter_08_Selfish-Routing.html) 
 - [🕹️Braess Paradox (HTML)](../files/agt/slides/Chapter_08_Braess-Paradox-Visualizer.html) 
+- [🕹️Network Formation (HTML)](../files/agt/slides/Chapter_08_Network-Formation.html) 
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_08_Network_Design_and_Routing.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -198,6 +200,8 @@ Learning and adaptation play a significant role in algorithmic game theory by ad
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_12_Ogrenme.pdf)
 - [🕹️Multi Armed Bandit](../files/agt/slides/Chapter_12_Multi-Armed-Bandit.html)
+- [🕹️Repeated Prisoners Dilemma](../files/agt/slides/Chapter_12_Repeated-Prisoners-Dilemma-Tournament.html)
+- [🕹️Replicator Dynamics](../files/agt/slides/Chapter_12_Replicator-Dynamics.html)
 - [Reinforcement Learning](../files/agt/slides/Chapter_12_Reinforcement_Learning.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_10_Learning_and_Adaptation.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
