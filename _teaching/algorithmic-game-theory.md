@@ -137,7 +137,8 @@ Social choice theory is a branch of economics and political science that studies
 Multi-agent systems refer to scenarios where multiple self-interested agents interact and make decisions in a shared environment. Multi-agent systems are analyzed to understand the strategic behavior of agents, optimize outcomes, and design mechanisms that align individual incentives with system objectives.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_07_Coklu_Ajan.pdf)
-- [🕹️Checkers game (HTML)](../files/agt/slides/Chapter_07_Checkers.html)
+- [🕹️Checkers Game (HTML)](../files/agt/slides/Chapter_07_Checkers.html)
+- [🕹️Public Goods Game (HTML)](../files/agt/slides/Chapter_07_Public-Goods-Game.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_13_Multi_Agent_Systems.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
