@@ -194,8 +194,8 @@ Price of Anarchy (PoA) is a measure that quantifies the loss of efficiency in a 
 Learning and adaptation play a significant role in algorithmic game theory by addressing how self-interested agents can improve their decision-making strategies over time and adapt to changing environments.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_12_Ogrenme.pdf)
+- [🕹️Multi Armed Bandit](../files/agt/slides/Chapter_12_Multi-Armed-Bandit.html)
 - [Reinforcement Learning](../files/agt/slides/Chapter_12_Reinforcement_Learning.html)
-- [Multi Armed Bandit](../files/agt/slides/Chapter_12_Multi-Armed-Bandit.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_10_Learning_and_Adaptation.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -206,6 +206,7 @@ Learning and adaptation play a significant role in algorithmic game theory by ad
 Decision-making is a central concept that focuses on how self-interested agents make choices or decisions in strategic situations. Decision-making in algorithmic game theory involves analyzing the strategic interactions among agents, understanding their preferences and objectives, and designing mechanisms and algorithms to optimize outcomes.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_13_Karar_Alma.pdf)
+- [🕹️Bayesian Decision Lab](../files/agt/slides/Chapter_13_Bayesian-Decision-Lab.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_12_Decision_Making.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
