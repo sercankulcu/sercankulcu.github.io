@@ -139,6 +139,7 @@ Multi-agent systems refer to scenarios where multiple self-interested agents int
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_07_Coklu_Ajan.pdf)
 - [🕹️Checkers Game (HTML)](../files/agt/slides/Chapter_07_Checkers.html)
 - [🕹️Public Goods Game (HTML)](../files/agt/slides/Chapter_07_Public-Goods-Game.html)
+- [🕹️Shapley Coalition Game (HTML)](../files/agt/slides/Chapter_07_Shapley-Coalition-Game.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_13_Multi_Agent_Systems.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
