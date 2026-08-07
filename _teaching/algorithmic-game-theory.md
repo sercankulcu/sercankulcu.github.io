@@ -98,6 +98,7 @@ Mechanism design is a field of study within game theory and economics that focus
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_04_Mekanizma.pdf)
 - [🕹️Poker game (HTML)](../files/agt/slides/Chapter_04_Poker/poker.html)
 - [🕹️Stable Matching (HTML)](../files/agt/slides/Chapter_04_Stable-Matching.html)
+- [🕹️Ultimatum Game (HTML)](../files/agt/slides/Chapter_04_Ultimatum-Game.html)
 - [Bayesian Games](../files/agt/slides/Chapter_04_Bayesian_Games.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_04_Mechanism_Design_and_Incentives.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
