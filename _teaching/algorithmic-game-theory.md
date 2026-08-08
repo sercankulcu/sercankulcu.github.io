@@ -58,6 +58,8 @@ Game theory is a mathematical framework used to analyze and understand strategic
 - [🕹️Guess the Average Game (HTML)](../files/agt/slides/Chapter_01_Guess_Avarage.html)
 - [🕹️TicTacToe game (HTML)](../files/agt/slides/Chapter_01_TicTacToe.html)
 - [🕹️Don't Say 21 Game (HTML)](../files/agt/slides/Chapter_01_Dontsay21.html)
+- [🕹️Nim Game (HTML)](../files/agt/slides/Chapter_01_Nim.html)
+- [🕹️Don't Say 21 Modern Game (HTML)](../files/agt/slides/Chapter_01_Dont-Say-21-Modern.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_01_Game_Theory_Fundamentals.pdf) | 
   [Real World Applications](../files/agt/slides/Chapter_01_Real_World_Applications.html) | 
   [Gerçek Dünya Uygulamaları](../files/agt/slides/Bolum_01_Gercek_Dunya_Uygulamalari.html)
@@ -70,7 +72,10 @@ Game theory is a mathematical framework used to analyze and understand strategic
 Algorithmic game theory is an interdisciplinary field that combines concepts from game theory and computer science. It focuses on the study of strategic interactions in computational settings and aims to design efficient algorithms and computational models for analyzing and solving games.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_02_Oyun_Kuramina_Giris.pdf)
-- [🕹️Othello game (HTML)](../files/agt/slides/Chapter_02_Othello.html)
+- [🕹️Othello Game (HTML)](../files/agt/slides/Chapter_02_Othello.html)
+- [🕹️Hex Game (HTML)](../files/agt/slides/Chapter_02_Hex.html)
+- [🕹️Reversi Game (HTML)](../files/agt/slides/Chapter_02_Reversi.html)
+- [🕹️Connect Four Game (HTML)](../files/agt/slides/Chapter_02_Connect-Four.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_02_Introduction_to_Algorithmic_Game_Theory.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -84,6 +89,9 @@ Nash equilibrium is a central concept in game theory that captures the notion of
 - [🕹️Prisoner's Dilemma (HTML)](../files/agt/slides/Chapter_03_Prisoners_Dilemma.html)
 - [🕹️Matrix Nash (HTML)](../files/agt/slides/Chapter_03_Matrix-Nash.html)
 - [🕹️Rock–Paper–Scissors Game (HTML)](../files/agt/slides/Chapter_03_Rock_Scissors_Paper.html)
+- [🕹️Colonel Blotto Game (HTML)](../files/agt/slides/Chapter_03_Colonel-Blotto.html)
+- [🕹️Fox and Geese Game (HTML)](../files/agt/slides/Chapter_03_Fox-and-Geese.html)
+- [🕹️Nine Mens Morris Game (HTML)](../files/agt/slides/Chapter_03_Nine-Mens-Morris.html)
 - [🕹️Chess game (HTML)](../files/agt/slides/Chapter_03_Chess.html)
 - [Computational Complexity of Equilibria](../files/agt/slides/Chapter_03_Computational_Complexity_of_Equilibria.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_03_Nash_Equilibrium_and_Strategic_Behavior.pdf)
@@ -116,6 +124,7 @@ Auctions and market design are closely related fields that utilize principles fr
   [First-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_first-price-auction-simulator.html) | 
   [Second-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_second-price-sealed-bid-auction.html)
 - [🕹️Double Auction Market (HTML)](../files/agt/slides/Chapter_05_Double-Auction-Market-Simulator.html)
+- [🕹️Vickrey Auction (HTML)](../files/agt/slides/Chapter_05_Vickrey-Auction.html)
 - [🕹️Monopoly game (HTML)](../files/agt/slides/Chapter_05_Monopoly/index.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_05_Auctions_and_Market_Design.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
@@ -217,6 +226,11 @@ Decision-making is a central concept that focuses on how self-interested agents 
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_13_Karar_Alma.pdf)
 - [🕹️Bayesian Decision Lab](../files/agt/slides/Chapter_13_Bayesian-Decision-Lab.html)
+- [🕹️Blackjack Game](../files/agt/slides/Chapter_13_Blackjack.html)
+- [🕹️HOKM Game](../files/agt/slides/Chapter_13_Hokm.html)
+- [🕹️Mangala Game](../files/agt/slides/Chapter_13_Mangala.html)
+- [🕹️Minesweeper Game](../files/agt/slides/Chapter_13_Minesweeper.html)
+- [🕹️Pişti Game](../files/agt/slides/Chapter_13_Pisti.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_12_Decision_Making.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
@@ -227,6 +241,7 @@ Decision-making is a central concept that focuses on how self-interested agents 
 Algorithmic game theory is a rapidly evolving field that continues to explore new directions and address emerging challenges.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_14_Gelecek.pdf)
+- [🕹️Age of Çotanak (HTML)](../files/agt/slides/Chapter_14_Age-of-Cotanak.html) 
 - [🕹️AI Agent Strategy Tournement (HTML)](../files/agt/slides/Chapter_14_Ai-Agent-Strategy-Tournament.html) 
 - [Student Projects](../files/agt/slides/Chapter_14_Student_Projects.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_14_Future_Directions.pdf)
