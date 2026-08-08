@@ -19,8 +19,8 @@ Algorithmic game theory studies strategic interaction through the lens of comput
 
 ## Announcements
 
-  [✍️ Vize & Final](../files/agt/slides/agt_odev.html) | 
-  [Proje Listesi](../files/agt/slides/projeler.html)
+  [✍️ 2025 Vize & Final](../files/agt/slides/agt_odev_2025.html) | 
+  [Proje Listesi](../files/agt/slides/projeler_2025.html)
 
 ---
 
@@ -56,7 +56,7 @@ Game theory is a mathematical framework used to analyze and understand strategic
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri.pdf)
 - [🕹️Guess the Average Game (HTML)](../files/agt/slides/Chapter_01_Guess_Avarage.html)
-- [🕹️TicTacToe game (HTML)](../files/agt/slides/Chapter_01_TicTacToe.html)
+- [🕹️TicTacToe Game (HTML)](../files/agt/slides/Chapter_01_TicTacToe.html)
 - [🕹️Don't Say 21 Game (HTML)](../files/agt/slides/Chapter_01_Dontsay21.html)
 - [🕹️Nim Game (HTML)](../files/agt/slides/Chapter_01_Nim.html)
 - [🕹️Don't Say 21 Modern Game (HTML)](../files/agt/slides/Chapter_01_Dont-Say-21-Modern.html)
@@ -104,7 +104,7 @@ Nash equilibrium is a central concept in game theory that captures the notion of
 Mechanism design is a field of study within game theory and economics that focuses on designing rules or mechanisms to achieve desired outcomes in strategic settings. It involves designing incentive-compatible mechanisms that align the self-interests of individual participants with the desired collective goals. Mechanism design asks how rules can be constructed so that self-interested participants reveal useful information and produce desirable outcomes. Common objectives include incentive compatibility, individual rationality, efficiency, revenue, and social welfare.
 
 - [🖼️Slides (PDF)](../files/agt/slides/Bolum_04_Mekanizma.pdf)
-- [🕹️Poker game (HTML)](../files/agt/slides/Chapter_04_Poker/poker.html)
+- [🕹️Poker Game (HTML)](../files/agt/slides/Chapter_04_Poker/poker.html)
 - [🕹️Stable Matching (HTML)](../files/agt/slides/Chapter_04_Stable-Matching.html)
 - [🕹️Ultimatum Game (HTML)](../files/agt/slides/Chapter_04_Ultimatum-Game.html)
 - [🕹️Incentive Compatibility (HTML)](../files/agt/slides/Chapter_04_Incentive-Compatibility-Lab.html)
@@ -125,7 +125,7 @@ Auctions and market design are closely related fields that utilize principles fr
   [Second-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_second-price-sealed-bid-auction.html)
 - [🕹️Double Auction Market (HTML)](../files/agt/slides/Chapter_05_Double-Auction-Market-Simulator.html)
 - [🕹️Vickrey Auction (HTML)](../files/agt/slides/Chapter_05_Vickrey-Auction.html)
-- [🕹️Monopoly game (HTML)](../files/agt/slides/Chapter_05_Monopoly/index.html)
+- [🕹️Monopoly Game (HTML)](../files/agt/slides/Chapter_05_Monopoly/index.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_05_Auctions_and_Market_Design.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
 
