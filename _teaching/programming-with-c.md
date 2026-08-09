@@ -25,6 +25,13 @@ C is a general-purpose programming language widely used in systems programming, 
 
 ---
 
+## Preliminary Materials: 
+
+* Prerequisites for preparation [pdf](../files/c/C_Procedural_Programming_Prerequisites.html)
+* Key figures who have shaped the field [pdf](../files/c/C_Procedural_Programming_Important_People.html)
+
+---
+
 ## Chapter 1: Introduction to C Programming
 - Origins and evolution of the C language
 - Features and benefits of using C
