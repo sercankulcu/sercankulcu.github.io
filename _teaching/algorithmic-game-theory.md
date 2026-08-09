@@ -50,6 +50,13 @@ Algorithmic game theory studies strategic interaction through the lens of comput
 
 ---
 
+## Preliminary Materials: 
+
+* Prerequisites for preparation [pdf](../files/agt/Algorithmic_Game_Theory_Prerequisites.html)
+* Key figures who have shaped the field [pdf](../files/agt/Algorithmic_Game_Theory_Important_People.html)
+
+---
+
 ## Chapter 1: Game Theory Fundamentals
 
 Game theory is a mathematical framework used to analyze and understand strategic interactions between rational decision-makers. It provides a systematic way of studying situations where the outcome of one person's decision depends on the actions of others.
