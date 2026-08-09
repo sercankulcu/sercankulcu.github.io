@@ -46,6 +46,13 @@ There are currently no announcements.
 
 ---
 
+## Preliminary Materials: 
+
+* Prerequisites for preparation [pdf](../files/microprocessors/Microprocessors_Prerequisites.html)
+* Key figures who have shaped the field [pdf](../files/microprocessors/Microprocessors_Important_People.html)
+
+---
+
 ## Chapter 1: Introduction to Microprocessors and the 8086 Architecture
 
 This chapter provides a foundational overview of microprocessor basics. It introduces the fundamental concepts of microprocessors and explores the significance of the 8086 architecture in computer systems. The content focuses on essential principles, helping students grasp the core workings of microprocessors.
