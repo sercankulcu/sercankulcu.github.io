@@ -74,6 +74,13 @@ There are currently no announcements.
 
 ---
 
+## Preliminary Materials: 
+
+* Prerequisites for preparation [pdf](../files/algorithms/Algorithms_Prerequisites.html)
+* Key figures who have shaped the field [pdf](../files/algorithms/Algorithms_Important_People.html)
+
+---
+
 ## Chapter 1: Introduction to Algorithms
 
 Algorithms are the step-by-step procedures that form the core of computer science, guiding computers through the maze of processing data. They are like the DNA of software, encoding the essence of problem-solving. Complexity, on the other hand, measures how an algorithm’s resource needs (like time and storage) grow as the input size increases. It’s a way to rate the efficiency of an algorithm, ensuring it can handle large amounts of data without breaking a sweat.
