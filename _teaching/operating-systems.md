@@ -87,8 +87,8 @@ No current announcements.
 
 The world of operating systems is introduced as a key aspect of modern computing. Fundamental concepts, design principles, and implementation techniques are explored to highlight how interaction between hardware and software is enabled.
 
-* Prerequisites for preparation [pdf](../files/os/The_prerequisites.pdf)
-* Key figures who have shaped the field [pdf](../files/os/Important_people.pdf)
+* Prerequisites for preparation [pdf](../files/os/Prerequisites_for_Operating_Systems.html)
+* Key figures who have shaped the field [pdf](../files/os/Pioneers_of_Operating_Systems.html)
 * Questions & Answers from OSTEP [pdf](../files/os/QA_from_OSTEP.pdf)
 
 ---
