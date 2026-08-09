@@ -73,6 +73,13 @@ There are currently no announcements.
 
 ---
 
+## Preliminary Materials: 
+
+* Prerequisites for preparation [pdf](../files/data_structures/Data_Structures_Prerequisites.html)
+* Key figures who have shaped the field [pdf](../files/data_structures/Data_Structures_Important_People.html)
+
+---
+
 ## Chapter 1: Introduction  
 
 Data structures are the backbone of computer science, serving as the fundamental building blocks that enable us to efficiently store, organize, and manipulate data. Each data structure has its own unique characteristics, advantages, and trade-offs, making them suitable for different scenarios and requirements. Understanding these structures is crucial for writing efficient code and solving complex computational problems.
