@@ -17,6 +17,7 @@ author_profile: true
 <button onclick="location.href='../apps/qr-code-generator.html'">🔳 QR CODE GENERATOR</button>
 <button onclick="location.href='../apps/password-generator.html'">🔐 PASSWORD GENERATOR</button>
 <button onclick="location.href='../apps/unit-converter.html'">📐 UNIT CONVERTER</button>
+<button onclick="location.href='../apps/favicon-generator.html'">🌐 FAVICON GENERATOR</button>
 
 <button onclick="location.href='../apps/generate-track-changes.html'">📝 TRACK CHANGES (DOCX)</button>
 <button onclick="location.href='../apps/image-metadata-viewer.html'">🏷️ IMAGE METADATA VIEWER</button>
