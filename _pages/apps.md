@@ -14,7 +14,10 @@ author_profile: true
 
 <button onclick="location.href='../apps/pdf-merger.html'"> ✨ PDF MERGE</button> 
 <button onclick="location.href='../apps/generate-track-changes.html'"> ✨ TRACK CHANGES (DOCX)</button> 
-<button onclick="location.href='../apps/minimal_timer.html'"> ✨ TIMER (5 min)</button> 
+<button onclick="location.href='../apps/minimal_timer.html'"> ✨ TIMER (5 min)</button>
+<button onclick="location.href='../apps/password-generator.html'"> ✨ PASSWORD GENERATOR</button>
+<button onclick="location.href='../apps/qr-code-generator.html'"> ✨ QR CODE GENERATOR</button>
+<button onclick="location.href='../apps/unit-converter.html'"> ✨ UNIT CONVERTER</button> 
 <button onclick="location.href='https://dorukdayim.netlify.app'">🧠 DORUKDAYIM</button> 
 <button onclick="location.href='../apps/fortune-teller.html'">🔮✨ FORTUNE TELLER</button> 
 <button onclick="location.href='../apps/tarot/tarot-reader.html'">🃏🔮 TAROT</button> 
