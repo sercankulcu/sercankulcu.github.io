@@ -20,6 +20,7 @@ author_profile: true
 <button onclick="location.href='../apps/pdf-compressor.html'">🗜️ PDF COMPRESSOR</button>
 <button onclick="location.href='../apps/pdf-page-organizer.html'">📑 PDF PAGE ORGANIZER</button>
 <button onclick="location.href='../apps/images-to-pdf.html'">🖼️ IMAGES TO PDF</button>
+<button onclick="location.href='../apps/pdf-review-integrity-scanner.html'">🛡️ PDF REVIEW INTEGRITY SCANNER</button>
 
 <button onclick="location.href='../apps/document-scanner.html'">📄 DOCUMENT SCANNER</button>
 <button onclick="location.href='../apps/signature-maker.html'">✒️ SIGNATURE MAKER</button>
