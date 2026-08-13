@@ -6,18 +6,36 @@ tags:
   - career
 ---
 
-War has shaped history. It has changed nations, leaders, and ideas. One of the greatest thinkers on war was Carl von Clausewitz. His book *On War* is still studied today. It is not just about battles and weapons. It is about strategy, politics, and human nature.
+Carl von Clausewitz was a Prussian officer and military thinker whose book *On War* became one of the most influential works on strategy.
 
-> Who Was Clausewitz?
+He experienced the Napoleonic Wars directly, and this shaped his view of conflict as something far more complicated than a clean plan on paper.
 
-Carl von Clausewitz was a Prussian general and military theorist. He lived in the late 18th and early 19th centuries. He fought in the Napoleonic Wars. His experiences on the battlefield helped him develop his ideas. He spent years studying war and its effects. His book *On War* was published after his death. It remains one of the most important books on military strategy.
+One of his best-known ideas is that war is connected to politics.
 
-## What Is *On War* About?
+Military action is not separate from political goals. A state goes to war for reasons, and those reasons should shape the strategy.
 
-Clausewitz believed that war is not just about fighting. It is connected to politics. He said, **“War is the continuation of politics by other means.”** This means that war is not random. It happens because of political goals. Governments use war to achieve their aims.
+This sounds simple, but it changes how war is understood.
 
-He also talked about the **“fog of war.”** In battle, things are unclear. There is confusion. Plans do not always work. Leaders must adapt. Good strategy is not just about planning. It is about reacting to the unknown.
+Winning battles is not enough if the political purpose is unclear.
 
-Another key idea is the **“center of gravity.”** This is the most important part of an enemy’s strength. It could be their army, their leader, or their economy. Destroying this will lead to victory.
+Clausewitz also wrote about uncertainty.
 
-Clausewitz’s ideas are still useful today. His book is studied in military academies. But his lessons go beyond war. Business leaders, politicians, and strategists use his ideas. His thoughts on uncertainty, adaptation, and strategy apply to many fields. War is more than guns and soldiers. It is about power, decisions, and consequences. 
+Plans meet incomplete information, fear, mistakes, weather, human emotion, and unexpected events. Later readers often connect this with the idea of the "fog of war."
+
+A commander rarely sees the whole situation clearly.
+
+This is why adaptation matters.
+
+Another famous concept is the "center of gravity," meaning a main source of an opponent's strength. Depending on the conflict, this might be an army, a political alliance, a capital, or another critical element.
+
+I find Clausewitz useful because he does not treat strategy as a set of perfect rules.
+
+He accepts friction.
+
+Real systems behave differently from diagrams.
+
+This idea applies beyond military history too.
+
+Organizations, projects, and negotiations also contain uncertainty. Plans matter, but plans are never the world itself.
+
+Good strategy requires both preparation and the ability to change.

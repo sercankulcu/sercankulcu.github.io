@@ -3,20 +3,53 @@ title: 'Why we need operating systems?'
 date: 2023-02-02
 permalink: /posts/2023/02/why-we-need-operating-systems/
 tags:
-  - career
+  - operating-systems
+  - computer-science
   - software
 ---
 
-<img width="150" alt="operating system" src="/images/posts/why-we-need-operating-systems.webp" style="float: left; margin-right: 20px;" /> In the early days of computing, computers were massive, expensive machines that could only run one program at a time. In an era where computers were hulking machines housed in climate-controlled rooms, the process of programming and interacting with these behemoths was a far cry from the user-friendly interfaces we now take for granted. Programming was done on punch cards, and the operator would manually feed the programming into the computer. The computer would then run the program, output some results, and wait for the next program to be fed in. This process was tedious, time-consuming, and not efficient.
+A computer without an operating system would still be a computer.
 
-To improve this process, operating systems were created to help computers operate themselves. Operating systems are programs that have special privileges on the hardware and can run and manage other programs. They are typically the first programs to start when a computer is turned on. The first OSs were created in the 1950s to handle the manual tasks of loading programs by hand.
+It would also be much harder to use.
 
-With the help of operating systems, computers could be given batches of programs, and when one was done, the next would start automatically. This was called batch processing. The computer would then output the results of each program as they completed. This was a significant improvement in efficiency and allowed programmers to focus on writing code instead of manual labor.
+Early computers required operators to load programs manually and manage hardware very directly. As systems became more complex, this approach became inefficient.
 
-Operating systems have evolved over time, and modern systems have many features such as multi-tasking, multi-user support, file systems, and security mechanisms. They allow us to run multiple programs simultaneously, share resources such as printers and internet connections, and manage system resources efficiently.
+Operating systems appeared to manage the machine on behalf of programs and users.
 
-Computers have come a long way since the early days of computing, where only one program could be run at a time. As computers became more widespread, the need for sharing software became increasingly important. However, computers had different configurations and peripherals, which had to be interfaced with on a low level. This made it challenging for programmers to write software that would work on different computers. To make it easier for programmers, operating systems (OSs) were implemented as intermediaries between software programs and hardware peripherals.
+At the simplest level, an operating system manages resources.
 
-Operating systems provide a software abstraction layer through APIs called device drivers, allowing programmers to talk to common input and output hardware using standardized mechanisms. This makes it easier to write software that works on different computers, regardless of their hardware configuration. Furthermore, operating systems enabled multitasking, allowing multiple programs to be run simultaneously on a single computer. Each program is allocated its own block of memory, and the operating system ensures that they do not interfere with each other.
+The CPU can run only a limited number of instructions at a time, so the operating system schedules processes and threads.
 
-Operating systems are essential for modern computers to function. They enable multitasking, device driver support, and provide a software abstraction layer for software programs to interact with hardware peripherals. Without operating systems, computers would still be running one program at a time, and sharing software would be very difficult. Operating systems are constantly evolving to meet the changing needs of users and businesses, and they are a critical component of the digital world we live in today.
+Memory is limited, so the operating system decides how it is allocated and protected.
+
+Storage needs files and directories.
+
+Devices need drivers.
+
+Programs need controlled ways to communicate with hardware.
+
+The operating system creates these abstractions.
+
+A program can open a file without knowing the physical details of the disk.
+
+It can create a process without manually configuring the processor.
+
+It can use a network socket without controlling every electrical signal.
+
+This abstraction is one of the reasons modern software is possible.
+
+Security is another important role.
+
+The operating system separates users and processes, controls permissions, and prevents ordinary applications from freely accessing everything on the machine.
+
+Modern systems such as Linux, Windows, macOS, Android, and iOS make different design choices, but the basic responsibilities are similar.
+
+I like teaching operating systems because they reveal what happens under the comfortable surface of a computer.
+
+A window opens.
+
+A program runs.
+
+A file is saved.
+
+Behind these simple actions, the operating system is constantly making decisions.

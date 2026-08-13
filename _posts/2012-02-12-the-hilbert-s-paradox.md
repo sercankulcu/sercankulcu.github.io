@@ -8,14 +8,46 @@ tags:
   - self-improvement
 ---
 
-<img width="180" alt="hotel" src="/images/posts/the-hilbert-s-paradox.webp" style="float: left; margin-right: 30px;" /> Hilbert’s Paradox is a thought experiment in mathematics which was first proposed by the renowned mathematician David Hilbert in the early 20th century. The paradox challenges our intuition and understanding of the concept of infinity. It has important implications for our understanding of the nature of mathematical objects and the limits of human knowledge. Hilbert’s Paradox is a prime example of a problem that highlights the counterintuitive nature of infinity and the challenges that arise when dealing with infinite sets. By illustrating how an infinite hotel can always accommodate more guests, even when fully occupied, it demonstrates the strange and paradoxical properties of infinite systems.
+<img width="200" alt="hilbert hotel" src="/images/posts/the-hilbert-s-paradox.webp" style="float: left; margin-right: 10px;" />
 
-The paradox goes as follows: imagine a hotel with an infinite number of rooms, each of which is occupied by a guest. Now imagine that a new guest arrives and asks for a room. Since the hotel has an infinite number of rooms, the manager can simply ask each guest to move to the next room, and the new guest can occupy room 1. Now suppose that an infinite number of new guests arrive. Can the manager find a way to accommodate them all?
+Hilbert's Hotel is one of my favorite ways to think about infinity.
 
-The answer is yes, and it is a surprising result. The manager can simply ask the guest in room 1 to move to room 2, the guest in room 2 to move to room 4, the guest in room 3 to move to room 6, and so on. In this way, the manager can make room for an infinite number of new guests, even though the hotel was already full.
+Imagine a hotel with infinitely many rooms.
 
-The paradox illustrates a number of important concepts in mathematics, including the nature of infinity, the concept of countability, and the limits of human knowledge. It shows that even seemingly well-defined concepts, such as the concept of a "full" hotel, can become more complex when we consider them in the context of infinity.
+Room 1, room 2, room 3, and so on forever.
 
-Hilbert's Paradox has important implications for the philosophy of mathematics as well. It shows that mathematical objects are not simply abstract concepts, but rather they have a certain reality that exists beyond human understanding. The paradox challenges the idea that mathematics is simply a product of human invention, and it suggests that mathematical truths may exist independently of human minds.
+Now imagine that every room is occupied.
 
-In conclusion, Hilbert's Paradox is a thought-provoking puzzle that challenges our intuition about infinity and the nature of mathematical objects. The paradox highlights the importance of careful reasoning and precise calculation in mathematics and science, and it has important implications for the philosophy of mathematics and the limits of human knowledge. By exploring the ideas underlying Hilbert's Paradox, we can gain insights into the nature of mathematical objects and the power of mathematical reasoning.
+In an ordinary hotel, the answer is obvious: there is no space for another guest.
+
+But this is an infinite hotel.
+
+When one new guest arrives, the manager asks the guest in room 1 to move to room 2, the guest in room 2 to move to room 3, and in general every guest in room n to move to room n+1.
+
+Now room 1 is empty.
+
+The hotel was full, and it still found space.
+
+Things become even stranger if infinitely many new guests arrive.
+
+The manager can move every current guest from room n to room 2n.
+
+All existing guests now occupy the even-numbered rooms, leaving every odd-numbered room free.
+
+An infinite number of new guests can move in.
+
+David Hilbert used examples like this to illustrate the strange behavior of actual infinity.
+
+The lesson is not that hotels should change their booking systems.
+
+The lesson is that infinite sets do not behave like finite sets.
+
+For finite collections, adding more elements makes the collection larger in the ordinary sense. With infinite sets, a set can have the same number of elements as a proper part of itself.
+
+The natural numbers and the even numbers are a classic example. The even numbers look like only half of the natural numbers, but each natural number n can be paired with exactly one even number 2n.
+
+Infinity is not simply a very large number.
+
+It is a different kind of idea.
+
+Hilbert's Hotel makes that difference impossible to ignore.

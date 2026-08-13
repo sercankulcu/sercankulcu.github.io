@@ -3,18 +3,26 @@ title: 'The story of computing'
 date: 2020-02-05
 permalink: /posts/2020/02/the-story-of-computing/
 tags:
-  - personal development
   - history
+  - personal development
 ---
 
-<img width="190" alt="computer" src="/images/posts/the-story-of-computing.webp" style="float: left; margin-right: 20px;" /> The story of computing is inextricably linked to the story of humanity. From the earliest days of civilization, we have been driven by a deep-seated desire to push beyond our physical and mental limitations. We have always sought new ways to understand the world around us, to communicate with one another, and to harness the power of technology to make our lives easier and more fulfilling. Computing, as a natural extension of this quest, represents our ongoing pursuit of innovation, creativity, and the ability to solve problems on an unprecedented scale.
+The story of computing is also a story about human limits.
 
-At the heart of this story is ambition. Our ancestors were driven by a burning desire to accomplish great things, to explore new frontiers, and to leave a lasting legacy for future generations. They built the pyramids, charted the stars, and developed writing systems to record their knowledge and ideas. And as technology advanced, so did our ambitions. We dreamed of flying, of traveling to the moon, and of building machines that could think and learn on their own.
+For thousands of years, people have created tools to count, measure, record, and communicate. An abacus, a mechanical calculator, a punched card, and a modern processor may look completely different, but they all come from a similar desire: to move some mental work outside the human mind.
 
-But ambition alone was not enough. It was paired with invention, creativity, and vision. Throughout history, we have been blessed with brilliant minds that have pushed the boundaries of what was thought to be possible. They were the ones who envisioned a world where computers could do more than just calculate numbers. They imagined a world where machines could understand natural language, recognize images, and even compose music.
+What interests me most is that the modern computer was not invented in one moment. It grew from many ideas. Charles Babbage imagined programmable machines. Ada Lovelace understood that such machines could manipulate more than numbers. George Boole gave logic a mathematical form. Alan Turing helped define what computation itself could mean. Later engineers turned these ideas into electronic machines that could actually be built and used.
 
-Yet, as with any human endeavor, there was also the darker side of the story. The story of avarice, where greed and ambition clash, where the drive for profit and power overshadowed the true potential of technology. It's a cautionary tale of how technology, when not used for the betterment of humanity, can be detrimental to society and individuals.
+The history is not a straight line. War accelerated some developments. Business needs accelerated others. Universities, governments, and private companies all played different roles. Sometimes an invention appeared before society knew what to do with it.
 
-Despite these darker moments, the story of computing is also one of serendipity. The unexpected discoveries and fortuitous events that have led to some of the most significant advancements in technology. The invention of the computer, for example, was not a premeditated goal but rather the outcome of a series of serendipitous events and the work of many individuals who contributed to the development of the modern computer.
+Computers also changed their purpose. Early electronic computers were rare machines used by specialists. Then computing entered companies, homes, schools, pockets, and eventually almost every part of daily life.
 
-In the end, the story of computing is the story of humanity. It is a story of our boundless ambition, our unending creativity, and our relentless drive to push beyond the limits of our bodies and minds. It is a story of both triumph and tragedy, of highs and lows, but most importantly, it is a story of hope and the belief that with the right tools, we can achieve anything we set our minds to.
+I think this is why computing history feels personal even when the events are technical. Each generation moved part of its work, memory, communication, and creativity into machines.
+
+There is also a darker side. Technology can increase inequality, surveillance, dependence, and conflict. More computing power does not automatically make people wiser.
+
+Still, I remain fascinated by the basic idea.
+
+We built machines to extend our ability to think and act.
+
+Now those machines are changing the way we think and act in return.

@@ -3,59 +3,55 @@ title: 'How do computers make decisions?'
 date: 2023-02-04
 permalink: /posts/2023/02/how-do-computers-make-decisions/
 tags:
-  - career
-  - software
+  - computer-science
+  - logic
+  - hardware
 ---
 
-<img width="150" alt="logic gates" src="/images/posts/how-do-computers-make-decisions.webp" style="float: left; margin-right: 20px;" /> How computers make decisions with logic gates, which is the fundamental building block for how computers operate? Computers make decisions using logic gates, which are the fundamental building blocks of all digital circuits. A logic gate is a basic electronic component that takes one or more binary inputs and produces a binary output based on a logical operation. The basic logic gates are AND, OR and NOT gates. These gates can be combined to create more complex circuits that can perform more advanced logical operations.
+Computers do not make decisions in the human sense.
 
-What are Logic Gates?
----
+They follow logical rules.
 
-Logic gates are fundamental building blocks in the design of digital circuits. They perform logical operations on input signals, which can be either a high voltage level (represented by a logical "1") or a low voltage level (represented by a logical "0"). The output of a logic gate is also a binary signal, which can be either a logical "1" or a logical "0".
+At the hardware level, these rules are built with logic gates.
 
-There are several types of logic gates, including AND, OR, NOT, NAND, and NOR gates. Each gate performs a specific logical operation on the input signals, as determined by its truth table. For example, an AND gate produces a logical "1" output only when both of its inputs are logical "1". In contrast, an OR gate produces a logical "1" output when at least one of its inputs is a logical "1".
+An AND gate produces a true output only when its required inputs are true.
 
-The NOT gate, also known as an inverter, produces an output that is the logical opposite of its input. That is, if the input is a logical "1", the output is a logical "0", and vice versa. The NAND and NOR gates are combinations of AND and NOT, and OR and NOT gates, respectively.
+An OR gate produces true when at least one input is true.
 
-Logic gates are typically implemented using transistors, which are semiconductor devices that can amplify or switch electronic signals. In modern digital circuits, logic gates are often integrated into a single chip, known as an integrated circuit (IC). This allows for high-density and low-power consumption designs, which are crucial in many applications, including mobile devices, automotive systems, and medical devices.
+A NOT gate reverses a value.
 
-The importance of logic gates in computer science cannot be overstated. They are used in a wide range of applications, including arithmetic operations, memory circuits, and control systems. For example, a basic adder circuit can be constructed using several logic gates to perform binary addition. Similarly, a memory cell can be designed using logic gates to store and retrieve binary data.
+These simple operations can be combined into much more complicated circuits.
 
-Types of Logic Gates:
----
+For example, an adder uses logic gates to calculate sums.
 
-NOT Gate:
-A NOT gate, also known as an inverter, has only one input and one output. It produces an output that is the opposite of its input. That is, if the input is a logical "1", the output is a logical "0", and vice versa. The symbol for a NOT gate is a small circle at the input, followed by an arrow pointing towards the output.
+A comparator can determine whether one binary value is larger than another.
 
-AND Gate:
-An AND gate has two inputs and one output. It produces a logical "1" output only when both inputs are logical "1". In other words, it requires both inputs to be true for the output to be true. The symbol for an AND gate is a large dot at the intersection of two input lines, followed by a line for the output.
+Multiplexers choose between different inputs.
 
-OR Gate:
-An OR gate also has two inputs and one output. It produces a logical "1" output if at least one of its inputs is a logical "1". In other words, it requires at least one input to be true for the output to be true. The symbol for an OR gate is a large plus sign at the intersection of two input lines, followed by a line for the output.
+Memory circuits store state.
 
-XOR Gate:
-An XOR gate, or exclusive OR gate, has two inputs and one output. It produces a logical "1" output if either one input or the other is a logical "1", but not both. In other words, it requires one input to be true and the other to be false for the output to be true. The symbol for an XOR gate is a large plus sign with a small circle at the intersection of two input lines, followed by a line for the output.
+At the software level, programmers use conditions such as `if`.
 
-The different types of logic gates can be combined to create more complex circuits, such as full adders, flip-flops, and multiplexers. These circuits are used in a variety of applications, including arithmetic operations, memory circuits, and control systems.
+A program may say: if the password is correct, allow access. If a number is larger than another, choose one branch. If a sensor value crosses a limit, trigger an action.
 
-How Do Logic Gates Work?
----
+These high-level decisions eventually become lower-level processor instructions.
 
-At the heart of logic gates are transistors, which are tiny electronic switches that can turn on or off based on the electrical charge they receive. Transistors are the building blocks of all electronic devices and are the backbone of modern computing.
+The processor itself is built from digital logic.
 
-The arrangement of transistors, connected to inputs and outputs, can create a circuit that performs logical operations. When an electrical current is applied to the input of the circuit, the transistors either allow the current to flow or block it based on their on or off state, resulting in the output. In other words, the output is the result of a logical operation performed on the input based on the configuration of the transistors.
+So a complex software decision can be traced downward through many layers until it becomes electrical behavior in circuits.
 
-Each type of logic gate has a unique truth table that defines the relationship between its inputs and outputs. For example, an AND gate only produces a logical "1" output if both of its inputs are logical "1". 
-The truth table for an OR gate, on the other hand, shows that the output is "1" if either input is "1".
+This does not mean computers understand why a condition matters.
 
-The combination of different types of logic gates can create complex circuits that perform more complex operations. These circuits are used in a variety of applications, including arithmetic operations, memory circuits, and control systems.
+They execute the rule we gave them.
 
-Why Are Logic Gates Essential for Computing?
----
+Even machine-learning systems ultimately run numerical and logical operations on hardware.
 
-Logic gates enable computers to perform complex operations using only ones and zeros. These operations are based on Boolean logic, which is a type of algebra that uses only two values, "true" or "false," represented by ones and zeros. By combining different types of logic gates, computers can perform a wide range of logical operations, such as AND, OR, NOT, and XOR, and process large amounts of data quickly and efficiently.
+What changes is how the rule is produced.
 
-In addition to processing and storing data, logic gates also allow computers to communicate with other devices. They are used in the design of communication circuits, such as modems and network adapters, which enable computers to transmit and receive data over networks. Logic gates are also used in the design of memory circuits, such as RAM and ROM, which enable computers to store and retrieve data quickly.
+In traditional programming, a human writes it directly.
 
-Furthermore, logic gates are essential for performing calculations. They are used in the design of arithmetic circuits, such as adders and multipliers, which enable computers to perform mathematical operations quickly and accurately. These circuits are essential for a wide range of applications, including scientific research, engineering, and finance.
+In machine learning, a model may learn parameters from data.
+
+The machine still computes.
+
+The meaning is something we give to the result.

@@ -7,21 +7,58 @@ tags:
   - philosophy
 ---
 
-<img width="200" alt="decision choice" src="/images/posts/navigating-choices-of-life-in-the-age-of-algorithms.webp" style="float: left; margin-right: 10px;" /> In a world brimming with choices, the quest for options has become an integral part of our daily lives. From deciding where to live and which school to send our kids, to pondering the people we surround ourselves with, the constant pursuit of alternatives seems to be a common theme. But why do we find ourselves perpetually searching for something more, and is there a way to break free from the chains of routine dictated by algorithms?
+We have more choices than people had in many earlier periods of history.
 
-### The Paradox of Choice:
-Psychologists have long studied the paradox of choice – the idea that while options offer freedom, an excess of choices can lead to decision paralysis and dissatisfaction. In a world where options are seemingly endless, the quest for something better can leave us perpetually unsatisfied with what we have.
+More places to live.
 
-### Fear of Missing Out (FOMO):
-The fear of missing out on a better opportunity or experience often propels our search for alternatives. Whether it's the best place to live, the ideal school for our kids, or the right social circles, the fear that there might be something better out there keeps us in a perpetual state of exploration.
+More things to watch.
 
-### Algorithmic Influence:
-The rise of digital platforms like Netflix, AmazonPrime, YouTube, Instagram, and Spotify has introduced a new player in the decision-making process – algorithms. These algorithms, designed to predict and cater to our preferences, can inadvertently shape our choices, leading to a sense of routine that may leave us questioning if we're truly in control of our lives.
+More products.
 
-### Breaking the Chains:
-Breaking free from the cycle of constant searching requires a conscious effort to appreciate the present and find contentment in what we have. It involves recognizing the influence of algorithms and consciously making choices that align with our genuine desires rather than those shaped by digital suggestions.
+More people to follow.
 
-### Mindful Living:
-Mindfulness, or being present in the moment, can be a powerful antidote to the restlessness fueled by the perpetual quest for options. Taking the time to reflect on our choices and appreciating the value of what we already have can bring a sense of fulfillment and break the chains of incessant seeking.
+More careers to imagine.
 
-In conclusion, the constant search for options is a natural consequence of a world abundant with choices. However, it's essential to strike a balance and recognize when the pursuit of more is hindering our ability to appreciate the richness of our current circumstances. By embracing mindfulness and making intentional choices, we can break free from the influence of algorithms and find contentment in the present moment.
+This sounds like freedom.
+
+Sometimes it feels like exhaustion.
+
+Online platforms also shape these choices with recommendation algorithms. A service suggests the next song, video, product, article, or person based on previous behavior.
+
+The suggestions can be useful.
+
+They can also create a comfortable loop.
+
+If I always click the same kind of content, the system learns to show me more of it. My past choices slowly influence my future choices.
+
+This is not a secret conspiracy.
+
+It is simply how personalization works.
+
+Still, I think it is worth noticing.
+
+Convenience can become routine.
+
+Routine can become a narrow view of the world.
+
+The same pattern exists outside technology. We choose familiar restaurants, familiar friends, familiar opinions, and familiar roads because they reduce uncertainty.
+
+There is nothing wrong with familiarity.
+
+But too much of it can make life smaller.
+
+Maybe freedom is not only having more options.
+
+Maybe freedom also requires the ability to step outside the options that are automatically placed in front of us.
+
+Read something you would not normally choose.
+
+Walk a different road.
+
+Talk to someone outside your usual circle.
+
+Let some decisions be imperfect.
+
+An algorithm can predict what I am likely to click.
+
+I hope it never becomes the only thing deciding what I am likely to experience.

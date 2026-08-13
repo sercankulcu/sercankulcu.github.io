@@ -8,28 +8,44 @@ tags:
   - time management
 ---
 
-<img width="200" alt="theatre" src="/images/posts/movie-suggestions-for-software-engineers.webp" style="float: left; margin-right: 10px;" /> Software engineers typically live a busy lifestyle, especially during the workweek, as they spend a significant amount of time in front of their computers, designing, coding, and testing software applications. Because technology is constantly evolving, software engineers often have to keep their skills up to date and stay informed about the latest trends in the industry. Regarding movie suggestions, some films that may be of interest to software engineers include The Social Network, which chronicles the creation and rise of Facebook; WarGames, a classic '80s movie about hacking and cybersecurity; and Ex Machina, a thought-provoking film about artificial intelligence and its ethical implications.
+Software engineers spend enough time in front of a screen for work.
 
-"The Social Network" - This movie tells the story of the founding of Facebook and the development of the social media platform. It is a great movie for software engineers interested in the startup world and the creation of new technologies.
+Still, sometimes another screen can be a good way to rest.
 
-"Jurassic Park" - This classic movie is about the creation of a theme park filled with genetically cloned dinosaurs. It is a great movie for software engineers interested in the intersection of technology and biology.
+I especially enjoy films and documentaries connected with technology, mathematics, invention, and the people behind systems.
 
-"The Matrix" - This science fiction classic is about a computer hacker who discovers that the world is a simulated reality created by sentient machines. It is a great movie for software engineers interested in the potential impact of technology on society.
+*The Imitation Game* tells a dramatized story around Alan Turing and codebreaking during the Second World War.
 
-"The Imitation Game" - This movie tells the true story of mathematician Alan Turing and his work cracking the Nazi Enigma code during World War II. It is a great movie for software engineers interested in the history of computing and cryptography.
+*Hidden Figures* focuses on African-American women mathematicians who worked at NASA and reminds us how much important technical work can remain invisible in popular history.
 
-"Ready Player One" - This movie is set in a virtual reality world and follows a group of players who are searching for a hidden Easter egg left by the creator of the virtual world. It is a great movie for software engineers interested in virtual reality and gaming.
+*The Social Network* is less about programming itself and more about ambition, relationships, business, and the growth of Facebook.
 
-"Silicon Valley" - This TV show is a satire of the tech startup scene in Silicon Valley and follows a group of young developers as they try to launch a successful startup. It is a great show for software engineers interested in the startup world and the culture of tech companies.
+*Pirates of Silicon Valley* looks at the early rivalry and history around Apple and Microsoft.
 
-"Ex Machina" - This movie is about a programmer who is invited to administer the Turing test to an intelligent humanoid robot. It is a great movie for software engineers interested in artificial intelligence and the ethical implications of creating intelligent machines.
+Documentaries can be even more interesting.
 
-"Her" - This movie is about a man who falls in love with the artificial intelligence operating system of his computer. It is a great movie for software engineers interested in the relationship between humans and technology.
+*Revolution OS* explores free software, GNU, Linux, and the open-source movement.
 
-"WarGames" - This classic movie is about a young computer hacker who accidentally initiates a global thermonuclear war simulation while trying to hack into a military computer system. It is a great movie for software engineers interested in cybersecurity and the potential dangers of technology.
+*Indie Game: The Movie* follows independent game developers and shows the emotional cost behind small creative projects.
 
-"Blade Runner" - This science fiction classic is about a group of genetically engineered replicants who are on the run from a blade runner trying to hunt them down. It is a great movie for software engineers interested in the intersection of technology and biology.
+I do not watch these films to learn technical details.
 
-"The Terminator" - This movie is about a cyborg assassin sent back in time to kill Sarah Connor, a woman whose unborn child will lead the human resistance against the machines in a future war. It is a great movie for software engineers interested in the potential impact of artificial intelligence on society.
+Movies simplify history and change events for storytelling.
 
-"Minority Report" - This movie is about a detective in a future where crime can be predicted and prevented using advanced technology. It is a great movie for software engineers interested in the intersection of technology and law enforcement.
+I watch them because they show the human side of technology.
+
+Behind every famous system there are people.
+
+They become tired.
+
+They compete.
+
+They make bad decisions.
+
+They become obsessed.
+
+They fail.
+
+Technology is never only code.
+
+Stories can remind us of that.

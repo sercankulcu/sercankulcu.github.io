@@ -8,24 +8,42 @@ tags:
   - time management
 ---
 
-<img width="200" alt="jean de la bruyere" src="/images/posts/book-suggestions-for-software-engineers.webp" style="float: left; margin-right: 10px;" /> The daily routine of a software engineer can differ based on the company or project they work on, but it typically includes several hours of working on a computer, attending meetings, and collaborating with team members. In addition to these tasks, many software engineers engage in professional development activities such as attending conferences or taking online courses to stay current with industry trends and emerging technologies. If looking to ease your mind and find comfort during busy workdays, you can refer to various book suggestions. Overall, these books offer valuable insights and practical advice to software engineers of all levels.
+Software engineers spend a lot of time learning from screens.
 
-"The Art of Racing in the Rain" by Garth Stein - This novel is told from the perspective of a dog named Enzo, who is the loyal companion of a race car driver. It is a heartwarming and thought-provoking story about life, love, and the human-animal bond.
+Documentation, source code, issue trackers, tutorials, and online discussions are part of daily work.
 
-"To Kill a Mockingbird" by Harper Lee - This classic novel is set in the Deep South during the 1930s, and tells the story of a young girl named Scout who learns about prejudice, injustice, and bravery through the experiences of her father, a lawyer, and her friends and neighbors.
+Books offer a different pace.
 
-"The Alchemist" by Paulo Coelho - This novel is a fable about a young shepherd named Santiago who sets out on a journey to find his personal legend and fulfill his dreams. It is a thought-provoking and inspiring story about self-discovery and the power of following one's heart.
+They allow one author to develop an idea without competing with notifications and search results.
 
-"The Great Gatsby" by F. Scott Fitzgerald - This novel is set in the United States during the Roaring Twenties, and tells the story of a young man named Nick who becomes drawn into the world of the wealthy and mysterious Jay Gatsby. It is a tale of love, obsession, and the corrupting influence of money and power.
+For programming practice, *The Pragmatic Programmer* is a book I often recommend because it talks about habits and judgment, not only syntax.
 
-"The Da Vinci Code" by Dan Brown - This novel is a thriller that follows the adventures of a symbologist named Robert Langdon as he investigates a series of clues related to a secret society and a hidden conspiracy. It is a fast-paced and intriguing read that combines elements of history, art, and mystery.
+*Clean Code* is useful for thinking about readability, naming, functions, and maintainability, even when we do not agree with every rule.
 
-"The Handmaid's Tale" by Margaret Atwood - This dystopian novel is set in a future society where women's rights have been stripped away and fertility is strictly controlled. It tells the story of Offred, a handmaid who is assigned to bear children for a wealthy couple, and her struggle to survive and reclaim her identity.
+*Code Complete* looks at software construction in a broad and practical way.
 
-"The Hitchhiker's Guide to the Galaxy" by Douglas Adams - This science fiction novel is the first in a series of five, and follows the adventures of an unwitting human and his alien companion as they travel through space and encounter a variety of strange and humorous characters.
+For design, *Design Patterns* by Gamma, Helm, Johnson, and Vlissides remains an important reference for object-oriented design ideas.
 
-"The Catcher in the Rye" by J.D. Salinger - This coming-of-age novel tells the story of Holden Caulfield, a rebellious and disillusioned teenager who is kicked out of prep school and wanders around New York City. It is a classic tale of alienation and the search for meaning in life.
+For algorithms, *Introduction to Algorithms* by Cormen, Leiserson, Rivest, and Stein is a standard reference.
 
-"The Grapes of Wrath" by John Steinbeck - This classic novel is set during the Great Depression and tells the story of the Joad family, who are forced to leave their farm in Oklahoma and travel to California in search of a better life. It is a poignant and powerful tale of hope, resilience, and the human spirit.
+For operating systems, Silberschatz's *Operating System Concepts* gives a strong overview.
 
-"To Kill a Kingdom" by Alexandra Christo - This young adult fantasy novel is a retelling of the Little Mermaid story, but with a twist. It follows the adventures of two rival pirate princes, Lira and Elian, as they try to outdo each other and prove their worth as rulers.
+For networks, Andrew Tanenbaum's *Computer Networks* is another classic.
+
+I also like books that explain computing from a wider perspective.
+
+Charles Petzold's *Code* connects simple ideas about signals and logic to the structure of computers.
+
+*The Mythical Man-Month* by Frederick Brooks is old, but many of its observations about software projects still feel familiar.
+
+The goal is not to read every famous programming book.
+
+That can become another form of collecting.
+
+Choose one book that matches a real question you have.
+
+Read slowly.
+
+Try the ideas.
+
+A useful technical book should change something about the way you work, not only increase the number of books on the shelf.
