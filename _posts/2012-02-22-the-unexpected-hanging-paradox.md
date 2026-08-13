@@ -8,12 +8,44 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="gallows" src="/images/posts/the-unexpected-hanging-paradox.webp" style="float: left; margin-right: 10px;" /> The Unexpected Hanging Paradox is a fascinating thought experiment that has puzzled many great minds in the fields of philosophy, mathematics, and logic. The paradox was first introduced by Raymond Smullyan in 1979 and has since captured the attention of many curious minds. This paradox raises many interesting questions about logic and reasoning, and it's a great example of how philosophy can challenge our assumptions and push us to think in new ways.
+<img width="200" alt="unexpected hanging" src="/images/posts/the-unexpected-hanging-paradox.webp" style="float: left; margin-right: 10px;" />
 
-The paradox goes as follows: a prisoner is sentenced to be hanged, and the executioner informs the prisoner that he will be hanged on a day between Monday and Friday, and that the hanging will be unexpected. The prisoner reasons that he cannot be hanged on Friday, since if he is still alive on Thursday, he will know that he will be hanged the next day, which would make the hanging expected. Similarly, he cannot be hanged on Thursday, since if he is still alive on Wednesday, he will know that he will be hanged the next day, which would make the hanging expected. The prisoner continues to reason in this way until he concludes that he cannot be hanged on any day, since he will always be able to anticipate the hanging.
+The Unexpected Hanging Paradox is a puzzle about prediction, knowledge, and surprise.
 
-The paradox illustrates a number of important concepts in logic and philosophy, including the nature of inference, the role of self-reference, and the limits of human reasoning. It challenges our intuitions about logical reasoning and the relationship between truth and knowledge, and it highlights the importance of precision and clarity in logical argumentation.
+A common version begins with a judge telling a prisoner that he will be executed on one weekday during the following week, but the execution will be a surprise. The prisoner will not know the day in advance.
 
-The Unexpected Hanging Paradox has important implications for the philosophy of science as well. It shows that even apparently straightforward logical problems can become more complex and nuanced when we consider the relationship between language, thought, and reality. The paradox also raises important questions about the nature of knowledge and the limits of human understanding, and it challenges us to think deeply about the relationship between logic, language, and the world.
+The prisoner starts reasoning backward.
 
-In conclusion, the Unexpected Hanging Paradox is a fascinating and challenging thought experiment that challenges our understanding of inference, self-reference, and the limits of human reasoning. The paradox highlights the importance of careful and precise reasoning in logical and philosophical inquiry, and it has important implications for our understanding of the relationship between language, thought, and reality. By exploring the ideas underlying the Unexpected Hanging Paradox, we can gain insights into the nature of logic and language, and we can deepen our understanding of the world around us.
+It cannot be Friday, he thinks.
+
+If I am still alive on Thursday evening, Friday will be the only possible day. Then the execution would not be a surprise.
+
+So Friday is impossible.
+
+If Friday is impossible, Thursday becomes impossible too. If I survive until Wednesday evening, Thursday would be the last remaining possible day, so I would know in advance.
+
+The same reasoning seems to remove Wednesday, Tuesday, and Monday.
+
+The prisoner concludes that the execution cannot happen.
+
+Then the guards arrive on Wednesday.
+
+He is surprised.
+
+So the judge's statement appears to have been fulfilled.
+
+The paradox has been discussed in many forms, including the "surprise examination" version. Its history is older and more complicated than a single modern author or date.
+
+What makes the puzzle interesting is the prisoner's attempt to reason about his own future knowledge.
+
+His conclusion changes the situation.
+
+Once he becomes convinced that the execution cannot happen, an execution during the week can again surprise him.
+
+The paradox shows how difficult statements about prediction can become when the prediction itself affects what a person believes.
+
+I like it because the story sounds simple, but the word "surprise" carries much more logical weight than we expect.
+
+Sometimes the most difficult word in a puzzle is not a mathematical symbol.
+
+It is an ordinary word we thought we already understood.

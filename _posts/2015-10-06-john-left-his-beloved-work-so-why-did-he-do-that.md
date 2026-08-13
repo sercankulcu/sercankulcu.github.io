@@ -9,18 +9,86 @@ tags:
   - self-improvement
 ---
 
-<img width="180" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-1.webp" style="float: left; margin-right: 30px;" /> John was a middle-aged man with a drive to succeed. He had always been passionate about technology, and that passion fueled his dreams of working in the defence industry. From a young age, he knew that he wanted to make a difference in the world, and he worked tirelessly to achieve his goals. John's hard work paid off when he was accepted into a prestigious engineering programme at a top university. He threw himself into his studies and quickly became a standout student. After his first year, John landed an internship with a defence company, and his career began to take shape. He was on the path to success, and nothing could stop him.
+<img width="180" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-1.webp" style="float: left; margin-right: 30px;" />
 
-As John approached the end of his final year at university, he stumbled upon a job posting that would change his life. The posting was for a software engineering role at a start-up in the defence industry, and John knew immediately that this was his chance to pursue his lifelong dream. He worked tirelessly to prepare for the interview, honing his skills and researching the company's mission. When the offer finally came through, John was overjoyed. The start-up was small, but John was drawn to the close-knit team and their shared commitment to making a difference in the world. He felt a sense of purpose in his work and was excited about the challenges that lay ahead. John was on the cusp of a new adventure, and he was ready to take it on with all the passion and determination that had brought him this far.
+John always imagined himself working with technology in the defence industry.
 
-<img width="200" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-2.webp" style="float: left; margin-right: 10px;" /> After joining the start-up company, John quickly found his place within the team. The company was focused on developing new technologies for use in military and defence applications, and John was eager to be a part of this important work. He threw himself into his new role, working hard to learn and grow as an engineer. The fast-paced, collaborative work environment suited him perfectly, and he relished the opportunity to work on exciting and innovative projects that had the potential to make a real difference. As the company grew, so did John's career. He was promoted to a senior position on a major project, a testament to his hard work and dedication. Despite the company's growth, the close-knit nature of the team remained, and John felt valued and supported by his colleagues. He was proud to be part of a team of well-meaning and knowledgeable people who were all working towards a common goal. For John, working at the start-up was more than just a job; it was an opportunity to make a real difference and contribute to something larger than himself.
+It was not a temporary interest. From a young age, he liked the idea of engineering work that had a clear mission and real consequences.
 
-<img width="200" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-3.webp" style="float: left; margin-right: 10px;" /> As the start-up company continued to grow, John couldn't help but notice a shift in the corporate culture. The focus seemed to be shifting away from the company's mission and more towards profits and meeting deadlines. There was less attention paid to ethical considerations, and John began to feel that his colleagues were more concerned with getting the job done than with doing the right thing. It was a difficult situation for John, who had always been committed to the company's mission and values. But he refused to compromise his principles, and he spoke out against the changes he saw happening. Though it was a risky move, John's courage paid off. His colleagues listened to his concerns, and the company leadership took steps to reaffirm their commitment to their mission and values. John was relieved and grateful to have taken a stand, and he was proud to be part of a company that was making a positive difference in the world. For John, it was a reminder that sometimes doing the right thing requires taking a stand, even when it's difficult or unpopular.
+He studied hard and entered a strong engineering program. After his first year, he found an internship at a defence company. The experience made the future he imagined feel possible.
 
-<img width="200" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-4.webp" style="float: left; margin-right: 10px;" /> After John got married, his priorities started to shift. He found himself feeling overwhelmed and conflicted, and he was having trouble sleeping and concentrating at work. He knew that he needed to make a change, but he wasn't sure what to do. After careful consideration, John made the difficult decision to leave his job and find a new one. It wasn't an easy decision to make, but he knew it was the right one for him. He decided to put his career on hold for a while and focus on his family. He and his wife decided to move to a small town where they could spend more time with their family and enjoy a better quality of life. John's wife found a job at a local university, and John decided to take some time off to be a stay-at-home dad. It was a big adjustment for him, but he was excited about the opportunity to be more involved in his children's lives. John's decision to prioritize his family over his career shows the importance of balancing work and personal life, and making choices that align with one's values and priorities.
+Near graduation, John saw a software-engineering position at a small defence start-up.
 
-<img width="200" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-5.webp" style="float: left; margin-right: 10px;" /> After much consideration, John made the difficult decision to leave his job and search for new opportunities. While it was a risky move, he knew it was the right thing to do. John understood the importance of being open to new opportunities and taking calculated risks to pursue his passions and goals. Although this decision came with some short-term sacrifices such as lost pay and uncertain career prospects, it opened up new opportunities for John and allowed him to find a sense of purpose and fulfilment in his work. He took the time to carefully consider his options, weighing the potential risks and benefits before making his decision. John's willingness to take a chance on himself is an important reminder that sometimes taking risks and stepping out of one's comfort zone can lead to greater opportunities and personal growth.
+He prepared seriously for the interview.
 
-It's always great to receive unexpected offers and opportunities that align with our goals and passions. John's decision to meet with his former colleague and learn more about the local university was a smart move, and it's great to see that it resulted in a fulfilling new position for him. It's wonderful that John can now use his skills and expertise to make a positive impact on the world while also being part of an academic community that values his contributions. It's important to remember that the road to success is not always straightforward, but by following our hearts and making decisions that align with our values, we can pave the way for a fulfilling and successful career. Congratulations to John on this exciting new chapter in his life!
+When the offer came, he was delighted.
 
-John was finally able to find a balance between his personal and professional life. He felt fulfilled knowing that he could make a difference in the world while being there for his family. This experience taught him an important lesson about prioritizing his values and balancing them with his career choices. John was grateful for the opportunity to take a break from his career and focus on his family. He realized that it was a necessary step to find a new purpose in his work and become a more grounded person. Looking back, John knew that he had made the right decision and was glad for the experience. He was excited to continue making positive changes in the world while being there for his loved ones.
+<img width="200" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-2.webp" style="float: left; margin-right: 10px;" />
+
+The company was small, and that was part of what he liked. People knew one another. Engineers worked closely. The projects were difficult and felt meaningful.
+
+John learned quickly and became an important member of the team.
+
+As the company grew, his responsibilities grew too. He eventually moved into a senior role on a major project.
+
+For a while, this looked exactly like the career he had wanted.
+
+Then the culture began to change.
+
+<img width="200" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-3.webp" style="float: left; margin-right: 10px;" />
+
+Deadlines became more important. Profit became more visible in discussions. John felt that ethical questions were sometimes treated as obstacles instead of responsibilities.
+
+This was difficult for him because the mission had been one of the reasons he joined.
+
+He spoke about his concerns.
+
+That was risky.
+
+Nobody likes being the person who makes a meeting uncomfortable.
+
+But values are easy to have when they cost nothing.
+
+The real test comes when staying silent would be easier.
+
+In John's case, his concerns were heard, and the leadership made efforts to return attention to the company's original values.
+
+Still, another change was happening in his life.
+
+<img width="200" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-4.webp" style="float: left; margin-right: 10px;" />
+
+John married, and his priorities slowly moved.
+
+The long hours that once felt exciting became heavier. He had trouble sleeping and concentrating. Work that had once given him energy started taking too much from the rest of his life.
+
+This was confusing.
+
+We often imagine leaving a job because we hate it.
+
+John did not hate his work.
+
+He left because he loved other parts of his life too.
+
+He and his wife decided to move to a smaller town. She found work at a local university, and John took time away from his career to spend more time with his family.
+
+<img width="200" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-5.webp" style="float: left; margin-right: 10px;" />
+
+From outside, this decision could look like stepping backward.
+
+He lost income and accepted uncertainty.
+
+But careers are not the only things that grow.
+
+A family grows.
+
+Priorities grow.
+
+Our idea of success grows.
+
+John's story reminds me that leaving something does not always mean it failed.
+
+Sometimes a job can be meaningful, a team can be good, and a career can be successful, yet another choice can still be right.
+
+We are allowed to change what we value.
+
+That may be one of the most difficult freedoms adulthood gives us.

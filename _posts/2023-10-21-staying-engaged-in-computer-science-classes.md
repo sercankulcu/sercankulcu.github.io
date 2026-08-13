@@ -3,37 +3,47 @@ title: 'Staying Engaged in Computer Science Classes'
 date: 2023-10-21
 permalink: /posts/2023/10/staying-engaged-in-computer-science-classes/
 tags:
-  - self-improvement
-  - career
+  - education
+  - computer-science
+  - students
 ---
 
-<img width="150" alt="staying engaged" src="/images/posts/staying-engaged-in-computer-science-classes.webp" style="float: left; margin-right: 20px;" /> Hey there, tech pioneers! If you've ever found yourself dozing off in your computer science class, you're not alone. It's a common journey that many great minds have embarked upon. But let's not waste these moments; let's turn them into opportunities for growth and inspiration. In the words of Steve Jobs, "Your work is going to fill a large part of your life, and the only way to be truly satisfied is to do what you believe is great work. And the only way to do great work is to love what you do." So, let's discuss how to love your computer science classes.
+Computer science classes can become difficult for a simple reason: the subject often moves from concrete to abstract very quickly.
 
-Is It Normal to Feel Bored in Class?
------
+A student sees code on the screen, then suddenly hears about memory models, graph complexity, process scheduling, or mathematical proofs.
 
-Absolutely, it's normal! Even the greatest visionaries experienced moments of boredom. It's not a sign of weakness; it's a sign that your mind is ready to dive deeper. Jobs once said, "I'm convinced that about half of what separates successful entrepreneurs from the non-successful ones is pure perseverance." So, let's persevere and make the most of those boring moments.
+It is easy to lose the thread.
 
-Advice from the Guru of Innovation:
------
+The first thing I recommend is active participation.
 
-<b> Stay Hungry, Stay Curious:</b> Jobs believed in staying insatiably curious. When boredom knocks on your door, see it as an invitation to dig deeper. Ask yourself why you're bored. Is it the content, the presentation, or your mindset? There's a world of knowledge waiting to be uncovered.
+Do not only copy what is on the board.
 
-<b> Think Differently:</b> In the world of computer science, there's always room for innovation. Instead of passively absorbing the material, challenge yourself to think differently. How can you apply what you're learning in new and exciting ways?
+Ask why.
 
-<b> Find Your Passion:</b> Jobs famously said, "The only way to do great work is to love what you do." If a specific aspect of computer science ignites your passion, explore it further. Dive into side projects or research areas that truly excite you.
+Change the example.
 
-<b> Connect the Dots:</b> Seek the bigger picture. Explore how what you're learning fits into the grand scheme of technology. Computer science isn't just about code; it's about solving real-world problems. Find the connections that make it meaningful to you.
+Predict what the code will do before running it.
 
-<b> Share Your Ideas:</b> Just like Jobs co-founded Apple, you can co-create knowledge. Engage with your instructors and classmates. Don't hesitate to ask questions, express your thoughts, and challenge ideas. Collaboration fuels innovation.
+A small question can turn a lecture from information into a problem.
 
-<b> Think of Learning as a Journey:</b> Jobs compared life to a bicycle journey; to keep your balance, you must keep moving. In the same way, your learning is a journey. Keep progressing, even during the mundane moments.
+Taking notes in your own words also helps. Copying slides creates a record. Rewriting the idea creates processing.
 
-<b> Stay Creative:</b> Sometimes, a touch of creativity can keep you engaged. Take notes with colorful markers, doodle your thoughts, or build visual representations of complex concepts.
+If a topic feels too abstract, search for a small implementation or visualization.
 
-In the Spirit of Innovation:
------
+A queue makes more sense when we build one.
 
-Boredom isn't your enemy; it's your ticket to discovery and innovation. Just as Steve Jobs transformed our world with his innovative spirit, you have the power to transform your learning experience. The next time you find yourself drifting in class, remember you're on the path to greatness. Embrace these moments, and you'll uncover a world of knowledge and inspiration waiting for you.
+A graph algorithm becomes easier when we draw the nodes.
 
-In the words of Jobs, "Don't let the noise of others' opinions drown out your own inner voice." Your inner voice is your guide, and your journey in computer science is an adventure. So, go forth and conquer the digital universe, one class at a time. 
+An operating-system concept becomes more real when we connect it with a process we can observe.
+
+Study groups can help too, especially when people actually explain ideas instead of only dividing homework.
+
+Teaching a concept to another student is one of the fastest ways to discover whether you understand it.
+
+Finally, accept that not every class will feel exciting.
+
+Interest is not constant.
+
+Sometimes engagement begins after effort rather than before it.
+
+A difficult topic can become interesting only after the first wall is passed.

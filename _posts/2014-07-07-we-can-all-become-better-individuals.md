@@ -7,18 +7,70 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="pigeon" src="/images/posts/we-can-all-become-better-individuals.webp" style="float: left; margin-right: 10px;" /> In today's world, we tend to look at a person's skills and knowledge before we judge them. However, these qualities don't necessarily reflect a person's true character. A person may be highly talented, but if they don't keep their promises, lack loyalty, or fail to uphold their word, then all their skills and knowledge are meaningless. In this context, it's essential to evaluate people based on their moral values and ethics rather than their abilities. If someone is truthful, keeps their promises, and is loyal, then they are worthy of praise and admiration, no matter what their skills or knowledge may be. Such people are rare, and they possess a quality that is far more superior than mere talent.
+<img width="200" alt="pigeon" src="/images/posts/we-can-all-become-better-individuals.webp" style="float: left; margin-right: 10px;" />
 
-Unfortunately, we live in a society that values fame and popularity over everything else. People often chase fame and fortune at the cost of their morals and ethics, and in the end, they end up empty-handed. The pursuit of fame may bring temporary satisfaction, but it's not a sustainable way of living. Instead, we should strive to discover our true selves, without getting distracted by superficial things like popularity.
+We often admire people for what they can do.
 
-To achieve this, we must let go of our egos and embrace unity. Every person has the same soul, and we should treat everyone with respect and kindness, regardless of their background, race, or beliefs. By embracing unity, we can all become a part of something greater, like a vast ocean. This is the path towards true happiness and fulfillment, not just temporary pleasure. Moreover, we should also strive to be aware of our emotions and feelings. Our emotions are like a guiding light, and we should learn to use them to make positive choices in our lives.
+They are intelligent, talented, successful, famous, or very knowledgeable.
 
-In today's fast-paced world, we often find ourselves regretting the choices we make. We become so consumed with our daily tasks and responsibilities that we forget to take a moment to reflect on our actions. It's easy to fall into the habit of constantly regretting our decisions, but doing so only leads to a life of misery and disappointment.
+These qualities are easy to notice.
 
-The Turkish proverb, "pişman olmayı kendine âdet edinirsen boyuna pişman olur durursun!" translates to "if you make regret a habit, you will always be regretful! Eventually, you will even regret your regret! Half of your life will be spent in misery, and the other half will be wasted in regret! Abandon this way of thinking and seek a better life, better friends, and better opportunities!"
+Character is quieter.
 
-It's important to acknowledge that mistakes are a part of life, and no one is perfect. However, constantly dwelling on past mistakes only leads to negative thoughts and emotions. Instead, it's essential to learn from our mistakes and move forward with a positive mindset.
+A person may know a lot and still fail to keep a promise. Someone may be extremely skilled and still treat people badly. A successful person may not be someone we would trust with a small secret.
 
-In addition to letting go of regret, it's crucial to treat ourselves and others with kindness and compassion. The phrase "ezel sofrası üzerinde her ne kadar halk kavgadaysa da, yediler ve yerlerse de, sofra yine o sofradır, hoş geldin de" translates to "even if there is a quarrel at the eternal table, they still eat and dine together. It's still the same table, so welcome it with a smile and kind words. This way, the beauty of its unique existence will shine through."
+This makes me think that ability and character should not be confused.
 
-Similarly, we must remember that our body and soul are interconnected. Our soul is our best friend and companion, and we must nurture it as such. The phrase "şu tenimiz ruhumuzun bir köşküdür. orası bir tepe, bit yıkık yer değildir" translates to "our body is the palace of our soul. It's not a broken-down place but a high peak." We must take care of our physical and mental health to ensure that our soul thrives.
+Skill matters.
+
+Knowledge matters.
+
+But honesty, loyalty, kindness, and reliability matter too.
+
+In some parts of life, they matter more.
+
+Modern life makes comparison easy. We see successful people constantly and begin to measure ourselves by visibility. Fame looks like value. Popularity looks like importance.
+
+But attention is not the same as worth.
+
+A quieter life can still be a good life.
+
+I also think regret deserves some attention. There is a Turkish saying that warns against turning regret into a habit. If we regret everything, eventually we even regret the regret itself.
+
+I understand what it means.
+
+Mistakes need reflection, but they should not become a permanent home.
+
+We can learn from a poor decision without building our identity around it.
+
+We also need some kindness toward ourselves.
+
+I like the old image of the body as a home for the soul. Whether we understand "soul" spiritually or simply as our inner life, the idea is beautiful.
+
+The body is not an enemy carrying us around.
+
+It is the place where our whole experience happens.
+
+Taking care of it matters.
+
+Taking care of the mind matters too.
+
+Becoming a better person is probably not one dramatic transformation.
+
+It is repeated small choices.
+
+Keep one promise.
+
+Apologize.
+
+Listen.
+
+Leave an unhealthy situation.
+
+Take care of yourself.
+
+Treat someone with respect when there is nothing to gain from it.
+
+These things do not make a person famous.
+
+Maybe they make a person better.

@@ -7,14 +7,38 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="gallows" src="/images/posts/a-genius-and-visionary-nicola-tesla.webp" style="float: left; margin-right: 10px;" /> A Genius and Visionary Nicola Tesla was one of the most brilliant inventors and scientists of his time. Born in 1856 in Croatia, Tesla moved to America in 1884 to pursue his passion for electrical engineering. He is best-known for his ground-breaking work in the field of electrical power and magnetism, which led to the development of the AC (alternating current) system that we use to this day.
+<img width="200" alt="Nikola Tesla" src="/images/posts/a-genius-and-visionary-nicola-tesla.webp" style="float: left; margin-right: 10px;" />
 
-Tesla had a lifelong obsession with electricity and spent his career working on a wide range of projects that would transform how we understand and use electricity. Perhaps his most famous invention was the Tesla coil, a device that generated high-voltage, low-current electricity that could be used for various purposes, from transmitting radio signals to lighting up neon lights.
+Nikola Tesla is one of those historical figures whose real achievements are impressive enough without adding legends.
 
-Despite his numerous achievements, Tesla was not as successful in commercializing his inventions as his contemporary and rival Thomas Edison. Nevertheless, his vision and genius paved the way for technological advancements that we take for granted today. For instance, without Tesla's contributions, we might not have radio, radar, or even wireless communication.
+He was born in 1856 in Smiljan, in what is now Croatia, and moved to the United States in 1884. His work in electrical engineering became especially important during the development of alternating-current power systems.
 
-At the same time, Tesla's legacy is not just limited to science and technology. Tesla was also an early advocate for renewable energy and electric cars, envisioning a future where we could harness the power of the sun and the wind to power our homes and vehicles. Today, Tesla Motors (named in honor of Nicola Tesla) is a leading producer of electric cars, with a mission to accelerate the world's transition to sustainable energy.
+Tesla worked on polyphase AC motors and power transmission, ideas that helped make long-distance electrical distribution practical. His induction motor and related patents became part of the famous competition between alternating current and direct current systems.
 
-He was born during a lightning storm, and despite the midwife's prediction that he would be a child of darkness, his mother declared he would be a child of light. Tesla had a great sense of humor, even poking fun at Rudyard Kipling. Although he and Thomas Edison were rivals in the "Current Wars," they had a love/hate relationship and respected each other. Tesla envisioned the smartphone and wireless internet, but he struggled to reduce his ideas to practice. He also had a famous earthquake machine in his Manhattan laboratory that "shook the poop out of Mark Twain." Tesla had famous friends, such as conservationist John Muir and financiers Henry Clay Frick and Thomas Fortune Ryan. He could not stand the sight of pearls, and he had a photographic memory and a fear of germs.
+This period is often simplified as Tesla against Thomas Edison, but history is more complicated than a two-person rivalry. Many engineers, companies, investors, and inventors were involved. Still, Tesla became one of the strongest symbols of AC technology.
 
-In conclusion, Nicola Tesla was an extraordinary individual who left an indelible mark on the world. His creativity, passion, and vision were instrumental in shaping our understanding of electricity and magnetism, as well as inspiring a new generation of inventors and scientists. We owe a debt of gratitude to this great visionary, and his legacy continues to inspire us even today.
+Another invention strongly connected with his name is the Tesla coil. It can produce very high-voltage, high-frequency alternating currents and became important in experiments with radio-frequency electricity.
+
+Tesla was also deeply interested in wireless communication and wireless transmission of power. He performed dramatic public demonstrations and imagined a future where information could move through the air over great distances.
+
+Some of his ideas were practical.
+
+Others were far ahead of the technology available to him, and some never became workable systems.
+
+This is part of what makes him interesting to me.
+
+He did not only improve existing machines. He imagined systems that did not yet exist.
+
+Tesla's personal life also became part of his legend. He was known for unusual habits, a strong memory, intense working routines, and a dislike of certain objects such as pearls. Stories about his laboratory, including demonstrations for visitors such as Mark Twain, helped create the image of the eccentric inventor.
+
+But I prefer remembering the engineer behind the mythology.
+
+His life was not a simple story of a misunderstood genius defeating everyone around him. He had successes, failed projects, financial difficulties, and ideas that were sometimes unrealistic.
+
+That makes his story more human.
+
+Real creativity is rarely a straight line.
+
+Tesla's legacy survives because some of his work became part of the electrical world we still live in.
+
+That is more remarkable than any myth.

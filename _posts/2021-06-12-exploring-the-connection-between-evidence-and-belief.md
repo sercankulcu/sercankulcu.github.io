@@ -3,18 +3,41 @@ title: 'Exploring the connection between evidence and belief'
 date: 2021-06-12
 permalink: /posts/2021/06/exploring-the-connection-between-evidence-and-belief/
 tags:
-  - story
-  - fun
+  - self-development
 ---
 
-<img width="200" alt="hammer" src="/images/posts/exploring-the-connection-between-evidence-and-belief.webp" style="float: left; margin-right: 10px;" /> Have you ever stopped to think about the connection between our beliefs and the standards of evidence we use to support them? It's a really fascinating topic that has been explored by philosophers for centuries. The truth is, when it comes to understanding the world around us, we often rely on our beliefs and what we want to believe. But the standards of evidence we use to support those beliefs are just as important. If we don't have good evidence to support our beliefs, then they might not be as reliable as we thought. That's why it's so important to be critical thinkers and to question our own beliefs and the evidence we use to support them. By doing so, we can ensure that our beliefs are based on solid evidence and are more likely to be true.
+Beliefs do not arrive only after careful investigation.
 
-One key insight is that the lower our standard for evidence, the stronger our desire to believe something must be. In other words, if we're willing to accept weak or questionable evidence to support our beliefs, it's likely that we have a strong desire to believe those things.
+We inherit some.
 
-One notable example of this is the story of Charles Darwin, who is known for his meticulous research and disciplined approach to evidence. When he suspected that he wanted to believe something, he made a point of looking for contradictory evidence. This kind of discipline helped him to avoid falling prey to false beliefs and to make new discoveries.
+We absorb others from friends, family, culture, and repeated experience.
 
-This idea of being disciplined about the evidence we use to support our beliefs can be applied not just in science but in everyday life as well. It's easy to get caught up in our own desires and biases and to overlook or ignore contradictory evidence, but by being mindful of this and making a conscious effort to seek out multiple perspectives and diverse evidence, we can improve the quality of our beliefs.
+Then we naturally look for evidence that fits what we already think.
 
-It's also worth noting that while this idea of evidence-based beliefs may seem like a no-brainer, it's not a common practice. It's exceptionally rare to find someone who holds themselves to such a high standard, and that's why it's worth pondering on.
+This is why the relationship between evidence and belief interests me.
 
-In conclusion, exploring the connection between evidence and belief is a worthwhile endeavor. By being mindful of our own desires and biases, and by holding ourselves to a high standard of evidence, we can improve the quality of our beliefs and make new discoveries. By doing this, we can build a better understanding of the world around us and make more informed decisions.
+Strong evidence should be able to change a belief.
+
+But in real life, the direction often works backward. A strong belief changes what we accept as evidence.
+
+We trust information from people we already agree with.
+
+We question information that threatens an important identity.
+
+This does not mean we should live without beliefs.
+
+That is impossible.
+
+The useful habit is to ask what kind of evidence would actually make us change our mind.
+
+If the answer is "nothing," then we are no longer testing a belief.
+
+We are protecting it.
+
+Different claims also need different levels of evidence. An ordinary claim about today's weather does not require the same proof as an extraordinary scientific claim.
+
+I try to keep one question close:
+
+What do I know, and what do I only feel certain about?
+
+Those two things can look very similar from inside the mind.

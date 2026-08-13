@@ -3,58 +3,53 @@ title: 'Clean Code Psychopath'
 date: 2025-02-01
 permalink: /posts/2025/02/clean-code-psychopath/
 tags:
-  - career
+  - software
+  - programming
+  - clean-code
 ---
 
-John Woods once said:
+John Woods once used the provocative phrase "clean code psychopath" to describe a certain kind of developer attitude.
 
-> "Always code as if the guy who ends up maintaining your code will be a violent psychopath who knows where you live."
+The phrase makes me smile because I have seen smaller versions of the behavior.
 
-This quote may sound extreme, but it carries an important lesson. Writing clean, readable, and maintainable code is a fundamental skill for every programmer.
+A developer becomes so committed to an idea of clean code that the code stops serving the project.
 
-## Why Clean Code Matters
+Names must follow one perfect rule.
 
-1. **Others Will Read Your Code**  
-   Code is not just for computers. Other developers will read and modify your work. If your code is messy, they will struggle to understand it.
+Functions must have one ideal size.
 
-2. **Future You is Also a Developer**  
-   You might revisit your code months or years later. If it is unclear, you will waste time figuring out what you did.
+Every pattern must match a book.
 
-3. **Bad Code Leads to Bugs**  
-   Poorly written code is harder to debug and maintain. Small mistakes can turn into big problems.
+A practical solution becomes unacceptable because it is not elegant enough.
 
-## How to Write Clean Code
+Clean code matters.
 
-1. **Use Clear and Descriptive Names**  
-   Variables, functions, and classes should have meaningful names. Avoid single-letter names unless they are in short loops.
+Readable code saves time.
 
-   **Bad:** `int x = 10;`  
-   **Good:** `int numberOfUsers = 10;`
+Good names matter.
 
-2. **Write Short and Simple Functions**  
-   A function should do one thing and do it well. Long functions are hard to read and debug.
+Simple functions matter.
 
-   **Bad:** A function that does calculations, prints results, and writes to a file.
-   **Good:** Break it into three functions: one for calculations, one for printing, and one for writing.
+Tests matter.
 
-3. **Use Comments Wisely**  
-   Write comments only when necessary. The best code is self-explanatory.
+But software engineering is full of trade-offs.
 
-   **Bad:** `// This adds 1 to x`  
-   `x = x + 1;`  
-   **Good:** `// Increase user count after registration`  
-   `userCount = userCount + 1;`
+A small script has different needs from a medical system.
 
-4. **Follow a Consistent Style**  
-   Use consistent indentation, spacing, and formatting. Most teams follow style guides like PEP 8 for Python or Google's Java style guide.
+A prototype has different needs from software expected to live for twenty years.
 
-5. **Avoid Hardcoding Values**  
-   Use constants or configuration files instead of writing fixed values in code.
+Sometimes a little duplication is easier to understand than a clever abstraction.
 
-   **Bad:** `double taxRate = 0.15;`  
-   **Good:** `final double TAX_RATE = 0.15;`
+Sometimes the "perfect" architecture creates more complexity than the problem itself.
 
-6. **Write Tests for Your Code**  
-   Automated tests help you catch errors early. They also make it easier to update your code without breaking things.
+I like clean-code principles when they make code easier for people.
 
-Clean code saves time and effort. It makes life easier for you and others who work with your code. Think of future developers, and maybe even a violent psychopath, when you write your next lines of code!
+I become suspicious when the principle becomes more important than the people.
+
+Rules are tools.
+
+They should help judgment, not replace it.
+
+The best code is not the code that looks most morally pure.
+
+It is code that works, can be understood, can be changed safely, and fits the reality of the project.

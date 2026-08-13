@@ -8,11 +8,52 @@ tags:
   - self-improvement
 ---
 
-<img width="180" alt="matrix" src="/images/posts/never-touch-your-idols-the-gilding-will-stick.webp" style="float: left; margin-right: 30px;" /> The phrase "Never touch your idols - the gilding will stick" serves as a powerful reminder that the individuals we idolize and look up to are not perfect. It suggests that by placing these individuals on a pedestal and holding them to such high standards, we run the risk of being disappointed when we ultimately learn of their flaws and shortcomings. While it is natural and even healthy to find inspiration and motivation from others, the phrase cautions against placing individuals on an unreachable pedestal, instead encouraging us to embrace our own imperfections and to recognize that nobody is infallible.
+There is an old warning that says, "Never touch your idols. The gilding will stick to your fingers."
 
-However, it is not only about the idols that we admire, but also the way we perceive and understand the world around us. The phrase also highlights the importance of being realistic and understanding that there is no such thing as a perfect person or situation. When we idolize someone or something, we tend to see only the good, the beauty and the success, and ignore the truth, essence and essence of the events.
+I understand it as a warning about idealization.
 
-This idea of not touching the idols also applies to our own self-perception. We often put ourselves under pressure to live up to the ideals we see in others, but this can lead to disappointment and dissatisfaction when we inevitably fall short. It is important to remember that everyone has their own flaws and imperfections, and it is unrealistic to expect ourselves to be perfect.
+From a distance, people can look perfect.
 
-The phrase also touches on the sadness of being realistic and how it can be difficult to accept that life is not always beautiful, good and successful. But, it is important to remember that it is through facing and accepting the difficulties of life that we grow and become stronger. It is through understanding the truth, essence and essence of events that we can learn to appreciate the good and the beautiful in life in a more authentic and meaningful way.
+A writer becomes only the beautiful sentences. A scientist becomes only the discoveries. A leader becomes only the achievements. We remove the ordinary, difficult, and unpleasant parts until the person becomes an image.
 
+Then we get closer.
+
+The image changes.
+
+Maybe the person is selfish.
+
+Maybe they are insecure.
+
+Maybe some of the stories we admired were exaggerated.
+
+Disappointment follows because the real person cannot compete with the version we created.
+
+I do not think the lesson is to stop admiring people.
+
+Admiration can be useful.
+
+Someone else's work can show us what is possible.
+
+The danger begins when inspiration becomes worship.
+
+A person can create something brilliant and still have serious weaknesses.
+
+Both can be true at the same time.
+
+This also applies to the way we judge ourselves.
+
+We compare our whole life with the polished part of someone else's life and wonder why we feel incomplete.
+
+That comparison is unfair.
+
+Nobody lives as a statue.
+
+People are contradictory, emotional, inconsistent, and unfinished.
+
+Maybe admiration becomes healthier when we admire specific qualities instead of entire people.
+
+I can respect someone's discipline without needing every part of their character to be perfect.
+
+That feels more realistic.
+
+And reality may be less shiny than gold, but at least it does not stick to our fingers.

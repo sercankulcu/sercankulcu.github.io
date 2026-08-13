@@ -7,40 +7,48 @@ tags:
   - career
 ---
 
-<img width="200" alt="dijkstra" src="/images/posts/edsger-wybe-dijkstra-1.webp" style="float: left; margin-right: 10px;" /> Edsger Wybe Dijkstra was a Dutch computer scientist and mathematician who made significant contributions to the field of computer science. He was born on May 11, 1930 in Rotterdam, Netherlands. In 1951, Dijkstra began studying theoretical physics at the University of Leiden. However, he soon switched to mathematics and theoretical physics at the University of Amsterdam. He graduated in 1954.
+<img width="200" alt="Edsger Dijkstra" src="/images/posts/edsger-wybe-dijkstra.webp" style="float: left; margin-right: 10px;" />
 
-In 1956, Dijkstra began working as a programmer at the Mathematical Center in Amsterdam. It was here that he first became interested in computer science and began working on his early research in the field.
+Edsger Wybe Dijkstra was one of the people who helped turn programming from a practical craft into a serious intellectual discipline.
 
-In 1959, Dijkstra was appointed as an assistant professor at the Eindhoven University of Technology in the Netherlands. He worked there until 1962 when he was appointed as a professor of mathematics at the same university.
+He was born in Rotterdam in 1930. His parents were both highly educated, and Dijkstra initially studied theoretical physics at Leiden University.
 
-In 1968, Dijkstra published a paper on a shortest path algorithm, which later became known as Dijkstra's algorithm. This algorithm is widely used to find the shortest path between two points in a graph and is considered to be one of the most important algorithms in computer science.
+While still a student, he began working as a programmer at the Mathematical Centre in Amsterdam in 1952. At the time, programming was so new that it was not yet a normal profession. Dijkstra later joked that when he wanted to record "programmer" as his profession, the authorities did not consider it a proper occupation.
 
-<img width="200" alt="dijkstra" src="/images/posts/edsger-wybe-dijkstra-2.webp" style="float: left; margin-right: 10px;" /> In 1972, Dijkstra was appointed as a professor of computer science at the University of Texas at Austin in the United States. He held this position until his retirement in 1999. During this time, he continued to work on a variety of research projects in the field of computer science, including automated theorem proving and concurrent programming.
+His work quickly became important.
 
-One of Dijkstra's most notable contributions to the field of computer science was his work on the shortest path algorithm, also known as Dijkstra's algorithm. This algorithm is used to find the shortest path between two points in a graph, and it is widely used in various fields such as transportation, networking, and logistics. Dijkstra's algorithm is considered to be one of the most important algorithms in computer science and is still widely used today.
+In 1956, while thinking about how to find the shortest route between cities, he developed what we now call Dijkstra's shortest-path algorithm. The algorithm became one of the classic ideas in graph theory and computer science.
 
-In addition to his work on the shortest path algorithm, Dijkstra also made significant contributions to the field of artificial intelligence. He was one of the pioneers in the development of automated theorem proving, which is the process of using a computer program to prove mathematical theorems. He also worked on the development of concurrent programming, which is the process of writing computer programs that can execute multiple tasks at the same time.
+He also worked with Jaap Zonneveld on an early compiler for ALGOL 60. Later, Dijkstra made major contributions to concurrent programming. His work on mutual exclusion, semaphores, and synchronization helped programmers reason about several processes sharing resources.
 
-Dijkstra was also known for his work on the development of formal methods for the verification of computer systems. He believed that the development of reliable computer systems was crucial for the advancement of society, and he was an advocate for the use of formal methods to ensure the reliability of computer systems.
+Dijkstra became a professor at Eindhoven University of Technology in 1962.
 
-Dijkstra was also a highly respected teacher and mentor. He held several academic positions during his career, and he is known for his ability to explain complex concepts in a clear and understandable way. Many of his students went on to become leading figures in the field of computer science.
+In the late 1960s, he became one of the strongest voices for structured programming. His famous letter "Go To Statement Considered Harmful" argued that uncontrolled jumps made programs much harder to understand and prove correct.
 
-In 2002, Dijkstra passed away on August 6th.
+The title became famous, but the larger idea mattered more.
 
-Some popular quotes of him:
+Programs should be written so human beings can reason about them.
 
-* "Simplicity is a great virtue but it requires hard work to achieve it and education to appreciate it."
+Dijkstra received the ACM Turing Award in 1972.
 
-* "The question of whether a computer can think is no more interesting than the question of whether a submarine can swim."
+From 1973 to 1984, he worked as a research fellow for Burroughs Corporation while remaining in the Netherlands. In 1984, he joined the University of Texas at Austin, where he stayed until retirement.
 
-* "Computer science is no more about computers than astronomy is about telescopes."
+One unusual part of his legacy is the collection of handwritten documents known as EWDs. Dijkstra wrote technical notes, arguments, and reflections by hand, copied them, and shared them with colleagues.
 
-* "Testing can be used to show the presence of bugs, but never to show their absence."
+He cared deeply about clarity.
 
-* "If debugging is the process of removing software bugs, then programming must be the process of putting them in."
+His writing could be sharp and sometimes severe, but it came from a belief that computing deserved mathematical discipline.
 
-* "The art of programming is the skill of controlling complexity."
+Dijkstra died in 2002.
 
-* "The structure of a program should reflect the structure of the problem it solves."
+I still find his work interesting because many of his questions remain alive.
 
-* "The competent programmer is fully aware of the strictly limited size of his own skull; therefore he approaches the programming task in full humility, and among other things he avoids clever tricks like the plague."
+How do we make software easier to reason about?
+
+How do we control complexity?
+
+How do we write programs for people, not only machines?
+
+Computers have changed enormously since Dijkstra began programming.
+
+Those questions have not.
