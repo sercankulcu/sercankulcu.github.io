@@ -1,5 +1,5 @@
 ---
-title: 'Exploring Identity, Change, and Continuity'
+title: 'Exploring Identity, Change, And Continuity'
 date: 2024-11-28
 permalink: /posts/2024/11/exploring-identity-change-and-continuity/
 tags:
@@ -8,58 +8,14 @@ tags:
   - reflection
 ---
 
-The Ship of Theseus asks a simple question with no simple answer.
+The Ship of Theseus asks a simple question with no simple answer. Imagine a wooden ship. Over many years, damaged boards are replaced one by one. Eventually, every original piece has been replaced. Is it still the same ship?
 
-Imagine a wooden ship.
+Our intuition often says yes because the change happened slowly and continuously. Now imagine someone collected all the original boards and rebuilt another ship. Which one is the original? The paradox is about identity through change. It applies surprisingly well to people.
 
-Over many years, damaged boards are replaced one by one.
+Our bodies change. Our cells change. Our opinions, habits, relationships, and memories change. The person I was twenty years ago is very different from the person writing this now. Still, I say "I."
 
-Eventually, every original piece has been replaced.
+A personal website creates a smaller version of the same puzzle. Old pages are rewritten. Design changes. Files are removed. New sections appear.
 
-Is it still the same ship?
+At what point is it a different website? Maybe identity is not hidden inside one permanent part. Maybe continuity itself matters. History. Relationships between versions.
 
-Our intuition often says yes because the change happened slowly and continuously.
-
-Now imagine someone collected all the original boards and rebuilt another ship.
-
-Which one is the original?
-
-The paradox is about identity through change.
-
-It applies surprisingly well to people.
-
-Our bodies change.
-
-Our cells change.
-
-Our opinions, habits, relationships, and memories change.
-
-The person I was twenty years ago is very different from the person writing this now.
-
-Still, I say "I."
-
-A personal website creates a smaller version of the same puzzle.
-
-Old pages are rewritten.
-
-Design changes.
-
-Files are removed.
-
-New sections appear.
-
-At what point is it a different website?
-
-Maybe identity is not hidden inside one permanent part.
-
-Maybe continuity itself matters.
-
-History.
-
-Relationships between versions.
-
-A story that connects change.
-
-I like the Ship of Theseus because it does not need a final answer to be useful.
-
-It makes an ordinary word such as "same" feel much less ordinary.
+A story that connects change. I like the Ship of Theseus because it does not need a final answer to be useful. It makes an ordinary word such as "same" feel much less ordinary.
