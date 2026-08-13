@@ -1,5 +1,5 @@
 ---
-title: 'Quotes from famous computer scientists'
+title: 'Quotes From Famous Computer Scientists'
 date: 2021-02-13
 permalink: /posts/2021/02/quotes-from-famous-computer-scientists/
 tags:
@@ -7,9 +7,7 @@ tags:
   - computer-science
 ---
 
-Computer science has produced many memorable sentences.
-
-I like quotes when they carry an idea larger than the sentence itself.
+Computer science has produced many memorable sentences. I like quotes when they carry an idea larger than the sentence itself.
 
 Alan Turing once wrote, "We can only see a short distance ahead, but we can see plenty there that needs to be done." I like this because computing is full of uncertainty. We do not need to know the entire future before beginning useful work.
 
@@ -19,16 +17,6 @@ Donald Knuth's famous warning that "premature optimization is the root of all ev
 
 Grace Hopper is often remembered for challenging the phrase, "We've always done it this way." Whether a quotation is repeated exactly or not, the attitude fits her career: computing grows when people question old limits.
 
-Quotes should not become decoration.
+Quotes should not become decoration. A good quote is useful when it makes us stop and think about our own work. Why am I making this complicated? What assumption am I accepting? Am I solving a real problem or only showing technical skill?
 
-A good quote is useful when it makes us stop and think about our own work.
-
-Why am I making this complicated?
-
-What assumption am I accepting?
-
-Am I solving a real problem or only showing technical skill?
-
-The best computer-science quotes are not only about computers.
-
-They are usually about thinking.
+The best computer-science quotes are not only about computers. They are usually about thinking.
