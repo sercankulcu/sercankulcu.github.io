@@ -1,504 +1,1084 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <title>Basketball Game - Interactive Hoop Shooting</title>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Play an interactive basketball shooting game online. Score points by shooting the ball into the hoop!">
-  <meta name="keywords" content="basketball game, online basketball, interactive game, hoop shooting">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Play a fast basketball shooting game. Swipe or drag the ball toward the hoop and score as many baskets as possible before time runs out.">
+  <meta name="keywords" content="basketball game, hoop shooting, arcade basketball, online game">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://sercankulcu.github.io/game/basketball.html">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.2/TweenMax.min.js"></script>
+  <title>Basketball - Arcade Hoop Shooting</title>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-
-    html,
-    body {
+    * {
       box-sizing: border-box;
-      height: 100%;
-      margin: 0 auto;
-      width: 100%;
     }
 
-    svg {
-      fill: rgb(255, 252, 255);
-      height: 30%;
-      width: 50%;
-      overflow: visible;
-      position: absolute;
-      stroke: black;
-      top: 10%;
-      left: 25%;
-      z-index: 0;
-      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    :root {
+      --wood-1: #d99a55;
+      --wood-2: #c9843d;
+      --wood-line: rgba(95, 51, 20, .16);
+      --cream: #fff7e8;
+      --ink: #1e2329;
+      --muted: #6e6257;
+      --panel: rgba(24, 26, 30, .92);
+      --orange: #e86f23;
+      --orange-dark: #74320e;
+      --rim: #df382f;
+      --green: #28a66a;
+      --shadow: rgba(42, 24, 10, .22);
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: #f5efe7;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    button,
+    #ball {
       -webkit-tap-highlight-color: transparent;
     }
 
+    button {
+      font: inherit;
+    }
+
+    .game-shell {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
     .stage {
-      background: #feebcb;
-      height: 100%;
-      overflow: hidden;
       position: relative;
-      visibility: hidden;
-      width: 100%;
+      height: min(76vh, 720px);
+      min-height: 500px;
+      overflow: hidden;
+      user-select: none;
+      touch-action: none;
+      background:
+        linear-gradient(90deg,
+          transparent 0,
+          transparent calc(20% - 1px),
+          rgba(255,255,255,.14) 20%,
+          transparent calc(20% + 1px),
+          transparent calc(40% - 1px),
+          rgba(255,255,255,.14) 40%,
+          transparent calc(40% + 1px),
+          transparent calc(60% - 1px),
+          rgba(255,255,255,.14) 60%,
+          transparent calc(60% + 1px),
+          transparent calc(80% - 1px),
+          rgba(255,255,255,.14) 80%,
+          transparent calc(80% + 1px)),
+        repeating-linear-gradient(
+          0deg,
+          var(--wood-1) 0 56px,
+          var(--wood-2) 56px 112px
+        );
+      border-bottom: 1px solid rgba(0,0,0,.08);
     }
 
-    #bHoop {
-      stroke-width: 5;
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, var(--wood-line) 1px, transparent 1px);
+      background-size: 180px 100%;
+      pointer-events: none;
     }
 
-    #bHoop .shadow {
-      fill: rgba(0, 0, 0, 0.7);
-      stroke: none;
+    .stage::after {
+      content: "";
+      position: absolute;
+      width: min(72vw, 720px);
+      height: min(72vw, 720px);
+      border: 4px solid rgba(255,255,255,.62);
+      border-radius: 50%;
+      left: 50%;
+      top: 64%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      opacity: .65;
     }
 
-    #basket #net {
-      fill: none;
-      stroke: #ccc;
-      stroke-miterlimit: 10;
+    .hud {
+      position: absolute;
+      top: max(14px, env(safe-area-inset-top));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      width: min(94%, 560px);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
     }
 
-    #basket #ring {
-      fill: #df4931;
-      stroke: none;
+    .hud-card {
+      min-width: 0;
+      border: 1px solid rgba(255,255,255,.12);
+      background: var(--panel);
+      color: white;
+      border-radius: 15px;
+      padding: 9px 12px 10px;
+      box-shadow: 0 8px 22px rgba(0,0,0,.18);
+      backdrop-filter: blur(8px);
+      text-align: center;
+    }
+
+    .hud-label {
+      display: block;
+      margin-bottom: 2px;
+      color: #c8cbd0;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .12em;
+    }
+
+    .hud-value {
+      display: block;
+      line-height: 1;
+      font-size: clamp(19px, 4.3vw, 28px);
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: .03em;
+    }
+
+    .court-title {
+      position: absolute;
+      left: 50%;
+      top: 92px;
+      transform: translateX(-50%);
+      z-index: 10;
+      font-size: clamp(12px, 2.7vw, 15px);
+      font-weight: 900;
+      letter-spacing: .16em;
+      color: rgba(75, 38, 12, .55);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .hoop-wrap {
+      position: absolute;
+      left: 50%;
+      top: 22%;
+      width: clamp(240px, 43vw, 410px);
+      aspect-ratio: 1.38;
+      transform: translateX(-50%);
+      z-index: 8;
+      pointer-events: none;
+    }
+
+    .backboard {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 84%;
+      height: 60%;
+      transform: translateX(-50%);
+      background: rgba(252,253,255,.76);
+      border: clamp(6px, 1vw, 9px) solid #eef1f3;
+      border-radius: 5px;
+      box-shadow: 0 10px 16px rgba(0,0,0,.12);
+    }
+
+    .backboard::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 7%;
+      width: 38%;
+      height: 45%;
+      transform: translateX(-50%);
+      border: 4px solid #ef5b45;
+    }
+
+    .rim {
+      position: absolute;
+      left: 50%;
+      top: 54%;
+      width: 43%;
+      height: 17px;
+      transform: translateX(-50%);
+      border: 8px solid var(--rim);
+      border-top-width: 6px;
+      border-radius: 50%;
+      z-index: 3;
+      filter: drop-shadow(0 4px 2px rgba(0,0,0,.13));
+    }
+
+    .net {
+      position: absolute;
+      left: 50%;
+      top: 59%;
+      width: 36%;
+      height: 32%;
+      transform: translateX(-50%);
+      transform-origin: top center;
+      z-index: 2;
+      opacity: .9;
+      background:
+        linear-gradient(68deg, transparent 47%, rgba(255,255,255,.95) 48% 52%, transparent 53%),
+        linear-gradient(-68deg, transparent 47%, rgba(255,255,255,.95) 48% 52%, transparent 53%);
+      background-size: 22px 22px;
+      clip-path: polygon(0 0, 100% 0, 77% 100%, 23% 100%);
+      border-top: 3px solid rgba(255,255,255,.9);
+    }
+
+    .net.swish {
+      animation: netSwish .5s ease-out;
+    }
+
+    @keyframes netSwish {
+      0%   { transform: translateX(-50%) scaleY(1); }
+      35%  { transform: translateX(-50%) scaleY(1.35) scaleX(.88); }
+      65%  { transform: translateX(-50%) scaleY(.92) scaleX(1.05); }
+      100% { transform: translateX(-50%) scaleY(1); }
     }
 
     #ball {
-      cursor: pointer;
-      fill: #df4931;
-      stroke: none;
-    }
-
-    #ball .ballPath {
-      clip-path: url(#clip-path);
-    }
-
-    #ball .ballStripe {
-      fill: none;
-      stroke: #fff;
-      stroke-miterlimit: 10;
-    }
-
-    #score-timer-container {
-      position: fixed;
-      justify-content: space-between;
-      top: 5%;
-      left: 50%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: clamp(64px, 12vw, 92px);
+      height: clamp(64px, 12vw, 92px);
       transform: translate(-50%, -50%);
-      /* Ortaya hizalama */
-      z-index: 1000;
+      z-index: 15;
+      cursor: grab;
+      touch-action: none;
+      filter: drop-shadow(0 12px 10px rgba(46,25,8,.25));
+      will-change: transform;
+      overflow: visible;
     }
 
-    .digital-display {
-      font-family: 'Orbitron', sans-serif;
-      background-color: rgba(0, 0, 0, 0.8);
-      /* Şeffaf siyah arka plan */
-      color: red;
-      padding: 5px 5px;
-      border-radius: 5px;
-      font-size: 12px;
+    #ball:active {
+      cursor: grabbing;
+    }
+
+    #ball circle {
+      fill: var(--orange);
+      stroke: var(--orange-dark);
+      stroke-width: 1.6;
+    }
+
+    #ball .ball-stripe {
+      fill: none;
+      stroke: #54270e;
+      stroke-width: 2.1;
+      stroke-linecap: round;
+    }
+
+    .aim-guide {
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 12;
+      pointer-events: none;
+      opacity: 0;
+      transform-origin: 0 50%;
+      height: 4px;
+      width: 100px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255,255,255,.95), rgba(255,255,255,.12));
+      box-shadow: 0 0 0 1px rgba(0,0,0,.08);
+      transition: opacity .12s ease;
+    }
+
+    .aim-guide.visible {
+      opacity: .9;
+    }
+
+    .feedback {
+      position: absolute;
+      left: 50%;
+      top: 48%;
+      z-index: 28;
+      transform: translate(-50%, -50%) scale(.8);
+      opacity: 0;
+      pointer-events: none;
+      color: white;
+      text-shadow: 0 3px 12px rgba(0,0,0,.35);
+      font-size: clamp(28px, 8vw, 58px);
+      font-weight: 1000;
+      letter-spacing: -.035em;
+      white-space: nowrap;
+    }
+
+    .feedback.show {
+      animation: feedbackPop .8s ease-out;
+    }
+
+    @keyframes feedbackPop {
+      0%   { opacity: 0; transform: translate(-50%, -42%) scale(.7); }
+      18%  { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+      62%  { opacity: 1; transform: translate(-50%, -55%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -73%) scale(.94); }
+    }
+
+    .start-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 8%;
+      transform: translateX(-50%);
+      z-index: 14;
+      color: rgba(58, 34, 17, .72);
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: .02em;
       text-align: center;
-      top: 5%;
-      right: 10px;
-      /* Sağdan mesafe */
-      z-index: 1000;
-      /* Diğer öğelerin üstünde kalmasını sağlar */
-      border: 3px solid red;
+      pointer-events: none;
+      transition: opacity .25s ease;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background: rgba(20, 22, 25, .34);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .2s ease, visibility .2s ease;
+    }
+
+    .overlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      width: min(92vw, 410px);
+      background: rgba(255, 251, 244, .97);
+      border: 1px solid rgba(255,255,255,.7);
+      border-radius: 25px;
+      padding: 28px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.28);
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 7px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .18em;
+      color: #a85b22;
+    }
+
+    .modal h1,
+    .modal h2 {
+      margin: 0;
+      color: #212326;
+      letter-spacing: -.04em;
+    }
+
+    .modal h1 {
+      font-size: clamp(38px, 11vw, 58px);
+    }
+
+    .modal h2 {
+      font-size: 38px;
+    }
+
+    .modal p {
+      margin: 12px auto 0;
+      max-width: 31ch;
+      color: #655c54;
+      line-height: 1.55;
+      font-size: 15px;
+    }
+
+    .result-score {
+      margin: 18px 0 4px;
+      font-size: 54px;
+      font-weight: 1000;
+      line-height: 1;
+      color: #e1601c;
+    }
+
+    .result-meta {
+      color: #655c54;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .primary-btn {
+      width: 100%;
+      margin-top: 22px;
+      border: 0;
+      border-radius: 15px;
+      padding: 14px 18px;
+      background: #202226;
+      color: white;
+      font-weight: 900;
+      letter-spacing: .02em;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,.16);
+      transition: transform .15s ease, background .15s ease;
+    }
+
+    .primary-btn:hover {
+      background: #111214;
+      transform: translateY(-1px);
+    }
+
+    .primary-btn:active {
+      transform: translateY(1px);
+    }
+
+    .info {
+      width: min(100% - 28px, 900px);
+      margin: 0 auto;
+      padding: 28px 0 42px;
+    }
+
+    .info h2 {
+      margin: 0 0 18px;
+      font-size: clamp(24px, 5vw, 34px);
+      letter-spacing: -.035em;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .info-card {
+      background: white;
+      border: 1px solid #ece4d9;
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(64,45,25,.06);
+    }
+
+    .info-card h3 {
+      margin: 0 0 7px;
+      font-size: 15px;
+    }
+
+    .info-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 720px) {
+      .stage {
+        height: min(72vh, 650px);
+        min-height: 540px;
+      }
+
+      .hoop-wrap {
+        top: 25%;
+        width: clamp(230px, 64vw, 330px);
+      }
+
+      #ball {
+        top: 0;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hud {
+        width: calc(100% - 20px);
+        gap: 6px;
+      }
+
+      .hud-card {
+        border-radius: 12px;
+        padding: 8px 7px 9px;
+      }
+
+      .start-hint {
+        bottom: 6.5%;
+      }
+    }
+
+    @media (max-height: 660px) {
+      .stage {
+        min-height: 480px;
+      }
+
+      .hoop-wrap {
+        top: 22%;
+        width: 240px;
+      }
+
+      #ball {
+        width: 66px;
+        height: 66px;
+        top: 0;
+      }
+
+      .court-title {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .001ms !important;
+      }
     }
   </style>
 </head>
 
 <body>
+  <main class="game-shell">
+    <section class="stage" id="stage" aria-label="Basketball game area">
+      <div class="hud" aria-label="Game information">
+        <div class="hud-card">
+          <span class="hud-label">SCORE</span>
+          <span class="hud-value" id="scoreDisplay">000</span>
+        </div>
+        <div class="hud-card">
+          <span class="hud-label">TIME</span>
+          <span class="hud-value" id="timeDisplay">30</span>
+        </div>
+        <div class="hud-card">
+          <span class="hud-label">BEST</span>
+          <span class="hud-value" id="bestDisplay">000</span>
+        </div>
+      </div>
 
-  <div class="stage" aria-label="Basketball Game Area">
+      <div class="court-title">BASKETBALL ARCADE</div>
 
-    <svg id="bHoop" viewBox="0 0 120 90" preserveAspectRatio="xMidYMin" xmlns="http://www.w3.org/2000/svg">
-      <rect x="2.5" y="2.5" width="115" height="85" />
-      <rect x="33" y="30" width="54" height="40" />
-      <foreignObject x="37" y="34" width="46" height="32">
-        <div xmlns="http://www.w3.org/1999/xhtml" id="score-display" class="digital-display">000</div>
-      </foreignObject>
-    </svg>
+      <div class="hoop-wrap" id="hoopWrap" aria-hidden="true">
+        <div class="backboard"></div>
+        <div class="rim" id="rim"></div>
+        <div class="net" id="net"></div>
+      </div>
 
-    <svg id="basket" viewBox="0 0 120 90" preserveAspectRatio="xMidYMin">
-      <g id="net">
-        <line x1="33" y1="76" x2="74.1" y2="117.1" />
-        <line x1="87" y1="76" x2="45.6" y2="117.4" />
-        <line x1="78.3" y1="73.8" x2="43.2" y2="109" />
-        <line x1="68.1" y1="73.8" x2="41.9" y2="100" />
-        <line x1="58.2" y1="73.8" x2="39.5" y2="92.5" />
-        <line x1="47.4" y1="73.8" x2="36.5" y2="84.7" />
-        <line x1="40.7" y1="73.5" x2="76.3" y2="109.1" />
-        <line x1="51.6" y1="73.8" x2="77.7" y2="99.9" />
-        <line x1="61.9" y1="73.8" x2="80.4" y2="92.3" />
-        <line x1="72.2" y1="73.8" x2="82.7" y2="84.3" />
-        <line x1="39.5" y1="92.5" x2="64.1" y2="117.2" />
-        <line x1="42.7" y1="106.3" x2="54.5" y2="118.1" />
-        <line x1="80.4" y1="92.3" x2="54.5" y2="118.1" />
-        <line x1="77.3" y1="105.8" x2="65.7" y2="117.4" />
-      </g>
-      <rect id="ring" x="28" y="70" width="64" height="6" rx="3" />
-    </svg>
+      <div class="aim-guide" id="aimGuide"></div>
 
-    <svg id="ball" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 50 50"
-      class="noSelect">
-      <defs>
-        <clipPath id="clip-path">
-          <circle cx="25" cy="25" r="20" />
-        </clipPath>
-      </defs>
+      <svg id="ball" viewBox="0 0 50 50" role="img" aria-label="Basketball">
+        <defs>
+          <clipPath id="ballClip">
+            <circle cx="25" cy="25" r="20"/>
+          </clipPath>
+        </defs>
+        <circle cx="25" cy="25" r="20"/>
+        <g clip-path="url(#ballClip)">
+          <path class="ball-stripe" d="M-3 24 C10 14, 27 13, 53 20"/>
+          <path class="ball-stripe" d="M25 -2 C34 9, 39 18, 37 28 C35 39, 27 47, 22 52"/>
+          <path class="ball-stripe" d="M1 8 C13 3, 20 6, 28 9 C38 13, 45 10, 50 4"/>
+          <path class="ball-stripe" d="M1 43 C15 40, 18 31, 29 25 C37 21, 44 24, 51 31"/>
+        </g>
+      </svg>
 
-      <circle cx="25" cy="25" r="20" />
-      <g class="ballPath">
-        <path class="ballStripe"
-          d="M2.4,8.1a25,25,0,0,1,9.5-2.3c4.9-.2,9.5,1.2,13.8,2.5s5.5,1.9,9.3,2.1,4.5-.2,5.8-1a6.6,6.6,0,0,0,2.7-3.1" />
-        <path class="ballStripe" d="M26.4,0c2.8,2.5,9.5,9,11.1,19.1C40.2,35.7,26.8,47.5,25.2,49" />
-        <path class="ballStripe" d="M-5,26.5a71.1,71.1,0,0,1,23.5-9.1,77,77,0,0,1,33,.7" />
-        <path class="ballStripe"
-          d="M4,42.3a35.5,35.5,0,0,0,6.9-2.8c9.3-5,10.1-11.2,19.8-15.8,4.3-2,6.7-2.1,8.1-1.9,5.5.6,8.5,5.1,8.9,5.7,3.4,5.2.7,10.6.3,11.3" />
-      </g>
-    </svg>
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+      <div class="start-hint" id="startHint">Drag or swipe the ball toward the hoop</div>
 
-  </div>
+      <div class="overlay visible" id="startOverlay">
+        <div class="modal">
+          <p class="eyebrow">30 SECOND CHALLENGE</p>
+          <h1>BASKETBALL</h1>
+          <p>Swipe or drag the ball toward the hoop. Score as many baskets as you can before time runs out.</p>
+          <button class="primary-btn" id="startButton" type="button">START GAME</button>
+        </div>
+      </div>
+
+      <div class="overlay" id="gameOverOverlay">
+        <div class="modal">
+          <p class="eyebrow">TIME'S UP</p>
+          <h2>GAME OVER</h2>
+          <div class="result-score" id="finalScore">0</div>
+          <div class="result-meta" id="resultMeta">Best: 0</div>
+          <button class="primary-btn" id="playAgainButton" type="button">PLAY AGAIN</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="info" aria-labelledby="howToPlayTitle">
+      <h2 id="howToPlayTitle">How to Play</h2>
+      <div class="info-grid">
+        <article class="info-card">
+          <h3>🏀 Shooting</h3>
+          <p>Drag the basketball and release it toward the hoop. The direction and speed of your movement determine the shot.</p>
+        </article>
+        <article class="info-card">
+          <h3>🎯 Scoring</h3>
+          <p>Every successful basket is worth 2 points. Consecutive baskets build a streak and can earn bonus points.</p>
+        </article>
+        <article class="info-card">
+          <h3>💡 Tip</h3>
+          <p>Smooth upward swipes are usually more accurate than extremely powerful throws. Find the right rhythm and angle.</p>
+        </article>
+      </div>
+    </section>
+  </main>
 
   <script>
+    (() => {
+      "use strict";
 
-    // wait until DOM is ready
-    document.addEventListener("DOMContentLoaded", function (event) {
+      const GAME_DURATION = 30;
+      const BASE_POINTS = 2;
+      const MAX_SHOT_SPEED = 1150;
+      const GRAVITY = 1650;
+      const RESET_DELAY = 550;
+      const STORAGE_KEY = "basketball-best-score";
 
-      // wait until window, stylesheets, images, links, and other media assets are loaded
-      window.onload = function () {
+      const stage = document.getElementById("stage");
+      const ball = document.getElementById("ball");
+      const hoopWrap = document.getElementById("hoopWrap");
+      const rim = document.getElementById("rim");
+      const net = document.getElementById("net");
+      const aimGuide = document.getElementById("aimGuide");
+      const feedback = document.getElementById("feedback");
+      const startHint = document.getElementById("startHint");
 
-        // A Vector
-        var Vector = {
-          _x: 1,
-          _y: 0,
+      const scoreDisplay = document.getElementById("scoreDisplay");
+      const timeDisplay = document.getElementById("timeDisplay");
+      const bestDisplay = document.getElementById("bestDisplay");
 
-          create: function (x, y) {
-            var obj = Object.create(this);
-            obj.setX(x);
-            obj.setY(y);
-            return obj;
-          },
+      const startOverlay = document.getElementById("startOverlay");
+      const gameOverOverlay = document.getElementById("gameOverOverlay");
+      const startButton = document.getElementById("startButton");
+      const playAgainButton = document.getElementById("playAgainButton");
+      const finalScore = document.getElementById("finalScore");
+      const resultMeta = document.getElementById("resultMeta");
 
-          setX: function (value) {
-            this._x = value;
-          },
+      let running = false;
+      let dragging = false;
+      let inFlight = false;
+      let scoredThisShot = false;
+      let gameEndTime = 0;
+      let timerId = null;
+      let animationId = null;
 
-          getX: function () {
-            return this._x;
-          },
+      let score = 0;
+      let streak = 0;
+      let best = loadBest();
 
-          setY: function (value) {
-            this._y = value;
-          },
+      let ballPos = { x: 0, y: 0 };
+      let velocity = { x: 0, y: 0 };
+      let rotation = 0;
+      let lastFrameTime = 0;
+      let pointerId = null;
 
-          getY: function () {
-            return this._y;
-          },
+      let pointerSamples = [];
+      let dragOffset = { x: 0, y: 0 };
 
-          setAngle: function (angle) {
-            var length = this.getLength();
-            this._x = Math.cos(angle) * length;
-            this._y = Math.sin(angle) * length;
-          },
+      function loadBest() {
+        try {
+          return Math.max(0, Number(localStorage.getItem(STORAGE_KEY)) || 0);
+        } catch {
+          return 0;
+        }
+      }
 
-          getAngle: function () {
-            return Math.atan2(this._y, this._x);
-          },
+      function saveBest(value) {
+        try {
+          localStorage.setItem(STORAGE_KEY, String(value));
+        } catch {
+          // localStorage may be unavailable in privacy-restricted environments.
+        }
+      }
 
-          setLength: function (length) {
-            var angle = this.getAngle();
-            this._x = Math.cos(angle) * length;
-            this._y = Math.sin(angle) * length;
-          },
+      function formatScore(value) {
+        return String(Math.max(0, Math.floor(value))).padStart(3, "0");
+      }
 
-          getLength: function () {
-            return Math.sqrt(this._x * this._x + this._y * this._y);
-          },
+      function updateHud() {
+        scoreDisplay.textContent = formatScore(score);
+        bestDisplay.textContent = formatScore(best);
+      }
 
-          add: function (v2) {
-            if (v2) {
-              return Vector.create(this._x + v2.getX(), this._y + v2.getY());
-            } else {
-              return Vector.create(this._x, this._y);;
-            }
-          },
+      function getStageRect() {
+        return stage.getBoundingClientRect();
+      }
 
-          subtract: function (v2) {
-            return Vector.create(this._x - v2.getX(), this._y - v2.getY());
-          },
+      function getBallSize() {
+        const rect = ball.getBoundingClientRect();
+        return Math.min(rect.width, rect.height);
+      }
 
-          scale: function (value) {
-            return Vector.create(this._x * value, this._x * value);
-          }
+      function getStartPosition() {
+        const stageRect = getStageRect();
+        return {
+          x: stageRect.width / 2,
+          y: stageRect.height * 0.82
         };
+      }
 
-        // A Particle
-        var Particle = {
-          position: null,
-          velocity: null,
-          gravity: null,
+      function setBallPosition(x, y, scale = 1) {
+        ballPos.x = x;
+        ballPos.y = y;
+        ball.style.transform =
+          `translate(${x}px, ${y}px) translate(-50%, -50%) rotate(${rotation}deg) scale(${scale})`;
+      }
 
-          create: function (x, y, speed, direction, grav) {
-            var obj = Object.create(this);
-            obj.position = Vector.create(x, y);
-            obj.velocity = Vector.create(0, 0);
-            obj.velocity.setLength(speed);
-            obj.velocity.setAngle(direction);
-            obj.gravity = Vector.create(0, grav || 0);
+      function resetBall(immediate = false) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+        inFlight = false;
+        dragging = false;
+        scoredThisShot = false;
+        velocity = { x: 0, y: 0 };
+        rotation = 0;
+        aimGuide.classList.remove("visible");
 
-            return obj;
-          },
+        const start = getStartPosition();
 
-          accelerate: function (vector) {
-            this.velocity = this.velocity.add(vector);
-          },
+        if (immediate) {
+          ball.style.transition = "none";
+          setBallPosition(start.x, start.y, 1);
+          requestAnimationFrame(() => {
+            ball.style.transition = "";
+          });
+          return;
+        }
 
-          update: function () {
-            this.velocity = this.velocity.add(this.gravity);
-            this.position = this.position.add(this.velocity);
-          }
+        ball.style.transition = "transform .42s cubic-bezier(.2,.8,.2,1)";
+        setBallPosition(start.x, start.y, 1);
+        window.setTimeout(() => {
+          ball.style.transition = "";
+        }, 450);
+      }
+
+      function getPointerPosition(e) {
+        const rect = getStageRect();
+        return {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
         };
+      }
 
-        // Ball and basket vars
-        var ball = document.getElementById("ball"),
-          offsetY,
-          ballRadius,
-          basket = document.getElementById("basket"),
-          basketWidth,
-          ratio,
-          scale,
-          w,
-          h;
+      function addPointerSample(point) {
+        const now = performance.now();
+        pointerSamples.push({ ...point, t: now });
+        while (pointerSamples.length > 7 || (pointerSamples[0] && now - pointerSamples[0].t > 110)) {
+          pointerSamples.shift();
+        }
+      }
 
-        // Motion vars
-        var p,
-          start,
-          force,
-          timestamp = null,
-          lastMouse,
-          hasThrown = false,
-          highEnough = false,
-          lastY,
-          rot;
-
-        // Score vars
-        var score = 0;
-
-        window.addEventListener("resize", resize);
-        window.addEventListener("orientationchange", resize);
-
-        resize();
-
-        // Wait a second before fading the elements in to prevent a flash of unpositioned/unstyled content
-        TweenMax.to(".stage", 1, { autoAlpha: 1, delay: 1 });
-
-        function addEvents() {
-          ball.addEventListener("mousedown", grabBall);
-          ball.addEventListener("touchstart", grabBall);
-          ball.addEventListener("mouseup", releaseBall);
-          ball.addEventListener("touchend", releaseBall);
+      function calculateReleaseVelocity() {
+        if (pointerSamples.length < 2) {
+          return { x: 0, y: -650 };
         }
 
-        function removeEvents() {
-          ball.removeEventListener("mousedown", grabBall);
-          ball.removeEventListener("touchstart", grabBall);
-          ball.removeEventListener("mouseup", releaseBall);
-          ball.removeEventListener("touchend", releaseBall);
-        }
+        const latest = pointerSamples[pointerSamples.length - 1];
+        let earliest = pointerSamples[0];
 
-        function resize() {
-          removeEvents();
-          addEvents();
-
-          offsetY = ball.getBoundingClientRect().height * 1.75;
-
-          // Find the smallest value of the SVG holding the basketball - it will give us the ball's radius
-          ballRadius = Math.min(ball.getBoundingClientRect().width, ball.getBoundingClientRect().height);
-          basketWidth = Math.round(basket.querySelector("rect").getBoundingClientRect().width);
-
-          // Work out how the ratio between the basket's width and the ball's radius, make it a tiny smaller just for safety
-          ratio = basketWidth / ballRadius - 0.2;
-
-          w = window.innerWidth;
-          h = window.innerHeight;
-
-          // Make sure the basketball has no previous GSAP's transforms on it
-          TweenMax.set(ball, { clearProps: "all" });
-
-          // Move the basketball to its starting offset
-          TweenMax.set(ball, { y: "+=" + offsetY }); // We need a number rather than a percentage to use later with collision calculation.
-
-          scale = TweenMax.to(ball, 0.5, { scale: ratio, ease: Power1.easeInOut }).progress(1).pause(0);
-        }
-
-        function tick() {
-          var currY = p.position.getY();
-          var currX = p.position.getX();
-
-          if (hasThrown) {
-            if (currY < 0) highEnough = true;
-
-            // Has the ball been thrown high enough
-            if (highEnough) {
-              // Is it falling?
-              if (lastY < currY && force.getLength() > 15) {
-                basket.style.zIndex = 1;
-
-                // Has it hit the basket
-                if (currY < 10 && currY > -10) {
-                  hasThrown = false;
-
-                  // Was it on target?
-                  if (currX > basketWidth * 0.15 && currX < basketWidth || currX < -basketWidth * 0.15 && currX > -basketWidth) {
-
-                    // Create an opposite force angled in relation to the basket
-                    force.setX(currX / 6);
-                    force.setLength(force.getLength() * 0.7);
-                    p.velocity = force;
-
-                    basket.style.zIndex = 0;
-                  } else if (currX <= basketWidth && currX >= -basketWidth) {
-                    // Yes
-                    score += 2;
-                    // Three pointer?
-                    if (force.getX() > 2 || force.getX() < -2) {
-                      score += 1;
-                    }
-
-                    TweenMax.to("#net", 0.5, { scaleY: 1.4, transformOrigin: "50% 0", ease: Elastic.easeOut });
-                    TweenMax.to("#net", 0.6, { scale: 1, transformOrigin: "50% 0", ease: Power2.easeInOut, delay: 0.6 });
-                  }
-                }
-              }
-            }
+        for (let i = pointerSamples.length - 2; i >= 0; i--) {
+          if (latest.t - pointerSamples[i].t >= 45) {
+            earliest = pointerSamples[i];
+            break;
           }
-
-          p.update();
-          TweenMax.set(ball, {
-            x: p.position.getX(),
-            y: currY,
-            rotation: rot
-          });
-
-          lastY = currY;
         }
 
-        function grabBall(e) {
-          p = Particle.create(0, offsetY, 0, 0, 0);
-          force = Vector.create(0, 0);
-          start = Vector.create(getMouse(e).x, getMouse(e).y - offsetY);
+        const dt = Math.max((latest.t - earliest.t) / 1000, 0.025);
+        let vx = (latest.x - earliest.x) / dt;
+        let vy = (latest.y - earliest.y) / dt;
 
-          document.addEventListener("mousemove", moveBall);
-          document.addEventListener("touchmove", moveBall);
+        // Keep small swipes gentle; stronger movement should be required
+        // for a high, fast shot.
+        vx *= 0.62;
+        vy *= 0.72;
+
+        const speed = Math.hypot(vx, vy);
+        if (speed > MAX_SHOT_SPEED) {
+          const scale = MAX_SHOT_SPEED / speed;
+          vx *= scale;
+          vy *= scale;
         }
 
-        function moveBall(e) {
-          getSpeed(e);
-
-          // Update the ball's position
-          TweenMax.set(ball, { x: p.position.getX(), y: p.position.getY() });
+        // Give very small upward swipes only a modest minimum lift.
+        if (vy > -180) {
+          vy = -360;
         }
 
-        function releaseBall() {
-          // Stop tracking the mousedown/touchdown
-          ball.removeEventListener("mousedown", grabBall);
-          ball.removeEventListener("touchstart", grabBall);
-          // Stop tracking the mousemove
-          document.removeEventListener("mousemove", moveBall);
-          document.removeEventListener("touchmove", moveBall);
-          // Reset the mouse tracking defaults
-          timestamp = null;
-          lastMouseX = null;
-          lastMouseY = null;
+        return { x: vx, y: vy };
+      }
 
-          hasThrown = true;
+      function updateAimGuide(point) {
+        const dx = point.x - ballPos.x;
+        const dy = point.y - ballPos.y;
+        const distance = Math.min(115, Math.max(34, Math.hypot(dx, dy)));
+        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
-          scale.play(0);
+        aimGuide.style.left = `${ballPos.x}px`;
+        aimGuide.style.top = `${ballPos.y}px`;
+        aimGuide.style.width = `${distance}px`;
+        aimGuide.style.transform = `rotate(${angle}deg)`;
+      }
 
-          // Limit how hard the ball can be thrown. Improves user accuracy diminishes realistic movement
-          if (force.getLength() > 30) force.setLength(30);
-          p.velocity = force;
-          p.gravity = Vector.create(0, 0.7);
+      function onPointerDown(e) {
+        if (!running || inFlight || dragging) return;
 
-          if (force.getX() > 0) {
-            rot = "-=4";
-          } else {
-            rot = "+=4";
-          }
+        dragging = true;
+        pointerId = e.pointerId;
+        pointerSamples = [];
 
-          // Start GSAP's tick so more physics-like movement can take place
-          TweenMax.ticker.addEventListener("tick", tick);
+        ball.setPointerCapture?.(pointerId);
 
-          // Stop it after some period of time - saves having to write edges and floor logic and the user can shoot every three seconds or so
-          TweenMax.delayedCall(2, reset);
+        const point = getPointerPosition(e);
+        dragOffset.x = ballPos.x - point.x;
+        dragOffset.y = ballPos.y - point.y;
+
+        addPointerSample(point);
+        updateAimGuide(point);
+        aimGuide.classList.add("visible");
+        startHint.style.opacity = "0";
+        e.preventDefault();
+      }
+
+      function onPointerMove(e) {
+        if (!dragging || e.pointerId !== pointerId) return;
+
+        const point = getPointerPosition(e);
+        const stageRect = getStageRect();
+        const radius = getBallSize() / 2;
+
+        const x = Math.min(stageRect.width - radius, Math.max(radius, point.x + dragOffset.x));
+        const y = Math.min(stageRect.height - radius, Math.max(radius, point.y + dragOffset.y));
+
+        setBallPosition(x, y, 1);
+        addPointerSample(point);
+        updateAimGuide(point);
+        e.preventDefault();
+      }
+
+      function onPointerUp(e) {
+        if (!dragging || e.pointerId !== pointerId) return;
+
+        dragging = false;
+        aimGuide.classList.remove("visible");
+
+        try {
+          ball.releasePointerCapture?.(pointerId);
+        } catch {}
+
+        pointerId = null;
+        velocity = calculateReleaseVelocity();
+
+        if (!running) {
+          resetBall();
+          return;
         }
 
-        function reset() {
-          TweenMax.ticker.removeEventListener("tick", tick);
+        inFlight = true;
+        scoredThisShot = false;
+        lastFrameTime = performance.now();
+        ball.style.transition = "";
+        animationId = requestAnimationFrame(tick);
+        e.preventDefault();
+      }
 
-          p.gravity = 0;
+      function getCollisionGeometry() {
+        const stageRect = getStageRect();
+        const rimRect = rim.getBoundingClientRect();
+        const ballRect = ball.getBoundingClientRect();
 
-          hasThrown = false;
-          highEnough = false;
+        return {
+          rimLeft: rimRect.left - stageRect.left,
+          rimRight: rimRect.right - stageRect.left,
+          rimY: rimRect.top - stageRect.top + rimRect.height / 2,
+          rimCenterX: rimRect.left - stageRect.left + rimRect.width / 2,
+          ballRadius: Math.min(ballRect.width, ballRect.height) / 2
+        };
+      }
 
-          basket.style.zIndex = 0;
+      function scoreBasket() {
+        if (scoredThisShot || !running) return;
 
-          ball.addEventListener("mousedown", grabBall);
-          ball.addEventListener("touchstart", grabBall);
+        scoredThisShot = true;
+        streak += 1;
 
-          updateScore();
+        const bonus = streak >= 5 ? 2 : streak >= 3 ? 1 : 0;
+        const points = BASE_POINTS + bonus;
+        score += points;
 
-          TweenMax.to(ball, 1, {
-            x: 0,
-            y: offsetY,
-            scale: 1,
-            rotation: 0,
-            ease: Power3.easeOut
-          });
+        if (score > best) {
+          best = score;
+          saveBest(best);
         }
 
-        function getMouse(e) {
-          return {
-            x: e.clientX || e.targetTouches[0].clientX,
-            y: e.clientY || e.targetTouches[0].clientY
-          };
+        updateHud();
+
+        let text = `SWISH! +${points}`;
+        if (streak >= 3) text += ` · ${streak} STREAK`;
+
+        showFeedback(text);
+        animateNet();
+      }
+
+      function registerMiss() {
+        if (!scoredThisShot) streak = 0;
+      }
+
+      function showFeedback(text) {
+        feedback.textContent = text;
+        feedback.classList.remove("show");
+        void feedback.offsetWidth;
+        feedback.classList.add("show");
+      }
+
+      function animateNet() {
+        net.classList.remove("swish");
+        void net.offsetWidth;
+        net.classList.add("swish");
+      }
+
+      function tick(now) {
+        if (!inFlight) return;
+
+        const dt = Math.min((now - lastFrameTime) / 1000, 0.025);
+        lastFrameTime = now;
+
+        const previousY = ballPos.y;
+        velocity.y += GRAVITY * dt;
+        ballPos.x += velocity.x * dt;
+        ballPos.y += velocity.y * dt;
+        rotation += velocity.x * dt * 0.09;
+
+        const geometry = getCollisionGeometry();
+        const stageRect = getStageRect();
+        const scale = Math.max(.67, Math.min(1, 1 - ((geometry.rimY - ballPos.y) / stageRect.height) * .32));
+
+        // Detect a basket only while the ball is travelling downward through the rim plane.
+        if (
+          !scoredThisShot &&
+          velocity.y > 0 &&
+          previousY < geometry.rimY &&
+          ballPos.y >= geometry.rimY &&
+          ballPos.x > geometry.rimLeft + geometry.ballRadius * .45 &&
+          ballPos.x < geometry.rimRight - geometry.ballRadius * .45
+        ) {
+          scoreBasket();
         }
 
-        function getSpeed(e) {
-          if (timestamp === null) {
-            timestamp = Date.now();
-            lastMouse = getMouse(e);
-            return;
-          }
+        // Gentle rim bounce on outer-edge contact.
+        const nearRimPlane = Math.abs(ballPos.y - geometry.rimY) < geometry.ballRadius * .55;
+        const nearLeftEdge = Math.abs(ballPos.x - geometry.rimLeft) < geometry.ballRadius * .75;
+        const nearRightEdge = Math.abs(ballPos.x - geometry.rimRight) < geometry.ballRadius * .75;
 
-          var now = Date.now(),
-            currMouse = getMouse(e),
-            dx = currMouse.x - lastMouse.x,
-            dy = currMouse.y - lastMouse.y;
-
-          // Let's make the angle less steep
-          dy *= 2;
-          dx /= 2;
-
-          timestamp = now;
-          lastMouse = currMouse;
-
-          force = Vector.create(dx, dy);
-          p.position.setX(getMouse(e).x - start.getX());
-          p.position.setY(getMouse(e).y - start.getY());
+        if (nearRimPlane && (nearLeftEdge || nearRightEdge) && velocity.y > 0) {
+          velocity.y *= -0.48;
+          velocity.x += nearLeftEdge ? -105 : 105;
+          streak = 0;
         }
 
-        function updateScore() {
-          document.getElementById('score-display').textContent = score.toString().padStart(3, '0');
-        }
-      };
-    });
+        setBallPosition(ballPos.x, ballPos.y, scale);
 
+        const margin = geometry.ballRadius * 2;
+        const out =
+          ballPos.y > stageRect.height + margin ||
+          ballPos.x < -margin ||
+          ballPos.x > stageRect.width + margin;
+
+        if (out) {
+          registerMiss();
+          inFlight = false;
+          window.setTimeout(() => {
+            if (running) resetBall();
+          }, RESET_DELAY);
+          return;
+        }
+
+        animationId = requestAnimationFrame(tick);
+      }
+
+      function updateTimer() {
+        if (!running) return;
+
+        const remaining = Math.max(0, Math.ceil((gameEndTime - performance.now()) / 1000));
+        timeDisplay.textContent = String(remaining).padStart(2, "0");
+
+        if (remaining <= 0) {
+          endGame();
+        }
+      }
+
+      function startGame() {
+        score = 0;
+        streak = 0;
+        running = true;
+        scoredThisShot = false;
+        gameEndTime = performance.now() + GAME_DURATION * 1000;
+
+        startOverlay.classList.remove("visible");
+        gameOverOverlay.classList.remove("visible");
+        startHint.style.opacity = "1";
+
+        updateHud();
+        timeDisplay.textContent = String(GAME_DURATION);
+        resetBall(true);
+
+        clearInterval(timerId);
+        timerId = setInterval(updateTimer, 100);
+        updateTimer();
+      }
+
+      function endGame() {
+        if (!running) return;
+
+        running = false;
+        dragging = false;
+        clearInterval(timerId);
+        timerId = null;
+
+        aimGuide.classList.remove("visible");
+        startHint.style.opacity = "0";
+        timeDisplay.textContent = "00";
+
+        if (score > best) {
+          best = score;
+          saveBest(best);
+        }
+
+        updateHud();
+
+        window.setTimeout(() => {
+          finalScore.textContent = score;
+          resultMeta.textContent = `Best: ${best}`;
+          gameOverOverlay.classList.add("visible");
+        }, 250);
+      }
+
+      function handleResize() {
+        if (!dragging && !inFlight) {
+          resetBall(true);
+        }
+      }
+
+      ball.addEventListener("pointerdown", onPointerDown);
+      stage.addEventListener("pointermove", onPointerMove);
+      stage.addEventListener("pointerup", onPointerUp);
+      stage.addEventListener("pointercancel", onPointerUp);
+
+      startButton.addEventListener("click", startGame);
+      playAgainButton.addEventListener("click", startGame);
+      window.addEventListener("resize", handleResize);
+      window.addEventListener("orientationchange", handleResize);
+
+      bestDisplay.textContent = formatScore(best);
+      scoreDisplay.textContent = "000";
+      timeDisplay.textContent = String(GAME_DURATION);
+      resetBall(true);
+    })();
   </script>
 </body>
-
 </html>
