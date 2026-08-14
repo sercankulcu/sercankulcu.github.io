@@ -1,6 +1,6 @@
 ---
-title: Kaizen Small Improvements, Big Results
-date: 2026-08-14
+title: 'Kaizen Small Improvements Big Results'
+date: 2026-08-13
 permalink: /posts/2026/08/kaizen-small-improvements-big-results/
 tags:
   - kaizen
