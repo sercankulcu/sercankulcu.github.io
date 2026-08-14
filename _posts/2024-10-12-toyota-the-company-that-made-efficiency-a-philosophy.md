@@ -1,5 +1,5 @@
 ---
-title: Toyota: The Company That Made Efficiency A Philosophy
+title: Toyota The Company That Made Efficiency A Philosophy
 date: 2024-10-12
 permalink: /posts/2024/10/toyota-the-company-that-made-efficiency-a-philosophy/
 tags:
