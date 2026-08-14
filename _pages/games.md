@@ -44,6 +44,7 @@ author_profile: true
 <button onclick="location.href='../game/millionaire.html'">💰 MILLIONAIRE</button>
 <button onclick="location.href='../game/capital-city-quiz.html'">🌍 CAPITAL CITY QUIZ</button>
 <button onclick="location.href='../game/movie-quiz.html'">🎬 MOVIE QUIZ</button>
+<button onclick="location.href='../game/pixar-color-millionaire.html'">🎬 PIXAR COLOR MILLIONAIRE</button>
 
 
 <h3>🎲 CLASSIC & CASUAL</h3>
