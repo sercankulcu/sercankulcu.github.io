@@ -7,9 +7,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="baggage" src="/images/posts/unpacking-emotional-baggage.webp" style="float: left; margin-right: 10px;" />
-
 We all carry things that cannot be seen. Some come from our own experiences. Others come from family, friends, school, culture, and the environment in which we grew up. Over time, these influences become part of the way we understand ourselves and other people. I like the metaphor of emotional baggage because baggage can be useful and heavy at the same time.
+
+<img width="200" alt="baggage" src="/images/posts/unpacking-emotional-baggage.webp" style="float: left; margin-right: 10px;" />
 
 A suitcase contains things we once decided were worth carrying. Emotional baggage works in a similar way. We carry beliefs, expectations, fears, habits, and memories because at some point they became part of our life. The problem is that we do not always check whether we still need them. Some beliefs may not even feel borrowed anymore.
 

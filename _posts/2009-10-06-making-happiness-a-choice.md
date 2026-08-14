@@ -6,9 +6,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="happiness" src="/images/posts/making-happiness-a-choice.webp" style="float: left; margin-right: 10px;" />
-
 Have you ever tried very hard to improve someone's mood and discovered that nothing you did was enough? I have thought about this more than once. We can be kind, make a joke, send a message, offer help, or simply stay near someone. Sometimes a small gesture changes the whole day. At other times, the same effort seems to touch nothing. It reminds me that happiness is deeply personal.
+
+<img width="200" alt="happiness" src="/images/posts/making-happiness-a-choice.webp" style="float: left; margin-right: 10px;" />
 
 We can influence another person's environment, but we cannot completely control what happens inside them. A kind word can open a door, but the other person still has to be able to walk through it. There are moments when sadness, disappointment, anger, or tiredness is simply stronger than our attempt to help. This does not mean kindness is useless.
 

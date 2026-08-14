@@ -8,9 +8,9 @@ tags:
    - self-improvement
 ---
 
-<img width="200" alt="age of empires" src="/images/posts/age-of-empires-ii.webp" style="float: left; margin-right: 10px;" />
-
 Age of Empires II is one of those games that can easily steal an evening from me. I start with the idea of playing for a short time, but there is always one more building to finish, one more technology to research, or one more attack to prepare. It was released in 1999 and is set mainly in the Middle Ages. The basic idea sounds simple: collect resources, build a civilization, train an army, and defeat your opponents. In practice, every match becomes a small story.
+
+<img width="200" alt="age of empires" src="/images/posts/age-of-empires-ii.webp" style="float: left; margin-right: 10px;" />
 
 What makes the game special for me is the balance between economy and war. A large army looks impressive, but it cannot survive without food, wood, gold, and stone. If I spend too much on soldiers, my economy becomes weak. If I focus only on gathering resources, an opponent may attack before I am ready. The game constantly asks me to choose between safety, growth, and risk.
 

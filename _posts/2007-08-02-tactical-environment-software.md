@@ -7,9 +7,9 @@ tags:
    - software
 ---
 
-<img width="200" alt="war" src="/images/posts/tactical-environment-software.webp" style="float: left; margin-right: 10px;" />
-
 Tactical environment software is an interesting example of software that must work with a large amount of changing information. In a military or operational environment, a user may need maps, weather data, positions, communication information, surveillance reports, and mission plans at the same time. The important problem is not only collecting this information. It is presenting the right part of it clearly enough to support a decision.
+
+<img width="200" alt="war" src="/images/posts/tactical-environment-software.webp" style="float: left; margin-right: 10px;" />
 
 This kind of software usually depends heavily on geographic information systems. Maps, terrain data, satellite imagery, roads, boundaries, and known positions can all become layers of the same operational picture. A map is no longer only a background image. It becomes a working surface where different kinds of information meet.
 

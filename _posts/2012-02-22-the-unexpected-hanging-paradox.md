@@ -8,9 +8,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="unexpected hanging" src="/images/posts/the-unexpected-hanging-paradox.webp" style="float: left; margin-right: 10px;" />
-
 The Unexpected Hanging Paradox is a puzzle about prediction, knowledge, and surprise. A common version begins with a judge telling a prisoner that he will be executed on one weekday during the following week, but the execution will be a surprise. The prisoner will not know the day in advance.
+
+<img width="200" alt="unexpected hanging" src="/images/posts/the-unexpected-hanging-paradox.webp" style="float: left; margin-right: 10px;" />
 
 The prisoner starts reasoning backward. It cannot be Friday, he thinks.
 

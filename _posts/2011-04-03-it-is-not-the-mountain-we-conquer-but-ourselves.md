@@ -7,9 +7,9 @@ tags:
    - self-improvement
 ---
 
-<img width="200" alt="bird" src="/images/posts/it-is-not-the-mountain-we-conquer-but-ourselves-1.webp" style="float: left; margin-right: 10px;" />
-
 When I watch a bird fly, I sometimes think about how strange that movement really is. Two wings work together, but each wing also needs its own space. They move as a pair without becoming the same thing. I like this as a small metaphor for life.
+
+<img width="200" alt="bird" src="/images/posts/it-is-not-the-mountain-we-conquer-but-ourselves-1.webp" style="float: left; margin-right: 10px;" />
 
 We need other people. We ask for advice, look for support, and share our problems. There is nothing weak about this. A life without connection would be very lonely. Still, there is a point where support should not replace our own judgment.
 

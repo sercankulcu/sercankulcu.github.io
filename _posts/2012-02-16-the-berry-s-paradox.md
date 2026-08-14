@@ -8,9 +8,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="berry paradox" src="/images/posts/the-berry-s-paradox.webp" style="float: left; margin-right: 10px;" />
-
 Berry's Paradox lives in the uncomfortable space between language and mathematics. A common form of the paradox asks us to consider: "The smallest positive integer that cannot be described in fewer than twenty words." At first, this sounds like a valid description.
+
+<img width="200" alt="berry paradox" src="/images/posts/the-berry-s-paradox.webp" style="float: left; margin-right: 10px;" />
 
 There must be many integers, and there are only finitely many sentences shorter than twenty words. So it seems reasonable that some integers cannot be described that briefly.
 

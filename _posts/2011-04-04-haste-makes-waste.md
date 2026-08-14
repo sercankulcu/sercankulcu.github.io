@@ -7,9 +7,9 @@ tags:
    - philosophy
 ---
 
-<img width="200" alt="butterfly" src="/images/posts/haste-makes-waste.webp" style="float: left; margin-right: 10px;" />
-
 We all know the saying, "Haste makes waste." It sounds simple, but I think we only understand it properly after we have rushed something important.
+
+<img width="200" alt="butterfly" src="/images/posts/haste-makes-waste.webp" style="float: left; margin-right: 10px;" />
 
 I once heard a story about a butterfly coming out of its cocoon. Someone sees the butterfly struggling and tries to help by opening the cocoon too early. The intention is kind. The result is not. The struggle was part of the process that helped the butterfly become ready to fly.
 

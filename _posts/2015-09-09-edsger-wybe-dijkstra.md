@@ -7,9 +7,9 @@ tags:
   - career
 ---
 
-<img width="200" alt="Edsger Dijkstra" src="/images/posts/edsger-wybe-dijkstra.webp" style="float: left; margin-right: 10px;" />
-
 Edsger Wybe Dijkstra was one of the people who helped turn programming from a practical craft into a serious intellectual discipline. He was born in Rotterdam in 1930. His parents were both highly educated, and Dijkstra initially studied theoretical physics at Leiden University.
+
+<img width="200" alt="Edsger Dijkstra" src="/images/posts/edsger-wybe-dijkstra.webp" style="float: left; margin-right: 10px;" />
 
 While still a student, he began working as a programmer at the Mathematical Centre in Amsterdam in 1952. At the time, programming was so new that it was not yet a normal profession. Dijkstra later joked that when he wanted to record "programmer" as his profession, the authorities did not consider it a proper occupation. His work quickly became important.
 

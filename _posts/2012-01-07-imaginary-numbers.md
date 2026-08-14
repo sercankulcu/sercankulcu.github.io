@@ -8,9 +8,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="imaginary numbers" src="/images/posts/imaginary-numbers.webp" style="float: left; margin-right: 10px;" />
-
 The name "imaginary number" sounds almost like a joke. How can a number be imaginary? The idea appears when we try to solve equations that have no answer among the real numbers. A simple example is
+
+<img width="200" alt="imaginary numbers" src="/images/posts/imaginary-numbers.webp" style="float: left; margin-right: 10px;" />
 
 x² + 1 = 0.
 

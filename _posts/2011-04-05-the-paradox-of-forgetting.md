@@ -7,9 +7,9 @@ tags:
    - philosophy
 ---
 
-<img width="160" alt="man" src="/images/posts/the-paradox-of-forgetting.webp" style="float: left; margin-right: 50px;" />
-
 Forgetting is usually described as a failure. We forget a name, a date, a promise, or something we studied. We become annoyed with ourselves. But forgetting is not always an enemy.
+
+<img width="160" alt="man" src="/images/posts/the-paradox-of-forgetting.webp" style="float: left; margin-right: 50px;" />
 
 Some memories become softer with time, and I think we sometimes need that. A painful event that once filled the whole mind may slowly become only one part of our story. We do not erase it completely, but it loses some of its power. I sometimes imagine memory as a door.
 

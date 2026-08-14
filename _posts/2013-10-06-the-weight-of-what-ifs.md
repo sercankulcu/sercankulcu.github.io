@@ -7,9 +7,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="what if" src="/images/posts/the-weight-of-what-ifs.webp" style="float: left; margin-right: 10px;" />
-
 "What if?" Two small words can create an entire future inside the mind. What if I fail? What if they do not like me? What if I send the message and receive no answer? What if I make the wrong decision?
+
+<img width="200" alt="what if" src="/images/posts/the-weight-of-what-ifs.webp" style="float: left; margin-right: 10px;" />
 
 These questions can be useful. They help us prepare for problems and think before acting.
 
