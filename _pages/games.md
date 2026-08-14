@@ -42,6 +42,7 @@ author_profile: true
 <button onclick="location.href='../game/flagquiz.html'">🏳️ FLAG QUIZ</button>
 <button onclick="location.href='../game/mathmaster.html'">➗ MATH MASTER</button>
 <button onclick="location.href='../game/millionaire.html'">💰 MILLIONAIRE</button>
+<button onclick="location.href='../game/capital-city-quiz.html'">🌍 CAPITAL CITY QUIZ</button>
 
 
 <h3>🎲 CLASSIC & CASUAL</h3>
