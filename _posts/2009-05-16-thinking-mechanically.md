@@ -8,9 +8,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="machine" src="/images/posts/thinking-mechanically-2.webp" style="float: left; margin-right: 10px;" />
-
 Sometimes I wonder how much of our behavior is really chosen and how much simply follows patterns we learned long ago. The idea of thinking mechanically comes from a view of the world in which events can be explained through rules, causes, and predictable processes. During the Scientific Revolution, this mechanical view became very powerful. Nature could be studied as a system. If we understood the parts and the laws acting on them, perhaps we could understand the whole. It is tempting to apply the same idea to people.
+
+<img width="200" alt="machine" src="/images/posts/thinking-mechanically-2.webp" style="float: left; margin-right: 10px;" />
 
 A machine receives an input, processes it according to its structure, and produces an output. Human behavior can sometimes look similar. Someone criticizes us and we become defensive. We feel stress and repeat an old habit. A familiar situation appears and we react almost automatically. In these moments, are we choosing, or are we following a program written by experience?
 

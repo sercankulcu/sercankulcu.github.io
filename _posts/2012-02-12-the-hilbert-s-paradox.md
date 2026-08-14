@@ -8,9 +8,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="hilbert hotel" src="/images/posts/the-hilbert-s-paradox.webp" style="float: left; margin-right: 10px;" />
-
 Hilbert's Hotel is one of my favorite ways to think about infinity. Imagine a hotel with infinitely many rooms. Room 1, room 2, room 3, and so on forever. Now imagine that every room is occupied. In an ordinary hotel, the answer is obvious: there is no space for another guest.
+
+<img width="200" alt="hilbert hotel" src="/images/posts/the-hilbert-s-paradox.webp" style="float: left; margin-right: 10px;" />
 
 But this is an infinite hotel. When one new guest arrives, the manager asks the guest in room 1 to move to room 2, the guest in room 2 to move to room 3, and in general every guest in room n to move to room n+1. Now room 1 is empty. The hotel was full, and it still found space. Things become even stranger if infinitely many new guests arrive.
 

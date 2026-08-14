@@ -8,9 +8,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="barber paradox" src="/images/posts/the-barber-paradox.webp" style="float: left; margin-right: 10px;" />
-
 The Barber Paradox is a simple story that carries the same logical problem as Russell's Paradox. Imagine a village with one barber. The rule is this: The barber shaves all men in the village who do not shave themselves, and only those men. At first, the rule seems clear.
+
+<img width="200" alt="barber paradox" src="/images/posts/the-barber-paradox.webp" style="float: left; margin-right: 10px;" />
 
 Then we ask one question. Who shaves the barber?
 

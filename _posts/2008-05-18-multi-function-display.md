@@ -8,9 +8,9 @@ tags:
    - self-improvement
 ---
 
-<img width="200" alt="mfd" src="/images/posts/multi-function-display.webp" style="float: left; margin-right: 10px;" />
-
 A Multi-Function Display, usually called an MFD, is one of the cockpit systems that interests me because it brings many different kinds of information onto a single screen. Instead of giving every function its own instrument, the display can change according to what the pilot needs at that moment.
+
+<img width="200" alt="mfd" src="/images/posts/multi-function-display.webp" style="float: left; margin-right: 10px;" />
 
 Navigation is one of its most important roles. An MFD can show a moving map, the aircraft's position, waypoints, routes, airports, terrain, and other navigation information. When these elements are shown together, the pilot can understand the flight in a more visual way. A route is no longer only a list of numbers or headings. It becomes something that can be seen in relation to the surrounding area.
 

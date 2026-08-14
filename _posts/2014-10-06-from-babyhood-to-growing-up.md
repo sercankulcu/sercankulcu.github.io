@@ -7,9 +7,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="childhood" src="/images/posts/from-babyhood-to-growing-up.webp" style="float: left; margin-right: 10px;" />
-
 A baby enters the world with a very direct way of communicating. Something is wrong, so the baby cries. Hungry. Tired. Cold. Uncomfortable.
+
+<img width="200" alt="childhood" src="/images/posts/from-babyhood-to-growing-up.webp" style="float: left; margin-right: 10px;" />
 
 The message is not polite or complicated. It is simply a need.
 

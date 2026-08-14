@@ -7,9 +7,9 @@ tags:
    - philosophy
 ---
 
-<img width="160" alt="bitter" src="/images/posts/embracing-the-bitter-and-the-sweet.webp" style="float: left; margin-right: 50px;" />
-
 My dear, People sometimes ask what the purpose of life is. I do not have a perfect answer. I am not sure anyone does.
+
+<img width="160" alt="bitter" src="/images/posts/embracing-the-bitter-and-the-sweet.webp" style="float: left; margin-right: 50px;" />
 
 But I know that life cannot be understood only through the pleasant parts. There is sweetness, but there is bitterness too.
 

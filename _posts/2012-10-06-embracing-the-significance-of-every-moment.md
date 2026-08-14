@@ -7,9 +7,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="moment older" src="/images/posts/embracing-the-significance-of-every-moment.webp" style="float: left; margin-right: 10px;" />
-
 Sometimes I think about how quickly a person disappears from memory. I know the names of my parents and grandparents, of course. But when I move further back, the details become weaker. Great-grandparents turn into a few stories, a photograph, or only a name.
+
+<img width="200" alt="moment older" src="/images/posts/embracing-the-significance-of-every-moment.webp" style="float: left; margin-right: 10px;" />
 
 After another generation, even that may disappear. At first, this thought feels sad.
 

@@ -8,9 +8,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="banach tarski paradox" src="/images/posts/the-banach-tarski-paradox.webp" style="float: left; margin-right: 10px;" />
-
 The Banach-Tarski Paradox sounds impossible the first time we hear it. In very informal language, it says that a solid mathematical ball can be divided into a small number of special pieces and then rearranged using only rotations and translations to create two balls, each the same size as the original. One ball becomes two. No stretching. No ordinary copying.
+
+<img width="200" alt="banach tarski paradox" src="/images/posts/the-banach-tarski-paradox.webp" style="float: left; margin-right: 10px;" />
 
 It sounds like magic. Of course, this cannot be done with a real orange, a football, or any physical object. The important word is mathematical.
 

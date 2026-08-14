@@ -7,9 +7,9 @@ tags:
    - self-improvement
 ---
 
-<img width="200" alt="atari" src="/images/posts/history-of-early-personal-computers-and-gaming-consoles.webp" style="float: left; margin-right: 10px;" />
-
 When I look at today's computers, it is easy to forget how young personal computing really is. Many of the machines that helped shape home computing and video games appeared only a few decades ago. They had tiny amounts of memory and very limited processors compared with modern systems, but they created a new relationship between people and computers.
+
+<img width="200" alt="atari" src="/images/posts/history-of-early-personal-computers-and-gaming-consoles.webp" style="float: left; margin-right: 10px;" />
 
 The Apple II, introduced in 1977, is one of the machines I find especially important. It helped move computers away from laboratories and large organizations and into homes, schools, and small businesses. It offered color graphics, expansion possibilities, and a growing software library. More importantly, it was a machine that ordinary users could sit in front of and explore.
 

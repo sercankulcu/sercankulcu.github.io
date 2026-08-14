@@ -8,9 +8,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="russell paradox" src="/images/posts/russell-s-paradox.webp" style="float: left; margin-right: 10px;" />
-
 Russell's Paradox is one of those problems that looks harmless until one sentence turns mathematics against itself. Bertrand Russell discovered the paradox around 1901 while thinking about the foundations of set theory. The problem begins with a simple question. Can a set contain itself?
+
+<img width="200" alt="russell paradox" src="/images/posts/russell-s-paradox.webp" style="float: left; margin-right: 10px;" />
 
 Some sets might be described in ways that make self-membership possible, while others clearly do not contain themselves. Now imagine the set R containing every set that does **not** contain itself.
 

@@ -7,9 +7,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="Nikola Tesla" src="/images/posts/a-genius-and-visionary-nicola-tesla.webp" style="float: left; margin-right: 10px;" />
-
 Nikola Tesla is one of those historical figures whose real achievements are impressive enough without adding legends. He was born in 1856 in Smiljan, in what is now Croatia, and moved to the United States in 1884. His work in electrical engineering became especially important during the development of alternating-current power systems.
+
+<img width="200" alt="Nikola Tesla" src="/images/posts/a-genius-and-visionary-nicola-tesla.webp" style="float: left; margin-right: 10px;" />
 
 Tesla worked on polyphase AC motors and power transmission, ideas that helped make long-distance electrical distribution practical. His induction motor and related patents became part of the famous competition between alternating current and direct current systems.
 

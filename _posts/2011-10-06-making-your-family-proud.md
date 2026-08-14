@@ -7,9 +7,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="bird proud" src="/images/posts/making-your-family-proud.webp" style="float: left; margin-right: 10px;" />
-
 Wanting to make our family proud can be a beautiful motivation. For many of us, family is connected with sacrifice. Parents work, worry, give time, and sometimes give up things we never fully see. Because of this, success can feel larger than a personal achievement. We want to show them that their effort mattered.
+
+<img width="200" alt="bird proud" src="/images/posts/making-your-family-proud.webp" style="float: left; margin-right: 10px;" />
 
 I understand this feeling. But there is a difficult side to it. The dream our family has for us may not always be the dream we have for ourselves.
 

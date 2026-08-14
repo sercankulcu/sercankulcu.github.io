@@ -9,9 +9,9 @@ tags:
   - self-improvement
 ---
 
-<img width="180" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-1.webp" style="float: left; margin-right: 30px;" />
-
 John always imagined himself working with technology in the defence industry. It was not a temporary interest. From a young age, he liked the idea of engineering work that had a clear mission and real consequences.
+
+<img width="180" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-1.webp" style="float: left; margin-right: 30px;" />
 
 He studied hard and entered a strong engineering program. After his first year, he found an internship at a defence company. The experience made the future he imagined feel possible.
 

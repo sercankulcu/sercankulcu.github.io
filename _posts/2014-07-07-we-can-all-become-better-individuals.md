@@ -7,9 +7,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="pigeon" src="/images/posts/we-can-all-become-better-individuals.webp" style="float: left; margin-right: 10px;" />
-
 We often admire people for what they can do. They are intelligent, talented, successful, famous, or very knowledgeable. These qualities are easy to notice. Character is quieter.
+
+<img width="200" alt="pigeon" src="/images/posts/we-can-all-become-better-individuals.webp" style="float: left; margin-right: 10px;" />
 
 A person may know a lot and still fail to keep a promise. Someone may be extremely skilled and still treat people badly. A successful person may not be someone we would trust with a small secret.
 

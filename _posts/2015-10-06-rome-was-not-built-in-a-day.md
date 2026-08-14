@@ -8,9 +8,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="rome colosseum" src="/images/posts/rome-was-not-built-in-a-day.webp" style="float: left; margin-right: 10px;" />
-
 "Rome was not built in a day" is one of those sayings we understand immediately and forget almost as quickly. Of course large things take time. We know this. Then we begin a new project, learn a new skill, try to improve our health, or work toward a career goal, and suddenly we want visible results next week. Patience becomes much harder when the unfinished thing belongs to us.
+
+<img width="200" alt="rome colosseum" src="/images/posts/rome-was-not-built-in-a-day.webp" style="float: left; margin-right: 10px;" />
 
 I think modern life makes this feeling stronger. We see the finished result of other people's work much more often than we see the years behind it.
 

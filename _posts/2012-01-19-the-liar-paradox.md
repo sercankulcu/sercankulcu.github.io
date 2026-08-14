@@ -8,9 +8,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="liar paradox" src="/images/posts/the-liar-paradox.webp" style="float: left; margin-right: 10px;" />
-
 Consider the sentence: "This statement is false." It is only four words, but it creates a problem that has troubled philosophers and logicians for centuries. Suppose the sentence is true.
+
+<img width="200" alt="liar paradox" src="/images/posts/the-liar-paradox.webp" style="float: left; margin-right: 10px;" />
 
 If it is true, then what it says must be correct. But it says that it is false. So if it is true, it is false.
 

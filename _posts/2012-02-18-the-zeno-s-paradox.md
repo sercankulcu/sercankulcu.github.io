@@ -8,9 +8,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="zeno paradox" src="/images/posts/the-zeno-s-paradox.webp" style="float: left; margin-right: 10px;" />
-
 Zeno of Elea created several paradoxes about motion more than two thousand years ago. The most famous versions all play with the same uncomfortable idea. Before you reach a destination, you must travel half the distance. Then you must travel half of what remains. Then half again.
+
+<img width="200" alt="zeno paradox" src="/images/posts/the-zeno-s-paradox.webp" style="float: left; margin-right: 10px;" />
 
 And again. There are infinitely many smaller distances. So how can you ever arrive?
 

@@ -8,9 +8,9 @@ tags:
   - self-improvement
 ---
 
-<img width="200" alt="birthday paradox" src="/images/posts/the-birthday-paradox.webp" style="float: left; margin-right: 10px;" />
-
 The Birthday Paradox is not a real contradiction. It is a contradiction between probability and intuition. Imagine a room with 23 people. What is the probability that at least two of them share the same birthday? Most people expect the probability to be small because there are 365 possible birthdays.
+
+<img width="200" alt="birthday paradox" src="/images/posts/the-birthday-paradox.webp" style="float: left; margin-right: 10px;" />
 
 The surprising answer is a little over 50 percent, if we ignore leap years and assume birthdays are spread evenly through the year. The reason becomes clearer when we stop comparing one person with the calendar and start counting pairs of people. With 23 people, there are 253 different pairs. That is a lot of opportunities for two birthdays to match. It is easier to calculate the opposite probability first: the probability that everybody has a different birthday.
 
