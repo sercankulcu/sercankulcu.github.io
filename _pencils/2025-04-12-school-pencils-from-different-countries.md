@@ -24,7 +24,7 @@ Untipped pencils are more common in parts of Europe and Asia, where separate blo
 
 Germany has a long tradition of pencils that look relatively restrained compared with many American school products. The STAEDTLER Noris is an obvious example: its yellow-and-black striped design is instantly recognizable, but it does not depend on an attached eraser in its classic form. Faber-Castell school pencils likewise often emphasize grade, brand identity, and barrel geometry more than the ferrule-and-eraser combination familiar in the United States.
 
-American school pencils frequently use yellow lacquer, but yellow itself is not a universal school-penc il color. The association became especially strong in the United States because yellow came to signal a conventional, dependable graphite pencil. Elsewhere, school pencils may be red, blue, green, natural wood, striped, or heavily decorated.
+American school pencils frequently use yellow lacquer, but yellow itself is not a universal school-pencil color. The association became especially strong in the United States because yellow came to signal a conventional, dependable graphite pencil. Elsewhere, school pencils may be red, blue, green, natural wood, striped, or heavily decorated.
 
 India shows another side of school-pencil design. Brands such as Nataraj and Apsara have developed strong visual identities around inexpensive pencils used by millions of students. Bright barrel graphics, bold logos, and school-oriented packaging are common. The pencils often have to compete in a price-sensitive market, so branding becomes important even when the product itself remains inexpensive.
 

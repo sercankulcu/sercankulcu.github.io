@@ -23,13 +23,13 @@ Fillers are especially important. Patent formulations for modern erasers include
 
 That last point explains why not every eraser should be used on every mark.
 
-A soft graphite eraser is designed to remove pencil deposits while disturbing the paper as little as practical. An ink eraser may use a more abrasive formulation because ordinary ink penetrates or bonds to the surface differently. Faber-Castell still sells combination erasers with one side for graphite and another for ink, which is a useful reminder that “erasing” is not a single material problem. citeturn391863search6turn391863search11
+A soft graphite eraser is designed to remove pencil deposits while disturbing the paper as little as practical. An ink eraser may use a more abrasive formulation because ordinary ink penetrates or bonds to the surface differently. Faber-Castell still sells combination erasers with one side for graphite and another for ink, which is a useful reminder that “erasing” is not a single material problem.
 
-The crumbs themselves are part of the design. One patented eraser formulation describes the material as forming a polymeric film that interacts with the mark and captures it in the eraser matrix. As the eraser is moved back and forth, that material rolls or gathers into pieces that can be brushed away. The ideal result is not zero wear; it is controlled wear that carries the unwanted mark with it. citeturn391863search12
+The crumbs themselves are part of the design. One patented eraser formulation describes the material as forming a polymeric film that interacts with the mark and captures it in the eraser matrix. As the eraser is moved back and forth, that material rolls or gathers into pieces that can be brushed away. The ideal result is not zero wear; it is controlled wear that carries the unwanted mark with it.
 
 This is why an eraser that never seems to wear can be disappointing. If the surface becomes glossy, hardened, or contaminated, it may slide across graphite instead of taking it up. Old erasers attached to vintage pencils often show exactly this failure. Decades of oxidation, plasticizer loss, heat, or storage can turn a once-functional plug into something that polishes the mark rather than removing it.
 
-Plastic erasers age differently from traditional rubber formulations. Modern manufacturers increasingly emphasize PVC-free compounds and alternative plasticizer systems. Faber-Castell states that most of its plastic erasers are PVC-free and that its PVC-free products avoid phthalate plasticizers, while retaining a soft, smear-free erasing behavior. citeturn391863search0turn391863search1
+Plastic erasers age differently from traditional rubber formulations. Modern manufacturers increasingly emphasize PVC-free compounds and alternative plasticizer systems. Faber-Castell states that most of its plastic erasers are PVC-free and that its PVC-free products avoid phthalate plasticizers, while retaining a soft, smear-free erasing behavior.
 
 For a collector, this means the eraser is not only an accessory at the end of the pencil. Its condition is a materials record.
 

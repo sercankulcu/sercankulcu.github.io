@@ -176,7 +176,7 @@ A pencil sold to parents and teachers is packaged differently from one sold to a
 
 The school pencil is therefore both object and message.
 
-Yellow is not the only American school-penc il color.
+Yellow is not the only American school-pencil color.
 
 Natural wood, red, blue, green, black, and novelty finishes all appear.
 
