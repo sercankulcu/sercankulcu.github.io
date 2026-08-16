@@ -314,9 +314,9 @@ It is one influential branch of a global history.
 
 Nuremberg remains symbolically important because the trade has unusually deep roots there.
 
-STAEDTLER still identifies Nuremberg as its headquarters, and Faber-Castell remains based in Stein. Their continued presence keeps geography connected to living production rather than only museum history. citeturn404172search0 citeturn404172search3
+STAEDTLER still identifies Nuremberg as its headquarters, and Faber-Castell remains based in Stein. Their continued presence keeps geography connected to living production rather than only museum history.
 
-The region's scale was already significant by 1900. STAEDTLER's historical material notes that the lead- and colored-pencil industry around Nuremberg had grown into a major industrial branch by then, with roughly 10,000 workers. citeturn404172search5
+The region's scale was already significant by 1900. STAEDTLER's historical material notes that the lead- and colored-pencil industry around Nuremberg had grown into a major industrial branch by then, with roughly 10,000 workers.
 
 That growth explains why pencil making became part of regional identity.
 
