@@ -53,10 +53,17 @@ Discover my curated collection of <a class="btn btn--inverse" href="/bookmarks/"
   🔖 Bookmarks
 </a>, featuring useful resources and interesting content. 
 
-Read my <a class="btn btn--inverse" href="/posts/">
+ead my <a class="btn btn--inverse" href="/posts/">
   📝 Blog posts
-</a> where I share insights, experiences, and ideas on various topics. Explore my <a class="btn btn--inverse" href="/pencils/">
-  ✏️ Pencils </a> collection and <a class="btn btn--inverse" href="/humanity/"> 🌍 Humanity </a> series.
+</a> where I share insights, experiences, and ideas on various topics. 
+
+Explore my <a class="btn btn--inverse" href="/pencils/">
+  ✏️ Pencils
+</a> collection, where I write about pencils, design, materials, craftsmanship, and the small details that make them interesting. 
+
+Follow my <a class="btn btn--inverse" href="/humanity/">
+  🌍 Humanity
+</a> series, a long-form journey through human origins, consciousness, civilization, philosophy, technology, and our possible future.
 
 **Note:** If any licensed content is found on the website, please don't hesitate to contact me via the links on the left-hand side. You can be sure that any related content will be quickly removed within 24 hours.
 
