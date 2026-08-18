@@ -55,7 +55,8 @@ Discover my curated collection of <a class="btn btn--inverse" href="/bookmarks/"
 
 Read my <a class="btn btn--inverse" href="/posts/">
   📝 Blog posts
-</a> where I share insights, experiences, and ideas on various topics. 
+</a> where I share insights, experiences, and ideas on various topics. Explore my <a class="btn btn--inverse" href="/pencils/">
+  ✏️ Pencils </a> collection and <a class="btn btn--inverse" href="/humanity/"> 🌍 Humanity </a> series.
 
 **Note:** If any licensed content is found on the website, please don't hesitate to contact me via the links on the left-hand side. You can be sure that any related content will be quickly removed within 24 hours.
 
