@@ -2,6 +2,7 @@
 title: 'BIC Evolution: The Pencil That Replaced Wood with Synthetic Resin'
 date: 2026-05-03
 permalink: /pencils/2026/05/bic-evolution/
+category: brands
 tags:
    - pencil
    - bic

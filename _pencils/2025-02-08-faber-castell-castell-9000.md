@@ -2,6 +2,7 @@
 title: 'Faber-Castell Castell 9000'
 date: 2025-02-08
 permalink: /pencils/2025/02/faber-castell-castell-9000/
+category: brands
 tags:
    - pencil
    - faber-castell

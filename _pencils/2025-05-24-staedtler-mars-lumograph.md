@@ -2,6 +2,7 @@
 title: 'Staedtler Mars Lumograph'
 date: 2025-05-24
 permalink: /pencils/2025/05/staedtler-mars-lumograph/
+category: brands
 tags:
    - pencil
    - staedtler

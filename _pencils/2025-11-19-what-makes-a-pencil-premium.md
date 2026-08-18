@@ -2,6 +2,7 @@
 title: 'What Makes a Pencil ''Premium''?'
 date: 2025-11-19
 permalink: /pencils/2025/11/what-makes-a-pencil-premium/
+category: design
 tags:
    - pencil
    - quality

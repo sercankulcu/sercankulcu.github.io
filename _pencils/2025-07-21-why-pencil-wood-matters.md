@@ -2,6 +2,7 @@
 title: 'Why Pencil Wood Matters'
 date: 2025-07-21
 permalink: /pencils/2025/07/why-pencil-wood-matters/
+category: materials
 tags:
    - pencil
    - wood

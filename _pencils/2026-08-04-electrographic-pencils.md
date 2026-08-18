@@ -2,6 +2,7 @@
 title: 'Electrographic Pencils: When Graphite Became Machine-Readable Data'
 date: 2026-08-04
 permalink: /pencils/2026/08/electrographic-pencils/
+category: types
 tags:
    - pencil
    - electrographic-pencil

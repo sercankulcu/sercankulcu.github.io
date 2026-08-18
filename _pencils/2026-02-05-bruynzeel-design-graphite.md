@@ -2,6 +2,7 @@
 title: 'Bruynzeel Design Graphite: The Dutch Pencil Born from Postwar Shortage'
 date: 2026-02-05
 permalink: /pencils/2026/02/bruynzeel-design-graphite/
+category: brands
 tags:
    - pencil
    - bruynzeel

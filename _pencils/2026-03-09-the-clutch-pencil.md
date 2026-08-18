@@ -2,6 +2,7 @@
 title: 'The Clutch Pencil: Why Draftsmen Kept the 2 mm Lead'
 date: 2026-03-09
 permalink: /pencils/2026/03/the-clutch-pencil/
+category: types
 tags:
    - pencil
    - clutch-pencil

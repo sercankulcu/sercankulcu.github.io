@@ -2,6 +2,7 @@
 title: 'Why Pencil Lacquer Matters'
 date: 2025-05-15
 permalink: /pencils/2025/05/why-pencil-lacquer-matters/
+category: materials
 tags:
    - pencil
    - lacquer

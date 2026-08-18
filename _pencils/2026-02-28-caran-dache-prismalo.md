@@ -2,6 +2,7 @@
 title: 'Caran d’Ache Prismalo: The Pencil That Learned to Become Watercolor'
 date: 2026-02-28
 permalink: /pencils/2026/02/caran-dache-prismalo/
+category: brands
 tags:
    - pencil
    - caran-dache

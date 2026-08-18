@@ -2,6 +2,7 @@
 title: 'Discontinued Pencils and Collector Psychology'
 date: 2025-10-26
 permalink: /pencils/2025/10/discontinued-pencils-and-collector-psychology/
+category: collecting
 tags:
    - pencil
    - collecting

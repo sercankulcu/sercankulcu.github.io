@@ -2,6 +2,7 @@
 title: 'How a Graphite Pencil Core Is Made'
 date: 2026-02-11
 permalink: /pencils/2026/02/how-a-graphite-pencil-core-is-made/
+category: materials
 tags:
    - pencil
    - graphite

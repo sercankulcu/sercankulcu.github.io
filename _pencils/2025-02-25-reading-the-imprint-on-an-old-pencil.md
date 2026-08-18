@@ -2,6 +2,7 @@
 title: 'Reading the Imprint on an Old Pencil'
 date: 2025-02-25
 permalink: /pencils/2025/02/reading-the-imprint-on-an-old-pencil/
+category: collecting
 tags:
    - pencil
    - collecting

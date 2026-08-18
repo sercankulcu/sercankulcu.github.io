@@ -2,6 +2,7 @@
 title: 'American School Pencils as Design Objects'
 date: 2025-06-27
 permalink: /pencils/2025/06/american-school-pencils-as-design-objects/
+category: design
 tags:
    - pencil
    - usa

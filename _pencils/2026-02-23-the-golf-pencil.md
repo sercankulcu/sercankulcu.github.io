@@ -2,6 +2,7 @@
 title: 'The Golf Pencil: Why Some Pencils Are Made Short'
 date: 2026-02-23
 permalink: /pencils/2026/02/the-golf-pencil/
+category: types
 tags:
    - pencil
    - golf-pencil

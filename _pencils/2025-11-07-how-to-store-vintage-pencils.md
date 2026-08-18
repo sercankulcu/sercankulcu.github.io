@@ -2,6 +2,7 @@
 title: 'How to Store Vintage Pencils'
 date: 2025-11-07
 permalink: /pencils/2025/11/how-to-store-vintage-pencils/
+category: collecting
 tags:
    - pencil
    - collecting

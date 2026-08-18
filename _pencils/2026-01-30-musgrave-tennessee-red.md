@@ -2,6 +2,7 @@
 title: 'Musgrave Tennessee Red: A Pencil Made from the Wood That Started the Company'
 date: 2026-01-30
 permalink: /pencils/2026/01/musgrave-tennessee-red/
+category: brands
 tags:
    - pencil
    - musgrave

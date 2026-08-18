@@ -2,6 +2,7 @@
 title: 'The Election Pencil: Why Polling Booths Still Use Graphite'
 date: 2026-06-24
 permalink: /pencils/2026/06/the-election-pencil/
+category: types
 tags:
    - pencil
    - election

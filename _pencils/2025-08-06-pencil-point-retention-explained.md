@@ -2,6 +2,7 @@
 title: 'Pencil Point Retention Explained'
 date: 2025-08-06
 permalink: /pencils/2025/08/pencil-point-retention-explained/
+category: materials
 tags:
    - pencil
    - writing

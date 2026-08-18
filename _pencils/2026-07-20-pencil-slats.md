@@ -2,6 +2,7 @@
 title: 'Pencil Slats: The Hidden Wooden Component Between Forest and Pencil'
 date: 2026-07-20
 permalink: /pencils/2026/07/pencil-slats/
+category: materials
 tags:
    - pencil
    - pencil-slats

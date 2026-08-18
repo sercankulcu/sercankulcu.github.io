@@ -2,6 +2,7 @@
 title: 'How to Photograph a Pencil Collection'
 date: 2025-04-14
 permalink: /pencils/2025/04/how-to-photograph-a-pencil-collection/
+category: collecting
 tags:
    - pencil
    - collecting

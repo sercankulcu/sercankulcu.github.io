@@ -2,6 +2,7 @@
 title: 'The Quiet Precision of H Pencils'
 date: 2025-08-11
 permalink: /pencils/2025/08/the-quiet-precision-of-h-pencils/
+category: experience
 tags:
    - pencil
    - hardness

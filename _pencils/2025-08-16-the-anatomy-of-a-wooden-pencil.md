@@ -2,6 +2,7 @@
 title: 'The Anatomy of a Wooden Pencil'
 date: 2025-08-16
 permalink: /pencils/2025/08/the-anatomy-of-a-wooden-pencil/
+category: design
 tags:
    - pencil
    - design

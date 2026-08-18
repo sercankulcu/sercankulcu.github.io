@@ -2,6 +2,7 @@
 title: 'The No. 2 Pencil'
 date: 2025-02-04
 permalink: /pencils/2025/02/the-no-2-pencil/
+category: history
 tags:
    - pencil
    - no-2

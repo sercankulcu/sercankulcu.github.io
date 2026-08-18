@@ -2,6 +2,7 @@
 title: 'Why Graphite Shines'
 date: 2025-05-03
 permalink: /pencils/2025/05/why-graphite-shines/
+category: materials
 tags:
    - pencil
    - graphite

@@ -2,6 +2,7 @@
 title: 'Stenographic Pencils: Built for Writing Faster Than Longhand'
 date: 2026-06-13
 permalink: /pencils/2026/06/stenographic-pencils/
+category: types
 tags:
    - pencil
    - stenographic-pencil

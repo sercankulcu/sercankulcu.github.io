@@ -2,6 +2,7 @@
 title: 'Eraser-Tipped vs Untipped Pencils'
 date: 2025-02-13
 permalink: /pencils/2025/02/eraser-tipped-vs-untipped-pencils/
+category: design
 tags:
    - pencil
    - eraser

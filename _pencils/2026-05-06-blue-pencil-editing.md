@@ -2,6 +2,7 @@
 title: 'Blue Pencil: How an Editing Tool Became a Verb'
 date: 2026-05-06
 permalink: /pencils/2026/05/blue-pencil-editing/
+category: history
 tags:
    - pencil
    - blue-pencil

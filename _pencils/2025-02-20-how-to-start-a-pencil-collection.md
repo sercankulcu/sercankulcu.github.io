@@ -2,6 +2,7 @@
 title: 'How to Start a Pencil Collection'
 date: 2025-02-20
 permalink: /pencils/2025/02/how-to-start-a-pencil-collection/
+category: collecting
 tags:
    - pencil
    - collecting

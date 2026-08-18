@@ -2,6 +2,7 @@
 title: 'Building a Pencil Catalog'
 date: 2025-04-30
 permalink: /pencils/2025/04/building-a-pencil-catalog/
+category: collecting
 tags:
    - pencil
    - collecting

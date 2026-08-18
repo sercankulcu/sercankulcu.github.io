@@ -2,6 +2,7 @@
 title: 'Borrowdale Graphite: The Deposit That Made Keswick a Pencil Town'
 date: 2026-08-08
 permalink: /pencils/2026/08/borrowdale-graphite-keswick/
+category: history
 tags:
    - pencil
    - graphite

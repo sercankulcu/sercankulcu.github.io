@@ -2,6 +2,7 @@
 title: 'Colored Pencils Are Not Graphite Pencils'
 date: 2025-03-28
 permalink: /pencils/2025/03/colored-pencils-are-not-graphite-pencils/
+category: materials
 tags:
    - pencil
    - colored-pencil

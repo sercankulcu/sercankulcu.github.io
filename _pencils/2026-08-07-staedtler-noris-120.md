@@ -2,6 +2,7 @@
 title: 'STAEDTLER Noris 120: 125 Years of a School Pencil Icon'
 date: 2026-08-07
 permalink: /pencils/2026/08/staedtler-noris-120/
+category: brands
 tags:
    - pencil
    - staedtler

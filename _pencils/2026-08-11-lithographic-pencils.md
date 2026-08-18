@@ -2,6 +2,7 @@
 title: 'Lithographic Pencils: Drawing with Grease to Make a Print'
 date: 2026-08-11
 permalink: /pencils/2026/08/lithographic-pencils/
+category: types
 tags:
    - pencil
    - lithographic-pencil

@@ -2,6 +2,7 @@
 title: 'Using Pencils Without Destroying a Collection'
 date: 2025-11-06
 permalink: /pencils/2025/11/using-pencils-without-destroying-a-collection/
+category: collecting
 tags:
    - pencil
    - collecting

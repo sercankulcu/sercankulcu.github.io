@@ -2,6 +2,7 @@
 title: 'Cheap Pencils Can Be Fascinating'
 date: 2025-02-22
 permalink: /pencils/2025/02/cheap-pencils-can-be-fascinating/
+category: collecting
 tags:
    - pencil
    - collecting

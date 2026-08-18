@@ -2,6 +2,7 @@
 title: 'A Pencil Is a Consumable Measuring Stick'
 date: 2025-08-07
 permalink: /pencils/2025/08/a-pencil-is-a-consumable-measuring-stick/
+category: experience
 tags:
    - pencil
    - writing

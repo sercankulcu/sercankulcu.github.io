@@ -2,6 +2,7 @@
 title: 'Red and Blue in One Barrel: The Logic of the Bicolor Pencil'
 date: 2026-04-16
 permalink: /pencils/2026/04/red-blue-bicolor-pencil/
+category: types
 tags:
    - pencil
    - bicolor-pencil

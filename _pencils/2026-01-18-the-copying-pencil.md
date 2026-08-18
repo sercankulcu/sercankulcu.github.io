@@ -2,6 +2,7 @@
 title: 'The Copying Pencil: A Forgotten Office Technology'
 date: 2026-01-18
 permalink: /pencils/2026/01/the-copying-pencil/
+category: types
 tags:
    - pencil
    - history

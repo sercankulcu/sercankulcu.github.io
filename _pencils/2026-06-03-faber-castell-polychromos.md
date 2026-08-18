@@ -2,6 +2,7 @@
 title: 'Faber-Castell Polychromos: The Colored Pencil Built Around Lightfastness'
 date: 2026-06-03
 permalink: /pencils/2026/06/faber-castell-polychromos/
+category: brands
 tags:
    - pencil
    - faber-castell

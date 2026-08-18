@@ -2,6 +2,7 @@
 title: 'Pencils in Space: What NASA Actually Used Before the Space Pen'
 date: 2026-07-12
 permalink: /pencils/2026/07/pencils-in-space/
+category: history
 tags:
    - pencil
    - nasa

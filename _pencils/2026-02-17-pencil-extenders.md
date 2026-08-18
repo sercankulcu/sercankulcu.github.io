@@ -2,6 +2,7 @@
 title: 'Pencil Extenders: The Tool That Gives a Stub a Second Life'
 date: 2026-02-17
 permalink: /pencils/2026/02/pencil-extenders/
+category: tools
 tags:
    - pencil
    - pencil-extender

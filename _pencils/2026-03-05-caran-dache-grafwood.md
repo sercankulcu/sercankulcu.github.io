@@ -2,6 +2,7 @@
 title: 'Caran d’Ache Grafwood: Fifteen Shades of Graphite'
 date: 2026-03-05
 permalink: /pencils/2026/03/caran-dache-grafwood/
+category: brands
 tags:
    - pencil
    - caran-dache

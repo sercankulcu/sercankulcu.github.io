@@ -2,6 +2,7 @@
 title: 'Why Pencils Break When Sharpening'
 date: 2025-09-20
 permalink: /pencils/2025/09/why-pencils-break-when-sharpening/
+category: materials
 tags:
    - pencil
    - sharpening

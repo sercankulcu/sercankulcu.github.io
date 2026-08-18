@@ -2,6 +2,7 @@
 title: 'The End Cap Is Not an Afterthought'
 date: 2025-12-16
 permalink: /pencils/2025/12/the-end-cap-is-not-an-afterthought/
+category: design
 tags:
    - pencil
    - design

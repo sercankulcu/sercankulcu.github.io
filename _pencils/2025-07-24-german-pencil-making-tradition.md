@@ -2,6 +2,7 @@
 title: 'German Pencil Making Tradition'
 date: 2025-07-24
 permalink: /pencils/2025/07/german-pencil-making-tradition/
+category: history
 tags:
    - pencil
    - germany
