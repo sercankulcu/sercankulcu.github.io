@@ -2,6 +2,7 @@
 title: 'From Prata to São Carlos: Brazil’s Two-Billion-Pencil Supply Chain'
 date: 2026-06-20
 permalink: /pencils/2026/06/brazil-pencil-supply-chain/
+category: history
 tags:
    - pencil
    - faber-castell

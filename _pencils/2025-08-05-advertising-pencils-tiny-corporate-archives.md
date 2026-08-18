@@ -2,6 +2,7 @@
 title: 'Advertising Pencils: Tiny Corporate Archives'
 date: 2025-08-05
 permalink: /pencils/2025/08/advertising-pencils-tiny-corporate-archives/
+category: history
 tags:
    - pencil
    - advertising

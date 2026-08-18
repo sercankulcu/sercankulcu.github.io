@@ -2,6 +2,7 @@
 title: 'Round, Hexagonal or Triangular?'
 date: 2025-10-22
 permalink: /pencils/2025/10/round-hexagonal-or-triangular/
+category: design
 tags:
    - pencil
    - design

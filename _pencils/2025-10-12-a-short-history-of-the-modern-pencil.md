@@ -2,6 +2,7 @@
 title: 'A Short History of the Modern Pencil'
 date: 2025-10-12
 permalink: /pencils/2025/10/a-short-history-of-the-modern-pencil/
+category: history
 tags:
    - pencil
    - history

@@ -2,6 +2,7 @@
 title: 'Prismacolor Col-Erase: The Colored Pencil Made for Revision'
 date: 2026-07-07
 permalink: /pencils/2026/07/prismacolor-col-erase/
+category: brands
 tags:
    - pencil
    - prismacolor

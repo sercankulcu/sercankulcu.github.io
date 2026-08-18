@@ -2,6 +2,7 @@
 title: 'What HB, B and H Really Mean'
 date: 2025-04-03
 permalink: /pencils/2025/04/what-hb-b-and-h-really-mean/
+category: materials
 tags:
    - pencil
    - graphite

@@ -2,6 +2,7 @@
 title: 'Mitsubishi Hi-Uni: The Pencil That Tried to Be Perfect'
 date: 2025-09-16
 permalink: /pencils/2025/09/mitsubishi-hi-uni/
+category: brands
 tags:
    - pencil
    - mitsubishi

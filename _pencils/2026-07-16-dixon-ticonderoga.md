@@ -2,6 +2,7 @@
 title: 'Dixon Ticonderoga: From Crucibles to America’s Yellow Pencil'
 date: 2026-07-16
 permalink: /pencils/2026/07/dixon-ticonderoga/
+category: brands
 tags:
    - pencil
    - dixon

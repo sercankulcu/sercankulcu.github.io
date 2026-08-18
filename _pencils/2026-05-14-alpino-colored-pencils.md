@@ -2,6 +2,7 @@
 title: 'Alpino Colored Pencils: From Toy-Factory Scraps to a Spanish School Icon'
 date: 2026-05-14
 permalink: /pencils/2026/05/alpino-colored-pencils/
+category: brands
 tags:
    - pencil
    - alpino

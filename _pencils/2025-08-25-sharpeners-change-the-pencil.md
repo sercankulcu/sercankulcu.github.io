@@ -2,6 +2,7 @@
 title: 'Sharpeners Change the Pencil'
 date: 2025-08-25
 permalink: /pencils/2025/08/sharpeners-change-the-pencil/
+category: tools
 tags:
    - pencil
    - sharpening

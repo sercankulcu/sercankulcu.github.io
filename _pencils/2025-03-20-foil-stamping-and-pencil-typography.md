@@ -2,6 +2,7 @@
 title: 'Foil Stamping and Pencil Typography'
 date: 2025-03-20
 permalink: /pencils/2025/03/foil-stamping-and-pencil-typography/
+category: design
 tags:
    - pencil
    - typography

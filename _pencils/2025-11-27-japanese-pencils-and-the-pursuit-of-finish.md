@@ -2,6 +2,7 @@
 title: 'Japanese Pencils and the Pursuit of Finish'
 date: 2025-11-27
 permalink: /pencils/2025/11/japanese-pencils-and-the-pursuit-of-finish/
+category: history
 tags:
    - pencil
    - japan

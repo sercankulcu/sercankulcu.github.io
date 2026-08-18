@@ -2,6 +2,7 @@
 title: 'Why Hexagonal Pencils Became a Classic'
 date: 2025-06-21
 permalink: /pencils/2025/06/why-hexagonal-pencils-became-a-classic/
+category: design
 tags:
    - pencil
    - design

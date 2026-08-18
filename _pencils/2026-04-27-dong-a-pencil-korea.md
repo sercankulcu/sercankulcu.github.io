@@ -2,6 +2,7 @@
 title: 'Dong-A Pencil: The Company That Opened Korea’s Stationery Industry'
 date: 2026-04-27
 permalink: /pencils/2026/04/dong-a-pencil-korea/
+category: history
 tags:
    - pencil
    - dong-a

@@ -2,6 +2,7 @@
 title: 'How I Test a New Pencil'
 date: 2025-01-15
 permalink: /pencils/2025/01/how-i-test-a-new-pencil/
+category: experience
 tags:
    - pencil
    - collecting

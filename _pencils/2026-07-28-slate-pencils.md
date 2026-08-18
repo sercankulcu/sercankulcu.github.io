@@ -2,6 +2,7 @@
 title: 'Slate Pencils: The School Pencil Before Cheap Paper'
 date: 2026-07-28
 permalink: /pencils/2026/07/slate-pencils/
+category: types
 tags:
    - pencil
    - slate-pencil

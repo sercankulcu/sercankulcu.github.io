@@ -2,6 +2,7 @@
 title: 'Why Core Centering Matters'
 date: 2025-04-09
 permalink: /pencils/2025/04/why-core-centering-matters/
+category: design
 tags:
    - pencil
    - quality

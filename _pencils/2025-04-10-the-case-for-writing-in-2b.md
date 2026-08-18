@@ -2,6 +2,7 @@
 title: 'The Case for Writing in 2B'
 date: 2025-04-10
 permalink: /pencils/2025/04/the-case-for-writing-in-2b/
+category: experience
 tags:
    - pencil
    - 2b

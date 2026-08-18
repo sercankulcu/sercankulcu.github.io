@@ -2,6 +2,7 @@
 title: 'Smoothness Is Not the Same as Quality'
 date: 2025-12-05
 permalink: /pencils/2025/12/smoothness-is-not-the-same-as-quality/
+category: experience
 tags:
    - pencil
    - writing

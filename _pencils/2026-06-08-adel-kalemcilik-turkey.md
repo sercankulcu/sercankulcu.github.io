@@ -2,6 +2,7 @@
 title: 'Adel Kalemcilik: Turkey’s Modern Pencil Manufacturer'
 date: 2026-06-08
 permalink: /pencils/2026/06/adel-kalemcilik-turkey/
+category: history
 tags:
    - pencil
    - adel

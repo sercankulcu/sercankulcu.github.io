@@ -2,6 +2,7 @@
 title: 'Why Pencil Leads Are Bonded to Wood'
 date: 2025-07-13
 permalink: /pencils/2025/07/why-pencil-leads-are-bonded-to-wood/
+category: materials
 tags:
    - pencil
    - manufacturing

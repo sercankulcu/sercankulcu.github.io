@@ -2,6 +2,7 @@
 title: 'Tomsk Pencil Factory: Siberian Cedar and Soviet Pencil Production'
 date: 2026-07-23
 permalink: /pencils/2026/07/tomsk-pencil-factory/
+category: history
 tags:
    - pencil
    - tomsk

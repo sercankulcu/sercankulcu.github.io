@@ -2,6 +2,7 @@
 title: 'Viking Pencil Factory: Denmark’s National Pencil'
 date: 2026-05-22
 permalink: /pencils/2026/05/viking-pencil-factory-denmark/
+category: history
 tags:
    - pencil
    - viking

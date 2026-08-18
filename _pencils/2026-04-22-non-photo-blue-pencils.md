@@ -2,6 +2,7 @@
 title: 'Non-Photo Blue Pencils: The Lines Meant to Disappear'
 date: 2026-04-22
 permalink: /pencils/2026/04/non-photo-blue-pencils/
+category: types
 tags:
    - pencil
    - non-photo-blue

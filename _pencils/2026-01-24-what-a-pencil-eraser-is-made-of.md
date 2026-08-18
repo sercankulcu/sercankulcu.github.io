@@ -2,6 +2,7 @@
 title: 'What a Pencil Eraser Is Actually Made Of'
 date: 2026-01-24
 permalink: /pencils/2026/01/what-a-pencil-eraser-is-made-of/
+category: materials
 tags:
    - pencil
    - eraser

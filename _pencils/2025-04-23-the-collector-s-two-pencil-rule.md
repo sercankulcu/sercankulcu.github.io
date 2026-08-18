@@ -2,6 +2,7 @@
 title: 'The Collector''s Two-Pencil Rule'
 date: 2025-04-23
 permalink: /pencils/2025/04/the-collector-s-two-pencil-rule/
+category: collecting
 tags:
    - pencil
    - collecting

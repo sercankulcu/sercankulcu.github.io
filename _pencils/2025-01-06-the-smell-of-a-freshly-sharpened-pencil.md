@@ -2,6 +2,7 @@
 title: 'The Smell of a Freshly Sharpened Pencil'
 date: 2025-01-06
 permalink: /pencils/2025/01/the-smell-of-a-freshly-sharpened-pencil/
+category: experience
 tags:
    - pencil
    - wood

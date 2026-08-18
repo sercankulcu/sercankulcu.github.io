@@ -2,6 +2,7 @@
 title: 'Why Vintage Pencil Boxes Matter'
 date: 2025-09-24
 permalink: /pencils/2025/09/why-vintage-pencil-boxes-matter/
+category: collecting
 tags:
    - pencil
    - collecting

@@ -2,6 +2,7 @@
 title: 'Cretacolor Monolith: When the Whole Pencil Becomes Graphite'
 date: 2026-04-03
 permalink: /pencils/2026/04/cretacolor-monolith/
+category: brands
 tags:
    - pencil
    - cretacolor

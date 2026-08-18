@@ -2,6 +2,7 @@
 title: 'Knife Sharpening a Pencil'
 date: 2025-06-02
 permalink: /pencils/2025/06/knife-sharpening-a-pencil/
+category: tools
 tags:
    - pencil
    - sharpening

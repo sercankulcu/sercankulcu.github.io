@@ -2,6 +2,7 @@
 title: 'Giotto Colored Pencils: An Italian School Classic Since the 1920s'
 date: 2026-07-02
 permalink: /pencils/2026/07/giotto-colored-pencils/
+category: brands
 tags:
    - pencil
    - giotto

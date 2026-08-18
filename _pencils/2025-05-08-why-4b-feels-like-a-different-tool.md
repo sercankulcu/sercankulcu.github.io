@@ -2,6 +2,7 @@
 title: 'Why 4B Feels Like a Different Tool'
 date: 2025-05-08
 permalink: /pencils/2025/05/why-4b-feels-like-a-different-tool/
+category: experience
 tags:
    - pencil
    - 4b

@@ -2,6 +2,7 @@
 title: 'Ferrules: The Tiny Metal Part Collectors Notice'
 date: 2025-06-20
 permalink: /pencils/2025/06/ferrules-the-tiny-metal-part-collectors-notice/
+category: design
 tags:
    - pencil
    - ferrule

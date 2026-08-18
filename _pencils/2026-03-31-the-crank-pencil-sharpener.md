@@ -2,6 +2,7 @@
 title: 'The Crank Pencil Sharpener: How Spiral Cutters Took Over the Desk'
 date: 2026-03-31
 permalink: /pencils/2026/03/the-crank-pencil-sharpener/
+category: tools
 tags:
    - pencil
    - sharpener

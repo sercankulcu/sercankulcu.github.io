@@ -2,6 +2,7 @@
 title: 'How a Pencil Eraser Is Crimped Into Place'
 date: 2026-03-02
 permalink: /pencils/2026/03/how-a-pencil-eraser-is-crimped/
+category: design
 tags:
    - pencil
    - ferrule

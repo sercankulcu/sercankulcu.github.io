@@ -2,6 +2,7 @@
 title: 'Conté Graphite Pencils: How France Turned a Graphite Shortage into a New Pencil'
 date: 2026-06-29
 permalink: /pencils/2026/06/conte-graphite-pencils/
+category: brands
 tags:
    - pencil
    - conte

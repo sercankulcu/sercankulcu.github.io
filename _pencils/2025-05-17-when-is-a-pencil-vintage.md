@@ -2,6 +2,7 @@
 title: 'When Is a Pencil Vintage?'
 date: 2025-05-17
 permalink: /pencils/2025/05/when-is-a-pencil-vintage/
+category: collecting
 tags:
    - pencil
    - vintage

@@ -2,6 +2,7 @@
 title: 'Incense Cedar vs Basswood: Two Different Ways to Build a Wooden Pencil'
 date: 2026-01-11
 permalink: /pencils/2026/01/incense-cedar-vs-basswood/
+category: materials
 tags:
    - pencil
    - incense-cedar

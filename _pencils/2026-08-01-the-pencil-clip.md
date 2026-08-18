@@ -2,6 +2,7 @@
 title: 'The Pencil Clip: Turning a Wooden Pencil Into a Pocket Tool'
 date: 2026-08-01
 permalink: /pencils/2026/08/the-pencil-clip/
+category: tools
 tags:
    - pencil
    - pencil-clip

@@ -2,6 +2,7 @@
 title: 'Venus Perfect Pencils: The American Drawing Pencil That Challenged Europe'
 date: 2026-04-09
 permalink: /pencils/2026/04/venus-perfect-pencils/
+category: brands
 tags:
    - pencil
    - venus

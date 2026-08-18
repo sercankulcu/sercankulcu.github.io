@@ -2,6 +2,7 @@
 title: 'Grease Pencils and China Markers: Writing Where Graphite Cannot'
 date: 2026-03-27
 permalink: /pencils/2026/03/grease-pencils-and-china-markers/
+category: types
 tags:
    - pencil
    - grease-pencil

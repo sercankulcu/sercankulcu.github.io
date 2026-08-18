@@ -2,6 +2,7 @@
 title: 'Inside a Pencil: Graphite, Clay and Wax'
 date: 2025-07-14
 permalink: /pencils/2025/07/inside-a-pencil-graphite-clay-and-wax/
+category: materials
 tags:
    - pencil
    - manufacturing

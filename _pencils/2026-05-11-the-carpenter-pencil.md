@@ -2,6 +2,7 @@
 title: 'The Carpenter Pencil: Why Flat Beats Round on a Job Site'
 date: 2026-05-11
 permalink: /pencils/2026/05/the-carpenter-pencil/
+category: types
 tags:
    - pencil
    - carpenter-pencil

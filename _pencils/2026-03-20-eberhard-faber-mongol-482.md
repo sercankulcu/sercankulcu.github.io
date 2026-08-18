@@ -2,6 +2,7 @@
 title: 'Eberhard Faber Mongol 482: The Pencil Behind “I, Pencil”'
 date: 2026-03-20
 permalink: /pencils/2026/03/eberhard-faber-mongol-482/
+category: brands
 tags:
    - pencil
    - eberhard-faber

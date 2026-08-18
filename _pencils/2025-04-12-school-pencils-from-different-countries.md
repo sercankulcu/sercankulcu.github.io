@@ -2,6 +2,7 @@
 title: 'School Pencils From Different Countries'
 date: 2025-04-12
 permalink: /pencils/2025/04/school-pencils-from-different-countries/
+category: history
 tags:
    - pencil
    - school

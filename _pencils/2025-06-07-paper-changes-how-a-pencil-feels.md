@@ -2,6 +2,7 @@
 title: 'Paper Changes How a Pencil Feels'
 date: 2025-06-07
 permalink: /pencils/2025/06/paper-changes-how-a-pencil-feels/
+category: experience
 tags:
    - pencil
    - paper

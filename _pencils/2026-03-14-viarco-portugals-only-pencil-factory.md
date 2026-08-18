@@ -2,6 +2,7 @@
 title: 'Viarco: Portugal’s Only Pencil Factory'
 date: 2026-03-14
 permalink: /pencils/2026/03/viarco-portugals-only-pencil-factory/
+category: history
 tags:
    - pencil
    - viarco

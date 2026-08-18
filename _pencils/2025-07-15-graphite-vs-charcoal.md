@@ -2,6 +2,7 @@
 title: 'Graphite vs Charcoal'
 date: 2025-07-15
 permalink: /pencils/2025/07/graphite-vs-charcoal/
+category: materials
 tags:
    - pencil
    - graphite

@@ -2,6 +2,7 @@
 title: 'Why Pencils Still Matter'
 date: 2025-10-31
 permalink: /pencils/2025/10/why-pencils-still-matter/
+category: experience
 tags:
    - pencil
    - writing
