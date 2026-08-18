@@ -9,7 +9,9 @@ redirect_from:
 
 <img align="right" width="150" alt="owl coffee beans" src="/images/owl-coffee-beans.webp">
 
-I am <u>Sercan Külcü</u>, an Assistant Professor in the <u>Department of Computer Engineering</u> at <u>Giresun University</u>. With over <u>20 years</u> of professional experience in <u>software engineering</u>, I hold a <u>PhD</u> specializing in <u>low-power wireless communication technologies</u>. My expertise spans <u>embedded</u> and <u>real-time operating systems</u>, programming in <u>C</u>, <u>C++</u>, and <u>Java</u>, as well as the application of <u>machine learning techniques</u>. I also enjoy developing small <u>JavaScript</u> applications.
+I am <u>Sercan Külcü</u>, an Assistant Professor in the <u>Department of Computer Engineering</u> at <u>Giresun University</u>. I have over <u>20 years of professional experience</u> in <u>software engineering</u> and hold a <u>PhD</u> focused on <u>low-power wireless communication technologies</u>.
+
+My interests include <u>embedded and real-time operating systems</u>, programming in <u>C</u>, <u>C++</u>, and <u>Java</u>, <u>machine learning</u>, and developing small <u>JavaScript applications</u>.
 
 <p id="install" style="display: none;">For a better mobile experience, you can also <button id="installPWA">🚀 click to install the app</button> and access everything directly from your home screen.</p>
 
@@ -37,34 +39,28 @@ window.addEventListener("appinstalled", () => {
 
 Learn about my <a class="btn btn--inverse" href="/teaching/">
   📚 Teaching
-</a> experience, materials, and educational contributions. 
+</a> experience, materials, and educational contributions.
 
 Check out the small <a class="btn btn--inverse" href="/apps/">
   📱 Apps
 </a> and <a class="btn btn--inverse" href="https://dorukdayim.netlify.app">
   🧠 Games
-</a> I've developed with JavaScript in my free time. 
+</a> I've developed in my free time.
 
 Explore my <a class="btn btn--inverse" href="/cv/">
-  📄 Resume
-</a> to learn about my education, professional experience, and skills. 
-
-Discover my curated collection of <a class="btn btn--inverse" href="/bookmarks/">
+  📄 CV
+</a>, <a class="btn btn--inverse" href="/bookmarks/">
   🔖 Bookmarks
-</a>, featuring useful resources and interesting content. 
+</a>, and <a class="btn btn--inverse" href="/posts/">
+  📝 Blog
+</a>.
 
-ead my <a class="btn btn--inverse" href="/posts/">
-  📝 Blog posts
-</a> where I share insights, experiences, and ideas on various topics. 
-
-Explore my <a class="btn btn--inverse" href="/pencils/">
+Read my <a class="btn btn--inverse" href="/pencils/">
   ✏️ Pencils
-</a> collection, where I write about pencils, design, materials, craftsmanship, and the small details that make them interesting. 
-
-Follow my <a class="btn btn--inverse" href="/humanity/">
+</a> and <a class="btn btn--inverse" href="/humanity/">
   🌍 Humanity
-</a> series, a long-form journey through human origins, consciousness, civilization, philosophy, technology, and our possible future.
+</a> collections.
 
-**Note:** If any licensed content is found on the website, please don't hesitate to contact me via the links on the left-hand side. You can be sure that any related content will be quickly removed within 24 hours.
+**Note:** If you believe any content on this website infringes a license or copyright, please contact me. I will review and remove the material promptly if necessary.
 
 <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="sercankulc" data-description="Support me on Buy me a coffee!" data-message="Thank you for visiting!" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
