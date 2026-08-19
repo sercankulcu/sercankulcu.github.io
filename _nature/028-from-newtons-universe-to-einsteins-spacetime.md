@@ -1,5 +1,5 @@
 ---
-title: 'From Newton's Universe to Einstein's Spacetime'
+title: "From Newton's Universe to Einstein's Spacetime"
 permalink: /nature/028-from-newtons-universe-to-einsteins-spacetime/
 chapter: 3
 chapter_title: 'Cosmos and Origins'
