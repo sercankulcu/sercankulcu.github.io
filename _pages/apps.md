@@ -23,6 +23,7 @@ author_profile: true
 <button onclick="location.href='../apps/image-to-a4-pdf.html'">📄 IMAGE TO A4 PDF</button>
 <button onclick="location.href='../apps/images-to-pdf.html'">🖼️ IMAGES TO PDF</button>
 <button onclick="location.href='../apps/pdf-to-image.html'">🖼️ PDF TO IMAGE</button>
+<button onclick="location.href='../apps/pdf-diff.html'">🔎 PDF DIFF</button>
 <button onclick="location.href='../apps/pdf-review-integrity-scanner.html'">🛡️ PDF REVIEW INTEGRITY SCANNER</button>
 
 <button onclick="location.href='../apps/document-scanner.html'">📄 DOCUMENT SCANNER</button>
