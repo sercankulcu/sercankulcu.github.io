@@ -1,5 +1,5 @@
 ---
-title: 'Hume's Problem of Induction'
+title: "Hume's Problem of Induction"
 permalink: /nature/065-humes-problem-of-induction/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'
