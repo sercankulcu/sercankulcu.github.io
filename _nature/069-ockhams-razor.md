@@ -1,5 +1,5 @@
 ---
-title: 'Ockham's Razor'
+title: "Ockham's Razor"
 permalink: /nature/069-ockhams-razor/
 chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'
