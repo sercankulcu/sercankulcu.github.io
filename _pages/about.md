@@ -37,8 +37,6 @@ window.addEventListener("appinstalled", () => {
 });
 </script>
 
-Learn about my <a class="btn btn--inverse" href="/teaching/">📚 Teaching</a> experience, materials, and educational contributions. Check out the small <a class="btn btn--inverse" href="/apps/">📱 Apps</a> and <a class="btn btn--inverse" href="https://dorukdayim.netlify.app">🧠 Games</a> I've developed in my free time. Explore my <a class="btn btn--inverse" href="/cv/">📄 CV</a>, <a class="btn btn--inverse" href="/bookmarks/">🔖 Bookmarks</a>, and <a class="btn btn--inverse" href="/posts/">📝 Blog</a>. Read my <a class="btn btn--inverse" href="/pencils/">✏️ Pencils</a> and <a class="btn btn--inverse" href="/humanity/">🌍 Humanity</a> collections.
-
 Learn about my <a class="btn btn--inverse" href="/teaching/">📚 Teaching</a> materials and courses. Try the <a class="btn btn--inverse" href="/apps/">📱 Apps</a> and <a class="btn btn--inverse" href="https://dorukdayim.netlify.app">🧠 Games</a> I have created. You can also visit my <a class="btn btn--inverse" href="/cv/">📄 CV</a>, <a class="btn btn--inverse" href="/bookmarks/">🔖 Bookmarks</a>, and <a class="btn btn--inverse" href="/posts/">📝 Blog</a>. I also maintain collections: <a class="btn btn--inverse" href="/pencils/">✏️ Pencils</a>, <a class="btn btn--inverse" href="/humanity/">🌍 Humanity</a>, and <a class="btn btn--inverse" href="/nature/">🌿 Nature</a>.
 
 **Note:** If you believe any content on this website infringes a license or copyright, please contact me. I will review and remove the material promptly if necessary.
