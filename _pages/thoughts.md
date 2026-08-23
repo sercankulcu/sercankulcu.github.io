@@ -9,5 +9,5 @@ Essays, observations, questions, and reflections on life, learning, people, and 
 
 {% assign entries = site.thoughts | sort: "date" | reverse %}
 {% for post in entries %}
-- [{{ post.title }}]({{ post.url | relative_url }}) — {{ post.date | date: "%B %-d, %Y" }}
+- [{{ post.title }}]({{ post.url | relative_url }})
 {% endfor %}
