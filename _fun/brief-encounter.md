@@ -1,7 +1,6 @@
 ---
 title: "Brief Encounter"
 date: 2008-12-31
-permalink: /posts/2008/12/brief-encounter/
 tags:
    - movie
    - romance

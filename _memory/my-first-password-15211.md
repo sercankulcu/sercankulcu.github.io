@@ -1,7 +1,6 @@
 ---
 title: "My First Password: 15211"
 date: 2010-07-17
-permalink: /posts/2010/07/my-first-password-15211/
 tags:
    - computers
    - memories

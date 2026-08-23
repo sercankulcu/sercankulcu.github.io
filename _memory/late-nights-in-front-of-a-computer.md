@@ -1,7 +1,6 @@
 ---
 title: 'Late Nights in Front of a Computer'
 date: 2006-10-14
-permalink: /posts/2006/10/late-nights-in-front-of-a-computer/
 tags:
   - life
   - computers

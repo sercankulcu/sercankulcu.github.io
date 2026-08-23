@@ -1,7 +1,6 @@
 ---
 title: "Issız Adam"
 date: 2011-08-06
-permalink: /posts/2011/08/issiz-adam/
 tags:
    - movie
    - family

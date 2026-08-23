@@ -1,7 +1,6 @@
 ---
 title: "Los Amantes del Círculo Polar"
 date: 2009-04-27
-permalink: /posts/2009/04/los-amantes-del-circulo-polar/
 tags:
    - movie
    - memories

@@ -1,7 +1,6 @@
 ---
 title: "Going to the Cinema Alone"
 date: 2011-03-30
-permalink: /posts/2011/03/going-to-the-cinema-alone/
 tags:
    - cinema
    - solitude

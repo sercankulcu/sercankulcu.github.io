@@ -1,7 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2014'
 date: 2014-11-10
-permalink: /posts/2014/11/remembering-ataturk-on-november-10-2014/
 tags:
   - ataturk
   - november-10

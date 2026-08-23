@@ -1,7 +1,6 @@
 ---
 title: 'The Comfort of Familiar Places'
 date: 2025-10-26
-permalink: /posts/2025/10/the-comfort-of-familiar-places/
 tags:
   - life
   - memories

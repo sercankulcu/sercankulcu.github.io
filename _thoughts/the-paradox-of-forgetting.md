@@ -1,7 +1,6 @@
 ---
 title: 'The Paradox Of Forgetting'
 date: 2011-04-05
-permalink: /posts/2011/04/the-paradox-of-forgetting/
 tags:
    - self-improvement
    - philosophy

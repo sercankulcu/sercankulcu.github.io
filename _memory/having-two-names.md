@@ -1,7 +1,6 @@
 ---
 title: "Having Two Names"
 date: 2012-06-24
-permalink: /posts/2012/06/having-two-names/
 tags:
    - memories
    - identity
