@@ -39,25 +39,12 @@ window.addEventListener("appinstalled", () => {
 });
 </script>
 
-## Explore
+Learn about my <a class="btn btn--inverse" href="/teaching/">📚 Teaching</a> materials and courses, try the <a class="btn btn--inverse" href="/apps/">📱 Apps</a> and <a class="btn btn--inverse" href="https://dorukdayim.netlify.app">🧠 Games</a> I have created, or visit my <a class="btn btn--inverse" href="/cv/">📄 CV</a> and <a class="btn btn--inverse" href="/bookmarks/">🔖 Bookmarks</a>.
 
-<a class="btn btn--inverse" href="/teaching/">📚 Teaching</a>
-<a class="btn btn--inverse" href="/apps/">📱 Apps</a>
-<a class="btn btn--inverse" href="https://dorukdayim.netlify.app">🧠 Games</a>
-<a class="btn btn--inverse" href="/cv/">📄 CV</a>
-<a class="btn btn--inverse" href="/bookmarks/">🔖 Bookmarks</a>
-<a class="btn btn--inverse" href="/posts/">💻 Technical Blog</a>
+My <a class="btn btn--inverse" href="/posts/">💻 Technical Blog</a> mainly contains writing about computers, software, programming, engineering, and the history of technology. I keep personal stories in <a class="btn btn--inverse" href="/memory/">🕰️ Memory</a>, essays and observations in <a class="btn btn--inverse" href="/thoughts/">💭 Thoughts</a>, and writing about films, games, music, and other things I enjoy in <a class="btn btn--inverse" href="/fun/">🎬 Fun</a>.
 
-## Collections
+I also maintain collections about <a class="btn btn--inverse" href="/pencils/">✏️ Pencils</a>, <a class="btn btn--inverse" href="/humanity/">🌍 Humanity</a>, and <a class="btn btn--inverse" href="/nature/">🌿 Nature</a>.
 
-<a class="btn btn--inverse" href="/memory/">🕰️ Memory</a>
-<a class="btn btn--inverse" href="/thoughts/">💭 Thoughts</a>
-<a class="btn btn--inverse" href="/fun/">🎬 Fun</a>
-<a class="btn btn--inverse" href="/pencils/">✏️ Pencils</a>
-<a class="btn btn--inverse" href="/humanity/">🌍 Humanity</a>
-<a class="btn btn--inverse" href="/nature/">🌿 Nature</a>
-
-The <strong>Technical Blog</strong> focuses mainly on computers, software, programming, engineering, and the history of technology. <strong>Memory</strong> contains personal stories and recollections. <strong>Thoughts</strong> is for essays, observations, and reflections. <strong>Fun</strong> collects writing about films, games, music, and other things I enjoy.
 
 **Note:** If you believe any content on this website infringes a license or copyright, please contact me. I will review and remove the material promptly if necessary.
 
