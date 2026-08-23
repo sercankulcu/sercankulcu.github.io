@@ -35,9 +35,13 @@ window.addEventListener("appinstalled", () => {
 });
 </script>
 
-Learn about my <a class="btn btn--inverse" href="/teaching/">📚 Teaching</a> materials and courses, try the <a class="btn btn--inverse" href="/apps/">📱 Apps</a> and <a class="btn btn--inverse" href="https://dorukdayim.netlify.app">🧠 Games</a> I have created, or visit my <a class="btn btn--inverse" href="/cv/">📄 CV</a> and <a class="btn btn--inverse" href="/bookmarks/">🔖 Bookmarks</a>. My <a class="btn btn--inverse" href="/posts/">💻 Technical Blog</a> mainly contains writing about computers, software, programming, engineering, and the history of technology. I also maintain collections about <a class="btn btn--inverse" href="/pencils/">✏️ Pencils</a>, <a class="btn btn--inverse" href="/humanity/">🌍 Humanity</a>, and <a class="btn btn--inverse" href="/nature/">🌿 Nature</a>. 
+Learn about my <button type="button" onclick="window.location.href='/teaching/'">📚 Teaching</button> materials and courses, try the <button type="button" onclick="window.location.href='/apps/'">📱 Apps</button> and <button type="button" onclick="window.location.href='https://dorukdayim.netlify.app'">🧠 Games</button> I have created, or visit my <button type="button" onclick="window.location.href='/cv/'">📄 CV</button> and <button type="button" onclick="window.location.href='/bookmarks/'">🔖 Bookmarks</button>.
 
-<!--I keep personal stories in <a class="btn btn--inverse" href="/memory/">🕰️ Memory</a>, essays and observations in <a class="btn btn--inverse" href="/thoughts/">💭 Thoughts</a>, and writing about films, games, music, and other things I enjoy in <a class="btn btn--inverse" href="/fun/">🎬 Fun</a>.-->
+My <button type="button" onclick="window.location.href='/posts/'">💻 Technical Blog</button> mainly contains writing about computers, software, programming, engineering, and the history of technology. I also maintain collections about <button type="button" onclick="window.location.href='/pencils/'">✏️ Pencils</button>, <button type="button" onclick="window.location.href='/humanity/'">🌍 Humanity</button>, and <button type="button" onclick="window.location.href='/nature/'">🌿 Nature</button>.
+
+<!--
+I keep personal stories in <button type="button" onclick="window.location.href='/memory/'">🕰️ Memory</button>, essays and observations in <button type="button" onclick="window.location.href='/thoughts/'">💭 Thoughts</button>, and writing about films, games, music, and other things I enjoy in <button type="button" onclick="window.location.href='/fun/'">🎬 Fun</button>.
+-->
 
 
 **Note:** If you believe any content on this website infringes a license or copyright, please contact me. I will review and remove the material promptly if necessary.
