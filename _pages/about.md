@@ -13,6 +13,12 @@ I am Sercan Külcü, an Assistant Professor in the Department of Computer Engine
 
 <p id="install" style="display: none;">For a better mobile experience, you can also <button id="installPWA">🚀 click to install the app</button> and access everything directly from your home screen.</p>
 
+<style>
+button {
+  margin: 0.25rem 0.12rem;
+}
+</style>
+
 <script>
 let deferredPrompt;
 
