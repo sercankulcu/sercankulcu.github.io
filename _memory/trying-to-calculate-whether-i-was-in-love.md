@@ -1,7 +1,6 @@
 ---
 title: "Trying to Calculate Whether I Was in Love"
 date: 2010-06-23
-permalink: /posts/2010/06/trying-to-calculate-whether-i-was-in-love/
 tags:
    - relationships
    - love

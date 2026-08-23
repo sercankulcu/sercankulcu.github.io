@@ -1,7 +1,6 @@
 ---
 title: 'Why Joy Fades As We Age'
 date: 2025-01-25
-permalink: /posts/2025/01/why-joy-fades-as-we-age/
 tags:
   - life
   - reflection

@@ -1,7 +1,6 @@
 ---
 title: 'The Power Of Self-Faith'
 date: 2017-10-06
-permalink: /posts/2017/10/the-power-of-self-faith/
 tags:
   - critics
   - self-improvement

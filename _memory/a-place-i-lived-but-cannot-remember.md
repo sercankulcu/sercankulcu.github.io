@@ -1,7 +1,6 @@
 ---
 title: "A Place I Lived but Cannot Remember"
 date: 2010-04-20
-permalink: /posts/2010/04/a-place-i-lived-but-cannot-remember/
 tags:
    - childhood
    - memory

@@ -1,7 +1,6 @@
 ---
 title: 'Rome Was Not Built In A Day'
 date: 2015-10-06
-permalink: /posts/2015/10/rome-was-not-built-in-a-day/
 tags:
   - critics
   - philosophy

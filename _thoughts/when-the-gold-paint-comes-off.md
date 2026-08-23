@@ -1,7 +1,6 @@
 ---
 title: "When the Gold Paint Comes Off"
 date: 2009-01-05
-permalink: /posts/2009/01/when-the-gold-paint-comes-off/
 tags:
    - reflections
    - idols

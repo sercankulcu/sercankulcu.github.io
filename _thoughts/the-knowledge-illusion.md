@@ -1,7 +1,6 @@
 ---
 title: 'The Knowledge Illusion'
 date: 2018-11-18
-permalink: /posts/2018/11/the-knowledge-illusion/
 tags:
   - general
   - self-improvement

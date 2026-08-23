@@ -1,7 +1,6 @@
 ---
 title: "When You Cannot Tell What You Feel"
 date: 2010-04-24
-permalink: /posts/2010/04/when-you-cannot-tell-what-you-feel/
 tags:
    - relationships
    - friendship

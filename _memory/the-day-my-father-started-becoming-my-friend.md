@@ -1,7 +1,6 @@
 ---
 title: "The Day My Father Started Becoming My Friend"
 date: 2010-07-21
-permalink: /posts/2010/07/the-day-my-father-started-becoming-my-friend/
 tags:
    - family
    - father
