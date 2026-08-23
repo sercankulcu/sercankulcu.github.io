@@ -1,7 +1,6 @@
 ---
 title: 'The Importance Of Having A Friend'
 date: 2020-08-01
-permalink: /posts/2020/08/the-importance-of-having-a-friend/
 tags:
   - career
 ---

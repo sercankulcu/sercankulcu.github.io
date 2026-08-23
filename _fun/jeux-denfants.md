@@ -1,7 +1,6 @@
 ---
 title: "Jeux d'enfants"
 date: 2006-03-01
-permalink: /posts/2006/03/jeux-denfants/
 tags:
    - movie
    - drama

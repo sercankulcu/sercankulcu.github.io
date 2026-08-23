@@ -1,7 +1,6 @@
 ---
 title: 'Movie Suggestions For Software Engineers'
 date: 2019-08-13
-permalink: /posts/2019/08/movie-suggestions-for-software-engineers/
 tags:
   - personal development
   - self-improvement

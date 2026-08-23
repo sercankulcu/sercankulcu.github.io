@@ -1,7 +1,6 @@
 ---
 title: 'Age of Empires II'
 date: 2006-02-14
-permalink: /posts/2006/02/age-of-empires-ii/
 tags:
    - fun
    - game

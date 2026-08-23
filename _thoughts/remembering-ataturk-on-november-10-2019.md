@@ -1,7 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2019'
 date: 2019-11-10
-permalink: /posts/2019/11/remembering-ataturk-on-november-10-2019/
 tags:
   - ataturk
   - november-10

@@ -1,7 +1,6 @@
 ---
 title: 'You At The Center Of Your Universe'
 date: 2022-08-11
-permalink: /posts/2022/08/you-at-the-center-of-your-universe/
 tags:
   - self-improvement
   - philosophy

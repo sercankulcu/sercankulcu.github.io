@@ -1,7 +1,6 @@
 ---
 title: "You Do Not Choose to Forget"
 date: 2010-07-04
-permalink: /posts/2010/07/you-do-not-choose-to-forget/
 tags:
    - memories
    - forgetting

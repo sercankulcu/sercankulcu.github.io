@@ -1,7 +1,6 @@
 ---
 title: 'Navigating Pain'
 date: 2022-06-28
-permalink: /posts/2022/06/navigating-pain/
 tags:
   - self-improvement
   - life

@@ -1,7 +1,6 @@
 ---
 title: 'Why I Like Learning from Manuals'
 date: 2007-11-18
-permalink: /posts/2007/11/why-i-like-learning-from-manuals/
 tags:
   - learning
   - programming

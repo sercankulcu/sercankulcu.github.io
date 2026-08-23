@@ -1,7 +1,6 @@
 ---
 title: "Ankara and Loneliness"
 date: 2009-01-27
-permalink: /posts/2009/01/ankara-and-loneliness/
 tags:
    - ankara
    - memories

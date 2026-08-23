@@ -1,7 +1,6 @@
 ---
 title: 'Why We Return to Old Hobbies'
 date: 2025-07-20
-permalink: /posts/2025/07/why-we-return-to-old-hobbies/
 tags:
   - life
   - memories

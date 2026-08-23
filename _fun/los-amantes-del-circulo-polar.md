@@ -1,7 +1,6 @@
 ---
 title: "Los Amantes del Círculo Polar"
 date: 2006-03-08
-permalink: /posts/2006/03/los-amantes-del-circulo-polar/
 tags:
    - movie
    - drama

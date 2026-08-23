@@ -1,7 +1,6 @@
 ---
 title: "Jeux d'enfants"
 date: 2010-05-02
-permalink: /posts/2010/05/jeux-denfants/
 tags:
    - movie
    - memories

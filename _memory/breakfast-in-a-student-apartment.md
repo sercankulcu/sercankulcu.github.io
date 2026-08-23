@@ -1,7 +1,6 @@
 ---
 title: "Breakfast in a Student Apartment"
 date: 2010-06-24
-permalink: /posts/2010/06/breakfast-in-a-student-apartment/
 tags:
    - memories
    - university

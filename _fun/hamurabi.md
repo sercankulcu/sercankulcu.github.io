@@ -1,7 +1,6 @@
 ---
 title: 'Hamurabi'
 date: 2006-02-20
-permalink: /posts/2006/02/hamurabi/
 tags:
    - fun
    - game

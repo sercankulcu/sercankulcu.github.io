@@ -1,7 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2006'
 date: 2006-11-10
-permalink: /posts/2006/11/remembering-ataturk-on-november-10-2006/
 tags:
   - ataturk
   - november-10
