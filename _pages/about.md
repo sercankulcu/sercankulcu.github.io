@@ -9,11 +9,7 @@ redirect_from:
 
 <img align="right" width="150" alt="owl coffee beans" src="/images/owl-coffee-beans.webp">
 
-I am <u>Sercan Külcü</u>, an Assistant Professor in the <u>Department of Computer Engineering</u> at <u>Giresun University</u>. I have over <u>20 years of professional experience</u> in <u>software engineering</u> and hold a <u>PhD</u> focused on <u>low-power wireless communication technologies</u>.
-
-My academic and technical interests include <u>embedded and real-time operating systems</u>, programming in <u>C</u>, <u>C++</u>, and <u>Java</u>, <u>machine learning</u>, and building small <u>JavaScript applications</u> and interactive teaching tools.
-
-This website is both a professional archive and a personal notebook. I use it to collect teaching materials, technical notes, small software experiments, longer essays, memories, and subjects I enjoy exploring over time.
+I am Sercan Külcü, an Assistant Professor in the Department of Computer Engineering at Giresun University. I have over 20 years of professional experience in software engineering and hold a PhD focused on low-power wireless communication technologies. My academic and technical interests include embedded and real-time operating systems, programming in C, C++, and Java, machine learning, and building small JavaScript applications and interactive teaching tools. This website is both a professional archive and a personal notebook. I use it to collect teaching materials, technical notes, small software experiments, longer essays, memories, and subjects I enjoy exploring over time.
 
 <p id="install" style="display: none;">For a better mobile experience, you can also <button id="installPWA">🚀 click to install the app</button> and access everything directly from your home screen.</p>
 
@@ -39,11 +35,7 @@ window.addEventListener("appinstalled", () => {
 });
 </script>
 
-Learn about my <a class="btn btn--inverse" href="/teaching/">📚 Teaching</a> materials and courses, try the <a class="btn btn--inverse" href="/apps/">📱 Apps</a> and <a class="btn btn--inverse" href="https://dorukdayim.netlify.app">🧠 Games</a> I have created, or visit my <a class="btn btn--inverse" href="/cv/">📄 CV</a> and <a class="btn btn--inverse" href="/bookmarks/">🔖 Bookmarks</a>.
-
-My <a class="btn btn--inverse" href="/posts/">💻 Technical Blog</a> mainly contains writing about computers, software, programming, engineering, and the history of technology. I keep personal stories in <a class="btn btn--inverse" href="/memory/">🕰️ Memory</a>, essays and observations in <a class="btn btn--inverse" href="/thoughts/">💭 Thoughts</a>, and writing about films, games, music, and other things I enjoy in <a class="btn btn--inverse" href="/fun/">🎬 Fun</a>.
-
-I also maintain collections about <a class="btn btn--inverse" href="/pencils/">✏️ Pencils</a>, <a class="btn btn--inverse" href="/humanity/">🌍 Humanity</a>, and <a class="btn btn--inverse" href="/nature/">🌿 Nature</a>.
+Learn about my <a class="btn btn--inverse" href="/teaching/">📚 Teaching</a> materials and courses, try the <a class="btn btn--inverse" href="/apps/">📱 Apps</a> and <a class="btn btn--inverse" href="https://dorukdayim.netlify.app">🧠 Games</a> I have created, or visit my <a class="btn btn--inverse" href="/cv/">📄 CV</a> and <a class="btn btn--inverse" href="/bookmarks/">🔖 Bookmarks</a>. My <a class="btn btn--inverse" href="/posts/">💻 Technical Blog</a> mainly contains writing about computers, software, programming, engineering, and the history of technology. I keep personal stories in <a class="btn btn--inverse" href="/memory/">🕰️ Memory</a>, essays and observations in <a class="btn btn--inverse" href="/thoughts/">💭 Thoughts</a>, and writing about films, games, music, and other things I enjoy in <a class="btn btn--inverse" href="/fun/">🎬 Fun</a>. I also maintain collections about <a class="btn btn--inverse" href="/pencils/">✏️ Pencils</a>, <a class="btn btn--inverse" href="/humanity/">🌍 Humanity</a>, and <a class="btn btn--inverse" href="/nature/">🌿 Nature</a>.
 
 
 **Note:** If you believe any content on this website infringes a license or copyright, please contact me. I will review and remove the material promptly if necessary.
