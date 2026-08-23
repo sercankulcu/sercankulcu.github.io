@@ -9,5 +9,5 @@ Personal stories, memories, and moments from different periods of my life.
 
 {% assign entries = site.memory | sort: "date" | reverse %}
 {% for post in entries %}
-- [{{ post.title }}]({{ post.url | relative_url }}) — {{ post.date | date: "%B %-d, %Y" }}
+- [{{ post.title }}]({{ post.url | relative_url }})
 {% endfor %}
