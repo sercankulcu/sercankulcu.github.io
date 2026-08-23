@@ -1,7 +1,6 @@
 ---
 title: "When FarmVille Made Loneliness Visible"
 date: 2009-11-01
-permalink: /posts/2009/11/when-farmville-made-loneliness-visible/
 tags:
    - memories
    - internet

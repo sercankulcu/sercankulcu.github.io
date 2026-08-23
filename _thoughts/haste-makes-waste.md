@@ -1,7 +1,6 @@
 ---
 title: 'Haste Makes Waste'
 date: 2011-04-04
-permalink: /posts/2011/04/haste-makes-waste/
 tags:
    - self-improvement
    - philosophy

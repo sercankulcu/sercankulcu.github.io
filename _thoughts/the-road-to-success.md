@@ -1,7 +1,6 @@
 ---
 title: 'The Road To Success'
 date: 2023-07-08
-permalink: /posts/2023/07/the-road-to-success/
 tags:
   - self-improvement
   - life

@@ -1,7 +1,6 @@
 ---
 title: 'Jean De La Bruyère'
 date: 2019-07-04
-permalink: /posts/2019/07/jean-de-la-bruyere/
 tags:
   - personal development
   - self-improvement

@@ -1,7 +1,6 @@
 ---
 title: 'Never Touch Your Idols - The Gilding Will Stick'
 date: 2018-07-07
-permalink: /posts/2018/08/never-touch-your-idols-the-gilding-will-stick/
 tags:
   - critics
   - philosophy

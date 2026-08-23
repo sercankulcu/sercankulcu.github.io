@@ -1,7 +1,6 @@
 ---
 title: 'Do Not Live In Ignorance'
 date: 2024-12-25
-permalink: /posts/2024/12/do-not-live-in-ignorance/
 tags:
   - philosophy
   - education

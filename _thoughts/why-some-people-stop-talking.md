@@ -1,7 +1,6 @@
 ---
 title: "Why Some People Stop Talking"
 date: 2012-07-07
-permalink: /posts/2012/07/why-some-people-stop-talking/
 tags:
    - communication
    - friendship

@@ -1,7 +1,6 @@
 ---
 title: 'From Babyhood To Growing Up'
 date: 2014-10-06
-permalink: /posts/2014/10/from-babyhood-to-growing-up/
 tags:
   - critics
   - self-improvement

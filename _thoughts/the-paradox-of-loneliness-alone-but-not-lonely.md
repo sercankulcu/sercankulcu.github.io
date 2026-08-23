@@ -1,7 +1,6 @@
 ---
 title: 'The Paradox Of Loneliness - Alone But Not Lonely'
 date: 2024-04-24
-permalink: /posts/2024/04/the-paradox-of-loneliness-alone-but-not-lonely/
 tags:
   - life
   - relationships

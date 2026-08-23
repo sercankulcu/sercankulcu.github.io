@@ -1,7 +1,6 @@
 ---
 title: 'We Can All Become Better Individuals'
 date: 2014-07-07
-permalink: /posts/2014/07/we-can-all-become-better-individuals/
 tags:
   - critics
   - self-improvement

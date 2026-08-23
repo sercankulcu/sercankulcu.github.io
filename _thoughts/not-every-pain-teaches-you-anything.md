@@ -1,7 +1,6 @@
 ---
 title: 'Not Every Pain Teaches You Anything'
 date: 2017-10-06
-permalink: /posts/2017/10/not-every-pain-teaches-you-anything/
 tags:
   - critics
   - self-improvement

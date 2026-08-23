@@ -1,7 +1,6 @@
 ---
 title: 'The Joy Of Unexpected Happy Moments'
 date: 2019-02-19
-permalink: /posts/2019/02/the-joy-of-unexpected-happy-moments/
 tags:
   - career
   - critics

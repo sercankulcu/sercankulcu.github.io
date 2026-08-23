@@ -1,7 +1,6 @@
 ---
 title: "Waiting for a Message"
 date: 2010-07-14
-permalink: /posts/2010/07/waiting-for-a-message/
 tags:
    - memories
    - relationships

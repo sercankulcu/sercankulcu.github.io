@@ -1,7 +1,6 @@
 ---
 title: 'Geworfen'
 date: 2022-03-18
-permalink: /posts/2022/03/geworfen/
 tags:
   - philosophy
   - self-improvement
