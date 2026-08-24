@@ -9,9 +9,11 @@ redirect_from:
 
 <img align="right" width="150" alt="owl coffee beans" src="/images/owl-coffee-beans.webp">
 
-I am Sercan Külcü, an Assistant Professor in the Department of Computer Engineering at Giresun University. I have over 20 years of professional experience in software engineering and hold a PhD focused on low-power wireless communication technologies. My academic and technical interests include embedded and real-time operating systems, programming in C, C++, and Java, machine learning, and building small JavaScript applications and interactive teaching tools. This website is both a professional archive and a personal notebook. I use it to collect teaching materials, technical notes, small software experiments, longer essays, memories, and subjects I enjoy exploring over time.
+I am Sercan Külcü, an Assistant Professor in the Department of Computer Engineering at Giresun University. I have over 20 years of professional experience in software engineering and hold a PhD focused on low-power wireless communication technologies. My work focuses on software engineering, embedded systems, programming, algorithms, and interactive tools for computer science education.
 
-<p id="install" style="display: none;">For a better mobile experience, you can also <button id="installPWA">🚀 click to install the app</button> and access everything directly from your home screen.</p>
+I use this website to share teaching materials, technical work, software experiments, and selected writings.
+
+<p id="install" style="display: none;">For easier mobile access, <button id="installPWA">🚀 Install App</button> directly on your device.</p>
 
 <style>
 button {
@@ -45,10 +47,11 @@ Learn about my <button type="button" onclick="window.location.href='/teaching/'"
 
 My <button type="button" onclick="window.location.href='/posts/'">💻 Technical Blog</button> mainly contains writing about computers, software, programming, engineering, and the history of technology. I also maintain collections about <button type="button" onclick="window.location.href='/pencils/'">✏️ Pencils</button>, <button type="button" onclick="window.location.href='/humanity/'">🌍 Humanity</button>, and <button type="button" onclick="window.location.href='/nature/'">🌿 Nature</button>.
 
-<!--
-I keep personal stories in <button type="button" onclick="window.location.href='/memory/'">🕰️ Memory</button>, essays and observations in <button type="button" onclick="window.location.href='/thoughts/'">💭 Thoughts</button>, and writing about films, games, music, and other things I enjoy in <button type="button" onclick="window.location.href='/fun/'">🎬 Fun</button>.
--->
+Explore my courses through <button type="button" onclick="window.location.href='/teaching/'">📚 Teaching</button>, use practical tools in <button type="button" onclick="window.location.href='/apps/'">📱 Apps</button>, try interactive projects in <button type="button" onclick="window.location.href='https://dorukdayim.netlify.app'">🧠 Games</button>, review my background in <button type="button" onclick="window.location.href='/cv/'">📄 CV</button>, or browse useful links in <button type="button" onclick="window.location.href='/bookmarks/'">🔖 Bookmarks</button>.
 
+Read technical notes in <button type="button" onclick="window.location.href='/posts/'">💻 Technical Blog</button>, explore writing tools in <button type="button" onclick="window.location.href='/pencils/'">✏️ Pencils</button>, discover broader topics in <button type="button" onclick="window.location.href='/humanity/'">🌍 Humanity</button>, or read observations about the world in <button type="button" onclick="window.location.href='/nature/'">🌿 Nature</button>.
+
+I keep personal stories in <button type="button" onclick="window.location.href='/memory/'">🕰️ Memory</button>, essays and observations in <button type="button" onclick="window.location.href='/thoughts/'">💭 Thoughts</button>, and writing about films, games, music, and other things I enjoy in <button type="button" onclick="window.location.href='/fun/'">🎬 Fun</button>.
 
 **Note:** If you believe any content on this website infringes a license or copyright, please contact me. I will review and remove the material promptly if necessary.
 
