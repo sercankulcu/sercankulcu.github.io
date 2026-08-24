@@ -9,196 +9,66 @@ tags:
    - self-improvement
 ---
 
-Long before computers existed, Hammurabi ruled Babylon.
+Long before there were computers, Hammurabi ruled Babylon.
 
-He lived almost four thousand years ago and became one of the best-known kings of ancient Mesopotamia. His name is especially associated with the **Code of Hammurabi**, a collection of laws inscribed on a stone monument. The laws dealt with subjects such as trade, property, debt, family life, wages, agriculture, and punishment.
+He lived almost four thousand years ago and became one of the best-known kings of ancient Mesopotamia. His name is closely associated with the Code of Hammurabi, a collection of laws dealing with trade, property, debt, family life, wages, agriculture, and punishment. He is remembered not only as a ruler, but as someone whose name became connected with the difficult business of organizing a society through rules and consequences.
 
-What makes Hammurabi interesting is not simply that he was a powerful king. His name became connected with the idea of governing a society through rules, responsibilities, rewards, and consequences.
+Thousands of years later, that name appeared in a much less impressive setting: on a computer terminal.
 
-Thousands of years later, that same name appeared in a very different place:
+The game is usually written *Hamurabi*, with one fewer “m” than the king.
 
-a computer terminal.
+Look at it today and it barely resembles what we now call a computer game. There are no graphics, no music, no animation, and no map. The machine prints a few numbers and asks what you want to do.
 
-The game is usually written **Hamurabi**, with one fewer m than the historical king.
+Yet behind those numbers is an idea that later strategy and simulation games would spend enormous amounts of computing power decorating: **you are responsible for a small world, and every decision changes what happens next.**
 
-It is strange to look at Hamurabi today and call it a computer game.
+Hamurabi belongs to the earliest generation of resource-management games. Its roots reach back to *The Sumerian Game*, an educational simulation from the 1960s. Doug Dyment later created a smaller version called *King of Sumeria*, and David H. Ahl published a BASIC version that became widely known as *Hamurabi*.
 
-There are no graphics. No music. No animation. There is not even a map.
+The historical reference makes sense. Hammurabi governed a kingdom. Hamurabi asks the player to imitate that task in a very small mathematical model.
 
-The computer simply gives you a few numbers and asks what you want to do.
+You have people, land, and grain. You have ten years.
 
-Yet behind those numbers is an idea that would later appear in countless strategy and simulation games: **you are responsible for a small world, and every decision has consequences.**
+At the beginning of each year, the game reports the consequences of the previous one. How many people are alive? How much grain was harvested? Did rats eat part of the supply? Did the population grow? Was there a plague?
 
-Hamurabi is one of the earliest resource-management computer games. Its roots go back to *The Sumerian Game*, an educational simulation created in the 1960s. Doug Dyment later developed a smaller version called *King of Sumeria*. David H. Ahl eventually published a BASIC version, and the game became widely known as *Hamurabi*.
+Then you decide how much land to buy or sell, how much grain to feed the population, and how many acres to plant.
 
-The historical connection is easy to understand.
+The questions are simple enough to fit on a terminal screen. The trade-offs are not.
 
-Hammurabi had to govern a kingdom.
+Feed the population too little and people starve. Feed them too generously and there may not be enough grain left to plant. Buy too much land and the reserves become fragile. Plan everything carefully and a poor harvest may still undo you.
 
-Hamurabi asks the player to do something similar, although in a greatly simplified form.
+The game is therefore not really about finding the correct move. It is about making a reasonable decision without knowing exactly what the next year will bring.
 
-You have people.
+That uncertainty is what gives the small model its life. A ruler cannot control the weather. A ruler cannot guarantee a good harvest. Disease and population changes do not wait for the budget to become convenient. What can be controlled is how much risk the system is carrying when something goes wrong.
 
-You have land.
+A bushel of grain makes this visible. It can feed someone today, help produce the next harvest, remain in storage, or indirectly be exchanged for land. Once used for one purpose, it is unavailable for the others.
 
-You have grain.
+In that sense, a resource is really a postponed decision.
 
-And you have ten years to prove that you can manage them.
+This is where the ancient king and the computer game meet more interestingly than the title first suggests. Hammurabi’s world involved land, agriculture, debt, trade, labor, and responsibility. Hamurabi reduces all of that to a few variables, but the central question remains recognizable: how should limited resources be distributed under uncertainty?
 
-At the beginning of each year, the game reports what happened during the previous one. How many people lived in the city? How much grain was harvested? Did rats eat part of the stored grain? Did the population increase? Did a plague arrive?
+Modern games often hide the same problem behind beautiful interfaces, maps, progress bars, buildings, animations, and dozens of resource types. Hamurabi leaves the arithmetic exposed.
 
-Then the decisions begin.
+It also makes growth look less innocent than it first appears. More land sounds like progress. A larger population sounds like success. A bigger harvest sounds like security. But each form of growth creates another obligation.
 
-How much land should you buy?
+More land needs people to cultivate it. More people need grain. More planting requires larger reserves. Expansion can make the kingdom stronger, but expansion without the ability to support it can make the kingdom brittle.
 
-Should you sell some land?
+The same pattern appears outside games. Larger software systems need more infrastructure. More users require more capacity. More features introduce more interactions and more ways for things to fail. Growth changes the problem rather than simply making the old problem bigger.
 
-How much grain should be given to the population?
+What I like most about Hamurabi is how little it needs to create tension. A modern game can occupy gigabytes. Hamurabi needs a short program, some variables, a few random events, and a player who has started caring about the numbers.
 
-How many acres should be planted?
+A good harvest feels like relief. A plague feels unfair. A starvation report turns last year’s confident decision into a mistake.
 
-The questions look simple because they are expressed as numbers.
+Nothing is shown, yet the player imagines a kingdom.
 
-They are not simple.
+That may be the most elegant part of the design. The program does not need to draw the city. A line saying that people starved is enough to suggest a failed policy. A successful harvest becomes another year survived. Ten turns of arithmetic quietly turn into a history.
 
-If too little grain is given to the people, they starve.
+The programmers who created these early games worked under severe limits. There was no room for elaborate presentation, so the rules had to carry the experience. The numbers had to interact in interesting ways. The player had to have something worth deciding.
 
-If too much grain is used for food, there may not be enough left for planting.
+More than half a century later, that still works.
 
-If too much land is purchased, the grain reserves may become dangerously small.
+Hamurabi is primitive if you judge it by what it can display. If you judge it by the questions it asks, it feels surprisingly modern.
 
-And even if everything is planned carefully, the next harvest may be disappointing.
+You have limited resources. The future is uncertain. This year’s sensible decision may become next year’s problem.
 
-That is what makes Hamurabi interesting.
+The cursor waits.
 
-The player is not trying to find one correct move. The player is trying to make reasonable decisions with incomplete information.
-
-In that sense, the game is closer to governing than it first appears.
-
-A ruler cannot control the weather.
-
-A ruler cannot guarantee a good harvest.
-
-A ruler cannot always predict disease or population changes.
-
-What can be controlled is the use of available resources.
-
-A good harvest can make a risky decision look brilliant. A bad harvest can expose a kingdom that has no reserves.
-
-The game therefore teaches something that is easy to forget when looking at modern strategy games: **resources are choices**.
-
-A bushel of grain is not simply grain.
-
-It can feed someone.
-
-It can help produce the next harvest.
-
-It can be saved for the future.
-
-It can indirectly be exchanged for land.
-
-Using it for one purpose means losing the opportunity to use it for another.
-
-This is where the ancient king and the computer game meet in an interesting way.
-
-Hammurabi is remembered partly because governing required rules about land, agriculture, trade, debt, and responsibility.
-
-Hamurabi reduces a kingdom to only a few variables, but the central problem remains recognizable:
-
-How should limited resources be distributed?
-
-Modern games hide these relationships behind beautiful interfaces, progress bars, maps, buildings, animations, and hundreds of different resources. Hamurabi presents almost the same problem using only text and arithmetic.
-
-There is another interesting lesson in the game: growth is not always good.
-
-Buying more land sounds like progress. A larger population sounds like success. A bigger harvest sounds like security.
-
-But every form of growth creates another requirement.
-
-More land needs more people to cultivate it.
-
-More people need more grain.
-
-More planting requires larger reserves.
-
-Expansion without the ability to support it can make the kingdom weaker rather than stronger.
-
-Ancient rulers understood this problem long before computers existed.
-
-A kingdom could conquer new land, but that land still had to be administered, defended, cultivated, and supplied.
-
-Growth creates power.
-
-It also creates responsibility.
-
-This idea appears everywhere in computing and engineering as well.
-
-A larger system needs more resources.
-
-More users require more capacity.
-
-More features create more complexity.
-
-More machines create more things that can fail.
-
-Growth changes the problem.
-
-Hamurabi also demonstrates how little a computer game actually needs in order to create tension.
-
-A modern game may require gigabytes of graphics and audio. Hamurabi needs only a small program, a few variables, some random numbers, and a player who cares about the result.
-
-After entering a number, you wait for the computer to tell you what happened.
-
-A good harvest feels like relief.
-
-A plague feels unfair.
-
-Starvation makes the previous year's decisions suddenly look very different.
-
-Nothing is animated, but a story still appears in the player's mind.
-
-Perhaps this is the most impressive part of the game.
-
-The computer does not show you a kingdom.
-
-It gives you enough information to imagine one.
-
-Behind a line saying that people starved is an entire failed policy. Behind a successful harvest is another year of survival. Behind the final statistics is a ten-year history created mostly from arithmetic.
-
-Hamurabi belongs to a period when computers had extremely limited memory and processing power. Those limitations forced programmers to focus on systems rather than presentation.
-
-There was no space for thousands of textures or complicated visual effects.
-
-The rules had to be interesting.
-
-The numbers had to interact.
-
-The player had to make decisions.
-
-More than half a century later, that design still works.
-
-Hamurabi is primitive when judged by graphics.
-
-It is surprisingly modern when judged by ideas.
-
-Resource management, risk, random events, economic trade-offs, population management, long-term planning, and the consequences of short-term decisions are all there.
-
-Many later strategy and city-building games would make these systems enormously more complicated.
-
-But the basic question remains almost unchanged:
-
-**You have limited resources and an uncertain future. What will you do this year?**
-
-Perhaps that is why the name Hammurabi fits the game so well.
-
-The historical king is remembered thousands of years later for ruling, organizing, legislating, and managing a complex society.
-
-The computer game gives us only grain, land, people, and a blinking cursor.
-
-But for a few minutes, it asks us to become a ruler too.
-
-And it reminds us of something that applies equally well to ancient kingdoms, computer systems, and ordinary life:
-
-Good decisions are not about predicting the future perfectly.
-
-They are about using today's resources without destroying tomorrow's possibilities.
+What do you do?

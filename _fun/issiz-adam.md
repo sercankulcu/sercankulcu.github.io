@@ -9,332 +9,88 @@ tags:
    - life
 ---
 
-Some films make you think about love.
+When *Issız Adam* ended, I called my mother.
 
-Some make you think about loneliness.
+That is still the most accurate review I can give the film.
 
-*Issız Adam* made me call my mother.
+I had realized something slightly embarrassing: in almost thirty years, I had hardly ever called her **“anneciğim.”** There was no family drama behind this. I loved my mother. We simply belonged to one of those families where affection was more often expressed through ordinary acts than through explicit declarations.
 
-That is probably the simplest way I can explain what the film did to me.
+A plate of food appeared in front of you. Someone asked whether you had taken a jacket. You were told to call when you arrived.
 
-When I first wrote about it, I realized something slightly embarrassing:
+Nobody needed to say very much.
 
-I had gone almost thirty years without calling my mother **"anneciğim."**
+At least, that was what we assumed.
 
-Not because I did not love her.
+Then I watched *Issız Adam* and picked up the phone.
 
-Not because there was a problem between us.
+That alone makes it difficult for me to dismiss the film, whatever its flaws may be. A work of art does not have to be perfect to become important. Sometimes it simply has to reach the right part of a person at the right time.
 
-It was simply not a word I used.
+The film follows Alper, a man who has built a comfortable life around independence. He lives alone, owns a restaurant, chooses his own schedule, and answers to nobody. From the outside, the arrangement looks attractive. Nobody asks where he has been. Nobody interferes with his plans. He can leave when he wants and return when he wants.
 
-Maybe some families say these things easily.
+It looks like freedom.
 
-Maybe some people grow up saying "I love you" every day.
+The film made me notice how easily freedom and loneliness can resemble each other from a distance.
 
-Others communicate differently.
+Living alone can be very comfortable. Perhaps too comfortable. You create routines that require no negotiation. Everything stays where you left it. Nobody complains about the music, asks why you came home late, or wants to discuss something when you would rather remain silent.
 
-A plate of food appears in front of you.
+After enough time, compromise begins to feel less like a normal part of human life and more like an intrusion.
 
-Someone asks whether you took a jacket.
+Then another person enters the picture.
 
-You are told to call when you arrive.
-
-Nobody says very much.
-
-But everybody somehow knows.
-
-At least we think everybody knows.
-
-Then I watched *Issız Adam*.
-
-And when the film ended, I called my mother.
-
-That alone makes it difficult for me to dismiss the film.
-
-A film does not have to be perfect to be important.
-
-Sometimes it only has to reach the right place at the right moment.
-
-The story is about Alper.
-
-He lives alone.
-
-He has his own restaurant.
-
-He seems independent.
-
-He has built a life that does not require too much from anybody else.
-
-From the outside, there is something attractive about that.
-
-Nobody asks where he is.
-
-Nobody tells him when to come home.
-
-Nobody interferes with his choices.
-
-He can eat when he wants.
-
-Sleep when he wants.
-
-Meet whoever he wants.
-
-Leave whenever he wants.
-
-Freedom.
-
-At least that is what it looks like.
-
-But freedom and loneliness can look very similar from a distance.
-
-That was the part of the film that stayed with me.
-
-Living alone can become extremely comfortable.
-
-Maybe too comfortable.
-
-You create your own routines.
-
-Everything is where you left it.
-
-Nobody complains about the music.
-
-Nobody asks why you came home late.
-
-Nobody wants to discuss what you are feeling when you would rather remain silent.
-
-After enough time, compromise begins to feel like an unnecessary disturbance.
-
-Then somebody enters your life.
-
-Suddenly there is another schedule.
-
-Another opinion.
-
-Another toothbrush.
-
-Another person waiting for an answer.
-
-The things that make a relationship valuable are often exactly the things that make it difficult.
-
-You are no longer the only person in the room.
-
-For someone who has learned to live alone, this can feel almost threatening.
+Suddenly there is another schedule, another opinion, another toothbrush, another person waiting for an answer. The qualities that make a relationship valuable are often the same qualities that make it difficult: you are no longer the only person in the room.
 
 I understood that more than I wanted to.
 
-When I wrote about the film in 2011, I mentioned people who had been living alone for five or six years and whose number of close friends could be counted on one hand.
+When I first wrote about the film, I mentioned people who had lived alone for five or six years and whose close friends could be counted on one hand. That description was not entirely accidental.
 
-That description was not completely accidental.
+Loneliness is strange because it does not always announce itself as pain. Sometimes it feels peaceful. You close the door and the world stops asking things from you. Nobody is waiting. Nobody needs an explanation.
 
-Loneliness is strange because it does not always feel bad.
+The danger is that you can become very good at this.
 
-Sometimes it feels peaceful.
+You learn how not to need anyone—or at least how to make that idea feel convincing.
 
-You come home.
+The problem appears when someone finally matters. Relationships require the exact skills that a highly self-contained life allows you to avoid: patience, compromise, explanation, adjustment, vulnerability.
 
-Close the door.
+There is a difference between being able to live alone and needing to remain alone.
 
-Everything becomes quiet.
+Alper seems to cross that line without fully noticing it.
 
-Nobody expects anything.
+Ada offers him something almost frightening in its ordinariness. Not an impossible adventure, but a life: meals, conversations, habits, family, continuity, the possibility that tomorrow will contain the same person as today.
 
-At first, that can be wonderful.
+For many people, that sounds reassuring. To somebody whose identity has been built around independence, it can sound like captivity.
 
-The danger is that you can become good at it.
+That is where the film becomes painful for me. Alper does not lose Ada because he feels nothing. He loses her because loving someone and knowing how to live with someone are different abilities.
 
-Very good.
+We often speak about love as if it automatically teaches the rest. It does not.
 
-You learn how not to need anybody.
+You can love someone and still be selfish. You can love someone and still be afraid. You can love someone and deliberately create the distance that eventually destroys the relationship.
 
-Or at least how to convince yourself that you do not.
+Sometimes the most damaging person is not the one who feels nothing, but the one who feels something and cannot carry the responsibility that follows from it.
 
-The problem appears when someone finally becomes important.
+The film also made me reconsider the way we praise independence. Of course adults should be able to stand on their own feet. Nobody should need another person simply in order to function.
 
-A relationship requires exactly the skills you have spent years avoiding.
+But complete independence has a cost.
 
-Patience.
+If nobody can affect your life, nobody can hurt you. Nobody can become deeply important either.
 
-Compromise.
-
-Explaining yourself.
-
-Changing plans.
-
-Being responsible for how another person feels.
-
-Allowing somebody to see the parts of your life you normally keep closed.
-
-There is a difference between being able to live alone and needing to live alone.
-
-I think Alper crosses that line without noticing.
-
-Ada offers him something very ordinary.
-
-That is probably why it frightens him.
-
-Not an extraordinary adventure.
-
-Not some impossible passion.
-
-A life.
-
-Meals together.
-
-Conversations.
-
-Habits.
-
-Family.
-
-Continuity.
-
-The possibility that tomorrow might contain the same person as today.
-
-For many people, that sounds comforting.
-
-For someone who has built his identity around independence, it can sound like a trap.
-
-And that is where the film becomes painful.
-
-Because Alper does not lose Ada because he does not love her.
-
-He loses her because loving someone and knowing how to live with someone are different skills.
-
-That is an uncomfortable thought.
-
-We often talk about relationships as if love automatically teaches us everything else.
-
-It doesn't.
-
-You can love someone and still be selfish.
-
-You can love someone and still be afraid.
-
-You can love someone and still make the wrong decision.
-
-You can even love someone and deliberately push them away.
-
-Sometimes the person who hurts us most is not the person who feels nothing.
-
-It is the person who feels something but cannot carry the responsibility that comes with it.
-
-The film also made me think about the word "independence."
-
-We usually treat independence as something unquestionably good.
-
-Children should become independent.
-
-Adults should stand on their own feet.
-
-Nobody should need another person in order to survive.
-
-All of that is true.
-
-But perhaps complete independence is not the final goal.
-
-If nobody can affect your life, nobody can hurt you.
-
-But nobody can become deeply important either.
-
-There is a price for being unreachable.
-
-I did not think about all of this immediately after the film.
-
-The first thing I did was much simpler.
+Still, these were not the first thoughts I had when the film ended.
 
 I thought about my mother.
 
-There is something about parents that makes us careless with time.
+Parents create a peculiar illusion of permanence. They have always been there, so we behave as though they will always continue to be there. Phone calls are postponed. Conversations are shortened. There will be another weekend, another holiday, another dinner.
 
-They have always been there.
+Until there is not.
 
-So we assume they will continue to be there.
-
-We postpone phone calls.
-
-We keep conversations short.
-
-We become busy.
-
-We think there will be another weekend.
-
-Another holiday.
-
-Another dinner.
-
-Another chance to say something.
-
-We treat permanent things as if permanence were guaranteed.
-
-Maybe the film reminded me that it is not.
-
-One day, all those ordinary conversations become memories.
-
-The questions that once irritated us become the things we would give anything to hear again.
-
-"Did you eat?"
-
-"Where are you?"
-
-"When are you coming?"
-
-"Take something warm with you."
-
-There is nothing poetic about these sentences while they are being said.
+The ordinary questions that sometimes irritate us—Did you eat? Where are you? When are you coming? Take something warm with you—contain almost no poetry while we are hearing them.
 
 Later, they may become poetry.
 
-That night, I called my mother.
+I do not remember the whole conversation from that night. We probably talked about ordinary things. What I was doing. Whether I had eaten. What she was doing.
 
-I do not remember the entire conversation.
+That seems appropriate.
 
-That is probably appropriate.
+Most important moments do not identify themselves as important while they are happening.
 
-Most important moments do not announce themselves as important while they are happening.
+Years later, I am not especially interested in deciding whether *Issız Adam* is a perfect film. It made me pick up the phone.
 
-Maybe we talked about ordinary things.
-
-What I was doing.
-
-Whether I had eaten.
-
-What she was doing.
-
-Something completely forgettable.
-
-But I remember why I called.
-
-A film about loneliness reminded me that being alone and being loved are not opposites.
-
-You can be surrounded by people and still be lonely.
-
-You can live by yourself and still have people who carry you inside their daily lives.
-
-The question is whether you remember to carry them in yours.
-
-Years later, I do not know whether I would describe *Issız Adam* as a perfect film.
-
-That does not matter much to me.
-
-It made me pick up the phone.
-
-Sometimes art does not need to change your life.
-
-Sometimes changing what you do in the next five minutes is enough.
-
-So if there is someone you have been meaning to call, call them.
-
-Not because something terrible is about to happen.
-
-Not because you need to make a dramatic speech.
-
-Just because they are there.
-
-And because one day, they won't be.
-
-That night, *Issız Adam* reminded me of something I should not have needed a film to remember:
-
-Love is not only something we feel.
-
-Sometimes it is simply making the call.
+Sometimes that is enough.
