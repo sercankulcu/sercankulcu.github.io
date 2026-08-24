@@ -9,148 +9,38 @@ tags:
    - nostalgia
 ---
 
-I first watched *Back to the Future* on television during a summer holiday.
+The first time I watched *Back to the Future*, I wanted the DeLorean.
 
-I was not thinking about time travel seriously.
+That was the entire intellectual effect of the film on me. A car with doors that opened upward could already have occupied my imagination for weeks; a car that also travelled through time seemed almost unfair to every other machine ever built.
 
-I was thinking about the car.
+I saw it on television during a summer holiday. The afternoon was too hot to go outside, the curtains were half closed, and I lay on the floor because that was the coolest part of the room. I remember the blue light from the television and the pleasure of Doc Brown explaining something impossible with the confidence of a man discussing a household repair.
 
-The DeLorean looked perfect.
+Years later, when I watched the film again, the car was still wonderful. But it was no longer the strangest idea in the story.
 
-Doors opening upward.
+Meeting your parents before they became your parents was.
 
-Lights.
+Children enter their parents' lives halfway through. We know them after important choices have already been made, after friendships have come and gone, after ambitions have been modified, after disappointments have been absorbed into personality. A parent arrives in a child's consciousness as if fully formed, carrying rules and habits that seem to have existed forever.
 
-Displays.
+Marty receives the impossible privilege of seeing the drafts.
 
-Wires.
+His father is not yet the timid man he knows. His mother is not yet the mother who tells stories about how people behaved properly in her youth. They are young, uncertain, vain, frightened, impulsive, and entirely unaware that one day another human being will treat them as the source of authority.
 
-A machine with one impossible function.
+That idea changed something for me. I began asking my parents questions I had never thought to ask: What music did you listen to? Who were your friends? What did you want to become? What did you buy with your first salary? The answers were rarely dramatic. That was precisely why I liked them. They turned parents back into people.
 
-For a while, that was enough.
+Time-travel stories make another ordinary truth visible: enormous consequences may begin in moments too small to be recognized at the time. Someone misses a bus. A teacher encourages a student. Two people happen to attend the same event. A family moves to another city. A person accepts one job and rejects another. Years later, entire lives hang from those decisions.
 
-Then the film quietly introduced a much stranger idea.
+We cannot return to test the alternatives, which is probably why the phrase *what if* has such power. Fiction gives the question machinery. Build a device, enter a date, go back, and discover what the other branch of the decision tree contains.
 
-Imagine meeting your parents before they became your parents.
+Real life is less cooperative. We receive memory instead, and memory has no experimental control group.
 
-Not as authority figures.
+Doc Brown's enthusiasm also looks different to me now. He builds something absurd before asking whether it is useful. There is something wonderfully pure in that curiosity. Many technical projects begin with a similarly irresponsible question: can this be done? Practicality arrives later carrying forms.
 
-Not as the people who already know the rules.
+When I was young, I thought *Back to the Future* was about escaping the limitations of time.
 
-As young people.
+Now I think it is partly about discovering that the past was once as open and uncertain as the present feels to us.
 
-Uncertain.
-
-Awkward.
-
-Making mistakes.
-
-That idea stayed with me longer than the time machine.
-
-Children know their parents only from the middle of the story.
-
-By the time we become aware of them as people, they already have histories we did not witness.
-
-They had friends before us.
-
-Fears before us.
-
-Plans that changed.
-
-Versions of themselves we will never meet.
-
-*Marty* gets to meet those versions.
-
-That makes the comedy unexpectedly moving.
-
-George McFly is especially interesting.
-
-Marty has grown up knowing his father as timid and defeated.
-
-Then he discovers that this personality was not inevitable.
-
-A few decisions, moments of courage, humiliations, and opportunities shaped the person he later knew.
-
-The film turns personality into something historical.
-
-We often speak as if people simply are what they are.
-
-In reality, a person is partly the accumulated result of moments nobody else remembers.
-
-That thought made the time-travel mechanics more interesting.
-
-Changing one event changes many others.
-
-The film exaggerates this for comedy, but ordinary life contains a quieter version.
-
-A teacher encourages someone.
-
-A person misses a bus.
-
-Two people meet.
-
-Someone chooses one university instead of another.
-
-A family moves.
-
-A job is accepted.
-
-Years later, entire lives exist because of decisions that seemed small at the time.
-
-We cannot travel backward to test the alternatives.
-
-That may be why we think about them so much.
-
-What if?
-
-What if I had gone?
-
-What if I had stayed?
-
-What if I had said yes?
-
-Time-travel stories turn regret into engineering.
-
-Build the machine.
-
-Set the date.
-
-Try again.
-
-Real life gives us memory instead.
-
-Less useful.
-
-More dangerous.
-
-Doc Brown's enthusiasm also made an impression on me.
-
-He builds something absurd because curiosity is stronger than practicality.
-
-That is a type of character I have always liked.
-
-The person who asks, “Can this be done?” before asking whether anybody requested it.
-
-Many interesting technical projects probably begin that way.
-
-Not with a business case.
-
-With curiosity.
-
-Of course, most do not produce time machines.
-
-Still, the impulse is familiar.
-
-When I watched the film again later, the DeLorean was still wonderful.
-
-But the family story had become more interesting.
-
-That is one of the pleasures of revisiting old films.
-
-The movie stays the same.
-
-The viewer changes.
+The film stays the same. The viewer moves.
 
 As a child, I wanted the car.
 
-Later, I wanted the chance to ask my parents what they were like before I knew them.
+Later, I wanted an afternoon with my parents before they knew who I was.

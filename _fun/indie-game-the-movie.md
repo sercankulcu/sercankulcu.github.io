@@ -11,118 +11,64 @@ tags:
 
 I watched *Indie Game: The Movie* on a Sunday afternoon when I was supposed to be doing something productive.
 
-That may be why it affected me.
+That coincidence was unhelpful.
 
-The room was bright, the computer was on, and several unfinished tasks were waiting nearby. I started the documentary as a break.
+Several unfinished tasks were open on my computer. I started the documentary as a break from work and soon found myself watching people whose inability to stop working made my own procrastination look almost healthy.
 
-It did not feel like a break for very long.
-
-The film follows independent game developers working on projects that have consumed years of their lives. There are bugs, deadlines, money problems, public expectations, exhaustion, and the strange psychological pressure of turning a private obsession into something strangers can judge.
+The film follows independent game developers through the long, unpleasant middle of creation: the part after the exciting idea and before the finished thing. There are bugs, deadlines, money problems, arguments, exhaustion and the growing fear that years of private effort will eventually be compressed into a stranger's five-minute judgment.
 
 I expected a documentary about games.
 
-I ended up thinking about work.
+I recognized programming.
 
-More specifically, about what happens when the thing you are making becomes too closely connected to your sense of self.
+There is a dangerous moment in any personal project when the object stops being merely something you are making and begins to function as evidence about you.
 
-Programming makes this surprisingly easy.
+At first, abandonment is easy. A small experiment can fail without meaning much. Then you spend enough evenings on it. You solve problems nobody else will ever know existed. You redesign parts that seemed finished. You delete weeks of work because the structure was wrong. Time accumulates inside the project.
 
-At first, a project is just a project. You are experimenting. You can abandon it without explanation.
+Eventually criticism of the thing can feel like criticism of the person who spent that time.
 
-Then you spend enough evenings on it.
+This is irrational.
 
-You solve difficult problems. You redesign parts nobody else has seen. You delete weeks of work. You become familiar with every flaw.
+It is also common.
 
-Eventually the project begins to carry evidence of your time.
+I once built a small application for no particularly important reason and delayed showing it to anyone because I kept finding details to improve. A button was slightly misaligned. One transition could be smoother. The wording of an error message bothered me. None of these flaws prevented the application from working.
 
-That changes the stakes.
+The real problem was that finishing would remove my control over the audience.
 
-If someone dislikes a small program you made in an afternoon, who cares?
+While the project remained unfinished, every weakness was temporary. Once released, weakness became visible.
 
-If someone dismisses something that consumed two years of your life, it is much harder to keep the criticism attached only to the software.
+The documentary understands this fear.
 
-The documentary captures that boundary becoming dangerously thin.
-
-A bug is no longer just a bug.
-
-A delay is not merely a scheduling problem.
-
-A review can feel like a verdict on the person who made the thing.
-
-I recognized a much smaller version of this from programming.
-
-There is a peculiar emotional progression when you build something alone. In the beginning, you are excited because you can see what the project might become.
-
-In the middle, you mostly see everything that is wrong with it.
-
-Near the end, you are tired enough that even simple decisions feel expensive.
-
-Then comes the cruel part.
-
-You have to release it.
-
-For months or years, the project has existed inside a protected environment where you understand every compromise. You know why a feature is missing. You know which ugly solution was necessary. You remember the bug that took three nights to find.
-
-The user knows none of this.
+Users do not know the history of a compromise. They do not know that a bug took three nights to find or that a feature was removed to save the rest of the system. They encounter only the present version.
 
 They click.
 
 It works or it does not.
 
-They like it or they do not.
+They care or they do not.
 
-That simplicity is brutal.
+There is a kind of cruelty in that simplicity.
 
-Engineers often talk about quality as though it can be measured entirely through technical properties. Reliability, performance, maintainability, correctness.
+Creative software makes the situation harder because technical success is not enough. A program can be correct and unwanted. A game can run perfectly and leave the player cold. Engineering asks whether the thing works; art adds the less answerable question of whether anyone feels anything.
 
-Creative software adds another layer.
+The romantic story of independent creation is freedom. No manager. No committee. Build exactly what you want.
 
-Does anyone care?
+The documentary shows the hidden clause.
 
-A perfectly engineered thing that nobody wants can still feel like a failure. A messy thing that connects with people can become important despite its flaws.
+If nobody can stop you, nobody can tell you when to stop.
 
-Games make this tension especially visible because software and expression occupy the same object.
+Freedom can produce a workday with no natural boundary. There is always one more improvement available, which means perfection becomes a horizon that retreats at exactly your speed.
 
-The code has to function.
+After the documentary ended, the unfinished work on my own screen looked less innocent.
 
-The experience has to mean something.
+I closed one file and sent another project to someone before I could revise it again.
 
-That combination is difficult.
+Nothing dramatic happened.
 
-What I appreciated most in *Indie Game: The Movie* was that it did not make independent creation look like permanent freedom.
+They found a bug.
 
-The romantic version is attractive: escape the company, build your own idea, answer to nobody.
+That was useful.
 
-But answering to nobody can also mean there is nobody to stop you.
+Finishing, I realized, is not the point where nothing more can be improved.
 
-Nobody to say the feature is good enough.
-
-Nobody to tell you to go home.
-
-Nobody to separate your identity from the project when you have forgotten how.
-
-Freedom can become another form of pressure when every decision is yours.
-
-When the film ended, I looked at the unfinished work on my own screen.
-
-Nothing I was doing carried the same financial or emotional stakes as the projects in the documentary.
-
-Still, I recognized the temptation.
-
-Just one more improvement.
-
-One more fix.
-
-One more evening.
-
-Then it will be ready.
-
-Software has a dangerous property: there is almost always one more thing you could improve.
-
-At some point, finishing becomes less a technical decision than an act of courage.
-
-You stop touching it.
-
-You let other people see it.
-
-And you discover that the project now has a life that no longer belongs entirely to you.
+It is the point where you accept that improvement must continue in public.

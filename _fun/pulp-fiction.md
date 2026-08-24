@@ -9,126 +9,64 @@ tags:
    - chance
 ---
 
-I watched *Pulp Fiction* on a night when I was too tired to watch anything complicated.
+I watched *Pulp Fiction* on a night when I was too tired for a complicated film.
 
-This turned out to be a poor choice.
+This was bad planning.
 
-A friend had given me the film and said almost nothing about it except, “Watch it.”
+A friend had given me the DVD and said only, “Watch it.” I began without knowing the structure. Half an hour later, I was convinced either I had missed something or the movie had.
 
-So I did.
+Then I realized the confusion was part of the entertainment.
 
-At first I thought I had missed something.
+The film does not arrange events in the order they happened. Once I stopped demanding that courtesy, another question became more interesting than “what happens next?”
 
-Then I thought the film had missed something.
+Why am I seeing this now?
 
-Then I understood that the confusion was part of the design.
+That question changed the way I watched stories.
 
-The story refuses to behave chronologically. Events appear out of order. A character can disappear and return. Something that feels like an ending may occur before something that feels like a beginning.
+Chronology gives events sequence. Editing gives them meaning.
 
-What surprised me was how quickly I stopped caring.
+A character can die and later walk into a room alive without resurrection, simply because the storyteller has moved us to an earlier point. The knowledge of the death follows us backward, changing every ordinary gesture the character makes.
 
-Once I accepted that the film was not going to arrange time for my convenience, I started paying attention differently.
+The event is the same.
 
-Instead of asking, “What happens next?” I began asking, “Why am I seeing this now?”
+Our position is different.
 
-That is a more interesting question than I expected from a crime film.
+The dialogue surprised me even more. Criminals are expected to discuss crime. The people in *Pulp Fiction* discuss hamburgers, foot massages, television pilots, coffee and names, then commit acts of terrible violence and return to conversation.
 
-The structure made me think about how much storytelling depends on order.
+The effect is unsettling because villains usually help us by behaving like villains.
 
-Take the same events and rearrange them, and meaning changes.
+These people behave like people.
 
-A person we believe is doomed can suddenly be alive again—not because the story has reversed death, but because the storyteller has moved us to an earlier point.
+Jules became the character I carried away from the film. Bullets miss him and Vincent, and the two men experience the same physical event. Vincent calls it luck. Jules decides it is a message.
 
-Chronology gives events logic.
+Whether a miracle objectively occurred is almost irrelevant.
 
-Editing gives them emphasis.
+Interpretation creates the consequence.
 
-I noticed the dialogue even more.
+Two people can survive the same accident. One continues exactly as before. The other changes careers, relationships, religion, habits or direction.
 
-People in crime films are supposed to discuss crimes.
+The event does not contain the future.
 
-The characters in *Pulp Fiction* discuss hamburgers, foot massages, television pilots, names, coffee, and all kinds of things that appear unrelated to the danger surrounding them.
+The meaning assigned to it helps produce the future.
 
-That made the violence stranger.
+Years later I had a minor car accident. Nobody was hurt, the damage was repairable, and objectively the event was not important. Still, for several weeks I drove differently. A friend who heard the story said, “You were lucky.”
 
-Ordinary conversation and terrible behavior occupy the same people.
+He was right.
 
-There is no clean transition where the criminals become “criminal.”
+I also understood Jules.
 
-They talk like people.
+Objects acquire unusual gravity in the film: a watch, a briefcase, a wallet. None has meaning by itself. People attach memory, danger, honor or desire to them.
 
-Then they do something horrifying.
+We do this constantly.
 
-Then they talk again.
+An old ticket is paper to everyone except the person who kept it.
 
-That mixture is disturbing because we prefer villains to announce themselves.
+When the film ended that first night, I immediately replayed the opening.
 
-The film does not give us that comfort.
+Nothing in the scene had changed.
 
-Jules became the character I kept thinking about.
+But it was no longer the beginning.
 
-His transformation begins with chance—or what he chooses to interpret as something more than chance.
-
-Bullets miss him.
-
-That event could mean nothing.
-
-It could mean luck.
-
-It could mean poor shooting.
-
-He decides it means something.
-
-That decision changes his life.
-
-Whether a miracle objectively happened is almost beside the point.
-
-Human beings live partly through interpretation.
-
-Two people can survive the same event.
-
-One says, “We were lucky.”
-
-The other says, “I have to change.”
-
-The event is identical.
-
-The future is not.
-
-Vincent's response is almost the opposite. He moves through the film as though consequences are temporary inconveniences. Problems happen; then somebody clever cleans them up.
-
-For a while that worldview works.
-
-Until it does not.
-
-I also liked how objects acquire strange importance.
-
-A briefcase.
-
-A watch.
-
-A wallet.
-
-A syringe.
-
-None of them are inherently meaningful. The characters make them meaningful through desire, memory, fear, or obligation.
-
-That seems to be how life works too.
-
-We attach enormous stories to ordinary objects, then forget that somebody else may see only the object.
-
-When the film ended, it was very late.
-
-I immediately wanted to watch the beginning again.
-
-Not because I had failed to understand the plot.
-
-Because the beginning was no longer the beginning.
-
-The film had changed it by showing me what came before and after.
+The movie had rearranged my understanding without altering a frame.
 
 That was the trick I admired most.
-
-Nothing on the screen had changed.
-
-Only my position in the story had.

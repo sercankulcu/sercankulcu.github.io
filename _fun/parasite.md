@@ -9,160 +9,52 @@ tags:
    - space
 ---
 
-I watched *Parasite* in a cinema without reading much about it beforehand.
+I watched *Parasite* in a cinema without reading a review, which is increasingly difficult to achieve with a film everyone is discussing.
 
-That was a good decision.
+For the first half hour I thought I knew what kind of story I was watching. Then someone rang a doorbell.
 
-For the first part of the film, I thought I understood what kind of story I was watching.
+After that, classification became useless.
 
-Then the doorbell rang.
+Comedy darkened into suspense, suspense acquired the shape of horror, and horror eventually revealed something sadder underneath. Yet through every shift the film kept returning to the same material fact: where people live.
 
-After that, I stopped trying to classify it.
+The Kim family occupies a semi-basement. Their window is close to the pavement, low enough to collect drunk passersby, dust, fumigation and the legs of people whose lives take place above them. The Park house sits high behind walls, glass and carefully designed space.
 
-Comedy became tension.
+The difference between the families is explained architecturally before it is explained economically.
 
-Tension became horror.
+You move between them through stairs.
 
-Horror became something sadder.
+That is what I noticed when I left the cinema. The parking garage had a long concrete staircase, and for the first time that evening the ordinary act of climbing felt like commentary.
 
-The film kept changing genre without changing its real subject.
-
-Space.
-
-That is what I kept thinking about afterward.
-
-The Kim family lives below street level.
-
-The Park family lives high above the city.
-
-One home looks outward through a window that collects drunken strangers and pesticide.
-
-The other looks into a carefully designed garden.
-
-The difference is not explained through speeches.
-
-You walk it.
-
-Stairs.
-
-More stairs.
-
-Down.
-
-Up.
-
-Down again.
-
-The city itself becomes a diagram of class.
-
-I found that much more effective than a character explaining inequality.
-
-Architecture is argument.
-
-The rain sequence made this impossible to miss.
-
-For one family, rain is beautiful.
-
-The garden looks fresh.
-
-The air becomes cleaner.
-
-For the other family, the same rain destroys their home.
+The rain sequence is the film's argument in miniature. For the Parks, the storm clears the air and leaves the garden beautiful. For the Kims, the same rain turns home into sewage.
 
 Same weather.
 
-Different consequence.
+Not the same event.
 
-That is one of the simplest and strongest ideas in the film.
+We often describe large events as though they happen equally to everyone. Recession, inflation, a storm, an epidemic, a power cut. The noun is shared; the capacity to absorb it is not.
 
-We often talk about events as though they happen equally to everyone.
+This is where *Parasite* avoids an easier moral structure. The poor family is not made automatically virtuous, nor the rich family automatically monstrous. The Kims lie, manipulate and hurt people. The Parks can be pleasant, even generous, inside the terms of their world.
 
-A recession.
+The problem is larger than niceness.
 
-A storm.
+Mr. Park's obsession with the “line” reveals this. Class is not announced as ideology. It appears in discomfort, distance, smell and assumptions about who may become familiar. He does not need to wake each morning deciding to humiliate anyone. The hierarchy already exists in the arrangement of space.
 
-A pandemic.
+The word *smell* becomes particularly cruel because it follows the body across disguise. Clothes can change. Speech can be rehearsed. Qualifications can be forged. The body still carries evidence of where it sleeps.
 
-A price increase.
+A few weeks after seeing the film, I visited an apartment for rent. The advertisement had described it as “garden level.” The window looked directly at the tires of parked cars.
 
-Technically, the event is shared.
+I thought of the Kim home and laughed, then felt bad for laughing.
 
-The ability to absorb it is not.
+Language, too, has architecture.
 
-The film also avoids making poverty automatically noble.
+A basement can become garden level if the person selling it controls the description.
 
-The Kim family lies.
+By the end of *Parasite*, the house has revealed spaces even its owners barely know. That feels like the film's final insult to the fantasy that wealth provides complete knowledge of the world one owns.
 
-Manipulates.
+Somebody may be beneath you.
 
-Hurts other people.
+Not metaphorically.
 
-That is important.
+Actually beneath you.
 
-A weaker film might have made them morally pure victims.
-
-*Parasite* is more uncomfortable.
-
-People under pressure can still behave badly.
-
-People with money can still be kind in ordinary situations.
-
-The problem is larger than individual niceness.
-
-That is what makes the film difficult.
-
-Mr. Park is not a cartoon villain.
-
-He is polite.
-
-He pays.
-
-He does not wake up planning to humiliate anyone.
-
-Yet there is always a line.
-
-A smell.
-
-A boundary.
-
-Do not cross it.
-
-Class appears through small reactions.
-
-That felt realistic.
-
-People rarely announce hierarchy directly.
-
-They perform it through distance.
-
-The word “smell” becomes especially cruel because it is something the Kims cannot easily remove.
-
-Clothes can be changed.
-
-Language can be rehearsed.
-
-Credentials can be invented.
-
-The body still carries evidence of where it sleeps.
-
-When the film ended, I remember walking out of the cinema and noticing stairs.
-
-That sounds ridiculous.
-
-But the film had made vertical movement meaningful.
-
-Up.
-
-Down.
-
-Who lives where?
-
-Who enters through which door?
-
-Who is visible?
-
-Who is hidden underneath?
-
-A few hours earlier, stairs were architecture.
-
-After *Parasite*, they looked like social structure.
+The genius of the film is that, after two hours, a staircase is no longer merely a staircase.

@@ -9,166 +9,48 @@ tags:
    - kindness
 ---
 
-I first watched *Forrest Gump* during an afternoon when I had nowhere to be.
+I first watched *Forrest Gump* on an afternoon when I had nowhere to go, which may be the ideal condition for a film that begins with a man sitting on a bench and talking to whoever happens to sit beside him.
 
-That detail matters because the film itself feels like somebody telling you a very long story while neither of you is in a hurry.
+The film moves through wars, elections, protests, businesses, television appearances and cultural changes, yet Forrest rarely behaves as if he is living inside capital-H History. He is usually trying to understand the next person, the next promise, the next task.
 
-There is a bench.
+I liked that immediately.
 
-A stranger.
+We tend to imagine historical periods from above. Dates, presidents, wars, inventions, movements. People living inside those years experience something much less organized. They still miss buses, cook dinner, fall in love, worry about money and misunderstand each other. History happens while daily life is distracted.
 
-Then another stranger.
+Forrest becomes entangled with extraordinary events without becoming impressed by his own importance. At first his simplicity can look like a lack. Over time it becomes a contrast with everyone who cannot stop narrating themselves.
 
-Forrest talks.
+I am very good at building explanations around problems. Many people are. We replay conversations, prepare arguments for discussions that have already ended, imagine alternative outcomes and search for motives until thought is producing only more thought.
 
-His life keeps becoming entangled with events much larger than he is: war, politics, protest, business, celebrity, cultural change.
+Forrest rarely constructs those rooms.
 
-Yet he rarely behaves as though he is living through History with a capital H.
+He acts, often because he made a promise.
 
-He is usually trying to do the next thing in front of him.
+Bubba talks about shrimp; Forrest listens. Lieutenant Dan is furious; Forrest remains. Jenny disappears; his affection does not transform into an argument about what she owes him.
 
-That contrast stayed with me.
+This does not make him wise in every situation. Simplicity can expose him to people who understand the world more strategically. But it protects him from a particular kind of self-deception: the need to make every action proof of an identity.
 
-We imagine important historical periods as though everyone living through them understood their importance.
+The running sequence is my favorite example. Forrest runs because he wants to run. The world finds this unacceptable. People follow him and assume there must be a message. Journalists ask what the running means. Strangers turn movement into philosophy because purposeless action makes us nervous.
 
-They did not.
+Then one day he stops.
 
-People still had lunch.
+The people who needed his action to contain a theory are disappointed.
 
-Missed buses.
+I remember watching the film again years later with my father. We laughed at different places. He responded more strongly to Lieutenant Dan; I was more interested in Jenny. Afterward we argued about whether Forrest was lucky. My father said luck explained too much. “He also keeps doing things,” he said.
 
-Fell in love with the wrong person.
+That sentence stayed with me.
 
-Worried about money.
+Chance shapes the film. A feather moves in the air, people meet, events arrive without permission. But Forrest also keeps choosing what to do next. Destiny and accident do not have to cancel agency.
 
-Went to work.
-
-History happens while daily life is busy being daily life.
-
-Forrest moves through extraordinary events with an almost complete lack of self-importance.
-
-At first that can look like naivety.
-
-Later I began to see it as one of the film's criticisms of the rest of us.
-
-Most people spend enormous energy constructing explanations for who they are.
-
-Forrest often simply does the thing he believes he should do.
-
-Bubba talks about shrimp.
-
-Forrest listens.
-
-Lieutenant Dan is furious.
-
-Forrest stays.
-
-Jenny leaves.
-
-Forrest continues loving her without turning that love into a theory about what she owes him.
-
-This simplicity does not mean his life is simple.
-
-He experiences rejection, violence, war, death, loneliness, success, and loss.
-
-What changes is the amount of narrative he adds to suffering.
-
-That affected me more than the famous lines.
-
-I am very capable of thinking about a problem long after thinking has stopped improving it.
-
-Many people are.
-
-We replay conversations.
-
-Construct alternative outcomes.
-
-Search for hidden motives.
-
-Prepare arguments for discussions that ended three days ago.
-
-Forrest's mind does not seem to build those elaborate rooms.
-
-Sometimes that protects him.
-
-Sometimes it leaves him vulnerable.
-
-The running sequence is funny because the world refuses to accept purposeless action.
-
-Forrest runs because he feels like running.
-
-People follow him.
-
-They assume there must be a message.
-
-There has to be a philosophy.
-
-A movement.
-
-A reason.
-
-We are uncomfortable when an action does not explain itself.
-
-The film keeps playing with that desire for meaning.
-
-The feather at the beginning and end can be read in many ways.
-
-Destiny.
-
-Chance.
-
-God.
-
-Randomness.
-
-Life carrying us where it wants.
-
-The film never forces one answer.
-
-Forrest's life contains both accident and decision.
-
-He cannot choose everything that happens to him.
-
-He repeatedly chooses what to do next.
-
-Maybe that balance is enough.
-
-Jenny made the film sadder for me when I watched it again years later.
-
-The first time, I mostly wondered why she kept leaving.
-
-Later, I saw someone whose ability to accept uncomplicated love had been damaged long before Forrest offered it.
+Jenny became sadder for me on later viewings. The first time I mostly wondered why she kept leaving. Eventually I saw someone whose ability to trust uncomplicated affection had been damaged long before Forrest offered it.
 
 People do not always reject good things because they cannot recognize them.
 
-Sometimes they recognize them and do not believe they deserve to stay.
+Sometimes recognition is exactly what frightens them.
 
-By the end, the enormous public events have become less important.
+By the end, the great public events become less important than a child, a grave, a school bus and a father waiting.
 
-What remains is intimate.
+That afternoon when I first watched it, I remained in my chair after the film ended.
 
-A child.
+I still had nowhere to go.
 
-A grave.
-
-A bus.
-
-A father waiting.
-
-The film spends hours moving through American history and finally reduces life to the people one misses when they are gone.
-
-That afternoon, after the film ended, I remember the unusual feeling of not wanting to start anything else immediately.
-
-I had nowhere to be.
-
-So I sat there for a while.
-
-Perhaps *Forrest Gump* was the right film for a day without a schedule.
-
-It is a film about a man who crosses decades by continuing to put one foot in front of the other.
-
-Sometimes running.
-
-Sometimes walking.
-
-Sometimes simply waiting for the bus.
+For once, that felt sufficient.

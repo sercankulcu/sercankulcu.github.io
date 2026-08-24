@@ -11,35 +11,19 @@ tags:
 
 I watched *The Intouchables* on an evening when I wanted something light.
 
-It made me laugh.
+The film made me laugh, which was expected.
 
-That part was expected.
+What I did not expect was to leave thinking about dignity.
 
-What I did not expect was how much the film would make me think about dignity.
+Philippe requires assistance with almost every physical part of daily life. That fact organizes the people around him. They become professional, careful and courteous.
 
-Philippe needs help with almost everything physical.
+Sometimes too courteous.
 
-That creates a difficult social situation around him.
-
-People become careful.
-
-Professional.
-
-Polite.
-
-Sometimes too polite.
-
-Driss enters without that caution.
-
-He jokes.
-
-He argues.
-
-He treats Philippe as a man rather than as a medical condition.
+Driss arrives without the correct training and, more importantly, without the correct reverence. He jokes, argues, becomes impatient and treats Philippe as a man whose disability is real but not exhaustive.
 
 That distinction is the heart of the film for me.
 
-Care can become dehumanizing when the person receiving it is reduced to the care they need.
+Care can accidentally shrink a person into the list of care they require.
 
 Medication.
 
@@ -51,88 +35,56 @@ Risk.
 
 Procedure.
 
-All of these are necessary.
+All necessary.
 
-None of them is a personality.
+None a personality.
 
-Driss is not a good caregiver because he begins with technical competence.
+I once visited an elderly relative in a hospital and noticed how conversations changed when a nurse entered. Everyone began speaking about him while standing beside him: medication, appetite, sleep, discharge.
 
-He often does not.
+Eventually he said, “I'm still here.”
 
-He is valuable because he restores something other people have accidentally removed.
+Nobody had intended to exclude him.
 
-Normality.
+That was what made the sentence uncomfortable.
 
-The right to be teased.
+*The Intouchables* reminded me of that moment.
 
-The right to make bad decisions.
+Driss restores ordinary social risk. Philippe is allowed to be teased, annoyed, contradicted and encouraged toward experiences other people consider impractical.
 
-The right to be treated as someone who still has desire, vanity, humor, pride, and embarrassment.
+This does not mean pretending limitation does not exist.
 
-That made me think about how easily kindness can become distance.
+It means refusing to let limitation become biography.
 
-We sometimes treat vulnerable people so carefully that the care itself creates a wall.
+The friendship works because neither man is transformed into the other's inspirational device. They can be selfish, funny, difficult and wrong.
 
-Do not joke.
+That is a form of equality.
 
-Do not challenge.
+People sometimes become overly gentle around vulnerability, as if ordinary humor might break something. The intention is kindness. The result can be distance.
 
-Do not ask difficult questions.
+Laughter can restore participation.
 
-Be gentle.
+The paragliding sequence expresses the film's idea clearly. Philippe's physical condition creates real constraints. Driss does not respond by making the world smaller than those constraints require.
 
-The intention is good.
+He looks for another route into experience.
 
-The result can be isolation.
+Adaptation is different from surrender.
 
-The film argues for another kind of respect.
+When the film ended, my immediate reaction was uncomplicated: I felt better than when it began.
 
-Not pretending limitations do not exist.
+The later effect was more useful.
 
-Not allowing limitations to become the whole person.
+Helping someone is not only doing tasks they cannot do.
 
-The friendship works because both men have something the other lacks.
+It may also mean protecting the parts of life that are easy to erase once care becomes professional.
 
-But I liked that the exchange is not perfectly symmetrical or sentimental.
+Choice.
 
-They annoy each other.
+Embarrassment.
 
-They misunderstand.
+Desire.
 
-They push.
+Bad jokes.
 
-That feels healthier than the idea that friendship is permanent emotional support.
+Risk.
 
-Sometimes friendship is someone refusing to let you remain inside your preferred excuse.
-
-The paragliding scene captures this.
-
-Philippe's body imposes limits.
-
-Driss does not respond by making life smaller.
-
-He looks for another experience.
-
-That is different from denial.
-
-It is adaptation.
-
-The film's humor also matters.
-
-Laughing around illness can seem dangerous because people are afraid laughter will become cruelty.
-
-But laughter can also restore equality.
-
-The ability to laugh with someone assumes they are still part of ordinary human life.
-
-That is valuable.
-
-When the film ended, I was in a better mood.
-
-That was the immediate effect.
-
-The longer effect was a small change in how I thought about helping people.
-
-Help is not only doing things for someone.
-
-Sometimes it is protecting their right to remain more than the thing they cannot do.
+The right to remain more complicated than the problem everyone can see.

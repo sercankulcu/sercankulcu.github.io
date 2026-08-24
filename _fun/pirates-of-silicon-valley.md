@@ -9,92 +9,68 @@ tags:
    - history
 ---
 
-I watched *Pirates of Silicon Valley* on a copied CD.
+I watched *Pirates of Silicon Valley* from a copied CD.
 
 That detail belongs to the experience as much as the film does.
 
-A friend had given me a disc containing a strange mixture of software, documents, music, and films. File collections were less organized then. You opened folders without knowing exactly what you would find. Sometimes the filename was the entire recommendation.
+A friend had given me a disc containing the kind of collection common at the time: software, drivers, songs, documents, utilities, a few photographs, and films with filenames that served as recommendations. There was no elegant library interface. You opened folders and discovered whatever another person had decided was worth carrying.
 
-One evening I noticed *Pirates of Silicon Valley* and started watching.
+One evening I found *Pirates of Silicon Valley* among those files.
 
-The video quality was not impressive. Neither was the screen. I was sitting in front of a desktop computer, probably closer to the monitor than I should have been.
+The video quality was poor. The monitor was small. I sat too close to it.
 
-But the subject was irresistible.
+The subject was irresistible.
 
-Apple. Microsoft. Jobs. Gates. Personal computers becoming personal.
+Apple and Microsoft had already become facts of life by the time I knew their names. Windows was not a risky idea; it was the environment through which I understood a computer. Apple was a company, not an uncertain group of people trying to persuade others that personal computers mattered.
 
-I had grown up encountering these names after their victories.
+The film pushed those names backward into a period when none of the outcomes were guaranteed.
 
-Windows was already Windows.
+I loved that.
 
-Apple was already Apple.
+Technology history becomes dangerously tidy after success. The winning product appears destined to win. The failed product's weaknesses seem obvious. A visionary looks visionary because we already know which prediction came true.
 
-The personal computer was not an uncertain experiment. It was a normal object sitting on a desk.
-
-The film pushed those familiar names backward into a period when none of the outcomes looked inevitable.
-
-I liked that.
-
-Technology history often becomes too tidy when we learn it afterward. A successful company appears to have been moving toward success all along. A failed product seems obviously flawed. The winner looks visionary. The loser looks mistaken.
-
-People living through the period did not have that advantage.
+People living through the period had no such advantage.
 
 They were guessing.
 
-That may be the most useful thing *Pirates of Silicon Valley* gave me: a sense that computing history was improvised by people who did not know they were living inside a chapter that would later receive a title.
+That may be the most useful thing the film gave me. Personal computing was not handed down by History fully assembled. It was improvised by ambitious, competitive, persuasive, occasionally difficult people making decisions with incomplete information.
 
-The film presents rivalry, ego, imitation, opportunism, negotiation, and the almost theatrical personalities around the early personal-computer industry.
+The film also damaged a comforting engineering belief: that the technically superior idea should naturally win.
 
-This is not the clean engineering story I had absorbed from technical books.
+History has no such obligation.
 
-In textbooks, machines evolve through architecture.
+Distribution matters. Price matters. Compatibility matters. Timing matters. Contracts matter. Sometimes simply being in the room when another company needs a solution matters enormously.
 
-In business history, machines also evolve through timing, persuasion, licensing agreements, personalities, marketing, and the ability to recognize which imperfect technology is ready to become ordinary.
+An elegant technology can disappear.
 
-That last part interested me especially.
+A limited one can become a standard.
 
-Engineers often want the best technical solution to win.
+This is disappointing if you want the world to behave like a benchmark.
 
-History is less obedient.
+Watching younger versions of Bill Gates and Steve Jobs also altered their scale. By the time I knew them, they were closer to institutions than ordinary people. The film returned them, however imperfectly, to rooms where they had to convince someone of something.
 
-A technology can be elegant and disappear.
+Young people making bets.
 
-Another can be limited and become a standard.
+Making mistakes.
 
-Distribution matters. Price matters. Compatibility matters. Timing matters. Sometimes simply being available in the right place at the right moment matters more than technical purity.
+Recognizing opportunities.
 
-Watching Bill Gates and Steve Jobs represented as young, ambitious, difficult people also changed the scale of the story.
+Occasionally taking things.
 
-By the time I knew their names, they were already institutions.
+That last part explains the title.
 
-The film made them look temporary again.
+Ideas in computing have always moved strangely between invention, borrowing, improvement and appropriation. Interfaces, programming concepts and business models migrate. The line between learning from something and taking it is often disputed most passionately after money arrives.
 
-Young people in rooms.
+When the film ended, I ejected the copied CD and laughed at the arrangement.
 
-People trying to convince other people.
+A film about rivalry, ownership and the birth of personal computing had reached me through a disc of copied files passed informally from one computer owner to another.
 
-People making bets with incomplete information.
+There was something historically appropriate about that.
 
-People occasionally behaving badly.
+Messy.
 
-That made the computer on my desk feel different.
+Unofficial.
 
-We tend to treat ordinary technology as if it had always existed. The desktop metaphor, the operating system, the mouse, the graphical interface—once familiar, these things become almost invisible.
+Shared.
 
-But somebody had to fight over them before the rest of us could take them for granted.
-
-When the film ended, I ejected the CD and looked at the machine I had watched it on.
-
-There was something funny about that.
-
-A cheaply copied film about the birth of the personal-computer industry had arrived on a disc passed from one computer owner to another.
-
-Not an official archive.
-
-Not a museum.
-
-Just another file in a folder.
-
-Perhaps that was an appropriate way to encounter the history of personal computing.
-
-Messy, copied, shared, and sitting on somebody's desk.
+Sitting on a desk.

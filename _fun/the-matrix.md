@@ -11,128 +11,56 @@ tags:
 
 I watched *The Matrix* on a computer.
 
-That seems almost too appropriate.
+That is almost too neat a memory, but it is true to the way the film entered my life. The monitor was small, the speakers were ordinary, and the image was not good enough to justify cinematic reverence. Yet by the end I was looking at the machine differently.
 
-It was not a good setup by modern standards. The monitor was small, the speakers were ordinary, and the video quality was far from perfect. But the film did not need a large screen to get into my head.
+Not because I believed reality might be a simulation.
 
-By the end, I was looking at the computer differently.
+Because the film had taken things I already knew—code, screens, networks, programs, interfaces—and made them metaphors for the world outside the computer.
 
-Not because I believed reality might actually be a simulation.
+The red pill and blue pill are famous because they reduce a philosophical problem to a choice simple enough to hold in one hand.
 
-Because the film had taken familiar things—screens, code, networks, programs, interfaces—and turned them into metaphors for something much larger.
+Comfort or truth.
 
-What if the world you accept as normal is only the world you have learned not to question?
+But truth is attractive when discussed abstractly. The film is more interesting after Neo discovers that truth is cold, unpleasant and irreversible. Knowledge does not make him happy.
 
-That idea is much older than the film.
+It makes him responsible.
 
-But *The Matrix* gave it an interface.
+There are smaller versions of this in ordinary learning. Once you understand how software works, software stops appearing entirely natural. Once you understand how a network is organized, the internet looks less like magic. Once you see how an institution makes decisions, its official language can become difficult to hear innocently again.
 
-The red pill and blue pill became famous for a reason. They reduce a difficult philosophical question to a simple choice.
+Knowledge removes some kinds of comfort.
 
-Comfort or truth?
+I remember the first time I opened the source code of a program I had used for months. The interface had always seemed fixed, as if the buttons occupied their places by natural law. Seeing the code produced a ridiculous but important realization.
 
-But I am not sure the choice is really that simple.
+Someone decided this.
 
-Truth is attractive when it is abstract.
+Users experience systems as environments. Makers see decisions.
 
-Reality becomes less romantic when the truth is cold, ugly, difficult, and irreversible.
+That difference is at the center of *The Matrix*. Morpheus wants Neo to stop seeing the rules as physics and start seeing the structure producing the rules.
 
-Neo does not receive enlightenment and become happy.
+Programmers know the intoxication of that moment.
 
-He receives responsibility.
+An interface says: this is what is possible.
 
-That stayed with me.
+Code says: this is what someone implemented.
 
-We often say that knowledge is power.
+Agent Smith is frightening partly because he is less a person than a privilege level. He uses the environment more completely than the people living inside it. He can appear where the system permits him to appear.
 
-Sometimes knowledge is also inconvenience.
+Some problems work that way outside computers too. They are not one bad individual. They are properties of a structure.
 
-Once you know something, you lose the ability to return completely to the version of yourself who did not know it.
+Arguing with one instance does not remove the system that keeps producing instances.
 
-That is true in much smaller ways too.
+Years after first seeing the film, I watched someone struggle with a badly designed form on a government website. After several failed attempts he said, “It won't let me.”
 
-Learning how software works changes the way you see software.
+That phrase reminded me of *The Matrix*.
 
-Learning how networks work changes the way you see the internet.
+Interfaces quietly define action.
 
-Learning how an institution actually makes decisions changes the way you hear its official language.
+When the film ended that first time, my desktop returned. Icons, folders, a taskbar. Nothing had changed.
 
-Understanding removes some kinds of innocence.
-
-The film also made programming look almost magical.
-
-Code becomes architecture.
-
-Rules become physics.
-
-A sufficiently deep understanding of the system allows a person to stop treating those rules as natural laws.
-
-That is a seductive idea for anyone who programs.
-
-Most users experience software as fixed.
-
-Buttons are where they are.
-
-Menus behave as they behave.
-
-The program defines what is possible.
-
-A programmer sees something else.
-
-Someone made these rules.
-
-Someone can change them.
-
-That difference between using a system and understanding a system is one of the strongest feelings in the film.
-
-Morpheus believes Neo has to stop seeing the Matrix as reality and start seeing its structure.
-
-That is also how technical learning often feels.
-
-At first you see the interface.
-
-Later you see the abstraction underneath it.
-
-Then, if you keep going, you begin to see the assumptions underneath the abstraction.
-
-The film's villains make this even more interesting.
-
-Agent Smith is not frightening because he is emotional.
-
-He is frightening because he is systemic.
-
-He can appear anywhere.
-
-He uses the rules of the environment more completely than the people trapped inside it.
-
-He feels less like a person than an operating constraint.
-
-That made sense to me.
-
-Some problems are not individuals.
-
-They are structures.
-
-You cannot persuade them.
-
-You have to understand the system that gives them power.
-
-When the film ended, the desktop returned.
-
-Icons.
-
-Folders.
-
-A taskbar.
-
-Nothing had changed.
-
-Yet for a while the computer no longer felt like an ordinary machine.
-
-It felt like a visible example of a much larger idea.
+For a while, though, every element looked contingent.
 
 Every system has rules.
 
-Every interface hides complexity.
+Some rules belong to reality.
 
-And sometimes the first step toward freedom is realizing that the rules you have been obeying were written by someone.
+Others were written by someone.

@@ -9,122 +9,48 @@ tags:
    - alienation
 ---
 
-I watched *Fight Club* for the first time on a small computer monitor in a student room.
+I watched *Fight Club* on a small computer monitor in a student room containing nearly everything a student room is expected to contain: an inexpensive desk, cables in permanent negotiation with one another, books stacked horizontally because the shelf was full, CDs, clothes waiting to become laundry, and several objects I had bought because owning them had briefly seemed like progress.
 
-That was probably the ideal environment.
+Then Tyler Durden began talking about possessions.
 
-The room contained a bed, a desk, too many cables, a few books, CDs, clothes that should have been folded, and possessions I had somehow decided were necessary despite having very little money.
+The timing was irritating.
 
-Then Tyler Durden started talking about possessions.
+That was part of the film's attraction. It attacks the small agreements people make with ordinary life: that a better object may improve the person who owns it, that a job can serve as identity, that comfort and purpose are approximately the same thing.
 
-The film was immediately irritating.
+I was young enough for Tyler's anger to sound intelligent before it sounded dangerous.
 
-That is partly why I liked it.
+That distinction matters. A charismatic idea does not need to be entirely wrong. In fact, it works better if the first diagnosis is accurate. The narrator is numb. His work is meaningless to him. He buys objects to give shape to a personality he cannot otherwise feel. His insomnia is the body's refusal to participate in the arrangement.
 
-It attacks things that are easy to recognize in other people and less comfortable to recognize in yourself: the need to build an identity from objects, the desire to escape ordinary life, the suspicion that everyone else has understood adulthood better than you have.
+Tyler sees the weakness and offers an answer with perfect confidence.
 
-I was young enough for the film's anger to feel attractive.
+The answer is worse than the disease.
 
-That matters.
+This is what I appreciate most now. Fight Club begins as rebellion against a system and gradually becomes another system, complete with rules, hierarchy, ritual, uniforms and obedience. Men who wanted to escape being interchangeable consumers become interchangeable members of Project Mayhem.
 
-There is a version of *Fight Club* that is very easy to misunderstand if you encounter it at the right—or wrong—age.
+The joke is brutal because it is believable. Rebellion can become conformity with different clothing.
 
-Tyler is charismatic.
+Consumer culture says: buy these things and become yourself. Tyler says: reject these things and become yourself. Both instructions still provide a package.
 
-He speaks in sentences designed to be remembered.
+The support groups at the beginning reveal how hungry the narrator is for something unmanufactured. He enters rooms where people are confronting illness and death because their emotion feels real enough to break through his numbness. It is ethically dubious and psychologically precise. He cannot feel his own life, so he borrows access to someone else's.
 
-He rejects consumer culture, office life, status anxiety, comfort, fear, and conventional success.
+Fight Club provides a more violent version of the same solution. Pain forces attention into the present. A fist is difficult to multitask around. The body becomes undeniable.
 
-For someone who already feels trapped by routine, that sounds like freedom.
+That fantasy has obvious appeal in a life dominated by abstract anxieties, deadlines, screens and imagined futures. We sometimes want an experience so immediate that it leaves no room for rumination.
 
-But the film keeps showing what happens when rebellion becomes another system.
+But immediacy is not meaning.
 
-Fight Club begins as escape.
+The first time I saw the film, I remembered Tyler's sentences. They were designed to be carried away. Years later, I remembered the structure that destroys them.
 
-Then it develops rules.
+That change probably says more about getting older than about cinema.
 
-Then hierarchy.
+When the credits ended in that student room, I looked around at the desk, the CDs, the cheap chair and the things I had accumulated. None was impressive enough to represent a consumerist tragedy.
 
-Then obedience.
+Still, for a few minutes the room became an interrogation.
 
-Then uniforms of a different kind.
+Why do I own this?
 
-The people who wanted to stop being replaceable consumers become replaceable members of a movement.
+Because I need it?
 
-That transformation became much more interesting to me than the fighting.
+Because I enjoy it?
 
-We often imagine conformity and rebellion as opposites.
-
-The film suggests how easily one can become the other.
-
-A person can reject one identity only to accept another identity even more completely.
-
-Consumer culture says: become yourself by buying these things.
-
-Tyler says: become free by doing these things.
-
-Both offer a package.
-
-The narrator's apartment is important for that reason.
-
-He has constructed himself through catalogs. Furniture becomes biography.
-
-Then the apartment disappears.
-
-At first the destruction looks liberating.
-
-But removing an artificial identity does not automatically reveal an authentic one underneath.
-
-Sometimes there is just confusion.
-
-The film's real subject, for me, gradually became identity rather than consumerism.
-
-Who is speaking inside your head?
-
-Which desires are actually yours?
-
-How much of your personality is assembled from expectations, advertisements, work, fear, other people, imagined versions of masculinity?
-
-Those questions are harder than breaking furniture.
-
-The support groups at the beginning are also important.
-
-The narrator cannot sleep because he feels disconnected from his own life. He finds relief by entering rooms where other people are confronting mortality.
-
-It is strange and morally questionable.
-
-It is also revealing.
-
-He needs genuine human emotion so badly that he borrows access to someone else's suffering.
-
-Fight Club later provides another form of bodily reality.
-
-Pain makes the moment undeniable.
-
-You cannot answer email while being punched.
-
-The body forces the mind to be present.
-
-I think part of the film's appeal comes from that fantasy: the desire to experience something so immediate that all the abstract anxieties of modern life temporarily disappear.
-
-But immediacy is not the same as meaning.
-
-The film eventually has to destroy Tyler's philosophy from inside because following it consistently leads somewhere terrifying.
-
-The first time I watched *Fight Club*, I remembered the lines.
-
-Years later, I remembered the warning.
-
-That difference probably says more about age than about the film.
-
-When the credits ended on that small monitor, I looked around the room.
-
-Nothing I owned was especially impressive.
-
-Still, for a few minutes every object seemed to be asking a question.
-
-Do I have this because I need it?
-
-Because I like it?
-
-Or because, somewhere along the way, I decided a person like me is supposed to own one?
+Or because I once imagined that a person like me should have one?

@@ -9,154 +9,64 @@ tags:
    - identity
 ---
 
-I watched *Oldboy* because someone told me not to read anything about it first.
+A friend told me to watch *Oldboy* without reading anything about it.
 
-For once, I followed the advice.
+He refused even to tell me why.
 
-No reviews.
+This was annoying enough that I almost looked up the plot out of spite. I did not, and I remain grateful for the restraint.
 
-No plot summary.
+At first the film offers a simple mystery: why has Oh Dae-su been imprisoned?
 
-No explanation of why the film was famous.
+Then it releases him and makes the question worse.
 
-That made the experience much stronger.
+Why was he released?
 
-At the beginning, the question seems simple.
+The answer exists somewhere in memory, but memory in this film is not a refuge. It is evidence buried badly.
 
-Why has this man been imprisoned?
+What disturbed me most about *Oldboy* was the design of the revenge. It is not merely an act committed against another person. It is an experience constructed for him. Information is withheld, supplied, timed and staged until discovery itself becomes punishment.
 
-Then another question replaces it.
+Revenge becomes authorship.
 
-Why has he been released?
+The victim is forced to live inside someone else's narrative.
 
-By the end, I was no longer sure which question was worse.
+We usually treat truth as liberation. Discover what happened. Identify the cause. Understand the past. The film asks a darker question: are there truths that leave a person less free after learning them?
 
-The film is built around revenge, but revenge in *Oldboy* is not a straight line.
+I did not want that question.
 
-It is architecture.
-
-Someone has designed an experience for another person.
-
-Information is controlled.
-
-Timing is controlled.
-
-Discovery itself becomes punishment.
-
-That was what disturbed me most.
-
-Usually we imagine revenge as an act.
-
-Hit someone.
-
-Expose them.
-
-Take something from them.
-
-Here revenge becomes a story the victim has to live through.
-
-That is more intimate.
-
-The person seeking revenge does not only want pain.
-
-He wants understanding.
-
-He wants the other person to arrive at a particular realization.
-
-That makes knowledge itself dangerous.
-
-We usually treat truth as something liberating.
-
-Find out what happened.
-
-Understand the past.
-
-Discover who is responsible.
-
-*Oldboy* asks whether there are truths a person may not survive unchanged.
-
-That is uncomfortable.
-
-Memory plays the same role.
-
-Oh Dae-su's imprisonment turns time into obsession.
-
-He exercises.
-
-Plans.
-
-Remembers.
-
-Builds a future around the idea of revenge.
-
-But memory is incomplete.
-
-The missing information is exactly where the danger lives.
-
-That made me think about how confidently we build explanations from partial histories.
-
-Someone hurt me because of this.
-
-That relationship ended because of that.
-
-I failed because of one decision.
-
-We create causes because causes are easier to live with than uncertainty.
-
-Sometimes the cause is correct.
-
-Sometimes it is only the best story available.
-
-The film's violence is memorable, especially the corridor fight.
-
-But even there, what impressed me was exhaustion.
-
-The scene does not make violence look clean.
-
-People become tired.
-
-Bodies slow down.
+The corridor fight is famous for good reason, but I remember its exhaustion more than its choreography. Bodies slow down. Violence becomes labor. The scene does not make revenge look clean or efficient.
 
 Winning looks miserable.
 
-That felt appropriate for a revenge story.
+That seems right.
 
-Revenge is often presented as energizing.
+Stories often energize revenge because revenge gives grief a purpose. *Oldboy* lets purpose become poison.
 
-Here it consumes everyone involved.
+The film also made me think about the explanations we build for our own lives. Someone hurt me because of this. A relationship failed because of that. I became this person because that event happened. We prefer causes to uncertainty because causes allow us to arrange the past.
 
-The final revelations make earlier scenes change meaning.
+Sometimes the cause is correct.
 
-I like films that can do that.
+Sometimes it is only the story available with the evidence we kept.
 
-Nothing in the earlier scene physically changes.
+After the film, my friend called and asked only one question: “Did you know?”
 
-The viewer changes.
+I said no.
 
-A gesture that looked ordinary becomes horrifying.
+He laughed and refused to discuss the ending for several minutes, as if speaking too quickly would damage the experience.
 
-A sentence becomes evidence.
+I understood.
 
-A memory becomes dangerous.
+Some films become smaller when summarized.
 
-That is one of cinema's strangest powers.
+The final revelations alter earlier scenes without changing a single frame. A gesture that once seemed ordinary becomes unbearable. A sentence becomes evidence. The viewer discovers that context is capable of rewriting an image after the image has already been seen.
 
-The same image can become a different image after you know more.
+That is one of cinema's cruelest pleasures.
 
-When the film ended, I sat through the credits.
+We think we are watching the present.
 
-Not because I was admiring the music.
+Later information informs us that we were watching the past incorrectly.
 
-I needed the extra minutes.
+When the credits ended, I sat still longer than usual.
 
-Some films leave you wanting to talk immediately.
+The film had not surprised me by hiding the destination.
 
-*Oldboy* made me reluctant to explain it.
-
-Explaining would make the experience smaller.
-
-I understood why I had been told not to read anything first.
-
-There are stories where knowing the destination helps.
-
-This one needs you to discover that the road was designed against you.
+It had made me realize that the road itself had been constructed as punishment.

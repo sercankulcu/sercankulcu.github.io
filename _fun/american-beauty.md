@@ -9,154 +9,34 @@ tags:
    - beauty
 ---
 
-I watched *American Beauty* at a time when adulthood still looked, from a distance, like something people eventually figured out.
+I watched *American Beauty* at an age when adulthood still seemed to be a destination rather than a condition. From far away, the route looked conventional enough: finish school, find work, earn money, build a home, perhaps raise a family, and eventually arrive at that stable country called being grown up.
 
-A job.
+The film was useful because almost everyone in it has arrived.
 
-A house.
+And almost no one knows what to do there.
 
-A family.
+Lester Burnham has the furniture, the job, the wife, the daughter, the lawn and the practiced routines of a respectable life. None of those things is false. The problem is that together they have become a kind of stage set. He has learned to perform the role without remembering why he wanted it.
 
-A car.
+I first saw the film at a friend's apartment after a long afternoon spent helping him assemble a bookcase. We had argued over the instructions, lost one screw, found it beneath the sofa, and finally stood back to admire a piece of furniture neither of us particularly cared about. Then we ordered food and watched the movie. Somewhere during Lester's rebellion, I looked at that bookcase and thought how much effort adults spend arranging objects around themselves as evidence that life is proceeding correctly.
 
-Routine.
+That may be why Carolyn interested me more than I expected. She does not merely want success; she wants success to be visible. The house must present itself correctly. The smile must appear on schedule. A professional setback is not only a practical problem but a crack in the image. Her tragedy is not vanity alone. It is the exhausting belief that if the surface can be kept under control, perhaps the interior will eventually follow.
 
-The film was useful because it made that picture look less reliable.
+Lester rebels against this performance, but the film is too intelligent to make rebellion automatically admirable. His attempts to recover youth are liberating in one moment and embarrassingly adolescent in the next. Dissatisfaction may be truthful, yet truth does not excuse every response to it. Other people live inside the life he wants to escape.
 
-Lester Burnham appears to have many of the things adulthood is supposed to produce.
+This is one of the film's crueller observations: we can be genuinely unhappy inside a life that still contains things worth loving.
 
-He is not happy.
-
-That contradiction was the first thing that stayed with me.
-
-We are often given lists without being told they are lists.
-
-Study.
-
-Find work.
-
-Earn more.
-
-Buy something better.
-
-Build a respectable life.
-
-None of these goals is necessarily wrong.
-
-The danger is assuming that completing the list will automatically produce meaning.
-
-*American Beauty* is full of people who have achieved some version of the expected life and are quietly trying to escape it.
-
-The escapes are not always admirable.
-
-That matters.
-
-Dissatisfaction does not make every rebellion wise.
-
-Lester's transformation can look liberating in one scene and childish in the next.
-
-That ambiguity makes him more interesting.
-
-There is a fantasy of starting over that appears whenever life becomes repetitive.
-
-Quit.
-
-Change.
-
-Become the person you were before responsibilities accumulated.
-
-The fantasy usually forgets that other people have built their lives around the person you currently are.
-
-Freedom has consequences when relationships exist.
-
-Carolyn fascinated me for another reason.
-
-She treats success almost like a performance that must never visibly fail.
-
-Smile.
-
-Sell the house.
-
-Look capable.
-
-Control the environment.
-
-Her unhappiness is different from Lester's, but it comes from the same gap between appearance and experience.
-
-The film keeps returning to surfaces.
-
-Homes.
-
-Gardens.
-
-Clothes.
-
-Bodies.
-
-Cars.
-
-Photographs.
-
-Everything is arranged.
-
-Then something underneath leaks out.
-
-That seems to be the real subject.
-
-How much effort do people spend making life look correct?
-
-Ricky and the plastic bag introduce another idea.
-
-Beauty does not always appear where we have been trained to look for it.
-
-A piece of trash moving in the wind can become beautiful if someone pays attention long enough.
-
-I found that scene slightly ridiculous the first time.
-
-Later, I understood it better.
-
-The object is not the point.
-
-Attention is.
-
-Most days contain things we do not see because they are too ordinary to qualify as events.
-
-Light on a wall.
-
-Movement in a curtain.
-
-Someone laughing in another room.
-
-A small kindness.
-
-Nothing dramatic enough to record.
-
-The film suggests that beauty may be less rare than attention.
+Ricky's plastic bag has become the obvious symbol of the film, and on first viewing I found the scene almost ridiculous. A piece of trash moves in the wind and someone treats it like revelation. Years later, I understand the scene more generously. The bag is not beautiful because plastic has secretly become sublime. The point is attention. Ricky looks long enough at something ordinary for the ordinary thing to stop being invisible.
 
 That idea has aged better for me than some of the film's provocations.
 
-The final moments rearrange everything.
+Most of a life is made from material too small to announce itself as important: light entering a room in the late afternoon, a familiar voice from another part of the house, a photograph we stop noticing because it has been on the same shelf for years. We are trained to wait for large events and can miss the accumulation of small ones that actually make a life recognizable.
 
-Lester spends much of the story trying to feel alive again.
+The film's ending returns Lester to those ordinary things. After spending so much of the story fantasizing about another life, he looks back toward the one he had. The photographs matter. Memory matters. The family he found difficult to live with is still the family whose faces summon tenderness.
 
-Then, at the end, the things that matter become unexpectedly ordinary.
+When the credits ended that evening, my friend asked whether I liked the film. I said yes, although I could not yet explain why.
 
-Family photographs.
+Before leaving, I looked again at the newly assembled bookcase.
 
-Memory.
+It was crooked by perhaps two millimeters.
 
-A face.
-
-The life he wanted to escape still contains the things he loves.
-
-That contradiction is painful.
-
-We can be unhappy inside a life that still contains valuable things.
-
-Wanting change does not make the past worthless.
-
-When the film ended, adulthood looked less like a destination.
-
-More like maintenance.
-
-You can build the correct-looking life and still need to ask whether you are actually present inside it.
+We left it that way.

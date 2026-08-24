@@ -13,146 +13,62 @@ I watched *Trainspotting* expecting something energetic.
 
 It was.
 
-That was the problem.
+That is what made it uncomfortable.
 
-The film makes destruction move quickly.
+The music, movement, jokes and friendships give destruction a pulse. Addiction is not introduced as an obviously bad decision made by people who have failed to read the warning label.
 
-Music.
+It contains pleasure.
 
-Jokes.
+That matters.
 
-Friends.
+Moral stories often weaken themselves by making harmful choices unattractive from the start. Real harmful choices survive precisely because something in them works now.
 
-Nightlife.
+The future sends invoices.
 
-Chaos.
+The present offers cash.
 
-For a while, addiction is presented with enough style that you can understand why the characters keep returning to it.
+Renton understands that heroin is destroying his life. Knowledge is not the missing ingredient. This seems obvious, yet we often speak as if correct information naturally produces correct behavior.
 
-That is important.
+People know smoking is dangerous.
 
-A moralizing film would make the bad choice look bad from the beginning.
+They know sleep matters.
 
-Real bad choices often contain pleasure.
+They know certain relationships are bad for them.
 
-That is why people choose them.
+Information can coexist peacefully with self-destruction.
 
-Renton knows heroin is destroying his life.
+Addiction narrows time. The next few hours become more real than the next few years.
 
-Knowledge is not enough.
+That shrinking of the future interested me most.
 
-That seems obvious, but we often behave as if information automatically produces behavior.
+The friendships make escape harder because habits are social environments as much as private choices. A group can normalize almost anything if everyone agrees not to examine it carefully.
 
-Tell people smoking is dangerous.
+I learned a much smaller version of this during university. A group of us had developed the habit of staying up absurdly late. Nobody had decided this was good. Each person made it easier for the others to treat exhaustion as normal.
 
-Tell them sleep matters.
+When one friend began leaving early, we mocked him.
 
-Tell them exercise is good.
+He was the sensible one.
 
-Tell them addiction ruins lives.
+That memory returned while watching Renton try to change.
 
-Correct information can coexist perfectly well with destructive action.
+Sometimes a friendship preserves the version of you that you are trying to leave.
 
-The problem is not always ignorance.
+“Choose Life” rejects the conventional package: job, mortgage, television, consumer goods, routine. The speech is seductive because many parts of that package deserve questioning.
 
-Sometimes the immediate reward is simply stronger than the distant consequence.
+The film eventually asks what rejection produces by itself.
 
-The film understands immediacy.
-
-Everything is now.
-
-Pleasure now.
-
-Pain now.
-
-Money now.
-
-Withdrawal now.
-
-The future becomes abstract.
-
-That may be one of addiction's most destructive effects.
-
-It shrinks time.
-
-A life that should contain years becomes organized around the next few hours.
-
-The friends make this more complicated.
-
-Addiction is not only chemical.
-
-It is social.
-
-People become environments for one another.
-
-One friend makes a behavior easier.
-
-Another makes change harder.
-
-A group can normalize almost anything if everybody inside the group agrees not to look too closely.
-
-That made me think about friendship differently.
-
-We often define a good friend as someone who stays.
-
-Sometimes staying is not enough.
-
-A friendship can also preserve the version of you that you are trying to escape.
-
-Renton has to leave not only the drug.
-
-He has to leave a social system.
-
-The “Choose Life” speech is famous because it attacks conventional adulthood.
-
-Jobs.
-
-Televisions.
-
-Mortgages.
-
-Consumer goods.
-
-Routine.
-
-At first the rejection sounds rebellious.
-
-But the film eventually asks what the alternative actually is.
-
-Rejecting a conventional life does not automatically create a meaningful one.
-
-Freedom from something is incomplete without movement toward something.
-
-That distinction stayed with me.
-
-It is easy to define yourself negatively.
-
-I am not like them.
-
-I do not want that life.
-
-I refuse those rules.
-
-Eventually you still have to answer another question.
+Freedom *from* something is incomplete.
 
 Then what?
 
-The film's ugliest scenes prevent the energy from becoming romantic.
+That is the less glamorous question.
 
-Consequences arrive.
+The ugliest scenes prevent the movie's energy from becoming advertising. Consequences arrive in bodies, death, betrayal and the narrowing of every option.
 
-Bodies fail.
+The fun and the damage belong to the same system.
 
-People die.
+That is why the film's music stayed in my head longer than many of its warnings.
 
-Friendship becomes betrayal.
+Some dangerous things endure because part of them is genuinely attractive.
 
-The fun and the horror belong to the same system.
-
-When the film ended, the music stayed in my head longer than the images.
-
-That felt appropriate.
-
-Some dangerous things survive because part of them is genuinely attractive.
-
-If there were nothing good in the experience, leaving would be easy.
+If the whole experience were misery, leaving would be easy.

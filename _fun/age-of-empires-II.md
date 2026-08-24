@@ -7,28 +7,30 @@ tags:
    - self-improvement
 ---
 
-Age of Empires II is one of the few games that can still turn “I’ll play for half an hour” into an entire evening.
+There was a period when I could sit down to play *Age of Empires II* after dinner, promise myself that I would stop after one match, and discover that the room had gone quiet and the clock had moved far beyond what I had intended. The game was never especially mysterious about what it wanted from me. Gather food, wood, gold, and stone. Build. Scout. Defend. Attack. The difficulty came from the fact that every sensible decision damaged another sensible possibility.
 
-It was released in 1999 and is set mainly in the Middle Ages. The premise is easy to explain: gather resources, build a civilization, train an army, and defeat your opponents. What keeps the game interesting is that none of those tasks can really be separated from the others. Every military decision has an economic cost, every economic decision creates a military risk, and every map forces you to reconsider what looked like a good plan a few minutes earlier.
+That is still what I like about it.
 
-<img width="200" alt="age of empires" src="/images/posts/age-of-empires-ii.webp" style="float: left; margin-right: 10px;" />
+A large army looks impressive until there is no economy behind it. A flourishing economy looks intelligent until an opponent appears before it is ready to defend itself. The game turns resources into arguments about the future. Food is not simply food; it may become another villager, another soldier, or the difference between reaching the next age now and reaching it several minutes too late. Wood can become farms, houses, ships, siege workshops, or nothing useful at all if collected without a plan.
 
-That balance between economy and war is probably what I enjoy most. A large army is useless if it cannot be replaced. A beautiful economy is equally useless if an opponent arrives before it becomes productive. Food, wood, gold, and stone are not just numbers in the corner of the screen; they are choices about what kind of future you are trying to build.
+I learned this slowly. My early games were full of activity and very little thought. Villagers gathered whatever happened to be nearby. Buildings appeared wherever there was empty ground. An army was created only after danger became visible. I was busy all the time and, in strategic terms, often doing almost nothing.
 
-The civilizations make those choices feel different. Byzantines encourage a more defensive style. Franks become especially attractive when cavalry matters. Goths can overwhelm with infantry, Mongols are dangerous with mobility, Vikings feel natural on water maps, and Turks become threatening once gunpowder enters the game. The differences are large enough that I cannot comfortably repeat the same plan in every match.
+Scouting changed that. A scout moving through unexplored land could tell me more than another military unit standing at home. An enemy barracks built early suggested one future; an undefended expansion suggested another. The map itself became information. High ground, forests, narrow passes, open plains, and water were not decoration but conditions that rewarded one kind of plan and punished another.
 
-The opening minutes matter more than they first appear to. A strong economy in the early ages gives you options later. Idle villagers are expensive in a way that is not immediately visible, and gathering resources without a plan is almost the same as wasting them. If I want cavalry, food and gold have to be ready before the stable becomes useful. If I expect a defensive game, stone and building placement start to matter much earlier.
+The civilizations sharpened this lesson. Byzantines invited patience, Franks made cavalry tempting, Goths rewarded pressure through infantry, Mongols made mobility feel natural, Vikings changed the value of water, and Turks made gunpowder something to anticipate. I could have a favorite civilization, but the game refused to let preference replace attention.
 
-Scouting taught me another lesson: information is a resource too. A scout circling the map can reveal enemy buildings, unclaimed resources, weak approaches, and the shape of the terrain. Seeing an early barracks or stable may be more valuable than having a few extra soldiers, because it gives time to prepare. If the opponent is slow, that same information may tell me that I can expand safely.
+I remember one match in particular, played late at night on Black Forest. I had spent an absurd amount of time constructing what I considered a perfect defense: layers of walls, castles covering the narrow approach, resources safely gathered behind them. I admired it. Then my opponent did not attack where I had prepared for him. He found another route, cut through trees, and entered from the side. The defeat was almost elegant. I had solved the problem I wanted to have rather than the problem the map actually contained.
 
-Then there is the map itself. High ground, forests, narrow passages, and water can completely change the meaning of an army. Arabia creates open space and makes early pressure dangerous. Black Forest often turns into a patient defensive game around a few narrow routes. Coastal maps make ships part of the economy. Nomad begins with uncertainty and asks you to create order before you can even think seriously about strategy.
+That lesson has survived the game.
 
-Even hotkeys changed the way I understood the game. At first, clicking everything with the mouse seemed perfectly natural. Later, keyboard shortcuts made the game feel less like operating an interface and more like thinking directly through it. Once that happens, going back to the mouse for every action feels strangely slow.
+Plans are necessary because without them every action becomes reactive. But attachment to a plan can be more dangerous than having no plan at all. The world is under no obligation to cooperate with a strategy simply because we invested time in it.
 
-But the most useful habit Age of Empires II encourages is flexibility. A plan is necessary, but attachment to a plan can be fatal. I may prepare for cavalry and discover that the opponent has already built the perfect counter. I may intend to attack early and find that the map gives me a much stronger defensive position. Good players seem to notice these changes before everyone else does.
+Even hotkeys eventually became part of this change in thinking. At first I clicked everything with the mouse. Later the keyboard made actions almost disappear between thought and execution. The interface became less visible. I was no longer deciding where to click; I was deciding what the economy needed, where the enemy might be, and which mistake could still be repaired.
 
-That is probably why the game has remained interesting to me for so long. It rewards speed, certainly, but speed alone is not enough. You have to observe, anticipate, manage risk, and change your mind.
+Every match starts with a handful of villagers in a mostly empty world. An hour later there may be farms, trade routes, walls, dead armies, ruined plans, and a history that did not exist when the match began.
 
-Every match begins with a handful of villagers and a largely empty map. Not long afterward there are towns, farms, walls, armies, ruined plans, improvised solutions, and dozens of decisions that seemed small when they were made.
+What keeps me returning is not victory. It is the small reconstruction that comes afterward.
 
-When the game ends, I almost always remember one of them and think: I should have done that differently.
+There is always one moment I can point to and say: that was where the game changed.
+
+Usually, I noticed it too late.

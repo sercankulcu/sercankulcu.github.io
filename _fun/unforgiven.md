@@ -9,120 +9,78 @@ tags:
    - life
 ---
 
-At the entrance of our apartment building, someone had written a word on the wall in red paint:
+At the entrance of our apartment building, someone had written one word on the wall in red paint:
 
 **Unforgiven.**
 
-I was a child and had no idea what it meant.
+I was a child and did not know what it meant.
 
-For some reason, I never asked.
+For reasons that seem absurd now, I never asked. Perhaps I assumed everyone else already knew and the question would reveal some embarrassing gap in my knowledge. Childhood is full of private mysteries maintained only because asking feels dangerous.
 
-Perhaps I was afraid my friends would laugh. Perhaps I assumed everyone else already knew. Childhood contains many questions like that: you want the answer, but asking would expose the fact that you do not already have it.
+I could have asked my father.
 
-I could have asked my father. I can almost hear the probable response:
+I can imagine the response: forget about *Unforgiven* and go study.
 
-“Forget about Unforgiven and go study.”
+So the word remained on the wall without explanation.
 
-So the word remained where it was, unexplained.
+Years passed. We moved. I forgot the wall, or believed I had.
 
-Then time did what it usually does. We moved through years. I forgot the wall—or thought I had.
+Then I got into university and my father kept a promise he had made me.
 
-When I got into university, my father kept a promise he had made me and bought me a computer.
+He bought me a computer.
 
-That machine became one of the most important objects in my life.
+That machine became less an appliance than a country I had been given permission to explore. I installed programs, broke things, tried to repair them, failed, reinstalled, copied files from friends and learned that most technical disasters become less frightening after the third time.
 
-It was not simply useful. It was a doorway. Until then, computers had mostly been things I encountered at school, in shops, in magazines, or at somebody else’s house. Now one sat on my desk.
+University computers were social objects too. People passed around CDs containing impossible combinations of software, games, documents and music. I copied almost everything.
 
-Mine.
+Foreign music was especially new to me. I listened without a system. Rock, metal, pop, songs whose lyrics I barely understood, bands whose names meant nothing.
 
-I could install things, break things, try to repair them, fail, reinstall, and try again.
+Disk space was precious enough that I should have deleted what I disliked.
 
-University computers were also social machines. People exchanged programs, games, documents, and music. Somebody always had a CD full of files. I copied almost anything people gave me.
+I rarely did.
 
-Foreign music was especially new. I listened without much system: rock, metal, pop, songs I did not understand, bands whose names meant nothing to me.
+Maybe I would like it later.
 
-Disk space felt valuable, so deleting files should have been easy.
+That sentence saved a great deal of bad music and, occasionally, something important.
 
-It was not.
-
-Even when I disliked a song, I kept thinking: maybe I will like it later.
-
-So I kept almost everything.
-
-This was before streaming services could build a polished sequence of recommendations around every preference. Discovery was more accidental. Someone gave you a folder. You opened files one by one. Most were forgettable.
-
-Occasionally one stayed for the rest of your life.
-
-Then, one day, I saw the title:
+One day I saw a filename.
 
 **The Unforgiven.**
 
-I stared at it.
+The wall returned immediately.
 
-The word from the wall had returned.
+Years had passed, yet the word was waiting intact somewhere in memory.
 
-Except now it was not red paint at the entrance of an apartment building. It was a Metallica song on my computer.
+I played the Metallica song and experienced the odd sensation of a childhood mystery acquiring sound. Before I knew anything about the band, before I understood the lyrics, the title already had a history inside me.
 
-I played it.
+Perhaps that is why I liked it so quickly.
 
-And suddenly a childhood mystery had a sound.
+Memory stores apparently useless details with no obligation to explain their future use. A color of paint. A word. A hallway. A smell. Then something touches the same point years later and the connection appears as if it had been prepared.
 
-The feeling was larger than simply discovering a song. Two unrelated parts of my life had unexpectedly touched: a wall from childhood and a computer at university, separated by years and connected by one word.
+The computer produced many discoveries like this. It changed not only what I learned but the order in which learning arrived. Books had chapters. Teachers had lesson plans. The computer mixed everything together.
 
-Perhaps that is why I liked the song so quickly. It arrived with a history already attached to it.
+Programming beside music.
 
-Before I knew anything about Metallica, before I understood the lyrics, before I had much idea what kind of music I liked, the title had already been waiting somewhere in my memory.
+Games beside documents.
 
-Memory is good at preserving apparently useless details.
+Experiments beside mistakes.
 
-A word on a wall. The color of paint. A street. A smell. One sentence somebody said years ago.
+Learning became disorderly.
 
-Most of these fragments seem to have no purpose. Then something touches the same point and the connection appears immediately.
+It suited me.
 
-The computer created many experiences like that for me. It changed not only what I could learn, but how learning felt.
+I still do not know who wrote *Unforgiven* on the wall or why. Perhaps the person loved Metallica. Perhaps the word had another source entirely.
 
-Before I had one, information usually arrived in an organized form. Books had chapters. Teachers had lessons. Television had schedules. Newspapers had sections.
+The author of the graffiti has no idea it became part of someone else's memory.
 
-The computer mixed everything together.
-
-Programming, games, music, experiments, mistakes.
-
-One minute I was trying to understand Windows. The next I was installing a program. Then listening to a song. Then breaking something I did not know how to repair.
-
-Learning became less orderly and much more interesting.
-
-Music became part of that change. For the first time, my taste was not limited to what radio or television happened to play. One band led to another. One folder led to another. Metallica opened a door, and behind it were more doors.
-
-I also began to understand that taste is not always immediate.
-
-Sometimes we encounter something too early.
-
-A song, a book, a film, an idea—or even a person—can make no sense at first. Years later, the same thing returns and suddenly fits.
-
-That was why I had been reluctant to delete music. Maybe I would understand it later.
-
-Often, I did.
-
-I still do not know who wrote “Unforgiven” on that wall or why. Perhaps it was a Metallica fan. Perhaps it had nothing to do with the band. Perhaps someone was simply trying to look impressive.
-
-It does not matter much now.
-
-An anonymous piece of graffiti became part of somebody else’s memory.
-
-Mine.
-
-We leave traces like that without knowing who will encounter them: a book we lend, a song played in a car, a sentence written somewhere, a recommendation, a word on a wall.
+We leave traces like that constantly: a book lent, a song played in a car, a recommendation made casually, a sentence written somewhere.
 
 Most disappear.
 
-A few travel.
+Some travel farther than intended.
 
-My first computer would eventually become the place where I learned an enormous amount about programming, operating systems, the internet, music, and my own curiosity. It taught me that pressing the wrong button was usually not the end of the world. Most mistakes could be investigated. Most broken things could be repaired.
+My first computer taught me that broken systems could often be repaired and stupid questions could be asked privately without embarrassment.
 
-And when Windows became completely hopeless, there was always another installation.
+It never cared that I had once been too shy to ask what *Unforgiven* meant.
 
-Computers suited me because they let me ask stupid questions without embarrassment.
-
-The machine did not care that I had once been afraid to ask what “Unforgiven” meant.
-
-Years later, it simply played the file.
+Years later, it simply played the answer.

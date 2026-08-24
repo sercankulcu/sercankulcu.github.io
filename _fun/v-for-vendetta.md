@@ -9,144 +9,78 @@ tags:
    - identity
 ---
 
-I watched *V for Vendetta* during a period when I was reading a lot of news online.
+I watched *V for Vendetta* during a period when I was reading far too much news online.
 
-That probably shaped the way I saw it.
+That probably changed the film.
 
-The film imagines a society where fear has become a political technology.
+Its world is built around fear used as political infrastructure. Authority does not simply issue commands. It provides a story explaining why control is necessary, why surveillance is reasonable and why obedience should be confused with safety.
 
-The government does not simply issue orders.
+Fear is efficient because frightened people often request restrictions they would resist under calmer conditions.
 
-It creates a story about danger.
+The arrangement does not require everyone to believe the government is good.
 
-The story explains why control is necessary.
+They need only believe the alternative is worse.
 
-Why surveillance is reasonable.
+The film's theatricality can make this seem larger than life—masks, broadcasts, explosions, a date transformed into ritual—but the underlying mechanism is ordinary enough.
 
-Why obedience is safety.
+Control the frame.
 
-That mechanism interested me more than the explosions.
+Select which danger receives attention.
 
-Fear is powerful because it can make people request restrictions they would reject under normal conditions.
+Repeat.
 
-If the threat feels large enough, almost anything can be described as temporary necessity.
-
-Temporary arrangements have a habit of becoming normal.
-
-The film makes this process dramatic, but the underlying idea is ordinary.
-
-People accept many systems not because they believe the systems are good.
-
-They believe the alternative is worse.
-
-V responds with another kind of story.
+V answers with another story.
 
 A mask.
 
 A symbol.
 
-A date.
+A public performance.
 
-A performance.
+The government uses narrative to produce obedience; V uses narrative to produce resistance. Both understand that facts do not move people without interpretation.
 
-This creates a strange conflict.
-
-The government uses narrative to create obedience.
-
-V uses narrative to create resistance.
-
-Both understand that people act through stories, not facts alone.
-
-That is one reason the mask matters.
+That makes the mask interesting and troubling.
 
 A face belongs to one person.
 
-A mask can belong to anyone.
+A mask can become available to everyone.
 
 The individual becomes an idea.
 
-That sounds liberating.
+Ideas are easier to admire than people because they do not have to display ordinary weaknesses.
 
-It is also dangerous.
+Evey's relationship with fear matters more to me than V's speeches. She has internalized enough of the system that authority does not need to stand beside her constantly. She anticipates danger and adjusts herself.
 
-Ideas are easier to admire than people because ideas do not have ordinary weaknesses.
+That is the most economical form of control.
 
-V is charismatic because he is partly hidden.
+I once caught myself deleting a sentence from a public post because I imagined an argument that had not happened and people who had not complained. The subject was trivial, the consequence nonexistent.
 
-We see the symbol more clearly than the man.
+Still, the moment was instructive.
 
-Evey's transformation affected me more.
+Self-censorship often arrives before censorship.
 
-Fear controls her life before the government has to.
+The question is not whether fear should disappear. Fear is useful. It keeps people alive.
 
-That is the most efficient kind of control.
+The question is whether fear is supplying information or making the decision.
 
-When people censor themselves, avoid risk, and anticipate punishment, authority does not need to be physically present every minute.
+After the film, I returned to the news sites I had been reading and noticed the framing more than the stories for a while.
 
-The prison sequence is therefore central.
+Which event is placed at the top?
 
-The goal is not simply to make Evey brave.
+Which photograph accompanies it?
 
-It is to remove fear's monopoly over her decisions.
+What emotion does the headline expect before the article has been read?
 
-That is a frightening idea.
+None of this automatically makes the news false.
 
-Most of us do not want to become fearless.
+Selection is unavoidable.
 
-Fear is useful.
+But selection creates a world.
 
-It keeps us alive.
+*V for Vendetta* is too theatrical to serve as a political manual and too simple in places to serve as political theory.
 
-The real question is whether fear is informing a choice or making the choice.
+Its warning is smaller and more durable.
 
-The film's most famous symbols are large.
+Fear can protect us from danger.
 
-Parliament.
-
-Fireworks.
-
-Masks.
-
-Crowds.
-
-But I kept thinking about the television.
-
-A screen enters every home and tells people what reality means.
-
-That felt familiar in a different way.
-
-Control over information does not require inventing every fact.
-
-Selection can be enough.
-
-Repeat one event.
-
-Ignore another.
-
-Choose the image.
-
-Choose the language.
-
-Eventually the public discussion occurs inside a frame someone else created.
-
-When the film ended, I closed the news sites I had been reading before it.
-
-Not because I had decided they were propaganda.
-
-Because for a few minutes I became more aware of framing.
-
-What is being shown?
-
-What is absent?
-
-What emotion is this information asking me to feel?
-
-The film is not a political manual.
-
-It is too theatrical for that.
-
-But its central warning is useful.
-
-Fear can protect people from danger.
-
-It can also become a very convenient reason to stop asking questions.
+It can also become a convenient reason to stop asking who benefits from our fear.
