@@ -45,7 +45,7 @@ Explore my courses through <button type="button" onclick="window.location.href='
 
 Read technical notes in <button type="button" onclick="window.location.href='/posts/'">💻 Technical Blog</button>, explore writing tools in <button type="button" onclick="window.location.href='/pencils/'">✏️ Pencils</button>, discover broader topics in <button type="button" onclick="window.location.href='/humanity/'">🌍 Humanity</button>, or read observations about the world in <button type="button" onclick="window.location.href='/nature/'">🌿 Nature</button>.
 
-I keep personal stories in <button type="button" onclick="window.location.href='/memory/'">🕰️ Memory</button>, essays and observations in <button type="button" onclick="window.location.href='/thoughts/'">💭 Thoughts</button>, and writing about films, games, music, and other things I enjoy in <button type="button" onclick="window.location.href='/fun/'">🎬 Fun</button>.
+<!-- I keep personal stories in <button type="button" onclick="window.location.href='/memory/'">🕰️ Memory</button>, essays and observations in <button type="button" onclick="window.location.href='/thoughts/'">💭 Thoughts</button>, and writing about films, games, music, and other things I enjoy in <button type="button" onclick="window.location.href='/fun/'">🎬 Fun</button>.-->
 
 **Note:** If you believe any content on this website infringes a license or copyright, please contact me. I will review and remove the material promptly if necessary.
 
