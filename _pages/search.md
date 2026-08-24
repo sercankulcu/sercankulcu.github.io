@@ -8,6 +8,9 @@ author_profile: false
 <style>
 .site-search {
   max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
 }
 
 .site-search-input {
