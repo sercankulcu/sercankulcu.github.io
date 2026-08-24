@@ -9,160 +9,62 @@ tags:
    - attention
 ---
 
-I watched *The Silence of the Lambs* late at night, alone, with headphones.
+I watched *The Silence of the Lambs* late at night with headphones.
 
-That was a mistake.
+This was an error in judgment.
 
-Not because the film is full of sudden scares.
+The film does not depend mainly on sudden scares. It makes attention itself threatening.
 
-It is worse than that.
+Hannibal Lecter spends much of the story behind glass or bars. His body is contained. Conversation is not.
 
-It makes conversation frightening.
+He watches people with an intensity most of us reserve for problems we are being paid to solve. Vocabulary, hesitation, clothing, accent, posture—nothing arrives as background.
 
-Hannibal Lecter spends much of the film behind glass or bars.
+Clarice enters believing she has come to observe him.
 
-He is physically contained.
+Within seconds, she is the object being observed.
 
-Yet every conversation with him feels dangerous.
+That reversal produces more tension than physical movement.
 
-That contradiction fascinated me.
+Most people reveal enormous amounts of information because most listeners are not paying closely enough to assemble it. Lecter is frightening because he assembles.
 
-We usually associate threat with movement.
+I once sat through a job interview with someone who seemed to remember every casual phrase I used. Near the end, he referred back to a small comment from the first five minutes and asked a question that made me realize he had been constructing a model of me while I had been concentrating on appearing competent.
 
-Someone approaches.
+The experience was harmless.
 
-A weapon appears.
+I disliked it intensely.
 
-A door opens.
+Clarice lives inside a much more dangerous version of that imbalance. She has institutional authority but less psychological control. What I admire is that fear does not remove her competence.
 
-Lecter often does almost nothing.
+She continues asking questions.
 
-He watches.
+That is a quieter form of courage than fearlessness.
 
-He listens.
+The title returns the film to memory. Clarice carries a childhood sound that has never entirely stopped. Memories often survive this way, not as complete narrative but as fragments with physical force: a smell, a room, a voice, an animal, a moment when the world became unsafe.
 
-He notices.
+The adult mind may understand the event perfectly.
 
-The danger comes from attention.
+The body keeps its own archive.
 
-That is rare.
+The final sequence in darkness is frightening because the information imbalance becomes literal. Clarice cannot see. Someone else can.
 
-Most people do not listen carefully enough to be frightening.
+Again the advantage belongs to the person with better access to reality.
 
-Lecter does.
+That theme runs through the entire film.
 
-He treats every word, gesture, hesitation, accent, and piece of clothing as information.
+Who notices?
 
-Clarice enters the room believing she is there to study him.
+Who knows what the other person does not know?
 
-He immediately begins studying her.
+Who understands what the evidence means?
 
-That reversal creates the film's tension.
+When the film ended, I removed the headphones and the room became strangely loud in its quietness. A refrigerator clicked. Pipes made small noises. Something moved outside.
 
-She has institutional authority.
+For several minutes I listened with more attention than those sounds deserved.
 
-He has psychological control.
+That was the film's effect on me.
 
-The scenes between them made me think about how much information people reveal without intending to.
+It did not make me fear monsters.
 
-Vocabulary.
+It made me suspicious of observation.
 
-Posture.
-
-What they avoid answering.
-
-What they answer too quickly.
-
-The assumptions inside a question.
-
-We leak ourselves constantly.
-
-Most of the time nobody is paying enough attention to collect the pieces.
-
-Lecter is terrifying because he does.
-
-Clarice, however, is the character I admired.
-
-She is young.
-
-She is surrounded by older men.
-
-She knows that people are evaluating whether she belongs in the room.
-
-And still she keeps asking questions.
-
-That form of courage is quieter than the courage usually celebrated in thrillers.
-
-She is afraid.
-
-She continues observing.
-
-Fear does not prevent competence.
-
-The film also understands that vulnerability and weakness are not the same thing.
-
-Clarice reveals personal things to Lecter because the investigation requires a form of exchange.
-
-That exposes her.
-
-But exposure does not make her powerless.
-
-She keeps using the conversation.
-
-The title itself stayed with me.
-
-The silence of the lambs.
-
-A childhood memory becomes a sound that never fully disappears.
-
-That feels psychologically true.
-
-Some memories are not stored as complete stories.
-
-They survive as sensations.
-
-A sound.
-
-A smell.
-
-A room.
-
-A moment when you were helpless.
-
-Years later, the adult mind may understand the event perfectly and still react to the old feeling.
-
-Knowledge does not erase memory.
-
-The final sequence in darkness is frightening for the opposite reason from the Lecter scenes.
-
-Clarice cannot see.
-
-Someone else can.
-
-Again, control belongs to the person with better information.
-
-That theme runs through the whole film.
-
-Who sees more?
-
-Who understands more?
-
-Who notices what the other person misses?
-
-When the film ended, I removed the headphones and the room felt too quiet.
-
-For a few minutes I became unusually aware of small sounds.
-
-The refrigerator.
-
-A pipe.
-
-Something outside.
-
-That was the effect the film had on me.
-
-It did not make me afraid of monsters.
-
-It made me think about attention.
-
-The person who sees what everybody else ignores often has the advantage.
+The person who sees what everyone else overlooks has power long before anyone notices the power exists.

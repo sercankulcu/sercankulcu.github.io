@@ -9,140 +9,50 @@ tags:
    - memory
 ---
 
-The second time I watched *Kill Bill*, I paid less attention to the revenge.
+The second time I watched *Kill Bill*, I paid much less attention to who was going to die.
 
-I watched the filmmaking.
+I watched the movie changing its clothes.
 
-That changed the film completely.
+Color becomes black and white. Live action becomes animation. A western walks into a martial-arts film. Music arrives from somewhere that ought not to fit and fits anyway. Quentin Tarantino treats cinema history less like a museum than a crowded cupboard whose contents may be combined for the pleasure of seeing what happens.
 
-The first time, the list drives everything.
+On first viewing, I followed the list.
 
-Names.
+On second viewing, I followed the grammar.
 
-Targets.
+That change began because I watched the film with a friend who had studied photography. He kept noticing things I had treated as invisible: the temperature of a light, the shape of a frame, the way yellow carried across a scene. I became irritated with him for talking, then discovered that I was seeing a different film.
 
-Progress.
+Style is often described as decoration, something added after the real content has been decided.
 
-The second time, I noticed how often Quentin Tarantino changes the language of the movie itself.
+*Kill Bill* makes that distinction impossible.
 
-Color becomes black and white.
+A realistic version of the same violence would be difficult to watch. Here violence becomes choreography, color, rhythm and quotation. The filmmaking does not merely present the story; it tells us what category of experience the violence belongs to from moment to moment.
 
-Live action becomes animation.
+Cinema is always doing this, even when it pretends not to.
 
-A western suddenly becomes a martial-arts film.
+Music can make an act triumphant or horrifying. Editing can turn the same gesture into comedy or threat. A close-up can transform an object into destiny. There is no neutral camera patiently delivering content.
 
-Music seems to belong to another movie and somehow fits perfectly.
+The Bride also changed for me on a second viewing. The first time I saw determination. Later I noticed reconstruction.
 
-The film behaves as though cinema history is a box of parts that can be opened and recombined.
+She wakes into a life other people have decided is finished. Her body has been violated, her future interrupted, her identity reduced to what was done to her. Revenge becomes not only punishment but authorship: she takes control of what happens next.
 
-That should feel artificial.
+This does not make every act morally admirable.
 
-Instead, the artificiality becomes the point.
+It makes the energy understandable.
 
-*Kill Bill* never asks us to forget that we are watching a movie.
+There is power in a character refusing the ending assigned to her.
 
-It seems delighted by the fact.
+I also noticed how often the film is funny, something memory had largely removed because the violence is easier to summarize. Humor creates distance. We are permitted to enjoy spectacle that would become unbearable under realistic rules.
 
-That made me think about style.
+That permission interests me more than the body count.
 
-Style is often treated as decoration.
+What are audiences allowed to enjoy, and what formal signals grant the permission?
 
-First you have content.
+The second viewing left me remembering transitions, colors and music more than individual deaths. That is probably the strongest defense of the film's excess.
 
-Then you decide how to present it.
+Its plot can be summarized quickly.
 
-The film refuses that separation.
+Its experience cannot.
 
-The presentation changes what the revenge means.
+Some films disappear into their stories.
 
-A realistic version of the same violence would be almost unbearable.
-
-Here violence becomes choreography, color, rhythm, genre memory.
-
-We are not simply watching what happens.
-
-We are watching how cinema has taught us to recognize what happens.
-
-The Bride herself also felt different on a second viewing.
-
-The first time, I saw determination.
-
-The second time, I noticed how much identity is being reconstructed.
-
-She wakes into a life that has been taken from her.
-
-Her body has been violated.
-
-Her future was interrupted.
-
-Other people decided the story was over.
-
-The revenge is therefore not only punishment.
-
-It is authorship.
-
-She starts deciding what the next chapter will be.
-
-That does not make every choice morally good.
-
-But it explains the force.
-
-There is something powerful about a character refusing the ending assigned to her.
-
-The film is full of borrowed genres, but the central character does not feel borrowed.
-
-She moves through these cinematic worlds with a very direct purpose.
-
-Perhaps that is why the excess works.
-
-The form is unstable.
-
-Her objective is not.
-
-I also noticed how funny the film is.
-
-That was easier to miss the first time because the violence dominates memory.
-
-Humor keeps appearing beside brutality.
-
-This creates distance.
-
-The film gives the audience permission to enjoy something that would be horrifying under realistic rules.
-
-That permission is interesting.
-
-Cinema constantly negotiates what we are allowed to enjoy.
-
-Music changes violence.
-
-Editing changes violence.
-
-Genre changes violence.
-
-Context can turn the same physical act into horror, comedy, tragedy, or spectacle.
-
-That is a reminder that images do not carry meaning alone.
-
-Form tells us how to feel.
-
-When the film ended the second time, I remembered fewer individual kills.
-
-I remembered transitions.
-
-Colors.
-
-Music.
-
-The shape of scenes.
-
-That is probably the strongest argument for its style.
-
-You could summarize the plot quickly.
-
-You cannot summarize the experience without describing how it looks and sounds.
-
-Some films tell stories.
-
-Others make you remember the machinery of cinema while the story is happening.
-
-*Kill Bill* does both.
+*Kill Bill* keeps reminding you that somebody is behind the camera, delighted by what a camera can do.

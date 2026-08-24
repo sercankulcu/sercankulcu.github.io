@@ -11,148 +11,70 @@ tags:
 
 I watched *Schindler's List* alone.
 
-That was not planned. I had the film on a borrowed DVD and started it one evening without really thinking about its length or whether I was in the right mood.
+That was not planned. I had a borrowed DVD, an evening without plans and the vague assumption that I knew what kind of film I was about to see because I already knew the historical subject.
 
-By the time it ended, the room felt inappropriate for ordinary activity.
+Knowledge of history did not prepare me for the scale becoming personal.
 
-I did not turn on music.
+Dates, camps and numbers are necessary, but very large numbers eventually exceed imagination. The mind can understand six million arithmetically without being able to picture six million individual absences.
 
-I did not immediately check email.
+The film repeatedly moves in the other direction.
 
-I just sat there.
+A name.
 
-Some films produce opinions.
+A face.
 
-This one produced silence.
+A child.
 
-I had learned about the Holocaust before. Dates, camps, numbers, photographs, names of places.
+A worker trying to remain useful for another day.
 
-Historical knowledge can become strangely abstract when the scale grows too large. A number like six million is so enormous that the mind cannot really picture it.
+The girl in the red coat becomes unforgettable because the film has removed most color and because crowds are constantly threatening to turn individuals into mass. For a brief period, one child is visible.
 
-The film works in the opposite direction.
+Later she is visible for a different reason.
 
-One person.
+That movement is terrible.
 
-One name.
+Oskar Schindler makes the moral story more complicated because he does not begin as a saint. He likes money, status, influence, good clothes and useful relationships. The transformation matters precisely because transformation is required.
 
-One coat.
+We prefer moral tales in which good people were always good. This protects the audience. If heroes are a separate species, ordinary people need not compare themselves too closely.
 
-One child.
+Schindler is less convenient.
 
-One worker trying to remain useful for another day.
-
-The scale becomes understandable only when it becomes painfully small.
-
-The girl in the red coat is unforgettable partly because the film has removed almost all color. In a world of crowds, uniforms, smoke, trains, lists, and bodies, one small figure becomes visible.
-
-Then she becomes part of the mass again.
-
-That movement—from individual to statistic—was difficult to shake.
-
-Oskar Schindler also makes the film morally complicated in a useful way.
-
-He does not begin as a saint.
-
-He is a businessman.
-
-He likes status, money, good clothes, important contacts.
-
-The remarkable part of his story is not that he was always virtuous.
-
-It is that his understanding changed.
-
-We often prefer moral stories in which character is fixed. Good people do good things. Bad people do bad things.
-
-Real life is less convenient.
-
-People can become better.
-
-They can become worse.
-
-They can notice something late and still decide that late is not too late to act.
-
-That idea matters because fixed moral categories allow us to excuse ourselves too easily.
-
-If heroes are born heroic, the rest of us are free from comparison.
-
-Schindler is more uncomfortable.
-
-He sees.
+He sees more.
 
 Then he changes what he is willing to risk.
 
-The lists themselves affected me too.
+The bureaucratic elements of the film disturbed me as much as the explicit violence. Lists, forms, work assignments, transport records, permits—objects of administration become instruments of life and death.
 
-Normally a list is administrative.
+Bureaucracy has no moral character by itself.
 
-Names in rows.
+It receives one from the system it serves.
 
-A system for organizing people.
+That is frightening because evil often looks more ordinary once organized. A terrible goal can be distributed into small professional tasks. Someone keeps records. Someone schedules transport. Someone signs a document.
 
-In the film, bureaucracy is used both to destroy and to save.
+No single desk has to contain the entire crime.
 
-That duality is disturbing.
+Near the end, Schindler looks at his possessions and calculates how many more people might have been saved. The scene is unbearable because success becomes insufficiency. He has done something extraordinary and can see only the remainder.
 
-A form, a permit, a signature, a transport record—none of these objects are moral by themselves. Their meaning depends on the system they serve and the person using them.
+After the film ended, I did not turn on music or check email. I put the DVD back into its case more carefully than necessary and sat in the quiet room.
 
-We tend to imagine evil as emotional.
-
-Hatred.
-
-Rage.
-
-Violence.
-
-The film also shows something colder: evil becoming procedural.
-
-People processed.
-
-Property recorded.
-
-Trains scheduled.
-
-Work assigned.
-
-Death administered.
-
-That may be one of the most frightening things about modern history.
-
-A terrible objective can be made efficient.
-
-Near the end, Schindler looks at what he owns and calculates how many more people might have been saved.
-
-That scene is almost unbearable because success turns into insufficiency.
-
-He has done something extraordinary.
-
-He sees only what he failed to do.
-
-I do not think that is a fair way to judge him.
-
-But I understand the feeling.
-
-Once a human life has a face, arithmetic becomes difficult.
-
-The film ended long after midnight.
-
-I remember ejecting the disc and putting it back into its case very carefully, as though the object itself required more respect than an ordinary DVD.
-
-The next morning the room was normal again.
-
-Computer.
+The next morning everything looked normal again.
 
 Desk.
 
-Window.
+Computer.
 
 Coffee.
 
-That bothered me for a moment.
+Traffic outside.
 
-History contains events after which the world should somehow look permanently different.
+That normality bothered me.
+
+History contains events after which the world seems as though it should remain visibly altered.
 
 It does not.
 
-The ordinary world continues.
+The ordinary world is extremely good at continuing.
 
-Perhaps that is why remembering has to be deliberate.
+Remembering therefore cannot depend on atmosphere.
+
+It has to be deliberate.

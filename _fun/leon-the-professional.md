@@ -9,156 +9,48 @@ tags:
    - family
 ---
 
-I watched *Léon: The Professional* on television one summer night.
+I watched *Léon: The Professional* on television during a hot summer night. The windows were open, and in the quiet scenes I could hear traffic below the apartment. That ordinary sound made Léon's life seem even more sealed.
 
-The apartment was warm.
+He has reduced existence to a few reliable elements: work, milk, exercise, sleep and a plant he carries from place to place.
 
-The windows were open.
+The simplicity looks disciplined.
 
-I remember hearing traffic outside during the quieter scenes.
+It is also lonely.
 
-That ordinary background made the film's isolation feel stronger.
+Then Mathilda arrives at his door.
 
-Léon lives like someone who has reduced life to function.
-
-Work.
-
-Milk.
-
-A plant.
-
-Exercise.
-
-Sleep.
-
-Repeat.
-
-There is almost nothing unnecessary in his world.
-
-That kind of simplicity can look disciplined.
-
-It can also look lonely.
-
-Then Mathilda enters.
-
-Not politely.
-
-Not gradually.
-
-She arrives because everything outside Léon's door has become dangerous.
-
-The scene at the door is the one I remember most.
-
-She walks past her own apartment and keeps going.
-
-Léon has to decide whether to open the door.
-
-That decision is small in physical terms.
-
-Turn the lock.
-
-Open.
-
-But the entire film follows from it.
-
-We often imagine important choices as things we prepare for.
-
-Applications.
-
-Marriages.
-
-Moves.
-
-Jobs.
-
-Real life also changes through decisions made in seconds.
-
-Let this person in.
-
-Answer the phone.
-
-Stay.
-
-Leave.
+The scene matters because almost nothing happens physically. She has nowhere safe to go. Léon has every reason not to become involved. The decision that changes both lives is no larger than a lock turning.
 
 Open the door.
 
-Léon is professionally good at killing and personally bad at living.
+I have always liked stories in which enormous consequences begin with gestures too small to recognize themselves as plot. We prepare for the important decisions we can name—jobs, marriages, moves, applications—but life also changes through seconds: answer the phone, sit at this table, let this person in.
 
-That contrast gives the film its strange tenderness.
+Léon is extraordinarily competent at killing and almost incompetent at living. This gives the film its strange tenderness. Mathilda cannot teach him anything useful about violence. She teaches him attachment, which is much more dangerous for a man whose survival depends on remaining portable.
 
-Mathilda teaches him nothing about violence.
+The plant is not a subtle symbol, but I have never minded. It has roots inside a pot and nowhere in the world. Léon can move it because he has arranged his own life the same way. No soil, no fixed address in the deeper sense, no person capable of making departure costly.
 
-He already understands violence.
+Mathilda wants roots before he does.
 
-She teaches him attachment.
+The relationship between them becomes uncomfortable in places, and the film is strongest for me when I read it not as romance but as two damaged people inventing a form of family without possessing the correct vocabulary. Protector, student, child, friend—none fits completely.
 
-Attachment is more dangerous for him.
+People often become important before the category is clear.
 
-Once another person matters, the clean routines stop being enough.
+I once kept a plant alive through three moves, not because I cared particularly about plants but because it had belonged to a room associated with a good period of my life. At each new apartment, the plant was the first object that made the place feel less temporary.
 
-The plant is important for that reason.
+I thought about that years after seeing *Léon*.
 
-Léon carries it from place to place because it has roots in a pot but nowhere in the world.
+Objects can carry continuity when people cannot.
 
-He is the same.
+At the end, Mathilda puts Léon's plant into the ground. It is a simple image, perhaps too simple, yet it completes something the film has been doing from the beginning. What Léon could only carry finally gets to remain.
 
-Portable.
+He does not receive the ordinary life he had begun, perhaps too late, to imagine.
 
-Self-contained.
+Something connected to him does.
 
-Never fully belonging.
+After the film ended that summer night, traffic was still moving outside. The city had no idea anything had happened.
 
-Mathilda immediately understands the symbolism before Léon seems willing to.
+I kept thinking about the door.
 
-She wants roots.
+Some lives are protected by keeping it closed.
 
-The relationship between them is deliberately uncomfortable in places, and I think the film works best when it remains about two damaged people trying to invent a form of family neither knows how to build properly.
-
-Trust grows badly.
-
-Awkwardly.
-
-But it grows.
-
-That interested me more than the action.
-
-People often become important to each other before they have the correct language for the relationship.
-
-Friend.
-
-Teacher.
-
-Parent.
-
-Student.
-
-Protector.
-
-Family.
-
-Sometimes the categories arrive after the attachment.
-
-The ending gives the plant a different meaning.
-
-For most of the film, it is movable.
-
-At the end, it finally enters the ground.
-
-That image stayed with me.
-
-Léon does not get the ordinary life he might have learned to want.
-
-But something connected to him does.
-
-A root enters soil.
-
-After the film ended, traffic was still moving outside.
-
-The world had remained completely ordinary.
-
-For a while I kept thinking about the door.
-
-There are moments when protecting your life means keeping it closed.
-
-There are other moments when a life begins because you open it.
+Others begin when it opens.

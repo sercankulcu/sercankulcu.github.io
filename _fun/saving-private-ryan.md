@@ -9,136 +9,60 @@ tags:
    - duty
 ---
 
-I watched *Saving Private Ryan* on television, expecting a war film.
+I watched *Saving Private Ryan* on television expecting a war film and discovered, during the opening battle, that I had confused war films with war.
 
-The opening changed that expectation almost immediately.
+Most cinematic battles I had seen possessed a useful geography. You understood where the enemy was, which direction the soldiers were moving, what objective mattered.
 
-I had seen cinematic battles before.
+The Normandy landing begins with confusion.
 
-They usually had shape.
+Noise, water, sand, blood, orders that cannot be heard, men trying to stay alive long enough to understand where they are.
 
-You understood where people were.
+For the first time, strategy felt like something that happened to bodies.
 
-Who was advancing.
+History must use abstraction. Armies advance. Lines collapse. A beachhead is established. Operations succeed or fail. Without that language, large events cannot be explained.
 
-Who was winning.
+But the sentence “take the beach” is much cleaner than the experience required to make it true.
 
-The Normandy landing in *Saving Private Ryan* felt different.
+The film keeps forcing the abstraction back into individual people.
 
-Confusion came first.
+That is why the central mission is morally difficult. Several men are ordered to risk their lives to bring one man home because his brothers have died.
 
-Noise.
+Mathematically, the exchange looks absurd.
 
-Water.
+Human beings do not live mathematically.
 
-Sand.
+The soldiers resent the mission because they understand the arithmetic. Why should their mothers receive telegrams so another mother does not?
 
-Fear.
+There is no answer capable of making the danger fair.
 
-People trying to stay alive long enough to understand what was happening.
+Years after seeing the film, I visited a military cemetery. Rows of markers extended farther than I expected. From a distance, the pattern was almost beautiful. Up close, every stone contained a name and an age.
 
-For the first time, a battle scene made me think less about strategy and more about the individual body inside strategy.
+Abstraction works at distance.
 
-Maps are clean.
+Names destroy it.
 
-Orders are clean.
+Captain Miller affected me because he is not fearless. His hands shake. He is tired. He wants to return to ordinary life. Courage, in the film, is not the absence of fear but the continued performance of responsibility while fear remains.
 
-“Take the beach” is a sentence.
+The phrase “Earn this” has always troubled me.
 
-Then people have to do it.
+How does someone earn lives lost on their behalf?
 
-That distance between the command and the experience stayed with me.
+There is no calculation.
 
-War history is often taught through movement.
+A debt like that cannot be paid because repayment would require reversing time.
 
-Armies advance.
+The older Ryan at the cemetery asks whether he has been a good man. It is an impossible question directed toward people who cannot answer.
 
-Lines break.
+Perhaps that is the burden of surviving sacrifice. The dead no longer need to justify what happened.
 
-Cities fall.
+The living do.
 
-Operations succeed.
-
-The language is necessary because history needs abstraction.
-
-But abstraction can make suffering invisible.
-
-The film forces the abstraction back into individual people.
-
-That makes the central mission morally difficult.
-
-Several men are asked to risk their lives to save one man.
-
-Mathematically, the mission seems absurd.
-
-Humanly, the situation is less simple.
-
-A government has decided that one family has already lost enough.
-
-That decision creates another question.
-
-How much is one life worth?
-
-The film refuses to give a clean answer.
-
-Captain Miller's group does not agree.
-
-Why should they die for someone they do not know?
-
-That resentment is understandable.
-
-Duty does not remove arithmetic.
-
-But military organizations depend on people accepting orders whose full reasoning they may never know.
-
-That tension interested me.
-
-Obedience can make coordinated action possible.
-
-It can also ask people to carry costs decided by someone far away.
-
-Captain Miller is compelling because he is tired rather than heroic in an uncomplicated way.
-
-His hands shake.
-
-He wants to go home.
-
-He performs the role required of him even when the role is consuming him.
-
-That feels closer to courage than fearlessness.
-
-The line “Earn this” is the part of the film I kept returning to.
-
-It is an impossible instruction.
-
-How do you earn the lives of people who died so that you could continue living?
-
-You cannot repay that debt.
-
-You can only live under its existence.
-
-That is a heavy way to think about survival.
-
-The older Ryan at the cemetery makes the question explicit.
-
-Was I a good man?
-
-Did I live well enough?
-
-There is no objective answer.
-
-That may be the point.
-
-Sacrifice creates obligations that cannot be measured cleanly.
-
-When the film ended, I did not feel the excitement I sometimes felt after action films.
+When the film ended, I did not feel the excitement action films often leave behind.
 
 I felt tired.
 
-That was probably intentional.
+That was probably one of its achievements.
 
-The film had taken a genre that can easily turn combat into spectacle and made victory look expensive.
+Victory is usually the cleanest sentence in a history book.
 
-History remembers who won.
-
-The dead paid before the sentence was finished.
+The film asks us to look at what had to happen before anyone could write it.

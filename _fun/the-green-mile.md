@@ -9,93 +9,35 @@ tags:
    - life
 ---
 
-I watched *The Green Mile* on a rainy evening when I had expected something much simpler.
+I watched *The Green Mile* on a rainy evening expecting a prison story.
 
-I knew it was set on death row.
+What remained with me was a question about certainty.
 
-I assumed the film would be about guilt, punishment, and prison.
+Death row is built around procedures. Cells, schedules, meals, paperwork, rehearsed movements, a corridor, a chair. An irreversible act is made administratively repeatable.
 
-It was.
+Institutions need procedures. That is how they remain consistent.
 
-But what stayed with me was kindness.
+The danger is that procedure can make finality feel ordinary.
 
-That surprised me.
-
-The setting is designed around finality.
-
-People arrive knowing where the corridor leads.
-
-The guards know.
-
-The prisoners know.
-
-Everything has procedure.
-
-A cell.
-
-A schedule.
-
-A last meal.
-
-A walk.
-
-A chair.
-
-Death has been turned into administration.
-
-Then John Coffey enters that environment and makes certainty uncomfortable.
-
-He is physically enormous and emotionally gentle.
-
-The contrast is obvious, but it works because the people around him keep having to reconsider what appearance means.
-
-That seems like a small lesson.
-
-It is not.
-
-Human beings make rapid judgments constantly.
+John Coffey enters this world looking physically capable of violence and behaving with extraordinary gentleness. The contrast is obvious, but it works because everyone around him must confront the speed at which human beings assign categories.
 
 Dangerous.
 
-Safe.
+Weak.
 
 Intelligent.
 
-Weak.
-
-Normal.
-
 Strange.
 
-We need categories because the world moves too quickly to examine everyone deeply.
+We make these judgments constantly because careful investigation of everyone is impossible.
 
-But categories become dangerous when institutions treat them as complete truths.
+Institutions make the same judgments with greater consequences.
 
-The film's supernatural element makes the injustice clear in a way reality rarely does.
+The film's supernatural element makes John's innocence morally unambiguous in a way real life rarely is. He can heal. He can provide evidence no ordinary defendant could produce. This convenience lets the film ask a harder question underneath.
 
-John's goodness is almost physically demonstrable.
+How certain should a system be before making a mistake impossible to repair?
 
-He heals.
-
-He absorbs pain.
-
-He gives other people evidence.
-
-Real cases are not so convenient.
-
-That made me think about the confidence required to make irreversible decisions.
-
-The death penalty is the obvious example.
-
-Once carried out, there is no correction.
-
-No appeal.
-
-No later discovery can restore the person.
-
-Irreversibility changes the moral weight of certainty.
-
-In software, we are trained to like undo.
+My professional mind immediately thinks in terms of undo.
 
 Backups.
 
@@ -105,50 +47,34 @@ Rollback.
 
 Transactions.
 
-Systems are safer when mistakes can be reversed.
+We design technical systems to make mistakes reversible whenever possible because people will inevitably make them.
 
-Human institutions do not always have that luxury.
+Human institutions do not always have that option.
 
-That thought stayed with me.
+Years after seeing the film, I accidentally deleted a database table during a test. For several seconds I believed I had damaged production data. Then I learned that I was in the correct environment and restored everything from a snapshot.
 
-How certain should we be before doing something that cannot be undone?
+The relief was physical.
 
-Paul Edgecomb's relationship with John is painful because understanding arrives without power.
+I thought, absurdly, of *The Green Mile*.
 
-He begins to know that the system is wrong in this particular case.
+Some systems contain no snapshot.
 
-But the machinery around the decision is larger than his personal knowledge.
+Paul Edgecomb's tragedy is partly that knowledge arrives without enough power. He becomes convinced the process is wrong in this case, but personal understanding does not automatically stop institutional machinery.
 
-That is another frightening thing about institutions.
+That may be one of the film's most unsettling ideas.
 
-A good person inside a bad outcome does not automatically stop the outcome.
+Good people can participate in bad outcomes while feeling the wrongness clearly.
 
-Individual morality and institutional procedure are not the same thing.
+The later story of Paul's long life turns another common wish inside out. We routinely wish people many years as if duration were automatically a gift. The film asks what longevity means when it becomes a long sequence of departures.
 
-The film also made longevity feel strangely like punishment.
+Time has value partly because other people occupy it with us.
 
-We usually wish people a long life without qualification.
+When the film ended, rain was still hitting the windows. I stayed in the chair and listened to it for a while.
 
-Live many years.
+The corridor is called the Green Mile because prisoners walk it toward a known ending.
 
-See more.
+Most of us walk a version of that corridor without knowing our position.
 
-Experience more.
+The uncertainty is frightening.
 
-The film asks what happens when living longer means surviving everyone you loved.
-
-Duration alone is not necessarily a gift.
-
-The value of time depends partly on who shares it.
-
-When the film ended, the rain was still hitting the windows.
-
-I remember not wanting to move for a while.
-
-The prison corridor in the film is called the Green Mile because every prisoner walks it toward death.
-
-But afterward I kept thinking that everyone has some version of that corridor.
-
-The difference is that most of us do not know exactly where we are on it.
-
-Perhaps that uncertainty is mercy.
+It may also be mercy.

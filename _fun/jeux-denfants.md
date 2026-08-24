@@ -11,114 +11,76 @@ tags:
 
 I did not expect *Jeux d'enfants* to do anything unusual to me.
 
-I had not been waiting to see it. Nobody had insisted that it would change my life. I simply started the film thinking, let’s see what this is.
-
-For the next hour and a half I did not get up. I watched and smoked one cigarette after another.
-
-When the film ended, nothing happened immediately.
+I began the film without ceremony and spent the next hour and a half smoking one cigarette after another. When it ended, I stood up, moved around the room, and thought that was that.
 
 About ten minutes later, I started crying.
 
-Not really because of Julien. Not really because of Sophie.
+Not because of Julien.
 
-The film had reminded me of **my Sophie**.
+Not exactly because of Sophie.
 
-That was not her name, of course. But after the film I could not think of her in any other way.
+The film had returned someone to me.
 
-We had grown up together until I was about eleven. At that age, you do not understand how temporary the ordinary parts of life can be. Someone is simply there. You play, argue, laugh, and assume you will see each other again tomorrow.
+We had grown up together until I was about eleven. At that age, friendship rarely begins with a decision. A person simply belongs to the landscape: the same street, the same games, the same arguments, the same expectation that tomorrow will repeat enough of today to feel permanent.
 
-Children rarely imagine an ending to something that has never needed a beginning.
+Children do not understand how temporary ordinary life is.
 
-Then my father was transferred.
+Then my father was transferred and we moved.
 
-We moved.
+There was no final scene worthy of a film. No carefully written goodbye. Childhood continued in another place, which is how many important endings occur: disguised as logistics.
 
-There was no dramatic farewell scene. Childhood simply continued in another place.
+New schools, new friends, university, work and different cities accumulated. Life is excellent at adding things quickly enough that you do not notice what it has removed. Eventually I no longer knew where she lived, what she was doing, or what kind of adult had grown out of the child I remembered.
 
-Years accumulated quickly: new schools, new friends, university, work, different cities, different people. Life is very good at adding things fast enough that you do not always notice what it has removed.
+Then *Jeux d'enfants* gave memory a face.
 
-Eventually I did not know where she lived, what she was doing, or what kind of person she had become.
+Julien and Sophie have their game, *Cap ou pas cap?*—dare or not dare? As children they create a private world with rules of their own. The difficulty begins when adulthood arrives but the game keeps demanding loyalty to its old logic. Pride, desire and fear enter something that once belonged to childhood.
 
-There had once been somebody who occupied almost every ordinary day of my childhood. Years later, she existed only in memory.
+While watching, I stopped following only their story.
 
-Then I watched *Jeux d'enfants*.
+I began remembering ours.
 
-Julien and Sophie have their game: **Cap ou pas cap?** Dare or not dare?
+There is a special intimacy in childhood friendships because neither person has yet assembled a finished identity. You know one another before careers, adult manners, ambitions and the stories people later learn to tell about themselves.
 
-As children, they create a private language and a world with rules of their own. That is what children do. The adult world has not yet convinced them that reality must be organized in one particular way.
+Years afterward, you may remember a person who no longer exists in exactly that form.
 
-The difficulty begins when the children grow older and the game refuses to remain a childhood game. Pride, love, fear, and adult consequences enter the same space that once belonged to simple dares.
+And they remember a version of you that has also disappeared.
 
-While watching them, I stopped following only their story.
+When I wrote about the film that night, I ended with a sentence I believed completely:
 
-Memories began appearing.
+**Unfortunately, things like this don't happen in real life.**
 
-I remembered the strange intimacy of childhood friendships that you never consciously chose. There is no moment when you decided to become friends. The person simply belonged to the landscape of your life.
+Then I deleted the film.
 
-And because there was no beginning, perhaps you never imagined an ending.
+I did not want to watch it again. Some films entertain us; others find a room we had forgotten and switch on the light.
 
-That is one of the cruelties of childhood: you do not know when something is happening for the last time.
-
-The last game. The last walk home. The last argument. The last ordinary afternoon.
-
-Nobody tells you to pay attention because you will remember it decades later.
-
-When my family moved, life changed direction and that was all. Perhaps this is why *Jeux d'enfants* affected me so strongly. It made me think about people who belong completely to one period of our lives and then disappear from the next.
-
-Sometimes we lose people because somebody behaved badly. Sometimes because of an argument or a choice.
-
-And sometimes nobody does anything wrong.
-
-A family moves. School ends. A job begins. A city changes.
-
-One day you notice that a person who once knew almost everything about your daily life has become someone whose life you know nothing about.
-
-When I wrote about the film that night, I ended with a confident sentence:
-
-**Unfortunately, things like this don’t happen in real life.**
-
-I believed it.
-
-Films are allowed to make circles. People disappear and return. Childhood promises survive for decades. Coincidences wait patiently for the right scene.
-
-Real life seemed less interested in completing its stories.
-
-So I deleted the film. I genuinely did not want to watch it again, even accidentally. Once was enough. Some films are enjoyable to revisit; others open a door you would rather not keep walking through.
-
-I thought that was the end of the story.
-
-Months later, Facebook did something it was becoming unexpectedly good at doing in those years: it reconnected people who had vanished from each other’s lives long before the internet became ordinary.
+Months later, Facebook performed one of the minor miracles it was becoming famous for in those years.
 
 She found me.
 
 My Sophie.
 
-After all those years.
+After all that time.
 
-When I returned to the old entry on October 23, 2010, I had to correct myself.
+I returned to the old post on October 23, 2010 and changed one sentence.
 
-The first version had said:
+The first version had said that things like this do not happen in real life.
 
-**Unfortunately, things like this don’t happen in real life.**
-
-The second version became:
+The second said:
 
 **Unfortunately, in real life, you never know what will happen.**
 
 I still prefer the correction.
 
-We spend a surprising amount of time declaring stories finished. Someone belongs to the past. A door has closed. A period of life is over. Most of the time, perhaps we are right.
+We declare stories finished because the alternative is exhausting. Someone belongs to the past. A city is gone. A period is over. Most of the time, that classification works.
 
-But occasionally life continues writing after we have already placed the full stop.
+Occasionally life ignores it.
 
-*Jeux d'enfants* reminded me of somebody I had lost somewhere between childhood and adulthood. For one night, that was painful enough to make me wish I had never watched it.
+The strange thing about memory is that it preserves people without asking whether they will ever return. For years, a child from one part of my life existed only in that private archive.
 
-A few months later, life added another sentence.
+Then a film opened the file.
 
-Not a perfect ending. Not a tragedy either.
+A few months later, real life added a page.
 
-Just another sentence.
+Films require endings.
 
-Films need endings.
-
-Life can be less cooperative.
+Life is less disciplined.

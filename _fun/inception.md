@@ -11,158 +11,60 @@ tags:
 
 I watched *Inception* in a cinema and spent the walk home explaining it to myself.
 
-Not to another person.
+Not because I had failed to follow the plot entirely, but because the film had left several systems running in my head at once. A dream inside a dream, time stretching differently at each level, memories breaking into constructed spaces, rules established with confidence and then violated by the people who made them.
 
-To myself.
+I enjoyed the machinery. What remained with me, however, was not the machinery.
 
-That is usually a good sign.
+It was the idea.
 
-The film had ended, but my mind was still trying to arrange its levels: dream inside dream, time moving at different speeds, memories entering constructed spaces, rules established and then bent.
+The film treats inception as an extraordinary act: placing an idea deeply enough in another person's mind that it feels self-generated. Outside science fiction, smaller versions of this happen constantly. A teacher says something casually and the sentence returns ten years later. A friend recommends a book. A parent repeats one warning throughout childhood. An advertisement attaches a feeling to an object. Eventually the idea survives while its source disappears.
 
-I enjoyed the puzzle.
+That is unsettling.
 
-But the puzzle was not what stayed with me.
+We like to imagine our minds as private property, yet much of what we call ourselves was introduced by other people.
 
-The idea that remained was much simpler.
+Cobb's real problem makes this more personal. He can enter and manipulate other people's mental architecture, but knowledge gives him surprisingly little control over his own memory of Mal. He understands what is happening. He can explain why the projection appears. None of that stops her from appearing.
 
-An idea can change a person without asking permission.
+The engineer in me has always found that unfair.
 
-The film calls inception almost impossible: placing an idea deeply enough inside someone's mind that they experience it as their own.
+Understanding a mechanism should help.
 
-Outside science fiction, we do smaller versions of this constantly.
+Often it does. Not always.
 
-A teacher says something that returns ten years later.
+You can know exactly why a fear is irrational and remain afraid. You can understand grief psychologically and continue grieving. You can recognize that a memory has been edited by guilt and still experience the edited version as emotionally true.
 
-A friend recommends a book.
+The mind is not obligated to accept a correct diagnosis as a patch.
 
-Someone makes an offhand comment.
+I once woke from a dream about an old apartment where I had not lived for years. Nothing dramatic happened in the dream. I was simply looking for a light switch in the hallway and could not find it. For the rest of the morning, the apartment felt more present than the room I was actually in. I had not consciously thought about that hallway in years, yet the mind had apparently preserved its geometry.
 
-A parent repeats one sentence throughout childhood.
+That experience returned to me during *Inception*.
 
-An advertisement connects an object with a feeling.
+Memory is not an archive we visit only when invited. It runs background processes.
 
-A film gives you an image you cannot forget.
+The dream architecture in the film also resembles software in a way I found irresistible. Each level has constraints, dependencies and timing. Events in one layer propagate into another. A complicated operation has to remain synchronized across environments.
 
-Most of the ideas shaping us do not arrive with labels explaining where they came from.
+And, as in software, the most elegant system eventually meets a human being.
 
-Eventually we remember the idea and forget the source.
+The architecture can be perfect. The subconscious is not.
 
-That is slightly unsettling.
+The spinning top became the object everyone discussed afterward. Does it fall? Is Cobb awake? What is real?
 
-Cobb's problem makes it personal.
+I joined those arguments at first.
 
-He is an expert at entering other people's mental worlds but cannot control his own memory of Mal.
+Later I became more interested in the moment when Cobb looks away from the top.
 
-That contradiction interested me more than the technology.
+For most of the film, he requires verification. By the end, perhaps he requires something else more.
 
-Knowledge does not guarantee control.
+Technical work trains us to value certainty. Measure, test, reproduce, know the state of the system. This habit is useful enough that it can become moral.
 
-You can understand exactly why a memory is misleading and still feel its power.
+Life does not always provide the final test.
 
-You can know a fear is irrational and remain afraid.
+Some questions remain probabilistic.
 
-You can explain grief psychologically and continue grieving.
+Sometimes we decide how much uncertainty we are willing to live with.
 
-The mind does not obey understanding as neatly as engineers might prefer.
+When I reached home after the film, the first thing I saw was an ordinary table. Nothing folded upward. Gravity remained dependable.
 
-Mal appears inside Cobb's constructed worlds because memory is not passive storage.
+For a few seconds, though, the room looked designed.
 
-It interferes.
-
-That felt true.
-
-We like to imagine memory as an archive.
-
-Open the correct folder.
-
-Retrieve the event.
-
-Close it.
-
-Real memory is more invasive.
-
-A place reminds you of someone.
-
-A smell changes your mood before you know why.
-
-A song recreates a year.
-
-The past inserts itself into the present without asking whether the timing is convenient.
-
-The dream architecture also appealed to the programmer in me.
-
-Each level has rules.
-
-Time behaves according to a system.
-
-There are dependencies.
-
-Actions at one layer affect another.
-
-A complicated operation has to remain synchronized across several environments.
-
-It is difficult not to see something computational in that.
-
-Yet the film becomes most interesting whenever the system fails because of a human being.
-
-The architecture can be perfect.
-
-The subconscious is not.
-
-There is always an unplanned process running somewhere.
-
-The spinning top became the image everybody discussed afterward.
-
-Does it fall?
-
-Is Cobb awake?
-
-What is real?
-
-I joined those discussions too.
-
-But eventually I became less interested in the answer.
-
-At the end, Cobb looks at the top and then looks away.
-
-That gesture matters more to me than what the object does next.
-
-For most of the film he needs a test.
-
-By the end, perhaps he needs his children more than certainty.
-
-Engineers are trained to value verification.
-
-Prove it.
-
-Measure it.
-
-Test it.
-
-Know which state the system is in.
-
-That habit is useful.
-
-Life is not always cooperative.
-
-Some questions cannot be debugged until they produce a clean answer.
-
-Sometimes you choose how much uncertainty you are willing to live with.
-
-When I arrived home after the film, the first thing I saw was an ordinary table.
-
-Nothing moved.
-
-Nothing folded upward.
-
-Gravity behaved itself.
-
-For a second, though, the room felt constructed.
-
-Then the feeling disappeared.
-
-The film had planted something.
-
-Not doubt about reality.
-
-Attention to how easily an idea can change the way reality looks.
+Then the idea settled in.

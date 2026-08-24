@@ -11,148 +11,62 @@ tags:
 
 I watched *The Prestige* because I thought I was going to see a film about magicians.
 
-I ended up thinking about obsession.
+I came away thinking about people who allow comparison to become a profession.
 
-The film explains a magic trick in three stages.
-
-The Pledge.
-
-The Turn.
-
-The Prestige.
-
-That structure is elegant enough that the film uses it on the audience too.
-
-Something ordinary is shown.
-
-Something impossible happens.
-
-Then we demand an explanation.
-
-That demand is part of the trap.
+The film explains a magic trick in three stages: the pledge, the turn and the prestige. Something ordinary is presented, something impossible appears to happen, and the audience demands that the impossible be returned to order.
 
 We say we want to know how the trick works.
 
-Usually we want both things.
+Usually we want two incompatible things.
 
-We want the explanation.
+We want the explanation, and we want the magic to survive it.
 
-And we want the magic to survive the explanation.
+Technical people are especially bad at leaving boxes closed. Open it. Trace the mechanism. Find the hidden dependency. Discover what the apparatus is actually doing.
 
-Those desires are incompatible.
+There is pleasure in explanation.
 
-Once you understand the mechanism, the impossible becomes engineering.
+There is also loss.
 
-That idea interested me because technical people are trained to destroy mystery.
+Once you understand the trick, you cannot experience precisely the same impossibility again.
 
-Open the box.
+Angier and Borden turn this desire for knowledge into rivalry. At first the competition is professional: a better illusion, a stronger audience reaction, a secret worth discovering.
 
-Trace the signal.
+Then the competitor becomes the unit of measurement.
 
-Read the code.
+That is the dangerous transition.
 
-Understand the mechanism.
+I once worked with two people who were both excellent programmers and, separately, pleasant. Put them on neighboring solutions to the same problem and every design discussion became a contest. Features nobody needed appeared because the other version had something similar. Performance optimizations were produced for loads the system would never experience.
 
-There is satisfaction in that.
+The work stopped asking, “What does the project need?”
 
-But explanation has a cost.
+It began asking, “Who wins?”
 
-You cannot unknow how the trick is done.
+*The Prestige* takes that pathology to an operatic extreme.
 
-Angier and Borden take this much further.
+The sacrifices accumulate: time, bodies, relationships, identity. The public sees the successful illusion for a few minutes. The magician lives inside the cost for years.
 
-Their rivalry begins professionally.
+This difference applies far beyond performance.
 
-Then it consumes everything around it.
+A paper, a company, a program, a career—the audience sees the prestige. The creator remembers the pledge and the turn.
 
-The most frightening part is not that they want to be good.
+Finished work hides its discarded versions.
 
-It is that being better than the other person becomes more important than the original craft.
+The film is also about secrecy. A secret gives power because another person lacks it, but maintaining secrecy changes the life of the person carrying it. Schedules, relationships and explanations must bend around what cannot be revealed.
 
-That can happen in much smaller ways.
+Eventually the secret owns real estate inside the self.
 
-Competition is useful until the competitor becomes your measurement system.
+When the final answers arrive, the film becomes less magical and more disturbing.
 
-Then you stop asking, “Is this good?”
+That is fair.
 
-You ask, “Is this better than his?”
-
-That is a dangerous substitution.
-
-The object of the work disappears.
-
-Only comparison remains.
-
-The film is full of sacrifice.
-
-Time.
-
-Bodies.
-
-Relationships.
-
-Identity.
-
-The audience sees the finished illusion for a few seconds.
-
-The magician lives inside the cost for years.
-
-That difference stayed with me.
-
-We consume finished work without seeing the private machinery behind it.
-
-A performance.
-
-A paper.
-
-A program.
-
-A business.
-
-A career.
-
-The public sees the prestige.
-
-The creator knows the pledge and the turn.
-
-The film also made secrecy feel expensive.
-
-A secret gives power because others do not know it.
-
-But maintaining a secret changes the person who carries it.
-
-You have to organize life around what cannot be revealed.
-
-Eventually the secret owns part of you.
-
-When the final explanations arrive, the film becomes less magical and more disturbing.
-
-That is appropriate.
-
-We wanted to know.
-
-Now we know.
+We insisted on knowing.
 
 The cost of the trick becomes visible.
 
-I remember thinking about the audience inside the film.
+The audience inside the film applauds and goes home. They are not responsible for the machinery backstage.
 
-They applaud.
+We often enjoy achievement the same way.
 
-They go home.
+Talent is what can be seen from the seats.
 
-They never imagine what had to happen backstage.
-
-That may be true of many things we admire.
-
-We see the result and call it talent.
-
-Sometimes talent is only the visible part.
-
-The hidden part is repetition, compromise, sacrifice, and occasionally a degree of obsession that would look unhealthy if the final product were not impressive.
-
-The film asks whether the result justifies the cost.
-
-I am not sure it answers.
-
-Maybe that is why I kept thinking about it.
+Obsession is usually behind the curtain.

@@ -9,98 +9,72 @@ tags:
    - freedom
 ---
 
-I watched *Revolution OS* during a period when I was reinstalling operating systems far more often than any sensible person should.
+I watched *Revolution OS* during a period when I was reinstalling operating systems more often than any stable adult should.
 
 Linux had turned my computer into a laboratory.
 
-I would install a distribution, change something I did not fully understand, break the graphical environment, search for a solution, repair half of the problem, create another one, and occasionally decide that starting from zero was easier.
+I would install a distribution, change something I barely understood, break the graphical environment, search for a solution, repair half the problem, create a new one and eventually decide that another installation was educational rather than evidence of poor judgment.
 
-This was frustrating.
+This was the state of mind in which the documentary found me.
 
-It was also fun.
+I expected computer history.
 
-That is the state of mind in which *Revolution OS* found me.
+I got an argument about freedom.
 
-The documentary covers GNU, Linux, free software, open source, Richard Stallman, Linus Torvalds, and the larger movement around software that could be studied, modified, and redistributed.
+The film covers GNU, Linux, Richard Stallman, Linus Torvalds and the movement around software whose source code could be studied, modified and redistributed. Until then I had mostly treated licenses as paperwork surrounding software.
 
-At first, I expected computer history.
+The documentary made the paperwork philosophical.
 
-What I got was an argument about values.
-
-That surprised me.
-
-Until then, I had mostly treated software licenses as something surrounding software rather than something capable of changing its culture. Programs were things you installed and used. Source code was interesting if you wanted to understand how something worked.
-
-The documentary made the legal and philosophical layer harder to ignore.
-
-Who is allowed to inspect the program?
+Who may inspect the program?
 
 Who may change it?
 
-Who benefits from the improvement?
+Who benefits from an improvement?
 
-What exactly does it mean to “own” software when software can be copied perfectly?
+What does ownership mean when the object can be copied perfectly without removing the original from its owner?
 
-Those questions are easy to dismiss when all you want is a working machine.
+These questions become less abstract the first time a program does something wrong and you can actually look behind the interface.
 
-They become more interesting the first time a piece of software does not work and you realize that access to the source changes what is possible.
+Access to source does not guarantee understanding. Often it guarantees a more sophisticated form of confusion.
 
-There is a particular satisfaction in being able to look behind the interface.
+Still, the possibility changes your relationship to the machine.
 
-Even if you do not understand everything you see.
+Closed software presents itself as an object: use me as I am.
 
-Perhaps especially then.
+Open source presents an invitation: this is how I work; if something bothers you enough, look.
 
-A closed program presents itself as an object: use me as I am.
+I once spent an entire evening fixing a sound problem caused by a configuration change I had made myself. By midnight the speakers worked exactly as they had before I touched anything.
 
-Open source presents an invitation that is both generous and slightly intimidating: here is how I work; if you do not like something, find it.
+On paper, I had accomplished nothing.
 
-Of course, reality is not as romantic as the slogan.
+In practice, I understood the system better.
 
-Having source code does not mean you have the time, knowledge, or patience to repair it. Communities can be difficult. Documentation can be incomplete. Freedom can include the freedom to spend an entire evening debugging something that worked perfectly before you touched it.
+This is one of the strange pleasures of technical learning. A day can end where it began and still contain progress.
 
-I knew that part well.
+The social model behind open source interested me just as much. Software can be shared without the original disappearing. If I give you a chair, I lose the chair. If I give you a copy of a program, we both have it.
 
-Still, *Revolution OS* helped me understand why so many people cared about the distinction.
+That technical property permits unusual forms of collaboration.
 
-Software is unusual because sharing it does not consume the original. If I give you a chair, I no longer have the chair. If I give you a copy of a program, both of us can have it.
+A student can study code written by professionals.
 
-That simple technical fact creates social possibilities that do not exist in quite the same way for physical objects.
+A stranger can repair a bug affecting people on another continent.
 
-Communities can build things together.
+A project can survive the organization that started it.
 
-A student can study professional-quality code.
+Of course, communities remain human. Open code does not create open-minded people automatically. There are arguments, abandoned projects, competing visions, tired maintainers and discussions whose emotional intensity seems disproportionate to the number of affected users.
 
-A project can outlive the company or individual that began it.
+Perhaps that makes the successful collaborations more impressive.
 
-Someone on the other side of the world can fix a problem for people they will never meet.
-
-That idea felt almost utopian when I first encountered it.
-
-Later I learned that open-source projects contain all the ordinary difficulties of human collaboration: disagreements, politics, abandoned code, competing visions, tired maintainers, and people arguing for weeks over changes that most users will never notice.
-
-Maybe that makes the achievement more impressive.
-
-The code is open.
-
-Human beings remain complicated.
-
-After watching the documentary, I returned to my Linux installation with slightly more patience.
+After watching *Revolution OS*, I returned to Linux with slightly more patience.
 
 Not much more.
 
 I still wanted the sound card to work.
 
-But the operating system no longer felt like only a product running on my machine. It felt like the visible surface of a very large conversation conducted through code.
+But the operating system no longer felt like a sealed product on my desk. It felt like the visible surface of a conversation carried out through code by people who might never meet.
 
-Somewhere, someone had written the piece I was using.
+Then I edited another configuration file.
 
-Someone else had found a problem.
+The machine stopped booting properly.
 
-Another person had changed it.
-
-I had received the result without knowing any of them.
-
-Then, inevitably, I changed a configuration file I did not understand and broke something again.
-
-At least now the disaster felt philosophical.
+Freedom has consequences.

@@ -9,56 +9,54 @@ tags:
    - solitude
 ---
 
-I watched *The Imitation Game* on a cold Saturday evening, in a cinema that was almost empty by the time the final credits appeared.
+I watched *The Imitation Game* on a cold Saturday evening in a cinema that was nearly empty by the time the credits appeared.
 
-I had gone there after spending most of the day in front of a computer. That should probably have made a film about codebreaking the last thing I wanted to see. Instead, the opposite happened. The darkness of the cinema separated computing from work for a few hours. There was no editor window, no compiler, no error message waiting for me. There was only a story about a man trying to make a machine do something that other people believed required a human mind.
+I had spent much of the day at a computer, which should have made codebreaking an unattractive choice for entertainment. Instead, the darkness of the cinema separated computing from work. No editor, compiler or unfinished task was waiting. There was only a story about people trying to make a machine do something that seemed to require human intelligence.
 
-I already knew Alan Turing's name, of course. In computer science it is almost impossible not to. Turing machines, computability, the Turing test: his surname appears so often in technical education that it can start to feel like part of the vocabulary rather than the name of a person.
+I already knew Alan Turing's name.
 
-That was what the film changed for me, at least for one evening.
+That was part of the problem.
 
-It returned the person to the name.
+In computer science, some names are repeated so often that they stop sounding like names. Turing machine. Turing test. Computability. The surname becomes technical vocabulary.
 
-I do not treat *The Imitation Game* as a documentary. Films compress history, combine events, sharpen conflicts, and create scenes that serve drama better than archival accuracy. I knew that while watching it. Yet accuracy was not the only thing occupying my mind.
+The film returned a person to the word.
 
-What stayed with me was the loneliness of difficult work.
+I do not treat it as a documentary. Historical films compress, combine and rearrange events. The point that stayed with me was less factual than psychological.
 
-There is a romantic image of invention in which a brilliant idea arrives, the inventor recognizes it, and history eventually rewards the achievement. Real technical work rarely feels like that from inside. For long periods, nobody knows whether the idea will work. The machine looks useless. The experiment fails. Other people become impatient. The person building it may not even be able to explain convincingly why another week, another month, another attempt is justified.
+Difficult work can be lonely long before it becomes important.
 
-Watching the machine in the film being assembled reminded me of a much smaller and far less important feeling: the moment when you are working on something that makes sense in your head but looks pointless to everyone else.
+There is a romantic story of invention in which the brilliant idea arrives, the inventor recognizes it, and history eventually catches up. Real technical work contains longer periods when nobody knows whether the idea will work. The machine looks useless. The experiment fails. Colleagues lose patience. Another week of effort cannot be justified with certainty.
 
-Programming contains many small versions of that experience.
+I recognize a tiny version of this feeling in programming.
 
-You can spend an afternoon fixing something invisible. At the end of the day the software appears almost exactly as it did in the morning, except one rare failure no longer happens. Nobody applauds. Often nobody notices. The absence of the problem is the result.
+You can spend an afternoon repairing something invisible. At the end, the software appears exactly as it did in the morning except one rare failure no longer occurs.
 
-Codebreaking during a war is obviously on another scale entirely. Still, the psychological shape was recognizable: patience applied to something whose value may become obvious only after it succeeds.
+Nobody notices.
 
-The film also made me think differently about secrecy.
+The absence of the problem is the result.
 
-Software culture usually rewards visibility. We publish code, explain systems, document decisions, give presentations, write papers, and attach our names to results. Recognition is part of the professional ecosystem.
+Wartime cryptanalysis belongs to another moral and historical scale, but the shape of patience is recognizable.
 
-The people working at Bletchley Park lived under almost the opposite condition. Success could not simply become a public achievement. Some victories had to remain invisible precisely because revealing them would reduce their value.
+The film also made secrecy feel strange. Modern technical culture usually rewards visibility. Publish the code, write the paper, present the result, attach names to achievements.
 
-That is a strange form of accomplishment: doing something historically important while accepting that history may not immediately know you did it.
+At Bletchley Park, success often had to remain hidden in order to remain useful.
 
-When the film moved beyond the machine and toward Turing's treatment by the society he had served, the story became harder to keep inside the comfortable category of “computer history.”
+Imagine solving something important and understanding that recognition would damage the work.
 
-A society can depend on someone's mind and still refuse to accept the person who owns that mind.
+That is an unfamiliar form of accomplishment.
 
-That contradiction stayed with me longer than any scene involving gears, code, or cryptography.
+Turing's later treatment by the society he helped serve prevents the story from remaining comfortably about computing. A society can depend on a person's mind while refusing to accept the person who owns it.
 
-We often tell the history of computing as a sequence of intellectual breakthroughs: one model, one theorem, one machine, one language after another. It is a clean way to organize a course.
+That contradiction stayed with me longer than the machinery.
 
-Human lives are less clean.
+We teach technical history as a sequence of achievements because courses require structure. A theorem, a model, a machine, a language.
 
-The people behind those breakthroughs have fears, relationships, bodies, private lives, and weaknesses. Institutions can admire the useful part of a person while punishing everything that does not fit their expectations.
+Human lives resist that organization.
 
-By the time I left the cinema, the streets were quiet. I remember walking for a while instead of going directly home. I was not thinking about the Turing machine or the details of Enigma.
+After leaving the cinema, I walked for a while before going home. I remember thinking about names in textbooks.
 
-I was thinking about names in textbooks.
+A name printed beside a theorem looks settled, as if history has completed the account.
 
-A name printed beside a theorem looks complete. It gives the impression that history has already settled the account.
+Sometimes the surname survives more comfortably than the person ever lived.
 
-But sometimes a surname survives much more comfortably than the person ever lived.
-
-After *The Imitation Game*, “Turing” sounded a little less like terminology to me.
+After the film, “Turing” sounded less like terminology to me.

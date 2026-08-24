@@ -9,100 +9,66 @@ tags:
    - courage
 ---
 
-I first watched *The Lord of the Rings: The Fellowship of the Ring* on a winter evening with friends.
+I first watched *The Lord of the Rings: The Fellowship of the Ring* on a winter evening with friends. We had food on the table and enough conversation during the opening minutes to suggest that nobody expected to become solemn about hobbits.
 
-We had snacks on the table, people were talking over the first few minutes, and I remember thinking the film looked beautiful but also wondering how seriously I was expected to take names like hobbits, Mordor, and Middle-earth.
+Three hours later, the room was quiet.
 
-Three hours later, nobody was making jokes.
+What changed was not my opinion of fantasy.
 
-What changed was not that I suddenly became interested in fantasy.
+It was the scale of the journey.
 
-I became interested in the journey.
+The film begins in the Shire, a place built from repetition: meals, gardens, birthdays, local gossip, familiar roads. Safety is almost geographical.
 
-The film begins in one of the safest places imaginable.
+Then the map opens.
 
-The Shire is green, familiar, domestic, and small. People eat, drink, celebrate birthdays, argue about relatives, and care about local things.
+Frodo does not leave because adventure has called to a heroic part of him. He leaves because something dangerous has entered the ordinary world and remaining would endanger the people he loves.
 
-Then the world becomes larger.
+I find that more persuasive than fearlessness.
 
-That expansion affected me.
+Frodo is afraid for most of the story.
 
-Frodo does not begin as a warrior. He has no special military ability. He is not looking for adventure. Something dangerous enters an ordinary life and forces the ordinary person to move.
+He continues anyway.
 
-I think that is one reason the story works so well.
-
-Courage is often presented as confidence.
-
-Frodo is rarely confident.
-
-He is afraid and continues anyway.
-
-Sam may have affected me even more.
-
-There are many powerful characters in the film: kings, wizards, warriors, ancient beings.
-
-Sam's power is much less impressive.
+Sam affected me more on later viewings. The film contains warriors, kings, wizards and ancient powers, yet Sam's most important ability is reliability.
 
 He stays.
 
-That sounds small until staying becomes difficult.
+The word sounds unimpressive until staying becomes expensive.
 
-Friendship is easy when it is convenient. Loyalty becomes visible when the other person's problem starts interfering with your own life.
+Friendship is easy when the other person's difficulties remain entertaining stories. Loyalty becomes visible when their burden starts interfering with your own plans.
 
-Sam repeatedly crosses that line.
+The Fellowship itself is interesting for the opposite reason. Its members are not naturally compatible. They carry different motives, histories, prejudices and kinds of pride. Some do not particularly like one another.
 
-The Fellowship itself also interested me because it is not built from similarity.
+For a period, they share a direction.
 
-Its members have different motives, histories, abilities, prejudices, and loyalties. Some do not particularly like each other.
+That resembles successful groups more closely than the fantasy of perfect chemistry. A team does not require one personality. It requires a purpose strong enough to survive several personalities.
 
-Yet for a period they move in the same direction.
+I remember walking home after that first viewing. The night was cold and the distance was perhaps fifteen minutes. For a few blocks, after watching mountains and ruined kingdoms, the familiar streets looked slightly more dramatic.
 
-That feels more realistic to me than the idea that successful groups are made from people who naturally agree.
+Then I slipped on ice and the spell ended.
 
-A team does not need one personality.
+Boromir has become more interesting to me with age because his failure is based on an argument, not simple wickedness. He wants to use power to protect his people.
 
-It needs a shared destination strong enough to survive different personalities.
+Bad choices rarely introduce themselves as bad choices.
 
-Boromir makes the group more interesting precisely because he fails.
+They arrive carrying reasons.
 
-The Ring does not tempt everybody in the same way. It finds the argument each person is most likely to believe.
+The Ring understands rationalization better than most people do.
 
-For Boromir, power can be justified as protection.
+Use this because the situation is exceptional.
 
-That is what makes temptation dangerous.
+Break the rule because the goal is noble.
 
-The worst choices rarely introduce themselves by saying, “This is evil.”
+Take a little power now and give it back later.
 
-They usually arrive with a reason.
+The story knows how quickly protection can become possession.
 
-Use this power because your people need you.
+When the Fellowship breaks, the mission becomes more personal rather than less important. Each character carries a fragment of responsibility separately.
 
-Break this rule because the situation is exceptional.
+That may be why the story remains powerful beyond spectacle.
 
-Do something wrong now because the final objective is good.
+Important journeys often begin before the people taking them feel prepared.
 
-The Ring seems to understand rationalization better than most people do.
+Someone says the road must be taken.
 
-When the Fellowship breaks, I expected the story to feel smaller.
-
-Instead, it becomes more personal.
-
-The great mission remains, but the characters now have to carry pieces of it separately.
-
-That night, when the film ended, we were surprised by how late it had become.
-
-Outside it was cold. The streets were quiet.
-
-For a few minutes, walking home felt slightly different after spending hours watching people cross mountains.
-
-Of course, the feeling disappeared.
-
-The pavement became pavement again.
-
-But one idea stayed.
-
-The important journeys rarely begin with people who feel ready.
-
-Someone says the road has to be taken.
-
-Then someone takes the first step.
+Then ordinary feet start walking.

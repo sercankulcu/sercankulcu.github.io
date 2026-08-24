@@ -9,160 +9,44 @@ tags:
    - corruption
 ---
 
-I watched *GoodFellas* on DVD one evening after someone told me it was “one of those films you have to see.”
+Someone recommended *GoodFellas* to me with the fatal phrase “one of those films you have to see,” which usually transforms pleasure into homework.
 
-That kind of recommendation usually makes me suspicious.
+I postponed it for weeks.
 
-It creates homework.
+Then one Friday night I watched the DVD and understood, within minutes, why the recommendation had carried such confidence. The film moves as if it already knows you will follow. Music enters before you ask for it. Doors open. People talk over one another. Money changes hands. A young man discovers that the world has a side entrance.
 
-But *GoodFellas* did not feel like homework for very long.
+That entrance is the important thing.
 
-The film moves with confidence.
+Henry Hill does not become involved in organized crime because he has misunderstood its nature. He likes what he sees. People know his name. Rules that govern ordinary people appear flexible around him. Restaurants find tables. Problems can be solved with a telephone call. Respect becomes something physically visible in the way a room reacts when he enters.
 
-Music enters.
+The famous Copacabana tracking shot captures this perfectly. Henry and Karen do not wait in line. They descend through the back, pass kitchens and corridors, greet people, and eventually arrive at a table that seems to materialize for them.
 
-People talk fast.
+That is power in its most seductive form: not possessing something, but living in an environment that reorganizes itself around your presence.
 
-Doors open.
+We recognize smaller versions everywhere. A title, a connection, the right surname, knowing which person to call. Procedures are often strictest for people without access.
 
-Money appears.
+The film is intelligent enough to let us enjoy this before it shows the bill.
 
-Rules seem flexible for the right people.
+Eventually the same network that offers belonging becomes a system of suspicion. Loyalty is praised constantly, which is usually a sign that loyalty cannot be assumed. Friends disappear. Trust becomes calculation. The group calling itself a family proves very willing to remove relatives when incentives change.
 
-For a while, the criminal world looks less like a warning than an invitation.
+I have become suspicious of organizations that describe themselves as families.
 
-That is what makes the film dangerous in an intelligent way.
+Real families generally do not need the slogan.
 
-It understands the attraction before it shows the cost.
+The film's rhythm changes with Henry's life. Early speed feels glamorous: cars, clubs, cash, conversations. Later the speed becomes panic. Phones ring. Drugs have to be moved. Food is being cooked. A helicopter may or may not be following him. Every task collides with another.
 
-Henry Hill does not enter that world because he has misunderstood it.
+The lifestyle has not changed its basic tempo.
 
-He likes what he sees.
+His relationship to the tempo has.
 
-Respect.
+That is the cleverest moral argument the film makes. It does not stop the story to explain that crime has consequences. The same energy we enjoyed becomes exhausting.
 
-Access.
+Years after seeing the film, I walked past a restaurant where a local politician was being greeted. The owner appeared at the door, hands were shaken, a table was found although other people were waiting. It was entirely ordinary and probably innocent. Still, for a second I thought of Henry entering the Copacabana.
 
-Money.
+Cinema had given me a vocabulary for a small social gesture.
 
-Belonging.
+That is why *GoodFellas* survives beyond its violence.
 
-The feeling that ordinary restrictions no longer apply.
+The most dangerous systems rarely look terrible at the entrance.
 
-That is more honest than a story in which somebody accidentally becomes corrupt.
-
-Many bad systems survive because they offer something people genuinely want.
-
-Status.
-
-Protection.
-
-Community.
-
-Shortcuts.
-
-The right to feel more important than people outside the group.
-
-The film makes that seduction visible.
-
-Then it slowly changes the texture.
-
-The same world that once felt generous becomes paranoid.
-
-Friendship becomes conditional.
-
-Loyalty becomes fear.
-
-The people who seemed untouchable begin disappearing.
-
-Success creates more things to lose.
-
-The restaurant entrance scene stayed with me because it captures social power so efficiently.
-
-Henry does not wait in line.
-
-People know him.
-
-Tables move.
-
-Doors open.
-
-The sequence is seductive because recognition itself feels like wealth.
-
-You do not merely have money.
-
-The environment responds to you differently.
-
-That kind of power exists in many forms outside crime.
-
-Titles.
-
-Connections.
-
-Access.
-
-Knowing the right person.
-
-Walking into a place and being treated as though ordinary procedures belong to other people.
-
-It can be addictive.
-
-The film also made loyalty look much less noble than crime stories usually do.
-
-Everyone talks about loyalty.
-
-Yet the loyalty lasts only while incentives remain aligned.
-
-Once fear becomes stronger than affection, the structure collapses.
-
-That interested me because organizations often use the language of family.
-
-“We are family.”
-
-It sounds warm.
-
-Families are supposed to stay.
-
-But when an institution says it is a family, I become slightly suspicious.
-
-Real families do not usually require the phrase.
-
-The later part of *GoodFellas* is almost exhausting.
-
-Henry's life becomes fragmented.
-
-Drugs.
-
-Phones.
-
-Helicopters.
-
-Cooking.
-
-Deliveries.
-
-Fear.
-
-The speed that once made the lifestyle exciting now becomes panic.
-
-That transformation is brilliant.
-
-The film does not need to tell us, “This life is destroying him.”
-
-The rhythm does it.
-
-At the beginning, speed feels like freedom.
-
-At the end, speed feels like being hunted.
-
-When the film ended, I understood why people love it.
-
-Not because it makes criminals admirable.
-
-Because it shows how admiration can begin.
-
-That is much more interesting.
-
-The most dangerous systems rarely look terrible from the entrance.
-
-They look like a door that opens for you while everybody else is still waiting outside.
+They look like someone opening a door for you.

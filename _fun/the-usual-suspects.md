@@ -9,138 +9,74 @@ tags:
    - perception
 ---
 
-I watched *The Usual Suspects* knowing only one thing.
+I watched *The Usual Suspects* knowing one thing I would have preferred not to know.
 
 There was a twist.
 
-That was enough to make me suspicious of everything.
+This information made me unbearable.
 
-This almost ruined the film.
+Every object looked like a clue. Every sentence seemed designed to mislead me. I spent much of the film trying to defeat it rather than watching it.
 
-Every character looked like a clue.
+That was my first mistake.
 
-Every sentence sounded important.
-
-Every object in the room seemed guilty.
-
-I spent much of the film trying to defeat it.
-
-That was my mistake.
-
-The film is not only about the final revelation.
-
-It is about the act of listening to a story.
+The film is not only about its final revelation. It is about the power involved in telling a story to someone who believes they are collecting facts.
 
 Verbal Kint sits in a room and talks.
 
-That sounds harmless.
+The situation looks weak.
 
-A man tells investigators what happened.
+He is physically unthreatening, surrounded by institutional authority, apparently the source from whom information is being extracted.
 
-But storytelling is a form of control.
+Yet the storyteller controls sequence.
 
-The person telling the story decides where to begin.
+Where to begin.
 
-What to include.
+Which detail deserves emphasis.
 
-What to omit.
+What should be explained.
 
-Which detail receives attention.
+What may remain mysterious.
 
-Which event is explained.
+Facts rarely arrive in a pile. Someone arranges them.
 
-Which remains mysterious.
+That arrangement is already an argument.
 
-The listener thinks they are receiving information.
+I became more aware of this after sitting through two accounts of the same workplace disagreement. Both people described events that were largely factual. Neither had to lie. One began with a missed deadline; the other began with a change in requirements.
 
-They are also receiving structure.
+The starting point changed the guilty party.
 
-That distinction became very clear to me by the end.
+That experience came back to me when I rewatched the film.
 
-Facts do not arrive alone.
+Narrative control is a form of power because listeners need structure before they can make sense of information.
 
-Someone arranges them.
+Keyser Söze becomes powerful partly through absence. Nobody can verify enough. Missing information becomes a space in which fear can build whatever architecture it wants.
 
-That happens everywhere.
+Uncertainty is rarely neutral.
 
-News.
+Fear fills it with monsters.
 
-History.
+Admiration fills it with legends.
 
-Arguments.
+The final sequence works because objects we had seen without importance become suddenly overqualified. Names detach from the story. Details reveal themselves as borrowed.
 
-Meetings.
+The best twists do not introduce an answer from outside the frame.
 
-Personal conflicts.
+They reveal that the evidence was visible and the interpretation was wrong.
 
-Two people can describe the same event accurately and still produce completely different stories by choosing different details.
+When the film ended, I replayed several scenes.
 
-The film turns that ordinary fact into a weapon.
+I was not looking for cheating.
 
-Verbal appears weak.
+I wanted to observe myself being persuaded.
 
-That matters.
-
-We often confuse visible power with actual control.
-
-The loud person.
-
-The armed person.
-
-The person standing.
-
-The person giving orders.
-
-The film quietly asks whether the person controlling the narrative may be more powerful than all of them.
-
-The name Keyser Söze becomes powerful partly because nobody can verify him easily.
-
-Uncertainty creates mythology.
-
-People fill missing information with fear.
-
-That also felt realistic.
-
-When facts are incomplete, imagination rarely remains neutral.
-
-It invents.
-
-Usually in the direction of whatever emotion is already strongest.
-
-Fear creates monsters.
-
-Admiration creates legends.
-
-Suspicion creates conspiracies.
-
-The final sequence is famous because the story collapses in real time.
-
-Objects that seemed irrelevant become sources.
-
-Names become borrowed.
-
-Details detach from reality.
-
-I remember the pleasure of realizing that I had been looking directly at the mechanism without seeing it.
-
-That is the best kind of twist.
-
-Not information hidden outside the frame.
-
-Information visible but interpreted incorrectly.
-
-When the film ended, I wanted to replay several scenes.
-
-Not to find mistakes.
-
-To observe myself making them.
+That was more interesting.
 
 The film had not simply lied to me.
 
-It had given me enough material to lie to myself.
+It had noticed the assumptions I was willing to supply and built a story that let me do part of the deception myself.
 
-That difference is important.
+We are easiest to fool when the explanation fits the shape we already expect.
 
-We are easier to deceive when the story matches the assumptions we already prefer.
+A good storyteller does not have to invent the whole illusion.
 
-The storyteller only has to notice what those assumptions are.
+The audience brings materials.
