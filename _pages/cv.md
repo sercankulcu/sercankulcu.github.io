@@ -38,5 +38,3 @@ During my master's studies, I developed a web-based collaborative dictionary pla
 
 ### <img src="/images/logo-hacettepe.jpg" alt="Hacettepe" width="72" height="72"> B.S. in Computer Engineering, Hacettepe University, 2006
 During my undergraduate studies, I completed several software and systems projects across different programming environments. I developed a Tetris game in assembly language for the x86 PC platform, using interrupts for keyboard interaction and random number generation. I also implemented a file system in C++ based on the B+ tree data structure, supporting efficient file storage, retrieval, allocation, deletion, and search operations. In addition, I built a Java Swing client-server chat application using sockets for communication over a local network. I also developed a computer vision application capable of detecting vehicle license plates and estimating the speed of moving vehicles.
-
-
