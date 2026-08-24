@@ -1,175 +1,124 @@
 ---
 title: "Jeux d'enfants"
-date: 2006-03-01
+date: 2010-05-02
 tags:
    - movie
-   - drama
+   - memories
+   - childhood
    - romance
-   - self-improvement
+   - life
 ---
 
-Some films entertain you.
+I did not expect *Jeux d'enfants* to do anything unusual to me.
 
-Some films stay with you.
+I had not been waiting to see it. Nobody had insisted that it would change my life. I simply started the film thinking, let’s see what this is.
 
-*Jeux d'enfants* was one of those films for me.
+For the next hour and a half I did not get up. I watched and smoked one cigarette after another.
 
-I watched it without expecting very much, but when it ended, I kept thinking about it. Not because the story was realistic in every detail, and not because the characters always made reasonable choices. In fact, much of the film is about doing exactly the opposite.
+When the film ended, nothing happened immediately.
 
-It is about two people who turn life into a game.
+About ten minutes later, I started crying.
 
-Julien and Sophie begin with a simple challenge:
+Not really because of Julien. Not really because of Sophie.
 
-**Cap ou pas cap?**
+The film had reminded me of **my Sophie**.
 
-Dare or not dare?
+That was not her name, of course. But after the film I could not think of her in any other way.
 
-At first, it feels innocent.
+We had grown up together until I was about eleven. At that age, you do not understand how temporary the ordinary parts of life can be. Someone is simply there. You play, argue, laugh, and assume you will see each other again tomorrow.
 
-Children invent games because the world around them is too serious. They create their own rules, their own language, and their own small universe. Julien and Sophie do the same. A small tin box becomes the symbol of their friendship, and whoever has the box can challenge the other.
+Children rarely imagine an ending to something that has never needed a beginning.
 
-Do something embarrassing.
+Then my father was transferred.
 
-Do something dangerous.
+We moved.
 
-Break a rule.
+There was no dramatic farewell scene. Childhood simply continued in another place.
 
-Prove that you are brave enough.
+Years accumulated quickly: new schools, new friends, university, work, different cities, different people. Life is very good at adding things fast enough that you do not always notice what it has removed.
 
-When they are children, this is funny.
+Eventually I did not know where she lived, what she was doing, or what kind of person she had become.
 
-Then they grow up.
+There had once been somebody who occupied almost every ordinary day of my childhood. Years later, she existed only in memory.
 
-But the game grows up with them.
+Then I watched *Jeux d'enfants*.
 
-That is where the film becomes uncomfortable.
+Julien and Sophie have their game: **Cap ou pas cap?** Dare or not dare?
 
-The challenges are no longer harmless. They begin to affect relationships, families, careers, and eventually their entire lives.
+As children, they create a private language and a world with rules of their own. That is what children do. The adult world has not yet convinced them that reality must be organized in one particular way.
 
-At some point, it becomes difficult to understand where the game ends and where their real feelings begin.
+The difficulty begins when the children grow older and the game refuses to remain a childhood game. Pride, love, fear, and adult consequences enter the same space that once belonged to simple dares.
 
-Maybe they do not know either.
+While watching them, I stopped following only their story.
 
-This was the part of the film that affected me most.
+Memories began appearing.
 
-Julien and Sophie clearly love each other, but instead of simply saying it, they constantly test each other.
+I remembered the strange intimacy of childhood friendships that you never consciously chose. There is no moment when you decided to become friends. The person simply belonged to the landscape of your life.
 
-Who will surrender first?
+And because there was no beginning, perhaps you never imagined an ending.
 
-Who cares more?
+That is one of the cruelties of childhood: you do not know when something is happening for the last time.
 
-Who can hurt the other more?
+The last game. The last walk home. The last argument. The last ordinary afternoon.
 
-Who is brave enough to come back?
+Nobody tells you to pay attention because you will remember it decades later.
 
-Their love becomes mixed with pride.
+When my family moved, life changed direction and that was all. Perhaps this is why *Jeux d'enfants* affected me so strongly. It made me think about people who belong completely to one period of our lives and then disappear from the next.
 
-And pride is a dangerous thing when two people are waiting for the other person to make the first move.
+Sometimes we lose people because somebody behaved badly. Sometimes because of an argument or a choice.
 
-Sometimes we imagine that love should be dramatic.
+And sometimes nobody does anything wrong.
 
-If someone really loves us, perhaps they should prove it.
+A family moves. School ends. A job begins. A city changes.
 
-They should fight for us.
+One day you notice that a person who once knew almost everything about your daily life has become someone whose life you know nothing about.
 
-They should take risks.
+When I wrote about the film that night, I ended with a confident sentence:
 
-They should understand what we mean without us saying it.
+**Unfortunately, things like this don’t happen in real life.**
 
-Films often make this idea beautiful.
+I believed it.
 
-Real life is usually less forgiving.
+Films are allowed to make circles. People disappear and return. Childhood promises survive for decades. Coincidences wait patiently for the right scene.
 
-A relationship cannot survive forever as a competition.
+Real life seemed less interested in completing its stories.
 
-When every conversation becomes a test, nobody wins.
+So I deleted the film. I genuinely did not want to watch it again, even accidentally. Once was enough. Some films are enjoyable to revisit; others open a door you would rather not keep walking through.
 
-Watching Julien and Sophie made me think about how easily people can hide serious feelings behind jokes.
+I thought that was the end of the story.
 
-It is much easier to say something as part of a game.
+Months later, Facebook did something it was becoming unexpectedly good at doing in those years: it reconnected people who had vanished from each other’s lives long before the internet became ordinary.
 
-It gives us an escape.
+She found me.
 
-If the other person reacts badly, we can pretend we were not serious.
+My Sophie.
 
-If they react well, perhaps we can continue.
+After all those years.
 
-The game protects us from rejection.
+When I returned to the old entry on October 23, 2010, I had to correct myself.
 
-But it also prevents honesty.
+The first version had said:
 
-That is the strange contradiction at the center of *Jeux d'enfants*.
+**Unfortunately, things like this don’t happen in real life.**
 
-The characters are extremely brave when it comes to challenges.
+The second version became:
 
-They are willing to embarrass themselves, destroy things, take enormous risks, and turn their lives upside down.
+**Unfortunately, in real life, you never know what will happen.**
 
-But when it comes to saying something simple and honest, they become afraid.
+I still prefer the correction.
 
-"I love you."
+We spend a surprising amount of time declaring stories finished. Someone belongs to the past. A door has closed. A period of life is over. Most of the time, perhaps we are right.
 
-"I missed you."
+But occasionally life continues writing after we have already placed the full stop.
 
-"I was hurt."
+*Jeux d'enfants* reminded me of somebody I had lost somewhere between childhood and adulthood. For one night, that was painful enough to make me wish I had never watched it.
 
-"I want you to stay."
+A few months later, life added another sentence.
 
-Those sentences are more difficult than any dare.
+Not a perfect ending. Not a tragedy either.
 
-The film is also visually very different from ordinary romantic dramas.
+Just another sentence.
 
-Reality often feels exaggerated, almost like a childhood memory. Colors, camera movements, impossible transitions, and sudden changes of mood make the story feel like a fairy tale.
+Films need endings.
 
-But it is not exactly a happy fairy tale.
-
-There is something dark underneath it.
-
-The same imagination that makes childhood beautiful can also become a way of refusing to accept reality.
-
-Julien and Sophie keep returning to their game because the game is the one place where they understand each other completely.
-
-The rest of the world has rules they did not create.
-
-School.
-
-Marriage.
-
-Work.
-
-Family.
-
-Adulthood.
-
-Their game allows them to ignore those rules.
-
-For a while.
-
-But every escape has a cost.
-
-Perhaps this is why the film stayed in my mind.
-
-It is romantic, but it is also a warning.
-
-There is something beautiful about having another person who understands your madness.
-
-Someone with whom you can be childish.
-
-Someone who remembers who you were before the world became serious.
-
-Someone who can say two words and immediately bring back an entire history.
-
-But love should not require destruction to prove that it exists.
-
-Sometimes the bravest thing is not accepting a dare.
-
-Sometimes it is ending the game.
-
-And sometimes saying what you actually feel requires more courage than doing something spectacular.
-
-After watching *Jeux d'enfants*, the phrase **"Cap ou pas cap?"** feels different.
-
-At first, it sounds like an invitation to do something crazy.
-
-By the end, it can also be understood as a much more difficult question:
-
-Are you brave enough to stop hiding behind the game?
+Life can be less cooperative.

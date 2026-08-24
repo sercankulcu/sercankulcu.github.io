@@ -9,267 +9,65 @@ tags:
    - life
 ---
 
-Some songs can be played.
+Some songs can survive almost any kind of listening. You can leave them in the background while answering email, cleaning the room, browsing the web, or talking to somebody.
 
-Others have to be listened to in a particular way.
+*Space-Dye Vest* has never been that kind of song for me.
 
-For me, *Space-Dye Vest* has always belonged to the second group.
+Years ago, I wrote that every food has a way it should be eaten, and this song has a way it should be heard. I still think that is true, although “way” may be the wrong word. Ritual is probably closer.
 
-Years ago, I wrote that every food has a way it should be eaten, and this song has a way it should be heard.
-
-I still like that idea.
-
-There are songs you can leave in the background.
-
-You can answer email.
-
-You can browse the web.
-
-You can clean the room.
-
-You can talk to somebody.
-
-The music continues without demanding much from you.
-
-*Space-Dye Vest* does not work like that for me.
-
-It asks for attention.
-
-More specifically, it creates one particular reflex.
-
-There is a point in the song where I always want to turn the volume up.
-
-It happens somewhere between the moment the voice says that it will never be open again and the later moment where smiling and pretending enter the picture.
-
-I know the transition is coming.
-
-I have heard the song before.
-
-Many times.
-
-That does not matter.
-
-My hand still wants to reach for the volume control.
+There is a point in the song where I always want to turn the volume up. I know it is coming. I have heard the track many times. None of that matters. When the transition approaches, my hand still moves toward the volume control.
 
 A little louder.
 
-Then a little louder.
+Then louder again.
 
-The strange part comes when the volume is already at maximum.
+The strange moment comes when the volume is already at maximum. The body expects the ritual, but the control has nowhere left to go. The music reaches the same point, the reflex arrives on schedule, and the feeling has no mechanical outlet.
 
-There is nowhere left to go.
+It stays in the stomach.
 
-The music reaches the same point.
+That may sound like an odd way to describe music, but some listening experiences are physical before they are intellectual. We can analyze lyrics, harmony, melody, tempo, instrumentation, and production. All of that is real. But there is also the part where the body knows a song before the mind explains it.
 
-The body expects the ritual.
+You lean forward. You stop what you were doing. Your breathing changes slightly. A familiar line arrives and you already know what the next ten seconds will feel like.
 
-The hand wants to increase the volume.
+After enough listens, a recording becomes partly a collection of expectations.
 
-It cannot.
+This is why two people can love the same song and still disagree completely about how it should be heard. One talks through the quiet section. The other considers this unacceptable. One skips the intro. The other thinks the intro is the reason the rest works. One plays it from a phone speaker. The other immediately starts looking for better speakers.
 
-And somehow the feeling has nowhere to escape.
+We do not only have favorite songs. We develop favorite ways of hearing them.
 
-It sits in the stomach.
+That was even more noticeable when music was less frictionless than it is now. A song could belong to a particular computer, a pair of speakers, a room, or a certain hour of the night. You did not necessarily hear it all day because an algorithm had placed it into an endless stream. Sometimes you deliberately chose it.
 
-That was how I described it years ago.
+You opened a folder, found the file, double-clicked, and listened.
 
-I cannot think of a much better description now.
+That small amount of effort made the act feel intentional.
 
-Music has a physical side that is difficult to explain.
+I remember songs that belonged to driving, songs that belonged to waiting, and songs that were probably a bad idea when I was already in a bad mood. There were songs one should not play while waiting for a message from someone one liked.
 
-We often talk about songs as if they were information.
+*Space-Dye Vest* was perfectly capable of making an ordinary bad mood more ambitious.
 
-Lyrics.
+That was part of the attraction.
 
-Melody.
+Not all music is supposed to rescue us from a feeling. Sometimes we choose the opposite. We want to go deeper into it, not because suffering is admirable, but because there is a peculiar comfort in finding a song willing to remain there with us.
 
-Harmony.
+It does not hurry to improve the mood. It stays.
 
-Tempo.
+People often ask what a song means. It is a reasonable question, but I increasingly think there is another one that matters just as much: what happened to the song after it entered your life?
 
-Instruments.
-
-Production.
-
-All of those things can be analyzed.
-
-But sometimes the important part is what the body does.
-
-You lean forward.
-
-You close your eyes.
-
-You stop whatever you were doing.
-
-You turn the volume up.
-
-A certain drum hit makes you move your head.
-
-A guitar enters and your breathing changes.
-
-A familiar line arrives and you already know what the next ten seconds are going to feel like.
-
-That is not analysis.
-
-It is memory turning into reflex.
-
-After enough listens, a song stops being only a recording.
-
-You develop a relationship with it.
-
-You know where it is going.
-
-You know which part you are waiting for.
-
-You know when not to interrupt it.
-
-You know when somebody talking over it would be annoying.
-
-You know when the volume is wrong.
-
-This is why listening to music with another person can be unexpectedly revealing.
-
-Two people may like the same song and still listen to it differently.
-
-One person wants to talk during the quiet section.
-
-The other considers that a crime.
-
-One person skips the intro.
-
-The other believes the intro is the whole point.
-
-One person plays the song from a phone speaker.
-
-The other immediately begins looking for better speakers.
-
-We do not only have favorite songs.
-
-We have favorite ways of hearing them.
-
-That was especially true before music became something constantly available everywhere.
-
-A song could be attached to a particular computer.
-
-A particular pair of speakers.
-
-A particular room.
-
-A particular hour of the night.
-
-You did not necessarily hear it ten times a day through algorithmic playlists.
-
-Sometimes you deliberately chose it.
-
-Opened the folder.
-
-Found the file.
-
-Double-clicked.
-
-Then listened.
-
-That small amount of effort made the act feel more intentional.
-
-I remember having songs that belonged to nighttime.
-
-Songs for driving.
-
-Songs for waiting.
-
-Songs that were dangerous when already feeling bad.
-
-Songs that should not be played when waiting for a message from someone you liked.
-
-*Space-Dye Vest* was definitely capable of making an ordinary bad mood much more ambitious.
-
-That is part of its attraction.
-
-Not all music is supposed to improve your mood.
-
-Sometimes you do not want to be rescued from a feeling.
-
-You want to go deeper into it.
-
-There is comfort in finding a song that seems willing to go there with you.
-
-It does not tell you that everything will be fine.
-
-It does not rush to cheer you up.
-
-It stays.
-
-For a few minutes, that can be enough.
-
-There is a common question people ask about music:
-
-What does this song mean?
-
-It is a reasonable question.
-
-But it is not always the most interesting one.
-
-Another question is:
-
-What happened to this song after it entered your life?
-
-Did it become attached to a person?
-
-A breakup?
-
-A university dorm?
-
-A computer?
-
-A city?
-
-A long drive?
-
-A particular winter?
-
-Did you use it when you needed to think?
-
-Did you avoid it because it brought something back too clearly?
+Did it become attached to a person? A breakup? A dorm room? A city? A winter? A long drive? Did you use it when you needed to think? Did you avoid it for a period because it remembered something too accurately?
 
 Did you always turn the volume up at the same place?
 
-That is where the personal meaning begins.
+The recording is shared. The listening is private.
 
-The recording is the same for everyone.
+That may be why certain songs survive for decades in a person’s life. We do not hear them in exactly the same way each time. A twenty-year-old listener leaves something inside the song. A thirty-year-old comes back and finds both the music and the younger self waiting there.
 
-The listening is not.
-
-That may be why certain songs survive for decades.
-
-Not because we hear them exactly as we did the first time.
-
-Because every version of ourselves leaves something inside them.
-
-You listen at twenty.
-
-Then at thirty.
-
-Then years later.
-
-The song has not aged.
-
-You have.
-
-Some lines become less important.
-
-Others suddenly make sense.
-
-Some parts that once felt dramatic become almost embarrassing.
-
-Then one familiar transition arrives and your hand still moves toward the volume control.
+Some lines become less important. Others suddenly make sense. A part that once seemed profound may become embarrassing. Then a familiar transition arrives and the hand still moves toward the volume control.
 
 There you are.
 
-The old listener is still somewhere inside the new one.
+The old listener has not disappeared. He has simply acquired more memories.
 
-Maybe that is the best thing about having a ritual around a song.
-
-It gives memory a button.
+Perhaps that is what a listening ritual really gives us: a reliable way to activate a particular piece of ourselves.
 
 Press play.
 
@@ -279,6 +77,4 @@ The moment approaches.
 
 Turn it up.
 
-And if it is already at full volume, there is nothing left to do.
-
-Let it sit in your stomach.
+And if it is already as loud as it can go, there is nothing left to adjust.
