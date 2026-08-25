@@ -1,23 +1,36 @@
 ---
-title: 'The Driving Forces Behind Success'
+title: 'Discipline Is Mostly Removing Decisions'
 date: 2018-12-15
 tags:
-  - general
-  - self-improvement
+  - discipline
+  - work
+  - habits
 ---
 
-Success is usually described with exciting words. Passion. Vision. Talent. Knowledge.
+I used to think discipline meant repeatedly winning an argument with myself.
 
-All of these matter. But I think discipline is the quieter force that keeps the others alive. Passion can begin a project. It cannot always finish one.
+You do not feel like working, so you force yourself to work. You want to stop, so you insist on continuing. In that picture, a disciplined person has unusually strong willpower.
 
-The first days are easy because the idea is new. Later, repetition begins. The work becomes ordinary. That is where discipline becomes visible.
+I now think good discipline often works in the opposite direction.
 
-A clear vision also helps. If we know what we are trying to build, smaller decisions become easier. But vision without action remains imagination.
+It removes the argument.
 
-Knowledge gives us tools, yet knowledge also needs practice. Reading about programming does not create programming skill by itself. Reading about exercise does not make the body stronger.
+A fixed time to work means I do not negotiate every morning about when to begin. A short list of priorities means I do not repeatedly decide what deserves attention. Putting distractions somewhere inconvenient is less heroic than resisting them, but usually more effective.
 
-Discipline connects intention with repeated action. This does not mean working without rest or forcing ourselves endlessly. Good discipline includes limits. It includes sleep, realistic planning, and knowing when a goal is no longer worth the cost. I also think discipline is easier when we stop expecting every day to feel important.
+The routine does not make the work easy. It makes starting less dependent on mood.
 
-Many successful periods are built from boring days. The same practice. The same small task. The same decision to continue. Big achievements are often visible.
+This matters because motivation is unstable. New projects generate their own energy. Repetition does not. After the novelty disappears, relying on enthusiasm means asking an emotion to perform the job of a system.
 
-The routine underneath them is not. Maybe that is why discipline is underestimated. It is not dramatic. It simply keeps showing up.
+There is also a limit to discipline that motivational language often ignores.
+
+Persistence cannot make every goal wise. A routine can efficiently carry us in the wrong direction. Continuing merely because we have already continued for a long time is not strength; sometimes it is inertia wearing the clothes of commitment.
+
+So discipline needs periodic doubt.
+
+During the work, reduce unnecessary decisions. At intervals, step outside the routine and ask whether the work still deserves repetition.
+
+That combination seems more useful than endless self-control.
+
+The disciplined person is not necessarily the one who can force himself to do anything.
+
+He may simply be the person who has decided fewer things need to be decided every day—and who still remembers that a system is a servant, not a reason for living.
