@@ -1,17 +1,42 @@
 ---
-title: 'Navigating Pain'
+title: 'Pain Is Not a Competition'
 date: 2022-06-28
 tags:
-  - self-improvement
   - life
+  - empathy
+  - reflection
 ---
 
-Pain is difficult to compare. Two people can experience similar events and react very differently. This does not mean one person is weak and the other is strong. Experience has context. A loss enters a life that already contains memories, relationships, fears, responsibilities, and previous wounds.
+Two people can go through similar events and carry them very differently.
 
-We cannot measure all of that from outside. This is why sentences such as "Other people have it worse" rarely help. They may be factually true. They still do not make the present pain disappear. I think empathy begins when we stop turning suffering into a competition.
+From outside, this can look irrational. We compare events as if suffering had a scale: this loss is worse than that disappointment, this illness is more serious than that fear, this person's pain is legitimate while another person's is excessive.
 
-We do not need to decide whose pain is larger before offering kindness. At the same time, understanding another person's pain does not mean we know exactly what they feel. Sometimes "I understand" is too confident. "I am here" can be more honest.
+But pain does not enter an empty life.
 
-Pain also changes shape over time. Some days it becomes quieter. Then a small detail can suddenly make it strong again.
+It arrives inside a history.
 
-This irregular movement is normal. There is no perfect schedule for difficult emotions. Maybe the best we can do for one another is to leave room for different ways of carrying them.
+The same event lands on different memories, expectations, relationships, fears, responsibilities, and previous wounds. What looks small from the outside may touch something old and deep. What looks devastating to one person may be easier for another because they have different supports or a different story around it.
+
+This is why "other people have it worse" is such a strange form of comfort.
+
+It may be factually true. It is also usually irrelevant.
+
+Someone else's broken leg does not make my headache disappear. More importantly, suffering does not need to win a competition before it deserves attention.
+
+Montaigne distrusted easy judgments about human experience because we rarely see enough of another person's inner life to measure it accurately. I think that restraint belongs in empathy too.
+
+Even the phrase "I know exactly how you feel" can claim too much.
+
+Perhaps I have experienced something similar. That does not mean I inhabit the same memory.
+
+Sometimes the more honest sentence is simply:
+
+**I do not know exactly what this feels like for you, but I am here.**
+
+There is humility in that sentence. It does not solve the pain or explain it. It does not turn suffering into a lesson.
+
+It leaves room for another person's experience to remain partly their own.
+
+Pain is already difficult enough.
+
+We do not need to make people defend its size as well.
