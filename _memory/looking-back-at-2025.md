@@ -1,38 +1,42 @@
 ---
-title: 'Looking Back at 2025'
+title: "What Stayed From the Year"
 date: 2025-12-28
 tags:
-  - life
-  - reflection
-  - personal
+   - life
+   - reflection
+   - personal
 ---
 
-The end of a year always creates a strange feeling for me. Nothing really changes at midnight. The same life continues. Still, a number on the calendar gives us a reason to stop and look behind.
+At the end of 2025, I tried to remember the year and discovered that the important parts did not arrive in order.
 
-When I think about 2025, I do not first remember big achievements. I remember ordinary days. Work, coffee, small plans, small problems, short conversations, things I fixed, things I delayed, and things I forgot.
+There were things that could have gone on a list: work completed, pages made, small tools finished, problems solved. I could have arranged them by month and made the year look organized. That would have been accurate, but it would not have been how the year felt.
 
-For a long time, I thought ordinary days were only the space between important moments. I do not think that anymore. Ordinary days are most of life. The big moments are only punctuation.
+What came back first were smaller things.
 
-This year also reminded me that I enjoy making small things. A simple page, a tiny tool, an improvement that nobody else may notice. These things do not look impressive from outside, but they create movement.
+A cup of coffee beside the computer. A short conversation that improved a bad day. A task I delayed for weeks and then finished in twenty minutes. An idea that looked important in March and had completely lost its importance by September.
 
-I like movement more than waiting for the perfect plan.
+Technology seemed to move faster than the calendar. There was always a new tool, a new model, another thing that everyone suddenly appeared to understand. Some days I learned with curiosity. Other days I had the uncomfortable feeling that I was running while the road itself was moving.
 
-Technology continued to move very quickly too. There was always something new to learn. A new model, a new tool, a new discussion. Sometimes this creates pressure. You can feel late even while learning every day.
+I did not learn everything.
 
-I tried to remind myself that I do not need to know everything. I only need to keep learning.
+This was not a disaster.
 
-There were also plans that did not happen. Some ideas stayed as ideas. Some tasks moved from one month to another until they stopped being important. I am becoming more comfortable with that.
+One useful change during the year was becoming less interested in perfect plans. I preferred making something small and real. A simple page that worked was better than a large idea waiting for the correct future.
 
-A plan is not a promise to the universe.
+Some plans disappeared entirely. I used to treat abandoned plans as small failures. By the end of the year, I was less certain. Sometimes a plan becomes unnecessary because the person who made it has moved somewhere else.
 
-People were more important than plans anyway. A good conversation can improve an entire day. A short message can arrive at the right time. Someone can remember a detail you forgot you mentioned.
+The year also contained people who would never appear in any summary of productivity. Someone remembered a detail I had mentioned months earlier. Someone sent a message at the right moment. A conversation lasted longer than expected and changed the mood of the evening.
 
-These things do not appear in productivity reports, but they stay in memory.
+These were difficult to measure and easy to remember.
 
-I do not know what I will remember from 2025 ten years from now. Memory has its own logic.
+On December 31, nothing magical would happen at midnight. The room would remain the same room, and most unfinished things would still be unfinished in the morning.
 
-For now, I am grateful that the year happened.
+Still, the number on the calendar gave me a reason to look back.
 
-It was not perfect.
+I could not tell which parts of 2025 I would remember ten years later. Memory has never respected annual reports.
 
-That is fine.
+So I stopped trying to prepare one.
+
+The year had happened. Some things were finished, some were not, and most of life had taken place in the ordinary space between them.
+
+That seemed enough.
