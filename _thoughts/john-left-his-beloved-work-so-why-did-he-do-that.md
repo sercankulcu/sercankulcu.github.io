@@ -1,47 +1,48 @@
 ---
-title: 'John Left His Beloved Work, So Why Did He Do That?'
+title: 'A Good Job Can Still Be the Wrong Life'
 date: 2015-10-06
 tags:
-  - career
-  - critics
-  - essays
-  - self-improvement
+  - work
+  - priorities
+  - reflection
 ---
 
-John always imagined himself working with technology in the defence industry. It was not a temporary interest. From a young age, he liked the idea of engineering work that had a clear mission and real consequences.
+John did not leave because he hated his job.
+
+That is what makes his decision interesting.
+
+He had wanted to work with technology in the defence industry from a young age. He studied engineering, found an internship in the field, and later joined a small defence start-up as a software engineer. The company was close to the future he had imagined: difficult technical work, a clear mission, a small team, and the feeling that what he built had consequences.
 
 <img width="180" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-1.webp" style="float: left; margin-right: 30px;" />
 
-He studied hard and entered a strong engineering program. After his first year, he found an internship at a defence company. The experience made the future he imagined feel possible.
+He became good at the work. His responsibilities increased, and eventually he moved into a senior role on a major project. From outside, the story looked like progress in the usual direction: more skill, more responsibility, more importance.
 
-Near graduation, John saw a software-engineering position at a small defence start-up. He prepared seriously for the interview. When the offer came, he was delighted.
+Then two things changed.
 
-<img width="200" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-2.webp" style="float: left; margin-right: 10px;" />
-
-The company was small, and that was part of what he liked. People knew one another. Engineers worked closely. The projects were difficult and felt meaningful. John learned quickly and became an important member of the team.
-
-As the company grew, his responsibilities grew too. He eventually moved into a senior role on a major project.
-
-For a while, this looked exactly like the career he had wanted. Then the culture began to change.
+The first was the company. As it grew, deadlines and profit became more visible in decisions. John felt that some ethical questions were being treated as obstacles rather than responsibilities. He raised his concerns, which mattered because values are easiest to defend when defending them costs nothing. Leadership listened and made efforts to recover some of the original mission.
 
 <img width="200" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-3.webp" style="float: left; margin-right: 10px;" />
 
-Deadlines became more important. Profit became more visible in discussions. John felt that ethical questions were sometimes treated as obstacles instead of responsibilities.
+The second change was John himself.
 
-This was difficult for him because the mission had been one of the reasons he joined. He spoke about his concerns. That was risky. Nobody likes being the person who makes a meeting uncomfortable. But values are easy to have when they cost nothing.
+He married. The long hours that once felt exciting began taking something from the rest of his life. Sleep became worse. Concentration became harder. Work had not suddenly become meaningless, but it was no longer the only thing whose meaning had to be counted.
 
-The real test comes when staying silent would be easier. In John's case, his concerns were heard, and the leadership made efforts to return attention to the company's original values. Still, another change was happening in his life.
+That distinction matters to me because career stories are usually told as if dissatisfaction must justify departure. We understand leaving a terrible manager, meaningless work, or a failing company. Leaving something good is harder to explain.
 
-<img width="200" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-4.webp" style="float: left; margin-right: 10px;" />
+Aristotle's idea of practical wisdom is useful here. A good choice is not produced by maximizing one good in isolation. Work can be genuinely valuable while family, health, friendship, or time become more valuable in a particular life. Goods can conflict without one of them becoming bad.
 
-John married, and his priorities slowly moved. The long hours that once felt exciting became heavier. He had trouble sleeping and concentrating. Work that had once given him energy started taking too much from the rest of his life.
-
-This was confusing. We often imagine leaving a job because we hate it. John did not hate his work. He left because he loved other parts of his life too.
-
-He and his wife decided to move to a smaller town. She found work at a local university, and John took time away from his career to spend more time with his family.
+John and his wife eventually moved to a smaller town. She found work at a local university, and he stepped away from the career he had spent years building. He lost income and accepted uncertainty. Someone looking only at his professional trajectory could call that a step backward.
 
 <img width="200" alt="john" src="/images/posts/john-left-his-beloved-work-so-why-did-he-do-that-5.webp" style="float: left; margin-right: 10px;" />
 
-From outside, this decision could look like stepping backward. He lost income and accepted uncertainty. But careers are not the only things that grow. A family grows. Priorities grow.
+But a career is only one axis on which a life can move forward.
 
-Our idea of success grows. John's story reminds me that leaving something does not always mean it failed. Sometimes a job can be meaningful, a team can be good, and a career can be successful, yet another choice can still be right. We are allowed to change what we value. That may be one of the most difficult freedoms adulthood gives us.
+This is the part I find difficult and useful: **leaving does not prove that the thing we left was a mistake.** Sometimes an earlier choice was right for the person we were, and a different choice becomes right for the person we have become.
+
+We often demand consistency from ourselves long after the conditions that made the original decision sensible have changed. We call that loyalty, discipline, or perseverance. Sometimes it is simply reluctance to disappoint an older version of ourselves.
+
+John did not need to rewrite his career as a failure in order to leave it. The work had mattered. He had learned from it. He had wanted it sincerely.
+
+Then other parts of life became heavy enough to change the calculation.
+
+A good job can still be the wrong life.
