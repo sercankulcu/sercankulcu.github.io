@@ -9,327 +9,41 @@ tags:
    - life
 ---
 
-Platonic love is difficult.
+Platonic love is difficult, especially when the person is not somewhere far away but sitting on the same company shuttle every morning.
 
-Especially when the person is not somewhere far away.
+There was a time when I saw the same girl almost every day. She got on one stop after me and got off one stop before me. That sounds like a very small detail. When you like someone from a distance, small details stop being small. They become the structure of the whole story.
 
-Especially when you see them every morning.
+Some mornings she sat in front of me. That was easy. I could look without turning around, while pretending to be interested in the road, the window, traffic, anything except the person directly in front of me. Other mornings she sat behind me, which created a more complicated engineering problem. You cannot simply turn around every thirty seconds, so the right side of the shuttle suddenly becomes extremely interesting.
 
-There was a time when I saw the same girl on the company shuttle almost every day.
+This is one of the ridiculous things about liking somebody without telling them: you begin developing strategies for situations that would otherwise require no strategy at all. Where should I sit? Did she see me? Should I say hello? Would saying hello now seem strange because I have not said it for the last thirty mornings?
 
-She got on one stop after me.
+The longer you wait, the harder the simplest action becomes. On the first day, saying hello is easy. After one week, it is slightly awkward. After one month, it starts to feel like a major diplomatic event. Every day that you do not talk makes tomorrow more difficult.
 
-She got off one stop before me.
+Routine magnifies everything. You begin noticing a jacket, a bag, a hairstyle, the exact stop where she gets on. None of this information has practical value, yet the mind stores it as if there will be an exam. Then one morning she does not appear, and uncertainty begins doing what uncertainty does best: inventing possibilities.
 
-That sounds like a very small detail.
+Did she miss the shuttle? Is she sick? Did she take the day off? Did she stay somewhere else last night? That last possibility can destroy an otherwise peaceful morning, even though nothing has actually happened. The person has not promised anything. They may not even know you are thinking about them. Still, you react emotionally to scenarios that exist only in your own head.
 
-When you like someone from a distance, small details stop being small.
+This is where platonic love becomes more than simple attraction. Very little happens in reality, so imagination takes over the missing space. There are no dates, arguments, anniversaries, promises, or breakups, but there can still be an enormous amount of emotion. A look can improve the entire day. A missed morning can create worry. A two-second conversation can be replayed for hours.
 
-They become the entire story.
+The person in imagination also has an unfair advantage over the real person. They never say the wrong thing. They are never boring. They never reject you. The imagined relationship remains perfect because it never has to survive contact with ordinary life.
 
-Some mornings she sat in front of me.
+Kierkegaard wrote about possibility as something that can produce both freedom and anxiety. I think that is part of what happens here. Possibility is attractive because nothing has been decided yet. It allows every version of the future to remain available. But the same openness that protects hope also prevents reality from correcting the fantasy.
 
-That was easy.
+Occasionally, something extraordinary happens: the seat next to her is empty. This should be the easiest situation imaginable. There is an empty seat. You need a seat. You sit down. That is how normal transportation works. But by then the possibility has become too important. You wonder whether sitting there would look intentional, what you would say, what she would think. Then courage disappears and you sit somewhere else.
 
-I could look without turning around.
+That moment matters because the obstacle is no longer distance. It is the cost of replacing possibility with information.
 
-Not constantly, of course.
+The moment you speak, imagination loses control. There will be an answer. Maybe a good one. Maybe an ordinary one. Maybe a disappointing one. But there will finally be something real.
 
-You have to pretend to be interested in the road.
+Years ago, I described this situation very simply: every day passes, and the longer you cannot talk, the more impossible talking becomes. I still think that is the important part.
 
-The window.
+We imagine courage as something needed for dramatic moments: quitting a job, moving to another city, standing in front of a crowd, taking some enormous risk. Sometimes courage is much smaller. Sometimes it is sitting in the empty seat. Sometimes it is saying, "Good morning."
 
-Traffic.
+The tragedy of platonic love is not always rejection. Rejection would at least provide an answer. The more durable regret can come from protecting a possibility so carefully that it is never allowed to become real.
 
-Anything except the person directly in front of you.
+Maybe the person would have liked you. Maybe not. Maybe you would have had coffee once and discovered there was nothing there. Maybe something important would have happened. You never know.
 
-Other mornings she sat behind me.
-
-That created a more complicated engineering problem.
-
-You cannot simply turn around every thirty seconds.
-
-So suddenly the right side of the shuttle becomes extremely interesting.
-
-You look toward the window.
-
-You notice something outside.
-
-You turn your head slightly farther than necessary.
-
-Just enough.
-
-There she is.
-
-Then you turn back before anyone notices.
-
-At least you hope nobody notices.
-
-This is one of the ridiculous things about liking somebody without telling them.
-
-You begin developing strategies for situations that would otherwise require no strategy at all.
-
-Where should I sit?
-
-Where will she sit?
-
-Did she see me?
-
-Should I say hello?
-
-Would saying hello now seem strange because I have not said it for the last thirty mornings?
-
-The longer you wait, the harder the simplest action becomes.
-
-The first day, saying hello is easy.
-
-After one week, it is slightly awkward.
-
-After one month, it becomes a major diplomatic event.
-
-You begin thinking:
-
-If I suddenly talk to her now, she will realize that I have been noticing her all this time.
-
-Which is, of course, exactly what has happened.
-
-But you would prefer not to admit it.
-
-So you continue not talking.
-
-And every day that you do not talk makes tomorrow more difficult.
-
-Morning routines become important.
-
-You start noticing what she wears.
-
-Not in any useful sense.
-
-Your brain simply remembers.
-
-You see a jacket and think:
-
-She wore that last week.
-
-You see a bag and recognize it.
-
-A hairstyle changes.
-
-You notice immediately.
-
-None of this information has any practical value.
-
-Yet your mind stores it as if you are preparing for an exam.
-
-Then one morning she does not get on the shuttle.
-
-Now the real trouble begins.
-
-Did she miss it?
-
-Is she sick?
-
-Did she take the day off?
-
-Did she stay somewhere else last night?
-
-That last possibility is especially effective at destroying an otherwise peaceful morning.
-
-A completely imaginary situation can ruin your mood before work has even started.
-
-This is the strange power of uncertainty.
-
-When you know nothing, your mind is free to invent everything.
-
-The person has not done anything.
-
-They have not promised you anything.
-
-They may not even know you are thinking about them.
-
-Yet somehow you are already reacting emotionally to scenarios that exist only in your own head.
-
-Then there are the evenings.
-
-You wonder whether she will take the shuttle home.
-
-Sometimes she does.
-
-Sometimes she does not.
-
-If she does not appear, another set of questions begins.
-
-Where did she go?
-
-Who is she with?
-
-Will she come tomorrow morning?
-
-You have no right to any of these answers.
-
-That does not stop you from wanting them.
-
-Occasionally, something extraordinary happens.
-
-She gets on the shuttle.
-
-The seat next to her is empty.
-
-This should be the easiest situation imaginable.
-
-There is an empty seat.
-
-You need a seat.
-
-You sit down.
-
-That is how normal human beings operate.
-
-But platonic love turns basic transportation into a psychological experiment.
-
-You walk toward the seat.
-
-Then you think too much.
-
-Would it look intentional?
-
-Of course it would be intentional.
-
-What would I say?
-
-Nothing has happened yet and you are already planning the conversation after sitting down.
-
-Then courage disappears.
-
-You sit somewhere else.
-
-The shuttle moves.
-
-The empty seat stays empty for a while.
-
-And you spend the rest of the journey wondering why sitting on a chair became impossible.
-
-This is what makes platonic love exhausting.
-
-Very little actually happens.
-
-Most of the relationship takes place inside one person's head.
-
-There are no arguments.
-
-No dates.
-
-No breakups.
-
-No anniversaries.
-
-No promises.
-
-But there can be an enormous amount of emotion.
-
-A look can improve the entire day.
-
-An empty shuttle seat can become an opportunity.
-
-A missed morning can create unnecessary worry.
-
-A two-second conversation can be replayed for hours.
-
-Everything is magnified because there is so little real information.
-
-You are building a story from fragments.
-
-The dangerous part is that the person in your imagination becomes more complete than the person in reality.
-
-You know what you hope they are like.
-
-You imagine how they would respond.
-
-You imagine conversations.
-
-You imagine coincidences.
-
-You imagine how natural everything would be if only the first sentence could somehow happen without you having to say it.
-
-Reality has an unfair disadvantage.
-
-The imaginary person never says the wrong thing.
-
-They never become boring.
-
-They never disappoint you.
-
-They never reject you.
-
-The imagined relationship remains perfect because it never has to survive contact with real life.
-
-Maybe that is why talking becomes increasingly frightening.
-
-The moment you speak, imagination loses control.
-
-There will be an answer.
-
-Maybe a good one.
-
-Maybe an ordinary one.
-
-Maybe a disappointing one.
-
-But there will finally be something real.
-
-And reality is always riskier than possibility.
-
-Years ago, I described this situation very simply:
-
-Every day passes.
-
-And the longer you cannot talk, the more impossible talking becomes.
-
-I still think that is the important part.
-
-We imagine courage as something needed for dramatic moments.
-
-Quitting a job.
-
-Moving to another city.
-
-Standing in front of a crowd.
-
-Taking some enormous risk.
-
-But sometimes courage is much smaller.
-
-Sometimes it is sitting in the empty seat.
-
-Sometimes it is saying:
-
-"Good morning."
-
-The tragedy of platonic love is not always rejection.
-
-Sometimes rejection would at least provide an answer.
-
-The real tragedy can be spending so much time protecting a possibility that you never allow it to become real.
-
-Maybe the person would have liked you.
-
-Maybe not.
-
-Maybe you would have had coffee once and discovered there was nothing there.
-
-Maybe you would have become friends.
-
-Maybe something important would have happened.
-
-You never know.
-
-And when nothing happens, the unanswered possibilities remain strangely durable.
-
-Years later, you may forget what the person wore.
-
-You may forget the exact route.
-
-You may forget the model of the shuttle.
+Years later, you may forget the jacket, the exact route, even the model of the shuttle.
 
 But you remember the empty seat.
 
