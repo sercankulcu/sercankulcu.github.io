@@ -1,17 +1,46 @@
 ---
-title: 'Not Every Pain Teaches You Anything'
+title: 'Pain Does Not Owe Us a Lesson'
 date: 2017-10-06
 tags:
-  - critics
-  - self-improvement
+  - life
+  - pain
+  - meaning
 ---
 
-There is a comforting idea that every painful experience teaches us something. I understand why we want to believe it. If pain contains a lesson, then at least it was not meaningless. But I do not think life always works that way. Sometimes pain is only pain.
+There is a comforting story we tell about suffering: every difficult experience teaches us something.
 
-A loss does not automatically make us wiser. A betrayal does not always improve our judgment. A difficult period may leave us tired rather than stronger.
+I understand the attraction.
 
-Ataol Behramoğlu expressed this idea very simply: not every pain teaches a person something; often, you only suffer. I like the honesty in that sentence. It removes the pressure to turn every wound into a success story. Of course, we can learn from difficult experiences. We may discover a boundary, understand ourselves better, or change a habit.
+If pain contains a lesson, then perhaps it was not wasted. A loss becomes wisdom. A betrayal becomes better judgment. A difficult year becomes character.
 
-But the lesson often comes later, and sometimes it never comes at all. That does not make our suffering a failure. We do not have to justify every painful event by becoming a better person because of it. Sometimes surviving is enough. Sometimes healing is enough.
+But pain does not always cooperate with that story.
 
-Maybe wisdom is not saying, "Everything happened for a reason." Maybe it is being able to say, "This hurt, and I am still here."
+Sometimes a loss only leaves an absence. Sometimes a betrayal makes us more suspicious, not wiser. Sometimes exhaustion does not reveal a hidden strength. It only exhausts us.
+
+Albert Camus resisted the temptation to pretend that the world always gives us the meaning we want from it. I find that honesty useful here. Suffering does not become noble merely because it happened to us.
+
+Meaning, when it comes, is something we may create afterward.
+
+That distinction matters.
+
+If every wound must contain a lesson, then a person who remains confused has somehow failed twice: first by suffering, then by failing to transform the suffering into wisdom.
+
+I do not think we owe pain that kind of productivity.
+
+Of course, difficult experiences can teach us. We may discover a boundary we should have set earlier. We may understand another person's suffering differently. We may change a habit or leave a situation we had tolerated for too long.
+
+But those lessons belong to what we do with the experience. They are not hidden prizes inside the pain itself.
+
+And sometimes there is no lesson worth extracting.
+
+Sometimes the most truthful sentence is simply: **that should not have happened, and it hurt.**
+
+There is no shame in stopping there.
+
+We do not need to turn every scar into evidence that suffering was secretly useful.
+
+Healing is enough.
+
+Surviving is enough.
+
+Pain does not owe us an explanation, and we do not owe pain a success story.
