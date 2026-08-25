@@ -1,18 +1,56 @@
 ---
-title: 'A Fool Is Not Foolish For Losing Something Valuable'
+title: 'Regret Is Not Proof You Chose Badly'
 date: 2024-02-14
 tags:
-  - life
+  - regret
+  - judgment
   - reflection
-  - self-improvement
 ---
 
-Losing something valuable does not automatically make a person foolish. Loss happens to everyone. People leave. Opportunities disappear. Objects break.
+After we lose something valuable, the mind becomes an excellent prosecutor.
 
-Time passes. What matters more is whether we understand the value of what was lost. Sometimes we recognize value only after absence makes it visible. A person who was always available becomes important when the messages stop. A healthy body becomes precious when a small problem interrupts normal life.
+It reconstructs the past with information we did not have at the time.
 
-Free time becomes valuable after responsibilities fill every hour. The painful part is that recognition often comes late. This is why reflection matters. Not every loss can be prevented. But some losses can teach us what deserves more attention while it is still present.
+You should have noticed.
 
-There is another side too. We should not turn every loss into self-punishment. Sometimes we did our best. Sometimes circumstances changed. Sometimes another person chose differently.
+You should have stayed.
 
-Wisdom is not controlling everything. It is seeing clearly. If something valuable is gone, I want to understand why it mattered. Not so I can live forever in regret. So I can become better at recognizing value before the next thing becomes a memory.
+You should have left earlier.
+
+You should have known what this person, opportunity, place, or period would eventually mean to you.
+
+The accusation feels convincing because the outcome is now obvious.
+
+But outcomes have an unfair advantage over decisions: they arrive later.
+
+A decision has to be made with incomplete information. We do not know which friendship will last, which job will become important, which ordinary afternoon will later feel precious, or which risk will turn out to have been unnecessary.
+
+Once the future becomes the past, uncertainty disappears from the story. We look backward and mistake visibility for inevitability.
+
+This is one reason regret can be intellectually dishonest even when it is emotionally real.
+
+A painful result does not prove that the original choice was foolish. A good decision can end badly. A careless decision can end well. Luck, timing, other people's choices, and information unavailable to us all enter the outcome.
+
+The useful question is therefore not simply, "Did I lose something valuable?"
+
+It is, "Given what I knew then, was my judgment reasonable?"
+
+Sometimes the answer will still be no.
+
+Perhaps I ignored obvious evidence because accepting it would have been painful. Perhaps pride kept me from apologizing. Perhaps I treated something durable as if it were replaceable.
+
+Then regret can teach something specific.
+
+But sometimes the answer is yes. I chose as carefully as I could and the world still changed.
+
+That kind of loss needs grief, not a fictional confession of stupidity.
+
+We cannot evaluate every past decision by whether we like its final outcome. If we do, hindsight turns all misfortune into personal failure.
+
+Wisdom requires a harder distinction.
+
+Learn from the choices that were actually poor.
+
+Mourn the losses that were simply losses.
+
+And do not confuse knowing the ending with having been able to predict it.
