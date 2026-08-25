@@ -1,20 +1,40 @@
 ---
-title: 'Why Joy Fades As We Age'
+title: 'Adult Joy Is Quieter'
 date: 2025-01-25
 tags:
   - life
   - reflection
-  - self-improvement
+  - joy
 ---
 
-Children can become extremely happy about things adults barely notice. A new toy. A puddle. A small surprise. A trip that begins tomorrow.
+Children can become intensely happy about things adults barely register.
 
-As we get older, joy often becomes quieter. Part of this may be familiarity. The first experience has a special intensity. After the hundredth time, the same thing becomes normal. Responsibilities also occupy more mental space.
+A puddle. A new toy. A trip tomorrow. The first snow of winter.
 
-An adult may sit in a beautiful place while thinking about work, money, family, or tomorrow's schedule. The moment is present. The mind is somewhere else. I do not think adulthood has to mean losing joy. But joy may need more attention than it did before.
+It is tempting to say that joy fades with age. I am not sure that is true.
 
-We can become better at noticing small things. A good meal. A peaceful morning. A message from someone we missed. Finishing something difficult.
+What fades may be surprise.
 
-We can also allow ourselves interests that have no professional value. Adults often turn every hobby into productivity. Maybe some joy disappears because everything is asked to become useful. There is also value in accepting that happiness changes form. The excitement of childhood may not return exactly.
+The hundredth train ride cannot feel like the first. A familiar meal does not announce itself as an event. Adults also carry more unfinished business in their heads. We can sit in a beautiful place while mentally answering an email that has not yet arrived.
 
-Adult joy can be slower. A quiet sense that, for one moment, nothing needs to be different. That is still joy.
+But there is another mistake in comparing adult happiness with childhood happiness: we assume joy must remain loud in order to remain real.
+
+Epicurus wrote about pleasure in a way that is much quieter than the modern word suggests. He was interested in freedom from unnecessary disturbance, friendship, simple food, and the relief of not needing more.
+
+That feels closer to many forms of adult joy.
+
+The happiness of finishing difficult work and closing the laptop. Drinking coffee before anyone needs anything from you. Hearing from someone whose voice has become rare. Realizing, for ten minutes, that nothing in the room needs to change.
+
+These moments are easy to underestimate because they do not resemble excitement.
+
+Adulthood also has a habit of putting usefulness on trial. A hobby should improve us. Exercise should produce numbers. Reading should teach something. A photograph should be shared. An interest should perhaps become income.
+
+The question "What is this for?" can slowly poison things that were valuable precisely because they were for nothing.
+
+I do not expect to recover the joy of childhood exactly. Wanting that may itself become another kind of nostalgia.
+
+Maybe the task is to learn the new scale.
+
+Childhood joy often shouts.
+
+Adult joy may simply sit beside us quietly enough that we have to notice it.
