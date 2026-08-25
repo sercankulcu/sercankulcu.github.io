@@ -1,20 +1,48 @@
 ---
-title: 'Why Are We Spending Time Without Much Thought'
+title: 'Distraction Is Often a Way of Avoiding Ourselves'
 date: 2020-08-20
 tags:
-  - career
+  - time
+  - attention
+  - reflection
 ---
 
-Time is the resource we discuss as if it were unlimited and remember as if it disappeared too quickly. I often notice this at the end of a busy day. I did many things. But did I spend the day on things that mattered to me? Busyness can hide that question.
+At the end of some busy days, I have a strange feeling: I did many things, but I am not sure I chose the day.
 
-Work, messages, news, social media, small tasks, and constant notifications can fill every empty space. None of them needs to be terrible on its own. The problem is that they can use an entire day without asking permission.
+Messages were answered. News was checked. Small tasks disappeared. A few minutes of scrolling became an hour in fragments.
 
-Digital life makes this especially easy. There is always another page, video, conversation, or notification. We rarely decide to waste two hours. We lose them in small pieces.
+Nothing dramatic happened.
 
-Procrastination works in a similar way. We avoid one difficult task because the discomfort feels immediate. Later, the task is still there and the time is gone.
+That is exactly why the time is difficult to notice.
 
-I do not think every minute needs to be productive. That would turn life into a factory.
+Pascal wrote about *divertissement*: the human tendency to keep ourselves occupied so that we do not have to remain alone with certain thoughts. His examples belonged to another century, but the mechanism feels familiar.
 
-Rest matters. Doing nothing matters. Entertainment matters. The difference is intention. An hour spent resting because I chose to rest feels different from an hour lost to random scrolling when I wanted to do something else.
+Distraction is not always laziness.
 
-I try to ask a simple question more often: If I continue spending my days this way, will I be comfortable with where the time went? The answer is not always yes. That is probably why the question is useful.
+Sometimes it is avoidance with better entertainment.
+
+A difficult task produces uncertainty, so I check something easier. Silence feels uncomfortable, so I put something in my ears. A question about work, relationships, or direction begins to form, and suddenly there are many small things that urgently deserve attention.
+
+Digital tools did not invent this tendency. They simply made escape unusually convenient.
+
+There is always another message, article, video, notification, argument, or piece of information waiting to replace the thought we were about to have.
+
+This does not mean entertainment is wasted time. Rest can be deliberate. Doing nothing can be deliberate. Watching something for two hours because I wanted to watch it is different from discovering that two hours disappeared while I was repeatedly choosing the next thirty seconds.
+
+The distinction I care about is not productive versus unproductive.
+
+It is chosen versus automatic.
+
+Busyness can hide this difference because a full day looks responsible from the outside. But activity does not answer the question of whether I wanted to spend my attention that way.
+
+I try to notice the moments when I reach for distraction too quickly.
+
+Not because every empty minute should become useful, but because an empty minute may contain a thought I have been avoiding.
+
+Sometimes the thing I call boredom is simply the few seconds before I have to meet my own mind.
+
+That may be why distraction is so attractive.
+
+And why attention is more than a productivity skill.
+
+It is one of the ways we decide which parts of our life we are willing to experience.
