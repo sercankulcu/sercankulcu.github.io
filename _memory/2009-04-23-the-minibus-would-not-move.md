@@ -10,32 +10,20 @@ tags:
    - friendship
 ---
 
-The hiking days usually followed a reliable shape. We left the city, ate something local in the morning, walked for hours, reached wherever the route was taking us, and sometimes stopped at a market before going home.
+Our hiking trips usually followed a familiar order. We left Ankara, ate something in the morning, walked for hours, reached the end of the route, and sometimes stopped at a local market before heading home. By late afternoon, everyone knew roughly what remained in the day.
 
-On one trip, the minibus interrupted the plan.
+On one trip, the minibus refused to continue.
 
-It could not continue.
+The market disappeared from the plan immediately. People gathered around the vehicle instead. Someone offered an idea, someone tried to help, someone waited for instructions, and somebody inevitably found a reason to joke. I no longer remember exactly what was wrong with the minibus, and the memory does not need a mechanical diagnosis added years later.
 
-The market visit disappeared immediately. Instead, the group gathered around the vehicle and tried to solve a problem that had not appeared on any itinerary.
+What I remember is the mood.
 
-I no longer remember exactly what had happened to the minibus, and I do not want to invent a better mechanical failure than memory provides. What I remember is the strange result: dealing with the vehicle was more enjoyable than the market would have been.
+We had spent the day walking the same route, but now the whole group had one small problem in common. There was no summit to reach and no schedule worth protecting. The delay gave us something unplanned to do together.
 
-A small failure had given everybody something to do.
+Nothing about the situation was serious enough to frighten us. It was inconvenient, but not dangerous. That made room for a strange kind of enjoyment. Instead of walking through a market and looking at things we did not need, we stood beside a broken journey and tried to get it moving again.
 
-Someone suggested an idea. Someone helped. Someone waited. Someone probably joked at the wrong time. The group that had spent the day walking along the same route was suddenly working around one shared obstacle.
+Eventually the trip continued. The market was gone, and I cannot remember what I had expected to find there anyway.
 
-Nothing was dangerous enough to make the situation frightening.
+I remember the minibus.
 
-Nothing was easy enough to leave no story.
-
-That middle ground is where many good travel memories live.
-
-The plan had failed.
-
-The day had not.
-
-Years later, I remember the minibus more clearly than the destination we were supposed to visit afterward.
-
-The market was part of the itinerary.
-
-The problem became the trip.
+The market had been on the itinerary. The minibus was the part that stayed.

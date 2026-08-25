@@ -13,30 +13,18 @@ Someone once asked what I liked most about Ankara.
 
 “It lets you experience loneliness completely,” I wrote.
 
-The sentence was partly a joke, but Ankara knew how to support it. A winter evening could empty a street without making it peaceful. The sky turned gray early, buses kept moving, apartment windows lit one by one, and everyone seemed to have somewhere definite to go.
+The answer was partly a joke, but winter evenings in the city knew how to support it. The sky darkened early, buses kept moving, apartment windows came on one by one, and everyone outside seemed to have somewhere definite to go. If you did not, Ankara had a way of making that fact visible.
 
-If you had nowhere to go, the city made that visible.
+Some evenings I went home, made tea, turned on the computer, and put on music. The city continued outside the window without asking anything from me. Friday night could feel exactly like Tuesday afternoon. No event announced itself. Nothing happened badly enough to complain about, and nothing happened well enough to change the evening.
 
-I knew several Ankaras. There was the city seen from buses, the city after work, the student version, the late-night version, and the version walked with people who later disappeared into other cities and other lives.
+That was one version of Ankara. There were others: the city seen through bus windows, the student city, the city after work, the late-night city, and the streets I had once walked with people who later moved elsewhere. The roads could stay exactly where they were while the city changed around them.
 
-The streets did not need to change for the city to change.
+A café closed. A bus route changed. More often, a person simply stopped being part of a place where I was used to seeing them. Then an ordinary street acquired an empty space that existed only for me.
 
-Sometimes a café closed. Sometimes a route changed. More often, the person who had once been beside you was simply no longer part of that street.
+I used to complain that Ankara made loneliness too easy to notice. I still think that was true.
 
-On quiet evenings, I would make tea, turn on the computer, put on music, and remain inside while the city continued beyond the window. Nothing asked me to participate. Ankara could make a Friday night feel like a Tuesday afternoon.
+But when I remember the city now, I do not first see monuments or large avenues. I see a dark window, tea beside a computer, a bus moving through winter, and lights appearing in other apartments.
 
-I complained about that quality.
+The city could make an evening feel empty.
 
-I also learned how to live inside it.
-
-There is a difference between being alone and noticing that you are alone. Some cities work hard to distract you from the second condition.
-
-Ankara rarely did.
-
-Perhaps that is why I remember it less through monuments than through weather, bus windows, empty evenings, tea, computer screens, and people who were once nearby.
-
-The city could feel lonely.
-
-It never became empty.
-
-Too much of my life had already happened there.
+It never felt unfamiliar.
