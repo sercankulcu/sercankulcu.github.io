@@ -1,17 +1,44 @@
 ---
-title: 'The Inevitability Of Problems'
+title: 'Do Not Make Every Problem a Verdict'
 date: 2024-10-11
 tags:
   - life
   - reflection
+  - stoicism
 ---
 
-One morning, I woke up already irritated. Then I opened my inbox and found a few small problems. Because of my mood, each one looked larger than it really was. Later, I told a friend about the terrible morning. While speaking, I suddenly heard how ordinary the problems sounded.
+One morning, I woke up already irritated.
 
-Nothing had happened that could not be solved. The main difference was my state of mind. This reminded me of something simple. Problems are not exceptional events. They are part of normal life.
+Then I opened my inbox and found several small problems. None of them was serious. But because I had already decided, without noticing, that the day was going badly, each new inconvenience became evidence.
 
-A completely problem-free week would probably be more unusual than a difficult one. Some problems are serious. Many are small. The mind does not always respect the difference. When I am tired or stressed, a minor inconvenience can feel like evidence that the whole day is broken.
+A delayed reply meant people were unreliable. A technical problem meant the whole task was a mess. One annoying message seemed to confirm that the morning itself had turned against me.
 
-This is why I try to ask a few questions now. Will this matter next month? Can I solve it today? Does it need action, patience, or simply acceptance? The goal is not to become emotionally cold.
+Later I described the day to a friend and heard how ordinary the events sounded when spoken aloud.
 
-A problem can be annoying and still be small. Life does not become peaceful because problems disappear. Maybe it becomes more peaceful when we stop being surprised by their existence.
+That embarrassed me a little.
+
+The problems were real. The verdict was mine.
+
+Epictetus makes a distinction that is easy to repeat and difficult to practice: an event and our judgment about the event are not the same thing. I do not take this to mean that we can think every problem away. Some events deserve fear, anger, grief, or urgent action.
+
+But many daily problems arrive without the meaning we immediately attach to them.
+
+A broken plan is not proof that everything is failing. A disagreement is not proof that a relationship is collapsing. A bad hour is not necessarily a bad day.
+
+The mind likes to promote individual events into general conclusions.
+
+I try to interrupt that process with smaller questions now.
+
+What exactly happened?
+
+What does it require: action, patience, acceptance, or nothing at all?
+
+Will it matter next week?
+
+These questions do not remove the inconvenience. They reduce its territory.
+
+Problems are part of ordinary life. The real burden often begins when every problem is asked to explain the whole life around it.
+
+A problem can remain a problem.
+
+It does not always need to become a verdict.
