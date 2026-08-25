@@ -1,15 +1,50 @@
 ---
-title: 'Jean De La Bruyère'
+title: 'We Perform More Than We Admit'
 date: 2019-07-04
 tags:
-  - personal development
-  - self-improvement
+  - character
+  - status
+  - reflection
 ---
 
-Jean de La Bruyère was a French writer and moralist best known for observing human character with uncomfortable precision. He was born in Paris in 1645 and studied law. His most famous work, *Les Caractères*, was published in 1688 and expanded through several editions. The book combines portraits, short observations, and moral reflections. La Bruyère wrote about vanity, ambition, wealth, conversation, social status, hypocrisy, and many other parts of human behavior.
+Some writers become dated because the world they describe disappears.
 
-What I find interesting is how modern some of these observations feel. Technology changes. Fashion changes. Political systems change. Human insecurity does not change as quickly.
+Jean de La Bruyère has the opposite effect on me.
 
-People still want approval. We still compare ourselves with others. We still try to look more important than we feel. La Bruyère often writes as if he is quietly watching a room and noticing the small performances people do without realizing it. This kind of writing can be uncomfortable because the target is never only "other people."
+He wrote in seventeenth-century France about vanity, ambition, conversation, wealth, status, hypocrisy, and the small performances people use to manage how others see them. The clothing has changed. The rooms have changed. The performances have not disappeared.
 
-A good observation eventually turns toward the reader. We recognize someone we know. Then, if we are honest, we recognize ourselves. That is probably one reason moralists remain readable centuries later. They do not need modern technology to stay relevant. Their subject is us.
+That is what interests me.
+
+We often imagine personality as something private and stable: this is simply who I am.
+
+But social situations reveal how much of the self is adjusted for an audience.
+
+A person speaks differently to a manager than to a close friend. Someone becomes more certain when they want to impress. Another person mentions a success casually enough to make sure everyone hears it without appearing to boast. We laugh harder at the joke of someone powerful. We become modest in ways that still advertise what we want noticed.
+
+None of this requires deliberate deception.
+
+Performance can become so habitual that the performer no longer experiences it as performance.
+
+That is where La Bruyère becomes uncomfortable.
+
+It is easy to recognize vanity in someone else. The person who dominates a conversation, exaggerates an achievement, collects important acquaintances, or treats status as evidence of worth is visible from across the room.
+
+My own versions are harder to see.
+
+When do I explain something because it is useful, and when because I want to appear knowledgeable?
+
+When does modesty become a more sophisticated form of self-promotion?
+
+When do I disagree because the argument is weak, and when because agreement would place someone else above me?
+
+A moralist is useful when the observation turns around.
+
+The point is not to discover that other people are vain. That discovery requires very little intelligence.
+
+The harder task is noticing the forms of vanity that feel reasonable from inside our own motives.
+
+Maybe this is why observations written centuries ago can still feel current.
+
+Technology changes the stage faster than it changes the actor.
+
+And the most convincing performance is usually the one we have stopped recognizing as a performance.
