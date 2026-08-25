@@ -1,32 +1,34 @@
 ---
-title: 'Why I Like Learning from Manuals'
+title: 'Manuals Teach the Questions I Did Not Know to Ask'
 date: 2007-11-18
 tags:
   - learning
   - programming
-  - life
+  - reflection
 ---
 
-When I start using a new program or programming language, I often want to understand everything quickly. I search the web, read a few examples, copy something that looks useful, and try to make it work.
-
-This is fast, but sometimes it leaves holes in my understanding.
+When I start using a new program or programming language, my first instinct is usually to search for the exact thing I need. The method is efficient: find an example, adapt it, make the immediate problem disappear. It is also a good way to remain unaware of everything I did not know to search for.
 
 That is why I still like manuals.
 
-A good manual is not exciting. It does not promise that I will become an expert in ten minutes. It usually begins with simple things and moves slowly. At first, this can feel boring. Then I discover something important that I would never have searched for because I did not know it existed.
+A search engine is strongest when the question already exists. A manual is valuable when the missing part is the question itself. Its order exposes features, assumptions, vocabulary, and relationships that would never have entered my search box because I had no reason to suspect they were there.
 
-Search engines are very good when we know the question. Manuals are useful when we do not know which questions to ask yet.
+I learned this repeatedly with programming tools. I can use the same command for months, believing I understand it well enough, then read a few pages of documentation and discover an option that makes the entire workaround unnecessary. The embarrassing part is not that the option was hidden. It is that I had built a stable habit around incomplete understanding.
 
-I learned this especially with programming tools. Sometimes I use a command in the same way for months. Then I read a few pages of documentation and discover a simpler option that was always there.
+This is one reason systematic reading can feel slower while producing a different kind of speed later. It builds a map instead of only solving a coordinate. When a new problem appears, I may not remember the exact answer, but I remember that a certain region of the tool exists and where to look.
 
-It feels a little embarrassing, but also satisfying.
+Dewey's emphasis on experience matters here, but experience alone is not enough. Repetition can make a bad model feel natural. Documentation interrupts that familiarity by showing how the system describes itself rather than how I happened to learn it.
 
-There is another reason I like manuals. They force me to slow down. When I search online, I jump between pages. One answer leads to another. My attention becomes divided.
+Of course, manuals have their own weaknesses. They can be badly written, outdated, overly complete, or organized around the author's mental model instead of the user's. Reading everything from beginning to end can become ritual rather than learning. I do not think completeness is the goal.
 
-A manual has an order. It asks me to stay with the topic.
+The useful distinction is between **answer retrieval** and **model building**.
 
-Of course, I do not read every manual from beginning to end. Life is too short for that. But I try to spend some time with the official documentation when a tool becomes important to me.
+Sometimes I need the answer in thirty seconds. Search is perfect. Sometimes a tool has become important enough that I want to understand its shape, not only today's error message. Then I want the manual.
 
-Learning is not only about getting the answer to today's problem.
+There is also something valuable about the slower attention it requires. Search encourages jumping: one result, another tab, another explanation. A manual asks me to remain inside one structure long enough to see how its pieces connect.
 
-Sometimes it is about building a map in the mind so tomorrow's problem feels less unfamiliar.
+That does not make manuals superior to search. They solve different ignorance.
+
+Search helps when I know what I do not know.
+
+A good manual helps when I do not yet know that there is something to know.
