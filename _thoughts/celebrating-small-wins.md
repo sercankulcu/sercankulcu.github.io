@@ -1,16 +1,36 @@
 ---
-title: 'Celebrating Small Wins'
+title: 'When Every Finish Line Moves'
 date: 2020-09-17
 tags:
-  - career
+  - work
+  - ambition
+  - reflection
 ---
 
-We are usually very good at seeing what is still missing. The unfinished work. The next goal. The skill we do not have yet. Because of this, progress can become invisible.
+One of the easiest ways to become permanently dissatisfied is to move the finish line every time we reach it.
 
-I think small wins deserve more attention. Finishing a difficult page, solving a bug, keeping a habit for one week, reading a chapter, or having a conversation we were avoiding may not look important from outside. Inside a larger journey, these moments matter. They tell us that movement is happening. Celebrating a small win does not need a party. Sometimes it is only stopping for one minute and saying, "That went well."
+Finish the project, and immediately think about the next one. Solve the problem, and notice the ten problems still open. Receive good news, enjoy it for five minutes, then return to what is missing.
 
-This small recognition can change motivation. If we only look at the distance remaining, a long goal becomes exhausting.
+Ambition makes this feel reasonable. There is always more to learn and more to improve. But if every achievement becomes ordinary the moment it is achieved, progress can become psychologically invisible.
 
-If we also look at the distance already travelled, the same goal feels more possible. There is a balance here. Celebration should not become an excuse to stop. But constant dissatisfaction is not a healthy form of ambition either. I have noticed that people who never allow themselves to feel successful eventually make every achievement feel normal.
+I have noticed this especially in long projects. From inside the work, attention naturally goes to what remains unfinished. The missing feature matters more than the twenty features already working. The page that still needs revision matters more than the pages already written.
 
-They reach a goal and immediately replace it with another one. There is no arrival. Maybe we do not need a final arrival. But we need a few places to stop along the road. Small wins are those places.
+This bias is useful for completing things. It is terrible for recognizing movement.
+
+The answer is not constant celebration. Not every completed task deserves a reward, and congratulating ourselves for everything can become another distraction.
+
+What seems more valuable is measurement.
+
+Occasionally compare the present not with the ideal, but with the actual past.
+
+What can I do now that I could not do a year ago? Which problem that once intimidated me has become routine? Which difficult conversation did I finally have? Which unfinished thing is now finished?
+
+Montaigne's habit of examining himself without turning every observation into a grand rule is useful here. Progress is often easier to see backward than forward.
+
+There may never be a final arrival. Most worthwhile pursuits keep opening new distances.
+
+But a moving horizon should not erase the road already travelled.
+
+Sometimes the sensible response to finishing something is not to make a ceremony of it.
+
+It is simply to notice that the person who began it could not yet do what the person who finished it just did.
