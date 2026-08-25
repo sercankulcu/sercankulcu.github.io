@@ -1,24 +1,32 @@
 ---
-title: 'Small Projects and the Joy of Finishing'
+title: 'Small Projects Close the Loop'
 date: 2025-03-08
 tags:
-  - life
   - projects
-  - self-improvement
+  - learning
+  - reflection
 ---
 
-I used to think a project had to be big to be meaningful. A large project looked serious and important. It felt like something worth talking about. Small projects looked temporary to me, almost like exercises. Over time, this changed. I started to enjoy the feeling of finishing something small much more than carrying a large unfinished idea for months.
+I used to think a project had to be large to deserve attention. Large projects looked serious. Small ones looked temporary, almost like exercises. Over time, I began to suspect that scale and seriousness are not the same thing.
 
-A small project has a clear shape. You begin with one simple idea, you make a few mistakes, you solve a few problems, and then one day it works. Maybe it is only a timer, a tiny game, a calculator, or a page that does one useful thing. It will not change the world. Still, when I look at it and say, "I made this," I feel a quiet satisfaction.
+A small project has one advantage that large plans often lose: it can complete a feedback loop. You imagine something, build it, discover what was wrong with the idea, change it, and eventually decide that it is finished enough to exist. The loop closes.
 
-Large plans can become heavy very quickly. At first they are exciting, but later the list of missing parts starts to grow. Then the project becomes something that follows you in your mind. Small projects are lighter. You do not need to imagine the next six months. You only need to solve the next small problem.
+That matters because planning can hide from reality for a surprisingly long time. A project can look elegant in notes and diagrams. Then the first button does not work. The layout breaks on a phone. A simple feature needs three unexpected decisions. Building introduces resistance, and resistance produces information.
 
-I also learned that finishing teaches more than planning. Planning feels safe because nothing can break yet. Building is different. A button refuses to work. A layout looks good on a computer but terrible on a phone. A simple idea becomes more difficult than expected. These moments are sometimes annoying, but they are also where learning happens.
+This is why I now think of small projects less as miniature versions of large ones and more as experiments with consequences. They are large enough to reveal mistakes but small enough that the mistakes remain affordable.
 
-Not every project needs a business plan, a large audience, or a serious purpose. Sometimes curiosity is enough. Sometimes I only want to know if I can make something work. That is a good reason to start.
+Dewey treated learning as something tested through experience rather than stored only as abstract knowledge. Small projects make that idea concrete. A tutorial can tell me how something should work. A small application tells me what happens when my understanding meets an actual system.
 
-I now believe that many small finished things can slowly become something large. A page becomes a tool. A tool becomes a collection. A collection becomes part of a website. The first small step does not need to know where everything will end.
+There is another benefit: finishing forces exclusion. An unfinished project can contain every future feature because none of them has to coexist yet. Finishing means deciding what this version will not include. That can feel like loss, but it is also what gives the work a shape.
 
-There is also something emotional about finishing. Time becomes visible. The hours did not simply disappear. They became a small object on the screen. Maybe it is not perfect. Maybe I will change it later. But for that moment, it is complete.
+I notice this especially with small tools. A timer, a calculator, a tiny game, a page that solves one problem: none needs to become a company, a product, or a platform. It can simply do one thing well enough to be complete.
 
-That simple feeling still makes me happy.
+That changes the emotional weight of work. A huge unfinished plan can follow me for months. A small finished project becomes quiet. I can look at it, notice what I learned, and move on without carrying twenty unresolved decisions into the next idea.
+
+Of course, small projects can become another form of avoidance. It is possible to finish easy things forever because the harder project is frightening. The value is not in staying small. It is in learning when small scope creates useful feedback and when it becomes a hiding place.
+
+The distinction I care about now is not **small versus ambitious**. It is **closed loop versus permanent intention**.
+
+A finished small thing has met reality. An enormous plan may still be waiting to do so.
+
+Sometimes the most useful project is the one modest enough to teach you something before your enthusiasm runs out.
