@@ -9,28 +9,14 @@ tags:
    - everyday-life
 ---
 
-During the pandemic, my wife learned how to cut my hair.
+During the pandemic, my wife learned how to cut my hair, and the training material was me. The first attempts were not especially successful. I described the results at the time by saying she had repeatedly turned me into a monkey, which was unfair to monkeys but accurate enough about my confidence when I looked in the mirror.
 
-The training material was me.
+Hair grows back, so we continued. By August, something had changed: the cuts had become good enough that the experiment no longer felt like an emergency solution. At the same time, the price I remembered from before the pandemic had risen sharply. A service that had once seemed ordinary now invited a calculation.
 
-The first attempts were not especially successful. I described the results at the time by saying she had repeatedly turned me into a monkey, which was unfair to monkeys but accurate enough about my confidence when I looked in the mirror.
+Why go back? Only a few months earlier, the question would have sounded strange. Haircuts belonged outside the home. You went somewhere, sat down, someone else handled the problem, and you returned with less hair.
 
-Still, hair grows back, so we continued.
+Then the house began absorbing tasks that had once belonged elsewhere. Work, meetings, exercise, and many other parts of daily life moved indoors. In our case, haircuts did too. What began as a temporary answer to a closed world slowly became a normal household skill.
 
-By August, something had changed. The cuts had become good enough that the experiment no longer felt like an emergency solution. At the same time, the price I remembered from before the pandemic had risen sharply. A service that had once seemed ordinary now invited a calculation.
+The part that stayed with me was the learning curve rather than the saving. Something that had once seemed to belong entirely to professionals became possible through repetition. Each attempt corrected a little of the previous one, although I had to wear every stage of that education in public whenever I left the house.
 
-Why go back?
-
-That question would have sounded strange only a few months earlier. Haircuts belonged outside the home. You went somewhere, sat down, someone else handled the problem, and you returned with less hair.
-
-Then the world changed its rules and the house began absorbing tasks that had once belonged elsewhere. Work came home. Meetings came home. Exercise came home. In our case, the barber came home too.
-
-The part I remember most is not the saving. It is the learning curve. A skill that once appeared to belong to professionals slowly became something another person in the house could do because there had been enough attempts.
-
-Of course, I had to wear every attempt.
-
-That was my contribution.
-
-By the time the result became reliable, the strange part was no longer cutting hair at home.
-
-The strange part was paying someone else to do it.
+By the time the result became reliable, cutting hair at home no longer felt unusual. Paying someone else to do it had become the stranger idea.
