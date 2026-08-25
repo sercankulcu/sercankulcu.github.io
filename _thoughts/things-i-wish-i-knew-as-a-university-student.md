@@ -1,40 +1,30 @@
 ---
-title: 'Things I Wish I Knew as a University Student'
+title: 'University Teaches More Than the Syllabus'
 date: 2026-04-18
 tags:
   - education
   - students
-  - life
+  - reflection
 ---
 
-University feels long while you are inside it.
+University feels long while you are inside it and surprisingly short afterward. That difference in perspective changes what seems important.
 
-Later, it feels surprisingly short.
+If I could speak to my younger student self, I would probably not give him a list of rules. I would tell him to pay attention to the parts of education that are difficult to recognize while they are happening.
 
-There are many things I would like to tell my younger student self. I am not sure I would listen, but I would try.
+The first is delayed understanding. Some ideas make no sense the first time. They sit in the mind without connecting to anything. Months later, another course, a project, a mistake, or a conversation suddenly gives them a place. I used to think not understanding immediately meant failure. Now I think some knowledge needs time to become usable.
 
-The first thing would be simple: you do not need to understand everything immediately. Some ideas need time. You can hear an explanation today and understand it months later. That does not mean the first attempt was wasted.
+I would also ask more questions. Students often protect themselves from looking uninformed by remaining silently uninformed. There is no prize for that. A question can reveal a missing assumption in the lecture, in the textbook, or in our own thinking. Dewey's view of education as experience makes sense to me here: learning becomes stronger when the student is not only receiving an answer but doing something with the uncertainty that came before it.
 
-Learning is strange. Ideas sometimes stay quietly in the mind until another course, another book, or another example connects the pieces.
+Grades matter, but they measure a narrow slice of education. They can reward preparation, memory, consistency, and technical competence. They do not fully measure curiosity, resilience, judgment, collaboration, or the ability to keep working when the problem stops resembling the example from class.
 
-I would also tell myself to ask more questions. Students often stay silent because they think the question is too simple. Usually, someone else has the same question.
+Projects taught me this more directly than exams. A small program that fails in an unexpected way can expose a gap that ten correct homework answers never revealed. Building something forces knowledge to leave the comfortable form in which it was taught.
 
-There is no prize for being confused quietly.
+There is another part of university that looks secondary at the time: people. Years later, I may forget the exact question on an exam but remember who sat beside me, the coffee after class, the conversation before a deadline, or the friend who helped me see a problem differently. Education happens socially even when the transcript records only individual grades.
 
-Grades matter, but they are not everything. They can open doors and measure some kinds of effort, but they do not measure curiosity, patience, teamwork, or the ability to continue when a problem becomes messy.
+Montaigne distrusted education that filled memory without improving judgment. I understand that better now. The useful question is not only, "What did I learn?" It is also, "What kind of learner did I become?"
 
-I would also build more small things. Do not wait until you know enough. You will never feel completely ready. Make a small program. Create a website. Write a tiny game. Break it. Fix it.
-
-Projects reveal gaps that courses cannot always reveal.
-
-Friends are part of the education too. Years later, you may forget the exact exam question, but you may remember the person sitting next to you, the coffee after class, or the conversation before a deadline.
-
-University is not only a place where we collect information.
-
-It is also a period of life.
-
-Maybe the most important advice is to learn how to learn. Technology changes. Jobs change. Tools change. But the ability to understand something difficult stays useful.
+Technologies change. Jobs change. Tools disappear. Entire subjects can be transformed within a few years. The durable part of university is not a fixed inventory of facts. It is the ability to meet something difficult without immediately turning away.
 
 I cannot go back and give this advice to my younger self.
 
-Maybe that is why I am writing it here.
+Perhaps writing it is the closest thing available.
