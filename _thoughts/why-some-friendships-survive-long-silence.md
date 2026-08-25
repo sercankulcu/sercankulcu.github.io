@@ -1,22 +1,36 @@
 ---
-title: 'Why Some Friendships Survive Long Silence'
+title: 'Some Friendships Do Not Need Constant Proof'
 date: 2017-09-17
 tags:
-  - life
   - friendship
-  - memories
+  - distance
+  - reflection
 ---
 
-Some friendships need constant contact. Others seem to survive silence.
+Some friendships seem to weaken the moment contact becomes irregular. Others survive months or years of silence and then resume with surprising ease.
 
-Months can pass. Sometimes years. Then you meet again and the first few minutes feel slightly strange. After that, the old rhythm returns. I find this kind of friendship interesting.
+I find the second kind interesting because it challenges the usual idea that closeness must be constantly demonstrated. We often measure friendship through frequency: messages, calls, visits, shared plans. Those things matter. But frequency and depth are not identical.
 
-It does not mean the people stopped caring. Life simply became crowded. Work changed. Cities changed. Families grew. Daily routines moved in different directions.
+When we are young, friendship is often supported by structure. School, university, neighborhoods, and early jobs place the same people in front of us repeatedly. Contact happens before intention is tested. Later, life removes that infrastructure. Cities change. Work becomes heavier. Families grow. Time becomes fragmented.
 
-When we are younger, friendship often depends on shared time. We see the same people every day because school or university puts us in the same place.
+Then friendship has to survive without the machinery that once kept it visible.
 
-Later, friendship becomes more intentional. We have to choose to call, visit, or write. This makes some relationships disappear, but it also shows which connections can survive distance.
+Montaigne's famous friendship with La Boétie was unusual in intensity, but what interests me is his sense that friendship is not merely a schedule of interactions. Fromm, in a different way, reminds us that care is an activity rather than a possession. Both ideas help distinguish **absence of contact** from **absence of regard**.
 
-I do not think silence is always healthy. Some people disappear because something is broken and nobody wants to say it.
+They are not the same thing.
 
-But sometimes silence is only silence. There is comfort in having a person with whom you do not need to explain every missing month. You begin with, "It has been a long time," and then continue. Maybe strong friendship is not measured only by how often two people speak. Maybe it is also measured by how little distance changes the feeling when they finally do.
+Of course, silence can also hide a broken relationship. People sometimes stop speaking because resentment has accumulated, because one person has stopped investing, or because neither wants to name what changed. Romanticizing every long silence would be naive.
+
+The test is what happens when contact returns.
+
+Do both people need an accounting of every missing month? Does the conversation feel like maintenance overdue, or does it feel like a room that remained available even while nobody entered it?
+
+The strongest friendships I know often contain a kind of generosity toward time. They allow another person's life to become temporarily crowded without interpreting every absence as a verdict. That generosity is not indifference. It depends on confidence built earlier.
+
+This is why some friendships can be quiet without becoming empty.
+
+They do not need constant proof because the relationship is not being renegotiated every week.
+
+Maybe closeness is not measured only by how often two people speak.
+
+Sometimes it is measured by how little explanation they need when they finally do.
