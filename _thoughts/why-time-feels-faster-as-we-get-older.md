@@ -1,44 +1,38 @@
 ---
-title: 'Why Time Feels Faster as We Get Older'
+title: 'A Year Needs Landmarks'
 date: 2026-05-10
 tags:
   - life
   - time
-  - reflection
+  - memory
 ---
 
-When I was a child, one summer felt very long.
+When I was a child, a summer seemed to contain several different lives.
 
-A school year felt almost endless.
+There was the first week after school, a visit somewhere, a new game, a relative arriving, a day that went unexpectedly wrong, another day I remembered for years. Looking back, the summer had landmarks.
 
-Now months can disappear before I understand what happened.
+Adult months can be much smoother.
 
-I know that time itself is not moving faster. The clock is not changing its speed. Still, the feeling is real.
+This is different from saying that time literally moves faster or that routine is simply bad. Routine is useful. Much of a stable life depends on repetition.
 
-I think routine is part of the reason. New experiences create more details in memory. When many days look similar, the mind may store them in a more compact way.
+The problem appears later, in memory.
 
-A week full of new places, conversations, and problems can feel long when we remember it. A month of similar days can feel very short.
+We do not remember duration the way a clock records it. We remember events, transitions, surprises, beginnings, endings, places, conversations. Henri Bergson distinguished measurable clock time from lived duration. I find the distinction useful because two months of equal length can occupy completely different amounts of memory.
 
-This makes me think that the feeling of time may be connected to attention.
+A week in an unfamiliar city may leave dozens of markers. Six ordinary weeks can collapse into a sentence: I was working a lot then.
 
-Children experience many things for the first time. Adults have fewer first times. We already know the road, the room, the schedule, the type of problem.
+This makes me think that the frightening part of aging is not only that fewer years remain. It is that years can become harder to distinguish from one another.
 
-The mind becomes efficient.
+I do not want to solve this by turning life into a collection of artificial experiences. Novelty can become another form of consumption: new restaurant, new trip, new activity, quickly replaced by the next one.
 
-Efficiency is useful, but maybe it also makes time feel smoother and faster.
+What I want instead is enough variation for memory to have edges.
 
-There is another simple reason too. One year is a large part of a ten-year-old's life. It is a much smaller part of an older person's life. We compare time with the amount of life we have already lived.
+A project with a beginning and an end. A recurring walk that changes with the seasons. A dinner I actually pay attention to. Learning something difficult enough that I can remember not knowing it.
 
-I do not know how much each explanation matters, but the feeling still makes me uncomfortable sometimes.
+Perhaps this is why rituals matter too. A birthday, an annual trip, a particular meal, even a photograph taken in the same place each year gives time a visible structure.
 
-It reminds me that days can disappear quietly.
+We cannot make a year longer.
 
-I do not think the answer is to make every day exciting. That sounds exhausting. Ordinary life is important too.
+But we can give it shape.
 
-Maybe the answer is simply to notice more.
-
-Take a different road. Call someone. Learn something small. Look at the sky for a minute. Leave a day with one detail that makes it different from the day before.
-
-We cannot slow the clock.
-
-But maybe we can make time feel a little less invisible.
+A life without landmarks may still be full. It is simply harder to see where it went.
