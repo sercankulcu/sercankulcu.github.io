@@ -7,28 +7,24 @@ tags:
   - reflection
 ---
 
-In 2023, one professional title changed.
+In 2023, one line in my professional life changed: I became an Assistant Professor.
 
-I became an Assistant Professor, and the new title carried the satisfying weight of something that had taken years to reach. It appeared neatly on paper, exactly the kind of achievement a year-end summary knows how to display.
+The title looked clean on paper. It carried years of work behind it, but the result itself could be written in a few words. It was exactly the kind of achievement that fits comfortably into a CV and makes a year look as if it moved in one clear direction.
 
-The rest of the year was less tidy.
+The rest of the year refused to cooperate with that version.
 
-There were periods when ordinary routines were interrupted and plans had to become smaller. Family worries entered the same calendar. Days that had been arranged around work suddenly had other priorities.
+There were periods when ordinary routines broke apart and plans had to become smaller. Family concerns entered days that had been organized around work. Some things that had seemed urgent in the morning stopped mattering by the afternoon.
 
-At the same time, I kept building small things.
+I kept making small things anyway. I worked on my website, followed new interests, and returned to modest projects that could be improved one page or one technical change at a time. They were not solutions to larger problems. They simply gave certain evenings a shape.
 
-I worked on my website. I found new interests and returned to modest projects that could be finished in an evening or improved one piece at a time. A page, a note, or a technical change did not solve anything larger, but it gave a day a visible shape.
+I liked that scale. A large professional title had changed, but much of the year was lived through smaller acts: fixing a page, finishing a note, solving one technical problem, then closing the computer.
 
-That contrast is what I want to keep from the year.
+A year-end summary could have placed the promotion in a column marked *good* and the difficult periods in another marked *bad*. The small projects would not have known where to go.
 
-One line on a CV moved forward.
+That is why I remember the year less as a list than as a desk with several things on it at once.
 
-Some weeks narrowed life to more immediate concerns.
+One line on the CV had moved forward.
 
-Small creative work continued in the spaces between them.
+Life around it remained untidy.
 
-If I placed 2023 into two columns marked *good* and *bad*, I would spend too much time moving the same events back and forth.
-
-The year did not belong in either column.
-
-It happened across both.
+The page still got built.

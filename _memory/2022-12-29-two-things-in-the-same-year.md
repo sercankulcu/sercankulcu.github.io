@@ -7,36 +7,24 @@ tags:
   - reflection
 ---
 
-I finished my doctorate in 2022.
+In 2022, I reached the end of my doctorate.
 
-The sentence looks clean now. It hides the ordinary days that made it possible: reading the same paragraph again, changing a sentence, waiting for feedback, correcting something I thought was already finished, and returning to work that had become so familiar I could no longer see its edges.
+For years, the work had existed as files, corrections, paragraphs I read too many times, feedback I waited for, and sentences that seemed finished until I opened them again. Near the end, the project had become so familiar that progress was difficult to see. Then one day there was no next chapter waiting for me.
 
-When it was finally done, relief arrived before pride.
+Relief came before pride.
 
-In the same year, there was a serious loss close to the family.
+People congratulated me, and I thanked them. The exchange was simple: years of work had reached a clear result, exactly the kind of event that fits neatly into a sentence.
 
-Celebration and grief did not take turns. They existed beside each other without trying to make the year emotionally consistent. One part of life had reached a goal after years of work while another part had become permanently emptier.
+The same year also contained a serious loss close to the family.
 
-That made ordinary congratulations feel strange for a while.
+That part did not fit beside the doctorate as neatly. Celebration and grief did not wait for separate months or take turns politely. One part of life had reached a long-awaited finish while another had become permanently emptier.
 
-“You finished.”
+For a while, congratulations felt strange because they were completely correct and still incomplete. “You finished.” Yes. “Wonderful.” Yes. There was nothing false in either answer. They simply belonged to only one part of the year.
 
-Yes.
+I do not remember 2022 as a balance sheet in which one event compensated for another. They did not cancel each other, and I do not want them to.
 
-“Wonderful.”
+One long piece of work reached its last page.
 
-Yes.
+Someone important was missing from what came after.
 
-Both answers were true, and neither described the whole year.
-
-A year does not owe us one mood. The calendar simply places events beside each other because they happened between January and December.
-
-I remember 2022 that way.
-
-A long piece of work reached its last page.
-
-Someone important was no longer there to enter the next year with us.
-
-The two facts do not explain each other.
-
-They only share the same date range.
+Both happened in the same year. That is the only connection they need.
