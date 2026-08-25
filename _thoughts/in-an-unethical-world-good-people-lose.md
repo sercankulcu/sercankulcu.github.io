@@ -1,28 +1,62 @@
 ---
-title: 'In an Unethical World, Good People Lose'
+title: 'Goodness Needs Institutions'
 date: 2016-02-14
 tags:
-  - essay
+  - ethics
+  - institutions
+  - power
 ---
 
-There is an uncomfortable idea I keep returning to: an ethical person can lose inside a system that rewards unethical behavior.
+An ethical person can lose inside a system that rewards unethical behavior.
 
-At first, this sounds unfair because we usually want to believe that honesty is stronger in the long run. Sometimes it is. But not every environment rewards patience, fairness, or truth. A person with moral limits may refuse to lie, cheat, manipulate, or harm others. Someone without those limits has more options.
+This sounds pessimistic only if we assume morality is automatically competitive.
 
-Imagine two people in the same race. One respects every rule. The other ignores the rules whenever it gives an advantage. If nobody stops the second person, the unfair strategy may work.
+It is not.
 
-This can happen in workplaces, politics, business, and even ordinary daily life. A salesperson who exaggerates numbers may appear more successful than the person who reports them honestly. A student who cheats may receive a better grade. A manager who takes credit for other people's work may move faster than someone who behaves fairly.
+A person who refuses to lie has fewer available strategies than someone willing to lie. A manager who refuses to steal credit gives up an advantage that another manager may happily use. A student who will not cheat accepts constraints that a cheater ignores.
 
-The problem is not ethics.
+Machiavelli understood something uncomfortable about political life: behavior cannot be judged only by the character of individuals. The structure around them matters.
 
-The problem is an environment where unethical behavior has no cost.
+If deception is rewarded, deception becomes rational.
 
-I do not think the answer is to become unethical in return. That only makes the environment worse. A better response is to build systems where good behavior is protected and bad behavior has consequences.
+If reporting misconduct is punished, silence becomes rational.
 
-One honest person can feel weak inside a corrupt structure. Several people who support the same values are harder to ignore.
+If rules exist but are never enforced, breaking them becomes rational.
 
-This is why culture matters so much. Rules matter. Transparency matters. Institutions matter.
+The problem is therefore larger than asking whether people are good.
 
-Good people should not have to become bad people just to survive.
+**What does the environment make expensive?**
 
-If honesty always loses, the system itself needs to change.
+A workplace can make honesty costly. A political system can make compromise impossible. A school can accidentally reward cheating if grades matter greatly and enforcement matters very little.
+
+Once incentives move in that direction, individual virtue has to fight the structure every day.
+
+Some people will still resist. Character matters.
+
+But designing institutions as if character alone will save them is naive.
+
+We use locks not because everyone is a thief, but because a system that depends entirely on voluntary restraint is fragile.
+
+The same principle applies to transparency, audits, separation of powers, peer review, conflict-of-interest rules, and accountable decision making.
+
+Good institutions do not make everyone good.
+
+They make certain forms of bad behavior harder, more visible, or more expensive.
+
+They also protect ethical people from having to choose repeatedly between integrity and survival.
+
+This changes the way I think about moral failure.
+
+Sometimes a corrupt outcome reveals a corrupt person.
+
+Sometimes it reveals a badly designed game.
+
+Usually it reveals some combination of both.
+
+Goodness matters.
+
+But goodness without structure can become a private disadvantage.
+
+If we want ethical behavior to survive, we cannot rely only on ethical people.
+
+We have to build environments in which ethics is not punished for existing.
