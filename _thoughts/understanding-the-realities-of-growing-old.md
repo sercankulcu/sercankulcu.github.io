@@ -1,19 +1,38 @@
 ---
-title: 'Understanding The Realities Of Growing Old'
+title: 'Growing Older Is Not the Same as Becoming Old'
 date: 2023-01-04
 tags:
-  - life
-  - self-improvement
+  - aging
+  - curiosity
+  - reflection
 ---
 
-Getting older is strange because it happens slowly until one day it feels sudden. A photograph, a birthday, a small physical change, or seeing someone younger can make time visible in a way the calendar cannot. When we are young, age often looks like something happening to other people. Later, we understand that there is no separate road. We are already on it.
+Age arrives gradually, but our awareness of it often arrives in flashes.
 
-This can create fear. The body changes. Energy changes. People we love become older too. Some possibilities become smaller.
+A photograph looks older than we expect. Someone we remember as a child is suddenly an adult. Recovery takes longer. A birthday number begins to sound less abstract.
 
-But age also adds things. Experience becomes a kind of memory library. Problems that once felt enormous can become familiar. We learn which arguments are not worth having and which people deserve more of our time. I do not believe getting older automatically makes a person wise.
+The body keeps a calendar even when the mind does not.
 
-Years can pass without reflection. But years give us material from which wisdom can be built. The hardest part may be accepting that time cannot be negotiated with. We can take care of ourselves, make plans, and try to live well. We cannot stop movement.
+What interests me more, however, is that growing older and becoming old are not exactly the same process.
 
-Maybe the better goal is not to stay young. Maybe it is to stay interested. Interested in people. Interested in learning. Interested in the next ordinary day.
+One is biological. The other can become a habit of withdrawal.
 
-Age changes the body. I hope curiosity can remain younger.
+Montaigne wrote about aging without pretending that philosophy could negotiate with nature. The body changes. Energy changes. Possibilities narrow. People disappear from our lives. Any serious reflection on age has to admit loss.
+
+But loss is not the whole account.
+
+Years also create comparison. A problem that once seemed catastrophic may become recognizable. We learn which arguments repeat themselves under different names. We become less impressed by some forms of status and more attentive to time, health, and people who make ordinary days easier.
+
+None of this is automatic wisdom. A person can repeat the same year twenty times and merely become older.
+
+Experience becomes useful only when it is examined.
+
+That is why I increasingly think curiosity matters more than trying to remain young. Curiosity keeps the world from shrinking entirely to what we already know. It gives us reasons to read another book, learn another tool, listen to someone younger, change an opinion, visit a place, ask a question that may reveal our ignorance.
+
+The body will continue to record time.
+
+I cannot argue with that.
+
+But I would rather measure aging by more than what becomes difficult.
+
+As long as something can still make me genuinely curious, the future has not become only repetition.
