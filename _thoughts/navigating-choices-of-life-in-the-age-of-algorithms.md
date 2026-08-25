@@ -1,25 +1,28 @@
 ---
-title: 'Navigating Choices Of Life In The Age Of Algorithms'
+title: 'Convenience Can Narrow a Life'
 date: 2019-01-11
 tags:
-  - career
-  - philosophy
+  - technology
+  - choice
+  - reflection
 ---
 
-We have more choices than people had in many earlier periods of history. More places to live. More things to watch. More products. More people to follow.
+A recommendation that saves me ten minutes seems harmless. Most of the time, it is. The interesting question begins when thousands of small conveniences start choosing the shape of a life.
 
-More careers to imagine. This sounds like freedom. Sometimes it feels like exhaustion.
+A platform learns which songs I finish, which articles I open, which videos I stop watching, and which people hold my attention. It becomes better at predicting what I am likely to choose next. This is useful because human attention is limited. Faced with too many possibilities, we naturally welcome filters.
 
-Online platforms also shape these choices with recommendation algorithms. A service suggests the next song, video, product, article, or person based on previous behavior.
+But prediction has a quiet side effect: it treats the past as evidence about what the future should contain. If I repeatedly choose one kind of music, one kind of political argument, one kind of film, or one kind of person to follow, the system does not need to forbid anything else. It only needs to make the familiar slightly easier to reach.
 
-The suggestions can be useful. They can also create a comfortable loop.
+That is enough to interest me. Freedom is usually imagined as the absence of restriction, yet a life can become narrow without anyone closing a door. The doors we already use can simply become smoother than the others.
 
-If I always click the same kind of content, the system learns to show me more of it. My past choices slowly influence my future choices.
+Thoreau distrusted lives organized by convenience when convenience began deciding what was worth doing. Orwell, in a different way, was attentive to how systems shape thought without needing to announce themselves. Recommendation systems are not sinister versions of either problem, but they make an old question unusually visible: **how much of my preference is discovery, and how much is reinforcement?**
 
-This is not a secret conspiracy. It is simply how personalization works. Still, I think it is worth noticing. Convenience can become routine. Routine can become a narrow view of the world.
+The answer cannot be to reject algorithms. Maps are useful. Search is useful. Recommendations often introduce me to things I would genuinely enjoy. Deliberately choosing the unfamiliar every time would become another mechanical rule.
 
-The same pattern exists outside technology. We choose familiar restaurants, familiar friends, familiar opinions, and familiar roads because they reduce uncertainty.
+What matters is preserving some friction. Occasionally read the article the system would not predict. Walk through the part of a city you did not search beforehand. Ask a person rather than a ranking. Choose something because it confuses your existing preferences instead of confirming them.
 
-There is nothing wrong with familiarity. But too much of it can make life smaller. Maybe freedom is not only having more options. Maybe freedom also requires the ability to step outside the options that are automatically placed in front of us. Read something you would not normally choose.
+The danger of personalization is not that a machine eventually controls every decision. That gives the machine too much credit.
 
-Walk a different road. Talk to someone outside your usual circle. Let some decisions be imperfect. An algorithm can predict what I am likely to click. I hope it never becomes the only thing deciding what I am likely to experience.
+The subtler danger is that a comfortable sequence of reasonable choices can make curiosity unnecessary.
+
+A good life probably needs some decisions that cannot be explained by the sentence: "This is similar to what you liked before."
