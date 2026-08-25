@@ -1,15 +1,44 @@
 ---
-title: 'The Wisdom Of Seth Godin And Jerzy Gregorek'
+title: 'Discomfort Is Not a Verdict'
 date: 2022-07-07
 tags:
-  - self-improvement
-  - life
+  - persistence
+  - judgment
+  - reflection
 ---
 
-Two pieces of advice sometimes appear to disagree. One says: do not give up something with long-term potential because of short-term stress. The other says that hard choices often create an easier life, while easy choices can create a harder one. I think both ideas point toward the same problem. We naturally give today's discomfort more weight than tomorrow's value.
+I have noticed that difficult things often make their strongest argument for quitting at exactly the wrong moment.
 
-A difficult project feels worst while we are inside the difficult part. Exercise is hardest before the habit exists. Saving money feels restrictive before the future benefit becomes visible. Learning a complex subject can feel pointless during the period when progress is slow. But persistence should not become blind stubbornness.
+A project becomes boring after the exciting beginning. Exercise feels pointless before the habit has had time to produce anything visible. Learning a difficult subject becomes most discouraging during the period when I know enough to see how much I still do not know.
 
-Not every difficult road is worth continuing. Sometimes quitting is the intelligent choice. The question I try to ask is whether I want to stop because the direction is wrong or because the current moment is uncomfortable. Those are very different reasons. Short-term stress can distort judgment.
+At those moments, discomfort begins to sound like information.
 
-So can pride. A person can remain in a bad situation simply because leaving feels like failure. Wisdom probably lives somewhere between persistence and flexibility. Stay long enough to give meaningful things a chance. Leave when the long-term direction no longer deserves the cost.
+Maybe this is not for me. Maybe I chose badly. Maybe stopping would be more intelligent.
+
+Sometimes that conclusion is correct. That is what makes the problem difficult.
+
+Persistence is not automatically a virtue. A bad relationship does not become good because we endured it longer. A project with no remaining value does not become meaningful because we already spent two years on it. Pride can keep us in places that wisdom would leave.
+
+But discomfort and wrong direction are not the same thing.
+
+That distinction matters more to me than any slogan about grit.
+
+The question I try to ask is not simply, "Do I want to continue?" Desire is too sensitive to the mood of the day. I ask instead: **Has the reason for continuing changed, or has only the experience become unpleasant?**
+
+If the reason has disappeared, persistence may be inertia. If the reason remains but the work is temporarily difficult, quitting may simply be a way to purchase immediate relief at the cost of something I still value.
+
+Montaigne often distrusted grand rules because human situations change under our feet. I think this problem deserves the same suspicion. "Never quit" is foolish. "Life is short, leave anything that makes you unhappy" can be just as foolish.
+
+Some worthwhile things are unpleasant for long stretches. Some harmful things are pleasant enough to keep us from leaving.
+
+So I no longer treat discomfort as a verdict.
+
+It is evidence, but weak evidence by itself.
+
+The better question is what the discomfort is telling me. Is this pain the cost of learning, the cost of fear, the cost of a poor system, or the cost of staying somewhere I no longer believe in?
+
+Those are different problems.
+
+The difficult skill is not persistence.
+
+It is knowing what deserves persistence.
