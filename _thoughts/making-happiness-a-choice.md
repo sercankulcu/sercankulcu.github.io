@@ -1,22 +1,42 @@
 ---
-title: 'Making Happiness A Choice'
+title: 'You Cannot Make Someone Happy'
 date: 2009-10-06
 tags:
-  - self-improvement
+  - relationships
+  - happiness
+  - reflection
 ---
 
-Have you ever tried very hard to improve someone's mood and discovered that nothing you did was enough? I have thought about this more than once. We can be kind, make a joke, send a message, offer help, or simply stay near someone. Sometimes a small gesture changes the whole day. At other times, the same effort seems to touch nothing. It reminds me that happiness is deeply personal.
+There is a particular kind of frustration in trying to improve someone's mood and discovering that nothing works.
 
-<img width="200" alt="happiness" src="/images/posts/making-happiness-a-choice.webp" style="float: left; margin-right: 10px;" />
+You make a joke. You send a message. You offer help. You stay close. Sometimes one small gesture changes the whole day. Sometimes every gesture seems to disappear without effect.
 
-We can influence another person's environment, but we cannot completely control what happens inside them. A kind word can open a door, but the other person still has to be able to walk through it. There are moments when sadness, disappointment, anger, or tiredness is simply stronger than our attempt to help. This does not mean kindness is useless.
+For a long time, I thought this meant I had failed to help well enough.
 
-Actually, I think the opposite is true. Small things often matter more than we know. A short conversation, a cup of coffee, a message from someone we did not expect, or a person who listens without trying to solve everything can make life feel lighter. The important difference is that support is not control.
+Now I think the mistake was more basic: I had confused support with control.
 
-Trying to force someone to be happy can create another burden. It can send the message that their current feeling is wrong or inconvenient. Sometimes people do not need to be made happy. They need space, understanding, or time.
+We can influence another person's surroundings. We can make a difficult hour less lonely. We can listen, cook, drive, sit quietly, or say something kind at the right moment. But none of this gives us direct access to another person's inner life.
 
-I also think there is some choice in our own relationship with happiness, although I do not believe every emotion can simply be switched on and off. We cannot command ourselves to feel good in every situation. Life does not work like that. But we can notice small good things more carefully.
+Their sadness may come from somewhere our kindness cannot reach quickly. Their anger may need time. Their exhaustion may need sleep rather than encouragement. Their grief may not need to be solved at all.
 
-We can choose some of the people we spend time with. We can create routines that help us. We can do work that gives us meaning when possible. We can learn when to rest. We can become better at accepting a good moment without immediately worrying about the next problem.
+Trying too hard to make someone happy can even become another demand.
 
-Maybe happiness is not one large decision. Maybe it is many small decisions, mixed with circumstances we cannot control. I cannot make another person happy by force, and another person cannot permanently create happiness for me. Still, we can make life a little kinder for each other. Sometimes that is enough.
+Cheer up. Look at the positive side. Come on, smile.
+
+What sounds like encouragement can quietly mean: please become easier for me to be around.
+
+This is why I have become suspicious of the phrase "happiness is a choice." Some choices affect happiness, certainly. We can choose people, routines, habits, environments, and sometimes the direction of our attention. But emotion is not a switch that obeys moral instruction.
+
+A person can make sensible choices and still be sad.
+
+The same is true in the other direction. Another person can contribute greatly to our happiness without becoming responsible for maintaining it.
+
+That distinction makes kindness both smaller and more important.
+
+Smaller, because I cannot rescue another person's emotional life.
+
+More important, because I can still make sure they do not have to carry it entirely alone.
+
+Perhaps care is not the ability to make someone happy.
+
+Perhaps it is the willingness to remain present when happiness is not available.
