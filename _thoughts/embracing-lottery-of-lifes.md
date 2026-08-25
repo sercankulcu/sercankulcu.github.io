@@ -1,20 +1,50 @@
 ---
-title: 'Embracing Lottery Of Life'
+title: 'The Starting Line Is Not Chosen'
 date: 2019-03-22
 tags:
-  - critics
-  - essays
-  - self-improvement
+  - luck
+  - fairness
+  - responsibility
 ---
 
-A large part of life begins before we make our first decision. We do not choose our country. We do not choose our family. We do not choose our genes, childhood language, economic conditions, or many of the events that shape our early years. In that sense, life contains a lottery.
+Before we make our first decision, a surprising amount has already been decided for us.
 
-Some people begin with advantages that others never receive. Some begin with difficulties they did nothing to deserve. This can feel deeply unfair because it is unfair. I do not think pretending otherwise makes us stronger. At the same time, a starting point is not the whole journey.
+Country. Family. Language. Genes. Early health. Economic conditions. The expectations surrounding us. The schools available nearby. The accidents that happen before we are old enough to understand them.
 
-We gain choices gradually. Not unlimited choices. Real choices are shaped by money, health, responsibilities, geography, and many other conditions. But even inside limits, we can sometimes change direction. I think two mistakes are possible here.
+None of this is earned.
 
-One is believing that everything is determined by luck. The other is believing that success is entirely personal effort. Reality is usually a mixture. Chance opens and closes doors. Effort changes what we do with some of the doors that remain.
+It is inherited.
 
-This perspective makes me more careful when judging other people's lives. A person's result does not reveal every condition that produced it. It also makes gratitude more specific. Some good things in my life were earned. Some were given.
+That fact makes me uncomfortable with stories that explain every outcome through character.
 
-Some simply happened. Recognizing luck does not remove responsibility. It only makes the story more honest.
+Success is often narrated backward. Once someone has achieved something, persistence, discipline, intelligence, and courage become visible. The conditions that made those qualities easier to use are less visible.
+
+Failure is narrated in the same way. We see the result and imagine it reveals the person completely.
+
+Rawls's thought experiment of the veil of ignorance is useful because it asks us to imagine designing a society without knowing which position inside it will become ours. The exercise exposes how morally arbitrary many starting conditions are.
+
+But recognizing luck creates another danger: turning circumstance into destiny.
+
+The starting line is not chosen. The entire race is not therefore fixed.
+
+People gain different degrees of agency over time. Some choices become possible. Others remain closed. Money, health, geography, law, family responsibilities, and chance continue to shape the available range.
+
+That makes responsibility more complicated than either of the slogans we usually hear.
+
+"Anyone can become anything" ignores structure.
+
+"Everything is determined by circumstance" ignores agency.
+
+Real lives contain both.
+
+This perspective changes how I think about gratitude too. Some things I worked hard for. Some became possible because someone helped me. Some depended on being born in the right place at the right moment. Some happened almost accidentally.
+
+Acknowledging that does not cheapen effort.
+
+It makes the accounting more accurate.
+
+Perhaps humility begins by separating two questions:
+
+What did I do with what I was given?
+
+And what was I given before I had done anything at all?
