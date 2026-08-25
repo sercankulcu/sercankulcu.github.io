@@ -1,22 +1,56 @@
 ---
-title: 'Baltasar Gracián The Art Of Worldly Wisdom'
+title: 'Being Right Is Not Enough'
 date: 2017-02-13
 tags:
-  - career
+  - judgment
+  - communication
+  - reflection
 ---
 
-Baltasar Gracián's *The Art of Worldly Wisdom* is a collection of short observations about judgment, reputation, timing, and human behavior. Gracián was a seventeenth-century Spanish Jesuit writer. His book contains hundreds of compact maxims, and many of them still feel surprisingly modern.
+I used to think that if an idea was correct, presenting it clearly should be enough.
 
-The advice is not idealistic. It assumes that the world contains competition, misunderstanding, pride, and hidden motives. Because of this, Gracián often recommends patience and caution. Do not reveal everything immediately. Choose friends carefully.
+Reality is less cooperative.
 
-Know when to speak. Protect your reputation. Do not let emotion make every decision. One idea I like is that wisdom is not only knowing what is true. It is also knowing what to do with that truth.
+A correct idea can arrive at the wrong moment. A useful criticism can be delivered in a way that guarantees resistance. A truth can be spoken to someone who is not yet able to hear it. Good judgment therefore involves more than deciding what is true.
 
-A person can be intelligent and still make poor social decisions. Timing, tone, and self-control matter.
+It also involves deciding what to do with the truth.
 
-Some of Gracián's advice can sound too strategic for ordinary life. If every conversation becomes a calculation, relationships lose something human.
+This is one reason Baltasar Gracián still interests me.
 
-Still, his writing is useful because it makes us notice the social side of judgment. The world does not respond only to what we mean. It also responds to what people understand. That difference can be painful.
+His *Art of Worldly Wisdom* is full of observations about timing, reputation, restraint, conversation, and the distance between private intention and public effect. The book can feel overly strategic. If every relationship becomes a calculation, something human disappears.
 
-Reading Gracián slowly is better than reading him quickly. A short sentence can contain enough tension for an entire page of thought.
+But there is a distinction in Gracián that I find difficult to dismiss:
 
-Maybe that is why the book has lasted. It does not give one large theory of life. It gives many small warnings.
+**sincerity and effectiveness are not the same thing.**
+
+We sometimes defend poor judgment by pointing to good intentions.
+
+"But I was only being honest."
+
+Perhaps. But honesty does not decide the volume, the timing, the audience, or the form.
+
+Telling a colleague they are wrong in front of ten people is not the same act as telling them privately. Giving advice to someone who asked for it is different from correcting someone who only wanted to be heard. Revealing every thought immediately may feel authentic while still being careless.
+
+Restraint is not automatically dishonesty.
+
+Sometimes it is respect for context.
+
+The opposite danger also exists. Strategy can become an excuse for cowardice. "Wrong timing" can mean "I am afraid to speak." Diplomacy can become permanent vagueness. Protecting a reputation can become protecting an illusion.
+
+So the problem is not to become more calculating.
+
+It is to notice that communication has two tests.
+
+Is what I am saying true?
+
+And am I saying it in a way that gives the truth a reasonable chance to do useful work?
+
+Those questions do not always produce the same answer.
+
+An intelligent person can be repeatedly correct and still fail socially because intelligence alone does not choose the moment.
+
+That is the part of Gracián I keep.
+
+Being right matters.
+
+Knowing what to do with being right matters too.
