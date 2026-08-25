@@ -1,17 +1,34 @@
 ---
-title: 'Accountability Is The Path To Growth'
+title: 'What Part of This Is Mine?'
 date: 2024-05-08
 tags:
-  - self-improvement
-  - life
+  - responsibility
+  - reflection
+  - stoicism
 ---
 
-Blaming other people is emotionally attractive. It protects the image we have of ourselves. If every failure belongs to someone else, we never have to look too closely at our own decisions. The cost is that we also lose the ability to change anything. Accountability begins with an uncomfortable question:
+When something goes wrong, the first explanation is often external.
 
-What part of this belongs to me? Sometimes the answer is very small. Sometimes the answer is most of the problem. Taking responsibility does not mean accepting blame for things outside our control. That would be another distortion.
+The other person was unfair. The system was badly designed. The timing was terrible. Someone failed to do what they promised.
 
-Other people can hurt us. Systems can be unfair. Bad luck exists. The useful part is separating what we control from what we do not. If I made a mistake, I can admit it.
+Sometimes all of that is true.
 
-If my communication was poor, I can improve it. If I repeated the same unhealthy choice, I can examine why. Arrogance makes this difficult because admitting error feels like losing status. But hiding a flaw does not remove it. It only protects it from improvement.
+But there is a question I find more useful than deciding who deserves the largest share of blame:
 
-I think accountability is less about guilt and more about power. The moment I can honestly say, "This part was mine," I also gain the ability to do something different next time.
+**What part of this is mine?**
+
+The question is uncomfortable because it threatens the version of the story in which I am only the observer of what happened. Yet even when most of a situation was outside my control, there may still be a small part that belongs to me: a warning I ignored, a conversation I postponed, a boundary I failed to set, an assumption I never checked.
+
+Epictetus built much of his philosophy around a severe distinction: some things depend on us and others do not. The distinction sounds simple until we try to apply it to something that has hurt our pride.
+
+Taking responsibility is not the same as accepting total blame. That confusion is dangerous. We can be harmed by another person's decision and still examine our own response. We can live inside an unfair system without pretending the system is fair. We can be unlucky without turning luck into an explanation for every future choice.
+
+What matters is precision.
+
+If none of it was mine, then there may be nothing to correct. If some of it was mine, even five percent, that five percent is the only part from which I can learn directly.
+
+Blame asks who should feel guilty.
+
+Responsibility asks what can be changed.
+
+I increasingly prefer the second question.
