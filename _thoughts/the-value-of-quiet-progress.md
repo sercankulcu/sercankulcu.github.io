@@ -1,44 +1,42 @@
 ---
-title: 'The Value of Quiet Progress'
+title: 'Progress Is Sometimes Subtraction'
 date: 2026-01-24
 tags:
   - life
-  - self-improvement
-  - motivation
+  - progress
+  - reflection
 ---
 
-We notice big changes easily. A graduation, a new job, a finished project, or a difficult goal finally completed.
+We usually imagine progress as addition.
 
-Most progress does not look like this.
+More knowledge. More skill. More projects. More money. More responsibility. More visible evidence that life is moving forward.
 
-Most progress is quiet.
+That picture is incomplete.
 
-Reading one page does not change your life. Writing ten lines of code does not create a great project. Walking for twenty minutes does not transform your health. But repeated small things slowly become something larger.
+Some of the most important changes in my life have looked like subtraction.
 
-This is easy to understand and strangely hard to accept.
+Removing a feature from a project because it made everything harder to use. Dropping a habit that consumed attention. Saying no to work that no longer justified its cost. Ending a commitment I had kept only because I had already invested time in it.
 
-We want visible results. We want proof that our effort matters. Quiet progress often gives us no proof for a long time.
+From outside, subtraction can resemble retreat.
 
-Some days are especially difficult because we have very little energy. I used to think those days were wasted. Now I see them differently.
+Nothing new appears. There may be less to show.
 
-Sometimes doing the minimum is enough.
+But Thoreau's idea of simplification interests me because it treats removal not as failure but as a way of seeing what actually matters. A crowded life can hide its own priorities.
 
-Read two pages. Fix one small thing. Reply to one message. Take a short walk.
+This is easy to forget in work especially. Adding a new feature feels productive. Deleting unnecessary code can be more valuable. Beginning another project feels ambitious. Finishing or abandoning an old one may create more freedom.
 
-The goal is not always to move far. Sometimes the goal is simply not to lose contact with the thing that matters.
+The same is true outside work.
 
-Comparison makes this harder. Someone else is always doing something bigger, at least from outside. We see the announcement, not the years before it. We see the finished result, not the empty mornings.
+Progress can mean fewer obligations, fewer possessions, fewer arguments we feel compelled to win, fewer relationships maintained only from habit.
 
-Then our own progress looks weak.
+Of course, subtraction is not automatically wise. Quitting because something is difficult is different from removing something because it no longer belongs.
 
-This is unfair because we are comparing our process with someone else's result.
+The hard question is whether an absence creates emptiness or space.
 
-I also learned that progress can mean removing things. We usually imagine progress as addition: more skills, more projects, more goals. But sometimes growth means deleting a bad habit, removing a feature, saying no to a plan, or ending something that no longer fits.
+I used to look for progress mostly in what had accumulated.
 
-An empty space can also be evidence of change.
+Now I also look at what I no longer need.
 
-There will be days when progress feels too small to matter.
+A life can improve by becoming larger.
 
-I think those days matter more than we realize.
-
-Quietly continuing is still continuing.
+It can also improve by becoming less crowded.
