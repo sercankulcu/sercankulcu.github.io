@@ -1,16 +1,46 @@
 ---
-title: 'Finding Solutions Through Shared Experiences'
+title: 'Other People Lend Us Their Memory'
 date: 2021-05-02
 tags:
-  - self-development
+  - learning
+  - community
+  - experience
 ---
 
-A problem often feels unique while we are inside it. Nobody has had this bug. Nobody has made this career mistake. Nobody has felt this confused. Then we talk to someone.
+A problem feels most isolating before we discover that someone else has already met a version of it.
 
-Very often, the first surprise is that the problem is not unique at all. Someone has seen a similar situation. This is one reason communities matter.
+A bug appears in unfamiliar code. A career decision feels impossible to compare. A relationship problem seems too specific to explain. From inside the difficulty, the situation can feel unprecedented.
 
-Programmers use forums and question sites because shared mistakes save time. Researchers read papers because somebody may already have explored the same question. Friends talk because an experience becomes easier to understand when another person says, "Something like that happened to me too."
+Then someone says, "I have seen something like this before."
 
-Shared experience does not mean copying another person's solution. Context matters. A decision that worked for one person may be wrong for another. But another person's story can reveal options we did not know existed. It can also reduce shame.
+That sentence does more than provide advice.
 
-Some problems become heavier because we think having the problem says something bad about us. Then we discover that many capable people have faced the same thing. The problem becomes a problem again, instead of an identity. I think asking for help is partly the skill of entering the shared memory of other people. We do not have to solve everything as if nobody came before us.
+It gives us access to memory we did not personally earn.
+
+Programmers rely on this constantly. A forum answer may compress hours of somebody else's failed attempts into three useful lines. Researchers read previous work for the same reason. Crafts, professions, families, and friendships all contain forms of accumulated memory.
+
+Communities are partly systems for storing experience outside any one person.
+
+This is more interesting to me than the usual advice to "ask for help." Help is not only emotional support or expertise. Sometimes another person simply remembers a path through a problem that is new to us.
+
+Of course, borrowed memory is not borrowed judgment.
+
+Another person's solution belongs to another person's circumstances. A career move that saved one person may damage another. A relationship lesson can become dangerous when copied without context. Even technical advice can become obsolete when the system changes.
+
+The value is not that somebody else can choose for us.
+
+It is that their experience enlarges the set of possibilities we can see.
+
+Shared experience also changes shame.
+
+Some problems become heavier because we interpret their existence as evidence about ourselves. I should have known this. I should not be struggling with this. Competent people do not make this mistake.
+
+Then we discover that competent people have made it many times.
+
+The problem returns to its proper size.
+
+It becomes a problem rather than an identity.
+
+None of us has enough time to make every useful mistake personally.
+
+One of the quiet advantages of living among other people is that, when we listen carefully, they lend us some of the memory their mistakes created.
