@@ -1,29 +1,60 @@
 ---
-title: 'Making Your Family Proud'
+title: 'Love Can Become an Expectation'
 date: 2011-10-06
 tags:
-  - essay
-  - self-improvement
+  - family
+  - identity
+  - responsibility
 ---
 
-Wanting to make our family proud can be a beautiful motivation. For many of us, family is connected with sacrifice. Parents work, worry, give time, and sometimes give up things we never fully see. Because of this, success can feel larger than a personal achievement. We want to show them that their effort mattered.
+Wanting to make our family proud can begin as gratitude.
 
-<img width="200" alt="bird proud" src="/images/posts/making-your-family-proud.webp" style="float: left; margin-right: 10px;" />
+Someone supported us, worried about us, paid for something, waited for us, or gave up part of their own comfort so that we could have more choices.
 
-I understand this feeling. But there is a difficult side to it. The dream our family has for us may not always be the dream we have for ourselves.
+It is natural to want that effort to mean something.
 
-A family may imagine a safe career, a certain kind of life, or a path that feels familiar to them. Their wish may come from love, but love does not automatically make every expectation right for us.
+The difficulty begins when gratitude quietly becomes obedience.
 
-This can create pressure. We begin to ask whether we are doing enough. A small failure feels larger because it seems to disappoint more than one person. Even success can feel strange if it belongs to a path we never really wanted. Another difficulty is that pride is not always spoken.
+A family can love us deeply and still imagine the wrong life for us.
 
-Some families say "I am proud of you" easily. Others rarely say it, even when they feel it strongly. If we depend only on hearing those words, we may spend years waiting for proof that already exists quietly.
+They may prefer a safer career, a more familiar city, a different partner, a more conventional definition of success. Their expectation may come from fear rather than control. It may even be reasonable from their point of view.
 
-At some point, I think we need another question: Am I proud of myself? This is not selfish. It is a useful form of honesty.
+But love does not make every expectation binding.
 
-If every decision is made only to receive approval, the target keeps moving. There is always another achievement, another comparison, another expectation. External approval can become an endless job.
+This is where family loyalty becomes morally complicated.
 
-I think the healthiest version of making family proud is not about becoming perfect. It is about living with effort and integrity. Work seriously. Keep your word. Treat people well. Learn from mistakes. Build a life that you can explain honestly.
+We do owe something to people who cared for us. Gratitude matters. Responsibility matters. But what exactly do we owe?
 
-Communication matters too. If family expectations become heavy, silence usually does not improve the situation. A calm conversation may not solve every disagreement, but it can make the invisible pressure visible.
+A specific profession?
 
-Most families want similar things in the end. They want us to be safe, healthy, successful, and happy. The disagreement is often about what those words mean. Maybe the best way to honor the people who supported us is not to become exactly what they imagined. Maybe it is to use what they gave us to become a person we can respect.
+A certain income?
+
+A life close to home?
+
+Permanent agreement?
+
+I do not think gratitude can reasonably require another person to surrender authorship of their own life.
+
+Erich Fromm wrote about love as an active concern for another person's growth. That idea creates a useful test. If love requires the other person to remain inside a version we designed for them, it begins to resemble possession.
+
+The same question applies in reverse.
+
+I may want my family to approve every important decision. That desire can also become a form of dependence. If their pride is the final measure of whether I chose well, then my life still belongs partly to an audience.
+
+This does not mean rejecting family expectations simply to prove independence.
+
+Sometimes families see risks we do not see. Sometimes their experience is useful. Sometimes what feels like pressure is advice worth hearing.
+
+The important distinction is between listening and surrendering judgment.
+
+I can take their hopes seriously without treating them as commands.
+
+I can be grateful without converting gratitude into a debt that can never be repaid.
+
+Perhaps making a family proud is not about becoming the person they predicted.
+
+Perhaps it is about becoming someone who can explain their choices honestly, carry their consequences, and still remain capable of love when agreement is impossible.
+
+A family gives us a beginning.
+
+It should not have to write the entire ending.
