@@ -1,24 +1,64 @@
 ---
-title: 'Niccolò Machiavelli’s The Prince'
+title: 'Power Is Judged by Consequences'
 date: 2017-02-10
 tags:
-  - career
+  - power
+  - leadership
+  - reflection
 ---
 
-Niccolò Machiavelli's *The Prince* is a short book with a very long reputation. Machiavelli wrote it in 1513 after losing his political position in Florence. He had worked as a diplomat and had seen rulers, wars, alliances, betrayals, and political changes closely.
+One reason Machiavelli remains uncomfortable is that he refuses to let intention settle the argument.
 
-The book asks a direct question: How does a ruler gain and keep power? What made *The Prince* controversial was its willingness to discuss politics as it actually worked instead of as people wished it worked.
+A leader may mean well and still produce disaster.
 
-Machiavelli separates political success from personal goodness more clearly than many earlier writers. A ruler may need to act against ordinary morality if the survival of the state is at risk.
+Another may act harshly and create stability.
 
-One famous idea is the tension between being loved and being feared. Machiavelli argues that if a ruler cannot have both, fear can be more reliable than love. But he also warns strongly against becoming hated.
+That does not make cruelty good. It does make political judgment more complicated than asking whether the person appeared virtuous.
 
-That difference matters. He is not simply recommending cruelty. He is describing power as something that depends on perception, stability, timing, and human behavior.
+This is the part of *The Prince* that stays with me.
 
-Another important idea is *fortuna*, often translated as fortune. Leaders cannot control everything. Events, luck, and changing circumstances matter. What they can control is how they respond.
+Power is exercised through consequences, not only motives.
 
-This is connected with *virtù*, Machiavelli's idea of strength, ability, decisiveness, and political skill. I do not read *The Prince* as a moral guide. I read it as a study of power.
+We often prefer moral stories in which good people make good decisions and bad people make bad ones. Real institutions are less tidy. A kind manager can avoid a necessary decision until the cost spreads to everyone else. A decisive leader can solve a problem while damaging trust in the process. A policy can be designed with generous intentions and still create incentives that produce the opposite result.
 
-That makes it useful even when we disagree with its advice. The book forces us to ask uncomfortable questions about leadership, appearances, loyalty, fear, and political survival.
+Intentions matter because they tell us something about character.
 
-People often want power to be clean. Machiavelli reminds us that it rarely is.
+They do not complete the evaluation.
+
+Machiavelli's distinction between being loved, feared, and hated is useful here when removed from the usual slogan. The deeper issue is that authority depends partly on how people respond to it.
+
+A leader who is loved but never believed may be weak.
+
+A leader who is feared but widely hated may eventually become unstable.
+
+A leader who confuses obedience with trust may not discover the difference until conditions change.
+
+Power therefore creates an epistemic problem.
+
+The more authority someone has, the harder it can become to receive honest information. People edit bad news. They agree faster. They laugh more carefully. Silence starts resembling consent.
+
+This may be more dangerous than open opposition.
+
+A ruler, manager, teacher, or parent can begin believing that the absence of resistance proves the quality of the decision.
+
+Sometimes it only proves the cost of disagreeing.
+
+That is why I do not read Machiavelli as permission to ignore morality.
+
+I read him as a warning against evaluating power by self-image.
+
+Good intentions do not cancel bad outcomes.
+
+Popularity does not prove good judgment.
+
+Obedience does not prove legitimacy.
+
+And appearing virtuous is not the same thing as governing well.
+
+Power deserves a harder test.
+
+What did the decision actually make possible, what did it damage, and what kind of behavior did it encourage afterward?
+
+Consequences do not tell us everything about leadership.
+
+But they tell us more than the leader's preferred story about themselves.
