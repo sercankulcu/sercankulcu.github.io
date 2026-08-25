@@ -1,20 +1,48 @@
 ---
-title: 'Understanding Different Levels Of Understanding'
+title: 'Expertise Hides Its Own Steps'
 date: 2020-10-06
 tags:
-  - self-development
+  - learning
+  - communication
+  - teaching
 ---
 
-One of the easiest mistakes in communication is assuming that another person begins where we begin. When I know a topic well, some steps become invisible to me. I stop noticing the background knowledge I am using. Then I explain something to another person and feel surprised when they do not understand. The problem may not be intelligence. It may be distance.
+One of the strange effects of learning something well is that the path into it begins to disappear.
 
-A teacher has seen the same concept many times. A student may be seeing it for the first time.
+A concept that once required ten steps now feels like one thought.
 
-A programmer explains an error using words that make sense only if the listener already understands the system around it. This is why good explanation requires more than knowledge. It requires imagination. We have to imagine what the idea looks like without the knowledge we already have. Examples help.
+A programmer sees an error message and immediately suspects three causes. A teacher looks at an equation and no longer notices the background knowledge required to read it. An experienced person says, "It is obvious," not because the idea is simple, but because the missing steps have become automatic.
 
-Simple language helps. Questions help even more.
+Expertise compresses.
 
-Instead of asking, "Do you understand?" I prefer questions that reveal what the other person understands.
+That compression is useful when doing the work. It can be terrible when explaining it.
 
-Where did the explanation become unclear? What does this word mean to you? Can you describe the idea in your own words? Communication becomes easier when we stop treating misunderstanding as a competition between a bad listener and a bad speaker. Sometimes both people are doing their best.
+The person listening does not necessarily lack intelligence. They may simply lack one invisible intermediate idea that the speaker stopped noticing years ago.
 
-They are simply standing on different steps. The goal is to find a bridge between them.
+This is why explanation requires a kind of reverse engineering.
+
+What had to become familiar before this sentence made sense to me? Which term am I using as if its meaning were universal? At what point did I stop needing an example?
+
+The usual question, "Do you understand?" is weak because it places the burden on the listener and often invites a polite yes.
+
+Better questions expose the structure.
+
+What happens first?
+
+Why does this step follow from the previous one?
+
+Can you explain the idea in your own words?
+
+Where does your explanation become uncertain?
+
+These questions are useful because misunderstanding is rarely a single gap. It is often a missing rung in a ladder both people thought was complete.
+
+Good teaching therefore requires more than knowing a subject.
+
+It requires remembering what it was like not to know it.
+
+That may be one reason some brilliant people explain poorly. Their understanding has become so compressed that they can no longer see the path they travelled.
+
+Expertise hides its own steps.
+
+Explanation is the work of making them visible again.
