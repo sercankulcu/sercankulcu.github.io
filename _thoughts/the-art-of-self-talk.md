@@ -1,18 +1,54 @@
 ---
-title: 'The Art Of Self-Talk'
+title: 'Some Voices in Your Head Are Inherited'
 date: 2021-04-22
 tags:
-  - self-development
+  - reflection
+  - language
+  - identity
 ---
 
-We all speak to ourselves. Most of the conversation is silent. A mistake happens and a sentence appears immediately. "That was stupid." "You always do this."
+We all speak to ourselves, but not every sentence in that conversation feels entirely original.
 
-"You will never understand." If another person spoke to us this way every day, we would probably avoid them. Yet we can accept the same tone from ourselves without noticing. I do not believe positive self-talk means pretending everything is wonderful. Sometimes things are difficult.
+A mistake happens and a voice appears immediately:
 
-Sometimes we really made a bad decision. A useful inner voice should be honest, not artificial. Instead of "I am terrible at this," we can say, "I do not understand this yet." Instead of "Everything is ruined," we can ask, "What is the next thing I can repair?" The difference looks small, but language changes the shape of a problem.
+You always do this.
 
-A permanent judgment closes the door. A temporary description leaves some space.
+That was stupid.
 
-I also think our inner voice is partly borrowed. Parents, teachers, friends, and past experiences leave phrases in us.
+You should have known better.
 
-Some are helpful. Some should probably be returned. Learning to notice self-talk is not about becoming endlessly positive. It is about becoming a fairer person to live with. And we live with ourselves all the time.
+Sometimes the sentence sounds strangely familiar because it is.
+
+Much of our inner language is inherited. Parents, teachers, friends, authority figures, old relationships, and repeated experiences leave phrases behind. Years later, the person may be gone while the sentence continues speaking in their tone.
+
+I find this more interesting than the usual advice to "practice positive self-talk." Positivity can become another form of dishonesty. If I failed badly, repeating that everything is wonderful does not make me wiser.
+
+The useful question is different:
+
+**Who taught me to describe myself this way?**
+
+A harsh sentence may once have served a purpose. Fear of embarrassment may have made me prepare more carefully. A demanding teacher may have pushed me to improve. But a voice that was useful in one period can become destructive when it survives every change in circumstance.
+
+Marcus Aurelius repeatedly examined the judgments his mind added to events. The event and the interpretation were not the same thing. That distinction matters in self-talk too.
+
+"I made a mistake" describes an event.
+
+"I am incompetent" turns the event into an identity.
+
+"I do not understand this yet" leaves time inside the sentence.
+
+"I will never understand this" removes it.
+
+Language does not magically change reality, but it changes what kinds of responses remain imaginable.
+
+This is why I do not want an inner voice that is endlessly encouraging. I want one that is accurate.
+
+Accurate enough to say when I was careless.
+
+Accurate enough to admit when I am tired rather than lazy.
+
+Accurate enough to recognize when an old criticism has become an automatic habit instead of useful information.
+
+Perhaps growing up includes deciding which inherited voices deserve to keep speaking.
+
+Not every voice inside us has earned permanent residence.
