@@ -1,19 +1,46 @@
 ---
-title: 'Balancing Priorities For Financial And Emotional Well-Being'
+title: 'Not Every Need Becomes Your Duty'
 date: 2018-10-06
 tags:
-  - critics
-  - self-improvement
+  - boundaries
+  - relationships
+  - responsibility
 ---
 
-Caring about other people is good. But caring without limits can slowly become exhaustion. We all have roles. Family member. Friend.
+Other people's needs can become obligations in our minds before anyone has actually asked us to accept them.
 
-Colleague. Partner. Sometimes every role seems to ask for time, attention, money, or emotional energy at the same moment. The natural response is often to keep giving. Then one day we discover that almost nothing is left for ourselves.
+A family member is struggling. A friend needs help. A colleague is overwhelmed. Someone wants our time, attention, money, or emotional energy.
 
-I do not think the answer is to stop caring about people. The answer is to learn boundaries. A boundary says, "I care about you, but I cannot solve everything for you." This can feel selfish at first, especially if we are used to being available all the time. But constant overextension creates resentment.
+The need may be real.
 
-It also affects practical parts of life. Time given to every request is time not used for our own health, learning, work, or rest. Money spent only to satisfy expectations is money not saved for our own future. Emotional energy also has limits. Protecting these resources does not mean becoming cold.
+That does not automatically make it ours to carry.
 
-Actually, healthy boundaries can make relationships more honest because help becomes a choice instead of an obligation. I think balance is the important word. There are moments when another person genuinely needs us and we should be there. There are also moments when saying no is the responsible decision. Financial well-being and emotional well-being are connected more than we sometimes admit.
+I find this distinction difficult because refusing a request can feel morally worse than accepting one. Saying yes looks generous immediately. The cost of saying yes often appears later: less time, less money, resentment, exhaustion, or the quiet abandonment of something that mattered to us.
 
-Both improve when we become clearer about what is ours to carry. Not every request is a duty. Not every problem belongs to us.
+Aristotle's idea of practical wisdom is useful here because generosity is not simply giving as much as possible. A virtue without judgment can become its own distortion.
+
+Too little care becomes indifference.
+
+Too much care can become self-erasure.
+
+The harder question is proportion.
+
+What does this person genuinely need from me? What can I give without turning help into resentment? Am I helping because I choose to, or because I am afraid of appearing selfish?
+
+Money makes the issue especially visible. Spending to support someone can be generous. Spending repeatedly to satisfy expectations can quietly damage our own future. Time behaves the same way. Every yes is paid for with something else we cannot do.
+
+This does not mean relationships should become transactions calculated to the minute.
+
+Some periods of life are unequal. Someone we love may need much more from us for a while. Serious friendship and family life require that kind of asymmetry.
+
+But temporary sacrifice and permanent availability are different things.
+
+A boundary is not a declaration that another person's problem does not matter.
+
+It is a decision about which part of that problem can honestly become ours.
+
+Not every request is selfish.
+
+Not every refusal is selfish either.
+
+And not every genuine need creates a duty in the person who happens to be nearby.
