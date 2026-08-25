@@ -1,23 +1,40 @@
 ---
-title: 'Ignorance Lead To Sinking'
+title: 'Avoidance Charges Interest'
 date: 2018-11-28
 tags:
-  - general
-  - self-improvement
+  - procrastination
+  - work
+  - reflection
 ---
 
-Deadlines become heavier when we refuse to look at them. I know this feeling. A task is uncomfortable, so we delay it for one day. Then another day. For a short time, ignoring the task feels like relief.
+Some problems become worse because of what they are.
 
-But the task has not disappeared. Only the available time has become smaller.
+Others become worse because we refuse to look at them.
 
-This is why procrastination can create a strange sinking feeling. The longer we wait, the more difficult the same work feels.
+A deadline is a good example. A task feels uncomfortable, so we avoid opening the document. For one evening, avoidance works. The anxiety drops because the problem is temporarily out of sight.
 
-A deadline is not automatically good. Some deadlines are unrealistic. Some are created badly. But most deadlines at least give a task a boundary.
+Nothing else has improved.
 
-The safest approach is usually to face the date early. How much work is needed? Which part is unclear? What can be done today? Breaking the task into smaller parts reduces the emotional size of the problem.
+The work is still there, but now there is less time to do it.
 
-A report due in two weeks is frightening when it is one large object. It becomes easier when today only requires finding three sources. Tomorrow can be for the outline. Another day can be for the first section. Ignoring reality rarely improves reality.
+This is why I think avoidance behaves a little like debt. It gives relief in the present and sends the cost forward. The longer we postpone contact with reality, the more interest accumulates: less time, fewer options, more uncertainty, more embarrassment about having waited.
 
-The same idea applies outside work. Bills, difficult conversations, maintenance, health appointments, and small problems can become larger when we continually postpone them. I do not think discipline means feeling motivated all the time. Sometimes discipline is simply looking directly at the thing we would rather avoid. Once we do that, the sinking often stops.
+Seneca repeatedly warned against wasting time as if it were an abundant resource. What interests me here is not simply the moral lesson to "stop procrastinating." That advice is usually useless. People rarely avoid a task because they have forgotten that doing it would be better.
 
-The problem may still exist. But at least we are moving again.
+We avoid because looking at the task creates discomfort.
+
+So the first useful action is often smaller than "finish it."
+
+Open the document. Read the email. Check the balance. Look at the deadline. Write down what is actually required.
+
+Reality is frequently less frightening after it acquires dimensions.
+
+"I have a terrible report to write" is shapeless. "I need three sources today and an outline tomorrow" is not pleasant, but it is visible.
+
+The same pattern appears outside work. Maintenance, difficult conversations, administrative problems, unanswered messages, medical appointments, money. Avoidance converts uncertainty into temporary comfort, then often converts that comfort into a larger problem.
+
+Not everything should be confronted immediately. Some situations genuinely need time. But postponement and avoidance are not the same thing. One is a decision. The other is an attempt not to decide.
+
+Problems do not usually disappear because we stop looking at them.
+
+They simply continue without our participation.
