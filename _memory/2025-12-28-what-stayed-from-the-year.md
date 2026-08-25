@@ -7,36 +7,18 @@ tags:
    - personal
 ---
 
-At the end of 2025, I tried to remember the year and discovered that the important parts did not arrive in order.
+At the end of 2025, I tried to remember the year and discovered that the important parts did not return in order. There were things that could have gone on a list—work completed, pages made, small tools finished, problems solved. I could have arranged them by month and made the year look organized. That would have been accurate, but it would not have been how the year felt.
 
-There were things that could have gone on a list: work completed, pages made, small tools finished, problems solved. I could have arranged them by month and made the year look organized. That would have been accurate, but it would not have been how the year felt.
+What came back first were smaller things: a cup of coffee beside the computer, a short conversation that improved a bad day, a task I delayed for weeks and then finished in twenty minutes, an idea that looked important in March and had lost its importance by September. None of these belonged naturally in an annual report, yet they were easier to remember than many of the items that did.
 
-What came back first were smaller things.
+Technology seemed to move faster than the calendar. There was always a new tool, a new model, another thing that everyone suddenly appeared to understand. Some days I followed with curiosity; on others I had the uncomfortable feeling that I was running while the road itself was moving. I did not learn everything, and eventually that stopped feeling like a failure.
 
-A cup of coffee beside the computer. A short conversation that improved a bad day. A task I delayed for weeks and then finished in twenty minutes. An idea that looked important in March and had completely lost its importance by September.
+One useful change was becoming less interested in perfect plans. I preferred making something small and real. A simple page that worked was better than a large idea waiting for the correct future. Some plans disappeared entirely, and I became less certain that every abandoned plan deserved to be called a failure. Sometimes the person who made the plan had simply moved somewhere else.
 
-Technology seemed to move faster than the calendar. There was always a new tool, a new model, another thing that everyone suddenly appeared to understand. Some days I learned with curiosity. Other days I had the uncomfortable feeling that I was running while the road itself was moving.
+The year also contained people who would never appear in any summary of productivity. Someone remembered a detail I had mentioned months earlier. Someone sent a message at the right moment. A conversation lasted longer than expected and changed the mood of an evening. These things were difficult to measure and easy to remember.
 
-I did not learn everything.
+Nothing magical would happen at midnight on December 31. The room would remain the same room, and most unfinished things would still be unfinished in the morning. The number on the calendar merely offered a convenient place to look back.
 
-This was not a disaster.
+I could not know which parts of 2025 would survive ten years in memory. Memory has never respected annual reports. So I stopped trying to prepare one. Some things were finished, some were not, and most of life had taken place in the ordinary space between them.
 
-One useful change during the year was becoming less interested in perfect plans. I preferred making something small and real. A simple page that worked was better than a large idea waiting for the correct future.
-
-Some plans disappeared entirely. I used to treat abandoned plans as small failures. By the end of the year, I was less certain. Sometimes a plan becomes unnecessary because the person who made it has moved somewhere else.
-
-The year also contained people who would never appear in any summary of productivity. Someone remembered a detail I had mentioned months earlier. Someone sent a message at the right moment. A conversation lasted longer than expected and changed the mood of the evening.
-
-These were difficult to measure and easy to remember.
-
-On December 31, nothing magical would happen at midnight. The room would remain the same room, and most unfinished things would still be unfinished in the morning.
-
-Still, the number on the calendar gave me a reason to look back.
-
-I could not tell which parts of 2025 I would remember ten years later. Memory has never respected annual reports.
-
-So I stopped trying to prepare one.
-
-The year had happened. Some things were finished, some were not, and most of life had taken place in the ordinary space between them.
-
-That seemed enough.
+That seemed like a better record of the year.
