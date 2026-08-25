@@ -1,29 +1,72 @@
 ---
-title: 'Haste Makes Waste'
+title: 'Speed Can Hide Impatience'
 date: 2011-04-04
 tags:
-   - self-improvement
-   - philosophy
+  - judgment
+  - patience
+  - reflection
 ---
 
-We all know the saying, "Haste makes waste." It sounds simple, but I think we only understand it properly after we have rushed something important.
+Speed is easy to praise because it looks like decisiveness.
 
-<img width="200" alt="butterfly" src="/images/posts/haste-makes-waste.webp" style="float: left; margin-right: 10px;" />
+A quick answer feels confident. A fast decision feels efficient. A shortcut feels intelligent when it works.
 
-I once heard a story about a butterfly coming out of its cocoon. Someone sees the butterfly struggling and tries to help by opening the cocoon too early. The intention is kind. The result is not. The struggle was part of the process that helped the butterfly become ready to fly.
+But sometimes speed is not clarity.
 
-Whether every detail of the story is biologically exact is not really the important part for me. The image stays in my mind because life often works in a similar way. We want results quickly.
+It is discomfort escaping through action.
 
-We want to leave a bad situation, become better at something, finish a difficult period, or reach a goal. When the process is uncomfortable, we naturally look for a shortcut.
+I notice this most when uncertainty becomes unpleasant. The temptation is not always to choose well. Sometimes it is simply to stop having to choose.
 
-Sometimes shortcuts help. Sometimes they only create the appearance of progress.
+Send the message.
 
-A person can leave one problem very quickly and enter another version of the same problem. We can memorize enough information to pass an exam without really learning the subject. We can make a decision only to stop feeling uncertain. These are the false wings I think about.
+Quit the project.
 
-From outside, they can look like success. Inside, we may still be in the same place.
+Accept the offer.
 
-Growth often needs time because part of the result is created by the difficulty itself. Learning patience, making mistakes, changing our mind, and trying again are not always delays. Sometimes they are the work.
+End the conversation.
 
-This does not mean we should move slowly in everything. Some decisions should be made quickly. Some situations should be left immediately.
+Buy the thing.
 
-But speed should not become a goal by itself. When I become impatient, I try to ask a simple question: am I moving quickly because it is wise, or because I cannot tolerate the discomfort of waiting? The answer is not always clear. Still, asking the question can save us from tearing open our own cocoon too early.
+Any decision can feel better than remaining inside an unresolved one.
+
+This is why I no longer find "haste makes waste" interesting as a general warning to move slowly. Slow decisions can be foolish too. Some situations require immediate action. Delay can become cowardice with better manners.
+
+The useful distinction is between **necessary speed** and **emotional speed**.
+
+Necessary speed comes from the situation. A deadline is real. A danger is real. An opportunity genuinely closes.
+
+Emotional speed comes from us. We want the tension to disappear.
+
+That difference is difficult to see from inside the moment because both produce the same sentence:
+
+"I need to decide now."
+
+Sometimes that sentence is true.
+
+Sometimes "now" means "before I have to feel uncertain for another hour."
+
+There is an old story about someone cutting open a butterfly's cocoon to help it emerge. The image is memorable because it captures premature assistance: removing the difficulty also removes part of the process.
+
+I do not know how far the biology of the story should be trusted, and I do not need it as a law of life. Difficulty does not automatically improve us. Waiting does not automatically make an answer better.
+
+But some processes contain information that only appears if we do not force the ending too early.
+
+A difficult draft reveals the weak idea.
+
+A disagreement allowed to continue for another ten minutes may reveal the real disagreement.
+
+A period of uncertainty may show which option we keep returning to after the first panic fades.
+
+Patience, in those cases, is not inactivity.
+
+It is allowing enough reality to arrive before pretending the decision is obvious.
+
+The question I now prefer is not, "Am I moving too fast?"
+
+It is:
+
+**What exactly requires this speed?**
+
+If the answer is the situation, move.
+
+If the answer is only my impatience, another hour may be doing more work than it appears.
