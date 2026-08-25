@@ -1,29 +1,44 @@
 ---
-title: 'It Is Not The Mountain We Conquer, But Ourselves'
+title: 'Support Should Not Replace Judgment'
 date: 2011-04-03
 tags:
-   - philosophy
-   - self-improvement
+  - independence
+  - judgment
+  - reflection
 ---
 
-When I watch a bird fly, I sometimes think about how strange that movement really is. Two wings work together, but each wing also needs its own space. They move as a pair without becoming the same thing. I like this as a small metaphor for life.
+We often ask other people what we should do when the decision feels important enough.
 
-<img width="200" alt="bird" src="/images/posts/it-is-not-the-mountain-we-conquer-but-ourselves-1.webp" style="float: left; margin-right: 10px;" />
+That makes sense. Other people can see risks we miss. They can challenge our excuses, offer experience, and remind us that a difficult choice is not the same as an impossible one. Advice is one of the ways human beings borrow perspective from one another.
 
-We need other people. We ask for advice, look for support, and share our problems. There is nothing weak about this. A life without connection would be very lonely. Still, there is a point where support should not replace our own judgment.
+The danger begins when borrowed perspective replaces judgment.
 
-<img width="200" alt="bird" src="/images/posts/it-is-not-the-mountain-we-conquer-but-ourselves-2.webp" style="float: left; margin-right: 10px;" />
+A decision can collect so many opinions that it no longer feels like ours. One friend says leave. Another says stay. A parent recommends safety. A colleague recommends ambition. Each answer may be reasonable from inside that person's life.
 
-At the end of the day, we are responsible for many of our choices. Other people can help us see the road, but they cannot walk every step for us. Sometimes we have to trust our own ability even when we are not fully sure.
+But reasonableness is not transferability.
 
-Independence does not mean refusing help. For me, it means staying able to stand on your own while still being close to others. The bird needs both wings, but one wing cannot simply become the other.
+Montaigne often tested ideas against lived experience rather than treating abstract rules as sufficient. Epictetus, from another direction, insisted on distinguishing what belongs to our own judgment from what belongs to the world outside us. I think both approaches help here: advice can inform a choice without becoming the author of it.
 
-There is also another part of flying that I find meaningful. Before the bird moves into the air, it has to leave the branch. We also have branches.
+This matters because other people rarely pay the full cost of the decisions they recommend.
 
-A job that no longer feels right. A relationship that keeps us small. A fear that has become too familiar. A way of thinking that once protected us but now limits us.
+They may sincerely want the best for us. They may also value things differently. A parent who fears instability may overvalue security. A friend who regrets missed chances may overvalue risk. Someone who admires endurance may tell us to stay in a situation they themselves would never have to inhabit.
 
-Letting go is not always brave or beautiful. Sometimes it is painful. Sometimes we leave something and immediately wonder if we made a mistake. But staying only because the branch is familiar is also a decision.
+None of this makes advice useless. It makes context essential.
 
-The quote says, "It is not the mountain we conquer, but ourselves." I think that is true in a quiet way. Many difficult journeys begin before the first step. They begin when we decide that fear, habit, or dependence will not make every decision for us.
+Independence is sometimes described as needing nobody. I do not find that convincing. A person who refuses help can be as dependent on an image of self-sufficiency as another person is dependent on approval.
 
-We do not need to fly alone. We only need to remember that our wings are still ours.
+The more useful form of independence is **remaining able to decide after listening**.
+
+Support should widen judgment, not replace it.
+
+The same is true of fear. We often imagine difficult choices as external obstacles: the mountain, the distance, the branch we have to leave. But the harder part is frequently internal. Habit can make a bad situation feel safer than an unknown one. Approval can make another person's preference feel like our duty. Fear can turn uncertainty into evidence that we should not move.
+
+That does not mean every act of leaving is brave. Sometimes staying is wiser. Sometimes fear is warning us about something real. The point is not to glorify action over caution.
+
+It is to notice who is making the decision.
+
+A good choice can include other people's wisdom without becoming a referendum on what everyone else wants.
+
+We do not need to fly alone.
+
+We do need to know whose hands are on the controls.
