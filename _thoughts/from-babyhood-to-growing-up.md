@@ -1,29 +1,38 @@
 ---
-title: 'From Babyhood To Growing Up'
+title: 'Growing Up Means Learning Which Voice Is Yours'
 date: 2014-10-06
 tags:
-  - critics
-  - self-improvement
+  - identity
+  - expectations
+  - reflection
 ---
 
-A baby enters the world with a very direct way of communicating. Something is wrong, so the baby cries. Hungry. Tired. Cold. Uncomfortable.
+A baby begins with a very direct relationship to need. Hunger becomes crying. Discomfort becomes crying. The signal is crude but honest: something is wrong, and the child does not yet know how to disguise it.
 
-<img width="200" alt="childhood" src="/images/posts/from-babyhood-to-growing-up.webp" style="float: left; margin-right: 10px;" />
+Growing up makes communication more sophisticated. We learn language, politeness, timing, negotiation, and the fact that other people have needs too. This is necessary. A person who never learns to consider others cannot live well with anyone.
 
-The message is not polite or complicated. It is simply a need.
+But social learning has a second effect. The question "What do I need?" slowly becomes entangled with another question: "What is expected of me?"
 
-A caregiver responds, and slowly the child begins to learn that communication changes the world around them. Then growing up begins.
+Parents have hopes. Teachers reward certain behaviors. Friends create their own rules. Culture supplies a picture of what a successful life should look like. None of these influences is automatically bad. Many of them protect us, educate us, and make cooperation possible.
 
-Language develops. The child can point, ask, explain, refuse, and negotiate. At the same time, another kind of learning starts. The child discovers that other people also have wishes.
+The difficulty is that an expectation repeated long enough can begin to sound like an inner voice.
 
-Parents expect certain behavior. Friends create social rules. School adds more expectations. Culture quietly teaches what is considered normal.
+Erich Fromm wrote about the tension between being and conforming to what society rewards. Montaigne, in a different way, kept returning to the problem of living according to one's own judgment rather than borrowed opinion. I recognize both problems in ordinary adult life.
 
-The simple question "What do I need?" slowly becomes mixed with another question: "What do other people expect from me?" This change is necessary. A person who never learns to consider others cannot live well in a community. But there is also a danger.
+We become very good at answering questions nobody explicitly asks anymore. Choose the respectable path. Keep everyone comfortable. Do not disappoint the family. Stay busy. Be useful. Want what people like you are supposed to want.
 
-If we become too good at satisfying expectations, we may stop hearing our own needs. I think adulthood contains a strange version of the same problem. We are much better at speaking than babies, but sometimes we are worse at knowing what we actually want. We work because we should. We agree because it is easier.
+Eventually, obedience can become so efficient that no external pressure is needed.
 
-We follow a path because it looks normal. Then one day we feel tired without understanding why. Growing up should not mean replacing every personal desire with social expectations. A healthy life probably needs both. Responsibility toward others and a sense of individuality.
+Then a strange thing happens: an adult can be far more articulate than a child and still have more difficulty answering a simple question—what do I actually want?
 
-Parents and teachers have an important role here. Children need limits, but they also need some space to choose, make mistakes, and discover preferences.
+This is not an argument for selfishness. Our own desires are not sacred simply because they are ours. They can be foolish, harmful, temporary, or impossible. Other people's claims on us are real too. Responsibility matters.
 
-Independence does not suddenly appear at eighteen. It develops through many small chances to decide. Maybe growing up is not the journey from selfish need to total obedience. Maybe it is learning how to hear both voices. Our own. And the voices of the people around us.
+The distinction I care about is between **considering other voices** and **losing the ability to identify our own**.
+
+Growing up should not mean replacing every personal impulse with social approval. Nor should maturity mean returning to the baby's world where only our needs exist.
+
+Perhaps adulthood is the more difficult position between the two: hearing the expectations around us clearly enough to take them seriously, while still being able to ask which ones deserve authority.
+
+Independence does not suddenly appear at eighteen. It develops through hundreds of small acts of judgment.
+
+At some point, growing up becomes less about learning what other people want from us and more about learning which of those voices we have decided to keep.
