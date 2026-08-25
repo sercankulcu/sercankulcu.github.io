@@ -1,42 +1,38 @@
 ---
-title: 'Why I Still Like Writing on a Personal Blog'
+title: 'A Personal Blog Lets Ideas Stay'
 date: 2026-08-05
 tags:
   - blogging
   - writing
-  - life
+  - reflection
 ---
 
-Writing on the internet feels very different from how it felt years ago.
+Writing on the internet now feels increasingly temporary. Most platforms are built around movement: a post appears, receives attention for a short time, and is pushed downward by newer material. The system rewards arrival more than permanence.
 
-Today, most writing happens inside platforms. Posts are short. Feeds move quickly. Something that feels important in the morning can disappear under hundreds of newer things by evening.
+A personal blog feels different because it does not have to behave like a feed.
 
-A personal blog is slower.
+I can write something without asking whether it will perform well today. A technical note can sit beside a memory. A teaching reflection can sit beside a small observation about a film or a habit. The arrangement would look incoherent on a company site, but on a personal site the inconsistency is part of the point. A person is not a content category.
 
-I like that.
+Montaigne's essays still feel alive partly because they preserve the movement of a mind rather than the polish of a final doctrine. I like personal blogs for a smaller, modern version of that reason. They let unfinished intellectual history remain visible.
 
-A blog post does not need to win attention in the first three seconds. It can simply exist. It can be useful today or found by someone three years later.
+Sometimes I begin a post certain of what I think and end with a weaker, more complicated conclusion. Writing exposes where an opinion relies on vague language or where two beliefs I hold do not fit together. The post becomes less a declaration than a record of revision.
 
-I also like that a personal blog allows different kinds of writing to live together. One post can be technical. Another can be about teaching. Another can be about a memory or a small thought that stayed in my mind.
+That record matters to me even when nobody else reads it. Years later, an old post can show not only what I believed but what I noticed, what I worried about, which tools I used, and what kind of questions seemed important at the time.
 
-This would look strange on a company website.
+This is different from keeping a private notebook. Publishing changes the writing slightly. Knowing that another person *could* read the page forces enough clarity to make the thought inspectable. But because the page is mine, it does not need to become optimized for maximum reach.
 
-On a personal website, it feels natural.
+There is freedom in that middle ground: public enough to require care, private enough to tolerate idiosyncrasy.
 
-Writing also helps me understand what I think. Sometimes I begin a post with one opinion and finish with a slightly different one. The act of putting ideas into sentences forces me to slow down.
+Of course, owning a site does not automatically produce independence. I can still become obsessed with traffic, search rankings, analytics, or the appearance of consistency. A personal blog can become another performance if every entry is written for an imagined audience.
 
-I notice weak parts. I notice contradictions. I discover what I actually care about.
+The reason I still like it is simpler. A blog gives thoughts a stable address.
 
-Not every post needs to be important. I think this is one of the nicest parts.
+Feeds ask what is new. A personal archive can also ask what is still worth returning to.
 
-A small personal observation can be enough.
+Some entries will age badly. Some will become embarrassing. Some may turn out to be more interesting years later than they were when written. I do not see that unevenness as a defect.
 
-Maybe nobody will read it. Maybe one person will. Maybe I will find it years later and remember what life felt like at that time.
+It is evidence that the archive belongs to a changing person.
 
-That possibility is enough for me.
+Maybe that is what I value most. A personal blog does not need to prove that every thought was important.
 
-I do not think blogs need to compete with faster platforms.
-
-Their value may be exactly the opposite.
-
-They can stay.
+It only needs to let the thoughts stay long enough for their importance to change.
