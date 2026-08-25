@@ -1,19 +1,34 @@
 ---
-title: 'Time Passes Quickly'
+title: 'Routine Is How Time Disappears'
 date: 2025-01-20
 tags:
-  - life
+  - time
+  - memory
   - reflection
 ---
 
-The older I become, the faster years seem to move. I know the clock has not changed. A day still contains twenty-four hours. Still, childhood summers felt much longer than many adult years feel now. Routine may be part of the reason.
+The clock does not move faster as we get older.
 
-New experiences leave more details in memory. When days become similar, the mind can compress them. Work. Home. Messages.
+Memory does something stranger.
 
-Sleep. Repeat. A month passes and there are fewer clear markers inside it. Another reason may be proportion. For a ten-year-old, one year is a large part of all remembered life.
+Childhood summers can occupy enormous space in the mind, while an adult year sometimes collapses into a few scenes: a project, a trip, an illness, a conversation, a deadline. The rest becomes background.
 
-For an adult, one year is a much smaller fraction. Whatever the reason, the feeling makes me want to notice ordinary time more carefully. I do not think every day needs to be exciting. That would be exhausting. But a small new experience can give a day shape.
+I used to think this meant time itself was accelerating. Now I suspect routine is doing much of the work.
 
-A walk on a different road. A conversation. A book. A small project. Even stopping to notice an ordinary moment can make it less invisible.
+When days resemble one another, memory has fewer reasons to keep them separate. Wake up. Work. Messages. Home. Sleep. Repeat. Nothing is wrong with any single day, yet a month can pass without leaving many distinct edges behind.
 
-We cannot slow time. Maybe attention is the closest thing we have.
+Montaigne was interested in the texture of ordinary life rather than only its grand events. I think that is useful here because the problem is not that ordinary days are inferior. The problem is that unattended days become difficult to remember.
+
+Novelty helps, but novelty does not need to mean constant travel or excitement. A different route home can be enough. A long conversation. Learning something difficult. Cooking something badly for the first time. Starting a small project. Paying full attention to an otherwise ordinary afternoon.
+
+These things create markers.
+
+There is also the familiar explanation that a year becomes a smaller fraction of life as we age. Perhaps that contributes to the feeling. But whatever the psychology, the practical lesson seems similar.
+
+We cannot slow the clock.
+
+We can make fewer days interchangeable.
+
+Attention may not give us more time.
+
+It may give time more shape.
