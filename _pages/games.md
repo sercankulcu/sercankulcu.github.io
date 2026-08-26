@@ -26,6 +26,7 @@ author_profile: true
 <button onclick="location.href='../game/connections.html'">🧩 CONNECTIONS</button>
 <button onclick="location.href='../game/strands.html'">🧶 STRANDS</button>
 <button onclick="location.href='../game/memory.html'">🧠 MEMORY</button>
+<button onclick="location.href='../game/bulls-and-cows/'">🐂🐄 BULLS & COWS</button>
 
 
 <h3>🔤 WORD GAMES</h3>
