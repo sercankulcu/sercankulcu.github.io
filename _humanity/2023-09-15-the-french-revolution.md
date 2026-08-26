@@ -11,164 +11,58 @@ tags:
    - equality
 ---
 
-The French Revolution began by attacking privilege.
+The French Revolution began by attacking privilege. It ended by teaching humanity how terrifying political purification can become.
 
-It ended by teaching humanity how terrifying political purification can become.
-
-Before 1789, French society was structured through inherited estates, fiscal inequality, monarchy, and privilege.
-
-Financial crisis intensified political pressure.
-
-Food prices mattered.
-
-Ideas mattered.
-
-State weakness mattered.
+Before 1789, French society was structured through inherited estates, fiscal inequality, monarchy, and privilege. Financial crisis intensified political pressure, while food prices, ideas, and state weakness also mattered.
 
 Revolution emerged when these forces converged.
 
-The Declaration of the Rights of Man and of the Citizen announced universal principles.
+The Declaration of the Rights of Man and of the Citizen announced universal principles: liberty, equality, popular sovereignty, and law grounded in the nation rather than the king.
 
-Liberty.
+This was politically explosive. Hierarchy could no longer justify itself merely through tradition, and citizenship replaced subjecthood as ideal.
 
-Equality.
+The revolution also attacked symbolic order: titles, church property, monarchical ceremony, calendar, dress, and language.
 
-Popular sovereignty.
+A revolution is not satisfied with changing rulers. It often tries to change meaning.
 
-Law grounded in the nation rather than the king.
+This is where politics becomes cultural reconstruction. The old world must not only lose power; it must lose legitimacy.
 
-This was politically explosive.
-
-Hierarchy could no longer justify itself merely through tradition.
-
-Citizenship replaced subjecthood as ideal.
-
-The revolution also attacked symbolic order.
-
-Titles.
-
-Church property.
-
-Monarchical ceremony.
-
-Calendar.
-
-Dress.
-
-Language.
-
-A revolution is not satisfied with changing rulers.
-
-It often tries to change meaning.
-
-This is where politics becomes cultural reconstruction.
-
-The old world must not only lose power.
-
-It must lose legitimacy.
-
-The French Revolution expanded equality more aggressively than many earlier political systems.
-
-But it also revealed a danger inside universal politics.
+The French Revolution expanded equality more aggressively than many earlier political systems, but it also revealed a danger inside universal politics.
 
 If the revolution represents the people, who counts as enemy of the people?
 
-Once dissent becomes treason, political disagreement becomes existential.
-
-The Reign of Terror emerged from war, fear, faction, and revolutionary logic.
-
-Violence was justified as defense of virtue.
+Once dissent becomes treason, political disagreement becomes existential. The Reign of Terror emerged from war, fear, faction, and revolutionary logic. Violence was justified as defense of virtue.
 
 This is one of modern politics' most disturbing patterns.
 
-A movement committed to liberation can become coercive when it believes history has only one legitimate direction.
+A movement committed to liberation can become coercive when it believes history has only one legitimate direction. The problem is not revolution uniquely. It is certainty combined with state power.
 
-The problem is not revolution uniquely.
+If opponents are merely wrong, debate is possible. If opponents are enemies of humanity, elimination becomes imaginable.
 
-It is certainty combined with state power.
+The revolution also transformed war. Mass mobilization connected citizenship to military service, and the nation became a community capable of demanding sacrifice from ordinary people.
 
-If opponents are merely wrong, debate is possible.
-
-If opponents are enemies of humanity, elimination becomes imaginable.
-
-The revolution also transformed war.
-
-Mass mobilization connected citizenship to military service.
-
-The nation became a community capable of demanding sacrifice from ordinary people.
-
-This contributed to modern nationalism.
-
-The citizen is free.
-
-The citizen also owes the nation.
+This contributed to modern nationalism. The citizen is free, but the citizen also owes the nation.
 
 Freedom and obligation expand together.
 
-Napoleon later emerged from the revolutionary world.
+Napoleon later emerged from the revolutionary world. He spread legal and administrative reforms while building empire.
 
-He spread legal and administrative reforms while building empire.
+Again, contradictory legacies coexist. The Napoleonic Code modernized aspects of law, while Napoleonic warfare devastated Europe. Revolutionary universalism became imperial expansion.
 
-Again, contradictory legacies coexist.
+The French Revolution also inspired movements far beyond France. Haiti's revolution pushed universal liberty further by overthrowing slavery and colonial rule. European conservatives feared revolutionary contagion, while nationalist and liberal movements drew inspiration from 1789.
 
-The Napoleonic Code modernized aspects of law.
-
-Napoleonic warfare devastated Europe.
-
-Revolutionary universalism became imperial expansion.
-
-The French Revolution also inspired movements far beyond France.
-
-Haiti's revolution pushed universal liberty further by overthrowing slavery and colonial rule.
-
-European conservatives feared revolutionary contagion.
-
-Nationalist and liberal movements drew inspiration from 1789.
-
-The revolution became a political vocabulary.
-
-Left.
-
-Right.
-
-Citizen.
-
-Nation.
-
-Revolution.
-
-Reaction.
+The revolution became a political vocabulary: left, right, citizen, nation, revolution, reaction.
 
 Modern political identity took shape.
 
-The deepest lesson may be that equality destabilizes every inherited hierarchy.
-
-Once people accept that status requires justification, no institution remains safe automatically.
-
-Monarchy.
-
-Church.
-
-Class.
-
-Gender.
-
-Empire.
+The deepest lesson may be that equality destabilizes every inherited hierarchy. Once people accept that status requires justification, no institution remains safe automatically: monarchy, church, class, gender, empire.
 
 All can be questioned.
 
-But questioning power does not guarantee wise replacement.
-
-Destroying an unjust order is easier than building a durable just one.
+But questioning power does not guarantee wise replacement. Destroying an unjust order is easier than building a durable just one.
 
 The French Revolution created both modern democratic hope and modern revolutionary fear.
 
-It asked:
+It asked: can humanity remake society through reason?
 
-Can humanity remake society through reason?
-
-The answer was:
-
-Yes.
-
-And not without consequences.
+The answer was: yes. And not without consequences.
