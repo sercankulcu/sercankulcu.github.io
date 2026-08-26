@@ -63,7 +63,7 @@ author_profile: true
 
 <h3>🔮 FUN & ENTERTAINMENT</h3>
 
-<button onclick="location.href='../apps/fortune-teller.html'">🔮 FORTUNE TELLER</button>
+<button onclick="location.href='../apps/fortune-teller/'">🔮 FORTUNE TELLER</button>
 <button onclick="location.href='../apps/tarot/tarot-reader.html'">🃏 TAROT</button>
 
 
