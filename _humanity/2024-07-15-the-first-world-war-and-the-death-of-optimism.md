@@ -11,174 +11,52 @@ tags:
    - modernity
 ---
 
-Before 1914, parts of Europe had reasons for confidence.
-
-Science advanced.
-
-Industry expanded.
-
-Railways connected cities.
-
-Telegraphy accelerated communication.
-
-Medicine improved.
-
-Trade grew.
-
-Many intellectuals believed civilization was becoming more rational.
+Before 1914, parts of Europe had reasons for confidence. Science advanced, industry expanded, railways connected cities, telegraphy accelerated communication, medicine improved, and trade grew. Many intellectuals believed civilization was becoming more rational.
 
 Then Europe industrialized killing.
 
-The First World War did not destroy optimism completely.
+The First World War did not destroy optimism completely, but it made naïve progress much harder to defend.
 
-But it made naïve progress much harder to defend.
+The war began through a chain of alliances, mobilization plans, nationalism, imperial rivalry, military calculations, and political failure. The assassination of Archduke Franz Ferdinand became the trigger, and the system transformed one crisis into continental war.
 
-The war began through a chain of alliances, mobilization plans, nationalism, imperial rivalry, military calculations, and political failure.
-
-The assassination of Archduke Franz Ferdinand became trigger.
-
-The system transformed one crisis into continental war.
-
-This is one of history's clearest examples of interconnected risk.
-
-Every state makes a decision partly in response to others.
-
-Mobilization by one creates fear in another.
-
-Fear creates mobilization.
-
-The system accelerates.
+This is one of history's clearest examples of interconnected risk. Every state makes a decision partly in response to others. Mobilization by one creates fear in another, fear creates mobilization, and the system accelerates.
 
 No single actor needs to desire catastrophe for catastrophe to emerge.
 
-Modern war also exposed the moral neutrality of technology.
+Modern war also exposed the moral neutrality of technology. Machine guns, heavy artillery, poison gas, railways, telecommunications, and industrial chemistry all represented technical achievement. They also increased killing capacity.
 
-Machine guns.
+Science had expanded human control over nature. States redirected that control toward human bodies.
 
-Heavy artillery.
+The trench became a symbol of technological contradiction: modern weapons, pre-modern mud. Millions of soldiers endured conditions of extraordinary brutality.
 
-Poison gas.
+War became a factory process through shell production, logistics, timetables, mass conscription, and standardized death.
 
-Railways.
-
-Telecommunications.
-
-Industrial chemistry.
-
-All represented technical achievement.
-
-They also increased killing capacity.
-
-Science had expanded human control over nature.
-
-States redirected that control toward human bodies.
-
-The trench became symbol of technological contradiction.
-
-Modern weapons.
-
-Pre-modern mud.
-
-Millions of soldiers endured conditions of extraordinary brutality.
-
-War became factory process.
-
-Shell production.
-
-Logistics.
-
-Timetables.
-
-Mass conscription.
-
-Standardized death.
-
-The nation mobilized entire populations.
-
-Civilians produced.
-
-Soldiers fought.
-
-Governments controlled information.
-
-Economies reorganized.
-
-The distinction between battlefield and society weakened.
+The nation mobilized entire populations. Civilians produced, soldiers fought, governments controlled information, and economies reorganized. The distinction between battlefield and society weakened.
 
 This was total war.
 
-The psychological impact was enormous.
-
-Older ideals of heroic combat collided with artillery and anonymous destruction.
-
-A soldier could die without seeing the person who killed him.
-
-Individual courage mattered less against industrial systems.
+The psychological impact was enormous. Older ideals of heroic combat collided with artillery and anonymous destruction. A soldier could die without seeing the person who killed him. Individual courage mattered less against industrial systems.
 
 This changes the meaning of war.
 
 The machine dominates the hero.
 
-The war also destabilized empires.
+The war also destabilized empires: Russian, Ottoman, Austro-Hungarian, and German. Political maps changed. Revolution spread. National self-determination became powerful language.
 
-Russian.
+But new borders created new minorities. One problem was solved by generating others.
 
-Ottoman.
+The peace settlement also left resentment through economic burdens, territorial grievances, and political humiliation. The war ended militarily without creating stable psychological peace. This helped shape conditions that later contributed to fascism and the Second World War.
 
-Austro-Hungarian.
+The First World War also transformed memory. Monuments filled towns, a generation carried grief, and names of the dead became architecture. The scale of loss forced societies to ritualize absence.
 
-German.
-
-Political maps changed.
-
-Revolution spread.
-
-National self-determination became powerful language.
-
-But new borders created new minorities.
-
-One problem was solved by generating others.
-
-The peace settlement also left resentment.
-
-Economic burdens.
-
-Territorial grievances.
-
-Political humiliation.
-
-The war ended militarily without creating stable psychological peace.
-
-This helped shape conditions that later contributed to fascism and the Second World War.
-
-The First World War also transformed memory.
-
-Monuments filled towns.
-
-A generation carried grief.
-
-Names of the dead became architecture.
-
-The scale of loss forced societies to ritualize absence.
-
-The war's intellectual consequence was deeper.
-
-Civilization could no longer be equated simply with moral progress.
+The war's intellectual consequence was deeper. Civilization could no longer be equated simply with moral progress.
 
 A society can produce universities, orchestras, philosophy, and industrial slaughter simultaneously.
 
-Education does not eliminate barbarism.
-
-Technology does not eliminate tribalism.
-
-Culture does not guarantee restraint.
+Education does not eliminate barbarism. Technology does not eliminate tribalism. Culture does not guarantee restraint.
 
 This is one of modern history's hardest truths.
 
-Humanity became more capable faster than it became wiser.
+Humanity became more capable faster than it became wiser. The First World War exposed the gap.
 
-The First World War exposed the gap.
-
-We had learned how to coordinate millions.
-
-We had not learned why coordination should stop before catastrophe.
+We had learned how to coordinate millions. We had not learned why coordination should stop before catastrophe.
