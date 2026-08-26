@@ -11,146 +11,56 @@ tags:
    - war
 ---
 
-On August 6, 1945, an atomic bomb destroyed much of Hiroshima.
+On August 6, 1945, an atomic bomb destroyed much of Hiroshima. Three days later, another atomic bomb was dropped on Nagasaki.
 
-Three days later, another atomic bomb was dropped on Nagasaki.
+Human beings had crossed a threshold. A single weapon could destroy a city in moments.
 
-Human beings had crossed a threshold.
+The scientific path to nuclear weapons began with discoveries about atomic structure and nuclear fission. The Manhattan Project then converted theoretical knowledge into military technology through enormous industrial organization involving physicists, engineers, chemists, military planners, factories, mining, computation, and logistics.
 
-A single weapon could destroy a city in moments.
+The bomb was not one invention by one genius. It was civilization-scale engineering.
 
-The scientific path to nuclear weapons began with discoveries about atomic structure and nuclear fission.
-
-The Manhattan Project then converted theoretical knowledge into military technology through enormous industrial organization.
-
-Physicists.
-
-Engineers.
-
-Chemists.
-
-Military planners.
-
-Factories.
-
-Mining.
-
-Computation.
-
-Logistics.
-
-The bomb was not one invention by one genius.
-
-It was civilization-scale engineering.
-
-This matters because responsibility was distributed.
-
-Science made the mechanism understandable.
-
-War created urgency.
-
-The state supplied resources.
-
-Industry built the system.
-
-Politics decided use.
+This matters because responsibility was distributed. Science made the mechanism understandable, war created urgency, the state supplied resources, industry built the system, and politics decided use.
 
 No layer can be understood alone.
 
-The bombings remain subjects of intense historical and moral debate.
+The bombings remain subjects of intense historical and moral debate. Supporters of the decision have argued that they accelerated Japan's surrender and avoided an invasion that could have caused enormous casualties. Critics emphasize civilian deaths, alternatives that may have existed, the role of Soviet entry into the war, and the moral consequences of using nuclear weapons against cities.
 
-Supporters of the decision have argued that they accelerated Japan's surrender and avoided an invasion that could have caused enormous casualties.
+The debate should not be reduced to easy certainty. The evidence is historical. The moral stakes are immense.
 
-Critics emphasize civilian deaths, alternatives that may have existed, the role of Soviet entry into the war, and the moral consequences of using nuclear weapons against cities.
+What is beyond dispute is the transformation that followed. Nuclear weapons changed war from a problem of victory into a problem of species-level risk.
 
-The debate should not be reduced to easy certainty.
+Once multiple states possessed large arsenals, total war between major powers could become suicidal. Deterrence emerged.
 
-The evidence is historical.
+The logic is strange: peace through fear of annihilation.
 
-The moral stakes are immense.
-
-What is beyond dispute is the transformation that followed.
-
-Nuclear weapons changed war from a problem of victory into a problem of species-level risk.
-
-Once multiple states possessed large arsenals, total war between major powers could become suicidal.
-
-Deterrence emerged.
-
-The logic is strange.
-
-Peace through fear of annihilation.
-
-Each side keeps weapons it hopes never to use.
-
-Security depends on convincing the other side that use is possible.
+Each side keeps weapons it hopes never to use. Security depends on convincing the other side that use is possible.
 
 This is one of the most paradoxical institutions humanity has created.
 
-The nuclear age also changes time.
+The nuclear age also changes time. Earlier civilizations could imagine collapse. Now humanity could imagine rapid self-destruction through deliberate action.
 
-Earlier civilizations could imagine collapse.
+Extinction was no longer only asteroid, plague, or cosmic event. It became political possibility.
 
-Now humanity could imagine rapid self-destruction through deliberate action.
+This creates a new kind of responsibility. A small number of leaders can influence the future of billions.
 
-Extinction was no longer only asteroid, plague, or cosmic event.
+Humanity's technological power has exceeded the scale of ordinary democratic intuition. Most people will never control nuclear policy directly, yet everyone lives under its consequences.
 
-It became political possibility.
+Hiroshima also exposes the moral distance created by technology. The bomber crew does not see every victim, and the weapon is delivered from above. Modern warfare increasingly separates action from immediate experience.
 
-This creates a new kind of responsibility.
+Drones continue the pattern. Cyberwarfare intensifies abstraction further.
 
-A small number of leaders can influence the future of billions.
+Distance can reduce empathy. A button can represent bodies.
 
-Humanity's technological power has exceeded the scale of ordinary democratic intuition.
+This is why technological interfaces require ethical imagination. The easier action becomes physically, the harder we may need to work morally.
 
-Most people will never control nuclear policy directly.
+The atomic bomb also changed science. Scientists could no longer imagine research as detached completely from consequence.
 
-Yet everyone lives under its consequences.
-
-Hiroshima also exposes the moral distance created by technology.
-
-The bomber crew does not see every victim.
-
-The weapon is delivered from above.
-
-Modern warfare increasingly separates action from immediate experience.
-
-Drones continue the pattern.
-
-Cyberwarfare intensifies abstraction further.
-
-Distance can reduce empathy.
-
-A button can represent bodies.
-
-This is why technological interfaces require ethical imagination.
-
-The easier action becomes physically, the harder we may need to work morally.
-
-The atomic bomb also changed science.
-
-Scientists could no longer imagine research as detached completely from consequence.
-
-Knowledge has downstream effects.
-
-A discovery can become medicine.
-
-Energy.
-
-Weapon.
-
-The scientist may not control use.
-
-But the possibility creates responsibility to think beyond publication.
+Knowledge has downstream effects. A discovery can become medicine, energy, or weapon. The scientist may not control use, but the possibility creates responsibility to think beyond publication.
 
 Hiroshima marks the moment humanity understood that intelligence had become existentially dangerous.
 
-We had gained the ability to split the atom.
-
-We had not gained equivalent wisdom about when not to use what we could build.
+We had gained the ability to split the atom. We had not gained equivalent wisdom about when not to use what we could build.
 
 This gap will return with biotechnology and artificial intelligence.
 
-The nuclear age asks the same question in its starkest form.
-
-Can a species become powerful enough to destroy itself and disciplined enough not to?
+The nuclear age asks the same question in its starkest form: can a species become powerful enough to destroy itself and disciplined enough not to?
