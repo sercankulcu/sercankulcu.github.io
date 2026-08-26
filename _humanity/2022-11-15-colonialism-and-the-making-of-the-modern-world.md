@@ -11,195 +11,59 @@ tags:
    - modernity
 ---
 
-Colonialism is not a side story of modern history.
+Colonialism is not a side story of modern history. It is one of its foundations.
 
-It is one of its foundations.
-
-European powers conquered territories across the Americas, Africa, Asia, and Oceania.
-
-They extracted resources.
-
-Reorganized economies.
-
-Redrew borders.
-
-Imposed institutions.
-
-Moved populations.
-
-Spread languages and religions.
-
-Destroyed and transformed local systems.
+European powers conquered territories across the Americas, Africa, Asia, and Oceania. They extracted resources, reorganized economies, redrew borders, imposed institutions, moved populations, spread languages and religions, and destroyed or transformed local systems.
 
 The effects remain visible.
 
-Colonialism had different forms.
+Colonialism had different forms. Settler colonies displaced indigenous peoples, plantation colonies organized forced labor around export crops, commercial empires controlled ports and trade, and administrative colonies governed large populations through relatively small foreign elites.
 
-Settler colonies displaced indigenous peoples.
+No single model explains everything, but unequal power connects them. The colonizer claimed authority over people who did not possess equal political choice.
 
-Plantation colonies organized forced labor around export crops.
+Economic extraction was central. Colonies often produced raw materials for distant markets: sugar, cotton, rubber, minerals, tea, coffee, and timber. The local economy became oriented toward imperial demand.
 
-Commercial empires controlled ports and trade.
-
-Administrative colonies governed large populations through relatively small foreign elites.
-
-No single model explains everything.
-
-But unequal power connects them.
-
-The colonizer claimed authority over people who did not possess equal political choice.
-
-Economic extraction was central.
-
-Colonies often produced raw materials for distant markets.
-
-Sugar.
-
-Cotton.
-
-Rubber.
-
-Minerals.
-
-Tea.
-
-Coffee.
-
-Timber.
-
-The local economy became oriented toward imperial demand.
-
-This could create infrastructure.
-
-Roads.
-
-Railways.
-
-Ports.
-
-But infrastructure served extraction first.
-
-A railway is not automatically development if its purpose is moving resources outward efficiently.
+This could create infrastructure such as roads, railways, and ports, but infrastructure served extraction first. A railway is not automatically development if its purpose is moving resources outward efficiently.
 
 This distinction matters in evaluating imperial legacies.
 
-Colonialism also needed ideology.
-
-Conquest rarely presents itself honestly as self-interest.
-
-European empires developed civilizing narratives.
-
-Racial theories.
-
-Religious missions.
-
-Claims of progress.
-
-Colonized peoples were portrayed as backward and therefore governable.
+Colonialism also needed ideology. Conquest rarely presents itself honestly as self-interest. European empires developed civilizing narratives, racial theories, religious missions, and claims of progress. Colonized peoples were portrayed as backward and therefore governable.
 
 Power turned difference into hierarchy.
 
-Modern racism became deeply entangled with imperial expansion.
-
-Scientific language was sometimes misused to justify inequality.
-
-This is one of modernity's darkest contradictions.
-
-The age of reason also produced elaborate theories of racial domination.
+Modern racism became deeply entangled with imperial expansion, and scientific language was sometimes misused to justify inequality. This is one of modernity's darkest contradictions: the age of reason also produced elaborate theories of racial domination.
 
 Knowledge does not automatically generate morality.
 
-Colonial rule also transformed identity.
-
-Borders grouped different communities into single administrative units.
-
-Or split related communities across new frontiers.
-
-After independence, many states inherited these boundaries.
+Colonial rule also transformed identity. Borders grouped different communities into single administrative units or split related communities across new frontiers. After independence, many states inherited these boundaries.
 
 The colonial map survived colonial government.
 
-This is a common pattern.
-
-Institutions outlive rulers.
-
-Legal systems.
-
-Languages.
-
-Educational structures.
-
-Property arrangements.
-
-Administrative categories.
+This is a common pattern. Institutions outlive rulers: legal systems, languages, educational structures, property arrangements, and administrative categories can persist long after political authority changes.
 
 Colonialism continues partly through institutional inertia.
 
-Resistance was constant.
+Resistance was constant. Rebellions, intellectual critique, religious movements, labor resistance, and nationalism all challenged colonial rule. Colonized people were not passive victims; they negotiated, adapted, collaborated, resisted, and built new identities.
 
-Rebellions.
+History becomes misleading when imperial archives make colonizers appear as the only actors. Power produces more documents, but documentation is not the same as agency.
 
-Intellectual critique.
+Colonialism also created hybrid cultures. Languages mixed, cuisines changed, religions adapted, literatures emerged, and people formed identities impossible before contact.
 
-Religious movements.
-
-Labor resistance.
-
-Nationalism.
-
-Colonized people were not passive victims.
-
-They negotiated, adapted, collaborated, resisted, and built new identities.
-
-History becomes misleading when imperial archives make colonizers appear as the only actors.
-
-Power produces more documents.
-
-Documentation is not the same as agency.
-
-Colonialism also created hybrid cultures.
-
-Languages mixed.
-
-Cuisines changed.
-
-Religions adapted.
-
-Literatures emerged.
-
-People formed identities impossible before contact.
-
-This does not justify domination.
-
-It demonstrates that cultural consequences exceed political intention.
+This does not justify domination. It demonstrates that cultural consequences exceed political intention.
 
 Violence can create new cultures without making the violence good.
 
-Modern wealth is also connected to colonial history in complex ways.
+Modern wealth is also connected to colonial history in complex ways. Industrialization, trade, plantation production, resource extraction, and slavery interacted. Different historians debate exact magnitudes and causal weight, but the larger fact is clear.
 
-Industrialization, trade, plantation production, resource extraction, and slavery interacted.
-
-Different historians debate exact magnitudes and causal weight.
-
-The larger fact is clear.
-
-Global economic inequality did not emerge in a neutral marketplace.
-
-It developed inside histories of conquest and unequal exchange.
+Global economic inequality did not emerge in a neutral marketplace. It developed inside histories of conquest and unequal exchange.
 
 This matters because present inequality inherits past structure.
 
-The philosophical challenge is not inherited guilt.
-
-People today are not personally responsible for acts committed before they were born.
-
-The challenge is inherited consequence.
+The philosophical challenge is not inherited guilt. People today are not personally responsible for acts committed before they were born. The challenge is inherited consequence.
 
 If an institution or distribution was shaped by past injustice, present societies must decide whether to preserve, reform, or repair it.
 
-History creates responsibility not through ancestry alone.
-
-It creates responsibility through continuing effects.
+History creates responsibility not through ancestry alone. It creates responsibility through continuing effects.
 
 Colonialism made the modern world.
 
