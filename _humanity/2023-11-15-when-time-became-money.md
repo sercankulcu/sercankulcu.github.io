@@ -11,223 +11,73 @@ tags:
    - capitalism
 ---
 
-Humans always understood time.
+Humans always understood time through day and night, season and age, birth and death. But industrial society changed what time meant economically.
 
-Day.
+Time became measurable labor. An hour could be priced, a minute could be wasted, and a delay could become cost.
 
-Night.
+This seems normal now. It was historically transformative.
 
-Season.
+Agricultural work is partly task-oriented: harvest when ready, milk the animals, repair the fence. Industrial work is schedule-oriented. A shift begins at a fixed hour because the factory machine requires coordination.
 
-Age.
-
-Birth.
-
-Death.
-
-But industrial society changed what time meant economically.
-
-Time became measurable labor.
-
-An hour could be priced.
-
-A minute could be wasted.
-
-A delay could become cost.
-
-This seems normal now.
-
-It was historically transformative.
-
-Agricultural work is partly task-oriented.
-
-Harvest when ready.
-
-Milk the animals.
-
-Repair the fence.
-
-Industrial work is schedule-oriented.
-
-Shift begins at a fixed hour.
-
-The factory machine requires coordination.
-
-Workers must arrive together.
-
-Production depends on synchronized time.
+Workers must arrive together, and production depends on synchronized time.
 
 Clock discipline becomes social discipline.
 
-The mechanical clock therefore becomes more than a device.
-
-It becomes an institution.
-
-Schools use bells.
-
-Factories use whistles.
-
-Trains require timetables.
-
-Offices require schedules.
-
-Cities synchronize.
+The mechanical clock therefore becomes more than a device. It becomes an institution. Schools use bells, factories use whistles, trains require timetables, offices require schedules, and cities synchronize.
 
 Civilization begins moving to shared minutes.
 
-This improves coordination enormously.
-
-A railway network cannot function if every town uses an unrelated local time.
-
-Standard time emerges partly from transportation and communication needs.
+This improves coordination enormously. A railway network cannot function if every town uses an unrelated local time. Standard time emerges partly from transportation and communication needs.
 
 The world becomes temporally standardized.
 
-This is a hidden form of globalization.
+This is a hidden form of globalization. Time itself becomes infrastructure.
 
-Time itself becomes infrastructure.
+But measurement changes psychology. What is measured becomes visible, and visibility invites optimization.
 
-But measurement changes psychology.
+How many units per hour? How long did the task take? How much idle time?
 
-What is measured becomes visible.
+Productivity becomes numerical. The worker is evaluated through output per unit time.
 
-Visibility invites optimization.
+This can increase efficiency, but it can also reduce human experience to metrics.
 
-How many units per hour?
+Modern digital work extends this through response times, activity tracking, billable hours, delivery windows, and performance dashboards. The clock becomes software, while the underlying logic remains industrial.
 
-How long did the task take?
-
-How much idle time?
-
-Productivity becomes numerical.
-
-The worker is evaluated through output per unit time.
-
-This can increase efficiency.
-
-It can also reduce human experience to metrics.
-
-Modern digital work extends this.
-
-Response times.
-
-Activity tracking.
-
-Billable hours.
-
-Delivery windows.
-
-Performance dashboards.
-
-The clock becomes software.
-
-The underlying logic is industrial.
-
-Time also becomes morally charged.
-
-Productive.
-
-Unproductive.
-
-Busy.
-
-Lazy.
-
-Efficient.
-
-Wasteful.
+Time also becomes morally charged: productive or unproductive, busy or lazy, efficient or wasteful.
 
 A person resting may feel guilty because time is imagined as an economic asset.
 
-This is psychologically remarkable.
-
-An abstract measurement system enters self-worth.
+This is psychologically remarkable. An abstract measurement system enters self-worth.
 
 "I wasted the day."
 
-The day existed.
+The day existed. What was wasted was an expectation.
 
-What was wasted was an expectation.
+Capitalism intensifies this because time can be exchanged for money. Wage labor makes the relationship explicit: one hour equals a price.
 
-Capitalism intensifies this because time can be exchanged for money.
+But the equation is never complete. An hour of childhood, an hour with a dying parent, an hour waiting in pain, and an hour doing meaningful work are not equivalent experientially.
 
-Wage labor makes the relationship explicit.
+Clock time is uniform. Human time is not.
 
-One hour equals a price.
+This creates tension. Economies require standardized units, while lives are qualitative. The same sixty minutes can feel empty or unforgettable.
 
-But the equation is never complete.
+Modernity often privileges measurable time over lived time. This can make people efficient without making them satisfied.
 
-An hour of childhood.
-
-An hour with a dying parent.
-
-An hour waiting in pain.
-
-An hour doing meaningful work.
-
-These are not equivalent experientially.
-
-Clock time is uniform.
-
-Human time is not.
-
-This creates tension.
-
-Economies require standardized units.
-
-Lives are qualitative.
-
-The same sixty minutes can feel empty or unforgettable.
-
-Modernity often privileges measurable time over lived time.
-
-This can make people efficient without making them satisfied.
-
-The phrase "time is money" therefore contains a category mistake when taken literally.
-
-Time can produce money.
-
-Money cannot produce more past.
+The phrase "time is money" therefore contains a category mistake when taken literally. Time can produce money. Money cannot produce more past.
 
 A lost hour is not recoverable through wealth.
 
-This becomes more obvious with age.
-
-Young people often treat time as abundant.
-
-Older people increasingly recognize scarcity.
+This becomes more obvious with age. Young people often treat time as abundant, while older people increasingly recognize scarcity.
 
 Economic value and existential value diverge.
 
-The industrial clock helped create modern prosperity.
+The industrial clock helped create modern prosperity. It also colonized consciousness.
 
-It also colonized consciousness.
+We began scheduling not only work, but also exercise, social life, rest, children, meditation, and leisure. Even spontaneity receives calendar space.
 
-We began scheduling not only work.
+This is not necessarily bad. Coordination requires planning. But it reveals how deeply temporal discipline has entered identity.
 
-Exercise.
-
-Social life.
-
-Rest.
-
-Children.
-
-Meditation.
-
-Leisure.
-
-Even spontaneity receives calendar space.
-
-This is not necessarily bad.
-
-Coordination requires planning.
-
-But it reveals how deeply temporal discipline has entered identity.
-
-The challenge is remembering that time is more than a resource.
-
-It is the substance of lived experience.
+The challenge is remembering that time is more than a resource. It is the substance of lived experience.
 
 When we sell time, schedule time, optimize time, and save time, we should still ask:
 
