@@ -1,469 +1,856 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PDF Review Integrity Scanner</title>
-  <meta name="description" content="Scan submitted PDFs for hidden or suspicious instructions that may attempt to influence peer review." />
-  <style>
-    :root{
-      --bg:#f6f7fb; --card:#fff; --text:#111827; --muted:#667085; --line:#e5e7eb;
-      --accent:#2563eb; --accent2:#1d4ed8; --green:#067647; --green-bg:#ecfdf3;
-      --amber:#b54708; --amber-bg:#fffaeb; --red:#b42318; --red-bg:#fef3f2;
-      --shadow:0 16px 50px rgba(16,24,40,.08);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; background:linear-gradient(180deg,#f8faff 0,#f6f7fb 45%,#f3f4f6 100%);
-      color:var(--text); font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      min-height:100vh;
-    }
-    .wrap{width:min(1100px,calc(100% - 32px)); margin:0 auto; padding:52px 0 72px}
-    header{text-align:center; margin-bottom:28px}
-    .eyebrow{
-      display:inline-flex; gap:8px; align-items:center; padding:6px 10px; border:1px solid #dbe4ff;
-      border-radius:999px; color:#3448a0; background:#f3f6ff; font-size:12px; font-weight:750; letter-spacing:.03em;
-    }
-    h1{font-size:clamp(30px,5vw,48px); line-height:1.06; margin:16px 0 12px; letter-spacing:-.035em}
-    header p{margin:0 auto; max-width:760px; color:var(--muted); font-size:17px}
-    .card{background:var(--card); border:1px solid var(--line); border-radius:20px; box-shadow:var(--shadow)}
-    .upload{padding:22px}
-    .drop{
-      border:1.5px dashed #b8c0cc; border-radius:16px; min-height:250px; display:grid; place-items:center;
-      text-align:center; padding:34px 22px; cursor:pointer; transition:.18s ease; background:#fcfcfd;
-    }
-    .drop:hover,.drop.drag{border-color:var(--accent); background:#f7f9ff; transform:translateY(-1px)}
-    .icon{
-      width:54px;height:54px;border-radius:14px;background:#eef4ff;color:var(--accent);
-      display:grid;place-items:center;margin:0 auto 15px;font-size:25px;font-weight:800;
-    }
-    .drop h2{font-size:19px;margin:0 0 7px}
-    .drop p{color:var(--muted);margin:0}
-    .browse{color:var(--accent);font-weight:750}
-    .privacy{margin-top:14px;color:#697586;font-size:12.5px}
-    input{display:none}
-    .progress{display:none; margin-top:16px}
-    .bar{height:8px;background:#eef0f3;border-radius:999px;overflow:hidden}
-    .bar>div{height:100%;width:0;background:var(--accent);transition:width .2s}
-    .progress-row{display:flex;justify-content:space-between;gap:12px;margin-top:8px;color:var(--muted);font-size:13px}
-    .error{display:none;margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--red-bg);color:var(--red);font-weight:600}
-    #results{display:none;margin-top:22px}
-    .summary{padding:22px}
-    .summary-top{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap}
-    .filename{font-weight:800;font-size:17px;word-break:break-word}
-    .meta{color:var(--muted);font-size:13px;margin-top:3px}
-    .risk{
-      display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:850;
-      letter-spacing:.02em
-    }
-    .risk.safe{background:var(--green-bg);color:var(--green)}
-    .risk.low{background:#f2f4f7;color:#475467}
-    .risk.medium{background:var(--amber-bg);color:var(--amber)}
-    .risk.high{background:var(--red-bg);color:var(--red)}
-    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
-    .stat{padding:14px;border:1px solid var(--line);border-radius:14px;background:#fcfcfd}
-    .stat b{display:block;font-size:21px}
-    .stat span{font-size:12px;color:var(--muted)}
-    .notice{margin-top:14px;padding:12px 14px;border-radius:12px;background:#f8fafc;border:1px solid #e8ebef;color:#475467;font-size:13px}
-    .section{margin-top:18px}
-    .section-title{font-size:14px;font-weight:850;margin:0 0 10px}
-    .finding{padding:16px 17px;margin-top:10px}
-    .finding-head{display:flex;justify-content:space-between;gap:12px;align-items:center}
-    .finding-title{font-weight:800}
-    .pill{font-size:11px;font-weight:850;border-radius:999px;padding:4px 8px;white-space:nowrap}
-    .pill.high{color:var(--red);background:var(--red-bg)}
-    .pill.medium{color:var(--amber);background:var(--amber-bg)}
-    .pill.low{color:#475467;background:#f2f4f7}
-    .why{color:var(--muted);font-size:13px;margin-top:5px}
-    .evidence{
-      margin-top:11px;padding:11px 12px;background:#f8fafc;border:1px solid #e8ebef;border-radius:10px;
-      font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word
-    }
-    mark{background:#fef0c7;color:inherit;padding:0 1px;border-radius:2px}
-    .empty{padding:25px;text-align:center;color:var(--muted)}
-    .actions{display:flex;gap:9px;margin-top:16px;flex-wrap:wrap}
-    button{
-      border:0;border-radius:10px;padding:10px 13px;font:inherit;font-weight:750;cursor:pointer;
-      background:var(--accent);color:#fff
-    }
-    button:hover{background:var(--accent2)}
-    button.secondary{background:#fff;color:#344054;border:1px solid #d0d5dd}
-    button.secondary:hover{background:#f9fafb}
-    footer{text-align:center;color:#98a2b3;font-size:12px;margin-top:22px}
-    @media(max-width:720px){.wrap{padding-top:28px}.stats{grid-template-columns:repeat(2,1fr)}.upload,.summary{padding:16px}}
-  </style>
-</head>
-<body>
-<div class="wrap">
-  <header>
-    <div class="eyebrow">REVIEW INTEGRITY · LOCAL PDF ANALYSIS</div>
-    <h1>PDF Review Integrity Scanner</h1>
+---
+layout: without-sidebar
+title: "PDF Review Integrity Scanner"
+permalink: /apps/pdf-review-integrity-scanner/
+redirect_from:
+  - /apps/pdf-review-integrity-scanner.html
+excerpt: "Scan submitted PDFs for hidden or suspicious instructions that may attempt to influence peer review."
+---
+
+<style>
+.pdf-integrity-app,
+.pdf-integrity-app *,
+.pdf-integrity-app *::before,
+.pdf-integrity-app *::after { box-sizing:border-box; }
+
+.pdf-integrity-app {
+  width:min(1100px,calc(100% - 24px));
+  margin:.5rem auto 1.5rem;
+  color:var(--global-text-color);
+  font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+.pis-header { text-align:center; margin-bottom:24px; }
+
+.pis-eyebrow {
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  padding:6px 10px;
+  border:1px solid var(--global-border-color);
+  border-radius:999px;
+  background:rgba(127,127,127,.04);
+  color:var(--global-link-color);
+  font-size:12px;
+  font-weight:750;
+  letter-spacing:.03em;
+}
+
+.pis-title {
+  margin:14px 0 10px;
+  color:var(--global-text-color);
+  font-size:clamp(30px,5vw,46px);
+  line-height:1.06;
+  letter-spacing:-.035em;
+}
+
+.pis-header p {
+  max-width:760px;
+  margin:0 auto;
+  color:var(--global-text-color);
+  opacity:.68;
+  font-size:16px;
+}
+
+.pis-card {
+  border:1px solid var(--global-border-color);
+  border-radius:18px;
+  background:var(--global-bg-color);
+  box-shadow:0 12px 35px rgba(0,0,0,.07);
+}
+
+.pis-upload,
+.pis-summary { padding:20px; }
+
+.pis-drop {
+  min-height:230px;
+  display:grid;
+  place-items:center;
+  padding:30px 20px;
+  border:1.5px dashed rgba(127,127,127,.5);
+  border-radius:14px;
+  background:rgba(127,127,127,.025);
+  text-align:center;
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.pis-drop:hover,
+.pis-drop.drag {
+  border-color:var(--global-link-color);
+  background:rgba(80,120,200,.06);
+}
+
+.pis-icon {
+  width:54px;
+  height:54px;
+  display:grid;
+  place-items:center;
+  margin:0 auto 15px;
+  border-radius:14px;
+  background:rgba(80,120,200,.10);
+  color:var(--global-link-color);
+  font-size:22px;
+  font-weight:800;
+}
+
+.pis-drop h2 {
+  margin:0 0 7px;
+  color:var(--global-text-color);
+  font-size:19px;
+}
+
+.pis-drop p {
+  margin:0;
+  color:var(--global-text-color);
+  opacity:.62;
+}
+
+.pis-browse { color:var(--global-link-color); font-weight:750; }
+.pis-privacy { margin-top:14px; color:var(--global-text-color); opacity:.52; font-size:12.5px; }
+
+.pis-progress { display:none; margin-top:16px; }
+.pis-bar { height:8px; overflow:hidden; border-radius:999px; background:rgba(127,127,127,.12); }
+.pis-bar > div { height:100%; width:0; background:var(--global-link-color); transition:width .2s; }
+
+.pis-progress-row {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:8px;
+  color:var(--global-text-color);
+  opacity:.6;
+  font-size:13px;
+}
+
+.pis-error {
+  display:none;
+  margin-top:14px;
+  padding:12px 14px;
+  border:1px solid rgba(180,35,24,.25);
+  border-radius:12px;
+  background:rgba(180,35,24,.08);
+  color:#b42318;
+  font-weight:600;
+}
+
+html[data-theme="dark"] .pis-error { color:#ffaaa3; }
+
+#pis-results { display:none; margin-top:22px; }
+
+.pis-summary-top {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+  flex-wrap:wrap;
+}
+
+.pis-filename {
+  color:var(--global-text-color);
+  font-weight:800;
+  font-size:17px;
+  word-break:break-word;
+}
+
+.pis-meta { color:var(--global-text-color); opacity:.58; font-size:13px; margin-top:3px; }
+
+.pis-risk {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:7px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:850;
+  letter-spacing:.02em;
+}
+
+.pis-risk.safe { background:rgba(6,118,71,.10); color:#067647; }
+.pis-risk.low { background:rgba(127,127,127,.09); color:var(--global-text-color); }
+.pis-risk.medium { background:rgba(181,71,8,.10); color:#b54708; }
+.pis-risk.high { background:rgba(180,35,24,.10); color:#b42318; }
+
+html[data-theme="dark"] .pis-risk.safe { color:#83d7ae; }
+html[data-theme="dark"] .pis-risk.medium { color:#ffbf72; }
+html[data-theme="dark"] .pis-risk.high { color:#ff9f9f; }
+
+.pis-stats {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:18px;
+}
+
+.pis-stat {
+  padding:14px;
+  border:1px solid var(--global-border-color);
+  border-radius:12px;
+  background:rgba(127,127,127,.025);
+}
+
+.pis-stat b { display:block; color:var(--global-text-color); font-size:21px; }
+.pis-stat span { color:var(--global-text-color); opacity:.55; font-size:12px; }
+
+.pis-notice {
+  margin-top:14px;
+  padding:12px 14px;
+  border:1px solid var(--global-border-color);
+  border-radius:12px;
+  background:rgba(127,127,127,.025);
+  color:var(--global-text-color);
+  opacity:.78;
+  font-size:13px;
+}
+
+.pis-actions { display:flex; gap:9px; margin-top:16px; flex-wrap:wrap; }
+
+.pis-btn {
+  min-height:40px;
+  padding:0 13px;
+  border:1px solid rgba(45,45,45,.42);
+  border-radius:999px;
+  background:rgba(45,45,45,.08);
+  color:var(--global-text-color);
+  font:inherit;
+  font-weight:750;
+  cursor:pointer;
+}
+
+.pis-btn:hover { background:rgba(45,45,45,.14); }
+
+html[data-theme="dark"] .pis-btn {
+  border-color:rgba(255,255,255,.22);
+  background:rgba(255,255,255,.06);
+}
+
+.pis-section { margin-top:18px; }
+.pis-section-title { margin:0 0 10px; color:var(--global-text-color); font-size:14px; font-weight:850; }
+.pis-finding { padding:16px 17px; margin-top:10px; }
+.pis-finding-head { display:flex; justify-content:space-between; gap:12px; align-items:center; }
+.pis-finding-title { color:var(--global-text-color); font-weight:800; }
+
+.pis-pill {
+  padding:4px 8px;
+  border-radius:999px;
+  white-space:nowrap;
+  font-size:11px;
+  font-weight:850;
+}
+
+.pis-pill.high { color:#b42318; background:rgba(180,35,24,.10); }
+.pis-pill.medium { color:#b54708; background:rgba(181,71,8,.10); }
+.pis-pill.low { color:var(--global-text-color); background:rgba(127,127,127,.09); }
+
+html[data-theme="dark"] .pis-pill.high { color:#ff9f9f; }
+html[data-theme="dark"] .pis-pill.medium { color:#ffbf72; }
+
+.pis-why { margin-top:5px; color:var(--global-text-color); opacity:.6; font-size:13px; }
+
+.pis-evidence {
+  margin-top:11px;
+  padding:11px 12px;
+  border:1px solid var(--global-border-color);
+  border-radius:10px;
+  background:rgba(127,127,127,.025);
+  color:var(--global-text-color);
+  font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+
+.pis-empty { padding:25px; text-align:center; color:var(--global-text-color); opacity:.6; }
+.pis-footer { margin-top:20px; color:var(--global-text-color); opacity:.4; text-align:center; font-size:12px; }
+
+@media(max-width:720px) {
+  .pdf-integrity-app { width:100%; }
+  .pis-stats { grid-template-columns:repeat(2,1fr); }
+  .pis-upload,.pis-summary { padding:16px; }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .pdf-integrity-app *,
+  .pdf-integrity-app *::before,
+  .pdf-integrity-app *::after { transition-duration:.001ms!important; scroll-behavior:auto!important; }
+}
+</style>
+
+<div class="pdf-integrity-app">
+  <header class="pis-header">
+    <div class="pis-eyebrow">REVIEW INTEGRITY · LOCAL PDF ANALYSIS</div>
+    <h1 class="pis-title">PDF Review Integrity Scanner</h1>
     <p>Detect suspicious or hidden instructions that may be intended to influence a peer reviewer, automated reviewer, or AI-assisted review process.</p>
   </header>
 
-  <section class="card upload">
-    <div class="drop" id="dropZone" tabindex="0" role="button" aria-label="Choose PDF">
+  <section class="pis-card pis-upload">
+    <div class="pis-drop" id="pis-drop-zone" tabindex="0" role="button" aria-label="Choose PDF">
       <div>
-        <div class="icon">PDF</div>
+        <div class="pis-icon">PDF</div>
         <h2>Drop a submitted PDF here</h2>
-        <p>or <span class="browse">browse your computer</span></p>
-        <div class="privacy">The PDF is processed in your browser. It is not uploaded by this page.</div>
+        <p>or <span class="pis-browse">browse your computer</span></p>
+        <div class="pis-privacy">The PDF is processed in your browser. It is not uploaded by this page.</div>
       </div>
     </div>
-    <input id="fileInput" type="file" accept="application/pdf,.pdf" />
-    <div class="progress" id="progress">
-      <div class="bar"><div id="barFill"></div></div>
-      <div class="progress-row"><span id="progressText">Reading PDF…</span><span id="progressPct">0%</span></div>
+
+    <input id="pis-file-input" type="file" accept="application/pdf,.pdf" hidden>
+
+    <div class="pis-progress" id="pis-progress">
+      <div class="pis-bar"><div id="pis-bar-fill"></div></div>
+      <div class="pis-progress-row">
+        <span id="pis-progress-text">Reading PDF…</span>
+        <span id="pis-progress-pct">0%</span>
+      </div>
     </div>
-    <div class="error" id="errorBox"></div>
+
+    <div class="pis-error" id="pis-error-box"></div>
   </section>
 
-  <section id="results">
-    <div class="card summary">
-      <div class="summary-top">
+  <section id="pis-results">
+    <div class="pis-card pis-summary">
+      <div class="pis-summary-top">
         <div>
-          <div class="filename" id="filename"></div>
-          <div class="meta" id="filemeta"></div>
+          <div class="pis-filename" id="pis-filename"></div>
+          <div class="pis-meta" id="pis-filemeta"></div>
         </div>
-        <div class="risk safe" id="overallRisk">NO STRONG SIGNALS</div>
+        <div class="pis-risk safe" id="pis-overall-risk">NO STRONG SIGNALS</div>
       </div>
-      <div class="stats">
-        <div class="stat"><b id="pagesStat">0</b><span>Pages scanned</span></div>
-        <div class="stat"><b id="textStat">0</b><span>Text fragments</span></div>
-        <div class="stat"><b id="hiddenStat">0</b><span>Hidden-text signals</span></div>
-        <div class="stat"><b id="findingsStat">0</b><span>Suspicious findings</span></div>
+
+      <div class="pis-stats">
+        <div class="pis-stat"><b id="pis-pages-stat">0</b><span>Pages scanned</span></div>
+        <div class="pis-stat"><b id="pis-text-stat">0</b><span>Text fragments</span></div>
+        <div class="pis-stat"><b id="pis-hidden-stat">0</b><span>Hidden-text signals</span></div>
+        <div class="pis-stat"><b id="pis-findings-stat">0</b><span>Suspicious findings</span></div>
       </div>
-      <div class="notice">
+
+      <div class="pis-notice">
         This is a heuristic integrity check, not proof of misconduct. Always inspect flagged passages in context before making an editorial or review decision.
       </div>
-      <div class="actions">
-        <button class="secondary" id="scanAnother">Scan another PDF</button>
-        <button class="secondary" id="copyReport">Copy report</button>
+
+      <div class="pis-actions">
+        <button class="pis-btn" id="pis-scan-another" type="button">Scan another PDF</button>
+        <button class="pis-btn" id="pis-copy-report" type="button">Copy report</button>
       </div>
     </div>
 
-    <div class="section">
-      <h3 class="section-title">Findings</h3>
-      <div id="findings"></div>
+    <div class="pis-section">
+      <h3 class="pis-section-title">Findings</h3>
+      <div id="pis-findings"></div>
     </div>
   </section>
 
-  <footer>Designed to surface review-influencing instructions, prompt-injection patterns, and suspiciously hidden text.</footer>
+  <footer class="pis-footer">
+    Designed to surface review-influencing instructions, prompt-injection patterns, and suspiciously hidden text.
+  </footer>
 </div>
 
 <script type="module">
-  import * as pdfjsLib from "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.2.108/build/pdf.mjs";
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.2.108/build/pdf.worker.mjs";
+import * as pdfjsLib from "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.2.108/build/pdf.mjs";
 
-  const $ = s => document.querySelector(s);
-  const dropZone = $("#dropZone"), fileInput = $("#fileInput"), results = $("#results");
-  const progress = $("#progress"), barFill = $("#barFill"), progressText = $("#progressText"), progressPct = $("#progressPct");
-  const errorBox = $("#errorBox");
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.2.108/build/pdf.worker.mjs";
 
-  let lastReport = null;
+const byId = id => document.getElementById(id);
 
-  const RULES = [
-    {
-      id:"direct-review-command", weight:7, label:"Direct instruction to reviewer",
-      re:/\b(?:reviewer|peer reviewer|evaluator|referee)\b.{0,90}\b(?:must|should|please|kindly|need to|have to)\b.{0,100}\b(?:accept|recommend|approve|score|rate|give|assign|ignore|overlook|praise|favor|favour)\b/gi
-    },
-    {
-      id:"decision-manipulation", weight:8, label:"Attempt to influence review outcome",
-      re:/\b(?:accept (?:this|the) (?:paper|manuscript|submission)|recommend acceptance|give (?:this|the) (?:paper|manuscript|submission).{0,30}(?:high|maximum|positive).{0,20}(?:score|rating)|rate (?:this|the) (?:paper|manuscript).{0,30}(?:high|positively)|do not reject|must be accepted)\b/gi
-    },
-    {
-      id:"prompt-injection", weight:8, label:"Prompt-injection style instruction",
-      re:/\b(?:ignore|disregard|forget|override)\b.{0,45}\b(?:previous|prior|earlier|system|review|reviewer|instructions?|criteria|guidelines?|prompt)\b/gi
-    },
-    {
-      id:"ai-reviewer", weight:7, label:"Instruction targeting an AI reviewer",
-      re:/\b(?:chatgpt|gpt-?\d*|large language model|llm|ai (?:reviewer|review|system|assistant)|automated reviewer)\b.{0,120}\b(?:ignore|follow|must|should|accept|recommend|score|rate|output|respond|say|write)\b/gi
-    },
-    {
-      id:"secrecy", weight:6, label:"Instruction to conceal the manipulation",
-      re:/\b(?:do not|don't|never)\b.{0,45}\b(?:mention|reveal|disclose|report|tell|acknowledge)\b.{0,80}\b(?:instruction|prompt|text|message|review|reviewer|author)\b/gi
-    },
-    {
-      id:"identity-control", weight:6, label:"Reviewer-role manipulation",
-      re:/\b(?:you are|act as|behave as|pretend (?:to be|you are))\b.{0,60}\b(?:reviewer|peer reviewer|editor|referee|expert evaluator)\b/gi
-    },
-    {
-      id:"positive-language", weight:4, label:"Suspicious positive-review instruction",
-      re:/\b(?:write|produce|provide|return|give)\b.{0,60}\b(?:positive|favorable|favourable|enthusiastic|strong)\b.{0,30}\b(?:review|recommendation|assessment|evaluation)\b/gi
-    },
-    {
-      id:"review-score", weight:4, label:"Suspicious scoring instruction",
-      re:/\b(?:score|rating|recommendation)\b.{0,35}\b(?:must|should|set|give|assign|be)\b.{0,25}\b(?:[89]|10|high|maximum|highest|accept|strong accept)\b/gi
+const dropZone = byId("pis-drop-zone");
+const fileInput = byId("pis-file-input");
+const results = byId("pis-results");
+const progress = byId("pis-progress");
+const barFill = byId("pis-bar-fill");
+const progressText = byId("pis-progress-text");
+const progressPct = byId("pis-progress-pct");
+const errorBox = byId("pis-error-box");
+
+let lastReport = null;
+
+const RULES = [
+  {
+    id:"direct-review-command", weight:7, label:"Direct instruction to reviewer",
+    re:/\b(?:reviewer|peer reviewer|evaluator|referee)\b.{0,90}\b(?:must|should|please|kindly|need to|have to)\b.{0,100}\b(?:accept|recommend|approve|score|rate|give|assign|ignore|overlook|praise|favor|favour)\b/gi
+  },
+  {
+    id:"decision-manipulation", weight:8, label:"Attempt to influence review outcome",
+    re:/\b(?:accept (?:this|the) (?:paper|manuscript|submission)|recommend acceptance|give (?:this|the) (?:paper|manuscript|submission).{0,30}(?:high|maximum|positive).{0,20}(?:score|rating)|rate (?:this|the) (?:paper|manuscript).{0,30}(?:high|positively)|do not reject|must be accepted)\b/gi
+  },
+  {
+    id:"prompt-injection", weight:8, label:"Prompt-injection style instruction",
+    re:/\b(?:ignore|disregard|forget|override)\b.{0,45}\b(?:previous|prior|earlier|system|review|reviewer|instructions?|criteria|guidelines?|prompt)\b/gi
+  },
+  {
+    id:"ai-reviewer", weight:7, label:"Instruction targeting an AI reviewer",
+    re:/\b(?:chatgpt|gpt-?\d*|large language model|llm|ai (?:reviewer|review|system|assistant)|automated reviewer)\b.{0,120}\b(?:ignore|follow|must|should|accept|recommend|score|rate|output|respond|say|write)\b/gi
+  },
+  {
+    id:"secrecy", weight:6, label:"Instruction to conceal the manipulation",
+    re:/\b(?:do not|don't|never)\b.{0,45}\b(?:mention|reveal|disclose|report|tell|acknowledge)\b.{0,80}\b(?:instruction|prompt|text|message|review|reviewer|author)\b/gi
+  },
+  {
+    id:"identity-control", weight:6, label:"Reviewer-role manipulation",
+    re:/\b(?:you are|act as|behave as|pretend (?:to be|you are))\b.{0,60}\b(?:reviewer|peer reviewer|editor|referee|expert evaluator)\b/gi
+  },
+  {
+    id:"positive-language", weight:4, label:"Suspicious positive-review instruction",
+    re:/\b(?:write|produce|provide|return|give)\b.{0,60}\b(?:positive|favorable|favourable|enthusiastic|strong)\b.{0,30}\b(?:review|recommendation|assessment|evaluation)\b/gi
+  },
+  {
+    id:"review-score", weight:4, label:"Suspicious scoring instruction",
+    re:/\b(?:score|rating|recommendation)\b.{0,35}\b(?:must|should|set|give|assign|be)\b.{0,25}\b(?:[89]|10|high|maximum|highest|accept|strong accept)\b/gi
+  }
+];
+
+const normalize = value =>
+  value.replace(/\u0000/g,"").replace(/\s+/g," ").trim();
+
+const escapeHtml = value =>
+  value.replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    "\"":"&quot;",
+    "'":"&#039;"
+  })[char]);
+
+const sizeMB = bytes =>
+  (bytes / 1024 / 1024).toFixed(2) + " MB";
+
+function setProgress(percent, text) {
+  progress.style.display = "block";
+  const value = Math.max(0, Math.min(100, Math.round(percent)));
+  barFill.style.width = value + "%";
+  progressPct.textContent = value + "%";
+  progressText.textContent = text;
+}
+
+function severity(score) {
+  if (score >= 12) return "high";
+  if (score >= 7) return "medium";
+  return "low";
+}
+
+function contextAround(text, start, end, radius = 170) {
+  const from = Math.max(0, start - radius);
+  const to = Math.min(text.length, end + radius);
+  return (from > 0 ? "…" : "") + text.slice(from, to) + (to < text.length ? "…" : "");
+}
+
+function scanRules(text, pageNum, hiddenBoost = 0, hiddenReasons = []) {
+  const findings = [];
+
+  for (const rule of RULES) {
+    rule.re.lastIndex = 0;
+    let match;
+
+    while ((match = rule.re.exec(text)) !== null) {
+      const score = rule.weight + hiddenBoost;
+
+      findings.push({
+        page: pageNum,
+        type: rule.label,
+        score,
+        severity: severity(score),
+        evidence: contextAround(text, match.index, match.index + match[0].length),
+        match: match[0],
+        reasons: [...hiddenReasons],
+        rule: rule.id
+      });
+
+      if (match.index === rule.re.lastIndex) {
+        rule.re.lastIndex++;
+      }
     }
+  }
+
+  return findings;
+}
+
+function mergeNearby(items) {
+  items.sort((a,b) => a.page - b.page || b.score - a.score);
+
+  const merged = [];
+
+  for (const finding of items) {
+    const duplicate = merged.find(item =>
+      item.page === finding.page &&
+      (item.evidence.includes(finding.match) || finding.evidence.includes(item.match)) &&
+      Math.abs(item.score - finding.score) <= 5
+    );
+
+    if (duplicate) {
+      if (finding.score > duplicate.score) {
+        duplicate.score = finding.score;
+        duplicate.severity = finding.severity;
+        duplicate.type = finding.type;
+      }
+
+      duplicate.reasons = [...new Set([...duplicate.reasons, ...finding.reasons])];
+    } else {
+      merged.push(finding);
+    }
+  }
+
+  return merged;
+}
+
+async function analyzePdf(file) {
+  errorBox.style.display = "none";
+  results.style.display = "none";
+  setProgress(3, "Loading PDF…");
+
+  const data = new Uint8Array(await file.arrayBuffer());
+  const pdf = await pdfjsLib.getDocument({data}).promise;
+
+  const findings = [];
+  const hiddenSignals = [];
+
+  let fragmentCount = 0;
+  let allExtracted = "";
+
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+    setProgress(
+      5 + (pageNumber - 1) / pdf.numPages * 86,
+      `Scanning page ${pageNumber} of ${pdf.numPages}…`
+    );
+
+    const page = await pdf.getPage(pageNumber);
+    const viewport = page.getViewport({scale:1});
+    const textContent = await page.getTextContent({includeMarkedContent:true});
+    const textItems = textContent.items.filter(item =>
+      typeof item.str === "string" && item.str.trim()
+    );
+
+    fragmentCount += textItems.length;
+
+    const pageText = normalize(textItems.map(item => item.str).join(" "));
+    allExtracted += "\n" + pageText;
+
+    findings.push(...scanRules(pageText, pageNumber, 0, []));
+
+    for (const item of textItems) {
+      const text = normalize(item.str);
+      if (!text) continue;
+
+      const transform = item.transform || [1,0,0,1,0,0];
+      const fontHeight = Math.max(
+        Math.hypot(transform[2], transform[3]),
+        Math.hypot(transform[0], transform[1])
+      );
+
+      const x = transform[4] || 0;
+      const y = transform[5] || 0;
+
+      const outside =
+        x < -5 || x > viewport.width + 5 ||
+        y < -5 || y > viewport.height + 5;
+
+      const tiny = fontHeight > 0 && fontHeight < 3.5;
+      const nearlyZero = fontHeight > 0 && fontHeight < 1.1;
+
+      let boost = 0;
+      const reasons = [];
+
+      if (outside) {
+        boost += 5;
+        reasons.push("text positioned outside the normal page area");
+      }
+
+      if (tiny) {
+        boost += 4;
+        reasons.push(`very small text (~${fontHeight.toFixed(1)} pt-equivalent)`);
+      }
+
+      if (nearlyZero) {
+        boost += 3;
+        reasons.push("near-zero-size text");
+      }
+
+      if (reasons.length) {
+        hiddenSignals.push({
+          page: pageNumber,
+          text,
+          reasons
+        });
+
+        findings.push(...scanRules(text, pageNumber, boost, reasons));
+      }
+    }
+
+    try {
+      const opList = await page.getOperatorList();
+      const OPS = pdfjsLib.OPS;
+
+      let renderMode = 0;
+      let invisibleRuns = 0;
+
+      for (let index = 0; index < opList.fnArray.length; index++) {
+        const fn = opList.fnArray[index];
+        const args = opList.argsArray[index];
+
+        if (fn === OPS.setTextRenderingMode) {
+          renderMode = Number(args?.[0] ?? 0);
+        } else if (
+          renderMode === 3 &&
+          (
+            fn === OPS.showText ||
+            fn === OPS.showSpacedText ||
+            fn === OPS.nextLineShowText ||
+            fn === OPS.nextLineSetSpacingShowText
+          )
+        ) {
+          invisibleRuns++;
+        }
+      }
+
+      if (invisibleRuns) {
+        hiddenSignals.push({
+          page: pageNumber,
+          text: "",
+          reasons: [`${invisibleRuns} invisible PDF text-rendering operation(s) detected`]
+        });
+
+        for (const finding of findings) {
+          if (finding.page === pageNumber) {
+            finding.score += 3;
+            finding.severity = severity(finding.score);
+            finding.reasons = [
+              ...new Set([
+                ...finding.reasons,
+                "page contains invisible text-rendering operations"
+              ])
+            ];
+          }
+        }
+      }
+    } catch (error) {
+      console.warn("Operator-list inspection skipped on page", pageNumber, error);
+    }
+  }
+
+  setProgress(94, "Evaluating findings…");
+
+  const documentFindings = scanRules(normalize(allExtracted), 0, 0, []);
+
+  if (!findings.length && documentFindings.length) {
+    for (const finding of documentFindings.slice(0,5)) {
+      finding.page = "Document";
+      findings.push(finding);
+    }
+  }
+
+  const merged = mergeNearby(findings).sort(
+    (a,b) => b.score - a.score || (Number(a.page) || 0) - (Number(b.page) || 0)
+  );
+
+  const maxScore = merged.length
+    ? Math.max(...merged.map(finding => finding.score))
+    : 0;
+
+  let overall = "safe";
+
+  if (maxScore >= 12) overall = "high";
+  else if (maxScore >= 7) overall = "medium";
+  else if (maxScore > 0) overall = "low";
+
+  setProgress(100, "Scan complete");
+
+  setTimeout(() => {
+    progress.style.display = "none";
+  }, 350);
+
+  return {
+    file,
+    pdfPages: pdf.numPages,
+    fragmentCount,
+    hiddenSignals,
+    findings: merged,
+    overall
+  };
+}
+
+function renderReport(report) {
+  lastReport = report;
+
+  byId("pis-filename").textContent = report.file.name;
+  byId("pis-filemeta").textContent = `${sizeMB(report.file.size)} · PDF`;
+  byId("pis-pages-stat").textContent = report.pdfPages;
+  byId("pis-text-stat").textContent = report.fragmentCount.toLocaleString();
+  byId("pis-hidden-stat").textContent = report.hiddenSignals.length;
+  byId("pis-findings-stat").textContent = report.findings.length;
+
+  const risk = byId("pis-overall-risk");
+  risk.className = "pis-risk " + report.overall;
+
+  risk.textContent = ({
+    safe: "NO STRONG SIGNALS",
+    low: "LOW-CONFIDENCE SIGNAL",
+    medium: "REVIEW RECOMMENDED",
+    high: "HIGH-RISK FINDING"
+  })[report.overall];
+
+  const box = byId("pis-findings");
+  box.innerHTML = "";
+
+  if (!report.findings.length) {
+    box.innerHTML =
+      '<div class="pis-card pis-empty">No review-influencing instruction matched the current detection rules.</div>';
+  } else {
+    report.findings.forEach(finding => {
+      const why = finding.reasons.length
+        ? "Visibility signals: " + finding.reasons.join("; ") + "."
+        : "Matched language associated with reviewer manipulation or prompt injection.";
+
+      const article = document.createElement("article");
+      article.className = "pis-card pis-finding";
+
+      article.innerHTML = `
+        <div class="pis-finding-head">
+          <div class="pis-finding-title">Page ${escapeHtml(String(finding.page))} · ${escapeHtml(finding.type)}</div>
+          <span class="pis-pill ${finding.severity}">${finding.severity.toUpperCase()}</span>
+        </div>
+        <div class="pis-why">${escapeHtml(why)} Risk score: ${finding.score}.</div>
+        <div class="pis-evidence">${escapeHtml(finding.evidence)}</div>`;
+
+      box.appendChild(article);
+    });
+  }
+
+  results.style.display = "block";
+  results.scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function reportText(report) {
+  const lines = [
+    "PDF REVIEW INTEGRITY SCAN",
+    `File: ${report.file.name}`,
+    `Pages: ${report.pdfPages}`,
+    `Overall: ${report.overall.toUpperCase()}`,
+    `Hidden-text signals: ${report.hiddenSignals.length}`,
+    `Suspicious findings: ${report.findings.length}`,
+    ""
   ];
 
-  const normalize = s => s.replace(/\u0000/g,"").replace(/\s+/g," ").trim();
-  const esc = s => s.replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
-  const sizeMB = n => (n/1024/1024).toFixed(2) + " MB";
-
-  function setProgress(p, text){
-    progress.style.display="block";
-    const v = Math.max(0,Math.min(100,Math.round(p)));
-    barFill.style.width=v+"%"; progressPct.textContent=v+"%"; progressText.textContent=text;
+  if (!report.findings.length) {
+    lines.push("No matching review-influencing instruction was detected.");
   }
 
-  function severity(score){
-    if(score >= 12) return "high";
-    if(score >= 7) return "medium";
-    return "low";
-  }
+  report.findings.forEach((finding,index) => {
+    lines.push(`${index + 1}. Page ${finding.page} — ${finding.type} [${finding.severity.toUpperCase()}]`);
+    lines.push(`   Score: ${finding.score}`);
 
-  function contextAround(text, start, end, radius=170){
-    const a=Math.max(0,start-radius), b=Math.min(text.length,end+radius);
-    return (a>0?"…":"") + text.slice(a,b) + (b<text.length?"…":"");
-  }
-
-  function scanRules(text, pageNum, hiddenBoost=0, hiddenReasons=[]){
-    const out=[];
-    for(const rule of RULES){
-      rule.re.lastIndex=0;
-      let m;
-      while((m=rule.re.exec(text)) !== null){
-        const score = rule.weight + hiddenBoost;
-        out.push({
-          page:pageNum, type:rule.label, score, severity:severity(score),
-          evidence:contextAround(text,m.index,m.index+m[0].length),
-          match:m[0], reasons:[...hiddenReasons],
-          rule:rule.id
-        });
-        if(m.index === rule.re.lastIndex) rule.re.lastIndex++;
-      }
-    }
-    return out;
-  }
-
-  function mergeNearby(items){
-    items.sort((a,b)=>a.page-b.page || b.score-a.score);
-    const merged=[];
-    for(const f of items){
-      const duplicate=merged.find(x =>
-        x.page===f.page &&
-        (x.evidence.includes(f.match) || f.evidence.includes(x.match)) &&
-        Math.abs(x.score-f.score)<=5
-      );
-      if(duplicate){
-        if(f.score>duplicate.score){ duplicate.score=f.score; duplicate.severity=f.severity; duplicate.type=f.type; }
-        duplicate.reasons=[...new Set([...duplicate.reasons,...f.reasons])];
-      } else merged.push(f);
-    }
-    return merged;
-  }
-
-  async function analyzePdf(file){
-    errorBox.style.display="none";
-    results.style.display="none";
-    setProgress(3,"Loading PDF…");
-
-    const data = new Uint8Array(await file.arrayBuffer());
-    const pdf = await pdfjsLib.getDocument({data}).promise;
-    const findings=[], hiddenSignals=[];
-    let fragmentCount=0, allExtracted="";
-
-    for(let p=1;p<=pdf.numPages;p++){
-      setProgress(5 + (p-1)/pdf.numPages*86, `Scanning page ${p} of ${pdf.numPages}…`);
-      const page=await pdf.getPage(p);
-      const viewport=page.getViewport({scale:1});
-      const tc=await page.getTextContent({includeMarkedContent:true});
-      const textItems=tc.items.filter(x => typeof x.str==="string" && x.str.trim());
-      fragmentCount += textItems.length;
-
-      const pageText=normalize(textItems.map(x=>x.str).join(" "));
-      allExtracted += "\n" + pageText;
-
-      // Normal text scan.
-      findings.push(...scanRules(pageText,p,0,[]));
-
-      // Fragment-level visibility heuristics.
-      for(const item of textItems){
-        const t=normalize(item.str);
-        if(!t) continue;
-        const tr=item.transform || [1,0,0,1,0,0];
-        const fontHeight=Math.max(Math.hypot(tr[2],tr[3]), Math.hypot(tr[0],tr[1]));
-        const x=tr[4]||0, y=tr[5]||0;
-        const outside = x < -5 || x > viewport.width+5 || y < -5 || y > viewport.height+5;
-        const tiny = fontHeight > 0 && fontHeight < 3.5;
-        const nearlyZero = fontHeight > 0 && fontHeight < 1.1;
-
-        let boost=0; const reasons=[];
-        if(outside){ boost+=5; reasons.push("text positioned outside the normal page area"); }
-        if(tiny){ boost+=4; reasons.push(`very small text (~${fontHeight.toFixed(1)} pt-equivalent)`); }
-        if(nearlyZero){ boost+=3; reasons.push("near-zero-size text"); }
-
-        if(reasons.length){
-          hiddenSignals.push({page:p,text:t,reasons});
-          findings.push(...scanRules(t,p,boost,reasons));
-        }
-      }
-
-      // Content-stream rendering-mode check. Rendering mode 3 = invisible text in PDF.
-      try{
-        const opList=await page.getOperatorList();
-        const OPS=pdfjsLib.OPS;
-        let renderMode=0;
-        let invisibleRuns=0;
-        for(let i=0;i<opList.fnArray.length;i++){
-          const fn=opList.fnArray[i], args=opList.argsArray[i];
-          if(fn===OPS.setTextRenderingMode){
-            renderMode = Number(args?.[0] ?? 0);
-          } else if(renderMode===3 && (fn===OPS.showText || fn===OPS.showSpacedText || fn===OPS.nextLineShowText || fn===OPS.nextLineSetSpacingShowText)){
-            invisibleRuns++;
-          }
-        }
-        if(invisibleRuns){
-          hiddenSignals.push({page:p,text:"",reasons:[`${invisibleRuns} invisible PDF text-rendering operation(s) detected`]});
-          // If the page already contains suspicious linguistic content, raise its confidence.
-          for(const f of findings){
-            if(f.page===p){
-              f.score += 3;
-              f.severity=severity(f.score);
-              f.reasons=[...new Set([...f.reasons,"page contains invisible text-rendering operations"])];
-            }
-          }
-        }
-      }catch(e){
-        console.warn("Operator-list inspection skipped on page",p,e);
-      }
+    if (finding.reasons.length) {
+      lines.push(`   Visibility: ${finding.reasons.join("; ")}`);
     }
 
-    setProgress(94,"Evaluating findings…");
-
-    // Whole-document scan catches phrases split across page text fragments.
-    const docFindings=scanRules(normalize(allExtracted),0,0,[]);
-    // Keep page-specific results as primary; only add doc-level result if nothing else caught.
-    if(!findings.length && docFindings.length){
-      for(const d of docFindings.slice(0,5)){
-        d.page="Document";
-        findings.push(d);
-      }
-    }
-
-    const merged=mergeNearby(findings).sort((a,b)=>b.score-a.score || (Number(a.page)||0)-(Number(b.page)||0));
-    const maxScore=merged.length ? Math.max(...merged.map(f=>f.score)) : 0;
-    let overall="safe";
-    if(maxScore>=12) overall="high";
-    else if(maxScore>=7) overall="medium";
-    else if(maxScore>0) overall="low";
-
-    setProgress(100,"Scan complete");
-    setTimeout(()=>progress.style.display="none",350);
-
-    return {file,pdfPages:pdf.numPages,fragmentCount,hiddenSignals,findings:merged,overall};
-  }
-
-  function renderReport(r){
-    lastReport=r;
-    $("#filename").textContent=r.file.name;
-    $("#filemeta").textContent=`${sizeMB(r.file.size)} · PDF`;
-    $("#pagesStat").textContent=r.pdfPages;
-    $("#textStat").textContent=r.fragmentCount.toLocaleString();
-    $("#hiddenStat").textContent=r.hiddenSignals.length;
-    $("#findingsStat").textContent=r.findings.length;
-
-    const risk=$("#overallRisk");
-    risk.className="risk "+r.overall;
-    risk.textContent = ({
-      safe:"NO STRONG SIGNALS",
-      low:"LOW-CONFIDENCE SIGNAL",
-      medium:"REVIEW RECOMMENDED",
-      high:"HIGH-RISK FINDING"
-    })[r.overall];
-
-    const box=$("#findings");
-    box.innerHTML="";
-    if(!r.findings.length){
-      box.innerHTML=`<div class="card empty">No review-influencing instruction matched the current detection rules.</div>`;
-    }else{
-      r.findings.forEach((f,i)=>{
-        const why = f.reasons.length
-          ? "Visibility signals: " + f.reasons.join("; ") + "."
-          : "Matched language associated with reviewer manipulation or prompt injection.";
-        const div=document.createElement("article");
-        div.className="card finding";
-        div.innerHTML=`
-          <div class="finding-head">
-            <div class="finding-title">Page ${esc(String(f.page))} · ${esc(f.type)}</div>
-            <span class="pill ${f.severity}">${f.severity.toUpperCase()}</span>
-          </div>
-          <div class="why">${esc(why)} Risk score: ${f.score}.</div>
-          <div class="evidence">${esc(f.evidence)}</div>`;
-        box.appendChild(div);
-      });
-    }
-    results.style.display="block";
-    results.scrollIntoView({behavior:"smooth",block:"start"});
-  }
-
-  function reportText(r){
-    const lines=[
-      "PDF REVIEW INTEGRITY SCAN",
-      `File: ${r.file.name}`,
-      `Pages: ${r.pdfPages}`,
-      `Overall: ${r.overall.toUpperCase()}`,
-      `Hidden-text signals: ${r.hiddenSignals.length}`,
-      `Suspicious findings: ${r.findings.length}`,
-      ""
-    ];
-    if(!r.findings.length) lines.push("No matching review-influencing instruction was detected.");
-    r.findings.forEach((f,i)=>{
-      lines.push(`${i+1}. Page ${f.page} — ${f.type} [${f.severity.toUpperCase()}]`);
-      lines.push(`   Score: ${f.score}`);
-      if(f.reasons.length) lines.push(`   Visibility: ${f.reasons.join("; ")}`);
-      lines.push(`   Evidence: ${f.evidence}`);
-      lines.push("");
-    });
-    lines.push("Note: Heuristic screening only; inspect flagged content in context.");
-    return lines.join("\n");
-  }
-
-  async function handleFile(file){
-    if(!file) return;
-    if(file.type!=="application/pdf" && !file.name.toLowerCase().endsWith(".pdf")){
-      errorBox.textContent="Please choose a PDF file.";
-      errorBox.style.display="block";
-      return;
-    }
-    try{
-      const report=await analyzePdf(file);
-      renderReport(report);
-    }catch(err){
-      console.error(err);
-      progress.style.display="none";
-      errorBox.textContent="The PDF could not be analyzed. It may be encrypted, malformed, or unsupported by the browser PDF engine.";
-      errorBox.style.display="block";
-    }
-  }
-
-  dropZone.addEventListener("click",()=>fileInput.click());
-  dropZone.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();fileInput.click();}});
-  fileInput.addEventListener("change",e=>handleFile(e.target.files[0]));
-  ["dragenter","dragover"].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add("drag")}));
-  ["dragleave","drop"].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove("drag")}));
-  dropZone.addEventListener("drop",e=>handleFile(e.dataTransfer.files[0]));
-
-  $("#scanAnother").addEventListener("click",()=>{
-    fileInput.value="";
-    results.style.display="none";
-    errorBox.style.display="none";
-    window.scrollTo({top:0,behavior:"smooth"});
-    setTimeout(()=>fileInput.click(),250);
+    lines.push(`   Evidence: ${finding.evidence}`);
+    lines.push("");
   });
 
-  $("#copyReport").addEventListener("click",async e=>{
-    if(!lastReport) return;
-    try{
-      await navigator.clipboard.writeText(reportText(lastReport));
-      const old=e.target.textContent; e.target.textContent="Copied";
-      setTimeout(()=>e.target.textContent=old,1200);
-    }catch{
-      alert("Clipboard access is unavailable in this browser.");
+  lines.push("Note: Heuristic screening only; inspect flagged content in context.");
+
+  return lines.join("\n");
+}
+
+async function handleFile(file) {
+  if (!file) return;
+
+  if (
+    file.type !== "application/pdf" &&
+    !file.name.toLowerCase().endsWith(".pdf")
+  ) {
+    errorBox.textContent = "Please choose a PDF file.";
+    errorBox.style.display = "block";
+    return;
+  }
+
+  try {
+    const report = await analyzePdf(file);
+    renderReport(report);
+    fileInput.value = "";
+  } catch (error) {
+    console.error(error);
+    progress.style.display = "none";
+    errorBox.textContent =
+      "The PDF could not be analyzed. It may be encrypted, malformed, or unsupported by the browser PDF engine.";
+    errorBox.style.display = "block";
+  }
+}
+
+async function copyReport() {
+  if (!lastReport) return;
+
+  const text = reportText(lastReport);
+
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly","");
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
     }
+
+    const button = byId("pis-copy-report");
+    const old = button.textContent;
+    button.textContent = "Copied";
+    setTimeout(() => {
+      button.textContent = old;
+    }, 1200);
+  } catch (error) {
+    errorBox.textContent = "Clipboard access is unavailable in this browser.";
+    errorBox.style.display = "block";
+  }
+}
+
+dropZone.addEventListener("click", () => fileInput.click());
+
+dropZone.addEventListener("keydown", event => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    fileInput.click();
+  }
+});
+
+fileInput.addEventListener("change", event => {
+  handleFile(event.target.files[0]);
+});
+
+["dragenter","dragover"].forEach(type => {
+  dropZone.addEventListener(type, event => {
+    event.preventDefault();
+    dropZone.classList.add("drag");
   });
+});
+
+["dragleave","drop"].forEach(type => {
+  dropZone.addEventListener(type, event => {
+    event.preventDefault();
+    dropZone.classList.remove("drag");
+  });
+});
+
+dropZone.addEventListener("drop", event => {
+  handleFile(event.dataTransfer.files[0]);
+});
+
+byId("pis-scan-another").addEventListener("click", () => {
+  fileInput.value = "";
+  results.style.display = "none";
+  errorBox.style.display = "none";
+  lastReport = null;
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+  setTimeout(() => {
+    fileInput.click();
+  }, 250);
+});
+
+byId("pis-copy-report").addEventListener("click", copyReport);
 </script>
-</body>
-</html>

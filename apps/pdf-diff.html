@@ -1,155 +1,803 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDF Diff</title>
+---
+layout: without-sidebar
+title: "PDF Diff"
+permalink: /apps/pdf-diff/
+redirect_from:
+  - /apps/pdf-diff.html
+excerpt: "Compare two PDF files page by page with text and visual differences directly in your browser."
+---
+
 <style>
-:root{--bg:#0f172a;--panel:#111827;--border:#263244;--text:#e5e7eb;--muted:#94a3b8;--green:#22c55e;--red:#ef4444;--blue:#38bdf8}
-*{box-sizing:border-box}body{margin:0;padding:18px;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}.app{max-width:1500px;margin:auto}
-h1{margin:0 0 6px}.sub{color:var(--muted);margin-bottom:18px;line-height:1.5}.grid{display:grid;grid-template-columns:1fr 1fr auto;gap:12px}
-.drop,.panel,.status,.card{background:var(--panel);border:1px solid var(--border);border-radius:14px}.drop{padding:18px}.drop strong{display:block;margin-bottom:8px}.drop small{color:var(--muted);display:block;margin-top:8px;overflow-wrap:anywhere}
-.actions{display:flex;flex-direction:column;gap:8px;justify-content:center}button,select{border:1px solid var(--border);background:#172033;color:var(--text);border-radius:10px;padding:10px 13px;font-weight:700}
-button{cursor:pointer}button.primary{background:var(--green);color:#052e16;border:none}button:disabled{opacity:.45;cursor:not-allowed}
-.opts{display:flex;flex-wrap:wrap;gap:14px;margin:14px 0;padding:12px;background:#0b1220;border:1px solid var(--border);border-radius:12px}.opts label{color:var(--muted)}
-.status{padding:12px;margin:14px 0;color:var(--muted)}.status.ok{color:#86efac}.status.err{color:#fca5a5}
-.summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:14px 0}.card{padding:14px}.n{font-size:25px;font-weight:800}.l{color:var(--muted);font-size:12px;margin-top:4px}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.tabs button.active{outline:2px solid var(--blue)}
-.panel{overflow:hidden}.title,.bar{padding:11px 13px;border-bottom:1px solid var(--border)}.title{font-weight:700}.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.diffgrid,.visualgrid{display:grid;grid-template-columns:1fr 1fr}.side{min-width:0;border-right:1px solid var(--border)}.side:last-child{border-right:0}.sidehead{background:#172033;padding:10px;font-weight:700}
-.diff{padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.55 Consolas,monospace}.add{background:rgba(34,197,94,.18);color:#bbf7d0}.del{background:rgba(239,68,68,.18);color:#fecaca;text-decoration:line-through}
-table{width:100%;border-collapse:collapse}th,td{padding:10px 12px;border-bottom:1px solid var(--border);text-align:left;font-size:13px}tbody tr:hover{background:#141d2e;cursor:pointer}
-.badge{padding:3px 7px;border-radius:999px;font-size:12px;font-weight:700}.changed{background:rgba(245,158,11,.18);color:#fde68a}.same{background:rgba(34,197,94,.18);color:#bbf7d0}.missing{background:rgba(239,68,68,.18);color:#fecaca}
-.canvascell{padding:12px;overflow:auto;background:#080d16;border-right:1px solid var(--border)}.canvascell:last-child{border-right:0}canvas{display:block;max-width:100%;height:auto;margin:auto;background:#fff}.hidden{display:none!important}
-@media(max-width:900px){body{padding:10px}.grid,.diffgrid,.visualgrid{grid-template-columns:1fr}.actions{flex-direction:row}.summary{grid-template-columns:repeat(2,1fr)}.side,.canvascell{border-right:0;border-bottom:1px solid var(--border)}}
+.pdf-diff-app,
+.pdf-diff-app *,
+.pdf-diff-app *::before,
+.pdf-diff-app *::after { box-sizing:border-box; }
+
+.pdf-diff-app {
+  width:min(1500px,calc(100% - 24px));
+  margin:.5rem auto 1.5rem;
+  color:var(--global-text-color);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+.pd-header { margin-bottom:18px; text-align:center; }
+.pd-title {
+  margin:0 0 6px;
+  color:var(--global-text-color);
+  font-size:clamp(2rem,5vw,3rem);
+  letter-spacing:-.04em;
+}
+.pd-sub {
+  max-width:850px;
+  margin:0 auto;
+  color:var(--global-text-color);
+  opacity:.66;
+  line-height:1.5;
+}
+
+.pd-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr auto;
+  gap:12px;
+}
+
+.pd-drop,
+.pd-panel,
+.pd-status,
+.pd-card {
+  border:1px solid var(--global-border-color);
+  border-radius:14px;
+  background:var(--global-bg-color);
+}
+
+.pd-drop {
+  padding:18px;
+  cursor:pointer;
+}
+
+.pd-drop strong { display:block; margin-bottom:8px; color:var(--global-text-color); }
+.pd-drop small {
+  display:block;
+  margin-top:8px;
+  color:var(--global-text-color);
+  opacity:.58;
+  overflow-wrap:anywhere;
+}
+
+.pd-drop input { width:100%; color:var(--global-text-color); }
+
+.pd-actions {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  justify-content:center;
+}
+
+.pd-btn,
+.pd-select {
+  min-height:40px;
+  padding:0 13px;
+  border:1px solid rgba(45,45,45,.42);
+  border-radius:999px;
+  background:rgba(45,45,45,.08);
+  color:var(--global-text-color);
+  font:inherit;
+  font-weight:700;
+}
+
+.pd-btn { cursor:pointer; }
+.pd-btn:hover:not(:disabled) { background:rgba(45,45,45,.14); }
+
+.pd-btn.primary {
+  border-color:transparent;
+  background:var(--global-link-color);
+  color:var(--global-bg-color);
+}
+
+.pd-btn:disabled { opacity:.45; cursor:not-allowed; }
+
+html[data-theme="dark"] .pd-btn,
+html[data-theme="dark"] .pd-select {
+  border-color:rgba(255,255,255,.22);
+  background:rgba(255,255,255,.06);
+}
+
+html[data-theme="dark"] .pd-btn.primary {
+  border-color:transparent;
+  background:var(--global-link-color);
+  color:var(--global-bg-color);
+}
+
+.pd-opts {
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  margin:14px 0;
+  padding:12px;
+  border:1px solid var(--global-border-color);
+  border-radius:12px;
+  background:rgba(127,127,127,.025);
+}
+
+.pd-opts label {
+  color:var(--global-text-color);
+  opacity:.68;
+}
+
+.pd-status {
+  padding:12px;
+  margin:14px 0;
+  color:var(--global-text-color);
+  opacity:.62;
+}
+
+.pd-status.ok { color:#067647; opacity:1; }
+.pd-status.err { color:#b42318; opacity:1; }
+html[data-theme="dark"] .pd-status.ok { color:#83d7ae; }
+html[data-theme="dark"] .pd-status.err { color:#ff9f9f; }
+
+.pd-summary {
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px;
+  margin:14px 0;
+}
+
+.pd-card { padding:14px; }
+.pd-number { color:var(--global-text-color); font-size:25px; font-weight:800; }
+.pd-label { margin-top:4px; color:var(--global-text-color); opacity:.55; font-size:12px; }
+
+.pd-tabs {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:14px 0;
+}
+
+.pd-tabs .pd-btn.active {
+  outline:2px solid var(--global-link-color);
+  outline-offset:1px;
+}
+
+.pd-panel { overflow:hidden; }
+
+.pd-panel-title,
+.pd-bar {
+  padding:11px 13px;
+  border-bottom:1px solid var(--global-border-color);
+}
+
+.pd-panel-title { color:var(--global-text-color); font-weight:700; }
+
+.pd-bar {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.pd-diff-grid,
+.pd-visual-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+
+.pd-side {
+  min-width:0;
+  border-right:1px solid var(--global-border-color);
+}
+
+.pd-side:last-child { border-right:0; }
+
+.pd-side-head {
+  padding:10px;
+  background:rgba(127,127,127,.04);
+  color:var(--global-text-color);
+  font-weight:700;
+}
+
+.pd-diff {
+  padding:12px;
+  color:var(--global-text-color);
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  font:13px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+
+.pd-add {
+  background:rgba(34,197,94,.18);
+  color:inherit;
+}
+
+.pd-del {
+  background:rgba(239,68,68,.18);
+  color:inherit;
+  text-decoration:line-through;
+}
+
+.pd-table-wrap { overflow:auto; }
+
+.pd-table {
+  width:100%;
+  border-collapse:collapse;
+}
+
+.pd-table th,
+.pd-table td {
+  padding:10px 12px;
+  border-bottom:1px solid var(--global-border-color);
+  color:var(--global-text-color);
+  text-align:left;
+  font-size:13px;
+}
+
+.pd-table tbody tr:hover {
+  background:rgba(127,127,127,.04);
+  cursor:pointer;
+}
+
+.pd-badge {
+  padding:3px 7px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:700;
+}
+
+.pd-changed { background:rgba(245,158,11,.18); }
+.pd-same { background:rgba(34,197,94,.18); }
+.pd-missing { background:rgba(239,68,68,.18); }
+
+.pd-canvas-cell {
+  padding:12px;
+  overflow:auto;
+  border-right:1px solid var(--global-border-color);
+  background:rgba(127,127,127,.025);
+}
+
+.pd-canvas-cell:last-child { border-right:0; }
+
+.pd-canvas-cell canvas {
+  display:block;
+  max-width:100%;
+  height:auto;
+  margin:auto;
+  background:#fff;
+}
+
+.pd-hidden { display:none!important; }
+
+@media(max-width:900px) {
+  .pdf-diff-app { width:100%; }
+  .pd-grid,.pd-diff-grid,.pd-visual-grid { grid-template-columns:1fr; }
+  .pd-actions { flex-direction:row; }
+  .pd-summary { grid-template-columns:repeat(2,1fr); }
+  .pd-side,.pd-canvas-cell {
+    border-right:0;
+    border-bottom:1px solid var(--global-border-color);
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .pdf-diff-app *,
+  .pdf-diff-app *::before,
+  .pdf-diff-app *::after { transition-duration:.001ms!important; }
+}
 </style>
-</head>
-<body>
-<div class="app">
-<h1>📄 PDF Diff</h1>
-<div class="sub">Compare two PDF files page by page. Text extraction and comparison run locally in your browser. Added and removed text is highlighted, and pages can also be viewed side by side.</div>
 
-<div class="grid">
-<label class="drop"><strong>PDF A — Original</strong><input id="a" type="file" accept=".pdf,application/pdf"><small id="an">No file selected</small></label>
-<label class="drop"><strong>PDF B — Revised</strong><input id="b" type="file" accept=".pdf,application/pdf"><small id="bn">No file selected</small></label>
-<div class="actions"><button id="go" class="primary" disabled>COMPARE PDFs</button><button id="reset">Reset</button></div>
-</div>
+<div class="pdf-diff-app">
+  <header class="pd-header">
+    <h1 class="pd-title">PDF Diff</h1>
+    <div class="pd-sub">
+      Compare two PDF files page by page. Text extraction and comparison run locally in your browser.
+      Added and removed text is highlighted, and pages can also be viewed side by side.
+    </div>
+  </header>
 
-<div class="opts">
-<label><input id="ic" type="checkbox"> Ignore case</label>
-<label><input id="iw" type="checkbox" checked> Normalize whitespace</label>
-<label><input id="ip" type="checkbox"> Ignore page numbers</label>
-<label>Diff mode <select id="mode"><option value="words">Words</option><option value="lines">Lines</option><option value="chars">Characters</option></select></label>
-</div>
+  <div class="pd-grid">
+    <label class="pd-drop">
+      <strong>PDF A — Original</strong>
+      <input id="pd-a" type="file" accept=".pdf,application/pdf">
+      <small id="pd-an">No file selected</small>
+    </label>
 
-<div id="status" class="status">Select two PDF files.</div>
+    <label class="pd-drop">
+      <strong>PDF B — Revised</strong>
+      <input id="pd-b" type="file" accept=".pdf,application/pdf">
+      <small id="pd-bn">No file selected</small>
+    </label>
 
-<div id="summary" class="summary hidden">
-<div class="card"><div class="n" id="pa">0</div><div class="l">Pages in PDF A</div></div>
-<div class="card"><div class="n" id="pb">0</div><div class="l">Pages in PDF B</div></div>
-<div class="card"><div class="n" id="pc">0</div><div class="l">Changed pages</div></div>
-<div class="card"><div class="n" id="aa">0</div><div class="l">Added tokens</div></div>
-<div class="card"><div class="n" id="rr">0</div><div class="l">Removed tokens</div></div>
-</div>
+    <div class="pd-actions">
+      <button id="pd-go" class="pd-btn primary" type="button" disabled>COMPARE PDFs</button>
+      <button id="pd-reset" class="pd-btn" type="button">Reset</button>
+    </div>
+  </div>
 
-<div id="results" class="hidden">
-<div class="tabs"><button id="tt" class="active">Text Diff</button><button id="ts">Page Summary</button><button id="tv">Visual Compare</button></div>
+  <div class="pd-opts">
+    <label><input id="pd-ic" type="checkbox"> Ignore case</label>
+    <label><input id="pd-iw" type="checkbox" checked> Normalize whitespace</label>
+    <label><input id="pd-ip" type="checkbox"> Ignore page numbers</label>
+    <label>
+      Diff mode
+      <select id="pd-mode" class="pd-select">
+        <option value="words">Words</option>
+        <option value="lines">Lines</option>
+        <option value="chars">Characters</option>
+      </select>
+    </label>
+  </div>
 
-<section id="text" class="panel">
-<div class="title">Text Difference — Page <span id="pl">1</span></div>
-<div class="bar"><button id="prev">← Previous</button><button id="next">Next →</button><select id="pages"></select></div>
-<div class="diffgrid">
-<div class="side"><div class="sidehead">PDF A</div><div id="da" class="diff"></div></div>
-<div class="side"><div class="sidehead">PDF B</div><div id="db" class="diff"></div></div>
-</div>
-</section>
+  <div id="pd-status" class="pd-status">Select two PDF files.</div>
 
-<section id="summaryPanel" class="panel hidden">
-<div class="title">Page Summary</div>
-<div style="overflow:auto"><table><thead><tr><th>Page</th><th>Status</th><th>Added</th><th>Removed</th><th>Similarity</th></tr></thead><tbody id="tbody"></tbody></table></div>
-</section>
+  <div id="pd-summary" class="pd-summary pd-hidden">
+    <div class="pd-card"><div class="pd-number" id="pd-pa">0</div><div class="pd-label">Pages in PDF A</div></div>
+    <div class="pd-card"><div class="pd-number" id="pd-pb">0</div><div class="pd-label">Pages in PDF B</div></div>
+    <div class="pd-card"><div class="pd-number" id="pd-pc">0</div><div class="pd-label">Changed pages</div></div>
+    <div class="pd-card"><div class="pd-number" id="pd-aa">0</div><div class="pd-label">Added tokens</div></div>
+    <div class="pd-card"><div class="pd-number" id="pd-rr">0</div><div class="pd-label">Removed tokens</div></div>
+  </div>
 
-<section id="visual" class="panel hidden">
-<div class="title">Visual Page Comparison</div>
-<div class="bar"><button id="vprev">← Previous</button><button id="vnext">Next →</button><select id="vpages"></select><label>Scale <select id="scale"><option value="1">100%</option><option value="1.25" selected>125%</option><option value="1.5">150%</option><option value="2">200%</option></select></label></div>
-<div class="visualgrid"><div class="canvascell"><canvas id="ca"></canvas></div><div class="canvascell"><canvas id="cb"></canvas></div></div>
-</section>
-</div>
+  <div id="pd-results" class="pd-hidden">
+    <div class="pd-tabs">
+      <button id="pd-tt" class="pd-btn active" type="button">Text Diff</button>
+      <button id="pd-ts" class="pd-btn" type="button">Page Summary</button>
+      <button id="pd-tv" class="pd-btn" type="button">Visual Compare</button>
+    </div>
+
+    <section id="pd-text" class="pd-panel">
+      <div class="pd-panel-title">Text Difference — Page <span id="pd-pl">1</span></div>
+
+      <div class="pd-bar">
+        <button id="pd-prev" class="pd-btn" type="button">← Previous</button>
+        <button id="pd-next" class="pd-btn" type="button">Next →</button>
+        <select id="pd-pages" class="pd-select"></select>
+      </div>
+
+      <div class="pd-diff-grid">
+        <div class="pd-side">
+          <div class="pd-side-head">PDF A</div>
+          <div id="pd-da" class="pd-diff"></div>
+        </div>
+
+        <div class="pd-side">
+          <div class="pd-side-head">PDF B</div>
+          <div id="pd-db" class="pd-diff"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pd-summary-panel" class="pd-panel pd-hidden">
+      <div class="pd-panel-title">Page Summary</div>
+
+      <div class="pd-table-wrap">
+        <table class="pd-table">
+          <thead>
+            <tr>
+              <th>Page</th>
+              <th>Status</th>
+              <th>Added</th>
+              <th>Removed</th>
+              <th>Similarity</th>
+            </tr>
+          </thead>
+          <tbody id="pd-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="pd-visual" class="pd-panel pd-hidden">
+      <div class="pd-panel-title">Visual Page Comparison</div>
+
+      <div class="pd-bar">
+        <button id="pd-vprev" class="pd-btn" type="button">← Previous</button>
+        <button id="pd-vnext" class="pd-btn" type="button">Next →</button>
+        <select id="pd-vpages" class="pd-select"></select>
+
+        <label>
+          Scale
+          <select id="pd-scale" class="pd-select">
+            <option value="1">100%</option>
+            <option value="1.25" selected>125%</option>
+            <option value="1.5">150%</option>
+            <option value="2">200%</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="pd-visual-grid">
+        <div class="pd-canvas-cell"><canvas id="pd-ca"></canvas></div>
+        <div class="pd-canvas-cell"><canvas id="pd-cb"></canvas></div>
+      </div>
+    </section>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/diff@5.2.0/dist/diff.min.js"></script>
+
 <script type="module">
-import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs';
-pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs';
-const $=x=>document.getElementById(x);
-let fa=null,fb=null,pdfa=null,pdfb=null,ta=[],tb=[],res=[],cur=1,vcur=1;
+import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs";
 
-function status(s,c=''){$('status').textContent=s;$('status').className='status'+(c?' '+c:'')}
-function buttons(){$('go').disabled=!(fa&&fb)}
-$('a').onchange=e=>{fa=e.target.files[0]||null;$('an').textContent=fa?fa.name:'No file selected';buttons()}
-$('b').onchange=e=>{fb=e.target.files[0]||null;$('bn').textContent=fb?fb.name:'No file selected';buttons()}
-$('reset').onclick=()=>location.reload();
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
 
-async function load(file){return await pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise}
-async function extract(pdf,label){
- const out=[];
- for(let i=1;i<=pdf.numPages;i++){
-  status(`Extracting ${label}: page ${i} / ${pdf.numPages}`);
-  const p=await pdf.getPage(i),c=await p.getTextContent();
-  let y=null,s='';
-  for(const it of c.items){
-   const ny=Math.round(it.transform[5]);
-   if(y!==null&&Math.abs(ny-y)>3)s+='\n';else if(s&&!s.endsWith('\n'))s+=' ';
-   s+=it.str;y=ny;
+const byId = id => document.getElementById(id);
+
+let fileA = null;
+let fileB = null;
+let pdfA = null;
+let pdfB = null;
+let textA = [];
+let textB = [];
+let results = [];
+let currentPage = 1;
+let visualPage = 1;
+
+function setStatus(message, className = "") {
+  const element = byId("pd-status");
+  element.textContent = message;
+  element.className = "pd-status" + (className ? " " + className : "");
+}
+
+function updateCompareButton() {
+  byId("pd-go").disabled = !(fileA && fileB);
+}
+
+function resetApp() {
+  fileA = null;
+  fileB = null;
+  pdfA = null;
+  pdfB = null;
+  textA = [];
+  textB = [];
+  results = [];
+  currentPage = 1;
+  visualPage = 1;
+
+  byId("pd-a").value = "";
+  byId("pd-b").value = "";
+  byId("pd-an").textContent = "No file selected";
+  byId("pd-bn").textContent = "No file selected";
+
+  byId("pd-ic").checked = false;
+  byId("pd-iw").checked = true;
+  byId("pd-ip").checked = false;
+  byId("pd-mode").value = "words";
+  byId("pd-scale").value = "1.25";
+
+  byId("pd-summary").classList.add("pd-hidden");
+  byId("pd-results").classList.add("pd-hidden");
+
+  byId("pd-da").innerHTML = "";
+  byId("pd-db").innerHTML = "";
+  byId("pd-tbody").innerHTML = "";
+  byId("pd-pages").innerHTML = "";
+  byId("pd-vpages").innerHTML = "";
+
+  const canvasA = byId("pd-ca");
+  const canvasB = byId("pd-cb");
+  canvasA.width = canvasA.height = 0;
+  canvasB.width = canvasB.height = 0;
+
+  updateCompareButton();
+  setStatus("Select two PDF files.");
+}
+
+byId("pd-a").addEventListener("change", event => {
+  fileA = event.target.files[0] || null;
+  byId("pd-an").textContent = fileA ? fileA.name : "No file selected";
+  updateCompareButton();
+});
+
+byId("pd-b").addEventListener("change", event => {
+  fileB = event.target.files[0] || null;
+  byId("pd-bn").textContent = fileB ? fileB.name : "No file selected";
+  updateCompareButton();
+});
+
+byId("pd-reset").addEventListener("click", resetApp);
+
+async function loadPdf(file) {
+  return await pdfjsLib.getDocument({
+    data: new Uint8Array(await file.arrayBuffer())
+  }).promise;
+}
+
+async function extractText(pdf, label) {
+  const output = [];
+
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+    setStatus(`Extracting ${label}: page ${pageNumber} / ${pdf.numPages}`);
+
+    const page = await pdf.getPage(pageNumber);
+    const content = await page.getTextContent();
+
+    let previousY = null;
+    let text = "";
+
+    for (const item of content.items) {
+      const y = Math.round(item.transform[5]);
+
+      if (previousY !== null && Math.abs(y - previousY) > 3) {
+        text += "\n";
+      } else if (text && !text.endsWith("\n")) {
+        text += " ";
+      }
+
+      text += item.str;
+      previousY = y;
+    }
+
+    output.push(text);
   }
-  out.push(s);
- }
- return out;
-}
-function norm(s){
- if($('iw').checked)s=s.replace(/\u00a0/g,' ').replace(/[ \t]+/g,' ').replace(/\s*\n\s*/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
- if($('ic').checked)s=s.toLowerCase();
- if($('ip').checked)s=s.replace(/^\s*\d+\s*$/gm,'').replace(/^\s*page\s+\d+\s*$/gim,'').replace(/^\s*\d+\s*\/\s*\d+\s*$/gm,'');
- return s;
-}
-function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function diff(a,b){const m=$('mode').value;return m==='lines'?Diff.diffLines(a,b):m==='chars'?Diff.diffChars(a,b):Diff.diffWordsWithSpace(a,b)}
-function one(a,b){
- const parts=diff(norm(a||''),norm(b||''));let ha='',hb='',add=0,del=0,same=0;
- for(const p of parts){const v=esc(p.value),n=p.count||0;if(p.added){hb+=`<span class="add">${v}</span>`;add+=n}else if(p.removed){ha+=`<span class="del">${v}</span>`;del+=n}else{ha+=v;hb+=v;same+=n}}
- const total=add+del+same,sim=total?100*same/total:100;
- return {ha,hb,add,del,sim,changed:add>0||del>0}
-}
-function build(){
- const n=Math.max(ta.length,tb.length);res=[];
- for(let i=0;i<n;i++)res.push(one(ta[i],tb[i]));
- $('pa').textContent=ta.length;$('pb').textContent=tb.length;$('pc').textContent=res.filter(x=>x.changed).length;$('aa').textContent=res.reduce((s,x)=>s+x.add,0);$('rr').textContent=res.reduce((s,x)=>s+x.del,0);
- $('summary').classList.remove('hidden');$('results').classList.remove('hidden');
- $('pages').innerHTML='';$('vpages').innerHTML='';
- for(let i=1;i<=n;i++){$('pages').add(new Option('Page '+i,i));$('vpages').add(new Option('Page '+i,i))}
- const body=$('tbody');body.innerHTML='';
- res.forEach((r,i)=>{const missing=i>=ta.length||i>=tb.length,st=missing?'Missing page':r.changed?'Changed':'Same',cl=missing?'missing':r.changed?'changed':'same';const tr=document.createElement('tr');tr.innerHTML=`<td>${i+1}</td><td><span class="badge ${cl}">${st}</span></td><td>${r.add}</td><td>${r.del}</td><td>${r.sim.toFixed(1)}%</td>`;tr.onclick=()=>{show('text');showText(i+1)};body.appendChild(tr)});
- showText(1);status(`Done. ${res.filter(x=>x.changed).length} changed page(s) detected.`,'ok');
-}
-function showText(p){if(!res.length)return;cur=Math.max(1,Math.min(res.length,p));const r=res[cur-1];$('da').innerHTML=r.ha||'(No text)';$('db').innerHTML=r.hb||'(No text)';$('pl').textContent=cur;$('pages').value=cur;$('prev').disabled=cur===1;$('next').disabled=cur===res.length}
-$('prev').onclick=()=>showText(cur-1);$('next').onclick=()=>showText(cur+1);$('pages').onchange=e=>showText(+e.target.value);
 
-function show(x){$('text').classList.toggle('hidden',x!=='text');$('summaryPanel').classList.toggle('hidden',x!=='summary');$('visual').classList.toggle('hidden',x!=='visual');$('tt').classList.toggle('active',x==='text');$('ts').classList.toggle('active',x==='summary');$('tv').classList.toggle('active',x==='visual')}
-$('tt').onclick=()=>show('text');$('ts').onclick=()=>show('summary');$('tv').onclick=()=>{show('visual');renderVisual(vcur)};
-
-async function renderOne(pdf,n,canvas,scale){
- const ctx=canvas.getContext('2d');
- if(!pdf||n>pdf.numPages){canvas.width=600;canvas.height=180;ctx.fillStyle='#fff';ctx.fillRect(0,0,600,180);ctx.fillStyle='#111';ctx.font='24px Arial';ctx.fillText('Page not available',30,90);return}
- const p=await pdf.getPage(n),vp=p.getViewport({scale});canvas.width=vp.width;canvas.height=vp.height;await p.render({canvasContext:ctx,viewport:vp}).promise
+  return output;
 }
-async function renderVisual(p){if(!res.length)return;vcur=Math.max(1,Math.min(res.length,p));$('vpages').value=vcur;$('vprev').disabled=vcur===1;$('vnext').disabled=vcur===res.length;status(`Rendering page ${vcur}...`);const sc=+$('scale').value;await Promise.all([renderOne(pdfa,vcur,$('ca'),sc),renderOne(pdfb,vcur,$('cb'),sc)]);status(`Visual comparison ready for page ${vcur}.`,'ok')}
-$('vprev').onclick=()=>renderVisual(vcur-1);$('vnext').onclick=()=>renderVisual(vcur+1);$('vpages').onchange=e=>renderVisual(+e.target.value);$('scale').onchange=()=>renderVisual(vcur);
 
-$('go').onclick=async()=>{
- try{$('go').disabled=true;status('Loading PDF A...');pdfa=await load(fa);status('Loading PDF B...');pdfb=await load(fb);ta=await extract(pdfa,'PDF A');tb=await extract(pdfb,'PDF B');build()}
- catch(e){console.error(e);status('Error: '+(e.message||e),'err')}finally{$('go').disabled=false}
-};
-['ic','iw','ip','mode'].forEach(id=>$(id).onchange=()=>{if(ta.length||tb.length)build()});
+function normalizeText(text) {
+  if (byId("pd-iw").checked) {
+    text = text
+      .replace(/\u00a0/g, " ")
+      .replace(/[ \t]+/g, " ")
+      .replace(/\s*\n\s*/g, "\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+
+  if (byId("pd-ic").checked) {
+    text = text.toLowerCase();
+  }
+
+  if (byId("pd-ip").checked) {
+    text = text
+      .replace(/^\s*\d+\s*$/gm, "")
+      .replace(/^\s*page\s+\d+\s*$/gim, "")
+      .replace(/^\s*\d+\s*\/\s*\d+\s*$/gm, "");
+  }
+
+  return text;
+}
+
+function escapeHtml(text) {
+  return text.replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    "\"":"&quot;",
+    "'":"&#39;"
+  })[char]);
+}
+
+function diffParts(a, b) {
+  const mode = byId("pd-mode").value;
+
+  return mode === "lines"
+    ? Diff.diffLines(a, b)
+    : mode === "chars"
+      ? Diff.diffChars(a, b)
+      : Diff.diffWordsWithSpace(a, b);
+}
+
+function compareOne(a, b) {
+  const parts = diffParts(
+    normalizeText(a || ""),
+    normalizeText(b || "")
+  );
+
+  let htmlA = "";
+  let htmlB = "";
+  let added = 0;
+  let removed = 0;
+  let same = 0;
+
+  for (const part of parts) {
+    const value = escapeHtml(part.value);
+    const count = part.count || 0;
+
+    if (part.added) {
+      htmlB += `<span class="pd-add">${value}</span>`;
+      added += count;
+    } else if (part.removed) {
+      htmlA += `<span class="pd-del">${value}</span>`;
+      removed += count;
+    } else {
+      htmlA += value;
+      htmlB += value;
+      same += count;
+    }
+  }
+
+  const total = added + removed + same;
+  const similarity = total ? 100 * same / total : 100;
+
+  return {
+    htmlA,
+    htmlB,
+    added,
+    removed,
+    similarity,
+    changed: added > 0 || removed > 0
+  };
+}
+
+function buildResults() {
+  const pageCount = Math.max(textA.length, textB.length);
+  results = [];
+
+  for (let index = 0; index < pageCount; index++) {
+    results.push(compareOne(textA[index], textB[index]));
+  }
+
+  byId("pd-pa").textContent = textA.length;
+  byId("pd-pb").textContent = textB.length;
+  byId("pd-pc").textContent = results.filter(item => item.changed).length;
+  byId("pd-aa").textContent = results.reduce((sum,item) => sum + item.added, 0);
+  byId("pd-rr").textContent = results.reduce((sum,item) => sum + item.removed, 0);
+
+  byId("pd-summary").classList.remove("pd-hidden");
+  byId("pd-results").classList.remove("pd-hidden");
+
+  byId("pd-pages").innerHTML = "";
+  byId("pd-vpages").innerHTML = "";
+
+  for (let pageNumber = 1; pageNumber <= pageCount; pageNumber++) {
+    byId("pd-pages").add(new Option("Page " + pageNumber, pageNumber));
+    byId("pd-vpages").add(new Option("Page " + pageNumber, pageNumber));
+  }
+
+  const tbody = byId("pd-tbody");
+  tbody.innerHTML = "";
+
+  results.forEach((result,index) => {
+    const missing = index >= textA.length || index >= textB.length;
+    const statusText = missing ? "Missing page" : result.changed ? "Changed" : "Same";
+    const badgeClass = missing ? "pd-missing" : result.changed ? "pd-changed" : "pd-same";
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td><span class="pd-badge ${badgeClass}">${statusText}</span></td>
+      <td>${result.added}</td>
+      <td>${result.removed}</td>
+      <td>${result.similarity.toFixed(1)}%</td>`;
+
+    row.addEventListener("click", () => {
+      showPanel("text");
+      showText(index + 1);
+    });
+
+    tbody.appendChild(row);
+  });
+
+  showText(1);
+
+  setStatus(
+    `Done. ${results.filter(item => item.changed).length} changed page(s) detected.`,
+    "ok"
+  );
+}
+
+function showText(pageNumber) {
+  if (!results.length) {
+    return;
+  }
+
+  currentPage = Math.max(1, Math.min(results.length, pageNumber));
+
+  const result = results[currentPage - 1];
+
+  byId("pd-da").innerHTML = result.htmlA || "(No text)";
+  byId("pd-db").innerHTML = result.htmlB || "(No text)";
+  byId("pd-pl").textContent = currentPage;
+  byId("pd-pages").value = currentPage;
+  byId("pd-prev").disabled = currentPage === 1;
+  byId("pd-next").disabled = currentPage === results.length;
+}
+
+byId("pd-prev").addEventListener("click", () => showText(currentPage - 1));
+byId("pd-next").addEventListener("click", () => showText(currentPage + 1));
+byId("pd-pages").addEventListener("change", event => showText(Number(event.target.value)));
+
+function showPanel(panel) {
+  byId("pd-text").classList.toggle("pd-hidden", panel !== "text");
+  byId("pd-summary-panel").classList.toggle("pd-hidden", panel !== "summary");
+  byId("pd-visual").classList.toggle("pd-hidden", panel !== "visual");
+
+  byId("pd-tt").classList.toggle("active", panel === "text");
+  byId("pd-ts").classList.toggle("active", panel === "summary");
+  byId("pd-tv").classList.toggle("active", panel === "visual");
+}
+
+byId("pd-tt").addEventListener("click", () => showPanel("text"));
+byId("pd-ts").addEventListener("click", () => showPanel("summary"));
+byId("pd-tv").addEventListener("click", () => {
+  showPanel("visual");
+  renderVisual(visualPage);
+});
+
+async function renderOne(pdf, pageNumber, canvas, scale) {
+  const context = canvas.getContext("2d");
+
+  if (!pdf || pageNumber > pdf.numPages) {
+    canvas.width = 600;
+    canvas.height = 180;
+
+    context.fillStyle = "#ffffff";
+    context.fillRect(0,0,600,180);
+    context.fillStyle = "#111111";
+    context.font = "24px Arial";
+    context.fillText("Page not available",30,90);
+    return;
+  }
+
+  const page = await pdf.getPage(pageNumber);
+  const viewport = page.getViewport({scale});
+
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+
+  await page.render({
+    canvasContext: context,
+    viewport
+  }).promise;
+}
+
+async function renderVisual(pageNumber) {
+  if (!results.length) {
+    return;
+  }
+
+  visualPage = Math.max(1, Math.min(results.length, pageNumber));
+
+  byId("pd-vpages").value = visualPage;
+  byId("pd-vprev").disabled = visualPage === 1;
+  byId("pd-vnext").disabled = visualPage === results.length;
+
+  setStatus(`Rendering page ${visualPage}...`);
+
+  const scale = Number(byId("pd-scale").value);
+
+  await Promise.all([
+    renderOne(pdfA, visualPage, byId("pd-ca"), scale),
+    renderOne(pdfB, visualPage, byId("pd-cb"), scale)
+  ]);
+
+  setStatus(`Visual comparison ready for page ${visualPage}.`, "ok");
+}
+
+byId("pd-vprev").addEventListener("click", () => renderVisual(visualPage - 1));
+byId("pd-vnext").addEventListener("click", () => renderVisual(visualPage + 1));
+byId("pd-vpages").addEventListener("change", event => renderVisual(Number(event.target.value)));
+byId("pd-scale").addEventListener("change", () => renderVisual(visualPage));
+
+byId("pd-go").addEventListener("click", async () => {
+  try {
+    byId("pd-go").disabled = true;
+
+    setStatus("Loading PDF A...");
+    pdfA = await loadPdf(fileA);
+
+    setStatus("Loading PDF B...");
+    pdfB = await loadPdf(fileB);
+
+    textA = await extractText(pdfA, "PDF A");
+    textB = await extractText(pdfB, "PDF B");
+
+    buildResults();
+  } catch (error) {
+    console.error(error);
+    setStatus("Error: " + (error.message || error), "err");
+  } finally {
+    updateCompareButton();
+  }
+});
+
+["pd-ic","pd-iw","pd-ip","pd-mode"].forEach(id => {
+  byId(id).addEventListener("change", () => {
+    if (textA.length || textB.length) {
+      buildResults();
+    }
+  });
+});
+
+resetApp();
 </script>
-</body>
-</html>
