@@ -1,22 +1,686 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1020"><title>PDF Form Filler</title><script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script><script type="module">import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.1.200/pdf.min.mjs";pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.1.200/pdf.worker.min.mjs";window.pdfjsLib=pdfjsLib;window.dispatchEvent(new Event("pdfjs-ready"));</script><style>
-:root{--panel:#121a2b;--panel2:#182238;--line:#293752;--text:#f7f9fd;--muted:#9eabc2;--accent:#7ea7ff;--accent2:#b78cff;--good:#83d7ae;--bad:#ff9f9f}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%}
-body{min-height:100svh;display:grid;place-items:center;padding:10px;background:radial-gradient(circle at 15% 0%,rgba(72,94,185,.24),transparent 34rem),radial-gradient(circle at 90% 90%,rgba(140,75,180,.16),transparent 30rem),linear-gradient(155deg,#090e19,#11182a 55%,#0a101c);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text)}
-.app{width:min(980px,100%)}.panel{border:1px solid var(--line);border-radius:26px;background:rgba(18,26,43,.97);box-shadow:0 30px 80px rgba(0,0,0,.42);padding:clamp(16px,3vw,30px)}
-.brand{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:900}.hero{text-align:center;margin:12px auto 0}.hero h1{margin:0;font-size:clamp(1.9rem,5vw,3.2rem);letter-spacing:-.04em}.hero p{max-width:700px;margin:9px auto 0;color:var(--muted);line-height:1.55;font-size:.9rem}
-.drop{border:1px dashed #4b5e82;border-radius:17px;padding:20px;text-align:center;background:#0f1727;cursor:pointer}.drop.drag{border-color:var(--accent);background:#14223b}
-.card{border:1px solid var(--line);border-radius:16px;background:#101827;padding:14px}.field{display:grid;gap:5px}.field label{font-size:.7rem;color:var(--muted);font-weight:800}
-input,select,textarea{width:100%;min-height:41px;border:1px solid var(--line);border-radius:11px;background:#0d1525;color:var(--text);padding:0 10px;font:inherit}textarea{padding:10px}
-.btn{min-height:41px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);color:var(--text);padding:0 13px;font:inherit;font-size:.79rem;font-weight:800;cursor:pointer}.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:0;color:#08101c}.btn:disabled{opacity:.38;cursor:not-allowed}.actions{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.meta{font-size:.73rem;color:var(--muted);line-height:1.5}.note{text-align:center;color:#758095;font-size:.68rem;margin:15px 0 0}.canvasWrap{display:grid;place-items:center;overflow:auto}.canvasWrap canvas{max-width:100%;height:auto;background:white;border-radius:8px;touch-action:none}
-@media(max-width:680px){body{padding:6px}.panel{padding:14px 10px;border-radius:20px}.row{grid-template-columns:1fr}}
-</style></head><body><main class="app"><section class="panel"><div class="brand">Mobile PDF Tool</div><div class="hero"><h1>PDF Form Filler</h1><p>Add text, dates or check marks to a PDF from your phone. Choose a page, tap the preview to position the item, then export.</p></div>
-<div class="drop" id="drop">Choose PDF<input id="file" type="file" accept=".pdf,application/pdf" hidden></div><div class="row" style="margin-top:12px"><div class="card canvasWrap"><canvas id="preview" width="600" height="800"></canvas></div><div class="card"><div class="field"><label>Page</label><input id="page" type="number" min="1" value="1"></div><div class="field" style="margin-top:8px"><label>Item type</label><select id="type"><option value="text">Text</option><option value="date">Today's date</option><option value="check">Check mark</option></select></div><div class="field" style="margin-top:8px"><label>Text</label><input id="text" placeholder="Enter text"></div><div class="field" style="margin-top:8px"><label>Font size</label><input id="fontSize" type="number" min="7" max="40" value="14"></div><p class="meta">Tap preview to choose position, then tap Add Item. Repeat as needed.</p><div class="actions"><button class="btn" id="add" disabled>Add Item</button><button class="btn" id="undo">Undo</button><button class="btn primary" id="save" disabled>Download Filled PDF</button></div><p class="meta" id="count">0 items</p></div></div><p class="note">This overlays content onto the PDF. It does not modify interactive AcroForm fields directly.</p></section></main><script>
-const $=id=>document.getElementById(id);let bytes=null,pdf=null,pos={x:.5,y:.5},items=[];
-$("drop").onclick=()=>$("file").click();$("file").onchange=async e=>{let f=e.target.files[0];if(!f)return;bytes=new Uint8Array(await f.arrayBuffer());$("add").disabled=$("save").disabled=false;await render()};
-async function render(){if(!bytes||!window.pdfjsLib)return;pdf=await pdfjsLib.getDocument({data:bytes.slice()}).promise;let n=Math.min(pdf.numPages,Math.max(1,+$("page").value||1));$("page").max=pdf.numPages;$("page").value=n;let p=await pdf.getPage(n),vp=p.getViewport({scale:1.2}),c=$("preview");c.width=vp.width;c.height=vp.height;let x=c.getContext("2d");await p.render({canvasContext:x,viewport:vp}).promise;x.strokeStyle="#e33";x.beginPath();x.arc(pos.x*c.width,pos.y*c.height,6,0,Math.PI*2);x.stroke()}
-$("preview").onclick=e=>{let r=$("preview").getBoundingClientRect();pos={x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height};render()};$("page").onchange=render;
-$("add").onclick=()=>{let type=$("type").value,value=type==="date"?new Date().toLocaleDateString("en-GB"):type==="check"?"X":$("text").value;if(!value)return;items.push({page:+$("page").value,x:pos.x,y:pos.y,value,size:+$("fontSize").value});$("count").textContent=items.length+" items"};
-$("undo").onclick=()=>{items.pop();$("count").textContent=items.length+" items"};
-$("save").onclick=async()=>{let d=await PDFLib.PDFDocument.load(bytes),font=await d.embedFont(PDFLib.StandardFonts.Helvetica);for(const a of items){let p=d.getPage(a.page-1);p.drawText(a.value,{x:a.x*p.getWidth(),y:(1-a.y)*p.getHeight(),size:a.size,font,color:PDFLib.rgb(0,0,0)})}let b=await d.save(),z=document.createElement("a");z.href=URL.createObjectURL(new Blob([b],{type:"application/pdf"}));z.download="filled.pdf";z.click()};
-window.addEventListener("pdfjs-ready",()=>bytes&&render());
-</script></body></html>
+---
+layout: without-sidebar
+title: "PDF Form Filler"
+permalink: /apps/pdf-form-filler/
+redirect_from:
+  - /apps/pdf-form-filler.html
+excerpt: "Add text, dates and check marks to PDF pages directly in your browser."
+---
+
+<style>
+.pdf-form-filler-app,
+.pdf-form-filler-app *,
+.pdf-form-filler-app *::before,
+.pdf-form-filler-app *::after {
+  box-sizing: border-box;
+}
+
+.pdf-form-filler-app {
+  width: min(980px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.pff-panel {
+  padding: clamp(16px, 3vw, 28px);
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0,0,0,.07);
+}
+
+.pff-brand {
+  margin: 0;
+  color: var(--global-link-color);
+  font-size: .66rem;
+  font-weight: 900;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.pff-hero {
+  max-width: 720px;
+  margin: 10px auto 0;
+  text-align: center;
+}
+
+.pff-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.9rem, 5vw, 2.8rem);
+  line-height: 1.08;
+  letter-spacing: -.04em;
+}
+
+.pff-intro {
+  max-width: 700px;
+  margin: 9px auto 0;
+  color: var(--global-text-color);
+  opacity: .7;
+  font-size: .84rem;
+  line-height: 1.5;
+}
+
+.pff-drop {
+  margin-top: 18px;
+  padding: 20px 16px;
+  border: 1px dashed rgba(127,127,127,.52);
+  border-radius: 14px;
+  background: rgba(127,127,127,.04);
+  color: var(--global-text-color);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease;
+}
+
+.pff-drop:hover,
+.pff-drop.drag {
+  border-color: var(--global-link-color);
+  background: rgba(80,120,200,.08);
+}
+
+.pff-row {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 12px;
+  margin-top: 12px;
+  align-items: start;
+}
+
+.pff-card {
+  padding: 14px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 13px;
+  background: rgba(127,127,127,.035);
+}
+
+.pff-canvas-wrap {
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  min-height: 420px;
+}
+
+.pff-canvas-wrap canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  background: white;
+  border-radius: 8px;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.pff-field {
+  display: grid;
+  gap: 6px;
+}
+
+.pff-field + .pff-field {
+  margin-top: 9px;
+}
+
+.pff-field label {
+  color: var(--global-text-color);
+  opacity: .62;
+  font-size: .71rem;
+  font-weight: 800;
+}
+
+.pff-field input,
+.pff-field select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 10px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 10px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  font: inherit;
+  font-size: .8rem;
+}
+
+.pff-meta {
+  margin: 11px 0 0;
+  color: var(--global-text-color);
+  opacity: .58;
+  font-size: .72rem;
+  line-height: 1.5;
+}
+
+.pff-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.pff-btn {
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid rgba(45,45,45,.42);
+  border-radius: 999px;
+  background: rgba(45,45,45,.08);
+  color: var(--global-text-color);
+  font: inherit;
+  font-size: .74rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.pff-btn:hover:not(:disabled) {
+  background: rgba(45,45,45,.14);
+}
+
+.pff-btn.primary {
+  border-color: transparent;
+  background: var(--global-link-color);
+  color: var(--global-bg-color);
+}
+
+.pff-btn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+html[data-theme="dark"] .pff-btn {
+  border-color: rgba(255,255,255,.22);
+  background: rgba(255,255,255,.06);
+}
+
+html[data-theme="dark"] .pff-btn.primary {
+  border-color: transparent;
+  background: var(--global-link-color);
+  color: var(--global-bg-color);
+}
+
+.pff-status {
+  margin-top: 10px;
+  color: var(--global-text-color);
+  opacity: .58;
+  text-align: center;
+  font-size: .72rem;
+  line-height: 1.4;
+}
+
+.pff-status.error {
+  color: #b42318;
+  opacity: 1;
+}
+
+html[data-theme="dark"] .pff-status.error {
+  color: #ff9f9f;
+}
+
+.pff-note {
+  margin: 16px 0 0;
+  padding: 10px 12px;
+  border-left: 4px solid var(--global-link-color);
+  background: rgba(80,120,200,.04);
+  color: var(--global-text-color);
+  opacity: .66;
+  font-size: .68rem;
+  line-height: 1.5;
+}
+
+@media (max-width:760px) {
+  .pdf-form-filler-app {
+    width: 100%;
+  }
+
+  .pff-panel {
+    padding: 14px 10px;
+  }
+
+  .pff-row {
+    grid-template-columns: 1fr;
+  }
+
+  .pff-canvas-wrap {
+    min-height: 300px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pdf-form-filler-app *,
+  .pdf-form-filler-app *::before,
+  .pdf-form-filler-app *::after {
+    transition-duration: .001ms !important;
+  }
+}
+</style>
+
+<div class="pdf-form-filler-app">
+  <section class="pff-panel" aria-labelledby="pff-title">
+    <p class="pff-brand">Mobile PDF Tool</p>
+
+    <header class="pff-hero">
+      <h1 class="pff-title" id="pff-title">PDF Form Filler</h1>
+      <p class="pff-intro">
+        Add text, today's date or check marks to a PDF.
+        Choose a page, tap the preview to set the position, then export the filled PDF.
+      </p>
+    </header>
+
+    <div
+      class="pff-drop"
+      id="pff-drop"
+      role="button"
+      tabindex="0"
+      aria-label="Choose PDF file"
+    >
+      Choose PDF
+      <input
+        id="pff-file"
+        type="file"
+        accept=".pdf,application/pdf"
+        hidden
+      >
+    </div>
+
+    <div class="pff-row">
+      <div class="pff-card pff-canvas-wrap">
+        <canvas id="pff-preview" width="600" height="800"></canvas>
+      </div>
+
+      <div class="pff-card">
+        <div class="pff-field">
+          <label for="pff-page">Page</label>
+          <input id="pff-page" type="number" min="1" value="1">
+        </div>
+
+        <div class="pff-field">
+          <label for="pff-type">Item type</label>
+          <select id="pff-type">
+            <option value="text">Text</option>
+            <option value="date">Today's date</option>
+            <option value="check">Check mark</option>
+          </select>
+        </div>
+
+        <div class="pff-field" id="pff-text-field">
+          <label for="pff-text">Text</label>
+          <input id="pff-text" placeholder="Enter text">
+        </div>
+
+        <div class="pff-field">
+          <label for="pff-font-size">Font size</label>
+          <input
+            id="pff-font-size"
+            type="number"
+            min="7"
+            max="40"
+            value="14"
+          >
+        </div>
+
+        <p class="pff-meta">
+          Tap the preview to choose a position, then tap Add Item.
+          Repeat as needed.
+        </p>
+
+        <div class="pff-actions">
+          <button class="pff-btn" id="pff-add" type="button" disabled>Add Item</button>
+          <button class="pff-btn" id="pff-undo" type="button" disabled>Undo</button>
+          <button class="pff-btn primary" id="pff-save" type="button" disabled>Download Filled PDF</button>
+          <button class="pff-btn" id="pff-clear" type="button" disabled>Clear</button>
+        </div>
+
+        <p class="pff-meta" id="pff-count">0 items</p>
+
+        <div
+          class="pff-status"
+          id="pff-status"
+          role="status"
+          aria-live="polite"
+        ></div>
+      </div>
+    </div>
+
+    <div class="pff-note">
+      This tool overlays content onto PDF pages. It does not modify interactive AcroForm fields directly.
+    </div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+<script type="module">
+import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.1.200/pdf.min.mjs";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.1.200/pdf.worker.min.mjs";
+
+const byId = id => document.getElementById(id);
+
+const drop = byId("pff-drop");
+const fileInput = byId("pff-file");
+const preview = byId("pff-preview");
+const pageInput = byId("pff-page");
+const typeInput = byId("pff-type");
+const textInput = byId("pff-text");
+const textField = byId("pff-text-field");
+const fontSizeInput = byId("pff-font-size");
+const addBtn = byId("pff-add");
+const undoBtn = byId("pff-undo");
+const saveBtn = byId("pff-save");
+const clearBtn = byId("pff-clear");
+const count = byId("pff-count");
+const status = byId("pff-status");
+
+let sourceBytes = null;
+let pdfPreview = null;
+let position = {x:.5,y:.5};
+let items = [];
+let sourceFile = null;
+let outputUrl = null;
+let rendering = false;
+
+function setStatus(message, error=false) {
+  status.textContent = message;
+  status.classList.toggle("error", error);
+}
+
+function updateButtons() {
+  const ready = !!sourceBytes;
+  addBtn.disabled = !ready;
+  saveBtn.disabled = !ready;
+  clearBtn.disabled = !ready;
+  undoBtn.disabled = items.length === 0;
+  count.textContent = `${items.length} item${items.length === 1 ? "" : "s"}`;
+}
+
+function clearAll() {
+  sourceBytes = null;
+  sourceFile = null;
+  pdfPreview = null;
+  items = [];
+  position = {x:.5,y:.5};
+
+  fileInput.value = "";
+  pageInput.value = "1";
+  pageInput.removeAttribute("max");
+  typeInput.value = "text";
+  textInput.value = "";
+  fontSizeInput.value = "14";
+  textField.style.display = "";
+
+  const context = preview.getContext("2d");
+  context.clearRect(0,0,preview.width,preview.height);
+
+  if (outputUrl) {
+    URL.revokeObjectURL(outputUrl);
+    outputUrl = null;
+  }
+
+  setStatus("");
+  updateButtons();
+}
+
+async function render() {
+  if (!sourceBytes || rendering) return;
+
+  rendering = true;
+
+  try {
+    if (!pdfPreview) {
+      pdfPreview = await pdfjsLib.getDocument({
+        data: sourceBytes.slice()
+      }).promise;
+    }
+
+    const pageNumber = Math.min(
+      pdfPreview.numPages,
+      Math.max(1, Number(pageInput.value) || 1)
+    );
+
+    pageInput.max = pdfPreview.numPages;
+    pageInput.value = pageNumber;
+
+    const page = await pdfPreview.getPage(pageNumber);
+    const viewport = page.getViewport({scale:1.2});
+
+    preview.width = Math.ceil(viewport.width);
+    preview.height = Math.ceil(viewport.height);
+
+    const context = preview.getContext("2d");
+
+    await page.render({
+      canvasContext: context,
+      viewport
+    }).promise;
+
+    context.strokeStyle = "#d33";
+    context.lineWidth = 2;
+    context.beginPath();
+    context.arc(
+      position.x * preview.width,
+      position.y * preview.height,
+      6,
+      0,
+      Math.PI * 2
+    );
+    context.stroke();
+
+    setStatus(`Page ${pageNumber} ready.`);
+  } catch (error) {
+    console.error(error);
+    setStatus(
+      "The PDF preview could not be rendered. It may be encrypted, damaged or unsupported.",
+      true
+    );
+  } finally {
+    rendering = false;
+  }
+}
+
+async function loadFile(file) {
+  if (
+    !file ||
+    (
+      file.type !== "application/pdf" &&
+      !file.name.toLowerCase().endsWith(".pdf")
+    )
+  ) {
+    setStatus("Please choose a PDF file.", true);
+    return;
+  }
+
+  try {
+    sourceFile = file;
+    sourceBytes = new Uint8Array(await file.arrayBuffer());
+    pdfPreview = null;
+    items = [];
+    position = {x:.5,y:.5};
+
+    fileInput.value = "";
+
+    updateButtons();
+    await render();
+  } catch (error) {
+    console.error(error);
+    clearAll();
+    setStatus("The PDF could not be read.", true);
+  }
+}
+
+drop.addEventListener("click", () => {
+  fileInput.click();
+});
+
+drop.addEventListener("keydown", event => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    fileInput.click();
+  }
+});
+
+fileInput.addEventListener("change", event => {
+  loadFile(event.target.files[0]);
+});
+
+["dragenter","dragover"].forEach(type => {
+  drop.addEventListener(type, event => {
+    event.preventDefault();
+    drop.classList.add("drag");
+  });
+});
+
+["dragleave","drop"].forEach(type => {
+  drop.addEventListener(type, event => {
+    event.preventDefault();
+    drop.classList.remove("drag");
+  });
+});
+
+drop.addEventListener("drop", event => {
+  loadFile(event.dataTransfer.files[0]);
+});
+
+preview.addEventListener("pointerdown", event => {
+  if (!sourceBytes) return;
+
+  const rect = preview.getBoundingClientRect();
+
+  position = {
+    x: Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width)),
+    y: Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height))
+  };
+
+  render();
+});
+
+pageInput.addEventListener("change", render);
+
+typeInput.addEventListener("change", () => {
+  textField.style.display =
+    typeInput.value === "text"
+      ? ""
+      : "none";
+});
+
+addBtn.addEventListener("click", () => {
+  if (!sourceBytes) return;
+
+  const type = typeInput.value;
+
+  const value =
+    type === "date"
+      ? new Date().toLocaleDateString("en-GB")
+      : type === "check"
+        ? "X"
+        : textInput.value.trim();
+
+  if (!value) {
+    setStatus("Enter text before adding the item.", true);
+    return;
+  }
+
+  const pageNumber = Number(pageInput.value) || 1;
+  const size = Math.max(
+    7,
+    Math.min(
+      40,
+      Number(fontSizeInput.value) || 14
+    )
+  );
+
+  fontSizeInput.value = size;
+
+  items.push({
+    page: pageNumber,
+    x: position.x,
+    y: position.y,
+    value,
+    size
+  });
+
+  setStatus("Item added.");
+  updateButtons();
+});
+
+undoBtn.addEventListener("click", () => {
+  if (!items.length) return;
+
+  items.pop();
+  setStatus("Last item removed.");
+  updateButtons();
+});
+
+clearBtn.addEventListener("click", clearAll);
+
+saveBtn.addEventListener("click", async () => {
+  if (!sourceBytes) return;
+
+  if (!window.PDFLib) {
+    setStatus("PDF library could not be loaded.", true);
+    return;
+  }
+
+  try {
+    saveBtn.disabled = true;
+    addBtn.disabled = true;
+    undoBtn.disabled = true;
+
+    setStatus("Creating filled PDF…");
+
+    const documentPdf = await PDFLib.PDFDocument.load(sourceBytes);
+    const font = await documentPdf.embedFont(PDFLib.StandardFonts.Helvetica);
+
+    for (const item of items) {
+      const page = documentPdf.getPage(item.page - 1);
+
+      page.drawText(item.value, {
+        x: item.x * page.getWidth(),
+        y: (1 - item.y) * page.getHeight(),
+        size: item.size,
+        font,
+        color: PDFLib.rgb(0,0,0)
+      });
+    }
+
+    const outputBytes = await documentPdf.save();
+
+    if (outputUrl) {
+      URL.revokeObjectURL(outputUrl);
+    }
+
+    outputUrl = URL.createObjectURL(
+      new Blob(
+        [outputBytes],
+        {type:"application/pdf"}
+      )
+    );
+
+    const anchor = document.createElement("a");
+    const base =
+      sourceFile?.name?.replace(/\.pdf$/i,"") ||
+      "filled";
+
+    anchor.href = outputUrl;
+    anchor.download = `${base}-filled.pdf`;
+
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+
+    window.setTimeout(() => {
+      if (outputUrl) {
+        URL.revokeObjectURL(outputUrl);
+        outputUrl = null;
+      }
+    }, 1500);
+
+    setStatus("Filled PDF downloaded.");
+  } catch (error) {
+    console.error(error);
+    setStatus("The filled PDF could not be created.", true);
+  } finally {
+    updateButtons();
+  }
+});
+
+updateButtons();
+</script>
