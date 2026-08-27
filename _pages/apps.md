@@ -42,7 +42,7 @@ author_profile: true
 <button onclick="location.href='../apps/password-generator/'">🔐 PASSWORD GENERATOR</button>
 <button onclick="location.href='../apps/unit-converter/'">📐 UNIT CONVERTER</button>
 <button onclick="location.href='../apps/favicon-generator/'">🌐 FAVICON GENERATOR</button>
-<button onclick="location.href='../apps/minimal_timer/'">⏱️ 5 MIN TIMER</button>
+<button onclick="location.href='../apps/minimal-timer/'">⏱️ 5 MIN TIMER</button>
 
 
 <h3>🔎 DOCUMENT & METADATA TOOLS</h3>
