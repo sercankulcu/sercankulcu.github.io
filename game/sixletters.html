@@ -1,93 +1,667 @@
-<!doctype html>
-<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#2563eb"><title>Six Letters</title><style>
-:root{
-  --bg:#f6f8fc;--surface:#ffffff;--surface2:#f0f4fb;--ink:#172033;--muted:#667085;
-  --line:#dfe5ef;--accent:#2563eb;--accent2:#1d4ed8;--good:#16a34a;--warn:#d97706;--bad:#dc2626;
-  --shadow:0 14px 40px rgba(15,23,42,.10);--r:20px
+---
+layout: without-sidebar
+title: "Six Letters"
+permalink: /game/sixletters/
+redirect_from:
+  - /game/sixletters.html
+excerpt: "Guess the hidden six-letter Turkish word in six attempts."
+---
+
+<style>
+.sixletters-app,
+.sixletters-app *,
+.sixletters-app *::before,
+.sixletters-app *::after {
+  box-sizing: border-box;
 }
-*{box-sizing:border-box}
-html{color-scheme:light}
-body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:
-radial-gradient(circle at top left,#eaf1ff 0,transparent 32rem),var(--bg);color:var(--ink);min-height:100vh}
-button,input,select{font:inherit}
-button{border:0}
-.app{width:min(860px,94vw);margin:24px auto 40px}
-.card{background:rgba(255,255,255,.96);border:1px solid rgba(223,229,239,.9);border-radius:var(--r);box-shadow:var(--shadow);padding:22px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
-.brand{display:flex;align-items:center;gap:12px}.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#7c3aed);color:white;display:grid;place-items:center;font-size:24px;font-weight:900}
-h1{font-size:clamp(1.65rem,4vw,2.25rem);margin:0;letter-spacing:-.03em}
-.subtitle{color:var(--muted);margin:4px 0 0;font-size:.98rem}
-.toolbar,.stats,.actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
-.stats{justify-content:center;margin:14px 0}
-.stat{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:9px 13px;font-weight:800}
-.btn{border-radius:12px;padding:11px 15px;background:#eaf0fb;color:var(--ink);font-weight:800;cursor:pointer;transition:.16s transform,.16s background,.16s opacity}
-.btn:hover{transform:translateY(-1px);background:#dde7f7}.btn:active{transform:translateY(0)}
-.btn.primary{background:var(--accent);color:#fff}.btn.primary:hover{background:var(--accent2)}
-.btn.good{background:#dcfce7;color:#166534}.btn.bad{background:#fee2e2;color:#991b1b}.btn.warn{background:#ffedd5;color:#9a3412}
-.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
-.message{min-height:34px;text-align:center;font-weight:800;margin:14px 0 2px}
-.help{position:fixed;right:16px;top:16px;width:42px;height:42px;border-radius:50%;background:#111827;color:#fff;font-weight:900;z-index:10;box-shadow:0 8px 24px #0003;cursor:pointer}
-.modal{display:none;position:fixed;inset:0;background:rgba(15,23,42,.82);backdrop-filter:blur(6px);z-index:50;padding:24px;overflow:auto}
-.modal.open{display:block}.modalbox{max-width:720px;margin:5vh auto;background:white;color:var(--ink);border-radius:20px;padding:24px;box-shadow:0 30px 70px #0005}
-.modalbox h2{margin-top:0}.modalbox li{margin:.45rem 0}.modalclose{float:right}
-.gamegrid{display:grid;gap:10px}
-.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#eef2f7;border:1px solid #d0d5dd;border-bottom-width:3px;border-radius:7px;padding:2px 7px}
-.progress{height:10px;background:#e7edf6;border-radius:999px;overflow:hidden}.progress>span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7c3aed);width:0%;transition:width .25s}
-input[type=text],input[type=number]{width:100%;border:2px solid var(--line);border-radius:13px;padding:13px 14px;background:white;outline:none}
-input:focus{border-color:var(--accent);box-shadow:0 0 0 4px #2563eb18}
-.section{background:#fbfcfe;border:1px solid var(--line);border-radius:16px;padding:16px}
-.small{font-size:.9rem;color:var(--muted)}
-@media(max-width:640px){.app{width:min(96vw,860px);margin:8px auto 24px}.card{padding:14px;border-radius:16px}.topbar{align-items:flex-start}.help{top:auto;bottom:14px}.btn{padding:10px 12px}.logo{width:42px;height:42px}}
-</style></head>
-<body>
-<button class="help" id="helpBtn" aria-label="Yardım">?</button>
-<div class="modal" id="helpModal" role="dialog" aria-modal="true"><div class="modalbox">
-<button class="btn modalclose" id="helpClose">Kapat</button><h2>Six Letters</h2><ul><li><b>Yeşil:</b> doğru harf ve doğru yer.</li><li><b>Turuncu:</b> harf var ama yeri yanlış.</li><li><b>Gri:</b> harf kelimede yok.</li><li>Fiziksel klavye de desteklenir.</li></ul></div></div>
-<div class="app"><div class="card">
-<div class="topbar"><div class="brand"><div class="logo">6️⃣</div><div><h1>Six Letters</h1><p class="subtitle">6 harfli gizli kelimeyi 6 tahminde bul.</p></div></div></div>
-<div class="stats"><span class="stat">Tahmin: <b id="attempt">1</b>/6</span><span class="stat">Seri: <b id="streak">0</b></span></div>
-<div id="board" class="gamegrid" style="justify-content:center;margin:18px 0"></div>
-<div id="kb" class="gamegrid" style="grid-template-columns:repeat(10,minmax(30px,1fr));max-width:680px;margin:auto"></div>
-<div id="msg" class="message" aria-live="polite"></div><div class="actions" style="justify-content:center"><button id="restart" class="btn">Yeni Kelime</button></div>
-</div></div>
+
+.sixletters-app {
+  width: min(820px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.sixletters-panel {
+  padding: 22px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, .07);
+}
+
+.sixletters-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.sixletters-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sixletters-logo {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--global-link-color);
+  color: #fff;
+  font-size: 23px;
+  font-weight: 900;
+}
+
+.sixletters-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.65rem, 4vw, 2.25rem);
+  line-height: 1.1;
+  letter-spacing: -.03em;
+}
+
+.sixletters-subtitle {
+  margin: 4px 0 0;
+  color: var(--global-text-color);
+  opacity: .64;
+  font-size: .92rem;
+}
+
+.sixletters-help,
+.sixletters-button,
+.sixletters-key {
+  font: inherit;
+}
+
+.sixletters-help {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--global-text-color);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.sixletters-help:hover,
+.sixletters-button:hover {
+  background: rgba(127, 127, 127, .10);
+}
+
+.sixletters-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 9px;
+  margin: 14px 0;
+}
+
+.sixletters-stat {
+  padding: 9px 13px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+  background: rgba(127, 127, 127, .06);
+  color: var(--global-text-color);
+  font-size: .88rem;
+  font-weight: 800;
+}
+
+.sixletters-board {
+  width: min(100%, 390px);
+  margin: 18px auto;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.sixletters-cell {
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--global-border-color);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--global-text-color);
+  font-size: clamp(18px, 4vw, 27px);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.sixletters-cell.is-correct {
+  border-color: #2f855a;
+  background: #2f855a;
+  color: #fff;
+}
+
+.sixletters-cell.is-present {
+  border-color: #c27a13;
+  background: #c27a13;
+  color: #fff;
+}
+
+.sixletters-cell.is-absent {
+  border-color: #667085;
+  background: #667085;
+  color: #fff;
+}
+
+.sixletters-keyboard {
+  width: min(100%, 690px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(10, minmax(30px, 1fr));
+  gap: 6px;
+}
+
+.sixletters-key {
+  min-height: 42px;
+  padding: 0 5px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 10px;
+  background: rgba(127, 127, 127, .07);
+  color: var(--global-text-color);
+  font-size: .88rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.sixletters-key:hover:not(:disabled) {
+  border-color: var(--global-link-color);
+}
+
+.sixletters-key.is-correct {
+  border-color: #2f855a;
+  background: #2f855a;
+  color: #fff;
+}
+
+.sixletters-key.is-present {
+  border-color: #c27a13;
+  background: #c27a13;
+  color: #fff;
+}
+
+.sixletters-key.is-absent {
+  border-color: #667085;
+  background: #667085;
+  color: #fff;
+}
+
+.sixletters-key.is-action {
+  border-color: var(--global-link-color);
+  font-size: 1.05rem;
+}
+
+.sixletters-message {
+  min-height: 34px;
+  margin: 14px 0 2px;
+  color: var(--global-text-color);
+  text-align: center;
+  font-weight: 800;
+}
+
+.sixletters-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.sixletters-button {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--global-text-color);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.sixletters-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  padding: 24px;
+  overflow: auto;
+  background: rgba(0, 0, 0, .62);
+}
+
+.sixletters-modal.is-open {
+  display: block;
+}
+
+.sixletters-modal-box {
+  width: min(680px, 100%);
+  margin: 8vh auto;
+  padding: 22px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .28);
+}
+
+.sixletters-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sixletters-modal-title {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.sixletters-rules {
+  margin: 14px 0 0;
+  padding-left: 1.2rem;
+  line-height: 1.65;
+  opacity: .8;
+}
+
+.sixletters-rules li + li {
+  margin-top: .35rem;
+}
+
+@media (max-width: 640px) {
+  .sixletters-app {
+    width: 100%;
+    margin: 0 auto 1rem;
+  }
+
+  .sixletters-panel {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .sixletters-board {
+    width: min(94vw, 360px);
+    gap: 5px;
+  }
+
+  .sixletters-keyboard {
+    grid-template-columns: repeat(8, minmax(30px, 1fr));
+    gap: 5px;
+  }
+
+  .sixletters-key {
+    min-height: 40px;
+    font-size: .82rem;
+  }
+}
+
+@media (max-width: 430px) {
+  .sixletters-keyboard {
+    grid-template-columns: repeat(7, minmax(30px, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sixletters-app *,
+  .sixletters-app *::before,
+  .sixletters-app *::after {
+    transition-duration: .001ms !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+</style>
+
+<div class="sixletters-app">
+  <section class="sixletters-panel" aria-labelledby="sixletters-title">
+    <div class="sixletters-topbar">
+      <div class="sixletters-brand">
+        <div class="sixletters-logo" aria-hidden="true">6️⃣</div>
+        <div>
+          <h1 class="sixletters-title" id="sixletters-title">Six Letters</h1>
+          <p class="sixletters-subtitle">Guess the hidden six-letter Turkish word in six attempts.</p>
+        </div>
+      </div>
+
+      <button class="sixletters-help" id="sixletters-help" type="button" aria-label="How to play">?</button>
+    </div>
+
+    <div class="sixletters-stats" aria-label="Game statistics">
+      <span class="sixletters-stat">Attempt: <b id="sixletters-attempt">1</b>/6</span>
+      <span class="sixletters-stat">Streak: <b id="sixletters-streak">0</b></span>
+    </div>
+
+    <div class="sixletters-board" id="sixletters-board" aria-label="Guess board"></div>
+
+    <div class="sixletters-keyboard" id="sixletters-keyboard" aria-label="Turkish alphabet keyboard"></div>
+
+    <div class="sixletters-message" id="sixletters-message" aria-live="polite"></div>
+
+    <div class="sixletters-actions">
+      <button class="sixletters-button" id="sixletters-restart" type="button">New Word</button>
+    </div>
+  </section>
+</div>
+
+<div class="sixletters-modal" id="sixletters-modal" role="dialog" aria-modal="true" aria-labelledby="sixletters-modal-title">
+  <div class="sixletters-modal-box">
+    <div class="sixletters-modal-head">
+      <h2 class="sixletters-modal-title" id="sixletters-modal-title">How to Play</h2>
+      <button class="sixletters-button" id="sixletters-close" type="button">Close</button>
+    </div>
+
+    <ul class="sixletters-rules">
+      <li>Guess the six-letter Turkish word in six attempts.</li>
+      <li><b>Green:</b> correct letter in the correct position.</li>
+      <li><b>Orange:</b> the letter is in the word but in another position.</li>
+      <li><b>Gray:</b> the letter is not present in that remaining position.</li>
+      <li>You can use either the on-screen keyboard or a physical keyboard.</li>
+    </ul>
+  </div>
+</div>
+
 <script>
-const helpModal=document.getElementById('helpModal');
-document.getElementById('helpBtn').onclick=()=>helpModal.classList.add('open');
-document.getElementById('helpClose').onclick=()=>helpModal.classList.remove('open');
-helpModal.addEventListener('click',e=>{if(e.target===helpModal)helpModal.classList.remove('open')});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')helpModal.classList.remove('open')});
+(() => {
+  "use strict";
 
-const WORDS=["KARTAL", "YILDIZ", "BALKON", "DOSTUM", "KÖPRÜM", "ORMANİ", "KAHVEİ", "BAHARİ", "KİTABI", "GÜNEŞİ", "DENİZİ"],N=6,ALPH='ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ';
-let secret='',guess='',row=0,over=false,st=0,history=[];
-const norm=s=>s.toLocaleUpperCase('tr-TR');
-function reset(){secret=WORDS[Math.floor(Math.random()*WORDS.length)];guess='';row=0;over=false;history=[];attempt.textContent=1;msg.textContent='';draw();paintKeys();}
-function draw(){
- board.innerHTML='';board.style.gridTemplateColumns=`repeat(${N},minmax(42px,58px))`;
- for(let r=0;r<6;r++)for(let c=0;c<N;c++){
-  const d=document.createElement('div');d.style='aspect-ratio:1;border:2px solid #d0d5dd;border-radius:10px;display:grid;place-items:center;font-size:clamp(18px,4vw,26px);font-weight:900;background:#fff;transition:.2s';
-  if(r<history.length){const h=history[r];d.textContent=h.word[c];d.style.background=h.res[c]===2?'#16a34a':h.res[c]===1?'#d97706':'#667085';d.style.color='#fff';d.style.borderColor='transparent'}
-  else if(r===row)d.textContent=guess[c]||'';
-  board.appendChild(d);
- }
-}
-function evaluate(word){const sec=[...secret],used=Array(N).fill(false),res=Array(N).fill(0);[...word].forEach((c,i)=>{if(c===sec[i]){res[i]=2;used[i]=true}});[...word].forEach((c,i)=>{if(res[i])return;let j=sec.findIndex((x,k)=>x===c&&!used[k]);if(j>=0){res[i]=1;used[j]=true}});return res}
-function add(c){if(!over&&guess.length<N){guess+=c;draw()}}
-function submit(){
- if(over)return;if(guess.length!==N){msg.textContent=`${N} harf girin.`;return}
- const res=evaluate(guess);history.push({word:guess,res});
- if(guess===secret){st++;streak.textContent=st;msg.textContent=`Tebrikler! ${row+1}. tahminde buldunuz.`;over=true;draw();paintKeys();return}
- row++;guess='';attempt.textContent=Math.min(row+1,6);draw();paintKeys();
- if(row>=6){st=0;streak.textContent=0;msg.textContent='Kelime: '+secret;over=true}else msg.textContent='';
-}
-function paintKeys(){
- const best={};history.forEach(h=>[...h.word].forEach((c,i)=>best[c]=Math.max(best[c]||0,h.res[i])));
- [...kb.querySelectorAll('button[data-k]')].forEach(b=>{const v=best[b.dataset.k];b.style.background=v===2?'#16a34a':v===1?'#d97706':v===0?'#667085':'';b.style.color=v!==undefined?'#fff':''})
-}
-ALPH.split('').forEach(c=>{let b=document.createElement('button');b.className='btn';b.dataset.k=c;b.textContent=c;b.onclick=()=>add(c);kb.appendChild(b)});
-let del=document.createElement('button');del.className='btn';del.textContent='⌫';del.onclick=()=>{guess=guess.slice(0,-1);draw()};kb.appendChild(del);
-let ok=document.createElement('button');ok.className='btn primary';ok.textContent='↵';ok.onclick=submit;kb.appendChild(ok);
-document.addEventListener('keydown',e=>{let k=norm(e.key);if(ALPH.includes(k)&&e.key.length===1)add(k);if(e.key==='Backspace'){guess=guess.slice(0,-1);draw()}if(e.key==='Enter')submit()});
-restart.onclick=reset;reset();
+  const WORDS = [
+    "KARTAL",
+    "YILDIZ",
+    "BALKON",
+    "DOSTUM",
+    "KÖPRÜM",
+    "ORMANI",
+    "KALEMİ",
+    "BAHARI",
+    "KİTABI",
+    "GÜNEŞİ",
+    "DENİZİ"
+  ];
 
-</script></body></html>
+  const SIZE = 6;
+  const MAX_ATTEMPTS = 6;
+  const ALPHABET = "ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ";
+
+  const boardView = document.getElementById("sixletters-board");
+  const keyboard = document.getElementById("sixletters-keyboard");
+  const attemptView = document.getElementById("sixletters-attempt");
+  const streakView = document.getElementById("sixletters-streak");
+  const message = document.getElementById("sixletters-message");
+  const restart = document.getElementById("sixletters-restart");
+  const help = document.getElementById("sixletters-help");
+  const modal = document.getElementById("sixletters-modal");
+  const close = document.getElementById("sixletters-close");
+
+  let secret = "";
+  let currentGuess = "";
+  let row = 0;
+  let gameOver = false;
+  let streak = 0;
+  let history = [];
+  let lastSecret = "";
+
+  function normalize(text) {
+    return text.toLocaleUpperCase("tr-TR");
+  }
+
+  function chooseSecret() {
+    const available = WORDS.length > 1
+      ? WORDS.filter(word => word !== lastSecret)
+      : WORDS;
+
+    const selected = available[Math.floor(Math.random() * available.length)];
+    lastSecret = selected;
+    return selected;
+  }
+
+  function evaluate(word) {
+    const secretLetters = [...secret];
+    const used = Array(SIZE).fill(false);
+    const result = Array(SIZE).fill(0);
+    const guessLetters = [...word];
+
+    guessLetters.forEach((letter, index) => {
+      if (letter === secretLetters[index]) {
+        result[index] = 2;
+        used[index] = true;
+      }
+    });
+
+    guessLetters.forEach((letter, index) => {
+      if (result[index] !== 0) return;
+
+      const matchIndex = secretLetters.findIndex(
+        (candidate, candidateIndex) =>
+          candidate === letter && !used[candidateIndex]
+      );
+
+      if (matchIndex >= 0) {
+        result[index] = 1;
+        used[matchIndex] = true;
+      }
+    });
+
+    return result;
+  }
+
+  function renderBoard() {
+    boardView.innerHTML = "";
+
+    for (let r = 0; r < MAX_ATTEMPTS; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        const cell = document.createElement("div");
+        cell.className = "sixletters-cell";
+
+        if (r < history.length) {
+          const entry = history[r];
+          cell.textContent = entry.word[c];
+
+          if (entry.result[c] === 2) {
+            cell.classList.add("is-correct");
+          } else if (entry.result[c] === 1) {
+            cell.classList.add("is-present");
+          } else {
+            cell.classList.add("is-absent");
+          }
+        } else if (r === row) {
+          cell.textContent = currentGuess[c] || "";
+        }
+
+        boardView.appendChild(cell);
+      }
+    }
+  }
+
+  function keyStates() {
+    const states = {};
+
+    for (const entry of history) {
+      [...entry.word].forEach((letter, index) => {
+        states[letter] = Math.max(
+          states[letter] ?? -1,
+          entry.result[index]
+        );
+      });
+    }
+
+    return states;
+  }
+
+  function renderKeyStates() {
+    const states = keyStates();
+
+    for (const button of keyboard.querySelectorAll("[data-letter]")) {
+      button.classList.remove("is-correct", "is-present", "is-absent");
+
+      const state = states[button.dataset.letter];
+
+      if (state === 2) {
+        button.classList.add("is-correct");
+      } else if (state === 1) {
+        button.classList.add("is-present");
+      } else if (state === 0) {
+        button.classList.add("is-absent");
+      }
+    }
+  }
+
+  function addLetter(letter) {
+    if (gameOver || currentGuess.length >= SIZE) return;
+
+    currentGuess += letter;
+    renderBoard();
+  }
+
+  function deleteLetter() {
+    if (gameOver || currentGuess.length === 0) return;
+
+    currentGuess = currentGuess.slice(0, -1);
+    renderBoard();
+  }
+
+  function submitGuess() {
+    if (gameOver) return;
+
+    if (currentGuess.length !== SIZE) {
+      message.textContent = `Enter ${SIZE} letters.`;
+      return;
+    }
+
+    const result = evaluate(currentGuess);
+    history.push({
+      word: currentGuess,
+      result
+    });
+
+    if (currentGuess === secret) {
+      streak += 1;
+      streakView.textContent = String(streak);
+      message.textContent = `Correct in ${row + 1} ${row === 0 ? "attempt" : "attempts"}.`;
+      gameOver = true;
+      renderBoard();
+      renderKeyStates();
+      return;
+    }
+
+    row += 1;
+    currentGuess = "";
+
+    attemptView.textContent = String(Math.min(row + 1, MAX_ATTEMPTS));
+
+    renderBoard();
+    renderKeyStates();
+
+    if (row >= MAX_ATTEMPTS) {
+      streak = 0;
+      streakView.textContent = "0";
+      message.textContent = `The word was ${secret}.`;
+      gameOver = true;
+    } else {
+      message.textContent = "";
+    }
+  }
+
+  function buildKeyboard() {
+    keyboard.innerHTML = "";
+
+    for (const letter of ALPHABET) {
+      const button = document.createElement("button");
+
+      button.type = "button";
+      button.className = "sixletters-key";
+      button.dataset.letter = letter;
+      button.textContent = letter;
+      button.addEventListener("click", () => addLetter(letter));
+
+      keyboard.appendChild(button);
+    }
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "sixletters-key is-action";
+    deleteButton.textContent = "⌫";
+    deleteButton.setAttribute("aria-label", "Delete letter");
+    deleteButton.addEventListener("click", deleteLetter);
+
+    const enterButton = document.createElement("button");
+    enterButton.type = "button";
+    enterButton.className = "sixletters-key is-action";
+    enterButton.textContent = "↵";
+    enterButton.setAttribute("aria-label", "Submit guess");
+    enterButton.addEventListener("click", submitGuess);
+
+    keyboard.appendChild(deleteButton);
+    keyboard.appendChild(enterButton);
+  }
+
+  function startGame() {
+    secret = chooseSecret();
+    currentGuess = "";
+    row = 0;
+    gameOver = false;
+    history = [];
+
+    attemptView.textContent = "1";
+    message.textContent = "";
+
+    renderBoard();
+    renderKeyStates();
+  }
+
+  function openHelp() {
+    modal.classList.add("is-open");
+    close.focus();
+  }
+
+  function closeHelp() {
+    modal.classList.remove("is-open");
+    help.focus();
+  }
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && modal.classList.contains("is-open")) {
+      closeHelp();
+      return;
+    }
+
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+    if (event.key === "Backspace") {
+      event.preventDefault();
+      deleteLetter();
+      return;
+    }
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      submitGuess();
+      return;
+    }
+
+    if (event.key.length !== 1) return;
+
+    const letter = normalize(event.key);
+
+    if (ALPHABET.includes(letter)) {
+      addLetter(letter);
+    }
+  });
+
+  restart.addEventListener("click", startGame);
+  help.addEventListener("click", openHelp);
+  close.addEventListener("click", closeHelp);
+
+  modal.addEventListener("click", event => {
+    if (event.target === modal) {
+      closeHelp();
+    }
+  });
+
+  buildKeyboard();
+  startGame();
+})();
+</script>
