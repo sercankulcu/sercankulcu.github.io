@@ -47,7 +47,7 @@ author_profile: true
 
 <h3>🔎 DOCUMENT & METADATA TOOLS</h3>
 
-<button onclick="location.href='/apps/word-document-diff/'">📝 TRACK CHANGES (DOCX)</button>
+<button onclick="location.href='/apps/word-document-diff/'">📝 WORD DOCUMENT DIFF (DOCX)</button>
 <button onclick="location.href='/apps/pdf-metadata-viewer/'">🔎 PDF METADATA VIEWER</button>
 <button onclick="location.href='/apps/office-metadata-viewer/'">🗂️ OFFICE METADATA VIEWER</button>
 <button onclick="location.href='/apps/image-metadata-viewer/'">🏷️ IMAGE METADATA VIEWER</button>
@@ -57,7 +57,7 @@ author_profile: true
 
 <button onclick="location.href='/apps/reaction-time-test/'">⚡ REACTION TIME TEST</button>
 <button onclick="location.href='/apps/memory-test/'">🧠 MEMORY TEST</button>
-<button onclick="location.href='/apps/cognitive-reasoning-test/'">🧩 IQ TEST</button>
+<button onclick="location.href='/apps/cognitive-reasoning-test/'">🧩 COGNITIVE REASONING TEST</button>
 <button onclick="location.href='/apps/personality-test/'">🌟 PERSONALITY TEST</button>
 
 
