@@ -1,15 +1,506 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0b1020"><title>Images to PDF</title><script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script><style>
-:root{--panel:#121a2b;--panel2:#182238;--line:#293752;--text:#f7f9fd;--muted:#9eabc2;--accent:#7ea7ff;--accent2:#b78cff;--good:#83d7ae;--bad:#ff9f9f}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%}
-body{min-height:100svh;display:grid;place-items:center;padding:10px;background:radial-gradient(circle at 15% 0%,rgba(72,94,185,.24),transparent 34rem),radial-gradient(circle at 90% 90%,rgba(140,75,180,.16),transparent 30rem),linear-gradient(155deg,#090e19,#11182a 55%,#0a101c);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text)}
-.app{width:min(980px,100%)}.panel{border:1px solid var(--line);border-radius:26px;background:rgba(18,26,43,.97);box-shadow:0 30px 80px rgba(0,0,0,.42);padding:clamp(16px,3vw,30px)}
-.brand{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:900}.hero{text-align:center;margin:12px auto 0}.hero h1{margin:0;font-size:clamp(1.9rem,5vw,3.2rem);letter-spacing:-.04em}.hero p{max-width:700px;margin:9px auto 0;color:var(--muted);line-height:1.55;font-size:.9rem}
-.drop{border:1px dashed #4b5e82;border-radius:17px;padding:20px;text-align:center;background:#0f1727;cursor:pointer}.drop.drag{border-color:var(--accent);background:#14223b}
-.card{border:1px solid var(--line);border-radius:16px;background:#101827;padding:14px}.field{display:grid;gap:5px}.field label{font-size:.7rem;color:var(--muted);font-weight:800}
-input,select,textarea{width:100%;min-height:41px;border:1px solid var(--line);border-radius:11px;background:#0d1525;color:var(--text);padding:0 10px;font:inherit}textarea{padding:10px}
-.btn{min-height:41px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);color:var(--text);padding:0 13px;font:inherit;font-size:.79rem;font-weight:800;cursor:pointer}.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:0;color:#08101c}.btn:disabled{opacity:.38;cursor:not-allowed}.actions{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.meta{font-size:.73rem;color:var(--muted);line-height:1.5}.note{text-align:center;color:#758095;font-size:.68rem;margin:15px 0 0}.canvasWrap{display:grid;place-items:center;overflow:auto}.canvasWrap canvas{max-width:100%;height:auto;background:white;border-radius:8px;touch-action:none}
-@media(max-width:680px){body{padding:6px}.panel{padding:14px 10px;border-radius:20px}.row{grid-template-columns:1fr}}
-</style></head><body><main class="app"><section class="panel"><div class="brand">Mobile PDF Tool</div><div class="hero"><h1>Images to PDF</h1><p>Select multiple photos from your phone, arrange them by filename order and create one PDF.</p></div><div class="drop" id="drop">Choose Images<input id="file" type="file" accept="image/*" multiple hidden></div><div class="card" style="margin-top:12px"><div class="row"><div class="field"><label>Page size</label><select id="pageSize"><option value="auto">Fit each image</option><option value="a4" selected>A4</option></select></div><div class="field"><label>Margin</label><select id="margin"><option value="0">None</option><option value="18" selected>Small</option><option value="36">Large</option></select></div></div><textarea id="list" readonly style="margin-top:10px" placeholder="Selected files will appear here"></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" id="make" disabled>Create PDF</button></div></div><p class="note">Photos are processed locally and kept in the selected order.</p></section></main><script>
-const $=id=>document.getElementById(id);let fs=[];$("drop").onclick=()=>$("file").click();$("file").onchange=e=>{fs=[...e.target.files].filter(f=>f.type.startsWith("image/"));$("list").value=fs.map((f,i)=>(i+1)+". "+f.name).join("\n");$("make").disabled=!fs.length};
-$("make").onclick=async()=>{let d=await PDFLib.PDFDocument.create(),m=+$("margin").value;for(const f of fs){let data=new Uint8Array(await f.arrayBuffer()),im;if(f.type==="image/png")im=await d.embedPng(data);else im=await d.embedJpg(data);let p;if($("pageSize").value==="auto")p=d.addPage([im.width,im.height]);else p=d.addPage([595.28,841.89]);let r=Math.min((p.getWidth()-2*m)/im.width,(p.getHeight()-2*m)/im.height),w=im.width*r,h=im.height*r;p.drawImage(im,{x:(p.getWidth()-w)/2,y:(p.getHeight()-h)/2,width:w,height:h})}let b=await d.save(),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([b],{type:"application/pdf"}));a.download="images.pdf";a.click()};
-</script></body></html>
+---
+layout: without-sidebar
+title: "Images to PDF"
+permalink: /apps/images-to-pdf/
+redirect_from:
+  - /apps/images-to-pdf.html
+excerpt: "Combine multiple images into a single PDF directly in your browser."
+---
+
+<style>
+.images-to-pdf-app,
+.images-to-pdf-app *,
+.images-to-pdf-app *::before,
+.images-to-pdf-app *::after {
+  box-sizing: border-box;
+}
+
+.images-to-pdf-app {
+  width: min(980px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.itp-panel {
+  padding: clamp(16px, 3vw, 28px);
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0,0,0,.07);
+}
+
+.itp-brand {
+  margin: 0;
+  color: var(--global-link-color);
+  font-size: .66rem;
+  font-weight: 900;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.itp-hero {
+  max-width: 720px;
+  margin: 10px auto 0;
+  text-align: center;
+}
+
+.itp-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.9rem, 5vw, 2.8rem);
+  line-height: 1.08;
+  letter-spacing: -.04em;
+}
+
+.itp-intro {
+  max-width: 700px;
+  margin: 9px auto 0;
+  color: var(--global-text-color);
+  opacity: .7;
+  font-size: .84rem;
+  line-height: 1.5;
+}
+
+.itp-drop {
+  margin-top: 18px;
+  padding: 20px 16px;
+  border: 1px dashed rgba(127,127,127,.52);
+  border-radius: 14px;
+  background: rgba(127,127,127,.04);
+  color: var(--global-text-color);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease;
+}
+
+.itp-drop:hover,
+.itp-drop.drag {
+  border-color: var(--global-link-color);
+  background: rgba(80,120,200,.08);
+}
+
+.itp-card {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 13px;
+  background: rgba(127,127,127,.035);
+}
+
+.itp-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.itp-field {
+  display: grid;
+  gap: 6px;
+}
+
+.itp-field label {
+  color: var(--global-text-color);
+  opacity: .62;
+  font-size: .71rem;
+  font-weight: 800;
+}
+
+.itp-field select,
+.itp-list {
+  width: 100%;
+  border: 1px solid var(--global-border-color);
+  border-radius: 10px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  font: inherit;
+  font-size: .8rem;
+}
+
+.itp-field select {
+  min-height: 42px;
+  padding: 0 10px;
+}
+
+.itp-list {
+  min-height: 150px;
+  margin-top: 10px;
+  padding: 10px;
+  resize: vertical;
+}
+
+.itp-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.itp-btn {
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid rgba(45,45,45,.42);
+  border-radius: 999px;
+  background: rgba(45,45,45,.08);
+  color: var(--global-text-color);
+  font: inherit;
+  font-size: .74rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.itp-btn:hover:not(:disabled) {
+  background: rgba(45,45,45,.14);
+}
+
+.itp-btn.primary {
+  border-color: transparent;
+  background: var(--global-link-color);
+  color: var(--global-bg-color);
+}
+
+.itp-btn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+html[data-theme="dark"] .itp-btn {
+  border-color: rgba(255,255,255,.22);
+  background: rgba(255,255,255,.06);
+}
+
+html[data-theme="dark"] .itp-btn.primary {
+  border-color: transparent;
+  background: var(--global-link-color);
+  color: var(--global-bg-color);
+}
+
+.itp-status {
+  margin-top: 10px;
+  color: var(--global-text-color);
+  opacity: .58;
+  text-align: center;
+  font-size: .72rem;
+  line-height: 1.4;
+}
+
+.itp-note {
+  margin: 16px 0 0;
+  color: var(--global-text-color);
+  opacity: .45;
+  text-align: center;
+  font-size: .65rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 680px) {
+  .images-to-pdf-app {
+    width: 100%;
+  }
+
+  .itp-panel {
+    padding: 14px 10px;
+  }
+
+  .itp-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .images-to-pdf-app *,
+  .images-to-pdf-app *::before,
+  .images-to-pdf-app *::after {
+    transition-duration: .001ms !important;
+  }
+}
+</style>
+
+<div class="images-to-pdf-app">
+  <section class="itp-panel" aria-labelledby="itp-title">
+    <p class="itp-brand">Mobile PDF Tool</p>
+
+    <header class="itp-hero">
+      <h1 class="itp-title" id="itp-title">Images to PDF</h1>
+      <p class="itp-intro">
+        Select multiple photos, keep them in the chosen order,
+        and create one PDF directly in your browser.
+      </p>
+    </header>
+
+    <div
+      class="itp-drop"
+      id="itp-drop"
+      role="button"
+      tabindex="0"
+      aria-label="Choose images or drop them here"
+    >
+      Choose Images
+      <input
+        id="itp-file"
+        type="file"
+        accept="image/*"
+        multiple
+        hidden
+      >
+    </div>
+
+    <div class="itp-card">
+      <div class="itp-row">
+        <div class="itp-field">
+          <label for="itp-page-size">Page size</label>
+          <select id="itp-page-size">
+            <option value="auto">Fit each image</option>
+            <option value="a4" selected>A4</option>
+          </select>
+        </div>
+
+        <div class="itp-field">
+          <label for="itp-margin">Margin</label>
+          <select id="itp-margin">
+            <option value="0">None</option>
+            <option value="18" selected>Small</option>
+            <option value="36">Large</option>
+          </select>
+        </div>
+      </div>
+
+      <textarea
+        class="itp-list"
+        id="itp-list"
+        readonly
+        placeholder="Selected files will appear here"
+      ></textarea>
+
+      <div class="itp-actions">
+        <button
+          class="itp-btn primary"
+          id="itp-make"
+          type="button"
+          disabled
+        >
+          Create PDF
+        </button>
+
+        <button
+          class="itp-btn"
+          id="itp-clear"
+          type="button"
+          disabled
+        >
+          Clear
+        </button>
+      </div>
+
+      <div
+        class="itp-status"
+        id="itp-status"
+        role="status"
+        aria-live="polite"
+      >
+        Choose one or more images to begin.
+      </div>
+    </div>
+
+    <p class="itp-note">
+      Images are processed locally and kept in the selected order.
+    </p>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+<script>
+(() => {
+  "use strict";
+
+  const byId = id => document.getElementById(id);
+
+  const drop = byId("itp-drop");
+  const fileInput = byId("itp-file");
+  const list = byId("itp-list");
+  const makeBtn = byId("itp-make");
+  const clearBtn = byId("itp-clear");
+  const status = byId("itp-status");
+
+  let files = [];
+  let pdfUrl = null;
+
+  function setStatus(message) {
+    status.textContent = message;
+  }
+
+  function updateList() {
+    list.value = files
+      .map((file, index) => `${index + 1}. ${file.name}`)
+      .join("\n");
+
+    makeBtn.disabled = files.length === 0;
+    clearBtn.disabled = files.length === 0;
+
+    setStatus(
+      files.length
+        ? `${files.length} image${files.length === 1 ? "" : "s"} selected.`
+        : "Choose one or more images to begin."
+    );
+  }
+
+  function addFiles(inputFiles) {
+    const selected = [...inputFiles]
+      .filter(file => file.type.startsWith("image/"));
+
+    if (!selected.length) {
+      setStatus("Please choose valid image files.");
+      return;
+    }
+
+    files = selected;
+    updateList();
+
+    fileInput.value = "";
+  }
+
+  function clearAll() {
+    files = [];
+    list.value = "";
+    fileInput.value = "";
+
+    if (pdfUrl) {
+      URL.revokeObjectURL(pdfUrl);
+      pdfUrl = null;
+    }
+
+    updateList();
+  }
+
+  drop.addEventListener("click", () => {
+    fileInput.click();
+  });
+
+  drop.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      fileInput.click();
+    }
+  });
+
+  fileInput.addEventListener("change", event => {
+    addFiles(event.target.files);
+  });
+
+  ["dragenter", "dragover"].forEach(type => {
+    drop.addEventListener(type, event => {
+      event.preventDefault();
+      drop.classList.add("drag");
+    });
+  });
+
+  ["dragleave", "drop"].forEach(type => {
+    drop.addEventListener(type, event => {
+      event.preventDefault();
+      drop.classList.remove("drag");
+    });
+  });
+
+  drop.addEventListener("drop", event => {
+    addFiles(event.dataTransfer.files);
+  });
+
+  clearBtn.addEventListener("click", clearAll);
+
+  makeBtn.addEventListener("click", async () => {
+    if (!files.length) {
+      return;
+    }
+
+    if (!window.PDFLib) {
+      setStatus("PDF library could not be loaded.");
+      return;
+    }
+
+    makeBtn.disabled = true;
+    clearBtn.disabled = true;
+
+    try {
+      setStatus("Creating PDF…");
+
+      const documentPdf = await PDFLib.PDFDocument.create();
+      const margin = Number(byId("itp-margin").value);
+      const pageSize = byId("itp-page-size").value;
+
+      for (const file of files) {
+        const data = new Uint8Array(await file.arrayBuffer());
+
+        let image;
+
+        if (file.type === "image/png") {
+          image = await documentPdf.embedPng(data);
+        } else {
+          image = await documentPdf.embedJpg(data);
+        }
+
+        const page =
+          pageSize === "auto"
+            ? documentPdf.addPage([image.width, image.height])
+            : documentPdf.addPage([595.28, 841.89]);
+
+        const availableWidth = page.getWidth() - 2 * margin;
+        const availableHeight = page.getHeight() - 2 * margin;
+
+        const scale = Math.min(
+          availableWidth / image.width,
+          availableHeight / image.height
+        );
+
+        const width = image.width * scale;
+        const height = image.height * scale;
+
+        page.drawImage(image, {
+          x: (page.getWidth() - width) / 2,
+          y: (page.getHeight() - height) / 2,
+          width,
+          height
+        });
+      }
+
+      const bytes = await documentPdf.save();
+
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+
+      pdfUrl = URL.createObjectURL(
+        new Blob(
+          [bytes],
+          { type: "application/pdf" }
+        )
+      );
+
+      const anchor = document.createElement("a");
+      anchor.href = pdfUrl;
+      anchor.download = "images.pdf";
+      anchor.click();
+
+      window.setTimeout(() => {
+        if (pdfUrl) {
+          URL.revokeObjectURL(pdfUrl);
+          pdfUrl = null;
+        }
+      }, 1500);
+
+      setStatus(`PDF created from ${files.length} image${files.length === 1 ? "" : "s"}.`);
+    } catch (error) {
+      console.error(error);
+      setStatus(
+        "The PDF could not be created. PNG and JPEG images are supported."
+      );
+    } finally {
+      makeBtn.disabled = files.length === 0;
+      clearBtn.disabled = files.length === 0;
+    }
+  });
+
+  updateList();
+})();
+</script>
