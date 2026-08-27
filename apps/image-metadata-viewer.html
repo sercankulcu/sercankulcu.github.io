@@ -1,20 +1,1013 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Image Metadata Viewer</title><style>
-:root{--panel:#121a2b;--panel2:#182238;--line:#293752;--text:#f7f9fd;--muted:#9eabc2;--accent:#7ea7ff;--accent2:#b78cff;--good:#83d7ae;--bad:#ff9f9f}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%}body{min-height:100svh;display:grid;place-items:center;padding:14px;background:radial-gradient(circle at 15% 0%,rgba(72,94,185,.24),transparent 34rem),radial-gradient(circle at 90% 90%,rgba(140,75,180,.16),transparent 30rem),linear-gradient(155deg,#090e19,#11182a 55%,#0a101c);font-family:Inter,system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--text)}
-.app{width:min(960px,100%)}.panel{border:1px solid var(--line);border-radius:28px;background:rgba(18,26,43,.96);box-shadow:0 30px 80px rgba(0,0,0,.42);padding:clamp(18px,4vw,34px)}.brand{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:900}.hero{text-align:center;margin:15px auto 0}.hero h1{margin:0;font-size:clamp(2rem,5vw,3.5rem);letter-spacing:-.04em}.hero p{max-width:680px;margin:10px auto 0;color:var(--muted);line-height:1.6}.drop{border:1px dashed #4b5e82;border-radius:18px;padding:25px;text-align:center;background:#0f1727;cursor:pointer;margin-top:20px}.drop.drag{border-color:var(--accent);background:#14223b}.meta{color:var(--muted);font-size:.76rem;line-height:1.5}.note{text-align:center;color:#758095;font-size:.69rem;margin:17px 0 0}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:15px}.stat{border:1px solid var(--line);border-radius:13px;background:#0e1625;padding:11px}.stat b{display:block;font-size:.95rem;overflow-wrap:anywhere}.stat span{font-size:.67rem;color:var(--muted)}.tableWrap{margin-top:15px;border:1px solid var(--line);border-radius:17px;overflow:hidden;background:#0e1625}.toolbar{display:flex;gap:8px;padding:10px;border-bottom:1px solid var(--line)}input{width:100%;min-height:40px;border:1px solid var(--line);border-radius:10px;background:#111b2d;color:var(--text);padding:0 10px;font:inherit}.btn{min-height:40px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--text);padding:0 12px;font:inherit;font-size:.78rem;font-weight:800;cursor:pointer}table{width:100%;border-collapse:collapse}td{padding:9px 11px;border-top:1px solid rgba(41,55,82,.6);font-size:.78rem;vertical-align:top;overflow-wrap:anywhere}td:first-child{width:34%;color:var(--muted);font-weight:800}.empty{text-align:center;padding:28px;color:var(--muted)}.sectionTitle{margin:18px 0 8px;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}@media(max-width:650px){body{padding:8px}.panel{padding:16px 12px;border-radius:22px}.summary{grid-template-columns:repeat(2,1fr)}td:first-child{width:42%}}
-</style></head><body><main class="app"><section class="panel">
-<div class="brand">Metadata Tool</div><div class="hero"><h1>Image Metadata Viewer</h1><p>Inspect image dimensions, file properties and available EXIF metadata including camera, exposure and GPS fields.</p></div>
-<div class="drop" id="drop">Drop an image here or click to choose<input id="file" type="file" accept="image/*,.heic,.heif,.tif,.tiff" hidden></div>
-<div class="summary"><div class="stat"><b id="name">—</b><span>File</span></div><div class="stat"><b id="size">—</b><span>Size</span></div><div class="stat"><b id="type">—</b><span>Type</span></div><div class="stat"><b id="dims">—</b><span>Dimensions</span></div></div>
-<div class="tableWrap"><div class="toolbar"><input id="search" placeholder="Filter metadata…"><button class="btn" id="copy">Copy JSON</button></div><div id="output" class="empty">No image selected.</div></div><p class="note">Metadata is read locally. GPS information is shown only when it exists in the file.</p></section></main>
-<script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js"></script><script>
-const $=id=>document.getElementById(id);let data={};
-function fmt(n){return n<1024?n+" B":n<1048576?(n/1024).toFixed(1)+" KB":(n/1048576).toFixed(2)+" MB"}
-function value(v){if(v==null)return"";if(v instanceof Date)return v.toISOString();if(Array.isArray(v))return v.join(", ");if(typeof v==="object"){try{return JSON.stringify(v)}catch{return String(v)}}return String(v)}
-function render(){let q=$("search").value.toLowerCase(),rows=Object.entries(data).filter(([k,v])=>k.toLowerCase().includes(q)||value(v).toLowerCase().includes(q)).sort((a,b)=>a[0].localeCompare(b[0]));$("output").className="";$("output").innerHTML=rows.length?"<table>"+rows.map(([k,v])=>"<tr><td>"+escapeHtml(k)+"</td><td>"+escapeHtml(value(v))+"</td></tr>").join("")+"</table>":"<div class='empty'>No matching metadata.</div>"}
-function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]))}
-async function load(f){if(!f)return;$("name").textContent=f.name;$("size").textContent=fmt(f.size);$("type").textContent=f.type||"Unknown";$("dims").textContent="Reading…";data={FileName:f.name,FileSize:f.size,FileType:f.type||"",LastModified:new Date(f.lastModified)};
-let img=new Image(),url=URL.createObjectURL(f);img.onload=()=>{$("dims").textContent=img.naturalWidth+" × "+img.naturalHeight;data.Width=img.naturalWidth;data.Height=img.naturalHeight;render();URL.revokeObjectURL(url)};img.onerror=()=>{$("dims").textContent="Not available";URL.revokeObjectURL(url)};img.src=url;
-try{if(!window.exifr)throw new Error("EXIF library unavailable");let ex=await exifr.parse(f,{tiff:true,exif:true,gps:true,icc:true,iptc:true,xmp:true,translateValues:true,reviveValues:true});if(ex)Object.assign(data,ex);render()}catch(e){data.MetadataError=e.message;render()}}
-$("drop").onclick=()=>$("file").click();$("file").onchange=e=>load(e.target.files[0]);["dragover","dragenter"].forEach(x=>$("drop").addEventListener(x,e=>{e.preventDefault();$("drop").classList.add("drag")}));["dragleave","drop"].forEach(x=>$("drop").addEventListener(x,e=>{e.preventDefault();$("drop").classList.remove("drag")}));$("drop").ondrop=e=>load(e.dataTransfer.files[0]);$("search").oninput=render;$("copy").onclick=()=>navigator.clipboard?.writeText(JSON.stringify(data,(k,v)=>v instanceof Date?v.toISOString():v,2));
-</script></body></html>
+---
+layout: without-sidebar
+title: "Image Metadata Viewer"
+permalink: /apps/image-metadata-viewer/
+redirect_from:
+  - /apps/image-metadata-viewer.html
+excerpt: "Inspect image dimensions, file properties and available EXIF metadata directly in your browser."
+---
+
+<style>
+.metadata-app,
+.metadata-app *,
+.metadata-app *::before,
+.metadata-app *::after {
+  box-sizing: border-box;
+}
+
+.metadata-app {
+  width: min(900px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+
+  color: var(--global-text-color);
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.metadata-panel {
+  padding: 22px 24px;
+
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+
+  background: var(--global-bg-color);
+
+  box-shadow:
+    0 12px 35px
+    rgba(0, 0, 0, .07);
+}
+
+.metadata-brand {
+  margin: 0;
+
+  color: var(--global-link-color);
+
+  font-size: .66rem;
+  font-weight: 900;
+
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.metadata-header {
+  max-width: 680px;
+  margin: 10px auto 0;
+
+  text-align: center;
+}
+
+.metadata-title {
+  margin: 0;
+
+  color: var(--global-text-color);
+
+  font-size:
+    clamp(1.9rem, 5vw, 2.8rem);
+
+  line-height: 1.08;
+  letter-spacing: -.04em;
+}
+
+.metadata-intro {
+  max-width: 610px;
+  margin: 9px auto 0;
+
+  color: var(--global-text-color);
+
+  opacity: .7;
+
+  font-size: .84rem;
+  line-height: 1.5;
+}
+
+.metadata-drop {
+  margin-top: 18px;
+  padding: 24px 16px;
+
+  border:
+    1px dashed
+    rgba(127, 127, 127, .52);
+
+  border-radius: 14px;
+
+  background:
+    rgba(127, 127, 127, .045);
+
+  color: var(--global-text-color);
+
+  text-align: center;
+
+  cursor: pointer;
+
+  transition:
+    border-color .18s ease,
+    background .18s ease;
+}
+
+.metadata-drop:hover,
+.metadata-drop.drag {
+  border-color:
+    var(--global-link-color);
+
+  background:
+    rgba(80, 120, 200, .08);
+}
+
+.metadata-drop strong {
+  display: block;
+
+  font-size: .92rem;
+}
+
+.metadata-drop span {
+  display: block;
+
+  margin-top: 4px;
+
+  opacity: .58;
+
+  font-size: .72rem;
+}
+
+.metadata-summary {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 8px;
+
+  margin-top: 12px;
+}
+
+.metadata-stat {
+  min-width: 0;
+
+  padding: 11px;
+
+  border: 1px solid var(--global-border-color);
+  border-radius: 12px;
+
+  background:
+    rgba(127, 127, 127, .035);
+}
+
+.metadata-stat strong {
+  display: block;
+
+  overflow-wrap: anywhere;
+
+  color: var(--global-text-color);
+
+  font-size: .9rem;
+  line-height: 1.3;
+}
+
+.metadata-stat span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: var(--global-text-color);
+
+  opacity: .5;
+
+  font-size: .64rem;
+}
+
+.metadata-table-wrap {
+  margin-top: 12px;
+
+  overflow: hidden;
+
+  border: 1px solid var(--global-border-color);
+  border-radius: 14px;
+
+  background:
+    rgba(127, 127, 127, .025);
+}
+
+.metadata-toolbar {
+  display: grid;
+
+  grid-template-columns:
+    1fr auto;
+
+  gap: 8px;
+
+  padding: 9px;
+
+  border-bottom:
+    1px solid
+    var(--global-border-color);
+}
+
+.metadata-search {
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
+
+  padding: 0 10px;
+
+  border: 1px solid var(--global-border-color);
+  border-radius: 9px;
+
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+
+  font: inherit;
+  font-size: .78rem;
+}
+
+.metadata-search:focus {
+  outline:
+    2px solid
+    var(--global-link-color);
+
+  outline-offset: 2px;
+}
+
+.metadata-btn {
+  min-height: 38px;
+
+  padding: 0 12px;
+
+  border:
+    1px solid
+    rgba(45, 45, 45, .42);
+
+  border-radius: 999px;
+
+  background:
+    rgba(45, 45, 45, .10);
+
+  color: var(--global-text-color);
+
+  font: inherit;
+  font-size: .71rem;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.metadata-btn:hover {
+  background:
+    rgba(45, 45, 45, .17);
+}
+
+html[data-theme="dark"] .metadata-btn {
+  border-color:
+    rgba(255, 255, 255, .22);
+
+  background:
+    rgba(255, 255, 255, .07);
+}
+
+html[data-theme="dark"] .metadata-btn:hover {
+  border-color:
+    rgba(255, 255, 255, .34);
+
+  background:
+    rgba(255, 255, 255, .12);
+}
+
+.metadata-output {
+  overflow-x: auto;
+}
+
+.metadata-table {
+  width: 100%;
+
+  border-collapse: collapse;
+}
+
+.metadata-table td {
+  padding: 9px 11px;
+
+  border-top:
+    1px solid
+    var(--global-border-color);
+
+  color: var(--global-text-color);
+
+  vertical-align: top;
+
+  overflow-wrap: anywhere;
+
+  font-size: .76rem;
+  line-height: 1.4;
+}
+
+.metadata-table tr:first-child td {
+  border-top: 0;
+}
+
+.metadata-table td:first-child {
+  width: 34%;
+
+  opacity: .6;
+
+  font-weight: 800;
+}
+
+.metadata-empty {
+  padding: 28px 14px;
+
+  color: var(--global-text-color);
+
+  opacity: .52;
+
+  text-align: center;
+
+  font-size: .78rem;
+}
+
+.metadata-note {
+  margin: 13px 0 0;
+
+  color: var(--global-text-color);
+
+  opacity: .45;
+
+  text-align: center;
+
+  font-size: .65rem;
+  line-height: 1.45;
+}
+
+.metadata-toast {
+  position: fixed;
+
+  left: 50%;
+  bottom: 20px;
+  z-index: 999;
+
+  transform:
+    translate(-50%, 12px);
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  padding: 9px 13px;
+
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+
+  box-shadow:
+    0 10px 30px
+    rgba(0, 0, 0, .18);
+
+  font-size: .72rem;
+
+  transition: .25s;
+}
+
+.metadata-toast.show {
+  opacity: 1;
+
+  transform:
+    translate(-50%, 0);
+}
+
+@media (max-width: 700px) {
+  .metadata-app {
+    width: 100%;
+
+    margin: 0 auto 1rem;
+  }
+
+  .metadata-panel {
+    padding: 16px 12px;
+
+    border-radius: 14px;
+  }
+
+  .metadata-title {
+    font-size: 1.8rem;
+  }
+
+  .metadata-intro {
+    font-size: .78rem;
+  }
+
+  .metadata-summary {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .metadata-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .metadata-table td:first-child {
+    width: 42%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metadata-app *,
+  .metadata-app *::before,
+  .metadata-app *::after {
+    transition-duration:
+      .001ms !important;
+  }
+}
+</style>
+
+<div class="metadata-app">
+  <section
+    class="metadata-panel"
+    aria-labelledby="metadata-title"
+  >
+    <p class="metadata-brand">
+      Metadata Tool
+    </p>
+
+    <header class="metadata-header">
+      <h1
+        class="metadata-title"
+        id="metadata-title"
+      >
+        Image Metadata Viewer
+      </h1>
+
+      <p class="metadata-intro">
+        Inspect image dimensions, file properties and available EXIF metadata,
+        including camera, exposure and GPS fields.
+      </p>
+    </header>
+
+    <div
+      class="metadata-drop"
+      id="metadata-drop"
+      role="button"
+      tabindex="0"
+      aria-label="Choose an image or drop one here"
+    >
+      <strong>
+        Drop an image here or click to choose
+      </strong>
+
+      <span>
+        JPEG, PNG, WebP, HEIC, HEIF, TIFF and other supported image formats
+      </span>
+
+      <input
+        id="metadata-file"
+        type="file"
+        accept="image/*,.heic,.heif,.tif,.tiff"
+        hidden
+      >
+    </div>
+
+    <div class="metadata-summary">
+      <div class="metadata-stat">
+        <strong id="metadata-name">
+          —
+        </strong>
+
+        <span>
+          File
+        </span>
+      </div>
+
+      <div class="metadata-stat">
+        <strong id="metadata-size">
+          —
+        </strong>
+
+        <span>
+          Size
+        </span>
+      </div>
+
+      <div class="metadata-stat">
+        <strong id="metadata-type">
+          —
+        </strong>
+
+        <span>
+          Type
+        </span>
+      </div>
+
+      <div class="metadata-stat">
+        <strong id="metadata-dims">
+          —
+        </strong>
+
+        <span>
+          Dimensions
+        </span>
+      </div>
+    </div>
+
+    <div class="metadata-table-wrap">
+      <div class="metadata-toolbar">
+        <input
+          class="metadata-search"
+          id="metadata-search"
+          type="search"
+          placeholder="Filter metadata…"
+          aria-label="Filter metadata"
+        >
+
+        <button
+          class="metadata-btn"
+          id="metadata-copy"
+          type="button"
+        >
+          Copy JSON
+        </button>
+      </div>
+
+      <div
+        class="metadata-output"
+        id="metadata-output"
+      >
+        <div class="metadata-empty">
+          No image selected.
+        </div>
+      </div>
+    </div>
+
+    <p class="metadata-note">
+      Metadata is read locally in your browser.
+      GPS information is shown only when it exists in the file.
+    </p>
+  </section>
+</div>
+
+<div
+  class="metadata-toast"
+  id="metadata-toast"
+  role="status"
+  aria-live="polite"
+></div>
+
+<script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js"></script>
+
+<script>
+(() => {
+  "use strict";
+
+  const byId = id =>
+    document.getElementById(id);
+
+  const drop =
+    byId("metadata-drop");
+
+  const fileInput =
+    byId("metadata-file");
+
+  const searchInput =
+    byId("metadata-search");
+
+  const output =
+    byId("metadata-output");
+
+  const copyButton =
+    byId("metadata-copy");
+
+  const toast =
+    byId("metadata-toast");
+
+  let metadata = {};
+  let toastTimer = null;
+
+  function formatBytes(bytes) {
+    if (
+      bytes < 1024
+    ) {
+      return `${bytes} B`;
+    }
+
+    if (
+      bytes < 1048576
+    ) {
+      return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+
+    return `${(bytes / 1048576).toFixed(2)} MB`;
+  }
+
+  function displayValue(value) {
+    if (
+      value == null
+    ) {
+      return "";
+    }
+
+    if (
+      value instanceof Date
+    ) {
+      return value.toISOString();
+    }
+
+    if (
+      Array.isArray(value)
+    ) {
+      return value.join(", ");
+    }
+
+    if (
+      typeof value === "object"
+    ) {
+      try {
+        return JSON.stringify(value);
+      } catch (error) {
+        return String(value);
+      }
+    }
+
+    return String(value);
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(
+        /[&<>"]/g,
+        character => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;"
+        })[character]
+      );
+  }
+
+  function render() {
+    const query =
+      searchInput.value
+        .trim()
+        .toLowerCase();
+
+    const rows =
+      Object.entries(metadata)
+        .filter(
+          ([key, value]) =>
+            key
+              .toLowerCase()
+              .includes(query) ||
+            displayValue(value)
+              .toLowerCase()
+              .includes(query)
+        )
+        .sort(
+          (a, b) =>
+            a[0]
+              .localeCompare(b[0])
+        );
+
+    if (
+      !rows.length
+    ) {
+      output.innerHTML = `
+        <div class="metadata-empty">
+          ${
+            Object.keys(metadata).length
+              ? "No matching metadata."
+              : "No image selected."
+          }
+        </div>
+      `;
+
+      return;
+    }
+
+    output.innerHTML = `
+      <table class="metadata-table">
+        <tbody>
+          ${
+            rows
+              .map(
+                ([key, value]) => `
+                  <tr>
+                    <td>
+                      ${escapeHtml(key)}
+                    </td>
+
+                    <td>
+                      ${escapeHtml(displayValue(value))}
+                    </td>
+                  </tr>
+                `
+              )
+              .join("")
+          }
+        </tbody>
+      </table>
+    `;
+  }
+
+  function showToast(message) {
+    clearTimeout(
+      toastTimer
+    );
+
+    toast.textContent =
+      message;
+
+    toast
+      .classList
+      .add("show");
+
+    toastTimer =
+      window.setTimeout(
+        () => {
+          toast
+            .classList
+            .remove("show");
+        },
+        1500
+      );
+  }
+
+  function readDimensions(file) {
+    byId("metadata-dims")
+      .textContent =
+        "Reading…";
+
+    const image =
+      new Image();
+
+    const url =
+      URL.createObjectURL(file);
+
+    image.onload = () => {
+      const width =
+        image.naturalWidth;
+
+      const height =
+        image.naturalHeight;
+
+      byId("metadata-dims")
+        .textContent =
+          `${width} × ${height}`;
+
+      metadata.Width =
+        width;
+
+      metadata.Height =
+        height;
+
+      render();
+
+      URL.revokeObjectURL(
+        url
+      );
+    };
+
+    image.onerror = () => {
+      byId("metadata-dims")
+        .textContent =
+          "Not available";
+
+      URL.revokeObjectURL(
+        url
+      );
+    };
+
+    image.src =
+      url;
+  }
+
+  async function loadFile(file) {
+    if (
+      !file
+    ) {
+      return;
+    }
+
+    byId("metadata-name")
+      .textContent =
+        file.name;
+
+    byId("metadata-size")
+      .textContent =
+        formatBytes(
+          file.size
+        );
+
+    byId("metadata-type")
+      .textContent =
+        file.type ||
+        "Unknown";
+
+    metadata = {
+      FileName:
+        file.name,
+      FileSize:
+        file.size,
+      FileType:
+        file.type || "",
+      LastModified:
+        new Date(
+          file.lastModified
+        )
+    };
+
+    searchInput.value = "";
+
+    render();
+    readDimensions(file);
+
+    try {
+      if (
+        !window.exifr
+      ) {
+        throw new Error(
+          "EXIF library unavailable"
+        );
+      }
+
+      const exif =
+        await window.exifr.parse(
+          file,
+          {
+            tiff: true,
+            exif: true,
+            gps: true,
+            icc: true,
+            iptc: true,
+            xmp: true,
+            translateValues: true,
+            reviveValues: true
+          }
+        );
+
+      if (
+        exif
+      ) {
+        Object.assign(
+          metadata,
+          exif
+        );
+      }
+
+      render();
+    } catch (error) {
+      metadata.MetadataError =
+        error.message;
+
+      render();
+    }
+  }
+
+  async function copyJson() {
+    if (
+      !Object.keys(metadata).length
+    ) {
+      showToast(
+        "No metadata to copy"
+      );
+
+      return;
+    }
+
+    const json =
+      JSON.stringify(
+        metadata,
+        (
+          key,
+          value
+        ) =>
+          value instanceof Date
+            ? value.toISOString()
+            : value,
+        2
+      );
+
+    try {
+      await navigator
+        .clipboard
+        .writeText(json);
+    } catch (error) {
+      const textarea =
+        document.createElement(
+          "textarea"
+        );
+
+      textarea.value =
+        json;
+
+      textarea.style.position =
+        "fixed";
+
+      textarea.style.opacity =
+        "0";
+
+      document.body
+        .appendChild(
+          textarea
+        );
+
+      textarea.select();
+
+      document.execCommand(
+        "copy"
+      );
+
+      textarea.remove();
+    }
+
+    showToast(
+      "JSON copied"
+    );
+  }
+
+  function openFilePicker() {
+    fileInput.click();
+  }
+
+  drop.addEventListener(
+    "click",
+    openFilePicker
+  );
+
+  drop.addEventListener(
+    "keydown",
+    event => {
+      if (
+        event.key === "Enter" ||
+        event.key === " "
+      ) {
+        event.preventDefault();
+        openFilePicker();
+      }
+    }
+  );
+
+  fileInput.addEventListener(
+    "change",
+    event => {
+      loadFile(
+        event.target.files[0]
+      );
+    }
+  );
+
+  [
+    "dragover",
+    "dragenter"
+  ].forEach(type => {
+    drop.addEventListener(
+      type,
+      event => {
+        event.preventDefault();
+
+        drop
+          .classList
+          .add("drag");
+      }
+    );
+  });
+
+  [
+    "dragleave",
+    "drop"
+  ].forEach(type => {
+    drop.addEventListener(
+      type,
+      event => {
+        event.preventDefault();
+
+        drop
+          .classList
+          .remove("drag");
+      }
+    );
+  });
+
+  drop.addEventListener(
+    "drop",
+    event => {
+      loadFile(
+        event.dataTransfer
+          .files[0]
+      );
+    }
+  );
+
+  searchInput.addEventListener(
+    "input",
+    render
+  );
+
+  copyButton.addEventListener(
+    "click",
+    copyJson
+  );
+})();
+</script>
