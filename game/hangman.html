@@ -252,6 +252,25 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
   margin-top: .35rem;
 }
 
+
+.hangman-lang {
+  min-height: 42px;
+  padding: 0 10px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 999px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.hangman-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 @media (max-width: 640px) {
   .hangman-app {
     width: 100%;
@@ -302,17 +321,27 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
         <div class="hangman-logo" aria-hidden="true">🎯</div>
         <div>
           <h1 class="hangman-title" id="hangman-title">Hangman</h1>
-          <p class="hangman-subtitle">Guess the hidden Turkish word before six incorrect letters.</p>
+          <p class="hangman-subtitle" id="hangman-subtitle">Guess the hidden word before six incorrect letters.</p>
         </div>
       </div>
 
-      <button class="hangman-help" id="hangman-help" type="button" aria-label="How to play">?</button>
+      <div class="hangman-top-actions">
+        <select class="hangman-lang" id="hangman-language" aria-label="Language">
+          <option value="tr">TR</option>
+          <option value="en" selected>EN</option>
+          <option value="de">DE</option>
+          <option value="fr">FR</option>
+          <option value="es">ES</option>
+          <option value="ru">RU</option>
+        </select>
+        <button class="hangman-help" id="hangman-help" type="button" aria-label="How to play">?</button>
+      </div>
     </div>
 
     <div class="hangman-stats" aria-label="Game statistics">
-      <span class="hangman-stat">Score: <b id="hangman-score">0</b></span>
-      <span class="hangman-stat">Lives: <b id="hangman-lives">6</b></span>
-      <span class="hangman-stat">Streak: <b id="hangman-streak">0</b></span>
+      <span class="hangman-stat"><span id="hangman-score-label">Score</span>: <b id="hangman-score">0</b></span>
+      <span class="hangman-stat"><span id="hangman-lives-label">Lives</span>: <b id="hangman-lives">6</b></span>
+      <span class="hangman-stat"><span id="hangman-streak-label">Streak</span>: <b id="hangman-streak">0</b></span>
     </div>
 
     <img
@@ -344,11 +373,11 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
     </div>
 
     <ul class="hangman-rules">
-      <li>Select a letter on screen or type it on your keyboard.</li>
-      <li>Correct letters are revealed in the hidden word.</li>
-      <li>Each incorrect letter costs one life.</li>
-      <li>The round ends after six incorrect guesses.</li>
-      <li>Winning increases both your score and streak.</li>
+      <li id="hangman-rule-1">Select a letter on screen or type it on your keyboard.</li>
+      <li id="hangman-rule-2">Correct letters are revealed in the hidden word.</li>
+      <li id="hangman-rule-3">Each incorrect letter costs one life.</li>
+      <li id="hangman-rule-4">The round ends after six incorrect guesses.</li>
+      <li id="hangman-rule-5">Winning increases both your score and streak.</li>
     </ul>
   </div>
 </div>
@@ -357,25 +386,148 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
 (() => {
   "use strict";
 
-  const WORDS = [
-    "BİLGİSAYAR",
-    "ALGORİTMA",
-    "İSTANBUL",
-    "PROGRAM",
-    "KİTAPLIK",
-    "ÖĞRENCİ",
-    "MÜHENDİS",
-    "TEKNOLOJİ",
-    "BULMACA",
-    "MATEMATİK",
-    "İNTERNET",
-    "YAZILIM",
-    "DONANIM",
-    "KLAVYE",
-    "VERİTABANI"
-  ];
+  let WORDS = [];
+  let allWords = {};
+  let currentLanguage = "en";
 
-  const ALPHABET = "ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ";
+  const LANGUAGE_CONFIG = {
+    tr: {
+      alphabet: "ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ",
+      locale: "tr-TR",
+      subtitle: "Altı yanlış harften önce gizli kelimeyi bul.",
+      score: "Skor",
+      lives: "Can",
+      streak: "Seri",
+      newWord: "Yeni Kelime",
+      help: "Nasıl Oynanır",
+      close: "Kapat",
+      rules: [
+        "Ekrandaki bir harfi seç veya klavyeden yaz.",
+        "Doğru harfler gizli kelimede açılır.",
+        "Her yanlış harf bir can götürür.",
+        "Tur altı yanlış tahminden sonra biter.",
+        "Kazanmak skorunu ve serini artırır."
+      ],
+      correct: word => `Doğru! Kelime ${word} idi.`,
+      lost: word => `Kelime ${word} idi.`,
+      loading: "Kelimeler yükleniyor...",
+      loadError: "Kelime listesi yüklenemedi."
+    },
+    en: {
+      alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      locale: "en-US",
+      subtitle: "Guess the hidden word before six incorrect letters.",
+      score: "Score",
+      lives: "Lives",
+      streak: "Streak",
+      newWord: "New Word",
+      help: "How to Play",
+      close: "Close",
+      rules: [
+        "Select a letter on screen or type it on your keyboard.",
+        "Correct letters are revealed in the hidden word.",
+        "Each incorrect letter costs one life.",
+        "The round ends after six incorrect guesses.",
+        "Winning increases both your score and streak."
+      ],
+      correct: word => `Correct! The word was ${word}.`,
+      lost: word => `The word was ${word}.`,
+      loading: "Loading words...",
+      loadError: "Word list could not be loaded."
+    },
+    de: {
+      alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜß",
+      locale: "de-DE",
+      subtitle: "Errate das versteckte Wort vor sechs falschen Buchstaben.",
+      score: "Punkte",
+      lives: "Leben",
+      streak: "Serie",
+      newWord: "Neues Wort",
+      help: "Spielanleitung",
+      close: "Schließen",
+      rules: [
+        "Wähle einen Buchstaben auf dem Bildschirm oder tippe ihn auf der Tastatur.",
+        "Richtige Buchstaben werden im versteckten Wort angezeigt.",
+        "Jeder falsche Buchstabe kostet ein Leben.",
+        "Die Runde endet nach sechs falschen Versuchen.",
+        "Ein Sieg erhöht Punkte und Serie."
+      ],
+      correct: word => `Richtig! Das Wort war ${word}.`,
+      lost: word => `Das Wort war ${word}.`,
+      loading: "Wörter werden geladen...",
+      loadError: "Wortliste konnte nicht geladen werden."
+    },
+    fr: {
+      alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      locale: "fr-FR",
+      subtitle: "Devinez le mot caché avant six lettres incorrectes.",
+      score: "Score",
+      lives: "Vies",
+      streak: "Série",
+      newWord: "Nouveau mot",
+      help: "Comment jouer",
+      close: "Fermer",
+      rules: [
+        "Choisissez une lettre à l'écran ou tapez-la au clavier.",
+        "Les bonnes lettres sont révélées dans le mot caché.",
+        "Chaque mauvaise lettre coûte une vie.",
+        "La manche se termine après six erreurs.",
+        "Une victoire augmente le score et la série."
+      ],
+      correct: word => `Correct ! Le mot était ${word}.`,
+      lost: word => `Le mot était ${word}.`,
+      loading: "Chargement des mots...",
+      loadError: "Impossible de charger la liste de mots."
+    },
+    es: {
+      alphabet: "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",
+      locale: "es-ES",
+      subtitle: "Adivina la palabra oculta antes de seis letras incorrectas.",
+      score: "Puntos",
+      lives: "Vidas",
+      streak: "Racha",
+      newWord: "Nueva palabra",
+      help: "Cómo jugar",
+      close: "Cerrar",
+      rules: [
+        "Selecciona una letra en pantalla o escríbela con el teclado.",
+        "Las letras correctas se revelan en la palabra oculta.",
+        "Cada letra incorrecta cuesta una vida.",
+        "La ronda termina después de seis errores.",
+        "Ganar aumenta tu puntuación y tu racha."
+      ],
+      correct: word => `¡Correcto! La palabra era ${word}.`,
+      lost: word => `La palabra era ${word}.`,
+      loading: "Cargando palabras...",
+      loadError: "No se pudo cargar la lista de palabras."
+    },
+    ru: {
+      alphabet: "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
+      locale: "ru-RU",
+      subtitle: "Угадайте скрытое слово до шести неверных букв.",
+      score: "Счёт",
+      lives: "Жизни",
+      streak: "Серия",
+      newWord: "Новое слово",
+      help: "Как играть",
+      close: "Закрыть",
+      rules: [
+        "Выберите букву на экране или введите её с клавиатуры.",
+        "Правильные буквы открываются в скрытом слове.",
+        "Каждая неверная буква отнимает одну жизнь.",
+        "Раунд заканчивается после шести ошибок.",
+        "Победа увеличивает счёт и серию."
+      ],
+      correct: word => `Верно! Слово было ${word}.`,
+      lost: word => `Слово было ${word}.`,
+      loading: "Загрузка слов...",
+      loadError: "Не удалось загрузить список слов."
+    }
+  };
+
+  function getConfig() {
+    return LANGUAGE_CONFIG[currentLanguage];
+  }
 
   const score = document.getElementById("hangman-score");
   const lives = document.getElementById("hangman-lives");
@@ -388,6 +540,19 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
   const help = document.getElementById("hangman-help");
   const modal = document.getElementById("hangman-modal");
   const close = document.getElementById("hangman-close");
+  const language = document.getElementById("hangman-language");
+  const subtitle = document.getElementById("hangman-subtitle");
+  const scoreLabel = document.getElementById("hangman-score-label");
+  const livesLabel = document.getElementById("hangman-lives-label");
+  const streakLabel = document.getElementById("hangman-streak-label");
+  const modalTitle = document.getElementById("hangman-modal-title");
+  const ruleEls = [
+    document.getElementById("hangman-rule-1"),
+    document.getElementById("hangman-rule-2"),
+    document.getElementById("hangman-rule-3"),
+    document.getElementById("hangman-rule-4"),
+    document.getElementById("hangman-rule-5")
+  ];
 
   let word = "";
   let guessed = new Set();
@@ -409,7 +574,7 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
 
   function renderWord() {
     wordView.textContent = [...word]
-      .map(letter => guessed.has(letter) ? letter : "_")
+      .map(letter => letter === " " ? " " : (guessed.has(letter) ? letter : "_"))
       .join(" ");
   }
 
@@ -422,7 +587,7 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
   function buildKeyboard() {
     keyboard.innerHTML = "";
 
-    for (const letter of ALPHABET) {
+    for (const letter of getConfig().alphabet) {
       const button = document.createElement("button");
 
       button.type = "button";
@@ -443,14 +608,14 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
 
     score.textContent = scoreValue;
     streak.textContent = streakValue;
-    message.textContent = `Correct! The word was ${word}.`;
+    message.textContent = getConfig().correct(word);
   }
 
   function finishLoss() {
     ended = true;
     streakValue = 0;
     streak.textContent = "0";
-    message.textContent = `The word was ${word}.`;
+    message.textContent = getConfig().lost(word);
   }
 
   function guess(letter, button) {
@@ -470,7 +635,7 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
     renderWord();
     renderFigure();
 
-    const solved = [...word].every(letter => guessed.has(letter));
+    const solved = [...word].every(letter => letter === " " || guessed.has(letter));
 
     if (solved) {
       finishWin();
@@ -491,6 +656,34 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
     buildKeyboard();
     renderWord();
     renderFigure();
+  }
+
+  function applyLanguage(lang) {
+    if (!LANGUAGE_CONFIG[lang] || !Array.isArray(allWords[lang])) return;
+
+    currentLanguage = lang;
+    const config = getConfig();
+
+    WORDS = allWords[lang]
+      .map(item => String(item).trim().toLocaleUpperCase(config.locale))
+      .filter(Boolean);
+
+    document.documentElement.lang = lang;
+    subtitle.textContent = config.subtitle;
+    scoreLabel.textContent = config.score;
+    livesLabel.textContent = config.lives;
+    streakLabel.textContent = config.streak;
+    restart.textContent = config.newWord;
+    modalTitle.textContent = config.help;
+    close.textContent = config.close;
+    help.setAttribute("aria-label", config.help);
+    language.setAttribute("aria-label", config.help === "How to Play" ? "Language" : "Language");
+
+    ruleEls.forEach((el, index) => {
+      el.textContent = config.rules[index];
+    });
+
+    startRound();
   }
 
   function openHelp() {
@@ -520,9 +713,9 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
 
     if (event.ctrlKey || event.metaKey || event.altKey) return;
 
-    const letter = event.key.toLocaleUpperCase("tr-TR");
+    const letter = event.key.toLocaleUpperCase(getConfig().locale);
 
-    if (!ALPHABET.includes(letter)) return;
+    if (!getConfig().alphabet.includes(letter)) return;
 
     const button = [...keyboard.children]
       .find(item => item.dataset.letter === letter);
@@ -534,6 +727,54 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
 
   restart.addEventListener("click", startRound);
 
-  startRound();
+  language.addEventListener("change", () => {
+    localStorage.setItem("hangman-language", language.value);
+    applyLanguage(language.value);
+  });
+
+  async function loadWords() {
+    restart.disabled = true;
+    message.textContent = getConfig().loading;
+
+    try {
+      const response = await fetch("/game/hangman/hangman-words.json", {
+        cache: "no-cache"
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data || typeof data !== "object") {
+        throw new Error("Word data is missing.");
+      }
+
+      allWords = data;
+
+      const preferred =
+        localStorage.getItem("hangman-language") ||
+        language.value ||
+        "en";
+
+      const initial = LANGUAGE_CONFIG[preferred] && Array.isArray(allWords[preferred])
+        ? preferred
+        : "en";
+
+      language.value = initial;
+      restart.disabled = false;
+      message.textContent = "";
+      applyLanguage(initial);
+    } catch (error) {
+      console.error("Hangman word list could not be loaded:", error);
+      restart.disabled = true;
+      keyboard.innerHTML = "";
+      wordView.textContent = "—";
+      message.textContent = getConfig().loadError;
+    }
+  }
+
+  loadWords();
 })();
 </script>
