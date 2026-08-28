@@ -1,1058 +1,771 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Interactive stack simulator for learning push, pop, peek, search, and LIFO behavior.">
-    <meta name="author" content="Sercan Kulcu">
-    <title>Stack Simulator</title>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --text: #1f2937;
-            --muted: #64748b;
-            --surface: #ffffff;
-            --surface-soft: #f8fafc;
-            --border: #cbd5e1;
-            --checking: #fef3c7;
-            --checking-border: #d97706;
-            --found: #dcfce7;
-            --found-border: #15803d;
-            --danger: #b91c1c;
-            --success: #15803d;
-            --shadow: 0 12px 32px rgba(15, 23, 42, 0.10);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            padding: 16px;
-            font-family: Arial, Helvetica, sans-serif;
-            color: var(--text);
-            background: #eef2f7;
-            line-height: 1.55;
-        }
-
-        button,
-        input {
-            font: inherit;
-        }
-
-        .page {
-            width: min(100%, 1060px);
-            margin: 0 auto;
-        }
-
-        .container {
-            overflow: hidden;
-            background: var(--surface);
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-        }
-
-        .header {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: 16px;
-            padding: 20px 24px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .header h1 {
-            margin: 0;
-            text-align: center;
-            font-size: clamp(1.5rem, 4vw, 2.2rem);
-        }
-
-        .back-button {
-            color: var(--primary-dark);
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .back-button:hover {
-            text-decoration: underline;
-        }
-
-        .header-spacer {
-            width: 54px;
-        }
-
-        main {
-            padding: 24px;
-        }
-
-        .intro,
-        .panel {
-            padding: 20px;
-            border: 1px solid #bfdbfe;
-            border-radius: 12px;
-            background: #eff6ff;
-        }
-
-        .intro h2,
-        .panel h2,
-        .panel h3 {
-            margin-top: 0;
-        }
-
-        .complexity-summary,
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        .complexity-summary {
-            margin-top: 18px;
-        }
-
-        .metric,
-        .stat {
-            padding: 11px;
-            border: 1px solid #bfdbfe;
-            border-radius: 9px;
-            background: white;
-        }
-
-        .metric strong,
-        .stat strong {
-            display: block;
-        }
-
-        .section-title {
-            margin: 28px 0 12px;
-            font-size: 1.2rem;
-        }
-
-        .control-panel {
-            display: grid;
-            gap: 14px;
-            padding: 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            background: var(--surface-soft);
-        }
-
-        .control-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
-            gap: 10px;
-            align-items: end;
-        }
-
-        .field {
-            display: grid;
-            gap: 5px;
-        }
-
-        .field label {
-            font-size: 0.92rem;
-            font-weight: 700;
-        }
-
-        input {
-            width: 100%;
-            min-height: 42px;
-            padding: 9px 10px;
-            color: var(--text);
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-
-        button {
-            min-height: 42px;
-            padding: 9px 13px;
-            color: white;
-            background: var(--primary);
-            border: 0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.18s ease, transform 0.18s ease;
-        }
-
-        button:hover:not(:disabled) {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        button.secondary {
-            color: var(--text);
-            background: #e2e8f0;
-        }
-
-        button.secondary:hover:not(:disabled) {
-            background: #cbd5e1;
-        }
-
-        button.danger {
-            background: var(--danger);
-        }
-
-        button:disabled {
-            cursor: not-allowed;
-            opacity: 0.55;
-        }
-
-        button:focus-visible,
-        input:focus-visible,
-        .back-button:focus-visible {
-            outline: 3px solid #f59e0b;
-            outline-offset: 2px;
-        }
-
-        .speed-row {
-            display: grid;
-            grid-template-columns: minmax(120px, 1fr) minmax(180px, 3fr) auto;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .speed-row output {
-            min-width: 72px;
-            font-weight: 700;
-            text-align: right;
-        }
-
-        .workspace {
-            display: grid;
-            grid-template-columns: minmax(260px, 0.8fr) minmax(280px, 1.2fr);
-            gap: 20px;
-            margin-top: 18px;
-        }
-
-        .visualization {
-            min-height: 480px;
-            padding: 20px;
-            border: 2px solid var(--primary);
-            border-radius: 12px;
-            background: var(--surface-soft);
-        }
-
-        .stack-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            color: var(--muted);
-            font-size: 0.82rem;
-            font-weight: 700;
-        }
-
-        .stack-shell {
-            width: min(100%, 260px);
-            min-height: 370px;
-            margin: 0 auto;
-            padding: 12px;
-            display: flex;
-            flex-direction: column-reverse;
-            justify-content: flex-start;
-            gap: 7px;
-            border: 4px solid var(--primary-dark);
-            border-top: 0;
-            border-radius: 0 0 12px 12px;
-            background: #dbeafe;
-            position: relative;
-        }
-
-        .stack-shell::before,
-        .stack-shell::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            width: 28px;
-            height: 4px;
-            background: var(--primary-dark);
-        }
-
-        .stack-shell::before {
-            left: -4px;
-        }
-
-        .stack-shell::after {
-            right: -4px;
-        }
-
-        .stack-item {
-            min-height: 49px;
-            padding: 8px 12px;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
-            gap: 8px;
-            color: var(--text);
-            background: white;
-            border: 2px solid var(--primary-dark);
-            border-radius: 8px;
-            font-weight: 700;
-            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
-        }
-
-        .stack-item small {
-            color: var(--muted);
-            font-size: 0.72rem;
-        }
-
-        .stack-item.checking {
-            background: var(--checking);
-            border-color: var(--checking-border);
-            transform: scale(1.05);
-        }
-
-        .stack-item.found {
-            background: var(--found);
-            border-color: var(--found-border);
-            transform: scale(1.05);
-        }
-
-        .stack-item.pushing {
-            animation: push-in 0.35s ease;
-        }
-
-        .stack-item.popping {
-            animation: pop-out 0.35s ease forwards;
-        }
-
-        .top-marker {
-            width: min(100%, 260px);
-            margin: 10px auto 0;
-            color: var(--primary-dark);
-            font-weight: 700;
-            text-align: center;
-        }
-
-        .empty-state {
-            margin: auto;
-            color: var(--muted);
-            text-align: center;
-        }
-
-        .info-side {
-            display: grid;
-            align-content: start;
-            gap: 14px;
-        }
-
-        .status {
-            min-height: 1.6em;
-            margin: 0;
-            padding: 14px;
-            border: 1px solid #dbeafe;
-            border-radius: 10px;
-            background: white;
-            font-weight: 700;
-        }
-
-        .status.success {
-            color: var(--success);
-        }
-
-        .status.error {
-            color: var(--danger);
-        }
-
-        .history {
-            min-height: 190px;
-            padding: 14px;
-            border: 1px solid #dbeafe;
-            border-radius: 10px;
-            background: white;
-        }
-
-        .history h3 {
-            margin: 0 0 10px;
-        }
-
-        .history-list {
-            margin: 0;
-            padding-left: 22px;
-        }
-
-        .history-list li {
-            margin: 5px 0;
-        }
-
-        .code-box {
-            padding: 14px;
-            overflow-x: auto;
-            border-radius: 10px;
-            color: #e2e8f0;
-            background: #0f172a;
-        }
-
-        .code-box pre {
-            margin: 0;
-            font-family: Consolas, Monaco, monospace;
-            font-size: 0.88rem;
-            white-space: pre-wrap;
-        }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .content-card {
-            min-width: 0;
-            padding: 18px;
-            border: 1px solid #dbeafe;
-            border-radius: 12px;
-            background: #eff6ff;
-        }
-
-        .content-card h3 {
-            margin-top: 0;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-
-        th,
-        td {
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #cbd5e1;
-        }
-
-        th {
-            background: #e2e8f0;
-        }
-
-        code {
-            padding: 2px 5px;
-            border-radius: 5px;
-            background: #e2e8f0;
-        }
-
-        @keyframes push-in {
-            from {
-                transform: translateY(-35px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes pop-out {
-            from {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateY(-35px);
-                opacity: 0;
-            }
-        }
-
-        @media (max-width: 780px) {
-            body {
-                padding: 8px;
-            }
-
-            main {
-                padding: 14px;
-            }
-
-            .header {
-                grid-template-columns: 1fr;
-                padding: 16px;
-            }
-
-            .back-button {
-                justify-self: start;
-            }
-
-            .header-spacer {
-                display: none;
-            }
-
-            .complexity-summary,
-            .stats,
-            .content-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .workspace {
-                grid-template-columns: 1fr;
-            }
-
-            .speed-row {
-                grid-template-columns: 1fr;
-            }
-
-            .speed-row output {
-                text-align: left;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .complexity-summary,
-            .stats,
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-                scroll-behavior: auto !important;
-            }
-        }
-    </style>
-</head>
-<body>
-<div class="page">
-    <div class="container">
-        <header class="header">
-            <a class="back-button" href="https://sercankulcu.github.io/teaching/data-structures">&larr; Back</a>
-            <h1>Stack Simulator</h1>
-            <span class="header-spacer" aria-hidden="true"></span>
-        </header>
-
-        <main>
-            <section class="intro">
-                <h2>What is a Stack?</h2>
-                <p>
-                    A stack is a Last-In, First-Out (LIFO) data structure. Elements are inserted and removed
-                    only from the top. Think of a stack of plates: the last plate placed on top is the first
-                    one removed.
-                </p>
-
-                <div class="complexity-summary">
-                    <div class="metric"><strong>Push</strong>O(1)</div>
-                    <div class="metric"><strong>Pop</strong>O(1)</div>
-                    <div class="metric"><strong>Peek</strong>O(1)</div>
-                    <div class="metric"><strong>Search</strong>O(n)</div>
-                </div>
-            </section>
-
-            <h2 class="section-title">Stack operations</h2>
-            <section class="control-panel" aria-label="Stack controls">
-                <div class="control-group">
-                    <div class="field">
-                        <label for="valueInput">Value</label>
-                        <input id="valueInput" type="number" value="50" inputmode="numeric">
-                    </div>
-                    <button id="pushButton" type="button">Push</button>
-                    <button id="randomButton" type="button">Push Random</button>
-                    <button id="popButton" type="button">Pop</button>
-                    <button id="peekButton" type="button">Peek</button>
-                </div>
-
-                <div class="control-group">
-                    <div class="field">
-                        <label for="searchInput">Search value</label>
-                        <input id="searchInput" type="number" value="50" inputmode="numeric">
-                    </div>
-                    <button id="searchButton" type="button">Search from Top</button>
-                    <button id="fillButton" type="button">Fill Example</button>
-                    <button id="clearButton" type="button" class="danger">Clear</button>
-                    <button id="cancelButton" type="button" class="secondary">Cancel Animation</button>
-                </div>
-
-                <div class="speed-row">
-                    <label for="speedInput"><strong>Animation speed</strong></label>
-                    <input id="speedInput" type="range" min="50" max="900" step="50" value="350">
-                    <output id="speedOutput" for="speedInput">350 ms</output>
-                </div>
-            </section>
-
-            <div class="workspace">
-                <section class="visualization" aria-label="Stack visualization">
-                    <div class="stack-labels">
-                        <span>Bottom</span>
-                        <span>Capacity: <span id="capacityLabel">0 / 6</span></span>
-                    </div>
-                    <div id="stackShell" class="stack-shell"></div>
-                    <div id="topMarker" class="top-marker">TOP → empty</div>
-                </section>
-
-                <section class="info-side">
-                    <p id="status" class="status" role="status" aria-live="polite">
-                        Enter a value and choose an operation.
-                    </p>
-
-                    <div class="stats" aria-label="Operation statistics">
-                        <div class="stat"><strong>Current operation</strong><span id="operationStat">Idle</span></div>
-                        <div class="stat"><strong>Items checked</strong><span id="checkedStat">0</span></div>
-                        <div class="stat"><strong>Stack size</strong><span id="sizeStat">0</span></div>
-                        <div class="stat"><strong>Complexity</strong><span id="complexityStat">—</span></div>
-                    </div>
-
-                    <div class="history">
-                        <h3>Operation history</h3>
-                        <ol id="historyList" class="history-list">
-                            <li>No operations yet.</li>
-                        </ol>
-                    </div>
-
-                    <div class="code-box" aria-label="Pseudocode for current operation">
-                        <pre id="codeOutput">push(value):
-    stack[top] = value
-    top = top + 1</pre>
-                    </div>
-                </section>
-            </div>
-
-            <h2 class="section-title">Stack concepts</h2>
-            <div class="content-grid">
-                <article class="content-card">
-                    <h3>LIFO behavior</h3>
-                    <p>
-                        The newest element is always at the top. A Pop operation therefore removes the most
-                        recently pushed value.
-                    </p>
-                </article>
-
-                <article class="content-card">
-                    <h3>Overflow and underflow</h3>
-                    <p>
-                        Overflow occurs when Push is attempted on a full fixed-capacity stack. Underflow occurs
-                        when Pop or Peek is attempted on an empty stack.
-                    </p>
-                </article>
-
-                <article class="content-card">
-                    <h3>Array implementation</h3>
-                    <p>
-                        An array-based stack stores values in consecutive positions and maintains a top index.
-                        Push and Pop update only that index.
-                    </p>
-                </article>
-
-                <article class="content-card">
-                    <h3>Common applications</h3>
-                    <p>
-                        Stacks are used for function calls, undo operations, expression evaluation, syntax
-                        parsing, depth-first search, and backtracking.
-                    </p>
-                </article>
-            </div>
-
-            <h2 class="section-title">Typical time complexities</h2>
-            <section class="panel">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Operation</th>
-                        <th>Time</th>
-                        <th>Reason</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>Push</td>
-                        <td>O(1)</td>
-                        <td>The value is added directly at the top.</td>
-                    </tr>
-                    <tr>
-                        <td>Pop</td>
-                        <td>O(1)</td>
-                        <td>Only the top value is removed.</td>
-                    </tr>
-                    <tr>
-                        <td>Peek</td>
-                        <td>O(1)</td>
-                        <td>The top value is read without removal.</td>
-                    </tr>
-                    <tr>
-                        <td>Search</td>
-                        <td>O(n)</td>
-                        <td>Every value may need to be checked from top to bottom.</td>
-                    </tr>
-                    <tr>
-                        <td>Space</td>
-                        <td>O(n)</td>
-                        <td>Storage grows with the number of stack elements.</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </section>
-        </main>
+---
+layout: without-sidebar
+title: "Stack Simulator"
+permalink: /files/data_structures/slides/Bolum_04_Stack.html
+excerpt: "Interactive stack simulator for push, pop, peek, search, and LIFO behavior."
+---
+
+<style>
+.ds-stack,
+.ds-stack *,
+.ds-stack *::before,
+.ds-stack *::after { box-sizing: border-box; }
+
+.ds-stack {
+  width: min(1060px, 100%);
+  margin: 0 auto 2rem;
+  color: var(--global-text-color);
+  --ds-surface: color-mix(in srgb, var(--global-link-color) 2.5%, var(--global-bg-color));
+  --ds-surface-strong: color-mix(in srgb, var(--global-link-color) 7%, var(--global-bg-color));
+  --ds-border: color-mix(in srgb, var(--global-link-color) 38%, var(--global-border-color));
+  --ds-shadow: 0 8px 24px rgba(15, 23, 42, 0.065);
+  --ds-shadow-soft: 0 3px 10px rgba(15, 23, 42, 0.045);
+}
+
+.ds-stack__hero,
+.ds-stack__panel,
+.ds-stack__visual,
+.ds-stack__card,
+.ds-stack__status,
+.ds-stack__history {
+  border: 1.5px solid var(--ds-border);
+  background: var(--ds-surface);
+}
+
+.ds-stack__hero {
+  padding: 1.35rem;
+  border-radius: 16px;
+  background: var(--ds-surface-strong);
+  box-shadow: var(--ds-shadow);
+}
+
+.ds-stack__hero h1 {
+  margin: 0 0 .55rem;
+  text-align: center;
+  color: var(--global-text-color);
+  font-size: clamp(1.65rem, 4vw, 2.3rem);
+}
+
+.ds-stack__hero p {
+  width: 100%;
+  margin: 0;
+  max-width: none;
+  line-height: 1.65;
+  text-align: justify;
+  text-justify: inter-word;
+  opacity: .86;
+}
+
+.ds-stack__metrics,
+.ds-stack__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .65rem;
+}
+
+.ds-stack__metrics { margin-top: 1rem; }
+
+.ds-stack__metric,
+.ds-stack__stat {
+  padding: .8rem;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  box-shadow: var(--ds-shadow-soft);
+}
+
+.ds-stack__metric strong,
+.ds-stack__stat strong {
+  display: block;
+  margin-bottom: .15rem;
+}
+
+.ds-stack__section { margin-top: 1.4rem; }
+
+.ds-stack__section h2 {
+  margin: 0 0 .7rem;
+  color: var(--global-text-color);
+  font-size: 1.2rem;
+}
+
+.ds-stack__panel {
+  display: grid;
+  gap: .8rem;
+  padding: 1rem;
+  border-radius: 14px;
+  box-shadow: var(--ds-shadow-soft);
+}
+
+.ds-stack__group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: .6rem;
+  align-items: end;
+}
+
+.ds-stack__field {
+  display: grid;
+  gap: .3rem;
+}
+
+.ds-stack__field label,
+.ds-stack__speed label {
+  font-size: .86rem;
+  font-weight: 800;
+}
+
+.ds-stack input {
+  width: 100%;
+  min-height: 42px;
+  padding: .55rem .65rem;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 9px;
+  background: var(--ds-surface);
+  color: var(--global-text-color);
+  font: inherit;
+}
+
+.ds-stack input:focus-visible,
+.ds-stack button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--global-link-color) 30%, transparent);
+  outline-offset: 2px;
+}
+
+.ds-stack__btn {
+  min-height: 42px;
+  padding: .55rem .75rem;
+  border: 1px solid var(--global-link-color);
+  border-radius: 9px;
+  background: var(--global-link-color);
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ds-stack__btn:hover:not(:disabled) { filter: brightness(1.08); }
+
+.ds-stack__btn--secondary {
+  border-color: var(--ds-border);
+  background: var(--ds-surface);
+  color: var(--global-text-color);
+}
+
+.ds-stack__btn--danger {
+  border-color: #b91c1c;
+  background: #b91c1c;
+}
+
+.ds-stack__btn:disabled {
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+.ds-stack__speed {
+  display: grid;
+  grid-template-columns: minmax(130px, auto) 1fr auto;
+  gap: .65rem;
+  align-items: center;
+}
+
+.ds-stack__speed output {
+  min-width: 70px;
+  text-align: right;
+  font-size: .85rem;
+  font-weight: 800;
+}
+
+.ds-stack__workspace {
+  display: grid;
+  grid-template-columns: minmax(260px, .8fr) minmax(280px, 1.2fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.ds-stack__visual {
+  min-height: 480px;
+  padding: 1rem;
+  border-radius: 14px;
+  box-shadow: var(--ds-shadow);
+}
+
+.ds-stack__labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: .55rem;
+  font-size: .78rem;
+  font-weight: 800;
+  opacity: .58;
+}
+
+.ds-stack__shell {
+  width: min(100%, 260px);
+  min-height: 365px;
+  margin: 0 auto;
+  padding: .7rem;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  gap: .4rem;
+  border: 4px solid color-mix(in srgb, var(--global-link-color) 85%, var(--global-border-color));
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+  background: color-mix(in srgb, var(--global-link-color) 8%, var(--global-bg-color));
+  position: relative;
+}
+
+.ds-stack__shell::before,
+.ds-stack__shell::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 28px;
+  height: 4px;
+  background: var(--global-link-color);
+}
+
+.ds-stack__shell::before { left: -4px; }
+.ds-stack__shell::after { right: -4px; }
+
+.ds-stack__item {
+  min-height: 49px;
+  padding: .5rem .7rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: .5rem;
+  border: 2px solid color-mix(in srgb, var(--global-link-color) 85%, var(--global-border-color));
+  border-radius: 8px;
+  background: var(--ds-surface);
+  color: var(--global-text-color);
+  box-shadow: inset 0 -2px 0 rgba(15, 23, 42, 0.045);
+  font-weight: 800;
+  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.ds-stack__item small {
+  font-size: .7rem;
+  opacity: .55;
+}
+
+.ds-stack__item.is-checking {
+  background: #fef3c7;
+  border-color: #d97706;
+  color: #3f2a00;
+  transform: scale(1.04);
+}
+
+.ds-stack__item.is-found {
+  background: #dcfce7;
+  border-color: #15803d;
+  color: #14532d;
+  transform: scale(1.05);
+}
+
+.ds-stack__top-marker {
+  width: min(100%, 260px);
+  margin: .6rem auto 0;
+  text-align: center;
+  color: var(--global-link-color);
+  font-weight: 800;
+}
+
+.ds-stack__empty {
+  margin: auto;
+  text-align: center;
+  opacity: .58;
+}
+
+.ds-stack__info {
+  display: grid;
+  align-content: start;
+  gap: .8rem;
+}
+
+.ds-stack__status,
+.ds-stack__history {
+  padding: .9rem;
+  border-radius: 10px;
+  box-shadow: var(--ds-shadow-soft);
+}
+
+.ds-stack__status {
+  min-height: 3.25rem;
+  margin: 0;
+  font-weight: 800;
+}
+
+.ds-stack__status.is-success { color: #15803d; }
+.ds-stack__status.is-error { color: #b91c1c; }
+
+.ds-stack__history {
+  min-height: 185px;
+}
+
+.ds-stack__history h3 {
+  margin: 0 0 .55rem;
+  font-size: 1rem;
+}
+
+.ds-stack__history ol {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.ds-stack__history li {
+  margin: .25rem 0;
+  font-size: .86rem;
+}
+
+.ds-stack__code {
+  padding: .9rem;
+  overflow-x: auto;
+  border-radius: 10px;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.ds-stack__code pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: Consolas, Monaco, monospace;
+  font-size: .84rem;
+}
+
+.ds-stack__stats { margin-top: .8rem; }
+
+.ds-stack__stat strong {
+  font-size: .75rem;
+  opacity: .65;
+}
+
+.ds-stack__cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .8rem;
+}
+
+.ds-stack__card {
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: var(--ds-shadow-soft);
+}
+
+.ds-stack__card h3 {
+  margin: 0 0 .45rem;
+  color: var(--global-text-color);
+  font-size: 1rem;
+}
+
+.ds-stack__card p,
+.ds-stack__card li {
+  font-size: .9rem;
+  line-height: 1.55;
+}
+
+.ds-stack__card p { margin: 0; opacity: .78; }
+.ds-stack__card ul { margin: .4rem 0 0; padding-left: 1.1rem; }
+
+.ds-stack__table-wrap { overflow-x: auto; }
+
+.ds-stack table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .88rem;
+}
+
+.ds-stack th,
+.ds-stack td {
+  padding: .65rem;
+  border: 1.5px solid var(--ds-border);
+  text-align: left;
+}
+
+.ds-stack th {
+  background: color-mix(in srgb, var(--global-text-color) 5%, var(--global-bg-color));
+}
+
+@media (max-width: 780px) {
+  .ds-stack__hero p { text-align: left; }
+  .ds-stack__metrics,
+  .ds-stack__stats,
+  .ds-stack__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ds-stack__workspace { grid-template-columns: 1fr; }
+  .ds-stack__speed { grid-template-columns: 1fr; }
+  .ds-stack__speed output { text-align: left; }
+}
+
+@media (max-width: 500px) {
+  .ds-stack__metrics,
+  .ds-stack__stats,
+  .ds-stack__cards,
+  .ds-stack__group { grid-template-columns: 1fr; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .ds-stack {
+    --ds-surface: var(--global-bg-color);
+    --ds-surface-strong: color-mix(in srgb, var(--global-link-color) 5%, var(--global-bg-color));
+    --ds-border: color-mix(in srgb, var(--global-border-color) 85%, var(--global-text-color));
+    --ds-shadow: none;
+    --ds-shadow-soft: none;
+  }
+  .ds-stack__item { box-shadow: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-stack *,
+  .ds-stack *::before,
+  .ds-stack *::after {
+    transition-duration: .001ms !important;
+    animation-duration: .001ms !important;
+  }
+}
+</style>
+
+<div class="ds-stack">
+  <section class="ds-stack__hero">
+    <h1>Stack Simulator</h1>
+    <p>
+      A stack is a Last-In, First-Out (LIFO) data structure. Elements are inserted and removed only from the top.
+      The most recently pushed element is therefore the first element to be popped.
+    </p>
+
+    <div class="ds-stack__metrics">
+      <div class="ds-stack__metric"><strong>Push</strong>O(1)</div>
+      <div class="ds-stack__metric"><strong>Pop</strong>O(1)</div>
+      <div class="ds-stack__metric"><strong>Peek</strong>O(1)</div>
+      <div class="ds-stack__metric"><strong>Search</strong>O(n)</div>
     </div>
+  </section>
+
+  <section class="ds-stack__section">
+    <h2>Stack operations</h2>
+
+    <div class="ds-stack__panel">
+      <div class="ds-stack__group">
+        <div class="ds-stack__field">
+          <label for="ds-stack-value">Value</label>
+          <input id="ds-stack-value" type="number" value="50" inputmode="numeric">
+        </div>
+        <button class="ds-stack__btn" id="ds-stack-push" type="button">Push</button>
+        <button class="ds-stack__btn" id="ds-stack-random" type="button">Push Random</button>
+        <button class="ds-stack__btn" id="ds-stack-pop" type="button">Pop</button>
+        <button class="ds-stack__btn" id="ds-stack-peek" type="button">Peek</button>
+      </div>
+
+      <div class="ds-stack__group">
+        <div class="ds-stack__field">
+          <label for="ds-stack-search-value">Search value</label>
+          <input id="ds-stack-search-value" type="number" value="50" inputmode="numeric">
+        </div>
+        <button class="ds-stack__btn" id="ds-stack-search" type="button">Search from Top</button>
+        <button class="ds-stack__btn" id="ds-stack-fill" type="button">Fill Example</button>
+        <button class="ds-stack__btn ds-stack__btn--danger" id="ds-stack-clear" type="button">Clear</button>
+        <button class="ds-stack__btn ds-stack__btn--secondary" id="ds-stack-cancel" type="button">Cancel Animation</button>
+      </div>
+
+      <div class="ds-stack__speed">
+        <label for="ds-stack-speed">Animation speed</label>
+        <input id="ds-stack-speed" type="range" min="50" max="900" step="50" value="350">
+        <output id="ds-stack-speed-output" for="ds-stack-speed">350 ms</output>
+      </div>
+    </div>
+
+    <div class="ds-stack__workspace">
+      <div class="ds-stack__visual">
+        <div class="ds-stack__labels"><span>Bottom</span><span>Top</span></div>
+        <div class="ds-stack__shell" id="ds-stack-shell"></div>
+        <div class="ds-stack__top-marker" id="ds-stack-top-marker">TOP</div>
+      </div>
+
+      <div class="ds-stack__info">
+        <p class="ds-stack__status" id="ds-stack-status" role="status" aria-live="polite">
+          Use the controls to inspect or modify the stack.
+        </p>
+
+        <div class="ds-stack__history">
+          <h3>Operation history</h3>
+          <ol id="ds-stack-history"></ol>
+        </div>
+
+        <div class="ds-stack__code"><pre>push(x):
+  stack[top + 1] = x
+  top = top + 1
+
+pop():
+  x = stack[top]
+  top = top - 1
+  return x</pre></div>
+
+        <div class="ds-stack__stats">
+          <div class="ds-stack__stat"><strong>Current operation</strong><span id="ds-stack-op">Idle</span></div>
+          <div class="ds-stack__stat"><strong>Elements checked</strong><span id="ds-stack-checks">0</span></div>
+          <div class="ds-stack__stat"><strong>Size</strong><span id="ds-stack-size">0</span></div>
+          <div class="ds-stack__stat"><strong>Complexity</strong><span id="ds-stack-complexity">—</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-stack__section">
+    <h2>Stack concepts</h2>
+    <div class="ds-stack__cards">
+      <article class="ds-stack__card"><h3>LIFO discipline</h3><p>The last element inserted is the first one removed. Only the top is directly accessible.</p></article>
+      <article class="ds-stack__card"><h3>Constant-time top operations</h3><p>Push, pop, and peek only affect the top position, so each takes O(1).</p></article>
+      <article class="ds-stack__card"><h3>Searching</h3><p>A search may inspect every element from the top downward, giving O(n) worst-case time.</p></article>
+      <article class="ds-stack__card"><h3>Common uses</h3><p>Stacks are used for function calls, undo/redo, expression evaluation, and depth-first search.</p></article>
+    </div>
+  </section>
+
+  <section class="ds-stack__section">
+    <h2>Typical time complexities</h2>
+    <div class="ds-stack__panel ds-stack__table-wrap">
+      <table>
+        <thead><tr><th>Operation</th><th>Time</th><th>Reason</th></tr></thead>
+        <tbody>
+          <tr><td>Push</td><td>O(1)</td><td>Add one element at the top.</td></tr>
+          <tr><td>Pop</td><td>O(1)</td><td>Remove one element from the top.</td></tr>
+          <tr><td>Peek</td><td>O(1)</td><td>Read the current top element.</td></tr>
+          <tr><td>Search</td><td>O(n)</td><td>Elements may be checked from top to bottom.</td></tr>
+          <tr><td>Space</td><td>O(n)</td><td>One storage position is needed per element.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 </div>
 
 <script>
-    "use strict";
+(() => {
+  "use strict";
+  const root = document.querySelector(".ds-stack");
+  if (!root) return;
 
-    const MAX_SIZE = 6;
+  const q = id => root.querySelector("#" + id);
+  const el = {
+    value: q("ds-stack-value"),
+    searchValue: q("ds-stack-search-value"),
+    speed: q("ds-stack-speed"),
+    speedOutput: q("ds-stack-speed-output"),
+    shell: q("ds-stack-shell"),
+    marker: q("ds-stack-top-marker"),
+    status: q("ds-stack-status"),
+    history: q("ds-stack-history"),
+    op: q("ds-stack-op"),
+    checks: q("ds-stack-checks"),
+    size: q("ds-stack-size"),
+    complexity: q("ds-stack-complexity")
+  };
 
-    const elements = {
-        valueInput: document.getElementById("valueInput"),
-        searchInput: document.getElementById("searchInput"),
-        speedInput: document.getElementById("speedInput"),
-        speedOutput: document.getElementById("speedOutput"),
-        stackShell: document.getElementById("stackShell"),
-        topMarker: document.getElementById("topMarker"),
-        capacityLabel: document.getElementById("capacityLabel"),
-        status: document.getElementById("status"),
-        operationStat: document.getElementById("operationStat"),
-        checkedStat: document.getElementById("checkedStat"),
-        sizeStat: document.getElementById("sizeStat"),
-        complexityStat: document.getElementById("complexityStat"),
-        historyList: document.getElementById("historyList"),
-        codeOutput: document.getElementById("codeOutput")
-    };
+  const btn = {
+    push: q("ds-stack-push"),
+    random: q("ds-stack-random"),
+    pop: q("ds-stack-pop"),
+    peek: q("ds-stack-peek"),
+    search: q("ds-stack-search"),
+    fill: q("ds-stack-fill"),
+    clear: q("ds-stack-clear"),
+    cancel: q("ds-stack-cancel")
+  };
 
-    const buttons = {
-        push: document.getElementById("pushButton"),
-        random: document.getElementById("randomButton"),
-        pop: document.getElementById("popButton"),
-        peek: document.getElementById("peekButton"),
-        search: document.getElementById("searchButton"),
-        fill: document.getElementById("fillButton"),
-        clear: document.getElementById("clearButton"),
-        cancel: document.getElementById("cancelButton")
-    };
+  let stack = [12, 34, 56];
+  let token = 0;
+  let history = [];
 
-    let stack = [];
-    let history = [];
-    let operationToken = 0;
-    let running = false;
+  const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const delay = () => reducedMotion() ? 0 : Number(el.speed.value);
+  const wait = (ms, t) => new Promise(resolve => setTimeout(() => resolve(t === token), ms));
 
-    const pseudocode = {
-        push: `push(value):
-    if stack is full:
-        report overflow
-    else:
-        stack[top] = value
-        top = top + 1`,
-        pop: `pop():
-    if stack is empty:
-        report underflow
-    else:
-        top = top - 1
-        return stack[top]`,
-        peek: `peek():
-    if stack is empty:
-        report underflow
-    else:
-        return stack[top - 1]`,
-        search: `search(target):
-    for i from top - 1 down to 0:
-        if stack[i] == target:
-            return distance from top
-    return not found`
-    };
+  function message(text, type = "") {
+    el.status.textContent = text;
+    el.status.classList.remove("is-success", "is-error");
+    if (type) el.status.classList.add(type);
+  }
 
-    function getDelay() {
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-            return 0;
-        }
-        return Number(elements.speedInput.value);
+  function stats(operation = "Idle", checks = 0, complexity = "—") {
+    el.op.textContent = operation;
+    el.checks.textContent = checks;
+    el.size.textContent = stack.length;
+    el.complexity.textContent = complexity;
+  }
+
+  function addHistory(text) {
+    history.unshift(text);
+    history = history.slice(0, 7);
+    el.history.innerHTML = history.map(item => `<li>${item}</li>`).join("");
+  }
+
+  function disable(state) {
+    Object.entries(btn).forEach(([key, button]) => {
+      button.disabled = state && key !== "cancel";
+    });
+    btn.cancel.disabled = !state;
+  }
+
+  function clearMarks() {
+    root.querySelectorAll(".ds-stack__item").forEach(item => {
+      item.classList.remove("is-checking", "is-found");
+    });
+  }
+
+  function cancel(msg = "") {
+    token++;
+    disable(false);
+    clearMarks();
+    if (msg) message(msg);
+  }
+
+  function item(index) {
+    return root.querySelector(`#ds-stack-item-${index}`);
+  }
+
+  function render() {
+    el.shell.innerHTML = "";
+    if (!stack.length) {
+      const empty = document.createElement("p");
+      empty.className = "ds-stack__empty";
+      empty.textContent = "The stack is empty.";
+      el.shell.append(empty);
+      el.marker.textContent = "TOP = empty";
+      stats(el.op.textContent, Number(el.checks.textContent) || 0, el.complexity.textContent);
+      return;
     }
 
-    function wait(milliseconds, token) {
-        return new Promise((resolve) => {
-            window.setTimeout(() => resolve(token === operationToken), milliseconds);
-        });
-    }
-
-    function getInteger(input, label) {
-        const raw = input.value.trim();
-        if (raw === "") {
-            throw new Error(`${label} is required.`);
-        }
-
-        const value = Number(raw);
-        if (!Number.isInteger(value)) {
-            throw new Error(`${label} must be an integer.`);
-        }
-        return value;
-    }
-
-    function setStatus(message, type = "") {
-        elements.status.textContent = message;
-        elements.status.className = `status ${type}`.trim();
-    }
-
-    function setStats(operation = "Idle", checked = 0, complexity = "—") {
-        elements.operationStat.textContent = operation;
-        elements.checkedStat.textContent = String(checked);
-        elements.sizeStat.textContent = String(stack.length);
-        elements.complexityStat.textContent = complexity;
-    }
-
-    function addHistory(message) {
-        history.unshift(message);
-        history = history.slice(0, 6);
-        elements.historyList.innerHTML = history.map((entry) => `<li>${escapeHtml(entry)}</li>`).join("");
-    }
-
-    function escapeHtml(value) {
-        return String(value)
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
-    }
-
-    function setControlsDisabled(disabled) {
-        Object.entries(buttons).forEach(([name, button]) => {
-            button.disabled = disabled && name !== "cancel";
-        });
-        buttons.cancel.disabled = !disabled;
-    }
-
-    function cancelOperation(message = "") {
-        operationToken += 1;
-        running = false;
-        setControlsDisabled(false);
-        clearVisualStates();
-        if (message) {
-            setStatus(message);
-        }
-    }
-
-    function startOperation(operation, complexity, codeKey) {
-        cancelOperation();
-        running = true;
-        const token = ++operationToken;
-        setControlsDisabled(true);
-        setStats(operation, 0, complexity);
-        elements.codeOutput.textContent = pseudocode[codeKey];
-        return token;
-    }
-
-    function finishOperation(message, type = "success") {
-        running = false;
-        setControlsDisabled(false);
-        setStatus(message, type);
-        setStats(elements.operationStat.textContent, Number(elements.checkedStat.textContent), elements.complexityStat.textContent);
-    }
-
-    function renderStack(newIndex = -1) {
-        elements.stackShell.innerHTML = "";
-
-        if (stack.length === 0) {
-            const empty = document.createElement("p");
-            empty.className = "empty-state";
-            empty.textContent = "The stack is empty.";
-            elements.stackShell.appendChild(empty);
-            elements.topMarker.textContent = "TOP → empty";
-        } else {
-            stack.forEach((value, index) => {
-                const item = document.createElement("div");
-                item.className = "stack-item";
-                item.id = `stack-item-${index}`;
-                item.setAttribute("aria-label", `Stack position ${index}, value ${value}`);
-                item.innerHTML = `<span>${escapeHtml(value)}</span><small>${index === stack.length - 1 ? "TOP" : `index ${index}`}</small>`;
-                if (index === newIndex) {
-                    item.classList.add("pushing");
-                }
-                elements.stackShell.appendChild(item);
-            });
-            elements.topMarker.textContent = `TOP → ${stack.at(-1)}`;
-        }
-
-        elements.capacityLabel.textContent = `${stack.length} / ${MAX_SIZE}`;
-        elements.sizeStat.textContent = String(stack.length);
-        updateButtonAvailability();
-    }
-
-    function updateButtonAvailability() {
-        if (running) return;
-        buttons.push.disabled = stack.length >= MAX_SIZE;
-        buttons.random.disabled = stack.length >= MAX_SIZE;
-        buttons.fill.disabled = stack.length >= MAX_SIZE;
-        buttons.pop.disabled = stack.length === 0;
-        buttons.peek.disabled = stack.length === 0;
-        buttons.search.disabled = stack.length === 0;
-        buttons.clear.disabled = stack.length === 0;
-        buttons.cancel.disabled = true;
-    }
-
-    function clearVisualStates() {
-        document.querySelectorAll(".stack-item").forEach((item) => {
-            item.classList.remove("checking", "found", "popping");
-        });
-    }
-
-    function getItem(index) {
-        return document.getElementById(`stack-item-${index}`);
-    }
-
-    function pushValue(value, source = "Push") {
-        if (stack.length >= MAX_SIZE) {
-            setStatus("Stack overflow: the fixed-capacity stack is full.", "error");
-            addHistory("Overflow: Push was rejected.");
-            return;
-        }
-
-        cancelOperation();
-        stack.push(value);
-        renderStack(stack.length - 1);
-        setStats(source, 0, "O(1)");
-        elements.codeOutput.textContent = pseudocode.push;
-        setStatus(`Pushed ${value} onto the stack.`, "success");
-        addHistory(`Push ${value}`);
-    }
-
-    function pushFromInput() {
-        try {
-            pushValue(getInteger(elements.valueInput, "Value"));
-        } catch (error) {
-            setStatus(error.message, "error");
-        }
-    }
-
-    function pushRandom() {
-        pushValue(Math.floor(Math.random() * 100), "Push Random");
-    }
-
-    async function popValue() {
-        if (stack.length === 0) {
-            setStatus("Stack underflow: the stack is empty.", "error");
-            addHistory("Underflow: Pop was rejected.");
-            return;
-        }
-
-        const token = startOperation("Pop", "O(1)", "pop");
-        const topIndex = stack.length - 1;
-        const value = stack[topIndex];
-        const item = getItem(topIndex);
-
-        item?.classList.add("checking");
-        setStatus(`Removing the top value ${value}.`);
-
-        if (!(await wait(getDelay(), token))) return;
-
-        item?.classList.remove("checking");
-        item?.classList.add("popping");
-
-        if (!(await wait(Math.max(0, getDelay() / 2), token))) return;
-
-        stack.pop();
-        renderStack();
-        finishOperation(`Popped ${value} from the stack.`);
-        addHistory(`Pop → ${value}`);
-    }
-
-    async function peekValue() {
-        if (stack.length === 0) {
-            setStatus("Stack underflow: the stack is empty.", "error");
-            addHistory("Underflow: Peek was rejected.");
-            return;
-        }
-
-        const token = startOperation("Peek", "O(1)", "peek");
-        const topIndex = stack.length - 1;
-        const value = stack[topIndex];
-
-        getItem(topIndex)?.classList.add("checking");
-        setStatus("Reading the top element without removing it.");
-
-        if (!(await wait(getDelay(), token))) return;
-
-        clearVisualStates();
-        getItem(topIndex)?.classList.add("found");
-        finishOperation(`The top value is ${value}.`);
-        addHistory(`Peek → ${value}`);
-    }
-
-    async function searchStack() {
-        try {
-            if (stack.length === 0) {
-                throw new Error("The stack is empty.");
-            }
-
-            const target = getInteger(elements.searchInput, "Search value");
-            const token = startOperation("Search from Top", "O(n)", "search");
-            let checked = 0;
-
-            for (let index = stack.length - 1; index >= 0; index -= 1) {
-                clearVisualStates();
-                getItem(index)?.classList.add("checking");
-                checked += 1;
-                setStats("Search from Top", checked, "O(n)");
-                setStatus(`Comparing ${stack[index]} with ${target}.`);
-
-                if (!(await wait(getDelay(), token))) return;
-
-                if (stack[index] === target) {
-                    clearVisualStates();
-                    getItem(index)?.classList.add("found");
-                    const depth = stack.length - 1 - index;
-                    finishOperation(`Found ${target} at depth ${depth} from the top.`);
-                    addHistory(`Search ${target} → found at depth ${depth}`);
-                    return;
-                }
-            }
-
-            clearVisualStates();
-            finishOperation(`${target} was not found in the stack.`, "error");
-            addHistory(`Search ${target} → not found`);
-        } catch (error) {
-            setStatus(error.message, "error");
-        }
-    }
-
-    function fillExample() {
-        cancelOperation();
-        stack = [14, 27, 39, 52];
-        renderStack();
-        setStats("Fill Example", 0, "O(n)");
-        setStatus("Loaded an example stack with four values.", "success");
-        addHistory("Loaded example stack");
-    }
-
-    function clearStack() {
-        cancelOperation();
-        stack = [];
-        renderStack();
-        setStats("Clear", 0, "O(n)");
-        setStatus("The stack was cleared.", "success");
-        addHistory("Clear stack");
-    }
-
-    elements.speedInput.addEventListener("input", () => {
-        elements.speedOutput.value = `${elements.speedInput.value} ms`;
-        elements.speedOutput.textContent = `${elements.speedInput.value} ms`;
+    stack.forEach((value, index) => {
+      const div = document.createElement("div");
+      div.className = "ds-stack__item";
+      div.id = `ds-stack-item-${index}`;
+      div.innerHTML = `<span>${value}</span><small>${index === stack.length - 1 ? "TOP" : `index ${index}`}</small>`;
+      el.shell.append(div);
     });
 
-    elements.valueInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            pushFromInput();
+    el.marker.textContent = `TOP → ${stack[stack.length - 1]}`;
+    stats(el.op.textContent, Number(el.checks.textContent) || 0, el.complexity.textContent);
+  }
+
+  function getInteger(input, label) {
+    if (input.value.trim() === "") throw new Error(`${label} is required.`);
+    const value = Number(input.value);
+    if (!Number.isInteger(value)) throw new Error(`${label} must be an integer.`);
+    return value;
+  }
+
+  btn.push.addEventListener("click", () => {
+    try {
+      cancel();
+      const value = getInteger(el.value, "Value");
+      stack.push(value);
+      render();
+      item(stack.length - 1)?.classList.add("is-found");
+      stats("Push", 0, "O(1)");
+      addHistory(`push(${value})`);
+      message(`Pushed ${value} onto the stack.`, "is-success");
+    } catch (error) { message(error.message, "is-error"); }
+  });
+
+  btn.random.addEventListener("click", () => {
+    cancel();
+    const value = Math.floor(Math.random() * 90) + 10;
+    stack.push(value);
+    render();
+    item(stack.length - 1)?.classList.add("is-found");
+    stats("Push Random", 0, "O(1)");
+    addHistory(`push(${value})`);
+    message(`Pushed random value ${value}.`, "is-success");
+  });
+
+  btn.pop.addEventListener("click", async () => {
+    if (!stack.length) return message("Stack underflow: the stack is empty.", "is-error");
+    cancel();
+    const t = ++token;
+    disable(true);
+    stats("Pop", 0, "O(1)");
+    const top = stack.length - 1;
+    item(top)?.classList.add("is-found");
+    message(`Removing top value ${stack[top]}...`);
+    if (!await wait(delay(), t)) return;
+    const value = stack.pop();
+    render();
+    disable(false);
+    addHistory(`pop() → ${value}`);
+    stats("Pop", 0, "O(1)");
+    message(`Popped ${value}.`, "is-success");
+  });
+
+  btn.peek.addEventListener("click", () => {
+    if (!stack.length) return message("The stack is empty.", "is-error");
+    cancel();
+    const top = stack.length - 1;
+    item(top)?.classList.add("is-found");
+    stats("Peek", 0, "O(1)");
+    addHistory(`peek() → ${stack[top]}`);
+    message(`Top value is ${stack[top]}.`, "is-success");
+  });
+
+  btn.search.addEventListener("click", async () => {
+    if (!stack.length) return message("The stack is empty.", "is-error");
+    try {
+      const target = getInteger(el.searchValue, "Search value");
+      cancel();
+      const t = ++token;
+      disable(true);
+      let checks = 0;
+      stats("Search from Top", 0, "O(n)");
+
+      for (let i = stack.length - 1; i >= 0; i--) {
+        clearMarks();
+        item(i)?.classList.add("is-checking");
+        checks++;
+        stats("Search from Top", checks, "O(n)");
+        message(`Checking ${stack[i]} at stack index ${i}.`);
+        if (!await wait(delay(), t)) return;
+
+        if (stack[i] === target) {
+          clearMarks();
+          item(i)?.classList.add("is-found");
+          disable(false);
+          addHistory(`search(${target}) → index ${i}`);
+          message(`Found ${target} at stack index ${i}.`, "is-success");
+          return;
         }
-    });
+      }
 
-    elements.searchInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            searchStack();
-        }
-    });
+      disable(false);
+      addHistory(`search(${target}) → not found`);
+      message(`${target} was not found.`, "is-error");
+    } catch (error) {
+      disable(false);
+      message(error.message, "is-error");
+    }
+  });
 
-    buttons.push.addEventListener("click", pushFromInput);
-    buttons.random.addEventListener("click", pushRandom);
-    buttons.pop.addEventListener("click", popValue);
-    buttons.peek.addEventListener("click", peekValue);
-    buttons.search.addEventListener("click", searchStack);
-    buttons.fill.addEventListener("click", fillExample);
-    buttons.clear.addEventListener("click", clearStack);
-    buttons.cancel.addEventListener("click", () => cancelOperation("Animation cancelled."));
+  btn.fill.addEventListener("click", () => {
+    cancel();
+    stack = [10, 20, 30, 40, 50];
+    render();
+    stats("Fill Example", 0, "O(n)");
+    addHistory("fill example");
+    message("Example stack created.", "is-success");
+  });
 
-    renderStack();
-    setStats();
+  btn.clear.addEventListener("click", () => {
+    cancel();
+    stack = [];
+    render();
+    stats("Clear", 0, "O(n)");
+    addHistory("clear()");
+    message("Stack cleared.");
+  });
+
+  btn.cancel.addEventListener("click", () => cancel("Animation cancelled."));
+
+  el.speed.addEventListener("input", () => {
+    el.speedOutput.textContent = `${el.speed.value} ms`;
+  });
+
+  disable(false);
+  btn.cancel.disabled = true;
+  render();
+  stats();
+})();
 </script>
-</body>
-</html>
