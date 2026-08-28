@@ -160,6 +160,7 @@ A tree is a hierarchical data structure composed of nodes connected by edges, si
 
 - [🖼️Sunum-Ağaçlar (PDF)](../files/data_structures/slides/Bolum_07_Agac.pdf)  
 - 🕹️Simulators:
+  - [General Tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_General_Tree.html)  
   - [Binary Tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_Tree.html)  
   - [B-tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_BTree.html)  
   - [B-plus-tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_BPlusTree.html)  
