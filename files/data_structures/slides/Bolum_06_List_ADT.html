@@ -50,6 +50,11 @@ excerpt: "Interactive List ADT simulator comparing ArrayList-style contiguous st
 .ds-list__metric strong{display:block;font-size:.75rem;opacity:.65}
 .ds-list__cards{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}
 .ds-list__card{padding:1rem;border-radius:12px}.ds-list__card h3{margin:0 0 .45rem}.ds-list__card p{margin:0;line-height:1.55;opacity:.78}
+
+.ds-list__cell.is-moving,.ds-list__node.is-moving{background:#fef3c7;border-color:#d97706;transform:translateY(-3px)}
+.ds-list__cell.is-new,.ds-list__node.is-new{background:#dcfce7;border-color:#15803d}
+.ds-list__ghost{opacity:.32;border-style:dashed}
+
 @media(max-width:780px){.ds-list__hero p{text-align:left}.ds-list__views,.ds-list__cards{grid-template-columns:1fr}.ds-list__metrics{grid-template-columns:repeat(2,1fr)}.ds-list__speed{grid-template-columns:1fr}}
 @media(max-width:520px){.ds-list__metrics,.ds-list__group{grid-template-columns:1fr}}
 @media(prefers-color-scheme:dark){.ds-list{--ds-surface:var(--global-bg-color);--ds-surface-strong:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));--ds-border:color-mix(in srgb,var(--global-border-color) 85%,var(--global-text-color));--ds-shadow:none;--ds-shadow-soft:none}}
@@ -94,6 +99,7 @@ excerpt: "Interactive List ADT simulator comparing ArrayList-style contiguous st
     </div>
 
     <p id="ds-list-status" class="ds-list__status" role="status">Example list loaded.</p>
+    <div id="ds-list-phase" class="ds-list__compare"><strong>Current phase:</strong> <span>Ready</span></div>
 
     <div class="ds-list__metrics">
       <div class="ds-list__metric"><strong>Size</strong><span id="ds-list-size">0</span></div>
@@ -144,6 +150,7 @@ excerpt: "Interactive List ADT simulator comparing ArrayList-style contiguous st
     array:q("ds-list-array"),
     linked:q("ds-list-linked"),
     status:q("ds-list-status"),
+    phase:q("ds-list-phase"),
     size:q("ds-list-size"),
     aSteps:q("ds-list-array-steps"),
     lSteps:q("ds-list-linked-steps"),
@@ -166,42 +173,30 @@ excerpt: "Interactive List ADT simulator comparing ArrayList-style contiguous st
 
   var data=[];
   var token=0;
-  var arrayMarkIndex=-1;
-  var arrayMarkKind="";
-  var linkedMarkIndex=-1;
-  var linkedMarkKind="";
+  var arrayView=[];
+  var linkedView=[];
+  var arrayMarks={};
+  var linkedMarks={};
   var arraySteps=0;
   var linkedSteps=0;
 
-  function delay(){
-    return Number(el.speed.value);
-  }
-
+  function delay(){return Number(el.speed.value);}
   function wait(ms,t){
     return new Promise(function(resolve){
-      setTimeout(function(){
-        resolve(t===token);
-      },ms);
+      setTimeout(function(){resolve(t===token);},ms);
     });
   }
-
   function disable(state){
-    Object.keys(btn).forEach(function(k){
-      btn[k].disabled=state&&k!=="cancel";
-    });
+    Object.keys(btn).forEach(function(k){btn[k].disabled=state&&k!=="cancel";});
     btn.cancel.disabled=!state;
   }
-
-  function setStatus(text){
-    el.status.textContent=text;
-  }
-
+  function setStatus(text){el.status.textContent=text;}
+  function setPhase(text){el.phase.querySelector("span").textContent=text;}
   function readValue(){
     var v=Number(el.value.value);
     if(!Number.isFinite(v))throw new Error("Enter a valid number.");
     return v;
   }
-
   function readIndex(allowEnd){
     var i=Number(el.index.value);
     var max=allowEnd?data.length:data.length-1;
@@ -210,340 +205,341 @@ excerpt: "Interactive List ADT simulator comparing ArrayList-style contiguous st
     }
     return i;
   }
+  function cloneData(){arrayView=data.slice();linkedView=data.slice();}
+  function clearMarks(){arrayMarks={};linkedMarks={};}
+  function mark(map,index,kind){map[index]=kind;}
+  function unmark(map,index){delete map[index];}
 
-  function clearMarks(){
-    arrayMarkIndex=-1;
-    arrayMarkKind="";
-    linkedMarkIndex=-1;
-    linkedMarkKind="";
+  function renderArray(){
+    el.array.innerHTML="";
+    if(!arrayView.length){el.array.textContent="Empty";return;}
+    arrayView.forEach(function(v,i){
+      var c=document.createElement("div");
+      var kind=arrayMarks[i]||"";
+      c.className="ds-list__cell"+(kind?" "+kind:"");
+      c.innerHTML="<strong></strong><small>index "+i+"</small>";
+      c.querySelector("strong").textContent=v===null?"·":v;
+      el.array.appendChild(c);
+    });
   }
 
-  function render(){
-    el.array.innerHTML="";
+  function renderLinked(){
     el.linked.innerHTML="";
-
-    data.forEach(function(v,i){
-      var c=document.createElement("div");
-      c.className="ds-list__cell"+(i===arrayMarkIndex&&arrayMarkKind?" "+arrayMarkKind:"");
-      c.innerHTML="<strong></strong><small>index "+i+"</small>";
-      c.querySelector("strong").textContent=v;
-      el.array.appendChild(c);
-
+    if(!linkedView.length){el.linked.textContent="Empty";return;}
+    linkedView.forEach(function(v,i){
       var n=document.createElement("div");
-      n.className="ds-list__node"+(i===linkedMarkIndex&&linkedMarkKind?" "+linkedMarkKind:"");
+      var kind=linkedMarks[i]||"";
+      n.className="ds-list__node"+(kind?" "+kind:"");
       n.innerHTML="<strong></strong><small>node "+i+"</small>";
-      n.querySelector("strong").textContent=v;
+      n.querySelector("strong").textContent=v===null?"·":v;
       el.linked.appendChild(n);
-
-      if(i<data.length-1){
+      if(i<linkedView.length-1){
         var a=document.createElement("span");
         a.className="ds-list__arrow";
         a.textContent="→";
         el.linked.appendChild(a);
       }
     });
+  }
 
-    if(!data.length){
-      el.array.textContent="Empty";
-      el.linked.textContent="Empty";
-    }
-
+  function render(){
+    renderArray();
+    renderLinked();
     el.size.textContent=String(data.length);
     el.aSteps.textContent=String(arraySteps);
     el.lSteps.textContent=String(linkedSteps);
   }
 
-  async function animateAccess(index){
-    token++;
-    var t=token;
-    disable(true);
+  async function animateAppend(value){
+    token++;var t=token;disable(true);clearMarks();cloneData();
+    arraySteps=0;linkedSteps=0;
 
+    setPhase("ArrayList");
+    setStatus("ArrayList: write the new value at the next free index.");
+    arrayView.push(value);
     arraySteps=1;
-    linkedSteps=0;
-
-    arrayMarkIndex=index;
-    arrayMarkKind="is-found";
-    linkedMarkIndex=-1;
-    linkedMarkKind="";
-    setStatus("ArrayList: direct access to index "+index+" (1 step).");
+    mark(arrayMarks,arrayView.length-1,"is-new");
     render();
-
     if(!(await wait(delay(),t)))return false;
 
-    arrayMarkIndex=-1;
-    arrayMarkKind="";
+    clearMarks();
+    setPhase("LinkedList");
+    setStatus("LinkedList: use the tail reference, create one node, and update tail.next.");
+    linkedView.push(value);
+    linkedSteps=1;
+    mark(linkedMarks,linkedView.length-1,"is-new");
+    render();
+    if(!(await wait(delay(),t)))return false;
 
-    for(var i=0;i<=index;i++){
-      linkedMarkIndex=i;
-      linkedMarkKind=(i===index)?"is-found":"is-checking";
-      linkedSteps=i+1;
-      setStatus("LinkedList: follow next references to node "+i+" of "+index+".");
-      render();
-
-      if(!(await wait(delay(),t)))return false;
-    }
-
-    disable(false);
-    return true;
+    data.push(value);
+    cloneData();clearMarks();render();
+    setPhase("Complete");
+    setStatus("Append complete. Both are O(1) here because the linked list keeps a tail reference.");
+    el.result.textContent="append("+value+")";
+    disable(false);return true;
   }
 
   async function animatePrepend(value){
-    token++;
-    var t=token;
-    disable(true);
+    token++;var t=token;disable(true);clearMarks();cloneData();
+    arraySteps=0;linkedSteps=0;
 
-    var before=data.slice();
-
-    linkedSteps=1;
-    linkedMarkIndex=0;
-    linkedMarkKind="is-found";
-    arrayMarkIndex=-1;
-    arrayMarkKind="";
-    setStatus("LinkedList: update the head reference and attach one new node (O(1)).");
-    render();
-
+    setPhase("ArrayList");
+    setStatus("ArrayList: make room at index 0 by shifting every existing element one position right.");
+    arrayView.push(null);
+    for(var i=data.length-1;i>=0;i--){
+      clearMarks();
+      mark(arrayMarks,i,"is-moving");
+      mark(arrayMarks,i+1,"is-checking");
+      arrayView[i+1]=arrayView[i];
+      arraySteps++;
+      render();
+      if(!(await wait(delay(),t)))return false;
+    }
+    arrayView[0]=value;
+    arraySteps++;
+    clearMarks();mark(arrayMarks,0,"is-new");render();
     if(!(await wait(delay(),t)))return false;
 
-    linkedMarkIndex=-1;
-    linkedMarkKind="";
-    arraySteps=0;
+    clearMarks();
+    setPhase("LinkedList");
+    setStatus("LinkedList: create one new node and point it to the old head.");
+    linkedView.unshift(value);
+    linkedSteps=1;
+    mark(linkedMarks,0,"is-new");
+    render();
+    if(!(await wait(delay(),t)))return false;
 
-    for(var i=before.length-1;i>=0;i--){
-      arrayMarkIndex=i;
-      arrayMarkKind="is-checking";
+    data.unshift(value);
+    cloneData();clearMarks();render();
+    setPhase("Complete");
+    setStatus("Prepend complete: ArrayList shifted "+(data.length-1)+" elements; LinkedList changed one head link.");
+    el.result.textContent="prepend("+value+")";
+    disable(false);return true;
+  }
+
+  async function animateInsert(value,index){
+    token++;var t=token;disable(true);clearMarks();cloneData();
+    arraySteps=0;linkedSteps=0;
+
+    setPhase("ArrayList");
+    setStatus("ArrayList: shift the suffix right to open index "+index+".");
+    arrayView.push(null);
+    for(var i=data.length-1;i>=index;i--){
+      clearMarks();
+      mark(arrayMarks,i,"is-moving");
+      mark(arrayMarks,i+1,"is-checking");
+      arrayView[i+1]=arrayView[i];
       arraySteps++;
-      setStatus("ArrayList: shift element at index "+i+" to index "+(i+1)+".");
       render();
+      if(!(await wait(delay(),t)))return false;
+    }
+    arrayView[index]=value;
+    arraySteps++;
+    clearMarks();mark(arrayMarks,index,"is-new");render();
+    if(!(await wait(delay(),t)))return false;
 
+    clearMarks();
+    setPhase("LinkedList");
+    setStatus(index===0?
+      "LinkedList: insertion at head needs no traversal.":
+      "LinkedList: traverse to the node before index "+index+".");
+    if(index>0){
+      for(var j=0;j<index;j++){
+        clearMarks();
+        mark(linkedMarks,j,"is-checking");
+        linkedSteps++;
+        render();
+        if(!(await wait(delay(),t)))return false;
+      }
+    }
+    linkedView.splice(index,0,value);
+    linkedSteps++;
+    clearMarks();mark(linkedMarks,index,"is-new");render();
+    if(!(await wait(delay(),t)))return false;
+
+    data.splice(index,0,value);
+    cloneData();clearMarks();render();
+    setPhase("Complete");
+    setStatus("Insert complete: ArrayList shifted "+(data.length-index-1)+" elements; LinkedList traversed then relinked.");
+    el.result.textContent="insert("+index+", "+value+")";
+    disable(false);return true;
+  }
+
+  async function animateAccess(index){
+    token++;var t=token;disable(true);clearMarks();cloneData();
+    arraySteps=1;linkedSteps=0;
+
+    setPhase("ArrayList");
+    setStatus("ArrayList: compute the address for index "+index+" directly.");
+    mark(arrayMarks,index,"is-found");render();
+    if(!(await wait(delay(),t)))return false;
+
+    clearMarks();
+    setPhase("LinkedList");
+    setStatus("LinkedList: start at head and follow next references.");
+    for(var i=0;i<=index;i++){
+      clearMarks();
+      mark(linkedMarks,i,i===index?"is-found":"is-checking");
+      linkedSteps=i+1;
+      render();
       if(!(await wait(delay(),t)))return false;
     }
 
-    data.unshift(value);
-
-    arraySteps=before.length+1;
-    arrayMarkIndex=0;
-    arrayMarkKind="is-found";
-    linkedMarkIndex=0;
-    linkedMarkKind="is-found";
-
-    el.result.textContent=value;
-    setStatus(
-      "Prepend complete: LinkedList changed one head reference; ArrayList shifted "+
-      before.length+" element"+(before.length===1?"":"s")+"."
-    );
-    render();
-
-    if(!(await wait(delay(),t)))return false;
-
-    clearMarks();
-    render();
-    disable(false);
-    return true;
+    clearMarks();render();
+    setPhase("Complete");
+    setStatus("Access complete: ArrayList used 1 direct step; LinkedList visited "+(index+1)+" node"+(index===0?"":"s")+".");
+    el.result.textContent=data[index];
+    disable(false);return true;
   }
 
-  btn.append.addEventListener("click",function(){
-    try{
-      var v=readValue();
-      data.push(v);
-      arraySteps=1;
-      linkedSteps=1;
-      clearMarks();
-      el.result.textContent=v;
+  async function animateDelete(index){
+    token++;var t=token;disable(true);clearMarks();cloneData();
+    arraySteps=0;linkedSteps=0;
+    var removed=data[index];
+
+    setPhase("ArrayList");
+    setStatus("ArrayList: remove index "+index+" and shift the remaining suffix left.");
+    clearMarks();mark(arrayMarks,index,"is-found");render();
+    if(!(await wait(delay(),t)))return false;
+    for(var i=index;i<data.length-1;i++){
+      arrayView[i]=arrayView[i+1];
+      clearMarks();mark(arrayMarks,i,"is-moving");mark(arrayMarks,i+1,"is-checking");
+      arraySteps++;
       render();
-      setStatus("Appended "+v+".");
-    }catch(e){
-      setStatus(e.message);
+      if(!(await wait(delay(),t)))return false;
     }
-  });
+    arrayView.pop();
+    arraySteps++;
+    clearMarks();render();
 
-  btn.prepend.addEventListener("click",async function(){
-    try{
-      var v=readValue();
-      await animatePrepend(v);
-    }catch(e){
-      disable(false);
-      setStatus(e.message);
-    }
-  });
-
-  btn.insert.addEventListener("click",function(){
-    try{
-      var v=readValue();
-      var i=readIndex(true);
-
-      data.splice(i,0,v);
-      arraySteps=data.length-i;
-      linkedSteps=i+1;
-      clearMarks();
-
-      el.result.textContent=v;
-      render();
-      setStatus("Inserted "+v+" at index "+i+".");
-    }catch(e){
-      setStatus(e.message);
-    }
-  });
-
-  btn.access.addEventListener("click",async function(){
-    try{
-      var i=readIndex(false);
-      arraySteps=0;
-      linkedSteps=0;
-
-      if(!(await animateAccess(i)))return;
-
-      el.result.textContent=data[i];
-      setStatus(
-        "Access complete: ArrayList = 1 direct step; LinkedList = "+
-        (i+1)+" node visit"+(i===0?"":"s")+"."
-      );
-    }catch(e){
-      disable(false);
-      setStatus(e.message);
-    }
-  });
-
-  btn.del.addEventListener("click",function(){
-    try{
-      var i=readIndex(false);
-      var v=data[i];
-
-      data.splice(i,1);
-      arraySteps=data.length-i+1;
-      linkedSteps=i+1;
-      clearMarks();
-
-      el.result.textContent=v;
-      render();
-      setStatus("Deleted value "+v+" from index "+i+".");
-    }catch(e){
-      setStatus(e.message);
-    }
-  });
-
-  btn.search.addEventListener("click",async function(){
-    try{
-      var v=readValue();
-      token++;
-      var t=token;
-      disable(true);
-
-      arraySteps=0;
-      linkedSteps=0;
-      var found=-1;
-
-      for(var i=0;i<data.length;i++){
-        arrayMarkIndex=i;
-        arrayMarkKind="is-checking";
-        linkedMarkIndex=i;
-        linkedMarkKind="is-checking";
-
-        arraySteps=i+1;
-        linkedSteps=i+1;
+    setPhase("LinkedList");
+    setStatus(index===0?
+      "LinkedList: deleting the head updates the head reference directly.":
+      "LinkedList: traverse to the node before index "+index+".");
+    if(index>0){
+      for(var j=0;j<index;j++){
+        clearMarks();mark(linkedMarks,j,"is-checking");
+        linkedSteps++;
         render();
-
-        if(!(await wait(delay(),t)))return;
-
-        if(data[i]===v){
-          found=i;
-          break;
-        }
+        if(!(await wait(delay(),t)))return false;
       }
-
-      if(found>=0){
-        arrayMarkKind="is-found";
-        linkedMarkKind="is-found";
-        render();
-        el.result.textContent=found;
-        setStatus("Found "+v+" at index "+found+".");
-      }else{
-        clearMarks();
-        render();
-        el.result.textContent="not found";
-        setStatus(v+" was not found.");
-      }
-
-      disable(false);
-    }catch(e){
-      disable(false);
-      setStatus(e.message);
     }
-  });
+    clearMarks();mark(linkedMarks,index,"is-found");render();
+    if(!(await wait(delay(),t)))return false;
+    linkedView.splice(index,1);
+    linkedSteps++;
+    clearMarks();render();
 
-  btn.traverse.addEventListener("click",async function(){
-    token++;
-    var t=token;
-    disable(true);
+    data.splice(index,1);
+    cloneData();render();
+    setPhase("Complete");
+    setStatus("Delete complete: ArrayList shifted elements; LinkedList traversed then changed links.");
+    el.result.textContent=removed;
+    disable(false);return true;
+  }
 
-    arraySteps=0;
-    linkedSteps=0;
+  async function animateSearch(value){
+    token++;var t=token;disable(true);clearMarks();cloneData();
+    arraySteps=0;linkedSteps=0;
+    var found=-1;
 
-    for(var i=0;i<data.length;i++){
-      arrayMarkIndex=i;
-      arrayMarkKind="is-checking";
-      linkedMarkIndex=i;
-      linkedMarkKind="is-checking";
+    setPhase("ArrayList");
+    setStatus("ArrayList: linear search checks elements from left to right.");
+    for(var i=0;i<arrayView.length;i++){
+      clearMarks();mark(arrayMarks,i,"is-checking");
+      arraySteps=i+1;render();
+      if(!(await wait(delay(),t)))return false;
+      if(arrayView[i]===value){found=i;break;}
+    }
+    if(found>=0){clearMarks();mark(arrayMarks,found,"is-found");render();if(!(await wait(delay(),t)))return false;}
 
-      arraySteps=i+1;
-      linkedSteps=i+1;
-      render();
+    clearMarks();
+    setPhase("LinkedList");
+    setStatus("LinkedList: linear search follows next references node by node.");
+    var foundLinked=-1;
+    for(var j=0;j<linkedView.length;j++){
+      clearMarks();mark(linkedMarks,j,"is-checking");
+      linkedSteps=j+1;render();
+      if(!(await wait(delay(),t)))return false;
+      if(linkedView[j]===value){foundLinked=j;break;}
+    }
+    if(foundLinked>=0){clearMarks();mark(linkedMarks,foundLinked,"is-found");render();if(!(await wait(delay(),t)))return false;}
 
-      if(!(await wait(delay(),t)))return;
+    clearMarks();render();
+    setPhase("Complete");
+    el.result.textContent=found>=0?found:"not found";
+    setStatus(found>=0?"Found "+value+" at index "+found+".":"Value "+value+" was not found.");
+    disable(false);return true;
+  }
+
+  async function animateTraverse(){
+    token++;var t=token;disable(true);clearMarks();cloneData();
+    arraySteps=0;linkedSteps=0;
+
+    setPhase("ArrayList");
+    setStatus("ArrayList: iterate across contiguous indices.");
+    for(var i=0;i<arrayView.length;i++){
+      clearMarks();mark(arrayMarks,i,"is-checking");
+      arraySteps=i+1;render();
+      if(!(await wait(delay(),t)))return false;
     }
 
     clearMarks();
-    render();
+    setPhase("LinkedList");
+    setStatus("LinkedList: follow next references until null.");
+    for(var j=0;j<linkedView.length;j++){
+      clearMarks();mark(linkedMarks,j,"is-checking");
+      linkedSteps=j+1;render();
+      if(!(await wait(delay(),t)))return false;
+    }
+
+    clearMarks();render();
+    setPhase("Complete");
     el.result.textContent=data.join(" → ");
-    disable(false);
     setStatus("Traversal complete.");
+    disable(false);return true;
+  }
+
+  btn.append.addEventListener("click",async function(){
+    try{await animateAppend(readValue());}catch(e){disable(false);setStatus(e.message);}
+  });
+  btn.prepend.addEventListener("click",async function(){
+    try{await animatePrepend(readValue());}catch(e){disable(false);setStatus(e.message);}
+  });
+  btn.insert.addEventListener("click",async function(){
+    try{await animateInsert(readValue(),readIndex(true));}catch(e){disable(false);setStatus(e.message);}
+  });
+  btn.access.addEventListener("click",async function(){
+    try{await animateAccess(readIndex(false));}catch(e){disable(false);setStatus(e.message);}
+  });
+  btn.del.addEventListener("click",async function(){
+    try{await animateDelete(readIndex(false));}catch(e){disable(false);setStatus(e.message);}
+  });
+  btn.search.addEventListener("click",async function(){
+    try{await animateSearch(readValue());}catch(e){disable(false);setStatus(e.message);}
+  });
+  btn.traverse.addEventListener("click",async function(){
+    try{await animateTraverse();}catch(e){disable(false);setStatus(e.message);}
   });
 
   btn.example.addEventListener("click",function(){
-    token++;
-    data=[12,34,56,78,90];
-    clearMarks();
-    arraySteps=0;
-    linkedSteps=0;
-    el.result.textContent="—";
-    render();
-    setStatus("Example list loaded.");
+    token++;data=[12,34,56,78,90];cloneData();clearMarks();
+    arraySteps=0;linkedSteps=0;el.result.textContent="—";
+    setPhase("Ready");setStatus("Example list loaded.");render();
   });
-
   btn.random.addEventListener("click",function(){
-    token++;
-    data=Array.from({length:8},function(){
-      return Math.floor(Math.random()*90)+10;
-    });
-    clearMarks();
-    arraySteps=0;
-    linkedSteps=0;
-    el.result.textContent="—";
-    render();
-    setStatus("Random list generated.");
+    token++;data=Array.from({length:8},function(){return Math.floor(Math.random()*90)+10;});
+    cloneData();clearMarks();arraySteps=0;linkedSteps=0;el.result.textContent="—";
+    setPhase("Ready");setStatus("Random list generated.");render();
   });
-
   btn.clear.addEventListener("click",function(){
-    token++;
-    data=[];
-    clearMarks();
-    arraySteps=0;
-    linkedSteps=0;
-    el.result.textContent="—";
-    render();
-    setStatus("List cleared.");
+    token++;data=[];cloneData();clearMarks();arraySteps=0;linkedSteps=0;el.result.textContent="—";
+    setPhase("Ready");setStatus("List cleared.");render();
   });
-
   btn.cancel.addEventListener("click",function(){
-    token++;
-    clearMarks();
-    disable(false);
-    render();
-    setStatus("Animation cancelled.");
+    token++;cloneData();clearMarks();disable(false);setPhase("Cancelled");setStatus("Animation cancelled.");render();
   });
-
-  el.speed.addEventListener("input",function(){
-    el.speedOut.textContent=el.speed.value+" ms";
-  });
+  el.speed.addEventListener("input",function(){el.speedOut.textContent=el.speed.value+" ms";});
 
   btn.example.click();
   btn.cancel.disabled=true;
