@@ -1,1137 +1,285 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Interactive Stock Span Problem simulator using a monotonic stack, with step controls, custom prices, and complexity analysis.">
-    <meta name="author" content="Sercan Kulcu">
-    <title>Stock Span Simulator</title>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --text: #1f2937;
-            --muted: #64748b;
-            --surface: #ffffff;
-            --surface-soft: #f8fafc;
-            --border: #cbd5e1;
-            --checking: #fef3c7;
-            --checking-border: #d97706;
-            --found: #dcfce7;
-            --found-border: #15803d;
-            --danger: #b91c1c;
-            --success: #15803d;
-            --shadow: 0 12px 32px rgba(15, 23, 42, 0.10);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            padding: 16px;
-            font-family: Arial, Helvetica, sans-serif;
-            color: var(--text);
-            background: #eef2f7;
-            line-height: 1.55;
-        }
-
-        button,
-        input {
-            font: inherit;
-        }
-
-        .page {
-            width: min(100%, 1160px);
-            margin: 0 auto;
-        }
-
-        .container {
-            overflow: hidden;
-            background: var(--surface);
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-        }
-
-        .header {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: 16px;
-            padding: 20px 24px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .header h1 {
-            margin: 0;
-            text-align: center;
-            font-size: clamp(1.5rem, 4vw, 2.2rem);
-        }
-
-        .back-button {
-            color: var(--primary-dark);
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .back-button:hover {
-            text-decoration: underline;
-        }
-
-        .header-spacer {
-            width: 54px;
-        }
-
-        main {
-            padding: 24px;
-        }
-
-        .intro,
-        .panel {
-            padding: 20px;
-            border: 1px solid #bfdbfe;
-            border-radius: 12px;
-            background: #eff6ff;
-        }
-
-        .intro h2,
-        .panel h2,
-        .panel h3 {
-            margin-top: 0;
-        }
-
-        .metrics,
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        .metrics {
-            margin-top: 18px;
-        }
-
-        .metric,
-        .stat {
-            min-width: 0;
-            padding: 11px;
-            border: 1px solid #bfdbfe;
-            border-radius: 9px;
-            background: white;
-        }
-
-        .metric strong,
-        .stat strong {
-            display: block;
-        }
-
-        .section-title {
-            margin: 28px 0 12px;
-            font-size: 1.2rem;
-        }
-
-        .control-panel {
-            display: grid;
-            gap: 14px;
-            padding: 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            background: var(--surface-soft);
-        }
-
-        .control-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
-            gap: 10px;
-            align-items: end;
-        }
-
-        .field {
-            display: grid;
-            gap: 5px;
-        }
-
-        .field.wide {
-            grid-column: span 2;
-        }
-
-        .field label {
-            font-size: 0.92rem;
-            font-weight: 700;
-        }
-
-        input {
-            width: 100%;
-            min-height: 42px;
-            padding: 9px 10px;
-            color: var(--text);
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-
-        button {
-            min-height: 42px;
-            padding: 9px 13px;
-            color: white;
-            background: var(--primary);
-            border: 0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.18s ease, transform 0.18s ease;
-        }
-
-        button:hover:not(:disabled) {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        button.secondary {
-            color: var(--text);
-            background: #e2e8f0;
-        }
-
-        button.secondary:hover:not(:disabled) {
-            background: #cbd5e1;
-        }
-
-        button.danger {
-            background: var(--danger);
-        }
-
-        button:disabled {
-            cursor: not-allowed;
-            opacity: 0.55;
-        }
-
-        button:focus-visible,
-        input:focus-visible,
-        .back-button:focus-visible {
-            outline: 3px solid #f59e0b;
-            outline-offset: 2px;
-        }
-
-        .speed-row {
-            display: grid;
-            grid-template-columns: minmax(120px, 1fr) minmax(180px, 3fr) auto;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .speed-row output {
-            min-width: 72px;
-            font-weight: 700;
-            text-align: right;
-        }
-
-        .workspace {
-            display: grid;
-            grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.55fr);
-            gap: 16px;
-            margin-top: 18px;
-        }
-
-        .visualization,
-        .stack-panel {
-            min-width: 0;
-            padding: 18px;
-            border: 2px solid var(--primary);
-            border-radius: 12px;
-            background: var(--surface-soft);
-        }
-
-        .chart-title,
-        .stack-panel h3 {
-            margin: 0 0 12px;
-        }
-
-        .chart-scroll {
-            overflow-x: auto;
-        }
-
-        .chart {
-            min-width: 650px;
-            height: 370px;
-            display: flex;
-            align-items: flex-end;
-            gap: 8px;
-            padding: 18px 10px 30px;
-            position: relative;
-            border-left: 2px solid #94a3b8;
-            border-bottom: 2px solid #94a3b8;
-            background:
-                repeating-linear-gradient(
-                    to top,
-                    transparent 0,
-                    transparent 49px,
-                    #e2e8f0 50px
-                );
-        }
-
-        .day-column {
-            flex: 1 1 0;
-            min-width: 48px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 4px;
-            position: relative;
-        }
-
-        .price-label {
-            font-size: 0.78rem;
-            font-weight: 700;
-        }
-
-        .price-bar {
-            width: 72%;
-            min-height: 4px;
-            border: 2px solid var(--primary-dark);
-            border-radius: 7px 7px 0 0;
-            background: #93c5fd;
-            transition: height 0.25s ease, background 0.2s ease, transform 0.2s ease;
-        }
-
-        .day-column.current .price-bar {
-            background: var(--checking);
-            border-color: var(--checking-border);
-            transform: scaleX(1.08);
-        }
-
-        .day-column.completed .price-bar {
-            background: var(--found);
-            border-color: var(--found-border);
-        }
-
-        .day-label {
-            position: absolute;
-            bottom: -25px;
-            color: var(--muted);
-            font-size: 0.76rem;
-            font-weight: 700;
-        }
-
-        .span-badge {
-            min-width: 28px;
-            min-height: 28px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 999px;
-            color: white;
-            background: var(--primary);
-            font-size: 0.78rem;
-            font-weight: 700;
-        }
-
-        .span-badge.pending {
-            color: var(--muted);
-            background: #e2e8f0;
-        }
-
-        .stack-panel {
-            border-color: #64748b;
-        }
-
-        .stack-shell {
-            min-height: 300px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column-reverse;
-            justify-content: flex-start;
-            gap: 7px;
-            border: 4px solid #475569;
-            border-top: 0;
-            border-radius: 0 0 10px 10px;
-            background: #e2e8f0;
-        }
-
-        .stack-item {
-            min-height: 46px;
-            padding: 7px 10px;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
-            gap: 8px;
-            border: 2px solid var(--primary-dark);
-            border-radius: 8px;
-            background: white;
-            font-weight: 700;
-        }
-
-        .stack-item small {
-            color: var(--muted);
-        }
-
-        .stack-item.comparing {
-            background: var(--checking);
-            border-color: var(--checking-border);
-        }
-
-        .stack-empty {
-            margin: auto;
-            color: var(--muted);
-            text-align: center;
-        }
-
-        .stack-top-label {
-            margin-top: 10px;
-            color: var(--primary-dark);
-            text-align: center;
-            font-weight: 700;
-        }
-
-        .status {
-            min-height: 1.6em;
-            margin: 16px 0 0;
-            padding: 14px;
-            border: 1px solid #dbeafe;
-            border-radius: 10px;
-            background: white;
-            font-weight: 700;
-        }
-
-        .status.success {
-            color: var(--success);
-        }
-
-        .status.error {
-            color: var(--danger);
-        }
-
-        .stats {
-            margin-top: 14px;
-        }
-
-        .lower-grid {
-            display: grid;
-            grid-template-columns: minmax(280px, 0.9fr) minmax(320px, 1.1fr);
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .table-panel,
-        .code-panel {
-            min-width: 0;
-            padding: 18px;
-            border: 1px solid #dbeafe;
-            border-radius: 12px;
-            background: white;
-        }
-
-        .table-panel h3,
-        .code-panel h3 {
-            margin-top: 0;
-        }
-
-        .result-scroll {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-
-        th,
-        td {
-            padding: 9px;
-            text-align: left;
-            border: 1px solid #cbd5e1;
-        }
-
-        th {
-            background: #e2e8f0;
-        }
-
-        tr.active-row {
-            background: var(--checking);
-        }
-
-        tr.done-row {
-            background: var(--found);
-        }
-
-        .code-box {
-            padding: 14px;
-            overflow-x: auto;
-            border-radius: 10px;
-            color: #e2e8f0;
-            background: #0f172a;
-        }
-
-        .code-box pre {
-            margin: 0;
-            font-family: Consolas, Monaco, monospace;
-            font-size: 0.88rem;
-            white-space: pre-wrap;
-        }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .content-card {
-            min-width: 0;
-            padding: 18px;
-            border: 1px solid #dbeafe;
-            border-radius: 12px;
-            background: #eff6ff;
-        }
-
-        .content-card h3 {
-            margin-top: 0;
-        }
-
-        code {
-            padding: 2px 5px;
-            border-radius: 5px;
-            background: #e2e8f0;
-        }
-
-        @media (max-width: 850px) {
-            body {
-                padding: 8px;
-            }
-
-            main {
-                padding: 14px;
-            }
-
-            .header {
-                grid-template-columns: 1fr;
-                padding: 16px;
-            }
-
-            .back-button {
-                justify-self: start;
-            }
-
-            .header-spacer {
-                display: none;
-            }
-
-            .metrics,
-            .stats,
-            .content-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .workspace,
-            .lower-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .speed-row {
-                grid-template-columns: 1fr;
-            }
-
-            .speed-row output {
-                text-align: left;
-            }
-        }
-
-        @media (max-width: 520px) {
-            .metrics,
-            .stats,
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .field.wide {
-                grid-column: auto;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-                scroll-behavior: auto !important;
-            }
-        }
-    </style>
-</head>
-<body>
-<div class="page">
-    <div class="container">
-        <header class="header">
-            <a class="back-button" href="https://sercankulcu.github.io/teaching/data-structures">&larr; Back</a>
-            <h1>Stock Span Simulator</h1>
-            <span class="header-spacer" aria-hidden="true"></span>
-        </header>
-
-        <main>
-            <section class="intro">
-                <h2>What is the Stock Span Problem?</h2>
-                <p>
-                    For each day, the stock span is the number of consecutive days ending on that day for which
-                    the price was less than or equal to the current price. A monotonic decreasing stack computes
-                    all spans in linear time.
-                </p>
-
-                <div class="metrics">
-                    <div class="metric"><strong>Naive solution</strong>O(n²)</div>
-                    <div class="metric"><strong>Stack solution</strong>O(n)</div>
-                    <div class="metric"><strong>Auxiliary space</strong>O(n)</div>
-                    <div class="metric"><strong>Stack stores</strong>Indices</div>
-                </div>
-            </section>
-
-            <h2 class="section-title">Input and playback controls</h2>
-            <section class="control-panel" aria-label="Stock span controls">
-                <div class="control-group">
-                    <div class="field wide">
-                        <label for="pricesInput">Prices separated by commas</label>
-                        <input id="pricesInput" type="text" value="100, 80, 60, 70, 60, 75, 85">
-                    </div>
-                    <button id="loadButton" type="button">Load Prices</button>
-                    <button id="randomButton" type="button">Generate Random</button>
-                    <button id="resetButton" type="button" class="danger">Reset</button>
-                </div>
-
-                <div class="control-group">
-                    <button id="previousButton" type="button" class="secondary">Previous Step</button>
-                    <button id="nextButton" type="button">Next Step</button>
-                    <button id="autoButton" type="button">Auto Calculate</button>
-                    <button id="calculateButton" type="button">Calculate Instantly</button>
-                    <button id="cancelButton" type="button" class="secondary">Cancel Animation</button>
-                </div>
-
-                <div class="speed-row">
-                    <label for="speedInput"><strong>Animation speed</strong></label>
-                    <input id="speedInput" type="range" min="100" max="1200" step="100" value="500">
-                    <output id="speedOutput" for="speedInput">500 ms</output>
-                </div>
-            </section>
-
-            <div class="workspace">
-                <section class="visualization" aria-label="Stock price chart">
-                    <h3 class="chart-title">Prices and calculated spans</h3>
-                    <div class="chart-scroll">
-                        <div id="chart" class="chart"></div>
-                    </div>
-                </section>
-
-                <aside class="stack-panel" aria-label="Monotonic stack">
-                    <h3>Monotonic stack</h3>
-                    <div id="stackShell" class="stack-shell"></div>
-                    <div id="stackTopLabel" class="stack-top-label">TOP → empty</div>
-                </aside>
-            </div>
-
-            <p id="status" class="status" role="status" aria-live="polite">
-                Prices loaded. Use Next Step or Auto Calculate.
-            </p>
-
-            <div class="stats" aria-label="Algorithm statistics">
-                <div class="stat"><strong>Current day</strong><span id="dayStat">—</span></div>
-                <div class="stat"><strong>Comparisons</strong><span id="comparisonStat">0</span></div>
-                <div class="stat"><strong>Stack pops</strong><span id="popStat">0</span></div>
-                <div class="stat"><strong>Progress</strong><span id="progressStat">0 / 7</span></div>
-            </div>
-
-            <div class="lower-grid">
-                <section class="table-panel">
-                    <h3>Calculation table</h3>
-                    <div class="result-scroll">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Day</th>
-                                <th>Price</th>
-                                <th>Previous greater day</th>
-                                <th>Span</th>
-                            </tr>
-                            </thead>
-                            <tbody id="resultBody"></tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section class="code-panel">
-                    <h3>Monotonic-stack algorithm</h3>
-                    <div class="code-box">
-<pre>for i from 0 to n - 1:
-    while stack is not empty
-          and price[stack.top] &lt;= price[i]:
-        stack.pop()
-
-    if stack is empty:
-        span[i] = i + 1
-    else:
-        span[i] = i - stack.top
-
-    stack.push(i)</pre>
-                    </div>
-                </section>
-            </div>
-
-            <h2 class="section-title">Stock span concepts</h2>
-            <div class="content-grid">
-                <article class="content-card">
-                    <h3>Why store indices?</h3>
-                    <p>
-                        The algorithm needs both the previous greater price and its distance from the current
-                        day. Storing indices provides both pieces of information.
-                    </p>
-                </article>
-
-                <article class="content-card">
-                    <h3>Monotonic invariant</h3>
-                    <p>
-                        Prices at stack indices remain strictly decreasing from bottom to top. Any smaller or
-                        equal price is removed because it can no longer limit a future span.
-                    </p>
-                </article>
-
-                <article class="content-card">
-                    <h3>Amortized O(n)</h3>
-                    <p>
-                        Although one day may pop several entries, each index is pushed once and popped at most
-                        once. Therefore, the complete algorithm performs O(n) stack operations.
-                    </p>
-                </article>
-
-                <article class="content-card">
-                    <h3>Span interpretation</h3>
-                    <p>
-                        A span of 1 means the previous day had a greater price. A span of <code>i + 1</code>
-                        means no earlier greater price exists.
-                    </p>
-                </article>
-            </div>
-
-            <h2 class="section-title">Complexity comparison</h2>
-            <section class="panel">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Approach</th>
-                        <th>Time</th>
-                        <th>Space</th>
-                        <th>Idea</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>Backward scan for every day</td>
-                        <td>O(n²)</td>
-                        <td>O(1)</td>
-                        <td>Repeatedly inspect earlier prices.</td>
-                    </tr>
-                    <tr>
-                        <td>Monotonic stack</td>
-                        <td>O(n)</td>
-                        <td>O(n)</td>
-                        <td>Discard indices that can never be a future boundary.</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </section>
-        </main>
+---
+layout: without-sidebar
+title: "Stock Span Simulator"
+permalink: /files/data_structures/slides/Bolum_04_Stock_Span.html
+excerpt: "Interactive Stock Span Problem simulator using a monotonic stack."
+---
+
+<style>
+.ds-span,.ds-span *,.ds-span *::before,.ds-span *::after{box-sizing:border-box}
+.ds-span{
+  width:min(1160px,100%);margin:0 auto 2rem;color:var(--global-text-color);
+  --ds-surface:color-mix(in srgb,var(--global-link-color) 2.5%,var(--global-bg-color));
+  --ds-surface-strong:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  --ds-border:color-mix(in srgb,var(--global-link-color) 38%,var(--global-border-color));
+  --ds-shadow:0 8px 24px rgba(15,23,42,.065);
+  --ds-shadow-soft:0 3px 10px rgba(15,23,42,.045)
+}
+.ds-span__hero,.ds-span__panel,.ds-span__visual,.ds-span__stack-panel,.ds-span__card,.ds-span__table-panel,.ds-span__code-panel,.ds-span__status{
+  border:1.5px solid var(--ds-border);background:var(--ds-surface)
+}
+.ds-span__hero{padding:1.35rem;border-radius:16px;background:var(--ds-surface-strong);box-shadow:var(--ds-shadow)}
+.ds-span__hero h1{margin:0 0 .55rem;text-align:center;color:var(--global-text-color);font-size:clamp(1.65rem,4vw,2.3rem)}
+.ds-span__hero p{width:100%;margin:0;max-width:none;line-height:1.65;text-align:justify;text-justify:inter-word;opacity:.86}
+.ds-span__metrics,.ds-span__stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem}
+.ds-span__metrics{margin-top:1rem}
+.ds-span__metric,.ds-span__stat{padding:.8rem;border:1.5px solid var(--ds-border);border-radius:10px;background:var(--ds-surface);box-shadow:var(--ds-shadow-soft)}
+.ds-span__metric strong,.ds-span__stat strong{display:block;margin-bottom:.15rem}
+.ds-span__section{margin-top:1.4rem}.ds-span__section h2{margin:0 0 .7rem;color:var(--global-text-color);font-size:1.2rem}
+.ds-span__panel{display:grid;gap:.8rem;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow-soft)}
+.ds-span__group{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;align-items:end}
+.ds-span__field{display:grid;gap:.3rem}.ds-span__field--wide{grid-column:span 2}
+.ds-span__field label,.ds-span__speed label{font-size:.86rem;font-weight:800}
+.ds-span input{width:100%;min-height:42px;padding:.55rem .65rem;border:1.5px solid var(--ds-border);border-radius:9px;background:var(--ds-surface);color:var(--global-text-color);font:inherit}
+.ds-span input:focus-visible,.ds-span button:focus-visible{outline:3px solid color-mix(in srgb,var(--global-link-color) 30%,transparent);outline-offset:2px}
+.ds-span__btn{min-height:42px;padding:.55rem .75rem;border:1px solid var(--global-link-color);border-radius:9px;background:var(--global-link-color);color:#fff;font:inherit;font-weight:800;cursor:pointer}
+.ds-span__btn:hover:not(:disabled){filter:brightness(1.08)}.ds-span__btn--secondary{border-color:var(--ds-border);background:var(--ds-surface);color:var(--global-text-color)}
+.ds-span__btn--danger{border-color:#b91c1c;background:#b91c1c}.ds-span__btn:disabled{cursor:not-allowed;opacity:.5}
+.ds-span__speed{display:grid;grid-template-columns:minmax(130px,auto) 1fr auto;gap:.65rem;align-items:center}.ds-span__speed output{min-width:70px;text-align:right;font-size:.85rem;font-weight:800}
+.ds-span__workspace{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(260px,.55fr);gap:.8rem;margin-top:1rem}
+.ds-span__visual,.ds-span__stack-panel{min-width:0;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow)}
+.ds-span__visual h3,.ds-span__stack-panel h3{margin:0 0 .7rem;font-size:1rem}
+.ds-span__chart-scroll{overflow-x:auto}
+.ds-span__chart{min-width:650px;height:370px;display:flex;align-items:flex-end;gap:.5rem;padding:1rem .65rem 2rem;position:relative;border-left:2px solid var(--ds-border);border-bottom:2px solid var(--ds-border);background:repeating-linear-gradient(to top,transparent 0,transparent 49px,color-mix(in srgb,var(--global-border-color) 55%,transparent) 50px)}
+.ds-span__day{flex:1 1 0;min-width:48px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:.25rem;position:relative}
+.ds-span__price-label{font-size:.75rem;font-weight:800}.ds-span__bar{width:72%;min-height:4px;border:2px solid color-mix(in srgb,var(--global-link-color) 85%,var(--global-border-color));border-radius:7px 7px 0 0;background:color-mix(in srgb,var(--global-link-color) 32%,var(--global-bg-color));box-shadow:inset 0 -2px 0 rgba(15,23,42,.05);transition:.18s}
+.ds-span__day.is-current .ds-span__bar{background:#fef3c7;border-color:#d97706;transform:scaleX(1.08)}
+.ds-span__day.is-done .ds-span__bar{background:#dcfce7;border-color:#15803d}
+.ds-span__day-label{position:absolute;bottom:-24px;font-size:.72rem;font-weight:800;opacity:.55}
+.ds-span__badge{min-width:28px;min-height:28px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:var(--global-link-color);color:#fff;font-size:.75rem;font-weight:800}
+.ds-span__badge.is-pending{background:color-mix(in srgb,var(--global-text-color) 8%,var(--global-bg-color));color:var(--global-text-color)}
+.ds-span__stack-shell{min-height:300px;padding:.6rem;display:flex;flex-direction:column-reverse;justify-content:flex-start;gap:.4rem;border:4px solid color-mix(in srgb,var(--global-text-color) 55%,var(--global-border-color));border-top:0;border-radius:0 0 10px 10px;background:color-mix(in srgb,var(--global-text-color) 4%,var(--global-bg-color))}
+.ds-span__stack-item{min-height:46px;padding:.45rem .65rem;display:grid;grid-template-columns:1fr auto;align-items:center;gap:.5rem;border:2px solid color-mix(in srgb,var(--global-link-color) 85%,var(--global-border-color));border-radius:8px;background:var(--ds-surface);font-weight:800}
+.ds-span__stack-item small{opacity:.55}.ds-span__stack-item.is-comparing{background:#fef3c7;border-color:#d97706;color:#3f2a00}.ds-span__stack-empty{margin:auto;text-align:center;opacity:.58}.ds-span__stack-top{margin-top:.55rem;text-align:center;color:var(--global-link-color);font-weight:800}
+.ds-span__status{min-height:3rem;margin:.8rem 0 0;padding:.85rem;border-radius:10px;box-shadow:var(--ds-shadow-soft);font-weight:800}.ds-span__status.is-success{color:#15803d}.ds-span__status.is-error{color:#b91c1c}
+.ds-span__stats{margin-top:.8rem}.ds-span__stat strong{font-size:.75rem;opacity:.65}
+.ds-span__lower{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(320px,1.1fr);gap:.8rem;margin-top:.8rem}
+.ds-span__table-panel,.ds-span__code-panel{min-width:0;padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}.ds-span__table-panel h3,.ds-span__code-panel h3{margin:0 0 .55rem;font-size:1rem}
+.ds-span__table-scroll{overflow-x:auto}.ds-span table{width:100%;border-collapse:collapse;font-size:.87rem}.ds-span th,.ds-span td{padding:.6rem;border:1.5px solid var(--ds-border);text-align:left}.ds-span th{background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color))}
+.ds-span tr.is-active{background:#fef3c7;color:#3f2a00}.ds-span tr.is-done{background:#dcfce7;color:#14532d}
+.ds-span__code{padding:.9rem;overflow-x:auto;border-radius:10px;background:#0f172a;color:#e2e8f0}.ds-span__code pre{margin:0;white-space:pre-wrap;font-family:Consolas,Monaco,monospace;font-size:.84rem}
+.ds-span__cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}.ds-span__card{padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}.ds-span__card h3{margin:0 0 .45rem;color:var(--global-text-color);font-size:1rem}.ds-span__card p{margin:0;font-size:.9rem;line-height:1.55;opacity:.78}
+@media(max-width:850px){.ds-span__hero p{text-align:left}.ds-span__metrics,.ds-span__stats,.ds-span__cards{grid-template-columns:repeat(2,minmax(0,1fr))}.ds-span__workspace,.ds-span__lower{grid-template-columns:1fr}.ds-span__speed{grid-template-columns:1fr}.ds-span__speed output{text-align:left}}
+@media(max-width:520px){.ds-span__metrics,.ds-span__stats,.ds-span__cards,.ds-span__group{grid-template-columns:1fr}.ds-span__field--wide{grid-column:auto}}
+@media(prefers-color-scheme:dark){.ds-span{--ds-surface:var(--global-bg-color);--ds-surface-strong:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));--ds-border:color-mix(in srgb,var(--global-border-color) 85%,var(--global-text-color));--ds-shadow:none;--ds-shadow-soft:none}.ds-span__bar{box-shadow:none}}
+@media(prefers-reduced-motion:reduce){.ds-span *,.ds-span *::before,.ds-span *::after{transition-duration:.001ms!important;animation-duration:.001ms!important}}
+</style>
+
+<div class="ds-span">
+  <section class="ds-span__hero">
+    <h1>Stock Span Simulator</h1>
+    <p>
+      For each day, the stock span is the number of consecutive days ending on that day for which the price
+      was less than or equal to the current price. A monotonic decreasing stack computes all spans in linear time.
+    </p>
+    <div class="ds-span__metrics">
+      <div class="ds-span__metric"><strong>Naive solution</strong>O(n²)</div>
+      <div class="ds-span__metric"><strong>Stack solution</strong>O(n)</div>
+      <div class="ds-span__metric"><strong>Auxiliary space</strong>O(n)</div>
+      <div class="ds-span__metric"><strong>Stack stores</strong>Indices</div>
     </div>
+  </section>
+
+  <section class="ds-span__section">
+    <h2>Simulation controls</h2>
+    <div class="ds-span__panel">
+      <div class="ds-span__group">
+        <div class="ds-span__field ds-span__field--wide">
+          <label for="ds-span-prices">Prices (comma-separated)</label>
+          <input id="ds-span-prices" type="text" value="100,80,60,70,60,75,85">
+        </div>
+        <button class="ds-span__btn" id="ds-span-load" type="button">Load Prices</button>
+        <button class="ds-span__btn" id="ds-span-example" type="button">Example</button>
+        <button class="ds-span__btn" id="ds-span-random" type="button">Random</button>
+      </div>
+      <div class="ds-span__group">
+        <button class="ds-span__btn ds-span__btn--secondary" id="ds-span-prev" type="button">Previous Step</button>
+        <button class="ds-span__btn" id="ds-span-next" type="button">Next Step</button>
+        <button class="ds-span__btn" id="ds-span-auto" type="button">Auto Run</button>
+        <button class="ds-span__btn ds-span__btn--danger" id="ds-span-reset" type="button">Reset</button>
+      </div>
+      <div class="ds-span__speed">
+        <label for="ds-span-speed">Animation speed</label>
+        <input id="ds-span-speed" type="range" min="100" max="1200" step="100" value="500">
+        <output id="ds-span-speed-output">500 ms</output>
+      </div>
+    </div>
+
+    <div class="ds-span__workspace">
+      <div class="ds-span__visual">
+        <h3>Price chart and computed spans</h3>
+        <div class="ds-span__chart-scroll"><div class="ds-span__chart" id="ds-span-chart"></div></div>
+      </div>
+      <div class="ds-span__stack-panel">
+        <h3>Monotonic stack</h3>
+        <div class="ds-span__stack-shell" id="ds-span-stack"></div>
+        <div class="ds-span__stack-top" id="ds-span-stack-top">TOP</div>
+      </div>
+    </div>
+
+    <p class="ds-span__status" id="ds-span-status" role="status" aria-live="polite">Use Next Step to process the first day.</p>
+
+    <div class="ds-span__stats">
+      <div class="ds-span__stat"><strong>Current day</strong><span id="ds-span-current">0 / 7</span></div>
+      <div class="ds-span__stat"><strong>Comparisons</strong><span id="ds-span-comparisons">0</span></div>
+      <div class="ds-span__stat"><strong>Pushes / pops</strong><span id="ds-span-ops">0 / 0</span></div>
+      <div class="ds-span__stat"><strong>Complexity</strong>O(n)</div>
+    </div>
+
+    <div class="ds-span__lower">
+      <div class="ds-span__table-panel">
+        <h3>Results</h3>
+        <div class="ds-span__table-scroll">
+          <table>
+            <thead><tr><th>Day</th><th>Price</th><th>Span</th></tr></thead>
+            <tbody id="ds-span-table"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="ds-span__code-panel">
+        <h3>Monotonic-stack algorithm</h3>
+        <div class="ds-span__code"><pre>for i = 0 ... n-1:
+  while stack not empty
+        and price[stack.top] <= price[i]:
+    stack.pop()
+
+  if stack empty:
+    span[i] = i + 1
+  else:
+    span[i] = i - stack.top
+
+  stack.push(i)</pre></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-span__section">
+    <h2>Why the stack solution is O(n)</h2>
+    <div class="ds-span__cards">
+      <article class="ds-span__card"><h3>Monotonic invariant</h3><p>Indices in the stack refer to prices that decrease from bottom to top.</p></article>
+      <article class="ds-span__card"><h3>Each index is pushed once</h3><p>Every day enters the stack exactly once when its span has been computed.</p></article>
+      <article class="ds-span__card"><h3>Each index is popped at most once</h3><p>Once a smaller or equal price is removed, it never returns to the stack.</p></article>
+      <article class="ds-span__card"><h3>Amortized reasoning</h3><p>Across all days there are at most n pushes and n pops, so total stack work is linear.</p></article>
+    </div>
+  </section>
 </div>
 
 <script>
-    "use strict";
+(() => {
+  "use strict";
+  const root = document.querySelector(".ds-span");
+  if (!root) return;
+  const q = id => root.querySelector("#" + id);
 
-    const elements = {
-        pricesInput: document.getElementById("pricesInput"),
-        speedInput: document.getElementById("speedInput"),
-        speedOutput: document.getElementById("speedOutput"),
-        chart: document.getElementById("chart"),
-        stackShell: document.getElementById("stackShell"),
-        stackTopLabel: document.getElementById("stackTopLabel"),
-        status: document.getElementById("status"),
-        dayStat: document.getElementById("dayStat"),
-        comparisonStat: document.getElementById("comparisonStat"),
-        popStat: document.getElementById("popStat"),
-        progressStat: document.getElementById("progressStat"),
-        resultBody: document.getElementById("resultBody")
-    };
+  const el = {
+    prices:q("ds-span-prices"), speed:q("ds-span-speed"), speedOutput:q("ds-span-speed-output"),
+    chart:q("ds-span-chart"), stack:q("ds-span-stack"), stackTop:q("ds-span-stack-top"),
+    status:q("ds-span-status"), current:q("ds-span-current"), comparisons:q("ds-span-comparisons"),
+    ops:q("ds-span-ops"), table:q("ds-span-table")
+  };
+  const btn = {
+    load:q("ds-span-load"), example:q("ds-span-example"), random:q("ds-span-random"),
+    prev:q("ds-span-prev"), next:q("ds-span-next"), auto:q("ds-span-auto"), reset:q("ds-span-reset")
+  };
 
-    const buttons = {
-        load: document.getElementById("loadButton"),
-        random: document.getElementById("randomButton"),
-        reset: document.getElementById("resetButton"),
-        previous: document.getElementById("previousButton"),
-        next: document.getElementById("nextButton"),
-        auto: document.getElementById("autoButton"),
-        calculate: document.getElementById("calculateButton"),
-        cancel: document.getElementById("cancelButton")
-    };
+  let prices=[100,80,60,70,60,75,85], snapshots=[], step=0, autoToken=0, autoRunning=false;
 
-    let prices = [100, 80, 60, 70, 60, 75, 85];
-    let spans = new Array(prices.length).fill(null);
-    let previousGreater = new Array(prices.length).fill(null);
-    let stack = [];
-    let currentIndex = 0;
-    let comparisons = 0;
-    let pops = 0;
-    let snapshots = [];
-    let animationToken = 0;
-    let running = false;
+  function computeSnapshots(values){
+    const stack=[], spans=Array(values.length).fill(null), out=[];
+    let comparisons=0,pushes=0,pops=0;
+    out.push({stack:[...stack],spans:[...spans],i:-1,comparisons,pushes,pops,message:"Ready."});
+    for(let i=0;i<values.length;i++){
+      while(stack.length){
+        comparisons++;
+        if(values[stack[stack.length-1]]<=values[i]){stack.pop();pops++;}
+        else break;
+      }
+      spans[i]=stack.length ? i-stack[stack.length-1] : i+1;
+      stack.push(i);pushes++;
+      out.push({
+        stack:[...stack],spans:[...spans],i,comparisons,pushes,pops,
+        message:`Day ${i+1}: price ${values[i]}, span ${spans[i]}.`
+      });
+    }
+    return out;
+  }
 
-    function parsePrices() {
-        const parts = elements.pricesInput.value
-            .split(",")
-            .map((part) => part.trim())
-            .filter(Boolean);
+  function maxPrice(){return Math.max(...prices,1)}
 
-        if (parts.length < 1 || parts.length > 20) {
-            throw new Error("Enter between 1 and 20 prices.");
-        }
+  function render(){
+    const snap=snapshots[step];
+    el.chart.innerHTML=prices.map((price,i)=>{
+      const h=Math.max(8,(price/maxPrice())*250);
+      const cls=i===snap.i?"is-current":(snap.spans[i]!=null?"is-done":"");
+      const badge=snap.spans[i]==null?"?":snap.spans[i];
+      return `<div class="ds-span__day ${cls}">
+        <span class="ds-span__price-label">${price}</span>
+        <span class="ds-span__badge ${snap.spans[i]==null?"is-pending":""}">${badge}</span>
+        <div class="ds-span__bar" style="height:${h}px"></div>
+        <span class="ds-span__day-label">D${i+1}</span>
+      </div>`;
+    }).join("");
 
-        const values = parts.map(Number);
-        if (values.some((value) => !Number.isFinite(value) || value <= 0)) {
-            throw new Error("Every price must be a positive number.");
-        }
-
-        return values;
+    if(!snap.stack.length){
+      el.stack.innerHTML='<p class="ds-span__stack-empty">Stack is empty.</p>';
+      el.stackTop.textContent="TOP = empty";
+    } else {
+      el.stack.innerHTML=snap.stack.map(index=>
+        `<div class="ds-span__stack-item"><span>D${index+1} · ${prices[index]}</span><small>index ${index}</small></div>`
+      ).join("");
+      const top=snap.stack[snap.stack.length-1];
+      el.stackTop.textContent=`TOP → D${top+1}`;
     }
 
-    function getDelay() {
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-            return 0;
-        }
-        return Number(elements.speedInput.value);
+    el.table.innerHTML=prices.map((price,i)=>`
+      <tr class="${i===snap.i?"is-active":(snap.spans[i]!=null?"is-done":"")}">
+        <td>${i+1}</td><td>${price}</td><td>${snap.spans[i]??"—"}</td>
+      </tr>`).join("");
+
+    el.current.textContent=`${Math.max(0,step)} / ${prices.length}`;
+    el.comparisons.textContent=String(snap.comparisons);
+    el.ops.textContent=`${snap.pushes} / ${snap.pops}`;
+    el.status.textContent=step===snapshots.length-1?"All spans computed in linear time.":snap.message;
+    el.status.className="ds-span__status"+(step===snapshots.length-1?" is-success":"");
+
+    btn.prev.disabled=step===0||autoRunning;
+    btn.next.disabled=step===snapshots.length-1||autoRunning;
+    btn.auto.disabled=step===snapshots.length-1||autoRunning;
+    btn.load.disabled=btn.example.disabled=btn.random.disabled=autoRunning;
+  }
+
+  function parsePrices(text){
+    const vals=text.split(",").map(s=>Number(s.trim())).filter(v=>Number.isFinite(v)&&v>0);
+    if(!vals.length) throw new Error("Enter at least one positive price.");
+    if(vals.length>20) throw new Error("Use at most 20 prices.");
+    return vals;
+  }
+
+  function setup(values){
+    autoToken++;autoRunning=false;prices=values;snapshots=computeSnapshots(prices);step=0;
+    el.prices.value=prices.join(",");render();
+  }
+
+  btn.load.addEventListener("click",()=>{
+    try{setup(parsePrices(el.prices.value));}
+    catch(e){el.status.textContent=e.message;el.status.className="ds-span__status is-error";}
+  });
+
+  btn.example.addEventListener("click",()=>setup([100,80,60,70,60,75,85]));
+  btn.random.addEventListener("click",()=>setup(Array.from({length:8},()=>Math.floor(Math.random()*70)+30)));
+  btn.reset.addEventListener("click",()=>{autoToken++;autoRunning=false;step=0;render();});
+  btn.next.addEventListener("click",()=>{if(step<snapshots.length-1){step++;render();}});
+  btn.prev.addEventListener("click",()=>{if(step>0){step--;render();}});
+
+  btn.auto.addEventListener("click",async()=>{
+    autoRunning=true;const token=++autoToken;render();
+    while(step<snapshots.length-1&&token===autoToken){
+      step++;render();await new Promise(r=>setTimeout(r,Number(el.speed.value)));
     }
+    if(token===autoToken){autoRunning=false;render();}
+  });
 
-    function wait(milliseconds, token) {
-        return new Promise((resolve) => {
-            window.setTimeout(() => resolve(token === animationToken), milliseconds);
-        });
-    }
-
-    function setStatus(message, type = "") {
-        elements.status.textContent = message;
-        elements.status.className = `status ${type}`.trim();
-    }
-
-    function resetAlgorithm() {
-        animationToken += 1;
-        running = false;
-        spans = new Array(prices.length).fill(null);
-        previousGreater = new Array(prices.length).fill(null);
-        stack = [];
-        currentIndex = 0;
-        comparisons = 0;
-        pops = 0;
-        snapshots = [];
-        render();
-        setStatus("Prices loaded. Use Next Step or Auto Calculate.");
-    }
-
-    function loadPrices() {
-        try {
-            prices = parsePrices();
-            resetAlgorithm();
-        } catch (error) {
-            setStatus(error.message, "error");
-        }
-    }
-
-    function generateRandom() {
-        const length = Math.floor(Math.random() * 6) + 7;
-        prices = Array.from({ length }, () => Math.floor(Math.random() * 91) + 10);
-        elements.pricesInput.value = prices.join(", ");
-        resetAlgorithm();
-        setStatus(`Generated ${length} random prices.`, "success");
-    }
-
-    function saveSnapshot() {
-        snapshots.push({
-            spans: [...spans],
-            previousGreater: [...previousGreater],
-            stack: [...stack],
-            currentIndex,
-            comparisons,
-            pops
-        });
-    }
-
-    function restoreSnapshot(snapshot) {
-        spans = [...snapshot.spans];
-        previousGreater = [...snapshot.previousGreater];
-        stack = [...snapshot.stack];
-        currentIndex = snapshot.currentIndex;
-        comparisons = snapshot.comparisons;
-        pops = snapshot.pops;
-    }
-
-    function render() {
-        renderChart();
-        renderStack();
-        renderTable();
-        renderStats();
-        updateButtons();
-    }
-
-    function renderChart() {
-        elements.chart.innerHTML = "";
-        const maximum = Math.max(...prices, 1);
-
-        prices.forEach((price, index) => {
-            const column = document.createElement("div");
-            column.className = "day-column";
-
-            if (index === currentIndex && currentIndex < prices.length) {
-                column.classList.add("current");
-            } else if (index < currentIndex) {
-                column.classList.add("completed");
-            }
-
-            const priceLabel = document.createElement("span");
-            priceLabel.className = "price-label";
-            priceLabel.textContent = String(price);
-
-            const bar = document.createElement("div");
-            bar.className = "price-bar";
-            bar.style.height = `${Math.max(4, (price / maximum) * 260)}px`;
-
-            const spanBadge = document.createElement("span");
-            spanBadge.className = `span-badge ${spans[index] === null ? "pending" : ""}`.trim();
-            spanBadge.textContent = spans[index] === null ? "?" : String(spans[index]);
-            spanBadge.setAttribute(
-                "aria-label",
-                spans[index] === null ? `Span for day ${index + 1} not calculated` : `Span ${spans[index]}`
-            );
-
-            const dayLabel = document.createElement("span");
-            dayLabel.className = "day-label";
-            dayLabel.textContent = `D${index + 1}`;
-
-            column.append(priceLabel, bar, spanBadge, dayLabel);
-            elements.chart.appendChild(column);
-        });
-    }
-
-    function renderStack(comparingIndex = null) {
-        elements.stackShell.innerHTML = "";
-
-        if (stack.length === 0) {
-            const empty = document.createElement("p");
-            empty.className = "stack-empty";
-            empty.textContent = "The stack is empty.";
-            elements.stackShell.appendChild(empty);
-            elements.stackTopLabel.textContent = "TOP → empty";
-            return;
-        }
-
-        stack.forEach((index) => {
-            const item = document.createElement("div");
-            item.className = "stack-item";
-            if (index === comparingIndex) item.classList.add("comparing");
-            item.innerHTML = `<span>Day ${index + 1}: ${prices[index]}</span><small>index ${index}</small>`;
-            elements.stackShell.appendChild(item);
-        });
-
-        const top = stack.at(-1);
-        elements.stackTopLabel.textContent = `TOP → Day ${top + 1}, price ${prices[top]}`;
-    }
-
-    function renderTable() {
-        elements.resultBody.innerHTML = prices.map((price, index) => {
-            const rowClass =
-                index === currentIndex && currentIndex < prices.length
-                    ? "active-row"
-                    : index < currentIndex
-                        ? "done-row"
-                        : "";
-
-            const previous =
-                previousGreater[index] === null
-                    ? (spans[index] === null ? "—" : "None")
-                    : `Day ${previousGreater[index] + 1}`;
-
-            return `
-                <tr class="${rowClass}">
-                    <td>${index + 1}</td>
-                    <td>${price}</td>
-                    <td>${previous}</td>
-                    <td>${spans[index] === null ? "—" : spans[index]}</td>
-                </tr>
-            `;
-        }).join("");
-    }
-
-    function renderStats() {
-        elements.dayStat.textContent =
-            currentIndex < prices.length ? `${currentIndex + 1} (price ${prices[currentIndex]})` : "Complete";
-        elements.comparisonStat.textContent = String(comparisons);
-        elements.popStat.textContent = String(pops);
-        elements.progressStat.textContent = `${currentIndex} / ${prices.length}`;
-    }
-
-    function updateButtons() {
-        buttons.previous.disabled = running || snapshots.length === 0;
-        buttons.next.disabled = running || currentIndex >= prices.length;
-        buttons.auto.disabled = running || currentIndex >= prices.length;
-        buttons.calculate.disabled = running || currentIndex >= prices.length;
-        buttons.cancel.disabled = !running;
-        buttons.load.disabled = running;
-        buttons.random.disabled = running;
-        elements.pricesInput.disabled = running;
-    }
-
-    async function processOneDay(token, animated = true) {
-        if (currentIndex >= prices.length) return false;
-
-        saveSnapshot();
-        const index = currentIndex;
-        const currentPrice = prices[index];
-
-        setStatus(`Processing Day ${index + 1}, price ${currentPrice}.`);
-
-        while (stack.length > 0) {
-            const topIndex = stack.at(-1);
-            comparisons += 1;
-            render();
-            renderStack(topIndex);
-            setStatus(
-                `Compare current price ${currentPrice} with stack top price ${prices[topIndex]} from Day ${topIndex + 1}.`
-            );
-
-            if (animated && !(await wait(getDelay(), token))) return false;
-
-            if (prices[topIndex] <= currentPrice) {
-                stack.pop();
-                pops += 1;
-                render();
-                setStatus(
-                    `Pop Day ${topIndex + 1} because ${prices[topIndex]} ≤ ${currentPrice}.`
-                );
-
-                if (animated && !(await wait(Math.max(0, getDelay() / 2), token))) return false;
-            } else {
-                break;
-            }
-        }
-
-        previousGreater[index] = stack.length === 0 ? null : stack.at(-1);
-        spans[index] = stack.length === 0 ? index + 1 : index - stack.at(-1);
-        stack.push(index);
-        currentIndex += 1;
-        render();
-
-        setStatus(
-            `Day ${index + 1}: span = ${spans[index]}. Pushed index ${index} onto the stack.`,
-            "success"
-        );
-
-        if (animated && !(await wait(Math.max(0, getDelay() / 2), token))) return false;
-        return true;
-    }
-
-    async function nextStep() {
-        if (running || currentIndex >= prices.length) return;
-
-        running = true;
-        const token = ++animationToken;
-        updateButtons();
-
-        await processOneDay(token, true);
-
-        running = false;
-        render();
-
-        if (currentIndex === prices.length) {
-            setStatus("All spans were calculated in linear time.", "success");
-        }
-    }
-
-    function previousStep() {
-        if (running || snapshots.length === 0) return;
-
-        animationToken += 1;
-        const snapshot = snapshots.pop();
-        restoreSnapshot(snapshot);
-        render();
-        setStatus(`Returned to Day ${currentIndex + 1}.`);
-    }
-
-    async function autoCalculate() {
-        if (running || currentIndex >= prices.length) return;
-
-        running = true;
-        const token = ++animationToken;
-        updateButtons();
-        setStatus("Automatic calculation started.");
-
-        while (currentIndex < prices.length && token === animationToken) {
-            const completed = await processOneDay(token, true);
-            if (!completed) break;
-        }
-
-        running = false;
-        render();
-
-        if (token === animationToken && currentIndex === prices.length) {
-            setStatus("All spans were calculated in linear time.", "success");
-        }
-    }
-
-    async function calculateInstantly() {
-        if (running || currentIndex >= prices.length) return;
-
-        running = true;
-        const token = ++animationToken;
-        updateButtons();
-
-        while (currentIndex < prices.length && token === animationToken) {
-            const completed = await processOneDay(token, false);
-            if (!completed) break;
-        }
-
-        running = false;
-        render();
-
-        if (currentIndex === prices.length) {
-            setStatus("All spans were calculated instantly.", "success");
-        }
-    }
-
-    function cancelAnimation() {
-        if (!running) return;
-        animationToken += 1;
-        running = false;
-        render();
-        setStatus("Animation cancelled. The completed steps were preserved.");
-    }
-
-    elements.speedInput.addEventListener("input", () => {
-        elements.speedOutput.value = `${elements.speedInput.value} ms`;
-        elements.speedOutput.textContent = `${elements.speedInput.value} ms`;
-    });
-
-    elements.pricesInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            loadPrices();
-        }
-    });
-
-    buttons.load.addEventListener("click", loadPrices);
-    buttons.random.addEventListener("click", generateRandom);
-    buttons.reset.addEventListener("click", resetAlgorithm);
-    buttons.previous.addEventListener("click", previousStep);
-    buttons.next.addEventListener("click", nextStep);
-    buttons.auto.addEventListener("click", autoCalculate);
-    buttons.calculate.addEventListener("click", calculateInstantly);
-    buttons.cancel.addEventListener("click", cancelAnimation);
-
-    resetAlgorithm();
+  el.speed.addEventListener("input",()=>{el.speedOutput.textContent=`${el.speed.value} ms`;});
+  setup(prices);
+})();
 </script>
-</body>
-</html>

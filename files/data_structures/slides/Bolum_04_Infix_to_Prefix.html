@@ -1,1312 +1,343 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Interactive infix-to-prefix converter with tokenization, validation, operator-stack visualization, and step-by-step playback.">
-    <meta name="author" content="Sercan Kulcu">
-    <title>Infix to Prefix Converter</title>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --text: #1f2937;
-            --muted: #64748b;
-            --surface: #ffffff;
-            --surface-soft: #f8fafc;
-            --border: #cbd5e1;
-            --checking: #fef3c7;
-            --checking-border: #d97706;
-            --found: #dcfce7;
-            --found-border: #15803d;
-            --danger: #b91c1c;
-            --success: #15803d;
-            --shadow: 0 12px 32px rgba(15, 23, 42, 0.10);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            padding: 16px;
-            font-family: Arial, Helvetica, sans-serif;
-            color: var(--text);
-            background: #eef2f7;
-            line-height: 1.55;
-        }
-
-        button,
-        input,
-        select {
-            font: inherit;
-        }
-
-        .page {
-            width: min(100%, 1160px);
-            margin: 0 auto;
-        }
-
-        .container {
-            overflow: hidden;
-            background: var(--surface);
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-        }
-
-        .header {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: 16px;
-            padding: 20px 24px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .header h1 {
-            margin: 0;
-            text-align: center;
-            font-size: clamp(1.5rem, 4vw, 2.2rem);
-        }
-
-        .back-button {
-            color: var(--primary-dark);
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .back-button:hover {
-            text-decoration: underline;
-        }
-
-        .header-spacer {
-            width: 54px;
-        }
-
-        main {
-            padding: 24px;
-        }
-
-        .intro,
-        .panel {
-            padding: 20px;
-            border: 1px solid #bfdbfe;
-            border-radius: 12px;
-            background: #eff6ff;
-        }
-
-        .intro h2,
-        .panel h2,
-        .panel h3 {
-            margin-top: 0;
-        }
-
-        .metrics,
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        .metrics {
-            margin-top: 18px;
-        }
-
-        .metric,
-        .stat {
-            min-width: 0;
-            padding: 11px;
-            border: 1px solid #bfdbfe;
-            border-radius: 9px;
-            background: white;
-        }
-
-        .metric strong,
-        .stat strong {
-            display: block;
-        }
-
-        .section-title {
-            margin: 28px 0 12px;
-            font-size: 1.2rem;
-        }
-
-        .control-panel {
-            display: grid;
-            gap: 14px;
-            padding: 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            background: var(--surface-soft);
-        }
-
-        .control-group {
-            display: grid;
-            grid-template-columns: minmax(240px, 2fr) repeat(4, minmax(120px, 1fr));
-            gap: 10px;
-            align-items: end;
-        }
-
-        .field {
-            display: grid;
-            gap: 5px;
-        }
-
-        .field label {
-            font-size: 0.92rem;
-            font-weight: 700;
-        }
-
-        input,
-        select {
-            width: 100%;
-            min-height: 42px;
-            padding: 9px 10px;
-            color: var(--text);
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-
-        button {
-            min-height: 42px;
-            padding: 9px 13px;
-            color: white;
-            background: var(--primary);
-            border: 0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.18s ease, transform 0.18s ease;
-        }
-
-        button:hover:not(:disabled) {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        button.secondary {
-            color: var(--text);
-            background: #e2e8f0;
-        }
-
-        button.secondary:hover:not(:disabled) {
-            background: #cbd5e1;
-        }
-
-        button.danger {
-            background: var(--danger);
-        }
-
-        button:disabled {
-            cursor: not-allowed;
-            opacity: 0.55;
-        }
-
-        button:focus-visible,
-        input:focus-visible,
-        select:focus-visible,
-        .back-button:focus-visible {
-            outline: 3px solid #f59e0b;
-            outline-offset: 2px;
-        }
-
-        .speed-row {
-            display: grid;
-            grid-template-columns: minmax(120px, 1fr) minmax(180px, 3fr) auto;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .speed-row output {
-            min-width: 72px;
-            font-weight: 700;
-            text-align: right;
-        }
-
-        .token-strip {
-            min-height: 64px;
-            margin-top: 18px;
-            padding: 12px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 7px;
-            border: 2px solid var(--primary);
-            border-radius: 12px;
-            background: var(--surface-soft);
-        }
-
-        .token {
-            min-width: 38px;
-            min-height: 38px;
-            padding: 6px 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: white;
-            font-family: Consolas, Monaco, monospace;
-            font-weight: 700;
-        }
-
-        .token.current {
-            background: var(--checking);
-            border-color: var(--checking-border);
-            transform: scale(1.07);
-        }
-
-        .token.processed {
-            background: var(--found);
-            border-color: var(--found-border);
-        }
-
-        .workspace {
-            display: grid;
-            grid-template-columns: minmax(230px, 0.55fr) minmax(320px, 1.45fr);
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .stack-panel,
-        .process-panel {
-            min-width: 0;
-            padding: 18px;
-            border: 1px solid #dbeafe;
-            border-radius: 12px;
-            background: white;
-        }
-
-        .stack-panel h3,
-        .process-panel h3 {
-            margin-top: 0;
-        }
-
-        .stack-shell {
-            min-height: 280px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column-reverse;
-            justify-content: flex-start;
-            gap: 7px;
-            border: 4px solid #475569;
-            border-top: 0;
-            border-radius: 0 0 10px 10px;
-            background: #e2e8f0;
-        }
-
-        .stack-item {
-            min-height: 44px;
-            padding: 7px 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid var(--primary-dark);
-            border-radius: 8px;
-            background: white;
-            font-family: Consolas, Monaco, monospace;
-            font-weight: 700;
-        }
-
-        .stack-empty {
-            margin: auto;
-            color: var(--muted);
-            text-align: center;
-        }
-
-        .stack-top {
-            margin-top: 10px;
-            color: var(--primary-dark);
-            text-align: center;
-            font-weight: 700;
-        }
-
-        .process-message {
-            min-height: 72px;
-            padding: 14px;
-            border: 1px solid #dbeafe;
-            border-radius: 10px;
-            background: #eff6ff;
-            font-weight: 700;
-        }
-
-        .expression-box {
-            margin-top: 14px;
-            padding: 14px;
-            border: 1px solid #dbeafe;
-            border-radius: 10px;
-            background: var(--surface-soft);
-        }
-
-        .expression-box strong {
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        .expression-value {
-            min-height: 38px;
-            padding: 8px 10px;
-            overflow-wrap: anywhere;
-            border-radius: 7px;
-            background: white;
-            font-family: Consolas, Monaco, monospace;
-            font-size: 1.05rem;
-        }
-
-        .status {
-            min-height: 1.6em;
-            margin: 16px 0 0;
-            padding: 14px;
-            border: 1px solid #dbeafe;
-            border-radius: 10px;
-            background: white;
-            font-weight: 700;
-        }
-
-        .status.success {
-            color: var(--success);
-        }
-
-        .status.error {
-            color: var(--danger);
-        }
-
-        .stats {
-            margin-top: 14px;
-        }
-
-        .lower-grid {
-            display: grid;
-            grid-template-columns: minmax(300px, 1fr) minmax(300px, 1fr);
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .table-panel,
-        .code-panel {
-            min-width: 0;
-            padding: 18px;
-            border: 1px solid #dbeafe;
-            border-radius: 12px;
-            background: white;
-        }
-
-        .table-panel h3,
-        .code-panel h3 {
-            margin-top: 0;
-        }
-
-        .table-scroll {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-
-        th,
-        td {
-            padding: 9px;
-            text-align: left;
-            border: 1px solid #cbd5e1;
-        }
-
-        th {
-            background: #e2e8f0;
-        }
-
-        tr.active-row {
-            background: var(--checking);
-        }
-
-        tr.done-row {
-            background: var(--found);
-        }
-
-        .code-box {
-            padding: 14px;
-            overflow-x: auto;
-            border-radius: 10px;
-            color: #e2e8f0;
-            background: #0f172a;
-        }
-
-        .code-box pre {
-            margin: 0;
-            font-family: Consolas, Monaco, monospace;
-            font-size: 0.88rem;
-            white-space: pre-wrap;
-        }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .content-card {
-            min-width: 0;
-            padding: 18px;
-            border: 1px solid #dbeafe;
-            border-radius: 12px;
-            background: #eff6ff;
-        }
-
-        .content-card h3 {
-            margin-top: 0;
-        }
-
-        code {
-            padding: 2px 5px;
-            border-radius: 5px;
-            background: #e2e8f0;
-        }
-
-        @media (max-width: 900px) {
-            .control-group {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .field {
-                grid-column: 1 / -1;
-            }
-
-            .workspace,
-            .lower-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 760px) {
-            body {
-                padding: 8px;
-            }
-
-            main {
-                padding: 14px;
-            }
-
-            .header {
-                grid-template-columns: 1fr;
-                padding: 16px;
-            }
-
-            .back-button {
-                justify-self: start;
-            }
-
-            .header-spacer {
-                display: none;
-            }
-
-            .metrics,
-            .stats,
-            .content-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .speed-row {
-                grid-template-columns: 1fr;
-            }
-
-            .speed-row output {
-                text-align: left;
-            }
-        }
-
-        @media (max-width: 500px) {
-            .control-group,
-            .metrics,
-            .stats,
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .field {
-                grid-column: auto;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-                scroll-behavior: auto !important;
-            }
-        }
-    </style>
-</head>
-<body>
-<div class="page">
-    <div class="container">
-        <header class="header">
-            <a class="back-button" href="https://sercankulcu.github.io/teaching/data-structures">&larr; Back</a>
-            <h1>Infix to Prefix Converter</h1>
-            <span class="header-spacer" aria-hidden="true"></span>
-        </header>
-
-        <main>
-            <section class="intro">
-                <h2>What is Prefix Notation?</h2>
-                <p>
-                    In infix notation, an operator appears between its operands, such as <code>A + B</code>.
-                    In prefix notation, the operator appears first: <code>+ A B</code>. Prefix expressions do
-                    not require parentheses because the evaluation order is encoded by token order.
-                </p>
-
-                <div class="metrics">
-                    <div class="metric"><strong>Tokenization</strong>O(n)</div>
-                    <div class="metric"><strong>Conversion</strong>O(n)</div>
-                    <div class="metric"><strong>Auxiliary space</strong>O(n)</div>
-                    <div class="metric"><strong>Supported</strong>Identifiers and numbers</div>
-                </div>
-            </section>
-
-            <h2 class="section-title">Expression and playback controls</h2>
-            <section class="control-panel" aria-label="Infix to prefix controls">
-                <div class="control-group">
-                    <div class="field">
-                        <label for="expressionInput">Infix expression</label>
-                        <input id="expressionInput" type="text" value="A + B * C" spellcheck="false">
-                    </div>
-                    <button id="convertButton" type="button">Convert</button>
-                    <button id="previousButton" type="button" class="secondary">Previous</button>
-                    <button id="nextButton" type="button">Next</button>
-                    <button id="autoButton" type="button">Auto Play</button>
-                </div>
-
-                <div class="control-group">
-                    <div class="field">
-                        <label for="exampleSelect">Example expression</label>
-                        <select id="exampleSelect">
-                            <option value="A + B * C">A + B * C</option>
-                            <option value="(A + B) * C">(A + B) * C</option>
-                            <option value="A ^ B ^ C">A ^ B ^ C</option>
-                            <option value="total + value1 * 25">total + value1 * 25</option>
-                            <option value="-A + B * (C - 2)">-A + B * (C - 2)</option>
-                        </select>
-                    </div>
-                    <button id="loadExampleButton" type="button">Load Example</button>
-                    <button id="instantButton" type="button">Show Result</button>
-                    <button id="resetButton" type="button" class="danger">Reset</button>
-                    <button id="cancelButton" type="button" class="secondary">Cancel Animation</button>
-                </div>
-
-                <div class="speed-row">
-                    <label for="speedInput"><strong>Animation speed</strong></label>
-                    <input id="speedInput" type="range" min="100" max="1200" step="100" value="500">
-                    <output id="speedOutput" for="speedInput">500 ms</output>
-                </div>
-            </section>
-
-            <section id="tokenStrip" class="token-strip" aria-label="Expression tokens"></section>
-
-            <div class="workspace">
-                <aside class="stack-panel" aria-label="Operator stack">
-                    <h3>Operator stack</h3>
-                    <div id="operatorStack" class="stack-shell"></div>
-                    <div id="stackTop" class="stack-top">TOP → empty</div>
-                </aside>
-
-                <section class="process-panel">
-                    <h3>Step-by-step process</h3>
-                    <div id="processMessage" class="process-message">
-                        Click Convert to validate and prepare the expression.
-                    </div>
-
-                    <div class="expression-box">
-                        <strong>Postfix output being built</strong>
-                        <div id="postfixOutput" class="expression-value">—</div>
-                    </div>
-
-                    <div class="expression-box">
-                        <strong>Prefix result</strong>
-                        <div id="prefixOutput" class="expression-value">—</div>
-                    </div>
-                </section>
-            </div>
-
-            <p id="status" class="status" role="status" aria-live="polite">
-                Enter an expression and click Convert.
-            </p>
-
-            <div class="stats" aria-label="Conversion statistics">
-                <div class="stat"><strong>Current token</strong><span id="tokenStat">—</span></div>
-                <div class="stat"><strong>Operators popped</strong><span id="popStat">0</span></div>
-                <div class="stat"><strong>Progress</strong><span id="progressStat">0 / 0</span></div>
-                <div class="stat"><strong>Complexity</strong><span>O(n)</span></div>
-            </div>
-
-            <div class="lower-grid">
-                <section class="table-panel">
-                    <h3>Token table</h3>
-                    <div class="table-scroll">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Token</th>
-                                <th>Type</th>
-                                <th>Status</th>
-                            </tr>
-                            </thead>
-                            <tbody id="tokenBody"></tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section class="code-panel">
-                    <h3>Conversion algorithm</h3>
-                    <div class="code-box">
-<pre>tokens = tokenize(infix)
-postfix = shuntingYard(tokens)
-
-prefixStack = empty stack
-for token in postfix:
-    if token is an operand:
-        prefixStack.push(token)
-    else:
-        right = prefixStack.pop()
-        left  = prefixStack.pop()
-        prefixStack.push(operator + left + right)
-
-prefix = prefixStack.pop()</pre>
-                    </div>
-                </section>
-            </div>
-
-            <h2 class="section-title">Important concepts</h2>
-            <div class="content-grid">
-                <article class="content-card">
-                    <h3>Operator precedence</h3>
-                    <p>
-                        Exponentiation has higher precedence than multiplication and division, which have higher
-                        precedence than addition and subtraction.
-                    </p>
-                </article>
-
-                <article class="content-card">
-                    <h3>Associativity</h3>
-                    <p>
-                        Exponentiation is right-associative, so <code>A ^ B ^ C</code> means
-                        <code>A ^ (B ^ C)</code>. The converter preserves this rule.
-                    </p>
-                </article>
-
-                <article class="content-card">
-                    <h3>Tokenization</h3>
-                    <p>
-                        Multi-character operands such as <code>value1</code>, <code>total</code>, and
-                        <code>123</code> are treated as single tokens instead of separate characters.
-                    </p>
-                </article>
-
-                <article class="content-card">
-                    <h3>Validation</h3>
-                    <p>
-                        The converter rejects mismatched parentheses, missing operands, adjacent operands, and
-                        unsupported characters before starting the visualization.
-                    </p>
-                </article>
-            </div>
-
-            <h2 class="section-title">Operator rules</h2>
-            <section class="panel">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Operator</th>
-                        <th>Precedence</th>
-                        <th>Associativity</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr><td>Unary +, unary −</td><td>4</td><td>Right</td></tr>
-                    <tr><td>^</td><td>3</td><td>Right</td></tr>
-                    <tr><td>*, /, %</td><td>2</td><td>Left</td></tr>
-                    <tr><td>+, −</td><td>1</td><td>Left</td></tr>
-                    </tbody>
-                </table>
-            </section>
-        </main>
+---
+layout: without-sidebar
+title: "Infix to Prefix Converter"
+permalink: /files/data_structures/slides/Bolum_04_Infix_to_Prefix.html
+excerpt: "Interactive infix-to-prefix converter with tokenization, operator-stack visualization, validation, and step-by-step playback."
+---
+
+<style>
+.ds-prefix,.ds-prefix *,.ds-prefix *::before,.ds-prefix *::after{box-sizing:border-box}
+.ds-prefix{
+  width:min(1160px,100%);margin:0 auto 2rem;color:var(--global-text-color);
+  --ds-surface:color-mix(in srgb,var(--global-link-color) 2.5%,var(--global-bg-color));
+  --ds-surface-strong:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  --ds-border:color-mix(in srgb,var(--global-link-color) 38%,var(--global-border-color));
+  --ds-shadow:0 8px 24px rgba(15,23,42,.065);
+  --ds-shadow-soft:0 3px 10px rgba(15,23,42,.045)
+}
+.ds-prefix__hero,.ds-prefix__panel,.ds-prefix__tokens,.ds-prefix__stack-panel,.ds-prefix__process,.ds-prefix__card,.ds-prefix__table-panel,.ds-prefix__code-panel,.ds-prefix__status{
+  border:1.5px solid var(--ds-border);background:var(--ds-surface)
+}
+.ds-prefix__hero{padding:1.35rem;border-radius:16px;background:var(--ds-surface-strong);box-shadow:var(--ds-shadow)}
+.ds-prefix__hero h1{margin:0 0 .55rem;text-align:center;color:var(--global-text-color);font-size:clamp(1.65rem,4vw,2.3rem)}
+.ds-prefix__hero p{width:100%;margin:0;max-width:none;line-height:1.65;text-align:justify;text-justify:inter-word;opacity:.86}
+.ds-prefix__metrics,.ds-prefix__stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem}
+.ds-prefix__metrics{margin-top:1rem}.ds-prefix__metric,.ds-prefix__stat{padding:.8rem;border:1.5px solid var(--ds-border);border-radius:10px;background:var(--ds-surface);box-shadow:var(--ds-shadow-soft)}
+.ds-prefix__metric strong,.ds-prefix__stat strong{display:block;margin-bottom:.15rem}
+.ds-prefix__section{margin-top:1.4rem}.ds-prefix__section h2{margin:0 0 .7rem;color:var(--global-text-color);font-size:1.2rem}
+.ds-prefix__panel{display:grid;gap:.8rem;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow-soft)}
+.ds-prefix__group{display:grid;grid-template-columns:minmax(240px,2fr) repeat(4,minmax(115px,1fr));gap:.6rem;align-items:end}
+.ds-prefix__field{display:grid;gap:.3rem}.ds-prefix__field label,.ds-prefix__speed label{font-size:.86rem;font-weight:800}
+.ds-prefix input{width:100%;min-height:42px;padding:.55rem .65rem;border:1.5px solid var(--ds-border);border-radius:9px;background:var(--ds-surface);color:var(--global-text-color);font:inherit}
+.ds-prefix input:focus-visible,.ds-prefix button:focus-visible{outline:3px solid color-mix(in srgb,var(--global-link-color) 30%,transparent);outline-offset:2px}
+.ds-prefix__btn{min-height:42px;padding:.55rem .75rem;border:1px solid var(--global-link-color);border-radius:9px;background:var(--global-link-color);color:#fff;font:inherit;font-weight:800;cursor:pointer}
+.ds-prefix__btn:hover:not(:disabled){filter:brightness(1.08)}.ds-prefix__btn--secondary{border-color:var(--ds-border);background:var(--ds-surface);color:var(--global-text-color)}.ds-prefix__btn--danger{border-color:#b91c1c;background:#b91c1c}.ds-prefix__btn:disabled{cursor:not-allowed;opacity:.5}
+.ds-prefix__speed{display:grid;grid-template-columns:minmax(130px,auto) 1fr auto;gap:.65rem;align-items:center}.ds-prefix__speed output{min-width:70px;text-align:right;font-size:.85rem;font-weight:800}
+.ds-prefix__tokens{min-height:64px;margin-top:1rem;padding:.75rem;display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}
+.ds-prefix__token{min-width:38px;min-height:38px;padding:.35rem .6rem;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--ds-border);border-radius:8px;background:var(--ds-surface);font-family:Consolas,Monaco,monospace;font-weight:800}
+.ds-prefix__token.is-current{background:#fef3c7;border-color:#d97706;color:#3f2a00;transform:scale(1.06)}.ds-prefix__token.is-processed{background:#dcfce7;border-color:#15803d;color:#14532d}
+.ds-prefix__workspace{display:grid;grid-template-columns:minmax(230px,.55fr) minmax(320px,1.45fr);gap:.8rem;margin-top:.8rem}
+.ds-prefix__stack-panel,.ds-prefix__process{min-width:0;padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow)}
+.ds-prefix__stack-panel h3,.ds-prefix__process h3{margin:0 0 .65rem;font-size:1rem}
+.ds-prefix__stack{min-height:280px;padding:.6rem;display:flex;flex-direction:column-reverse;justify-content:flex-start;gap:.4rem;border:4px solid color-mix(in srgb,var(--global-text-color) 55%,var(--global-border-color));border-top:0;border-radius:0 0 10px 10px;background:color-mix(in srgb,var(--global-text-color) 4%,var(--global-bg-color))}
+.ds-prefix__stack-item{min-height:44px;padding:.4rem .65rem;display:flex;align-items:center;justify-content:center;border:2px solid color-mix(in srgb,var(--global-link-color) 85%,var(--global-border-color));border-radius:8px;background:var(--ds-surface);font-family:Consolas,Monaco,monospace;font-weight:800}
+.ds-prefix__stack-empty{margin:auto;text-align:center;opacity:.58}.ds-prefix__stack-top{margin-top:.55rem;text-align:center;color:var(--global-link-color);font-weight:800}
+.ds-prefix__message{min-height:72px;padding:.85rem;border:1.5px solid var(--ds-border);border-radius:10px;background:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));font-weight:800}
+.ds-prefix__expr{margin-top:.7rem;padding:.8rem;border:1.5px solid var(--ds-border);border-radius:10px;background:var(--ds-surface)}.ds-prefix__expr strong{display:block;margin-bottom:.35rem}.ds-prefix__value{min-height:38px;padding:.45rem .6rem;overflow-wrap:anywhere;border-radius:7px;background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color));font-family:Consolas,Monaco,monospace;font-size:1.02rem}
+.ds-prefix__status{min-height:3rem;margin:.8rem 0 0;padding:.85rem;border-radius:10px;box-shadow:var(--ds-shadow-soft);font-weight:800}.ds-prefix__status.is-success{color:#15803d}.ds-prefix__status.is-error{color:#b91c1c}
+.ds-prefix__stats{margin-top:.8rem}.ds-prefix__stat strong{font-size:.75rem;opacity:.65}
+.ds-prefix__lower{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:.8rem}.ds-prefix__table-panel,.ds-prefix__code-panel{min-width:0;padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}.ds-prefix__table-panel h3,.ds-prefix__code-panel h3{margin:0 0 .55rem;font-size:1rem}
+.ds-prefix__table-scroll{overflow-x:auto}.ds-prefix table{width:100%;border-collapse:collapse;font-size:.86rem}.ds-prefix th,.ds-prefix td{padding:.6rem;border:1.5px solid var(--ds-border);text-align:left}.ds-prefix th{background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color))}.ds-prefix tr.is-active{background:#fef3c7;color:#3f2a00}.ds-prefix tr.is-done{background:#dcfce7;color:#14532d}
+.ds-prefix__code{padding:.9rem;overflow-x:auto;border-radius:10px;background:#0f172a;color:#e2e8f0}.ds-prefix__code pre{margin:0;white-space:pre-wrap;font-family:Consolas,Monaco,monospace;font-size:.84rem}
+.ds-prefix__cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}.ds-prefix__card{padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}.ds-prefix__card h3{margin:0 0 .45rem;color:var(--global-text-color);font-size:1rem}.ds-prefix__card p{margin:0;font-size:.9rem;line-height:1.55;opacity:.78}
+@media(max-width:900px){.ds-prefix__group{grid-template-columns:repeat(2,minmax(0,1fr))}.ds-prefix__field{grid-column:1/-1}.ds-prefix__workspace,.ds-prefix__lower{grid-template-columns:1fr}}
+@media(max-width:760px){.ds-prefix__hero p{text-align:left}.ds-prefix__metrics,.ds-prefix__stats,.ds-prefix__cards{grid-template-columns:repeat(2,minmax(0,1fr))}.ds-prefix__speed{grid-template-columns:1fr}.ds-prefix__speed output{text-align:left}}
+@media(max-width:500px){.ds-prefix__group,.ds-prefix__metrics,.ds-prefix__stats,.ds-prefix__cards{grid-template-columns:1fr}.ds-prefix__field{grid-column:auto}}
+@media(prefers-color-scheme:dark){.ds-prefix{--ds-surface:var(--global-bg-color);--ds-surface-strong:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));--ds-border:color-mix(in srgb,var(--global-border-color) 85%,var(--global-text-color));--ds-shadow:none;--ds-shadow-soft:none}}
+@media(prefers-reduced-motion:reduce){.ds-prefix *,.ds-prefix *::before,.ds-prefix *::after{transition-duration:.001ms!important;animation-duration:.001ms!important}}
+</style>
+
+<div class="ds-prefix">
+  <section class="ds-prefix__hero">
+    <h1>Infix to Prefix Converter</h1>
+    <p>
+      In infix notation, operators appear between operands, such as A + B. In prefix notation, the operator appears
+      before its operands, such as + A B. Prefix expressions encode evaluation order directly and therefore do not
+      require parentheses during evaluation.
+    </p>
+    <div class="ds-prefix__metrics">
+      <div class="ds-prefix__metric"><strong>Tokenization</strong>O(n)</div>
+      <div class="ds-prefix__metric"><strong>Conversion</strong>O(n)</div>
+      <div class="ds-prefix__metric"><strong>Auxiliary space</strong>O(n)</div>
+      <div class="ds-prefix__metric"><strong>Operators</strong>+ − × ÷ ^</div>
     </div>
+  </section>
+
+  <section class="ds-prefix__section">
+    <h2>Expression and playback controls</h2>
+    <div class="ds-prefix__panel">
+      <div class="ds-prefix__group">
+        <div class="ds-prefix__field">
+          <label for="ds-prefix-input">Infix expression</label>
+          <input id="ds-prefix-input" type="text" value="A + B * C" spellcheck="false">
+        </div>
+        <button class="ds-prefix__btn" id="ds-prefix-load" type="button">Convert</button>
+        <button class="ds-prefix__btn" id="ds-prefix-example" type="button">Example</button>
+        <button class="ds-prefix__btn ds-prefix__btn--secondary" id="ds-prefix-prev" type="button">Previous Step</button>
+        <button class="ds-prefix__btn" id="ds-prefix-next" type="button">Next Step</button>
+      </div>
+      <div class="ds-prefix__group">
+        <button class="ds-prefix__btn" id="ds-prefix-auto" type="button">Auto Run</button>
+        <button class="ds-prefix__btn ds-prefix__btn--danger" id="ds-prefix-reset" type="button">Reset</button>
+      </div>
+      <div class="ds-prefix__speed">
+        <label for="ds-prefix-speed">Animation speed</label>
+        <input id="ds-prefix-speed" type="range" min="100" max="1200" step="100" value="500">
+        <output id="ds-prefix-speed-output">500 ms</output>
+      </div>
+    </div>
+
+    <div class="ds-prefix__tokens" id="ds-prefix-tokens" aria-label="Expression tokens"></div>
+
+    <div class="ds-prefix__workspace">
+      <div class="ds-prefix__stack-panel">
+        <h3>Operator stack</h3>
+        <div class="ds-prefix__stack" id="ds-prefix-stack"></div>
+        <div class="ds-prefix__stack-top" id="ds-prefix-stack-top">TOP</div>
+      </div>
+
+      <div class="ds-prefix__process">
+        <h3>Current conversion state</h3>
+        <div class="ds-prefix__message" id="ds-prefix-message"></div>
+        <div class="ds-prefix__expr">
+          <strong>Temporary output (right-to-left scan)</strong>
+          <div class="ds-prefix__value" id="ds-prefix-temp">—</div>
+        </div>
+        <div class="ds-prefix__expr">
+          <strong>Prefix result</strong>
+          <div class="ds-prefix__value" id="ds-prefix-result">—</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="ds-prefix__status" id="ds-prefix-status" role="status" aria-live="polite">
+      Convert the expression, then use Next Step to inspect the algorithm.
+    </p>
+
+    <div class="ds-prefix__stats">
+      <div class="ds-prefix__stat"><strong>Current step</strong><span id="ds-prefix-step">0 / 0</span></div>
+      <div class="ds-prefix__stat"><strong>Tokens</strong><span id="ds-prefix-count">0</span></div>
+      <div class="ds-prefix__stat"><strong>Stack operations</strong><span id="ds-prefix-ops">0</span></div>
+      <div class="ds-prefix__stat"><strong>Complexity</strong>O(n)</div>
+    </div>
+
+    <div class="ds-prefix__lower">
+      <div class="ds-prefix__table-panel">
+        <h3>Step table</h3>
+        <div class="ds-prefix__table-scroll">
+          <table>
+            <thead><tr><th>Step</th><th>Token</th><th>Action</th></tr></thead>
+            <tbody id="ds-prefix-table"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="ds-prefix__code-panel">
+        <h3>Core idea</h3>
+        <div class="ds-prefix__code"><pre>scan tokens from right to left
+
+operand:
+  append to temporary output
+
+operator:
+  pop higher-precedence operators
+  push current operator
+
+parentheses:
+  reverse their stack behavior
+
+finally:
+  pop remaining operators
+  reverse temporary output
+  → prefix expression</pre></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-prefix__section">
+    <h2>Key ideas</h2>
+    <div class="ds-prefix__cards">
+      <article class="ds-prefix__card"><h3>Precedence</h3><p>Multiplication and division bind more strongly than addition and subtraction; exponentiation has the highest supported precedence.</p></article>
+      <article class="ds-prefix__card"><h3>Associativity</h3><p>Exponentiation is right-associative. The stack rule must treat equal-precedence exponent operators differently.</p></article>
+      <article class="ds-prefix__card"><h3>Why a stack?</h3><p>Operators must wait until enough of the expression has been scanned to determine when they belong in the output.</p></article>
+      <article class="ds-prefix__card"><h3>Linear complexity</h3><p>Each token is processed once, while each operator is pushed and popped at most once.</p></article>
+    </div>
+  </section>
 </div>
 
 <script>
-    "use strict";
+(() => {
+  "use strict";
+  const root=document.querySelector(".ds-prefix");
+  if(!root)return;
+  const q=id=>root.querySelector("#"+id);
 
-    const OPERATORS = {
-        "+":  { precedence: 1, associativity: "left", arity: 2 },
-        "-":  { precedence: 1, associativity: "left", arity: 2 },
-        "*":  { precedence: 2, associativity: "left", arity: 2 },
-        "/":  { precedence: 2, associativity: "left", arity: 2 },
-        "%":  { precedence: 2, associativity: "left", arity: 2 },
-        "^":  { precedence: 3, associativity: "right", arity: 2 },
-        "u+": { precedence: 4, associativity: "right", arity: 1 },
-        "u-": { precedence: 4, associativity: "right", arity: 1 }
-    };
+  const el={
+    input:q("ds-prefix-input"),speed:q("ds-prefix-speed"),speedOutput:q("ds-prefix-speed-output"),
+    tokens:q("ds-prefix-tokens"),stack:q("ds-prefix-stack"),stackTop:q("ds-prefix-stack-top"),
+    message:q("ds-prefix-message"),temp:q("ds-prefix-temp"),result:q("ds-prefix-result"),
+    status:q("ds-prefix-status"),step:q("ds-prefix-step"),count:q("ds-prefix-count"),
+    ops:q("ds-prefix-ops"),table:q("ds-prefix-table")
+  };
+  const btn={
+    load:q("ds-prefix-load"),example:q("ds-prefix-example"),prev:q("ds-prefix-prev"),
+    next:q("ds-prefix-next"),auto:q("ds-prefix-auto"),reset:q("ds-prefix-reset")
+  };
 
-    const elements = {
-        expressionInput: document.getElementById("expressionInput"),
-        exampleSelect: document.getElementById("exampleSelect"),
-        speedInput: document.getElementById("speedInput"),
-        speedOutput: document.getElementById("speedOutput"),
-        tokenStrip: document.getElementById("tokenStrip"),
-        operatorStack: document.getElementById("operatorStack"),
-        stackTop: document.getElementById("stackTop"),
-        processMessage: document.getElementById("processMessage"),
-        postfixOutput: document.getElementById("postfixOutput"),
-        prefixOutput: document.getElementById("prefixOutput"),
-        status: document.getElementById("status"),
-        tokenStat: document.getElementById("tokenStat"),
-        popStat: document.getElementById("popStat"),
-        progressStat: document.getElementById("progressStat"),
-        tokenBody: document.getElementById("tokenBody")
-    };
+  let tokens=[],steps=[],cursor=0,autoToken=0,autoRunning=false;
 
-    const buttons = {
-        convert: document.getElementById("convertButton"),
-        previous: document.getElementById("previousButton"),
-        next: document.getElementById("nextButton"),
-        auto: document.getElementById("autoButton"),
-        loadExample: document.getElementById("loadExampleButton"),
-        instant: document.getElementById("instantButton"),
-        reset: document.getElementById("resetButton"),
-        cancel: document.getElementById("cancelButton")
-    };
+  const precedence=op=>({"+":1,"-":1,"*":2,"/":2,"^":3}[op]||0);
+  const isOperator=t=>["+", "-", "*", "/", "^"].includes(t);
+  const isOperand=t=>/^[A-Za-z_][A-Za-z0-9_]*$/.test(t)||/^\d+(?:\.\d+)?$/.test(t);
 
-    let tokens = [];
-    let steps = [];
-    let currentStep = -1;
-    let finalPrefix = "";
-    let running = false;
-    let animationToken = 0;
-
-    function tokenize(expression) {
-        const result = [];
-        let index = 0;
-
-        while (index < expression.length) {
-            const char = expression[index];
-
-            if (/\s/.test(char)) {
-                index += 1;
-                continue;
-            }
-
-            if (/[A-Za-z_]/.test(char)) {
-                let value = char;
-                index += 1;
-                while (index < expression.length && /[A-Za-z0-9_]/.test(expression[index])) {
-                    value += expression[index];
-                    index += 1;
-                }
-                result.push({ value, type: "operand" });
-                continue;
-            }
-
-            if (/\d/.test(char) || (char === "." && /\d/.test(expression[index + 1] || ""))) {
-                let value = char;
-                let dots = char === "." ? 1 : 0;
-                index += 1;
-
-                while (index < expression.length && /[\d.]/.test(expression[index])) {
-                    if (expression[index] === ".") dots += 1;
-                    if (dots > 1) throw new Error(`Invalid number near "${value + expression[index]}".`);
-                    value += expression[index];
-                    index += 1;
-                }
-
-                result.push({ value, type: "operand" });
-                continue;
-            }
-
-            if ("+-*/%^()".includes(char)) {
-                result.push({
-                    value: char,
-                    type: char === "(" || char === ")" ? "parenthesis" : "operator"
-                });
-                index += 1;
-                continue;
-            }
-
-            throw new Error(`Unsupported character "${char}" at position ${index + 1}.`);
-        }
-
-        if (result.length === 0) {
-            throw new Error("Enter an infix expression.");
-        }
-
-        return normalizeUnaryOperators(result);
+  function tokenize(text){
+    const out=[];let i=0;
+    while(i<text.length){
+      const c=text[i];
+      if(/\s/.test(c)){i++;continue}
+      if(/[A-Za-z_]/.test(c)){
+        let s=c;i++;
+        while(i<text.length&&/[A-Za-z0-9_]/.test(text[i]))s+=text[i++];
+        out.push(s);continue;
+      }
+      if(/\d|\./.test(c)){
+        let s=c;i++;
+        while(i<text.length&&/[\d.]/.test(text[i]))s+=text[i++];
+        if(!/^\d+(?:\.\d+)?$/.test(s))throw new Error(`Invalid number: ${s}`);
+        out.push(s);continue;
+      }
+      if("+-*/^()".includes(c)){out.push(c);i++;continue}
+      throw new Error(`Unsupported character: ${c}`);
     }
-
-    function normalizeUnaryOperators(inputTokens) {
-        return inputTokens.map((token, index) => {
-            if (
-                token.type === "operator" &&
-                (token.value === "+" || token.value === "-") &&
-                (
-                    index === 0 ||
-                    inputTokens[index - 1].type === "operator" ||
-                    inputTokens[index - 1].value === "("
-                )
-            ) {
-                return { value: `u${token.value}`, type: "operator" };
-            }
-            return { ...token };
-        });
-    }
-
-    function validateTokens(inputTokens) {
-        let balance = 0;
-        let expectOperand = true;
-
-        inputTokens.forEach((token, index) => {
-            if (token.value === "(") {
-                if (!expectOperand) {
-                    throw new Error(`Missing operator before "(" at token ${index + 1}.`);
-                }
-                balance += 1;
-                expectOperand = true;
-                return;
-            }
-
-            if (token.value === ")") {
-                if (expectOperand) {
-                    throw new Error(`Missing operand before ")" at token ${index + 1}.`);
-                }
-                balance -= 1;
-                if (balance < 0) throw new Error("Closing parenthesis has no matching opening parenthesis.");
-                expectOperand = false;
-                return;
-            }
-
-            if (token.type === "operand") {
-                if (!expectOperand) {
-                    throw new Error(`Missing operator before "${token.value}".`);
-                }
-                expectOperand = false;
-                return;
-            }
-
-            const operator = OPERATORS[token.value];
-            if (!operator) throw new Error(`Unsupported operator "${token.value}".`);
-
-            if (operator.arity === 1) {
-                if (!expectOperand) {
-                    throw new Error(`Unary operator "${displayOperator(token.value)}" is in an invalid position.`);
-                }
-                expectOperand = true;
-            } else {
-                if (expectOperand) {
-                    throw new Error(`Operator "${token.value}" is missing a left operand.`);
-                }
-                expectOperand = true;
-            }
-        });
-
-        if (balance !== 0) throw new Error("Parentheses are not balanced.");
-        if (expectOperand) throw new Error("The expression ends before an operand is provided.");
-    }
-
-    function displayOperator(operator) {
-        if (operator === "u-") return "− (unary)";
-        if (operator === "u+") return "+ (unary)";
-        return operator;
-    }
-
-    function shouldPop(topOperator, currentOperator) {
-        const top = OPERATORS[topOperator];
-        const current = OPERATORS[currentOperator];
-
-        if (!top || !current) return false;
-
-        return current.associativity === "left"
-            ? current.precedence <= top.precedence
-            : current.precedence < top.precedence;
-    }
-
-    function buildConversion(inputTokens) {
-        const operatorStack = [];
-        const postfix = [];
-        const generatedSteps = [];
-        let popCount = 0;
-
-        function snapshot(tokenIndex, message) {
-            generatedSteps.push({
-                tokenIndex,
-                message,
-                operators: [...operatorStack],
-                postfix: [...postfix],
-                popCount
-            });
-        }
-
-        inputTokens.forEach((token, index) => {
-            if (token.type === "operand") {
-                postfix.push(token.value);
-                snapshot(index, `Append operand "${token.value}" to the postfix output.`);
-                return;
-            }
-
-            if (token.value === "(") {
-                operatorStack.push(token.value);
-                snapshot(index, 'Push "(" onto the operator stack.');
-                return;
-            }
-
-            if (token.value === ")") {
-                while (operatorStack.length > 0 && operatorStack.at(-1) !== "(") {
-                    const popped = operatorStack.pop();
-                    postfix.push(popped);
-                    popCount += 1;
-                    snapshot(index, `Pop "${displayOperator(popped)}" because a closing parenthesis was reached.`);
-                }
-
-                if (operatorStack.at(-1) !== "(") {
-                    throw new Error("Closing parenthesis has no matching opening parenthesis.");
-                }
-
-                operatorStack.pop();
-                snapshot(index, 'Discard the matching "(".');
-                return;
-            }
-
-            while (
-                operatorStack.length > 0 &&
-                operatorStack.at(-1) !== "(" &&
-                shouldPop(operatorStack.at(-1), token.value)
-            ) {
-                const popped = operatorStack.pop();
-                postfix.push(popped);
-                popCount += 1;
-                snapshot(
-                    index,
-                    `Pop "${displayOperator(popped)}" because it has higher precedence, or equal precedence with left associativity.`
-                );
-            }
-
-            operatorStack.push(token.value);
-            snapshot(index, `Push operator "${displayOperator(token.value)}" onto the stack.`);
-        });
-
-        while (operatorStack.length > 0) {
-            const popped = operatorStack.pop();
-            if (popped === "(") throw new Error("Parentheses are not balanced.");
-            postfix.push(popped);
-            popCount += 1;
-            snapshot(inputTokens.length, `Input finished: pop "${displayOperator(popped)}" to postfix.`);
-        }
-
-        const prefix = postfixToPrefix(postfix);
-        generatedSteps.push({
-            tokenIndex: inputTokens.length,
-            message: `Conversion complete. Prefix expression: ${prefix}`,
-            operators: [],
-            postfix: [...postfix],
-            popCount
-        });
-
-        return { steps: generatedSteps, postfix, prefix };
-    }
-
-    function postfixToPrefix(postfix) {
-        const stack = [];
-
-        postfix.forEach((token) => {
-            const operator = OPERATORS[token];
-
-            if (!operator) {
-                stack.push(token);
-                return;
-            }
-
-            if (operator.arity === 1) {
-                if (stack.length < 1) throw new Error("Invalid expression: unary operator has no operand.");
-                const operand = stack.pop();
-                stack.push(`${token === "u-" ? "-" : "+"} ${operand}`);
-                return;
-            }
-
-            if (stack.length < 2) throw new Error(`Invalid expression: operator "${token}" has too few operands.`);
-            const right = stack.pop();
-            const left = stack.pop();
-            stack.push(`${token} ${left} ${right}`);
-        });
-
-        if (stack.length !== 1) {
-            throw new Error("Invalid expression: operands and operators do not form one expression.");
-        }
-
-        return stack[0];
-    }
-
-    function prepareConversion() {
-        try {
-            animationToken += 1;
-            running = false;
-            tokens = tokenize(elements.expressionInput.value.trim());
-            validateTokens(tokens);
-            const result = buildConversion(tokens);
-            steps = result.steps;
-            finalPrefix = result.prefix;
-            currentStep = -1;
-            render();
-            setStatus("Expression validated. Use Next or Auto Play.", "success");
-        } catch (error) {
-            clearConversion();
-            setStatus(error.message, "error");
-        }
-    }
-
-    function clearConversion() {
-        animationToken += 1;
-        running = false;
-        tokens = [];
-        steps = [];
-        currentStep = -1;
-        finalPrefix = "";
-        render();
-    }
-
-    function render() {
-        const step = currentStep >= 0 ? steps[currentStep] : null;
-        renderTokens(step);
-        renderStack(step?.operators || []);
-        renderTable(step);
-        elements.processMessage.textContent =
-            step?.message || "Click Convert to validate and prepare the expression.";
-        elements.postfixOutput.textContent =
-            step && step.postfix.length > 0
-                ? step.postfix.map(displayOperator).join(" ")
-                : "—";
-        elements.prefixOutput.textContent =
-            currentStep === steps.length - 1 && finalPrefix ? finalPrefix : "—";
-
-        elements.tokenStat.textContent =
-            step && step.tokenIndex < tokens.length
-                ? displayOperator(tokens[step.tokenIndex].value)
-                : currentStep === steps.length - 1
-                    ? "Complete"
-                    : "—";
-        elements.popStat.textContent = String(step?.popCount || 0);
-        elements.progressStat.textContent = `${Math.max(0, currentStep + 1)} / ${steps.length}`;
-        updateButtons();
-    }
-
-    function renderTokens(step) {
-        elements.tokenStrip.innerHTML = "";
-
-        if (tokens.length === 0) {
-            elements.tokenStrip.textContent = "Tokens will appear here after validation.";
-            return;
-        }
-
-        tokens.forEach((token, index) => {
-            const tokenElement = document.createElement("span");
-            tokenElement.className = "token";
-
-            if (step) {
-                if (index === step.tokenIndex && index < tokens.length) {
-                    tokenElement.classList.add("current");
-                } else if (index < step.tokenIndex || step.tokenIndex >= tokens.length) {
-                    tokenElement.classList.add("processed");
-                }
-            }
-
-            tokenElement.textContent = displayOperator(token.value);
-            elements.tokenStrip.appendChild(tokenElement);
-        });
-    }
-
-    function renderStack(operatorStack) {
-        elements.operatorStack.innerHTML = "";
-
-        if (operatorStack.length === 0) {
-            const empty = document.createElement("p");
-            empty.className = "stack-empty";
-            empty.textContent = "The operator stack is empty.";
-            elements.operatorStack.appendChild(empty);
-            elements.stackTop.textContent = "TOP → empty";
-            return;
-        }
-
-        operatorStack.forEach((operator) => {
-            const item = document.createElement("div");
-            item.className = "stack-item";
-            item.textContent = displayOperator(operator);
-            elements.operatorStack.appendChild(item);
-        });
-
-        elements.stackTop.textContent = `TOP → ${displayOperator(operatorStack.at(-1))}`;
-    }
-
-    function renderTable(step) {
-        elements.tokenBody.innerHTML = tokens.map((token, index) => {
-            let status = "Waiting";
-            let rowClass = "";
-
-            if (step) {
-                if (index === step.tokenIndex && index < tokens.length) {
-                    status = "Current";
-                    rowClass = "active-row";
-                } else if (index < step.tokenIndex || step.tokenIndex >= tokens.length) {
-                    status = "Processed";
-                    rowClass = "done-row";
-                }
-            }
-
-            return `
-                <tr class="${rowClass}">
-                    <td>${index + 1}</td>
-                    <td>${escapeHtml(displayOperator(token.value))}</td>
-                    <td>${escapeHtml(token.type)}</td>
-                    <td>${status}</td>
-                </tr>
-            `;
-        }).join("");
-    }
-
-    function escapeHtml(value) {
-        return String(value)
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
-    }
-
-    function updateButtons() {
-        buttons.previous.disabled = running || currentStep <= -1;
-        buttons.next.disabled = running || steps.length === 0 || currentStep >= steps.length - 1;
-        buttons.auto.disabled = running || steps.length === 0 || currentStep >= steps.length - 1;
-        buttons.instant.disabled = running || steps.length === 0;
-        buttons.cancel.disabled = !running;
-        buttons.convert.disabled = running;
-        buttons.loadExample.disabled = running;
-        elements.expressionInput.disabled = running;
-        elements.exampleSelect.disabled = running;
-    }
-
-    function setStatus(message, type = "") {
-        elements.status.textContent = message;
-        elements.status.className = `status ${type}`.trim();
-    }
-
-    function getDelay() {
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-            return 0;
-        }
-        return Number(elements.speedInput.value);
-    }
-
-    function wait(milliseconds, token) {
-        return new Promise((resolve) => {
-            window.setTimeout(() => resolve(token === animationToken), milliseconds);
-        });
-    }
-
-    function previousStep() {
-        if (running || currentStep < 0) return;
-        currentStep -= 1;
-        render();
-        setStatus(currentStep < 0 ? "Returned to the initial state." : `Showing step ${currentStep + 1}.`);
-    }
-
-    function nextStep() {
-        if (running || currentStep >= steps.length - 1) return;
-        currentStep += 1;
-        render();
-
-        if (currentStep === steps.length - 1) {
-            setStatus(`Conversion complete: ${finalPrefix}`, "success");
-        } else {
-            setStatus(`Showing step ${currentStep + 1}.`);
-        }
-    }
-
-    async function autoPlay() {
-        if (running || steps.length === 0 || currentStep >= steps.length - 1) return;
-
-        running = true;
-        const token = ++animationToken;
-        updateButtons();
-        setStatus("Automatic playback started.");
-
-        while (currentStep < steps.length - 1 && token === animationToken) {
-            currentStep += 1;
-            render();
-
-            if (!(await wait(getDelay(), token))) break;
-        }
-
-        running = false;
-        render();
-
-        if (token === animationToken && currentStep === steps.length - 1) {
-            setStatus(`Conversion complete: ${finalPrefix}`, "success");
-        }
-    }
-
-    function showResult() {
-        if (steps.length === 0) return;
-        animationToken += 1;
-        running = false;
-        currentStep = steps.length - 1;
-        render();
-        setStatus(`Conversion complete: ${finalPrefix}`, "success");
-    }
-
-    function cancelAnimation() {
-        if (!running) return;
-        animationToken += 1;
-        running = false;
-        render();
-        setStatus("Animation cancelled. The current step was preserved.");
-    }
-
-    function loadExample() {
-        elements.expressionInput.value = elements.exampleSelect.value;
-        clearConversion();
-        setStatus("Example loaded. Click Convert.");
-    }
-
-    function resetPage() {
-        elements.expressionInput.value = "A + B * C";
-        elements.exampleSelect.value = "A + B * C";
-        clearConversion();
-        setStatus("Enter an expression and click Convert.");
-    }
-
-    elements.speedInput.addEventListener("input", () => {
-        elements.speedOutput.value = `${elements.speedInput.value} ms`;
-        elements.speedOutput.textContent = `${elements.speedInput.value} ms`;
+    if(!out.length)throw new Error("Enter an expression.");
+    return out;
+  }
+
+  function validate(ts){
+    let balance=0,expectOperand=true;
+    ts.forEach(t=>{
+      if(t==="("){if(!expectOperand)throw new Error("Missing operator before '('.");balance++;expectOperand=true}
+      else if(t===")"){if(expectOperand)throw new Error("Unexpected ')'.");balance--;if(balance<0)throw new Error("Unbalanced parentheses.");expectOperand=false}
+      else if(isOperand(t)){if(!expectOperand)throw new Error(`Missing operator before ${t}.`);expectOperand=false}
+      else if(isOperator(t)){if(expectOperand)throw new Error(`Operator ${t} is missing a left operand.`);expectOperand=true}
+      else throw new Error(`Invalid token: ${t}`);
     });
+    if(balance!==0)throw new Error("Unbalanced parentheses.");
+    if(expectOperand)throw new Error("Expression cannot end with an operator.");
+  }
 
-    elements.expressionInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            prepareConversion();
+  function buildSteps(ts){
+    const stack=[],output=[],frames=[];
+    let stackOps=0;
+    frames.push({index:null,stack:[...stack],output:[...output],action:"Ready to scan from right to left.",stackOps});
+    for(let i=ts.length-1;i>=0;i--){
+      const token=ts[i];
+      if(isOperand(token)){
+        output.push(token);
+        frames.push({index:i,stack:[...stack],output:[...output],action:`Operand ${token}: append it to temporary output.`,stackOps});
+      } else if(token===")"){
+        stack.push(token);stackOps++;
+        frames.push({index:i,stack:[...stack],output:[...output],action:"Right parenthesis: push it onto the operator stack.",stackOps});
+      } else if(token==="("){
+        while(stack.length&&stack[stack.length-1]!==")"){output.push(stack.pop());stackOps++}
+        if(!stack.length)throw new Error("Unbalanced parentheses.");
+        stack.pop();stackOps++;
+        frames.push({index:i,stack:[...stack],output:[...output],action:"Left parenthesis: pop operators until the matching right parenthesis.",stackOps});
+      } else {
+        while(stack.length&&isOperator(stack[stack.length-1])&&(
+          precedence(stack[stack.length-1])>precedence(token) ||
+          (precedence(stack[stack.length-1])===precedence(token)&&token==="^")
+        )){
+          output.push(stack.pop());stackOps++;
         }
-    });
+        stack.push(token);stackOps++;
+        frames.push({index:i,stack:[...stack],output:[...output],action:`Operator ${token}: apply precedence rules, then push it.`,stackOps});
+      }
+    }
+    while(stack.length){
+      const op=stack.pop();
+      if(op==="("||op===")")throw new Error("Unbalanced parentheses.");
+      output.push(op);stackOps++;
+      frames.push({index:null,stack:[...stack],output:[...output],action:`Drain operator ${op} from the stack.`,stackOps});
+    }
+    const prefix=[...output].reverse();
+    frames.push({index:null,stack:[],output:[...output],prefix,action:"Reverse the temporary output to obtain the prefix expression.",stackOps});
+    return frames;
+  }
 
-    buttons.convert.addEventListener("click", prepareConversion);
-    buttons.previous.addEventListener("click", previousStep);
-    buttons.next.addEventListener("click", nextStep);
-    buttons.auto.addEventListener("click", autoPlay);
-    buttons.loadExample.addEventListener("click", loadExample);
-    buttons.instant.addEventListener("click", showResult);
-    buttons.reset.addEventListener("click", resetPage);
-    buttons.cancel.addEventListener("click", cancelAnimation);
+  function render(){
+    const frame=steps[cursor]||{stack:[],output:[],action:"",stackOps:0};
+    el.tokens.innerHTML=tokens.map((t,i)=>{
+      const processed=frame.index===null?false:(i>frame.index);
+      return `<span class="ds-prefix__token ${i===frame.index?"is-current":processed?"is-processed":""}">${t}</span>`;
+    }).join("");
 
-    render();
+    if(!frame.stack.length){
+      el.stack.innerHTML='<p class="ds-prefix__stack-empty">Stack is empty.</p>';
+      el.stackTop.textContent="TOP = empty";
+    }else{
+      el.stack.innerHTML=frame.stack.map(op=>`<div class="ds-prefix__stack-item">${op}</div>`).join("");
+      el.stackTop.textContent=`TOP → ${frame.stack[frame.stack.length-1]}`;
+    }
+
+    el.message.textContent=frame.action||"—";
+    el.temp.textContent=frame.output.length?frame.output.join(" "):"—";
+    el.result.textContent=frame.prefix?frame.prefix.join(" "):"—";
+    el.step.textContent=`${cursor} / ${Math.max(0,steps.length-1)}`;
+    el.count.textContent=String(tokens.length);
+    el.ops.textContent=String(frame.stackOps||0);
+
+    el.table.innerHTML=steps.slice(1).map((s,i)=>`
+      <tr class="${i+1===cursor?"is-active":i+1<cursor?"is-done":""}">
+        <td>${i+1}</td><td>${s.index==null?"—":tokens[s.index]}</td><td>${s.action}</td>
+      </tr>`).join("");
+
+    const complete=steps.length&&cursor===steps.length-1;
+    el.status.textContent=complete?`Prefix: ${frame.prefix.join(" ")}`:"Use Next Step to continue the conversion.";
+    el.status.className="ds-prefix__status"+(complete?" is-success":"");
+
+    btn.prev.disabled=cursor===0||autoRunning;
+    btn.next.disabled=!steps.length||cursor===steps.length-1||autoRunning;
+    btn.auto.disabled=!steps.length||cursor===steps.length-1||autoRunning;
+    btn.load.disabled=btn.example.disabled=autoRunning;
+    el.input.disabled=autoRunning;
+  }
+
+  function setup(text){
+    autoToken++;autoRunning=false;
+    try{
+      tokens=tokenize(text);validate(tokens);steps=buildSteps(tokens);cursor=0;render();
+    }catch(e){
+      steps=[];tokens=[];cursor=0;
+      el.tokens.innerHTML="";el.stack.innerHTML="";el.message.textContent="—";el.temp.textContent="—";el.result.textContent="—";
+      el.status.textContent=e.message;el.status.className="ds-prefix__status is-error";
+      el.step.textContent="0 / 0";el.count.textContent="0";el.ops.textContent="0";el.table.innerHTML="";
+    }
+  }
+
+  btn.load.addEventListener("click",()=>setup(el.input.value));
+  btn.example.addEventListener("click",()=>{el.input.value="(A + B) * (C - D) ^ E";setup(el.input.value)});
+  btn.reset.addEventListener("click",()=>{autoToken++;autoRunning=false;cursor=0;render()});
+  btn.next.addEventListener("click",()=>{if(cursor<steps.length-1){cursor++;render()}});
+  btn.prev.addEventListener("click",()=>{if(cursor>0){cursor--;render()}});
+  btn.auto.addEventListener("click",async()=>{
+    autoRunning=true;const token=++autoToken;render();
+    while(cursor<steps.length-1&&token===autoToken){
+      cursor++;render();
+      await new Promise(r=>setTimeout(r,Number(el.speed.value)));
+    }
+    if(token===autoToken){autoRunning=false;render()}
+  });
+  el.speed.addEventListener("input",()=>{el.speedOutput.textContent=`${el.speed.value} ms`});
+  setup(el.input.value);
+})();
 </script>
-</body>
-</html>
