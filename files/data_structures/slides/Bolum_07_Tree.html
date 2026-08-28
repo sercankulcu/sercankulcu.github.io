@@ -297,6 +297,7 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
         successor = successor.left;
       }
 
+      path.push(successor.value);
       node.value = successor.value;
 
       function removeMin(n) {
@@ -365,6 +366,10 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
   var speed = byId("ds-tree-speed");
   var speedOutput = byId("ds-tree-speed-output");
 
+  var animationToken = 0;
+  var nodeStates = {};
+  var activeEdges = {};
+
   function setStatus(text, type) {
     status.textContent = text;
     status.classList.remove("is-success");
@@ -389,6 +394,26 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
     }
 
     return value;
+  }
+
+  function delay() {
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return 0;
+    }
+    return Number(speed.value);
+  }
+
+  function wait(ms, token) {
+    return new Promise(function (resolve) {
+      window.setTimeout(function () {
+        resolve(token === animationToken);
+      }, ms);
+    });
+  }
+
+  function clearHighlightState() {
+    nodeStates = {};
+    activeEdges = {};
   }
 
   function metrics() {
@@ -421,14 +446,14 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
   }
 
   function clearSvg() {
-    while (svg.lastChild) {
-      var tag = svg.lastChild.tagName ? svg.lastChild.tagName.toLowerCase() : "";
+    var children = svg.children;
+    var i;
 
-      if (tag === "title" || tag === "desc") {
-        break;
+    for (i = children.length - 1; i >= 0; i -= 1) {
+      var tag = children[i].tagName ? children[i].tagName.toLowerCase() : "";
+      if (tag !== "title" && tag !== "desc") {
+        svg.removeChild(children[i]);
       }
-
-      svg.removeChild(svg.lastChild);
     }
   }
 
@@ -460,13 +485,9 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
 
     function findPosition(node) {
       var j;
-
       for (j = 0; j < positions.length; j += 1) {
-        if (positions[j].node === node) {
-          return positions[j];
-        }
+        if (positions[j].node === node) return positions[j];
       }
-
       return null;
     }
 
@@ -497,9 +518,7 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
     var i;
 
     for (i = 0; i < ordered.length; i += 1) {
-      if (ordered[i].depth > maxDepth) {
-        maxDepth = ordered[i].depth;
-      }
+      if (ordered[i].depth > maxDepth) maxDepth = ordered[i].depth;
     }
 
     svg.setAttribute("viewBox", "0 0 1100 " + Math.max(560, 140 + maxDepth * 90));
@@ -513,23 +532,27 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
 
         if (parentPos && childPos) {
           var edge = document.createElementNS(svgNS, "line");
+          var edgeKey = String(item.parent.value) + "->" + String(item.node.value);
+
           edge.setAttribute("x1", String(parentPos.x));
           edge.setAttribute("y1", String(parentPos.y));
           edge.setAttribute("x2", String(childPos.x));
           edge.setAttribute("y2", String(childPos.y));
-          edge.setAttribute("class", "ds-tree__edge");
+          edge.setAttribute("class", "ds-tree__edge" + (activeEdges[edgeKey] ? " is-active" : ""));
           svg.appendChild(edge);
         }
       }
     }
 
     for (i = 0; i < ordered.length; i += 1) {
-      var pos = layout.findPosition(ordered[i].node);
+      var current = ordered[i];
+      var pos = layout.findPosition(current.node);
 
       if (!pos) continue;
 
+      var state = nodeStates[String(current.node.value)] || "";
       var group = document.createElementNS(svgNS, "g");
-      group.setAttribute("class", "ds-tree__node");
+      group.setAttribute("class", "ds-tree__node" + (state ? " " + state : ""));
       group.setAttribute("transform", "translate(" + pos.x + " " + pos.y + ")");
 
       var circle = document.createElementNS(svgNS, "circle");
@@ -537,7 +560,7 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
 
       var text = document.createElementNS(svgNS, "text");
       text.setAttribute("y", "1");
-      text.textContent = String(ordered[i].node.value);
+      text.textContent = String(current.node.value);
 
       group.appendChild(circle);
       group.appendChild(text);
@@ -547,11 +570,43 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
     metrics();
   }
 
+  async function animatePath(path, finalValue, finalState) {
+    animationToken += 1;
+    var token = animationToken;
+    var i;
+
+    clearHighlightState();
+
+    for (i = 0; i < path.length; i += 1) {
+      clearHighlightState();
+
+      if (i > 0) {
+        activeEdges[String(path[i - 1]) + "->" + String(path[i])] = true;
+      }
+
+      if (i === path.length - 1 && finalValue !== null && path[i] === finalValue) {
+        nodeStates[String(path[i])] = finalState || "is-found";
+      } else {
+        nodeStates[String(path[i])] = "is-checking";
+      }
+
+      pathLengthStat.textContent = String(i + 1);
+      render();
+
+      if (!(await wait(delay(), token))) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   function load(values) {
+    animationToken += 1;
+    clearHighlightState();
     tree = new BST();
 
     var i;
-
     for (i = 0; i < values.length; i += 1) {
       tree.insert(values[i]);
     }
@@ -559,90 +614,99 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
     operationPath.textContent = "—";
     traversalPath.textContent = "—";
     pathLengthStat.textContent = "0";
-
     render();
   }
 
   function showOperationPath(path) {
     operationPath.textContent = path.length ? path.join(" → ") : "—";
-    pathLengthStat.textContent = String(path.length);
   }
 
-  byId("ds-tree-insert").addEventListener("click", function () {
+  byId("ds-tree-insert").addEventListener("click", async function () {
     try {
       var value = getValue();
       var result = tree.insert(value);
 
       showOperationPath(result.path);
-      render();
+      await animatePath(result.path, value, "is-found");
 
-      if (result.inserted) {
-        setStatus("Inserted " + value + ".", "is-success");
-      } else {
-        setStatus(value + " already exists in the tree.", "is-error");
-      }
+      setStatus(
+        result.inserted ? "Inserted " + value + "." : value + " already exists in the tree.",
+        result.inserted ? "is-success" : "is-error"
+      );
     } catch (error) {
       setStatus(error.message, "is-error");
     }
   });
 
-  byId("ds-tree-search").addEventListener("click", function () {
+  byId("ds-tree-search").addEventListener("click", async function () {
     try {
       var value = getValue();
       var result = tree.search(value);
 
       showOperationPath(result.path);
+      await animatePath(result.path, result.found ? value : null, "is-found");
 
-      if (result.found) {
-        setStatus("Found " + value + ".", "is-success");
-      } else {
-        setStatus(value + " was not found.", "is-error");
-      }
+      setStatus(
+        result.found ? "Found " + value + "." : value + " was not found.",
+        result.found ? "is-success" : "is-error"
+      );
     } catch (error) {
       setStatus(error.message, "is-error");
     }
   });
 
-  byId("ds-tree-delete").addEventListener("click", function () {
+  byId("ds-tree-delete").addEventListener("click", async function () {
     try {
       var value = getValue();
-      var result = tree.delete(value);
+      var before = tree.search(value);
 
-      showOperationPath(result.path);
-      render();
+      showOperationPath(before.path);
 
-      if (result.deleted) {
-        setStatus("Deleted " + value + ".", "is-success");
-      } else {
+      if (!before.found) {
+        await animatePath(before.path, null, "");
         setStatus(value + " was not found.", "is-error");
+        return;
       }
+
+      await animatePath(before.path, value, "is-found");
+
+      var result = tree.delete(value);
+      showOperationPath(result.path);
+
+      clearHighlightState();
+      render();
+      setStatus("Deleted " + value + ".", "is-success");
     } catch (error) {
       setStatus(error.message, "is-error");
     }
   });
 
-  byId("ds-tree-min").addEventListener("click", function () {
+  byId("ds-tree-min").addEventListener("click", async function () {
     var result = tree.min();
 
     showOperationPath(result.path);
 
-    if (result.node) {
-      setStatus("Minimum value is " + result.node.value + ".", "is-success");
-    } else {
+    if (!result.node) {
       setStatus("Tree is empty.", "is-error");
+      return;
     }
+
+    await animatePath(result.path, result.node.value, "is-found");
+    setStatus("Minimum value is " + result.node.value + ".", "is-success");
   });
 
-  byId("ds-tree-max").addEventListener("click", function () {
+  byId("ds-tree-max").addEventListener("click", async function () {
     var result = tree.max();
 
     showOperationPath(result.path);
 
-    if (result.node) {
-      setStatus("Maximum value is " + result.node.value + ".", "is-success");
-    } else {
+    if (!result.node) {
       setStatus("Tree is empty.", "is-error");
+      return;
     }
+
+    await animatePath(result.path, result.node.value, "is-found");
+    setStatus("Maximum value is " + result.node.value + ".", "is-success");
   });
 
   byId("ds-tree-inorder").addEventListener("click", function () {
@@ -692,7 +756,9 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
   });
 
   byId("ds-tree-reset").addEventListener("click", function () {
+    animationToken += 1;
     tree = new BST();
+    clearHighlightState();
     operationPath.textContent = "—";
     traversalPath.textContent = "—";
     pathLengthStat.textContent = "0";
@@ -701,7 +767,10 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
   });
 
   byId("ds-tree-cancel").addEventListener("click", function () {
-    setStatus("No animation is currently running.");
+    animationToken += 1;
+    clearHighlightState();
+    render();
+    setStatus("Animation cancelled.");
   });
 
   speed.addEventListener("input", function () {
