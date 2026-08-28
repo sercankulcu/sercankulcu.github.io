@@ -1,938 +1,752 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="Fast Reflex is a 30-second reaction game. Tap the good animals, avoid the bad ones, and beat your best score.">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://sercankulcu.github.io/game/fastreflex.html">
-  <title>Fast Reflex - Reaction Game</title>
+---
+layout: without-sidebar
+title: "Fast Reflex"
+permalink: /game/fastreflex/
+redirect_from:
+  - /game/fastreflex.html
+excerpt: "Tap good targets quickly, avoid traps, and beat your best score in 30 seconds."
+---
 
-  <style>
-    * { box-sizing: border-box; }
+<style>
+.fastreflex-app,
+.fastreflex-app *,
+.fastreflex-app *::before,
+.fastreflex-app *::after { box-sizing:border-box; }
 
-    :root {
-      --bg: #f5f2eb;
-      --panel: #202428;
-      --text: #1e2428;
-      --muted: #6d736f;
-      --green: #2f9d67;
-      --green-dark: #237a50;
-      --red: #d94d4d;
-      --amber: #e0a333;
-      --card: #ffffff;
-      --line: #e8e1d5;
-      --shadow: rgba(44, 35, 26, .12);
-    }
+.fastreflex-app {
+  width:min(920px,calc(100% - 24px));
+  margin:.5rem auto 1.5rem;
+  color:var(--global-text-color);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
 
-    html, body {
-      margin: 0;
-      min-height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+.fastreflex-app button { font:inherit; -webkit-tap-highlight-color:transparent; }
 
-    body {
-      min-height: 100vh;
-      min-height: 100dvh;
-    }
+.fastreflex-game {
+  position:relative;
+  width:100%;
+  height:min(72vh,720px);
+  min-height:560px;
+  overflow:hidden;
+  border:1px solid var(--global-border-color);
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 20% 20%,rgba(255,255,255,.65),transparent 28%),
+    linear-gradient(180deg,#eef6ef 0%,#dfe9dc 100%);
+  box-shadow:0 12px 35px rgba(0,0,0,.07);
+  touch-action:manipulation;
+  user-select:none;
+}
 
-    button {
-      font: inherit;
-      -webkit-tap-highlight-color: transparent;
-    }
+.fastreflex-game::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:.45;
+  background-image:
+    linear-gradient(rgba(255,255,255,.42) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.42) 1px,transparent 1px);
+  background-size:34px 34px;
+}
 
-    .page {
-      min-height: 100vh;
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-    }
+.fastreflex-hud {
+  position:absolute;
+  top:14px;
+  left:50%;
+  z-index:20;
+  width:min(94%,720px);
+  transform:translateX(-50%);
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
 
-    .game-area {
-      position: relative;
-      width: 100%;
-      height: min(76vh, 760px);
-      min-height: 560px;
-      overflow: hidden;
-      background:
-        radial-gradient(circle at 20% 20%, rgba(255,255,255,.65), transparent 28%),
-        linear-gradient(180deg, #eef6ef 0%, #dfe9dc 100%);
-      border-bottom: 1px solid #d8d1c8;
-      touch-action: manipulation;
-      user-select: none;
-    }
+.fastreflex-hud-card {
+  min-width:0;
+  padding:9px 8px 10px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  background:rgba(31,35,39,.94);
+  color:#fff;
+  text-align:center;
+  box-shadow:0 8px 24px rgba(0,0,0,.16);
+}
 
-    .game-area::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      opacity: .45;
-      background-image:
-        linear-gradient(rgba(255,255,255,.42) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.42) 1px, transparent 1px);
-      background-size: 34px 34px;
-    }
+.fastreflex-hud-label {
+  display:block;
+  margin-bottom:2px;
+  color:#bfc5c8;
+  font-size:.62rem;
+  font-weight:900;
+  letter-spacing:.12em;
+}
 
-    .hud {
-      position: absolute;
-      top: max(14px, env(safe-area-inset-top));
-      left: 50%;
-      z-index: 20;
-      transform: translateX(-50%);
-      width: min(94%, 720px);
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
+.fastreflex-hud-value {
+  display:block;
+  font-size:clamp(1.15rem,4vw,1.7rem);
+  font-weight:900;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+}
 
-    .hud-card {
-      min-width: 0;
-      padding: 9px 8px 10px;
-      border-radius: 14px;
-      background: rgba(31, 35, 39, .94);
-      color: white;
-      text-align: center;
-      box-shadow: 0 8px 24px rgba(0,0,0,.16);
-      border: 1px solid rgba(255,255,255,.08);
-      backdrop-filter: blur(8px);
-    }
+.fastreflex-mode-chip {
+  position:absolute;
+  top:92px;
+  left:50%;
+  z-index:15;
+  transform:translateX(-50%);
+  padding:7px 12px;
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:999px;
+  background:rgba(255,255,255,.86);
+  color:#4b544d;
+  font-size:.72rem;
+  font-weight:900;
+  pointer-events:none;
+}
 
-    .hud-label {
-      display: block;
-      margin-bottom: 2px;
-      color: #bfc5c8;
-      font-size: 10px;
-      font-weight: 900;
-      letter-spacing: .12em;
-    }
+.fastreflex-playfield {
+  position:absolute;
+  inset:118px 16px 16px;
+  overflow:hidden;
+  border:2px solid rgba(255,255,255,.74);
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 50% 120%,rgba(77,132,71,.18),transparent 48%),
+    rgba(255,255,255,.28);
+}
 
-    .hud-value {
-      display: block;
-      line-height: 1;
-      font-size: clamp(18px, 4vw, 27px);
-      font-weight: 950;
-      font-variant-numeric: tabular-nums;
-    }
+.fastreflex-target {
+  position:absolute;
+  display:grid;
+  place-items:center;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:rgba(255,255,255,.92);
+  cursor:pointer;
+  box-shadow:0 12px 20px rgba(57,65,56,.16),inset 0 0 0 2px rgba(255,255,255,.85);
+  transform:scale(.4);
+  opacity:0;
+  animation:fastreflex-pop .16s cubic-bezier(.2,.9,.25,1.2) forwards;
+  touch-action:manipulation;
+}
 
-    .mode-chip {
-      position: absolute;
-      top: 92px;
-      left: 50%;
-      z-index: 15;
-      transform: translateX(-50%);
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.86);
-      border: 1px solid rgba(0,0,0,.06);
-      box-shadow: 0 5px 16px rgba(40,50,40,.08);
-      color: #4b544d;
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: .04em;
-      pointer-events: none;
-    }
+.fastreflex-target img {
+  width:78%;
+  height:78%;
+  object-fit:contain;
+  pointer-events:none;
+  user-select:none;
+}
 
-    .playfield {
-      position: absolute;
-      inset: 118px 16px 16px;
-      border-radius: 24px;
-      overflow: hidden;
-      border: 2px solid rgba(255,255,255,.74);
-      background:
-        radial-gradient(circle at 50% 120%, rgba(77,132,71,.18), transparent 48%),
-        rgba(255,255,255,.28);
-      box-shadow: inset 0 0 0 1px rgba(63,84,62,.06);
-    }
+.fastreflex-fallback {
+  display:none;
+  font-size:70%;
+  line-height:1;
+  pointer-events:none;
+}
 
-    .target {
-      position: absolute;
-      display: grid;
-      place-items: center;
-      border: 0;
-      padding: 0;
-      border-radius: 50%;
-      background-color: rgba(255,255,255,.92);
-      cursor: pointer;
-      box-shadow:
-        0 12px 20px rgba(57,65,56,.16),
-        inset 0 0 0 2px rgba(255,255,255,.85);
-      transform: scale(.4);
-      opacity: 0;
-      animation: targetPop .16s cubic-bezier(.2, .9, .25, 1.2) forwards;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-    }
+.fastreflex-target.good { outline:3px solid rgba(47,157,103,.22); }
+.fastreflex-target.bad { outline:3px solid rgba(217,77,77,.18); }
+.fastreflex-target.leaving { animation:fastreflex-leave .12s ease-in forwards; pointer-events:none; }
 
+@keyframes fastreflex-pop { to { transform:scale(1); opacity:1; } }
+@keyframes fastreflex-leave { to { transform:scale(.6); opacity:0; } }
 
-    .target img {
-      width: 78%;
-      height: 78%;
-      object-fit: contain;
-      pointer-events: none;
-      user-select: none;
-    }
+.fastreflex-feedback {
+  position:fixed;
+  z-index:1000;
+  transform:translate(-50%,-50%) scale(.82);
+  opacity:0;
+  pointer-events:none;
+  font-size:clamp(1.25rem,5vw,2.1rem);
+  font-weight:900;
+  text-shadow:0 3px 12px rgba(255,255,255,.9);
+  white-space:nowrap;
+}
 
-    .target .emoji-fallback {
-      display: none;
-      font-size: 70%;
-      line-height: 1;
-      pointer-events: none;
-    }
+.fastreflex-feedback.good { color:#237a50; }
+.fastreflex-feedback.bad { color:#d94d4d; }
+.fastreflex-feedback.miss { color:#6c7173; }
+.fastreflex-feedback.show { animation:fastreflex-feedback .7s ease-out; }
 
-    .target.good {
-      outline: 3px solid rgba(47,157,103,.22);
-    }
+@keyframes fastreflex-feedback {
+  0%{opacity:0;transform:translate(-50%,-38%) scale(.76)}
+  18%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}
+  62%{opacity:1;transform:translate(-50%,-66%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-95%) scale(.96)}
+}
 
-    .target.bad {
-      outline: 3px solid rgba(217,77,77,.18);
-    }
+.fastreflex-overlay {
+  position:absolute;
+  inset:0;
+  z-index:50;
+  display:grid;
+  place-items:center;
+  padding:22px;
+  background:rgba(27,31,34,.30);
+  backdrop-filter:blur(7px);
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .18s ease,visibility .18s ease;
+}
 
-    .target.leaving {
-      animation: targetLeave .12s ease-in forwards;
-      pointer-events: none;
-    }
+.fastreflex-overlay.visible { opacity:1; visibility:visible; }
 
-    @keyframes targetPop {
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
+.fastreflex-modal {
+  width:min(92%,470px);
+  padding:28px;
+  border:1px solid rgba(255,255,255,.8);
+  border-radius:25px;
+  background:rgba(255,255,255,.97);
+  color:#1e2428;
+  box-shadow:0 24px 70px rgba(0,0,0,.25);
+  text-align:center;
+}
 
-    @keyframes targetLeave {
-      to {
-        transform: scale(.6);
-        opacity: 0;
-      }
-    }
+.fastreflex-modal h1,.fastreflex-modal h2 { margin:0; letter-spacing:-.045em; }
+.fastreflex-modal h1 { font-size:clamp(2.4rem,10vw,3.6rem); }
+.fastreflex-modal h2 { font-size:clamp(2rem,8vw,2.9rem); }
+.fastreflex-modal p { max-width:36ch; margin:12px auto 0; color:#6d736f; font-size:.92rem; line-height:1.55; }
 
-    .feedback {
-      position: absolute;
-      z-index: 30;
-      pointer-events: none;
-      transform: translate(-50%, -50%) scale(.82);
-      opacity: 0;
-      font-size: clamp(20px, 5vw, 34px);
-      font-weight: 1000;
-      letter-spacing: -.03em;
-      text-shadow: 0 3px 12px rgba(255,255,255,.9);
-      white-space: nowrap;
-    }
+.fastreflex-eyebrow {
+  margin:0 0 8px !important;
+  color:#237a50 !important;
+  font-size:.72rem !important;
+  font-weight:900;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
 
-    .feedback.good { color: var(--green-dark); }
-    .feedback.bad { color: var(--red); }
-    .feedback.miss { color: #6c7173; }
+.fastreflex-mode-buttons {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:20px;
+}
 
-    .feedback.show {
-      animation: feedbackFloat .7s ease-out;
-    }
+.fastreflex-mode-button {
+  padding:11px 10px;
+  border:1px solid #dfe4df;
+  border-radius:14px;
+  background:#f7f9f7;
+  color:#3f4842;
+  font-weight:900;
+  cursor:pointer;
+}
 
-    @keyframes feedbackFloat {
-      0%   { opacity: 0; transform: translate(-50%, -38%) scale(.76); }
-      18%  { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
-      62%  { opacity: 1; transform: translate(-50%, -66%) scale(1); }
-      100% { opacity: 0; transform: translate(-50%, -95%) scale(.96); }
-    }
+.fastreflex-mode-button.active {
+  border-color:#65b98a;
+  background:#eaf6ef;
+  color:#25784d;
+  box-shadow:inset 0 0 0 1px #8bcaa6;
+}
 
-    .overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 50;
-      display: grid;
-      place-items: center;
-      padding: 22px;
-      background: rgba(27, 31, 34, .30);
-      backdrop-filter: blur(7px);
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity .18s ease, visibility .18s ease;
-    }
+.fastreflex-primary {
+  width:100%;
+  margin-top:12px;
+  padding:14px 18px;
+  border:0;
+  border-radius:15px;
+  background:#202428;
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
 
-    .overlay.visible {
-      opacity: 1;
-      visibility: visible;
-    }
+.fastreflex-results {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:9px;
+  margin-top:18px;
+}
 
-    .modal {
-      width: min(92vw, 470px);
-      padding: 28px;
-      border-radius: 25px;
-      background: rgba(255,255,255,.97);
-      box-shadow: 0 24px 70px rgba(0,0,0,.25);
-      border: 1px solid rgba(255,255,255,.8);
-      text-align: center;
-    }
+.fastreflex-result-card {
+  padding:13px 10px;
+  border:1px solid #e5e9e5;
+  border-radius:15px;
+  background:#f5f7f5;
+}
 
-    .eyebrow {
-      margin: 0 0 8px;
-      color: var(--green-dark);
-      font-size: 12px;
-      font-weight: 950;
-      letter-spacing: .18em;
-    }
+.fastreflex-result-label { display:block; color:#798079; font-size:.62rem; font-weight:900; letter-spacing:.1em; }
+.fastreflex-result-value { display:block; margin-top:3px; font-size:1.35rem; font-weight:900; }
 
-    .modal h1,
-    .modal h2 {
-      margin: 0;
-      letter-spacing: -.045em;
-    }
+.fastreflex-info {
+  margin-top:14px;
+  padding:16px;
+  border:1px solid var(--global-border-color);
+  border-radius:16px;
+  background:var(--global-bg-color);
+}
 
-    .modal h1 {
-      font-size: clamp(40px, 10vw, 58px);
-    }
+.fastreflex-info h2 { margin:0 0 12px; color:var(--global-text-color); font-size:1.05rem; }
 
-    .modal h2 {
-      font-size: clamp(34px, 8vw, 46px);
-    }
+.fastreflex-info-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
 
-    .modal p {
-      max-width: 36ch;
-      margin: 12px auto 0;
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.55;
-    }
+.fastreflex-info-card {
+  padding:13px;
+  border:1px solid var(--global-border-color);
+  border-radius:12px;
+  background:rgba(127,127,127,.035);
+}
 
-    .mode-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 9px;
-      margin-top: 20px;
-    }
+.fastreflex-info-card h3 { margin:0 0 6px; color:var(--global-text-color); font-size:.88rem; }
+.fastreflex-info-card p { margin:0; color:var(--global-text-color); opacity:.67; font-size:.8rem; line-height:1.5; }
 
-    .mode-button {
-      border: 1px solid #dfe4df;
-      border-radius: 14px;
-      padding: 11px 10px;
-      background: #f7f9f7;
-      color: #3f4842;
-      font-weight: 900;
-      cursor: pointer;
-      transition: transform .15s ease, border-color .15s ease, background .15s ease;
-    }
+@media(max-width:720px){
+  .fastreflex-app{width:100%;margin:0 auto 1rem}
+  .fastreflex-game{min-height:600px;height:min(78vh,720px);border-radius:14px}
+  .fastreflex-hud{width:calc(100% - 18px);gap:5px}
+  .fastreflex-hud-card{padding:8px 4px 9px;border-radius:11px}
+  .fastreflex-mode-chip{top:88px}
+  .fastreflex-playfield{inset:114px 10px 10px;border-radius:19px}
+  .fastreflex-info-grid{grid-template-columns:1fr}
+}
 
-    .mode-button:hover {
-      transform: translateY(-1px);
-    }
+@media(prefers-reduced-motion:reduce){
+  .fastreflex-app *,
+  .fastreflex-app *::before,
+  .fastreflex-app *::after {
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.001ms!important;
+  }
+}
+</style>
 
-    .mode-button.active {
-      border-color: #65b98a;
-      background: #eaf6ef;
-      color: #25784d;
-      box-shadow: inset 0 0 0 1px #8bcaa6;
-    }
+<div class="fastreflex-app">
+  <section class="fastreflex-game" aria-label="Fast Reflex game">
+    <div class="fastreflex-hud">
+      <div class="fastreflex-hud-card"><span class="fastreflex-hud-label">SCORE</span><span class="fastreflex-hud-value" id="fastreflex-score">000</span></div>
+      <div class="fastreflex-hud-card"><span class="fastreflex-hud-label">TIME</span><span class="fastreflex-hud-value" id="fastreflex-time">30</span></div>
+      <div class="fastreflex-hud-card"><span class="fastreflex-hud-label">BEST</span><span class="fastreflex-hud-value" id="fastreflex-best">000</span></div>
+      <div class="fastreflex-hud-card"><span class="fastreflex-hud-label">FASTEST</span><span class="fastreflex-hud-value" id="fastreflex-fastest">--</span></div>
+    </div>
 
-    .primary-button {
-      width: 100%;
-      margin-top: 12px;
-      border: 0;
-      border-radius: 15px;
-      padding: 14px 18px;
-      background: var(--panel);
-      color: white;
-      font-weight: 950;
-      cursor: pointer;
-      transition: transform .15s ease, background .15s ease;
-      box-shadow: 0 8px 20px rgba(0,0,0,.14);
-    }
+    <div class="fastreflex-mode-chip" id="fastreflex-mode-chip">EASY MODE</div>
+    <div class="fastreflex-playfield" id="fastreflex-playfield"></div>
+    <div class="fastreflex-feedback" id="fastreflex-feedback" aria-live="polite"></div>
 
-    .primary-button:hover {
-      background: #111416;
-      transform: translateY(-1px);
-    }
-
-    .results {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 9px;
-      margin-top: 18px;
-    }
-
-    .result-card {
-      padding: 13px 10px;
-      border-radius: 15px;
-      background: #f5f7f5;
-      border: 1px solid #e5e9e5;
-    }
-
-    .result-label {
-      display: block;
-      color: #798079;
-      font-size: 10px;
-      font-weight: 900;
-      letter-spacing: .1em;
-    }
-
-    .result-value {
-      display: block;
-      margin-top: 3px;
-      font-size: 22px;
-      font-weight: 1000;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .info {
-      width: min(100% - 28px, 920px);
-      margin: 0 auto;
-      padding: 28px 0 42px;
-    }
-
-    .info h2 {
-      margin: 0 0 18px;
-      font-size: clamp(24px, 5vw, 34px);
-      letter-spacing: -.035em;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-
-    .info-card {
-      padding: 18px;
-      border-radius: 18px;
-      background: var(--card);
-      border: 1px solid var(--line);
-      box-shadow: 0 8px 24px rgba(64,45,25,.05);
-    }
-
-    .info-card h3 {
-      margin: 0 0 7px;
-      font-size: 15px;
-    }
-
-    .info-card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.55;
-    }
-
-    @media (max-width: 720px) {
-      .game-area {
-        min-height: 600px;
-        height: min(78vh, 720px);
-      }
-
-      .hud {
-        width: calc(100% - 18px);
-        gap: 5px;
-      }
-
-      .hud-card {
-        padding: 8px 4px 9px;
-        border-radius: 11px;
-      }
-
-      .mode-chip {
-        top: 88px;
-      }
-
-      .playfield {
-        inset: 114px 10px 10px;
-        border-radius: 19px;
-      }
-
-      .info-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 390px) {
-      .hud-label {
-        font-size: 9px;
-        letter-spacing: .08em;
-      }
-
-      .hud-value {
-        font-size: 17px;
-      }
-
-      .modal {
-        padding: 22px 18px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        animation-duration: .001ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .001ms !important;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <main class="page">
-    <section class="game-area" aria-label="Fast Reflex game">
-      <div class="hud">
-        <div class="hud-card">
-          <span class="hud-label">SCORE</span>
-          <span class="hud-value" id="scoreDisplay">000</span>
+    <div class="fastreflex-overlay visible" id="fastreflex-start">
+      <div class="fastreflex-modal">
+        <p class="fastreflex-eyebrow">30 Second Challenge</p>
+        <h1>Fast Reflex</h1>
+        <p>Tap the good animals quickly. Avoid the bad ones and build the highest score you can.</p>
+        <div class="fastreflex-mode-buttons">
+          <button class="fastreflex-mode-button active" id="fastreflex-easy" type="button">🌕 Easy</button>
+          <button class="fastreflex-mode-button" id="fastreflex-hard" type="button">🔥 Hard</button>
         </div>
-        <div class="hud-card">
-          <span class="hud-label">TIME</span>
-          <span class="hud-value" id="timeDisplay">30</span>
-        </div>
-        <div class="hud-card">
-          <span class="hud-label">BEST</span>
-          <span class="hud-value" id="bestDisplay">000</span>
-        </div>
-        <div class="hud-card">
-          <span class="hud-label">FASTEST</span>
-          <span class="hud-value" id="fastestDisplay">--</span>
-        </div>
+        <button class="fastreflex-primary" id="fastreflex-start-btn" type="button">Start Game</button>
       </div>
+    </div>
 
-      <div class="mode-chip" id="modeChip">EASY MODE</div>
+    <div class="fastreflex-overlay" id="fastreflex-over">
+      <div class="fastreflex-modal">
+        <p class="fastreflex-eyebrow">Time's Up</p>
+        <h2>Game Over</h2>
 
-      <div class="playfield" id="playfield" aria-label="Tap targets here"></div>
-      <div class="feedback" id="feedback" aria-live="polite"></div>
-
-      <div class="overlay visible" id="startOverlay">
-        <div class="modal">
-          <p class="eyebrow">30 SECOND CHALLENGE</p>
-          <h1>FAST REFLEX</h1>
-          <p>Tap the good animals as quickly as possible. Avoid the bad ones and build the highest score you can.</p>
-
-          <div class="mode-buttons" aria-label="Difficulty">
-            <button class="mode-button active" id="easyButton" type="button">🌕 Easy</button>
-            <button class="mode-button" id="hardButton" type="button">🔥 Hard</button>
-          </div>
-
-          <button class="primary-button" id="startButton" type="button">START GAME</button>
+        <div class="fastreflex-results">
+          <div class="fastreflex-result-card"><span class="fastreflex-result-label">SCORE</span><span class="fastreflex-result-value" id="fastreflex-final-score">0</span></div>
+          <div class="fastreflex-result-card"><span class="fastreflex-result-label">BEST</span><span class="fastreflex-result-value" id="fastreflex-final-best">0</span></div>
+          <div class="fastreflex-result-card"><span class="fastreflex-result-label">FASTEST</span><span class="fastreflex-result-value" id="fastreflex-final-fastest">--</span></div>
+          <div class="fastreflex-result-card"><span class="fastreflex-result-label">ACCURACY</span><span class="fastreflex-result-value" id="fastreflex-final-accuracy">0%</span></div>
+          <div class="fastreflex-result-card"><span class="fastreflex-result-label">CORRECT</span><span class="fastreflex-result-value" id="fastreflex-final-correct">0</span></div>
+          <div class="fastreflex-result-card"><span class="fastreflex-result-label">WRONG / MISS</span><span class="fastreflex-result-value" id="fastreflex-final-mistakes">0 / 0</span></div>
         </div>
-      </div>
 
-      <div class="overlay" id="gameOverOverlay">
-        <div class="modal">
-          <p class="eyebrow">TIME'S UP</p>
-          <h2>GAME OVER</h2>
-
-          <div class="results">
-            <div class="result-card">
-              <span class="result-label">SCORE</span>
-              <span class="result-value" id="finalScore">0</span>
-            </div>
-            <div class="result-card">
-              <span class="result-label">BEST</span>
-              <span class="result-value" id="finalBest">0</span>
-            </div>
-            <div class="result-card">
-              <span class="result-label">FASTEST</span>
-              <span class="result-value" id="finalFastest">--</span>
-            </div>
-            <div class="result-card">
-              <span class="result-label">ACCURACY</span>
-              <span class="result-value" id="finalAccuracy">0%</span>
-            </div>
-            <div class="result-card">
-              <span class="result-label">CORRECT</span>
-              <span class="result-value" id="finalCorrect">0</span>
-            </div>
-            <div class="result-card">
-              <span class="result-label">WRONG / MISS</span>
-              <span class="result-value" id="finalMistakes">0 / 0</span>
-            </div>
-          </div>
-
-          <div class="mode-buttons" aria-label="Difficulty">
-            <button class="mode-button" id="easyButtonEnd" type="button">🌕 Easy</button>
-            <button class="mode-button" id="hardButtonEnd" type="button">🔥 Hard</button>
-          </div>
-
-          <button class="primary-button" id="playAgainButton" type="button">PLAY AGAIN</button>
+        <div class="fastreflex-mode-buttons">
+          <button class="fastreflex-mode-button" id="fastreflex-easy-end" type="button">🌕 Easy</button>
+          <button class="fastreflex-mode-button" id="fastreflex-hard-end" type="button">🔥 Hard</button>
         </div>
+
+        <button class="fastreflex-primary" id="fastreflex-again" type="button">Play Again</button>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="info" aria-labelledby="howToPlayTitle">
-      <h2 id="howToPlayTitle">How to Play</h2>
+  <section class="fastreflex-info">
+    <h2>How to Play</h2>
+    <div class="fastreflex-info-grid">
+      <article class="fastreflex-info-card"><h3>🐇 Good Targets</h3><p>Rabbit and turtle give points. Faster reactions earn more points, up to +10.</p></article>
+      <article class="fastreflex-info-card"><h3>🐦‍⬛ Bad Targets</h3><p>Crow and hedgehog are traps. Tapping one costs 5 points.</p></article>
+      <article class="fastreflex-info-card"><h3>🔥 Difficulty</h3><p>Easy uses longer target times. Hard adds more animal types and faster disappear times.</p></article>
+    </div>
+  </section>
+</div>
 
-      <div class="info-grid">
-        <article class="info-card">
-          <h3>🐇 Good Targets</h3>
-          <p>Rabbit and turtle give points. Faster reactions earn more points: up to +10 for very quick taps.</p>
-        </article>
+<script>
+(() => {
+  "use strict";
 
-        <article class="info-card">
-          <h3>🐦‍⬛ Bad Targets</h3>
-          <p>Crow and hedgehog are traps. Tapping one costs 5 points, so react quickly but identify the animal first.</p>
-        </article>
+  const GAME_DURATION = 30;
+  const STORAGE_PREFIX = "fast-reflex-best-";
 
-        <article class="info-card">
-          <h3>🔥 Difficulty</h3>
-          <p>Easy mode uses rabbit and crow with longer target times. Hard mode adds turtle and hedgehog and makes targets disappear faster.</p>
-        </article>
-      </div>
-    </section>
-  </main>
+  const playfield = document.getElementById("fastreflex-playfield");
+  const feedback = document.getElementById("fastreflex-feedback");
+  const scoreDisplay = document.getElementById("fastreflex-score");
+  const timeDisplay = document.getElementById("fastreflex-time");
+  const bestDisplay = document.getElementById("fastreflex-best");
+  const fastestDisplay = document.getElementById("fastreflex-fastest");
+  const modeChip = document.getElementById("fastreflex-mode-chip");
 
-  <script>
-    (() => {
-      "use strict";
+  const startOverlay = document.getElementById("fastreflex-start");
+  const gameOverOverlay = document.getElementById("fastreflex-over");
 
-      const GAME_DURATION = 30;
-      const STORAGE_PREFIX = "fast-reflex-best-";
+  const easyButton = document.getElementById("fastreflex-easy");
+  const hardButton = document.getElementById("fastreflex-hard");
+  const easyButtonEnd = document.getElementById("fastreflex-easy-end");
+  const hardButtonEnd = document.getElementById("fastreflex-hard-end");
+  const startButton = document.getElementById("fastreflex-start-btn");
+  const playAgainButton = document.getElementById("fastreflex-again");
 
-      const playfield = document.getElementById("playfield");
-      const feedback = document.getElementById("feedback");
+  const finalScore = document.getElementById("fastreflex-final-score");
+  const finalBest = document.getElementById("fastreflex-final-best");
+  const finalFastest = document.getElementById("fastreflex-final-fastest");
+  const finalAccuracy = document.getElementById("fastreflex-final-accuracy");
+  const finalCorrect = document.getElementById("fastreflex-final-correct");
+  const finalMistakes = document.getElementById("fastreflex-final-mistakes");
 
-      const scoreDisplay = document.getElementById("scoreDisplay");
-      const timeDisplay = document.getElementById("timeDisplay");
-      const bestDisplay = document.getElementById("bestDisplay");
-      const fastestDisplay = document.getElementById("fastestDisplay");
-      const modeChip = document.getElementById("modeChip");
+  let mode = "easy";
+  let gameActive = false;
+  let score = 0;
+  let fastestReaction = Infinity;
+  let correct = 0;
+  let wrong = 0;
+  let misses = 0;
+  let gameEndTime = 0;
+  let timerInterval = null;
+  let targetTimeout = null;
+  let currentTarget = null;
 
-      const startOverlay = document.getElementById("startOverlay");
-      const gameOverOverlay = document.getElementById("gameOverOverlay");
+  function getBest() {
+    try {
+      return Math.max(0, Number(localStorage.getItem(STORAGE_PREFIX + mode)) || 0);
+    } catch {
+      return 0;
+    }
+  }
 
-      const easyButton = document.getElementById("easyButton");
-      const hardButton = document.getElementById("hardButton");
-      const easyButtonEnd = document.getElementById("easyButtonEnd");
-      const hardButtonEnd = document.getElementById("hardButtonEnd");
+  function saveBest(value) {
+    try {
+      localStorage.setItem(STORAGE_PREFIX + mode, String(value));
+    } catch {}
+  }
 
-      const startButton = document.getElementById("startButton");
-      const playAgainButton = document.getElementById("playAgainButton");
+  function formatScore(value) {
+    const sign = value < 0 ? "-" : "";
+    return sign + String(Math.abs(Math.trunc(value))).padStart(3, "0");
+  }
 
-      const finalScore = document.getElementById("finalScore");
-      const finalBest = document.getElementById("finalBest");
-      const finalFastest = document.getElementById("finalFastest");
-      const finalAccuracy = document.getElementById("finalAccuracy");
-      const finalCorrect = document.getElementById("finalCorrect");
-      const finalMistakes = document.getElementById("finalMistakes");
+  function updateHud() {
+    scoreDisplay.textContent = formatScore(score);
+    bestDisplay.textContent = formatScore(getBest());
+    fastestDisplay.textContent = Number.isFinite(fastestReaction)
+      ? `${fastestReaction}ms`
+      : "--";
+  }
 
-      let mode = "easy";
-      let gameActive = false;
-      let score = 0;
-      let fastestReaction = Infinity;
-      let correct = 0;
-      let wrong = 0;
-      let misses = 0;
-      let totalClicked = 0;
+  function updateModeUI() {
+    const easy = mode === "easy";
 
-      let gameEndTime = 0;
-      let timerInterval = null;
-      let targetTimeout = null;
-      let currentTarget = null;
+    easyButton.classList.toggle("active", easy);
+    hardButton.classList.toggle("active", !easy);
+    easyButtonEnd.classList.toggle("active", easy);
+    hardButtonEnd.classList.toggle("active", !easy);
 
-      function getBest() {
-        try {
-          return Math.max(0, Number(localStorage.getItem(STORAGE_PREFIX + mode)) || 0);
-        } catch {
-          return 0;
-        }
+    modeChip.textContent = easy ? "EASY MODE" : "HARD MODE";
+    bestDisplay.textContent = formatScore(getBest());
+  }
+
+  function setMode(nextMode) {
+    if (gameActive) return;
+    mode = nextMode;
+    updateModeUI();
+  }
+
+  function clearTarget() {
+    clearTimeout(targetTimeout);
+    targetTimeout = null;
+
+    if (currentTarget && currentTarget.isConnected) {
+      currentTarget.remove();
+    }
+
+    currentTarget = null;
+  }
+
+  function getAnimal() {
+    if (mode === "easy") {
+      return Math.random() < .68 ? "rabbit" : "crow";
+    }
+
+    const r = Math.random();
+    if (r < .34) return "rabbit";
+    if (r < .58) return "turtle";
+    if (r < .79) return "crow";
+    return "hedgehog";
+  }
+
+  function isGoodAnimal(animal) {
+    return animal === "rabbit" || animal === "turtle";
+  }
+
+  function getTargetLife() {
+    return mode === "easy"
+      ? 1150 + Math.random() * 750
+      : 680 + Math.random() * 520;
+  }
+
+  function getTargetSize(animal) {
+    const base = Math.min(playfield.clientWidth, playfield.clientHeight);
+    const easySize = Math.max(64, Math.min(86, base * .12));
+    const hardSize = Math.max(56, Math.min(76, base * .105));
+
+    let size = mode === "easy" ? easySize : hardSize;
+    if (animal === "turtle") size *= .90;
+    if (animal === "hedgehog") size *= .94;
+
+    return Math.round(size);
+  }
+
+  function getPoints(reactionTime) {
+    if (reactionTime < 250) return 10;
+    if (reactionTime < 400) return 8;
+    if (reactionTime < 600) return 6;
+    if (reactionTime < 800) return 4;
+    return 2;
+  }
+
+  function showFeedback(text, kind, x, y) {
+    feedback.textContent = text;
+    feedback.className = `fastreflex-feedback ${kind}`;
+    feedback.style.left = `${x}px`;
+    feedback.style.top = `${y}px`;
+
+    void feedback.offsetWidth;
+    feedback.classList.add("show");
+  }
+
+  function spawnTarget() {
+    clearTarget();
+    if (!gameActive) return;
+
+    const animal = getAnimal();
+    const good = isGoodAnimal(animal);
+    const size = getTargetSize(animal);
+
+    const target = document.createElement("button");
+    target.type = "button";
+    target.className = `fastreflex-target ${good ? "good" : "bad"}`;
+    target.setAttribute("aria-label", animal);
+    target.style.width = `${size}px`;
+    target.style.height = `${size}px`;
+
+    const emojiMap = {
+      rabbit: "🐇",
+      turtle: "🐢",
+      crow: "🐦‍⬛",
+      hedgehog: "🦔"
+    };
+
+    const image = document.createElement("img");
+    image.src = `/game/${animal}.webp`;
+    image.alt = "";
+    image.draggable = false;
+
+    const fallback = document.createElement("span");
+    fallback.className = "fastreflex-fallback";
+    fallback.textContent = emojiMap[animal];
+
+    image.addEventListener("error", () => {
+      image.style.display = "none";
+      fallback.style.display = "block";
+    });
+
+    target.append(image, fallback);
+
+    const maxX = Math.max(0, playfield.clientWidth - size);
+    const maxY = Math.max(0, playfield.clientHeight - size);
+    const x = Math.random() * maxX;
+    const y = Math.random() * maxY;
+
+    target.style.left = `${x}px`;
+    target.style.top = `${y}px`;
+
+    const createdAt = performance.now();
+
+    target.addEventListener("pointerdown", event => {
+      event.preventDefault();
+
+      if (!gameActive || target !== currentTarget) return;
+
+      const reactionTime = Math.max(
+        1,
+        Math.round(performance.now() - createdAt)
+      );
+
+      fastestReaction = Math.min(fastestReaction, reactionTime);
+
+      const rect = target.getBoundingClientRect();
+
+      if (good) {
+        const points = getPoints(reactionTime);
+        score += points;
+        correct += 1;
+        showFeedback(
+          `+${points} · ${reactionTime}ms`,
+          "good",
+          rect.left + rect.width / 2,
+          rect.top + rect.height / 2
+        );
+      } else {
+        score -= 5;
+        wrong += 1;
+        showFeedback(
+          "WRONG -5",
+          "bad",
+          rect.left + rect.width / 2,
+          rect.top + rect.height / 2
+        );
       }
 
-      function saveBest(value) {
-        try {
-          localStorage.setItem(STORAGE_PREFIX + mode, String(value));
-        } catch {
-          // Ignore storage restrictions.
-        }
-      }
-
-      function formatScore(value) {
-        const sign = value < 0 ? "-" : "";
-        return sign + String(Math.abs(Math.trunc(value))).padStart(3, "0");
-      }
-
-      function updateHud() {
-        scoreDisplay.textContent = formatScore(score);
-        bestDisplay.textContent = formatScore(getBest());
-        fastestDisplay.textContent = Number.isFinite(fastestReaction) ? `${fastestReaction}ms` : "--";
-      }
-
-      function updateModeUI() {
-        const easy = mode === "easy";
-
-        easyButton.classList.toggle("active", easy);
-        hardButton.classList.toggle("active", !easy);
-        easyButtonEnd.classList.toggle("active", easy);
-        hardButtonEnd.classList.toggle("active", !easy);
-
-        modeChip.textContent = easy ? "EASY MODE" : "HARD MODE";
-        bestDisplay.textContent = formatScore(getBest());
-      }
-
-      function setMode(nextMode) {
-        if (gameActive) return;
-        mode = nextMode;
-        updateModeUI();
-      }
-
-      function clearTarget() {
-        clearTimeout(targetTimeout);
-        targetTimeout = null;
-
-        if (currentTarget && currentTarget.isConnected) {
-          currentTarget.remove();
-        }
-
-        currentTarget = null;
-      }
-
-      function getAnimal() {
-        if (mode === "easy") {
-          return Math.random() < 0.68 ? "rabbit" : "crow";
-        }
-
-        const r = Math.random();
-
-        if (r < 0.34) return "rabbit";
-        if (r < 0.58) return "turtle";
-        if (r < 0.79) return "crow";
-        return "hedgehog";
-      }
-
-      function isGoodAnimal(animal) {
-        return animal === "rabbit" || animal === "turtle";
-      }
-
-      function getTargetLife() {
-        if (mode === "easy") {
-          return 1150 + Math.random() * 750;
-        }
-
-        return 680 + Math.random() * 520;
-      }
-
-      function getTargetSize(animal) {
-        const base = Math.min(playfield.clientWidth, playfield.clientHeight);
-        const easySize = Math.max(64, Math.min(86, base * .12));
-        const hardSize = Math.max(56, Math.min(76, base * .105));
-
-        let size = mode === "easy" ? easySize : hardSize;
-
-        if (animal === "turtle") size *= .90;
-        if (animal === "hedgehog") size *= .94;
-
-        return Math.round(size);
-      }
-
-      function getPoints(reactionTime) {
-        if (reactionTime < 250) return 10;
-        if (reactionTime < 400) return 8;
-        if (reactionTime < 600) return 6;
-        if (reactionTime < 800) return 4;
-        return 2;
-      }
-
-      function showFeedback(text, kind, x, y) {
-        feedback.textContent = text;
-        feedback.className = `feedback ${kind}`;
-        feedback.style.left = `${x}px`;
-        feedback.style.top = `${y}px`;
-
-        void feedback.offsetWidth;
-        feedback.classList.add("show");
-      }
-
-      function spawnTarget() {
-        clearTarget();
-        if (!gameActive) return;
-
-        const animal = getAnimal();
-        const good = isGoodAnimal(animal);
-        const size = getTargetSize(animal);
-
-        const target = document.createElement("button");
-        target.type = "button";
-        target.className = `target ${good ? "good" : "bad"}`;
-        target.setAttribute("aria-label", animal);
-        target.dataset.animal = animal;
-        target.style.width = `${size}px`;
-        target.style.height = `${size}px`;
-
-        const emojiMap = {
-          rabbit: "🐇",
-          turtle: "🐢",
-          crow: "🐦‍⬛",
-          hedgehog: "🦔"
-        };
-
-        const animalImage = document.createElement("img");
-        animalImage.src = `https://sercankulcu.github.io/game/${animal}.webp`;
-        animalImage.alt = "";
-        animalImage.draggable = false;
-
-        const fallback = document.createElement("span");
-        fallback.className = "emoji-fallback";
-        fallback.textContent = emojiMap[animal];
-
-        animalImage.addEventListener("error", () => {
-          animalImage.style.display = "none";
-          fallback.style.display = "block";
-        });
-
-        target.append(animalImage, fallback);
-
-        const maxX = Math.max(0, playfield.clientWidth - size);
-        const maxY = Math.max(0, playfield.clientHeight - size);
-        const x = Math.random() * maxX;
-        const y = Math.random() * maxY;
-
-        target.style.left = `${x}px`;
-        target.style.top = `${y}px`;
-
-        const createdAt = performance.now();
-
-        target.addEventListener("pointerdown", (event) => {
-          event.preventDefault();
-
-          if (!gameActive || target !== currentTarget) return;
-
-          const reactionTime = Math.max(1, Math.round(performance.now() - createdAt));
-          fastestReaction = Math.min(fastestReaction, reactionTime);
-          totalClicked += 1;
-
-          const fieldRect = playfield.getBoundingClientRect();
-          const centerX = x + size / 2 + fieldRect.left;
-          const centerY = y + size / 2 + fieldRect.top;
-
-          if (good) {
-            const points = getPoints(reactionTime);
-            score += points;
-            correct += 1;
-            showFeedback(`+${points} · ${reactionTime}ms`, "good", centerX, centerY);
-          } else {
-            score -= 5;
-            wrong += 1;
-            showFeedback(`WRONG -5`, "bad", centerX, centerY);
-          }
-
-          updateHud();
-
-          target.classList.add("leaving");
-
-          clearTimeout(targetTimeout);
-          targetTimeout = null;
-
-          currentTarget = null;
-
-          window.setTimeout(() => {
-            target.remove();
-            if (gameActive) spawnTarget();
-          }, 115);
-        });
-
-        playfield.appendChild(target);
-        currentTarget = target;
-
-        targetTimeout = window.setTimeout(() => {
-          if (!gameActive || target !== currentTarget) return;
-
-          const rect = target.getBoundingClientRect();
-
-          misses += 1;
-          showFeedback("MISS", "miss", rect.left + rect.width / 2, rect.top + rect.height / 2);
-
-          target.classList.add("leaving");
-          currentTarget = null;
-
-          window.setTimeout(() => {
-            target.remove();
-            if (gameActive) spawnTarget();
-          }, 115);
-        }, getTargetLife());
-      }
-
-      function updateTimer() {
-        if (!gameActive) return;
-
-        const remaining = Math.max(0, Math.ceil((gameEndTime - performance.now()) / 1000));
-        timeDisplay.textContent = String(remaining).padStart(2, "0");
-
-        if (remaining <= 0) {
-          endGame();
-        }
-      }
-
-      function startGame() {
-        clearTarget();
-
-        score = 0;
-        fastestReaction = Infinity;
-        correct = 0;
-        wrong = 0;
-        misses = 0;
-        totalClicked = 0;
-        gameActive = true;
-
-        startOverlay.classList.remove("visible");
-        gameOverOverlay.classList.remove("visible");
-
-        scoreDisplay.textContent = "000";
-        timeDisplay.textContent = String(GAME_DURATION);
-        fastestDisplay.textContent = "--";
-        updateHud();
-
-        gameEndTime = performance.now() + GAME_DURATION * 1000;
-
-        clearInterval(timerInterval);
-        timerInterval = window.setInterval(updateTimer, 100);
-        updateTimer();
-
-        window.setTimeout(spawnTarget, 250);
-      }
-
-      function endGame() {
-        if (!gameActive) return;
-
-        gameActive = false;
-        clearInterval(timerInterval);
-        timerInterval = null;
-        clearTarget();
-
-        timeDisplay.textContent = "00";
-
-        const previousBest = getBest();
-        if (score > previousBest) {
-          saveBest(score);
-        }
-
-        const attempts = correct + wrong;
-        const accuracy = attempts > 0 ? Math.round((correct / attempts) * 100) : 0;
-
-        finalScore.textContent = score;
-        finalBest.textContent = getBest();
-        finalFastest.textContent = Number.isFinite(fastestReaction) ? `${fastestReaction} ms` : "--";
-        finalAccuracy.textContent = `${accuracy}%`;
-        finalCorrect.textContent = correct;
-        finalMistakes.textContent = `${wrong} / ${misses}`;
-
-        updateHud();
-        updateModeUI();
-
-        window.setTimeout(() => {
-          gameOverOverlay.classList.add("visible");
-        }, 220);
-      }
-
-      easyButton.addEventListener("click", () => setMode("easy"));
-      hardButton.addEventListener("click", () => setMode("hard"));
-      easyButtonEnd.addEventListener("click", () => setMode("easy"));
-      hardButtonEnd.addEventListener("click", () => setMode("hard"));
-
-      startButton.addEventListener("click", startGame);
-      playAgainButton.addEventListener("click", startGame);
-
-      window.addEventListener("resize", () => {
-        if (gameActive && currentTarget) {
-          spawnTarget();
-        }
-      });
-
-      updateModeUI();
       updateHud();
-    })();
-  </script>
-</body>
-</html>
+      target.classList.add("leaving");
+
+      clearTimeout(targetTimeout);
+      targetTimeout = null;
+      currentTarget = null;
+
+      window.setTimeout(() => {
+        target.remove();
+        if (gameActive) spawnTarget();
+      }, 115);
+    });
+
+    playfield.appendChild(target);
+    currentTarget = target;
+
+    targetTimeout = window.setTimeout(() => {
+      if (!gameActive || target !== currentTarget) return;
+
+      const rect = target.getBoundingClientRect();
+      misses += 1;
+
+      showFeedback(
+        "MISS",
+        "miss",
+        rect.left + rect.width / 2,
+        rect.top + rect.height / 2
+      );
+
+      target.classList.add("leaving");
+      currentTarget = null;
+
+      window.setTimeout(() => {
+        target.remove();
+        if (gameActive) spawnTarget();
+      }, 115);
+    }, getTargetLife());
+  }
+
+  function updateTimer() {
+    if (!gameActive) return;
+
+    const remaining = Math.max(
+      0,
+      Math.ceil((gameEndTime - performance.now()) / 1000)
+    );
+
+    timeDisplay.textContent = String(remaining).padStart(2, "0");
+
+    if (remaining <= 0) {
+      endGame();
+    }
+  }
+
+  function startGame() {
+    clearTarget();
+
+    score = 0;
+    fastestReaction = Infinity;
+    correct = 0;
+    wrong = 0;
+    misses = 0;
+    gameActive = true;
+
+    startOverlay.classList.remove("visible");
+    gameOverOverlay.classList.remove("visible");
+
+    scoreDisplay.textContent = "000";
+    timeDisplay.textContent = String(GAME_DURATION);
+    fastestDisplay.textContent = "--";
+    updateHud();
+
+    gameEndTime = performance.now() + GAME_DURATION * 1000;
+
+    clearInterval(timerInterval);
+    timerInterval = window.setInterval(updateTimer, 100);
+    updateTimer();
+
+    window.setTimeout(spawnTarget, 250);
+  }
+
+  function endGame() {
+    if (!gameActive) return;
+
+    gameActive = false;
+    clearInterval(timerInterval);
+    timerInterval = null;
+    clearTarget();
+    timeDisplay.textContent = "00";
+
+    const previousBest = getBest();
+    if (score > previousBest) {
+      saveBest(score);
+    }
+
+    const attempts = correct + wrong;
+    const accuracy = attempts > 0
+      ? Math.round(correct / attempts * 100)
+      : 0;
+
+    finalScore.textContent = String(score);
+    finalBest.textContent = String(getBest());
+    finalFastest.textContent = Number.isFinite(fastestReaction)
+      ? `${fastestReaction} ms`
+      : "--";
+    finalAccuracy.textContent = `${accuracy}%`;
+    finalCorrect.textContent = String(correct);
+    finalMistakes.textContent = `${wrong} / ${misses}`;
+
+    updateHud();
+    updateModeUI();
+
+    window.setTimeout(() => {
+      gameOverOverlay.classList.add("visible");
+    }, 220);
+  }
+
+  easyButton.addEventListener("click", () => setMode("easy"));
+  hardButton.addEventListener("click", () => setMode("hard"));
+  easyButtonEnd.addEventListener("click", () => setMode("easy"));
+  hardButtonEnd.addEventListener("click", () => setMode("hard"));
+
+  startButton.addEventListener("click", startGame);
+  playAgainButton.addEventListener("click", startGame);
+
+  window.addEventListener("resize", () => {
+    if (gameActive && currentTarget) {
+      spawnTarget();
+    }
+  });
+
+  updateModeUI();
+  updateHud();
+})();
+</script>
