@@ -360,7 +360,7 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
   if (!root) return;
 
   const q = id => root.querySelector("#" + id);
-  const tree = new BST();
+  let tree = new BST();
   const ns = "http://www.w3.org/2000/svg";
 
   const el = {
@@ -474,7 +474,8 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
       });
     });
 
-    return { ordered, positions };
+    const maxDepth = ordered.reduce((m, item) => Math.max(m, item.depth), 0);
+    return { ordered, positions, maxDepth };
   }
 
   function render() {
@@ -494,7 +495,10 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
       return;
     }
 
-    const { ordered, positions } = buildLayout();
+    const { ordered, positions, maxDepth } = buildLayout();
+    const svgHeight = Math.max(560, 130 + maxDepth * 90);
+    el.svg.setAttribute("viewBox", `0 0 1100 ${svgHeight}`);
+    el.svg.style.minHeight = `${svgHeight}px`;
 
     ordered.forEach(({ node, parent }) => {
       if (!parent) return;
@@ -575,8 +579,11 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
   }
 
   function load(values) {
-    cancel();
-    tree.root = null;
+    token++;
+    disable(false);
+    nodeStates.clear();
+    activeEdges.clear();
+    tree = new BST();
     values.forEach(value => tree.insert(value));
     el.operation.textContent = "—";
     el.traversal.textContent = "—";
@@ -667,10 +674,14 @@ excerpt: "Interactive Binary Search Tree simulator with insert, search, delete, 
   });
 
   btn.random.addEventListener("click", () => {
-    const values = new Set();
-    while (values.size < 10) values.add(Math.floor(Math.random() * 90) + 10);
-    load([...values]);
-    message("Random tree generated.", "is-success");
+    try {
+      const values = new Set();
+      while (values.size < 10) values.add(Math.floor(Math.random() * 90) + 10);
+      load(Array.from(values));
+      message("Random tree generated.", "is-success");
+    } catch (error) {
+      message(`Random tree error: ${error.message}`, "is-error");
+    }
   });
 
   btn.reset.addEventListener("click", () => {
