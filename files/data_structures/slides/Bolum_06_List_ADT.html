@@ -76,10 +76,10 @@ excerpt: "Interactive List ADT simulator comparing ArrayList-style contiguous st
       </div>
       <div class="ds-list__group">
         <button class="ds-list__btn" id="ds-list-traverse" type="button">Traverse</button>
-        <button class="ds-list__btn" id="ds-list-example" type="button">Load Example</button>
-        <button class="ds-list__btn" id="ds-list-random" type="button">Random List</button>
+        <button class="ds-list__btn" id="ds-list-example" type="button">Load</button>
+        <button class="ds-list__btn" id="ds-list-random" type="button">Random</button>
         <button class="ds-list__btn ds-list__btn--danger" id="ds-list-clear" type="button">Clear</button>
-        <button class="ds-list__btn ds-list__btn--secondary" id="ds-list-cancel" type="button">Cancel Animation</button>
+        <button class="ds-list__btn ds-list__btn--secondary" id="ds-list-cancel" type="button">Cancel</button>
       </div>
       <div class="ds-list__speed">
         <label for="ds-list-speed">Animation speed</label>
@@ -139,7 +139,7 @@ excerpt: "Interactive List ADT simulator comparing ArrayList-style contiguous st
     del:q("ds-list-delete"),search:q("ds-list-search"),traverse:q("ds-list-traverse"),example:q("ds-list-example"),
     random:q("ds-list-random"),clear:q("ds-list-clear"),cancel:q("ds-list-cancel")};
 
-  var data=[],token=0,markIndex=-1,markKind="",arraySteps=0,linkedSteps=0;
+  var data=[],token=0,arrayMarkIndex=-1,arrayMarkKind="",linkedMarkIndex=-1,linkedMarkKind="",arraySteps=0,linkedSteps=0;
 
   function delay(){return Number(el.speed.value);}
   function wait(ms,t){return new Promise(function(r){setTimeout(function(){r(t===token);},ms);});}
@@ -156,10 +156,10 @@ excerpt: "Interactive List ADT simulator comparing ArrayList-style contiguous st
   function render(){
     el.array.innerHTML=""; el.linked.innerHTML="";
     data.forEach(function(v,i){
-      var c=document.createElement("div");c.className="ds-list__cell"+(i===markIndex&&markKind?" "+markKind:"");
+      var c=document.createElement("div");c.className="ds-list__cell"+(i===arrayMarkIndex&&arrayMarkKind?" "+arrayMarkKind:"");
       c.innerHTML="<strong></strong><small>index "+i+"</small>";c.querySelector("strong").textContent=v;el.array.appendChild(c);
 
-      var n=document.createElement("div");n.className="ds-list__node"+(i===markIndex&&markKind?" "+markKind:"");
+      var n=document.createElement("div");n.className="ds-list__node"+(i===linkedMarkIndex&&linkedMarkKind?" "+linkedMarkKind:"");
       n.innerHTML="<strong></strong><small>node "+i+"</small>";n.querySelector("strong").textContent=v;el.linked.appendChild(n);
       if(i<data.length-1){var a=document.createElement("span");a.className="ds-list__arrow";a.textContent="→";el.linked.appendChild(a);}
     });
@@ -167,34 +167,101 @@ excerpt: "Interactive List ADT simulator comparing ArrayList-style contiguous st
     el.size.textContent=String(data.length);el.aSteps.textContent=String(arraySteps);el.lSteps.textContent=String(linkedSteps);
   }
 
-  async function animateToIndex(index,forArrayFast){
-    token++;var t=token;disable(true);markKind="is-checking";
-    if(forArrayFast){
-      markIndex=index;arraySteps=1;render();await wait(delay(),t);
-    }else{
-      for(var i=0;i<=index;i++){markIndex=i;linkedSteps=i+1;render();if(!(await wait(delay(),t)))return false;}
+  async function animateAccess(index){
+    token++;var t=token;disable(true);
+    arraySteps=1;linkedSteps=0;
+
+    // ArrayList: direct indexed access.
+    arrayMarkIndex=index;arrayMarkKind="is-found";
+    linkedMarkIndex=-1;linkedMarkKind="";
+    el.status.textContent="ArrayList: direct access to index "+index+" (1 step).";
+    render();
+    if(!(await wait(delay(),t)))return false;
+
+    // LinkedList: traverse node by node from the head.
+    arrayMarkIndex=-1;arrayMarkKind="";
+    for(var i=0;i<=index;i++){
+      linkedMarkIndex=i;linkedMarkKind=i===index?"is-found":"is-checking";
+      linkedSteps=i+1;
+      el.status.textContent="LinkedList: follow next references to node "+i+" of "+index+".";
+      render();
+      if(!(await wait(delay(),t)))return false;
     }
-    markKind="is-found";render();await wait(delay(),t);disable(false);return true;
+
+    disable(false);
+    return true;
+  }
+
+  async function animatePrepend(value){
+    token++;var t=token;disable(true);
+    var before=data.slice();
+
+    // LinkedList: new node becomes the head immediately.
+    linkedSteps=1;
+    linkedMarkIndex=0;linkedMarkKind="is-found";
+    arrayMarkIndex=-1;arrayMarkKind="";
+    el.status.textContent="LinkedList: create one new head node and update the head reference (O(1)).";
+    render();
+    if(!(await wait(delay(),t)))return false;
+
+    // ArrayList: every existing element must shift one position to the right.
+    linkedMarkIndex=-1;linkedMarkKind="";
+    arraySteps=0;
+    for(var i=before.length-1;i>=0;i--){
+      arrayMarkIndex=i;arrayMarkKind="is-checking";
+      arraySteps++;
+      el.status.textContent="ArrayList: shift element at index "+i+" to index "+(i+1)+".";
+      render();
+      if(!(await wait(delay(),t)))return false;
+    }
+
+    data.unshift(value);
+    arraySteps=before.length+1;
+    arrayMarkIndex=0;arrayMarkKind="is-found";
+    linkedMarkIndex=0;linkedMarkKind="is-found";
+    el.result.textContent=value;
+    el.status.textContent="Prepend complete: LinkedList changed the head; ArrayList shifted "+before.length+" element"+(before.length===1?"":"s")+".";
+    render();
+    if(!(await wait(delay(),t)))return false;
+
+    arrayMarkIndex=-1;arrayMarkKind="";
+    linkedMarkIndex=-1;linkedMarkKind="";
+    render();
+    disable(false);
+    return true;
   }
 
   btn.append.addEventListener("click",function(){try{var v=readValue();data.push(v);arraySteps=1;linkedSteps=1;el.result.textContent=v;render();setStatus("Appended "+v+".");}catch(e){setStatus(e.message);}});
-  btn.prepend.addEventListener("click",function(){try{var v=readValue();data.unshift(v);arraySteps=data.length;linkedSteps=1;el.result.textContent=v;render();setStatus("Prepended "+v+".");}catch(e){setStatus(e.message);}});
+  btn.prepend.addEventListener("click",async function(){
+    try{
+      var v=readValue();
+      await animatePrepend(v);
+    }catch(e){setStatus(e.message);}
+  });
   btn.insert.addEventListener("click",function(){try{var v=readValue(),i=readIndex(true);data.splice(i,0,v);arraySteps=data.length-i;linkedSteps=i+1;el.result.textContent=v;render();setStatus("Inserted "+v+" at index "+i+".");}catch(e){setStatus(e.message);}});
-  btn.access.addEventListener("click",async function(){try{var i=readIndex(false);arraySteps=0;linkedSteps=0;await animateToIndex(i,true);el.result.textContent=data[i];setStatus("ArrayList accesses index directly; LinkedList would traverse to index "+i+".");}catch(e){setStatus(e.message);}});
-  btn.del.addEventListener("click",function(){try{var i=readIndex(false),v=data[i];data.splice(i,1);arraySteps=data.length-i+1;linkedSteps=i+1;el.result.textContent=v;markIndex=-1;render();setStatus("Deleted value "+v+" from index "+i+".");}catch(e){setStatus(e.message);}});
+  btn.access.addEventListener("click",async function(){
+    try{
+      var i=readIndex(false);
+      arraySteps=0;linkedSteps=0;
+      if(!(await animateAccess(i)))return;
+      el.result.textContent=data[i];
+      setStatus("Access complete: ArrayList = 1 direct step; LinkedList = "+(i+1)+" node visit"+(i===0?"":"s")+".");
+    }catch(e){setStatus(e.message);}
+  });
+  btn.del.addEventListener("click",function(){try{var i=readIndex(false),v=data[i];data.splice(i,1);arraySteps=data.length-i+1;linkedSteps=i+1;el.result.textContent=v;arrayMarkIndex=-1;arrayMarkKind="";linkedMarkIndex=-1;linkedMarkKind="";render();setStatus("Deleted value "+v+" from index "+i+".");}catch(e){setStatus(e.message);}});
   btn.search.addEventListener("click",async function(){try{
     var v=readValue();token++;var t=token;disable(true);arraySteps=0;linkedSteps=0;var found=-1;
-    for(var i=0;i<data.length;i++){markIndex=i;markKind="is-checking";arraySteps=i+1;linkedSteps=i+1;render();if(!(await wait(delay(),t)))return;if(data[i]===v){found=i;break;}}
-    if(found>=0){markKind="is-found";render();el.result.textContent=found;setStatus("Found "+v+" at index "+found+".");}else{markIndex=-1;render();el.result.textContent="not found";setStatus(v+" was not found.");}
+    for(var i=0;i<data.length;i++){arrayMarkIndex=i;arrayMarkKind="is-checking";linkedMarkIndex=i;linkedMarkKind="is-checking";arraySteps=i+1;linkedSteps=i+1;render();if(!(await wait(delay(),t)))return;if(data[i]===v){found=i;break;}}
+    if(found>=0){arrayMarkKind="is-found";linkedMarkKind="is-found";render();el.result.textContent=found;setStatus("Found "+v+" at index "+found+".");}else{arrayMarkIndex=-1;arrayMarkKind="";linkedMarkIndex=-1;linkedMarkKind="";render();el.result.textContent="not found";setStatus(v+" was not found.");}
     disable(false);
   }catch(e){setStatus(e.message);}});
   btn.traverse.addEventListener("click",async function(){token++;var t=token;disable(true);arraySteps=0;linkedSteps=0;
-    for(var i=0;i<data.length;i++){markIndex=i;markKind="is-checking";arraySteps=i+1;linkedSteps=i+1;render();if(!(await wait(delay(),t)))return;}
-    markIndex=-1;render();el.result.textContent=data.join(" → ");disable(false);setStatus("Traversal complete.");});
-  btn.example.addEventListener("click",function(){token++;data=[12,34,56,78,90];markIndex=-1;arraySteps=0;linkedSteps=0;el.result.textContent="—";render();setStatus("Example list loaded.");});
-  btn.random.addEventListener("click",function(){token++;data=Array.from({length:8},function(){return Math.floor(Math.random()*90)+10;});markIndex=-1;render();setStatus("Random list generated.");});
-  btn.clear.addEventListener("click",function(){token++;data=[];markIndex=-1;render();setStatus("List cleared.");});
-  btn.cancel.addEventListener("click",function(){token++;markIndex=-1;disable(false);render();setStatus("Animation cancelled.");});
+    for(var i=0;i<data.length;i++){arrayMarkIndex=i;arrayMarkKind="is-checking";linkedMarkIndex=i;linkedMarkKind="is-checking";arraySteps=i+1;linkedSteps=i+1;render();if(!(await wait(delay(),t)))return;}
+    arrayMarkIndex=-1;arrayMarkKind="";linkedMarkIndex=-1;linkedMarkKind="";render();el.result.textContent=data.join(" → ");disable(false);setStatus("Traversal complete.");});
+  btn.example.addEventListener("click",function(){token++;data=[12,34,56,78,90];arrayMarkIndex=-1;arrayMarkKind="";linkedMarkIndex=-1;linkedMarkKind="";arraySteps=0;linkedSteps=0;el.result.textContent="—";render();setStatus("Example list loaded.");});
+  btn.random.addEventListener("click",function(){token++;data=Array.from({length:8},function(){return Math.floor(Math.random()*90)+10;});arrayMarkIndex=-1;arrayMarkKind="";linkedMarkIndex=-1;linkedMarkKind="";render();setStatus("Random list generated.");});
+  btn.clear.addEventListener("click",function(){token++;data=[];arrayMarkIndex=-1;arrayMarkKind="";linkedMarkIndex=-1;linkedMarkKind="";render();setStatus("List cleared.");});
+  btn.cancel.addEventListener("click",function(){token++;arrayMarkIndex=-1;arrayMarkKind="";linkedMarkIndex=-1;linkedMarkKind="";disable(false);render();setStatus("Animation cancelled.");});
   el.speed.addEventListener("input",function(){el.speedOut.textContent=el.speed.value+" ms";});
 
   btn.example.click();btn.cancel.disabled=true;
