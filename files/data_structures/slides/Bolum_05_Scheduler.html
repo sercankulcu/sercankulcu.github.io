@@ -1,902 +1,528 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Interactive Round Robin process scheduler using a queue, with configurable time quantum, process metrics, and automatic execution.">
-    <meta name="author" content="Sercan Kulcu">
-    <title>Round Robin Scheduler</title>
-    <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --text: #1f2937;
-            --muted: #64748b;
-            --surface: #ffffff;
-            --surface-soft: #f8fafc;
-            --border: #cbd5e1;
-            --running: #fee2e2;
-            --running-border: #dc2626;
-            --done: #dcfce7;
-            --done-border: #15803d;
-            --danger: #b91c1c;
-            --success: #15803d;
-            --shadow: 0 12px 32px rgba(15, 23, 42, 0.10);
-        }
-
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            padding: 16px;
-            font-family: Arial, Helvetica, sans-serif;
-            color: var(--text);
-            background: #eef2f7;
-            line-height: 1.55;
-        }
-
-        button, input { font: inherit; }
-
-        .page {
-            width: min(100%, 1160px);
-            margin: 0 auto;
-        }
-
-        .container {
-            overflow: hidden;
-            background: var(--surface);
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-        }
-
-        .header {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            align-items: center;
-            gap: 16px;
-            padding: 20px 24px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .header h1 {
-            margin: 0;
-            text-align: center;
-            font-size: clamp(1.5rem, 4vw, 2.2rem);
-        }
-
-        .back-button {
-            color: var(--primary-dark);
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .back-button:hover { text-decoration: underline; }
-        .header-spacer { width: 54px; }
-
-        main { padding: 24px; }
-
-        .intro, .panel {
-            padding: 20px;
-            border: 1px solid #bfdbfe;
-            border-radius: 12px;
-            background: #eff6ff;
-        }
-
-        .intro h2, .panel h2 { margin-top: 0; }
-
-        .metrics, .stats {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        .metrics { margin-top: 18px; }
-
-        .metric, .stat {
-            min-width: 0;
-            padding: 11px;
-            border: 1px solid #bfdbfe;
-            border-radius: 9px;
-            background: white;
-        }
-
-        .metric strong, .stat strong { display: block; }
-
-        .section-title {
-            margin: 28px 0 12px;
-            font-size: 1.2rem;
-        }
-
-        .control-panel {
-            display: grid;
-            gap: 14px;
-            padding: 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            background: var(--surface-soft);
-        }
-
-        .control-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 10px;
-            align-items: end;
-        }
-
-        .field {
-            display: grid;
-            gap: 5px;
-        }
-
-        .field label {
-            font-size: 0.92rem;
-            font-weight: 700;
-        }
-
-        input {
-            width: 100%;
-            min-height: 42px;
-            padding: 9px 10px;
-            color: var(--text);
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-
-        button {
-            min-height: 42px;
-            padding: 9px 13px;
-            color: white;
-            background: var(--primary);
-            border: 0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.18s ease, transform 0.18s ease;
-        }
-
-        button:hover:not(:disabled) {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        button.secondary {
-            color: var(--text);
-            background: #e2e8f0;
-        }
-
-        button.secondary:hover:not(:disabled) { background: #cbd5e1; }
-        button.danger { background: var(--danger); }
-
-        button:disabled {
-            cursor: not-allowed;
-            opacity: 0.55;
-        }
-
-        button:focus-visible,
-        input:focus-visible,
-        .back-button:focus-visible {
-            outline: 3px solid #f59e0b;
-            outline-offset: 2px;
-        }
-
-        .speed-row {
-            display: grid;
-            grid-template-columns: minmax(120px, 1fr) minmax(180px, 3fr) auto;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .speed-row output {
-            min-width: 72px;
-            font-weight: 700;
-            text-align: right;
-        }
-
-        .workspace {
-            display: grid;
-            grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
-            gap: 16px;
-            margin-top: 18px;
-        }
-
-        .queue-panel,
-        .current-panel {
-            min-width: 0;
-            padding: 18px;
-            border: 2px solid var(--primary);
-            border-radius: 12px;
-            background: var(--surface-soft);
-        }
-
-        .queue-panel h3,
-        .current-panel h3 {
-            margin-top: 0;
-        }
-
-        .queue-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            color: var(--muted);
-            font-size: 0.82rem;
-            font-weight: 700;
-        }
-
-        .queue-track {
-            min-height: 150px;
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            overflow-x: auto;
-            border: 4px solid var(--primary-dark);
-            border-left-width: 12px;
-            border-right-width: 12px;
-            border-radius: 12px;
-            background: #dbeafe;
-        }
-
-        .process-card {
-            flex: 0 0 112px;
-            min-height: 90px;
-            padding: 10px;
-            display: grid;
-            gap: 4px;
-            align-content: center;
-            border: 2px solid var(--primary-dark);
-            border-radius: 10px;
-            background: white;
-            text-align: center;
-            font-weight: 700;
-            transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-        }
-
-        .process-card small {
-            color: var(--muted);
-            font-weight: 600;
-        }
-
-        .process-card.running {
-            background: var(--running);
-            border-color: var(--running-border);
-            transform: scale(1.04);
-        }
-
-        .process-card.completed {
-            background: var(--done);
-            border-color: var(--done-border);
-        }
-
-        .empty-state {
-            width: 100%;
-            color: var(--muted);
-            text-align: center;
-        }
-
-        .current-slot {
-            min-height: 150px;
-            display: grid;
-            place-items: center;
-            border: 2px dashed #94a3b8;
-            border-radius: 12px;
-            background: white;
-        }
-
-        .progress {
-            width: 100%;
-            height: 10px;
-            overflow: hidden;
-            border-radius: 999px;
-            background: #e2e8f0;
-        }
-
-        .progress-bar {
-            height: 100%;
-            width: 0;
-            background: var(--primary);
-            transition: width 0.25s ease;
-        }
-
-        .status {
-            min-height: 1.6em;
-            margin: 16px 0 0;
-            padding: 14px;
-            border: 1px solid #dbeafe;
-            border-radius: 10px;
-            background: white;
-            font-weight: 700;
-        }
-
-        .status.success { color: var(--success); }
-        .status.error { color: var(--danger); }
-        .stats { margin-top: 14px; }
-
-        .lower-grid {
-            display: grid;
-            grid-template-columns: minmax(320px, 1.2fr) minmax(280px, 0.8fr);
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .table-panel,
-        .log-panel {
-            min-width: 0;
-            padding: 18px;
-            border: 1px solid #dbeafe;
-            border-radius: 12px;
-            background: white;
-        }
-
-        .table-panel h3,
-        .log-panel h3 { margin-top: 0; }
-
-        .table-scroll { overflow-x: auto; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-
-        th, td {
-            padding: 9px;
-            text-align: left;
-            border: 1px solid #cbd5e1;
-        }
-
-        th { background: #e2e8f0; }
-
-        .log-list {
-            max-height: 300px;
-            margin: 0;
-            padding-left: 22px;
-            overflow-y: auto;
-        }
-
-        .log-list li { margin: 5px 0; }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .content-card {
-            min-width: 0;
-            padding: 18px;
-            border: 1px solid #dbeafe;
-            border-radius: 12px;
-            background: #eff6ff;
-        }
-
-        .content-card h3 { margin-top: 0; }
-
-        code {
-            padding: 2px 5px;
-            border-radius: 5px;
-            background: #e2e8f0;
-        }
-
-        @media (max-width: 850px) {
-            body { padding: 8px; }
-            main { padding: 14px; }
-
-            .header {
-                grid-template-columns: 1fr;
-                padding: 16px;
-            }
-
-            .back-button { justify-self: start; }
-            .header-spacer { display: none; }
-
-            .workspace, .lower-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .metrics, .stats, .content-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .speed-row { grid-template-columns: 1fr; }
-            .speed-row output { text-align: left; }
-        }
-
-        @media (max-width: 520px) {
-            .metrics, .stats, .content-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-                scroll-behavior: auto !important;
-            }
-        }
-    </style>
-</head>
-<body>
-<div class="page">
-    <div class="container">
-        <header class="header">
-            <a class="back-button" href="https://sercankulcu.github.io/teaching/data-structures">&larr; Back</a>
-            <h1>Round Robin Scheduler</h1>
-            <span class="header-spacer" aria-hidden="true"></span>
-        </header>
-
-        <main>
-            <section class="intro">
-                <h2>What is Round Robin Scheduling?</h2>
-                <p>
-                    Round Robin is a preemptive CPU scheduling algorithm. Processes wait in a FIFO ready queue.
-                    Each process receives at most one time quantum. If it does not finish, it returns to the rear
-                    of the queue.
-                </p>
-
-                <div class="metrics">
-                    <div class="metric"><strong>Scheduling structure</strong>FIFO queue</div>
-                    <div class="metric"><strong>Preemption</strong>After each quantum</div>
-                    <div class="metric"><strong>Fairness</strong>Every ready process gets CPU time</div>
-                    <div class="metric"><strong>Queue operation</strong>O(1)</div>
-                </div>
-            </section>
-
-            <h2 class="section-title">Scheduler controls</h2>
-            <section class="control-panel" aria-label="Scheduler controls">
-                <div class="control-group">
-                    <div class="field">
-                        <label for="burstInput">Burst time</label>
-                        <input id="burstInput" type="number" min="1" max="30" value="6" inputmode="numeric">
-                    </div>
-                    <div class="field">
-                        <label for="quantumInput">Time quantum</label>
-                        <input id="quantumInput" type="number" min="1" max="10" value="2" inputmode="numeric">
-                    </div>
-                    <button id="addButton" type="button">Add Process</button>
-                    <button id="randomButton" type="button">Add Random</button>
-                    <button id="stepButton" type="button">Run One Quantum</button>
-                </div>
-
-                <div class="control-group">
-                    <button id="autoButton" type="button">Auto Run</button>
-                    <button id="pauseButton" type="button" class="secondary">Pause</button>
-                    <button id="exampleButton" type="button">Load Example</button>
-                    <button id="resetButton" type="button" class="danger">Reset</button>
-                </div>
-
-                <div class="speed-row">
-                    <label for="speedInput"><strong>Auto-run speed</strong></label>
-                    <input id="speedInput" type="range" min="200" max="1500" step="100" value="700">
-                    <output id="speedOutput" for="speedInput">700 ms</output>
-                </div>
-            </section>
-
-            <div class="workspace">
-                <section class="queue-panel">
-                    <h3>Ready Queue</h3>
-                    <div class="queue-labels">
-                        <span>FRONT — next process</span>
-                        <span>REAR — returning processes</span>
-                    </div>
-                    <div id="queueTrack" class="queue-track" aria-label="Ready queue"></div>
-                </section>
-
-                <section class="current-panel">
-                    <h3>Current Process</h3>
-                    <div id="currentSlot" class="current-slot" aria-label="Current process"></div>
-                    <div class="progress" aria-label="Current process completion">
-                        <div id="progressBar" class="progress-bar"></div>
-                    </div>
-                </section>
-            </div>
-
-            <p id="status" class="status" role="status" aria-live="polite">
-                Add a process or load the example workload.
-            </p>
-
-            <div class="stats" aria-label="Scheduler statistics">
-                <div class="stat"><strong>Current time</strong><span id="timeStat">0</span></div>
-                <div class="stat"><strong>Ready processes</strong><span id="readyStat">0</span></div>
-                <div class="stat"><strong>Completed</strong><span id="completedStat">0</span></div>
-                <div class="stat"><strong>Context switches</strong><span id="switchStat">0</span></div>
-            </div>
-
-            <div class="lower-grid">
-                <section class="table-panel">
-                    <h3>Process metrics</h3>
-                    <div class="table-scroll">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Process</th>
-                                <th>Burst</th>
-                                <th>Remaining</th>
-                                <th>Completion</th>
-                                <th>Turnaround</th>
-                                <th>Waiting</th>
-                            </tr>
-                            </thead>
-                            <tbody id="processBody"></tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section class="log-panel">
-                    <h3>Execution log</h3>
-                    <ol id="logList" class="log-list">
-                        <li>No scheduler events yet.</li>
-                    </ol>
-                </section>
-            </div>
-
-            <h2 class="section-title">Round Robin concepts</h2>
-            <div class="content-grid">
-                <article class="content-card">
-                    <h3>FIFO ready queue</h3>
-                    <p>
-                        A process enters at the rear and leaves from the front. An unfinished process returns to
-                        the rear after its quantum expires.
-                    </p>
-                </article>
-
-                <article class="content-card">
-                    <h3>Time quantum</h3>
-                    <p>
-                        A small quantum improves responsiveness but increases context-switch overhead. A large
-                        quantum makes Round Robin behave more like First-Come, First-Served.
-                    </p>
-                </article>
-
-                <article class="content-card">
-                    <h3>Turnaround time</h3>
-                    <p>
-                        Turnaround time is <code>completion time − arrival time</code>. In this simulator, all
-                        added processes arrive at the current scheduler time.
-                    </p>
-                </article>
-
-                <article class="content-card">
-                    <h3>Waiting time</h3>
-                    <p>
-                        Waiting time is <code>turnaround time − burst time</code>. It measures how long a process
-                        spent waiting rather than executing.
-                    </p>
-                </article>
-            </div>
-
-            <h2 class="section-title">Algorithm summary</h2>
-            <section class="panel">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Step</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr><td>1</td><td>Dequeue the process at the front of the ready queue.</td></tr>
-                    <tr><td>2</td><td>Execute it for <code>min(quantum, remaining time)</code>.</td></tr>
-                    <tr><td>3</td><td>If it finishes, record completion and timing metrics.</td></tr>
-                    <tr><td>4</td><td>Otherwise, enqueue it again at the rear.</td></tr>
-                    </tbody>
-                </table>
-            </section>
-        </main>
+---
+layout: without-sidebar
+title: "Round Robin Scheduler"
+permalink: /files/data_structures/slides/Bolum_05_Scheduler.html
+excerpt: "Interactive Round Robin process scheduler using a FIFO ready queue, configurable time quantum, process metrics, and automatic execution."
+---
+
+<style>
+.ds-scheduler,.ds-scheduler *,.ds-scheduler *::before,.ds-scheduler *::after{box-sizing:border-box}
+.ds-scheduler{
+  width:min(1160px,100%);margin:0 auto 2rem;color:var(--global-text-color);
+  --ds-surface:color-mix(in srgb,var(--global-link-color) 2.5%,var(--global-bg-color));
+  --ds-surface-strong:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  --ds-border:color-mix(in srgb,var(--global-link-color) 38%,var(--global-border-color));
+  --ds-shadow:0 8px 24px rgba(15,23,42,.065);
+  --ds-shadow-soft:0 3px 10px rgba(15,23,42,.045)
+}
+.ds-scheduler__hero,.ds-scheduler__panel,.ds-scheduler__queue-panel,.ds-scheduler__current-panel,
+.ds-scheduler__table-panel,.ds-scheduler__log-panel,.ds-scheduler__card,.ds-scheduler__status{
+  border:1.5px solid var(--ds-border);background:var(--ds-surface)
+}
+.ds-scheduler__hero{padding:1.35rem;border-radius:16px;background:var(--ds-surface-strong);box-shadow:var(--ds-shadow)}
+.ds-scheduler__hero h1{margin:0 0 .55rem;text-align:center;color:var(--global-text-color);font-size:clamp(1.65rem,4vw,2.3rem)}
+.ds-scheduler__hero p{width:100%;margin:0;max-width:none;line-height:1.65;text-align:justify;text-justify:inter-word;opacity:.86}
+.ds-scheduler__metrics,.ds-scheduler__stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem}
+.ds-scheduler__metrics{margin-top:1rem}
+.ds-scheduler__metric,.ds-scheduler__stat{padding:.8rem;border:1.5px solid var(--ds-border);border-radius:10px;background:var(--ds-surface);box-shadow:var(--ds-shadow-soft)}
+.ds-scheduler__metric strong,.ds-scheduler__stat strong{display:block;margin-bottom:.15rem}
+.ds-scheduler__section{margin-top:1.4rem}.ds-scheduler__section h2{margin:0 0 .7rem;color:var(--global-text-color);font-size:1.2rem}
+.ds-scheduler__panel{display:grid;gap:.8rem;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow-soft)}
+.ds-scheduler__group{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:.6rem;align-items:end}
+.ds-scheduler__field{display:grid;gap:.3rem}.ds-scheduler__field label,.ds-scheduler__speed label{font-size:.86rem;font-weight:800}
+.ds-scheduler input{width:100%;min-height:42px;padding:.55rem .65rem;border:1.5px solid var(--ds-border);border-radius:9px;background:var(--ds-surface);color:var(--global-text-color);font:inherit}
+.ds-scheduler input:focus-visible,.ds-scheduler button:focus-visible{outline:3px solid color-mix(in srgb,var(--global-link-color) 30%,transparent);outline-offset:2px}
+.ds-scheduler__btn{min-height:42px;padding:.55rem .75rem;border:1px solid var(--global-link-color);border-radius:9px;background:var(--global-link-color);color:#fff;font:inherit;font-weight:800;cursor:pointer}
+.ds-scheduler__btn:hover:not(:disabled){filter:brightness(1.08)}
+.ds-scheduler__btn--secondary{border-color:var(--ds-border);background:var(--ds-surface);color:var(--global-text-color)}
+.ds-scheduler__btn--danger{border-color:#b91c1c;background:#b91c1c}.ds-scheduler__btn:disabled{cursor:not-allowed;opacity:.5}
+.ds-scheduler__speed{display:grid;grid-template-columns:minmax(130px,auto) 1fr auto;gap:.65rem;align-items:center}
+.ds-scheduler__speed output{min-width:70px;text-align:right;font-size:.85rem;font-weight:800}
+
+.ds-scheduler__workspace{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);gap:.8rem;margin-top:1rem}
+.ds-scheduler__queue-panel,.ds-scheduler__current-panel{min-width:0;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow)}
+.ds-scheduler__queue-panel h3,.ds-scheduler__current-panel h3{margin:0 0 .65rem;font-size:1rem}
+.ds-scheduler__queue-labels{display:flex;justify-content:space-between;gap:1rem;margin-bottom:.5rem;font-size:.76rem;font-weight:800;opacity:.6}
+.ds-scheduler__queue{
+  min-height:160px;padding:1rem;display:flex;align-items:center;gap:.5rem;overflow-x:auto;
+  border:4px solid color-mix(in srgb,var(--global-link-color) 85%,var(--global-border-color));
+  border-left-width:12px;border-right-width:12px;border-radius:12px;
+  background:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color))
+}
+.ds-scheduler__process{
+  flex:0 0 112px;min-height:90px;padding:.55rem;display:grid;gap:.18rem;align-content:center;
+  border:2px solid color-mix(in srgb,var(--global-link-color) 85%,var(--global-border-color));
+  border-radius:10px;background:var(--ds-surface);text-align:center;box-shadow:inset 0 -2px 0 rgba(15,23,42,.045);font-weight:800
+}
+.ds-scheduler__process small{font-size:.7rem;opacity:.58;font-weight:700}
+.ds-scheduler__process.is-running{background:#fee2e2;border-color:#dc2626;color:#7f1d1d;transform:scale(1.03)}
+.ds-scheduler__process.is-complete{background:#dcfce7;border-color:#15803d;color:#14532d}
+.ds-scheduler__empty{width:100%;text-align:center;opacity:.58}
+.ds-scheduler__current-slot{
+  min-height:160px;display:grid;place-items:center;padding:.75rem;border:2px dashed var(--ds-border);
+  border-radius:12px;background:color-mix(in srgb,var(--global-text-color) 2.5%,var(--global-bg-color))
+}
+.ds-scheduler__progress{width:100%;height:11px;margin-top:.7rem;overflow:hidden;border-radius:999px;background:color-mix(in srgb,var(--global-text-color) 8%,var(--global-bg-color))}
+.ds-scheduler__progress-bar{height:100%;width:0;background:var(--global-link-color);transition:width .2s ease}
+
+.ds-scheduler__status{min-height:3rem;margin:.8rem 0 0;padding:.85rem;border-radius:10px;box-shadow:var(--ds-shadow-soft);font-weight:800}
+.ds-scheduler__status.is-success{color:#15803d}.ds-scheduler__status.is-error{color:#b91c1c}
+.ds-scheduler__stats{margin-top:.8rem}.ds-scheduler__stat strong{font-size:.75rem;opacity:.65}
+.ds-scheduler__lower{display:grid;grid-template-columns:minmax(320px,1.2fr) minmax(280px,.8fr);gap:.8rem;margin-top:.8rem}
+.ds-scheduler__table-panel,.ds-scheduler__log-panel{min-width:0;padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}
+.ds-scheduler__table-panel h3,.ds-scheduler__log-panel h3{margin:0 0 .55rem;font-size:1rem}
+.ds-scheduler__table-scroll{overflow-x:auto}.ds-scheduler table{width:100%;border-collapse:collapse;font-size:.86rem}
+.ds-scheduler th,.ds-scheduler td{padding:.6rem;border:1.5px solid var(--ds-border);text-align:left}
+.ds-scheduler th{background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color))}
+.ds-scheduler tr.is-running{background:#fee2e2;color:#7f1d1d}.ds-scheduler tr.is-complete{background:#dcfce7;color:#14532d}
+.ds-scheduler__log{max-height:300px;margin:0;padding-left:1.25rem;overflow-y:auto}.ds-scheduler__log li{margin:.25rem 0;font-size:.84rem}
+.ds-scheduler__cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
+.ds-scheduler__card{padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}
+.ds-scheduler__card h3{margin:0 0 .45rem;color:var(--global-text-color);font-size:1rem}.ds-scheduler__card p{margin:0;font-size:.9rem;line-height:1.55;opacity:.78}
+
+@media(max-width:850px){
+  .ds-scheduler__hero p{text-align:left}
+  .ds-scheduler__workspace,.ds-scheduler__lower{grid-template-columns:1fr}
+  .ds-scheduler__metrics,.ds-scheduler__stats,.ds-scheduler__cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ds-scheduler__speed{grid-template-columns:1fr}.ds-scheduler__speed output{text-align:left}
+}
+@media(max-width:520px){
+  .ds-scheduler__metrics,.ds-scheduler__stats,.ds-scheduler__cards,.ds-scheduler__group{grid-template-columns:1fr}
+  .ds-scheduler__queue-labels{font-size:.68rem}
+}
+@media(prefers-color-scheme:dark){
+  .ds-scheduler{
+    --ds-surface:var(--global-bg-color);
+    --ds-surface-strong:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));
+    --ds-border:color-mix(in srgb,var(--global-border-color) 85%,var(--global-text-color));
+    --ds-shadow:none;--ds-shadow-soft:none
+  }
+  .ds-scheduler__process{box-shadow:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .ds-scheduler *,.ds-scheduler *::before,.ds-scheduler *::after{transition-duration:.001ms!important;animation-duration:.001ms!important}
+}
+</style>
+
+<div class="ds-scheduler">
+  <section class="ds-scheduler__hero">
+    <h1>Round Robin Scheduler</h1>
+    <p>
+      Round Robin is a preemptive CPU scheduling algorithm. Processes wait in a FIFO ready queue and each process
+      receives at most one time quantum. If a process does not finish during its turn, it returns to the rear of
+      the ready queue and waits for another turn.
+    </p>
+
+    <div class="ds-scheduler__metrics">
+      <div class="ds-scheduler__metric"><strong>Scheduling structure</strong>FIFO queue</div>
+      <div class="ds-scheduler__metric"><strong>Preemption</strong>After each quantum</div>
+      <div class="ds-scheduler__metric"><strong>Fairness</strong>Every ready process gets CPU time</div>
+      <div class="ds-scheduler__metric"><strong>Queue operations</strong>O(1)</div>
     </div>
+  </section>
+
+  <section class="ds-scheduler__section">
+    <h2>Scheduler controls</h2>
+
+    <div class="ds-scheduler__panel">
+      <div class="ds-scheduler__group">
+        <div class="ds-scheduler__field">
+          <label for="ds-scheduler-burst">Burst time</label>
+          <input id="ds-scheduler-burst" type="number" min="1" max="30" value="6" inputmode="numeric">
+        </div>
+        <div class="ds-scheduler__field">
+          <label for="ds-scheduler-quantum">Time quantum</label>
+          <input id="ds-scheduler-quantum" type="number" min="1" max="10" value="2" inputmode="numeric">
+        </div>
+        <button class="ds-scheduler__btn" id="ds-scheduler-add" type="button">Add Process</button>
+        <button class="ds-scheduler__btn" id="ds-scheduler-random" type="button">Add Random</button>
+        <button class="ds-scheduler__btn" id="ds-scheduler-step-button" type="button">Run One Quantum</button>
+      </div>
+
+      <div class="ds-scheduler__group">
+        <button class="ds-scheduler__btn" id="ds-scheduler-auto" type="button">Auto Run</button>
+        <button class="ds-scheduler__btn ds-scheduler__btn--secondary" id="ds-scheduler-pause" type="button">Pause</button>
+        <button class="ds-scheduler__btn" id="ds-scheduler-example" type="button">Load Example</button>
+        <button class="ds-scheduler__btn ds-scheduler__btn--danger" id="ds-scheduler-reset" type="button">Reset</button>
+      </div>
+
+      <div class="ds-scheduler__speed">
+        <label for="ds-scheduler-speed">Auto-run speed</label>
+        <input id="ds-scheduler-speed" type="range" min="200" max="1500" step="100" value="700">
+        <output id="ds-scheduler-speed-output">700 ms</output>
+      </div>
+    </div>
+
+    <div class="ds-scheduler__workspace">
+      <div class="ds-scheduler__queue-panel">
+        <h3>Ready Queue</h3>
+        <div class="ds-scheduler__queue-labels">
+          <span>FRONT — next process</span>
+          <span>REAR — unfinished processes return here</span>
+        </div>
+        <div class="ds-scheduler__queue" id="ds-scheduler-queue"></div>
+      </div>
+
+      <div class="ds-scheduler__current-panel">
+        <h3>Current Process</h3>
+        <div class="ds-scheduler__current-slot" id="ds-scheduler-current"></div>
+        <div class="ds-scheduler__progress">
+          <div class="ds-scheduler__progress-bar" id="ds-scheduler-progress"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="ds-scheduler__status" id="ds-scheduler-status" role="status" aria-live="polite">
+      Add a process or load the example workload.
+    </p>
+
+    <div class="ds-scheduler__stats">
+      <div class="ds-scheduler__stat"><strong>Elapsed time</strong><span id="ds-scheduler-time">0</span></div>
+      <div class="ds-scheduler__stat"><strong>Ready processes</strong><span id="ds-scheduler-ready">0</span></div>
+      <div class="ds-scheduler__stat"><strong>Completed</strong><span id="ds-scheduler-completed">0</span></div>
+      <div class="ds-scheduler__stat"><strong>Context switches</strong><span id="ds-scheduler-switches">0</span></div>
+    </div>
+
+    <div class="ds-scheduler__lower">
+      <div class="ds-scheduler__table-panel">
+        <h3>Process metrics</h3>
+        <div class="ds-scheduler__table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Process</th><th>Burst</th><th>Remaining</th><th>Completion</th><th>Turnaround</th>
+              </tr>
+            </thead>
+            <tbody id="ds-scheduler-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="ds-scheduler__log-panel">
+        <h3>Execution log</h3>
+        <ol class="ds-scheduler__log" id="ds-scheduler-log"></ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-scheduler__section">
+    <h2>Round Robin concepts</h2>
+    <div class="ds-scheduler__cards">
+      <article class="ds-scheduler__card">
+        <h3>Ready queue</h3>
+        <p>The process at the front runs next. An unfinished process is enqueued again at the rear after its quantum expires.</p>
+      </article>
+      <article class="ds-scheduler__card">
+        <h3>Time quantum</h3>
+        <p>A smaller quantum improves responsiveness but increases context switches; a larger quantum behaves more like FCFS.</p>
+      </article>
+      <article class="ds-scheduler__card">
+        <h3>Fairness</h3>
+        <p>No ready process can permanently monopolize the CPU because execution rotates through the queue.</p>
+      </article>
+      <article class="ds-scheduler__card">
+        <h3>Queue connection</h3>
+        <p>Round Robin is a direct application of FIFO queue operations: dequeue from the front, execute, then optionally enqueue at the rear.</p>
+      </article>
+    </div>
+  </section>
 </div>
 
 <script>
-    "use strict";
+(() => {
+  "use strict";
 
-    const elements = {
-        burstInput: document.getElementById("burstInput"),
-        quantumInput: document.getElementById("quantumInput"),
-        speedInput: document.getElementById("speedInput"),
-        speedOutput: document.getElementById("speedOutput"),
-        queueTrack: document.getElementById("queueTrack"),
-        currentSlot: document.getElementById("currentSlot"),
-        progressBar: document.getElementById("progressBar"),
-        status: document.getElementById("status"),
-        timeStat: document.getElementById("timeStat"),
-        readyStat: document.getElementById("readyStat"),
-        completedStat: document.getElementById("completedStat"),
-        switchStat: document.getElementById("switchStat"),
-        processBody: document.getElementById("processBody"),
-        logList: document.getElementById("logList")
+  const root = document.querySelector(".ds-scheduler");
+  if (!root) return;
+
+  const q = id => root.querySelector("#" + id);
+
+  const el = {
+    burst: q("ds-scheduler-burst"),
+    quantum: q("ds-scheduler-quantum"),
+    speed: q("ds-scheduler-speed"),
+    speedOutput: q("ds-scheduler-speed-output"),
+    queue: q("ds-scheduler-queue"),
+    current: q("ds-scheduler-current"),
+    progress: q("ds-scheduler-progress"),
+    status: q("ds-scheduler-status"),
+    time: q("ds-scheduler-time"),
+    ready: q("ds-scheduler-ready"),
+    completed: q("ds-scheduler-completed"),
+    switches: q("ds-scheduler-switches"),
+    table: q("ds-scheduler-table"),
+    log: q("ds-scheduler-log")
+  };
+
+  const btn = {
+    add: q("ds-scheduler-add"),
+    random: q("ds-scheduler-random"),
+    step: q("ds-scheduler-step-button"),
+    auto: q("ds-scheduler-auto"),
+    pause: q("ds-scheduler-pause"),
+    example: q("ds-scheduler-example"),
+    reset: q("ds-scheduler-reset")
+  };
+
+  let processes = [];
+  let readyQueue = [];
+  let current = null;
+  let elapsed = 0;
+  let contextSwitches = 0;
+  let nextPid = 1;
+  let autoToken = 0;
+  let autoRunning = false;
+
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  function message(text, type = "") {
+    el.status.textContent = text;
+    el.status.classList.remove("is-success", "is-error");
+    if (type) el.status.classList.add(type);
+  }
+
+  function addLog(text) {
+    const li = document.createElement("li");
+    li.textContent = text;
+    el.log.prepend(li);
+    while (el.log.children.length > 12) el.log.removeChild(el.log.lastChild);
+  }
+
+  function getInt(input, label, min, max) {
+    const value = Number(input.value);
+    if (!Number.isInteger(value) || value < min || value > max) {
+      throw new Error(`${label} must be an integer from ${min} to ${max}.`);
+    }
+    return value;
+  }
+
+  function makeProcess(burst) {
+    return {
+      id: nextPid++,
+      burst,
+      remaining: burst,
+      completion: null
     };
+  }
 
-    const buttons = {
-        add: document.getElementById("addButton"),
-        random: document.getElementById("randomButton"),
-        step: document.getElementById("stepButton"),
-        auto: document.getElementById("autoButton"),
-        pause: document.getElementById("pauseButton"),
-        example: document.getElementById("exampleButton"),
-        reset: document.getElementById("resetButton")
-    };
+  function resetState() {
+    autoToken++;
+    autoRunning = false;
+    processes = [];
+    readyQueue = [];
+    current = null;
+    elapsed = 0;
+    contextSwitches = 0;
+    nextPid = 1;
+    el.log.innerHTML = "";
+    render();
+    message("Scheduler reset.");
+  }
 
-    let readyQueue = [];
-    let allProcesses = [];
-    let currentProcess = null;
-    let nextId = 1;
-    let currentTime = 0;
-    let contextSwitches = 0;
-    let autoRunning = false;
-    let autoToken = 0;
-    let logs = [];
+  function renderProcessCard(process, running = false) {
+    const card = document.createElement("div");
+    card.className = "ds-scheduler__process" + (running ? " is-running" : "");
+    card.innerHTML = `
+      <span>P${process.id}</span>
+      <small>Burst: ${process.burst}</small>
+      <small>Remaining: ${process.remaining}</small>
+    `;
+    return card;
+  }
 
-    function readInteger(input, label, min, max) {
-        const raw = input.value.trim();
-        if (raw === "") throw new Error(`${label} is required.`);
+  function render() {
+    el.queue.innerHTML = "";
 
-        const value = Number(raw);
-        if (!Number.isInteger(value) || value < min || value > max) {
-            throw new Error(`${label} must be an integer between ${min} and ${max}.`);
-        }
-        return value;
+    if (!readyQueue.length) {
+      el.queue.innerHTML = '<p class="ds-scheduler__empty">Ready queue is empty.</p>';
+    } else {
+      readyQueue.forEach(pid => {
+        const process = processes.find(p => p.id === pid);
+        if (process) el.queue.append(renderProcessCard(process));
+      });
     }
 
-    function createProcess(burst) {
-        const process = {
-            id: nextId++,
-            burst,
-            remaining: burst,
-            arrival: currentTime,
-            completion: null,
-            turnaround: null,
-            waiting: null
-        };
+    el.current.innerHTML = "";
 
-        allProcesses.push(process);
-        readyQueue.push(process);
-        addLog(`P${process.id} arrived with burst time ${burst}.`);
-        render();
+    if (current) {
+      const process = processes.find(p => p.id === current);
+      if (process) {
+        el.current.append(renderProcessCard(process, true));
+        const completedAmount = process.burst - process.remaining;
+        el.progress.style.width = `${(completedAmount / process.burst) * 100}%`;
+      }
+    } else {
+      el.current.innerHTML = '<p class="ds-scheduler__empty">CPU idle.</p>';
+      el.progress.style.width = "0%";
     }
 
-    function addProcess() {
-        try {
-            createProcess(readInteger(elements.burstInput, "Burst time", 1, 30));
-            setStatus("Process added to the ready queue.", "success");
-        } catch (error) {
-            setStatus(error.message, "error");
-        }
+    const done = processes.filter(p => p.completion !== null).length;
+
+    el.time.textContent = String(elapsed);
+    el.ready.textContent = String(readyQueue.length);
+    el.completed.textContent = `${done} / ${processes.length}`;
+    el.switches.textContent = String(contextSwitches);
+
+    el.table.innerHTML = processes.map(p => {
+      const running = p.id === current;
+      const complete = p.completion !== null;
+      return `
+        <tr class="${running ? "is-running" : complete ? "is-complete" : ""}">
+          <td>P${p.id}</td>
+          <td>${p.burst}</td>
+          <td>${p.remaining}</td>
+          <td>${p.completion ?? "—"}</td>
+          <td>${p.completion ?? "—"}</td>
+        </tr>
+      `;
+    }).join("");
+
+    btn.pause.disabled = !autoRunning;
+    btn.auto.disabled = autoRunning || (!readyQueue.length && !current);
+    btn.step.disabled = autoRunning || (!readyQueue.length && !current);
+    btn.add.disabled = btn.random.disabled = btn.example.disabled = autoRunning;
+    el.quantum.disabled = autoRunning;
+  }
+
+  async function runQuantum() {
+    if (!readyQueue.length && !current) {
+      message("No ready process is available.", "is-error");
+      return false;
     }
 
-    function addRandomProcess() {
-        createProcess(Math.floor(Math.random() * 10) + 1);
-        setStatus("Random process added.", "success");
+    if (!current) {
+      current = readyQueue.shift();
+      contextSwitches++;
     }
 
-    function getQuantum() {
-        return readInteger(elements.quantumInput, "Time quantum", 1, 10);
+    const process = processes.find(p => p.id === current);
+    if (!process) return false;
+
+    const quantum = getInt(el.quantum, "Time quantum", 1, 10);
+    const slice = Math.min(quantum, process.remaining);
+
+    message(`Running P${process.id} for ${slice} time unit${slice === 1 ? "" : "s"}.`);
+    addLog(`t=${elapsed}: P${process.id} starts a quantum of ${slice}.`);
+    render();
+
+    process.remaining -= slice;
+    elapsed += slice;
+
+    await wait(120);
+
+    if (process.remaining === 0) {
+      process.completion = elapsed;
+      addLog(`t=${elapsed}: P${process.id} completes.`);
+      message(`P${process.id} completed at time ${elapsed}.`, "is-success");
+      current = null;
+    } else {
+      readyQueue.push(process.id);
+      addLog(`t=${elapsed}: P${process.id} has ${process.remaining} remaining and returns to the rear.`);
+      message(`P${process.id} used its quantum and returned to the rear of the queue.`);
+      current = null;
     }
-
-    function addLog(message) {
-        logs.unshift(`[t=${currentTime}] ${message}`);
-        logs = logs.slice(0, 40);
-        elements.logList.innerHTML = logs.map((entry) => `<li>${escapeHtml(entry)}</li>`).join("");
-    }
-
-    function escapeHtml(value) {
-        return String(value)
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
-    }
-
-    function setStatus(message, type = "") {
-        elements.status.textContent = message;
-        elements.status.className = `status ${type}`.trim();
-    }
-
-    function processCard(process, running = false) {
-        const card = document.createElement("div");
-        card.className = `process-card ${running ? "running" : ""}`.trim();
-        card.innerHTML = `
-            <span>P${process.id}</span>
-            <small>remaining ${process.remaining} / ${process.burst}</small>
-        `;
-        return card;
-    }
-
-    function render() {
-        elements.queueTrack.innerHTML = "";
-
-        if (readyQueue.length === 0) {
-            const empty = document.createElement("p");
-            empty.className = "empty-state";
-            empty.textContent = "The ready queue is empty.";
-            elements.queueTrack.appendChild(empty);
-        } else {
-            readyQueue.forEach((process) => {
-                elements.queueTrack.appendChild(processCard(process));
-            });
-        }
-
-        elements.currentSlot.innerHTML = "";
-        if (currentProcess) {
-            elements.currentSlot.appendChild(processCard(currentProcess, true));
-            const completed = currentProcess.burst - currentProcess.remaining;
-            elements.progressBar.style.width = `${(completed / currentProcess.burst) * 100}%`;
-        } else {
-            elements.currentSlot.innerHTML = '<p class="empty-state">CPU is idle.</p>';
-            elements.progressBar.style.width = "0%";
-        }
-
-        elements.timeStat.textContent = String(currentTime);
-        elements.readyStat.textContent = String(readyQueue.length);
-        elements.completedStat.textContent = String(
-            allProcesses.filter((process) => process.completion !== null).length
-        );
-        elements.switchStat.textContent = String(contextSwitches);
-
-        elements.processBody.innerHTML = allProcesses.map((process) => `
-            <tr class="${process.completion !== null ? "completed-row" : ""}">
-                <td>P${process.id}</td>
-                <td>${process.burst}</td>
-                <td>${process.remaining}</td>
-                <td>${process.completion ?? "—"}</td>
-                <td>${process.turnaround ?? "—"}</td>
-                <td>${process.waiting ?? "—"}</td>
-            </tr>
-        `).join("");
-
-        updateButtons();
-    }
-
-    function updateButtons() {
-        const noWork = readyQueue.length === 0 && !currentProcess;
-        buttons.step.disabled = autoRunning || noWork;
-        buttons.auto.disabled = autoRunning || noWork;
-        buttons.pause.disabled = !autoRunning;
-        buttons.add.disabled = autoRunning;
-        buttons.random.disabled = autoRunning;
-        buttons.example.disabled = autoRunning;
-        elements.burstInput.disabled = autoRunning;
-        elements.quantumInput.disabled = autoRunning;
-    }
-
-    function runOneQuantum() {
-        try {
-            if (!currentProcess && readyQueue.length === 0) {
-                setStatus("No processes are ready to run.", "error");
-                return false;
-            }
-
-            const quantum = getQuantum();
-
-            if (!currentProcess) {
-                currentProcess = readyQueue.shift();
-                contextSwitches += 1;
-                addLog(`P${currentProcess.id} entered the CPU.`);
-            }
-
-            const executionTime = Math.min(quantum, currentProcess.remaining);
-            currentProcess.remaining -= executionTime;
-            currentTime += executionTime;
-
-            addLog(
-                `P${currentProcess.id} executed for ${executionTime} unit(s); ` +
-                `${currentProcess.remaining} remaining.`
-            );
-
-            if (currentProcess.remaining === 0) {
-                currentProcess.completion = currentTime;
-                currentProcess.turnaround = currentProcess.completion - currentProcess.arrival;
-                currentProcess.waiting = currentProcess.turnaround - currentProcess.burst;
-                addLog(`P${currentProcess.id} completed.`);
-                setStatus(`P${currentProcess.id} completed at time ${currentTime}.`, "success");
-                currentProcess = null;
-            } else {
-                readyQueue.push(currentProcess);
-                addLog(`P${currentProcess.id} returned to the rear of the ready queue.`);
-                setStatus(`Quantum expired; P${currentProcess.id} returned to the queue.`);
-                currentProcess = null;
-            }
-
-            render();
-            return true;
-        } catch (error) {
-            setStatus(error.message, "error");
-            return false;
-        }
-    }
-
-    function getAutoDelay() {
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return 0;
-        return Number(elements.speedInput.value);
-    }
-
-    function wait(milliseconds, token) {
-        return new Promise((resolve) => {
-            window.setTimeout(() => resolve(token === autoToken), milliseconds);
-        });
-    }
-
-    async function autoRun() {
-        if (autoRunning || (readyQueue.length === 0 && !currentProcess)) return;
-
-        autoRunning = true;
-        const token = ++autoToken;
-        render();
-        setStatus("Automatic scheduling started.");
-
-        while (
-            token === autoToken &&
-            (readyQueue.length > 0 || currentProcess)
-        ) {
-            if (!runOneQuantum()) break;
-            if (!(await wait(getAutoDelay(), token))) break;
-        }
-
-        if (token === autoToken) {
-            autoRunning = false;
-            render();
-
-            if (readyQueue.length === 0 && !currentProcess) {
-                setStatus(`All processes completed at time ${currentTime}.`, "success");
-            }
-        }
-    }
-
-    function pauseAutoRun() {
-        if (!autoRunning) return;
-        autoToken += 1;
-        autoRunning = false;
-        render();
-        setStatus("Automatic scheduling paused.");
-    }
-
-    function loadExample() {
-        resetScheduler(false);
-        [5, 9, 3, 7].forEach((burst) => createProcess(burst));
-        setStatus("Loaded four example processes.", "success");
-    }
-
-    function resetScheduler(showMessage = true) {
-        autoToken += 1;
-        autoRunning = false;
-        readyQueue = [];
-        allProcesses = [];
-        currentProcess = null;
-        nextId = 1;
-        currentTime = 0;
-        contextSwitches = 0;
-        logs = [];
-        elements.logList.innerHTML = "<li>No scheduler events yet.</li>";
-        render();
-
-        if (showMessage) {
-            setStatus("Scheduler reset.");
-        }
-    }
-
-    elements.speedInput.addEventListener("input", () => {
-        elements.speedOutput.value = `${elements.speedInput.value} ms`;
-        elements.speedOutput.textContent = `${elements.speedInput.value} ms`;
-    });
-
-    elements.burstInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            addProcess();
-        }
-    });
-
-    buttons.add.addEventListener("click", addProcess);
-    buttons.random.addEventListener("click", addRandomProcess);
-    buttons.step.addEventListener("click", runOneQuantum);
-    buttons.auto.addEventListener("click", autoRun);
-    buttons.pause.addEventListener("click", pauseAutoRun);
-    buttons.example.addEventListener("click", loadExample);
-    buttons.reset.addEventListener("click", () => resetScheduler(true));
 
     render();
+    return true;
+  }
+
+  btn.add.addEventListener("click", () => {
+    try {
+      const burst = getInt(el.burst, "Burst time", 1, 30);
+      const process = makeProcess(burst);
+      processes.push(process);
+      readyQueue.push(process.id);
+      addLog(`P${process.id} added with burst ${burst}.`);
+      message(`Added P${process.id} to the ready queue.`, "is-success");
+      render();
+    } catch (error) {
+      message(error.message, "is-error");
+    }
+  });
+
+  btn.random.addEventListener("click", () => {
+    const burst = Math.floor(Math.random() * 9) + 2;
+    const process = makeProcess(burst);
+    processes.push(process);
+    readyQueue.push(process.id);
+    addLog(`P${process.id} added with random burst ${burst}.`);
+    message(`Added random process P${process.id}.`, "is-success");
+    render();
+  });
+
+  btn.step.addEventListener("click", async () => {
+    try {
+      await runQuantum();
+    } catch (error) {
+      message(error.message, "is-error");
+    }
+  });
+
+  btn.auto.addEventListener("click", async () => {
+    if (!readyQueue.length && !current) return;
+
+    autoRunning = true;
+    const token = ++autoToken;
+    render();
+
+    while ((readyQueue.length || current) && token === autoToken) {
+      try {
+        await runQuantum();
+      } catch (error) {
+        message(error.message, "is-error");
+        break;
+      }
+
+      if (token !== autoToken) break;
+      await wait(Number(el.speed.value));
+    }
+
+    if (token === autoToken) {
+      autoRunning = false;
+      render();
+
+      if (processes.length && processes.every(p => p.completion !== null)) {
+        message(`All processes completed at time ${elapsed}.`, "is-success");
+      }
+    }
+  });
+
+  btn.pause.addEventListener("click", () => {
+    autoToken++;
+    autoRunning = false;
+    render();
+    message("Auto run paused.");
+  });
+
+  btn.example.addEventListener("click", () => {
+    autoToken++;
+    autoRunning = false;
+    processes = [];
+    readyQueue = [];
+    current = null;
+    elapsed = 0;
+    contextSwitches = 0;
+    nextPid = 1;
+    el.log.innerHTML = "";
+
+    [5, 8, 3, 6].forEach(burst => {
+      const p = makeProcess(burst);
+      processes.push(p);
+      readyQueue.push(p.id);
+    });
+
+    el.quantum.value = "2";
+    addLog("Example workload loaded: P1=5, P2=8, P3=3, P4=6.");
+    message("Example workload loaded.", "is-success");
+    render();
+  });
+
+  btn.reset.addEventListener("click", resetState);
+
+  el.speed.addEventListener("input", () => {
+    el.speedOutput.textContent = `${el.speed.value} ms`;
+  });
+
+  render();
+})();
 </script>
-</body>
-</html>
