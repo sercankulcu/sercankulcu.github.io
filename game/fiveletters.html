@@ -367,21 +367,8 @@ excerpt: "Guess the hidden five-letter Turkish word in six attempts."
 (() => {
   "use strict";
 
-  const WORDS = [
-    "ELMAS",
-    "KALEM",
-    "DENİZ",
-    "KİTAP",
-    "SEVGİ",
-    "BULUT",
-    "ÇİÇEK",
-    "KÖPRÜ",
-    "GÜNEŞ",
-    "MASAL",
-    "BAHAR",
-    "ORMAN",
-    "YOLCU"
-  ];
+  let WORDS = [];
+  let VALID_WORDS = new Set();
 
   const SIZE = 5;
   const MAX_ATTEMPTS = 6;
@@ -530,6 +517,11 @@ excerpt: "Guess the hidden five-letter Turkish word in six attempts."
       return;
     }
 
+    if (!VALID_WORDS.has(currentGuess)) {
+      message.textContent = "Not in word list.";
+      return;
+    }
+
     const result = evaluate(currentGuess);
 
     history.push({
@@ -660,7 +652,47 @@ excerpt: "Guess the hidden five-letter Turkish word in six attempts."
     }
   });
 
-  buildKeyboard();
-  startGame();
+  async function loadWords() {
+    restart.disabled = true;
+    message.textContent = "Loading words...";
+
+    try {
+      const response = await fetch("/game/words-five-letters.json", {
+        cache: "no-cache"
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (
+        !data ||
+        !Array.isArray(data.wordsFiveLetters) ||
+        !Array.isArray(data.allwordsFiveLetters) ||
+        data.wordsFiveLetters.length === 0 ||
+        data.allwordsFiveLetters.length === 0
+      ) {
+        throw new Error("Five-letter word data is missing or invalid.");
+      }
+
+      WORDS = data.wordsFiveLetters.map(normalize);
+      VALID_WORDS = new Set(data.allwordsFiveLetters.map(normalize));
+
+      restart.disabled = false;
+      message.textContent = "";
+      buildKeyboard();
+      startGame();
+    } catch (error) {
+      console.error("Five-letter word list could not be loaded:", error);
+      restart.disabled = true;
+      keyboard.innerHTML = "";
+      boardView.innerHTML = "";
+      message.textContent = "Word list could not be loaded.";
+    }
+  }
+
+  loadWords();
 })();
 </script>
