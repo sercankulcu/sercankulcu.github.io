@@ -75,8 +75,8 @@ There are currently no announcements.
 
 ## Preliminary Materials: 
 
-* Prerequisites for preparation [pdf](../files/data_structures/Data_Structures_Prerequisites.html)
-* Key figures who have shaped the field [pdf](../files/data_structures/Data_Structures_Important_People.html)
+* Prerequisites for preparation [(HTML)](../files/data_structures/Data_Structures_Prerequisites.html)
+* Key figures who have shaped the field [(HTML)](../files/data_structures/Data_Structures_Important_People.html)
 
 ---
 
@@ -148,6 +148,7 @@ A queue follows the First-In-First-Out (FIFO) principle, similar to a line of pe
 A list is an abstract data type representing an ordered sequence of elements. It can grow or shrink dynamically and supports operations such as insertion, deletion, access, and traversal. Lists may be implemented using dynamic arrays, linked structures, or other underlying representations. In Java, commonly used implementations include ArrayList and LinkedList, each offering different performance characteristics.
 
 - [🖼️Sunum-Liste (PDF)](../files/data_structures/slides/Bolum_06_Liste.pdf)
+- [🕹️List ADT Simulator (HTML)](../files/data_structures/slides/Bolum_06_List_ADT.html)
 - [🖼️Sunum-Sorular (PDF)](../files/data_structures/slides/Bolum_06_Sorular.pdf)
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_04_Lists.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders06/src)
@@ -228,7 +229,7 @@ A graph is a versatile data structure consisting of vertices (or nodes) connecte
 A set is a collection of distinct elements where order doesn't matter and duplicates are not allowed. Think of it as a mathematical set, perfect for maintaining a unique collection of items. Sets support operations like union, intersection, and difference, making them invaluable for comparing collections of data or removing duplicates. Sets are commonly implemented using hash tables for average-case constant-time operations or balanced search trees when sorted iteration and ordered operations are required. Sets are extensively used in database queries, finding unique values, and checking for membership in a collection.
 
 - [🖼️Sunum-Kümeler (PDF)](../files/data_structures/slides/Bolum_12_Kumeler.pdf)  
-- [🕹️Sets Simulator (HTML)](../files/data_structures/slides/Bolum_12_Sets.html)  
+- [🕹️Disjoint Set Union Simulator (HTML)](../files/data_structures/slides/Bolum_12_Disjoint_Set_Union.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src)  
 
