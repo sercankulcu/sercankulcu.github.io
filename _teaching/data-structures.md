@@ -67,16 +67,12 @@ There are currently no announcements.
   [final](../files/data_structures/slides/2023-2024-data-final-cevaplar.pdf) | 
   [but](../files/data_structures/slides/2023-2024-data-butunleme-cevaplar.pdf)
 
-- **Çalışma Soruları**  
-  [vize](../files/data_structures/slides/vize_calisma.txt) | 
-  [final](../files/data_structures/slides/final_calisma.txt)
-
 ---
 
 ## Preliminary Materials: 
 
-* Prerequisites for preparation [(HTML)](../files/data_structures/Data_Structures_Prerequisites.html)
-* Key figures who have shaped the field [(HTML)](../files/data_structures/Data_Structures_Important_People.html)
+* [Important People in Data Structures (HTML)](../files/data_structures/Data_Structures_Important_People.html)
+* [Prerequisites for Data Structures (HTML)](../files/data_structures/Data_Structures_Prerequisites.html)
 
 ---
 
@@ -134,7 +130,9 @@ A stack operates on the Last-In-First-Out (LIFO) principle, much like a stack of
 A queue follows the First-In-First-Out (FIFO) principle, similar to a line of people waiting for a service. Elements are added at one end (enqueue) and removed from the other end (dequeue), making it ideal for managing tasks that need to be processed in the order they were received. Queues are extensively used in scenarios like print job scheduling, handling requests in web servers, or managing any kind of service where maintaining order of arrival is important.
 
 - [🖼️Sunum-Kuyruk (PDF)](../files/data_structures/slides/Bolum_05_Kuyruk.pdf)  
-- [🕹️Queue Simulator (HTML)](../files/data_structures/slides/Bolum_05_Queue.html)  
+- 🕹️Simulators:
+  - [Queue Simulator (HTML)](../files/data_structures/slides/Bolum_05_Queue.html)
+  - [Deque Simulator (HTML)](../files/data_structures/slides/Bolum_05_Deque.html)
 - 🕹️Applications:
   - [Scheduler](../files/data_structures/slides/Bolum_05_Scheduler.html)
   - [Priority Scheduler](../files/data_structures/slides/Bolum_05_Priority_Scheduler.html)
@@ -217,8 +215,10 @@ A search tree, particularly a Binary Search Tree (BST), is a binary tree data st
 A graph is a versatile data structure consisting of vertices (or nodes) connected by edges, representing relationships between objects. Unlike trees, graphs can have cycles and multiple paths between nodes. They can be directed (edges have direction) or undirected, weighted or unweighted. Graphs are essential for modeling complex networks like social connections, road maps, computer networks, or any system where relationships between entities need to be represented and analyzed. They support various algorithms for traversal, shortest path finding, and network analysis. Understanding graph theory and traversal algorithms is essential for solving complex problems.
 
 - [🖼️Sunum-Çizge (PDF)](../files/data_structures/slides/Bolum_11_Cizge.pdf)  
-- [🕹️Graph Simulator (HTML)](../files/data_structures/slides/Bolum_11_Graph.html)  
-- [🕹️Dijkstra Simulator (HTML)](../files/data_structures/slides/Bolum_11_Dijkstra.html)  
+- 🕹️Simulators:
+  - [Graph Simulator (HTML)](../files/data_structures/slides/Bolum_11_Graph.html)
+  - [Directed Graph Simulator (HTML)](../files/data_structures/slides/Bolum_11_Directed_Graph.html)
+  - [Dijkstra Simulator (HTML)](../files/data_structures/slides/Bolum_11_Dijkstra.html)
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_07_Graphs.pdf)  
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders11/src)  
 
@@ -229,7 +229,9 @@ A graph is a versatile data structure consisting of vertices (or nodes) connecte
 A set is a collection of distinct elements where order doesn't matter and duplicates are not allowed. Think of it as a mathematical set, perfect for maintaining a unique collection of items. Sets support operations like union, intersection, and difference, making them invaluable for comparing collections of data or removing duplicates. Sets are commonly implemented using hash tables for average-case constant-time operations or balanced search trees when sorted iteration and ordered operations are required. Sets are extensively used in database queries, finding unique values, and checking for membership in a collection.
 
 - [🖼️Sunum-Kümeler (PDF)](../files/data_structures/slides/Bolum_12_Kumeler.pdf)  
-- [🕹️Disjoint Set Union Simulator (HTML)](../files/data_structures/slides/Bolum_12_Disjoint_Set_Union.html)  
+- 🕹️Simulators:
+  - [🕹️Set ADT Simulator (HTML)](../files/data_structures/slides/Bolum_12_Set_ADT.html)
+  - [🕹️Disjoint Set Union Simulator (HTML)](../files/data_structures/slides/Bolum_12_Disjoint_Set_Union.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src)  
 

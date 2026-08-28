@@ -1,0 +1,358 @@
+---
+layout: without-sidebar
+title: "Directed Graph Simulator"
+permalink: /files/data_structures/slides/Bolum_11_Directed_Graph.html
+excerpt: "Interactive directed graph simulator with indegree, outdegree, BFS, DFS, topological sorting, cycle detection, adjacency views, and responsive SVG visualization."
+---
+
+<style>
+.ds-dgraph,.ds-dgraph *,.ds-dgraph *::before,.ds-dgraph *::after{box-sizing:border-box}
+.ds-dgraph{
+  width:min(1220px,100%);margin:0 auto 2rem;color:var(--global-text-color);
+  --ds-surface:color-mix(in srgb,var(--global-link-color) 2.5%,var(--global-bg-color));
+  --ds-surface-strong:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  --ds-border:color-mix(in srgb,var(--global-link-color) 38%,var(--global-border-color));
+  --ds-shadow:0 8px 24px rgba(15,23,42,.065);
+  --ds-shadow-soft:0 3px 10px rgba(15,23,42,.045)
+}
+.ds-dgraph__hero,.ds-dgraph__panel,.ds-dgraph__visual,.ds-dgraph__status,.ds-dgraph__result,.ds-dgraph__repr,.ds-dgraph__card{
+  border:1.5px solid var(--ds-border);background:var(--ds-surface)
+}
+.ds-dgraph__hero{padding:1.35rem;border-radius:16px;background:var(--ds-surface-strong);box-shadow:var(--ds-shadow)}
+.ds-dgraph__hero h1{margin:0 0 .55rem;text-align:center;color:var(--global-text-color);font-size:clamp(1.65rem,4vw,2.3rem)}
+.ds-dgraph__hero p{margin:0;line-height:1.65;text-align:justify;opacity:.86}
+.ds-dgraph__metrics,.ds-dgraph__stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem}
+.ds-dgraph__metrics{margin-top:1rem}.ds-dgraph__metric,.ds-dgraph__stat{padding:.75rem;border:1.5px solid var(--ds-border);border-radius:10px;background:var(--ds-surface)}
+.ds-dgraph__metric strong,.ds-dgraph__stat strong{display:block;margin-bottom:.15rem}
+.ds-dgraph__section{margin-top:1.4rem}.ds-dgraph__section h2{margin:0 0 .7rem;font-size:1.2rem}
+.ds-dgraph__panel{display:grid;gap:.8rem;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow-soft)}
+.ds-dgraph__group{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;align-items:end}
+.ds-dgraph__field{display:grid;gap:.3rem}.ds-dgraph__field label,.ds-dgraph__speed label{font-size:.86rem;font-weight:800}
+.ds-dgraph input,.ds-dgraph select{width:100%;min-height:42px;padding:.55rem .65rem;border:1.5px solid var(--ds-border);border-radius:9px;background:var(--ds-surface);color:var(--global-text-color);font:inherit}
+.ds-dgraph input:focus-visible,.ds-dgraph select:focus-visible,.ds-dgraph button:focus-visible{outline:3px solid color-mix(in srgb,var(--global-link-color) 30%,transparent);outline-offset:2px}
+.ds-dgraph__btn{min-height:42px;padding:.55rem .75rem;border:1px solid var(--global-link-color);border-radius:9px;background:var(--global-link-color);color:#fff;font:inherit;font-weight:800;cursor:pointer}
+.ds-dgraph__btn--secondary{border-color:var(--ds-border);background:var(--ds-surface);color:var(--global-text-color)}
+.ds-dgraph__btn--danger{border-color:#b91c1c;background:#b91c1c}
+.ds-dgraph__btn:disabled{opacity:.5;cursor:not-allowed}
+.ds-dgraph__speed{display:grid;grid-template-columns:140px 1fr auto;gap:.65rem;align-items:center}
+.ds-dgraph__visual{margin-top:1rem;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow);overflow:auto}
+.ds-dgraph__canvas{min-width:800px}.ds-dgraph__svg{display:block;width:100%;height:auto;min-height:540px;touch-action:none}
+.ds-dgraph__edge{stroke:color-mix(in srgb,var(--global-text-color) 40%,var(--global-border-color));stroke-width:3;marker-end:url(#ds-dgraph-arrow)}
+.ds-dgraph__edge.is-active{stroke:#e11d48;stroke-width:5}
+.ds-dgraph__node circle{fill:var(--ds-surface);stroke:color-mix(in srgb,var(--global-link-color) 85%,var(--global-border-color));stroke-width:3}
+.ds-dgraph__node text.label{font-weight:800;fill:var(--global-text-color);text-anchor:middle;dominant-baseline:middle}
+.ds-dgraph__node text.meta{font-size:11px;fill:var(--global-text-color);text-anchor:middle;opacity:.62}
+.ds-dgraph__node.is-queued circle{fill:#fef3c7;stroke:#d97706;stroke-width:5}
+.ds-dgraph__node.is-visited circle{fill:#dcfce7;stroke:#15803d;stroke-width:5}
+.ds-dgraph__node.is-current circle{fill:#dcfce7;stroke:#15803d;stroke-width:6}
+.ds-dgraph__node.is-dragging circle{stroke:#f97316;stroke-width:5}
+.ds-dgraph__status{margin-top:.8rem;padding:.85rem;border-radius:10px;font-weight:800}
+.ds-dgraph__status.is-success{color:#15803d}.ds-dgraph__status.is-error{color:#b91c1c}
+.ds-dgraph__results,.ds-dgraph__representations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin-top:.8rem}
+.ds-dgraph__result,.ds-dgraph__repr{padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft);min-width:0}
+.ds-dgraph__result h3,.ds-dgraph__repr h3{margin:0 0 .55rem;font-size:1rem}
+.ds-dgraph__output{min-height:44px;padding:.6rem;border-radius:8px;background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color));font-family:Consolas,Monaco,monospace;overflow-wrap:anywhere}
+.ds-dgraph__frontier{display:flex;flex-wrap:wrap;gap:.45rem;min-height:45px;padding:.5rem;border-radius:8px;background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color))}
+.ds-dgraph__frontier span{padding:.4rem .65rem;border:1.5px solid var(--ds-border);border-radius:7px;background:var(--ds-surface-strong);font-weight:800}
+.ds-dgraph__scroll{overflow:auto;max-height:360px}.ds-dgraph__adj-list{margin:0;padding-left:1.4rem}.ds-dgraph__adj-list li{margin:.35rem 0;font-family:Consolas,Monaco,monospace}
+.ds-dgraph table{border-collapse:collapse;font-size:.88rem}.ds-dgraph th,.ds-dgraph td{min-width:38px;padding:.45rem;text-align:center;border:1.5px solid var(--ds-border)}.ds-dgraph th{background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color))}
+.ds-dgraph__cards{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.ds-dgraph__card{padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}
+.ds-dgraph__card h3{margin:0 0 .45rem}.ds-dgraph__card p{margin:0;line-height:1.55;opacity:.78}
+@media(max-width:820px){.ds-dgraph__hero p{text-align:left}.ds-dgraph__metrics,.ds-dgraph__stats,.ds-dgraph__cards,.ds-dgraph__results,.ds-dgraph__representations{grid-template-columns:repeat(2,1fr)}.ds-dgraph__speed{grid-template-columns:1fr}}
+@media(max-width:620px){.ds-dgraph__metrics,.ds-dgraph__stats,.ds-dgraph__cards,.ds-dgraph__results,.ds-dgraph__representations,.ds-dgraph__group{grid-template-columns:1fr}}
+@media(prefers-color-scheme:dark){.ds-dgraph{--ds-surface:var(--global-bg-color);--ds-surface-strong:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));--ds-border:color-mix(in srgb,var(--global-border-color) 85%,var(--global-text-color));--ds-shadow:none;--ds-shadow-soft:none}}
+@media(prefers-reduced-motion:reduce){.ds-dgraph *,.ds-dgraph *::before,.ds-dgraph *::after{transition-duration:.001ms!important;animation-duration:.001ms!important}}
+</style>
+
+<div class="ds-dgraph">
+  <section class="ds-dgraph__hero">
+    <h1>Directed Graph Simulator</h1>
+    <p>A directed graph stores edges with orientation: an edge from A to B does not automatically create an edge from B to A. This simulator focuses on directed traversal, indegree/outdegree, adjacency representations, and topological sorting of directed acyclic graphs.</p>
+    <div class="ds-dgraph__metrics">
+      <div class="ds-dgraph__metric"><strong>BFS / DFS</strong>O(V + E)</div>
+      <div class="ds-dgraph__metric"><strong>Topological sort</strong>O(V + E)</div>
+      <div class="ds-dgraph__metric"><strong>Edge type</strong>Directed</div>
+      <div class="ds-dgraph__metric"><strong>Topo requirement</strong>DAG</div>
+    </div>
+  </section>
+
+  <section class="ds-dgraph__section">
+    <h2>Graph editing and traversal</h2>
+    <div class="ds-dgraph__panel">
+      <div class="ds-dgraph__group">
+        <div class="ds-dgraph__field"><label for="ds-dgraph-label">New vertex label</label><input id="ds-dgraph-label" type="text" value="A" maxlength="8"></div>
+        <button class="ds-dgraph__btn" id="ds-dgraph-add" type="button">Add Vertex</button>
+        <div class="ds-dgraph__field"><label for="ds-dgraph-from">From</label><select id="ds-dgraph-from"></select></div>
+        <div class="ds-dgraph__field"><label for="ds-dgraph-to">To</label><select id="ds-dgraph-to"></select></div>
+        <button class="ds-dgraph__btn" id="ds-dgraph-edge" type="button">Add / Remove Edge</button>
+        <button class="ds-dgraph__btn" id="ds-dgraph-remove" type="button">Remove Vertex</button>
+      </div>
+
+      <div class="ds-dgraph__group">
+        <div class="ds-dgraph__field"><label for="ds-dgraph-start">Traversal start</label><select id="ds-dgraph-start"></select></div>
+        <button class="ds-dgraph__btn" id="ds-dgraph-bfs" type="button">Run BFS</button>
+        <button class="ds-dgraph__btn" id="ds-dgraph-dfs" type="button">Run DFS</button>
+        <button class="ds-dgraph__btn" id="ds-dgraph-topo" type="button">Topological Sort</button>
+        <button class="ds-dgraph__btn" id="ds-dgraph-cycle" type="button">Detect Cycle</button>
+        <button class="ds-dgraph__btn" id="ds-dgraph-example" type="button">Load DAG Example</button>
+        <button class="ds-dgraph__btn" id="ds-dgraph-cycle-example" type="button">Load Cycle Example</button>
+        <button class="ds-dgraph__btn ds-dgraph__btn--danger" id="ds-dgraph-clear" type="button">Clear</button>
+        <button class="ds-dgraph__btn ds-dgraph__btn--secondary" id="ds-dgraph-cancel" type="button">Cancel Animation</button>
+      </div>
+
+      <div class="ds-dgraph__speed">
+        <label for="ds-dgraph-speed">Animation speed</label>
+        <input id="ds-dgraph-speed" type="range" min="100" max="1000" step="100" value="350">
+        <output id="ds-dgraph-speed-output">350 ms</output>
+      </div>
+    </div>
+
+    <div class="ds-dgraph__visual">
+      <div class="ds-dgraph__canvas"><svg id="ds-dgraph-svg" class="ds-dgraph__svg" viewBox="0 0 1000 540" role="img" aria-label="Interactive directed graph"></svg></div>
+      <p id="ds-dgraph-status" class="ds-dgraph__status" role="status">Directed acyclic graph example loaded.</p>
+
+      <div class="ds-dgraph__stats">
+        <div class="ds-dgraph__stat"><strong>Vertices</strong><span id="ds-dgraph-v">0</span></div>
+        <div class="ds-dgraph__stat"><strong>Edges</strong><span id="ds-dgraph-e">0</span></div>
+        <div class="ds-dgraph__stat"><strong>Sources</strong><span id="ds-dgraph-sources">0</span></div>
+        <div class="ds-dgraph__stat"><strong>Sinks</strong><span id="ds-dgraph-sinks">0</span></div>
+      </div>
+    </div>
+
+    <div class="ds-dgraph__results">
+      <div class="ds-dgraph__result">
+        <h3>Traversal / topological order</h3>
+        <div id="ds-dgraph-order" class="ds-dgraph__output">—</div>
+        <h3 style="margin-top:1rem">Frontier</h3>
+        <div id="ds-dgraph-frontier" class="ds-dgraph__frontier"></div>
+      </div>
+
+      <div class="ds-dgraph__result">
+        <h3>Current step</h3>
+        <div id="ds-dgraph-step" class="ds-dgraph__output">—</div>
+      </div>
+    </div>
+
+    <div class="ds-dgraph__representations">
+      <div class="ds-dgraph__repr"><h3>Adjacency list</h3><div id="ds-dgraph-list" class="ds-dgraph__scroll"></div></div>
+      <div class="ds-dgraph__repr"><h3>Adjacency matrix</h3><div id="ds-dgraph-matrix" class="ds-dgraph__scroll"></div></div>
+    </div>
+  </section>
+
+  <section class="ds-dgraph__section">
+    <h2>Directed graph concepts</h2>
+    <div class="ds-dgraph__cards">
+      <article class="ds-dgraph__card"><h3>Indegree and outdegree</h3><p>Indegree counts incoming edges; outdegree counts outgoing edges. A source has indegree 0, while a sink has outdegree 0.</p></article>
+      <article class="ds-dgraph__card"><h3>Direction matters</h3><p>A → B and B → A are different edges. Reachability therefore depends on edge orientation.</p></article>
+      <article class="ds-dgraph__card"><h3>Topological sort</h3><p>Kahn's algorithm repeatedly removes vertices with indegree 0. A complete ordering exists only for a directed acyclic graph.</p></article>
+      <article class="ds-dgraph__card"><h3>Cycle detection</h3><p>If Kahn's algorithm cannot process every vertex, at least one directed cycle prevents a topological ordering.</p></article>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var root=document.querySelector(".ds-dgraph");if(!root)return;
+  function q(id){return root.querySelector("#"+id);}
+  var ns="http://www.w3.org/2000/svg";
+
+  var el={label:q("ds-dgraph-label"),from:q("ds-dgraph-from"),to:q("ds-dgraph-to"),start:q("ds-dgraph-start"),
+    speed:q("ds-dgraph-speed"),speedOut:q("ds-dgraph-speed-output"),svg:q("ds-dgraph-svg"),status:q("ds-dgraph-status"),
+    v:q("ds-dgraph-v"),e:q("ds-dgraph-e"),sources:q("ds-dgraph-sources"),sinks:q("ds-dgraph-sinks"),
+    order:q("ds-dgraph-order"),frontier:q("ds-dgraph-frontier"),step:q("ds-dgraph-step"),list:q("ds-dgraph-list"),matrix:q("ds-dgraph-matrix")};
+  var btn={add:q("ds-dgraph-add"),edge:q("ds-dgraph-edge"),remove:q("ds-dgraph-remove"),bfs:q("ds-dgraph-bfs"),
+    dfs:q("ds-dgraph-dfs"),topo:q("ds-dgraph-topo"),cycle:q("ds-dgraph-cycle"),example:q("ds-dgraph-example"),
+    cycleExample:q("ds-dgraph-cycle-example"),clear:q("ds-dgraph-clear"),cancel:q("ds-dgraph-cancel")};
+
+  var vertices=[],edges=new Set(),nextId=0,token=0,dragId=null,states={},activeEdge="";
+
+  function edgeKey(a,b){return a+"->"+b;}
+  function getVertex(id){var n=Number(id);return vertices.find(function(v){return v.id===n;})||null;}
+  function outNeighbors(id){var out=[];edges.forEach(function(k){var p=k.split("->").map(Number);if(p[0]===id)out.push(p[1]);});return out.sort(function(a,b){return a-b;});}
+  function indegree(id){var n=0;edges.forEach(function(k){if(Number(k.split("->")[1])===id)n++;});return n;}
+  function outdegree(id){var n=0;edges.forEach(function(k){if(Number(k.split("->")[0])===id)n++;});return n;}
+  function setStatus(t,type){el.status.textContent=t;el.status.classList.remove("is-success","is-error");if(type)el.status.classList.add(type);}
+  function delay(){return Number(el.speed.value);}
+  function wait(ms,t){return new Promise(function(r){setTimeout(function(){r(t===token);},ms);});}
+  function clearStates(){states={};activeEdge="";}
+  function disable(s){Object.keys(btn).forEach(function(k){btn[k].disabled=s&&k!=="cancel";});btn.cancel.disabled=!s;[el.from,el.to,el.start].forEach(function(x){x.disabled=s;});}
+  function uniqueLabel(raw){var base=raw.trim()||("V"+nextId),x=base,n=2;while(vertices.some(function(v){return v.label===x;})){x=base+n;n++;}return x;}
+
+  function updateSelects(){
+    var old=[el.from.value,el.to.value,el.start.value];
+    [el.from,el.to,el.start].forEach(function(s){s.innerHTML="";vertices.forEach(function(v){var o=document.createElement("option");o.value=v.id;o.textContent=v.label+" (#"+v.id+")";s.appendChild(o);});});
+    if(vertices.length){
+      el.from.value=vertices.some(function(v){return String(v.id)===old[0];})?old[0]:String(vertices[0].id);
+      el.to.value=vertices.some(function(v){return String(v.id)===old[1];})?old[1]:String(vertices[Math.min(1,vertices.length-1)].id);
+      el.start.value=vertices.some(function(v){return String(v.id)===old[2];})?old[2]:String(vertices[0].id);
+    }
+  }
+
+  function renderFrontier(arr){
+    el.frontier.innerHTML="";
+    arr.forEach(function(id){var v=getVertex(id),s=document.createElement("span");s.textContent=v?v.label:id;el.frontier.appendChild(s);});
+  }
+
+  function renderRepresentations(){
+    el.list.innerHTML="";
+    var ul=document.createElement("ul");ul.className="ds-dgraph__adj-list";
+    vertices.forEach(function(v){
+      var li=document.createElement("li"),outs=outNeighbors(v.id).map(function(id){return getVertex(id).label;});
+      li.textContent=v.label+" → "+(outs.length?outs.join(", "):"∅")+"   (in "+indegree(v.id)+", out "+outdegree(v.id)+")";
+      ul.appendChild(li);
+    });
+    el.list.appendChild(ul);
+
+    el.matrix.innerHTML="";
+    if(!vertices.length)return;
+    var table=document.createElement("table"),thead=document.createElement("thead"),trh=document.createElement("tr"),blank=document.createElement("th");
+    blank.textContent="";trh.appendChild(blank);
+    vertices.forEach(function(v){var th=document.createElement("th");th.textContent=v.label;trh.appendChild(th);});
+    thead.appendChild(trh);table.appendChild(thead);
+    var tbody=document.createElement("tbody");
+    vertices.forEach(function(a){
+      var tr=document.createElement("tr"),th=document.createElement("th");th.textContent=a.label;tr.appendChild(th);
+      vertices.forEach(function(b){var td=document.createElement("td");td.textContent=edges.has(edgeKey(a.id,b.id))?"1":"0";tr.appendChild(td);});
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);el.matrix.appendChild(table);
+  }
+
+  function render(){
+    while(el.svg.lastChild)el.svg.removeChild(el.svg.lastChild);
+    var defs=document.createElementNS(ns,"defs"),marker=document.createElementNS(ns,"marker"),path=document.createElementNS(ns,"path");
+    marker.setAttribute("id","ds-dgraph-arrow");marker.setAttribute("markerWidth","8");marker.setAttribute("markerHeight","8");marker.setAttribute("refX","7");marker.setAttribute("refY","4");marker.setAttribute("orient","auto");
+    path.setAttribute("d","M0,0 L8,4 L0,8 Z");path.setAttribute("fill","#94a3b8");marker.appendChild(path);defs.appendChild(marker);el.svg.appendChild(defs);
+
+    edges.forEach(function(k){
+      var p=k.split("->").map(Number),a=getVertex(p[0]),b=getVertex(p[1]);if(!a||!b)return;
+      var dx=b.x-a.x,dy=b.y-a.y,len=Math.sqrt(dx*dx+dy*dy)||1,ux=dx/len,uy=dy/len;
+      var line=document.createElementNS(ns,"line");
+      line.setAttribute("x1",String(a.x+ux*30));line.setAttribute("y1",String(a.y+uy*30));
+      line.setAttribute("x2",String(b.x-ux*34));line.setAttribute("y2",String(b.y-uy*34));
+      line.setAttribute("class","ds-dgraph__edge"+(activeEdge===k?" is-active":""));
+      el.svg.appendChild(line);
+    });
+
+    vertices.forEach(function(v){
+      var g=document.createElementNS(ns,"g"),cls="ds-dgraph__node";
+      if(states[v.id])cls+=" "+states[v.id];
+      if(dragId===v.id)cls+=" is-dragging";
+      g.setAttribute("class",cls);g.setAttribute("transform","translate("+v.x+" "+v.y+")");
+      var c=document.createElementNS(ns,"circle");c.setAttribute("r","28");
+      var t=document.createElementNS(ns,"text");t.setAttribute("class","label");t.setAttribute("y","-2");t.textContent=v.label;
+      var m=document.createElementNS(ns,"text");m.setAttribute("class","meta");m.setAttribute("y","44");m.textContent="in "+indegree(v.id)+" · out "+outdegree(v.id);
+      g.appendChild(c);g.appendChild(t);g.appendChild(m);el.svg.appendChild(g);
+      g.addEventListener("pointerdown",function(ev){dragId=v.id;g.setPointerCapture(ev.pointerId);render();});
+      g.addEventListener("pointermove",function(ev){if(dragId!==v.id)return;var r=el.svg.getBoundingClientRect();v.x=Math.max(35,Math.min(965,(ev.clientX-r.left)*1000/r.width));v.y=Math.max(35,Math.min(505,(ev.clientY-r.top)*540/r.height));render();});
+      g.addEventListener("pointerup",function(){dragId=null;render();});g.addEventListener("pointercancel",function(){dragId=null;render();});
+    });
+
+    el.v.textContent=vertices.length;el.e.textContent=edges.size;
+    el.sources.textContent=vertices.filter(function(v){return indegree(v.id)===0;}).length;
+    el.sinks.textContent=vertices.filter(function(v){return outdegree(v.id)===0;}).length;
+    renderRepresentations();
+  }
+
+  async function bfs(start){
+    token++;var t=token;disable(true);clearStates();var seen=new Set([start]),queue=[start],order=[];
+    renderFrontier(queue);
+    while(queue.length){
+      var u=queue.shift();states[u]="is-current";el.step.textContent="Visit "+getVertex(u).label+".";render();if(!(await wait(delay(),t)))return;
+      states[u]="is-visited";order.push(u);el.order.textContent=order.map(function(id){return getVertex(id).label;}).join(" → ");
+      var outs=outNeighbors(u);
+      for(var i=0;i<outs.length;i++){var v=outs[i];if(!seen.has(v)){seen.add(v);queue.push(v);states[v]="is-queued";activeEdge=edgeKey(u,v);renderFrontier(queue);render();if(!(await wait(delay(),t)))return;}}
+      activeEdge="";renderFrontier(queue);
+    }
+    disable(false);setStatus("BFS complete.","is-success");
+  }
+
+  async function dfs(start){
+    token++;var t=token;disable(true);clearStates();var seen=new Set(),order=[],stack=[];
+    async function visit(u,parent){
+      seen.add(u);stack.push(u);states[u]="is-current";if(parent!==null)activeEdge=edgeKey(parent,u);renderFrontier(stack);render();if(!(await wait(delay(),t)))return false;
+      states[u]="is-visited";order.push(u);el.order.textContent=order.map(function(id){return getVertex(id).label;}).join(" → ");
+      var outs=outNeighbors(u);
+      for(var i=0;i<outs.length;i++)if(!seen.has(outs[i])){if(!(await visit(outs[i],u)))return false;}
+      stack.pop();activeEdge="";renderFrontier(stack);render();return true;
+    }
+    await visit(start,null);disable(false);setStatus("DFS complete.","is-success");
+  }
+
+  function topoData(){
+    var deg=new Map();vertices.forEach(function(v){deg.set(v.id,indegree(v.id));});
+    var queue=vertices.filter(function(v){return deg.get(v.id)===0;}).map(function(v){return v.id;});
+    var order=[];
+    while(queue.length){
+      var u=queue.shift();order.push(u);
+      outNeighbors(u).forEach(function(v){deg.set(v,deg.get(v)-1);if(deg.get(v)===0)queue.push(v);});
+    }
+    return{order:order,acyclic:order.length===vertices.length};
+  }
+
+  async function topo(){
+    token++;var t=token;disable(true);clearStates();
+    var deg=new Map();vertices.forEach(function(v){deg.set(v.id,indegree(v.id));});
+    var queue=vertices.filter(function(v){return deg.get(v.id)===0;}).map(function(v){return v.id;}),order=[];
+    renderFrontier(queue);
+    while(queue.length){
+      var u=queue.shift();states[u]="is-current";el.step.textContent="Remove "+getVertex(u).label+" (indegree 0).";render();if(!(await wait(delay(),t)))return;
+      states[u]="is-visited";order.push(u);el.order.textContent=order.map(function(id){return getVertex(id).label;}).join(" → ");
+      var outs=outNeighbors(u);
+      for(var i=0;i<outs.length;i++){
+        var v=outs[i];activeEdge=edgeKey(u,v);deg.set(v,deg.get(v)-1);el.step.textContent="Decrease indegree of "+getVertex(v).label+" to "+deg.get(v)+".";render();if(!(await wait(delay(),t)))return;
+        if(deg.get(v)===0){queue.push(v);states[v]="is-queued";}
+        renderFrontier(queue);
+      }
+      activeEdge="";
+    }
+    disable(false);
+    if(order.length===vertices.length)setStatus("Topological sort complete.","is-success");
+    else setStatus("Cycle detected: a complete topological ordering is impossible.","is-error");
+  }
+
+  btn.add.addEventListener("click",function(){
+    var a=(vertices.length%10)/10*Math.PI*2;vertices.push({id:nextId++,label:uniqueLabel(el.label.value),x:500+Math.cos(a)*220,y:270+Math.sin(a)*180});
+    updateSelects();render();setStatus("Vertex added.","is-success");
+  });
+
+  btn.edge.addEventListener("click",function(){
+    var a=Number(el.from.value),b=Number(el.to.value);if(a===b){setStatus("Self-loops are not allowed in this simulator.","is-error");return;}
+    var k=edgeKey(a,b);if(edges.has(k)){edges.delete(k);setStatus("Directed edge removed.","is-success");}else{edges.add(k);setStatus("Directed edge added.","is-success");}
+    render();
+  });
+
+  btn.remove.addEventListener("click",function(){
+    var id=Number(el.from.value);vertices=vertices.filter(function(v){return v.id!==id;});
+    Array.from(edges).forEach(function(k){var p=k.split("->").map(Number);if(p[0]===id||p[1]===id)edges.delete(k);});
+    updateSelects();render();setStatus("Vertex removed.","is-success");
+  });
+
+  btn.bfs.addEventListener("click",function(){if(vertices.length)bfs(Number(el.start.value));});
+  btn.dfs.addEventListener("click",function(){if(vertices.length)dfs(Number(el.start.value));});
+  btn.topo.addEventListener("click",function(){if(vertices.length)topo();});
+  btn.cycle.addEventListener("click",function(){var d=topoData();el.order.textContent=d.acyclic?"No directed cycle.":"Directed cycle detected.";setStatus(d.acyclic?"Graph is acyclic.":"Graph contains a directed cycle.",d.acyclic?"is-success":"is-error");});
+
+  function loadDag(){
+    token++;vertices=[];edges=new Set();nextId=0;clearStates();
+    [["A",130,110],["B",330,90],["C",540,110],["D",250,300],["E",510,300],["F",780,230]].forEach(function(d){vertices.push({id:nextId++,label:d[0],x:d[1],y:d[2]});});
+    [[0,1],[0,3],[1,2],[1,4],[3,4],[2,5],[4,5]].forEach(function(e){edges.add(edgeKey(e[0],e[1]));});
+    updateSelects();el.order.textContent="—";el.step.textContent="—";renderFrontier([]);render();setStatus("Directed acyclic graph example loaded.","is-success");
+  }
+  function loadCycle(){
+    token++;vertices=[];edges=new Set();nextId=0;clearStates();
+    [["A",200,160],["B",500,90],["C",760,250],["D",440,380]].forEach(function(d){vertices.push({id:nextId++,label:d[0],x:d[1],y:d[2]});});
+    [[0,1],[1,2],[2,3],[3,0],[1,3]].forEach(function(e){edges.add(edgeKey(e[0],e[1]));});
+    updateSelects();el.order.textContent="—";el.step.textContent="—";renderFrontier([]);render();setStatus("Cycle example loaded.","is-success");
+  }
+
+  btn.example.addEventListener("click",loadDag);
+  btn.cycleExample.addEventListener("click",loadCycle);
+  btn.clear.addEventListener("click",function(){token++;vertices=[];edges=new Set();nextId=0;clearStates();updateSelects();el.order.textContent="—";el.step.textContent="—";renderFrontier([]);render();setStatus("Graph cleared.");});
+  btn.cancel.addEventListener("click",function(){token++;clearStates();disable(false);renderFrontier([]);render();setStatus("Animation cancelled.");});
+  el.speed.addEventListener("input",function(){el.speedOut.textContent=el.speed.value+" ms";});
+
+  loadDag();btn.cancel.disabled=true;
+})();
+</script>
