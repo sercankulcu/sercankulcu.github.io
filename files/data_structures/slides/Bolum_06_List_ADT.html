@@ -72,7 +72,7 @@ excerpt: "Interactive List ADT simulator comparing ArrayList-style contiguous st
         <button class="ds-list__btn" id="ds-list-insert" type="button">Insert at Index</button>
         <button class="ds-list__btn" id="ds-list-access" type="button">Access Index</button>
         <button class="ds-list__btn" id="ds-list-delete" type="button">Delete Index</button>
-        <button class="ds-list__btn" id="ds-list-search" type="button">Search Value</button>
+        <button class="ds-list__btn" id="ds-list-search" type="button">Search</button>
       </div>
       <div class="ds-list__group">
         <button class="ds-list__btn" id="ds-list-traverse" type="button">Traverse</button>
@@ -130,61 +130,156 @@ excerpt: "Interactive List ADT simulator comparing ArrayList-style contiguous st
 <script>
 (function(){
   "use strict";
-  var root=document.querySelector(".ds-list"); if(!root)return;
+
+  var root=document.querySelector(".ds-list");
+  if(!root)return;
+
   function q(id){return root.querySelector("#"+id);}
-  var el={value:q("ds-list-value"),index:q("ds-list-index"),speed:q("ds-list-speed"),speedOut:q("ds-list-speed-output"),
-    array:q("ds-list-array"),linked:q("ds-list-linked"),status:q("ds-list-status"),size:q("ds-list-size"),
-    aSteps:q("ds-list-array-steps"),lSteps:q("ds-list-linked-steps"),result:q("ds-list-result")};
-  var btn={append:q("ds-list-append"),prepend:q("ds-list-prepend"),insert:q("ds-list-insert"),access:q("ds-list-access"),
-    del:q("ds-list-delete"),search:q("ds-list-search"),traverse:q("ds-list-traverse"),example:q("ds-list-example"),
-    random:q("ds-list-random"),clear:q("ds-list-clear"),cancel:q("ds-list-cancel")};
 
-  var data=[],token=0,arrayMarkIndex=-1,arrayMarkKind="",linkedMarkIndex=-1,linkedMarkKind="",arraySteps=0,linkedSteps=0;
+  var el={
+    value:q("ds-list-value"),
+    index:q("ds-list-index"),
+    speed:q("ds-list-speed"),
+    speedOut:q("ds-list-speed-output"),
+    array:q("ds-list-array"),
+    linked:q("ds-list-linked"),
+    status:q("ds-list-status"),
+    size:q("ds-list-size"),
+    aSteps:q("ds-list-array-steps"),
+    lSteps:q("ds-list-linked-steps"),
+    result:q("ds-list-result")
+  };
 
-  function delay(){return Number(el.speed.value);}
-  function wait(ms,t){return new Promise(function(r){setTimeout(function(){r(t===token);},ms);});}
-  function disable(s){Object.keys(btn).forEach(function(k){btn[k].disabled=s&&k!=="cancel";});btn.cancel.disabled=!s;}
-  function setStatus(t){el.status.textContent=t;}
-  function readValue(){var v=Number(el.value.value);if(!Number.isFinite(v))throw new Error("Enter a valid number.");return v;}
+  var btn={
+    append:q("ds-list-append"),
+    prepend:q("ds-list-prepend"),
+    insert:q("ds-list-insert"),
+    access:q("ds-list-access"),
+    del:q("ds-list-delete"),
+    search:q("ds-list-search"),
+    traverse:q("ds-list-traverse"),
+    example:q("ds-list-example"),
+    random:q("ds-list-random"),
+    clear:q("ds-list-clear"),
+    cancel:q("ds-list-cancel")
+  };
+
+  var data=[];
+  var token=0;
+  var arrayMarkIndex=-1;
+  var arrayMarkKind="";
+  var linkedMarkIndex=-1;
+  var linkedMarkKind="";
+  var arraySteps=0;
+  var linkedSteps=0;
+
+  function delay(){
+    return Number(el.speed.value);
+  }
+
+  function wait(ms,t){
+    return new Promise(function(resolve){
+      setTimeout(function(){
+        resolve(t===token);
+      },ms);
+    });
+  }
+
+  function disable(state){
+    Object.keys(btn).forEach(function(k){
+      btn[k].disabled=state&&k!=="cancel";
+    });
+    btn.cancel.disabled=!state;
+  }
+
+  function setStatus(text){
+    el.status.textContent=text;
+  }
+
+  function readValue(){
+    var v=Number(el.value.value);
+    if(!Number.isFinite(v))throw new Error("Enter a valid number.");
+    return v;
+  }
+
   function readIndex(allowEnd){
     var i=Number(el.index.value);
     var max=allowEnd?data.length:data.length-1;
-    if(!Number.isInteger(i)||i<0||i>max)throw new Error("Index must be between 0 and "+Math.max(0,max)+".");
+    if(!Number.isInteger(i)||i<0||i>max){
+      throw new Error("Index must be between 0 and "+Math.max(0,max)+".");
+    }
     return i;
   }
 
-  function render(){
-    el.array.innerHTML=""; el.linked.innerHTML="";
-    data.forEach(function(v,i){
-      var c=document.createElement("div");c.className="ds-list__cell"+(i===arrayMarkIndex&&arrayMarkKind?" "+arrayMarkKind:"");
-      c.innerHTML="<strong></strong><small>index "+i+"</small>";c.querySelector("strong").textContent=v;el.array.appendChild(c);
+  function clearMarks(){
+    arrayMarkIndex=-1;
+    arrayMarkKind="";
+    linkedMarkIndex=-1;
+    linkedMarkKind="";
+  }
 
-      var n=document.createElement("div");n.className="ds-list__node"+(i===linkedMarkIndex&&linkedMarkKind?" "+linkedMarkKind:"");
-      n.innerHTML="<strong></strong><small>node "+i+"</small>";n.querySelector("strong").textContent=v;el.linked.appendChild(n);
-      if(i<data.length-1){var a=document.createElement("span");a.className="ds-list__arrow";a.textContent="→";el.linked.appendChild(a);}
+  function render(){
+    el.array.innerHTML="";
+    el.linked.innerHTML="";
+
+    data.forEach(function(v,i){
+      var c=document.createElement("div");
+      c.className="ds-list__cell"+(i===arrayMarkIndex&&arrayMarkKind?" "+arrayMarkKind:"");
+      c.innerHTML="<strong></strong><small>index "+i+"</small>";
+      c.querySelector("strong").textContent=v;
+      el.array.appendChild(c);
+
+      var n=document.createElement("div");
+      n.className="ds-list__node"+(i===linkedMarkIndex&&linkedMarkKind?" "+linkedMarkKind:"");
+      n.innerHTML="<strong></strong><small>node "+i+"</small>";
+      n.querySelector("strong").textContent=v;
+      el.linked.appendChild(n);
+
+      if(i<data.length-1){
+        var a=document.createElement("span");
+        a.className="ds-list__arrow";
+        a.textContent="→";
+        el.linked.appendChild(a);
+      }
     });
-    if(!data.length){el.array.textContent="Empty";el.linked.textContent="Empty";}
-    el.size.textContent=String(data.length);el.aSteps.textContent=String(arraySteps);el.lSteps.textContent=String(linkedSteps);
+
+    if(!data.length){
+      el.array.textContent="Empty";
+      el.linked.textContent="Empty";
+    }
+
+    el.size.textContent=String(data.length);
+    el.aSteps.textContent=String(arraySteps);
+    el.lSteps.textContent=String(linkedSteps);
   }
 
   async function animateAccess(index){
-    token++;var t=token;disable(true);
-    arraySteps=1;linkedSteps=0;
+    token++;
+    var t=token;
+    disable(true);
 
-    // ArrayList: direct indexed access.
-    arrayMarkIndex=index;arrayMarkKind="is-found";
-    linkedMarkIndex=-1;linkedMarkKind="";
-    el.status.textContent="ArrayList: direct access to index "+index+" (1 step).";
+    arraySteps=1;
+    linkedSteps=0;
+
+    arrayMarkIndex=index;
+    arrayMarkKind="is-found";
+    linkedMarkIndex=-1;
+    linkedMarkKind="";
+    setStatus("ArrayList: direct access to index "+index+" (1 step).");
     render();
+
     if(!(await wait(delay(),t)))return false;
 
-    // LinkedList: traverse node by node from the head.
-    arrayMarkIndex=-1;arrayMarkKind="";
+    arrayMarkIndex=-1;
+    arrayMarkKind="";
+
     for(var i=0;i<=index;i++){
-      linkedMarkIndex=i;linkedMarkKind=i===index?"is-found":"is-checking";
+      linkedMarkIndex=i;
+      linkedMarkKind=(i===index)?"is-found":"is-checking";
       linkedSteps=i+1;
-      el.status.textContent="LinkedList: follow next references to node "+i+" of "+index+".";
+      setStatus("LinkedList: follow next references to node "+i+" of "+index+".");
       render();
+
       if(!(await wait(delay(),t)))return false;
     }
 
@@ -193,77 +288,264 @@ excerpt: "Interactive List ADT simulator comparing ArrayList-style contiguous st
   }
 
   async function animatePrepend(value){
-    token++;var t=token;disable(true);
+    token++;
+    var t=token;
+    disable(true);
+
     var before=data.slice();
 
-    // LinkedList: new node becomes the head immediately.
     linkedSteps=1;
-    linkedMarkIndex=0;linkedMarkKind="is-found";
-    arrayMarkIndex=-1;arrayMarkKind="";
-    el.status.textContent="LinkedList: create one new head node and update the head reference (O(1)).";
+    linkedMarkIndex=0;
+    linkedMarkKind="is-found";
+    arrayMarkIndex=-1;
+    arrayMarkKind="";
+    setStatus("LinkedList: update the head reference and attach one new node (O(1)).");
     render();
+
     if(!(await wait(delay(),t)))return false;
 
-    // ArrayList: every existing element must shift one position to the right.
-    linkedMarkIndex=-1;linkedMarkKind="";
+    linkedMarkIndex=-1;
+    linkedMarkKind="";
     arraySteps=0;
+
     for(var i=before.length-1;i>=0;i--){
-      arrayMarkIndex=i;arrayMarkKind="is-checking";
+      arrayMarkIndex=i;
+      arrayMarkKind="is-checking";
       arraySteps++;
-      el.status.textContent="ArrayList: shift element at index "+i+" to index "+(i+1)+".";
+      setStatus("ArrayList: shift element at index "+i+" to index "+(i+1)+".");
       render();
+
       if(!(await wait(delay(),t)))return false;
     }
 
     data.unshift(value);
+
     arraySteps=before.length+1;
-    arrayMarkIndex=0;arrayMarkKind="is-found";
-    linkedMarkIndex=0;linkedMarkKind="is-found";
+    arrayMarkIndex=0;
+    arrayMarkKind="is-found";
+    linkedMarkIndex=0;
+    linkedMarkKind="is-found";
+
     el.result.textContent=value;
-    el.status.textContent="Prepend complete: LinkedList changed the head; ArrayList shifted "+before.length+" element"+(before.length===1?"":"s")+".";
+    setStatus(
+      "Prepend complete: LinkedList changed one head reference; ArrayList shifted "+
+      before.length+" element"+(before.length===1?"":"s")+"."
+    );
     render();
+
     if(!(await wait(delay(),t)))return false;
 
-    arrayMarkIndex=-1;arrayMarkKind="";
-    linkedMarkIndex=-1;linkedMarkKind="";
+    clearMarks();
     render();
     disable(false);
     return true;
   }
 
-  btn.append.addEventListener("click",function(){try{var v=readValue();data.push(v);arraySteps=1;linkedSteps=1;el.result.textContent=v;render();setStatus("Appended "+v+".");}catch(e){setStatus(e.message);}});
+  btn.append.addEventListener("click",function(){
+    try{
+      var v=readValue();
+      data.push(v);
+      arraySteps=1;
+      linkedSteps=1;
+      clearMarks();
+      el.result.textContent=v;
+      render();
+      setStatus("Appended "+v+".");
+    }catch(e){
+      setStatus(e.message);
+    }
+  });
+
   btn.prepend.addEventListener("click",async function(){
     try{
       var v=readValue();
       await animatePrepend(v);
-    }catch(e){setStatus(e.message);}
+    }catch(e){
+      disable(false);
+      setStatus(e.message);
+    }
   });
-  btn.insert.addEventListener("click",function(){try{var v=readValue(),i=readIndex(true);data.splice(i,0,v);arraySteps=data.length-i;linkedSteps=i+1;el.result.textContent=v;render();setStatus("Inserted "+v+" at index "+i+".");}catch(e){setStatus(e.message);}});
+
+  btn.insert.addEventListener("click",function(){
+    try{
+      var v=readValue();
+      var i=readIndex(true);
+
+      data.splice(i,0,v);
+      arraySteps=data.length-i;
+      linkedSteps=i+1;
+      clearMarks();
+
+      el.result.textContent=v;
+      render();
+      setStatus("Inserted "+v+" at index "+i+".");
+    }catch(e){
+      setStatus(e.message);
+    }
+  });
+
   btn.access.addEventListener("click",async function(){
     try{
       var i=readIndex(false);
-      arraySteps=0;linkedSteps=0;
-      if(!(await animateAccess(i)))return;
-      el.result.textContent=data[i];
-      setStatus("Access complete: ArrayList = 1 direct step; LinkedList = "+(i+1)+" node visit"+(i===0?"":"s")+".");
-    }catch(e){setStatus(e.message);}
-  });
-  btn.del.addEventListener("click",function(){try{var i=readIndex(false),v=data[i];data.splice(i,1);arraySteps=data.length-i+1;linkedSteps=i+1;el.result.textContent=v;arrayMarkIndex=-1;arrayMarkKind="";linkedMarkIndex=-1;linkedMarkKind="";render();setStatus("Deleted value "+v+" from index "+i+".");}catch(e){setStatus(e.message);}});
-  btn.search.addEventListener("click",async function(){try{
-    var v=readValue();token++;var t=token;disable(true);arraySteps=0;linkedSteps=0;var found=-1;
-    for(var i=0;i<data.length;i++){arrayMarkIndex=i;arrayMarkKind="is-checking";linkedMarkIndex=i;linkedMarkKind="is-checking";arraySteps=i+1;linkedSteps=i+1;render();if(!(await wait(delay(),t)))return;if(data[i]===v){found=i;break;}}
-    if(found>=0){arrayMarkKind="is-found";linkedMarkKind="is-found";render();el.result.textContent=found;setStatus("Found "+v+" at index "+found+".");}else{arrayMarkIndex=-1;arrayMarkKind="";linkedMarkIndex=-1;linkedMarkKind="";render();el.result.textContent="not found";setStatus(v+" was not found.");}
-    disable(false);
-  }catch(e){setStatus(e.message);}});
-  btn.traverse.addEventListener("click",async function(){token++;var t=token;disable(true);arraySteps=0;linkedSteps=0;
-    for(var i=0;i<data.length;i++){arrayMarkIndex=i;arrayMarkKind="is-checking";linkedMarkIndex=i;linkedMarkKind="is-checking";arraySteps=i+1;linkedSteps=i+1;render();if(!(await wait(delay(),t)))return;}
-    arrayMarkIndex=-1;arrayMarkKind="";linkedMarkIndex=-1;linkedMarkKind="";render();el.result.textContent=data.join(" → ");disable(false);setStatus("Traversal complete.");});
-  btn.example.addEventListener("click",function(){token++;data=[12,34,56,78,90];arrayMarkIndex=-1;arrayMarkKind="";linkedMarkIndex=-1;linkedMarkKind="";arraySteps=0;linkedSteps=0;el.result.textContent="—";render();setStatus("Example list loaded.");});
-  btn.random.addEventListener("click",function(){token++;data=Array.from({length:8},function(){return Math.floor(Math.random()*90)+10;});arrayMarkIndex=-1;arrayMarkKind="";linkedMarkIndex=-1;linkedMarkKind="";render();setStatus("Random list generated.");});
-  btn.clear.addEventListener("click",function(){token++;data=[];arrayMarkIndex=-1;arrayMarkKind="";linkedMarkIndex=-1;linkedMarkKind="";render();setStatus("List cleared.");});
-  btn.cancel.addEventListener("click",function(){token++;arrayMarkIndex=-1;arrayMarkKind="";linkedMarkIndex=-1;linkedMarkKind="";disable(false);render();setStatus("Animation cancelled.");});
-  el.speed.addEventListener("input",function(){el.speedOut.textContent=el.speed.value+" ms";});
+      arraySteps=0;
+      linkedSteps=0;
 
-  btn.example.click();btn.cancel.disabled=true;
+      if(!(await animateAccess(i)))return;
+
+      el.result.textContent=data[i];
+      setStatus(
+        "Access complete: ArrayList = 1 direct step; LinkedList = "+
+        (i+1)+" node visit"+(i===0?"":"s")+"."
+      );
+    }catch(e){
+      disable(false);
+      setStatus(e.message);
+    }
+  });
+
+  btn.del.addEventListener("click",function(){
+    try{
+      var i=readIndex(false);
+      var v=data[i];
+
+      data.splice(i,1);
+      arraySteps=data.length-i+1;
+      linkedSteps=i+1;
+      clearMarks();
+
+      el.result.textContent=v;
+      render();
+      setStatus("Deleted value "+v+" from index "+i+".");
+    }catch(e){
+      setStatus(e.message);
+    }
+  });
+
+  btn.search.addEventListener("click",async function(){
+    try{
+      var v=readValue();
+      token++;
+      var t=token;
+      disable(true);
+
+      arraySteps=0;
+      linkedSteps=0;
+      var found=-1;
+
+      for(var i=0;i<data.length;i++){
+        arrayMarkIndex=i;
+        arrayMarkKind="is-checking";
+        linkedMarkIndex=i;
+        linkedMarkKind="is-checking";
+
+        arraySteps=i+1;
+        linkedSteps=i+1;
+        render();
+
+        if(!(await wait(delay(),t)))return;
+
+        if(data[i]===v){
+          found=i;
+          break;
+        }
+      }
+
+      if(found>=0){
+        arrayMarkKind="is-found";
+        linkedMarkKind="is-found";
+        render();
+        el.result.textContent=found;
+        setStatus("Found "+v+" at index "+found+".");
+      }else{
+        clearMarks();
+        render();
+        el.result.textContent="not found";
+        setStatus(v+" was not found.");
+      }
+
+      disable(false);
+    }catch(e){
+      disable(false);
+      setStatus(e.message);
+    }
+  });
+
+  btn.traverse.addEventListener("click",async function(){
+    token++;
+    var t=token;
+    disable(true);
+
+    arraySteps=0;
+    linkedSteps=0;
+
+    for(var i=0;i<data.length;i++){
+      arrayMarkIndex=i;
+      arrayMarkKind="is-checking";
+      linkedMarkIndex=i;
+      linkedMarkKind="is-checking";
+
+      arraySteps=i+1;
+      linkedSteps=i+1;
+      render();
+
+      if(!(await wait(delay(),t)))return;
+    }
+
+    clearMarks();
+    render();
+    el.result.textContent=data.join(" → ");
+    disable(false);
+    setStatus("Traversal complete.");
+  });
+
+  btn.example.addEventListener("click",function(){
+    token++;
+    data=[12,34,56,78,90];
+    clearMarks();
+    arraySteps=0;
+    linkedSteps=0;
+    el.result.textContent="—";
+    render();
+    setStatus("Example list loaded.");
+  });
+
+  btn.random.addEventListener("click",function(){
+    token++;
+    data=Array.from({length:8},function(){
+      return Math.floor(Math.random()*90)+10;
+    });
+    clearMarks();
+    arraySteps=0;
+    linkedSteps=0;
+    el.result.textContent="—";
+    render();
+    setStatus("Random list generated.");
+  });
+
+  btn.clear.addEventListener("click",function(){
+    token++;
+    data=[];
+    clearMarks();
+    arraySteps=0;
+    linkedSteps=0;
+    el.result.textContent="—";
+    render();
+    setStatus("List cleared.");
+  });
+
+  btn.cancel.addEventListener("click",function(){
+    token++;
+    clearMarks();
+    disable(false);
+    render();
+    setStatus("Animation cancelled.");
+  });
+
+  el.speed.addEventListener("input",function(){
+    el.speedOut.textContent=el.speed.value+" ms";
+  });
+
+  btn.example.click();
+  btn.cancel.disabled=true;
 })();
 </script>
