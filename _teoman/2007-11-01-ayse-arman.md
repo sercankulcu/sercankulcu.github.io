@@ -1,6 +1,6 @@
 ---
 title: "Ayşe Arman ile Röportaj"
-date: 2007-11
+date: 2007-11-01
 publication: "Hürriyet"
 interviewer: "Ayşe Arman"
 type: "interview"
