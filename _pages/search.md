@@ -4,7 +4,7 @@ layout: without-sidebar
 title: "Search"
 permalink: /search/
 author_profile: false
----------------------
+---
 
 <style>
 .site-search {
