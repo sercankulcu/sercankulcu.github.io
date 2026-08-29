@@ -1,9 +1,10 @@
 ---
+
 layout: without-sidebar
 title: "Search"
 permalink: /search/
 author_profile: false
----
+---------------------
 
 <style>
 .site-search {
@@ -66,13 +67,13 @@ author_profile: false
 
 <div class="site-search">
 
-  <input
-    id="site-search-input"
-    class="site-search-input"
-    type="search"
-    placeholder="Search the site..."
-    autocomplete="off"
-    aria-label="Search this site">
+<input
+ id="site-search-input"
+ class="site-search-input"
+ type="search"
+ placeholder="Search posts, courses, apps, games, PDFs, and interactive content..."
+ autocomplete="off"
+ aria-label="Search this site">
 
   <div
     id="site-search-status"
@@ -104,14 +105,15 @@ author_profile: false
 
 
   /* --------------------------------------------------
-     TEXT NORMALIZATION
+     TEXT HELPERS
   -------------------------------------------------- */
 
   function normalize(value) {
     return (value || "")
       .toLocaleLowerCase()
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/ı/g, "i");
   }
 
 
@@ -137,14 +139,21 @@ author_profile: false
   -------------------------------------------------- */
 
   function getFileName(url) {
+
     try {
+
       const pathname =
-        new URL(url, window.location.origin).pathname;
+        new URL(
+          url,
+          window.location.origin
+        ).pathname;
 
       return decodeURIComponent(
         pathname.split("/").pop() || ""
       );
+
     } catch (e) {
+
       return "";
     }
   }
@@ -160,72 +169,18 @@ author_profile: false
   }
 
 
-  function getAssetType(url, title) {
-
-    const pathname =
-      new URL(url, window.location.origin)
-        .pathname
-        .toLowerCase();
-
-    const text =
-      (title || "").toLowerCase();
-
-
-    if (pathname.endsWith(".pdf")) {
-
-      if (
-        text.includes("sunum") ||
-        text.includes("slide")
-      ) {
-        return "Slides";
-      }
-
-      if (
-        text.includes("lecture note") ||
-        text.includes("notes")
-      ) {
-        return "Lecture Notes";
-      }
-
-      if (
-        text.includes("vize") ||
-        text.includes("final") ||
-        text.includes("but") ||
-        text.includes("exam")
-      ) {
-        return "Exam PDF";
-      }
-
-      return "PDF";
-    }
-
-
-    if (pathname.endsWith(".html")) {
-
-      if (
-        text.includes("simulator") ||
-        text.includes("simulation")
-      ) {
-        return "Simulator";
-      }
-
-      return "Interactive";
-    }
-
-
-    return "Resource";
-  }
-
-
   function isSearchableAsset(url) {
 
     try {
 
       const parsed =
-        new URL(url, window.location.origin);
+        new URL(
+          url,
+          window.location.origin
+        );
 
       /*
-       * Only index files belonging to this site.
+       * Only local files are indexed.
        */
       if (
         parsed.origin !==
@@ -244,53 +199,212 @@ author_profile: false
   }
 
 
-  /* --------------------------------------------------
-     FIND SECTION CONTEXT
-  -------------------------------------------------- */
+  function getAssetType(
+    url,
+    title,
+    sourceType
+  ) {
 
-  function getSectionContext(link) {
+    const pathname =
+      new URL(
+        url,
+        window.location.origin
+      )
+        .pathname
+        .toLowerCase();
+
+    const text =
+      normalize(title);
+
 
     /*
-     * Walk backwards through the rendered page.
-     *
-     * We collect:
-     * - nearest heading
-     * - nearby descriptive paragraph
+     * Apps and Games have priority
+     * over generic HTML classification.
      */
 
+    if (sourceType === "Apps") {
+      return "App";
+    }
+
+    if (sourceType === "Games") {
+      return "Game";
+    }
+
+
+    /*
+     * PDF resources referenced by courses.
+     */
+
+    if (pathname.endsWith(".pdf")) {
+
+      if (
+        text.includes("sunum") ||
+        text.includes("slide")
+      ) {
+        return "Slides";
+      }
+
+      if (
+        text.includes("lecture note") ||
+        text.includes("lecture notes") ||
+        text.includes("notes")
+      ) {
+        return "Lecture Notes";
+      }
+
+      if (
+        text.includes("vize") ||
+        text.includes("final") ||
+        text.includes("but") ||
+        text.includes("butunleme") ||
+        text.includes("exam")
+      ) {
+        return "Exam PDF";
+      }
+
+      return "PDF";
+    }
+
+
+    /*
+     * HTML resources referenced by courses.
+     */
+
+    if (
+      pathname.endsWith(".html") ||
+      pathname.endsWith(".htm")
+    ) {
+
+      if (
+        text.includes("simulator") ||
+        text.includes("simulation")
+      ) {
+        return "Simulator";
+      }
+
+      return "Interactive";
+    }
+
+
+    return "Resource";
+  }
+
+
+  /* --------------------------------------------------
+     PAGE CONTEXT
+  -------------------------------------------------- */
+
+  function getNearestHeading(link) {
+
     let element = link;
-    let heading = "";
-    let description = "";
 
-
-    while (element) {
+    while (
+      element &&
+      element.tagName !== "BODY"
+    ) {
 
       let sibling =
         element.previousElementSibling;
 
+      while (sibling) {
+
+        if (
+          /^H[1-4]$/.test(
+            sibling.tagName
+          )
+        ) {
+
+          return cleanText(
+            sibling.textContent
+          );
+        }
+
+        sibling =
+          sibling.previousElementSibling;
+      }
+
+      element =
+        element.parentElement;
+    }
+
+    return "";
+  }
+
+
+  function getNearbyDescription(link) {
+
+    /*
+     * First try the current list item.
+     */
+
+    const listItem =
+      link.closest("li");
+
+    if (listItem) {
+
+      const text =
+        cleanText(
+          listItem.textContent
+        );
+
+      const title =
+        cleanText(
+          link.textContent
+        );
+
+      if (
+        text &&
+        text !== title &&
+        text.length > title.length
+      ) {
+
+        return text
+          .replace(title, "")
+          .replace(/^[\s\-–—:|]+/, "")
+          .trim();
+      }
+    }
+
+
+    /*
+     * Then try nearby paragraphs.
+     */
+
+    let element =
+      link.parentElement;
+
+    while (
+      element &&
+      element.tagName !== "BODY"
+    ) {
+
+      let sibling =
+        element.previousElementSibling;
 
       while (sibling) {
 
         if (
-          !heading &&
-          /^H[1-4]$/.test(sibling.tagName)
-        ) {
-          heading =
-            cleanText(sibling.textContent);
-        }
-
-
-        if (
-          !description &&
           sibling.tagName === "P"
         ) {
 
           const text =
-            cleanText(sibling.textContent);
+            cleanText(
+              sibling.textContent
+            );
 
-          if (text.length > 40) {
-            description = text;
+          if (text.length > 30) {
+
+            return text;
           }
+        }
+
+
+        if (
+          /^H[1-4]$/.test(
+            sibling.tagName
+          )
+        ) {
+          break;
         }
 
 
@@ -299,52 +413,39 @@ author_profile: false
       }
 
 
-      if (heading) {
-        break;
-      }
-
-
       element =
         element.parentElement;
-
-
-      if (
-        !element ||
-        element.tagName === "BODY"
-      ) {
-        break;
-      }
     }
 
 
-    return {
-      heading: heading,
-      description: description
-    };
+    return "";
   }
 
 
   /* --------------------------------------------------
-     EXTRACT PDF / HTML LINKS FROM TEACHING PAGE
+     EXTRACT LINKED ASSETS
   -------------------------------------------------- */
 
-  function extractAssets(html, teachingItem) {
+  function extractAssets(
+    html,
+    sourcePage
+  ) {
 
     const parser =
       new DOMParser();
 
-    const documentPage =
+    const page =
       parser.parseFromString(
         html,
         "text/html"
       );
 
-
     const links =
       Array.from(
-        documentPage.querySelectorAll("a[href]")
+        page.querySelectorAll(
+          "a[href]"
+        )
       );
-
 
     const assets = [];
 
@@ -366,10 +467,10 @@ author_profile: false
         url =
           new URL(
             rawHref,
-            teachingItem.url.startsWith("http")
-              ? teachingItem.url
+            sourcePage.url.startsWith("http")
+              ? sourcePage.url
               : window.location.origin +
-                teachingItem.url
+                sourcePage.url
           );
 
       } catch (e) {
@@ -378,86 +479,103 @@ author_profile: false
       }
 
 
-      if (!isSearchableAsset(url.href)) {
+      if (
+        !isSearchableAsset(
+          url.href
+        )
+      ) {
         return;
       }
 
 
       const title =
-        cleanText(link.textContent) ||
-        readableFileName(url.href);
+        cleanText(
+          link.textContent
+        ) ||
+        readableFileName(
+          url.href
+        );
 
 
-      const context =
-        getSectionContext(link);
+      const heading =
+        getNearestHeading(
+          link
+        );
+
+
+      const nearbyDescription =
+        getNearbyDescription(
+          link
+        );
 
 
       const filename =
-        readableFileName(url.href);
+        readableFileName(
+          url.href
+        );
+
+
+      const type =
+        getAssetType(
+          url.href,
+          title,
+          sourcePage.sourceType
+        );
 
 
       /*
-       * The list item itself may contain some useful
-       * explanatory text.
+       * Short visible description.
        */
 
-      const listItem =
-        link.closest("li");
+      let excerpt = "";
 
+      if (
+        nearbyDescription &&
+        nearbyDescription !== title
+      ) {
 
-      let nearbyText = "";
+        excerpt =
+          nearbyDescription.length > 220
+            ? nearbyDescription.slice(
+                0,
+                217
+              ) + "..."
+            : nearbyDescription;
 
-      if (listItem) {
+      } else if (
+        heading &&
+        heading !== title
+      ) {
 
-        nearbyText =
-          cleanText(listItem.textContent);
+        excerpt = heading;
 
-        /*
-         * Avoid duplicating the title.
-         */
+      } else {
 
-        if (nearbyText === title) {
-          nearbyText = "";
-        }
+        excerpt =
+          sourcePage.title;
       }
 
 
-      const descriptionParts = [];
-
-
-      if (context.heading) {
-        descriptionParts.push(
-          context.heading
-        );
-      }
-
-
-      if (context.description) {
-
-        /*
-         * Keep excerpts reasonably short.
-         */
-
-        descriptionParts.push(
-          context.description.length > 220
-            ? context.description.slice(0, 217) + "..."
-            : context.description
-        );
-      }
-
-
-      const excerpt =
-        descriptionParts.join(" — ");
-
+      /*
+       * Searchable text.
+       *
+       * Includes:
+       * - visible link title
+       * - file name
+       * - section/chapter heading
+       * - nearby description
+       * - source page title
+       * - resource type
+       */
 
       const content = [
         title,
         filename,
-        context.heading,
-        context.description,
-        nearbyText,
-        teachingItem.title,
-        getAssetType(url.href, title)
+        heading,
+        nearbyDescription,
+        sourcePage.title,
+        sourcePage.sourceType,
+        type
       ]
         .filter(Boolean)
         .join(" ");
@@ -472,17 +590,12 @@ author_profile: false
           url.search +
           url.hash,
 
-        type:
-          getAssetType(
-            url.href,
-            title
-          ),
+        type: type,
 
-        excerpt:
-          excerpt,
+        excerpt: excerpt,
 
-        content:
-          content
+        content: content
+
       });
 
     });
@@ -493,30 +606,83 @@ author_profile: false
 
 
   /* --------------------------------------------------
-     LOAD TEACHING ASSETS
+     LOAD TEACHING / APPS / GAMES ASSETS
   -------------------------------------------------- */
 
-  async function loadTeachingAssets() {
+  async function loadLinkedAssets() {
 
-    const teachingPages =
-      searchIndex.filter(function (item) {
-        return item.type === "Teaching";
-      });
+    /*
+     * Teaching pages are already present
+     * in search.json.
+     */
+
+    const sourcePages =
+      searchIndex
+
+        .filter(function (item) {
+
+          return (
+            item.type ===
+            "Teaching"
+          );
+
+        })
+
+        .map(function (item) {
+
+          return {
+
+            title:
+              item.title,
+
+            url:
+              item.url,
+
+            sourceType:
+              "Teaching"
+
+          };
+
+        });
+
+
+    /*
+     * Additional index pages.
+     */
+
+    sourcePages.push(
+
+      {
+        title: "Apps",
+        url: "{{ '/apps/' | relative_url }}",
+        sourceType: "Apps"
+      },
+
+      {
+        title: "Games",
+        url: "{{ '/games/' | relative_url }}",
+        sourceType: "Games"
+      }
+
+    );
 
 
     const requests =
-      teachingPages.map(
-        async function (teachingItem) {
+      sourcePages.map(
+        async function (
+          sourcePage
+        ) {
 
           try {
 
             const response =
               await fetch(
-                teachingItem.url
+                sourcePage.url
               );
 
 
             if (!response.ok) {
+
               return [];
             }
 
@@ -527,7 +693,7 @@ author_profile: false
 
             return extractAssets(
               html,
-              teachingItem
+              sourcePage
             );
 
 
@@ -541,7 +707,9 @@ author_profile: false
 
 
     const groups =
-      await Promise.all(requests);
+      await Promise.all(
+        requests
+      );
 
 
     const assets =
@@ -549,36 +717,67 @@ author_profile: false
 
 
     /*
-     * Remove duplicate URLs.
+     * Avoid duplicate URLs.
      *
-     * Example:
-     * The same Lecture Notes PDF might appear
-     * under more than one chapter.
+     * The same PDF may be referenced
+     * several times from a course page.
      */
 
-    const existingUrls =
-      new Set(
-        searchIndex.map(
-          function (item) {
-            return item.url;
-          }
-        )
-      );
+    const knownUrls =
+      new Set();
+
+
+    searchIndex.forEach(
+      function (item) {
+
+        try {
+
+          const url =
+            new URL(
+              item.url,
+              window.location.origin
+            );
+
+          knownUrls.add(
+            url.pathname +
+            url.search +
+            url.hash
+          );
+
+        } catch (e) {
+
+          knownUrls.add(
+            item.url
+          );
+        }
+
+      }
+    );
 
 
     const uniqueAssets = [];
 
 
-    assets.forEach(function (asset) {
+    assets.forEach(
+      function (asset) {
 
-      if (!existingUrls.has(asset.url)) {
+        if (
+          !knownUrls.has(
+            asset.url
+          )
+        ) {
 
-        existingUrls.add(asset.url);
+          knownUrls.add(
+            asset.url
+          );
 
-        uniqueAssets.push(asset);
+          uniqueAssets.push(
+            asset
+          );
+        }
+
       }
-
-    });
+    );
 
 
     searchIndex =
@@ -595,10 +794,13 @@ author_profile: false
   function search(query) {
 
     const normalizedQuery =
-      normalize(query).trim();
+      normalize(
+        query
+      ).trim();
 
 
-    resultsElement.innerHTML = "";
+    resultsElement.innerHTML =
+      "";
 
 
     if (
@@ -624,77 +826,122 @@ author_profile: false
         .map(function (item) {
 
           const title =
-            normalize(item.title);
+            normalize(
+              item.title
+            );
 
           const content =
-            normalize(item.content);
+            normalize(
+              item.content
+            );
 
           const type =
-            normalize(item.type);
+            normalize(
+              item.type
+            );
 
           const excerpt =
-            normalize(item.excerpt);
+            normalize(
+              item.excerpt
+            );
 
 
           let score = 0;
+
           let matchedTerms = 0;
 
 
           terms.forEach(
             function (term) {
 
-              let matched = false;
+              let matched =
+                false;
 
 
-              if (title === term) {
+              /*
+               * Title relevance.
+               */
+
+              if (
+                title === term
+              ) {
 
                 score += 30;
+
                 matched = true;
 
               } else if (
-                title.startsWith(term)
+                title.startsWith(
+                  term
+                )
               ) {
 
                 score += 20;
+
                 matched = true;
 
               } else if (
-                title.includes(term)
+                title.includes(
+                  term
+                )
               ) {
 
                 score += 12;
+
                 matched = true;
               }
 
 
+              /*
+               * Type relevance.
+               */
+
               if (
-                type.includes(term)
+                type.includes(
+                  term
+                )
               ) {
 
                 score += 4;
+
                 matched = true;
               }
 
 
+              /*
+               * Description relevance.
+               */
+
               if (
-                excerpt.includes(term)
+                excerpt.includes(
+                  term
+                )
               ) {
 
                 score += 3;
+
                 matched = true;
               }
 
 
+              /*
+               * General content.
+               */
+
               if (
-                content.includes(term)
+                content.includes(
+                  term
+                )
               ) {
 
                 score += 1;
+
                 matched = true;
               }
 
 
               if (matched) {
+
                 matchedTerms++;
               }
 
@@ -703,8 +950,8 @@ author_profile: false
 
 
           /*
-           * Bonus when every search term
-           * matches somewhere.
+           * Prefer results matching
+           * every search term.
            */
 
           if (
@@ -717,44 +964,68 @@ author_profile: false
 
 
           return {
-            item: item,
-            score: score,
-            matchedTerms: matchedTerms
+
+            item:
+              item,
+
+            score:
+              score,
+
+            matchedTerms:
+              matchedTerms
+
           };
 
         })
 
 
-        .filter(function (result) {
-
-          return result.score > 0;
-
-        })
-
-
-        .sort(function (a, b) {
-
-          if (
-            b.matchedTerms !==
-            a.matchedTerms
-          ) {
+        .filter(
+          function (result) {
 
             return (
-              b.matchedTerms -
-              a.matchedTerms
+              result.score > 0
             );
           }
+        )
 
 
-          return (
-            b.score -
-            a.score
-          );
+        .sort(
+          function (a, b) {
 
-        })
+            /*
+             * First prefer results
+             * matching more query terms.
+             */
+
+            if (
+              b.matchedTerms !==
+              a.matchedTerms
+            ) {
+
+              return (
+                b.matchedTerms -
+                a.matchedTerms
+              );
+            }
 
 
-        .slice(0, 50);
+            /*
+             * Then sort by relevance.
+             */
+
+            return (
+              b.score -
+              a.score
+            );
+
+          }
+        )
+
+
+        .slice(
+          0,
+          50
+        );
 
 
     if (
@@ -785,7 +1056,9 @@ author_profile: false
 
 
         const li =
-          document.createElement("li");
+          document.createElement(
+            "li"
+          );
 
 
         li.className =
@@ -844,84 +1117,102 @@ author_profile: false
     "{{ '/search.json' | relative_url }}"
   )
 
-    .then(function (response) {
+    .then(
+      function (response) {
 
-      if (!response.ok) {
+        if (!response.ok) {
 
-        throw new Error(
-          "Search index could not be loaded."
-        );
+          throw new Error(
+            "Search index could not be loaded."
+          );
+        }
+
+
+        return response.json();
+
       }
+    )
 
 
-      return response.json();
+    .then(
+      async function (data) {
 
-    })
-
-
-    .then(async function (data) {
-
-      searchIndex = data;
+        searchIndex =
+          data;
 
 
-      /*
-       * Discover PDF and HTML resources
-       * referenced by Teaching pages.
-       */
+        /*
+         * Discover linked resources from:
+         *
+         * - Teaching pages
+         * - Apps
+         * - Games
+         */
 
-      await loadTeachingAssets();
-
-
-      statusElement.textContent =
-        "Search " +
-        searchIndex.length +
-        " items.";
+        await loadLinkedAssets();
 
 
-      input.addEventListener(
-        "input",
-        function () {
+        statusElement.textContent =
+          "Search " +
+          searchIndex.length +
+          " items.";
 
-          search(
-            input.value
+
+        input.addEventListener(
+          "input",
+          function () {
+
+            search(
+              input.value
+            );
+
+          }
+        );
+
+
+        /*
+         * Support:
+         *
+         * /search/?q=dijkstra
+         */
+
+        const params =
+          new URLSearchParams(
+            window.location.search
           );
 
-        }
-      );
+
+        const initialQuery =
+          params.get("q");
 
 
-      const params =
-        new URLSearchParams(
-          window.location.search
-        );
-
-
-      const initialQuery =
-        params.get("q");
-
-
-      if (initialQuery) {
-
-        input.value =
-          initialQuery;
-
-        search(
+        if (
           initialQuery
-        );
+        ) {
+
+          input.value =
+            initialQuery;
+
+          search(
+            initialQuery
+          );
+        }
+
+
+        input.focus();
+
       }
+    )
 
 
-      input.focus();
+    .catch(
+      function () {
 
-    })
+        statusElement.textContent =
+          "Search is temporarily unavailable.";
 
-
-    .catch(function () {
-
-      statusElement.textContent =
-        "Search is temporarily unavailable.";
-
-    });
+      }
+    );
 
 })();
 </script>
