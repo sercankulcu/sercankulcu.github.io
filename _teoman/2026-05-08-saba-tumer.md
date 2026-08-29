@@ -8,25 +8,24 @@ type: "video interview"
 verification: "primary"
 confidence: "high"
 topics:
-
-* songwriting
-* final album
-* 87 songs
-* aging
-* boredom
-* daily life
-* entertainer identity
-* Varoluşçuluk 101
-* fatherhood
-* daughter
-* education
-* cinema
-* novel adaptation
-* Generation Z
-* Generation Alpha
-* depression
-* melancholy
-* artistic legacy
+  - songwriting
+  - final album
+  - 87 songs
+  - aging
+  - boredom
+  - daily life
+  - entertainer identity
+  - Varoluşçuluk 101
+  - fatherhood
+  - daughter
+  - education
+  - cinema
+  - novel adaptation
+  - Generation Z
+  - Generation Alpha
+  - depression
+  - melancholy
+  - artistic legacy
 
 ---
 
