@@ -1,6 +1,6 @@
 ---
 title: "Teoman ile Söyleşi"
-date: 2006
+date: 2006-01-01
 interviewer: "Coşkun Çokyiğit"
 type: "interview"
 verification: "primary-archive"
