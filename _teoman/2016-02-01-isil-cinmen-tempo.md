@@ -1,6 +1,6 @@
 ---
 title: "Işıl Cinmen ile Tempo Röportajı"
-date: 2016-02
+date: 2016-02-01
 publication: "Tempo"
 interviewer: "Işıl Cinmen"
 type: "interview"

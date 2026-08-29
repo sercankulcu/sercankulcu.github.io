@@ -1,6 +1,6 @@
 ---
 title: "Türk Rock Müziğinin Romantik ve Asi Çocuğu Teoman"
-date: 2010-02
+date: 2010-02-01
 publication: "Aujourd’hui la Turquie"
 interviewer: "Ayça Yüksel"
 type: "interview"
