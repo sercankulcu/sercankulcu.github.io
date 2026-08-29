@@ -4,7 +4,7 @@ layout: without-sidebar
 title: "Search"
 permalink: /search/
 author_profile: false
----
+---------------------
 
 <style>
 .site-search {
@@ -75,31 +75,20 @@ author_profile: false
  autocomplete="off"
  aria-label="Search this site">
 
-  <div
-    id="site-search-status"
-    class="site-search-status"
-    aria-live="polite">
+  <div id="site-search-status" class="site-search-status" aria-live="polite">
     Loading search index...
   </div>
 
-  <ul
-    id="site-search-results"
-    class="site-search-results">
-  </ul>
+  <ul id="site-search-results" class="site-search-results"></ul>
 
 </div>
 
 <script>
 (function () {
 
-  const input =
-    document.getElementById("site-search-input");
-
-  const resultsElement =
-    document.getElementById("site-search-results");
-
-  const statusElement =
-    document.getElementById("site-search-status");
+  const input = document.getElementById("site-search-input");
+  const resultsElement = document.getElementById("site-search-results");
+  const statusElement = document.getElementById("site-search-status");
 
   let searchIndex = [];
 
@@ -116,7 +105,6 @@ author_profile: false
       .replace(/ı/g, "i");
   }
 
-
   function escapeHtml(value) {
     return (value || "")
       .replace(/&/g, "&amp;")
@@ -126,11 +114,8 @@ author_profile: false
       .replace(/'/g, "&#039;");
   }
 
-
   function cleanText(value) {
-    return (value || "")
-      .replace(/\s+/g, " ")
-      .trim();
+    return (value || "").replace(/\s+/g, " ").trim();
   }
 
 
@@ -139,28 +124,15 @@ author_profile: false
   -------------------------------------------------- */
 
   function getFileName(url) {
-
     try {
-
-      const pathname =
-        new URL(
-          url,
-          window.location.origin
-        ).pathname;
-
-      return decodeURIComponent(
-        pathname.split("/").pop() || ""
-      );
-
+      const pathname = new URL(url, window.location.origin).pathname;
+      return decodeURIComponent(pathname.split("/").pop() || "");
     } catch (e) {
-
       return "";
     }
   }
 
-
   function readableFileName(url) {
-
     return getFileName(url)
       .replace(/\.(pdf|html?)$/i, "")
       .replace(/[_-]+/g, " ")
@@ -168,59 +140,28 @@ author_profile: false
       .trim();
   }
 
-
-  function isSearchableAsset(url) {
-
+  function isSearchableAsset(url, sourceType) {
     try {
+      const parsed = new URL(url, window.location.origin);
 
-      const parsed =
-        new URL(
-          url,
-          window.location.origin
-        );
-
-      /*
-       * Only local files are indexed.
-       */
-      if (
-        parsed.origin !==
-        window.location.origin
-      ) {
+      if (parsed.origin !== window.location.origin) {
         return false;
       }
 
-      return /\.(pdf|html?)$/i
-        .test(parsed.pathname);
+      if (sourceType === "Apps" || sourceType === "Games") {
+        return true;
+      }
+
+      return /\.(pdf|html?)$/i.test(parsed.pathname);
 
     } catch (e) {
-
       return false;
     }
   }
 
-
-  function getAssetType(
-    url,
-    title,
-    sourceType
-  ) {
-
-    const pathname =
-      new URL(
-        url,
-        window.location.origin
-      )
-        .pathname
-        .toLowerCase();
-
-    const text =
-      normalize(title);
-
-
-    /*
-     * Apps and Games have priority
-     * over generic HTML classification.
-     */
+  function getAssetType(url, title, sourceType) {
+    const pathname = new URL(url, window.location.origin).pathname.toLowerCase();
+    const text = normalize(title);
 
     if (sourceType === "Apps") {
       return "App";
@@ -230,25 +171,13 @@ author_profile: false
       return "Game";
     }
 
-
-    /*
-     * PDF resources referenced by courses.
-     */
-
     if (pathname.endsWith(".pdf")) {
 
-      if (
-        text.includes("sunum") ||
-        text.includes("slide")
-      ) {
+      if (text.includes("sunum") || text.includes("slide")) {
         return "Slides";
       }
 
-      if (
-        text.includes("lecture note") ||
-        text.includes("lecture notes") ||
-        text.includes("notes")
-      ) {
+      if (text.includes("lecture note") || text.includes("lecture notes") || text.includes("notes")) {
         return "Lecture Notes";
       }
 
@@ -265,26 +194,14 @@ author_profile: false
       return "PDF";
     }
 
+    if (pathname.endsWith(".html") || pathname.endsWith(".htm")) {
 
-    /*
-     * HTML resources referenced by courses.
-     */
-
-    if (
-      pathname.endsWith(".html") ||
-      pathname.endsWith(".htm")
-    ) {
-
-      if (
-        text.includes("simulator") ||
-        text.includes("simulation")
-      ) {
+      if (text.includes("simulator") || text.includes("simulation")) {
         return "Simulator";
       }
 
       return "Interactive";
     }
-
 
     return "Resource";
   }
@@ -294,129 +211,61 @@ author_profile: false
      PAGE CONTEXT
   -------------------------------------------------- */
 
-  function getNearestHeading(link) {
+  function getNearestHeading(element) {
+    let current = element;
 
-    let element = link;
-
-    while (
-      element &&
-      element.tagName !== "BODY"
-    ) {
-
-      let sibling =
-        element.previousElementSibling;
+    while (current && current.tagName !== "BODY") {
+      let sibling = current.previousElementSibling;
 
       while (sibling) {
-
-        if (
-          /^H[1-4]$/.test(
-            sibling.tagName
-          )
-        ) {
-
-          return cleanText(
-            sibling.textContent
-          );
+        if (/^H[1-4]$/.test(sibling.tagName)) {
+          return cleanText(sibling.textContent);
         }
 
-        sibling =
-          sibling.previousElementSibling;
+        sibling = sibling.previousElementSibling;
       }
 
-      element =
-        element.parentElement;
+      current = current.parentElement;
     }
 
     return "";
   }
 
-
-  function getNearbyDescription(link) {
-
-    /*
-     * First try the current list item.
-     */
-
-    const listItem =
-      link.closest("li");
+  function getNearbyDescription(element) {
+    const listItem = element.closest("li");
 
     if (listItem) {
+      const text = cleanText(listItem.textContent);
+      const title = cleanText(element.textContent);
 
-      const text =
-        cleanText(
-          listItem.textContent
-        );
-
-      const title =
-        cleanText(
-          link.textContent
-        );
-
-      if (
-        text &&
-        text !== title &&
-        text.length > title.length
-      ) {
-
-        return text
-          .replace(title, "")
-          .replace(/^[\s\-–—:|]+/, "")
-          .trim();
+      if (text && text !== title && text.length > title.length) {
+        return text.replace(title, "").replace(/^[\s\-–—:|]+/, "").trim();
       }
     }
 
+    let current = element.parentElement;
 
-    /*
-     * Then try nearby paragraphs.
-     */
-
-    let element =
-      link.parentElement;
-
-    while (
-      element &&
-      element.tagName !== "BODY"
-    ) {
-
-      let sibling =
-        element.previousElementSibling;
+    while (current && current.tagName !== "BODY") {
+      let sibling = current.previousElementSibling;
 
       while (sibling) {
-
-        if (
-          sibling.tagName === "P"
-        ) {
-
-          const text =
-            cleanText(
-              sibling.textContent
-            );
+        if (sibling.tagName === "P") {
+          const text = cleanText(sibling.textContent);
 
           if (text.length > 30) {
-
             return text;
           }
         }
 
-
-        if (
-          /^H[1-4]$/.test(
-            sibling.tagName
-          )
-        ) {
+        if (/^H[1-4]$/.test(sibling.tagName)) {
           break;
         }
 
-
-        sibling =
-          sibling.previousElementSibling;
+        sibling = sibling.previousElementSibling;
       }
 
-
-      element =
-        element.parentElement;
+      current = current.parentElement;
     }
-
 
     return "";
   }
@@ -426,364 +275,181 @@ author_profile: false
      EXTRACT LINKED ASSETS
   -------------------------------------------------- */
 
-  function extractAssets(
-    html,
-    sourcePage
-  ) {
-
-    const parser =
-      new DOMParser();
-
-    const page =
-      parser.parseFromString(
-        html,
-        "text/html"
-      );
-
-    const links =
-      Array.from(
-        page.querySelectorAll(
-          "a[href]"
-        )
-      );
-
+  function extractAssets(html, sourcePage) {
+    const parser = new DOMParser();
+    const page = parser.parseFromString(html, "text/html");
     const assets = [];
 
+    const links = Array.from(page.querySelectorAll("a[href]"));
 
     links.forEach(function (link) {
+      addAsset(link.getAttribute("href"), cleanText(link.textContent), link);
+    });
 
-      const rawHref =
-        link.getAttribute("href");
 
+    /*
+     * Apps and Games use:
+     *
+     * <button onclick="location.href='...'">
+     */
+
+    const buttons = Array.from(page.querySelectorAll("button[onclick]"));
+
+    buttons.forEach(function (button) {
+      const onclick = button.getAttribute("onclick") || "";
+      const match = onclick.match(/(?:window\.)?location\.href\s*=\s*['"]([^'"]+)['"]/i);
+
+      if (!match) {
+        return;
+      }
+
+      addAsset(match[1], cleanText(button.textContent), button);
+    });
+
+
+    function addAsset(rawHref, title, element) {
       if (!rawHref) {
         return;
       }
 
-
       let url;
 
       try {
-
-        url =
-          new URL(
-            rawHref,
-            sourcePage.url.startsWith("http")
-              ? sourcePage.url
-              : window.location.origin +
-                sourcePage.url
-          );
-
+        const baseUrl = sourcePage.url.startsWith("http") ? sourcePage.url : window.location.origin + sourcePage.url;
+        url = new URL(rawHref, baseUrl);
       } catch (e) {
-
         return;
       }
 
-
-      if (
-        !isSearchableAsset(
-          url.href
-        )
-      ) {
+      if (!isSearchableAsset(url.href, sourcePage.sourceType)) {
         return;
       }
-
-
-      const title =
-        cleanText(
-          link.textContent
-        ) ||
-        readableFileName(
-          url.href
-        );
-
-
-      const heading =
-        getNearestHeading(
-          link
-        );
-
-
-      const nearbyDescription =
-        getNearbyDescription(
-          link
-        );
-
-
-      const filename =
-        readableFileName(
-          url.href
-        );
-
-
-      const type =
-        getAssetType(
-          url.href,
-          title,
-          sourcePage.sourceType
-        );
-
 
       /*
-       * Short visible description.
+       * Skip external files accidentally represented
+       * as local-looking URLs.
        */
+
+      if (url.origin !== window.location.origin) {
+        return;
+      }
+
+      title = title || readableFileName(url.href);
+
+      /*
+       * Remove decorative emoji from the beginning.
+       */
+
+      const cleanTitle = title.replace(/^[^\p{L}\p{N}]+/u, "").trim() || title;
+
+      const heading = getNearestHeading(element);
+      const nearbyDescription = getNearbyDescription(element);
+      const filename = readableFileName(url.href);
+      const type = getAssetType(url.href, cleanTitle, sourcePage.sourceType);
 
       let excerpt = "";
 
-      if (
-        nearbyDescription &&
-        nearbyDescription !== title
-      ) {
-
-        excerpt =
-          nearbyDescription.length > 220
-            ? nearbyDescription.slice(
-                0,
-                217
-              ) + "..."
-            : nearbyDescription;
-
-      } else if (
-        heading &&
-        heading !== title
-      ) {
-
+      if (nearbyDescription && nearbyDescription !== cleanTitle) {
+        excerpt = nearbyDescription.length > 220 ? nearbyDescription.slice(0, 217) + "..." : nearbyDescription;
+      } else if (heading && heading !== cleanTitle) {
         excerpt = heading;
-
       } else {
-
-        excerpt =
-          sourcePage.title;
+        excerpt = sourcePage.title;
       }
 
-
-      /*
-       * Searchable text.
-       *
-       * Includes:
-       * - visible link title
-       * - file name
-       * - section/chapter heading
-       * - nearby description
-       * - source page title
-       * - resource type
-       */
-
       const content = [
-        title,
+        cleanTitle,
         filename,
         heading,
         nearbyDescription,
         sourcePage.title,
         sourcePage.sourceType,
         type
-      ]
-        .filter(Boolean)
-        .join(" ");
-
+      ].filter(Boolean).join(" ");
 
       assets.push({
-
-        title: title,
-
-        url:
-          url.pathname +
-          url.search +
-          url.hash,
-
+        title: cleanTitle,
+        url: url.pathname + url.search + url.hash,
         type: type,
-
         excerpt: excerpt,
-
         content: content
-
       });
-
-    });
-
+    }
 
     return assets;
   }
 
 
   /* --------------------------------------------------
-     LOAD TEACHING / APPS / GAMES ASSETS
+     LOAD TEACHING / APPS / GAMES
   -------------------------------------------------- */
 
   async function loadLinkedAssets() {
-
-    /*
-     * Teaching pages are already present
-     * in search.json.
-     */
-
-    const sourcePages =
-      searchIndex
-
-        .filter(function (item) {
-
-          return (
-            item.type ===
-            "Teaching"
-          );
-
-        })
-
-        .map(function (item) {
-
-          return {
-
-            title:
-              item.title,
-
-            url:
-              item.url,
-
-            sourceType:
-              "Teaching"
-
-          };
-
-        });
-
-
-    /*
-     * Additional index pages.
-     */
+    const sourcePages = searchIndex
+      .filter(function (item) {
+        return item.type === "Teaching";
+      })
+      .map(function (item) {
+        return {
+          title: item.title,
+          url: item.url,
+          sourceType: "Teaching"
+        };
+      });
 
     sourcePages.push(
-
       {
         title: "Apps",
         url: "{{ '/apps/' | relative_url }}",
         sourceType: "Apps"
       },
-
       {
         title: "Games",
         url: "{{ '/games/' | relative_url }}",
         sourceType: "Games"
       }
-
     );
 
+    const requests = sourcePages.map(async function (sourcePage) {
+      try {
+        const response = await fetch(sourcePage.url);
 
-    const requests =
-      sourcePages.map(
-        async function (
-          sourcePage
-        ) {
-
-          try {
-
-            const response =
-              await fetch(
-                sourcePage.url
-              );
-
-
-            if (!response.ok) {
-
-              return [];
-            }
-
-
-            const html =
-              await response.text();
-
-
-            return extractAssets(
-              html,
-              sourcePage
-            );
-
-
-          } catch (e) {
-
-            return [];
-          }
-
-        }
-      );
-
-
-    const groups =
-      await Promise.all(
-        requests
-      );
-
-
-    const assets =
-      groups.flat();
-
-
-    /*
-     * Avoid duplicate URLs.
-     *
-     * The same PDF may be referenced
-     * several times from a course page.
-     */
-
-    const knownUrls =
-      new Set();
-
-
-    searchIndex.forEach(
-      function (item) {
-
-        try {
-
-          const url =
-            new URL(
-              item.url,
-              window.location.origin
-            );
-
-          knownUrls.add(
-            url.pathname +
-            url.search +
-            url.hash
-          );
-
-        } catch (e) {
-
-          knownUrls.add(
-            item.url
-          );
+        if (!response.ok) {
+          return [];
         }
 
+        const html = await response.text();
+        return extractAssets(html, sourcePage);
+
+      } catch (e) {
+        return [];
       }
-    );
+    });
 
+    const groups = await Promise.all(requests);
+    const assets = groups.flat();
+
+    const knownUrls = new Set();
+
+    searchIndex.forEach(function (item) {
+      try {
+        const url = new URL(item.url, window.location.origin);
+        knownUrls.add(url.pathname + url.search + url.hash);
+      } catch (e) {
+        knownUrls.add(item.url);
+      }
+    });
 
     const uniqueAssets = [];
 
-
-    assets.forEach(
-      function (asset) {
-
-        if (
-          !knownUrls.has(
-            asset.url
-          )
-        ) {
-
-          knownUrls.add(
-            asset.url
-          );
-
-          uniqueAssets.push(
-            asset
-          );
-        }
-
+    assets.forEach(function (asset) {
+      if (!knownUrls.has(asset.url)) {
+        knownUrls.add(asset.url);
+        uniqueAssets.push(asset);
       }
-    );
+    });
 
-
-    searchIndex =
-      searchIndex.concat(
-        uniqueAssets
-      );
+    searchIndex = searchIndex.concat(uniqueAssets);
   }
 
 
@@ -792,320 +458,109 @@ author_profile: false
   -------------------------------------------------- */
 
   function search(query) {
+    const normalizedQuery = normalize(query).trim();
 
-    const normalizedQuery =
-      normalize(
-        query
-      ).trim();
+    resultsElement.innerHTML = "";
 
-
-    resultsElement.innerHTML =
-      "";
-
-
-    if (
-      normalizedQuery.length < 2
-    ) {
-
-      statusElement.textContent =
-        "Type at least 2 characters.";
-
+    if (normalizedQuery.length < 2) {
+      statusElement.textContent = "Type at least 2 characters.";
       return;
     }
 
+    const terms = normalizedQuery.split(/\s+/).filter(Boolean);
 
-    const terms =
-      normalizedQuery
-        .split(/\s+/)
-        .filter(Boolean);
+    const matches = searchIndex
+      .map(function (item) {
+        const title = normalize(item.title);
+        const content = normalize(item.content);
+        const type = normalize(item.type);
+        const excerpt = normalize(item.excerpt);
 
+        let score = 0;
+        let matchedTerms = 0;
 
-    const matches =
-      searchIndex
+        terms.forEach(function (term) {
+          let matched = false;
 
-        .map(function (item) {
-
-          const title =
-            normalize(
-              item.title
-            );
-
-          const content =
-            normalize(
-              item.content
-            );
-
-          const type =
-            normalize(
-              item.type
-            );
-
-          const excerpt =
-            normalize(
-              item.excerpt
-            );
-
-
-          let score = 0;
-
-          let matchedTerms = 0;
-
-
-          terms.forEach(
-            function (term) {
-
-              let matched =
-                false;
-
-
-              /*
-               * Title relevance.
-               */
-
-              if (
-                title === term
-              ) {
-
-                score += 30;
-
-                matched = true;
-
-              } else if (
-                title.startsWith(
-                  term
-                )
-              ) {
-
-                score += 20;
-
-                matched = true;
-
-              } else if (
-                title.includes(
-                  term
-                )
-              ) {
-
-                score += 12;
-
-                matched = true;
-              }
-
-
-              /*
-               * Type relevance.
-               */
-
-              if (
-                type.includes(
-                  term
-                )
-              ) {
-
-                score += 4;
-
-                matched = true;
-              }
-
-
-              /*
-               * Description relevance.
-               */
-
-              if (
-                excerpt.includes(
-                  term
-                )
-              ) {
-
-                score += 3;
-
-                matched = true;
-              }
-
-
-              /*
-               * General content.
-               */
-
-              if (
-                content.includes(
-                  term
-                )
-              ) {
-
-                score += 1;
-
-                matched = true;
-              }
-
-
-              if (matched) {
-
-                matchedTerms++;
-              }
-
-            }
-          );
-
-
-          /*
-           * Prefer results matching
-           * every search term.
-           */
-
-          if (
-            matchedTerms ===
-            terms.length
-          ) {
-
-            score += 10;
+          if (title === term) {
+            score += 30;
+            matched = true;
+          } else if (title.startsWith(term)) {
+            score += 20;
+            matched = true;
+          } else if (title.includes(term)) {
+            score += 12;
+            matched = true;
           }
 
-
-          return {
-
-            item:
-              item,
-
-            score:
-              score,
-
-            matchedTerms:
-              matchedTerms
-
-          };
-
-        })
-
-
-        .filter(
-          function (result) {
-
-            return (
-              result.score > 0
-            );
+          if (type.includes(term)) {
+            score += 4;
+            matched = true;
           }
-        )
 
-
-        .sort(
-          function (a, b) {
-
-            /*
-             * First prefer results
-             * matching more query terms.
-             */
-
-            if (
-              b.matchedTerms !==
-              a.matchedTerms
-            ) {
-
-              return (
-                b.matchedTerms -
-                a.matchedTerms
-              );
-            }
-
-
-            /*
-             * Then sort by relevance.
-             */
-
-            return (
-              b.score -
-              a.score
-            );
-
+          if (excerpt.includes(term)) {
+            score += 3;
+            matched = true;
           }
-        )
 
+          if (content.includes(term)) {
+            score += 1;
+            matched = true;
+          }
 
-        .slice(
-          0,
-          50
-        );
+          if (matched) {
+            matchedTerms++;
+          }
+        });
 
+        if (matchedTerms === terms.length) {
+          score += 10;
+        }
 
-    if (
-      matches.length === 0
-    ) {
+        return {
+          item: item,
+          score: score,
+          matchedTerms: matchedTerms
+        };
+      })
+      .filter(function (result) {
+        return result.score > 0;
+      })
+      .sort(function (a, b) {
+        if (b.matchedTerms !== a.matchedTerms) {
+          return b.matchedTerms - a.matchedTerms;
+        }
 
-      statusElement.textContent =
-        "No results found.";
+        return b.score - a.score;
+      })
+      .slice(0, 50);
 
+    if (matches.length === 0) {
+      statusElement.textContent = "No results found.";
       return;
     }
 
+    statusElement.textContent = matches.length + (matches.length === 1 ? " result" : " results");
 
-    statusElement.textContent =
-      matches.length +
-      (
-        matches.length === 1
-          ? " result"
-          : " results"
-      );
+    matches.forEach(function (result) {
+      const item = result.item;
+      const li = document.createElement("li");
 
+      li.className = "site-search-result";
 
-    matches.forEach(
-      function (result) {
+      li.innerHTML =
+        '<span class="site-search-result-type">' +
+        escapeHtml(item.type) +
+        '</span>' +
+        '<h2><a href="' +
+        escapeHtml(item.url) +
+        '">' +
+        escapeHtml(item.title) +
+        '</a></h2>' +
+        (item.excerpt ? "<p>" + escapeHtml(item.excerpt) + "</p>" : "");
 
-        const item =
-          result.item;
-
-
-        const li =
-          document.createElement(
-            "li"
-          );
-
-
-        li.className =
-          "site-search-result";
-
-
-        li.innerHTML =
-
-          '<span class="site-search-result-type">' +
-
-            escapeHtml(
-              item.type
-            ) +
-
-          '</span>' +
-
-          '<h2><a href="' +
-
-            escapeHtml(
-              item.url
-            ) +
-
-          '">' +
-
-            escapeHtml(
-              item.title
-            ) +
-
-          '</a></h2>' +
-
-          (
-            item.excerpt
-              ? "<p>" +
-                escapeHtml(
-                  item.excerpt
-                ) +
-                "</p>"
-              : ""
-          );
-
-
-        resultsElement.appendChild(
-          li
-        );
-
-      }
-    );
+      resultsElement.appendChild(li);
+    });
   }
 
 
@@ -1113,106 +568,39 @@ author_profile: false
      INITIALIZATION
   -------------------------------------------------- */
 
-  fetch(
-    "{{ '/search.json' | relative_url }}"
-  )
-
-    .then(
-      function (response) {
-
-        if (!response.ok) {
-
-          throw new Error(
-            "Search index could not be loaded."
-          );
-        }
-
-
-        return response.json();
-
+  fetch("{{ '/search.json' | relative_url }}")
+    .then(function (response) {
+      if (!response.ok) {
+        throw new Error("Search index could not be loaded.");
       }
-    )
 
+      return response.json();
+    })
+    .then(async function (data) {
+      searchIndex = data;
 
-    .then(
-      async function (data) {
+      await loadLinkedAssets();
 
-        searchIndex =
-          data;
+      statusElement.textContent = "Search " + searchIndex.length + " items.";
 
+      input.addEventListener("input", function () {
+        search(input.value);
+      });
 
-        /*
-         * Discover linked resources from:
-         *
-         * - Teaching pages
-         * - Apps
-         * - Games
-         */
+      const params = new URLSearchParams(window.location.search);
+      const initialQuery = params.get("q");
 
-        await loadLinkedAssets();
-
-
-        statusElement.textContent =
-          "Search " +
-          searchIndex.length +
-          " items.";
-
-
-        input.addEventListener(
-          "input",
-          function () {
-
-            search(
-              input.value
-            );
-
-          }
-        );
-
-
-        /*
-         * Support:
-         *
-         * /search/?q=dijkstra
-         */
-
-        const params =
-          new URLSearchParams(
-            window.location.search
-          );
-
-
-        const initialQuery =
-          params.get("q");
-
-
-        if (
-          initialQuery
-        ) {
-
-          input.value =
-            initialQuery;
-
-          search(
-            initialQuery
-          );
-        }
-
-
-        input.focus();
-
+      if (initialQuery) {
+        input.value = initialQuery;
+        search(initialQuery);
       }
-    )
 
-
-    .catch(
-      function () {
-
-        statusElement.textContent =
-          "Search is temporarily unavailable.";
-
-      }
-    );
+      input.focus();
+    })
+    .catch(function (error) {
+      console.error("Search error:", error);
+      statusElement.textContent = "Search is temporarily unavailable.";
+    });
 
 })();
 </script>
