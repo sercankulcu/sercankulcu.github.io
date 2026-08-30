@@ -288,23 +288,3 @@ At the same time, he is already thinking about what happens when the success end
 The career is rising.
 
 But Teoman has begun imagining the descent.
-
----
-
-### Source Note
-
-**Original publication:** Sabah Gazetesi  
-**Date:** 24 January 2001  
-**Original title:** *Akıllı Kadın Her Zaman Daha İyidir*  
-**Interviewer:** Deniz Akkaya  
-**Document type:** Interview  
-**Verification:** Archived transcription  
-**Confidence:** Medium  
-
-A detailed transcription survives in the *Teoman Röportajları* archive. Its heading explicitly identifies **Sabah Gazetesi**, the date **24 January 2001**, **Deniz Akkaya**, and the title *Akıllı Kadın Her Zaman Daha İyidir*.
-
-The surviving text is internally consistent with Teoman's career at the beginning of 2001 and with topics he discussed in other interviews from the *Onyedi* period. However, an accessible copy of the original Sabah newspaper page has not yet been independently located.
-
-For that reason, the publication metadata is strong archival evidence but not yet primary-source verified.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*

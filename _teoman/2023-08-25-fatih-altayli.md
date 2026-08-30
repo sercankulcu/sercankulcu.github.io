@@ -502,24 +502,3 @@ It simply changes the task.
 The goal is no longer to become a person without restlessness.
 
 It is to become someone who knows what to do with it.
-
----
-
-### Source Note
-
-**Original platform:** Fatih Altaylı YouTube  
-**Date:** 25 August 2023  
-**Original title:** *“Türkiye'nin laik kalmasını istiyorum” Teoman, Fatih Altaylı'nın sorularını yanıtladı*  
-**Interviewer:** Fatih Altaylı  
-**Document type:** Video interview  
-**Duration:** approximately 1 hour 5 minutes  
-**Verification:** Primary source  
-**Confidence:** High  
-
-The complete interview remains available on Fatih Altaylı's verified YouTube channel and is explicitly dated **25 August 2023**. The official description provides detailed timestamps covering Teoman's new album, his departure from and return to music, changes in his musical style, his public image, Necip Fazıl Kısakürek, artistic permanence, younger generations, secularism, conservative Turkey, aging, future musical plans, Istanbul, social class, political consciousness, permanent restlessness and relationships.
-
-Contemporary reporting independently confirms the interview and its political discussion. T24 reported Teoman's comments on Necip Fazıl, conservative audiences and Boğaziçi two days after the interview, while Tele1 separately reported his explanation of the Necip Fazıl reference and his stated aim of encouraging social reconciliation.
-
-Because the complete original video remains publicly accessible from the interviewer’s verified channel and contemporary sources independently reported its major statements, provenance is primary-source verified with high confidence.
-
-*This page is an archival summary and commentary. It does not reproduce the full video interview.*

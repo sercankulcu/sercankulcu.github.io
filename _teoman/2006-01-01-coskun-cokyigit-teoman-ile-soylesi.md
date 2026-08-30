@@ -416,21 +416,3 @@ He accepts limitation.
 But within all of those constraints, he still wants one thing:
 
 **to arrive somewhere that could only have been made by Teoman.**
-
----
-
-### Source Note
-
-**Year:** 2006  
-**Original interviewer:** Coşkun Çokyiğit  
-**Document type:** Interview  
-**Verification:** Primary archival publication  
-**Confidence:** High  
-
-Coşkun Çokyiğit states that he personally conducted the interview with Teoman in 2006. According to his introductory note, part of the conversation was published at the newspaper where he was working at the time, while the remainder was preserved in his archive and later published by İstanbul Sanat Evi.
-
-The surviving İstanbul Sanat Evi page therefore differs substantially from anonymous fan transcriptions used for some earlier interviews: it is presented directly as an archived interview by the person who conducted it.
-
-The page does not provide a precise day or month for the original interview, nor does it identify the newspaper in which the shorter version first appeared. For that reason, this archive preserves only the verified year rather than inventing a more precise date.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*

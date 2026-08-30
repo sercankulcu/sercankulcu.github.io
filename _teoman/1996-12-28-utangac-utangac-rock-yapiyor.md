@@ -100,17 +100,3 @@ Later Teoman interviews can therefore be compared against this one.
 
 It provides something close to a **baseline Teoman**: the musician immediately before fame changed the conditions around him.
 
----
-
-### Source Note
-
-**Original publication:** Milliyet  
-**Date:** 28 December 1996  
-**Original title:** *Utangaç utangaç rock yapıyor*  
-**Interviewer:** Not identified on the surviving Milliyet page  
-**Verification:** Primary source available  
-**Confidence:** High  
-
-The article remains available in Milliyet's online archive. A 2013 Teoman interview archive also preserves a copy attributed to Milliyet, and its text corresponds closely with the surviving original.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*

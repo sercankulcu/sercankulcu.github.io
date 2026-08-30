@@ -439,22 +439,3 @@ The older Teoman can tell stories about the man who lived it.
 And occasionally, with a smile, he can still say:
 
 **“Ben bir rock yıldızıyım.”**
-
----
-
-### Source Note
-
-**Original program:** Umarım Annem Dinlemez  
-**Host / interviewer:** Tuluğ Özlü  
-**Date:** November 2023  
-**Document type:** Podcast interview  
-**Verification:** Cross-verified  
-**Confidence:** High  
-
-The Teoman episode opened the fifth season of Tuluğ Özlü's *Umarım Annem Dinlemez*. Later official event descriptions for the podcast specifically identify the **Teoman episode as the opening episode of season five** and note its unusually high social-media reach.
-
-The episode's existence and content are independently confirmed by numerous contemporary publications. On 7–8 November 2023, T24, Tele1, Mynet, OdaTV and TV100 all reported Teoman's appearance on Tuluğ Özlü's podcast and preserved overlapping statements about dating, fidelity, nightlife and sexuality.
-
-These independent contemporary reports strongly verify the authenticity and approximate publication period of the conversation. The exact original release date should be preserved as **1 November 2023 only when the podcast feed metadata itself is available in the archive**; otherwise `2023-11` is the more conservative metadata choice.
-
-*This page is an archival summary and commentary. It does not reproduce the full podcast conversation.*

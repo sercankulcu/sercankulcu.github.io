@@ -315,24 +315,3 @@ He is thinking simultaneously about music, literature, cinema, society and the c
 The “rock star” identity still exists.
 
 But it is beginning to look too small for the person inside it.
-
----
-
-### Source Note
-
-**Original publication:** Aujourd’hui la Turquie, Turkish supplement  
-**Issue:** No. 58  
-**Date:** February 2010  
-**Original title:** *Türk Rock Müziğinin Romantik ve Asi Çocuğu Teoman*  
-**Interviewer / preparer:** Ayça Yüksel  
-**Document type:** Interview  
-**Verification:** Primary source  
-**Confidence:** High  
-
-The original publication survives as a PDF in the official archive of *Aujourd’hui la Turquie*. The issue identifies itself as **No. 58, February 2010**, and the Teoman interview appears on page 4 under the title *Türk Rock Müziğinin Romantik ve Asi Çocuğu Teoman*.
-
-The introductory text states that the conversation took place at Teoman and his manager's office in Karaköy and centered on *İnsanlık Halleri*, the video for *Çoban Yıldızı*, music, literature and politics. The byline identifies **Ayça Yüksel** as the person who conducted and prepared the interview.
-
-Because the original issue itself is still available, the publication, date, title and interviewer can all be treated as primary-source verified.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*

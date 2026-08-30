@@ -592,26 +592,3 @@ But it is also the logical end point of one of the oldest themes in his career:
 The young Teoman wanted control over the song.
 
 The older Teoman wants control over the system around the song.
-
----
-
-### Source Note
-
-**Original publication:** Forbes Türkiye  
-**Date:** 6 August 2025  
-**Original title:** *Teoman: Yakın gelecekte sanatçılar ve iş dünyası ekonomik yıkımla karşılaşacak*  
-**Writer / interviewer:** Nilgün Balcı Çavdar  
-**Photography:** Ergun Candemir  
-**Document type:** Interview / profile  
-**Verification:** Primary source  
-**Confidence:** High  
-
-The complete article remains available on Forbes Türkiye's official website. It is explicitly dated **6 August 2025**, identifies **Nilgün Balcı Çavdar** as the writer and **Ergun Candemir** as the photographer.
-
-The article directly records Teoman's views on artificial intelligence, the future economic value of creative production, his belief that established artists will be better positioned than newcomers, his description of himself as both artist and businessman, and his strategy of managing Teoman as a diversified professional entity.
-
-It also documents Teoman's active use of AI-supported production, the expansion of his fictional character Timur into a digital media property, and AI-assisted work connected with the forthcoming *Kırılganlar Kralı* project.
-
-Because the original Forbes feature remains fully accessible from the original publisher with explicit publication metadata, this record is primary-source verified with high confidence.
-
-*This page is an archival summary and commentary. It does not reproduce the original Forbes article in full.*

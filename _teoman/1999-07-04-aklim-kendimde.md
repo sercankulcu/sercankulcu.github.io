@@ -319,20 +319,3 @@ The June 1999 interviews showed **Teoman encountering fame and examining himself
 This July interview adds another transformation:
 
 **Teoman begins to wonder whether becoming successful has also made him less capable of being passionately interested in the world outside himself.**
-
----
-
-### Source Note
-
-**Original publication:** Cumhuriyet Gazetesi  
-**Date:** 4 July 1999  
-**Original title:** *Aklım Kendimde*  
-**Interviewer:** Zeynep Güven  
-**Verification:** Archived transcription  
-**Confidence:** Medium  
-
-A detailed transcription survives in the *Teoman Röportajları* archive. The archived text explicitly identifies Zeynep Güven as the writer and Cumhuriyet Gazetesi as the original source.
-
-The original Cumhuriyet newspaper page has not yet been independently located in an accessible digital archive. For that reason, the interview's existence and content are well documented, but the surviving online version should still be considered an archival transcription rather than a verified digital original.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*

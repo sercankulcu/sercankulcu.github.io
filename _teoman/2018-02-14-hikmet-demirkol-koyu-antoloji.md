@@ -392,23 +392,3 @@ He is asking:
 **If I cannot control how long my work survives, can I at least help decide what survives with me?**
 
 *Koyu Antoloji* is one answer.
-
----
-
-### Source Note
-
-**Original publication:** Hürriyet  
-**Date:** 14 February 2018  
-**Original title:** *Teoman'dan arşivlik albüm: Koyu Antoloji*  
-**Interviewer / writer:** Hikmet Demirkol  
-**Document type:** Interview / music feature  
-**Verification:** Primary source  
-**Confidence:** High  
-
-The article remains available on Hürriyet's official website and is explicitly dated **14 February 2018**. Hikmet Demirkol discusses *Koyu Antoloji* directly with Teoman, including the twenty-six-song structure of the project, his relationship with older material and his changing motivation toward songwriting.
-
-The existence, date and track structure of *Koyu Antoloji* are independently consistent with Teoman's official discography.
-
-Because the original Hürriyet article remains publicly accessible, the publication, date, writer and interview context can all be treated as primary-source verified.
-
-*This page is an archival summary and commentary. It does not reproduce the original article in full.*

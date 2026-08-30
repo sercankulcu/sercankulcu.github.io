@@ -520,24 +520,3 @@ This may be one of the deepest transformations in the archive.
 The young Teoman spent decades constructing Teoman.
 
 The older Teoman gradually discovers that meaning may depend on thinking less about Teoman.
-
----
-
-### Source Note
-
-**Original platform:** GAİN  
-**Date:** 14 February 2021 for the officially published first interview segment  
-**Interviewer:** Mirgün Cabas  
-**Document type:** Video interview  
-**Verification:** Primary source  
-**Confidence:** High  
-
-Teoman's official YouTube channel preserves the first part of the GAİN conversation under the title *Teoman - Mirgün Cabas Söyleşisi | 1. Bölüm (Gain)*. It was published on **14 February 2021** and explicitly identifies the conversation as Teoman's interview with Mirgün Cabas for GAİN.
-
-The same official channel published the accompanying GAİN live performance on **5 February 2021**, confirming that the interview project belongs to this period. The performance includes *17*, *Kişisel Bir Şey*, *İnsanlar*, *Rüzgar Gülü* and *Hayal Meyal*.
-
-Some later streaming catalogues list *Teoman & Mirgün Cabas Söyleşisi* as a 2022 title. However, contemporary audience references to the interview already appear in late 2020 and early 2021, while Teoman's own official channel dates the material to February 2021.
-
-For archival purposes, the primary-source publication date therefore takes precedence over later catalogue metadata.
-
-*This page is an archival summary and commentary. It does not reproduce the full video interview.*

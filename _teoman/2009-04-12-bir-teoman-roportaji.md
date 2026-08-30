@@ -472,25 +472,3 @@ People change.
 Countries change.
 
 The meaning of old optimism changes with them.
-
----
-
-### Source Note
-
-**Original publication:** Sabah  
-**Extended version:** Hafif Müzik  
-**Date:** 12 April 2009  
-**Interviewer:** Mehmet Tez  
-**Document type:** Interview  
-**Verification:** Primary archival source / cross-verified  
-**Confidence:** High  
-
-Mehmet Tez's own surviving *Hafif Müzik* archive publishes the long version of the interview on **12 April 2009** under the title *Teoman röportajının tam metni!* Tez explicitly states that he had visited Teoman at his home the previous Thursday and that a shorter version of the conversation was published in **Sabah** that day.
-
-The surviving text contains the direct question-and-answer conversation and identifies its subjects as suicide, prostitutes, women, men, lies, music, cinema, poetry and lifestyles that may need to change. It also preserves Teoman's contemporary comments on elections, Ergenekon, 1 May, the Kurdish question and his optimism about Turkey's future.
-
-The provenance is independently strengthened by an academic study of Turkish rock music, which explicitly cites **“Bir Teoman Röportajı”, Hafifmuzik.org, 12 Nisan 2009** and preserves the former Hafifmuzik.org URL.
-
-Because the interviewer himself preserved the extended text and independent academic work confirms the source and date, this archive treats the record as **high-confidence primary archival material**.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*

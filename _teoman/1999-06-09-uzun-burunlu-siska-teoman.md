@@ -148,19 +148,3 @@ That makes this interview especially useful in a chronological archive.
 The 1996 interview records **Teoman before fame**.
 
 This 1999 interview records **Teoman discovering what fame does to identity**.
-
----
-
-### Source Note
-
-**Original publication:** Hürriyet Gazetesi, Kelebek supplement  
-**Date:** 9 June 1999  
-**Original title:** *Uzun Burunlu Sıska Teoman*  
-**Verification:** Cross-verified  
-**Confidence:** High  
-
-The interview survives as a transcription in the Teoman interview archive. Its publication details are independently supported by surviving listings of the physical 9 June 1999 issue of Hürriyet's *Kelebek* supplement, which identifies the same Teoman feature under the same title.
-
-The original Hürriyet web page does not appear to remain publicly accessible, so the surviving transcription should still be treated as an archival copy rather than an authoritative digital original.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*
