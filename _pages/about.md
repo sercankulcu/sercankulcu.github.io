@@ -7,11 +7,7 @@ redirect_from:
   - /about/
 ---
 
-<img align="right" width="150" alt="owl coffee beans" src="/images/owl-coffee-beans.webp">
-
-I am Sercan Külcü, an Assistant Professor in the Department of Computer Engineering at Giresun University. I have over 20 years of professional experience in software engineering and hold a PhD focused on low-power wireless communication technologies. My work focuses on software engineering, embedded systems, programming, algorithms, and interactive tools for computer science education. I use this website to share teaching materials, technical work, software experiments, and selected writings.
-
-<p id="install" style="display: none;">For easier mobile access, <button id="installPWA">🚀 Install App</button> directly on your device.</p>
+<!--  <img align="right" width="150" alt="owl coffee beans" src="/images/owl-coffee-beans.webp"> -->
 
 <style>
 button {
@@ -41,11 +37,21 @@ window.addEventListener("appinstalled", () => {
 });
 </script>
 
-Explore my courses through <button type="button" onclick="window.location.href='/teaching/'">📚 Teaching</button>, use practical tools in <button type="button" onclick="window.location.href='/apps/'">📱 Apps</button>, try interactive projects in <button type="button" onclick="window.location.href='https://dorukdayim.netlify.app'">🧠 Games</button>, review my background in <button type="button" onclick="window.location.href='/cv/'">📄 CV</button>, or browse useful links in <button type="button" onclick="window.location.href='/bookmarks/'">🔖 Bookmarks</button>.
+I am **Sercan Külcü**, an Assistant Professor of Computer Engineering at Giresun University.
 
-Read technical notes in <button type="button" onclick="window.location.href='/posts/'">💻 Technical Blog</button>, explore writing tools in <button type="button" onclick="window.location.href='/pencils/'">✏️ Pencils</button>, discover broader topics in <button type="button" onclick="window.location.href='/humanity/'">🌍 Humanity</button>, or read observations about the world in <button type="button" onclick="window.location.href='/nature/'">🌿 Nature</button>.
+I studied Computer Engineering at **Hacettepe University** and spent much of my professional career developing software for real-world engineering systems, including **ten years at SDT Space & Defence Technologies**. After more than two decades in software engineering, I moved further into academic research and teaching.
 
-<!-- I keep personal stories in <button type="button" onclick="window.location.href='/memory/'">🕰️ Memory</button>, essays and observations in <button type="button" onclick="window.location.href='/thoughts/'">💭 Thoughts</button>, and writing about films, games, music, and other things I enjoy in <button type="button" onclick="window.location.href='/fun/'">🎬 Fun</button>.-->
+My interests span **software engineering, embedded systems, machine learning, computer vision, radar-based perception, algorithms, and intelligent systems**.
+
+I enjoy building things, testing ideas, and understanding how systems work. This perspective also shapes my teaching: fundamentals become more meaningful when they can be implemented, explored, and experimented with.
+
+This website brings together my academic work, software projects, teaching materials, technical notes, personal writing, and other things I find worth exploring.
+
+<p id="install" style="display: none;">For easier mobile access, <button id="installPWA">🚀 Install App</button> directly on your device.</p>
+
+**Explore the site**
+
+[📚 Teaching](/teaching/) · [📄 CV](/cv/) · [🛠️ Apps](/apps/) · [🎮 Games](/games/) · [💻 Posts](/posts/) · [💭 Thoughts](/thoughts/) · [🎬 Fun](/fun/) · [🕰️ Memory](/memory/) · [🌍 Humanity](/humanity/) · [🌿 Nature](/nature/) · [✏️ Pencils](/pencils/) · [🔖 Bookmarks](/bookmarks/)
 
 **Note:** If you believe any content on this website infringes a license or copyright, please contact me. I will review and remove the material promptly if necessary.
 
