@@ -39,11 +39,9 @@ window.addEventListener("appinstalled", () => {
 
 I am **Sercan Külcü**, an Assistant Professor of Computer Engineering at Giresun University.
 
-I studied Computer Engineering at **Hacettepe University** and spent much of my professional career developing software for real-world engineering systems, including **ten years at SDT Space & Defence Technologies**. After more than two decades in software engineering, I moved further into academic research and teaching.
+I studied Computer Engineering at **Hacettepe University** and spent much of my professional career developing software for real-world engineering systems, including **ten years at SDT Space & Defence Technologies**. After that, I moved into academia and have spent more than ten years in research and teaching.
 
-My interests span **software engineering, embedded systems, machine learning, computer vision, radar-based perception, algorithms, and intelligent systems**.
-
-I enjoy building things, testing ideas, and understanding how systems work. This perspective also shapes my teaching: fundamentals become more meaningful when they can be implemented, explored, and experimented with.
+My interests span **software engineering, embedded systems, machine learning, computer vision, algorithms, and intelligent systems**.
 
 This website brings together my academic work, software projects, teaching materials, technical notes, personal writing, and other things I find worth exploring.
 
