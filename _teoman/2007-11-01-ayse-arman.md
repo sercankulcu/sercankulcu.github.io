@@ -489,24 +489,3 @@ And eventually the songwriter began asking another question:
 His answer is increasingly clear.
 
 The songs.
-
----
-
-### Source Note
-
-**Original publication:** Hürriyet  
-**Date:** November 2007  
-**Interviewer:** Ayşe Arman  
-**Document type:** Interview  
-**Verification:** Cross-verified archival transcription  
-**Confidence:** High  
-
-A long transcription survives in a Teoman fan archive under the explicit heading *Ayşe Arman Röportajı — Hürriyet Gazetesi — Kasım 2007*. It contains an extensive question-and-answer interview covering Teoman's father, mother, childhood, relationships, fame and musical ambitions.
-
-The provenance is strengthened by later independent publications that explicitly identify passages about Teoman's father as originating from his Ayşe Arman interview and reproduce the same exchange.
-
-The line from *Paramparça* around which Ayşe Arman frames the discussion is independently confirmed on Teoman's official site as part of the 2000 song.
-
-An accessible original Hürriyet page for the Teoman interview has not yet been located, and the surviving archive identifies only **November 2007**, not a precise publication day. For that reason, this archive deliberately preserves the month rather than inventing an exact date.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*

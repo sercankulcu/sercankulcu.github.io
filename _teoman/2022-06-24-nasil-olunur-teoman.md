@@ -482,26 +482,3 @@ Not even legacy.
 **Interest.**
 
 Because once a person already has the career, the songs and the public recognition, the hardest thing to manufacture may simply be a reason to remain curious.
-
----
-
-### Source Note
-
-**Original program:** Nasıl Olunur?  
-**Episode:** 159  
-**Date:** 24 June 2022  
-**Host / interviewer:** Nilay Örnek  
-**Duration:** approximately 1 hour 32 minutes  
-**Document type:** Podcast interview  
-**Verification:** Primary / multi-platform verified  
-**Confidence:** High  
-
-The episode remains publicly listed as **“159- Teoman”** in the *Nasıl Olunur?* podcast feed. Apple Podcasts identifies the publication date as **24 June 2022**, the episode number as **159**, and the duration as approximately **1 hour 32 minutes**.
-
-Spotify independently lists the same episode, title, date and duration. Storytel and Podtail preserve the same feed metadata and description.
-
-The official episode description introduces Teoman as a long-established rock star who has written many of his own songs, made films, acted, published an autobiographical book, increasingly designs his own special projects, appears less frequently in the media, tries to avoid boredom and is working on another book.
-
-Because the episode itself remains available through the original podcast distribution feed and its metadata is independently reproduced across major podcast platforms, its provenance is exceptionally strong.
-
-*This page is an archival summary and commentary. It does not reproduce the full podcast conversation.*

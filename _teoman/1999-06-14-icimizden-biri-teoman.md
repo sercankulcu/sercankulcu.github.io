@@ -288,20 +288,3 @@ The 9 June 1999 interview showed **the musician encountering celebrity**.
 This interview, only five days later, shows something different:
 
 **the person trying to understand himself beneath that celebrity.**
-
----
-
-### Source Note
-
-**Date:** 14 June 1999  
-**Original title:** *İçimizden Biri: Teoman*  
-**Original publication:** Not yet independently confirmed  
-**Interviewer:** Not yet independently confirmed  
-**Verification:** Archived transcription  
-**Confidence:** Medium  
-
-A detailed transcription of the interview survives in the *Teoman Röportajları* archive, where it is explicitly dated 14 June 1999. The same archive indexes it alongside other period interviews whose publication details can sometimes be independently verified.
-
-At present, however, an authoritative original newspaper or magazine page for this interview has not been located. Its date and text should therefore be treated as well-preserved archival information rather than fully primary-source-verified metadata.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*

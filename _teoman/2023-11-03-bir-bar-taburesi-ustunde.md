@@ -482,26 +482,3 @@ The title itself summarizes the transformation.
 In 2000, **a bar stool was inside the song**.
 
 In 2023, **the song has become the furniture of Teoman's public memory.**
-
----
-
-### Source Note
-
-**Original platform:** KAFA TV  
-**Program:** Bir Bar Taburesi Üstünde  
-**First Teoman episode:** 3 November 2023  
-**Second Teoman episode:** 17 November 2023  
-**Host / interviewer:** Candaş Tolga Işık  
-**Document type:** Video interview series  
-**Verification:** Primary source  
-**Confidence:** High  
-
-KAFA TV's verified YouTube channel published the first Teoman episode of *Bir Bar Taburesi Üstünde* on **3 November 2023**. The official description identifies Teoman as the guest and Candaş Tolga Işık as the program's presenter.
-
-A second Teoman episode, centered partly on the anecdote *Beni Tarkan Zannettiler*, was published on the same verified channel on **17 November 2023**.
-
-The conversation continued circulating later in November. T24, Haber Global and other contemporary publications independently identified Teoman's statements about his daily routine as coming from Candaş Tolga Işık's *Bir Bar Taburesi Üstünde* on KAFA TV.
-
-Because both original program videos remain accessible from KAFA TV's verified channel, the program, presenter and publication dates are primary-source verified.
-
-*This page is an archival summary and commentary. It does not reproduce the full video interviews.*

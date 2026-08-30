@@ -774,28 +774,3 @@ Life does not close the circle perfectly.
 It returns us to the same themes from another position.
 
 And by 2026, Teoman seems increasingly willing to accept imperfect circles.
-
----
-
-### Source Note
-
-**Original broadcaster:** NTV  
-**Program:** Empati  
-**Host / interviewer:** Ahmet Mümtaz Taylan  
-**Broadcast period:** 21–22 January 2026  
-**Archive date used:** 22 January 2026  
-**Document type:** Television interview  
-**Verification:** Primary / cross-verified  
-**Confidence:** High  
-
-Contemporary NTV-sourced coverage appeared on **22 January 2026** and identifies Teoman as that week's guest on Ahmet Mümtaz Taylan's *Empati*. The reports preserve extensive material concerning his childhood, his father's death, growing up with three women, Elvis Presley and Zagor as male figures, his mother's attitude toward his music career, aging, depression and fatherhood.
-
-The verified official YouTube channel **Ahmet Mümtaz Taylan ile Empati** subsequently published original excerpts from the Teoman episode. A 23 January clip preserves Teoman's discussion of fatherhood and his apology to his daughter, while later official clips preserve additional material from the same recording.
-
-Contemporary production-related coverage describes the episode as unusually archival in character and additionally preserves Teoman's remarks on emotional self-control, his childhood, his healthier lifestyle, *Varoluşçuluk 101*, the planned documentary and his wish to be remembered with the warmth associated with Özkan Uğur.
-
-Because the original broadcaster attribution, same-week contemporary reports and verified program-channel excerpts all agree, the interview is classified as **high-confidence primary/cross-verified material**.
-
-The precise television transmission appears to have occurred around the night of **21–22 January 2026**. Until an original NTV schedule page with an explicit broadcast timestamp is recovered, **22 January 2026** is retained as the conservative archive date.
-
-*This page is an archival summary and commentary. It does not reproduce the full television program.*

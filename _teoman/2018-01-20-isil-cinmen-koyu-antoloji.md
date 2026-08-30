@@ -557,24 +557,3 @@ And perhaps the central question of the 2018 Teoman is no longer:
 It is:
 
 **What should remain?**
-
----
-
-### Source Note
-
-**Original publication:** Posta  
-**Date:** 20 January 2018  
-**Interviewer:** Işıl Cinmen  
-**Document type:** Interview  
-**Verification:** Cross-verified  
-**Confidence:** High  
-
-The original Posta page is not currently accessible through the public web archive used for this project. However, multiple publications dated 20 January 2018 independently identify the material as Teoman's interview with **Işıl Cinmen of Posta** and preserve overlapping sections of the conversation.
-
-Contemporary reproductions cover the same discussion of *Koyu Antoloji*, Teoman's twenty-one-year press archive, his memoir project, aging, loneliness, relationships and his declining motivation to write new songs.
-
-The surrounding album context is independently verifiable. Teoman's official website lists *Koyu Antoloji* as a **2018 album containing twenty-six tracks**, while Teoman's contemporary statement about the project explains that he selected and rearranged older songs in order to represent his songwriting style and preserve them for the future.
-
-Because the original Posta page itself is unavailable but the interview is consistently preserved by multiple contemporary sources, this archive classifies the record as **cross-verified with high confidence**.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*

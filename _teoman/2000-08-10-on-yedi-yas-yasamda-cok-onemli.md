@@ -325,21 +325,3 @@ He wants albums to feel like coherent worlds.
 By 2000, he is no longer merely explaining what he writes.
 
 He is explaining **how he thinks about making art**.
-
----
-
-### Source Note
-
-**Original publication:** Cumhuriyet Gazetesi  
-**Date:** 10 August 2000  
-**Original title:** *On yedi yaş yaşamda çok önemli*  
-**Interviewer:** Barış Behramoğlu  
-**Document type:** Interview  
-**Verification:** Archived transcription  
-**Confidence:** Medium  
-
-A detailed transcription survives in the *Teoman Röportajları* archive. The transcription explicitly identifies **Barış Behramoğlu** as the interviewer and **Cumhuriyet Gazetesi** as the original source. It also contains extensive discussion of *Onyedi*, its production and Teoman's songwriting process.
-
-An accessible authoritative digital copy from Cumhuriyet has not yet been located. The publication metadata therefore comes from the surviving archival transcription rather than a directly verified original newspaper page.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*

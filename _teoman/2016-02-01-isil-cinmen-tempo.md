@@ -382,26 +382,3 @@ Not **one soldier**.
 That choice captures Teoman's political instinct better than any party label probably could.
 
 When ideology separates people into opposing camps, he tries to return to the human beings underneath.
-
----
-
-### Source Note
-
-**Original publication:** Tempo  
-**Date:** February 2016  
-**Interviewer:** Işıl Cinmen  
-**Document type:** Interview  
-**Verification:** Cross-verified  
-**Confidence:** High  
-
-The original Tempo web page is not currently available in an accessible archive. However, several contemporary publications independently identify the source as **Işıl Cinmen's interview with Teoman for Tempo's February 2016 issue** and reproduce overlapping passages from the conversation.
-
-Medyafaresi published substantial excerpts on **7 February 2016**, explicitly identifying Işıl Cinmen and Tempo and preserving Teoman's discussion of Turkey, Erdal Eren, Zekeriya Önge and *İki Çocuk*.
-
-Demokrat Haber independently published the same day and gives the same publication, interviewer and February issue context, while reproducing the same opening exchange about Turkey.
-
-The existence of *İki Çocuk* and its place on Teoman's 2006 album *Renkli Rüyalar Oteli* are independently documented by music catalog sources.
-
-Because the primary Tempo page itself has not been recovered, this archive classifies the interview as **cross-verified rather than primary-source verified**.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*

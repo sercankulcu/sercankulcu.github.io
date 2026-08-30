@@ -592,26 +592,3 @@ After almost thirty years of interviews, Teoman still does not provide a final a
 Instead, he has found something else to do with the question.
 
 He turned it into the show.
-
----
-
-### Source Note
-
-**Original platform:** Mirgün Cabas YouTube / podcast feed  
-**Date:** 12 November 2025  
-**Original title:** *Ne İşim Var Lan Benim Burada? | Konuk: Teoman*  
-**Interviewer:** Mirgün Cabas  
-**Document type:** Video and podcast interview  
-**Duration:** 28 minutes 44 seconds  
-**Verification:** Primary / multi-platform verified  
-**Confidence:** High  
-
-Mirgün Cabas's verified YouTube channel published the full conversation on **12 November 2025**. Its official chapter markers identify the principal subjects as *Varoluşçuluk 101*, Teoman's uncertainty about becoming a showman, *Fasa Fiso*, artificial intelligence and the future of the music industry, a tribute-album project and touring plans.
-
-The same conversation appears in Mirgün Cabas's official podcast distribution feed. Spotify identifies the episode as *Ne İşim Var Lan Benim Burada? | Konuk: Teoman*, dated **12 November 2025**, with a duration of **28 minutes 44 seconds**. Amazon Music independently gives the same date and approximately 28-minute duration.
-
-The context of *Varoluşçuluk 101* is independently confirmed by contemporary event coverage. The show combines Teoman's personal history, failures and existential concerns with music and irony; Teoman described its purpose as an attempt to explain the person who wrote his songs.
-
-Because the complete original video, official podcast feed and independent contemporary documentation all survive, the provenance is primary-source verified with high confidence.
-
-*This page is an archival summary and commentary. It does not reproduce the full interview.*

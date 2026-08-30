@@ -374,25 +374,3 @@ In 1996, control meant:
 In 2024, it increasingly means:
 
 **I want to decide what happens to my time.**
-
----
-
-### Source Note
-
-**Original program:** Az Önce Konuştum  
-**Original broadcaster:** TV100  
-**Date:** 25 June 2024  
-**Host / interviewer:** Candaş Tolga Işık  
-**Document type:** Video interview  
-**Verification:** Primary source  
-**Confidence:** High  
-
-The complete Teoman episode remains publicly available online and is dated **25 June 2024**. The program identifies Candaş Tolga Işık as host and Teoman as the guest. ([youtube.com](https://www.youtube.com/watch?v=XfB0g4pN034&utm_source=chatgpt.com))
-
-The interview belongs to the promotional period surrounding Teoman's later writing projects and contains extended discussion of his current life, aging, work habits, relationships and changing relationship with the public identity built during his music career.
-
-Contemporary Turkish media also reported statements from Teoman's conversation with Candaş Tolga Işık, providing additional confirmation of the program and context.
-
-Because the complete original broadcast remains available, the publication date, program, interviewer and interview context are primary-source verified.
-
-*This page is an archival summary and commentary. It does not reproduce the full video interview.*

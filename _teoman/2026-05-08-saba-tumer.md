@@ -654,23 +654,3 @@ storyteller,
 archivist,
 
 or simply the man presenting the songs that survived.
-
----
-
-### Source Note
-
-**Original broadcaster:** CNBC-e
-**Program:** Saba Tümer'le
-**Date:** 8 May 2026
-**Interviewer:** Saba Tümer
-**Document type:** Video interview
-**Verification:** Primary source
-**Confidence:** High
-
-Saba Tümer's verified YouTube channel published the full Teoman conversation on **8 May 2026**. The official video description provides detailed chapter markers covering Teoman's daily life and boredom, his decision to stop songwriting, his description of himself as an entertainer presenting the past, exercise and health, Generation Z and Alpha, *Varoluşçuluk 101*, fatherhood, education, cinema, the *Aman Songs* project, his proposed 87-song final album, adaptation of his novel for television, relationships, archival work and his continuing restlessness and melancholy.
-
-CNBC-e's own official site also preserves Teoman's appearance on Saba Tümer's program, dated **8 May 2026**, independently confirming the broadcaster, guest and publication date.
-
-Because both the full verified video and the broadcaster's original program page remain accessible, this record is classified as **primary-source verified with high confidence**.
-
-*This page is an archival summary and commentary. It does not reproduce the full interview.*

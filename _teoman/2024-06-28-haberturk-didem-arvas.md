@@ -521,27 +521,3 @@ Not to make himself larger.
 But to make one idea travel further:
 
 **Nobody should become a pariah in their own country.**
-
----
-
-### Source Note
-
-**Original broadcaster:** Habertürk  
-**Program:** Özel Röportaj  
-**Date:** 28 June 2024  
-**Interviewer:** Didem Arvas  
-**Document type:** Video interview  
-**Verification:** Primary source  
-**Confidence:** High  
-
-Habertürk TV's verified YouTube channel published the complete program on **28 June 2024** under the title *Söyledikleri nasıl popüler oldu? Şarkıcı Teoman yanıtladı | Özel Röportaj - 28 Haziran 2024*. The official description identifies the subjects directly: the popularity of Teoman's statements, the Necip Fazıl controversy, Gaza, his decision to become a writer and whether the fictional Timur resembles Teoman.
-
-Habertürk's own website independently preserves the complete *Özel Röportaj* and explicitly states that **Didem Arvas asked the questions and Teoman answered them**.
-
-Habertürk also published a separate written feature on the same day titled *Teoman: Kendimi onarmak için yazdım*. It preserves extensive direct material from the interview concerning Teoman's changing identity, *Sayın Bay Rock Yıldızı*, the Necip Fazıl strategy, social reconciliation and Gaza.
-
-The Necip Fazıl episode is further supported by Habertürk's own August 2023 coverage, which preserves Teoman's contemporary explanation that his intended work should serve social reconciliation rather than party politics.
-
-Because the full original broadcast, original broadcaster webpage and accompanying written feature are all still accessible, this record is primary-source verified with high confidence.
-
-*This page is an archival summary and commentary. It does not reproduce the full video interview.*

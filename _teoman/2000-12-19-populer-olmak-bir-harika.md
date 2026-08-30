@@ -234,21 +234,3 @@ The 1996 Teoman feared what mass appeal might do to music.
 The Teoman of late 2000 has learned something more complicated:
 
 **you can become popular without deciding to become someone else.**
-
----
-
-### Source Note
-
-**Date:** 19 December 2000  
-**Original title:** *Popüler Olmak Bir Harika*  
-**Original publication:** Not yet independently confirmed  
-**Interviewer:** Not yet independently confirmed  
-**Document type:** Interview  
-**Verification:** Archived transcription  
-**Confidence:** Medium  
-
-A transcription dated 19 December 2000 survives in the *Teoman Röportajları* archive under the title *Popüler Olmak Bir Harika*. The text discusses Teoman's popularity, musical identity, awards and the relationship between rock and pop during the highly successful *Onyedi* period.
-
-An authoritative original newspaper or magazine page has not yet been located in an accessible digital archive. The date, title and interview content are therefore currently supported by the surviving archival transcription rather than by a directly verified primary publication.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*

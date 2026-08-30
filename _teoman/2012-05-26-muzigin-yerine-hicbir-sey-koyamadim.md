@@ -594,26 +594,3 @@ More selective.
 And increasingly designed around the principle that would define his later life:
 
 **if quantity destroys meaning, reduce the quantity.**
-
----
-
-### Source Note
-
-**Original publication:** Milliyet Cadde  
-**Date:** 26 May 2012  
-**Original title:** *Müziğin Yerine Hiçbir Şey Koyamadım*  
-**Interviewer:** Tolga Akyıldız  
-**Photography:** Ozan Güzelce  
-**Document type:** Interview  
-**Verification:** Cross-verified  
-**Confidence:** High  
-
-The original Milliyet Cadde page is no longer reliably accessible, but its publication metadata is unusually well documented. An academic study cites the article explicitly as **Milliyet, 26 May 2012** and preserves the original Milliyet Cadde URL.
-
-T24 preserves an extensive contemporary reproduction of the interview and explicitly identifies **Tolga Akyıldız** as the interviewer and Milliyet's supplement as the original publication. The preserved text contains Teoman's discussion of creative exhaustion, live-performance dissatisfaction, becoming his own caricature, limited plans to return to concerts, storytelling in songs, Leonard Cohen, Tom Waits, Bon Jovi and his inability to replace music with another profession.
-
-Ensonhaber independently reproduced the interview on **26 May 2012** and identifies the original source as **Milliyet Cadde**, providing an additional contemporary confirmation of both date and provenance.
-
-Because the original URL, publication date, interviewer and extensive contemporaneous copies all agree, this archive classifies the record as **cross-verified with high confidence**.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*

@@ -438,23 +438,3 @@ The older Teoman uses fiction partly to escape himself.
 Or perhaps more precisely:
 
 **to become the author of Teoman again.**
-
----
-
-### Source Note
-
-**Original platform:** Mirgün Cabas YouTube  
-**Date:** 31 May 2024  
-**Original title:** *Orada Rahat mısın Teoman?*  
-**Interviewer:** Mirgün Cabas  
-**Document type:** Video interview  
-**Verification:** Primary source  
-**Confidence:** High  
-
-The complete conversation remains publicly available on Mirgün Cabas's YouTube channel and is explicitly dated **31 May 2024**. The program description and chapter structure identify major subjects including *Sayın Bay Rock Yıldızı*, the fictional character Timur, Teoman's relationship with writing, the rock-star identity, money, women, aging and younger generations.
-
-The interview is especially useful as a primary source for understanding how Teoman distinguishes the fictional Timur from himself while simultaneously using familiar elements of his own public biography as literary material.
-
-Because the complete original video remains accessible from the interviewer's channel, the date, interviewer, title and interview context are primary-source verified.
-
-*This page is an archival summary and commentary. It does not reproduce the full video interview.*

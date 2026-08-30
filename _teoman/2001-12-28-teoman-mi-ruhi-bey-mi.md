@@ -441,27 +441,3 @@ Also partly.
 That ambiguity is exactly what makes the character useful.
 
 Ruhi allows Teoman to tell the truth without having to tell only facts.
-
----
-
-### Source Note
-
-**Original publication:** Milliyet  
-**Date:** 28 December 2001  
-**Original title:** *Teoman mı? Ruhi Bey mi?*  
-**Interviewer:** Mefaret Aktaş  
-**Document type:** Interview  
-**Verification:** Cross-verified  
-**Confidence:** High  
-
-A detailed transcription survives in the *Teoman Röportajları* archive and identifies Mefaret Aktaş as the interviewer. The archive page itself labels the interview 23 December 2001.
-
-However, independent academic publications cite the original article as **Milliyet, 28 December 2001** and preserve its former Milliyet URL:
-
-`milliyet.com.tr/2001/12/28/cumartesi/cum04.html`
-
-Because this citation points to the original newspaper's dated URL, **28 December 2001 is the stronger publication date and is used in this archive**.
-
-The original Milliyet page is no longer readily accessible through the current site, but the agreement between the detailed surviving transcription and independent academic citation makes the provenance substantially stronger than for many other early archived interviews.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*

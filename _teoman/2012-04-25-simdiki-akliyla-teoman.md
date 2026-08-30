@@ -465,24 +465,3 @@ The Teoman of 2007 wanted his songs to survive him.
 The Teoman of 2012 tries something more radical:
 
 **he removes himself from the career to discover whether there is still a person underneath it.**
-
----
-
-### Source Note
-
-**Original publication:** GQ Türkiye  
-**Date:** 25 April 2012  
-**Original title:** *Şimdiki Aklıyla Teoman*  
-**Interviewer / writer:** Ebru Çapa  
-**Photography:** Cem Talu  
-**Document type:** Interview / profile  
-**Verification:** Primary source  
-**Confidence:** High  
-
-The article remains available on GQ Türkiye's official website and is explicitly dated **25 April 2012**. GQ introduces it as Ebru Çapa's conversation with Teoman after fifteen years, nine albums and his decision to take an early retirement from music. The introduction states that the interview focuses on why he left music, how he spent the approximately nine months afterward and what he might do next.
-
-GQ also published accompanying material two days later under the title *Teoman 2.0: Çekim arkası*, again describing Teoman as speaking to GQ for the first time about the nine-month period after leaving music. This independently strengthens the dating and context of the feature.
-
-Because the original publisher's article and related contemporary GQ material are still accessible, the provenance is primary-source verified.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*

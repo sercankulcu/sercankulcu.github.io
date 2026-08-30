@@ -351,22 +351,3 @@ A song that can survive radical transformation may have a stronger identity than
 **Can Teoman's songs live without Teoman?**
 
 The project suggests that they can.
-
----
-
-### Source Note
-
-**Original publication:** PowerTürk  
-**Date:** 2 February 2008  
-**Original title:** *Teoman “SÖZ MÜZİK TEOMAN”*  
-**Document type:** Interview  
-**Verification:** Primary source  
-**Confidence:** High  
-
-The full interview remains available on PowerTürk's own website, where it is explicitly dated **02.02.2008**. The page contains Teoman's direct answers about the origin of the project, the abandonment of the initial duet concept, his approach to different musical genres and his reasons for allowing other artists to reinterpret his songs.
-
-The existence and 2008 date of the *Söz Müzik Teoman* project are independently confirmed by Teoman's official website. The official album page lists performers including Sezen Aksu, Yalın, Candan Erçetin, Yaşar, Nil Karaibrahimgil, Emre Aydın, İzel, Mirkelam, Yavuz Bingöl, Harun Tekin, Rashit and Hayko Cepkin.
-
-A contemporary Cumhuriyet article dated 9 February 2008 also describes the newly released album and the same group of participating artists, providing additional independent confirmation of the project's contemporary context.
-
-*This page is an archival summary and commentary. It does not reproduce the original interview in full.*
