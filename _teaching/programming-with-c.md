@@ -8,7 +8,7 @@ date: 2023-04-04
 location: "Giresun, Turkey"
 ---
 
-![procedural programming with c](/images/teaching/procedural-programming-with-c.webp){: width="200" style="float: left; margin-right: 10px;"}
+![procedural programming with c](/images/teaching/teaching-procedural-programming-c.webp){: width="200" style="float: left; margin-right: 10px;"}
 C is a general-purpose programming language widely used in systems programming, embedded software, operating systems, compilers, and performance-sensitive applications. It combines portable high-level constructs with low-level access to memory and hardware-related operations. C gives programmers substantial control over data representation, memory allocation, and program execution. This control can enable efficient software, but it also requires careful handling of memory, types, and undefined behavior.
 
 ## Ders Öğretim Planı  

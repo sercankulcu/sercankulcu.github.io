@@ -8,7 +8,7 @@ date: 2026-07-14
 location: "Giresun, Turkey"
 ---
 
-![data structure](/images/teaching/data-structures-course.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
+![data structure](/images/teaching/teaching-data-structures.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
 Data structures provide systematic ways to organize, store, and access data. Choosing an appropriate structure directly affects the efficiency of operations such as searching, insertion, deletion, and traversal. This course examines arrays, linked structures, stacks, queues, trees, hash tables, graphs, and sets, with an emphasis on their implementations, complexity, and practical applications.
 
 ## Ders Öğretim Planı  

@@ -8,7 +8,7 @@ date: 2026-01-06
 location: "Giresun, Turkey"
 ---
 
-![operating systems](/images/teaching/operating-systems-course.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
+![operating systems](/images/teaching/teaching-operating-systems.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
 Operating systems are a fundamental part of modern computing. Operating systems manage hardware resources and provide abstractions and services for application software. They coordinate processor time, memory, storage, devices, and communication while supporting protection, isolation, and controlled resource sharing. An operating system provides a platform for programs to run. It acts as a bridge between hardware and software applications. This ensures that applications can interact with hardware using a standardized interface. The operating system handles tasks like memory management, process scheduling, and input/output operations. Without it, a computer is just a collection of hardware components.
 
 ## Ders Öğretim Planı

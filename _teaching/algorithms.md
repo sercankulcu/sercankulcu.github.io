@@ -8,7 +8,7 @@ date: 2026-01-07
 location: "Giresun, Turkey"
 ---
 
-![algorithms](/images/teaching/algorithms-course.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
+![algorithms](/images/teaching/teaching-algorithms.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
 An algorithm is a finite and well-defined sequence of steps for solving a problem or performing a computation. Algorithms form the foundation of software systems and are used in tasks ranging from sorting and searching to graph processing, optimization, text analysis, and scientific computing. This course examines fundamental algorithm-design techniques, correctness, time and space complexity, and the practical trade-offs between alternative solutions.
 
 ## Ders Öğretim Planı
