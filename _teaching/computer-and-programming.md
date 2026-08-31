@@ -1,9 +1,9 @@
 ---
 title: "Computer Fundamentals and Introduction to Programming"
 collection: teaching
-type: "Undergraduate course"
+type: "Undergraduate"
 permalink: /teaching/computer-and-introduction-to-programming
-venue: "Giresun University, Department of Electrical Electronics Engineering"
+venue: "Giresun University, Electrical Electronics Engineering"
 date: 2026-07-13
 location: "Giresun, Turkey"
 ---

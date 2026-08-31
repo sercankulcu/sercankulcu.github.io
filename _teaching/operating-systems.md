@@ -1,9 +1,9 @@
 ---
 title: "Operating Systems"
 collection: teaching
-type: "Undergraduate course"
+type: "Undergraduate"
 permalink: /teaching/operating-systems
-venue: "Giresun University, Department of Computer Engineering"
+venue: "Giresun University, Computer Engineering"
 date: 2026-01-06
 location: "Giresun, Turkey"
 ---
