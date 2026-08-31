@@ -32,6 +32,7 @@ author_profile: true
 
 <h3>🖼️ IMAGE TOOLS</h3>
 
+<button onclick="location.href='/apps/image-background-remover/'">✂️ IMAGE BACKGROUND REMOVER</button>
 <button onclick="location.href='/apps/image-compressor-resizer/'">🖼️ IMAGE COMPRESSOR & RESIZER</button>
 <button onclick="location.href='/apps/image-redactor/'">🕵️ IMAGE REDACTOR</button>
 
