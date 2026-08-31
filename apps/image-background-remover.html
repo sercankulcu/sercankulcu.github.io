@@ -1,0 +1,709 @@
+---
+layout: without-sidebar
+title: "Image Background Remover"
+permalink: /apps/image-background-remover/
+redirect_from:
+  - /apps/image-background-remover.html
+excerpt: "Remove image backgrounds locally in your browser with AI."
+---
+
+<style>
+.image-bg-remover-app,
+.image-bg-remover-app *,
+.image-bg-remover-app *::before,
+.image-bg-remover-app *::after {
+  box-sizing: border-box;
+}
+
+.image-bg-remover-app {
+  width: min(920px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.ibr-panel {
+  padding: clamp(18px, 4vw, 30px);
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0,0,0,.07);
+}
+
+.ibr-brand {
+  margin: 0;
+  color: var(--global-link-color);
+  font-size: .66rem;
+  font-weight: 900;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.ibr-hero {
+  max-width: 680px;
+  margin: 10px auto 0;
+  text-align: center;
+}
+
+.ibr-title {
+  margin: 0;
+  color: var(--global-text-color);
+  font-size: clamp(1.9rem, 5vw, 2.8rem);
+  line-height: 1.08;
+  letter-spacing: -.04em;
+}
+
+.ibr-intro {
+  max-width: 650px;
+  margin: 9px auto 0;
+  color: var(--global-text-color);
+  opacity: .7;
+  font-size: .84rem;
+  line-height: 1.5;
+}
+
+.ibr-drop {
+  margin-top: 18px;
+  padding: 22px 16px;
+  border: 1px dashed rgba(127,127,127,.52);
+  border-radius: 14px;
+  background: rgba(127,127,127,.04);
+  color: var(--global-text-color);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease;
+}
+
+.ibr-drop:hover,
+.ibr-drop.drag {
+  border-color: var(--global-link-color);
+  background: rgba(80,120,200,.08);
+}
+
+.ibr-drop strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: .82rem;
+}
+
+.ibr-drop span {
+  opacity: .58;
+  font-size: .71rem;
+}
+
+.ibr-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.ibr-tabs,
+.ibr-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ibr-btn {
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid rgba(45,45,45,.42);
+  border-radius: 999px;
+  background: rgba(45,45,45,.08);
+  color: var(--global-text-color);
+  font: inherit;
+  font-size: .74rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ibr-btn:hover:not(:disabled) {
+  background: rgba(45,45,45,.14);
+}
+
+.ibr-btn.primary {
+  border-color: transparent;
+  background: var(--global-link-color);
+  color: var(--global-bg-color);
+}
+
+.ibr-btn.active {
+  border-color: var(--global-link-color);
+  color: var(--global-link-color);
+  background: transparent;
+}
+
+.ibr-btn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+html[data-theme="dark"] .ibr-btn {
+  border-color: rgba(255,255,255,.22);
+  background: rgba(255,255,255,.06);
+}
+
+html[data-theme="dark"] .ibr-btn.primary {
+  border-color: transparent;
+  background: var(--global-link-color);
+  color: var(--global-bg-color);
+}
+
+html[data-theme="dark"] .ibr-btn.active {
+  border-color: var(--global-link-color);
+  color: var(--global-link-color);
+  background: transparent;
+}
+
+.ibr-stage {
+  position: relative;
+  min-height: 420px;
+  margin-top: 12px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--global-border-color);
+  border-radius: 14px;
+  background-color: rgba(127,127,127,.06);
+  background-image:
+    linear-gradient(45deg, rgba(127,127,127,.16) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(127,127,127,.16) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(127,127,127,.16) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(127,127,127,.16) 75%);
+  background-size: 22px 22px;
+  background-position: 0 0, 0 11px, 11px -11px, -11px 0;
+}
+
+.ibr-stage img {
+  display: block;
+  max-width: 100%;
+  max-height: 560px;
+  object-fit: contain;
+}
+
+.ibr-empty {
+  padding: 30px;
+  color: var(--global-text-color);
+  opacity: .5;
+  text-align: center;
+  font-size: .8rem;
+  line-height: 1.55;
+}
+
+.ibr-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: color-mix(in srgb, var(--global-bg-color) 88%, transparent);
+  z-index: 2;
+}
+
+.ibr-loading[hidden] {
+  display: none;
+}
+
+.ibr-loading-card {
+  width: min(360px, 100%);
+  text-align: center;
+}
+
+.ibr-spinner {
+  width: 30px;
+  height: 30px;
+  margin: 0 auto 12px;
+  border: 3px solid rgba(127,127,127,.2);
+  border-top-color: var(--global-link-color);
+  border-radius: 50%;
+  animation: ibr-spin .8s linear infinite;
+}
+
+@keyframes ibr-spin {
+  to { transform: rotate(360deg); }
+}
+
+.ibr-progress {
+  width: 100%;
+  height: 7px;
+  margin-top: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(127,127,127,.16);
+}
+
+.ibr-progress-bar {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--global-link-color);
+  transition: width .16s ease;
+}
+
+.ibr-status {
+  margin-top: 12px;
+  min-height: 1.2em;
+  color: var(--global-text-color);
+  opacity: .62;
+  text-align: center;
+  font-size: .72rem;
+  line-height: 1.5;
+}
+
+.ibr-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ibr-stat {
+  padding: 10px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 10px;
+  background: rgba(127,127,127,.035);
+  text-align: center;
+}
+
+.ibr-stat b {
+  display: block;
+  color: var(--global-text-color);
+  font-size: .9rem;
+}
+
+.ibr-stat span {
+  color: var(--global-text-color);
+  opacity: .5;
+  font-size: .66rem;
+}
+
+.ibr-note {
+  margin: 16px 0 0;
+  color: var(--global-text-color);
+  opacity: .45;
+  text-align: center;
+  font-size: .65rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 760px) {
+  .image-bg-remover-app {
+    width: 100%;
+  }
+
+  .ibr-panel {
+    padding: 16px 12px;
+  }
+
+  .ibr-stage {
+    min-height: 330px;
+  }
+
+  .ibr-toolbar {
+    justify-content: center;
+  }
+
+  .ibr-actions,
+  .ibr-tabs {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .ibr-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .ibr-btn {
+    min-height: 42px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image-bg-remover-app *,
+  .image-bg-remover-app *::before,
+  .image-bg-remover-app *::after {
+    transition-duration: .001ms !important;
+    animation-duration: .001ms !important;
+  }
+}
+</style>
+
+<div class="image-bg-remover-app">
+  <section class="ibr-panel" aria-labelledby="ibr-title">
+    <p class="ibr-brand">Image Tool</p>
+
+    <header class="ibr-hero">
+      <h1 class="ibr-title" id="ibr-title">Image Background Remover</h1>
+      <p class="ibr-intro">
+        Remove an image background automatically and export the result as a transparent PNG.
+      </p>
+    </header>
+
+    <div
+      class="ibr-drop"
+      id="ibr-drop"
+      role="button"
+      tabindex="0"
+      aria-label="Choose an image or drop one here"
+    >
+      <strong>Drop an image here or click to choose</strong>
+      <span>PNG, JPEG, WebP and other browser-supported image formats</span>
+      <input id="ibr-file" type="file" accept="image/*" hidden>
+    </div>
+
+    <div class="ibr-toolbar">
+      <div class="ibr-tabs" aria-label="Preview mode">
+        <button class="ibr-btn active" id="ibr-original-tab" type="button" disabled>Original</button>
+        <button class="ibr-btn" id="ibr-result-tab" type="button" disabled>Result</button>
+      </div>
+
+      <div class="ibr-actions">
+        <button class="ibr-btn primary" id="ibr-remove" type="button" disabled>Remove Background</button>
+        <button class="ibr-btn" id="ibr-download" type="button" disabled>Download PNG</button>
+        <button class="ibr-btn" id="ibr-reset" type="button">Reset</button>
+      </div>
+    </div>
+
+    <div class="ibr-stage" id="ibr-stage">
+      <img id="ibr-preview" alt="" hidden>
+      <div class="ibr-empty" id="ibr-empty">
+        Choose an image to begin.<br>
+        Your image is processed in the browser.
+      </div>
+
+      <div class="ibr-loading" id="ibr-loading" hidden>
+        <div class="ibr-loading-card">
+          <div class="ibr-spinner" aria-hidden="true"></div>
+          <strong id="ibr-loading-title">Preparing background remover…</strong>
+          <div class="ibr-progress" aria-hidden="true">
+            <div class="ibr-progress-bar" id="ibr-progress-bar"></div>
+          </div>
+          <div class="ibr-status" id="ibr-progress-text">The first run may download the AI model.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ibr-stats">
+      <div class="ibr-stat">
+        <b id="ibr-dimensions">—</b>
+        <span>Dimensions</span>
+      </div>
+      <div class="ibr-stat">
+        <b id="ibr-original-size">—</b>
+        <span>Original size</span>
+      </div>
+      <div class="ibr-stat">
+        <b id="ibr-result-size">—</b>
+        <span>Result size</span>
+      </div>
+    </div>
+
+    <div class="ibr-status" id="ibr-status" role="status" aria-live="polite"></div>
+
+    <p class="ibr-note">
+      Processing happens locally in your browser. The first use may take longer because the AI model must be downloaded and cached.
+    </p>
+  </section>
+</div>
+
+<script type="module">
+import removeBackground from "https://esm.sh/@imgly/background-removal@1.7.0?bundle&deps=onnxruntime-web@1.21.0";
+
+(() => {
+  "use strict";
+
+  const byId = id => document.getElementById(id);
+
+  const drop = byId("ibr-drop");
+  const fileInput = byId("ibr-file");
+  const preview = byId("ibr-preview");
+  const empty = byId("ibr-empty");
+  const loading = byId("ibr-loading");
+  const loadingTitle = byId("ibr-loading-title");
+  const progressBar = byId("ibr-progress-bar");
+  const progressText = byId("ibr-progress-text");
+  const status = byId("ibr-status");
+
+  const originalTab = byId("ibr-original-tab");
+  const resultTab = byId("ibr-result-tab");
+  const removeBtn = byId("ibr-remove");
+  const downloadBtn = byId("ibr-download");
+  const resetBtn = byId("ibr-reset");
+
+  let sourceFile = null;
+  let sourceUrl = null;
+  let resultBlob = null;
+  let resultUrl = null;
+  let currentView = "original";
+  let busy = false;
+
+  const MAX_FILE_SIZE = 25 * 1024 * 1024;
+
+  function formatBytes(bytes) {
+    if (!Number.isFinite(bytes) || bytes <= 0) return "—";
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / 1048576).toFixed(2)} MB`;
+  }
+
+  function setBusy(value) {
+    busy = value;
+    loading.hidden = !value;
+    removeBtn.disabled = value || !sourceFile;
+    downloadBtn.disabled = value || !resultBlob;
+    originalTab.disabled = value || !sourceFile;
+    resultTab.disabled = value || !resultBlob;
+    drop.setAttribute("aria-disabled", String(value));
+  }
+
+  function setProgress(percent, text) {
+    const safe = Math.max(0, Math.min(100, Number(percent) || 0));
+    progressBar.style.width = `${safe}%`;
+    if (text) progressText.textContent = text;
+  }
+
+  function showView(view) {
+    if (view === "result" && !resultUrl) return;
+    if (view === "original" && !sourceUrl) return;
+
+    currentView = view;
+    preview.src = view === "result" ? resultUrl : sourceUrl;
+    preview.hidden = false;
+    empty.hidden = true;
+
+    originalTab.classList.toggle("active", view === "original");
+    resultTab.classList.toggle("active", view === "result");
+  }
+
+  function clearResult() {
+    resultBlob = null;
+
+    if (resultUrl) {
+      URL.revokeObjectURL(resultUrl);
+      resultUrl = null;
+    }
+
+    byId("ibr-result-size").textContent = "—";
+    resultTab.disabled = true;
+    downloadBtn.disabled = true;
+  }
+
+  function resetApp() {
+    sourceFile = null;
+    resultBlob = null;
+    currentView = "original";
+
+    if (sourceUrl) {
+      URL.revokeObjectURL(sourceUrl);
+      sourceUrl = null;
+    }
+
+    if (resultUrl) {
+      URL.revokeObjectURL(resultUrl);
+      resultUrl = null;
+    }
+
+    preview.removeAttribute("src");
+    preview.hidden = true;
+    empty.hidden = false;
+
+    byId("ibr-dimensions").textContent = "—";
+    byId("ibr-original-size").textContent = "—";
+    byId("ibr-result-size").textContent = "—";
+
+    originalTab.disabled = true;
+    resultTab.disabled = true;
+    originalTab.classList.add("active");
+    resultTab.classList.remove("active");
+
+    removeBtn.disabled = true;
+    downloadBtn.disabled = true;
+
+    status.textContent = "";
+    fileInput.value = "";
+
+    progressBar.style.width = "0%";
+    progressText.textContent = "The first run may download the AI model.";
+    loading.hidden = true;
+    busy = false;
+  }
+
+  async function loadFile(file) {
+    if (busy) return;
+
+    if (!file || !file.type.startsWith("image/")) {
+      status.textContent = "Please choose a valid image file.";
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      status.textContent = "Please choose an image smaller than 25 MB.";
+      return;
+    }
+
+    clearResult();
+
+    if (sourceUrl) URL.revokeObjectURL(sourceUrl);
+
+    sourceFile = file;
+    sourceUrl = URL.createObjectURL(file);
+
+    const probe = new Image();
+
+    probe.onload = () => {
+      byId("ibr-dimensions").textContent = `${probe.naturalWidth} × ${probe.naturalHeight}`;
+      byId("ibr-original-size").textContent = formatBytes(file.size);
+
+      originalTab.disabled = false;
+      removeBtn.disabled = false;
+
+      showView("original");
+      status.textContent = file.name;
+      fileInput.value = "";
+    };
+
+    probe.onerror = () => {
+      sourceFile = null;
+      status.textContent = "The image could not be loaded.";
+    };
+
+    probe.src = sourceUrl;
+  }
+
+  async function processImage() {
+    if (!sourceFile || busy) return;
+
+    setBusy(true);
+    loadingTitle.textContent = "Removing background…";
+    setProgress(4, "Preparing image…");
+    status.textContent = "";
+
+    try {
+      const blob = await removeBackground(sourceFile, {
+        model: "isnet",
+        output: {
+          format: "image/png",
+          quality: 1
+        },
+        progress: (key, current, total) => {
+          if (!total) return;
+
+          const ratio = current / total;
+          let base = 8;
+          let span = 84;
+
+          if (key.startsWith("fetch:")) {
+            base = 5;
+            span = 55;
+            progressText.textContent = "Downloading AI model…";
+          } else if (key.startsWith("compute:")) {
+            base = 60;
+            span = 36;
+            progressText.textContent = "Processing image…";
+          }
+
+          setProgress(base + ratio * span);
+        }
+      });
+
+      clearResult();
+      resultBlob = blob;
+      resultUrl = URL.createObjectURL(blob);
+
+      byId("ibr-result-size").textContent = formatBytes(blob.size);
+
+      resultTab.disabled = false;
+      downloadBtn.disabled = false;
+
+      setProgress(100, "Done.");
+      showView("result");
+
+      status.textContent = "Background removed. The transparent PNG is ready.";
+    } catch (error) {
+      console.error(error);
+
+      let message = "Background removal failed.";
+
+      if (!navigator.onLine) {
+        message += " An internet connection is required the first time the AI model is loaded.";
+      } else {
+        message += " Try another image or reload the page.";
+      }
+
+      status.textContent = message;
+      showView("original");
+    } finally {
+      window.setTimeout(() => {
+        setBusy(false);
+        progressBar.style.width = "0%";
+        progressText.textContent = "The first run may download the AI model.";
+      }, 250);
+    }
+  }
+
+  function downloadResult() {
+    if (!resultBlob || !resultUrl) return;
+
+    const baseName = (sourceFile?.name || "image")
+      .replace(/\.[^.]+$/, "")
+      .replace(/[^\w.-]+/g, "-");
+
+    const link = document.createElement("a");
+    link.href = resultUrl;
+    link.download = `${baseName}-no-background.png`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
+
+  drop.addEventListener("click", () => {
+    if (!busy) fileInput.click();
+  });
+
+  drop.addEventListener("keydown", event => {
+    if (busy) return;
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      fileInput.click();
+    }
+  });
+
+  fileInput.addEventListener("change", event => {
+    loadFile(event.target.files?.[0]);
+  });
+
+  ["dragenter", "dragover"].forEach(type => {
+    drop.addEventListener(type, event => {
+      event.preventDefault();
+      if (!busy) drop.classList.add("drag");
+    });
+  });
+
+  ["dragleave", "drop"].forEach(type => {
+    drop.addEventListener(type, event => {
+      event.preventDefault();
+      drop.classList.remove("drag");
+    });
+  });
+
+  drop.addEventListener("drop", event => {
+    if (!busy) loadFile(event.dataTransfer?.files?.[0]);
+  });
+
+  originalTab.addEventListener("click", () => showView("original"));
+  resultTab.addEventListener("click", () => showView("result"));
+  removeBtn.addEventListener("click", processImage);
+  downloadBtn.addEventListener("click", downloadResult);
+  resetBtn.addEventListener("click", resetApp);
+
+  window.addEventListener("beforeunload", () => {
+    if (sourceUrl) URL.revokeObjectURL(sourceUrl);
+    if (resultUrl) URL.revokeObjectURL(resultUrl);
+  });
+})();
+</script>
