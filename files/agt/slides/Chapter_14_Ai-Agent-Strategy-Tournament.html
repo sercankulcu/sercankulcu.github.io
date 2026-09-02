@@ -1,1 +1,793 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Agent Strategy Tournament</title><style>:root{--bg:#f5f7fb;--card:#fff;--ink:#182230;--muted:#5f6b7a;--accent:#2563eb;--accent2:#0f766e;--border:#dce3ec}*{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}header{background:linear-gradient(135deg,#172554,#1d4ed8);color:#fff;padding:24px}.wrap{max-width:1180px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:300px 1fr;gap:18px}.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 5px 18px #1822300d}h2,h3{margin-top:0}.controls{display:grid;gap:10px}label{font-weight:650;font-size:.92rem}select,button{width:100%;padding:10px;border:1px solid var(--border);border-radius:9px;background:#fff;color:var(--ink)}button{cursor:pointer;font-weight:700;background:var(--accent);color:#fff;border-color:var(--accent)}button.secondary{background:#fff;color:var(--accent)}button.good{background:var(--accent2)}.status{padding:12px;border-radius:10px;background:#eff6ff;border:1px solid #bfdbfe;margin-bottom:12px}.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}.metric{padding:12px;border:1px solid var(--border);border-radius:10px;text-align:center}.metric b{display:block;font-size:1.35rem}.muted{color:var(--muted)}table{width:100%;border-collapse:collapse}th,td{padding:8px;border:1px solid var(--border);text-align:center}.log{max-height:250px;overflow:auto;background:#0f172a;color:#e2e8f0;padding:12px;border-radius:10px;font:13px/1.5 ui-monospace,monospace}.explain{margin-top:18px}.guide-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}.guide-card{border:1px solid var(--border);border-radius:12px;padding:15px}.note{padding:12px;border-left:4px solid var(--accent);background:#eff6ff;border-radius:8px}.pill{display:inline-block;padding:3px 8px;border-radius:999px;background:#e0e7ff;color:#3730a3;font-size:.8rem;font-weight:700}@media(max-width:800px){.grid{grid-template-columns:1fr}.wrap{padding:12px}}</style></head><body><header><h1>AI Agent Strategy Tournament</h1><p>Compare fixed, adaptive, and learning-inspired agents across classic strategic games.</p></header><main class="wrap"><div class="status"><div class="grid"><aside class="card"><h2>Tournament setup</h2><div class="controls"><label>Scenario<select id="scenario"><option value="pd">Prisoner's Dilemma</option><option value="mp">Matching Pennies</option><option value="coord">Coordination Game</option><option value="rps">Rock–Paper–Scissors</option></select></label><label>Mode<select id="mode"><option value="duel">Agent vs Agent</option><option value="human">Human vs Agent</option><option value="tournament">Full Tournament</option></select></label><label>Level<select id="level"><option value="1">Level 1 — Fixed Strategies</option><option value="2">Level 2 — Learning Agents</option><option value="3">Level 3 — Noisy Environment</option></select></label><label>Agent A<select id="agentA"></select></label><label>Agent B<select id="agentB"></select></label><button id="runBtn">Run experiment</button><button id="againBtn" class="good">Run another batch</button><button id="resetBtn" class="secondary">Reset tournament</button></div></aside><section class="card"><h2>Results</h2><p class="muted" id="desc"></p><div class="metric-grid"><div class="metric">Rounds<b id="rounds">0</b></div><div class="metric">Top agent<b id="winner">—</b></div><div class="metric">Avg payoff<b id="avg">0</b></div><div class="metric">Cooperation / match rate<b id="coop">0%</b></div></div><div id="ranking"></div><div class="status" id="verdict"></div><div class="log" id="log"></div></section></div><section class="card explain"><h2>How this teaches game theory</h2><p>This final laboratory compares strategy classes rather than only one game. Students can observe how success depends on the environment, opponent, feedback, noise, and adaptation rule. There is no universally best strategy across all strategic settings.</p></section><section class="card explain"><h2>Complete scenario, mode, level, and agent guide</h2><div class="guide-grid"><article class="guide-card"><h3>Prisoner's Dilemma</h3><p>Rewards cooperation but creates a temptation to defect. Useful for reciprocity and learning.</p></article><article class="guide-card"><h3>Matching Pennies</h3><p>A zero-sum game with no pure-strategy equilibrium; unpredictability matters.</p></article><article class="guide-card"><h3>Coordination Game</h3><p>Agents benefit from matching actions, highlighting convention formation.</p></article><article class="guide-card"><h3>Rock–Paper–Scissors</h3><p>Cyclic dominance rewards mixed or adaptive behavior rather than a single fixed action.</p></article></div><h3 style="margin-top:22px">Modes</h3><div class="guide-grid"><article class="guide-card"><h3>Agent vs Agent</h3><p>Two selected algorithms play many rounds against each other.</p></article><article class="guide-card"><h3>Human vs Agent</h3><p>The human is represented by a reactive strategy input model while the selected opponent adapts.</p></article><article class="guide-card"><h3>Full Tournament</h3><p>Every available agent plays every other agent and a ranking is produced.</p></article></div><h3 style="margin-top:22px">Levels</h3><div class="guide-grid"><article class="guide-card"><h3>Level 1 — Fixed Strategies</h3><p>Random, always-first, always-second, and simple best-response agents.</p></article><article class="guide-card"><h3>Level 2 — Learning Agents</h3><p>Adds fictitious-play and reinforcement-style agents that update from observed history.</p></article><article class="guide-card"><h3>Level 3 — Noisy Environment</h3><p>Actions occasionally flip, testing robustness and forgiveness under imperfect execution.</p></article></div><div class="note" style="margin-top:18px"><b>Interpretation:</b> tournament success is contextual. A strategy can dominate one opponent and perform poorly against another, so evaluation should include payoff, stability, exploitability, and robustness.</div></section></main><script>const $=id=>document.getElementById(id),scenario=$('scenario'),mode=$('mode'),level=$('level'),agentA=$('agentA'),agentB=$('agentB'),ranking=$('ranking'),roundsEl=$('rounds'),winnerEl=$('winner'),avgEl=$('avg'),coopEl=$('coop'),verdict=$('verdict'),logEl=$('log'),desc=$('desc');const baseAgents=['Random','Always A','Always B','Best Response'],learnAgents=['Fictitious Play','Reinforcement'];const texts={pd:'Cooperate/defect incentives reward reciprocity but tempt exploitation.',mp:'A zero-sum prediction game where deterministic behavior is exploitable.',coord:'Agents gain by coordinating on the same action.',rps:'Three actions create cyclic dominance and mixed-strategy pressure.'};function agentList(){return +level.value===1?baseAgents:[...baseAgents,...learnAgents]}function refreshAgents(){let list=agentList(),html=list.map(x=>`<option>${x}</option>`).join('');agentA.innerHTML=html;agentB.innerHTML=html;agentB.selectedIndex=Math.min(1,list.length-1);desc.textContent=texts[scenario.value]}function actions(){return scenario.value==='rps'?3:2}function payoff(a,b){if(scenario.value==='pd'){let M=[[[3,3],[0,5]],[[5,0],[1,1]]];return M[a][b]}if(scenario.value==='mp')return a===b?[1,-1]:[-1,1];if(scenario.value==='coord')return a===b?[3,3]:[0,0];if(a===b)return[0,0];return (a-b+3)%3===1?[1,-1]:[-1,1]}function choose(name,histSelf,histOpp,q){let k=actions();if(name==='Random')return Math.floor(Math.random()*k);if(name==='Always A')return 0;if(name==='Always B')return Math.min(1,k-1);if(name==='Best Response'){if(!histOpp.length)return 0;let counts=Array(k).fill(0);histOpp.forEach(x=>counts[x]++);let pred=counts.indexOf(Math.max(...counts)),best=0,bp=-1e9;for(let a=0;a<k;a++){let p=payoff(a,pred)[0];if(p>bp){bp=p;best=a}}return best}if(name==='Fictitious Play'){if(!histOpp.length)return Math.floor(Math.random()*k);let counts=Array(k).fill(0);histOpp.forEach(x=>counts[x]++);let best=0,bv=-1e9;for(let a=0;a<k;a++){let ev=counts.reduce((s,c,o)=>s+(c/histOpp.length)*payoff(a,o)[0],0);if(ev>bv){bv=ev;best=a}}return best}if(name==='Reinforcement'){if(Math.random()<.15)return Math.floor(Math.random()*k);return q.indexOf(Math.max(...q))}return 0}function match(A,B,R=100){let hA=[],hB=[],qA=Array(actions()).fill(0),qB=Array(actions()).fill(0),sA=0,sB=0,match=0;for(let r=0;r<R;r++){let a=choose(A,hA,hB,qA),b=choose(B,hB,hA,qB);if(+level.value===3&&Math.random()<.08)a=(a+1)%actions();if(+level.value===3&&Math.random()<.08)b=(b+1)%actions();let [pa,pb]=payoff(a,b);sA+=pa;sB+=pb;if((scenario.value==='pd'&&a===0&&b===0)||(scenario.value==='coord'&&a===b))match++;qA[a]+=0.12*(pa-qA[a]);qB[b]+=0.12*(pb-qB[b]);hA.push(a);hB.push(b)}return{sA,sB,match,R}}function run(){let R=+level.value===1?60:120;if(mode.value==='tournament'){let list=agentList(),scores=Object.fromEntries(list.map(x=>[x,0])),matches=0,total=0;for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){let x=match(list[i],list[j],R);scores[list[i]]+=x.sA;scores[list[j]]+=x.sB;matches+=x.match;total+=x.R}let arr=Object.entries(scores).sort((a,b)=>b[1]-a[1]);ranking.innerHTML='<table><tr><th>Rank</th><th>Agent</th><th>Total payoff</th></tr>'+arr.map((x,i)=>`<tr><td>${i+1}</td><td>${x[0]}</td><td>${x[1].toFixed(1)}</td></tr>`).join('')+'</table>';winnerEl.textContent=arr[0][0];avgEl.textContent=(arr[0][1]/Math.max(1,(list.length-1)*R)).toFixed(2);coopEl.textContent=(100*matches/Math.max(1,total)).toFixed(1)+'%';roundsEl.textContent=(list.length*(list.length-1)/2)*R;verdict.innerHTML=`<b>${arr[0][0]}</b> ranked first in this tournament.`;logEl.innerHTML=`Tournament completed with ${list.length} agents.<br>`+logEl.innerHTML}else{let A=mode.value==='human'?'Human Reactive':agentA.value,B=agentB.value;let realA=A==='Human Reactive'?'Best Response':A,x=match(realA,B,R);ranking.innerHTML=`<table><tr><th>Agent</th><th>Payoff</th><th>Average</th></tr><tr><td>${A}</td><td>${x.sA.toFixed(1)}</td><td>${(x.sA/R).toFixed(2)}</td></tr><tr><td>${B}</td><td>${x.sB.toFixed(1)}</td><td>${(x.sB/R).toFixed(2)}</td></tr></table>`;winnerEl.textContent=x.sA>x.sB?A:x.sB>x.sA?B:'Tie';avgEl.textContent=(Math.max(x.sA,x.sB)/R).toFixed(2);coopEl.textContent=(100*x.match/R).toFixed(1)+'%';roundsEl.textContent=R;verdict.innerHTML=`<b>${winnerEl.textContent}</b> performed best in this batch.`;logEl.innerHTML=`${A} vs ${B}: ${x.sA.toFixed(1)} / ${x.sB.toFixed(1)}.<br>`+logEl.innerHTML}}$('runBtn').onclick=run;$('againBtn').onclick=run;$('resetBtn').onclick=()=>{logEl.innerHTML='Tournament reset.';ranking.innerHTML='';winnerEl.textContent='—';avgEl.textContent='0';coopEl.textContent='0%';roundsEl.textContent='0'};scenario.onchange=refreshAgents;level.onchange=refreshAgents;mode.onchange=refreshAgents;refreshAgents();</script></body></html>
+---
+layout: without-sidebar
+title: "AI Agent Strategy Tournament"
+permalink: /files/agt/slides/Chapter_14_Ai-Agent-Strategy-Tournament.html
+excerpt: "Interactive AI strategy tournament comparing fixed, adaptive, and reinforcement-inspired agents across classic strategic games and noisy environments."
+---
+
+<style>
+.agt-ai-tournament,
+.agt-ai-tournament *,
+.agt-ai-tournament *::before,
+.agt-ai-tournament *::after{box-sizing:border-box}
+
+.agt-ai-tournament{
+  --ait-bg:#f5f7fb;
+  --ait-card:#fff;
+  --ait-ink:#182230;
+  --ait-muted:#5f6b7a;
+  --ait-accent:#2563eb;
+  --ait-accent2:#0f766e;
+  --ait-border:#dce3ec;
+  width:min(1180px,100%);
+  margin:0 auto 2rem;
+  color:var(--ait-ink);
+  font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif
+}
+
+.agt-ai-tournament .hero{
+  background:linear-gradient(135deg,#172554,#1d4ed8);
+  color:#fff;
+  padding:24px;
+  border-radius:18px 18px 0 0
+}
+
+.agt-ai-tournament .hero h1{
+  margin:0 0 6px;
+  color:#fff;
+  font-size:clamp(1.6rem,4vw,2.4rem)
+}
+
+.agt-ai-tournament .hero p{
+  margin:0;
+  max-width:900px;
+  opacity:.92
+}
+
+.agt-ai-tournament .wrap{
+  padding:20px;
+  background:var(--ait-bg);
+  border:1px solid var(--ait-border);
+  border-top:0;
+  border-radius:0 0 18px 18px
+}
+
+.agt-ai-tournament .grid{
+  display:grid;
+  grid-template-columns:300px 1fr;
+  gap:18px
+}
+
+.agt-ai-tournament .card{
+  background:var(--ait-card);
+  border:1px solid var(--ait-border);
+  border-radius:14px;
+  padding:16px;
+  box-shadow:0 5px 18px #1822300d
+}
+
+.agt-ai-tournament h2,
+.agt-ai-tournament h3{
+  margin-top:0;
+  color:var(--ait-ink)
+}
+
+.agt-ai-tournament .controls{
+  display:grid;
+  gap:10px
+}
+
+.agt-ai-tournament label{
+  font-weight:650;
+  font-size:.92rem
+}
+
+.agt-ai-tournament select,
+.agt-ai-tournament button{
+  width:100%;
+  padding:10px;
+  border:1px solid var(--ait-border);
+  border-radius:9px;
+  background:#fff;
+  color:var(--ait-ink);
+  font:inherit
+}
+
+.agt-ai-tournament button{
+  cursor:pointer;
+  font-weight:700;
+  background:var(--ait-accent);
+  color:#fff;
+  border-color:var(--ait-accent)
+}
+
+.agt-ai-tournament button.secondary{
+  background:#fff;
+  color:var(--ait-accent)
+}
+
+.agt-ai-tournament button.good{
+  background:var(--ait-accent2)
+}
+
+.agt-ai-tournament .status{
+  padding:12px;
+  border-radius:10px;
+  background:#eff6ff;
+  border:1px solid #bfdbfe;
+  margin-bottom:12px
+}
+
+.agt-ai-tournament .metric-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:10px;
+  margin:12px 0
+}
+
+.agt-ai-tournament .metric{
+  padding:12px;
+  border:1px solid var(--ait-border);
+  border-radius:10px;
+  text-align:center
+}
+
+.agt-ai-tournament .metric b{
+  display:block;
+  font-size:1.35rem
+}
+
+.agt-ai-tournament .muted{
+  color:var(--ait-muted)
+}
+
+.agt-ai-tournament table{
+  width:100%;
+  border-collapse:collapse
+}
+
+.agt-ai-tournament th,
+.agt-ai-tournament td{
+  padding:8px;
+  border:1px solid var(--ait-border);
+  text-align:center
+}
+
+.agt-ai-tournament .table-wrap{
+  overflow-x:auto
+}
+
+.agt-ai-tournament .log{
+  max-height:250px;
+  overflow:auto;
+  background:#0f172a;
+  color:#e2e8f0;
+  padding:12px;
+  border-radius:10px;
+  font:13px/1.5 ui-monospace,monospace
+}
+
+.agt-ai-tournament .explain{
+  margin-top:18px
+}
+
+.agt-ai-tournament .guide-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:14px
+}
+
+.agt-ai-tournament .guide-card{
+  border:1px solid var(--ait-border);
+  border-radius:12px;
+  padding:15px;
+  background:#fff
+}
+
+.agt-ai-tournament .note{
+  padding:12px;
+  border-left:4px solid var(--ait-accent);
+  background:#eff6ff;
+  border-radius:8px
+}
+
+@media(max-width:800px){
+  .agt-ai-tournament .grid{grid-template-columns:1fr}
+  .agt-ai-tournament .hero{padding:18px}
+  .agt-ai-tournament .wrap{padding:12px}
+}
+</style>
+
+<div class="agt-ai-tournament">
+<header class="hero">
+  <h1>AI Agent Strategy Tournament</h1>
+  <p>Compare fixed, adaptive, and learning-inspired agents across classic strategic games.</p>
+</header>
+
+<main class="wrap">
+<div class="status"></div>
+
+<div class="grid">
+<aside class="card">
+<h2>Tournament setup</h2>
+
+<div class="controls">
+<label>
+  Scenario
+  <select class="scenario-select">
+    <option value="pd">Prisoner's Dilemma</option>
+    <option value="mp">Matching Pennies</option>
+    <option value="coord">Coordination Game</option>
+    <option value="rps">Rock–Paper–Scissors</option>
+  </select>
+</label>
+
+<label>
+  Mode
+  <select class="mode-select">
+    <option value="duel">Agent vs Agent</option>
+    <option value="human">Human vs Agent</option>
+    <option value="tournament">Full Tournament</option>
+  </select>
+</label>
+
+<label>
+  Level
+  <select class="level-select">
+    <option value="1">Level 1 — Fixed Strategies</option>
+    <option value="2">Level 2 — Learning Agents</option>
+    <option value="3">Level 3 — Noisy Environment</option>
+  </select>
+</label>
+
+<label>
+  Agent A
+  <select class="agent-a"></select>
+</label>
+
+<label>
+  Agent B
+  <select class="agent-b"></select>
+</label>
+
+<button class="run-btn" type="button">Run experiment</button>
+<button class="again-btn good" type="button">Run another batch</button>
+<button class="reset-btn secondary" type="button">Reset tournament</button>
+</div>
+</aside>
+
+<section class="card">
+<h2>Results</h2>
+<p class="desc muted"></p>
+
+<div class="metric-grid">
+  <div class="metric">Rounds<b class="rounds">0</b></div>
+  <div class="metric">Top agent<b class="winner">—</b></div>
+  <div class="metric">Avg payoff<b class="avg">0</b></div>
+  <div class="metric">Cooperation / match rate<b class="coop">0%</b></div>
+</div>
+
+<div class="ranking table-wrap"></div>
+<div class="status verdict"></div>
+<div class="log"></div>
+</section>
+</div>
+
+<section class="card explain">
+<h2>How this teaches game theory</h2>
+<p>This final laboratory compares strategy classes rather than only one game. Students can observe how success depends on the environment, opponent, feedback, noise, and adaptation rule. There is no universally best strategy across all strategic settings.</p>
+</section>
+
+<section class="card explain">
+<h2>Complete scenario, mode, level, and agent guide</h2>
+
+<div class="guide-grid">
+<article class="guide-card">
+<h3>Prisoner's Dilemma</h3>
+<p>Rewards cooperation but creates a temptation to defect. Useful for reciprocity and learning.</p>
+</article>
+
+<article class="guide-card">
+<h3>Matching Pennies</h3>
+<p>A zero-sum game with no pure-strategy equilibrium; unpredictability matters.</p>
+</article>
+
+<article class="guide-card">
+<h3>Coordination Game</h3>
+<p>Agents benefit from matching actions, highlighting convention formation.</p>
+</article>
+
+<article class="guide-card">
+<h3>Rock–Paper–Scissors</h3>
+<p>Cyclic dominance rewards mixed or adaptive behavior rather than a single fixed action.</p>
+</article>
+</div>
+
+<h3 style="margin-top:22px">Modes</h3>
+<div class="guide-grid">
+<article class="guide-card">
+<h3>Agent vs Agent</h3>
+<p>Two selected algorithms play many rounds against each other.</p>
+</article>
+
+<article class="guide-card">
+<h3>Human vs Agent</h3>
+<p>The human is represented by a reactive strategy input model while the selected opponent adapts.</p>
+</article>
+
+<article class="guide-card">
+<h3>Full Tournament</h3>
+<p>Every available agent plays every other agent and a ranking is produced.</p>
+</article>
+</div>
+
+<h3 style="margin-top:22px">Levels</h3>
+<div class="guide-grid">
+<article class="guide-card">
+<h3>Level 1 — Fixed Strategies</h3>
+<p>Random, always-first, always-second, and simple best-response agents.</p>
+</article>
+
+<article class="guide-card">
+<h3>Level 2 — Learning Agents</h3>
+<p>Adds fictitious-play and reinforcement-style agents that update from observed history.</p>
+</article>
+
+<article class="guide-card">
+<h3>Level 3 — Noisy Environment</h3>
+<p>Actions occasionally flip, testing robustness and forgiveness under imperfect execution.</p>
+</article>
+</div>
+
+<div class="note" style="margin-top:18px">
+<b>Interpretation:</b> tournament success is contextual. A strategy can dominate one opponent and perform poorly against another, so evaluation should include payoff, stability, exploitability, and robustness.
+</div>
+</section>
+</main>
+</div>
+
+<script>
+(() => {
+  const root=document.querySelector('.agt-ai-tournament');
+  if(!root)return;
+
+  const scenario=root.querySelector('.scenario-select');
+  const mode=root.querySelector('.mode-select');
+  const level=root.querySelector('.level-select');
+  const agentA=root.querySelector('.agent-a');
+  const agentB=root.querySelector('.agent-b');
+  const ranking=root.querySelector('.ranking');
+  const roundsEl=root.querySelector('.rounds');
+  const winnerEl=root.querySelector('.winner');
+  const avgEl=root.querySelector('.avg');
+  const coopEl=root.querySelector('.coop');
+  const verdict=root.querySelector('.verdict');
+  const logEl=root.querySelector('.log');
+  const desc=root.querySelector('.desc');
+
+  const runBtn=root.querySelector('.run-btn');
+  const againBtn=root.querySelector('.again-btn');
+  const resetBtn=root.querySelector('.reset-btn');
+
+  const baseAgents=[
+    'Random',
+    'Always A',
+    'Always B',
+    'Best Response'
+  ];
+
+  const learningAgents=[
+    'Fictitious Play',
+    'Reinforcement'
+  ];
+
+  const texts={
+    pd:'Cooperate/defect incentives reward reciprocity but tempt exploitation.',
+    mp:'A zero-sum prediction game where deterministic behavior is exploitable.',
+    coord:'Agents gain by coordinating on the same action.',
+    rps:'Three actions create cyclic dominance and mixed-strategy pressure.'
+  };
+
+  function agentList(){
+    return +level.value===1
+      ? baseAgents
+      : [...baseAgents,...learningAgents];
+  }
+
+  function refreshAgents(){
+    const list=agentList();
+
+    const html=
+      list
+        .map(name=>`<option>${name}</option>`)
+        .join('');
+
+    agentA.innerHTML=html;
+    agentB.innerHTML=html;
+
+    agentB.selectedIndex=
+      Math.min(1,list.length-1);
+
+    desc.textContent=texts[scenario.value];
+  }
+
+  function actionCount(){
+    return scenario.value==='rps'
+      ? 3
+      : 2;
+  }
+
+  function payoff(a,b){
+    if(scenario.value==='pd'){
+      const matrix=[
+        [[3,3],[0,5]],
+        [[5,0],[1,1]]
+      ];
+
+      return matrix[a][b];
+    }
+
+    if(scenario.value==='mp'){
+      return a===b
+        ? [1,-1]
+        : [-1,1];
+    }
+
+    if(scenario.value==='coord'){
+      return a===b
+        ? [3,3]
+        : [0,0];
+    }
+
+    if(a===b){
+      return [0,0];
+    }
+
+    return (a-b+3)%3===1
+      ? [1,-1]
+      : [-1,1];
+  }
+
+  function choose(name,histSelf,histOpp,q){
+    const k=actionCount();
+
+    if(name==='Random'){
+      return Math.floor(Math.random()*k);
+    }
+
+    if(name==='Always A'){
+      return 0;
+    }
+
+    if(name==='Always B'){
+      return Math.min(1,k-1);
+    }
+
+    if(name==='Best Response'){
+      if(!histOpp.length){
+        return 0;
+      }
+
+      const counts=Array(k).fill(0);
+
+      histOpp.forEach(action=>{
+        counts[action]++;
+      });
+
+      const predicted=
+        counts.indexOf(
+          Math.max(...counts)
+        );
+
+      let best=0;
+      let bestPayoff=-1e9;
+
+      for(let action=0;action<k;action++){
+        const value=
+          payoff(action,predicted)[0];
+
+        if(value>bestPayoff){
+          bestPayoff=value;
+          best=action;
+        }
+      }
+
+      return best;
+    }
+
+    if(name==='Fictitious Play'){
+      if(!histOpp.length){
+        return Math.floor(Math.random()*k);
+      }
+
+      const counts=Array(k).fill(0);
+
+      histOpp.forEach(action=>{
+        counts[action]++;
+      });
+
+      let best=0;
+      let bestValue=-1e9;
+
+      for(let action=0;action<k;action++){
+        const expected=
+          counts.reduce(
+            (sum,count,oppAction)=>
+              sum+
+              (count/histOpp.length)*
+              payoff(action,oppAction)[0],
+            0
+          );
+
+        if(expected>bestValue){
+          bestValue=expected;
+          best=action;
+        }
+      }
+
+      return best;
+    }
+
+    if(name==='Reinforcement'){
+      if(Math.random()<.15){
+        return Math.floor(Math.random()*k);
+      }
+
+      return q.indexOf(
+        Math.max(...q)
+      );
+    }
+
+    return 0;
+  }
+
+  function match(A,B,R=100){
+    const histA=[];
+    const histB=[];
+    const qA=Array(actionCount()).fill(0);
+    const qB=Array(actionCount()).fill(0);
+
+    let scoreA=0;
+    let scoreB=0;
+    let matching=0;
+
+    for(let round=0;round<R;round++){
+      let a=choose(A,histA,histB,qA);
+      let b=choose(B,histB,histA,qB);
+
+      if(
+        +level.value===3 &&
+        Math.random()<.08
+      ){
+        a=(a+1)%actionCount();
+      }
+
+      if(
+        +level.value===3 &&
+        Math.random()<.08
+      ){
+        b=(b+1)%actionCount();
+      }
+
+      const [payA,payB]=payoff(a,b);
+
+      scoreA+=payA;
+      scoreB+=payB;
+
+      if(
+        (
+          scenario.value==='pd' &&
+          a===0 &&
+          b===0
+        ) ||
+        (
+          scenario.value==='coord' &&
+          a===b
+        )
+      ){
+        matching++;
+      }
+
+      qA[a]+=
+        0.12*
+        (
+          payA-qA[a]
+        );
+
+      qB[b]+=
+        0.12*
+        (
+          payB-qB[b]
+        );
+
+      histA.push(a);
+      histB.push(b);
+    }
+
+    return {
+      sA:scoreA,
+      sB:scoreB,
+      match:matching,
+      R
+    };
+  }
+
+  function run(){
+    const R=
+      +level.value===1
+        ? 60
+        : 120;
+
+    if(mode.value==='tournament'){
+      const list=agentList();
+
+      const scores=
+        Object.fromEntries(
+          list.map(name=>[name,0])
+        );
+
+      let matching=0;
+      let total=0;
+
+      for(let i=0;i<list.length;i++){
+        for(let j=i+1;j<list.length;j++){
+          const result=
+            match(
+              list[i],
+              list[j],
+              R
+            );
+
+          scores[list[i]]+=result.sA;
+          scores[list[j]]+=result.sB;
+
+          matching+=result.match;
+          total+=result.R;
+        }
+      }
+
+      const ordered=
+        Object.entries(scores)
+          .sort(
+            (a,b)=>b[1]-a[1]
+          );
+
+      ranking.innerHTML=
+        '<table>'+
+        '<tr><th>Rank</th><th>Agent</th><th>Total payoff</th></tr>'+
+        ordered.map((entry,i)=>`
+          <tr>
+            <td>${i+1}</td>
+            <td>${entry[0]}</td>
+            <td>${entry[1].toFixed(1)}</td>
+          </tr>
+        `).join('')+
+        '</table>';
+
+      winnerEl.textContent=
+        ordered[0][0];
+
+      avgEl.textContent=
+        (
+          ordered[0][1]/
+          Math.max(
+            1,
+            (list.length-1)*R
+          )
+        ).toFixed(2);
+
+      coopEl.textContent=
+        (
+          100*
+          matching/
+          Math.max(1,total)
+        ).toFixed(1)+'%';
+
+      roundsEl.textContent=
+        (
+          list.length*
+          (list.length-1)/
+          2
+        )*R;
+
+      verdict.innerHTML=
+        `<b>${ordered[0][0]}</b> ranked first in this tournament.`;
+
+      logEl.innerHTML=
+        `Tournament completed with ${list.length} agents.<br>`+
+        logEl.innerHTML;
+
+      return;
+    }
+
+    const labelA=
+      mode.value==='human'
+        ? 'Human Reactive'
+        : agentA.value;
+
+    const B=agentB.value;
+
+    const realA=
+      labelA==='Human Reactive'
+        ? 'Best Response'
+        : labelA;
+
+    const result=
+      match(
+        realA,
+        B,
+        R
+      );
+
+    ranking.innerHTML=`
+      <table>
+        <tr>
+          <th>Agent</th>
+          <th>Payoff</th>
+          <th>Average</th>
+        </tr>
+        <tr>
+          <td>${labelA}</td>
+          <td>${result.sA.toFixed(1)}</td>
+          <td>${(result.sA/R).toFixed(2)}</td>
+        </tr>
+        <tr>
+          <td>${B}</td>
+          <td>${result.sB.toFixed(1)}</td>
+          <td>${(result.sB/R).toFixed(2)}</td>
+        </tr>
+      </table>
+    `;
+
+    winnerEl.textContent=
+      result.sA>result.sB
+        ? labelA
+        : result.sB>result.sA
+          ? B
+          : 'Tie';
+
+    avgEl.textContent=
+      (
+        Math.max(
+          result.sA,
+          result.sB
+        )/R
+      ).toFixed(2);
+
+    coopEl.textContent=
+      (
+        100*
+        result.match/
+        R
+      ).toFixed(1)+'%';
+
+    roundsEl.textContent=R;
+
+    verdict.innerHTML=
+      `<b>${winnerEl.textContent}</b> performed best in this batch.`;
+
+    logEl.innerHTML=
+      `${labelA} vs ${B}: ${result.sA.toFixed(1)} / ${result.sB.toFixed(1)}.<br>`+
+      logEl.innerHTML;
+  }
+
+  function resetTournament(){
+    logEl.innerHTML='Tournament reset.';
+    ranking.innerHTML='';
+    winnerEl.textContent='—';
+    avgEl.textContent='0';
+    coopEl.textContent='0%';
+    roundsEl.textContent='0';
+  }
+
+  runBtn.addEventListener('click',run);
+  againBtn.addEventListener('click',run);
+  resetBtn.addEventListener('click',resetTournament);
+
+  scenario.addEventListener('change',refreshAgents);
+  level.addEventListener('change',refreshAgents);
+  mode.addEventListener('change',refreshAgents);
+
+  refreshAgents();
+})();
+</script>
