@@ -1,1 +1,408 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sponsored Search / Ad Auction Game</title><style>:root{--bg:#f5f7fb;--card:#fff;--ink:#182230;--muted:#5f6b7a;--accent:#2563eb;--accent2:#0f766e;--border:#dce3ec}*{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}header{background:linear-gradient(135deg,#172554,#1d4ed8);color:#fff;padding:24px}.wrap{max-width:1180px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:300px 1fr;gap:18px}.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 5px 18px #1822300d}h2,h3{margin-top:0}.controls{display:grid;gap:10px}label{font-weight:650;font-size:.92rem}select,input,button{width:100%;padding:10px;border:1px solid var(--border);border-radius:9px;background:#fff;color:var(--ink)}button{cursor:pointer;font-weight:700;background:var(--accent);color:#fff;border-color:var(--accent)}button.secondary{background:#fff;color:var(--accent)}button.good{background:var(--accent2)}.status{padding:12px;border-radius:10px;background:#eff6ff;border:1px solid #bfdbfe;margin-bottom:12px}.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}.metric{padding:12px;border:1px solid var(--border);border-radius:10px;text-align:center}.metric b{display:block;font-size:1.35rem}.muted{color:var(--muted)}.log{max-height:240px;overflow:auto;background:#0f172a;color:#e2e8f0;padding:12px;border-radius:10px;font:13px/1.5 ui-monospace,monospace}table{width:100%;border-collapse:collapse}th,td{padding:8px;border:1px solid var(--border);text-align:center}.explain{margin-top:18px}.guide-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}.guide-card{border:1px solid var(--border);border-radius:12px;padding:15px}.note{padding:12px;border-left:4px solid var(--accent);background:#eff6ff;border-radius:8px}.pill{display:inline-block;padding:3px 8px;border-radius:999px;background:#e0e7ff;color:#3730a3;font-size:.8rem;font-weight:700}@media(max-width:800px){.grid{grid-template-columns:1fr}.wrap{padding:12px}}</style></head><body><header><h1>Sponsored Search / Ad Auction Game</h1><p>Compete for ranked advertising slots using bids, quality scores, click-through rates, and auction pricing rules.</p></header><main class="wrap"><div class="status"><div class="grid"><aside class="card"><h2>Auction setup</h2><div class="controls"><label>Scenario<select id="scenario"><option value="search">Search Ads</option><option value="social">Social Media Ads</option><option value="market">Sponsored Products</option></select></label><label>Mode<select id="mode"><option value="human">Human Advertiser vs Bots</option><option value="advisor">Human + Bid Advisor</option><option value="all">Human Controls Market</option><option value="auto">Computer Simulation</option></select></label><label>Level<select id="level"><option value="1">Level 1 — First-Price Ranking</option><option value="2">Level 2 — GSP Pricing</option><option value="3">Level 3 — Strategic Bidding</option></select></label><label>Your bid<input id="bid" type="range" min="1" max="12" step=".5" value="6"><span id="bidOut"></span></label><button id="runBtn">Run auction</button><button id="bestBtn" class="good">Find best response</button><button id="resetBtn" class="secondary">New market</button></div></aside><section class="card"><h2>Ad auction</h2><p class="muted" id="desc"></p><div class="metric-grid"><div class="metric">Your position<b id="pos">—</b></div><div class="metric">Expected clicks<b id="clicks">0</b></div><div class="metric">Payment/click<b id="payment">0</b></div><div class="metric">Your utility<b id="utility">0</b></div><div class="metric">Platform revenue<b id="revenue">0</b></div></div><div id="table"></div><div class="status" id="verdict"></div><div class="log" id="log"></div></section></div><section class="card explain"><h2>How this teaches game theory</h2><p>Sponsored-search auctions are multi-slot allocation mechanisms. Advertisers care about position, expected clicks, conversion value, and price. The platform must rank advertisers while creating incentives that balance revenue and efficient allocation.</p></section><section class="card explain"><h2>Complete scenario, mode, level, and pricing guide</h2><div class="guide-grid"><article class="guide-card"><h3>Search Ads</h3><p>Higher positions receive larger click-through rates. Quality and bid jointly determine ranking.</p></article><article class="guide-card"><h3>Social Media Ads</h3><p>Engagement quality matters strongly, so a lower bid can outrank a weak high bidder.</p></article><article class="guide-card"><h3>Sponsored Products</h3><p>Marketplace ads compete for product visibility where relevance influences ranking.</p></article></div><h3 style="margin-top:22px">Modes</h3><div class="guide-grid"><article class="guide-card"><h3>Human Advertiser vs Bots</h3><p>You choose one bid while competing against fixed bot advertisers.</p></article><article class="guide-card"><h3>Human + Bid Advisor</h3><p>The simulator reports whether another bid would increase your expected utility.</p></article><article class="guide-card"><h3>Human Controls Market</h3><p>Your slider also shifts competing bids, making strategic interactions easier to inspect.</p></article><article class="guide-card"><h3>Computer Simulation</h3><p>All bidders adapt automatically to estimated value and position incentives.</p></article></div><h3 style="margin-top:22px">Levels</h3><div class="guide-grid"><article class="guide-card"><h3>Level 1 — First-Price Ranking</h3><p>Winners pay their own bid per click. Bid shading becomes immediately important.</p></article><article class="guide-card"><h3>Level 2 — GSP Pricing</h3><p>Ranking uses bid × quality, while payment is based on the next competitor's rank score.</p></article><article class="guide-card"><h3>Level 3 — Strategic Bidding</h3><p>Bots adjust bids and the human can search for a best response under competitive pressure.</p></article></div><div class="note" style="margin-top:18px"><b>Key idea:</b> the highest bid does not always win the best slot when quality matters. Payment rules change bidding incentives.</div></section></main><script>const $=id=>document.getElementById(id),scenario=$('scenario'),mode=$('mode'),level=$('level'),bid=$('bid'),bidOut=$('bidOut'),table=$('table'),pos=$('pos'),clicks=$('clicks'),payment=$('payment'),utility=$('utility'),revenue=$('revenue'),verdict=$('verdict'),logEl=$('log'),desc=$('desc');let ads=[];const ctr=[.12,.07,.035],texts={search:'Rank search advertisers by bid × quality and allocate three click-through-rate slots.',social:'Engagement quality is emphasized when ranking ads in a feed.',market:'Sponsored product ranking balances merchant bid and relevance.'};function rnd(a,b){return +(a+Math.random()*(b-a)).toFixed(2)}function reset(){ads=[{name:'You',value:rnd(5.5,10),quality:rnd(.65,1),bid:+bid.value,human:true},{name:'Alpha',value:rnd(5,10),quality:rnd(.55,1),bid:rnd(3,9)},{name:'Beta',value:rnd(4,9),quality:rnd(.55,1),bid:rnd(3,9)},{name:'Gamma',value:rnd(4,9),quality:rnd(.55,1),bid:rnd(3,9)}];logEl.innerHTML='New advertiser market created.';run()}function auction(testBid=null,silent=false){ads[0].bid=testBid===null?+bid.value:testBid;if(mode.value==='all'&&testBid===null){ads.slice(1).forEach((a,i)=>a.bid=Math.max(1,+bid.value-(i+1)*.8))}if(mode.value==='auto'&&testBid===null){ads.forEach(a=>a.bid=Math.max(1,a.value*rnd(.65,.95)))}const ranked=[...ads].sort((a,b)=>b.bid*b.quality-a.bid*a.quality);let rev=0,my={position:0,c:0,p:0,u:0};ranked.forEach((a,i)=>{if(i>=3)return;let ppc=+level.value===1?a.bid:(ranked[i+1]?ranked[i+1].bid*ranked[i+1].quality/a.quality:1);ppc=Math.min(ppc,a.bid);let c=ctr[i]*100,u=(a.value-ppc)*c;rev+=ppc*c;if(a.human)my={position:i+1,c,p:ppc,u}});if(!silent){pos.textContent=my.position?`#${my.position}`:'No slot';clicks.textContent=my.c.toFixed(1);payment.textContent=my.p.toFixed(2);utility.textContent=my.u.toFixed(1);revenue.textContent=rev.toFixed(1);table.innerHTML='<table><tr><th>Advertiser</th><th>Bid</th><th>Quality</th><th>Rank score</th></tr>'+ranked.map(a=>`<tr><td>${a.name}</td><td>${a.bid.toFixed(2)}</td><td>${a.quality.toFixed(2)}</td><td>${(a.bid*a.quality).toFixed(2)}</td></tr>`).join('')+'</table>';verdict.innerHTML=my.position?`<b>You won slot ${my.position}.</b> Value/click ${ads[0].value.toFixed(2)}, expected utility ${my.u.toFixed(1)}.`:'<b>You received no slot.</b> Increase rank score or improve quality.';logEl.innerHTML=`Bid ${ads[0].bid.toFixed(2)} → position ${my.position||'none'}, utility ${my.u.toFixed(1)}<br>`+logEl.innerHTML;desc.textContent=texts[scenario.value]}return my.u}function best(){let bestBid=1,bestU=-1e9;for(let b=1;b<=12;b+=.25){let u=auction(+b.toFixed(2),true);if(u>bestU){bestU=u;bestBid=b}}bid.value=bestBid;bidOut.textContent=bestBid.toFixed(2);auction();verdict.innerHTML+=` <b>Best-response search selected bid ${bestBid.toFixed(2)}.</b>`}bid.oninput=()=>bidOut.textContent=(+bid.value).toFixed(2);$('runBtn').onclick=()=>auction();$('bestBtn').onclick=best;$('resetBtn').onclick=reset;scenario.onchange=reset;mode.onchange=reset;level.onchange=()=>auction();bidOut.textContent=(+bid.value).toFixed(2);reset();</script></body></html>
+---
+layout: without-sidebar
+title: "Sponsored Search / Ad Auction Game"
+permalink: /files/agt/slides/Chapter_09_Sponsored-Search-Ad-Auction-Game.html
+excerpt: "Interactive sponsored-search auction game with bid-quality ranking, multi-slot CTRs, first-price and GSP-style payments, strategic bidding, and best-response search."
+---
+
+<style>
+.agt-sponsored-search,.agt-sponsored-search *,.agt-sponsored-search *::before,.agt-sponsored-search *::after{box-sizing:border-box}
+.agt-sponsored-search{--aa-card:#fff;--aa-ink:#182230;--aa-muted:#5f6b7a;--aa-accent:#2563eb;--aa-accent2:#0f766e;--aa-border:#dce3ec;width:min(1180px,100%);margin:0 auto 2rem;color:var(--aa-ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.agt-sponsored-search .hero{padding:24px;border-radius:18px 18px 0 0;background:linear-gradient(135deg,#172554,#1d4ed8);color:#fff}
+.agt-sponsored-search .hero h1{margin:0 0 6px;color:#fff;font-size:clamp(1.6rem,4vw,2.4rem)}
+.agt-sponsored-search .hero p{margin:0;max-width:950px;opacity:.92}
+.agt-sponsored-search .wrap{padding:20px;border:1px solid var(--aa-border);border-top:0;border-radius:0 0 18px 18px;background:#f5f7fb}
+.agt-sponsored-search .grid{display:grid;grid-template-columns:300px 1fr;gap:18px}
+.agt-sponsored-search .card{background:#fff;border:1px solid var(--aa-border);border-radius:14px;padding:16px;box-shadow:0 5px 18px #1822300d}
+.agt-sponsored-search h2,.agt-sponsored-search h3{margin-top:0;color:var(--aa-ink)}
+.agt-sponsored-search .controls{display:grid;gap:10px}
+.agt-sponsored-search label{font-weight:650;font-size:.92rem}
+.agt-sponsored-search select,.agt-sponsored-search input,.agt-sponsored-search button{width:100%;padding:10px;border:1px solid var(--aa-border);border-radius:9px;background:#fff;color:var(--aa-ink);font:inherit}
+.agt-sponsored-search button{cursor:pointer;font-weight:700;background:var(--aa-accent);color:#fff;border-color:var(--aa-accent)}
+.agt-sponsored-search button.secondary{background:#fff;color:var(--aa-accent)}
+.agt-sponsored-search button.good{background:var(--aa-accent2)}
+.agt-sponsored-search .status{padding:12px;border-radius:10px;background:#eff6ff;border:1px solid #bfdbfe;margin-bottom:12px}
+.agt-sponsored-search .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}
+.agt-sponsored-search .metric{padding:12px;border:1px solid var(--aa-border);border-radius:10px;text-align:center}
+.agt-sponsored-search .metric b{display:block;font-size:1.35rem}
+.agt-sponsored-search .muted{color:var(--aa-muted)}
+.agt-sponsored-search .log{max-height:240px;overflow:auto;background:#0f172a;color:#e2e8f0;padding:12px;border-radius:10px;font:13px/1.5 ui-monospace,monospace}
+.agt-sponsored-search table{width:100%;border-collapse:collapse}
+.agt-sponsored-search th,.agt-sponsored-search td{padding:8px;border:1px solid var(--aa-border);text-align:center}
+.agt-sponsored-search .table-wrap{overflow-x:auto}
+.agt-sponsored-search .explain{margin-top:18px}
+.agt-sponsored-search .guide-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.agt-sponsored-search .guide-card{border:1px solid var(--aa-border);border-radius:12px;padding:15px}
+.agt-sponsored-search .note{padding:12px;border-left:4px solid var(--aa-accent);background:#eff6ff;border-radius:8px}
+@media(max-width:800px){.agt-sponsored-search .grid{grid-template-columns:1fr}.agt-sponsored-search .wrap{padding:12px}.agt-sponsored-search .hero{padding:18px}}
+</style>
+
+<div class="agt-sponsored-search">
+<header class="hero">
+<h1>Sponsored Search / Ad Auction Game</h1>
+<p>Compete for ranked advertising slots using bids, quality scores, click-through rates, and auction pricing rules.</p>
+</header>
+
+<main class="wrap">
+<div class="status"></div>
+
+<div class="grid">
+<aside class="card">
+<h2>Auction setup</h2>
+<div class="controls">
+
+<label>Scenario
+<select class="scenario-select">
+<option value="search">Search Ads</option>
+<option value="social">Social Media Ads</option>
+<option value="market">Sponsored Products</option>
+</select>
+</label>
+
+<label>Mode
+<select class="mode-select">
+<option value="human">Human Advertiser vs Bots</option>
+<option value="advisor">Human + Bid Advisor</option>
+<option value="all">Human Controls Market</option>
+<option value="auto">Computer Simulation</option>
+</select>
+</label>
+
+<label>Level
+<select class="level-select">
+<option value="1">Level 1 — First-Price Ranking</option>
+<option value="2">Level 2 — GSP Pricing</option>
+<option value="3">Level 3 — Strategic Bidding</option>
+</select>
+</label>
+
+<label>Your bid
+<input class="bid-input" type="range" min="1" max="12" step=".5" value="6">
+<span class="bid-output"></span>
+</label>
+
+<button class="run-btn" type="button">Run auction</button>
+<button class="best-btn good" type="button">Find best response</button>
+<button class="reset-btn secondary" type="button">New market</button>
+</div>
+</aside>
+
+<section class="card">
+<h2>Ad auction</h2>
+<p class="desc muted"></p>
+
+<div class="metric-grid">
+<div class="metric">Your position<b class="position">—</b></div>
+<div class="metric">Expected clicks<b class="clicks">0</b></div>
+<div class="metric">Payment/click<b class="payment">0</b></div>
+<div class="metric">Your utility<b class="utility">0</b></div>
+<div class="metric">Platform revenue<b class="revenue">0</b></div>
+</div>
+
+<div class="auction-table table-wrap"></div>
+<div class="verdict status"></div>
+<div class="log"></div>
+</section>
+</div>
+
+<section class="card explain">
+<h2>How this teaches game theory</h2>
+<p>Sponsored-search auctions are multi-slot allocation mechanisms. Advertisers care about position, expected clicks, conversion value, and price. The platform must rank advertisers while creating incentives that balance revenue and efficient allocation.</p>
+</section>
+
+<section class="card explain">
+<h2>Complete scenario, mode, level, and pricing guide</h2>
+
+<div class="guide-grid">
+<article class="guide-card">
+<h3>Search Ads</h3>
+<p>Higher positions receive larger click-through rates. Quality and bid jointly determine ranking.</p>
+</article>
+
+<article class="guide-card">
+<h3>Social Media Ads</h3>
+<p>Engagement quality matters strongly, so a lower bid can outrank a weak high bidder.</p>
+</article>
+
+<article class="guide-card">
+<h3>Sponsored Products</h3>
+<p>Marketplace ads compete for product visibility where relevance influences ranking.</p>
+</article>
+</div>
+
+<h3 style="margin-top:22px">Modes</h3>
+<div class="guide-grid">
+<article class="guide-card">
+<h3>Human Advertiser vs Bots</h3>
+<p>You choose one bid while competing against fixed bot advertisers.</p>
+</article>
+
+<article class="guide-card">
+<h3>Human + Bid Advisor</h3>
+<p>The simulator reports whether another bid would increase your expected utility.</p>
+</article>
+
+<article class="guide-card">
+<h3>Human Controls Market</h3>
+<p>Your slider also shifts competing bids, making strategic interactions easier to inspect.</p>
+</article>
+
+<article class="guide-card">
+<h3>Computer Simulation</h3>
+<p>All bidders adapt automatically to estimated value and position incentives.</p>
+</article>
+</div>
+
+<h3 style="margin-top:22px">Levels</h3>
+<div class="guide-grid">
+<article class="guide-card">
+<h3>Level 1 — First-Price Ranking</h3>
+<p>Winners pay their own bid per click. Bid shading becomes immediately important.</p>
+</article>
+
+<article class="guide-card">
+<h3>Level 2 — GSP Pricing</h3>
+<p>Ranking uses bid × quality, while payment is based on the next competitor's rank score.</p>
+</article>
+
+<article class="guide-card">
+<h3>Level 3 — Strategic Bidding</h3>
+<p>Bots adjust bids and the human can search for a best response under competitive pressure.</p>
+</article>
+</div>
+
+<div class="note" style="margin-top:18px">
+<b>Key idea:</b> the highest bid does not always win the best slot when quality matters. Payment rules change bidding incentives.
+</div>
+</section>
+</main>
+</div>
+
+<script>
+(() => {
+  const root=document.querySelector('.agt-sponsored-search');
+  if(!root)return;
+
+  const scenario=root.querySelector('.scenario-select');
+  const mode=root.querySelector('.mode-select');
+  const level=root.querySelector('.level-select');
+  const bid=root.querySelector('.bid-input');
+  const bidOut=root.querySelector('.bid-output');
+  const table=root.querySelector('.auction-table');
+  const pos=root.querySelector('.position');
+  const clicks=root.querySelector('.clicks');
+  const payment=root.querySelector('.payment');
+  const utility=root.querySelector('.utility');
+  const revenue=root.querySelector('.revenue');
+  const verdict=root.querySelector('.verdict');
+  const logEl=root.querySelector('.log');
+  const desc=root.querySelector('.desc');
+  const runBtn=root.querySelector('.run-btn');
+  const bestBtn=root.querySelector('.best-btn');
+  const resetBtn=root.querySelector('.reset-btn');
+
+  let ads=[];
+
+  const ctr=[.12,.07,.035];
+
+  const texts={
+    search:'Rank search advertisers by bid × quality and allocate three click-through-rate slots.',
+    social:'Engagement quality is emphasized when ranking ads in a feed.',
+    market:'Sponsored product ranking balances merchant bid and relevance.'
+  };
+
+  function rnd(a,b){
+    return +(a+Math.random()*(b-a)).toFixed(2);
+  }
+
+  function reset(){
+    ads=[
+      {
+        name:'You',
+        value:rnd(5.5,10),
+        quality:rnd(.65,1),
+        bid:+bid.value,
+        human:true
+      },
+      {
+        name:'Alpha',
+        value:rnd(5,10),
+        quality:rnd(.55,1),
+        bid:rnd(3,9)
+      },
+      {
+        name:'Beta',
+        value:rnd(4,9),
+        quality:rnd(.55,1),
+        bid:rnd(3,9)
+      },
+      {
+        name:'Gamma',
+        value:rnd(4,9),
+        quality:rnd(.55,1),
+        bid:rnd(3,9)
+      }
+    ];
+
+    logEl.innerHTML='New advertiser market created.';
+    auction();
+  }
+
+  function auction(testBid=null,silent=false){
+    ads[0].bid=
+      testBid===null
+        ? +bid.value
+        : testBid;
+
+    if(mode.value==='all' && testBid===null){
+      ads.slice(1).forEach((ad,i)=>{
+        ad.bid=Math.max(
+          1,
+          +bid.value-(i+1)*.8
+        );
+      });
+    }
+
+    if(mode.value==='auto' && testBid===null){
+      ads.forEach(ad=>{
+        ad.bid=Math.max(
+          1,
+          ad.value*rnd(.65,.95)
+        );
+      });
+    }
+
+    const ranked=[...ads].sort(
+      (a,b)=>
+        b.bid*b.quality-
+        a.bid*a.quality
+    );
+
+    let platformRevenue=0;
+
+    let my={
+      position:0,
+      c:0,
+      p:0,
+      u:0
+    };
+
+    ranked.forEach((ad,i)=>{
+      if(i>=3)return;
+
+      let ppc=
+        +level.value===1
+          ? ad.bid
+          : (
+              ranked[i+1]
+                ? ranked[i+1].bid*
+                  ranked[i+1].quality/
+                  ad.quality
+                : 1
+            );
+
+      ppc=Math.min(ppc,ad.bid);
+
+      const expectedClicks=ctr[i]*100;
+      const userUtility=
+        (ad.value-ppc)*expectedClicks;
+
+      platformRevenue+=
+        ppc*expectedClicks;
+
+      if(ad.human){
+        my={
+          position:i+1,
+          c:expectedClicks,
+          p:ppc,
+          u:userUtility
+        };
+      }
+    });
+
+    if(!silent){
+      pos.textContent=
+        my.position
+          ? `#${my.position}`
+          : 'No slot';
+
+      clicks.textContent=
+        my.c.toFixed(1);
+
+      payment.textContent=
+        my.p.toFixed(2);
+
+      utility.textContent=
+        my.u.toFixed(1);
+
+      revenue.textContent=
+        platformRevenue.toFixed(1);
+
+      table.innerHTML=
+        '<table><tr><th>Advertiser</th><th>Bid</th><th>Quality</th><th>Rank score</th></tr>'+
+        ranked.map(ad=>`
+          <tr>
+            <td>${ad.name}</td>
+            <td>${ad.bid.toFixed(2)}</td>
+            <td>${ad.quality.toFixed(2)}</td>
+            <td>${(ad.bid*ad.quality).toFixed(2)}</td>
+          </tr>
+        `).join('')+
+        '</table>';
+
+      verdict.innerHTML=
+        my.position
+          ? `<b>You won slot ${my.position}.</b> Value/click ${ads[0].value.toFixed(2)}, expected utility ${my.u.toFixed(1)}.`
+          : '<b>You received no slot.</b> Increase rank score or improve quality.';
+
+      logEl.innerHTML=
+        `Bid ${ads[0].bid.toFixed(2)} → position ${my.position||'none'}, utility ${my.u.toFixed(1)}<br>`+
+        logEl.innerHTML;
+
+      desc.textContent=texts[scenario.value];
+    }
+
+    return my.u;
+  }
+
+  function best(){
+    let bestBid=1;
+    let bestUtility=-1e9;
+
+    for(let candidate=1;candidate<=12;candidate+=.25){
+      const utility=
+        auction(
+          +candidate.toFixed(2),
+          true
+        );
+
+      if(utility>bestUtility){
+        bestUtility=utility;
+        bestBid=candidate;
+      }
+    }
+
+    bid.value=bestBid;
+    bidOut.textContent=bestBid.toFixed(2);
+
+    auction();
+
+    verdict.innerHTML+=
+      ` <b>Best-response search selected bid ${bestBid.toFixed(2)}.</b>`;
+  }
+
+  bid.addEventListener('input',()=>{
+    bidOut.textContent=(+bid.value).toFixed(2);
+  });
+
+  runBtn.addEventListener('click',()=>auction());
+  bestBtn.addEventListener('click',best);
+  resetBtn.addEventListener('click',reset);
+  scenario.addEventListener('change',reset);
+  mode.addEventListener('change',reset);
+  level.addEventListener('change',()=>auction());
+
+  bidOut.textContent=(+bid.value).toFixed(2);
+  reset();
+})();
+</script>
