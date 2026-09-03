@@ -130,7 +130,6 @@ Auctions and market design are closely related fields that utilize principles fr
   [First-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_first-price-auction-simulator.html) | 
   [Second-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_second-price-sealed-bid-auction.html)
 - [🕹️Double Auction Market (HTML)](../files/agt/slides/Chapter_05_Double-Auction-Market-Simulator.html)
-- [🕹️Vickrey Auction (HTML)](../files/agt/slides/Chapter_05_Vickrey-Auction.html)
 - [🕹️Monopoly Game (HTML)](../files/agt/slides/Chapter_05_Monopoly/index.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_05_Auctions_and_Market_Design.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
