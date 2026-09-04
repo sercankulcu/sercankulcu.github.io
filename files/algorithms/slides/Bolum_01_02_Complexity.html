@@ -444,25 +444,46 @@ excerpt: "Interactive JavaScript algorithm complexity and performance analysis t
   }
 
   function benchmarkFunction(fn, size) {
-    for (var warmup = 0; warmup < 5; warmup++) {
-      fn(size);
+    // Warm up the function so JIT compilation has a chance to stabilize.
+    var sink = 0;
+    for (var warmup = 0; warmup < 20; warmup++) {
+      sink += Number(fn(size)) || 0;
     }
 
+    // Estimate a repetition count that gives a sufficiently long measurement window.
     var probeStart = performance.now();
-    fn(size);
-    var probeTime = performance.now() - probeStart;
-
-    var targetWindowMs = 40;
-    var repetitions = Math.ceil(targetWindowMs / Math.max(probeTime, 0.01));
-    repetitions = Math.max(1, Math.min(repetitions, 5000));
-
-    var start = performance.now();
-    for (var i = 0; i < repetitions; i++) {
-      fn(size);
+    for (var probe = 0; probe < 20; probe++) {
+      sink += Number(fn(size)) || 0;
     }
-    var total = performance.now() - start;
+    var probeTime = (performance.now() - probeStart) / 20;
 
-    return total / repetitions;
+    var targetWindowMs = 120;
+    var repetitions = Math.ceil(targetWindowMs / Math.max(probeTime, 0.001));
+    repetitions = Math.max(50, Math.min(repetitions, 100000));
+
+    // Measure several independent batches and use the median.
+    // Median is much less sensitive to browser scheduling, GC, CPU turbo, etc.
+    var batchTimes = [];
+
+    for (var batch = 0; batch < 7; batch++) {
+      var start = performance.now();
+
+      for (var i = 0; i < repetitions; i++) {
+        sink += Number(fn(size)) || 0;
+      }
+
+      var elapsed = performance.now() - start;
+      batchTimes.push(elapsed / repetitions);
+    }
+
+    // Keep the return values observable so the engine is less likely to discard the work.
+    window.__algoComplexityBenchmarkSink = sink;
+
+    batchTimes.sort(function(a, b) {
+      return a - b;
+    });
+
+    return batchTimes[Math.floor(batchTimes.length / 2)];
   }
 
   function run(){
