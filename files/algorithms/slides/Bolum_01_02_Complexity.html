@@ -286,7 +286,7 @@ excerpt: "Interactive JavaScript algorithm complexity and performance analysis t
   "use strict";
   var root=document.querySelector(".algo-complexity");if(!root)return;
   function q(id){return root.querySelector("#"+id);}
-  var editor=q("algo-complexity-js-function"),button=q("algo-complexity-analyze"),loader=q("algo-complexity-loader"),loading=q("algo-complexity-loading"),canvas=q("algo-complexity-chart"),chart=null;
+  var editor=q("algo-complexity-js-function"),button=q("algo-complexity-analyze"),loader=q("algo-complexity-loader"),loading=q("algo-complexity-loading"),canvas=q("algo-complexity-chart"),codeError=q("algo-complexity-code-error"),chart=null;
   var texts = {
     option1: [
       "function myFunction(size) {",
@@ -487,19 +487,46 @@ excerpt: "Interactive JavaScript algorithm complexity and performance analysis t
     return batchTimes[Math.floor(batchTimes.length / 2)];
   }
 
+  function buildTestFunction(source) {
+    if (!source || !source.trim()) {
+      throw new Error("JavaScript function is empty.");
+    }
+
+    try {
+      return new Function(
+        "size",
+        "\"use strict\";\n" +
+        source +
+        "\nif (typeof myFunction !== 'function') {" +
+        " throw new Error('Please define function myFunction(size).');" +
+        "}\nreturn myFunction(size);"
+      );
+    } catch (err) {
+      codeError.textContent = "Code error: " + (err && err.message ? err.message : "Invalid JavaScript.");
+      throw err;
+    }
+  }
+
   function run(){
     button.disabled=true;loader.style.display="block";loading.style.display="block";canvas.style.visibility="hidden";
     setTimeout(function(){
       try{
         var sizes = readSizes();
         var times = [];
-        var fn = new Function("size", editor.value + "\nreturn myFunction(size);");
+        var fn = buildTestFunction(editor.value);
+        codeError.textContent = "";
 
         sizes.forEach(function(size) {
           times.push(benchmarkFunction(fn, size));
         });
         canvas.style.visibility="visible";updateChart(sizes,times);
-      }catch(err){alert(err&&err.message?err.message:"The analysis could not be completed.");canvas.style.visibility="visible";}
+      }catch(err){
+        var message = err && err.message ? err.message : "The analysis could not be completed.";
+        if (!codeError.textContent) {
+          codeError.textContent = "Code error: " + message;
+        }
+        canvas.style.visibility="visible";
+      }
       finally{button.disabled=false;loader.style.display="none";loading.style.display="none";}
     },50);
   }
