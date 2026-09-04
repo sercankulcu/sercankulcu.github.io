@@ -74,6 +74,7 @@ There are currently no announcements.
 * Prerequisites for preparation [(HTML)](../files/algorithms/Algorithms_Prerequisites.html)
 * Key figures who have shaped the field [(HTML)](../files/algorithms/Algorithms_Important_People.html)
 * Practice Questions & Solutions [(HTML)](../files/algorithms/Algorithms_Questions_and_Solutions.html)
+
 ---
 
 ## Chapter 1: Introduction to Algorithms
