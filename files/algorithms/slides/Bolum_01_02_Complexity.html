@@ -286,7 +286,7 @@ excerpt: "Interactive JavaScript algorithm complexity and performance analysis t
   "use strict";
   var root=document.querySelector(".algo-complexity");if(!root)return;
   function q(id){return root.querySelector("#"+id);}
-  var editor=q("algo-complexity-js-function"),button=q("algo-complexity-analyze"),loader=q("algo-complexity-loader"),loading=q("algo-complexity-loading"),canvas=q("algo-complexity-chart"),codeError=q("algo-complexity-code-error"),chart=null;
+  var editor=q("algo-complexity-js-function"),button=q("algo-complexity-analyze"),loader=q("algo-complexity-loader"),loading=q("algo-complexity-loading"),canvas=q("algo-complexity-chart"),chart=null;
   var texts = {
     option1: [
       "function myFunction(size) {",
@@ -353,20 +353,19 @@ excerpt: "Interactive JavaScript algorithm complexity and performance analysis t
     option5: [20, 40, 60, 80, 100]
   };
 
-  function changeFunction() {
-    var selected = root.querySelector('input[name="algo-complexity-option"]:checked');
-    if (!selected || !texts[selected.value]) return;
+  function changeFunction(){
+    var s = root.querySelector('input[name="algo-complexity-option"]:checked');
+    if (!s || !texts[s.value]) return;
 
-    editor.value = texts[selected.value];
+    editor.value = texts[s.value];
 
-    var preset = sizePresets[selected.value];
+    var preset = sizePresets[s.value];
     if (preset) {
       preset.forEach(function(value, index) {
         q("algo-complexity-size" + (index + 1)).value = value;
       });
     }
   }
-
   function readSizes(){var a=[];for(var i=1;i<=5;i++){var v=parseInt(q("algo-complexity-size"+i).value,10);if(!Number.isFinite(v)||v<1)throw new Error("All input sizes must be positive integers.");a.push(v);}return a;}
   function cssVar(name,fallback){var v=getComputedStyle(document.documentElement).getPropertyValue(name).trim();return v||fallback;}
   function updateChart(sizes, times) {
@@ -445,66 +444,25 @@ excerpt: "Interactive JavaScript algorithm complexity and performance analysis t
   }
 
   function benchmarkFunction(fn, size) {
-    // Warm up the function so JIT compilation has a chance to stabilize.
-    var sink = 0;
-    for (var warmup = 0; warmup < 20; warmup++) {
-      sink += Number(fn(size)) || 0;
+    for (var warmup = 0; warmup < 5; warmup++) {
+      fn(size);
     }
 
-    // Estimate a repetition count that gives a sufficiently long measurement window.
     var probeStart = performance.now();
-    for (var probe = 0; probe < 20; probe++) {
-      sink += Number(fn(size)) || 0;
+    fn(size);
+    var probeTime = performance.now() - probeStart;
+
+    var targetWindowMs = 40;
+    var repetitions = Math.ceil(targetWindowMs / Math.max(probeTime, 0.01));
+    repetitions = Math.max(1, Math.min(repetitions, 5000));
+
+    var start = performance.now();
+    for (var i = 0; i < repetitions; i++) {
+      fn(size);
     }
-    var probeTime = (performance.now() - probeStart) / 20;
+    var total = performance.now() - start;
 
-    var targetWindowMs = 120;
-    var repetitions = Math.ceil(targetWindowMs / Math.max(probeTime, 0.001));
-    repetitions = Math.max(50, Math.min(repetitions, 100000));
-
-    // Measure several independent batches and use the median.
-    // Median is much less sensitive to browser scheduling, GC, CPU turbo, etc.
-    var batchTimes = [];
-
-    for (var batch = 0; batch < 7; batch++) {
-      var start = performance.now();
-
-      for (var i = 0; i < repetitions; i++) {
-        sink += Number(fn(size)) || 0;
-      }
-
-      var elapsed = performance.now() - start;
-      batchTimes.push(elapsed / repetitions);
-    }
-
-    // Keep the return values observable so the engine is less likely to discard the work.
-    window.__algoComplexityBenchmarkSink = sink;
-
-    batchTimes.sort(function(a, b) {
-      return a - b;
-    });
-
-    return batchTimes[Math.floor(batchTimes.length / 2)];
-  }
-
-  function buildTestFunction(source) {
-    if (!source || !source.trim()) {
-      throw new Error("JavaScript function is empty.");
-    }
-
-    try {
-      return new Function(
-        "size",
-        "\"use strict\";\n" +
-        source +
-        "\nif (typeof myFunction !== 'function') {" +
-        " throw new Error('Please define function myFunction(size).');" +
-        "}\nreturn myFunction(size);"
-      );
-    } catch (err) {
-      codeError.textContent = "Code error: " + (err && err.message ? err.message : "Invalid JavaScript.");
-      throw err;
-    }
+    return total / repetitions;
   }
 
   function run(){
@@ -513,20 +471,13 @@ excerpt: "Interactive JavaScript algorithm complexity and performance analysis t
       try{
         var sizes = readSizes();
         var times = [];
-        var fn = buildTestFunction(editor.value);
-        codeError.textContent = "";
+        var fn = new Function("size", editor.value + "\nreturn myFunction(size);");
 
         sizes.forEach(function(size) {
           times.push(benchmarkFunction(fn, size));
         });
         canvas.style.visibility="visible";updateChart(sizes,times);
-      }catch(err){
-        var message = err && err.message ? err.message : "The analysis could not be completed.";
-        if (!codeError.textContent) {
-          codeError.textContent = "Code error: " + message;
-        }
-        canvas.style.visibility="visible";
-      }
+      }catch(err){alert(err&&err.message?err.message:"The analysis could not be completed.");canvas.style.visibility="visible";}
       finally{button.disabled=false;loader.style.display="none";loading.style.display="none";}
     },50);
   }
