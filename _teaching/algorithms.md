@@ -70,7 +70,8 @@ There are currently no announcements.
 - **Soru Cevap**  
   [vize](../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf) | 
   [final](../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf) | 
-  [hw-sol](../files/algorithms/slides/Chapter_00_Homework_Solutions.html)
+  [hw-sol](../files/algorithms/slides/Chapter_00_Homework_Solutions.html) | 
+  [Practice Questions & Solutions](../files/algorithms/slides/Algorithms_Questions_and_Solutions.html)
 
 ---
 
