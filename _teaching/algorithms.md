@@ -67,19 +67,13 @@ There are currently no announcements.
   [final B](../files/algorithms/slides/2023-2024-algorithms-final-b-cevap.pdf) | 
   [but](../files/algorithms/slides/2023-2024-algorithms-butunleme-cevap.pdf)
 
-- **Soru Cevap**  
-  [vize](../files/algorithms/slides/Bolum_15_Soru_Cevap.pdf) | 
-  [final](../files/algorithms/slides/Bolum_16_Soru_Cevap_2.pdf) | 
-  [hw-sol](../files/algorithms/slides/Chapter_00_Homework_Solutions.html) | 
-  [Practice Questions & Solutions](../files/algorithms/slides/Algorithms_Questions_and_Solutions.html)
-
 ---
 
 ## Preliminary Materials: 
 
-* Prerequisites for preparation [pdf](../files/algorithms/Algorithms_Prerequisites.html)
-* Key figures who have shaped the field [pdf](../files/algorithms/Algorithms_Important_People.html)
-
+* Prerequisites for preparation [(HTML)](../files/algorithms/Algorithms_Prerequisites.html)
+* Key figures who have shaped the field [(HTML)](../files/algorithms/Algorithms_Important_People.html)
+* Practice Questions & Solutions [(HTML)](../files/algorithms/Algorithms_Questions_and_Solutions.html)
 ---
 
 ## Chapter 1: Introduction to Algorithms
