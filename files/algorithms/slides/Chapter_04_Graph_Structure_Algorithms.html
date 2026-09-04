@@ -1,0 +1,91 @@
+---
+layout: without-sidebar
+title: "Graph Structure Algorithms"
+permalink: /files/algorithms/slides/Chapter_04_Graph_Structure_Algorithms.html
+excerpt: "Interactive visualizer for topological sorting, strongly connected components, and articulation points."
+---
+
+<style>
+.alg-gs,.alg-gs *,.alg-gs *::before,.alg-gs *::after{box-sizing:border-box}
+.alg-gs{width:min(1100px,100%);margin:0 auto 2rem;color:var(--global-text-color);--b:color-mix(in srgb,var(--global-link-color) 34%,var(--global-border-color));--s:color-mix(in srgb,var(--global-link-color) 4%,var(--global-bg-color))}
+.alg-gs__hero,.alg-gs__controls,.alg-gs__view,.alg-gs__notes{border:1.5px solid var(--b);border-radius:14px;background:var(--global-bg-color)}
+.alg-gs__hero{padding:1rem;background:var(--s)}.alg-gs__controls{display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem;padding:1rem;margin-top:1rem}
+.alg-gs button{min-height:42px;border:1.5px solid var(--b);border-radius:9px;background:var(--global-bg-color);color:var(--global-text-color);font:inherit;font-weight:800;cursor:pointer}
+.alg-gs button[data-primary="1"]{background:var(--global-link-color);color:#fff;border-color:var(--global-link-color)}
+.alg-gs__view{padding:1rem;margin-top:1rem}.alg-gs svg{width:100%;height:auto;display:block}.alg-gs__result{margin-top:.8rem;line-height:1.6}.alg-gs__notes{margin-top:1rem;padding:1rem;line-height:1.6}
+@media(max-width:760px){.alg-gs__controls{grid-template-columns:1fr 1fr}}
+</style>
+
+<div class="alg-gs">
+<section class="alg-gs__hero"><h1>Topological Sort, SCC & Articulation Points</h1><p>Explore three graph-structure algorithms on small example graphs.</p></section>
+<section class="alg-gs__controls">
+<button id="gs-topo" data-primary="1" type="button">Topological Sort</button>
+<button id="gs-scc" data-primary="1" type="button">SCC</button>
+<button id="gs-art" data-primary="1" type="button">Articulation Points</button>
+<button id="gs-reset" type="button">Reset</button>
+</section>
+<section class="alg-gs__view"><svg id="gs-svg" viewBox="0 0 800 420" aria-label="Graph visualization"></svg><div id="gs-result" class="alg-gs__result"></div></section>
+<section class="alg-gs__notes"><strong>Topological sort</strong> applies only to DAGs. <strong>Strongly connected components</strong> partition directed graphs into maximal mutually reachable groups. <strong>Articulation points</strong> are vertices whose removal increases the number of connected components in an undirected graph.</section>
+</div>
+
+<script>
+(function(){
+"use strict";
+var root=document.querySelector(".alg-gs");if(!root)return;
+function q(id){return root.querySelector("#"+id);}
+var pos=[[100,80],[300,70],[520,80],[680,200],[500,320],[280,330],[100,250]];
+var dag=[[0,1],[0,5],[1,2],[1,4],[5,4],[4,2],[2,3],[4,3]];
+var sccEdges=[[0,1],[1,2],[2,0],[2,3],[3,4],[4,3],[4,5],[5,6],[6,5]];
+var undirected=[[0,1],[1,2],[1,5],[2,3],[3,4],[5,6]];
+function draw(edges,highlights){
+  var svg=q("gs-svg");svg.innerHTML="";
+  edges.forEach(function(e){
+    var a=pos[e[0]],b=pos[e[1]],line=document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute("x1",a[0]);line.setAttribute("y1",a[1]);line.setAttribute("x2",b[0]);line.setAttribute("y2",b[1]);
+    line.setAttribute("stroke","currentColor");line.setAttribute("stroke-width","2");svg.appendChild(line);
+  });
+  pos.forEach(function(p,i){
+    var c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",p[0]);c.setAttribute("cy",p[1]);c.setAttribute("r","24");
+    c.setAttribute("fill",highlights.indexOf(i)>=0?"#f59e0b":"var(--global-link-color)");svg.appendChild(c);
+    var t=document.createElementNS("http://www.w3.org/2000/svg","text");
+    t.setAttribute("x",p[0]);t.setAttribute("y",p[1]+5);t.setAttribute("text-anchor","middle");t.setAttribute("fill","#fff");t.textContent=String.fromCharCode(65+i);svg.appendChild(t);
+  });
+}
+function topo(){
+  var n=7,ind=Array(n).fill(0),adj=Array.from({length:n},function(){return[];});
+  dag.forEach(function(e){adj[e[0]].push(e[1]);ind[e[1]]++;});
+  var queue=[],order=[];ind.forEach(function(v,i){if(v===0)queue.push(i);});
+  while(queue.length){var u=queue.shift();order.push(u);adj[u].forEach(function(v){ind[v]--;if(ind[v]===0)queue.push(v);});}
+  draw(dag,order);q("gs-result").textContent="Topological order: "+order.map(function(i){return String.fromCharCode(65+i);}).join(" → ");
+}
+function scc(){
+  var n=7,adj=Array.from({length:n},function(){return[];}),radj=Array.from({length:n},function(){return[];});
+  sccEdges.forEach(function(e){adj[e[0]].push(e[1]);radj[e[1]].push(e[0]);});
+  var seen=Array(n).fill(false),order=[];
+  function dfs(u){seen[u]=true;adj[u].forEach(function(v){if(!seen[v])dfs(v);});order.push(u);}
+  for(var i=0;i<n;i++)if(!seen[i])dfs(i);
+  seen.fill(false);var comps=[];
+  function rdfs(u,c){seen[u]=true;c.push(u);radj[u].forEach(function(v){if(!seen[v])rdfs(v,c);});}
+  while(order.length){var u=order.pop();if(!seen[u]){var c=[];rdfs(u,c);comps.push(c);}}
+  draw(sccEdges,[]);
+  q("gs-result").textContent="SCCs: "+comps.map(function(c){return "{"+c.map(function(i){return String.fromCharCode(65+i);}).join(", ")+"}";}).join("  ");
+}
+function articulation(){
+  var n=7,adj=Array.from({length:n},function(){return[];});
+  undirected.forEach(function(e){adj[e[0]].push(e[1]);adj[e[1]].push(e[0]);});
+  var disc=Array(n).fill(-1),low=Array(n).fill(0),parent=Array(n).fill(-1),time=0,arts=new Set();
+  function dfs(u){
+    disc[u]=low[u]=++time;var children=0;
+    adj[u].forEach(function(v){
+      if(disc[v]===-1){children++;parent[v]=u;dfs(v);low[u]=Math.min(low[u],low[v]);if(parent[u]===-1&&children>1)arts.add(u);if(parent[u]!==-1&&low[v]>=disc[u])arts.add(u);}
+      else if(v!==parent[u])low[u]=Math.min(low[u],disc[v]);
+    });
+  }
+  dfs(0);var arr=Array.from(arts);draw(undirected,arr);
+  q("gs-result").textContent="Articulation points: "+(arr.length?arr.map(function(i){return String.fromCharCode(65+i);}).join(", "):"none");
+}
+function reset(){draw(dag,[]);q("gs-result").textContent="Choose an algorithm.";}
+q("gs-topo").addEventListener("click",topo);q("gs-scc").addEventListener("click",scc);q("gs-art").addEventListener("click",articulation);q("gs-reset").addEventListener("click",reset);reset();
+})();
+</script>
