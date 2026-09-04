@@ -1,0 +1,347 @@
+---
+layout: without-sidebar
+title: "Amortized Analysis"
+permalink: /files/algorithms/slides/Bolum_01_03_Amortized_Analysis.html
+excerpt: "An undergraduate introduction to amortized analysis with dynamic arrays, stack multipop, and aggregate, accounting, and potential methods."
+---
+
+<style>
+.alg-amortized,
+.alg-amortized *,
+.alg-amortized *::before,
+.alg-amortized *::after { box-sizing: border-box; }
+
+.alg-amortized {
+  width: min(1100px, 100%);
+  margin: 0 auto 2rem;
+  color: var(--global-text-color);
+  --aa-surface: color-mix(in srgb, var(--global-link-color) 2.5%, var(--global-bg-color));
+  --aa-strong: color-mix(in srgb, var(--global-link-color) 7%, var(--global-bg-color));
+  --aa-border: color-mix(in srgb, var(--global-link-color) 34%, var(--global-border-color));
+}
+
+.alg-amortized__hero,
+.alg-amortized__card,
+.alg-amortized__demo,
+.alg-amortized__note {
+  border: 1.5px solid var(--aa-border);
+  border-radius: 14px;
+  background: var(--aa-surface);
+}
+
+.alg-amortized__hero {
+  padding: 1.3rem;
+  background: var(--aa-strong);
+}
+
+.alg-amortized__hero h1 {
+  margin: 0 0 .45rem;
+  font-size: clamp(1.9rem, 4vw, 3rem);
+}
+
+.alg-amortized__hero p {
+  margin: 0;
+  line-height: 1.65;
+  opacity: .84;
+}
+
+.alg-amortized__note {
+  margin-top: 1rem;
+  padding: .9rem 1rem;
+  background: var(--global-bg-color);
+  line-height: 1.6;
+}
+
+.alg-amortized__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.alg-amortized__card,
+.alg-amortized__demo {
+  padding: 1rem;
+  background: var(--global-bg-color);
+}
+
+.alg-amortized__card h2,
+.alg-amortized__demo h2 {
+  margin: 0 0 .55rem;
+  font-size: 1.15rem;
+}
+
+.alg-amortized__card p,
+.alg-amortized__card li,
+.alg-amortized__demo p {
+  line-height: 1.6;
+}
+
+.alg-amortized code {
+  padding: .12rem .35rem;
+  border-radius: 6px;
+  background: var(--aa-strong);
+}
+
+.alg-amortized__formula {
+  padding: .8rem;
+  border: 1px solid var(--aa-border);
+  border-radius: 10px;
+  background: var(--aa-surface);
+  font-family: Consolas, Monaco, monospace;
+  overflow-x: auto;
+}
+
+.alg-amortized__controls {
+  display: flex;
+  gap: .6rem;
+  flex-wrap: wrap;
+  margin-top: .8rem;
+}
+
+.alg-amortized button {
+  min-height: 42px;
+  padding: .55rem .75rem;
+  border: 1.5px solid var(--aa-border);
+  border-radius: 9px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.alg-amortized button[data-primary="1"] {
+  background: var(--global-link-color);
+  color: #fff;
+  border-color: var(--global-link-color);
+}
+
+.alg-amortized__array {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  margin-top: .8rem;
+}
+
+.alg-amortized__cell {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--aa-border);
+  border-radius: 8px;
+  background: var(--aa-surface);
+  font-weight: 800;
+}
+
+.alg-amortized__cell.is-used {
+  background: var(--global-link-color);
+  color: #fff;
+  border-color: var(--global-link-color);
+}
+
+.alg-amortized__stats {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: .6rem;
+  margin-top: .8rem;
+}
+
+.alg-amortized__stat {
+  padding: .65rem;
+  border: 1px solid var(--aa-border);
+  border-radius: 9px;
+  background: var(--aa-surface);
+}
+
+.alg-amortized__stat strong {
+  display: block;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 760px) {
+  .alg-amortized__grid { grid-template-columns: 1fr; }
+  .alg-amortized__stats { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 460px) {
+  .alg-amortized__stats { grid-template-columns: 1fr; }
+  .alg-amortized__controls { display: grid; grid-template-columns: 1fr; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .alg-amortized {
+    --aa-surface: var(--global-bg-color);
+    --aa-strong: color-mix(in srgb, var(--global-link-color) 5%, var(--global-bg-color));
+    --aa-border: color-mix(in srgb, var(--global-border-color) 85%, var(--global-text-color));
+  }
+}
+</style>
+
+<div class="alg-amortized">
+  <section class="alg-amortized__hero">
+    <h1>Amortized Analysis</h1>
+    <p>Amortized analysis bounds the average cost per operation over a sequence of operations, without assuming a probability distribution over inputs.</p>
+  </section>
+
+  <div class="alg-amortized__note">
+    <strong>Important distinction:</strong> amortized analysis is not the same as average-case analysis. It gives a deterministic guarantee over a sequence of operations, even when an individual operation can be expensive.
+  </div>
+
+  <section class="alg-amortized__grid">
+    <article class="alg-amortized__card">
+      <h2>Why We Need It</h2>
+      <p>A single operation may occasionally cost Θ(n), while most operations cost Θ(1). Looking only at the worst case of one operation can therefore be misleading.</p>
+      <p>For a sequence of m operations with total cost T(m), the amortized cost per operation is bounded by T(m)/m.</p>
+    </article>
+
+    <article class="alg-amortized__card">
+      <h2>Classic Example: Dynamic Array</h2>
+      <p>Appending to a dynamic array normally costs Θ(1). When capacity is full, the array is resized and all existing elements are copied.</p>
+      <p>If capacity doubles each time, n appends cost Θ(n) in total, so append has <strong>amortized Θ(1)</strong> cost.</p>
+    </article>
+
+    <article class="alg-amortized__card">
+      <h2>Aggregate Method</h2>
+      <p>Analyze the total cost of a complete operation sequence, then divide by the number of operations.</p>
+      <div class="alg-amortized__formula">amortized cost = total sequence cost / number of operations</div>
+      <p>For geometric resizing, copied elements form a geometric series: 1 + 2 + 4 + ... &lt; 2n.</p>
+    </article>
+
+    <article class="alg-amortized__card">
+      <h2>Accounting Method</h2>
+      <p>Charge some cheap operations more than their actual cost and store the extra amount as credit.</p>
+      <p>The stored credit later pays for expensive operations. The credit balance must never become negative.</p>
+    </article>
+
+    <article class="alg-amortized__card">
+      <h2>Potential Method</h2>
+      <p>Represent stored work with a potential function Φ(D).</p>
+      <div class="alg-amortized__formula">ĉᵢ = cᵢ + Φ(Dᵢ) − Φ(Dᵢ₋₁)</div>
+      <p>If Φ starts at 0 and never becomes negative, the sum of amortized costs upper-bounds the sum of actual costs.</p>
+    </article>
+
+    <article class="alg-amortized__card">
+      <h2>Other Standard Examples</h2>
+      <ul>
+        <li>Stack with <code>MULTIPOP</code>: amortized Θ(1) per stack operation.</li>
+        <li>Binary counter increments: amortized Θ(1) bit flips per increment.</li>
+        <li>Union-Find: almost constant amortized cost with path compression and union by rank.</li>
+        <li>Splay trees: amortized O(log n) access operations.</li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="alg-amortized__demo">
+    <h2>Interactive Dynamic Array Demo</h2>
+    <p>Append elements and observe occasional resize operations. The expensive copies are spread over the full sequence.</p>
+
+    <div class="alg-amortized__controls">
+      <button id="aa-append" data-primary="1">Append</button>
+      <button id="aa-append10">Append 10</button>
+      <button id="aa-reset">Reset</button>
+    </div>
+
+    <div id="aa-array" class="alg-amortized__array"></div>
+
+    <div class="alg-amortized__stats">
+      <div class="alg-amortized__stat">Size<strong id="aa-size">0</strong></div>
+      <div class="alg-amortized__stat">Capacity<strong id="aa-capacity">1</strong></div>
+      <div class="alg-amortized__stat">Actual Cost<strong id="aa-cost">0</strong></div>
+      <div class="alg-amortized__stat">Avg. Cost / Append<strong id="aa-average">0.00</strong></div>
+    </div>
+
+    <p id="aa-status">Start with capacity 1.</p>
+  </section>
+
+  <section class="alg-amortized__card" style="margin-top:1rem">
+    <h2>Key Takeaway</h2>
+    <p>Amortized analysis explains why a data structure can provide strong long-run guarantees even when individual operations occasionally have high worst-case cost.</p>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var root = document.querySelector(".alg-amortized");
+  if (!root) return;
+
+  var appendBtn = root.querySelector("#aa-append");
+  var append10Btn = root.querySelector("#aa-append10");
+  var resetBtn = root.querySelector("#aa-reset");
+  var arrayEl = root.querySelector("#aa-array");
+  var sizeEl = root.querySelector("#aa-size");
+  var capEl = root.querySelector("#aa-capacity");
+  var costEl = root.querySelector("#aa-cost");
+  var avgEl = root.querySelector("#aa-average");
+  var statusEl = root.querySelector("#aa-status");
+
+  var size = 0;
+  var capacity = 1;
+  var totalCost = 0;
+  var appends = 0;
+
+  function render() {
+    arrayEl.innerHTML = "";
+
+    for (var i = 0; i < capacity; i++) {
+      var cell = document.createElement("span");
+      cell.className = "alg-amortized__cell";
+      if (i < size) {
+        cell.classList.add("is-used");
+        cell.textContent = i + 1;
+      } else {
+        cell.textContent = "·";
+      }
+      arrayEl.appendChild(cell);
+    }
+
+    sizeEl.textContent = size;
+    capEl.textContent = capacity;
+    costEl.textContent = totalCost;
+    avgEl.textContent = appends ? (totalCost / appends).toFixed(2) : "0.00";
+  }
+
+  function appendOne() {
+    var operationCost = 1;
+    var resized = false;
+    var copied = 0;
+
+    if (size === capacity) {
+      copied = size;
+      operationCost += copied;
+      capacity *= 2;
+      resized = true;
+    }
+
+    size++;
+    appends++;
+    totalCost += operationCost;
+
+    statusEl.textContent = resized
+      ? "Resize: copied " + copied + " elements, then appended one element. This operation cost " + operationCost + "."
+      : "Regular append: actual cost 1.";
+
+    render();
+  }
+
+  appendBtn.addEventListener("click", appendOne);
+
+  append10Btn.addEventListener("click", function () {
+    for (var i = 0; i < 10; i++) appendOne();
+  });
+
+  resetBtn.addEventListener("click", function () {
+    size = 0;
+    capacity = 1;
+    totalCost = 0;
+    appends = 0;
+    statusEl.textContent = "Start with capacity 1.";
+    render();
+  });
+
+  render();
+})();
+</script>

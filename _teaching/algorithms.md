@@ -82,9 +82,8 @@ Algorithms are the step-by-step procedures that form the core of computer scienc
 
 - [🖼️Sunum-Giriş (PDF)](../files/algorithms/slides/Bolum_01_01_Giris.pdf)
 - [🖼️Sunum-Karmaşıklık (PDF)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.pdf)
-- [🕹️Run time analysis (HTML)](../files/algorithms/slides/Bolum_01_02_Complexity.html)
-- [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_01_Introduction.pdf) | 
-[Complexity (PDF)](../files/algorithms/slides/Chapter_01_Complexity.pdf) 
+- [🕹️Run time analysis (HTML)](../files/algorithms/slides/Chapter_01_Algorithm_Complexity.html)
+- [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_01_Introduction.pdf)
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter01/src)
 
 ---
@@ -94,7 +93,7 @@ Algorithms are the step-by-step procedures that form the core of computer scienc
 Sorting algorithms are the architects of order, meticulously organizing data into a specific sequence, such as ascending or descending. They are fundamental tools in computer science, used to manage and retrieve data with efficiency and precision. There’s a variety of sorting methods, each with its own strategy and performance nuances.
 
 - [🖼️Sunum-Sıralama Algoritmaları (PDF)](../files/algorithms/slides/Bolum_02_Siralama.pdf)
-- [🕹️Sorting Algorithms (HTML)](../files/algorithms/slides/Bolum_02_Sorting.html)
+- [🕹️Sorting Algorithms (HTML)](../files/algorithms/slides/Chapter_02_Sorting.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_02_Sorting.pdf)
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter02/src)
 
@@ -105,7 +104,7 @@ Sorting algorithms are the architects of order, meticulously organizing data int
 Searching algorithms are the detectives of the data world, designed to track down information with speed and accuracy. They are used in a wide variety of applications, such as finding a file on a computer, a customer in a database, and a word in a document. They come in various forms, each suited to different scenarios.
 
 - [🖼️Sunum-Arama Algoritmaları (PDF)](../files/algorithms/slides/Bolum_03_Arama.pdf)
-- [🕹️Search Algorithms (HTML)](../files/algorithms/slides/Bolum_03_Search.html)
+- [🕹️Search Algorithms (HTML)](../files/algorithms/slides/Chapter_03_Search.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_03_Searching.pdf)
 - [💻Code Examples (Github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter03/src)
 
@@ -121,12 +120,12 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
   - [🖼️Sunum-Çizge Minimum Kapsayan (PDF)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.pdf) 
   - [🖼️Sunum-Çizge Ağ Akış (PDF)](../files/algorithms/slides/Bolum_04_04_Ag_Akis.pdf) 
 - 🕹️Applications:
-  - [🕹️BFS DFS (HTML)](../files/algorithms/slides/Bolum_04_01_Traversal.html)
-  - [🕹️Travelling Salesman (HTML)](../files/algorithms/slides/Bolum_04_02_TSP.html)
-  - [🕹️A* Pathfinding (HTML)](../files/algorithms/slides/Bolum_04_02_AStar.html)
-  - [🕹️Shortest Path (HTML)](../files/algorithms/slides/Bolum_04_02_Shortest.html) 
-  - [🕹️MST Simulator (HTML)](../files/algorithms/slides/Bolum_04_03_MST.html)
-  - [🕹️Network Flow (HTML)](../files/algorithms/slides/Bolum_04_04_Flow.html)
+  - [🕹️BFS DFS (HTML)](../files/algorithms/slides/Chapter_04_Graph_Traversal.html)
+  - [🕹️Travelling Salesman (HTML)](../files/algorithms/slides/Chapter_04_TSP.html)
+  - [🕹️A* Pathfinding (HTML)](../files/algorithms/slides/Chapter_04_AStar.html)
+  - [🕹️Shortest Path (HTML)](../files/algorithms/slides/Chapter_04_Shortest_Path.html) 
+  - [🕹️MST Simulator (HTML)](../files/algorithms/slides/Chapter_04_MST.html)
+  - [🕹️Network Flow (HTML)](../files/algorithms/slides/Chapter_04_Network_Flow.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_04_Graph.pdf) 
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src)
 
@@ -137,13 +136,13 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
 Have you ever wondered how your computer or smartphone handles text so efficiently? String algorithms are the craftsmen of text processing, weaving through characters to perform tasks like searching, sorting, and editing text. They are crucial in fields like computational biology for DNA sequencing, in search engines for matching queries, or even in text editors for find-and-replace functions. 
 
 - [🖼️Sunum-Dizgi Algoritmaları (1) (PDF)](../files/algorithms/slides/Bolum_05_Dizgi.pdf)  
-  - [🕹️Eşleme (HTML)](../files/algorithms/slides/Bolum_05_Dizgi_Matching.html)
-  - [🕹️Sıkıştırma (HTML)](../files/algorithms/slides/Bolum_05_Dizgi_Compression.html)
+  - [🕹️Eşleme (HTML)](../files/algorithms/slides/Chapter_05_String_Matching.html)
+  - [🕹️Sıkıştırma (HTML)](../files/algorithms/slides/Chapter_05_String_Compression.html)
 - [🖼️Sunum-Dizgi Algoritmaları (2) (PDF)](../files/algorithms/slides/Bolum_05_Dizgi_2.pdf)  
-  - [🕹️Sıralama (HTML)](../files/algorithms/slides/Bolum_05_Dizgi_Sorting.html)
-  - [🕹️Ayrıştırma (HTML)](../files/algorithms/slides/Bolum_05_Dizgi_Parsing.html)
-  - [🕹️Benzerlik (HTML)](../files/algorithms/slides/Bolum_05_Dizgi_Similarity.html)
-  - [🕹️Dönüşüm (HTML)](../files/algorithms/slides/Bolum_05_Dizgi_Transformation.html)
+  - [🕹️Sıralama (HTML)](../files/algorithms/slides/Chapter_05_String_Sorting.html)
+  - [🕹️Ayrıştırma (HTML)](../files/algorithms/slides/Chapter_05_String_Parsing.html)
+  - [🕹️Benzerlik (HTML)](../files/algorithms/slides/Chapter_05_String_Similarity.html)
+  - [🕹️Dönüşüm (HTML)](../files/algorithms/slides/Chapter_05_String_Transformation.html)
 - [🖼️Sunum-Trie (PDF)](../files/algorithms/slides/Bolum_05_Tries.pdf)  
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_05_Dynamic.pdf)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter05/src)
@@ -241,8 +240,8 @@ Branch and bound algorithms are a type of algorithm that solves optimization pro
 
 ## Supplementary Topics
 
- - [Amortized Analysis (HTML)](../files/algorithms/slides/Chapter_01_Amortized_Analysis.html) 
- - [Bit Manipulation (HTML)](../files/algorithms/slides/Chapter_01_Bit_Manipulation.html) 
- - [Matrix Algorithms (HTML)](../files/algorithms/slides/Chapter_01_Matrix_Algorithms.html) 
- - [NP Completeness (HTML)](../files/algorithms/slides/Chapter_01_NP_Completeness.html) 
- - [Number Theoretic Algorithms (HTML)](../files/algorithms/slides/Chapter_01_Number_Theoretic_Algorithms.html)
+ - [Amortized Analysis (HTML)](../files/algorithms/slides/Supplementary_Amortized_Analysis.html) 
+ - [Bit Manipulation (HTML)](../files/algorithms/slides/Supplementary_Bit_Manipulation.html) 
+ - [Matrix Algorithms (HTML)](../files/algorithms/slides/Supplementary_Matrix_Algorithms.html) 
+ - [NP Completeness (HTML)](../files/algorithms/slides/Supplementary_NP_Completeness.html) 
+ - [Number Theoretic Algorithms (HTML)](../files/algorithms/slides/Supplementary_Number_Theoretic_Algorithms.html)
