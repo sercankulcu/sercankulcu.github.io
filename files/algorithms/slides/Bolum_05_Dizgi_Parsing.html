@@ -1,117 +1,565 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>String Parsing - Finite State Machine</title>
+---
+layout: without-sidebar
+title: "String Parsing with a Finite State Machine"
+permalink: /files/algorithms/slides/Bolum_05_Dizgi_Parsing.html
+excerpt: "Interactive finite-state-machine parser for validating identifiers step by step."
+---
+
 <style>
-:root {
-  --bg:#f5f7fb; --card:#ffffff; --ink:#172033; --muted:#667085;
-  --line:#d0d5dd; --accent:#2563eb; --soft:#eff6ff; --ok:#dcfce7; --warn:#fef3c7;
+.algo-parsing,
+.algo-parsing *,
+.algo-parsing *::before,
+.algo-parsing *::after { box-sizing: border-box; }
+
+.algo-parsing {
+    width: min(1100px, 100%);
+    margin: 0 auto 2rem;
+    color: var(--global-text-color);
+    --ps-surface: color-mix(in srgb, var(--global-link-color) 2.5%, var(--global-bg-color));
+    --ps-strong: color-mix(in srgb, var(--global-link-color) 7%, var(--global-bg-color));
+    --ps-border: color-mix(in srgb, var(--global-link-color) 34%, var(--global-border-color));
+    --ps-shadow: 0 8px 24px rgba(15,23,42,.06);
 }
-* { box-sizing:border-box; }
-body { margin:0; font-family:Arial, Helvetica, sans-serif; background:var(--bg); color:var(--ink); }
-header { padding:28px 36px; color:white; background:linear-gradient(135deg,#1e3a8a,#2563eb); }
-header h1 { margin:0 0 8px; font-size:30px; }
-header p { margin:0; max-width:1000px; line-height:1.5; }
-main { max-width:1160px; margin:24px auto; padding:0 20px 40px; }
-.card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:18px; box-shadow:0 8px 22px rgba(15,23,42,.06); }
-.grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
-@media(max-width:850px){ .grid{ grid-template-columns:1fr; } }
-button { border:none; border-radius:10px; padding:11px 16px; background:var(--accent); color:white; font-weight:700; cursor:pointer; }
-button.secondary { background:#475569; }
-input, textarea { width:100%; border:1px solid var(--line); border-radius:10px; padding:10px; font-size:15px; }
-.controls { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; align-items:center; }
-pre { background:#0f172a; color:#e5e7eb; border-radius:12px; padding:14px; overflow-x:auto; min-height:90px; }
-.item { display:inline-block; padding:8px 10px; margin:4px; border:1px solid var(--line); border-radius:10px; background:white; font-family:Consolas, Monaco, monospace; }
-.active { outline:3px solid #f59e0b; background:#fffbeb; }
-.done { background:var(--ok); border-color:#86efac; }
-.badge { display:inline-block; margin:4px; padding:6px 10px; border-radius:999px; background:var(--soft); color:#1e40af; font-weight:700; font-family:Consolas, Monaco, monospace; }
-.small { color:var(--muted); font-size:14px; line-height:1.45; }
-.table-wrap { overflow-x:auto; }
-table { border-collapse:collapse; width:100%; background:white; }
-th, td { border:1px solid var(--line); padding:7px 9px; text-align:center; font-family:Consolas, Monaco, monospace; }
-th { background:#eff6ff; }
-.highlight { background:#fef3c7 !important; }
-.match { background:#dcfce7 !important; }
-.error { background:#fee2e2 !important; }
+
+.algo-parsing__hero,
+.algo-parsing__panel,
+.algo-parsing__card,
+.algo-parsing__scan,
+.algo-parsing__table-wrap {
+    border: 1.5px solid var(--ps-border);
+    border-radius: 14px;
+    background: var(--ps-surface);
+}
+
+.algo-parsing__hero {
+    padding: 1.25rem;
+    background: var(--ps-strong);
+    box-shadow: var(--ps-shadow);
+}
+
+.algo-parsing__hero h1 {
+    margin: 0 0 .4rem;
+    text-align: center;
+    font-size: clamp(1.7rem,4vw,2.35rem);
+}
+
+.algo-parsing__hero p {
+    margin: 0;
+    text-align: center;
+    line-height: 1.6;
+    opacity: .82;
+}
+
+.algo-parsing__panel {
+    margin-top: 1rem;
+    padding: 1rem;
+}
+
+.algo-parsing label {
+    display: block;
+    margin-bottom: .35rem;
+    font-weight: 800;
+}
+
+.algo-parsing input,
+.algo-parsing button {
+    min-height: 44px;
+    padding: .6rem .75rem;
+    border: 1.5px solid var(--ps-border);
+    border-radius: 9px;
+    background: var(--global-bg-color);
+    color: var(--global-text-color);
+    font: inherit;
+}
+
+.algo-parsing input {
+    width: 100%;
+}
+
+.algo-parsing button {
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.algo-parsing button[data-primary="1"] {
+    border-color: var(--global-link-color);
+    background: var(--global-link-color);
+    color: #fff;
+}
+
+.algo-parsing__buttons {
+    display: flex;
+    gap: .6rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.algo-parsing__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.algo-parsing__card {
+    padding: 1rem;
+}
+
+.algo-parsing__card h2,
+.algo-parsing__scan h2,
+.algo-parsing__table-wrap h2 {
+    margin: 0 0 .6rem;
+    font-size: 1.05rem;
+}
+
+.algo-parsing__pre {
+    margin: 0;
+    min-height: 110px;
+    padding: .9rem;
+    border-radius: 10px;
+    background: var(--global-bg-color);
+    border: 1px solid var(--ps-border);
+    white-space: pre-wrap;
+    font: 14px/1.5 Consolas, Monaco, monospace;
+}
+
+.algo-parsing__scan,
+.algo-parsing__table-wrap {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--global-bg-color);
+}
+
+.algo-parsing__items {
+    display: flex;
+    gap: .4rem;
+    flex-wrap: wrap;
+}
+
+.algo-parsing__item {
+    position: relative;
+    min-width: 38px;
+    padding: .5rem .6rem;
+    border: 1px solid var(--ps-border);
+    border-radius: 9px;
+    background: var(--global-bg-color);
+    text-align: center;
+    font: 700 15px Consolas, Monaco, monospace;
+}
+
+.algo-parsing__item small {
+    display: block;
+    margin-bottom: .15rem;
+    font-size: 10px;
+    font-weight: 400;
+    opacity: .65;
+}
+
+.algo-parsing__item.is-active {
+    background: #fde68a;
+    color: #111827;
+    border-color: #f59e0b;
+}
+
+.algo-parsing__item.is-done {
+    background: #bbf7d0;
+    color: #14532d;
+    border-color: #16a34a;
+}
+
+.algo-parsing__item.is-error {
+    background: #fecaca;
+    color: #7f1d1d;
+    border-color: #dc2626;
+}
+
+.algo-parsing__status {
+    margin: .8rem 0 0;
+    font-weight: 800;
+}
+
+.algo-parsing table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+}
+
+.algo-parsing th,
+.algo-parsing td {
+    border: 1px solid var(--ps-border);
+    padding: .5rem;
+    text-align: center;
+}
+
+.algo-parsing th {
+    background: var(--ps-strong);
+}
+
+.algo-parsing tr.is-current td {
+    background: color-mix(in srgb, #facc15 25%, var(--global-bg-color));
+}
+
+@media (max-width: 760px) {
+    .algo-parsing__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .algo-parsing__hero p {
+        text-align: left;
+    }
+}
+
+@media (max-width: 480px) {
+    .algo-parsing__buttons {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .algo-parsing {
+        --ps-surface: var(--global-bg-color);
+        --ps-strong: color-mix(in srgb, var(--global-link-color) 5%, var(--global-bg-color));
+        --ps-border: color-mix(in srgb, var(--global-border-color) 85%, var(--global-text-color));
+        --ps-shadow: none;
+    }
+}
 </style>
-</head>
-<body>
-<header>
-  <h1>String Parsing: Finite State Machine</h1>
-  <p>This example parses a string and checks whether it is a valid identifier. The algorithm uses states, transitions, a start state, and accepting states as described in the slides.</p>
-</header>
-<main>
-<section class="card">
-  <h2>Sample Input</h2>
-  <input id="input" value="user_count_2023">
-  <div class="controls">
-    <button onclick="loadData()">Load Input</button>
-    <button onclick="step()">Step Forward</button>
-    <button class="secondary" onclick="resetDemo()">Reset</button>
-  </div>
-  <p class="small">Rule: an identifier must start with a letter or underscore. Later characters may be letters, digits, or underscores.</p>
-</section>
-<section class="grid">
-  <div class="card"><h2>Current State</h2><pre id="state"></pre></div>
-  <div class="card"><h2>Step Explanation</h2><pre id="log"></pre></div>
-</section>
-<section class="card"><h2>Input Scan</h2><div id="scan"></div></section>
-</main>
+
+<div class="algo-parsing">
+    <section class="algo-parsing__hero">
+        <h1>String Parsing: Finite State Machine</h1>
+        <p>Validate an identifier step by step using states, character classes, and explicit transitions.</p>
+    </section>
+
+    <section class="algo-parsing__panel">
+        <label for="algo-parsing-input">Sample Input</label>
+        <input id="algo-parsing-input" value="user_count_2023">
+
+        <div class="algo-parsing__buttons">
+            <button id="algo-parsing-load" type="button" data-primary="1">Load Input</button>
+            <button id="algo-parsing-step" type="button">Step Forward</button>
+            <button id="algo-parsing-auto" type="button">Auto Run</button>
+            <button id="algo-parsing-reset" type="button">Reset</button>
+        </div>
+
+        <p class="algo-parsing__status" id="algo-parsing-status" role="status">
+            Rule: the first character must be a letter or underscore.
+        </p>
+    </section>
+
+    <section class="algo-parsing__grid">
+        <article class="algo-parsing__card">
+            <h2>Current State</h2>
+            <pre id="algo-parsing-state" class="algo-parsing__pre"></pre>
+        </article>
+
+        <article class="algo-parsing__card">
+            <h2>Step Explanation</h2>
+            <pre id="algo-parsing-log" class="algo-parsing__pre"></pre>
+        </article>
+    </section>
+
+    <section class="algo-parsing__scan">
+        <h2>Input Scan</h2>
+        <div id="algo-parsing-scan" class="algo-parsing__items"></div>
+    </section>
+
+    <section class="algo-parsing__table-wrap">
+        <h2>Transition Table</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Current State</th>
+                    <th>Character Class</th>
+                    <th>Next State</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-state="START" data-class="LETTER">
+                    <td>START</td><td>LETTER</td><td>IN_ID</td>
+                </tr>
+                <tr data-state="START" data-class="UNDERSCORE">
+                    <td>START</td><td>UNDERSCORE</td><td>IN_ID</td>
+                </tr>
+                <tr data-state="START" data-class="DIGIT">
+                    <td>START</td><td>DIGIT</td><td>REJECT</td>
+                </tr>
+                <tr data-state="START" data-class="OTHER">
+                    <td>START</td><td>OTHER</td><td>REJECT</td>
+                </tr>
+                <tr data-state="IN_ID" data-class="LETTER">
+                    <td>IN_ID</td><td>LETTER</td><td>IN_ID</td>
+                </tr>
+                <tr data-state="IN_ID" data-class="DIGIT">
+                    <td>IN_ID</td><td>DIGIT</td><td>IN_ID</td>
+                </tr>
+                <tr data-state="IN_ID" data-class="UNDERSCORE">
+                    <td>IN_ID</td><td>UNDERSCORE</td><td>IN_ID</td>
+                </tr>
+                <tr data-state="IN_ID" data-class="OTHER">
+                    <td>IN_ID</td><td>OTHER</td><td>REJECT</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+
 <script>
-let text="", i=0, state="START", accepted=false, rejected=false, stepNo=0;
-function cls(ch){
-  if(/[A-Za-z]/.test(ch)) return "LETTER";
-  if(/[0-9]/.test(ch)) return "DIGIT";
-  if(ch==="_") return "UNDERSCORE";
-  return "OTHER";
-}
-function loadData(){
-  text=document.getElementById("input").value;
-  i=0; state="START"; accepted=false; rejected=false; stepNo=0;
-  render("Input loaded. The machine starts in START state.");
-}
-function resetDemo(){ loadData(); }
-function render(msg){
-  document.getElementById("state").textContent=`State: ${state}\nIndex: ${i}\nAccepted: ${accepted}\nRejected: ${rejected}`;
-  let html="";
-  [...text].forEach((ch,idx)=>{
-    let c="item";
-    if(idx===i) c+=" active";
-    if(idx<i && !rejected) c+=" done";
-    html+=`<span class="${c}">${ch}</span>`;
-  });
-  document.getElementById("scan").innerHTML=html || "<span class='item'>empty input</span>";
-  document.getElementById("log").textContent=msg;
-}
-function step(){
-  if(accepted || rejected){ render(accepted ? "The string is accepted as a valid identifier." : "The string is rejected."); return; }
-  stepNo++;
-  if(i>=text.length){
-    if(state==="IN_ID"){ accepted=true; state="ACCEPT"; render(`Step ${stepNo}: End of input reached in an accepting state.`); }
-    else { rejected=true; state="REJECT"; render(`Step ${stepNo}: Empty or incomplete input. Rejected.`); }
-    return;
-  }
-  const ch=text[i], c=cls(ch);
-  if(state==="START"){
-    if(c==="LETTER" || c==="UNDERSCORE"){
-      state="IN_ID"; i++;
-      render(`Step ${stepNo}: '${ch}' is valid as the first character. Transition START → IN_ID.`);
-    } else {
-      state="REJECT"; rejected=true;
-      render(`Step ${stepNo}: '${ch}' cannot start an identifier. Transition START → REJECT.`);
+(function () {
+    "use strict";
+
+    var root = document.querySelector(".algo-parsing");
+    if (!root) return;
+
+    function q(id) {
+        return root.querySelector("#" + id);
     }
-  } else if(state==="IN_ID"){
-    if(c==="LETTER" || c==="DIGIT" || c==="UNDERSCORE"){
-      i++;
-      render(`Step ${stepNo}: '${ch}' is valid inside an identifier. Stay in IN_ID.`);
-    } else {
-      state="REJECT"; rejected=true;
-      render(`Step ${stepNo}: '${ch}' is not allowed. Transition IN_ID → REJECT.`);
+
+    var inputEl = q("algo-parsing-input");
+    var loadBtn = q("algo-parsing-load");
+    var stepBtn = q("algo-parsing-step");
+    var autoBtn = q("algo-parsing-auto");
+    var resetBtn = q("algo-parsing-reset");
+    var stateEl = q("algo-parsing-state");
+    var logEl = q("algo-parsing-log");
+    var scanEl = q("algo-parsing-scan");
+    var statusEl = q("algo-parsing-status");
+
+    var text = "";
+    var index = 0;
+    var state = "START";
+    var accepted = false;
+    var rejected = false;
+    var stepNo = 0;
+    var timer = null;
+    var lastClass = null;
+    var errorIndex = -1;
+
+    function charClass(ch) {
+        if (/[A-Za-z]/.test(ch)) return "LETTER";
+        if (/[0-9]/.test(ch)) return "DIGIT";
+        if (ch === "_") return "UNDERSCORE";
+        return "OTHER";
     }
-  }
-}
-loadData();
+
+    function clearRowHighlight() {
+        root.querySelectorAll("tbody tr").forEach(function (row) {
+            row.classList.remove("is-current");
+        });
+    }
+
+    function highlightTransition(currentState, cls) {
+        clearRowHighlight();
+
+        if (!cls) return;
+
+        var row = root.querySelector(
+            'tbody tr[data-state="' + currentState + '"][data-class="' + cls + '"]'
+        );
+
+        if (row) row.classList.add("is-current");
+    }
+
+    function render(message, transitionState) {
+        stateEl.textContent =
+            "State: " + state + "\n" +
+            "Index: " + index + "\n" +
+            "Accepted: " + accepted + "\n" +
+            "Rejected: " + rejected;
+
+        scanEl.innerHTML = "";
+
+        if (!text.length) {
+            var empty = document.createElement("span");
+            empty.className = "algo-parsing__item";
+            empty.textContent = "empty input";
+            scanEl.appendChild(empty);
+        } else {
+            Array.from(text).forEach(function (ch, i) {
+                var item = document.createElement("span");
+                item.className = "algo-parsing__item";
+
+                if (i < index && !rejected) {
+                    item.classList.add("is-done");
+                }
+
+                if (i === index && !accepted && !rejected) {
+                    item.classList.add("is-active");
+                }
+
+                if (i === errorIndex) {
+                    item.classList.add("is-error");
+                }
+
+                var small = document.createElement("small");
+                small.textContent = String(i);
+
+                item.appendChild(small);
+                item.appendChild(document.createTextNode(ch));
+                scanEl.appendChild(item);
+            });
+        }
+
+        logEl.textContent = message;
+        highlightTransition(transitionState || state, lastClass);
+    }
+
+    function loadData() {
+        clearInterval(timer);
+        timer = null;
+
+        text = inputEl.value;
+        index = 0;
+        state = "START";
+        accepted = false;
+        rejected = false;
+        stepNo = 0;
+        lastClass = null;
+        errorIndex = -1;
+
+        statusEl.textContent =
+            "Input loaded. The parser starts in the START state.";
+
+        render("Input loaded. The machine starts in START state.", "START");
+    }
+
+    function step() {
+        if (accepted || rejected) {
+            render(
+                accepted
+                    ? "The string is accepted as a valid identifier."
+                    : "The string is rejected."
+            );
+            return false;
+        }
+
+        stepNo++;
+
+        if (index >= text.length) {
+            lastClass = null;
+            clearRowHighlight();
+
+            if (state === "IN_ID") {
+                accepted = true;
+                state = "ACCEPT";
+                statusEl.textContent = "Accepted: valid identifier.";
+                render(
+                    "Step " + stepNo +
+                    ": end of input reached while in an accepting state."
+                );
+            } else {
+                rejected = true;
+                state = "REJECT";
+                statusEl.textContent = "Rejected: empty or incomplete input.";
+                render(
+                    "Step " + stepNo +
+                    ": input ended before a valid identifier was formed."
+                );
+            }
+
+            return false;
+        }
+
+        var ch = text[index];
+        var cls = charClass(ch);
+        var oldState = state;
+
+        lastClass = cls;
+        errorIndex = -1;
+
+        if (state === "START") {
+            if (cls === "LETTER" || cls === "UNDERSCORE") {
+                state = "IN_ID";
+                index++;
+
+                statusEl.textContent = "Valid transition: START → IN_ID.";
+
+                render(
+                    "Step " + stepNo +
+                    ": '" + ch + "' is classified as " + cls +
+                    ". Transition START → IN_ID.",
+                    oldState
+                );
+
+                return true;
+            }
+
+            state = "REJECT";
+            rejected = true;
+            errorIndex = index;
+
+            statusEl.textContent =
+                "Rejected: an identifier cannot start with this character.";
+
+            render(
+                "Step " + stepNo +
+                ": '" + ch + "' is classified as " + cls +
+                ". Transition START → REJECT.",
+                oldState
+            );
+
+            return false;
+        }
+
+        if (state === "IN_ID") {
+            if (
+                cls === "LETTER" ||
+                cls === "DIGIT" ||
+                cls === "UNDERSCORE"
+            ) {
+                index++;
+
+                statusEl.textContent = "Valid character. Stay in IN_ID.";
+
+                render(
+                    "Step " + stepNo +
+                    ": '" + ch + "' is classified as " + cls +
+                    ". Remain in IN_ID.",
+                    oldState
+                );
+
+                return true;
+            }
+
+            state = "REJECT";
+            rejected = true;
+            errorIndex = index;
+
+            statusEl.textContent =
+                "Rejected: this character is not allowed inside an identifier.";
+
+            render(
+                "Step " + stepNo +
+                ": '" + ch + "' is classified as OTHER." +
+                " Transition IN_ID → REJECT.",
+                oldState
+            );
+
+            return false;
+        }
+
+        return false;
+    }
+
+    function autoRun() {
+        clearInterval(timer);
+
+        timer = setInterval(function () {
+            var keepGoing = step();
+
+            if (!keepGoing || accepted || rejected) {
+                clearInterval(timer);
+                timer = null;
+            }
+        }, 650);
+    }
+
+    loadBtn.addEventListener("click", loadData);
+    stepBtn.addEventListener("click", step);
+    autoBtn.addEventListener("click", autoRun);
+    resetBtn.addEventListener("click", loadData);
+
+    loadData();
+})();
 </script>
-</body>
-</html>

@@ -1,537 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
+---
+layout: without-sidebar
+title: "Shortest Path Algorithms"
+permalink: /files/algorithms/slides/Bolum_04_02_Shortest.html
+excerpt: "Interactive comparison of Dijkstra, Bellman-Ford, and Floyd-Warshall shortest path algorithms."
+---
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shortest Path Algorithms Demo</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #fff;
-            color: #333;
-            text-align: center;
-            margin: 0 auto;
-            padding: 1vw;
-            max-width: 800px;
-            box-sizing: border-box;
-        }
+<style>
+.algo-shortest,.algo-shortest *,.algo-shortest *::before,.algo-shortest *::after{box-sizing:border-box}
+.algo-shortest{width:min(1000px,100%);margin:0 auto 2rem;color:var(--global-text-color);--sp-surface:color-mix(in srgb,var(--global-link-color) 2.5%,var(--global-bg-color));--sp-strong:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));--sp-border:color-mix(in srgb,var(--global-link-color) 34%,var(--global-border-color));--sp-shadow:0 8px 24px rgba(15,23,42,.06)}
+.algo-shortest__hero,.algo-shortest__controls,.algo-shortest__canvas-wrap,.algo-shortest__log,.algo-shortest__notes{border:1.5px solid var(--sp-border);border-radius:14px;background:var(--sp-surface)}
+.algo-shortest__hero{padding:1.25rem;background:var(--sp-strong);box-shadow:var(--sp-shadow)}
+.algo-shortest__hero h1{margin:0 0 .45rem;text-align:center;font-size:clamp(1.7rem,4vw,2.35rem)}
+.algo-shortest__hero p{margin:0;text-align:center;line-height:1.6;opacity:.82}
+.algo-shortest__controls{display:grid;grid-template-columns:1fr 1.2fr 1fr 1.2fr 1.2fr 1fr;gap:.6rem;margin-top:1rem;padding:1rem}
+.algo-shortest input,.algo-shortest button{min-height:44px;padding:.6rem .75rem;border:1.5px solid var(--sp-border);border-radius:9px;background:var(--global-bg-color);color:var(--global-text-color);font:inherit}
+.algo-shortest button{cursor:pointer;font-weight:800}.algo-shortest button[data-primary="1"]{border-color:var(--global-link-color);background:var(--global-link-color);color:#fff}.algo-shortest button:disabled{opacity:.5;cursor:not-allowed}
+.algo-shortest__canvas-wrap{margin-top:1rem;padding:.75rem;box-shadow:var(--sp-shadow)}
+.algo-shortest__canvas{display:block;width:100%;height:auto;aspect-ratio:3/2;border-radius:10px;background:var(--global-bg-color);touch-action:none;cursor:grab}.algo-shortest__canvas.is-dragging{cursor:grabbing}
+.algo-shortest__status{margin:.8rem 0 0;font-weight:800}
+.algo-shortest__log{margin-top:.8rem;max-height:240px;overflow-y:auto;padding:.85rem;background:var(--global-bg-color);font-size:.92rem;line-height:1.5}.algo-shortest__log-entry{padding:.25rem 0;border-bottom:1px dashed var(--sp-border)}
+.algo-shortest__notes{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin-top:1rem;padding:1rem}.algo-shortest__note h2{margin:0 0 .35rem;font-size:1.03rem}.algo-shortest__note p{margin:0;line-height:1.55;opacity:.82}
+@media(max-width:820px){.algo-shortest__controls{grid-template-columns:repeat(2,1fr)}.algo-shortest__controls input{grid-column:1/-1}.algo-shortest__notes{grid-template-columns:1fr}}
+@media(max-width:480px){.algo-shortest__controls{grid-template-columns:1fr}.algo-shortest__hero p{text-align:left}}
+@media(prefers-color-scheme:dark){.algo-shortest{--sp-surface:var(--global-bg-color);--sp-strong:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));--sp-border:color-mix(in srgb,var(--global-border-color) 85%,var(--global-text-color));--sp-shadow:none}}
+</style>
 
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1vw;
-        }
+<div class="algo-shortest">
+<section class="algo-shortest__hero"><h1>Shortest Path Algorithms</h1><p>Generate a connected weighted graph and compare Dijkstra, Bellman-Ford, and Floyd-Warshall from node A to the last node.</p></section>
+<section class="algo-shortest__controls">
+<input id="algo-shortest-node-count" type="number" min="3" max="10" value="7" aria-label="Number of nodes">
+<button id="algo-shortest-generate" type="button">Generate Graph</button>
+<button id="algo-shortest-dijkstra" type="button" data-primary="1">Dijkstra</button>
+<button id="algo-shortest-bellman" type="button" data-primary="1">Bellman-Ford</button>
+<button id="algo-shortest-floyd" type="button" data-primary="1">Floyd-Warshall</button>
+<button id="algo-shortest-cancel" type="button">Cancel</button>
+</section>
+<section class="algo-shortest__canvas-wrap"><canvas id="algo-shortest-canvas" class="algo-shortest__canvas" width="900" height="600"></canvas></section>
+<p id="algo-shortest-status" class="algo-shortest__status" role="status">Ready.</p>
+<div id="algo-shortest-log" class="algo-shortest__log" aria-live="polite"></div>
+<section class="algo-shortest__notes">
+<article class="algo-shortest__note"><h2>Dijkstra</h2><p>Efficient for graphs with non-negative edge weights. This simulator therefore generates only positive weights.</p></article>
+<article class="algo-shortest__note"><h2>Bellman-Ford</h2><p>Relaxes all edges repeatedly. It can handle negative edges in general, though this shared comparison graph uses positive weights.</p></article>
+<article class="algo-shortest__note"><h2>Floyd-Warshall</h2><p>Computes shortest paths between all pairs of vertices using dynamic programming in O(V³) time.</p></article>
+</section>
+</div>
 
-        h1 {
-            margin: auto;
-        }
-
-        .back-button {
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .back-button:hover {
-            text-decoration: underline;
-        }
-
-        .container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-        }
-
-        .controls {
-            display: flex;
-            flex-wrap: nowrap;
-            justify-content: space-between;
-            gap: 1vw;
-            width: 100%;
-            box-sizing: border-box;
-            padding: 1vw;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        input,
-        button {
-            width: calc((100% - (6 * 1vw)) / 5);
-            padding: 1vw;
-            margin: 0;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-            border: none;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        canvas {
-            margin-top: 20px;
-            cursor: grab;
-        }
-
-        #status {
-            margin-top: 10px;
-            text-align: center;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="header">
-        <a href="https://sercankulcu.github.io/teaching/algorithms" class="back-button">← Back</a>
-        <h1>Shortest Path Algorithms</h1>
-    </div>
-    <div class="container">
-        <div class="controls">
-            <input type="number" id="nodeCount" min="5" max="10" value="7">
-            <button onclick="generateGraph()">Generate Graph</button>
-            <button onclick="runDijkstra()">Dijkstra</button>
-            <button onclick="runBellmanFord()">Bellman-Ford</button>
-            <button onclick="runFloydWarshall()">Floyd-Warshall</button>
-        </div>
-    </div>
-
-    <canvas id="graphCanvas" width="600" height="400"></canvas>
-
-    <div id="status">Enter number of nodes and click 'Generate Graph'.</div>
-
-    <script>
-        const canvas = document.getElementById('graphCanvas');
-        const ctx = canvas.getContext('2d');
-        const statusDiv = document.getElementById('status');
-        let nodes = [];
-        let distances = {};
-        let distMatrix = [];
-        let previous = {};
-        let predecessors = [];
-        let visited = new Set();
-        let path = [];
-        let selectedNode = null;
-        let isDragging = false;
-
-        function generateGraph(attempts = 0, maxAttempts = 100) {
-            if (attempts >= maxAttempts) {
-                generateLinearGraph();
-                statusDiv.innerText = "Failed to generate random graph after multiple attempts. Using a simple linear graph.";
-                return;
-            }
-
-            const nodeCount = Math.min(Math.max(parseInt(document.getElementById('nodeCount').value), 3), 10);
-            nodes = [];
-            for (let i = 0; i < nodeCount; i++) {
-                nodes.push({
-                    x: Math.random() * (canvas.width - 60) + 30,
-                    y: Math.random() * (canvas.height - 60) + 30,
-                    id: String.fromCharCode(65 + i),
-                    edges: []
-                });
-            }
-
-            for (let i = 0; i < nodeCount; i++) {
-                let edgeCount = Math.floor(Math.random() * 2) + 2;
-                while (nodes[i].edges.length < edgeCount && nodes[i].edges.length < nodeCount - 1) {
-                    const targetIdx = Math.floor(Math.random() * nodeCount);
-                    if (targetIdx !== i &&
-                        !nodes[i].edges.some(e => e.to === nodes[targetIdx].id) &&
-                        !(i === 0 && targetIdx === nodeCount - 1) &&
-                        !(i === nodeCount - 1 && targetIdx === 0)) {
-                        let weight = Math.floor(Math.random() * 15) - 5;
-                        if (weight === 0) weight = 1;
-                        nodes[i].edges.push({ to: nodes[targetIdx].id, weight });
-                        nodes[targetIdx].edges.push({ to: nodes[i].id, weight });
-                    }
-                }
-            }
-
-            for (let i = 0; i < nodeCount - 1; i++) {
-                if (nodes[i].edges.length === 0) {
-                    const targetIdx = (i + 1) % nodeCount;
-                    if (!(i === 0 && targetIdx === nodeCount - 1) && !(i === nodeCount - 1 && targetIdx === 0)) {
-                        let weight = Math.floor(Math.random() * 5) + 1;
-                        nodes[i].edges.push({ to: nodes[targetIdx].id, weight });
-                        nodes[targetIdx].edges.push({ to: nodes[i].id, weight });
-                    }
-                }
-            }
-
-            if (!isGraphConnected()) {
-                generateGraph(attempts + 1, maxAttempts);
-                return;
-            }
-
-            if (hasNegativeCycle()) {
-                generateGraph(attempts + 1, maxAttempts);
-                return;
-            }
-
-            initialize();
-            let totalEdges = nodes.reduce((sum, node) => sum + node.edges.length, 0) / 2;
-            statusDiv.innerText = "Graph generated with " + nodes.length + " nodes and " + totalEdges + " edges.";
-        }
-
-        function generateLinearGraph() {
-            const nodeCount = Math.min(Math.max(parseInt(document.getElementById('nodeCount').value), 3), 10);
-            nodes = [];
-            for (let i = 0; i < nodeCount; i++) {
-                nodes.push({
-                    x: 60 + (i * (canvas.width - 120)) / (nodeCount - 1),
-                    y: canvas.height / 2,
-                    id: String.fromCharCode(65 + i),
-                    edges: []
-                });
-            }
-
-            for (let i = 0; i < nodeCount - 1; i++) {
-                let weight = Math.floor(Math.random() * 5) + 1;
-                nodes[i].edges.push({ to: nodes[i + 1].id, weight });
-                nodes[i + 1].edges.push({ to: nodes[i].id, weight });
-            }
-
-            initialize();
-            let totalEdges = nodes.reduce((sum, node) => sum + node.edges.length, 0) / 2;
-            statusDiv.innerText = "Generated simple linear graph with " + nodes.length + " nodes and " + totalEdges + " edges.";
-        }
-
-        function isGraphConnected() {
-            if (nodes.length === 0) return false;
-            const visited = new Set();
-            const queue = [nodes[0].id];
-            visited.add(nodes[0].id);
-
-            while (queue.length > 0) {
-                const current = queue.shift();
-                const currentNode = nodes.find(n => n.id === current);
-                currentNode.edges.forEach(edge => {
-                    if (!visited.has(edge.to)) {
-                        visited.add(edge.to);
-                        queue.push(edge.to);
-                    }
-                });
-            }
-
-            return visited.size === nodes.length;
-        }
-
-        function hasNegativeCycle() {
-            let distances = {};
-            nodes.forEach(node => distances[node.id] = Infinity);
-            distances[nodes[0].id] = 0;
-
-            for (let i = 0; i < nodes.length - 1; i++) {
-                nodes.forEach(node => {
-                    node.edges.forEach(edge => {
-                        if (distances[node.id] !== Infinity && distances[node.id] + edge.weight < distances[edge.to]) {
-                            distances[edge.to] = distances[node.id] + edge.weight;
-                        }
-                    });
-                });
-            }
-
-            for (let node of nodes) {
-                for (let edge of node.edges) {
-                    if (distances[node.id] !== Infinity && distances[node.id] + edge.weight < distances[edge.to]) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        function drawGraph(highlightEdges = [], highlightNodes = []) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            nodes.forEach(node => {
-                node.edges.forEach(edge => {
-                    const target = nodes.find(n => n.id === edge.to);
-                    ctx.beginPath();
-                    ctx.moveTo(node.x, node.y);
-                    ctx.lineTo(target.x, target.y);
-                    ctx.strokeStyle = highlightEdges.some(e => (e.from === node.id && e.to === edge.to) || (e.from === edge.to && e.to === node.id)) ? 'red' : 'black';
-                    ctx.lineWidth = highlightEdges.some(e => (e.from === node.id && e.to === edge.to) || (e.from === edge.to && e.to === node.id)) ? 3 : 1;
-                    ctx.stroke();
-
-                    const midX = (node.x + target.x) / 2;
-                    const midY = (node.y + target.y) / 2;
-                    ctx.fillStyle = 'black';
-                    ctx.font = '16px sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.fillText(edge.weight, midX - 5, midY - 5);
-                });
-            });
-
-            nodes.forEach(node => {
-                ctx.beginPath();
-                ctx.arc(node.x, node.y, 20, 0, 2 * Math.PI);
-                ctx.fillStyle = highlightNodes.includes(node.id) ? 'yellow' : 'lightblue';
-                ctx.fill();
-                ctx.strokeStyle = 'black';
-                ctx.stroke();
-                ctx.fillStyle = 'black';
-                ctx.font = '20px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(node.id, node.x, node.y + 5);
-                if (distances[node.id] !== undefined && distances[node.id] !== null) {
-                    ctx.fillText(distances[node.id] === Infinity ? '∞' : distances[node.id], node.x - 10, node.y - 25);
-                }
-            });
-        }
-
-        function initialize() {
-            distances = {};
-            previous = {};
-            distMatrix = [];
-            predecessors = [];
-            visited = new Set();
-            path = [];
-            nodes.forEach(node => {
-                distances[node.id] = Infinity;
-                previous[node.id] = null;
-            });
-            if (nodes.length > 0) distances[nodes[0].id] = 0;
-            drawGraph();
-        }
-
-        function getMinDistanceNode() {
-            let minDist = Infinity;
-            let minNode = null;
-            nodes.forEach(node => {
-                if (!visited.has(node.id) && distances[node.id] < minDist) {
-                    minDist = distances[node.id];
-                    minNode = node.id;
-                }
-            });
-            return minNode;
-        }
-
-        async function runDijkstra() {
-            if (nodes.length === 0) {
-                statusDiv.textContent = 'Please generate a graph first.';
-                return;
-            }
-            initialize();
-            statusDiv.textContent = 'Running Dijkstra...';
-            let highlightEdges = [];
-            let highlightNodes = [];
-
-            while (visited.size < nodes.length) {
-                const current = getMinDistanceNode();
-                if (!current) break;
-
-                visited.add(current);
-                highlightNodes = [current];
-
-                const currentNode = nodes.find(n => n.id === current);
-                for (let edge of currentNode.edges) {
-                    const neighbor = edge.to;
-                    if (!visited.has(neighbor)) {
-                        const newDist = distances[current] + edge.weight;
-                        if (newDist < distances[neighbor]) {
-                            distances[neighbor] = newDist;
-                            previous[neighbor] = current;
-                            highlightEdges = [{ from: current, to: neighbor }];
-                            drawGraph(highlightEdges, highlightNodes);
-                            statusDiv.innerHTML = `Updating distance to ${neighbor}: ${newDist}` + '<br>' + statusDiv.innerHTML;
-                            await new Promise(resolve => setTimeout(resolve, 1000));
-                        }
-                    }
-                }
-                drawGraph([], highlightNodes);
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-
-            let current = nodes[nodes.length - 1].id;
-            while (current) {
-                path.unshift(current);
-                current = previous[current];
-            }
-
-            highlightEdges = [];
-            for (let i = 0; i < path.length - 1; i++) {
-                highlightEdges.push({ from: path[i], to: path[i + 1] });
-            }
-            drawGraph(highlightEdges, path);
-            statusDiv.innerHTML = `Shortest path to ${nodes[nodes.length - 1].id}: ${path.join(' -> ')}, Distance: ${distances[nodes[nodes.length - 1].id] === Infinity ? '∞' : distances[nodes[nodes.length - 1].id]}` + '<br>' + statusDiv.innerHTML;
-        }
-
-        async function runBellmanFord() {
-            if (nodes.length === 0) {
-                statusDiv.textContent = 'Please generate a graph first.';
-                return;
-            }
-            initialize();
-            statusDiv.textContent = 'Running Bellman-Ford...';
-            let highlightEdges = [];
-            let highlightNodes = [];
-
-            for (let i = 0; i < nodes.length - 1; i++) {
-                let updated = false;
-                for (let node of nodes) {
-                    highlightNodes = [node.id];
-                    for (let edge of node.edges) {
-                        const newDist = distances[node.id] + edge.weight;
-                        if (distances[node.id] !== Infinity && newDist < distances[edge.to]) {
-                            distances[edge.to] = newDist;
-                            previous[edge.to] = node.id;
-                            highlightEdges = [{ from: node.id, to: edge.to }];
-                            drawGraph(highlightEdges, highlightNodes);
-                            statusDiv.innerHTML = `Relaxing edge ${node.id} -> ${edge.to}: New distance to ${edge.to} = ${newDist}` + '<br>' + statusDiv.innerHTML;
-                            updated = true;
-                            await new Promise(resolve => setTimeout(resolve, 1000));
-                        }
-                    }
-                }
-                if (!updated) break;
-                drawGraph([], highlightNodes);
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-
-            let current = nodes[nodes.length - 1].id;
-            path = [];
-            while (current) {
-                path.unshift(current);
-                current = previous[current];
-            }
-
-            highlightEdges = [];
-            for (let i = 0; i < path.length - 1; i++) {
-                highlightEdges.push({ from: path[i], to: path[i + 1] });
-            }
-            drawGraph(highlightEdges, path);
-            statusDiv.innerHTML = `Shortest path to ${nodes[nodes.length - 1].id}: ${path.join(' -> ')}, Distance: ${distances[nodes[nodes.length - 1].id] === Infinity ? '∞' : distances[nodes[nodes.length - 1].id]}` + '<br>' + statusDiv.innerHTML;
-        }
-
-        async function runFloydWarshall() {
-            if (nodes.length === 0) {
-                statusDiv.textContent = 'Please generate a graph first.';
-                return;
-            }
-
-            distMatrix = Array(nodes.length).fill().map(() => Array(nodes.length).fill(Infinity));
-            predecessors = Array(nodes.length).fill().map(() => Array(nodes.length).fill(null));
-            path = [];
-            visited = new Set();
-
-            nodes.forEach((node, i) => {
-                distMatrix[i][i] = 0;
-                node.edges.forEach(edge => {
-                    const j = nodes.findIndex(n => n.id === edge.to);
-                    distMatrix[i][j] = edge.weight;
-                    predecessors[i][j] = i;
-                });
-            });
-
-            statusDiv.textContent = 'Running Floyd-Warshall...';
-            let highlightEdges = [];
-            let highlightNodes = [];
-
-            for (let k = 0; k < nodes.length; k++) {
-                highlightNodes = [nodes[k].id];
-                for (let i = 0; i < nodes.length; i++) {
-                    for (let j = 0; j < nodes.length; j++) {
-                        if (distMatrix[i][k] !== Infinity && distMatrix[k][j] !== Infinity) {
-                            const newDist = distMatrix[i][k] + distMatrix[k][j];
-                            if (newDist < distMatrix[i][j]) {
-                                distMatrix[i][j] = newDist;
-                                predecessors[i][j] = predecessors[k][j];
-                                // Highlight edges (i,k) and (k,j) if they exist
-                                highlightEdges = [];
-                                const nodeI = nodes[i].id;
-                                const nodeK = nodes[k].id;
-                                const nodeJ = nodes[j].id;
-                                if (nodes[i].edges.some(e => e.to === nodeK)) {
-                                    highlightEdges.push({ from: nodeI, to: nodeK });
-                                }
-                                if (nodes[k].edges.some(e => e.to === nodeJ)) {
-                                    highlightEdges.push({ from: nodeK, to: nodeJ });
-                                }
-                                distances = {};
-                                nodes.forEach((n, idx) => {
-                                    distances[n.id] = distMatrix[0][idx] === Infinity ? Infinity : distMatrix[0][idx];
-                                });
-                                drawGraph(highlightEdges, highlightNodes);
-                                statusDiv.innerHTML = `Updating distance ${nodes[i].id} -> ${nodes[j].id} via ${nodes[k].id}: ${newDist}` + '<br>' + statusDiv.innerHTML;
-                                await new Promise(resolve => setTimeout(resolve, 1000));
-                            }
-                        }
-                    }
-                }
-                drawGraph([], highlightNodes);
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-
-            let start = 0;
-            let end = nodes.length - 1;
-            path = [];
-            if (predecessors[start][end] !== null || start === end) {
-                let current = end;
-                while (current !== null) {
-                    path.unshift(nodes[current].id);
-                    current = predecessors[start][current];
-                    start = current !== null ? nodes.findIndex(n => n.id === nodes[current].id) : null;
-                }
-            }
-
-            highlightEdges = [];
-            for (let i = 0; i < path.length - 1; i++) {
-                highlightEdges.push({ from: path[i], to: path[i + 1] });
-            }
-            distances = {};
-            nodes.forEach((n, idx) => {
-                distances[n.id] = distMatrix[0][idx] === Infinity ? Infinity : distMatrix[0][idx];
-            });
-            drawGraph(highlightEdges, path);
-            statusDiv.innerHTML = `Shortest path to ${nodes[nodes.length - 1].id}: ${path.length > 0 ? path.join(' -> ') : 'No path'}, Distance: ${distMatrix[0][nodes.length - 1] === Infinity ? '∞' : distMatrix[0][nodes.length - 1]}` + '<br>' + statusDiv.innerHTML;
-        }
-
-        canvas.addEventListener('mousedown', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-
-            nodes.forEach(node => {
-                const dx = mouseX - node.x;
-                const dy = mouseY - node.y;
-                if (dx * dx + dy * dy < 20 * 20) {
-                    selectedNode = node;
-                    isDragging = true;
-                    canvas.style.cursor = 'grabbing';
-                }
-            });
-        });
-
-        canvas.addEventListener('mousemove', (e) => {
-            if (isDragging && selectedNode) {
-                const rect = canvas.getBoundingClientRect();
-                selectedNode.x = Math.max(30, Math.min(canvas.width - 30, e.clientX - rect.left));
-                selectedNode.y = Math.max(30, Math.min(canvas.height - 30, e.clientY - rect.top));
-                drawGraph();
-            }
-        });
-
-        canvas.addEventListener('mouseup', () => {
-            isDragging = false;
-            selectedNode = null;
-            canvas.style.cursor = 'grab';
-        });
-
-        generateGraph();
-    </script>
-</body>
-
-</html>
+<script>
+(function(){"use strict";
+var root=document.querySelector('.algo-shortest');if(!root)return;
+function q(id){return root.querySelector('#'+id)}
+var canvas=q('algo-shortest-canvas'),ctx=canvas.getContext('2d'),nodeCountInput=q('algo-shortest-node-count'),generateButton=q('algo-shortest-generate'),dijkstraButton=q('algo-shortest-dijkstra'),bellmanButton=q('algo-shortest-bellman'),floydButton=q('algo-shortest-floyd'),cancelButton=q('algo-shortest-cancel'),statusDiv=q('algo-shortest-status'),logDiv=q('algo-shortest-log');
+var nodes=[],edges=[],activeToken=0,selectedNode=null,dragging=false;
+function cssVar(name,fallback){var v=getComputedStyle(document.documentElement).getPropertyValue(name).trim();return v||fallback}
+function colors(){return{background:cssVar('--global-bg-color','#fff'),text:cssVar('--global-text-color','#111827'),border:cssVar('--global-border-color','#94a3b8'),accent:cssVar('--global-link-color','#2563eb'),active:'#f59e0b',path:'#dc2626'}}
+function setBusy(v){nodeCountInput.disabled=v;generateButton.disabled=v;dijkstraButton.disabled=v;bellmanButton.disabled=v;floydButton.disabled=v;cancelButton.disabled=!v}
+function clearLog(){logDiv.innerHTML=''}
+function log(message){var e=document.createElement('div');e.className='algo-shortest__log-entry';e.textContent=message;logDiv.appendChild(e);logDiv.scrollTop=logDiv.scrollHeight}
+function addEdge(a,b,w){if(a===b)return;if(edges.some(function(e){return(e.a===a&&e.b===b)||(e.a===b&&e.b===a)}))return;edges.push({a:a,b:b,weight:w})}
+function generateGraph(){activeToken++;var n=parseInt(nodeCountInput.value,10);if(!Number.isFinite(n))n=7;n=Math.max(3,Math.min(10,n));nodeCountInput.value=n;nodes=[];edges=[];for(var i=0;i<n;i++){var angle=Math.PI*2*i/n-Math.PI/2,rx=canvas.width*.38,ry=canvas.height*.34;nodes.push({id:String.fromCharCode(65+i),x:canvas.width/2+Math.cos(angle)*rx,y:canvas.height/2+Math.sin(angle)*ry})}for(var j=0;j<n-1;j++)addEdge(j,j+1,1+Math.floor(Math.random()*14));for(var k=0;k<n;k++)for(var m=k+2;m<n;m++)if(Math.random()<.28)addEdge(k,m,1+Math.floor(Math.random()*14));clearLog();log('Connected graph generated with '+n+' nodes and '+edges.length+' edges.');statusDiv.textContent='Graph ready. Source: A, target: '+nodes[n-1].id+'.';setBusy(false);drawGraph([],[],{})}
+function adjacency(){var list=Array.from({length:nodes.length},function(){return[]});edges.forEach(function(e){list[e.a].push({to:e.b,weight:e.weight});list[e.b].push({to:e.a,weight:e.weight})});return list}
+function edgeKey(a,b){return Math.min(a,b)+'-'+Math.max(a,b)}
+function drawGraph(highlightEdges,highlightNodes,distances){highlightEdges=highlightEdges||[];highlightNodes=highlightNodes||[];distances=distances||{};var c=colors(),edgeSet=new Set(highlightEdges.map(function(e){return edgeKey(e[0],e[1])})),nodeSet=new Set(highlightNodes);ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle=c.background;ctx.fillRect(0,0,canvas.width,canvas.height);edges.forEach(function(e){var a=nodes[e.a],b=nodes[e.b],active=edgeSet.has(edgeKey(e.a,e.b));ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=active?c.path:c.border;ctx.lineWidth=active?4:2;ctx.stroke();var mx=(a.x+b.x)/2,my=(a.y+b.y)/2;ctx.fillStyle=c.background;ctx.fillRect(mx-14,my-10,28,20);ctx.fillStyle=c.text;ctx.font='bold 14px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(e.weight),mx,my)});nodes.forEach(function(node,index){var active=nodeSet.has(index);ctx.beginPath();ctx.arc(node.x,node.y,22,0,Math.PI*2);ctx.fillStyle=active?c.active:c.accent;ctx.fill();ctx.strokeStyle=c.text;ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(node.id,node.x,node.y);if(distances[index]!==undefined){ctx.fillStyle=c.text;ctx.font='12px sans-serif';ctx.fillText(distances[index]===Infinity?'∞':String(distances[index]),node.x,node.y-34)}})}
+function sleep(ms,token){return new Promise(function(resolve){setTimeout(function(){resolve(token===activeToken)},ms)})}
+function buildPath(prev,target){if(prev[target]===null&&target!==0)return[];var path=[],current=target,guard=0;while(current!==null&&guard<=nodes.length){path.unshift(current);current=prev[current];guard++}return path[0]===0?path:[]}
+function pathEdges(path){var r=[];for(var i=0;i<path.length-1;i++)r.push([path[i],path[i+1]]);return r}
+async function runDijkstra(){activeToken++;var token=activeToken;setBusy(true);clearLog();var adj=adjacency(),n=nodes.length,dist=Array(n).fill(Infinity),prev=Array(n).fill(null),visited=new Set();dist[0]=0;log('Running Dijkstra from A.');while(visited.size<n){var u=-1,best=Infinity;for(var i=0;i<n;i++)if(!visited.has(i)&&dist[i]<best){best=dist[i];u=i}if(u===-1)break;visited.add(u);drawGraph([],[u],dist);if(!await sleep(300,token))return;for(var j=0;j<adj[u].length;j++){var e=adj[u][j],alt=dist[u]+e.weight;if(alt<dist[e.to]){dist[e.to]=alt;prev[e.to]=u;log('Relax '+nodes[u].id+' → '+nodes[e.to].id+': '+alt);drawGraph([[u,e.to]],[u],dist);if(!await sleep(260,token))return}}}finish('Dijkstra',dist,prev);setBusy(false)}
+async function runBellmanFord(){activeToken++;var token=activeToken;setBusy(true);clearLog();var n=nodes.length,dist=Array(n).fill(Infinity),prev=Array(n).fill(null),directed=[];dist[0]=0;edges.forEach(function(e){directed.push([e.a,e.b,e.weight]);directed.push([e.b,e.a,e.weight])});log('Running Bellman-Ford from A.');for(var pass=0;pass<n-1;pass++){var updated=false;for(var i=0;i<directed.length;i++){var e=directed[i];if(dist[e[0]]!==Infinity&&dist[e[0]]+e[2]<dist[e[1]]){dist[e[1]]=dist[e[0]]+e[2];prev[e[1]]=e[0];updated=true;log('Pass '+(pass+1)+': relax '+nodes[e[0]].id+' → '+nodes[e[1]].id+' = '+dist[e[1]]);drawGraph([[e[0],e[1]]],[e[0]],dist);if(!await sleep(220,token))return}}if(!updated)break}finish('Bellman-Ford',dist,prev);setBusy(false)}
+async function runFloydWarshall(){activeToken++;var token=activeToken;setBusy(true);clearLog();var n=nodes.length,dist=Array.from({length:n},function(){return Array(n).fill(Infinity)}),next=Array.from({length:n},function(){return Array(n).fill(null)});for(var i=0;i<n;i++){dist[i][i]=0;next[i][i]=i}edges.forEach(function(e){dist[e.a][e.b]=e.weight;dist[e.b][e.a]=e.weight;next[e.a][e.b]=e.b;next[e.b][e.a]=e.a});log('Running Floyd-Warshall.');for(var k=0;k<n;k++){for(var a=0;a<n;a++)for(var b=0;b<n;b++)if(dist[a][k]+dist[k][b]<dist[a][b]){dist[a][b]=dist[a][k]+dist[k][b];next[a][b]=next[a][k]}drawGraph([],[k],dist[0]);log('Using '+nodes[k].id+' as an intermediate node.');if(!await sleep(320,token))return}var path=[],u=0,target=n-1;if(next[u][target]!==null){path.push(u);while(u!==target){u=next[u][target];path.push(u);if(path.length>n+1)break}}drawGraph(pathEdges(path),path,dist[0]);if(path.length){log('Floyd-Warshall shortest path: '+path.map(function(i){return nodes[i].id}).join(' → '));statusDiv.textContent='Floyd-Warshall complete. Distance: '+dist[0][target]+'.'}else statusDiv.textContent='No path found.';setBusy(false)}
+function finish(name,dist,prev){var target=nodes.length-1,path=buildPath(prev,target);drawGraph(pathEdges(path),path,dist);if(path.length){log(name+' shortest path: '+path.map(function(i){return nodes[i].id}).join(' → '));statusDiv.textContent=name+' complete. Distance: '+dist[target]+'.'}else statusDiv.textContent=name+' could not reach the target.'}
+function cancelRun(){activeToken++;setBusy(false);statusDiv.textContent='Algorithm cancelled.';drawGraph([],[],{})}
+function pointerPos(event){var rect=canvas.getBoundingClientRect();return{x:(event.clientX-rect.left)*canvas.width/rect.width,y:(event.clientY-rect.top)*canvas.height/rect.height}}
+canvas.addEventListener('pointerdown',function(event){if(dijkstraButton.disabled)return;var p=pointerPos(event);selectedNode=null;for(var i=nodes.length-1;i>=0;i--){var dx=p.x-nodes[i].x,dy=p.y-nodes[i].y;if(dx*dx+dy*dy<=22*22){selectedNode=nodes[i];break}}if(selectedNode){dragging=true;canvas.classList.add('is-dragging');canvas.setPointerCapture(event.pointerId)}})
+canvas.addEventListener('pointermove',function(event){if(!dragging||!selectedNode)return;var p=pointerPos(event);selectedNode.x=Math.max(30,Math.min(canvas.width-30,p.x));selectedNode.y=Math.max(30,Math.min(canvas.height-30,p.y));drawGraph([],[],{})})
+function stopDrag(event){dragging=false;selectedNode=null;canvas.classList.remove('is-dragging');if(event&&canvas.hasPointerCapture(event.pointerId))canvas.releasePointerCapture(event.pointerId)}
+canvas.addEventListener('pointerup',stopDrag);canvas.addEventListener('pointercancel',stopDrag);generateButton.addEventListener('click',generateGraph);dijkstraButton.addEventListener('click',runDijkstra);bellmanButton.addEventListener('click',runBellmanFord);floydButton.addEventListener('click',runFloydWarshall);cancelButton.addEventListener('click',cancelRun);new MutationObserver(function(){drawGraph([],[],{})}).observe(document.documentElement,{attributes:true,attributeFilter:['class','data-theme']});generateGraph();
+})();
+</script>

@@ -1,391 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
+---
+layout: without-sidebar
+title: "Minimum Spanning Tree"
+permalink: /files/algorithms/slides/Bolum_04_03_MST.html
+excerpt: "Interactive Minimum Spanning Tree visualizer for Prim and Kruskal algorithms."
+---
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Visualize and simulate Minimum Spanning Tree algorithms like Prim's and Kruskal's. Understand how MSTs are constructed step-by-step on a graph.">
-    <meta name="keywords"
-        content="Minimum Spanning Tree, MST, Prim's algorithm, Kruskal's algorithm, graph algorithm, graph visualization, algorithm simulator, computer science education">
+<style>
+.algo-mst,.algo-mst *,.algo-mst *::before,.algo-mst *::after{box-sizing:border-box}
+.algo-mst{width:min(1000px,100%);margin:0 auto 2rem;color:var(--global-text-color);--mst-surface:color-mix(in srgb,var(--global-link-color) 2.5%,var(--global-bg-color));--mst-strong:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));--mst-border:color-mix(in srgb,var(--global-link-color) 34%,var(--global-border-color));--mst-shadow:0 8px 24px rgba(15,23,42,.06)}
+.algo-mst__hero,.algo-mst__controls,.algo-mst__canvas-wrap,.algo-mst__log,.algo-mst__notes{border:1.5px solid var(--mst-border);border-radius:14px;background:var(--mst-surface)}
+.algo-mst__hero{padding:1.25rem;background:var(--mst-strong);box-shadow:var(--mst-shadow)}
+.algo-mst__hero h1{margin:0 0 .45rem;text-align:center;font-size:clamp(1.7rem,4vw,2.35rem)}
+.algo-mst__hero p{margin:0;text-align:center;line-height:1.6;opacity:.82}
+.algo-mst__controls{display:grid;grid-template-columns:1fr 1.1fr 1.2fr 1.2fr 1fr;gap:.6rem;margin-top:1rem;padding:1rem}
+.algo-mst input,.algo-mst button{min-height:44px;padding:.6rem .75rem;border:1.5px solid var(--mst-border);border-radius:9px;background:var(--global-bg-color);color:var(--global-text-color);font:inherit}
+.algo-mst button{cursor:pointer;font-weight:800}
+.algo-mst button[data-primary="1"]{border-color:var(--global-link-color);background:var(--global-link-color);color:#fff}
+.algo-mst button:disabled{opacity:.5;cursor:not-allowed}
+.algo-mst__canvas-wrap{margin-top:1rem;padding:.75rem;box-shadow:var(--mst-shadow)}
+.algo-mst__canvas{display:block;width:100%;height:auto;aspect-ratio:3/2;border-radius:10px;background:var(--global-bg-color);touch-action:none;cursor:grab}
+.algo-mst__canvas.is-dragging{cursor:grabbing}
+.algo-mst__status{margin:.8rem 0 0;font-weight:800}
+.algo-mst__log{margin-top:.8rem;max-height:240px;overflow-y:auto;padding:.85rem;background:var(--global-bg-color);font-size:.92rem;line-height:1.5}
+.algo-mst__entry{padding:.25rem 0;border-bottom:1px dashed var(--mst-border)}
+.algo-mst__notes{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;margin-top:1rem;padding:1rem}
+.algo-mst__note h2{margin:0 0 .35rem;font-size:1.04rem}
+.algo-mst__note p{margin:0;line-height:1.55;opacity:.82}
+@media(max-width:760px){.algo-mst__controls{grid-template-columns:repeat(2,1fr)}.algo-mst__controls input{grid-column:1/-1}.algo-mst__notes{grid-template-columns:1fr}}
+@media(max-width:480px){.algo-mst__controls{grid-template-columns:1fr}.algo-mst__hero p{text-align:left}}
+@media(prefers-color-scheme:dark){.algo-mst{--mst-surface:var(--global-bg-color);--mst-strong:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));--mst-border:color-mix(in srgb,var(--global-border-color) 85%,var(--global-text-color));--mst-shadow:none}}
+</style>
 
-    <title>Minimum Spanning Tree (MST) Simulator | Prim & Kruskal</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #fff;
-            color: #333;
-            text-align: center;
-            margin: 0 auto;
-            padding: 1vw;
-            max-width: 800px;
-            box-sizing: border-box;
-        }
+<div class="algo-mst">
+<section class="algo-mst__hero"><h1>Minimum Spanning Tree</h1><p>Generate a connected weighted graph and compare Prim's and Kruskal's algorithms step by step.</p></section>
+<section class="algo-mst__controls">
+<input id="algo-mst-count" type="number" min="2" max="15" value="10" aria-label="Number of nodes">
+<button id="algo-mst-generate" type="button">Generate</button>
+<button id="algo-mst-prim" type="button" data-primary="1">Prim's Algorithm</button>
+<button id="algo-mst-kruskal" type="button" data-primary="1">Kruskal's Algorithm</button>
+<button id="algo-mst-cancel" type="button">Cancel</button>
+</section>
+<section class="algo-mst__canvas-wrap"><canvas id="algo-mst-canvas" class="algo-mst__canvas" width="900" height="600"></canvas></section>
+<p id="algo-mst-status" class="algo-mst__status" role="status">Ready.</p>
+<div id="algo-mst-log" class="algo-mst__log" aria-live="polite"></div>
+<section class="algo-mst__notes">
+<article class="algo-mst__note"><h2>Prim's Algorithm</h2><p>Starts from one vertex and repeatedly selects the cheapest edge that connects the current tree to a new vertex.</p></article>
+<article class="algo-mst__note"><h2>Kruskal's Algorithm</h2><p>Processes edges from smallest weight to largest and adds an edge only if it does not create a cycle.</p></article>
+</section>
+</div>
 
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1vw;
-        }
-
-        h1 {
-            margin: auto;
-        }
-
-        .back-button {
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .back-button:hover {
-            text-decoration: underline;
-        }
-
-        .container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-        }
-
-        .controls {
-            display: flex;
-            flex-wrap: nowrap;
-            justify-content: space-between;
-            gap: 1vw;
-            width: 100%;
-            box-sizing: border-box;
-            padding: 1vw;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        input,
-        button {
-            width: calc((100% - (4 * 1vw)) / 4);
-            padding: 1vw;
-            margin: 0;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-            border: none;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        #graphCanvas {
-            margin: 10px;
-            width: 100%;
-            max-width: 600px;
-            height: auto;
-            display: block;
-        }
-
-        #output {
-            margin-top: 20px;
-            white-space: pre-wrap;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="header">
-        <a href="https://sercankulcu.github.io/teaching/algorithms" class="back-button">← Back</a>
-        <h1>Minimum Spanning Tree</h1>
-    </div>
-
-    <div class="container">
-        <div class="controls">
-            <input type="number" id="numCities" value="10" min="2">
-            <button onclick="generateGraph()">Generate</button>
-            <button onclick="startPrim()">Prim's Algorithm</button>
-            <button onclick="startKruskal()">Kruskal's Algorithm</button>
-        </div>
-    </div>
-
-    <canvas id="graphCanvas"></canvas>
-
-    <div id="output"></div>
-
-    <script>
-        const canvas = document.getElementById('graphCanvas');
-        const ctx = canvas.getContext('2d');
-        const outputDiv = document.getElementById('output');
-
-        let nodes = [];
-        let edges = [];
-        let adjMatrix = [];
-        const numNodesInput = document.getElementById('numCities');
-        const nodeRadius = 15;
-        const animationSpeed = 1000; // milliseconds
-
-        // Dragging state
-        let selectedNode = null;
-        let isDragging = false;
-
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-        function generateGraph() {
-            nodes = [];
-            edges = [];
-
-            const numNodes = parseInt(numNodesInput.value);
-            const minEdges = numNodes * 1.5;
-            const maxEdges = numNodes * 2.5;
-            adjMatrix = Array(numNodes).fill(null).map(() => Array(numNodes).fill(Infinity));
-
-            // Create nodes
-            for (let i = 0; i < numNodes; i++) {
-                let x, y;
-                let overlapping;
-                do {
-                    overlapping = false;
-                    x = getRandomInt(nodeRadius, canvas.width - nodeRadius);
-                    y = getRandomInt(nodeRadius, canvas.height - nodeRadius);
-                    for (const node of nodes) {
-                        const dx = x - node.x;
-                        const dy = y - node.y;
-                        if (Math.sqrt(dx * dx + dy * dy) < 2 * nodeRadius + 5) {
-                            overlapping = true;
-                            break;
-                        }
-                    }
-                } while (overlapping);
-                nodes.push({ id: i, x, y });
-            }
-
-            // Create edges
-            const numEdges = getRandomInt(minEdges, maxEdges);
-            let createdEdges = 0;
-            while (createdEdges < numEdges) {
-                const u = getRandomInt(0, numNodes - 1);
-                const v = getRandomInt(0, numNodes - 1);
-                if (u !== v && adjMatrix[u][v] === Infinity) {
-                    const weight = getRandomInt(1, 20);
-                    adjMatrix[u][v] = weight;
-                    adjMatrix[v][u] = weight;
-                    edges.push({ u, v, weight });
-                    createdEdges++;
-                }
-            }
-
-            outputDiv.innerText = "Graph generated with " + nodes.length + " nodes and " + edges.length + " edges.";
-            drawGraph();
-        }
-
-        // Helper function to check if mouse is over a node
-        function getNodeAtPosition(mouseX, mouseY) {
-            for (const node of nodes) {
-                const dx = mouseX - node.x;
-                const dy = mouseY - node.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance <= nodeRadius) {
-                    return node;
-                }
-            }
-            return null;
-        }
-
-        function drawGraph(highlightedEdges = [], algorithmStep = "") {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Draw edges
-            ctx.strokeStyle = 'gray';
-            ctx.lineWidth = 2;
-            edges.forEach(edge => {
-                const node1 = nodes.find(n => n.id === edge.u);
-                const node2 = nodes.find(n => n.id === edge.v);
-                ctx.beginPath();
-                ctx.moveTo(node1.x, node1.y);
-                ctx.lineTo(node2.x, node2.y);
-                const midX = (node1.x + node2.x) / 2;
-                const midY = (node1.y + node2.y) / 2;
-                ctx.stroke();
-
-                // Draw edge weight
-                ctx.fillStyle = '#000';
-                ctx.font = '16px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(edge.weight, midX + 2, midY - 5);
-            });
-
-            // Highlighted edges
-            ctx.strokeStyle = 'green';
-            ctx.lineWidth = 4;
-            highlightedEdges.forEach(edge => {
-                const node1 = nodes.find(n => n.id === edge.u);
-                const node2 = nodes.find(n => n.id === edge.v);
-                ctx.beginPath();
-                ctx.moveTo(node1.x, node1.y);
-                ctx.lineTo(node2.x, node2.y);
-                ctx.stroke();
-            });
-
-            // Draw nodes
-            ctx.fillStyle = '#eee';
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 2;
-            nodes.forEach(node => {
-                ctx.beginPath();
-                ctx.fillStyle = node === selectedNode && isDragging ? '#ddd' : '#eee'; // Highlight dragged node
-                ctx.arc(node.x, node.y, nodeRadius, 0, 2 * Math.PI);
-                ctx.fill();
-                ctx.stroke();
-                ctx.fillStyle = '#000';
-                ctx.font = '20px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(node.id, node.x, node.y + 7);
-            });
-
-            outputDiv.innerText = algorithmStep + outputDiv.innerText;
-        }
-
-        async function startPrim() {
-            if (nodes.length === 0) return;
-            outputDiv.innerText = "";
-
-            const mstEdges = [];
-            const numNodes = parseInt(numNodesInput.value);
-            const visited = new Array(numNodes).fill(false);
-            const edgeQueue = []; // { u, v, weight }
-            let current = 0; // Start from the first node
-
-            visited[current] = true;
-
-            while (mstEdges.length < numNodes - 1) {
-                for (let v = 0; v < numNodes; v++) {
-                    if (adjMatrix[current][v] !== Infinity && !visited[v]) {
-                        edgeQueue.push({ u: current, v, weight: adjMatrix[current][v] });
-                    }
-                }
-
-                edgeQueue.sort((a, b) => a.weight - b.weight);
-
-                if (edgeQueue.length === 0) break; // Disconnected graph
-
-                const nextEdge = edgeQueue.shift();
-                const nextNode = visited[nextEdge.u] ? nextEdge.v : nextEdge.u;
-
-                if (!visited[nextNode]) {
-                    mstEdges.push(nextEdge);
-                    visited[nextNode] = true;
-                    current = nextNode;
-                    drawGraph(mstEdges, `Added edge (${nextEdge.u}, ${nextEdge.v}) with weight ${nextEdge.weight}`+ "\n");
-                    await new Promise(resolve => setTimeout(resolve, animationSpeed));
-                } else {
-                    drawGraph(mstEdges, `Not added edge (${nextEdge.u}, ${nextEdge.v}) with weight ${nextEdge.weight}`+ "\n");
-                }
-            }
-
-            drawGraph(mstEdges, `Finished. Total weight: ${mstEdges.reduce((sum, edge) => sum + edge.weight, 0)}`+ "\n");
-        }
-
-        async function startKruskal() {
-            if (nodes.length === 0) return;
-            outputDiv.innerText = "";
-
-            const mstEdges = [];
-            const sortedEdges = [...edges].sort((a, b) => a.weight - b.weight);
-            const numNodes = parseInt(numNodesInput.value);
-            const parent = Array(numNodes).fill(null).map((_, i) => i);
-
-            function find(i) {
-                if (parent[i] === i) return i;
-                return parent[i] = find(parent[i]);
-            }
-
-            function union(i, j) {
-                const rootI = find(i);
-                const rootJ = find(j);
-                if (rootI !== rootJ) {
-                    parent[rootI] = rootJ;
-                    return true;
-                }
-                return false;
-            }
-
-            for (const edge of sortedEdges) {
-                if (union(edge.u, edge.v)) {
-                    mstEdges.push(edge);
-                    drawGraph(mstEdges, `Added edge (${edge.u}, ${edge.v}) with weight ${edge.weight}`+ "\n");
-                    await new Promise(resolve => setTimeout(resolve, animationSpeed));
-                } else {
-                    drawGraph(mstEdges, `Not added edge (${edge.u}, ${edge.v}) with weight ${edge.weight}`+ "\n");
-                }
-                if (mstEdges.length === numNodes - 1) break;
-            }
-
-            drawGraph(mstEdges, `Finished. Total weight: ${mstEdges.reduce((sum, edge) => sum + edge.weight, 0)}`+ "\n");
-        }
-
-        function resizeCanvas() {
-            const maxWidth = 600;
-            canvas.width = Math.min(window.innerWidth, maxWidth);
-            canvas.height = canvas.width * 0.6; // Maintain a 16:10 aspect ratio
-
-            // Initial graph generation
-            generateGraph();
-
-            drawGraph();
-        }
-
-        // Mouse event handlers for dragging
-        canvas.addEventListener('mousedown', (event) => {
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = event.clientX - rect.left;
-            const mouseY = event.clientY - rect.top;
-            selectedNode = getNodeAtPosition(mouseX, mouseY);
-            if (selectedNode) {
-                isDragging = true;
-                drawGraph();
-            }
-        });
-
-        canvas.addEventListener('mousemove', (event) => {
-            if (isDragging && selectedNode) {
-                const rect = canvas.getBoundingClientRect();
-                let mouseX = event.clientX - rect.left;
-                let mouseY = event.clientY - rect.top;
-
-                // Keep node within canvas bounds
-                mouseX = Math.max(nodeRadius, Math.min(canvas.width - nodeRadius, mouseX));
-                mouseY = Math.max(nodeRadius, Math.min(canvas.height - nodeRadius, mouseY));
-
-                selectedNode.x = mouseX;
-                selectedNode.y = mouseY;
-                drawGraph();
-            }
-        });
-
-        canvas.addEventListener('mouseup', () => {
-            isDragging = false;
-            selectedNode = null;
-            drawGraph();
-        });
-
-        canvas.addEventListener('mouseleave', () => {
-            isDragging = false;
-            selectedNode = null;
-            drawGraph();
-        });
-
-        // Initial canvas resizing
-        resizeCanvas();
-    </script>
-</body>
-
-</html>
+<script>
+(function(){
+"use strict";
+var root=document.querySelector(".algo-mst");if(!root)return;
+function q(id){return root.querySelector("#"+id);}
+var canvas=q("algo-mst-canvas"),ctx=canvas.getContext("2d"),countInput=q("algo-mst-count"),generateBtn=q("algo-mst-generate"),primBtn=q("algo-mst-prim"),kruskalBtn=q("algo-mst-kruskal"),cancelBtn=q("algo-mst-cancel"),status=q("algo-mst-status"),logDiv=q("algo-mst-log");
+var nodes=[],edges=[],token=0,selectedNode=null,dragging=false;
+function cssVar(n,f){var v=getComputedStyle(document.documentElement).getPropertyValue(n).trim();return v||f;}
+function colors(){return{bg:cssVar("--global-bg-color","#fff"),text:cssVar("--global-text-color","#111827"),border:cssVar("--global-border-color","#94a3b8"),accent:cssVar("--global-link-color","#2563eb"),mst:"#15803d",active:"#f59e0b"};}
+function setBusy(v){countInput.disabled=v;generateBtn.disabled=v;primBtn.disabled=v;kruskalBtn.disabled=v;cancelBtn.disabled=!v;}
+function clearLog(){logDiv.innerHTML="";}
+function addLog(s){var e=document.createElement("div");e.className="algo-mst__entry";e.textContent=s;logDiv.appendChild(e);logDiv.scrollTop=logDiv.scrollHeight;}
+function edgeKey(a,b){return Math.min(a,b)+"-"+Math.max(a,b);}
+function addEdge(a,b,w){if(a===b)return;if(edges.some(function(e){return edgeKey(e.u,e.v)===edgeKey(a,b);} ))return;edges.push({u:a,v:b,weight:w});}
+function generate(){
+token++;
+var n=parseInt(countInput.value,10);if(!Number.isFinite(n))n=10;n=Math.max(2,Math.min(15,n));countInput.value=n;
+nodes=[];edges=[];
+var rx=canvas.width*.38,ry=canvas.height*.34;
+for(var i=0;i<n;i++){var ang=2*Math.PI*i/n-Math.PI/2;nodes.push({id:i,x:canvas.width/2+Math.cos(ang)*rx,y:canvas.height/2+Math.sin(ang)*ry});}
+for(var j=0;j<n-1;j++)addEdge(j,j+1,1+Math.floor(Math.random()*20));
+for(var a=0;a<n;a++){for(var b=a+2;b<n;b++){if(Math.random()<.25)addEdge(a,b,1+Math.floor(Math.random()*20));}}
+clearLog();addLog("Connected graph generated with "+n+" nodes and "+edges.length+" edges.");status.textContent="Graph ready.";setBusy(false);draw([],[]);
+}
+function draw(selectedEdges,activeNodes){selectedEdges=selectedEdges||[];activeNodes=activeNodes||[];var c=colors(),s=new Set(selectedEdges.map(function(e){return edgeKey(e.u,e.v);})),ns=new Set(activeNodes);ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle=c.bg;ctx.fillRect(0,0,canvas.width,canvas.height);
+edges.forEach(function(e){var a=nodes[e.u],b=nodes[e.v],on=s.has(edgeKey(e.u,e.v));ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=on?c.mst:c.border;ctx.lineWidth=on?4:2;ctx.stroke();var mx=(a.x+b.x)/2,my=(a.y+b.y)/2;ctx.fillStyle=c.bg;ctx.fillRect(mx-14,my-10,28,20);ctx.fillStyle=c.text;ctx.font="bold 14px sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(String(e.weight),mx,my);});
+nodes.forEach(function(n){var on=ns.has(n.id);ctx.beginPath();ctx.arc(n.x,n.y,22,0,2*Math.PI);ctx.fillStyle=on?c.active:c.accent;ctx.fill();ctx.strokeStyle=c.text;ctx.stroke();ctx.fillStyle="#fff";ctx.font="bold 15px sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(String(n.id),n.x,n.y);});
+}
+function sleep(ms,t){return new Promise(function(r){setTimeout(function(){r(t===token);},ms);});}
+async function prim(){
+token++;var t=token;setBusy(true);clearLog();var n=nodes.length,visited=new Set([0]),mst=[];addLog("Prim starts from node 0.");
+while(mst.length<n-1){var best=null;edges.forEach(function(e){var a=visited.has(e.u),b=visited.has(e.v);if(a!==b&&(!best||e.weight<best.weight))best=e;});if(!best)break;mst.push(best);visited.add(best.u);visited.add(best.v);addLog("Add edge ("+best.u+", "+best.v+") weight "+best.weight+".");draw(mst,[best.u,best.v]);if(!await sleep(500,t))return;}
+var total=mst.reduce(function(s,e){return s+e.weight;},0);draw(mst,[]);status.textContent="Prim complete. Total weight: "+total+".";addLog("Finished. Total weight: "+total+".");setBusy(false);
+}
+async function kruskal(){
+token++;var t=token;setBusy(true);clearLog();var n=nodes.length,parent=Array.from({length:n},function(_,i){return i;}),rank=Array(n).fill(0),mst=[];function find(x){while(parent[x]!==x){parent[x]=parent[parent[x]];x=parent[x];}return x;}function union(a,b){a=find(a);b=find(b);if(a===b)return false;if(rank[a]<rank[b])parent[a]=b;else if(rank[a]>rank[b])parent[b]=a;else{parent[b]=a;rank[a]++;}return true;}
+var sorted=edges.slice().sort(function(a,b){return a.weight-b.weight;});addLog("Kruskal processes edges in ascending weight.");
+for(var i=0;i<sorted.length&&mst.length<n-1;i++){var e=sorted[i];if(union(e.u,e.v)){mst.push(e);addLog("Add edge ("+e.u+", "+e.v+") weight "+e.weight+".");draw(mst,[e.u,e.v]);if(!await sleep(450,t))return;}else{addLog("Skip edge ("+e.u+", "+e.v+") because it forms a cycle.");}}
+var total=mst.reduce(function(s,e){return s+e.weight;},0);draw(mst,[]);status.textContent="Kruskal complete. Total weight: "+total+".";addLog("Finished. Total weight: "+total+".");setBusy(false);
+}
+function cancel(){token++;setBusy(false);status.textContent="Algorithm cancelled.";draw([],[]);}
+function pos(ev){var r=canvas.getBoundingClientRect();return{x:(ev.clientX-r.left)*canvas.width/r.width,y:(ev.clientY-r.top)*canvas.height/r.height};}
+canvas.addEventListener("pointerdown",function(ev){if(primBtn.disabled)return;var p=pos(ev);selectedNode=null;for(var i=nodes.length-1;i>=0;i--){var dx=p.x-nodes[i].x,dy=p.y-nodes[i].y;if(dx*dx+dy*dy<=22*22){selectedNode=nodes[i];break;}}if(selectedNode){dragging=true;canvas.classList.add("is-dragging");canvas.setPointerCapture(ev.pointerId);}});
+canvas.addEventListener("pointermove",function(ev){if(!dragging||!selectedNode)return;var p=pos(ev);selectedNode.x=Math.max(28,Math.min(canvas.width-28,p.x));selectedNode.y=Math.max(28,Math.min(canvas.height-28,p.y));draw([],[]);});
+function stop(ev){dragging=false;selectedNode=null;canvas.classList.remove("is-dragging");if(ev&&canvas.hasPointerCapture(ev.pointerId))canvas.releasePointerCapture(ev.pointerId);}
+canvas.addEventListener("pointerup",stop);canvas.addEventListener("pointercancel",stop);
+generateBtn.addEventListener("click",generate);primBtn.addEventListener("click",prim);kruskalBtn.addEventListener("click",kruskal);cancelBtn.addEventListener("click",cancel);
+new MutationObserver(function(){draw([],[]);}).observe(document.documentElement,{attributes:true,attributeFilter:["class","data-theme"]});
+generate();
+})();
+</script>
