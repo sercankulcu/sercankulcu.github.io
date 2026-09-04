@@ -368,18 +368,114 @@ excerpt: "Interactive JavaScript algorithm complexity and performance analysis t
   }
   function readSizes(){var a=[];for(var i=1;i<=5;i++){var v=parseInt(q("algo-complexity-size"+i).value,10);if(!Number.isFinite(v)||v<1)throw new Error("All input sizes must be positive integers.");a.push(v);}return a;}
   function cssVar(name,fallback){var v=getComputedStyle(document.documentElement).getPropertyValue(name).trim();return v||fallback;}
-  function updateChart(sizes,times){
-    if(typeof Chart==="undefined")throw new Error("Chart library could not be loaded.");
-    if(chart)chart.destroy();
-    var text=cssVar("--global-text-color","#334155"),grid=cssVar("--global-border-color","#cbd5e1"),accent=cssVar("--global-link-color","#2563eb");
-    chart=new Chart(canvas,{type:"line",data:{labels:sizes,datasets:[{label:"Elapsed time (ms)",data:times,borderColor:accent,backgroundColor:"transparent",borderWidth:2,pointRadius:4,pointHoverRadius:6,tension:.15}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{title:{display:true,text:"Input size",color:text},ticks:{color:text},grid:{color:grid}},y:{title:{display:true,text:"Time (ms)",color:text},beginAtZero:true,ticks:{color:text},grid:{color:grid}}},plugins:{title:{display:true,text:"JavaScript Function Performance Chart",color:text},legend:{display:true,position:"bottom",labels:{color:text}}}}});
+  function updateChart(sizes, times) {
+    if (typeof Chart === "undefined") {
+      throw new Error("Chart library could not be loaded.");
+    }
+
+    if (chart) {
+      chart.destroy();
+    }
+
+    var textColor = cssVar("--global-text-color", "#334155");
+    var gridColor = cssVar("--global-border-color", "#cbd5e1");
+    var accent = cssVar("--global-link-color", "#2563eb");
+
+    var maxTime = Math.max.apply(null, times);
+    var useMicroseconds = maxTime < 1;
+    var displayTimes = useMicroseconds
+      ? times.map(function(time) { return time * 1000; })
+      : times;
+    var unit = useMicroseconds ? "µs" : "ms";
+
+    chart = new Chart(canvas, {
+      type: "line",
+      data: {
+        labels: sizes,
+        datasets: [{
+          label: "Average elapsed time (" + unit + ")",
+          data: displayTimes,
+          borderColor: accent,
+          backgroundColor: "transparent",
+          borderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          tension: 0.15
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: "Input size",
+              color: textColor
+            },
+            ticks: { color: textColor },
+            grid: { color: gridColor }
+          },
+          y: {
+            title: {
+              display: true,
+              text: "Average time (" + unit + ")",
+              color: textColor
+            },
+            beginAtZero: true,
+            ticks: { color: textColor },
+            grid: { color: gridColor }
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: "JavaScript Function Performance Chart",
+            color: textColor
+          },
+          legend: {
+            display: true,
+            position: "bottom",
+            labels: { color: textColor }
+          }
+        }
+      }
+    });
   }
+
+  function benchmarkFunction(fn, size) {
+    for (var warmup = 0; warmup < 5; warmup++) {
+      fn(size);
+    }
+
+    var probeStart = performance.now();
+    fn(size);
+    var probeTime = performance.now() - probeStart;
+
+    var targetWindowMs = 40;
+    var repetitions = Math.ceil(targetWindowMs / Math.max(probeTime, 0.01));
+    repetitions = Math.max(1, Math.min(repetitions, 5000));
+
+    var start = performance.now();
+    for (var i = 0; i < repetitions; i++) {
+      fn(size);
+    }
+    var total = performance.now() - start;
+
+    return total / repetitions;
+  }
+
   function run(){
     button.disabled=true;loader.style.display="block";loading.style.display="block";canvas.style.visibility="hidden";
     setTimeout(function(){
       try{
-        var sizes=readSizes(),times=[],fn=new Function("size",editor.value+"\nreturn myFunction(size);");
-        sizes.forEach(function(size){var s=performance.now();fn(size);times.push(performance.now()-s);});
+        var sizes = readSizes();
+        var times = [];
+        var fn = new Function("size", editor.value + "\nreturn myFunction(size);");
+
+        sizes.forEach(function(size) {
+          times.push(benchmarkFunction(fn, size));
+        });
         canvas.style.visibility="visible";updateChart(sizes,times);
       }catch(err){alert(err&&err.message?err.message:"The analysis could not be completed.");canvas.style.visibility="visible";}
       finally{button.disabled=false;loader.style.display="none";loading.style.display="none";}
