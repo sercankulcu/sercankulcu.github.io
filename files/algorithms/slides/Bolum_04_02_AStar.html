@@ -1,261 +1,601 @@
-<!DOCTYPE html>
-<html lang="en">
+---
+layout: without-sidebar
+title: "A* Pathfinding Algorithm"
+permalink: /files/algorithms/slides/Bolum_04_02_AStar.html
+excerpt: "Interactive A* pathfinding visualizer with editable walls and animated search."
+---
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A* Pathfinding Demo</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #fff;
-            color: #333;
-            text-align: center;
-            margin: 0 auto;
-            padding: 1vw;
-            max-width: 800px;
-            box-sizing: border-box;
-        }
+<style>
+.algo-astar,
+.algo-astar *,
+.algo-astar *::before,
+.algo-astar *::after {
+    box-sizing: border-box;
+}
 
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1vw;
-        }
+.algo-astar {
+    width: min(960px, 100%);
+    margin: 0 auto 2rem;
+    color: var(--global-text-color);
 
-        h1 {
-            margin: auto;
-        }
+    --aa-surface: color-mix(in srgb, var(--global-link-color) 2.5%, var(--global-bg-color));
+    --aa-strong: color-mix(in srgb, var(--global-link-color) 7%, var(--global-bg-color));
+    --aa-border: color-mix(in srgb, var(--global-link-color) 34%, var(--global-border-color));
+    --aa-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
 
-        .back-button {
-            cursor: pointer;
-            text-decoration: none;
-        }
+.algo-astar__hero,
+.algo-astar__controls,
+.algo-astar__canvas-wrap,
+.algo-astar__legend,
+.algo-astar__note {
+    border: 1.5px solid var(--aa-border);
+    border-radius: 14px;
+    background: var(--aa-surface);
+}
 
-        .back-button:hover {
-            text-decoration: underline;
-        }
+.algo-astar__hero {
+    padding: 1.25rem;
+    background: var(--aa-strong);
+    box-shadow: var(--aa-shadow);
+}
 
-        .container {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-        }
+.algo-astar__hero h1 {
+    margin: 0 0 0.45rem;
+    text-align: center;
+    font-size: clamp(1.7rem, 4vw, 2.35rem);
+}
 
-        .controls {
-            display: flex;
-            flex-wrap: nowrap;
-            justify-content: space-between;
-            gap: 1vw;
-            width: 100%;
-            box-sizing: border-box;
-            padding: 1vw;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+.algo-astar__hero p {
+    margin: 0;
+    text-align: center;
+    line-height: 1.6;
+    opacity: 0.82;
+}
 
-        input,
-        button {
-            width: calc((100% - (4 * 1vw)) / 3);
-            padding: 1vw;
-            margin: 0;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
+.algo-astar__controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.6rem;
+    margin-top: 1rem;
+    padding: 1rem;
+}
 
-        button {
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-            border: none;
-        }
+.algo-astar button {
+    min-height: 44px;
+    padding: 0.6rem 0.75rem;
+    border: 1.5px solid var(--aa-border);
+    border-radius: 9px;
+    background: var(--global-bg-color);
+    color: var(--global-text-color);
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
 
-        button:hover {
-            background-color: #45a049;
-        }
+.algo-astar button[data-primary="1"] {
+    border-color: var(--global-link-color);
+    background: var(--global-link-color);
+    color: #fff;
+}
 
-        canvas {
-            margin-top: 20px;
-            border: 1px solid black;
-        }
-    </style>
-</head>
+.algo-astar button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
 
-<body>
-    <div class="header">
-        <a href="https://sercankulcu.github.io/teaching/algorithms" class="back-button">← Back</a>
+.algo-astar button:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--global-link-color) 30%, transparent);
+    outline-offset: 2px;
+}
+
+.algo-astar__canvas-wrap {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    overflow: hidden;
+    box-shadow: var(--aa-shadow);
+}
+
+.algo-astar__canvas {
+    display: block;
+    width: min(640px, 100%);
+    height: auto;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    border-radius: 10px;
+    background: var(--global-bg-color);
+    touch-action: none;
+    cursor: crosshair;
+}
+
+.algo-astar__status {
+    margin: 0.8rem 0 0;
+    font-weight: 800;
+}
+
+.algo-astar__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem 1rem;
+    margin-top: 0.8rem;
+    padding: 0.8rem 1rem;
+}
+
+.algo-astar__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.92rem;
+}
+
+.algo-astar__swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--aa-border);
+}
+
+.algo-astar__note {
+    margin-top: 1rem;
+    padding: 1rem;
+}
+
+.algo-astar__note h2 {
+    margin: 0 0 0.35rem;
+    font-size: 1.05rem;
+}
+
+.algo-astar__note p {
+    margin: 0;
+    line-height: 1.55;
+    opacity: 0.82;
+}
+
+@media (max-width: 600px) {
+    .algo-astar__controls {
+        grid-template-columns: 1fr;
+    }
+
+    .algo-astar__hero p {
+        text-align: left;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .algo-astar {
+        --aa-surface: var(--global-bg-color);
+        --aa-strong: color-mix(in srgb, var(--global-link-color) 5%, var(--global-bg-color));
+        --aa-border: color-mix(in srgb, var(--global-border-color) 85%, var(--global-text-color));
+        --aa-shadow: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .algo-astar *,
+    .algo-astar *::before,
+    .algo-astar *::after {
+        transition-duration: 0.001ms !important;
+        animation-duration: 0.001ms !important;
+    }
+}
+</style>
+
+<div class="algo-astar">
+    <section class="algo-astar__hero">
         <h1>A* Pathfinding Algorithm</h1>
-    </div>
+        <p>Click cells to add or remove walls, then run A* to see explored cells and the final shortest path.</p>
+    </section>
 
-    <div class="container">
-        <div class="controls">
-            <button onclick="resetGrid()">Reset Grid</button>
-            <button onclick="findPath()">Find Path</button>
-        </div>
-    </div>
-    <canvas id="gridCanvas" width="400" height="400"></canvas>
+    <section class="algo-astar__controls">
+        <button id="algo-astar-reset" type="button">Reset Grid</button>
+        <button id="algo-astar-find" type="button" data-primary="1">Find Path</button>
+        <button id="algo-astar-cancel" type="button">Cancel</button>
+    </section>
 
-    <script>
-        const canvas = document.getElementById('gridCanvas');
-        const ctx = canvas.getContext('2d');
-        const gridSize = 20;
-        const cellSize = canvas.width / gridSize;
+    <section class="algo-astar__canvas-wrap">
+        <canvas
+            id="algo-astar-canvas"
+            class="algo-astar__canvas"
+            width="600"
+            height="600"
+            aria-label="A star pathfinding grid"
+        ></canvas>
+    </section>
 
-        // Initialize grid
-        let grid = Array(gridSize).fill().map(() => Array(gridSize).fill(0));
-        let start = { x: 0, y: 0 };
-        let end = { x: gridSize - 1, y: gridSize - 1 };
+    <p id="algo-astar-status" class="algo-astar__status" role="status">Ready.</p>
 
-        // Draw grid
-        function drawGrid() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let y = 0; y < gridSize; y++) {
-                for (let x = 0; x < gridSize; x++) {
-                    ctx.strokeRect(x * cellSize, y * cellSize, cellSize, cellSize);
-                    if (grid[y][x] === 1) {
-                        ctx.fillStyle = 'black';
-                        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-                    }
+    <section class="algo-astar__legend" aria-label="Grid legend">
+        <span class="algo-astar__legend-item"><span class="algo-astar__swatch" style="background:#16a34a"></span>Start</span>
+        <span class="algo-astar__legend-item"><span class="algo-astar__swatch" style="background:#dc2626"></span>Goal</span>
+        <span class="algo-astar__legend-item"><span class="algo-astar__swatch" style="background:#facc15"></span>Explored</span>
+        <span class="algo-astar__legend-item"><span class="algo-astar__swatch" style="background:#2563eb"></span>Path</span>
+        <span class="algo-astar__legend-item"><span class="algo-astar__swatch" style="background:#111827"></span>Wall</span>
+    </section>
+
+    <section class="algo-astar__note">
+        <h2>How A* works</h2>
+        <p>A* combines the cost already travelled, g(n), with a heuristic estimate to the goal, h(n). Here the heuristic is Manhattan distance, which is appropriate because movement is limited to up, down, left, and right.</p>
+    </section>
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    var root = document.querySelector(".algo-astar");
+    if (!root) return;
+
+    function q(id) {
+        return root.querySelector("#" + id);
+    }
+
+    var canvas = q("algo-astar-canvas");
+    var ctx = canvas.getContext("2d");
+    var resetButton = q("algo-astar-reset");
+    var findButton = q("algo-astar-find");
+    var cancelButton = q("algo-astar-cancel");
+    var statusDiv = q("algo-astar-status");
+
+    var gridSize = 20;
+    var cellSize = canvas.width / gridSize;
+
+    var grid = [];
+    var start = { x: 0, y: 0 };
+    var end = { x: gridSize - 1, y: gridSize - 1 };
+    var animationToken = 0;
+
+    function cssVar(name, fallback) {
+        var value = getComputedStyle(document.documentElement)
+            .getPropertyValue(name)
+            .trim();
+
+        return value || fallback;
+    }
+
+    function colors() {
+        return {
+            background: cssVar("--global-bg-color", "#ffffff"),
+            text: cssVar("--global-text-color", "#1f2937"),
+            border: cssVar("--global-border-color", "#cbd5e1"),
+            wall: "#111827",
+            start: "#16a34a",
+            end: "#dc2626",
+            explored: "#facc15",
+            path: "#2563eb"
+        };
+    }
+
+    function createEmptyGrid() {
+        grid = Array.from({ length: gridSize }, function () {
+            return Array(gridSize).fill(0);
+        });
+    }
+
+    function isSpecialCell(x, y) {
+        return (
+            (x === start.x && y === start.y) ||
+            (x === end.x && y === end.y)
+        );
+    }
+
+    function drawGrid(explored, path) {
+        explored = explored || [];
+        path = path || [];
+
+        var c = colors();
+        var exploredSet = new Set(explored.map(function (node) {
+            return node.x + "," + node.y;
+        }));
+        var pathSet = new Set(path.map(function (node) {
+            return node.x + "," + node.y;
+        }));
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = c.background;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        for (var y = 0; y < gridSize; y++) {
+            for (var x = 0; x < gridSize; x++) {
+                var key = x + "," + y;
+                var fill = c.background;
+
+                if (grid[y][x] === 1) {
+                    fill = c.wall;
                 }
-            }
-            // Draw start and end
-            ctx.fillStyle = 'green';
-            ctx.fillRect(start.x * cellSize, start.y * cellSize, cellSize, cellSize);
-            ctx.fillStyle = 'red';
-            ctx.fillRect(end.x * cellSize, end.y * cellSize, cellSize, cellSize);
-        }
 
-        // A* Algorithm with animation data
-        function aStar() {
-            let openSet = [{ x: start.x, y: start.y, g: 0, h: heuristic(start), f: 0 }];
-            let closedSet = [];
-            let cameFrom = {};
-            let explored = []; // For animation
-
-            while (openSet.length > 0) {
-                let current = openSet.reduce((min, node) => node.f < min.f ? node : min, openSet[0]);
-
-                if (current.x === end.x && current.y === end.y) {
-                    return { path: reconstructPath(cameFrom, current), explored };
+                if (exploredSet.has(key) && !isSpecialCell(x, y)) {
+                    fill = c.explored;
                 }
 
-                openSet = openSet.filter(node => node !== current);
-                closedSet.push(current);
-                explored.push({ x: current.x, y: current.y });
-
-                let neighbors = getNeighbors(current);
-                for (let neighbor of neighbors) {
-                    if (closedSet.some(node => node.x === neighbor.x && node.y === neighbor.y)) continue;
-
-                    let tentativeG = current.g + 1;
-
-                    let existing = openSet.find(node => node.x === neighbor.x && node.y === neighbor.y);
-                    if (!existing) {
-                        openSet.push(neighbor);
-                    } else if (tentativeG >= existing.g) {
-                        continue;
-                    }
-
-                    cameFrom[`${neighbor.x},${neighbor.y}`] = current;
-                    neighbor.g = tentativeG;
-                    neighbor.h = heuristic(neighbor);
-                    neighbor.f = neighbor.g + neighbor.h;
+                if (pathSet.has(key) && !isSpecialCell(x, y)) {
+                    fill = c.path;
                 }
-            }
-            return { path: [], explored };
-        }
 
-        function heuristic(node) {
-            return Math.abs(node.x - end.x) + Math.abs(node.y - end.y);
-        }
-
-        function getNeighbors(node) {
-            let neighbors = [];
-            let directions = [[0, 1], [1, 0], [0, -1], [-1, 0]];
-            for (let [dx, dy] of directions) {
-                let nx = node.x + dx;
-                let ny = node.y + dy;
-                if (nx >= 0 && nx < gridSize && ny >= 0 && ny < gridSize && grid[ny][nx] !== 1) {
-                    neighbors.push({ x: nx, y: ny, g: 0, h: 0, f: 0 });
+                if (x === start.x && y === start.y) {
+                    fill = c.start;
                 }
-            }
-            return neighbors;
-        }
 
-        function reconstructPath(cameFrom, current) {
-            let path = [{ x: current.x, y: current.y }];
-            while (cameFrom[`${current.x},${current.y}`]) {
-                current = cameFrom[`${current.x},${current.y}`];
-                path.push({ x: current.x, y: current.y });
-            }
-            return path.reverse();
-        }
-
-        function animatePathfinding(explored, path) {
-            let i = 0;
-            function step() {
-                if (i < explored.length) {
-                    drawGrid();
-                    // Draw explored nodes
-                    ctx.fillStyle = 'yellow';
-                    for (let j = 0; j <= i; j++) {
-                        let node = explored[j];
-                        if (node.x === start.x && node.y === start.y || node.x === end.x && node.y === end.y) continue;
-                        ctx.fillRect(node.x * cellSize, node.y * cellSize, cellSize, cellSize);
-                    }
-                    i++;
-                    setTimeout(step, 20); // Animation speed
-                } else {
-                    // Draw final path
-                    drawGrid();
-                    ctx.fillStyle = 'blue';
-                    for (let node of path) {
-                        if (node.x === start.x && node.y === start.y || node.x === end.x && node.y === end.y) continue;
-                        ctx.fillRect(node.x * cellSize, node.y * cellSize, cellSize, cellSize);
-                    }
+                if (x === end.x && y === end.y) {
+                    fill = c.end;
                 }
+
+                ctx.fillStyle = fill;
+                ctx.fillRect(
+                    x * cellSize,
+                    y * cellSize,
+                    cellSize,
+                    cellSize
+                );
+
+                ctx.strokeStyle = c.border;
+                ctx.lineWidth = 1;
+                ctx.strokeRect(
+                    x * cellSize,
+                    y * cellSize,
+                    cellSize,
+                    cellSize
+                );
             }
-            step();
         }
+    }
 
-        function resetGrid() {
-            grid = Array(gridSize).fill().map(() => Array(gridSize).fill(0));
-            // Add some random walls
-            for (let i = 0; i < gridSize * gridSize * 0.2; i++) {
-                let x = Math.floor(Math.random() * gridSize);
-                let y = Math.floor(Math.random() * gridSize);
-                if ((x !== start.x || y !== start.y) && (x !== end.x || y !== end.y)) {
-                    grid[y][x] = 1;
-                }
-            }
-            drawGrid();
-        }
+    function heuristic(node) {
+        return Math.abs(node.x - end.x) + Math.abs(node.y - end.y);
+    }
 
-        function findPath() {
-            let { path, explored } = aStar();
-            animatePathfinding(explored, path);
-        }
+    function key(node) {
+        return node.x + "," + node.y;
+    }
 
-        // Initial draw
-        resetGrid();
+    function getNeighbors(node) {
+        var directions = [
+            [0, 1],
+            [1, 0],
+            [0, -1],
+            [-1, 0]
+        ];
 
-        // Allow clicking to add walls
-        canvas.addEventListener('click', (e) => {
-            let rect = canvas.getBoundingClientRect();
-            let x = Math.floor((e.clientX - rect.left) / cellSize);
-            let y = Math.floor((e.clientY - rect.top) / cellSize);
-            if (x !== start.x || y !== start.y || x !== end.x || y !== end.y) {
-                grid[y][x] = grid[y][x] === 0 ? 1 : 0;
-                drawGrid();
+        var neighbors = [];
+
+        directions.forEach(function (direction) {
+            var nx = node.x + direction[0];
+            var ny = node.y + direction[1];
+
+            if (
+                nx >= 0 &&
+                nx < gridSize &&
+                ny >= 0 &&
+                ny < gridSize &&
+                grid[ny][nx] !== 1
+            ) {
+                neighbors.push({ x: nx, y: ny });
             }
         });
-    </script>
-</body>
 
-</html>
+        return neighbors;
+    }
+
+    function reconstructPath(cameFrom, current) {
+        var path = [{ x: current.x, y: current.y }];
+
+        while (cameFrom[key(current)]) {
+            current = cameFrom[key(current)];
+            path.push({ x: current.x, y: current.y });
+        }
+
+        return path.reverse();
+    }
+
+    function aStar() {
+        var startNode = {
+            x: start.x,
+            y: start.y,
+            g: 0,
+            h: heuristic(start),
+            f: heuristic(start)
+        };
+
+        var openSet = [startNode];
+        var openMap = {};
+        openMap[key(startNode)] = startNode;
+
+        var closed = new Set();
+        var cameFrom = {};
+        var explored = [];
+
+        while (openSet.length > 0) {
+            var bestIndex = 0;
+
+            for (var i = 1; i < openSet.length; i++) {
+                if (openSet[i].f < openSet[bestIndex].f) {
+                    bestIndex = i;
+                }
+            }
+
+            var current = openSet.splice(bestIndex, 1)[0];
+            delete openMap[key(current)];
+
+            if (current.x === end.x && current.y === end.y) {
+                return {
+                    path: reconstructPath(cameFrom, current),
+                    explored: explored
+                };
+            }
+
+            closed.add(key(current));
+            explored.push({ x: current.x, y: current.y });
+
+            var neighbors = getNeighbors(current);
+
+            for (var n = 0; n < neighbors.length; n++) {
+                var neighbor = neighbors[n];
+                var neighborKey = key(neighbor);
+
+                if (closed.has(neighborKey)) {
+                    continue;
+                }
+
+                var tentativeG = current.g + 1;
+                var existing = openMap[neighborKey];
+
+                if (existing && tentativeG >= existing.g) {
+                    continue;
+                }
+
+                var h = heuristic(neighbor);
+                var candidate = {
+                    x: neighbor.x,
+                    y: neighbor.y,
+                    g: tentativeG,
+                    h: h,
+                    f: tentativeG + h
+                };
+
+                cameFrom[neighborKey] = current;
+
+                if (existing) {
+                    existing.g = candidate.g;
+                    existing.h = candidate.h;
+                    existing.f = candidate.f;
+                } else {
+                    openSet.push(candidate);
+                    openMap[neighborKey] = candidate;
+                }
+            }
+        }
+
+        return {
+            path: [],
+            explored: explored
+        };
+    }
+
+    function sleep(ms, token) {
+        return new Promise(function (resolve) {
+            setTimeout(function () {
+                resolve(token === animationToken);
+            }, ms);
+        });
+    }
+
+    async function animateResult(result) {
+        animationToken++;
+        var token = animationToken;
+
+        resetButton.disabled = true;
+        findButton.disabled = true;
+        cancelButton.disabled = false;
+
+        statusDiv.textContent = "Searching...";
+
+        var shown = [];
+
+        for (var i = 0; i < result.explored.length; i++) {
+            if (token !== animationToken) return;
+
+            shown.push(result.explored[i]);
+            drawGrid(shown, []);
+
+            if (!await sleep(18, token)) return;
+        }
+
+        if (result.path.length > 0) {
+            drawGrid(result.explored, result.path);
+            statusDiv.textContent =
+                "Path found. Length: " + (result.path.length - 1) + " steps.";
+        } else {
+            drawGrid(result.explored, []);
+            statusDiv.textContent = "No path exists for the current grid.";
+        }
+
+        resetButton.disabled = false;
+        findButton.disabled = false;
+        cancelButton.disabled = true;
+    }
+
+    function resetGrid() {
+        animationToken++;
+        createEmptyGrid();
+
+        var wallCount = Math.floor(gridSize * gridSize * 0.2);
+
+        for (var i = 0; i < wallCount; i++) {
+            var x = Math.floor(Math.random() * gridSize);
+            var y = Math.floor(Math.random() * gridSize);
+
+            if (!isSpecialCell(x, y)) {
+                grid[y][x] = 1;
+            }
+        }
+
+        resetButton.disabled = false;
+        findButton.disabled = false;
+        cancelButton.disabled = true;
+        statusDiv.textContent = "Grid reset. Click cells to toggle walls.";
+        drawGrid();
+    }
+
+    function findPath() {
+        animationToken++;
+        var result = aStar();
+        animateResult(result);
+    }
+
+    function cancelAnimation() {
+        animationToken++;
+        resetButton.disabled = false;
+        findButton.disabled = false;
+        cancelButton.disabled = true;
+        statusDiv.textContent = "Animation cancelled.";
+        drawGrid();
+    }
+
+    function pointerToCell(event) {
+        var rect = canvas.getBoundingClientRect();
+        var scaleX = canvas.width / rect.width;
+        var scaleY = canvas.height / rect.height;
+
+        var px = (event.clientX - rect.left) * scaleX;
+        var py = (event.clientY - rect.top) * scaleY;
+
+        return {
+            x: Math.floor(px / cellSize),
+            y: Math.floor(py / cellSize)
+        };
+    }
+
+    canvas.addEventListener("pointerdown", function (event) {
+        if (findButton.disabled) return;
+
+        var cell = pointerToCell(event);
+
+        if (
+            cell.x < 0 ||
+            cell.x >= gridSize ||
+            cell.y < 0 ||
+            cell.y >= gridSize ||
+            isSpecialCell(cell.x, cell.y)
+        ) {
+            return;
+        }
+
+        grid[cell.y][cell.x] = grid[cell.y][cell.x] === 0 ? 1 : 0;
+        drawGrid();
+    });
+
+    resetButton.addEventListener("click", resetGrid);
+    findButton.addEventListener("click", findPath);
+    cancelButton.addEventListener("click", cancelAnimation);
+
+    var observer = new MutationObserver(function () {
+        drawGrid();
+    });
+
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["class", "data-theme"]
+    });
+
+    resetGrid();
+})();
+</script>

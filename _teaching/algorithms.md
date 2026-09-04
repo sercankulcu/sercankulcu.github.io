@@ -246,8 +246,8 @@ Branch and bound algorithms are a type of algorithm that solves optimization pro
 
 ## Supplementary Topics
 
- - [Amortized Analysis (HTML)](../files/algorithms/slides/Chapter_01_Amortized_Analysis.html) | 
- - [Bit Manipulation (HTML)](../files/algorithms/slides/Chapter_01_Bit_Manipulation.html) | 
- - [Matrix Algorithms (HTML)](../files/algorithms/slides/Chapter_01_Matrix_Algorithms.html) | 
- - [NP Completeness (HTML)](../files/algorithms/slides/Chapter_01_NP_Completeness.html) | 
+ - [Amortized Analysis (HTML)](../files/algorithms/slides/Chapter_01_Amortized_Analysis.html) 
+ - [Bit Manipulation (HTML)](../files/algorithms/slides/Chapter_01_Bit_Manipulation.html) 
+ - [Matrix Algorithms (HTML)](../files/algorithms/slides/Chapter_01_Matrix_Algorithms.html) 
+ - [NP Completeness (HTML)](../files/algorithms/slides/Chapter_01_NP_Completeness.html) 
  - [Number Theoretic Algorithms (HTML)](../files/algorithms/slides/Chapter_01_Number_Theoretic_Algorithms.html)
