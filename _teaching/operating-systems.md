@@ -75,11 +75,9 @@ No current announcements.
   [final](../files/os/slides/2022-2023-os-final-cevaplar.pdf) | 
   [final (EN)](../files/os/slides/2022-2023-os-final-answers.html)
 
-- **Soru Cevap**  
-  [vize (TR)](../files/os/slides/Bolum_17_Soru_Cevap.pdf) | 
-  [final (TR)](../files/os/slides/Bolum_18_Soru_Cevap.pdf) | 
-  [midterm (EN)](../files/os/slides/os_midterm_mcq.html) | 
-  [final (EN)](../files/os/slides/os_final_mcq.html)
+- **Questions & Answers**  
+  [midterm (HTML)](../files/os/slides/os_midterm_mcq.html) | 
+  [final (HTML)](../files/os/slides/os_final_mcq.html)
 
 ---
 
