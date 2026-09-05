@@ -1,0 +1,350 @@
+---
+layout: without-sidebar
+title: "Multicore Scheduling & Load Balancing Simulator"
+permalink: /files/os/slides/Chapter_12_Multicore_Scheduling.html
+excerpt: "An interactive multicore scheduling simulator comparing shared and per-core queues, processor affinity, and load balancing across multiple CPU cores."
+---
+
+<style>
+.multi-core{
+  --mc-line:var(--global-border-color);
+  --mc-accent:var(--global-link-color);
+  --mc-text:var(--global-text-color);
+  --mc-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
+  --mc-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  max-width:1180px;margin:0 auto;color:var(--mc-text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.multi-core *{box-sizing:border-box}
+.multi-core h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0}
+.multi-core .lead{max-width:920px;color:var(--mc-muted)}
+.multi-core .panel{margin-top:1rem;padding:1rem;border:1px solid var(--mc-line);border-radius:18px;background:var(--global-bg-color)}
+.multi-core .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
+.multi-core label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
+.multi-core select,.multi-core input,.multi-core button{
+  font:inherit;border:1px solid var(--mc-line);border-radius:10px;padding:.62rem .7rem;background:var(--global-bg-color);color:var(--mc-text)
+}
+.multi-core button{cursor:pointer;font-weight:800}
+.multi-core button.primary{background:var(--mc-accent);color:#fff;border-color:var(--mc-accent)}
+.multi-core .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
+.multi-core .cores{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem;margin-top:1rem}
+.multi-core .core{border:1px solid var(--mc-line);border-radius:16px;padding:.9rem;background:var(--mc-soft);min-height:150px}
+.multi-core .core h3{margin:0 0 .55rem}
+.multi-core .task{padding:.45rem .55rem;border:1px solid var(--mc-line);border-radius:9px;background:var(--global-bg-color);margin:.35rem 0;font-size:.84rem}
+.multi-core .task.running{outline:2px solid var(--mc-accent)}
+.multi-core .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.multi-core .metric{padding:.8rem;border:1px solid var(--mc-line);border-radius:14px;background:var(--mc-soft)}
+.multi-core .metric b{display:block;font-size:1.1rem;margin-top:.2rem}
+.multi-core .table-wrap{overflow-x:auto;margin-top:1rem}
+.multi-core table{width:100%;border-collapse:collapse;min-width:760px}
+.multi-core th,.multi-core td{border:1px solid var(--mc-line);padding:.5rem;text-align:center}
+.multi-core th{background:var(--mc-soft)}
+.multi-core td input{width:72px;text-align:center}
+.multi-core .log{margin-top:1rem;max-height:240px;overflow:auto;border:1px solid var(--mc-line);border-radius:12px;padding:.8rem;background:var(--mc-soft);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.85rem}
+.multi-core .note{color:var(--mc-muted);font-size:.88rem}
+@media(max-width:1000px){.multi-core .cores{grid-template-columns:repeat(2,1fr)}.multi-core .controls,.multi-core .metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.multi-core .cores,.multi-core .controls,.multi-core .metrics{grid-template-columns:1fr}}
+</style>
+
+<div class="multi-core">
+  <div>
+    <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--mc-accent)">Operating Systems · Chapter 12</div>
+    <h1>Multicore Scheduling & Load Balancing Simulator</h1>
+    <p class="lead">Explore how tasks are distributed across multiple CPU cores. Compare a global shared queue with per-core queues, and observe the effects of processor affinity and load balancing.</p>
+  </div>
+
+  <section class="panel">
+    <div class="controls">
+      <label>CPU cores
+        <select id="coresCount">
+          <option value="2">2 cores</option>
+          <option value="4" selected>4 cores</option>
+          <option value="8">8 cores</option>
+        </select>
+      </label>
+      <label>Queue model
+        <select id="queueModel">
+          <option value="shared">Shared global queue</option>
+          <option value="percore">Per-core queues</option>
+        </select>
+      </label>
+      <label>Processor affinity
+        <select id="affinityMode">
+          <option value="none">No affinity</option>
+          <option value="soft">Soft affinity</option>
+          <option value="hard">Hard affinity</option>
+        </select>
+      </label>
+      <label>Load balancing
+        <select id="balancing">
+          <option value="on">Enabled</option>
+          <option value="off">Disabled</option>
+        </select>
+      </label>
+    </div>
+    <div class="actions">
+      <button id="addTask">+ Add task</button>
+      <button id="step" class="primary">Run one tick</button>
+      <button id="run10">Run 10 ticks</button>
+      <button id="rebalance">Rebalance now</button>
+      <button id="reset">Reset scenario</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Task Set</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Task</th><th>Work units</th><th>Preferred core</th><th>Remaining</th><th>State</th><th></th></tr></thead>
+        <tbody id="taskBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Core State</h2>
+    <div id="cores" class="cores"></div>
+    <div class="metrics">
+      <div class="metric">Tick<b id="tick">0</b></div>
+      <div class="metric">Completed tasks<b id="completed">0</b></div>
+      <div class="metric">Task migrations<b id="migrations">0</b></div>
+      <div class="metric">Load imbalance<b id="imbalance">0</b></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Scheduler Log</h2>
+    <div id="log" class="log"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Concept Guide</h2>
+    <p><strong>Shared queue:</strong> all idle cores pull work from one global ready queue. Balancing is simple, but the shared queue can become a synchronization bottleneck.</p>
+    <p><strong>Per-core queues:</strong> each core maintains its own ready queue. This improves locality and scalability but may create uneven load.</p>
+    <p><strong>Soft affinity:</strong> the scheduler prefers keeping a task on its previous or preferred core but may migrate it.</p>
+    <p><strong>Hard affinity:</strong> the task is constrained to its preferred core in this simulator.</p>
+    <p><strong>Load balancing:</strong> moves queued tasks from busier cores to less busy ones to reduce imbalance.</p>
+    <p class="note">This is a conceptual scheduler model. Real kernels consider priorities, NUMA topology, cache hierarchy, interrupts, power states, and many other factors.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const root=document.querySelector(".multi-core");
+if(!root)return;
+
+const coresCount=root.querySelector("#coresCount");
+const queueModel=root.querySelector("#queueModel");
+const affinityMode=root.querySelector("#affinityMode");
+const balancing=root.querySelector("#balancing");
+const taskBody=root.querySelector("#taskBody");
+const coresEl=root.querySelector("#cores");
+const logEl=root.querySelector("#log");
+
+let tasks=[],tick=0,migrations=0,nextId=1,lastCore=new Map();
+
+function defaultTasks(){
+  return [
+    {id:"T1",work:6,remaining:6,pref:0,state:"ready",core:null},
+    {id:"T2",work:4,remaining:4,pref:1,state:"ready",core:null},
+    {id:"T3",work:8,remaining:8,pref:2,state:"ready",core:null},
+    {id:"T4",work:3,remaining:3,pref:0,state:"ready",core:null},
+    {id:"T5",work:5,remaining:5,pref:3,state:"ready",core:null}
+  ];
+}
+
+function addLog(msg){
+  const d=document.createElement("div");
+  d.textContent="["+tick+"] "+msg;
+  logEl.appendChild(d);
+  logEl.scrollTop=logEl.scrollHeight;
+}
+
+function reset(){
+  tasks=defaultTasks();
+  tick=0;migrations=0;nextId=6;lastCore.clear();logEl.innerHTML="";
+  normalizePrefs();
+  render();
+}
+
+function normalizePrefs(){
+  const n=+coresCount.value;
+  tasks.forEach(t=>{t.pref=Math.min(t.pref,n-1);});
+}
+
+function rowFor(t){
+  const tr=document.createElement("tr");
+  tr.innerHTML=`<td><strong>${t.id}</strong></td>
+    <td><input class="work" type="number" min="1" value="${t.work}"></td>
+    <td><input class="pref" type="number" min="0" max="${+coresCount.value-1}" value="${t.pref}"></td>
+    <td class="remaining">${t.remaining}</td>
+    <td class="state">${t.state}</td>
+    <td><button type="button">×</button></td>`;
+  tr.querySelector(".work").addEventListener("change",e=>{
+    t.work=Math.max(1,+e.target.value||1);
+    if(t.state!=="done")t.remaining=t.work;
+    render();
+  });
+  tr.querySelector(".pref").addEventListener("change",e=>{
+    t.pref=Math.max(0,Math.min(+coresCount.value-1,+e.target.value||0));
+    e.target.value=t.pref;
+  });
+  tr.querySelector("button").addEventListener("click",()=>{
+    tasks=tasks.filter(x=>x!==t);render();
+  });
+  return tr;
+}
+
+function chooseShared(core,ready){
+  if(!ready.length)return null;
+  const mode=affinityMode.value;
+  if(mode==="hard"){
+    return ready.find(t=>t.pref===core) || null;
+  }
+  if(mode==="soft"){
+    const exact=ready.find(t=>t.pref===core || lastCore.get(t.id)===core);
+    if(exact)return exact;
+  }
+  return ready[0];
+}
+
+function buildQueues(){
+  const n=+coresCount.value;
+  const queues=Array.from({length:n},()=>[]);
+  const ready=tasks.filter(t=>t.state==="ready"&&t.remaining>0);
+
+  if(queueModel.value==="shared"){
+    queues[0]=[...ready];
+    return queues;
+  }
+
+  ready.forEach(t=>{
+    let c=t.pref%n;
+    if(affinityMode.value==="soft"&&lastCore.has(t.id))c=lastCore.get(t.id)%n;
+    queues[c].push(t);
+  });
+
+  if(balancing.value==="on"){
+    balanceQueues(queues);
+  }
+  return queues;
+}
+
+function balanceQueues(queues){
+  let changed=true;
+  while(changed){
+    changed=false;
+    let maxI=0,minI=0;
+    for(let i=1;i<queues.length;i++){
+      if(queues[i].length>queues[maxI].length)maxI=i;
+      if(queues[i].length<queues[minI].length)minI=i;
+    }
+    if(queues[maxI].length-queues[minI].length>1){
+      const idx=queues[maxI].findIndex(t=>affinityMode.value!=="hard" || t.pref===minI);
+      if(idx>=0){
+        const [t]=queues[maxI].splice(idx,1);
+        queues[minI].push(t);migrations++;
+        addLog(`${t.id} migrated from Core ${maxI} to Core ${minI} for load balancing.`);
+        changed=true;
+      }
+    }
+  }
+}
+
+function runTick(){
+  const n=+coresCount.value;
+  tick++;
+  tasks.forEach(t=>{if(t.state==="running")t.state="ready";});
+
+  if(queueModel.value==="shared"){
+    const ready=tasks.filter(t=>t.state==="ready"&&t.remaining>0);
+    const selected=new Set();
+    for(let c=0;c<n;c++){
+      const available=ready.filter(t=>!selected.has(t));
+      const t=chooseShared(c,available);
+      if(!t)continue;
+      selected.add(t);
+      if(lastCore.has(t.id)&&lastCore.get(t.id)!==c)migrations++;
+      lastCore.set(t.id,c);
+      t.core=c;t.state="running";t.remaining--;
+      addLog(`${t.id} runs on Core ${c}. Remaining work: ${t.remaining}.`);
+      if(t.remaining<=0){t.state="done";t.core=null;addLog(`${t.id} completed.`);}
+    }
+  }else{
+    const queues=buildQueues();
+    for(let c=0;c<n;c++){
+      const q=queues[c];
+      let t=q[0];
+      if(!t)continue;
+      if(affinityMode.value==="hard"&&t.pref!==c)continue;
+      if(lastCore.has(t.id)&&lastCore.get(t.id)!==c)migrations++;
+      lastCore.set(t.id,c);
+      t.core=c;t.state="running";t.remaining--;
+      addLog(`${t.id} runs from Core ${c}'s queue. Remaining work: ${t.remaining}.`);
+      if(t.remaining<=0){t.state="done";t.core=null;addLog(`${t.id} completed.`);}
+    }
+  }
+
+  render();
+}
+
+function manualRebalance(){
+  if(queueModel.value!=="percore"){addLog("Manual rebalance applies only to per-core queues.");return;}
+  const q=buildQueues();
+  balanceQueues(q);
+  addLog("Manual load-balance pass completed.");
+  render();
+}
+
+function render(){
+  taskBody.innerHTML="";
+  tasks.forEach(t=>taskBody.appendChild(rowFor(t)));
+
+  const n=+coresCount.value;
+  const queues=buildQueues();
+  coresEl.innerHTML="";
+  for(let c=0;c<n;c++){
+    const d=document.createElement("div");
+    d.className="core";
+    let html=`<h3>Core ${c}</h3>`;
+    const running=tasks.find(t=>t.state==="running"&&lastCore.get(t.id)===c);
+    if(running)html+=`<div class="task running">${running.id} · running · ${running.remaining} left</div>`;
+    if(queueModel.value==="shared"){
+      if(c===0)html+=`<div class="task">Global queue: ${tasks.filter(t=>t.state==="ready"&&t.remaining>0).map(t=>t.id).join(", ")||"empty"}</div>`;
+      else html+=`<div class="task">Pulls from global queue</div>`;
+    }else{
+      const q=queues[c].filter(t=>t.state==="ready");
+      html+=q.length?q.map(t=>`<div class="task">${t.id} · ${t.remaining} left</div>`).join(""):`<div class="task">Queue empty</div>`;
+    }
+    d.innerHTML=html;coresEl.appendChild(d);
+  }
+
+  const loads=Array.from({length:n},(_,c)=>{
+    if(queueModel.value==="shared")return tasks.filter(t=>t.state==="ready"&&t.remaining>0).length/n;
+    return queues[c].filter(t=>t.state==="ready").length;
+  });
+  const imbalance=loads.length?Math.max(...loads)-Math.min(...loads):0;
+  root.querySelector("#tick").textContent=tick;
+  root.querySelector("#completed").textContent=tasks.filter(t=>t.state==="done").length;
+  root.querySelector("#migrations").textContent=migrations;
+  root.querySelector("#imbalance").textContent=Number(imbalance.toFixed(2));
+}
+
+root.querySelector("#addTask").addEventListener("click",()=>{
+  const n=+coresCount.value;
+  tasks.push({id:"T"+nextId++,work:4,remaining:4,pref:(nextId-2)%n,state:"ready",core:null});
+  render();
+});
+root.querySelector("#step").addEventListener("click",runTick);
+root.querySelector("#run10").addEventListener("click",()=>{for(let i=0;i<10;i++)runTick();});
+root.querySelector("#rebalance").addEventListener("click",manualRebalance);
+root.querySelector("#reset").addEventListener("click",reset);
+coresCount.addEventListener("change",()=>{normalizePrefs();render();});
+queueModel.addEventListener("change",render);
+affinityMode.addEventListener("change",render);
+balancing.addEventListener("change",render);
+
+reset();
+})();
+</script>

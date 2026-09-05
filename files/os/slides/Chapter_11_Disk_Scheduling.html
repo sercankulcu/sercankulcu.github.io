@@ -1,0 +1,316 @@
+---
+layout: without-sidebar
+title: "Disk Scheduling Simulator"
+permalink: /files/os/slides/Chapter_11_Disk_Scheduling.html
+excerpt: "An interactive disk scheduling simulator for FCFS, SSTF, SCAN, C-SCAN, LOOK, and C-LOOK with request ordering and total head movement."
+---
+
+<style>
+.disk-sim{
+  --ds-line:var(--global-border-color);
+  --ds-accent:var(--global-link-color);
+  --ds-text:var(--global-text-color);
+  --ds-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
+  --ds-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  max-width:1180px;margin:0 auto;color:var(--ds-text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.disk-sim *{box-sizing:border-box}
+.disk-sim h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0}
+.disk-sim .lead{max-width:900px;color:var(--ds-muted)}
+.disk-sim .panel{margin-top:1rem;padding:1rem;border:1px solid var(--ds-line);border-radius:18px;background:var(--global-bg-color)}
+.disk-sim .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
+.disk-sim label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
+.disk-sim input,.disk-sim select,.disk-sim button{
+  font:inherit;border:1px solid var(--ds-line);border-radius:10px;padding:.62rem .7rem;background:var(--global-bg-color);color:var(--ds-text)
+}
+.disk-sim button{cursor:pointer;font-weight:800}
+.disk-sim button.primary{background:var(--ds-accent);color:#fff;border-color:var(--ds-accent)}
+.disk-sim .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
+.disk-sim .metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.disk-sim .metric{padding:.85rem;border:1px solid var(--ds-line);border-radius:14px;background:var(--ds-soft)}
+.disk-sim .metric b{display:block;font-size:1.15rem;margin-top:.2rem}
+.disk-sim .path{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:1rem}
+.disk-sim .hop{padding:.45rem .65rem;border:1px solid var(--ds-line);border-radius:999px;background:var(--ds-soft);font-weight:800}
+.disk-sim .chart{position:relative;margin-top:1rem;padding:1rem .4rem .4rem;border:1px solid var(--ds-line);border-radius:14px;overflow-x:auto}
+.disk-sim svg{min-width:760px;width:100%;height:320px;display:block}
+.disk-sim .compare{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.65rem;margin-top:1rem}
+.disk-sim .compare-card{padding:.75rem;border:1px solid var(--ds-line);border-radius:14px;background:var(--ds-soft);text-align:center}
+.disk-sim .compare-card b{display:block;font-size:1.1rem;margin-top:.2rem}
+.disk-sim .note{color:var(--ds-muted);font-size:.88rem}
+@media(max-width:900px){.disk-sim .controls,.disk-sim .compare{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.disk-sim .controls,.disk-sim .metrics,.disk-sim .compare{grid-template-columns:1fr}}
+</style>
+
+<div class="disk-sim">
+  <div>
+    <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--ds-accent)">Operating Systems · Chapter 11</div>
+    <h1>Disk Scheduling Simulator</h1>
+    <p class="lead">Compare how different disk scheduling policies order cylinder requests and how much total head movement each policy requires.</p>
+  </div>
+
+  <section class="panel">
+    <div class="controls">
+      <label>Algorithm
+        <select id="algorithm">
+          <option value="fcfs">FCFS</option>
+          <option value="sstf">SSTF</option>
+          <option value="scan">SCAN</option>
+          <option value="cscan">C-SCAN</option>
+          <option value="look">LOOK</option>
+          <option value="clook">C-LOOK</option>
+        </select>
+      </label>
+      <label>Initial head
+        <input id="head" type="number" min="0" value="53">
+      </label>
+      <label>Max cylinder
+        <input id="maxCylinder" type="number" min="10" value="199">
+      </label>
+      <label>Direction
+        <select id="direction">
+          <option value="right">Toward higher cylinders</option>
+          <option value="left">Toward lower cylinders</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="controls" style="margin-top:.8rem">
+      <label style="grid-column:1/-1">Request queue
+        <input id="requests" value="98 183 37 122 14 124 65 67">
+      </label>
+    </div>
+
+    <div class="actions">
+      <button id="run" class="primary">Run simulation</button>
+      <button id="classic">Load classic example</button>
+      <button id="random">Random requests</button>
+      <button id="compareAll">Compare all</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Result</h2>
+    <div class="metrics">
+      <div class="metric">Total head movement<b id="movement">–</b></div>
+      <div class="metric">Requests served<b id="served">–</b></div>
+      <div class="metric">Average seek distance<b id="average">–</b></div>
+    </div>
+    <div id="path" class="path"></div>
+    <div class="chart"><svg id="svg" viewBox="0 0 1000 320" preserveAspectRatio="none"></svg></div>
+  </section>
+
+  <section class="panel">
+    <h2>Algorithm Comparison</h2>
+    <div id="compare" class="compare"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Algorithm Guide</h2>
+    <p><strong>FCFS:</strong> serves requests in arrival order.</p>
+    <p><strong>SSTF:</strong> serves the pending request closest to the current head position.</p>
+    <p><strong>SCAN:</strong> moves like an elevator to one end of the disk, then reverses direction.</p>
+    <p><strong>C-SCAN:</strong> serves in one direction only; after reaching one end, it jumps to the other end.</p>
+    <p><strong>LOOK:</strong> like SCAN, but reverses at the last request rather than the physical disk boundary.</p>
+    <p><strong>C-LOOK:</strong> like C-SCAN, but jumps between the last request on one side and the first request on the other side.</p>
+    <p class="note">For SCAN and C-SCAN, travel to physical disk boundaries is counted as head movement. For LOOK and C-LOOK, only requested cylinders define the turning/jump points.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const root=document.querySelector(".disk-sim");
+if(!root)return;
+
+const alg=root.querySelector("#algorithm");
+const headInput=root.querySelector("#head");
+const maxInput=root.querySelector("#maxCylinder");
+const dirInput=root.querySelector("#direction");
+const requestsInput=root.querySelector("#requests");
+const pathEl=root.querySelector("#path");
+const svg=root.querySelector("#svg");
+const compare=root.querySelector("#compare");
+
+function parse(){
+  const max=+maxInput.value,head=+headInput.value;
+  if(!Number.isInteger(max)||max<1)throw new Error("Max cylinder must be a positive integer.");
+  if(!Number.isInteger(head)||head<0||head>max)throw new Error("Initial head must be within the disk range.");
+  const req=requestsInput.value.trim().split(/[\s,]+/).filter(Boolean).map(Number);
+  if(!req.length)throw new Error("Enter at least one request.");
+  if(req.some(x=>!Number.isInteger(x)||x<0||x>max))throw new Error(`Every request must be an integer between 0 and ${max}.`);
+  return {max,head,req,dir:dirInput.value};
+}
+
+function fcfs(head,req){return [head,...req];}
+
+function sstf(head,req){
+  const pending=[...req],order=[head];let cur=head;
+  while(pending.length){
+    let best=0;
+    for(let i=1;i<pending.length;i++){
+      if(Math.abs(pending[i]-cur)<Math.abs(pending[best]-cur))best=i;
+    }
+    cur=pending.splice(best,1)[0];
+    order.push(cur);
+  }
+  return order;
+}
+
+function sides(req,head){
+  return {
+    left:req.filter(x=>x<head).sort((a,b)=>a-b),
+    equal:req.filter(x=>x===head),
+    right:req.filter(x=>x>head).sort((a,b)=>a-b)
+  };
+}
+
+function scan(head,req,max,dir){
+  const s=sides(req,head),order=[head,...s.equal];
+  if(dir==="right"){
+    order.push(...s.right);
+    if(order[order.length-1]!==max)order.push(max);
+    order.push(...[...s.left].reverse());
+  }else{
+    order.push(...[...s.left].reverse());
+    if(order[order.length-1]!==0)order.push(0);
+    order.push(...s.right);
+  }
+  return order;
+}
+
+function cscan(head,req,max,dir){
+  const s=sides(req,head),order=[head,...s.equal];
+  if(dir==="right"){
+    order.push(...s.right);
+    if(order[order.length-1]!==max)order.push(max);
+    if(s.left.length){order.push(0);order.push(...s.left);}
+  }else{
+    order.push(...[...s.left].reverse());
+    if(order[order.length-1]!==0)order.push(0);
+    if(s.right.length){order.push(max);order.push(...[...s.right].reverse());}
+  }
+  return order;
+}
+
+function look(head,req,dir){
+  const s=sides(req,head),order=[head,...s.equal];
+  if(dir==="right")order.push(...s.right,...[...s.left].reverse());
+  else order.push(...[...s.left].reverse(),...s.right);
+  return order;
+}
+
+function clook(head,req,dir){
+  const s=sides(req,head),order=[head,...s.equal];
+  if(dir==="right"){
+    order.push(...s.right);
+    if(s.left.length)order.push(...s.left);
+  }else{
+    order.push(...[...s.left].reverse());
+    if(s.right.length)order.push(...[...s.right].reverse());
+  }
+  return order;
+}
+
+function schedule(mode,data){
+  const {head,req,max,dir}=data;
+  return {
+    fcfs:()=>fcfs(head,req),
+    sstf:()=>sstf(head,req),
+    scan:()=>scan(head,req,max,dir),
+    cscan:()=>cscan(head,req,max,dir),
+    look:()=>look(head,req,dir),
+    clook:()=>clook(head,req,dir)
+  }[mode]();
+}
+
+function movement(order){
+  let sum=0;
+  for(let i=1;i<order.length;i++)sum+=Math.abs(order[i]-order[i-1]);
+  return sum;
+}
+
+function renderChart(order,max){
+  svg.innerHTML="";
+  const w=1000,h=320,padX=45,padY=30;
+  const steps=Math.max(1,order.length-1);
+
+  for(let i=0;i<=4;i++){
+    const x=padX+(w-2*padX)*(i/4);
+    const value=Math.round(max*(i/4));
+    const line=document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute("x1",x);line.setAttribute("x2",x);line.setAttribute("y1",padY);line.setAttribute("y2",h-padY);
+    line.setAttribute("stroke","currentColor");line.setAttribute("opacity",".15");
+    svg.appendChild(line);
+    const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+    t.setAttribute("x",x);t.setAttribute("y",18);t.setAttribute("text-anchor","middle");t.setAttribute("fill","currentColor");
+    t.textContent=value;svg.appendChild(t);
+  }
+
+  const pts=order.map((c,i)=>{
+    const x=padX+(w-2*padX)*(c/max);
+    const y=padY+(h-2*padY)*(i/steps);
+    return [x,y];
+  });
+
+  const poly=document.createElementNS("http://www.w3.org/2000/svg","polyline");
+  poly.setAttribute("points",pts.map(p=>p.join(",")).join(" "));
+  poly.setAttribute("fill","none");poly.setAttribute("stroke","currentColor");poly.setAttribute("stroke-width","3");
+  svg.appendChild(poly);
+
+  pts.forEach((p,i)=>{
+    const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",p[0]);c.setAttribute("cy",p[1]);c.setAttribute("r","5");c.setAttribute("fill","currentColor");
+    svg.appendChild(c);
+  });
+}
+
+function render(mode){
+  try{
+    const data=parse(),order=schedule(mode,data),move=movement(order);
+    root.querySelector("#movement").textContent=move;
+    root.querySelector("#served").textContent=data.req.length;
+    root.querySelector("#average").textContent=(move/data.req.length).toFixed(2);
+
+    pathEl.innerHTML="";
+    order.forEach((x,i)=>{
+      const d=document.createElement("span");
+      d.className="hop";
+      d.textContent=(i===0?"Start ":"")+x;
+      pathEl.appendChild(d);
+    });
+
+    renderChart(order,data.max);
+  }catch(e){alert(e.message);}
+}
+
+function compareAll(){
+  try{
+    const data=parse();
+    compare.innerHTML="";
+    [["fcfs","FCFS"],["sstf","SSTF"],["scan","SCAN"],["cscan","C-SCAN"],["look","LOOK"],["clook","C-LOOK"]].forEach(([mode,label])=>{
+      const m=movement(schedule(mode,data));
+      const d=document.createElement("div");
+      d.className="compare-card";
+      d.innerHTML=`${label}<b>${m}</b><span>cylinders</span>`;
+      compare.appendChild(d);
+    });
+  }catch(e){alert(e.message);}
+}
+
+root.querySelector("#run").addEventListener("click",()=>render(alg.value));
+root.querySelector("#compareAll").addEventListener("click",compareAll);
+root.querySelector("#classic").addEventListener("click",()=>{
+  headInput.value=53;maxInput.value=199;dirInput.value="right";requestsInput.value="98 183 37 122 14 124 65 67";
+  render(alg.value);compareAll();
+});
+root.querySelector("#random").addEventListener("click",()=>{
+  const max=+maxInput.value||199;
+  requestsInput.value=Array.from({length:8},()=>Math.floor(Math.random()*(max+1))).join(" ");
+  render(alg.value);compareAll();
+});
+
+render("fcfs");
+compareAll();
+})();
+</script>

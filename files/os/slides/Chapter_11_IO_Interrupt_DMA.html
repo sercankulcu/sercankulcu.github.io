@@ -1,0 +1,232 @@
+---
+layout: without-sidebar
+title: "Interrupt, DMA & I/O Flow Visualizer"
+permalink: /files/os/slides/Chapter_11_IO_Interrupt_DMA.html
+excerpt: "An interactive visualizer comparing polling, interrupt-driven I/O, and DMA across CPU, device controller, memory, and device."
+---
+
+<style>
+.io-viz{
+  --io-line:var(--global-border-color);
+  --io-accent:var(--global-link-color);
+  --io-text:var(--global-text-color);
+  --io-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
+  --io-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  max-width:1180px;margin:0 auto;color:var(--io-text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.io-viz *{box-sizing:border-box}
+.io-viz h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0}
+.io-viz .lead{max-width:900px;color:var(--io-muted)}
+.io-viz .panel{margin-top:1rem;padding:1rem;border:1px solid var(--io-line);border-radius:18px;background:var(--global-bg-color)}
+.io-viz .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
+.io-viz label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
+.io-viz input,.io-viz select,.io-viz button{
+  font:inherit;border:1px solid var(--io-line);border-radius:10px;padding:.62rem .7rem;background:var(--global-bg-color);color:var(--io-text)
+}
+.io-viz button{cursor:pointer;font-weight:800}
+.io-viz button.primary{background:var(--io-accent);color:#fff;border-color:var(--io-accent)}
+.io-viz .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
+.io-viz .flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem;margin-top:1rem}
+.io-viz .node{padding:1rem;border:1px solid var(--io-line);border-radius:16px;background:var(--io-soft);text-align:center;min-height:120px;display:flex;flex-direction:column;justify-content:center}
+.io-viz .node.active{outline:3px solid var(--io-accent)}
+.io-viz .node strong{font-size:1.1rem}
+.io-viz .node span{color:var(--io-muted);font-size:.86rem;margin-top:.3rem}
+.io-viz .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.io-viz .metric{padding:.8rem;border:1px solid var(--io-line);border-radius:14px;background:var(--io-soft)}
+.io-viz .metric b{display:block;font-size:1.1rem;margin-top:.2rem}
+.io-viz .log{margin-top:1rem;max-height:280px;overflow:auto;border:1px solid var(--io-line);border-radius:12px;padding:.8rem;background:var(--io-soft);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86rem}
+.io-viz .timeline{display:grid;gap:.6rem;margin-top:1rem}
+.io-viz .event{padding:.7rem;border:1px solid var(--io-line);border-radius:12px}
+.io-viz .event.done{background:var(--io-soft)}
+.io-viz .note{color:var(--io-muted);font-size:.88rem}
+@media(max-width:900px){.io-viz .controls,.io-viz .flow,.io-viz .metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.io-viz .controls,.io-viz .flow,.io-viz .metrics{grid-template-columns:1fr}}
+</style>
+
+<div class="io-viz">
+  <div>
+    <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--io-accent)">Operating Systems · Chapter 11</div>
+    <h1>Interrupt, DMA & I/O Flow Visualizer</h1>
+    <p class="lead">Compare how polling, interrupt-driven I/O, and DMA move data while consuming different amounts of CPU attention.</p>
+  </div>
+
+  <section class="panel">
+    <div class="controls">
+      <label>I/O method
+        <select id="method">
+          <option value="polling">Polling</option>
+          <option value="interrupt">Interrupt-driven I/O</option>
+          <option value="dma">DMA</option>
+        </select>
+      </label>
+      <label>Transfer size
+        <input id="size" type="number" min="1" max="64" value="8">
+      </label>
+      <label>Device latency
+        <select id="latency">
+          <option value="1">Low</option>
+          <option value="2" selected>Medium</option>
+          <option value="4">High</option>
+        </select>
+      </label>
+      <label>Direction
+        <select id="direction">
+          <option value="read">Device → Memory</option>
+          <option value="write">Memory → Device</option>
+        </select>
+      </label>
+    </div>
+    <div class="actions">
+      <button id="reset">Reset</button>
+      <button id="step" class="primary">Next step</button>
+      <button id="runAll">Run all</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>System Components</h2>
+    <div class="flow">
+      <div id="cpu" class="node"><strong>CPU</strong><span>issues commands, handles interrupts, may copy data</span></div>
+      <div id="controller" class="node"><strong>Device Controller</strong><span>mediates access to the hardware device</span></div>
+      <div id="memory" class="node"><strong>Main Memory</strong><span>source or destination of transferred data</span></div>
+      <div id="device" class="node"><strong>I/O Device</strong><span>disk, NIC, keyboard, sensor, etc.</span></div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric">Step<b id="stepNo">0</b></div>
+      <div class="metric">CPU busy units<b id="cpuBusy">0</b></div>
+      <div class="metric">Data moved<b id="moved">0</b></div>
+      <div class="metric">Interrupts<b id="interrupts">0</b></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Flow Timeline</h2>
+    <div id="timeline" class="timeline"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Event Log</h2>
+    <div id="log" class="log"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Concept Guide</h2>
+    <p><strong>Polling:</strong> the CPU repeatedly checks device status. Simple, but wastes CPU cycles while the device is not ready.</p>
+    <p><strong>Interrupt-driven I/O:</strong> the CPU starts the operation and continues other work. The controller interrupts the CPU when service is required.</p>
+    <p><strong>DMA:</strong> the CPU configures a DMA transfer, then a controller moves blocks directly between memory and the device. The CPU is usually interrupted only when the transfer completes.</p>
+    <p class="note">This is a conceptual simulator rather than a cycle-accurate hardware model. Its purpose is to make control flow and CPU involvement visible.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const root=document.querySelector(".io-viz");
+if(!root)return;
+
+const method=root.querySelector("#method");
+const sizeInput=root.querySelector("#size");
+const latencyInput=root.querySelector("#latency");
+const dirInput=root.querySelector("#direction");
+const timeline=root.querySelector("#timeline");
+const log=root.querySelector("#log");
+
+let state;
+
+function makeEvents(){
+  const size=Math.max(1,+sizeInput.value||1);
+  const latency=Math.max(1,+latencyInput.value||1);
+  const dir=dirInput.value;
+  const source=dir==="read"?"device":"memory";
+  const target=dir==="read"?"memory":"device";
+
+  if(method.value==="polling"){
+    const e=[
+      {who:["cpu","controller"],text:"CPU writes the I/O command to the device controller.",cpu:1,moved:0,int:0},
+    ];
+    for(let i=0;i<latency;i++)e.push({who:["cpu","controller"],text:"CPU polls the controller status register and finds the device not ready.",cpu:1,moved:0,int:0});
+    e.push({who:["cpu","controller","device"],text:"Controller reports the device is ready.",cpu:1,moved:0,int:0});
+    for(let i=0;i<size;i++)e.push({who:["cpu","controller",source,target],text:`CPU copies data unit ${i+1} from ${source} to ${target} through the controller.`,cpu:1,moved:1,int:0});
+    e.push({who:["cpu"],text:"CPU completes the I/O operation.",cpu:1,moved:0,int:0});
+    return e;
+  }
+
+  if(method.value==="interrupt"){
+    const e=[
+      {who:["cpu","controller"],text:"CPU starts the I/O operation and then continues with other work.",cpu:1,moved:0,int:0},
+    ];
+    for(let i=0;i<latency;i++)e.push({who:["controller","device"],text:"Device works independently while the CPU is free.",cpu:0,moved:0,int:0});
+    e.push({who:["controller","cpu"],text:"Controller raises an interrupt to request CPU service.",cpu:1,moved:0,int:1});
+    for(let i=0;i<size;i++)e.push({who:["cpu","controller",source,target],text:`Interrupt handler transfers data unit ${i+1} from ${source} to ${target}.`,cpu:1,moved:1,int:0});
+    e.push({who:["cpu"],text:"CPU finishes the interrupt handler and resumes previous work.",cpu:1,moved:0,int:0});
+    return e;
+  }
+
+  const e=[
+    {who:["cpu","controller","memory"],text:"CPU configures DMA source, destination, size, and direction.",cpu:1,moved:0,int:0},
+  ];
+  for(let i=0;i<latency;i++)e.push({who:["controller","device"],text:"DMA-capable controller waits for or services the device while CPU continues other work.",cpu:0,moved:0,int:0});
+  for(let i=0;i<size;i++)e.push({who:["controller",source,target],text:`DMA transfers data unit ${i+1} directly between ${source} and ${target}.`,cpu:0,moved:1,int:0});
+  e.push({who:["controller","cpu"],text:"DMA controller interrupts the CPU after block transfer completion.",cpu:1,moved:0,int:1});
+  e.push({who:["cpu"],text:"CPU acknowledges completion and continues execution.",cpu:1,moved:0,int:0});
+  return e;
+}
+
+function reset(){
+  state={events:makeEvents(),index:0,cpuBusy:0,moved:0,interrupts:0};
+  timeline.innerHTML="";
+  log.innerHTML="";
+  state.events.forEach((ev,i)=>{
+    const d=document.createElement("div");
+    d.className="event";
+    d.textContent=`${i+1}. ${ev.text}`;
+    timeline.appendChild(d);
+  });
+  update();
+}
+
+function clearActive(){
+  ["cpu","controller","memory","device"].forEach(id=>root.querySelector("#"+id).classList.remove("active"));
+}
+
+function addLog(text){
+  const d=document.createElement("div");
+  d.textContent="["+state.index+"] "+text;
+  log.appendChild(d);
+  log.scrollTop=log.scrollHeight;
+}
+
+function step(){
+  if(state.index>=state.events.length)return;
+  const ev=state.events[state.index];
+  clearActive();
+  ev.who.forEach(id=>root.querySelector("#"+id)?.classList.add("active"));
+  state.cpuBusy+=ev.cpu;
+  state.moved+=ev.moved;
+  state.interrupts+=ev.int;
+  timeline.children[state.index].classList.add("done");
+  state.index++;
+  addLog(ev.text);
+  update();
+}
+
+function update(){
+  root.querySelector("#stepNo").textContent=state.index;
+  root.querySelector("#cpuBusy").textContent=state.cpuBusy;
+  root.querySelector("#moved").textContent=state.moved;
+  root.querySelector("#interrupts").textContent=state.interrupts;
+}
+
+method.addEventListener("change",reset);
+sizeInput.addEventListener("change",reset);
+latencyInput.addEventListener("change",reset);
+dirInput.addEventListener("change",reset);
+root.querySelector("#reset").addEventListener("click",reset);
+root.querySelector("#step").addEventListener("click",step);
+root.querySelector("#runAll").addEventListener("click",()=>{while(state.index<state.events.length)step();});
+
+reset();
+})();
+</script>

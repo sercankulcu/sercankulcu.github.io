@@ -1,0 +1,304 @@
+---
+layout: without-sidebar
+title: "Real-Time Scheduling Simulator"
+permalink: /files/os/slides/Chapter_15_Real_Time_Scheduling.html
+excerpt: "An interactive real-time scheduling simulator for Rate Monotonic and Earliest Deadline First with utilization, deadlines, releases, and deadline-miss visualization."
+---
+
+<style>
+.rtos-sim{
+  --rt-line:var(--global-border-color);
+  --rt-accent:var(--global-link-color);
+  --rt-text:var(--global-text-color);
+  --rt-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
+  --rt-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  max-width:1180px;margin:0 auto;color:var(--rt-text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.rtos-sim *{box-sizing:border-box}
+.rtos-sim h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0}
+.rtos-sim .lead{max-width:920px;color:var(--rt-muted)}
+.rtos-sim .panel{margin-top:1rem;padding:1rem;border:1px solid var(--rt-line);border-radius:18px;background:var(--global-bg-color)}
+.rtos-sim .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
+.rtos-sim label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
+.rtos-sim input,.rtos-sim select,.rtos-sim button{
+  font:inherit;border:1px solid var(--rt-line);border-radius:10px;padding:.62rem .7rem;background:var(--global-bg-color);color:var(--rt-text)
+}
+.rtos-sim button{cursor:pointer;font-weight:800}
+.rtos-sim button.primary{background:var(--rt-accent);color:#fff;border-color:var(--rt-accent)}
+.rtos-sim .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
+.rtos-sim .table-wrap{overflow-x:auto;margin-top:1rem}
+.rtos-sim table{width:100%;border-collapse:collapse;min-width:760px}
+.rtos-sim th,.rtos-sim td{border:1px solid var(--rt-line);padding:.5rem;text-align:center}
+.rtos-sim th{background:var(--rt-soft)}
+.rtos-sim td input{width:78px;text-align:center}
+.rtos-sim .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.rtos-sim .metric{padding:.8rem;border:1px solid var(--rt-line);border-radius:14px;background:var(--rt-soft)}
+.rtos-sim .metric b{display:block;font-size:1.1rem;margin-top:.2rem}
+.rtos-sim .timeline{overflow-x:auto;margin-top:1rem}
+.rtos-sim .timeline-grid{display:grid;grid-auto-flow:column;grid-auto-columns:42px;gap:2px;min-width:max-content}
+.rtos-sim .slot{height:44px;border:1px solid var(--rt-line);display:flex;align-items:center;justify-content:center;font-size:.78rem;background:var(--global-bg-color)}
+.rtos-sim .slot.run{background:var(--rt-soft);font-weight:900}
+.rtos-sim .slot.miss{outline:2px solid #b42318}
+.rtos-sim .time-row .slot{height:30px;color:var(--rt-muted)}
+.rtos-sim .status{padding:.85rem;border:1px solid var(--rt-line);border-radius:14px;background:var(--rt-soft);margin-top:1rem}
+.rtos-sim .status.good{border-left:5px solid #0f8a6a}
+.rtos-sim .status.bad{border-left:5px solid #b42318}
+.rtos-sim .note{color:var(--rt-muted);font-size:.88rem}
+@media(max-width:900px){.rtos-sim .controls,.rtos-sim .metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.rtos-sim .controls,.rtos-sim .metrics{grid-template-columns:1fr}}
+</style>
+
+<div class="rtos-sim">
+  <div>
+    <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--rt-accent)">Operating Systems · Chapter 15</div>
+    <h1>Real-Time Scheduling Simulator</h1>
+    <p class="lead">Compare fixed-priority Rate Monotonic scheduling with dynamic-priority Earliest Deadline First. Observe periodic releases, CPU utilization, and deadline misses.</p>
+  </div>
+
+  <section class="panel">
+    <div class="controls">
+      <label>Algorithm
+        <select id="algorithm">
+          <option value="rm">Rate Monotonic</option>
+          <option value="edf">Earliest Deadline First</option>
+        </select>
+      </label>
+      <label>Simulation length
+        <input id="horizon" type="number" min="5" max="100" value="30">
+      </label>
+      <label>Scenario
+        <select id="scenario">
+          <option value="schedulable">Schedulable</option>
+          <option value="tight">Tight utilization</option>
+          <option value="miss">Deadline miss</option>
+        </select>
+      </label>
+      <label>&nbsp;
+        <button id="loadScenario">Load scenario</button>
+      </label>
+    </div>
+    <div class="actions">
+      <button id="addTask">+ Add task</button>
+      <button id="run" class="primary">Run simulation</button>
+      <button id="reset">Reset</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Periodic Tasks</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Task</th><th>Execution C</th><th>Period T</th><th>Deadline D</th><th>Utilization C/T</th><th></th></tr></thead>
+        <tbody id="taskBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Scheduling Result</h2>
+    <div class="metrics">
+      <div class="metric">Total utilization<b id="util">–</b></div>
+      <div class="metric">RM bound<b id="rmBound">–</b></div>
+      <div class="metric">Jobs released<b id="jobs">–</b></div>
+      <div class="metric">Deadline misses<b id="misses">–</b></div>
+    </div>
+    <div id="status" class="status">Run the simulation to evaluate the task set.</div>
+    <div id="timeline" class="timeline"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Concept Guide</h2>
+    <p><strong>Rate Monotonic (RM):</strong> shorter period means higher fixed priority.</p>
+    <p><strong>Earliest Deadline First (EDF):</strong> among ready jobs, the job with the nearest absolute deadline gets highest priority.</p>
+    <p><strong>Utilization:</strong> for periodic task <code>i</code>, utilization is <code>Cᵢ/Tᵢ</code>.</p>
+    <p><strong>RM utilization bound:</strong> for <code>n</code> independent periodic tasks with deadline equal to period, a sufficient schedulability bound is <code>n(2^(1/n)-1)</code>.</p>
+    <p><strong>Deadline miss:</strong> a job has remaining execution time when its absolute deadline arrives.</p>
+    <p class="note">This simulator assumes one CPU, independent periodic tasks, no blocking, and integer execution units.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const root=document.querySelector(".rtos-sim");
+if(!root)return;
+
+const body=root.querySelector("#taskBody");
+const algorithm=root.querySelector("#algorithm");
+const horizonInput=root.querySelector("#horizon");
+const timeline=root.querySelector("#timeline");
+const status=root.querySelector("#status");
+let tasks=[],nextId=1;
+
+const scenarios={
+  schedulable:[
+    {id:"T1",c:1,t:4,d:4},
+    {id:"T2",c:1,t:5,d:5},
+    {id:"T3",c:2,t:10,d:10}
+  ],
+  tight:[
+    {id:"T1",c:2,t:5,d:5},
+    {id:"T2",c:2,t:7,d:7},
+    {id:"T3",c:2,t:9,d:9}
+  ],
+  miss:[
+    {id:"T1",c:2,t:4,d:4},
+    {id:"T2",c:3,t:5,d:5},
+    {id:"T3",c:2,t:6,d:6}
+  ]
+};
+
+function clone(arr){return arr.map(x=>({...x}));}
+
+function renderTasks(){
+  body.innerHTML="";
+  tasks.forEach(task=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td><strong>${task.id}</strong></td>
+      <td><input class="c" type="number" min="1" value="${task.c}"></td>
+      <td><input class="t" type="number" min="1" value="${task.t}"></td>
+      <td><input class="d" type="number" min="1" value="${task.d}"></td>
+      <td class="u">${(task.c/task.t).toFixed(3)}</td>
+      <td><button type="button">×</button></td>`;
+    tr.querySelector(".c").addEventListener("change",e=>{task.c=Math.max(1,+e.target.value||1);renderTasks();});
+    tr.querySelector(".t").addEventListener("change",e=>{task.t=Math.max(1,+e.target.value||1);renderTasks();});
+    tr.querySelector(".d").addEventListener("change",e=>{task.d=Math.max(1,+e.target.value||1);renderTasks();});
+    tr.querySelector("button").addEventListener("click",()=>{tasks=tasks.filter(x=>x!==task);renderTasks();});
+    body.appendChild(tr);
+  });
+}
+
+function validate(){
+  if(!tasks.length)throw new Error("Add at least one task.");
+  const h=+horizonInput.value;
+  if(!Number.isInteger(h)||h<5||h>100)throw new Error("Simulation length must be between 5 and 100.");
+  tasks.forEach(t=>{
+    if(!Number.isInteger(t.c)||!Number.isInteger(t.t)||!Number.isInteger(t.d)||t.c<1||t.t<1||t.d<1)
+      throw new Error("Task parameters must be positive integers.");
+  });
+  return h;
+}
+
+function simulate(){
+  const horizon=validate();
+  const jobs=[];
+  let released=0,misses=0;
+  const schedule=Array(horizon).fill("Idle");
+  const missTimes=new Set();
+
+  for(let time=0;time<horizon;time++){
+    for(const task of tasks){
+      if(time%task.t===0){
+        jobs.push({
+          taskId:task.id,
+          task,
+          release:time,
+          deadline:time+task.d,
+          remaining:task.c,
+          done:false,
+          missed:false
+        });
+        released++;
+      }
+    }
+
+    for(const job of jobs){
+      if(!job.done&&!job.missed&&job.remaining>0&&time>=job.deadline){
+        job.missed=true;misses++;missTimes.add(time);
+      }
+    }
+
+    const ready=jobs.filter(j=>!j.done&&!j.missed&&j.remaining>0&&j.release<=time);
+    ready.sort((a,b)=>{
+      if(algorithm.value==="edf"){
+        return a.deadline-b.deadline || a.release-b.release || a.taskId.localeCompare(b.taskId);
+      }
+      return a.task.t-b.task.t || a.release-b.release || a.taskId.localeCompare(b.taskId);
+    });
+
+    const current=ready[0];
+    if(current){
+      schedule[time]=current.taskId;
+      current.remaining--;
+      if(current.remaining===0)current.done=true;
+    }
+  }
+
+  for(const job of jobs){
+    if(!job.done&&!job.missed&&job.remaining>0&&job.deadline<=horizon){
+      job.missed=true;misses++;missTimes.add(job.deadline);
+    }
+  }
+
+  return {horizon,schedule,released,misses,missTimes};
+}
+
+function renderTimeline(result){
+  timeline.innerHTML="";
+  const grid=document.createElement("div");
+  grid.className="timeline-grid";
+
+  const timeRow=document.createElement("div");
+  timeRow.className="time-row";
+  timeRow.style.display="contents";
+
+  result.schedule.forEach((_,i)=>{
+    const s=document.createElement("div");
+    s.className="slot";
+    s.textContent=i;
+    grid.appendChild(s);
+  });
+
+  result.schedule.forEach((taskId,i)=>{
+    const s=document.createElement("div");
+    s.className="slot "+(taskId==="Idle"?"":"run")+(result.missTimes.has(i)?" miss":"");
+    s.textContent=taskId;
+    grid.appendChild(s);
+  });
+
+  timeline.appendChild(grid);
+}
+
+function run(){
+  try{
+    const result=simulate();
+    const util=tasks.reduce((s,t)=>s+t.c/t.t,0);
+    const n=tasks.length;
+    const bound=n*(Math.pow(2,1/n)-1);
+
+    root.querySelector("#util").textContent=util.toFixed(3);
+    root.querySelector("#rmBound").textContent=bound.toFixed(3);
+    root.querySelector("#jobs").textContent=result.released;
+    root.querySelector("#misses").textContent=result.misses;
+
+    status.className="status "+(result.misses===0?"good":"bad");
+    status.innerHTML=result.misses===0
+      ? `<strong>No deadline misses.</strong> The task set completed all jobs within their deadlines during the simulated interval.`
+      : `<strong>${result.misses} deadline miss${result.misses===1?"":"es"}.</strong> The selected scheduler could not complete every released job in time.`;
+
+    renderTimeline(result);
+  }catch(e){alert(e.message);}
+}
+
+function load(name){
+  tasks=clone(scenarios[name]);
+  nextId=tasks.length+1;
+  renderTasks();
+  timeline.innerHTML="";
+  status.className="status";
+  status.textContent="Run the simulation to evaluate the task set.";
+  ["util","rmBound","jobs","misses"].forEach(id=>root.querySelector("#"+id).textContent="–");
+}
+
+root.querySelector("#addTask").addEventListener("click",()=>{
+  tasks.push({id:"T"+nextId++,c:1,t:6,d:6});
+  renderTasks();
+});
+root.querySelector("#run").addEventListener("click",run);
+root.querySelector("#loadScenario").addEventListener("click",()=>load(root.querySelector("#scenario").value));
+root.querySelector("#reset").addEventListener("click",()=>load("schedulable"));
+
+load("schedulable");
+})();
+</script>

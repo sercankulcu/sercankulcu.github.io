@@ -1,0 +1,322 @@
+---
+layout: without-sidebar
+title: "Synchronization Lab"
+permalink: /files/os/slides/Chapter_06_Synchronization_Lab.html
+excerpt: "An interactive synchronization lab covering mutexes, semaphores, producer-consumer, readers-writers, and dining philosophers."
+---
+
+<style>
+.sync-lab{
+  --sl-line:var(--global-border-color);
+  --sl-accent:var(--global-link-color);
+  --sl-text:var(--global-text-color);
+  --sl-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
+  --sl-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  max-width:1180px;margin:0 auto;color:var(--sl-text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.sync-lab *{box-sizing:border-box}
+.sync-lab h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0}
+.sync-lab .lead{max-width:880px;color:var(--sl-muted)}
+.sync-lab .panel{margin-top:1rem;padding:1rem;border:1px solid var(--sl-line);border-radius:18px;background:var(--global-bg-color)}
+.sync-lab .controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+.sync-lab label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
+.sync-lab select,.sync-lab input,.sync-lab button{
+  font:inherit;border:1px solid var(--sl-line);border-radius:10px;padding:.62rem .7rem;
+  background:var(--global-bg-color);color:var(--sl-text)
+}
+.sync-lab button{cursor:pointer;font-weight:800}
+.sync-lab button.primary{background:var(--sl-accent);color:#fff;border-color:var(--sl-accent)}
+.sync-lab .actions{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:.9rem}
+.sync-lab .state-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.sync-lab .state{padding:.85rem;border:1px solid var(--sl-line);border-radius:14px;background:var(--sl-soft)}
+.sync-lab .state b{display:block;font-size:1.1rem;margin-top:.2rem}
+.sync-lab .visual{display:grid;gap:.65rem;margin-top:1rem}
+.sync-lab .lane{display:flex;align-items:center;gap:.6rem;padding:.7rem;border:1px solid var(--sl-line);border-radius:12px}
+.sync-lab .actor{min-width:94px;font-weight:900}
+.sync-lab .bar{height:18px;flex:1;border-radius:999px;background:var(--sl-soft);overflow:hidden}
+.sync-lab .fill{height:100%;width:0;background:var(--sl-accent);transition:width .2s ease}
+.sync-lab .log{margin-top:1rem;max-height:280px;overflow:auto;border:1px solid var(--sl-line);border-radius:12px;padding:.8rem;background:var(--sl-soft);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86rem}
+.sync-lab .log div+div{margin-top:.35rem}
+.sync-lab .legend{color:var(--sl-muted);font-size:.88rem}
+.sync-lab .problem{padding:.8rem;border-left:4px solid var(--sl-accent);background:var(--sl-soft);border-radius:10px;margin-top:.8rem}
+.sync-lab .hidden{display:none!important}
+@media(max-width:900px){.sync-lab .controls,.sync-lab .state-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.sync-lab .controls,.sync-lab .state-grid{grid-template-columns:1fr}.sync-lab .lane{align-items:flex-start;flex-direction:column}.sync-lab .bar{width:100%}}
+</style>
+
+<div class="sync-lab">
+  <div>
+    <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--sl-accent)">Operating Systems · Chapter 6</div>
+    <h1>Synchronization Lab</h1>
+    <p class="lead">Explore how synchronization primitives coordinate concurrent actors. Change the scenario, step through events, and observe blocking, shared state, and fairness.</p>
+  </div>
+
+  <section class="panel">
+    <div class="controls">
+      <label>Scenario
+        <select id="scenario">
+          <option value="mutex">Mutex / Critical Section</option>
+          <option value="semaphore">Counting Semaphore</option>
+          <option value="producer">Producer–Consumer</option>
+          <option value="readers">Readers–Writers</option>
+          <option value="philosophers">Dining Philosophers</option>
+        </select>
+      </label>
+      <label>Actors
+        <input id="actors" type="number" min="2" max="8" value="4">
+      </label>
+      <label id="capacityWrap">Capacity / Permits
+        <input id="capacity" type="number" min="1" max="6" value="2">
+      </label>
+    </div>
+    <div class="actions">
+      <button id="reset">Reset</button>
+      <button id="step" class="primary">Step</button>
+      <button id="auto">Run 10 steps</button>
+    </div>
+    <div id="problem" class="problem"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Current State</h2>
+    <div class="state-grid">
+      <div class="state">Step<b id="stepNo">0</b></div>
+      <div class="state">Inside / Active<b id="activeCount">0</b></div>
+      <div class="state">Waiting<b id="waitingCount">0</b></div>
+      <div class="state">Shared value<b id="sharedValue">0</b></div>
+    </div>
+    <div id="visual" class="visual"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Event Log</h2>
+    <div id="log" class="log"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Concept Guide</h2>
+    <p><strong>Mutex:</strong> only one actor may enter the critical section at a time.</p>
+    <p><strong>Semaphore:</strong> allows a limited number of actors to access a shared resource concurrently.</p>
+    <p><strong>Producer–Consumer:</strong> producers add items to a bounded buffer while consumers remove them; synchronization prevents overflow and underflow.</p>
+    <p><strong>Readers–Writers:</strong> multiple readers can access data together, but writers require exclusive access.</p>
+    <p><strong>Dining Philosophers:</strong> illustrates deadlock and resource-ordering problems when multiple actors need more than one resource.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const root=document.querySelector(".sync-lab");
+if(!root)return;
+
+const scenario=root.querySelector("#scenario");
+const actorsInput=root.querySelector("#actors");
+const capacityInput=root.querySelector("#capacity");
+const capacityWrap=root.querySelector("#capacityWrap");
+const visual=root.querySelector("#visual");
+const log=root.querySelector("#log");
+const problem=root.querySelector("#problem");
+
+let state;
+
+function makeActors(n){
+  return Array.from({length:n},(_,i)=>({id:i,name:"A"+(i+1),status:"ready",progress:0}));
+}
+
+function reset(){
+  const n=Math.max(2,Math.min(8,+actorsInput.value||4));
+  const cap=Math.max(1,Math.min(6,+capacityInput.value||2));
+  state={
+    step:0,
+    actors:makeActors(n),
+    turn:0,
+    shared:0,
+    permits:cap,
+    capacity:cap,
+    buffer:[],
+    maxBuffer:cap,
+    writer:null,
+    readers:new Set(),
+    forks:Array.from({length:n},()=>null)
+  };
+  log.innerHTML="";
+  describeScenario();
+  render();
+}
+
+function describeScenario(){
+  const s=scenario.value;
+  capacityWrap.classList.toggle("hidden",s==="mutex"||s==="readers"||s==="philosophers");
+  const text={
+    mutex:"One actor can enter the critical section. Others must wait until the lock is released.",
+    semaphore:"At most the selected number of actors may be active at once.",
+    producer:"Odd-numbered actors produce, even-numbered actors consume. The buffer is bounded by Capacity.",
+    readers:"Most actors act as readers; every third actor acts as a writer. Writers need exclusive access.",
+    philosophers:"Each actor needs two neighboring forks. This simulator uses ordered fork acquisition to avoid deadlock."
+  }[s];
+  problem.textContent=text;
+}
+
+function addLog(msg){
+  const d=document.createElement("div");
+  d.textContent="["+state.step+"] "+msg;
+  log.appendChild(d);
+  log.scrollTop=log.scrollHeight;
+}
+
+function chooseActor(){
+  const a=state.actors[state.turn%state.actors.length];
+  state.turn=(state.turn+1)%state.actors.length;
+  return a;
+}
+
+function stepMutex(){
+  const active=state.actors.find(a=>a.status==="active");
+  if(active){
+    active.progress++;
+    state.shared++;
+    if(active.progress>=2){
+      active.status="ready";active.progress=0;
+      addLog(active.name+" leaves the critical section and releases the mutex.");
+    }else addLog(active.name+" executes inside the critical section.");
+    return;
+  }
+  const a=chooseActor();
+  a.status="active";
+  addLog(a.name+" acquires the mutex and enters the critical section.");
+}
+
+function stepSemaphore(){
+  const actives=state.actors.filter(a=>a.status==="active");
+  if(actives.length){
+    const a=actives[0];
+    a.progress++;state.shared++;
+    if(a.progress>=2){
+      a.status="ready";a.progress=0;state.permits++;
+      addLog(a.name+" releases a semaphore permit.");
+      return;
+    }
+  }
+  const a=chooseActor();
+  if(a.status==="ready"){
+    if(state.permits>0){
+      state.permits--;a.status="active";
+      addLog(a.name+" acquires a permit. Remaining permits: "+state.permits+".");
+    }else{
+      a.status="waiting";addLog(a.name+" waits because no semaphore permit is available.");
+    }
+  }else if(a.status==="waiting"&&state.permits>0){
+    state.permits--;a.status="active";
+    addLog(a.name+" wakes and acquires a permit.");
+  }
+}
+
+function stepProducer(){
+  const a=chooseActor();
+  const producer=(a.id%2===0);
+  if(producer){
+    if(state.buffer.length>=state.maxBuffer){
+      a.status="waiting";addLog(a.name+" wants to produce, but the buffer is full.");
+    }else{
+      state.buffer.push("item");state.shared=state.buffer.length;a.status="ready";
+      addLog(a.name+" produces one item. Buffer: "+state.buffer.length+"/"+state.maxBuffer+".");
+    }
+  }else{
+    if(!state.buffer.length){
+      a.status="waiting";addLog(a.name+" wants to consume, but the buffer is empty.");
+    }else{
+      state.buffer.shift();state.shared=state.buffer.length;a.status="ready";
+      addLog(a.name+" consumes one item. Buffer: "+state.buffer.length+"/"+state.maxBuffer+".");
+    }
+  }
+}
+
+function stepReaders(){
+  const a=chooseActor();
+  const writer=(a.id%3===2);
+  if(writer){
+    if(state.writer===a.id){
+      state.writer=null;a.status="ready";state.shared++;
+      addLog(a.name+" finishes writing and releases exclusive access.");
+    }else if(state.writer===null&&state.readers.size===0){
+      state.writer=a.id;a.status="active";
+      addLog(a.name+" begins writing with exclusive access.");
+    }else{
+      a.status="waiting";addLog(a.name+" waits because readers or another writer are active.");
+    }
+  }else{
+    if(state.writer===null){
+      if(state.readers.has(a.id)){
+        state.readers.delete(a.id);a.status="ready";
+        addLog(a.name+" finishes reading.");
+      }else{
+        state.readers.add(a.id);a.status="active";
+        addLog(a.name+" begins reading. Concurrent readers: "+state.readers.size+".");
+      }
+    }else{
+      a.status="waiting";addLog(a.name+" waits because a writer is active.");
+    }
+  }
+}
+
+function stepPhilosophers(){
+  const a=chooseActor();
+  const left=a.id;
+  const right=(a.id+1)%state.actors.length;
+  if(a.status==="active"){
+    state.forks[left]=null;state.forks[right]=null;a.status="ready";state.shared++;
+    addLog(a.name+" finishes eating and releases both forks.");
+    return;
+  }
+  const first=Math.min(left,right),second=Math.max(left,right);
+  if(state.forks[first]===null&&state.forks[second]===null){
+    state.forks[first]=a.id;state.forks[second]=a.id;a.status="active";
+    addLog(a.name+" acquires forks "+first+" and "+second+" in a fixed order and starts eating.");
+  }else{
+    a.status="waiting";addLog(a.name+" waits for both neighboring forks.");
+  }
+}
+
+function stepOnce(){
+  state.step++;
+  state.actors.forEach(a=>{if(a.status==="waiting")a.status="ready";});
+  const fn={
+    mutex:stepMutex,
+    semaphore:stepSemaphore,
+    producer:stepProducer,
+    readers:stepReaders,
+    philosophers:stepPhilosophers
+  }[scenario.value];
+  fn();
+  render();
+}
+
+function render(){
+  root.querySelector("#stepNo").textContent=state.step;
+  const active=state.actors.filter(a=>a.status==="active").length;
+  const waiting=state.actors.filter(a=>a.status==="waiting").length;
+  root.querySelector("#activeCount").textContent=active;
+  root.querySelector("#waitingCount").textContent=waiting;
+  root.querySelector("#sharedValue").textContent=state.shared;
+
+  visual.innerHTML="";
+  state.actors.forEach(a=>{
+    const lane=document.createElement("div");
+    lane.className="lane";
+    const pct=a.status==="active"?100:a.status==="waiting"?45:15;
+    lane.innerHTML=`<div class="actor">${a.name}</div><div class="bar"><div class="fill" style="width:${pct}%"></div></div><div>${a.status}</div>`;
+    visual.appendChild(lane);
+  });
+}
+
+scenario.addEventListener("change",reset);
+actorsInput.addEventListener("change",reset);
+capacityInput.addEventListener("change",reset);
+root.querySelector("#reset").addEventListener("click",reset);
+root.querySelector("#step").addEventListener("click",stepOnce);
+root.querySelector("#auto").addEventListener("click",()=>{for(let i=0;i<10;i++)stepOnce();});
+
+reset();
+})();
+</script>

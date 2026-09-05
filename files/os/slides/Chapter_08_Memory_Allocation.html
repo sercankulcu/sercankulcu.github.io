@@ -1,0 +1,270 @@
+---
+layout: without-sidebar
+title: "Memory Allocation Simulator"
+permalink: /files/os/slides/Chapter_08_Memory_Allocation.html
+excerpt: "An interactive memory allocation simulator for First Fit, Best Fit, Worst Fit, and Next Fit with allocation, deallocation, and fragmentation metrics."
+---
+
+<style>
+.mem-alloc{
+  --ma-line:var(--global-border-color);
+  --ma-accent:var(--global-link-color);
+  --ma-text:var(--global-text-color);
+  --ma-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
+  --ma-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  max-width:1180px;margin:0 auto;color:var(--ma-text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.mem-alloc *{box-sizing:border-box}
+.mem-alloc h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0}
+.mem-alloc .lead{max-width:900px;color:var(--ma-muted)}
+.mem-alloc .panel{margin-top:1rem;padding:1rem;border:1px solid var(--ma-line);border-radius:18px;background:var(--global-bg-color)}
+.mem-alloc .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
+.mem-alloc label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
+.mem-alloc input,.mem-alloc select,.mem-alloc button{
+  font:inherit;border:1px solid var(--ma-line);border-radius:10px;padding:.62rem .7rem;background:var(--global-bg-color);color:var(--ma-text)
+}
+.mem-alloc button{cursor:pointer;font-weight:800}
+.mem-alloc button.primary{background:var(--ma-accent);color:#fff;border-color:var(--ma-accent)}
+.mem-alloc .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
+.mem-alloc .memory{display:flex;min-height:160px;border:1px solid var(--ma-line);border-radius:14px;overflow:hidden;margin-top:1rem}
+.mem-alloc .block{min-width:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.5rem;border-right:1px solid var(--ma-line);text-align:center}
+.mem-alloc .block.free{background:var(--ma-soft)}
+.mem-alloc .block.used{background:color-mix(in srgb,var(--ma-accent) 16%,var(--global-bg-color))}
+.mem-alloc .block:last-child{border-right:0}
+.mem-alloc .block strong{font-size:.9rem}
+.mem-alloc .block span{font-size:.78rem;color:var(--ma-muted)}
+.mem-alloc .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.mem-alloc .metric{padding:.85rem;border:1px solid var(--ma-line);border-radius:14px;background:var(--ma-soft)}
+.mem-alloc .metric b{display:block;font-size:1.15rem;margin-top:.2rem}
+.mem-alloc .table-wrap{overflow-x:auto;margin-top:1rem}
+.mem-alloc table{width:100%;border-collapse:collapse;min-width:680px}
+.mem-alloc th,.mem-alloc td{border:1px solid var(--ma-line);padding:.55rem;text-align:center}
+.mem-alloc th{background:var(--ma-soft)}
+.mem-alloc .log{margin-top:1rem;max-height:230px;overflow:auto;border:1px solid var(--ma-line);border-radius:12px;padding:.8rem;background:var(--ma-soft);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86rem}
+.mem-alloc .note{color:var(--ma-muted);font-size:.88rem}
+@media(max-width:900px){.mem-alloc .controls,.mem-alloc .metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.mem-alloc .controls,.mem-alloc .metrics{grid-template-columns:1fr}.mem-alloc .memory{overflow-x:auto}}
+</style>
+
+<div class="mem-alloc">
+  <div>
+    <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--ma-accent)">Operating Systems · Chapter 8</div>
+    <h1>Memory Allocation Simulator</h1>
+    <p class="lead">Compare contiguous memory allocation strategies. Allocate processes, free them, and observe how holes and external fragmentation evolve.</p>
+  </div>
+
+  <section class="panel">
+    <div class="controls">
+      <label>Algorithm
+        <select id="algorithm">
+          <option value="first">First Fit</option>
+          <option value="best">Best Fit</option>
+          <option value="worst">Worst Fit</option>
+          <option value="next">Next Fit</option>
+        </select>
+      </label>
+      <label>Process ID
+        <input id="pid" value="P1">
+      </label>
+      <label>Process size
+        <input id="size" type="number" min="1" value="120">
+      </label>
+      <label>Scenario
+        <select id="scenario">
+          <option value="default">Default holes</option>
+          <option value="fragmented">Fragmented</option>
+          <option value="large">Large blocks</option>
+        </select>
+      </label>
+    </div>
+    <div class="actions">
+      <button id="allocate" class="primary">Allocate</button>
+      <button id="loadScenario">Load scenario</button>
+      <button id="reset">Reset</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Memory Map</h2>
+    <div id="memory" class="memory"></div>
+    <div class="metrics">
+      <div class="metric">Total free memory<b id="totalFree">–</b></div>
+      <div class="metric">Largest free block<b id="largestHole">–</b></div>
+      <div class="metric">External fragmentation<b id="externalFrag">–</b></div>
+      <div class="metric">Allocated processes<b id="allocatedCount">–</b></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Allocated Processes</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Process</th><th>Size</th><th>Start</th><th>End</th><th>Action</th></tr></thead>
+        <tbody id="allocBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Event Log</h2>
+    <div id="log" class="log"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Algorithm Guide</h2>
+    <p><strong>First Fit:</strong> choose the first hole large enough.</p>
+    <p><strong>Best Fit:</strong> choose the smallest hole that can satisfy the request.</p>
+    <p><strong>Worst Fit:</strong> choose the largest available hole.</p>
+    <p><strong>Next Fit:</strong> like First Fit, but continue searching from the previous allocation position.</p>
+    <p class="note">External fragmentation is approximated here as total free memory minus the largest free block. A high value means free space is split across many smaller holes.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const root=document.querySelector(".mem-alloc");
+if(!root)return;
+
+const memoryEl=root.querySelector("#memory");
+const allocBody=root.querySelector("#allocBody");
+const logEl=root.querySelector("#log");
+const alg=root.querySelector("#algorithm");
+const pidInput=root.querySelector("#pid");
+const sizeInput=root.querySelector("#size");
+const scenario=root.querySelector("#scenario");
+
+let blocks=[];
+let nextCursor=0;
+
+const scenarios={
+  default:[180,90,250,140,220],
+  fragmented:[60,130,45,170,80,110,55],
+  large:[320,180,420,260]
+};
+
+function init(sizes){
+  blocks=[];
+  sizes.forEach((size,i)=>{
+    if(i>0){
+      blocks.push({type:"used",pid:"SYS"+i,size:40,start:0});
+    }
+    blocks.push({type:"free",size,start:0});
+  });
+  recalcStarts();
+  nextCursor=0;
+  logEl.innerHTML="";
+  addLog("Scenario loaded.");
+  render();
+}
+
+function recalcStarts(){
+  let p=0;
+  blocks.forEach(b=>{b.start=p;p+=b.size;});
+}
+
+function addLog(msg){
+  const d=document.createElement("div");
+  d.textContent=msg;
+  logEl.appendChild(d);
+  logEl.scrollTop=logEl.scrollHeight;
+}
+
+function candidateIndices(size){
+  return blocks.map((b,i)=>b.type==="free"&&b.size>=size?i:-1).filter(i=>i>=0);
+}
+
+function chooseIndex(size){
+  const ids=candidateIndices(size);
+  if(!ids.length)return -1;
+  if(alg.value==="first")return ids[0];
+  if(alg.value==="best")return ids.sort((a,b)=>blocks[a].size-blocks[b].size)[0];
+  if(alg.value==="worst")return ids.sort((a,b)=>blocks[b].size-blocks[a].size)[0];
+  const n=blocks.length;
+  for(let off=0;off<n;off++){
+    const i=(nextCursor+off)%n;
+    if(blocks[i].type==="free"&&blocks[i].size>=size)return i;
+  }
+  return -1;
+}
+
+function allocate(){
+  const pid=pidInput.value.trim();
+  const size=+sizeInput.value;
+  if(!pid){alert("Enter a process ID.");return;}
+  if(!Number.isFinite(size)||size<=0){alert("Process size must be greater than 0.");return;}
+  if(blocks.some(b=>b.type==="used"&&b.pid===pid)){alert("Process ID already exists.");return;}
+
+  const idx=chooseIndex(size);
+  if(idx<0){addLog(pid+" cannot be allocated: no hole is large enough.");render();return;}
+
+  const hole=blocks[idx];
+  const used={type:"used",pid,size,start:hole.start};
+  const rest=hole.size-size;
+  const replacement=[used];
+  if(rest>0)replacement.push({type:"free",size:rest,start:hole.start+size});
+  blocks.splice(idx,1,...replacement);
+  recalcStarts();
+  if(alg.value==="next")nextCursor=(idx+replacement.length)%blocks.length;
+  addLog(pid+" allocated "+size+" units using "+alg.options[alg.selectedIndex].text+".");
+  render();
+}
+
+function freePid(pid){
+  const idx=blocks.findIndex(b=>b.type==="used"&&b.pid===pid);
+  if(idx<0)return;
+  blocks[idx]={type:"free",size:blocks[idx].size,start:blocks[idx].start};
+  mergeFree();
+  addLog(pid+" deallocated.");
+  render();
+}
+
+function mergeFree(){
+  const out=[];
+  for(const b of blocks){
+    const last=out[out.length-1];
+    if(last&&last.type==="free"&&b.type==="free")last.size+=b.size;
+    else out.push({...b});
+  }
+  blocks=out;recalcStarts();
+}
+
+function render(){
+  memoryEl.innerHTML="";
+  const total=blocks.reduce((s,b)=>s+b.size,0);
+  blocks.forEach(b=>{
+    const d=document.createElement("div");
+    d.className="block "+(b.type==="free"?"free":"used");
+    d.style.flex=Math.max(1,b.size/Math.max(1,total));
+    d.innerHTML=b.type==="free"
+      ? `<strong>Free</strong><span>${b.size} units</span>`
+      : `<strong>${b.pid}</strong><span>${b.size} units</span>`;
+    memoryEl.appendChild(d);
+  });
+
+  allocBody.innerHTML="";
+  blocks.filter(b=>b.type==="used"&&!b.pid.startsWith("SYS")).forEach(b=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${b.pid}</td><td>${b.size}</td><td>${b.start}</td><td>${b.start+b.size-1}</td><td><button type="button">Free</button></td>`;
+    tr.querySelector("button").addEventListener("click",()=>freePid(b.pid));
+    allocBody.appendChild(tr);
+  });
+
+  const free=blocks.filter(b=>b.type==="free");
+  const totalFree=free.reduce((s,b)=>s+b.size,0);
+  const largest=free.length?Math.max(...free.map(b=>b.size)):0;
+  const allocCount=blocks.filter(b=>b.type==="used"&&!b.pid.startsWith("SYS")).length;
+  root.querySelector("#totalFree").textContent=totalFree;
+  root.querySelector("#largestHole").textContent=largest;
+  root.querySelector("#externalFrag").textContent=Math.max(0,totalFree-largest);
+  root.querySelector("#allocatedCount").textContent=allocCount;
+}
+
+root.querySelector("#allocate").addEventListener("click",allocate);
+root.querySelector("#loadScenario").addEventListener("click",()=>init(scenarios[scenario.value]));
+root.querySelector("#reset").addEventListener("click",()=>init(scenarios.default));
+
+init(scenarios.default);
+})();
+</script>
