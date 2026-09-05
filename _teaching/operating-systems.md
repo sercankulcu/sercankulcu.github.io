@@ -50,34 +50,11 @@ No current announcements.
 
 ## Past Exams  
 
-- **2025-2026**  
-  [vize](../files/os/slides/2025-2026-os-vize-cevaplar.pdf) | 
-  [final](../files/os/slides/2025-2026-os-final-cevaplar.pdf)
-
-- **2024-2025**  
-  [vize](../files/os/slides/2024-2025-os-vize-cevaplar.pdf) | 
-  [vize (HTML)](../files/os/slides/2024-2025-os-vize-cevaplar.html) | 
-  [telafi](../files/os/slides/2024-2025-os-telafi-cevaplar.pdf) | 
-  [final](../files/os/slides/2024-2025-os-final-cevaplar.pdf) | 
-  [final (HTML)](../files/os/slides/2024-2025-os-final-cevaplar.html) | 
-  [but](../files/os/slides/2024-2025-os-butunleme-cevaplar.pdf)
-
-- **2023-2024**  
-  [vize](../files/os/slides/2023-2024-os-vize-cevap.pdf) | 
-  [telafi](../files/os/slides/2023-2024-os-telafi-cevaplar.pdf) | 
-  [final-a](../files/os/slides/2023-2024-os-final-a-cevaplar.pdf) | 
-  [final-b](../files/os/slides/2023-2024-os-final-b-cevaplar.pdf) | 
-  [but](../files/os/slides/2023-2024-os-butunleme-cevap.pdf)
-
-- **2022-2023**  
-  [vize](../files/os/slides/2022-2023-os-vize-cevaplar.pdf) | 
-  [midterm (EN)](../files/os/slides/2022-2023-os-midterm-answers.html) | 
-  [final](../files/os/slides/2022-2023-os-final-cevaplar.pdf) | 
-  [final (EN)](../files/os/slides/2022-2023-os-final-answers.html)
-
-- **Questions & Answers**  
-  [midterm (HTML)](../files/os/slides/os_midterm_mcq.html) | 
-  [final (HTML)](../files/os/slides/os_final_mcq.html)
+**2025-2026:** [vize](../files/os/slides/2025-2026-os-vize-cevaplar.pdf) | [final](../files/os/slides/2025-2026-os-final-cevaplar.pdf)
+**2024-2025:** [vize](../files/os/slides/2024-2025-os-vize-cevaplar.pdf) | [telafi](../files/os/slides/2024-2025-os-telafi-cevaplar.pdf) | [final](../files/os/slides/2024-2025-os-final-cevaplar.pdf) | [but](../files/os/slides/2024-2025-os-butunleme-cevaplar.pdf)
+**2023-2024:** [vize](../files/os/slides/2023-2024-os-vize-cevap.pdf) | [telafi](../files/os/slides/2023-2024-os-telafi-cevaplar.pdf) | [final-a](../files/os/slides/2023-2024-os-final-a-cevaplar.pdf) | [final-b](../files/os/slides/2023-2024-os-final-b-cevaplar.pdf) | [but](../files/os/slides/2023-2024-os-butunleme-cevap.pdf)
+**2022-2023:** [vize](../files/os/slides/2022-2023-os-vize-cevaplar.pdf) | [final](../files/os/slides/2022-2023-os-final-cevaplar.pdf)
+**Questions & Answers:** [midterm (HTML)](../files/os/slides/os_midterm_mcq.html) | [final (HTML)](../files/os/slides/os_final_mcq.html)
 
 ---
 
