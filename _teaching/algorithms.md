@@ -85,6 +85,7 @@ Algorithms are the step-by-step procedures that form the core of computer scienc
 - [🖼️Sunum-Karmaşıklık (PDF)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.pdf)
 - [🕹️Run time analysis (HTML)](../files/algorithms/slides/Chapter_01_Algorithm_Complexity.html)
 - [🕹️Recurrence & Master Theorem (HTML)](../files/algorithms/slides/Chapter_01_Recurrence_Master_Theorem.html)
+- [🕹️Asymptotic Growth Explorer (HTML)](../files/algorithms/slides/Chapter_01_Asymptotic_Growth_Explorer.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_01_Introduction.pdf)
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter01/src)
 
@@ -97,6 +98,7 @@ Sorting algorithms are the architects of order, meticulously organizing data int
 - [🖼️Sunum-Sıralama Algoritmaları (PDF)](../files/algorithms/slides/Bolum_02_Siralama.pdf)
 - [🕹️Sorting Algorithms (HTML)](../files/algorithms/slides/Chapter_02_Sorting.html)
 - [🕹️Sorting Race (HTML)](../files/algorithms/slides/Chapter_02_Sorting_Race.html)
+- [🕹️Sorting Properties Lab (HTML)](../files/algorithms/slides/Chapter_02_Sorting_Properties_Lab.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_02_Sorting.pdf)
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter02/src)
 
@@ -109,6 +111,7 @@ Searching algorithms are the detectives of the data world, designed to track dow
 - [🖼️Sunum-Arama Algoritmaları (PDF)](../files/algorithms/slides/Bolum_03_Arama.pdf)
 - [🕹️Search Algorithms (HTML)](../files/algorithms/slides/Chapter_03_Search.html)
 - [🕹️Hash & Interpolation Search (HTML)](../files/algorithms/slides/Chapter_03_Hash_Interpolation_Search.html)
+- [🕹️Exponential Search (HTML)](../files/algorithms/slides/Chapter_03_Exponential_Search.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_03_Searching.pdf)
 - [💻Code Examples (Github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter03/src)
 
@@ -131,6 +134,7 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
   - [🕹️MST Simulator (HTML)](../files/algorithms/slides/Chapter_04_MST.html)
   - [🕹️Network Flow (HTML)](../files/algorithms/slides/Chapter_04_Network_Flow.html)
   - [🕹️Topological Sort, SCC & Articulation Points (HTML)](../files/algorithms/slides/Chapter_04_Graph_Structure_Algorithms.html)
+  - [🕹️Bipartite, Cycle & Bridge Explorer (HTML)](../files/algorithms/slides/Chapter_04_Bipartite_Cycle_Bridge.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_04_Graph.pdf) 
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src)
 
@@ -150,6 +154,7 @@ Have you ever wondered how your computer or smartphone handles text so efficient
   - [🕹️Dönüşüm (HTML)](../files/algorithms/slides/Chapter_05_String_Transformation.html)
 - [🖼️Sunum-Trie (PDF)](../files/algorithms/slides/Bolum_05_Tries.pdf)
   - [🕹️Trie & Suffix Algorithms (HTML)](../files/algorithms/slides/Chapter_05_Trie_Suffix_Algorithms.html)
+- [🕹️Prefix Function & Z Algorithm (HTML)](../files/algorithms/slides/Chapter_05_Prefix_Z_Algorithms.html)
 - [🗒️Lecture Notes (PDF)](../files/algorithms/Chapter_05_Dynamic.pdf)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter05/src)
 
