@@ -1,0 +1,293 @@
+---
+layout: without-sidebar
+title: "Linux Process Explorer"
+permalink: /files/os/slides/Chapter_16_Linux_Process_Explorer.html
+excerpt: "An interactive Linux process explorer for learning ps, top, /proc, PID and PPID relationships, process trees, file descriptors, and memory maps."
+---
+
+<style>
+.linux-proc{
+  --lp-line:var(--global-border-color);
+  --lp-accent:var(--global-link-color);
+  --lp-text:var(--global-text-color);
+  --lp-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
+  --lp-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  max-width:1180px;margin:0 auto;color:var(--lp-text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.linux-proc *{box-sizing:border-box}
+.linux-proc h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0}
+.linux-proc .lead{max-width:920px;color:var(--lp-muted)}
+.linux-proc .panel{margin-top:1rem;padding:1rem;border:1px solid var(--lp-line);border-radius:18px;background:var(--global-bg-color)}
+.linux-proc .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
+.linux-proc label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
+.linux-proc select,.linux-proc input,.linux-proc button{
+  font:inherit;border:1px solid var(--lp-line);border-radius:10px;padding:.62rem .7rem;background:var(--global-bg-color);color:var(--lp-text)
+}
+.linux-proc button{cursor:pointer;font-weight:800}
+.linux-proc button.primary{background:var(--lp-accent);color:#fff;border-color:var(--lp-accent)}
+.linux-proc .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
+.linux-proc .layout{display:grid;grid-template-columns:1.05fr .95fr;gap:1rem}
+.linux-proc .table-wrap{overflow-x:auto}
+.linux-proc table{width:100%;border-collapse:collapse;min-width:680px}
+.linux-proc th,.linux-proc td{border:1px solid var(--lp-line);padding:.5rem;text-align:center}
+.linux-proc th{background:var(--lp-soft)}
+.linux-proc tr.selected{background:var(--lp-soft)}
+.linux-proc .tree{display:grid;gap:.45rem}
+.linux-proc .tree-item{padding:.55rem .7rem;border:1px solid var(--lp-line);border-radius:10px;background:var(--global-bg-color);cursor:pointer}
+.linux-proc .tree-item.selected{outline:2px solid var(--lp-accent)}
+.linux-proc .terminal{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--lp-soft);border:1px solid var(--lp-line);border-radius:12px;padding:.8rem;white-space:pre-wrap;min-height:220px;overflow:auto}
+.linux-proc .details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+.linux-proc .card{padding:.8rem;border:1px solid var(--lp-line);border-radius:14px;background:var(--lp-soft)}
+.linux-proc .card b{display:block;font-size:1.05rem;margin-top:.2rem}
+.linux-proc .fd-list,.linux-proc .map-list{display:grid;gap:.4rem;margin-top:.6rem}
+.linux-proc .entry{padding:.5rem .6rem;border:1px solid var(--lp-line);border-radius:10px;background:var(--global-bg-color);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.84rem}
+.linux-proc .note{color:var(--lp-muted);font-size:.88rem}
+@media(max-width:900px){.linux-proc .controls,.linux-proc .details{grid-template-columns:repeat(2,1fr)}.linux-proc .layout{grid-template-columns:1fr}}
+@media(max-width:600px){.linux-proc .controls,.linux-proc .details{grid-template-columns:1fr}}
+</style>
+
+<div class="linux-proc">
+  <div>
+    <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--lp-accent)">Operating Systems · Chapter 16</div>
+    <h1>Linux Process Explorer</h1>
+    <p class="lead">Explore a simulated Linux process table and connect command-line tools such as <code>ps</code>, <code>top</code>, and <code>/proc</code> to kernel process concepts.</p>
+  </div>
+
+  <section class="panel">
+    <div class="controls">
+      <label>View
+        <select id="view">
+          <option value="ps">ps-style table</option>
+          <option value="top">top-style view</option>
+          <option value="proc">/proc view</option>
+        </select>
+      </label>
+      <label>Sort by
+        <select id="sort">
+          <option value="pid">PID</option>
+          <option value="cpu">CPU %</option>
+          <option value="mem">Memory %</option>
+        </select>
+      </label>
+      <label>Filter user
+        <select id="userFilter">
+          <option value="all">All users</option>
+          <option value="root">root</option>
+          <option value="alice">alice</option>
+          <option value="bob">bob</option>
+        </select>
+      </label>
+      <label>Search
+        <input id="search" placeholder="bash, python, sshd…">
+      </label>
+    </div>
+    <div class="actions">
+      <button id="refresh" class="primary">Simulate refresh</button>
+      <button id="spawn">Spawn user process</button>
+      <button id="kill">Terminate selected</button>
+      <button id="reset">Reset scenario</button>
+    </div>
+  </section>
+
+  <section class="panel layout">
+    <div>
+      <h2>Process Table</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>PID</th><th>PPID</th><th>USER</th><th>STAT</th><th>CPU%</th><th>MEM%</th><th>COMMAND</th></tr></thead>
+          <tbody id="procBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <h2>Process Tree</h2>
+      <div id="tree" class="tree"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Command Output</h2>
+    <div id="terminal" class="terminal"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Selected Process</h2>
+    <div class="details">
+      <div class="card">PID / PPID<b id="pidInfo">–</b></div>
+      <div class="card">User / State<b id="userState">–</b></div>
+      <div class="card">CPU / Memory<b id="usage">–</b></div>
+      <div class="card">Command<b id="command">–</b></div>
+    </div>
+
+    <h3>File Descriptors</h3>
+    <div id="fdList" class="fd-list"></div>
+
+    <h3>Memory Map</h3>
+    <div id="mapList" class="map-list"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Concept Guide</h2>
+    <p><strong>PID:</strong> unique process identifier. <strong>PPID:</strong> identifier of the parent process.</p>
+    <p><strong>Process tree:</strong> shows how processes are created from parent processes, often starting from PID 1.</p>
+    <p><strong><code>/proc/&lt;pid&gt;</code>:</strong> a virtual filesystem interface exposing process state, memory mappings, open file descriptors, command-line arguments, and more.</p>
+    <p><strong>File descriptors:</strong> small integers referring to open files, pipes, sockets, terminals, and other I/O objects.</p>
+    <p><strong>Memory map:</strong> regions such as executable text, heap, shared libraries, memory-mapped files, and stack.</p>
+    <p class="note">This page simulates Linux concepts and command output. It does not inspect or control the visitor's actual operating system.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const root=document.querySelector(".linux-proc");
+if(!root)return;
+
+const body=root.querySelector("#procBody");
+const tree=root.querySelector("#tree");
+const terminal=root.querySelector("#terminal");
+const view=root.querySelector("#view");
+const sort=root.querySelector("#sort");
+const userFilter=root.querySelector("#userFilter");
+const search=root.querySelector("#search");
+
+let processes=[],selectedPid=1,nextPid=2200;
+
+function defaults(){
+  return [
+    {pid:1,ppid:0,user:"root",stat:"S",cpu:.1,mem:.3,cmd:"systemd",fds:["0 -> /dev/null","1 -> /dev/null","2 -> /dev/null"],maps:["00400000-00452000 /usr/lib/systemd/systemd","00651000-00654000 [heap]","7fff0000-7fff9000 [stack]"]},
+    {pid:421,ppid:1,user:"root",stat:"S",cpu:.0,mem:.2,cmd:"sshd",fds:["0 -> /dev/null","3 -> socket:[14302]","4 -> /run/sshd.pid"],maps:["00500000-00580000 /usr/sbin/sshd","7f100000-7f220000 libc.so","7fff1000-7fff9000 [stack]"]},
+    {pid:812,ppid:1,user:"alice",stat:"S",cpu:.2,mem:.4,cmd:"bash",fds:["0 -> /dev/pts/0","1 -> /dev/pts/0","2 -> /dev/pts/0"],maps:["00400000-004dd000 /usr/bin/bash","00a00000-00b20000 [heap]","7fff3000-7fff9000 [stack]"]},
+    {pid:934,ppid:812,user:"alice",stat:"R",cpu:12.4,mem:3.8,cmd:"python3 server.py",fds:["0 -> /dev/pts/0","1 -> /dev/pts/0","3 -> socket:[20191]","4 -> /home/alice/data.db"],maps:["00400000-00431000 /usr/bin/python3","01400000-01900000 [heap]","7f220000-7f420000 libpython.so","7fff5000-7fff9000 [stack]"]},
+    {pid:1042,ppid:1,user:"bob",stat:"S",cpu:.3,mem:1.1,cmd:"code",fds:["0 -> /dev/null","1 -> /tmp/code.log","7 -> socket:[22001]"],maps:["00500000-00800000 /usr/bin/code","02000000-02b00000 [heap]","7f500000-7f900000 shared-libs","7fff7000-7fff9000 [stack]"]},
+    {pid:1177,ppid:1042,user:"bob",stat:"S",cpu:2.1,mem:2.4,cmd:"node extensionHost",fds:["0 -> pipe:[3101]","1 -> pipe:[3102]","9 -> socket:[3109]"],maps:["00400000-00600000 /usr/bin/node","01000000-01900000 [heap]","7f700000-7fb00000 shared-libs","7fff8000-7fff9000 [stack]"]}
+  ];
+}
+
+function reset(){
+  processes=defaults();selectedPid=1;nextPid=2200;
+  render();
+}
+
+function selected(){return processes.find(p=>p.pid===selectedPid)||processes[0]||null;}
+
+function visible(){
+  const q=search.value.trim().toLowerCase();
+  let arr=processes.filter(p=>(userFilter.value==="all"||p.user===userFilter.value)&&(!q||p.cmd.toLowerCase().includes(q)||String(p.pid).includes(q)));
+  arr=[...arr].sort((a,b)=>{
+    if(sort.value==="cpu")return b.cpu-a.cpu;
+    if(sort.value==="mem")return b.mem-a.mem;
+    return a.pid-b.pid;
+  });
+  return arr;
+}
+
+function renderTable(){
+  body.innerHTML="";
+  visible().forEach(p=>{
+    const tr=document.createElement("tr");
+    if(p.pid===selectedPid)tr.classList.add("selected");
+    tr.innerHTML=`<td>${p.pid}</td><td>${p.ppid}</td><td>${p.user}</td><td>${p.stat}</td><td>${p.cpu.toFixed(1)}</td><td>${p.mem.toFixed(1)}</td><td>${p.cmd}</td>`;
+    tr.addEventListener("click",()=>{selectedPid=p.pid;render();});
+    body.appendChild(tr);
+  });
+}
+
+function descendants(pid,depth=0,seen=new Set()){
+  if(seen.has(pid))return "";
+  seen.add(pid);
+  const p=processes.find(x=>x.pid===pid);
+  if(!p)return "";
+  let html=`<div class="tree-item ${p.pid===selectedPid?"selected":""}" data-pid="${p.pid}" style="margin-left:${depth*18}px">${p.pid} · ${p.cmd}</div>`;
+  processes.filter(x=>x.ppid===pid).sort((a,b)=>a.pid-b.pid).forEach(c=>{html+=descendants(c.pid,depth+1,seen);});
+  return html;
+}
+
+function renderTree(){
+  tree.innerHTML="";
+  const roots=processes.filter(p=>p.ppid===0||!processes.some(x=>x.pid===p.ppid)).sort((a,b)=>a.pid-b.pid);
+  tree.innerHTML=roots.map(r=>descendants(r.pid)).join("");
+  tree.querySelectorAll(".tree-item").forEach(el=>el.addEventListener("click",()=>{selectedPid=+el.dataset.pid;render();}));
+}
+
+function renderTerminal(){
+  const arr=visible();
+  if(view.value==="top"){
+    const totalCpu=processes.reduce((s,p)=>s+p.cpu,0).toFixed(1);
+    terminal.textContent=`top - simulated\nTasks: ${processes.length} total\nCPU: ${totalCpu}% used\n\nPID   USER     CPU%  MEM%  COMMAND\n`+
+      arr.map(p=>`${String(p.pid).padEnd(5)} ${p.user.padEnd(8)} ${p.cpu.toFixed(1).padStart(4)} ${p.mem.toFixed(1).padStart(5)}  ${p.cmd}`).join("\n");
+  }else if(view.value==="proc"){
+    const p=selected();
+    terminal.textContent=p
+      ? `/proc/${p.pid}/status\nName:\t${p.cmd.split(" ")[0]}\nState:\t${p.stat}\nPid:\t${p.pid}\nPPid:\t${p.ppid}\nUid:\t${p.user}\n\n/proc/${p.pid}/fd\n${p.fds.join("\n")}\n\n/proc/${p.pid}/maps\n${p.maps.join("\n")}`
+      : "No process selected.";
+  }else{
+    terminal.textContent="PID   PPID  USER     STAT CPU% MEM% COMMAND\n"+
+      arr.map(p=>`${String(p.pid).padEnd(5)} ${String(p.ppid).padEnd(5)} ${p.user.padEnd(8)} ${p.stat.padEnd(4)} ${p.cpu.toFixed(1).padStart(4)} ${p.mem.toFixed(1).padStart(4)} ${p.cmd}`).join("\n");
+  }
+}
+
+function renderDetails(){
+  const p=selected();
+  if(!p){
+    ["pidInfo","userState","usage","command"].forEach(id=>root.querySelector("#"+id).textContent="–");
+    root.querySelector("#fdList").innerHTML="";
+    root.querySelector("#mapList").innerHTML="";
+    return;
+  }
+  root.querySelector("#pidInfo").textContent=`${p.pid} / ${p.ppid}`;
+  root.querySelector("#userState").textContent=`${p.user} / ${p.stat}`;
+  root.querySelector("#usage").textContent=`${p.cpu.toFixed(1)}% / ${p.mem.toFixed(1)}%`;
+  root.querySelector("#command").textContent=p.cmd;
+  root.querySelector("#fdList").innerHTML=p.fds.map(x=>`<div class="entry">${x}</div>`).join("");
+  root.querySelector("#mapList").innerHTML=p.maps.map(x=>`<div class="entry">${x}</div>`).join("");
+}
+
+function render(){
+  if(selectedPid&&!processes.some(p=>p.pid===selectedPid))selectedPid=processes[0]?.pid||null;
+  renderTable();renderTree();renderTerminal();renderDetails();
+}
+
+function refresh(){
+  processes.forEach(p=>{
+    p.cpu=Math.max(0,Math.min(99,p.cpu+(Math.random()*4-2)));
+    p.mem=Math.max(.1,Math.min(99,p.mem+(Math.random()*.4-.2)));
+    p.stat=Math.random()>.75?"R":"S";
+  });
+  render();
+}
+
+function spawn(){
+  const parent=selected()||processes.find(p=>p.pid===1);
+  const pid=nextPid++;
+  processes.push({
+    pid,ppid:parent?parent.pid:1,user:"alice",stat:"R",cpu:1.0,mem:.5,cmd:"demo-worker",
+    fds:["0 -> /dev/pts/1","1 -> /dev/pts/1","2 -> /dev/pts/1"],
+    maps:["00400000-00440000 /usr/local/bin/demo-worker","01000000-01100000 [heap]","7fff9000-7ffff000 [stack]"]
+  });
+  selectedPid=pid;render();
+}
+
+function killSelected(){
+  if(selectedPid===1){alert("PID 1 is protected in this simulation.");return;}
+  const p=selected();
+  if(!p)return;
+  const children=processes.filter(x=>x.ppid===p.pid);
+  children.forEach(c=>c.ppid=1);
+  processes=processes.filter(x=>x.pid!==p.pid);
+  selectedPid=1;render();
+}
+
+view.addEventListener("change",render);
+sort.addEventListener("change",render);
+userFilter.addEventListener("change",render);
+search.addEventListener("input",render);
+root.querySelector("#refresh").addEventListener("click",refresh);
+root.querySelector("#spawn").addEventListener("click",spawn);
+root.querySelector("#kill").addEventListener("click",killSelected);
+root.querySelector("#reset").addEventListener("click",reset);
+
+reset();
+})();
+</script>

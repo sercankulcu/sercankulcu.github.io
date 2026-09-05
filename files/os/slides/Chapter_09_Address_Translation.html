@@ -1,0 +1,310 @@
+---
+layout: without-sidebar
+title: "Paging & Address Translation Visualizer"
+permalink: /files/os/slides/Chapter_09_Address_Translation.html
+excerpt: "An interactive paging and address-translation visualizer covering virtual addresses, page numbers, offsets, page tables, TLB hits and misses, page faults, and physical addresses."
+---
+
+<style>
+.addr-viz{
+  --av-line:var(--global-border-color);
+  --av-accent:var(--global-link-color);
+  --av-text:var(--global-text-color);
+  --av-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
+  --av-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  max-width:1180px;margin:0 auto;color:var(--av-text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.addr-viz *{box-sizing:border-box}
+.addr-viz h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0}
+.addr-viz .lead{max-width:900px;color:var(--av-muted)}
+.addr-viz .panel{margin-top:1rem;padding:1rem;border:1px solid var(--av-line);border-radius:18px;background:var(--global-bg-color)}
+.addr-viz .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
+.addr-viz label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
+.addr-viz input,.addr-viz select,.addr-viz button{
+  font:inherit;border:1px solid var(--av-line);border-radius:10px;padding:.62rem .7rem;background:var(--global-bg-color);color:var(--av-text)
+}
+.addr-viz button{cursor:pointer;font-weight:800}
+.addr-viz button.primary{background:var(--av-accent);color:#fff;border-color:var(--av-accent)}
+.addr-viz .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
+.addr-viz .flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.7rem;align-items:stretch}
+.addr-viz .node{padding:.9rem;border:1px solid var(--av-line);border-radius:14px;background:var(--av-soft);text-align:center}
+.addr-viz .node b{display:block;font-size:1.1rem;margin-top:.25rem}
+.addr-viz .node.active{outline:2px solid var(--av-accent)}
+.addr-viz .arrow{display:none}
+.addr-viz .tables{display:grid;grid-template-columns:1.2fr .8fr;gap:1rem}
+.addr-viz .table-wrap{overflow-x:auto}
+.addr-viz table{width:100%;border-collapse:collapse}
+.addr-viz th,.addr-viz td{border:1px solid var(--av-line);padding:.5rem;text-align:center}
+.addr-viz th{background:var(--av-soft)}
+.addr-viz td input{width:70px;text-align:center}
+.addr-viz .status{padding:.85rem;border:1px solid var(--av-line);border-radius:14px;background:var(--av-soft);margin-top:1rem}
+.addr-viz .status.good{border-left:5px solid #0f8a6a}
+.addr-viz .status.warn{border-left:5px solid #b26a00}
+.addr-viz .status.bad{border-left:5px solid #b42318}
+.addr-viz .binary{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;word-break:break-all}
+.addr-viz .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.addr-viz .metric{padding:.8rem;border:1px solid var(--av-line);border-radius:14px;background:var(--av-soft)}
+.addr-viz .metric b{display:block;font-size:1.1rem;margin-top:.2rem}
+.addr-viz .note{color:var(--av-muted);font-size:.88rem}
+@media(max-width:900px){.addr-viz .controls,.addr-viz .flow,.addr-viz .metrics{grid-template-columns:repeat(2,1fr)}.addr-viz .tables{grid-template-columns:1fr}}
+@media(max-width:600px){.addr-viz .controls,.addr-viz .flow,.addr-viz .metrics{grid-template-columns:1fr}}
+</style>
+
+<div class="addr-viz">
+  <div>
+    <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--av-accent)">Operating Systems · Chapter 9</div>
+    <h1>Paging & Address Translation Visualizer</h1>
+    <p class="lead">Trace how a virtual address is split into page number and offset, checked in the TLB, resolved through the page table, and converted into a physical address.</p>
+  </div>
+
+  <section class="panel">
+    <div class="controls">
+      <label>Virtual address
+        <input id="virtualAddress" type="number" min="0" value="5379">
+      </label>
+      <label>Page size (bytes)
+        <select id="pageSize">
+          <option value="256">256</option>
+          <option value="512">512</option>
+          <option value="1024" selected>1024</option>
+          <option value="2048">2048</option>
+          <option value="4096">4096</option>
+        </select>
+      </label>
+      <label>Virtual pages
+        <input id="pageCount" type="number" min="4" max="32" value="8">
+      </label>
+      <label>Physical frames
+        <input id="frameCount" type="number" min="2" max="32" value="6">
+      </label>
+    </div>
+    <div class="actions">
+      <button id="translate" class="primary">Translate address</button>
+      <button id="randomize">Randomize page table</button>
+      <button id="clearTlb">Clear TLB</button>
+      <button id="step">Next step</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Translation Flow</h2>
+    <div class="flow">
+      <div class="node" id="nVirtual">Virtual address<b id="vAddr">–</b></div>
+      <div class="node" id="nSplit">Page + offset<b id="split">–</b></div>
+      <div class="node" id="nTlb">TLB lookup<b id="tlbResult">–</b></div>
+      <div class="node" id="nPage">Page table<b id="pageResult">–</b></div>
+      <div class="node" id="nPhysical">Physical address<b id="pAddr">–</b></div>
+    </div>
+    <div id="status" class="status">Enter an address and translate it.</div>
+  </section>
+
+  <section class="panel">
+    <div class="tables">
+      <div>
+        <h2>Page Table</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Page</th><th>Present</th><th>Frame</th><th>Valid range</th></tr></thead>
+            <tbody id="pageBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h2>TLB</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Page</th><th>Frame</th><th>Age</th></tr></thead>
+            <tbody id="tlbBody"></tbody>
+          </table>
+        </div>
+        <p class="note">The TLB stores recently translated page → frame mappings. This demo uses a small LRU-style TLB.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Address Details</h2>
+    <div class="metrics">
+      <div class="metric">Page number<b id="pageNo">–</b></div>
+      <div class="metric">Offset<b id="offset">–</b></div>
+      <div class="metric">Frame number<b id="frameNo">–</b></div>
+      <div class="metric">TLB state<b id="tlbState">–</b></div>
+    </div>
+    <p><strong>Virtual address (binary):</strong> <span id="vBinary" class="binary">–</span></p>
+    <p><strong>Physical address (binary):</strong> <span id="pBinary" class="binary">–</span></p>
+  </section>
+
+  <section class="panel">
+    <h2>Concept Guide</h2>
+    <p><strong>Page number:</strong> <code>floor(virtual address / page size)</code>.</p>
+    <p><strong>Offset:</strong> the position inside the selected page.</p>
+    <p><strong>TLB hit:</strong> the page-to-frame mapping is already cached, so page-table lookup can be skipped.</p>
+    <p><strong>TLB miss:</strong> the page table must be consulted. If the page is present, the mapping can then be inserted into the TLB.</p>
+    <p><strong>Page fault:</strong> the page-table entry says the page is not currently in physical memory.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const root=document.querySelector(".addr-viz");
+if(!root)return;
+
+const vInput=root.querySelector("#virtualAddress");
+const pageSizeInput=root.querySelector("#pageSize");
+const pageCountInput=root.querySelector("#pageCount");
+const frameCountInput=root.querySelector("#frameCount");
+const pageBody=root.querySelector("#pageBody");
+const tlbBody=root.querySelector("#tlbBody");
+const status=root.querySelector("#status");
+
+let tlb=[];
+let age=0;
+let lastResult=null;
+let stepIndex=0;
+
+function pageSize(){return +pageSizeInput.value;}
+function pageCount(){return +pageCountInput.value;}
+function frameCount(){return +frameCountInput.value;}
+
+function buildPageTable(randomize=false){
+  const pc=pageCount(),fc=frameCount();
+  pageBody.innerHTML="";
+  for(let i=0;i<pc;i++){
+    const present=randomize?Math.random()>.2:true;
+    const frame=randomize?Math.floor(Math.random()*fc):(i%fc);
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>P${i}</td>
+      <td><input class="present" type="checkbox" ${present?"checked":""}></td>
+      <td><input class="frame" type="number" min="0" max="${fc-1}" value="${frame}"></td>
+      <td>${i*pageSize()}–${(i+1)*pageSize()-1}</td>`;
+    pageBody.appendChild(tr);
+  }
+  tlb=[];
+  renderTlb();
+  clearResult();
+}
+
+function readEntry(page){
+  const row=pageBody.rows[page];
+  if(!row)return null;
+  return {
+    present:row.querySelector(".present").checked,
+    frame:+row.querySelector(".frame").value
+  };
+}
+
+function renderTlb(){
+  tlbBody.innerHTML="";
+  if(!tlb.length){
+    tlbBody.innerHTML='<tr><td colspan="3">Empty</td></tr>';
+    return;
+  }
+  [...tlb].sort((a,b)=>b.age-a.age).forEach(e=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>P${e.page}</td><td>F${e.frame}</td><td>${e.age}</td>`;
+    tlbBody.appendChild(tr);
+  });
+}
+
+function clearHighlights(){
+  ["nVirtual","nSplit","nTlb","nPage","nPhysical"].forEach(id=>root.querySelector("#"+id).classList.remove("active"));
+}
+
+function clearResult(){
+  lastResult=null;stepIndex=0;clearHighlights();
+  ["vAddr","split","tlbResult","pageResult","pAddr","pageNo","offset","frameNo","tlbState","vBinary","pBinary"].forEach(id=>root.querySelector("#"+id).textContent="–");
+  status.className="status";
+  status.textContent="Enter an address and translate it.";
+}
+
+function binary(n,bits){
+  return Math.max(0,n).toString(2).padStart(bits,"0");
+}
+
+function touchTlb(page,frame){
+  age++;
+  const found=tlb.find(e=>e.page===page);
+  if(found){found.frame=frame;found.age=age;return;}
+  if(tlb.length>=4){
+    tlb.sort((a,b)=>a.age-b.age);
+    tlb.shift();
+  }
+  tlb.push({page,frame,age});
+}
+
+function translate(){
+  try{
+    const va=+vInput.value,ps=pageSize(),pc=pageCount(),fc=frameCount();
+    if(!Number.isInteger(va)||va<0)throw new Error("Virtual address must be a non-negative integer.");
+    const max=pc*ps;
+    if(va>=max)throw new Error(`Virtual address is outside the configured address space (0–${max-1}).`);
+
+    const page=Math.floor(va/ps),offset=va%ps;
+    const tlbEntry=tlb.find(e=>e.page===page);
+    let frame=null,tlbHit=false,pageFault=false,entry=null;
+
+    if(tlbEntry){
+      frame=tlbEntry.frame;tlbHit=true;touchTlb(page,frame);
+    }else{
+      entry=readEntry(page);
+      if(!entry.present)pageFault=true;
+      else{
+        if(!Number.isInteger(entry.frame)||entry.frame<0||entry.frame>=fc)throw new Error(`Frame for page ${page} must be between 0 and ${fc-1}.`);
+        frame=entry.frame;touchTlb(page,frame);
+      }
+    }
+
+    const pa=pageFault?null:frame*ps+offset;
+    const vBits=Math.ceil(Math.log2(pc*ps));
+    const pBits=Math.ceil(Math.log2(fc*ps));
+
+    lastResult={va,page,offset,frame,pa,tlbHit,pageFault,vBits,pBits};
+    stepIndex=0;
+
+    root.querySelector("#vAddr").textContent=va;
+    root.querySelector("#split").textContent=`P${page} + ${offset}`;
+    root.querySelector("#tlbResult").textContent=tlbHit?`Hit → F${frame}`:"Miss";
+    root.querySelector("#pageResult").textContent=pageFault?"Not present":(tlbHit?"Skipped":"Present → F"+frame);
+    root.querySelector("#pAddr").textContent=pageFault?"Page fault":pa;
+    root.querySelector("#pageNo").textContent=page;
+    root.querySelector("#offset").textContent=offset;
+    root.querySelector("#frameNo").textContent=pageFault?"–":frame;
+    root.querySelector("#tlbState").textContent=tlbHit?"Hit":"Miss";
+    root.querySelector("#vBinary").textContent=binary(va,vBits);
+    root.querySelector("#pBinary").textContent=pageFault?"–":binary(pa,pBits);
+
+    status.className="status "+(pageFault?"bad":tlbHit?"good":"warn");
+    status.innerHTML=pageFault
+      ? `<strong>Page fault.</strong> Page ${page} is not currently resident in physical memory.`
+      : tlbHit
+        ? `<strong>TLB hit.</strong> Translation completed without reading the page table.`
+        : `<strong>TLB miss, page-table hit.</strong> Mapping P${page} → F${frame} was loaded into the TLB.`;
+
+    renderTlb();
+    showStep(4);
+  }catch(e){alert(e.message);}
+}
+
+function showStep(index){
+  clearHighlights();
+  const ids=["nVirtual","nSplit","nTlb","nPage","nPhysical"];
+  for(let i=0;i<=index&&i<ids.length;i++)root.querySelector("#"+ids[i]).classList.add("active");
+}
+
+root.querySelector("#translate").addEventListener("click",translate);
+root.querySelector("#randomize").addEventListener("click",()=>buildPageTable(true));
+root.querySelector("#clearTlb").addEventListener("click",()=>{tlb=[];renderTlb();clearResult();});
+root.querySelector("#step").addEventListener("click",()=>{
+  if(!lastResult){translate();return;}
+  showStep(stepIndex);
+  stepIndex=(stepIndex+1)%5;
+});
+pageSizeInput.addEventListener("change",()=>buildPageTable(false));
+pageCountInput.addEventListener("change",()=>buildPageTable(false));
+frameCountInput.addEventListener("change",()=>buildPageTable(false));
+
+buildPageTable(false);
+})();
+</script>

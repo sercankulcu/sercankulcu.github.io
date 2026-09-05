@@ -87,9 +87,9 @@ No current announcements.
 
 The world of operating systems is introduced as a key aspect of modern computing. Fundamental concepts, design principles, and implementation techniques are explored to highlight how interaction between hardware and software is enabled.
 
-* Prerequisites for preparation [pdf](../files/os/Prerequisites_for_Operating_Systems.html)
-* Key figures who have shaped the field [pdf](../files/os/Pioneers_of_Operating_Systems.html)
-* Questions & Answers from OSTEP [pdf](../files/os/QA_from_OSTEP.pdf)
+* Prerequisites for preparation [(HTML))](../files/os/Prerequisites_for_Operating_Systems.html)
+* Key figures who have shaped the field [(HTML)](../files/os/Pioneers_of_Operating_Systems.html)
+* Questions & Answers from OSTEP [(HTML)](../files/os/QA_from_OSTEP.pdf)
 
 ---
 
@@ -161,7 +161,8 @@ CPU scheduling is a critical component of any operating system, responsible for 
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_05_Cizelgeleme.pdf) | 
   [Sunum (pdf)](../files/os/slides/kemal/Bolum_05_Cizelgeleme_Bicakci.pdf)
-- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_5_Scheduling.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_5_Scheduling.pdf) | 
+  [CPU Scheduling Simulator (HTML)](../files/os/slides/Chapter_05_CPU_Scheduling.html)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter05/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab05) 
@@ -175,7 +176,8 @@ In a multi-threaded or multi-process environment, synchronization mechanisms pro
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_06_Senkronizasyon.pdf) | 
   [Sunum (pdf)](../files/os/slides/kemal/Bolum_06_Senkronizasyon_Bicakci.pdf)
-- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_6_Synchronization.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_6_Synchronization.pdf) | 
+  [Synchronization Lab (HTML)](../files/os/slides/Chapter_06_Synchronization_Lab.html)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter06/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab06) 
@@ -189,7 +191,8 @@ A deadlock occurs when a set of processes or threads waits indefinitely for reso
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_07_Kilitlenme.pdf) | 
   [Sunum (pdf)](../files/os/slides/kemal/Bolum_07_Kilitlenme_Bicakci.pdf)
-- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_7_Deadlocks.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_7_Deadlocks.pdf) | 
+  [Deadlock & Banker's Algorithm Simulator (HTML)](../files/os/slides/Chapter_07_Deadlock_Bankers.html)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter07/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab07) 
@@ -204,7 +207,8 @@ Memory management, which involves the allocation, monitoring, and protection of 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_08_Bellek_Yonetimi.pdf) | 
   [Sunum I (pdf)](../files/os/slides/kemal/Bolum_08_01_Bellek_Yonetimi_Bicakci.pdf) | 
   [Sunum II (pdf)](../files/os/slides/kemal/Bolum_08_02_Bellek_Yonetimi_Bicakci.pdf)
-- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_8_Memory_management.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_8_Memory_management.pdf) | 
+  [Memory Allocation Simulator (HTML)](../files/os/slides/Chapter_08_Memory_Allocation.html)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter08/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab08) 
@@ -218,7 +222,9 @@ Virtual memory gives each process an isolated virtual address space and maps vir
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_09_Sanal_Bellek.pdf) | 
   [Sunum (pdf)](../files/os/slides/kemal/Bolum_09_Sanal_Bellek_Bicakci.pdf)
-- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_9_Virtual_memory.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_9_Virtual_memory.pdf) | 
+  [Page Replacement Simulator (HTML)](../files/os/slides/Chapter_09_Page_Replacement.html) | 
+  [Paging & Address Translation Visualizer (HTML)](../files/os/slides/Chapter_09_Address_Translation.html)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter09/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab09) 
@@ -248,7 +254,9 @@ The operating system manages communication between applications and hardware or 
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_11_Giris_Cikis.pdf) | 
   [Sunum (pdf)](../files/os/slides/kemal/Bolum_11_Giris_Cikis_Bicakci.pdf)
-- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_11_Input_output.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_11_Input_output.pdf) | 
+  [Disk Scheduling Simulator (HTML)](../files/os/slides/Chapter_11_Disk_Scheduling.html) | 
+  [Interrupt, DMA & I/O Flow Visualizer (HTML)](../files/os/slides/Chapter_11_IO_Interrupt_DMA.html)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter11/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab11) 
@@ -261,7 +269,8 @@ The operating system manages communication between applications and hardware or 
 Multiprocessor systems introduce challenges involving parallel scheduling, cache coherence, synchronization, processor affinity, load balancing, and memory-access topology across multicore, SMP, and NUMA architectures.
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_12_Cok_Islemcili_Sistemler.pdf)
-- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_12_Multiple_processor_systems.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_12_Multiple_processor_systems.pdf) | 
+  [Multicore Scheduling & Load Balancing Simulator (HTML)](../files/os/slides/Chapter_12_Multicore_Scheduling.html)
 - 💻Lab:
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter12/src)
 - [🖋️Question & answers (pdf)](../files/os/questions/Chapter_12_Multiple_processor_systems.pdf)
@@ -273,7 +282,8 @@ Multiprocessor systems introduce challenges involving parallel scheduling, cache
 Security is a critical concern in modern computing environments, and operating systems play a central role in providing the necessary mechanisms and policies to protect system resources, data, and applications from unauthorized access, modification, and other forms of attack.
 
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_13_Guvenlik.pdf)
-- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_13_Security.pdf)
+- [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_13_Security.pdf) | 
+  [OS Protection & Permissions Lab (HTML)](../files/os/slides/Chapter_13_Permissions_Security.html)
 - 💻Lab:
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter13/src)
 - [🖋️Question & answers (pdf)](../files/os/questions/Chapter_13_Security.pdf)
@@ -299,6 +309,7 @@ Operating system design involves the careful consideration of a wide range of fa
 - [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_15_Isletim_Sistemi_Tasarimi.pdf)
 - [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_15_Operating_system_design.pdf) | 
   [RTOS (HTML)](../files/os/slides/Chapter_15_RTOS.html) | 
+  [Real-Time Scheduling Simulator (HTML)](../files/os/slides/Chapter_15_Real_Time_Scheduling.html) | 
   [Testing and Debugging (HTML)](../files/os/slides/Chapter_15_Testing_Debugging.html)
 - [🖋️Question & answers (pdf)](../files/os/questions/Chapter_15_Operating_system_design.pdf)
 
@@ -307,4 +318,5 @@ Operating system design involves the careful consideration of a wide range of fa
 ## Chapter 16: Case studies:
 
 **UNIX - Linux**
-- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_16_Linux.pdf)
+- [🖼️Sunum [TR] (pdf)](../files/os/slides/Bolum_16_Linux.pdf) | 
+  [Linux Process Explorer (HTML)](../files/os/slides/Chapter_16_Linux_Process_Explorer.html)

@@ -1,0 +1,307 @@
+---
+layout: without-sidebar
+title: "Deadlock & Banker's Algorithm Simulator"
+permalink: /files/os/slides/Chapter_07_Deadlock_Bankers.html
+excerpt: "An interactive deadlock and Banker's Algorithm simulator with allocation, maximum, need, available resources, safe-sequence analysis, and step-by-step checks."
+---
+
+<style>
+.bankers-lab{
+  --bk-line:var(--global-border-color);
+  --bk-accent:var(--global-link-color);
+  --bk-text:var(--global-text-color);
+  --bk-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
+  --bk-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  max-width:1180px;margin:0 auto;color:var(--bk-text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.bankers-lab *{box-sizing:border-box}
+.bankers-lab h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0}
+.bankers-lab .lead{max-width:900px;color:var(--bk-muted)}
+.bankers-lab .panel{margin-top:1rem;padding:1rem;border:1px solid var(--bk-line);border-radius:18px;background:var(--global-bg-color)}
+.bankers-lab .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
+.bankers-lab label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
+.bankers-lab input,.bankers-lab select,.bankers-lab button{
+  font:inherit;border:1px solid var(--bk-line);border-radius:10px;padding:.6rem .7rem;background:var(--global-bg-color);color:var(--bk-text)
+}
+.bankers-lab button{cursor:pointer;font-weight:800}
+.bankers-lab button.primary{background:var(--bk-accent);color:#fff;border-color:var(--bk-accent)}
+.bankers-lab .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
+.bankers-lab .table-wrap{overflow-x:auto;margin-top:1rem}
+.bankers-lab table{width:100%;border-collapse:collapse;min-width:760px}
+.bankers-lab th,.bankers-lab td{border:1px solid var(--bk-line);padding:.5rem;text-align:center}
+.bankers-lab th{background:var(--bk-soft)}
+.bankers-lab td input{width:62px;text-align:center}
+.bankers-lab .vectors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem}
+.bankers-lab .vector{padding:.8rem;border:1px solid var(--bk-line);border-radius:14px;background:var(--bk-soft)}
+.bankers-lab .vector b{display:block;margin-bottom:.4rem}
+.bankers-lab .chips{display:flex;gap:.4rem;flex-wrap:wrap}
+.bankers-lab .chip{padding:.35rem .55rem;border-radius:999px;background:var(--global-bg-color);border:1px solid var(--bk-line);font-weight:800}
+.bankers-lab .status{padding:.85rem;border-radius:14px;border:1px solid var(--bk-line);background:var(--bk-soft);margin-top:1rem}
+.bankers-lab .status.good{border-left:5px solid #0f8a6a}
+.bankers-lab .status.bad{border-left:5px solid #b42318}
+.bankers-lab .steps{margin-top:1rem;display:grid;gap:.6rem}
+.bankers-lab .step{padding:.75rem;border:1px solid var(--bk-line);border-radius:12px;background:var(--global-bg-color)}
+.bankers-lab .step.done{background:var(--bk-soft)}
+.bankers-lab .note{color:var(--bk-muted);font-size:.88rem}
+@media(max-width:900px){.bankers-lab .controls,.bankers-lab .vectors{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.bankers-lab .controls,.bankers-lab .vectors{grid-template-columns:1fr}}
+</style>
+
+<div class="bankers-lab">
+  <div>
+    <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--bk-accent)">Operating Systems · Chapter 7</div>
+    <h1>Deadlock & Banker’s Algorithm Simulator</h1>
+    <p class="lead">Edit Allocation, Maximum, and Available resources. The simulator computes Need = Maximum − Allocation and checks whether the system is in a safe state.</p>
+  </div>
+
+  <section class="panel">
+    <div class="controls">
+      <label>Processes
+        <input id="procCount" type="number" min="2" max="8" value="5">
+      </label>
+      <label>Resource types
+        <input id="resCount" type="number" min="1" max="5" value="3">
+      </label>
+      <label>Scenario
+        <select id="scenario">
+          <option value="classic">Classic safe example</option>
+          <option value="unsafe">Unsafe example</option>
+          <option value="simple">Small example</option>
+        </select>
+      </label>
+      <label>&nbsp;
+        <button id="loadScenario">Load scenario</button>
+      </label>
+    </div>
+    <div class="actions">
+      <button id="rebuild">Rebuild blank</button>
+      <button id="analyze" class="primary">Analyze safety</button>
+      <button id="step">Next Banker step</button>
+      <button id="resetSteps">Reset steps</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Resource Matrices</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th rowspan="2">Process</th>
+            <th id="allocHead">Allocation</th>
+            <th id="maxHead">Maximum</th>
+            <th id="needHead">Need</th>
+          </tr>
+          <tr id="resourceNames"></tr>
+        </thead>
+        <tbody id="matrixBody"></tbody>
+      </table>
+    </div>
+    <h3>Available</h3>
+    <div id="availableInputs" class="chips"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Banker Analysis</h2>
+    <div class="vectors">
+      <div class="vector"><b>Current Work vector</b><div id="workVector" class="chips"></div></div>
+      <div class="vector"><b>Safe sequence</b><div id="safeSequence" class="chips"></div></div>
+      <div class="vector"><b>Unfinished processes</b><div id="unfinished" class="chips"></div></div>
+    </div>
+    <div id="status" class="status">Run the analysis to evaluate the system state.</div>
+    <div id="steps" class="steps"></div>
+  </section>
+
+  <section class="panel">
+    <h2>How Banker’s Algorithm Works</h2>
+    <p><strong>1.</strong> Compute <code>Need = Maximum − Allocation</code>.</p>
+    <p><strong>2.</strong> Set <code>Work = Available</code> and mark every process unfinished.</p>
+    <p><strong>3.</strong> Find an unfinished process whose Need is less than or equal to Work.</p>
+    <p><strong>4.</strong> Pretend that process finishes, then add its Allocation back into Work.</p>
+    <p><strong>5.</strong> If every process can finish, the state is safe. Otherwise, no safe sequence exists from the current state.</p>
+    <p class="note">A safe state does not mean deadlock has already occurred; it means the system still has at least one completion order that avoids deadlock.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const root=document.querySelector(".bankers-lab");
+if(!root)return;
+
+const procCount=root.querySelector("#procCount");
+const resCount=root.querySelector("#resCount");
+const body=root.querySelector("#matrixBody");
+const names=root.querySelector("#resourceNames");
+const availWrap=root.querySelector("#availableInputs");
+const status=root.querySelector("#status");
+const workVector=root.querySelector("#workVector");
+const safeSequence=root.querySelector("#safeSequence");
+const unfinished=root.querySelector("#unfinished");
+const stepsWrap=root.querySelector("#steps");
+
+let stepState=null;
+
+const scenarios={
+ classic:{
+  p:5,r:3,
+  allocation:[[0,1,0],[2,0,0],[3,0,2],[2,1,1],[0,0,2]],
+  maximum:[[7,5,3],[3,2,2],[9,0,2],[2,2,2],[4,3,3]],
+  available:[3,3,2]
+ },
+ unsafe:{
+  p:4,r:3,
+  allocation:[[1,0,1],[1,2,0],[1,1,1],[0,0,2]],
+  maximum:[[3,2,2],[2,2,2],[3,3,3],[2,2,3]],
+  available:[0,0,0]
+ },
+ simple:{
+  p:3,r:2,
+  allocation:[[1,0],[0,1],[1,1]],
+  maximum:[[2,1],[1,2],[2,2]],
+  available:[1,1]
+ }
+};
+
+function resourceLabel(i){return String.fromCharCode(65+i);}
+
+function build(p,r,data){
+ procCount.value=p;resCount.value=r;
+ names.innerHTML="";
+ ["Allocation","Maximum","Need"].forEach(group=>{
+   for(let j=0;j<r;j++){
+     const th=document.createElement("th");
+     th.textContent=resourceLabel(j);
+     names.appendChild(th);
+   }
+ });
+ body.innerHTML="";
+ for(let i=0;i<p;i++){
+   const tr=document.createElement("tr");
+   let html=`<td><strong>P${i}</strong></td>`;
+   for(let j=0;j<r;j++)html+=`<td><input class="alloc" data-r="${j}" type="number" min="0" value="${data?.allocation?.[i]?.[j]??0}"></td>`;
+   for(let j=0;j<r;j++)html+=`<td><input class="max" data-r="${j}" type="number" min="0" value="${data?.maximum?.[i]?.[j]??0}"></td>`;
+   for(let j=0;j<r;j++)html+=`<td class="need" data-r="${j}">0</td>`;
+   tr.innerHTML=html;body.appendChild(tr);
+ }
+ availWrap.innerHTML="";
+ for(let j=0;j<r;j++){
+   const label=document.createElement("label");
+   label.style.display="inline-flex";
+   label.style.flexDirection="row";
+   label.style.alignItems="center";
+   label.innerHTML=`${resourceLabel(j)} <input class="available" data-r="${j}" type="number" min="0" value="${data?.available?.[j]??0}" style="width:68px">`;
+   availWrap.appendChild(label);
+ }
+ resetOutputs();
+ updateNeeds();
+}
+
+function matrix(selector){
+ return [...body.rows].map(row=>[...row.querySelectorAll(selector)].map(x=>+x.value));
+}
+function available(){
+ return [...root.querySelectorAll(".available")].map(x=>+x.value);
+}
+function updateNeeds(){
+ const a=matrix(".alloc"),m=matrix(".max");
+ [...body.rows].forEach((row,i)=>{
+   [...row.querySelectorAll(".need")].forEach((cell,j)=>{
+     cell.textContent=Math.max(0,(m[i]?.[j]??0)-(a[i]?.[j]??0));
+   });
+ });
+}
+
+function validate(a,m,av){
+ for(let i=0;i<a.length;i++){
+   for(let j=0;j<a[i].length;j++){
+     if(a[i][j]<0||m[i][j]<0||av[j]<0)throw new Error("Resource values cannot be negative.");
+     if(a[i][j]>m[i][j])throw new Error(`P${i}: Allocation cannot exceed Maximum for resource ${resourceLabel(j)}.`);
+   }
+ }
+}
+
+function analyzeData(){
+ const a=matrix(".alloc"),m=matrix(".max"),av=available();
+ validate(a,m,av);
+ const need=m.map((row,i)=>row.map((v,j)=>v-a[i][j]));
+ const work=[...av],finish=Array(a.length).fill(false),seq=[],trace=[];
+ let progress=true;
+ while(progress){
+   progress=false;
+   for(let i=0;i<a.length;i++){
+     if(finish[i])continue;
+     const can=need[i].every((v,j)=>v<=work[j]);
+     if(can){
+       const before=[...work];
+       for(let j=0;j<work.length;j++)work[j]+=a[i][j];
+       finish[i]=true;seq.push(i);progress=true;
+       trace.push({p:i,before,need:[...need[i]],after:[...work]});
+     }
+   }
+ }
+ return {a,m,av,need,work,finish,seq,trace,safe:finish.every(Boolean)};
+}
+
+function renderAnalysis(result){
+ [...body.rows].forEach((row,i)=>{
+   [...row.querySelectorAll(".need")].forEach((cell,j)=>cell.textContent=result.need[i][j]);
+ });
+ workVector.innerHTML=result.work.map((v,i)=>`<span class="chip">${resourceLabel(i)}=${v}</span>`).join("");
+ safeSequence.innerHTML=result.seq.length?result.seq.map(i=>`<span class="chip">P${i}</span>`).join(""):"<span class='chip'>None</span>";
+ unfinished.innerHTML=result.finish.map((f,i)=>!f?`<span class="chip">P${i}</span>`:"").join("")||"<span class='chip'>None</span>";
+ status.className="status "+(result.safe?"good":"bad");
+ status.innerHTML=result.safe
+   ? `<strong>Safe state.</strong> One safe sequence is ${result.seq.map(i=>"P"+i).join(" → ")}.`
+   : `<strong>Unsafe state.</strong> The remaining processes cannot all be guaranteed to finish with the current Available resources.`;
+ stepsWrap.innerHTML="";
+ result.trace.forEach((t,k)=>{
+   const d=document.createElement("div");
+   d.className="step";
+   d.textContent=`Step ${k+1}: P${t.p} can finish because Need [${t.need.join(", ")}] ≤ Work [${t.before.join(", ")}]. After release, Work = [${t.after.join(", ")}].`;
+   stepsWrap.appendChild(d);
+ });
+ stepState={trace:result.trace,index:0,result};
+}
+
+function resetOutputs(){
+ status.className="status";
+ status.textContent="Run the analysis to evaluate the system state.";
+ workVector.innerHTML="";safeSequence.innerHTML="";unfinished.innerHTML="";stepsWrap.innerHTML="";
+ stepState=null;
+}
+
+function runAnalyze(){
+ try{renderAnalysis(analyzeData());}
+ catch(e){alert(e.message);}
+}
+
+function nextStep(){
+ try{
+   if(!stepState){const r=analyzeData();renderAnalysis(r);}
+   if(!stepState.trace.length)return;
+   [...stepsWrap.children].forEach(x=>x.classList.remove("done"));
+   const upto=Math.min(stepState.index,stepState.trace.length-1);
+   for(let i=0;i<=upto;i++)stepsWrap.children[i].classList.add("done");
+   const t=stepState.trace[upto];
+   workVector.innerHTML=t.after.map((v,i)=>`<span class="chip">${resourceLabel(i)}=${v}</span>`).join("");
+   stepState.index=Math.min(stepState.index+1,stepState.trace.length);
+ }catch(e){alert(e.message);}
+}
+
+root.addEventListener("input",e=>{
+ if(e.target.matches(".alloc,.max"))updateNeeds();
+ if(e.target.matches(".alloc,.max,.available"))resetOutputs();
+});
+root.querySelector("#rebuild").addEventListener("click",()=>build(+procCount.value,+resCount.value,null));
+root.querySelector("#analyze").addEventListener("click",runAnalyze);
+root.querySelector("#step").addEventListener("click",nextStep);
+root.querySelector("#resetSteps").addEventListener("click",()=>{if(stepState){stepState.index=0;[...stepsWrap.children].forEach(x=>x.classList.remove("done"));workVector.innerHTML=stepState.result.av.map((v,i)=>`<span class="chip">${resourceLabel(i)}=${v}</span>`).join("");}});
+root.querySelector("#loadScenario").addEventListener("click",()=>{const s=scenarios[root.querySelector("#scenario").value];build(s.p,s.r,s);});
+procCount.addEventListener("change",()=>build(+procCount.value,+resCount.value,null));
+resCount.addEventListener("change",()=>build(+procCount.value,+resCount.value,null));
+
+build(scenarios.classic.p,scenarios.classic.r,scenarios.classic);
+})();
+</script>

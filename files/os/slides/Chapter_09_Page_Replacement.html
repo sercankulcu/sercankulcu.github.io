@@ -1,0 +1,297 @@
+---
+layout: without-sidebar
+title: "Page Replacement Simulator"
+permalink: /files/os/slides/Chapter_09_Page_Replacement.html
+excerpt: "An interactive page replacement simulator for FIFO, Optimal, LRU, LFU, and Second Chance with frame-by-frame visualization and page-fault metrics."
+---
+
+<style>
+.page-repl{
+  --pr-line:var(--global-border-color);
+  --pr-accent:var(--global-link-color);
+  --pr-text:var(--global-text-color);
+  --pr-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
+  --pr-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  max-width:1180px;margin:0 auto;color:var(--pr-text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.page-repl *{box-sizing:border-box}
+.page-repl h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0}
+.page-repl .lead{max-width:900px;color:var(--pr-muted)}
+.page-repl .panel{margin-top:1rem;padding:1rem;border:1px solid var(--pr-line);border-radius:18px;background:var(--global-bg-color)}
+.page-repl .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
+.page-repl label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
+.page-repl input,.page-repl select,.page-repl button{
+  font:inherit;border:1px solid var(--pr-line);border-radius:10px;padding:.62rem .7rem;background:var(--global-bg-color);color:var(--pr-text)
+}
+.page-repl button{cursor:pointer;font-weight:800}
+.page-repl button.primary{background:var(--pr-accent);color:#fff;border-color:var(--pr-accent)}
+.page-repl .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
+.page-repl .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.page-repl .metric{padding:.85rem;border:1px solid var(--pr-line);border-radius:14px;background:var(--pr-soft)}
+.page-repl .metric b{display:block;font-size:1.15rem;margin-top:.2rem}
+.page-repl .table-wrap{overflow-x:auto;margin-top:1rem}
+.page-repl table{border-collapse:collapse;min-width:max-content}
+.page-repl th,.page-repl td{border:1px solid var(--pr-line);padding:.5rem;text-align:center;min-width:58px}
+.page-repl th{background:var(--pr-soft)}
+.page-repl td.hit{background:color-mix(in srgb,#0f8a6a 14%,var(--global-bg-color))}
+.page-repl td.fault{background:color-mix(in srgb,#b42318 12%,var(--global-bg-color))}
+.page-repl .compare{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:.7rem;margin-top:1rem}
+.page-repl .compare-card{padding:.8rem;border:1px solid var(--pr-line);border-radius:14px;background:var(--pr-soft);text-align:center}
+.page-repl .compare-card b{display:block;font-size:1.2rem;margin-top:.2rem}
+.page-repl .note{color:var(--pr-muted);font-size:.88rem}
+@media(max-width:900px){.page-repl .controls,.page-repl .metrics,.page-repl .compare{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.page-repl .controls,.page-repl .metrics,.page-repl .compare{grid-template-columns:1fr}}
+</style>
+
+<div class="page-repl">
+  <div>
+    <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--pr-accent)">Operating Systems · Chapter 9</div>
+    <h1>Page Replacement Simulator</h1>
+    <p class="lead">Enter a reference string, choose the number of frames, and compare how replacement policies react to hits and page faults.</p>
+  </div>
+
+  <section class="panel">
+    <div class="controls">
+      <label>Algorithm
+        <select id="algorithm">
+          <option value="fifo">FIFO</option>
+          <option value="optimal">Optimal</option>
+          <option value="lru">LRU</option>
+          <option value="lfu">LFU</option>
+          <option value="clock">Second Chance / Clock</option>
+        </select>
+      </label>
+      <label>Frames
+        <input id="frames" type="number" min="1" max="8" value="3">
+      </label>
+      <label>Reference string
+        <input id="refs" value="7 0 1 2 0 3 0 4 2 3 0 3 2">
+      </label>
+      <label>Scenario
+        <select id="scenario">
+          <option value="default">Classic</option>
+          <option value="belady">Belady anomaly</option>
+          <option value="locality">Locality-heavy</option>
+        </select>
+      </label>
+    </div>
+    <div class="actions">
+      <button id="run" class="primary">Run simulation</button>
+      <button id="loadScenario">Load scenario</button>
+      <button id="compareAll">Compare all</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Results</h2>
+    <div class="metrics">
+      <div class="metric">Page faults<b id="faults">–</b></div>
+      <div class="metric">Page hits<b id="hits">–</b></div>
+      <div class="metric">Fault rate<b id="faultRate">–</b></div>
+      <div class="metric">Hit rate<b id="hitRate">–</b></div>
+    </div>
+    <div class="table-wrap">
+      <table id="resultTable"></table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Algorithm Comparison</h2>
+    <div id="compare" class="compare"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Algorithm Guide</h2>
+    <p><strong>FIFO:</strong> removes the page that entered memory earliest.</p>
+    <p><strong>Optimal:</strong> removes the page whose next use is farthest in the future. It is a theoretical benchmark because real systems do not know future references.</p>
+    <p><strong>LRU:</strong> removes the page that has not been used for the longest time.</p>
+    <p><strong>LFU:</strong> removes the page with the lowest reference count; ties are broken by oldest recent use.</p>
+    <p><strong>Second Chance / Clock:</strong> approximates LRU using a reference bit and a circular pointer.</p>
+    <p class="note">Try the Belady anomaly scenario with FIFO and compare 3 vs 4 frames. FIFO can sometimes produce more faults when given more memory.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const root=document.querySelector(".page-repl");
+if(!root)return;
+
+const alg=root.querySelector("#algorithm");
+const framesInput=root.querySelector("#frames");
+const refsInput=root.querySelector("#refs");
+const table=root.querySelector("#resultTable");
+const compare=root.querySelector("#compare");
+
+const scenarios={
+  default:"7 0 1 2 0 3 0 4 2 3 0 3 2",
+  belady:"1 2 3 4 1 2 5 1 2 3 4 5",
+  locality:"1 2 3 2 1 2 4 1 2 3 2 1 5 1 2"
+};
+
+function parseRefs(){
+  return refsInput.value.trim().split(/[\s,]+/).filter(Boolean).map(x=>{
+    const n=Number(x);
+    if(!Number.isFinite(n))throw new Error("Reference string must contain numbers only.");
+    return n;
+  });
+}
+function frameCount(){
+  const n=+framesInput.value;
+  if(!Number.isInteger(n)||n<1||n>8)throw new Error("Frames must be an integer between 1 and 8.");
+  return n;
+}
+
+function runFIFO(refs,n){
+  const frames=[],queue=[],steps=[];
+  for(const page of refs){
+    let hit=frames.includes(page);
+    if(!hit){
+      if(frames.length<n){frames.push(page);queue.push(page);}
+      else{
+        const victim=queue.shift();
+        const idx=frames.indexOf(victim);
+        frames[idx]=page;queue.push(page);
+      }
+    }
+    steps.push({page,frames:[...frames],hit});
+  }
+  return steps;
+}
+
+function runOptimal(refs,n){
+  const frames=[],steps=[];
+  refs.forEach((page,i)=>{
+    let hit=frames.includes(page);
+    if(!hit){
+      if(frames.length<n)frames.push(page);
+      else{
+        let victimIdx=0,far=-1;
+        frames.forEach((p,fi)=>{
+          const next=refs.slice(i+1).indexOf(p);
+          const dist=next<0?Infinity:next;
+          if(dist>far){far=dist;victimIdx=fi;}
+        });
+        frames[victimIdx]=page;
+      }
+    }
+    steps.push({page,frames:[...frames],hit});
+  });
+  return steps;
+}
+
+function runLRU(refs,n){
+  const frames=[],last=new Map(),steps=[];
+  refs.forEach((page,i)=>{
+    let hit=frames.includes(page);
+    if(!hit){
+      if(frames.length<n)frames.push(page);
+      else{
+        let victim=frames[0];
+        frames.forEach(p=>{if((last.get(p)??-1)<(last.get(victim)??-1))victim=p;});
+        frames[frames.indexOf(victim)]=page;
+      }
+    }
+    last.set(page,i);
+    steps.push({page,frames:[...frames],hit});
+  });
+  return steps;
+}
+
+function runLFU(refs,n){
+  const frames=[],freq=new Map(),last=new Map(),steps=[];
+  refs.forEach((page,i)=>{
+    let hit=frames.includes(page);
+    if(!hit){
+      if(frames.length<n)frames.push(page);
+      else{
+        let victim=frames[0];
+        frames.forEach(p=>{
+          const fp=freq.get(p)??0,fv=freq.get(victim)??0;
+          if(fp<fv||(fp===fv&&(last.get(p)??-1)<(last.get(victim)??-1)))victim=p;
+        });
+        frames[frames.indexOf(victim)]=page;
+      }
+    }
+    freq.set(page,(freq.get(page)??0)+1);
+    last.set(page,i);
+    steps.push({page,frames:[...frames],hit});
+  });
+  return steps;
+}
+
+function runClock(refs,n){
+  const frames=Array(n).fill(null),bits=Array(n).fill(0),steps=[];let hand=0,filled=0;
+  for(const page of refs){
+    let idx=frames.indexOf(page);
+    let hit=idx>=0;
+    if(hit){bits[idx]=1;}
+    else{
+      if(filled<n){
+        frames[hand]=page;bits[hand]=1;hand=(hand+1)%n;filled++;
+      }else{
+        while(bits[hand]===1){bits[hand]=0;hand=(hand+1)%n;}
+        frames[hand]=page;bits[hand]=1;hand=(hand+1)%n;
+      }
+    }
+    steps.push({page,frames:frames.filter(x=>x!==null),hit});
+  }
+  return steps;
+}
+
+function simulate(mode,refs,n){
+  return {fifo:runFIFO,optimal:runOptimal,lru:runLRU,lfu:runLFU,clock:runClock}[mode](refs,n);
+}
+
+function render(mode){
+  try{
+    const refs=parseRefs(),n=frameCount(),steps=simulate(mode,refs,n);
+    const faults=steps.filter(s=>!s.hit).length,hits=steps.length-faults;
+    root.querySelector("#faults").textContent=faults;
+    root.querySelector("#hits").textContent=hits;
+    root.querySelector("#faultRate").textContent=(100*faults/steps.length).toFixed(1)+"%";
+    root.querySelector("#hitRate").textContent=(100*hits/steps.length).toFixed(1)+"%";
+
+    table.innerHTML="";
+    const head=document.createElement("tr");
+    head.innerHTML="<th>Reference</th>"+refs.map(x=>`<th>${x}</th>`).join("");
+    table.appendChild(head);
+
+    for(let f=0;f<n;f++){
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<th>Frame ${f+1}</th>`+steps.map(s=>`<td>${s.frames[f]??"–"}</td>`).join("");
+      table.appendChild(tr);
+    }
+    const last=document.createElement("tr");
+    last.innerHTML="<th>Result</th>"+steps.map(s=>`<td class="${s.hit?"hit":"fault"}">${s.hit?"Hit":"Fault"}</td>`).join("");
+    table.appendChild(last);
+  }catch(e){alert(e.message);}
+}
+
+function compareAll(){
+  try{
+    const refs=parseRefs(),n=frameCount();
+    compare.innerHTML="";
+    [["fifo","FIFO"],["optimal","Optimal"],["lru","LRU"],["lfu","LFU"],["clock","Clock"]].forEach(([mode,label])=>{
+      const steps=simulate(mode,refs,n);
+      const faults=steps.filter(s=>!s.hit).length;
+      const d=document.createElement("div");
+      d.className="compare-card";
+      d.innerHTML=`${label}<b>${faults}</b><span>faults</span>`;
+      compare.appendChild(d);
+    });
+  }catch(e){alert(e.message);}
+}
+
+root.querySelector("#run").addEventListener("click",()=>render(alg.value));
+root.querySelector("#compareAll").addEventListener("click",compareAll);
+root.querySelector("#loadScenario").addEventListener("click",()=>{
+  refsInput.value=scenarios[root.querySelector("#scenario").value];
+  render(alg.value);compareAll();
+});
+
+render("fifo");
+compareAll();
+})();
+</script>
