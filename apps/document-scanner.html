@@ -97,6 +97,7 @@ excerpt: "Scan document photos, correct perspective, crop, enhance and export mu
 
 .ds-canvas-wrap {
   display: grid;
+  gap: 12px;
   place-items: center;
   overflow: auto;
   min-height: 440px;
@@ -113,21 +114,44 @@ excerpt: "Scan document photos, correct perspective, crop, enhance and export mu
   text-align: center;
 }
 
-.ds-stage {
-  position: relative;
+.ds-preview-block,
+.ds-editor-block {
   display: none;
-  max-width: 100%;
-  line-height: 0;
-  touch-action: none;
-  user-select: none;
+  width: 100%;
 }
 
-.ds-canvas-wrap.loaded .ds-stage {
-  display: inline-block;
+.ds-canvas-wrap.loaded .ds-preview-block {
+  display: block;
+}
+
+.ds-canvas-wrap.editing .ds-editor-block {
+  display: block;
 }
 
 .ds-canvas-wrap.loaded .ds-empty {
   display: none;
+}
+
+.ds-preview-label,
+.ds-editor-label {
+  margin: 0 0 7px;
+  color: var(--global-text-color);
+  opacity: .55;
+  font-size: .66rem;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.ds-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  max-width: 100%;
+  line-height: 0;
+  touch-action: none;
+  user-select: none;
 }
 
 .ds-stage canvas {
@@ -136,6 +160,11 @@ excerpt: "Scan document photos, correct perspective, crop, enhance and export mu
   height: auto;
   background: white;
   border-radius: 8px;
+}
+
+.ds-editor-block {
+  padding-top: 10px;
+  border-top: 1px solid var(--global-border-color);
 }
 
 #ds-overlay {
@@ -396,9 +425,20 @@ html[data-theme="dark"] .ds-btn.primary {
     <div class="ds-row">
       <div class="ds-card ds-canvas-wrap empty" id="ds-canvas-wrap">
         <div class="ds-empty" id="ds-empty">No photo selected.</div>
-        <div class="ds-stage" id="ds-stage">
-          <canvas id="ds-canvas" width="1" height="1"></canvas>
-          <canvas id="ds-overlay" width="1" height="1"></canvas>
+
+        <div class="ds-preview-block" id="ds-preview-block">
+          <p class="ds-preview-label">Download Preview</p>
+          <div class="ds-stage" id="ds-stage">
+            <canvas id="ds-canvas" width="1" height="1"></canvas>
+          </div>
+        </div>
+
+        <div class="ds-editor-block" id="ds-editor-block">
+          <p class="ds-editor-label">Adjustment Area</p>
+          <div class="ds-stage" id="ds-edit-stage">
+            <canvas id="ds-edit-canvas" width="1" height="1"></canvas>
+            <canvas id="ds-overlay" width="1" height="1"></canvas>
+          </div>
         </div>
       </div>
 
@@ -477,8 +517,10 @@ html[data-theme="dark"] .ds-btn.primary {
   const fileInput = byId("ds-file");
   const canvasWrap = byId("ds-canvas-wrap");
   const canvas = byId("ds-canvas");
+  const editCanvas = byId("ds-edit-canvas");
   const overlay = byId("ds-overlay");
   const stage = byId("ds-stage");
+  const editStage = byId("ds-edit-stage");
   const filter = byId("ds-filter");
   const brightness = byId("ds-bright");
   const contrast = byId("ds-contrast");
@@ -542,10 +584,10 @@ html[data-theme="dark"] .ds-btn.primary {
   }
 
   function syncOverlaySize() {
-    overlay.width = canvas.width;
-    overlay.height = canvas.height;
-    overlay.style.width = `${canvas.clientWidth}px`;
-    overlay.style.height = `${canvas.clientHeight}px`;
+    overlay.width = editCanvas.width;
+    overlay.height = editCanvas.height;
+    overlay.style.width = `${editCanvas.clientWidth}px`;
+    overlay.style.height = `${editCanvas.clientHeight}px`;
   }
 
   function resetGeometry() {
@@ -736,16 +778,64 @@ html[data-theme="dark"] .ds-btn.primary {
     return out;
   }
 
+  function copyCanvas(source, target) {
+    target.width = source.width;
+    target.height = source.height;
+    const context = target.getContext("2d");
+    context.clearRect(0, 0, target.width, target.height);
+    context.drawImage(source, 0, 0);
+  }
+
+  function renderCropPreview() {
+    const x = Math.round(cropRect.x * editCanvas.width);
+    const y = Math.round(cropRect.y * editCanvas.height);
+    const width = Math.max(1, Math.round(cropRect.w * editCanvas.width));
+    const height = Math.max(1, Math.round(cropRect.h * editCanvas.height));
+
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+    context.clearRect(0, 0, width, height);
+    context.drawImage(
+      editCanvas,
+      x,
+      y,
+      width,
+      height,
+      0,
+      0,
+      width,
+      height
+    );
+  }
+
+  function renderOutputPreview() {
+    if (!loaded) return;
+
+    if (editMode === "crop") {
+      renderCropPreview();
+      return;
+    }
+
+    if (editMode === "perspective") {
+      try {
+        copyCanvas(createPerspectiveCanvas(editCanvas), canvas);
+        return;
+      } catch (error) {
+        copyCanvas(editCanvas, canvas);
+        return;
+      }
+    }
+
+    copyCanvas(editCanvas, canvas);
+  }
+
   function draw() {
     if (!loaded) return;
 
     const filtered = applyFilters(getBaseCanvas(1400));
-    canvas.width = filtered.width;
-    canvas.height = filtered.height;
-
-    const context = canvas.getContext("2d");
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(filtered, 0, 0);
+    copyCanvas(filtered, editCanvas);
+    renderOutputPreview();
 
     requestAnimationFrame(() => {
       syncOverlaySize();
@@ -923,6 +1013,7 @@ html[data-theme="dark"] .ds-btn.primary {
         cropRect.y = Math.max(0, Math.min(1 - cropRect.h, dragTarget.rect.y + dy));
       }
 
+      renderOutputPreview();
       drawOverlay();
     }
   });
@@ -930,6 +1021,9 @@ html[data-theme="dark"] .ds-btn.primary {
   ["pointerup", "pointercancel"].forEach(type => {
     overlay.addEventListener(type, () => {
       dragTarget = null;
+      if (editMode === "perspective") {
+        renderOutputPreview();
+      }
     });
   });
 
@@ -1016,12 +1110,7 @@ html[data-theme="dark"] .ds-btn.primary {
     }
   }
 
-  function applyPerspective() {
-    const source = document.createElement("canvas");
-    source.width = canvas.width;
-    source.height = canvas.height;
-    source.getContext("2d").drawImage(canvas, 0, 0);
-
+  function createPerspectiveCanvas(source) {
     const points = perspective.map(point => ({
       x: point.x * source.width,
       y: point.y * source.height
@@ -1068,31 +1157,17 @@ html[data-theme="dark"] .ds-btn.primary {
     }
 
     outContext.putImageData(outImage, 0, 0);
-    replaceSourceWithCanvas(out);
+    return out;
+  }
+
+  function applyPerspective() {
+    renderOutputPreview();
+    replaceSourceWithCanvas(canvas);
   }
 
   function applyCrop() {
-    const x = Math.round(cropRect.x * canvas.width);
-    const y = Math.round(cropRect.y * canvas.height);
-    const width = Math.max(1, Math.round(cropRect.w * canvas.width));
-    const height = Math.max(1, Math.round(cropRect.h * canvas.height));
-
-    const out = document.createElement("canvas");
-    out.width = width;
-    out.height = height;
-    out.getContext("2d").drawImage(
-      canvas,
-      x,
-      y,
-      width,
-      height,
-      0,
-      0,
-      width,
-      height
-    );
-
-    replaceSourceWithCanvas(out);
+    renderOutputPreview();
+    replaceSourceWithCanvas(canvas);
   }
 
   function replaceSourceWithCanvas(sourceCanvas) {
@@ -1115,7 +1190,12 @@ html[data-theme="dark"] .ds-btn.primary {
     perspectiveBtn.classList.toggle("active", editMode === "perspective");
     cropBtn.classList.toggle("active", editMode === "crop");
     applyEditBtn.disabled = !loaded || !editMode;
-    drawOverlay();
+    canvasWrap.classList.toggle("editing", Boolean(editMode));
+    renderOutputPreview();
+    requestAnimationFrame(() => {
+      syncOverlaySize();
+      drawOverlay();
+    });
   }
 
   function setEditMode(mode) {
