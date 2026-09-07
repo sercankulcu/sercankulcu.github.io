@@ -186,6 +186,12 @@ excerpt: "A 30-question cognitive reasoning test covering numerical, logical, ve
     rgba(45, 45, 45, .17);
 }
 
+.iq-btn:disabled {
+  opacity: .45;
+
+  cursor: not-allowed;
+}
+
 .iq-btn.primary {
   border-color: var(--global-link-color);
 
@@ -721,6 +727,11 @@ html[data-theme="dark"] .iq-btn.primary {
         id="iq-result-text"
       ></p>
 
+      <p
+        class="iq-result-text"
+        id="iq-result-time"
+      ></p>
+
       <div class="iq-breakdown">
         <h3 id="iq-cats-head"></h3>
 
@@ -812,14 +823,16 @@ html[data-theme="dark"] .iq-btn.primary {
       start: "Teste Başla",
       q: "Soru",
       time: "Süre",
+      completion: "Tamamlanma süresi",
       result: "Sonucunuz",
       score: "Tahmini Akıl Yürütme Puanı",
-      accuracy: "Doğruluk",
+      accuracy: "doğruluk",
       correct: "doğru",
       again: "Tekrar Dene",
       review: "Cevapları İncele",
       hide: "İncelemeyi Gizle",
       pdf: "PDF Raporunu İndir",
+      pdfUnavailable: "PDF kütüphanesi yüklenemedi.",
       name: "Adınız",
       cats: "Kategori Dağılımı",
       disc: "Bu test yalnızca eğlence ve kişisel değerlendirme amaçlıdır. Klinik veya standardize edilmiş bir IQ testi değildir.",
@@ -838,14 +851,16 @@ html[data-theme="dark"] .iq-btn.primary {
       start: "Start Test",
       q: "Question",
       time: "Time",
+      completion: "Completion time",
       result: "Your Result",
       score: "Estimated Reasoning Score",
-      accuracy: "Accuracy",
+      accuracy: "accuracy",
       correct: "correct",
       again: "Try Again",
       review: "Review Answers",
       hide: "Hide Review",
       pdf: "Download PDF Report",
+      pdfUnavailable: "PDF library could not be loaded.",
       name: "Your name",
       cats: "Category Breakdown",
       disc: "This test is for entertainment and self-reflection only. It is not a clinical or standardized IQ assessment.",
@@ -894,7 +909,22 @@ html[data-theme="dark"] .iq-btn.primary {
   let index = 0;
   let answers = [];
   let started = 0;
+  let elapsedSeconds = 0;
   let timerId = null;
+
+  function formatDuration(seconds) {
+    const minutes =
+      Math.floor(seconds / 60);
+
+    const remainingSeconds =
+      seconds % 60;
+
+    return (
+      `${minutes}:` +
+      String(remainingSeconds)
+        .padStart(2, "0")
+    );
+  }
 
   function shuffle(array) {
     const copy = [...array];
@@ -1009,7 +1039,12 @@ html[data-theme="dark"] .iq-btn.primary {
 
     index = 0;
     answers = [];
+    elapsedSeconds = 0;
     started = Date.now();
+
+    byId("iq-review")
+      .classList
+      .remove("active");
 
     byId("iq-landing")
       .style.display = "none";
@@ -1040,16 +1075,10 @@ html[data-theme="dark"] .iq-btn.primary {
         (Date.now() - started) / 1000
       );
 
-    const minutes =
-      Math.floor(seconds / 60);
-
     byId("iq-timer")
       .textContent =
         `${UI[lang].time}: ` +
-        `${minutes}:` +
-        String(
-          seconds % 60
-        ).padStart(2, "0");
+        formatDuration(seconds);
   }
 
   function renderQuestion() {
@@ -1165,7 +1194,22 @@ html[data-theme="dark"] .iq-btn.primary {
   }
 
   function finish() {
+    elapsedSeconds =
+      Math.floor(
+        (Date.now() - started) / 1000
+      );
+
     clearInterval(timerId);
+
+    byId("iq-bar")
+      .style.width = "100%";
+
+    document
+      .querySelector(".iq-bar")
+      .setAttribute(
+        "aria-valuenow",
+        String(items.length)
+      );
 
     byId("iq-test")
       .classList
@@ -1278,8 +1322,16 @@ html[data-theme="dark"] .iq-btn.primary {
 
     byId("iq-result-text")
       .textContent =
-        `${result.correct} / ${answers.length} ` +
-        `${t.correct} · ${result.pct}% ${t.accuracy}`;
+        lang === "tr"
+          ? `${result.correct} / ${answers.length} ` +
+            `${t.correct} · %${result.pct} ${t.accuracy}`
+          : `${result.correct} / ${answers.length} ` +
+            `${t.correct} · ${result.pct}% ${t.accuracy}`;
+
+    byId("iq-result-time")
+      .textContent =
+        `${t.completion}: ` +
+        formatDuration(elapsedSeconds);
 
     byId("iq-cats-head")
       .textContent =
@@ -1331,9 +1383,24 @@ html[data-theme="dark"] .iq-btn.primary {
           ? t.hide
           : t.review;
 
-    byId("iq-pdf-btn")
-      .textContent =
-        t.pdf;
+    const pdfButton =
+      byId("iq-pdf-btn");
+
+    pdfButton.textContent =
+      t.pdf;
+
+    pdfButton.disabled =
+      !window.jspdf;
+
+    pdfButton.setAttribute(
+      "aria-disabled",
+      String(!window.jspdf)
+    );
+
+    pdfButton.title =
+      window.jspdf
+        ? ""
+        : t.pdfUnavailable;
 
     byId("iq-name-input")
       .placeholder =
@@ -1450,6 +1517,14 @@ html[data-theme="dark"] .iq-btn.primary {
         "Estimated Reasoning Score",
       accuracy:
         "Accuracy",
+      completion:
+        "Completion time",
+      average:
+        "Average time per question",
+      date:
+        "Date",
+      questions:
+        "Questions",
       categories:
         "Category Breakdown",
       disclaimer:
@@ -1510,7 +1585,42 @@ html[data-theme="dark"] .iq-btn.primary {
       61
     );
 
-    let y = 77;
+    documentPdf.text(
+      `${pdfText.completion}: ` +
+      formatDuration(elapsedSeconds),
+      20,
+      70
+    );
+
+    const averageSeconds =
+      answers.length
+        ? elapsedSeconds / answers.length
+        : 0;
+
+    documentPdf.text(
+      `${pdfText.average}: ` +
+      `${averageSeconds.toFixed(1)} s`,
+      20,
+      79
+    );
+
+    documentPdf.text(
+      `${pdfText.date}: ` +
+      new Date()
+        .toISOString()
+        .slice(0, 10),
+      20,
+      88
+    );
+
+    documentPdf.text(
+      `${pdfText.questions}: ` +
+      `${answers.length}`,
+      20,
+      97
+    );
+
+    let y = 113;
 
     documentPdf.setFont(
       "helvetica",
@@ -1559,6 +1669,61 @@ html[data-theme="dark"] .iq-btn.primary {
       "reasoning-report.pdf"
     );
   }
+
+  function handleKeyboardShortcut(event) {
+    if (
+      !byId("iq-test")
+        .classList
+        .contains("active") ||
+      event.repeat
+    ) {
+      return;
+    }
+
+    const key =
+      event.key.toLowerCase();
+
+    const shortcuts = {
+      "1": 0,
+      "2": 1,
+      "3": 2,
+      "4": 3,
+      "a": 0,
+      "b": 1,
+      "c": 2,
+      "d": 3
+    };
+
+    if (
+      !(key in shortcuts)
+    ) {
+      return;
+    }
+
+    const buttons =
+      [
+        ...document
+          .querySelectorAll(".iq-option")
+      ];
+
+    const button =
+      buttons[shortcuts[key]];
+
+    if (
+      !button ||
+      button.disabled
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    button.click();
+  }
+
+  document.addEventListener(
+    "keydown",
+    handleKeyboardShortcut
+  );
 
   document
     .querySelectorAll(".iq-lang")
