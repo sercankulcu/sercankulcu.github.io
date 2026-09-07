@@ -168,6 +168,7 @@ excerpt: "Scan document photos, correct perspective, crop, enhance and export mu
 }
 
 #ds-overlay {
+  pointer-events: none;
   position: absolute;
   inset: 0;
   width: 100%;
@@ -390,6 +391,8 @@ html[data-theme="dark"] .ds-btn.primary {
     transition-duration: .001ms !important;
   }
 }
+
+.ds-stage.editing #ds-overlay { pointer-events: auto; }
 </style>
 
 <div class="document-scanner-app">
@@ -434,10 +437,9 @@ html[data-theme="dark"] .ds-btn.primary {
         </div>
 
         <div class="ds-editor-block" id="ds-editor-block">
-          <p class="ds-editor-label">Adjustment Area</p>
+          <p class="ds-editor-label"></p>
           <div class="ds-stage" id="ds-edit-stage">
-            <canvas id="ds-edit-canvas" width="1" height="1"></canvas>
-            <canvas id="ds-overlay" width="1" height="1"></canvas>
+<canvas id="ds-overlay" width="1" height="1"></canvas>
           </div>
         </div>
       </div>
@@ -470,7 +472,7 @@ html[data-theme="dark"] .ds-btn.primary {
         </div>
 
         <p class="ds-help" id="ds-edit-help">
-          Perspective: drag the four corner handles. Crop: drag inside the box or its corners.
+          Drag the handles directly on the preview. Crop and perspective changes are shown live.
         </p>
 
         <div class="ds-actions">
@@ -517,7 +519,7 @@ html[data-theme="dark"] .ds-btn.primary {
   const fileInput = byId("ds-file");
   const canvasWrap = byId("ds-canvas-wrap");
   const canvas = byId("ds-canvas");
-  const editCanvas = byId("ds-edit-canvas");
+  const canvas = byId("ds-edit-canvas");
   const overlay = byId("ds-overlay");
   const stage = byId("ds-stage");
   const editStage = byId("ds-edit-stage");
@@ -584,10 +586,10 @@ html[data-theme="dark"] .ds-btn.primary {
   }
 
   function syncOverlaySize() {
-    overlay.width = editCanvas.width;
-    overlay.height = editCanvas.height;
-    overlay.style.width = `${editCanvas.clientWidth}px`;
-    overlay.style.height = `${editCanvas.clientHeight}px`;
+    overlay.width = canvas.width;
+    overlay.height = canvas.height;
+    overlay.style.width = `${canvas.clientWidth}px`;
+    overlay.style.height = `${canvas.clientHeight}px`;
   }
 
   function resetGeometry() {
@@ -787,17 +789,17 @@ html[data-theme="dark"] .ds-btn.primary {
   }
 
   function renderCropPreview() {
-    const x = Math.round(cropRect.x * editCanvas.width);
-    const y = Math.round(cropRect.y * editCanvas.height);
-    const width = Math.max(1, Math.round(cropRect.w * editCanvas.width));
-    const height = Math.max(1, Math.round(cropRect.h * editCanvas.height));
+    const x = Math.round(cropRect.x * canvas.width);
+    const y = Math.round(cropRect.y * canvas.height);
+    const width = Math.max(1, Math.round(cropRect.w * canvas.width));
+    const height = Math.max(1, Math.round(cropRect.h * canvas.height));
 
     canvas.width = width;
     canvas.height = height;
     const context = canvas.getContext("2d");
     context.clearRect(0, 0, width, height);
     context.drawImage(
-      editCanvas,
+      canvas,
       x,
       y,
       width,
@@ -819,22 +821,22 @@ html[data-theme="dark"] .ds-btn.primary {
 
     if (editMode === "perspective") {
       try {
-        copyCanvas(createPerspectiveCanvas(editCanvas), canvas);
+        copyCanvas(createPerspectiveCanvas(canvas), canvas);
         return;
       } catch (error) {
-        copyCanvas(editCanvas, canvas);
+        copyCanvas(canvas, canvas);
         return;
       }
     }
 
-    copyCanvas(editCanvas, canvas);
+    copyCanvas(canvas, canvas);
   }
 
   function draw() {
     if (!loaded) return;
 
     const filtered = applyFilters(getBaseCanvas(1400));
-    copyCanvas(filtered, editCanvas);
+    copyCanvas(filtered, canvas);
     renderOutputPreview();
 
     requestAnimationFrame(() => {
@@ -1187,6 +1189,7 @@ html[data-theme="dark"] .ds-btn.primary {
   }
 
   function updateEditButtons() {
+    stage.classList.toggle("editing", Boolean(editMode));
     perspectiveBtn.classList.toggle("active", editMode === "perspective");
     cropBtn.classList.toggle("active", editMode === "crop");
     applyEditBtn.disabled = !loaded || !editMode;
