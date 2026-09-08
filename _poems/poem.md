@@ -1,5 +1,5 @@
 ---
-title: ".."
+title: "Dumanlar Arasında Sensiz"
 poet: "tcd"
 order: 12
 ---
