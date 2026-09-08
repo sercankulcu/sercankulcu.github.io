@@ -49,7 +49,7 @@ This website brings together my academic work, software projects, teaching mater
 
 **Explore the site**
 
-[📚 Teaching](/teaching/) · [📄 CV](/cv/) · [🛠️ Apps](/apps/) · [🎮 Games](/games/) · [💻 Posts](/posts/) · [💭 Thoughts](/thoughts/) · [🎬 Fun](/fun/) · [🕰️ Memory](/memory/) · [🌍 Humanity](/humanity/) · [🌿 Nature](/nature/) · [✏️ Pencils](/pencils/) · [🔖 Bookmarks](/bookmarks/)
+[📚 Teaching](/teaching/) · [📄 CV](/cv/) · [🛠️ Apps](/apps/) · [🎮 Games](/games/) · [💻 Posts](/posts/) · [💭 Thoughts](/thoughts/) · [🎬 Fun](/fun/) · [📜 Poems](/poems/) · [🕰️ Memory](/memory/) · [🌍 Humanity](/humanity/) · [🌿 Nature](/nature/) · [✏️ Pencils](/pencils/) · [🔖 Bookmarks](/bookmarks/)
 
 **Note:** If you believe any content on this website infringes a license or copyright, please contact me. I will review and remove the material promptly if necessary.
 
