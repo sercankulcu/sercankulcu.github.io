@@ -10,6 +10,19 @@ author_profile: true
 
 ---
 
+<style>
+details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #0969da;
+}
+
+details summary:hover {
+  color: #0550ae;
+  text-decoration: underline;
+}
+</style>
+
 ## Journal Articles
 
 ### 2026 - Enhancing Radar PPI-Based Maritime Object Detection Using Hybrid Preprocessing and Deep Learning Approach
