@@ -93,7 +93,7 @@ This review examines the use of computer vision for food quality assessment, inc
 
 **How to cite:** Balpetek Kulcu, D., & Kulcu, S. (2018). Computer Vision Technology on Food Science. *Karaelmas Science and Engineering Journal, 8*(1), 403–409.
 
-[Paper](https://doi.org/10.7212/zkufbd.v8i1.1024)
+[Paper](https://dergipark.org.tr/en/pub/karaelmasfen/article/805752)
 
 ---
 
