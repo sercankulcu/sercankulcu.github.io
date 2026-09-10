@@ -326,6 +326,6 @@ This PhD thesis investigates the integration of smart and directional antennas w
 
 **How to cite:** Külcü, S. (2022). *Analysis of Smart Antenna Based Scheduling Algorithms for IoT Networks* [PhD thesis, Karadeniz Technical University].
 
-[Thesis](/files/theses/Analysis_of_Smart_Antenna_Based_Scheduling_Algorithms_for_IoT_Networks.pdf)
+[Thesis](/files/presentations/766420.pdf) · [Presentation EN](/files/presentations/IoT_Smart_Antenna_PhD_Defense.pdf) · [Presentation TR](/files/presentations/IoT_Akilli_Anten_Tez_Savunmasi.pdf)
 
 </details>
