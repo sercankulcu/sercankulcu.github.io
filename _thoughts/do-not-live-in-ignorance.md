@@ -1,6 +1,7 @@
 ---
 title: 'The Cave Is Easier When It Is Familiar'
 date: 2024-12-25
+description: "Plato's cave is not only about ignorance, but about why familiar illusions can be painful to leave."
 tags:
   - philosophy
   - education

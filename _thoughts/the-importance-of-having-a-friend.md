@@ -1,6 +1,7 @@
 ---
 title: 'A Good Friend Is Someone You Can Be Less Edited Around'
 date: 2020-08-01
+description: "A good friend is someone around whom we can become less edited and more honestly ourselves."
 tags:
   - friendship
   - trust

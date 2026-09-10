@@ -1,6 +1,7 @@
 ---
 title: 'Loneliness Is Not the Absence of People'
 date: 2024-04-24
+description: "Loneliness is not simply the absence of people, and solitude is not always a form of lack."
 tags:
   - solitude
   - relationships

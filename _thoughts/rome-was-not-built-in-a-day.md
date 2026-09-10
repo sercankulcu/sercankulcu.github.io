@@ -1,6 +1,7 @@
 ---
 title: 'Patience Is Not Waiting'
 date: 2015-10-06
+description: "Patience is not passive waiting; it is repeated construction when visible progress is still small."
 tags:
   - life
   - patience
@@ -23,7 +24,7 @@ Seneca's writing on time repeatedly returns to the question of how we use what i
 
 This distinction changes how I think about slow progress.
 
-Writing one page is not impressive because one page is large. It matters because it belongs to a process whose final shape is still invisible. Fixing one bug, practicing one difficult movement, having one honest conversation—none of these guarantees success.
+Writing one page is not impressive because one page is large. It matters because it belongs to a process whose final shape is still invisible. Fixing one bug, practicing one difficult movement, having one honest conversation, none of these guarantees success.
 
 They are simply today's share of a larger task.
 

@@ -1,6 +1,7 @@
 ---
 title: 'We Perform More Than We Admit'
 date: 2019-07-04
+description: "Social life is full of performance, and self-knowledge begins by noticing how much we edit ourselves for others."
 tags:
   - character
   - status

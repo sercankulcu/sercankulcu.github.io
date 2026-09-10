@@ -1,12 +1,13 @@
 ---
 title: "Why Some People Stop Talking"
 date: 2012-07-07
+description: "People sometimes stop talking not because nothing matters, but because too much has become difficult to say."
 tags:
-   - communication
-   - friendship
-   - silence
-   - trust
-   - reflections
+  - communication
+  - friendship
+  - silence
+  - trust
+  - reflections
 ---
 
 Some people are quiet because they have nothing to say. Others are quiet because they have learned that speaking is expensive.

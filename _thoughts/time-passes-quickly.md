@@ -1,6 +1,7 @@
 ---
 title: 'Routine Is How Time Disappears'
 date: 2025-01-20
+description: "Routine makes time disappear because days without landmarks are difficult for memory to hold."
 tags:
   - time
   - memory

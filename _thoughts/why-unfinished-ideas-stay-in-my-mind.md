@@ -1,6 +1,7 @@
 ---
 title: 'Unfinished Things Keep Asking for Attention'
 date: 2015-09-20
+description: "Unfinished ideas stay alive because the mind keeps returning to what has not yet found its form."
 tags:
   - projects
   - attention

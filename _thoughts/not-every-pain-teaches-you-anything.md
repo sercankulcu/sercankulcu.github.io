@@ -1,6 +1,7 @@
 ---
 title: 'Pain Does Not Owe Us a Lesson'
 date: 2017-10-06
+description: "Not every painful experience contains a lesson; sometimes pain simply needs care, time, and honesty."
 tags:
   - life
   - pain

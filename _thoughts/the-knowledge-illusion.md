@@ -1,6 +1,7 @@
 ---
 title: 'Borrowed Knowledge Feels Like Our Own'
 date: 2018-11-18
+description: "Borrowed knowledge can feel like our own until reality asks us to explain, use, or repair it."
 tags:
   - knowledge
   - judgment

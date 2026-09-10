@@ -1,6 +1,7 @@
 ---
 title: 'A Good Life Is Not a Pleasant One'
 date: 2011-04-06
+description: "A good life is not built by avoiding bitterness, but by learning what each bitter or sweet feeling is attached to."
 tags:
   - life
   - emotion
@@ -33,7 +34,7 @@ A difficult conversation can protect a relationship. An easy habit can slowly da
 
 The emotional label is not the verdict.
 
-That distinction matters to me because modern advice often treats feeling good as evidence that we are living well. Sometimes they coincide. Sometimes they do not.
+That distinction matters to me because a lot of advice treats feeling good as evidence that we are living well. Sometimes they coincide. Sometimes they do not.
 
 Epicurus is often simplified into a philosopher of pleasure, but his idea of a good life was more disciplined than constant enjoyment. Some pleasures create later pain. Some discomforts protect larger forms of peace.
 

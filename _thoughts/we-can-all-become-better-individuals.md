@@ -1,6 +1,7 @@
 ---
 title: 'Character Appears in Small Transactions'
 date: 2014-07-07
+description: "Character appears in small transactions, where ordinary choices reveal what we are practicing becoming."
 tags:
   - character
   - ethics

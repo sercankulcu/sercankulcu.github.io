@@ -1,6 +1,7 @@
 ---
 title: 'Progress Is Sometimes Subtraction'
 date: 2026-01-24
+description: "Some progress looks like subtraction: fewer distractions, fewer performances, and fewer unnecessary burdens."
 tags:
   - life
   - progress

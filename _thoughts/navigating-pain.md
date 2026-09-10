@@ -1,6 +1,7 @@
 ---
 title: 'Pain Is Not a Competition'
 date: 2022-06-28
+description: "Pain is not a competition, and comparing wounds rarely helps anyone heal more honestly."
 tags:
   - life
   - empathy

@@ -1,6 +1,7 @@
 ---
 title: 'Not Every Voice in Your Head Is Yours'
 date: 2010-10-06
+description: "Not every voice in our head began with us, and healing can require learning where those voices came from."
 tags:
   - identity
   - memory

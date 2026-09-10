@@ -1,6 +1,7 @@
 ---
 title: 'A Year Needs Landmarks'
 date: 2026-05-10
+description: "A year needs landmarks; without novelty and attention, time passes without giving memory enough to hold."
 tags:
   - life
   - time

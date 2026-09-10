@@ -1,12 +1,13 @@
 ---
 title: "When 'I'm Not Ready for a Relationship' Means 'Not with You'"
 date: 2009-11-04
+description: "Sometimes not ready for a relationship really means not ready for this relationship with this person."
 tags:
-   - relationships
-   - rejection
-   - memories
-   - communication
-   - life
+  - relationships
+  - rejection
+  - memories
+  - communication
+  - life
 ---
 
 There are sentences that sound more complicated than they really are. One of them is: **"I'm not looking for a serious relationship right now."** At first, it sounds reasonable. Maybe the timing is bad. Maybe work is difficult. Maybe life is complicated. Maybe the person genuinely needs space.
@@ -39,7 +40,7 @@ Accepting that can be strangely liberating. You do not need to become more persu
 
 That comparison is one of the ugliest parts of rejection. What does he have that I don't? Is he funnier, taller, more confident, more successful? Did he say something I should have said? The mind wants a ranking because rankings feel explainable. But attraction does not behave like a spreadsheet.
 
-The most useful thing I learned later was to take rejection more literally—not the explanation, the outcome. If someone wants to be with you, that desire usually becomes visible over time. People can be shy and confused, but sustained uncertainty is itself information. If you spend weeks trying to determine whether someone wants you in their life, you may already be investing far more energy than they are.
+The most useful thing I learned later was to take rejection more literally, not the explanation, the outcome. If someone wants to be with you, that desire usually becomes visible over time. People can be shy and confused, but sustained uncertainty is itself information. If you spend weeks trying to determine whether someone wants you in their life, you may already be investing far more energy than they are.
 
 There is another side to this. I have probably used soft language too. Most of us have. It is easier to say "I'm not ready" than "I don't want this with you." We protect ourselves from the discomfort of rejecting someone by giving an explanation that sounds less personal.
 

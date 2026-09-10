@@ -1,6 +1,7 @@
 ---
 title: 'Goodness Needs Institutions'
 date: 2016-02-14
+description: "Goodness needs more than private virtue when institutions reward the people willing to exploit others."
 tags:
   - ethics
   - institutions

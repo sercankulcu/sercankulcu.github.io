@@ -1,6 +1,7 @@
 ---
 title: 'The Days We Miss Were Once Ordinary'
 date: 2022-06-04
+description: "Many ordinary days become precious only after the people, places, or routines inside them disappear."
 tags:
   - life
   - memory
@@ -19,7 +20,7 @@ The strange part is that these things rarely arrive with a warning saying: *noti
 
 They simply repeat until one day they do not.
 
-This is why I find gratitude difficult when it is presented as a cheerful duty. Telling ourselves to appreciate everything can become another way of refusing to admit that some days are bad. Illness is bad. Grief is bad. Exhaustion does not become beautiful because somebody tells us to be grateful.
+This is why I find gratitude difficult when it is presented as a cheerful duty. Telling ourselves to appreciate everything can become another way of refusing to admit that some days are bad. Illness is bad. Grief is bad. Exhaustion does not become beautiful because someone tells us to be grateful.
 
 But Seneca's old practice of remembering that what we have is temporary points toward something more useful. We do not need to pretend an ordinary day is wonderful. We can simply remember that it is not guaranteed.
 

@@ -1,6 +1,7 @@
 ---
 title: 'You Are Central to Your Experience, Not to Everyone Else'
 date: 2022-08-11
+description: "We are central to our own experience, but not to everyone else's, and that distinction can make us kinder."
 tags:
   - perspective
   - ego
@@ -49,7 +50,7 @@ The second is self-consciousness: assuming other people are constantly evaluatin
 
 Both place the self at the center.
 
-In reality, most people are occupied with the same thing I am occupied with—their own unfinished life.
+In reality, most people are occupied with the same thing I am occupied with, their own unfinished life.
 
 I find that liberating.
 

@@ -1,6 +1,7 @@
 ---
 title: 'Discomfort Is Not a Verdict'
 date: 2022-07-07
+description: "Discomfort is not always a warning; sometimes it is the price of doing something worth doing."
 tags:
   - persistence
   - judgment

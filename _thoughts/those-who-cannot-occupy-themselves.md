@@ -1,6 +1,7 @@
 ---
 title: 'Unclaimed Attention Gets Claimed'
 date: 2024-07-05
+description: "Unclaimed attention gets claimed by noise, distraction, and other people's priorities."
 tags:
   - attention
   - autonomy
@@ -21,7 +22,7 @@ The problem is cumulative.
 
 A day can be consumed by reactions without containing a single deliberate decision about where attention should go.
 
-Pascal wrote about *divertissement*—the many activities through which people avoid sitting quietly with themselves. Modern technology did not invent distraction. It industrialized access to it.
+Pascal wrote about *divertissement*,the many activities through which people avoid sitting quietly with themselves. Modern technology did not invent distraction. It industrialized access to it.
 
 An empty minute rarely remains empty now.
 

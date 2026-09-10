@@ -1,6 +1,7 @@
 ---
 title: 'Every Explanation Inherits Something'
 date: 2024-01-11
+description: "Every explanation inherits something from older stories, habits, fears, and attempts to make sense of the world."
 tags:
   - philosophy
   - knowledge

@@ -1,6 +1,7 @@
 ---
 title: 'Admire the Work, Not the Statue'
 date: 2018-07-07
+description: "Admiration becomes healthier when we learn to value the work without turning the person into a statue."
 tags:
   - admiration
   - judgment

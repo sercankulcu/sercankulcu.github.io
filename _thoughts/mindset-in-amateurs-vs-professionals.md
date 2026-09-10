@@ -1,6 +1,7 @@
 ---
 title: 'Systems Matter Most After Motivation Leaves'
 date: 2020-07-03
+description: "Motivation is fragile; systems matter because they keep the work alive after enthusiasm leaves."
 tags:
   - practice
   - discipline

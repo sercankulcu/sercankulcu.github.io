@@ -1,6 +1,7 @@
 ---
 title: 'Adult Joy Is Quieter'
 date: 2025-01-25
+description: "Adult joy may become quieter not because life has less beauty, but because attention becomes heavier."
 tags:
   - life
   - reflection

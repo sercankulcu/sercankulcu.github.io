@@ -1,6 +1,7 @@
 ---
 title: 'A Personal Blog Lets Ideas Stay'
 date: 2026-08-05
+description: "A personal blog gives thoughts a stable address and lets old ideas remain available for return."
 tags:
   - blogging
   - writing

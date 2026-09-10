@@ -1,6 +1,7 @@
 ---
 title: 'Status Is a Shortcut, Not a Verdict'
 date: 2023-03-20
+description: "Status can decorate a person, but it cannot replace judgment, character, or inner worth."
 tags:
   - status
   - judgment

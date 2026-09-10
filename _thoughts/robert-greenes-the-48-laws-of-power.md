@@ -1,6 +1,7 @@
 ---
 title: 'Recognizing a Power Game Is Not the Same as Playing It'
 date: 2017-02-12
+description: "Recognizing power games can be useful, but awareness should not become admiration for manipulation."
 tags:
   - power
   - status

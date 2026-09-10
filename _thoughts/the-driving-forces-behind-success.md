@@ -1,6 +1,7 @@
 ---
 title: 'Discipline Is Mostly Removing Decisions'
 date: 2018-12-15
+description: "Discipline often works by removing repeated decisions before motivation has a chance to negotiate."
 tags:
   - discipline
   - work
@@ -33,4 +34,4 @@ That combination seems more useful than endless self-control.
 
 The disciplined person is not necessarily the one who can force himself to do anything.
 
-He may simply be the person who has decided fewer things need to be decided every day—and who still remembers that a system is a servant, not a reason for living.
+He may simply be the person who has decided fewer things need to be decided every day, and who still remembers that a system is a servant, not a reason for living.

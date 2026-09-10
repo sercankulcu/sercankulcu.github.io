@@ -1,6 +1,7 @@
 ---
 title: 'The Self That Refuses Correction'
 date: 2024-08-08
+description: "The self that refuses correction can become a greater obstacle than any external opponent."
 tags:
   - ego
   - learning

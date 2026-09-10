@@ -1,6 +1,7 @@
 ---
 title: 'Patterns Make Decisions Before We Notice'
 date: 2009-05-16
+description: "Mechanical thinking helps us function, but it can also make old patterns choose before we notice."
 tags:
   - habit
   - freedom
@@ -35,7 +36,7 @@ These questions do not prove that the automatic response is wrong. They make it 
 
 And visibility changes the relationship.
 
-A pattern we cannot see feels like character. A pattern we can see becomes something we may still choose—but now it has to compete with other possibilities.
+A pattern we cannot see feels like character. A pattern we can see becomes something we may still choose, but now it has to compete with other possibilities.
 
 Maybe freedom is not living without patterns.
 

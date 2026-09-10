@@ -1,12 +1,13 @@
 ---
 title: "When Growing Older Means Missing the Old Things"
 date: 2009-12-26
+description: "Growing older can mean discovering that ordinary things from the past carried more comfort than we knew."
 tags:
-   - aging
-   - childhood
-   - memory
-   - change
-   - reflection
+  - aging
+  - childhood
+  - memory
+  - change
+  - reflection
 ---
 
 When I was a child, getting something new could feel urgent.
@@ -43,7 +44,7 @@ You want to catch up.
 
 In December 2009, I wrote something about aging that began from exactly this place.
 
-I asked whether you had ever had to keep using something from childhood — a pair of shoes or a school bag, for example — even after your friends had replaced theirs.
+I asked whether you had ever had to keep using something from childhood , a pair of shoes or a school bag, for example , even after your friends had replaced theirs.
 
 Had you argued with your parents because your own things looked old and worn?
 

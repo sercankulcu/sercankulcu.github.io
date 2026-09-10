@@ -1,6 +1,7 @@
 ---
 title: 'Speed Can Hide Impatience'
 date: 2011-04-04
+description: "Speed can be useful, but hurry often hides impatience, fear, and the refusal to let judgment mature."
 tags:
   - judgment
   - patience

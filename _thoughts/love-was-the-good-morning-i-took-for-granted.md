@@ -1,12 +1,13 @@
 ---
 title: "Love Was the Good Morning I Took for Granted"
 date: 2010-04-24
+description: "Love often hides inside ordinary repetitions that only become visible when they stop happening."
 tags:
-   - love
-   - relationships
-   - habits
-   - memories
-   - reflection
+  - love
+  - relationships
+  - habits
+  - memories
+  - reflection
 ---
 
 There are things we notice because they happen.

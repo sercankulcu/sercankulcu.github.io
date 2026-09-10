@@ -1,6 +1,7 @@
 ---
 title: 'Changing Your Mind Is Not Losing'
 date: 2019-03-24
+description: "Changing your mind is not losing; it may be the price of seeing more clearly."
 tags:
   - belief
   - judgment

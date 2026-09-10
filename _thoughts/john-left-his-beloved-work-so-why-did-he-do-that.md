@@ -1,6 +1,7 @@
 ---
 title: 'A Good Job Can Still Be the Wrong Life'
 date: 2015-10-06
+description: "A good job can still become the wrong life when identity, comfort, and obligation replace honest desire."
 tags:
   - work
   - priorities

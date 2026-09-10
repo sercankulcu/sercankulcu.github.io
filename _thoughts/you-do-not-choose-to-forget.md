@@ -1,12 +1,13 @@
 ---
 title: "You Do Not Choose to Forget"
 date: 2010-07-04
+description: "Forgetting rarely obeys direct command; memory loosens through time, attention, and new life around the old wound."
 tags:
-   - memories
-   - forgetting
-   - time
-   - life
-   - reflection
+  - memories
+  - forgetting
+  - time
+  - life
+  - reflection
 ---
 
 Years ago, I wrote a single sentence about forgetting: **Forgetting is not something a person can do. It is something that happens to a person.** I still think there is truth in that.
@@ -39,4 +40,4 @@ Complete forgetting is not always possible, and perhaps not always desirable. So
 
 The problem begins when we demand obedience from memory: keep this, remove that, preserve that summer, erase this person. Human memory does not accept instructions so neatly. It has its own schedule.
 
-So I still believe the old sentence. Forgetting is not something you do. It happens—usually while you are occupied with something else, usually later than you want, and sometimes earlier than you expected.
+So I still believe the old sentence. Forgetting is not something you do. It happens, usually while you are occupied with something else, usually later than you want, and sometimes earlier than you expected.

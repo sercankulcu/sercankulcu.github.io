@@ -1,17 +1,18 @@
 ---
 title: "Staying Friends with an Ex"
 date: 2009-01-03
+description: "Staying friends with an ex requires honesty about attachment, timing, boundaries, and unfinished hope."
 tags:
-   - relationships
-   - memories
-   - breakup
-   - friendship
-   - life
+  - relationships
+  - memories
+  - breakup
+  - friendship
+  - life
 ---
 
 People often say it is mature to stay friends with an ex. Maybe sometimes it is. Maybe sometimes it works perfectly. But there is a version of this arrangement that looks much better in theory than it feels in real life.
 
-Imagine being in the same place with your ex and their new partner. Everybody is civilized. Everybody behaves like an adult. Then the two of them start kissing in front of you. That is a useful moment—not pleasant, useful—because all the abstract sentences are tested at once: *We are still friends. I am completely over it. The past is the past. I only want them to be happy.*
+Imagine being in the same place with your ex and their new partner. Everybody is civilized. Everybody behaves like an adult. Then the two of them start kissing in front of you. That is a useful moment, not pleasant, useful, because all the abstract sentences are tested at once: *We are still friends. I am completely over it. The past is the past. I only want them to be happy.*
 
 The body often answers faster than the mind. Jealousy does not care about your carefully prepared philosophy. Memory does not care that the relationship officially ended months ago. There is a difference between accepting that someone has moved on and watching them move on two meters away from you.
 
@@ -35,6 +36,6 @@ The phrase "stay friends" sounds beautiful because it suggests nothing was lost.
 
 That distance can feel cruel at first, but it is also how lives separate. Sometimes separation is exactly what a breakup needs: not hatred, not revenge, not a dramatic final speech, just enough distance for the word *ex* to become a description of the past instead of a strange form of the present.
 
-I do not think everyone should cut all contact with every former partner. There are no universal rules for relationships. But friendship should be real friendship—not surveillance, waiting, guilt, accidental hope, or an excuse to remain nearby.
+I do not think everyone should cut all contact with every former partner. There are no universal rules for relationships. But friendship should be real friendship, not surveillance, waiting, guilt, accidental hope, or an excuse to remain nearby.
 
 If seeing them happy with someone else still makes the room feel dangerous, perhaps friendship can wait. There is nothing wrong with allowing the past to become the past.

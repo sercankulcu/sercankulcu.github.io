@@ -1,6 +1,7 @@
 ---
 title: 'Most Days Do Not Feel Important'
 date: 2019-12-16
+description: "Small actions rarely feel important while they happen, but they quietly build the shape of a life."
 tags:
   - habits
   - life

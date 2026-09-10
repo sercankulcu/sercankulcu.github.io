@@ -1,6 +1,7 @@
 ---
 title: 'Silence Does Not Explain Itself'
 date: 2023-03-13
+description: "When someone leaves without explanation, we should separate the hurt they caused from the motives we cannot know."
 tags:
   - relationships
   - endings
@@ -57,7 +58,7 @@ The temptation is to solve uncertainty by converting it into judgment.
 
 If they will not explain themselves, I will explain them for them.
 
-The problem is that invented certainty can keep the relationship psychologically active long after the person is gone. We replay scenes, reinterpret messages, build motives, test theories against evidence that cannot answer back.
+The problem is that invented certainty can keep the relationship psychologically active long after the person is gone. We replay scenes, reinterpret messages, build motives, and test theories against evidence that cannot answer back.
 
 At some point, the search for closure can become another form of attachment.
 

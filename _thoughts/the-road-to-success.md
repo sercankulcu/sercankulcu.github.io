@@ -1,6 +1,7 @@
 ---
 title: 'Choose What Is Worth the Cost'
 date: 2023-07-08
+description: "Success is not only reaching a goal, but choosing a cost that is actually worth paying."
 tags:
   - life
   - work

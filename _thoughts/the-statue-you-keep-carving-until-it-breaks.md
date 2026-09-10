@@ -1,12 +1,13 @@
 ---
 title: "The Statue You Keep Carving Until It Breaks"
 date: 2010-06-12
+description: "Trying to perfect another person can turn love into pressure and break what affection meant to protect."
 tags:
-   - love
-   - relationships
-   - endings
-   - reflection
-   - memories
+  - love
+  - relationships
+  - endings
+  - reflection
+  - memories
 ---
 
 In June 2010, I described love as a statue.

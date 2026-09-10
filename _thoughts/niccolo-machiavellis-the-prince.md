@@ -1,6 +1,7 @@
 ---
 title: 'Power Is Judged by Consequences'
 date: 2017-02-10
+description: "Power is often judged by consequences, but understanding power games does not require surrendering to them."
 tags:
   - power
   - leadership

@@ -1,6 +1,7 @@
 ---
 title: 'Imagined Futures Can Become Real Burdens'
 date: 2013-10-06
+description: "Imagined futures can become real burdens when possibility is allowed to occupy the present too heavily."
 tags:
   - uncertainty
   - anxiety

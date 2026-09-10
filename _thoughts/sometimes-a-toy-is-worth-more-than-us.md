@@ -1,6 +1,7 @@
 ---
 title: 'Sometimes a Toy Is Worth More Than Us'
 date: 2026-09-07
+description: "A child's attachment to a toy can reveal how adults misunderstand value, loss, and comfort."
 tags:
   - childhood
   - family
@@ -22,7 +23,7 @@ The toy does.
 
 Maybe that is why the toy is easier to understand.
 
-A red car is red. A doll is a doll. A wooden horse does not come home angry because the boss shouted at it. A toy does not say, “Not now, I am tired.” It does not talk about tomorrow's bills. It does not tell the child to be quiet because guests are coming.
+A red car is red. A doll is a doll. A wooden horse does not come home angry because the boss shouted at it. A toy does not say, "Not now, I am tired." It does not talk about tomorrow's bills. It does not tell the child to be quiet because guests are coming.
 
 Adults are complicated.
 
@@ -42,7 +43,7 @@ They should not.
 
 We also cry over objects.
 
-We call them different names so we can feel mature. We say “my car,” “my house,” “my watch,” “my father's old radio,” “my mother's ring.” We do not call them toys because adults are embarrassed by simple truths. We prefer expensive words for the same attachment.
+We call them different names so we can feel mature. We say "my car," "my house," "my watch," "my father's old radio," "my mother's ring." We do not call them toys because adults are embarrassed by simple truths. We prefer expensive words for the same attachment.
 
 A child sees a plastic truck and imagines a road.
 
@@ -50,19 +51,19 @@ An adult sees a new car and imagines freedom.
 
 The difference is mostly the bank loan.
 
-So when a child cries because a toy is broken, “It is only a toy” is often a useless sentence. To us, maybe. To the child, a small world has collapsed.
+So when a child cries because a toy is broken, "It is only a toy" is often a useless sentence. To us, maybe. To the child, a small world has collapsed.
 
-This does not mean we should buy a new toy every time something breaks. Life is not a shopping centre, and love is not a credit card. A child also has to learn that things break, disappear, and sometimes cannot be replaced.
+This does not mean we should buy a new toy every time something breaks. Life is not a shopping center, and love is not a credit card. A child also has to learn that things break, disappear, and sometimes cannot be replaced.
 
 But there is a difference between teaching loss and mocking pain.
 
-We can say, “I know you loved it.”
+We can say, "I know you loved it."
 
 That sentence costs nothing.
 
 Funny, isn't it? We spend money to show love, then forget that sometimes love is the cheapest thing in the room.
 
-One day that toy will disappear. It will stay under a bed, lose a wheel, be given to a cousin, or end up in a rubbish bag during a move. Years later, the child may not even remember what colour it was.
+One day that toy will disappear. It will stay under a bed, lose a wheel, be given to a cousin, or end up in a trash bag during a move. Years later, the child may not even remember what color it was.
 
 But the child may remember something else.
 
@@ -70,7 +71,7 @@ Who laughed.
 
 Who shouted.
 
-Who said, “Stop crying.”
+Who said, "Stop crying."
 
 And who sat down beside them.
 
@@ -86,6 +87,6 @@ A lap.
 
 A hand.
 
-A voice saying, “I am here.”
+A voice saying, "I am here."
 
 That is when the real value appears.

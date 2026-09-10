@@ -1,6 +1,7 @@
 ---
 title: 'Every Room Has an Emotional Climate'
 date: 2019-02-07
+description: "Emotions move through rooms quietly, shaping what people say, notice, and become willing to feel."
 tags:
   - emotion
   - relationships

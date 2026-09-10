@@ -1,6 +1,7 @@
 ---
 title: 'You Cannot Make Someone Happy'
 date: 2009-10-06
+description: "We can support another person, but we cannot choose happiness on their behalf."
 tags:
   - relationships
   - happiness

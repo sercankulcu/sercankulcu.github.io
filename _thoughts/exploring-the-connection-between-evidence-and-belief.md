@@ -1,6 +1,7 @@
 ---
 title: 'A Belief Should Risk Losing'
 date: 2021-06-12
+description: "A belief is being tested only if some possible evidence would be allowed to change it."
 tags:
   - belief
   - evidence
