@@ -1,6 +1,7 @@
 ---
 title: 'Support Should Not Replace Judgment'
 date: 2011-04-03
+description: "Support can help us climb, but it should not replace judgment, ownership, or the work only we can do."
 tags:
   - independence
   - judgment

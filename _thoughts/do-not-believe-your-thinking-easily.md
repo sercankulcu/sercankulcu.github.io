@@ -1,6 +1,7 @@
 ---
 title: 'A Thought Is Not Yet a Conclusion'
 date: 2021-03-17
+description: "A thought may deserve attention, but it should not be promoted into a conclusion before evidence arrives."
 tags:
   - judgment
   - emotion
@@ -19,7 +20,7 @@ A plausible thought deserves attention. A conclusion deserves evidence.
 
 This distinction matters most when emotion is strong. Anger narrows the range of explanations we are willing to consider. Fear does the same. Both emotions may be completely justified and still be poor investigators. They tell us that something matters before they tell us exactly what is true.
 
-I try to create a small interval between the first story and the final judgment. What did I actually observe? What am I adding? What else could produce the same facts? What would I believe if the situation belonged to someone else?
+I try to create a small interval between the first story and the final judgment. What did I actually observe? What am I adding? What else could explain the same facts? What would I believe if the situation belonged to someone else?
 
 These questions are not a ritual for talking myself out of every uncomfortable intuition. Excessive self-doubt can become another way of refusing judgment. Sometimes experience detects patterns before we can explain them clearly.
 

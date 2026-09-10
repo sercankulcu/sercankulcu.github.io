@@ -1,6 +1,7 @@
 ---
 title: 'Small Projects Close the Loop'
 date: 2025-03-08
+description: "Small projects matter because they let us complete a loop and recover the pleasure of finishing."
 tags:
   - projects
   - learning

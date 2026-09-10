@@ -1,6 +1,7 @@
 ---
 title: 'Thinking Can Become a Shelter'
 date: 2019-06-22
+description: "Thinking can become a shelter when analysis protects us from the risk of choosing and acting."
 tags:
   - decision-making
   - uncertainty

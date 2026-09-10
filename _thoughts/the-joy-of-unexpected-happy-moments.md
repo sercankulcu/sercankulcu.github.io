@@ -1,6 +1,7 @@
 ---
 title: 'Not Everything Good Can Be Optimized'
 date: 2019-02-19
+description: "Some happy moments matter precisely because they were not planned, optimized, or forced into usefulness."
 tags:
   - serendipity
   - happiness

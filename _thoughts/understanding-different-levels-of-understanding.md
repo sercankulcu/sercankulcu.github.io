@@ -1,6 +1,7 @@
 ---
 title: 'Expertise Hides Its Own Steps'
 date: 2020-10-06
+description: "Expertise often hides its own steps, which is why understanding something and teaching it are different skills."
 tags:
   - learning
   - communication
@@ -41,7 +42,7 @@ Good teaching therefore requires more than knowing a subject.
 
 It requires remembering what it was like not to know it.
 
-That may be one reason some brilliant people explain poorly. Their understanding has become so compressed that they can no longer see the path they travelled.
+That may be one reason some brilliant people explain poorly. Their understanding has become so compressed that they can no longer see the path they traveled.
 
 Expertise hides its own steps.
 

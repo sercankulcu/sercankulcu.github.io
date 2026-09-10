@@ -1,6 +1,7 @@
 ---
 title: 'Distraction Is Often a Way of Avoiding Ourselves'
 date: 2020-08-20
+description: "Distraction is often not a lack of time, but a way of avoiding the questions quiet would ask."
 tags:
   - time
   - attention

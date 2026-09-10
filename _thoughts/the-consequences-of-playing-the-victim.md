@@ -1,6 +1,7 @@
 ---
 title: 'You Can Be Wronged Without Becoming Powerless'
 date: 2024-09-21
+description: "Being wronged does not have to mean becoming powerless or building identity around the wound."
 tags:
   - responsibility
   - agency

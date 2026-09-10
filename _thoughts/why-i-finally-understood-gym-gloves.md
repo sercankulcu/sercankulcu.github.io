@@ -1,15 +1,16 @@
 ---
 title: "Why I Finally Understood Gym Gloves"
 date: 2012-06-28
+description: "A small object like gym gloves can reveal how experience changes what we once judged from outside."
 tags:
-   - fitness
-   - habits
-   - experience
-   - everyday-life
-   - reflections
+  - fitness
+  - habits
+  - experience
+  - everyday-life
+  - reflections
 ---
 
-Some things look ridiculous until the exact moment you need them. Gym gloves were one of those things for me. At first they seemed unnecessary, almost theatrical—like wearing sunglasses at night. You are in a gym, you lift weights, your hands touch metal. Surely hands are already designed for holding things.
+Some things look ridiculous until the exact moment you need them. Gym gloves were one of those things for me. At first they seemed unnecessary, almost theatrical, like wearing sunglasses at night. You are in a gym, you lift weights, your hands touch metal. Surely hands are already designed for holding things.
 
 Then my hands started developing blisters, and suddenly gym gloves became one of the most logical inventions in human history.
 
@@ -29,7 +30,7 @@ There is also a social side to this. When you are new to something, you often do
 
 Am I experienced enough to use this? Do I deserve the equipment? Will people think I am pretending? These are strange questions. Tools do not require status. If something is appropriate and useful, that should be enough. Ironically, refusing useful tools can be one of the strongest signs that we are new.
 
-Experience gradually changes the way preparation looks. Carrying the charger, the adapter, the extra cable, checking the address, making backups, putting fuel in the car early—these things can look overly cautious when nothing has gone wrong yet. After enough mistakes, prevention begins to look less dramatic and more intelligent.
+Experience gradually changes the way preparation looks. Carrying the charger, the adapter, the extra cable, checking the address, making backups, putting fuel in the car early, these things can look overly cautious when nothing has gone wrong yet. After enough mistakes, prevention begins to look less dramatic and more intelligent.
 
 Useful precautions have a peculiar problem: when they work, the result is often that nothing happens. The backup restores the file. The helmet prevents the injury. The gloves prevent the blister. We notice interventions more easily than prevented events, so successful protection can look unnecessary precisely because it succeeded.
 
@@ -45,7 +46,7 @@ There is another lesson hiding in the original joke. It is easy to confuse unfam
 
 What problem is this solving?
 
-That is one of the best questions an engineer can develop. You see an ugly system. Before redesigning it, ask why it became this way. Maybe there was a constraint, an edge case, a regulation, a historical failure. The ugly component may be unnecessary—or it may be carrying twenty years of invisible experience.
+That is one of the best questions an engineer can develop. You see an ugly system. Before redesigning it, ask why it became this way. Maybe there was a constraint, an edge case, a regulation, a historical failure. The ugly component may be unnecessary, or it may be carrying twenty years of invisible experience.
 
 This is the engineering version of gym gloves: do not remove the glove until you understand the blister.
 

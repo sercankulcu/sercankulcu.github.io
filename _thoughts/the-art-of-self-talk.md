@@ -1,6 +1,7 @@
 ---
 title: 'Some Voices in Your Head Are Inherited'
 date: 2021-04-22
+description: "Some inner voices are inherited, and self-talk becomes healthier when we learn which ones deserve authority."
 tags:
   - reflection
   - language

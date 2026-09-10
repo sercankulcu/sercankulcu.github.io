@@ -1,6 +1,7 @@
 ---
 title: 'Luck Needs Something to Land On'
 date: 2021-04-12
+description: "Luck may open a door, but patience and repeated effort give luck somewhere useful to land."
 tags:
   - work
   - luck

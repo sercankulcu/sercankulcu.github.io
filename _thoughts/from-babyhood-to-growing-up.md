@@ -1,6 +1,7 @@
 ---
 title: 'Growing Up Means Learning Which Voice Is Yours'
 date: 2014-10-06
+description: "Growing up means slowly learning which voice is truly ours and which voices we simply inherited."
 tags:
   - identity
   - expectations
@@ -23,7 +24,7 @@ We become very good at answering questions nobody explicitly asks anymore. Choos
 
 Eventually, obedience can become so efficient that no external pressure is needed.
 
-Then a strange thing happens: an adult can be far more articulate than a child and still have more difficulty answering a simple question—what do I actually want?
+Then a strange thing happens: an adult can be far more articulate than a child and still have more difficulty answering a simple question, what do I actually want?
 
 This is not an argument for selfishness. Our own desires are not sacred simply because they are ours. They can be foolish, harmful, temporary, or impossible. Other people's claims on us are real too. Responsibility matters.
 

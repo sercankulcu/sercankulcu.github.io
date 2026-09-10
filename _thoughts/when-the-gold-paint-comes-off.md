@@ -1,12 +1,13 @@
 ---
 title: "When the Gold Paint Comes Off"
 date: 2009-01-05
+description: "Admiration changes when the gold paint comes off and the person behind the image becomes visible."
 tags:
-   - reflections
-   - idols
-   - disillusionment
-   - memories
-   - life
+  - reflections
+  - idols
+  - disillusionment
+  - memories
+  - life
 ---
 
 There is a kind of sadness that comes from learning too much about something you once admired.

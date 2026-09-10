@@ -1,6 +1,7 @@
 ---
 title: 'Friendship Needs a Structure'
 date: 2019-10-06
+description: "Long friendships often survive not only through affection, but through rituals and structures that protect time together."
 tags:
   - friendship
   - relationships
@@ -13,7 +14,7 @@ Now I think care is only part of it.
 
 Long friendships usually have some kind of structure.
 
-There is a Japanese term often associated with Okinawa, *moai*, for a social group whose members support one another over long periods. What interests me is not the exoticness of the term. It is the assumption behind it: connection should not be left entirely to chance.
+There is a Japanese term often associated with Okinawa, *moai*, for a social group whose members support one another over long periods. What interests me is not the foreignness of the term. It is the assumption behind it: connection should not be left entirely to chance.
 
 Modern friendship is often informal to the point of fragility.
 
@@ -31,7 +32,7 @@ Long friendships also contain a kind of memory no new relationship can reproduce
 
 That continuity can be comforting. It can also be corrective.
 
-A longtime friend sometimes sees a pattern before we do because they have more data.
+A longtime friend sometimes sees a pattern before we do because they have watched more of the story.
 
 Of course, not every old friendship deserves preservation. Duration alone does not create depth, and loyalty should not become an excuse for remaining inside a harmful relationship.
 

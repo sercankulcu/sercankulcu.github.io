@@ -1,6 +1,7 @@
 ---
 title: 'We Begin in the Middle of Things'
 date: 2022-03-18
+description: "We begin life already thrown into conditions we did not choose, and freedom begins inside that fact."
 tags:
   - philosophy
   - choice

@@ -1,6 +1,7 @@
 ---
 title: 'Growing Older Is Not the Same as Becoming Old'
 date: 2023-01-04
+description: "Growing older is not the same as becoming old, but it changes what the body, memory, and time ask of us."
 tags:
   - aging
   - curiosity

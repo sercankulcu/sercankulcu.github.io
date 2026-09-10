@@ -1,6 +1,7 @@
 ---
 title: 'Some Friendships Do Not Need Constant Proof'
 date: 2017-09-17
+description: "Some friendships survive long silence because trust has become larger than constant proof."
 tags:
   - friendship
   - distance

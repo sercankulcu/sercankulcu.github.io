@@ -1,6 +1,7 @@
 ---
 title: 'Not Every Conflict Deserves a Battle'
 date: 2017-02-11
+description: "Strategy begins before conflict, in the quiet work of understanding terrain, timing, limits, and ourselves."
 tags:
   - strategy
   - conflict

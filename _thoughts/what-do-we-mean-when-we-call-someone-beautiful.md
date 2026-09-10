@@ -1,12 +1,13 @@
 ---
 title: "What Do We Mean When We Call Someone Beautiful?"
 date: 2025-08-29
+description: "Beauty is not a single property; it is a mixture of perception, attention, memory, desire, and meaning."
 tags:
-   - beauty
-   - attraction
-   - aesthetics
-   - philosophy
-   - perception
+  - beauty
+  - attraction
+  - aesthetics
+  - philosophy
+  - perception
 ---
 
 Why do we find one person beautiful and remain almost indifferent to another person who may be equally beautiful by ordinary standards?
@@ -379,7 +380,7 @@ Subjective does not mean random.
 
 This list is evidence of that.
 
-The women are different, but the choices form patterns: expressive eyes, recognizable faces, a balance between femininity and strength, attraction to both mature presence and youthful softness, and an unusual tolerance — perhaps even a preference — for features that create individuality.
+The women are different, but the choices form patterns: expressive eyes, recognizable faces, a balance between femininity and strength, attraction to both mature presence and youthful softness, and an unusual tolerance , perhaps even a preference , for features that create individuality.
 
 Taste has structure even when it has no strict rules.
 

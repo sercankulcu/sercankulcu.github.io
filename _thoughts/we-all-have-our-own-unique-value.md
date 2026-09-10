@@ -1,6 +1,7 @@
 ---
 title: 'A Truffle Is Not a Failed Apple'
 date: 2019-09-14
+description: "A truffle is not a failed apple; value depends on context, rarity, and the right kind of attention."
 tags:
   - identity
   - work
@@ -27,7 +28,7 @@ That is why comparison is often intellectually lazy. We compare outcomes without
 
 The question is not whether I am uniquely valuable in some cosmic sense. I do not know how such a thing could be measured.
 
-A more useful question is whether I understand the combination of abilities, limitations, temperament, and interests I actually have—and whether I am placing them somewhere they can do useful work.
+A more useful question is whether I understand the combination of abilities, limitations, temperament, and interests I actually have, and whether I am placing them somewhere they can do useful work.
 
 Sometimes self-improvement is necessary.
 

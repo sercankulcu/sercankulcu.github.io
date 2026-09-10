@@ -1,6 +1,7 @@
 ---
 title: 'Freedom Is Having a Meaningful No'
 date: 2019-11-06
+description: "Freedom is not having every option, but having a meaningful no when life asks for consent."
 tags:
   - freedom
   - choice

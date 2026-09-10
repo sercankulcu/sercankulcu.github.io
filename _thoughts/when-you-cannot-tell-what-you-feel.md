@@ -1,12 +1,13 @@
 ---
 title: "When You Cannot Tell What You Feel"
 date: 2010-04-24
+description: "Some feelings become difficult to name because they arrive mixed with memory, fear, hope, and contradiction."
 tags:
-   - relationships
-   - friendship
-   - uncertainty
-   - memories
-   - reflections
+  - relationships
+  - friendship
+  - uncertainty
+  - memories
+  - reflections
 ---
 
 There is a point in some relationships when the category stops being clear.
@@ -647,9 +648,9 @@ Perspective.
 
 The emotion no longer needs to explain the entire world.
 
-So if I could answer the question hidden in my 2010 entry now—
+So if I could answer the question hidden in my 2010 entry now,
 
-Was it love, friendship, or something brotherly?—
+Was it love, friendship, or something brotherly?,
 
 I would probably say:
 

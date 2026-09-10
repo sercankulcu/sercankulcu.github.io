@@ -1,6 +1,7 @@
 ---
 title: 'Announcing Change Can Become a Substitute for Change'
 date: 2025-02-09
+description: "Announcing change can become a substitute for change; some reinvention needs silence and repeated proof."
 tags:
   - identity
   - habits

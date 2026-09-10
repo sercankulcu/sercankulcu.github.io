@@ -1,6 +1,7 @@
 ---
 title: 'Convenience Can Narrow a Life'
 date: 2019-01-11
+description: "Convenience can quietly narrow a life when algorithms make choice feel easier than attention."
 tags:
   - technology
   - choice

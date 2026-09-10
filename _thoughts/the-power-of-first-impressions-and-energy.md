@@ -1,6 +1,7 @@
 ---
 title: 'A First Impression Is a Hypothesis'
 date: 2022-10-06
+description: "A first impression is useful as a hypothesis, but dangerous when treated as a verdict."
 tags:
   - perception
   - relationships

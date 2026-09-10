@@ -1,6 +1,7 @@
 ---
 title: 'Podcasts Borrow the Empty Parts of a Day'
 date: 2018-08-26
+description: "Podcasts fill the empty parts of a day with voices that can inform, comfort, distract, or accompany us."
 tags:
   - learning
   - media

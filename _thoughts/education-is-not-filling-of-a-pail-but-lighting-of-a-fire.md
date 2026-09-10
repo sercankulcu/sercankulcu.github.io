@@ -1,6 +1,7 @@
 ---
 title: 'Teaching Should Leave Something Unfinished'
 date: 2021-07-21
+description: "Good teaching explains enough to prevent helplessness and leaves enough open to keep curiosity alive."
 tags:
   - education
   - curiosity
@@ -15,7 +16,7 @@ And sometimes almost nothing survives the exam.
 
 This is why I still like the old image often attributed to W. B. Yeats: education is not the filling of a pail but the lighting of a fire.
 
-The quotation is imperfect if taken too literally. Students do need information. Fundamentals matter. A learner cannot rediscover every theorem, algorithm, historical event, or scientific principle from scratch.
+The quotation becomes imperfect if taken too literally. Students do need information. Fundamentals matter. A learner cannot rediscover every theorem, algorithm, historical event, or scientific principle from scratch.
 
 But information alone does not explain why some ideas remain alive after a course while others disappear almost immediately.
 

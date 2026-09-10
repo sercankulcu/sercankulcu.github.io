@@ -1,6 +1,7 @@
 ---
 title: 'Some Knowledge Only Appears After You Begin'
 date: 2024-03-11
+description: "Some knowledge appears only after movement begins; the road teaches what planning cannot reveal."
 tags:
   - learning
   - experience

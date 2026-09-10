@@ -1,6 +1,7 @@
 ---
 title: 'Forgetting Is Part of Remembering'
 date: 2011-04-05
+description: "Forgetting is not only loss; it can also be part of how memory protects, rearranges, and heals."
 tags:
   - memory
   - philosophy
@@ -47,4 +48,4 @@ Perhaps forgetting is not the enemy of memory at all.
 
 It is one of the processes that gives memory its shape.
 
-We remember a life partly through what remains—and partly through what the mind has quietly allowed to become less loud.
+We remember a life partly through what remains, and partly through what the mind has quietly allowed to become less loud.

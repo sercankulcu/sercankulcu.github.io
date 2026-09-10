@@ -1,6 +1,7 @@
 ---
 title: 'Avoidance Charges Interest'
 date: 2018-11-28
+description: "Avoidance may feel like safety, but ignored problems often grow heavier while we look away."
 tags:
   - procrastination
   - work

@@ -1,6 +1,7 @@
 ---
 title: 'Other People Lend Us Their Memory'
 date: 2021-05-02
+description: "Other people can lend us experience, language, and memory when our own problem feels too private to solve alone."
 tags:
   - learning
   - community

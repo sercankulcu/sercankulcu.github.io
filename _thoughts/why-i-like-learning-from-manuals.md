@@ -1,6 +1,7 @@
 ---
 title: 'Manuals Teach the Questions I Did Not Know to Ask'
 date: 2007-11-18
+description: "Manuals teach questions we did not know to ask and slow us down enough to understand a tool properly."
 tags:
   - learning
   - programming

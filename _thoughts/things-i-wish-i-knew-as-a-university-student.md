@@ -1,6 +1,7 @@
 ---
 title: 'University Teaches More Than the Syllabus'
 date: 2026-04-18
+description: "University teaches more than the syllabus, especially when students learn how to learn, ask, fail, and continue."
 tags:
   - education
   - students

@@ -1,6 +1,7 @@
 ---
 title: 'Old Hobbies Let Us Meet Earlier Versions of Ourselves'
 date: 2025-07-20
+description: "Old hobbies let us meet earlier versions of ourselves while discovering what still remains alive."
 tags:
   - hobbies
   - memory

@@ -1,15 +1,16 @@
 ---
 title: "Going to the Cinema Alone"
 date: 2011-03-30
+description: "Going to the cinema alone can change from embarrassment into a small practice of independence."
 tags:
-   - cinema
-   - solitude
-   - memories
-   - life
-   - reflections
+  - cinema
+  - solitude
+  - memories
+  - life
+  - reflections
 ---
 
-There was a time when going to the cinema alone felt like something that needed an explanation. Not a legal explanation—a social one. Why are you here alone? Could you not find anyone? Are you all right? Nobody necessarily asked these questions aloud, which was almost worse because you could imagine them.
+There was a time when going to the cinema alone felt like something that needed an explanation. Not a legal explanation, a social one. Why are you here alone? Could you not find anyone? Are you all right? Nobody necessarily asked these questions aloud, which was almost worse because you could imagine them.
 
 Years ago, I wrote a very short entry: going to the cinema alone can be done to watch *Kaybedenler Kulübü*. That was all. One sentence. But I still remember the feeling hiding inside it. Some films do not require company. Some evenings do not require company either. The film is showing, you have time, you buy a ticket, and for two hours nobody needs anything from you.
 
@@ -25,7 +26,7 @@ We constantly check reality against other people. A joke lands and we turn. A su
 
 That can feel empty. It can also feel clean. There is something honest about liking a film without needing the person beside you to like it too. No post-film diplomacy. No saying "It was okay" when you loved it or "Yes, it was great" when you spent the last hour wondering whether falling asleep would be rude.
 
-I think that is part of what I learned from going alone: solitude removes some performance. Not all of it—we can perform even for ourselves—but enough to notice the difference. If a scene affects you, there is no reason to hide it except habit. If the film bores you, you are free to admit it. Freedom sometimes looks very small: one ticket, one seat, no coordination.
+I think that is part of what I learned from going alone: solitude removes some performance. Not all of it, we can perform even for ourselves, but enough to notice the difference. If a scene affects you, there is no reason to hide it except habit. If the film bores you, you are free to admit it. Freedom sometimes looks very small: one ticket, one seat, no coordination.
 
 This became more valuable as life became more complicated. Getting several adults to do something together can require project management: which day, what time, who has work, who has family obligations, who dislikes the genre, who already saw the film. At some point, the effort required to organize the experience becomes larger than the experience itself.
 
