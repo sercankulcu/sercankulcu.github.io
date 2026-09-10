@@ -14,9 +14,11 @@ I still like having one. This post is an attempt to explain why, partly because 
 
 ## What the alternatives offer
 
-In 2008, there are better options for most of what a personal website does. Blogger and WordPress.com will host a blog for free with no maintenance required. Facebook handles social updates and keeps them findable by the people you already know. MySpace allowed personal expression that my website cannot match in visual complexity. LinkedIn manages professional presence more efficiently.
+In 2008, there are better options for most of what a personal website does. Blogger, acquired by Google in 2003, hosts a blog for free with no maintenance required. WordPress.com, launched in 2005 as a hosted service separate from the self-hosted WordPress.org software, offers a more feature-rich alternative at no cost. Facebook, which opened to the general public in September 2006 and had over 100 million active users by August 2008, handles social updates and keeps them findable by the people you already know. MySpace allows personal expression with customisable profiles that my website cannot match in visual complexity. LinkedIn manages professional presence more efficiently.
 
 These platforms are also where the audience is. Writing on a personal website means writing for anyone who happens to find it — mostly through search, occasionally through links from other sites. Writing on a platform means writing for an existing community.
+
+The blogosphere as an interconnected community of self-hosted blogs peaked roughly between 2003 and 2007. The A-List bloggers — Daring Fireball, Kottke.org, John Gruber's site, Joel on Software — built audiences through links from each other, from Technorati's blog indexing, and from RSS readers. That era is being replaced by something more centralised. Platform-hosted writing reaches more people more efficiently. But something changes when the writing lives on someone else's infrastructure under someone else's rules.
 
 So why maintain a personal website at all?
 

@@ -9,18 +9,24 @@ tags:
 ---
 In 2022, the importance of computing can be seen from two very different directions: software and chips.
 
-Cloud services, mobile applications, machine learning, and cybersecurity continue to expand. At the same time, supply-chain problems and growing investment in semiconductor production have made the physical side of computing more visible. Modern technology needs both good software and capable hardware.
+## What 2022 is showing about hardware
 
-Computer Engineering is attractive because it connects these layers. A typical education includes programming, algorithms, data structures, databases, operating systems, networks, digital logic, and computer architecture. Students can later specialize without losing sight of the larger system.
+The global semiconductor shortage that began in 2020 continues into 2022. Automotive manufacturers have been among the most visibly affected — cars shipping with missing features, stuck on lots waiting for chips, production lines halted. The shortage has made it obvious that the software world depends on physical manufacturing capacity that does not scale on demand.
 
-Cybersecurity is one area becoming impossible to ignore. Governments, companies, and individuals depend on digital services, which creates a constant need to protect networks, applications, and data. Engineers who understand systems deeply are valuable because security problems often cross several technical layers.
+Ukraine produced roughly 70% of the world's neon gas used in chip lithography lasers before the February 2022 invasion, and the conflict created additional supply chain uncertainty for an industry already under strain. The United States responded with the CHIPS and Science Act, signed into law August 9, 2022, committing $52.7 billion to domestic semiconductor manufacturing and research. TSMC, the world's leading foundry, is constructing a new fabrication facility in Arizona; Intel has announced a major expansion of its US manufacturing under its IDM 2.0 strategy.
 
-Machine learning is another growing area, but it also shows why fundamentals matter. Training and running models requires algorithms, data, software infrastructure, and increasingly powerful processors. Understanding only the final application is not enough to understand the complete engineering problem.
+These events highlight something that Computer Engineering has always understood: software requires hardware, and hardware requires engineers who understand the full stack.
 
-Computer Engineering also gives students room to change direction. Someone interested in web development today may later move toward cloud infrastructure, embedded systems, AI, security, or chip design. A strong foundation makes these transitions easier.
+## What is happening in software
 
-The department is not for everyone. It involves mathematics, abstract concepts, long debugging sessions, and continuous learning. Students should not choose it only because technology jobs are popular.
+GitHub Copilot, an AI-powered code completion tool built on OpenAI's Codex model, became generally available on June 21, 2022, at $10 per month for individual users. This is the first AI tool widely adopted by professional developers as part of their daily workflow. Its arrival raises questions that will define the field for years: what does engineering skill mean when a tool can generate plausible code for many problems? Intel's Alder Lake processors (November 2021) introduced a hybrid architecture combining performance and efficiency cores, the most significant architectural change to Intel desktop CPUs in years.
 
-A better reason is curiosity: wanting to know how a processor executes instructions, how information travels across a network, how an operating system manages resources, or how software can solve a real problem.
+## What the degree provides
 
-In 2022, computers are becoming more important and more complex at the same time. For students who want to understand that complexity and turn it into useful systems, Computer Engineering remains an excellent choice.
+Computer Engineering is attractive because it connects software and hardware layers. A typical education includes programming, algorithms, data structures, databases, operating systems, networks, digital logic, and computer architecture. Students can later specialise in cybersecurity, AI systems, embedded hardware, cloud infrastructure, or chip design.
+
+Cybersecurity is one area that has become impossible to ignore. Ransomware attacks on hospitals, pipeline operators, and governments made security a board-level concern. Engineers who understand systems across multiple layers are valuable precisely because security vulnerabilities often live at the boundary between layers.
+
+Machine learning shows why fundamentals still matter. Training and running large models requires algorithms, data engineering, software infrastructure, distributed systems, and specialised processors. Understanding only the application is not enough to understand the engineering problem.
+
+A better reason to choose the department than job market popularity is curiosity: wanting to know how a processor executes instructions, how information travels across a network, how an operating system manages resources, or how software can solve a real problem. In 2022, computers are becoming both more important and more complex. That combination is an invitation to study them carefully.

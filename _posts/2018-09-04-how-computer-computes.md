@@ -9,6 +9,8 @@ tags:
 
 A computer looks complicated from the outside, but its basic operation can be described with a simple cycle repeated billions of times per second. Understanding that cycle helps explain why software behaves the way it does — why some operations are fast, others slow, and what actually happens when code runs.
 
+In January 2018, researchers published details of Spectre and Meltdown — two vulnerabilities in how modern processors speculatively execute instructions. Both attacks exploited the gap between the abstract model of computation (instructions run in order, memory is private to each process) and what processors actually do for performance (run instructions before they are needed, cache memory across process boundaries). Understanding the basic execution model helps make sense of why those optimisations existed and why removing them caused measurable performance regressions.
+
 ## The fetch-decode-execute cycle
 
 At the center of computation is the CPU. A program is stored as a sequence of instructions in memory. The CPU repeatedly does three things:
@@ -44,7 +46,9 @@ The compiler or interpreter translates the high-level line into these lower-leve
 
 RAM holds programs and data that are currently active. It is fast compared to disk storage, but slow compared to registers. Modern processors bridge this gap with **cache memory** — small, fast memory layers (L1, L2, L3) that sit between the registers and main RAM.
 
-When the CPU needs a value, it first checks the cache. If the value is there (a cache hit), it is retrieved quickly. If not (a cache miss), the processor must fetch it from RAM, which takes far longer. This is why the order in which a program accesses memory can matter more than the number of operations it performs.
+When the CPU needs a value, it first checks the cache. If the value is there (a cache hit), it is retrieved quickly — typically 4 cycles for L1, 12 cycles for L2, 30–40 cycles for L3. If not (a cache miss), the processor must fetch it from RAM, which takes 100–300 cycles depending on the hardware. This is why the order in which a program accesses memory can matter more than the number of operations it performs.
+
+Modern processors use **speculative execution** to hide this latency: the processor predicts which instruction will run next and executes it before the prediction is confirmed, discarding the result if the prediction was wrong. This technique is why the Spectre and Meltdown vulnerabilities published in January 2018 were so difficult to fix in hardware — the performance optimisation that created the vulnerability had been fundamental to CPU design since the 1990s.
 
 ## Everything is binary
 

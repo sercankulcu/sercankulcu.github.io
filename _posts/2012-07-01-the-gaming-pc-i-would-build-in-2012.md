@@ -8,9 +8,13 @@ If I were building a gaming PC on **July 1, 2012**, this is the machine I would 
 
 ### The context
 
-2012 is a transitional year. Intel's Ivy Bridge architecture launched in April, bringing 22nm manufacturing to the mainstream desktop platform. The GTX 680, NVIDIA's first Kepler GPU, launched in March and changed the value calculation considerably from the previous GTX 580 generation — Kepler was both faster and dramatically more power-efficient.
+2012 is a transitional year. Intel's Ivy Bridge architecture launched in April, bringing 22nm manufacturing to the mainstream desktop platform. The Sandy Bridge i5-2500K (2011) was so good for overclocking that many users skipped Ivy Bridge entirely; the i5-3570K is the Ivy Bridge equivalent with somewhat less headroom for extreme overclocking but lower power consumption and a modest IPC improvement.
 
-The dominant gaming target is still 1920×1080. A few early adopters are gaming on 2560×1440 using Korean IPS panels that offer the resolution for around $350, but 1440p is genuinely emerging rather than established. Popular games of the period include Battlefield 3, Skyrim, Diablo III (just launched May 2012), and Mass Effect 3. SSDs are becoming affordable enough to be reasonable primary storage for enthusiast builds — the Samsung 830 is one of the best-regarded options.
+On the GPU side, NVIDIA's Kepler architecture (28nm TSMC) launched with the GTX 680 in March 2012 and changed the value calculation from the previous Fermi generation fundamentally. The GTX 580 drew 244 W and ran at 87°C under load while barely outperforming the new 680. Kepler's GTX 680 drew 195 W, ran cooler, and was faster — a combination the Fermi generation never offered. The GK104 chip used in the 680 replaced the "shader clusters" approach of Fermi with a simpler SMX design that was more efficient per watt.
+
+AMD had launched the Radeon HD 7970 in December 2011 at $549 and the HD 7950 in February 2012 at $449. Both used the Tahiti chip on TSMC 28nm. At launch the HD 7970 was competitive with the GTX 580, but the GTX 680 launched at $499 and matched or beat the 7970 in most games while consuming less power. AMD responded with the 7970 GHz Edition later in 2012, but by July 1 the GTX 680 remains the cleaner choice.
+
+The dominant gaming target is still 1920×1080. A few early adopters are running 2560×1440 on Korean IPS panels available for around $350 (brands like Achieva Shimian), but 1440p is emerging rather than established. Popular games: Battlefield 3, Skyrim, Diablo III (launched May 2012), and Mass Effect 3. SSDs are affordable enough to be reasonable primary storage — the Samsung 830 is one of the best-regarded options at around $1.50 per gigabyte.
 
 ### The build
 

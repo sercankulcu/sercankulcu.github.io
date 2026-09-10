@@ -10,16 +10,26 @@ tags:
 
 Version control becomes important the first time a project grows large enough that "final", "final2", and "really-final" stop being funny file names. A proper system keeps the history of changes and allows us to return to an older version when something goes wrong.
 
-Git approaches this problem differently from centralized systems such as CVS or Subversion. Instead of treating one remote server as the place where the real history lives, every working copy can contain the complete repository history. At first, this feels unnecessary. Why should every developer need so much information locally?
+## Why Git exists
 
-After using the idea for a while, the advantages become clearer. Commits can be created without a network connection. Branches are cheap and fast. Different lines of development can exist without immediately disturbing the main work. A developer can experiment more freely because history is close.
+For most of the 2000s, Subversion (SVN) was the dominant version control system for open-source projects. It improved on CVS by treating commits as atomic snapshots, but it still used a single central repository as the source of truth. Every commit required a network connection to the central server. Branches were expensive — creating one meant duplicating the entire directory tree. Working offline meant working without version control.
 
-Git was created by Linus Torvalds in 2005 for Linux kernel development, so its design reflects the needs of a large distributed project. It can feel difficult at first because the mental model is different. Commands such as `commit`, `branch`, `merge`, `rebase`, `push`, and `pull` describe relationships between histories rather than only copying newer files to a server.
+The Linux kernel project used a commercial distributed system called BitKeeper from 2002 until April 2005, when BitKeeper revoked the free licence for open-source projects. Linus Torvalds, unwilling to go back to a centralized system for a project with thousands of contributors across dozens of time zones, spent April and May 2005 writing a replacement. The first version of Git was self-hosting by June 2005. The kernel project migrated to it the same month.
 
-The command line is not always friendly either. Git can produce messages that make sense only after the underlying model becomes familiar. I have learned that memorizing commands without understanding commits, branches, and the working tree leads to confusion very quickly.
+## How the mental model differs
 
-Still, distributed version control feels like an important direction. Open-source development increasingly involves people who may never meet and who work from different locations. A system designed around independent copies and later synchronization fits this world naturally.
+Git approaches version control through content-addressed storage. Every object — a file, a directory tree, a commit — is stored by the SHA-1 hash of its contents. A commit records a snapshot of the entire project tree plus a pointer to its parent commit. The result is a directed acyclic graph (DAG) of immutable snapshots rather than a list of file diffs. Two commits that produce the same tree produce the same SHA-1 hash; corruption is detectable because the hash no longer matches.
 
-GitHub, a new hosting service built around Git, is also making the workflow more visible on the web. It is still early, and I do not know how large it will become, but the social side of code hosting is interesting.
+The staging area (also called the index) is another unusual concept. Between a working tree and a commit, there is an intermediate space where the developer explicitly marks which changes belong in the next snapshot. This feels strange at first — why not just commit everything — but it becomes valuable when a working session touches several unrelated things and the developer wants to record them as separate, coherent commits.
 
-Version control used to feel like a safety system around programming. Git makes it feel more like part of the way programming itself is organized.
+Because every working copy contains the full history, several things that were expensive become cheap. Creating a branch is creating a pointer to a commit — it costs almost nothing and takes milliseconds. Switching between branches is fast. Comparing any two commits requires no network access. A developer can commit freely during an exploratory session, reorganize those commits before sharing them, and push only when the work is ready.
+
+Commands such as `commit`, `branch`, `merge`, `rebase`, `push`, and `pull` describe operations on this graph of snapshots rather than copying files to a server. The unfamiliar vocabulary reflects a genuinely different model, and I have found that memorizing commands without understanding the graph leads to confusion quickly. Once the graph becomes familiar, the commands make sense.
+
+## GitHub
+
+GitHub launched in April 2008 — only three months ago as I write this. It is a hosting service built around Git that adds a web interface, issue tracking, and crucially a mechanism for proposing changes through pull requests. Forking a repository creates a personal copy that can be modified independently, and the pull request proposes merging those changes back. This makes the contribution workflow visible and social in a way that mailing patches to a mailing list never was.
+
+It is still early. I do not know how large GitHub will become, but the combination of Git's distributed model and a hosting platform that makes contribution low-friction feels like it could change how open-source development is organized.
+
+Version control used to feel like a safety system around programming. Git makes it feel more like part of the way programming itself is organized — a continuous conversation about what the project was, is, and should become.
