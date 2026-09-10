@@ -1,6 +1,7 @@
 ---
 title: 'Plans Break Where Reality Begins'
 date: 2017-02-14
+description: "A plan is not a prediction of the future, but a structure for responding when reality refuses to cooperate."
 tags:
   - strategy
   - uncertainty
@@ -13,7 +14,7 @@ On paper, the steps are clean. Dependencies behave. People respond on time. Info
 
 Clausewitz called this interference *friction*.
 
-In war, friction includes uncertainty, fear, weather, mistakes, delay, incomplete information, exhaustion, and human behavior. Outside war, the scale is different but the pattern is familiar.
+In war, friction includes uncertainty, fear, weather, mistakes, delay, incomplete information, exhaustion, and human behavior. Outside war, the scale is different, but the pattern is familiar.
 
 A project begins with a neat timeline and immediately meets an unavailable person, a hidden technical problem, a misunderstood requirement, a budget constraint, or a decision that takes three times longer than expected.
 

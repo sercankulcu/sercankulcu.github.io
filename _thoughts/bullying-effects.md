@@ -1,6 +1,7 @@
 ---
 title: 'Children Learn What Power Looks Like'
 date: 2025-01-17
+description: "Bullying is not only an isolated act; it is also a lesson children absorb about power, fear, and responsibility."
 tags:
   - education
   - children
@@ -11,7 +12,7 @@ Children learn from rules, but they also learn from watching how adults use powe
 
 A child notices who is allowed to interrupt, who gets embarrassed in public, whose anger controls the room, and whether mistakes are answered with explanation or humiliation. These observations are not formal lessons. They are still lessons.
 
-That is one reason bullying interests me less as an isolated act and more as a model of power.
+That is one reason I think about bullying less as an isolated act and more as a model of power.
 
 The child who bullies may be trying to gain status, avoid becoming a target, imitate what they have seen, or test how much control they can exercise over someone weaker. There is no single cause, and reducing bullying to "bad children" makes the problem easier to condemn than to understand.
 

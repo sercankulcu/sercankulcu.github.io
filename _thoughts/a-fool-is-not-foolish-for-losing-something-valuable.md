@@ -1,6 +1,7 @@
 ---
 title: 'Regret Is Not Proof You Chose Badly'
 date: 2024-02-14
+description: "Regret can be emotionally real without proving that a past decision was foolish."
 tags:
   - regret
   - judgment
@@ -27,11 +28,11 @@ A decision has to be made with incomplete information. We do not know which frie
 
 Once the future becomes the past, uncertainty disappears from the story. We look backward and mistake visibility for inevitability.
 
-This is one reason regret can be intellectually dishonest even when it is emotionally real.
+This is one reason regret can be dishonest in thought even when it is honest in feeling.
 
 A painful result does not prove that the original choice was foolish. A good decision can end badly. A careless decision can end well. Luck, timing, other people's choices, and information unavailable to us all enter the outcome.
 
-The useful question is therefore not simply, "Did I lose something valuable?"
+The useful question is not simply, "Did I lose something valuable?"
 
 It is, "Given what I knew then, was my judgment reasonable?"
 

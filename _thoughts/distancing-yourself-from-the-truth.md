@@ -1,6 +1,7 @@
 ---
 title: 'Reality Collects Interest'
 date: 2024-06-17
+description: "Avoided truths do not disappear; they grow more expensive the longer we postpone meeting them."
 tags:
   - truth
   - avoidance
@@ -15,7 +16,7 @@ That is why denial is tempting. It is not always stupidity. Sometimes it is a te
 
 If I admit that something is over, I may have to leave. If I admit that I chose badly, I may have to repair the consequences. If I admit that another person is unlikely to change, I lose the comfort of waiting for a future version of them.
 
-Pascal wrote about diversion as one of the ways human beings avoid being alone with difficult truths. The modern versions are easy to recognize. We keep busy, gather more opinions, watch something, open another tab, invent another scenario, or tell ourselves that more time will create information when in fact the information is already sufficient.
+Pascal wrote about diversion as one of the ways human beings avoid being alone with difficult truths. The modern versions are easy to recognize. We keep busy, gather more opinions, watch something, open another tab, invent another scenario, or tell ourselves that more time will create information when the information is already sufficient.
 
 The delay can feel merciful. Sometimes it is. Not every truth should be confronted at maximum speed. Grief, shock, and uncertainty need time. There is a difference between **needing time to understand** and **using time to avoid understanding**.
 

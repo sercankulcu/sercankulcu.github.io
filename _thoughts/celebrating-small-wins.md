@@ -1,6 +1,7 @@
 ---
 title: 'When Every Finish Line Moves'
 date: 2020-09-17
+description: "Progress becomes invisible when every finished thing is immediately replaced by the next unfinished thing."
 tags:
   - work
   - ambition
@@ -29,7 +30,7 @@ Montaigne's habit of examining himself without turning every observation into a 
 
 There may never be a final arrival. Most worthwhile pursuits keep opening new distances.
 
-But a moving horizon should not erase the road already travelled.
+But a moving horizon should not erase the road already traveled.
 
 Sometimes the sensible response to finishing something is not to make a ceremony of it.
 

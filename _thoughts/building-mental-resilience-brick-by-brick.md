@@ -1,6 +1,7 @@
 ---
 title: 'What Surviving Something Actually Teaches Us'
 date: 2022-07-27
+description: "Resilience is not becoming untouched by pain, but recovering the ability to choose after being affected."
 tags:
   - resilience
   - life
@@ -39,7 +40,7 @@ It is recovering the ability to choose our next action after something has affec
 
 Some experiences leave scars. Some require help. Some take much longer to absorb than inspirational stories allow. There is no virtue in pretending otherwise.
 
-But when the next difficult period arrives, memory can offer something valuable—not the promise that everything will be fine, but evidence that confusion is temporary and that we have navigated uncertainty before.
+But when the next difficult period arrives, memory can offer something valuable: not the promise that everything will be fine, but evidence that confusion is temporary and that we have navigated uncertainty before.
 
 Strength is not the absence of damage.
 

@@ -1,6 +1,7 @@
 ---
 title: 'What Part of This Is Mine?'
 date: 2024-05-08
+description: "Responsibility begins with the precise question of what part of a difficult situation belongs to us."
 tags:
   - responsibility
   - reflection
@@ -19,7 +20,7 @@ But there is a question I find more useful than deciding who deserves the larges
 
 The question is uncomfortable because it threatens the version of the story in which I am only the observer of what happened. Yet even when most of a situation was outside my control, there may still be a small part that belongs to me: a warning I ignored, a conversation I postponed, a boundary I failed to set, an assumption I never checked.
 
-Epictetus built much of his philosophy around a severe distinction: some things depend on us and others do not. The distinction sounds simple until we try to apply it to something that has hurt our pride.
+Epictetus built much of his philosophy around a sharp distinction: some things depend on us and others do not. The distinction sounds simple until we try to apply it to something that has hurt our pride.
 
 Taking responsibility is not the same as accepting total blame. That confusion is dangerous. We can be harmed by another person's decision and still examine our own response. We can live inside an unfair system without pretending the system is fair. We can be unlucky without turning luck into an explanation for every future choice.
 
