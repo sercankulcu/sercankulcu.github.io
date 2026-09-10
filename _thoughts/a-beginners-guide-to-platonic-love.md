@@ -1,15 +1,16 @@
 ---
-title: "A Beginner's Guide to Platonic Love"
+title: "A Beginner's Guide to Unspoken Love"
 date: 2009-05-23
+description: "Unspoken love can turn a daily commute into a private drama of courage, fantasy, and regret."
 tags:
-   - memories
-   - relationships
-   - youth
-   - commuting
-   - life
+  - memories
+  - relationships
+  - youth
+  - commuting
+  - unspoken love
 ---
 
-Platonic love is difficult, especially when the person is not somewhere far away but sitting on the same company shuttle every morning.
+Unspoken love is difficult, especially when the person is not somewhere far away but sitting on the same company shuttle every morning.
 
 There was a time when I saw the same girl almost every day. She got on one stop after me and got off one stop before me. That sounds like a very small detail. When you like someone from a distance, small details stop being small. They become the structure of the whole story.
 
@@ -21,11 +22,11 @@ The longer you wait, the harder the simplest action becomes. On the first day, s
 
 Routine magnifies everything. You begin noticing a jacket, a bag, a hairstyle, the exact stop where she gets on. None of this information has practical value, yet the mind stores it as if there will be an exam. Then one morning she does not appear, and uncertainty begins doing what uncertainty does best: inventing possibilities.
 
-Did she miss the shuttle? Is she sick? Did she take the day off? Did she stay somewhere else last night? That last possibility can destroy an otherwise peaceful morning, even though nothing has actually happened. The person has not promised anything. They may not even know you are thinking about them. Still, you react emotionally to scenarios that exist only in your own head.
+Did she miss the shuttle? Is she sick? Did she take the day off? Did she stay somewhere else last night? That last possibility can destroy an otherwise peaceful morning, even though nothing has actually happened. The person has not promised anything. She may not even know you are thinking about her. Still, you react emotionally to scenarios that exist only in your own head.
 
-This is where platonic love becomes more than simple attraction. Very little happens in reality, so imagination takes over the missing space. There are no dates, arguments, anniversaries, promises, or breakups, but there can still be an enormous amount of emotion. A look can improve the entire day. A missed morning can create worry. A two-second conversation can be replayed for hours.
+This is where unspoken love becomes more than simple attraction. Very little happens in reality, so imagination takes over the missing space. There are no dates, arguments, anniversaries, promises, or breakups, but there can still be an enormous amount of emotion. A look can improve the entire day. A missed morning can create worry. A two-second conversation can be replayed for hours.
 
-The person in imagination also has an unfair advantage over the real person. They never say the wrong thing. They are never boring. They never reject you. The imagined relationship remains perfect because it never has to survive contact with ordinary life.
+The person in imagination also has an unfair advantage over the real person. She never says the wrong thing. She is never boring. She never rejects you. The imagined relationship remains perfect because it never has to survive contact with ordinary life.
 
 Kierkegaard wrote about possibility as something that can produce both freedom and anxiety. I think that is part of what happens here. Possibility is attractive because nothing has been decided yet. It allows every version of the future to remain available. But the same openness that protects hope also prevents reality from correcting the fantasy.
 
@@ -39,7 +40,7 @@ Years ago, I described this situation very simply: every day passes, and the lon
 
 We imagine courage as something needed for dramatic moments: quitting a job, moving to another city, standing in front of a crowd, taking some enormous risk. Sometimes courage is much smaller. Sometimes it is sitting in the empty seat. Sometimes it is saying, "Good morning."
 
-The tragedy of platonic love is not always rejection. Rejection would at least provide an answer. The more durable regret can come from protecting a possibility so carefully that it is never allowed to become real.
+The tragedy of unspoken love is not always rejection. Rejection would at least provide an answer. The more durable regret can come from protecting a possibility so carefully that it is never allowed to become real.
 
 Maybe the person would have liked you. Maybe not. Maybe you would have had coffee once and discovered there was nothing there. Maybe something important would have happened. You never know.
 

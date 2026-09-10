@@ -1,11 +1,12 @@
 ---
 title: "Being Misunderstood"
 date: 2010-06-18
+description: "Misunderstandings often grow when written words arrive without voice, expression, history, or the courage to ask what was meant."
 tags:
-   - life
-   - relationships
-   - communication
-   - memories
+  - life
+  - relationships
+  - communication
+  - memories
 ---
 
 Some problems begin with something that was never said. Others begin with something that was said and understood completely differently. I think the second kind can sometimes be worse, especially when two people cannot talk face to face.
@@ -24,13 +25,13 @@ A new person does not yet exist completely in your mind. You construct them from
 
 A harmless sentence becomes evidence. A late reply becomes evidence. A joke becomes evidence. Soon you are no longer trying to understand a person; you are trying to prove your theory about them.
 
-Trust is difficult at the beginning because neither person has enough data yet. We test people, usually without telling them there is a test. Will they call? Will they remember? Will they become jealous? Will they disappear? The other person does not know the rules, and then we are disappointed when they fail.
+Trust is difficult at the beginning because neither person has enough shared history yet. We test people, usually without telling them there is a test. Will they call? Will they remember? Will they become jealous? Will they disappear? The other person does not know the rules, and then we are disappointed when they fail.
 
 First impressions therefore become too powerful. A mistake that would be forgotten after ten years together can become decisive after ten days because there is no history to balance it. Only the mistake remains visible.
 
 Time can make this worse. If a misunderstanding is resolved quickly, it may disappear. If it is left alone, it begins collecting meaning. The original sentence becomes less important than the questions around it: Why didn't you explain? Why didn't you call? Why did you wait? Why didn't you care enough to fix it?
 
-Silence creates its own evidence. One person may be silent because they are afraid of making things worse; the other reads the silence as indifference. Both may be waiting for the same thing. Neither moves. Sometimes there is no real disagreement at all—only two people standing on opposite sides of the same silence.
+Silence creates its own evidence. One person may be silent because they are afraid of making things worse; the other reads the silence as indifference. Both may be waiting for the same thing. Neither moves. Sometimes there is no real disagreement at all, only two people standing on opposite sides of the same silence.
 
 I also think it is a mistake to reconstruct a person entirely from what they write online. People write for different reasons: anger, boredom, humor, memory, exaggeration, curiosity, loneliness. A collection of sentences is not a person.
 
@@ -40,7 +41,7 @@ We make the same mistake offline. We reduce people to moments: the thing they sa
 
 Perhaps understanding someone requires allowing them to contradict the version of them we have created. That is difficult because being wrong about another person can hurt our pride. Sometimes it is easier to lose the person than admit our interpretation was wrong.
 
-After enough misunderstandings, fixing things really can become difficult—not because the original problem was impossible, but because too much has been built on top of it: new suspicion, new arguments, new sentences, new silence.
+After enough misunderstandings, fixing things really can become difficult, not because the original problem was impossible, but because too much has been built on top of it: new suspicion, new arguments, new sentences, new silence.
 
 Maybe that is why certain conversations need to happen early, face to face if possible, with enough time and without trying to win. Not every disagreement needs a clever answer. Sometimes all that is needed is a simple question: **What did you mean?**
 

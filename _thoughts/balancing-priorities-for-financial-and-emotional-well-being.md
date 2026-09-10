@@ -1,6 +1,7 @@
 ---
 title: 'Not Every Need Becomes Your Duty'
 date: 2018-10-06
+description: "A reflection on generosity, boundaries, and the difference between helping someone and becoming permanently available."
 tags:
   - boundaries
   - relationships

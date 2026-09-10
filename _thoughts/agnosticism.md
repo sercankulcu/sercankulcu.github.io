@@ -1,6 +1,7 @@
 ---
 title: 'Uncertainty Is Not an Empty Position'
 date: 2020-03-12
+description: "Agnosticism is not passive indecision, but a disciplined refusal to claim more than the evidence allows."
 tags:
   - philosophy
   - uncertainty
@@ -33,7 +34,7 @@ I can care deeply about a question without pretending I possess its answer. In f
 
 This matters outside religion as well.
 
-In technical work, the most expensive mistakes often begin with hidden certainty. We assume the bottleneck before measuring it. We choose an architecture before understanding the constraints. We become loyal to a tool and then redesign the problem so that the tool remains correct.
+In technical work, the most expensive mistakes often begin with hidden certainty. We assume the bottleneck before measuring it. We choose an architecture before understanding the constraints. We become loyal to a tool and then quietly redesign the problem so the tool remains correct.
 
 The mature response is not endless doubt. Decisions still have to be made.
 

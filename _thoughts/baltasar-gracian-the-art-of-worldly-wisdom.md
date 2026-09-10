@@ -1,6 +1,7 @@
 ---
 title: 'Being Right Is Not Enough'
 date: 2017-02-13
+description: "Good judgment is not only knowing what is true, but knowing when and how a truth can do useful work."
 tags:
   - judgment
   - communication
