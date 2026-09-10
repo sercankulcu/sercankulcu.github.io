@@ -8,8 +8,8 @@ tags:
   - computing-history
 ---
 
-Microsoft released Windows Terminal 1.0 in May 2020 as a modern command-line host for PowerShell, Command Prompt, WSL distributions, and other shells.
+Microsoft released Windows Terminal 1.0 in May 2020, roughly a year after its first public preview at Microsoft Build 2019. The application replaced decades-old infrastructure: Command Prompt ran on conhost.exe, a host that dated to Windows NT and had no support for modern text rendering, multiple tabs, or proper Unicode.
 
-The application used GPU-accelerated text rendering, supported tabs, Unicode and emoji, customizable key bindings, and a JSON-based configuration system. It was open sourced from the beginning, allowing developers to follow and contribute to its development on GitHub.
+Windows Terminal used DirectWrite and DirectX for GPU-accelerated text rendering, supported multiple panes and tabs, handled the full Unicode range including emoji and CJK characters, allowed customizable key bindings, and stored all configuration in a JSON file under the user's roaming profile. It ran PowerShell, Command Prompt, Azure Cloud Shell, and any WSL distribution as separate tab profiles. That same month, WSL2 launched, adding a real Linux kernel running in a lightweight virtual machine inside Windows.
 
-Windows Terminal was part of a broader shift in Microsoft's developer strategy. Windows was increasingly expected to coexist with Linux tools, SSH, containers, Git, and cross-platform development rather than forcing every workflow through traditional Windows-only utilities.
+Windows Terminal was open sourced on GitHub from the first preview, giving developers visibility into how Microsoft was building it and allowing contributions. It reflected a larger reorientation: Windows under CEO Satya Nadella was increasingly expected to be a good host for Linux tools, containers, SSH, and cross-platform workflows rather than an environment where every developer tool had to be a native Windows application.

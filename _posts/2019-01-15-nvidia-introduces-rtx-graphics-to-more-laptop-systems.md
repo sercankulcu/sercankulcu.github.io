@@ -8,8 +8,8 @@ tags:
   - history
 ---
 
-NVIDIA brought GeForce RTX 20-series GPUs to gaming laptops in early 2019, moving Turing's ray-tracing and Tensor Core hardware into systems with much tighter power and cooling limits than desktop PCs.
+NVIDIA announced GeForce RTX 20-series laptop GPUs at CES in January 2019, bringing the Turing architecture's dedicated RT cores for ray tracing and Tensor cores for DLSS into mobile systems. The mobile lineup included the RTX 2060, 2070, and 2080, with most high-end configurations also available in Max-Q variants designed for thinner chassis.
 
-Laptop GPUs often use lower clock speeds and carefully managed power envelopes to fit inside thin chassis. NVIDIA's Max-Q approach coordinated GPU settings, thermals, and system design to trade some peak performance for lower noise and power use.
+Laptop GPUs operate within tighter power and thermal constraints than desktop cards. A desktop RTX 2080 drew up to 215W; a laptop RTX 2080 Max-Q was tuned to around 80W, achieving that reduction through lower base and boost clocks and the GPU Boost 4.0 algorithm that continuously balanced clockspeed against temperature and power draw. NVIDIA's Max-Q program — introduced with GTX 10-series in 2017 — required OEMs to co-develop system thermals with NVIDIA to reach the specified power targets without throttling.
 
-RTX laptops also brought hardware-accelerated ray tracing and DLSS to portable gaming. The challenge was especially clear on mobile hardware: advanced rendering features are useful only if the GPU can deliver them without exhausting the battery or overwhelming the cooling system.
+RTX laptops in 2019 represented the first time ray tracing was available in portable form, though the performance cost of real-time ray tracing was severe. Games such as Battlefield V and Metro Exodus added ray-traced lighting and reflections that required DLSS — using Tensor cores to upscale from a lower resolution — to maintain playable frame rates on mobile hardware. The combination illustrated that advanced rendering features were realistic on laptops, but only with a significant upscaling assist.
