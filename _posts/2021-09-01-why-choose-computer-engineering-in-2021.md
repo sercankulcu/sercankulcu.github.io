@@ -7,18 +7,24 @@ tags:
   - computer-engineering
   - education
 ---
-In 2021, it is difficult to find an important technology that does not involve computing. Cloud platforms run global services, artificial intelligence is entering more products, and the semiconductor shortage has reminded everyone that software still depends on physical hardware.
+In 2021, it is difficult to find an important technology that does not involve computing. Cloud platforms run global services, artificial intelligence is entering more products, and the global semiconductor shortage has reminded everyone that software still depends on physical hardware.
 
-That combination makes Computer Engineering especially interesting. The discipline does not treat hardware and software as completely separate worlds. Students can learn programming and algorithms while also studying processors, digital systems, operating systems, networks, and computer architecture.
+## What 2021 looks like from inside the field
 
-This broad view is useful because modern systems are becoming more specialized. A fast application may depend on efficient code, a well-designed network, a database architecture, and the capabilities of the underlying processor. AI workloads are increasing interest in GPUs and specialized accelerators. Mobile and embedded systems must balance performance with energy consumption.
+The chip shortage is not a background fact — it is a visible crisis. TSMC and Samsung are running fabrication capacity at over 100% utilisation. Consumer graphics cards are selling at two to three times their manufacturer's suggested retail price because Ethereum mining and pandemic-driven gaming demand are both drawing from the same supply. A PlayStation 5 is difficult to find in retail a full year after launch. This situation has taught people outside the industry something that engineers already knew: every piece of software ultimately runs on physical silicon, and silicon supply chains are complex.
 
-Computer Engineering also offers many career directions. Software engineering remains a major path, but students can also move toward cybersecurity, cloud infrastructure, embedded systems, data engineering, machine learning, networking, or hardware design.
+NVIDIA's A100 GPU, launched in May 2020, has become the primary workhorse for large-scale AI training. Language models, image generators, and recommendation systems increasingly depend on this class of hardware. Microsoft and OpenAI signed a $1 billion partnership to build the infrastructure to train the largest models. The compute requirements for frontier AI research are doubling roughly every six to twelve months, which has created intensive demand for engineers who understand both software and hardware.
 
-Another reason to choose the field is its international nature. Programming languages, open-source projects, technical documentation, and development platforms are shared globally. A student can learn from engineers around the world and contribute to projects beyond a local market.
+Remote work, accelerated by 2020 and now established as a normal mode for technical teams, has changed how software is built. GitHub Actions, launched November 2019, made continuous integration accessible to any project. Collaboration across time zones and countries is no longer unusual for software engineering teams.
 
-The most valuable part of the degree, however, is not access to one fashionable technology. Technology changes too quickly for that. The real value is learning how to analyze a problem, design a solution, test it, measure it, and improve it.
+## What the degree provides
 
-Computer Engineering is not an easy department. It requires mathematics, patience, and a willingness to learn continuously. But for students who enjoy understanding both how computers work and what can be built with them, the effort is worthwhile.
+Computer Engineering does not treat hardware and software as completely separate worlds. Students learn programming and algorithms while also studying processors, digital systems, operating systems, networks, and computer architecture. That combination matters increasingly in 2021, when fast applications may depend on efficient code, a well-designed network, a database that fits the access pattern, and the capabilities of the underlying processor.
 
-In 2021, computing is not just one sector among many. It is becoming a foundation for nearly every sector, which makes learning its fundamentals a powerful investment.
+AI workloads are driving renewed interest in GPU programming, specialized neural network accelerators, and the memory hierarchies that determine whether a training run finishes in hours or days. Mobile and embedded systems must balance performance with energy consumption in ways that general-purpose desktop software does not.
+
+## Career directions
+
+Software engineering remains the most common path, but graduates can also move toward cybersecurity, cloud infrastructure, embedded systems, data engineering, machine learning, networking, or hardware design. The Stack Overflow Developer Survey 2021 placed US developer median salaries around $120,000, and international remote work has expanded the accessible job market for students in many countries.
+
+The most valuable part of the degree is not access to one fashionable technology — technology changes too quickly for that. The real value is learning how to analyse a problem, design a solution, test it, measure it, and improve it. In 2021, computing is not just one sector among many. It is becoming a foundation for nearly every sector, which makes learning its fundamentals a durable investment.

@@ -8,34 +8,28 @@ tags:
   - software
 ---
 
-AI makes programming faster. That part is easy to see.
+AI tools have made certain parts of programming faster in ways that are hard to argue with. Generating a function from a description, explaining what an error message means, writing test cases for a known interface, translating code between languages — these tasks take a fraction of the time they did two years ago. That efficiency gain is real and significant.
 
-We can generate code, write tests, explain errors, and create documentation in much less time. A task that once took an hour can sometimes take ten minutes.
+The harder question is whether faster programming produces better programmers, or just faster ones.
 
-I enjoy this. I do not want to return to a slower world only because the old way feels familiar.
+## What faster looks like
 
-Still, I keep thinking about another question. Does faster programming make us better programmers?
+GitHub's research on Copilot, published in 2022, found that developers using the tool completed tasks roughly 55% faster in controlled experiments. The tasks in those studies were mostly well-defined, scope-limited, and written in languages well-represented in training data. This is consistent with what most developers report: the speedup is sharpest for the mechanical and predictable parts of programming — boilerplate, standard patterns, converting known logic into code.
 
-I am not sure.
+The slowdown in understanding comes later. Code that arrives quickly — before the problem is fully clear — can look complete before it is. It may solve the stated problem while missing the unstated constraints. A function that handles the happy path correctly but fails silently on unexpected input is not a solution, but it looks like one.
 
-The biggest change is that code can now arrive before the idea is fully clear. In the past, we often had to think for a while before anything useful appeared on the screen. Now a complete-looking solution can arrive immediately.
+## The calibration problem
 
-This is helpful, but it can also create a strange kind of laziness. If the code works, we may stop asking why.
+AI assistants in 2025 produce plausible code with a uniform tone of confidence regardless of whether the answer is correct or not. This is a calibration problem: the output of a certain AI-generated explanation looks the same whether it is right, subtly wrong, or completely hallucinated. A developer who receives an explanation and accepts it without checking has not learned anything — they have outsourced the thinking to a system that may have given them a false understanding.
 
-I try to resist that. When AI gives me something important, I want to be able to explain it in my own words. If I cannot explain the main idea, the code still feels partly foreign to me.
+The appropriate response is not skepticism of every word, but the habit of verification: can I trace this code myself? Does this explanation match what I already know? Is there a simpler way to confirm this?
 
-Programming has never been only typing. A good programmer asks questions. What is the real problem? What can fail? What happens when the data becomes large? Will another person understand this later? Does this feature even need to exist?
+## What actually makes programmers better
 
-AI can help answer these questions, but it cannot remove our responsibility for asking them.
+Better programming means different things depending on context, but most definitions include: the ability to understand a system well enough to change it predictably, the ability to identify when a proposed solution has a flaw, and the ability to explain what something does and why. These are not the parts that AI has made faster.
 
-I also think AI is a strange teacher. It can be endlessly patient. You can ask the same thing many times. You can request simpler explanations. This is wonderful. But it can also be wrong with confidence.
+Reading code carefully — tracing execution, understanding invariants, noticing what is missing — is a skill that has not been automated. Asking "what is the real problem here?" before writing anything is not a skill that AI prompts you to develop. Deciding that a feature should not be built at all requires judgment that does not come from generating it quickly.
 
-That means a new skill becomes important: healthy doubt.
+The most useful mental model I have found: AI as a tool that amplifies existing direction. A programmer who already asks the right questions can use AI to implement answers faster. A programmer who skips the questions can now produce larger volumes of questionable code more quickly.
 
-Not fear. Not rejection. Just the habit of checking.
-
-Maybe AI does not automatically make us better or worse. Maybe it increases the direction we already have. A curious programmer can learn faster. A careless programmer can become careless at higher speed.
-
-For me, the goal is not to prove that I can work without AI.
-
-The goal is to keep thinking while I use it.
+For me, the personal standard is simple: if I cannot explain the main idea of a piece of AI-generated code in my own words, I have not finished working on it. The code may be in the repository, but the understanding is not yet mine. That distinction matters when something breaks at 2am and the AI assistant's suggestion does not help.

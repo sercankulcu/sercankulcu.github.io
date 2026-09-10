@@ -8,18 +8,34 @@ tags:
   - self-improvement
 ---
 
-The Banach-Tarski Paradox sounds impossible the first time we hear it. In very informal language, it says that a solid mathematical ball can be divided into a small number of special pieces and then rearranged using only rotations and translations to create two balls, each the same size as the original. One ball becomes two. No stretching. No ordinary copying.
+The Banach-Tarski Paradox is a theorem in mathematics stating that a solid ball in three-dimensional space can be decomposed into a finite number of disjoint subsets, which can then be reassembled — using only rigid motions: rotations and translations — into two solid balls each identical in size to the original. One ball becomes two. No stretching, no scaling, no adding material.
 
 <img width="200" alt="banach tarski paradox" src="/images/posts/the-banach-tarski-paradox.webp" style="float: left; margin-right: 10px;" />
 
-It sounds like magic. Of course, this cannot be done with a real orange, a football, or any physical object. The important word is mathematical.
+This cannot be done with a physical orange. The important word is *mathematical*. The pieces in the Banach-Tarski construction are not objects that could be cut with a knife or described with a recipe. They are what mathematicians call non-measurable sets.
 
-The "pieces" in the Banach-Tarski construction are not normal solid pieces that could be cut with a knife. They are extremely complicated sets of points. They are non-measurable, which means ordinary ideas of volume do not apply to them in the usual way.
+## What non-measurable means
 
-The paradox depends on the Axiom of Choice, a principle in set theory that allows us to make selections from infinitely many sets under very general conditions. Stefan Banach and Alfred Tarski published the result in 1924.
+Measure theory is the branch of mathematics that formalizes the idea of size — length, area, volume — in a way that is consistent and well-behaved. A "measurable" set is one to which you can assign a well-defined size. Most sets we encounter in everyday mathematics are measurable.
 
-What makes the result feel so disturbing is that our physical intuition expects volume to behave nicely. If we cut an object into pieces and move them around, the total volume should stay the same.
+A non-measurable set is one for which no consistent assignment of size is possible. The first example was constructed by Giuseppe Vitali in 1905: using a choice axiom, he built a set of real numbers on the unit interval that cannot be given a length without creating a contradiction. If you assign it a length of zero, infinitely many translated copies of it fit inside a finite interval. If you assign it any positive length, finitely many copies would exceed the interval.
 
-For normal measurable pieces, it does. The Banach-Tarski construction works by leaving the world of ordinary measurable objects. I like this paradox because it is a warning about intuition. Our intuition was developed in a finite physical world. Mathematics can describe infinite structures that do not respect those expectations.
+The pieces used in the Banach-Tarski decomposition are similarly pathological — infinitely intricate collections of points, not regions with smooth boundaries. Volume does not apply to them in any meaningful way.
 
-The theorem is not telling us that we can create matter from nothing. It is telling us that infinity and set theory contain objects much stranger than everyday experience prepares us for. Sometimes mathematics becomes most interesting exactly where common sense stops being reliable.
+## The Axiom of Choice
+
+Stefan Banach and Alfred Tarski published the result in 1924. The proof depends on the Axiom of Choice (AC): a principle in set theory stating that, given any collection of non-empty sets, it is possible to select exactly one element from each set — even when the collection is infinite and no explicit rule for choosing exists.
+
+AC is accepted in most of modern mathematics because it is useful and because its negation creates equally strange results. But theorems that depend heavily on AC often produce conclusions that are impossible to realize in physical terms, and Banach-Tarski is the most striking example.
+
+## What the paradox actually says
+
+The result holds in three-dimensional space but fails in one and two dimensions. This is because the group of rotations of three-dimensional space (SO(3)) contains a "free group on two generators" as a subgroup — a structure that allows the paradoxical decomposition. Two-dimensional space lacks this structure.
+
+The theorem uses roughly five pieces. With more pieces, the decomposition can be made more explicit; the minimum number of pieces required was shown to be five by Robinson in 1947.
+
+## What it tells us
+
+The theorem is not telling us that matter can be created from nothing. It is telling us that the intuitive concept of "size" breaks down when applied to arbitrary subsets of three-dimensional space — that our physical intuition about volume, which developed from experience with measurable objects, cannot be extended to all mathematical objects without contradiction.
+
+I like the Banach-Tarski Paradox because it is a clean demonstration that mathematics is not just a formalization of physical intuition. The formal rules allow structures that physical reality does not. Understanding where that divergence occurs is part of understanding what mathematics actually is.

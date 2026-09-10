@@ -9,30 +9,38 @@ tags:
   - education
 ---
 
-Coding is important in computer science, but coding alone is not enough.
+Students entering computer science programs tend to focus on programming languages, frameworks, and algorithms. This is understandable — these skills are concrete, teachable, and immediately demonstrable. You write code, it does something, and the result is visible.
 
-I have seen students become very focused on programming languages, frameworks, and technical tools. This is understandable because these skills are visible. You can build something and show it.
+But the gap between a student who can write correct code and a professional who is effective in a team is not filled by more coding skill. It is filled by skills that exams rarely measure and courses rarely teach explicitly.
 
-Some other skills are quieter, but they matter just as much.
+## Reading code others have written
 
-One of them is communication. A good idea becomes much less useful if nobody understands it. Being able to explain a technical problem in simple words is a real skill. Writing a clear email, documenting a decision, or asking a good question can save a lot of time.
+A substantial fraction of professional programming work is reading: understanding what existing code does, why it was written that way, and how to change it without breaking something else. This is harder than writing new code because the code was written for someone else's mental model, often without comments, and has accumulated the decisions of multiple people over time.
 
-Another skill is patience. Many technical problems do not have immediate answers. Sometimes you need to read documentation, test several ideas, or sleep and return the next morning.
+Students who have only written their own code from scratch find this difficult. The habit to build is deliberate reading: trace a function you did not write, understand every branch, follow the data through the system. Doing this regularly with open-source projects before working professionally is useful preparation.
 
-Students often think good programmers solve things quickly. Experienced programmers know that many problems are solved slowly.
+## Writing that other people can follow
 
-Reading is important too. Not only books, but specifications, source code, error messages, documentation, and other people's explanations.
+Technical communication is a professional skill that most computer science programs treat as optional. It is not optional. A pull request description that explains what changed and why saves reviewers time and leaves a record for whoever reads the code in three years. A bug report that includes reproduction steps, environment details, and what was already tried takes five minutes to write and can save hours of debugging back-and-forth. A technical decision document that explains the alternatives considered and why one was chosen is useful every time someone asks "why is it done this way?"
 
-A large part of programming is understanding text written by someone else.
+None of these require elegant prose. They require precision: saying what is true without ambiguity and leaving out what is not relevant.
 
-I also think students should learn to work with uncertainty. Real problems are usually less clean than textbook exercises. Requirements can be incomplete. Data can be messy. People can change their minds.
+## Working with incomplete information
 
-Being comfortable with "I do not know yet" is useful.
+Textbook exercises have complete specifications. Real projects do not. Requirements are often underspecified — not because the stakeholders are careless, but because they do not yet know everything the system will need to do. Data arrives in formats that differ from what was expected. Dependencies have undocumented behaviors.
 
-Teamwork matters as well. Software is often built with other people. You need to accept criticism, explain choices, change your mind, and sometimes work with an idea you did not choose.
+Students who are accustomed to clean problem statements often freeze when a real problem is ambiguous. The skill to develop is comfort with "I do not know yet" as a temporary state rather than a signal that something is wrong. The next step when the specification is unclear is usually: ask one specific question, make one assumption explicitly, or build the simplest thing that would be testable, then learn from it.
 
-These skills are difficult to measure in an exam, but they become very visible in real projects.
+## Debugging as investigation, not guessing
 
-Programming languages will continue to change. AI tools will change too.
+Debugging by changing things randomly and seeing if the error disappears is a pattern that gets worse as systems grow. It also does not build understanding. Debugging as a skill means forming a hypothesis about what is wrong, designing a test that would distinguish between that hypothesis and an alternative, running it, and updating the hypothesis. This is slower than guessing until something works, right up until the point where the system is complex and guessing stops working.
 
-The ability to think, communicate, learn, and work with others will stay useful for a very long time.
+The habit is teachable: when something breaks, write down what you expect to happen and what actually happens before touching any code. The difference is the thing to explain.
+
+## Understanding the person who will use what you build
+
+Code that works correctly but is confusing to its users fails in a way that unit tests do not catch. The mental model of how a program works that the developer holds is not the same as the mental model a user arrives with. This gap causes errors that the developer finds hard to predict.
+
+Spending time watching someone else use a tool you built, without coaching them, is uncomfortable and informative in roughly equal measure. It is worth doing regularly.
+
+Programming languages will continue to change, and the tools developers use will change around them. These skills — reading carefully, writing precisely, working with uncertainty, debugging systematically, and understanding users — have been relevant throughout the history of the field, and there is no reason to expect that to stop.

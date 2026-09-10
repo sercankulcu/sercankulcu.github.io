@@ -9,36 +9,30 @@ tags:
   - life
 ---
 
-A personal website is a strange project because there is no real final version.
+A personal website is a strange project because there is no real final version. Every other software project has a definition of done — a feature ships, a bug is fixed, a version is released. A personal website has none of those endpoints. You can always change a sentence, move a section, update a post from five years ago, add a page you have been meaning to build, or remove something you are no longer sure should be there.
 
-You can always change a sentence, add a page, remove an old post, fix a broken link, or build a new tool. You can move a button five pixels and then move it back.
+I have been maintaining this site long enough to stop fighting that nature and start appreciating it.
 
-I have started to enjoy this unfinished nature.
+## What accumulates over time
 
-When a personal website becomes old enough, it contains different versions of the same person. Old interests, old writing styles, old technical choices, and old ideas all stay together.
+When a personal site runs long enough, it becomes an archive of different versions of the same person. The writing style from 2008 is different from 2015 is different from now. The technical choices — which static site generator, which CSS approach, which domain host — reflect what the ecosystem looked like when each decision was made and what I cared about at the time.
 
-Some pages make you proud. Some make you ask, "Why did I do this?"
+Some old pages are ones I am still proud of. Some raise the question "why did I write it that way?" Both kinds are useful to have. The embarrassing ones are particularly honest evidence that I understood things differently at a particular moment, and that understanding changed. A portfolio that only shows the current best work is a more polished object but a less accurate record.
 
-Both are valuable.
+Cleaning up old content turns out to be partly technical and partly something else. Deleting a post that is simply weak feels different from deleting a post that was written during a specific period in your life, even if the writing is poor. One is maintenance; the other feels closer to editing a memory. I have started leaving more of the old work in place than I used to, because the continuity is part of what makes the site feel like mine rather than a product.
 
-The site becomes more than a portfolio. It becomes a record of change.
+## What "not finished" enables
 
-Cleaning old content can feel surprisingly emotional. Even when a page is weak, it belongs to a period. Maybe the writing is poor. Maybe the topic no longer fits. Still, deleting it can feel like removing a small memory.
+The unfinished state means the site can change as I do, without an artificial forcing event. A platform requires me to fit myself into its structure — its categories, its interface, its algorithm for what gets shown to whom. A personal site requires only that I decide what goes on it.
 
-That is why I think website cleanup is partly technical and partly emotional.
+This sounds obvious but is easy to undervalue. The mixture of content that makes sense on a personal site — technical posts beside teaching materials beside personal writing beside a small game I built for an afternoon — would be incoherent on almost any platform. Platforms need consistency because they serve many people; the algorithm needs to know what kind of content you produce. A personal site serves me and whoever finds it useful, in no particular ratio.
 
-Not everything old should stay, but not everything old should disappear either.
+Not every page needs many visitors. Some pages exist because I wanted to make something. Some may help exactly one person who finds it through a specific search. Some are only useful for my future self, looking back. Value is not always visible in a page view counter, and I have mostly stopped trying to measure it that way.
 
-I also like owning a small place on the web. Social platforms are easier, but a personal website feels different. The structure is yours. The categories are yours. The strange little pages are yours.
+## The maintenance that remains
 
-Not every page needs many visitors either. Some pages exist because I wanted to make them. Some may help only one person. Some may only be useful for my future self.
+The practical reality of an unfinished site is that links break, dependencies age, and some content becomes incorrect as time passes. A post about a software tool from 2012 may describe behavior that changed years ago. Keeping a site is real work, and the question of what to update versus what to leave as a historical artifact is not always obvious.
 
-Value is not always visible in a counter.
+My current approach: fix broken links and clear factual errors when I notice them; mark older posts with their original date prominently so readers can calibrate; leave old work otherwise intact unless it is actively misleading. The site is a record of what I thought when I wrote, not a claim that I still think it.
 
-A personal website does not need one perfect identity. One page can be technical. Another can be personal. Another can be a game. Another can be a memory.
-
-A person is not one category.
-
-Maybe that is why a personal site never really feels finished.
-
-It keeps changing because we do.
+In 2026, AI-generated content is everywhere and growing. A site that has been consistently maintained by a person, changing over time in ways that reflect genuine thought rather than generated text, is its own kind of signal. The unfinished quality — the posts that trail off, the sections that were started and stopped, the old pages with visual styles no one would choose today — is evidence of something real. I would rather have that than a polished surface over nothing particular.

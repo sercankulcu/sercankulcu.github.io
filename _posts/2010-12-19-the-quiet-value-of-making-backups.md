@@ -8,22 +8,38 @@ tags:
   - life
 ---
 
-Backups are one of the least exciting parts of using a computer. Nothing new appears when a backup works. There is no faster program, new feature, or beautiful interface. We only create another copy of something we already have.
+Backups are one of the least exciting parts of using a computer. Nothing new appears when a backup works. There is no faster program, no new feature, no visual change at all. We only create another copy of something we already have.
 
-That is probably why many people understand backups properly only after losing data.
+That is probably why most people understand backups properly only after losing data.
 
-Hard drives fail. Laptops can be stolen. A file can be deleted by mistake. Malware can damage a system. Even a perfectly healthy computer cannot protect us from every human error.
+## What actually fails
 
-I have learned that one copy is not really safe. If an important document exists only on one disk, that disk is not storage and backup at the same time. A second copy should live somewhere else, preferably on a different device. For very important files, keeping one copy in another physical location gives protection against larger accidents too.
+The causes of data loss are mundane and varied. Hard drives have a mechanical failure rate that increases with age — most consumer drives are designed for three to five years of use, but failures can occur at any point. A laptop that is dropped can damage a drive immediately. A power surge can corrupt a drive's file system. A theft removes both the computer and everything stored on it simultaneously. A file deleted by mistake — yours or a piece of malware's — is gone unless another copy exists.
 
-External hard drives make this easier than it used to be. Online backup services are also appearing, although uploading large amounts of data can be slow and privacy needs consideration. The right system depends on the size and importance of the files.
+The worst aspect of each of these scenarios is that you cannot know when one will happen. A hard drive that has worked reliably for four years gives no warning before failing. Data loss is not gradual; it is sudden, and it happens at random moments that are never convenient.
 
-Automation is important because a backup plan that depends on memory eventually fails. People are good at following a routine for a few weeks and then forgetting it during a busy month. Software can be more disciplined than we are.
+## Why one copy is not safe
 
-The hardest lesson is that a backup should sometimes be tested. A file that cannot be restored is not useful simply because a program said "backup completed." Recovery is the real goal.
+The most common backup mistake is treating a single copy as a backup. A document that exists only on a laptop is not backed up. If the laptop's hard drive fails, the document is gone. A document that exists on the laptop and on a USB drive plugged into the laptop is barely better — if the laptop is stolen, both are taken together. If there is a fire, both are in the same room.
 
-I like backups as a metaphor for quiet preparation. Much of good engineering is invisible when it works. Redundancy, testing, documentation, and safety margins look unnecessary on normal days.
+The principle that addresses this is often called the 3-2-1 rule: three copies of any important data, on at least two different types of media, with one copy stored off-site. Three copies because one will be the original and two will be backups — if one backup fails during a restore, you have another. Two media types because failures often affect similar media simultaneously (a power surge can damage both a computer and an attached external drive). Off-site because physical disasters — fire, flood, theft — can destroy everything in one location.
 
-Their value appears on the abnormal day.
+In December 2010, the practical options are:
 
-By then, it is too late to begin.
+- **External hard drives** for a second local copy, preferably on an automated schedule using software like Windows Backup or Time Machine on a Mac
+- **Online backup services** — Mozy and Carbonite are the established options — which upload files continuously in the background. Upload speed is the limitation; a first backup of a large drive can take weeks. The privacy question is real for sensitive files
+- **A second computer** in a different location running scheduled synchronization
+
+## Automation matters more than intention
+
+A backup plan that depends on memory will fail. People follow a manual routine for a while and then miss it during a busy period, and then miss it again. Software running on a schedule is more reliable than intention.
+
+Time Machine on a Mac, once configured, backs up to an attached drive every hour with no further action required. Mozy and Carbonite run in the background and upload changed files continuously. The configuration is a one-time effort; the protection is continuous.
+
+## The part most people skip
+
+The final piece — the hardest lesson — is testing whether the backup can actually be restored. A backup is not confirmed until something has been restored from it. Software can report "backup completed" after writing to a disk that has developed read errors. An online service can show green checkmarks while the account is in a state that prevents downloads.
+
+Restoring a sample of files from the backup once a year takes twenty minutes and confirms that the system is actually working. Without this test, a backup is something closer to a hope.
+
+I like backups as a metaphor for quiet preparation. Much of good engineering is invisible when it works — the fallback that never activates, the safety margin that is never needed, the documentation that sits unread until the person who wrote it is unavailable. These things look unnecessary on normal days. Their value appears on the abnormal day, which is the only day when it is too late to begin.

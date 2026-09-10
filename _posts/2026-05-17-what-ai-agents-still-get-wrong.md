@@ -8,18 +8,36 @@ tags:
   - software
 ---
 
-AI agents are one of the most discussed ideas in software right now. Instead of asking a model one question and receiving one answer, an agent can plan several steps, use tools, read files, call services, and continue working toward a larger goal.
+AI agents have moved from demo to daily use over the past year. The pattern is familiar: an agent receives a goal, plans steps, calls tools — reading files, executing code, querying APIs, sending messages — and continues until the task is complete or it encounters something it cannot handle. The step from "answer a question" to "carry out a task with multiple steps and side effects" seemed like a natural progression. The experience of actually using these systems has revealed where the progression is less natural than it looked.
 
-The demos can be impressive. An agent may inspect a codebase, modify several files, run tests, and correct some of its mistakes. Another may search documents, collect information, and prepare a report. The interaction starts to feel more like delegating a task than using autocomplete.
+## The compounding error problem
 
-The weaknesses also become clearer as tasks become longer. A small misunderstanding at the beginning can influence many later steps. Agents can choose the wrong tool, repeat work, lose track of constraints, or confidently complete the wrong task.
+A single-turn language model response that is wrong costs the user a moment of confusion and a follow-up question. An agent that starts with a misunderstanding and takes forty steps before a human checks the result has compounded that misunderstanding across every subsequent decision.
 
-This is different from a single bad answer. When software can act, errors have consequences. Writing the wrong paragraph is inconvenient. Deleting the wrong file or sending the wrong message is a different category of failure.
+The mechanism is specific: agents build context from their own previous outputs. Step 3 depends on what step 2 produced. Step 10 depends on the accumulated state of everything before it. If step 2 contained a subtle error — the wrong interpretation of a file name, an incorrect assumption about which API endpoint to call — then steps 3 through 10 may all be internally consistent with step 2 while being collectively wrong relative to the actual goal.
 
-Good agent systems therefore need boundaries, permissions, checkpoints, and ways to verify results. Human review remains especially important before irreversible actions.
+This is different from a wrong answer. It is wrong confidence, compounded over time, producing a result that looks like successful execution.
 
-I think the interesting future is not complete autonomy. It is adjustable autonomy. Some tasks can be delegated completely because mistakes are cheap and easy to detect. Other tasks should stop and ask before every important action.
+## Tool hallucination and the verification gap
 
-The question "Can the model do this?" is becoming less useful.
+Agents have access to tools, but their knowledge of what those tools do comes from training data and tool descriptions — not from real-time inspection of the tool's current behavior. An agent can call an API endpoint that has changed its response format, interpret the new response as if it were the old one, and continue building on incorrect data without any error signal.
 
-A better question is, "How much freedom should we give it before checking?"
+In testing, agents regularly call tools with plausible-sounding but incorrect parameters. They attempt to use tools that do not exist. They interpret an error response as partial success and continue. The verification that a human would apply automatically — "does this response look right?" — requires explicit design in agent systems. Without it, agents proceed confidently through incorrect states.
+
+## The irreversibility asymmetry
+
+Software that reads information and fails silently can be restarted. Software that acts — that sends an email, commits code to a repository, deletes a record, submits a form — creates state in the world that is not recoverable by rerunning the agent.
+
+The most dangerous agent tasks are those where the action itself provides no feedback that anything was wrong. An agent that books a meeting, sends a message, or modifies database records based on an early misunderstanding may complete the task successfully in the narrow sense that the operations executed while having done something the user did not intend.
+
+This asymmetry argues for designing agent systems with explicit reversibility: prefer operations that can be undone, add confirmation steps before irreversible actions, and log what happened in enough detail to reconstruct the sequence of decisions.
+
+## What calibrated autonomy looks like
+
+The interesting design space is not "agent or not agent" but how much autonomy is appropriate for a given task and a given error cost.
+
+Some tasks are genuinely good candidates for full delegation: generating a first draft, searching a large document set, reformatting data, running a test suite. Mistakes in these tasks are cheap — a wrong draft is still a draft, a missed search result can be recovered, a test failure stops the process.
+
+Other tasks warrant intervention points: before sending anything externally, before modifying files that are not easily restored, before making any decision that depends on an ambiguous requirement the agent has not verified.
+
+The question worth asking for any agent task is not "can the model do this?" but "at what point in this task does an error become expensive, and is there a checkpoint before that point?" Answering that question well is the difference between a useful agent and a confident one that causes problems at the worst possible time.

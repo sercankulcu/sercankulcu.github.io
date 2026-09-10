@@ -8,34 +8,49 @@ tags:
   - machine-learning
 ---
 
-Computer vision has always fascinated me because the task sounds simple when we describe it in human language.
+Computer vision has always fascinated me because the task sounds simple when we describe it in human language: "Find the object in this image." "Recognize this face." "Tell me what is happening in this picture." Humans do these things before they can write. For computers, the same tasks have been among the hardest problems in artificial intelligence for decades.
 
-"Find the object in this image."
+The story of why that changed so sharply in the past few years is worth telling specifically.
 
-"Recognize this face."
+## The ImageNet moment
 
-"Tell me what is happening in this picture."
+ImageNet is a dataset of over a million labeled images across a thousand categories — dogs, cars, chairs, instruments, foods, hundreds more. Since 2010, researchers have competed annually in the ImageNet Large Scale Visual Recognition Challenge (ILSVRC) to see which system could classify images most accurately. For the first two years, the best systems achieved error rates around 25-26%, using hand-engineered features.
 
-Humans do these things so naturally that we forget how much information is hidden inside vision.
+In 2012, a team from the University of Toronto — Alex Krizhevsky, Ilya Sutskever, and Geoffrey Hinton — submitted a convolutional neural network called AlexNet. It achieved a top-5 error rate of 15.3%, compared to the second-place entry's 26.2%. The gap was so large that the competition effectively ended the era of hand-designed features for image classification.
 
-For computers, the problem is difficult.
+AlexNet's key ingredients: convolutional layers that learned spatial features from the images themselves rather than accepting features designed by humans, rectified linear unit (ReLU) activations that trained faster than sigmoid functions, dropout regularization to reduce overfitting, and — critically — training on two NVIDIA GTX 580 GPUs, which made it feasible to train a network with 60 million parameters in about a week.
 
-In recent years, deep learning has changed the mood around computer vision. Convolutional neural networks are producing impressive results in image classification and recognition tasks. Better hardware, larger datasets, and new training methods are allowing models to learn useful visual features instead of depending only on features designed by hand.
+## What followed
 
-This is exciting, but I also think we should be careful with the excitement.
+The ILSVRC results from 2012 to now tell the story clearly:
 
-A system that performs well on a benchmark does not understand an image in the same way a person does. It can still fail in surprising situations. Training also requires large amounts of data and computing power.
+| Year | Winner       | Error rate |
+|------|--------------|------------|
+| 2011 | Conventional | 25.8%      |
+| 2012 | AlexNet      | 15.3%      |
+| 2014 | VGGNet       | 7.3%       |
+| 2015 | ResNet       | 3.57%      |
 
-Still, the progress is real.
+Humans, by comparison, perform at approximately 5% error on the same task. ResNet — from Microsoft Research — surpassed human performance in 2015. The improvement from 2012 to 2015 was driven by deeper networks, better training techniques, and increased GPU power.
 
-For researchers and students, this creates a strange moment. Techniques that felt advanced only a few years ago can quickly become normal. Papers become old faster. Tools change. New frameworks make experiments easier.
+## How convolutional networks work
 
-This can feel difficult to follow.
+The architecture that made this possible — the convolutional neural network — is designed around the structure of images. Images are spatial: nearby pixels are related, and patterns can appear anywhere in the frame.
 
-But it is also a good time to learn.
+A convolutional layer applies learned filters to local regions of the image, detecting edges, curves, textures, and eventually higher-level features. The same filter is applied across the entire image (weight sharing), which reduces the number of parameters dramatically compared to a fully connected network. Pooling layers reduce spatial dimensions, making the representation more compact and somewhat invariant to small translations.
 
-Computer vision is becoming a place where mathematics, programming, data, and hardware meet very directly.
+After several convolutional and pooling layers, fully connected layers combine the features into a final classification decision.
 
-When a model finally recognizes something correctly, the result appears simple.
+## The tools available now
 
-The work behind that simple answer is not simple at all.
+Training these networks requires significant computing resources, but frameworks released in the past year have made experimentation much more accessible. Google released TensorFlow as open source in November 2015. Caffe from Berkeley has been widely used in research. These frameworks handle the gradient calculations and GPU operations, letting researchers focus on architecture design rather than numerical implementation.
+
+Still, training a serious model on ImageNet requires GPU clusters. Researchers without institutional computing resources work with pre-trained models through transfer learning — taking a network trained on ImageNet and fine-tuning it for a more specific task with a smaller dataset.
+
+## Where caution belongs
+
+A system that performs at 3.57% error on ImageNet does not "understand" images in any philosophically meaningful sense. It has learned statistical patterns from labeled training data. Applied outside the distribution it was trained on — different lighting, unusual angles, images that were deliberately perturbed by a few pixels — it can fail in ways that no human would.
+
+The adversarial example problem is striking: images that appear identical to a human can be processed very differently by a neural network, because the network has learned different features than humans use to perceive the image. This is not a bug in any specific implementation; it reflects the nature of what these networks have learned.
+
+The progress is real and the applications are real — Google Photos can recognize faces and scenes in your library; medical imaging research is producing results in skin cancer detection and radiology. At the same time, the failures are real and the gap between benchmark performance and deployed reliability remains significant. This is a field in the middle of a genuine revolution, with everything that implies: rapid progress, incomplete understanding, and important open questions about where the current approach reaches its limits.
