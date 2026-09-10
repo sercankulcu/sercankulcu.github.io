@@ -36,7 +36,7 @@ This study combines radar-specific preprocessing with YOLO-based deep learning t
 
 **How to cite:** Külcü, S. (2026). Enhancing Radar PPI-Based Maritime Object Detection Using Hybrid Preprocessing and Deep Learning Approach. *IEEE Access, 14*, 111715–111730.
 
-[Paper](https://doi.org/10.1109/ACCESS.2026.3715472) · [Presentation](/files/presentations/Enhancing_Radar_PPI-Based_Presentation.pdf)
+[Paper](https://doi.org/10.1109/ACCESS.2026.3715472) · [Presentation](/files/presentations/Enhancing_Radar_PPI_Based_Presentation.pdf)
 
 </details>
 
@@ -116,7 +116,7 @@ This study proposes a lightweight radar-image framework that combines HSV-based 
 
 **How to cite:** Külcü, S. (2026). Radar image-based object detection and tracking for autonomous surface vehicles. *Turkish Journal of Maritime and Marine Sciences, 12*(1), 35–47.
 
-[Paper](https://doi.org/10.52998/trjmms.1743670) · [Presentation](/files/presentations/Radar_Image-Based_Object_Presentation.pdf)
+[Paper](https://doi.org/10.52998/trjmms.1743670) · [Presentation](/files/presentations/Radar_Image_Based_Object_Presentation.pdf)
 
 </details>
 
