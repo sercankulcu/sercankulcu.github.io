@@ -8,14 +8,36 @@ tags:
   - education
 ---
 
-The first Raspberry Pi was exciting because it made a computer feel inexpensive enough to experiment with. The new Raspberry Pi 3 continues that idea, but the small board is becoming much more capable. A faster processor, built-in Wi-Fi, and Bluetooth make it easier to use without adding several external devices.
+The Raspberry Pi 3 launched last month, and the specifications represent a meaningful jump from the Pi 2 — but the change I find most interesting is not the processor.
 
-I still think the most important feature is not performance. It is permission to experiment. A normal laptop contains important documents, accounts, and daily work. We usually do not want to turn it into a strange hardware project. A small board creates a different feeling. If the operating system breaks, we can rewrite the memory card and begin again.
+## What is new in the Pi 3
 
-This makes the Raspberry Pi especially useful for education. Students can learn Linux, programming, networking, and electronics on the same device. A Python program can read a sensor or control an LED. A small web server can run beside a simple robot project. The distance between software and physical computing becomes very short.
+The Pi 3 uses a Broadcom BCM2837, a 64-bit quad-core ARM Cortex-A53 running at 1.2 GHz. The Pi 2 ran at 900 MHz, so this is roughly a 33% clock speed increase, plus the 64-bit architecture. In practice this means the Pi 3 can run 64-bit operating systems, though the official Raspbian image is still 32-bit for now because 64-bit Linux distributions for ARM are less mature.
 
-The growing power of the board also creates a small danger. It is easy to turn the Raspberry Pi into only a cheap desktop computer and forget why it became interesting. The GPIO pins and the ability to connect the machine to the physical world are part of its personality.
+RAM stays at 1 GB, which the Pi 2 also had. The USB and HDMI ports are unchanged. The GPIO header has the same 40-pin layout as the Pi 2, so boards and accessories designed for the Pi 2 work on the Pi 3 without modification.
 
-I like computers that invite us to open them, connect things, and make mistakes. Many modern devices are becoming more polished and more closed at the same time. The Raspberry Pi moves in another direction.
+The additions that change how the board is used are **802.11n Wi-Fi** and **Bluetooth 4.1**, both built directly into the board. These did not exist on the Pi 2. To add Wi-Fi to a Pi 2, you plugged in a USB dongle. This worked, but it used one of the two USB ports and required finding a compatible dongle.
 
-A small computer can be useful because it is not precious. Sometimes learning becomes easier when we are not afraid of breaking the machine.
+## Why built-in Wi-Fi changes the use cases
+
+The practical difference is significant. A Pi 3 can connect to a wireless network during initial setup, before any additional hardware is attached. It can be placed somewhere useful — a shelf, inside a project enclosure, mounted behind a screen — without needing to be near an Ethernet cable. Headless setups, where the Pi runs without a monitor and is accessed via SSH, become much simpler when you do not need a wired connection.
+
+This matters most for the applications where the Pi 3 is genuinely good: home automation sensors, a small always-on server, a media player mounted behind a television, a network-attached storage device, a print server. These use cases benefit from being placed wherever makes sense physically, not wherever an Ethernet port happens to be.
+
+The Bluetooth addition opens a different set of connections — wireless keyboards, game controllers, sensors that communicate over Bluetooth Low Energy, and integration with the growing ecosystem of Bluetooth IoT devices.
+
+## Performance for real workloads
+
+The Pi 3 is fast enough to run a desktop Linux environment comfortably for light tasks — web browsing with a few tabs, writing documents, running a terminal. Chromium runs reasonably on it. For a student who needs a machine to learn programming and does not have access to a better computer, the Pi 3 is genuinely usable for daily study, not just as a toy.
+
+For server workloads — running a lightweight web server, a database, a home automation system, a file server — the performance is adequate. The bottleneck on those workloads is typically memory or I/O rather than raw CPU speed, and the Pi 3 is comparable to Pi 2 in those areas.
+
+For computationally demanding tasks — video encoding, compiling large codebases, running machine learning inference — the Pi 3 is slow. It is not the right tool for those jobs, and the 64-bit capability does not change that meaningfully in practice.
+
+## The GPIO still matters
+
+The built-in Wi-Fi makes it easy to forget that the row of 40 pins along the board's edge is still there. GPIO is what distinguishes the Pi from a cheap Android mini-PC or a discarded thin client. The Pi 3 can control a servo, read a humidity sensor, drive an I2C display, manage a relay, or interface with a wide range of electronics components.
+
+This connection to the physical world is the feature that makes the Pi useful for education in a way that a general-purpose cheap computer is not. When a student's Python program causes a fan to turn on because a temperature sensor exceeded a threshold, the software is no longer abstract. The Pi 3 keeps this, and the improved performance and wireless make it easier to build projects where the board is embedded in something rather than sitting on a desk.
+
+The Foundation has now sold more than eight million boards since the original Pi launched in 2012. The Pi 3 continues a pattern that has been consistent since the beginning: meaningfully more capable with each generation, while keeping the price and the fundamental character of the device the same.
