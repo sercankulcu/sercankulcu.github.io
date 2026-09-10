@@ -8,18 +8,24 @@ tags:
   - mobile
 ---
 
-Computers have moved from desks to laps and then into pockets. The next suggested destination is the body.
+Computers have moved from desks to laps and then into pockets. The next suggested destination is the body, and in February 2014 several companies are in the middle of that experiment with mixed results.
 
-Wearable computing is becoming more visible through devices such as fitness trackers, smart glasses, and early smartwatches. The idea is attractive because a device worn all day can collect information or provide small pieces of information without asking us to take out a phone.
+## The devices that exist
 
-Fitness seems like one of the clearest uses. A small device can count steps, estimate activity, and turn ordinary movement into data. This can be motivating because progress becomes visible. It can also become another number to worry about if measurement replaces the actual experience of exercise.
+**Fitness trackers** have established a clear niche. The Jawbone UP, Nike FuelBand, and Fitbit Flex count steps, estimate calories, and track sleep using accelerometers. These are simple devices with a simple value proposition: make activity visible, and people may act on what they see. The limitation is the same as most tracking: the measurement is motivating at first, but habitual use can shift into fixation on numbers rather than the underlying behavior. Still, the fitness tracker is the clearest case of a wearable doing something because of *where* it is — on the body, constantly, without requiring attention.
 
-Smart glasses create a more ambitious vision. Google Glass places information near the user's field of view and allows photos, navigation, and notifications without a traditional screen in the hand. The technology is impressive, but social acceptance may be harder than the engineering. People behave differently when they think a camera may always be present.
+**Google Glass** (Explorer Edition launched April 2013 for a select group at $1,500) represents the ambitious end. Glass places a small display in the user's peripheral vision and allows voice commands, photos, navigation, and notifications without holding a phone. The engineering is impressive; the social acceptance problem has been harder. People near a Glass wearer often do not know whether they are being recorded. The reactions — some curious, some hostile — have already produced the term "Glasshole" in early 2014. Whether this reflects a permanent problem with head-mounted cameras in public or simply unfamiliarity is not yet clear.
 
-Smartwatches face another question: what problem should the watch solve that a phone does not already solve? Showing a notification on the wrist is convenient, but convenience alone may not be enough to make another device essential. Battery life, comfort, and interface size also matter.
+**Smartwatches** are the most contested space. Samsung's Galaxy Gear launched September 2013 with a 1.9-inch screen, a camera, and an Android-derived OS requiring a paired Samsung phone. The Pebble Watch, which raised over $10 million on Kickstarter in 2012 and shipped in 2013, takes a simpler approach: an e-ink display, notification forwarding, and week-long battery life. The Pebble asks less of the user and lasts longer between charges; the Galaxy Gear asks more and dies faster. Both have struggled to clearly answer the question: what does a smartwatch do that a phone does not already do, and is that difference worth wearing another device?
 
-I think wearables will succeed when they stop trying to become tiny versions of existing computers. A watch does not need every phone feature. Glasses do not need every desktop application. Devices worn on the body should probably focus on interactions that are useful because of **where** the device is.
+Apple has not yet announced a smartwatch. Rumors and analyst speculation about an "iWatch" are active in early 2014.
 
-This reminds me of early smartphones. At first, people tried to place desktop ideas on a smaller screen. Over time, location, touch, cameras, and sensors created new kinds of applications.
+## The right question to ask about wearables
 
-Wearable computing is still looking for its native ideas. The hardware is appearing first. The most interesting uses may arrive later.
+Asking whether a smartwatch can replace a phone is the wrong question. The smartphone succeeded not by replacing the desktop — it created new categories of use that were impossible or impractical on a desktop: location-aware applications, always-available communication, photography without a dedicated camera.
+
+Devices worn on the body have a distinctive set of potential advantages: they are always on, always present, and positioned on parts of the body that have physiological information (wrist for heart rate, arm for motion) or that are near the user's field of view. Applications that exploit these specific properties — health monitoring, glanceable information, context-sensitive notifications that don't require reaching for a phone — have a reason to exist on a wearable rather than a phone.
+
+Applications that are simply shrunken versions of phone applications do not. A watch that browses the web poorly is not useful. A watch that reliably tells you whether to check your phone — because something requires attention versus merely generating a notification — might be.
+
+The hardware is appearing before the software has found its native purposes. That was also true of smartphones in 2007–2008. What comes after the obvious features is usually what defines whether a category lasts.

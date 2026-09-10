@@ -6,6 +6,16 @@ tags: [computers, gaming, hardware, pc-build, technology]
 
 If I were building a gaming PC on **July 1, 2016**, this is the machine I would actually want. I am not simply choosing the most expensive part in every category. The priority is gaming performance, then reliability, cooling and enough headroom to keep the system useful for years.
 
+### The context
+
+Mid-2016 is one of the more exciting moments in recent PC gaming history, and the reason is NVIDIA's Pascal architecture. The GTX 1080 launched May 27, 2016, and the GTX 1070 followed on June 10. Both are manufactured on TSMC's 16nm FinFET process — a significant process node improvement from the 28nm used by Maxwell — delivering a rare combination of substantially better performance and substantially lower power consumption simultaneously. The GTX 1080 is meaningfully faster than the GTX 980 Ti while using roughly 80 watts less power under load.
+
+This matters for build priorities. 1440p gaming at high refresh rates — which required a GTX 980 Ti or Titan X to be confident in, and still had rough edges — becomes comfortable with a GTX 1080. VR is a genuine consideration in July 2016: the Oculus Rift launched in March and the HTC Vive in April, and NVIDIA's "VR Ready" certification is based around GTX 970 or better. The GTX 1080 handles both VR and 1440p without compromise.
+
+On the CPU side, Intel's Skylake (6th generation Core, August 2015) introduced DDR4 support on the mainstream platform, though Skylake's performance improvement over Haswell in gaming was modest. AMD's competing CPUs in mid-2016 — Carrizo and Kaveri derivatives — are not competitive with Intel at the high end. Zen has been announced but is not yet available.
+
+AMD's RX 480 was announced on June 29, 2016 — just two days before July 1. At $199 for the 4GB model, it is an interesting value proposition but not yet available at retail on July 1, 2016.
+
 ### The build
 
 - **CPU:** Intel Core i7-6700K

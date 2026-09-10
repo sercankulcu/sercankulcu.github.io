@@ -6,6 +6,14 @@ tags: [computers, gaming, hardware, pc-build, technology]
 
 If I were building a gaming PC on **July 1, 2023**, this is the machine I would actually want. I am not simply choosing the most expensive part in every category. The priority is gaming performance, then reliability, cooling and enough headroom to keep the system useful for years.
 
+### The context
+
+July 2023 is one of the most interesting CPU moments in recent gaming history. AMD launched the Ryzen 7 7800X3D on April 6, 2023 at $449. It uses AMD's 3D V-Cache technology — a second SRAM die stacked directly on top of the compute die, bringing total L3 cache to 96MB from the usual 32MB on the standard 7700X. In games, cache-bound performance problems are common, and this extra cache frequently makes the 7800X3D the fastest gaming CPU available, often beating Intel's Core i9-13900K despite the Intel chip having four more performance cores and higher single-thread clock speeds. The 7800X3D is a narrowly optimized product — it runs at lower clocks and costs more than alternatives for productivity workloads — but for pure gaming, it is the right choice.
+
+NVIDIA's RTX 40 series (Ada Lovelace, TSMC 4N) launched in October 2022 and has expanded since. The RTX 4090 at $1,599 is the undisputed single-card performance leader. DLSS 3 Frame Generation (exclusive to RTX 40 series) uses optical flow to generate intermediate frames, doubling frame rates in supported titles at a latency cost. AMD's RX 7900 XTX is competitive in rasterization performance but lacks frame generation and trails in ray-traced workloads.
+
+The RTX 4090's 12VHPWR connector was flagged for melt incidents on some cables; AMD submitted a safety advisory mid-2023. Using the cable without sharp bends is essential.
+
 ### The build
 
 - **CPU:** AMD Ryzen 7 7800X3D

@@ -7,20 +7,63 @@ tags:
   - software
 ---
 
-The traditional web is very good at presenting information to people. The Semantic Web asks another question: can web data also be described in a way that machines can understand more clearly?
+Tim Berners-Lee proposed the Semantic Web in a 2001 Scientific American article written with James Hendler and Ora Lassila. The vision was compelling: an extension of the existing web in which information would have explicit meaning, allowing software agents to reason across data from different sources, make connections automatically, and perform tasks that currently require human judgment to navigate.
 
-This idea does not mean computers suddenly understand meaning like humans. It means we describe data with explicit relationships and shared vocabularies. Several technologies are important here.
+Fifteen years later, the Semantic Web as originally envisioned has not arrived. But several of its technologies have become practically important in more specific contexts, and understanding the gap between the vision and the reality is itself instructive.
 
-RDF, the Resource Description Framework, represents information as triples: subject, predicate, and object. For example, we can describe that "Ankara isCapitalOf Turkey" as a simple relationship.
+## The core technology stack
 
-URIs give resources unique identities. RDFS and OWL allow us to describe classes, properties, and more complex relationships. Ontologies give a domain a shared vocabulary.
+**RDF (Resource Description Framework)** is the foundational data model. Information is represented as triples: subject — predicate — object. Each element is identified by a URI or is a literal value.
 
-SPARQL is used to query RDF data. Instead of searching only for text, we can ask questions about connected entities and relationships.
+```
+<http://dbpedia.org/resource/Ankara> 
+  <http://dbpedia.org/ontology/isCapitalOf> 
+  <http://dbpedia.org/resource/Turkey>
+```
 
-I find this interesting because ordinary web pages often contain meaning only for human readers. A person sees a page and understands that one line is a person's name, another is a university, and another is a research topic.
+This triple asserts a relationship between two identified resources using a named predicate. Unlike a relational database row, the triple is self-describing — the predicate is a dereferenceable URI that can carry its own definition.
 
-A machine sees strings unless we provide structure. Semantic technologies try to make that structure explicit. This can help in knowledge bases, data integration, linked data, scientific information, and systems where many different datasets need to work together.
+**SPARQL** is the query language for RDF data. A query that asks for the capital of all EU member states:
 
-The idea is ambitious and sometimes difficult. Ontologies take effort to design. Different organizations may describe the same thing in different ways. Large semantic datasets can also become complex to manage.
+```sparql
+SELECT ?country ?capital WHERE {
+  ?country rdf:type dbo:Country ;
+           dbo:isCapitalOf ?capital ;
+           dbo:isMemberOf dbr:European_Union .
+}
+```
 
-Still, the goal is valuable. The web contains enormous amounts of information. Connecting that information by meaning, not only by hyperlinks, can make it more useful.
+This returns structured results from graph-shaped data, combining information from multiple subjects and predicates.
+
+**OWL (Web Ontology Language)** allows specifying class hierarchies, property restrictions, and logical relationships. An OWL ontology can assert that "every person has exactly two biological parents" or "if A isPartOf B and B isPartOf C, then A isPartOf C" — reasoning that software can then apply automatically to data.
+
+## Where it has worked
+
+**DBpedia** extracts structured information from Wikipedia's infoboxes and publishes it as RDF. As of 2017, it covers approximately 4.58 million resources described with hundreds of millions of RDF triples. It is one of the most linked datasets in the Linked Open Data cloud and has been used as a knowledge base for question-answering systems.
+
+**Schema.org** is the most practically successful outcome of Semantic Web thinking, though it operates differently from the original vision. It was launched in 2011 by Google, Microsoft, Yahoo, and Yandex as a shared vocabulary for structured markup. Web pages can include Schema.org annotations (in RDFa, Microdata, or JSON-LD format) that tell search engines what the page is about:
+
+```html
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Giresun University",
+  "url": "https://www.giresun.edu.tr"
+}
+</script>
+```
+
+Google uses these annotations to generate rich search results — event listings, product prices, recipe information — directly in search. This is Semantic Web technology succeeding because it produces immediate business value for the publishers and for Google.
+
+**Knowledge graphs** at Google, Bing, and Wikidata use RDF-like structures to organize entities and relationships. Google's Knowledge Graph, which powers the information panels in search results, began largely from Freebase data and schema.org markup.
+
+## Why the broader vision struggled
+
+The original Semantic Web vision assumed that websites would add structured metadata describing what their content means — that publishers would annotate their data with ontologies and interoperable vocabularies. The incentive problem is that adding semantic markup takes effort, and the benefit accrues largely to the aggregators, not to the publisher.
+
+RDF's flexibility also produced a proliferation of vocabularies. The same concept — "author of a document" — might be expressed using Dublin Core, FOAF, Schema.org, or a custom vocabulary. Data integration required reconciling these differences manually, which was expensive precisely at the scale where it mattered most.
+
+JSON-LD, which can embed structured data inside regular JSON (familiar to web developers) rather than requiring separate RDF files, has substantially lowered the barrier to adoption. It is currently the recommended format for Schema.org markup and is supported by all major search engines. It represents a pragmatic convergence: the structured-data goal of the Semantic Web, achieved through a format that developers already understand.
+
+The web does not have the universal machine-readable meaning layer that Berners-Lee imagined. It does have pockets of explicit structure where the value is clear and the implementation is practical. That narrower success has already changed what search engines can do.

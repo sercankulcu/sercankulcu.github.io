@@ -8,18 +8,37 @@ tags:
   - self-improvement
 ---
 
-Berry's Paradox lives in the uncomfortable space between language and mathematics. A common form of the paradox asks us to consider: "The smallest positive integer that cannot be described in fewer than twenty words." At first, this sounds like a valid description.
+Berry's Paradox lives in the uncomfortable space between language and mathematics — the space where ordinary words meet formal definitions and produce results neither can handle alone.
+
+The paradox was communicated to Bertrand Russell in a letter around 1905 by G. G. Berry, a librarian at the Bodleian Library at Oxford. Russell published it in his 1908 paper "Mathematical Logic as Based on the Theory of Types," where he used it as evidence that naive self-reference in language leads to contradiction.
 
 <img width="200" alt="berry paradox" src="/images/posts/the-berry-s-paradox.webp" style="float: left; margin-right: 10px;" />
 
-There must be many integers, and there are only finitely many sentences shorter than twenty words. So it seems reasonable that some integers cannot be described that briefly.
+The standard form: consider "the smallest positive integer that cannot be described in fewer than twenty words." Count the words: *the-smallest-positive-integer-that-cannot-be-described-in-fewer-than-twenty-words* is fourteen words. So the sentence is itself a description of a number — in fewer than twenty words — that claims to be indescribable in fewer than twenty words.
 
-Then the problem appears. The sentence itself describes the number in fewer than twenty words. So we have just described a number that was defined as impossible to describe in that way. The contradiction comes from using natural language as if the idea of "describable" were perfectly precise. It is not.
+If the definition succeeds, it refutes itself. The number exists but cannot be pinned down without the definition collapsing.
 
-What counts as a description? Which language are we using? Do two phrases that mean the same thing count separately? Can a description refer to another description? Questions like these show that ordinary language has hidden flexibility.
+## Why the contradiction appears
 
-The paradox is associated with G. G. Berry and became known through Bertrand Russell in the early twentieth century.
+The problem is the word "described." It sounds precise. In practice it conceals several decisions:
 
-I like Berry's Paradox because it feels almost like a programming bug in language. The sentence creates a condition and then accidentally satisfies the condition it says cannot be satisfied. In formal mathematics and computer science, we often try to remove this kind of ambiguity by defining syntax and rules very carefully. Natural language is much harder to control. That is part of its beauty.
+- Described in which language? English, French, a formal notation?
+- By whose reading? Does "the successor of the number of days in a year" describe 366?
+- Are synonymous descriptions the same description?
+- Can a description contain references to other descriptions?
 
-It is also part of its danger. Berry's Paradox reminds us that words can look precise while quietly changing meaning under our feet.
+Natural language has enough flexibility that "describable in fewer than twenty words" is not a well-defined predicate. It depends on what we count as a description, and any definition we give is subject to the same kind of recursive problem that produced the paradox in the first place.
+
+## The connection to Gödel and complexity
+
+Berry's Paradox anticipates several important ideas that were made precise in the twentieth century.
+
+Gödel's 1931 incompleteness theorems use a structure closely related to Berry's argument. Gödel assigned each mathematical statement a unique number (a "Gödel number"), allowing mathematical statements to refer to other mathematical statements as numbers. He then constructed the mathematical equivalent of "the smallest number whose associated statement is not provable" — and showed that this encoding, in a consistent formal system, leads to a statement that is true but unprovable. The paradox was not just a curiosity; it was a template for one of the most important results in logic.
+
+Kolmogorov complexity — developed independently in the 1960s by Kolmogorov, Chaitin, and Solomonoff — formalizes the idea of "the shortest description of a number" in terms of the length of programs that generate it. A number that requires a long program to generate is "complex." Berry's Paradox appears directly here: Chaitin showed that the statement "the smallest number with Kolmogorov complexity greater than n bits" cannot be proved in a formal system of complexity less than n bits — for essentially the same reason that Berry's description refutes itself.
+
+## What it means in practice
+
+In computer science and formal methods, we try to remove the ambiguity that makes Berry's Paradox possible by defining things with explicit syntax and semantics. A formal language specifies exactly what counts as a valid expression and exactly what meaning it carries. This eliminates the flexibility that allows the paradox to arise.
+
+Natural language is harder to control. Words look precise while their meanings shift subtly with context. Berry's Paradox is a sharp reminder of that flexibility — a sentence that appears to be making a specific mathematical claim but actually depends on conceptual imprecision that makes the claim self-defeating. The sentence looks like a programming statement. Run it and you get a runtime error.

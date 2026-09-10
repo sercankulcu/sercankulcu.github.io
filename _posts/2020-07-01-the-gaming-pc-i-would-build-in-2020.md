@@ -6,6 +6,16 @@ tags: [computers, gaming, hardware, pc-build, technology]
 
 If I were building a gaming PC on **July 1, 2020**, this is the machine I would actually want. I am not simply choosing the most expensive part in every category. The priority is gaming performance, then reliability, cooling and enough headroom to keep the system useful for years.
 
+### The context
+
+July 2020 is one of the most uncomfortable months in recent PC building history. The GPU market is at a standstill: NVIDIA's Turing architecture (RTX 20 series) is two years old and aging, and RTX 30 series (Ampere) is widely rumored to arrive in September or October 2020. AMD's RDNA2 is also expected by the end of 2020. On July 1, none of this exists.
+
+On the CPU side, Intel launched 10th gen Comet Lake in May 2020. The i9-10900K adds two more cores versus the previous 9900K, reaching ten cores at up to 5.3 GHz single-core boost on an upgraded Z490 platform. AMD's Ryzen 3000 (Zen 2, 2019) remains competitive in multi-threaded work — the Ryzen 9 3950X with 16 cores is the content creation choice — but Intel maintains a single-thread gaming edge at the high end.
+
+The RTX 2080 Ti, launching September 2018 at $999–1199, is still the fastest gaming GPU available on July 1. DLSS 2.0 (released March 2020) dramatically improved NVIDIA's AI upscaling quality over the original version, and AMD's RDNA architecture with RX 5700 XT offers strong 1440p performance at lower cost.
+
+The honest verdict: this is a bad time to buy a GPU. Building in July 2020 means accepting you may see 50–80% faster GPUs in September for the same money. I would build only if the need is immediate.
+
 ### The build
 
 - **CPU:** Intel Core i9-10900K

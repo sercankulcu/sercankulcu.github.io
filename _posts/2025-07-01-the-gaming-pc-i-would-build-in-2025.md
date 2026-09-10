@@ -6,6 +6,16 @@ tags: [computers, gaming, hardware, pc-build, technology]
 
 If I were building a gaming PC on **July 1, 2025**, this is the machine I would actually want. I am not simply choosing the most expensive part in every category. The priority is gaming performance, then reliability, cooling and enough headroom to keep the system useful for years.
 
+### The context
+
+Two major generational launches have arrived in the past eight months. AMD released the Ryzen 7 9800X3D in November 2024 at $479, succeeding the 7800X3D. It uses the same 3D V-Cache concept — a second SRAM die stacked above the compute die for a total of 104MB L3 cache — now built on the Zen 5 architecture. Benchmarks show roughly 8–15% gaming improvement over the 7800X3D depending on the title, and the 9800X3D also benefits from Zen 5's higher IPC for lightly-threaded workloads. It is the clear gaming CPU recommendation in mid-2025.
+
+NVIDIA launched the RTX 50 series (Blackwell) on January 30, 2025. The RTX 5090 starts at $1,999 MSRP with 21,760 CUDA cores and 32GB of GDDR7 memory on a 512-bit bus. DLSS 4 adds "Multi Frame Generation" — generating up to 3 AI-interpolated frames per rendered frame — which produces very high measured frame rates at the cost of increased latency. The RTX 5080 at $999 offers substantially better value but is a significant step below the 5090 in rasterization throughput.
+
+The RTX 5090 launched into a shortage: cards were routinely selling for $3,000–4,000+ in January and February 2025 before normalizing closer to MSRP by mid-year. By July 1, availability has improved, though allocation at MSRP remains inconsistent.
+
+AMD's Radeon RX 9070 XT (RDNA 4) launched March 2025 at $599 as a compelling mid-range option, but does not compete with the RTX 5090 at the extreme end.
+
 ### The build
 
 - **CPU:** AMD Ryzen 7 9800X3D

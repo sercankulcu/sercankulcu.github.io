@@ -8,24 +8,28 @@ tags:
   - software
 ---
 
-This week, a security bug called Heartbleed has made a small piece of software suddenly important to millions of people.
+On April 7, 2014, a security bug called Heartbleed was publicly disclosed, making a library most people had never heard of suddenly important to millions of people. The bug — CVE-2014-0160 — affected OpenSSL, the open-source cryptographic library used by the majority of servers to provide HTTPS connections.
 
-The bug affects certain versions of OpenSSL, the open-source library used by many servers to provide encrypted HTTPS connections. A flaw in the implementation of the TLS heartbeat extension can allow an attacker to request data from a server's memory beyond what should be returned.
+## The specific technical mistake
 
-The technical mistake is surprisingly small. The consequences are not.
+The TLS protocol includes a "heartbeat" extension: a way for a client to tell a server that the connection is still alive, by sending a small payload and requesting the same payload back. The extension sends a payload along with a field specifying the payload's length.
 
-Memory may contain passwords, session information, private messages, or even cryptographic key material. Because the attack can leave little evidence, a server administrator may not know whether sensitive information was ever read.
+The bug: OpenSSL did not verify that the stated length actually matched the real payload length. An attacker could send a heartbeat message with a 1-byte payload but claim the payload was 64 kilobytes. OpenSSL would respond with 64 kilobytes of memory from the server process — whatever happened to be stored adjacent to the actual payload.
 
-For normal users, the situation is confusing. We have learned to look for HTTPS and the lock icon as signs that a connection is protected. Heartbleed does not mean encryption itself is useless. It means the software implementing security can contain ordinary programming errors.
+Those 64 kilobytes might contain nothing interesting. Or they might contain passwords, session tokens, private keys for the server's SSL certificate, or private messages. Because the attack is a normal heartbeat request from the server's perspective, it typically leaves no trace in server logs.
 
-That is an uncomfortable but important distinction.
+The bug was introduced in OpenSSL 1.0.1 (March 2012) and went undetected for approximately two years. Neel Mehta of Google Security and researchers at Codenomicon independently discovered it around the same time. An estimated 17% of all HTTPS-enabled servers were vulnerable at disclosure.
 
-The response requires more than installing a patch. Vulnerable servers need updated OpenSSL versions, and certificates may need to be replaced if private keys could have been exposed. Users may need to change passwords, but changing a password before a service is fixed does not help much.
+## What it requires to fix
 
-I also think Heartbleed is an important open-source story. The source code was available for inspection, yet the bug remained unnoticed for a long time. "Open source" does not automatically mean "many experts are carefully reviewing every line." Important infrastructure can depend on projects with surprisingly limited resources.
+Patching is necessary but not sufficient. Servers running affected OpenSSL versions need to update. But if a private SSL key was exposed before the patch — and there is no way to know whether it was — patching alone does not close the risk. The exposed key can still be used to impersonate the server or decrypt previously intercepted traffic. Affected servers need to generate new private keys, obtain new certificates, and revoke the old certificates.
 
-The web feels abstract when it works. We type a password, see a lock icon, and trust several layers of software we never think about. Heartbleed makes those invisible layers visible for a moment.
+Changing user passwords on a service is only useful after the server itself is patched and re-certificated; changing a password before that does not help and may transmit the new password through the same vulnerable channel.
 
-Security is not one feature added at the end.
+## What this reveals about infrastructure
 
-It is a chain of assumptions, and one small broken link can affect an enormous number of systems.
+For most users, Heartbleed was confusing because we are taught that HTTPS and the lock icon mean a connection is protected. They do — but "protected" means the encryption algorithm is sound and the connection is authenticated. It does not mean the software implementing the encryption is free of bugs.
+
+The OpenSSL Foundation, at the time of the disclosure, was maintained by a small number of people with minimal funding, despite being critical infrastructure for a significant portion of the internet's security. The source code was publicly available for inspection, but "open source" does not automatically mean "extensively reviewed." It means the source can be reviewed. Whether it is, and by whom, depends on resources, attention, and priority. Heartbleed was a two-year-old bug in one of the most security-sensitive libraries in wide use.
+
+Security is not a feature added at the end. It is a chain of software, configuration, processes, and human decisions, and a failure at any link can propagate to every system that depends on the chain above it.

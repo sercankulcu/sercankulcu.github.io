@@ -9,28 +9,28 @@ tags:
   - life
 ---
 
-Some of my favorite project ideas begin with a very simple thought: what if I make this?
+Some of my favorite personal projects started with a thought that is hard to justify: I want to see what happens if I make this. No one asked for it. No deadline. No user waiting. Sometimes no clear reason beyond the fact that the idea kept returning to my mind until I decided to try it.
 
-Nobody requested it. There is no deadline. There is no customer waiting. Sometimes there is not even a clear reason. I just want to see the idea become real.
+I think this kind of work has value that is real but difficult to account for in professional terms.
 
-I think there is value in that kind of work.
+## What you can do without a specification
 
-We often try to explain everything with useful words. Productivity. Impact. Users. Career. These things matter, but curiosity matters too. A small project can begin because a button on another website gives you an idea, or because you are tired of doing one small task manually.
+Professional software development involves constraints that are useful for producing reliable software but limiting for exploration. There is a user whose needs must be respected, a codebase that must be maintained, a timeline that must be met, and a standard of quality that must be demonstrated. These constraints are not bad — they are what makes professional software trustworthy — but they define a narrow space.
 
-You start with one feature. Then another thought appears. A few hours later, something exists.
+A personal project that nobody requested can be built in any direction. The database schema can be strange. The interface can make decisions that would confuse a user who wasn't expecting them. The feature that seemed necessary can be removed the next day. The whole thing can be thrown away without disappointing anyone.
 
-Maybe only a few people will ever use it. Maybe nobody will. Still, you learned something while making it. You discovered how an API works. You finally understood drag and drop. You solved a problem that seemed simple until you tried to build it.
+This freedom is not primarily about making unusual aesthetic choices. It is about the specific learning that happens when no decision is pre-made by someone else's requirements. You encounter questions that specifications normally answer before you get there: how should this data be structured? What happens when this is empty? Is this feature worth the complexity it adds? Making these decisions yourself, in a context where you see the full consequences, builds judgment that working inside existing constraints cannot build as directly.
 
-Personal projects also feel different because they are free from many expectations. You can make strange decisions. You can remove features. You can stop when the thing feels complete. You do not have to impress anyone.
+## The calibration that only comes from finishing things
 
-Failure is cheaper too. If the design is ugly, you can change it. If the whole idea is bad, you can delete it. Nobody is angry. This gives you space to experiment.
+There is a specific kind of knowledge that comes from finishing a small thing, seeing it work, and noticing what you got wrong. A small game tells you where the interaction is unclear. A personal tool tells you which features you actually use and which ones you imagined needing. A small website tells you how much maintenance even a simple site requires.
 
-I think play is an important part of learning, even for adults. We often forget this because professional work needs structure, deadlines, and responsibility. Personal projects can give us a small place where curiosity leads.
+This calibration transfers to professional work. A developer who has shipped five small personal projects has a more accurate sense of what is hard, what is easy, and what is risky than one who has only worked on someone else's larger systems.
 
-There is another lesson I learned from these projects: not everything needs to grow. When something works, we often start thinking about accounts, cloud storage, mobile versions, subscriptions, and extra features. Sometimes the best decision is to add nothing.
+## Not everything needs to grow
 
-A tiny game can be complete. A one-page tool can be complete. A simple website can be complete.
+A recurring temptation with personal projects that work is to scale them: add accounts, cloud storage, mobile versions, subscription options, and features for hypothetical other users. This is usually a mistake, and not just because it adds complexity. The value of a personal project that works for you is precisely that it solves your problem in your way. Turning it into a product for others changes what it is.
 
-If a strange little idea keeps returning to your mind, maybe it deserves one evening.
+A one-page tool can be complete. A tiny game can be complete. A script that runs once a week can be complete.
 
-It does not need permission.
+If a small idea keeps returning to you, it probably deserves an evening. The outcome might be a useful tool, a discovered skill, or a clear understanding of why the idea wasn't quite right. Any of these is a reasonable result.

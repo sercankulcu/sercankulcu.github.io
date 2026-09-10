@@ -8,16 +8,24 @@ tags:
   - technology
 ---
 
-For years, the floppy disk was one of the most normal objects around a computer. We carried documents, homework, small programs, and configuration files on a square piece of plastic that could disappear into a pocket. The 1.44 MB capacity felt useful because many of the things we moved were small enough to fit.
+For most of my computing life, the floppy disk was one of the most normal objects in the room. Documents, homework, small programs, configuration files: these moved between computers on a square piece of plastic small enough to disappear into a pocket. The 1.44 MB capacity of the 3.5-inch high-density disk — the format that became standard in 1987 — felt reasonable because many of the things we wanted to move were small enough to fit.
 
-Now the floppy is slowly becoming an object from another period. New computers increasingly arrive without floppy drives, while USB flash drives are becoming cheaper and easier to find. A small flash drive can hold hundreds of times more data and does not make the same worrying mechanical sounds when a file is being read.
+Now, in December 2006, the floppy is becoming an artifact.
 
-The change is obviously an improvement. I do not miss the message telling me that a disk cannot be read, especially when the only copy of an important file is on it. I do not miss dividing a larger archive across several disks or discovering that one damaged disk has made the whole set useless. Convenience is winning for good reasons.
+## The transition
 
-Still, technology becomes emotional when we have used it long enough. The sound of a floppy drive belongs to a particular kind of computer memory for me. Saving a file was a more visible action. The disk had to be inserted, the drive made noise, and we waited. Storage felt like a physical event.
+IBM introduced the 8-inch floppy disk in 1971 as a way to distribute microcode for mainframes. The 5.25-inch format followed in 1976, smaller and more practical for personal computers. Sony developed the 3.5-inch format in the early 1980s, and by the late 1980s and through the 1990s, the 3.5-inch HD disk was the universal medium for software distribution and personal file transfer.
 
-USB flash drives make the same task almost invisible. We can carry hundreds of documents, photographs, and programs without thinking about capacity in the same way. External hard drives are becoming more common too. The unit of everyday storage is moving from megabytes toward gigabytes.
+Apple removed the floppy drive from the original iMac in 1998 — a decision that was criticized as arrogant at the time, but that reflected an early read on where storage was going. The iMac shipped with a CD drive and a USB port. External USB floppy drives were available for $50 if you needed one.
 
-This makes me wonder which objects around today's computer will look equally old in another ten years. Technology rarely tells us when a normal object is becoming historical. One day we simply notice that we have not used it for a long time.
+The alternatives took several years to arrive in force. Zip drives (Iomega, 100MB and later 250MB) were a partial solution in the late 1990s, expensive but capable. CD-RW drives allowed rewritable optical storage but required software and a few minutes to burn. The decisive replacement arrived more quietly: USB flash drives, first commercially available in 2000 (Trek Technology, 8MB, about $50), have dropped in price and grown in capacity every year since. In December 2006, a 512MB drive costs around $15–20. It holds the equivalent of 355 floppy disks and fits in a pocket without the mechanical fragility.
 
-I still have a few floppy disks in a drawer. I am not sure what is on them, and I am even less sure whether I could read all of them now. Maybe that is the right ending for an old storage technology: a small object still holding data, even after the rest of the world has moved on.
+## What is lost
+
+I do not miss the technical frustrations: the disk that refused to read on the second machine, the failed backup discovered at the worst possible moment, the cheerful announcement that a disk could not be formatted. One 1.44MB disk held a comfortable amount in 1995 and became inadequate almost faster than I noticed.
+
+But I miss the physicality of the medium in a minor way. Saving a file to floppy was a visible action: insert the disk, hear the drive engage, see the light, wait. Storage felt like a physical event with a beginning and an end. USB flash drives make the same transfer nearly invisible.
+
+The floppy disk will become fully historical when the generation that used it as a normal object ages out. A curious thing is that the icon for "save" in almost every application — including modern ones — is still the image of a 3.5-inch floppy disk. Many people who use this icon daily have never touched the object it represents. The symbol outlasted the technology it described, which is a strange kind of immortality for a storage medium from 1987.
+
+I still have a few floppy disks in a drawer. I am uncertain what is on them, and uncertain whether I could read all of them if I tried. Magnetic media degrades over decades. The data may already be gone, stored in a format on a medium attached to hardware that is increasingly difficult to find. That is the right ending for a physical storage medium: slowly unreadable, even if still present.
