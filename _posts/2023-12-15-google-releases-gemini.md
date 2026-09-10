@@ -8,8 +8,8 @@ tags:
   - computing-history
 ---
 
-Google introduced Gemini in December 2023 as a new multimodal model family with Nano, Pro, and Ultra variants. Rather than treating images, text, and other modalities only as separate systems connected afterward, Google emphasized multimodal training and reasoning as a core design goal.
+Google introduced Gemini on December 6, 2023, as a natively multimodal model family in three sizes: Nano (running on-device in Pixel 8 Pro phones), Pro (replacing Bard as Google's conversational AI), and Ultra (the largest version, subject to further safety testing before release). Unlike earlier Google models that added multimodal capability by aligning separate text and vision encoders, Gemini was trained from the start on interleaved sequences of text, images, audio, and video, allowing reasoning that crossed modalities within a single pass.
 
-Gemini Nano targeted on-device use, Pro powered services including Bard, and Ultra was presented as the largest version for more demanding tasks. The family could process combinations of text, images, audio, and code depending on the product.
+Google released benchmark results showing Gemini Ultra scoring 90.0% on the MMLU benchmark (Massive Multitask Language Understanding), which it claimed was the first model to exceed human expert-level performance on that test at 89.8%, and 59.4% on the MMMU benchmark for college-level multimodal problems. GPT-4 had scored 86.4% on MMLU. Gemini Ultra launched publicly as Gemini Advanced on February 8, 2024, through a $19.99/month Google One AI Premium subscription, replacing the Bard brand entirely.
 
-The launch was strategically important after the rapid rise of ChatGPT and GPT-4. Google was bringing DeepMind and Google Brain research under one model program while trying to deploy the results across Search, Android, cloud services, and consumer applications.
+The release marked Google's structural consolidation of DeepMind (which built Gemini) with Google Brain (which had built LaMDA and PaLM) into a single unit called Google DeepMind. The combined organization had to both produce frontier research and ship it inside Search, Google Assistant on Pixel devices, Google Workspace, and Google Cloud's Vertex AI platform — a different operational challenge than a standalone AI lab with one product.
