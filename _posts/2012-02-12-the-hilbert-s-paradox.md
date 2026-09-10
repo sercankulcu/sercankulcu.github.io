@@ -8,7 +8,7 @@ tags:
   - self-improvement
 ---
 
-Hilbert's Hotel is one of my favorite ways to think about infinity. The thought experiment was introduced by David Hilbert, the German mathematician, around 1924, and it remains the clearest illustration I know of why infinity does not behave like a very large finite number.
+Hilbert's Hotel is one of my favourite ways to think about infinity. David Hilbert described the idea in a 1924 lecture in Göttingen; it was not published formally but was later popularised by the physicist George Gamow in his 1947 book *One Two Three... Infinity*. It remains the clearest illustration I know of why infinity does not behave like a very large finite number.
 
 Imagine a hotel with infinitely many rooms, numbered 1, 2, 3, and so on forever. Every room is occupied. A new guest arrives. In an ordinary hotel with a finite number of rooms, this is simply impossible — all full means all full.
 
@@ -32,6 +32,8 @@ Cantor also showed that not all infinities are equal. His diagonal argument prov
 
 ## Why it matters outside mathematics
 
-Hilbert's Hotel is not just an amusement. It encodes a genuine tension between the infinity we can count through (like the natural numbers) and the infinity we cannot (like the real number line). This distinction appears in computer science: problems where the solution space is countably infinite can sometimes be enumerated; problems over the real numbers or continuous spaces require different tools.
+Hilbert's Hotel is not just an amusement. It encodes a genuine tension between the infinity we can count through (like the natural numbers) and the infinity we cannot (like the real number line). Georg Cantor, whose work Hilbert's thought experiment illustrates, faced fierce resistance from contemporaries including Henri Poincaré, who called Cantor's transfinite set theory "a disease from which mathematics will eventually be cured." Cantor suffered a breakdown in 1884. Hilbert's attitude was the opposite: he called Cantor's work "the most admirable flower of mathematical genius and one of the supreme achievements of purely intellectual human activity." The idea of different sizes of infinity was genuinely shocking when Cantor introduced it.
 
-It also challenges a basic intuition — that "the part is smaller than the whole" — that holds for every finite collection but fails for infinite ones. Understanding exactly where and why our intuitions break down is part of what makes mathematics interesting.
+This distinction appears in computer science as well: a Turing machine's tape is countably infinite (positions numbered by natural numbers), and the set of all programs that could be written is countably infinite. But the set of all real-valued functions is uncountably infinite, which is one reason why some mathematical objects are not computable — there are too many of them to enumerate, let alone compute. Alan Turing's proof that no algorithm can decide whether an arbitrary program halts drew on precisely this kind of Cantorian reasoning.
+
+Hilbert's Hotel also challenges the intuition that "the part is smaller than the whole" — something true for every finite collection but false for infinite ones. Understanding exactly where our ordinary intuitions break down is part of what makes mathematics interesting, and sometimes practically important.

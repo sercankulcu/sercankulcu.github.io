@@ -13,38 +13,32 @@ Some of the most impressive engineering solutions do not look like engineering a
 
 Centuries ago, Japanese carpenters building temples, shrines, and pagodas developed remarkably complex ways of connecting wooden beams without depending on metal fasteners. Instead of simply driving a nail through two pieces of timber, they shaped the wood itself so that one piece locked into another.
 
-The basic idea sounds simple. Cut a projection into one beam, create a matching opening in another, and fit them together. In practice, the joints could become extremely sophisticated. Tenons, slots, wedges, pegs, and carefully shaped surfaces transferred forces between pieces of timber while keeping the structure together.
+## The joints themselves
 
-What I find particularly clever is that the goal was not always to make the building completely rigid.
+The tradition is called *kigumi* (木組み) — literally, "wood assembly." It encompasses hundreds of joint types developed over more than a thousand years. The joints fall into two broad families: *tsugi-te* (継手) for lengthening a beam end-to-end, and *shiguchi* (仕口) for connecting members at angles and corners. A carpenter's apprenticeship traditionally included years of practice cutting these joints by hand, with the test of quality being a tight fit that required no gap-filling and no additional fastening.
 
-Modern intuition often tells us that a strong structure should resist movement. Traditional Japanese timber construction shows another possibility: a structure can survive movement by allowing a controlled amount of it.
+The geometry can be extraordinary. The *kanawa-tsugi* joint, used for lengthening a large timber, involves a three-dimensional interlocking shape that cannot be disassembled by pulling straight in any direction — the pieces must be slid apart along a diagonal path. The *nuki* (貫) system threads horizontal planks through vertical posts, connecting a frame into a unit that can flex without the mortise-and-tenon joints failing under lateral load.
 
-This becomes especially interesting in pagodas.
+The preferred materials were *hinoki* (Japanese cypress) and *sugi* (Japanese cedar). Both are lightweight relative to their strength, resist moisture and insects through natural oils, and shrink very little after drying — important qualities in joints that must remain tight for generations without adjustment.
 
-The different levels of some Japanese pagodas behave more like stacked wooden structures than one completely rigid tower. During an earthquake, parts of the building can move slightly in different directions. The joints have small amounts of play, and the timber itself can bend without immediately failing.
+## The Horyuji Pagoda and the shinbashira
 
-Many pagodas also contain a large central column called the **shinbashira**. Depending on the design, this column can move somewhat independently from the surrounding structure. Together with the flexible timber frame, it helps reduce the destructive effect of earthquake motion.
+The Five-Storey Pagoda of Horyuji Temple near Nara is the world's oldest surviving wooden building, originally built in 607 CE and rebuilt after a fire in approximately 711 CE. It has survived over thirteen centuries of earthquakes, typhoons, and temperature cycles in a seismically active country.
 
-In other words, the building does not simply fight the earthquake.
+The structure's earthquake resistance depends in part on a central column called the *shinbashira* (心柱). In the Horyuji pagoda, this column does not rest on the ground floor — it is suspended from the top of the structure and hangs down through the centre, almost touching the foundation stone below but not fixed to it. The surrounding timber frame is built around it. During an earthquake, the frame and the central column can move semi-independently; the column acts as a pendulum, its inertia partially out of phase with the lateral movement of the surrounding structure. The net effect is that the energy of ground motion is not transmitted uniformly to the entire building at once.
 
-It moves with it.
+Modern seismic engineering sometimes refers to a similar concept as a "tuned mass damper." The Taipei 101 skyscraper contains a steel pendulum mass of 660 tonnes suspended near the top of the building for exactly the same reason. The principle was embedded in Japanese timber construction more than 1,300 years earlier.
 
-That is a surprisingly modern engineering idea hidden inside very old craftsmanship.
+## Rigidity is not always strength
 
-There is another advantage to these joints. Individual wooden parts can sometimes be removed, repaired, or replaced without destroying the entire structure. For buildings expected to survive for generations, repairability is almost as important as initial strength.
+What I find particularly clever is that the goal was not always to make the building completely rigid. Modern intuition often tells us that a strong structure should resist movement. Traditional Japanese timber construction shows another possibility: a structure can survive movement by allowing a controlled amount of it.
 
-None of this means that every traditional Japanese building was constructed without a single nail, or that one magical joint explains why old temples survived. The reality is more complicated. Different periods, buildings, and carpenters used different techniques.
+The joints have small amounts of play, and the timber itself can flex without immediately failing. The different levels of a pagoda can rock slightly relative to each other during ground motion rather than transferring the full force directly through a rigid frame. This flexibility distributes and dissipates energy rather than concentrating it.
 
-But the larger principle is fascinating.
+There is also a practical maintenance advantage. Individual wooden members can be removed and replaced without dismantling the surrounding structure. For a building expected to survive for generations, repairability is almost as important as initial strength. Carpenters at Horyuji have been replacing deteriorating timbers in place for over a thousand years while the building continues to stand.
 
-Instead of forcing materials to behave in an unnatural way, the carpenter tried to understand how wood wanted to move, bend, shrink, and carry weight. The joint was designed around those properties.
+None of this means that every traditional Japanese building was constructed without a single nail, or that one joint explains why old temples survived while other buildings did not. The reality is more complicated. Different periods, buildings, and carpenters used different techniques.
 
-Today we often solve structural problems by adding more material: thicker steel, stronger concrete, larger bolts.
+But the larger principle is fascinating. Instead of forcing materials to behave in an unnatural way, the carpenter tried to understand how wood wanted to move, bend, shrink, and carry weight, and designed the joint around those properties. Today we often solve structural problems by adding more material — thicker steel, stronger concrete, larger bolts.
 
 These carpenters often solved the problem by adding more knowledge.
-
-A few carefully cut surfaces in a piece of wood could create a connection strong enough to become part of a building that might stand for centuries.
-
-Super robust.
-
-But even more importantly, very clever.
