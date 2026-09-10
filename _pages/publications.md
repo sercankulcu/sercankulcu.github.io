@@ -100,7 +100,7 @@ This study integrates tiled training, SAHI inference, and YOLOv11 oriented bound
 
 **How to cite:** Külcü, S. (2026). High-Precision Marine Radar Object Detection Using Tiled Training and SAHI Enhanced YOLOv11-OBB. *Sensors, 26*(3), 942.
 
-[Paper](https://doi.org/10.3390/s26030942) · [Presentation](/files/presentations/High-Precision_Marine_Radar_Presentation.pdf)
+[Paper](https://doi.org/10.3390/s26030942) · [Presentation](/files/presentations/High_Precision_Marine_Radar_Presentation.pdf)
 
 </details>
 
@@ -198,7 +198,7 @@ This study combines EfficientNet-B0, DenseNet201, and ResNet50 with an MLP meta-
 
 **How to cite:** Külcü, S. (2025). Meta-Learner Ensemble Model for Brain Tumor Classification. In *Proceedings of the 7th International Conference on Engineering and Applied Natural Sciences (ICEANS 2025)*, pp. 127–133. All Sciences Academy.
 
-[Paper](https://www.researchgate.net/publication/397081245_Meta-Learner_Ensemble_Model_for_Brain_Tumor_Classification) · [Presentation](/files/presentations/Meta-Learner_Ensemble_Model_Presentation.pdf)
+[Paper](https://www.researchgate.net/publication/397081245_Meta_Learner_Ensemble_Model_for_Brain_Tumor_Classification) · [Presentation](/files/presentations/Meta-Learner_Ensemble_Model_Presentation.pdf)
 
 </details>
 
@@ -311,5 +311,23 @@ This work presents a scalable framework that classifies Turkish tweets by sentim
 **How to cite:** Kulcu, S., & Dogdu, E. (2016). A Scalable Approach for Sentiment Analysis of Turkish Tweets and Linking Tweets to News. In *2016 IEEE Tenth International Conference on Semantic Computing (ICSC)*, pp. 471–476. IEEE.
 
 [Paper](https://doi.org/10.1109/ICSC.2016.66) · [Presentation](/files/presentations/A_Scalable_Approach_Presentation.pdf)
+
+</details>
+
+## Theses
+
+<div class="publication-title">2022 - Analysis of Smart Antenna Based Scheduling Algorithms for IoT Networks</div>
+
+<details markdown="1">
+
+<summary>Details</summary>
+
+This PhD thesis investigates the integration of smart and directional antennas with the IETF 6TiSCH protocol stack to improve resource utilization in low-power IoT networks. It proposes neighbor discovery mechanisms, antenna direction selection methods, and hybrid distributed/autonomous and centralized/autonomous scheduling algorithms that exploit spatial reuse in addition to time and frequency resources.
+
+**Original title:** IoT Ağlar İçin Akıllı Anten Tabanlı Çizelgeleme Algoritmalarının İncelenmesi
+
+**How to cite:** Külcü, S. (2022). *Analysis of Smart Antenna Based Scheduling Algorithms for IoT Networks* [PhD thesis, Karadeniz Technical University].
+
+[Thesis](/files/theses/Analysis_of_Smart_Antenna_Based_Scheduling_Algorithms_for_IoT_Networks.pdf)
 
 </details>
