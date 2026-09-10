@@ -6,20 +6,18 @@ author_profile: true
 ---
 
 <style>
-.publication-title {
-  font-size: 1.15em;
-  font-weight: normal;
-  margin-top: 1.2em;
-  margin-bottom: 0.4em;
+details summary,
+details a {
+  color: #2a7ae2 !important;
 }
 
 details summary {
   cursor: pointer;
   font-weight: normal;
-  color: #0000EE;
 }
 
-details summary:hover {
+details summary:hover,
+details a:hover {
   text-decoration: underline;
 }
 </style>
