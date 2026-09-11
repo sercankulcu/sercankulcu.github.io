@@ -1,8 +1,8 @@
 ---
 title: "We're Starting"
 date: 2012-06-16
+description: "The doctor entered the room and said 'Come on, kids. We're starting.' — and that sentence made the waiting room orderly through the confidence of someone who knew what came next."
 tags:
-   - memories
    - trust
    - fear
    - doctors

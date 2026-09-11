@@ -1,11 +1,11 @@
 ---
 title: "The Simpler Explanation"
 date: 2009-01-09
+description: "She said she did not want to get married — it was a clear sentence, and he spent weeks building a complicated theory to avoid the simplest explanation."
 tags:
    - relationships
-   - marriage
-   - memories
-   - uncertainty
+   - rejection
+   - self-deception
    - humor
 ---
 

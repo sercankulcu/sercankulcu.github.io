@@ -1,6 +1,7 @@
 ---
 title: "One Poğaça"
 date: 2010-07-23
+description: "The office banned breakfast in August, and from that day he finished his single poğaça on the pavement outside — the rule had not changed what he ate, only where."
 tags:
    - office
    - work

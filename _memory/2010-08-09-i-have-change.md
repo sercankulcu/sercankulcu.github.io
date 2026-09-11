@@ -1,12 +1,11 @@
 ---
 title: "I Have Change"
 date: 2010-08-09
+description: "Two passengers announced they had change while the driver searched his own pockets — announcing the existence of a solution is not quite the same as providing one."
 tags:
    - friends
    - driving
    - humor
-   - everyday-life
-   - memories
 ---
 
 Three people were in a car leaving a parking lot. The driver had one hand on the wheel and the other in a pocket, searching for coins.

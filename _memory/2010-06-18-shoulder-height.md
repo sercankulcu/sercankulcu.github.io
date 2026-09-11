@@ -1,12 +1,11 @@
 ---
 title: "Shoulder Height"
 date: 2010-06-18
+description: "The wall he remembered as enormous barely reached his shoulder when he returned — childhood measures distances through effort, not meters, and both measurements were true."
 tags:
-   - memories
    - childhood
    - growing-up
    - nostalgia
-   - life
 ---
 
 There was a wall from my childhood that I remembered as enormous. On the other side stood a mulberry tree, and reaching the fruit required planning. We gathered stones, stacked them carefully, tested the pile, and took turns climbing while somebody held the base.
@@ -39,6 +38,4 @@ The shoulder remembered better.
 
 ## After Shoulder Height
 
-The scene becomes clearer to me now because it stayed small. The scene keeps one clear fragment and lets the rest stay blurred.
-
-The scene keeps one clear fragment and lets the rest stay blurred. A larger story would probably make it less honest.
+The scene becomes clearer to me now because it stayed small. The scene keeps one clear fragment and lets the rest stay blurred. A larger story would probably make it less honest.

@@ -1,12 +1,11 @@
 ---
 title: "Whatever Was Left"
 date: 2010-06-24
+description: "A real student breakfast depended on inventory — you opened the refrigerator and discovered what yesterday had left, and the curriculum was presented entirely by shortage."
 tags:
-   - memories
    - university
    - student-life
    - humor
-   - life
 ---
 
 Someone once described a student breakfast with sesame bread, cheese, cherry tomatoes, roasted peppers, and tea.

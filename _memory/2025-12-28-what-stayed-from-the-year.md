@@ -1,10 +1,12 @@
 ---
 title: "What Stayed From the Year"
 date: 2025-12-28
+description: "At the end of 2025 what returned first were not achievements but smaller things — a coffee beside the computer, a conversation that improved a bad day, an idea whose importance had evaporated by September."
 tags:
-   - life
-   - reflection
-   - personal
+   - year-end
+   - technology
+   - small-victories
+   - memory
 ---
 
 At the end of 2025, I tried to remember the year and discovered that the important parts did not return in order. There were things that could have gone on a list—work completed, pages made, small tools finished, problems solved. I could have arranged them by month and made the year look organized. That would have been accurate, but it would not have been how the year felt.

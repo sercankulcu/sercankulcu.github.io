@@ -1,12 +1,11 @@
 ---
 title: "Ten Meters of Freedom"
 date: 2012-06-16
+description: "Ten meters of cable turned wired headphones into a small transportation system — enough to make tea, open a window, or cross the room without stopping the song."
 tags:
    - technology
    - music
    - home
-   - memories
-   - everyday-life
 ---
 
 My headphones had a cable so long that I could leave the computer and continue walking through the house.

@@ -1,12 +1,12 @@
 ---
 title: "Still on the Stairs"
 date: 2018-12-27
+description: "Three minutes up, five minutes looking, two minutes at a door, five minutes down — once the arithmetic became visible, the scene stopped being drama."
 tags:
    - television
    - storytelling
    - pacing
    - humor
-   - thoughts
 ---
 
 A man entered a building.

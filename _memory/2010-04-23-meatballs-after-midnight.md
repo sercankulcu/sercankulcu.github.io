@@ -1,11 +1,11 @@
 ---
 title: "Meatballs After Midnight"
 date: 2010-04-23
+description: "Whether the meatballs near the metro exit were truly the best in Ankara or simply the right food at the right hour could never be determined — and that was not important."
 tags:
    - ankara
    - food
    - nightlife
-   - memories
    - humor
 ---
 
@@ -57,6 +57,4 @@ For a memory, it is enough.
 
 ## Around Meatballs After Midnight
 
-I like the memory most where it refuses to explain itself completely. Taste is only part of it. Timing and company do most of the remembering.
-
-Taste is only part of it. Timing and company do most of the remembering. The memory does not ask to be important; it only asks not to be erased.
+I like the memory most where it refuses to explain itself completely. Taste is only part of it. Timing and company do most of the remembering. The memory does not ask to be important; it only asks not to be erased.

@@ -1,12 +1,12 @@
 ---
 title: "Twenty Good Minutes"
 date: 2009-11-05
+description: "A cup of tea does not need to change your life — on the modest contract of twenty minutes of television and why not everything pleasant needs to become significant."
 tags:
    - television
    - how-i-met-your-mother
+   - entertainment
    - rest
-   - memories
-   - thoughts
 ---
 
 People were complaining that a sitcom they watched was no longer giving them what they expected. I remember wondering what, exactly, a twenty-minute television comedy was supposed to provide.
@@ -29,6 +29,4 @@ Some things earn their place by making twenty ordinary minutes better.
 
 ## Through Twenty Good Minutes
 
-I keep returning to the small practical detail, because that is where the feeling is stored. The object or phrase works like a handle on a drawer I did not know was still there.
-
-The object or phrase works like a handle on a drawer I did not know was still there. The memory does not ask to be important; it only asks not to be erased.
+I keep returning to the small practical detail, because that is where the feeling is stored. The object or phrase works like a handle on a drawer I did not know was still there. The memory does not ask to be important; it only asks not to be erased.

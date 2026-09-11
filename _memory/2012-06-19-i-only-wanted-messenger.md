@@ -1,12 +1,12 @@
 ---
 title: "I Only Wanted Messenger"
 date: 2012-06-19
+description: "He only wanted Messenger — but it had returned from several years away carrying administrative responsibilities, and wanting it was probably not only wanting the software."
 tags:
    - software
    - messenger
    - internet
    - technology
-   - memories
 ---
 
 I needed Messenger again and started installing it.

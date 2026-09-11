@@ -1,12 +1,12 @@
 ---
 title: "His Voice in the Film"
 date: 2013-03-10
+description: "A father character in a film began speaking and for a few seconds the actor's voice disappeared — replaced by a tone from a different room entirely."
 tags:
    - father
    - movies
-   - running
-   - memories
-   - reflection
+   - grief
+   - memory
 ---
 
 I was watching a film when the father character began speaking to his son, and for a few seconds I stopped hearing the actor.

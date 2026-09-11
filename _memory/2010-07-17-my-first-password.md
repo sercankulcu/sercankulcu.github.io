@@ -1,12 +1,11 @@
 ---
 title: "My First Password"
 date: 2010-07-17
+description: "The computer repairman thought for a moment and gave him five digits — by modern standards a terrible password; as a beginning, perfect."
 tags:
    - computers
-   - memories
    - childhood
    - technology
-   - life
 ---
 
 The man assembling the computer asked me what password I wanted.

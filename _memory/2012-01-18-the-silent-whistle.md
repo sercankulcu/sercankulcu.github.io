@@ -1,12 +1,11 @@
 ---
 title: "The Silent Whistle"
 date: 2012-01-18
+description: "The military whistle was never used during service — found years later and blown into, it produced no sound, which turned out to be the most honest thing it could say."
 tags:
-   - memories
    - objects
    - military-service
    - nostalgia
-   - everyday-life
 ---
 
 During military service, everyone was given a whistle.
@@ -47,6 +46,4 @@ The signal arrived anyway.
 
 ## Around The Silent Whistle
 
-Looking back, I trust the ordinary detail more than the tidy conclusion. The smallness is not a weakness. It is the reason the memory can remain exact.
-
-The smallness is not a weakness. It is the reason the memory can remain exact. The memory does not ask to be important; it only asks not to be erased.
+Looking back, I trust the ordinary detail more than the tidy conclusion. The smallness is not a weakness. It is the reason the memory can remain exact. The memory does not ask to be important; it only asks not to be erased.

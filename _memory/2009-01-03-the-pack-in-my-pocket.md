@@ -1,12 +1,12 @@
 ---
 title: "The Pack in My Pocket"
 date: 2009-01-03
+description: "Walking through snow for half an hour at midnight to buy cigarettes — not drama, but practicality: for six years the habit had quietly made itself as necessary as keys."
 tags:
-   - memories
    - smoking
    - addiction
-   - life
-   - reflection
+   - habits
+   - solitude
 ---
 
 One winter night, I discovered that I had no cigarettes. It was late, snow had covered the streets, and the nearest place where I might find an open shop was not close. A reasonable person could have looked outside, looked at the hour, and decided to sleep. I put on my coat and walked through the snow for almost half an hour to buy a pack.

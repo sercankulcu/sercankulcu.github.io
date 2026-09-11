@@ -1,7 +1,8 @@
 ---
 title: "The Bottle"
 date: 2020-01-01
-tags: [academia, work, memories, absurdity, people]
+description: "The janitor mentioned it casually: the roommate urinated into a bottle because the toilet was three floors away — three floors had defeated civilization."
+tags: [academia, work, absurdity, office-life]
 ---
 
 By 2020, I was no longer new. I knew the corridors, the rooms, the habits, and some of the people well enough to speak without measuring every sentence.

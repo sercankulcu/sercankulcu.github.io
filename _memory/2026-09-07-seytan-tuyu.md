@@ -1,13 +1,13 @@
 ---
 title: "Şeytan Tüyü: The Ankara I Could Never Find Again"
 date: 2026-09-07
+description: "Şeytan Tüyü was the sound of an Ankara that existed for a few years at Baraka, Nil, and Motion — a live band culture where the same faces returned week after week and the night already had its own rhythm."
 tags:
-   - Şeytan Tüyü
-   - Ankara
-   - live music
+   - seytan-tuyu
+   - ankara
+   - live-music
    - nightlife
-   - Turkish rock
-   - memories
+   - turkish-rock
 ---
 
 # Şeytan Tüyü: The Ankara I Could Never Find Again

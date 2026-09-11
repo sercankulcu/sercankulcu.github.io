@@ -1,8 +1,8 @@
 ---
 title: 'The Nautica Sweatshirt'
 date: 2026-09-07
+description: "At the New Year's party Özem gave him a Nautica sweatshirt with perfume sprayed on it — years later faces and rooms are gone but the smell of that fabric still carries the whole night."
 tags:
-  - memory
   - university
   - new-year
   - music

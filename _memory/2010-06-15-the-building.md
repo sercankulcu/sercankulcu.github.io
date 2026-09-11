@@ -1,12 +1,12 @@
 ---
 title: "The Building"
 date: 2010-06-15
+description: "In an aerospace company so vast that a cigarette break became a journey, he learned that engineering also lived in the corridors, the cafeteria, and the security guard's conversation."
 tags:
    - engineering
    - montreal
    - aerospace
    - work
-   - memories
 ---
 
 For the first few days, I could not find anything without thinking about the route.

@@ -1,12 +1,12 @@
 ---
 title: "The Wrong Cup"
 date: 2018-11-05
+description: "He woke at night to feed the baby and walked back to the room carrying coffee — two versions of his life had met in the same dark kitchen."
 tags:
    - parenting
    - sleep
    - family
    - humor
-   - memories
 ---
 
 I woke in the middle of the night because the baby needed feeding. I went to the kitchen, prepared something with the confidence of a person who had repeated the same movement many times, and returned carrying a cup of coffee.

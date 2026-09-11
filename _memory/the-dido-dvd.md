@@ -1,12 +1,12 @@
 ---
 title: 'The Dido DVD'
 date: 2026-09-07
+description: "He bought the Dido Live at Brixton Academy DVD as a gift, waited outside her workplace until eleven, managed to annoy her, gave the DVD away anyway — then never saw her again."
 tags:
-  - memory
   - dido
   - gift
-  - internet
   - regret
+  - youth
 ---
 
 I once bought the **Dido: Live at Brixton Academy** DVD as a gift for someone I had met through Ekşi Sözlük. I paid good money for it too. At the time, buying a DVD still felt like buying something real. You did not send a link and say, “Watch this when you have time.” You went somewhere, found the edition you wanted, paid for it, carried it home, and imagined the other person opening it.

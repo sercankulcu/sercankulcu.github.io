@@ -1,12 +1,12 @@
 ---
 title: "Pros, Cons, and Other Romantic Instruments"
 date: 2010-06-23
+description: "If you are trying this hard to calculate whether you are in love, you probably are — indifference rarely requires a spreadsheet, and the person was already inside the problem."
 tags:
    - relationships
    - love
    - decision-making
    - overthinking
-   - memories
 ---
 
 There is a point at which an emotion becomes sufficiently confusing that the sensible person reaches for paper.
@@ -43,6 +43,4 @@ But the list remains touching because it proves we tried to be fair to a feeling
 
 ## Around Pros, Cons, and Other Romantic Instruments
 
-Looking back, I trust the ordinary detail more than the tidy conclusion. Attachment rarely leaves through the main door. It stays in side details and waits there.
-
-Attachment rarely leaves through the main door. It stays in side details and waits there. It remains as a modest proof that ordinary life was never as empty as it looked.
+Looking back, I trust the ordinary detail more than the tidy conclusion. Attachment rarely leaves through the main door. It stays in side details and waits there. It remains as a modest proof that ordinary life was never as empty as it looked.

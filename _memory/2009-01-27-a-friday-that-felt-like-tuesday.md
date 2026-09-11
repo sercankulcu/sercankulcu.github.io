@@ -1,12 +1,12 @@
 ---
 title: "A Friday That Felt Like Tuesday"
 date: 2009-01-27
+description: "Ankara could make a Friday feel exactly like a Tuesday afternoon — the city excelled at making an empty evening impossible to ignore."
 tags:
    - ankara
-   - memories
-   - loneliness
+   - solitude
    - city
-   - life
+   - winter
 ---
 
 Someone once asked what I liked most about Ankara.

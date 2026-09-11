@@ -1,12 +1,11 @@
 ---
 title: "Half Eskişehirli"
 date: 2010-07-09
+description: "After enough return trips the city stopped being directions — belonging rarely announces itself, but you notice it when you start complaining about the local water bottle being too full."
 tags:
    - eskisehir
    - travel
    - work-trip
-   - memories
-   - everyday-life
 ---
 
 On one of our early work trips to Eskişehir, somebody handed us local bottled water and told us it was famous. We drank it, and they laughed.
@@ -35,9 +34,7 @@ Repeatedly spilling the same local water might get you closer.
 
 ## Past Half Eskişehirli
 
-The scene becomes clearer to me now because it stayed small. A minor detail can be more faithful than a grand summary.
-
-A minor detail can be more faithful than a grand summary. That small resistance to disappearance is enough.
+The scene becomes clearer to me now because it stayed small. A minor detail can be more faithful than a grand summary. That small resistance to disappearance is enough.
 
 Eskişehirli olmanın yarısı bile bazen yeter. Bir şehirle bağ kurmak için nüfus kaydından çok daha küçük şeyler gerekir: hangi sokakta yavaşlanacağını bilmek, hangi soğuğun akşamı sertleştireceğini tanımak, bir ismi duyunca zihinde doğru rengin belirmesi.
 

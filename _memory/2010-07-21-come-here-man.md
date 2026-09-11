@@ -1,11 +1,11 @@
 ---
 title: "Come Here, Man"
 date: 2010-07-21
+description: "The evening he imagined putting his arm around his father's neck and saying 'Come here, man' was the first time he understood his father was slowly becoming his friend."
 tags:
    - family
    - father
    - growing-up
-   - memories
 ---
 
 We were sitting together after dinner when I noticed that something had changed between us. I cannot remember what we were talking about, and that is probably important. The subject was ordinary enough to disappear, but the feeling stayed.

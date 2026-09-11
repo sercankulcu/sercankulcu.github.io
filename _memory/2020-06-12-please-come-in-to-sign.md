@@ -1,12 +1,12 @@
 ---
 title: "Please Come In to Sign"
 date: 2020-06-12
+description: "During the pandemic, when everything moved online, the institution still required a physical signature — the exception landed at the exact point where a person needed to stay home."
 tags:
    - remote-work
    - university
    - bureaucracy
    - pandemic
-   - thoughts
 ---
 
 Classes had moved online. Meetings had moved online. Documents traveled by email, and electronic signatures already existed.
@@ -45,6 +45,6 @@ It still wanted me to come in and sign.
 
 ## Under Please Come In to Sign
 
-This is the kind of moment that survives by being oddly specific. Student life made small things feel official before they deserved to be official: a form, a seat, a delay, a half-success.
+This is the kind of moment that survives by being oddly specific.
 
 Student life made small things feel official before they deserved to be official: a form, a seat, a delay, a half-success. So I leave it there: not polished smooth, just visible enough.

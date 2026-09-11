@@ -1,12 +1,11 @@
 ---
 title: "The Hidden Sentence"
 date: 2010-06-14
+description: "She heard criticism in a comment about temperature — and years later, the simpler explanation is that he had not said the hidden sentence out loud in the first place."
 tags:
    - communication
    - relationships
    - misunderstandings
-   - memories
-   - thoughts
 ---
 
 She suggested going for a walk, and I agreed even though I did not really feel like going.
