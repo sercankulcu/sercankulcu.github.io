@@ -1,5 +1,5 @@
 ---
-title: "When You Cannot Tell What You Feel"
+title: "A Feeling Does Not Require a Category"
 date: 2010-04-24
 description: "Some feelings become difficult to name because they arrive mixed with memory, fear, hope, and contradiction."
 tags:
@@ -7,7 +7,7 @@ tags:
   - friendship
   - uncertainty
   - memories
-  - reflections
+  - reflection
 ---
 
 There is a point in some relationships when the category stops being clear.

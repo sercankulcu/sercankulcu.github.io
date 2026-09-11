@@ -1,13 +1,13 @@
 ---
-title: "Going to the Cinema Alone"
+title: "Waiting for Company Can Become Waiting for Permission"
 date: 2011-03-30
 description: "Going to the cinema alone can change from embarrassment into a small practice of independence."
 tags:
   - cinema
   - solitude
   - memories
-  - life
-  - reflections
+  - independence
+  - reflection
 ---
 
 There was a time when going to the cinema alone felt like something that needed an explanation. Not a legal explanation, a social one. Why are you here alone? Could you not find anyone? Are you all right? Nobody necessarily asked these questions aloud, which was almost worse because you could imagine them.

@@ -1,5 +1,5 @@
 ---
-title: "When Growing Older Means Missing the Old Things"
+title: "Replacement Is Not Neutral"
 date: 2009-12-26
 description: "Growing older can mean discovering that ordinary things from the past carried more comfort than we knew."
 tags:
