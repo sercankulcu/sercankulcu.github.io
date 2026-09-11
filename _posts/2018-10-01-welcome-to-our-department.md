@@ -8,16 +8,14 @@ tags:
   - students
 ---
 
-Beginning Computer Engineering in 2018 means entering a world increasingly shaped by data, cloud computing, cybersecurity, artificial intelligence, and connected systems.
+Welcome to Computer Engineering in 2018.
 
-During the coming years, you will learn much more than programming. You will study algorithms, databases, computer networks, operating systems, computer architecture, software engineering, and many other subjects that explain how modern computing systems actually work.
+This is a good time to enter the field. There are more tutorials, libraries, development tools, and online courses than ever before. That abundance is helpful, but it can also be confusing. When everything is available, it becomes harder to know what deserves attention.
 
-Do not worry if some topics seem difficult at first. University is not a place where you are expected to arrive with all the answers. It is a place where you learn how to ask better questions.
+Your education should help you turn curiosity into understanding. Do not measure progress only by how many frameworks or languages you have touched. Measure it by whether you can explain a problem, design a solution, test your assumptions, and learn from failure.
 
-Take advantage of your time here. Develop projects outside your assignments. Learn version control. Read technical documentation. Join student activities. Work with different people. These experiences will help you understand what kind of engineer you want to become.
+In the early semesters, take the basic courses seriously. Programming, discrete mathematics, algorithms, digital design, and computer organization may not always look glamorous, but they train your mind to reason about systems. That ability is more durable than any single technology stack.
 
-Technology changes quickly, but the habits of good engineers remain surprisingly stable: curiosity, discipline, patience, clear thinking, and a willingness to keep learning.
+Build things outside class, but keep them small enough to finish. A completed simple project teaches more than an ambitious folder that never runs.
 
-Your first year is only the beginning. You may enter the department with one career idea and discover a completely different interest later.
-
-Explore.
+Welcome to the department. Stay curious, but give your curiosity structure.

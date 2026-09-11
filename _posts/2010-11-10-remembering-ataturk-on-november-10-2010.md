@@ -8,14 +8,14 @@ tags:
   - turkey
 ---
 
-Every November 10, Türkiye remembers Mustafa Kemal Atatürk.
+Every November 10, Turkiye pauses at 09:05 to remember Mustafa Kemal Ataturk.
 
-The ceremonies are familiar: flags, sirens, silence at 09:05. But remembrance becomes meaningful when we also think about the ideas behind the ceremony.
+In 2010, a generation was growing up with the internet as a normal part of life. For students and young people, Ataturk's message should not be treated as a fixed sentence repeated on special days. It is a challenge: use your mind, develop yourself, and take the future seriously.
 
-Atatürk saw education as one of the foundations of national independence. He supported science, rational thought, institutional reform, and the participation of citizens in a modern republic.
+Ataturk trusted youth not because youth is automatically wise, but because every republic eventually depends on the generation that inherits it. That trust carries a demand. It asks young people to study, to question, to produce, and to avoid the comfort of simply repeating what others say.
 
-In 2010, technology is changing the way people learn, communicate, and work. The tools are new, but the importance of knowledge is not.
+The Republic was not built so that later generations could only admire it. It was built so that they could improve it. That is a harder form of respect.
 
-A country that wants to remain strong must continue to educate, research, produce, and question.
+On November 10, the country becomes quiet for a moment. The better tribute begins after the silence: in classrooms, laboratories, libraries, workshops, and every place where people try to do their work well.
 
-Today, we remember Atatürk not only as a historical leader, but as the founder of a republic whose future depends on every new generation.
+We remember Ataturk with respect and gratitude.

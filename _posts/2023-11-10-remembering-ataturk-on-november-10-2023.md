@@ -8,14 +8,14 @@ tags:
   - turkey
 ---
 
-November 10, 2023 carries special meaning because this year marks the centenary of the Republic of Türkiye.
+Every November 10, Turkiye remembers Mustafa Kemal Ataturk.
 
-One hundred years after the Republic was proclaimed, we remember Mustafa Kemal Atatürk not only as its founder, but as the central figure in a political transformation whose effects continue into the present.
+In 2023, the Republic reached its centennial. That made the day feel different. November 10 was no longer only a yearly act of remembrance; it stood inside a hundred-year frame of struggle, construction, change, and unfinished work.
 
-The Türkiye of 1923 faced the enormous task of rebuilding after war and creating new institutions. The Türkiye of 2023 lives in a world of artificial intelligence, global networks, advanced science, and rapid communication.
+A century is long enough to create pride, but it is also long enough to create distance. Ataturk can easily become a symbol that everyone recognizes and too few people study carefully. The centennial should push in the opposite direction: back to reading, understanding, and asking what kind of public life his ideas require.
 
-The technologies have changed, but the need for education, critical thinking, strong institutions, and national responsibility remains.
+The Republic's first century was built by many generations. Its second century will not be protected by ceremony alone. It will need better education, stronger institutions, more scientific confidence, and citizens who take responsibility without waiting for perfect conditions.
 
-The Republic was not created as a finished object. It was created as a project that future generations would continue to shape.
+At 09:05, the silence remembers a founder. In 2023, it also asks what we will do with the century that comes next.
 
-On this November 10, in the centennial year of the Republic, we remember Mustafa Kemal Atatürk with respect, gratitude, and a renewed sense of historical responsibility.
+We remember Mustafa Kemal Ataturk with respect and gratitude.

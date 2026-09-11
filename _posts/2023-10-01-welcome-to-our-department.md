@@ -8,18 +8,16 @@ tags:
   - students
 ---
 
-Starting Computer Engineering in 2023 feels especially interesting because artificial intelligence has suddenly become part of everyday conversation.
+Welcome to Computer Engineering in 2023.
 
-Generative AI tools can now produce text, images, and code. You will probably use some of these tools during your education. But your purpose here is not simply to learn how to use them.
+This year, generative AI is impossible to ignore. Tools can write code, explain concepts, summarize documentation, and sometimes sound more confident than they deserve. For a new student, this is both useful and dangerous.
 
-Your purpose is to understand the systems behind them.
+Use these tools, but do not outsource your understanding to them. If an assistant gives you code you cannot explain, you have not learned the topic yet. If it solves an assignment while you remain confused, it has helped you finish a task but not become an engineer.
 
-Computer Engineering will teach you programming, algorithms, data structures, operating systems, databases, computer networks, computer architecture, and software engineering. These foundations will help you understand not only today's AI systems, but also whatever technologies arrive next.
+The fundamentals matter even more now. Programming, algorithms, data structures, mathematics, computer architecture, operating systems, databases, and networks give you the ability to judge what a tool produces. Without that judgment, automation can make you faster at being wrong.
 
-Do not treat AI as a shortcut around learning. Use it carefully. Ask why a solution works. Check results. Write code yourself. Learn how to debug. Build the ability to recognize when an answer is wrong.
+Build your own projects. Debug your own mistakes. Ask why a solution works. Compare alternatives. Talk with classmates. Learn to read error messages patiently.
 
-Your university years are also a chance to experiment. Create projects. Join competitions. Work with open-source software. Explore cybersecurity, embedded systems, robotics, cloud computing, and machine learning.
+Computer engineering in 2023 is not less important because AI tools exist. It is more interesting because understanding, judgment, and responsibility have become even more valuable.
 
-You do not need to decide your entire career now.
-
-The most valuable skill you can develop is the ability to keep learning as technology changes.
+Welcome to the department.

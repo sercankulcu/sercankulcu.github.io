@@ -8,14 +8,14 @@ tags:
   - turkey
 ---
 
-On November 10, we remember Mustafa Kemal Atatürk, the founder of the Republic of Türkiye.
+Every November 10, Turkiye pauses to remember Mustafa Kemal Ataturk.
 
-The world of 2008 is facing economic uncertainty and rapid change. Periods like this remind us why strong institutions, education, rational decision-making, and public responsibility matter.
+In 2008, the world was shaken by a financial crisis. Even when such crises begin elsewhere, they remind every country that independence is not only a political word. It is also tied to education, production, institutions, and the ability to make sound decisions under pressure.
 
-Atatürk's leadership emerged from a period of far greater uncertainty. His response was not to retreat from the future, but to build toward it through education, law, science, modernization, and national sovereignty.
+Ataturk understood independence in that broad sense. The Republic he founded was not meant to stand still after a military victory. It needed schools, factories, laws, universities, and citizens who believed that the future could be built with reason and effort.
 
-Remembering him today means more than looking backward. It means understanding the principles that helped transform a country in crisis into a republic with confidence in its future.
+That is why November 10 should not feel distant. The questions behind it are still practical. How does a country become more capable? How does it educate its children? How does it avoid becoming dependent on decisions made elsewhere?
 
-At 09:05, silence becomes a shared language across the country.
+At 09:05, we remember not only a founder, but also the difficult work of remaining worthy of a republic.
 
-We remember Atatürk with respect and gratitude.
+We remember Ataturk with respect and gratitude.

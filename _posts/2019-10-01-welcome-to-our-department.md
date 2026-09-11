@@ -8,16 +8,14 @@ tags:
   - students
 ---
 
-If you are starting Computer Engineering in 2019, you are entering a discipline that now touches almost every industry. Software is inside phones, cars, financial systems, factories, hospitals, communication networks, and entertainment platforms.
+If you are starting Computer Engineering in 2019, you are entering a discipline that touches almost every industry.
 
-Your education will help you understand the systems behind this digital world.
+Software is inside phones, financial systems, factories, hospitals, communication networks, cars, games, and entertainment platforms. Your education will help you understand the systems behind this digital world, but it will also challenge the simple idea that computer engineering is only programming.
 
-You will learn programming, but programming is only one part of Computer Engineering. Algorithms, data structures, operating systems, databases, networks, computer architecture, mathematics, and software design will all become part of your engineering toolkit.
+Programming is important, of course. Yet the field also includes algorithms, data structures, operating systems, databases, networks, computer architecture, software design, mathematics, and teamwork. At first these subjects may feel separate. Over time they begin to connect.
 
-At first, university life may feel fast. There will be new terminology, unfamiliar assignments, and problems that seem impossible. Give yourself time. The ability to solve difficult technical problems is developed through repetition.
+Give yourself time. University problems can be frustrating because they are designed to stretch you. A bug, a proof, or a difficult assignment is not evidence that you chose the wrong field. Often it is simply the normal shape of learning.
 
-Use these years to experiment. Build applications. Try embedded systems. Explore cybersecurity. Learn about artificial intelligence. Contribute to open-source projects. You do not need to choose your specialization immediately.
+Use these years to experiment. Build applications. Try embedded systems. Explore cybersecurity. Learn about artificial intelligence. Contribute to open source if you can. You do not need to choose your path immediately.
 
-Most importantly, learn how to learn.
-
-The technologies you use after graduation may be different from the technologies you see today. Your ability to adapt will matter more than memorizing one tool.
+Most importantly, learn how to learn. The tools will change; that habit will stay with you.

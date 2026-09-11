@@ -8,14 +8,14 @@ tags:
   - turkey
 ---
 
-November 10 is a day of remembrance for Mustafa Kemal Atatürk, founder of the Republic of Türkiye.
+Every November 10, Turkiye pauses to remember Mustafa Kemal Ataturk.
 
-In 2016, Türkiye has experienced a difficult and intense year. Moments of national strain make reflection on institutions, citizenship, law, education, and democratic responsibility especially meaningful.
+In 2016, the country lived through a difficult and tense year. In such periods, remembrance can easily become louder, but what is needed is often calmer: reason, law, education, and a sense of common responsibility.
 
-Atatürk's legacy emerged from another period of extraordinary uncertainty. He believed that national independence needed more than military success. It also required institutions, education, economic development, scientific thinking, and a shared sense of civic responsibility.
+Ataturk's legacy offers that calmer vocabulary. He believed that a nation could protect its independence by building modern institutions and citizens capable of thought. This matters most when public life feels heavy. The answer to uncertainty cannot be only fear or anger; it must also include knowledge, patience, and trust in civic order.
 
-That is why November 10 should not be only ceremonial.
+November 10 does not remove the difficulties of a year. It places them inside a longer history. The Republic was born from hard conditions, and its survival depends on how responsibly later generations behave in their own hard times.
 
-At 09:05, the country becomes silent.
+At 09:05, the country falls silent. In that silence, respect and responsibility stand together.
 
-In that silence, we remember not only a leader, but also the difficult work of building and maintaining a modern state.
+We remember Ataturk with gratitude.

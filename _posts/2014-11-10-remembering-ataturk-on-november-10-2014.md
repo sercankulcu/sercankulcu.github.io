@@ -8,16 +8,14 @@ tags:
   - turkey
 ---
 
-Every November 10, Türkiye remembers Mustafa Kemal Atatürk.
+Every November 10, Turkiye pauses to remember Mustafa Kemal Ataturk.
 
-The moment of silence at 09:05 is one of the rare occasions when an entire country seems to pause together.
+In 2014, a century had passed since the beginning of the First World War. That wider historical frame gives November 10 a deeper meaning. Ataturk belonged to a generation that saw the cost of war closely. His later emphasis on sovereignty, peace, education, and modernization came from experience, not from comfortable theory.
 
-In 2014, the world is increasingly shaped by technology, global communication, scientific research, and rapid social change. These developments make one part of Atatürk's legacy especially important: his confidence in education and reason.
+Remembering him only as a victorious commander leaves the story incomplete. The more difficult lesson is what came after war: building a republic, reforming institutions, and trying to give a tired society a modern direction.
 
-Modernization was never only about adopting new machines or institutions. It required a society capable of learning, questioning, and producing knowledge.
+That is why peace matters in Ataturk's legacy. Peace is not passivity. It is the condition that allows schools, science, culture, and production to grow. A country that knows the cost of destruction should value the patient work of construction.
 
-That challenge continues.
+At 09:05, we remember a leader shaped by hard history and committed to a better future.
 
-Remembering Atatürk can therefore be both historical and forward-looking. We honor what was achieved, but we also ask what kind of future we are building.
-
-With respect and gratitude, we remember Mustafa Kemal Atatürk.
+We remember Mustafa Kemal Ataturk with respect and gratitude.

@@ -8,16 +8,14 @@ tags:
   - turkey
 ---
 
-On November 10, 2024, Türkiye once again pauses at 09:05 to remember Mustafa Kemal Atatürk.
+Every November 10, Turkiye pauses to remember Mustafa Kemal Ataturk.
 
-The world around us is changing rapidly. Artificial intelligence is transforming work and education, global competition is increasingly technological, and scientific capability is becoming a major source of national strength.
+In 2024, the Republic had entered its second century. That changes the tone of remembrance. The founding story remains essential, but the question now points forward: how can the Republic stay educated, fair, productive, and confident in a rapidly changing world?
 
-In this environment, Atatürk's emphasis on education, science, and modernization feels particularly relevant.
+Ataturk's ideas are useful only when they are allowed to speak to the present. Science, reason, education, and independence are not museum words. They matter in classrooms, laboratories, courts, public debates, technology policy, and the daily choices of citizens.
 
-Modernization is not simply adopting the newest technology. It means building the knowledge, institutions, and culture needed to understand and produce it.
+The second century should not be a repetition of the first. It should be a continuation with better tools, deeper knowledge, and clearer responsibility. Remembering Ataturk in 2024 means refusing to let gratitude become laziness.
 
-A society that educates, researches, questions, and creates strengthens its ability to shape its own future.
+The silence at 09:05 is a pause, not an ending. It gives the country a moment to remember where it came from and to ask where it is going.
 
-November 10 is therefore not only a day to remember the past. It is also an opportunity to think about the kind of country future generations will inherit.
-
-We remember Mustafa Kemal Atatürk with respect, gratitude, and reflection.
+We remember Ataturk with respect and gratitude.

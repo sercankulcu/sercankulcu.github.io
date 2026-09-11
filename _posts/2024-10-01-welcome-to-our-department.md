@@ -8,20 +8,14 @@ tags:
   - students
 ---
 
-If you are beginning Computer Engineering in 2024, you are entering the field at a moment when artificial intelligence, cloud systems, cybersecurity, robotics, and specialized hardware are developing rapidly.
+If you are beginning Computer Engineering in 2024, welcome to a field where tools are becoming more powerful and judgment is becoming more important.
 
-You will see many impressive tools during your education. Some will become important. Some will disappear. Your real advantage will come from understanding the principles that remain useful when tools change.
+AI assistants, cloud platforms, cybersecurity risks, robotics, and data-driven products are now part of the normal technology landscape. You will see tools that can generate code, explain errors, and speed up routine work. Use them, but do not let them replace your own thinking.
 
-That is why your early courses matter.
+Your real advantage will come from understanding principles. Programming, algorithms, data structures, mathematics, operating systems, networks, databases, digital design, and computer architecture may look like separate courses at first. Over time, they become the map you use to understand complex systems.
 
-Programming, algorithms, data structures, mathematics, operating systems, networks, databases, digital design, and computer architecture may look like separate subjects at first. Over time, you will see how they connect.
+In your first year, focus on habits as much as grades. Write code often. Take notes. Learn version control. Ask questions. Test your programs. Read documentation. Work with classmates without copying their thinking.
 
-Use university to build more than technical knowledge.
+Engineering is not only about making something run. It is about knowing why it runs, when it fails, and what responsibility comes with releasing it into the world.
 
-Learn how to work in teams. Explain your ideas clearly. Read documentation. Use version control. Test your software. Accept criticism. Learn from failed projects.
-
-AI tools can help you write and analyze code, but do not allow them to replace your own thinking. Engineering requires judgment. You need to understand the problem, evaluate solutions, and take responsibility for what you build.
-
-Explore different areas before choosing a specialization. You may discover an interest in software engineering, AI, cybersecurity, embedded systems, data, cloud infrastructure, or hardware.
-
-You have several years ahead of you. Use them well.
+Welcome to the department. Build strong fundamentals; the tools will keep changing.

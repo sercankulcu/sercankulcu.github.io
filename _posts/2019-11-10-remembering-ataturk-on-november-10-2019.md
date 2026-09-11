@@ -8,16 +8,14 @@ tags:
   - turkey
 ---
 
-Every November 10, Türkiye remembers Mustafa Kemal Atatürk.
+Every November 10, Turkiye remembers Mustafa Kemal Ataturk.
 
-More than eight decades after his death, his presence remains visible throughout the country: in schools, public institutions, city squares, books, family memories, and the political vocabulary of the Republic.
+In 2019, the hundredth anniversary of Ataturk's arrival in Samsun gave the year a special weight. Samsun marks not an ending, but a beginning: a moment when responsibility was accepted before success was guaranteed.
 
-But memory is strongest when it is connected to understanding.
+That is one reason the story still matters. It is easy to read history backward, as if every result was inevitable. It was not. The national struggle required courage, organization, persuasion, and patience at a time when the future was uncertain.
 
-Atatürk's generation lived through the collapse of an empire, years of war, and the creation of a new state. Building the Republic required more than victory. It required laws, schools, institutions, economic plans, and a new vision of citizenship.
+November 10, in this centennial year of that beginning, should remind us that public responsibility often starts before conditions are ideal. Ataturk did not wait for certainty before acting. He read the moment, trusted the possibility of a nation, and worked toward it.
 
-In 2019, the challenges are different, but the need for capable institutions, good education, science, and responsible citizenship remains.
+The best remembrance is not passive admiration. It is the willingness to carry responsibility in one's own time.
 
-At 09:05, we pause.
-
-We remember Mustafa Kemal Atatürk with respect and gratitude.
+We remember Mustafa Kemal Ataturk with respect and gratitude.

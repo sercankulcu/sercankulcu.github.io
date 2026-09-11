@@ -8,16 +8,14 @@ tags:
   - turkey
 ---
 
-November 10, 2020 arrives during an extraordinary year.
+Every November 10, Turkiye pauses to remember Mustafa Kemal Ataturk.
 
-The COVID-19 pandemic has changed education, work, health systems, travel, and daily life around the world. It has also reminded societies of the importance of science, institutions, public responsibility, and collective action.
+In 2020, the pandemic made science, public health, and collective responsibility visible in everyday life. Suddenly, trust in knowledge was not an abstract value. It affected schools, families, hospitals, work, and the most ordinary decisions.
 
-These ideas give this year's remembrance of Mustafa Kemal Atatürk a particular meaning.
+That context makes Ataturk's respect for scientific thinking especially concrete. A society guided by reason is not one that never disagrees. It is one that can look for evidence, listen to expertise, correct mistakes, and understand that individual choices can affect everyone.
 
-Atatürk placed great importance on science and education because he understood that national progress requires knowledge and institutions capable of responding to new challenges.
+November 10 in 2020 therefore carries a quiet lesson. Modernization is not only about technology or buildings. It is also about habits of mind: patience with facts, respect for education, and responsibility toward others.
 
-The problems of 2020 are very different from those of the early Republic, but the principle remains familiar: difficult periods require reason, discipline, cooperation, and confidence in learning.
+At 09:05, the country remembers a founder. In the middle of a difficult year, it also remembers why knowledge matters.
 
-At 09:05, wherever we are, we can still pause.
-
-We remember Mustafa Kemal Atatürk with respect and gratitude.
+We remember Ataturk with respect and gratitude.

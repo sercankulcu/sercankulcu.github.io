@@ -8,18 +8,14 @@ tags:
   - turkey
 ---
 
-On November 10, we remember Mustafa Kemal Atatürk.
+Every November 10, Turkiye remembers Mustafa Kemal Ataturk.
 
-After nearly two years shaped by a global pandemic, the importance of resilient institutions, education, science, and public trust is clearer than ever.
+In 2021, after long months of disruption, students, teachers, families, and institutions were still trying to recover their rhythm. Education had been interrupted, moved online, reorganized, and tested in ways few people expected.
 
-These themes also belong to the history of the Republic.
+That experience makes Ataturk's emphasis on education feel very close. Schools are not only places where information is delivered. They are where a society repairs its future, gives young people confidence, and teaches the habits needed for public life.
 
-Atatürk's project was not limited to political independence. It aimed to create the institutional and intellectual foundations of a modern society: schools, laws, scientific thinking, public administration, and a strong sense of national sovereignty.
+Remembering Ataturk in 2021 means thinking about what education requires after disruption: patience, support for teachers, curiosity from students, and the belief that learning cannot be postponed without cost.
 
-In 2021, we live with technologies and possibilities that would have been unimaginable in his lifetime. Yet modernization is never finished.
+The silence at 09:05 is respectful, but it should not be empty. It should remind us that the Republic depends on minds that continue to grow even after difficult years.
 
-Every generation has to decide how to use new tools, how to educate itself, and how to protect the institutions on which society depends.
-
-At 09:05, Türkiye pauses.
-
-We remember Mustafa Kemal Atatürk with respect and gratitude.
+We remember Mustafa Kemal Ataturk with respect and gratitude.
