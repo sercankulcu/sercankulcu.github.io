@@ -1,12 +1,13 @@
 ---
 title: "In July: Sometimes the Destination Is Beside You"
 date: 2002-08-29
+description: "Daniel needs the illusion before he can reach the truth — sometimes the wrong destination is exactly what gives us enough courage to leave our ordinary life."
 tags:
    - movies
    - love
    - travel
-   - fate
-   - memories
+   - coincidence
+   - fatih-akin
 ---
 
 There are films we remember because they are great films, and there are others we remember because they entered our lives at the right moment. *In July* belongs to the second group for me. I do not remember it mainly because of technique, structure, or cinematic perfection. What remained was a feeling: summer, movement, coincidence, uncertainty, and the strange experience of traveling toward something important without fully understanding what it is.

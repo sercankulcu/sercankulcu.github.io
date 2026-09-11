@@ -1,6 +1,7 @@
 ---
 title: "Revolution OS"
 date: 2008-04-19
+description: "The operating system felt like the visible surface of a conversation carried out through code by people who might never meet — and freedom has consequences."
 tags:
    - documentary
    - linux

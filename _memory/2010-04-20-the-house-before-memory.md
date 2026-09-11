@@ -24,3 +24,9 @@ After hearing the stories often enough, we begin saying, â€œI used to do that,â€
 I looked at the photograph once more. The child did not seem troubled by any of this. He was simply standing there, inside a life that had not yet learned how to remember itself.
 
 Then I put the photograph back in the album. The house was still part of my past, but it belonged to a chapter written before I became the narrator.
+
+## After The House Before Memory
+
+The scene becomes clearer to me now because it stayed small. A house is built from these small transfers of responsibility: someone cooks, someone clears, someone remembers where the missing thing belongs.
+
+The room matters because everyone in it already knows rules nobody has bothered to write down. A larger story would probably make it less honest.

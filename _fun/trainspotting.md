@@ -1,6 +1,7 @@
 ---
 title: "Trainspotting"
 date: 2004-08-28
+description: "Addiction contains pleasure — moral stories weaken themselves by making harmful choices unattractive from the start, because the future sends invoices while the present offers cash."
 tags:
    - movie
    - addiction

@@ -1,14 +1,13 @@
 ---
 title: "Bir Ay Doğar İlk Akşamdan Geceden: The Light We Wait For"
 date: 2025-09-03
+description: "The moon at the beginning of the night does not remove the darkness — it simply gives enough light to continue."
 tags:
    - music
    - cengiz-ozkan
-   - turku
    - night
    - longing
    - hope
-   - memories
 ---
 
 Some songs do not begin with a story. They begin with an atmosphere. A night, a distant light, a road, a voice, and a feeling that something is missing.

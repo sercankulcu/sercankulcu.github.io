@@ -26,3 +26,9 @@ After a while, the place became easier to read. The building had not changed. We
 The entrance had cost fifteen dollars. That was the only part of the evening that arrived with a clear number.
 
 Everything else took about half an hour.
+
+## Under Half an Hour to Understand the Room
+
+The day probably looked forgettable from outside, which makes its survival more interesting. The place gives the memory its geometry: a corner, a route, a delay, the short distance between comfort and embarrassment.
+
+The place gives the memory its geometry: a corner, a route, a delay, the short distance between comfort and embarrassment. The rest of the day may be gone, but this little arrangement still has edges.

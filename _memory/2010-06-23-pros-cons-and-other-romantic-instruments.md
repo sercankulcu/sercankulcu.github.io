@@ -40,3 +40,9 @@ Still, I understand the impulse. Lists give anxiety a job. They let the mind bel
 It rarely does.
 
 But the list remains touching because it proves we tried to be fair to a feeling that had no intention of being fair back.
+
+## Around Pros, Cons, and Other Romantic Instruments
+
+Looking back, I trust the ordinary detail more than the tidy conclusion. Attachment rarely leaves through the main door. It stays in side details and waits there.
+
+Attachment rarely leaves through the main door. It stays in side details and waits there. It remains as a modest proof that ordinary life was never as empty as it looked.

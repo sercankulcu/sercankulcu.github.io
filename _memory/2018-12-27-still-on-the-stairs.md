@@ -36,3 +36,9 @@ The absurdity was useful because it showed me what bothered me about long episod
 A story can take ninety minutes if it needs ninety minutes.
 
 It should not need five extra minutes because a staircase is available.
+
+## Through Still on the Stairs
+
+The day probably looked forgettable from outside, which makes its survival more interesting. The map would miss the important part, because the important part is the mood of being there.
+
+Movement is the secret subject here. Someone waits, crosses, turns, arrives, or fails to arrive. A larger story would probably make it less honest.

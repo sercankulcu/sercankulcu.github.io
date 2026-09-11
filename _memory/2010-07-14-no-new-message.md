@@ -32,3 +32,9 @@ Only the empty space where a reply might appear.
 The computer had no fault.
 
 That did not make waiting in front of it any easier.
+
+## Around No New Message
+
+Looking back, I trust the ordinary detail more than the tidy conclusion. What hurts, or amuses, is not always the event; sometimes it is the interpretation that arrived too late.
+
+Attachment rarely leaves through the main door. It stays in side details and waits there. It remains as a modest proof that ordinary life was never as empty as it looked.

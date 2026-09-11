@@ -1,10 +1,12 @@
 ---
 title: 'Age of Empires II'
 date: 2006-02-14
+description: "I had solved the problem I wanted to have rather than the problem the map actually contained — a lesson the game teaches and refuses to take back."
 tags:
-   - fun
    - game
-   - self-improvement
+   - strategy
+   - planning
+   - decision-making
 ---
 
 There was a period when I could sit down to play *Age of Empires II* after dinner, promise myself that I would stop after one match, and discover that the room had gone quiet and the clock had moved far beyond what I had intended. The game was never especially mysterious about what it wanted from me. Gather food, wood, gold, and stone. Build. Scout. Defend. Attack. The difficulty came from the fact that every sensible decision damaged another sensible possibility.

@@ -26,3 +26,9 @@ The chess memory survives for the same reason. I do not remember who won any par
 He knew chess.
 
 He simply had his own way of making sure we rarely finished a game.
+
+## Past He Knew Chess
+
+The scene becomes clearer to me now because it stayed small. The scene keeps one clear fragment and lets the rest stay blurred.
+
+A minor detail can be more faithful than a grand summary. The memory does not ask to be important; it only asks not to be erased.

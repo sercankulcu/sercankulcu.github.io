@@ -34,3 +34,9 @@ I had noticed the bicycle before I noticed the teacher.
 That took longer.
 
 Perhaps some lessons do.
+
+## After The Open Computer
+
+The useful part is not a lesson so much as a texture. The campus feeling is there: low stakes from far away, enormous stakes from inside the day.
+
+Student life made small things feel official before they deserved to be official: a form, a seat, a delay, a half-success. That small resistance to disappearance is enough.

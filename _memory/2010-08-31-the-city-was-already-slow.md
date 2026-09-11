@@ -36,3 +36,9 @@ We were already living inside a system where the clock moved slowly enough.
 The town did not need to hurry for us.
 
 We needed it to provide evidence that the outside world was still moving.
+
+## After The City Was Already Slow
+
+The useful part is not a lesson so much as a texture. The place gives the memory its geometry: a corner, a route, a delay, the short distance between comfort and embarrassment.
+
+The map would miss the important part, because the important part is the mood of being there. The rest of the day may be gone, but this little arrangement still has edges.

@@ -1,14 +1,13 @@
 ---
 title: "Moonlight Sonata: What the Night Keeps for Us"
 date: 2026-09-03
+description: "Memory is not a perfect archive — it is an old storyteller who changes small details but tries to protect the meaning of the story."
 tags:
    - music
    - beethoven
    - moonlight-sonata
    - night
-   - memory
    - silence
-   - life
 ---
 
 Some music seems to change the room before we fully notice it. Beethoven's *Moonlight Sonata* has this effect on me. It begins quietly, almost without asking for attention, yet after a short time everything around it feels slower. The room is still the same, but somehow the silence has become deeper.

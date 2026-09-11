@@ -48,3 +48,9 @@ It was not a theory about music. It was not research.
 It was simply something that kept working.
 
 Sometimes that is enough reason to leave a thing alone.
+
+## Under Leave the CD In
+
+This is the kind of moment that survives by being oddly specific. The smallness is not a weakness. It is the reason the memory can remain exact.
+
+The object or phrase works like a handle on a drawer I did not know was still there. The memory does not ask to be important; it only asks not to be erased.

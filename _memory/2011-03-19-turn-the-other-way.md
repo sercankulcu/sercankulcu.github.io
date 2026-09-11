@@ -30,3 +30,13 @@ This place was very visible.
 Its strongest advantage, according to my old note, was that parking was easy. I like the balance of that review. Outside, the car had no trouble at all.
 
 Inside, almost everything else required a second attempt.
+
+## Through Turn the Other Way
+
+The scene becomes clearer to me now because it stayed small. The smallness is not a weakness. It is the reason the memory can remain exact.
+
+A minor detail can be more faithful than a grand summary. That small resistance to disappearance is enough.
+
+Bazen bakmamak korkaklık değildir; hafızanın kendini koruma biçimidir. Gözün çevrildiği yerde olay bitmez, ama insan kendisine küçük bir pay bırakır: bu görüntüyü içeri almayacağım.
+
+Bu yüzden cümle bende emir gibi değil, küçük bir hayatta kalma tavsiyesi gibi duruyor. Her şeyi görmek zorunda değiliz. Bazı sahneler, görülmedikleri ölçüde daha az sahip olurlar bize.

@@ -1,6 +1,7 @@
 ---
 title: "Ay Tenli Kadın"
 date: 2026-09-07
+description: "Perhaps love is not entering every room — it is knowing that the rooms are there and still choosing to stay near the door."
 tags:
    - music
    - love

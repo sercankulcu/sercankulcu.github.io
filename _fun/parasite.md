@@ -1,6 +1,7 @@
 ---
 title: "Parasite"
 date: 2020-02-15
+description: "After two hours, a staircase is no longer merely a staircase — class is explained architecturally before it is explained economically."
 tags:
    - movie
    - class

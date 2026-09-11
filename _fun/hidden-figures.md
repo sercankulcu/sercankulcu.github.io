@@ -1,6 +1,7 @@
 ---
 title: "Hidden Figures"
 date: 2017-03-11
+description: "The history of technology is also the story of people fighting to have their capability seen — and merit does not produce its own light."
 tags:
    - movie
    - mathematics

@@ -1,6 +1,7 @@
 ---
 title: "Nereye Böyle"
 date: 2026-09-07
+description: "There is a difference between an ending and an escape — an ending allows both people to speak, an escape leaves one person talking to an empty room."
 tags:
    - music
    - love

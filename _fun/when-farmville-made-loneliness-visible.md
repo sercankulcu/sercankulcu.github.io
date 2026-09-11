@@ -1,12 +1,13 @@
 ---
 title: "When FarmVille Made Loneliness Visible"
 date: 2009-11-01
+description: "The internet gave boredom activity — you could feel busy without becoming engaged in anything large enough to remember."
 tags:
-   - memories
+   - social-media
    - internet
    - loneliness
    - facebook
-   - life
+   - isolation
 ---
 
 There was a particular kind of loneliness in the early social-web years: you could be connected to almost everyone you had ever known and still spend the evening entirely alone.

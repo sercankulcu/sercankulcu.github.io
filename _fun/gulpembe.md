@@ -1,13 +1,13 @@
 ---
 title: "Gülpembe: Some People Stay After They Are Gone"
 date: 2024-09-03
+description: "Some people leave the house but never completely leave us — on the empty chair, inherited habits, and what we owe to those who made a season feel like spring."
 tags:
    - music
    - baris-manco
-   - gulpembe
-   - memories
    - family
    - loss
+   - legacy
 ---
 
 Some people make a house feel warmer just by being there. The table is the same, the tea is the same, and the rooms are the same, but everything feels different when that person is around. Then one day they are gone, and we understand that a home is not made only of walls and furniture.

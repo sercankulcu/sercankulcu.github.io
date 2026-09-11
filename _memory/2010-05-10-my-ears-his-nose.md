@@ -106,3 +106,9 @@ My problem disappeared.
 His remained.
 
 And somewhere between medicine and comedy, we both left with evidence that our version of the story had been correct.
+
+## Inside My Ears, His Nose
+
+I like the memory most where it refuses to explain itself completely. The smallness is not a weakness. It is the reason the memory can remain exact.
+
+The scene keeps one clear fragment and lets the rest stay blurred. That small resistance to disappearance is enough.

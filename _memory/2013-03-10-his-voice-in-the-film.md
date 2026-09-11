@@ -40,3 +40,9 @@ Voices are especially good at this. A face can be forgotten slowly, but a voice 
 For a moment, the film is no longer only a film.
 
 Someone from outside it has entered the room.
+
+## Inside His Voice in the Film
+
+I keep returning to the small practical detail, because that is where the feeling is stored. Home often announces itself through chores before it announces itself through emotion.
+
+The room matters because everyone in it already knows rules nobody has bothered to write down. A larger story would probably make it less honest.

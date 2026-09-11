@@ -56,3 +56,13 @@ It was memory.
 Experience sometimes enters the car before the next passenger does.
 
 And once it is sitting beside you, even “a little farther” sounds longer.
+
+## Past A Little Farther
+
+The day probably looked forgettable from outside, which makes its survival more interesting. A minor detail can be more faithful than a grand summary.
+
+The object or phrase works like a handle on a drawer I did not know was still there. The memory does not ask to be important; it only asks not to be erased.
+
+Biraz daha ileri gitmek çoğu zaman karar gibi görünmez. Büyük bir irade yoktur; yalnızca yürüyüşün devam eden ivmesi, merakın küçük itmesi, dönmek için henüz çok erken olduğu hissi vardır.
+
+Ama hatırlanan şey tam da bu eşiğin kendisi olabilir. Geri dönmekle devam etmek arasındaki o masum mesafe. İnsan bazen hayatının küçük sapmalarını böyle başlatır.

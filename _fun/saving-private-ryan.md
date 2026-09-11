@@ -1,6 +1,7 @@
 ---
 title: "Saving Private Ryan"
 date: 2001-09-29
+description: "Victory is usually the cleanest sentence in a history book; the film asks us to look at what had to happen before anyone could write it."
 tags:
    - movie
    - war

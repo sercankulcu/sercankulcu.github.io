@@ -1,12 +1,13 @@
 ---
 title: "Raf: What We Cannot Let Go"
 date: 2021-02-03
+description: "Music enters from the side door, walks past reason, and opens the room where everything was supposedly packed away."
 tags:
    - music
-   - memories
+   - deeperise
+   - nostalgia
    - love
    - melancholy
-   - relationships
 ---
 
 Some things are hard to throw away.

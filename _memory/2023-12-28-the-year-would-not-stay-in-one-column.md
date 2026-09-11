@@ -28,3 +28,9 @@ One line on the CV had moved forward.
 Life around it remained untidy.
 
 The page still got built.
+
+## Inside The Year Would Not Stay in One Column
+
+This is the kind of moment that survives by being oddly specific. The smallness is not a weakness. It is the reason the memory can remain exact.
+
+The object or phrase works like a handle on a drawer I did not know was still there. That is why the memory keeps its weight without becoming dramatic.

@@ -1,11 +1,11 @@
 ---
 title: "Denize Doğru: Before Winter Comes"
 date: 2007-03-19
+description: "The sea has no memory of us — on leaving before winter comes, the impossible desire to plant fallen leaves, and what geography offers when psychology cannot."
 tags:
    - music
+   - mustafa-sandal
    - love
-   - sea
-   - memories
    - loss
    - philosophy
 ---

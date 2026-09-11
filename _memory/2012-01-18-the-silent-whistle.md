@@ -44,3 +44,9 @@ Some memories work that way too. Nothing loud happened. Nobody else would mark t
 The world continued normally.
 
 The signal arrived anyway.
+
+## Around The Silent Whistle
+
+Looking back, I trust the ordinary detail more than the tidy conclusion. The smallness is not a weakness. It is the reason the memory can remain exact.
+
+The smallness is not a weakness. It is the reason the memory can remain exact. The memory does not ask to be important; it only asks not to be erased.

@@ -1,6 +1,7 @@
 ---
 title: "The Social Network"
 date: 2011-02-05
+description: "Success makes memory valuable — suddenly everyone remembers the beginning differently, and the larger the outcome, the more expensive the origin story becomes."
 tags:
    - movie
    - internet

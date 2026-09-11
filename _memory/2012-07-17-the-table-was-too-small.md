@@ -32,3 +32,9 @@ A game can travel, of course. Traditions survive because people carry them into 
 But geometry is less flexible than culture.
 
 Four people still need room.
+
+## Through The Table Was Too Small
+
+I keep returning to the small practical detail, because that is where the feeling is stored. The object or phrase works like a handle on a drawer I did not know was still there.
+
+The smallness is not a weakness. It is the reason the memory can remain exact. A larger story would probably make it less honest.

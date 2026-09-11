@@ -1,12 +1,13 @@
 ---
 title: "Jeux d'enfants"
 date: 2010-05-02
+description: "Films require endings. Life is less disciplined — and occasionally adds a page to stories we declared finished."
 tags:
    - movie
-   - memories
    - childhood
    - romance
-   - life
+   - coincidence
+   - friendship
 ---
 
 I did not expect *Jeux d'enfants* to do anything unusual to me.

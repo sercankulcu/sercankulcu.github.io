@@ -45,3 +45,9 @@ Maybe that is why the phrase stayed with me.
 Not a relevant field.
 
 A bureaucratic sentence with the emotional range of a locked door.
+
+## After Not a Relevant Field
+
+The scene becomes clearer to me now because it stayed small. The machine gives the memory a timestamp, but the human confusion around it is still current.
+
+The machine gives the memory a timestamp, but the human confusion around it is still current. So I leave it there: not polished smooth, just visible enough.

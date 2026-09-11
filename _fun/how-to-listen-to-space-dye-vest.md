@@ -1,12 +1,13 @@
 ---
 title: "How to Listen to Space-Dye Vest"
 date: 2010-06-18
+description: "A record is fixed; the listener is not — on ritual, bodily memory, and what happens to a song after it enters your life."
 tags:
    - music
-   - memories
    - dream-theater
    - listening
-   - life
+   - ritual
+   - nostalgia
 ---
 
 Some songs tolerate almost any kind of listening. They survive kitchens, traffic, conversation, cheap speakers and the distracted half-attention we now give to enormous amounts of music.

@@ -1,12 +1,13 @@
 ---
 title: "The Intouchables"
 date: 2012-06-09
+description: "Care can accidentally shrink a person into the list of care they require — Driss restores ordinary social risk by refusing to let limitation become biography."
 tags:
    - movie
    - friendship
    - dignity
+   - disability
    - care
-   - life
 ---
 
 I watched *The Intouchables* on an evening when I wanted something light.

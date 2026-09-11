@@ -1,11 +1,13 @@
 ---
 title: "Brief Encounter"
 date: 2008-12-31
+description: "Unlived lives remain polished by absence — silence is not emptiness but a container of possible sentences, each leading toward another life."
 tags:
    - movie
    - romance
-   - memories
-   - life
+   - restraint
+   - longing
+   - unspoken
 ---
 
 There are sentences we regret saying and sentences we regret withholding. *Brief Encounter* belongs almost entirely to the second category.

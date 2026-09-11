@@ -65,3 +65,9 @@ You return knowing where you failed, which makes hope less innocent but more use
 The second attempt rarely feels like a new beginning.
 
 It feels like beginning with evidence.
+
+## After Second Attempt
+
+The useful part is not a lesson so much as a texture. The object or phrase works like a handle on a drawer I did not know was still there.
+
+The smallness is not a weakness. It is the reason the memory can remain exact. I think the truth of the memory lives exactly in that uneven size.

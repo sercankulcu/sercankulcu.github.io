@@ -30,3 +30,13 @@ Instead, the problem moved through hierarchy and arrived at me.
 Afterward I wrote that interns should be selected the way people select watermelons. Examine carefully. Tap the surface. Listen. Hope for the best.
 
 It was not a serious hiring method, but neither was the day.
+
+## Under The Cards on the Desk
+
+The scene becomes clearer to me now because it stayed small. The map would miss the important part, because the important part is the mood of being there.
+
+A location can hold the feeling better than a full explanation can. That small resistance to disappearance is enough.
+
+Masadaki kartlar açıklık vaat eder. Ne varsa ortadadır, herkes görür, kimse bilinmeyene sığınamaz. Fakat insan ilişkilerinde kartları açmak bile bazen yalnızca başka bir saklanma biçimidir.
+
+Çünkü görünen şey her zaman niyet değildir. Masanın üzeri düzenli olabilir; asıl karışıklık hâlâ bakanların içinde durur.

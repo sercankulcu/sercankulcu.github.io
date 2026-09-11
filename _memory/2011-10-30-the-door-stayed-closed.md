@@ -26,3 +26,9 @@ I remember writing that I was not sure whether I would go to work the next day. 
 Three days earlier, the apartment had been somewhere I returned to.
 
 By the end, returning to the world seemed to require more effort.
+
+## Inside The Door Stayed Closed
+
+The useful part is not a lesson so much as a texture. A house is built from these small transfers of responsibility: someone cooks, someone clears, someone remembers where the missing thing belongs.
+
+The family part of the scene is not sentimental to me; it is practical, almost procedural, and that makes it more tender. That small resistance to disappearance is enough.

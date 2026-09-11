@@ -28,3 +28,9 @@ Years later, I remember the numbers because they show the scale of the decision 
 The experience I did not buy remained perfect because reality never had the chance to disappoint me. Perhaps it would have been forgettable. Perhaps not.
 
 All I know is that Montreal offered one more thing that night, and my wallet answered before I did.
+
+## After Fifteen Dollars
+
+I like the memory most where it refuses to explain itself completely. The smallness is not a weakness. It is the reason the memory can remain exact.
+
+The object or phrase works like a handle on a drawer I did not know was still there. The rest of the day may be gone, but this little arrangement still has edges.

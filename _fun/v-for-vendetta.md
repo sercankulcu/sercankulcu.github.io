@@ -1,6 +1,7 @@
 ---
 title: "V for Vendetta"
 date: 2006-12-02
+description: "Self-censorship often arrives before censorship — on fear used as political infrastructure and who benefits from our compliance."
 tags:
    - movie
    - freedom

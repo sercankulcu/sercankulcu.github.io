@@ -30,3 +30,9 @@ You open one file for practical reasons and suddenly meet an earlier self: less 
 That small program stayed open because it was not only code.
 
 It was proof that learning leaves artifacts before it becomes confidence.
+
+## Around A Folder from Another Time
+
+I keep returning to the small practical detail, because that is where the feeling is stored. The machine gives the memory a timestamp, but the human confusion around it is still current.
+
+A screen or file can preserve an earlier self with embarrassing accuracy. I think the truth of the memory lives exactly in that uneven size.

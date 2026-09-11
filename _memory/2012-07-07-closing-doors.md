@@ -56,3 +56,9 @@ So did everyone else.
 For several minutes, I had treated one particular metro as if the future depended on it.
 
 The next train probably arrived soon after.
+
+## Through Closing Doors
+
+I keep returning to the small practical detail, because that is where the feeling is stored. What hurts, or amuses, is not always the event; sometimes it is the interpretation that arrived too late.
+
+Attachment rarely leaves through the main door. It stays in side details and waits there. That is why the memory keeps its weight without becoming dramatic.

@@ -1,6 +1,7 @@
 ---
 title: "Schindler's List"
 date: 2004-01-27
+description: "Remembering cannot depend on atmosphere — it has to be deliberate, because the ordinary world is extremely good at continuing."
 tags:
    - movie
    - history

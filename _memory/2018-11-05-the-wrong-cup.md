@@ -22,3 +22,9 @@ Responsibility did not feel noble at that hour. It felt like walking through a d
 I went back and made the formula.
 
 The coffee remained as evidence that, for a few minutes, two versions of my life had met in the same kitchen. One knew exactly how to make coffee in the middle of the night. The other was still learning what the night now required.
+
+## Beside The Wrong Cup
+
+This is the kind of moment that survives by being oddly specific. The room matters because everyone in it already knows rules nobody has bothered to write down.
+
+The family part of the scene is not sentimental to me; it is practical, almost procedural, and that makes it more tender. A larger story would probably make it less honest.

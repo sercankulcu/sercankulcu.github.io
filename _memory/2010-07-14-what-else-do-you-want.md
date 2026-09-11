@@ -32,3 +32,9 @@ Eventually I stopped checking every few minutes. There would be other applicatio
 Team player. Flexible. Analytical. I love you.
 
 It was not professional, which was probably why it sounded human.
+
+## Past What Else Do You Want?
+
+The useful part is not a lesson so much as a texture. The smallness is not a weakness. It is the reason the memory can remain exact.
+
+The object or phrase works like a handle on a drawer I did not know was still there. That is why the memory keeps its weight without becoming dramatic.

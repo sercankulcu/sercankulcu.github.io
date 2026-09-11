@@ -1,6 +1,7 @@
 ---
 title: "Fight Club"
 date: 2003-10-04
+description: "Rebellion can become conformity with different clothing — men who wanted to escape being interchangeable consumers become interchangeable members of Project Mayhem."
 tags:
    - movie
    - identity

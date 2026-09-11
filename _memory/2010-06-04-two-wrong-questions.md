@@ -26,3 +26,9 @@ There was also the professor’s appeal procedure. When I asked whether students
 A right existed. Access to the right was another matter.
 
 Years later, I remember very little of the mathematics from that exam. I remember the red book, the number thirty-three, and the extraordinary relief of discovering that sometimes the student is confused because the question is wrong.
+
+## After Two Wrong Questions
+
+The useful part is not a lesson so much as a texture. What returns is the public awkwardness of learning how to be a person among other people.
+
+Student life made small things feel official before they deserved to be official: a form, a seat, a delay, a half-success. That is why the memory keeps its weight without becoming dramatic.

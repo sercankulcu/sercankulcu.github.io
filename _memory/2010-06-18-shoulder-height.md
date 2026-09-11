@@ -36,3 +36,9 @@ Shoulder height sounds small, but the body understands such comparisons immediat
 A number would have been cleaner.
 
 The shoulder remembered better.
+
+## After Shoulder Height
+
+The scene becomes clearer to me now because it stayed small. The scene keeps one clear fragment and lets the rest stay blurred.
+
+The scene keeps one clear fragment and lets the rest stay blurred. A larger story would probably make it less honest.

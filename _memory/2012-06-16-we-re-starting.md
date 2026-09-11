@@ -54,3 +54,9 @@ I remember the sentence.
 “We're starting.”
 
 And I remember the strange relief of believing that the person saying it knew exactly what he was doing.
+
+## Inside We're Starting
+
+The day probably looked forgettable from outside, which makes its survival more interesting. The object or phrase works like a handle on a drawer I did not know was still there.
+
+The scene keeps one clear fragment and lets the rest stay blurred. That small resistance to disappearance is enough.

@@ -50,3 +50,9 @@ I remember the children playing.
 And I remember that, for a few seconds, I had chosen a direction for myself.
 
 Then an adult gently turned me toward another door.
+
+## Past The Eraser on a String
+
+I like the memory most where it refuses to explain itself completely. Student life made small things feel official before they deserved to be official: a form, a seat, a delay, a half-success.
+
+The campus feeling is there: low stakes from far away, enormous stakes from inside the day. So I leave it there: not polished smooth, just visible enough.

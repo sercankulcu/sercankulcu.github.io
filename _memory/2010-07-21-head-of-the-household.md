@@ -50,3 +50,9 @@ At that time, that was not me.
 The transfer of power was peaceful.
 
 I was probably at work when it happened.
+
+## After Head of the Household
+
+The scene becomes clearer to me now because it stayed small. Home often announces itself through chores before it announces itself through emotion.
+
+The room matters because everyone in it already knows rules nobody has bothered to write down. A larger story would probably make it less honest.

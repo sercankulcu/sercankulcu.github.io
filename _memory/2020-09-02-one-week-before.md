@@ -38,3 +38,9 @@ Two weeks passed.
 The original note ended there, and that is where this one should end too. Whatever happened afterward belongs to her life, not to the pattern my memory wanted to invent.
 
 What remains is smaller and funnier: one old crush, two weddings, two social-media events, and a narrator staring at coincidence as if coincidence had a plan.
+
+## Past One Week Before
+
+The scene becomes clearer to me now because it stayed small. The campus feeling is there: low stakes from far away, enormous stakes from inside the day.
+
+What returns is the public awkwardness of learning how to be a person among other people. A larger story would probably make it less honest.

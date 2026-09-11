@@ -1,6 +1,7 @@
 ---
 title: "The Matrix"
 date: 2002-03-09
+description: "Interfaces quietly define action — once you see the structure producing the rules, you cannot stop seeing it."
 tags:
    - movie
    - computing

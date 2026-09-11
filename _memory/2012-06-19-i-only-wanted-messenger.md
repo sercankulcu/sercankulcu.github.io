@@ -52,3 +52,9 @@ Wanting Messenger was probably not only wanting Messenger.
 It was wanting the world in which Messenger mattered.
 
 A world where presence could be reduced to a status icon, and somehow that felt enough.
+
+## After I Only Wanted Messenger
+
+I keep returning to the small practical detail, because that is where the feeling is stored. The machine gives the memory a timestamp, but the human confusion around it is still current.
+
+Old tools are never only tools; they remember the habits we built around them. It remains as a modest proof that ordinary life was never as empty as it looked.

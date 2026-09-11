@@ -1,6 +1,7 @@
 ---
 title: "Beni Hatırla"
 date: 2026-09-07
+description: "Being forgotten frightens us partly because it makes us wonder whether the past can disappear if nobody carries it anymore."
 tags:
    - music
    - memory
