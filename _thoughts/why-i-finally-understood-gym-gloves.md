@@ -6,8 +6,8 @@ tags:
   - fitness
   - habits
   - experience
-  - everyday-life
-  - reflections
+  - judgment
+  - reflection
 ---
 
 Some things look ridiculous until the exact moment you need them. Gym gloves were one of those things for me. At first they seemed unnecessary, almost theatrical, like wearing sunglasses at night. You are in a gym, you lift weights, your hands touch metal. Surely hands are already designed for holding things.

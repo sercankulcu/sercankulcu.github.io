@@ -1,5 +1,5 @@
 ---
-title: "Why Some People Stop Talking"
+title: "Words That Wait for a Better Room"
 date: 2012-07-07
 description: "People sometimes stop talking not because nothing matters, but because too much has become difficult to say."
 tags:
@@ -7,7 +7,7 @@ tags:
   - friendship
   - silence
   - trust
-  - reflections
+  - reflection
 ---
 
 Some people are quiet because they have nothing to say. Others are quiet because they have learned that speaking is expensive.

@@ -1,12 +1,12 @@
 ---
-title: "Being Misunderstood"
+title: "Silence Collects Its Own Evidence"
 date: 2010-06-18
 description: "Misunderstandings often grow when written words arrive without voice, expression, history, or the courage to ask what was meant."
 tags:
-  - life
   - relationships
   - communication
   - memories
+  - reflection
 ---
 
 Some problems begin with something that was never said. Others begin with something that was said and understood completely differently. I think the second kind can sometimes be worse, especially when two people cannot talk face to face.
