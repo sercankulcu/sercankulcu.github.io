@@ -10,93 +10,47 @@ tags:
    - separation
 ---
 
-Some endings hurt because somebody leaves. Others hurt because they leave before listening.
+Some words become heavy when they have nowhere to go.
 
-*Nereye Böyle* makes me think about that second kind.
+You prepare the sentence. You find the right moment. And then the person is already somewhere else — mentally, emotionally, physically moving toward the door. The words are ready and the conversation is over.
 
-There is something deeply painful in wanting to explain yourself to a person who has already decided what the story means. You are still trying to find the right words, but they are already walking away. Maybe they think they understand. Maybe they are tired. Maybe listening would make leaving more difficult.
+*Nereye Böyle* lives in that gap.
 
-Whatever the reason, you are left with sentences that have nowhere to go.
+There is a particular pain in wanting to explain yourself to someone who has already decided what the story means. You are still looking for language. They are already walking. Maybe they think they understand. Maybe listening would make leaving more difficult, and they know this. Whatever the reason, you are left holding sentences that no longer have an address.
 
-I know how heavy unsaid words can become.
+I know how heavy those become.
 
-Sometimes we imagine that communication problems are about not speaking enough. I am not sure that is true. Two people can speak constantly and still fail to hear each other. Listening requires more than silence while the other person talks. It requires the possibility that your own version of events may be incomplete.
+They do not disappear. They become the conversation you replay in different versions — the version where you said the right thing, the version where they stayed to hear it, the version where both of you were less afraid of the same moment.
 
-That is difficult when emotions are already damaged.
+Most adults become very good at hiding when something is wrong.
 
-When we are hurt, we become excellent lawyers for ourselves. We collect evidence. We remember every sentence that proves we were right and every mistake that proves the other person was wrong. Soon there are two completely different stories about the same relationship.
+We say "I'm fine" because the truth takes longer than the moment allows. We hope that the person closest to us will notice without being told. When they don't, a particular loneliness enters the relationship — not the loneliness of being alone, but of being beside someone who is looking past you.
 
-And both people believe theirs.
+That distinction matters.
 
-Maybe that is why a simple question can become so important.
+Being lonely alone is at least legible. You know the shape of it. Being lonely beside someone is stranger, because you cannot explain it without sounding ungrateful, and you cannot stop feeling it simply by deciding to.
 
-How are you?
+What stays with me in this song is the urgency of a last chance.
 
-Not as a greeting.
+The door has not completely closed, but one person is already moving toward it. There is still time. But time is visibly running out.
 
-Really asking.
+If you have something to say, say it now.
 
-There have been days when I looked perfectly normal while things inside me were far from normal. I went to work, answered messages, talked to people and did everything I was supposed to do. Nobody had any reason to think something was wrong.
+Because the questions change.
 
-That does not mean I was fine.
+At first: why are you leaving?
 
-I think most adults become good at this.
+Later: why didn't you listen?
 
-We learn how to carry sadness without making it visible. We say "I'm okay" because explaining the truth would take too long. Sometimes we even hope one particular person will notice without being told.
+And after enough time has passed: nothing. The question dissolves into the past along with everything else that never got finished.
 
-Then they do not.
+There is a difference between an ending and an escape.
 
-That can hurt more than expected.
+An ending allows both people to speak, even when what they say is difficult. An escape saves one person from discomfort and leaves the other standing in a room that is suddenly empty, holding words that were never delivered, wondering whether any conversation could have changed the direction.
 
-Perhaps it is unfair. Nobody can read our minds. But love creates strange expectations. We want the person closest to us to see the cracks before everyone else does.
+Perhaps some could have.
 
-When they cannot, loneliness enters the relationship.
-
-And being lonely beside someone is very different from being lonely alone.
-
-The song also makes me think about what happens when feelings become too large to keep private. At some point you tell somebody. A friend asks what happened, and suddenly the whole story comes out.
-
-Later, you wonder whether you should have said anything.
-
-I understand that regret too.
-
-There are things we want to keep between two people even after those two people have stopped being close. Speaking about them feels like opening a private room to strangers.
-
-But sometimes the room is too heavy to sit in alone.
-
-So we talk.
-
-Maybe that is not betrayal.
-
-Maybe it is survival.
-
-What stays with me most in *Nereye Böyle* is the urgency. There is still something unfinished. The door has not completely closed, but one person is already moving toward it.
-
-That moment is familiar.
-
-If you have something to say, this is the last chance.
-
-If you want to ask a question, ask it now.
-
-If you still care how the other person feels, stop for a minute.
-
-Because after enough time, the questions change.
-
-At first you ask, "Why are you leaving?"
-
-Later you ask, "Why didn't you listen?"
-
-And years after that, you may ask nothing at all.
-
-I think some relationships could have ended differently if both people had slowed down for one honest conversation. Not necessarily with a happy ending. Some people still need to separate.
-
-But there is a difference between an ending and an escape.
-
-An ending allows both people to speak.
-
-An escape leaves one person talking to an empty room.
-
-Maybe that is the real sadness behind the question.
+Perhaps that is the real sadness behind the question.
 
 Not "Where are you going?"
 

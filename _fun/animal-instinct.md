@@ -10,67 +10,37 @@ tags:
    - fear
 ---
 
-There are moments when life changes without warning.
+One night I was watching my child sleep.
 
-You can be sitting somewhere, doing something ordinary, drinking tea, thinking about nothing important, and suddenly a fear enters your mind. Nothing around you has changed, but inside you something has moved. The world feels less safe than it did a few seconds ago.
+Nothing was wrong. The room was quiet. They were completely fine. Still, a fear arrived — quiet and specific, the kind that does not correspond to any actual danger but arrives anyway.
 
-*Animal Instinct* makes me think about that kind of fear.
+I wanted to stay in the doorway indefinitely.
 
-It is strange how loving someone can make you stronger and more frightened at the same time. Before they become important to you, the world has fewer ways to hurt you. Then one person arrives, and suddenly their safety matters as much as your own.
+*Animal Instinct* is about that kind of love.
 
-Maybe even more.
+Before children, I understood protection mostly as a practical idea. Keep someone away from danger. Make sensible decisions. Intervene when necessary.
 
-I understood this much better after becoming a father.
+Then you have a child, and you discover that protection is not predominantly rational. It is a reflex that precedes thought. It comes before you have time to decide whether it is appropriate or useful. If something happens, you move. If they are afraid, you become calm — not by deciding to, but because something arranges itself inside you and takes the role.
 
-Before children, I thought protection was mostly a practical idea. You keep someone away from danger. You make sensible decisions. You try to prevent bad things from happening.
+The difficult lesson arrives later.
 
-Then you have a child and discover that protection is not completely rational.
+You can hold a small hand while crossing the street. You can check the doors at night. You can be present and careful. But at some point you understand with complete clarity that the world does not care about your intentions. It will reach the people you love regardless. Illness, timing, other people's choices, plain bad luck.
 
-Sometimes you look at them when they are sleeping and feel an unexpected fear. They are perfectly safe. Nothing is wrong. Still, your mind quietly begins creating disasters that do not exist.
+You cannot stand between a person and everything.
 
-You want to stop all of them.
+What you can do becomes very specific.
 
-You cannot.
+You can give advice when it is wanted. You can be present when it is needed. You can show, through ordinary behavior repeated over years, what you believe about how to live. You can tell the truth, even when a reassuring version of it would be easier.
 
-That is one of the difficult lessons of being a parent.
+And then — the part nobody explains clearly in advance — you let them go.
 
-You can hold a small hand while crossing the street. You can check the doors at night. You can give advice, solve problems and try to create a safe home. But eventually you understand that you cannot control reality.
+Not because you care less. Because you trust them more.
 
-The world will reach the people you love.
+The instinct does not disappear when children become adults. It only changes form. Becomes quieter. Becomes the habit of thinking of someone during the ordinary part of the day, of checking a phone at a particular hour, of hoping without being sure what you are hoping for.
 
-They will be disappointed. They will fail at something. Somebody will hurt them. They will make decisions you would not make. One day they will walk through a door without your hand in theirs.
+Love made portable.
 
-Knowing this does not stop the instinct to protect them.
-
-Perhaps that is why the word "instinct" fits so well.
-
-There is a kind of love that arrives before thought. You do not calculate it. You do not decide whether it is reasonable. Your body seems to understand it before your mind does.
-
-If something happens, you move.
-
-If they are afraid, you become calm.
-
-If somebody threatens them, a different version of you appears.
-
-I think most parents eventually meet that version of themselves.
-
-The song also reminds me that love creates doubt. When something matters deeply, certainty becomes difficult. You begin asking questions you cannot answer. Am I doing enough? Am I protecting too much? Should I help, or should I let them learn alone?
-
-There is no perfect answer.
-
-Sometimes protecting somebody also means allowing them to experience the world without you.
-
-That may be the hardest part.
-
-When children are small, holding their hand is easy. Years later, love asks for something more difficult: knowing when to let go.
-
-Not because you care less.
-
-Because you trust them more.
-
-I suppose this instinct never really disappears. The form changes, but the feeling remains. A child grows taller, becomes independent, develops a life you cannot completely see, and still some part of you remembers the small hand.
-
-Maybe that is what I hear in *Animal Instinct*.
+That may be what I hear most in the song: not the fear itself, but the love that makes the fear make sense. If something did not matter, there would be nothing to lose. Vulnerability is not a weakness that arrived alongside love. It is the same thing, in a different light.
 
 Love is beautiful partly because it gives us something worth protecting.
 
