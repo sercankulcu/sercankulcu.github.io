@@ -1,13 +1,13 @@
 ---
 title: "Tea and Engineering"
 date: 2009-11-05
+description: "An old joke held that scientists drink tea while engineers work — until working as an engineer made both halves look equally exhausting and absurd."
 tags:
    - engineering
    - science
-   - work
+   - workplace
    - career
    - humor
-   - memories
 ---
 
 My old theory about scientists and engineers was simple: the scientist drinks tea while the engineer works. There was another version too. The scientist discovers something, and the engineer turns it into money. These were not serious definitions; they were professional jokes produced by someone who was already tired enough to believe that engineering had received the harder part of the bargain.

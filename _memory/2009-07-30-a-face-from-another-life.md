@@ -1,12 +1,13 @@
 ---
 title: "A Face From Another Life"
 date: 2009-07-30
+description: "Recognizing a first love across a dark Montreal bar, years later, and finding only the distance between who we had each quietly become."
 tags:
    - montreal
    - first-love
-   - memory
    - travel
    - coincidence
+   - reunion
 ---
 
 I was in Montreal for only a short visit, so the city still felt temporary to me. I had no routine there, no familiar streets, and no place that truly belonged to my daily life. Every door led into a world I would probably never see again.
