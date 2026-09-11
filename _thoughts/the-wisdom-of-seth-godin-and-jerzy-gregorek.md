@@ -1,11 +1,11 @@
 ---
 title: 'Discomfort Is Not a Verdict'
 date: 2022-07-07
-description: "Discomfort is not always a warning; sometimes it is the price of doing something worth doing."
+description: "Discomfort and wrong direction are not the same thing — the difficult skill is knowing what deserves persistence."
 tags:
   - persistence
   - judgment
-  - reflection
+  - sunk-cost
 ---
 
 I have noticed that difficult things often make their strongest argument for quitting at exactly the wrong moment.

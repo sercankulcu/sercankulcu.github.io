@@ -36,3 +36,11 @@ I kept it.
 It could not make a sound.
 
 It had already said enough.
+
+A silent whistle is a perfect little contradiction. It suggests a signal that exists without becoming public, a call meant for someone who already knows how to hear it.
+
+Some memories work that way too. Nothing loud happened. Nobody else would mark the moment. But inside, something answered.
+
+The world continued normally.
+
+The signal arrived anyway.

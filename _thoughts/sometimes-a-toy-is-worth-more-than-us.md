@@ -1,12 +1,11 @@
 ---
 title: 'Sometimes a Toy Is Worth More Than Us'
 date: 2026-09-07
-description: "A child's attachment to a toy can reveal how adults misunderstand value, loss, and comfort."
+description: "We spend money to show love, then forget that sometimes love is the cheapest thing in the room."
 tags:
   - childhood
-  - family
-  - love
-  - life
+  - attachment
+  - value
 ---
 
 There is a sentence that can hurt a parent's pride: **Sometimes, in the eyes of a child, a toy is more valuable than their mother or father.**

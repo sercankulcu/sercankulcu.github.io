@@ -1,7 +1,7 @@
 ---
 title: 'Love Can Become an Expectation'
 date: 2011-10-06
-description: "Family love can become tangled with expectation when pride turns into a measure of worth."
+description: "Gratitude cannot reasonably require another person to surrender authorship of their own life."
 tags:
   - family
   - identity

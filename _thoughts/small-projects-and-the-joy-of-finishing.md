@@ -1,11 +1,11 @@
 ---
 title: 'Small Projects Close the Loop'
 date: 2025-03-08
-description: "Small projects matter because they let us complete a loop and recover the pleasure of finishing."
+description: "A finished small thing has met reality; an enormous plan may still be waiting to do so."
 tags:
   - projects
   - learning
-  - reflection
+  - completion
 ---
 
 I used to think a project had to be large to deserve attention. Large projects looked serious. Small ones looked temporary, almost like exercises. Over time, I began to suspect that scale and seriousness are not the same thing.

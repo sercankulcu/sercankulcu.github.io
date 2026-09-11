@@ -1,11 +1,11 @@
 ---
 title: 'Growing Older Is Not the Same as Becoming Old'
 date: 2023-01-04
-description: "Growing older is not the same as becoming old, but it changes what the body, memory, and time ask of us."
+description: "A person can repeat the same year twenty times and merely become older — experience becomes useful only when examined."
 tags:
   - aging
   - curiosity
-  - reflection
+  - growth
 ---
 
 Age arrives gradually, but our awareness of it often arrives in flashes.

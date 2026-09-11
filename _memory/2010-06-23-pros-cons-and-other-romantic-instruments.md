@@ -32,3 +32,11 @@ That was the ridiculous part.
 The person was already inside the problem.
 
 The paper was pretending to stand outside it.
+
+There is something comic about bringing rational instruments into emotional weather. Pros and cons look confident on paper. Then a single look, message, or memory walks into the room and ruins the spreadsheet.
+
+Still, I understand the impulse. Lists give anxiety a job. They let the mind believe that if it sorts enough evidence, the heart will become administratively cooperative.
+
+It rarely does.
+
+But the list remains touching because it proves we tried to be fair to a feeling that had no intention of being fair back.

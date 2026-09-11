@@ -4,8 +4,8 @@ date: 2019-10-06
 description: "Long friendships often survive not only through affection, but through rituals and structures that protect time together."
 tags:
   - friendship
-  - relationships
-  - belonging
+  - ritual
+  - longevity
 ---
 
 I used to think strong friendships survived mainly because the people involved cared enough.

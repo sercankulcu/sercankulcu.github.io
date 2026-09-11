@@ -26,3 +26,13 @@ I still think there is something funny about beginners buying every possible acc
 My hands settled the question.
 
 They did not care how the gloves looked.
+
+Blisters are funny after they stop hurting. During the walk, they are not symbolic. They are just small private disasters inside your shoes.
+
+Only later does the body turn them into evidence. You went farther than comfort allowed. You kept walking after the sensible point. You paid for distance in skin.
+
+There are memories like that: unimpressive from outside, very specific from within.
+
+A map would show only the route.
+
+My feet kept better records.

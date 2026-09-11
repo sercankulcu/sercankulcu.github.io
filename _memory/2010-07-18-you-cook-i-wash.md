@@ -49,6 +49,24 @@ The sink empties.
 
 Then everyone sits down.
 
+The beauty of the arrangement was that it turned weakness into policy. I was not avoiding cooking because I was lazy. I was protecting the household from uncertainty. This is, admittedly, the kind of argument a lazy person would make, but it had a certain administrative elegance.
+
+Cooking contains too many invisible judgments.
+
+Enough salt.
+
+Too much heat.
+
+A little longer.
+
+Maybe now.
+
+Washing dishes is more democratic. The evidence is public. If there is sauce on the plate, the plate is not clean. If the glass still feels oily, the glass has filed a complaint.
+
+I liked this clarity.
+
+Maybe that is why small household agreements can feel more intimate than grand promises. They are practical. They happen after ordinary hunger, ordinary fatigue, ordinary days. A person learns where another person refuses effort and where they are willing to give it.
+
 This was not equality in the mathematical sense.
 
 It was better.

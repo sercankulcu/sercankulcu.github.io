@@ -3,9 +3,9 @@ title: 'Do Not Make Every Problem a Verdict'
 date: 2024-10-11
 description: "Problems are inevitable, but not every problem deserves to become a verdict on the whole life."
 tags:
-  - life
-  - reflection
   - stoicism
+  - cognitive-distortion
+  - equanimity
 ---
 
 One morning, I woke up already irritated.

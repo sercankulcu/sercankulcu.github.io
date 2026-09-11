@@ -1,11 +1,11 @@
 ---
 title: 'Growing Up Means Learning Which Voice Is Yours'
 date: 2014-10-06
-description: "Growing up means slowly learning which voice is truly ours and which voices we simply inherited."
+description: "An expectation repeated long enough can begin to sound like an inner voice."
 tags:
   - identity
   - expectations
-  - reflection
+  - conformity
 ---
 
 A baby begins with a very direct relationship to need. Hunger becomes crying. Discomfort becomes crying. The signal is crude but honest: something is wrong, and the child does not yet know how to disguise it.

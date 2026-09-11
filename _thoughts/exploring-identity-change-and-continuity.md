@@ -1,7 +1,7 @@
 ---
 title: 'Identity May Be a Story of Continuity'
 date: 2024-11-28
-description: "The Ship of Theseus suggests that identity may depend less on an unchanged core than on continuity over time."
+description: "Identity may be less like a hidden object we possess and more like a relationship between versions over time."
 tags:
   - philosophy
   - identity

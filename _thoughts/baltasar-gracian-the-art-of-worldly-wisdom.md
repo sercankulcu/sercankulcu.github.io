@@ -1,11 +1,11 @@
 ---
 title: 'Being Right Is Not Enough'
 date: 2017-02-13
-description: "Good judgment is not only knowing what is true, but knowing when and how a truth can do useful work."
+description: "Sincerity and effectiveness are not the same thing — and knowing the difference is its own form of intelligence."
 tags:
   - judgment
   - communication
-  - reflection
+  - timing
 ---
 
 I used to think that if an idea was correct, presenting it clearly should be enough.

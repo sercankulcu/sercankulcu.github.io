@@ -1,11 +1,11 @@
 ---
 title: 'We Perform More Than We Admit'
 date: 2019-07-04
-description: "Social life is full of performance, and self-knowledge begins by noticing how much we edit ourselves for others."
+description: "The most convincing performance is usually the one we have stopped recognizing as a performance."
 tags:
   - character
   - status
-  - reflection
+  - self-deception
 ---
 
 Some writers become dated because the world they describe disappears.

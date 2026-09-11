@@ -38,3 +38,13 @@ The next step is movement.
 The passengers had completed the intellectual part.
 
 The driver was waiting for implementation.
+
+There is a special embarrassment in discovering that the smallest practical problem can control the whole scene. Not love, not pride, not destiny. Coins.
+
+I used to think adulthood meant solving large questions. Often it means having the right change at the right moment and not making everyone wait while you search your pockets with theatrical despair.
+
+The sentence stayed with me because it was so modest.
+
+I have change.
+
+Sometimes that is enough to move the day forward.

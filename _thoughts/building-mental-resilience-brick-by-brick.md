@@ -1,11 +1,11 @@
 ---
-title: 'What Surviving Something Actually Teaches Us'
+title: 'Strength Is Not the Absence of Damage'
 date: 2022-07-27
 description: "Resilience is not becoming untouched by pain, but recovering the ability to choose after being affected."
 tags:
   - resilience
-  - life
-  - reflection
+  - stoicism
+  - adversity
 ---
 
 After a difficult period ends, we often tell ourselves a simple story: it made me stronger.

@@ -52,3 +52,11 @@ If you call a stranger and ask, “Who are you?”
 the fairest answer may simply be:
 
 “The person you called.”
+
+Questions like that carry more weight than their grammar admits. On the surface, it is curiosity. Underneath, it can be suspicion, jealousy, concern, comedy, or all of them standing in a line pretending not to know each other.
+
+The phone makes private life visible in fragments. A name on a screen, a pause before answering, a tone of voice that changes slightly. People build entire theories from these crumbs.
+
+Sometimes the question is not really about the call.
+
+It is about whether someone still knows where they stand.

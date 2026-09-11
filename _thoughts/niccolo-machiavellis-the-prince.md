@@ -1,11 +1,11 @@
 ---
 title: 'Power Is Judged by Consequences'
 date: 2017-02-10
-description: "Power is often judged by consequences, but understanding power games does not require surrendering to them."
+description: "Good intentions do not cancel bad outcomes, and appearing virtuous is not the same thing as governing well."
 tags:
   - power
   - leadership
-  - reflection
+  - consequences
 ---
 
 One reason Machiavelli remains uncomfortable is that he refuses to let intention settle the argument.

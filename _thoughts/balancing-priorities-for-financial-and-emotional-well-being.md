@@ -1,7 +1,7 @@
 ---
 title: 'Not Every Need Becomes Your Duty'
 date: 2018-10-06
-description: "A reflection on generosity, boundaries, and the difference between helping someone and becoming permanently available."
+description: "Not every genuine need creates a duty in the person who happens to be nearby."
 tags:
   - boundaries
   - relationships
