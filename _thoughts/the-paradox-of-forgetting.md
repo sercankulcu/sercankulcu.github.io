@@ -1,11 +1,11 @@
 ---
-title: 'Forgetting Is Part of Remembering'
+title: 'A Useful Memory Is Not a Perfect Archive'
 date: 2011-04-05
 description: "Forgetting is not only loss; it can also be part of how memory protects, rearranges, and heals."
 tags:
   - memory
-  - philosophy
-  - reflection
+  - forgetting
+  - healing
 ---
 
 We usually describe forgetting as a defect.

@@ -22,3 +22,11 @@ I closed some files and deleted others.
 One small program stayed open a little longer.
 
 The code was no longer useful. That was not why I kept looking at it. For a few minutes, an old folder had become a room, and someone I used to be was still sitting there.
+
+Old folders are dangerous because they pretend to be storage. Really, they are time machines with bad interfaces.
+
+You open one file for practical reasons and suddenly meet an earlier self: less skilled, more certain in odd places, worried about problems that no longer exist. It is easy to laugh at him. It is kinder to remember that he carried you this far.
+
+That small program stayed open because it was not only code.
+
+It was proof that learning leaves artifacts before it becomes confidence.

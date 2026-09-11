@@ -1,11 +1,11 @@
 ---
 title: 'A Good Life Is Not a Pleasant One'
 date: 2011-04-06
-description: "A good life is not built by avoiding bitterness, but by learning what each bitter or sweet feeling is attached to."
+description: "The emotional label is not the verdict — pain is not always a signal to leave, and pleasure is not always a reason to stay."
 tags:
-  - life
   - emotion
-  - reflection
+  - pleasure-pain
+  - discernment
 ---
 
 For a long time, I treated happiness as a sorting problem.

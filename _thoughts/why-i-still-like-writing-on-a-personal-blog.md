@@ -1,11 +1,11 @@
 ---
 title: 'A Personal Blog Lets Ideas Stay'
 date: 2026-08-05
-description: "A personal blog gives thoughts a stable address and lets old ideas remain available for return."
+description: "A personal blog does not need to prove every thought was important — only to let thoughts stay long enough for their importance to change."
 tags:
   - blogging
   - writing
-  - reflection
+  - permanence
 ---
 
 Writing on the internet now feels increasingly temporary. Most platforms are built around movement: a post appears, receives attention for a short time, and is pushed downward by newer material. The system rewards arrival more than permanence.

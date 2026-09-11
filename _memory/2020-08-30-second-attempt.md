@@ -57,3 +57,11 @@ Then the engine.
 The car was bad in several perfectly measurable ways.
 
 It was also fun in a way no measurement could explain.
+
+Second attempts are quieter than first attempts. The first one has drama. The second one has information.
+
+You return knowing where you failed, which makes hope less innocent but more useful. There is less romance in trying again, and maybe more dignity.
+
+The second attempt rarely feels like a new beginning.
+
+It feels like beginning with evidence.

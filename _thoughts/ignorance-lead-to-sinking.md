@@ -4,8 +4,8 @@ date: 2018-11-28
 description: "Avoidance may feel like safety, but ignored problems often grow heavier while we look away."
 tags:
   - procrastination
-  - work
-  - reflection
+  - avoidance
+  - opportunity-cost
 ---
 
 Some problems become worse because of what they are.

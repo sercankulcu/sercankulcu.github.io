@@ -1,11 +1,11 @@
 ---
 title: 'You Cannot Make Someone Happy'
 date: 2009-10-06
-description: "We can support another person, but we cannot choose happiness on their behalf."
+description: "Trying too hard to make someone happy can quietly become another demand on them."
 tags:
   - relationships
   - happiness
-  - reflection
+  - care
 ---
 
 There is a particular kind of frustration in trying to improve someone's mood and discovering that nothing works.

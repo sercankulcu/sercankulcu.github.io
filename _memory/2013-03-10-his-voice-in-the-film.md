@@ -32,3 +32,11 @@ What remained was smaller.
 A father on a screen began talking.
 
 For a moment, mine answered.
+
+A familiar voice inside a film can disturb the boundary between fiction and life. The screen is doing one thing, memory another. Suddenly the story has an extra layer the director did not put there.
+
+Voices are especially good at this. A face can be forgotten slowly, but a voice returns with frightening precision.
+
+For a moment, the film is no longer only a film.
+
+Someone from outside it has entered the room.

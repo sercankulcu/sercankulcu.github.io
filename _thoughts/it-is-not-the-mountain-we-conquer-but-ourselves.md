@@ -1,11 +1,11 @@
 ---
-title: 'Support Should Not Replace Judgment'
+title: 'We Need to Know Whose Hands Are on the Controls'
 date: 2011-04-03
 description: "Support can help us climb, but it should not replace judgment, ownership, or the work only we can do."
 tags:
   - independence
   - judgment
-  - reflection
+  - decision-making
 ---
 
 We often ask other people what we should do when the decision feels important enough.

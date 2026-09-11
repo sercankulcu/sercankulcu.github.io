@@ -44,3 +44,11 @@ Perhaps age had reduced my tolerance for ceremony. Perhaps the program had genui
 I only wanted Messenger.
 
 Messenger wanted a relationship.
+
+It is strange how a tool can carry a whole period of life. Messenger was not only software. It was the sound of someone becoming available, the small green sign of possibility, the feeling that a conversation could begin without ceremony.
+
+Wanting Messenger was probably not only wanting Messenger.
+
+It was wanting the world in which Messenger mattered.
+
+A world where presence could be reduced to a status icon, and somehow that felt enough.

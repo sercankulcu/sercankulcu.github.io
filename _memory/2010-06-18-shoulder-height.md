@@ -28,3 +28,11 @@ I trusted both.
 The smaller one was the wall that remained.
 
 The larger one was the wall we had to climb.
+
+There are measurements no official document records. Height on a wall, a hand against a shoulder, the sudden realization that someone has grown or that you have stopped noticing time accurately.
+
+Shoulder height sounds small, but the body understands such comparisons immediately. They are intimate because they do not require explanation.
+
+A number would have been cleaner.
+
+The shoulder remembered better.

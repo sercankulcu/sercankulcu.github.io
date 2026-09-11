@@ -55,6 +55,26 @@ Doctor: nose.
 
 Me: ears.
 
+There was a strange comedy in being both corrected and confirmed at the same time. My ears were, apparently, guilty. My nose was also a suspect. The doctor had a wider theory of the case, while I was emotionally committed to the simpler explanation.
+
+Patients often arrive with stories already written.
+
+This hurts.
+
+This fixed it last time.
+
+Please repeat the old solution.
+
+Doctors arrive with systems.
+
+Everything is connected.
+
+The body has accomplices.
+
+The obvious symptom may not be the first cause.
+
+Both positions are reasonable. Both can also be annoying.
+
 Eventually he cleaned them.
 
 Then he asked:
@@ -84,3 +104,5 @@ He had discovered another one.
 My problem disappeared.
 
 His remained.
+
+And somewhere between medicine and comedy, we both left with evidence that our version of the story had been correct.

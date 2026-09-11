@@ -1,11 +1,11 @@
 ---
 title: 'Recognizing a Power Game Is Not the Same as Playing It'
 date: 2017-02-12
-description: "Recognizing power games can be useful, but awareness should not become admiration for manipulation."
+description: "A map of manipulation is useful even if you have no intention of becoming a manipulator."
 tags:
   - power
-  - status
-  - reflection
+  - manipulation
+  - social-awareness
 ---
 
 Some books become dangerous when we read description as instruction.

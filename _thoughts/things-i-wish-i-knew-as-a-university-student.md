@@ -1,11 +1,11 @@
 ---
-title: 'University Teaches More Than the Syllabus'
+title: 'What Kind of Learner Did You Become?'
 date: 2026-04-18
-description: "University teaches more than the syllabus, especially when students learn how to learn, ask, fail, and continue."
+description: "Grades measure a narrow slice of education — the durable part may not be knowledge at all."
 tags:
   - education
-  - students
-  - reflection
+  - learning
+  - university
 ---
 
 University feels long while you are inside it and surprisingly short afterward. That difference in perspective changes what seems important.

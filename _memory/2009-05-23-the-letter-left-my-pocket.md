@@ -32,3 +32,11 @@ Once the letter left my pocket, that argument stopped.
 Nothing had been solved.
 
 But one question had finally gone quiet.
+
+A letter leaving a pocket feels more serious than a message being sent. Paper has weight. It can be folded badly, touched too often, damaged by nervous hands.
+
+Digital words disappear into a system. A letter crosses a small physical distance. It makes the sender visible.
+
+That is probably why the moment stayed.
+
+Once the letter left my pocket, the thought was no longer only mine.

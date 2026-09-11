@@ -4,8 +4,8 @@ date: 2019-12-16
 description: "Small actions rarely feel important while they happen, but they quietly build the shape of a life."
 tags:
   - habits
-  - life
-  - reflection
+  - compounding
+  - daily-practice
 ---
 
 Most days do not announce that they are shaping us.

@@ -3,8 +3,8 @@ title: 'The Journey Is Not the Waiting Room'
 date: 2024-01-21
 description: "A destination can justify effort, but it cannot justify treating the present as disposable."
 tags:
-  - life
-  - reflection
+  - deferred-living
+  - presence
   - time
 ---
 

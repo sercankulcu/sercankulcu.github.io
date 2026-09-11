@@ -35,3 +35,13 @@ You remain the same person while your official importance changes from room to r
 The degree did not become meaningless.
 
 It had simply reached a place where nobody was using that field.
+
+Forms have a strange power to decide which parts of us are official. If there is no box for something, the institution behaves as if that part of life is decorative.
+
+But people do not live in relevant fields. They live in interruptions, side stories, awkward explanations, and details that do not fit the template.
+
+Maybe that is why the phrase stayed with me.
+
+Not a relevant field.
+
+A bureaucratic sentence with the emotional range of a locked door.

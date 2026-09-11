@@ -3,9 +3,9 @@ title: 'Patience Is Not Waiting'
 date: 2015-10-06
 description: "Patience is not passive waiting; it is repeated construction when visible progress is still small."
 tags:
-  - life
   - patience
-  - work
+  - persistence
+  - time
 ---
 
 "Rome was not built in a day" is so familiar that it is easy to agree with and almost useless to remember.

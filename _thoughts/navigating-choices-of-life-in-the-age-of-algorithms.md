@@ -4,8 +4,8 @@ date: 2019-01-11
 description: "Convenience can quietly narrow a life when algorithms make choice feel easier than attention."
 tags:
   - technology
-  - choice
-  - reflection
+  - algorithmic-choice
+  - attention
 ---
 
 A recommendation that saves me ten minutes seems harmless. Most of the time, it is. The interesting question begins when thousands of small conveniences start choosing the shape of a life.

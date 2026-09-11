@@ -27,3 +27,11 @@ That is probably the only part of my old theory I still trust.
 Not the invincible stomach.
 
 The hand.
+
+The older I get, the more I distrust the heroic version of memory. We like to pretend that important things announce themselves clearly. In reality, memory often keeps the ridiculous detail: the lemon, the shell, the small ceremony of someone handing you food in the street.
+
+Maybe that is why the mussel stayed. It was not about appetite. It was about being chosen for one small second, about receiving something ordinary as if it had briefly become personal.
+
+A hundred mussels would have been only a number.
+
+One handed with care became a memory.
