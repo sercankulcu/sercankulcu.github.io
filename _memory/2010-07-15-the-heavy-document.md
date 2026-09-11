@@ -1,12 +1,12 @@
 ---
 title: "The Heavy Document"
 date: 2010-07-15
+description: "A short answer looks suspiciously easy; a long answer arrives carrying evidence of labor — on the strange punishment of clarity and the incentive to produce quantity instead."
 tags:
    - work
    - documentation
    - engineering
    - productivity
-   - thoughts
 ---
 
 A document arrived, and before anyone understood what was inside it, its size had already made an impression.
@@ -39,6 +39,4 @@ The heavier file is not always the heavier thinking.
 
 ## Near The Heavy Document
 
-The useful part is not a lesson so much as a texture. The smallness is not a weakness. It is the reason the memory can remain exact.
-
-The smallness is not a weakness. It is the reason the memory can remain exact. A larger story would probably make it less honest.
+The useful part is not a lesson so much as a texture. The smallness is not a weakness. It is the reason the memory can remain exact. A larger story would probably make it less honest.

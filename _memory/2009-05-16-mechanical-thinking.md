@@ -1,12 +1,12 @@
 ---
 title: "Mechanical Thinking"
 date: 2009-05-16
+description: "Language can improve the dignity of a bad habit without changing it — mechanical thinking sounds almost professional until the road changes and the machine keeps running."
 tags:
    - thinking
    - habits
    - language
    - work
-   - thoughts
 ---
 
 I became interested in the phrase “mechanical thinking” because it gave a respectable name to something much simpler.

@@ -1,12 +1,12 @@
 ---
 title: "Facebook, Winamp, Five Thousand"
 date: 2013-02-01
+description: "The requirements were impressively modest: open Facebook, play music — somehow these two needs had evolved into a five-thousand-lira budget discussion about processor specifications."
 tags:
    - technology
    - shopping
    - consumerism
    - laptops
-   - thoughts
 ---
 
 We were looking for a laptop, and the requirements were impressively modest.

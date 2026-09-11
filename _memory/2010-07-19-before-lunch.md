@@ -1,12 +1,12 @@
 ---
 title: "Before Lunch"
 date: 2010-07-19
+description: "Military paperwork, phone, internet, water, electricity — all before lunch despite the meter detour; adult life contains victories too small for a ceremony but too difficult to ignore."
 tags:
    - ankara
    - bureaucracy
    - military-service
    - moving
-   - memories
 ---
 
 I left home at about half past eight with several tasks that normally had enough power to destroy an entire day. There was military paperwork, a telephone and internet account to close, water to cancel, electricity to cancel, and a friend to reach afterward.

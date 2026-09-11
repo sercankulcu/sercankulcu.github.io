@@ -1,12 +1,12 @@
 ---
 title: "The Chocolates"
 date: 2015-09-01
+description: "He bought chocolates to welcome himself to the new job — nobody came while he was there, but in his absence over the weekend the problem solved itself entirely."
 tags:
    - academia
    - work
-   - memories
-   - people
    - absurdity
+   - office-life
 ---
 
 I had just been appointed.

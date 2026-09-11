@@ -1,10 +1,10 @@
 ---
 title: "The Cafeteria"
 date: 2011-07-03
+description: "The intern was surprised at eating in the cafeteria 'like the workers' — and the simple answer was: yes, like workers; we were at work."
 tags:
    - work
    - engineering
-   - memories
    - class
    - humor
 ---

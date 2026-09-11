@@ -1,12 +1,11 @@
 ---
 title: "The First Bitter Cup"
 date: 2012-06-25
+description: "The first cup of tea without sugar tasted wrong — weeks later, someone gave him sugar by mistake and it was too sweet, which was how he knew normal had quietly moved."
 tags:
-   - memories
    - tea
    - habits
    - daily-life
-   - life
 ---
 
 The first cup of tea without sugar tasted wrong.

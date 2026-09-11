@@ -1,10 +1,10 @@
 ---
 title: "Leave the CD In"
 date: 2011-10-07
+description: "One CD stayed in the car for a month — almost everyone who got in recognized something and said leave it, which made the decision easy: do not take the CD out."
 tags:
    - music
    - driving
-   - memories
    - friends
    - 2010s
 ---

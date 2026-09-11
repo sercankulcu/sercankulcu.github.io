@@ -1,12 +1,12 @@
 ---
 title: "Seven Functions"
 date: 2011-04-21
+description: "An audio library with seven functions — no new philosophy, no objects to create other objects, just a tool that absorbed its own complexity and left him to solve his actual problem."
 tags:
    - software
    - programming
    - simplicity
    - engineering
-   - thoughts
 ---
 
 I opened the documentation for an audio library expecting the usual ceremony.

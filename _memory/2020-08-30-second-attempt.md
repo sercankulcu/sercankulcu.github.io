@@ -1,11 +1,12 @@
 ---
 title: "Second Attempt"
 date: 2020-08-30
+description: "The car needed two or three attempts to start most mornings — that required participation was exactly why it never disappeared into the background the way reliable machines do."
 tags:
    - cars
    - humor
-   - memories
    - imperfection
+   - attachment
 ---
 
 The car did not always start on the first attempt.

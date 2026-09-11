@@ -1,12 +1,12 @@
 ---
 title: "Not a Relevant Field"
 date: 2010-08-09
+description: "The same degree underlined at work became invisible in another institution — every place brings its own measuring tape, and you remain the same person while your official importance changes."
 tags:
    - education
    - work
    - military-service
    - career
-   - memories
    - identity
 ---
 
@@ -48,6 +48,4 @@ A bureaucratic sentence with the emotional range of a locked door.
 
 ## After Not a Relevant Field
 
-The scene becomes clearer to me now because it stayed small. The machine gives the memory a timestamp, but the human confusion around it is still current.
-
-The machine gives the memory a timestamp, but the human confusion around it is still current. So I leave it there: not polished smooth, just visible enough.
+The scene becomes clearer to me now because it stayed small. The machine gives the memory a timestamp, but the human confusion around it is still current. So I leave it there: not polished smooth, just visible enough.

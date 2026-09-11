@@ -1,10 +1,10 @@
 ---
 title: "I Was Already Going Somewhere Else"
 date: 2010-05-20
+description: "The sentence was technically true — which was what made it effective: a friend moved pieces while he did not know a game had started, using one accurate word to clear the room."
 tags:
    - friendship
    - relationships
-   - memories
    - betrayal
    - humor
 ---

@@ -1,12 +1,12 @@
 ---
 title: "The Blisters"
 date: 2012-06-28
+description: "Fitness gloves looked ridiculous until his hands developed blisters — pain is especially persuasive; the body has little interest in maintaining an opinion for the sake of consistency."
 tags:
    - fitness
    - learning
    - habits
    - humor
-   - thoughts
 ---
 
 Fitness gloves looked ridiculous to me at first. They seemed like the gym version of wearing sunglasses at night: an accessory designed to make an ordinary activity look more serious than it was.
@@ -39,6 +39,4 @@ My feet kept better records.
 
 ## Around The Blisters
 
-Looking back, I trust the ordinary detail more than the tidy conclusion. The scene keeps one clear fragment and lets the rest stay blurred.
-
-The scene keeps one clear fragment and lets the rest stay blurred. The memory does not ask to be important; it only asks not to be erased.
+Looking back, I trust the ordinary detail more than the tidy conclusion. The scene keeps one clear fragment and lets the rest stay blurred. The memory does not ask to be important; it only asks not to be erased.

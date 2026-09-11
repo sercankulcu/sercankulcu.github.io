@@ -1,11 +1,11 @@
 ---
 title: "Still Running"
 date: 2009-11-13
+description: "The first time he drove home without thinking about how not to stall, the car stopped feeling like a machine he was negotiating with."
 tags:
    - cars
    - driving
-   - youth
-   - memories
+   - learning
    - humor
 ---
 

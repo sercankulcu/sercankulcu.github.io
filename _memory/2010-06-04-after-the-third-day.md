@@ -1,12 +1,11 @@
 ---
 title: "After the Third Day"
 date: 2010-06-04
+description: "When the food his mother had prepared ran out, his father cooked; when dinner ended, his father gave him the dishes — family life is work kept moving between people without anyone writing a plan."
 tags:
    - family
    - father
    - home
-   - everyday-life
-   - memories
 ---
 
 When my mother was away, my father did not begin cooking immediately.

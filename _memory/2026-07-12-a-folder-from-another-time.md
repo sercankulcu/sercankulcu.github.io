@@ -1,10 +1,12 @@
 ---
 title: "A Folder from Another Time"
 date: 2026-07-12
+description: "He opened an old folder and found code written years earlier — reading it he could almost see the person who had thought those choices were reasonable, still carrying him this far."
 tags:
-  - life
-  - memories
   - technology
+  - nostalgia
+  - coding
+  - time
 ---
 
 I opened an old folder and found a small piece of code I had written many years earlier. The file had not aged visibly. Its letters were as sharp as anything created that morning, and for a second that made the date beside it look like a mistake.

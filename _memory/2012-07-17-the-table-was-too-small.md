@@ -1,12 +1,12 @@
 ---
 title: "The Table Was Too Small"
 date: 2012-07-17
+description: "The game of okey needed a large table, tea in the familiar glass, and enough space to forget the table existed — the modern coffee shop had only one of those."
 tags:
    - okey
    - coffeehouses
    - culture
    - humor
-   - thoughts
 ---
 
 I had a simple theory about okey: the game needed more than tiles and four players.

@@ -1,11 +1,11 @@
 ---
 title: "One Word Too Many"
 date: 2010-07-03
+description: "Remove two words and the same entry moves from punishable to permissible — once people discover that moderation depends on wording rather than purpose, they become small lawyers."
 tags:
    - internet
    - eksisozluk
    - rules
-   - memories
    - online-communities
 ---
 

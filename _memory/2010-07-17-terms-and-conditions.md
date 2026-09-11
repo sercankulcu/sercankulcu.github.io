@@ -1,12 +1,12 @@
 ---
 title: "Terms and Conditions"
 date: 2010-07-17
+description: "The laptop had stopped being portable, stopped being stereo, and stopped using its own graphics driver — but it still worked, which meant they had moved from user-device to agreement."
 tags:
    - computers
    - laptops
    - troubleshooting
    - humor
-   - memories
 ---
 
 By 2010, my laptop no longer behaved like a machine that could simply be switched on and used. It had conditions.

@@ -1,12 +1,12 @@
 ---
 title: "The House Before Memory"
 date: 2010-04-20
+description: "Two years lived before memory formed — the photograph proved he had been there, other people's stories proved what he was like, and neither helped him remember any of it."
 tags:
    - childhood
    - memory
    - places
    - identity
-   - reflections
 ---
 
 I found the photograph in an old family album. A small child was standing in front of a building, and the child was me. I knew this because everyone said so, not because anything in the picture felt familiar.

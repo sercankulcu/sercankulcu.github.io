@@ -1,12 +1,12 @@
 ---
 title: "The Letter Left My Pocket"
 date: 2009-05-23
+description: "Carrying a resignation letter without using it was heavier than handing it in — the burden was the daily argument of deciding again, not the decision itself."
 tags:
    - work
    - resignation
    - military-service
    - uncertainty
-   - memories
 ---
 
 For a long time, the resignation letter stayed with me without becoming a resignation.

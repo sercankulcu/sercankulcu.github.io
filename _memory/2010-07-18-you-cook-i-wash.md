@@ -1,12 +1,12 @@
 ---
 title: "You Cook, I Wash"
 date: 2010-07-18
+description: "You cook, I wash — a division of labor where weakness was reframed as policy and the household's inequalities were redesignated as specialization."
 tags:
    - home
    - cooking
    - humor
    - relationships
-   - memories
 ---
 
 I had discovered a domestic system.
@@ -93,6 +93,4 @@ For one household system, that was enough architecture.
 
 ## Inside You Cook, I Wash
 
-Nothing here needs to be enlarged; it only needs to be held still for a second. A house is built from these small transfers of responsibility: someone cooks, someone clears, someone remembers where the missing thing belongs.
-
-A house is built from these small transfers of responsibility: someone cooks, someone clears, someone remembers where the missing thing belongs. A larger story would probably make it less honest.
+Nothing here needs to be enlarged; it only needs to be held still for a second. A house is built from these small transfers of responsibility: someone cooks, someone clears, someone remembers where the missing thing belongs. A larger story would probably make it less honest.

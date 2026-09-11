@@ -1,12 +1,12 @@
 ---
 title: "For Ninety Minutes"
 date: 2010-03-08
+description: "Standing quietly in a home supporters' section was not an acceptable strategy — for ninety minutes, the question of who they supported received a very practical answer."
 tags:
    - eskisehir
    - football
    - work-trip
-   - friends
-   - memories
+   - belonging
 ---
 
 We were in Eskişehir for work when our manager produced football tickets and announced what we were doing that evening. There had been no discussion. He had already bought them, so the plan arrived complete.
@@ -33,6 +33,4 @@ But for ninety minutes, in that part of Eskişehir, the question of who we suppo
 
 ## Near For Ninety Minutes
 
-The useful part is not a lesson so much as a texture. The scene keeps one clear fragment and lets the rest stay blurred.
-
-The scene keeps one clear fragment and lets the rest stay blurred. I think the truth of the memory lives exactly in that uneven size.
+The useful part is not a lesson so much as a texture. The scene keeps one clear fragment and lets the rest stay blurred. I think the truth of the memory lives exactly in that uneven size.

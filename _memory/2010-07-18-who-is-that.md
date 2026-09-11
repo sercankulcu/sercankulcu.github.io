@@ -1,12 +1,12 @@
 ---
 title: "Who Is That?"
 date: 2010-07-18
+description: "He asked who the young woman on screen was — his father answered immediately, and for a few seconds the direction of knowledge had reversed between them."
 tags:
    - family
    - father
    - television
    - music
-   - memories
 ---
 
 My father and I were watching television when an old clip of Sezen Aksu appeared. She was young enough in the footage that I did not recognize her immediately, so I asked the room, “Who is that?”
@@ -31,6 +31,4 @@ For a few seconds, however, the direction of knowledge had reversed. I asked the
 
 ## Beside Who Is That?
 
-I like the memory most where it refuses to explain itself completely. The family part of the scene is not sentimental to me; it is practical, almost procedural, and that makes it more tender.
-
-The family part of the scene is not sentimental to me; it is practical, almost procedural, and that makes it more tender. That small resistance to disappearance is enough.
+I like the memory most where it refuses to explain itself completely. The family part of the scene is not sentimental to me; it is practical, almost procedural, and that makes it more tender. That small resistance to disappearance is enough.

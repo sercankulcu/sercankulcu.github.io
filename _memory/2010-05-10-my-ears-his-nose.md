@@ -1,12 +1,11 @@
 ---
 title: "My Ears, His Nose"
 date: 2010-05-10
+description: "He came with an ear problem; the doctor had a wider theory involving the nose — and when the ears were finally cleaned and declared perfect, the doctor said: 'Wait. Do not run away.'"
 tags:
    - doctor
    - humor
-   - memories
    - communication
-   - everyday-life
 ---
 
 I went to the doctor because my ears felt blocked.

@@ -1,11 +1,11 @@
 ---
 title: "What Else Do You Want?"
 date: 2010-07-14
+description: "He imagined the shortest honest application: team player, flexible, analytical, I love you — because real cover letters had made him sound like a machine assembled from adjectives."
 tags:
    - engineering
    - career
    - job-search
-   - memories
    - humor
 ---
 

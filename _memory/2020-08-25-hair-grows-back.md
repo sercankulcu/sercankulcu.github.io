@@ -1,12 +1,12 @@
 ---
 title: "Hair Grows Back"
 date: 2020-08-25
+description: "His wife learned to cut his hair during the pandemic using him as training material — by August the result was reliable enough that paying someone else had become the stranger idea."
 tags:
    - pandemic
    - family
    - home
-   - memories
-   - everyday-life
+   - skills
 ---
 
 During the pandemic, my wife learned how to cut my hair, and the training material was me. The first attempts were not especially successful. I described the results at the time by saying she had repeatedly turned me into a monkey, which was unfair to monkeys but accurate enough about my confidence when I looked in the mirror.

@@ -1,11 +1,11 @@
 ---
 title: "The Eraser on a String"
 date: 2010-07-12
+description: "He walked toward the children playing on his first day of school — and was gently turned toward the correct classroom by his mother, which was how education began."
 tags:
    - childhood
    - school
    - education
-   - memories
    - growing-up
 ---
 

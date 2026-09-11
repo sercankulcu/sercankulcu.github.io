@@ -1,10 +1,10 @@
 ---
 title: "Four Places in a Row"
 date: 2012-07-07
+description: "His map of Eskişehir was not landmarks but a short row of neighboring doors: hotel, shop, soup place, pastry shop — and something sweet at the end."
 tags:
    - eskisehir
    - travel
-   - memories
    - city-life
    - food
 ---

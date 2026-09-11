@@ -1,8 +1,8 @@
 ---
 title: "A Name from the Stage"
 date: 2010-05-15
+description: "A nickname announced from the festival stage seemed for a moment to be his — then three days later, the name from the note sat down across from him at dinner."
 tags:
-   - memories
    - university
    - music
    - festivals
@@ -35,6 +35,4 @@ Real life occasionally produces the structure of a story and then refuses to pro
 
 ## Under A Name from the Stage
 
-The scene becomes clearer to me now because it stayed small. There is a young-person seriousness in the scene, the kind that treats a minor event as evidence for an entire future.
-
-There is a young-person seriousness in the scene, the kind that treats a minor event as evidence for an entire future. That small resistance to disappearance is enough.
+The scene becomes clearer to me now because it stayed small. There is a young-person seriousness in the scene, the kind that treats a minor event as evidence for an entire future. That small resistance to disappearance is enough.

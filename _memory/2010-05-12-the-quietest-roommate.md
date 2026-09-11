@@ -1,10 +1,10 @@
 ---
 title: "The Quietest Roommate"
 date: 2010-05-12
+description: "He named the cockroach, gave it the bathroom as its territory, and returned from a work trip genuinely relieved to find it again — the apartment was no longer completely empty."
 tags:
    - living-alone
    - humor
-   - memories
    - home
 ---
 

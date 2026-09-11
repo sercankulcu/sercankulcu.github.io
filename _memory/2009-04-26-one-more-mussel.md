@@ -1,11 +1,12 @@
 ---
 title: "One More Mussel"
 date: 2009-04-26
+description: "A hundred mussels would have been only a number — the one that stayed in memory was the one handed over with care."
 tags:
    - student-life
    - food
    - humor
-   - memories
+   - gesture
 ---
 
 During my student years, I had eaten enough questionable food to develop an unreasonable confidence in my stomach.

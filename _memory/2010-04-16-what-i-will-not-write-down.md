@@ -1,11 +1,11 @@
 ---
 title: "What I Will Not Write Down"
 date: 2010-04-16
+description: "The professional version of the man was easy to record — the evenings after work were not, and that omission has kept him more alive in memory than any archive could."
 tags:
    - work
    - friendship
    - coworkers
-   - memories
 ---
 
 On the day a coworker left, I tried to write down what I would remember about him.
@@ -44,6 +44,4 @@ It simply does not get to hear them.
 
 ## After What I Will Not Write Down
 
-I keep returning to the small practical detail, because that is where the feeling is stored. A minor detail can be more faithful than a grand summary.
-
-A minor detail can be more faithful than a grand summary. It remains as a modest proof that ordinary life was never as empty as it looked.
+I keep returning to the small practical detail, because that is where the feeling is stored. A minor detail can be more faithful than a grand summary. It remains as a modest proof that ordinary life was never as empty as it looked.

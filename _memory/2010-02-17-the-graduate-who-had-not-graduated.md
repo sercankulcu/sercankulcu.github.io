@@ -1,12 +1,12 @@
 ---
 title: "The Graduate Who Had Not Graduated"
 date: 2010-02-17
+description: "For two weeks he was a graduate in the past but not in the present — graduation is not one event: first you finish university, then the university finishes with you."
 tags:
    - university
    - graduation
    - bureaucracy
-   - memories
-   - life
+   - administration
 ---
 
 The document said that I had graduated on February 3. The university computer, however, did not appear to share this opinion.

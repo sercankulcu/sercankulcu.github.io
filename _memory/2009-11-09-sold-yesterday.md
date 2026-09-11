@@ -1,12 +1,12 @@
 ---
 title: "Sold Yesterday"
 date: 2009-11-09
+description: "Four cars sold the day before he arrived — coincidence only gets a face once you decide you want something, and timing becomes personal."
 tags:
    - coincidence
    - cars
    - youth
    - humor
-   - memories
 ---
 
 During one month, I found four used cars I genuinely wanted to see.
@@ -55,4 +55,4 @@ The universe, apparently, had a very short attention span.
 
 The day probably looked forgettable from outside, which makes its survival more interesting. The scene keeps one clear fragment and lets the rest stay blurred.
 
-A minor detail can be more faithful than a grand summary. The rest of the day may be gone, but this little arrangement still has edges.
+The rest of the day may be gone, but this little arrangement still has edges.

@@ -1,12 +1,11 @@
 ---
 title: "Who Were You Calling?"
 date: 2010-05-09
+description: "Two calls, both opening with 'Who are you?' — the man who placed the call asked the person who answered to identify themselves first, and neither of them learned anything useful."
 tags:
    - phone-calls
-   - everyday-life
    - humor
    - communication
-   - memories
 ---
 
 My phone rang, and I answered.
@@ -63,6 +62,4 @@ It is about whether someone still knows where they stand.
 
 ## Under Who Were You Calling?
 
-Nothing here needs to be enlarged; it only needs to be held still for a second. The emotional charge is in what remains unsolved: the message, the question, the phrase that kept echoing after the moment ended.
-
-The emotional charge is in what remains unsolved: the message, the question, the phrase that kept echoing after the moment ended. The memory does not ask to be important; it only asks not to be erased.
+Nothing here needs to be enlarged; it only needs to be held still for a second. The emotional charge is in what remains unsolved: the message, the question, the phrase that kept echoing after the moment ended. The memory does not ask to be important; it only asks not to be erased.

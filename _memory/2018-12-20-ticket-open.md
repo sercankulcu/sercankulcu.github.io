@@ -1,12 +1,12 @@
 ---
 title: "Ticket Open"
 date: 2018-12-20
+description: "The domain redirect should have taken minutes; by day four the original technical problem had disappeared from his mind and the ticket itself had become the project."
 tags:
    - internet
    - domains
    - customer-service
-   - web
-   - thoughts
+   - bureaucracy
 ---
 
 The task should have taken a few minutes. I wanted a domain name to point somewhere else. The site was ready, the destination was ready, and only the address needed to be told where to go.

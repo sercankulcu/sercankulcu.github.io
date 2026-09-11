@@ -1,12 +1,12 @@
 ---
 title: "Half an Hour to Understand the Room"
 date: 2009-07-26
+description: "The obvious differences in travel are easy because you expect them — the invisible rules everybody follows without knowing they are rules take about half an hour."
 tags:
    - montreal
    - travel
    - nightlife
    - culture
-   - memories
 ---
 
 We entered a large nightclub in Montreal and spent the first half hour trying to understand what kind of place we had entered.
@@ -29,6 +29,4 @@ Everything else took about half an hour.
 
 ## Under Half an Hour to Understand the Room
 
-The day probably looked forgettable from outside, which makes its survival more interesting. The place gives the memory its geometry: a corner, a route, a delay, the short distance between comfort and embarrassment.
-
-The place gives the memory its geometry: a corner, a route, a delay, the short distance between comfort and embarrassment. The rest of the day may be gone, but this little arrangement still has edges.
+The day probably looked forgettable from outside, which makes its survival more interesting. The place gives the memory its geometry: a corner, a route, a delay, the short distance between comfort and embarrassment. The rest of the day may be gone, but this little arrangement still has edges.

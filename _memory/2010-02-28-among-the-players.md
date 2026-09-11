@@ -1,12 +1,12 @@
 ---
 title: "Among the Players"
 date: 2010-02-28
+description: "A sibling's victory creates borrowed happiness — you did not earn it, yet the success enters the family like good weather through an open window."
 tags:
    - family
    - brother
    - sports
    - eskisehir
-   - memories
 ---
 
 My brother's university team won an American football game in Eskişehir, and the celebration lasted well beyond the final whistle. I was not certain enough about the exact score to record it like a journalist. What mattered to me was that his team had won and that he was among the players.

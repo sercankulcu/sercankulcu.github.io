@@ -1,12 +1,12 @@
 ---
 title: "Fifteen Dollars"
 date: 2009-07-23
+description: "The experience not bought remained perfect because reality never had the chance to disappoint — fifteen dollars and the price of a moment kept hypothetical."
 tags:
    - montreal
    - travel
    - nightlife
    - money
-   - memories
 ---
 
 The night had a price list.

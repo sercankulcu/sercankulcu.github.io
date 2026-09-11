@@ -1,12 +1,11 @@
 ---
 title: "No New Message"
 date: 2010-07-14
+description: "The computer was working perfectly — the only thing it could not produce was a message from one person, and there is no progress bar for a person's silence."
 tags:
-   - memories
    - relationships
    - computers
    - loneliness
-   - life
 ---
 
 The computer was working perfectly.

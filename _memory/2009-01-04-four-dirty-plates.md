@@ -1,12 +1,12 @@
 ---
 title: "Four Dirty Plates"
 date: 2009-01-04
+description: "Four dirty plates, four names, a complete group photo without a single face — and the lesson that everyone who mocked early social media was already inside it."
 tags:
    - facebook
-   - internet
    - social-media
    - humor
-   - memories
+   - identity
 ---
 
 Dinner was over, and four dirty plates remained on the table. Under normal circumstances, this would have been the least interesting moment of the evening. Instead, someone took out a phone and told everyone not to move anything.

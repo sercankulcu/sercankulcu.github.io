@@ -1,12 +1,11 @@
 ---
 title: "No Photograph"
 date: 2010-07-09
+description: "He had the diploma — what his mother wanted was a photograph proving she had been there to see it, and graduation ceremonies belong as much to families as to students."
 tags:
    - university
    - graduation
    - family
-   - memories
-   - life
 ---
 
 My mother wanted one photograph: me in a graduation gown. That should have been easy because I had finished university. I had passed the courses, completed the paperwork, and received the document that said I was a graduate.

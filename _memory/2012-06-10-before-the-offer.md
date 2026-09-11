@@ -1,12 +1,11 @@
 ---
 title: "Before the Offer"
 date: 2012-06-10
+description: "He left the interview calculating how long he would need to resign properly — nobody had offered him anything yet, which became important when the silence stretched into months."
 tags:
    - career
    - interviews
    - work
-   - memories
-   - life
 ---
 
 The interview went so well that I left the building thinking about how I would resign from my current job.

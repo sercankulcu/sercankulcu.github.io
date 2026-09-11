@@ -1,10 +1,10 @@
 ---
 title: "The Door Stayed Closed"
 date: 2011-10-30
+description: "Three days, bread and cigarettes through the doorman, two and a half seasons of television — by the third evening the door was working perfectly but no longer required."
 tags:
    - television
    - home
-   - memories
    - solitude
    - 2010s
 ---
