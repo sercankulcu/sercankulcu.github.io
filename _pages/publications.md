@@ -114,7 +114,7 @@ This study proposes a lightweight radar-image framework that combines HSV-based 
 
 **How to cite:** Külcü, S. (2026). Radar image-based object detection and tracking for autonomous surface vehicles. *Turkish Journal of Maritime and Marine Sciences, 12*(1), 35–47.
 
-[Paper](https://doi.org/10.52998/trjmms.1743670) · [Presentation](/files/presentations/Radar_Image_Based_Object_Presentation.pdf)
+[Paper](https://doi.org/10.52998/trjmms.1743670) · [Presentation](/files/presentations/Radar_Image_Based_Object_Detection_Presentation.pdf)
 
 </details>
 
@@ -196,7 +196,7 @@ This study combines EfficientNet-B0, DenseNet201, and ResNet50 with an MLP meta-
 
 **How to cite:** Külcü, S. (2025). Meta-Learner Ensemble Model for Brain Tumor Classification. In *Proceedings of the 7th International Conference on Engineering and Applied Natural Sciences (ICEANS 2025)*, pp. 127–133. All Sciences Academy.
 
-[Paper](https://www.researchgate.net/publication/397081245_Meta_Learner_Ensemble_Model_for_Brain_Tumor_Classification) · [Presentation](/files/presentations/Meta-Learner_Ensemble_Model_Presentation.pdf)
+[Paper](https://www.researchgate.net/publication/397081245_Meta_Learner_Ensemble_Model_for_Brain_Tumor_Classification) · [Presentation](/files/presentations/Meta_Learner_Ensemble_Model_Presentation.pdf)
 
 </details>
 
