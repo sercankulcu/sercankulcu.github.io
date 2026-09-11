@@ -13,3 +13,21 @@ Google announced Google Compute Engine in preview at Google I/O in June 2012 and
 The technical differentiation Google emphasized was its networking infrastructure. Compute Engine VMs connected to Google's private global fiber network, which linked Google's data centers in the US, Europe, and Asia with lower latency and higher bandwidth than public internet routing. Persistent disk throughput scaled with the size of the disk (up to 720 MB/s per disk in later generations) rather than being a fixed per-VM allocation as Amazon EBS was at the time. Google's data center locations were fewer than Amazon's in 2012 (US-central-1 and US-east-1 initially, with Europe added in 2013) but Google emphasized SLA uptime and networking quality over geographic breadth.
 
 Compute Engine's December 2012 expansion to general availability put Google directly in the IaaS (Infrastructure as a Service) market alongside Amazon Web Services (the 2012 market leader with AWS EC2, S3, RDS, and many supporting services) and Microsoft Azure (launched commercially in February 2010). Google Cloud Platform's cloud storage and BigQuery had already been available, but Compute Engine's general availability allowed enterprises to migrate arbitrary virtual machine workloads — a broader footprint than App Engine's managed platform could accommodate. Google's early cloud revenue was a fraction of Amazon's; AWS reported $684 million in Q4 2014 revenue, while Google Cloud (combined) reported its first annual revenue of approximately $500 million in 2015.
+
+## Why This Moment Mattered
+
+The topic is useful because it captures a broader shift in how people build, use, and understand technology. In the short term, it gave users and developers something concrete to react to. In the longer term, it became part of a larger pattern in cloud, software, and distributed systems: hardware, software, services, and user expectations were all changing at the same time.
+
+A good technology milestone usually matters for more than one audience. Enthusiasts notice the specifications or the interface first. Developers ask what new assumptions they can make. Companies look at cost, compatibility, and strategy. Ordinary users mostly notice whether the result makes their devices faster, easier, safer, or more useful.
+
+## The Broader Context
+
+This period of computing was shaped by several overlapping transitions: faster networks, more capable mobile devices, cloud infrastructure, stronger security expectations, and software that changed continuously after release. Against that background, the milestone was not an isolated headline. It was one piece of a much larger movement away from static products and toward connected platforms.
+
+That context helps explain why some announcements that looked modest at the time became important later. A browser feature, processor change, development tool, or platform policy can alter what future products are able to assume. Once enough users, developers, and vendors adapt, the new assumption becomes normal.
+
+## Looking Back
+
+The value of revisiting the moment is that it shows how technology history is built from many medium-sized steps. Some are celebrated immediately, while others become meaningful only after the ecosystem catches up.
+
+Looking back also keeps the story balanced. Progress usually brings tradeoffs: performance against power use, openness against consistency, convenience against control, and speed against stability. The most interesting milestones are the ones that reveal those tradeoffs clearly. This one belongs in that category because it helps explain not just what changed, but why the direction of computing kept moving the way it did.
