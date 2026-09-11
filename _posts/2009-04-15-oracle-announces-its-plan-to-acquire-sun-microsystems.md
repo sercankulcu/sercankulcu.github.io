@@ -8,8 +8,24 @@ tags:
   - history
 ---
 
-Oracle announced in April 2009 that it would acquire Sun Microsystems for about $7.4 billion. Sun owned technologies that sat at the center of enterprise computing, including Java, Solaris, SPARC processors, MySQL, and a large collection of open-source projects.
+Oracle announced its plan to acquire Sun Microsystems in 2009, and the news immediately felt larger than a normal enterprise acquisition. Sun had shaped major parts of computing culture: Java, Solaris, SPARC, NFS, workstations, servers, and important open-source projects all carried Sun's influence.
 
-The acquisition immediately raised questions because Oracle was primarily known for databases and enterprise software. MySQL was a widely used open-source database and a competitor to Oracle products in some markets. Java was even more important: millions of applications depended on the Java language, virtual machine, and class libraries.
+Oracle was known for databases and enterprise software. Bringing Sun into Oracle's orbit raised questions about the future of Java, MySQL, OpenOffice.org, Solaris, and the hardware business.
 
-After the deal closed in 2010, Oracle became the steward of both Java and MySQL. The acquisition showed how ownership can matter even when software is standardized or open source. Governance, licensing decisions, release schedules, and investment priorities can influence an ecosystem as much as the code itself.
+## Why Sun Mattered
+
+Sun's slogan, 'the network is the computer,' captured a worldview that became increasingly accurate. The company helped define networked workstations, server infrastructure, and software platforms designed for distributed systems. Java in particular became one of the most important programming environments in enterprise computing.
+
+Sun also had a complicated but meaningful relationship with open source. Projects connected to Sun were widely used by developers, universities, and companies, even when their governance and business models were debated.
+
+## Why Oracle Wanted It
+
+For Oracle, Sun offered control over hardware, operating systems, Java, and database-adjacent infrastructure. The acquisition supported a more vertically integrated enterprise strategy: sell customers not only database software, but also systems tuned to run it.
+
+The Java angle was especially important. Java was everywhere in enterprise software, and stewardship of the platform carried enormous influence.
+
+## The Aftermath In Perspective
+
+The announcement marked the end of Sun as an independent force and the beginning of a new phase for many technologies associated with it. Some communities adjusted, some forked projects, and some moved toward alternatives.
+
+Looking back, the deal is a reminder that technology history is also institutional history. Languages, databases, operating systems, and developer communities do not float separately from the companies that fund and govern them. Oracle's plan to acquire Sun changed not only a balance sheet, but the future path of several important ecosystems.

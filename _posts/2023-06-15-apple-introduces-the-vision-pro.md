@@ -13,3 +13,21 @@ Apple introduced Vision Pro at WWDC on June 5, 2023 as a “spatial computer” 
 The interface used no handheld controllers. A user looked at a button to select it (eye tracking via low-power IR illuminators and dedicated IR cameras), pinched their thumb and index finger to click it, and scrolled by flicking their wrist. Voice input via Siri handled text. EyeSight — an outward-facing OLED display showing a rendering of the wearer's eyes to people nearby — attempted to preserve social awareness by signaling when the user was immersed in a VR environment vs. in passthrough (seeing the real room through cameras). visionOS, the new operating system, organized applications as floating windows positioned in the user's physical space and anchored to specific physical locations within a room's coordinate system.
 
 At $3,499 with a battery pack (one to two hours of use) worn separately via a braided cable, Vision Pro targeted professional creative and developer use rather than mass-market consumers. Apple sold an estimated 200,000–400,000 units in 2024, significantly below initial analyst projections of 800,000. Apple positioned Vision Pro as the beginning of a product category rather than a finished product, drawing an analogy to the original iPhone in 2007 — a device that demonstrated a platform before the software ecosystem had developed to justify its cost.
+
+## Why This Moment Mattered
+
+The event is useful to read as a platform signal, not only as a product announcement. In the short term, it gave users and developers something concrete to react to. In the longer term, it became part of a larger pattern in hardware, software, technology-history: hardware, software, services, and user expectations were all changing at the same time.
+
+A good technology milestone usually matters for more than one audience. Enthusiasts notice the specifications or the interface first. Developers ask what new assumptions they can make. Companies look at cost, compatibility, and strategy. Ordinary users mostly notice whether the result makes their devices faster, easier, safer, or more useful.
+
+## The Broader Context
+
+This period of computing was shaped by several overlapping transitions: faster networks, more capable mobile devices, cloud infrastructure, stronger security expectations, and software that changed continuously after release. Against that background, the milestone was not an isolated headline. It was one piece of a much larger movement away from static products and toward connected platforms.
+
+That context helps explain why some announcements that looked modest at the time became important later. A browser feature, processor change, development tool, or platform policy can alter what future products are able to assume. Once enough users, developers, and vendors adapt, the new assumption becomes normal.
+
+## Looking Back
+
+The value of revisiting the moment is that it shows how technology history is built from many medium-sized steps. Some are celebrated immediately, while others become meaningful only after the ecosystem catches up.
+
+Looking back also keeps the story balanced. Progress usually brings tradeoffs: performance against power use, openness against consistency, convenience against control, and speed against stability. The most interesting milestones are the ones that reveal those tradeoffs clearly. This one belongs in that category because it helps explain not just what changed, but why the direction of computing kept moving the way it did.

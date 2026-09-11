@@ -8,8 +8,24 @@ tags:
   - computing-history
 ---
 
-Mozilla changed Firefox to a rapid release schedule in 2011, moving away from long gaps between major browser versions. Instead of waiting a year or more for a large release, Mozilla planned new versions roughly every six weeks.
+Firefox's move to a faster release model in 2011 was a major cultural change for one of the web's most important browsers. Earlier browser releases often felt like large events separated by long waits. The web, however, was moving too quickly for that rhythm. New standards, security fixes, performance improvements, and developer needs demanded a shorter feedback loop.
 
-The change was partly a response to Chrome, which already updated frequently and automatically. Faster releases let browser-engine improvements, JavaScript optimizations, security fixes, and new web standards reach users sooner. But the new cadence also created compatibility problems for enterprises and extension developers who had built processes around slow version changes.
+Mozilla's shift toward rapid releases was partly a response to Chrome, which had made frequent browser updates feel normal. But it was also a recognition that the browser had become critical infrastructure. Waiting too long to ship improvements could slow the entire web platform.
 
-Mozilla eventually introduced extended-support releases for organizations that needed stability. The episode illustrates a tension that still exists in software delivery: rapid deployment reduces the delay between writing and shipping code, but users who depend on a platform also need predictable compatibility windows.
+## Why Release Cadence Matters
+
+A browser is not a normal application. It interprets code from across the internet, protects users from hostile pages, implements evolving standards, and provides tools for developers. When browsers update slowly, web developers either avoid new capabilities or build complicated workarounds for inconsistent support.
+
+Faster releases allowed Mozilla to deliver improvements incrementally. Security patches, JavaScript performance gains, CSS features, HTML APIs, and developer-tool changes could reach users sooner. The tradeoff was that organizations and extension developers had to adapt to more frequent change.
+
+## The Extension And Enterprise Challenge
+
+Firefox had a passionate extension ecosystem, and rapid releases made compatibility a more visible issue. Add-ons that depended on internal browser behavior could break more often. Enterprises also worried about testing cycles, because a browser update could affect internal web applications.
+
+These concerns were real, and Mozilla later refined its approach with extended support releases for organizations that needed a slower, more predictable cadence.
+
+## The Bigger Picture
+
+The faster release model showed how browser competition had changed. Version numbers became less important than continuous improvement. Users gradually stopped thinking of browser upgrades as major manual events and started expecting the browser to keep itself current.
+
+That expectation is now normal across much of software. Firefox's 2011 transition was one step in the broader move from occasional releases to living platforms that evolve in place.
