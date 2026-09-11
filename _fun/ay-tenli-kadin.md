@@ -10,60 +10,36 @@ tags:
    - memory
 ---
 
-Some people enter your life slowly. You do not notice the exact moment when they become important. One day you simply realize that they have reached a place in you that was empty before.
+Late at night, certain things become easier to feel than to explain.
 
-*Ay Tenli Kadın* makes me think about that kind of closeness.
+The world loses its competing details. Streets become quieter. The mind fills the recovered space with things it kept politely aside during the day — people, evenings, the particular quality of a light in a room that no longer exists.
 
-There is something powerful in the idea of finding your roots inside another person. Love is often described as excitement, attraction or happiness, but sometimes it feels more like recognition. You meet someone and there is a strange sense that part of you already knows where to stay.
+*Ay Tenli Kadın* belongs to that hour.
 
-I have always found that feeling both beautiful and dangerous.
+There is something the song understands about the moon: that it does not remove darkness. It only gives it shape. And some people are like that too. They do not solve loneliness. They make it luminous for a while.
 
-When you become deeply connected to someone, your life starts growing around them. Small routines appear. Certain places become yours together. A song gains a new meaning. Even the night can begin to belong to a person.
+I have known that kind of closeness.
 
-Then imagination makes everything stronger.
+The kind that arrives not with drama but with recognition. One day you simply realize that someone has reached a place in you that was empty before, and you cannot name the exact moment it happened. Being with such a person in reality is ordinary in the best sense — comfortable silence, shared attention to small things, conversations that go nowhere in particular. But imagining them is something else. Memory and desire remove all the ordinary parts. They keep only the moments that felt most alive.
 
-Being with someone is real. Reality contains normal days, tired conversations, bad moods and silence. But imagining someone removes all of that. Memory and desire keep only what they want.
+This is imagination's dishonesty. Also its gift.
 
-Perhaps that is why sometimes dreaming about a person can feel more intense than actually seeing them.
+At night, the correction is suspended.
 
-The mind is very good at creating perfect versions of people.
+The moon is bright but selective. It lights part of the world and leaves the rest in shadow. There is a permission in that — you do not have to see everything at once. Some things can remain half-visible and still be real.
 
-At night, this becomes easier.
+Perhaps love works like that too.
 
-The world loses detail in darkness. Streets become quieter, rooms become smaller, and thoughts become louder. Someone who seemed far away during the day can suddenly feel very close.
+No matter how close two people become, there is always a part of the other person that remains private. Hidden rooms. This can frighten people — the sense that closeness has a ceiling, that knowing someone fully is impossible.
 
-I think this is why so many memories return at night.
-
-There are fewer things to protect us from ourselves.
-
-The moon is also a strange companion for longing. It is bright, but it does not remove the darkness. It only gives it shape.
-
-Maybe some people are like that too.
-
-They do not solve loneliness. They simply make it beautiful for a while.
-
-I have known moments when missing someone felt almost physical. You want to see them, but seeing them does not seem enough. You want to understand what is happening inside them. You want access to the hidden rooms.
-
-That is probably impossible.
-
-No matter how close two people become, there is always a part of the other person that remains private.
+I have come to think of it differently.
 
 Perhaps love is not entering every room.
 
 Perhaps it is knowing that the rooms are there and still choosing to stay near the door.
 
-What I like most about *Ay Tenli Kadın* is that its longing does not feel complicated. There is no long explanation, no attempt to solve love like a problem. There is simply attraction, imagination and the wish to be close.
+Years later, you may forget the conversations, the places, even the reasons things ended. What remains might be something smaller and harder to name. A particular quality of light. The feeling of an evening that wanted to continue. A person who made one season of life feel completely different from any other.
 
-As I get older, I appreciate that simplicity more.
+That is what the night keeps.
 
-We spend too much time trying to explain why we love certain people. We look for compatibility, timing, logic and reasons. These things matter, of course. But sometimes affection begins somewhere deeper than explanation.
-
-You look at someone and something inside you moves.
-
-That may be all.
-
-Years later, you may forget many details. You may forget the conversations, the places and even the reasons why things ended.
-
-But you may still remember the night.
-
-And the person who once made it feel different.
+And sometimes, quietly, it returns it.

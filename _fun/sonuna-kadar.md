@@ -10,64 +10,48 @@ tags:
    - memory
 ---
 
-Some relationships end before two people truly understand each other.
+There is a particular kind of waiting that stops being about the person.
 
-That is what *Sonuna Kadar* makes me think about. There is love, waiting and longing in the song, but what stays with me most is the feeling of not being able to reach someone completely. You try to explain yourself, you wait for the right moment, you hope that one day the other person will finally understand, and somehow that day never comes.
+It begins as hope: a message may come, something will be said that makes the distance legible. Then it becomes habit. Then, somewhere in the slow middle, it becomes the last familiar thing you have left of them.
 
-I think many relationships are lost this way.
+One day you realize you are no longer waiting for them.
 
-Not because there was no love, but because love alone could not solve the distance between two people. One person spoke, the other heard something different. One waited, the other did not know what was being waited for. By the time both sides understood what had happened, too much time had already passed.
+You are waiting for the version of yourself who believed they would return.
 
-I have always found that kind of ending more difficult than a clear goodbye.
+*Sonuna Kadar* makes me think about that shift.
 
-If somebody tells you directly that they do not want you anymore, at least there is an answer. It hurts, but it has a shape. Uncertainty is worse. It leaves space for imagination, and imagination is rarely kind.
+Uncertain endings are the hardest kind. If somebody tells you directly that they do not want you anymore, the information is painful but it has shape. You know where to stand. Uncertainty gives imagination somewhere to live, and imagination — especially the kind born from longing — is rarely kind to you.
 
 Maybe I should have said more.
 
-Maybe I should have waited longer.
+Maybe what I said was heard differently.
 
 Maybe they understood everything and simply chose not to answer.
 
-These questions can survive for years.
+These questions do not expire. They can survive years, reappear in unguarded moments, find you in completely unrelated situations. A song plays in a public place and for a second you are back in that period of your life, still not knowing the answer.
 
-Waiting also changes with time. At first, it feels active. You believe something is about to happen. A phone call may come. A message may appear. A door may open.
+What changes is not the question.
 
-After a while, waiting becomes a habit.
+It is the energy you are willing to give it.
 
-Then one day you realize you are no longer waiting for the person. You are waiting for the version of yourself who believed they would return.
-
-That realization can be painful.
-
-The song also makes me think about how difficult absence becomes when it repeats. Missing somebody once is manageable. Missing them every day is different. Their absence begins to become part of the routine. You wake up with it, carry it through the day and take it home again at night.
-
-Eventually you get tired.
-
-Not necessarily of loving them.
-
-Of carrying them.
-
-I have learned that there is a point where even strong feelings become heavy. You can care deeply about someone and still have no energy left to continue. The heart may keep going long after the rest of you is exhausted.
-
-Perhaps that is why some people stay in our memories for so long.
-
-The relationship ends, but the unfinished conversation does not.
-
-Years pass. Life changes. New people arrive. New worries replace the old ones. Yet a small part of the past remains untouched because it never received a proper ending.
-
-I do not know whether forgetting is always necessary.
-
-Maybe some people simply become part of our internal history. We do not think about them every day, but they remain connected to a certain age, a certain street, a certain song.
-
-Then something brings them back.
-
-For a few minutes, time collapses.
-
-You remember how much you waited.
-
-You remember how badly you wanted to be understood.
-
-And perhaps you finally understand something yourself.
+There comes a point where even genuine love becomes heavy to carry. Not because the feeling has gone, but because you are exhausted. You can care deeply about someone and have nothing left to spend on caring. The heart keeps going long after the rest of you has sat down.
 
 Reaching the end of a love does not always mean reaching the person you loved.
 
 Sometimes you only reach the end of your own strength.
+
+And that is when you finally stop.
+
+Not dramatically. Not with a decision you can point to. You simply notice that one day you did not check, and the next day you did not check either, and by the time you noticed, a week had passed.
+
+Some people stay in our memories not because we hold onto them, but because they were never properly finished. They belong to a small room inside us that never received a closing.
+
+Eventually, something opens that room briefly.
+
+A season. A sound. A street that looks like another street.
+
+You remember how much you wanted to be understood.
+
+You remember waiting.
+
+And sometimes, very quietly, you finally understand something that could not have been reached any sooner.
