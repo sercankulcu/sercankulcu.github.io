@@ -8,18 +8,14 @@ tags:
   - students
 ---
 
-If you are joining Computer Engineering in 2022, you are starting at a time when both software and hardware are receiving renewed attention.
+If you are starting Computer Engineering in 2022, welcome.
 
-Cloud platforms, cybersecurity, artificial intelligence, and data systems continue to grow, while global interest in processors and semiconductor production has reminded everyone that computing depends on more than code.
+You are entering the field at a time when artificial intelligence, cybersecurity, cloud computing, data systems, and software platforms are part of ordinary technology news. This makes the field exciting, but it also makes it easy to feel rushed.
 
-Your education will introduce you to both sides of this world.
+Do not rush past the basics. The early courses are not obstacles placed before the interesting parts. They are the language of the interesting parts. Algorithms, mathematics, programming, computer architecture, operating systems, databases, and networks will help you understand why modern systems work and why they fail.
 
-You will study programming, algorithms, databases, operating systems, networks, digital systems, and computer architecture. Over time, these subjects will begin to connect. You will see that good software depends on the systems beneath it, and good hardware becomes useful through the software built for it.
+Also remember that engineers build for people. A secure system, a usable interface, a reliable service, and a well-documented project all require more than clever code. They require judgment and responsibility.
 
-Do not rush to specialize too early. Explore different areas. Try web development. Work with microcontrollers. Learn basic machine learning. Study security. Join a team project.
+Try different areas before deciding what kind of engineer you want to become. Build a web project, write a small tool, experiment with hardware, read about security, and learn how teams organize software.
 
-You may discover that your strongest interest is different from what you expected when you entered the department.
-
-Also remember that engineering is collaborative. Learning how to explain a technical idea, document your work, review code, and work with others is part of your education too.
-
-The next few years will be challenging, but they can also be extremely rewarding.
+Welcome to the department. Let the excitement of the field motivate you, but let fundamentals guide you.

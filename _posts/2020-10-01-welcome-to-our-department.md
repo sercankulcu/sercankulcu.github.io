@@ -8,16 +8,14 @@ tags:
   - students
 ---
 
-Starting university in 2020 is different from what many students expected. Education, work, communication, and daily life have all become more dependent on digital systems in a very short time.
+If you are beginning Computer Engineering in 2020, your first year is starting in an unusual time.
 
-For Computer Engineering students, this year offers an unusual lesson before the first course even begins: computing infrastructure matters.
+The pandemic has moved classes, meetings, work, and many daily routines onto digital systems. For computer engineering students, this is both difficult and revealing. The infrastructure you are preparing to study is suddenly visible everywhere: video calls, learning platforms, networks, servers, devices, databases, and software that people depend on.
 
-Online platforms, communication tools, cloud services, networks, security systems, and software applications are now supporting activities that once happened almost entirely in physical spaces.
+This year may not give you the ordinary campus experience at first. Still, it can teach an important lesson: technology is not abstract. When systems fail, people feel it. When systems work well, they make education, communication, and cooperation possible.
 
-During your education, you will learn how these systems work. You will study programming, algorithms, databases, operating systems, computer networks, computer architecture, and software engineering.
+Take your foundations seriously. Programming, mathematics, algorithms, operating systems, and networks will help you understand the world you are already using. Do not let remote learning make you passive. Write code regularly, ask questions, take notes, and keep contact with classmates.
 
-Some parts of university life may feel more distant this year, but learning does not need to be passive. Build projects. Collaborate online. Use open-source tools. Read documentation. Ask questions. Try to create rather than only consume technology.
+Also protect your patience. Learning technical subjects during a disrupted year is hard. Progress may feel uneven, but steady practice matters more than a perfect routine.
 
-Computer Engineering rewards independence. The habit of learning on your own will be as important as anything you learn in a classroom.
-
-You are beginning your education during a difficult year, but also during a year that clearly demonstrates the importance of computing.
+Welcome to the department. May this strange beginning make you more resilient and more aware of why good engineering matters.

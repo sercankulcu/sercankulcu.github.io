@@ -8,18 +8,14 @@ tags:
   - students
 ---
 
-Beginning Computer Engineering in 2021 means joining a field that has become central to almost every part of modern life.
+Welcome to Computer Engineering in 2021.
 
-Cloud computing, remote collaboration, artificial intelligence, cybersecurity, mobile systems, and semiconductor technologies are all receiving enormous attention. You will encounter many of these areas during your education.
+You are entering university after a period that changed how people study, work, and communicate. Some habits moved online; some returned slowly to classrooms and laboratories. This mixed experience is a useful reminder for computer engineers: technology is not separate from human life. It shapes how people cooperate.
 
-But your first goal should be simpler: build strong foundations.
+Your education will not be only about learning a language or passing exams. You will learn how systems behave, why algorithms matter, how data is stored, how networks connect people, and why small technical decisions can have large effects.
 
-Learn programming carefully. Understand algorithms instead of memorizing them. Take mathematics seriously. Learn how operating systems, networks, databases, and processors work. These subjects may not always look exciting at first, but they will make advanced technologies much easier to understand later.
+The first year may feel uneven. Some topics will be familiar; others will feel completely new. Do not confuse difficulty with failure. Engineering is learned through repeated attempts, mistakes, and corrections.
 
-University is also a place to discover your interests. You may enjoy software development, embedded systems, cybersecurity, machine learning, computer architecture, or something you have not encountered yet.
+Build habits early. Read documentation. Use version control. Write small programs. Explain problems to friends. Ask for help before confusion becomes silence. These ordinary habits will do more for you than waiting for motivation.
 
-Do not be afraid to change direction.
-
-Work with your classmates. Participate in projects. Read technical material beyond the minimum required for your courses. Learn how to communicate your ideas and how to accept feedback.
-
-A successful engineering education is not built only from grades. It is built from experience.
+Computer engineering rewards curiosity, but it also rewards persistence. Welcome to the department; use these years to build both.

@@ -8,16 +8,14 @@ tags:
   - turkey
 ---
 
-Every November 10, Türkiye remembers Mustafa Kemal Atatürk.
+Every November 10, Turkiye remembers Mustafa Kemal Ataturk.
 
-In 2025, the world is moving deeper into an age shaped by artificial intelligence, automation, advanced computing, biotechnology, and global technological competition.
+In 2025, artificial intelligence, automation, advanced computing, and global technological competition made knowledge more important than ever. In such a world, Ataturk's emphasis on science and education does not feel distant. It feels practical.
 
-These changes make education and scientific capability more important than ever.
+Independence today is not only defended at borders. It is also defended in schools, universities, laboratories, factories, software teams, and research centers. A country that cannot understand or produce technology becomes dependent on decisions made elsewhere.
 
-Atatürk's understanding of modernization placed knowledge at the center of national progress. Schools, universities, institutions, and scientific thinking were not secondary details of the Republic. They were part of the foundation.
+That is why November 10 in 2025 should lead naturally to questions about education and capability. Are young people being prepared to think deeply? Are institutions supporting knowledge? Are we using technology with judgment, or only following it from behind?
 
-A modern society must do more than follow technological change. It must educate people who can understand it, question it, improve it, and use it responsibly.
+Ataturk's legacy does not answer these questions for us, but it gives a direction: trust reason, invest in education, and build the confidence to produce.
 
-At 09:05, daily routines stop for a moment and shared silence connects generations.
-
-We remember Mustafa Kemal Atatürk with respect and gratitude, and we continue to reflect on the responsibilities that come with the Republic he helped create.
+We remember Mustafa Kemal Ataturk with respect, gratitude, and responsibility.

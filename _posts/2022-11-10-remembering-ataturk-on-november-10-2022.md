@@ -8,16 +8,14 @@ tags:
   - turkey
 ---
 
-Every November 10, Türkiye pauses to remember Mustafa Kemal Atatürk.
+Every November 10, Turkiye pauses to remember Mustafa Kemal Ataturk.
 
-In 2022, the world is dealing with war, economic uncertainty, energy concerns, technological competition, and rapid geopolitical change.
+In 2022, the Republic was one year away from its centennial. That approaching milestone made remembrance feel like preparation. The question was not only how to honor the founder, but how to enter the second century with seriousness.
 
-Such periods remind us that national sovereignty and institutional strength are not abstract ideas.
+Ataturk's legacy should make people uncomfortable in a useful way. It asks whether education is strong enough, whether public life is guided by reason, whether young people are given confidence, and whether the country is producing knowledge instead of only consuming it.
 
-Atatürk's political life was shaped by the struggle for independence and by the challenge of building a functioning state after years of conflict. His answer emphasized education, law, economic development, science, and the ability of a nation to make its own decisions.
+A centennial is not a finish line. It is a mirror. It shows what has endured, but also what needs repair. November 10 helps place that mirror in front of the country with respect rather than noise.
 
-Remembering Atatürk does not mean pretending that history provides simple answers to every modern problem. It means taking history seriously enough to understand what was achieved and under what conditions.
+At 09:05, we remember the life that opened the path. After that moment, the question belongs to us: what kind of Republic will we carry forward?
 
-At 09:05, Türkiye becomes silent.
-
-We remember Mustafa Kemal Atatürk with respect and gratitude.
+We remember Ataturk with gratitude and responsibility.

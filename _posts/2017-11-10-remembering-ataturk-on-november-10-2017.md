@@ -8,14 +8,14 @@ tags:
   - turkey
 ---
 
-Every November 10, Türkiye pauses at 09:05 to remember Mustafa Kemal Atatürk.
+Every November 10, Turkiye remembers Mustafa Kemal Ataturk.
 
-In 2017, younger generations live in a world of constant notifications, instant news, and rapidly changing technology. It is easy for historical memory to become compressed into a few images or quotations.
+In 2017, the founding years were far enough away that memory required conscious care. Dates remain on calendars, photographs remain on walls, but understanding does not preserve itself automatically.
 
-But history deserves more attention than that.
+Ataturk's work on language, education, culture, and public life reminds us that a nation is held together by shared meanings as much as shared borders. Those meanings need to be taught, discussed, and renewed. Otherwise memory becomes decoration.
 
-Atatürk's importance lies not only in individual speeches or symbols, but in the scale of the transformation he led: from a country emerging from war to a republic seeking modern institutions, universal education, scientific progress, and national sovereignty.
+This is why November 10 should make room for more than official words. It should lead people back to reading, listening, and thinking: what problem was Ataturk trying to solve, what kind of citizen did he imagine, and what does that ask of us now?
 
-Perhaps one of the best ways to commemorate him today is through serious study and understanding.
+The answer will not be exactly the same in every decade. But the need for reason, education, and responsibility remains.
 
-We remember Mustafa Kemal Atatürk with respect and gratitude.
+We remember Mustafa Kemal Ataturk with respect and gratitude.

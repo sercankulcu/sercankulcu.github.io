@@ -8,18 +8,14 @@ tags:
   - turkey
 ---
 
-November 10, 2018 marks eighty years since the death of Mustafa Kemal Atatürk.
+Every November 10, Turkiye pauses at 09:05 to remember Mustafa Kemal Ataturk.
 
-Eighty years is a significant distance in time. The Türkiye of today is very different from the country of 1938, and the world has changed beyond recognition.
+In 2018, public institutions were again at the center of national discussion. That makes Ataturk's legacy especially relevant. His achievement was not only personal leadership; it was the attempt to turn leadership into a durable republic.
 
-Yet some questions remain familiar.
+Strong institutions are less dramatic than heroic stories, but they matter more in daily life. Schools, courts, assemblies, universities, and public offices are where the idea of a republic becomes real. When they work well, citizens do not need to depend on luck or personality. They can depend on rules, knowledge, and public responsibility.
 
-How should a country educate its people? How should it respond to scientific and technological change? How can institutions remain strong? How can national independence coexist with engagement in the wider world?
+Remembering Ataturk in 2018 therefore means thinking about the difference between admiration and institutional care. A founder can open a path, but later generations decide whether that path remains usable.
 
-Atatürk's leadership was shaped by questions like these.
+The silence at 09:05 is brief. The duty it points toward is longer.
 
-An eightieth anniversary is an appropriate moment not only to remember, but also to evaluate and understand.
-
-At 09:05, Türkiye pauses as it has for generations.
-
-We remember Mustafa Kemal Atatürk with respect and gratitude, eighty years after his passing.
+We remember Ataturk with respect, gratitude, and reflection.

@@ -8,14 +8,14 @@ tags:
   - turkey
 ---
 
-November 10, 2013 marks seventy-five years since the death of Mustafa Kemal Atatürk.
+Every November 10, Turkiye remembers Mustafa Kemal Ataturk.
 
-Three quarters of a century is long enough for several generations to have known Atatürk only through history, family stories, photographs, speeches, and the institutions of the Republic.
+In 2013, the Republic turned ninety. That milestone made remembrance feel connected to measurement: what had been built, what had endured, and what still needed care. A republic can be celebrated, but it also has to be examined honestly.
 
-Yet historical distance does not remove relevance.
+Ataturk's legacy is often strongest when it becomes a standard rather than a slogan. Education should be better. Public reason should be stronger. Citizens should feel responsible for more than their private lives. Institutions should serve the public with dignity. These expectations are not old-fashioned; they are the normal requirements of a modern country.
 
-His commitment to national sovereignty, education, modernization, secular public institutions, and scientific thought continues to influence how Türkiye understands itself.
+The silence at 09:05 carries both gratitude and uneasiness. Gratitude for what was founded, uneasiness because the work is never finished.
 
-The responsibility of a new generation is not simply to repeat the words of the past. It is to study them, understand their context, and decide how their principles apply to present challenges.
+Remembering Ataturk in the Republic's ninetieth year means accepting that history gave later generations not only pride, but also homework.
 
-On this 75th anniversary, we remember Mustafa Kemal Atatürk with respect, gratitude, and serious reflection.
+We remember him with respect and reflection.

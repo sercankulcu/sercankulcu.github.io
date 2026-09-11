@@ -8,14 +8,14 @@ tags:
   - students
 ---
 
-If you are beginning Computer Engineering in 2017, you are joining the field at an interesting time. Mobile applications, cloud platforms, artificial intelligence, connected devices, and open-source software are becoming increasingly important.
+If you are beginning Computer Engineering in 2017, welcome to a field full of attractive buzzwords.
 
-You will encounter many of these technologies during your education, but your real goal is not to memorize what is popular today. It is to understand the fundamentals behind computing.
+Artificial intelligence, mobile development, cybersecurity, data science, and cloud computing all sound exciting, and they are. But your first task is not to chase every trend. Your first task is to build foundations strong enough that you can understand trends instead of merely following them.
 
-You will learn how algorithms solve problems, how operating systems manage resources, how computers communicate over networks, how databases organize information, and how software and hardware work together.
+Programming will matter. So will mathematics, algorithms, data structures, computer architecture, operating systems, databases, and networks. Some of these subjects may feel distant from the products you use every day. Later, you will notice that they are the hidden structure beneath those products.
 
-Some courses will be easy to enjoy immediately. Others may require patience. Programming assignments can fail because of a single character. A difficult problem may take hours to solve. These moments are part of becoming an engineer.
+Do not worry if you do not know your specialization yet. The first years are for exploration. Try different areas. Build small projects. Read documentation even when it is difficult. Work with classmates. Learn how to debug without panic.
 
-Do not study only for exams. Build small projects. Read code written by others. Explore technologies outside the classroom. Work with your friends and learn how to explain your ideas clearly.
+The most valuable habit you can develop is honest learning: knowing what you understand, noticing what you do not, and closing that gap step by step.
 
-The field will continue to change while you are studying. That is not a problem. A strong foundation will help you learn whatever comes next.
+Welcome to the department. The field changes quickly, but careful thinking remains useful.

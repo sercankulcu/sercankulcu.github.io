@@ -8,20 +8,14 @@ tags:
   - students
 ---
 
-Starting Computer Engineering in 2025 means entering a field where powerful AI tools are already part of everyday technical work.
+Welcome to Computer Engineering in 2025.
 
-Code can be generated faster. Errors can be explained automatically. Documentation can be summarized. Prototypes can be created in minutes.
+You are starting at a time when coding assistants and agentic tools are becoming part of everyday software development. This can make learning faster, but it can also create a trap: a student may produce answers without building understanding.
 
-This does not make engineering education less important. It makes understanding more important.
+Use AI tools as helpers, not as substitutes for thought. Ask them questions, compare explanations, and let them show alternatives. But when you submit code, solve a problem, or make a design decision, make sure you understand what is happening. Engineering requires responsibility.
 
-During your studies, you will learn programming, algorithms, data structures, operating systems, computer networks, databases, computer architecture, digital systems, and software engineering. These subjects will help you understand what happens beneath the tools you use.
+The basics still matter. Programming, algorithms, mathematics, computer architecture, operating systems, databases, networks, and software engineering give you the ability to reason about systems. Without them, tools become magic boxes. With them, tools become useful instruments.
 
-Do not measure your progress by how quickly you can produce code. Learn to ask better questions.
+During your first year, build small things. A calculator, a simple game, a personal website, a command-line tool, a tiny database project: each one will teach you something real. Finish projects, read errors, revise your code, and explain what you learned.
 
-Is the solution correct? Is it secure? Is it efficient? Can another engineer maintain it? What happens when the system fails? What assumptions are hidden inside the design?
-
-These are engineering questions, and they will remain important no matter how capable software tools become.
-
-Use your time here to explore. Build real projects. Work with other students. Learn from open-source software. Experiment with AI, embedded systems, cybersecurity, cloud computing, robotics, and any other area that interests you.
-
-Technology will change many times during your career. Your strongest advantage will be the ability to understand new systems quickly and think independently.
+Welcome to the department. Learn the new tools, but do not skip the slow work that makes you an engineer.
