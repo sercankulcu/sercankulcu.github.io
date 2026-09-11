@@ -1,6 +1,7 @@
 ---
 title: "Oldboy"
 date: 2005-09-17
+description: "Revenge becomes authorship — the film asks whether some truths leave a person less free after learning them."
 tags:
    - movie
    - revenge

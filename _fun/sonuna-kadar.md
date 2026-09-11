@@ -1,6 +1,7 @@
 ---
 title: "Sonuna Kadar"
 date: 2026-09-07
+description: "Reaching the end of a love does not always mean reaching the person you loved — sometimes you only reach the end of your own strength."
 tags:
    - music
    - love

@@ -1,11 +1,12 @@
 ---
 title: "Kalbim Yaralı: When Someone Takes Tomorrow with Them"
 date: 2007-07-29
+description: "When we love someone, we quietly populate tomorrow with them — and separation collapses those imaginary scenes all at once."
 tags:
    - music
+   - murat-gogebakan
    - love
-   - loss
-   - memories
+   - heartbreak
    - philosophy
 ---
 

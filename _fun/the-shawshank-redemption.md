@@ -1,12 +1,13 @@
 ---
 title: "The Shawshank Redemption"
 date: 2005-11-19
+description: "We can adapt to conditions we should never have accepted — and a man works for years on something almost nobody can see."
 tags:
    - movie
    - freedom
    - friendship
    - hope
-   - life
+   - adaptation
 ---
 
 I first watched *The Shawshank Redemption* on television after the film had already begun.

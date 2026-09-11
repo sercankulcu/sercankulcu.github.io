@@ -1,12 +1,13 @@
 ---
 title: "Forrest Gump"
 date: 2005-06-12
+description: "Destiny and accident do not have to cancel agency — Forrest keeps choosing what to do next even as chance shapes everything around him."
 tags:
    - movie
-   - life
    - memory
    - chance
    - kindness
+   - simplicity
 ---
 
 I first watched *Forrest Gump* on an afternoon when I had nowhere to go, which may be the ideal condition for a film that begins with a man sitting on a bench and talking to whoever happens to sit beside him.

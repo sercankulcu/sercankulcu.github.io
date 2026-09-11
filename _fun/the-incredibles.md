@@ -1,6 +1,7 @@
 ---
 title: "The Incredibles"
 date: 2005-02-19
+description: "The powers make the Parr family extraordinary; the complaints make them familiar — on nostalgia, identity, and the impossible project of recovering an earlier self."
 tags:
    - movie
    - family

@@ -26,3 +26,9 @@ Silence forces you to review a conversation differently. The smiles become ordin
 What embarrassed me was not the rejection, because technically there had been no rejection. It was how quickly I had built the next stage of my life from a few encouraging signals. The company had returned to its normal work after the interview; I had already begun leaving mine in imagination.
 
 After that, I became more careful with good interviews. A pleasant conversation could be pleasant. Interest could be interest. Until an actual offer arrived, the future was still only grammar.
+
+## Under Before the Offer
+
+I like the memory most where it refuses to explain itself completely. The campus feeling is there: low stakes from far away, enormous stakes from inside the day.
+
+Student life made small things feel official before they deserved to be official: a form, a seat, a delay, a half-success. I think the truth of the memory lives exactly in that uneven size.

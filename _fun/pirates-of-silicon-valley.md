@@ -1,6 +1,7 @@
 ---
 title: "Pirates of Silicon Valley"
 date: 2007-09-16
+description: "Technology history becomes dangerously tidy after success — the winning product appears destined to win, but the people living through the period were simply guessing."
 tags:
    - movie
    - computers

@@ -40,3 +40,9 @@ There is a point in the life of an old device when “working correctly” becom
 We no longer had a user-device relationship.
 
 We had an agreement.
+
+## Past Terms and Conditions
+
+This is the kind of moment that survives by being oddly specific. A minor detail can be more faithful than a grand summary.
+
+The scene keeps one clear fragment and lets the rest stay blurred. That is why the memory keeps its weight without becoming dramatic.

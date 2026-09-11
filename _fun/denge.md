@@ -1,12 +1,13 @@
 ---
 title: "Denge: Please Do Not Disturb My Beautiful Disorder"
 date: 2007-06-29
+description: "The luxury of saying fine — not because the other person is right, but because your afternoon is worth more than the argument."
 tags:
    - music
-   - life
-   - balance
-   - freedom
    - sezen-aksu
+   - balance
+   - equanimity
+   - freedom
 ---
 
 There are songs about finding balance. *Denge* makes me think that perhaps balance is not something we find at all. Perhaps it is the small private arrangement we build inside ourselves and then spend half our lives protecting from other people.

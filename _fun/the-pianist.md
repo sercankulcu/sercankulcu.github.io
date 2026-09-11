@@ -1,6 +1,7 @@
 ---
 title: "The Pianist"
 date: 2004-04-18
+description: "A world in which expression can become evidence of presence — on silence, survival, and the strange freedom of being allowed to be heard."
 tags:
    - movie
    - war

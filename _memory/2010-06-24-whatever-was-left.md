@@ -36,3 +36,9 @@ Student apartments teach through shortage. Nobody gives a lecture. The refrigera
 You learn to cook because nobody else will. You learn what can wait until tomorrow. You learn that shopping requires energy and that hunger can reorganize standards very quickly.
 
 And sometimes you learn to like the thing nobody else had finished.
+
+## Past Whatever Was Left
+
+Nothing here needs to be enlarged; it only needs to be held still for a second. The campus feeling is there: low stakes from far away, enormous stakes from inside the day.
+
+There is a young-person seriousness in the scene, the kind that treats a minor event as evidence for an entire future. That is why the memory keeps its weight without becoming dramatic.

@@ -1,6 +1,7 @@
 ---
 title: "Üzgünüm"
 date: 2026-09-07
+description: "By the time you finally say goodbye aloud, you are already tired from carrying it alone — on exhaustion, guilt, and endings without a clear villain."
 tags:
    - music
    - love

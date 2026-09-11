@@ -1,12 +1,12 @@
 ---
 title: "İki Tas Çorba: Maybe This Is Enough"
 date: 2011-04-29
+description: "Perhaps home is simply the place where somebody automatically puts out a second bowl — on how radical it is to discover that enough is very small."
 tags:
    - music
+   - mustafa-sandal
    - love
    - simplicity
-   - home
-   - memories
    - philosophy
 ---
 

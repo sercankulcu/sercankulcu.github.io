@@ -36,3 +36,9 @@ The old joke was that perhaps a customer should reward the author of an enormous
 I would now give the reward to the person who made the document easy to use.
 
 The heavier file is not always the heavier thinking.
+
+## Near The Heavy Document
+
+The useful part is not a lesson so much as a texture. The smallness is not a weakness. It is the reason the memory can remain exact.
+
+The smallness is not a weakness. It is the reason the memory can remain exact. A larger story would probably make it less honest.

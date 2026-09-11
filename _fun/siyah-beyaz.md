@@ -1,6 +1,7 @@
 ---
 title: "Siyah Beyaz"
 date: 2026-09-07
+description: "Being lonely beside someone is very different from being lonely alone — on the empty place that belongs to another chapter and the way old memories lose their colors."
 tags:
    - music
    - memory

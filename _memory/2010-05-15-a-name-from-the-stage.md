@@ -32,3 +32,9 @@ The dinner continued normally.
 That was the strange elegance of the whole thing. A meaningless name had appeared from a stage, remained in my mind for days, and then sat down across from me at dinner. Nothing proved that the two events were connected, and nothing needed to.
 
 Real life occasionally produces the structure of a story and then refuses to provide the explanation.
+
+## Under A Name from the Stage
+
+The scene becomes clearer to me now because it stayed small. There is a young-person seriousness in the scene, the kind that treats a minor event as evidence for an entire future.
+
+There is a young-person seriousness in the scene, the kind that treats a minor event as evidence for an entire future. That small resistance to disappearance is enough.

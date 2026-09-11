@@ -1,6 +1,7 @@
 ---
 title: "Yalnızlık Senfonisi"
 date: 2026-09-07
+description: "Resilience is less heroic than we imagine — most of the time it is getting dressed when you do not feel like it, and then somehow you are still standing."
 tags:
    - music
    - loneliness

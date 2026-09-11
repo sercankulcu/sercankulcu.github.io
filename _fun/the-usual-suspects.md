@@ -1,6 +1,7 @@
 ---
 title: "The Usual Suspects"
 date: 2002-11-02
+description: "The film had noticed the assumptions I was willing to supply and built a story that let me do part of the deception myself."
 tags:
    - movie
    - crime

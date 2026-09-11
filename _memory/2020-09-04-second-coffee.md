@@ -42,3 +42,9 @@ Years later, I do not think the coffee machine defined that period. That would b
 But it defined some hours.
 
 And sometimes memory returns through exactly that scale: a room, a cup, a machine, and the second coffee of the day.
+
+## Past Second Coffee
+
+The useful part is not a lesson so much as a texture. The family part of the scene is not sentimental to me; it is practical, almost procedural, and that makes it more tender.
+
+Home often announces itself through chores before it announces itself through emotion. It remains as a modest proof that ordinary life was never as empty as it looked.

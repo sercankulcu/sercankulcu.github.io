@@ -38,3 +38,9 @@ It rarely is.
 Sometimes the sentence that prevents the argument is not the clever one.
 
 It is the hidden sentence said aloud.
+
+## Around The Hidden Sentence
+
+The useful part is not a lesson so much as a texture. The scene remembers how much can happen inside one sentence when the right person is involved.
+
+The emotional charge is in what remains unsolved: the message, the question, the phrase that kept echoing after the moment ended. A larger story would probably make it less honest.

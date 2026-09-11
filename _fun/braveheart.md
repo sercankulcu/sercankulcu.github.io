@@ -1,12 +1,13 @@
 ---
 title: "Braveheart"
 date: 2001-10-13
+description: "Large causes often reach people through small doors — and the film's oldest political question remains: at what point does obedience cost more than resistance?"
 tags:
    - movie
    - freedom
    - history
    - courage
-   - identity
+   - resistance
 ---
 
 I first saw *Braveheart* on television on an evening that seemed to grow longer with the film. Dinner ended, tea arrived, somebody left the room and returned, the windows turned black, and still the story continued across hills, castles and battlefields. By the final scenes, the room had the peculiar silence produced when several people have watched the same thing for so long that talking would feel like breaking a spell.

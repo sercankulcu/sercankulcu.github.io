@@ -1,13 +1,13 @@
 ---
 title: "Experience: Suddenly My Walk Has a Soundtrack"
 date: 2014-01-29
+description: "Once the piano begins, you are no longer a person going to buy yogurt — on Einaudi, small repetitions, and how large things are built."
 tags:
    - music
+   - ludovico-einaudi
    - piano
-   - life
    - time
    - imagination
-   - humor
 ---
 
 There are songs you listen to while doing something, and then there is Ludovico Einaudi's *Experience*, which immediately convinces you that whatever you are doing must be extremely important. You may only be walking to the supermarket, but once the piano begins and the strings slowly enter, you are no longer a person going to buy yogurt. You are a man carrying the emotional history of Europe through the streets. A plastic bag may be waiting for you ten minutes later, but for now you clearly have a destiny.

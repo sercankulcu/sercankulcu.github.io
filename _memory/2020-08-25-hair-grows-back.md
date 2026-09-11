@@ -20,3 +20,9 @@ Then the house began absorbing tasks that had once belonged elsewhere. Work, mee
 The part that stayed with me was the learning curve rather than the saving. Something that had once seemed to belong entirely to professionals became possible through repetition. Each attempt corrected a little of the previous one, although I had to wear every stage of that education in public whenever I left the house.
 
 By the time the result became reliable, cutting hair at home no longer felt unusual. Paying someone else to do it had become the stranger idea.
+
+## Through Hair Grows Back
+
+The scene becomes clearer to me now because it stayed small. A house is built from these small transfers of responsibility: someone cooks, someone clears, someone remembers where the missing thing belongs.
+
+The family part of the scene is not sentimental to me; it is practical, almost procedural, and that makes it more tender. A larger story would probably make it less honest.

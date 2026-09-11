@@ -1,12 +1,13 @@
 ---
 title: "The Green Mile"
 date: 2002-12-21
+description: "How certain should a system be before making a mistake impossible to repair — a software engineer's longing for undo, confronted with justice that has none."
 tags:
    - movie
    - justice
    - compassion
    - death
-   - life
+   - irreversibility
 ---
 
 I watched *The Green Mile* on a rainy evening expecting a prison story.

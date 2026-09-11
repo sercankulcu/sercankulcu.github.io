@@ -22,3 +22,9 @@ Sports never allow celebration to last very long. Another match was already wait
 But on that night, none of that needed much attention. His team had won.
 
 For once, somebody else's good day was enough.
+
+## After Among the Players
+
+I like the memory most where it refuses to explain itself completely. The family part of the scene is not sentimental to me; it is practical, almost procedural, and that makes it more tender.
+
+Home often announces itself through chores before it announces itself through emotion. That is why the memory keeps its weight without becoming dramatic.

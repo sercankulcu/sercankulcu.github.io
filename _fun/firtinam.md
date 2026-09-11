@@ -1,6 +1,7 @@
 ---
 title: "Fırtınam"
 date: 2026-09-07
+description: "A person can appear completely fine while carrying an old storm somewhere inside — and this song always finds mine."
 tags:
    - music
    - love

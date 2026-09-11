@@ -1,11 +1,13 @@
 ---
 title: "Los Amantes del Círculo Polar"
 date: 2009-04-27
+description: "A circle is not the same as return — on timing, almost-meetings, and the way coincidence can feel like a physical force."
 tags:
    - movie
-   - memories
    - romance
-   - life
+   - coincidence
+   - timing
+   - palindrome
 ---
 
 When I wrote about *Los Amantes del Círculo Polar* in 2009, I called it the most beautiful film I had ever seen.

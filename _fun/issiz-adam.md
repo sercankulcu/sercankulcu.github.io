@@ -1,12 +1,13 @@
 ---
 title: "Issız Adam"
 date: 2011-08-06
+description: "The film helped me distinguish two conditions that can look identical from outside: being capable of living alone and needing to remain alone."
 tags:
    - movie
    - family
    - loneliness
-   - memories
-   - life
+   - solitude
+   - attachment
 ---
 
 When *Issız Adam* ended, I called my mother.

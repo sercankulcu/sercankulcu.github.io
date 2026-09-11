@@ -30,3 +30,9 @@ The strange part was that the original intention still made sense to me. I was n
 A single word stood between punishment and permission.
 
 Naturally, I began paying very close attention to that word.
+
+## Beside One Word Too Many
+
+I keep returning to the small practical detail, because that is where the feeling is stored. Attachment rarely leaves through the main door. It stays in side details and waits there.
+
+The scene remembers how much can happen inside one sentence when the right person is involved. So I leave it there: not polished smooth, just visible enough.

@@ -28,3 +28,9 @@ He offered no story about the singer or the period. There was no explanation of 
 The television continued.
 
 For a few seconds, however, the direction of knowledge had reversed. I asked the question, and my father already had the answer.
+
+## Beside Who Is That?
+
+I like the memory most where it refuses to explain itself completely. The family part of the scene is not sentimental to me; it is practical, almost procedural, and that makes it more tender.
+
+The family part of the scene is not sentimental to me; it is practical, almost procedural, and that makes it more tender. That small resistance to disappearance is enough.

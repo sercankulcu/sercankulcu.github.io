@@ -46,3 +46,9 @@ Facebook.
 Music.
 
 Everything after that should at least have the honesty to call itself preference.
+
+## Near Facebook, Winamp, Five Thousand
+
+The scene becomes clearer to me now because it stayed small. The machine gives the memory a timestamp, but the human confusion around it is still current.
+
+The technology in the scene is already a period object now, but the feeling around it has not aged as quickly. That is why the memory keeps its weight without becoming dramatic.

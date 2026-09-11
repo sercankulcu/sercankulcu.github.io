@@ -20,3 +20,9 @@ The sequence was predictable: request, complaint, lecture, payment, success. If 
 I never considered the situation serious enough to shut the system down completely, and that is important. The joke existed because affection was stronger than irritation. Families survive many small unfairnesses that would destroy a business, partly because nobody expects every dinner, taxi, or small purchase to end at exactly zero.
 
 Still, I noticed the pattern, and apparently he noticed that I noticed. Then he continued improving. I should probably have been proud. Not everyone gets to watch professional development happen at their own expense.
+
+## Near The Older Brother Pays
+
+Nothing here needs to be enlarged; it only needs to be held still for a second. The room matters because everyone in it already knows rules nobody has bothered to write down.
+
+A house is built from these small transfers of responsibility: someone cooks, someone clears, someone remembers where the missing thing belongs. A larger story would probably make it less honest.

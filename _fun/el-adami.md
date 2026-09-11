@@ -1,6 +1,7 @@
 ---
 title: "El Adamı"
 date: 2026-09-07
+description: "Being alone and choosing solitude are not the same thing — on the dignity of recognizing when enough is enough, and loving without becoming owned."
 tags:
    - music
    - love

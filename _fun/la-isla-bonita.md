@@ -1,6 +1,7 @@
 ---
 title: "La Isla Bonita: Take Me Back to the Heat"
 date: 2014-07-29
+description: "A song can remind the body that the world is larger than obligation — on temporary escape, warm-night love, and the small rebellion of pleasure."
 tags:
    - music
    - summer

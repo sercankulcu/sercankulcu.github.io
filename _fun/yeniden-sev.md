@@ -1,6 +1,7 @@
 ---
 title: "Yeniden Sev"
 date: 2026-09-07
+description: "Real renewal cannot be two people repeating their old roles expecting a new ending — but some fires do not disappear simply because we walked away."
 tags:
    - music
    - love

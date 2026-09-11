@@ -30,3 +30,9 @@ Memory translates them.
 Ten meters meant I could make tea without stopping the song.
 
 For me, that was the real measurement.
+
+## Near Ten Meters of Freedom
+
+This is the kind of moment that survives by being oddly specific. The family part of the scene is not sentimental to me; it is practical, almost procedural, and that makes it more tender.
+
+The room matters because everyone in it already knows rules nobody has bothered to write down. The rest of the day may be gone, but this little arrangement still has edges.

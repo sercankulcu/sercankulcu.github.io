@@ -1,6 +1,7 @@
 ---
 title: "Animal Instinct"
 date: 2026-09-07
+description: "Loving someone makes you stronger and more frightened at the same time — the instinct to protect never disappears, only changes form when holding their hand becomes letting them go."
 tags:
    - music
    - love

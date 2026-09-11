@@ -1,6 +1,7 @@
 ---
 title: "The Imitation Game"
 date: 2015-01-24
+description: "Difficult work can be lonely long before it becomes important — and a surname can survive more comfortably in textbooks than the person who owned it ever lived."
 tags:
    - movie
    - computing

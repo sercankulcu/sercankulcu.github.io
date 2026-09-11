@@ -30,3 +30,9 @@ We celebrated a goal against the team we normally supported with enough enthusia
 By the end of the match, nobody had officially changed teams. There were no declarations, no new scarves, no permanent conversion. We were still ourselves.
 
 But for ninety minutes, in that part of Eskişehir, the question of who we supported had received a very practical answer.
+
+## Near For Ninety Minutes
+
+The useful part is not a lesson so much as a texture. The scene keeps one clear fragment and lets the rest stay blurred.
+
+The scene keeps one clear fragment and lets the rest stay blurred. I think the truth of the memory lives exactly in that uneven size.

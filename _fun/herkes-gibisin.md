@@ -1,6 +1,7 @@
 ---
 title: "Herkes Gibisin"
 date: 2026-09-07
+description: "The strongest sign a relationship is truly over is not when you stop loving someone — it is when you stop needing them to understand what they did."
 tags:
    - music
    - love

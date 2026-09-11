@@ -20,3 +20,9 @@ I never liked that version of engineering. The engineers I respected could move 
 Lunch should have been easier. Take a tray, take food, sit, eat, return to work. It was an efficient system. Perhaps the cafeteria food was bad; that would have been a perfectly good reason not to go. But “like workers” was different because it turned a meal into a statement about status.
 
 Years later, I do not remember what we ate or even whether we eventually went to the cafeteria together. I remember the sentence. And I still think the answer is simple: yes, like workers. We were at work.
+
+## Under The Cafeteria
+
+The day probably looked forgettable from outside, which makes its survival more interesting. Student life made small things feel official before they deserved to be official: a form, a seat, a delay, a half-success.
+
+The campus feeling is there: low stakes from far away, enormous stakes from inside the day. That is why the memory keeps its weight without becoming dramatic.

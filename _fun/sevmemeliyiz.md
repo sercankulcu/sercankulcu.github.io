@@ -1,6 +1,7 @@
 ---
 title: "Sevmemeliyiz"
 date: 2026-09-07
+description: "To have someone beside you and still miss being found — on the strangest loneliness, which is loving someone who does not truly see you."
 tags:
    - music
    - love

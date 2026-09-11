@@ -48,3 +48,9 @@ Years later, I am glad I do not remember what I said next.
 I remember only what I almost said.
 
 Sometimes the sentence you swallow tells the story better than the one that leaves your mouth.
+
+## Past After Three and a Half Years
+
+I keep returning to the small practical detail, because that is where the feeling is stored. The emotional charge is in what remains unsolved: the message, the question, the phrase that kept echoing after the moment ended.
+
+The emotional charge is in what remains unsolved: the message, the question, the phrase that kept echoing after the moment ended. It remains as a modest proof that ordinary life was never as empty as it looked.

@@ -1,6 +1,7 @@
 ---
 title: "Indie Game: The Movie"
 date: 2013-01-06
+description: "Finishing is not the point where nothing more can be improved — it is the point where you accept that improvement must continue in public."
 tags:
    - documentary
    - games

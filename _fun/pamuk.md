@@ -1,11 +1,12 @@
 ---
 title: "Pamuk: Moving Out of a Soft Heart"
 date: 2009-10-29
+description: "Moving out of someone's heart requires accepting that the place can remain beautiful long after it stops being yours."
 tags:
    - music
    - love
    - separation
-   - memories
+   - heartbreak
    - pop
 ---
 

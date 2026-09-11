@@ -48,3 +48,9 @@ The sentence stayed with me because it was so modest.
 I have change.
 
 Sometimes that is enough to move the day forward.
+
+## Inside I Have Change
+
+Looking back, I trust the ordinary detail more than the tidy conclusion. The object or phrase works like a handle on a drawer I did not know was still there.
+
+A minor detail can be more faithful than a grand summary. The rest of the day may be gone, but this little arrangement still has edges.

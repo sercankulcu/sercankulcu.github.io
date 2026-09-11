@@ -28,3 +28,9 @@ But when I remember the city now, I do not first see monuments or large avenues.
 The city could make an evening feel empty.
 
 It never felt unfamiliar.
+
+## Near A Friday That Felt Like Tuesday
+
+I keep returning to the small practical detail, because that is where the feeling is stored. The place gives the memory its geometry: a corner, a route, a delay, the short distance between comfort and embarrassment.
+
+A location can hold the feeling better than a full explanation can. I think the truth of the memory lives exactly in that uneven size.

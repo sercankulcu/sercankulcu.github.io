@@ -36,3 +36,9 @@ There are memories like that: unimpressive from outside, very specific from with
 A map would show only the route.
 
 My feet kept better records.
+
+## Around The Blisters
+
+Looking back, I trust the ordinary detail more than the tidy conclusion. The scene keeps one clear fragment and lets the rest stay blurred.
+
+The scene keeps one clear fragment and lets the rest stay blurred. The memory does not ask to be important; it only asks not to be erased.

@@ -1,6 +1,7 @@
 ---
 title: "Life Is Beautiful"
 date: 2005-03-26
+description: "Translation is not always deception — sometimes it is shelter, and Guido's genius is protecting his son not from circumstance but from its full meaning."
 tags:
    - movie
    - family

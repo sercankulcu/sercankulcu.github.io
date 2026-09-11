@@ -1,12 +1,13 @@
 ---
 title: 'Hamurabi'
 date: 2006-02-20
+description: "Growth creates obligations — a game that teaches resource allocation by making every grain of wheat a choice between this year and the next."
 tags:
-   - fun
    - game
    - programming
    - history
-   - self-improvement
+   - simulation
+   - resource-management
 ---
 
 Long before anyone thought of a computer game, Hammurabi ruled Babylon. His name survived through one of history's best-known law codes, a record of a society trying to make trade, property, debt, agriculture, family and punishment legible through rules.

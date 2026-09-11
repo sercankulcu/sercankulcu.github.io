@@ -1,6 +1,7 @@
 ---
 title: "Kill Bill, Revisited"
 date: 2007-01-20
+description: "On second viewing, I watched the movie changing its clothes — style is not decoration added after the content is decided."
 tags:
    - movie
    - revenge

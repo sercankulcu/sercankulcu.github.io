@@ -1,6 +1,7 @@
 ---
 title: "Dido: Live at Brixton Academy"
 date: 2026-09-07
+description: "Dido's Brixton Academy concert became a place to return to across many late nights — energy that wakes you up not by noise but by making you want to stay present."
 tags:
    - music
    - dido

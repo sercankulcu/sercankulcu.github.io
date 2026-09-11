@@ -30,3 +30,9 @@ I was already going somewhere else.
 True enough to be defended.
 
 Useful enough to remove me from the room.
+
+## Beside I Was Already Going Somewhere Else
+
+I like the memory most where it refuses to explain itself completely. Attachment rarely leaves through the main door. It stays in side details and waits there.
+
+The emotional charge is in what remains unsolved: the message, the question, the phrase that kept echoing after the moment ended. It remains as a modest proof that ordinary life was never as empty as it looked.

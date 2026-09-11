@@ -1,6 +1,7 @@
 ---
 title: "Kill Bill"
 date: 2006-10-07
+description: "A list gives grief a direction — but a life organized around an enemy creates a problem the enemy cannot solve."
 tags:
    - movie
    - revenge

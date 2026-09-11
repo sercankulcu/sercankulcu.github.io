@@ -1,6 +1,7 @@
 ---
 title: "Inception"
 date: 2010-08-07
+description: "The mind is not obligated to accept a correct diagnosis as a patch — on planted ideas, the architecture of memory, and why understanding a mechanism does not guarantee control of it."
 tags:
    - movie
    - dreams

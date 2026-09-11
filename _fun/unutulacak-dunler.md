@@ -1,11 +1,12 @@
 ---
 title: "Unutulacak Dünler: There Are Still Days to Live"
 date: 2021-08-25
+description: "There are yesterdays that will be forgotten and still days waiting to be lived — a tired mind should not make permanent conclusions from temporary conditions."
 tags:
    - music
-   - memories
-   - life
+   - gazapizm
    - hope
+   - resilience
    - philosophy
 ---
 

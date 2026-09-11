@@ -41,3 +41,9 @@ Years later, that decision has preserved him surprisingly well.
 The archive knows there were stories.
 
 It simply does not get to hear them.
+
+## After What I Will Not Write Down
+
+I keep returning to the small practical detail, because that is where the feeling is stored. A minor detail can be more faithful than a grand summary.
+
+A minor detail can be more faithful than a grand summary. It remains as a modest proof that ordinary life was never as empty as it looked.

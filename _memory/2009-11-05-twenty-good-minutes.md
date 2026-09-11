@@ -26,3 +26,9 @@ I still like that standard.
 Not everything pleasant needs to become significant.
 
 Some things earn their place by making twenty ordinary minutes better.
+
+## Through Twenty Good Minutes
+
+I keep returning to the small practical detail, because that is where the feeling is stored. The object or phrase works like a handle on a drawer I did not know was still there.
+
+The object or phrase works like a handle on a drawer I did not know was still there. The memory does not ask to be important; it only asks not to be erased.

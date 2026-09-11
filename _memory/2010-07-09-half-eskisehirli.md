@@ -32,3 +32,13 @@ Belonging rarely arrives through a formal moment. Sometimes it appears because y
 I do not know whether drinking one bottle can make anyone half a citizen of a city.
 
 Repeatedly spilling the same local water might get you closer.
+
+## Past Half Eskişehirli
+
+The scene becomes clearer to me now because it stayed small. A minor detail can be more faithful than a grand summary.
+
+A minor detail can be more faithful than a grand summary. That small resistance to disappearance is enough.
+
+Eskişehirli olmanın yarısı bile bazen yeter. Bir şehirle bağ kurmak için nüfus kaydından çok daha küçük şeyler gerekir: hangi sokakta yavaşlanacağını bilmek, hangi soğuğun akşamı sertleştireceğini tanımak, bir ismi duyunca zihinde doğru rengin belirmesi.
+
+Belki de yarım aidiyet bu yüzden tam aidiyetten daha dürüst gelir. İçinde hem sahiplenme hem mesafe vardır. İnsan bir yere tamamen ait olmadığında, o yeri daha dikkatli seyreder.

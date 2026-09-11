@@ -1,14 +1,13 @@
 ---
 title: "Hasret Türküsü: The Distance That Grows Inside Us"
 date: 2026-09-03
+description: "A life without longing would also be a life without strong connections — on the untranslatable weight of hasret and the distance that grows only inside us."
 tags:
    - music
    - suavi
-   - hasret-turkusu
    - longing
    - distance
-   - memories
-   - life
+   - identity
 ---
 
 Some kinds of longing are easy to understand. You miss a person, a city, a house, or a familiar voice. You know exactly what is absent.

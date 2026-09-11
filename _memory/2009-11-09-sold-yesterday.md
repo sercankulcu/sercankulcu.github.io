@@ -50,3 +50,9 @@ But “bad timing” was much less satisfying than believing somebody, somewhere
 Four days after writing that complaint, I had bought a car.
 
 The universe, apparently, had a very short attention span.
+
+## Under Sold Yesterday
+
+The day probably looked forgettable from outside, which makes its survival more interesting. The scene keeps one clear fragment and lets the rest stay blurred.
+
+A minor detail can be more faithful than a grand summary. The rest of the day may be gone, but this little arrangement still has edges.

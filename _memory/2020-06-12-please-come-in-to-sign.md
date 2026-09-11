@@ -42,3 +42,9 @@ Electronic signatures had arrived.
 The future was functioning.
 
 It still wanted me to come in and sign.
+
+## Under Please Come In to Sign
+
+This is the kind of moment that survives by being oddly specific. Student life made small things feel official before they deserved to be official: a form, a seat, a delay, a half-success.
+
+Student life made small things feel official before they deserved to be official: a form, a seat, a delay, a half-success. So I leave it there: not polished smooth, just visible enough.

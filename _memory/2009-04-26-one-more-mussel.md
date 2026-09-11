@@ -35,3 +35,9 @@ Maybe that is why the mussel stayed. It was not about appetite. It was about bei
 A hundred mussels would have been only a number.
 
 One handed with care became a memory.
+
+## Under One More Mussel
+
+Looking back, I trust the ordinary detail more than the tidy conclusion. There is a young-person seriousness in the scene, the kind that treats a minor event as evidence for an entire future.
+
+There is a young-person seriousness in the scene, the kind that treats a minor event as evidence for an entire future. That is why the memory keeps its weight without becoming dramatic.

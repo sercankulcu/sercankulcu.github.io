@@ -1,6 +1,7 @@
 ---
 title: "Sen Ağlama Yar"
 date: 2026-09-07
+description: "One of the purest forms of love is not saying do not leave me — it is saying whatever happens to me, please be all right."
 tags:
    - music
    - love

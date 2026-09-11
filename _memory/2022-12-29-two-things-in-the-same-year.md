@@ -28,3 +28,13 @@ One long piece of work reached its last page.
 Someone important was missing from what came after.
 
 Both happened in the same year. That is the only connection they need.
+
+## Near Two Things in the Same Year
+
+This is the kind of moment that survives by being oddly specific. A minor detail can be more faithful than a grand summary.
+
+The object or phrase works like a handle on a drawer I did not know was still there. The rest of the day may be gone, but this little arrangement still has edges.
+
+Aynı yıl içinde iki şey olunca takvim adil davranmamış gibi gelir. İnsan bir olayın ağırlığını yerleştirmeye çalışırken diğeri gelir ve aynı rafı ister.
+
+Bu yüzden bazı yıllar tek cümleyle kapanmaz. Birbirine değen iki ayrı ağırlık taşırlar. Yılı hatırlatan şey olaylardan biri değil, ikisinin aynı kutuya sığmaya zorlanmasıdır.

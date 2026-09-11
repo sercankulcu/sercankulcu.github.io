@@ -1,13 +1,12 @@
 ---
 title: "Nilüfer: Loving Someone Who Is No Longer Yours"
 date: 2026-09-03
+description: "After a long separation, we may no longer miss the real person — we miss the person we remember, and the version of ourselves who knew them."
 tags:
    - music
    - muslum-gurses
-   - nilufer
    - love
    - separation
-   - memories
    - longing
 ---
 

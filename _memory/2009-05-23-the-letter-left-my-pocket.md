@@ -40,3 +40,9 @@ Digital words disappear into a system. A letter crosses a small physical distanc
 That is probably why the moment stayed.
 
 Once the letter left my pocket, the thought was no longer only mine.
+
+## Inside The Letter Left My Pocket
+
+The day probably looked forgettable from outside, which makes its survival more interesting. A minor detail can be more faithful than a grand summary.
+
+The smallness is not a weakness. It is the reason the memory can remain exact. I think the truth of the memory lives exactly in that uneven size.

@@ -1,6 +1,7 @@
 ---
 title: "Kırmış Kalbini"
 date: 2026-09-07
+description: "Many people are around when life is easy — real friendship often reveals itself by simply refusing to disappear."
 tags:
    - music
    - friendship

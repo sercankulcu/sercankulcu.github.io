@@ -27,3 +27,9 @@ Eventually the trip continued. The market was gone, and I cannot remember what I
 I remember the minibus.
 
 The market had been on the itinerary. The minibus was the part that stayed.
+
+## After The Minibus Would Not Move
+
+The scene becomes clearer to me now because it stayed small. The place gives the memory its geometry: a corner, a route, a delay, the short distance between comfort and embarrassment.
+
+Movement is the secret subject here. Someone waits, crosses, turns, arrives, or fails to arrive. The memory does not ask to be important; it only asks not to be erased.

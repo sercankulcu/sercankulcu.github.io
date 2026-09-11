@@ -26,3 +26,9 @@ That was the useful part.
 Before seeing another workplace, the rules of your own environment can feel natural. Then another office shows you that hours, hierarchy, breaks, and even the relationship between work and ordinary life are designed choices.
 
 After that, your old rules can no longer pretend they are the only ones.
+
+## Beside Friday at Noon
+
+Looking back, I trust the ordinary detail more than the tidy conclusion. The machine gives the memory a timestamp, but the human confusion around it is still current.
+
+A screen or file can preserve an earlier self with embarrassing accuracy. It remains as a modest proof that ordinary life was never as empty as it looked.
