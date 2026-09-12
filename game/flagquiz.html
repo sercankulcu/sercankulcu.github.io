@@ -338,6 +338,7 @@ excerpt: "Identify country flags in a 10-question quiz."
       <div class="flagquiz-flag-card">
         <img class="flagquiz-flag" id="flagquiz-flag" src="" alt="">
         <p class="flagquiz-fallback" id="flagquiz-fallback" hidden>Flag image could not be loaded.</p>
+        <button class="flagquiz-button" id="flagquiz-retry" type="button" hidden>Retry</button>
       </div>
     </div>
 
@@ -411,6 +412,8 @@ excerpt: "Identify country flags in a 10-question quiz."
   const help = document.getElementById("flagquiz-help");
   const modal = document.getElementById("flagquiz-modal");
   const close = document.getElementById("flagquiz-close");
+  const retry = document.getElementById("flagquiz-retry");
+  const panel = document.querySelector(".flagquiz-panel");
 
   let quiz = [];
   let questionIndex = 0;
@@ -419,6 +422,7 @@ excerpt: "Identify country flags in a 10-question quiz."
   let current = null;
   let locked = false;
   let advanceTimer = null;
+  let shownIndex = -1;
 
   function shuffle(items) {
     const copy = [...items];
@@ -443,6 +447,34 @@ excerpt: "Identify country flags in a 10-question quiz."
     message.textContent = `Quiz complete: ${correctCount}/10 correct, score ${scoreValue}.`;
   }
 
+  function handleFlagError() {
+    fallback.hidden = false;
+    retry.hidden = false;
+    locked = true;
+
+    for (const option of options.children) {
+      option.disabled = true;
+    }
+
+    message.textContent = "The flag did not load, so answering is paused. Try again.";
+  }
+
+  function handleFlagLoad() {
+    fallback.hidden = true;
+    retry.hidden = true;
+
+    /* Only re-open answering when we recovered before the question was answered. */
+    if (locked && questionIndex === shownIndex) {
+      locked = false;
+
+      for (const option of options.children) {
+        option.disabled = false;
+      }
+
+      message.textContent = "";
+    }
+  }
+
   function showQuestion() {
     if (questionIndex >= quiz.length) {
       finishQuiz();
@@ -451,19 +483,19 @@ excerpt: "Identify country flags in a 10-question quiz."
 
     locked = false;
     current = quiz[questionIndex];
+    shownIndex = questionIndex;
 
     flagWrap.hidden = false;
     fallback.hidden = true;
+    retry.hidden = true;
     message.textContent = "";
     number.textContent = String(questionIndex + 1);
     progress.style.width = `${questionIndex * 10}%`;
 
+    flag.alt = "Flag to identify";
+    flag.onerror = handleFlagError;
+    flag.onload = handleFlagLoad;
     flag.src = flagUrl(current[1]);
-    flag.alt = `Flag to identify`;
-
-    flag.onerror = () => {
-      fallback.hidden = false;
-    };
 
     const wrongChoices = shuffle(
       COUNTRIES.filter(country => country[0] !== current[0])
@@ -548,11 +580,13 @@ excerpt: "Identify country flags in a 10-question quiz."
 
   function openHelp() {
     modal.classList.add("is-open");
+    panel.inert = true;
     close.focus();
   }
 
   function closeHelp() {
     modal.classList.remove("is-open");
+    panel.inert = false;
     help.focus();
   }
 
@@ -569,6 +603,14 @@ excerpt: "Identify country flags in a 10-question quiz."
     if (event.key === "Escape" && modal.classList.contains("is-open")) {
       closeHelp();
     }
+  });
+
+  retry.addEventListener("click", () => {
+    if (!current) return;
+    fallback.hidden = true;
+    retry.hidden = true;
+    message.textContent = "Loading flag...";
+    flag.src = `${flagUrl(current[1])}?retry=${Date.now()}`;
   });
 
   restart.addEventListener("click", startQuiz);

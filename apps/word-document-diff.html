@@ -223,6 +223,16 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   </script>
 <script>(() => {
   'use strict';
+/* Blocking site data makes localStorage itself throw, which would abort this
+   whole script. Fall back to a memory store so the page still works. */
+let store;
+try { localStorage.getItem("_probe"); store = localStorage; }
+catch { const mem = new Map(); store = {
+  getItem: k => (mem.has(k) ? mem.get(k) : null),
+  setItem: (k, v) => { mem.set(k, String(v)); },
+  removeItem: k => { mem.delete(k); }
+}; }
+
 
   const MAX_FILE_SIZE = 80 * 1024 * 1024;
   const IMAGE_SENTINEL = '\uFFFC';
@@ -254,7 +264,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     ar:{languageLabel:'اللغة',theme:'تغيير المظهر',description:'يقارن مستندي Word ويحوّل المستند المعدّل بالكامل إلى PDF بتنسيق مقال. يظهر النص غير المتغير بالأسود، والإضافات بالأخضر، والحذف بالأحمر.',oldLabel:'المستند القديم / الأصلي',oldHelp:'اسحب الملف أو انقر للاختيار',newLabel:'المستند الجديد / المعدّل',newHelp:'يعتمد تنسيق PDF على هذا المستند',noFile:'لم يتم اختيار ملف',swap:'تبديل المستندين',privacy:'تتم المقارنة وإنشاء PDF بالكامل داخل المتصفح.',clear:'مسح',create:'إنشاء PDF بالتغييرات',ready:'ملف PDF جاهز',unchangedText:'نص غير متغير',addedText:'نص مضاف',removedText:'نص محذوف',black:'أسود',green:'أخضر',red:'أحمر',footnote:'تُنقل الفقرات والعناوين والجداول وتنسيقات الصور الشائعة من المستند المعدّل إلى PDF. لا تُعلّم تغييرات التنسيق فقط كفروق. ملفات .doc القديمة غير مدعومة.',uploadAria:'رفع مستندات Word',legendAria:'ألوان PDF',invalidFile:'يمكن استخدام ملفات .docx أو .docm فقط.',tooLarge:'يتجاوز الملف حد 80 ميغابايت.',reading:'جارٍ قراءة مستندات Word…',calculating:'جارٍ حساب تغييرات النص…',layingOut:'جارٍ تنسيق صفحات PDF…',pages:'جارٍ إعداد صفحات PDF ({current}/{total})…',creatingPdf:'جارٍ إنشاء ملف PDF…',downloaded:'تم تنزيل PDF',genericError:'حدث خطأ أثناء إعداد PDF.',summary:'تم إنشاء PDF من {pages} صفحة. تم تعليم {added} كلمة مضافة و{removed} كلمة محذوفة. تم نقل {images} صورة.',added:'مضاف',removed:'محذوف',unchanged:'غير متغير',formatNote:'تغييرات التنسيق غير مشمولة في المقارنة.',image:'صورة',imageAlt:'صورة المستند'}
   };
   const supportedLanguages = Object.keys(translations);
-  let currentLanguage = localStorage.getItem('wordTrackPdfLanguage') || (navigator.language || 'tr').slice(0,2).toLowerCase();
+  let currentLanguage = store.getItem('wordTrackPdfLanguage') || (navigator.language || 'tr').slice(0,2).toLowerCase();
   if (!supportedLanguages.includes(currentLanguage)) currentLanguage = 'en';
   function t(key, vars = {}) {
     let text = translations[currentLanguage]?.[key] ?? translations.en[key] ?? key;
@@ -262,7 +272,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   }
   function applyLanguage(language) {
     currentLanguage = supportedLanguages.includes(language) ? language : 'en';
-    localStorage.setItem('wordTrackPdfLanguage', currentLanguage);
+    store.setItem('wordTrackPdfLanguage', currentLanguage);
     appRoot.lang = currentLanguage;
     appRoot.dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
     appRoot.querySelectorAll('[data-i18n]').forEach((node) => { node.textContent = t(node.dataset.i18n); });

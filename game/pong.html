@@ -80,7 +80,15 @@ const ctx = canvas.getContext("2d");
 const W = 800, H = 450;
 const PW = 12, PH = 88, BR = 8;
 const WINNING = 7;
-const AI_SPEED = [3.2, 5.5, 8]; /* easy, medium, hard */
+/* Per-second units so the game plays the same on 60Hz and 144Hz screens.
+   dt is capped at one 60Hz frame: a slow machine runs in slow motion rather
+   than letting the ball jump straight through a paddle. */
+const AI_SPEED = [192, 330, 480]; /* easy, medium, hard - px/s */
+const PLAYER_SPEED = 420;         /* px/s */
+const BALL_SPEED_INIT = 300;      /* px/s */
+const BALL_SPEED_STEP = 21;       /* px/s per paddle hit */
+const BALL_SPEED_MAX = 1080;      /* px/s */
+const MAX_DT = 1 / 60;
 let difficulty = 0;
 let scores = [0, 0];
 let state = "idle"; /* idle | playing | scored | over */
@@ -88,12 +96,13 @@ let raf = 0;
 
 let ball, player, ai;
 let keysDown = {};
+let lastTime = 0;
 
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
 function initBall(dir = 1) {
   const ang = (Math.random() * 0.6 - 0.3);
-  const speed = 5;
+  const speed = BALL_SPEED_INIT;
   ball = { x: W/2, y: H/2, vx: dir * speed * Math.cos(ang), vy: speed * Math.sin(ang), speed };
 }
 
@@ -111,7 +120,8 @@ function startGame() {
   document.getElementById("pong-overlay").style.display = "none";
   document.getElementById("pong-status").textContent = "Playing";
   cancelAnimationFrame(raf);
-  loop();
+  lastTime = performance.now();
+  raf = requestAnimationFrame(loop);
 }
 
 function updateScoreUI() {
@@ -119,16 +129,16 @@ function updateScoreUI() {
   document.getElementById("pong-score-ai").textContent = scores[1];
 }
 
-function movePlayerByKeys() {
-  const speed = 7;
+function movePlayerByKeys(dt) {
+  const speed = PLAYER_SPEED * dt;
   if (keysDown["w"] || keysDown["W"] || keysDown["ArrowUp"])
     player.y = clamp(player.y - speed, 0, H - PH);
   if (keysDown["s"] || keysDown["S"] || keysDown["ArrowDown"])
     player.y = clamp(player.y + speed, 0, H - PH);
 }
 
-function moveAI() {
-  const spd = AI_SPEED[difficulty];
+function moveAI(dt) {
+  const spd = AI_SPEED[difficulty] * dt;
   const target = ball.y - PH/2;
   ai.y += clamp(target - ai.y, -spd, spd);
   ai.y = clamp(ai.y, 0, H - PH);
@@ -141,13 +151,13 @@ function ballHitsPaddle(paddle) {
          ball.y + BR > paddle.y;
 }
 
-function update() {
+function update(dt) {
   if (state !== "playing") return;
-  movePlayerByKeys();
-  moveAI();
+  movePlayerByKeys(dt);
+  moveAI(dt);
 
-  ball.x += ball.vx;
-  ball.y += ball.vy;
+  ball.x += ball.vx * dt;
+  ball.y += ball.vy * dt;
 
   /* Top / bottom wall */
   if (ball.y - BR <= 0) { ball.y = BR; ball.vy = Math.abs(ball.vy); }
@@ -157,7 +167,7 @@ function update() {
   if (ball.vx < 0 && ballHitsPaddle(player)) {
     ball.x = player.x + PW + BR;
     const rel = ((ball.y - player.y) / PH) - 0.5;
-    ball.speed = Math.min(ball.speed + 0.35, 18);
+    ball.speed = Math.min(ball.speed + BALL_SPEED_STEP, BALL_SPEED_MAX);
     const ang = rel * Math.PI * 0.6;
     ball.vx = ball.speed * Math.cos(ang);
     ball.vy = ball.speed * Math.sin(ang);
@@ -167,7 +177,7 @@ function update() {
   if (ball.vx > 0 && ballHitsPaddle(ai)) {
     ball.x = ai.x - BR;
     const rel = ((ball.y - ai.y) / PH) - 0.5;
-    ball.speed = Math.min(ball.speed + 0.35, 18);
+    ball.speed = Math.min(ball.speed + BALL_SPEED_STEP, BALL_SPEED_MAX);
     const ang = rel * Math.PI * 0.6;
     ball.vx = -(ball.speed * Math.cos(ang));
     ball.vy = ball.speed * Math.sin(ang);
@@ -245,8 +255,10 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-function loop() {
-  update();
+function loop(now) {
+  const dt = Math.min((now - lastTime) / 1000, MAX_DT);
+  lastTime = now;
+  update(dt);
   draw();
   if (state === "playing" || state === "scored") raf = requestAnimationFrame(loop);
 }

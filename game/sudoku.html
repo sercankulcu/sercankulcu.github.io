@@ -551,6 +551,16 @@ html[data-theme="dark"] .sudoku-app {
 
 <script>
 (()=>{'use strict';
+/* Blocking site data makes localStorage itself throw, which would abort this
+   whole script. Fall back to a memory store so the page still works. */
+let store;
+try { localStorage.getItem("_probe"); store = localStorage; }
+catch { const mem = new Map(); store = {
+  getItem: k => (mem.has(k) ? mem.get(k) : null),
+  setItem: (k, v) => { mem.set(k, String(v)); },
+  removeItem: k => { mem.delete(k); }
+}; }
+
 const DIFFICULTIES={easy:{clues:44},medium:{clues:37},hard:{clues:31},expert:{clues:27}},BEST_KEY='sudoku-best-times-v2';
 let solution=[],puzzle=[],initialPuzzle=[],values=[],notes=[],selected=null,notesMode=false,mistakes=0,hintsUsed=0,seconds=0,timerId=null,started=false,solved=false,undoStack=[],redoStack=[],soundEnabled=true,audioCtx=null;
 const boardEl=document.getElementById('board'),keypadEl=document.getElementById('keypad'),statusEl=document.getElementById('status'),timerEl=document.getElementById('timer'),mistakesEl=document.getElementById('mistakes'),notesStateEl=document.getElementById('notesState'),emptyCountEl=document.getElementById('emptyCount'),hintsUsedEl=document.getElementById('hintsUsed'),difficultyEl=document.getElementById('difficulty'),bestTimeEl=document.getElementById('bestTime'),winPanel=document.getElementById('winPanel');
@@ -583,8 +593,8 @@ function restart(){values=deep(initialPuzzle);notes=emptyNotes();selected=null;m
 function updateStats(){timerEl.textContent=time(seconds);mistakesEl.textContent=`${mistakes} / 3`;notesStateEl.textContent=notesMode?'ON':'OFF';hintsUsedEl.textContent=hintsUsed;let e=0;for(const row of values)for(const v of row)if(!v)e++;emptyCountEl.textContent=e;updateBest();updateButtons()}
 function updateButtons(){document.getElementById('undoBtn').disabled=!undoStack.length||solved;document.getElementById('redoBtn').disabled=!redoStack.length||solved;document.getElementById('hintBtn').disabled=solved}
 function updateAll(){renderBoard();updateStats()}
-function getBest(){try{return JSON.parse(localStorage.getItem(BEST_KEY))||{}}catch{return{}}}
-function saveBest(){const b=getBest(),k=difficultyEl.value;if(b[k]==null||seconds<b[k]){b[k]=seconds;localStorage.setItem(BEST_KEY,JSON.stringify(b))}updateBest()}
+function getBest(){try{return JSON.parse(store.getItem(BEST_KEY))||{}}catch{return{}}}
+function saveBest(){const b=getBest(),k=difficultyEl.value;if(b[k]==null||seconds<b[k]){b[k]=seconds;store.setItem(BEST_KEY,JSON.stringify(b))}updateBest()}
 function updateBest(){const b=getBest(),v=b[difficultyEl.value];bestTimeEl.textContent=v==null?'---':time(v)}
 function unlockAudio(){if(!soundEnabled)return;try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}catch(_){}}
 function tone(f,d,v=.025,type='sine',delay=0){if(!soundEnabled)return;try{unlockAudio();const o=audioCtx.createOscillator(),g=audioCtx.createGain(),t=audioCtx.currentTime+delay;o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+d)}catch(_){}}

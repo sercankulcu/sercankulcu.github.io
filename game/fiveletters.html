@@ -122,6 +122,7 @@ excerpt: "Guess the hidden five-letter Turkish word in six attempts."
 }
 
 .fiveletters-cell {
+  position: relative;
   aspect-ratio: 1 / 1;
   display: grid;
   place-items: center;
@@ -132,6 +133,22 @@ excerpt: "Guess the hidden five-letter Turkish word in six attempts."
   font-size: clamp(18px, 4vw, 27px);
   font-weight: 900;
 }
+
+/* The result is also carried by a corner mark so it does not rely on colour. */
+.fiveletters-cell.is-correct::after,
+.fiveletters-cell.is-present::after,
+.fiveletters-cell.is-absent::after {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: .62rem;
+  font-weight: 900;
+  line-height: 1;
+  opacity: .9;
+}
+.fiveletters-cell.is-correct::after { content: "\2713"; }
+.fiveletters-cell.is-present::after { content: "\25CF"; }
+.fiveletters-cell.is-absent::after  { content: "\2715"; }
 
 .fiveletters-cell.is-correct {
   border-color: #2f855a;
@@ -380,6 +397,7 @@ excerpt: "Guess the hidden five-letter Turkish word in six attempts."
   const SIZE = 5;
   const MAX_ATTEMPTS = 6;
   const ALPHABET = "ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ";
+  const STREAK_KEY = "five-letters-streak";
 
   const boardView = document.getElementById("fiveletters-board");
   const keyboard = document.getElementById("fiveletters-keyboard");
@@ -390,14 +408,29 @@ excerpt: "Guess the hidden five-letter Turkish word in six attempts."
   const help = document.getElementById("fiveletters-help");
   const modal = document.getElementById("fiveletters-modal");
   const close = document.getElementById("fiveletters-close");
+  const panel = document.querySelector(".fiveletters-panel");
 
   let secret = "";
   let currentGuess = "";
   let row = 0;
   let gameOver = false;
-  let streak = 0;
+  let streak = loadStreak();
   let history = [];
   let lastSecret = "";
+
+  function loadStreak() {
+    try {
+      return Math.max(0, Number(localStorage.getItem(STREAK_KEY)) || 0);
+    } catch {
+      return 0;
+    }
+  }
+
+  function saveStreak(value) {
+    try {
+      localStorage.setItem(STREAK_KEY, String(value));
+    } catch {}
+  }
 
   function normalize(text) {
     return text.toLocaleUpperCase("tr-TR");
@@ -443,6 +476,12 @@ excerpt: "Guess the hidden five-letter Turkish word in six attempts."
     return result;
   }
 
+  const STATE_LABEL = [
+    "not in the word",
+    "in the word, wrong spot",
+    "correct spot"
+  ];
+
   function renderBoard() {
     boardView.innerHTML = "";
 
@@ -454,6 +493,10 @@ excerpt: "Guess the hidden five-letter Turkish word in six attempts."
         if (r < history.length) {
           const entry = history[r];
           cell.textContent = entry.word[c];
+          cell.setAttribute(
+            "aria-label",
+            `${entry.word[c]}, ${STATE_LABEL[entry.result[c]]}`
+          );
 
           if (entry.result[c] === 2) {
             cell.classList.add("is-correct");
@@ -493,6 +536,15 @@ excerpt: "Guess the hidden five-letter Turkish word in six attempts."
       button.classList.remove("is-correct", "is-present", "is-absent");
 
       const state = states[button.dataset.letter];
+
+      if (state === undefined) {
+        button.removeAttribute("aria-label");
+      } else {
+        button.setAttribute(
+          "aria-label",
+          `${button.dataset.letter}, ${STATE_LABEL[state]}`
+        );
+      }
 
       if (state === 2) {
         button.classList.add("is-correct");
@@ -538,6 +590,7 @@ excerpt: "Guess the hidden five-letter Turkish word in six attempts."
 
     if (currentGuess === secret) {
       streak += 1;
+      saveStreak(streak);
       streakView.textContent = String(streak);
       message.textContent = `Correct in ${row + 1} ${row === 0 ? "attempt" : "attempts"}.`;
       gameOver = true;
@@ -555,6 +608,7 @@ excerpt: "Guess the hidden five-letter Turkish word in six attempts."
 
     if (row >= MAX_ATTEMPTS) {
       streak = 0;
+      saveStreak(streak);
       streakView.textContent = "0";
       message.textContent = `The word was ${secret}.`;
       gameOver = true;
@@ -612,11 +666,13 @@ excerpt: "Guess the hidden five-letter Turkish word in six attempts."
 
   function openHelp() {
     modal.classList.add("is-open");
+    panel.inert = true;
     close.focus();
   }
 
   function closeHelp() {
     modal.classList.remove("is-open");
+    panel.inert = false;
     help.focus();
   }
 
@@ -689,6 +745,7 @@ excerpt: "Guess the hidden five-letter Turkish word in six attempts."
 
       restart.disabled = false;
       message.textContent = "";
+      streakView.textContent = String(streak);
       buildKeyboard();
       startGame();
     } catch (error) {
