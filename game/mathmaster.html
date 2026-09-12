@@ -336,7 +336,7 @@ excerpt: "Solve as many arithmetic problems as possible in two minutes."
       <span id="mathmaster-progress"></span>
     </div>
 
-    <div class="mathmaster-question" id="mathmaster-question"></div>
+    <div class="mathmaster-question" id="mathmaster-question" aria-live="polite"></div>
 
     <input
       class="mathmaster-answer"
@@ -387,7 +387,7 @@ excerpt: "Solve as many arithmetic problems as possible in two minutes."
       <li>⌫ removes the last digit and C clears the answer.</li>
       <li>Correct answers increase your streak and score bonus.</li>
       <li>Wrong answers cost 2 points and reset the streak.</li>
-      <li>Skipping costs 1 point and reveals the answer.</li>
+      <li>Skipping costs 3 points and reveals the answer.</li>
       <li>The game lasts two minutes.</li>
     </ul>
   </div>
@@ -415,10 +415,12 @@ excerpt: "Solve as many arithmetic problems as possible in two minutes."
   const help = document.getElementById("mathmaster-help");
   const modal = document.getElementById("mathmaster-modal");
   const close = document.getElementById("mathmaster-close");
+  const panel = document.querySelector(".mathmaster-panel");
 
   let score = 0;
   let streak = 0;
   let secondsLeft = GAME_SECONDS;
+  let gameEndTime = 0;
   let correctAnswer = 0;
   let timer = null;
   let ended = false;
@@ -468,6 +470,9 @@ excerpt: "Solve as many arithmetic problems as possible in two minutes."
   }
 
   function updateClock() {
+    /* Derived from a wall-clock deadline: a throttled tab would otherwise
+       hand the player extra time, because ticks stop firing once a second. */
+    secondsLeft = Math.max(0, Math.ceil((gameEndTime - performance.now()) / 1000));
     timeView.textContent = formatTime(secondsLeft);
     progress.style.width = `${Math.max(0, secondsLeft / GAME_SECONDS * 100)}%`;
   }
@@ -495,6 +500,7 @@ excerpt: "Solve as many arithmetic problems as possible in two minutes."
     score = 0;
     streak = 0;
     secondsLeft = GAME_SECONDS;
+    gameEndTime = performance.now() + GAME_SECONDS * 1000;
     ended = false;
 
     scoreView.textContent = "0";
@@ -506,13 +512,12 @@ excerpt: "Solve as many arithmetic problems as possible in two minutes."
     newQuestion();
 
     timer = window.setInterval(() => {
-      secondsLeft -= 1;
       updateClock();
 
       if (secondsLeft <= 0) {
         finishGame();
       }
-    }, 1000);
+    }, 250);
   }
 
   function appendDigit(digit) {
@@ -561,7 +566,7 @@ excerpt: "Solve as many arithmetic problems as possible in two minutes."
     const revealed = correctAnswer;
 
     streak = 0;
-    score = Math.max(0, score - 1);
+    score = Math.max(0, score - 3);
 
     scoreView.textContent = String(score);
     streakView.textContent = "0";
@@ -572,11 +577,13 @@ excerpt: "Solve as many arithmetic problems as possible in two minutes."
 
   function openHelp() {
     modal.classList.add("is-open");
+    panel.inert = true;
     close.focus();
   }
 
   function closeHelp() {
     modal.classList.remove("is-open");
+    panel.inert = false;
     help.focus();
   }
 

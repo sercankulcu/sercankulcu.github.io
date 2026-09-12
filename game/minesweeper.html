@@ -473,6 +473,7 @@ catch { const mem = new Map(); store = {
   let flags = 0;
   let safeRevealed = 0;
   let seconds = 0;
+  let startTime = 0;
   let timerId = null;
   let longPressTimer = null;
   let longPressTriggered = false;
@@ -766,17 +767,18 @@ catch { const mem = new Map(); store = {
 
   function renderCell(cell) {
     const el = cell.element;
+    const position = `row ${cell.row+1}, column ${cell.col+1}`;
     el.className = "minesweeper-cell";
     el.textContent = "";
 
     if (cell.flagged && !cell.revealed) {
       el.classList.add("flagged");
-      el.setAttribute("aria-label",`Flagged square row ${cell.row+1}, column ${cell.col+1}`);
+      el.setAttribute("aria-label",`Flagged square ${position}`);
       return;
     }
 
     if (!cell.revealed) {
-      el.setAttribute("aria-label",`Covered square row ${cell.row+1}, column ${cell.col+1}`);
+      el.setAttribute("aria-label",`Covered square ${position}`);
       return;
     }
 
@@ -784,8 +786,15 @@ catch { const mem = new Map(); store = {
 
     if (cell.mine) {
       el.classList.add("mine-reveal");
+      el.setAttribute("aria-label",`Mine ${position}`);
       return;
     }
+
+    /* An empty revealed square has no text at all, so without this the screen
+       reader would still announce the stale "Covered square" label. */
+    el.setAttribute("aria-label", cell.neighborMines > 0
+      ? `${position}, ${cell.neighborMines} neighbouring ${cell.neighborMines === 1 ? "mine" : "mines"}`
+      : `Empty square ${position}`);
 
     if (cell.neighborMines > 0) {
       el.textContent = cell.neighborMines;
@@ -854,12 +863,15 @@ catch { const mem = new Map(); store = {
 
   function startTimer() {
     stopTimer();
+    startTime = performance.now();
 
+    /* Derived from a wall-clock start: a throttled tab would otherwise bank a
+       best time far shorter than the player actually took. */
     timerId = setInterval(() => {
-      seconds = Math.min(999,seconds+1);
+      seconds = Math.min(999, Math.floor((performance.now() - startTime) / 1000));
       timerEl.textContent = formatCounter(seconds);
       if (seconds >= 999) stopTimer();
-    },1000);
+    },250);
   }
 
   function stopTimer() {
