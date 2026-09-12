@@ -26,7 +26,7 @@ Taking responsibility is not the same as accepting total blame. That confusion i
 
 What matters is precision.
 
-If none of it was mine, then there may be nothing to correct. If some of it was mine, even five percent, that five percent is the only part from which I can learn directly.
+Sometimes none of the original harm was mine to prevent. There may still be choices about seeking support, protecting myself, or responding differently next time. When I did contribute to the problem, identifying that contribution gives me something specific to change. I can also learn from what other people and institutions did; responsibility does not limit where useful information can come from.
 
 Blame asks who should feel guilty.
 

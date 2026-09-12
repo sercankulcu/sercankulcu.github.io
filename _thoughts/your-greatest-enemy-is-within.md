@@ -32,4 +32,4 @@ Perhaps the real enemy is not the ego itself. We need some stable sense of self 
 
 The danger is building a self that must never be revised.
 
-Anything that cannot be corrected can only become more wrong.
+Without a way to accept correction, even a small error can become something we spend years defending.

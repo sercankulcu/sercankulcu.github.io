@@ -24,7 +24,7 @@ It may be factually true. It is also usually irrelevant.
 
 Someone else's broken leg does not make my headache disappear. More importantly, suffering does not need to win a competition before it deserves attention.
 
-Montaigne distrusted easy judgments about human experience because we rarely see enough of another person's inner life to measure it accurately. I think that restraint belongs in empathy too.
+We rarely know enough of another person's history to judge the size of a reaction. Listening gives us a better chance of understanding what the comparison left out.
 
 Even the phrase "I know exactly how you feel" can claim too much.
 

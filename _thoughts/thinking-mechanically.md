@@ -16,7 +16,7 @@ This mechanical side of behavior is not a defect. We depend on it. If every ordi
 
 The difficulty begins when a useful shortcut becomes invisible authority.
 
-Descartes helped make mechanical explanation powerful in the study of nature, even though his account of the mind was more complicated than a simple machine metaphor. I do not think people are machines. But the metaphor becomes useful when a response is so repeatable that it starts to feel inevitable.
+A response can become so repeatable that it feels inevitable. The useful part of the machine metaphor is that it makes me ask what keeps triggering the same sequence.
 
 Someone says something. I react. The reaction feels like personality: *this is simply who I am.* Yet repetition can disguise history. The response may have been learned in a family, reinforced at school, rewarded at work, or built around an old fear that no longer fits the current situation.
 

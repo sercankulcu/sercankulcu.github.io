@@ -8,30 +8,18 @@ tags:
   - habits
 ---
 
-I used to think discipline meant repeatedly winning an argument with myself.
+Starting work can involve more decisions than the work itself seems to require. When should I begin? Which task first? Where is the file? Should I answer that message before settling down?
 
-You do not feel like working, so you force yourself to work. You want to stop, so you insist on continuing. In that picture, a disciplined person has unusually strong willpower.
+Each question is small. Together they leave plenty of room for starting to become tomorrow's problem.
 
-I now think good discipline often works in the opposite direction.
+This is the part of discipline that interests me most: arranging the beginning so that it asks less of the mood I happen to be in. A fixed working time helps because the morning no longer needs a negotiation. A short list helps because choosing the task does not become a separate project. Keeping distractions out of easy reach removes a decision that would otherwise return every few minutes.
 
-It removes the argument.
+The arrangement can be modest. At the end of a session, write down the next action. Leave the relevant material easy to find. Decide what a short but useful session would contain, so that a difficult day does not have to choose between doing everything and doing nothing.
 
-A fixed time to work means I do not negotiate every morning about when to begin. A short list of priorities means I do not repeatedly decide what deserves attention. Putting distractions somewhere inconvenient is less heroic than resisting them, but usually more effective.
+For programming, "work on the project" is a vague instruction. "Reproduce the error with this input" gives the next session a beginning. It does not solve the error, but it reduces the effort needed to make contact with it.
 
-The routine does not make the work easy. It makes starting less dependent on mood.
+Too much preparation can create another obstacle. A routine that needs perfect quiet, a long free afternoon, and an elaborate sequence before any work counts will fail on many ordinary days. The useful structure is the one that makes the real task easier to reach.
 
-This matters because motivation is unstable. New projects generate their own energy. Repetition does not. After the novelty disappears, relying on enthusiasm means asking an emotion to perform the job of a system.
+There is still effort after the beginning. Routine does not remove the difficult paragraph or the unfamiliar concept. It reserves more of the available energy for them.
 
-There is also a limit to discipline that motivational language often ignores.
-
-Persistence cannot make every goal wise. A routine can efficiently carry us in the wrong direction. Continuing merely because we have already continued for a long time is not strength; sometimes it is inertia wearing the clothes of commitment.
-
-So discipline needs periodic doubt.
-
-During the work, reduce unnecessary decisions. At intervals, step outside the routine and ask whether the work still deserves repetition.
-
-That combination seems more useful than endless self-control.
-
-The disciplined person is not necessarily the one who can force himself to do anything.
-
-He may simply be the person who has decided fewer things need to be decided every day, and who still remembers that a system is a servant, not a reason for living.
+I used to picture discipline as winning an argument with myself. Now I am more interested in which parts of that argument can be settled before I am tired enough to reopen them.

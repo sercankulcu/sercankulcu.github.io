@@ -1,39 +1,23 @@
 ---
-title: 'Growing Older Is Not the Same as Becoming Old'
+title: "Curiosity Has Room to Grow Older"
 date: 2023-01-04
-description: "A person can repeat the same year twenty times and merely become older — experience becomes useful only when examined."
+description: "Curiosity can change with age without denying the losses and limits that aging brings."
 tags:
   - aging
   - curiosity
   - growth
 ---
 
-Age arrives gradually, but our awareness of it often arrives in flashes.
+Age arrives gradually, but awareness of it can arrive in flashes. A photograph looks older than expected. Someone remembered as a child is an adult. A familiar task takes longer to recover from. A birthday number begins to feel less abstract.
 
-A photograph looks older than we expect. Someone we remember as a child is suddenly an adult. Recovery takes longer. A birthday number begins to sound less abstract.
+I am interested in how curiosity changes alongside those reminders. It is tempting to make curiosity a test of whether someone has stayed young. That seems unfair to both curiosity and age. Illness, grief, fatigue, and limited opportunities can narrow a person's activity without saying anything simple about their willingness to live.
 
-The body keeps a calendar even when the mind does not.
+There are losses that no attitude cancels. Bodies change, people disappear, and some possibilities close. A reflection on aging needs room for that without demanding a cheerful lesson from it.
 
-What interests me more, however, is that growing older and becoming old are not exactly the same process.
+Years can also create useful comparison. A problem once experienced as a catastrophe becomes recognizable. We have seen a similar argument before. Some forms of status matter less, while time with a particular person matters more. None of this happens automatically, but experience can give judgment more to work with.
 
-One is biological. The other can become a habit of withdrawal.
+Curiosity helps me use that experience without making it the boundary of what I can know. Another book, an unfamiliar tool, or a conversation with someone younger can expose an assumption that has been comfortable for too long.
 
-Montaigne wrote about aging without pretending that philosophy could negotiate with nature. The body changes. Energy changes. Possibilities narrow. People disappear from our lives. Any serious reflection on age has to admit loss.
+Those encounters need not be ambitious. Reading a page carefully can count. So can asking a question about something everybody else seems to understand. Curiosity does not have to produce a new skill or an impressive story to make the day less closed.
 
-But loss is not the whole account.
-
-Years also create comparison. A problem that once seemed catastrophic may become recognizable. We learn which arguments repeat themselves under different names. We become less impressed by some forms of status and more attentive to time, health, and people who make ordinary days easier.
-
-None of this is automatic wisdom. A person can repeat the same year twenty times and merely become older.
-
-Experience becomes useful only when it is examined.
-
-That is why I increasingly think curiosity matters more than trying to remain young. Curiosity keeps the world from shrinking entirely to what we already know. It gives us reasons to read another book, learn another tool, listen to someone younger, change an opinion, visit a place, ask a question that may reveal our ignorance.
-
-The body will continue to record time.
-
-I cannot argue with that.
-
-But I would rather measure aging by more than what becomes difficult.
-
-As long as something can still make me genuinely curious, the future has not become only repetition.
+I cannot choose all the ways age will change my life. I can look for forms of interest that fit the life available, including when its scale becomes smaller. There may still be something I want to understand tomorrow.
