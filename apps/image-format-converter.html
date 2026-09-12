@@ -1,0 +1,424 @@
+---
+layout: without-sidebar
+title: "Image Format Converter"
+permalink: /apps/image-format-converter/
+redirect_from:
+  - /apps/image-format-converter.html
+excerpt: "Convert images between JPEG, PNG, and WebP formats entirely in your browser — no upload, no server."
+---
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<style>
+.ifc-app,
+.ifc-app *,
+.ifc-app *::before,
+.ifc-app *::after { box-sizing: border-box; }
+
+.ifc-app {
+  width: min(960px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.ifc-panel {
+  padding: clamp(18px, 4vw, 32px);
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0,0,0,.07);
+}
+
+.ifc-hero { text-align: center; margin-bottom: 24px; }
+.ifc-hero h1 { margin: 0 0 6px; font-size: clamp(1.5rem, 4vw, 2.1rem); font-weight: 750; letter-spacing: -.03em; }
+.ifc-hero p { margin: 0; font-size: .85rem; opacity: .6; }
+
+.ifc-drop {
+  position: relative;
+  padding: 36px 20px;
+  border: 2px dashed color-mix(in srgb, var(--global-text-color) 22%, transparent);
+  border-radius: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .18s, background .18s;
+}
+.ifc-drop:hover, .ifc-drop.over {
+  border-color: var(--global-link-color);
+  background: color-mix(in srgb, var(--global-link-color) 5%, transparent);
+}
+.ifc-drop input[type=file] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+}
+.ifc-drop-icon { font-size: 2.2rem; margin-bottom: 10px; }
+.ifc-drop-text { font-size: .88rem; opacity: .7; }
+.ifc-drop-text strong { display: block; font-size: 1rem; font-weight: 700; opacity: 1; margin-bottom: 4px; color: var(--global-text-color); }
+
+.ifc-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  margin-top: 22px;
+  padding: 18px 20px;
+  border: 1px solid color-mix(in srgb, var(--global-text-color) 10%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--global-text-color) 3%, transparent);
+}
+
+.ifc-opt { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 160px; }
+.ifc-opt label { font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; opacity: .6; }
+.ifc-opt select, .ifc-opt input[type=range] {
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 9px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  font: inherit;
+  font-size: .85rem;
+  cursor: pointer;
+}
+.ifc-opt input[type=range] { padding: 0; cursor: ew-resize; }
+
+.ifc-quality-row { display: flex; align-items: center; gap: 8px; }
+.ifc-quality-row input { flex: 1; }
+.ifc-quality-val { font-size: .82rem; font-weight: 700; min-width: 38px; text-align: right; }
+
+.ifc-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.ifc-btn {
+  padding: 0 22px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  font: inherit;
+  font-size: .85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.ifc-btn:hover { opacity: .82; }
+.ifc-btn.primary { background: var(--global-link-color); color: #fff; }
+.ifc-btn.ghost {
+  background: color-mix(in srgb, var(--global-text-color) 8%, transparent);
+  color: var(--global-text-color);
+}
+.ifc-btn:disabled { opacity: .35; cursor: default; }
+
+.ifc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.ifc-card {
+  border: 1px solid var(--global-border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--global-text-color) 3%, transparent);
+}
+.ifc-card-img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  display: block;
+  background: color-mix(in srgb, var(--global-text-color) 6%, transparent);
+}
+.ifc-card-body { padding: 10px 12px; }
+.ifc-card-name { font-size: .78rem; font-weight: 600; margin: 0 0 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ifc-card-meta { font-size: .7rem; opacity: .55; margin: 0 0 8px; }
+.ifc-card-dl {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: var(--global-link-color);
+  color: #fff;
+  font-size: .72rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: opacity .15s;
+}
+.ifc-card-dl:hover { opacity: .82; }
+.ifc-card-dl:disabled { opacity: .4; cursor: default; }
+
+.ifc-status {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: .82rem;
+  font-weight: 600;
+  display: none;
+}
+.ifc-status.info { background: color-mix(in srgb, #4a90d9 12%, transparent); color: #4a90d9; display: block; }
+.ifc-status.success { background: color-mix(in srgb, #3aaa6f 12%, transparent); color: #3aaa6f; display: block; }
+.ifc-status.error { background: color-mix(in srgb, #e05252 12%, transparent); color: #e05252; display: block; }
+
+@media(max-width: 600px) {
+  .ifc-opt { min-width: 100%; }
+  .ifc-actions { flex-direction: column; }
+}
+</style>
+
+<div class="ifc-app">
+  <div class="ifc-panel">
+    <div class="ifc-hero">
+      <h1>Image Format Converter</h1>
+      <p>Convert JPEG, PNG, and WebP images locally in your browser — no server, no upload.</p>
+    </div>
+
+    <div class="ifc-drop" id="ifc-drop">
+      <input type="file" id="ifc-input" multiple accept="image/jpeg,image/png,image/webp,image/gif,image/bmp">
+      <div class="ifc-drop-icon">🖼</div>
+      <div class="ifc-drop-text">
+        <strong>Drop images here or click to browse</strong>
+        JPEG · PNG · WebP · GIF · BMP
+      </div>
+    </div>
+
+    <div class="ifc-options" id="ifc-options">
+      <div class="ifc-opt">
+        <label for="ifc-format">Output format</label>
+        <select id="ifc-format">
+          <option value="image/jpeg">JPEG</option>
+          <option value="image/png">PNG</option>
+          <option value="image/webp" selected>WebP</option>
+        </select>
+      </div>
+      <div class="ifc-opt" id="ifc-quality-opt">
+        <label for="ifc-quality">Quality</label>
+        <div class="ifc-quality-row">
+          <input type="range" id="ifc-quality" min="10" max="100" value="85" step="5">
+          <span class="ifc-quality-val" id="ifc-quality-val">85%</span>
+        </div>
+      </div>
+      <div class="ifc-actions">
+        <button class="ifc-btn primary" id="ifc-convert-btn" disabled>Convert all</button>
+        <button class="ifc-btn ghost" id="ifc-zip-btn" disabled>Download ZIP</button>
+        <button class="ifc-btn ghost" id="ifc-clear-btn" disabled>Clear</button>
+      </div>
+    </div>
+
+    <div class="ifc-status" id="ifc-status"></div>
+
+    <div class="ifc-grid" id="ifc-grid"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+
+  const dropEl = $("ifc-drop");
+  const inputEl = $("ifc-input");
+  const formatSel = $("ifc-format");
+  const qualityEl = $("ifc-quality");
+  const qualityVal = $("ifc-quality-val");
+  const convertBtn = $("ifc-convert-btn");
+  const zipBtn = $("ifc-zip-btn");
+  const clearBtn = $("ifc-clear-btn");
+  const grid = $("ifc-grid");
+  const status = $("ifc-status");
+  const qualityOpt = $("ifc-quality-opt");
+
+  let files = [];
+  let converted = [];
+
+  const EXT = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
+
+  function showStatus(msg, type = "info") {
+    status.textContent = msg;
+    status.className = "ifc-status " + type;
+  }
+  function hideStatus() { status.className = "ifc-status"; }
+
+  formatSel.addEventListener("change", () => {
+    qualityOpt.style.opacity = formatSel.value === "image/png" ? ".4" : "1";
+    qualityOpt.style.pointerEvents = formatSel.value === "image/png" ? "none" : "auto";
+  });
+
+  qualityEl.addEventListener("input", () => {
+    qualityVal.textContent = qualityEl.value + "%";
+  });
+
+  function addFiles(list) {
+    const imgs = [...list].filter(f => f.type.startsWith("image/"));
+    if (!imgs.length) { showStatus("No valid image files found.", "error"); return; }
+    files = [...files, ...imgs];
+    converted = files.map(() => null);
+    renderGrid();
+    convertBtn.disabled = false;
+    zipBtn.disabled = true;
+    clearBtn.disabled = false;
+    hideStatus();
+  }
+
+  function renderGrid() {
+    grid.innerHTML = "";
+    files.forEach((file, i) => {
+      const card = document.createElement("div");
+      card.className = "ifc-card";
+
+      const img = document.createElement("img");
+      img.className = "ifc-card-img";
+      img.alt = file.name;
+      const reader = new FileReader();
+      reader.onload = e => { img.src = e.target.result; };
+      reader.readAsDataURL(file);
+
+      const body = document.createElement("div");
+      body.className = "ifc-card-body";
+
+      const name = document.createElement("p");
+      name.className = "ifc-card-name";
+      name.title = file.name;
+      name.textContent = file.name;
+
+      const meta = document.createElement("p");
+      meta.className = "ifc-card-meta";
+      meta.textContent = formatBytes(file.size);
+
+      const dl = document.createElement("button");
+      dl.className = "ifc-card-dl";
+      dl.textContent = "Download";
+      dl.disabled = !converted[i];
+      dl.id = `ifc-dl-${i}`;
+      if (converted[i]) {
+        dl.addEventListener("click", () => downloadBlob(converted[i], i));
+      }
+
+      body.append(name, meta, dl);
+      card.append(img, body);
+      grid.appendChild(card);
+    });
+  }
+
+  function formatBytes(n) {
+    if (n < 1024) return n + " B";
+    if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
+    return (n / 1024 / 1024).toFixed(2) + " MB";
+  }
+
+  async function convertImage(file) {
+    const fmt = formatSel.value;
+    const quality = fmt === "image/png" ? 1 : +qualityEl.value / 100;
+
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext("2d");
+        if (fmt === "image/jpeg") {
+          ctx.fillStyle = "#fff";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Conversion failed")), fmt, quality);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Cannot load image")); };
+      img.src = url;
+    });
+  }
+
+  function newName(file) {
+    const base = file.name.replace(/\.[^.]+$/, "");
+    return base + "." + EXT[formatSel.value];
+  }
+
+  async function convertAll() {
+    convertBtn.disabled = true;
+    zipBtn.disabled = true;
+    showStatus("Converting…", "info");
+    converted = [];
+
+    let ok = 0;
+    for (let i = 0; i < files.length; i++) {
+      try {
+        const blob = await convertImage(files[i]);
+        converted[i] = blob;
+        const dl = $(`ifc-dl-${i}`);
+        if (dl) {
+          dl.disabled = false;
+          dl.addEventListener("click", ((idx) => () => downloadBlob(converted[idx], idx))(i));
+          const meta = dl.previousElementSibling;
+          if (meta) meta.textContent = formatBytes(blob.size);
+        }
+        ok++;
+      } catch (e) {
+        converted[i] = null;
+      }
+    }
+
+    convertBtn.disabled = false;
+    if (ok === files.length) {
+      showStatus(`${ok} image${ok > 1 ? "s" : ""} converted successfully.`, "success");
+      zipBtn.disabled = false;
+    } else {
+      showStatus(`${ok}/${files.length} converted (${files.length - ok} failed).`, ok === 0 ? "error" : "info");
+      if (ok > 0) zipBtn.disabled = false;
+    }
+  }
+
+  function downloadBlob(blob, i) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = newName(files[i]);
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  }
+
+  async function downloadZip() {
+    if (typeof JSZip === "undefined") { showStatus("JSZip not loaded. Try refreshing.", "error"); return; }
+    zipBtn.disabled = true;
+    showStatus("Creating ZIP…", "info");
+
+    const zip = new JSZip();
+    converted.forEach((blob, i) => {
+      if (blob) zip.file(newName(files[i]), blob);
+    });
+
+    try {
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(zipBlob);
+      a.download = "converted-images.zip";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      showStatus("ZIP downloaded.", "success");
+    } catch (e) {
+      showStatus("Failed to create ZIP: " + e.message, "error");
+    }
+    zipBtn.disabled = false;
+  }
+
+  function clearAll() {
+    files = []; converted = [];
+    grid.innerHTML = "";
+    convertBtn.disabled = true;
+    zipBtn.disabled = true;
+    clearBtn.disabled = true;
+    hideStatus();
+    inputEl.value = "";
+  }
+
+  inputEl.addEventListener("change", () => { if (inputEl.files.length) addFiles(inputEl.files); });
+  convertBtn.addEventListener("click", convertAll);
+  zipBtn.addEventListener("click", downloadZip);
+  clearBtn.addEventListener("click", clearAll);
+
+  dropEl.addEventListener("dragover", e => { e.preventDefault(); dropEl.classList.add("over"); });
+  dropEl.addEventListener("dragleave", () => dropEl.classList.remove("over"));
+  dropEl.addEventListener("drop", e => {
+    e.preventDefault();
+    dropEl.classList.remove("over");
+    if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
+  });
+})();
+</script>

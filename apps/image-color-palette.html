@@ -1,0 +1,447 @@
+---
+layout: without-sidebar
+title: "Image Color Palette"
+permalink: /apps/image-color-palette/
+redirect_from:
+  - /apps/image-color-palette.html
+excerpt: "Extract dominant color palettes from any image entirely in your browser — with hex, RGB, and HSL values."
+---
+
+<style>
+.icp-app,
+.icp-app *,
+.icp-app *::before,
+.icp-app *::after { box-sizing: border-box; }
+
+.icp-app {
+  width: min(960px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  color: var(--global-text-color);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.icp-panel {
+  padding: clamp(18px, 4vw, 32px);
+  border: 1px solid var(--global-border-color);
+  border-radius: 18px;
+  background: var(--global-bg-color);
+  box-shadow: 0 12px 35px rgba(0,0,0,.07);
+}
+
+.icp-hero { text-align: center; margin-bottom: 24px; }
+.icp-hero h1 { margin: 0 0 6px; font-size: clamp(1.5rem, 4vw, 2.1rem); font-weight: 750; letter-spacing: -.03em; }
+.icp-hero p { margin: 0; font-size: .85rem; opacity: .6; }
+
+.icp-drop {
+  position: relative;
+  padding: 36px 20px;
+  border: 2px dashed color-mix(in srgb, var(--global-text-color) 22%, transparent);
+  border-radius: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .18s, background .18s;
+}
+.icp-drop:hover, .icp-drop.over {
+  border-color: var(--global-link-color);
+  background: color-mix(in srgb, var(--global-link-color) 5%, transparent);
+}
+.icp-drop input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.icp-drop-icon { font-size: 2.2rem; margin-bottom: 10px; }
+.icp-drop-text { font-size: .88rem; opacity: .7; }
+.icp-drop-text strong { display: block; font-size: 1rem; font-weight: 700; opacity: 1; margin-bottom: 4px; color: var(--global-text-color); }
+
+.icp-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+  margin-top: 22px;
+}
+
+.icp-ctrl { display: flex; flex-direction: column; gap: 6px; }
+.icp-ctrl label { font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; opacity: .6; }
+.icp-ctrl select {
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 9px;
+  background: var(--global-bg-color);
+  color: var(--global-text-color);
+  font: inherit;
+  font-size: .85rem;
+  cursor: pointer;
+}
+
+.icp-btn {
+  height: 38px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 9px;
+  font: inherit;
+  font-size: .85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .15s;
+  align-self: flex-end;
+}
+.icp-btn.primary { background: var(--global-link-color); color: #fff; }
+.icp-btn.ghost {
+  background: color-mix(in srgb, var(--global-text-color) 8%, transparent);
+  color: var(--global-text-color);
+}
+.icp-btn:hover { opacity: .82; }
+.icp-btn:disabled { opacity: .35; cursor: default; }
+
+.icp-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-top: 22px;
+}
+
+.icp-preview-wrap {
+  border: 1px solid var(--global-border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--global-text-color) 5%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+}
+.icp-preview {
+  max-width: 100%;
+  max-height: 340px;
+  object-fit: contain;
+  display: block;
+}
+
+.icp-palette-wrap { display: flex; flex-direction: column; gap: 10px; }
+.icp-palette-title { font-size: .8rem; font-weight: 700; opacity: .55; text-transform: uppercase; letter-spacing: .08em; }
+
+.icp-swatch {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 11px;
+  cursor: pointer;
+  transition: background .18s;
+}
+.icp-swatch:hover { background: color-mix(in srgb, var(--global-text-color) 4%, transparent); }
+.icp-swatch-color {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,.08);
+}
+.icp-swatch-info { flex: 1; min-width: 0; }
+.icp-swatch-hex { font-size: .95rem; font-weight: 750; font-family: ui-monospace, monospace; letter-spacing: .03em; }
+.icp-swatch-rgb { font-size: .72rem; opacity: .55; margin-top: 2px; }
+.icp-swatch-copy {
+  padding: 5px 11px;
+  border: 1px solid var(--global-border-color);
+  border-radius: 7px;
+  font: inherit;
+  font-size: .72rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: transparent;
+  color: var(--global-text-color);
+  transition: background .15s, color .15s;
+  flex-shrink: 0;
+}
+.icp-swatch-copy:hover { background: var(--global-text-color); color: var(--global-bg-color); }
+.icp-swatch-copy.copied { background: #3aaa6f; color: #fff; border-color: #3aaa6f; }
+
+.icp-export {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.icp-status {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: .82rem;
+  font-weight: 600;
+  display: none;
+}
+.icp-status.info { background: color-mix(in srgb, #4a90d9 12%, transparent); color: #4a90d9; display: block; }
+.icp-status.error { background: color-mix(in srgb, #e05252 12%, transparent); color: #e05252; display: block; }
+
+@media(max-width: 640px) {
+  .icp-layout { grid-template-columns: 1fr; }
+}
+</style>
+
+<div class="icp-app">
+  <div class="icp-panel">
+    <div class="icp-hero">
+      <h1>Image Color Palette</h1>
+      <p>Extract dominant colors from any image. Click a swatch to copy its value.</p>
+    </div>
+
+    <div class="icp-drop" id="icp-drop">
+      <input type="file" id="icp-input" accept="image/*">
+      <div class="icp-drop-icon">🎨</div>
+      <div class="icp-drop-text">
+        <strong>Drop an image here or click to browse</strong>
+        JPEG · PNG · WebP · GIF · BMP
+      </div>
+    </div>
+
+    <div class="icp-controls">
+      <div class="icp-ctrl">
+        <label for="icp-count">Number of colors</label>
+        <select id="icp-count">
+          <option value="4">4 colors</option>
+          <option value="6" selected>6 colors</option>
+          <option value="8">8 colors</option>
+          <option value="10">10 colors</option>
+          <option value="12">12 colors</option>
+        </select>
+      </div>
+      <div class="icp-ctrl">
+        <label for="icp-fmt">Copy format</label>
+        <select id="icp-fmt">
+          <option value="hex" selected>HEX</option>
+          <option value="rgb">RGB</option>
+          <option value="hsl">HSL</option>
+        </select>
+      </div>
+      <button class="icp-btn ghost" id="icp-extract-btn" disabled>Re-extract</button>
+      <button class="icp-btn ghost" id="icp-css-btn" disabled>Copy CSS vars</button>
+    </div>
+
+    <div class="icp-status" id="icp-status"></div>
+
+    <div class="icp-layout" id="icp-layout" style="display:none">
+      <div class="icp-preview-wrap">
+        <img class="icp-preview" id="icp-preview" alt="Uploaded image preview">
+      </div>
+      <div class="icp-palette-wrap">
+        <div class="icp-palette-title">Dominant colors</div>
+        <div id="icp-palette"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<canvas id="icp-canvas" style="display:none" aria-hidden="true"></canvas>
+
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+
+  const drop = $("icp-drop");
+  const input = $("icp-input");
+  const preview = $("icp-preview");
+  const layout = $("icp-layout");
+  const palette = $("icp-palette");
+  const canvas = $("icp-canvas");
+  const extractBtn = $("icp-extract-btn");
+  const cssBtn = $("icp-css-btn");
+  const status = $("icp-status");
+  const ctx = canvas.getContext("2d");
+
+  let currentColors = [];
+  let currentFile = null;
+
+  function showStatus(msg, type) {
+    status.textContent = msg; status.className = "icp-status " + type;
+  }
+
+  function rgbToHex(r, g, b) {
+    return "#" + [r, g, b].map(v => v.toString(16).padStart(2, "0")).join("");
+  }
+
+  function rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) { h = s = 0; }
+    else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / d + 2) / 6; break;
+        default: h = ((r - g) / d + 4) / 6;
+      }
+    }
+    return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
+  }
+
+  function colorStr([r, g, b]) {
+    const fmt = $("icp-fmt").value;
+    if (fmt === "rgb") return `rgb(${r}, ${g}, ${b})`;
+    if (fmt === "hsl") return rgbToHsl(r, g, b);
+    return rgbToHex(r, g, b);
+  }
+
+  function colorDist([r1, g1, b1], [r2, g2, b2]) {
+    return (r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2;
+  }
+
+  function kMeans(pixels, k) {
+    const N = pixels.length;
+    if (N === 0) return [];
+
+    // Initialize with random distinct pixels
+    let centroids = [];
+    const seen = new Set();
+    let attempts = 0;
+    while (centroids.length < k && attempts < k * 20) {
+      const idx = Math.floor(Math.random() * N);
+      const key = pixels[idx].join(",");
+      if (!seen.has(key)) { seen.add(key); centroids.push([...pixels[idx]]); }
+      attempts++;
+    }
+    if (centroids.length < k) {
+      while (centroids.length < k) centroids.push([...centroids[0]]);
+    }
+
+    for (let iter = 0; iter < 15; iter++) {
+      const sums = centroids.map(() => [0, 0, 0, 0]);
+      for (const p of pixels) {
+        let minD = Infinity, minI = 0;
+        for (let i = 0; i < k; i++) {
+          const d = colorDist(p, centroids[i]);
+          if (d < minD) { minD = d; minI = i; }
+        }
+        sums[minI][0] += p[0]; sums[minI][1] += p[1]; sums[minI][2] += p[2]; sums[minI][3]++;
+      }
+      let moved = false;
+      for (let i = 0; i < k; i++) {
+        if (sums[i][3] === 0) continue;
+        const nr = Math.round(sums[i][0] / sums[i][3]);
+        const ng = Math.round(sums[i][1] / sums[i][3]);
+        const nb = Math.round(sums[i][2] / sums[i][3]);
+        if (nr !== centroids[i][0] || ng !== centroids[i][1] || nb !== centroids[i][2]) moved = true;
+        centroids[i] = [nr, ng, nb];
+      }
+      if (!moved) break;
+    }
+
+    // Sort by luminance
+    return centroids.sort((a, b) => {
+      const la = 0.299 * a[0] + 0.587 * a[1] + 0.114 * a[2];
+      const lb = 0.299 * b[0] + 0.587 * b[1] + 0.114 * b[2];
+      return la - lb;
+    });
+  }
+
+  function extractColors() {
+    const k = +$("icp-count").value;
+    const MAX = 100;
+
+    let w = preview.naturalWidth, h = preview.naturalHeight;
+    if (w > MAX || h > MAX) {
+      const r = Math.min(MAX / w, MAX / h);
+      w = Math.round(w * r); h = Math.round(h * r);
+    }
+    canvas.width = w; canvas.height = h;
+    ctx.drawImage(preview, 0, 0, w, h);
+
+    const data = ctx.getImageData(0, 0, w, h).data;
+    const pixels = [];
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i + 3] < 128) continue;
+      pixels.push([data[i], data[i + 1], data[i + 2]]);
+    }
+    if (pixels.length < k) { showStatus("Image has too few distinct pixels.", "error"); return; }
+
+    currentColors = kMeans(pixels, k);
+    renderPalette();
+    cssBtn.disabled = false;
+    status.className = "icp-status";
+  }
+
+  function renderPalette() {
+    palette.innerHTML = "";
+    currentColors.forEach(([r, g, b]) => {
+      const hex = rgbToHex(r, g, b);
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+
+      const swatch = document.createElement("div");
+      swatch.className = "icp-swatch";
+
+      const colorBox = document.createElement("div");
+      colorBox.className = "icp-swatch-color";
+      colorBox.style.background = hex;
+
+      const info = document.createElement("div");
+      info.className = "icp-swatch-info";
+
+      const hexEl = document.createElement("div");
+      hexEl.className = "icp-swatch-hex";
+      hexEl.textContent = hex.toUpperCase();
+
+      const rgbEl = document.createElement("div");
+      rgbEl.className = "icp-swatch-rgb";
+      rgbEl.textContent = `rgb(${r}, ${g}, ${b}) · ${rgbToHsl(r, g, b)}`;
+
+      info.append(hexEl, rgbEl);
+
+      const copyBtn = document.createElement("button");
+      copyBtn.className = "icp-swatch-copy";
+      copyBtn.textContent = "Copy";
+      copyBtn.addEventListener("click", async e => {
+        e.stopPropagation();
+        const val = colorStr([r, g, b]);
+        try { await navigator.clipboard.writeText(val); } catch (_) {}
+        copyBtn.textContent = "Copied!";
+        copyBtn.classList.add("copied");
+        setTimeout(() => { copyBtn.textContent = "Copy"; copyBtn.classList.remove("copied"); }, 1500);
+      });
+
+      swatch.addEventListener("click", () => copyBtn.click());
+      swatch.append(colorBox, info, copyBtn);
+      palette.appendChild(swatch);
+    });
+  }
+
+  async function copyCssVars() {
+    const lines = currentColors.map(([r, g, b], i) => `  --color-${i + 1}: ${colorStr([r, g, b])};`);
+    const css = ":root {\n" + lines.join("\n") + "\n}";
+    try { await navigator.clipboard.writeText(css); } catch (_) {}
+    cssBtn.textContent = "Copied!";
+    setTimeout(() => { cssBtn.textContent = "Copy CSS vars"; }, 1800);
+  }
+
+  function loadFile(file) {
+    if (!file || !file.type.startsWith("image/")) {
+      showStatus("Please select a valid image file.", "error"); return;
+    }
+    currentFile = file;
+    const url = URL.createObjectURL(file);
+    preview.onload = () => {
+      URL.revokeObjectURL(url);
+      layout.style.display = "";
+      extractBtn.disabled = false;
+      status.className = "icp-status";
+      extractColors();
+    };
+    preview.onerror = () => { URL.revokeObjectURL(url); showStatus("Could not load image.", "error"); };
+    preview.src = url;
+  }
+
+  input.addEventListener("change", () => { if (input.files[0]) loadFile(input.files[0]); });
+  extractBtn.addEventListener("click", extractColors);
+  cssBtn.addEventListener("click", copyCssVars);
+  $("icp-count").addEventListener("change", () => { if (currentFile) extractColors(); });
+
+  drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
+  drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+  drop.addEventListener("drop", e => {
+    e.preventDefault(); drop.classList.remove("over");
+    if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+  });
+})();
+</script>

@@ -1,0 +1,340 @@
+---
+layout: without-sidebar
+title: "Pomodoro Timer"
+permalink: /apps/pomodoro-timer/
+redirect_from:
+  - /apps/pomodoro-timer.html
+excerpt: "Boost focus with the Pomodoro technique — 25-minute work sessions, short breaks, and long breaks with session tracking and browser notifications."
+---
+
+<style>
+.pomodoro-app{--clr-work:#e05252;--clr-short:#3aaa6f;--clr-long:#4a90d9;--fg:var(--global-text-color);--muted:color-mix(in srgb,var(--global-text-color) 55%,transparent);--line:color-mix(in srgb,var(--global-text-color) 14%,transparent);--soft:color-mix(in srgb,var(--global-text-color) 6%,transparent);position:relative;width:min(1040px,calc(100% - 24px));min-height:800px;margin:.5rem auto 1.5rem;padding:26px 20px 36px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--global-border-color);border-radius:18px;background:var(--global-bg-color);color:var(--fg);user-select:none}
+.pomodoro-app,.pomodoro-app *,.pomodoro-app *:before,.pomodoro-app *:after{box-sizing:border-box}
+.pomodoro-app button,.pomodoro-app input,.pomodoro-app select{font:inherit;color:inherit}
+.pomodoro-app button{border:0;background:none;cursor:pointer}
+.pa-topbar{position:absolute;top:18px;left:20px;right:20px;z-index:5;display:flex;justify-content:flex-end;gap:6px}
+.pa-icon{width:42px;height:42px;border-radius:999px;display:grid;place-items:center;font-size:17px}
+.pa-icon:hover{background:var(--soft)}
+.pa-center{display:flex;flex-direction:column;align-items:center;gap:22px}
+.pa-phase-label{font-size:.78rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;opacity:.6;transition:opacity .3s}
+.pa-wrap{position:relative;width:min(70vw,60vh,560px);aspect-ratio:1;display:grid;place-items:center}
+.pa-ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.pa-track{stroke:var(--line)}
+.pa-progress{stroke-linecap:round;transition:stroke-dashoffset .2s linear,stroke .5s ease}
+.pa-time{position:relative;z-index:2;font-variant-numeric:tabular-nums lining-nums;font-size:clamp(68px,12vw,175px);font-weight:650;letter-spacing:-.075em;line-height:.85}
+.pa-dots{display:flex;gap:12px;align-items:center}
+.pa-dot{width:13px;height:13px;border-radius:999px;background:var(--line);transition:background .4s,transform .3s}
+.pa-dot.done{background:var(--clr-work);transform:scale(1.15)}
+.pa-controls{display:flex;gap:8px}
+.pa-btn{height:44px;padding:0 20px;border-radius:999px;font-size:13px;font-weight:650;background:var(--soft);color:var(--fg);transition:opacity .15s,background .4s,color .4s}
+.pa-btn.primary{min-width:88px;color:#fff}
+.pa-btn:hover{opacity:.82}
+.pa-hint{color:var(--muted);font-size:12px;white-space:nowrap}
+.pa-overlay{position:absolute;inset:0;z-index:20;display:none;place-items:center;padding:24px;background:color-mix(in srgb,var(--global-bg-color) 92%,transparent);backdrop-filter:blur(22px)}
+.pa-overlay.open{display:grid}
+.pa-sheet{width:min(480px,100%)}
+.pa-sheet h3{margin:0 0 22px;font-size:1.1rem;font-weight:700}
+.pa-fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px}
+.pa-field{display:flex;flex-direction:column;gap:7px}
+.pa-field label{font-size:.72rem;font-weight:800;opacity:.58;text-transform:uppercase;letter-spacing:.1em}
+.pa-field input{padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:var(--soft);font-size:1.1rem;font-weight:650;text-align:center;outline:none;width:100%;transition:border-color .18s}
+.pa-field input:focus{border-color:var(--fg)}
+.pa-sheet-actions{display:flex;justify-content:flex-end;gap:8px}
+.pa-toast{position:fixed;left:50%;bottom:24px;z-index:999;transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:11px 16px;border-radius:12px;background:var(--global-text-color);color:var(--global-bg-color);font-size:13px;font-weight:750;transition:.22s;white-space:nowrap}
+.pa-toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:700px){.pomodoro-app{width:100%;min-height:700px;padding:18px 12px 28px}.pa-topbar{top:12px;left:12px;right:12px}.pa-wrap{width:min(86vw,55vh)}.pa-time{font-size:clamp(65px,22vw,135px)}.pa-fields{grid-template-columns:1fr}}
+</style>
+
+<div class="pomodoro-app" id="pomodoro-app">
+  <header class="pa-topbar">
+    <button class="pa-icon" id="pa-notify" type="button" aria-label="Toggle notifications">🔕</button>
+    <button class="pa-icon" id="pa-settings" type="button" aria-label="Settings" title="Settings">⚙</button>
+    <button class="pa-icon" id="pa-fullscreen" type="button" aria-label="Toggle fullscreen" title="Fullscreen (F)">↗</button>
+  </header>
+
+  <div class="pa-center">
+    <div class="pa-phase-label" id="pa-phase-label">Work</div>
+
+    <div class="pa-wrap">
+      <svg class="pa-ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="pa-track" cx="50" cy="50" r="47" fill="none" stroke-width=".7"/>
+        <circle class="pa-progress" id="pa-progress" cx="50" cy="50" r="47" fill="none" stroke-width=".9"/>
+      </svg>
+      <div class="pa-time" id="pa-time" aria-live="polite" aria-label="Time remaining">25:00</div>
+    </div>
+
+    <div class="pa-dots" id="pa-dots" role="group" aria-label="Pomodoro session progress"></div>
+
+    <div class="pa-controls">
+      <button class="pa-btn" id="pa-skip" type="button">Skip</button>
+      <button class="pa-btn primary" id="pa-toggle" type="button">Start</button>
+      <button class="pa-btn" id="pa-reset" type="button">Reset</button>
+    </div>
+
+    <div class="pa-hint">Space start/pause &nbsp;·&nbsp; S skip &nbsp;·&nbsp; R reset &nbsp;·&nbsp; F fullscreen</div>
+  </div>
+
+  <div class="pa-overlay" id="pa-overlay" role="dialog" aria-modal="true" aria-label="Timer settings">
+    <div class="pa-sheet">
+      <h3>Duration settings (minutes)</h3>
+      <div class="pa-fields">
+        <div class="pa-field">
+          <label for="pa-in-work">Work</label>
+          <input id="pa-in-work" type="number" min="1" max="120" value="25" inputmode="numeric">
+        </div>
+        <div class="pa-field">
+          <label for="pa-in-short">Short break</label>
+          <input id="pa-in-short" type="number" min="1" max="60" value="5" inputmode="numeric">
+        </div>
+        <div class="pa-field">
+          <label for="pa-in-long">Long break</label>
+          <input id="pa-in-long" type="number" min="1" max="120" value="15" inputmode="numeric">
+        </div>
+      </div>
+      <div class="pa-sheet-actions">
+        <button class="pa-btn" id="pa-cancel" type="button">Cancel</button>
+        <button class="pa-btn primary" id="pa-apply" type="button" style="background:var(--clr-work)">Apply</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pa-toast" id="pa-toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const app = $("pomodoro-app");
+  const timeEl = $("pa-time");
+  const progressEl = $("pa-progress");
+  const toggleBtn = $("pa-toggle");
+  const phaseLabel = $("pa-phase-label");
+  const dotsEl = $("pa-dots");
+  const overlay = $("pa-overlay");
+  const toast = $("pa-toast");
+
+  const CIRC = 2 * Math.PI * 47;
+  progressEl.style.strokeDasharray = CIRC;
+
+  const COLORS = { work: "#e05252", short: "#3aaa6f", long: "#4a90d9" };
+  const LABELS = { work: "Work", short: "Short Break", long: "Long Break" };
+  const PHASE_SEQ = ["work","short","work","short","work","short","work","long"];
+
+  let cfg = {
+    work: Math.max(1, +(localStorage.getItem("pomo.work") || 25)),
+    short: Math.max(1, +(localStorage.getItem("pomo.short") || 5)),
+    long: Math.max(1, +(localStorage.getItem("pomo.long") || 15)),
+  };
+
+  let phaseIdx = 0;
+  let pomoDone = 0;
+  let duration = 0;
+  let remaining = 0;
+  let running = false;
+  let endAt = 0;
+  let raf = 0;
+  let notificationsEnabled = (localStorage.getItem("pomo.notifications") || "off") === "on";
+
+  function currentPhaseKey() { return PHASE_SEQ[phaseIdx]; }
+  function phaseSecs(key) {
+    return (key === "work" ? cfg.work : key === "short" ? cfg.short : cfg.long) * 60;
+  }
+
+  function loadPhase() {
+    const key = currentPhaseKey();
+    duration = phaseSecs(key);
+    remaining = duration;
+    running = false;
+    cancelAnimationFrame(raf);
+    const color = COLORS[key];
+    progressEl.style.stroke = color;
+    toggleBtn.style.background = color;
+    phaseLabel.textContent = LABELS[key];
+    renderDots();
+    render();
+  }
+
+  function renderDots() {
+    dotsEl.innerHTML = "";
+    for (let i = 0; i < 4; i++) {
+      const dot = document.createElement("div");
+      dot.className = "pa-dot" + (i < pomoDone ? " done" : "");
+      dot.setAttribute("aria-label", (i < pomoDone ? "Done" : "Pending") + " pomodoro " + (i + 1));
+      dotsEl.appendChild(dot);
+    }
+  }
+
+  function fmt(s) {
+    s = Math.max(0, Math.ceil(s));
+    const m = Math.floor(s / 60), ss = s % 60;
+    return `${String(m).padStart(2, "0")}:${String(ss).padStart(2, "0")}`;
+  }
+
+  function render() {
+    timeEl.textContent = fmt(remaining);
+    const ratio = duration ? Math.max(0, Math.min(1, remaining / duration)) : 0;
+    progressEl.style.strokeDashoffset = CIRC * (1 - ratio);
+    if (running) toggleBtn.textContent = "Pause";
+    else if (remaining <= 0) toggleBtn.textContent = "Next";
+    else toggleBtn.textContent = "Start";
+  }
+
+  function tick() {
+    if (!running) return;
+    remaining = Math.max(0, (endAt - performance.now()) / 1000);
+    render();
+    if (remaining <= 0) { finish(); return; }
+    raf = requestAnimationFrame(tick);
+  }
+
+  function start() {
+    if (remaining <= 0) { advancePhase(); return; }
+    running = true;
+    endAt = performance.now() + remaining * 1000;
+    render();
+    tick();
+  }
+
+  function pause() {
+    if (!running) return;
+    remaining = Math.max(0, (endAt - performance.now()) / 1000);
+    running = false;
+    cancelAnimationFrame(raf);
+    render();
+  }
+
+  function toggle() { running ? pause() : start(); }
+
+  function advancePhase() {
+    const key = currentPhaseKey();
+    if (key === "work") {
+      pomoDone = (pomoDone + 1) % 5;
+      if (pomoDone === 0) pomoDone = 0;
+    }
+    phaseIdx = (phaseIdx + 1) % PHASE_SEQ.length;
+    if (phaseIdx === 0) pomoDone = 0;
+    loadPhase();
+  }
+
+  function finish() {
+    running = false; remaining = 0; render();
+    beep();
+    navigator.vibrate?.([180, 100, 180]);
+    const key = currentPhaseKey();
+    const msgs = {
+      work: "Work session complete! Take a break.",
+      short: "Break over — time to focus!",
+      long: "Long break done — ready to go!",
+    };
+    showToast(msgs[key]);
+    notify(msgs[key]);
+  }
+
+  function beep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [[0, 660], [0.22, 770], [0.44, 880]].forEach(([d, f]) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = "sine"; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, ctx.currentTime + d);
+        g.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + d + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + d + 0.16);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(ctx.currentTime + d); o.stop(ctx.currentTime + d + 0.18);
+      });
+    } catch (_) {}
+  }
+
+  function showToast(msg) {
+    toast.textContent = msg; toast.classList.add("show");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove("show"), 2800);
+  }
+
+  function notify(body) {
+    if (!notificationsEnabled) return;
+    if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
+    try { new Notification("Pomodoro", { body }); } catch (_) {}
+  }
+
+  function renderNotifyBtn() {
+    const btn = $("pa-notify");
+    btn.textContent = notificationsEnabled ? "🔔" : "🔕";
+    btn.title = notificationsEnabled ? "Notifications on" : "Notifications off";
+    btn.setAttribute("aria-pressed", String(notificationsEnabled));
+  }
+
+  async function toggleNotify() {
+    notificationsEnabled = !notificationsEnabled;
+    localStorage.setItem("pomo.notifications", notificationsEnabled ? "on" : "off");
+    if (notificationsEnabled && "Notification" in window && Notification.permission === "default") {
+      try { await Notification.requestPermission(); } catch (_) {}
+    }
+    renderNotifyBtn();
+    showToast(notificationsEnabled ? "Notifications on" : "Notifications off");
+  }
+
+  function openSettings() {
+    pause();
+    $("pa-in-work").value = cfg.work;
+    $("pa-in-short").value = cfg.short;
+    $("pa-in-long").value = cfg.long;
+    overlay.classList.add("open");
+    $("pa-in-work").focus();
+  }
+
+  function closeSettings() { overlay.classList.remove("open"); }
+
+  function applySettings() {
+    const w = +$("pa-in-work").value, s = +$("pa-in-short").value, l = +$("pa-in-long").value;
+    if (!Number.isFinite(w) || !Number.isFinite(s) || !Number.isFinite(l)) return;
+    cfg = {
+      work: Math.max(1, Math.min(120, w)),
+      short: Math.max(1, Math.min(60, s)),
+      long: Math.max(1, Math.min(120, l)),
+    };
+    localStorage.setItem("pomo.work", cfg.work);
+    localStorage.setItem("pomo.short", cfg.short);
+    localStorage.setItem("pomo.long", cfg.long);
+    closeSettings();
+    phaseIdx = 0; pomoDone = 0;
+    loadPhase();
+    showToast("Settings saved");
+  }
+
+  toggleBtn.addEventListener("click", toggle);
+  $("pa-skip").addEventListener("click", () => { pause(); advancePhase(); showToast("Phase skipped"); });
+  $("pa-reset").addEventListener("click", () => { pause(); phaseIdx = 0; pomoDone = 0; loadPhase(); });
+  $("pa-notify").addEventListener("click", toggleNotify);
+  $("pa-settings").addEventListener("click", openSettings);
+  $("pa-cancel").addEventListener("click", closeSettings);
+  $("pa-apply").addEventListener("click", applySettings);
+  $("pa-fullscreen").addEventListener("click", () =>
+    document.fullscreenElement ? document.exitFullscreen() : app.requestFullscreen?.()
+  );
+  overlay.addEventListener("click", e => { if (e.target === overlay) closeSettings(); });
+
+  window.addEventListener("keydown", e => {
+    if (overlay.classList.contains("open")) {
+      if (e.key === "Escape") closeSettings();
+      else if (e.key === "Enter") applySettings();
+      return;
+    }
+    if (e.code === "Space") { e.preventDefault(); toggle(); }
+    else if (e.key === "r" || e.key === "R") { pause(); phaseIdx = 0; pomoDone = 0; loadPhase(); }
+    else if (e.key === "s" || e.key === "S") { pause(); advancePhase(); showToast("Phase skipped"); }
+    else if (e.key === "f" || e.key === "F") $("pa-fullscreen").click();
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && running) {
+      remaining = Math.max(0, (endAt - performance.now()) / 1000);
+      if (remaining <= 0) finish(); else tick();
+    }
+  });
+
+  renderNotifyBtn();
+  loadPhase();
+})();
+</script>

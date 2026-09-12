@@ -25,6 +25,7 @@ author_profile: true
 <button onclick="location.href='/apps/pdf-to-image/'">🖼️ PDF TO IMAGE</button>
 <button onclick="location.href='/apps/pdf-diff/'">🔎 PDF DIFF</button>
 <button onclick="location.href='/apps/pdf-review-integrity-scanner/'">🛡️ PDF REVIEW INTEGRITY SCANNER</button>
+<button onclick="location.href='/apps/pdf-splitter/'">✂️ PDF SPLITTER</button>
 
 <button onclick="location.href='/apps/document-scanner/'">📄 DOCUMENT SCANNER</button>
 <button onclick="location.href='/apps/signature-maker/'">✒️ SIGNATURE MAKER</button>
@@ -35,6 +36,8 @@ author_profile: true
 <button onclick="location.href='/apps/image-background-remover/'">✂️ IMAGE BACKGROUND REMOVER</button>
 <button onclick="location.href='/apps/image-compressor-resizer/'">🖼️ IMAGE COMPRESSOR & RESIZER</button>
 <button onclick="location.href='/apps/image-redactor/'">🕵️ IMAGE REDACTOR</button>
+<button onclick="location.href='/apps/image-format-converter/'">🔄 IMAGE FORMAT CONVERTER</button>
+<button onclick="location.href='/apps/image-color-palette/'">🎨 IMAGE COLOR PALETTE</button>
 
 
 <h3>🛠️ UTILITIES</h3>
@@ -44,6 +47,7 @@ author_profile: true
 <button onclick="location.href='/apps/unit-converter/'">📐 UNIT CONVERTER</button>
 <button onclick="location.href='/apps/favicon-generator/'">🌐 FAVICON GENERATOR</button>
 <button onclick="location.href='/apps/minimal-timer/'">⏱️ MINIMAL TIMER</button>
+<button onclick="location.href='/apps/pomodoro-timer/'">🍅 POMODORO TIMER</button>
 
 
 <h3>🔎 DOCUMENT & METADATA TOOLS</h3>
