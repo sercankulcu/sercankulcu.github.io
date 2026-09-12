@@ -1,0 +1,225 @@
+---
+layout: without-sidebar
+title: "Sliding Puzzle"
+permalink: /game/sliding-puzzle/
+redirect_from:
+  - /game/sliding-puzzle.html
+excerpt: "Classic 15-puzzle: slide numbered tiles into order. Choose 3×3 or 4×4 grid."
+---
+
+<style>
+.sp-app,.sp-app *,.sp-app *::before,.sp-app *::after{box-sizing:border-box}
+.sp-app{
+  width:min(600px,calc(100% - 24px));
+  margin:.5rem auto 1.5rem;
+  color:var(--global-text-color);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.sp-app button{font:inherit;cursor:pointer}
+.sp-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.sp-title{margin:0;font-size:clamp(1.5rem,5vw,2rem);font-weight:750;letter-spacing:-.04em}
+.sp-topbar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.sp-stat{padding:10px 8px;border:1px solid var(--global-border-color);border-radius:13px;background:rgba(127,127,127,.04);text-align:center}
+.sp-stat small{display:block;opacity:.5;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.sp-stat strong{display:block;font-size:1.25rem;font-weight:750;margin-top:2px;font-variant-numeric:tabular-nums}
+.sp-size-tabs{display:flex;gap:6px;margin-bottom:12px}
+.sp-size-btn{flex:1;padding:9px;border:1px solid var(--global-border-color);border-radius:10px;background:rgba(127,127,127,.04);color:var(--global-text-color);font-size:.82rem;font-weight:700;transition:background .15s}
+.sp-size-btn.active{background:var(--global-text-color);color:var(--global-bg-color)}
+.sp-board{
+  display:grid;
+  gap:6px;
+  padding:10px;
+  border:1px solid var(--global-border-color);
+  border-radius:18px;
+  background:color-mix(in srgb,var(--global-text-color) 5%,transparent);
+  touch-action:none;
+  user-select:none;
+}
+.sp-tile{
+  display:flex;align-items:center;justify-content:center;
+  border-radius:12px;
+  font-weight:750;
+  cursor:pointer;
+  transition:transform .12s ease,background .2s;
+  border:1px solid rgba(127,127,127,.15);
+  -webkit-tap-highlight-color:transparent;
+}
+.sp-tile:not(.blank):hover{transform:scale(.96)}
+.sp-tile.blank{background:transparent;border-color:transparent;cursor:default}
+.sp-tile:not(.blank){background:var(--global-bg-color);box-shadow:0 3px 10px rgba(0,0,0,.1)}
+.sp-tile.correct{background:color-mix(in srgb,#3aaa6f 18%,var(--global-bg-color))}
+.sp-controls{display:flex;gap:8px;margin-top:12px}
+.sp-btn{flex:1;padding:11px;border:1px solid var(--global-border-color);border-radius:12px;background:rgba(127,127,127,.04);color:var(--global-text-color);font-size:.85rem;font-weight:700;transition:background .15s}
+.sp-btn.primary{background:var(--global-text-color);color:var(--global-bg-color);border-color:var(--global-text-color)}
+.sp-btn:hover{opacity:.82}
+.sp-won{
+  text-align:center;padding:16px;margin-top:14px;
+  border:1px solid var(--global-border-color);border-radius:14px;
+  background:color-mix(in srgb,#3aaa6f 10%,transparent);
+  font-weight:700;color:#2f7a55;display:none;
+}
+.sp-hint{text-align:center;margin-top:8px;font-size:.72rem;opacity:.45}
+</style>
+
+<div class="sp-app">
+  <div class="sp-header">
+    <h1 class="sp-title">Sliding Puzzle</h1>
+  </div>
+
+  <div class="sp-topbar">
+    <div class="sp-stat"><small>Moves</small><strong id="sp-moves">0</strong></div>
+    <div class="sp-stat"><small>Time</small><strong id="sp-time">0:00</strong></div>
+    <div class="sp-stat"><small>Best</small><strong id="sp-best">—</strong></div>
+  </div>
+
+  <div class="sp-size-tabs">
+    <button class="sp-size-btn" data-n="3">3 × 3</button>
+    <button class="sp-size-btn active" data-n="4">4 × 4</button>
+    <button class="sp-size-btn" data-n="5">5 × 5</button>
+  </div>
+
+  <div class="sp-board" id="sp-board"></div>
+
+  <div class="sp-won" id="sp-won">🎉 Tebrikler! Bulmacayı çözdün!</div>
+
+  <div class="sp-controls">
+    <button class="sp-btn" id="sp-shuffle-btn">Karıştır</button>
+    <button class="sp-btn primary" id="sp-new-btn">Yeni Oyun</button>
+  </div>
+  <div class="sp-hint">Boş hücreye komşu karo'ya tıkla veya ok tuşlarını kullan</div>
+</div>
+
+<script>
+(() => {
+"use strict";
+let N = 4;
+let tiles = [];
+let blankIdx = 0;
+let moves = 0;
+let seconds = 0;
+let timerInt = null;
+let won = false;
+let bests = JSON.parse(localStorage.getItem("sp.bests") || "{}");
+
+const board = document.getElementById("sp-board");
+const movesEl = document.getElementById("sp-moves");
+const timeEl = document.getElementById("sp-time");
+const bestEl = document.getElementById("sp-best");
+const wonEl = document.getElementById("sp-won");
+
+function fmt(s) { return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; }
+
+function bestKey() { return `n${N}`; }
+function getBest() { return bests[bestKey()] || null; }
+function saveBest(s) { bests[bestKey()] = s; localStorage.setItem("sp.bests", JSON.stringify(bests)); }
+function renderBest() { const b = getBest(); bestEl.textContent = b ? fmt(b) : "—"; }
+
+function startTimer() {
+  clearInterval(timerInt);
+  seconds = 0;
+  timerInt = setInterval(() => { seconds++; timeEl.textContent = fmt(seconds); }, 1000);
+}
+function stopTimer() { clearInterval(timerInt); }
+
+function solved() {
+  for (let i = 0; i < N*N - 1; i++) if (tiles[i] !== i + 1) return false;
+  return tiles[N*N - 1] === 0;
+}
+
+function isSolvable(arr) {
+  let inv = 0;
+  const flat = arr.filter(x => x !== 0);
+  for (let i = 0; i < flat.length; i++)
+    for (let j = i+1; j < flat.length; j++)
+      if (flat[i] > flat[j]) inv++;
+  if (N % 2 === 1) return inv % 2 === 0;
+  const blankRow = Math.floor(arr.indexOf(0) / N);
+  return (inv + blankRow) % 2 === 1;
+}
+
+function shuffle() {
+  do {
+    tiles = [...Array(N*N - 1).keys()].map(i => i + 1).concat(0);
+    for (let i = tiles.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+    }
+  } while (!isSolvable(tiles) || solved());
+  blankIdx = tiles.indexOf(0);
+}
+
+function render() {
+  board.style.gridTemplateColumns = `repeat(${N},1fr)`;
+  const size = Math.min(520, board.clientWidth || 480) - 20;
+  const tileSize = Math.floor((size - (N-1)*6) / N);
+  const fontSize = Math.max(14, Math.min(32, tileSize * 0.4));
+  board.innerHTML = "";
+  tiles.forEach((val, idx) => {
+    const tile = document.createElement("div");
+    tile.className = "sp-tile" + (val === 0 ? " blank" : "") + (val !== 0 && val === idx + 1 ? " correct" : "");
+    tile.style.height = tileSize + "px";
+    tile.style.fontSize = fontSize + "px";
+    if (val !== 0) {
+      tile.textContent = val;
+      tile.addEventListener("click", () => tryMove(idx));
+    }
+    board.appendChild(tile);
+  });
+}
+
+function tryMove(idx) {
+  if (won) return;
+  const row = Math.floor(idx / N), col = idx % N;
+  const brow = Math.floor(blankIdx / N), bcol = blankIdx % N;
+  if (Math.abs(row - brow) + Math.abs(col - bcol) !== 1) return;
+  [tiles[idx], tiles[blankIdx]] = [tiles[blankIdx], tiles[idx]];
+  blankIdx = idx;
+  moves++;
+  movesEl.textContent = moves;
+  render();
+  if (solved()) {
+    stopTimer();
+    won = true;
+    wonEl.style.display = "";
+    const b = getBest();
+    if (!b || seconds < b) { saveBest(seconds); renderBest(); }
+  }
+}
+
+function newGame() {
+  won = false; moves = 0;
+  movesEl.textContent = "0";
+  wonEl.style.display = "none";
+  shuffle();
+  render();
+  startTimer();
+  renderBest();
+}
+
+// Arrow keys
+window.addEventListener("keydown", e => {
+  if (won) return;
+  const brow = Math.floor(blankIdx / N), bcol = blankIdx % N;
+  let target = -1;
+  if (e.key === "ArrowUp"    && brow < N-1) target = blankIdx + N;
+  if (e.key === "ArrowDown"  && brow > 0)   target = blankIdx - N;
+  if (e.key === "ArrowLeft"  && bcol < N-1) target = blankIdx + 1;
+  if (e.key === "ArrowRight" && bcol > 0)   target = blankIdx - 1;
+  if (target >= 0) { e.preventDefault(); tryMove(target); }
+});
+
+document.getElementById("sp-shuffle-btn").addEventListener("click", newGame);
+document.getElementById("sp-new-btn").addEventListener("click", newGame);
+
+document.querySelectorAll("[data-n]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    N = +btn.dataset.n;
+    document.querySelectorAll("[data-n]").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    newGame();
+  });
+});
+
+newGame();
+})();
+</script>
