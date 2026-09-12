@@ -8,40 +8,16 @@ tags:
   - time
 ---
 
-"Rome was not built in a day" is so familiar that it is easy to agree with and almost useless to remember.
+Some work has a delay built into it. A skill needs practice before the movement becomes familiar. Trust needs repeated behavior after an apology. A draft sometimes needs distance before its weak argument becomes visible.
 
-Of course large things take time.
+These delays are frustrating because effort and evidence arrive on different schedules. We do something today and want the result to tell us immediately that it was enough.
 
-The difficulty begins when the unfinished thing is ours.
+Patience becomes useful when we can distinguish the part that is available to do now from the part that needs time. After an honest conversation, there may be a promise to keep rather than another explanation to give. After a practice session, there may be little benefit in checking again whether we have improved.
 
-A new skill feels slow. A project refuses to become elegant. A relationship does not repair itself after one conversation. We know that time is required, yet we still treat delay as evidence that something is going wrong.
+Constant checking can turn a slow process into a series of apparent failures. The relationship is not repaired yet. The new skill is not fluent yet. The project is still unfinished. Each statement may be true while telling us very little about whether the process is working.
 
-I think the problem is that patience is often confused with waiting.
+That does not mean progress should be accepted on faith. It helps to decide what evidence is reasonable to expect and when. Are the same mistakes becoming less frequent? Has a commitment been kept over several occasions? Is the difficult passage clearer after revision? These questions fit the work better than a general demand to feel successful today.
 
-Waiting is passive. Patience is not.
+There are also delays that time alone cannot help. Missing information needs a question. A broken process needs a change. An agreement repeatedly ignored needs examination. Patience should not make those differences disappear.
 
-Seneca's writing on time repeatedly returns to the question of how we use what is given to us. That is useful here because patient work is not simply allowing days to pass. It is continuing to act while accepting that the result cannot be forced to arrive on our preferred schedule.
-
-This distinction changes how I think about slow progress.
-
-Writing one page is not impressive because one page is large. It matters because it belongs to a process whose final shape is still invisible. Fixing one bug, practicing one difficult movement, having one honest conversation, none of these guarantees success.
-
-They are simply today's share of a larger task.
-
-There is also a limit to patience.
-
-Time does not improve everything. A bad plan can remain bad for years. A relationship can remain harmful. Repetition can strengthen the wrong habit as easily as the right one.
-
-So patience needs judgment.
-
-The question is not only, "Can I keep going?"
-
-It is also, "Is this still worth continuing?"
-
-That is why I no longer like the proverb as a promise that persistence will eventually produce Rome.
-
-Sometimes persistence builds something worthwhile. Sometimes it builds a wall we should have stopped constructing much earlier.
-
-Patience is not faith that time will reward us.
-
-It is the discipline of giving worthwhile things enough time without surrendering the right to reconsider them.
+The proverb about Rome is too large for most of these moments. The unfinished thing in front of us is usually smaller and more awkward. What helps is knowing today's share of the work, doing it, and allowing a reasonable interval before asking the result to answer back.

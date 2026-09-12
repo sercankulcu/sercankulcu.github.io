@@ -18,7 +18,7 @@ A decision can collect so many opinions that it no longer feels like ours. One f
 
 But reasonableness is not transferability.
 
-Montaigne often tested ideas against lived experience rather than treating abstract rules as sufficient. Epictetus, from another direction, insisted on distinguishing what belongs to our own judgment from what belongs to the world outside us. I think both approaches help here: advice can inform a choice without becoming the author of it.
+A useful opinion adds something I can examine: a risk, an experience, an alternative. It should still leave me able to explain why the choice makes sense in my own circumstances.
 
 This matters because other people rarely pay the full cost of the decisions they recommend.
 
@@ -32,7 +32,7 @@ The more useful form of independence is **remaining able to decide after listeni
 
 Support should widen judgment, not replace it.
 
-The same is true of fear. We often imagine difficult choices as external obstacles: the mountain, the distance, the branch we have to leave. But the harder part is frequently internal. Habit can make a bad situation feel safer than an unknown one. Approval can make another person's preference feel like our duty. Fear can turn uncertainty into evidence that we should not move.
+The same is true of fear. We often describe a difficult choice only through its external obstacles: money, distance, or an uncertain opportunity. But the harder part is frequently internal. Habit can make a bad situation feel safer than an unknown one. Approval can make another person's preference feel like our duty. Fear can turn uncertainty into evidence that we should not move.
 
 That does not mean every act of leaving is brave. Sometimes staying is wiser. Sometimes fear is warning us about something real. The point is not to glorify action over caution.
 

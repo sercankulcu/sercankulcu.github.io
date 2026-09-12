@@ -20,7 +20,7 @@ Dewey treated learning as something tested through experience rather than stored
 
 There is another benefit: finishing forces exclusion. An unfinished project can contain every future feature because none of them has to coexist yet. Finishing means deciding what this version will not include. That can feel like loss, but it is also what gives the work a shape.
 
-I notice this especially with small tools. A timer, a calculator, a tiny game, a page that solves one problem: none needs to become a company, a product, or a platform. It can simply do one thing well enough to be complete.
+I notice this especially with the small tools on this site, such as the [timer](/apps/minimal-timer.html) and the [memory test](/apps/memory-test.html). Their scope makes completion concrete: the controls need to work, the result needs to be clear, and the page needs to remain usable on a phone. There is still judgment involved, but a small tool does not need to become a platform before it deserves to exist.
 
 That changes the emotional weight of work. A huge unfinished plan can follow me for months. A small finished project becomes quiet. I can look at it, notice what I learned, and move on without carrying twenty unresolved decisions into the next idea.
 

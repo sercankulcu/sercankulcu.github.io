@@ -26,7 +26,7 @@ Occasionally compare the present not with the ideal, but with the actual past.
 
 What can I do now that I could not do a year ago? Which problem that once intimidated me has become routine? Which difficult conversation did I finally have? Which unfinished thing is now finished?
 
-Montaigne's habit of examining himself without turning every observation into a grand rule is useful here. Progress is often easier to see backward than forward.
+Progress is often easier to see against a particular earlier difficulty than against an ideal we keep revising.
 
 There may never be a final arrival. Most worthwhile pursuits keep opening new distances.
 

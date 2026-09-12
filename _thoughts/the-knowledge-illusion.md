@@ -14,13 +14,13 @@ I can use a phone without understanding radio communication, semiconductor desig
 
 The difficulty is psychological: access to knowledge begins to feel like possession of knowledge.
 
-Researchers such as Steven Sloman and Philip Fernbach have described this as a knowledge illusion. We rely on information distributed across other people and institutions, then quietly confuse what the group knows with what exists inside our own head.
+A related problem is the **illusion of explanatory depth**. In [their 2002 study](https://onlinelibrary.wiley.com/doi/10.1207/s15516709cog2605_1), Leonid Rozenblit and Frank Keil found that people overestimated how deeply they understood complex phenomena. Attempting an explanation can expose a gap that familiarity had concealed.
 
-A simple test exposes the gap. Ask someone whether they understand how a zipper, toilet, bicycle, or mechanical lock works. Most people feel reasonably confident. Then ask for a step-by-step explanation. Confidence often collapses before the explanation is finished.
+Try the question on a familiar device: could I explain how each part contributes to its operation, without looking up the answer? Knowing how to use something may not prepare me to explain its mechanism. The difference becomes easier to notice when I try.
 
-I like this test because it does not prove stupidity. It proves dependence.
+I like this exercise because a missing explanation identifies something to learn. It need not become a judgment about intelligence.
 
-Human knowledge has always been social. Russell's clarity about uncertainty and Hume's suspicion of easy certainty both point toward the same discipline: distinguish the strength of a belief from the strength of the evidence behind it.
+Relying on other people is unavoidable. The useful discipline is to distinguish what I can explain myself from what I trust someone else to explain.
 
 The problem becomes more serious when mechanisms disappear but opinions remain. We may speak confidently about economics, artificial intelligence, medicine, education, or public policy while carrying only a compressed summary of somebody else's explanation.
 

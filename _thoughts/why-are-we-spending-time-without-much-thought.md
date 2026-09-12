@@ -8,42 +8,20 @@ tags:
   - reflection
 ---
 
-At the end of some busy days, I have a strange feeling: I did many things, but I am not sure I chose the day.
+Sometimes I reach for a distraction at a very precise moment: a task has become uncertain, a difficult conversation has come to mind, or the room has gone quiet enough for an uncomfortable question to return.
 
-Messages were answered. News was checked. Small tasks disappeared. A few minutes of scrolling became an hour in fragments.
+The phone is convenient, but the sequence interests me more than the device. Something becomes hard to remain with. I look elsewhere. For a few minutes the discomfort recedes.
 
-Nothing dramatic happened.
+An interruption is usually easy to identify when it comes from outside. This kind begins before the notification. I am already looking for something that will let me stop feeling unsure about the paragraph, the decision, or the conversation.
 
-That is exactly why the time is difficult to notice.
+It helps to ask what happened just before I changed the subject. Did the work become boring? Did I encounter something I do not understand? Am I tired, or afraid of discovering that the idea is weak?
 
-Pascal wrote about *divertissement*: the human tendency to keep ourselves occupied so that we do not have to remain alone with certain thoughts. His examples belonged to another century, but the mechanism feels familiar.
+Those are different situations. Tiredness may need a real break. Missing knowledge may need a specific question. A weak idea may need revision. Scrolling can postpone all three without helping me tell them apart.
 
-Distraction is not always laziness.
+There is no need to turn every distraction into evidence of a hidden emotional problem. Sometimes a video is simply enjoyable. Sometimes I want music while I cook. Pleasure does not need to defend itself as productive.
 
-Sometimes it is avoidance with better entertainment.
+The useful clue is whether I am getting the rest or enjoyment I sought. Deliberately watching a film can be satisfying. Repeatedly choosing the next thirty seconds while half-thinking about an avoided task often leaves neither the task nor the evening in a better state.
 
-A difficult task produces uncertainty, so I check something easier. Silence feels uncomfortable, so I put something in my ears. A question about work, relationships, or direction begins to form, and suddenly there are many small things that urgently deserve attention.
+I do not want to eliminate escape. I want to recognize when I am using it. Naming the discomfort can make the choice less automatic: I am stuck here; I need a break; I do not yet want to make this decision.
 
-Digital tools did not invent this tendency. They simply made escape unusually convenient.
-
-There is always another message, article, video, notification, argument, or piece of information waiting to replace the thought we were about to have.
-
-This does not mean entertainment is wasted time. Rest can be deliberate. Doing nothing can be deliberate. Watching something for two hours because I wanted to watch it is different from discovering that two hours disappeared while I was repeatedly choosing the next thirty seconds.
-
-The distinction I care about is not productive versus unproductive.
-
-It is chosen versus automatic.
-
-Busyness can hide this difference because a full day looks responsible from the outside. But activity does not answer the question of whether I wanted to spend my attention that way.
-
-I try to notice the moments when I reach for distraction too quickly.
-
-Not because every empty minute should become useful, but because an empty minute may contain a thought I have been avoiding.
-
-Sometimes the thing I call boredom is simply the few seconds before I have to meet my own mind.
-
-That may be why distraction is so attractive.
-
-And why attention is more than a productivity skill.
-
-It is one of the ways we decide which parts of our life we are willing to experience.
+Then I can either return with a smaller question or leave the task deliberately for a while. Both give the pause an ending that another swipe rarely supplies.
