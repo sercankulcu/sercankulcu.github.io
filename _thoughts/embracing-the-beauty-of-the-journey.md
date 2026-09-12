@@ -18,7 +18,7 @@ It turns the present into a waiting room.
 
 There is always another condition we can attach to being satisfied: when the semester ends, when the promotion comes, when the debt is paid, when the house is finished, when the difficult year is over. Some of these goals matter. But a life organized entirely around arrival quietly teaches us to treat most of our days as disposable.
 
-Montaigne often began with ordinary experience and distrusted grand formulas about how life should be lived. I find that useful here. The point is not to romanticize every difficult moment. Some periods are simply exhausting. Some roads are ugly. Some work is only work.
+That does not require romanticizing every difficult moment. Some periods are simply exhausting. Some roads are ugly. Some work is only work.
 
 But even an unpleasant stage is still part of the finite amount of time we have.
 

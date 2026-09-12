@@ -1,37 +1,29 @@
 ---
-title: 'Reality Collects Interest'
+title: "When Waiting Protects an Answer"
 date: 2024-06-17
-description: "Avoided truths do not disappear; they grow more expensive the longer we postpone meeting them."
+description: "Waiting can preserve a comforting possibility after the evidence has begun asking us to act."
 tags:
   - truth
   - avoidance
   - reflection
 ---
 
-Some truths become expensive only because we postpone meeting them.
+There is a kind of waiting that depends on keeping a question open after the answer has become difficult to ignore.
 
-A relationship is no longer what it was. A project is failing. A decision has already been made emotionally even though we keep pretending it is still open. None of these situations becomes false because we avoid naming it. But naming it can change what we are now required to do.
+A relationship no longer offers what it once did. A project has repeatedly failed to meet its purpose. Someone keeps making a promise without changing the behavior behind it. We ask for another conversation, another opinion, another month. Sometimes that is sensible caution. Sometimes the uncertainty is no longer in the evidence. It is in what accepting the evidence would require.
 
-That is why denial is tempting. It is not always stupidity. Sometimes it is a temporary shelter from action.
+I find that distinction uncomfortable because gathering information usually feels responsible. It can continue to feel responsible even when I am asking the same question in the hope of receiving a more convenient answer.
 
-If I admit that something is over, I may have to leave. If I admit that I chose badly, I may have to repair the consequences. If I admit that another person is unlikely to change, I lose the comfort of waiting for a future version of them.
+If I admit that a situation is unlikely to change, I lose the version of the future in which it repairs itself. I may have to disappoint someone, abandon a plan, or grieve something while it is still partly present. Leaving the question unresolved protects me from that work for a while.
 
-Pascal wrote about diversion as one of the ways human beings avoid being alone with difficult truths. The modern versions are easy to recognize. We keep busy, gather more opinions, watch something, open another tab, invent another scenario, or tell ourselves that more time will create information when the information is already sufficient.
+The difficulty is that other decisions continue during the delay. I make commitments around the possibility I am protecting. I explain away new disappointments using the same old hope. Eventually it becomes harder to distinguish loyalty to a person or a project from loyalty to my prediction about them.
 
-The delay can feel merciful. Sometimes it is. Not every truth should be confronted at maximum speed. Grief, shock, and uncertainty need time. There is a difference between **needing time to understand** and **using time to avoid understanding**.
+A useful question is: what evidence would actually change my mind now?
 
-The difference usually appears in what time is doing. Is the situation becoming clearer, or am I merely becoming more practiced at not looking at it?
+If I can name it, waiting may have a purpose. A changed behavior sustained over time, a result from a real trial, or a conversation that clarifies what both people want could matter. If no answer seems sufficient, more time may only extend a conclusion I am unwilling to reach.
 
-That question matters because reality collects interest. A conversation postponed for one week may require courage. Postponed for one year, it may also require undoing a year of silence. A small financial problem can become debt. A small resentment can become the history through which every new event is interpreted.
+This is not an argument for confronting every difficult truth immediately. Grief and shock need room. Incomplete information is sometimes genuinely incomplete. We should be able to wait without accusing ourselves of cowardice.
 
-Avoidance does not preserve the original problem. It changes it.
+But waiting becomes more honest when it has a reason we can describe. What remains unknown? What will the next month allow us to learn? What are we committing in the meantime?
 
-I still think imagination is useful. It lets us rehearse possibilities, create art, hope, and survive periods when the facts are temporarily unbearable. But imagination becomes dangerous when it is asked to perform the job of evidence.
-
-A comforting possibility deserves to remain a possibility until reality supports it.
-
-The difficult part is recognizing when hope has stopped helping us face reality and started helping us postpone it.
-
-Sometimes courage is not discovering a new truth.
-
-It is admitting that we already know enough.
+I still want hope to have a place in difficult periods. I just want to notice when I have made hope responsible for contradicting everything else I know. At that point, the next task may be accepting the answer rather than asking again.

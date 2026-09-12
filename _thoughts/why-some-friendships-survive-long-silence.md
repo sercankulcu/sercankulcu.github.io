@@ -16,7 +16,7 @@ When we are young, friendship is often supported by structure. School, universit
 
 Then friendship has to survive without the machinery that once kept it visible.
 
-Montaigne's famous friendship with La Boétie was unusual in intensity, but what interests me is his sense that friendship is not merely a schedule of interactions. Fromm, in a different way, reminds us that care is an activity rather than a possession. Both ideas help distinguish **absence of contact** from **absence of regard**.
+The distinction that matters here is between **absence of contact** and **absence of regard**. A history of showing up when it mattered can give an ordinary silence a different meaning.
 
 They are not the same thing.
 

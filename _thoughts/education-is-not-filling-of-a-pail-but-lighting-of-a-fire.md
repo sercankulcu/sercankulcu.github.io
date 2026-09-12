@@ -14,9 +14,7 @@ Definitions were covered. Slides were finished. Examples were solved. Students c
 
 And sometimes almost nothing survives the exam.
 
-This is why I still like the old image often attributed to W. B. Yeats: education is not the filling of a pail but the lighting of a fire.
-
-The quotation becomes imperfect if taken too literally. Students do need information. Fundamentals matter. A learner cannot rediscover every theorem, algorithm, historical event, or scientific principle from scratch.
+This does not make clear instruction less important. Students need fundamentals; a learner cannot rediscover every theorem or algorithm from scratch.
 
 But information alone does not explain why some ideas remain alive after a course while others disappear almost immediately.
 
@@ -24,9 +22,9 @@ The difference often seems to be unfinished curiosity.
 
 A student encounters a question that the lesson does not fully close. Why does this algorithm fail here? What would happen if we changed this assumption? Why was this design chosen instead of another one?
 
-The question remains slightly irritating.
+Consider a binary search lesson. Once students understand how to find a matching value in a sorted array, ask what should happen when the same value appears several times. Finding any match and finding the first match are different tasks. A familiar algorithm suddenly contains a question that the worked example did not settle.
 
-That irritation can be educationally valuable.
+The student has enough structure to investigate, and a reason to do so.
 
 As a teacher, it is tempting to resolve every ambiguity because clarity feels like success. But a perfectly closed explanation can also remove the reason to continue thinking.
 

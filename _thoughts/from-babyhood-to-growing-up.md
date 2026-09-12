@@ -8,32 +8,20 @@ tags:
   - conformity
 ---
 
-A baby begins with a very direct relationship to need. Hunger becomes crying. Discomfort becomes crying. The signal is crude but honest: something is wrong, and the child does not yet know how to disguise it.
+Growing up teaches us to notice what other people need. We learn to wait, share, explain, and accept that wanting something does not settle whether we should have it.
 
-Growing up makes communication more sophisticated. We learn language, politeness, timing, negotiation, and the fact that other people have needs too. This is necessary. A person who never learns to consider others cannot live well with anyone.
+That education is necessary. It also makes another question harder to hear: what do I want?
 
-But social learning has a second effect. The question "What do I need?" slowly becomes entangled with another question: "What is expected of me?"
+By adulthood, expectations can arrive before a decision has even been described. A career should look respectable. A move should not worry the family. A choice should make sense to people who have supported us. We begin preparing a defense before we have worked out our preference.
 
-Parents have hopes. Teachers reward certain behaviors. Friends create their own rules. Culture supplies a picture of what a successful life should look like. None of these influences is automatically bad. Many of them protect us, educate us, and make cooperation possible.
+The difficulty is not simply external pressure. Other people can have good reasons to be concerned. A parent may recognize a risk I am underestimating. A partner may bear costs that my picture of independence conveniently leaves out. Listening to them is part of taking the decision seriously.
 
-The difficulty is that an expectation repeated long enough can begin to sound like an inner voice.
+But listening becomes less useful when approval is the only acceptable outcome. A decision can be carefully considered and still disappoint someone. If disappointment automatically disqualifies it, there was little room for judgment in the first place.
 
-Erich Fromm wrote about the tension between being and conforming to what society rewards. Montaigne, in a different way, kept returning to the problem of living according to one's own judgment rather than borrowed opinion. I recognize both problems in ordinary adult life.
+One way to make the problem clearer is to separate three things: what I prefer, what I owe, and what other people would prefer for me. They may overlap. They should not become indistinguishable.
 
-We become very good at answering questions nobody explicitly asks anymore. Choose the respectable path. Keep everyone comfortable. Do not disappoint the family. Stay busy. Be useful. Want what people like you are supposed to want.
+A responsibility to support someone is different from a wish to impress them. A shared commitment is different from an expectation nobody has agreed to discuss. Naming those differences can reveal a real obligation, or make room for a choice that guilt had hidden.
 
-Eventually, obedience can become so efficient that no external pressure is needed.
+Our own desires need examination too. They may be temporary, unrealistic, or unfair. Calling a wish authentic does not make its consequences disappear. It does at least give the conversation an honest starting point.
 
-Then a strange thing happens: an adult can be far more articulate than a child and still have more difficulty answering a simple question, what do I actually want?
-
-This is not an argument for selfishness. Our own desires are not sacred simply because they are ours. They can be foolish, harmful, temporary, or impossible. Other people's claims on us are real too. Responsibility matters.
-
-The distinction I care about is between **considering other voices** and **losing the ability to identify our own**.
-
-Growing up should not mean replacing every personal impulse with social approval. Nor should maturity mean returning to the baby's world where only our needs exist.
-
-Perhaps adulthood is the more difficult position between the two: hearing the expectations around us clearly enough to take them seriously, while still being able to ask which ones deserve authority.
-
-Independence does not suddenly appear at eighteen. It develops through hundreds of small acts of judgment.
-
-At some point, growing up becomes less about learning what other people want from us and more about learning which of those voices we have decided to keep.
+Adulthood asks us to remain capable of both care and disagreement. I want to take other people's hopes seriously while still being able to explain a decision they would not have made for me. Sometimes growing up becomes visible in that conversation, long after the age at which independence was supposed to arrive.
