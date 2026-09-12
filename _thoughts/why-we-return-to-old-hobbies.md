@@ -14,7 +14,7 @@ A game, a camera, a keyboard, a chessboard, or a book may look like an object fr
 
 This is why returning to an old hobby can feel disproportionate to the activity itself. We are not only resuming something we once did. We are comparing two versions of the person doing it.
 
-Montaigne was interested in how the self changes while still feeling continuous. Old hobbies make that problem strangely concrete. The activity may be almost identical, but the motive has changed. A game once played competitively may now feel peaceful. A book once abandoned as boring may suddenly contain something we were too young to notice. Something we once wanted to master may now be valuable precisely because we no longer need to be good at it.
+An old hobby makes change visible through something familiar. The activity may be almost identical, but the motive has changed. A game once played competitively may now feel peaceful. A book once abandoned as boring may suddenly contain something we were too young to notice. Something we once wanted to master may now be valuable precisely because we no longer need to be good at it.
 
 That change can be comforting because it shows that identity does not need perfect continuity. We can return without pretending that nothing happened in between.
 

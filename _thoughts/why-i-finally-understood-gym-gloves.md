@@ -58,7 +58,7 @@ A tiny gym entry became useful because the sequence repeats throughout life: jud
 
 The ideal would be to learn everything through wisdom. In practice, a great deal of learning happens through irritation.
 
-I do not remember the exact day my hands started blistering or which exercise finally changed my mind. The archive preserves only the conclusion: gym gloves initially looked like sunglasses at night. Then my hands blistered. Then I understood why they existed.
+I do not remember the exact day my hands started blistering or which exercise finally changed my mind. What stayed with me was how quickly an unnecessary accessory became useful once I understood the problem it solved.
 
 That is enough to remind me that opinions formed before experience should be held lightly, especially opinions about other people's solutions.
 

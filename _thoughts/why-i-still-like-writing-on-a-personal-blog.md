@@ -18,6 +18,8 @@ Montaigne's essays still feel alive partly because they preserve the movement of
 
 Sometimes I begin a post certain of what I think and end with a weaker, more complicated conclusion. Writing exposes where an opinion relies on vague language or where two beliefs I hold do not fit together. The post becomes less a declaration than a record of revision.
 
+My old [note about a missing good morning](/thoughts/love-was-the-good-morning-i-took-for-granted/) is one example. It began with something like a definition of love. Returning to it leaves me more interested in a particular form of affection that I had stopped noticing. Keeping the note lets that change in interpretation remain visible.
+
 That record matters to me even when nobody else reads it. Years later, an old post can show not only what I believed but what I noticed, what I worried about, which tools I used, and what kind of questions seemed important at the time.
 
 This is different from keeping a private notebook. Publishing changes the writing slightly. Knowing that another person *could* read the page forces enough clarity to make the thought inspectable. But because the page is mine, it does not need to become optimized for maximum reach.

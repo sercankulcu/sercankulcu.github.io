@@ -14,7 +14,7 @@ Now I think care is only part of it.
 
 Long friendships usually have some kind of structure.
 
-There is a Japanese term often associated with Okinawa, *moai*, for a social group whose members support one another over long periods. What interests me is not the foreignness of the term. It is the assumption behind it: connection should not be left entirely to chance.
+In Okinawa, *moai* groups provide a structure for mutual support; [this account from Blue Zones describes the practice](https://www.bluezones.com/2018/08/moai-this-tradition-is-why-okinawan-people-live-longer-better/). What interests me here is the commitment to make contact recurring, rather than leaving it entirely to chance.
 
 Modern friendship is often informal to the point of fragility.
 

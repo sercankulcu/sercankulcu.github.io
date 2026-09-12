@@ -28,7 +28,7 @@ The question I try to ask is not simply, "Do I want to continue?" Desire is too 
 
 If the reason has disappeared, persistence may be inertia. If the reason remains but the work is temporarily difficult, quitting may simply be a way to purchase immediate relief at the cost of something I still value.
 
-Montaigne often distrusted grand rules because human situations change under our feet. I think this problem deserves the same suspicion. "Never quit" is foolish. "Life is short, leave anything that makes you unhappy" can be just as foolish.
+A general rule is unlikely to settle such different situations. "Never quit" is foolish. "Life is short, leave anything that makes you unhappy" can be just as foolish.
 
 Some worthwhile things are unpleasant for long stretches. Some harmful things are pleasant enough to keep us from leaving.
 

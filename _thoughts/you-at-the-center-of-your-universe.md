@@ -32,7 +32,7 @@ I have enormous amounts of information about my own intentions and almost none a
 
 So the mind explains missing information with the most available character: itself.
 
-Montaigne repeatedly treated self-observation as useful precisely because the self is both the nearest object of study and an unreliable measure of everything else. I find that tension helpful.
+My own story is the easiest one for me to consult. That availability does not make it the best explanation for what someone else is doing.
 
 The goal is not to make myself insignificant.
 

@@ -8,52 +8,18 @@ tags:
   - reflection
 ---
 
-"Those who cannot occupy themselves will be occupied by others."
+A day can fill with requests without containing a clear decision about what deserves it.
 
-I used to hear this mainly as advice about having hobbies or goals.
+There is a message to answer, a colleague's problem, a notification, something briefly urgent enough to displace what came before. Each interruption may be reasonable. The difficulty appears in the total: being available has become the plan.
 
-Now I think it describes something more basic: attention behaves like unclaimed territory.
+I notice that attention is easier to claim when it already has somewhere to go. A book I meant to read, a project I chose, or an evening I wanted to keep free can otherwise lose to whatever arrives first. The request is visible; the displaced intention is not.
 
-If I do not decide what deserves it, something else usually does.
+This is a problem of access as much as self-control. If every channel can reach me immediately, other people's timing becomes the structure of the day. Good intentions do not prevent that. Wanting to be helpful can make it harder to notice that there is no interval left in which I am not responding.
 
-A notification. A message. Someone else's urgency. News chosen by an algorithm. A request I never consciously agreed was important. None of these things needs to be harmful by itself.
+Some interruptions deserve priority. Other people genuinely need us, and rigid protection of time can become indifference. The question is whether every request has to make that decision for us merely by arriving.
 
-The problem is cumulative.
+A boundary makes the choice visible. Reading a message later, naming a time when I can help, or allowing an hour to remain unavailable gives an intention some practical protection. The boundary does not need an impressive justification. Rest is a reason. So is wanting to finish a thought.
 
-A day can be consumed by reactions without containing a single deliberate decision about where attention should go.
+This is different from assigning every minute a productive purpose. Unplanned time can be the very thing worth protecting. An evening without an objective is still an evening I can choose, rather than space automatically available for somebody else's objective.
 
-Pascal wrote about *divertissement*,the many activities through which people avoid sitting quietly with themselves. Modern technology did not invent distraction. It industrialized access to it.
-
-An empty minute rarely remains empty now.
-
-The phone offers immediate occupation before boredom has time to become anything else.
-
-That matters because boredom is not always a defect.
-
-Sometimes it is the short uncomfortable interval before an unscripted thought appears.
-
-Without that interval, our attention can remain permanently rented.
-
-This does not mean every hour should serve a project. Rest can be chosen. Entertainment can be chosen. Doing nothing can be chosen.
-
-The distinction is not productive versus unproductive.
-
-It is **claimed versus unclaimed**.
-
-Did I choose this use of attention, or did I simply fail to defend the empty space?
-
-The question applies beyond phones.
-
-People can occupy our attention too. A person who has not decided what matters may become extremely available to every request, expectation, argument, and emergency around them.
-
-Availability can look like generosity while slowly eliminating authorship.
-
-There is no need to control every minute. That would become another form of captivity.
-
-But some part of life needs to remain deliberately ours.
-
-A book nobody assigned. A project nobody requested. A walk with no message to answer. A thought allowed to become boring before becoming interesting.
-
-Attention is one of the few resources through which a life is actually experienced.
-
-If we never claim any of it ourselves, someone else usually will.
+I want enough openness to respond when it matters, and enough room left to recognize my own day. That requires deciding occasionally what may wait for an answer.
