@@ -36,7 +36,7 @@ That disappointment reveals something important: nostalgia is not really a desir
 
 It is often a desire for an old arrangement of the self.
 
-Montaigne wrote by repeatedly comparing himself with himself, accepting that the subject kept moving. Familiar places can do something similar without words. They become fixed points against which change becomes easier to see.
+Familiar places can make that comparison possible without words. They become fixed points against which change becomes easier to see.
 
 This is why a childhood street can feel more emotionally powerful than a beautiful place visited once. Its value is not necessarily in what it is.
 

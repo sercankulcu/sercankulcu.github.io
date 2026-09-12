@@ -1,91 +1,35 @@
 ---
 title: 'Sometimes a Toy Is Worth More Than Us'
 date: 2026-09-07
-description: "We spend money to show love, then forget that sometimes love is the cheapest thing in the room."
+description: "A broken toy can mean more than adults realize; taking a child seriously does not require replacing everything they lose."
 tags:
   - childhood
   - attachment
   - value
 ---
 
-There is a sentence that can hurt a parent's pride: **Sometimes, in the eyes of a child, a toy is more valuable than their mother or father.**
+For a moment, a broken toy can seem to matter more to a child than anything a parent has done that day.
 
-We adults do not like this sentence. We think of the shoes we bought, the food we carried home, the nights we stayed awake, the money we counted twice before spending once. Then the child takes a cheap plastic truck, holds it to the chest, and cries as if the whole world has ended.
+We think of the food carried home, the shoes bought, the night spent awake. Then the child holds a cheap plastic truck to their chest and cries as if the whole world has ended. Our efforts seem to have disappeared behind a missing wheel.
 
-It looks unfair.
+That can hurt a parent's pride. It does not tell us what the child thinks our love is worth.
 
-But childhood has never been fair according to adult rules.
+The work that supports a household can be difficult for a young child to understand. Some children notice money worries early; others are protected from them. Either way, an adult's sacrifice and a child's attachment do not become comparable simply because both matter.
 
-A child does not know the price of bread, rent, electricity, medicine, or school clothes. A child does not know that the father came home with pain in his back or that the mother postponed buying something for herself. Love has no receipt in the child's pocket. Sacrifice has no price tag hanging from it.
+The toy is easier to grasp. It is there, in the child's hands, and it belongs to a world the child can arrange. The house, the furniture, the rules, even bedtime are largely decided by adults. One small truck can feel like a kingdom.
 
-The toy does.
+A toy does not come home tired. It does not say "not now" or ask the child to be quiet because guests are coming. It is available for whatever story needs to happen next. Losing it interrupts more than ownership.
 
-Maybe that is why the toy is easier to understand.
+Having few toys can make a loss harder to replace. But a room full of them does not make one particular toy interchangeable. Its history may be invisible to the adult trying to offer a substitute.
 
-A red car is red. A doll is a doll. A wooden horse does not come home angry because the boss shouted at it. A toy does not say, "Not now, I am tired." It does not talk about tomorrow's bills. It does not tell the child to be quiet because guests are coming.
+We understand that better with our own objects: a father's radio, a mother's ring, a watch kept long after it stopped working. Their value is not exhausted by what they do. We should recognize at least something familiar in the child's attachment.
 
-Adults are complicated.
+A child sees a plastic truck and imagines a road. An adult sees a new car and imagines freedom. Sometimes the difference is mostly the bank loan.
 
-Toys are honest.
+None of this means buying a replacement every time something breaks. Things get lost, and not everything can be restored. But learning that is different from being laughed at for caring.
 
-And sometimes honesty wins.
+"I know you loved it" leaves room for the loss without promising a new purchase. Sitting beside the child can do something that explaining the price of the toy cannot.
 
-There is another side to this. Most children own almost nothing. The house belongs to the parents. The furniture belongs to the parents. The television, the phone, the money, the rules, even the hour of sleep belongs to the parents. Then one small truck appears and suddenly the child has a kingdom.
+One day the truck will probably disappear. It may stay under a bed, go to a cousin, or leave in a bag during a move. Years later, the child may have forgotten its color. They may still remember how adults responded when something small mattered enormously to them.
 
-Of course the child protects it.
-
-The poor understand this better than the rich. When a child has a room full of toys, one broken car is only one broken car. But when there are only two or three toys in the house, a missing wheel can become a national disaster.
-
-Adults may laugh at this.
-
-They should not.
-
-We also cry over objects.
-
-We call them different names so we can feel mature. We say "my car," "my house," "my watch," "my father's old radio," "my mother's ring." We do not call them toys because adults are embarrassed by simple truths. We prefer expensive words for the same attachment.
-
-A child sees a plastic truck and imagines a road.
-
-An adult sees a new car and imagines freedom.
-
-The difference is mostly the bank loan.
-
-So when a child cries because a toy is broken, "It is only a toy" is often a useless sentence. To us, maybe. To the child, a small world has collapsed.
-
-This does not mean we should buy a new toy every time something breaks. Life is not a shopping center, and love is not a credit card. A child also has to learn that things break, disappear, and sometimes cannot be replaced.
-
-But there is a difference between teaching loss and mocking pain.
-
-We can say, "I know you loved it."
-
-That sentence costs nothing.
-
-Funny, isn't it? We spend money to show love, then forget that sometimes love is the cheapest thing in the room.
-
-One day that toy will disappear. It will stay under a bed, lose a wheel, be given to a cousin, or end up in a trash bag during a move. Years later, the child may not even remember what color it was.
-
-But the child may remember something else.
-
-Who laughed.
-
-Who shouted.
-
-Who said, "Stop crying."
-
-And who sat down beside them.
-
-Maybe parents do not have to be more valuable than the toy every day. Maybe this is a foolish competition created by adult pride. The toy can win today.
-
-Let it win.
-
-Because one day the toy will break.
-
-And when it does, the child will look for something plastic cannot give.
-
-A lap.
-
-A hand.
-
-A voice saying, "I am here."
-
-That is when the real value appears.
+Perhaps the competition with the toy was ours all along. We do not need to win it. We need to be someone the child can turn to when the wheel comes off.

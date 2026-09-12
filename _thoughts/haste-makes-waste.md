@@ -46,11 +46,7 @@ Sometimes that sentence is true.
 
 Sometimes "now" means "before I have to feel uncertain for another hour."
 
-There is an old story about someone cutting open a butterfly's cocoon to help it emerge. The image is memorable because it captures premature assistance: removing the difficulty also removes part of the process.
-
-I do not know how far the biology of the story should be trusted, and I do not need it as a law of life. Difficulty does not automatically improve us. Waiting does not automatically make an answer better.
-
-But some processes contain information that only appears if we do not force the ending too early.
+Waiting does not automatically make an answer better. But some processes contain information that takes time to appear.
 
 A difficult draft reveals the weak idea.
 
