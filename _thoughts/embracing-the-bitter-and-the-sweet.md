@@ -1,5 +1,5 @@
 ---
-title: 'A Good Life Is Not a Pleasant One'
+title: 'A Good Life Is Not Always a Pleasant One'
 date: 2011-04-06
 description: "The emotional label is not the verdict — pain is not always a signal to leave, and pleasure is not always a reason to stay."
 tags:
