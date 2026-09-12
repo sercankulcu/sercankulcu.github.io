@@ -85,7 +85,7 @@ excerpt: "Classic Battleship — place your fleet and sink the enemy ships befor
       <div class="bs-grid-wrap" id="bs-player-grid"></div>
       <div class="bs-ships" id="bs-ship-list"></div>
       <div class="bs-controls">
-        <button class="bs-btn" id="bs-rotate-btn">🔄 Döndür</button>
+        <button class="bs-btn" id="bs-rotate-btn">🔄 Döndür (Yatay)</button>
         <button class="bs-btn" id="bs-auto-btn">⚡ Otomatik Yerleştir</button>
         <button class="bs-btn primary" id="bs-start-btn" disabled>⚔️ Savaşa Başla!</button>
       </div>
@@ -126,6 +126,7 @@ let aiHits     = new Array(100).fill(null);
 let placedShips = {};
 let aiPlaced   = {};
 let hoverIdx   = -1;
+let awaitingAI = false;
 
 /* AI hunt/target */
 let aiQueue = [];
@@ -288,7 +289,7 @@ function aiAttack() {
       for (let i = 0; i < 100; i++) if (!aiAttacked.has(i)) { target = i; break; }
     }
   }
-  if (target < 0) return;
+  if (target < 0) return false;
   aiAttacked.add(target);
   const hit = playerGrid[target] !== null;
   playerHits[target] = hit ? "hit" : "miss";
@@ -300,36 +301,55 @@ function aiAttack() {
     if (c > 0) aiQueue.push(idx(r,c-1));
     if (c < 9) aiQueue.push(idx(r,c+1));
   }
+  return hit;
 }
 
 function playerAttack(i) {
-  if (phase !== "battle") return;
+  if (phase !== "battle" || awaitingAI) return;
   if (aiHits[i]) return;
   const hit = aiGrid[i] !== null;
   aiHits[i] = hit ? "hit" : "miss";
+  renderAIGrid(); renderAIShips();
 
   if (checkWin(aiGrid, aiHits)) {
-    renderAIGrid(); renderAIShips();
+    phase = "over";
+    renderAIGrid();
     setStatus("🎉 Kazandın! Tüm düşman gemileri battı!");
-    phase = "over"; return;
+    return;
   }
 
-  /* AI turn */
-  setTimeout(() => {
-    aiAttack();
-    renderPlayerGrid();
-    if (checkWin(playerGrid, playerHits)) {
-      renderAIGrid(); renderAIShips();
-      setStatus("💥 Kaybettin! Düşman tüm gemilerini batırdı.");
-      phase = "over"; return;
-    }
-    renderAIGrid(); renderAIShips();
-    setStatus("Senin hamlen! Düşman haritasına tıkla.");
-  }, 600);
-  renderAIGrid(); renderAIShips();
-  const sunk = hit && isShipSunk(aiGrid, aiHits, aiGrid[i]);
-  if (sunk) setStatus(`🔥 Battı! ${SHIPS.find(s=>s.id===aiGrid[i])?.name || ""} — Saldırmaya devam et!`);
-  else setStatus(hit ? "💥 İsabet! Tekrar saldır!" : "• Kaçtı. AI hamle yapıyor...");
+  if (hit) {
+    const sunk = SHIPS.find(s => s.id === aiGrid[i] && isShipSunk(aiGrid, aiHits, s.id));
+    setStatus(sunk ? `🔥 Battı! ${sunk.name} — Saldırmaya devam et!` : "💥 İsabet! Tekrar saldır!");
+    return;
+  }
+
+  setStatus("• Kaçtı. AI hamle yapıyor...");
+  awaitingAI = true;
+  setTimeout(aiTurn, 600);
+}
+
+function aiTurn() {
+  if (phase !== "battle") { awaitingAI = false; return; }
+
+  const hit = aiAttack();
+  renderPlayerGrid();
+
+  if (checkWin(playerGrid, playerHits)) {
+    phase = "over"; awaitingAI = false;
+    renderAIGrid();
+    setStatus("💥 Kaybettin! Düşman tüm gemilerini batırdı.");
+    return;
+  }
+
+  if (hit) {
+    setStatus("💥 Düşman gemine vurdu! Tekrar saldırıyor...");
+    setTimeout(aiTurn, 600);
+    return;
+  }
+
+  awaitingAI = false;
+  setStatus("Senin hamlen! Düşman haritasına tıkla.");
 }
 
 function checkWin(grid, hits) {
@@ -347,6 +367,8 @@ function initGame() {
   aiHits     = new Array(100).fill(null);
   placedShips = {}; aiPlaced = {};
   aiQueue = []; aiAttacked = new Set();
+  awaitingAI = false;
+  document.getElementById("bs-rotate-btn").textContent = "🔄 Döndür (Yatay)";
 
   buildGridEl("bs-player-grid",
     i => {
