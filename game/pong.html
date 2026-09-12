@@ -1,0 +1,293 @@
+---
+layout: without-sidebar
+title: "Pong"
+permalink: /game/pong/
+redirect_from:
+  - /game/pong.html
+excerpt: "Classic Pong against the computer — three difficulty levels, smooth controls, first to 7 wins."
+---
+
+<style>
+.pong-app,.pong-app *,.pong-app *::before,.pong-app *::after{box-sizing:border-box}
+.pong-app{
+  width:min(860px,calc(100% - 24px));
+  margin:.5rem auto 1.5rem;
+  color:var(--global-text-color);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.pong-app button{font:inherit;cursor:pointer}
+.pong-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.pong-title{margin:0;font-size:clamp(1.6rem,5vw,2.3rem);font-weight:750;letter-spacing:-.04em}
+.pong-icon-btn{width:40px;height:40px;border:1px solid var(--global-border-color);border-radius:11px;background:transparent;color:var(--global-text-color)}
+.pong-scorebar{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:10px}
+.pong-score{padding:10px 8px;border:1px solid var(--global-border-color);border-radius:14px;background:rgba(127,127,127,.04);text-align:center}
+.pong-score small{display:block;opacity:.5;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.pong-score strong{display:block;font-size:1.6rem;font-weight:750;margin-top:2px}
+.pong-status{padding:9px 14px;border:1px solid var(--global-border-color);border-radius:14px;background:rgba(127,127,127,.04);text-align:center;font-weight:700;font-size:.82rem}
+.pong-canvas-wrap{position:relative;border:1px solid var(--global-border-color);border-radius:16px;overflow:hidden;background:#000;touch-action:none}
+#pong-canvas{display:block;width:100%;height:auto;cursor:none}
+.pong-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(0,0,0,.7);color:#fff}
+.pong-overlay h2{margin:0;font-size:clamp(1.4rem,4vw,2rem);font-weight:750;text-align:center}
+.pong-overlay p{margin:0;opacity:.7;font-size:.85rem;text-align:center}
+.pong-overlay .pong-start-btn{padding:12px 32px;border:none;border-radius:12px;background:#fff;color:#000;font:inherit;font-size:.95rem;font-weight:750;cursor:pointer}
+.pong-overlay .pong-start-btn:hover{opacity:.88}
+.pong-controls-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.pong-ctrl-btn{padding:9px 6px;border:1px solid var(--global-border-color);border-radius:12px;background:rgba(127,127,127,.04);color:var(--global-text-color);font-size:.78rem;font-weight:700;transition:background .15s}
+.pong-ctrl-btn:hover,.pong-ctrl-btn.active{background:var(--global-text-color);color:var(--global-bg-color)}
+.pong-hint{text-align:center;margin-top:8px;font-size:.72rem;opacity:.45}
+</style>
+
+<div class="pong-app">
+  <div class="pong-header">
+    <h1 class="pong-title">Pong</h1>
+    <button class="pong-icon-btn" id="pong-new" title="New game">↺</button>
+  </div>
+
+  <div class="pong-scorebar">
+    <div class="pong-score">
+      <small>Player</small>
+      <strong id="pong-score-player">0</strong>
+    </div>
+    <div class="pong-status" id="pong-status">First to 7 wins</div>
+    <div class="pong-score">
+      <small>Computer</small>
+      <strong id="pong-score-ai">0</strong>
+    </div>
+  </div>
+
+  <div class="pong-canvas-wrap" id="pong-wrap">
+    <canvas id="pong-canvas" width="800" height="450"></canvas>
+    <div class="pong-overlay" id="pong-overlay">
+      <h2>🏓 Pong</h2>
+      <p>Move your mouse or use W/S keys to control<br>the left paddle.</p>
+      <button class="pong-start-btn" id="pong-start-btn">Start Game</button>
+    </div>
+  </div>
+
+  <div class="pong-controls-bar">
+    <button class="pong-ctrl-btn active" id="diff-easy" data-diff="0">Easy</button>
+    <button class="pong-ctrl-btn" id="diff-med" data-diff="1">Medium</button>
+    <button class="pong-ctrl-btn" id="diff-hard" data-diff="2">Hard</button>
+  </div>
+  <div class="pong-hint">Mouse / touch &nbsp;·&nbsp; W / S or ↑ / ↓ keys &nbsp;·&nbsp; first to 7 points wins</div>
+</div>
+
+<script>
+(() => {
+"use strict";
+const canvas = document.getElementById("pong-canvas");
+const ctx = canvas.getContext("2d");
+const W = 800, H = 450;
+const PW = 12, PH = 88, BR = 8;
+const WINNING = 7;
+const AI_SPEED = [3.2, 5.5, 8]; // easy, medium, hard
+let difficulty = 0;
+let scores = [0, 0];
+let state = "idle"; // idle | playing | scored | over
+let raf = 0;
+
+let ball, player, ai;
+let keysDown = {};
+
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+function initBall(dir = 1) {
+  const ang = (Math.random() * 0.6 - 0.3);
+  const speed = 5;
+  ball = { x: W/2, y: H/2, vx: dir * speed * Math.cos(ang), vy: speed * Math.sin(ang), speed };
+}
+
+function initPaddles() {
+  player = { x: 20, y: H/2 - PH/2 };
+  ai     = { x: W - 20 - PW, y: H/2 - PH/2 };
+}
+
+function startGame() {
+  scores = [0, 0];
+  updateScoreUI();
+  initPaddles();
+  initBall(Math.random() > 0.5 ? 1 : -1);
+  state = "playing";
+  document.getElementById("pong-overlay").style.display = "none";
+  document.getElementById("pong-status").textContent = "Playing";
+  cancelAnimationFrame(raf);
+  loop();
+}
+
+function updateScoreUI() {
+  document.getElementById("pong-score-player").textContent = scores[0];
+  document.getElementById("pong-score-ai").textContent = scores[1];
+}
+
+function movePlayerByKeys() {
+  const speed = 7;
+  if (keysDown["w"] || keysDown["W"] || keysDown["ArrowUp"])
+    player.y = clamp(player.y - speed, 0, H - PH);
+  if (keysDown["s"] || keysDown["S"] || keysDown["ArrowDown"])
+    player.y = clamp(player.y + speed, 0, H - PH);
+}
+
+function moveAI() {
+  const spd = AI_SPEED[difficulty];
+  const target = ball.y - PH/2;
+  ai.y += clamp(target - ai.y, -spd, spd);
+  ai.y = clamp(ai.y, 0, H - PH);
+}
+
+function ballHitsPaddle(paddle) {
+  return ball.x - BR < paddle.x + PW &&
+         ball.x + BR > paddle.x &&
+         ball.y - BR < paddle.y + PH &&
+         ball.y + BR > paddle.y;
+}
+
+function update() {
+  if (state !== "playing") return;
+  movePlayerByKeys();
+  moveAI();
+
+  ball.x += ball.vx;
+  ball.y += ball.vy;
+
+  // Top / bottom wall
+  if (ball.y - BR <= 0) { ball.y = BR; ball.vy = Math.abs(ball.vy); }
+  if (ball.y + BR >= H) { ball.y = H - BR; ball.vy = -Math.abs(ball.vy); }
+
+  // Player paddle hit
+  if (ball.vx < 0 && ballHitsPaddle(player)) {
+    ball.x = player.x + PW + BR;
+    const rel = ((ball.y - player.y) / PH) - 0.5;
+    ball.speed = Math.min(ball.speed + 0.35, 18);
+    const ang = rel * Math.PI * 0.6;
+    ball.vx = ball.speed * Math.cos(ang);
+    ball.vy = ball.speed * Math.sin(ang);
+    if (ball.vx < 0) ball.vx = -ball.vx;
+  }
+  // AI paddle hit
+  if (ball.vx > 0 && ballHitsPaddle(ai)) {
+    ball.x = ai.x - BR;
+    const rel = ((ball.y - ai.y) / PH) - 0.5;
+    ball.speed = Math.min(ball.speed + 0.35, 18);
+    const ang = rel * Math.PI * 0.6;
+    ball.vx = -(ball.speed * Math.cos(ang));
+    ball.vy = ball.speed * Math.sin(ang);
+    if (ball.vx > 0) ball.vx = -ball.vx;
+  }
+
+  // Scoring
+  if (ball.x + BR < 0) { scored(1); return; }
+  if (ball.x - BR > W) { scored(0); return; }
+}
+
+function scored(winner) {
+  scores[winner]++;
+  updateScoreUI();
+  state = "scored";
+  if (scores[winner] >= WINNING) {
+    gameOver(winner);
+  } else {
+    document.getElementById("pong-status").textContent = winner === 0 ? "Player scores!" : "Computer scores!";
+    setTimeout(() => {
+      initBall(winner === 0 ? 1 : -1);
+      state = "playing";
+      document.getElementById("pong-status").textContent = "Playing";
+    }, 900);
+  }
+}
+
+function gameOver(winner) {
+  state = "over";
+  cancelAnimationFrame(raf);
+  const ov = document.getElementById("pong-overlay");
+  ov.innerHTML = `
+    <h2>${winner === 0 ? "🎉 You Win!" : "💻 Computer Wins"}</h2>
+    <p>Final score: <strong>${scores[0]} – ${scores[1]}</strong></p>
+    <button class="pong-start-btn" onclick="document.getElementById('pong-start-btn-inner').click()">Play Again</button>
+  `;
+  ov.style.display = "";
+  ov.querySelector("button").addEventListener("click", startGame);
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, W, H);
+
+  // Center line
+  ctx.setLineDash([8, 10]);
+  ctx.strokeStyle = "rgba(255,255,255,.18)";
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(W/2, 0); ctx.lineTo(W/2, H); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Paddles
+  ctx.fillStyle = "#fff";
+  ctx.beginPath(); roundRect(ctx, player.x, player.y, PW, PH, 4); ctx.fill();
+  ctx.beginPath(); roundRect(ctx, ai.x, ai.y, PW, PH, 4); ctx.fill();
+
+  // Ball
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, BR, 0, Math.PI * 2);
+  ctx.fillStyle = "#fff";
+  ctx.fill();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+function loop() {
+  update();
+  draw();
+  if (state === "playing" || state === "scored") raf = requestAnimationFrame(loop);
+}
+
+// Mouse / touch control
+const wrap = document.getElementById("pong-wrap");
+function mouseMove(e) {
+  if (state !== "playing") return;
+  const rect = canvas.getBoundingClientRect();
+  const scaleY = H / rect.height;
+  const cy = (e.clientY ?? e.touches[0].clientY) - rect.top;
+  player.y = clamp(cy * scaleY - PH/2, 0, H - PH);
+}
+wrap.addEventListener("mousemove", mouseMove);
+wrap.addEventListener("touchmove", e => { e.preventDefault(); mouseMove(e); }, { passive: false });
+
+window.addEventListener("keydown", e => { keysDown[e.key] = true; });
+window.addEventListener("keyup",   e => { keysDown[e.key] = false; });
+
+document.getElementById("pong-start-btn").addEventListener("click", startGame);
+document.getElementById("pong-new").addEventListener("click", () => {
+  cancelAnimationFrame(raf);
+  state = "idle";
+  const ov = document.getElementById("pong-overlay");
+  ov.innerHTML = `<h2>🏓 Pong</h2><p>Move your mouse or use W/S keys to control<br>the left paddle.</p><button class="pong-start-btn" id="pong-start-btn">Start Game</button>`;
+  ov.style.display = "";
+  document.getElementById("pong-start-btn").addEventListener("click", startGame);
+});
+
+// Difficulty buttons
+document.querySelectorAll("[data-diff]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    difficulty = +btn.dataset.diff;
+    document.querySelectorAll("[data-diff]").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+  });
+});
+
+// Initial draw
+initPaddles();
+initBall();
+draw();
+})();
+</script>

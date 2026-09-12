@@ -17,6 +17,8 @@ author_profile: true
 <button onclick="location.href='../game/basketball.html'">🏀 BASKETBALL</button>
 <button onclick="location.href='../game/fastreflex.html'">⚡ HIZLI OL</button>
 <button onclick="location.href='../game/squid.html'">🟢🔴 RED LIGHT GREEN LIGHT</button>
+<button onclick="location.href='../game/pong.html'">🏓 PONG</button>
+<button onclick="location.href='../game/flappy-bird.html'">🐦 FLOPPY KUŞ</button>
 
 
 <h3>🧠 PUZZLE & LOGIC</h3>
@@ -27,6 +29,8 @@ author_profile: true
 <button onclick="location.href='../game/strands.html'">🧶 STRANDS</button>
 <button onclick="location.href='../game/memory.html'">🧠 MEMORY</button>
 <button onclick="location.href='../game/bulls-and-cows/'">🐂🐄 BULLS & COWS</button>
+<button onclick="location.href='../game/sliding-puzzle.html'">🔢 SLİDİNG PUZZLE</button>
+<button onclick="location.href='../game/battleship.html'">⚓ AMİRAL BATTI</button>
 
 
 <h3>🔤 WORD GAMES</h3>
@@ -36,6 +40,7 @@ author_profile: true
 <button onclick="location.href='../game/oneword.html'">🔤 ONE WORD</button>
 <button onclick="location.href='../game/spellbee.html'">🐝 SPELL BEE</button>
 <button onclick="location.href='../game/hangman.html'">🎯 HANGMAN</button>
+<button onclick="location.href='../game/boggle.html'">🔡 BOGGLE</button>
 
 
 <h3>🎓 QUIZ & BRAIN TRAINING</h3>
@@ -46,6 +51,8 @@ author_profile: true
 <button onclick="location.href='../game/capital-city-quiz.html'">🌍 CAPITAL CITY QUIZ</button>
 <button onclick="location.href='../game/movie-quiz.html'">🎬 MOVIE QUIZ</button>
 <button onclick="location.href='../game/pixar-color-millionaire.html'">🎬 PIXAR COLOR MILLIONAIRE</button>
+<button onclick="location.href='../game/emoji-quiz.html'">🎭 EMOJİ QUİZ</button>
+<button onclick="location.href='../game/turkiye-cografya-quiz.html'">🇹🇷 TÜRKİYE COĞRAFYA QUİZ</button>
 
 
 <h3>🎲 CLASSIC & CASUAL</h3>

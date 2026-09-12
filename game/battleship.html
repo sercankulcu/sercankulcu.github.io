@@ -1,0 +1,408 @@
+---
+layout: without-sidebar
+title: "Amiral Battı"
+permalink: /game/battleship/
+redirect_from:
+  - /game/battleship.html
+excerpt: "Classic Battleship — place your fleet and sink the enemy ships before they find yours!"
+---
+
+<style>
+.bs-app,.bs-app *,.bs-app *::before,.bs-app *::after{box-sizing:border-box}
+.bs-app{
+  width:min(900px,calc(100% - 24px));
+  margin:.5rem auto 1.5rem;
+  color:var(--global-text-color);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.bs-app button{font:inherit;cursor:pointer}
+.bs-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.bs-title{margin:0;font-size:clamp(1.5rem,5vw,2rem);font-weight:750;letter-spacing:-.04em}
+.bs-status{
+  padding:10px 16px;border:1px solid var(--global-border-color);border-radius:13px;
+  background:rgba(127,127,127,.04);text-align:center;font-weight:700;font-size:.88rem;
+  margin-bottom:12px;min-height:44px;display:flex;align-items:center;justify-content:center;
+}
+.bs-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.bs-board-section{display:flex;flex-direction:column;gap:8px}
+.bs-board-title{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;opacity:.5;text-align:center}
+.bs-grid-wrap{
+  display:grid;grid-template-columns:20px repeat(10,1fr);
+  grid-template-rows:20px repeat(10,1fr);
+  gap:3px;
+}
+.bs-label{display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;opacity:.4}
+.bs-cell{
+  aspect-ratio:1;border-radius:5px;border:1px solid var(--global-border-color);
+  background:color-mix(in srgb,#4a90d9 8%,var(--global-bg-color));
+  cursor:pointer;transition:background .12s;
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;
+  -webkit-tap-highlight-color:transparent;
+}
+.bs-cell:hover{background:color-mix(in srgb,#4a90d9 20%,var(--global-bg-color))}
+.bs-cell.ship{background:color-mix(in srgb,var(--global-text-color) 20%,var(--global-bg-color));border-color:var(--global-text-color)}
+.bs-cell.ship.preview{background:color-mix(in srgb,var(--global-link-color) 25%,var(--global-bg-color));border-color:var(--global-link-color)}
+.bs-cell.ship.preview-invalid{background:color-mix(in srgb,#e05252 25%,var(--global-bg-color));border-color:#e05252}
+.bs-cell.hit{background:#e05252;border-color:#c03030;color:#fff;cursor:default}
+.bs-cell.miss{background:color-mix(in srgb,#4a90d9 25%,transparent);cursor:default}
+.bs-cell.sunk{background:#b02020;border-color:#801010;color:#fff;cursor:default}
+.bs-cell.ai-ship.hit{background:#e05252;color:#fff}
+.bs-cell.no-cursor{cursor:default}
+.bs-ships{display:flex;flex-direction:column;gap:6px}
+.bs-ship-item{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;
+  border:1px solid var(--global-border-color);border-radius:10px;
+  cursor:pointer;transition:background .15s;
+}
+.bs-ship-item:hover{background:color-mix(in srgb,var(--global-text-color) 5%,transparent)}
+.bs-ship-item.selected{background:color-mix(in srgb,var(--global-link-color) 12%,transparent);border-color:var(--global-link-color)}
+.bs-ship-item.placed{opacity:.45;cursor:default;pointer-events:none}
+.bs-ship-dots{display:flex;gap:3px}
+.bs-ship-dot{width:14px;height:14px;border-radius:4px;background:color-mix(in srgb,var(--global-text-color) 25%,transparent)}
+.bs-ship-name{flex:1;font-size:.8rem;font-weight:700}
+.bs-ship-size{font-size:.72rem;opacity:.5}
+.bs-controls{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.bs-btn{flex:1;min-width:100px;padding:10px 8px;border:1px solid var(--global-border-color);border-radius:11px;background:rgba(127,127,127,.04);color:var(--global-text-color);font-size:.82rem;font-weight:700;transition:background .15s}
+.bs-btn.primary{background:var(--global-text-color);color:var(--global-bg-color);border-color:var(--global-text-color)}
+.bs-btn:hover{opacity:.82}
+.bs-btn:disabled{opacity:.35;cursor:default}
+.bs-hint{font-size:.72rem;opacity:.45;text-align:center;margin-top:6px}
+@media(max-width:620px){.bs-layout{grid-template-columns:1fr}}
+</style>
+
+<div class="bs-app">
+  <div class="bs-header">
+    <h1 class="bs-title">⚓ Amiral Battı</h1>
+    <button class="bs-btn" id="bs-new-btn" style="width:auto;padding:8px 16px;flex:none">Yeni Oyun</button>
+  </div>
+
+  <div class="bs-status" id="bs-status">Gemilerini yerleştir, ardından savaşa başla!</div>
+
+  <div class="bs-layout">
+    <!-- Player board -->
+    <div class="bs-board-section">
+      <div class="bs-board-title" id="bs-player-title">Senin Denizin</div>
+      <div class="bs-grid-wrap" id="bs-player-grid"></div>
+      <div class="bs-ships" id="bs-ship-list"></div>
+      <div class="bs-controls">
+        <button class="bs-btn" id="bs-rotate-btn">🔄 Döndür</button>
+        <button class="bs-btn" id="bs-auto-btn">⚡ Otomatik Yerleştir</button>
+        <button class="bs-btn primary" id="bs-start-btn" disabled>⚔️ Savaşa Başla!</button>
+      </div>
+      <div class="bs-hint" id="bs-place-hint">Bir gemi seç, sonra haritaya tıkla</div>
+    </div>
+
+    <!-- AI board -->
+    <div class="bs-board-section">
+      <div class="bs-board-title">Düşman Denizi</div>
+      <div class="bs-grid-wrap" id="bs-ai-grid"></div>
+      <div style="margin-top:8px">
+        <div class="bs-ships" id="bs-ai-ships"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+"use strict";
+const SHIPS = [
+  { name:"Uçak Gemisi", size:5, id:"c" },
+  { name:"Savaş Gemisi", size:4, id:"b" },
+  { name:"Destroyer",    size:3, id:"d1" },
+  { name:"Denizaltı",    size:3, id:"d2" },
+  { name:"Mayın Tarayıcı",size:2, id:"m" },
+];
+const COLS = "ABCDEFGHIJ".split("");
+
+// Game state
+let phase = "place"; // place | battle | over
+let horizontal = true;
+let selectedShip = null;
+let playerGrid = new Array(100).fill(null); // null | shipId
+let aiGrid     = new Array(100).fill(null);
+let playerHits = new Array(100).fill(null); // null | "hit" | "miss"
+let aiHits     = new Array(100).fill(null);
+let placedShips = {};
+let aiPlaced   = {};
+let hoverIdx   = -1;
+
+// AI hunt/target
+let aiQueue = [];
+let aiAttacked = new Set();
+
+function idx(r,c){ return r*10+c; }
+function rowOf(i){ return Math.floor(i/10); }
+function colOf(i){ return i%10; }
+
+// --- Grid rendering ---
+function buildGridEl(containerId, clickHandler, hoverHandler, leaveHandler) {
+  const wrap = document.getElementById(containerId);
+  wrap.innerHTML = "";
+  // Corner
+  const corner = document.createElement("div");
+  corner.className = "bs-label"; wrap.appendChild(corner);
+  // Column labels
+  COLS.forEach(c => {
+    const lbl = document.createElement("div"); lbl.className = "bs-label"; lbl.textContent = c; wrap.appendChild(lbl);
+  });
+  // Row labels + cells
+  for (let r = 0; r < 10; r++) {
+    const lbl = document.createElement("div"); lbl.className = "bs-label"; lbl.textContent = r+1; wrap.appendChild(lbl);
+    for (let c = 0; c < 10; c++) {
+      const cell = document.createElement("div");
+      cell.className = "bs-cell";
+      cell.dataset.idx = idx(r,c);
+      if (clickHandler) cell.addEventListener("click", () => clickHandler(idx(r,c)));
+      if (hoverHandler) cell.addEventListener("mouseenter", () => hoverHandler(idx(r,c)));
+      if (leaveHandler) cell.addEventListener("mouseleave", leaveHandler);
+      wrap.appendChild(cell);
+    }
+  }
+}
+
+function renderPlayerGrid() {
+  const cells = document.querySelectorAll("#bs-player-grid .bs-cell");
+  cells.forEach(cell => {
+    const i = +cell.dataset.idx;
+    cell.className = "bs-cell no-cursor";
+    cell.textContent = "";
+    if (playerHits[i] === "hit")  { cell.className += " hit";  cell.textContent = "💥"; return; }
+    if (playerHits[i] === "miss") { cell.className += " miss"; cell.textContent = "•";  return; }
+    if (playerGrid[i])            { cell.className += " ship"; }
+  });
+
+  // Show preview
+  if (phase === "place" && selectedShip && hoverIdx >= 0) {
+    const cells = previewCells(hoverIdx, selectedShip.size, horizontal);
+    const valid = cells && cells.length === selectedShip.size && cells.every(c => !playerGrid[c]);
+    cells && cells.forEach(c => {
+      const el = document.querySelector(`#bs-player-grid [data-idx="${c}"]`);
+      if (el) el.className = "bs-cell ship " + (valid ? "preview" : "preview-invalid");
+    });
+  }
+}
+
+function renderAIGrid() {
+  const cells = document.querySelectorAll("#bs-ai-grid .bs-cell");
+  cells.forEach(cell => {
+    const i = +cell.dataset.idx;
+    cell.className = "bs-cell" + (phase !== "battle" ? " no-cursor" : "");
+    cell.textContent = "";
+    if (aiHits[i] === "hit")  { cell.className += " hit";  cell.textContent = "💥"; }
+    if (aiHits[i] === "miss") { cell.className += " miss"; cell.textContent = "•";  }
+    // Show sunk ships
+    if (aiHits[i] === "hit" && isShipSunk(aiGrid, aiHits, aiGrid[i])) {
+      cell.className = "bs-cell sunk"; cell.textContent = "💥";
+    }
+  });
+}
+
+function renderShipList() {
+  const list = document.getElementById("bs-ship-list");
+  list.innerHTML = "";
+  SHIPS.forEach(ship => {
+    const item = document.createElement("div");
+    item.className = "bs-ship-item" + (selectedShip === ship ? " selected" : "") + (placedShips[ship.id] ? " placed" : "");
+    item.innerHTML = `<div class="bs-ship-dots">${"<div class='bs-ship-dot'></div>".repeat(ship.size)}</div><span class="bs-ship-name">${ship.name}</span><span class="bs-ship-size">${ship.size}</span>`;
+    if (!placedShips[ship.id]) item.addEventListener("click", () => { selectedShip = ship; renderPlayerGrid(); renderShipList(); });
+    list.appendChild(item);
+  });
+}
+
+function renderAIShips() {
+  const list = document.getElementById("bs-ai-ships");
+  if (phase !== "battle" && phase !== "over") { list.innerHTML = ""; return; }
+  list.innerHTML = "";
+  SHIPS.forEach(ship => {
+    const sunk = isShipSunk(aiGrid, aiHits, ship.id);
+    const item = document.createElement("div");
+    item.className = "bs-ship-item" + (sunk ? " placed" : "");
+    item.innerHTML = `<div class="bs-ship-dots">${"<div class='bs-ship-dot'></div>".repeat(ship.size)}</div><span class="bs-ship-name">${ship.name}</span><span>${sunk ? "⚓ Battı" : "🌊"}</span>`;
+    list.appendChild(item);
+  });
+}
+
+// --- Ship placement helpers ---
+function previewCells(startIdx, size, horiz) {
+  const cells = [];
+  const r = rowOf(startIdx), c = colOf(startIdx);
+  for (let i = 0; i < size; i++) {
+    const nr = horiz ? r : r + i;
+    const nc = horiz ? c + i : c;
+    if (nr > 9 || nc > 9) return [];
+    cells.push(idx(nr, nc));
+  }
+  return cells;
+}
+
+function placeShip(grid, placed, shipId, startIdx, size, horiz) {
+  const cells = previewCells(startIdx, size, horiz);
+  if (!cells.length || cells.some(c => grid[c])) return false;
+  cells.forEach(c => { grid[c] = shipId; });
+  placed[shipId] = { cells, startIdx, horiz };
+  return true;
+}
+
+function removeShip(grid, placed, shipId) {
+  if (!placed[shipId]) return;
+  placed[shipId].cells.forEach(c => { grid[c] = null; });
+  delete placed[shipId];
+}
+
+function autoPlace(grid, placed) {
+  // Clear first
+  Object.keys(placed).forEach(id => removeShip(grid, placed, id));
+  SHIPS.forEach(ship => {
+    let ok = false;
+    let attempts = 0;
+    while (!ok && attempts < 200) {
+      attempts++;
+      const horiz = Math.random() > 0.5;
+      const startIdx = Math.floor(Math.random() * 100);
+      ok = placeShip(grid, placed, ship.id, startIdx, ship.size, horiz);
+    }
+  });
+}
+
+// --- AI logic ---
+function isShipSunk(grid, hits, shipId) {
+  return grid.every((cell, i) => cell !== shipId || hits[i] === "hit");
+}
+
+function aiAttack() {
+  let target = -1;
+  while (aiQueue.length && target < 0) {
+    const q = aiQueue.shift();
+    if (!aiAttacked.has(q)) target = q;
+  }
+  if (target < 0) {
+    // Checkerboard hunt
+    const candidates = [];
+    for (let i = 0; i < 100; i++) {
+      if (!aiAttacked.has(i) && (rowOf(i) + colOf(i)) % 2 === 0) candidates.push(i);
+    }
+    if (candidates.length) {
+      target = candidates[Math.floor(Math.random() * candidates.length)];
+    } else {
+      for (let i = 0; i < 100; i++) if (!aiAttacked.has(i)) { target = i; break; }
+    }
+  }
+  if (target < 0) return;
+  aiAttacked.add(target);
+  const hit = playerGrid[target] !== null;
+  playerHits[target] = hit ? "hit" : "miss";
+  if (hit) {
+    // Queue adjacent cells
+    const r = rowOf(target), c = colOf(target);
+    if (r > 0) aiQueue.push(idx(r-1,c));
+    if (r < 9) aiQueue.push(idx(r+1,c));
+    if (c > 0) aiQueue.push(idx(r,c-1));
+    if (c < 9) aiQueue.push(idx(r,c+1));
+  }
+}
+
+function playerAttack(i) {
+  if (phase !== "battle") return;
+  if (aiHits[i]) return;
+  const hit = aiGrid[i] !== null;
+  aiHits[i] = hit ? "hit" : "miss";
+
+  if (checkWin(aiGrid, aiHits)) {
+    renderAIGrid(); renderAIShips();
+    setStatus("🎉 Kazandın! Tüm düşman gemileri battı!");
+    phase = "over"; return;
+  }
+
+  // AI turn
+  setTimeout(() => {
+    aiAttack();
+    renderPlayerGrid();
+    if (checkWin(playerGrid, playerHits)) {
+      renderAIGrid(); renderAIShips();
+      setStatus("💥 Kaybettin! Düşman tüm gemilerini batırdı.");
+      phase = "over"; return;
+    }
+    renderAIGrid(); renderAIShips();
+    setStatus("Senin hamlen! Düşman haritasına tıkla.");
+  }, 600);
+  renderAIGrid(); renderAIShips();
+  const sunk = hit && isShipSunk(aiGrid, aiHits, aiGrid[i]);
+  if (sunk) setStatus(`🔥 Battı! ${SHIPS.find(s=>s.id===aiGrid[i])?.name || ""} — Saldırmaya devam et!`);
+  else setStatus(hit ? "💥 İsabet! Tekrar saldır!" : "• Kaçtı. AI hamle yapıyor...");
+}
+
+function checkWin(grid, hits) {
+  return grid.every((cell, i) => !cell || hits[i] === "hit");
+}
+
+function setStatus(msg) { document.getElementById("bs-status").textContent = msg; }
+
+// --- Init ---
+function initGame() {
+  phase = "place"; horizontal = true; selectedShip = null;
+  playerGrid = new Array(100).fill(null);
+  aiGrid     = new Array(100).fill(null);
+  playerHits = new Array(100).fill(null);
+  aiHits     = new Array(100).fill(null);
+  placedShips = {}; aiPlaced = {};
+  aiQueue = []; aiAttacked = new Set();
+
+  buildGridEl("bs-player-grid",
+    i => {
+      if (phase !== "place" || !selectedShip) return;
+      const ok = placeShip(playerGrid, placedShips, selectedShip.id, i, selectedShip.size, horizontal);
+      if (ok) {
+        const next = SHIPS.find(s => !placedShips[s.id]);
+        selectedShip = next || null;
+        if (!next) {
+          document.getElementById("bs-start-btn").disabled = false;
+          setStatus("Tüm gemiler yerleştirildi! Savaşa başlayabilirsin.");
+        }
+        renderPlayerGrid(); renderShipList();
+      }
+    },
+    i => { hoverIdx = i; renderPlayerGrid(); },
+    () => { hoverIdx = -1; renderPlayerGrid(); }
+  );
+  buildGridEl("bs-ai-grid", playerAttack, null, null);
+
+  // Place AI ships randomly
+  autoPlace(aiGrid, aiPlaced);
+
+  renderPlayerGrid();
+  renderAIGrid();
+  renderShipList();
+  renderAIShips();
+  setStatus("Gemilerini yerleştir, ardından savaşa başla!");
+  document.getElementById("bs-start-btn").disabled = true;
+  document.getElementById("bs-place-hint").style.display = "";
+}
+
+document.getElementById("bs-rotate-btn").addEventListener("click", () => {
+  horizontal = !horizontal;
+  document.getElementById("bs-rotate-btn").textContent = horizontal ? "🔄 Döndür (Yatay)" : "🔄 Döndür (Dikey)";
+  renderPlayerGrid();
+});
+
+document.getElementById("bs-auto-btn").addEventListener("click", () => {
+  autoPlace(playerGrid, placedShips);
+  selectedShip = null;
+  document.getElementById("bs-start-btn").disabled = false;
+  setStatus("Tüm gemiler otomatik yerleştirildi!");
+  renderPlayerGrid(); renderShipList();
+});
+
+document.getElementById("bs-start-btn").addEventListener("click", () => {
+  phase = "battle";
+  document.getElementById("bs-place-hint").style.display = "none";
+  document.getElementById("bs-start-btn").disabled = true;
+  setStatus("🎯 Savaş başladı! Düşman haritasına tıkla.");
+  renderAIGrid(); renderAIShips();
+});
+
+document.getElementById("bs-new-btn").addEventListener("click", initGame);
+
+initGame();
+})();
+</script>

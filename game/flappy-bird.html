@@ -1,0 +1,253 @@
+---
+layout: without-sidebar
+title: "Floppy Kuş"
+permalink: /game/flappy-bird/
+redirect_from:
+  - /game/flappy-bird.html
+excerpt: "Tap or press Space to flap your wings — dodge the pipes and beat your high score!"
+---
+
+<style>
+.fb-app,.fb-app *,.fb-app *::before,.fb-app *::after{box-sizing:border-box}
+.fb-app{
+  width:min(480px,calc(100% - 24px));
+  margin:.5rem auto 1.5rem;
+  color:var(--global-text-color);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.fb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.fb-title{margin:0;font-size:clamp(1.5rem,5vw,2rem);font-weight:750;letter-spacing:-.04em}
+.fb-best{font-size:.82rem;font-weight:700;opacity:.55}
+.fb-canvas-wrap{
+  position:relative;
+  border:1px solid var(--global-border-color);
+  border-radius:16px;
+  overflow:hidden;
+  touch-action:none;
+  cursor:pointer;
+  background:#70c5ce;
+}
+#fb-canvas{display:block;width:100%;height:auto}
+.fb-overlay{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:rgba(0,0,0,.45);color:#fff;text-align:center;padding:20px;
+}
+.fb-overlay h2{margin:0;font-size:1.8rem;font-weight:800}
+.fb-overlay p{margin:0;opacity:.8;font-size:.88rem}
+.fb-overlay .fb-play-btn{
+  padding:12px 34px;border:none;border-radius:12px;
+  background:#fff;color:#333;font:inherit;font-size:1rem;font-weight:750;cursor:pointer;
+}
+.fb-overlay .fb-play-btn:hover{opacity:.88}
+.fb-hint{text-align:center;margin-top:8px;font-size:.72rem;opacity:.45}
+</style>
+
+<div class="fb-app">
+  <div class="fb-header">
+    <h1 class="fb-title">Floppy Kuş 🐦</h1>
+    <span class="fb-best">Best: <strong id="fb-best">0</strong></span>
+  </div>
+  <div class="fb-canvas-wrap" id="fb-wrap">
+    <canvas id="fb-canvas" width="340" height="600"></canvas>
+    <div class="fb-overlay" id="fb-overlay">
+      <h2>🐦 Floppy Kuş</h2>
+      <p>Boşluktan geç, borulara çarpma!<br>Tıkla veya Space tuşuna bas.</p>
+      <button class="fb-play-btn" id="fb-play-btn">Başla</button>
+    </div>
+  </div>
+  <div class="fb-hint">Tıkla &nbsp;·&nbsp; Dokun &nbsp;·&nbsp; Space</div>
+</div>
+
+<script>
+(() => {
+"use strict";
+const canvas = document.getElementById("fb-canvas");
+const ctx = canvas.getContext("2d");
+const W = 340, H = 600;
+
+const GRAVITY = 0.45;
+const FLAP    = -8;
+const PIPE_W  = 52;
+const GAP     = 155;
+const PIPE_SPD_INIT = 2.4;
+const PIPE_INTERVAL = 95; // frames between new pipes
+
+let state = "idle"; // idle | playing | dead
+let bird, pipes, score, frame, pipeSpd;
+let bestScore = +(localStorage.getItem("fb.best") || 0);
+document.getElementById("fb-best").textContent = bestScore;
+
+// Colors
+const SKY_TOP = "#5ec8d8", SKY_BOT = "#a0dce8";
+const GROUND_COL = "#ded895", DIRT_COL = "#b59a5e";
+const PIPE_COL = "#73bf2e", PIPE_DARK = "#3f9f00";
+const BIRD_BODY = "#f5c400", BIRD_WING = "#e8a000", BIRD_EYE = "#fff", BIRD_PUPIL = "#222";
+
+function init() {
+  bird = { x: 80, y: H/2, vy: 0, rot: 0 };
+  pipes = [];
+  score = 0;
+  frame = 0;
+  pipeSpd = PIPE_SPD_INIT;
+}
+
+function flap() {
+  if (state === "dead") return;
+  if (state === "idle") { startGame(); return; }
+  bird.vy = FLAP;
+}
+
+function addPipe() {
+  const minTop = 60, maxTop = H - 120 - GAP;
+  const topH = Math.floor(Math.random() * (maxTop - minTop) + minTop);
+  pipes.push({ x: W + 10, topH, passed: false });
+}
+
+function startGame() {
+  init();
+  state = "playing";
+  document.getElementById("fb-overlay").style.display = "none";
+  bird.vy = FLAP;
+  loop();
+}
+
+function drawBg() {
+  const grad = ctx.createLinearGradient(0, 0, 0, H - 80);
+  grad.addColorStop(0, SKY_TOP); grad.addColorStop(1, SKY_BOT);
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H - 80);
+}
+
+function drawGround() {
+  ctx.fillStyle = GROUND_COL;
+  ctx.fillRect(0, H - 80, W, 80);
+  ctx.fillStyle = DIRT_COL;
+  ctx.fillRect(0, H - 55, W, 55);
+  // Grass blades effect
+  ctx.fillStyle = "#8dc63f";
+  ctx.fillRect(0, H - 80, W, 12);
+}
+
+function drawPipe(x, topH) {
+  const r = 6;
+  // Top pipe
+  ctx.fillStyle = PIPE_COL;
+  ctx.fillRect(x, 0, PIPE_W, topH - 10);
+  ctx.fillStyle = PIPE_DARK;
+  ctx.fillRect(x - 4, topH - 30, PIPE_W + 8, 30);
+
+  // Bottom pipe
+  const botY = topH + GAP;
+  ctx.fillStyle = PIPE_COL;
+  ctx.fillRect(x, botY + 30, PIPE_W, H - botY - 30 - 80);
+  ctx.fillStyle = PIPE_DARK;
+  ctx.fillRect(x - 4, botY, PIPE_W + 8, 30);
+}
+
+function drawBird() {
+  const { x, y, rot } = bird;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(Math.max(-0.5, Math.min(1.2, rot)));
+  // Body
+  ctx.fillStyle = BIRD_BODY;
+  ctx.beginPath(); ctx.ellipse(0, 0, 18, 14, 0, 0, Math.PI*2); ctx.fill();
+  // Wing
+  ctx.fillStyle = BIRD_WING;
+  ctx.beginPath(); ctx.ellipse(-4, 4, 11, 7, -0.4, 0, Math.PI*2); ctx.fill();
+  // Eye
+  ctx.fillStyle = BIRD_EYE;
+  ctx.beginPath(); ctx.arc(9, -5, 5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = BIRD_PUPIL;
+  ctx.beginPath(); ctx.arc(11, -5, 2.5, 0, Math.PI*2); ctx.fill();
+  // Beak
+  ctx.fillStyle = "#f08030";
+  ctx.beginPath(); ctx.moveTo(18, -2); ctx.lineTo(28, 0); ctx.lineTo(18, 3); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
+function drawScore() {
+  ctx.fillStyle = "#fff";
+  ctx.strokeStyle = "rgba(0,0,0,.35)";
+  ctx.lineWidth = 4;
+  ctx.font = "bold 36px Arial";
+  ctx.textAlign = "center";
+  ctx.strokeText(score, W/2, 60);
+  ctx.fillText(score, W/2, 60);
+}
+
+function update() {
+  frame++;
+  bird.vy += GRAVITY;
+  bird.y += bird.vy;
+  bird.rot = bird.vy * 0.06;
+
+  // Add pipes
+  if (frame % PIPE_INTERVAL === 0) addPipe();
+
+  // Speed up gradually
+  if (frame % 200 === 0) pipeSpd = Math.min(pipeSpd + 0.3, 5.5);
+
+  // Move pipes
+  pipes.forEach(p => {
+    p.x -= pipeSpd;
+    if (!p.passed && p.x + PIPE_W < bird.x - 18) {
+      p.passed = true; score++;
+      if (score > bestScore) { bestScore = score; localStorage.setItem("fb.best", bestScore); document.getElementById("fb-best").textContent = bestScore; }
+    }
+  });
+  pipes = pipes.filter(p => p.x > -PIPE_W - 10);
+
+  // Collision: ground / ceiling
+  if (bird.y + 14 >= H - 80 || bird.y - 14 <= 0) { die(); return; }
+
+  // Collision: pipes
+  for (const p of pipes) {
+    const bx = bird.x, by = bird.y, br = 13;
+    const px = p.x, topH = p.topH, botY = topH + GAP;
+    if (bx + br > px - 2 && bx - br < px + PIPE_W + 2) {
+      if (by - br < topH - 8 || by + br > botY + 8) { die(); return; }
+    }
+  }
+}
+
+function die() {
+  state = "dead";
+  showOverlay();
+}
+
+function showOverlay() {
+  const ov = document.getElementById("fb-overlay");
+  ov.innerHTML = `
+    <h2>${score > 0 ? "💥 Game Over" : "💥 Oops!"}</h2>
+    <p>Score: <strong>${score}</strong> &nbsp;·&nbsp; Best: <strong>${bestScore}</strong></p>
+    <button class="fb-play-btn" id="fb-play-btn">Tekrar Oyna</button>
+  `;
+  ov.style.display = "";
+  document.getElementById("fb-play-btn").addEventListener("click", startGame);
+}
+
+let rafId = 0;
+function loop() {
+  ctx.clearRect(0, 0, W, H);
+  drawBg();
+  pipes.forEach(p => drawPipe(p.x, p.topH));
+  drawGround();
+  drawBird();
+  drawScore();
+  if (state === "playing") { update(); rafId = requestAnimationFrame(loop); }
+}
+
+// Initial idle frame
+init();
+ctx.clearRect(0, 0, W, H);
+drawBg(); drawGround(); drawBird(); drawScore();
+
+// Controls
+const wrap = document.getElementById("fb-wrap");
+wrap.addEventListener("click", flap);
+wrap.addEventListener("touchstart", e => { e.preventDefault(); flap(); }, { passive: false });
+window.addEventListener("keydown", e => { if (e.code === "Space") { e.preventDefault(); flap(); } });
+document.getElementById("fb-play-btn").addEventListener("click", startGame);
+})();
+</script>
