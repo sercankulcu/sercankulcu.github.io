@@ -326,13 +326,6 @@ excerpt: "Swipe the ball toward the hoop and score as many baskets as possible i
   box-shadow:0 24px 70px rgba(0,0,0,.28);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .basketball-modal { background:rgba(28,30,35,.97); color:var(--global-text-color); border-color:rgba(255,255,255,.12); }
-  :root:not([data-theme="light"]) .basketball-modal h1,
-  :root:not([data-theme="light"]) .basketball-modal h2 { color:var(--global-text-color); }
-  :root:not([data-theme="light"]) .basketball-modal p { color:rgba(200,200,200,.7); }
-  :root:not([data-theme="light"]) .basketball-modal-label { color:#f6875f !important; }
-}
 :root[data-theme="dark"] .basketball-modal { background:rgba(28,30,35,.97); color:var(--global-text-color); border-color:rgba(255,255,255,.12); }
 :root[data-theme="dark"] .basketball-modal h1,
 :root[data-theme="dark"] .basketball-modal h2 { color:var(--global-text-color); }
@@ -601,6 +594,8 @@ excerpt: "Swipe the ball toward the hoop and score as many baskets as possible i
   let ballPos = { x: 0, y: 0 };
   let velocity = { x: 0, y: 0 };
   let rotation = 0;
+  let appliedScale = 1;
+  const court = { width: 0, height: 0, rimLeft: 0, rimRight: 0, rimY: 0, ballRadius: 0 };
   let lastFrameTime = 0;
   let pointerId = null;
   let pointerSamples = [];
@@ -658,6 +653,7 @@ excerpt: "Swipe the ball toward the hoop and score as many baskets as possible i
     scoredThisShot = false;
     velocity = { x: 0, y: 0 };
     rotation = 0;
+    appliedScale = 1;
     aimGuide.classList.remove("is-visible");
 
     const start = getStartPosition();
@@ -799,6 +795,7 @@ excerpt: "Swipe the ball toward the hoop and score as many baskets as possible i
       return;
     }
 
+    measure();
     inFlight = true;
     scoredThisShot = false;
     lastFrameTime = performance.now();
@@ -807,17 +804,21 @@ excerpt: "Swipe the ball toward the hoop and score as many baskets as possible i
     event.preventDefault();
   }
 
-  function getCollisionGeometry() {
+  /* Stage and rim cannot move mid-flight, so measuring once per shot avoids
+     forcing a synchronous layout on every animation frame. The ball size comes
+     from the computed style rather than a rect because the ball is an SVG
+     element (no offsetWidth) and its rect would include our scale transform. */
+  function measure() {
     const stageRect = getStageRect();
     const rimRect = rim.getBoundingClientRect();
-    const ballRect = ball.getBoundingClientRect();
+    const ballStyle = getComputedStyle(ball);
 
-    return {
-      rimLeft: rimRect.left - stageRect.left,
-      rimRight: rimRect.right - stageRect.left,
-      rimY: rimRect.top - stageRect.top + rimRect.height / 2,
-      ballRadius: Math.min(ballRect.width, ballRect.height) / 2
-    };
+    court.width = stageRect.width;
+    court.height = stageRect.height;
+    court.rimLeft = rimRect.left - stageRect.left;
+    court.rimRight = rimRect.right - stageRect.left;
+    court.rimY = rimRect.top - stageRect.top + rimRect.height / 2;
+    court.ballRadius = Math.min(parseFloat(ballStyle.width), parseFloat(ballStyle.height)) / 2;
   }
 
   function showFeedback(text) {
@@ -873,30 +874,26 @@ excerpt: "Swipe the ball toward the hoop and score as many baskets as possible i
     ballPos.y += velocity.y * dt;
     rotation += velocity.x * dt * .09;
 
-    const geometry = getCollisionGeometry();
-    const stageRect = getStageRect();
+    const ballRadius = court.ballRadius * appliedScale;
     const scale = Math.max(
       .67,
-      Math.min(1, 1 - ((geometry.rimY - ballPos.y) / stageRect.height) * .32)
+      Math.min(1, 1 - ((court.rimY - ballPos.y) / court.height) * .32)
     );
 
     if (
       !scoredThisShot &&
       velocity.y > 0 &&
-      previousY < geometry.rimY &&
-      ballPos.y >= geometry.rimY &&
-      ballPos.x > geometry.rimLeft + geometry.ballRadius * .45 &&
-      ballPos.x < geometry.rimRight - geometry.ballRadius * .45
+      previousY < court.rimY &&
+      ballPos.y >= court.rimY &&
+      ballPos.x > court.rimLeft + ballRadius * .45 &&
+      ballPos.x < court.rimRight - ballRadius * .45
     ) {
       scoreBasket();
     }
 
-    const nearRimPlane =
-      Math.abs(ballPos.y - geometry.rimY) < geometry.ballRadius * .55;
-    const nearLeftEdge =
-      Math.abs(ballPos.x - geometry.rimLeft) < geometry.ballRadius * .75;
-    const nearRightEdge =
-      Math.abs(ballPos.x - geometry.rimRight) < geometry.ballRadius * .75;
+    const nearRimPlane = Math.abs(ballPos.y - court.rimY) < ballRadius * .55;
+    const nearLeftEdge = Math.abs(ballPos.x - court.rimLeft) < ballRadius * .75;
+    const nearRightEdge = Math.abs(ballPos.x - court.rimRight) < ballRadius * .75;
 
     if (nearRimPlane && (nearLeftEdge || nearRightEdge) && velocity.y > 0) {
       velocity.y *= -.48;
@@ -905,12 +902,13 @@ excerpt: "Swipe the ball toward the hoop and score as many baskets as possible i
     }
 
     setBallPosition(ballPos.x, ballPos.y, scale);
+    appliedScale = scale;
 
-    const margin = geometry.ballRadius * 2;
+    const margin = ballRadius * 2;
     const out =
-      ballPos.y > stageRect.height + margin ||
+      ballPos.y > court.height + margin ||
       ballPos.x < -margin ||
-      ballPos.x > stageRect.width + margin;
+      ballPos.x > court.width + margin;
 
     if (out) {
       registerMiss();
@@ -987,6 +985,8 @@ excerpt: "Swipe the ball toward the hoop and score as many baskets as possible i
   }
 
   function handleResize() {
+    measure();
+
     if (!dragging && !inFlight) {
       resetBall(true);
     }
@@ -1005,6 +1005,7 @@ excerpt: "Swipe the ball toward the hoop and score as many baskets as possible i
   bestDisplay.textContent = formatScore(best);
   scoreDisplay.textContent = "000";
   timeDisplay.textContent = String(GAME_DURATION);
+  measure();
   resetBall(true);
 })();
 </script>
