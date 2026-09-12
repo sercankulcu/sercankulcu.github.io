@@ -46,7 +46,7 @@ excerpt: "Tap or press Space to flap your wings — dodge the pipes and beat you
 <div class="fb-app">
   <div class="fb-header">
     <h1 class="fb-title">Floppy Kuş 🐦</h1>
-    <span class="fb-best">Best: <strong id="fb-best">0</strong></span>
+    <span class="fb-best">En İyi: <strong id="fb-best">0</strong></span>
   </div>
   <div class="fb-canvas-wrap" id="fb-wrap">
     <canvas id="fb-canvas" width="340" height="600"></canvas>
@@ -62,20 +62,36 @@ excerpt: "Tap or press Space to flap your wings — dodge the pipes and beat you
 <script>
 (() => {
 "use strict";
+/* Blocking site data makes localStorage itself throw, which would abort this
+   whole script. Fall back to a memory store so the page still works. */
+let store;
+try { localStorage.getItem("_probe"); store = localStorage; }
+catch { const mem = new Map(); store = {
+  getItem: k => (mem.has(k) ? mem.get(k) : null),
+  setItem: (k, v) => { mem.set(k, String(v)); },
+  removeItem: k => { mem.delete(k); }
+}; }
+
 const canvas = document.getElementById("fb-canvas");
 const ctx = canvas.getContext("2d");
 const W = 340, H = 600;
 
-const GRAVITY = 0.45;
-const FLAP    = -8;
+/* Per-second units so the game runs the same on 60Hz and 144Hz screens.
+   These are the original per-frame values scaled by a 60fps baseline. */
+const GRAVITY = 1620;        /* px/s^2 */
+const FLAP    = -480;        /* px/s   */
 const PIPE_W  = 52;
 const GAP     = 155;
-const PIPE_SPD_INIT = 2.4;
-const PIPE_INTERVAL = 95; /* frames between new pipes */
+const PIPE_SPD_INIT = 144;   /* px/s   */
+const PIPE_SPD_MAX  = 330;
+const PIPE_SPD_STEP = 18;
+const PIPE_EVERY    = 95 / 60;   /* seconds between new pipes */
+const SPEEDUP_EVERY = 200 / 60;  /* seconds between speed-ups */
+const MAX_DT        = 0.05;      /* clamp so a background tab cannot teleport the bird */
 
 let state = "idle"; /* idle | playing | dead */
-let bird, pipes, score, frame, pipeSpd;
-let bestScore = +(localStorage.getItem("fb.best") || 0);
+let bird, pipes, score, pipeSpd, pipeTimer, speedTimer, lastTime;
+let bestScore = +(store.getItem("fb.best") || 0);
 document.getElementById("fb-best").textContent = bestScore;
 
 /* Colors */
@@ -88,8 +104,9 @@ function init() {
   bird = { x: 80, y: H/2, vy: 0, rot: 0 };
   pipes = [];
   score = 0;
-  frame = 0;
   pipeSpd = PIPE_SPD_INIT;
+  pipeTimer = 0;
+  speedTimer = 0;
 }
 
 function flap() {
@@ -105,11 +122,13 @@ function addPipe() {
 }
 
 function startGame() {
+  cancelAnimationFrame(rafId);
   init();
   state = "playing";
   document.getElementById("fb-overlay").style.display = "none";
   bird.vy = FLAP;
-  loop();
+  lastTime = performance.now();
+  rafId = requestAnimationFrame(loop);
 }
 
 function drawBg() {
@@ -176,30 +195,31 @@ function drawScore() {
   ctx.fillText(score, W/2, 60);
 }
 
-function update() {
-  frame++;
-  bird.vy += GRAVITY;
-  bird.y += bird.vy;
-  bird.rot = bird.vy * 0.06;
+function update(dt) {
+  bird.vy += GRAVITY * dt;
+  bird.y += bird.vy * dt;
+  bird.rot = bird.vy * 0.001;
 
-  /* Add pipes */
-  if (frame % PIPE_INTERVAL === 0) addPipe();
+  pipeTimer += dt;
+  if (pipeTimer >= PIPE_EVERY) { pipeTimer -= PIPE_EVERY; addPipe(); }
 
-  /* Speed up gradually */
-  if (frame % 200 === 0) pipeSpd = Math.min(pipeSpd + 0.3, 5.5);
+  speedTimer += dt;
+  if (speedTimer >= SPEEDUP_EVERY) {
+    speedTimer -= SPEEDUP_EVERY;
+    pipeSpd = Math.min(pipeSpd + PIPE_SPD_STEP, PIPE_SPD_MAX);
+  }
 
-  /* Move pipes */
   pipes.forEach(p => {
-    p.x -= pipeSpd;
+    p.x -= pipeSpd * dt;
     if (!p.passed && p.x + PIPE_W < bird.x - 18) {
       p.passed = true; score++;
-      if (score > bestScore) { bestScore = score; localStorage.setItem("fb.best", bestScore); document.getElementById("fb-best").textContent = bestScore; }
+      if (score > bestScore) { bestScore = score; store.setItem("fb.best", bestScore); document.getElementById("fb-best").textContent = bestScore; }
     }
   });
   pipes = pipes.filter(p => p.x > -PIPE_W - 10);
 
-  /* Collision: ground / ceiling */
-  if (bird.y + 14 >= H - 80 || bird.y - 14 <= 0) { die(); return; }
+  if (bird.y - 14 <= 0) { bird.y = 14; if (bird.vy < 0) bird.vy = 0; }
+  if (bird.y + 14 >= H - 80) { die(); return; }
 
   /* Collision: pipes */
   for (const p of pipes) {
@@ -219,8 +239,8 @@ function die() {
 function showOverlay() {
   const ov = document.getElementById("fb-overlay");
   ov.innerHTML = `
-    <h2>${score > 0 ? "💥 Game Over" : "💥 Oops!"}</h2>
-    <p>Score: <strong>${score}</strong> &nbsp;·&nbsp; Best: <strong>${bestScore}</strong></p>
+    <h2>${score > 0 ? "💥 Oyun Bitti" : "💥 Eyvah!"}</h2>
+    <p>Skor: <strong>${score}</strong> &nbsp;·&nbsp; En İyi: <strong>${bestScore}</strong></p>
     <button class="fb-play-btn" id="fb-play-btn">Tekrar Oyna</button>
   `;
   ov.style.display = "";
@@ -228,20 +248,25 @@ function showOverlay() {
 }
 
 let rafId = 0;
-function loop() {
+function draw() {
   ctx.clearRect(0, 0, W, H);
   drawBg();
   pipes.forEach(p => drawPipe(p.x, p.topH));
   drawGround();
   drawBird();
   drawScore();
-  if (state === "playing") { update(); rafId = requestAnimationFrame(loop); }
+}
+function loop(now) {
+  const dt = Math.min((now - lastTime) / 1000, MAX_DT);
+  lastTime = now;
+  if (state === "playing") update(dt);
+  draw();
+  if (state === "playing") rafId = requestAnimationFrame(loop);
 }
 
 /* Initial idle frame */
 init();
-ctx.clearRect(0, 0, W, H);
-drawBg(); drawGround(); drawBird(); drawScore();
+draw();
 
 /* Controls */
 const wrap = document.getElementById("fb-wrap");

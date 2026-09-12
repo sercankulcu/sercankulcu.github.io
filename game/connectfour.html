@@ -36,7 +36,7 @@ excerpt: "Play Connect Four against another player or three levels of computer A
 .connectfour-status.red{color:#ef3f47}.connectfour-status.yellow{color:#c99d00}.connectfour-status.win{color:#2f855a}
 .connectfour-board-wrap{position:relative;width:min(94vw,620px);margin:0 auto}
 .connectfour-hints{display:grid;grid-template-columns:repeat(7,1fr);height:42px;margin:0 12px 4px}
-.connectfour-hint{display:grid;place-items:center;color:rgba(127,127,127,.28);font-size:22px;cursor:pointer;user-select:none}
+.connectfour-hint{display:grid;place-items:center;padding:0;border:0;background:none;color:rgba(127,127,127,.28);font:inherit;font-size:22px;line-height:1;cursor:pointer;user-select:none}
 .connectfour-hint.preview-red{color:#ef3f47}.connectfour-hint.preview-yellow{color:#ffd43b}
 .connectfour-board{position:relative;display:grid;grid-template-columns:repeat(7,1fr);gap:clamp(5px,1.3vw,10px);padding:clamp(10px,2.6vw,16px);border-radius:18px;background:linear-gradient(180deg,#0b5fd7,#0a47a7);box-shadow:inset 0 0 0 3px rgba(255,255,255,.08),inset 0 -10px 20px rgba(0,0,0,.18),0 18px 40px rgba(0,0,0,.22);overflow:hidden}
 .connectfour-slot{aspect-ratio:1;position:relative;border-radius:50%;background:#081423;box-shadow:inset 0 4px 10px rgba(0,0,0,.75),0 1px 0 rgba(255,255,255,.08);cursor:pointer}
@@ -79,7 +79,7 @@ excerpt: "Play Connect Four against another player or three levels of computer A
     <div class="connectfour-setting"><label for="connectfour-color">Your Color</label><select id="connectfour-color"><option value="red" selected>Red</option><option value="yellow">Yellow</option></select></div>
     <div class="connectfour-setting"><label for="connectfour-starter">Starts</label><select id="connectfour-starter"><option value="human" selected>You</option><option value="computer">Computer</option><option value="random">Random</option></select></div>
   </section>
-  <div class="connectfour-status red" id="connectfour-status">🔴 YOUR TURN</div>
+  <div class="connectfour-status red" id="connectfour-status" aria-live="polite">🔴 YOUR TURN</div>
   <section class="connectfour-board-wrap" aria-label="Connect Four board">
     <div class="connectfour-hints" id="connectfour-hints"></div>
     <div class="connectfour-board" id="connectfour-board"></div>
@@ -107,9 +107,19 @@ excerpt: "Play Connect Four against another player or three levels of computer A
 <script>
 (() => {
 "use strict";
+/* Blocking site data makes localStorage itself throw, which would abort this
+   whole script. Fall back to a memory store so the page still works. */
+let store;
+try { localStorage.getItem("_probe"); store = localStorage; }
+catch { const mem = new Map(); store = {
+  getItem: k => (mem.has(k) ? mem.get(k) : null),
+  setItem: (k, v) => { mem.set(k, String(v)); },
+  removeItem: k => { mem.delete(k); }
+}; }
+
 const ROWS=6,COLS=7,EMPTY=0,RED=1,YELLOW=2;
 let board=[],currentPlayer=RED,humanPiece=RED,aiPiece=YELLOW,mode="cpu",difficulty="medium",round=1,leftScore=0,rightScore=0,gameOver=false,busy=false;
-let soundEnabled=localStorage.getItem("connect-four-sound")!=="off",audioCtx=null;
+let soundEnabled=store.getItem("connect-four-sound")!=="off",audioCtx=null;
 const boardEl=document.getElementById("connectfour-board"),hintsEl=document.getElementById("connectfour-hints"),statusEl=document.getElementById("connectfour-status");
 const modeEl=document.getElementById("connectfour-mode"),difficultyEl=document.getElementById("connectfour-difficulty"),colorEl=document.getElementById("connectfour-color"),starterEl=document.getElementById("connectfour-starter");
 const leftScoreEl=document.getElementById("connectfour-left-score"),rightScoreEl=document.getElementById("connectfour-right-score"),roundEl=document.getElementById("connectfour-round");
@@ -121,8 +131,8 @@ function legalMoves(b){return Array.from({length:COLS},(_,c)=>c).filter(c=>first
 function checkWin(b,p){const dirs=[[0,1],[1,0],[1,1],[1,-1]];for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(b[r][c]!==p)continue;for(const[dr,dc]of dirs){const cells=[];for(let k=0;k<4;k++){const rr=r+dr*k,cc=c+dc*k;if(rr<0||rr>=ROWS||cc<0||cc>=COLS||b[rr][cc]!==p){cells.length=0;break}cells.push([rr,cc])}if(cells.length===4)return cells}}return null}
 const isDraw=b=>legalMoves(b).length===0, cloneBoard=b=>b.map(r=>r.slice());
 function dropOn(b,col,p){const r=firstOpenRow(b,col);if(r<0)return null;b[r][col]=p;return r}
-function render(){boardEl.innerHTML="";for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const slot=document.createElement("button");slot.type="button";slot.className="connectfour-slot";slot.addEventListener("click",()=>humanMove(c));const p=board[r][c];if(p){const d=document.createElement("span");d.className=`connectfour-disc ${colorName(p)}`;slot.appendChild(d)}boardEl.appendChild(slot)}updateHints()}
-function updateHints(){hintsEl.innerHTML="";for(let c=0;c<COLS;c++){const h=document.createElement("div");h.className="connectfour-hint";h.textContent="●";h.addEventListener("mouseenter",()=>{if(!gameOver&&!busy&&firstOpenRow(board,c)>=0)h.classList.add(currentPlayer===RED?"preview-red":"preview-yellow")});h.addEventListener("mouseleave",()=>h.classList.remove("preview-red","preview-yellow"));h.addEventListener("click",()=>humanMove(c));hintsEl.appendChild(h)}}
+function render(){boardEl.innerHTML="";for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const slot=document.createElement("button");slot.type="button";slot.className="connectfour-slot";slot.addEventListener("click",()=>humanMove(c));const p=board[r][c];slot.setAttribute("aria-label",`Column ${c+1}, row ${r+1}, ${p?colorName(p):"empty"}`);if(p){const d=document.createElement("span");d.className=`connectfour-disc ${colorName(p)}`;slot.appendChild(d)}boardEl.appendChild(slot)}updateHints()}
+function updateHints(){hintsEl.innerHTML="";for(let c=0;c<COLS;c++){const h=document.createElement("button");h.type="button";h.className="connectfour-hint";h.textContent="●";h.setAttribute("aria-label",`Drop a disc in column ${c+1}`);h.addEventListener("mouseenter",()=>{if(!gameOver&&!busy&&firstOpenRow(board,c)>=0)h.classList.add(currentPlayer===RED?"preview-red":"preview-yellow")});h.addEventListener("mouseleave",()=>h.classList.remove("preview-red","preview-yellow"));h.addEventListener("click",()=>humanMove(c));hintsEl.appendChild(h)}}
 function updateStatus(text=null,cls=null){statusEl.className="connectfour-status";if(cls)statusEl.classList.add(cls);if(text){statusEl.textContent=text;return}if(gameOver)return;const icon=currentPlayer===RED?"🔴":"🟡";statusEl.textContent=mode==="cpu"?(currentPlayer===humanPiece?`${icon} YOUR TURN`:`${icon} COMPUTER`):`${icon} ${currentPlayer===RED?"RED":"YELLOW"} TURN`;statusEl.classList.add(colorName(currentPlayer))}
 function animateDisc(row,col,p){const slot=boardEl.children[row*COLS+col];slot.innerHTML="";const d=document.createElement("span");d.className=`connectfour-disc ${colorName(p)} drop`;slot.appendChild(d)}
 async function playMove(col,p){if(gameOver||busy)return false;const row=firstOpenRow(board,col);if(row<0)return false;busy=true;board[row][col]=p;animateDisc(row,col,p);tone(p===RED?340:440,.045,.02);await new Promise(r=>setTimeout(r,420));const win=checkWin(board,p);if(win){finishWin(p,win);busy=false;return true}if(isDraw(board)){gameOver=true;updateStatus("DRAW","win");busy=false;return true}currentPlayer=other(p);busy=false;render();updateStatus();return true}
@@ -136,7 +146,8 @@ function minimax(b,depth,alpha,beta,maximizing){if(checkWin(b,aiPiece))return 10
 function hardMove(){const win=findImmediate(board,aiPiece);if(win!==null)return win;const block=findImmediate(board,humanPiece);if(block!==null)return block;let best=-Infinity,cols=[];for(const c of [3,2,4,1,5,0,6].filter(c=>legalMoves(board).includes(c))){const copy=cloneBoard(board);dropOn(copy,c,aiPiece);const val=minimax(copy,5,-Infinity,Infinity,false);if(val>best){best=val;cols=[c]}else if(val===best)cols.push(c)}return cols[Math.floor(Math.random()*cols.length)]}
 function aiMove(){if(gameOver||busy||mode!=="cpu"||currentPlayer!==aiPiece)return;const moves=legalMoves(board);if(!moves.length)return;const col=difficulty==="easy"?moves[Math.floor(Math.random()*moves.length)]:difficulty==="medium"?mediumMove():hardMove();playMove(col,aiPiece)}
 function resolveStarter(){const v=starterEl.value;if(mode==="pvp")return v==="random"?(Math.random()<.5?RED:YELLOW):v==="computer"?YELLOW:RED;if(v==="random")return Math.random()<.5?humanPiece:aiPiece;return v==="computer"?aiPiece:humanPiece}
-function newRound(){board=emptyBoard();gameOver=false;busy=false;mode=modeEl.value;difficulty=difficultyEl.value;humanPiece=colorEl.value==="red"?RED:YELLOW;aiPiece=other(humanPiece);currentPlayer=resolveStarter();leftLabel.textContent=mode==="cpu"?"YOU":"RED";rightLabel.textContent=mode==="cpu"?"CPU":"YELLOW";render();updateScores();updateStatus();if(mode==="cpu"&&currentPlayer===aiPiece)setTimeout(aiMove,350)}
+function syncControls(){const pvp=modeEl.value==="pvp";difficultyEl.disabled=pvp;colorEl.disabled=pvp;starterEl.options[0].text=pvp?"Red":"You";starterEl.options[1].text=pvp?"Yellow":"Computer"}
+function newRound(){syncControls();board=emptyBoard();gameOver=false;busy=false;mode=modeEl.value;difficulty=difficultyEl.value;humanPiece=colorEl.value==="red"?RED:YELLOW;aiPiece=other(humanPiece);currentPlayer=resolveStarter();leftLabel.textContent=mode==="cpu"?"YOU":"RED";rightLabel.textContent=mode==="cpu"?"CPU":"YELLOW";render();updateScores();updateStatus();if(mode==="cpu"&&currentPlayer===aiPiece)setTimeout(aiMove,350)}
 function resetMatch(){clearTimeout(_winToneTimer);round=1;leftScore=0;rightScore=0;newRound()}
 function updateScores(){leftScoreEl.textContent=String(leftScore);rightScoreEl.textContent=String(rightScore);roundEl.textContent=String(round)}
 function unlockAudio(){if(!soundEnabled)return;try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume()}catch(_){}}
@@ -146,7 +157,7 @@ function updateSound(){soundBtn.textContent=soundEnabled?"🔊":"🔇";soundBtn.
 document.getElementById("connectfour-new").addEventListener("click",()=>{round++;newRound()});
 document.getElementById("connectfour-reset").addEventListener("click",resetMatch);
 modeEl.addEventListener("change",resetMatch);difficultyEl.addEventListener("change",newRound);colorEl.addEventListener("change",resetMatch);starterEl.addEventListener("change",resetMatch);
-soundBtn.addEventListener("click",()=>{soundEnabled=!soundEnabled;localStorage.setItem("connect-four-sound",soundEnabled?"on":"off");updateSound();if(soundEnabled)tone(660,.06,.03)});
+soundBtn.addEventListener("click",()=>{soundEnabled=!soundEnabled;store.setItem("connect-four-sound",soundEnabled?"on":"off");updateSound();if(soundEnabled)tone(660,.06,.03)});
 updateSound();resetMatch();
 })();
 </script>

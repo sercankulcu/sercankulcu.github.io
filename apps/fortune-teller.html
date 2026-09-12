@@ -87,10 +87,20 @@ redirect_from:
 
 <script>
 (() => {
+/* Blocking site data makes localStorage itself throw, which would abort this
+   whole script. Fall back to a memory store so the page still works. */
+let store;
+try { localStorage.getItem("_probe"); store = localStorage; }
+catch { const mem = new Map(); store = {
+  getItem: k => (mem.has(k) ? mem.get(k) : null),
+  setItem: (k, v) => { mem.set(k, String(v)); },
+  removeItem: k => { mem.delete(k); }
+}; }
+
   const $ = id => document.getElementById(id);
   const STORAGE_KEY = 'ft-daily-reading-v3';
   const LANG_KEY = 'ft-language';
-  let lang = localStorage.getItem(LANG_KEY) || 'en';
+  let lang = store.getItem(LANG_KEY) || 'en';
   let isReading = false;
   let currentReading = null;
 
@@ -161,9 +171,9 @@ redirect_from:
   function todayKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
   function rand(max){if(window.crypto&&crypto.getRandomValues){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%max}return Math.floor(Math.random()*max)}
   function createReading(){return {date:todayKey(),fortune:rand(fortunes.length),number:1+rand(99),color:rand(colors.length),symbol:rand(symbols.length),energy:rand(energies.length)}}
-  function getReading(){try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY));if(saved&&saved.date===todayKey())return saved}catch(e){}const r=createReading();localStorage.setItem(STORAGE_KEY,JSON.stringify(r));return r}
+  function getReading(){try{const saved=JSON.parse(store.getItem(STORAGE_KEY));if(saved&&saved.date===todayKey())return saved}catch(e){}const r=createReading();store.setItem(STORAGE_KEY,JSON.stringify(r));return r}
   function t(){return ui[lang]}
-  function setLanguage(next){lang=next;localStorage.setItem(LANG_KEY,lang);document.querySelectorAll('.ft-lang-btn').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===lang)));$('ftEyebrow').textContent=t().eyebrow;$('ftTitle').textContent=t().title;$('ftSubtitle').textContent=t().subtitle;$('ftHint').textContent=t().hint;$('numberLabel').textContent=t().number;$('colorLabel').textContent=t().color;$('symbolLabel').textContent=t().symbol;$('energyLabel').textContent=t().energy;$('nextReading').textContent=t().next;$('shareBtn').textContent=t().share;$('copyBtn').textContent=t().copy;$('xBtn').textContent=t().x;$('waBtn').textContent=t().wa;$('ftNote').textContent=t().note;$('crystalBall').setAttribute('aria-label',t().hint);if(currentReading) render(currentReading);else $('fortuneText').textContent=t().placeholder}
+  function setLanguage(next){lang=next;store.setItem(LANG_KEY,lang);document.querySelectorAll('.ft-lang-btn').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===lang)));$('ftEyebrow').textContent=t().eyebrow;$('ftTitle').textContent=t().title;$('ftSubtitle').textContent=t().subtitle;$('ftHint').textContent=t().hint;$('numberLabel').textContent=t().number;$('colorLabel').textContent=t().color;$('symbolLabel').textContent=t().symbol;$('energyLabel').textContent=t().energy;$('nextReading').textContent=t().next;$('shareBtn').textContent=t().share;$('copyBtn').textContent=t().copy;$('xBtn').textContent=t().x;$('waBtn').textContent=t().wa;$('ftNote').textContent=t().note;$('crystalBall').setAttribute('aria-label',t().hint);if(currentReading) render(currentReading);else $('fortuneText').textContent=t().placeholder}
   function render(r){currentReading=r;const f=fortunes[r.fortune],col=colors[r.color],sym=symbols[r.symbol],en=energies[r.energy];$('category').textContent=lang==='tr'?f.ct:f.c;$('category').classList.add('visible');$('fortuneText').textContent=lang==='tr'?f.tr:f.en;$('watchText').innerHTML=`<strong>${t().watch}:</strong> ${lang==='tr'?f.wtr:f.wen}`;$('adviceText').innerHTML=`<strong>${t().advice}:</strong> ${lang==='tr'?f.atr:f.aen}`;$('watchText').classList.add('visible');$('adviceText').classList.add('visible');$('luckyNumber').textContent=r.number;$('luckyColor').textContent=lang==='tr'?col.tr:col.en;$('colorVisual').innerHTML=`<span class="ft-color-dot" style="background:${col.hex}"></span>`;$('symbolIcon').textContent=sym.icon;$('symbolValue').textContent=lang==='tr'?sym.tr:sym.en;$('energyValue').textContent=lang==='tr'?en.tr:en.en;[...$('energyMeter').children].forEach((x,i)=>x.classList.toggle('on',i<en.level));$('fortuneCard').classList.add('revealed');$('details').classList.add('visible');$('actions').classList.add('visible');$('nextReading').classList.add('visible')}
   function shareText(){const r=currentReading,f=fortunes[r.fortune],col=colors[r.color],sym=symbols[r.symbol],en=energies[r.energy];return `${t().shareLead}\n${lang==='tr'?f.tr:f.en}\n\n🍀 ${t().number}: ${r.number}\n🎨 ${t().color}: ${lang==='tr'?col.tr:col.en}\n${sym.icon} ${t().symbol}: ${lang==='tr'?sym.tr:sym.en}\n✨ ${t().energy}: ${lang==='tr'?en.tr:en.en}\n\nhttps://sercankulcu.github.io/apps/fortune-teller/`}
   function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').classList.remove('show'),1800)}

@@ -96,6 +96,16 @@ excerpt: "A minimal countdown timer with presets, keyboard shortcuts, fullscreen
 <script>
 (() => {
   "use strict";
+/* Blocking site data makes localStorage itself throw, which would abort this
+   whole script. Fall back to a memory store so the page still works. */
+let store;
+try { localStorage.getItem("_probe"); store = localStorage; }
+catch { const mem = new Map(); store = {
+  getItem: k => (mem.has(k) ? mem.get(k) : null),
+  setItem: (k, v) => { mem.set(k, String(v)); },
+  removeItem: k => { mem.delete(k); }
+}; }
+
   const byId=id=>document.getElementById(id);
   const app=byId("minimal-timer"),timeEl=byId("mt-time"),progressEl=byId("mt-progress"),toggleBtn=byId("mt-toggle");
   const overlay=byId("mt-overlay"),minutesInput=byId("mt-minutes"),notifyBtn=byId("mt-notify"),toast=byId("mt-toast"),fullscreenBtn=byId("mt-fullscreen");
@@ -106,7 +116,7 @@ excerpt: "A minimal countdown timer with presets, keyboard shortcuts, fullscreen
   const fromUrl=Number(params.get("s"));
   let duration=Number.isFinite(fromUrl)&&fromUrl>0?Math.min(Math.round(fromUrl),359999):300;
   let remaining=duration,running=false,endAt=0,raf=0;
-  let notificationsEnabled=(localStorage.getItem("timer.notifications")??localStorage.getItem("minute.notifications"))==="on";
+  let notificationsEnabled=(store.getItem("timer.notifications")??store.getItem("minute.notifications"))==="on";
 
   function fmt(seconds){
     seconds=Math.max(0,Math.ceil(seconds));
@@ -198,9 +208,9 @@ excerpt: "A minimal countdown timer with presets, keyboard shortcuts, fullscreen
   }
   async function toggleNotifications(){
     if(notificationsEnabled){
-      notificationsEnabled=false;localStorage.setItem("timer.notifications","off");renderNotify();showToast("Notifications off");return;
+      notificationsEnabled=false;store.setItem("timer.notifications","off");renderNotify();showToast("Notifications off");return;
     }
-    notificationsEnabled=true;localStorage.setItem("timer.notifications","on");renderNotify();
+    notificationsEnabled=true;store.setItem("timer.notifications","on");renderNotify();
     if("Notification"in window&&Notification.permission==="default"){
       try{
         const permission=await Notification.requestPermission();

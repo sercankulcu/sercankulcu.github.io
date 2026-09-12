@@ -104,6 +104,16 @@ excerpt: "Boost focus with the Pomodoro technique — 25-minute work sessions, s
 <script>
 (() => {
   "use strict";
+/* Blocking site data makes localStorage itself throw, which would abort this
+   whole script. Fall back to a memory store so the page still works. */
+let store;
+try { localStorage.getItem("_probe"); store = localStorage; }
+catch { const mem = new Map(); store = {
+  getItem: k => (mem.has(k) ? mem.get(k) : null),
+  setItem: (k, v) => { mem.set(k, String(v)); },
+  removeItem: k => { mem.delete(k); }
+}; }
+
   const $ = id => document.getElementById(id);
   const app = $("pomodoro-app");
   const timeEl = $("pa-time");
@@ -122,9 +132,9 @@ excerpt: "Boost focus with the Pomodoro technique — 25-minute work sessions, s
   const PHASE_SEQ = ["work","short","work","short","work","short","work","long"];
 
   let cfg = {
-    work: Math.max(1, +(localStorage.getItem("pomo.work") || 25)),
-    short: Math.max(1, +(localStorage.getItem("pomo.short") || 5)),
-    long: Math.max(1, +(localStorage.getItem("pomo.long") || 15)),
+    work: Math.max(1, +(store.getItem("pomo.work") || 25)),
+    short: Math.max(1, +(store.getItem("pomo.short") || 5)),
+    long: Math.max(1, +(store.getItem("pomo.long") || 15)),
   };
 
   let phaseIdx = 0;
@@ -134,7 +144,7 @@ excerpt: "Boost focus with the Pomodoro technique — 25-minute work sessions, s
   let running = false;
   let endAt = 0;
   let raf = 0;
-  let notificationsEnabled = (localStorage.getItem("pomo.notifications") || "off") === "on";
+  let notificationsEnabled = (store.getItem("pomo.notifications") || "off") === "on";
 
   function currentPhaseKey() { return PHASE_SEQ[phaseIdx]; }
   function phaseSecs(key) {
@@ -267,7 +277,7 @@ excerpt: "Boost focus with the Pomodoro technique — 25-minute work sessions, s
 
   async function toggleNotify() {
     notificationsEnabled = !notificationsEnabled;
-    localStorage.setItem("pomo.notifications", notificationsEnabled ? "on" : "off");
+    store.setItem("pomo.notifications", notificationsEnabled ? "on" : "off");
     if (notificationsEnabled && "Notification" in window && Notification.permission === "default") {
       try { await Notification.requestPermission(); } catch (_) {}
     }
@@ -294,9 +304,9 @@ excerpt: "Boost focus with the Pomodoro technique — 25-minute work sessions, s
       short: Math.max(1, Math.min(60, s)),
       long: Math.max(1, Math.min(120, l)),
     };
-    localStorage.setItem("pomo.work", cfg.work);
-    localStorage.setItem("pomo.short", cfg.short);
-    localStorage.setItem("pomo.long", cfg.long);
+    store.setItem("pomo.work", cfg.work);
+    store.setItem("pomo.short", cfg.short);
+    store.setItem("pomo.long", cfg.long);
     closeSettings();
     phaseIdx = 0; pomoDone = 0;
     loadPhase();

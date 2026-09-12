@@ -350,6 +350,15 @@ excerpt: "Tap good targets quickly, avoid traps, and beat your best score in 30 
       </div>
     </div>
 
+    <div class="fastreflex-overlay" id="fastreflex-paused">
+      <div class="fastreflex-modal">
+        <p class="fastreflex-eyebrow">Paused</p>
+        <h2>Take Your Time</h2>
+        <p>The clock stopped when you left this tab.</p>
+        <button class="fastreflex-primary" id="fastreflex-resume" type="button">Resume</button>
+      </div>
+    </div>
+
     <div class="fastreflex-overlay" id="fastreflex-over">
       <div class="fastreflex-modal">
         <p class="fastreflex-eyebrow">Time's Up</p>
@@ -408,6 +417,8 @@ excerpt: "Tap good targets quickly, avoid traps, and beat your best score in 30 
   const hardButtonEnd = document.getElementById("fastreflex-hard-end");
   const startButton = document.getElementById("fastreflex-start-btn");
   const playAgainButton = document.getElementById("fastreflex-again");
+  const pausedOverlay = document.getElementById("fastreflex-paused");
+  const resumeButton = document.getElementById("fastreflex-resume");
 
   const finalScore = document.getElementById("fastreflex-final-score");
   const finalBest = document.getElementById("fastreflex-final-best");
@@ -427,6 +438,7 @@ excerpt: "Tap good targets quickly, avoid traps, and beat your best score in 30 
   let timerInterval = null;
   let targetTimeout = null;
   let currentTarget = null;
+  let remainingOnPause = 0;
 
   function getBest() {
     try {
@@ -594,11 +606,10 @@ excerpt: "Tap good targets quickly, avoid traps, and beat your best score in 30 
         Math.round(performance.now() - createdAt)
       );
 
-      fastestReaction = Math.min(fastestReaction, reactionTime);
-
       const rect = target.getBoundingClientRect();
 
       if (good) {
+        fastestReaction = Math.min(fastestReaction, reactionTime);
         const points = getPoints(reactionTime);
         score += points;
         correct += 1;
@@ -685,6 +696,8 @@ excerpt: "Tap good targets quickly, avoid traps, and beat your best score in 30 
 
     startOverlay.classList.remove("visible");
     gameOverOverlay.classList.remove("visible");
+    pausedOverlay.classList.remove("visible");
+    remainingOnPause = 0;
 
     scoreDisplay.textContent = "000";
     timeDisplay.textContent = String(GAME_DURATION);
@@ -744,10 +757,42 @@ excerpt: "Tap good targets quickly, avoid traps, and beat your best score in 30 
   startButton.addEventListener("click", startGame);
   playAgainButton.addEventListener("click", startGame);
 
+  function pauseGame() {
+    if (!gameActive) return;
+    gameActive = false;
+    remainingOnPause = Math.max(0, gameEndTime - performance.now());
+    clearInterval(timerInterval);
+    timerInterval = null;
+    clearTarget();
+    pausedOverlay.classList.add("visible");
+  }
+
+  function resumeGame() {
+    if (gameActive || remainingOnPause <= 0) return;
+    gameActive = true;
+    gameEndTime = performance.now() + remainingOnPause;
+    remainingOnPause = 0;
+    pausedOverlay.classList.remove("visible");
+    timerInterval = window.setInterval(updateTimer, 100);
+    updateTimer();
+    window.setTimeout(spawnTarget, 250);
+  }
+
+  resumeButton.addEventListener("click", resumeGame);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) pauseGame();
+  });
+
+  /* Respawning here would hand out a free target and skip the miss, so the
+     live one is just pulled back inside the resized playfield instead. */
   window.addEventListener("resize", () => {
-    if (gameActive && currentTarget) {
-      spawnTarget();
-    }
+    if (!gameActive || !currentTarget) return;
+    const size = currentTarget.offsetWidth;
+    const maxX = Math.max(0, playfield.clientWidth - size);
+    const maxY = Math.max(0, playfield.clientHeight - size);
+    currentTarget.style.left = `${Math.min(parseFloat(currentTarget.style.left) || 0, maxX)}px`;
+    currentTarget.style.top = `${Math.min(parseFloat(currentTarget.style.top) || 0, maxY)}px`;
   });
 
   updateModeUI();

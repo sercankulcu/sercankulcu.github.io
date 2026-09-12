@@ -401,6 +401,16 @@ html[data-theme="dark"] .pm-status.error { color:#ff9f9f; }
 <script>
 (() => {
   "use strict";
+/* Blocking site data makes localStorage itself throw, which would abort this
+   whole script. Fall back to a memory store so the page still works. */
+let store;
+try { localStorage.getItem("_probe"); store = localStorage; }
+catch { const mem = new Map(); store = {
+  getItem: k => (mem.has(k) ? mem.get(k) : null),
+  setItem: (k, v) => { mem.set(k, String(v)); },
+  removeItem: k => { mem.delete(k); }
+}; }
+
 
   const byId = id => document.getElementById(id);
 
@@ -441,7 +451,7 @@ html[data-theme="dark"] .pm-status.error { color:#ff9f9f; }
   }
 
   function detectLanguage() {
-    const saved = localStorage.getItem("pdf-merger-language");
+    const saved = store.getItem("pdf-merger-language");
     if (saved && translations[saved]) return saved;
     const langs = navigator.languages?.length ? navigator.languages : [navigator.language || "en"];
     for (const lang of langs) {
@@ -453,7 +463,7 @@ html[data-theme="dark"] .pm-status.error { color:#ff9f9f; }
 
   function applyLanguage(lang) {
     currentLanguage = translations[lang] ? lang : "en";
-    localStorage.setItem("pdf-merger-language", currentLanguage);
+    store.setItem("pdf-merger-language", currentLanguage);
 
     const rtl = currentLanguage === "ar";
     const root = document.querySelector(".pdf-merger-app");

@@ -386,6 +386,16 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
 <script>
 (() => {
   "use strict";
+/* Blocking site data makes localStorage itself throw, which would abort this
+   whole script. Fall back to a memory store so the page still works. */
+let store;
+try { localStorage.getItem("_probe"); store = localStorage; }
+catch { const mem = new Map(); store = {
+  getItem: k => (mem.has(k) ? mem.get(k) : null),
+  setItem: (k, v) => { mem.set(k, String(v)); },
+  removeItem: k => { mem.delete(k); }
+}; }
+
 
   let WORDS = [];
   let allWords = {};
@@ -395,6 +405,9 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
     tr: {
       alphabet: "ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZ",
       locale: "tr-TR",
+      keyboardLabel: "Türkçe alfabe klavyesi",
+      languageLabel: "Dil",
+      figureAlt: stage => `Adam asmaca çizimi, 6 aşamadan ${stage}. aşama`,
       subtitle: "Altı yanlış harften önce gizli kelimeyi bul.",
       score: "Skor",
       lives: "Can",
@@ -417,6 +430,9 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
     en: {
       alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
       locale: "en-US",
+      keyboardLabel: "Alphabet keyboard",
+      languageLabel: "Language",
+      figureAlt: stage => `Hangman drawing, stage ${stage} of 6`,
       subtitle: "Guess the hidden word before six incorrect letters.",
       score: "Score",
       lives: "Lives",
@@ -439,6 +455,9 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
     de: {
       alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜß",
       locale: "de-DE",
+      keyboardLabel: "Buchstabentastatur",
+      languageLabel: "Sprache",
+      figureAlt: stage => `Galgenmännchen-Zeichnung, Stufe ${stage} von 6`,
       subtitle: "Errate das versteckte Wort vor sechs falschen Buchstaben.",
       score: "Punkte",
       lives: "Leben",
@@ -461,6 +480,9 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
     fr: {
       alphabet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
       locale: "fr-FR",
+      keyboardLabel: "Clavier alphabétique",
+      languageLabel: "Langue",
+      figureAlt: stage => `Dessin du pendu, étape ${stage} sur 6`,
       subtitle: "Devinez le mot caché avant six lettres incorrectes.",
       score: "Score",
       lives: "Vies",
@@ -483,6 +505,9 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
     es: {
       alphabet: "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",
       locale: "es-ES",
+      keyboardLabel: "Teclado alfabético",
+      languageLabel: "Idioma",
+      figureAlt: stage => `Dibujo del ahorcado, etapa ${stage} de 6`,
       subtitle: "Adivina la palabra oculta antes de seis letras incorrectas.",
       score: "Puntos",
       lives: "Vidas",
@@ -505,6 +530,9 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
     ru: {
       alphabet: "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
       locale: "ru-RU",
+      keyboardLabel: "Алфавитная клавиатура",
+      languageLabel: "Язык",
+      figureAlt: stage => `Рисунок висельницы, этап ${stage} из 6`,
       subtitle: "Угадайте скрытое слово до шести неверных букв.",
       score: "Счёт",
       lives: "Жизни",
@@ -542,6 +570,7 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
   const modal = document.getElementById("hangman-modal");
   const close = document.getElementById("hangman-close");
   const language = document.getElementById("hangman-language");
+  const panel = document.querySelector(".hangman-panel");
   const subtitle = document.getElementById("hangman-subtitle");
   const scoreLabel = document.getElementById("hangman-score-label");
   const livesLabel = document.getElementById("hangman-lives-label");
@@ -558,8 +587,8 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
   let word = "";
   let guessed = new Set();
   let livesLeft = 6;
-  let scoreValue = 0;
-  let streakValue = 0;
+  let scoreValue = Number(store.getItem("hangman-score")) || 0;
+  let streakValue = Number(store.getItem("hangman-streak")) || 0;
   let ended = false;
   let lastWord = "";
 
@@ -582,7 +611,7 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
   function renderFigure() {
     const stage = 6 - livesLeft;
     figure.src = `/game/hangman/hangman-${stage}.png`;
-    figure.alt = `Hangman drawing, stage ${stage} of 6`;
+    figure.alt = getConfig().figureAlt(stage);
   }
 
   function buildKeyboard() {
@@ -602,10 +631,16 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
     }
   }
 
+  function saveProgress() {
+    store.setItem("hangman-score", scoreValue);
+    store.setItem("hangman-streak", streakValue);
+  }
+
   function finishWin() {
     ended = true;
     streakValue += 1;
     scoreValue += word.length * 10 + livesLeft * 5;
+    saveProgress();
 
     score.textContent = scoreValue;
     streak.textContent = streakValue;
@@ -615,6 +650,7 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
   function finishLoss() {
     ended = true;
     streakValue = 0;
+    saveProgress();
     streak.textContent = "0";
     message.textContent = getConfig().lost(word);
   }
@@ -678,7 +714,10 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
     modalTitle.textContent = config.help;
     close.textContent = config.close;
     help.setAttribute("aria-label", config.help);
-    language.setAttribute("aria-label", config.help === "How to Play" ? "Language" : "Language");
+    language.setAttribute("aria-label", config.languageLabel);
+    keyboard.setAttribute("aria-label", config.keyboardLabel);
+    score.textContent = scoreValue;
+    streak.textContent = streakValue;
 
     ruleEls.forEach((el, index) => {
       el.textContent = config.rules[index];
@@ -689,11 +728,13 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
 
   function openHelp() {
     modal.classList.add("is-open");
+    panel.inert = true;
     close.focus();
   }
 
   function closeHelp() {
     modal.classList.remove("is-open");
+    panel.inert = false;
     help.focus();
   }
 
@@ -726,10 +767,19 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
     }
   });
 
-  restart.addEventListener("click", startRound);
+  restart.addEventListener("click", () => {
+    /* Abandoning a started round must not shelter the streak from a loss. */
+    if (!ended && guessed.size > 0) {
+      streakValue = 0;
+      saveProgress();
+      streak.textContent = "0";
+    }
+
+    startRound();
+  });
 
   language.addEventListener("change", () => {
-    localStorage.setItem("hangman-language", language.value);
+    store.setItem("hangman-language", language.value);
     applyLanguage(language.value);
   });
 
@@ -755,7 +805,7 @@ excerpt: "Guess the hidden Turkish word before six incorrect letters."
       allWords = data;
 
       const preferred =
-        localStorage.getItem("hangman-language") ||
+        store.getItem("hangman-language") ||
         language.value ||
         "en";
 
