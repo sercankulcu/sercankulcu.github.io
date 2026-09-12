@@ -329,7 +329,8 @@ excerpt: "Match pairs of cards while tracking moves and time."
     <div class="memory-stats" aria-label="Game statistics">
       <span class="memory-stat">Moves: <b id="memory-moves">0</b></span>
       <span class="memory-stat">Time: <b id="memory-time">0</b>s</span>
-      <span class="memory-stat">Pairs: <b id="memory-pairs">0</b>/8</span>
+      <span class="memory-stat">Pairs: <b id="memory-pairs">0</b>/<span id="memory-total">8</span></span>
+      <span class="memory-stat">Best: <b id="memory-best">—</b></span>
     </div>
 
     <div class="memory-grid" id="memory-game" aria-label="Memory card grid"></div>
@@ -377,6 +378,20 @@ excerpt: "Match pairs of cards while tracking moves and time."
   const help = document.getElementById("memory-help");
   const modal = document.getElementById("memory-modal");
   const close = document.getElementById("memory-close");
+  const totalView = document.getElementById("memory-total");
+  const bestView = document.getElementById("memory-best");
+  const panel = document.querySelector(".memory-panel");
+
+  /* Blocking site data makes localStorage itself throw, which would abort this
+     whole script. Fall back to a memory store so the page still works. */
+  let store;
+  try { localStorage.getItem("_probe"); store = localStorage; }
+  catch { const mem = new Map(); store = {
+    getItem: k => (mem.has(k) ? mem.get(k) : null),
+    setItem: (k, v) => { mem.set(k, String(v)); }
+  }; }
+
+  const BEST_KEY = "memory-best-seconds";
 
   let openCards = [];
   let moveCount = 0;
@@ -385,6 +400,8 @@ excerpt: "Match pairs of cards while tracking moves and time."
   let timer = null;
   let lock = false;
   let started = false;
+  let startTime = 0;
+  let totalPairs = 0;
 
   function shuffle(items) {
     const copy = [...items];
@@ -400,11 +417,13 @@ excerpt: "Match pairs of cards while tracking moves and time."
   function startTimer() {
     if (started) return;
     started = true;
+    startTime = performance.now();
 
+    /* Derived from a wall-clock start so a throttled tab cannot slow the timer. */
     timer = window.setInterval(() => {
-      seconds += 1;
+      seconds = Math.floor((performance.now() - startTime) / 1000);
       time.textContent = seconds;
-    }, 1000);
+    }, 250);
   }
 
   function stopTimer() {
@@ -418,16 +437,37 @@ excerpt: "Match pairs of cards while tracking moves and time."
     for (const card of openCards) {
       card.textContent = "?";
       card.classList.remove("is-open");
-      card.setAttribute("aria-label", "Hidden card");
+      card.setAttribute("aria-label", `Hidden card ${card.dataset.index}`);
     }
 
     openCards = [];
     lock = false;
   }
 
+  function getBest() {
+    const value = Number(store.getItem(BEST_KEY));
+    return value > 0 ? value : null;
+  }
+
+  function renderBest() {
+    const best = getBest();
+    bestView.textContent = best === null ? "—" : `${best}s`;
+  }
+
   function finishGame() {
     stopTimer();
-    message.textContent = `Completed in ${moveCount} moves and ${seconds} seconds.`;
+
+    const best = getBest();
+    const isRecord = best === null || seconds < best;
+
+    if (isRecord) {
+      store.setItem(BEST_KEY, seconds);
+      renderBest();
+    }
+
+    message.textContent = isRecord
+      ? `Completed in ${moveCount} moves and ${seconds} seconds. New best time.`
+      : `Completed in ${moveCount} moves and ${seconds} seconds. Best: ${best}s.`;
   }
 
   function flip(card) {
@@ -459,7 +499,7 @@ excerpt: "Match pairs of cards while tracking moves and time."
       pairCount += 1;
       pairs.textContent = pairCount;
 
-      if (pairCount === 8) {
+      if (pairCount === totalPairs) {
         finishGame();
       }
 
@@ -486,6 +526,9 @@ excerpt: "Match pairs of cards while tracking moves and time."
     message.textContent = "";
 
     const theme = THEMES[Math.floor(Math.random() * THEMES.length)];
+    totalPairs = theme.length;
+    totalView.textContent = String(totalPairs);
+    renderBest();
     const cards = shuffle([...theme, ...theme]);
 
     game.innerHTML = "";
@@ -496,6 +539,7 @@ excerpt: "Match pairs of cards while tracking moves and time."
       card.type = "button";
       card.className = "memory-card";
       card.dataset.value = symbol;
+      card.dataset.index = String(index + 1);
       card.textContent = "?";
       card.setAttribute("aria-label", `Hidden card ${index + 1}`);
 
@@ -506,11 +550,13 @@ excerpt: "Match pairs of cards while tracking moves and time."
 
   function openHelp() {
     modal.classList.add("is-open");
+    panel.inert = true;
     close.focus();
   }
 
   function closeHelp() {
     modal.classList.remove("is-open");
+    panel.inert = false;
     help.focus();
   }
 

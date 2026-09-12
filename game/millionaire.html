@@ -552,6 +552,15 @@ excerpt: "500 soruluk havuzdan seçilen 10 soruyla Milyoner oyununu oynayın."
     fiftyBtn.classList.add("used");
   }
 
+  /* 50:50 may already have removed options, so the other lifelines must only
+     ever talk about the ones still on screen. */
+  function remainingOptionIndexes() {
+    return [...optionsEl.querySelectorAll(".millionaire-option")]
+      .map((button, optionIndex) =>
+        button.style.visibility === "hidden" ? -1 : optionIndex)
+      .filter(optionIndex => optionIndex >= 0);
+  }
+
   function usePhone() {
     if (locked || phoneBtn.disabled) return;
 
@@ -562,8 +571,10 @@ excerpt: "500 soruluk havuzdan seçilen 10 soruyla Milyoner oyununu oynayın."
     if (Math.random() < correctChance) {
       suggestion = q.c;
     } else {
-      const wrong = [0,1,2,3].filter(i => i !== q.c);
-      suggestion = wrong[Math.floor(Math.random() * wrong.length)];
+      const wrong = remainingOptionIndexes().filter(i => i !== q.c);
+      suggestion = wrong.length
+        ? wrong[Math.floor(Math.random() * wrong.length)]
+        : q.c;
     }
 
     messageEl.textContent =
@@ -579,21 +590,23 @@ excerpt: "500 soruluk havuzdan seçilen 10 soruyla Milyoner oyununu oynayın."
 
     const q = gameQuestions[index];
     const baseCorrect = Math.max(42, 72 - index * 3);
-    const remaining = 100 - baseCorrect;
+    const available = remainingOptionIndexes();
     const shares = [0,0,0,0];
 
     shares[q.c] = baseCorrect;
 
-    const wrong = [0,1,2,3].filter(i => i !== q.c);
-    const first = Math.floor(Math.random() * (remaining + 1));
-    const second = Math.floor(Math.random() * (remaining - first + 1));
+    const wrong = available.filter(i => i !== q.c);
+    let left = 100 - baseCorrect;
 
-    shares[wrong[0]] = first;
-    shares[wrong[1]] = second;
-    shares[wrong[2]] = remaining - first - second;
+    wrong.forEach((optionIndex, position) => {
+      const isLast = position === wrong.length - 1;
+      const value = isLast ? left : Math.floor(Math.random() * (left + 1));
+      shares[optionIndex] = value;
+      left -= value;
+    });
 
-    messageEl.textContent = shares
-      .map((value,i) => `${String.fromCharCode(65+i)}: %${value}`)
+    messageEl.textContent = available
+      .map(i => `${String.fromCharCode(65+i)}: %${shares[i]}`)
       .join("   ");
 
     audienceBtn.disabled = true;
@@ -622,27 +635,32 @@ excerpt: "500 soruluk havuzdan seçilen 10 soruyla Milyoner oyununu oynayın."
   audienceBtn.addEventListener("click", useAudience);
   document.getElementById("millionaire-new").addEventListener("click", newGame);
 
-  helpBtn.addEventListener("click", () => {
-    modal.classList.add("open");
-    closeBtn.focus();
-  });
+  const appEl = document.querySelector(".millionaire-app");
 
-  closeBtn.addEventListener("click", () => {
+  function openHelp() {
+    modal.classList.add("open");
+    appEl.inert = true;
+    closeBtn.focus();
+  }
+
+  function closeHelp() {
     modal.classList.remove("open");
+    appEl.inert = false;
     helpBtn.focus();
-  });
+  }
+
+  helpBtn.addEventListener("click", openHelp);
+  closeBtn.addEventListener("click", closeHelp);
 
   modal.addEventListener("click", event => {
     if (event.target === modal) {
-      modal.classList.remove("open");
-      helpBtn.focus();
+      closeHelp();
     }
   });
 
   document.addEventListener("keydown", event => {
     if (modal.classList.contains("open") && event.key === "Escape") {
-      modal.classList.remove("open");
-      helpBtn.focus();
+      closeHelp();
     }
   });
 
