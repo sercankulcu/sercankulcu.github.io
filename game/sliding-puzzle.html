@@ -20,7 +20,7 @@ excerpt: "Classic 15-puzzle: slide numbered tiles into order. Choose 3×3 or 4×
 .sp-title{margin:0;font-size:clamp(1.5rem,5vw,2rem);font-weight:750;letter-spacing:-.04em}
 .sp-topbar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
 .sp-stat{padding:10px 8px;border:1px solid var(--global-border-color);border-radius:13px;background:rgba(127,127,127,.04);text-align:center}
-.sp-stat small{display:block;opacity:.5;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.sp-stat small{display:block;opacity:.8;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .sp-stat strong{display:block;font-size:1.25rem;font-weight:750;margin-top:2px;font-variant-numeric:tabular-nums}
 .sp-size-tabs{display:flex;gap:6px;margin-bottom:12px}
 .sp-size-btn{flex:1;padding:9px;border:1px solid var(--global-border-color);border-radius:10px;background:rgba(127,127,127,.04);color:var(--global-text-color);font-size:.82rem;font-weight:700;transition:background .15s}
@@ -36,19 +36,31 @@ excerpt: "Classic 15-puzzle: slide numbered tiles into order. Choose 3×3 or 4×
   user-select:none;
 }
 .sp-tile{
+  position:relative;
   display:flex;align-items:center;justify-content:center;
   border-radius:12px;
+  color:var(--global-text-color);
+  font:inherit;
   font-weight:750;
   cursor:pointer;
   transition:transform .12s ease,background .2s;
   border:1px solid rgba(127,127,127,.15);
   -webkit-tap-highlight-color:transparent;
 }
+.sp-tile:focus-visible{outline:3px solid var(--global-link-color);outline-offset:2px}
+
+/* "Already in place" was a 18% tint only, which is both faint and colour-only. */
+.sp-tile.correct::after{
+  content:"\2713";
+  position:absolute;top:3px;right:5px;
+  font-size:.6rem;font-weight:900;line-height:1;opacity:.75;
+}
 .sp-tile:not(.blank):hover{transform:scale(.96)}
 .sp-tile.blank{background:transparent;border-color:transparent;cursor:default}
 .sp-tile:not(.blank){background:var(--global-bg-color);box-shadow:0 3px 10px rgba(0,0,0,.1)}
 .sp-tile.correct{background:color-mix(in srgb,#3aaa6f 18%,var(--global-bg-color))}
 .sp-controls{display:flex;gap:8px;margin-top:12px}
+.sp-controls .sp-btn{flex:1}
 .sp-btn{flex:1;padding:11px;border:1px solid var(--global-border-color);border-radius:12px;background:rgba(127,127,127,.04);color:var(--global-text-color);font-size:.85rem;font-weight:700;transition:background .15s}
 .sp-btn.primary{background:var(--global-text-color);color:var(--global-bg-color);border-color:var(--global-text-color)}
 .sp-btn:hover{opacity:.82}
@@ -56,9 +68,11 @@ excerpt: "Classic 15-puzzle: slide numbered tiles into order. Choose 3×3 or 4×
   text-align:center;padding:16px;margin-top:14px;
   border:1px solid var(--global-border-color);border-radius:14px;
   background:color-mix(in srgb,#3aaa6f 10%,transparent);
-  font-weight:700;color:#2f7a55;display:none;
+  font-weight:700;color:#1f5c3d;display:none;
 }
-.sp-hint{text-align:center;margin-top:8px;font-size:.72rem;opacity:.45}
+.sp-won.is-visible{display:block}
+:root[data-theme="dark"] .sp-won{color:#7fd6a6}
+.sp-hint{text-align:center;margin-top:8px;font-size:.72rem;opacity:.8}
 </style>
 
 <div class="sp-app">
@@ -73,18 +87,17 @@ excerpt: "Classic 15-puzzle: slide numbered tiles into order. Choose 3×3 or 4×
   </div>
 
   <div class="sp-size-tabs">
-    <button class="sp-size-btn" data-n="3">3 × 3</button>
-    <button class="sp-size-btn active" data-n="4">4 × 4</button>
-    <button class="sp-size-btn" data-n="5">5 × 5</button>
+    <button class="sp-size-btn" type="button" data-n="3" aria-pressed="false">3 × 3</button>
+    <button class="sp-size-btn active" type="button" data-n="4" aria-pressed="true">4 × 4</button>
+    <button class="sp-size-btn" type="button" data-n="5" aria-pressed="false">5 × 5</button>
   </div>
 
-  <div class="sp-board" id="sp-board"></div>
+  <div class="sp-board" id="sp-board" role="group" aria-label="Kayan bulmaca tahtası"></div>
 
-  <div class="sp-won" id="sp-won">🎉 Tebrikler! Bulmacayı çözdün!</div>
+  <div class="sp-won" id="sp-won" role="status" aria-live="polite"></div>
 
   <div class="sp-controls">
-    <button class="sp-btn" id="sp-shuffle-btn">Karıştır</button>
-    <button class="sp-btn primary" id="sp-new-btn">Yeni Oyun</button>
+    <button class="sp-btn primary" id="sp-new-btn" type="button">Yeni Oyun</button>
   </div>
   <div class="sp-hint">Boş hücreye komşu karo'ya tıkla veya ok tuşlarını kullan</div>
 </div>
@@ -109,6 +122,8 @@ let moves = 0;
 let seconds = 0;
 let timerInt = null;
 let won = false;
+let startTime = 0;
+let resizeTimer = 0;
 let bests = JSON.parse(store.getItem("sp.bests") || "{}");
 
 const board = document.getElementById("sp-board");
@@ -120,14 +135,26 @@ const wonEl = document.getElementById("sp-won");
 function fmt(s) { return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; }
 
 function bestKey() { return `n${N}`; }
-function getBest() { return bests[bestKey()] || null; }
+function getBest() {
+  const value = bests[bestKey()];
+  /* A zero is a real time, not a missing one. */
+  return Number.isFinite(value) && value >= 0 ? value : null;
+}
 function saveBest(s) { bests[bestKey()] = s; store.setItem("sp.bests", JSON.stringify(bests)); }
-function renderBest() { const b = getBest(); bestEl.textContent = b ? fmt(b) : "—"; }
+function renderBest() { const b = getBest(); bestEl.textContent = b === null ? "—" : fmt(b); }
 
 function startTimer() {
   clearInterval(timerInt);
   seconds = 0;
-  timerInt = setInterval(() => { seconds++; timeEl.textContent = fmt(seconds); }, 1000);
+  startTime = performance.now();
+  timeEl.textContent = fmt(0);
+  /* Derived from a wall-clock start: counting ticks let a throttled tab bank a
+     best time far shorter than the player actually took, and that time is
+     written straight to storage. */
+  timerInt = setInterval(() => {
+    seconds = Math.floor((performance.now() - startTime) / 1000);
+    timeEl.textContent = fmt(seconds);
+  }, 250);
 }
 function stopTimer() { clearInterval(timerInt); }
 
@@ -158,48 +185,77 @@ function shuffle() {
   blankIdx = tiles.indexOf(0);
 }
 
-function render() {
+function canMove(idx) {
+  const row = Math.floor(idx / N), col = idx % N;
+  const brow = Math.floor(blankIdx / N), bcol = blankIdx % N;
+  return Math.abs(row - brow) + Math.abs(col - bcol) === 1;
+}
+
+function render(focusIdx = -1) {
+  const keepFocus = board.contains(document.activeElement);
   board.style.gridTemplateColumns = `repeat(${N},1fr)`;
   const size = Math.min(520, board.clientWidth || 480) - 20;
-  const tileSize = Math.floor((size - (N-1)*6) / N);
+  /* A transiently collapsed board (mid-resize, or a hidden tab) would otherwise
+     compute a negative height and drop the style entirely. */
+  const tileSize = Math.max(24, Math.floor((size - (N-1)*6) / N));
   const fontSize = Math.max(14, Math.min(32, tileSize * 0.4));
   board.innerHTML = "";
   tiles.forEach((val, idx) => {
-    const tile = document.createElement("div");
-    tile.className = "sp-tile" + (val === 0 ? " blank" : "") + (val !== 0 && val === idx + 1 ? " correct" : "");
+    const blank = val === 0;
+    const tile = document.createElement(blank ? "div" : "button");
+    tile.className = "sp-tile" + (blank ? " blank" : "") + (!blank && val === idx + 1 ? " correct" : "");
     tile.style.height = tileSize + "px";
     tile.style.fontSize = fontSize + "px";
-    if (val !== 0) {
+    if (!blank) {
+      const movable = canMove(idx);
+      tile.type = "button";
       tile.textContent = val;
+      /* Only the tiles that can actually move are tab stops, so a 5x5 board
+         costs at most four stops instead of twenty-four. */
+      tile.tabIndex = movable ? 0 : -1;
+      tile.setAttribute("aria-label",
+        `${val}, satır ${Math.floor(idx/N)+1}, sütun ${idx%N+1}` +
+        (val === idx + 1 ? ", yerinde" : "") +
+        (movable ? "" : ", şu an oynanamaz"));
+      if (!movable) tile.setAttribute("aria-disabled", "true");
       tile.addEventListener("click", () => tryMove(idx));
     }
     board.appendChild(tile);
   });
+
+  if (keepFocus && focusIdx >= 0 && board.children[focusIdx]) {
+    board.children[focusIdx].focus();
+  }
 }
 
 function tryMove(idx) {
-  if (won) return;
-  const row = Math.floor(idx / N), col = idx % N;
-  const brow = Math.floor(blankIdx / N), bcol = blankIdx % N;
-  if (Math.abs(row - brow) + Math.abs(col - bcol) !== 1) return;
+  if (won || !canMove(idx)) return;
+  /* The tile slides into the slot the blank is vacating, so that is where the
+     keyboard focus has to follow it after the board is redrawn. */
+  const landedAt = blankIdx;
   [tiles[idx], tiles[blankIdx]] = [tiles[blankIdx], tiles[idx]];
   blankIdx = idx;
   moves++;
   movesEl.textContent = moves;
-  render();
+  render(landedAt);
   if (solved()) {
     stopTimer();
     won = true;
-    wonEl.style.display = "";
     const b = getBest();
-    if (!b || seconds < b) { saveBest(seconds); renderBest(); }
+    const record = b === null || seconds < b;
+    if (record) { saveBest(seconds); renderBest(); }
+    /* Written rather than merely unhidden, so assistive tech announces it. */
+    wonEl.textContent = `🎉 Tebrikler! ${moves} hamlede, ${fmt(seconds)} sürede çözdün.` +
+      (record ? " Yeni rekor!" : "");
+    wonEl.classList.add("is-visible");
   }
 }
 
 function newGame() {
   won = false; moves = 0;
   movesEl.textContent = "0";
-  wonEl.style.display = "none";
+  wonEl.textContent = "";
+  wonEl.classList.remove("is-visible");
   shuffle();
   render();
   startTimer();
@@ -218,14 +274,22 @@ window.addEventListener("keydown", e => {
   if (target >= 0) { e.preventDefault(); tryMove(target); }
 });
 
-document.getElementById("sp-shuffle-btn").addEventListener("click", newGame);
 document.getElementById("sp-new-btn").addEventListener("click", newGame);
+
+/* Tile heights are baked in as pixels at render time, so a rotation or a resized
+   window left the board at its old size until the next move. */
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => render(), 150);
+});
 
 document.querySelectorAll("[data-n]").forEach(btn => {
   btn.addEventListener("click", () => {
     N = +btn.dataset.n;
-    document.querySelectorAll("[data-n]").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+    document.querySelectorAll("[data-n]").forEach(b => {
+      b.classList.toggle("active", b === btn);
+      b.setAttribute("aria-pressed", String(b === btn));
+    });
     newGame();
   });
 });

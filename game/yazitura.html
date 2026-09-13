@@ -568,7 +568,7 @@ excerpt: "Pick heads or tails, place a virtual bet, and track your results."
       </div>
     </div>
 
-    <div class="coinflip-result" id="coinflip-result">
+    <div class="coinflip-result" id="coinflip-result" role="status" aria-live="polite">
       <div class="coinflip-result-title" id="coinflip-result-title">Choose a Side</div>
       <div class="coinflip-result-sub" id="coinflip-result-sub">Heads or tails?</div>
     </div>
@@ -661,18 +661,48 @@ catch { const mem = new Map(); store = {
 
   const START_BALANCE = 100;
   const SOUND_KEY = "coin-flip-sound";
+  const STATE_KEY = "coin-flip-state";
 
-  let balance = START_BALANCE;
-  let wins = 0;
-  let losses = 0;
+  function loadState() {
+    try {
+      const saved = JSON.parse(store.getItem(STATE_KEY));
+      if (!saved || typeof saved !== "object") return null;
+
+      const whole = (value, fallback = 0) =>
+        Number.isFinite(Number(value)) ? Math.max(0, Math.floor(Number(value))) : fallback;
+
+      return {
+        balance: whole(saved.balance, START_BALANCE),
+        wins: whole(saved.wins),
+        losses: whole(saved.losses),
+        bestStreak: whole(saved.bestStreak),
+        headsCount: whole(saved.headsCount),
+        tailsCount: whole(saved.tailsCount),
+        history: Array.isArray(saved.history)
+          ? saved.history
+              .filter(item => item && (item.side === "heads" || item.side === "tails"))
+              .slice(0, 10)
+              .map(item => ({ side: item.side, won: !!item.won, bet: whole(item.bet, 1) }))
+          : []
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  const restored = loadState();
+
+  let balance = restored ? restored.balance : START_BALANCE;
+  let wins = restored ? restored.wins : 0;
+  let losses = restored ? restored.losses : 0;
   let streak = 0;
-  let bestStreak = 0;
-  let headsCount = 0;
-  let tailsCount = 0;
+  let bestStreak = restored ? restored.bestStreak : 0;
+  let headsCount = restored ? restored.headsCount : 0;
+  let tailsCount = restored ? restored.tailsCount : 0;
   let choice = "heads";
   let bet = 10;
   let flipping = false;
-  let history = [];
+  let history = restored ? restored.history : [];
   let soundEnabled = store.getItem(SOUND_KEY) !== "off";
   let audioCtx = null;
   let streakTimer = null;
@@ -707,6 +737,14 @@ catch { const mem = new Map(); store = {
   const choiceButtons = [...document.querySelectorAll(".coinflip-choice")];
   const betButtons = [...document.querySelectorAll(".coinflip-bet")];
 
+  function saveState() {
+    try {
+      store.setItem(STATE_KEY, JSON.stringify({
+        balance, wins, losses, bestStreak, headsCount, tailsCount, history
+      }));
+    } catch {}
+  }
+
   function clampBet(value) {
     const number = Math.floor(Number(value));
     if (!Number.isFinite(number)) return 1;
@@ -718,14 +756,19 @@ catch { const mem = new Map(); store = {
     choice = nextChoice;
 
     choiceButtons.forEach(button => {
-      button.classList.toggle("is-selected", button.dataset.choice === choice);
+      const selected = button.dataset.choice === choice;
+      button.classList.toggle("is-selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
     });
 
     clickSound();
   }
 
   function clearBetSelection() {
-    betButtons.forEach(button => button.classList.remove("is-selected"));
+    betButtons.forEach(button => {
+      button.classList.remove("is-selected");
+      button.setAttribute("aria-pressed", "false");
+    });
   }
 
   function setBet(value) {
@@ -742,6 +785,7 @@ catch { const mem = new Map(); store = {
           : Number(valueString) === bet;
 
       button.classList.toggle("is-selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
     });
 
     updateFlipButton();
@@ -806,9 +850,13 @@ catch { const mem = new Map(); store = {
       el.className =
         `coinflip-history-coin ${item.won ? "is-win" : "is-lose"}`;
       el.textContent = item.side === "heads" ? "H" : "T";
-      el.title =
+      const label =
         `${item.side === "heads" ? "Heads" : "Tails"} · ` +
         `${item.won ? "Won" : "Lost"} ${item.bet}`;
+      el.title = label;
+      /* The win/lose state was carried by colour alone. */
+      el.setAttribute("role", "img");
+      el.setAttribute("aria-label", label);
       historyEl.appendChild(el);
     });
   }
@@ -865,9 +913,11 @@ catch { const mem = new Map(); store = {
     history.unshift({ side: outcome, won, bet });
     history = history.slice(0, 10);
     renderHistory();
+    saveState();
 
     if (balance <= 0) {
       balance = 0;
+      saveState();
       window.setTimeout(() => {
         resultBox.className = "coinflip-result is-lose";
         resultTitle.textContent = "OUT OF COINS";
@@ -962,22 +1012,21 @@ catch { const mem = new Map(); store = {
     resultSub.textContent = "Heads or tails?";
 
     choiceButtons.forEach(button => {
-      button.classList.toggle(
-        "is-selected",
-        button.dataset.choice === "heads"
-      );
+      const selected = button.dataset.choice === "heads";
+      button.classList.toggle("is-selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
     });
 
     betButtons.forEach(button => {
-      button.classList.toggle(
-        "is-selected",
-        button.dataset.bet === "10"
-      );
+      const selected = button.dataset.bet === "10";
+      button.classList.toggle("is-selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
     });
 
     customBet.value = "";
     renderHistory();
     updateHUD();
+    saveState();
     clickSound();
   }
 
@@ -1098,12 +1147,17 @@ catch { const mem = new Map(); store = {
   });
 
   document.addEventListener("keydown", event => {
-    if (event.target.tagName === "INPUT") return;
+    const tag = event.target.tagName;
+    if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
 
     const key = event.key.toLowerCase();
 
     if (key === "h") setChoice("heads");
     if (key === "t") setChoice("tails");
+
+    /* Space and Enter belong to whichever control has focus: hitting Enter on
+       Reset used to flip the coin instead of resetting. */
+    if (tag === "BUTTON" && (key === " " || key === "enter")) return;
 
     if ((key === " " || key === "enter") && !flipping) {
       event.preventDefault();
@@ -1112,6 +1166,16 @@ catch { const mem = new Map(); store = {
   });
 
   updateSoundButton();
+  choiceButtons.forEach(button => {
+    const selected = button.dataset.choice === choice;
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+  betButtons.forEach(button => {
+    const selected = button.dataset.bet === "10";
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
   updateHUD();
   renderHistory();
 })();

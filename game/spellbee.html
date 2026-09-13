@@ -21,6 +21,7 @@ excerpt: "Create Turkish words from seven letters while always using the center 
   --sb-honey-active: #f28c28;
   --sb-good: #2e7d32;
   --sb-bad: #c62828;
+  --sb-outer: #e8e2d4;
   width: min(740px, calc(100% - 24px));
   margin: .5rem auto 1.5rem;
   color: var(--global-text-color);
@@ -29,6 +30,12 @@ excerpt: "Create Turkish words from seven letters while always using the center 
 
 .spellbee-app button {
   font: inherit;
+}
+
+:root[data-theme="dark"] .spellbee-app {
+  --sb-good: #7ddc9a;
+  --sb-bad: #ff9a9a;
+  --sb-outer: #cfc7b4;
 }
 
 .sb-header {
@@ -121,7 +128,7 @@ excerpt: "Create Turkish words from seven letters while always using the center 
   height: 90px;
   padding: 0;
   border: 0;
-  background: var(--sb-honey);
+  background: var(--sb-outer);
   color: #161616;
   clip-path: polygon(25% 6.7%,75% 6.7%,100% 50%,75% 93.3%,25% 93.3%,0 50%);
   display: flex;
@@ -144,11 +151,12 @@ excerpt: "Create Turkish words from seven letters while always using the center 
 
 .sb-hex.center {
   background: var(--sb-honey);
+  box-shadow: inset 0 0 0 3px rgba(0,0,0,.22);
 }
 
 .sb-hex.selected {
   background: var(--sb-honey-active) !important;
-  color: #fff;
+  color: #161616;
   filter: brightness(.98);
 }
 
@@ -187,6 +195,9 @@ excerpt: "Create Turkish words from seven letters while always using the center 
   background: var(--sb-honey);
   color: #161616;
 }
+
+.sb-message.is-ok { color: var(--sb-good); }
+.sb-message.is-bad { color: var(--sb-bad); }
 
 .sb-message {
   min-height: 30px;
@@ -401,16 +412,23 @@ excerpt: "Create Turkish words from seven letters while always using the center 
 
   let DICTIONARY = new Set();
 
+  /* Every set below is checked against the shipped word list: 83-110 valid
+     words and at least six pangrams each, so the seven-letter bonus is real. */
   const PUZZLES = [
-    {center:"A", outer:["E","K","L","M","S","R"]},
-    {center:"E", outer:["K","L","N","T","R","İ"]},
-    {center:"İ", outer:["K","L","M","R","S","T"]},
-    {center:"O", outer:["K","L","M","R","S","T"]},
-    {center:"U", outer:["B","K","L","M","R","T"]},
-    {center:"A", outer:["B","Ç","D","K","R","T"]}
+    {center:"D", outer:["A","I","K","L","M","R"]},
+    {center:"O", outer:["A","K","L","M","N","U"]},
+    {center:"O", outer:["A","B","K","L","M","Ş"]},
+    {center:"Z", outer:["E","K","L","M","S","İ"]},
+    {center:"B", outer:["A","I","K","M","R","T"]},
+    {center:"Y", outer:["A","D","I","K","M","R"]},
+    {center:"Z", outer:["A","I","K","M","R","S"]},
+    {center:"C", outer:["A","I","K","L","N","Y"]},
+    {center:"Ç", outer:["E","K","M","R","T","İ"]},
+    {center:"P", outer:["E","K","L","M","T","İ"]}
   ];
 
   let puzzle = null;
+  let lastPuzzleIndex = -1;
   let current = "";
   let found = [];
   let scoreVal = 0;
@@ -432,7 +450,14 @@ excerpt: "Create Turkish words from seven letters while always using the center 
   const hexes = [...document.querySelectorAll(".sb-hex")];
 
   function pickPuzzle() {
-    puzzle = PUZZLES[Math.floor(Math.random() * PUZZLES.length)];
+    /* Without this, "Yeni Petek" hands back the board you just left often
+       enough to look broken. */
+    let index = Math.floor(Math.random() * PUZZLES.length);
+    if (PUZZLES.length > 1 && index === lastPuzzleIndex) {
+      index = (index + 1 + Math.floor(Math.random() * (PUZZLES.length - 1))) % PUZZLES.length;
+    }
+    lastPuzzleIndex = index;
+    puzzle = PUZZLES[index];
     outerOrder = [...puzzle.outer];
     found = [];
     current = "";
@@ -449,8 +474,10 @@ excerpt: "Create Turkish words from seven letters while always using the center 
 
   function renderHive() {
     hexes[0].textContent = puzzle.center;
+    hexes[0].setAttribute("aria-label", `${puzzle.center}, zorunlu merkez harf`);
     outerOrder.forEach((ch,index) => {
       hexes[index + 1].textContent = ch;
+      hexes[index + 1].setAttribute("aria-label", ch);
     });
   }
 
@@ -539,10 +566,11 @@ excerpt: "Create Turkish words from seven letters while always using the center 
 
   function showMessage(text, good) {
     messageEl.textContent = text;
-    messageEl.style.color = good ? "var(--sb-good)" : "var(--sb-bad)";
+    messageEl.className = good ? "sb-message is-ok" : "sb-message is-bad";
     clearTimeout(showMessage.timer);
     showMessage.timer = setTimeout(() => {
       messageEl.textContent = "";
+      messageEl.className = "sb-message";
     },1600);
   }
 
@@ -568,11 +596,20 @@ excerpt: "Create Turkish words from seven letters while always using the center 
 
   deleteBtn.addEventListener("click", deleteLastLetter);
 
+  function syncSelections() {
+    hexes.forEach(hex => hex.classList.remove("selected"));
+    clickHistory = [...current].map(ch =>
+      ch === puzzle.center ? 0 : outerOrder.indexOf(ch) + 1
+    ).filter(index => index > 0 || index === 0);
+    clickHistory.forEach(index => hexes[index].classList.add("selected"));
+  }
+
   shuffleBtn.addEventListener("click", () => {
     outerOrder.sort(() => Math.random() - .5);
     renderHive();
-    clearSelections();
-    current = "";
+    /* Rebuilt against the new order instead of thrown away: shuffling used to
+       wipe the word you were part-way through typing. */
+    syncSelections();
     renderWord();
   });
 
@@ -581,10 +618,7 @@ excerpt: "Create Turkish words from seven letters while always using the center 
 
   document.addEventListener("keydown", event => {
     if (helpModal.classList.contains("open")) {
-      if (event.key === "Escape") {
-        helpModal.classList.remove("open");
-        helpBtn.focus();
-      }
+      if (event.key === "Escape") closeHelp();
       return;
     }
 
@@ -609,21 +643,25 @@ excerpt: "Create Turkish words from seven letters while always using the center 
     }
   });
 
-  helpBtn.addEventListener("click", () => {
-    helpModal.classList.add("open");
-    closeBtn.focus();
-  });
+  const app = document.querySelector(".spellbee-app");
 
-  closeBtn.addEventListener("click", () => {
+  function openHelp() {
+    helpModal.classList.add("open");
+    app.inert = true;
+    closeBtn.focus();
+  }
+
+  function closeHelp() {
     helpModal.classList.remove("open");
+    app.inert = false;
     helpBtn.focus();
-  });
+  }
+
+  helpBtn.addEventListener("click", openHelp);
+  closeBtn.addEventListener("click", closeHelp);
 
   helpModal.addEventListener("click", event => {
-    if (event.target === helpModal) {
-      helpModal.classList.remove("open");
-      helpBtn.focus();
-    }
+    if (event.target === helpModal) closeHelp();
   });
 
   async function loadDictionary() {
@@ -661,6 +699,7 @@ excerpt: "Create Turkish words from seven letters while always using the center 
     } catch (error) {
       console.error("Spell Bee kelime listesi yüklenemedi:", error);
       messageEl.textContent = "Kelime listesi yüklenemedi.";
+      messageEl.className = "sb-message is-bad";
       hexes.forEach(hex => {
         hex.textContent = "";
         hex.disabled = true;

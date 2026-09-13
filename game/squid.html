@@ -455,7 +455,7 @@ excerpt: "Reach the finish line by moving only during the green light."
     </div>
 
     <div class="squid-game" id="squid-game">
-      <div class="squid-light is-red" id="squid-light">RED LIGHT</div>
+      <div class="squid-light is-red" id="squid-light" role="status" aria-live="assertive">RED LIGHT</div>
       <div class="squid-tree"></div>
       <div class="squid-doll is-red" id="squid-doll"></div>
       <div class="squid-finish"></div>
@@ -537,11 +537,19 @@ excerpt: "Reach the finish line by moving only during the green light."
   const CONTROLLED_INDEX = 2;
   const PLAYER_COUNT = 5;
   const PLAYER_SPEED = 3;
-  const LIGHT_INTERVAL = 4500;
+  /* A fixed interval turned the game into counting to four and a half. Random
+     phases make it a reaction test, which is what it is meant to be. */
+  const GREEN_MS = [1800, 4200];
+  const RED_MS = [1400, 3200];
+  /* ...and because the change is now unpredictable, a key that is already held
+     down gets a moment to be released before it counts as moving. */
+  const REACTION_GRACE_MS = 260;
 
   let players = [];
   let isGreen = false;
   let gameRunning = false;
+  let paused = false;
+  let redSince = 0;
   let lightTimer = null;
   let holdTimer = null;
 
@@ -567,7 +575,7 @@ excerpt: "Reach the finish line by moving only during the green light."
 
   function stopAllTimers() {
     if (lightTimer !== null) {
-      window.clearInterval(lightTimer);
+      window.clearTimeout(lightTimer);
       lightTimer = null;
     }
 
@@ -577,6 +585,7 @@ excerpt: "Reach the finish line by moving only during the green light."
 
   function setLight(green) {
     isGreen = green;
+    if (!green) redSince = performance.now();
 
     doll.classList.toggle("is-green", green);
     doll.classList.toggle("is-red", !green);
@@ -596,9 +605,17 @@ excerpt: "Reach the finish line by moving only during the green light."
     }
   }
 
-  function toggleLight() {
-    if (!gameRunning) return;
-    setLight(!isGreen);
+  function randomBetween([low, high]) {
+    return low + Math.random() * (high - low);
+  }
+
+  function scheduleLight() {
+    window.clearTimeout(lightTimer);
+    lightTimer = window.setTimeout(() => {
+      if (!gameRunning || paused) return;
+      setLight(!isGreen);
+      scheduleLight();
+    }, randomBetween(isGreen ? GREEN_MS : RED_MS));
   }
 
   function createPlayers() {
@@ -647,7 +664,7 @@ excerpt: "Reach the finish line by moving only during the green light."
     }
   }
 
-  function finishBottom(player) {
+  function finishBottom() {
     return Math.max(0, game.clientHeight - 105);
   }
 
@@ -666,15 +683,44 @@ excerpt: "Reach the finish line by moving only during the green light."
   }
 
   function movementAllowed() {
-    if (!gameRunning) return false;
+    if (!gameRunning || paused) return false;
 
     if (!isGreen) {
+      if (performance.now() - redSince < REACTION_GRACE_MS) return false;
       endGame(false);
       return false;
     }
 
     return true;
   }
+
+  function pauseGame() {
+    if (!gameRunning || paused) return;
+    paused = true;
+    window.clearTimeout(lightTimer);
+    lightTimer = null;
+    stopAutomaticPlayers();
+    stopHoldMovement();
+    audio.pause();
+  }
+
+  function resumeGame() {
+    if (!gameRunning || !paused) return;
+    paused = false;
+    /* A fresh reaction window, since the player was not watching the light. */
+    if (!isGreen) redSince = performance.now();
+    else {
+      audio.play().catch(() => {});
+      startAutomaticPlayers();
+    }
+    scheduleLight();
+  }
+
+  /* Losing the round because the tab went away is not the player's mistake. */
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) pauseGame();
+    else if (!modal.classList.contains("is-open")) resumeGame();
+  });
 
   function moveControlled(dx, dy) {
     if (!movementAllowed()) return;
@@ -689,7 +735,7 @@ excerpt: "Reach the finish line by moving only during the green light."
     left = Math.max(0, Math.min(game.clientWidth - width, left + dx));
     bottom = Math.max(0, bottom + dy);
 
-    const target = finishBottom(player);
+    const target = finishBottom();
 
     if (bottom >= target) {
       bottom = target;
@@ -725,7 +771,7 @@ excerpt: "Reach the finish line by moving only during the green light."
         let bottom = parseFloat(player.element.style.bottom) || 0;
         bottom += step;
 
-        const target = finishBottom(player);
+        const target = finishBottom();
 
         if (bottom >= target) {
           bottom = target;
@@ -754,22 +800,28 @@ excerpt: "Reach the finish line by moving only during the green light."
     stopAllTimers();
 
     gameRunning = true;
+    paused = false;
     message.textContent = "";
     restart.textContent = "New Game";
 
     createPlayers();
     setLight(true);
-
-    lightTimer = window.setInterval(toggleLight, LIGHT_INTERVAL);
+    scheduleLight();
   }
+
+  const panel = document.querySelector(".squid-panel");
 
   function openHelp() {
     modal.classList.add("is-open");
+    panel.inert = true;
+    pauseGame();
     close.focus();
   }
 
   function closeHelp() {
     modal.classList.remove("is-open");
+    panel.inert = false;
+    resumeGame();
     help.focus();
   }
 
@@ -807,6 +859,8 @@ excerpt: "Reach the finish line by moving only during the green light."
   upButton.addEventListener("pointercancel", stopHoldMovement);
 
   document.addEventListener("keydown", event => {
+    if (modal.classList.contains("is-open")) return;
+
     if (
       !["ArrowUp", "ArrowLeft", "ArrowRight"].includes(event.key) ||
       event.ctrlKey ||
@@ -840,6 +894,23 @@ excerpt: "Reach the finish line by moving only during the green light."
     if (event.key === "Escape" && modal.classList.contains("is-open")) {
       closeHelp();
     }
+  });
+
+  let resizeTimer = 0;
+  window.addEventListener("resize", () => {
+    window.clearTimeout(resizeTimer);
+    /* Positions are absolute pixels, so a narrower window would otherwise leave
+       players parked outside the track. */
+    resizeTimer = window.setTimeout(() => {
+      const target = finishBottom();
+      for (const player of players) {
+        const width = player.element.offsetWidth || 50;
+        const left = parseFloat(player.element.style.left) || 0;
+        const bottom = parseFloat(player.element.style.bottom) || 0;
+        player.element.style.left = `${Math.max(0, Math.min(game.clientWidth - width, left))}px`;
+        player.element.style.bottom = `${Math.min(bottom, target)}px`;
+      }
+    }, 150);
   });
 
   setLight(false);

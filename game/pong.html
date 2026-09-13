@@ -21,7 +21,7 @@ excerpt: "Classic Pong against the computer — three difficulty levels, smooth 
 .pong-icon-btn{width:40px;height:40px;border:1px solid var(--global-border-color);border-radius:11px;background:transparent;color:var(--global-text-color)}
 .pong-scorebar{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:10px}
 .pong-score{padding:10px 8px;border:1px solid var(--global-border-color);border-radius:14px;background:rgba(127,127,127,.04);text-align:center}
-.pong-score small{display:block;opacity:.5;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.pong-score small{display:block;opacity:.8;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .pong-score strong{display:block;font-size:1.6rem;font-weight:750;margin-top:2px}
 .pong-status{padding:9px 14px;border:1px solid var(--global-border-color);border-radius:14px;background:rgba(127,127,127,.04);text-align:center;font-weight:700;font-size:.82rem}
 .pong-canvas-wrap{position:relative;border:1px solid var(--global-border-color);border-radius:16px;overflow:hidden;background:#000;touch-action:none}
@@ -33,14 +33,15 @@ excerpt: "Classic Pong against the computer — three difficulty levels, smooth 
 .pong-overlay .pong-start-btn:hover{opacity:.88}
 .pong-controls-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
 .pong-ctrl-btn{padding:9px 6px;border:1px solid var(--global-border-color);border-radius:12px;background:rgba(127,127,127,.04);color:var(--global-text-color);font-size:.78rem;font-weight:700;transition:background .15s}
-.pong-ctrl-btn:hover,.pong-ctrl-btn.active{background:var(--global-text-color);color:var(--global-bg-color)}
-.pong-hint{text-align:center;margin-top:8px;font-size:.72rem;opacity:.45}
+.pong-ctrl-btn.active{background:var(--global-text-color);color:var(--global-bg-color)}
+.pong-ctrl-btn:hover:not(.active){background:rgba(127,127,127,.14)}
+.pong-hint{text-align:center;margin-top:8px;font-size:.72rem;opacity:.8}
 </style>
 
 <div class="pong-app">
   <div class="pong-header">
     <h1 class="pong-title">Pong</h1>
-    <button class="pong-icon-btn" id="pong-new" title="New game">↺</button>
+    <button class="pong-icon-btn" id="pong-new" type="button" title="New game" aria-label="New game">↺</button>
   </div>
 
   <div class="pong-scorebar">
@@ -48,7 +49,7 @@ excerpt: "Classic Pong against the computer — three difficulty levels, smooth 
       <small>Player</small>
       <strong id="pong-score-player">0</strong>
     </div>
-    <div class="pong-status" id="pong-status">First to 7 wins</div>
+    <div class="pong-status" id="pong-status" role="status" aria-live="polite">First to 7 wins</div>
     <div class="pong-score">
       <small>Computer</small>
       <strong id="pong-score-ai">0</strong>
@@ -56,18 +57,18 @@ excerpt: "Classic Pong against the computer — three difficulty levels, smooth 
   </div>
 
   <div class="pong-canvas-wrap" id="pong-wrap">
-    <canvas id="pong-canvas" width="800" height="450"></canvas>
+    <canvas id="pong-canvas" width="800" height="450" role="img" aria-label="Pong court. Your paddle is on the left, the computer paddle on the right. The score is shown above the court."></canvas>
     <div class="pong-overlay" id="pong-overlay">
       <h2>🏓 Pong</h2>
-      <p>Move your mouse or use W/S keys to control<br>the left paddle.</p>
+      <p>Move your mouse, or use W/S or ↑/↓,<br>to control the left paddle.</p>
       <button class="pong-start-btn" id="pong-start-btn">Start Game</button>
     </div>
   </div>
 
   <div class="pong-controls-bar">
-    <button class="pong-ctrl-btn active" id="diff-easy" data-diff="0">Easy</button>
-    <button class="pong-ctrl-btn" id="diff-med" data-diff="1">Medium</button>
-    <button class="pong-ctrl-btn" id="diff-hard" data-diff="2">Hard</button>
+    <button class="pong-ctrl-btn active" id="diff-easy" type="button" data-diff="0" aria-pressed="true">Easy</button>
+    <button class="pong-ctrl-btn" id="diff-med" type="button" data-diff="1" aria-pressed="false">Medium</button>
+    <button class="pong-ctrl-btn" id="diff-hard" type="button" data-diff="2" aria-pressed="false">Hard</button>
   </div>
   <div class="pong-hint">Mouse / touch &nbsp;·&nbsp; W / S or ↑ / ↓ keys &nbsp;·&nbsp; first to 7 points wins</div>
 </div>
@@ -97,6 +98,7 @@ let raf = 0;
 let ball, player, ai;
 let keysDown = {};
 let lastTime = 0;
+let resumeTimer = 0;
 
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
@@ -112,6 +114,7 @@ function initPaddles() {
 }
 
 function startGame() {
+  clearTimeout(resumeTimer);
   scores = [0, 0];
   updateScoreUI();
   initPaddles();
@@ -197,7 +200,10 @@ function scored(winner) {
     gameOver(winner);
   } else {
     document.getElementById("pong-status").textContent = winner === 0 ? "Player scores!" : "Computer scores!";
-    setTimeout(() => {
+    /* Guarded: pressing New game during the serve pause used to let this fire
+       afterwards and drop the game into "playing" with no loop running. */
+    resumeTimer = setTimeout(() => {
+      if (state !== "scored") return;
       initBall(winner === 0 ? 1 : -1);
       state = "playing";
       document.getElementById("pong-status").textContent = "Playing";
@@ -208,14 +214,19 @@ function scored(winner) {
 function gameOver(winner) {
   state = "over";
   cancelAnimationFrame(raf);
+  clearTimeout(resumeTimer);
   const ov = document.getElementById("pong-overlay");
   ov.innerHTML = `
     <h2>${winner === 0 ? "🎉 You Win!" : "💻 Computer Wins"}</h2>
     <p>Final score: <strong>${scores[0]} – ${scores[1]}</strong></p>
-    <button class="pong-start-btn" onclick="document.getElementById('pong-start-btn-inner').click()">Play Again</button>
+    <button class="pong-start-btn" type="button">Play Again</button>
   `;
   ov.style.display = "";
-  ov.querySelector("button").addEventListener("click", startGame);
+  const again = ov.querySelector("button");
+  again.addEventListener("click", startGame);
+  again.focus();
+  document.getElementById("pong-status").textContent =
+    winner === 0 ? `You win ${scores[0]}–${scores[1]}` : `Computer wins ${scores[1]}–${scores[0]}`;
 }
 
 function draw() {
@@ -275,15 +286,27 @@ function mouseMove(e) {
 wrap.addEventListener("mousemove", mouseMove);
 wrap.addEventListener("touchmove", e => { e.preventDefault(); mouseMove(e); }, { passive: false });
 
-window.addEventListener("keydown", e => { keysDown[e.key] = true; });
-window.addEventListener("keyup",   e => { keysDown[e.key] = false; });
+window.addEventListener("keydown", e => {
+  keysDown[e.key] = true;
+  /* Otherwise the arrow keys scroll the page out from under the player. */
+  if ((state === "playing" || state === "scored") &&
+      (e.key === "ArrowUp" || e.key === "ArrowDown")) e.preventDefault();
+});
+window.addEventListener("keyup", e => { keysDown[e.key] = false; });
+/* A key held while the window loses focus never sends its keyup, which left the
+   paddle gliding into the wall on return. */
+window.addEventListener("blur", () => { keysDown = {}; });
 
 document.getElementById("pong-start-btn").addEventListener("click", startGame);
 document.getElementById("pong-new").addEventListener("click", () => {
   cancelAnimationFrame(raf);
+  clearTimeout(resumeTimer);
   state = "idle";
+  scores = [0, 0];
+  updateScoreUI();
+  document.getElementById("pong-status").textContent = "First to 7 wins";
   const ov = document.getElementById("pong-overlay");
-  ov.innerHTML = `<h2>🏓 Pong</h2><p>Move your mouse or use W/S keys to control<br>the left paddle.</p><button class="pong-start-btn" id="pong-start-btn">Start Game</button>`;
+  ov.innerHTML = `<h2>🏓 Pong</h2><p>Move your mouse, or use W/S or ↑/↓,<br>to control the left paddle.</p><button class="pong-start-btn" id="pong-start-btn" type="button">Start Game</button>`;
   ov.style.display = "";
   document.getElementById("pong-start-btn").addEventListener("click", startGame);
 });
@@ -292,8 +315,10 @@ document.getElementById("pong-new").addEventListener("click", () => {
 document.querySelectorAll("[data-diff]").forEach(btn => {
   btn.addEventListener("click", () => {
     difficulty = +btn.dataset.diff;
-    document.querySelectorAll("[data-diff]").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+    document.querySelectorAll("[data-diff]").forEach(b => {
+      b.classList.toggle("active", b === btn);
+      b.setAttribute("aria-pressed", String(b === btn));
+    });
   });
 });
 
