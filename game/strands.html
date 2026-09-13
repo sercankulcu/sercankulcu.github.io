@@ -135,6 +135,7 @@ excerpt: "Find hidden words connected by a common theme."
 }
 
 .strands-tile {
+  position: relative;
   aspect-ratio: 1 / 1;
   min-width: 0;
   display: grid;
@@ -155,8 +156,8 @@ excerpt: "Find hidden words connected by a common theme."
 }
 
 .strands-tile.is-selected {
-  border-color: #c27a13;
-  background: #c27a13;
+  border-color: #9c6210;
+  background: #9c6210;
   color: #fff;
 }
 
@@ -166,8 +167,22 @@ excerpt: "Find hidden words connected by a common theme."
   color: #fff;
 }
 
-:root[data-theme="dark"] .strands-tile.is-selected { border-color: #d69e2e; background: #d69e2e; }
-:root[data-theme="dark"] .strands-tile.is-found    { border-color: #38a169; background: #38a169; }
+:root[data-theme="dark"] .strands-tile.is-selected { border-color: #d69e2e; background: #d69e2e; color: #10151c; }
+:root[data-theme="dark"] .strands-tile.is-found    { border-color: #38a169; background: #38a169; color: #10151c; }
+
+/* Selected and solved must not rest on background colour alone. */
+.strands-tile.is-selected::after,
+.strands-tile.is-found::after {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: .58rem;
+  font-weight: 900;
+  line-height: 1;
+  opacity: .9;
+}
+.strands-tile.is-selected::after { content: "\25CF"; }
+.strands-tile.is-found::after    { content: "\2713"; }
 
 .strands-tile:disabled {
   cursor: default;
@@ -403,7 +418,29 @@ excerpt: "Find hidden words connected by a common theme."
   let currentWord = "";
   let path = [];
   let solvedTiles = new Set();
+  let placements = {};
   let lastTheme = "";
+
+  const NEIGHBOURS = [...Array(SIZE * SIZE).keys()].map(index => {
+    const row = Math.floor(index / SIZE);
+    const column = index % SIZE;
+    const list = [];
+
+    for (let rowStep = -1; rowStep <= 1; rowStep++) {
+      for (let columnStep = -1; columnStep <= 1; columnStep++) {
+        if (rowStep === 0 && columnStep === 0) continue;
+
+        const nextRow = row + rowStep;
+        const nextColumn = column + columnStep;
+
+        if (nextRow >= 0 && nextRow < SIZE && nextColumn >= 0 && nextColumn < SIZE) {
+          list.push(nextRow * SIZE + nextColumn);
+        }
+      }
+    }
+
+    return list;
+  });
 
   function shuffle(items) {
     const copy = [...items];
@@ -468,25 +505,95 @@ excerpt: "Find hidden words connected by a common theme."
     return path;
   }
 
+  /* Lays each word along its own randomly chosen snake of adjacent tiles,
+     backtracking when a choice paints a later word into a corner. */
+  function layOutWords(words, budget) {
+    const used = new Set();
+    const result = {};
+    let steps = 0;
+
+    function walk(letters, position, cell, path) {
+      if (++steps > budget) return false;
+      if (used.has(cell) || path.includes(cell)) return false;
+
+      path.push(cell);
+      if (position === letters.length - 1) return true;
+
+      for (const next of shuffle(NEIGHBOURS[cell])) {
+        if (walk(letters, position + 1, next, path)) return true;
+      }
+
+      path.pop();
+      return false;
+    }
+
+    function place(wordIndex) {
+      if (steps > budget) return false;
+      if (wordIndex === words.length) return true;
+
+      const letters = [...words[wordIndex]];
+      const starts = shuffle(
+        [...Array(SIZE * SIZE).keys()].filter(index => !used.has(index))
+      );
+
+      for (const start of starts) {
+        const path = [];
+
+        if (walk(letters, 0, start, path)) {
+          path.forEach(cell => used.add(cell));
+          result[words[wordIndex]] = [...path];
+
+          if (place(wordIndex + 1)) return true;
+
+          path.forEach(cell => used.delete(cell));
+          delete result[words[wordIndex]];
+        }
+
+        if (steps > budget) return false;
+      }
+
+      return false;
+    }
+
+    return place(0) ? result : null;
+  }
+
   function buildBoard() {
     const board = Array(SIZE * SIZE).fill("");
-    const path = snakePath();
-    const words = shuffle(puzzle.words);
-    let cursor = 0;
+    let layout = null;
 
-    for (const word of words) {
-      for (const letter of word) {
-        if (cursor >= path.length) break;
+    for (let attempt = 0; attempt < 8 && layout === null; attempt++) {
+      layout = layOutWords(shuffle(puzzle.words), 60000);
+    }
 
-        board[path[cursor]] = letter;
-        cursor += 1;
+    if (layout === null) {
+      /* Serpentine fallback: readable, but always solvable. */
+      layout = {};
+      const path = snakePath();
+      let cursor = 0;
+
+      for (const word of shuffle(puzzle.words)) {
+        layout[word] = [];
+        for (const letter of word) {
+          if (cursor >= path.length) break;
+          layout[word].push(path[cursor]);
+          cursor += 1;
+        }
       }
     }
 
-    while (cursor < path.length) {
-      board[path[cursor]] =
-        ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
-      cursor += 1;
+    placements = layout;
+
+    for (const [word, cells] of Object.entries(layout)) {
+      [...word].forEach((letter, position) => {
+        board[cells[position]] = letter;
+      });
+    }
+
+    for (let index = 0; index < board.length; index++) {
+      if (!board[index]) {
+        board[index] = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
+      }
     }
 
     return board;
@@ -511,6 +618,13 @@ excerpt: "Find hidden words connected by a common theme."
   function selectTile(index) {
     if (solvedTiles.has(index)) {
       message.textContent = "That tile belongs to a word already found.";
+      return;
+    }
+
+    /* Tapping the tile you just added takes it back, which is the obvious
+       gesture and saves a trip to the Delete button. */
+    if (path.length > 0 && path[path.length - 1] === index) {
+      deleteLast();
       return;
     }
 
@@ -613,6 +727,11 @@ excerpt: "Find hidden words connected by a common theme."
       return;
     }
 
+    if ((placements[word] || []).join(",") !== path.join(",")) {
+      message.textContent = "Right word, wrong tiles - it is hidden elsewhere on the board.";
+      return;
+    }
+
     foundWords.push(word);
 
     for (const index of path) {
@@ -628,7 +747,7 @@ excerpt: "Find hidden words connected by a common theme."
     clearCurrent();
 
     message.textContent = foundWords.length === puzzle.words.length
-      ? "You found all five theme words."
+      ? `You found all ${puzzle.words.length} theme words.`
       : "Correct.";
   }
 
@@ -664,13 +783,17 @@ excerpt: "Find hidden words connected by a common theme."
     renderFound();
   }
 
+  const panel = document.querySelector(".strands-panel");
+
   function openHelp() {
     modal.classList.add("is-open");
+    panel.inert = true;
     close.focus();
   }
 
   function closeHelp() {
     modal.classList.remove("is-open");
+    panel.inert = false;
     help.focus();
   }
 

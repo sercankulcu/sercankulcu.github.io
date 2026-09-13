@@ -185,6 +185,12 @@ excerpt: "Play Tic Tac Toe against the computer with three difficulty levels."
   border-color: rgba(47, 133, 90, .45);
 }
 
+/* A computer win used to glow the same friendly green as yours. */
+.ttt-cell.is-win.is-o {
+  background: rgba(197, 48, 48, .13);
+  border-color: rgba(197, 48, 48, .45);
+}
+
 .ttt-cell:disabled {
   cursor: default;
 }
@@ -374,13 +380,53 @@ excerpt: "Play Tic Tac Toe against the computer with three difficulty levels."
   const modal = document.getElementById("ttt-modal");
   const close = document.getElementById("ttt-close");
 
+  /* Blocking site data makes localStorage itself throw, which would abort this
+     whole script. Fall back to a memory store so the page still works. */
+  let store;
+  try { localStorage.getItem("_probe"); store = localStorage; }
+  catch { const mem = new Map(); store = {
+    getItem: k => (mem.has(k) ? mem.get(k) : null),
+    setItem: (k, v) => { mem.set(k, String(v)); }
+  }; }
+
+  const SCORE_KEY = "tictactoe-score";
+
+  function loadScore() {
+    try {
+      const saved = JSON.parse(store.getItem(SCORE_KEY)) || {};
+      return {
+        win: Math.max(0, Number(saved.win) || 0),
+        loss: Math.max(0, Number(saved.loss) || 0),
+        draw: Math.max(0, Number(saved.draw) || 0)
+      };
+    } catch {
+      return { win: 0, loss: 0, draw: 0 };
+    }
+  }
+
+  const saved = loadScore();
+
   let board = Array(9).fill("");
   let gameOver = false;
   let locked = false;
-  let winCount = 0;
-  let lossCount = 0;
-  let drawCount = 0;
+  let winCount = saved.win;
+  let lossCount = saved.loss;
+  let drawCount = saved.draw;
   let aiTimer = null;
+
+  function saveScore() {
+    try {
+      store.setItem(SCORE_KEY, JSON.stringify({
+        win: winCount, loss: lossCount, draw: drawCount
+      }));
+    } catch {}
+  }
+
+  function renderScore() {
+    wins.textContent = String(winCount);
+    losses.textContent = String(lossCount);
+    draws.textContent = String(drawCount);
+  }
 
   function freeSquares(state = board) {
     return state
@@ -404,6 +450,9 @@ excerpt: "Play Tic Tac Toe against the computer with three difficulty levels."
     cell.textContent = player;
     cell.disabled = true;
     cell.classList.add(player === "X" ? "is-x" : "is-o");
+    /* An aria-label overrides the button's own text, so without this a screen
+       reader announced "Square 5" and never the mark sitting in it. */
+    cell.setAttribute("aria-label", `Square ${index + 1}, ${player}`);
   }
 
   function highlightWin(line) {
@@ -419,7 +468,8 @@ excerpt: "Play Tic Tac Toe against the computer with three difficulty levels."
     if (xLine) {
       gameOver = true;
       winCount += 1;
-      wins.textContent = String(winCount);
+      renderScore();
+      saveScore();
       message.textContent = "You win.";
       highlightWin(xLine);
       return true;
@@ -429,7 +479,8 @@ excerpt: "Play Tic Tac Toe against the computer with three difficulty levels."
     if (oLine) {
       gameOver = true;
       lossCount += 1;
-      losses.textContent = String(lossCount);
+      renderScore();
+      saveScore();
       message.textContent = "Computer wins.";
       highlightWin(oLine);
       return true;
@@ -438,7 +489,8 @@ excerpt: "Play Tic Tac Toe against the computer with three difficulty levels."
     if (isFull()) {
       gameOver = true;
       drawCount += 1;
-      draws.textContent = String(drawCount);
+      renderScore();
+      saveScore();
       message.textContent = "Draw.";
       return true;
     }
@@ -458,9 +510,11 @@ excerpt: "Play Tic Tac Toe against the computer with three difficulty levels."
     return undefined;
   }
 
-  function minimax(state, maximizing) {
-    if (winningLine("O", state)) return 10;
-    if (winningLine("X", state)) return -10;
+  /* Depth-weighted: an immediate win beats a win three moves later, so the
+     computer stops dawdling when it already has the game. */
+  function minimax(state, maximizing, depth = 0) {
+    if (winningLine("O", state)) return 10 - depth;
+    if (winningLine("X", state)) return depth - 10;
     if (isFull(state)) return 0;
 
     const available = freeSquares(state);
@@ -470,7 +524,7 @@ excerpt: "Play Tic Tac Toe against the computer with three difficulty levels."
 
       for (const index of available) {
         state[index] = "O";
-        best = Math.max(best, minimax(state, false));
+        best = Math.max(best, minimax(state, false, depth + 1));
         state[index] = "";
       }
 
@@ -481,7 +535,7 @@ excerpt: "Play Tic Tac Toe against the computer with three difficulty levels."
 
     for (const index of available) {
       state[index] = "X";
-      best = Math.min(best, minimax(state, true));
+      best = Math.min(best, minimax(state, true, depth + 1));
       state[index] = "";
     }
 
@@ -494,7 +548,7 @@ excerpt: "Play Tic Tac Toe against the computer with three difficulty levels."
 
     for (const index of freeSquares()) {
       board[index] = "O";
-      const score = minimax(board, false);
+      const score = minimax(board, false, 1);
       board[index] = "";
 
       if (score > bestScore) {
@@ -570,20 +624,25 @@ excerpt: "Play Tic Tac Toe against the computer with three difficulty levels."
 
       cell.type = "button";
       cell.className = "ttt-cell";
-      cell.setAttribute("aria-label", `Square ${index + 1}`);
+      cell.setAttribute("aria-label", `Square ${index + 1}, empty`);
       cell.addEventListener("click", () => playerMove(index));
 
       boardView.appendChild(cell);
     }
   }
 
+  const panel = document.querySelector(".tictactoe-panel") ||
+    document.querySelector(".ttt-panel");
+
   function openHelp() {
     modal.classList.add("is-open");
+    if (panel) panel.inert = true;
     close.focus();
   }
 
   function closeHelp() {
     modal.classList.remove("is-open");
+    if (panel) panel.inert = false;
     help.focus();
   }
 
@@ -605,6 +664,7 @@ excerpt: "Play Tic Tac Toe against the computer with three difficulty levels."
   restart.addEventListener("click", startRound);
   level.addEventListener("change", startRound);
 
+  renderScore();
   startRound();
 })();
 </script>

@@ -90,7 +90,7 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
 }
 
 .oneword-stat.time {
-  color: #d95f31;
+  color: #c2491c;
 }
 
 .oneword-progress {
@@ -105,7 +105,7 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
   display: block;
   width: 100%;
   height: 100%;
-  background: #d95f31;
+  background: #c2491c;
   transition: width 1s linear;
 }
 
@@ -134,21 +134,21 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
   justify-content: center;
   border: 0;
   border-radius: 9px;
-  background: #4caf50;
+  background: #2e7d32;
   color: #fff;
   font-size: clamp(1.15rem, 5vw, 1.75rem);
   font-weight: 900;
-  box-shadow: 0 3px 0 #388e3c;
+  box-shadow: 0 3px 0 #1b5e20;
   cursor: pointer;
   user-select: none;
   transition: transform .12s, box-shadow .12s;
 }
 
-:root[data-theme="dark"] .oneword-letter { background: #3daa42; box-shadow: 0 3px 0 #2d8632; }
+:root[data-theme="dark"] .oneword-letter { background: #2d8632; box-shadow: 0 3px 0 #1b5e20; }
 
 .oneword-letter:active {
   transform: translateY(2px);
-  box-shadow: 0 1px 0 #388e3c;
+  box-shadow: 0 1px 0 #1b5e20;
 }
 
 .oneword-input-wrap {
@@ -210,6 +210,15 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
   font-size: 1rem;
   font-weight: 800;
 }
+
+.oneword-message.is-error { color: #c53030; }
+.oneword-message.is-ok    { color: #2f855a; }
+.oneword-message.is-time  { color: #c2491c; }
+.oneword-message.is-info  { color: var(--global-link-color); }
+
+:root[data-theme="dark"] .oneword-message.is-error { color: #fc8181; }
+:root[data-theme="dark"] .oneword-message.is-ok    { color: #48bb78; }
+:root[data-theme="dark"] .oneword-message.is-time  { color: #f6875f; }
 
 .oneword-found {
   margin-top: 14px;
@@ -419,11 +428,13 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
   "use strict";
 
   let dictionary = new Set();
+  let playableWords = [];
 
   let score = 0;
   let letters = [];
   let timer = null;
   let timeLeft = 30;
+  let paused = false;
   let foundWords = [];
 
   const vowels = ["A","A","A","E","E","E","İ","İ","İ","I","I","O","O","U","U","Ö","Ü"];
@@ -439,6 +450,7 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
   const overlay = document.getElementById("oneword-overlay");
   const infoBtn = document.getElementById("oneword-info");
   const closeBtn = document.getElementById("oneword-close");
+  const app = document.querySelector(".oneword-app");
 
   function shuffle(array) {
     const copy = [...array];
@@ -457,11 +469,45 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
     return value.toLocaleLowerCase("tr-TR");
   }
 
-  function generateLetters() {
+  function drawLetters() {
     return shuffle([
       ...shuffle(vowels).slice(0,3),
       ...shuffle(consonants).slice(0,4)
     ]);
+  }
+
+  /* Stops as soon as the limit is reached, so an ordinary set costs a single
+     early-exit pass rather than a full scan of the word list. */
+  function countWords(source, limit) {
+    const pool = new Set(source);
+    let found = 0;
+
+    for (const word of playableWords) {
+      if (word.length > source.length) continue;
+
+      let possible = true;
+      for (const ch of word) {
+        if (!pool.has(ch)) { possible = false; break; }
+      }
+
+      if (possible && canBuild(word, source)) {
+        found++;
+        if (found >= limit) return found;
+      }
+    }
+
+    return found;
+  }
+
+  function generateLetters() {
+    /* A blind draw occasionally yields a set with no valid word at all, which
+       hands the player a dead 30 seconds. Re-draw instead. */
+    for (let attempt = 0; attempt < 40; attempt++) {
+      const candidate = drawLetters();
+      if (countWords(candidate, 3) >= 3) return candidate;
+    }
+
+    return drawLetters();
   }
 
   function updateLetters() {
@@ -487,8 +533,8 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
     }
   }
 
-  function canBuild(word) {
-    const available = [...letters];
+  function canBuild(word, source = letters) {
+    const available = [...source];
 
     for (const ch of [...trUpper(word)]) {
       const index = available.indexOf(ch);
@@ -502,18 +548,33 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
   function startTimer() {
     clearInterval(timer);
     timeLeft = 30;
+    syncPaused();
     updateTimer();
 
     timer = setInterval(() => {
+      if (paused) return;
+
       timeLeft--;
       updateTimer();
 
       if (timeLeft <= 0) {
+        /* newRound() wipes the list, so read the count before it runs. */
+        const total = foundWords.length;
         newRound();
-        showMessage("⏱️ Süre doldu, yeni harfler geldi.", "#d95f31");
+        showMessage(total
+          ? `⏱️ Süre doldu — ${total} kelime buldun. Yeni harfler geldi.`
+          : "⏱️ Süre doldu, yeni harfler geldi.", "time");
       }
     },1000);
   }
+
+  /* The round is a 30 second budget, not a stopwatch: it must not drain while
+     the player is reading the rules or the tab is in the background. */
+  function syncPaused() {
+    paused = document.hidden || overlay.classList.contains("open");
+  }
+
+  document.addEventListener("visibilitychange", syncPaused);
 
   function updateTimer() {
     timerEl.textContent = "Süre: " + timeLeft;
@@ -532,19 +593,19 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
     const lower = trLower(raw);
 
     if (upper.length < 2) {
-      showMessage("❌ En az 2 harf kullanmalısınız.", "#c53030");
+      showMessage("❌ En az 2 harf kullanmalısınız.", "error");
       input.value = "";
       return;
     }
 
     if (!canBuild(upper)) {
-      showMessage("❌ Yalnızca verilen harfleri kullanabilirsiniz.", "#c53030");
+      showMessage("❌ Yalnızca verilen harfleri kullanabilirsiniz.", "error");
       input.value = "";
       return;
     }
 
     if (foundWords.map(trLower).includes(lower)) {
-      showMessage("❌ Bu kelimeyi zaten kullandınız.", "#c53030");
+      showMessage("❌ Bu kelimeyi zaten kullandınız.", "error");
       input.value = "";
       return;
     }
@@ -555,26 +616,24 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
       score += gain;
       scoreEl.textContent = "Puan: " + score;
       renderFound();
-      showMessage("🎉 +" + gain + " puan kazandınız!", "#2f855a");
+      showMessage("🎉 +" + gain + " puan kazandınız!", "ok");
     } else {
-      showMessage("❌ Geçersiz kelime!", "#c53030");
+      showMessage("❌ Geçersiz kelime!", "error");
     }
 
     input.value = "";
     input.focus();
   }
 
-  const _isDark = () => document.documentElement.dataset.theme === "dark" ||
-    (!document.documentElement.dataset.theme && window.matchMedia("(prefers-color-scheme: dark)").matches);
-
-  function showMessage(text, color) {
+  /* The site has no prefers-color-scheme rules at all: light simply means the
+     data-theme attribute is absent. Let CSS decide instead of guessing here. */
+  function showMessage(text, tone) {
     messageEl.textContent = text;
-    if (color === "#c53030") color = _isDark() ? "#fc8181" : "#c53030";
-    if (color === "#2f855a") color = _isDark() ? "#48bb78" : "#2f855a";
-    messageEl.style.color = color;
+    messageEl.className = tone ? `oneword-message is-${tone}` : "oneword-message";
     clearTimeout(showMessage.timer);
     showMessage.timer = setTimeout(() => {
       messageEl.textContent = "";
+      messageEl.className = "oneword-message";
     },1800);
   }
 
@@ -607,7 +666,7 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
 
   document.getElementById("oneword-newletters").addEventListener("click", () => {
     newRound();
-    showMessage("Yeni harfler geldi.", "var(--global-link-color)");
+    showMessage("Yeni harfler geldi.", "info");
   });
 
   input.addEventListener("input", event => {
@@ -623,10 +682,7 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
 
   document.addEventListener("keydown", event => {
     if (overlay.classList.contains("open")) {
-      if (event.key === "Escape") {
-        overlay.classList.remove("open");
-        infoBtn.focus();
-      }
+      if (event.key === "Escape") closeHelp();
       return;
     }
 
@@ -641,6 +697,13 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
     if (event.key === "Enter") {
       event.preventDefault();
       checkWord();
+      return;
+    }
+
+    if (event.key === "Backspace") {
+      event.preventDefault();
+      input.value = input.value.slice(0,-1);
+      input.focus();
       return;
     }
 
@@ -660,21 +723,25 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
     }
   });
 
-  infoBtn.addEventListener("click", () => {
+  function openHelp() {
     overlay.classList.add("open");
+    app.inert = true;
+    syncPaused();
     closeBtn.focus();
-  });
+  }
 
-  closeBtn.addEventListener("click", () => {
+  function closeHelp() {
     overlay.classList.remove("open");
+    app.inert = false;
+    syncPaused();
     infoBtn.focus();
-  });
+  }
+
+  infoBtn.addEventListener("click", openHelp);
+  closeBtn.addEventListener("click", closeHelp);
 
   overlay.addEventListener("click", event => {
-    if (event.target === overlay) {
-      overlay.classList.remove("open");
-      infoBtn.focus();
-    }
+    if (event.target === overlay) closeHelp();
   });
 
   async function loadDictionary() {
@@ -700,6 +767,9 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
       }
 
       dictionary = new Set(data.words.map(word => trLower(String(word).trim())));
+      playableWords = [...dictionary]
+        .filter(word => word.length >= 2 && word.length <= 7)
+        .map(trUpper);
 
       input.disabled = false;
       document.getElementById("oneword-check").disabled = false;
@@ -711,6 +781,7 @@ excerpt: "Yedi harften olabildiğince çok Türkçe kelime türetmeye çalışı
       console.error("One Word kelime listesi yüklenemedi:", error);
       lettersEl.innerHTML = "";
       messageEl.textContent = "Kelime listesi yüklenemedi.";
+      messageEl.className = "oneword-message is-error";
     }
   }
 
