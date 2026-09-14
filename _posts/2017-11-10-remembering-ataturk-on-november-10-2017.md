@@ -1,6 +1,9 @@
 ---
 title: 'Remembering Atatürk on November 10, 2017'
-date: 2017-11-10
+date: 2017-11-10
+permalink: /posts/2017/11/remembering-ataturk-on-november-10-2017/
+redirect_from:
+  - /remembering-ataturk-on-november-10-2017/
 tags:
   - ataturk
   - november-10

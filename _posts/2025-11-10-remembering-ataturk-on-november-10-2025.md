@@ -1,6 +1,9 @@
 ---
 title: 'Remembering Atatürk on November 10, 2025'
-date: 2025-11-10
+date: 2025-11-10
+permalink: /posts/2025/11/remembering-ataturk-on-november-10-2025/
+redirect_from:
+  - /remembering-ataturk-on-november-10-2025/
 tags:
   - ataturk
   - november-10

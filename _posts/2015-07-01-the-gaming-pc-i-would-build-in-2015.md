@@ -1,6 +1,9 @@
 ---
 title: "The Gaming PC I Would Build in 2015"
 date: 2015-07-01
+permalink: /posts/2015/07/the-gaming-pc-i-would-build-in-2015/
+redirect_from:
+  - /the-gaming-pc-i-would-build-in-2015/
 tags: [computers, gaming, hardware, pc-build, technology]
 ---
 
