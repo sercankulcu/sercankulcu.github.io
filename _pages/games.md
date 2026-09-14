@@ -3,6 +3,8 @@ layout: archive
 permalink: /games/
 title: "Games"
 author_profile: true
+redirect_from:
+  - /game/
 ---
 
 <style>
