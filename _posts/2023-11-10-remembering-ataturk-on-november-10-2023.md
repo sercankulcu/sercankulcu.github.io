@@ -1,6 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2023'
-date: 2023-11-10
+date: 2023-11-10
 permalink: /posts/2023/11/remembering-ataturk-on-november-10-2023/
 redirect_from:
   - /remembering-ataturk-on-november-10-2023/

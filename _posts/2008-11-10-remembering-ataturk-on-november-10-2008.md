@@ -1,6 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2008'
-date: 2008-11-10
+date: 2008-11-10
 permalink: /posts/2008/11/remembering-ataturk-on-november-10-2008/
 redirect_from:
   - /remembering-ataturk-on-november-10-2008/
