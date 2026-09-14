@@ -1,6 +1,6 @@
 ---
 title: 'Remembering Atatürk on November 10, 2007'
-date: 2007-11-10
+date: 2007-11-10
 permalink: /posts/2007/11/remembering-ataturk-on-november-10-2007/
 redirect_from:
   - /remembering-ataturk-on-november-10-2007/
