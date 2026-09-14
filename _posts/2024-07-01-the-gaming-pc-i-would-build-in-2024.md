@@ -1,6 +1,9 @@
 ---
 title: "The Gaming PC I Would Build in 2024"
 date: 2024-07-01
+permalink: /posts/2024/07/the-gaming-pc-i-would-build-in-2024/
+redirect_from:
+  - /the-gaming-pc-i-would-build-in-2024/
 tags: [computers, gaming, hardware, pc-build, technology]
 ---
 

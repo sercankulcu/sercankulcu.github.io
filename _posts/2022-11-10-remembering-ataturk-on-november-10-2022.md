@@ -1,6 +1,9 @@
 ---
 title: 'Remembering Atatürk on November 10, 2022'
-date: 2022-11-10
+date: 2022-11-10
+permalink: /posts/2022/11/remembering-ataturk-on-november-10-2022/
+redirect_from:
+  - /remembering-ataturk-on-november-10-2022/
 tags:
   - ataturk
   - november-10

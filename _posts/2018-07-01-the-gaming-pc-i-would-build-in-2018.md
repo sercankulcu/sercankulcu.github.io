@@ -1,6 +1,9 @@
 ---
 title: "The Gaming PC I Would Build in 2018"
 date: 2018-07-01
+permalink: /posts/2018/07/the-gaming-pc-i-would-build-in-2018/
+redirect_from:
+  - /the-gaming-pc-i-would-build-in-2018/
 tags: [computers, gaming, hardware, pc-build, technology]
 ---
 

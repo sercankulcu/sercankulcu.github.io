@@ -1,6 +1,9 @@
 ---
 title: "The Gaming PC I Would Build in 2020"
 date: 2020-07-01
+permalink: /posts/2020/07/the-gaming-pc-i-would-build-in-2020/
+redirect_from:
+  - /the-gaming-pc-i-would-build-in-2020/
 tags: [computers, gaming, hardware, pc-build, technology]
 ---
 

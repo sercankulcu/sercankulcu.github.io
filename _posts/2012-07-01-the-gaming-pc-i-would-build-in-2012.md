@@ -1,6 +1,9 @@
 ---
 title: "The Gaming PC I Would Build in 2012"
 date: 2012-07-01
+permalink: /posts/2012/07/the-gaming-pc-i-would-build-in-2012/
+redirect_from:
+  - /the-gaming-pc-i-would-build-in-2012/
 tags: [computers, gaming, hardware, pc-build, technology]
 ---
 
