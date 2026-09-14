@@ -18,22 +18,38 @@ button {
 <script>
 let deferredPrompt;
 
+function showInstallPrompt() {
+    const wrapper = document.getElementById("install");
+    if (deferredPrompt && wrapper) {
+        wrapper.style.display = "block";
+    }
+}
+
 window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     deferredPrompt = event;
-    document.getElementById("install").style.display = "block";
+    showInstallPrompt();
 });
 
-document.getElementById("installPWA").addEventListener("click", async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        deferredPrompt = null;
+document.addEventListener("DOMContentLoaded", () => {
+    const installButton = document.getElementById("installPWA");
+    if (!installButton) {
+        return;
     }
-});
 
-window.addEventListener("appinstalled", () => {
-    document.getElementById("installPWA").style.display = "none";
+    showInstallPrompt();
+
+    installButton.addEventListener("click", async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+        }
+    });
+
+    window.addEventListener("appinstalled", () => {
+        installButton.style.display = "none";
+    });
 });
 </script>
 
