@@ -3,8 +3,8 @@ title: 'Book Suggestions For Software Engineers'
 date: 2019-08-12
 permalink: /posts/2019/08/book-suggestions-for-software-engineers/
 tags:
-   - self-improvement
-   - productivity
+  - self-improvement
+  - productivity
 ---
 
 Software engineers spend a lot of time learning from screens — documentation, source code, issue trackers, tutorials, and online discussions. Books offer a different pace. They allow one author to develop an idea fully, without competing with notifications and search results, and without the pressure to be immediately practical that tutorials often carry.

@@ -3,8 +3,8 @@ title: 'Vim A Powerful Text Editor'
 date: 2016-05-14
 permalink: /posts/2016/05/vim-a-powerful-text-editor/
 tags:
-   - software
-   - productivity
+  - software
+  - productivity
 ---
 
 Vim is one of those tools that looks unfriendly before it starts to make sense. The first time someone opens it, even quitting the editor requires knowledge that is not obvious — `:q` to quit, `:wq` to save and quit, or `:q!` to quit without saving. That has become a standing joke among programmers, but it also explains something important about the editor. Vim does not try to behave like a normal graphical text editor. It is a modal editor with a grammar.

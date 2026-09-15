@@ -3,11 +3,11 @@ title: "The Day Everyone Became a Manager"
 date: 2010-07-08
 permalink: /posts/2010/07/the-day-everyone-became-a-manager/
 tags:
-   - work
-   - career
-   - office-life
-   - memories
-   - humor
+  - work
+  - career
+  - office-life
+  - memories
+  - humor
 ---
 
 There are many ways to become a manager: promotion, experience, performance, politics, seniority, a carefully planned career path. And then there is the method we discovered one day at a small company — everyone above you disappears.

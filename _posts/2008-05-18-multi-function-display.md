@@ -3,9 +3,9 @@ title: 'Multi-Function Display'
 date: 2008-05-18
 permalink: /posts/2008/05/multi-function-display/
 tags:
-   - career
-   - institutions
-   - self-improvement
+  - career
+  - institutions
+  - self-improvement
 ---
 
 A Multi-Function Display, usually called an MFD, is one of the cockpit systems that interests me because it brings many different kinds of information onto a single screen. Instead of giving every function its own instrument, the display can change according to what the pilot needs at that moment.

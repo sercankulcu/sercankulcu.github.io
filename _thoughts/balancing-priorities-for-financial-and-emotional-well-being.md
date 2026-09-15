@@ -3,9 +3,9 @@ title: 'Not Every Need Becomes Your Duty'
 date: 2018-10-06
 description: "Not every genuine need creates a duty in the person who happens to be nearby."
 tags:
-   - autonomy
-   - relationships
-   - responsibility
+  - autonomy
+  - relationships
+  - responsibility
 ---
 
 Other people's needs can become obligations in our minds before anyone has actually asked us to accept them.

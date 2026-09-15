@@ -3,9 +3,9 @@ title: 'You Are Central to Your Experience, Not to Everyone Else'
 date: 2022-08-11
 description: "We are central to our own experience, but not to everyone else's, and that distinction can make us kinder."
 tags:
-   - judgment
-   - ego
-   - reflection
+  - judgment
+  - ego
+  - reflection
 ---
 
 Every person experiences life from the center of one private world.

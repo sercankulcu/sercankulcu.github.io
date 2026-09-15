@@ -3,8 +3,8 @@ title: 'Apple Silicon And The Return Of Processor Diversity'
 date: 2021-01-31
 permalink: /posts/2021/01/apple-silicon-and-the-return-of-processor-diversity/
 tags:
-   - hardware
-   - technology
+  - hardware
+  - technology
 ---
 
 Apple announced its transition from Intel processors to its own Apple Silicon at WWDC in June 2020 and shipped the first M1 Macs — the MacBook Air, 13-inch MacBook Pro, and Mac mini — in November 2020. By January 2021, reviews and benchmarks have had time to accumulate, and the results are unusual enough to warrant serious attention.

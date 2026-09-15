@@ -3,11 +3,11 @@ title: "Sometimes Distance Is Not Bitterness, It Is Structure"
 date: 2009-01-03
 description: "Staying friends with an ex requires honesty about attachment, timing, boundaries, and unfinished hope."
 tags:
-   - relationships
-   - memories
-   - endings
-   - friendship
-   - reflection
+  - relationships
+  - memories
+  - endings
+  - friendship
+  - reflection
 ---
 
 People often say it is mature to stay friends with an ex. Maybe sometimes it is. Maybe sometimes it works perfectly. But there is a version of this arrangement that looks much better in theory than it feels in real life.

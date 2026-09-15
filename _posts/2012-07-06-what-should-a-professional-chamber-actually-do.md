@@ -3,11 +3,11 @@ title: "What Should a Professional Chamber Actually Do?"
 date: 2012-07-06
 permalink: /posts/2012/07/what-should-a-professional-chamber-actually-do/
 tags:
-   - computer-engineering
-   - career
-   - institutions
-   - memories
-   - engineering
+  - computer-engineering
+  - career
+  - institutions
+  - memories
+  - engineering
 ---
 
 In July 2012, I wrote about the newly formed Chamber of Computer Engineers. My first reaction was not philosophical — it was financial. I wrote, roughly: I will love this chamber as long as nobody comes to my door saying, "hands in your pockets." In other words: please do not ask me for dues. That was the joke. But underneath it was a more serious question: what exactly should a professional chamber do for a computer engineer?

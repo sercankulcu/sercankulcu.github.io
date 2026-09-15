@@ -3,9 +3,9 @@ title: 'Growing Up Means Learning Which Voice Is Yours'
 date: 2014-10-06
 description: "An expectation repeated long enough can begin to sound like an inner voice."
 tags:
-   - identity
-   - expectations
-   - independence
+  - identity
+  - expectations
+  - independence
 ---
 
 Growing up teaches us to notice what other people need. We learn to wait, share, explain, and accept that wanting something does not settle whether we should have it.

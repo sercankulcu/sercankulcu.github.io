@@ -3,9 +3,9 @@ title: "A Friday Night at IKEA Ankara"
 date: 2011-09-30
 permalink: /posts/2011/09/a-friday-night-at-ikea-ankara/
 tags:
-   - ankara
-   - city-life
-   - memories
+  - ankara
+  - city-life
+  - memories
 ---
 
 Some places begin as stores and somehow become part of a city's social life. That was the strange thing about IKEA Ankara. In September 2011, I wrote about it with the kind of confidence I often had then when observing other people's habits. I had tried the famous meatballs, and my conclusion was that anyone going there only to eat them needed to reconsider their life choices. I had also heard — and partly observed — that Mamak's nightlife seemed to be happening there; the place was crowded with people who did not fit any single category. And when people said it was the biggest IKEA in Turkey, I dismissed that too: of course it was big, I thought, half of it was pillows and duvets. That was the entry — short, mocking, very certain.

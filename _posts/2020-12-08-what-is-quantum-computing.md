@@ -3,9 +3,9 @@ title: 'What Is Quantum Computing?'
 date: 2020-12-08
 permalink: /posts/2020/12/what-is-quantum-computing/
 tags:
-   - career
-   - physics
-   - software
+  - career
+  - physics
+  - software
 ---
 
 Quantum computing is often described as a technology that will make computers unbelievably fast. That description is too simple and somewhat misleading. A quantum computer is not a faster version of an ordinary computer for every task. It is a different model of computation that can offer major advantages for specific kinds of problems — and very little advantage for most of the things ordinary computers do every day.

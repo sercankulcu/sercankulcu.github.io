@@ -3,8 +3,8 @@ title: 'Why We Need Operating Systems?'
 date: 2023-02-02
 permalink: /posts/2023/02/why-we-need-operating-systems/
 tags:
-   - computer-science
-   - software
+  - computer-science
+  - software
 ---
 
 A computer without an operating system would still be a computer. The processor would still execute instructions. Memory would still store values. But using it would require detailed knowledge of the specific hardware — the exact memory addresses where data should be placed, the precise sequence of instructions to communicate with a storage device, the mechanism for switching between different tasks. Early computers operated this way. Human operators loaded programs manually, assigned resources directly, and managed the hardware as closely as the machine itself.

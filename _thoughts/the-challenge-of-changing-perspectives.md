@@ -3,9 +3,9 @@ title: 'Changing Your Mind Is Not Losing'
 date: 2019-03-24
 description: "In debate, changing sides looks like losing. In inquiry, refusing to update when evidence changes is the real failure."
 tags:
-   - belief
-   - truth
-   - knowledge
+  - belief
+  - truth
+  - knowledge
 ---
 
 Changing an opinion can feel strangely personal.

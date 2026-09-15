@@ -3,8 +3,8 @@ title: 'Kotlin Arrives On Android'
 date: 2017-04-23
 permalink: /posts/2017/04/kotlin-arrives-on-android/
 tags:
-   - mobile
-   - programming
+  - mobile
+  - programming
 ---
 
 Java has been the main language of Android development since the first Android SDK in 2008. It has worked, but it has also accumulated frustrations that Android developers have complained about for years. Kotlin — designed by JetBrains and reaching version 1.0 in February 2016 — has been gaining serious traction as an alternative, and the community momentum suggests this is no longer a niche experiment.
