@@ -21,6 +21,8 @@ The pencil will eventually be sharpened away.
 
 Yet the manufacturer gives its surface extraordinary attention.
 
+## Lacquer
+
 Lacquer is one of the first things collectors notice.
 
 Premium Japanese pencils often use deep, even finishes with strong color saturation and smooth transitions across flats and corners.
@@ -57,6 +59,8 @@ The goal is controlled application.
 
 Japanese premium pencils often succeed because the finish feels deliberate rather than merely thick.
 
+## Typography and End Treatment
+
 Typography adds a second layer of precision.
 
 Gold or silver stamping is usually expected to be crisp.
@@ -91,6 +95,8 @@ The Japanese premium aesthetic often emphasizes a clean uninterrupted barrel.
 
 That visual restraint makes the imprint and lacquer even more important.
 
+## Sharpening Is the Real Test
+
 Core centering is another area where expectations are high.
 
 A beautifully finished pencil loses credibility if the graphite is obviously off-center.
@@ -110,6 +116,8 @@ Tight glue line.
 Even support.
 
 These are the hidden details that justify the exterior.
+
+## Darker and Smoother, With Caveats
 
 Japanese premium pencils are also famous among users for smooth, dark writing.
 
@@ -191,6 +199,8 @@ Tombow similarly connects traditional wooden pencils with the MONO identity, era
 
 Long-running corporate design systems make these families rewarding to study.
 
+## Packaging and Variant Discipline
+
 Packaging is especially important in Japanese stationery.
 
 Boxes and sets often receive as much visual attention as the pencils.
@@ -237,6 +247,8 @@ A character print on the same underlying pencil may be primarily a graphic varia
 
 All can be collectible, but they answer different questions.
 
+## Preservation and the Two-Pencil Rule
+
 Finish quality also affects preservation.
 
 Glossy lacquer shows scratches easily.
@@ -269,6 +281,8 @@ A collector who never sharpens one may never understand why the model became fam
 
 Duplicates solve the problem when affordable.
 
+## Dating Vintage Japanese Pencils
+
 Vintage Japanese pencils introduce a chronology challenge.
 
 Logos change.
@@ -294,6 +308,8 @@ Machine translation can help later.
 Packaging codes may also prove useful.
 
 The important point is to preserve the evidence.
+
+## National Context Comes After Inspection
 
 The rise of Japanese premium pencils should be understood in the broader context of postwar manufacturing.
 
@@ -348,6 +364,8 @@ A special print may be fun but technically ordinary.
 A plain professional pencil may contain more manufacturing interest.
 
 Both can belong in a collection if the purpose is clear.
+
+## Refinement Instead of Invention
 
 Japanese pencils are also useful for comparing finish philosophies with German pencils.
 
@@ -420,6 +438,8 @@ A new end cap matters.
 The design vocabulary is quiet.
 
 Collectors learn to read quietly.
+
+## Finish Changes How Disposal Feels
 
 Finish also changes the emotional perception of disposability.
 

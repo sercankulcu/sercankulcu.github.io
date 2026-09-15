@@ -19,6 +19,8 @@ That fact produced one of the strangest branches of pencil history: the electrog
 
 These pencils belonged to the world of automated test scoring, punched cards, tabulating machines, and early information processing. They looked much like ordinary wooden pencils, but their job connected handwriting directly to machinery.
 
+## Graphite Conducts
+
 The principle depended on a familiar property of graphite.
 
 Graphite conducts electricity.
@@ -53,6 +55,8 @@ The intelligence came from the layout of the form.
 
 The pencil supplied the signal.
 
+## Reynold B. Johnson and the IBM 805
+
 The story is closely associated with Reynold B. Johnson.
 
 In the early 1930s, Johnson was a high-school physics teacher in Ironwood, Michigan. He began experimenting with ways to automate the scoring of objective tests, which were becoming increasingly common in schools and professional examinations.
@@ -86,6 +90,8 @@ But the sensing principle was different.
 Modern optical mark recognition looks at how much light is reflected from a region.
 
 Early electrographic systems cared about electrical conductivity.
+
+## Why the Pencil Had to Be Special
 
 That difference affected the pencil.
 
@@ -130,6 +136,8 @@ Even the direction and completeness of the mark could matter.
 The answer sheet was therefore not passive paper.
 
 It was part of an electrical interface.
+
+## Mark Sense Beyond Test Scoring
 
 IBM extended Mark Sense beyond test scoring.
 
@@ -189,6 +197,8 @@ Machine-readable record.
 
 The entire sequence could begin with graphite.
 
+## Where "Use a No. 2 Pencil" Came From
+
 This technology also explains the long cultural association between standardized tests and the No. 2 pencil.
 
 The connection is more complicated than the usual story.
@@ -239,6 +249,8 @@ The engineering changes.
 
 The rule becomes culture.
 
+## Identifying One in a Collection
+
 For collectors, electrographic pencils are especially appealing because the barrel often looks understated.
 
 An IBM Electrographic pencil is typically recognized by its imprint rather than an exotic shape.
@@ -269,6 +281,8 @@ Those instructions transform the object from stationery into documentation.
 
 For a collector, I would preserve that packaging as carefully as the pencil itself.
 
+## Leads, Cards and Manuals
+
 Mechanical-pencil leads are another part of the story.
 
 IBM sold electrographic leads separately for holders.
@@ -292,6 +306,8 @@ The machine manual explains why the mark had to conduct electricity.
 The pencil box explains how the user was expected to make the mark.
 
 Each object provides information the others lack.
+
+## Two Audiences: Writer and Machine
 
 There were also electrographic and machine-scoring pencils from manufacturers beyond IBM.
 
@@ -345,6 +361,8 @@ The graphite handled detection.
 
 The machine handled conversion.
 
+## The Ritual Survived the Physics
+
 The same logic appears in modern bubble sheets even though the sensing mechanism has changed.
 
 Fill the correct region.
@@ -372,6 +390,8 @@ The bubble sheet looks ordinary.
 The pencil instruction looks ordinary.
 
 But both descend from a period when engineers were literally sending electric current through pencil marks.
+
+## Testing a Vintage Example
 
 Testing a vintage Electrographic pencil today can be tempting because collectors often praise the dark, smooth line.
 

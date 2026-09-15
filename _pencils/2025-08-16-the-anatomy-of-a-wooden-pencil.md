@@ -11,6 +11,8 @@ tags:
 
 A wooden pencil can be read almost like a small machine. Start at the point and move backward: core, wood, adhesive, lacquer, imprint, barrel geometry, end treatment, ferrule, and eraser. Each part has a job, and each part gives a collector something different to inspect.
 
+## The Core
+
 The most obvious component is the core.
 
 In an ordinary graphite pencil, the core is not metallic lead. It is a manufactured composite based on graphite and mineral material such as clay, with binders and lubricating treatments used to control strength, hardness, friction, and deposition.
@@ -34,6 +36,8 @@ A wandering core can appear centered at one end and drift toward one side farthe
 This becomes visible only after repeated sharpening.
 
 Centering is one of the first quality clues collectors notice.
+
+## The Sandwich and the Glue Line
 
 At the factory, the core sits in a groove cut into a wooden slat.
 
@@ -65,6 +69,8 @@ A pencil dropped on a hard floor can fracture internally while appearing normal 
 
 Good bonding does not make the graphite indestructible, but it reduces the consequences of damage.
 
+## The Wood
+
 The wood is the next major component.
 
 Its job is mechanical.
@@ -86,6 +92,8 @@ Incense cedar is famous in pencil making, but species alone does not define qual
 Basswood and other suitable woods can perform very well when selected, dried, machined, and bonded carefully.
 
 A better question than “Is it cedar?” is “Does it sharpen cleanly and protect the core?”
+
+## Geometry, Diameter and Length
 
 The barrel geometry is created after the slats are glued.
 
@@ -120,6 +128,8 @@ Carpenter pencils are often physically broader and may differ in length.
 Promotional pencils can be made in unusual formats.
 
 Collectors should measure before sharpening when dimensions matter.
+
+## Finish
 
 The outer finish is another engineered layer.
 
@@ -162,6 +172,8 @@ The primer beneath the color can matter too.
 A dark topcoat over a pale base may reveal chips clearly.
 
 Collectors often see this around sharpened cones and worn edges.
+
+## The Imprint
 
 The imprint sits on top of the finish but carries disproportionate historical value.
 
@@ -219,6 +231,8 @@ Repeated on packaging.
 
 The grade is both technical information and part of visual design.
 
+## End Treatment
+
 End treatment marks the transition between barrel and rear hardware.
 
 Untipped pencils may end in exposed wood.
@@ -240,6 +254,8 @@ Some manufacturers use a color system so users can identify hardness quickly in 
 Others keep all grades visually identical except for printed text.
 
 The choice reflects workflow.
+
+## Ferrule and Eraser
 
 Ferrules add another structural system.
 
@@ -313,6 +329,8 @@ Others use plastic caps or molded extensions.
 
 These parts turn the simple wooden pencil into a more complex assembly.
 
+## The Point Is User-Made
+
 At the opposite end, the sharpened point is temporary anatomy.
 
 It exists only after use begins.
@@ -362,6 +380,8 @@ The remaining barrel becomes a record of use.
 The internal core may also reveal consistency or defects farther down.
 
 This is why a used pencil can teach things an unsharpened specimen cannot.
+
+## Packaging and the Layers Together
 
 Packaging belongs just outside the physical anatomy but completes the product system.
 

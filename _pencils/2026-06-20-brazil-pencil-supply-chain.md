@@ -13,11 +13,15 @@ tags:
 
 A pencil can look like a local object even when its production depends on a landscape hundreds of kilometers away. Faber-Castell’s Brazilian operation makes that relationship unusually visible. Its wood begins in managed forests near Prata, Minas Gerais, while large-scale pencil production takes place in São Carlos, São Paulo.
 
+## Why Brazil Became the Wood Supply
+
 Brazil became central to Faber-Castell’s pencil business because wood supply could be organized at industrial scale. The company says it began planting trees for pencil production in the 1950s, using former pastureland rather than depending entirely on natural forests. That decision turned forestry from an external purchasing problem into part of the manufacturing system itself.
 
 The species used in the company’s Prata forestry project is mainly *Pinus caribaea*. Faber-Castell describes roughly 10,000 hectares of planted forest in southeastern Brazil, far from the Amazon rainforest. Those forests feed the São Carlos factory with wood for pencils while also allowing the company to plan replanting, harvest cycles, and long-term material supply.
 
 This matters because pencil factories need consistency more than spectacular wood. A slat must have predictable moisture, density, straightness, and machining behavior. Grooves need to be cut accurately, glued cores must remain centered, and the finished sandwich has to survive shaping, lacquering, stamping, and sharpening. Forestry decisions made years earlier can affect all of those later steps.
+
+## Two Billion Pencils a Year
 
 The scale in Brazil is remarkable. Faber-Castell’s Brazilian operation reports annual production of around two billion wood-cased EcoLápis pencils, with the São Carlos facility supplying both the domestic market and exports to dozens of countries. The company describes the Brazilian subsidiary as its largest operation and São Carlos as the center of the world’s largest EcoLápis production.
 
@@ -26,6 +30,8 @@ At that volume, tiny manufacturing choices become large economic decisions. A sl
 The wood does not travel directly from tree to finished pencil. Faber-Castell operates forestry and wood-processing activities in Prata before the material reaches São Carlos for pencil production. This separation is useful for understanding modern pencil manufacture: the factory that paints and finishes the pencil may not be the place where its wood began its industrial life.
 
 Faber-Castell also presents the Brazilian forests as part of a broader environmental strategy. The company states that millions of pine trees are managed there, that new seedlings are planted each year, and that part of the managed area is left untouched as habitat for native wildlife. Its global wood-cased pencil production uses certified wood under FSC or PEFC systems.
+
+## What "Made in Brazil" Tells a Collector
 
 For collectors, this gives a modern Brazilian-made pencil more context than a country stamp alone. “Made in Brazil” can indicate participation in a vertically organized supply chain involving forestry, wood processing, pencil manufacture, packaging, and export. That is a different historical story from nineteenth-century German factories that bought wood through external suppliers.
 

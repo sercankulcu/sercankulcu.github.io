@@ -15,11 +15,15 @@ A polling booth is one of the few places where a pencil remains part of an offic
 
 The reason is practical rather than ceremonial.
 
+## What Election Commissions Actually Say
+
 The United Kingdom's Electoral Commission explains that there is no legal requirement for voters to use a pencil. Pens are allowed. Pencils are supplied because ink pens can dry out or spill, and wet ink can transfer when a ballot paper is folded. A transferred mark can create ambiguity on a document where one clear choice is the entire purpose.
 
 Australia gives a similar explanation. The Australian Electoral Commission says pencils are reliable because they do not run out, can be sharpened during election day, can be stored between elections, and work well in tropical conditions. Australian voters may still use their own pens if they prefer.
 
 Canada goes one step further in law. Elections Canada states that polling places must provide electors with a black-lead pencil, although voters may use another pen or pencil they bring themselves. The pencil is therefore both ordinary stationery and part of the equipment specified for conducting an election.
+
+## What a Ballot Pencil Needs
 
 A ballot pencil does not need premium lacquer, a luxury ferrule, or a wide range of graphite grades. It needs to make a dark, unmistakable mark quickly and reliably on ballot stock. It may be used by hundreds of people in one day, sharpened repeatedly, handled by polling staff, and stored as inexpensive equipment.
 
@@ -32,6 +36,8 @@ Australian election authorities have also had to address a persistent conspiracy
 In fact, the system is designed so that the mark does not depend on being permanent in the same sense as archival ink. Ballot security comes from controlled handling, observers, seals, reconciliation procedures, numbered or otherwise controlled ballot materials, and the count itself.
 
 Accessibility adds another dimension. UK Electoral Commission guidance includes pencil grips among equipment that can help voters with dexterity impairments. Elections Canada also provides large-grip pencils in limited quantities at polling stations. The object can therefore change size or grip geometry while performing the same basic marking function.
+
+## Institutional Objects, Anonymous by Design
 
 For collectors, election pencils are interesting because they are institutional objects.
 
@@ -64,6 +70,8 @@ It does not depend on gravity feeding ink toward a ball.
 It can remain stored for long periods and return to service after sharpening.
 
 A polling station can keep many identical examples ready at low cost.
+
+## Packaging, Provenance and Wear
 
 For collectors, packaging and documentation are therefore more informative than luxury features. A box label naming an electoral commission, municipality, constituency, supplier, or election year can turn a plain pencil into a precisely dated artifact.
 

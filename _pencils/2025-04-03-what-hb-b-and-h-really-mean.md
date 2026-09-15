@@ -21,6 +21,8 @@ A 2B from one manufacturer does not have to behave exactly like a 2B from anothe
 
 The letters are better understood as coordinates within a manufacturer's own family than as universal laboratory measurements.
 
+## Which Direction the Letters Point
+
 The basic direction is straightforward.
 
 Move toward H and the core becomes harder, usually lighter, more point-retentive, and more resistant to wear.
@@ -54,6 +56,8 @@ Core diameter may change.
 Manufacturers decide what their 2B should feel like.
 
 That freedom creates brand character.
+
+## HB Is Not One Value
 
 HB is the most famous middle grade.
 
@@ -93,6 +97,8 @@ In others, HB or No. 2 dominates.
 
 Usage culture affects what feels “standard.”
 
+## The H Side
+
 The H side serves different needs.
 
 H and 2H are useful when point retention and line precision matter.
@@ -130,6 +136,8 @@ The groove remains.
 Hardness therefore changes technique.
 
 A light hand is often more appropriate.
+
+## The Soft End
 
 The soft end creates the opposite challenge.
 
@@ -189,6 +197,8 @@ A “medium” from two brands can differ.
 
 The label remains useful within context.
 
+## Numerical and National Traditions
+
 The American numerical system creates another layer.
 
 No. 1, No. 2, No. 2½, No. 3, and harder numerical grades have long been used in the United States.
@@ -238,6 +248,8 @@ A complete set invites the user to move systematically from hard precision to so
 This makes the grade scale visible as a design philosophy.
 
 The product family is organized around controlled variation.
+
+## Paper, Pressure and Angle
 
 Paper changes every grade.
 
@@ -305,6 +317,8 @@ Erasing is therefore not simply easier with harder pencils.
 
 Pressure and paper are involved.
 
+## The Best Grade Is a Compromise
+
 Point retention generally improves toward H.
 
 That makes hard grades useful for long precise work.
@@ -348,6 +362,8 @@ Soft is not better.
 Hard is not more professional.
 
 The grade is a tool choice.
+
+## Build Reference Anchors
 
 A good comparison experiment is simple.
 
@@ -414,6 +430,8 @@ A modern range may extend softer or harder than earlier versions.
 Mars Lumograph, for example, now reaches extreme soft grades that expand the artistic side of the family.
 
 Grade expansion is part of product history.
+
+## Outside Graphite
 
 The H-B system also applies imperfectly outside graphite.
 

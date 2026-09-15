@@ -17,6 +17,8 @@ A red-and-blue bicolor pencil makes a different promise: two functions are alway
 
 That small change in architecture creates a surprisingly different object.
 
+## One Barrel, Two Ends
+
 The familiar form is simple. One end contains a red lead, the other a blue lead, and both ends can be sharpened independently. The barrel is usually divided visually so the user can identify each side before touching the point to paper.
 
 Faber-Castell still makes several versions of this idea. The Castell Color 873 is a red/blue pencil with a thick lead intended for writing, marking, and drawing. The Castell Document 9608 uses the same two-color arrangement for document-proof marking and is supplied sharpened at both ends. The Janus red/blue pencil is also double-ended, while the Jumbo Grip Bicolor adapts the concept for school correction and syllable-separation exercises.
@@ -24,6 +26,8 @@ Faber-Castell still makes several versions of this idea. The Castell Color 873 i
 Those products show that “red/blue pencil” is not one narrow category.
 
 The same architecture can serve office marking, document work, classroom correction, language exercises, and general annotation.
+
+## The Advantage Is Speed
 
 The advantage is not color variety.
 
@@ -46,6 +50,8 @@ The exact meaning changes with the user.
 The two-ended design does not prescribe the system.
 
 It makes a two-state system easy to maintain.
+
+## A Manufacturing Problem in the Middle
 
 The construction also creates an interesting manufacturing problem.
 
@@ -83,6 +89,8 @@ Some collectors therefore prefer to keep bicolor pencils unsharpened, especially
 
 For users, however, the object only makes complete sense when both ends are active.
 
+## Barrel Graphics Do the Selecting
+
 The barrel graphics usually reinforce the internal division.
 
 Some models divide the lacquer into two colors.
@@ -116,6 +124,8 @@ Another can mark formal documents.
 The shared idea is not age, market, or pigment.
 
 It is the decision to place two permanent functions in one wooden body.
+
+## What to Record
 
 Collectors should record bicolor pencils differently from ordinary colored pencils.
 

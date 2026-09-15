@@ -11,6 +11,8 @@ tags:
 
 Germany occupies a central place in pencil history, especially the area around Nuremberg and nearby Stein. The importance of the region is not simply that several famous brands happened to begin there. It developed a durable industrial ecosystem around pencil making: woodworking, graphite processing, pigments, machinery, printing, trade, and skilled labor reinforced one another over centuries.
 
+## Nuremberg Since the Seventeenth Century
+
 Documented pencil making in Nuremberg reaches back to the seventeenth century.
 
 STAEDTLER's historical records identify Friedrich Staedtler as a Nuremberg pencil maker from around 1662. He produced both the writing core and its wooden casing at a time when craft boundaries made that combination controversial.
@@ -43,6 +45,8 @@ Branding improved.
 
 Export networks expanded.
 
+## Stein and the Faber Story
+
 The nearby town of Stein became equally important.
 
 Faber-Castell traces its history to 1761, when cabinetmaker Caspar Faber began making pencils in Stein near Nuremberg.
@@ -71,6 +75,8 @@ The buyer could ask for a specific maker and grade.
 
 Brand identity and technical specification began to reinforce one another.
 
+## Staedtler's Parallel Path
+
 STAEDTLER followed a different but related path.
 
 Johann Sebastian Staedtler founded J.S. Staedtler in Nuremberg in 1835.
@@ -92,6 +98,8 @@ The familiar German emphasis on systematic grade ranges fits that environment.
 A drawing pencil was not just soft or hard.
 
 It could be part of a carefully ordered family.
+
+## How Grading Became a System
 
 The H-B grading system is now so familiar that it seems inevitable.
 
@@ -118,6 +126,8 @@ Harder grades were useful for light construction and precision.
 Softer grades served darker lines, tonal work, and artistic drawing.
 
 A broad range allowed one brand to serve many tasks.
+
+## Green, Blue and Visual Identity
 
 German pencil design also developed strong visual identities.
 
@@ -157,6 +167,8 @@ Packaging is redesigned.
 
 The product remains visually continuous while manufacturing history accumulates underneath.
 
+## Chronology From Small Differences
+
 This makes German pencils excellent chronology objects.
 
 Collectors can build timelines from small differences.
@@ -180,6 +192,8 @@ East German pencil production followed separate industrial structures.
 That broader national history appears directly on stationery.
 
 A country line only a few millimeters long can carry major historical information.
+
+## A Manufacturing Tradition
 
 The German tradition is also a manufacturing tradition.
 
@@ -228,6 +242,8 @@ Modern manufacturing is global even when brand identity remains strongly German.
 This distinction matters to collectors.
 
 Brand origin, corporate headquarters, manufacturing country, and material origin are separate questions.
+
+## Global Materials Behind a National Brand
 
 The German pencil tradition is therefore cultural and industrial rather than a claim that every component is local.
 
@@ -294,6 +310,8 @@ Another traces ferrules or logos.
 Another compares pencils made before and after political transitions.
 
 The depth is unusually rich.
+
+## One Branch of a Global History
 
 German pencils also influenced expectations far outside Germany.
 

@@ -19,6 +19,8 @@ But a traditional slate pencil belongs to a different writing system.
 
 It was made to write on a slate board.
 
+## Before Cheap Paper
+
 For much of the nineteenth century, that combination—slate board and slate pencil—was one of the most economical ways to give a child a reusable writing surface.
 
 Paper changes how we think about writing because paper preserves the mark.
@@ -38,6 +40,8 @@ The same surface could be used hundreds or thousands of times.
 That mattered when paper was comparatively expensive and when a classroom might contain dozens of children practicing letters, arithmetic, spelling, and penmanship every day.
 
 The National Museum of American History describes slate boards and slate pencils as the most popular writing instruments for American schoolchildren during the nineteenth century. The reason was economic: the slate could be erased and reused instead of consuming sheet after sheet of paper.
+
+## Stone Against Stone
 
 The pencil itself was not a graphite pencil adapted to stone.
 
@@ -67,6 +71,8 @@ A slate pencil and slate board form another still.
 
 Change the surface and the ideal pencil changes with it.
 
+## The Classroom Slate
+
 The classroom slate was usually a thin piece of dark slate held inside a wooden frame.
 
 Some were simple single boards.
@@ -94,6 +100,8 @@ The physical object survives while the information it carried does not.
 For a collector, that makes associated slate pencils unusually important.
 
 They help reconstruct the everyday process that the board itself can no longer show.
+
+## A Mature Technology, Not a Brief Phase
 
 The Smithsonian has a particularly evocative box containing five slate pencils wrapped in paper printed with American flag designs.
 
@@ -133,6 +141,8 @@ The slate's great strength was that nothing had to be kept.
 
 Paper's great strength was that everything could be kept.
 
+## The Squeak
+
 Slate pencils also had a sensory reputation that no modern stationery advertisement would want.
 
 They could squeak.
@@ -152,6 +162,8 @@ Some slate boards had fabric, leather, yarn, or other material around the frame 
 The writing sound itself was harder to solve.
 
 A different pencil composition could change the feel and sound, however.
+
+## Material and Construction Vary
 
 Not every slate pencil was made from exactly the same material.
 
@@ -219,6 +231,8 @@ Education rarely replaces one tool overnight.
 
 Old and new systems coexist.
 
+## Wrappers Carry Ideology
+
 The patriotic slate pencils preserved by the Smithsonian show another dimension entirely.
 
 School supplies can carry ideology.
@@ -248,6 +262,8 @@ Packaging can be even better.
 A complete box may preserve product names and quantities that individual pencils never carried.
 
 For slate pencils, the box can be more informative than the pencil.
+
+## A Pencil That Begins as Geology
 
 There is also a geographical story.
 
@@ -295,6 +311,8 @@ No archive is needed.
 
 Only practice matters.
 
+## Temporary Work Versus a Record
+
 That educational philosophy is almost built into the material.
 
 The slate treats writing as temporary work.
@@ -324,6 +342,8 @@ The action was literal.
 A dirty slate became blank again.
 
 Nothing remained except perhaps faint scratches, mineral wear, and the memory of what had been written.
+
+## Wear, Testing and Cataloging
 
 The pencil itself also records use in a different way from graphite.
 
@@ -370,6 +390,8 @@ For cataloging vintage examples, I would record at least the construction type, 
 Photographing the cross-section can also help.
 
 A wood-cased slate pencil may otherwise look almost identical to an unusual graphite pencil.
+
+## Not a Primitive Graphite Pencil
 
 The category becomes even more interesting when placed beside a modern school pencil.
 

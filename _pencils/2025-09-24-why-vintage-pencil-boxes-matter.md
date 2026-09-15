@@ -15,6 +15,8 @@ That makes a pencil box more than a container.
 
 It is primary evidence.
 
+## More Space Than a Barrel
+
 The pencil itself usually carries only limited information. A manufacturer name, model number, grade, country mark, and perhaps a slogan have to fit onto a narrow barrel.
 
 A box has much more space.
@@ -26,6 +28,8 @@ Those details often make the box easier to date than the pencil inside.
 A company may use the same barrel imprint for years while redesigning packaging several times.
 
 That makes packaging chronology useful when building a model history.
+
+## Logos, Addresses and Country Wording
 
 Logo changes are one of the first clues.
 
@@ -59,6 +63,8 @@ English-only packaging, multilingual European text, local safety information, or
 
 This is why brand country and market country should not be treated as the same thing.
 
+## Grade Charts and Model Hierarchy
+
 Grade charts are especially valuable.
 
 A loose HB pencil tells you one grade existed.
@@ -78,6 +84,8 @@ Manufacturers often explain whether a pencil is intended for school, office, dra
 Without the box, a collector may assume a pencil's role from its appearance.
 
 The packaging can provide direct evidence.
+
+## Slogans, Illustration and Typography
 
 Slogans reveal positioning.
 
@@ -111,6 +119,8 @@ Later boxes may use more complex printing, photography, metallic foil, or plasti
 
 The printing technology becomes part of the industrial history.
 
+## Box Construction and Quantity
+
 Box construction itself can also change.
 
 Sliding cardboard boxes, two-piece rigid boxes, folding cartons, paper sleeves, plastic cases, tins, blister packs, and hang-tab retail packages all reflect different distribution systems.
@@ -138,6 +148,8 @@ A graded set from 6H to 6B suggests artistic or technical use.
 A small decorative set may target gifts or children.
 
 The box gives meaning to the quantity.
+
+## Batch Variation and Its Limits
 
 Complete boxes are also useful for studying manufacturing consistency.
 
@@ -172,6 +184,8 @@ Sealed packaging carries stronger provenance than an open box, but even seals ca
 Old adhesive tape, shop labels, and later wrapping should be examined carefully.
 
 A collector should document uncertainty rather than force a confident conclusion.
+
+## Conservation
 
 Condition changes differently in paper packaging than in pencils.
 
@@ -231,6 +245,8 @@ Others include accessories such as erasers, sharpeners, or blending tools.
 
 Those arrangements are part of the original product.
 
+## Price Labels, Barcodes and Copyright Lines
+
 Price labels can be extremely useful.
 
 A surviving retailer sticker can identify store, country, currency, and approximate period.
@@ -266,6 +282,8 @@ The strongest chronology comes from several independent details agreeing.
 Suppose a box has an old logo, a company address used until 1968, no barcode, and a catalog from 1965 showing the same artwork.
 
 Together, those facts create a much stronger date range than any one alone.
+
+## Ownership Changes and Transitional Boxes
 
 Packaging is also important when brand ownership changes.
 
@@ -311,6 +329,8 @@ Safety standards, certification marks, age warnings, and material statements bec
 
 Those details can help distinguish modern reissues from genuine older stock.
 
+## Retro Packaging and Reissues
+
 Retro packaging is especially dangerous for casual dating.
 
 A modern manufacturer can intentionally recreate old typography and colors.
@@ -352,6 +372,8 @@ That asymmetry makes packaging significant.
 A common vintage pencil may become much more interesting when paired with a rare early box.
 
 The box can reveal exactly which variant it belongs to.
+
+## Cataloging Packaging Systematically
 
 Cataloging packaging should therefore be systematic.
 

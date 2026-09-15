@@ -15,6 +15,8 @@ A wooden pencil gives graphite a handle.
 
 The Cretacolor Monolith asks what happens when the handle disappears.
 
+## When the Handle Disappears
+
 Instead of placing a narrow graphite core between two wooden slats, Monolith makes almost the entire pencil from the drawing material itself. Cretacolor describes the modern version as a 7 mm solid graphite pencil covered only by a thin layer of varnish. The result still looks and feels like a pencil, but structurally it is much closer to a graphite stick shaped for precise handling.
 
 That difference changes how the tool can be used.
@@ -35,6 +37,8 @@ That makes it especially useful for drawings that alternate between structure an
 
 A portrait can begin with a light outline, move into broad cheek and hair shadows, then return to sharper accents. A landscape can use the side for sky or distant tone and the point for branches or architecture. The pencil remains the same; only the contact area changes.
 
+## Six Grades, All Soft
+
 Cretacolor currently offers Monolith in six grades: HB, 2B, 4B, 6B, 8B, and 9B.
 
 The absence of hard H grades makes sense.
@@ -48,6 +52,8 @@ A 6B wooden pencil and a 6B Monolith do not automatically feel like equivalent t
 The grade describes the core formulation.
 
 The body describes how that formulation reaches the page.
+
+## Building Tone Without Burnishing
 
 This becomes obvious when making a gradient.
 
@@ -77,6 +83,8 @@ That possibility is easy to overlook.
 
 Graphite dust can be spread with a brush, cloth, paper stump, or other blending tool. It can establish a soft background tone before sharper pencil work is added. In a wooden pencil, shavings are mostly waste. In a woodless pencil, the material removed by sharpening is still graphite.
 
+## The Trade-Off for Losing Wood
+
 The absence of wood creates a trade-off, however.
 
 Wood does more than provide a grip.
@@ -90,6 +98,8 @@ The thin varnish protects the user's fingers and gives the pencil a cleaner surf
 That vulnerability is part of the design.
 
 The artist gains direct access to a large mass of graphite and gives up some protection in return.
+
+## A Category of Its Own
 
 For collectors, woodless pencils deserve their own category.
 
@@ -114,6 +124,8 @@ A used example is equally valuable.
 It shows how the varnish wears, how much of the side the artist exposes, and whether the pencil was treated as a precision point or as a broad graphite block.
 
 Wear becomes evidence of technique.
+
+## Cretacolor's Unusual Lineage
 
 Cretacolor itself has an unusual history for a pencil maker. Its lineage includes Carl Brevillier's Zeus pencil factory, founded in Vienna in 1863. The modern Cretacolor story took shape when pencil collector Hans Wolfgang Hromatka acquired the Hirm pencil factory in 1996 and later combined that tradition with Brevillier-Urban. The company explicitly lists Graphite Monolith among the innovations developed under this modern identity.
 

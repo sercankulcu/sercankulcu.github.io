@@ -11,9 +11,13 @@ tags:
 
 Soft graphite gets most of the attention because dark marks are visually dramatic, but hard grades solve a different problem. An H pencil is not trying to produce the richest black. Its strengths are point retention, controlled deposition, narrow lines, and the ability to build structure without immediately filling the page with graphite. Those qualities made hard pencils important in drafting rooms, map work, technical illustration, and any task where precision mattered more than expressive darkness.
 
+## Why Hard Cores Behave Differently
+
 The basic reason is formulation. Graphite pencil cores are made from graphite, clay, and other processing materials. As the proportion of clay increases relative to graphite, the core generally becomes harder and leaves a lighter mark. The exact recipes differ by manufacturer, so an H from one brand can feel like another company's 2H, but the overall trend remains clear: more hardness usually means less material is deposited with each stroke.
 
 Point retention is the most obvious practical advantage. A freshly sharpened 2H can maintain a narrow working tip far longer than a 2B or 4B because the harder core resists abrasion. That reduces sharpening frequency and makes line width more predictable over time. In technical work, consistency can matter more than maximum darkness.
+
+## Drafting, Architecture and Cartography
 
 This is one reason harder grades were natural companions to traditional drafting. Before CAD displaced most manual technical drawing, draftsmen needed pencils that could hold a fine point while producing construction lines, dimensions, lettering, and precise geometry. A softer pencil could create dark presentation lines, but a harder grade was better suited to the scaffolding underneath.
 
@@ -25,11 +29,15 @@ Cartography historically benefited from the same properties. Fine map symbols, c
 
 Scientific illustration offers another use. Diagrams of specimens, apparatus, geological structures, or anatomical forms often begin with delicate construction. A hard pencil can define boundaries and measured relationships without producing a heavy graphite layer that becomes difficult to erase or ink over.
 
+## Inside the H Range
+
 The differences inside the H range are worth noticing. H is only slightly harder than HB and can still work comfortably for everyday notes. 2H gives more obvious point retention and lighter marks. 3H and 4H move further toward technical use, especially on smooth paper. Grades such as 5H and 6H can become extremely pale and firm, useful for specialized construction work but less comfortable for ordinary handwriting.
 
 Beyond that, very hard grades become increasingly dependent on surface choice. On rough paper, a 6H point can feel harsh because it rides across pronounced fibers rather than depositing enough graphite to lubricate the stroke. On smooth drawing paper or drafting film, the same grade can feel much more controlled.
 
 Paper therefore changes the personality of hard graphite. A smooth, well-sized sheet allows a fine point to glide with relatively little resistance. Rough sketch paper exaggerates scratchiness and can cause users to press harder than necessary. When someone says an H pencil feels unpleasant, the paper may be part of the problem.
+
+## Pressure Is the Main Danger
 
 Pressure is the main danger with hard grades. Writers often try to make an H pencil behave like a B pencil by pressing harder to obtain a darker line. That defeats the purpose. Excessive pressure can emboss the paper, polish the surface, create hand fatigue, and make erasing more difficult.
 
@@ -47,6 +55,8 @@ Because H-grade cores are less prone to rapid wear, they are excellent for small
 
 They can also be useful for underdrawing before ink. A light graphite framework is easier to erase after the ink dries, provided the user has not pressed hard enough to indent the paper. Comic artists, illustrators, and designers have long exploited this distinction between pale construction and final line.
 
+## H Grades Expose Manufacturing Quality
+
 For collectors, harder grades reveal manufacturing quality in a different way from soft grades. A soft 4B can impress with darkness and smoothness, but a refined 2H has to avoid scratchiness while still remaining genuinely hard. Poor particle processing or inconsistent clay distribution becomes easier to feel in harder cores.
 
 A good 2H should feel firm without producing random gritty interruptions. It should hold a fine point, leave an even pale line, and sharpen predictably. If the stroke repeatedly catches or changes darkness without pressure changes, the core may be less uniform than expected.
@@ -58,6 +68,8 @@ The same test can be extended within one product family. A well-designed range s
 Hard grades also expose differences in wood and sharpening because the point remains usable for longer. If the core is off-center, the asymmetry can become visible over many strokes. If the wood cuts poorly, a long technical point may reveal it immediately. Precision in the graphite makes construction quality easier to judge.
 
 There is also an economic advantage. Because H pencils wear slowly, one pencil can last through a surprising amount of technical work. The user sharpens less often and loses less length to repeated point restoration. For professional environments where pencils were consumed continuously, this mattered.
+
+## Still Useful After Manual Drafting
 
 The decline of manual drafting did not eliminate the usefulness of hard graphite. H and 2H remain excellent for woodworking layouts, model making, fine diagrams, engineering notebooks, preliminary sketches, and any task where a clean narrow mark is preferable to a dark expressive one.
 

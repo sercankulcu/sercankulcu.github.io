@@ -15,11 +15,15 @@ Some pencils become famous because artists adopt them. Others become famous beca
 
 The STAEDTLER Noris belongs to the second group. Its black-and-yellow stripes, red end, hexagonal body, and straightforward graphite grades make it one of the most recognizable school pencils in Europe. In 2026 the Noris name turns 125, which makes this a useful moment to look at how an ordinary writing pencil became a long-lived design object.
 
+## The 1901 Trademark
+
 STAEDTLER dates the Noris trademark to 1901. The name was submitted for registration on April 1 and formally registered at the Imperial Patent Office in Berlin on September 10 of that year. That gives the brand a documented life stretching back well before the modern school-supply market took its current form.
 
 The visual identity developed into something unusually durable. STAEDTLER still describes Noris through the combination of yellow and black stripes, a red tip, and a clear functional shape. Many pencil models survive for decades by changing packaging while keeping the barrel conservative. Noris went further: the barrel itself became the brand.
 
 That matters because school pencils live in crowded environments. A child may have several pencils from different manufacturers in the same case. A teacher may need to recognize one at a glance. Strong color blocking solves that problem more effectively than small barrel text. The Noris can be identified from across a desk before its imprint is readable.
+
+## Grades, Bonding and the Modern Core
 
 The modern Noris 120 keeps the classic hexagonal form. STAEDTLER currently offers it in five grades: 2B, B, HB, H, and 2H. That is a narrower range than the Mars Lumograph, which is aimed more directly at technical drawing and artists, and the difference is revealing. Noris does not try to be a complete graphite laboratory. Its grade range covers the practical center where schoolwork, handwriting, sketching, and everyday note-taking overlap.
 
@@ -30,6 +34,8 @@ STAEDTLER emphasizes this durability in the current Noris 120 through what it ca
 The current construction is also more interesting than the old appearance suggests. STAEDTLER now produces the Noris 120 from what it calls Upcycled Wood. Instead of cutting the body only from conventional pencil slats, the company uses wood chips from certified sources and processes them into a pencil material. The finished object deliberately keeps the visual language of a century-old wooden pencil while changing how the casing material is produced.
 
 That creates an unusual collector transition. Older Noris pencils document conventional wood-cased manufacturing; newer examples document a shift toward engineered wood material. The model name and stripe pattern can remain familiar even while the production technology underneath them changes.
+
+## Noris as a Lineage, Not a Pencil
 
 For collectors, Noris is therefore best treated as a lineage rather than a single pencil. Barrel printing, stripe width, typography, grade marking, end treatment, country wording, lacquer texture, and packaging can all change while the pencil remains recognizably Noris. Keeping several generations side by side is more informative than owning only one perfect example.
 

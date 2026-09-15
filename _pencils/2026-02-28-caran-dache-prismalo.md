@@ -14,6 +14,8 @@ A colored pencil normally ends where the line is drawn.
 
 Prismalo was designed so the line could keep changing.
 
+## The First Water-Soluble Colored Pencil
+
 Caran d’Ache introduced Prismalo in 1931 and describes it as the world’s first water-soluble colored pencil. The idea was simple to explain but technically important: make a colored-pencil core that behaved normally when dry, then released and moved when touched with water.
 
 That turned one tool into two.
@@ -25,6 +27,8 @@ That distinction makes Prismalo very different from a permanent artist pencil su
 Polychromos is designed to keep the dry mark stable.
 
 Prismalo is designed to let the dry mark become a starting point.
+
+## A Thin, Hard Core by Design
 
 The engineering challenge is in the core. A water-soluble colored pencil still has to survive sharpening, hold a fine point, deposit pigment evenly, and remain strong enough for ordinary drawing. At the same time, its binder system must allow water to mobilize the color after it reaches the paper.
 
@@ -43,6 +47,8 @@ You can hatch a sky, then pull water through the marks until the individual stro
 You can build a dark edge with repeated dry layers and leave it untouched while dissolving lighter neighboring areas.
 
 The same color can appear as a line, texture, gradient, or transparent stain depending on how much water is introduced.
+
+## Test It Wet, Not Just Dry
 
 This is why watercolor pencils should not be evaluated only by making dry swatches.
 
@@ -71,6 +77,8 @@ That third technique is especially revealing because it shows that the wooden ba
 The pencil can function as a portable paint pan.
 
 Caran d’Ache itself recommends techniques such as watercolor washes, hatching, and lifting color from the pencil with a wet brush.
+
+## Paper and Water Make the System
 
 Paper becomes critical once water enters the process.
 
@@ -101,6 +109,8 @@ They are controlling concentration.
 That is one reason watercolor pencils can be useful for travel and field sketching.
 
 A set of pencils provides precise dry drawing without the need to open paints immediately. Later, a small brush and water can transform selected areas. The artist can work in stages and choose which marks remain graphic and which become painterly.
+
+## Geneva, 1915 to 1931
 
 Prismalo’s history is especially interesting because Caran d’Ache introduced the idea so early.
 
@@ -143,6 +153,8 @@ Red can be diluted toward pink.
 A dark color can become a pale wash simply by increasing water.
 
 One pencil can produce a much wider tonal range than its dry barrel swatch suggests.
+
+## What a Used Prismalo Reveals
 
 For collectors, that makes used examples especially informative.
 

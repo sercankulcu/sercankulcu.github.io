@@ -11,6 +11,8 @@ tags:
 
 A wooden pencil looks like a piece of painted wood with a dark center, but the core is a carefully engineered ceramic-like composite. Calling it “lead” is traditional shorthand; ordinary graphite pencils do not use metallic lead in the writing core.
 
+## The Ingredients
+
 The basic ingredients are simple.
 
 Graphite supplies the dark marking material.
@@ -63,6 +65,8 @@ Core diameter.
 
 All of these influence the result.
 
+## Mixing and Extrusion
+
 The first manufacturing challenge is uniform mixing.
 
 Graphite and mineral ingredients have different physical properties.
@@ -94,6 +98,8 @@ Drying removes moisture before firing.
 If drying is too fast or uneven, cracks or warping can develop.
 
 Straightness matters because the rods later need to sit accurately in wooden grooves.
+
+## Firing and Impregnation
 
 Firing transforms the dried rods.
 
@@ -136,6 +142,8 @@ Too much can make it overly slick, weak, or fast-wearing depending on formulatio
 Smoothness is therefore not a direct measure of quality.
 
 It is one chosen performance characteristic.
+
+## Darkness, Hardness and Core Diameter
 
 Darkness is another.
 
@@ -189,6 +197,8 @@ Remove the wood entirely and graphite becomes a broad drawing material.
 
 The wood-cased pencil is one way of packaging that material.
 
+## Core Strength Through Assembly
+
 Core strength matters during manufacturing as much as during use.
 
 The rods must survive handling before they are placed into slats.
@@ -230,6 +240,8 @@ This structure protects the core from lateral stress.
 A dropped pencil can still crack internally, but good bonding reduces movement of broken segments.
 
 This is why some pencils survive impacts better than others.
+
+## How the Mark Is Made
 
 The internal surface of the core is not perfectly smooth at microscopic scale.
 
@@ -315,6 +327,8 @@ Collector reviews should acknowledge that.
 
 One vintage sample does not define the original factory standard.
 
+## Grades Are Relative, Not Chemical
+
 Manufacturers guard formulations because small differences create recognizable writing character.
 
 A Hi-Uni HB can feel different from a MONO 100 HB.
@@ -368,6 +382,8 @@ A pencil can be excellent in one area and average in another.
 That is not contradiction.
 
 It is design.
+
+## Erasing, Smudging and Measurement
 
 Erasing depends partly on core deposition.
 
@@ -435,6 +451,8 @@ Bonding.
 
 All of those stages influence the line on paper.
 
+## Other Cores in the Same Barrel
+
 The core can also be engineered for specialized purposes.
 
 Copying pencils historically used soluble dyes in addition to graphite-like components.
@@ -494,6 +512,8 @@ The used pencil reveals formulation.
 The untouched pencil preserves factory state.
 
 Together they tell the full story.
+
+## An Invisible Recipe
 
 Inside a pencil, the apparent simplicity disappears.
 

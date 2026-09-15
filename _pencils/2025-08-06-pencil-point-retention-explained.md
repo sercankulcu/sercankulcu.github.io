@@ -17,6 +17,8 @@ The moment graphite touches paper, material begins to wear away.
 
 The useful question is how quickly that geometry changes and whether the resulting shape remains controllable.
 
+## Not the Same as Hardness
+
 Point retention is therefore not the same as hardness.
 
 Hardness strongly influences it, but core formulation, diameter, paper, pressure, sharpening angle, writing angle, rotation, and lubrication all matter.
@@ -59,6 +61,8 @@ A premium writing pencil is not simply the darkest HB.
 
 If it becomes blunt after two sentences, the darkness may create more inconvenience than value.
 
+## Core Diameter and Sharpening Angle
+
 Core diameter changes the geometry.
 
 A thin writing core can maintain a narrow line because less material contacts the paper.
@@ -98,6 +102,8 @@ Blade condition should also be similar.
 A dull sharpener can create a rough or fractured tip before writing begins.
 
 That makes apparent “poor point retention” partly a sharpening defect.
+
+## Paper, Pressure and Angle
 
 Paper is one of the largest variables.
 
@@ -145,6 +151,8 @@ That can flatten the point differently.
 
 The wear pattern becomes asymmetrical.
 
+## Rotation Extends Point Life
+
 Rotation is the classic solution.
 
 Writers naturally rotate pencils between fingers.
@@ -187,6 +195,8 @@ A firmer, slightly more resistant core may feel less luxurious but last longer b
 
 This is one reason smoothness should not be treated as the only quality measure.
 
+## Economic and Workflow Consequences
+
 Point retention has economic consequences.
 
 A pencil that wears rapidly needs more sharpening.
@@ -212,6 +222,8 @@ A field researcher taking notes may value reliability more than maximum darkness
 An artist at an easel may keep several sharpened pencils ready and care less about interruption.
 
 The same property has different importance in different environments.
+
+## Hard Grades and the Compromise Zone
 
 Hard grades are natural point-retention specialists.
 
@@ -256,6 +268,8 @@ Internal fractures, off-center cores, poor bonding, and long unsupported geometr
 This should be recorded separately from normal abrasion.
 
 A pencil that gradually rounds is different from one that repeatedly breaks.
+
+## How to Measure It
 
 Sharpening frequency is a crude but practical measure.
 
@@ -317,6 +331,8 @@ It is a different wear regime.
 
 Point retention should always be interpreted relative to purpose.
 
+## Colored Pencils, Charcoal and Mechanical Leads
+
 Colored pencils complicate the concept.
 
 Their pigment-and-binder cores may wear very differently from graphite.
@@ -344,6 +360,8 @@ This shows how important point wear is across writing technology.
 Wooden pencils rely on the user's rotation and sharpening habits instead.
 
 The barrel becomes part of the wear-management system.
+
+## Needle, Working and Broad Points
 
 A collector should avoid judging retention from a few words.
 

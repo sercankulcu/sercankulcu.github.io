@@ -11,6 +11,8 @@ tags:
 
 A pencil collection does not need to begin with rare or expensive pieces. In fact, the best beginning is usually a small group of ordinary pencils that are different enough to teach you what to notice.
 
+## Start With Contrast, Not Prestige
+
 The first goal should be comparison, not accumulation.
 
 Five well-chosen pencils can teach more than fifty random purchases.
@@ -57,6 +59,8 @@ If you start with prestige, you may end up buying famous names without learning 
 
 If you start with comparison, taste develops naturally.
 
+## Separate Collecting From Using
+
 The second principle is to separate collecting from using.
 
 Pencils are consumable.
@@ -80,6 +84,8 @@ Common pencils can be used freely.
 Rare pencils may deserve preservation.
 
 The rule is most useful for models you expect to revisit.
+
+## Document Early
 
 The third principle is to document early.
 
@@ -106,6 +112,8 @@ For unusual pencils, add ferrule, eraser, end, point, and packaging images.
 Use systematic filenames.
 
 A catalog ID such as P0001 is better than relying on random camera names.
+
+## Variants and Packaging
 
 The fourth principle is to define what counts as a variant.
 
@@ -143,6 +151,8 @@ Retailers and collectors can mix stock.
 
 Treat packaging as evidence, not automatic truth.
 
+## Condition Language
+
 The sixth principle is to learn condition language.
 
 Avoid vague labels such as “mint,” “excellent,” or “good” unless you define them.
@@ -170,6 +180,8 @@ A used advertising pencil may be historically interesting because of its wear.
 A pristine artist pencil may be valuable because it preserves factory condition.
 
 Do not treat every sign of use as damage.
+
+## Direction and Budget
 
 The seventh principle is to choose a collecting axis.
 
@@ -210,6 +222,8 @@ Track spending from the beginning.
 Record purchase price and shipping separately if useful.
 
 This turns collecting into a measurable hobby rather than invisible leakage.
+
+## Rarity, Price and Significance
 
 The ninth principle is to distinguish rarity from price.
 
@@ -254,6 +268,8 @@ The same principle works for colors and variants.
 Sample first.
 
 Deepen later.
+
+## Compare Under Controlled Conditions
 
 The eleventh principle is to compare pencils under consistent conditions.
 
@@ -317,6 +333,8 @@ Many common pencils are marketed dramatically because buyers do not know the pro
 
 Buy evidence, not adjectives.
 
+## Storage, Provenance and Duplicates
+
 The fourteenth principle is to learn how pencils age.
 
 Wood can warp.
@@ -379,6 +397,8 @@ Know why you have six.
 
 If the answer is “I forgot I already owned them,” the catalog needs work.
 
+## Reference Sets and Photographing First
+
 The seventeenth principle is to build a reference set.
 
 A small group of familiar pencils helps compare new acquisitions.
@@ -426,6 +446,8 @@ Update the catalog rather than hiding the error.
 A collection becomes more rigorous when corrections are preserved.
 
 Research is iterative.
+
+## Think in Stories
 
 The twentieth principle is to think in stories rather than totals.
 

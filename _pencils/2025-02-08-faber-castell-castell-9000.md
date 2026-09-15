@@ -11,6 +11,8 @@ tags:
 
 The dark green Castell 9000 is one of the easiest pencils to recognize from across a desk. Its appearance is restrained, but the model carries more than a century of history and remains one of the clearest examples of a pencil designed as a graded technical system rather than a single writing tool.
 
+## Launched in 1905
+
 Faber-Castell dates the launch of the Castell 9000 to 1905 and attributes it to Alexander Graf von Faber-Castell.
 
 The model was introduced from the beginning as a premium pencil family.
@@ -22,6 +24,8 @@ Faber-Castell's historical material describes the new pencil as appearing in a g
 That decision was powerful because color made the pencil recognizable before the imprint could be read.
 
 More than a century later, green still functions as a visual shorthand for Castell 9000.
+
+## Sixteen Grades as a System
 
 The product also launched with a remarkably broad grade philosophy.
 
@@ -56,6 +60,8 @@ A 2H, HB, 2B, 4B, and 6B from one family reveal how that manufacturer organizes 
 The Castell 9000 is particularly interesting in this respect because the range has a long historical identity.
 
 Artists and technical users can move across grades without changing barrel geometry or product philosophy.
+
+## The Hexagonal Body and Visual Restraint
 
 The hexagonal body reinforces that system.
 
@@ -117,6 +123,8 @@ The same model name can document different industrial periods.
 
 That is more interesting than treating every green pencil as interchangeable.
 
+## Bonding and What Sharpening Reveals
+
 The current product still emphasizes technical continuity.
 
 Faber-Castell describes the standard Castell 9000 as available in sixteen hardness grades for writing, drawing, and technical applications.
@@ -164,6 +172,8 @@ Very soft grades may benefit from shorter support or careful long-point sharpeni
 Artists often refine soft graphite with knife and sandpaper when broad side use is important.
 
 That changes the pencil from a writing point into a small drawing stick.
+
+## Paper, Shine and Erasing
 
 Paper also transforms the experience.
 
@@ -217,6 +227,8 @@ Soft grades serve tone.
 
 The full family demonstrates how much behavior can change inside the same wooden architecture.
 
+## A Reference Pencil
+
 That is one reason the Castell 9000 works well as a reference pencil.
 
 A collector or reviewer can compare unfamiliar pencils against it.
@@ -258,6 +270,8 @@ Modern Faber-Castell catalogs include variants and sets around the same identity
 That shows how a classic model can become a platform.
 
 The core visual language survives while formats adapt to different users.
+
+## Record the Exact Version
 
 Collectors should therefore record the exact version rather than only “Castell 9000.”
 
@@ -307,6 +321,8 @@ Preserve packaging.
 
 If a duplicate exists, use the duplicate.
 
+## The Imprint as a Timeline
+
 The design history is especially visible in the imprint.
 
 Gold foil or gold-colored stamping contrasts strongly with the green barrel.
@@ -342,6 +358,8 @@ New boxes may contain leftover variants.
 Those mismatches can be historically real.
 
 The best collection preserves the evidence rather than forcing every object into a neat chronology.
+
+## Continuity on the Surface, Change Underneath
 
 The model's age also makes it useful for studying changes in manufacturing philosophy.
 

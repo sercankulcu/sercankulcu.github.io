@@ -19,6 +19,8 @@ Lay several Grafwood pencils beside one another and the bodies move from pale gr
 
 That decision makes Grafwood unusually easy to recognize, but the more interesting engineering is hidden inside.
 
+## Fifteen Grades, Fifteen Core Diameters
+
 The range currently runs through fifteen hardnesses from 4H to 9B. Caran d’Ache also changes the diameter of the graphite core across that range, from about 2.1 mm at the harder end to as much as 3.6 mm for softer grades.
 
 That is a practical response to a basic problem.
@@ -53,6 +55,8 @@ The barrel color reinforces the same progression before the pencil ever touches 
 
 Few graphite ranges make hardness this legible.
 
+## Geneva, 1915
+
 Grafwood belongs to Caran d’Ache's Graphite Line, introduced in 2006 as a collection devoted to different expressions of black.
 
 The company itself is much older.
@@ -72,6 +76,8 @@ That makes it useful in a collection for another reason.
 Many famous graphite pencils come from Germany, Japan, the United States, or the Czech lands.
 
 Grafwood gives Switzerland a distinct place on the same shelf.
+
+## A Different Design Language
 
 Its design language is also very different from the traditional model-specific identities of those countries.
 
@@ -104,6 +110,8 @@ The grades can be read from left to right almost like a value chart.
 For an artist, that is practical.
 
 For a collector, it makes the set more interesting than the individual pencil.
+
+## Construction and What the Core Diameter Changes
 
 The construction remains traditional.
 
@@ -169,6 +177,8 @@ The physical distance between 4H and 9B is therefore much greater than the thirt
 
 A full Grafwood set is a compact demonstration of how much a “graphite pencil” can vary while keeping the same basic wooden architecture.
 
+## Color Coding for Graphite
+
 The lacquer system helps when working with several pencils at once.
 
 Artists often place a group of grades on the table and switch between them rapidly.
@@ -196,6 +206,8 @@ The pencils all produce shades of gray-black on paper, yet the barrel carries in
 The outside predicts the inside.
 
 This is more informative than decorative lacquer chosen only for brand recognition.
+
+## Inside the Graphite Line
 
 Grafwood also sits inside a wider Caran d’Ache graphite family.
 
@@ -226,6 +238,8 @@ A manufacturer's 2B is a position within that manufacturer's own material system
 Grafwood is best understood as a complete internal scale.
 
 Comparing two adjacent Grafwood grades is often more meaningful than assuming its 2B must behave exactly like another company's 2B.
+
+## Testing the Whole Scale
 
 That makes a systematic test useful.
 
@@ -260,6 +274,8 @@ Caran d’Ache changes packaging over time, and a pencil that remains technicall
 Sets are particularly worth preserving intact.
 
 Separating a single grade from a fifteen-pencil sequence removes part of the design logic.
+
+## What a Used Set Reveals
 
 Wear also becomes interesting.
 

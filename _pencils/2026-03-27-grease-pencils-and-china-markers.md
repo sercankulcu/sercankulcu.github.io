@@ -16,6 +16,8 @@ Glass does not cooperate.
 
 Neither does glazed ceramic, polished metal, glossy plastic, or many laminated surfaces. A normal graphite point may skate across them, leave a faint unstable mark, or leave almost nothing at all.
 
+## Built for Surfaces Graphite Cannot Hold
+
 The grease pencil was built for that problem.
 
 Also known as a china marker, wax pencil, or chinagraph pencil, it replaces the familiar graphite-and-clay core with a much softer marking material based largely on wax and pigment. Instead of abrading dry graphite particles onto a porous surface, the core deposits a thin waxy layer that can cling to smooth, non-porous materials.
@@ -27,6 +29,8 @@ A grease pencil can mark glass, ceramics, metal, plastic, film, polished stone, 
 The name “china marker” makes more sense in that context.
 
 China means glazed ceramic ware. A tool that could write directly on smooth porcelain without needing ink was genuinely useful in workshops, warehouses, shops, laboratories, studios, and industrial settings.
+
+## The Wrapper Is the Sharpening System
 
 But the most memorable part of many grease pencils is not the core.
 
@@ -54,6 +58,8 @@ It also changes the way the object ages.
 
 A wooden pencil becomes shorter mainly through sharpening. A paper-wrapped grease pencil becomes progressively more skeletal. The paper peels away in stages, exposing a thicker section of wax until the object is eventually reduced to a short wrapped stub.
 
+## Using It Destroys the Label
+
 For collectors, that process creates an immediate preservation problem.
 
 Using the pencil literally destroys part of the packaging.
@@ -67,6 +73,8 @@ At the same time, an unused example tells you less about how the material perfor
 That is the familiar collector's contradiction again: preserve the artifact or use the tool.
 
 Grease pencils make the choice unusually visible.
+
+## Wax Is Not One Material
 
 The core itself also deserves more attention than it usually receives.
 
@@ -87,6 +95,8 @@ A grease pencil belongs to another material system entirely.
 Color becomes more important than hardness.
 
 Black and white are especially practical because they create contrast on light or dark surfaces. Red, blue, yellow, green, and other colors are useful for coding, inspection, manufacturing, and temporary identification.
+
+## Where the Marks Were Needed
 
 Imagine a sheet of glass moving through a factory.
 
@@ -117,6 +127,8 @@ Polished metal is still difficult for graphite.
 A removable wax mark is still useful.
 
 That practical durability explains why paper-wrapped china markers are still manufactured today even though the design can look like a survivor from another century.
+
+## Almost Nothing Left to Eliminate
 
 The peel-away wrapper is especially interesting from an industrial-design perspective because almost every part performs more than one job.
 
@@ -179,6 +191,8 @@ Country-of-origin markings change.
 Even the instructions for peeling the wrapper may be printed differently.
 
 A collector who ignores these objects because they are “not real graphite pencils” misses a fascinating branch of the pencil family.
+
+## What Makes Something Pencil-Like
 
 The better question is not whether a grease pencil is a true pencil.
 

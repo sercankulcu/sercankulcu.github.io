@@ -19,6 +19,8 @@ Its job was to make a line that a person could see clearly while a reproduction 
 
 That sounds like a contradiction until the pencil is placed inside the workflow of twentieth-century printing, illustration, comics, animation, and graphic design.
 
+## The Workflow Before Digital
+
 Before digital scanners and layered drawing software, artwork intended for reproduction often passed through a camera.
 
 The finished drawing might contain black ink that had to reproduce strongly, while the page underneath could also contain construction lines, registration marks, notes, panel guides, corrections, or preliminary sketches that were useful during production but were not supposed to appear in print.
@@ -52,6 +54,8 @@ The black remains.
 The blue vanishes.
 
 No eraser required.
+
+## Comics and Animation
 
 That workflow became especially useful in comics and animation.
 
@@ -103,6 +107,8 @@ The artist can see it when needed and ignore it when focusing on the final conto
 
 This makes the color psychologically useful even in a fully digital workflow where its original photographic advantage is no longer necessary.
 
+## Not Every Light Blue Qualifies
+
 The material itself also matters.
 
 Not every light blue colored pencil is a true non-photo blue pencil.
@@ -118,6 +124,8 @@ Another could accept ink beautifully but leave too dark a blue line to drop out 
 A third might erase well but feel too hard for fast animation drawing.
 
 The “non-photo” promise therefore depended on both material and reproduction method.
+
+## Modern Scanners See the Blue
 
 This is important today because modern scanners do not behave like old graphic-arts cameras.
 
@@ -142,6 +150,8 @@ The technology changed.
 The workflow survived.
 
 That is one reason non-photo blue pencils remain in art stores.
+
+## An Engineered Compromise
 
 Caran d’Ache, for example, introduced its Sketcher Non-Photo Blue pencil as a tool for cartoonists, comic artists, animators, illustrators, designers, architects, and other users who wanted preliminary lines that could disappear during reproduction.
 
@@ -173,6 +183,8 @@ Graphite pencils balance darkness, hardness, smoothness, and point retention.
 
 Non-photo blue pencils balance visibility, erasability, ink compatibility, and reproducibility.
 
+## Testing It as a Collector
+
 This also makes them interesting collector objects.
 
 A collector can compare more than brand and barrel design.
@@ -203,6 +215,8 @@ The barrel may look almost identical.
 
 The surrounding workflow is completely different.
 
+## Reading the Packaging
+
 Packaging can make that history visible.
 
 Words such as NON-PHOTO, NON-REPRO, COPY-NOT, LAYOUT, SKETCH, or similar production language tell us how manufacturers expected the pencil to be used.
@@ -228,6 +242,8 @@ The final board was not merely a drawing.
 It was a manufactured object in the production chain.
 
 Non-photo blue belonged naturally to that world.
+
+## Pale Blue Says Temporary
 
 The pencil also connects surprisingly well with architecture and technical drawing.
 
@@ -260,6 +276,8 @@ A rough graphite sketch can feel increasingly precious as it becomes darker and 
 A blue rough often feels provisional from the beginning.
 
 It gives permission to be wrong.
+
+## Placing the Pencil Inside a System
 
 For collectors who usually focus on famous graphite models, this category offers a useful change of perspective.
 

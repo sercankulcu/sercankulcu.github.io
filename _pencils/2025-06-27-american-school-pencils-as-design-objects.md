@@ -13,6 +13,8 @@ The ordinary American school pencil is easy to dismiss because it is so familiar
 
 A classic American school pencil is a compact piece of industrial problem-solving. It has to be inexpensive enough for mass purchase, durable enough for children, dark enough for ordinary writing, easy to sharpen, easy to erase, recognizable at a glance, and simple enough to manufacture by the millions.
 
+## The Yellow Barrel
+
 The yellow barrel is the first thing most people notice.
 
 Yellow became strongly associated with American pencils during the late nineteenth and twentieth centuries, especially as manufacturers competed to make their products visually distinctive. Over time the color became less a feature of one company and more a category signal.
@@ -24,6 +26,8 @@ That is an unusual achievement in product design.
 Most consumer products need a logo to establish identity.
 
 The school pencil can often be identified from silhouette and color alone.
+
+## Six Flat Faces
 
 The hexagonal barrel contributes to that recognition.
 
@@ -40,6 +44,8 @@ The shape also makes printing easier.
 Manufacturer, model, grade, promotional wording, country mark, and certification text can be distributed across the flats.
 
 That matters when a pencil is both writing tool and advertising surface.
+
+## The Attached Eraser
 
 The attached eraser is another defining feature of the American school pencil.
 
@@ -79,6 +85,8 @@ A change in eraser color can indicate a model revision, a different market, or s
 
 That is why the whole pencil must be considered rather than only the graphite.
 
+## The No. 2 Marking
+
 The No. 2 marking is perhaps the most culturally specific feature.
 
 In the American numerical grading tradition, No. 2 occupies the familiar middle writing territory roughly comparable to HB.
@@ -108,6 +116,8 @@ The result is that millions of American students learned to see one pencil type 
 That default was not inevitable.
 
 It was created by manufacturing, procurement, testing conventions, classroom practice, and visual repetition.
+
+## Designed for Bulk Purchasing
 
 School districts also shaped design through bulk purchasing.
 
@@ -140,6 +150,8 @@ It also has to survive storage and repeated flexing inside the ferrule.
 Cheap erasers sometimes harden quickly.
 
 Better ones remain elastic and usable longer.
+
+## What Old School Pencils Reveal
 
 For collectors, old school pencils reveal how manufacturers balanced these constraints.
 
@@ -192,6 +204,8 @@ A bright plastic-colored barrel may target younger students.
 A black lacquered No. 2 may try to look more adult or premium.
 
 The basic specification stays familiar while visual language changes.
+
+## Advertising and Local History
 
 Advertising pencils overlap with school-pencil design because they often use the same manufacturing platform.
 
@@ -258,6 +272,8 @@ Useful fields include manufacturer, model, model number, exact imprint, country,
 If two pencils look almost identical but one has a different ferrule stripe or country mark, keep them as separate variants.
 
 The differences may later prove historically significant.
+
+## A Comparative Object
 
 The famous American yellow pencil is also useful as a comparative object.
 

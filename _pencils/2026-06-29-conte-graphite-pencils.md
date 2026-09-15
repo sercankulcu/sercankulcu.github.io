@@ -14,6 +14,8 @@ tags:
 
 The modern graphite pencil owes one of its most important design changes to a shortage.
 
+## A Supply Crisis in 1794
+
 At the end of the eighteenth century, France had a problem.
 
 High-quality pencil graphite was strongly associated with the famous Borrowdale deposit in Cumberland, England. Political and military conflict made imported material difficult to obtain. France still needed pencils for drawing, engineering, administration, and military work, but access to the best English graphite had become unreliable.
@@ -35,6 +37,8 @@ Change the firing.
 Change the behavior of the lead.
 
 That idea sits at the center of nearly every graded graphite pencil we use today.
+
+## The Patent and the Word "Artificial"
 
 Conté patented his “artificial pencils” in France on January 7, 1795.
 
@@ -73,6 +77,8 @@ An artist could choose a softer one.
 A manufacturer could build an ordered range.
 
 The pencil became a scale.
+
+## From Selection to Formulation
 
 Conté’s solution also changed the economics of production.
 
@@ -124,6 +130,8 @@ French institutional sources note that his pencils were praised at the 1798 Expo
 
 The material solution had become a commercial product.
 
+## Conté Was Not Only a Pencil Maker
+
 Conté’s life makes the story even stranger.
 
 He was not simply a pencil maker.
@@ -145,6 +153,8 @@ The core had to be reproducible.
 The raw materials had to be obtainable.
 
 The result had to work.
+
+## Which Conté Do You Mean?
 
 Conté’s name remains attached to drawing materials more than two centuries later.
 
@@ -169,6 +179,8 @@ They are not simply wooden pencils with the wood removed.
 Their geometry and formulations are designed for different drawing techniques.
 
 The wood-cased Conté graphite pencil is the closer descendant of the 1790s pencil story.
+
+## The Modern Conté Range
 
 Today, Conté à Paris still sells graphite pencils made in France.
 
@@ -218,6 +230,8 @@ Those expectations exist because pencil lead became something that could be engi
 
 Conté belongs near the beginning of that transformation.
 
+## Continuity a Collector Can Hold
+
 For collectors, French Conté pencils add something that a German or Japanese model cannot.
 
 They connect a present-day product directly to one of the foundational changes in pencil chemistry.
@@ -263,6 +277,8 @@ That makes boxes worth preserving.
 A bare pencil is an object.
 
 A box can be a technical document.
+
+## France Beside Germany and Japan
 
 There is also a useful comparison to make with Faber-Castell.
 
@@ -333,6 +349,8 @@ That hidden variation is one reason graphite pencils remain interesting to colle
 Two pencils can look almost identical while behaving very differently.
 
 Conté’s breakthrough made that difference controllable instead of accidental.
+
+## From the Mine to the Process
 
 There is a broader lesson in the story.
 

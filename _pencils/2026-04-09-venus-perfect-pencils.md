@@ -27,6 +27,8 @@ Yet the box preserves one of the most ambitious claims in early twentieth-centur
 
 “VENUS PERFECT PENCILS.”
 
+## The American Lead Pencil Company, 1905
+
 The name belonged to the American Lead Pencil Company, a New York manufacturer that had been operating since the nineteenth century and introduced the Venus line of drawing pencils in 1905.
 
 That date matters because high-grade drawing pencils were still strongly associated with European makers.
@@ -58,6 +60,8 @@ Soft.
 Very soft.
 
 Each grade was supposed to occupy a repeatable position in the scale.
+
+## The "Never Vary" Guarantee
 
 The box even makes a striking guarantee:
 
@@ -93,6 +97,8 @@ All of these can influence how the finished pencil behaves.
 
 “Never vary” means the company wanted customers to think of Venus grades almost as calibrated tools.
 
+## 8H Reveals the Audience
+
 The surviving Smithsonian set dated to roughly 1918–1939 contains pencils marked H, 3H, 4H, 5H, and 8H.
 
 Those grades immediately reveal the intended audience.
@@ -121,6 +127,8 @@ A professional drawing pencil gains credibility when it appears beside drafting 
 
 The pencil becomes part of a larger technical toolkit.
 
+## Wartime Opportunity
+
 The timing also helped Venus.
 
 The First World War disrupted international trade and reduced access to many European products in the United States.
@@ -140,6 +148,8 @@ A professional pencil still had to work.
 The line survived for decades.
 
 That persistence suggests that users found something worth returning to.
+
+## Blue as Brand Language
 
 The visual identity helped too.
 
@@ -166,6 +176,8 @@ When a professional keeps several pencils on a crowded drawing table, color matt
 A barrel can identify the tool before the imprint is read.
 
 The grade markings then provide the second layer of information.
+
+## A Worn Set Tells a Different Story
 
 The Smithsonian box adds another clue about how users interacted with the range.
 
@@ -305,6 +317,8 @@ But the ambition is clear.
 
 Venus wanted to be trusted as a scale.
 
+## Company Names as Chronological Evidence
+
 The company itself changed names as the brand became more important.
 
 In 1956, the American Pencil Company became the Venus Pen and Pencil Corporation.
@@ -348,6 +362,8 @@ Trademark symbols may appear or disappear.
 Retailer labels may connect a box to a specific drafting supplier.
 
 A collector who keeps only the pencils and discards the box loses much of that evidence.
+
+## Another American Tradition
 
 Venus also deserves attention because it complicates the usual geography of premium pencils.
 
@@ -397,6 +413,8 @@ Manufacturers reached similar grade labels through different formulations and pr
 
 The stamp “4H” does not erase those differences.
 
+## Aging Complicates the Comparison
+
 For an old pencil, aging adds another variable.
 
 Wax or oil impregnation may change slightly over decades.
@@ -420,6 +438,8 @@ If they behave consistently with one another, that tells us something.
 If one is scratchy while another is smooth, storage or manufacturing variation may be involved.
 
 The brand's old guarantee that each degree would never vary becomes an interesting hypothesis to test a century later.
+
+## Venus Is Not One Object
 
 There is another collecting challenge.
 

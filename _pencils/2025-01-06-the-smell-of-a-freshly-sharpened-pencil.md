@@ -15,6 +15,8 @@ That is why sharpening changes the smell so quickly. Before sharpening, only the
 
 Those shavings matter. A single pencil shaving can release more noticeable aroma than the intact barrel because so much new wood is exposed at once. The smell is strongest immediately after sharpening and then fades as volatile compounds disperse.
 
+## Wood Species and Its Limits
+
 Wood species therefore influences the experience. Incense cedar has long been prized in pencil making partly because it cuts cleanly, but it is also associated with a distinctive warm, resinous aroma that many users recognize instantly.
 
 That scent is not identical in every pencil made from cedar. Growing conditions, drying, storage, finishing, and the age of the slat all influence what reaches the nose.
@@ -29,6 +31,8 @@ Lacquer complicates the picture further. Freshly manufactured pencils can carry 
 
 Once the barrel is cut, the balance changes. The newly exposed wood can become the strongest note, especially if the pencil has been stored long enough for surface coating odors to fade.
 
+## Lacquer, Adhesive and Graphite
+
 Adhesive inside the pencil can also contribute. A wooden pencil is assembled from two grooved slats bonded around the core. Sharpening cuts across that structure and may expose glue lines as well as wood.
 
 The amount is small, but the freshly cut point is a composite object rather than pure wood.
@@ -36,6 +40,8 @@ The amount is small, but the freshly cut point is a composite object rather than
 Graphite itself contributes little to the familiar “pencil smell” compared with the wood and surrounding materials. The core may contain graphite, clay, binders, waxes, or lubricants, but the aroma most users associate with sharpening usually comes from the wooden casing.
 
 This is why woodless graphite sticks do not recreate the same experience even when the mark on paper is similar.
+
+## The Sharpening Method Changes It
 
 Sharpening method changes how strongly the aroma is perceived. A handheld sharpener brings the pencil and shavings close to the face, so the user encounters the smell immediately.
 
@@ -53,6 +59,8 @@ Paper and graphite also contribute to the total sensory environment. The scratch
 
 This is part of why wooden pencils feel materially rich despite their simplicity.
 
+## Smell and Memory
+
 Smell is strongly connected to memory. Olfactory perception is closely associated with parts of the brain involved in emotion and memory, which helps explain why a familiar pencil aroma can trigger vivid associations with classrooms, drawing lessons, school desks, libraries, or stationery shops.
 
 That effect is personal. One person may associate cedar with school exams, another with architecture studios, and another with childhood art supplies.
@@ -66,6 +74,8 @@ Once the pencils are sharpened, the balance shifts toward exposed wood.
 Collectors can use smell as a descriptive observation, but it should remain secondary evidence. “Strong cedar aroma when sharpened” can be worth recording, especially when comparing pencils made from different woods.
 
 It should not become “this must be cedar because it smells like cedar.” Visual grain, manufacturer documentation, known production history, and sharpening behavior are more reliable.
+
+## Vintage Pencils and Sealed Boxes
 
 Vintage pencils are particularly interesting because aroma can survive surprisingly long under favorable storage conditions.
 
@@ -86,6 +96,8 @@ Packaging is therefore part of the sensory history of a pencil.
 A sealed dozen box may preserve a combined smell of lacquer, wood, erasers, paperboard, and ink that disappears soon after opening.
 
 Collectors who care about documentation can note that experience before the box airs out.
+
+## Erasers, Mustiness and Conservation
 
 Erasers introduce another material system. Natural rubber, synthetic rubber, vinyl, fillers, and plasticizers all have their own odors.
 
@@ -118,6 +130,8 @@ This is why the smell of a pencil is tied so closely to sharpening rather than s
 An unsharpened pencil can sit unchanged for decades. The moment it is sharpened, surface area, geometry, texture, smell, and function all change together.
 
 The aroma is therefore not just decoration around the writing experience. It is evidence of a physical transformation.
+
+## A Comparison Experiment
 
 A good comparison experiment is simple. Sharpen several pencils made from known or suspected different woods using the same sharpener.
 

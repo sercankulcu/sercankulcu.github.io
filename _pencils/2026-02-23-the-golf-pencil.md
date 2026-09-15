@@ -21,6 +21,8 @@ It is designed for scorecards, forms, voting slips, surveys, restaurant order pa
 
 The reduced length changes the economics immediately: less wood, lacquer, packaging, and shipping volume are required. When pencils are expected to be given away or used briefly, those savings matter.
 
+## Why Golf Made the Format Visible
+
 Golf made the format especially visible because the pencil had to travel with the scorecard.
 
 A full-length pencil is easy to lose in a golf bag and awkward to carry in a pocket during play. A short pencil fits beside a scorecard, inside a small holder, or in a cart compartment without taking much space.
@@ -36,6 +38,8 @@ The short pencil solved the problem more simply: it only needed to be small enou
 That simplicity is one reason the golf-pencil format spread beyond golf.
 
 Any environment where writing instruments are communal, disposable, or temporary can benefit from the same geometry. Libraries have used short pencils near catalogues and forms. Businesses place them beside questionnaires. Churches, hotels, exhibition halls, restaurants, and public-service counters have all used similar pencils because a full-length writing instrument would offer little extra value.
+
+## Hexagonal, Usually Without an Eraser
 
 The body is commonly hexagonal because flat sides resist rolling and provide useful printing surfaces.
 
@@ -54,6 +58,8 @@ A pencil made for a miniature notebook may be slightly longer.
 A pencil supplied with a scorecard may be shorter.
 
 A promotional version may choose its length according to the available printing area.
+
+## The Printing Area Shapes the Typography
 
 That printing area is important.
 
@@ -88,6 +94,8 @@ Company logos, slogans, typefaces, and addresses can help.
 A pencil with a business name but no modern web address may belong to a different era from one carrying a URL or QR code.
 
 Packaging is useful when available, but golf pencils are often distributed loose, which makes provenance especially valuable.
+
+## Short by Design, Not by Accident
 
 The core itself is usually unremarkable, and that is part of the design.
 

@@ -18,6 +18,8 @@ The problem is simply that the object has become too short for the hand.
 
 A pencil extender solves that problem with almost embarrassing simplicity: attach a new handle to the remaining stub.
 
+## Patented in 1870
+
 That idea has existed for far longer than the modern artist's accessory aisle suggests.
 
 In 1870, William N. Bartholomew received a United States patent for what he described as a combined point protector, extension piece, and lead pencil. The patent was assigned to Joseph Reckendorfer of New York, a name that appears repeatedly in nineteenth-century pencil history.
@@ -35,6 +37,8 @@ That is already most of the pencil-extender concept.
 The pencil itself remained disposable.
 
 The holder did not.
+
+## Between a Pencil and a Mechanical Pencil
 
 This distinction is important because an extender occupies an unusual place between a wooden pencil and a mechanical pencil.
 
@@ -71,6 +75,8 @@ It changes barrel diameter.
 It may introduce metal, wood, rubber, or plastic where the fingers once touched lacquer.
 
 A favorite pencil near the end of its life can therefore become a slightly different tool.
+
+## The Gripping Problem
 
 Nineteenth-century inventors spent real effort on this interface.
 
@@ -114,6 +120,8 @@ Tighten.
 
 Write.
 
+## Holders as Advertising Surfaces
+
 A 1910 United States patent by Charles A. See shows that designers were still refining the same basic object decades later.
 
 See described a pencil extender, holder, and protector intended to be simple, durable, and capable of holding pencils of different sizes. The patent also contemplated the outer surface as a place for advertising.
@@ -131,6 +139,8 @@ That made the holder a logical place for a company name, promotional message, or
 Advertising pencils are already miniature archives.
 
 Advertising pencil extenders can be even stranger artifacts because the message survives while many different pencils pass through the same holder.
+
+## Why It Mattered More Then
 
 The history also explains why extenders were especially attractive when pencils were worth preserving.
 
@@ -165,6 +175,8 @@ An extender turns the unusable stub back into a normal-sized drawing tool.
 The same applies to soft graphite grades.
 
 A short 6B or 8B pencil may still contain plenty of core but become difficult to control when held for broad shading. Adding a handle restores leverage.
+
+## Split Ferrules, Collets and Sleeves
 
 The type of extender changes the result.
 
@@ -211,6 +223,8 @@ Available insertion depth.
 Clamping range.
 
 These are more useful than a vague label such as “universal.”
+
+## Insertion Depth and the Limits
 
 The insertion depth is especially important.
 
@@ -266,6 +280,8 @@ The stub enters the extender.
 
 Eventually almost nothing remains.
 
+## Finishing a Pencil Deliberately
+
 For a collector who also uses pencils, that sequence creates useful information.
 
 A full pencil tells you about design.
@@ -291,6 +307,8 @@ Does the pencil become unpleasantly light as it shortens?
 Does the eraser or end treatment interfere with inserting the stub?
 
 These are not questions a five-line writing sample can answer.
+
+## Extenders as a Collecting Category
 
 Pencil extenders also create their own collecting category.
 

@@ -13,9 +13,13 @@ A clutch pencil looks like a mechanical pencil, but it behaves much more like a 
 
 Instead of advancing a thin 0.5 or 0.7 mm lead in tiny steps, a traditional leadholder grips a much thicker rod of graphite, often around 2 mm in diameter. Pressing the button opens a set of jaws at the tip. Gravity or the user's fingers move the lead forward, and releasing the button closes the jaws around it again.
 
+## Not the Same as a Thin-Lead Pencil
+
 A thin-lead mechanical pencil is designed to protect a fragile filament and keep its line width reasonably constant. A clutch pencil gives the user a large piece of graphite and expects the user to shape it. The point can be sharpened to a needle, flattened into a chisel, rounded for sketching, or deliberately left broad.
 
 The mechanism is old. A U.S. patent granted in 1879 to Joseph Hoffman described a lead and crayon holder with jaws that clasped the marking material. Another patent from 1883 described an automatic crayon or lead holder with a clamping device and spring intended to reduce breakage. By the middle of the twentieth century, clutch pencils had become closely associated with drafting and art. A 1944 American Lead Pencil Company patent described releasable-clutch pencils as instruments that had been on the market for many years and were commonly called draftsmen's or artists' pencils. Drafting explains why the thicker lead survived.
+
+## Built for the Drafting Table
 
 Before CAD, technical drawings were constructed by hand on paper, tracing cloth, or film. A draftsman needed lines of different weights, precise points, and a tool that could be reshaped repeatedly without throwing away a wooden casing. A 2 mm graphite rod provided enough material to grind into a controlled geometry while remaining strong enough for ruler, template, and freehand work.
 
@@ -26,6 +30,8 @@ STAEDTLER's current Mars technico 780 is a good example. It accepts 2 mm leads a
 With a wooden pencil, the grade is printed permanently on the barrel. A 2H pencil remains 2H until it is consumed. A leadholder separates the body from the graphite. The same metal or plastic instrument can hold HB today, 2H tomorrow, or a softer drawing lead later.
 
 A user could keep several holders loaded with different grades or keep one favorite body and exchange leads as needed. The barrel became equipment rather than consumable packaging.
+
+## How the Jaws Grip
 
 When the button is pressed, the jaws open enough for the lead to slide. When released, a spring-loaded sleeve or collet forces the jaws inward. The contact pressure has to hold the graphite securely without crushing it.
 
@@ -40,6 +46,8 @@ Collectors can often read this mechanism through use marks.
 A heavily used metal grip may show polished high points where fingers repeatedly touched it. The jaws may contain graphite dust. The push-button sharpener can carry a ring of dark residue. A hardness indicator may be frozen in one position after decades of neglect.
 
 Those signs can be evidence that the object lived on a desk rather than in a display case.
+
+## Lead Diameter as an Identification Clue
 
 Lead diameter is another useful identification clue. The classic drafting leadholder is strongly associated with 2 mm graphite, but clutch mechanisms also exist for thicker leads such as 3.15 mm and 5.6 mm. Those larger formats move away from technical drafting and toward sketching, shading, charcoal, and broad expressive marks.
 

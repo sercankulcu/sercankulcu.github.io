@@ -15,6 +15,8 @@ Smoothness is only one property in a larger mechanical system. Darkness, frictio
 
 A pencil can be extremely smooth and still be badly suited to the task.
 
+## Friction Is Not a Defect
+
 Smoothness begins with friction between the core and paper. When graphite, clay, binders, and lubricants move across the surface, the user feels resistance through the point and barrel.
 
 That resistance is not automatically a defect.
@@ -24,6 +26,8 @@ Some friction gives the hand information. It tells the writer how quickly the po
 Too little feedback can make a pencil feel uncontrolled, especially in small handwriting.
 
 This is similar to the difference between a very smooth computer mouse surface and one with slightly more drag. Minimum friction is not always maximum precision.
+
+## Formulation and Lubricants
 
 Core formulation strongly affects smoothness. Softer grades usually contain a formulation that deposits graphite more readily, which can create a lubricated sensation.
 
@@ -45,6 +49,8 @@ That can be attractive in handwriting and undesirable in tonal drawing.
 
 Smoothness therefore has a visual cost in some formulations.
 
+## Point Retention and the Tradeoff
+
 Point retention creates another tradeoff. A soft, smooth pencil often wears faster because more material transfers to the page.
 
 A harder, slightly more resistant pencil may maintain a narrow point for much longer.
@@ -58,6 +64,8 @@ A soft pencil may feel wonderful for the first ten words and become blunt halfwa
 A firmer pencil may feel less impressive at first but maintain consistent line width through a full page.
 
 Quality should include how the pencil behaves over time, not just the first stroke.
+
+## Darkness and Smudging Are Separate
 
 Darkness is another separate variable.
 
@@ -74,6 +82,8 @@ A soft smooth core may leave more loose graphite on the surface, increasing tran
 A firmer core may produce a cleaner notebook even if the line feels less luxurious.
 
 For left-handed writers, smudging can be more important than smoothness because the hand often passes directly across fresh writing.
+
+## Paper, Point and Angle
 
 Paper changes every one of these impressions.
 
@@ -112,6 +122,8 @@ A pencil that feels dry under a heavy hand may feel controlled and refined with 
 This is one reason personal reviews can conflict so strongly.
 
 Two reviewers may use the same pencil on the same paper and still experience it differently because their pressure and angle differ.
+
+## Consistency Is the Real Quality Marker
 
 Core uniformity is where smoothness becomes a genuine quality signal.
 
@@ -158,6 +170,8 @@ Ferrules and erasers matter on writing pencils.
 An attached eraser that smears graphite or detaches under pressure weakens the product regardless of how smooth the core feels.
 
 End finishing, imprint quality, and consistency across a box also reveal manufacturing control.
+
+## Score the Categories Separately
 
 A useful pencil review should therefore separate categories.
 
@@ -215,6 +229,8 @@ Neither sound is inherently better, but acoustic feedback often correlates with 
 
 The best pencil may therefore be the one whose combination of sound, friction, darkness, and point life matches the user's rhythm.
 
+## A Better Comparison Test
+
 A practical comparison test should use more than one mark.
 
 Start with a paragraph of normal handwriting.
@@ -260,6 +276,8 @@ Documentation matters.
 Grade, paper, sharpener, point geometry, and condition should be recorded alongside the subjective impression.
 
 This makes comparisons reproducible.
+
+## From Adjectives to Description
 
 The phrase “buttery smooth” is enjoyable language, but it is not enough data.
 

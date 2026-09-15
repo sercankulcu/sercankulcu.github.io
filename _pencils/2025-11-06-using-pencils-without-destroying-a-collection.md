@@ -15,6 +15,8 @@ That does not mean collectible pencils should never be used.
 
 It means use should be deliberate.
 
+## Duplication
+
 The easiest strategy is duplication.
 
 For pencils that are still available, I like to keep at least two examples: one archival and one working.
@@ -33,6 +35,8 @@ For discontinued or rare pencils, it becomes harder.
 
 Then the decision has to be made object by object.
 
+## What Information the Pencil Carries
+
 The first question is what information the pencil carries.
 
 If its value lies mainly in an unusual imprint, factory-sharpened point, sealed packaging, ferrule, or provenance, sharpening may destroy the most important evidence.
@@ -46,6 +50,8 @@ A rare drafting pencil with a famous grade range may deserve one carefully docum
 A one-of-a-kind advertising pencil may be more valuable unsharpened because its message and local history matter more than its graphite.
 
 Use should follow research purpose.
+
+## Document Before You Use
 
 Before using an unusual pencil, document it.
 
@@ -70,6 +76,8 @@ Catalog the specimen used.
 If a collection contains three identical pencils and only one is sharpened, record exactly which ID became the working example.
 
 This prevents future confusion about condition and provenance.
+
+## Start With the Least Invasive Method
 
 The first sharpening should be conservative.
 
@@ -114,6 +122,8 @@ Damage should be proportional to information gained.
 This is where collector discipline matters.
 
 The temptation to “see what's inside” can destroy evidence without producing useful knowledge.
+
+## A Used Specimen Has Its Own Value
 
 A used specimen has its own value.
 
@@ -179,6 +189,8 @@ A working pencil can therefore become a research specimen.
 
 The important point is that it should be treated intentionally, not casually.
 
+## Tools, Erasers and Test Efficiency
+
 Use appropriate sharpeners.
 
 A dull blade can destroy more material than necessary.
@@ -239,6 +251,8 @@ Begin with normal pressure.
 
 Escalate only when necessary.
 
+## Handling and Retirement
+
 Handling can also damage a pencil without shortening it.
 
 Repeatedly pulling rare pencils from crowded boxes causes lacquer rub.
@@ -292,6 +306,8 @@ This prevents abrasion and accidental crushing.
 If the box contains multiple unused pencils, choose one specimen and leave the arrangement of the others intact when possible.
 
 Photograph the original arrangement first.
+
+## A Three-Level Strategy
 
 The two-pencil strategy can expand into a three-level system for serious collections.
 
@@ -361,6 +377,8 @@ Collections are not only financial assets.
 
 They can contain personal history.
 
+## Reversibility
+
 Reversibility is a useful principle.
 
 Photography is reversible because it changes nothing.
@@ -404,6 +422,8 @@ A collector may discover that every rare pencil is untouched and every common pe
 Or the opposite.
 
 The balance can then be adjusted intentionally.
+
+## Document First, Use Second, Record Third
 
 Photography reduces anxiety, but documentation should happen before use rather than after.
 

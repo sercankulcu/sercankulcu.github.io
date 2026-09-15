@@ -11,6 +11,8 @@ tags:
 
 A pencil is one of the simplest tools on a desk, yet it offers something that many modern writing instruments do not: visible change. The point becomes shorter, the paint acquires scratches, the lettering slowly disappears under the fingers, and every page removes a little more of the object.
 
+## A Tool That Records Its Own Use
+
 A pencil records use in its own body.
 
 That physical change is one reason the wooden pencil still feels relevant.
@@ -41,6 +43,8 @@ The object becomes shorter because the work happened.
 
 That relationship is simple enough to ignore, but direct enough to feel satisfying.
 
+## It Fails Gracefully
+
 Pencils also remain useful because they fail gracefully.
 
 A battery does not die.
@@ -64,6 +68,8 @@ Even the sharpener is optional.
 A knife can renew the point.
 
 In some settings, the ability to write without electricity or ink is still genuinely practical.
+
+## Pressure and One Tool, Several Marks
 
 Pencils are also pressure-sensitive in a way that ordinary ballpoint pens are not.
 
@@ -107,6 +113,8 @@ A harder grade can maintain a fine point for small notes.
 
 The grade can be chosen to fit the user rather than forcing every writer into one fixed behavior.
 
+## Correctable, Therefore Exploratory
+
 Pencils are also correctable.
 
 That sounds obvious, but correction changes the psychology of writing.
@@ -146,6 +154,8 @@ Mind maps.
 Drafting.
 
 Any activity where ideas change as they are externalized benefits from a mark that is visible but not absolute.
+
+## A Narrow Space Beside the Screen
 
 The digital world also makes pencils more interesting rather than less.
 
@@ -211,6 +221,8 @@ The casing stays familiar.
 
 The material inside changes the function.
 
+## Engineering You Can See
+
 Pencils are also technically interesting.
 
 What we casually call “lead” is normally a graphite-based composite rather than metallic lead.
@@ -265,6 +277,8 @@ The core is exposed.
 
 The pencil literally reveals itself through consumption.
 
+## Why It Rewards Collecting
+
 That makes it unusually rewarding to collect.
 
 A collection can be organized around brands, grades, countries, factories, ferrules, erasers, typography, packaging, discontinued models, advertising, or historical eras.
@@ -312,6 +326,8 @@ A school pencil can show what children used in a particular decade.
 A factory pencil can show industrial procurement.
 
 The historical value comes from context, not price.
+
+## National Design Differences
 
 Pencils also preserve national design differences.
 
@@ -391,6 +407,8 @@ Archivists sometimes prefer graphite where ink permanence or bleed is undesirabl
 
 The use cases have narrowed in some places, but they have not disappeared.
 
+## A Teaching Object
+
 The pencil also remains a powerful teaching object.
 
 It can demonstrate friction.
@@ -441,6 +459,8 @@ Collecting pencils trains the eye to see tolerances.
 
 That skill transfers to other manufactured objects.
 
+## Low-Stakes Action
+
 There is also a psychological reason pencils endure.
 
 They invite low-stakes action.
@@ -490,6 +510,8 @@ Mechanical pencils solve some problems better.
 Yet the wooden pencil still occupies a useful intersection of price, reliability, tactility, correctability, portability, and expressive range.
 
 It survives because no single successor dominates all of those dimensions.
+
+## Consumed by Its Own Purpose
 
 For collectors, there is one more reason pencils matter: they disappear.
 
