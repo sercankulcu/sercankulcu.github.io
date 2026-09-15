@@ -6,7 +6,7 @@ chapter: 7
 chapter_title: 'The Birth of Civilization'
 order: 68
 tags:
-   - law
+   - institutions
    - justice
    - civilization
 ---

@@ -5,7 +5,7 @@ description: "The professional version of the man was easy to record — the eve
 tags:
    - work
    - friendship
-   - coworkers
+   - workplace
 ---
 
 On the day a coworker left, I tried to write down what I would remember about him.

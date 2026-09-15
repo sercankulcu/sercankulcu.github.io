@@ -6,8 +6,7 @@ tags:
    - movie
    - identity
    - consumerism
-   - masculinity
-   - alienation
+   - loneliness
 ---
 
 I watched *Fight Club* on a small computer monitor in a student room containing nearly everything a student room is expected to contain: an inexpensive desk, cables in permanent negotiation with one another, books stacked horizontally because the shelf was full, CDs, clothes waiting to become laundry, and several objects I had bought because owning them had briefly seemed like progress.

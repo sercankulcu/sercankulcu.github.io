@@ -3,9 +3,8 @@ title: 'Chatbots Before The Hype'
 date: 2016-09-18
 permalink: /posts/2016/09/chatbots-before-the-hype/
 tags:
-  - artificial-intelligence
-  - chatbots
-  - software
+   - artificial-intelligence
+   - software
 ---
 
 In April 2016, Facebook opened the Messenger Platform to developers, allowing companies to build bots that could receive and send messages through Messenger's API. In the weeks that followed, thousands of bots appeared — bots to order pizza, check weather, browse CNN headlines, get customer support, and more. Microsoft launched the Bot Framework in March 2016 with connectors for Skype, Slack, and other platforms. Amazon Alexa, which had launched with the Echo in November 2014, was drawing attention from developers building voice-driven skills for the device.

@@ -6,7 +6,6 @@ chapter: 10
 chapter_title: 'Empires and Global Humanity'
 order: 95
 tags:
-   - silk-road
    - trade
    - globalization
 ---

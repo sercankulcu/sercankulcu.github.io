@@ -3,9 +3,9 @@ title: 'Sometimes a Toy Is Worth More Than Us'
 date: 2026-09-07
 description: "A broken toy can mean more than adults realize; taking a child seriously does not require replacing everything they lose."
 tags:
-  - childhood
-  - attachment
-  - value
+   - childhood
+   - attachment
+   - meaning
 ---
 
 For a moment, a broken toy can seem to matter more to a child than anything a parent has done that day.

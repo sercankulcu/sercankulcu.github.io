@@ -6,9 +6,8 @@ chapter: 13
 chapter_title: 'The Modern Human'
 order: 129
 tags:
-   - hiroshima
-   - nuclear-weapons
    - war
+   - technology
 ---
 
 On August 6, 1945, an atomic bomb destroyed much of Hiroshima. Three days later, another atomic bomb was dropped on Nagasaki.

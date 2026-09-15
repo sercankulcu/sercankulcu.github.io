@@ -5,7 +5,7 @@ permalink: /pencils/2025/06/american-school-pencils-as-design-objects/
 category: design
 tags:
    - pencil
-   - usa
+   - pencil-origins
    - school
 ---
 

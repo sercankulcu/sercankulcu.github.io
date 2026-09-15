@@ -5,7 +5,7 @@ permalink: /pencils/2025/03/foil-stamping-and-pencil-typography/
 category: design
 tags:
    - pencil
-   - typography
+   - printing
    - design
 ---
 

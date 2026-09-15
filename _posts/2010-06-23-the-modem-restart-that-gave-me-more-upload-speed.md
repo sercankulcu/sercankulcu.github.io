@@ -4,7 +4,7 @@ date: 2010-06-23
 permalink: /posts/2010/06/the-modem-restart-that-gave-me-more-upload-speed/
 tags:
    - internet
-   - turk-telekom
+   - turkey
    - technology
    - memories
    - humor

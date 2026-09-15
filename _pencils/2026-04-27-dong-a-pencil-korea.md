@@ -5,8 +5,8 @@ permalink: /pencils/2026/04/dong-a-pencil-korea/
 category: history
 tags:
    - pencil
-   - dong-a
-   - south-korea
+   - pencil-brands
+   - pencil-origins
    - manufacturing
    - stationery
    - history

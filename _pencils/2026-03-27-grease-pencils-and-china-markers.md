@@ -5,8 +5,7 @@ permalink: /pencils/2026/03/grease-pencils-and-china-markers/
 category: types
 tags:
    - pencil
-   - grease-pencil
-   - china-marker
+   - pencil-types
    - tools
    - collecting
 ---

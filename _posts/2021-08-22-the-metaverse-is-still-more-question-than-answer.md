@@ -3,9 +3,8 @@ title: 'The Metaverse Is Still More Question Than Answer'
 date: 2021-08-22
 permalink: /posts/2021/08/the-metaverse-is-still-more-question-than-answer/
 tags:
-  - virtual-reality
-  - technology
-  - internet
+   - technology
+   - internet
 ---
 
 The word "metaverse" comes from Neal Stephenson's 1992 novel *Snow Crash*, where it describes a persistent virtual world accessible through goggles — a shared space where people can walk, talk, and conduct business as avatars. The term has been sitting in technology culture since then, invoked occasionally, not quite arriving.

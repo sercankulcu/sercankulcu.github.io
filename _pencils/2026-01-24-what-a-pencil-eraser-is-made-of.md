@@ -6,10 +6,8 @@ category: materials
 tags:
    - pencil
    - eraser
-   - rubber
-   - plastic
-   - graphite
    - materials
+   - graphite
 ---
 
 A pencil eraser looks like a single piece of soft material, but its job depends on a carefully balanced mixture of elasticity, friction, filler, and controlled wear.

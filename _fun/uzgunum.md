@@ -6,7 +6,7 @@ tags:
    - music
    - love
    - separation
-   - acceptance
+   - equanimity
    - regret
 ---
 

@@ -5,7 +5,7 @@ description: "He bought chocolates to welcome himself to the new job — nobody 
 tags:
    - academia
    - work
-   - absurdity
+   - humor
    - office-life
 ---
 

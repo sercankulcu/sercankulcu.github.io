@@ -3,10 +3,10 @@ title: 'How Japanese Carpenters Built Without Nails'
 date: 2026-09-07
 permalink: /posts/2026/09/how-japanese-carpenters-built-without-nails/
 tags:
-  - engineering
-  - architecture
-  - japan
-  - woodworking
+   - engineering
+   - software
+   - japan
+   - manufacturing
 ---
 
 Some of the most impressive engineering solutions do not look like engineering at first.

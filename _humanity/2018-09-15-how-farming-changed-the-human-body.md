@@ -7,8 +7,8 @@ chapter_title: 'The Agricultural Revolution'
 order: 57
 tags:
    - agriculture
-   - health
-   - human-body
+   - society
+   - human-evolution
 ---
 
 Agriculture changed society. It also changed bodies.

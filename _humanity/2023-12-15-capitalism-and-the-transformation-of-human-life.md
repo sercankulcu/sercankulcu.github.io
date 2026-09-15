@@ -7,7 +7,7 @@ chapter_title: 'Reason, Science and Revolution'
 order: 120
 tags:
    - capitalism
-   - markets
+   - economy
    - modernity
 ---
 

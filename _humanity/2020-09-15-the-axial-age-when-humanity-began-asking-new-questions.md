@@ -6,7 +6,7 @@ chapter: 9
 chapter_title: 'Philosophy Begins'
 order: 81
 tags:
-   - axial-age
+   - religion
    - philosophy
    - civilization
 ---

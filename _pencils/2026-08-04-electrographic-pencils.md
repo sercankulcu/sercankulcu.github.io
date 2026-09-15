@@ -5,9 +5,8 @@ permalink: /pencils/2026/08/electrographic-pencils/
 category: types
 tags:
    - pencil
-   - electrographic-pencil
-   - mark-sense
-   - IBM
+   - pencil-types
+   - pencil-brands
    - computing-history
    - collecting
 ---

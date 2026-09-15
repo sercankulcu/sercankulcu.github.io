@@ -6,10 +6,8 @@ category: materials
 tags:
    - pencil
    - graphite
-   - pencil-core
    - manufacturing
-   - clay
-   - firing
+   - materials
 ---
 
 The graphite core inside a wooden pencil looks simple only after the factory has finished with it.

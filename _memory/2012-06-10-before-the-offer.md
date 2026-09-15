@@ -4,7 +4,6 @@ date: 2012-06-10
 description: "He left the interview calculating how long he would need to resign properly — nobody had offered him anything yet, which became important when the silence stretched into months."
 tags:
    - career
-   - interviews
    - work
 ---
 

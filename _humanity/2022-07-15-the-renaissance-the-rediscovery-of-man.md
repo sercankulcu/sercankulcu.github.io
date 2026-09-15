@@ -6,8 +6,8 @@ chapter: 11
 chapter_title: 'The Birth of the Modern World'
 order: 103
 tags:
-   - renaissance
-   - humanism
+   - history
+   - philosophy
    - art
 ---
 

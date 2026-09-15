@@ -5,7 +5,6 @@ description: "Dido's Brixton Academy concert became a place to return to across 
 tags:
    - music
    - dido
-   - live
    - memory
    - night
 ---

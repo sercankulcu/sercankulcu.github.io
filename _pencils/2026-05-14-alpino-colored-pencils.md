@@ -5,8 +5,8 @@ permalink: /pencils/2026/05/alpino-colored-pencils/
 category: brands
 tags:
    - pencil
-   - alpino
-   - spain
+   - pencil-brands
+   - pencil-origins
    - colored-pencil
    - school-pencil
    - collecting

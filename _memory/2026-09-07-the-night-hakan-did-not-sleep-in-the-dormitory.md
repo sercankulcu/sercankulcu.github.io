@@ -3,10 +3,9 @@ title: 'The Night Hakan Did Not Sleep in the Dormitory'
 date: 2026-09-07
 description: "Hakan sent a link, he clicked it, his email password disappeared — the recovery ended with an IT office and a chase through the dormitory corridor, after which Hakan was too afraid to sleep there that night."
 tags:
-  - dormitory
-  - university
-  - internet
-  - phishing
+   - dormitory
+   - university
+   - internet
 ---
 
 There was a boy named Hakan.

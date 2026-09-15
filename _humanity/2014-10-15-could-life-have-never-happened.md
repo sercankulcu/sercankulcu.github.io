@@ -7,7 +7,7 @@ chapter_title: 'Before Humanity'
 order: 10
 tags:
    - life
-   - astrobiology
+   - cosmology
    - philosophy
 ---
 

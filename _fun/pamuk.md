@@ -7,7 +7,6 @@ tags:
    - love
    - separation
    - heartbreak
-   - pop
 ---
 
 There is something wonderfully strange about saying that you are moving out of someone's heart.

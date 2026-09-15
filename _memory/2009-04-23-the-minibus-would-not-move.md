@@ -3,10 +3,9 @@ title: "The Minibus Would Not Move"
 date: 2009-04-23
 description: "The market was on the itinerary; the broken-down minibus became the part that stayed — how an unplanned delay gave the whole group something in common."
 tags:
-   - hiking
-   - friendship
    - travel
-   - unexpected
+   - friendship
+   - coincidence
 ---
 
 Our hiking trips usually followed a familiar order. We left Ankara, ate something in the morning, walked for hours, reached the end of the route, and sometimes stopped at a local market before heading home. By late afternoon, everyone knew roughly what remained in the day.

@@ -6,7 +6,6 @@ category: brands
 tags:
    - pencil
    - eberhard-faber
-   - mongol-482
    - american-pencil
    - history
    - collecting

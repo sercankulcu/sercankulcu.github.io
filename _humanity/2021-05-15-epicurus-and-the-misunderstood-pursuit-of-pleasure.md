@@ -6,9 +6,8 @@ chapter: 9
 chapter_title: 'Philosophy Begins'
 order: 89
 tags:
-   - epicurus
-   - pleasure
    - philosophy
+   - good-life
 ---
 
 Epicurus is often misunderstood as a philosopher of indulgence: luxury, food, and sensual excess.

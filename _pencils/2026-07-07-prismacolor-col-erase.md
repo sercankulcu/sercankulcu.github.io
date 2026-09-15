@@ -5,11 +5,9 @@ permalink: /pencils/2026/07/prismacolor-col-erase/
 category: brands
 tags:
    - pencil
-   - prismacolor
-   - col-erase
    - colored-pencil
    - animation
-   - illustration
+   - drawing
 ---
 
 Most colored pencils are designed to make a mark that stays.

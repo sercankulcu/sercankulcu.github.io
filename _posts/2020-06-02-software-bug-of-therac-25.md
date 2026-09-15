@@ -3,7 +3,11 @@ title: 'Software Bug Of Therac-25'
 date: 2020-06-02
 permalink: /posts/2020/06/software-bug-of-therac-25/
 tags:
-  - self-improvement
+  - software
+  - debugging
+  - engineering
+  - ethics
+  - history
 ---
 
 The Therac-25 is one of the most studied cases in software-engineering history because the consequences of the bugs it contained were not degraded performance or corrupted data. Patients received radiation doses hundreds of times above therapeutic levels. At least six people were seriously injured. Three died.

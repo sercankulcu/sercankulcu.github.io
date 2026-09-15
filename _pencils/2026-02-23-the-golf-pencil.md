@@ -5,9 +5,8 @@ permalink: /pencils/2026/02/the-golf-pencil/
 category: types
 tags:
    - pencil
-   - golf-pencil
-   - short-pencil
-   - scoring
+   - pencil-types
+   - manufacturing
    - design
    - collecting
 ---

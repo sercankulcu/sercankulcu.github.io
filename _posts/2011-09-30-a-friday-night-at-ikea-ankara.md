@@ -5,8 +5,6 @@ permalink: /posts/2011/09/a-friday-night-at-ikea-ankara/
 tags:
    - ankara
    - city-life
-   - ikea
-   - everyday-life
    - memories
 ---
 

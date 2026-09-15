@@ -6,9 +6,8 @@ chapter: 12
 chapter_title: 'Reason, Science and Revolution'
 order: 116
 tags:
-   - american-revolution
-   - democracy
-   - rights
+   - politics
+   - human-rights
 ---
 
 The American Revolution turned Enlightenment language into political rebellion. Taxation, representation, natural rights, and consent of the governed became more than colonial grievances; they became a broader claim that government requires legitimacy from the people.

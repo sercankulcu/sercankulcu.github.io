@@ -6,7 +6,6 @@ chapter: 5
 chapter_title: 'The World Before Civilization'
 order: 44
 tags:
-   - africa
    - migration
    - human-origins
 ---

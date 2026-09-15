@@ -6,9 +6,9 @@ chapter: 14
 chapter_title: 'The Digital Age'
 order: 136
 tags:
-   - connection
+   - community
    - loneliness
-   - digital-life
+   - modernity
 ---
 
 Humanity has never been easier to contact. That does not mean humanity has never been lonelier.

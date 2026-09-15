@@ -6,9 +6,9 @@ chapter: 1
 chapter_title: 'Before Humanity'
 order: 7
 tags:
-   - origin-of-life
-   - abiogenesis
-   - biology
+   - life
+   - origins
+   - evolution
 ---
 
 At some point on the early Earth, chemistry crossed a threshold.

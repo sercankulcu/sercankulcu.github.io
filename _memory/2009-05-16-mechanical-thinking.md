@@ -3,7 +3,7 @@ title: "Mechanical Thinking"
 date: 2009-05-16
 description: "Language can improve the dignity of a bad habit without changing it — mechanical thinking sounds almost professional until the road changes and the machine keeps running."
 tags:
-   - thinking
+   - overthinking
    - habits
    - language
    - work

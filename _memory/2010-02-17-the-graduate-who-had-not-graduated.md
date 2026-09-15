@@ -6,7 +6,6 @@ tags:
    - university
    - graduation
    - bureaucracy
-   - administration
 ---
 
 The document said that I had graduated on February 3. The university computer, however, did not appear to share this opinion.

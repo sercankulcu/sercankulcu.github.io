@@ -7,7 +7,7 @@ chapter_title: 'Before Humanity'
 order: 6
 tags:
    - earth
-   - habitability
+   - cosmology
    - life
 ---
 

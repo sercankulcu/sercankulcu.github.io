@@ -3,10 +3,10 @@ title: "The Year Would Not Stay in One Column"
 date: 2023-12-28
 description: "He became an Assistant Professor in 2023 and spent the rest of the year fixing pages and small things — the title changed while life around it remained untidy."
 tags:
-  - academia
-  - promotion
-  - small-projects
-  - year-end
+   - academia
+   - career
+   - productivity
+   - year-end
 ---
 
 In 2023, one line in my professional life changed: I became an Assistant Professor.

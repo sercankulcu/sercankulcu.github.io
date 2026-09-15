@@ -5,7 +5,7 @@ permalink: /pencils/2025/02/the-no-2-pencil/
 category: history
 tags:
    - pencil
-   - no-2
+   - hardness
    - writing
 ---
 

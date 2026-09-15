@@ -6,7 +6,6 @@ chapter: 9
 chapter_title: 'Philosophy Begins'
 order: 85
 tags:
-   - socrates
    - philosophy
    - ethics
 ---

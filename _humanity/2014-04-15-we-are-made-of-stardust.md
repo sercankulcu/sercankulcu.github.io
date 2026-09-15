@@ -6,8 +6,7 @@ chapter: 1
 chapter_title: 'Before Humanity'
 order: 4
 tags:
-   - stardust
-   - elements
+   - cosmology
    - humanity
 ---
 

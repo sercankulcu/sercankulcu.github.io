@@ -6,7 +6,6 @@ category: collecting
 tags:
    - pencil
    - collecting
-   - catalog
 ---
 
 A pencil collection becomes much more useful when it is cataloged. Without a catalog, a drawer full of pencils is still enjoyable, but comparison depends on memory. Once the collection reaches dozens or hundreds of objects, memory becomes unreliable. Small differences in ferrules, imprints, grade marks, packaging, and country statements begin to blur together.

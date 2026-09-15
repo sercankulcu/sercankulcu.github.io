@@ -6,7 +6,6 @@ chapter: 9
 chapter_title: 'Philosophy Begins'
 order: 86
 tags:
-   - plato
    - philosophy
    - metaphysics
 ---

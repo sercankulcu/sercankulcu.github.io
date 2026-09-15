@@ -8,7 +8,6 @@ order: 75
 tags:
    - monotheism
    - religion
-   - theology
 ---
 
 Many ancient societies imagined divine worlds populated by multiple gods, with different gods governing storms, fertility, war, rivers, cities, or households.

@@ -3,9 +3,8 @@ title: 'Wearable Computing Is Looking For A Purpose'
 date: 2014-02-16
 permalink: /posts/2014/02/wearable-computing-is-looking-for-a-purpose/
 tags:
-  - wearables
-  - technology
-  - mobile
+   - technology
+   - mobile
 ---
 
 Computers have moved from desks to laps and then into pockets. The next suggested destination is the body, and in February 2014 several companies are in the middle of that experiment with mixed results.

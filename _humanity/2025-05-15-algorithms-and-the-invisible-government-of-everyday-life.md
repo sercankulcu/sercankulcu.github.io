@@ -7,8 +7,8 @@ chapter_title: 'The Digital Age'
 order: 137
 tags:
    - algorithms
-   - governance
-   - digital-society
+   - state
+   - modernity
 ---
 
 An algorithm is a procedure: a sequence of steps for transforming input into output. Humans used algorithms long before computers. Long division is an algorithm. A recipe resembles one.

@@ -6,9 +6,8 @@ chapter: 9
 chapter_title: 'Philosophy Begins'
 order: 84
 tags:
-   - laozi
-   - daoism
    - philosophy
+   - religion
 ---
 
 Human civilization is built on intervention: cut the tree, move the river, write the law, train the child, conquer the enemy, improve the system.

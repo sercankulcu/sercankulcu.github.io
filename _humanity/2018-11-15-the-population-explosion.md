@@ -6,9 +6,8 @@ chapter: 6
 chapter_title: 'The Agricultural Revolution'
 order: 59
 tags:
-   - population
+   - society
    - agriculture
-   - demography
 ---
 
 Agriculture did not necessarily make each person healthier. It made more people possible.

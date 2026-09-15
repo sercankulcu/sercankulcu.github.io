@@ -7,7 +7,7 @@ tags:
    - war
    - sacrifice
    - history
-   - duty
+   - responsibility
 ---
 
 I watched *Saving Private Ryan* on television expecting a war film and discovered, during the opening battle, that I had confused war films with war.

@@ -6,7 +6,6 @@ tags:
    - internet
    - eksisozluk
    - rules
-   - online-communities
 ---
 
 There was a rule on an online community I used: if a title was written as a question, you were not supposed to write an entry that merely answered it.

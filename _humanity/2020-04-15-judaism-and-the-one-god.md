@@ -6,9 +6,8 @@ chapter: 8
 chapter_title: 'Gods, Religion and Morality'
 order: 76
 tags:
-   - judaism
-   - monotheism
    - religion
+   - monotheism
 ---
 
 Judaism is one of the most historically influential religious traditions in human history, and its importance cannot be reduced simply to being "the religion before Christianity." It developed its own rich traditions of law, interpretation, worship, identity, philosophy, and communal life.

@@ -5,10 +5,8 @@ permalink: /pencils/2026/01/musgrave-tennessee-red/
 category: brands
 tags:
    - pencil
-   - musgrave
-   - tennessee-red
-   - red-cedar
    - american-pencil
+   - pencil-wood
    - collecting
 ---
 

@@ -3,9 +3,8 @@ title: 'HTTPS Is Becoming Everyones Problem'
 date: 2015-12-13
 permalink: /posts/2015/12/https-is-becoming-everyones-problem/
 tags:
-  - security
-  - web
-  - https
+   - security
+   - web
 ---
 
 For years, HTTPS was associated mainly with banks, shopping carts, and login pages — places where passwords and credit card numbers obviously needed protection. A simple personal website or blog routinely stayed on plain HTTP. Certificates cost money, expired annually, required configuration, and for a blog about recipes or software notes, the effort seemed disproportionate.

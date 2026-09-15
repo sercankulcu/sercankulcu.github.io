@@ -3,10 +3,10 @@ title: 'A Night at Nil Bar'
 date: 2024-09-07
 description: "A 220p recording from Nil Bar where Şeytan Tüyü was playing — today he would not want it to look better: this old camera recorded not just the performance but the whole period."
 tags:
-  - ankara
-  - music
-  - seytan-tuyu
-  - nil-bar
+   - ankara
+   - music
+   - seytan-tuyu
+   - nightlife
 ---
 
 I recorded this video myself.

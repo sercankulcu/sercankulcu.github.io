@@ -5,8 +5,8 @@ description: "Ankara could make a Friday feel exactly like a Tuesday afternoon â
 tags:
    - ankara
    - solitude
-   - city
-   - winter
+   - city-life
+   - daily-life
 ---
 
 Someone once asked what I liked most about Ankara.

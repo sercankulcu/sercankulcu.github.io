@@ -6,7 +6,7 @@ chapter: 4
 chapter_title: 'Consciousness and Meaning'
 order: 32
 tags:
-   - self-awareness
+   - consciousness
    - cognition
    - human-evolution
 ---

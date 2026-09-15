@@ -5,11 +5,8 @@ permalink: /pencils/2026/03/the-clutch-pencil/
 category: types
 tags:
    - pencil
-   - clutch-pencil
-   - leadholder
-   - drafting
    - mechanical-pencil
-   - 2mm
+   - drafting
 ---
 
 A clutch pencil looks like a mechanical pencil, but it behaves much more like a wooden pencil whose casing has been replaced by a reusable machine.

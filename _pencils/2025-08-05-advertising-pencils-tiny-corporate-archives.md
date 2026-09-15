@@ -5,7 +5,6 @@ permalink: /pencils/2025/08/advertising-pencils-tiny-corporate-archives/
 category: history
 tags:
    - pencil
-   - advertising
    - collecting
 ---
 

@@ -5,7 +5,6 @@ description: "She heard criticism in a comment about temperature — and years l
 tags:
    - communication
    - relationships
-   - misunderstandings
 ---
 
 She suggested going for a walk, and I agreed even though I did not really feel like going.

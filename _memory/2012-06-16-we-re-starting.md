@@ -5,7 +5,7 @@ description: "The doctor entered the room and said 'Come on, kids. We're startin
 tags:
    - trust
    - fear
-   - doctors
+   - daily-life
    - growing-up
 ---
 

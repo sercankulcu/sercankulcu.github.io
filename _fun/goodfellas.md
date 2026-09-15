@@ -7,7 +7,7 @@ tags:
    - crime
    - power
    - loyalty
-   - corruption
+   - politics
 ---
 
 Someone recommended *GoodFellas* to me with the fatal phrase “one of those films you have to see,” which usually transforms pleasure into homework.

@@ -4,9 +4,9 @@ date: 2007-03-03
 description: "Talent is what can be seen from the seats; obsession is usually behind the curtain — on rivalry, secrecy, and the cost of explanation."
 tags:
    - movie
-   - obsession
-   - illusion
-   - rivalry
+   - attachment
+   - perception
+   - ambition
    - sacrifice
 ---
 

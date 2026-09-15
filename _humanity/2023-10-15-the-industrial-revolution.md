@@ -6,7 +6,7 @@ chapter: 12
 chapter_title: 'Reason, Science and Revolution'
 order: 118
 tags:
-   - industrial-revolution
+   - modernity
    - technology
    - economy
 ---

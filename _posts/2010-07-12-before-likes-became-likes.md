@@ -6,7 +6,6 @@ tags:
    - internet
    - social-media
    - eksisozluk
-   - validation
    - memories
    - humor
 ---

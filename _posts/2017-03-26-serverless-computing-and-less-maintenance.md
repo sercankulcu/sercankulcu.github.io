@@ -3,9 +3,8 @@ title: 'Serverless Computing And The Idea Of Less Maintenance'
 date: 2017-03-26
 permalink: /posts/2017/03/serverless-computing-and-less-maintenance/
 tags:
-  - cloud
-  - serverless
-  - software
+   - cloud
+   - software
 ---
 
 The word "serverless" is a little funny because the servers do not actually disappear. They are still there — running in AWS data centers in Virginia or Oregon or wherever the platform routes your traffic. The servers become less visible to the developer, which is different from not existing.

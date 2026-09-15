@@ -5,7 +5,6 @@ permalink: /posts/2010/07/the-day-everyone-became-a-manager/
 tags:
    - work
    - career
-   - management
    - office-life
    - memories
    - humor

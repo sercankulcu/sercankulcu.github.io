@@ -6,9 +6,8 @@ category: history
 tags:
    - pencil
    - faber-castell
-   - brazil
+   - pencil-origins
    - manufacturing
-   - forestry
    - pencil-wood
 ---
 

@@ -3,10 +3,9 @@ title: 'The Browser Is Becoming A Platform'
 date: 2010-02-28
 permalink: /posts/2010/02/the-browser-is-becoming-a-platform/
 tags:
-  - web
-  - html5
-  - javascript
-  - technology
+   - web
+   - javascript
+   - technology
 ---
 
 For most of the web's history, a browser was a program for reading documents. HTML was a document format. JavaScript was a scripting language for small interactive touches — form validation, a dropdown menu, an image that changes when you hover over it. Serious applications ran on the desktop.

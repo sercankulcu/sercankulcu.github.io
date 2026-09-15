@@ -6,7 +6,6 @@ chapter: 1
 chapter_title: 'Before Humanity'
 order: 3
 tags:
-   - stars
    - cosmology
    - origins
 ---

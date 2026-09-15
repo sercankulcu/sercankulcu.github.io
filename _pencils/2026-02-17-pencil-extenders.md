@@ -5,10 +5,9 @@ permalink: /pencils/2026/02/pencil-extenders/
 category: tools
 tags:
    - pencil
-   - pencil-extender
+   - tools
    - history
    - collecting
-   - tools
 ---
 
 A wooden pencil becomes awkward long before it becomes useless.

@@ -6,7 +6,6 @@ category: materials
 tags:
    - pencil
    - incense-cedar
-   - basswood
    - pencil-wood
    - manufacturing
    - collecting

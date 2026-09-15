@@ -6,9 +6,8 @@ chapter: 13
 chapter_title: 'The Modern Human'
 order: 123
 tags:
-   - nietzsche
-   - meaning
    - philosophy
+   - meaning
 ---
 
 "God is dead" is one of philosophy's most misunderstood statements. Nietzsche was not reporting a biological event; he was diagnosing a cultural one.

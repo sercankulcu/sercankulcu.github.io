@@ -3,7 +3,6 @@ title: "Closing Doors"
 date: 2012-07-07
 description: "He ran toward the closing metro and arrived through the doors with more speed than dignity — and for the next few stations studied the route map with unnecessary seriousness."
 tags:
-   - metro
    - city-life
    - humor
 ---

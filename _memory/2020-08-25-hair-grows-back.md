@@ -6,7 +6,7 @@ tags:
    - pandemic
    - family
    - home
-   - skills
+   - learning
 ---
 
 During the pandemic, my wife learned how to cut my hair, and the training material was me. The first attempts were not especially successful. I described the results at the time by saying she had repeatedly turned me into a monkey, which was unfair to monkeys but accurate enough about my confidence when I looked in the mirror.

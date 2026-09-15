@@ -6,9 +6,8 @@ chapter: 13
 chapter_title: 'The Modern Human'
 order: 124
 tags:
-   - freud
    - psychology
-   - unconscious
+   - mind
 ---
 
 Sigmund Freud made the mind suspicious of itself.

@@ -3,9 +3,8 @@ title: 'Generative Image Models Are Getting Hard To Ignore'
 date: 2022-05-15
 permalink: /posts/2022/05/generative-image-models-are-getting-hard-to-ignore/
 tags:
-  - artificial-intelligence
-  - machine-learning
-  - images
+   - artificial-intelligence
+   - machine-learning
 ---
 
 Image generation from text has improved remarkably quickly. Systems such as DALL-E 2, announced by OpenAI this year, can create images from written descriptions with a level of coherence that would have looked much less convincing only a short time ago.

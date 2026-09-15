@@ -7,7 +7,7 @@ chapter_title: 'The Birth of the Modern World'
 order: 110
 tags:
    - cosmology
-   - copernicus
+   - scientific-revolution
    - humanity
 ---
 

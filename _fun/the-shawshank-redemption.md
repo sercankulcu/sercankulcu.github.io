@@ -7,7 +7,7 @@ tags:
    - freedom
    - friendship
    - hope
-   - adaptation
+   - resilience
 ---
 
 I first watched *The Shawshank Redemption* on television after the film had already begun.

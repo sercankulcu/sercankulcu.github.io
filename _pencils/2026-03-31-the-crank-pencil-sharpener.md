@@ -5,11 +5,10 @@ permalink: /pencils/2026/03/the-crank-pencil-sharpener/
 category: tools
 tags:
    - pencil
-   - sharpener
-   - crank-sharpener
-   - apsco
+   - sharpening
+   - american-pencil
    - drafting
-   - office-history
+   - history
 ---
 
 Before the familiar desk-mounted crank sharpener became ordinary, sharpening was still a manual skill. Knives and simple handheld sharpeners worked, but the late nineteenth and early twentieth centuries turned sharpening into a machine problem: cut wood and graphite evenly, center the point, avoid breakage, collect shavings, and repeat the result consistently.

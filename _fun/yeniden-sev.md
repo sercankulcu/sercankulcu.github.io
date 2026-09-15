@@ -6,8 +6,6 @@ tags:
    - music
    - love
    - hope
-   - renewal
-   - second-chances
 ---
 
 There are relationships we want to leave behind, and there are others we secretly wish we could begin again.

@@ -4,9 +4,7 @@ date: 2009-11-05
 description: "A cup of tea does not need to change your life — on the modest contract of twenty minutes of television and why not everything pleasant needs to become significant."
 tags:
    - television
-   - how-i-met-your-mother
-   - entertainment
-   - rest
+   - sleep
 ---
 
 People were complaining that a sitcom they watched was no longer giving them what they expected. I remember wondering what, exactly, a twenty-minute television comedy was supposed to provide.

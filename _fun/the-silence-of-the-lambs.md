@@ -4,7 +4,6 @@ date: 2003-02-08
 description: "The person who sees what everyone else overlooks has power long before anyone notices the power exists — on attention as threat."
 tags:
    - movie
-   - thriller
    - psychology
    - fear
    - attention

@@ -6,9 +6,9 @@ chapter: 12
 chapter_title: 'Reason, Science and Revolution'
 order: 117
 tags:
-   - french-revolution
-   - revolution
-   - equality
+   - politics
+   - history
+   - human-rights
 ---
 
 The French Revolution began by attacking privilege. It ended by teaching humanity how terrifying political purification can become.

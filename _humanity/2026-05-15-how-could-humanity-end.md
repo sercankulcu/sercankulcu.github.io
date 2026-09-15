@@ -7,7 +7,6 @@ chapter_title: 'Where Are We Going?'
 order: 149
 tags:
    - extinction
-   - existential-risk
    - future
 ---
 

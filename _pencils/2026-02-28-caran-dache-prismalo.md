@@ -6,8 +6,6 @@ category: brands
 tags:
    - pencil
    - caran-dache
-   - prismalo
-   - watercolor-pencil
    - colored-pencil
    - collecting
 ---

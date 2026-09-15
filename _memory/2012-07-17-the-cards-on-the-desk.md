@@ -4,7 +4,6 @@ date: 2012-07-17
 description: "The intern spread playing cards on the desk and began telling fortunes — when the manager saw it, the problem traveled through hierarchy and arrived at the person who should have prevented it."
 tags:
    - work
-   - interns
    - office-life
    - humor
 ---

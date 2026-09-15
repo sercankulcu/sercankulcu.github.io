@@ -6,10 +6,7 @@ category: history
 tags:
    - pencil
    - graphite
-   - borrowdale
-   - keswick
-   - england
-   - mining
+   - pencil-origins
    - history
 ---
 

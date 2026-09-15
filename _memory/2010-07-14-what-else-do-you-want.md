@@ -5,7 +5,6 @@ description: "He imagined the shortest honest application: team player, flexible
 tags:
    - engineering
    - career
-   - job-search
    - humor
 ---
 

@@ -6,9 +6,8 @@ category: brands
 tags:
    - pencil
    - caran-dache
-   - grafwood
    - graphite
-   - swiss-made
+   - pencil-origins
    - collecting
 ---
 

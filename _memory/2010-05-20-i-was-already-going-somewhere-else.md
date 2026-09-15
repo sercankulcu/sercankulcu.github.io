@@ -5,7 +5,7 @@ description: "The sentence was technically true — which was what made it effec
 tags:
    - friendship
    - relationships
-   - betrayal
+   - trust
    - humor
 ---
 

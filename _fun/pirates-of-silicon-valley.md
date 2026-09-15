@@ -5,8 +5,6 @@ description: "Technology history becomes dangerously tidy after success — the 
 tags:
    - movie
    - computers
-   - apple
-   - microsoft
    - history
 ---
 

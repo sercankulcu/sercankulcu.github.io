@@ -6,7 +6,7 @@ tags:
    - student-life
    - food
    - humor
-   - gesture
+   - communication
 ---
 
 During my student years, I had eaten enough questionable food to develop an unreasonable confidence in my stomach.

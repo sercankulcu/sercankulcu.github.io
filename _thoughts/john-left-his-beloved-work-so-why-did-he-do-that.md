@@ -3,9 +3,9 @@ title: 'A Good Job Can Still Be the Wrong Life'
 date: 2015-10-06
 description: "John's decision to leave work he valued raises a harder question about how a career fits the rest of a life."
 tags:
-  - work
-  - priorities
-  - reflection
+   - work
+   - decision-making
+   - reflection
 ---
 
 John did not leave because he hated his job. That is what makes his decision difficult to explain through the usual story of career progress.

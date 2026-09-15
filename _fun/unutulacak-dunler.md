@@ -4,7 +4,7 @@ date: 2021-08-25
 description: "There are yesterdays that will be forgotten and still days waiting to be lived — a tired mind should not make permanent conclusions from temporary conditions."
 tags:
    - music
-   - gazapizm
+   - musicians
    - hope
    - resilience
    - philosophy

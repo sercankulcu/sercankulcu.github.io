@@ -6,9 +6,8 @@ chapter: 7
 chapter_title: 'The Birth of Civilization'
 order: 62
 tags:
-   - mesopotamia
    - civilization
-   - sumer
+   - history
 ---
 
 Mesopotamia means the land between rivers. The Tigris and Euphrates created fertile environments, but fertility alone did not create civilization.

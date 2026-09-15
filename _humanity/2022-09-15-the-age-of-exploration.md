@@ -6,9 +6,8 @@ chapter: 11
 chapter_title: 'The Birth of the Modern World'
 order: 105
 tags:
-   - exploration
-   - navigation
    - globalization
+   - trade
 ---
 
 The phrase "Age of Exploration" reflects a European viewpoint. The lands Europeans reached were already inhabited, and many were connected through existing trade networks. They were not waiting to be discovered.

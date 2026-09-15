@@ -7,7 +7,6 @@ chapter_title: 'Becoming Human'
 order: 28
 tags:
    - art
-   - symbolism
    - prehistory
 ---
 

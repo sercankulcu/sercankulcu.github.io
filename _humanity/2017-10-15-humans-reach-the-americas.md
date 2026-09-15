@@ -6,7 +6,6 @@ chapter: 5
 chapter_title: 'The World Before Civilization'
 order: 46
 tags:
-   - americas
    - migration
    - prehistory
 ---

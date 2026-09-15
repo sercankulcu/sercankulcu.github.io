@@ -5,7 +5,7 @@ description: "At the end of 2025 what returned first were not achievements but s
 tags:
    - year-end
    - technology
-   - small-victories
+   - milestones
    - memory
 ---
 

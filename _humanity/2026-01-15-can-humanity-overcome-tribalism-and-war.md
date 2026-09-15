@@ -6,9 +6,8 @@ chapter: 15
 chapter_title: 'Where Are We Going?'
 order: 145
 tags:
-   - tribalism
+   - society
    - war
-   - peace
 ---
 
 Human beings divide the world into us and them with disturbing ease: family, clan, religion, class, race, nation, party, ideology.

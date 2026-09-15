@@ -6,9 +6,8 @@ chapter: 3
 chapter_title: 'Becoming Human'
 order: 27
 tags:
-   - stories
+   - myth
    - culture
-   - mythology
 ---
 
 Humans do not merely remember events. We arrange them. Beginning. Conflict. Cause. Choice. Consequence. Ending. That arrangement is a story.

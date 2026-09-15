@@ -6,7 +6,7 @@ chapter: 10
 chapter_title: 'Empires and Global Humanity'
 order: 98
 tags:
-   - islamic-golden-age
+   - civilization
    - science
    - knowledge
 ---

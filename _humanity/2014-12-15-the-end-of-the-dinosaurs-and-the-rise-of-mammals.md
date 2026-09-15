@@ -6,8 +6,7 @@ chapter: 2
 chapter_title: 'The Long Road to Humanity'
 order: 12
 tags:
-   - dinosaurs
-   - mammals
+   - extinction
    - evolution
 ---
 

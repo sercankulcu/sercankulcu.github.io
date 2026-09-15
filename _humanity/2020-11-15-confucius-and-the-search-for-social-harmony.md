@@ -6,7 +6,7 @@ chapter: 9
 chapter_title: 'Philosophy Begins'
 order: 83
 tags:
-   - confucius
+   - philosophy
    - ethics
    - china
 ---

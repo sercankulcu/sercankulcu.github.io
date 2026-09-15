@@ -5,8 +5,8 @@ permalink: /pencils/2026/06/stenographic-pencils/
 category: types
 tags:
    - pencil
-   - stenographic-pencil
-   - shorthand
+   - pencil-types
+   - writing
    - history
    - collecting
 ---

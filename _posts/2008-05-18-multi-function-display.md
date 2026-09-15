@@ -4,7 +4,7 @@ date: 2008-05-18
 permalink: /posts/2008/05/multi-function-display/
 tags:
    - career
-   - military
+   - institutions
    - self-improvement
 ---
 

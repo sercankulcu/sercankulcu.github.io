@@ -5,7 +5,6 @@ description: "Difficult work can be lonely long before it becomes important — 
 tags:
    - movie
    - computing
-   - alan-turing
    - history
    - solitude
 ---

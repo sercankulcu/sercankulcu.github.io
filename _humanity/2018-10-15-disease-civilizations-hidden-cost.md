@@ -6,7 +6,7 @@ chapter: 6
 chapter_title: 'The Agricultural Revolution'
 order: 58
 tags:
-   - disease
+   - society
    - civilization
    - agriculture
 ---

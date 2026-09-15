@@ -3,7 +3,11 @@ title: 'Software Bug Of Pathfinder'
 date: 2020-05-22
 permalink: /posts/2020/05/software-bug-of-pathfinder/
 tags:
-  - self-improvement
+  - software
+  - debugging
+  - embedded-systems
+  - engineering
+  - space
 ---
 
 Mars Pathfinder landed successfully on July 4, 1997 — the first Mars lander since the Viking missions of 1976. The entry, descent, and landing were flawless. Within days, the spacecraft and its small rover Sojourner were returning data and images. Then the resets began.

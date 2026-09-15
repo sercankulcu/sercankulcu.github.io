@@ -4,7 +4,7 @@ date: 2024-09-03
 description: "Some people leave the house but never completely leave us — on the empty chair, inherited habits, and what we owe to those who made a season feel like spring."
 tags:
    - music
-   - baris-manco
+   - musicians
    - family
    - loss
    - legacy

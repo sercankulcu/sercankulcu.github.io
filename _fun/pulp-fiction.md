@@ -4,9 +4,9 @@ date: 2006-07-22
 description: "Chronology gives events sequence; editing gives them meaning — and the interpretation assigned to a shared event helps produce entirely different futures."
 tags:
    - movie
-   - tarantino
+   - cinema
    - storytelling
-   - dialogue
+   - communication
    - chance
 ---
 

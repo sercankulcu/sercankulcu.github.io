@@ -6,7 +6,6 @@ tags:
    - movie
    - friendship
    - dignity
-   - disability
    - care
 ---
 

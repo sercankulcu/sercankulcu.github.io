@@ -7,7 +7,6 @@ tags:
    - freedom
    - history
    - courage
-   - resistance
 ---
 
 I first saw *Braveheart* on television on an evening that seemed to grow longer with the film. Dinner ended, tea arrived, somebody left the room and returned, the windows turned black, and still the story continued across hills, castles and battlefields. By the final scenes, the room had the peculiar silence produced when several people have watched the same thing for so long that talking would feel like breaking a spell.

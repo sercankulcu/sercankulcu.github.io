@@ -7,7 +7,7 @@ chapter_title: 'The Modern Human'
 order: 130
 tags:
    - human-rights
-   - united-nations
+   - institutions
    - dignity
 ---
 

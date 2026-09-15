@@ -4,7 +4,7 @@ date: 2012-07-09
 permalink: /posts/2012/07/the-day-windows-cleaned-up-after-me/
 tags:
    - linux
-   - windows
+   - software
    - programming
    - embedded-systems
    - engineering

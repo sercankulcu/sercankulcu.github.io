@@ -3,9 +3,9 @@ title: 'Recognizing a Power Game Is Not the Same as Playing It'
 date: 2017-02-12
 description: "A map of manipulation is useful even if you have no intention of becoming a manipulator."
 tags:
-  - power
-  - manipulation
-  - social-awareness
+   - power
+   - trust
+   - community
 ---
 
 Some books become dangerous when we read description as instruction.

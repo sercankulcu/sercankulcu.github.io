@@ -3,9 +3,8 @@ title: 'Daily Life Of A Software Engineer'
 date: 2019-08-14
 permalink: /posts/2019/08/daily-life-of-a-software-engineer/
 tags:
-  - personal development
-  - self-improvement
-  - time management
+   - self-improvement
+   - productivity
 ---
 
 The daily life of a software engineer is usually less dramatic than movies make programming look. There are no montages of cascading green characters or last-minute keystrokes that save cities. Most days are a mixture of reading, testing, discussing, debugging, and — somewhere in the middle — writing code.

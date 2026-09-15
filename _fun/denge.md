@@ -4,8 +4,7 @@ date: 2007-06-29
 description: "The luxury of saying fine — not because the other person is right, but because your afternoon is worth more than the argument."
 tags:
    - music
-   - sezen-aksu
-   - balance
+   - musicians
    - equanimity
    - freedom
 ---

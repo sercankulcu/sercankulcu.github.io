@@ -6,8 +6,8 @@ chapter: 13
 chapter_title: 'The Modern Human'
 order: 125
 tags:
-   - nationalism
-   - nation
+   - politics
+   - state
    - identity
 ---
 

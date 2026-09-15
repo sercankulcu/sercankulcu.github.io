@@ -5,7 +5,7 @@ permalink: /pencils/2025/05/why-pencil-lacquer-matters/
 category: materials
 tags:
    - pencil
-   - lacquer
+   - materials
    - manufacturing
    - collecting
 ---

@@ -6,9 +6,8 @@ chapter: 3
 chapter_title: 'Becoming Human'
 order: 30
 tags:
-   - burial
-   - death
    - ritual
+   - death
 ---
 
 Death is biological. Burial is cultural. Every organism dies. Only some species respond to death in ways that suggest prolonged social attention. Humans transformed death into one of the central problems of culture.

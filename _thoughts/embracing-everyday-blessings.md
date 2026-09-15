@@ -3,9 +3,9 @@ title: 'The Days We Miss Were Once Ordinary'
 date: 2022-06-04
 description: "Many ordinary days become precious only after the people, places, or routines inside them disappear."
 tags:
-  - life
-  - memory
-  - gratitude
+   - life
+   - memory
+   - happiness
 ---
 
 Some of the days I remember most warmly did not feel important while I was living them.

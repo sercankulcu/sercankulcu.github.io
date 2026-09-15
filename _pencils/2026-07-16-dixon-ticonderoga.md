@@ -5,8 +5,6 @@ permalink: /pencils/2026/07/dixon-ticonderoga/
 category: brands
 tags:
    - pencil
-   - dixon
-   - ticonderoga
    - american-pencil
    - history
    - collecting
