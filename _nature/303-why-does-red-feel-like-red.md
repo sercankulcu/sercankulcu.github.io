@@ -5,7 +5,6 @@ chapter: 16
 chapter_title: 'Consciousness'
 order: 303
 tags:
-   - color
    - qualia
    - perception
    - consciousness

@@ -8,7 +8,6 @@ tags:
    - uncertainty
    - decision-making
    - epistemology
-   - risk
    - reasoning
 ---
 

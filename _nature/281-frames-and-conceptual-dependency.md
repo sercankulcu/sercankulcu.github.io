@@ -6,7 +6,6 @@ chapter_title: 'Intelligence and Artificial Intelligence'
 order: 281
 tags:
    - frames
-   - conceptual-dependency
    - knowledge-representation
    - artificial-intelligence
    - semantics

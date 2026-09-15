@@ -6,10 +6,9 @@ chapter_title: 'Knowing and the Philosophy of Science'
 order: 55
 tags:
    - measurement
-   - units
-   - calibration
+   - scale
    - uncertainty
-   - metrology
+   - methodology
 ---
 
 Science does not merely observe.

@@ -5,7 +5,6 @@ chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'
 order: 208
 tags:
-   - typographical-number-theory
    - hofstadter
    - arithmetic
    - formal-systems

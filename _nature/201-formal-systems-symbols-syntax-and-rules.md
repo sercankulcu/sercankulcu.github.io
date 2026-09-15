@@ -8,7 +8,7 @@ tags:
    - formal-systems
    - syntax
    - axioms
-   - inference-rules
+   - inference
    - metalogic
 ---
 

@@ -5,10 +5,9 @@ chapter: 3
 chapter_title: 'Cosmos and Origins'
 order: 51
 tags:
-   - laws-of-nature
+   - necessity
    - metaphysics
    - physics
-   - necessity
    - explanation
 ---
 

@@ -5,7 +5,6 @@ chapter: 3
 chapter_title: 'Cosmos and Origins'
 order: 49
 tags:
-   - multiverse
    - cosmology
    - inflation
    - quantum-mechanics

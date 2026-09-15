@@ -7,7 +7,7 @@ order: 274
 tags:
    - artificial-intelligence
    - rational-agents
-   - human-behavior
+   - behavior
    - turing-test
    - decision-making
 ---

@@ -8,7 +8,7 @@ tags:
    - recursion
    - infinity
    - formal-systems
-   - generative-rules
+   - generativity
    - complexity
 ---
 

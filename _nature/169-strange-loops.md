@@ -5,7 +5,6 @@ chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'
 order: 169
 tags:
-   - strange-loops
    - self-reference
    - hofstadter
    - hierarchy

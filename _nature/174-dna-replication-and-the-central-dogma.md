@@ -5,11 +5,9 @@ chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'
 order: 174
 tags:
-   - dna-replication
-   - central-dogma
-   - transcription
-   - translation
-   - molecular-biology
+   - dna
+   - genetics
+   - biological-information
 ---
 
 A genome can influence the next generation only if its sequence can be copied.

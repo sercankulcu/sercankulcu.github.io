@@ -7,7 +7,7 @@ order: 271
 tags:
    - intelligence
    - cognition
-   - adaptation
+   - evolution
    - agents
    - artificial-intelligence
 ---

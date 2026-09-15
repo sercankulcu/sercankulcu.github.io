@@ -5,9 +5,8 @@ chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'
 order: 69
 tags:
-   - ockhams-razor
-   - simplicity
-   - model-selection
+   - methodology
+   - models
    - explanation
    - philosophy-of-science
 ---

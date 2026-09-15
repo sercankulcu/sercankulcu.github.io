@@ -5,9 +5,8 @@ chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'
 order: 82
 tags:
-   - faith
+   - belief
    - evidence
-   - revelation
    - epistemology
    - religion
 ---

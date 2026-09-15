@@ -8,7 +8,6 @@ tags:
    - emergence
    - composition
    - systems
-   - collective-properties
    - complexity
 ---
 

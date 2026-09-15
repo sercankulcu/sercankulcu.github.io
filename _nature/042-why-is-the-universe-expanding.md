@@ -6,7 +6,6 @@ chapter_title: 'Cosmos and Origins'
 order: 42
 tags:
    - expansion
-   - hubble-law
    - cosmology
    - general-relativity
    - dark-energy

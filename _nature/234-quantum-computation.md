@@ -5,11 +5,11 @@ chapter: 13
 chapter_title: 'Computation and Computer Science'
 order: 234
 tags:
-   - quantum-computation
-   - qubits
-   - quantum-information
+   - computation
+   - bits
+   - information
    - complexity
-   - entanglement
+   - quantum-mechanics
 ---
 
 Classical computers process bits.

@@ -8,8 +8,7 @@ tags:
    - digital-physics
    - cellular-automata
    - information
-   - discrete-physics
-   - computational-universe
+   - physics
 ---
 
 What if reality is fundamentally discrete?

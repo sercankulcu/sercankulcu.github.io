@@ -7,7 +7,6 @@ order: 38
 tags:
    - big-bang
    - cosmology
-   - initial-conditions
    - origins
    - philosophy-of-science
 ---

@@ -7,7 +7,6 @@ order: 347
 tags:
    - emergence
    - consciousness
-   - persons
    - reductionism
    - ontology
 ---

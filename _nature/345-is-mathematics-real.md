@@ -6,9 +6,8 @@ chapter_title: 'Reality and the Final Questions'
 order: 345
 tags:
    - mathematics
-   - platonism
-   - nominalism
-   - fictionalism
+   - philosophy
+   - metaphysics
    - ontology
 ---
 

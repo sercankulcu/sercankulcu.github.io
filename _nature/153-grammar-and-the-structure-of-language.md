@@ -7,7 +7,6 @@ order: 153
 tags:
    - grammar
    - syntax
-   - linguistic-structure
    - hierarchy
    - language
 ---

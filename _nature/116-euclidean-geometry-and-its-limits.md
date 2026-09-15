@@ -5,10 +5,9 @@ chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'
 order: 116
 tags:
-   - euclidean-geometry
    - geometry
    - fractals
-   - curvature
+   - mathematics
    - scale
 ---
 

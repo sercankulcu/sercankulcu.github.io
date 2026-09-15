@@ -9,7 +9,7 @@ tags:
    - metaphysics
    - cosmology
    - nothingness
-   - final-question
+   - philosophy
 ---
 
 We began with nature.

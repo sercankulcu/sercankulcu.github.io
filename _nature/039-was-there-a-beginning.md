@@ -5,10 +5,9 @@ chapter: 3
 chapter_title: 'Cosmos and Origins'
 order: 39
 tags:
-   - beginning
    - cosmology
    - time
-   - singularity
+   - big-bang
    - origins
 ---
 

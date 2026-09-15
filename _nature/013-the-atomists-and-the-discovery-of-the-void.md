@@ -5,10 +5,8 @@ chapter: 2
 chapter_title: 'Nothing'
 order: 13
 tags:
-   - atomism
-   - void
-   - democritus
-   - leucippus
+   - atoms
+   - nothingness
    - ancient-philosophy
 ---
 

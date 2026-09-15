@@ -9,7 +9,7 @@ tags:
    - algorithms
    - logic
    - computability
-   - decision-problems
+   - decision-problem
 ---
 
 A mathematical problem may have a correct answer for every input.

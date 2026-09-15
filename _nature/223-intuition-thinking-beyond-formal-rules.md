@@ -5,7 +5,6 @@ chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'
 order: 223
 tags:
-   - intuition
    - reasoning
    - mathematics
    - creativity

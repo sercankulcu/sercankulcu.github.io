@@ -5,11 +5,10 @@ chapter: 3
 chapter_title: 'Cosmos and Origins'
 order: 28
 tags:
-   - newton
+   - physics
    - einstein
    - spacetime
    - relativity
-   - history-of-physics
 ---
 
 For more than two centuries, Newton's picture of the universe looked like the natural language of reality.

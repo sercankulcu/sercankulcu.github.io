@@ -6,7 +6,7 @@ chapter_title: 'Formal Systems, Metalogic, and Gödel'
 order: 219
 tags:
    - truth
-   - unprovability
+   - provability
    - godel
    - arithmetic
    - metamathematics

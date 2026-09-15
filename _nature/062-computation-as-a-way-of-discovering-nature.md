@@ -6,9 +6,9 @@ chapter_title: 'Knowing and the Philosophy of Science'
 order: 62
 tags:
    - computation
-   - discovery
+   - science
    - algorithms
-   - scientific-computing
+   - simulation
    - complexity
 ---
 

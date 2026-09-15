@@ -5,9 +5,8 @@ chapter: 8
 chapter_title: 'Information and Representation'
 order: 142
 tags:
-   - messages
+   - message
    - layers
-   - protocols
    - representation
    - communication
 ---

@@ -6,7 +6,6 @@ chapter_title: 'Reality and the Final Questions'
 order: 353
 tags:
    - knowledge
-   - limits-of-knowledge
    - incompleteness
    - computation
    - science

@@ -5,11 +5,10 @@ chapter: 2
 chapter_title: 'Nothing'
 order: 12
 tags:
-   - parmenides
-   - zeno
-   - non-being
-   - change
    - ancient-philosophy
+   - paradox
+   - non-being
+   - metaphysics
 ---
 
 Long before modern physics asked whether empty space could exist, Greek philosophers confronted a more radical problem.

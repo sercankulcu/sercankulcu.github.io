@@ -6,9 +6,8 @@ chapter_title: 'Intelligence and Artificial Intelligence'
 order: 286
 tags:
    - neural-networks
-   - deep-learning
-   - backpropagation
-   - representation-learning
+   - machine-learning
+   - representation
    - artificial-intelligence
 ---
 

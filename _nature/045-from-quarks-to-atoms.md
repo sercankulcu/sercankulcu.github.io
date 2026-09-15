@@ -5,9 +5,8 @@ chapter: 3
 chapter_title: 'Cosmos and Origins'
 order: 45
 tags:
-   - quarks
+   - particles
    - atoms
-   - nucleosynthesis
    - early-universe
    - particle-physics
 ---

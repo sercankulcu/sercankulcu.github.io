@@ -5,7 +5,6 @@ chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'
 order: 86
 tags:
-   - mystery
    - science
    - explanation
    - wonder

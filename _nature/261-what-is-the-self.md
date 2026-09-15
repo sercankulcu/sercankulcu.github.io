@@ -7,7 +7,6 @@ order: 261
 tags:
    - self
    - identity
-   - personal-identity
    - consciousness
    - mind
 ---

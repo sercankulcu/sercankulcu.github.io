@@ -5,10 +5,9 @@ chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'
 order: 177
 tags:
-   - self-assembly
+   - order
    - self-organization
    - chemistry
-   - nanotechnology
    - emergence
 ---
 

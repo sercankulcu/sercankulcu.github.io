@@ -6,9 +6,9 @@ chapter_title: 'Consciousness'
 order: 315
 tags:
    - consciousness
-   - mental-causation
-   - epiphenomenalism
-   - causal-closure
+   - causation
+   - dualism
+   - physicalism
    - philosophy-of-mind
 ---
 

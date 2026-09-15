@@ -5,7 +5,7 @@ chapter: 2
 chapter_title: 'Nothing'
 order: 20
 tags:
-   - quantum-vacuum
+   - vacuum
    - quantum-field-theory
    - fields
    - particles

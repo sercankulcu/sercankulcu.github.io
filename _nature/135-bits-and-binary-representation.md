@@ -6,8 +6,8 @@ chapter_title: 'Information and Representation'
 order: 135
 tags:
    - bits
-   - binary
-   - digital-computing
+   - codes
+   - computer-science
    - representation
    - information
 ---

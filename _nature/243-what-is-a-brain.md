@@ -7,8 +7,7 @@ order: 243
 tags:
    - brain
    - neuroscience
-   - neurons
-   - nervous-system
+   - systems
    - cognition
 ---
 

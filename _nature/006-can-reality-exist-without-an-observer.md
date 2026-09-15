@@ -8,7 +8,7 @@ tags:
    - reality
    - observation
    - quantum-mechanics
-   - idealism
+   - metaphysics
    - philosophy
 ---
 

@@ -5,7 +5,6 @@ chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'
 order: 72
 tags:
-   - popper
    - falsifiability
    - demarcation
    - philosophy-of-science

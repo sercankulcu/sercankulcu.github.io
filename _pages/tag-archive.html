@@ -5,13 +5,44 @@ title: "Posts by Tags"
 author_profile: true
 ---
 
-{% include base_path %}
-{% include group-by-array collection=site.posts field="tags" %}
+{% comment %}
+  Every collection is included, not just site.posts: the tag links rendered on a
+  collection document point at /tags/#<slug>, so anything left out of this page
+  turns those links into dead anchors.  Add new collections to the concat chain.
 
-{% for tag in group_names %}
-  {% assign posts = group_items[forloop.index0] %}
-  <h2 id="{{ tag | slugify }}" class="archive__subtitle">{{ tag }}</h2>
-  {% for post in posts %}
-    {% include archive-single.html %}
-  {% endfor %}
+  Entries are deliberately compact rather than full archive cards — with ~6000
+  tag/document pairs the card layout pushed this page past 3 MB.
+{% endcomment %}
+
+{% assign docs = site.posts %}
+{% assign docs = docs
+  | concat: site.nature
+  | concat: site.humanity
+  | concat: site.pencils
+  | concat: site.fun
+  | concat: site.memory
+  | concat: site.thoughts
+  | concat: site.teaching
+  | concat: site.teoman
+  | concat: site.poems %}
+{% assign nejat = site['nejat-isler'] %}
+{% if nejat %}{% assign docs = docs | concat: nejat %}{% endif %}
+
+{% assign all_tags = docs | map: "tags" | join: "," | join: "," | split: "," | uniq | sort %}
+
+<p><em>{{ all_tags | size }} tags across {{ docs | size }} posts.</em></p>
+
+<p class="tag-index">
+{% for tag in all_tags %}{% if tag != "" %}<a href="#{{ tag | slugify }}">{{ tag }}</a>{% unless forloop.last %} · {% endunless %}{% endif %}{% endfor %}
+</p>
+
+{% for tag in all_tags %}
+  {% if tag == "" %}{% continue %}{% endif %}
+  {% assign tagged = docs | where_exp: "d", "d.tags contains tag" | sort: "title" %}
+  <h2 id="{{ tag | slugify }}" class="archive__subtitle">{{ tag }} <small>({{ tagged | size }})</small></h2>
+  <ul>
+    {% for d in tagged %}
+      <li><a href="{{ d.url | relative_url }}">{{ d.title }}</a>{% if d.collection and d.collection != "posts" %} <small>· {{ d.collection }}</small>{% endif %}</li>
+    {% endfor %}
+  </ul>
 {% endfor %}

@@ -5,7 +5,7 @@ chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'
 order: 168
 tags:
-   - liar-paradox
+   - semantics
    - self-reference
    - truth
    - logic

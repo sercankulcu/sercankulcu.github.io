@@ -9,7 +9,6 @@ tags:
    - necessity
    - possibility
    - possible-worlds
-   - accessibility
 ---
 
 Classical propositional logic asks whether propositions are:

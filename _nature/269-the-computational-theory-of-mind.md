@@ -5,7 +5,7 @@ chapter: 14
 chapter_title: 'Brain, Mind, and Self'
 order: 269
 tags:
-   - computational-theory-of-mind
+   - mind
    - cognition
    - representation
    - functionalism

@@ -8,7 +8,6 @@ tags:
    - dna
    - information
    - genetics
-   - biology
    - representation
 ---
 

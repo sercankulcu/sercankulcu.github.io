@@ -5,11 +5,10 @@ chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'
 order: 73
 tags:
-   - verificationism
-   - logical-positivism
+   - philosophy
    - meaning
    - philosophy-of-science
-   - empiricism
+   - epistemology
 ---
 
 What makes a statement meaningful?

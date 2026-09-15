@@ -7,9 +7,9 @@ order: 148
 tags:
    - biological-information
    - dna
-   - heredity
-   - signaling
-   - regulation
+   - genetics
+   - communication
+   - control
 ---
 
 Living systems do not merely contain information.

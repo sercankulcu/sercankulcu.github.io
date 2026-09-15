@@ -7,9 +7,9 @@ order: 107
 tags:
    - dynamical-systems
    - mathematics
-   - state-space
+   - systems
    - evolution
-   - modeling
+   - models
 ---
 
 Nature changes.

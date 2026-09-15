@@ -5,7 +5,6 @@ chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'
 order: 162
 tags:
-   - machines
    - language
    - artificial-intelligence
    - natural-language-processing

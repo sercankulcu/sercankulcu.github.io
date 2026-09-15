@@ -7,8 +7,7 @@ order: 350
 tags:
    - emergence
    - composition
-   - holism
-   - mereology
+   - reductionism
    - ontology
 ---
 

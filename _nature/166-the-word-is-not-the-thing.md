@@ -6,7 +6,6 @@ chapter_title: 'Self-Reference, Self-Representation, and Life'
 order: 166
 tags:
    - representation
-   - reference
    - language
    - symbols
    - semantics

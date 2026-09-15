@@ -5,7 +5,7 @@ chapter: 11
 chapter_title: 'Logic and Reasoning'
 order: 189
 tags:
-   - paradoxes
+   - paradox
    - logic
    - self-reference
    - infinity

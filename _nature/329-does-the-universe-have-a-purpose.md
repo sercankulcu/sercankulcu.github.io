@@ -6,7 +6,6 @@ chapter_title: 'Free Will, Agency, and Purpose'
 order: 329
 tags:
    - purpose
-   - teleology
    - universe
    - cosmology
    - philosophy

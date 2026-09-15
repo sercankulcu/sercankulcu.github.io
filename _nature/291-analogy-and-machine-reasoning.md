@@ -5,8 +5,7 @@ chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'
 order: 291
 tags:
-   - analogy
-   - machine-reasoning
+   - reasoning
    - abstraction
    - cognition
    - artificial-intelligence

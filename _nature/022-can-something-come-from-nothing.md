@@ -7,7 +7,7 @@ order: 22
 tags:
    - nothingness
    - causality
-   - quantum-cosmology
+   - cosmology
    - metaphysics
    - origins
 ---

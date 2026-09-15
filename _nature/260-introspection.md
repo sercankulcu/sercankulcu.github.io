@@ -6,9 +6,9 @@ chapter_title: 'Brain, Mind, and Self'
 order: 260
 tags:
    - introspection
-   - self-knowledge
+   - knowledge
    - consciousness
-   - metacognition
+   - cognition
    - mind
 ---
 

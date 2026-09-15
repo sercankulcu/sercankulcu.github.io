@@ -5,11 +5,10 @@ chapter: 3
 chapter_title: 'Cosmos and Origins'
 order: 35
 tags:
-   - fundamental-interactions
+   - interactions
    - gravity
    - electromagnetism
-   - strong-force
-   - weak-force
+   - particle-physics
 ---
 
 Modern physics organizes an enormous range of phenomena around four fundamental interactions:

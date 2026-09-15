@@ -5,11 +5,10 @@ chapter: 3
 chapter_title: 'Cosmos and Origins'
 order: 44
 tags:
-   - cosmic-microwave-background
-   - cmb
+   - observation
    - early-universe
    - cosmology
-   - radiation
+   - physics
 ---
 
 The night sky looks dark.

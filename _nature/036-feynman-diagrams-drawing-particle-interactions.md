@@ -5,11 +5,10 @@ chapter: 3
 chapter_title: 'Cosmos and Origins'
 order: 36
 tags:
-   - feynman-diagrams
+   - physics
    - quantum-field-theory
    - particle-physics
    - interactions
-   - richard-feynman
 ---
 
 Particle physics often looks surprisingly simple on paper.

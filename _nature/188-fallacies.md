@@ -5,11 +5,10 @@ chapter: 11
 chapter_title: 'Logic and Reasoning'
 order: 188
 tags:
-   - fallacies
-   - reasoning-errors
+   - logic
+   - reasoning
    - arguments
-   - informal-logic
-   - critical-thinking
+   - cognitive-bias
 ---
 
 A fallacy is a pattern of reasoning that appears stronger than it really is.

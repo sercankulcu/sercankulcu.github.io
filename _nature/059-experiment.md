@@ -8,7 +8,6 @@ tags:
    - experiment
    - causality
    - control
-   - randomization
    - scientific-method
 ---
 

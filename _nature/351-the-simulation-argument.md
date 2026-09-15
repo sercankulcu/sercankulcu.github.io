@@ -5,9 +5,8 @@ chapter: 19
 chapter_title: 'Reality and the Final Questions'
 order: 351
 tags:
-   - simulation-argument
-   - nick-bostrom
-   - anthropic-reasoning
+   - simulation
+   - reasoning
    - probability
    - reality
 ---

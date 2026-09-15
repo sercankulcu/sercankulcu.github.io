@@ -5,10 +5,8 @@ chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'
 order: 206
 tags:
-   - number-theory
+   - foundations
    - arithmetic
-   - primes
-   - integers
    - mathematics
 ---
 

@@ -7,9 +7,9 @@ order: 273
 tags:
    - artificial-intelligence
    - rationality
-   - cognitive-modeling
+   - cognition
    - logic
-   - human-thinking
+   - thought
 ---
 
 What should artificial intelligence imitate?

@@ -6,7 +6,6 @@ chapter_title: 'Knowing and the Philosophy of Science'
 order: 78
 tags:
    - truth
-   - scientific-progress
    - realism
    - philosophy-of-science
    - knowledge

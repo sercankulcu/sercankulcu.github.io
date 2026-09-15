@@ -8,8 +8,6 @@ tags:
    - creativity
    - artificial-intelligence
    - generative-ai
-   - novelty
-   - authorship
 ---
 
 A machine paints an image no human has seen before.

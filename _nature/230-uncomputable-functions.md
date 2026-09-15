@@ -5,10 +5,9 @@ chapter: 13
 chapter_title: 'Computation and Computer Science'
 order: 230
 tags:
-   - uncomputable-functions
-   - busy-beaver
+   - undecidability
    - computability
-   - diagonalization
+   - self-reference
    - turing
 ---
 

@@ -7,7 +7,6 @@ order: 268
 tags:
    - functionalism
    - philosophy-of-mind
-   - multiple-realizability
    - mental-states
    - computation
 ---

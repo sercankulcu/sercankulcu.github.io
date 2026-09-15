@@ -5,10 +5,10 @@ chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'
 order: 296
 tags:
-   - language-models
+   - natural-language-processing
    - understanding
    - semantics
-   - symbol-grounding
+   - meaning
    - artificial-intelligence
 ---
 

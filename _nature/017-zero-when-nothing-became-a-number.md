@@ -7,8 +7,7 @@ order: 17
 tags:
    - zero
    - mathematics
-   - number-systems
-   - history-of-mathematics
+   - arithmetic
    - nothingness
 ---
 

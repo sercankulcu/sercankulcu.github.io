@@ -8,7 +8,6 @@ tags:
    - quantum-mechanics
    - measurement
    - interpretation
-   - wave-function
    - physics
 ---
 

@@ -5,11 +5,11 @@ chapter: 13
 chapter_title: 'Computation and Computer Science'
 order: 238
 tags:
-   - computational-thinking
+   - computer-science
    - problem-solving
    - abstraction
    - algorithms
-   - decomposition
+   - levels
 ---
 
 Computer science is not only a collection of technologies.

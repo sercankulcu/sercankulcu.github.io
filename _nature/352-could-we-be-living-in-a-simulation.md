@@ -5,7 +5,7 @@ chapter: 19
 chapter_title: 'Reality and the Final Questions'
 order: 352
 tags:
-   - simulation-hypothesis
+   - simulation
    - reality
    - epistemology
    - falsifiability

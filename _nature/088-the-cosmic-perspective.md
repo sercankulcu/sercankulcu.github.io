@@ -5,9 +5,9 @@ chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'
 order: 88
 tags:
-   - cosmic-perspective
+   - cosmos
    - astronomy
-   - humanity
+   - philosophy
    - meaning
    - awe
 ---

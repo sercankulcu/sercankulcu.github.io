@@ -5,8 +5,8 @@ chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'
 order: 157
 tags:
-   - language-acquisition
-   - children
+   - language
+   - development
    - learning
    - cognition
    - linguistics

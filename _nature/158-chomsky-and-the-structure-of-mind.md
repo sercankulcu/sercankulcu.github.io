@@ -5,9 +5,8 @@ chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'
 order: 158
 tags:
-   - chomsky
-   - generative-grammar
-   - universal-grammar
+   - language
+   - grammar
    - mind
    - linguistics
 ---

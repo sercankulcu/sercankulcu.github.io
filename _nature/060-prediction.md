@@ -7,8 +7,7 @@ order: 60
 tags:
    - prediction
    - scientific-method
-   - forecasting
-   - theory-testing
+   - experiment
    - falsifiability
 ---
 

@@ -5,10 +5,10 @@ chapter: 19
 chapter_title: 'Reality and the Final Questions'
 order: 344
 tags:
-   - dreams
-   - fiction
+   - consciousness
+   - culture
    - myth
-   - narrative
+   - language
    - reality
 ---
 

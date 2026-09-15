@@ -5,11 +5,11 @@ chapter: 3
 chapter_title: 'Cosmos and Origins'
 order: 29
 tags:
-   - special-relativity
+   - relativity
    - einstein
    - spacetime
-   - time-dilation
-   - light
+   - time
+   - physics
 ---
 
 Special relativity begins with a simple conflict.

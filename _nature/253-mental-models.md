@@ -5,7 +5,7 @@ chapter: 14
 chapter_title: 'Brain, Mind, and Self'
 order: 253
 tags:
-   - mental-models
+   - models
    - cognition
    - simulation
    - representation

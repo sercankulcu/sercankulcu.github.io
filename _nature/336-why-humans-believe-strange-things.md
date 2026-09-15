@@ -7,9 +7,8 @@ order: 336
 tags:
    - belief
    - cognitive-bias
-   - superstition
-   - conspiracy
-   - social-psychology
+   - psychology
+   - culture
 ---
 
 Humans can build particle accelerators.

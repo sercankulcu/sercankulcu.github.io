@@ -5,10 +5,9 @@ chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'
 order: 99
 tags:
-   - collective-intelligence
-   - swarms
-   - flocking
-   - ant-colonies
+   - intelligence
+   - self-organization
+   - behavior
    - emergence
 ---
 

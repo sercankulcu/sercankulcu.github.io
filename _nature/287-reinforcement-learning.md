@@ -8,7 +8,7 @@ tags:
    - reinforcement-learning
    - reward
    - agents
-   - temporal-difference-learning
+   - learning
    - artificial-intelligence
 ---
 

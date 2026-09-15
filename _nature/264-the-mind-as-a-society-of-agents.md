@@ -6,7 +6,7 @@ chapter_title: 'Brain, Mind, and Self'
 order: 264
 tags:
    - agents
-   - distributed-mind
+   - mind
    - cognition
    - emergence
    - control

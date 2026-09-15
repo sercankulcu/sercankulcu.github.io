@@ -6,8 +6,7 @@ chapter_title: 'Brain, Mind, and Self'
 order: 251
 tags:
    - concepts
-   - categories
-   - prototypes
+   - abstraction
    - representation
    - cognition
 ---

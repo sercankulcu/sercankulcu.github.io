@@ -5,8 +5,7 @@ chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'
 order: 320
 tags:
-   - hard-determinism
-   - hard-incompatibilism
+   - philosophy
    - free-will
    - moral-responsibility
    - determinism

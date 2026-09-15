@@ -5,9 +5,8 @@ chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'
 order: 85
 tags:
-   - supernatural
+   - religion
    - science
-   - miracles
    - methodology
    - epistemology
 ---

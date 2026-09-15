@@ -8,8 +8,7 @@ tags:
    - inflation
    - early-universe
    - cosmology
-   - horizon-problem
-   - flatness-problem
+   - universe
 ---
 
 Cosmic inflation is one of the most influential ideas in modern cosmology.

@@ -5,10 +5,10 @@ chapter: 14
 chapter_title: 'Brain, Mind, and Self'
 order: 252
 tags:
-   - neural-representation
-   - mental-representation
+   - representation
+   - mental-states
    - neuroscience
-   - coding
+   - encoding
    - cognition
 ---
 

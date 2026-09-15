@@ -7,7 +7,6 @@ order: 302
 tags:
    - qualia
    - consciousness
-   - phenomenal-experience
    - philosophy-of-mind
    - perception
 ---

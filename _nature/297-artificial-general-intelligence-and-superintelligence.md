@@ -5,11 +5,10 @@ chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'
 order: 297
 tags:
-   - artificial-general-intelligence
-   - superintelligence
+   - intelligence
    - artificial-intelligence
    - autonomy
-   - ai-safety
+   - ethics
 ---
 
 A chess engine can outperform every human at chess.

@@ -7,8 +7,7 @@ order: 304
 tags:
    - subjective-experience
    - consciousness
-   - first-person
-   - phenomenology
+   - introspection
    - philosophy-of-mind
 ---
 

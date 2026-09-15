@@ -7,9 +7,9 @@ order: 283
 tags:
    - expert-systems
    - artificial-intelligence
-   - knowledge-engineering
+   - knowledge-representation
    - inference
-   - symbolic-ai
+   - symbols
 ---
 
 What if intelligence is not mainly about general reasoning?

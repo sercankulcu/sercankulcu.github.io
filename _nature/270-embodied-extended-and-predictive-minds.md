@@ -5,10 +5,10 @@ chapter: 14
 chapter_title: 'Brain, Mind, and Self'
 order: 270
 tags:
-   - embodied-cognition
-   - extended-mind
+   - mind
+   - philosophy-of-mind
    - predictive-processing
-   - enactivism
+   - perception
    - cognition
 ---
 

@@ -6,8 +6,8 @@ chapter_title: 'Information and Representation'
 order: 140
 tags:
    - message
-   - medium
-   - media
+   - communication
+   - culture
    - decoding
    - representation
 ---

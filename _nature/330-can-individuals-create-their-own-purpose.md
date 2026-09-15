@@ -7,7 +7,7 @@ order: 330
 tags:
    - purpose
    - meaning
-   - existentialism
+   - philosophy
    - agency
    - ethics
 ---

@@ -5,10 +5,9 @@ chapter: 11
 chapter_title: 'Logic and Reasoning'
 order: 187
 tags:
-   - contradictions
+   - contradiction
    - consistency
-   - classical-logic
-   - paraconsistent-logic
+   - logic
    - reasoning
 ---
 

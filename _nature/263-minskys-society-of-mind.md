@@ -5,8 +5,7 @@ chapter: 14
 chapter_title: 'Brain, Mind, and Self'
 order: 263
 tags:
-   - minsky
-   - society-of-mind
+   - mind
    - artificial-intelligence
    - cognition
    - agents

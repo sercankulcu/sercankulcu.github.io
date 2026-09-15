@@ -5,10 +5,9 @@ chapter: 16
 chapter_title: 'Consciousness'
 order: 312
 tags:
-   - global-workspace-theory
    - consciousness
-   - cognitive-architecture
-   - attention
+   - models
+   - cognition
    - neuroscience
 ---
 

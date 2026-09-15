@@ -6,9 +6,8 @@ chapter_title: 'Consciousness'
 order: 305
 tags:
    - sentience
-   - self-awareness
+   - self
    - consciousness
-   - animals
    - machine-consciousness
 ---
 

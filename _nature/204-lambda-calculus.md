@@ -5,9 +5,9 @@ chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'
 order: 204
 tags:
-   - lambda-calculus
+   - programming-languages
    - computation
-   - functions
+   - function
    - church
    - formal-systems
 ---

@@ -5,11 +5,11 @@ chapter: 3
 chapter_title: 'Cosmos and Origins'
 order: 46
 tags:
-   - stars
+   - astronomy
    - galaxies
-   - structure-formation
+   - order
    - gravity
-   - cosmic-evolution
+   - evolution
 ---
 
 After atoms formed, the universe became transparent.

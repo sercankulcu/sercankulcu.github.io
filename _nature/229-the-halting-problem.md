@@ -5,7 +5,6 @@ chapter: 13
 chapter_title: 'Computation and Computer Science'
 order: 229
 tags:
-   - halting-problem
    - turing
    - undecidability
    - self-reference

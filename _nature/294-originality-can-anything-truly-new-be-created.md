@@ -5,7 +5,6 @@ chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'
 order: 294
 tags:
-   - originality
    - creativity
    - emergence
    - information

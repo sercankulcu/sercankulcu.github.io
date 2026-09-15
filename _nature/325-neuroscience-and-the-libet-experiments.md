@@ -5,10 +5,9 @@ chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'
 order: 325
 tags:
-   - libet
    - neuroscience
    - free-will
-   - readiness-potential
+   - brain
    - agency
 ---
 

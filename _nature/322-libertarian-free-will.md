@@ -5,10 +5,10 @@ chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'
 order: 322
 tags:
-   - libertarian-free-will
+   - agency
    - free-will
-   - agent-causation
-   - incompatibilism
+   - causation
+   - determinism
    - philosophy
 ---
 

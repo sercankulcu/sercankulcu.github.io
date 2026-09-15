@@ -6,7 +6,6 @@ chapter_title: 'Belief, Patterns, and Uncertainty'
 order: 338
 tags:
    - cognitive-bias
-   - confirmation-bias
    - reasoning
    - psychology
    - epistemology

@@ -5,10 +5,10 @@ chapter: 8
 chapter_title: 'Information and Representation'
 order: 143
 tags:
-   - triggers
+   - behavior
    - causation
    - information
-   - signals
+   - communication
    - control
 ---
 

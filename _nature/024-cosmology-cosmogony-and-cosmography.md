@@ -6,8 +6,7 @@ chapter_title: 'Cosmos and Origins'
 order: 24
 tags:
    - cosmology
-   - cosmogony
-   - cosmography
+   - origins
    - universe
    - astronomy
 ---

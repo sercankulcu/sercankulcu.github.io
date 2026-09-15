@@ -7,9 +7,8 @@ order: 129
 tags:
    - recursion
    - nature
-   - art
-   - music
-   - patterns
+   - creativity
+   - order
 ---
 
 A fern resembles itself.

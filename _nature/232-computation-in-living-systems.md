@@ -5,10 +5,9 @@ chapter: 13
 chapter_title: 'Computation and Computer Science'
 order: 232
 tags:
-   - biological-computation
-   - living-systems
+   - biological-information
+   - nature
    - information-processing
-   - cells
    - computation
 ---
 

@@ -5,11 +5,10 @@ chapter: 16
 chapter_title: 'Consciousness'
 order: 306
 tags:
-   - access-consciousness
-   - phenomenal-consciousness
-   - ned-block
+   - cognition
+   - subjective-experience
+   - philosophy-of-mind
    - consciousness
-   - cognitive-access
 ---
 
 A visual state can guide behavior.

@@ -5,7 +5,6 @@ chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'
 order: 108
 tags:
-   - linearity
    - nonlinearity
    - dynamical-systems
    - complexity

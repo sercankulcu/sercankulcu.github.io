@@ -5,8 +5,8 @@ chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'
 order: 94
 tags:
-   - weak-emergence
-   - strong-emergence
+   - emergence
+   - levels
    - reductionism
    - complexity
    - philosophy-of-mind

@@ -5,7 +5,6 @@ chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'
 order: 154
 tags:
-   - morphology
    - syntax
    - semantics
    - pragmatics

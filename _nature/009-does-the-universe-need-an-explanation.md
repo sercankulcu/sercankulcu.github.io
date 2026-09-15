@@ -7,7 +7,7 @@ order: 9
 tags:
    - universe
    - explanation
-   - cosmological-argument
+   - causation
    - metaphysics
    - philosophy
 ---

@@ -7,7 +7,6 @@ order: 70
 tags:
    - demarcation
    - science
-   - pseudoscience
    - philosophy-of-science
    - methodology
 ---

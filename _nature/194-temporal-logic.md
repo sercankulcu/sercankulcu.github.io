@@ -5,11 +5,10 @@ chapter: 11
 chapter_title: 'Logic and Reasoning'
 order: 194
 tags:
-   - temporal-logic
+   - modal-logic
    - time
    - verification
    - computation
-   - modal-logic
 ---
 
 Ordinary logic treats propositions as if their truth does not change with time.

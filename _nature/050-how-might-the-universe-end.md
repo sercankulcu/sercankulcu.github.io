@@ -5,10 +5,9 @@ chapter: 3
 chapter_title: 'Cosmos and Origins'
 order: 50
 tags:
-   - fate-of-the-universe
-   - heat-death
+   - universe
+   - entropy
    - dark-energy
-   - big-rip
    - cosmology
 ---
 

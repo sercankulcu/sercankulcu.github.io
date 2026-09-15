@@ -5,8 +5,8 @@ chapter: 8
 chapter_title: 'Information and Representation'
 order: 132
 tags:
-   - alphabets
-   - strings
+   - symbols
+   - encoding
    - codes
    - formal-languages
    - representation

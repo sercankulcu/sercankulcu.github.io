@@ -6,10 +6,9 @@ chapter_title: 'Knowing and the Philosophy of Science'
 order: 67
 tags:
    - causality
-   - correlation
-   - confounding
-   - intervention
-   - counterfactuals
+   - statistics
+   - experiment
+   - possible-worlds
 ---
 
 Two things move together.

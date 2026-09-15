@@ -6,8 +6,7 @@ chapter_title: 'Logic and Reasoning'
 order: 190
 tags:
    - identity
-   - sameness
-   - ship-of-theseus
+   - ontology
    - logic
    - metaphysics
 ---

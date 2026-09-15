@@ -7,7 +7,6 @@ order: 131
 tags:
    - symbols
    - representation
-   - semiotics
    - meaning
    - information
 ---

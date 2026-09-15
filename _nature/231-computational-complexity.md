@@ -5,11 +5,10 @@ chapter: 13
 chapter_title: 'Computation and Computer Science'
 order: 231
 tags:
-   - computational-complexity
-   - complexity-theory
-   - p-vs-np
+   - complexity
+   - computability
    - algorithms
-   - resources
+   - limits
 ---
 
 Computability asks:

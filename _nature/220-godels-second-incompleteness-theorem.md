@@ -6,7 +6,7 @@ chapter_title: 'Formal Systems, Metalogic, and Gödel'
 order: 220
 tags:
    - godel
-   - second-incompleteness
+   - incompleteness
    - consistency
    - self-reference
    - formal-systems

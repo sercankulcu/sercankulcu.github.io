@@ -6,7 +6,7 @@ chapter_title: 'Brain, Mind, and Self'
 order: 246
 tags:
    - brain
-   - levels-of-organization
+   - levels
    - neuroscience
    - emergence
    - cognition

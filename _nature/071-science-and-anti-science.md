@@ -6,9 +6,9 @@ chapter_title: 'Knowing and the Philosophy of Science'
 order: 71
 tags:
    - science
-   - anti-science
+   - demarcation
    - skepticism
-   - misinformation
+   - culture
    - philosophy-of-science
 ---
 
