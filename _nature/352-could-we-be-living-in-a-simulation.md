@@ -126,9 +126,9 @@ Discreteness is not a unique simulation signature.
 
 The Planck length is:
 
-\[
+$$
 \ell_P=\sqrt{\frac{\hbar G}{c^3}}
-\]
+$$
 
 It marks a scale where quantum gravity becomes important.
 
@@ -140,9 +140,9 @@ the pixel size of the universe.
 
 Could:
 
-\[
+$$
 c
-\]
+$$
 
 be a processor speed limit?
 

@@ -39,9 +39,9 @@ This creates a feedback loop.
 
 A simple cycle is:
 
-\[
+$$
 Environment \rightarrow Perception \rightarrow Agent \rightarrow Action \rightarrow Environment
-\]
+$$
 
 The process repeats.
 
@@ -85,14 +85,14 @@ Good action may depend on the whole history.
 
 An abstract agent function maps percept history to action:
 
-\[
+$$
 f:P^*\rightarrow A
-\]
+$$
 
 where:
 
-- \(P^*\) = possible percept sequences,
-- \(A\) = actions.
+- $$P^*$$ = possible percept sequences,
+- $$A$$ = actions.
 
 This is a formal definition of behavior.
 
@@ -333,9 +333,9 @@ The model supports prediction.
 
 If the agent knows:
 
-\[
+$$
 P(s'|s,a)
-\]
+$$
 
 it can simulate consequences of actions.
 
@@ -345,9 +345,9 @@ Planning becomes model-based control.
 
 A policy specifies action selection:
 
-\[
+$$
 \pi(a|s)
-\]
+$$
 
 It may be:
 

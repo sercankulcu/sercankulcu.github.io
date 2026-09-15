@@ -36,9 +36,9 @@ It is related to:
 
 For a reversible heat transfer:
 
-\[
-dS=rac{\delta Q_{	ext{rev}}}{T}
-\]
+$$
+dS=\frac{\delta Q_{\text{rev}}}{T}
+$$
 
 This is a physical quantity with units.
 
@@ -48,14 +48,14 @@ Boltzmann connected thermodynamic entropy to microscopic possibilities.
 
 His famous relation is:
 
-\[
+$$
 S=k_B\ln \Omega
-\]
+$$
 
 where:
 
-- \(k_B\) is Boltzmann's constant,
-- \(\Omega\) is the number of compatible microstates.
+- $$k_B$$ is Boltzmann's constant,
+- $$\Omega$$ is the number of compatible microstates.
 
 More compatible microstates mean greater entropy.
 
@@ -63,9 +63,9 @@ More compatible microstates mean greater entropy.
 
 Shannon entropy is:
 
-\[
+$$
 H=-\sum_i p_i\log p_i
-\]
+$$
 
 It measures uncertainty in a probability distribution.
 
@@ -137,13 +137,13 @@ Thermodynamic entropy is not merely subjective ignorance.
 
 Statistical mechanics uses expressions such as:
 
-\[
+$$
 S=-k_B\sum_i p_i\ln p_i
-\]
+$$
 
 This is mathematically Shannon-like.
 
-The factor \(k_B\) gives physical units.
+The factor $$k_B$$ gives physical units.
 
 The same probability structure appears in both fields.
 
@@ -231,9 +231,9 @@ This deepened the information-physics connection.
 
 Rolf Landauer argued that logically irreversible erasure of one bit has a minimum thermodynamic cost under suitable conditions:
 
-\[
+$$
 k_B T\ln 2
-\]
+$$
 
 of heat dissipated per erased bit in the ideal limit.
 

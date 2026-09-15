@@ -50,7 +50,7 @@ Classical intuition says that an observer outside should measure the speed of th
 
 Special relativity says no.
 
-Both observers measure the same value, \(c\).
+Both observers measure the same value, $$c$$.
 
 To make this possible, their measurements of space and time must differ.
 
@@ -98,13 +98,13 @@ This sounds paradoxical only if we assume absolute time.
 
 The effect follows from spacetime geometry.
 
-For relative speed \(v\), the Lorentz factor is:
+For relative speed $$v$$, the Lorentz factor is:
 
-\[
-\gamma = rac{1}{\sqrt{1-v^2/c^2}}
-\]
+$$
+\gamma = \frac{1}{\sqrt{1-v^2/c^2}}
+$$
 
-As \(v\) increases, \(\gamma\) increases.
+As $$v$$ increases, $$\gamma$$ increases.
 
 At everyday speeds, the effect is tiny.
 
@@ -162,11 +162,11 @@ Its measured length along the direction of motion is shorter than its proper len
 
 The relation is:
 
-\[
-L = rac{L_0}{\gamma}
-\]
+$$
+L = \frac{L_0}{\gamma}
+$$
 
-where \(L_0\) is the length measured in the object's rest frame.
+where $$L_0$$ is the length measured in the object's rest frame.
 
 This is not mechanical squeezing.
 
@@ -180,19 +180,19 @@ Length contraction follows from that difference.
 
 Relativity also modifies how velocities combine.
 
-Two ordinary velocities do not simply add when they become comparable to \(c\).
+Two ordinary velocities do not simply add when they become comparable to $$c$$.
 
 The relativistic velocity-addition formula prevents massive objects from being accelerated past the speed of light.
 
-Even if one observer measures an object moving extremely fast and another observer moves relative to the first, neither measures the object exceeding \(c\).
+Even if one observer measures an object moving extremely fast and another observer moves relative to the first, neither measures the object exceeding $$c$$.
 
 ## Why Massive Objects Cannot Reach Light Speed
 
-As the speed of a massive object approaches \(c\), the energy required to continue accelerating it grows without bound.
+As the speed of a massive object approaches $$c$$, the energy required to continue accelerating it grows without bound.
 
 No finite amount of energy can push a massive particle to the speed of light.
 
-Massless particles such as photons travel at \(c\) in vacuum.
+Massless particles such as photons travel at $$c$$ in vacuum.
 
 The speed of light is therefore not merely a property of light.
 
@@ -204,21 +204,21 @@ Relativity changes the classical relations among energy, momentum, and mass.
 
 A central relation is:
 
-\[
+$$
 E^2 = p^2c^2 + m^2c^4
-\]
+$$
 
-For an object at rest, \(p = 0\), giving:
+For an object at rest, $$p = 0$$, giving:
 
-\[
+$$
 E = mc^2
-\]
+$$
 
-For a massless particle such as a photon, \(m = 0\), and the relation becomes:
+For a massless particle such as a photon, $$m = 0$$, and the relation becomes:
 
-\[
+$$
 E = pc
-\]
+$$
 
 This unifies massive and massless cases in one framework.
 
@@ -242,9 +242,9 @@ But they agree on the spacetime interval.
 
 For suitable sign convention, a simplified one-dimensional form can be written as:
 
-\[
+$$
 \Delta s^2 = c^2\Delta t^2 - \Delta x^2
-\]
+$$
 
 This invariant structure replaces separate absolute space and absolute time.
 

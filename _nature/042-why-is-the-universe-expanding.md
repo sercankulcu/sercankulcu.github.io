@@ -36,7 +36,7 @@ Cosmic expansion is a property of spacetime geometry.
 
 On sufficiently large scales, the average distance between comoving galaxies increases with time.
 
-Cosmologists describe this using the **scale factor**, usually written as \(a(t)\).
+Cosmologists describe this using the **scale factor**, usually written as $$a(t)$$.
 
 If the scale factor doubles, the proper distance between idealized comoving points doubles.
 
@@ -64,11 +64,11 @@ the expansion is not a universal stretching of every ruler.
 
 For relatively nearby galaxies participating in the cosmic expansion, recession velocity is approximately proportional to distance:
 
-\[
+$$
 v = H_0 d
-\]
+$$
 
-where \(H_0\) is the present Hubble constant.
+where $$H_0$$ is the present Hubble constant.
 
 The farther the galaxy, the faster it recedes on average.
 
@@ -211,7 +211,7 @@ Current observations are broadly consistent with a cosmological constant, but th
 
 ## Does Expansion Violate the Speed of Light?
 
-Very distant galaxies can have recession rates greater than \(c\) in standard cosmological coordinates.
+Very distant galaxies can have recession rates greater than $$c$$ in standard cosmological coordinates.
 
 This does not violate special relativity.
 

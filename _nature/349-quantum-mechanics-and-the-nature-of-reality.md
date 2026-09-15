@@ -26,9 +26,9 @@ The ontology remains contested.
 
 A quantum system is represented by a state such as:
 
-\[
+$$
 |\psi\rangle
-\]
+$$
 
 The state determines probabilities for possible measurement outcomes.
 
@@ -40,9 +40,9 @@ That depends on interpretation.
 
 A quantum state can be written as:
 
-\[
+$$
 |\psi\rangle = \alpha|0\rangle+\beta|1\rangle
-\]
+$$
 
 This is a superposition.
 
@@ -94,11 +94,11 @@ This is the **measurement problem**.
 
 Between measurements, quantum states evolve according to equations such as the Schrödinger equation:
 
-\[
+$$
 i\hbar\frac{\partial}{\partial t}|\psi\rangle
 =
 \hat{H}|\psi\rangle
-\]
+$$
 
 This evolution is deterministic and linear.
 
@@ -206,9 +206,9 @@ Probability also becomes conceptually subtle if every outcome occurs.
 
 Why should branch weights correspond to probabilities:
 
-\[
+$$
 |\alpha|^2
-\]
+$$
 
 if all outcomes exist?
 
@@ -346,11 +346,11 @@ This directly challenges simple atomistic metaphysics.
 
 For a Bell state:
 
-\[
+$$
 |\psi\rangle=
 \frac{1}{\sqrt{2}}
 (|00\rangle+|11\rangle)
-\]
+$$
 
 the whole has a definite relational structure while each part individually may lack a definite corresponding property.
 
@@ -390,9 +390,9 @@ Quantum contextuality is a technical physical concept.
 
 For noncommuting observables:
 
-\[
+$$
 \Delta x \Delta p \geq \frac{\hbar}{2}
-\]
+$$
 
 Position and momentum cannot both be arbitrarily sharp in one quantum state.
 

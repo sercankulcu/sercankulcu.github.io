@@ -85,9 +85,9 @@ Neither is straightforwardly true or false in the same way.
 
 Formal logic uses symbols such as:
 
-\[
+$$
 P,\ Q,\ R
-\]
+$$
 
 to stand for whole propositions.
 
@@ -99,9 +99,9 @@ For example:
 
 Then:
 
-\[
+$$
 P \rightarrow Q
-\]
+$$
 
 represents a conditional relation.
 
@@ -115,9 +115,9 @@ Instead of treating:
 
 as one indivisible proposition, predicate logic analyzes it as:
 
-\[
+$$
 Mortal(Socrates)
-\]
+$$
 
 The predicate is:
 
@@ -260,9 +260,9 @@ It makes a claim over an entire domain.
 
 Predicate logic represents it using a universal quantifier:
 
-\[
+$$
 \forall x\,(Human(x) \rightarrow Mortal(x))
-\]
+$$
 
 ## Existential Qualification
 
@@ -270,9 +270,9 @@ Predicate logic represents it using a universal quantifier:
 
 This can be written:
 
-\[
+$$
 \exists x\,(Human(x) \land Philosopher(x))
-\]
+$$
 
 The qualifier "some" becomes existential quantification.
 
@@ -282,9 +282,9 @@ Negation changes the truth condition of a proposition.
 
 If:
 
-\[
+$$
 P
-\]
+$$
 
 means:
 
@@ -292,9 +292,9 @@ It is raining,
 
 then:
 
-\[
+$$
 \neg P
-\]
+$$
 
 means:
 
@@ -306,9 +306,9 @@ Negation is one of logic's basic operators.
 
 A conjunction combines two propositions:
 
-\[
+$$
 P \land Q
-\]
+$$
 
 meaning:
 
@@ -320,9 +320,9 @@ It is true only when both are true in classical logic.
 
 A disjunction:
 
-\[
+$$
 P \lor Q
-\]
+$$
 
 means:
 
@@ -338,9 +338,9 @@ Natural-language "or" can sometimes imply exclusivity.
 
 A conditional:
 
-\[
+$$
 P \rightarrow Q
-\]
+$$
 
 means:
 
@@ -354,9 +354,9 @@ This difference will matter later.
 
 A biconditional:
 
-\[
+$$
 P \leftrightarrow Q
-\]
+$$
 
 means roughly:
 

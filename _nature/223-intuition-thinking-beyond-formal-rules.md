@@ -72,9 +72,9 @@ Intuition often begins with pattern recognition.
 
 A mathematician examines cases:
 
-\[
+$$
 1,4,9,16,25,\ldots
-\]
+$$
 
 and recognizes squares.
 

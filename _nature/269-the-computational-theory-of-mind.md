@@ -146,9 +146,9 @@ Compositional representation gives a natural explanation.
 
 Reasoning can then be modeled as transformations such as:
 
-\[
+$$
 R_1,R_2 \rightarrow R_3
-\]
+$$
 
 where representations are manipulated by rules.
 

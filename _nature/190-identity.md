@@ -74,17 +74,17 @@ Logic uses identity for the first.
 
 Formal logic often uses:
 
-\[
+$$
 =
-\]
+$$
 
 to represent identity.
 
 The expression:
 
-\[
+$$
 a=b
-\]
+$$
 
 means that a and b designate the same object.
 
@@ -94,9 +94,9 @@ This is stronger than saying they are similar.
 
 Identity is reflexive:
 
-\[
+$$
 a=a
-\]
+$$
 
 Every object is identical with itself.
 
@@ -108,15 +108,15 @@ But it is foundational.
 
 If:
 
-\[
+$$
 a=b
-\]
+$$
 
 then:
 
-\[
+$$
 b=a
-\]
+$$
 
 Identity is symmetric.
 
@@ -124,21 +124,21 @@ Identity is symmetric.
 
 If:
 
-\[
+$$
 a=b
-\]
+$$
 
 and:
 
-\[
+$$
 b=c
-\]
+$$
 
 then:
 
-\[
+$$
 a=c
-\]
+$$
 
 Identity is transitive.
 
@@ -154,9 +154,9 @@ This is often called **Leibniz's Law** or the indiscernibility of identicals.
 
 Symbolically, very roughly:
 
-\[
+$$
 x=y \rightarrow (P(x) \leftrightarrow P(y))
-\]
+$$
 
 for appropriate properties P.
 

@@ -32,23 +32,23 @@ The other is semantic:
 
 Recall:
 
-\[
+$$
 \Gamma\vdash\varphi
-\]
+$$
 
 means:
 
-\(\varphi\) is formally derivable from premises \(\Gamma\).
+$$\varphi$$ is formally derivable from premises $$\Gamma$$.
 
 And:
 
-\[
+$$
 \Gamma\models\varphi
-\]
+$$
 
 means:
 
-every model satisfying \(\Gamma\) also satisfies \(\varphi\).
+every model satisfying $$\Gamma$$ also satisfies $$\varphi$$.
 
 One is proof.
 
@@ -58,15 +58,15 @@ The other is semantic consequence.
 
 A proof system is **sound** if:
 
-\[
+$$
 \Gamma\vdash\varphi
-\]
+$$
 
 implies:
 
-\[
+$$
 \Gamma\models\varphi
-\]
+$$
 
 Everything provable is semantically valid.
 
@@ -86,21 +86,21 @@ For example, modus ponens:
 
 From:
 
-\[
+$$
 P
-\]
+$$
 
 and:
 
-\[
+$$
 P\rightarrow Q
-\]
+$$
 
 infer:
 
-\[
+$$
 Q
-\]
+$$
 
 If both premises are true, Q must be true.
 
@@ -120,15 +120,15 @@ Meta-reasoning validates object-level reasoning.
 
 A proof system is **complete** if:
 
-\[
+$$
 \Gamma\models\varphi
-\]
+$$
 
 implies:
 
-\[
+$$
 \Gamma\vdash\varphi
-\]
+$$
 
 Everything semantically entailed can be formally proved.
 
@@ -157,11 +157,11 @@ Such a proof system is not useful for reliable reasoning.
 
 The ideal is:
 
-\[
+$$
 \Gamma\vdash\varphi
 \quad\text{iff}\quad
 \Gamma\models\varphi
-\]
+$$
 
 Proof and semantic consequence coincide.
 
@@ -183,11 +183,11 @@ If a first-order sentence is true in every model satisfying the premises, then t
 
 Symbolically:
 
-\[
+$$
 \Gamma\models\varphi
 \Rightarrow
 \Gamma\vdash\varphi
-\]
+$$
 
 This was a major triumph of formal logic.
 
@@ -274,9 +274,9 @@ This distinction resolves much confusion.
 
 The statement:
 
-\[
+$$
 0+0=0
-\]
+$$
 
 is true in standard arithmetic.
 
@@ -286,17 +286,17 @@ Theory supplies meaning beyond pure logic.
 
 ## Theory Completeness
 
-A theory T is sometimes called **complete** if for every sentence \(\varphi\):
+A theory T is sometimes called **complete** if for every sentence $$\varphi$$:
 
-\[
+$$
 T\vdash\varphi
-\]
+$$
 
 or:
 
-\[
+$$
 T\vdash\neg\varphi
-\]
+$$
 
 This is a different use of "complete."
 
@@ -327,9 +327,9 @@ There is no algorithm that always determines validity.
 
 ## Why Proof Search Is Not a Decider
 
-Since proofs are enumerable, we can search for a proof of \(\varphi\).
+Since proofs are enumerable, we can search for a proof of $$\varphi$$.
 
-If \(\varphi\) is valid, completeness guarantees eventual success.
+If $$\varphi$$ is valid, completeness guarantees eventual success.
 
 If it is invalid, search may continue forever.
 

@@ -50,13 +50,13 @@ Together these form the **superposition principle**.
 
 Consider:
 
-\[
+$$
 y=3x
-\]
+$$
 
-Double \(x\).
+Double $$x$$.
 
-\(y\) doubles.
+$$y$$ doubles.
 
 Add two inputs.
 
@@ -106,11 +106,11 @@ A system is nonlinear when outputs do not combine proportionally.
 
 For example:
 
-\[
+$$
 y=x^2
-\]
+$$
 
-Double \(x\).
+Double $$x$$.
 
 The output becomes four times larger.
 
@@ -122,11 +122,11 @@ Superposition fails.
 
 Suppose:
 
-\[
+$$
 y=x_1+x_2+x_1x_2
-\]
+$$
 
-The \(x_1x_2\) term represents interaction.
+The $$x_1x_2$$ term represents interaction.
 
 The combined effect cannot be reconstructed by simply adding independent effects.
 
@@ -152,17 +152,17 @@ Feedback makes the future depend on the current state in a multiplicative way.
 
 A classic continuous model is:
 
-\[
-rac{dN}{dt}=rN\left(1-rac{N}{K}ight)
-\]
+$$
+\frac{dN}{dt}=rN\left(1-\frac{N}{K}\right)
+$$
 
 where:
 
-- \(N\) is population,
-- \(r\) growth rate,
-- \(K\) carrying capacity.
+- $$N$$ is population,
+- $$r$$ growth rate,
+- $$K$$ carrying capacity.
 
-The \(N^2\)-like term makes the system nonlinear.
+The $$N^2$$-like term makes the system nonlinear.
 
 Growth slows as population approaches capacity.
 
@@ -250,9 +250,9 @@ A small-angle pendulum is approximately linear.
 
 For small angles:
 
-\[
-\sin 	heta pprox 	heta
-\]
+$$
+\sin \theta \approx \theta
+$$
 
 This makes the equation easy to solve.
 

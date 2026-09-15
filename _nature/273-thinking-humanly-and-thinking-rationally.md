@@ -268,9 +268,9 @@ An action is evaluated by expected consequences.
 
 A simplified rule is:
 
-\[
+$$
 EU(a)=\sum_s P(s\mid a)U(s)
-\]
+$$
 
 Choose the action with highest expected utility.
 

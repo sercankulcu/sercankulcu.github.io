@@ -32,15 +32,15 @@ The natural numbers can be built recursively.
 
 Start with:
 
-\[
+$$
 0
-\]
+$$
 
 Then apply a successor operation:
 
-\[
+$$
 n \mapsto n+1
-\]
+$$
 
 A finite generative principle yields an unbounded sequence.
 
@@ -48,15 +48,15 @@ A finite generative principle yields an unbounded sequence.
 
 Factorial is one of the clearest recursive definitions:
 
-\[
+$$
 0!=1
-\]
+$$
 
-\[
+$$
 n!=n(n-1)!
-\]
+$$
 
-The value at \(n\) depends on the same function evaluated at a smaller argument.
+The value at $$n$$ depends on the same function evaluated at a smaller argument.
 
 The base case prevents infinite regress.
 
@@ -64,13 +64,13 @@ The base case prevents infinite regress.
 
 The Fibonacci sequence uses two previous instances:
 
-\[
+$$
 F_0=0,\quad F_1=1
-\]
+$$
 
-\[
+$$
 F_n=F_{n-1}+F_{n-2}
-\]
+$$
 
 This is mathematically elegant.
 
@@ -85,7 +85,7 @@ Sets can be defined recursively.
 For example, define a set of strings:
 
 - the empty string belongs,
-- if \(w\) belongs, then \(0w\) and \(1w\) belong.
+- if $$w$$ belongs, then $$0w$$ and $$1w$$ belong.
 
 From two rules comes an infinite collection.
 
@@ -126,23 +126,23 @@ It is implemented through ordinary machine state.
 
 Suppose we compute:
 
-\[
+$$
 4!
-\]
+$$
 
 The calls conceptually become:
 
-\[
-4 	imes 3!
-\]
+$$
+4 \times 3!
+$$
 
-\[
-4 	imes 3 	imes 2!
-\]
+$$
+4 \times 3 \times 2!
+$$
 
-\[
-4 	imes 3 	imes 2 	imes 1!
-\]
+$$
+4 \times 3 \times 2 \times 1!
+$$
 
 until the base case is reached.
 
@@ -238,9 +238,9 @@ Syntax and computation mirror one another.
 
 An arithmetic expression such as:
 
-\[
-(2+3)	imes(4-1)
-\]
+$$
+(2+3)\times(4-1)
+$$
 
 can be represented as a tree.
 
@@ -417,15 +417,15 @@ We often analyze recursive algorithms using recurrence relations.
 
 For merge sort:
 
-\[
+$$
 T(n)=2T(n/2)+O(n)
-\]
+$$
 
 Solving the recurrence reveals:
 
-\[
+$$
 T(n)=O(n\log n)
-\]
+$$
 
 The algorithm's recursive structure becomes a mathematical equation about cost.
 

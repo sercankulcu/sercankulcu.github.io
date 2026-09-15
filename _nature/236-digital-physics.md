@@ -74,9 +74,9 @@ Quantum theory is not simply classical bits underneath.
 
 The Planck length is approximately:
 
-\[
+$$
 1.6\times10^{-35}\text{ m}
-\]
+$$
 
 It is often described in popular accounts as a "smallest possible length."
 

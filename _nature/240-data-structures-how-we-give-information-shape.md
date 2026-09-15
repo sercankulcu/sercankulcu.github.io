@@ -40,9 +40,9 @@ It is a computational commitment.
 
 Suppose we store:
 
-\[
+$$
 10,20,30,40
-\]
+$$
 
 In an array, the elements occupy indexed positions.
 
@@ -158,9 +158,9 @@ An array stores elements in indexed order.
 
 It supports efficient direct access:
 
-\[
+$$
 A[i]
-\]
+$$
 
 Arrays exploit contiguous or logically indexed structure.
 
@@ -200,15 +200,15 @@ When balanced, search can be efficient.
 
 A perfectly balanced tree can have height roughly:
 
-\[
+$$
 O(\log n)
-\]
+$$
 
 A badly skewed tree can degrade toward:
 
-\[
+$$
 O(n)
-\]
+$$
 
 Structure quality affects algorithmic complexity.
 
@@ -241,9 +241,9 @@ A hash table maps keys to positions using a hash function.
 
 Average lookup can be close to:
 
-\[
+$$
 O(1)
-\]
+$$
 
 under good assumptions.
 
@@ -295,9 +295,9 @@ A graph can be represented as a matrix.
 
 For n vertices, an adjacency matrix uses roughly:
 
-\[
+$$
 O(n^2)
-\]
+$$
 
 space.
 
@@ -309,9 +309,9 @@ An adjacency list stores neighbors for each vertex.
 
 For sparse graphs, it can use approximately:
 
-\[
+$$
 O(n+m)
-\]
+$$
 
 space, where m is the number of edges.
 

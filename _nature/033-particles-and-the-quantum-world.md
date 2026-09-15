@@ -175,11 +175,11 @@ The limitation is structural.
 
 A familiar form is:
 
-\[
-\Delta x \Delta p \geq rac{\hbar}{2}
-\]
+$$
+\Delta x \Delta p \geq \frac{\hbar}{2}
+$$
 
-Here \(\Delta x\) and \(\Delta p\) represent statistical spreads in position and momentum measurements for a quantum state.
+Here $$\Delta x$$ and $$\Delta p$$ represent statistical spreads in position and momentum measurements for a quantum state.
 
 The relation does not mean "we need better microscopes."
 

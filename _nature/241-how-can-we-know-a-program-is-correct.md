@@ -34,9 +34,9 @@ It is correct relative to a **specification**.
 
 Suppose a sorting function receives:
 
-\[
+$$
 [a_1,a_2,\ldots,a_n]
-\]
+$$
 
 A reasonable specification might require:
 
@@ -68,15 +68,15 @@ Functional correctness asks whether the program returns the right result.
 
 For a function computing factorial:
 
-\[
+$$
 f(n)=n!
-\]
+$$
 
 we want:
 
-\[
+$$
 program(n)=n!
-\]
+$$
 
 for every valid n.
 
@@ -134,9 +134,9 @@ For small finite domains, exhaustive testing may be possible.
 
 A Boolean function with three inputs has only:
 
-\[
+$$
 2^3=8
-\]
+$$
 
 cases.
 
@@ -150,9 +150,9 @@ Suppose a system has 100 Boolean state variables.
 
 Then there are:
 
-\[
+$$
 2^{100}
-\]
+$$
 
 possible configurations.
 
@@ -258,9 +258,9 @@ A **precondition** describes what must hold before a function runs.
 
 For division:
 
-\[
+$$
 b\neq0
-\]
+$$
 
 may be required.
 
@@ -272,35 +272,35 @@ A **postcondition** describes what must hold after execution.
 
 For:
 
-\[
+$$
 max(a,b)
-\]
+$$
 
 we might require:
 
-\[
+$$
 result\geq a
-\]
+$$
 
 and:
 
-\[
+$$
 result\geq b
-\]
+$$
 
 and:
 
-\[
+$$
 result=a \lor result=b
-\]
+$$
 
 ## Hoare Triples
 
 Tony Hoare introduced a notation:
 
-\[
+$$
 \{P\}\ C\ \{Q\}
-\]
+$$
 
 where:
 
@@ -322,9 +322,9 @@ x := x + 1
 
 we may write:
 
-\[
+$$
 \{x=4\}\ x:=x+1\ \{x=5\}
-\]
+$$
 
 This turns program behavior into logical reasoning.
 
@@ -356,15 +356,15 @@ At termination, the invariant helps establish the postcondition.
 
 Suppose after k iterations:
 
-\[
+$$
 sum=a_1+\cdots+a_k
-\]
+$$
 
 If this invariant is preserved, then when k reaches n:
 
-\[
+$$
 sum=a_1+\cdots+a_n
-\]
+$$
 
 The invariant compresses reasoning across arbitrarily many iterations.
 
@@ -555,9 +555,9 @@ Some algorithms are randomized.
 
 Correctness may be expressed probabilistically:
 
-\[
+$$
 Pr[\text{correct output}] \geq 1-\epsilon
-\]
+$$
 
 Verification must then reason about distributions.
 

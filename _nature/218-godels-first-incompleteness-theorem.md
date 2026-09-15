@@ -73,9 +73,9 @@ become arithmetic relations.
 
 Inside the arithmetic theory, define a formula corresponding to:
 
-\[
+$$
 Prov(x)
-\]
+$$
 
 meaning, informally:
 
@@ -85,11 +85,11 @@ The theory can now speak about its own provability relation in coded form.
 
 ## Step 3: Diagonalization
 
-The diagonal lemma allows construction of a sentence \(G\) satisfying:
+The diagonal lemma allows construction of a sentence $$G$$ satisfying:
 
-\[
+$$
 T\vdash G\leftrightarrow \neg Prov(\ulcorner G\urcorner)
-\]
+$$
 
 Informally:
 
@@ -101,9 +101,9 @@ G says:
 
 Assume:
 
-\[
+$$
 T\vdash G
-\]
+$$
 
 Then there actually is a formal proof of G.
 
@@ -115,9 +115,9 @@ Under the required consistency conditions, this cannot happen.
 
 So:
 
-\[
+$$
 T\nvdash G
-\]
+$$
 
 ## What G Says
 
@@ -153,11 +153,11 @@ That difference converts paradox into incompleteness.
 
 For incompleteness, we want neither side to be provable.
 
-Gödel's original proof used a stronger hypothesis called **\(\omega\)-consistency** to establish that:
+Gödel's original proof used a stronger hypothesis called **$$\omega$$-consistency** to establish that:
 
-\[
+$$
 T\nvdash \neg G
-\]
+$$
 
 Later results, especially Rosser's improvement, weakened the requirement.
 
@@ -177,15 +177,15 @@ Any consistent, effectively axiomatized theory strong enough to represent a suit
 
 There exists a sentence G such that:
 
-\[
+$$
 T\nvdash G
-\]
+$$
 
 and:
 
-\[
+$$
 T\nvdash\neg G
-\]
+$$
 
 ## Theory-Level Incompleteness
 
@@ -213,15 +213,15 @@ No contradiction.
 
 If T does not decide G, then both:
 
-\[
+$$
 T+G
-\]
+$$
 
 and:
 
-\[
+$$
 T+\neg G
-\]
+$$
 
 may be consistent relative to T under suitable conditions.
 
@@ -235,13 +235,13 @@ When we say G is "true," we usually mean:
 
 true in the standard model:
 
-\[
+$$
 \mathbb{N}=\{0,1,2,\ldots\}
-\]
+$$
 
 This distinction is essential.
 
-Some nonstandard models of T may satisfy \(\neg G\).
+Some nonstandard models of T may satisfy $$\neg G$$.
 
 Truth must be tied to interpretation.
 
@@ -251,9 +251,9 @@ Yes.
 
 Create:
 
-\[
+$$
 T'=T+G
-\]
+$$
 
 Now G is an axiom.
 
@@ -261,7 +261,7 @@ The new theory proves it.
 
 But if T' remains effectively axiomatized, consistent, and sufficiently strong, Gödel applies again.
 
-There is another undecidable sentence \(G'\).
+There is another undecidable sentence $$G'$$.
 
 ## No Final Effective Completion
 

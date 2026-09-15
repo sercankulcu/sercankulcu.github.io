@@ -65,9 +65,9 @@ A proposition is **necessary** if it could not have been false.
 
 Examples often include:
 
-\[
+$$
 2+2=4
-\]
+$$
 
 or:
 
@@ -114,15 +114,15 @@ Modal logic introduces operators.
 
 Necessarily:
 
-\[
+$$
 \Box P
-\]
+$$
 
 Possibly:
 
-\[
+$$
 \Diamond P
-\]
+$$
 
 These enrich ordinary propositional logic.
 
@@ -130,9 +130,9 @@ These enrich ordinary propositional logic.
 
 In standard modal logic:
 
-\[
+$$
 \Diamond P \equiv \neg \Box \neg P
-\]
+$$
 
 Meaning:
 
@@ -144,9 +144,9 @@ it is not necessary that P is false.
 
 Similarly:
 
-\[
+$$
 \Box P \equiv \neg \Diamond \neg P
-\]
+$$
 
 Necessity and possibility are dual notions.
 
@@ -154,9 +154,9 @@ Necessity and possibility are dual notions.
 
 If P is true, that does not mean:
 
-\[
+$$
 \Box P
-\]
+$$
 
 For example:
 
@@ -174,9 +174,9 @@ In standard modal systems with reflexive accessibility, if P is necessary, then 
 
 This principle is formalized in system T:
 
-\[
+$$
 \Box P \rightarrow P
-\]
+$$
 
 But modal systems can differ depending on what "necessity" is meant to represent.
 
@@ -186,9 +186,9 @@ Some statements are necessary because denying them violates logic.
 
 Example:
 
-\[
+$$
 P \lor \neg P
-\]
+$$
 
 in classical logic.
 
@@ -200,9 +200,9 @@ Mathematical truths are often treated as necessary.
 
 If:
 
-\[
+$$
 7+5=12
-\]
+$$
 
 then perhaps it is true in every possible world where standard arithmetic applies.
 
@@ -292,17 +292,17 @@ It can be understood as a complete way things might have been.
 
 Then:
 
-\[
+$$
 \Box P
-\]
+$$
 
 means P is true in all relevant possible worlds.
 
 And:
 
-\[
+$$
 \Diamond P
-\]
+$$
 
 means P is true in at least one.
 
@@ -475,15 +475,15 @@ How can these modal ideas be formalized?
 
 What rules should govern:
 
-\[
+$$
 \Box
-\]
+$$
 
 and:
 
-\[
+$$
 \Diamond
-\]
+$$
 
 And why do different notions of necessity require different formal systems?
 

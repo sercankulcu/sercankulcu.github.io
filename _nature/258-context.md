@@ -328,9 +328,9 @@ If two hypotheses explain the same data, context changes their priors.
 
 Thus:
 
-\[
+$$
 P(H\mid D,C)
-\]
+$$
 
 depends on context C.
 

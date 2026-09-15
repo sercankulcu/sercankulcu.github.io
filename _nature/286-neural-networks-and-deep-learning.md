@@ -26,21 +26,21 @@ Their power comes from learning internal representations from data.
 
 A simple artificial neuron receives inputs:
 
-\[
+$$
 x_1,x_2,\ldots,x_n
-\]
+$$
 
 Each input has a weight:
 
-\[
+$$
 w_1,w_2,\ldots,w_n
-\]
+$$
 
 The unit computes something like:
 
-\[
+$$
 z=\sum_i w_i x_i+b
-\]
+$$
 
 and then applies an activation function.
 
@@ -76,18 +76,18 @@ The XOR problem became a famous demonstration that a single-layer perceptron can
 
 For XOR:
 
-\[
+$$
 0\oplus0=0
-\]
-\[
+$$
+$$
 0\oplus1=1
-\]
-\[
+$$
+$$
 1\oplus0=1
-\]
-\[
+$$
+$$
 1\oplus1=0
-\]
+$$
 
 No single straight line separates the positive from negative cases.
 
@@ -143,15 +143,15 @@ This tells each parameter how changing it would affect the loss.
 
 If:
 
-\[
+$$
 y=f(g(x))
-\]
+$$
 
 then:
 
-\[
+$$
 \frac{dy}{dx}=\frac{df}{dg}\frac{dg}{dx}
-\]
+$$
 
 Backpropagation applies this idea across computational graphs.
 
@@ -159,9 +159,9 @@ Backpropagation applies this idea across computational graphs.
 
 After gradients are computed, parameters are updated:
 
-\[
+$$
 \theta\leftarrow\theta-\eta\nabla_\theta L
-\]
+$$
 
 This process repeats across data.
 
@@ -177,7 +177,7 @@ It also introduces useful noise.
 
 ## Learning Rate
 
-The learning rate \(\eta\) controls update size.
+The learning rate $$\eta$$ controls update size.
 
 Too large:
 
@@ -300,9 +300,9 @@ Each token computes relationships with other tokens.
 
 A simplified attention formula is:
 
-\[
+$$
 Attention(Q,K,V)=softmax\left(\frac{QK^T}{\sqrt{d_k}}\right)V
-\]
+$$
 
 The model learns which elements should influence each other.
 
@@ -371,15 +371,15 @@ They improve optimization in deep networks.
 
 Instead of learning:
 
-\[
+$$
 H(x)
-\]
+$$
 
 directly, a block may learn:
 
-\[
+$$
 F(x)+x
-\]
+$$
 
 ## Normalization
 

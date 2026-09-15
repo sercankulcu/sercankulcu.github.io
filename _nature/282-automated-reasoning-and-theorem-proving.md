@@ -38,21 +38,21 @@ This makes theorem proving a natural computational task.
 
 Suppose we know:
 
-\[
+$$
 P
-\]
+$$
 
 and:
 
-\[
+$$
 P\rightarrow Q
-\]
+$$
 
 Then modus ponens gives:
 
-\[
+$$
 Q
-\]
+$$
 
 An automated reasoner can apply this rule mechanically.
 
@@ -131,21 +131,21 @@ Execution becomes proof search.
 
 Example:
 
-\[
+$$
 Human(x)
-\]
+$$
 
 and:
 
-\[
+$$
 Human(Socrates)
-\]
+$$
 
 unify with:
 
-\[
+$$
 x=Socrates
-\]
+$$
 
 This is fundamental in automated logic.
 
@@ -155,21 +155,21 @@ Once variables are unified, rules can be instantiated.
 
 For example:
 
-\[
+$$
 Human(x)\rightarrow Mortal(x)
-\]
+$$
 
 with:
 
-\[
+$$
 x=Socrates
-\]
+$$
 
 becomes:
 
-\[
+$$
 Human(Socrates)\rightarrow Mortal(Socrates)
-\]
+$$
 
 ## Resolution
 
@@ -181,21 +181,21 @@ It operates especially naturally on clauses in conjunctive normal form.
 
 Suppose:
 
-\[
+$$
 P\lor Q
-\]
+$$
 
 and:
 
-\[
+$$
 \neg P\lor R
-\]
+$$
 
 Resolution on P gives:
 
-\[
+$$
 Q\lor R
-\]
+$$
 
 The complementary literals disappear.
 
@@ -209,9 +209,9 @@ T,
 
 add:
 
-\[
+$$
 \neg T
-\]
+$$
 
 to the premises.
 

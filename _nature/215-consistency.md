@@ -22,17 +22,17 @@ A consistent system does not prove both a statement and its negation.
 
 ## Syntactic Consistency
 
-A theory T is syntactically consistent if there is no sentence \(P\) such that:
+A theory T is syntactically consistent if there is no sentence $$P$$ such that:
 
-\[
+$$
 T\vdash P
-\]
+$$
 
 and:
 
-\[
+$$
 T\vdash \neg P
-\]
+$$
 
 Both cannot be derivable.
 
@@ -42,15 +42,15 @@ In classical logic, contradiction can trigger explosion.
 
 If a theory proves:
 
-\[
+$$
 P
-\]
+$$
 
 and:
 
-\[
+$$
 \neg P
-\]
+$$
 
 then arbitrary formulas may become derivable.
 
@@ -62,15 +62,15 @@ A theory is **trivial** if every sentence is provable.
 
 Then:
 
-\[
+$$
 2+2=4
-\]
+$$
 
 and:
 
-\[
+$$
 2+2=5
-\]
+$$
 
 are both theorems.
 
@@ -88,9 +88,9 @@ Or to:
 
 a fixed contradiction such as:
 
-\[
+$$
 0=1
-\]
+$$
 
 is not provable.
 
@@ -161,9 +161,9 @@ If theory A is consistent, then theory B is consistent.
 
 Symbolically:
 
-\[
+$$
 Con(A)\rightarrow Con(B)
-\]
+$$
 
 This transfers trust rather than creating it from nothing.
 
@@ -205,9 +205,9 @@ A stronger theory can sometimes prove the consistency of a weaker one.
 
 For example, a system with stronger axioms may formalize enough reasoning to establish:
 
-\[
+$$
 Con(T)
-\]
+$$
 
 for weaker T.
 
@@ -229,11 +229,11 @@ no.
 
 For a suitable effectively axiomatized consistent theory T strong enough to represent arithmetic:
 
-\[
+$$
 T\nvdash Con(T)
-\]
+$$
 
-where \(Con(T)\) is the formalized statement expressing T's own consistency.
+where $$Con(T)$$ is the formalized statement expressing T's own consistency.
 
 The details matter.
 
@@ -263,9 +263,9 @@ A theory might consistently describe the wrong structure.
 
 Suppose a theory includes:
 
-\[
+$$
 0=1
-\]
+$$
 
 but uses a nonclassical setup or altered interpretation where this is not treated as ordinary arithmetic equality.
 
@@ -289,7 +289,7 @@ These are different properties.
 
 ## Omega-Consistency
 
-Gödel's original first incompleteness theorem used a stronger condition called **\(\omega\)-consistency**.
+Gödel's original first incompleteness theorem used a stronger condition called **$$\omega$$-consistency**.
 
 Later refinements weakened assumptions.
 
@@ -335,9 +335,9 @@ Theories can be compared by the consistency statements they can prove.
 
 One theory may establish:
 
-\[
+$$
 Con(T)
-\]
+$$
 
 while another cannot.
 

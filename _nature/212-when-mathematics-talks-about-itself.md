@@ -47,9 +47,9 @@ But a coded bridge now connects them.
 
 Suppose proof relation is represented as:
 
-\[
+$$
 Proof(x,y)
-\]
+$$
 
 Then arithmetic can express:
 
@@ -57,9 +57,9 @@ Then arithmetic can express:
 
 That is:
 
-\[
+$$
 \exists x\,Proof(x,y)
-\]
+$$
 
 Arithmetic mirrors statements about its own proof machinery.
 
@@ -67,9 +67,9 @@ Arithmetic mirrors statements about its own proof machinery.
 
 Define:
 
-\[
+$$
 Prov(y)\equiv \exists x\,Proof(x,y)
-\]
+$$
 
 Now a formula can say:
 
@@ -89,9 +89,9 @@ The sentence can talk about itself indirectly.
 
 A Gödel sentence G is constructed so that, informally:
 
-\[
+$$
 G \leftrightarrow \neg Prov(\ulcorner G\urcorner)
-\]
+$$
 
 G says:
 

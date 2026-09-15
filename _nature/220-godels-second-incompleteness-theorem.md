@@ -26,9 +26,9 @@ Under the standard conditions, the answer is no.
 
 Because proofs can be encoded with Gödel numbers, the theory can represent:
 
-\[
+$$
 Proof_T(x,y)
-\]
+$$
 
 meaning:
 
@@ -42,19 +42,19 @@ There is no T-proof of contradiction.
 
 Choose a contradiction, such as:
 
-\[
+$$
 0=1
-\]
+$$
 
 Then a consistency statement can be represented informally as:
 
-\[
+$$
 Con(T)\equiv \neg Prov_T(\ulcorner 0=1\urcorner)
-\]
+$$
 
 In words:
 
-T does not prove \(0=1\).
+T does not prove $$0=1$$.
 
 ## Why This Is Possible
 
@@ -80,9 +80,9 @@ If T is:
 
 then:
 
-\[
+$$
 T\nvdash Con(T)
-\]
+$$
 
 T cannot prove its own consistency using its ordinary internal resources.
 
@@ -103,9 +103,9 @@ Suppose U is stronger than T.
 
 U may prove:
 
-\[
+$$
 Con(T)
-\]
+$$
 
 This is common in proof theory.
 
@@ -119,33 +119,33 @@ Gödel applies again if U satisfies the conditions.
 
 We may have:
 
-\[
+$$
 T_0
-\]
+$$
 
 with stronger:
 
-\[
+$$
 T_1
-\]
+$$
 
 proving:
 
-\[
+$$
 Con(T_0)
-\]
+$$
 
 and still stronger:
 
-\[
+$$
 T_2
-\]
+$$
 
 proving:
 
-\[
+$$
 Con(T_1)
-\]
+$$
 
 There is no final self-validating endpoint obtained in this straightforward way.
 
@@ -169,11 +169,11 @@ Self-reference again becomes decisive.
 
 For a suitable Gödel sentence G, the theory can often prove a relation roughly of the form:
 
-\[
+$$
 Con(T)\rightarrow G
-\]
+$$
 
-If T could prove \(Con(T)\), it could then prove G.
+If T could prove $$Con(T)$$, it could then prove G.
 
 But the first incompleteness theorem tells us that, under the required assumptions, T cannot prove G.
 
@@ -199,9 +199,9 @@ The theorem is technically precise.
 
 Inside T:
 
-\[
+$$
 Prov_T(\ulcorner P\urcorner)
-\]
+$$
 
 means:
 
@@ -219,9 +219,9 @@ A related result is **Löb's theorem**.
 
 Very roughly, if T proves:
 
-\[
+$$
 Prov_T(\ulcorner P\urcorner)\rightarrow P
-\]
+$$
 
 then T already proves P.
 
@@ -249,9 +249,9 @@ A sufficiently strong theory cannot provide the desired internal consistency pro
 
 Gerhard Gentzen later proved the consistency of Peano Arithmetic using transfinite induction up to the ordinal:
 
-\[
+$$
 \varepsilon_0
-\]
+$$
 
 The proof uses principles stronger than those formalizable in Peano Arithmetic itself.
 

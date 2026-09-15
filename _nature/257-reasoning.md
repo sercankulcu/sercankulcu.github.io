@@ -157,9 +157,9 @@ Reasoning is context-sensitive.
 
 From:
 
-\[
+$$
 P\rightarrow Q
-\]
+$$
 
 and P,
 
@@ -287,9 +287,9 @@ This creates errors in:
 
 People may judge:
 
-\[
+$$
 P(A\land B)>P(A)
-\]
+$$
 
 even though this is impossible by probability rules.
 
@@ -368,9 +368,9 @@ A rational agent should update beliefs in proportion to evidence.
 
 Bayes' theorem gives:
 
-\[
+$$
 P(H\mid D)=\frac{P(D\mid H)P(H)}{P(D)}
-\]
+$$
 
 The challenge is assigning realistic probabilities.
 
@@ -380,9 +380,9 @@ Evidence is informative when it is more expected under one hypothesis than anoth
 
 The likelihood ratio:
 
-\[
+$$
 \frac{P(D\mid H_1)}{P(D\mid H_2)}
-\]
+$$
 
 captures comparative support.
 

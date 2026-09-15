@@ -33,17 +33,17 @@ Proof concerns what can be derived inside a formal system.
 
 Suppose we interpret arithmetic in the ordinary natural numbers:
 
-\[
+$$
 0,1,2,3,\ldots
-\]
+$$
 
 A statement is true if it correctly describes that structure.
 
 For example:
 
-\[
+$$
 2+2=4
-\]
+$$
 
 is true in the standard natural numbers.
 
@@ -79,13 +79,13 @@ Metalogic studies the relationship between them.
 
 We write:
 
-\[
+$$
 \Gamma \models \varphi
-\]
+$$
 
 to mean:
 
-In every model where all statements in \(\Gamma\) are true, \(\varphi\) is also true.
+In every model where all statements in $$\Gamma$$ are true, $$\varphi$$ is also true.
 
 This is semantic consequence.
 
@@ -93,27 +93,27 @@ This is semantic consequence.
 
 We write:
 
-\[
+$$
 \Gamma \vdash \varphi
-\]
+$$
 
 to mean:
 
-There exists a formal proof of \(\varphi\) from assumptions \(\Gamma\).
+There exists a formal proof of $$\varphi$$ from assumptions $$\Gamma$$.
 
 This is derivability.
 
 The symbols:
 
-\[
+$$
 \models
-\]
+$$
 
 and:
 
-\[
+$$
 \vdash
-\]
+$$
 
 represent different relations.
 
@@ -121,15 +121,15 @@ represent different relations.
 
 A proof system is **sound** if:
 
-\[
+$$
 \Gamma \vdash \varphi
-\]
+$$
 
 implies:
 
-\[
+$$
 \Gamma \models \varphi
-\]
+$$
 
 In words:
 
@@ -141,15 +141,15 @@ A sound system does not prove false consequences of true premises.
 
 A proof system is **complete** if:
 
-\[
+$$
 \Gamma \models \varphi
-\]
+$$
 
 implies:
 
-\[
+$$
 \Gamma \vdash \varphi
-\]
+$$
 
 In words:
 
@@ -392,15 +392,15 @@ Logic aims to preserve consistency.
 
 But what happens when a system contains both:
 
-\[
+$$
 P
-\]
+$$
 
 and:
 
-\[
+$$
 \neg P
-\]
+$$
 
 What exactly is a contradiction, and why is it so dangerous in classical logic?
 

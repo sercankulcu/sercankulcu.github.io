@@ -33,9 +33,9 @@ A formal sentence has meaning only relative to an interpretation.
 
 For arithmetic, the intended structure is usually the standard natural numbers:
 
-\[
+$$
 \mathbb{N}=\{0,1,2,3,\ldots\}
-\]
+$$
 
 When logicians call a Gödel sentence true, they normally mean:
 
@@ -60,15 +60,15 @@ without naming a system is incomplete.
 
 Semantic truth:
 
-\[
+$$
 \mathbb{N}\models G
-\]
+$$
 
 Formal provability:
 
-\[
+$$
 T\vdash G
-\]
+$$
 
 Gödel shows these can come apart for sufficiently strong effective theories T.
 
@@ -76,9 +76,9 @@ Gödel shows these can come apart for sufficiently strong effective theories T.
 
 For a suitable theory T, construct G such that:
 
-\[
+$$
 G\leftrightarrow \neg Prov_T(\ulcorner G\urcorner)
-\]
+$$
 
 Informally:
 
@@ -108,9 +108,9 @@ It is a change of level.
 
 Suppose stronger theory U can prove:
 
-\[
+$$
 Con(T)
-\]
+$$
 
 and enough metamathematics about T.
 
@@ -124,21 +124,21 @@ It is beyond T.
 
 We can imagine:
 
-\[
+$$
 T_0
-\]
+$$
 
 then a stronger:
 
-\[
+$$
 T_1
-\]
+$$
 
 then:
 
-\[
+$$
 T_2
-\]
+$$
 
 Each system may settle statements undecidable in weaker systems.
 
@@ -265,7 +265,7 @@ consistent
 
 with:
 
-all theorems are true in \(\mathbb{N}\).
+all theorems are true in $$\mathbb{N}$$.
 
 ## Natural Independent Statements
 

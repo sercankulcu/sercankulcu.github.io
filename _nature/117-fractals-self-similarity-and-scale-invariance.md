@@ -112,11 +112,11 @@ Power laws often appear in scale-invariant systems.
 
 A power law has the form:
 
-\[
-y \propto x^lpha
-\]
+$$
+y \propto x^\alpha
+$$
 
-Scaling \(x\) by a factor changes \(y\) by a predictable power.
+Scaling $$x$$ by a factor changes $$y$$ by a predictable power.
 
 Power laws have no characteristic scale in the same way exponential decay does.
 
@@ -169,27 +169,27 @@ Dimension becomes a measure of how detail scales.
 
 For certain exactly self-similar fractals, dimension can be derived from:
 
-\[
+$$
 N=s^D
-\]
+$$
 
 where:
 
-- \(N\) is the number of self-similar pieces,
-- \(s\) is the magnification factor,
-- \(D\) is dimension.
+- $$N$$ is the number of self-similar pieces,
+- $$s$$ is the magnification factor,
+- $$D$$ is dimension.
 
 Then:
 
-\[
-D=rac{\log N}{\log s}
-\]
+$$
+D=\frac{\log N}{\log s}
+$$
 
 For the Koch curve:
 
-\[
-D=rac{\log 4}{\log 3}
-\]
+$$
+D=\frac{\log 4}{\log 3}
+$$
 
 which is about 1.26.
 
@@ -207,17 +207,17 @@ Dimension quantifies geometric complexity.
 
 For irregular objects, one common approach is **box counting**.
 
-Cover the object with boxes of size \(\epsilon\).
+Cover the object with boxes of size $$\epsilon$$.
 
-Count how many boxes \(N(\epsilon)\) are needed.
+Count how many boxes $$N(\epsilon)$$ are needed.
 
 If:
 
-\[
+$$
 N(\epsilon)\sim \epsilon^{-D}
-\]
+$$
 
-then \(D\) estimates a fractal dimension.
+then $$D$$ estimates a fractal dimension.
 
 This method can be applied to data.
 

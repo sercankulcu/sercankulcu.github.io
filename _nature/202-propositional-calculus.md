@@ -22,9 +22,9 @@ Instead of analyzing:
 
 into subject and predicate, it simply calls the entire statement:
 
-\[
+$$
 P
-\]
+$$
 
 Then it studies how such propositions combine.
 
@@ -32,9 +32,9 @@ Then it studies how such propositions combine.
 
 Symbols such as:
 
-\[
+$$
 P,\ Q,\ R
-\]
+$$
 
 stand for propositions.
 
@@ -61,13 +61,13 @@ These connectives are truth-functional.
 
 Negation is written:
 
-\[
+$$
 \neg P
-\]
+$$
 
-If P is true, \(\neg P\) is false.
+If P is true, $$\neg P$$ is false.
 
-If P is false, \(\neg P\) is true.
+If P is false, $$\neg P$$ is true.
 
 Negation reverses truth value.
 
@@ -75,9 +75,9 @@ Negation reverses truth value.
 
 Conjunction is written:
 
-\[
+$$
 P \land Q
-\]
+$$
 
 It is true only when both P and Q are true.
 
@@ -89,9 +89,9 @@ P and Q.
 
 Disjunction is written:
 
-\[
+$$
 P \lor Q
-\]
+$$
 
 In classical logic, this is usually inclusive.
 
@@ -105,9 +105,9 @@ It is true when:
 
 A conditional is written:
 
-\[
+$$
 P \rightarrow Q
-\]
+$$
 
 It is false only when:
 
@@ -138,9 +138,9 @@ This creates cases that feel unintuitive.
 
 If P is false, then:
 
-\[
+$$
 P \rightarrow Q
-\]
+$$
 
 is true regardless of Q.
 
@@ -152,9 +152,9 @@ The formal definition prioritizes truth conditions over everyday conversational 
 
 A biconditional is written:
 
-\[
+$$
 P \leftrightarrow Q
-\]
+$$
 
 It is true when P and Q have the same truth value.
 
@@ -168,7 +168,7 @@ A **truth table** lists every possible assignment of truth values.
 
 For conjunction:
 
-| P | Q | \(P \land Q\) |
+| P | Q | $$P \land Q$$ |
 |---|---|---|
 | T | T | T |
 | T | F | F |
@@ -183,9 +183,9 @@ A formula is a **tautology** if it is true under every truth assignment.
 
 Example:
 
-\[
+$$
 P \lor \neg P
-\]
+$$
 
 This is the law of excluded middle in classical logic.
 
@@ -195,9 +195,9 @@ A formula is a **contradiction** if it is false under every truth assignment.
 
 Example:
 
-\[
+$$
 P \land \neg P
-\]
+$$
 
 It cannot be true in classical logic.
 
@@ -213,15 +213,15 @@ Two formulas are logically equivalent if they have the same truth value under ev
 
 For example:
 
-\[
+$$
 P \rightarrow Q
-\]
+$$
 
 is equivalent to:
 
-\[
+$$
 \neg P \lor Q
-\]
+$$
 
 Truth tables can verify this.
 
@@ -229,15 +229,15 @@ Truth tables can verify this.
 
 Important equivalences include:
 
-\[
+$$
 \neg(P \land Q) \equiv \neg P \lor \neg Q
-\]
+$$
 
 and:
 
-\[
+$$
 \neg(P \lor Q) \equiv \neg P \land \neg Q
-\]
+$$
 
 These laws appear throughout logic and computing.
 
@@ -245,9 +245,9 @@ These laws appear throughout logic and computing.
 
 In classical logic:
 
-\[
+$$
 \neg\neg P \equiv P
-\]
+$$
 
 Some nonclassical systems treat negation differently.
 
@@ -257,19 +257,19 @@ Again, formal rules depend on the logic chosen.
 
 A standard inference rule is:
 
-\[
+$$
 P
-\]
+$$
 
-\[
+$$
 P \rightarrow Q
-\]
+$$
 
 therefore:
 
-\[
+$$
 Q
-\]
+$$
 
 This is modus ponens.
 
@@ -277,19 +277,19 @@ This is modus ponens.
 
 Another valid rule is:
 
-\[
+$$
 P \rightarrow Q
-\]
+$$
 
-\[
+$$
 \neg Q
-\]
+$$
 
 therefore:
 
-\[
+$$
 \neg P
-\]
+$$
 
 Both can be justified semantically by truth tables.
 
@@ -340,11 +340,11 @@ But it terminates.
 
 ## Exponential Growth
 
-If a formula contains \(n\) independent propositional variables, a truth table has:
+If a formula contains $$n$$ independent propositional variables, a truth table has:
 
-\[
+$$
 2^n
-\]
+$$
 
 rows.
 

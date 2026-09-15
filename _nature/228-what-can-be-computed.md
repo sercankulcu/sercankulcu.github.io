@@ -30,14 +30,14 @@ They are impossible for any algorithm in the classical sense.
 
 A function:
 
-\[
+$$
 f:\mathbb{N}\rightarrow\mathbb{N}
-\]
+$$
 
 is computable if there exists an effective procedure that, for every valid input n:
 
 - halts,
-- returns \(f(n)\).
+- returns $$f(n)$$.
 
 The exact machine model does not matter if it has ordinary Turing power.
 
@@ -71,9 +71,9 @@ A real number is **computable** if there is an algorithm that can generate appro
 Examples include:
 
 - rational numbers,
-- \(\sqrt2\),
-- \(\pi\),
-- \(e\).
+- $$\sqrt2$$,
+- $$\pi$$,
+- $$e$$.
 
 Many familiar constants are computable.
 
@@ -247,11 +247,11 @@ Hardness transfers.
 
 ## Many-One Reduction
 
-A many-one reduction transforms any instance x of A into instance \(f(x)\) of B such that:
+A many-one reduction transforms any instance x of A into instance $$f(x)$$ of B such that:
 
-\[
+$$
 x\in A \iff f(x)\in B
-\]
+$$
 
 If B were decidable, A would be too.
 

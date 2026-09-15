@@ -60,15 +60,15 @@ Some encodings are designed to be reversible.
 
 If:
 
-\[
+$$
 E(x)=y
-\]
+$$
 
 and decoding satisfies:
 
-\[
+$$
 D(y)=x
-\]
+$$
 
 then the original can be recovered exactly.
 

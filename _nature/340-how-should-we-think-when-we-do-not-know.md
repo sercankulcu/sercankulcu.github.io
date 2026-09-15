@@ -160,9 +160,9 @@ This can balance optimism and caution.
 
 When probabilities are credible, expected utility remains powerful:
 
-\[
+$$
 EU(a)=\sum_i P(s_i)U(a,s_i)
-\]
+$$
 
 But the quality of the decision depends on:
 

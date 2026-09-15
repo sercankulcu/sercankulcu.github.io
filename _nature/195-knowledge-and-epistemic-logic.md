@@ -34,19 +34,19 @@ Knowledge creates layers.
 
 A common notation is:
 
-\[
+$$
 K_a P
-\]
+$$
 
 meaning:
 
-Agent \(a\) knows that P.
+Agent $$a$$ knows that P.
 
 For example:
 
-\[
+$$
 K_{Alice}(DoorOpen)
-\]
+$$
 
 means:
 
@@ -68,15 +68,15 @@ Knowledge is often treated as **factive**.
 
 If:
 
-\[
+$$
 K_a P
-\]
+$$
 
 then:
 
-\[
+$$
 P
-\]
+$$
 
 If Alice knows P, P must be true.
 
@@ -96,9 +96,9 @@ Knowledge becomes elimination of alternatives.
 
 Each agent has an accessibility relation.
 
-World \(w_1\) may access \(w_2\) for Alice if:
+World $$w_1$$ may access $$w_2$$ for Alice if:
 
-from Alice's information, \(w_2\) is still possible.
+from Alice's information, $$w_2$$ is still possible.
 
 Different agents can have different relations.
 
@@ -143,9 +143,9 @@ Information changes the model.
 
 Epistemic logic supports nesting.
 
-\[
+$$
 K_a K_b P
-\]
+$$
 
 means:
 
@@ -225,9 +225,9 @@ If an agent does not know P, the agent knows that they do not know P.
 
 Symbolically:
 
-\[
+$$
 \neg K_a P \rightarrow K_a \neg K_a P
-\]
+$$
 
 This is **negative introspection**.
 
@@ -237,9 +237,9 @@ Humans do not always satisfy it.
 
 Another principle is:
 
-\[
+$$
 K_a P \rightarrow K_a K_a P
-\]
+$$
 
 If an agent knows P, they know that they know P.
 

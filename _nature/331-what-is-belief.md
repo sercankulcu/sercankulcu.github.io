@@ -182,9 +182,9 @@ A **credence** is a degree of belief.
 
 Example:
 
-\[
+$$
 P(\text{rain tomorrow}) = 0.7
-\]
+$$
 
 Bayesian epistemology often models beliefs this way.
 
@@ -542,9 +542,9 @@ This is operationally precise.
 
 Example:
 
-\[
+$$
 P(s_1)=0.6,\quad P(s_2)=0.4
-\]
+$$
 
 The agent acts based on this uncertainty.
 

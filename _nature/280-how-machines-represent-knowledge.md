@@ -77,13 +77,13 @@ Predicates express properties or relations.
 
 Examples:
 
-\[
+$$
 Bird(Tweety)
-\]
+$$
 
-\[
+$$
 LivesIn(Alice, Istanbul)
-\]
+$$
 
 This connects AI to formal logic.
 
@@ -93,9 +93,9 @@ A fact is a represented assertion.
 
 For example:
 
-\[
+$$
 Human(Socrates)
-\]
+$$
 
 Facts form a knowledge base.
 
@@ -105,21 +105,21 @@ Rules allow inference.
 
 Example:
 
-\[
+$$
 Human(x)\rightarrow Mortal(x)
-\]
+$$
 
 Combine this rule with:
 
-\[
+$$
 Human(Socrates)
-\]
+$$
 
 to infer:
 
-\[
+$$
 Mortal(Socrates)
-\]
+$$
 
 Knowledge becomes active.
 

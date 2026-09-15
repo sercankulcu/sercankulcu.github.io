@@ -171,17 +171,17 @@ Therefore Q.
 
 Symbolically:
 
-\[
+$$
 P \rightarrow Q
-\]
+$$
 
-\[
+$$
 P
-\]
+$$
 
-\[
+$$
 \therefore Q
-\]
+$$
 
 This is **modus ponens**.
 

@@ -32,15 +32,15 @@ Quantum algorithms exploit these features to reorganize computational possibilit
 
 A classical bit has one of two states:
 
-\[
+$$
 0
-\]
+$$
 
 or:
 
-\[
+$$
 1
-\]
+$$
 
 A classical register of n bits occupies one definite bit string at a time.
 
@@ -48,15 +48,15 @@ A classical register of n bits occupies one definite bit string at a time.
 
 A qubit can be in a state:
 
-\[
+$$
 |\psi\rangle=\alpha|0\rangle+\beta|1\rangle
-\]
+$$
 
-where \(\alpha\) and \(\beta\) are complex amplitudes satisfying:
+where $$\alpha$$ and $$\beta$$ are complex amplitudes satisfying:
 
-\[
+$$
 |\alpha|^2+|\beta|^2=1
-\]
+$$
 
 This is a quantum superposition.
 
@@ -80,9 +80,9 @@ When measured in the computational basis, the qubit yields:
 
 with probability:
 
-\[
+$$
 |\alpha|^2
-\]
+$$
 
 and:
 
@@ -90,9 +90,9 @@ and:
 
 with probability:
 
-\[
+$$
 |\beta|^2
-\]
+$$
 
 Measurement converts quantum possibilities into classical outcomes.
 
@@ -125,17 +125,17 @@ A good quantum algorithm arranges interference so desirable answers become more 
 
 A two-qubit system has basis states:
 
-\[
+$$
 |00\rangle,\ |01\rangle,\ |10\rangle,\ |11\rangle
-\]
+$$
 
 A general state is a superposition of all four.
 
 For n qubits, the state vector has:
 
-\[
+$$
 2^n
-\]
+$$
 
 complex amplitudes.
 
@@ -143,7 +143,7 @@ complex amplitudes.
 
 This exponential representation is one reason quantum systems are difficult to simulate classically.
 
-But it does not mean a quantum computer simply evaluates all \(2^n\) answers and lets us read them out.
+But it does not mean a quantum computer simply evaluates all $$2^n$$ answers and lets us read them out.
 
 Measurement returns limited classical information.
 
@@ -155,9 +155,9 @@ Two qubits can occupy a state that cannot be factored into separate individual s
 
 Example:
 
-\[
+$$
 \frac{|00\rangle+|11\rangle}{\sqrt2}
-\]
+$$
 
 This is an entangled state.
 
@@ -188,15 +188,15 @@ Mathematically, these are unitary transformations.
 
 The Hadamard gate can transform:
 
-\[
+$$
 |0\rangle
-\]
+$$
 
 into:
 
-\[
+$$
 \frac{|0\rangle+|1\rangle}{\sqrt2}
-\]
+$$
 
 It creates a balanced superposition.
 
@@ -284,15 +284,15 @@ Quantum speedup is selective.
 
 Grover's algorithm searches an unstructured space of N candidates in roughly:
 
-\[
+$$
 O(\sqrt N)
-\]
+$$
 
 oracle queries rather than:
 
-\[
+$$
 O(N)
-\]
+$$
 
 classically.
 

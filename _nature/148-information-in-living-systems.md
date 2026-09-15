@@ -48,9 +48,9 @@ DNA provides a remarkably stable molecular basis for this inheritance.
 
 DNA is built from four nucleotide bases:
 
-\[
+$$
 A,\ C,\ G,\ T
-\]
+$$
 
 Their order matters.
 

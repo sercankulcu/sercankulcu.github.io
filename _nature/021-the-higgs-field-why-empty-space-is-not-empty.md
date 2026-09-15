@@ -138,7 +138,7 @@ A proton's mass is much larger than the sum of the rest masses of its constituen
 
 Most proton and neutron mass arises from the energy associated with the strong interaction—quark and gluon dynamics inside nucleons.
 
-Through \(E = mc^2\), that energy contributes to mass.
+Through $$E = mc^2$$, that energy contributes to mass.
 
 So the Higgs field is essential, but it is not the sole source of the mass of everyday objects.
 

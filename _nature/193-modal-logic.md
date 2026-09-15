@@ -32,15 +32,15 @@ The two basic modal operators are:
 
 Necessity:
 
-\[
+$$
 \Box P
-\]
+$$
 
 Possibility:
 
-\[
+$$
 \Diamond P
-\]
+$$
 
 Read them as:
 
@@ -51,15 +51,15 @@ Read them as:
 
 In standard systems:
 
-\[
+$$
 \Diamond P \equiv \neg \Box \neg P
-\]
+$$
 
 and:
 
-\[
+$$
 \Box P \equiv \neg \Diamond \neg P
-\]
+$$
 
 Possibility and necessity are dual.
 
@@ -71,9 +71,9 @@ A possible world is a way things might be.
 
 Then:
 
-\[
+$$
 \Box P
-\]
+$$
 
 means:
 
@@ -81,9 +81,9 @@ P is true in all accessible worlds.
 
 And:
 
-\[
+$$
 \Diamond P
-\]
+$$
 
 means:
 
@@ -117,9 +117,9 @@ The basic normal modal logic is usually called **K**.
 
 It includes the distribution principle:
 
-\[
+$$
 \Box(P \rightarrow Q) \rightarrow (\Box P \rightarrow \Box Q)
-\]
+$$
 
 and a rule allowing necessary truths to be inferred from theorems under suitable conditions.
 
@@ -129,9 +129,9 @@ K assumes relatively little about accessibility.
 
 System **T** adds:
 
-\[
+$$
 \Box P \rightarrow P
-\]
+$$
 
 This corresponds to reflexive accessibility.
 
@@ -143,9 +143,9 @@ If something is necessary, it is true in the current world.
 
 S4 adds a principle like:
 
-\[
+$$
 \Box P \rightarrow \Box\Box P
-\]
+$$
 
 This corresponds, in standard Kripke semantics, to transitive accessibility in addition to reflexivity.
 
@@ -157,9 +157,9 @@ S5 treats accessibility in a highly symmetric way.
 
 One characteristic principle is:
 
-\[
+$$
 \Diamond P \rightarrow \Box\Diamond P
-\]
+$$
 
 If something is possible, then necessarily it is possible.
 
@@ -211,9 +211,9 @@ Accessible worlds might be those that obey the same physical laws.
 
 Then:
 
-\[
+$$
 \Box P
-\]
+$$
 
 means:
 
@@ -227,9 +227,9 @@ For logical possibility, accessible worlds may be any worlds consistent with log
 
 A contradiction such as:
 
-\[
+$$
 P \land \neg P
-\]
+$$
 
 is not logically possible in classical semantics.
 
@@ -265,15 +265,15 @@ The distinction between **de dicto** and **de re** modality is important.
 
 Compare:
 
-\[
+$$
 \Box \exists x\, P(x)
-\]
+$$
 
 with:
 
-\[
+$$
 \exists x\, \Box P(x)
-\]
+$$
 
 The first says:
 
@@ -309,9 +309,9 @@ This helps explain necessary identity claims.
 
 If:
 
-\[
+$$
 a=b
-\]
+$$
 
 and both names rigidly designate the same object, then Kripke argues the identity is necessary.
 

@@ -28,7 +28,7 @@ They are not the same.
 
 A system is deterministic when:
 
-given the complete state at time \(t\)
+given the complete state at time $$t$$
 
 and:
 
@@ -38,9 +38,9 @@ only one future state is physically possible.
 
 Formally, we can imagine:
 
-\[
+$$
 S_{t+1}=F(S_t)
-\]
+$$
 
 where the same state always evolves according to the same rule.
 

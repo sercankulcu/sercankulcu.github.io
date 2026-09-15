@@ -80,51 +80,51 @@ The number of required segments increases faster than for an ordinary smooth lin
 
 ## The Scaling Relation
 
-Suppose the coastline is measured using ruler size \(\epsilon\).
+Suppose the coastline is measured using ruler size $$\epsilon$$.
 
-Let \(N(\epsilon)\) be the number of rulers needed.
+Let $$N(\epsilon)$$ be the number of rulers needed.
 
 Measured length is approximately:
 
-\[
+$$
 L(\epsilon)=N(\epsilon)\epsilon
-\]
+$$
 
 For a smooth curve:
 
-\[
+$$
 N(\epsilon)\propto \epsilon^{-1}
-\]
+$$
 
 so the length tends toward a constant.
 
 For a fractal-like curve:
 
-\[
+$$
 N(\epsilon)\propto \epsilon^{-D}
-\]
+$$
 
-with \(D>1\).
+with $$D>1$$.
 
 Then:
 
-\[
+$$
 L(\epsilon)\propto \epsilon^{1-D}
-\]
+$$
 
-As \(\epsilon\) decreases, measured length increases.
+As $$\epsilon$$ decreases, measured length increases.
 
 ## Fractal Dimension
 
-The exponent \(D\) is related to the **fractal dimension**.
+The exponent $$D$$ is related to the **fractal dimension**.
 
 For a coastline-like curve:
 
-\[
+$$
 1<D<2
-\]
+$$
 
-A larger \(D\) generally indicates a rougher boundary that fills the plane more densely.
+A larger $$D$$ generally indicates a rougher boundary that fills the plane more densely.
 
 Dimension becomes a measure of scaling complexity.
 
@@ -146,7 +146,7 @@ At each step, every segment is replaced by four segments one-third as long.
 
 After one iteration:
 
-length multiplies by \(4/3\).
+length multiplies by $$4/3$$.
 
 Repeat forever.
 
@@ -225,17 +225,17 @@ The special behavior comes from geometric roughness.
 
 ## Box-Counting Dimension
 
-A common empirical method covers a boundary with boxes of size \(\epsilon\).
+A common empirical method covers a boundary with boxes of size $$\epsilon$$.
 
 Count how many boxes contain part of the object.
 
 If:
 
-\[
+$$
 N(\epsilon)\sim \epsilon^{-D}
-\]
+$$
 
-over a meaningful range, the slope on a log-log plot estimates \(D\).
+over a meaningful range, the slope on a log-log plot estimates $$D$$.
 
 This is **box-counting dimension**.
 
@@ -243,9 +243,9 @@ This is **box-counting dimension**.
 
 Take logarithms:
 
-\[
-\log N(\epsilon)pprox -D\log \epsilon + C
-\]
+$$
+\log N(\epsilon)\approx -D\log \epsilon + C
+$$
 
 A power law becomes approximately linear on a log-log plot.
 

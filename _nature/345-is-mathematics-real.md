@@ -271,9 +271,9 @@ This rejects some classical principles.
 
 Intuitionists do not universally accept:
 
-\[
+$$
 P \lor \neg P
-\]
+$$
 
 for arbitrary mathematical propositions unless one side can be constructed.
 
@@ -430,9 +430,9 @@ This is a structuralist compromise.
 
 Set theory introduces entities such as:
 
-\[
+$$
 \{1,2,3\}
-\]
+$$
 
 Are sets real?
 

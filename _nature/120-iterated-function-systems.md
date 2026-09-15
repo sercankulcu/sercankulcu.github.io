@@ -73,15 +73,15 @@ The whole fractal is encoded in three small rules.
 
 Mathematically, an IFS can be viewed as a set of maps:
 
-\[
+$$
 f_1,f_2,\ldots,f_n
-\]
+$$
 
 Instead of applying one transformation, we apply all of them to a set:
 
-\[
+$$
 F(S)=f_1(S)\cup f_2(S)\cup\cdots\cup f_n(S)
-\]
+$$
 
 Repeated application can converge to a unique invariant set under suitable contraction conditions.
 
@@ -129,26 +129,26 @@ The realism is surprising because the rule set is so short.
 
 A two-dimensional affine transformation can be written:
 
-\[
-egin{pmatrix}
+$$
+\begin{pmatrix}
 x'\\
 y'
 \end{pmatrix}
 =
-egin{pmatrix}
+\begin{pmatrix}
 a & b\\
 c & d
 \end{pmatrix}
-egin{pmatrix}
+\begin{pmatrix}
 x\\
 y
 \end{pmatrix}
 +
-egin{pmatrix}
+\begin{pmatrix}
 e\\
 f
 \end{pmatrix}
-\]
+$$
 
 The matrix controls:
 
@@ -318,11 +318,11 @@ A curve can match data and remain irregular.
 
 The central concept is the invariant set.
 
-A fractal attractor \(A\) satisfies:
+A fractal attractor $$A$$ satisfies:
 
-\[
+$$
 A=f_1(A)\cup f_2(A)\cup\cdots\cup f_n(A)
-\]
+$$
 
 The whole is made from transformed copies of itself.
 

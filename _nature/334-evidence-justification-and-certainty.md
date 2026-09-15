@@ -72,11 +72,11 @@ Which hypothesis explains the evidence better?
 
 In probabilistic reasoning, evidence matters partly through:
 
-\[
+$$
 P(E|H)
-\]
+$$
 
-How likely would evidence \(E\) be if hypothesis \(H\) were true?
+How likely would evidence $$E$$ be if hypothesis $$H$$ were true?
 
 This is the **likelihood**.
 
@@ -84,9 +84,9 @@ This is the **likelihood**.
 
 Bayes' theorem expresses belief revision:
 
-\[
+$$
 P(H|E)=\frac{P(E|H)P(H)}{P(E)}
-\]
+$$
 
 Posterior belief depends on:
 
@@ -124,9 +124,9 @@ Evidence confirms a hypothesis when it raises its probability.
 
 Formally:
 
-\[
+$$
 P(H|E)>P(H)
-\]
+$$
 
 Confirmation is graded.
 

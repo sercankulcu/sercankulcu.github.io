@@ -37,21 +37,21 @@ A room may be:
 
 Instead of restricting truth values to:
 
-\[
+$$
 0
-\]
+$$
 
 or:
 
-\[
+$$
 1
-\]
+$$
 
 fuzzy logic allows intermediate values such as:
 
-\[
+$$
 0.2,\ 0.6,\ 0.9
-\]
+$$
 
 A statement can be true to a degree.
 
@@ -63,21 +63,21 @@ Suppose a fuzzy set represents the predicate:
 
 A person 150 cm tall might have membership:
 
-\[
+$$
 0.1
-\]
+$$
 
 A person 180 cm tall:
 
-\[
+$$
 0.7
-\]
+$$
 
 A person 200 cm tall:
 
-\[
+$$
 0.98
-\]
+$$
 
 These are illustrative membership values, not universal biological facts.
 
@@ -85,11 +85,11 @@ These are illustrative membership values, not universal biological facts.
 
 A **membership function** maps an object to a value between 0 and 1.
 
-For fuzzy set \(A\):
+For fuzzy set $$A$$:
 
-\[
+$$
 \mu_A(x) \in [0,1]
-\]
+$$
 
 The value represents degree of membership.
 
@@ -113,9 +113,9 @@ This distinction is crucial.
 
 Suppose:
 
-\[
+$$
 \mu_{Tall}(Alice)=0.7
-\]
+$$
 
 This does **not** mean:
 
@@ -147,9 +147,9 @@ Fuzzy logic can address the second.
 
 A common fuzzy negation is:
 
-\[
+$$
 \mu_{\neg A}(x)=1-\mu_A(x)
-\]
+$$
 
 If something is tall to degree 0.8, it may be not-tall to degree 0.2.
 
@@ -161,9 +161,9 @@ Other systems exist.
 
 One common definition uses minimum:
 
-\[
+$$
 \mu_{A \land B}(x)=\min(\mu_A(x),\mu_B(x))
-\]
+$$
 
 If something is red to 0.9 and large to 0.6, then:
 
@@ -175,9 +175,9 @@ may be 0.6.
 
 A common fuzzy disjunction uses maximum:
 
-\[
+$$
 \mu_{A \lor B}(x)=\max(\mu_A(x),\mu_B(x))
-\]
+$$
 
 Again, alternative fuzzy operators are possible.
 
@@ -315,9 +315,9 @@ The category boundary becomes a slope rather than a cliff.
 
 Critics ask whether assigning:
 
-\[
+$$
 0.73
-\]
+$$
 
 to tallness reflects genuine truth degree or merely an engineering convenience.
 

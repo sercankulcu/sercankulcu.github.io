@@ -70,9 +70,9 @@ For example, a gene may be expressed only when:
 
 This resembles:
 
-\[
+$$
 A \land \neg B
-\]
+$$
 
 The analogy can be made experimentally precise.
 

@@ -351,9 +351,9 @@ People may judge a detailed conjunction as more probable than one of its compone
 
 But:
 
-\[
+$$
 P(A \land B) \leq P(A)
-\]
+$$
 
 The conjunction cannot be more probable than either event alone.
 

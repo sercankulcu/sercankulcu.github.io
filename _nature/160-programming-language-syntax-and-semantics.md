@@ -161,13 +161,13 @@ Meaning becomes a mathematical mapping.
 
 Hoare logic uses forms such as:
 
-\[
+$$
 \{P\}\ C\ \{Q\}
-\]
+$$
 
 meaning:
 
-if precondition \(P\) holds and command \(C\) executes correctly, then postcondition \(Q\) holds.
+if precondition $$P$$ holds and command $$C$$ executes correctly, then postcondition $$Q$$ holds.
 
 Semantics becomes reasoning about correctness.
 

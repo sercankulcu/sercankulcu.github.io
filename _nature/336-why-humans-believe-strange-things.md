@@ -206,9 +206,9 @@ A,
 
 then:
 
-\[
+$$
 P(A \cap B) \leq P(A)
-\]
+$$
 
 Yet people sometimes judge a vivid conjunction as more likely.
 

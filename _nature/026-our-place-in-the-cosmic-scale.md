@@ -36,19 +36,19 @@ The easiest way to travel through cosmic scale is with powers of ten.
 
 One meter is:
 
-\(10^0\) meters.
+$$10^0$$ meters.
 
 Ten meters is:
 
-\(10^1\) meters.
+$$10^1$$ meters.
 
 A thousand meters is:
 
-\(10^3\) meters.
+$$10^3$$ meters.
 
 A million meters is:
 
-\(10^6\) meters.
+$$10^6$$ meters.
 
 The notation lets us compare ranges that ordinary language cannot handle comfortably.
 
@@ -80,7 +80,7 @@ A typical human cell is measured in micrometers.
 
 One micrometer is:
 
-\(10^{-6}\) meters.
+$$10^{-6}$$ meters.
 
 Millions of cells can fit into volumes that appear small to us.
 
@@ -94,7 +94,7 @@ Molecules live at still smaller scales.
 
 A nanometer is:
 
-\(10^{-9}\) meters.
+$$10^{-9}$$ meters.
 
 DNA has structural features measured in nanometers.
 
@@ -110,7 +110,7 @@ Life is organized molecular activity.
 
 Atoms are roughly on the scale of:
 
-\(10^{-10}\) meters.
+$$10^{-10}$$ meters.
 
 An atom is mostly not like a tiny solid ball.
 
@@ -124,7 +124,7 @@ What feels solid at human scale is the result of quantum and electromagnetic int
 
 Atomic nuclei occupy scales around:
 
-\(10^{-15}\) meters.
+$$10^{-15}$$ meters.
 
 That is about one hundred thousand times smaller than the overall scale of an atom.
 
@@ -142,7 +142,7 @@ They contain quarks bound through the strong interaction.
 
 Experiments probe extremely small scales, but whether nature has a final smallest length is unknown.
 
-The Planck length, about \(10^{-35}\) meters, often appears in discussions of quantum gravity.
+The Planck length, about $$10^{-35}$$ meters, often appears in discussions of quantum gravity.
 
 It should not casually be described as a proven smallest possible length.
 

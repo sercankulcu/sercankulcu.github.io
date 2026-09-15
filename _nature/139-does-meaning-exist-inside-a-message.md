@@ -290,9 +290,9 @@ Semantic interpretation can connect to imagined worlds as well as physical ones.
 
 The expression:
 
-\[
+$$
 2+2=4
-\]
+$$
 
 is meaningful within mathematical structures and conventions.
 

@@ -87,14 +87,14 @@ The opponent is assumed to respond optimally.
 
 A simplified minimax value is:
 
-\[
+$$
 V(s)=
 \begin{cases}
 U(s), & \text{if terminal}\\
 \max_a V(T(s,a)), & \text{our turn}\\
 \min_a V(T(s,a)), & \text{opponent's turn}
 \end{cases}
-\]
+$$
 
 The idea is conceptually simple.
 

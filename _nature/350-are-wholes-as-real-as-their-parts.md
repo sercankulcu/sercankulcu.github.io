@@ -373,10 +373,10 @@ The whole state contains irreducible relational structure.
 
 For:
 
-\[
+$$
 |\psi\rangle=
 \frac{1}{\sqrt{2}}(|00\rangle+|11\rangle)
-\]
+$$
 
 the joint state is definite in a way the individual parts are not.
 

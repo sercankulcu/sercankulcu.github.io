@@ -46,9 +46,9 @@ Suppose a tiny language has only 1,000 words.
 
 If every five-word sequence were allowed, there would be:
 
-\[
+$$
 1000^5
-\]
+$$
 
 possible sequences.
 
@@ -82,9 +82,9 @@ It provides rules that generate structures.
 
 For example:
 
-\[
-S ightarrow NP\ VP
-\]
+$$
+S \rightarrow NP\ VP
+$$
 
 A sentence consists of a noun phrase and a verb phrase.
 
@@ -94,17 +94,17 @@ Then each of those categories can be expanded.
 
 Imagine:
 
-\[
-S ightarrow NP\ VP
-\]
+$$
+S \rightarrow NP\ VP
+$$
 
-\[
-NP ightarrow Det\ N
-\]
+$$
+NP \rightarrow Det\ N
+$$
 
-\[
-VP ightarrow V\ NP
-\]
+$$
+VP \rightarrow V\ NP
+$$
 
 With a small lexicon, we can generate:
 
@@ -120,9 +120,9 @@ The grammar reuses structural patterns.
 
 Now add:
 
-\[
-NP ightarrow NP\ PP
-\]
+$$
+NP \rightarrow NP\ PP
+$$
 
 A noun phrase can contain another modifying phrase.
 
@@ -142,9 +142,9 @@ Recursive rules remove a fixed structural ceiling.
 
 Add:
 
-\[
-NP ightarrow NP\ RelClause
-\]
+$$
+NP \rightarrow NP\ RelClause
+$$
 
 Now we can build:
 

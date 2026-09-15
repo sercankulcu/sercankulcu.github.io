@@ -255,11 +255,11 @@ The relation between premises and conclusion is called **logical consequence**.
 
 We may write:
 
-\[
+$$
 P_1, P_2, \ldots, P_n \models C
-\]
+$$
 
-to express that \(C\) follows semantically from the premises.
+to express that $$C$$ follows semantically from the premises.
 
 Different formal systems define consequence precisely.
 
@@ -271,9 +271,9 @@ A conclusion may be derivable through formal rules.
 
 We may write:
 
-\[
-P_1, P_2, \ldots, P_n dash C
-\]
+$$
+P_1, P_2, \ldots, P_n \vdash C
+$$
 
 The distinction between semantic consequence and formal derivability will become important later.
 
@@ -287,11 +287,11 @@ Formal logic introduces controlled symbols to expose inference structure.
 
 For example:
 
-if \(P\), then \(Q\).
+if $$P$$, then $$Q$$.
 
-\(P\).
+$$P$$.
 
-Therefore \(Q\).
+Therefore $$Q$$.
 
 The form becomes explicit.
 
@@ -299,19 +299,19 @@ The form becomes explicit.
 
 This inference rule is called **modus ponens**:
 
-\[
-P ightarrow Q
-\]
+$$
+P \rightarrow Q
+$$
 
-\[
+$$
 P
-\]
+$$
 
 therefore:
 
-\[
+$$
 Q
-\]
+$$
 
 It is one of the simplest valid patterns.
 
@@ -319,21 +319,19 @@ It is one of the simplest valid patterns.
 
 Another is **modus tollens**:
 
-\[
-P ightarrow Q
-\]
+$$
+P \rightarrow Q
+$$
 
-\[
-
-eg Q
-\]
+$$
+\neg Q
+$$
 
 therefore:
 
-\[
-
-eg P
-\]
+$$
+\neg P
+$$
 
 Again, validity depends on form.
 

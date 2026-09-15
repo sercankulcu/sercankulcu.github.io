@@ -171,9 +171,9 @@ If much is lost, the system is highly integrated.
 
 The symbol:
 
-\[
+$$
 \Phi
-\]
+$$
 
 is associated with integrated information.
 

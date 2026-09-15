@@ -48,33 +48,33 @@ The relevant input size is usually not n itself.
 
 It is the number of bits needed to represent n:
 
-\[
+$$
 \Theta(\log n)
-\]
+$$
 
 Representation matters.
 
 ## Time Complexity
 
-If an algorithm takes \(T(n)\) steps on inputs of size n, we study how \(T(n)\) grows.
+If an algorithm takes $$T(n)$$ steps on inputs of size n, we study how $$T(n)$$ grows.
 
 Examples:
 
-\[
+$$
 O(n)
-\]
+$$
 
-\[
+$$
 O(n\log n)
-\]
+$$
 
-\[
+$$
 O(n^2)
-\]
+$$
 
-\[
+$$
 O(2^n)
-\]
+$$
 
 Growth rate matters more than small constant factors at large scale.
 
@@ -84,25 +84,25 @@ Big-O notation gives an asymptotic upper bound.
 
 If:
 
-\[
+$$
 T(n)=O(n^2)
-\]
+$$
 
-then beyond some point, runtime grows no faster than a constant multiple of \(n^2\).
+then beyond some point, runtime grows no faster than a constant multiple of $$n^2$$.
 
 It describes scale, not exact seconds.
 
 ## Omega and Theta
 
-\[
+$$
 \Omega(f(n))
-\]
+$$
 
 gives an asymptotic lower bound.
 
-\[
+$$
 \Theta(f(n))
-\]
+$$
 
 means upper and lower bounds match asymptotically.
 
@@ -112,9 +112,9 @@ These symbols help describe algorithmic growth precisely.
 
 Algorithms with runtime:
 
-\[
+$$
 O(n^k)
-\]
+$$
 
 for fixed k are called polynomial-time.
 
@@ -126,9 +126,9 @@ This is imperfect but foundational.
 
 An algorithm requiring:
 
-\[
+$$
 O(2^n)
-\]
+$$
 
 grows much faster.
 
@@ -142,17 +142,17 @@ Suppose a machine checks one billion possibilities per second.
 
 For:
 
-\[
+$$
 2^{30}
-\]
+$$
 
 possibilities, brute force is manageable.
 
 For:
 
-\[
+$$
 2^{100}
-\]
+$$
 
 it is not.
 
@@ -192,9 +192,9 @@ If a problem can be solved quickly, its answer can certainly be verified quickly
 
 Therefore:
 
-\[
+$$
 P\subseteq NP
-\]
+$$
 
 The famous question is whether the inclusion is strict.
 
@@ -202,15 +202,15 @@ The famous question is whether the inclusion is strict.
 
 Does:
 
-\[
+$$
 P=NP
-\]
+$$
 
 or:
 
-\[
+$$
 P\neq NP?
-\]
+$$
 
 We do not know.
 
@@ -245,9 +245,9 @@ This is the Cook–Levin theorem.
 
 If SAT has a polynomial-time algorithm, then:
 
-\[
+$$
 P=NP
-\]
+$$
 
 ## Reductions Again
 
@@ -304,9 +304,9 @@ For example, propositional tautology is co-NP-complete.
 
 Whether:
 
-\[
+$$
 NP=coNP
-\]
+$$
 
 is unknown.
 
@@ -338,9 +338,9 @@ Complexity classes form hierarchies.
 
 Unlike P vs NP, we know:
 
-\[
+$$
 P\neq EXPTIME
-\]
+$$
 
 by time hierarchy results.
 
@@ -348,9 +348,9 @@ by time hierarchy results.
 
 A simplified picture is:
 
-\[
+$$
 P\subseteq NP\subseteq PSPACE\subseteq EXPTIME
-\]
+$$
 
 Some containments may be equalities.
 
@@ -403,17 +403,17 @@ Grover's algorithm provides a quadratic speedup for unstructured search.
 
 Classically:
 
-\[
+$$
 O(N)
-\]
+$$
 
 queries.
 
 Quantumly:
 
-\[
+$$
 O(\sqrt N)
-\]
+$$
 
 This is powerful but not an exponential miracle.
 
@@ -461,9 +461,9 @@ This refines the simple polynomial/exponential distinction.
 
 A problem is fixed-parameter tractable if runtime has form roughly:
 
-\[
+$$
 f(k)n^{O(1)}
-\]
+$$
 
 The potentially expensive part depends mainly on parameter k.
 

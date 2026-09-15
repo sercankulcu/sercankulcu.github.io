@@ -36,11 +36,11 @@ Quantum theory appears to break strict determinism.
 
 Quantum mechanics predicts probabilities for measurement outcomes.
 
-For a state \(|\psi\rangle\), the probability of obtaining outcome associated with state \(|i\rangle\) is given by the Born rule:
+For a state $$|\psi\rangle$$, the probability of obtaining outcome associated with state $$|i\rangle$$ is given by the Born rule:
 
-\[
+$$
 P(i)=|\langle i|\psi\rangle|^2
-\]
+$$
 
 This introduces fundamental-looking uncertainty.
 

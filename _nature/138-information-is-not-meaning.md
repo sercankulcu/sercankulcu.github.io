@@ -235,9 +235,9 @@ Meaning is not measured by entropy alone.
 
 Einstein's equation:
 
-\[
+$$
 E=mc^2
-\]
+$$
 
 is extremely short.
 

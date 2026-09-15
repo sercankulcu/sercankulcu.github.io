@@ -26,9 +26,9 @@ This is the **halting problem**.
 
 Imagine a hypothetical procedure:
 
-\[
+$$
 HALTS(P,x)
-\]
+$$
 
 It receives:
 
@@ -88,9 +88,9 @@ Suppose, for contradiction, that the perfect procedure exists.
 
 It always tells us whether:
 
-\[
+$$
 P(x)
-\]
+$$
 
 halts.
 
@@ -98,9 +98,9 @@ Now construct a new program.
 
 Call it:
 
-\[
+$$
 D
-\]
+$$
 
 for "diagonal."
 
@@ -110,9 +110,9 @@ D takes a program P as input.
 
 It asks:
 
-\[
+$$
 HALTS(P,P)
-\]
+$$
 
 In other words:
 
@@ -141,9 +141,9 @@ So:
 
 Ask:
 
-\[
+$$
 D(D)
-\]
+$$
 
 What happens?
 
@@ -153,9 +153,9 @@ There are only two possibilities.
 
 Suppose:
 
-\[
+$$
 HALTS(D,D)=YES
-\]
+$$
 
 Then D's definition says:
 
@@ -169,9 +169,9 @@ HALTS was wrong.
 
 Suppose:
 
-\[
+$$
 HALTS(D,D)=NO
-\]
+$$
 
 Then D's definition says:
 
@@ -241,9 +241,9 @@ It does not decide nonhalting.
 
 The set:
 
-\[
+$$
 K=\{\langle P,x\rangle : P\text{ halts on }x\}
-\]
+$$
 
 is recursively enumerable.
 

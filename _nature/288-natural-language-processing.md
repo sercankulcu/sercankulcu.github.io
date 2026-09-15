@@ -266,15 +266,15 @@ A language model estimates probability over sequences.
 
 A basic objective is:
 
-\[
+$$
 P(w_1,w_2,\ldots,w_n)
-\]
+$$
 
 Using the chain rule:
 
-\[
+$$
 P(w_1,\ldots,w_n)=\prod_t P(w_t|w_{<t})
-\]
+$$
 
 Prediction becomes the training task.
 
@@ -284,9 +284,9 @@ Older language models estimated probability from short word histories.
 
 A trigram model approximates:
 
-\[
+$$
 P(w_t|w_{t-2},w_{t-1})
-\]
+$$
 
 This captures local patterns.
 
@@ -366,9 +366,9 @@ The model uses context to infer likely words.
 
 Autoregressive models predict the next token:
 
-\[
+$$
 P(w_t|w_1,\ldots,w_{t-1})
-\]
+$$
 
 Generation follows by repeatedly sampling or selecting next tokens.
 
