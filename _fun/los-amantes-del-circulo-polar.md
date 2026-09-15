@@ -7,7 +7,7 @@ tags:
    - romance
    - coincidence
    - timing
-   - palindrome
+   - mathematics
 ---
 
 When I wrote about *Los Amantes del Círculo Polar* in 2009, I called it the most beautiful film I had ever seen.

@@ -5,9 +5,8 @@ description: "Şeytan Tüyü was the sound of an Ankara that existed for a few y
 tags:
    - seytan-tuyu
    - ankara
-   - live-music
+   - music
    - nightlife
-   - turkish-rock
 ---
 
 # Şeytan Tüyü: The Ankara I Could Never Find Again

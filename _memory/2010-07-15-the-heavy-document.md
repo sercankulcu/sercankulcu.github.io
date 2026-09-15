@@ -4,7 +4,6 @@ date: 2010-07-15
 description: "A short answer looks suspiciously easy; a long answer arrives carrying evidence of labor — on the strange punishment of clarity and the incentive to produce quantity instead."
 tags:
    - work
-   - documentation
    - engineering
    - productivity
 ---

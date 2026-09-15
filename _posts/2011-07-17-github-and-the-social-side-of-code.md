@@ -3,9 +3,8 @@ title: 'GitHub And The Social Side Of Code'
 date: 2011-07-17
 permalink: /posts/2011/07/github-and-the-social-side-of-code/
 tags:
-  - github
-  - programming
-  - open-source
+   - programming
+   - open-source
 ---
 
 Source-code hosting used to feel like infrastructure — a necessary utility, not a social space. Sourceforge (launched 1999) and Google Code (launched 2006) provided repositories, bug trackers, and download pages. They were functional. You submitted a project, it hosted the files, other developers found it through search.

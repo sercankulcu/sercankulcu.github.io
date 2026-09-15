@@ -3,7 +3,10 @@ title: 'Smart Antennas'
 date: 2020-10-03
 permalink: /posts/2020/10/smart-antennas/
 tags:
-  - career
+  - hardware
+  - engineering
+  - technology
+  - mobile
 ---
 
 A traditional antenna has a radiation pattern largely fixed by its physical shape and orientation. If you want to direct signal in a particular direction, you physically point the antenna that way. Smart antennas change this. By combining multiple antenna elements with signal processing, a system can steer its effective beam electronically — no moving parts required. In 2020, with 5G networks rolling out and Wi-Fi 6 becoming standard in new hardware, smart antenna techniques are no longer only a research topic. They are inside the devices people are using today.

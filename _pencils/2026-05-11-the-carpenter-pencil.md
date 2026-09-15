@@ -5,7 +5,7 @@ permalink: /pencils/2026/05/the-carpenter-pencil/
 category: types
 tags:
    - pencil
-   - carpenter-pencil
+   - pencil-types
    - design
    - tools
 ---

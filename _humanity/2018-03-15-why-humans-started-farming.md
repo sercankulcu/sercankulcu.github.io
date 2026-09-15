@@ -7,7 +7,6 @@ chapter_title: 'The Agricultural Revolution'
 order: 51
 tags:
    - agriculture
-   - farming
    - prehistory
 ---
 

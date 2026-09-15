@@ -5,9 +5,9 @@ permalink: /pencils/2026/02/bruynzeel-design-graphite/
 category: brands
 tags:
    - pencil
-   - bruynzeel
+   - pencil-brands
    - graphite
-   - netherlands
+   - pencil-origins
    - history
    - collecting
 ---

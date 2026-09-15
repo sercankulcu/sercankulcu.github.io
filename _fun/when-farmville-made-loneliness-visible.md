@@ -7,7 +7,7 @@ tags:
    - internet
    - loneliness
    - facebook
-   - isolation
+   - solitude
 ---
 
 There was a particular kind of loneliness in the early social-web years: you could be connected to almost everyone you had ever known and still spend the evening entirely alone.

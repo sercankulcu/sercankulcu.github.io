@@ -8,7 +8,7 @@ order: 35
 tags:
    - meaning
    - philosophy
-   - human-condition
+   - humanity
 ---
 
 Humans do not seem satisfied with survival. Food, safety, and reproduction matter. Yet people who possess all three can still ask:

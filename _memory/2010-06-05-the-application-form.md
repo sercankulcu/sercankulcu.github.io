@@ -4,7 +4,6 @@ date: 2010-06-05
 description: "Before the coffee arrived, she asked how much he earned — a reasonable question eventually, but there is a difference between eventually and before the coffee arrives."
 tags:
    - relationships
-   - dating
    - adulthood
    - humor
 ---

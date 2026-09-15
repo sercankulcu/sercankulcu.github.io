@@ -6,7 +6,7 @@ tags:
    - ankara
    - bureaucracy
    - military-service
-   - moving
+   - places
 ---
 
 I left home at about half past eight with several tasks that normally had enough power to destroy an entire day. There was military paperwork, a telephone and internet account to close, water to cancel, electricity to cancel, and a friend to reach afterward.

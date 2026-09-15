@@ -6,9 +6,8 @@ chapter: 12
 chapter_title: 'Reason, Science and Revolution'
 order: 112
 tags:
-   - newton
-   - physics
    - scientific-revolution
+   - physics
 ---
 
 Isaac Newton changed the human image of the universe.

@@ -3,9 +3,9 @@ title: 'Patterns Make Decisions Before We Notice'
 date: 2009-05-16
 description: "Mechanical thinking helps us function, but it can also make old patterns choose before we notice."
 tags:
-  - habit
-  - freedom
-  - reflection
+   - habits
+   - freedom
+   - reflection
 ---
 
 Some decisions are made before they feel like decisions.

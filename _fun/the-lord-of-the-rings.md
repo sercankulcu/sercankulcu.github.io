@@ -4,9 +4,9 @@ date: 2002-02-16
 description: "Frodo is afraid for most of the story and continues anyway — on loyalty, the word stay, and how bad choices rarely introduce themselves as bad choices."
 tags:
    - movie
-   - fantasy
+   - imagination
    - friendship
-   - journey
+   - travel
    - courage
 ---
 

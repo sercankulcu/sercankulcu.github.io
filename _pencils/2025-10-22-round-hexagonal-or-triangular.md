@@ -6,7 +6,6 @@ category: design
 tags:
    - pencil
    - design
-   - ergonomics
 ---
 
 Barrel shape changes a pencil more than photographs suggest. The core may be identical, the wood may come from the same slats, and the lacquer may use the same chemistry, yet a round, hexagonal, and triangular pencil can feel like three different tools.

@@ -6,8 +6,8 @@ chapter: 11
 chapter_title: 'The Birth of the Modern World'
 order: 108
 tags:
-   - slavery
-   - atlantic
+   - inequality
+   - trade
    - human-rights
 ---
 

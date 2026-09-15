@@ -4,9 +4,9 @@ date: 2002-04-06
 description: "Almost everyone in the film has arrived at the life they wanted, and almost no one knows what to do there — the film's cruelest observation is that we can be genuinely unhappy inside a life that still contains things worth loving."
 tags:
    - movie
-   - suburbia
+   - childhood
    - identity
-   - dissatisfaction
+   - longing
    - beauty
 ---
 

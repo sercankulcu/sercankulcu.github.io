@@ -6,9 +6,8 @@ chapter: 5
 chapter_title: 'The World Before Civilization'
 order: 47
 tags:
-   - megafauna
    - extinction
-   - ecology
+   - earth
 ---
 
 Imagine walking through a landscape where giant ground sloths, mammoths, mastodons, enormous marsupials, and other large animals are ordinary. For much of human prehistory, such worlds existed.

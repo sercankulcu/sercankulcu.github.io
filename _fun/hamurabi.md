@@ -7,7 +7,7 @@ tags:
    - programming
    - history
    - simulation
-   - resource-management
+   - planning
 ---
 
 Long before anyone thought of a computer game, Hammurabi ruled Babylon. His name survived through one of history's best-known law codes, a record of a society trying to make trade, property, debt, agriculture, family and punishment legible through rules.

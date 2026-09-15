@@ -6,7 +6,7 @@ tags:
    - movie
    - memory
    - chance
-   - kindness
+   - care
    - simplicity
 ---
 

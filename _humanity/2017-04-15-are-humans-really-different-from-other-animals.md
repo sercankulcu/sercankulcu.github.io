@@ -6,7 +6,7 @@ chapter: 4
 chapter_title: 'Consciousness and Meaning'
 order: 40
 tags:
-   - animals
+   - life
    - humanity
    - evolution
 ---

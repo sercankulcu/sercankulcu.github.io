@@ -5,7 +5,7 @@ permalink: /pencils/2026/07/slate-pencils/
 category: types
 tags:
    - pencil
-   - slate-pencil
+   - pencil-types
    - school
    - history
    - collecting

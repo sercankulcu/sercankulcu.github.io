@@ -5,11 +5,10 @@ permalink: /pencils/2026/04/cretacolor-monolith/
 category: brands
 tags:
    - pencil
-   - cretacolor
-   - monolith
-   - woodless-pencil
+   - pencil-brands
+   - pencil-types
    - graphite
-   - austria
+   - pencil-origins
 ---
 
 A wooden pencil gives graphite a handle.

@@ -4,8 +4,7 @@ date: 2010-02-28
 description: "A sibling's victory creates borrowed happiness — you did not earn it, yet the success enters the family like good weather through an open window."
 tags:
    - family
-   - brother
-   - sports
+   - fitness
    - eskisehir
 ---
 

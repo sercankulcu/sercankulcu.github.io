@@ -7,8 +7,8 @@ chapter_title: 'Where Are We Going?'
 order: 147
 tags:
    - evolution
-   - biotechnology
-   - future-human
+   - technology
+   - future
 ---
 
 Homo sapiens will not remain unchanged forever. No species does.

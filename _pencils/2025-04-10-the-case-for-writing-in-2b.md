@@ -5,7 +5,7 @@ permalink: /pencils/2025/04/the-case-for-writing-in-2b/
 category: experience
 tags:
    - pencil
-   - 2b
+   - hardness
    - writing
 ---
 

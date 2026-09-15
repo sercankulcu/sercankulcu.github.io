@@ -5,7 +5,6 @@ permalink: /pencils/2025/09/mitsubishi-hi-uni/
 category: brands
 tags:
    - pencil
-   - mitsubishi
    - japanese-pencils
    - collecting
 ---

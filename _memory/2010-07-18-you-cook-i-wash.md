@@ -4,7 +4,7 @@ date: 2010-07-18
 description: "You cook, I wash — a division of labor where weakness was reframed as policy and the household's inequalities were redesignated as specialization."
 tags:
    - home
-   - cooking
+   - food
    - humor
    - relationships
 ---

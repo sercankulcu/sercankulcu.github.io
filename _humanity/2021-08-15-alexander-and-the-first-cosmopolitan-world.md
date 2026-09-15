@@ -6,9 +6,8 @@ chapter: 10
 chapter_title: 'Empires and Global Humanity'
 order: 92
 tags:
-   - alexander
-   - hellenistic-world
    - empire
+   - civilization
 ---
 
 Alexander the Great conquered astonishing territory in a short life. From Macedonia, his armies moved through the Persian Empire and reached as far as parts of the Indian subcontinent.

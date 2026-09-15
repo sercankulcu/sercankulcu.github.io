@@ -6,7 +6,6 @@ chapter: 10
 chapter_title: 'Empires and Global Humanity'
 order: 99
 tags:
-   - mongols
    - empire
    - globalization
 ---

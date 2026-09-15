@@ -6,9 +6,8 @@ chapter: 7
 chapter_title: 'The Birth of Civilization'
 order: 63
 tags:
-   - egypt
-   - afterlife
    - civilization
+   - afterlife
 ---
 
 Ancient Egypt turned mortality into architecture. The Nile created agricultural abundance, the state organized labor, religion connected kingship to cosmic order, and the dead became part of political life.

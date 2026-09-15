@@ -3,9 +3,8 @@ title: "Who Were You Calling?"
 date: 2010-05-09
 description: "Two calls, both opening with 'Who are you?' — the man who placed the call asked the person who answered to identify themselves first, and neither of them learned anything useful."
 tags:
-   - phone-calls
-   - humor
    - communication
+   - humor
 ---
 
 My phone rang, and I answered.

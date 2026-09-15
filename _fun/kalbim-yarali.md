@@ -4,7 +4,7 @@ date: 2007-07-29
 description: "When we love someone, we quietly populate tomorrow with them — and separation collapses those imaginary scenes all at once."
 tags:
    - music
-   - murat-gogebakan
+   - musicians
    - love
    - heartbreak
    - philosophy

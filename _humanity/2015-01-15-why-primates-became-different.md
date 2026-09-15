@@ -6,7 +6,7 @@ chapter: 2
 chapter_title: 'The Long Road to Humanity'
 order: 13
 tags:
-   - primates
+   - human-evolution
    - evolution
    - intelligence
 ---

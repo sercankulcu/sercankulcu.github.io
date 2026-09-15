@@ -3,10 +3,10 @@ title: "Second Coffee"
 date: 2020-09-04
 description: "During quarantine the coffee machine became part of the clock — the first cup meant morning had begun, the second meant enough of the day had passed to need interruption."
 tags:
-   - coffee
-   - quarantine
+   - food
+   - pandemic
    - home
-   - routines
+   - habits
 ---
 
 During the quarantine months, the coffee machine became part of the clock.

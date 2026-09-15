@@ -4,8 +4,7 @@ date: 2014-01-29
 description: "Once the piano begins, you are no longer a person going to buy yogurt — on Einaudi, small repetitions, and how large things are built."
 tags:
    - music
-   - ludovico-einaudi
-   - piano
+   - musicians
    - time
    - imagination
 ---

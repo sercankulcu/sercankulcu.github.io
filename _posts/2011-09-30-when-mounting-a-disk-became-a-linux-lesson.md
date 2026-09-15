@@ -4,7 +4,6 @@ date: 2011-09-30
 permalink: /posts/2011/09/when-mounting-a-disk-became-a-linux-lesson/
 tags:
    - linux
-   - ntfs
    - debugging
    - engineering
    - memories

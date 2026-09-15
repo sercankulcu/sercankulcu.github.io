@@ -4,9 +4,9 @@ date: 2009-05-07
 description: "Students keep two records of professors — lectures and grades, and smaller evidence: whether the door felt open, whether a question cost embarrassment."
 tags:
    - university
-   - professors
+   - academia
    - computer-engineering
-   - mentorship
+   - learning
 ---
 
 I did not appreciate the professor immediately.

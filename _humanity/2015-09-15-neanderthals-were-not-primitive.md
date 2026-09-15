@@ -6,7 +6,7 @@ chapter: 3
 chapter_title: 'Becoming Human'
 order: 21
 tags:
-   - neanderthals
+   - hominins
    - human-origins
    - evolution
 ---

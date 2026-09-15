@@ -6,8 +6,8 @@ tags:
    - music
    - summer
    - travel
-   - desire
-   - madonna
+   - longing
+   - musicians
 ---
 
 I don't want a careful holiday.

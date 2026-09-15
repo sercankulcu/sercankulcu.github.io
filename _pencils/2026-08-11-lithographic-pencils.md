@@ -5,9 +5,8 @@ permalink: /pencils/2026/08/lithographic-pencils/
 category: types
 tags:
    - pencil
-   - lithographic-pencil
-   - lithography
-   - printmaking
+   - pencil-types
+   - printing
    - history
    - collecting
 ---

@@ -5,9 +5,8 @@ permalink: /pencils/2026/04/venus-perfect-pencils/
 category: brands
 tags:
    - pencil
-   - venus
-   - american-lead-pencil-company
-   - drawing-pencil
+   - american-pencil
+   - drawing
    - history
    - collecting
 ---

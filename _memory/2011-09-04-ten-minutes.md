@@ -4,9 +4,7 @@ date: 2011-09-04
 description: "He entered the anonymous chat website curious and left ten minutes later having exchanged more insults than in any other ten-minute period of his life — the place had recruited him into its behavior."
 tags:
    - internet
-   - anonymity
    - social-media
-   - online-culture
 ---
 
 I opened an anonymous-chat website and decided to see what would happen.

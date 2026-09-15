@@ -6,7 +6,7 @@ chapter: 14
 chapter_title: 'The Digital Age'
 order: 134
 tags:
-   - smartphone
+   - technology
    - attention
    - society
 ---

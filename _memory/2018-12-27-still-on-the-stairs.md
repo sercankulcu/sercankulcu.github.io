@@ -5,7 +5,7 @@ description: "Three minutes up, five minutes looking, two minutes at a door, fiv
 tags:
    - television
    - storytelling
-   - pacing
+   - habits
    - humor
 ---
 

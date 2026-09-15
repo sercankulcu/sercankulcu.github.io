@@ -4,7 +4,7 @@ date: 2015-02-21
 description: "Memory preserves what made us feel alive, not what was good for us — melancholy begins when we know that even if the past returned, the innocence would be gone."
 tags:
    - music
-   - lana-del-rey
+   - musicians
    - summer
    - nostalgia
    - melancholy

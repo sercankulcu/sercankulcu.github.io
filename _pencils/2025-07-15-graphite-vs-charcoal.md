@@ -6,7 +6,7 @@ category: materials
 tags:
    - pencil
    - graphite
-   - charcoal
+   - materials
 ---
 
 Graphite and charcoal are both carbon-based drawing materials, but they behave very differently on paper. They can both make black marks, both can be sold in wooden pencils, and both can be blended or erased to some degree. Yet their internal structure, particle behavior, sheen, value range, and interaction with paper make them distinct tools rather than interchangeable versions of the same medium.

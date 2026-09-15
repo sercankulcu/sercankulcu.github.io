@@ -6,9 +6,8 @@ chapter: 13
 chapter_title: 'The Modern Human'
 order: 127
 tags:
-   - world-war-one
-   - war
    - modernity
+   - war
 ---
 
 Before 1914, parts of Europe had reasons for confidence. Science advanced, industry expanded, railways connected cities, telegraphy accelerated communication, medicine improved, and trade grew. Many intellectuals believed civilization was becoming more rational.

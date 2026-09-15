@@ -4,8 +4,8 @@ date: 2010-06-18
 description: "A record is fixed; the listener is not — on ritual, bodily memory, and what happens to a song after it enters your life."
 tags:
    - music
-   - dream-theater
-   - listening
+   - musicians
+   - attention
    - ritual
    - nostalgia
 ---

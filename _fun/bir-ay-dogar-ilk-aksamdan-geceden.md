@@ -4,7 +4,7 @@ date: 2025-09-03
 description: "The moon at the beginning of the night does not remove the darkness — it simply gives enough light to continue."
 tags:
    - music
-   - cengiz-ozkan
+   - musicians
    - night
    - longing
    - hope

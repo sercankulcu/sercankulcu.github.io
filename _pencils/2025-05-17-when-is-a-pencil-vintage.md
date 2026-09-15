@@ -5,7 +5,6 @@ permalink: /pencils/2025/05/when-is-a-pencil-vintage/
 category: collecting
 tags:
    - pencil
-   - vintage
    - collecting
 ---
 

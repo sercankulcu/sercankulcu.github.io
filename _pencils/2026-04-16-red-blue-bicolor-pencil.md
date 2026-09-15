@@ -5,9 +5,8 @@ permalink: /pencils/2026/04/red-blue-bicolor-pencil/
 category: types
 tags:
    - pencil
-   - bicolor-pencil
-   - red-blue
-   - marking-pencil
+   - colored-pencil
+   - pencil-types
    - school-pencil
    - collecting
 ---

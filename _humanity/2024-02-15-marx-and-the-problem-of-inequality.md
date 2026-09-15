@@ -6,7 +6,7 @@ chapter: 13
 chapter_title: 'The Modern Human'
 order: 122
 tags:
-   - marx
+   - politics
    - inequality
    - capitalism
 ---

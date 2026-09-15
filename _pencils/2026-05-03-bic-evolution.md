@@ -5,9 +5,9 @@ permalink: /pencils/2026/05/bic-evolution/
 category: brands
 tags:
    - pencil
-   - bic
+   - pencil-brands
    - evolution
-   - synthetic-resin
+   - materials
    - manufacturing
    - collecting
 ---

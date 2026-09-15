@@ -4,7 +4,6 @@ date: 2010-07-09
 permalink: /posts/2010/07/c-is-a-manual-transmission/
 tags:
    - programming
-   - c
    - java
    - engineering
    - memories

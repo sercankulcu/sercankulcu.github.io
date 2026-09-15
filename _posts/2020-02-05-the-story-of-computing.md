@@ -3,8 +3,8 @@ title: 'The Story Of Computing'
 date: 2020-02-05
 permalink: /posts/2020/02/the-story-of-computing/
 tags:
-  - history
-  - personal development
+   - history
+   - self-improvement
 ---
 
 The story of computing is also a story about human limits. For thousands of years, people have built tools to extend what the mind alone can do — to count faster, to record more, to calculate at scales impossible by hand. An abacus, a mechanical calculator, a punched card, and a modern processor look completely different but serve the same basic impulse: move some mental work outside the human mind.

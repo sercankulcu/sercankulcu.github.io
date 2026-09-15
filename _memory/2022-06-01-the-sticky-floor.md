@@ -2,7 +2,7 @@
 title: "The Sticky Floor"
 date: 2022-06-01
 description: "Someone had spilled beer in the office the night before — he arrived, found the floor sticky, looked at his desk, and started writing his thesis anyway."
-tags: [academia, thesis, work, determination]
+tags: [academia, university, work, persistence]
 ---
 
 It was the beginning of summer in 2022.

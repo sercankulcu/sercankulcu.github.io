@@ -5,9 +5,9 @@ permalink: /pencils/2026/06/conte-graphite-pencils/
 category: brands
 tags:
    - pencil
-   - conte
+   - pencil-brands
    - graphite
-   - france
+   - pencil-origins
    - history
    - collecting
 ---

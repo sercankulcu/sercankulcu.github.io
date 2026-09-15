@@ -6,7 +6,7 @@ category: types
 tags:
    - pencil
    - history
-   - copying-pencil
+   - pencil-types
    - collecting
 ---
 

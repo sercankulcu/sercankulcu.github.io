@@ -7,7 +7,7 @@ chapter_title: 'Gods, Religion and Morality'
 order: 72
 tags:
    - religion
-   - temples
+   - ritual
    - institutions
 ---
 

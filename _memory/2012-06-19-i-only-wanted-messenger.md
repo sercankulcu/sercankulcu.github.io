@@ -4,7 +4,7 @@ date: 2012-06-19
 description: "He only wanted Messenger — but it had returned from several years away carrying administrative responsibilities, and wanting it was probably not only wanting the software."
 tags:
    - software
-   - messenger
+   - communication
    - internet
    - technology
 ---

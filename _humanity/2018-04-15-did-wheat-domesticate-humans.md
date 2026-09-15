@@ -6,8 +6,8 @@ chapter: 6
 chapter_title: 'The Agricultural Revolution'
 order: 52
 tags:
-   - wheat
-   - domestication
+   - human-evolution
+   - evolution
    - agriculture
 ---
 

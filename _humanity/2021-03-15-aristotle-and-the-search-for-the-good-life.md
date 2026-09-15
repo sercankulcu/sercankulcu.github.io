@@ -6,9 +6,8 @@ chapter: 9
 chapter_title: 'Philosophy Begins'
 order: 87
 tags:
-   - aristotle
-   - ethics
    - philosophy
+   - ethics
 ---
 
 Aristotle asks a practical question: what is the highest human good?

@@ -3,7 +3,7 @@ title: 'History of Early Personal Computers and Gaming Consoles'
 date: 2007-03-12
 permalink: /posts/2007/03/history-of-early-personal-computers-and-gaming-consoles/
 tags:
-   - fun
+   - humor
    - self-improvement
 ---
 

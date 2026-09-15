@@ -5,7 +5,7 @@ permalink: /pencils/2026/04/non-photo-blue-pencils/
 category: types
 tags:
    - pencil
-   - non-photo-blue
+   - colored-pencil
    - printing
    - animation
    - collecting

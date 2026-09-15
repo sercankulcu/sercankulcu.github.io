@@ -7,7 +7,7 @@ chapter_title: 'The Modern Human'
 order: 128
 tags:
    - holocaust
-   - genocide
+   - war
    - civilization
 ---
 

@@ -6,9 +6,8 @@ chapter: 11
 chapter_title: 'The Birth of the Modern World'
 order: 102
 tags:
-   - black-death
-   - plague
    - society
+   - death
 ---
 
 The Black Death killed on a scale difficult to imagine. In the fourteenth century, plague devastated populations across Europe, the Middle East, North Africa, and parts of Asia, and in some regions enormous fractions of the population died within a few years.

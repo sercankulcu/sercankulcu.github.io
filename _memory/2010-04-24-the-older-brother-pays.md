@@ -4,7 +4,6 @@ date: 2010-04-24
 description: "The complaint was never enforcement — it was a service fee: the older brother's ritual protest, predictable enough to have become part of the transaction itself."
 tags:
    - family
-   - siblings
    - money
    - humor
 ---

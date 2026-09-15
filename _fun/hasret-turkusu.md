@@ -4,7 +4,7 @@ date: 2026-09-03
 description: "A life without longing would also be a life without strong connections — on the untranslatable weight of hasret and the distance that grows only inside us."
 tags:
    - music
-   - suavi
+   - musicians
    - longing
    - distance
    - identity

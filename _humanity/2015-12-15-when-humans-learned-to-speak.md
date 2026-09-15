@@ -7,7 +7,6 @@ chapter_title: 'Becoming Human'
 order: 24
 tags:
    - language
-   - speech
    - cognition
 ---
 

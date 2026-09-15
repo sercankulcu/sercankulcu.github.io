@@ -3,9 +3,9 @@ title: "Curiosity Has Room to Grow Older"
 date: 2023-01-04
 description: "Curiosity can change with age without denying the losses and limits that aging brings."
 tags:
-  - aging
-  - curiosity
-  - growth
+   - aging
+   - curiosity
+   - learning
 ---
 
 Age arrives gradually, but awareness of it can arrive in flashes. A photograph looks older than expected. Someone remembered as a child is an adult. A familiar task takes longer to recover from. A birthday number begins to feel less abstract.

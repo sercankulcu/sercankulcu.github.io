@@ -7,7 +7,6 @@ chapter_title: 'The Digital Age'
 order: 140
 tags:
    - artificial-intelligence
-   - superintelligence
    - future
 ---
 

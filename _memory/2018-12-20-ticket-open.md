@@ -4,8 +4,7 @@ date: 2018-12-20
 description: "The domain redirect should have taken minutes; by day four the original technical problem had disappeared from his mind and the ticket itself had become the project."
 tags:
    - internet
-   - domains
-   - customer-service
+   - work
    - bureaucracy
 ---
 

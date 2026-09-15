@@ -6,7 +6,6 @@ chapter: 7
 chapter_title: 'The Birth of Civilization'
 order: 64
 tags:
-   - indus
    - civilization
    - archaeology
 ---

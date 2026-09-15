@@ -5,10 +5,9 @@ permalink: /pencils/2026/08/the-pencil-clip/
 category: tools
 tags:
    - pencil
-   - pencil-clip
-   - pocket
-   - accessory
-   - patent
+   - tools
+   - pencil-types
+   - history
    - collecting
 ---
 

@@ -6,9 +6,8 @@ chapter: 9
 chapter_title: 'Philosophy Begins'
 order: 82
 tags:
-   - buddha
-   - buddhism
-   - suffering
+   - religion
+   - meaning
 ---
 
 The Buddha began with a problem almost everyone recognizes: life contains suffering. Pain, loss, aging, illness, death, and disappointment are unavoidable, and even pleasure becomes unstable because it passes.

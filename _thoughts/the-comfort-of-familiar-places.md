@@ -3,9 +3,9 @@ title: 'We Return to Places to Measure Ourselves'
 date: 2025-10-26
 description: "Familiar places let us measure change by showing us who we were when we last stood there."
 tags:
-  - memory
-  - place
-  - reflection
+   - memory
+   - identity
+   - reflection
 ---
 
 There are places I return to even when there is no practical reason to go back.

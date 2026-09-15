@@ -5,7 +5,7 @@ description: "A nickname announced from the festival stage seemed for a moment t
 tags:
    - university
    - music
-   - festivals
+   - culture
    - humor
 ---
 

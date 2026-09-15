@@ -4,10 +4,10 @@ date: 2010-07-08
 description: "Memory stores apparently useless details — a word on a wall waited intact for years, and a computer simply played the answer."
 tags:
    - music
-   - metallica
+   - musicians
    - university
    - computers
-   - discovery
+   - science
 ---
 
 At the entrance of our apartment building, someone had written one word on the wall in red paint:

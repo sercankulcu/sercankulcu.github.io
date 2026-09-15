@@ -5,7 +5,7 @@ description: "He left the exam convinced he had become less intelligent than he 
 tags:
    - university
    - mathematics
-   - exams
+   - education
    - humor
 ---
 

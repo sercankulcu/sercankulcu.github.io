@@ -6,9 +6,8 @@ chapter: 11
 chapter_title: 'The Birth of the Modern World'
 order: 106
 tags:
-   - columbus
-   - colonization
    - globalization
+   - empire
 ---
 
 Christopher Columbus did not discover an empty world. He entered a populated one.

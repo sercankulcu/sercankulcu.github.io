@@ -5,9 +5,8 @@ permalink: /pencils/2026/05/viking-pencil-factory-denmark/
 category: history
 tags:
    - pencil
-   - viking
-   - denmark
-   - copenhagen
+   - pencil-brands
+   - pencil-origins
    - manufacturing
    - collecting
 ---

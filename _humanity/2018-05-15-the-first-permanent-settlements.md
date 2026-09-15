@@ -6,8 +6,7 @@ chapter: 6
 chapter_title: 'The Agricultural Revolution'
 order: 53
 tags:
-   - settlements
-   - villages
+   - civilization
    - agriculture
 ---
 

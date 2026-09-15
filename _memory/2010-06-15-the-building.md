@@ -5,7 +5,6 @@ description: "In an aerospace company so vast that a cigarette break became a jo
 tags:
    - engineering
    - montreal
-   - aerospace
    - work
 ---
 

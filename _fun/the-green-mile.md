@@ -5,9 +5,9 @@ description: "How certain should a system be before making a mistake impossible 
 tags:
    - movie
    - justice
-   - compassion
+   - care
    - death
-   - irreversibility
+   - time
 ---
 
 I watched *The Green Mile* on a rainy evening expecting a prison story.

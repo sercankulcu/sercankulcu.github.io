@@ -4,8 +4,7 @@ date: 2026-09-03
 description: "Memory is not a perfect archive — it is an old storyteller who changes small details but tries to protect the meaning of the story."
 tags:
    - music
-   - beethoven
-   - moonlight-sonata
+   - musicians
    - night
    - silence
 ---

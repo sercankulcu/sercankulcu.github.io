@@ -5,9 +5,9 @@ permalink: /pencils/2026/03/viarco-portugals-only-pencil-factory/
 category: history
 tags:
    - pencil
-   - viarco
-   - portugal
-   - pencil-factory
+   - pencil-brands
+   - pencil-origins
+   - manufacturing
    - history
    - collecting
 ---

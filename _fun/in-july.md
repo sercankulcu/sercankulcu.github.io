@@ -7,7 +7,7 @@ tags:
    - love
    - travel
    - coincidence
-   - fatih-akin
+   - cinema
 ---
 
 There are films we remember because they are great films, and there are others we remember because they entered our lives at the right moment. *In July* belongs to the second group for me. I do not remember it mainly because of technique, structure, or cinematic perfection. What remained was a feeling: summer, movement, coincidence, uncertainty, and the strange experience of traveling toward something important without fully understanding what it is.

@@ -5,10 +5,8 @@ permalink: /pencils/2026/07/tomsk-pencil-factory/
 category: history
 tags:
    - pencil
-   - tomsk
-   - soviet-union
-   - russia
-   - siberian-cedar
+   - pencil-origins
+   - pencil-wood
    - manufacturing
 ---
 

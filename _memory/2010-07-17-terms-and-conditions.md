@@ -5,7 +5,7 @@ description: "The laptop had stopped being portable, stopped being stereo, and s
 tags:
    - computers
    - laptops
-   - troubleshooting
+   - programming
    - humor
 ---
 

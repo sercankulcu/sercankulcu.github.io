@@ -7,7 +7,6 @@ tags:
    - pencil
    - ferrule
    - eraser
-   - crimping
    - manufacturing
    - collecting
 ---

@@ -7,7 +7,6 @@ chapter_title: 'The Digital Age'
 order: 133
 tags:
    - internet
-   - networks
    - communication
 ---
 

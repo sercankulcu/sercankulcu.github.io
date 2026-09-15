@@ -5,7 +5,6 @@ permalink: /pencils/2026/06/adel-kalemcilik-turkey/
 category: history
 tags:
    - pencil
-   - adel
    - turkey
    - manufacturing
    - faber-castell

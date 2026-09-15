@@ -3,9 +3,9 @@ title: 'How To Study To Be A Good Software Developer'
 date: 2017-08-14
 permalink: /posts/2017/08/how-to-study-to-be-a-good-software-developer/
 tags:
-  - career
-  - self-improvement
-  - time management
+   - career
+   - self-improvement
+   - productivity
 ---
 
 Learning software development can easily become overwhelming because there is always another topic to study. A programming language leads to a framework. The framework leads to databases, networking, testing, operating systems, design, and security. Each topic reveals three more.

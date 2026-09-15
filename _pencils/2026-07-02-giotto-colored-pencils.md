@@ -5,9 +5,8 @@ permalink: /pencils/2026/07/giotto-colored-pencils/
 category: brands
 tags:
    - pencil
-   - giotto
-   - fila
-   - italy
+   - pencil-brands
+   - pencil-origins
    - colored-pencil
    - school-pencil
 ---

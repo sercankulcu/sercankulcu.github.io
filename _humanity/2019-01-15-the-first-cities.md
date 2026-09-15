@@ -6,9 +6,8 @@ chapter: 7
 chapter_title: 'The Birth of Civilization'
 order: 61
 tags:
-   - cities
    - civilization
-   - urbanization
+   - society
 ---
 
 A city is more than a large village. It is a new social machine.

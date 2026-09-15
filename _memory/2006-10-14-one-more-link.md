@@ -4,9 +4,9 @@ date: 2006-10-14
 description: "After midnight the screen was the brightest object in the room, and every error produced a search that produced a link that produced morning."
 tags:
    - computers
-   - late-night
+   - nightlife
    - curiosity
-   - insomnia
+   - sleep
 ---
 
 After midnight, the computer became a different machine.

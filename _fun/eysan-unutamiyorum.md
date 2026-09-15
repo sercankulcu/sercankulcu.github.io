@@ -3,11 +3,11 @@ title: "Eyşan Unutamıyorum"
 date: 2026-09-08
 description: "Unfinished stories are worse than painful endings — they leave the door slightly open, and imagination is very good at walking through small openings."
 tags:
-  - music
-  - toygar-isikli
-  - ezel
-  - nostalgia
-  - kierkegaard
+   - music
+   - musicians
+   - movie
+   - nostalgia
+   - philosophy
 ---
 
 There is a soundtrack from *Ezel* called “Eyşan – Unutamıyorum.” The title is already dramatic enough on its own. It feels like the kind of music you listen to late at night and then suddenly wonder why your life feels more complicated than it actually is.

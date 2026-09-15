@@ -3,9 +3,8 @@ title: "The Wrong Cup"
 date: 2018-11-05
 description: "He woke at night to feed the baby and walked back to the room carrying coffee — two versions of his life had met in the same dark kitchen."
 tags:
-   - parenting
-   - sleep
    - family
+   - sleep
    - humor
 ---
 

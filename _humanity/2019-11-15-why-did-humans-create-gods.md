@@ -6,7 +6,6 @@ chapter: 8
 chapter_title: 'Gods, Religion and Morality'
 order: 71
 tags:
-   - gods
    - religion
    - anthropology
 ---

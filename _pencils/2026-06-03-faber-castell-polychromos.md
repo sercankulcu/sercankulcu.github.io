@@ -6,9 +6,8 @@ category: brands
 tags:
    - pencil
    - faber-castell
-   - polychromos
    - colored-pencil
-   - pigments
+   - materials
    - collecting
 ---
 

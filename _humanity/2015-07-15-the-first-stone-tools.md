@@ -6,7 +6,7 @@ chapter: 2
 chapter_title: 'The Long Road to Humanity'
 order: 19
 tags:
-   - stone-tools
+   - tools
    - technology
    - archaeology
 ---

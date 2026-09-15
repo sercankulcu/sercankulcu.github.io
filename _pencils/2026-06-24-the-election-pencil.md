@@ -5,9 +5,8 @@ permalink: /pencils/2026/06/the-election-pencil/
 category: types
 tags:
    - pencil
-   - election
-   - voting
-   - ballot
+   - history
+   - pencil-types
    - graphite
    - collecting
 ---

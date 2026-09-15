@@ -3,10 +3,9 @@ title: "Annual Procurement"
 date: 2009-04-29
 description: "A small social discomfort appeared — the solution was infrastructure: buying a year's supply of toilet paper at dawn to minimize witnesses."
 tags:
-   - embarrassment
    - humor
    - habits
-   - logistics
+   - work
 ---
 
 I had a problem with buying toilet paper. Not using it—carrying it home. The package was too large to hide in a bag, and walking through the street with it made me strangely self-conscious. Everyone needed toilet paper, and everyone knew everyone else needed toilet paper. None of this helped.

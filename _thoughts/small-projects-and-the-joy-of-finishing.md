@@ -3,9 +3,9 @@ title: 'Small Projects Close the Loop'
 date: 2025-03-08
 description: "A finished small thing has met reality; an enormous plan may still be waiting to do so."
 tags:
-  - projects
-  - learning
-  - completion
+   - projects
+   - learning
+   - endings
 ---
 
 I used to think a project had to be large to deserve attention. Large projects looked serious. Small ones looked temporary, almost like exercises. Over time, I began to suspect that scale and seriousness are not the same thing.

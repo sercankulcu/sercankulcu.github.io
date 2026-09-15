@@ -5,9 +5,8 @@ permalink: /pencils/2026/07/pencil-slats/
 category: materials
 tags:
    - pencil
-   - pencil-slats
-   - incense-cedar
    - manufacturing
+   - incense-cedar
    - wood
    - collecting
 ---

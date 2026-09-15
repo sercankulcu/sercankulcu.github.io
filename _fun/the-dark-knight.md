@@ -4,7 +4,6 @@ date: 2008-08-09
 description: "Most of us judge ourselves in good weather — the Joker's experiment demonstrates that principles become negotiable under sufficient pressure."
 tags:
    - movie
-   - batman
    - morality
    - chaos
    - choices

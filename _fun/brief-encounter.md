@@ -5,9 +5,9 @@ description: "Unlived lives remain polished by absence — silence is not emptin
 tags:
    - movie
    - romance
-   - restraint
+   - equanimity
    - longing
-   - unspoken
+   - silence
 ---
 
 There are sentences we regret saying and sentences we regret withholding. *Brief Encounter* belongs almost entirely to the second category.

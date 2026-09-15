@@ -4,7 +4,7 @@ date: 2010-08-31
 description: "The town was officially praised for being slow — unfortunate for a soldier already counting days, who needed the outside world to provide evidence it was still moving."
 tags:
    - military-service
-   - seferihisar
+   - places
    - humor
    - turkey
 ---

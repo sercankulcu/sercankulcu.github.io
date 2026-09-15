@@ -4,7 +4,6 @@ date: 2012-07-06
 permalink: /posts/2012/07/what-should-a-professional-chamber-actually-do/
 tags:
    - computer-engineering
-   - profession
    - career
    - institutions
    - memories

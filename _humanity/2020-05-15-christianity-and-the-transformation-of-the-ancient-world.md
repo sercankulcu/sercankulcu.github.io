@@ -6,9 +6,8 @@ chapter: 8
 chapter_title: 'Gods, Religion and Morality'
 order: 77
 tags:
-   - christianity
-   - roman-empire
    - religion
+   - rome
 ---
 
 Christianity began as a small movement in the eastern Roman world, but it became one of the largest religions in history. That transformation changed politics, morality, art, philosophy, law, and concepts of personhood across enormous regions.

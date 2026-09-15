@@ -6,7 +6,6 @@ category: brands
 tags:
    - pencil
    - staedtler
-   - noris
    - germany
    - school-pencil
    - collecting

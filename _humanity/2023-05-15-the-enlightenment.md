@@ -6,8 +6,8 @@ chapter: 12
 chapter_title: 'Reason, Science and Revolution'
 order: 113
 tags:
-   - enlightenment
-   - reason
+   - history
+   - knowledge
    - politics
 ---
 

@@ -6,7 +6,6 @@ category: collecting
 tags:
    - pencil
    - collecting
-   - discontinued
 ---
 
 A perfectly ordinary pencil can become psychologically different the moment production stops. Before discontinuation, sharpening is routine because another dozen can be bought. After discontinuation, the same action begins to feel like consumption of a finite resource. Nothing about the graphite has changed, yet the user’s relationship with the object has.

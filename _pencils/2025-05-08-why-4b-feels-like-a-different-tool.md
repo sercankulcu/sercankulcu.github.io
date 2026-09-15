@@ -5,7 +5,7 @@ permalink: /pencils/2025/05/why-4b-feels-like-a-different-tool/
 category: experience
 tags:
    - pencil
-   - 4b
+   - hardness
    - drawing
 ---
 

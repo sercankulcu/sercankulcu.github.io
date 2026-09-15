@@ -3,9 +3,8 @@ title: 'The Rise Of Smart Speakers'
 date: 2017-11-19
 permalink: /posts/2017/11/the-rise-of-smart-speakers/
 tags:
-  - voice
-  - technology
-  - artificial-intelligence
+   - technology
+   - artificial-intelligence
 ---
 
 Amazon introduced the Echo in late 2014, and it spent a year available only by invitation before opening broadly. Google Home launched in November 2016. Apple announced HomePod at WWDC in June and it will ship next year. In three years, voice-activated speakers have moved from a product few people had heard of to the fastest-growing consumer electronics category.

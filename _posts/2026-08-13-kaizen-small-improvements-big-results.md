@@ -3,11 +3,10 @@ title: 'Kaizen Small Improvements Big Results'
 date: 2026-08-13
 permalink: /posts/2026/08/kaizen-small-improvements-big-results/
 tags:
-  - kaizen
-  - continuous improvement
-  - productivity
-  - software engineering
-  - lean
+   - kaizen
+   - productivity
+   - engineering
+   - lean
 ---
 
 There is a peculiar kind of problem that almost never gets fixed. It is not serious enough to become an emergency. It does not crash the system, stop production, or ruin the day. It simply wastes a few seconds, creates a little frustration, or requires one unnecessary step. So we tolerate it. Then we tolerate it again tomorrow. And the day after that.

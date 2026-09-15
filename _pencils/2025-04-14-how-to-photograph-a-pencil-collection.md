@@ -6,7 +6,7 @@ category: collecting
 tags:
    - pencil
    - collecting
-   - photography
+   - printing
 ---
 
 Good photographs turn a pencil collection into a searchable visual archive. Once a collection grows beyond a few dozen pieces, memory becomes unreliable. Images begin to serve as identification records, condition reports, variant references, and evidence of how an object looked at a particular moment in time.

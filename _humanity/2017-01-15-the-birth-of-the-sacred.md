@@ -6,7 +6,6 @@ chapter: 4
 chapter_title: 'Consciousness and Meaning'
 order: 37
 tags:
-   - sacred
    - religion
    - anthropology
 ---

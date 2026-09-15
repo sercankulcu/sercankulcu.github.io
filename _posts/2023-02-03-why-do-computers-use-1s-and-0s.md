@@ -3,9 +3,9 @@ title: 'Why Do Computers Use 1s And 0s?'
 date: 2023-02-03
 permalink: /posts/2023/02/why-do-computers-use-1s-and-0s/
 tags:
-  - computer-science
-  - hardware
-  - binary
+   - computer-science
+   - hardware
+   - computing
 ---
 
 People often ask why computers use 1s and 0s when we normally count with ten digits. The answer starts with the hardware — but the real reason runs deeper than transistors.

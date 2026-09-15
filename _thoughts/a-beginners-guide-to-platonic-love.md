@@ -3,11 +3,11 @@ title: "A Beginner's Guide to Unspoken Love"
 date: 2009-05-23
 description: "Unspoken love can turn a daily commute into a private drama of courage, fantasy, and regret."
 tags:
-  - memories
-  - relationships
-  - youth
-  - commuting
-  - unspoken love
+   - memories
+   - relationships
+   - youth
+   - work
+   - love
 ---
 
 Unspoken love is difficult, especially when the person is not somewhere far away but sitting on the same company shuttle every morning.

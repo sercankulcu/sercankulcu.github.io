@@ -8,7 +8,6 @@ order: 39
 tags:
    - humanity
    - philosophy
-   - human-nature
 ---
 
 What makes us human?

@@ -6,7 +6,6 @@ category: experience
 tags:
    - pencil
    - writing
-   - essay
 ---
 
 A wooden pencil records use in a way that most writing tools do not. Every sharpening removes part of the object itself, so the pencil gradually becomes a physical measure of the work done with it. The change is visible: the barrel gets shorter, the imprint moves closer to the fingers, the balance shifts, and eventually the pencil reaches a length at which it is no longer comfortable to hold. A mechanical pencil can consume many leads while its body remains almost unchanged. A wood-cased pencil cannot hide its history so easily.

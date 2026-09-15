@@ -7,7 +7,7 @@ chapter_title: 'Reason, Science and Revolution'
 order: 119
 tags:
    - time
-   - labor
+   - economy
    - capitalism
 ---
 

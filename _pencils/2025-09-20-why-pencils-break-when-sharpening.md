@@ -6,7 +6,7 @@ category: materials
 tags:
    - pencil
    - sharpening
-   - maintenance
+   - tools
 ---
 
 Few pencil problems are more frustrating than a point that breaks every time it emerges from the sharpener. The visible break happens at the tip, but the actual cause may be somewhere else: inside the core, in the wood, at the glue line, in the sharpener, or in the user's technique.

@@ -4,7 +4,7 @@ date: 2009-05-23
 description: "Carrying a resignation letter without using it was heavier than handing it in — the burden was the daily argument of deciding again, not the decision itself."
 tags:
    - work
-   - resignation
+   - career
    - military-service
    - uncertainty
 ---

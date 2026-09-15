@@ -6,7 +6,6 @@ chapter: 11
 chapter_title: 'The Birth of the Modern World'
 order: 101
 tags:
-   - middle-ages
    - history
    - civilization
 ---

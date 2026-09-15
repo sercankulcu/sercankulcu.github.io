@@ -5,10 +5,9 @@ permalink: /pencils/2026/05/blue-pencil-editing/
 category: history
 tags:
    - pencil
-   - blue-pencil
-   - editing
-   - proofreading
-   - publishing
+   - colored-pencil
+   - writing
+   - printing
    - collecting
 ---
 

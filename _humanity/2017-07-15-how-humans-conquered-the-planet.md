@@ -7,7 +7,6 @@ chapter_title: 'The World Before Civilization'
 order: 43
 tags:
    - migration
-   - human-expansion
    - prehistory
 ---
 
