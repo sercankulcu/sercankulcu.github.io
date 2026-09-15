@@ -11,11 +11,15 @@ tags:
 
 Good photographs turn a pencil collection into a searchable visual archive. Once a collection grows beyond a few dozen pieces, memory becomes unreliable. Images begin to serve as identification records, condition reports, variant references, and evidence of how an object looked at a particular moment in time.
 
+## Consistency First
+
 The first goal should be consistency. A beautiful photograph of one pencil and a completely different style for the next makes comparison harder. For catalog work, repeatable framing, background, lighting, orientation, and scale are more useful than dramatic styling.
 
 A neutral background is usually best. White, light gray, and matte neutral surfaces keep attention on the pencil and make color comparison easier. Strongly colored backgrounds can reflect into glossy lacquer and alter the apparent hue of the barrel.
 
 Matte backgrounds are preferable to glossy ones because they reduce secondary reflections. A shiny table can create a second image of the pencil underneath it, which may look attractive but often hides small details such as end-cap geometry or ferrule shape.
+
+## Light and Reflection
 
 Light quality matters more than raw brightness. Soft, diffused light spreads reflections over a larger area and makes lacquer, foil, and metal easier to read. Direct flash produces small, intense highlights that can completely erase printed lettering.
 
@@ -24,6 +28,8 @@ Window light can work well if it is indirect and stable. A sheer curtain acts as
 Glossy lacquer creates one of the biggest challenges. The barrel behaves like a narrow curved mirror, so even a large light source can produce a bright stripe along the length of the pencil. Moving the light slightly or rotating the pencil often reveals lettering that looked invisible a moment earlier.
 
 Foil stamping requires special attention. Metallic gold and silver can appear black, white, or invisible depending on angle. Rather than trying to find one “perfect” exposure, take several photographs with slight changes in rotation. The best documentation image is the one that makes the imprint legible.
+
+## A Standard Sequence of Views
 
 A full-length photograph should come first. It records overall color, barrel shape, imprint placement, ferrule, eraser, end treatment, and whether the pencil is sharpened. This image acts as the visual equivalent of a catalog overview.
 
@@ -43,6 +49,8 @@ Untipped pencils require an end view. The rear end can reveal lacquer treatment,
 
 If the pencil is sharpened, photograph the point. This records wood color, grain, core diameter, centering, sharpening geometry, and signs of core fracture. A collector may later forget whether a pencil arrived sharpened or was sharpened after acquisition; a dated photograph removes that ambiguity.
 
+## Macro, Depth of Field and Perspective
+
 Macro photography is especially useful for imprint wear, foil defects, lacquer cracks, ferrule corrosion, and wood grain. A phone with a good close-focus camera may be sufficient, but dedicated macro lenses provide better control over magnification and perspective.
 
 Depth of field becomes very shallow at close distances. Stopping down the aperture on a camera helps, but very small apertures can reduce sharpness through diffraction. The practical solution is often to move slightly farther away and crop rather than trying to fill the frame completely.
@@ -52,6 +60,8 @@ For extremely detailed documentation, focus stacking can be useful. Several phot
 Perspective should be controlled. A pencil photographed from a steep angle can appear shorter at one end and wider at the other. For measurements and catalog comparison, keep the camera sensor as parallel as possible to the pencil's long axis.
 
 A tripod or fixed support improves consistency. Even a small tabletop stand can keep framing and distance constant while dozens of pencils are photographed. This makes later side-by-side comparison much easier.
+
+## Scale and Color Accuracy
 
 Scale should be documented in at least one image. A ruler or measurement grid placed beside the pencil records actual length and helps distinguish standard pencils from golf pencils, jumbo pencils, or unusual promotional formats.
 
@@ -63,6 +73,8 @@ Using the same lighting and white-balance setting throughout a session improves 
 
 Editing should be restrained. Correcting exposure, white balance, perspective, and crop is useful. Changing saturation, removing scratches, or cloning out defects destroys documentary value. A catalog photograph should show the object as it actually exists.
 
+## File Naming and Metadata
+
 File naming is one of the simplest ways to make photographs useful. “IMG_4837.jpg” tells you nothing. A name such as `STAEDTLER-NORIS-120-HB-variant-a-front.jpg` remains searchable years later.
 
 A consistent naming scheme can include manufacturer, model, grade, variant, view, and acquisition number. If the collection already uses database IDs, the same ID should appear in the image filename.
@@ -70,6 +82,8 @@ A consistent naming scheme can include manufacturer, model, grade, variant, view
 Folder structure matters too. One folder per manufacturer or one folder per catalog number both work, but the system should be predictable. Avoid relying on date-created folders if your main goal is object retrieval rather than photography history.
 
 Metadata can add another layer. EXIF fields already record camera and exposure information. IPTC or XMP fields can store title, description, keywords, and copyright. For large collections, however, a spreadsheet or database is usually more efficient than embedding every piece of collection data inside image files.
+
+## Batch Work, Boxes and Condition
 
 Batch photography saves enormous time. Set up the background, lights, tripod, and camera once, then photograph many pencils using the same sequence: full length, imprint, rotation, ferrule, end, point, and measurement image.
 
@@ -83,6 +97,8 @@ Condition photography should include defects deliberately. Chips, cracks, faded 
 
 Repeated photographs can act as preservation records. A ferrule photographed today and again five years later may reveal increasing corrosion. An eraser that begins to crack can be tracked. This turns photography into a basic conservation tool.
 
+## Reflective Metal and Phones
+
 Reflective metal can be difficult to photograph because it mirrors the room. A simple white card placed near the ferrule can create a clean controlled reflection and make the shape easier to see.
 
 Black cards can be used in the opposite way. They create dark reflected edges that help define shiny cylindrical surfaces. This technique is common in product photography and works surprisingly well on ferrules.
@@ -94,6 +110,8 @@ Phones are perfectly capable of producing useful collection images if technique 
 Computational sharpening can sometimes make phone images look more detailed than they really are. For archival work, check the original image at full size to ensure small lettering has not been distorted by aggressive processing.
 
 High resolution is useful, but consistency is more important than megapixel count. A technically perfect 50-megapixel image that cannot be matched to the correct catalog entry is less useful than a modest but correctly named, consistently framed record.
+
+## Backups and a Practical Catalog Set
 
 Backups are essential. The collection archive should exist in more than one location. At minimum, keep the working copy and one independent backup. If the images are irreplaceable, an off-site or cloud copy adds another layer of protection.
 

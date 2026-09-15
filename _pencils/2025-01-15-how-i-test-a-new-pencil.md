@@ -13,6 +13,8 @@ When a new pencil enters my collection, I try not to judge it from a single scri
 
 A useful pencil test does not need laboratory equipment. It needs repeatable conditions.
 
+## Control What Can Be Controlled
+
 The first rule is to control what can be controlled. I use the same papers, the same sharpeners, similar point geometry, and roughly the same writing pressure whenever I compare pencils. The goal is not to eliminate subjectivity. The goal is to make the subjective observations more meaningful.
 
 I begin before sharpening.
@@ -28,6 +30,8 @@ I record the imprint exactly when the pencil is vintage or potentially interesti
 Then I photograph the pencil before use.
 
 An unsharpened photograph preserves factory condition. Once the sharpener removes the end, that state cannot be reconstructed.
+
+## The First Sharpening
 
 The first sharpening is one of the most informative parts of the test.
 
@@ -60,6 +64,8 @@ The wood itself is worth noting.
 Color, grain fineness, smell, and how cleanly it cuts all contribute to the experience.
 
 I avoid identifying wood species from appearance alone unless the manufacturer documents it.
+
+## The Writing Sample
 
 The next step is a normal writing sample.
 
@@ -109,6 +115,8 @@ A firmer pencil may be less dramatic but remain useful much longer.
 
 That tradeoff is central to performance.
 
+## Lines, Gradients and Shine
+
 Next I make controlled lines.
 
 I draw several parallel strokes at light, medium, and heavy pressure.
@@ -143,6 +151,8 @@ Others remain visually darker at oblique angles.
 
 Graphite shine is not automatically bad, but it matters for drawing.
 
+## Smudging and Erasing
+
 I test smudging after a consistent delay.
 
 A fresh mark is more vulnerable than one that has sat for several minutes.
@@ -169,6 +179,8 @@ That is a paper effect as much as a pencil effect.
 
 I therefore avoid blaming the core for grooves created by excessive pressure.
 
+## Paper Is the Largest Variable
+
 Paper is one of the largest variables in pencil testing.
 
 I never rely on one sheet alone.
@@ -188,6 +200,8 @@ I also check performance on paper with a different color if that matters to the 
 Hard grades can look much paler on cream paper than on bright white stock.
 
 Contrast changes perception.
+
+## The Second Sharpening
 
 The second sharpening is important.
 
@@ -210,6 +224,8 @@ I check how cleanly the eraser removes the pencil's own mark, whether it smears,
 Ferrule stability is easy to ignore until repeated erasing makes it rotate or loosen.
 
 For drawing pencils without attached erasers, I focus more on tonal control, layering, point retention, and side shading.
+
+## Purpose Before Ranking
 
 The weighting of the test depends on the intended role.
 
@@ -282,6 +298,8 @@ For example, smoothness 4/5 and point retention 2/5 can communicate a useful con
 But the written description remains more important.
 
 “Dark, low-friction HB with fast point wear and moderate smudging” is more informative than “8.5/10.”
+
+## Delayed Judgment
 
 The final step is delayed judgment.
 

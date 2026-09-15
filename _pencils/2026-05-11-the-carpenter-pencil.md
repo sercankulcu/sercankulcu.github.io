@@ -14,6 +14,8 @@ A carpenter pencil looks like someone took an ordinary pencil and pressed it fla
 
 That strange geometry is not decorative. It is a compact example of design shaped almost entirely by the environment in which the tool is used.
 
+## Geometry Shaped by the Job Site
+
 A conventional writing pencil works well on a desk. A carpenter may be standing on a ladder, kneeling beside framing lumber, balancing tools on a roof, or marking a rough piece of timber. In those situations, a round pencil has an obvious weakness: put it down on a sloped surface and it can simply roll away.
 
 The broad, flat body of a carpenter pencil largely solves that problem.
@@ -27,6 +29,8 @@ Instead of the narrow cylindrical core associated with a writing pencil, carpent
 Rough-sawn lumber is very different from notebook paper.
 
 The fibers are uneven. Saw marks, dust, grain, moisture, and construction debris can all interfere with a fine graphite point. A carpenter pencil is expected to leave a visible line anyway.
+
+## One Core, Several Line Widths
 
 The flat core also gives the user more than one line width.
 
@@ -48,6 +52,8 @@ The barrel itself is robust for the same reason.
 
 A carpenter pencil has enough wood around the core to tolerate being carried in a tool belt with metal tools. Its broad sides are also easier to grip when hands are dusty or when gloves make fine finger control more difficult.
 
+## Is It Still the Same Object?
+
 The design is so specialized that it raises an interesting question: is this still really the same object as a writing pencil?
 
 Technically, yes. It is still a graphite-based marking core enclosed in wood and exposed by sharpening.
@@ -55,6 +61,8 @@ Technically, yes. It is still a graphite-based marking core enclosed in wood and
 Functionally, however, almost every dimension has been renegotiated.
 
 The body is wider because rolling matters more than compactness. The core is flatter because durability and line variation matter more than a symmetrical point. The sharpening method changes because a knife can create geometry that a normal rotary sharpener cannot. Even the way the pencil is held and rotated is tied to the mark being made.
+
+## A Different Collecting Category
 
 For collectors, carpenter pencils open a category that is very different from premium drawing pencils.
 
@@ -73,6 +81,8 @@ Some examples are almost rectangular. Others have clipped or rounded corners, pr
 These variations are not trivial.
 
 Sharper corners give broad surfaces and clear indexing in the hand, while more rounded edges can make prolonged use more comfortable. As with ordinary hexagonal pencils, a few millimeters of geometry change the entire tactile experience.
+
+## There Is No Single Ideal Pencil Shape
 
 The carpenter pencil also illustrates something that is easy to miss when looking only at stationery-store pencils.
 

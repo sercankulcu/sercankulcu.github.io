@@ -12,6 +12,8 @@ tags:
 
 A pencil eraser looks like a single piece of soft material, but its job depends on a carefully balanced mixture of elasticity, friction, filler, and controlled wear.
 
+## Polymer, Filler and Oil
+
 Modern erasers are commonly built around either rubber-like materials or plastic-based compounds. Faber-Castell describes rubber and plastic as the two basic material families used for erasers, and its current ranges include both caoutchouc-based and plastic PVC-free products. The distinction matters because the base material affects softness, smear resistance, aging, and the way the eraser produces crumbs.
 
 An eraser does not simply scrape graphite away like sandpaper. When graphite is rubbed onto paper, particles lodge on and between the paper fibers. During erasing, the eraser surface grips part of that deposited material while also wearing away itself. The dark crumbs left behind are therefore evidence of the process: eraser material and removed graphite have become mixed together.
@@ -23,6 +25,8 @@ Fillers are especially important. Patent formulations for modern erasers include
 That last point explains why not every eraser should be used on every mark.
 
 A soft graphite eraser is designed to remove pencil deposits while disturbing the paper as little as practical. An ink eraser may use a more abrasive formulation because ordinary ink penetrates or bonds to the surface differently. Faber-Castell still sells combination erasers with one side for graphite and another for ink, which is a useful reminder that “erasing” is not a single material problem.
+
+## Wear Is the Point
 
 The crumbs themselves are part of the design. One patented eraser formulation describes the material as forming a polymeric film that interacts with the mark and captures it in the eraser matrix. As the eraser is moved back and forth, that material rolls or gathers into pieces that can be brushed away. The ideal result is not zero wear; it is controlled wear that carries the unwanted mark with it.
 
@@ -39,6 +43,8 @@ An aged one may shrink away from the ferrule, harden, crack, discolor, become st
 Those changes can help explain storage history, but they can also damage the pencil. A deteriorating eraser can stain paper sleeves, transfer residue to neighboring pencils, or place stress on the ferrule if it shrinks unevenly.
 
 Testing a vintage eraser therefore deserves caution. Using it may permanently flatten the end, shed irreplaceable material, or expose a color that had been protected from light inside the ferrule. If the pencil is scarce, it is usually more useful to document the eraser's dimensions, color, texture, and condition than to prove that it can still erase.
+
+## Ferrule, Eraser and Barrel as One System
 
 Modern attached erasers also reveal how tightly the material formula is connected to mechanical design. The plug has to be soft enough to erase but firm enough to survive insertion and crimping. If it compresses too easily, the ferrule may not hold it securely. If it is too rigid, it may crack during assembly or feel harsh on paper.
 

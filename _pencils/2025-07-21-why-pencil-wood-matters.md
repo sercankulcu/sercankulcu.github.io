@@ -13,6 +13,8 @@ The wood around a pencil core is easy to overlook until sharpening goes badly. T
 
 A wooden pencil is not simply graphite wearing a decorative shell. The casing protects the core, gives the hand something to grip, determines how cleanly the point can be renewed, and absorbs much of the mechanical abuse the pencil experiences.
 
+## What Pencil Wood Has to Do
+
 The ideal pencil wood has to satisfy several requirements at once.
 
 It should be soft enough to sharpen without excessive force.
@@ -41,6 +43,8 @@ A well-prepared basswood or another suitable species can make an excellent penci
 
 Performance matters more than mythology.
 
+## Before the Factory: Sawing, Drying, Grading
+
 Wood selection begins before the pencil factory receives a finished slat.
 
 Logs must be sawn, dried, graded, and converted into boards or slats with controlled dimensions.
@@ -60,6 +64,8 @@ Wood that is too dry can become brittle.
 Large changes after gluing can stress the sandwich structure.
 
 Dimensional stability therefore affects both appearance and core protection.
+
+## The Sandwich and Core Centering
 
 The classic pencil sandwich places several cores between two grooved wooden slats.
 
@@ -93,6 +99,8 @@ Very oily, contaminated, or poorly prepared surfaces can weaken bonding.
 
 This is one reason material preparation matters as much as species.
 
+## Shaping and What the Barrel Records
+
 After gluing, the sandwich is shaped into individual barrels.
 
 Hexagonal, round, triangular, and specialty profiles all require controlled cutting.
@@ -118,6 +126,8 @@ Fuzzy grain, chipped corners, or irregular facets often reveal weaker machining 
 Lacquer hides some of this evidence.
 
 Heavy paint can make a mediocre wood surface look smooth from the outside.
+
+## Sharpening Removes the Disguise
 
 Sharpening removes that disguise.
 
@@ -209,6 +219,8 @@ So do knots and variation, if the manufacturer allows them.
 
 Premium natural pencils often rely on careful slat selection because defects cannot be hidden under paint.
 
+## Identifying Species Honestly
+
 Collectors should be cautious when identifying species visually.
 
 Color alone is unreliable.
@@ -258,6 +270,8 @@ A sealed box may have protected pencils from light and abrasion.
 It may also have trapped moisture or odors.
 
 Condition must be judged object by object.
+
+## Sustainability and Alternative Woods
 
 Wood species also interacts with sustainability.
 
@@ -323,6 +337,8 @@ Average timber can perform very well if it is selected, dried, machined, and bon
 
 Process matters.
 
+## Sharpening Angle and Long-Term Use
+
 The interaction with sharpening angle is especially revealing.
 
 A short-point sharpener removes less wood and supports the core strongly.
@@ -374,6 +390,8 @@ Core.
 Geometry.
 
 No single part works alone.
+
+## Good Pencil Wood Is Processed Wood
 
 This is why the phrase “good pencil wood” should not be reduced to species name.
 

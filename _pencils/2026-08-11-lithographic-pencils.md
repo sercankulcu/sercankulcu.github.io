@@ -15,6 +15,8 @@ A lithographic pencil does something an ordinary graphite pencil is not designed
 
 It creates a drawing that can become a printing surface.
 
+## Grease and Water
+
 The distinction begins with grease.
 
 Traditional lithography is based on the fact that grease and water resist one another. An artist draws on a prepared limestone surface with a greasy crayon, pencil, or liquid tusche. The stone is then chemically processed so that the drawn areas remain receptive to oily printing ink while the untouched areas accept water and repel that ink.
@@ -30,6 +32,8 @@ A graphite pencil deposits graphite because the writer wants a visible line.
 A lithographic pencil deposits a greasy drawing material because the printer wants the marked region to behave differently from the unmarked stone.
 
 The line is both image and chemistry.
+
+## Senefelder and Planographic Printing
 
 Lithography emerged at the end of the eighteenth century through the experiments of Alois Senefelder.
 
@@ -85,6 +89,8 @@ The gestures of drawing could enter printmaking more directly.
 
 The lithographic pencil was one of the tools that made that possible.
 
+## Not a Graphite Pencil
+
 It should not be confused with a conventional graphite drawing pencil.
 
 Traditional lithographic drawing materials contain substantial greasy or waxy components.
@@ -104,6 +110,8 @@ Their exact recipes have varied across manufacturers and periods, but traditiona
 The black color is useful to the artist.
 
 The grease is essential to the process.
+
+## Numbered Grades Mean Grease
 
 This produces a grading system that looks familiar but means something different from HB, B, and H.
 
@@ -130,6 +138,8 @@ The correct grade depends on the image.
 A printmaker building a dark, broad mass may want a soft material.
 
 Someone drawing fine architectural detail may prefer a harder lithographic pencil.
+
+## The Stone Contributes
 
 The stone contributes to the result too.
 
@@ -159,6 +169,8 @@ Pressure therefore affects more than darkness on the original stone.
 
 It influences the density of the eventual printed mark.
 
+## A Surface That Remembers Everything
+
 A lithographic pencil is also unusually sensitive to contamination.
 
 The artist's hand contains grease.
@@ -184,6 +196,8 @@ Corrections matter.
 Even a careless touch can become printable information.
 
 The artist is drawing on a surface that remembers grease.
+
+## From Drawing to Printing Surface
 
 Once the image is finished, the printer begins a sequence that can seem almost magical if you only know graphite pencils.
 
@@ -239,6 +253,8 @@ One surface economizes writing.
 
 The other multiplies images.
 
+## Pencil, Crayon, Chalk, Tusche
+
 Lithography also explains why the words pencil, crayon, chalk, and tusche can overlap confusingly in printmaking catalogs.
 
 A lithographic crayon may be a rectangular or cylindrical stick of greasy drawing material.
@@ -264,6 +280,8 @@ Other plate-based systems exist as well.
 But the basic grease-and-water logic remains recognizable.
 
 An artist still creates an image with materials that establish ink-receptive areas.
+
+## Collecting Them
 
 That continuity is important for collectors.
 
@@ -326,6 +344,8 @@ A slate pencil belongs on slate.
 A lithographic pencil belongs inside lithography.
 
 Remove the working surface and the object becomes easy to misunderstand.
+
+## One Line, Many Sheets
 
 There is another reason this category deserves space in a pencil collection.
 

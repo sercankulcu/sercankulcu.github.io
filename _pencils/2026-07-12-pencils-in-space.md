@@ -16,11 +16,15 @@ The most famous story about writing in space is also one of the most misleading.
 
 According to the popular version, NASA spent millions of dollars inventing a pen that could write in zero gravity while Soviet cosmonauts solved the same problem with an ordinary pencil. The real history is more interesting. Both Americans and Soviets used pencils, NASA later adopted the Fisher Space Pen, and the pen itself was developed privately rather than through a multimillion-dollar NASA invention program.
 
+## Pencils Were There from the Beginning
+
 Pencils were present in the American space program from the beginning. The Smithsonian preserves a notepad and pencil issued to John Glenn for the Friendship 7 mission in February 1962. The pencil was attached with nylon cord so it would not float away, an early example of how even a familiar writing tool had to be adapted for microgravity.
 
 NASA continued using pencils during Project Gemini. Mechanical pencils were attached to spacecraft interiors with retractable cords, allowing astronauts to make notes, record anomalies, and work with flight documents without losing the writing instrument inside the cabin.
 
 The choice of a mechanical pencil made sense. It avoided the need for a sharpener, provided a consistently narrow point, and could be built in a sturdy metal body. But it was not a perfect solution.
+
+## The Real Problem Was Floating Graphite
 
 Broken graphite was the main concern.
 
@@ -34,6 +38,8 @@ NASA also encountered another issue: cost. The National Air and Space Museum rec
 
 The Apollo program still carried mechanical pencils.
 
+## The Garland 35-P on Apollo
+
 One of the best documented examples is the Garland 35-P. The Smithsonian preserves Garland mechanical pencils associated with Apollo 11, including examples connected with Michael Collins. These were polished chrome pencils with a twist mechanism for advancing the lead.
 
 NASA purchased Garland pencils from Lew Manufacturing of Rhode Island for Apollo and Skylab use. A piece of Velcro was added to the barrel so the pencil could be fixed to the spacecraft interior instead of drifting around the cabin.
@@ -45,6 +51,8 @@ Astronauts used these pencils for practical work rather than ceremony.
 They wrote notes and made alterations to flight plans.
 
 That detail matters because Apollo paperwork was not static. Mission crews had procedures, checklists, charts, and plans that sometimes needed to be amended during flight. A pencil remained useful precisely because it could make an immediate mark without batteries, ink flow, or complicated hardware.
+
+## Where the Fisher Space Pen Came From
 
 The Fisher Space Pen entered this environment in the late 1960s.
 
@@ -59,6 +67,8 @@ NASA later adopted it broadly, and Soviet cosmonauts began using Fisher pens as 
 Pencils did not disappear instantly.
 
 Apollo-era collections show that mechanical pencils and Space Pens overlapped. The transition was practical rather than theatrical. NASA was replacing a tool that worked but carried small debris risks with one that could write in microgravity without producing graphite fragments.
+
+## Why the Ordinary Details Matter
 
 For collectors, space-program pencils are fascinating because ordinary design features suddenly acquire aerospace reasons.
 

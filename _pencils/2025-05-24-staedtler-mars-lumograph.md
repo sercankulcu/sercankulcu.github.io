@@ -11,6 +11,8 @@ tags:
 
 The blue barrel of the STAEDTLER Mars Lumograph has become one of the most recognizable forms in professional graphite drawing. It is not simply a blue pencil available in many grades. It belongs to a product line that helped make graded drawing pencils into a systematic professional tool.
 
+## The Mars Name Since 1900
+
 The history of the Mars name reaches back more than a century.
 
 STAEDTLER states that the Mars word mark was applied for in 1900 and registered in 1901. The name became associated with the company's premium products and eventually with the blue that still identifies the line.
@@ -31,6 +33,8 @@ A modern pencil is instantly recognizable, but older examples can differ in logo
 
 The basic form stays familiar while small production details change.
 
+## Twenty-Four Grades
+
 The current standard Mars Lumograph 100 range is unusually broad.
 
 STAEDTLER lists twenty-four grades from 12B through 10H.
@@ -44,6 +48,8 @@ At the soft end, the pencil behaves almost like a compact graphite drawing stick
 At the hard end, it becomes a precision instrument capable of fine, pale, point-retentive lines.
 
 The same blue barrel therefore covers a remarkable range of behavior.
+
+## Core Diameter Changes With the Grade
 
 Core diameter changes across the range.
 
@@ -81,6 +87,8 @@ A conventional sharpener works well for ordinary middle grades.
 
 Very soft grades may benefit from careful blade condition, shorter support, or manual refinement.
 
+## HB Is One Manufacturer's Interpretation
+
 The grade range also exposes the limitations of treating H and B labels as universal measurements.
 
 A STAEDTLER HB is STAEDTLER's interpretation of HB.
@@ -111,6 +119,8 @@ Soft grades glide more easily and cover more tooth.
 
 This is why a full-range test is more revealing than a single HB review.
 
+## Drafting and Drawing in One Family
+
 The hard grades historically align with drafting and technical traditions.
 
 Before CAD displaced much manual drawing, architects, engineers, and draftsmen depended heavily on controlled line weight, clean reproduction, and stable points.
@@ -138,6 +148,8 @@ This metallic lustre is a normal property of graphite rather than a manufacturin
 It is also why the darkest graphite does not behave like charcoal.
 
 A heavily worked 8B or 12B graphite area can look dark from one angle and silvery from another.
+
+## Mars as a Platform
 
 STAEDTLER now offers related Mars Lumograph variants that address different drawing needs.
 
@@ -173,6 +185,8 @@ Practically, it protects the wood and provides a consistent tactile surface.
 
 Historically, it makes production changes easier to compare because the overall color identity remains stable while smaller details evolve.
 
+## Imprint and Packaging
+
 The imprint deserves close inspection.
 
 Logo form, font, grade placement, “Made in Germany” wording, registered marks, article numbers, and other details can help separate generations.
@@ -200,6 +214,8 @@ Their larger cores, faster wear, broader side strokes, and different handling ma
 Likewise, 8H, 9H, and 10H are not ordinary writing pencils made slightly harder.
 
 They belong to a precision end of the scale where line control and low deposition become central.
+
+## Testing Across Papers
 
 Paper choice changes the experience across the range.
 
@@ -238,6 +254,8 @@ An excellent graphite formula is frustrating if the barrel splinters or the core
 The Mars Lumograph's reputation therefore depends on the complete object, not only the grade printed near the end.
 
 Core centering, bonding, lacquer, wood, typography, and grade consistency all contribute.
+
+## A Reference Specimen
 
 This is why the pencil works well as a reference specimen.
 

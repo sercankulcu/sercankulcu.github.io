@@ -12,9 +12,13 @@ tags:
 
 The colored surface of a wooden pencil is easy to dismiss as decoration, but lacquer is part of the pencil’s construction. It changes how the barrel feels in the hand, how easily the wood absorbs moisture and dirt, how well printed markings adhere, how the pencil survives repeated handling, and how the object ages in a collection. Two pencils made from similar wood and graphite can feel surprisingly different because their finishes were built in different ways.
 
+## Protection and Grip
+
 A bare wooden barrel is porous. It can absorb oils from the hand, pick up dirt, and respond quickly to changes in humidity. A lacquered surface slows that interaction by sealing the exterior. The coating does not make the pencil waterproof, because moisture can still move through exposed end grain, sharpened wood, ferrule joints, and microscopic defects, but it reduces direct contact between the environment and most of the barrel.
 
 The finish also changes grip. A high-gloss lacquer can feel smooth and almost slippery when new, while a matte or satin finish creates more friction. Some manufacturers deliberately leave wood partially or completely unfinished to create a warmer, more tactile surface. Others build a thick, polished coating that makes the pencil feel more like a small lacquered object than a piece of wood.
+
+## Applying It Evenly
 
 Applying lacquer evenly to a pencil is more difficult than it appears. A pencil is narrow, long, and often faceted. The coating must cover flat faces and edges without creating heavy ridges, drips, or thin spots. Hexagonal pencils are especially revealing because lacquer can accumulate along corners or leave different gloss levels on adjacent faces if the application is inconsistent.
 
@@ -28,9 +32,13 @@ Primer or undercoat can matter as much as the visible color. Light-colored lacqu
 
 Foil stamping and printed imprints depend on the finish beneath them. The surface needs to be smooth enough for letters to transfer cleanly and stable enough that the imprint does not flake away immediately. If a manufacturer changes lacquer chemistry, the same foil or printing process may behave differently. This is why typography, lacquer, and finishing should be considered together rather than as unrelated features.
 
+## How Lacquer Behaves in the Sharpener
+
 The lacquer also affects sharpening. A brittle coating can chip along the freshly cut edge, especially with a dull blade or aggressive sharpener. A more flexible finish may cut cleanly with the wood. Chipping near the point is not always a sign of poor wood; sometimes it is the finish that is failing under the cutter.
 
 Collectors can learn a great deal from this behavior. A pencil whose lacquer consistently fractures during sharpening may have a hard, brittle coating or may have aged in a way that reduced flexibility. Another pencil may produce a clean spiral of lacquer and wood with almost no edge damage. These differences are part of the physical character of the model.
+
+## Wear Patterns and Storage
 
 Wear patterns are equally informative. High points on a hexagonal barrel often lose lacquer first because they receive the most contact in a pocket, case, or hand. Gold foil may disappear before the surrounding paint. Glossy finishes can become matte where fingers repeatedly touch them, while matte finishes can become polished through use.
 
@@ -41,6 +49,8 @@ Storage conditions can alter lacquer even when a pencil has never been used. Hea
 Vintage pencils sometimes develop a fine network of cracks in the finish. This can happen when the coating and wooden substrate respond differently to decades of temperature and humidity changes. The result may look attractive to a collector, but it is also evidence of material aging rather than intentional design.
 
 Smell can occasionally provide another clue, although it should be treated cautiously. Fresh lacquer, cedar, adhesives, and erasers can all contribute to the scent of a new pencil, while old coatings may lose volatile components over time. A strong chemical odor in a vintage pencil can indicate later contamination or storage rather than original manufacture.
+
+## Documenting the Finish
 
 From a collecting perspective, lacquer should be documented as carefully as the imprint. Note whether the surface is glossy, satin, matte, unfinished, metallic, translucent, or opaque. Look for visible primer, edge pooling, chips, cracks, fading, discoloration, and differences between pencils from the same box.
 

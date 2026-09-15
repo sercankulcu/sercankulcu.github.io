@@ -14,6 +14,8 @@ tags:
 
 South Korea is famous for electronics, automobiles, and modern design, but its stationery industry has a much older industrial story than many collectors realize. Dong-A Pencil sits near the beginning of that story. Founded in 1946, the company is described by the Korean government as the country’s first stationery company, and pencil manufacturing was its starting point.
 
+## Founded in the Year After Occupation
+
 The timing matters. Korea had just emerged from Japanese colonial rule in 1945, and domestic manufacturing capacity was limited. According to a Korean government profile, founder Kim Jeong-woo brought pencil-making knowledge back from Japan after learning the technology at Mitsubishi. In 1946 he established Dong-A Pencil and began building a Korean stationery business around an object that every school, office, and household needed.
 
 That origin gives Dong-A a different place in pencil history from the older European manufacturers. Faber-Castell, Staedtler, and Koh-I-Noor developed in regions where pencil production had already existed for generations. Dong-A began in a country rebuilding its industrial base. The pencil was not a novelty there; the challenge was producing it domestically and reliably at scale.
@@ -21,6 +23,8 @@ That origin gives Dong-A a different place in pencil history from the older Euro
 The company name still preserves that origin. Even after expanding into ballpoint pens, crayons, paints, markers, mechanical pencils, and other stationery, the business remained Dong-A Pencil Co. The current company site still presents the brand with the phrase “Since 1946,” while government business records classify it as a manufacturer established that year.
 
 For collectors, this makes early and mid-century Dong-A pencils especially interesting. They document more than a single brand. They belong to the development of South Korea’s domestic stationery industry. Barrel markings, Korean typography, grade designations, packaging language, and changes in logos can all help place a pencil within that broader industrial history.
+
+## What the Mitsubishi Connection Means
 
 The Mitsubishi connection is also worth noting carefully. It does not mean that Dong-A was simply a Korean version of Mitsubishi Pencil. The Korean government’s account says Kim Jeong-woo learned pencil technology at Mitsubishi and then brought that knowledge into Korea. What followed was an independent Korean company that developed its own products, distribution, and identity.
 
@@ -31,6 +35,8 @@ Dong-A expanded steadily beyond graphite pencils. The company added ballpoint pe
 The company also became highly visible in national events. Korean government sources note that Dong-A held official merchandising rights connected with the 1986 Asian Games and the 1988 Seoul Olympics. Those events helped present South Korea as a modern industrial nation, and stationery bearing official event branding became part of that consumer landscape.
 
 For a collector, such event-related products can be more informative than a standard production pencil. They provide a fixed historical context, often with dated logos, packaging, or promotional graphics. A pencil that might otherwise be difficult to place can become much easier to date when tied to a known event.
+
+## Eighty Years Later
 
 Dong-A reached another milestone in 2026: its 80th anniversary. The company marked the occasion with a heritage project called DONG-A 1946, using the hexagonal geometry associated with pencils as part of the design language of a limited wood-bodied writing instrument. Even though the anniversary product is not a conventional wooden pencil, the choice of form is revealing. Eight decades after the company expanded far beyond pencils, the hexagonal pencil body still represents its origin story.
 

@@ -13,6 +13,8 @@ The hexagonal pencil is so familiar that its shape rarely receives attention. Ye
 
 That combination helps explain why the hexagon became one of the dominant forms of the wooden pencil.
 
+## Manufacturing Geometry
+
 The story begins with manufacturing geometry.
 
 A traditional wood-cased pencil starts as two slats. Grooves are cut into the wood, cores are placed in one slat, adhesive is applied, and the second slat is bonded on top. The result is a flat pencil sandwich containing several parallel cores.
@@ -39,6 +41,8 @@ Opposite flats can be controlled precisely.
 
 That makes the pencil compatible with ferrule machinery, printing equipment, packaging trays, and sharpeners.
 
+## Anti-Roll
+
 The anti-roll advantage is equally obvious.
 
 Place a round pencil on a slightly sloped desk and it can begin moving immediately.
@@ -56,6 +60,8 @@ A pencil that stays on the desk is less likely to fall, break its point, or disa
 Anti-roll behavior is especially useful when the pencil is sharpened to a fragile long point.
 
 Preventing one fall can save several millimeters of material.
+
+## Six Printing Surfaces
 
 The six flats also create excellent printing surfaces.
 
@@ -115,6 +121,8 @@ They can.
 
 But hexagonal geometry simplifies certain processes.
 
+## Lacquer Softens the Corners
+
 The shape also works well with lacquer.
 
 Each flat can receive a consistent coating while the corners remain visible.
@@ -148,6 +156,8 @@ It gives orientation without forcing one exact grip.
 For ordinary handwriting, that is a useful compromise.
 
 The thumb and fingers can rest across flats and corners in many combinations.
+
+## Rotation and Point Management
 
 The barrel can also be rotated deliberately.
 
@@ -211,6 +221,8 @@ Matte hexagons.
 
 The six-sided concept remains constant while the tactile result changes.
 
+## Packing, Shipping and Retail
+
 The hexagon also interacts well with pencil cases and boxes.
 
 Flat-sided pencils pack predictably.
@@ -230,6 +242,8 @@ In shipping, reduced movement can also mean less cosmetic damage.
 Less rubbing means less lacquer wear.
 
 The geometry therefore contributes to preservation before the pencil even reaches the user.
+
+## A Practical Form Becomes a Convention
 
 There is also a visual reason the hexagon persisted.
 
@@ -327,6 +341,8 @@ Visually familiar.
 
 That package of advantages is difficult to beat.
 
+## What Collectors Read From the Flats
+
 Collectors can read those advantages directly from old pencils.
 
 Wear on corners shows how the object was handled.
@@ -372,6 +388,8 @@ Because distance from the central core to the middle of a flat is shorter than d
 An off-center core becomes obvious when one side reaches graphite earlier.
 
 That is useful both for quality control and collector inspection.
+
+## Why Alternatives Have Not Displaced It
 
 Manufacturers have experimented repeatedly with alternatives.
 

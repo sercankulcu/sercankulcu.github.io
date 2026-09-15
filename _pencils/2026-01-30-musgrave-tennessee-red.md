@@ -12,6 +12,8 @@ tags:
 
 Musgrave Pencil Company began with wood before it began with pencils.
 
+## From Slats to Pencils
+
 James Raford Musgrave founded the company in Shelbyville, Tennessee, in 1916. Middle Tennessee had an abundant supply of Eastern red cedar, a fragrant, fine-grained wood that had already proved useful for pencil making. Musgrave cut the cedar into slats and shipped them to pencil manufacturers in Europe.
 
 Only later did the company become a pencil maker itself.
@@ -29,6 +31,8 @@ By the 1920s, the company was already using California incense cedar as Tennesse
 The Tennessee Red brings the older wood back.
 
 That is what makes the pencil interesting.
+
+## Clear Coat Over Tennessee Cedar
 
 The Tennessee Red is not simply a modern No. 2 with a regional name. Musgrave created it after obtaining pencil-ready slats of Eastern red cedar. The finished pencil leaves that wood almost completely visible.
 
@@ -53,6 +57,8 @@ The factory is still in Shelbyville.
 This makes Tennessee Red unusual in a market where many pencils use branding that could belong almost anywhere.
 
 Its regional identity is part of the material itself.
+
+## The Smell Is the Point
 
 The strongest sensory feature is not visual.
 
@@ -85,6 +91,8 @@ That simplicity makes comparison easier.
 Put a Tennessee Red beside an ordinary incense-cedar No. 2 and sharpen both.
 
 The differences in wood become visible immediately.
+
+## Musgrave Is Open About the Defects
 
 Eastern red cedar is not as dimensionally predictable as the material modern pencil factories usually prefer.
 
@@ -125,6 +133,8 @@ That tells us something about how specialized the wood is in a modern production
 The pencil factory was optimized over decades around predictable materials.
 
 Reintroducing an older wood means rediscovering some of its complications.
+
+## The History Loops Back
 
 The history loops back on itself.
 
@@ -168,6 +178,8 @@ A Bruynzeel can represent Dutch postwar pencil production.
 
 The Tennessee Red represents a much more regional American story: cedar, Shelbyville, and a factory that began by exporting slats.
 
+## Packaging and What to Catalog
+
 Packaging strengthens that connection.
 
 The standard twelve-pack uses a red paper box.
@@ -207,6 +219,8 @@ Any centering variation becomes measurable.
 A pristine pencil preserves factory condition, but a sharpened example explains the material.
 
 The two-pencil approach makes particular sense here.
+
+## Variation Instead of Consistency
 
 The Tennessee Red also changes how we think about “consistency.”
 
@@ -253,6 +267,8 @@ It moved because manufacturing at scale requires material that can be sourced an
 Tennessee Red deliberately steps away from some of that industrial convenience.
 
 The result is a pencil that looks less uniform but tells a clearer material story.
+
+## The Body, Not Just the Core
 
 That is why I would not compare it to a Ticonderoga or a Blackwing only by writing feel.
 

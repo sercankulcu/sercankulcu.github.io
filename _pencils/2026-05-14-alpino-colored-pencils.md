@@ -14,6 +14,8 @@ tags:
 
 Some pencil companies begin with graphite, machinery, or a famous inventor. Alpino began with leftover wood.
 
+## From Toy-Factory Scraps
+
 The story starts in 1933 in Anglès, a town in Girona, where the Masats brothers were working around a family toy-making business. Instead of discarding the pieces of wood left over from toy production, they began using them to make pencils and colored leads. The first experiments were small and improvised, but the idea eventually developed into one of Spain’s most recognizable school-stationery brands.
 
 The business took time to stabilize. Alpino’s own history says that the operation began to succeed in 1942 and that the Alpino brand was formally founded in 1943. Three years later the company moved to Barcelona, where design, branding, and communication became increasingly important parts of the business.
@@ -23,6 +25,8 @@ That sequence makes Alpino different from many older European pencil companies. 
 Colored pencils became the center of the identity.
 
 Alpino still describes itself as a benchmark Spanish stationery brand and continues to sell colored pencils as one of its defining products. The current range includes standard school pencils, watercolor pencils, triangular pencils, erasable versions, pastel and fluorescent sets, and products intended for younger children.
+
+## The Box Became the Brand
 
 The brand’s packaging became almost as important as the pencils themselves.
 
@@ -37,6 +41,8 @@ The brand name also works unusually well with the imagery.
 “Alpino” immediately suggests mountains, and the mountain landscape became a recurring part of the package. The deer reinforces the outdoor image. Together they created a visual identity that could be understood by a child before the child was old enough to care about company history.
 
 For collectors outside Spain, that cultural familiarity can be easy to underestimate.
+
+## Why Wear Is Interesting
 
 An Alpino box is not rare simply because it is old. Millions of children used these pencils. Their importance comes from the opposite quality: they were ordinary enough to become part of shared school memory.
 

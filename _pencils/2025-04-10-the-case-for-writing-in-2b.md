@@ -11,15 +11,21 @@ tags:
 
 HB is treated as the default writing grade in many places, but 2B deserves to be considered as a serious everyday writing option rather than simply a drawing pencil. The attraction is easy to understand: a good 2B produces a dark, readable line with less pressure than a typical HB, and that changes the physical experience of handwriting.
 
+## The Scale Is Not Standardized
+
 The H–B scale is not internationally standardized down to an exact formula. Manufacturers adjust graphite, clay, binders, and lubricants differently, so one company's 2B may feel close to another company's B or even a dark HB. Faber-Castell, for example, explains hardness largely in terms of the graphite-to-clay balance and notes that the precise classification still depends on the manufacturer. That variation is important because “2B” describes a range of behavior rather than one universal composition.
 
 For handwriting, the most immediate advantage is lower required pressure. A softer core releases graphite more readily, so the writer does not have to force the point into the paper to achieve a clear line. Over long note-taking sessions, that can make the hand feel more relaxed, especially for people who naturally grip pencils too tightly.
 
 The visual difference is equally important. A 2B line usually has stronger contrast than HB on ordinary notebook paper. Under classroom lighting, office lighting, or low-contrast indoor conditions, darker handwriting is easier to scan quickly. This matters more than it may seem when a page contains dense notes, marginal comments, mathematical symbols, or small diagrams.
 
+## The Cost of Darkness
+
 The cost of that darkness is faster wear. A 2B point abrades more quickly because the core is softer and deposits more material per stroke. Fine handwriting can therefore broaden sooner than with HB. Someone writing small equations or annotations may need to rotate the pencil regularly or sharpen more often.
 
 Pencil rotation becomes a useful technique rather than a minor habit. If the writer turns the barrel slightly every few words, different parts of the point contact the paper and the tip wears more evenly. This helps maintain a narrower line without constant sharpening and makes 2B much more practical for continuous writing.
+
+## Paper, Smudging and Erasing
 
 Paper has a large effect on the result. On rough paper, a 2B core releases graphite rapidly and can feel noticeably softer than the same pencil on smooth notebook stock. Rough paper also shortens point life because the surface acts more aggressively on the core. Smooth paper preserves the point longer but may encourage graphite shine if heavy pressure is used.
 
@@ -29,9 +35,13 @@ That does not mean 2B is inherently messy. Core formulation matters. Some 2B pen
 
 Erasing performance can vary for the same reason. Darker graphite means more material has to be removed, and heavy pressure can drive particles deeper into the paper. A lightly written 2B line can erase very cleanly, while a heavily burnished line may leave a visible ghost. This is especially relevant in schoolwork and drafting, where correction is frequent.
 
+## Japan Treats 2B as Normal
+
 Japan provides one of the clearest examples of 2B as a mainstream writing grade rather than an artist specialty. Tombow's ippo! school-pencil ranges include 2B prominently for children learning to write, and some products for early elementary students are specifically offered in 2B with shorter barrels or triangular shapes. Tombow also markets darker 2B, 4B, and 6B school pencils designed to erase cleanly, showing how strongly softer grades are integrated into Japanese handwriting practice.
 
 That Japanese context is useful because it challenges the assumption that HB must be the natural writing standard. If children learn to write with darker, softer grades, the hand adapts to different pressure and wear characteristics from the beginning. The grade becomes part of handwriting culture rather than merely a technical choice.
+
+## Where 2B Works and Where It Does Not
 
 For adults, 2B can be especially effective for journaling and long-form notes. The line is dark enough to feel finished without requiring ink, but the pencil still allows correction and variation. The changing point also gives handwriting a slight modulation that many people find more expressive than the uniform line of a mechanical pencil.
 
@@ -42,6 +52,8 @@ Speed writing is another interesting use. During lectures or meetings, a softer 
 The grade also affects how often the pencil must be sharpened during a page of writing. This is easy to test. Write one full page with HB and another with 2B from the same product line, using the same paper and similar pressure. Measure how often each pencil needs sharpening and compare line darkness at the end of the page. The tradeoff becomes obvious.
 
 A 2B can also reduce the temptation to press too hard. Writers using pale HB pencils sometimes increase pressure to get a darker line, which can emboss the page and make erasing harder. A softer 2B reaches a similar darkness with less mechanical force.
+
+## Comparing Brands in 2B
 
 Brand comparison is especially revealing in 2B because formulation differences become more noticeable. One 2B may have excellent point retention and moderate darkness; another may be very soft and dark; a third may feel unusually smooth because of waxes or processing choices. Testing several models side by side helps identify the balance that suits a particular handwriting style.
 

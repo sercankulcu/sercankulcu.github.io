@@ -14,6 +14,8 @@ At first glance, an old copying pencil can look disappointingly ordinary. It may
 
 Add water, however, and the pencil reveals what it really is.
 
+## What a Copying Pencil Was For
+
 Copying pencils—also sold as indelible pencils, chemical pencils, or ink pencils—were designed to combine the convenience of a pencil with some of the permanence of ink. Their cores contained not only graphite and clay but also a water-soluble dye. Violet and blue were especially common.
 
 The idea made sense in a world before photocopiers, carbonless forms, scanners, and email.
@@ -30,6 +32,8 @@ This explains why the copying pencil was not simply a strange colored pencil.
 
 Its formulation was designed around a process.
 
+## Dye Instead of Clay
+
 A conventional graphite core relies mainly on graphite and clay, with the proportions and processing controlling hardness and darkness. A copying pencil added soluble colorants to that system. Historical formulas varied considerably, but aniline dyes became strongly associated with the category.
 
 The rise of synthetic dyes made this possible.
@@ -41,6 +45,8 @@ A dry copying-pencil line could still appear surprisingly graphite-like. That is
 Then the dye can bleed.
 
 That property has important consequences for anyone handling historical documents. Water that would have little effect on a normal graphite annotation can mobilize a copying-pencil line, turning gray writing into violet or blue staining. Alcohol can also affect some of these colorants.
+
+## Identifying One Without Destroying It
 
 For a collector, this makes identification interesting but potentially destructive.
 
@@ -59,6 +65,8 @@ As office copying methods changed, copying pencils increasingly served as durabl
 In that sense, the copying pencil occupied an unusual technological space between pencil and pen.
 
 It behaved like a pencil in the hand but borrowed permanence from ink chemistry.
+
+## Why the Category Disappeared
 
 Eventually that advantage became less important. Carbon paper, typewriters, improved copying systems, and especially the spread of the ballpoint pen reduced the need for a pencil that pretended to be ink.
 

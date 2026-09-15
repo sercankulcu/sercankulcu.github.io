@@ -19,6 +19,8 @@ For generations of editors, proofreaders, publishers, and censors, the blue penc
 
 That linguistic afterlife makes the blue pencil unusually important.
 
+## From 1845 to a Verb
+
 Merriam-Webster traces the noun “blue pencil” in this editorial sense to 1845 and the verb “blue-pencil” to 1883. By the late nineteenth century, the tool had become familiar enough that the object and the action were nearly interchangeable.
 
 The editor did not need a special machine.
@@ -38,6 +40,8 @@ Blue belonged to the person judging the text.
 That distinction gave the color authority.
 
 A blue line across a sentence did not merely add another mark. It could mean that the sentence would disappear before publication.
+
+## Correction or Censorship
 
 This is why “blue-pencil” gradually developed a harsher secondary meaning.
 
@@ -60,6 +64,8 @@ Context does.
 That ambiguity made the blue pencil a useful metaphor in publishing and politics. Once readers understood that editors used blue pencils to remove material, references to “the blue pencil” could suggest editorial power even when no literal pencil was present.
 
 The tool became shorthand for control over what survived into print.
+
+## Not the Same as Non-Photo Blue
 
 This history should not be confused with the non-photo blue pencil.
 
@@ -84,6 +90,8 @@ A red-and-blue bicolor pencil adds yet another category.
 It combines two marking functions in one barrel and was often useful for checking, classification, office work, school correction, or map marking.
 
 The categories overlap historically, but they are not identical.
+
+## What a Collector Should Record
 
 The collector should therefore record more than “blue pencil.”
 
@@ -116,6 +124,8 @@ Others behaved more like conventional colored pencils.
 This means an old editorial pencil should be tested cautiously, if at all.
 
 A single writing sample on archival paper is usually more informative than sharpening away several centimeters of an uncommon specimen.
+
+## The Tool Faded, the Phrase Stayed
 
 The blue pencil also shows how office tools can disappear while their language survives.
 

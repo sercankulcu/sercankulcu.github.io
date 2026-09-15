@@ -17,6 +17,8 @@ The second is a working specimen.
 
 That sounds almost too simple to deserve a collecting rule, but it solves one of the fundamental problems of pencil collecting: the object is designed to be destroyed gradually by the very act that reveals its most important qualities.
 
+## Evidence Versus Performance
+
 An unsharpened pencil preserves evidence.
 
 A sharpened pencil reveals performance.
@@ -61,6 +63,8 @@ These questions cannot be answered completely by looking at an untouched object.
 
 That is why two specimens are more informative than one.
 
+## Assigning Roles, Not Duplicating
+
 The rule is not really about duplication.
 
 It is about assigning roles.
@@ -84,6 +88,8 @@ Mark the other as working.
 Record the relationship.
 
 This prevents the wrong pencil from being sharpened accidentally.
+
+## Document Both Before Use
 
 The archival specimen should be documented first.
 
@@ -116,6 +122,8 @@ Maybe the cores differ.
 Maybe one was stored differently.
 
 The pair creates a small controlled comparison.
+
+## Current Production Is Ideal
 
 Current-production pencils are ideal for this method.
 
@@ -165,6 +173,8 @@ Now the collector can study both design changes and performance changes.
 
 That is much more useful than owning four random duplicates.
 
+## Selective Duplication Across a Grade Range
+
 The rule also works with grade ranges.
 
 Suppose you want to study a famous drawing pencil line.
@@ -196,6 +206,8 @@ Will use destroy information I want to preserve?
 If the answer to all three is yes, buy two.
 
 If not, one may be enough.
+
+## When the Rule Breaks
 
 Rare vintage pencils often break the rule.
 
@@ -234,6 +246,8 @@ The ideal pair can sometimes be one unsharpened and one historically used specim
 The used example shows original wear rather than modern collector intervention.
 
 That can be more informative than creating new wear.
+
+## Packaging, Erasers and Ferrules
 
 Packaging introduces another version of the rule.
 
@@ -291,6 +305,8 @@ These changes become visible only through paired specimens.
 
 The pair can therefore document aging under use.
 
+## Photographing the Working Pencil Over Time
+
 Photography should continue after the initial record.
 
 Photograph the working pencil at intervals.
@@ -344,6 +360,8 @@ Was the working pencil perhaps a variant?
 Without the untouched reference, those questions are harder.
 
 The archival pencil can even become a future working specimen if the first is lost or destroyed, though doing so changes the role and should be documented.
+
+## Levels of Intervention
 
 Roles are useful, not sacred.
 
@@ -406,6 +424,8 @@ Preserve scarce evidence.
 Consume replaceable evidence.
 
 Use duplicates intelligently.
+
+## It Removes the Emotional Conflict
 
 The method also helps control collector anxiety.
 
@@ -509,6 +529,8 @@ But pencils make the logic especially clear because use physically consumes the 
 
 Every sharpening makes the tradeoff visible.
 
+## An Ethical Dimension
+
 There is an ethical dimension to rare objects as well.
 
 A collector may own one of very few surviving examples.
@@ -574,6 +596,8 @@ Document eraser performance.
 A working specimen without notes is only a consumed pencil.
 
 A working specimen with notes becomes research.
+
+## Both Kinds of Aging
 
 The archival specimen should also be inspected periodically.
 

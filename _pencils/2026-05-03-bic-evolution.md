@@ -16,6 +16,8 @@ Most wooden pencils are assembled from pieces.
 
 A graphite core is placed into grooves cut in one wooden slat, a second slat is glued over it, and the resulting sandwich is shaped into individual pencils. BIC Evolution takes a different route. Its identity comes from replacing the conventional wooden casing with a synthetic-resin body that can be formed around the writing core.
 
+## Launched in 1993
+
 BIC launched Evolution in 1993. The company describes the original product as a graphite and coloring pencil made with recycled materials, and later celebrated the range as a synthetic-resin pencil. That makes it a useful counterpoint to almost every traditional pencil in a collection.
 
 The difference is easy to miss because the finished object still looks familiar.
@@ -31,6 +33,8 @@ It writes like a pencil.
 Yet the body is not a pair of wooden slats.
 
 That changes the manufacturing problem.
+
+## Synthetic Wood as a Material Problem
 
 Traditional pencil making begins with timber. The wood must be cut into slats, dried to the correct moisture level, grooved accurately, glued around the core, shaped, sanded, painted, printed, and finished. Every stage depends on the behavior of a natural material.
 
@@ -51,6 +55,8 @@ This is what makes Evolution interesting from an engineering perspective.
 The pencil is not trying to behave like a plastic pen.
 
 It is trying to behave like wood without being wood.
+
+## Extrusion Reverses the Logic
 
 Extrusion is central to that idea.
 
@@ -92,6 +98,8 @@ The body can still be damaged.
 
 But the failure mode is different, and that matters in products intended heavily for schools.
 
+## What the Sharpener Reveals
+
 Sharpening provides the best way to understand the material.
 
 Put a cedar pencil and an Evolution into the same sharpener.
@@ -118,6 +126,8 @@ That is often how successful material substitutions work.
 
 The user notices less than the engineer.
 
+## Not the Same as a Woodless Pencil
+
 There is also a useful distinction between BIC Evolution and a woodless graphite pencil such as Cretacolor Monolith.
 
 Both remove traditional wood.
@@ -143,6 +153,8 @@ A mechanical pencil eliminates the disposable wooden casing by using a permanent
 Its use cycle remains completely traditional.
 
 That makes the material substitution more subtle.
+
+## Recording Body Material
 
 For collectors, Evolution is valuable because it represents a manufacturing branch that can disappear inside an ordinary-looking stationery drawer.
 

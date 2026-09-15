@@ -10,9 +10,13 @@ tags:
 
 A perfectly ordinary pencil can become psychologically different the moment production stops. Before discontinuation, sharpening is routine because another dozen can be bought. After discontinuation, the same action begins to feel like consumption of a finite resource. Nothing about the graphite has changed, yet the user’s relationship with the object has.
 
+## Scarcity and Replacement Anxiety
+
 Scarcity is the first mechanism. A pencil that once seemed common acquires a limited future supply. Collectors begin counting boxes, watching auction listings, and comparing sellers. Even users who never thought of themselves as collectors may buy extra stock because they fear losing access to a familiar writing feel.
 
 This fear is not irrational. Pencil formulations, woods, lacquer systems, ferrules, erasers, and even factory locations can change over time. A replacement carrying the same model name may not reproduce every detail of the discontinued version. Once a particular production combination disappears, it may never return in exactly the same form.
+
+## Blackwing, Mongol and Mirado
 
 The Blackwing 602 is one of the clearest examples of this psychology. The original Eberhard Faber version became famous partly because of its distinctive soft, dark core and adjustable rectangular eraser, but discontinuation intensified its mythology. Remaining pencils became collectibles, prices rose sharply, and the act of using an original Blackwing became inseparable from the knowledge that each sharpening reduced a finite stock.
 
@@ -32,6 +36,8 @@ Memory itself is unreliable. A pencil used twenty years earlier may be remembere
 
 This is one reason discontinued stationery attracts collectors who do not normally collect expensive objects. The emotional value may come from recognition rather than rarity. A cheap pencil from childhood can provoke a stronger response than a technically superior premium pencil bought yesterday.
 
+## Price, Rarity and Temporary Shortage
+
 Price behavior after discontinuation can be misleading. Initial scarcity often produces a rapid spike as users panic-buy remaining stock. Later prices may stabilize, continue rising, or even fall if demand fades. A high asking price does not prove historical importance, and a rare pencil is not automatically valuable.
 
 True rarity also needs to be distinguished from temporary shortage. A model can disappear from retailers because of distribution problems, packaging changes, regional stock differences, or a factory transition. Collectors sometimes declare a pencil “discontinued” too early, causing unnecessary buying and speculation.
@@ -41,6 +47,8 @@ Documentation is therefore essential. Manufacturer announcements, archived catal
 Regional discontinuation complicates the picture further. A pencil may vanish from one country while remaining available elsewhere. Export versions may end while domestic versions continue. A model number may survive even after the design or manufacturing source changes.
 
 Collectors should also distinguish discontinuation from rebranding. A familiar pencil may return under another name, with a revised imprint or different packaging. In some cases the underlying product remains similar; in others only the brand identity survives.
+
+## Preserve or Use
 
 The tension between preservation and use becomes strongest with finite stock. An untouched dozen preserves factory condition, packaging, and variant information. A sharpened example reveals writing performance, wood behavior, core centering, and point retention. Both states provide different evidence.
 
@@ -53,6 +61,8 @@ Sealed boxes create another temptation. Opening one may reduce market value but 
 Hoarding can distort the market. When users buy more than they can realistically use, remaining supply disappears faster from ordinary retail channels. Scarcity then becomes partly self-reinforcing: fear of shortage creates the shortage people feared.
 
 Online communities accelerate this effect. A single announcement or rumor can send collectors to retailers within hours. Before internet forums and social media, discontinued pencils might remain unnoticed in shop inventory for years. Today, information travels faster than physical stock.
+
+## Scarcity Creates Myths
 
 Scarcity can also create myths. Claims about “better old graphite,” “lost formulas,” or “superior vintage wood” may circulate without documentation. Sometimes these claims are correct; sometimes they are based on sample variation or nostalgia. Comparative testing is more reliable than inherited reputation.
 

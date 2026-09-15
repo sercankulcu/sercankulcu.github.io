@@ -12,6 +12,8 @@ A pencil collection becomes much more useful when it is cataloged. Without a cat
 
 A good catalog turns the collection into a research system. It answers basic questions quickly: which variants do I own, which are duplicates, when did I acquire them, how much did I pay, which version is still unsharpened, and which photographs belong to which object?
 
+## What Counts as One Entry
+
 The first decision is what counts as one catalog entry. I prefer to catalog distinct variants rather than only model names. If two pencils share the same brand and model but differ in ferrule, imprint, country marking, end treatment, grade typography, or packaging, they receive separate entries.
 
 That approach prevents important historical differences from disappearing inside one generic row. “Dixon Ticonderoga No. 2” is not enough if the collection contains versions made in different countries, with different ferrules, different erasers, or different corporate markings.
@@ -19,6 +21,8 @@ That approach prevents important historical differences from disappearing inside
 Every object should have a unique catalog ID. The ID does not need to contain meaning. A simple sequence such as P0001, P0002, and P0003 is often better than an elaborate code because company names, dates, and classifications may change as research improves.
 
 The catalog ID should never change once assigned. Brand names can be corrected, estimated dates can be narrowed, and condition can change, but the ID remains the stable link between the physical object, photographs, notes, and acquisition records.
+
+## The Basic Fields
 
 The most basic fields are manufacturer, brand, model, model number, grade, country of manufacture, barrel shape, barrel color, finish, ferrule or end type, eraser color, acquisition date, source, quantity, condition, and notes.
 
@@ -31,6 +35,8 @@ Grade deserves its own controlled field. HB, B, 2B, No. 2, F, copying, indelible
 For numerical American grades, I record exactly what appears on the pencil rather than converting automatically. A pencil marked “No. 2” stays No. 2 in the catalog even if it is broadly comparable to HB.
 
 Country information needs precision. “Brand country,” “manufacturer country,” and “country printed on pencil” are not necessarily the same thing. A German-owned brand may be manufactured in Indonesia, Mexico, or another country.
+
+## Transcribing the Imprint
 
 The barrel imprint is one of the most important fields for vintage pencils. I transcribe it exactly, including capitalization, punctuation, grade symbols, trademark marks, and unusual spacing when possible.
 
@@ -46,6 +52,8 @@ Length should be measured in factory condition when possible. A sharpened pencil
 
 Core diameter can be useful for drawing pencils. A 2 mm writing core and a thick artist core may carry the same nominal grade but behave very differently.
 
+## Ferrule, Eraser, End and Finish
+
 Ferrules deserve more detail than “metal.” I record finish, color, stripe pattern, approximate length, crimp style, and whether the ferrule appears original.
 
 Eraser color should be recorded conservatively because aging changes it. Instead of inventing precise color names, simple descriptions such as pink, red, white, black, green, or natural rubber are easier to compare.
@@ -53,6 +61,8 @@ Eraser color should be recorded conservatively because aging changes it. Instead
 Untipped pencils need a rear-end field. Exposed wood, dipped end, painted cap, rounded end, unfinished cut, and decorative end treatment can all help distinguish variants.
 
 Finish should include both color and surface. Glossy yellow lacquer and matte yellow lacquer are different observations. Natural wood, stained wood, clear coat, painted, metallic, and unfinished may also be useful categories.
+
+## Condition and Sharpening Status
 
 Condition should be descriptive rather than emotional. “Unsharpened, minor lacquer rub near grade stamp, ferrule clean, eraser hardened” is far more useful than “excellent condition.”
 
@@ -62,11 +72,15 @@ Sharpening status deserves its own field because it affects both value and resea
 
 Factory sharpening should be distinguished from later sharpening when it can be identified. Some pencils were sold pre-sharpened, while others were not.
 
+## Packaging as Its Own Record
+
 Packaging should have its own record rather than being buried in notes. A dozen box can contain dating information that the pencil itself does not carry.
 
 Useful packaging fields include box type, quantity, barcode, address, copyright text, distributor, country statement, grade range, and whether the box appears original to the pencils inside.
 
 Boxes and pencils should be linked but not assumed permanently inseparable. A loose pencil can be placed in the wrong box decades later. The catalog should preserve uncertainty rather than treating every pairing as proven.
+
+## Acquisition and Provenance
 
 Acquisition data is another important layer. I record date, seller or source, purchase price, shipping cost if relevant, and whether the item was bought individually or as part of a lot.
 
@@ -76,11 +90,15 @@ Provenance is more useful than many collectors realize. A pencil bought from the
 
 The source field should therefore be specific enough to reconstruct the acquisition. “eBay” is less useful than seller name, country, lot title, and date.
 
+## Photographs and Filenames
+
 Photographs should be linked directly to the catalog ID. File names such as `P0042-front.jpg`, `P0042-imprint.jpg`, and `P0042-ferrule.jpg` remain understandable even if the model identification later changes.
 
 For ordinary pencils, I like at least a full-length image and an imprint image. Important vintage variants benefit from ferrule, end, point, box, and scale photographs as well.
 
 Image filenames should be systematic. Random phone filenames such as IMG_5831.jpg become useless once they are copied into a large archive.
+
+## Model Records Versus Object Records
 
 A catalog should also distinguish object-level data from model-level research. “This pencil has a chipped ferrule” belongs to the object. “This model was introduced in 1952” belongs to the model or research record.
 
@@ -99,6 +117,8 @@ Duplicates should not automatically be discarded from the catalog. Multiple iden
 Quantity should be explicit. If five identical unsharpened pencils are stored together, either catalog them individually or use one entry with quantity five and a clear rule for when individual IDs are required.
 
 Rare or high-value examples deserve individual IDs even when duplicates exist. Ordinary modern stock can be grouped if the collection would otherwise become too cumbersome.
+
+## Dates, Evidence and References
 
 Dates should distinguish confirmed from estimated. A field such as `date_from`, `date_to`, and `date_confidence` is more useful than forcing every object into one exact year.
 
@@ -120,6 +140,8 @@ Tags can help create cross-cutting groups: school pencil, advertising, copying, 
 
 Tags are especially useful when one pencil belongs to several categories.
 
+## Spreadsheet or Database
+
 A spreadsheet is enough for many collections. It is portable, easy to sort, and does not require special software.
 
 For larger collections, a relational database becomes attractive because one manufacturer can link to many brands, one model can link to many variants, and one acquisition can contain many objects.
@@ -131,6 +153,8 @@ Backups are essential because the catalog may eventually represent hundreds of h
 Versioned backups are even better. If a large batch edit goes wrong, an older copy can be restored.
 
 Exportability matters too. Proprietary software can disappear. CSV, JSON, plain text, and ordinary image files are safer long-term formats than a system that cannot export its data.
+
+## What the Catalog Gives Back
 
 A catalog can prevent duplicate purchases. Before buying a pencil, search by model number, imprint, ferrule, and country marking rather than only by name.
 

@@ -13,11 +13,15 @@ Some pencils become classics because they are inexpensive and everywhere. The Mi
 
 Mitsubishi Pencil introduced the Hi-Uni in 1966, eight years after launching the original Uni. The earlier pencil had already helped establish the Uni name as a high-quality Japanese pencil brand. Hi-Uni was intended to go further.
 
+## Refining the Core
+
 One of the interesting parts of its development was the graphite core. Pencil cores are made from mixtures in which graphite, clay, and other ingredients are processed into a remarkably precise material. Mitsubishi experimented not only with the ingredients but also with the distribution of particle sizes. The objective was a core capable of producing a dark mark while remaining smooth and resisting excessive wear.
 
 That combination matters more than it sounds. A very soft pencil can easily feel smooth and dark, but it may lose its point rapidly. A harder pencil can retain a point but feel dry or produce a pale line. Much of pencil engineering lies in negotiating those competing properties.
 
 Hi-Uni also makes this engineering unusually easy to explore because of its enormous grade range. Today the series extends from 10H to 10B, giving it twenty-two hardness grades. Moving through the range is almost like watching the same pencil gradually transform into a different instrument.
+
+## A Barrel That Never Changed
 
 The barrel is equally recognizable. Its deep burgundy finish, gold-colored lettering, black grade indicator, and carefully finished end give it the appearance of an object designed to be noticed without becoming decorative for decoration's sake.
 

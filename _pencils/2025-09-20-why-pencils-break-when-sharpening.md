@@ -11,6 +11,8 @@ tags:
 
 Few pencil problems are more frustrating than a point that breaks every time it emerges from the sharpener. The visible break happens at the tip, but the actual cause may be somewhere else: inside the core, in the wood, at the glue line, in the sharpener, or in the user's technique.
 
+## Internal Core Fracture
+
 The first possibility is internal core fracture.
 
 A pencil dropped onto a hard floor can develop cracks inside the graphite core while the wooden barrel remains completely intact.
@@ -57,6 +59,8 @@ Still, even a well-bonded core can break under sufficient impact.
 
 No wooden pencil is drop-proof.
 
+## A Dull Sharpener Blade
+
 The second major cause is a dull sharpener blade.
 
 A sharp blade slices wood fibers.
@@ -90,6 +94,8 @@ Then try the problem pencil in a different sharpener.
 If every pencil fails in one sharpener, blame the sharpener.
 
 If one pencil fails in several good sharpeners, suspect the pencil.
+
+## Sharpener Geometry
 
 Sharpener geometry also matters.
 
@@ -135,6 +141,8 @@ A fracture may become visible before the point snaps.
 
 This does not repair the damage, but it can confirm the diagnosis.
 
+## Core Centering and Straightness
+
 Core centering is another important factor.
 
 A centered core remains surrounded by roughly even wood during sharpening.
@@ -162,6 +170,8 @@ A pencil can start centered and then wander.
 Repeated sharpening may reveal the core moving from side to side.
 
 This suggests longitudinal alignment problems during manufacture.
+
+## Wood, Lacquer and Core Diameter
 
 Wood quality can create another failure path.
 
@@ -217,6 +227,8 @@ Conventional sharpeners may place too much rotational stress on them.
 
 Knife sharpening and sandpaper are often safer.
 
+## Technique
+
 The user's technique matters.
 
 A handheld sharpener should not be treated like a drill.
@@ -271,6 +283,8 @@ Cold brittle coatings and aged adhesives may behave differently from room-temper
 
 It is sensible to let stored pencils acclimate before aggressive sharpening.
 
+## Diagnose Methodically
+
 Repeated breakage should be diagnosed methodically.
 
 First, inspect the sharpener blade.
@@ -307,6 +321,8 @@ A sudden drop in resistance can occur when a broken core segment releases.
 
 A collector should stop immediately rather than continue automatically.
 
+## A Lower-Risk Approach for Valuable Pencils
+
 Valuable pencils deserve a lower-risk approach.
 
 If an unsharpened vintage pencil is rare, do not use repeated trial-and-error sharpening to diagnose it.
@@ -332,6 +348,8 @@ Some users warm damaged pencils gently in hopes that softened internal adhesive 
 Results are inconsistent, and excessive heat can damage lacquer, erasers, ferrules, or wood.
 
 It is not a method I would use casually on a collectible pencil.
+
+## Prevention
 
 The more reliable approach is prevention.
 

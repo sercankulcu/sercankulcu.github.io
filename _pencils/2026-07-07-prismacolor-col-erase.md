@@ -18,6 +18,8 @@ The line is made for drawings that are still changing: animation roughs, illustr
 
 That requirement changes the pencil.
 
+## Not Judged Like a Finished-Art Pencil
+
 A conventional artist colored pencil usually prioritizes saturation, blending, layering, and permanence. Col-Erase has to deliver enough pigment to remain clearly visible while also allowing part of the line to be removed with an eraser.
 
 Those goals pull in different directions.
@@ -42,6 +44,8 @@ In animation and illustration, preliminary drawing often has a different job fro
 
 An erasable colored pencil gives the sketch its own visual layer.
 
+## Why Blue Became the Construction Color
+
 Blue is especially common for this.
 
 A blue construction drawing can sit underneath darker graphite, ink, or another colored line without becoming visually confused with it. The artist can see immediately which marks belong to the first pass and which belong to a later correction.
@@ -57,6 +61,8 @@ The purpose is not simply to disappear during reproduction.
 The purpose is to create a colored working line that can be changed.
 
 Prismacolor currently offers Col-Erase in sets of twelve and twenty-four colors, including blues, reds, greens, earth tones, violet, grey, yellow, orange, and black.
+
+## Color as Version Control
 
 That range suggests several practical workflows.
 
@@ -81,6 +87,8 @@ An illustrator might use a light warm color beneath a portrait so that the const
 A designer might assign different colors to alternate ideas on the same sheet.
 
 The pencil becomes a simple form of version control.
+
+## Erasable Does Not Mean Perfectly Clean
 
 Erasability does not mean the page always returns to perfectly clean white.
 
@@ -116,6 +124,8 @@ Repeat on a smoother and a rougher paper.
 
 That simple test tells you much more about Col-Erase than a color swatch alone.
 
+## The Eraser Belongs to the Workflow
+
 The attached eraser is another functional clue.
 
 Most professional colored pencils are sold without erasers because finished colored-pencil work is usually built through controlled layering rather than constant correction.
@@ -141,6 +151,8 @@ That matters in animation and rapid sketching.
 A preliminary pencil may be sharpened repeatedly, handled quickly, dropped on a desk, carried between workstations, and used for long sessions. Constant core fracture would interrupt the workflow.
 
 Durability is part of performance.
+
+## A Category, Not a Color
 
 For collectors, Col-Erase is interesting because color names and sets create more variation than a normal graphite model.
 

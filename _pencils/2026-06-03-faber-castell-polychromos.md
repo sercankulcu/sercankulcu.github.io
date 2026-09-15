@@ -17,6 +17,8 @@ That problem was already central to Faber-Castell when Polychromos appeared in 1
 
 Alexander von Faber-Castell introduced the new artist pencil range with sixty colors. Company archives describe lightfastness as one of the main manufacturing challenges. The goal was not simply to place more colors in a box. The pigments had to survive exposure to light without fading rapidly or shifting enough to damage finished artwork.
 
+## Pigment Is Not Graphite
+
 That requirement changes how a colored pencil is engineered.
 
 A graphite core is based mainly on graphite, clay, and processing choices that control hardness and friction. A colored pencil replaces graphite with pigments and a binder system. Each color is therefore its own formulation problem. A deep red and a pale yellow do not behave identically simply because they are placed in the same wooden barrel.
@@ -30,6 +32,8 @@ The first range contained sixty.
 The modern range contains 120.
 
 More colors do not merely reduce the need for mixing. They let an artist choose between neighboring hues whose differences may be subtle but important: warm and cool reds, several earth tones, multiple greens, blue-violets, skin colors, greys, and dark chromatic alternatives to black.
+
+## A Thick, Bonded Core
 
 The modern Polychromos pencil uses a 3.8 mm core, noticeably thicker than a typical writing-pencil core. That diameter gives the artist enough pigment for broad layering while still allowing a fine point when sharpened carefully.
 
@@ -46,6 +50,8 @@ Polychromos cores are water-resistant and smudge-resistant rather than water-sol
 The distinction is important for collectors because pencils that look similar can belong to very different drawing systems.
 
 With Polychromos, the mark is intended to remain a dry colored-pencil mark.
+
+## Layering Is the Method
 
 Layering is therefore central to how the pencil works.
 
@@ -66,6 +72,8 @@ That makes testing colored pencils more complicated than making one dark scribbl
 A useful test should include a light-pressure swatch, several layered passes, a sharp line, cross-hatching, and a burnished area. Try the same color on two paper surfaces. Then layer a neighboring hue over it.
 
 Only then does the pencil begin to show what it can do.
+
+## Lightfastness Deserves a Field
 
 Lightfastness deserves its own test conceptually, even if a collector does not want to wait years.
 
@@ -95,6 +103,8 @@ Packaging generation.
 
 A single Polychromos pencil is not just “red.” It is a precisely identified color in a long-running system.
 
+## Dating a Vintage Polychromos
+
 The 1908 origin also makes older packaging particularly interesting.
 
 Faber-Castell's own archive shows that the original Polychromos range was sold in several packages and advertised as a major new product family. The company later recreated elements of that historical presentation for the 111th anniversary edition, including an older style of barrel stamping.
@@ -104,6 +114,8 @@ That tells collectors something important: imprint design changed over time.
 A vintage Polychromos should therefore not be dated by barrel color alone.
 
 Typography, logo, color numbering, box graphics, company wording, and the specific assortment can all provide clues.
+
+## Polychromos Beside the Castell 9000
 
 The series also gives us a useful contrast with the Castell 9000.
 

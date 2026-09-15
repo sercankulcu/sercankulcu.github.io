@@ -12,6 +12,8 @@ Barrel shape changes a pencil more than photographs suggest. The core may be ide
 
 The barrel is the interface between the graphite and the hand. Shape influences grip, rotation, pressure, desk stability, manufacturing, printing, sharpening, and how the pencil changes during long writing sessions.
 
+## Hexagonal
+
 Hexagonal pencils are the most familiar general-purpose form. Six flats provide clear contact surfaces for the thumb, index finger, and middle finger while the corners prevent the pencil from rolling easily across a desk.
 
 That anti-roll behavior is more important than it sounds. School desks, drafting tables, workshops, and sloped surfaces all reward a pencil that stays where it is placed.
@@ -36,6 +38,8 @@ Diameter matters just as much. A narrow hexagonal pencil can feel precise but en
 
 This is one reason jumbo school pencils often feel very different from ordinary hexagonal pencils even when their shape is technically the same.
 
+## Round
+
 Round pencils remove corners entirely. The surface is continuous, so the fingers can rotate the pencil without crossing distinct edges.
 
 Some writers find that continuous surface more relaxed because there is no preferred orientation. The hand can settle wherever it wants.
@@ -57,6 +61,8 @@ The circular profile distributes grip pressure differently. There are no concent
 Surface finish therefore matters strongly on round pencils. A glossy round barrel can feel slippery in a way that the same lacquer on a hexagonal barrel does not.
 
 Matte coatings, exposed wood, rubberized surfaces, and textured paints can compensate by increasing friction.
+
+## Triangular
 
 Triangular pencils make a stronger ergonomic statement. Instead of merely providing flats, the geometry encourages three primary contact areas.
 
@@ -82,6 +88,8 @@ A triangular pencil can still be rotated, but each step is larger. The hand move
 
 Some manufacturers soften this problem by using rounded triangular profiles. These retain three broad grip zones while allowing smoother rotation.
 
+## Shapes Between the Categories
+
 There are also shapes between the major categories. Semi-hexagonal pencils have broader faces and softer corners than traditional hexagons.
 
 Oval and flattened pencils appear in specialty tools, while carpenter pencils use a broad rectangular or elliptical profile to prevent rolling and create a wide, durable core.
@@ -96,6 +104,8 @@ Children's pencils may favor triangular or jumbo forms because grip guidance and
 
 Drawing pencils often remain hexagonal because the geometry balances grip, control, rotation, printing space, and anti-roll behavior.
 
+## Shape Changes Sharpening
+
 Shape also affects sharpening. Standard sharpeners usually locate the pencil by its maximum diameter, so hexagonal and triangular pencils can be sharpened in round holes as long as they fit.
 
 The actual barrel contacts the sharpener differently during rotation. A round pencil presents constant radius.
@@ -108,6 +118,8 @@ Jumbo triangular pencils often require dedicated larger-diameter sharpeners simp
 
 Knife sharpening largely removes these constraints because the user controls the cutting geometry manually.
 
+## Wall Thickness Around the Core
+
 Barrel shape also changes structural thickness around the core. In a centered round pencil, wood thickness is nearly uniform in every radial direction.
 
 In a hexagonal pencil, distance from the core to the middle of a flat is shorter than distance to a corner.
@@ -119,6 +131,8 @@ This normally causes no problem, but it helps explain why off-center cores can b
 Triangular barrels create another distribution of material around the core. The exact effect depends on how rounded the corners are.
 
 Shape and core diameter must therefore be designed together rather than independently.
+
+## Lacquer and Imprint
 
 The lacquer process also interacts with geometry. Paint tends to collect differently near edges than across broad flats.
 
@@ -135,6 +149,8 @@ Triangular barrels offer broad faces but fewer of them, so designers have less t
 This can influence how branding looks. A hexagonal pencil often feels information-rich because six faces can carry different elements.
 
 Round pencils often favor simpler graphics that remain readable from several angles.
+
+## Ergonomics Is Not Just Cross-Section
 
 Grip pressure complicates every ergonomic claim. A shape that feels uncomfortable under a tight grip may feel perfectly comfortable when held lightly.
 
@@ -165,6 +181,8 @@ A triangular pencil may feel stable during handwriting but awkward when constant
 A hexagonal pencil may not be the absolute best at any single property, yet it performs well across many situations.
 
 That broad compromise helps explain its persistence without needing to treat hexagonal form as universally superior.
+
+## Recording Shape
 
 Collectors should record shape because it is part of model identity. A round and hexagonal version of the same product may target different markets or production periods.
 

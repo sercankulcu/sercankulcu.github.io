@@ -11,6 +11,8 @@ tags:
 
 The modern pencil is the result of several technologies meeting over centuries: graphite mining, wood working, ceramic-like core manufacture, precision cutting, adhesives, coatings, printing, and mass production. Its familiar form looks inevitable only because it has been refined for so long.
 
+## Before the Modern Pencil
+
 The story begins before the modern pencil existed.
 
 People had long used metalpoint, chalk, charcoal, and other materials for writing and drawing.
@@ -32,6 +34,8 @@ Holders were another solution.
 The important point is that early graphite writing depended heavily on naturally occurring material.
 
 If the graphite deposit was good, the writing tool was good.
+
+## The Supply Problem and the Wooden Casing
 
 That created a supply problem.
 
@@ -58,6 +62,8 @@ His work is significant because pencil making crossed older craft boundaries.
 The core and wood casing could be treated as one integrated product.
 
 That integration helped create an independent pencil-making trade.
+
+## Conté and the Manufactured Core
 
 The early wooden pencil was still very different from later industrial products.
 
@@ -107,6 +113,8 @@ It can be repeated.
 
 The pencil moves from natural material wrapped for convenience to an industrial composite designed for performance.
 
+## The Slat Sandwich
+
 The wood casing evolved alongside the core.
 
 The efficient method is to start with slats.
@@ -132,6 +140,8 @@ The precision improved.
 The basic geometry survived.
 
 That survival is a sign of a mature manufacturing idea.
+
+## Industry and Brands
 
 The nineteenth century turned pencil making into large-scale industry.
 
@@ -181,6 +191,8 @@ That created the modern expectation that two pencils from the same box should be
 
 Consistency became part of quality.
 
+## Grades for Professionals
+
 The hardness scale became more useful in this environment.
 
 Professional users needed predictable tools.
@@ -222,6 +234,8 @@ Graphite became not merely a writing medium but a complete drawing medium.
 Manufacturers responded with wider B ranges and thicker soft cores.
 
 The industrial pencil could now support both technical precision and expressive art.
+
+## The American Tradition
 
 The United States developed its own strong pencil traditions.
 
@@ -268,6 +282,8 @@ Imprints had to align.
 Boxes had to protect and market the pencils.
 
 Industrial maturity came from coordinating all these processes cheaply.
+
+## The Twentieth-Century Paradox
 
 The twentieth century brought further automation.
 
@@ -323,6 +339,8 @@ Formulations shift.
 
 The basic identity survives.
 
+## Japan and a Global Map
+
 Japan developed another major pencil culture.
 
 Japanese manufacturers such as Mitsubishi Pencil and Tombow built strong domestic and export traditions.
@@ -373,6 +391,8 @@ Country markings therefore became important evidence for collectors.
 
 The modern pencil is an international object even when its design looks local.
 
+## Material Science and Specialty Cores
+
 Material science continued to evolve.
 
 Manufacturers refined graphite processing.
@@ -410,6 +430,8 @@ Golf pencils reduce length.
 The wooden casing became a platform.
 
 Graphite was only the beginning.
+
+## Mechanical Pencils, Pens and Screens
 
 Mechanical pencils created another branch of history.
 
@@ -520,6 +542,8 @@ The H-B scale remains useful.
 But modern factories use tighter process control, different coatings, global sourcing, automated inspection, and new sustainability standards.
 
 A classic technology can continue to improve without becoming visually futuristic.
+
+## A Chain of Refinements
 
 This is the real history of the pencil.
 

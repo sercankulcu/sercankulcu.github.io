@@ -19,6 +19,8 @@ That restraint makes sense.
 
 The pencil was designed for a job in which almost every unnecessary interruption was a problem.
 
+## Writing Under Time Pressure
+
 Shorthand is writing under time pressure.
 
 A stenographer taking dictation cannot stop every few sentences to inspect a broken point, search for a sharpener, rotate an awkward barrel, or fight a scratchy core. The pencil must move quickly, produce a predictable line, and survive long enough for the writer to think about language rather than stationery.
@@ -39,6 +41,8 @@ If a point breaks while recording speech that continues whether the writer is re
 
 Reliability becomes part of accuracy.
 
+## Two Points Instead of One
+
 This is why some shorthand writers sharpened pencils at both ends.
 
 A broken or dull point did not necessarily mean reaching for another pencil.
@@ -52,6 +56,8 @@ The practice also explains why an eraser-tipped pencil was not automatically ide
 For ordinary handwriting, that tradeoff may be irrelevant.
 
 For rapid dictation, redundancy can matter more than convenience.
+
+## Pitman, Gregg and the Core
 
 The graphite itself presents another problem.
 
@@ -90,6 +96,8 @@ Gregg does not depend on the same heavy-versus-light shading principle, so the p
 Pitman benefits more directly from a softer, responsive core.
 
 The existence of system-specific recommendations shows how specialized the category once became.
+
+## Why the Barrel Is Round
 
 The barrel shape matters too.
 
@@ -153,6 +161,8 @@ Nothing dramatic.
 
 Everything purposeful.
 
+## The Castell Steno 9008
+
 A surviving modern example makes this clear.
 
 Faber-Castell still produces the Castell Steno 9008.
@@ -198,6 +208,8 @@ Placed beside their better-known hexagonal relatives, these pencils reveal how a
 The most obvious visual change may be the barrel.
 
 The most important change is the intended behavior.
+
+## Reporters, Clerks and Occupational Pencils
 
 Older British pencils add another layer.
 
@@ -251,6 +263,8 @@ A pencil advertised to a court reporter belongs to a different social setting fr
 
 The pencil becomes evidence of the occupation around it.
 
+## Stationery History Meets Information Technology
+
 This is one reason shorthand pencils deserve more collector attention than they receive.
 
 They sit at the intersection of stationery history and information technology.
@@ -288,6 +302,8 @@ Shorthand itself survived, but its role narrowed.
 Special-purpose pencils followed the same path.
 
 What had once been professional equipment became a niche stationery object.
+
+## Specialization You Cannot See
 
 That makes surviving examples especially interesting.
 

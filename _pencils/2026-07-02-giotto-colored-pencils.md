@@ -15,6 +15,8 @@ Some pencil brands are remembered for technical specifications. Others are remem
 
 Giotto belongs to the second group.
 
+## F.I.L.A., Florence, 1920
+
 F.I.L.A., short for Fabbrica Italiana Lapis ed Affini, was founded in Florence on June 23, 1920. The company began with pencils and related stationery, and its early catalogues already included graphite pencils, copying pencils, shorthand pencils, carpenter pencils, and colored crayons.
 
 Giotto appeared almost immediately.
@@ -26,6 +28,8 @@ That detail is important because children's colored pencils were not always sold
 Early Giotto school pencils could be only about 9 centimeters long, roughly half the length of a standard 18-centimeter pencil. Small cardboard boxes held six or twelve colors.
 
 The product was designed around children from the beginning.
+
+## The Box That Never Changed
 
 By the late 1920s, the packaging had acquired the image that would define the brand for decades: the young Giotto di Bondone drawing a sheep while being noticed by the master Cimabue.
 
@@ -42,6 +46,8 @@ Many pencil packages change completely every few years. Giotto retained the same
 For collectors, that continuity is useful.
 
 A Giotto box can be studied through typography, color printing, logo design, pencil length, assortment size, and small changes in the illustration while still being recognized immediately as part of the same family.
+
+## How the Pencils Themselves Evolved
 
 The pencils themselves also show how school colored pencils evolved.
 
@@ -73,6 +79,8 @@ A very thick core would deposit more color but require more wood and change shar
 
 A medium core gives school users enough color while keeping the pencil familiar in size and handling.
 
+## From Pencil to Creativity Brand
+
 Giotto's history also shows how a successful pencil name can grow beyond the original product.
 
 After the Second World War, F.I.L.A. expanded the Giotto identity into markers, paints, chalks, drawing albums, sharpeners, erasers, and other school supplies.
@@ -103,6 +111,8 @@ Giotto did the opposite.
 
 It modernized while preserving a recognizably historical identity.
 
+## Collecting Giotto Chronologically
+
 That makes the brand useful for chronological collecting.
 
 An early short-pencil box documents the economics and dimensions of interwar school stationery.
@@ -126,6 +136,8 @@ It is sharpened unevenly, dropped, mixed with other brands, and often reduced to
 That means clean surviving examples can become surprisingly informative with age.
 
 They preserve an object that was never designed to become archival.
+
+## The School Pencil as a Cultural Object
 
 This is one reason Giotto belongs in a pencil collection even if the collection already contains more technically sophisticated colored pencils.
 

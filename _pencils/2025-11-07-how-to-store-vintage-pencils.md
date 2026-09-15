@@ -11,6 +11,8 @@ tags:
 
 Vintage pencils are relatively robust objects, but careless storage can slowly damage the details that make them historically useful. A pencil may survive decades in a drawer, yet lacquer can fade, ferrules can corrode, erasers can harden, boxes can crush, and adhesives can fail. Preservation is mostly about slowing those changes.
 
+## Temperature and Humidity
+
 The first principle is environmental stability.
 
 Extreme heat is harmful because it accelerates chemical aging. Attics, car interiors, radiators, and unventilated storage rooms can expose pencils to temperatures far above normal indoor conditions.
@@ -31,6 +33,8 @@ The ideal practical goal is not a perfect museum number but a stable, moderate i
 
 A living room, study, or interior closet is usually safer than a basement, garage, shed, or attic.
 
+## Light and Display
+
 Light is another major source of damage.
 
 Direct sunlight can fade lacquer, printed decoration, foil stamping, paper labels, and boxes.
@@ -50,6 +54,8 @@ Glass does not automatically make display safe.
 Ordinary glazing reduces some environmental exposure but does not eliminate light damage.
 
 If preservation matters, distance from windows and low display intensity are more important than relying on glass alone.
+
+## Erasers and Ferrules
 
 Erasers are among the most vulnerable parts of vintage pencils.
 
@@ -84,6 +90,8 @@ The important thing is not to store damp or contaminated metal surfaces.
 If a ferrule is already corroding, isolate it from pristine pencils until the condition is understood.
 
 Corrosion products can transfer.
+
+## Boxes, Paper and Plastic
 
 Boxes deserve separate treatment because paper ages differently from wood and graphite.
 
@@ -126,6 +134,8 @@ PVC is especially undesirable for long-term archival storage.
 If an old pencil is already inside original plastic packaging, removing it may destroy provenance.
 
 In that case, preserve the package as a whole and monitor it for stickiness, yellowing, or chemical odor.
+
+## Preventing Mechanical Damage
 
 Mechanical damage is easier to prevent than chemical aging.
 
@@ -176,6 +186,8 @@ Dust seems harmless, but it becomes abrasive when objects rub against it.
 Dust can also trap moisture and pollutants.
 
 Closed storage reduces both problems.
+
+## Cleaning, Pests and Inspection
 
 Cleaning vintage pencils should be conservative.
 
@@ -239,6 +251,8 @@ A good catalog reduces the need to physically inspect an object every time a que
 
 High-resolution photographs can answer many visual questions without opening the storage container.
 
+## Handling and Labeling
+
 Handling should be deliberate.
 
 Hold pencils by stable barrel areas rather than fragile erasers or ferrules.
@@ -277,6 +291,8 @@ A box separated from its original dozen can lose research value if the connectio
 
 Photograph the complete arrangement before disassembly.
 
+## Sealed Packaging and Duplicates
+
 Sealed packaging presents a special decision.
 
 Opening a sealed box can reveal pencils and condition, but it destroys the original seal.
@@ -298,6 +314,8 @@ The same strategy applies to individual pencils.
 Keep one unsharpened example and one working specimen when possible.
 
 Storage and use do not have to be mutually exclusive.
+
+## Inventory and Disaster Planning
 
 Insurance and inventory become relevant for larger or valuable collections.
 

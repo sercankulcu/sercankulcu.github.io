@@ -11,6 +11,8 @@ tags:
 
 The printed line on an old pencil barrel can be the most information-dense part of the object. A few centimeters of foil or paint may contain manufacturer, model, grade, country, trademark status, corporate identity, and clues to when the pencil was made.
 
+## Transcribe Literally
+
 The first rule is simple: read exactly what is there.
 
 Do not begin by translating the imprint into what you think it means.
@@ -30,6 +32,8 @@ Spacing can matter.
 A collector who writes “Faber Castell 9000 HB” may erase distinctions that the pencil itself preserves.
 
 A more exact transcription might reveal an older corporate form, a different logo, or a grade positioned differently.
+
+## Company and Model Names
 
 The company name is usually the first major clue.
 
@@ -70,6 +74,8 @@ A prefix may be added.
 A trademark symbol may move.
 
 The same famous name can hide several generations.
+
+## Grade, Country and City
 
 Grade markings are especially useful.
 
@@ -127,6 +133,8 @@ Business names can disappear.
 
 A tiny promotional pencil can become a local-history document.
 
+## Trademark, Patent and Certification Marks
+
 Trademark symbols deserve close attention.
 
 ™ and ® do not simply mean “modern.”
@@ -158,6 +166,8 @@ Non-toxic claims, conformity marks, recycling symbols, or environmental certific
 These marks often appear first on packaging and later on barrels.
 
 That transition itself can be collectible.
+
+## Typography and Photographing a Worn Imprint
 
 Typography is another source of evidence.
 
@@ -243,6 +253,8 @@ Photographs under neutral light are important.
 
 Do not rely on memory.
 
+## Which Face Carries What
+
 The relationship between imprint and barrel face is especially useful on hexagonal pencils.
 
 Record which face carries the main brand.
@@ -270,6 +282,8 @@ Metal caps can contain logos.
 Ferrules can carry stripes that function almost like imprinting.
 
 The “written” identity of the pencil extends beyond the main barrel text.
+
+## Packaging, Catalogs and Date Ranges
 
 Packaging should always be compared when available.
 
@@ -332,6 +346,8 @@ A box may show a foreign distributor.
 This separates manufacturing country from market country.
 
 That distinction matters in global pencil history.
+
+## Reproductions and Distorted Evidence
 
 Counterfeits and reproductions complicate interpretation.
 
@@ -401,6 +417,8 @@ Industrial pencils may include obsolete phone numbers or addresses.
 
 The barrel becomes an archive.
 
+## Language Change and Exact Transcription
+
 Imprints also document language change.
 
 “Lead pencil” may appear where modern packaging would say graphite.
@@ -442,6 +460,8 @@ Exact imprint preserves evidence.
 Normalized manufacturer and model fields make sorting easier.
 
 Do not force one field to do both jobs.
+
+## Imprints as Manufacturing Evidence
 
 Imprints can also reveal production quality.
 

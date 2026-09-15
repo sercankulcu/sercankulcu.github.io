@@ -16,6 +16,8 @@ Bruynzeel did not begin as a pencil company.
 
 That fact makes its pencil history much more interesting.
 
+## Why a Woodworking Company Made Pencils
+
 Before the Second World War, the Netherlands imported many of its pencils from Germany, Austria, and Czechoslovakia. When the war ended, those supplies were scarce just as the country was trying to rebuild schools, industry, and everyday life.
 
 The Dutch government needed pencils.
@@ -31,6 +33,8 @@ Pencils were not part of the original plan.
 In the aftermath of the war, however, the Dutch government asked Bruynzeel to begin producing them. The goal was practical: help restore the educational system while also creating employment.
 
 The government provided foreign exchange so the company could purchase pencil-making machinery from the United States.
+
+## Six Months to Deliver
 
 There was one difficult condition.
 
@@ -66,6 +70,8 @@ Generations of Dutch children grew up using Bruynzeel graphite pencils at school
 
 That school identity remains important, but it can hide the professional side of the range.
 
+## Twelve Grades, Mostly Soft
+
 The modern Bruynzeel Design Graphite line is aimed at serious drawing rather than basic classroom writing.
 
 The current boxed set contains twelve hardnesses:
@@ -100,6 +106,8 @@ A professional range should allow the artist to move gradually.
 
 The grades become a tonal ladder.
 
+## From Scarcity to Refinement
+
 The modern Design range also illustrates how the meaning of a pencil company can change over time.
 
 Bruynzeel began making pencils because the Netherlands lacked basic supplies.
@@ -117,6 +125,8 @@ The modern question is:
 Can we make twelve grades behave as a coherent drawing system?
 
 That is a large shift for one brand.
+
+## Zaandam, Bergen op Zoom, Sakura, Talens
 
 The manufacturing geography changed as well.
 
@@ -147,6 +157,8 @@ Do not assume two pencils with similar colors are the same generation.
 Small typographic changes can matter.
 
 A complete box can be much more informative than a loose pencil because it may preserve article numbers, factory addresses, grade lists, and corporate names.
+
+## Testing the Ladder
 
 The current Design Graphite box is also useful as a modern reference object.
 
@@ -183,6 +195,8 @@ That makes cross-brand comparison interesting.
 It also makes complete sets valuable.
 
 A full Bruynzeel Design range shows the internal logic of one manufacturer in a way that a single HB cannot.
+
+## Pencils and National Recovery
 
 There is another reason Bruynzeel deserves a place in a pencil collection.
 

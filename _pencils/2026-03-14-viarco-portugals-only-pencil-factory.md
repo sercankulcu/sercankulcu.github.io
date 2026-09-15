@@ -14,6 +14,8 @@ tags:
 
 Portugal has one surviving pencil factory, and its story begins before the name Viarco existed.
 
+## From 1907 to the Viarco Name
+
 In 1907, Figueiredo Faria and the French engineer Jules Cacheux established a pencil-making operation in Vila do Conde. The company became known as Portugália, or Faria, Cacheux & Cª, and produced writing materials at a time when Portugal depended heavily on imported manufactured goods. The factory survived the disruptions of the First World War and the difficult economic years that followed, but by the early 1930s it needed new ownership and direction.
 
 Manoel Vieira de Araújo, an industrialist from São João da Madeira with interests in hat manufacturing, acquired the pencil business. In 1936 the Viarco name was registered. The word was formed from Vieira Araújo & Companhia, linking the pencil operation to the family company while giving it a distinct identity.
@@ -23,6 +25,8 @@ That change was more than a new label. António Vieira Araújo, Manoel's son, to
 The factory still occupies that industrial landscape.
 
 This is what makes Viarco unusual in a pencil collection. Many historic pencil names survive only as trademarks. Their original factories are gone, their machinery has been replaced, or production has moved across borders. Viarco remains tied to a specific Portuguese city and to manufacturing equipment whose history is visible inside the plant.
+
+## A Working Factory, Not a Museum
 
 São João da Madeira treats the factory as part of its industrial heritage. Visitors can enter through the city's industrial-tourism program and see pencil production as a working process rather than as a museum reconstruction. The factory is old, but it is not a static exhibit.
 
@@ -37,6 +41,8 @@ For a collector, this matters because the pencil stops looking like one object.
 It becomes a chain of operations.
 
 The graphite mixture determines darkness and hardness. The groove determines core position. The slat determines sharpening behavior. Shaping creates the familiar round or hexagonal body. Lacquer changes both appearance and surface feel. Foil printing adds identity. A painted end, eraser, or other finish can separate one product family from another.
+
+## Pencils for Specialized Trades
 
 Viarco's history also preserves the connection between ordinary pencils and specialized trades.
 
@@ -56,11 +62,15 @@ A Japanese pencil can show postwar precision and finishing.
 
 A Viarco pencil records Portugal's much smaller pencil industry.
 
+## Reading the Name and the Box
+
 That makes packaging especially worth collecting. A loose pencil gives you the imprint, grade, and finish. A box can reveal older logos, Portuguese wording, product numbers, intended professions, and the way the company presented itself to domestic customers.
 
 The exact Viarco name also helps place a pencil within the company's history. During the 1970s the pencil business became more independent from the wider Vieira Araújo group and operated as Viarco – Indústria de Lápis, Lda. Older material can therefore preserve company descriptions that belong to earlier corporate phases.
 
 These changes are easy to miss if every pencil is cataloged only as “Viarco.”
+
+## How the Factory Survived
 
 The factory's survival was not guaranteed.
 
@@ -87,6 +97,8 @@ One city.
 One working factory.
 
 A long sequence of machinery, recipes, packaging, and local memory.
+
+## Collecting Viarco Chronologically
 
 This makes Viarco particularly rewarding for chronological collecting. Rather than buying one modern example, look for pencils and boxes from different decades. Compare the typography. Record product numbers. Note whether a pencil was intended for school, drawing, copying, or industry. Photograph end treatments and barrel markings.
 

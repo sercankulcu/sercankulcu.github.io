@@ -15,6 +15,8 @@ Graphite pencils rely on a core built around graphite and mineral components suc
 
 That change affects almost every useful property of the pencil.
 
+## Grading Does Not Transfer
+
 The first difference is grading. Graphite pencils can be arranged along familiar H and B scales because hardness and darkness are central to the system. Colored pencils have no universal equivalent.
 
 A red colored pencil is not meaningfully “2B” or “3H.” Its behavior depends on pigment load, binder formulation, core diameter, pressure response, opacity, and how it layers with other colors.
@@ -24,6 +26,8 @@ Even within one colored-pencil range, two colors can feel different.
 A dark blue may feel firmer than a pale yellow. A red containing one pigment family may lay down more densely than another red in the same set.
 
 This is one reason professional colored-pencil ranges can feel less mechanically uniform than graphite ranges. The manufacturer is trying to make dozens or hundreds of different pigments behave like members of one family.
+
+## What Is Inside a Colored Core
 
 Pigment is the obvious ingredient, but it is not the only one that matters.
 
@@ -55,6 +59,8 @@ A very soft core can be excellent for broad coverage but difficult for tiny deta
 
 A firmer core may require more layers but hold a point longer and produce cleaner edges.
 
+## Opacity and Transparency
+
 Opacity is another property that has no direct graphite equivalent.
 
 Some colored pencils cover paper strongly and obscure previous layers.
@@ -78,6 +84,8 @@ Black colored pencils are also different from graphite.
 A black pigment core can produce a deep matte black without graphite's metallic sheen.
 
 This makes black colored pencil useful for dark passages where reflective graphite would be distracting.
+
+## Layering, Pressure and Burnishing
 
 Layering is central to colored-pencil technique.
 
@@ -111,6 +119,8 @@ Graphite can also burnish, but the visual effect is different because graphite b
 
 Colored-pencil burnishing is usually about smoothing pigment and filling tooth.
 
+## Blending and Solvents
+
 Blending can happen mechanically or optically.
 
 Mechanical blending physically mixes layers on the surface.
@@ -126,6 +136,8 @@ Some artists use compatible solvents to soften binder and redistribute pigment.
 This can produce painterly results, but compatibility, ventilation, paper, and archival concerns need to be considered.
 
 Not every colored-pencil range responds the same way.
+
+## Paper Tooth and Paper Color
 
 Paper tooth is critical.
 
@@ -150,6 +162,8 @@ A warm cream sheet shifts the entire palette.
 Gray or tan paper can reduce the amount of background that needs to be filled.
 
 Black paper rewards opaque colors and makes weak pigments immediately obvious.
+
+## Lightfastness
 
 Lightfastness is one of the most important colored-pencil properties and one of the least relevant to ordinary graphite.
 
@@ -197,6 +211,8 @@ Complete sets are therefore particularly valuable for research.
 
 Missing pencils can be identified from the original tray arrangement or printed color chart.
 
+## Sharpening a Thick Core
+
 Sharpening behavior also changes.
 
 Colored cores are often thicker than standard writing graphite cores.
@@ -236,6 +252,8 @@ An off-center thick core may leave very little wood on one side.
 The sharpener can then expose the core prematurely.
 
 This can create asymmetrical points and increase breakage.
+
+## Bloom, Fixatives and Erasing
 
 Colored pencils can also have wax-related surface effects.
 
@@ -288,6 +306,8 @@ Collectors face the same problem when documenting pencil barrels.
 A red lacquered colored pencil may photograph differently under warm and cool light.
 
 Color-reference cards can help when exact shade documentation matters.
+
+## The Shared Platform, Different Engineering
 
 The physical similarity between graphite and colored pencils can hide these differences.
 

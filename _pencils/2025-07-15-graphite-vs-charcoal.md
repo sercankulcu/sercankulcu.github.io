@@ -11,6 +11,8 @@ tags:
 
 Graphite and charcoal are both carbon-based drawing materials, but they behave very differently on paper. They can both make black marks, both can be sold in wooden pencils, and both can be blended or erased to some degree. Yet their internal structure, particle behavior, sheen, value range, and interaction with paper make them distinct tools rather than interchangeable versions of the same medium.
 
+## Two Forms of Carbon
+
 Graphite is a crystalline form of carbon. Its atoms are arranged in layers that can slide over one another relatively easily. That layered structure helps explain the familiar smoothness of graphite and also its tendency to reflect light when a dense layer is built on paper.
 
 Charcoal is produced by heating organic material, traditionally wood or vines, in a low-oxygen environment. The result is a porous carbon-rich material with a much less ordered structure than graphite. That difference in structure contributes to charcoal's matte appearance and its ability to produce very deep blacks without the metallic reflection associated with heavy graphite.
@@ -21,6 +23,8 @@ This matters in drawing because value is not only about how dark a mark looks fr
 
 Charcoal is much less prone to that metallic shine, which is one reason artists often choose it for dramatic tonal work. Large shadow masses can remain visually dark under changing light instead of turning silver at oblique angles.
 
+## Point Control and Binder
+
 Graphite usually offers more predictable point control. A well-made graphite pencil can be sharpened to a narrow tip and maintain that geometry for a useful period, especially in HB or harder grades. This makes it natural for small lettering, measured drawing, technical lines, detailed hatching, and controlled contours.
 
 Charcoal pencils can also be sharpened finely, but the core is often more fragile. A long exposed point may snap if lateral pressure is applied. The artist must therefore balance sharpness against mechanical support.
@@ -28,6 +32,8 @@ Charcoal pencils can also be sharpened finely, but the core is often more fragil
 Binder changes charcoal dramatically. Vine and willow charcoal contain little or no added binder and are extremely soft, powdery, and easy to move. Compressed charcoal is made from charcoal particles combined with a binder and pressed into sticks or cores. Charcoal pencils typically use a formulated core that is stronger and cleaner to handle than loose vine charcoal.
 
 Because of these differences, “charcoal” is not one single behavior. A vine stick, a compressed charcoal block, and a hard charcoal pencil can feel very different from one another. The same is true of graphite, where an H pencil and an 8B pencil occupy very different regions of the material's performance range.
+
+## Grading and Paper
 
 Graphite's grading system is one of its major advantages. Manufacturers commonly offer a continuous range from hard H grades through HB and into softer B grades. This allows artists to choose point retention, darkness, and material deposition with considerable precision.
 
@@ -38,6 +44,8 @@ Paper tooth affects both materials, but in different ways. Graphite tends to rid
 Charcoal particles are often larger and more loosely bound. Tooth helps trap them, so textured drawing paper can hold charcoal effectively while still allowing blending and lifting. On very smooth paper, charcoal may sit loosely on the surface and become difficult to control.
 
 This is why charcoal papers often have more pronounced texture than papers used for fine graphite work. The surface acts almost like a mechanical reservoir for particles.
+
+## Smudging, Subtraction and Dust
 
 Smudging is another major difference. Graphite can smear, especially in soft grades, but charcoal is usually much more mobile. A hand passing over a charcoal drawing can move significant amounts of material and contaminate clean areas.
 
@@ -55,6 +63,8 @@ A soft brush or careful tilting of the paper is usually safer. Charcoal pencils 
 
 Graphite is generally cleaner. It produces fewer loose particles and can be carried in notebooks without the same level of transfer. For field notes, sketchbooks, and mixed writing/drawing use, that cleanliness is a major advantage.
 
+## Fixative and Archival Behavior
+
 Fixative is more commonly associated with charcoal because the finished drawing remains vulnerable to smudging. A workable or final fixative can help stabilize the surface, although sprays may alter value, texture, or appearance.
 
 Graphite drawings sometimes use fixative as well, but the need is usually less urgent. Heavy graphite can still transfer, yet the material is generally more stable under normal handling than soft charcoal.
@@ -62,6 +72,8 @@ Graphite drawings sometimes use fixative as well, but the need is usually less u
 Archival behavior depends on more than the carbon material itself. Graphite and charcoal are both chemically stable forms of carbon, but paper quality, binders, fixatives, adhesives, and storage conditions often determine long-term preservation.
 
 This is important because artists sometimes assume a carbon-based mark is automatically permanent. The drawing may survive chemically while the paper yellows, becomes brittle, or reacts to poor framing materials.
+
+## How They Respond to Pressure
 
 Pressure produces different visual responses. With graphite, more pressure generally increases deposition until the surface begins to burnish. Past that point, additional pressure may increase shine more than darkness.
 
@@ -79,6 +91,8 @@ Line character differs as the point wears. A graphite point tends to polish and 
 
 That texture is valuable in subjects such as hair, foliage, fabric, stone, or atmospheric shadows. Graphite often produces cleaner boundaries, while charcoal naturally introduces irregularity.
 
+## Blending, Layering and Combining
+
 Blending tools also behave differently. Tortillons and blending stumps can spread graphite smoothly, but excessive blending may produce a dull polished surface. With charcoal, the same tools can move a much larger amount of material and create broad soft transitions.
 
 Fingers are sometimes used for charcoal blending, but skin oils can contaminate the paper and change how later layers behave. Tools are more predictable and cleaner for archival work.
@@ -94,6 +108,8 @@ Sharpening reveals another practical difference. Graphite pencils usually tolera
 Knife sharpening is common for charcoal because it allows the artist to expose a long section of core without subjecting it to strong rotational stress. Sandpaper can then refine the point.
 
 The same technique is used with graphite drawing pencils, but the risk of breakage is usually greater with fragile charcoal. Wood quality and core bonding become especially important.
+
+## A Side-by-Side Test
 
 For collectors, charcoal pencils are interesting because familiar wooden-pencil construction hides a different internal technology. From the outside, a charcoal pencil may look almost identical to a graphite drawing pencil. The change becomes apparent only after sharpening and use.
 

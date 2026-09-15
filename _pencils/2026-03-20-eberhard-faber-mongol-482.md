@@ -17,6 +17,8 @@ The Eberhard Faber Mongol 482 belongs to the second group.
 
 Eberhard Faber’s own historical archive describes the MONGOL as one of the company’s best-known products and dates its production to around 1900. A surviving catalogue illustration from 1923 already shows Mongol as an established range rather than a temporary experiment. By then, the name had become part of American pencil culture.
 
+## Eberhard Faber, New York to Wilkes-Barre
+
 That history sits inside a larger company story.
 
 John Eberhard Faber began making pencils in New York in 1861. The factory moved from Manhattan to Brooklyn in 1872 and remained there until 1956, when production shifted to Wilkes-Barre, Pennsylvania. Eberhard Faber became one of the major names in American pencils, producing everything from ordinary school and office models to the later Blackwing 602.
@@ -28,6 +30,8 @@ It was not marketed as a luxury object. It was a dependable writing pencil inten
 The MONGOL name had been filed earlier, in 1920.
 
 Those dates are useful to collectors because they show that model numbers and brand names can have legal histories separate from the physical pencil. A barrel may look simple, but the words stamped into it can represent decades of commercial continuity.
+
+## The Pencil That Became a Literary Character
 
 The Mongol 482 is also one of the few pencils to become a literary character.
 
@@ -46,6 +50,8 @@ This one is also remembered because somebody used it to explain how manufactured
 The choice was effective precisely because the pencil was ordinary.
 
 A rare artist pencil would have weakened the point. Read needed an object that readers could take for granted. The Mongol 482 was familiar enough to represent the entire category.
+
+## Two Ways to Look at the Same Pencil
 
 For collectors, this creates two ways to look at the same pencil.
 
@@ -75,6 +81,8 @@ The model name lasted longer than a single factory.
 
 That survival is part of its collecting interest.
 
+## Same Model Number Is Not the Same Pencil
+
 It also creates a warning: “same model number” does not mean “same pencil.”
 
 Core formulation can change.
@@ -96,6 +104,8 @@ A No. 2 from one era may not feel like a No. 2 from another.
 That makes a writing sample worth keeping with the collection.
 
 Use the same paper, the same approximate pressure, and the same sharpener when comparing generations. Record the result rather than relying on memory.
+
+## Mongol Beside the Blackwing
 
 The 482 also belongs beside the Blackwing 602 for an interesting reason.
 

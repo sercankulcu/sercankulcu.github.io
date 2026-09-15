@@ -15,6 +15,8 @@ The eraser on the end of a wooden pencil looks almost incidental, but attaching 
 
 Three different materials have to cooperate: a wooden barrel, a thin metal ferrule, and a rubber or synthetic eraser plug. None of them behaves the same way under pressure. Wood can crush, metal can bend permanently, and the eraser can compress and recover.
 
+## The Ferrule as a Deformable Sleeve
+
 The ferrule solves the problem by acting as a deformable sleeve.
 
 During assembly, one end of the metal tube is fitted over the finished pencil barrel and the eraser is inserted into the opposite end. The ferrule is then crimped. Instead of relying only on glue, the metal is pressed inward at selected points so that it grips both the wood and the eraser mechanically.
@@ -24,6 +26,8 @@ That deformation is why ferrules often have visible rings, dimples, ribs, or ban
 Those marks are not purely decorative.
 
 A crimping die presses the metal into a new shape and creates local pressure against the materials underneath. On the barrel side, the ferrule has to hold tightly enough that it does not rotate or pull off during normal use. On the eraser side, it has to retain the eraser without cutting it, crushing it excessively, or allowing it to slide out.
+
+## Getting the Pressure Right
 
 The pressure has to be balanced.
 
@@ -51,6 +55,8 @@ This becomes especially important on mass-market school pencils.
 
 A ferrule may look like a cheap stamped part, but a factory producing millions of pencils cannot afford a high percentage of loose erasers or detached metal sleeves. A failure that seems minor on one pencil becomes a serious quality-control problem when repeated across large production runs.
 
+## The Wood Under the Ferrule
+
 The wood under the ferrule adds another variable.
 
 The end of the pencil must be cut cleanly and consistently. If the barrel is undersized, out of round, cracked, or poorly coated, the ferrule may grip unevenly.
@@ -60,6 +66,8 @@ Some ferrules cover the lacquered barrel.
 Others meet an exposed or specially prepared end section.
 
 The joint between wood and metal can therefore reveal something about finishing order as well as attachment method.
+
+## Why Ferrules Date a Pencil
 
 For collectors, this is useful because ferrules often change before the rest of a pencil changes.
 

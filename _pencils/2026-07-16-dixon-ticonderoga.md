@@ -24,6 +24,8 @@ For generations of American students, that combination has looked less like a de
 
 That familiarity hides a long industrial history.
 
+## From Crucibles to Pencils
+
 The company behind the Ticonderoga did not begin with school supplies.
 
 Joseph Dixon founded a graphite-based manufacturing business in 1827, initially concentrating on crucibles used for melting metals. Graphite was valuable because it could withstand high temperatures, and Dixon became an expert in processing it for industrial use.
@@ -59,6 +61,8 @@ The name therefore was not simply decorative branding.
 It pointed back to material.
 
 Graphite from New York became part of the identity of an American-made pencil intended to compete with imported products.
+
+## Yellow Arrived in 1913
 
 The earliest Ticonderoga pencils did not yet look like the ones people recognize today.
 
@@ -99,6 +103,8 @@ The brand lives in proportion, color, typography, finish, and repetition.
 Millions of nearly identical pencils built recognition.
 
 That is why a Ticonderoga can often be identified across a classroom before the name is visible.
+
+## Consistency at Enormous Scale
 
 The No. 2 version became especially dominant.
 
@@ -150,6 +156,8 @@ Weak ferrules become classroom litter.
 
 The success of a school pencil depends on reducing small failures.
 
+## Cedar, Forestry and a Hidden Supply Chain
+
 The Ticonderoga also belongs to the larger American transition in pencil woods.
 
 Early American manufacturers relied heavily on eastern red cedar.
@@ -200,6 +208,8 @@ It built a recognizable national brand.
 
 The Ticonderoga became the visible end of a much larger industrial network.
 
+## Norman Rockwell and the Ordinary American
+
 Advertising helped fix that identity.
 
 In the 1920s, Dixon commissioned Norman Rockwell to create paintings for Ticonderoga advertisements.
@@ -235,6 +245,8 @@ Office worker.
 Child learning to write.
 
 The model succeeded by becoming culturally normal.
+
+## A Long-Lived Model Accumulates Variations
 
 That normality creates an interesting collecting problem.
 
@@ -318,6 +330,8 @@ The Ticonderoga has remained recognizable long enough for production changes to 
 
 It becomes possible to compare industrial eras using objects that were meant to be functionally equivalent.
 
+## Comparing an Old One With a New One
+
 One comparison is especially revealing.
 
 Take an older Ticonderoga No. 2 and a recent one.
@@ -371,6 +385,8 @@ Consumer expectations change.
 The object must absorb those changes without losing recognition.
 
 Ticonderoga has done that remarkably well.
+
+## A Counterpoint to Prestige Pencils
 
 It is also a good counterpoint to prestige pencils.
 

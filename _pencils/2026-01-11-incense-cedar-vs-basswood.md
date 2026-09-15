@@ -15,6 +15,8 @@ A wooden pencil is often judged by its graphite, but the material surrounding th
 
 Two of the most important pencil woods today are incense cedar and basswood. They can both produce perfectly usable pencils, yet they arrive there through different combinations of grain, density, machining behavior, cost, supply, and finishing quality.
 
+## Why Incense Cedar
+
 Incense cedar became important after the American pencil industry began moving away from Eastern red cedar in the early twentieth century. In 1910, Eagle Pencil Company’s Hudson Lumber subsidiary established a slat operation in San Leandro, California, specifically to process incense cedar. The species proved unusually well suited to pencil production.
 
 Its main advantage is not simply that it smells pleasant when sharpened.
@@ -30,6 +32,8 @@ California Cedar Products describes it as particularly suitable for close-tolera
 The wood also has relatively straight, fine grain.
 
 That matters during sharpening because the blade is cutting both across and along the grain while the pencil rotates. Coarse or irregular grain can produce rough shavings, torn surfaces, or sudden changes in cutting resistance. A well-made incense-cedar pencil usually gives the sharpener an easier, more uniform job.
+
+## What Basswood Offers
 
 Basswood solves the same problem differently.
 
@@ -47,6 +51,8 @@ It changes the trade-off.
 
 Basswood can provide an economical, dependable slat supply for an enormous range of pencils, from value-oriented school products to better-quality writing and drawing pencils. Modern slat suppliers grade and process it specifically for pencil manufacturing rather than treating any piece of linden wood as interchangeable.
 
+## Species Is Not a Quality Rating
+
 This distinction is important.
 
 Wood species alone does not determine pencil quality.
@@ -56,6 +62,8 @@ Drying, slat grading, machining accuracy, groove geometry, glue, core bonding, s
 Collectors sometimes make the mistake of reading “cedar” as a complete quality rating.
 
 It is better understood as one piece of evidence.
+
+## What Sharpening Reveals
 
 The most obvious difference appears when the pencil is sharpened.
 
@@ -85,6 +93,8 @@ Does the shaving form a continuous ribbon?
 
 These observations reveal both the species and the quality of the slat processing.
 
+## Economics and the Slat Supply
+
 The comparison also explains why expensive pencils do not all use the same wood.
 
 Incense cedar remains a premium material, but its economics differ from alternative species. CalCedar notes that incense cedar now serves primarily the higher end of the pencil market, while basswood programs are designed to cover both high-quality and more economical pencils.
@@ -102,6 +112,8 @@ Many modern pencil companies no longer begin with logs. They buy prepared pencil
 That specialization also means two pencils made by different brands may begin with wood from the same slat supplier.
 
 The brand name on the barrel does not necessarily reveal the entire supply chain.
+
+## Recording Wood Honestly
 
 For a collection database, I would therefore add a field for wood species only when it is documented or strongly supported. “Cedar-colored wood” is not enough.
 
