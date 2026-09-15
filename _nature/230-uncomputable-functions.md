@@ -34,9 +34,9 @@ Finite strings over a finite alphabet are countable.
 
 Therefore all programs can, in principle, be listed:
 
-\[
+$$
 P_1,P_2,P_3,\ldots
-\]
+$$
 
 So there are only countably many programs.
 
@@ -48,9 +48,9 @@ Therefore there are only countably many computable functions.
 
 But how many functions are there from:
 
-\[
+$$
 \mathbb{N}\rightarrow\{0,1\}?
-\]
+$$
 
 Uncountably many.
 
@@ -86,13 +86,13 @@ Yes.
 
 Define:
 
-\[
+$$
 H(P,x)=
 \begin{cases}
 1 & P\text{ halts on }x\\
 0 & P\text{ does not halt on }x
 \end{cases}
-\]
+$$
 
 If H were computable, the halting problem would be decidable.
 
@@ -104,17 +104,17 @@ Therefore H is uncomputable.
 
 Suppose we enumerate computable binary functions:
 
-\[
+$$
 f_1,f_2,f_3,\ldots
-\]
+$$
 
 Define:
 
-\[
+$$
 g(n)=1-f_n(n)
-\]
+$$
 
-Then g differs from each \(f_n\) at input n.
+Then g differs from each $$f_n$$ at input n.
 
 So g is not on the list.
 
@@ -140,9 +140,9 @@ Among all n-state machines that eventually halt, what is the maximum number of s
 
 Call this:
 
-\[
+$$
 BB(n)
-\]
+$$
 
 Exact definitions vary by machine convention.
 
@@ -158,9 +158,9 @@ Even modest input sizes become extraordinarily difficult.
 
 Suppose we could compute:
 
-\[
+$$
 BB(n)
-\]
+$$
 
 Then for any n-state machine, simulate it for BB(n) steps.
 
@@ -174,9 +174,9 @@ Extending this gives a contradiction.
 
 For every computable function f, eventually:
 
-\[
+$$
 BB(n)>f(n)
-\]
+$$
 
 Busy Beaver outruns:
 
@@ -193,9 +193,9 @@ It crosses the computability boundary.
 
 Another famous uncomputable object is **Chaitin's constant**, often written:
 
-\[
+$$
 \Omega
-\]
+$$
 
 It encodes the halting probability of a universal prefix-free machine.
 
@@ -203,7 +203,7 @@ Its binary digits contain highly compressed information about halting.
 
 ## Omega and Algorithmic Randomness
 
-The digits of \(\Omega\) are algorithmically random in a strong formal sense.
+The digits of $$\Omega$$ are algorithmically random in a strong formal sense.
 
 No program significantly shorter than the relevant prefix can generate arbitrarily long initial segments.
 
@@ -211,7 +211,7 @@ Uncomputability connects to information theory.
 
 ## Machine Dependence
 
-The exact value of \(\Omega\) depends on the chosen universal machine.
+The exact value of $$\Omega$$ depends on the chosen universal machine.
 
 So there is no single universal numerical constant with machine-independent digits.
 
@@ -223,9 +223,9 @@ A real number is computable if an algorithm can approximate it to arbitrary prec
 
 Examples:
 
-\[
+$$
 \sqrt2,\ \pi,\ e
-\]
+$$
 
 These numbers may have infinitely many digits.
 

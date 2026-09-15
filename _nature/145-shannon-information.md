@@ -26,15 +26,15 @@ His theory became the foundation of digital communication.
 
 ## Information and Surprise
 
-Suppose an event has probability \(p\).
+Suppose an event has probability $$p$$.
 
 A rare event is more surprising than a common one.
 
 Shannon defined the information associated with observing an event as:
 
-\[
+$$
 I(x)=-\log_2 p(x)
-\]
+$$
 
 The smaller the probability, the larger the information.
 
@@ -46,15 +46,15 @@ If two independent events occur, their information adds.
 
 If:
 
-\[
+$$
 p(x,y)=p(x)p(y)
-\]
+$$
 
 then:
 
-\[
+$$
 I(x,y)=I(x)+I(y)
-\]
+$$
 
 This makes information behave naturally across combined events.
 
@@ -64,15 +64,15 @@ Using base-2 logarithms gives information in **bits**.
 
 If two outcomes are equally likely:
 
-\[
-p=rac{1}{2}
-\]
+$$
+p=\frac{1}{2}
+$$
 
 then:
 
-\[
-I=-\log_2\left(rac{1}{2}ight)=1
-\]
+$$
+I=-\log_2\left(\frac{1}{2}\right)=1
+$$
 
 One binary choice corresponds to one bit.
 
@@ -116,9 +116,9 @@ Information is defined relative to an assumed source distribution.
 
 The expected information produced by a source is its **Shannon entropy**:
 
-\[
+$$
 H(X)=-\sum_x p(x)\log_2 p(x)
-\]
+$$
 
 Entropy measures average uncertainty before observing the outcome.
 
@@ -136,21 +136,21 @@ Uniform uncertainty maximizes potential information.
 
 Suppose a source emits:
 
-\[
+$$
 A,B,C,D
-\]
+$$
 
 each with probability:
 
-\[
-rac{1}{4}
-\]
+$$
+\frac{1}{4}
+$$
 
 Then each symbol carries:
 
-\[
--\log_2\left(rac{1}{4}ight)=2
-\]
+$$
+-\log_2\left(\frac{1}{4}\right)=2
+$$
 
 bits.
 
@@ -205,11 +205,11 @@ Formally, this connects information theory to prediction.
 
 **Mutual information** measures how much knowing one variable tells us about another.
 
-If \(X\) and \(Y\) are independent:
+If $$X$$ and $$Y$$ are independent:
 
-\[
+$$
 I(X;Y)=0
-\]
+$$
 
 If they are strongly related, mutual information is larger.
 

@@ -42,9 +42,9 @@ DNA uses four nucleotide bases:
 
 We abbreviate them:
 
-\[
+$$
 A,\ C,\ G,\ T
-\]
+$$
 
 A DNA molecule is not merely a string of letters.
 
@@ -81,9 +81,9 @@ DNA can be analyzed with information theory.
 
 A sequence drawn from four possible bases can, under idealized equal probabilities, carry up to:
 
-\[
+$$
 \log_2 4 = 2
-\]
+$$
 
 bits per base.
 

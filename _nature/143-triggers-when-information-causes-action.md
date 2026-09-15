@@ -92,9 +92,9 @@ An AND gate responds to two binary inputs.
 
 Only one combination yields output 1:
 
-\[
+$$
 1 \land 1 = 1
-\]
+$$
 
 Different input patterns cause different electrical outcomes.
 

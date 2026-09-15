@@ -101,9 +101,9 @@ Landauer's principle links information erasure to heat dissipation.
 
 Erasing one logical bit in an idealized setting has a minimum thermodynamic cost:
 
-\[
+$$
 k_B T\ln 2
-\]
+$$
 
 This demonstrates that logical operations can have unavoidable physical consequences.
 

@@ -184,7 +184,7 @@ This allows general claims about syntax.
 
 For example:
 
-"If formula \(A\) is provable..."
+"If formula $$A$$ is provable..."
 
 Now the system discusses expressions abstractly.
 

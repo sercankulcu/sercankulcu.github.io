@@ -20,9 +20,9 @@ It is not.
 
 From the simple sequence:
 
-\[
+$$
 0,1,2,3,\ldots
-\]
+$$
 
 emerge questions involving:
 
@@ -38,9 +38,9 @@ Number theory became central to both pure mathematics and modern cryptography.
 
 The integers are:
 
-\[
+$$
 \mathbb{Z}=\{\ldots,-2,-1,0,1,2,\ldots\}
-\]
+$$
 
 Their basic operations are:
 
@@ -54,15 +54,15 @@ Division introduces complications.
 
 We say:
 
-\[
+$$
 a\mid b
-\]
+$$
 
 if there exists an integer k such that:
 
-\[
+$$
 b=ak
-\]
+$$
 
 Divisibility organizes arithmetic structure.
 
@@ -75,9 +75,9 @@ A positive integer greater than 1 is **prime** if its only positive divisors are
 
 Examples:
 
-\[
+$$
 2,3,5,7,11,\ldots
-\]
+$$
 
 Primes are the building blocks of integers.
 
@@ -87,9 +87,9 @@ Every integer greater than 1 can be factored uniquely into primes, apart from or
 
 For example:
 
-\[
+$$
 60=2^2\cdot3\cdot5
-\]
+$$
 
 This is the **Fundamental Theorem of Arithmetic**.
 
@@ -101,15 +101,15 @@ Euclid proved there are infinitely many primes.
 
 Suppose there were only finitely many:
 
-\[
+$$
 p_1,p_2,\ldots,p_n
-\]
+$$
 
 Consider:
 
-\[
+$$
 N=p_1p_2\cdots p_n+1
-\]
+$$
 
 N is not divisible by any listed prime.
 
@@ -127,9 +127,9 @@ Their distribution is irregular enough to appear mysterious and regular enough t
 
 The Prime Number Theorem says the number of primes up to x is approximately:
 
-\[
+$$
 \frac{x}{\ln x}
-\]
+$$
 
 for large x.
 
@@ -141,9 +141,9 @@ The **greatest common divisor** of a and b is the largest positive integer divid
 
 It is written:
 
-\[
+$$
 \gcd(a,b)
-\]
+$$
 
 The Euclidean algorithm computes it efficiently.
 
@@ -151,9 +151,9 @@ The Euclidean algorithm computes it efficiently.
 
 Repeated division with remainder gives:
 
-\[
+$$
 \gcd(a,b)
-\]
+$$
 
 This is one of the oldest algorithms in mathematics.
 
@@ -165,11 +165,11 @@ In modular arithmetic, numbers are considered according to their remainder.
 
 We write:
 
-\[
+$$
 a\equiv b \pmod n
-\]
+$$
 
-if n divides \(a-b\).
+if n divides $$a-b$$.
 
 This creates a cyclic arithmetic.
 
@@ -177,9 +177,9 @@ This creates a cyclic arithmetic.
 
 Modulo 12:
 
-\[
+$$
 10+5\equiv3\pmod{12}
-\]
+$$
 
 This resembles a clock.
 
@@ -197,19 +197,19 @@ This connects arithmetic to the broader concept of equivalence relations.
 
 If p is prime and a is not divisible by p, then:
 
-\[
+$$
 a^{p-1}\equiv1\pmod p
-\]
+$$
 
 This theorem is important in modular arithmetic and cryptographic algorithms.
 
 ## Euler's Theorem
 
-A generalization uses Euler's totient function \(\varphi(n)\):
+A generalization uses Euler's totient function $$\varphi(n)$$:
 
-\[
+$$
 a^{\varphi(n)}\equiv1\pmod n
-\]
+$$
 
 when a and n are coprime.
 
@@ -221,19 +221,19 @@ A **Diophantine equation** seeks integer solutions to polynomial equations.
 
 Example:
 
-\[
+$$
 x^2+y^2=z^2
-\]
+$$
 
 Integer solutions form Pythagorean triples.
 
 ## Fermat's Last Theorem
 
-Fermat claimed that for integers \(n>2\):
+Fermat claimed that for integers $$n>2$$:
 
-\[
+$$
 x^n+y^n=z^n
-\]
+$$
 
 has no positive integer solutions.
 
@@ -247,9 +247,9 @@ A simple statement can require enormous theory.
 
 Another classical form is:
 
-\[
+$$
 x^2-Dy^2=1
-\]
+$$
 
 for nonsquare D.
 
@@ -263,9 +263,9 @@ A perfect number equals the sum of its proper positive divisors.
 
 For example:
 
-\[
+$$
 6=1+2+3
-\]
+$$
 
 The concept connects to Mersenne primes.
 
@@ -275,9 +275,9 @@ Ancient arithmetic questions remain active today.
 
 Twin primes differ by 2:
 
-\[
+$$
 (3,5), (5,7), (11,13)
-\]
+$$
 
 Are there infinitely many?
 

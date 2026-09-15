@@ -227,9 +227,9 @@ A codon contains three nucleotide bases.
 
 With four possible bases, there are:
 
-\[
+$$
 4^3 = 64
-\]
+$$
 
 possible codons.
 

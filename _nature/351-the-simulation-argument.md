@@ -74,19 +74,19 @@ If you regard yourself as a random observer from the relevant class, simulation 
 
 Suppose:
 
-real observers = \(N_R\)
+real observers = $$N_R$$
 
-simulated observers = \(N_S\)
+simulated observers = $$N_S$$
 
 Then a naive self-sampling probability might be:
 
-\[
+$$
 P(\text{simulated})
 =
 \frac{N_S}{N_R+N_S}
-\]
+$$
 
-If \(N_S \gg N_R\), the ratio approaches 1.
+If $$N_S \gg N_R$$, the ratio approaches 1.
 
 ## The Argument Is Conditional
 
@@ -94,7 +94,7 @@ This conclusion depends on major assumptions.
 
 If simulated consciousness is impossible, then:
 
-\(N_S=0\)
+$$N_S=0$$
 
 for genuine conscious simulated observers.
 
@@ -436,12 +436,12 @@ We have no empirical frequency of base universes.
 
 Posterior simulation probability would depend on:
 
-\[
+$$
 P(\text{simulation}|\text{evidence})
 \propto
 P(\text{evidence}|\text{simulation})
 P(\text{simulation})
-\]
+$$
 
 The prior is deeply uncertain.
 
@@ -453,9 +453,9 @@ A simulator could choose almost any world.
 
 Therefore:
 
-\[
+$$
 P(E|\text{simulation})
-\]
+$$
 
 is hard to specify.
 

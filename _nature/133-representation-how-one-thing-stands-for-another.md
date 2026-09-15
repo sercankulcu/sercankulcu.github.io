@@ -313,9 +313,9 @@ Mathematics represents quantities and relations abstractly.
 
 The equation:
 
-\[
+$$
 F=ma
-\]
+$$
 
 represents a relation among force, mass, and acceleration.
 

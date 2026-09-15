@@ -34,15 +34,15 @@ This is the domain of **probabilistic reasoning**.
 
 A probability assigns a number between:
 
-\[
+$$
 0
-\]
+$$
 
 and:
 
-\[
+$$
 1
-\]
+$$
 
 to an event.
 
@@ -56,23 +56,23 @@ Exactly what probability means is philosophically contested.
 
 Modern probability theory is commonly built from three axioms.
 
-For an event \(A\):
+For an event $$A$$:
 
-\[
+$$
 P(A) \geq 0
-\]
+$$
 
 The probability of the entire sample space is:
 
-\[
+$$
 P(\Omega)=1
-\]
+$$
 
 For mutually exclusive events:
 
-\[
+$$
 P(A \cup B)=P(A)+P(B)
-\]
+$$
 
 These simple rules generate a rich theory.
 
@@ -80,9 +80,9 @@ These simple rules generate a rich theory.
 
 The probability that A does not occur is:
 
-\[
+$$
 P(\neg A)=1-P(A)
-\]
+$$
 
 If rain probability is 0.3, then no-rain probability is 0.7.
 
@@ -90,9 +90,9 @@ If rain probability is 0.3, then no-rain probability is 0.7.
 
 For two events A and B:
 
-\[
+$$
 P(A \land B)
-\]
+$$
 
 means:
 
@@ -104,15 +104,15 @@ Joint probabilities capture interaction.
 
 The probability of A given B is:
 
-\[
+$$
 P(A \mid B)=\frac{P(A \land B)}{P(B)}
-\]
+$$
 
 when:
 
-\[
+$$
 P(B)>0
-\]
+$$
 
 Conditional probability is one of the foundations of rational updating.
 
@@ -120,9 +120,9 @@ Conditional probability is one of the foundations of rational updating.
 
 Events A and B are independent if:
 
-\[
+$$
 P(A \land B)=P(A)P(B)
-\]
+$$
 
 Equivalently, learning B does not change the probability of A.
 
@@ -132,15 +132,15 @@ Independence is an assumption that must be justified.
 
 For a fair coin:
 
-\[
+$$
 P(H)=\frac12
-\]
+$$
 
 Two independent heads:
 
-\[
+$$
 P(HH)=\frac12 \times \frac12=\frac14
-\]
+$$
 
 Simple examples build intuition.
 
@@ -201,17 +201,17 @@ Probability can encode ignorance.
 
 Bayes' theorem is:
 
-\[
+$$
 P(H \mid E)=\frac{P(E \mid H)P(H)}{P(E)}
-\]
+$$
 
 It tells us how to update belief in hypothesis H after evidence E.
 
 ## Prior
 
-\[
+$$
 P(H)
-\]
+$$
 
 is the **prior probability**.
 
@@ -226,9 +226,9 @@ Ignoring priors leads to common reasoning errors.
 
 ## Likelihood
 
-\[
+$$
 P(E \mid H)
-\]
+$$
 
 is the **likelihood**.
 
@@ -240,9 +240,9 @@ Good hypotheses often make observed evidence likely.
 
 ## Posterior
 
-\[
+$$
 P(H \mid E)
-\]
+$$
 
 is the **posterior probability**.
 
@@ -287,15 +287,15 @@ A tiny probability of observing evidence if someone were innocent does not imply
 
 Confusing:
 
-\[
+$$
 P(E \mid Innocent)
-\]
+$$
 
 with:
 
-\[
+$$
 P(Innocent \mid E)
-\]
+$$
 
 is a serious error.
 
@@ -321,11 +321,11 @@ Human intuition underestimates combinatorics.
 
 Probability supports decision-making through **expected value**.
 
-If outcome \(i\) has value \(v_i\) and probability \(p_i\):
+If outcome $$i$$ has value $$v_i$$ and probability $$p_i$$:
 
-\[
+$$
 E[V]=\sum_i p_i v_i
-\]
+$$
 
 This combines uncertainty and consequence.
 
@@ -390,9 +390,9 @@ Evidence can be measured by how much more likely it is under one hypothesis than
 
 The **likelihood ratio** is:
 
-\[
+$$
 \frac{P(E \mid H_1)}{P(E \mid H_2)}
-\]
+$$
 
 This expresses evidential discrimination.
 
@@ -420,7 +420,7 @@ Instead of saying:
 
 we ask:
 
-How much should it change \(P(H)\)?
+How much should it change $$P(H)$$?
 
 Support becomes quantitative.
 

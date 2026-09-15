@@ -30,15 +30,15 @@ This is one of the deepest ideas in mathematics and computation:
 
 The natural numbers begin simply:
 
-\[
+$$
 0,1,2,3,\ldots
-\]
+$$
 
 No finite list contains them all.
 
 But one finite rule suffices:
 
-given \(n\), produce \(n+1\).
+given $$n$$, produce $$n+1$$.
 
 A tiny successor rule defines an infinite sequence.
 
@@ -56,17 +56,17 @@ The rule compresses an infinite family.
 
 Take an alphabet:
 
-\[
+$$
 \{0,1\}
-\]
+$$
 
 It contains only two symbols.
 
 But strings can have arbitrary length:
 
-\[
+$$
 0,\ 1,\ 00,\ 01,\ 10,\ 11,\ 000,\ldots
-\]
+$$
 
 A finite alphabet generates infinitely many possible finite strings.
 
@@ -78,19 +78,19 @@ Yet it can generate sentences of arbitrary length.
 
 For example:
 
-\[
-Sightarrow aS
-\]
+$$
+S\rightarrow aS
+$$
 
-\[
-Sightarrow b
-\]
+$$
+S\rightarrow b
+$$
 
 This produces:
 
-\[
+$$
 b,\ ab,\ aab,\ aaab,\ldots
-\]
+$$
 
 Finite syntax opens an infinite language.
 
@@ -100,23 +100,23 @@ Balanced parentheses provide another example.
 
 Start with:
 
-\[
+$$
 ()
-\]
+$$
 
 Then build larger forms:
 
-\[
+$$
 (())
-\]
+$$
 
-\[
+$$
 ()()
-\]
+$$
 
-\[
+$$
 ((()))
-\]
+$$
 
 Recursive rules generate arbitrarily deep nesting.
 
@@ -126,17 +126,17 @@ Formal structure has no fixed maximum depth.
 
 A finite grammar can define expressions such as:
 
-\[
+$$
 1+2
-\]
+$$
 
-\[
-(1+2)	imes3
-\]
+$$
+(1+2)\times3
+$$
 
-\[
-((1+2)	imes3)-4
-\]
+$$
+((1+2)\times3)-4
+$$
 
 Subexpressions contain subexpressions.
 
@@ -150,17 +150,17 @@ Polynomials can have arbitrary degree.
 
 A finite recursive definition can generate:
 
-\[
+$$
 1
-\]
+$$
 
-\[
+$$
 x+1
-\]
+$$
 
-\[
+$$
 x^2+3x+2
-\]
+$$
 
 and indefinitely more.
 

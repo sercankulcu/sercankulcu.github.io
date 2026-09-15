@@ -98,9 +98,9 @@ Phrases contain smaller phrases.
 
 For example:
 
-\[
-S ightarrow NP\ VP
-\]
+$$
+S \rightarrow NP\ VP
+$$
 
 A noun phrase may itself contain another noun phrase through rules involving relative clauses or possession.
 
@@ -130,9 +130,9 @@ A grammar may contain a rule that indirectly refers to its own category.
 
 For example:
 
-\[
-NP ightarrow NP\ PP
-\]
+$$
+NP \rightarrow NP\ PP
+$$
 
 A noun phrase can contain a prepositional phrase attached to another noun phrase.
 
@@ -296,9 +296,9 @@ Parentheses are visual markers of nesting.
 
 Consider:
 
-\[
-((a+b)	imes(c-d))
-\]
+$$
+((a+b)\times(c-d))
+$$
 
 The expression's meaning depends on hierarchy.
 

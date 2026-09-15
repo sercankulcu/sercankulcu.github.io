@@ -341,9 +341,9 @@ The brain may combine:
 
 In Bayesian language:
 
-\[
+$$
 P(H\mid D)\propto P(D\mid H)P(H)
-\]
+$$
 
 This is a powerful formal analogy.
 

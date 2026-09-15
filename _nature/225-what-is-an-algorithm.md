@@ -50,29 +50,29 @@ output: the gcd.
 
 One of the oldest known algorithms computes:
 
-\[
+$$
 \gcd(a,b)
-\]
+$$
 
 by repeated remainder operations.
 
 For:
 
-\[
+$$
 a>b
-\]
+$$
 
 replace:
 
-\[
+$$
 (a,b)
-\]
+$$
 
 with:
 
-\[
+$$
 (b,a\bmod b)
-\]
+$$
 
 until the remainder becomes zero.
 
@@ -82,33 +82,33 @@ The last nonzero divisor is the gcd.
 
 Find:
 
-\[
+$$
 \gcd(48,18)
-\]
+$$
 
 Compute:
 
-\[
+$$
 48=2\cdot18+12
-\]
+$$
 
 Then:
 
-\[
+$$
 18=1\cdot12+6
-\]
+$$
 
 Then:
 
-\[
+$$
 12=2\cdot6+0
-\]
+$$
 
 Therefore:
 
-\[
+$$
 \gcd(48,18)=6
-\]
+$$
 
 Finite steps.
 
@@ -171,9 +171,9 @@ For sorting:
 
 Input:
 
-\[
+$$
 [a_1,\ldots,a_n]
-\]
+$$
 
 Output:
 
@@ -253,9 +253,9 @@ An invariant may state:
 
 After k iterations, variable `sum` equals:
 
-\[
+$$
 a_1+\cdots+a_k
-\]
+$$
 
 At termination, the invariant gives the final result.
 
@@ -269,15 +269,15 @@ Example:
 
 factorial.
 
-\[
+$$
 n! = n(n-1)!
-\]
+$$
 
 with base case:
 
-\[
+$$
 0!=1
-\]
+$$
 
 ## Recursion Must Progress
 
@@ -396,15 +396,15 @@ Asymptotic notation describes growth.
 
 For example:
 
-\[
+$$
 O(n)
-\]
+$$
 
 means runtime grows at most linearly up to constant factors in the asymptotic sense.
 
-\[
+$$
 O(n^2)
-\]
+$$
 
 grows quadratically.
 

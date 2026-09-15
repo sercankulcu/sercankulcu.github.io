@@ -316,9 +316,9 @@ But mathematical notation often surpasses ordinary language.
 
 Consider:
 
-\[
-orall x\, P(x)
-\]
+$$
+\forall x\, P(x)
+$$
 
 Symbolic systems can support thought in forms distinct from natural-language sentences.
 

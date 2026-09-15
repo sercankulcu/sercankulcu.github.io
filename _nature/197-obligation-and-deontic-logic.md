@@ -30,25 +30,25 @@ The formal study of such normative notions is called **deontic logic**.
 
 A common notation uses:
 
-\[
+$$
 O P
-\]
+$$
 
 for:
 
 P is obligatory.
 
-\[
+$$
 P P
-\]
+$$
 
 is sometimes used for permission, though notation varies.
 
 To avoid ambiguity, we can also write:
 
-\[
+$$
 Perm(P)
-\]
+$$
 
 for:
 
@@ -56,9 +56,9 @@ P is permitted.
 
 And:
 
-\[
+$$
 F P
-\]
+$$
 
 for:
 
@@ -68,9 +68,9 @@ P is forbidden.
 
 If:
 
-\[
+$$
 O P
-\]
+$$
 
 it does not follow that P actually occurs.
 
@@ -88,9 +88,9 @@ Permission is often defined through absence of prohibition.
 
 For example:
 
-\[
+$$
 Perm(P) \equiv \neg O(\neg P)
-\]
+$$
 
 This says:
 
@@ -102,9 +102,9 @@ Different deontic systems formalize this differently.
 
 Similarly, prohibition can be represented as:
 
-\[
+$$
 F(P) \equiv O(\neg P)
-\]
+$$
 
 P is forbidden if not-P is obligatory.
 
@@ -120,9 +120,9 @@ They are **normatively ideal** worlds.
 
 Then:
 
-\[
+$$
 O P
-\]
+$$
 
 means:
 
@@ -234,9 +234,9 @@ It shows that ordinary logical closure can distort normative meaning.
 
 In classical logic:
 
-\[
+$$
 P \vdash P \lor Q
-\]
+$$
 
 But obligation is not simple truth.
 
@@ -250,15 +250,15 @@ What if two rules require incompatible actions?
 
 For example:
 
-\[
+$$
 O(P)
-\]
+$$
 
 and:
 
-\[
+$$
 O(\neg P)
-\]
+$$
 
 A strict system becomes inconsistent.
 
@@ -346,9 +346,9 @@ If someone is obligated to do P, then P must be possible for them.
 
 Symbolically:
 
-\[
+$$
 O(P) \rightarrow \Diamond P
-\]
+$$
 
 The principle is plausible but debated.
 

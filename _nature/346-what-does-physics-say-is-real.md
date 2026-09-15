@@ -154,9 +154,9 @@ Many realists accept unobservable entities.
 
 Quantum mechanics represents a system using a **wavefunction**:
 
-\[
+$$
 |\psi\rangle
-\]
+$$
 
 or equivalent state formalism.
 

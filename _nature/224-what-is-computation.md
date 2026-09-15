@@ -56,9 +56,9 @@ according to rules.
 
 We can write:
 
-\[
+$$
 f(x)=y
-\]
+$$
 
 A computational process realizes some transformation from x to y.
 

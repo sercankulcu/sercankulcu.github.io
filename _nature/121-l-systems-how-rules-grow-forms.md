@@ -49,9 +49,9 @@ An L-system begins with symbols.
 
 For example:
 
-\[
+$$
 A,\ B,\ +,\ -
-\]
+$$
 
 At first, these symbols need not mean anything spatial.
 
@@ -65,9 +65,9 @@ An L-system starts with an initial string called the **axiom**.
 
 For example:
 
-\[
+$$
 A
-\]
+$$
 
 This is generation zero.
 
@@ -79,39 +79,39 @@ A production rule tells us how each symbol changes.
 
 For example:
 
-\[
-A ightarrow AB
-\]
+$$
+A \rightarrow AB
+$$
 
-\[
-B ightarrow A
-\]
+$$
+B \rightarrow A
+$$
 
-Starting from \(A\):
+Starting from $$A$$:
 
 Generation 0:
 
-\[
+$$
 A
-\]
+$$
 
 Generation 1:
 
-\[
+$$
 AB
-\]
+$$
 
 Generation 2:
 
-\[
+$$
 ABA
-\]
+$$
 
 Generation 3:
 
-\[
+$$
 ABAAB
-\]
+$$
 
 A complex string grows through repeated rewriting.
 
@@ -137,9 +137,9 @@ A common system uses **turtle graphics**.
 
 For example:
 
-- \(F\): move forward and draw,
-- \(+\): turn right,
-- \(-\): turn left.
+- $$F$$: move forward and draw,
+- $$+$$: turn right,
+- $$-$$: turn left.
 
 Now a symbolic string becomes geometry.
 
@@ -149,8 +149,8 @@ Special symbols can represent branching.
 
 A common convention uses:
 
-- \([ \): save current position and direction,
-- \(] \): return to saved state.
+- $$[ $$: save current position and direction,
+- $$] $$: return to saved state.
 
 This allows one string to describe a branching tree.
 
@@ -160,15 +160,15 @@ The grammar becomes a growth program.
 
 Suppose the rule is:
 
-\[
-F ightarrow F[+F]F[-F]F
-\]
+$$
+F \rightarrow F[+F]F[-F]F
+$$
 
 Start with:
 
-\[
+$$
 F
-\]
+$$
 
 After one iteration, one branch becomes several.
 
@@ -233,15 +233,15 @@ Instead of one fixed replacement, a symbol may have several possible productions
 
 For example:
 
-\[
-F ightarrow F[+F]F
-\]
+$$
+F \rightarrow F[+F]F
+$$
 
 or
 
-\[
-F ightarrow F[-F]F
-\]
+$$
+F \rightarrow F[-F]F
+$$
 
 chosen with certain probabilities.
 

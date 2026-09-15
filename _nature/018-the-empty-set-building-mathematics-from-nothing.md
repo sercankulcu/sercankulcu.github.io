@@ -20,11 +20,11 @@ This distinction is one of the cleanest examples of how mathematics formalizes a
 
 The empty set is written:
 
-\(arnothing\)
+$$\varnothing$$
 
 or sometimes:
 
-\(\{\}\)
+$$\{\}$$
 
 It has no elements.
 
@@ -80,7 +80,7 @@ The number of elements in a set is its **cardinality**.
 
 The empty set has cardinality:
 
-\(|arnothing| = 0\)
+$$|\varnothing| = 0$$
 
 This creates a natural connection between zero and empty collection.
 
@@ -100,9 +100,9 @@ They can be connected formally without being identical in ordinary informal math
 
 A surprising theorem says:
 
-\(arnothing \subseteq A\)
+$$\varnothing \subseteq A$$
 
-for every set \(A\).
+for every set $$A$$.
 
 Why?
 
@@ -158,13 +158,13 @@ itself.
 
 Therefore:
 
-\(\mathcal{P}(arnothing) = \{arnothing\}\)
+$$\mathcal{P}(\varnothing) = \{\varnothing\}$$
 
 Notice the difference.
 
-\(arnothing\) contains zero elements.
+$$\varnothing$$ contains zero elements.
 
-\(\{arnothing\}\) contains one element—the empty set.
+$$\{\varnothing\}$$ contains one element—the empty set.
 
 Visually similar notation represents fundamentally different structures.
 
@@ -172,11 +172,11 @@ Visually similar notation represents fundamentally different structures.
 
 Compare:
 
-\(arnothing\)
+$$\varnothing$$
 
-\(\{arnothing\}\)
+$$\{\varnothing\}$$
 
-\(\{arnothing, \{arnothing\}\}\)
+$$\{\varnothing, \{\varnothing\}\}$$
 
 The first has 0 elements.
 
@@ -194,19 +194,19 @@ This leads to one of the most elegant constructions in foundational mathematics.
 
 In the **von Neumann construction** of natural numbers, we define:
 
-\(0 = arnothing\)
+$$0 = \varnothing$$
 
 Then:
 
-\(1 = \{0\} = \{arnothing\}\)
+$$1 = \{0\} = \{\varnothing\}$$
 
 Then:
 
-\(2 = \{0,1\}\)
+$$2 = \{0,1\}$$
 
 Then:
 
-\(3 = \{0,1,2\}\)
+$$3 = \{0,1,2\}$$
 
 and so on.
 

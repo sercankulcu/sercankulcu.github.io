@@ -294,9 +294,9 @@ Logical languages are even more abstract.
 
 Symbols such as:
 
-\[
-orall,\ \exists,\ \land,\ \lor
-\]
+$$
+\forall,\ \exists,\ \land,\ \lor
+$$
 
 are assigned precise rules.
 

@@ -313,9 +313,9 @@ Evidence updates that probability.
 
 Bayes' theorem gives:
 
-\[
+$$
 P(H \mid E)=\frac{P(E \mid H)P(H)}{P(E)}
-\]
+$$
 
 Explanatory fit and prior plausibility interact.
 
@@ -325,9 +325,9 @@ A good explanation often makes the evidence probable.
 
 Bayesian reasoning makes this explicit through:
 
-\[
+$$
 P(E \mid H)
-\]
+$$
 
 But high likelihood alone is not enough.
 

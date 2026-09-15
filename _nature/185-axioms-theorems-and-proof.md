@@ -140,21 +140,21 @@ For example, to prove that the sum of two even integers is even:
 
 Let:
 
-\[
+$$
 a=2m
-\]
+$$
 
 and:
 
-\[
+$$
 b=2n
-\]
+$$
 
 Then:
 
-\[
+$$
 a+b=2m+2n=2(m+n)
-\]
+$$
 
 Therefore the sum is even.
 
@@ -168,13 +168,13 @@ This method is powerful in classical logic.
 
 It relies on specific logical principles.
 
-## Example: Irrationality of \(\sqrt{2}\)
+## Example: Irrationality of $$\sqrt{2}$$
 
 The classical proof assumes:
 
-\[
+$$
 \sqrt{2}=\frac{p}{q}
-\]
+$$
 
 in lowest terms.
 
@@ -182,21 +182,21 @@ Algebra then implies both p and q are even.
 
 That contradicts the assumption that the fraction was reduced.
 
-Therefore \(\sqrt{2}\) is irrational.
+Therefore $$\sqrt{2}$$ is irrational.
 
 ## Contrapositive Proof
 
 To prove:
 
-\[
+$$
 P \rightarrow Q
-\]
+$$
 
 we may instead prove:
 
-\[
+$$
 \neg Q \rightarrow \neg P
-\]
+$$
 
 These are logically equivalent in classical logic.
 
@@ -348,15 +348,15 @@ A formal system should ideally be **consistent**.
 
 It should not prove both:
 
-\[
+$$
 P
-\]
+$$
 
 and:
 
-\[
+$$
 \neg P
-\]
+$$
 
 for the same proposition.
 

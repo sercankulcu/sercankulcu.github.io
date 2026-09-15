@@ -45,9 +45,9 @@ Paradoxes often reveal structure that ordinary reasoning hides.
 
 A contradiction has the form:
 
-\[
+$$
 P \land \neg P
-\]
+$$
 
 A paradox may end in contradiction.
 
@@ -73,9 +73,9 @@ The puzzle is resolved by locating the invalid step.
 
 Fake proofs that:
 
-\[
+$$
 1=2
-\]
+$$
 
 usually belong here.
 
@@ -107,9 +107,9 @@ Calculus shows that an infinite series can have a finite sum.
 
 For example:
 
-\[
+$$
 \frac12+\frac14+\frac18+\cdots=1
-\]
+$$
 
 Infinitely many mathematical intervals need not require infinite total distance or time.
 
@@ -131,11 +131,11 @@ Consider:
 
 the set of all sets that are not members of themselves.
 
-Call it \(R\).
+Call it $$R$$.
 
 Ask:
 
-Is \(R\) a member of itself?
+Is $$R$$ a member of itself?
 
 If yes, then by definition it should not be.
 
@@ -245,7 +245,7 @@ Can the hotel accommodate them?
 
 Yes.
 
-Move guest in room \(n\) to room \(n+1\).
+Move guest in room $$n$$ to room $$n+1$$.
 
 Room 1 becomes free.
 
@@ -372,9 +372,9 @@ Yes, under the standard rules.
 
 Switching gives probability:
 
-\[
+$$
 \frac{2}{3}
-\]
+$$
 
 The result feels wrong because people intuitively reset the probabilities to 1/2.
 

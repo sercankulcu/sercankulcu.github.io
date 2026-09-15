@@ -242,20 +242,17 @@ The heart of general relativity is encoded in Einstein's field equations.
 
 Schematically:
 
-\[
-G_{\mu
-u} + \Lambda g_{\mu
-u}
+$$
+G_{\mu\nu} + \Lambda g_{\mu\nu}
 =
-rac{8\pi G}{c^4}T_{\mu
-u}
-\]
+\frac{8\pi G}{c^4}T_{\mu\nu}
+$$
 
 The left side describes aspects of spacetime geometry.
 
 The right side describes matter and energy content.
 
-The cosmological constant \(\Lambda\) allows spacetime geometry to include an additional large-scale term.
+The cosmological constant $$\Lambda$$ allows spacetime geometry to include an additional large-scale term.
 
 The equation is compact.
 

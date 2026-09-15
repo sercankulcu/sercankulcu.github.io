@@ -34,11 +34,11 @@ Large language models became one of the most visible forms of this shift.
 
 A discriminative model often estimates something like:
 
-\[
+$$
 P(y|x)
-\]
+$$
 
-Given input \(x\), predict label \(y\).
+Given input $$x$$, predict label $$y$$.
 
 A generative model instead learns structure that allows it to produce or model data itself.
 
@@ -48,9 +48,9 @@ A language model assigns probabilities to sequences.
 
 Using the chain rule:
 
-\[
+$$
 P(w_1,\ldots,w_n)=\prod_{t=1}^{n}P(w_t|w_1,\ldots,w_{t-1})
-\]
+$$
 
 Autoregressive models learn to predict the next token.
 
@@ -111,9 +111,9 @@ Self-attention lets each token selectively incorporate information from other to
 
 A simplified form is:
 
-\[
+$$
 Attention(Q,K,V)=softmax\left(\frac{QK^T}{\sqrt{d_k}}\right)V
-\]
+$$
 
 The exact implementation varies.
 

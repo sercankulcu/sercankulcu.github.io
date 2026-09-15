@@ -416,9 +416,9 @@ tails is due.
 
 For independent fair flips:
 
-\[
+$$
 P(T|\text{previous sequence})=0.5
-\]
+$$
 
 Past streaks do not create debt.
 

@@ -58,7 +58,7 @@ Once geometry itself became physical, the idea that geometry might be emergent b
 
 ## The Planck Scale
 
-Near the Planck length, about \(10^{-35}\) meters, dimensional arguments suggest quantum-gravitational effects become important.
+Near the Planck length, about $$10^{-35}$$ meters, dimensional arguments suggest quantum-gravitational effects become important.
 
 This is not a confirmed smallest unit of space.
 

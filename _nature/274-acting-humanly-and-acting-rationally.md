@@ -163,9 +163,9 @@ Bad luck does not make a decision irrational.
 
 One formal framework selects the action maximizing expected utility:
 
-\[
+$$
 a^*=\arg\max_a \mathbb{E}[U\mid a]
-\]
+$$
 
 The agent considers possible outcomes and their values.
 

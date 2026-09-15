@@ -122,9 +122,9 @@ d,
 
 the number of possible paths can grow roughly like:
 
-\[
+$$
 b^d
-\]
+$$
 
 This is exponential growth.
 
@@ -148,9 +148,9 @@ Heuristics are informed shortcuts.
 
 Greedy best-first search chooses states appearing closest to the goal according to a heuristic:
 
-\[
+$$
 h(n)
-\]
+$$
 
 It can be fast.
 
@@ -165,14 +165,14 @@ A* combines:
 
 Its evaluation is:
 
-\[
+$$
 f(n)=g(n)+h(n)
-\]
+$$
 
 where:
 
-- \(g(n)\) = cost from start,
-- \(h(n)\) = estimated cost to goal.
+- $$g(n)$$ = cost from start,
+- $$h(n)$$ = estimated cost to goal.
 
 ## Admissible Heuristic
 
@@ -184,9 +184,9 @@ Under standard conditions, A* with an admissible heuristic finds an optimal solu
 
 A stronger property is **consistency**:
 
-\[
+$$
 h(n)\leq c(n,n')+h(n')
-\]
+$$
 
 This ensures heuristic estimates behave coherently along edges.
 
@@ -356,9 +356,9 @@ It includes:
 
 A **policy** maps states to actions:
 
-\[
+$$
 \pi(s)=a
-\]
+$$
 
 Rather than one fixed plan, a policy adapts action to observed state.
 

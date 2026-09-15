@@ -68,15 +68,15 @@ This family of views overlaps with **digital physics**.
 
 Suppose a physical state at time t is:
 
-\[
+$$
 S_t
-\]
+$$
 
 and laws of nature define:
 
-\[
+$$
 S_{t+1}=F(S_t)
-\]
+$$
 
 This resembles a computational transition function.
 
@@ -88,9 +88,9 @@ Many mathematical descriptions have similar form.
 
 Classical physics often represents evolution through differential equations:
 
-\[
+$$
 \frac{dS}{dt}=F(S)
-\]
+$$
 
 This is continuous rather than discrete.
 

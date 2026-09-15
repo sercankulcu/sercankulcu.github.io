@@ -55,9 +55,9 @@ This is a finite or specified set of symbols.
 
 For example:
 
-\[
+$$
 \{0,1,+,=,(,)\}
-\]
+$$
 
 The symbols themselves need not have meaning.
 
@@ -79,17 +79,17 @@ A legal expression is often called a **well-formed formula**, or WFF.
 
 For example:
 
-\[
+$$
 P \rightarrow Q
-\]
+$$
 
 may be well formed.
 
 But:
 
-\[
+$$
 \rightarrow P Q )
-\]
+$$
 
 may not be.
 
@@ -103,9 +103,9 @@ Example:
 
 If P and Q are formulas, then:
 
-\[
+$$
 (P \land Q)
-\]
+$$
 
 is also a formula.
 
@@ -134,9 +134,9 @@ They are starting points.
 
 Example:
 
-\[
+$$
 P \rightarrow (Q \rightarrow P)
-\]
+$$
 
 might be an axiom schema in a logical calculus.
 
@@ -158,21 +158,21 @@ A classic rule is modus ponens:
 
 From:
 
-\[
+$$
 P
-\]
+$$
 
 and:
 
-\[
+$$
 P \rightarrow Q
-\]
+$$
 
 infer:
 
-\[
+$$
 Q
-\]
+$$
 
 The rule is purely structural.
 
@@ -221,9 +221,9 @@ A formal system can also be given an interpretation.
 
 Suppose:
 
-\[
+$$
 P
-\]
+$$
 
 means:
 
@@ -416,15 +416,15 @@ It also brings self-referential risk.
 
 A system is consistent if it does not derive both:
 
-\[
+$$
 P
-\]
+$$
 
 and:
 
-\[
+$$
 \neg P
-\]
+$$
 
 for the same proposition.
 

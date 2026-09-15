@@ -46,23 +46,23 @@ Without a base case, recursion may never terminate.
 
 A classic example is factorial.
 
-\[
+$$
 n!=n(n-1)(n-2)\cdots1
-\]
+$$
 
 Recursively:
 
-\[
+$$
 0!=1
-\]
+$$
 
-and for \(n>0\):
+and for $$n>0$$:
 
-\[
+$$
 n!=n\cdot(n-1)!
-\]
+$$
 
-The definition of \(n!\) uses factorial again.
+The definition of $$n!$$ uses factorial again.
 
 But with a smaller argument.
 
@@ -84,17 +84,17 @@ Recursion refers to itself through simpler instances.
 
 The Fibonacci sequence can be defined:
 
-\[
+$$
 F_0=0
-\]
+$$
 
-\[
+$$
 F_1=1
-\]
+$$
 
-\[
+$$
 F_n=F_{n-1}+F_{n-2}
-\]
+$$
 
 Each new term depends on earlier terms from the same sequence.
 
@@ -107,7 +107,7 @@ Sets can be defined recursively.
 For example:
 
 - the empty string is in a language,
-- if \(w\) is in the language, then \(aw\) is too.
+- if $$w$$ is in the language, then $$aw$$ is too.
 
 A finite rule can define infinitely many valid strings.
 
@@ -276,9 +276,9 @@ Safe recursion usually moves toward a base case according to a well-founded orde
 
 For natural numbers:
 
-\[
+$$
 n,n-1,n-2,\ldots,0
-\]
+$$
 
 Each step is smaller.
 

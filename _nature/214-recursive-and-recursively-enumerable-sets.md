@@ -31,15 +31,15 @@ This distinction leads to two central concepts in computability theory:
 
 Suppose:
 
-\[
+$$
 A\subseteq \mathbb{N}
-\]
+$$
 
-For any natural number \(n\), ask:
+For any natural number $$n$$, ask:
 
-\[
+$$
 n\in A?
-\]
+$$
 
 A set can therefore be viewed as a yes/no problem.
 
@@ -51,13 +51,13 @@ Can an algorithm always answer correctly?
 
 A set A has a characteristic function:
 
-\[
+$$
 \chi_A(n)=
 \begin{cases}
 1 & \text{if } n\in A\\
 0 & \text{if } n\notin A
 \end{cases}
-\]
+$$
 
 If this function is computable, membership in A is decidable.
 
@@ -75,9 +75,9 @@ The algorithm always finishes.
 
 Let:
 
-\[
+$$
 E=\{n\in\mathbb{N}: n\text{ is even}\}
-\]
+$$
 
 Given n, divide by 2 or inspect the last binary bit.
 
@@ -91,9 +91,9 @@ The set of prime numbers is also recursive.
 
 A simple algorithm can test divisibility up to:
 
-\[
+$$
 \sqrt n
-\]
+$$
 
 Better algorithms exist.
 
@@ -119,8 +119,8 @@ A set is **recursively enumerable**, or **computably enumerable**, if there is a
 
 One equivalent formulation:
 
-- if \(n\in A\), the algorithm eventually halts and says yes;
-- if \(n\notin A\), it may run forever.
+- if $$n\in A$$, the algorithm eventually halts and says yes;
+- if $$n\notin A$$, it may run forever.
 
 This is weaker than decidability.
 
@@ -157,9 +157,9 @@ The word reflects this listing idea.
 
 A machine can enumerate:
 
-\[
+$$
 a_1,a_2,a_3,\ldots
-\]
+$$
 
 containing exactly the elements of the set.
 
@@ -171,9 +171,9 @@ If membership is decidable, then membership is certainly recognizable.
 
 So:
 
-\[
+$$
 Recursive \subseteq RE
-\]
+$$
 
 But the inclusion is strict.
 
@@ -186,7 +186,7 @@ A key theorem says:
 A set A is recursive iff:
 
 - A is recursively enumerable,
-- its complement \(\overline A\) is recursively enumerable.
+- its complement $$\overline A$$ is recursively enumerable.
 
 Why?
 
@@ -214,9 +214,9 @@ Dovetailing is a basic computability technique.
 
 Consider the set:
 
-\[
+$$
 K=\{\langle P,x\rangle : P\text{ eventually halts on input }x\}
-\]
+$$
 
 This set is recursively enumerable.
 
@@ -382,9 +382,9 @@ But theoremhood asks:
 
 Does there exist some proof p of formula f?
 
-\[
+$$
 \exists p\,Proof(p,f)
-\]
+$$
 
 This existential search can be recursively enumerable without being decidable.
 
@@ -458,15 +458,15 @@ Formal systems also need another kind of stability.
 
 A system should not be able to prove both:
 
-\[
+$$
 P
-\]
+$$
 
 and:
 
-\[
+$$
 \neg P
-\]
+$$
 
 What exactly does it mean for a theory to be consistent?
 

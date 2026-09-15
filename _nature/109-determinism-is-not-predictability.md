@@ -114,11 +114,11 @@ Roughly:
 
 small error grows like
 
-\[
+$$
 \delta(t) \sim \delta(0)e^{\lambda t}
-\]
+$$
 
-where \(\lambda>0\).
+where $$\lambda>0$$.
 
 Prediction horizon becomes finite.
 

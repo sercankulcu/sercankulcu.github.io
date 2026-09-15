@@ -106,17 +106,17 @@ This is one reason functionalism became influential in AI.
 
 A simple functional schema might look like:
 
-\[
+$$
 Input \rightarrow Internal\ State \rightarrow Output
-\]
+$$
 
 But mental states also interact with one another.
 
 So the network is richer:
 
-\[
+$$
 S_{t+1}=F(S_t, I_t)
-\]
+$$
 
 where internal state changes over time.
 

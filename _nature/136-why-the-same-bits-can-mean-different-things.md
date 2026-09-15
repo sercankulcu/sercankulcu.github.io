@@ -14,9 +14,9 @@ tags:
 
 Consider the eight-bit pattern:
 
-\[
+$$
 01000001
-\]
+$$
 
 What does it mean?
 
@@ -56,15 +56,15 @@ Type is supplied by context.
 
 Interpret:
 
-\[
+$$
 01000001
-\]
+$$
 
 as an unsigned binary integer.
 
 Then:
 
-\[
+$$
 0\cdot2^7+
 1\cdot2^6+
 0\cdot2^5+
@@ -73,13 +73,13 @@ Then:
 0\cdot2^2+
 0\cdot2^1+
 1\cdot2^0
-\]
+$$
 
 equals:
 
-\[
+$$
 65
-\]
+$$
 
 The bits represent a number because we choose a positional numerical code.
 
@@ -210,9 +210,9 @@ An eight-bit pattern can be interpreted as:
 
 For example:
 
-\[
+$$
 11111111
-\]
+$$
 
 can represent:
 
@@ -266,9 +266,9 @@ Consider:
 
 If both are numbers:
 
-\[
+$$
 11
-\]
+$$
 
 If they are strings in some programming contexts:
 

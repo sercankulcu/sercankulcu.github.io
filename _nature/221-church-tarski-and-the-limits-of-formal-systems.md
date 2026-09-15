@@ -105,9 +105,9 @@ Alfred Tarski studied another dangerous concept:
 
 Can a sufficiently expressive formal language contain a predicate:
 
-\[
+$$
 True(x)
-\]
+$$
 
 that correctly applies to exactly the codes of its own true sentences?
 
@@ -129,9 +129,9 @@ Tarski captured ordinary truth through patterns such as:
 
 Formally:
 
-\[
+$$
 True(\ulcorner P\urcorner)\leftrightarrow P
-\]
+$$
 
 for sentences P.
 
@@ -155,27 +155,27 @@ One solution is a hierarchy of languages.
 
 Object language:
 
-\[
+$$
 L_0
-\]
+$$
 
 cannot define its own truth predicate.
 
 A metalanguage:
 
-\[
+$$
 L_1
-\]
+$$
 
-can define truth for \(L_0\).
+can define truth for $$L_0$$.
 
 A still higher language:
 
-\[
+$$
 L_2
-\]
+$$
 
-can discuss truth in \(L_1\).
+can discuss truth in $$L_1$$.
 
 And so on.
 

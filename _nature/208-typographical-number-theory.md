@@ -85,9 +85,9 @@ The notation is intentionally mechanical.
 
 The successor function formalizes the step:
 
-\[
+$$
 n \mapsto n+1
-\]
+$$
 
 Natural numbers can be generated recursively:
 
@@ -103,9 +103,9 @@ A simple symbol creates an infinite sequence.
 
 A formula might express:
 
-\[
+$$
 SS0 + S0 = SSS0
-\]
+$$
 
 Interpreted arithmetically:
 
@@ -142,9 +142,9 @@ A **formula** makes a claim.
 
 Example:
 
-\[
+$$
 x+0=x
-\]
+$$
 
 The distinction between term and proposition is structural.
 
@@ -152,9 +152,9 @@ The distinction between term and proposition is structural.
 
 Variables such as:
 
-\[
+$$
 a,\ b,\ c
-\]
+$$
 
 can stand for numbers.
 
@@ -166,9 +166,9 @@ With quantifiers, it can make a complete general claim.
 
 A formula such as:
 
-\[
+$$
 \forall a\,(a+0=a)
-\]
+$$
 
 means:
 
@@ -180,9 +180,9 @@ The system can express general arithmetic laws.
 
 Likewise:
 
-\[
+$$
 \exists a\,(a+a=SSSS0)
-\]
+$$
 
 asks whether some natural number added to itself equals four.
 
@@ -217,15 +217,15 @@ Exact axiom sets vary.
 
 Addition can be specified through rules such as:
 
-\[
+$$
 a+0=a
-\]
+$$
 
 and:
 
-\[
+$$
 a+S(b)=S(a+b)
-\]
+$$
 
 These rules define addition recursively.
 
@@ -235,15 +235,15 @@ No intuition about "combining piles" is required.
 
 Similarly:
 
-\[
+$$
 a\cdot 0=0
-\]
+$$
 
 and:
 
-\[
+$$
 a\cdot S(b)=a\cdot b+a
-\]
+$$
 
 Multiplication becomes symbolically definable from simpler operations.
 
@@ -266,21 +266,21 @@ A rule might allow:
 
 from:
 
-\[
+$$
 P
-\]
+$$
 
 and:
 
-\[
+$$
 P\rightarrow Q
-\]
+$$
 
 infer:
 
-\[
+$$
 Q
-\]
+$$
 
 This is modus ponens.
 
@@ -292,15 +292,15 @@ A general formula may permit substitution of one term for a variable.
 
 For example, from:
 
-\[
+$$
 \forall a\,(a+0=a)
-\]
+$$
 
 we can obtain:
 
-\[
+$$
 SS0+0=SS0
-\]
+$$
 
 Substitution turns general structure into instances.
 

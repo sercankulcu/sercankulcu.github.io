@@ -97,9 +97,9 @@ It may not explain why the process has subjective experience.
 
 If neural activity N correlates with conscious experience C:
 
-\[
+$$
 N \leftrightarrow C
-\]
+$$
 
 we have found a relationship.
 

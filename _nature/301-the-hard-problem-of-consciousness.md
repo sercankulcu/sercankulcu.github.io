@@ -91,9 +91,9 @@ Suppose brain state N always accompanies experience E.
 
 We have:
 
-\[
+$$
 N \leftrightarrow E
-\]
+$$
 
 This is a strong empirical regularity.
 

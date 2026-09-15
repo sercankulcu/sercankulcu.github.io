@@ -210,7 +210,7 @@ This is one of the consequences of relativity.
 
 Einstein's famous relation:
 
-\(E = mc^2\)
+$$E = mc^2$$
 
 is often summarized as "mass can be converted into energy."
 
@@ -218,7 +218,7 @@ That is useful but can be misleading.
 
 Mass is already associated with rest energy.
 
-A particle with rest mass \(m\) has rest energy \(mc^2\).
+A particle with rest mass $$m$$ has rest energy $$mc^2$$.
 
 In reactions, the invariant mass of a system can decrease while other forms of energy such as kinetic energy or radiation increase.
 

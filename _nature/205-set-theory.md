@@ -30,9 +30,9 @@ It also revealed some of the deepest paradoxes in formal thought.
 
 The basic relation is:
 
-\[
+$$
 x \in A
-\]
+$$
 
 meaning:
 
@@ -48,15 +48,15 @@ This is the principle of **extensionality**.
 
 If:
 
-\[
+$$
 \forall x\,(x\in A \leftrightarrow x\in B)
-\]
+$$
 
 then:
 
-\[
+$$
 A=B
-\]
+$$
 
 A set is determined by its membership structure.
 
@@ -66,15 +66,15 @@ The **empty set** contains no elements.
 
 It is written:
 
-\[
+$$
 \varnothing
-\]
+$$
 
 or:
 
-\[
+$$
 \{\}
-\]
+$$
 
 It is one of the most important objects in mathematics.
 
@@ -82,23 +82,23 @@ It is one of the most important objects in mathematics.
 
 One standard construction defines:
 
-\[
+$$
 0=\varnothing
-\]
+$$
 
 Then:
 
-\[
+$$
 1=\{0\}
-\]
+$$
 
-\[
+$$
 2=\{0,1\}
-\]
+$$
 
-\[
+$$
 3=\{0,1,2\}
-\]
+$$
 
 Natural numbers can be built from sets.
 
@@ -108,9 +108,9 @@ A set A is a subset of B if every element of A belongs to B.
 
 We write:
 
-\[
+$$
 A\subseteq B
-\]
+$$
 
 The subset relation is itself a structural relation among sets.
 
@@ -120,15 +120,15 @@ The **power set** of A is the set of all subsets of A.
 
 It is written:
 
-\[
+$$
 \mathcal{P}(A)
-\]
+$$
 
-If A has \(n\) elements, then:
+If A has $$n$$ elements, then:
 
-\[
+$$
 |\mathcal{P}(A)|=2^n
-\]
+$$
 
 for finite A.
 
@@ -138,9 +138,9 @@ Cantor proved something stronger:
 
 For every set A,
 
-\[
+$$
 |A|<|\mathcal{P}(A)|
-\]
+$$
 
 No set has the same cardinality as its power set.
 
@@ -152,9 +152,9 @@ A set can be infinite.
 
 The natural numbers:
 
-\[
+$$
 \mathbb{N}
-\]
+$$
 
 are infinite.
 
@@ -182,9 +182,9 @@ Cantor's diagonal argument proves there is no complete list of real numbers.
 
 So:
 
-\[
+$$
 |\mathbb{R}|>|\mathbb{N}|
-\]
+$$
 
 Infinity has structure.
 
@@ -196,15 +196,15 @@ the set of all objects satisfying any property.
 
 Then consider:
 
-\[
+$$
 R=\{x\mid x\notin x\}
-\]
+$$
 
 Ask:
 
-\[
+$$
 R\in R?
-\]
+$$
 
 If yes, then no.
 
@@ -244,9 +244,9 @@ This avoids creating unrestricted universal collections.
 
 The pairing axiom allows sets such as:
 
-\[
+$$
 \{a,b\}
-\]
+$$
 
 to exist.
 
@@ -258,9 +258,9 @@ The union axiom allows us to combine members of members.
 
 For a set A:
 
-\[
+$$
 \bigcup A
-\]
+$$
 
 contains elements belonging to sets inside A.
 
@@ -284,9 +284,9 @@ The axiom of foundation prevents infinitely descending membership chains of the 
 
 It rules out structures such as:
 
-\[
+$$
 x\in x
-\]
+$$
 
 in standard ZF set theory.
 
@@ -326,9 +326,9 @@ A relation can be represented as a set of ordered pairs.
 
 For example:
 
-\[
+$$
 R\subseteq A\times B
-\]
+$$
 
 Functions can also be represented set-theoretically.
 
@@ -399,15 +399,15 @@ Cohen later showed it cannot be proved either.
 
 The Continuum Hypothesis asks whether there is a cardinality strictly between:
 
-\[
+$$
 |\mathbb{N}|
-\]
+$$
 
 and:
 
-\[
+$$
 |\mathbb{R}|
-\]
+$$
 
 Within ZFC, the question is independent.
 

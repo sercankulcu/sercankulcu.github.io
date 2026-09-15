@@ -168,7 +168,7 @@ A highly intelligent machine might fail because it answers too accurately.
 
 Suppose the judge asks:
 
-What is \(917 \times 643\)?
+What is $$917 \times 643$$?
 
 A machine can compute instantly.
 

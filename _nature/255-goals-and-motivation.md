@@ -178,9 +178,9 @@ A famous computational idea models dopamine-related signals as **reward predicti
 
 Roughly:
 
-\[
+$$
 \delta = r + \gamma V(s') - V(s)
-\]
+$$
 
 The signal reflects difference between:
 
@@ -230,17 +230,17 @@ Future outcomes are often discounted.
 
 In formal models:
 
-\[
+$$
 G_t=r_{t+1}+\gamma r_{t+2}+\gamma^2r_{t+3}+\cdots
-\]
+$$
 
 with:
 
-\[
+$$
 0\leq \gamma \leq1
-\]
+$$
 
-The parameter \(\gamma\) controls future weighting.
+The parameter $$\gamma$$ controls future weighting.
 
 ## Temporal Discounting
 

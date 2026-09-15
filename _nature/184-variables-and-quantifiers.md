@@ -42,15 +42,15 @@ A **variable** is a symbol that can stand for different objects.
 
 Common examples are:
 
-\[
+$$
 x,\ y,\ z
-\]
+$$
 
 The expression:
 
-\[
+$$
 Human(x)
-\]
+$$
 
 does not yet make a complete claim about one particular individual.
 
@@ -66,9 +66,9 @@ A **constant** names a particular object.
 
 For example:
 
-\[
+$$
 Human(Socrates)
-\]
+$$
 
 Here `Socrates` is treated as a name for one individual.
 
@@ -80,17 +80,17 @@ Constants designate.
 
 A predicate such as:
 
-\[
+$$
 Tall(x)
-\]
+$$
 
 contains an open place.
 
 Supply an object:
 
-\[
+$$
 Tall(Ali)
-\]
+$$
 
 and the expression becomes a proposition.
 
@@ -102,9 +102,9 @@ A formula containing an unbound variable is often called an **open formula**.
 
 For example:
 
-\[
+$$
 x > 5
-\]
+$$
 
 has no fixed truth value until we specify:
 
@@ -119,9 +119,9 @@ Quantifiers control that possibility.
 
 The symbol:
 
-\[
+$$
 \forall
-\]
+$$
 
 means roughly:
 
@@ -129,9 +129,9 @@ means roughly:
 
 For example:
 
-\[
+$$
 \forall x\, Human(x)
-\]
+$$
 
 would say:
 
@@ -147,9 +147,9 @@ All humans are mortal.
 
 is represented as:
 
-\[
+$$
 \forall x\,(Human(x) \rightarrow Mortal(x))
-\]
+$$
 
 Read:
 
@@ -161,9 +161,9 @@ This captures the universal structure.
 
 The symbol:
 
-\[
+$$
 \exists
-\]
+$$
 
 means:
 
@@ -171,9 +171,9 @@ means:
 
 For example:
 
-\[
+$$
 \exists x\, Philosopher(x)
-\]
+$$
 
 means:
 
@@ -183,9 +183,9 @@ At least one object in the domain is a philosopher.
 
 A more explicit form is:
 
-\[
+$$
 \exists x\,(Human(x) \land Philosopher(x))
-\]
+$$
 
 This says there is at least one x that is both:
 
@@ -210,9 +210,9 @@ This is another natural-language/formal-language difference.
 
 Suppose we write:
 
-\[
+$$
 \forall x\, Red(x)
-\]
+$$
 
 Is it true?
 
@@ -245,9 +245,9 @@ A variable is **free** when it is not governed by a quantifier.
 
 Example:
 
-\[
+$$
 Loves(x, Maria)
-\]
+$$
 
 The variable x is free.
 
@@ -259,9 +259,9 @@ A variable is **bound** when a quantifier governs it.
 
 Example:
 
-\[
+$$
 \exists x\, Loves(x, Maria)
-\]
+$$
 
 Now x is bound.
 
@@ -279,9 +279,9 @@ The scope is the part of the formula it governs.
 
 For example:
 
-\[
+$$
 \forall x\,(Human(x) \rightarrow Mortal(x))
-\]
+$$
 
 the quantifier governs the entire expression in parentheses.
 
@@ -291,9 +291,9 @@ Scope matters because different scopes can change meaning dramatically.
 
 Consider:
 
-\[
+$$
 \forall x\,\exists y\, Loves(x,y)
-\]
+$$
 
 This means:
 
@@ -303,9 +303,9 @@ The person loved may be different for each x.
 
 Now compare:
 
-\[
+$$
 \exists y\,\forall x\, Loves(x,y)
-\]
+$$
 
 This means:
 
@@ -338,15 +338,15 @@ Quantifiers interact with negation.
 
 The negation of:
 
-\[
+$$
 \forall x\, P(x)
-\]
+$$
 
 is equivalent to:
 
-\[
+$$
 \exists x\, \neg P(x)
-\]
+$$
 
 Meaning:
 
@@ -360,15 +360,15 @@ Something is not P.
 
 Similarly:
 
-\[
+$$
 \neg \exists x\,P(x)
-\]
+$$
 
 is equivalent to:
 
-\[
+$$
 \forall x\,\neg P(x)
-\]
+$$
 
 Meaning:
 
@@ -388,15 +388,15 @@ No cats are reptiles.
 
 can be represented as:
 
-\[
+$$
 \forall x\,(Cat(x) \rightarrow \neg Reptile(x))
-\]
+$$
 
 or equivalently:
 
-\[
+$$
 \neg \exists x\,(Cat(x) \land Reptile(x))
-\]
+$$
 
 Different forms can express the same logical content.
 
@@ -427,15 +427,15 @@ Even basic logic rests on conventions.
 
 Predicate logic can include the identity symbol:
 
-\[
+$$
 =
-\]
+$$
 
 This allows claims such as:
 
-\[
+$$
 x = y
-\]
+$$
 
 and formal treatment of uniqueness.
 
@@ -447,9 +447,9 @@ there exists exactly one object satisfying some predicate.
 
 "There is exactly one king" can be formalized as:
 
-\[
+$$
 \exists x\,(King(x) \land \forall y\,(King(y) \rightarrow y=x))
-\]
+$$
 
 The formula contains both:
 
@@ -466,9 +466,9 @@ For example:
 
 Everyone has a parent.
 
-\[
+$$
 \forall x\,\exists y\, ParentOf(y,x)
-\]
+$$
 
 This structure cannot be represented adequately in simple propositional logic.
 

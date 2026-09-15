@@ -49,21 +49,21 @@ The untyped lambda calculus has only three basic forms.
 
 ### Variable
 
-\[
+$$
 x
-\]
+$$
 
 ### Abstraction
 
-\[
+$$
 \lambda x.M
-\]
+$$
 
 ### Application
 
-\[
+$$
 M\,N
-\]
+$$
 
 That is essentially the whole language.
 
@@ -71,9 +71,9 @@ That is essentially the whole language.
 
 The expression:
 
-\[
+$$
 \lambda x.M
-\]
+$$
 
 means:
 
@@ -81,9 +81,9 @@ a function of x whose body is M.
 
 For example:
 
-\[
+$$
 \lambda x.x
-\]
+$$
 
 is the identity function.
 
@@ -93,21 +93,21 @@ It returns its argument unchanged.
 
 If:
 
-\[
+$$
 F=\lambda x.x
-\]
+$$
 
 then:
 
-\[
+$$
 F\,a
-\]
+$$
 
 reduces to:
 
-\[
+$$
 a
-\]
+$$
 
 Function application performs computation.
 
@@ -117,21 +117,21 @@ The main computational rule is **beta reduction**.
 
 Example:
 
-\[
+$$
 (\lambda x.x)\,a
-\]
+$$
 
 reduces to:
 
-\[
+$$
 a
-\]
+$$
 
 More generally:
 
-\[
+$$
 (\lambda x.M)\,N
-\]
+$$
 
 reduces by replacing free occurrences of x in M with N.
 
@@ -151,15 +151,15 @@ Bound variable names are often irrelevant.
 
 These expressions represent the same function:
 
-\[
+$$
 \lambda x.x
-\]
+$$
 
 and:
 
-\[
+$$
 \lambda y.y
-\]
+$$
 
 Renaming bound variables is **alpha conversion**.
 
@@ -169,9 +169,9 @@ The name is not the function.
 
 In:
 
-\[
+$$
 \lambda x.(x\,y)
-\]
+$$
 
 x is bound.
 
@@ -187,9 +187,9 @@ The lambda binder has scope.
 
 In:
 
-\[
+$$
 \lambda x.M
-\]
+$$
 
 the variable x is bound within M.
 
@@ -210,9 +210,9 @@ This is **higher-order** computation.
 
 Consider a function that takes a function f and applies it twice:
 
-\[
+$$
 \lambda f.\lambda x.f(f(x))
-\]
+$$
 
 Functions become manipulable objects.
 
@@ -224,15 +224,15 @@ A function of two arguments can be represented as a function returning another f
 
 Instead of:
 
-\[
+$$
 f(x,y)
-\]
+$$
 
 we can write:
 
-\[
+$$
 f(x)(y)
-\]
+$$
 
 This technique is called **currying**, after Haskell Curry.
 
@@ -244,21 +244,21 @@ For example:
 
 Zero:
 
-\[
+$$
 \lambda f.\lambda x.x
-\]
+$$
 
 One:
 
-\[
+$$
 \lambda f.\lambda x.f(x)
-\]
+$$
 
 Two:
 
-\[
+$$
 \lambda f.\lambda x.f(f(x))
-\]
+$$
 
 A number becomes repeated function application.
 
@@ -280,15 +280,15 @@ For example:
 
 True:
 
-\[
+$$
 \lambda x.\lambda y.x
-\]
+$$
 
 False:
 
-\[
+$$
 \lambda x.\lambda y.y
-\]
+$$
 
 A Boolean becomes a function choosing one of two arguments.
 
@@ -324,9 +324,9 @@ The most famous is the **Y combinator**.
 
 A fixed-point combinator constructs a value satisfying:
 
-\[
+$$
 F(X)=X
-\]
+$$
 
 This connects lambda calculus to the self-reference themes we encountered earlier.
 
@@ -344,9 +344,9 @@ Self-application creates recursion.
 
 Consider:
 
-\[
+$$
 x\,x
-\]
+$$
 
 A function is applied to itself.
 
@@ -366,15 +366,15 @@ A famous nonterminating term is built from self-application.
 
 Let:
 
-\[
+$$
 \omega=\lambda x.x\,x
-\]
+$$
 
 Then:
 
-\[
+$$
 \omega\,\omega
-\]
+$$
 
 reduces to itself forever.
 
@@ -437,9 +437,9 @@ Types prevent certain nonsensical or paradoxical constructions.
 
 In simply typed lambda calculus, terms receive types such as:
 
-\[
+$$
 A \rightarrow B
-\]
+$$
 
 meaning:
 

@@ -16,15 +16,15 @@ A contradiction occurs when a claim and its negation are both accepted.
 
 Formally:
 
-\[
+$$
 P
-\]
+$$
 
 and:
 
-\[
+$$
 \neg P
-\]
+$$
 
 In ordinary life, contradictions may be signs of confusion, changing beliefs, or incomplete information.
 
@@ -116,11 +116,11 @@ In Latin:
 
 Symbolically:
 
-\[
+$$
 P,\ \neg P \vdash Q
-\]
+$$
 
-for arbitrary \(Q\).
+for arbitrary $$Q$$.
 
 This is why inconsistency can trivialize a classical system.
 
@@ -128,27 +128,27 @@ This is why inconsistency can trivialize a classical system.
 
 Suppose:
 
-\[
+$$
 P
-\]
+$$
 
 and:
 
-\[
+$$
 \neg P
-\]
+$$
 
-From \(P\), classical logic allows us to infer:
+From $$P$$, classical logic allows us to infer:
 
-\[
+$$
 P \lor Q
-\]
+$$
 
-Then using \(\neg P\), disjunctive reasoning can yield:
+Then using $$\neg P$$, disjunctive reasoning can yield:
 
-\[
+$$
 Q
-\]
+$$
 
 The exact derivation depends on the proof system, but the general result is standard.
 

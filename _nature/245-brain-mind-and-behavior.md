@@ -112,9 +112,9 @@ Two systems may produce identical outputs while using different internal process
 
 A calculator and a human can both answer:
 
-\[
+$$
 17+28=45
-\]
+$$
 
 The behavior matches.
 

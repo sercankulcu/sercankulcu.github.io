@@ -165,7 +165,7 @@ Not every physical prediction need be algorithmically solvable.
 
 Some systems may have no shortcut to prediction.
 
-To know what happens at step \(n\), you effectively must run the process to step \(n\).
+To know what happens at step $$n$$, you effectively must run the process to step $$n$$.
 
 This idea is associated with computational irreducibility.
 

@@ -71,13 +71,13 @@ To obtain semantics, symbols must be connected to:
 
 For example:
 
-\[
+$$
 x+1
-\]
+$$
 
 has syntax.
 
-Its meaning depends on what \(x\), \(+\), and the domain represent.
+Its meaning depends on what $$x$$, $$+$$, and the domain represent.
 
 ## Same Syntax, Different Semantics
 
@@ -85,9 +85,9 @@ The same formal expression can receive different interpretations.
 
 A symbol like:
 
-\[
+$$
 *
-\]
+$$
 
 may mean:
 
@@ -220,18 +220,18 @@ But the interpretive layer remains distinct from syntax.
 
 Suppose a formal language contains:
 
-\[
+$$
 P(a)
-\]
+$$
 
 Syntax says this is a valid formula.
 
 A model specifies:
 
-- what object \(a\) denotes,
-- what property \(P\) denotes.
+- what object $$a$$ denotes,
+- what property $$P$$ denotes.
 
-Only then can we ask whether \(P(a)\) is true.
+Only then can we ask whether $$P(a)$$ is true.
 
 ## Truth Depends on Interpretation
 

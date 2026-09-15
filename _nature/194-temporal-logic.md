@@ -51,9 +51,9 @@ These operators are central in computer verification.
 
 ## Always
 
-\[
+$$
 G P
-\]
+$$
 
 means:
 
@@ -67,9 +67,9 @@ This is a safety property.
 
 ## Eventually
 
-\[
+$$
 F P
-\]
+$$
 
 means:
 
@@ -83,9 +83,9 @@ This is a liveness property.
 
 ## Next
 
-\[
+$$
 X P
-\]
+$$
 
 means:
 
@@ -100,9 +100,9 @@ It is less natural for continuous time unless time is discretized.
 
 ## Until
 
-\[
+$$
 P\ U\ Q
-\]
+$$
 
 means roughly:
 

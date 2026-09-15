@@ -163,13 +163,13 @@ This changed scientific intuition.
 
 The logistic map is perhaps the simplest famous example:
 
-\[
+$$
 x_{n+1}=rx_n(1-x_n)
-\]
+$$
 
 It was originally motivated by population dynamics.
 
-As the parameter \(r\) changes, the system displays:
+As the parameter $$r$$ changes, the system displays:
 
 - stable points,
 - oscillations,

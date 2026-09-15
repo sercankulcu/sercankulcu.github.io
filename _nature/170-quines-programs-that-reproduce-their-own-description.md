@@ -132,11 +132,11 @@ A transformation is applied to a program description.
 
 The result is the same description.
 
-Symbolically, for some transformation \(F\):
+Symbolically, for some transformation $$F$$:
 
-\[
+$$
 F(x)=x
-\]
+$$
 
 Fixed points connect self-reference to mathematics.
 

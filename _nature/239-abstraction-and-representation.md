@@ -42,21 +42,21 @@ Computer science turns representation into an engineering discipline.
 
 The number ten can be written as:
 
-\[
+$$
 10
-\]
+$$
 
 in decimal,
 
-\[
+$$
 1010
-\]
+$$
 
 in binary,
 
-\[
+$$
 A
-\]
+$$
 
 in hexadecimal.
 
@@ -299,9 +299,9 @@ An embedding maps objects into a vector space.
 
 For example:
 
-\[
+$$
 word \rightarrow \mathbb{R}^n
-\]
+$$
 
 Distances or directions in that space may capture useful relationships.
 

@@ -104,15 +104,15 @@ The hope was that mathematical reasoning could be made fully systematic.
 
 A system should never prove both:
 
-\[
+$$
 P
-\]
+$$
 
 and:
 
-\[
+$$
 \neg P
-\]
+$$
 
 Consistency protects mathematics from collapse.
 
@@ -128,7 +128,7 @@ For each statement P:
 
 either P is provable,
 
-or \(\neg P\) is provable.
+or $$\neg P$$ is provable.
 
 This is completeness in the theory-level sense.
 

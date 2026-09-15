@@ -26,19 +26,19 @@ That difference is enough to require a different logic.
 
 A common notation is:
 
-\[
+$$
 B_a P
-\]
+$$
 
 meaning:
 
-Agent \(a\) believes that P.
+Agent $$a$$ believes that P.
 
 For example:
 
-\[
+$$
 B_{Alice}(Raining)
-\]
+$$
 
 means:
 
@@ -50,17 +50,17 @@ The proposition may be true or false.
 
 Knowledge usually satisfies:
 
-\[
+$$
 K_a P \rightarrow P
-\]
+$$
 
 Belief does not.
 
 We do not assume:
 
-\[
+$$
 B_a P \rightarrow P
-\]
+$$
 
 People are mistaken.
 
@@ -74,9 +74,9 @@ A world is doxastically accessible if it is compatible with what the agent belie
 
 Then:
 
-\[
+$$
 B_a P
-\]
+$$
 
 means:
 
@@ -100,15 +100,15 @@ Many formal systems idealize agents as having consistent beliefs.
 
 If an agent believes:
 
-\[
+$$
 P
-\]
+$$
 
 and:
 
-\[
+$$
 \neg P
-\]
+$$
 
 their belief set is inconsistent.
 
@@ -144,9 +144,9 @@ These are strong idealizations.
 
 One common principle is:
 
-\[
+$$
 B_a P \rightarrow \neg B_a \neg P
-\]
+$$
 
 If the agent believes P, they do not also believe not-P.
 
@@ -156,9 +156,9 @@ This rules out direct contradictory belief.
 
 Another principle is:
 
-\[
+$$
 B_a P \rightarrow B_a B_a P
-\]
+$$
 
 If the agent believes P, they believe that they believe P.
 
@@ -170,9 +170,9 @@ Formal agents are cleaner.
 
 A further principle is:
 
-\[
+$$
 \neg B_a P \rightarrow B_a \neg B_a P
-\]
+$$
 
 If the agent does not believe P, they believe that they do not believe P.
 
@@ -198,15 +198,15 @@ Probability theory offers a richer model.
 
 Instead of:
 
-\[
+$$
 B_a P
-\]
+$$
 
 we may represent:
 
-\[
+$$
 P_a(P)=0.8
-\]
+$$
 
 The agent assigns 80% credence to P.
 
@@ -317,9 +317,9 @@ Epistemology asks whether beliefs deserve acceptance.
 
 We can nest belief operators:
 
-\[
+$$
 B_a B_b P
-\]
+$$
 
 Alice believes that Bob believes P.
 
@@ -345,15 +345,15 @@ Deception deliberately manipulates another agent's belief state.
 
 A liar wants:
 
-\[
+$$
 B_{other} P
-\]
+$$
 
 while knowing:
 
-\[
+$$
 \neg P
-\]
+$$
 
 Social intelligence is partly doxastic engineering.
 

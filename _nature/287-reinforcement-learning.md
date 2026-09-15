@@ -28,12 +28,12 @@ This is **reinforcement learning**.
 
 Reinforcement learning begins with an agent interacting with an environment.
 
-At time \(t\):
+At time $$t$$:
 
-- agent observes state \(s_t\),
-- chooses action \(a_t\),
-- receives reward \(r_{t+1}\),
-- moves to state \(s_{t+1}\).
+- agent observes state $$s_t$$,
+- chooses action $$a_t$$,
+- receives reward $$r_{t+1}$$,
+- moves to state $$s_{t+1}$$.
 
 The loop repeats.
 
@@ -43,15 +43,15 @@ The agent aims to maximize cumulative reward over time.
 
 A common return is:
 
-\[
+$$
 G_t=\sum_{k=0}^{\infty}\gamma^k r_{t+k+1}
-\]
+$$
 
 where:
 
-\[
+$$
 0\leq\gamma\leq1
-\]
+$$
 
 discounts future reward.
 
@@ -71,9 +71,9 @@ A policy describes behavior.
 
 It maps states to action probabilities:
 
-\[
+$$
 \pi(a|s)
-\]
+$$
 
 The goal of learning is often to discover a good policy.
 
@@ -81,9 +81,9 @@ The goal of learning is often to discover a good policy.
 
 The value of a state is the expected future return under a policy:
 
-\[
+$$
 V^\pi(s)
-\]
+$$
 
 It answers:
 
@@ -93,13 +93,13 @@ How good is it to be here?
 
 The action-value function is:
 
-\[
+$$
 Q^\pi(s,a)
-\]
+$$
 
 It asks:
 
-How good is it to take action \(a\) in state \(s\) and then follow the policy?
+How good is it to take action $$a$$ in state $$s$$ and then follow the policy?
 
 ## Markov Decision Process
 
@@ -118,9 +118,9 @@ The Markov assumption says the current state contains all information relevant t
 
 Formally:
 
-\[
+$$
 P(s_{t+1}|s_t,a_t,\text{history})=P(s_{t+1}|s_t,a_t)
-\]
+$$
 
 Real representations may violate this.
 
@@ -130,9 +130,9 @@ Value satisfies recursive structure.
 
 For a policy:
 
-\[
+$$
 V^\pi(s)=\mathbb{E}[r_{t+1}+\gamma V^\pi(s_{t+1})]
-\]
+$$
 
 Future value appears inside present value.
 
@@ -177,19 +177,19 @@ This supports planning.
 
 A simple update is:
 
-\[
+$$
 V(s_t)\leftarrow V(s_t)+\alpha\delta_t
-\]
+$$
 
 where:
 
-\[
+$$
 \delta_t=r_{t+1}+\gamma V(s_{t+1})-V(s_t)
-\]
+$$
 
 ## Prediction Error
 
-The quantity \(\delta_t\) is a temporal-difference error.
+The quantity $$\delta_t$$ is a temporal-difference error.
 
 It measures:
 
@@ -217,10 +217,10 @@ The mapping is informative, not complete.
 
 Q-learning uses:
 
-\[
+$$
 Q(s,a)\leftarrow Q(s,a)+\alpha
 [r+\gamma\max_{a'}Q(s',a')-Q(s,a)]
-\]
+$$
 
 It is off-policy because it learns about a greedy target policy while behavior may explore differently.
 
@@ -228,10 +228,10 @@ It is off-policy because it learns about a greedy target policy while behavior m
 
 SARSA updates using the action actually selected next:
 
-\[
+$$
 Q(s,a)\leftarrow Q(s,a)+\alpha
 [r+\gamma Q(s',a')-Q(s,a)]
-\]
+$$
 
 It is on-policy.
 
@@ -250,7 +250,7 @@ This creates the exploration–exploitation dilemma.
 A simple policy is:
 
 - usually choose best-known action,
-- with probability \(\epsilon\), explore.
+- with probability $$\epsilon$$, explore.
 
 This is easy.
 
@@ -360,9 +360,9 @@ Instead of learning value first, a policy-gradient method directly adjusts polic
 
 A simplified gradient is:
 
-\[
+$$
 \nabla_\theta J(\theta)
-\]
+$$
 
 The policy itself is optimized.
 
@@ -389,9 +389,9 @@ This resembles the learning-agent architecture.
 
 The **advantage function** measures whether an action is better than the state's average:
 
-\[
+$$
 A(s,a)=Q(s,a)-V(s)
-\]
+$$
 
 This improves policy-gradient learning.
 

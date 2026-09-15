@@ -55,15 +55,15 @@ A constant symbol names a particular object.
 
 Examples:
 
-\[
+$$
 a,\ b,\ c
-\]
+$$
 
 or more suggestively:
 
-\[
+$$
 Socrates
-\]
+$$
 
 The symbol need not resemble the object.
 
@@ -73,9 +73,9 @@ It is part of the formal language.
 
 Variables such as:
 
-\[
+$$
 x,\ y,\ z
-\]
+$$
 
 range over objects in the domain.
 
@@ -85,15 +85,15 @@ They allow general statements.
 
 A one-place predicate expresses a property:
 
-\[
+$$
 Human(x)
-\]
+$$
 
 A two-place predicate expresses a relation:
 
-\[
+$$
 Loves(x,y)
-\]
+$$
 
 Predicates expose internal logical structure.
 
@@ -103,15 +103,15 @@ Function symbols map objects to objects.
 
 Example:
 
-\[
+$$
 FatherOf(x)
-\]
+$$
 
 or:
 
-\[
+$$
 x+1
-\]
+$$
 
 Functions create terms.
 
@@ -129,9 +129,9 @@ Terms can be:
 
 For example:
 
-\[
+$$
 FatherOf(Socrates)
-\]
+$$
 
 is a term.
 
@@ -141,15 +141,15 @@ An atomic formula applies a predicate to terms.
 
 Example:
 
-\[
+$$
 Human(Socrates)
-\]
+$$
 
 or:
 
-\[
+$$
 GreaterThan(x,y)
-\]
+$$
 
 Complex formulas are built from atomic formulas.
 
@@ -157,9 +157,9 @@ Complex formulas are built from atomic formulas.
 
 The universal quantifier:
 
-\[
+$$
 \forall
-\]
+$$
 
 means:
 
@@ -167,9 +167,9 @@ for all.
 
 The existential quantifier:
 
-\[
+$$
 \exists
-\]
+$$
 
 means:
 
@@ -181,9 +181,9 @@ These create generality.
 
 All humans are mortal:
 
-\[
+$$
 \forall x\,(Human(x)\rightarrow Mortal(x))
-\]
+$$
 
 This says:
 
@@ -193,9 +193,9 @@ for every object x, if x is human, then x is mortal.
 
 Some humans are philosophers:
 
-\[
+$$
 \exists x\,(Human(x)\land Philosopher(x))
-\]
+$$
 
 This says:
 
@@ -207,17 +207,17 @@ A variable is **bound** if governed by a quantifier.
 
 Example:
 
-\[
+$$
 \forall x\,Human(x)
-\]
+$$
 
 The x is bound.
 
 In:
 
-\[
+$$
 Human(x)
-\]
+$$
 
 x is free.
 
@@ -229,15 +229,15 @@ Quantifiers have scope.
 
 Compare:
 
-\[
+$$
 \forall x\,\exists y\,Loves(x,y)
-\]
+$$
 
 with:
 
-\[
+$$
 \exists y\,\forall x\,Loves(x,y)
-\]
+$$
 
 The first says:
 
@@ -297,13 +297,13 @@ A model **satisfies** a formula if the formula is true under that interpretation
 
 We write:
 
-\[
+$$
 \mathcal{M}\models \varphi
-\]
+$$
 
 to say:
 
-model \(\mathcal{M}\) satisfies \(\varphi\).
+model $$\mathcal{M}$$ satisfies $$\varphi$$.
 
 ## Logical Validity
 
@@ -315,11 +315,11 @@ Validity is structural.
 
 ## Logical Consequence
 
-If every model satisfying premises \(\Gamma\) also satisfies conclusion \(\varphi\), then:
+If every model satisfying premises $$\Gamma$$ also satisfies conclusion $$\varphi$$, then:
 
-\[
+$$
 \Gamma \models \varphi
-\]
+$$
 
 This is semantic consequence.
 
@@ -327,21 +327,21 @@ This is semantic consequence.
 
 A formal proof system provides syntactic derivability:
 
-\[
+$$
 \Gamma \vdash \varphi
-\]
+$$
 
 The distinction between:
 
-\[
+$$
 \models
-\]
+$$
 
 and:
 
-\[
+$$
 \vdash
-\]
+$$
 
 returns.
 
@@ -351,15 +351,15 @@ Gödel proved that first-order logic is complete in the following sense:
 
 If:
 
-\[
+$$
 \Gamma \models \varphi
-\]
+$$
 
 then:
 
-\[
+$$
 \Gamma \vdash \varphi
-\]
+$$
 
 Every semantically valid first-order consequence is formally derivable.
 

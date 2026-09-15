@@ -14,15 +14,15 @@ tags:
 
 One of the most famous equations in chaos theory is almost absurdly simple:
 
-\[
+$$
 x_{n+1}=rx_n(1-x_n)
-\]
+$$
 
 This is the **logistic map**.
 
 It was inspired by population growth.
 
-Yet as the parameter \(r\) changes, this one-dimensional recurrence produces:
+Yet as the parameter $$r$$ changes, this one-dimensional recurrence produces:
 
 - stable equilibria,
 - oscillation,
@@ -36,13 +36,13 @@ The logistic map became a symbol of a larger discovery:
 
 ## Why This Equation?
 
-Suppose \(x_n\) represents a normalized population at generation \(n\).
+Suppose $$x_n$$ represents a normalized population at generation $$n$$.
 
 If growth were unconstrained, we might write:
 
-\[
+$$
 x_{n+1}=rx_n
-\]
+$$
 
 More population produces more offspring.
 
@@ -50,41 +50,41 @@ But real populations face limited resources.
 
 The factor:
 
-\[
+$$
 1-x_n
-\]
+$$
 
 reduces growth as the population approaches its effective carrying limit.
 
 The result is nonlinear feedback.
 
-## The Role of \(r\)
+## The Role of $$r$$
 
-The parameter \(r\) controls growth intensity.
+The parameter $$r$$ controls growth intensity.
 
-For different values of \(r\), the same equation behaves qualitatively differently.
+For different values of $$r$$, the same equation behaves qualitatively differently.
 
 This makes the logistic map an ideal laboratory for studying **bifurcation**.
 
 A bifurcation occurs when changing a parameter causes a qualitative change in long-term dynamics.
 
-## Small \(r\): Extinction
+## Small $$r$$: Extinction
 
-For sufficiently small positive \(r\), populations decline toward zero.
+For sufficiently small positive $$r$$, populations decline toward zero.
 
 The growth rate is too weak to sustain a nonzero stable population.
 
 The fixed point:
 
-\[
+$$
 x=0
-\]
+$$
 
 dominates.
 
 ## Stable Population
 
-As \(r\) increases, a nonzero stable fixed point appears.
+As $$r$$ increases, a nonzero stable fixed point appears.
 
 Starting from many different initial values, the sequence approaches one long-term population.
 
@@ -94,7 +94,7 @@ A single attractor governs the dynamics.
 
 ## Stability Can Be Lost
 
-Increase \(r\) further.
+Increase $$r$$ further.
 
 The fixed point eventually becomes unstable.
 
@@ -116,7 +116,7 @@ That is a bifurcation.
 
 ## Period Doubling
 
-Increase \(r\) again.
+Increase $$r$$ again.
 
 The period-2 cycle becomes unstable.
 
@@ -151,9 +151,9 @@ Chaos emerged from iteration.
 
 ## The Bifurcation Diagram
 
-A **bifurcation diagram** displays the long-term values of \(x_n\) as \(r\) changes.
+A **bifurcation diagram** displays the long-term values of $$x_n$$ as $$r$$ changes.
 
-For low \(r\):
+For low $$r$$:
 
 one branch.
 
@@ -181,23 +181,23 @@ This distinction between transient and asymptotic behavior is central in dynamic
 
 ## Fixed Points
 
-A fixed point \(x^*\) satisfies:
+A fixed point $$x^*$$ satisfies:
 
-\[
+$$
 x^*=rx^*(1-x^*)
-\]
+$$
 
 One solution is:
 
-\[
+$$
 x^*=0
-\]
+$$
 
 Another, when appropriate, is:
 
-\[
-x^*=1-rac{1}{r}
-\]
+$$
+x^*=1-\frac{1}{r}
+$$
 
 But existence is not the same as stability.
 
@@ -213,7 +213,7 @@ If it exceeds one, deviations grow.
 
 This connects local calculus to global dynamics.
 
-Stability itself changes as \(r\) changes.
+Stability itself changes as $$r$$ changes.
 
 ## Bifurcation Is a Change in Possibility
 
@@ -235,9 +235,9 @@ Mitchell Feigenbaum studied the spacing between successive period doublings.
 
 He found that the ratios approach a universal constant of roughly:
 
-\[
+$$
 4.669...
-\]
+$$
 
 This is the **Feigenbaum constant**.
 
@@ -293,7 +293,7 @@ The logistic map makes sensitive dependence visible without atmospheric complexi
 
 Every value follows exactly from the previous one.
 
-Given exact \(x_0\) and exact \(r\), the sequence is fixed.
+Given exact $$x_0$$ and exact $$r$$, the sequence is fixed.
 
 There is no random choice.
 

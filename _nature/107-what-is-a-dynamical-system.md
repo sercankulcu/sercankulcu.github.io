@@ -113,11 +113,11 @@ Differential equations describe how variables change at every instant.
 
 For example:
 
-\[
-rac{dx}{dt}=f(x)
-\]
+$$
+\frac{dx}{dt}=f(x)
+$$
 
-The function \(f\) tells us the instantaneous rate of change.
+The function $$f$$ tells us the instantaneous rate of change.
 
 Classical mechanics commonly uses continuous-time dynamics.
 
@@ -131,9 +131,9 @@ A computer simulation may update once per cycle.
 
 A discrete system can be written:
 
-\[
+$$
 x_{n+1}=f(x_n)
-\]
+$$
 
 The next state is obtained by applying a rule to the current state.
 
@@ -195,11 +195,11 @@ A **fixed point** is a state that does not change.
 
 If:
 
-\[
+$$
 f(x^*)=x^*
-\]
+$$
 
-in a discrete system, then \(x^*\) remains fixed.
+in a discrete system, then $$x^*$$ remains fixed.
 
 In continuous systems, the corresponding rate of change is zero.
 

@@ -55,15 +55,15 @@ Termination on every input is essential.
 
 ## Decidable Set
 
-A set \(A\) is decidable if there is an algorithm computing its characteristic function:
+A set $$A$$ is decidable if there is an algorithm computing its characteristic function:
 
-\[
+$$
 \chi_A(x)=
 \begin{cases}
 1 & x\in A\\
 0 & x\notin A
 \end{cases}
-\]
+$$
 
 The algorithm always finishes.
 
@@ -71,9 +71,9 @@ The algorithm always finishes.
 
 Given n, test:
 
-\[
+$$
 n\bmod 2
-\]
+$$
 
 If the remainder is 0, answer yes.
 
@@ -121,9 +121,9 @@ A brute-force algorithm can test all assignments.
 
 For n variables, there are:
 
-\[
+$$
 2^n
-\]
+$$
 
 possibilities.
 
@@ -175,9 +175,9 @@ Given program P and input x, will P eventually halt on x?
 
 Suppose we had:
 
-\[
+$$
 H(P,x)
-\]
+$$
 
 that always returns the correct answer.
 
@@ -234,15 +234,15 @@ If F has no proof, search may continue forever.
 
 Suppose a theory proves either:
 
-\[
+$$
 P
-\]
+$$
 
 or:
 
-\[
+$$
 \neg P
-\]
+$$
 
 for every sentence P.
 
@@ -392,15 +392,15 @@ The word "undecidable" is used in both proof theory and computability, and conte
 
 If statement P is independent of theory T, then:
 
-\[
+$$
 T\nvdash P
-\]
+$$
 
 and:
 
-\[
+$$
 T\nvdash\neg P
-\]
+$$
 
 That is theory-relative undecidability.
 

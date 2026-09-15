@@ -141,9 +141,9 @@ In logic:
 
 means:
 
-\[
+$$
 \neg \exists x\,P(x)
-\]
+$$
 
 It does not posit an entity named Nothing.
 

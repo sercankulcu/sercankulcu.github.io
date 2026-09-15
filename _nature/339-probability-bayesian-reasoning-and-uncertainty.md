@@ -26,9 +26,9 @@ Probability gives us a language for reasoning when knowledge is incomplete.
 
 A probability lies between:
 
-\[
+$$
 0 \leq P(A) \leq 1
-\]
+$$
 
 where:
 
@@ -79,63 +79,63 @@ This is more ontological.
 
 ## Probability Rules
 
-For any event \(A\):
+For any event $$A$$:
 
-\[
+$$
 0 \leq P(A) \leq 1
-\]
+$$
 
 and:
 
-\[
+$$
 P(\neg A)=1-P(A)
-\]
+$$
 
 These simple rules constrain coherent beliefs.
 
 ## Addition Rule
 
-For mutually exclusive events \(A\) and \(B\):
+For mutually exclusive events $$A$$ and $$B$$:
 
-\[
+$$
 P(A \cup B)=P(A)+P(B)
-\]
+$$
 
 If they can overlap:
 
-\[
+$$
 P(A \cup B)=P(A)+P(B)-P(A \cap B)
-\]
+$$
 
 ## Conditional Probability
 
-The probability of \(A\) given \(B\) is:
+The probability of $$A$$ given $$B$$ is:
 
-\[
+$$
 P(A|B)=\frac{P(A \cap B)}{P(B)}
-\]
+$$
 
 provided:
 
-\[
+$$
 P(B)>0
-\]
+$$
 
 Conditional probability is central to evidence.
 
 ## Independence
 
-Events \(A\) and \(B\) are independent when:
+Events $$A$$ and $$B$$ are independent when:
 
-\[
+$$
 P(A \cap B)=P(A)P(B)
-\]
+$$
 
 Equivalently:
 
-\[
+$$
 P(A|B)=P(A)
-\]
+$$
 
 Learning B does not change probability of A.
 
@@ -155,17 +155,17 @@ Treating correlated evidence as independent exaggerates confidence.
 
 Bayes' theorem follows from conditional probability:
 
-\[
+$$
 P(H|E)=\frac{P(E|H)P(H)}{P(E)}
-\]
+$$
 
-It tells us how evidence should update belief in hypothesis \(H\).
+It tells us how evidence should update belief in hypothesis $$H$$.
 
 ## Prior
 
-\[
+$$
 P(H)
-\]
+$$
 
 is the **prior probability**.
 
@@ -173,25 +173,25 @@ It represents belief before new evidence.
 
 ## Likelihood
 
-\[
+$$
 P(E|H)
-\]
+$$
 
 is the **likelihood** of observing evidence if the hypothesis is true.
 
 ## Posterior
 
-\[
+$$
 P(H|E)
-\]
+$$
 
 is the **posterior probability** after evidence is observed.
 
 ## Evidence Term
 
-\[
+$$
 P(E)
-\]
+$$
 
 normalizes probabilities across competing hypotheses.
 
@@ -201,31 +201,31 @@ In practice, hypothesis comparison often uses ratios.
 
 Bayesian updating becomes especially intuitive in odds form:
 
-\[
+$$
 \text{Posterior Odds}
 =
 \text{Prior Odds}
 \times
 \text{Likelihood Ratio}
-\]
+$$
 
 This separates prior belief from evidential strength.
 
 ## Likelihood Ratio
 
-For hypotheses \(H_1\) and \(H_0\):
+For hypotheses $$H_1$$ and $$H_0$$:
 
-\[
+$$
 LR=\frac{P(E|H_1)}{P(E|H_0)}
-\]
+$$
 
 If:
 
-\[
+$$
 LR=10
-\]
+$$
 
-the evidence is ten times more expected under \(H_1\) than \(H_0\).
+the evidence is ten times more expected under $$H_1$$ than $$H_0$$.
 
 ## Evidence Is Comparative
 
@@ -253,9 +253,9 @@ A positive test feels alarming.
 
 But what is:
 
-\[
+$$
 P(\text{disease}|\text{positive})?
-\]
+$$
 
 ## Natural Frequencies
 
@@ -281,13 +281,13 @@ True positives:
 
 Therefore:
 
-\[
+$$
 P(\text{disease}|\text{positive})
 \approx
 \frac{99}{594}
 \approx
 16.7\%
-\]
+$$
 
 ## Base-Rate Neglect
 
@@ -311,15 +311,15 @@ probability defendant is innocent = 1 in a million.
 
 That confuses:
 
-\[
+$$
 P(E|\text{innocent})
-\]
+$$
 
 with:
 
-\[
+$$
 P(\text{innocent}|E)
-\]
+$$
 
 ## Transposed Conditional
 
@@ -327,9 +327,9 @@ This error is common.
 
 In general:
 
-\[
+$$
 P(A|B) \neq P(B|A)
-\]
+$$
 
 Bayes' theorem tells us how to connect them.
 
@@ -409,9 +409,9 @@ Leave room to learn.
 
 Evidence confirms H when:
 
-\[
+$$
 P(H|E)>P(H)
-\]
+$$
 
 A hypothesis can be confirmed without becoming probable overall.
 
@@ -513,9 +513,9 @@ Correlation structure alone does not determine causal direction.
 
 Ask:
 
-\[
+$$
 P(Y|X)
-\]
+$$
 
 What happens when X is observed?
 
@@ -628,9 +628,9 @@ Good forecasting seeks both:
 
 For binary outcomes, one scoring rule is:
 
-\[
+$$
 (\text{forecast probability}-\text{outcome})^2
-\]
+$$
 
 Lower average Brier score is better.
 
@@ -656,9 +656,9 @@ Decision-making combines probabilities with outcomes.
 
 Expected value:
 
-\[
+$$
 EV=\sum_i P_i V_i
-\]
+$$
 
 A low-probability high-impact event can matter greatly.
 
@@ -678,9 +678,9 @@ Decision theory combines them.
 
 When value is nonlinear, decision theory often uses utility:
 
-\[
+$$
 EU=\sum_i P_i U(x_i)
-\]
+$$
 
 This models risk preferences.
 

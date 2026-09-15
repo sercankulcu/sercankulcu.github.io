@@ -66,9 +66,9 @@ It is a sequence.
 
 So we need a way to encode:
 
-\[
+$$
 a_1,a_2,\ldots,a_n
-\]
+$$
 
 as one natural number.
 
@@ -78,15 +78,15 @@ Prime factorization provides one elegant method.
 
 Let the first primes be:
 
-\[
+$$
 2,3,5,7,11,\ldots
-\]
+$$
 
 Encode the sequence as:
 
-\[
+$$
 2^{a_1}3^{a_2}5^{a_3}\cdots p_n^{a_n}
-\]
+$$
 
 Because prime factorization is unique, the original sequence can be recovered.
 
@@ -106,9 +106,9 @@ ABC
 
 could be encoded as:
 
-\[
+$$
 2^1\cdot3^2\cdot5^3
-\]
+$$
 
 That number uniquely carries the sequence under the chosen scheme.
 
@@ -169,9 +169,9 @@ can be represented by an arithmetic relation.
 
 Call it informally:
 
-\[
+$$
 Proof(x,y)
-\]
+$$
 
 This says:
 
@@ -181,9 +181,9 @@ x codes a valid proof whose final formula has code y.
 
 Then we can define a provability predicate:
 
-\[
+$$
 Provable(y)\equiv \exists x\,Proof(x,y)
-\]
+$$
 
 In words:
 
@@ -237,19 +237,19 @@ A formula with a free variable is made to receive its own code as input.
 
 A central result called the **diagonal lemma** says, roughly:
 
-For suitable formula \(F(x)\), there exists a sentence \(G\) such that:
+For suitable formula $$F(x)$$, there exists a sentence $$G$$ such that:
 
-\[
+$$
 G \leftrightarrow F(\ulcorner G\urcorner)
-\]
+$$
 
 is provable in the system.
 
 Here:
 
-\[
+$$
 \ulcorner G\urcorner
-\]
+$$
 
 means the Gödel number of G.
 
@@ -257,7 +257,7 @@ This is formal self-reference.
 
 ## "This Sentence Is Not Provable"
 
-Choose \(F(x)\) to express:
+Choose $$F(x)$$ to express:
 
 "x is not provable."
 

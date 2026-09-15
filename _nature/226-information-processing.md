@@ -44,9 +44,9 @@ A system has a **state** when some description captures its current configuratio
 
 For a finite-state machine, the state may be one of:
 
-\[
+$$
 q_0,q_1,q_2,\ldots
-\]
+$$
 
 For a computer, state includes:
 
@@ -88,9 +88,9 @@ Output may itself become input to another system.
 
 A simple model is:
 
-\[
+$$
 Input \rightarrow Transformation \rightarrow Output
-\]
+$$
 
 But this hides internal structure.
 
@@ -107,9 +107,9 @@ Some transformations depend only on current input.
 
 Example:
 
-\[
+$$
 f(x)=2x
-\]
+$$
 
 The same input always produces the same output.
 
@@ -236,9 +236,9 @@ A classifier maps an input into a category.
 
 For example:
 
-\[
+$$
 image \rightarrow cat
-\]
+$$
 
 Classification is information processing because a rich input state is transformed into a more compact label.
 
@@ -564,9 +564,9 @@ Landauer's principle connects logically irreversible information erasure to ther
 
 Erasing one bit has a minimum heat cost proportional to:
 
-\[
+$$
 kT\ln 2
-\]
+$$
 
 under idealized conditions.
 

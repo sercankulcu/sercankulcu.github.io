@@ -76,11 +76,11 @@ It is a formal representation of preference.
 
 ## Expected Utility
 
-If action \(A\) can produce outcomes \(o_i\) with probabilities \(p_i\), expected utility is:
+If action $$A$$ can produce outcomes $$o_i$$ with probabilities $$p_i$$, expected utility is:
 
-\[
+$$
 EU(A)=\sum_i p_i U(o_i)
-\]
+$$
 
 A standard decision rule is:
 

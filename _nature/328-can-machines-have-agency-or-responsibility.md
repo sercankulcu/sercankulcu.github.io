@@ -78,9 +78,9 @@ Other theories tie responsibility to subjective moral awareness.
 
 A machine with a policy:
 
-\[
+$$
 \pi(a|s)
-\]
+$$
 
 selects actions based on state.
 

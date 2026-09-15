@@ -97,14 +97,14 @@ Perception organizes data according to hypotheses.
 
 One useful framework models perception as Bayesian inference:
 
-\[
+$$
 P(H|D)\propto P(D|H)P(H)
-\]
+$$
 
 where:
 
-- \(H\) is a hypothesis about the world,
-- \(D\) is sensory data.
+- $$H$$ is a hypothesis about the world,
+- $$D$$ is sensory data.
 
 The brain combines prior expectations with evidence.
 

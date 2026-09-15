@@ -14,15 +14,15 @@ tags:
 
 Modern computers reduce astonishing diversity to two symbols:
 
-\[
+$$
 0
-\]
+$$
 
 and
 
-\[
+$$
 1
-\]
+$$
 
 Text.
 
@@ -46,15 +46,15 @@ A **bit** is a binary digit.
 
 It can take one of two logical values:
 
-\[
+$$
 0
-\]
+$$
 
 or
 
-\[
+$$
 1
-\]
+$$
 
 The bit is abstract.
 
@@ -113,21 +113,21 @@ Binary positional notation works like decimal notation but with base 2.
 
 For example:
 
-\[
+$$
 1011_2
-\]
+$$
 
 means:
 
-\[
+$$
 1\cdot2^3+0\cdot2^2+1\cdot2^1+1\cdot2^0
-\]
+$$
 
 which equals:
 
-\[
+$$
 11_{10}
-\]
+$$
 
 The string and the number are not identical.
 
@@ -137,9 +137,9 @@ The string represents the number under a convention.
 
 Each binary position represents a power of two:
 
-\[
+$$
 \ldots, 2^3,2^2,2^1,2^0
-\]
+$$
 
 This makes arithmetic systematic.
 
@@ -153,17 +153,17 @@ A **byte** usually contains eight bits.
 
 For example:
 
-\[
+$$
 01000001
-\]
+$$
 
 A byte can represent 256 different bit patterns.
 
 Because:
 
-\[
+$$
 2^8=256
-\]
+$$
 
 Bytes became a standard unit of digital storage.
 
@@ -181,9 +181,9 @@ Long binary strings are hard for humans to read.
 
 Hexadecimal uses sixteen symbols:
 
-\[
+$$
 0,1,\ldots,9,A,B,C,D,E,F
-\]
+$$
 
 Each hexadecimal digit corresponds exactly to four bits.
 
@@ -193,27 +193,27 @@ This makes conversion compact.
 
 Binary:
 
-\[
+$$
 11111111
-\]
+$$
 
 can be grouped:
 
-\[
+$$
 1111\ 1111
-\]
+$$
 
 Each group is:
 
-\[
+$$
 F
-\]
+$$
 
 so the hexadecimal representation is:
 
-\[
+$$
 FF
-\]
+$$
 
 Humans gain readability without changing the underlying bit pattern.
 
@@ -251,9 +251,9 @@ But many real numbers cannot be represented exactly.
 
 The decimal number:
 
-\[
+$$
 0.1
-\]
+$$
 
 does not have a finite exact binary expansion.
 
@@ -318,9 +318,9 @@ Data and instructions can therefore share the same physical memory.
 
 Consider:
 
-\[
+$$
 01000001
-\]
+$$
 
 It could represent:
 
@@ -409,19 +409,19 @@ It is an engineering success, not a logical necessity.
 
 ## Information Capacity
 
-A system with \(n\) independent bits can represent:
+A system with $$n$$ independent bits can represent:
 
-\[
+$$
 2^n
-\]
+$$
 
 distinct patterns.
 
 Ten bits:
 
-\[
+$$
 2^{10}=1024
-\]
+$$
 
 possibilities.
 
@@ -431,9 +431,9 @@ A modest number of bits creates enormous representational capacity.
 
 With 100 bits:
 
-\[
+$$
 2^{100}
-\]
+$$
 
 possible strings exist.
 

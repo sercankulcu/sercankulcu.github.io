@@ -14,9 +14,9 @@ tags:
 
 The equation is tiny:
 
-\[
+$$
 z_{n+1}=z_n^2+c
-\]
+$$
 
 The image is endless.
 
@@ -199,9 +199,9 @@ A system can be easy to run but hard to foresee.
 
 The recurrence:
 
-\[
+$$
 z_{n+1}=z_n^2+c
-\]
+$$
 
 feeds the current state back into itself.
 
@@ -271,7 +271,7 @@ The universe can be richly structured without its laws being equally complicated
 
 Simple law plus different initial conditions can yield different worlds.
 
-In the Mandelbrot set, parameter \(c\) changes behavior.
+In the Mandelbrot set, parameter $$c$$ changes behavior.
 
 In physical systems, initial states and boundary conditions do similar work.
 

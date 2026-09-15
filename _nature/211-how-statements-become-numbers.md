@@ -39,8 +39,8 @@ For example:
 - =,
 - (,
 - ),
-- \(\neg\),
-- \(\forall\),
+- $$\neg$$,
+- $$\forall$$,
 - variables.
 
 Assign each symbol a unique code.
@@ -72,9 +72,9 @@ The mapping only needs to be:
 
 The formula:
 
-\[
+$$
 S0+S0=SS0
-\]
+$$
 
 is a sequence of symbols.
 
@@ -88,15 +88,15 @@ One method uses successive primes.
 
 If a sequence has codes:
 
-\[
+$$
 a_1,a_2,\ldots,a_n
-\]
+$$
 
 encode it as:
 
-\[
+$$
 2^{a_1}3^{a_2}5^{a_3}\cdots p_n^{a_n}
-\]
+$$
 
 Unique prime factorization guarantees recoverability.
 
@@ -208,9 +208,9 @@ The metatheory can be mirrored inside number theory.
 
 We can define a relation:
 
-\[
+$$
 Proof(x,y)
-\]
+$$
 
 meaning:
 
@@ -222,9 +222,9 @@ This is an arithmetic relation between natural numbers.
 
 Then:
 
-\[
+$$
 Prov(y)\equiv \exists x\,Proof(x,y)
-\]
+$$
 
 means:
 
@@ -234,7 +234,7 @@ A meta-level statement about proof has been translated into arithmetic.
 
 ## From Formula to Numeral
 
-Suppose formula \(F\) has Gödel number 527381.
+Suppose formula $$F$$ has Gödel number 527381.
 
 Arithmetic can contain a numeral denoting:
 
@@ -258,9 +258,9 @@ Numbers become names for formulas.
 
 Now imagine a formula:
 
-\[
+$$
 A(x)
-\]
+$$
 
 with one free variable.
 
@@ -298,19 +298,19 @@ The result is more rigorous than ordinary self-reference.
 
 A central result says roughly:
 
-For any suitable formula \(F(x)\), there exists a sentence \(G\) such that:
+For any suitable formula $$F(x)$$, there exists a sentence $$G$$ such that:
 
-\[
+$$
 G \leftrightarrow F(\ulcorner G\urcorner)
-\]
+$$
 
 is provable.
 
 Here:
 
-\[
+$$
 \ulcorner G\urcorner
-\]
+$$
 
 denotes the Gödel number of G.
 
@@ -332,15 +332,15 @@ Self-reference is a fixed point of representation.
 
 ## The Gödel Sentence
 
-Let \(F(x)\) mean:
+Let $$F(x)$$ mean:
 
 "x is not provable."
 
 Then diagonalization yields a sentence G satisfying:
 
-\[
+$$
 G \leftrightarrow \neg Prov(\ulcorner G\urcorner)
-\]
+$$
 
 Informally:
 

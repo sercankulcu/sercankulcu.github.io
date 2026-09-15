@@ -98,9 +98,9 @@ In supervised learning, examples include:
 
 The model learns a mapping:
 
-\[
+$$
 x\rightarrow y
-\]
+$$
 
 ## Classification
 
@@ -136,9 +136,9 @@ The learning algorithm tries to minimize loss.
 
 For regression, a common loss is:
 
-\[
+$$
 L=\frac{1}{n}\sum_{i=1}^{n}(y_i-\hat y_i)^2
-\]
+$$
 
 Large errors are penalized strongly.
 
@@ -167,9 +167,9 @@ Learning is parameter adaptation.
 
 Training often becomes:
 
-\[
+$$
 \theta^*=\arg\min_{\theta} L(\theta)
-\]
+$$
 
 The goal is to find parameter values minimizing loss.
 
@@ -177,11 +177,11 @@ The goal is to find parameter values minimizing loss.
 
 Gradient descent updates parameters in the direction reducing loss:
 
-\[
+$$
 \theta_{t+1}=\theta_t-\eta\nabla_\theta L
-\]
+$$
 
-where \(\eta\) is the learning rate.
+where $$\eta$$ is the learning rate.
 
 ## Training Is Not the Goal
 
@@ -365,9 +365,9 @@ It learns which actions produce good long-term outcomes.
 
 The basic elements are:
 
-- state \(s\),
-- action \(a\),
-- reward \(r\).
+- state $$s$$,
+- action $$a$$,
+- reward $$r$$.
 
 The agent learns a policy.
 
@@ -375,9 +375,9 @@ The agent learns a policy.
 
 The agent often maximizes discounted cumulative reward:
 
-\[
+$$
 G_t=\sum_{k=0}^{\infty}\gamma^k r_{t+k+1}
-\]
+$$
 
 Future reward matters.
 
@@ -385,19 +385,19 @@ Future reward matters.
 
 A value function estimates expected future return from a state:
 
-\[
+$$
 V(s)
-\]
+$$
 
 This supports planning and learning.
 
 ## Q-Function
 
-An action-value function estimates return for taking action \(a\) in state \(s\):
+An action-value function estimates return for taking action $$a$$ in state $$s$$:
 
-\[
+$$
 Q(s,a)
-\]
+$$
 
 The policy can choose high-value actions.
 
@@ -405,9 +405,9 @@ The policy can choose high-value actions.
 
 Q-learning updates estimates using:
 
-\[
+$$
 Q(s,a)\leftarrow Q(s,a)+\alpha[r+\gamma\max_{a'}Q(s',a')-Q(s,a)]
-\]
+$$
 
 This is a temporal-difference rule.
 

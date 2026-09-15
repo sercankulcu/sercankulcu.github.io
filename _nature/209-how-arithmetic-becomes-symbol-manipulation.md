@@ -14,9 +14,9 @@ tags:
 
 When a child learns:
 
-\[
+$$
 2+3=5
-\]
+$$
 
 the symbols usually carry meaning.
 
@@ -46,9 +46,9 @@ That is the appeal of syntax.
 
 Consider:
 
-\[
+$$
 2+3=5
-\]
+$$
 
 At one level, this contains tokens:
 
@@ -104,9 +104,9 @@ Syntax says which strings are legal.
 
 For example:
 
-\[
+$$
 (2+3)=5
-\]
+$$
 
 may be legal.
 
@@ -120,15 +120,15 @@ Arithmetic can be viewed through rewriting rules.
 
 Example:
 
-\[
+$$
 a+0 \rightarrow a
-\]
+$$
 
 and:
 
-\[
+$$
 a+S(b)\rightarrow S(a+b)
-\]
+$$
 
 Repeated rewrites compute sums.
 
@@ -138,33 +138,33 @@ Calculation becomes transformation of strings.
 
 Using successor notation:
 
-\[
+$$
 SS0+S0
-\]
+$$
 
 Apply:
 
-\[
+$$
 a+S(b)\rightarrow S(a+b)
-\]
+$$
 
 giving:
 
-\[
+$$
 S(SS0+0)
-\]
+$$
 
 Then:
 
-\[
+$$
 a+0\rightarrow a
-\]
+$$
 
 giving:
 
-\[
+$$
 SSS0
-\]
+$$
 
 The result corresponds to 3.
 
@@ -182,15 +182,15 @@ Computation and proof share structural themes.
 
 Consider:
 
-\[
+$$
 x+2=5
-\]
+$$
 
 Subtracting 2 from both sides yields:
 
-\[
+$$
 x=3
-\]
+$$
 
 Formally, this is not "moving the 2."
 
@@ -204,9 +204,9 @@ Equality supports principles such as substitution:
 
 if:
 
-\[
+$$
 a=b
-\]
+$$
 
 then expressions containing a can often replace it with b under suitable conditions.
 
@@ -366,15 +366,15 @@ One classic encoding method uses prime numbers.
 
 Suppose symbols have codes:
 
-\[
+$$
 a_1,a_2,\ldots,a_n
-\]
+$$
 
 Then encode the sequence as:
 
-\[
+$$
 2^{a_1}3^{a_2}5^{a_3}\cdots p_n^{a_n}
-\]
+$$
 
 Unique prime factorization lets us recover the sequence.
 

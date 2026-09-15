@@ -94,13 +94,13 @@ The butterfly effect belongs to unstable directions in state space.
 
 In chaotic systems, nearby states may separate roughly exponentially for some interval.
 
-If error begins at \(\delta_0\), it can grow like:
+If error begins at $$\delta_0$$, it can grow like:
 
-\[
-\delta(t)pprox\delta_0e^{\lambda t}
-\]
+$$
+\delta(t)\approx\delta_0e^{\lambda t}
+$$
 
-with positive \(\lambda\).
+with positive $$\lambda$$.
 
 Repeated amplification transforms microscopic uncertainty into macroscopic divergence.
 

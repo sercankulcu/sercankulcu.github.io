@@ -28,9 +28,9 @@ And is its apparent flow a feature of reality itself?
 
 Physics often represents time as a coordinate:
 
-\[
+$$
 t
-\]
+$$
 
 Events occur at different temporal locations.
 

@@ -325,7 +325,7 @@ Special relativity also changes the relation between mass and energy.
 
 The famous equation:
 
-\(E = mc^2\)
+$$E = mc^2$$
 
 expresses a deep equivalence between mass and energy.
 

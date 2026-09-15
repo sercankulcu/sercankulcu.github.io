@@ -122,9 +122,9 @@ It is part of the number system.
 
 Zero has a special role in arithmetic.
 
-For any number \(a\):
+For any number $$a$$:
 
-\(a + 0 = a\)
+$$a + 0 = a$$
 
 This makes zero the **additive identity**.
 
@@ -206,15 +206,15 @@ Zero behaves normally under addition and multiplication.
 
 Division is different.
 
-Why is \(1/0\) not an ordinary number?
+Why is $$1/0$$ not an ordinary number?
 
-Division asks for a number \(x\) such that:
+Division asks for a number $$x$$ such that:
 
-\(0 × x = 1\)
+$$0 × x = 1$$
 
 But multiplying zero by any ordinary number gives zero.
 
-No such \(x\) exists.
+No such $$x$$ exists.
 
 So division by zero is undefined in ordinary arithmetic.
 
@@ -224,11 +224,11 @@ It follows from the structure of the operations.
 
 ## What About 0/0?
 
-The expression \(0/0\) is even stranger.
+The expression $$0/0$$ is even stranger.
 
-We seek an \(x\) such that:
+We seek an $$x$$ such that:
 
-\(0 × x = 0\)
+$$0 × x = 0$$
 
 Every number satisfies that equation.
 
@@ -246,9 +246,9 @@ A quantity may approach zero while another grows without bound.
 
 The reciprocal relation:
 
-\(1/x\)
+$$1/x$$
 
-becomes arbitrarily large as positive \(x\) approaches zero.
+becomes arbitrarily large as positive $$x$$ approaches zero.
 
 But infinity is not simply the result of dividing by zero in ordinary real arithmetic.
 

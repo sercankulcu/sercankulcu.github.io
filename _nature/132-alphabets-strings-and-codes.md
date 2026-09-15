@@ -36,17 +36,17 @@ In formal language theory, an **alphabet** is a finite set of symbols.
 
 For example:
 
-\[
+$$
 \Sigma=\{0,1\}
-\]
+$$
 
 is the binary alphabet.
 
 Another alphabet might be:
 
-\[
+$$
 \Sigma=\{A,C,G,T\}
-\]
+$$
 
 which resembles the four DNA bases.
 
@@ -68,23 +68,23 @@ A **string** is a finite sequence of symbols from an alphabet.
 
 Using:
 
-\[
+$$
 \Sigma=\{0,1\}
-\]
+$$
 
 examples include:
 
-\[
+$$
 0
-\]
+$$
 
-\[
+$$
 101
-\]
+$$
 
-\[
+$$
 001101
-\]
+$$
 
 Order matters.
 
@@ -94,9 +94,9 @@ Order matters.
 
 Formal systems include the **empty string**, usually written:
 
-\[
+$$
 \epsilon
-\]
+$$
 
 It contains zero symbols.
 
@@ -108,23 +108,23 @@ Earlier, the empty set played a similar role in mathematics.
 
 ## Length
 
-The length of a string \(w\) is written:
+The length of a string $$w$$ is written:
 
-\[
+$$
 |w|
-\]
+$$
 
 For:
 
-\[
+$$
 w=10110
-\]
+$$
 
 we have:
 
-\[
+$$
 |w|=5
-\]
+$$
 
 Length counts symbol positions, not meaning.
 
@@ -134,31 +134,31 @@ Strings can be joined.
 
 If:
 
-\[
+$$
 x=01
-\]
+$$
 
 and:
 
-\[
+$$
 y=110
-\]
+$$
 
 then concatenation gives:
 
-\[
+$$
 xy=01110
-\]
+$$
 
 This simple operation is fundamental to formal languages.
 
 ## All Strings
 
-Given alphabet \(\Sigma\), the notation:
+Given alphabet $$\Sigma$$, the notation:
 
-\[
+$$
 \Sigma^*
-\]
+$$
 
 means the set of all finite strings over that alphabet, including the empty string.
 
@@ -170,9 +170,9 @@ This connects directly to recursion.
 
 Digital computing often reduces information to two symbolic states:
 
-\[
+$$
 \{0,1\}
-\]
+$$
 
 Why binary?
 
@@ -274,25 +274,25 @@ Numbers themselves need representations.
 
 The number ten can be written:
 
-\[
+$$
 10
-\]
+$$
 
 in decimal.
 
 Or:
 
-\[
+$$
 1010
-\]
+$$
 
 in binary.
 
 Or:
 
-\[
+$$
 A
-\]
+$$
 
 in hexadecimal notation.
 
@@ -387,9 +387,9 @@ Information survives imperfect physical channels through mathematical structure.
 
 Biology uses four nucleotide bases:
 
-\[
+$$
 \{A,C,G,T\}
-\]
+$$
 
 DNA sequences can therefore be treated formally as strings.
 

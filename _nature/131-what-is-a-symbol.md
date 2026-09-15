@@ -18,7 +18,7 @@ The word "tree" refers to a tree.
 
 A flag represents a country.
 
-A variable \(x\) can stand for a number.
+A variable $$x$$ can stand for a number.
 
 These are all **symbols**.
 
@@ -127,21 +127,21 @@ Arbitrariness and regularity coexist.
 
 Mathematics relies heavily on symbols.
 
-\[
+$$
 +
-\]
+$$
 
 can represent addition.
 
-\[
+$$
 =
-\]
+$$
 
 represents equality.
 
-\[
+$$
 x
-\]
+$$
 
 may represent a variable.
 
@@ -213,17 +213,17 @@ Symbols can be combined according to rules.
 
 For example:
 
-\[
+$$
 2+3
-\]
+$$
 
 is well-formed arithmetic notation.
 
 But:
 
-\[
+$$
 +2=*
-\]
+$$
 
 may be malformed under ordinary rules.
 
@@ -233,9 +233,9 @@ Syntax governs admissible symbol arrangements.
 
 Semantics assigns interpretation.
 
-\[
+$$
 2+3
-\]
+$$
 
 means an addition operation whose value is 5.
 

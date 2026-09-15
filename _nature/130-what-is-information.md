@@ -62,11 +62,11 @@ Claude Shannon formalized this idea in communication theory.
 
 A rare event carries more information than a predictable event.
 
-If an event has probability \(p\), its information content is often written:
+If an event has probability $$p$$, its information content is often written:
 
-\[
+$$
 I=-\log_2 p
-\]
+$$
 
 The less expected the event, the larger the information.
 
@@ -88,11 +88,11 @@ A bit measures distinction, not meaning.
 
 ## Shannon Entropy
 
-For a set of possible outcomes with probabilities \(p_i\), Shannon entropy is:
+For a set of possible outcomes with probabilities $$p_i$$, Shannon entropy is:
 
-\[
+$$
 H=-\sum_i p_i\log_2 p_i
-\]
+$$
 
 Entropy measures expected uncertainty before the outcome is known.
 
@@ -149,7 +149,7 @@ Information can therefore be relational.
 
 Information theory quantifies shared dependence using **mutual information**.
 
-If knowing variable \(X\) reduces uncertainty about variable \(Y\), then \(X\) carries information about \(Y\).
+If knowing variable $$X$$ reduces uncertainty about variable $$Y$$, then $$X$$ carries information about $$Y$$.
 
 This idea appears in:
 

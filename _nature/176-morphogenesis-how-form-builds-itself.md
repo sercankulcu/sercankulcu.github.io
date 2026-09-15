@@ -130,15 +130,13 @@ Spatial patterns emerge spontaneously.
 
 A simplified reaction–diffusion system has equations like:
 
-\[
-rac{\partial u}{\partial t}=D_u
-abla^2u+f(u,v)
-\]
+$$
+\frac{\partial u}{\partial t}=D_u\nabla^2u+f(u,v)
+$$
 
-\[
-rac{\partial v}{\partial t}=D_v
-abla^2v+g(u,v)
-\]
+$$
+\frac{\partial v}{\partial t}=D_v\nabla^2v+g(u,v)
+$$
 
 Local chemical reactions interact with diffusion.
 
