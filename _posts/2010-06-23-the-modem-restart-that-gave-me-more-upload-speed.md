@@ -3,11 +3,11 @@ title: "The Modem Restart That Gave Me More Upload Speed"
 date: 2010-06-23
 permalink: /posts/2010/06/the-modem-restart-that-gave-me-more-upload-speed/
 tags:
-   - internet
-   - turkey
-   - technology
-   - memories
-   - humor
+  - internet
+  - turkey
+  - technology
+  - memories
+  - humor
 ---
 
 There was a period when internet problems were not background annoyances. They were events. You noticed every kilobit, knew what speed you were supposed to have, knew what speed you actually had, stared at modem statistics, restarted hardware, and called customer support. And sometimes, after thirty minutes of explaining a technical problem, the recommended solution was the most universal instruction in the history of consumer electronics: turn it off and turn it on again.

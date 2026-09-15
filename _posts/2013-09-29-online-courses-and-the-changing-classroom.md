@@ -3,8 +3,8 @@ title: 'Online Courses And The Changing Classroom'
 date: 2013-09-29
 permalink: /posts/2013/09/online-courses-and-the-changing-classroom/
 tags:
-   - education
-   - technology
+  - education
+  - technology
 ---
 
 The New York Times called 2012 "The Year of the MOOC." Massive open online courses arrived with enormous energy: Coursera launched in April 2012, founded by Stanford professors Daphne Koller and Andrew Ng; edX launched two months later as a nonprofit from MIT and Harvard; Udacity, founded by Sebastian Thrun after his Stanford AI course enrolled 160,000 students online in 2011, was already operating. By September 2013, millions of students worldwide have enrolled in courses on these platforms, often from institutions they could not have attended in person.

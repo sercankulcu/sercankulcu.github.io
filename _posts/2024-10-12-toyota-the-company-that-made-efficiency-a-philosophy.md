@@ -3,10 +3,10 @@ title: 'Toyota The Company That Made Efficiency A Philosophy'
 date: 2024-10-12
 permalink: /posts/2024/10/toyota-the-company-that-made-efficiency-a-philosophy/
 tags:
-   - manufacturing
-   - lean
-   - kaizen
-   - engineering
+  - manufacturing
+  - lean
+  - kaizen
+  - engineering
 ---
 
 Toyota is often described as one of the world's largest automobile manufacturers. That description is correct. It is also incomplete. Toyota became important not only because of the cars it produced, but because of the way it learned to produce them.

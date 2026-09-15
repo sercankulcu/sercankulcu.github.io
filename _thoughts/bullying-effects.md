@@ -3,9 +3,9 @@ title: 'Children Learn What Power Looks Like'
 date: 2025-01-17
 description: "Bullying is not only an isolated act; it is also a lesson children absorb about power, fear, and responsibility."
 tags:
-   - education
-   - family
-   - power
+  - education
+  - family
+  - power
 ---
 
 Children learn from rules, but they also learn from watching how adults use power.

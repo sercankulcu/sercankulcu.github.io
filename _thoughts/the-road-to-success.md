@@ -3,8 +3,8 @@ title: 'Choose What Is Worth the Cost'
 date: 2023-07-08
 description: "Success is not only reaching a goal, but choosing a cost that is actually worth paying."
 tags:
-   - opportunity-cost
-   - ambition
+  - opportunity-cost
+  - ambition
 ---
 
 Success is usually presented as a destination. I have become more interested in its price.

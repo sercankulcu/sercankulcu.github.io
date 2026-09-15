@@ -3,9 +3,9 @@ title: 'Confidence Is Not the Same as Self-Trust'
 date: 2017-10-06
 description: "Self-trust is quieter than confidence and depends on knowing we will remain with ourselves through difficulty."
 tags:
-   - trust
-   - uncertainty
-   - reflection
+  - trust
+  - uncertainty
+  - reflection
 ---
 
 Confidence is easiest when the evidence is favorable.

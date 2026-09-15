@@ -3,8 +3,8 @@ title: 'Containers Are Changing The Way Software Is Delivered'
 date: 2016-05-29
 permalink: /posts/2016/05/containers-are-changing-the-way-software-is-delivered/
 tags:
-   - docker
-   - software
+  - docker
+  - software
 ---
 
 Deployment problems are often environment problems. A program works correctly on a developer's machine, then fails on a staging server because a library is a different version, a configuration file has a different path, or a system dependency is missing. Debugging these discrepancies is time-consuming and tedious because the mismatch can be anywhere in a large stack.

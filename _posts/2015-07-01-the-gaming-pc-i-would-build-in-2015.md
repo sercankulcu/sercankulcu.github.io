@@ -4,7 +4,12 @@ date: 2015-07-01
 permalink: /posts/2015/07/the-gaming-pc-i-would-build-in-2015/
 redirect_from:
   - /the-gaming-pc-i-would-build-in-2015/
-tags: [computers, gaming, hardware, pc-build, technology]
+tags:
+  - computers
+  - gaming
+  - hardware
+  - pc-build
+  - technology
 ---
 
 If I were building a gaming PC on **July 1, 2015**, this is the machine I would actually want. I am not simply choosing the most expensive part in every category. The priority is gaming performance, then reliability, cooling and enough headroom to keep the system useful for years.

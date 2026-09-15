@@ -3,10 +3,10 @@ title: 'Docker And The Idea Of Portable Software'
 date: 2015-02-22
 permalink: /posts/2015/02/docker-and-the-idea-of-portable-software/
 tags:
-   - docker
-   - software
-   - cloud
-   - programming
+  - docker
+  - software
+  - cloud
+  - programming
 ---
 
 One sentence has caused programmers pain for a very long time: "It works on my machine." Docker, which released version 1.0 last June and has grown quickly since then, is the most practical answer I have seen to this problem.

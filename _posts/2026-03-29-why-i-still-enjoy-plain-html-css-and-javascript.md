@@ -3,9 +3,9 @@ title: 'Why I Still Enjoy Plain HTML, CSS, and JavaScript'
 date: 2026-03-29
 permalink: /posts/2026/03/why-i-still-enjoy-plain-html-css-and-javascript/
 tags:
-   - programming
-   - javascript
-   - web
+  - programming
+  - javascript
+  - web
 ---
 
 In March 2026, the modern web development landscape includes dozens of frameworks, meta-frameworks built on top of frameworks, build tools that compile JavaScript that compiles to JavaScript, AI-assisted scaffolding that generates entire project structures before you have written a line of code, and package managers competing to install those structures most efficiently.

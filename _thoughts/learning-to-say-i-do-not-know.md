@@ -3,9 +3,9 @@ title: 'I Do Not Know Is a Professional Skill'
 date: 2014-10-19
 description: "Saying I do not know can be a form of competence when it protects truth from performance."
 tags:
-   - learning
-   - work
-   - ego
+  - learning
+  - work
+  - ego
 ---
 
 There was a time when saying "I do not know" felt like a small professional failure.

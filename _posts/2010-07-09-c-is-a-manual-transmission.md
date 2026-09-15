@@ -3,10 +3,10 @@ title: "C Is a Manual Transmission"
 date: 2010-07-09
 permalink: /posts/2010/07/c-is-a-manual-transmission/
 tags:
-   - programming
-   - java
-   - engineering
-   - memories
+  - programming
+  - java
+  - engineering
+  - memories
 ---
 
 Years ago, I tried to explain the difference between C and Java with cars. C, I wrote, was like driving a manual transmission. Java was like driving an automatic. The comparison was not academically complete. It was not supposed to be. It was the kind of explanation you give when you have spent enough time with both languages to stop thinking only about syntax and start thinking about how they feel.

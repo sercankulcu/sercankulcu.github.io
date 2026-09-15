@@ -3,9 +3,9 @@ title: 'Most of Us Will Be Forgotten'
 date: 2012-10-06
 description: "Being forgotten does not make ordinary life smaller; it may free us from using permanence as the measure of value."
 tags:
-   - life
-   - memory
-   - aging
+  - life
+  - memory
+  - aging
 ---
 
 Most of us will be forgotten.

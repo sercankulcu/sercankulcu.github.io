@@ -3,9 +3,9 @@ title: 'The Starting Line Is Not Chosen'
 date: 2019-03-22
 description: "Luck shapes the starting line of life, but recognizing that should deepen humility without erasing agency."
 tags:
-   - luck
-   - ethics
-   - responsibility
+  - luck
+  - ethics
+  - responsibility
 ---
 
 Before we make our first decision, a surprising amount has already been decided for us.

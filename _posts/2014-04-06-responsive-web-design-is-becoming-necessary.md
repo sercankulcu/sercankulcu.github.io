@@ -3,8 +3,8 @@ title: 'Responsive Web Design Is Becoming Necessary'
 date: 2014-04-06
 permalink: /posts/2014/04/responsive-web-design-is-becoming-necessary/
 tags:
-   - web
-   - mobile
+  - web
+  - mobile
 ---
 
 A few years ago, designing a website meant designing for a computer screen. The assumption was safe enough when the percentage of web traffic from phones was in single digits. In 2014, that assumption is becoming dangerous.

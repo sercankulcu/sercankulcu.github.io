@@ -3,8 +3,8 @@ title: 'Deep Learning Is Changing Computer Vision'
 date: 2016-04-30
 permalink: /posts/2016/04/deep-learning-is-changing-computer-vision/
 tags:
-   - artificial-intelligence
-   - machine-learning
+  - artificial-intelligence
+  - machine-learning
 ---
 
 Computer vision has always fascinated me because the task sounds simple when we describe it in human language: "Find the object in this image." "Recognize this face." "Tell me what is happening in this picture." Humans do these things before they can write. For computers, the same tasks have been among the hardest problems in artificial intelligence for decades.

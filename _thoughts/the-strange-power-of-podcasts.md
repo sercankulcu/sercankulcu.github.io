@@ -3,8 +3,8 @@ title: 'Podcasts Borrow the Empty Parts of a Day'
 date: 2018-08-26
 description: "Listening can create a convincing imitation of understanding — recognition is not recall, and familiarity is not mastery."
 tags:
-   - learning
-   - attention
+  - learning
+  - attention
 ---
 
 Podcasts fit into time that other media cannot easily reach.

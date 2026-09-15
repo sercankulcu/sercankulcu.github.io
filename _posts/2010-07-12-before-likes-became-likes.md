@@ -3,11 +3,11 @@ title: "Before Likes Became Likes"
 date: 2010-07-12
 permalink: /posts/2010/07/before-likes-became-likes/
 tags:
-   - internet
-   - social-media
-   - eksisozluk
-   - memories
-   - humor
+  - internet
+  - social-media
+  - eksisozluk
+  - memories
+  - humor
 ---
 
 Long before every platform put a heart, thumb, star, flame, clap, or reaction button under everything we wrote, people were already doing the same emotional mathematics: who liked this, who agreed, who noticed, who said something, and who said something but did not press the button.

@@ -3,11 +3,11 @@ title: "The Day Windows Cleaned Up After Me"
 date: 2012-07-09
 permalink: /posts/2012/07/the-day-windows-cleaned-up-after-me/
 tags:
-   - linux
-   - software
-   - programming
-   - embedded-systems
-   - engineering
+  - linux
+  - software
+  - programming
+  - embedded-systems
+  - engineering
 ---
 
 For years, I had been trained to respect Linux. At university, I had professors who loved it. Later, at work, I spent a great deal of time on embedded systems. So Linux was not some exotic operating system I occasionally installed out of curiosity — it was part of the technical world I knew. Windows development, on the other hand, was something I had done much less of. Then, in 2012, I had to use it, and because engineers are apparently incapable of simply using a new environment normally, I decided to experiment.

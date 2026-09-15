@@ -3,9 +3,9 @@ title: 'Git And The Strange Idea Of Distributed Version Control'
 date: 2008-07-13
 permalink: /posts/2008/07/git-and-the-strange-idea-of-distributed-version-control/
 tags:
-   - open-source
-   - programming
-   - software
+  - open-source
+  - programming
+  - software
 ---
 
 Version control becomes important the first time a project grows large enough that "final", "final2", and "really-final" stop being funny file names. A proper system keeps the history of changes and allows us to return to an older version when something goes wrong.

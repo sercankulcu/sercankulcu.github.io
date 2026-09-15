@@ -3,10 +3,10 @@ title: "Beauty Is What Asks the Eye to Return"
 date: 2025-08-29
 description: "Beauty is not a single property; it is a mixture of perception, attention, memory, desire, and meaning."
 tags:
-   - beauty
-   - love
-   - philosophy
-   - perception
+  - beauty
+  - love
+  - philosophy
+  - perception
 ---
 
 Why can two people who look very different attract the same observer, while two people with similar features leave completely different impressions?

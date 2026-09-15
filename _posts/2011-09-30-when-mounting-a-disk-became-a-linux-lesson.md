@@ -3,10 +3,10 @@ title: "When Mounting a Disk Became a Linux Lesson"
 date: 2011-09-30
 permalink: /posts/2011/09/when-mounting-a-disk-became-a-linux-lesson/
 tags:
-   - linux
-   - debugging
-   - engineering
-   - memories
+  - linux
+  - debugging
+  - engineering
+  - memories
 ---
 
 There are technical problems that begin with a sentence so innocent that you already know the evening is lost. "I just need to write something to this disk." That was more or less the situation. The disk was NTFS. The system was Linux. The tool involved was `ntfs-3g`. Nothing about this sounded dramatic — mount the disk, copy the files, continue with life. Instead, the computer gradually transformed into something that felt less like a workstation and more like a geological formation: slow, heavy, unresponsive. Every operation seemed to require negotiation.

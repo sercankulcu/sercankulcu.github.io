@@ -3,9 +3,9 @@ title: 'Discomfort Is Not a Verdict'
 date: 2022-07-07
 description: "Discomfort and wrong direction are not the same thing — the difficult skill is knowing what deserves persistence."
 tags:
-   - persistence
-   - judgment
-   - opportunity-cost
+  - persistence
+  - judgment
+  - opportunity-cost
 ---
 
 I have noticed that difficult things often make their strongest argument for quitting at exactly the wrong moment.

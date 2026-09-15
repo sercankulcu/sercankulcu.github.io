@@ -3,10 +3,10 @@ title: "When the Gold Paint Comes Off"
 date: 2009-01-05
 description: "Admiration changes when the gold paint comes off and the person behind the image becomes visible."
 tags:
-   - admiration
-   - belief
-   - memories
-   - reflection
+  - admiration
+  - belief
+  - memories
+  - reflection
 ---
 
 In January 2009, I wrote about an image that stayed with me: touching an idol and finding gold paint on your hands.

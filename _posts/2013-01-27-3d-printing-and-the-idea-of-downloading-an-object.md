@@ -3,9 +3,9 @@ title: '3D Printing And The Idea Of Downloading An Object'
 date: 2013-01-27
 permalink: /posts/2013/01/3d-printing-and-the-idea-of-downloading-an-object/
 tags:
-   - technology
-   - hardware
-   - manufacturing
+  - technology
+  - hardware
+  - manufacturing
 ---
 
 For most of my life, a digital file and a physical object have belonged to different worlds. A document can become a printout. A photograph can become a print. But a bracket, a gear, a custom case, or a replacement part for something discontinued — these required a factory, a workshop, or a person with specialized tools.

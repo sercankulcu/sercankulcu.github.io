@@ -3,8 +3,8 @@ title: 'History of Early Personal Computers and Gaming Consoles'
 date: 2007-03-12
 permalink: /posts/2007/03/history-of-early-personal-computers-and-gaming-consoles/
 tags:
-   - humor
-   - self-improvement
+  - humor
+  - self-improvement
 ---
 
 When I look at today's computers, it is easy to forget how young personal computing really is. Many of the machines that helped shape home computing and video games appeared only a few decades ago. They had tiny amounts of memory and very limited processors compared with modern systems, but they created a new relationship between people and computers.

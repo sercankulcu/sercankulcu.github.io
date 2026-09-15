@@ -3,8 +3,8 @@ title: 'Blogging For Your Career And Life'
 date: 2020-04-07
 permalink: /posts/2020/04/blogging-for-your-career-and-life/
 tags:
-   - career
-   - self-improvement
+  - career
+  - self-improvement
 ---
 
 Writing in public is different from writing for yourself, and that difference is where the value comes from.

@@ -3,9 +3,9 @@ title: 'Not Every Conflict Deserves a Battle'
 date: 2017-02-11
 description: "Strategy begins before conflict, in the quiet work of understanding terrain, timing, limits, and ourselves."
 tags:
-   - strategy
-   - relationships
-   - reflection
+  - strategy
+  - relationships
+  - reflection
 ---
 
 There is a strange temptation in conflict: once disagreement appears, winning can become more important than the original goal.

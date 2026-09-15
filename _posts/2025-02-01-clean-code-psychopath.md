@@ -3,8 +3,8 @@ title: 'Clean Code Psychopath'
 date: 2025-02-01
 permalink: /posts/2025/02/clean-code-psychopath/
 tags:
-   - software
-   - programming
+  - software
+  - programming
 ---
 
 John Woods wrote something that has stayed with me: "Always code as if the guy who ends up maintaining your code will be a violent psychopath who knows where you live." The quote is usually cited as a case for clean code. But there is a darker inversion of the same pressure that I have been thinking about — the developer who becomes so committed to an idea of clean code that the code stops serving the project.
