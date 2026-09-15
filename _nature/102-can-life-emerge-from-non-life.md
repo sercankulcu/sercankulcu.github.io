@@ -5,8 +5,7 @@ chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'
 order: 102
 tags:
-   - abiogenesis
-   - origin-of-life
+   - origins
    - emergence
    - chemistry
    - evolution

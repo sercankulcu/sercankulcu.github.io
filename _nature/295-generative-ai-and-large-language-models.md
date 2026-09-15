@@ -6,9 +6,7 @@ chapter_title: 'Intelligence and Artificial Intelligence'
 order: 295
 tags:
    - generative-ai
-   - large-language-models
    - transformers
-   - foundation-models
    - artificial-intelligence
 ---
 

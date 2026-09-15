@@ -5,10 +5,8 @@ chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'
 order: 76
 tags:
-   - kuhn
-   - paradigms
-   - scientific-revolutions
-   - normal-science
+   - scientific-method
+   - science
    - philosophy-of-science
 ---
 

@@ -5,11 +5,10 @@ chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'
 order: 124
 tags:
-   - biomorphs
    - evolution
    - genotype
    - phenotype
-   - artificial-selection
+   - genetics
 ---
 
 How can a small genetic description generate a large variety of forms?

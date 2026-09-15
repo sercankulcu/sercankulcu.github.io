@@ -5,9 +5,8 @@ chapter: 2
 chapter_title: 'Nothing'
 order: 21
 tags:
-   - higgs-field
-   - higgs-boson
-   - standard-model
+   - fields
+   - particles
    - vacuum
    - particle-physics
 ---

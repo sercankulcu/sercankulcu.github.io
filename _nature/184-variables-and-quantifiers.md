@@ -5,11 +5,10 @@ chapter: 11
 chapter_title: 'Logic and Reasoning'
 order: 184
 tags:
-   - variables
+   - syntax
    - quantifiers
    - predicate-logic
    - logic
-   - scope
 ---
 
 Logic becomes much more powerful when it stops treating whole sentences as indivisible blocks.

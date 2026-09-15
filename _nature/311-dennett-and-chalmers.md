@@ -5,7 +5,6 @@ chapter: 16
 chapter_title: 'Consciousness'
 order: 311
 tags:
-   - dennett
    - chalmers
    - consciousness
    - hard-problem

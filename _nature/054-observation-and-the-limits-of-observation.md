@@ -7,7 +7,6 @@ order: 54
 tags:
    - observation
    - measurement
-   - instruments
    - perception
    - epistemology
 ---

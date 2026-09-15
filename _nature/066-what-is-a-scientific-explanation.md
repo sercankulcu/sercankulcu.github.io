@@ -7,8 +7,7 @@ order: 66
 tags:
    - explanation
    - causality
-   - hempel
-   - mechanism
+   - causation
    - philosophy-of-science
 ---
 

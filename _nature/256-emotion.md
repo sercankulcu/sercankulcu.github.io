@@ -6,10 +6,9 @@ chapter_title: 'Brain, Mind, and Self'
 order: 256
 tags:
    - emotion
-   - affect
    - cognition
    - neuroscience
-   - valuation
+   - reward
 ---
 
 Emotion is often treated as the opposite of reason.

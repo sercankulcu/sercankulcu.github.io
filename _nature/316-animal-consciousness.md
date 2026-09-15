@@ -5,9 +5,9 @@ chapter: 16
 chapter_title: 'Consciousness'
 order: 316
 tags:
-   - animal-consciousness
+   - consciousness
    - sentience
-   - comparative-cognition
+   - cognition
    - neuroscience
    - ethics
 ---

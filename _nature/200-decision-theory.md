@@ -5,9 +5,8 @@ chapter: 11
 chapter_title: 'Logic and Reasoning'
 order: 200
 tags:
-   - decision-theory
-   - expected-utility
-   - rational-choice
+   - decision-making
+   - rationality
    - uncertainty
    - probability
 ---

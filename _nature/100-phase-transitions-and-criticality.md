@@ -6,10 +6,9 @@ chapter_title: 'Reductionism, Emergence, and Complexity'
 order: 100
 tags:
    - phase-transitions
-   - criticality
    - universality
    - emergence
-   - statistical-physics
+   - physics
 ---
 
 Matter can reorganize abruptly.

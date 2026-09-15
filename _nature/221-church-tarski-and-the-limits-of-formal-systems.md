@@ -6,10 +6,10 @@ chapter_title: 'Formal Systems, Metalogic, and Gödel'
 order: 221
 tags:
    - church
-   - tarski
+   - logic
    - undecidability
    - truth
-   - formal-limits
+   - limits
 ---
 
 Gödel showed that sufficiently strong formal theories are incomplete.

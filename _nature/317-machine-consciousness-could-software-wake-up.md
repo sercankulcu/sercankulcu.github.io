@@ -6,7 +6,6 @@ chapter_title: 'Consciousness'
 order: 317
 tags:
    - machine-consciousness
-   - artificial-consciousness
    - functionalism
    - artificial-intelligence
    - philosophy-of-mind

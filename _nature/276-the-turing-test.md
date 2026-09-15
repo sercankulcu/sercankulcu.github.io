@@ -6,7 +6,7 @@ chapter_title: 'Intelligence and Artificial Intelligence'
 order: 276
 tags:
    - turing-test
-   - alan-turing
+   - turing
    - artificial-intelligence
    - intelligence
    - behavior

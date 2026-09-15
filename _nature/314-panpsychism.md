@@ -7,7 +7,6 @@ order: 314
 tags:
    - panpsychism
    - consciousness
-   - combination-problem
    - metaphysics
    - philosophy-of-mind
 ---

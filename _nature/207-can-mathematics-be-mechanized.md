@@ -5,8 +5,8 @@ chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'
 order: 207
 tags:
-   - mechanization
-   - hilbert
+   - computation
+   - mathematics
    - decision-problem
    - theorem-proving
    - foundations

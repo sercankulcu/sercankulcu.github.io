@@ -8,7 +8,6 @@ tags:
    - skepticism
    - epistemology
    - descartes
-   - brain-in-a-vat
    - knowledge
 ---
 

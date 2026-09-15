@@ -9,7 +9,6 @@ tags:
    - dynamical-systems
    - nonlinearity
    - attractors
-   - unpredictability
 ---
 
 Chaos does not mean disorder without rules.

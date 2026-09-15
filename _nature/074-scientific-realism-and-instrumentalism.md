@@ -5,9 +5,8 @@ chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'
 order: 74
 tags:
-   - scientific-realism
-   - instrumentalism
-   - anti-realism
+   - realism
+   - models
    - ontology
    - philosophy-of-science
 ---

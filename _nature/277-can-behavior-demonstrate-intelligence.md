@@ -9,7 +9,6 @@ tags:
    - behavior
    - artificial-intelligence
    - cognition
-   - evaluation
 ---
 
 We never observe another mind directly.

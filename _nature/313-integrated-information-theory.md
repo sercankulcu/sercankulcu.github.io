@@ -5,10 +5,9 @@ chapter: 16
 chapter_title: 'Consciousness'
 order: 313
 tags:
-   - integrated-information-theory
+   - information
    - consciousness
-   - phi
-   - causal-structure
+   - causation
    - neuroscience
 ---
 

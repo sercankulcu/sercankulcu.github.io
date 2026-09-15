@@ -5,10 +5,10 @@ chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'
 order: 77
 tags:
-   - scientific-change
+   - science
    - evidence
    - uncertainty
-   - self-correction
+   - methodology
    - philosophy-of-science
 ---
 

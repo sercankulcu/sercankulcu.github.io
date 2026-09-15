@@ -7,7 +7,6 @@ order: 205
 tags:
    - set-theory
    - foundations
-   - membership
    - infinity
    - mathematics
 ---

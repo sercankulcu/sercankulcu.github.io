@@ -6,7 +6,6 @@ chapter_title: 'Chaos, Fractals, and Recursion'
 order: 109
 tags:
    - determinism
-   - predictability
    - chaos
    - dynamical-systems
    - uncertainty

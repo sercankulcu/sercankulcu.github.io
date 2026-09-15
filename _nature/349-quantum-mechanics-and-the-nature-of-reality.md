@@ -7,9 +7,9 @@ order: 349
 tags:
    - quantum-mechanics
    - reality
-   - measurement-problem
-   - bell-theorem
-   - quantum-foundations
+   - measurement
+   - physics
+   - interpretation
 ---
 
 Quantum mechanics predicts experiments with extraordinary precision.

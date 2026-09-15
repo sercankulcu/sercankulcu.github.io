@@ -7,7 +7,6 @@ order: 290
 tags:
    - artificial-life
    - evolutionary-computation
-   - genetic-algorithms
    - emergence
    - evolution
 ---

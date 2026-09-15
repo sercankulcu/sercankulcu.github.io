@@ -7,7 +7,6 @@ order: 43
 tags:
    - universe
    - expansion
-   - center
    - cosmology
    - geometry
 ---

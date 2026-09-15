@@ -5,9 +5,8 @@ chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'
 order: 293
 tags:
-   - emotions
+   - emotion
    - artificial-intelligence
-   - affective-computing
    - consciousness
    - agency
 ---

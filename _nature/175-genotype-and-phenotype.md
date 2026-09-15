@@ -9,7 +9,6 @@ tags:
    - phenotype
    - development
    - genetics
-   - environment
 ---
 
 A genome is not an organism.

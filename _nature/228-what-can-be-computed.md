@@ -6,8 +6,8 @@ chapter_title: 'Computation and Computer Science'
 order: 228
 tags:
    - computability
-   - turing-computability
-   - church-turing-thesis
+   - turing
+   - church
    - undecidability
    - algorithms
 ---

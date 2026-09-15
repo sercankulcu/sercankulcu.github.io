@@ -6,7 +6,6 @@ chapter_title: 'Brain, Mind, and Self'
 order: 262
 tags:
    - self
-   - illusion
    - self-model
    - consciousness
    - identity

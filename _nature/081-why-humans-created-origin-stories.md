@@ -5,11 +5,10 @@ chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'
 order: 81
 tags:
-   - origin-stories
    - myth
    - cognition
    - culture
-   - human-nature
+   - philosophy
 ---
 
 Every culture has a past.

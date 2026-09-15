@@ -5,7 +5,6 @@ chapter: 2
 chapter_title: 'Nothing'
 order: 18
 tags:
-   - empty-set
    - set-theory
    - mathematics
    - foundations

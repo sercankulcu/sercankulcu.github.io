@@ -7,9 +7,8 @@ order: 92
 tags:
    - complexity
    - emergence
-   - more-is-different
    - phase-transitions
-   - collective-behavior
+   - behavior
 ---
 
 Add one molecule to another.

@@ -7,7 +7,6 @@ order: 136
 tags:
    - bits
    - interpretation
-   - types
    - representation
    - context
 ---

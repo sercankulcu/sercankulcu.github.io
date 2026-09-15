@@ -5,10 +5,9 @@ chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'
 order: 111
 tags:
-   - butterfly-effect
+   - nonlinearity
    - chaos
-   - sensitivity
-   - weather
+   - prediction
    - dynamical-systems
 ---
 

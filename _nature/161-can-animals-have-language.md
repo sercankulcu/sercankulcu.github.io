@@ -5,7 +5,7 @@ chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'
 order: 161
 tags:
-   - animal-language
+   - language
    - communication
    - cognition
    - linguistics

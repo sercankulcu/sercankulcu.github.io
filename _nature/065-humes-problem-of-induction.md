@@ -5,7 +5,7 @@ chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'
 order: 65
 tags:
-   - hume
+   - philosophy
    - induction
    - epistemology
    - causation

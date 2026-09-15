@@ -6,7 +6,6 @@ chapter_title: 'Nothing'
 order: 19
 tags:
    - vacuum
-   - empty-space
    - physics
    - spacetime
    - nothingness

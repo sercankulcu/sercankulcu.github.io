@@ -7,8 +7,7 @@ order: 327
 tags:
    - moral-responsibility
    - free-will
-   - blame
-   - punishment
+   - agency
    - ethics
 ---
 

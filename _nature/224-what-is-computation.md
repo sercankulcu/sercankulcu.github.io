@@ -8,7 +8,7 @@ tags:
    - computation
    - computer-science
    - information-processing
-   - turing-machines
+   - turing
    - philosophy-of-computation
 ---
 

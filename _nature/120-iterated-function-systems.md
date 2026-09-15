@@ -5,11 +5,10 @@ chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'
 order: 120
 tags:
-   - iterated-function-systems
+   - iteration
    - fractals
    - recursion
-   - transformations
-   - computer-graphics
+   - geometry
 ---
 
 A fern can be generated from a handful of equations.

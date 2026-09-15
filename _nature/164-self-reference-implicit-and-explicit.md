@@ -6,7 +6,7 @@ chapter_title: 'Self-Reference, Self-Representation, and Life'
 order: 164
 tags:
    - self-reference
-   - self-representation
+   - representation
    - recursion
    - language
    - logic

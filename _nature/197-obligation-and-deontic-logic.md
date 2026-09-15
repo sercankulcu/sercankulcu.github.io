@@ -5,10 +5,9 @@ chapter: 11
 chapter_title: 'Logic and Reasoning'
 order: 197
 tags:
-   - deontic-logic
-   - obligation
-   - permission
-   - norms
+   - logic
+   - agency
+   - culture
    - ethics
 ---
 

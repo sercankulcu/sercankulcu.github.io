@@ -5,10 +5,8 @@ chapter: 11
 chapter_title: 'Logic and Reasoning'
 order: 183
 tags:
-   - propositions
-   - predicates
-   - qualifiers
-   - descriptors
+   - predicate-logic
+   - quantifiers
    - logic
 ---
 

@@ -5,7 +5,6 @@ chapter: 14
 chapter_title: 'Brain, Mind, and Self'
 order: 254
 tags:
-   - memory
    - neuroscience
    - cognition
    - learning

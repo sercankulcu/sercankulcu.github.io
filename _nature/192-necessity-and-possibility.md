@@ -7,7 +7,6 @@ order: 192
 tags:
    - necessity
    - possibility
-   - modality
    - logic
    - possible-worlds
 ---

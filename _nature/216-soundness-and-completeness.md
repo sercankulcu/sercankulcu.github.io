@@ -6,7 +6,6 @@ chapter_title: 'Formal Systems, Metalogic, and Gödel'
 order: 216
 tags:
    - soundness
-   - completeness
    - semantics
    - syntax
    - first-order-logic

@@ -9,7 +9,6 @@ tags:
    - mathematics
    - computation
    - self-reference
-   - structure
 ---
 
 A tree contains branches.

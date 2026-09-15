@@ -5,10 +5,10 @@ chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'
 order: 326
 tags:
-   - choice
-   - intention
+   - decision-making
+   - purpose
    - agency
-   - action
+   - behavior
    - free-will
 ---
 

@@ -5,8 +5,8 @@ chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'
 order: 156
 tags:
-   - natural-language
-   - formal-language
+   - language
+   - formal-languages
    - grammar
    - programming-languages
    - logic

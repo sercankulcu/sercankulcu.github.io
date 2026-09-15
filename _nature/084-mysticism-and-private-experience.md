@@ -6,7 +6,6 @@ chapter_title: 'Science, Religion, Mysticism, and Wonder'
 order: 84
 tags:
    - mysticism
-   - experience
    - consciousness
    - epistemology
    - religion

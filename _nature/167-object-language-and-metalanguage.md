@@ -5,7 +5,6 @@ chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'
 order: 167
 tags:
-   - object-language
    - metalanguage
    - logic
    - truth

@@ -7,7 +7,6 @@ order: 147
 tags:
    - information
    - physics
-   - landauer
    - computation
    - thermodynamics
 ---

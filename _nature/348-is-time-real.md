@@ -7,9 +7,9 @@ order: 348
 tags:
    - time
    - relativity
-   - presentism
-   - eternalism
-   - arrow-of-time
+   - metaphysics
+   - ontology
+   - entropy
 ---
 
 Yesterday is gone.

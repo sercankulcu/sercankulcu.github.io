@@ -7,8 +7,8 @@ order: 285
 tags:
    - machine-learning
    - artificial-intelligence
-   - generalization
-   - supervised-learning
+   - abstraction
+   - learning
    - reinforcement-learning
 ---
 

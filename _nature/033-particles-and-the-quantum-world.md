@@ -7,8 +7,7 @@ order: 33
 tags:
    - particles
    - quantum-mechanics
-   - wave-particle-duality
-   - quantum-fields
+   - fields
    - physics
 ---
 

@@ -7,7 +7,6 @@ order: 334
 tags:
    - evidence
    - justification
-   - certainty
    - epistemology
    - bayesian-reasoning
 ---

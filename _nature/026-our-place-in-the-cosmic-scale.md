@@ -6,7 +6,6 @@ chapter_title: 'Cosmos and Origins'
 order: 26
 tags:
    - scale
-   - humans
    - cosmos
    - atoms
    - galaxies

@@ -6,7 +6,6 @@ chapter_title: 'Intelligence and Artificial Intelligence'
 order: 275
 tags:
    - artificial-intelligence
-   - history-of-ai
    - machine-learning
    - neural-networks
    - expert-systems

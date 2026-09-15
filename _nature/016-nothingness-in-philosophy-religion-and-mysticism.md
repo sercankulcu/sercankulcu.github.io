@@ -9,7 +9,6 @@ tags:
    - religion
    - mysticism
    - philosophy
-   - emptiness
 ---
 
 The word *nothingness* hides many different ideas.

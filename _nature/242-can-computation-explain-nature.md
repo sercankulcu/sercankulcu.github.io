@@ -5,7 +5,6 @@ chapter: 13
 chapter_title: 'Computation and Computer Science'
 order: 242
 tags:
-   - computational-explanation
    - nature
    - models
    - simulation

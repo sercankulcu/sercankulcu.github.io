@@ -8,7 +8,6 @@ tags:
    - search
    - problem-solving
    - planning
-   - heuristics
    - artificial-intelligence
 ---
 

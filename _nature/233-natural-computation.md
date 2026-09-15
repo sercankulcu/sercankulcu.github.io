@@ -5,8 +5,7 @@ chapter: 13
 chapter_title: 'Computation and Computer Science'
 order: 233
 tags:
-   - natural-computation
-   - unconventional-computing
+   - computation
    - cellular-automata
    - evolutionary-computation
    - nature

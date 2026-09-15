@@ -5,11 +5,10 @@ chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'
 order: 172
 tags:
-   - typogenetics
    - hofstadter
    - self-reference
    - artificial-life
-   - symbolic-systems
+   - formal-systems
 ---
 
 What would happen if symbols could behave like molecules?

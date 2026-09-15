@@ -5,8 +5,7 @@ chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'
 order: 214
 tags:
-   - recursive-sets
-   - recursively-enumerable
+   - set-theory
    - computability
    - decidability
    - algorithms

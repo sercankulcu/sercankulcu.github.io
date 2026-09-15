@@ -5,8 +5,8 @@ chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'
 order: 328
 tags:
-   - machine-agency
-   - responsibility
+   - agency
+   - moral-responsibility
    - artificial-intelligence
    - autonomy
    - ethics

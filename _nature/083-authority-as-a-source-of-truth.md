@@ -5,11 +5,10 @@ chapter: 5
 chapter_title: 'Science, Religion, Mysticism, and Wonder'
 order: 83
 tags:
-   - authority
-   - expertise
-   - testimony
+   - knowledge
+   - evidence
    - epistemology
-   - trust
+   - belief
 ---
 
 You cannot personally verify everything you believe.

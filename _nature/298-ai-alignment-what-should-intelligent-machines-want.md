@@ -5,11 +5,10 @@ chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'
 order: 298
 tags:
-   - ai-alignment
+   - ethics
    - artificial-intelligence
-   - value-alignment
-   - corrigibility
-   - safety
+   - autonomy
+   - control
 ---
 
 An intelligent machine can become very good at achieving a goal.

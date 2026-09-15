@@ -5,9 +5,8 @@ chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'
 order: 279
 tags:
-   - chess
-   - checkers
-   - game-playing
+   - problem-solving
+   - algorithms
    - search
    - artificial-intelligence
 ---

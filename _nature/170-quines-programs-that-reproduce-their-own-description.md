@@ -5,10 +5,9 @@ chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'
 order: 170
 tags:
-   - quines
+   - programming-languages
    - self-reference
-   - programs
-   - code-as-data
+   - algorithms
    - computation
 ---
 

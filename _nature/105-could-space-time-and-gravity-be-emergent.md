@@ -9,7 +9,6 @@ tags:
    - gravity
    - emergence
    - quantum-gravity
-   - holography
 ---
 
 Space feels fundamental.

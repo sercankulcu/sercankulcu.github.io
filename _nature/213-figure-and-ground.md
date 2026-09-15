@@ -5,9 +5,8 @@ chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'
 order: 213
 tags:
-   - figure-ground
    - perception
-   - gestalt
+   - cognition
    - representation
    - self-reference
 ---

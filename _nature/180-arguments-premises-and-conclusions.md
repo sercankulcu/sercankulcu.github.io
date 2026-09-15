@@ -6,8 +6,7 @@ chapter_title: 'Logic and Reasoning'
 order: 180
 tags:
    - arguments
-   - premises
-   - conclusions
+   - logic
    - reasoning
    - inference
 ---

@@ -8,7 +8,7 @@ tags:
    - knowledge-representation
    - artificial-intelligence
    - symbols
-   - ontologies
+   - ontology
    - reasoning
 ---
 

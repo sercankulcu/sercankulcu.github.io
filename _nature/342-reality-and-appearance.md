@@ -6,7 +6,6 @@ chapter_title: 'Reality and the Final Questions'
 order: 342
 tags:
    - reality
-   - appearance
    - perception
    - representation
    - philosophy

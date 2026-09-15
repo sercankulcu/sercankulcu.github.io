@@ -5,11 +5,11 @@ chapter: 6
 chapter_title: 'Reductionism, Emergence, and Complexity'
 order: 101
 tags:
-   - cities
-   - economies
-   - networks
+   - culture
+   - behavior
+   - complexity
    - emergence
-   - complex-systems
+   - systems
 ---
 
 A city has no single mind.

@@ -5,8 +5,7 @@ chapter: 4
 chapter_title: 'Knowing and the Philosophy of Science'
 order: 57
 tags:
-   - hypotheses
-   - theories
+   - theory
    - models
    - scientific-method
    - explanation

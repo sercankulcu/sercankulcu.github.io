@@ -6,8 +6,7 @@ chapter_title: 'Cosmos and Origins'
 order: 25
 tags:
    - universe
-   - observable-universe
-   - cosmic-horizon
+   - observation
    - cosmology
    - scale
 ---

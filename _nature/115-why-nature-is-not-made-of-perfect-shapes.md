@@ -7,7 +7,6 @@ order: 115
 tags:
    - geometry
    - nature
-   - roughness
    - fractals
    - scale
 ---

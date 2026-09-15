@@ -6,7 +6,6 @@ chapter_title: 'Consciousness'
 order: 310
 tags:
    - consciousness
-   - illusionism
    - qualia
    - philosophy-of-mind
    - introspection

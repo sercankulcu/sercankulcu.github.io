@@ -6,7 +6,6 @@ chapter_title: 'Reductionism, Emergence, and Complexity'
 order: 98
 tags:
    - order
-   - design
    - self-organization
    - evolution
    - complexity

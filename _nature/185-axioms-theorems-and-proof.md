@@ -6,7 +6,6 @@ chapter_title: 'Logic and Reasoning'
 order: 185
 tags:
    - axioms
-   - theorems
    - proof
    - mathematics
    - formal-systems

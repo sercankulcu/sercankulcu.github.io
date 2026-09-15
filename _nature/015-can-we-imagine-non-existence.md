@@ -5,8 +5,8 @@ chapter: 2
 chapter_title: 'Nothing'
 order: 15
 tags:
-   - non-existence
-   - imagination
+   - existence
+   - thought
    - consciousness
    - nothingness
    - philosophy

@@ -6,9 +6,9 @@ chapter_title: 'Chaos, Fractals, and Recursion'
 order: 113
 tags:
    - attractors
-   - strange-attractors
+   - dynamical-systems
    - chaos
-   - phase-space
+   - systems
    - fractals
 ---
 

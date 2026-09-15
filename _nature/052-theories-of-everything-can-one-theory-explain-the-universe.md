@@ -5,8 +5,7 @@ chapter: 3
 chapter_title: 'Cosmos and Origins'
 order: 52
 tags:
-   - theory-of-everything
-   - unification
+   - foundations
    - quantum-gravity
    - physics
    - explanation

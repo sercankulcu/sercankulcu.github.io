@@ -6,7 +6,6 @@ chapter_title: 'Consciousness'
 order: 300
 tags:
    - explanation
-   - description
    - function
    - consciousness
    - philosophy-of-science

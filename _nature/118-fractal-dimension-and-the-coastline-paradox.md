@@ -5,8 +5,7 @@ chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'
 order: 118
 tags:
-   - fractal-dimension
-   - coastline-paradox
+   - fractals
    - measurement
    - scaling
    - geometry

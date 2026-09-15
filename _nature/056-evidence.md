@@ -7,8 +7,8 @@ order: 56
 tags:
    - evidence
    - epistemology
-   - scientific-reasoning
-   - confirmation
+   - reasoning
+   - induction
    - inference
 ---
 

@@ -6,7 +6,7 @@ chapter_title: 'Logic and Reasoning'
 order: 196
 tags:
    - belief
-   - doxastic-logic
+   - logic
    - epistemic-logic
    - agents
    - reasoning

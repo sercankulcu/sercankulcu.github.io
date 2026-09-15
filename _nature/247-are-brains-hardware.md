@@ -6,8 +6,8 @@ chapter_title: 'Brain, Mind, and Self'
 order: 247
 tags:
    - brain
-   - hardware
-   - software
+   - computer
+   - algorithms
    - computation
    - neuroscience
 ---

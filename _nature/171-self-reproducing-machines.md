@@ -5,9 +5,8 @@ chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'
 order: 171
 tags:
-   - self-reproduction
-   - von-neumann
-   - automata
+   - self-reference
+   - cellular-automata
    - artificial-life
    - computation
 ---

@@ -5,7 +5,7 @@ chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'
 order: 159
 tags:
-   - ambiguity
+   - vagueness
    - context
    - semantics
    - pragmatics

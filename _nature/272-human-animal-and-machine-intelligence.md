@@ -5,11 +5,10 @@ chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'
 order: 272
 tags:
-   - human-intelligence
-   - animal-intelligence
-   - machine-intelligence
+   - intelligence
+   - behavior
+   - artificial-intelligence
    - cognition
-   - comparative-intelligence
 ---
 
 A crow bends a wire into a tool.

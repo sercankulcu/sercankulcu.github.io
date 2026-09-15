@@ -5,10 +5,9 @@ chapter: 3
 chapter_title: 'Cosmos and Origins'
 order: 40
 tags:
-   - pre-big-bang
+   - origins
    - cosmology
    - quantum-gravity
-   - origins
    - time
 ---
 

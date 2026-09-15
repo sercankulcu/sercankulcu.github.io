@@ -7,7 +7,7 @@ order: 122
 tags:
    - mandelbrot-set
    - fractals
-   - complex-numbers
+   - mathematics
    - iteration
    - chaos
 ---

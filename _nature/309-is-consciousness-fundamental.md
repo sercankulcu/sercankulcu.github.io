@@ -7,8 +7,7 @@ order: 309
 tags:
    - consciousness
    - panpsychism
-   - russellian-monism
-   - neutral-monism
+   - physicalism
    - metaphysics
 ---
 

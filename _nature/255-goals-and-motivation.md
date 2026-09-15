@@ -5,10 +5,10 @@ chapter: 14
 chapter_title: 'Brain, Mind, and Self'
 order: 255
 tags:
-   - goals
-   - motivation
+   - purpose
+   - behavior
    - reward
-   - homeostasis
+   - control
    - agency
 ---
 

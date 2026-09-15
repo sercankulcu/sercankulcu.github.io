@@ -5,7 +5,6 @@ chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'
 order: 323
 tags:
-   - randomness
    - free-will
    - indeterminism
    - agency

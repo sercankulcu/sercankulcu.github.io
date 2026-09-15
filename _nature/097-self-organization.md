@@ -8,7 +8,6 @@ tags:
    - self-organization
    - emergence
    - complexity
-   - feedback
    - dynamical-systems
 ---
 

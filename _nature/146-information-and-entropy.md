@@ -8,8 +8,8 @@ tags:
    - entropy
    - information
    - thermodynamics
-   - shannon
-   - statistical-mechanics
+   - shannon-information
+   - physics
 ---
 
 The word **entropy** appears in two major scientific contexts.

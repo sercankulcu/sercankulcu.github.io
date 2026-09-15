@@ -5,11 +5,11 @@ chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'
 order: 112
 tags:
-   - logistic-map
-   - bifurcation
+   - iteration
+   - nonlinearity
    - chaos
-   - nonlinear-dynamics
-   - population-models
+   - dynamical-systems
+   - models
 ---
 
 One of the most famous equations in chaos theory is almost absurdly simple:

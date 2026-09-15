@@ -5,10 +5,9 @@ chapter: 3
 chapter_title: 'Cosmos and Origins'
 order: 27
 tags:
-   - space
    - time
    - spacetime
-   - philosophy-of-physics
+   - philosophy-of-science
    - relativity
 ---
 

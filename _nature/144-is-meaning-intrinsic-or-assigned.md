@@ -7,8 +7,7 @@ order: 144
 tags:
    - meaning
    - semantics
-   - intrinsic-meaning
-   - convention
+   - culture
    - biological-information
 ---
 

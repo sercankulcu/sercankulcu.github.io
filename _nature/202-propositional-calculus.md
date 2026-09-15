@@ -5,8 +5,8 @@ chapter: 12
 chapter_title: 'Formal Systems, Metalogic, and Gödel'
 order: 202
 tags:
-   - propositional-logic
-   - truth-tables
+   - first-order-logic
+   - semantics
    - inference
    - formal-systems
    - logic

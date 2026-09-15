@@ -5,10 +5,10 @@ chapter: 9
 chapter_title: 'Language, Syntax, and Meaning'
 order: 163
 tags:
-   - machine-understanding
+   - understanding
    - semantics
    - artificial-intelligence
-   - grounding
+   - meaning
    - philosophy-of-mind
 ---
 

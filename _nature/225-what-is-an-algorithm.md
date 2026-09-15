@@ -7,8 +7,7 @@ order: 225
 tags:
    - algorithms
    - computation
-   - procedures
-   - correctness
+   - verification
    - computer-science
 ---
 

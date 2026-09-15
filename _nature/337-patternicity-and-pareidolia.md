@@ -5,9 +5,8 @@ chapter: 18
 chapter_title: 'Belief, Patterns, and Uncertainty'
 order: 337
 tags:
-   - patternicity
-   - pareidolia
-   - signal-detection
+   - psychology
+   - uncertainty
    - perception
    - cognitive-bias
 ---

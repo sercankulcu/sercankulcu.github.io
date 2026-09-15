@@ -6,8 +6,7 @@ chapter_title: 'Logic and Reasoning'
 order: 191
 tags:
    - vagueness
-   - sorites
-   - borderline-cases
+   - paradox
    - language
    - logic
 ---

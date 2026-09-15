@@ -5,10 +5,10 @@ chapter: 7
 chapter_title: 'Chaos, Fractals, and Recursion'
 order: 121
 tags:
-   - l-systems
+   - generativity
    - recursion
-   - growth
-   - formal-grammars
+   - development
+   - grammar
    - fractals
 ---
 

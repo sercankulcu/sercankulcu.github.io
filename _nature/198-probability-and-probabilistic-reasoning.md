@@ -7,7 +7,7 @@ order: 198
 tags:
    - probability
    - uncertainty
-   - bayes
+   - bayesian-reasoning
    - reasoning
    - statistics
 ---

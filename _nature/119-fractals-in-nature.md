@@ -7,7 +7,6 @@ order: 119
 tags:
    - fractals
    - nature
-   - branching
    - scaling
    - complexity
 ---

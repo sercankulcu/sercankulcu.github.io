@@ -6,10 +6,10 @@ chapter_title: 'Brain, Mind, and Self'
 order: 267
 tags:
    - physicalism
-   - materialism
+   - metaphysics
    - philosophy-of-mind
    - reductionism
-   - supervenience
+   - emergence
 ---
 
 If thoughts depend on brains, perhaps the simplest conclusion is:

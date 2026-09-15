@@ -5,10 +5,9 @@ chapter: 18
 chapter_title: 'Belief, Patterns, and Uncertainty'
 order: 333
 tags:
-   - gettier-problem
-   - justified-true-belief
+   - justification
+   - belief
    - knowledge
-   - epistemic-luck
    - epistemology
 ---
 

@@ -5,7 +5,7 @@ chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'
 order: 284
 tags:
-   - intelligent-agents
+   - agents
    - artificial-intelligence
    - rational-agents
    - planning

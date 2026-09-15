@@ -5,11 +5,11 @@ chapter: 13
 chapter_title: 'Computation and Computer Science'
 order: 241
 tags:
-   - program-correctness
+   - computer-science
    - verification
-   - testing
-   - hoare-logic
-   - formal-methods
+   - methodology
+   - logic
+   - formal-systems
 ---
 
 A program runs.

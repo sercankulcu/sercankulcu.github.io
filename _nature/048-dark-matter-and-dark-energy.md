@@ -5,11 +5,11 @@ chapter: 3
 chapter_title: 'Cosmos and Origins'
 order: 48
 tags:
-   - dark-matter
+   - matter
    - dark-energy
    - cosmology
-   - galaxy-rotation
-   - accelerated-expansion
+   - galaxies
+   - expansion
 ---
 
 Most of the universe is not made of the ordinary matter we can see.

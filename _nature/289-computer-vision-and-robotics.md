@@ -5,8 +5,8 @@ chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'
 order: 289
 tags:
-   - computer-vision
-   - robotics
+   - machine-learning
+   - autonomy
    - perception
    - control
    - artificial-intelligence

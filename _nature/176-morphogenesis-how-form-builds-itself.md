@@ -5,9 +5,8 @@ chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'
 order: 176
 tags:
-   - morphogenesis
    - development
-   - pattern-formation
+   - order
    - turing
    - self-organization
 ---

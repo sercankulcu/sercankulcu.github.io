@@ -5,7 +5,6 @@ chapter: 15
 chapter_title: 'Intelligence and Artificial Intelligence'
 order: 282
 tags:
-   - automated-reasoning
    - theorem-proving
    - logic
    - artificial-intelligence

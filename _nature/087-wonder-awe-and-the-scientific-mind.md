@@ -8,7 +8,6 @@ tags:
    - wonder
    - awe
    - science
-   - curiosity
    - psychology
 ---
 

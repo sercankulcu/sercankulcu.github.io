@@ -5,9 +5,8 @@ chapter: 11
 chapter_title: 'Logic and Reasoning'
 order: 199
 tags:
-   - fuzzy-logic
+   - truth
    - vagueness
-   - degrees-of-truth
    - logic
    - uncertainty
 ---

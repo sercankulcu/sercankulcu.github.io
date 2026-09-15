@@ -7,7 +7,6 @@ order: 299
 tags:
    - consciousness
    - subjective-experience
-   - awareness
    - philosophy-of-mind
    - neuroscience
 ---

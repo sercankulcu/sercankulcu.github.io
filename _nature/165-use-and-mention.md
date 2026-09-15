@@ -5,9 +5,9 @@ chapter: 10
 chapter_title: 'Self-Reference, Self-Representation, and Life'
 order: 165
 tags:
-   - use-mention
+   - semantics
    - metalanguage
-   - quotation
+   - symbols
    - self-reference
    - logic
 ---

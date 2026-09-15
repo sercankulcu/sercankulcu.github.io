@@ -5,11 +5,10 @@ chapter: 17
 chapter_title: 'Free Will, Agency, and Purpose'
 order: 321
 tags:
-   - compatibilism
+   - determinism
    - free-will
    - moral-responsibility
    - agency
-   - reasons-responsiveness
 ---
 
 What if freedom does not require being uncaused?

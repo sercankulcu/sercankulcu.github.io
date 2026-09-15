@@ -6,9 +6,9 @@ chapter_title: 'Cosmos and Origins'
 order: 31
 tags:
    - matter
-   - energy
+   - thermodynamics
    - physics
-   - mass
+   - particles
    - cosmology
 ---
 

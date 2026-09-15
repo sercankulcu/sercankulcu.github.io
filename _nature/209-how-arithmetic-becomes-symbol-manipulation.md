@@ -6,9 +6,9 @@ chapter_title: 'Formal Systems, Metalogic, and Gödel'
 order: 209
 tags:
    - arithmetic
-   - symbol-manipulation
+   - symbols
    - syntax
-   - formalization
+   - formal-systems
    - proof
 ---
 

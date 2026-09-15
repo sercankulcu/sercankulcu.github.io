@@ -6,8 +6,8 @@ chapter_title: 'Chaos, Fractals, and Recursion'
 order: 117
 tags:
    - fractals
-   - self-similarity
-   - scale-invariance
+   - scaling
+   - universality
    - geometry
    - complexity
 ---
