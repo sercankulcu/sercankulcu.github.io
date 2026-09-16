@@ -3,9 +3,42 @@
 <!-- Support for MathJax.
      Math is written in the sources as kramdown math ($$ ... $$); kramdown renders
      it as \( ... \) and \[ ... \], which are MathJax's own default delimiters, so
-     no extra configuration is needed here.
+     no extra configuration is needed here. Raw .html pages keep their $$ ... $$,
+     which MathJax also treats as display math by default.
+     MathJax is ~940 KB, and only about one page in ten has any math, so it is
+     loaded only when the rendered page actually contains math delimiters. A page
+     that builds its formulas from JavaScript can opt in with "mathjax: true" in
+     its front matter.
      Do not add a // line comment to an inline script on this site: the compress
      layout collapses the script onto one line and the comment eats the rest. -->
+{% assign needs_mathjax = false %}
+{% if page.mathjax %}
+  {% assign needs_mathjax = true %}
+{% elsif content contains '\(' or content contains '\[' or content contains '$$' or content contains 'math/tex' %}
+  {% assign needs_mathjax = true %}
+{% endif %}
+{% if needs_mathjax %}
 <script id="MathJax-script" defer src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-mml-chtml.js"></script>
+{% else %}
+<!-- Safety net: if a page carries math the Liquid test above did not see (for
+     instance formulas written by JavaScript), load MathJax from the client side.
+     The delimiters are assembled from pieces on purpose, so that this script does
+     not match itself when it scans the page text. -->
+<script>
+(function () {
+  if (!document.body || document.getElementById("MathJax-script")) { return; }
+  var text = document.body.textContent || "";
+  var inline = "\\" + "(";
+  var display = "\\" + "[";
+  var dollars = "$" + "$";
+  if (text.indexOf(inline) < 0 && text.indexOf(display) < 0 && text.indexOf(dollars) < 0) { return; }
+  var s = document.createElement("script");
+  s.id = "MathJax-script";
+  s.defer = true;
+  s.src = "https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-mml-chtml.js";
+  document.head.appendChild(s);
+})();
+</script>
+{% endif %}
 
 <!-- end custom footer snippets -->
