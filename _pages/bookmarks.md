@@ -24,6 +24,8 @@ Sık kullandığım yapay zekâ, akademik araştırma, yazılım geliştirme, be
 * [Connected Papers](https://www.connectedpapers.com/) — İlişkili akademik çalışmaları görsel ağ üzerinde gösteren araç.
 * [arXiv](https://arxiv.org/) — Bilimsel ön baskı çalışmalarının yayımlandığı açık arşiv.
 * [IEEE Xplore](https://ieeexplore.ieee.org/) — Mühendislik ve bilgisayar bilimi yayınları veri tabanı.
+* [DergiPark](https://dergipark.org.tr/) — Türkiye'deki akademik dergilerin ortak yayın platformu.
+* [YÖK Ulusal Tez Merkezi](https://tez.yok.gov.tr/UlusalTezMerkezi/) — Türkiye'de yapılmış lisansüstü tezlerin arşivi.
 
 ## Akademik yazım ve kaynakça
 
@@ -31,6 +33,7 @@ Sık kullandığım yapay zekâ, akademik araştırma, yazılım geliştirme, be
 * [Mendeley](https://www.mendeley.com/) — Akademik kaynak yönetimi ve PDF düzenleme platformu.
 * [Crossref Search](https://search.crossref.org/) — DOI ve akademik yayın bilgisi arama hizmeti.
 * [ORCID](https://orcid.org/) — Araştırmacılar için kalıcı dijital kimlik platformu.
+* [YÖK Akademik](https://akademik.yok.gov.tr/) — Türkiye'deki akademisyen profilleri ve yayın kayıtları.
 * [Overleaf](https://www.overleaf.com/) — Çevrim içi ve ortak çalışmalı LaTeX düzenleyicisi.
 * [Mathpix](https://mathpix.com/) — Görsel ve formülleri LaTeX biçimine dönüştürme aracı.
 
@@ -39,6 +42,7 @@ Sık kullandığım yapay zekâ, akademik araştırma, yazılım geliştirme, be
 * [SCImago Journal Rank](https://www.scimagojr.com/) — Akademik dergilerin sıralama ve atıf göstergeleri.
 * [Web of Science Master Journal List](https://mjl.clarivate.com/) — Web of Science kapsamındaki dergileri kontrol etme aracı.
 * [Scopus Sources](https://www.scopus.com/sources) — Scopus tarafından indekslenen yayınları arama hizmeti.
+* [TR Dizin](https://trdizin.gov.tr/) — ULAKBİM ulusal atıf dizini ve dergi değerlendirme kaynağı.
 * [Retraction Watch](https://retractionwatch.com/) — Geri çekilen akademik yayınları izleyen platform.
 
 ## Dil, sözlük ve metin düzenleme
@@ -48,7 +52,7 @@ Sık kullandığım yapay zekâ, akademik araştırma, yazılım geliştirme, be
 * [Tureng](https://tureng.com/) — Türkçe ve İngilizce ağırlıklı çevrim içi sözlük.
 * [Cambridge Dictionary](https://dictionary.cambridge.org/) — İngilizce tanım, telaffuz ve örnek cümle kaynağı.
 * [Terimler](https://terimler.org/) — Akademik ve bilimsel Türkçe terimler sözlüğü.
-* [Bilişim Sözlüğü](https://eski.tbd.org.tr/index.php?sayfa=sozluk&mi1) — Türkiye Bilişim Derneği bilişim terimleri sözlüğü.
+* [Bilişimde Özenli Türkçe](https://bilisimde.ozenliturkce.org.tr/) — Türkiye Bilişim Derneği bilişim terimleri sözlüğü.
 * [TDK Güncel Türkçe Sözlük](https://sozluk.gov.tr/) — Türkçe kelimelerin anlam ve yazımlarını gösteren resmî sözlük.
 * [QuillBot](https://quillbot.com/) — Metin yeniden yazma ve özetleme aracı.
 * [Grammarly](https://www.grammarly.com/) — İngilizce yazım ve dil bilgisi denetim aracı.
