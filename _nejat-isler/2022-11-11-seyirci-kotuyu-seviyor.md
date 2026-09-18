@@ -1,5 +1,6 @@
 ---
 title: "Seyirci Kötüyü Seviyor, Ben Bunun Canlı Kanıtıyım"
+description: "This interview arrives at a revealing moment in Nejat İşler's life. Tamirhane is reaching cinemas. He has just completed a long period associated with Gümüşlük."
 date: 2022-11-11
 publication: "Gazete Oksijen"
 interviewer: "Binnaz Saktanber"
@@ -19,8 +20,6 @@ tags:
   - aging
   - public image
 ---
-
-## Seyirci Kötüyü Seviyor, Ben Bunun Canlı Kanıtıyım
 
 **Gazete Oksijen — 11 November 2022**  
 **Interview by Binnaz Saktanber**

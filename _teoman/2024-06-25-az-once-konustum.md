@@ -1,5 +1,6 @@
 ---
 title: "Az Önce Konuştum — Teoman"
+description: "This conversation comes only a few weeks after Teoman's long interview with Mirgün Cabas. The same broad period is visible:"
 date: 2024-06-25
 publication: "TV100"
 interviewer: "Candaş Tolga Işık"
@@ -19,8 +20,6 @@ tags:
   - self-irony
   - future
 ---
-
-## Az Önce Konuştum — Teoman
 
 **TV100 — 25 June 2024**  
 **Interview by Candaş Tolga Işık**

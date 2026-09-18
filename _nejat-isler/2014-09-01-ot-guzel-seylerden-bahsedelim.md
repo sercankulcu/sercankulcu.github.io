@@ -1,5 +1,6 @@
 ---
 title: "OT: Güzel Şeylerden Bahsedelim"
+description: "In September 2014, Nejat İşler returned to a long-form interview after one of the most serious periods of his life."
 date: 2014-09-01
 publication: "OT"
 interviewer: "Ercan Mehmet Erdem"
@@ -20,8 +21,6 @@ tags:
   - public image
   - Behzat Ç.
 ---
-
-## OT: Güzel Şeylerden Bahsedelim
 
 **OT — September 2014**  
 **Interview by Ercan Mehmet Erdem**

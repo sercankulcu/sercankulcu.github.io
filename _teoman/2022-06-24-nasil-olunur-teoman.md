@@ -1,5 +1,6 @@
 ---
 title: "Nasıl Olunur? #159 — Teoman"
+description: "This is one of the most substantial long-form conversations with Teoman in the archive."
 date: 2022-06-24
 publication: "Nasıl Olunur?"
 interviewer: "Nilay Örnek"
@@ -21,8 +22,6 @@ tags:
   - private life
   - legacy
 ---
-
-## Nasıl Olunur? #159 — Teoman
 
 **Nasıl Olunur? — 24 June 2022**  
 **Interview by Nilay Örnek**  

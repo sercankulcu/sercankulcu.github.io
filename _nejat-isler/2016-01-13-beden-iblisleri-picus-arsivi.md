@@ -1,5 +1,6 @@
 ---
 title: "Beden İblisleri"
+description: "Among the surviving Nejat İşler interviews, Beden İblisleri is unusual. It is not organized around a film. There is no conventional promotional structure."
 date: 2016-01-13
 publication: "Picus / Egoist Okur archive"
 interviewer: "Tolga Meriç"
@@ -21,8 +22,6 @@ tags:
   - public image
   - acting
 ---
-
-## Beden İblisleri
 
 **Originally published in Picus — exact date unknown**  
 **Archived by Egoist Okur — 13 January 2016**  

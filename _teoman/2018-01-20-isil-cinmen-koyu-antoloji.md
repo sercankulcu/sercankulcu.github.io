@@ -1,5 +1,6 @@
 ---
 title: "Işıl Cinmen ile Koyu Antoloji Röportajı"
+description: "This is one of the darkest and most self-analytical Teoman interviews in the archive. At fifty, Teoman has spent more than two decades as a professional musician."
 date: 2018-01-20
 publication: "Posta"
 interviewer: "Işıl Cinmen"
@@ -21,8 +22,6 @@ tags:
   - Fasa Fiso
   - artistic legacy
 ---
-
-## Işıl Cinmen ile Koyu Antoloji Röportajı
 
 **Posta — 20 January 2018**  
 **Interview by Işıl Cinmen**

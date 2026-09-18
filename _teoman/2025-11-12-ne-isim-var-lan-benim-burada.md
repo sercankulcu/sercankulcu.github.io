@@ -1,5 +1,6 @@
 ---
 title: "Ne İşim Var Lan Benim Burada?"
+description: "By late 2025, Teoman has found a new use for a problem that has followed him through almost his entire public life."
 date: 2025-11-12
 publication: "Mirgün Cabas"
 interviewer: "Mirgün Cabas"
@@ -20,8 +21,6 @@ tags:
   - artistic identity
   - self-irony
 ---
-
-## Ne İşim Var Lan Benim Burada?
 
 **Mirgün Cabas — 12 November 2025**  
 **Duration: 28 minutes 44 seconds**

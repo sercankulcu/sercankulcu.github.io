@@ -1,5 +1,6 @@
 ---
 title: "OT TV: Evcilik, Sinema ve Eski Nejat"
+description: "The January 2025 OT TV appearance is very different from Nejat İşler's more formal newspaper interviews. Serious cinema discussion can suddenly become a joke."
 date: 2025-01-03
 publication: "OT TV"
 type: "video interview"
@@ -17,8 +18,6 @@ tags:
   - humor
   - memory
 ---
-
-## OT TV: Evcilik, Sinema ve Eski Nejat
 
 **OT TV — 3 January 2025**
 

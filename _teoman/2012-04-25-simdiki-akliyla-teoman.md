@@ -1,5 +1,6 @@
 ---
 title: "Şimdiki Aklıyla Teoman"
+description: "This interview takes place after one of the most dramatic decisions in Teoman's career."
 date: 2012-04-25
 publication: "GQ Türkiye"
 interviewer: "Ebru Çapa"
@@ -17,8 +18,6 @@ tags:
   - self-discipline
   - creative exhaustion
 ---
-
-## Şimdiki Aklıyla Teoman
 
 **GQ Türkiye — 25 April 2012**  
 **Interview by Ebru Çapa**

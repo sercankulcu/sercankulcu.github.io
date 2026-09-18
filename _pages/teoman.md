@@ -27,7 +27,7 @@ Interviews, conversations, profiles, and archival material about Teoman.
 {% assign entries = site.teoman | sort: "date" | reverse %}
 {% for post in entries %}
 {% assign words = post.content | number_of_words %}
-{% assign reading_time = words | divided_by: 200 %}
+{% assign reading_time = words | divided_by: site.words_per_minute %}
 {% if reading_time < 1 %}
 {% assign reading_time = 1 %}
 {% endif %}

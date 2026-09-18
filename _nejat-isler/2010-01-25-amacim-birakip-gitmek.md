@@ -1,5 +1,6 @@
 ---
 title: "Amacım Bırakıp Gitmek"
+description: "In January 2010, Nejat İşler sounded tired. Not tired of acting itself. That distinction is important."
 date: 2010-01-25
 publication: "Milliyet"
 interviewer: "İlknur Taş"
@@ -18,8 +19,6 @@ tags:
   - freedom
   - acting
 ---
-
-## Amacım Bırakıp Gitmek
 
 **Milliyet — 25 January 2010**  
 **Interview by İlknur Taş**

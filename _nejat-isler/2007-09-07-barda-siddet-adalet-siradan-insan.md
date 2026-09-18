@@ -1,5 +1,6 @@
 ---
 title: "Barda: Şiddet, Adalet ve Sıradan İnsan"
+description: "The 2007 Barda period contains more than one useful Nejat İşler interview. The Harper's Bazaar conversation gives us the broad social question:"
 date: 2007-09-07
 publication: "Archived interview reproduction"
 type: "interview"
@@ -19,8 +20,6 @@ tags:
   - working conditions
   - morality
 ---
-
-## Barda: Şiddet, Adalet ve Sıradan İnsan
 
 **2007 — surviving online reproduction dated 7 September 2007**
 

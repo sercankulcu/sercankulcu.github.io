@@ -1,5 +1,6 @@
 ---
 title: "Teoman, Fatih Altaylı'nın Sorularını Yanıtladı"
+description: "This interview is one of the most important political and philosophical conversations of Teoman's later period."
 date: 2023-08-25
 publication: "Fatih Altaylı YouTube"
 interviewer: "Fatih Altaylı"
@@ -19,8 +20,6 @@ tags:
   - Istanbul
   - relationships
 ---
-
-## Teoman, Fatih Altaylı'nın Sorularını Yanıtladı
 
 **Fatih Altaylı YouTube — 25 August 2023**  
 **Interview by Fatih Altaylı**  

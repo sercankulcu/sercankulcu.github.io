@@ -1,5 +1,6 @@
 ---
 title: "Bu Film Kayıp Yılların Fotoğrafı"
+description: "Two days after Kaybedenler Kulübü entered cinemas, Nejat İşler and Yiğit Özşener sat down with Sibel Ateş Yengin to talk not only about the film but about the decade it represented."
 date: 2011-03-27
 publication: "Akşam"
 interviewer: "Sibel Ateş Yengin"
@@ -18,8 +19,6 @@ tags:
   - Istanbul
   - public image
 ---
-
-## Bu Film Kayıp Yılların Fotoğrafı
 
 **Akşam — 27 March 2011**  
 **Interview by Sibel Ateş Yengin**  

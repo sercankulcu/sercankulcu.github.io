@@ -1,5 +1,6 @@
 ---
 title: "Diziler Bitti, Sinemaya Devam"
+description: "In July 2015, Nejat İşler made one of the clearest professional decisions of his career. He was not retiring from acting."
 date: 2015-07-01
 publication: "Anadolu Ajansı"
 type: "press interview"
@@ -17,8 +18,6 @@ tags:
   - freedom
   - Gümüşlükspor
 ---
-
-## Diziler Bitti, Sinemaya Devam
 
 **Anadolu Ajansı — 1 July 2015**
 

@@ -1,5 +1,6 @@
 ---
 title: "Bundan Sonra Artık Kendim İçin Hiçbir Şey Yapmayacağım"
+description: "By May 2016, Nejat İşler had moved beyond simply recovering from illness. He had begun giving the experience a meaning."
 date: 2016-05-22
 publication: "Hürriyet"
 interviewer: "Uğur Vardan"
@@ -18,8 +19,6 @@ tags:
   - music
   - purpose
 ---
-
-## Bundan Sonra Artık Kendim İçin Hiçbir Şey Yapmayacağım
 
 **Hürriyet — 22 May 2016**  
 **Interview by Uğur Vardan**

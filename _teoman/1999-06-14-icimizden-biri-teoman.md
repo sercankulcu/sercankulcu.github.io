@@ -1,5 +1,6 @@
 ---
 title: "İçimizden Biri: Teoman"
+description: "This interview captures a particularly reflective Teoman. The discussion moves far beyond music."
 date: 1999-06-14
 type: "interview"
 verification: "archived"
@@ -16,8 +17,6 @@ tags:
   - childhood
   - popular culture
 ---
-
-## İçimizden Biri: Teoman
 
 **14 June 1999**
 

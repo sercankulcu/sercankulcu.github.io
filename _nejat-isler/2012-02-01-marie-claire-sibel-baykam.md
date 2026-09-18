@@ -1,5 +1,6 @@
 ---
 title: "Marie Claire: Public Image and the Man at Home"
+description: "By 2012, Nejat İşler had acquired a remarkably stable public image. He was widely associated with: The success of Kaybedenler Kulübü had strengthened this image further."
 date: 2012-02-01
 publication: "Marie Claire Türkiye"
 interviewer: "Sibel Baykam"
@@ -16,8 +17,6 @@ tags:
   - success
   - masculinity
 ---
-
-## Marie Claire: Public Image and the Man at Home
 
 **Marie Claire Türkiye — February 2012**  
 **Interview by Sibel Baykam**

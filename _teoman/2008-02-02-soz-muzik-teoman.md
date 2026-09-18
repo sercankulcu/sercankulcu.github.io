@@ -1,5 +1,6 @@
 ---
 title: "Söz Müzik Teoman"
+description: "This interview documents an unusual moment in Teoman's career. Instead of releasing another conventional Teoman album, he gives his songs to other musicians."
 date: 2008-02-02
 publication: "PowerTürk"
 type: "interview"
@@ -12,8 +13,6 @@ tags:
   - authorship
   - artistic identity
 ---
-
-## Söz Müzik Teoman
 
 **PowerTürk — 2 February 2008**
 

@@ -1,5 +1,6 @@
 ---
 title: "İşportacıydı Artık Yıldız"
+description: "In early 2003, Nejat İşler was at an unusual point in his career. He was no longer an unknown theatre-trained actor trying to find work."
 date: 2003-01-19
 publication: "Milliyet"
 type: "interview"
@@ -12,8 +13,6 @@ tags:
   - television
   - public image
 ---
-
-## İşportacıydı Artık Yıldız
 
 **Milliyet — 19 January 2003**
 

@@ -1,5 +1,6 @@
 ---
 title: "Teoman ile Söyleşi"
+description: "This interview finds Teoman in a more established stage of his career. The central question is no longer whether he can become successful, or whether popularity will change him."
 date: 2006-01-01
 interviewer: "Coşkun Çokyiğit"
 type: "interview"
@@ -12,8 +13,6 @@ tags:
   - identity
   - popularity
 ---
-
-## Teoman ile Söyleşi
 
 **2006**  
 **Interview by Coşkun Çokyiğit**

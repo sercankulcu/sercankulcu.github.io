@@ -1,5 +1,6 @@
 ---
 title: "Ercüment Çözer: Adalet, Saygı ve Dayatma"
+description: "Three days before Saygı: Bir Ercüment Çözer Dizisi reached audiences, Nejat İşler gave one of his clearest explanations of how he personally understood Ercüment Çözer."
 date: 2020-10-23
 publication: "T24"
 type: "video statement"
@@ -15,8 +16,6 @@ tags:
   - acting
   - Behzat Ç.
 ---
-
-## Ercüment Çözer: Adalet, Saygı ve Dayatma
 
 **T24 — 23 October 2020**
 

@@ -1,5 +1,6 @@
 ---
 title: "Utangaç Utangaç Rock Yapıyor"
+description: "This is one of the earliest surviving interviews with Teoman, published shortly before the release of his first album. At the time, he was still largely unknown to the general public."
 date: 1996-12-28
 publication: "Milliyet"
 type: "interview"
@@ -13,8 +14,6 @@ tags:
   - literature
   - Boğaziçi University
 ---
-
-## Utangaç Utangaç Rock Yapıyor
 
 **Milliyet — 28 December 1996**
 

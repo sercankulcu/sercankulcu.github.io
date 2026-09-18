@@ -1,5 +1,6 @@
 ---
 title: "Aklım Kendimde"
+description: "This interview is one of the most personal portraits of Teoman from the late 1990s."
 date: 1999-07-04
 publication: "Cumhuriyet Gazetesi"
 interviewer: "Zeynep Güven"
@@ -18,8 +19,6 @@ tags:
   - cinema
   - career
 ---
-
-## Aklım Kendimde
 
 **Cumhuriyet Gazetesi — 4 July 1999**  
 **Interview by Zeynep Güven**

@@ -1,5 +1,6 @@
 ---
 title: "Rüyalar ve Sayıklamalar"
+description: "By 2019, Nejat İşler had already been an actor for decades. But the Socrates interview reveals that acting was never the only creative identity available to him."
 date: 2019-08-01
 publication: "Socrates"
 type: "interview"
@@ -18,8 +19,6 @@ tags:
   - Istanbul
   - Beyoğlu
 ---
-
-## Rüyalar ve Sayıklamalar
 
 **Socrates — 1 August 2019**
 

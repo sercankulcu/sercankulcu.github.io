@@ -1,5 +1,6 @@
 ---
 title: "İkimizin Yerine: Beden Değişti, Oyunculuk Devam Etti"
+description: "By October 2016, Nejat İşler was no longer speaking only as someone who had survived a major health crisis. He was back inside a film."
 date: 2016-10-23
 publication: "Hürriyet"
 interviewer: "Cengiz Semercioğlu"
@@ -16,8 +17,6 @@ tags:
   - relationships
   - cinema
 ---
-
-## İkimizin Yerine: Beden Değişti, Oyunculuk Devam Etti
 
 **Hürriyet — 23 October 2016**  
 **Interview by Cengiz Semercioğlu**

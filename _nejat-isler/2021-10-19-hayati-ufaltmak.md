@@ -1,5 +1,6 @@
 ---
 title: "Hayatı Ufaltmak"
+description: "By 2021, Nejat İşler had found a working model that came surprisingly close to the life he had been describing for more than a decade."
 date: 2021-10-19
 publication: "Milliyet Sanat"
 interviewer: "Asu Maro"
@@ -18,8 +19,6 @@ tags:
   - acting
   - lifestyle
 ---
-
-## Hayatı Ufaltmak
 
 **Milliyet Sanat — 19 October 2021**  
 **Interview by Asu Maro**

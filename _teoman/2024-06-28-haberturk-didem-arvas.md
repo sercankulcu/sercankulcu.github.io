@@ -1,5 +1,6 @@
 ---
 title: "Özel Röportaj — Teoman"
+description: "This interview is particularly valuable because several themes that had appeared separately in Teoman's recent public life are brought together in one conversation."
 date: 2024-06-28
 publication: "Habertürk"
 interviewer: "Didem Arvas"
@@ -14,8 +15,6 @@ tags:
   - social reconciliation
   - aging
 ---
-
-## Özel Röportaj — Teoman
 
 **Habertürk — 28 June 2024**  
 **Interview by Didem Arvas**

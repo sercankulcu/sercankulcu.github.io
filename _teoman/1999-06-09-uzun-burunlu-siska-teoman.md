@@ -1,5 +1,6 @@
 ---
 title: "Uzun Burunlu Sıska Teoman"
+description: "By the summer of 1999, Teoman was no longer the unknown musician introduced to newspaper readers only a few years earlier."
 date: 1999-06-09
 publication: "Hürriyet Kelebek"
 type: "interview"
@@ -14,8 +15,6 @@ tags:
   - celebrity
   - loneliness
 ---
-
-## Uzun Burunlu Sıska Teoman
 
 **Hürriyet Kelebek — 9 June 1999**
 
