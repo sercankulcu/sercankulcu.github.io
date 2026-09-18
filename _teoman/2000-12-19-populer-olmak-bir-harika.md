@@ -4,7 +4,7 @@ date: 2000-12-19
 type: "interview"
 verification: "archived"
 confidence: "medium"
-topics:
+tags:
   - popularity
   - fame
   - awards

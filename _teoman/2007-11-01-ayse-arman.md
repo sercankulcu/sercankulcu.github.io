@@ -6,7 +6,7 @@ interviewer: "Ayşe Arman"
 type: "interview"
 verification: "cross-verified"
 confidence: "high"
-topics:
+tags:
   - father
   - childhood
   - mother

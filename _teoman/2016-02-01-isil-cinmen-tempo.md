@@ -6,7 +6,7 @@ interviewer: "Işıl Cinmen"
 type: "interview"
 verification: "cross-verified"
 confidence: "high"
-topics:
+tags:
   - Turkey
   - political polarization
   - Erdal Eren

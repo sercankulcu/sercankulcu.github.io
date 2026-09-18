@@ -5,7 +5,7 @@ publication: "Yeni Yüzyıl P"
 type: "interview"
 verification: "cross-verified"
 confidence: "high"
-topics:
+tags:
   - Gümüşlükspor
   - football
   - amateurism

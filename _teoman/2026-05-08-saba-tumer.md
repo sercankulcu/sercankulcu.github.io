@@ -7,7 +7,7 @@ interviewer: "Saba Tümer"
 type: "video interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - songwriting
   - final album
   - 87 songs

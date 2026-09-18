@@ -6,7 +6,7 @@ interviewer: "Ege Görgün"
 type: "interview"
 verification: "cross-verified"
 confidence: "high"
-topics:
+tags:
   - Kaybedenler Kulübü
   - Kaan Çaydamlı
   - losers

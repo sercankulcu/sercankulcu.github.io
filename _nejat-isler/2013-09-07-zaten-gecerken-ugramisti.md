@@ -6,7 +6,7 @@ author: "Asu Maro"
 type: "profile / archival commentary"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - İntikam
   - Gümüşlük
   - television

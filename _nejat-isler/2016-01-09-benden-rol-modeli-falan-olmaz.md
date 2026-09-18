@@ -6,7 +6,7 @@ interviewer: "Uğur Vardan"
 type: "interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - Gümüşlükspor
   - football
   - championship

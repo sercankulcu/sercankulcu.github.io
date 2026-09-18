@@ -6,7 +6,7 @@ interviewer: "Ahmet Mümtaz Taylan"
 type: "television interview"
 verification: "primary / cross-verified"
 confidence: "high"
-topics:
+tags:
   - childhood
   - father
   - mother

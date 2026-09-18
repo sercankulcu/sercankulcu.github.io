@@ -6,7 +6,7 @@ interviewer: "Mirgün Cabas"
 type: "video interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - fame
   - retirement
   - dissatisfaction

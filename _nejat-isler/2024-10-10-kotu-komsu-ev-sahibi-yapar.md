@@ -5,7 +5,7 @@ publication: "Antalya Altın Portakal Film Festivali"
 type: "festival talk"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - Evcilik
   - producing
   - independent cinema

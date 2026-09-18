@@ -8,7 +8,7 @@ verification: "archived"
 confidence: "high"
 date_precision: "year"
 archive_date: "2014-01-26"
-topics:
+tags:
   - fame
   - interviews
   - celebrity

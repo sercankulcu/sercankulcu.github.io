@@ -6,7 +6,7 @@ interviewer: "Nilgün Balcı Çavdar"
 type: "interview / profile"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - artificial intelligence
   - music industry
   - creative economy

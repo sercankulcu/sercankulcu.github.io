@@ -6,7 +6,7 @@ interviewer: "Asu Maro"
 type: "interview"
 verification: "cross-verified"
 confidence: "high"
-topics:
+tags:
   - İntikam
   - Rüzgar
   - discipline

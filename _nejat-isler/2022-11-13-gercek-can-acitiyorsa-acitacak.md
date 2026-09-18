@@ -6,7 +6,7 @@ interviewer: "Deniz Ülkütekin"
 type: "interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - Tamirhane
   - reality
   - good and evil

@@ -5,7 +5,7 @@ publication: "Milliyet"
 type: "interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - Gülbeyaz
   - early career
   - fame

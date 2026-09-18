@@ -5,7 +5,7 @@ interviewer: "Coşkun Çokyiğit"
 type: "interview"
 verification: "primary-archive"
 confidence: "high"
-topics:
+tags:
   - songwriting
   - originality
   - commercial art

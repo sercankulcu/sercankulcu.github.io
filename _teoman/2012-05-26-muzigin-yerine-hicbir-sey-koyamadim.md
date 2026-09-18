@@ -6,7 +6,7 @@ interviewer: "Tolga Akyıldız"
 type: "interview"
 verification: "cross-verified"
 confidence: "high"
-topics:
+tags:
   - retirement
   - creative exhaustion
   - concert quality

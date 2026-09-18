@@ -6,7 +6,7 @@ interviewer: "Mehmet Tez"
 type: "interview"
 verification: "primary-archive"
 confidence: "high"
-topics:
+tags:
   - İnsanlık Halleri
   - politics
   - Kurdish issue

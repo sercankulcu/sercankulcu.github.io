@@ -5,7 +5,7 @@ publication: "T24"
 type: "video statement"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - Saygı
   - Ercüment Çözer
   - justice

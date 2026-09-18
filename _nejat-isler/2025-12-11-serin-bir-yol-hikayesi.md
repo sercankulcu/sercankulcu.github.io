@@ -6,7 +6,7 @@ interviewer: "Eylül Seren Altay"
 type: "interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - Miras
   - memory
   - youth

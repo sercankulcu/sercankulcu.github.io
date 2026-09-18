@@ -6,7 +6,7 @@ interviewer: "Asu Maro"
 type: "interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - Saygı
   - Ercüment Çözer
   - digital platforms

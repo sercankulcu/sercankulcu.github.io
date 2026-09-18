@@ -6,7 +6,7 @@ interviewer: "Tuluğ Özlü"
 type: "podcast interview"
 verification: "cross-verified"
 confidence: "high"
-topics:
+tags:
   - relationships
   - sex
   - fidelity

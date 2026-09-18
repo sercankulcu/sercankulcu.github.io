@@ -6,7 +6,7 @@ interviewer: "Ömür Gedik"
 type: "television interview"
 verification: "cross-verified"
 confidence: "high"
-topics:
+tags:
   - Kapalıçarşı
   - Ejder Kapanı
   - television

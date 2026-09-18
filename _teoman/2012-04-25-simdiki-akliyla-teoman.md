@@ -6,7 +6,7 @@ interviewer: "Ebru Çapa"
 type: "interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - retirement
   - burnout
   - music industry

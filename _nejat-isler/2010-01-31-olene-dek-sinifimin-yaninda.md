@@ -5,7 +5,7 @@ publication: "Cumhuriyet"
 type: "interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - Ejder Kapanı
   - class
   - labor
