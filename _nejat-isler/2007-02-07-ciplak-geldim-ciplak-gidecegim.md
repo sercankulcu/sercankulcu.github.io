@@ -1,5 +1,6 @@
 ---
 title: "Çıplak Geldim, Çıplak Gideceğim"
+description: "This interview changes the chronology of Nejat İşler's philosophy. For years, the sentence most closely associated with his mature view of work and money seemed to belong to a much later period:"
 date: 2007-02-07
 publication: "Ulusoy Dergisi / Tiyatro Dünyası archive"
 type: "archived interview"
@@ -24,8 +25,6 @@ tags:
   - travel
   - public image
 ---
-
-## Çıplak Geldim, Çıplak Gideceğim
 
 **Ulusoy Dergisi — archived 7 February 2007**
 

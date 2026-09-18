@@ -1,5 +1,6 @@
 ---
 title: "Serin Bir Yol Hikâyesi"
+description: "The December 2025 MediaCat interview is one of the richest late-period documents in Nejat İşler's archive. But very quickly, the book opens into larger questions:"
 date: 2025-12-11
 publication: "MediaCat"
 interviewer: "Eylül Seren Altay"
@@ -17,8 +18,6 @@ tags:
   - acting
   - storytelling
 ---
-
-## Serin Bir Yol Hikâyesi
 
 **MediaCat — 11 December 2025**  
 **Interview by Eylül Seren Altay**

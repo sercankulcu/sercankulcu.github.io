@@ -1,5 +1,6 @@
 ---
 title: "Empati — Teoman"
+description: "This is one of the most biographically revealing conversations in the Teoman archive. Many of its subjects are familiar."
 date: 2026-01-22
 publication: "NTV / Empati"
 interviewer: "Ahmet Mümtaz Taylan"
@@ -21,8 +22,6 @@ tags:
   - public persona
   - legacy
 ---
-
-## Empati — Teoman
 
 **NTV — January 2026**  
 **Interview by Ahmet Mümtaz Taylan**

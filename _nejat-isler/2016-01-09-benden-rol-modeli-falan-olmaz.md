@@ -1,5 +1,6 @@
 ---
 title: "Benden Rol Modeli Falan Olmaz"
+description: "In January 2016, Gümüşlükspor had just become champions of its amateur league group. Nejat İşler was not watching from the stands."
 date: 2016-01-09
 publication: "Hürriyet"
 interviewer: "Uğur Vardan"
@@ -17,8 +18,6 @@ tags:
   - amateurism
   - community
 ---
-
-## Benden Rol Modeli Falan Olmaz
 
 **Hürriyet — 9 January 2016**  
 **Interview by Uğur Vardan**

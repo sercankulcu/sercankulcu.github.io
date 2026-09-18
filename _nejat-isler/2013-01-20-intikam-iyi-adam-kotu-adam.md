@@ -1,5 +1,6 @@
 ---
 title: "İntikam: İyi Adam, Kötü Adam ve Gizli Düzen"
+description: "In early 2013, Nejat İşler was appearing in İntikam as Rüzgar. The role is useful because it places him in almost the opposite position from characters such as Selim in Barda or Ercüment Çözer."
 date: 2013-01-20
 publication: "Milliyet"
 interviewer: "Asu Maro"
@@ -18,8 +19,6 @@ tags:
   - Gümüşlük
   - television
 ---
-
-## İntikam: İyi Adam, Kötü Adam ve Gizli Düzen
 
 **Milliyet — January 2013**  
 **Interview by Asu Maro**

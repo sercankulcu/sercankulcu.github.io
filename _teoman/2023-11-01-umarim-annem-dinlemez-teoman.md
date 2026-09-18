@@ -1,5 +1,6 @@
 ---
 title: "Umarım Annem Dinlemez — Teoman"
+description: "This conversation shows a different side of Teoman. There is less discussion of albums, artistic legacy or Turkish politics."
 date: 2023-11-01
 publication: "Umarım Annem Dinlemez"
 interviewer: "Tuluğ Özlü"
@@ -17,8 +18,6 @@ tags:
   - public persona
   - freedom
 ---
-
-## Umarım Annem Dinlemez — Teoman
 
 **Umarım Annem Dinlemez — November 2023**  
 **Interview by Tuluğ Özlü**

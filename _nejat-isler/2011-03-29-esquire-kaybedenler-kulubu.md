@@ -1,5 +1,6 @@
 ---
 title: "Esquire: Kaybedenler, Hırs and Public Image"
+description: "In March 2011, Nejat İşler entered one of the most culturally important periods of his career. Kaybedenler Kulübü had just reached cinemas."
 date: 2011-03-29
 publication: "Esquire Türkiye"
 interviewer: "Ege Görgün"
@@ -18,8 +19,6 @@ tags:
   - public image
   - masculinity
 ---
-
-## Esquire: Kaybedenler, Hırs and Public Image
 
 **Esquire Türkiye — March 2011**  
 **Interview by Ege Görgün**

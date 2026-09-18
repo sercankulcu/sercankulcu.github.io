@@ -1,5 +1,6 @@
 ---
 title: "Orada Rahat mısın Teoman?"
+description: "This conversation finds Teoman increasingly comfortable with a new identity: not simply Teoman the songwriter,"
 date: 2024-05-31
 publication: "Mirgün Cabas YouTube"
 interviewer: "Mirgün Cabas"
@@ -21,8 +22,6 @@ tags:
   - self-irony
   - artistic identity
 ---
-
-## Orada Rahat mısın Teoman?
 
 **31 May 2024**  
 **Interview by Mirgün Cabas**

@@ -1,5 +1,6 @@
 ---
 title: "Ölene Dek Sınıfımın Yanında Yer Alacağım"
+description: "By the end of January 2010, Nejat İşler's conflict with the television industry had become much larger than a personal dispute about leaving Kapalıçarşı."
 date: 2010-01-31
 publication: "Cumhuriyet"
 type: "interview"
@@ -21,8 +22,6 @@ tags:
   - public image
   - Fenerbahçe
 ---
-
-## Ölene Dek Sınıfımın Yanında Yer Alacağım
 
 **Cumhuriyet — 31 January 2010**
 

@@ -1,5 +1,6 @@
 ---
 title: "Teoman'dan Arşivlik Albüm: Koyu Antoloji"
+description: "This interview belongs to the same period as the Işıl Cinmen conversation, but its emphasis is different. The Posta interview was highly personal."
 date: 2018-02-14
 publication: "Hürriyet"
 interviewer: "Hikmet Demirkol"
@@ -14,8 +15,6 @@ tags:
   - reinterpretation
   - aging
 ---
-
-## Teoman'dan Arşivlik Albüm: Koyu Antoloji
 
 **Hürriyet — 14 February 2018**  
 **Interview by Hikmet Demirkol**

@@ -1,5 +1,6 @@
 ---
 title: "Harper’s Bazaar: Barda, Violence and Justice"
+description: "By early 2007, the public image surrounding Nejat İşler had changed considerably."
 date: 2007-02-01
 publication: "Harper’s Bazaar Türkiye"
 type: "interview"
@@ -18,8 +19,6 @@ tags:
   - public image
   - acting
 ---
-
-## Harper’s Bazaar: Barda, Violence and Justice
 
 **Harper’s Bazaar Türkiye — February 2007**
 

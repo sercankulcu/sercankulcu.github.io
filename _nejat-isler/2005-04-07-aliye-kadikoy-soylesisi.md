@@ -1,5 +1,6 @@
 ---
 title: "Aliye ve Aile Üzerine Kadıköy Söyleşisi"
+description: "This 2005 event is not a conventional Nejat İşler interview. It is valuable for a different reason."
 date: 2005-04-07
 publication: "Kadıköy Belediyesi / Gazete Kadıköy archive"
 type: "public panel"
@@ -11,8 +12,6 @@ tags:
   - celebrity
   - early career
 ---
-
-## Aliye ve Aile Üzerine Kadıköy Söyleşisi
 
 **Kadıköy — 7 April 2005**
 

@@ -1,5 +1,6 @@
 ---
 title: "Türk Rock Müziğinin Romantik ve Asi Çocuğu Teoman"
+description: "This interview captures Teoman at an important transitional moment. İnsanlık Halleri had been released recently."
 date: 2010-02-01
 publication: "Aujourd’hui la Turquie"
 interviewer: "Ayça Yüksel"
@@ -17,8 +18,6 @@ tags:
   - literature
   - artistic identity
 ---
-
-## Türk Rock Müziğinin Romantik ve Asi Çocuğu Teoman
 
 **Aujourd’hui la Turquie — February 2010**  
 **Interview by Ayça Yüksel**

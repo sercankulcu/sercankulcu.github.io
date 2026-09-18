@@ -1,5 +1,6 @@
 ---
 title: "Yer Çekimine En Fazla Direnen Şey Yaşam"
+description: "In June 2019, Nejat İşler had just published his second book, Ben Hep Senin Yanındaydım."
 date: 2019-06-23
 publication: "Milliyet Pazar"
 interviewer: "Adalet Çavdar"
@@ -17,8 +18,6 @@ tags:
   - fiction
   - fear
 ---
-
-## Yer Çekimine En Fazla Direnen Şey Yaşam
 
 **Milliyet Pazar — 23 June 2019**  
 **Interview by Adalet Çavdar**

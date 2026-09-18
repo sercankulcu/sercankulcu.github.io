@@ -1,5 +1,6 @@
 ---
 title: "Kaybedenler Kulübü Yolda: Delikanlı Değilim"
+description: "Seven years after Kaybedenler Kulübü, Nejat İşler returned to Kaan Çaydamlı. But neither the actor nor the character was the same."
 date: 2018-03-18
 publication: "Habertürk"
 interviewer: "Mehmet Çalışkan"
@@ -17,8 +18,6 @@ tags:
   - relationships
   - celebrity
 ---
-
-## Kaybedenler Kulübü Yolda: Delikanlı Değilim
 
 **Habertürk — 18 March 2018**  
 **Interview by Mehmet Çalışkan**

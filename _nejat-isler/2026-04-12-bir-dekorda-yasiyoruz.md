@@ -1,5 +1,6 @@
 ---
 title: "Bir Dekorda Yaşıyoruz"
+description: "In April 2026, Nejat İşler returned to a question that had followed him for almost twenty years: The vocabulary has changed."
 date: 2026-04-12
 publication: "BirGün TV"
 interviewer: "Timur Soykan"
@@ -16,8 +17,6 @@ tags:
   - writing
   - freedom
 ---
-
-## Bir Dekorda Yaşıyoruz
 
 **BirGün TV — 12 April 2026**  
 **Cevap Hakkı #07 — Timur Soykan**

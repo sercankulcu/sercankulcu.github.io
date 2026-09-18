@@ -1,5 +1,6 @@
 ---
 title: "On Yedi Yaş Yaşamda Çok Önemli"
+description: "This interview is one of the clearest explanations Teoman gave during the Onyedi period about how he writes songs and how he constructs an album."
 date: 2000-08-10
 publication: "Cumhuriyet Gazetesi"
 interviewer: "Barış Behramoğlu"
@@ -12,8 +13,6 @@ tags:
   - album concept
   - realism
 ---
-
-## On Yedi Yaş Yaşamda Çok Önemli
 
 **Cumhuriyet Gazetesi — 10 August 2000**  
 **Interview by Barış Behramoğlu**

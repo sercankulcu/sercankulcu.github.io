@@ -1,5 +1,6 @@
 ---
 title: "Episode: Kötüyü Kötü Oynamıyorum"
+description: "This Episode interview is one of the best documents for understanding Nejat İşler as an actor."
 date: 2023-01-27
 publication: "Episode"
 interviewer: "Onur Bayrakçeken"
@@ -24,8 +25,6 @@ tags:
   - Gezi
   - rock
 ---
-
-## Episode: Kötüyü Kötü Oynamıyorum
 
 **Episode — Issue 27 / web archive 27 January 2023**  
 **Interview by Onur Bayrakçeken**

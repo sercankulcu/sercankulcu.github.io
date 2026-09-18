@@ -1,5 +1,6 @@
 ---
 title: "Kötü Komşu Ev Sahibi Yapar"
+description: "The Evcilik team talk at Antalya is important because it catches Nejat İşler's move toward producing before the later January 2025 interviews gave that move a clearer philosophy."
 date: 2024-10-10
 publication: "Antalya Altın Portakal Film Festivali"
 type: "festival talk"
@@ -15,8 +16,6 @@ tags:
   - creative control
   - collaboration
 ---
-
-## Kötü Komşu Ev Sahibi Yapar
 
 **Antalya Altın Portakal Film Festivali — October 2024**
 

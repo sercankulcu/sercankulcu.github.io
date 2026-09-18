@@ -1,5 +1,6 @@
 ---
 title: "Başkan Olunca Bu İşler Ne Kadar Zormuş Dedim"
+description: "By the end of 2015, Nejat İşler had entered a role very different from the ones that had made him famous. He was now the president of Gümüşlükspor."
 date: 2015-12-28
 publication: "Yeni Yüzyıl P"
 type: "interview"
@@ -15,8 +16,6 @@ tags:
   - Fenerbahçe
   - Gümüşlük
 ---
-
-## Başkan Olunca Bu İşler Ne Kadar Zormuş Dedim
 
 **Yeni Yüzyıl P — 28 December 2015**
 

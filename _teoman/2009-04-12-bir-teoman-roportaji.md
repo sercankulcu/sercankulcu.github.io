@@ -1,5 +1,6 @@
 ---
 title: "Bir Teoman Röportajı"
+description: "This interview is one of the broadest and most provocative Teoman conversations from the late 2000s. Mehmet Tez visits Teoman at his home in Cihangir shortly after the release of İnsanlık Halleri."
 date: 2009-04-12
 publication: "Sabah / Hafif Müzik"
 interviewer: "Mehmet Tez"
@@ -17,8 +18,6 @@ tags:
   - cinema
   - lifestyle
 ---
-
-## Bir Teoman Röportajı
 
 **Sabah / Hafif Müzik — 12 April 2009**  
 **Interview by Mehmet Tez**

@@ -1,5 +1,6 @@
 ---
 title: "Akıllı Kadın Her Zaman Daha İyidir"
+description: "This interview captures Teoman at a moment when success has already changed his position in Turkish popular culture."
 date: 2001-01-24
 publication: "Sabah Gazetesi"
 interviewer: "Deniz Akkaya"
@@ -17,8 +18,6 @@ tags:
   - success
   - aging
 ---
-
-## Akıllı Kadın Her Zaman Daha İyidir
 
 **Sabah Gazetesi — 24 January 2001**  
 **Interview by Deniz Akkaya**

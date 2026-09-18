@@ -1,5 +1,6 @@
 ---
 title: "Sette Olanları AİHM’ye Götürsek Kazanırız"
+description: "One day after Nejat İşler's major Milliyet interview about leaving Kapalıçarşı, another conversation made his position even clearer."
 date: 2010-01-26
 publication: "Cinemania / Habertürk"
 interviewer: "Ömür Gedik"
@@ -15,8 +16,6 @@ tags:
   - cinema
   - acting
 ---
-
-## Sette Olanları AİHM’ye Götürsek Kazanırız
 
 **Cinemania — 26 January 2010**  
 **Hosted by Ömür Gedik**

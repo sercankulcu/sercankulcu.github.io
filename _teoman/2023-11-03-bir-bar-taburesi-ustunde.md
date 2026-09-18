@@ -1,5 +1,6 @@
 ---
 title: "Bir Bar Taburesi Üstünde"
+description: "The title of this program is almost impossible to separate from Teoman. More than twenty years earlier, Paramparça had contained one of the most recognizable lines of his career:"
 date: 2023-11-03
 publication: "KAFA TV"
 interviewer: "Candaş Tolga Işık"
@@ -14,8 +15,6 @@ tags:
   - public persona
   - aging
 ---
-
-## Bir Bar Taburesi Üstünde
 
 **KAFA TV — November 2023**  
 **Interview by Candaş Tolga Işık**

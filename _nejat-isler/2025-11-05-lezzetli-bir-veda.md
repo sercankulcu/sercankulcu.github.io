@@ -1,5 +1,6 @@
 ---
 title: "Lezzetli Bir Veda"
+description: "By late 2025, Nejat İşler had begun looking backward in a more deliberate way. Not to produce a heroic autobiography."
 date: 2025-11-05
 publication: "Mirgün Cabas"
 interviewer: "Mirgün Cabas"
@@ -23,8 +24,6 @@ tags:
   - media
   - future
 ---
-
-## Lezzetli Bir Veda
 
 **Mirgün Cabas — 5 November 2025**  
 **Interview by Mirgün Cabas**

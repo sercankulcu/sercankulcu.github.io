@@ -1,5 +1,6 @@
 ---
 title: "Zamanı Satın Almak"
+description: "By 2017, Nejat İşler had developed a much clearer philosophy for the life he was trying to build. Earlier interviews had shown pieces of it."
 date: 2017-03-07
 publication: "Habertürk"
 interviewer: "Mehmet Çalışkan"
@@ -19,8 +20,6 @@ tags:
   - acting
   - independence
 ---
-
-## Zamanı Satın Almak
 
 **Habertürk — 7 March 2017**  
 **Interview by Mehmet Çalışkan**

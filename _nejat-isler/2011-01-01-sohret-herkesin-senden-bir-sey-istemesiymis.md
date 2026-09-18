@@ -1,5 +1,6 @@
 ---
 title: "Şöhret, Herkesin Senden Bir Şey İstemesiymiş"
+description: "One of the most persistent ideas in Nejat İşler's public image is that he dislikes interviews. He does not like journalists."
 date: 2011-01-01
 publication: "Ters Ninja"
 interviewer: "Ege Görgün"
@@ -21,8 +22,6 @@ tags:
   - expectations
   - Kaybedenler Kulübü
 ---
-
-## Şöhret, Herkesin Senden Bir Şey İstemesiymiş
 
 **Ters Ninja — 2011**  
 **Interview by Ege Görgün**

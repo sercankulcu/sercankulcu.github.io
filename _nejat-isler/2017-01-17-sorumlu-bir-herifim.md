@@ -1,5 +1,6 @@
 ---
 title: "Sorumlu Bir Herifim"
+description: "By early 2017, two very different versions of Nejat İşler existed in public. One was familiar from celebrity culture:"
 date: 2017-01-17
 publication: "L'Officiel Hommes Türkiye / Habertürk reproduction"
 type: "interview"
@@ -19,8 +20,6 @@ tags:
   - Fenerbahçe
   - Gümüşlük
 ---
-
-## Sorumlu Bir Herifim
 
 **L'Officiel Hommes Türkiye — January 2017**  
 **Habertürk reproduction — 17 January 2017**

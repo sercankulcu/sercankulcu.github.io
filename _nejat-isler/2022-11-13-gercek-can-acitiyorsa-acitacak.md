@@ -1,5 +1,6 @@
 ---
 title: "Gerçek Can Acıtıyorsa Acıtacak"
+description: "Two days after the Gazete Oksijen interview, Nejat İşler appeared in another substantial conversation about Tamirhane."
 date: 2022-11-13
 publication: "Cumhuriyet Pazar"
 interviewer: "Deniz Ülkütekin"
@@ -17,8 +18,6 @@ tags:
   - teamwork
   - violence
 ---
-
-## Gerçek Can Acıtıyorsa Acıtacak
 
 **Cumhuriyet Pazar — 13 November 2022**  
 **Interview by Deniz Ülkütekin**

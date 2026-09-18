@@ -1,5 +1,6 @@
 ---
 title: "Müziğin Yerine Hiçbir Şey Koyamadım"
+description: "This is one of the most important interviews from Teoman's retirement period. Only about ten months had passed since he announced that he was leaving music."
 date: 2012-05-26
 publication: "Milliyet Cadde"
 interviewer: "Tolga Akyıldız"
@@ -16,8 +17,6 @@ tags:
   - cinema
   - music industry
 ---
-
-## Müziğin Yerine Hiçbir Şey Koyamadım
 
 **Milliyet Cadde — 26 May 2012**  
 **Interview by Tolga Akyıldız**
