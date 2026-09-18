@@ -10,7 +10,7 @@ redirect_from:
 
 I am an Assistant Professor of Computer Engineering with professional software engineering experience dating back to 2005. My career combines academic teaching and research with extensive hands-on experience in embedded, real-time, and distributed software systems. I hold a Ph.D. in Computer Engineering, where my research focused on low-power wireless communication technologies. My current research spans deep learning based object detection in radar and sonar imagery, biomedical and agricultural image analysis, and wireless network protocols, alongside continuing interests in operating systems and software development.
 
-[📄 Publications](/publications/) · [📚 Teaching](/teaching/) · [💻 Posts](/posts/)
+[📄 Publications](/publications/) · [📚 Teaching](/teaching/) · [💻 Posts](/posts/) · [⬇️ CV (PDF)](/files/Sercan_Kulcu_CV.pdf)
 
 ## Professional Experience
 
