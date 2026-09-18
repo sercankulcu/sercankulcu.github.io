@@ -6,7 +6,7 @@ interviewer: "Mirgün Cabas"
 type: "video interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - Sayın Bay Rock Yıldızı
   - Timur
   - fiction

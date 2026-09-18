@@ -6,7 +6,7 @@ interviewer: "Deniz Akkaya"
 type: "interview"
 verification: "archived"
 confidence: "medium"
-topics:
+tags:
   - fame
   - women
   - relationships

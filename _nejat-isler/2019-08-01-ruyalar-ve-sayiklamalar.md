@@ -5,7 +5,7 @@ publication: "Socrates"
 type: "interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - writing
   - Ben Hep Senin Yanındayım
   - Gerçek Hesap Bu!

@@ -7,7 +7,7 @@ type: "video interview"
 verification: "primary"
 confidence: "high"
 duration: "1h 05m"
-topics:
+tags:
   - Ben Zargana Deus Ex Machina
   - retirement
   - return to music

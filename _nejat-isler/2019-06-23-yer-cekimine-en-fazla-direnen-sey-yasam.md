@@ -6,7 +6,7 @@ interviewer: "Adalet Çavdar"
 type: "interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - Ben Hep Senin Yanındaydım
   - writing
   - success

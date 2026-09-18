@@ -8,7 +8,7 @@ verification: "primary"
 confidence: "high"
 interview_period: "2021"
 publication_note: "Originally published in Episode issue 27; web archive published on 27 January 2023."
-topics:
+tags:
   - Saygı
   - Ercüment Çözer
   - 9,75

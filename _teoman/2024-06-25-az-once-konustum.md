@@ -6,7 +6,7 @@ interviewer: "Candaş Tolga Işık"
 type: "video interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - writing
   - Sayın Bay Rock Yıldızı
   - aging

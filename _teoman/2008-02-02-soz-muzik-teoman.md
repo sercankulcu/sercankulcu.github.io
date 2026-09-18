@@ -5,7 +5,7 @@ publication: "PowerTürk"
 type: "interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - Söz Müzik Teoman
   - songwriting
   - reinterpretation

@@ -5,7 +5,7 @@ publication: "Hürriyet Kelebek"
 type: "interview"
 verification: "cross-verified"
 confidence: "high"
-topics:
+tags:
   - fame
   - Beyoğlu
   - relationships

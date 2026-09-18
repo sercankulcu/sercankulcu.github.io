@@ -6,7 +6,7 @@ interviewer: "Candaş Tolga Işık"
 type: "video interview series"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - daily life
   - cafés
   - work

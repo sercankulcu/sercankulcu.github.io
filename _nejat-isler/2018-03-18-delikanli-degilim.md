@@ -6,7 +6,7 @@ interviewer: "Mehmet Çalışkan"
 type: "interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - Kaybedenler Kulübü Yolda
   - Kaan Çaydamlı
   - masculinity

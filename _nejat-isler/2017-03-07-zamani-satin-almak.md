@@ -6,7 +6,7 @@ interviewer: "Mehmet Çalışkan"
 type: "interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - time
   - freedom
   - property

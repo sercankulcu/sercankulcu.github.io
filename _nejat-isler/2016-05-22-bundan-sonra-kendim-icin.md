@@ -6,7 +6,7 @@ interviewer: "Uğur Vardan"
 type: "interview"
 verification: "cross-verified"
 confidence: "high"
-topics:
+tags:
   - Gerçek Hesap Bu!
   - illness
   - mortality

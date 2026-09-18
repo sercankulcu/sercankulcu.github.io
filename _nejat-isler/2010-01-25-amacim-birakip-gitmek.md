@@ -6,7 +6,7 @@ interviewer: "İlknur Taş"
 type: "interview"
 verification: "cross-verified"
 confidence: "high"
-topics:
+tags:
   - Kapalıçarşı
   - fame
   - privacy

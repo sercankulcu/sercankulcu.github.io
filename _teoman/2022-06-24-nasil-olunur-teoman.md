@@ -7,7 +7,7 @@ type: "podcast interview"
 verification: "primary"
 confidence: "high"
 duration: "1h 32m"
-topics:
+tags:
   - songwriting
   - reading
   - cinema

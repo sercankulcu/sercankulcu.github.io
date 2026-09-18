@@ -6,7 +6,7 @@ interviewer: "Mefaret Aktaş"
 type: "interview"
 verification: "cross-verified"
 confidence: "high"
-topics:
+tags:
   - Gönülçelen
   - Ruhi
   - alter ego

@@ -6,7 +6,7 @@ interviewer: "Hikmet Demirkol"
 type: "interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - Koyu Antoloji
   - songwriting
   - creative fatigue

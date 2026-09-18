@@ -7,7 +7,7 @@ type: "interview"
 verification: "cross-verified"
 confidence: "high"
 date_precision: "month"
-topics:
+tags:
   - illness
   - recovery
   - memory

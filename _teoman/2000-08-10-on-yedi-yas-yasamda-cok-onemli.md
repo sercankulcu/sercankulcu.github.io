@@ -6,7 +6,7 @@ interviewer: "Barış Behramoğlu"
 type: "interview"
 verification: "archived"
 confidence: "medium"
-topics:
+tags:
   - Onyedi
   - adolescence
   - songwriting

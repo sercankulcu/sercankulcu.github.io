@@ -5,7 +5,7 @@ publication: "Kadıköy Belediyesi / Gazete Kadıköy archive"
 type: "public panel"
 verification: "archived"
 confidence: "medium"
-topics:
+tags:
   - Aliye
   - television
   - family

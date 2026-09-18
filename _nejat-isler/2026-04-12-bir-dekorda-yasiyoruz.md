@@ -7,7 +7,7 @@ program: "Cevap Hakkı"
 type: "video interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - modern life
   - happiness
   - comfort

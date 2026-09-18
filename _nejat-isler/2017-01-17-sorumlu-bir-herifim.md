@@ -5,7 +5,7 @@ publication: "L'Officiel Hommes Türkiye / Habertürk reproduction"
 type: "interview"
 verification: "cross-verified"
 confidence: "high"
-topics:
+tags:
   - Gümüşlükspor
   - responsibility
   - mother

@@ -6,7 +6,7 @@ interviewer: "Ayça Yüksel"
 type: "interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - İnsanlık Halleri
   - Çoban Yıldızı
   - French culture

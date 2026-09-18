@@ -6,7 +6,7 @@ interviewer: "Cengiz Semercioğlu"
 type: "interview"
 verification: "cross-verified"
 confidence: "high"
-topics:
+tags:
   - İkimizin Yerine
   - illness
   - recovery

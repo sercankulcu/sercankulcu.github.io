@@ -5,7 +5,7 @@ publication: "Anadolu Ajansı"
 type: "press interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - television
   - cinema
   - Gümüşlük

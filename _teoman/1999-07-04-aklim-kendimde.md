@@ -6,7 +6,7 @@ interviewer: "Zeynep Güven"
 type: "interview"
 verification: "archived"
 confidence: "medium"
-topics:
+tags:
   - childhood
   - father
   - mother

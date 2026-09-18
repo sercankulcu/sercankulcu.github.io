@@ -6,7 +6,7 @@ interviewer: "Binnaz Saktanber"
 type: "interview"
 verification: "primary"
 confidence: "high"
-topics:
+tags:
   - Tamirhane
   - fatigue
   - Gümüşlük

@@ -7,7 +7,7 @@ verification: "archived"
 confidence: "medium"
 original_date: "2007"
 date_note: "The surviving online reproduction is dated 7 September 2007; the original interview appears to belong to the Barda release period, but its original publisher and exact publication date could not be securely verified."
-topics:
+tags:
   - Barda
   - violence
   - justice

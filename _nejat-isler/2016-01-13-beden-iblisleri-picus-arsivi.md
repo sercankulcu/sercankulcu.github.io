@@ -8,7 +8,7 @@ verification: "archived"
 confidence: "high"
 original_date: "unknown"
 date_note: "The interview was originally published in Picus during the magazine's earlier publication period. Egoist Okur republished the full interview on 13 January 2016. The exact original Picus issue and date have not been securely recovered."
-topics:
+tags:
   - body
   - masculinity
   - gender

@@ -4,7 +4,7 @@ date: 1999-06-14
 type: "interview"
 verification: "archived"
 confidence: "medium"
-topics:
+tags:
   - identity
   - fame
   - loneliness

@@ -5,7 +5,7 @@ publication: "OT TV"
 type: "video interview"
 verification: "primary"
 confidence: "medium"
-topics:
+tags:
   - Evcilik
   - cinema
   - childhood

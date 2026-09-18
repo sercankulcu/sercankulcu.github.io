@@ -7,7 +7,7 @@ type: "video and podcast interview"
 verification: "primary"
 confidence: "high"
 duration: "28m 44s"
-topics:
+tags:
   - Varoluşçuluk 101
   - existentialism
   - depression

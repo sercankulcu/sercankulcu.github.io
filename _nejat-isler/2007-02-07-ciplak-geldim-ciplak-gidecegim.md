@@ -6,7 +6,7 @@ type: "archived interview"
 verification: "archived"
 confidence: "high"
 date_note: "Tiyatro Dünyası archived the interview on 7 February 2007 and identifies Ulusoy Dergisi as the original publication. The exact original Ulusoy issue date has not been independently recovered."
-topics:
+tags:
   - time
   - money
   - property

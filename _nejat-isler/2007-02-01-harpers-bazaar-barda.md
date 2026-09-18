@@ -6,7 +6,7 @@ type: "interview"
 verification: "cross-verified"
 confidence: "high"
 date_precision: "month"
-topics:
+tags:
   - Barda
   - violence
   - justice

@@ -6,7 +6,7 @@ interviewer: "Sibel Ateş Yengin"
 type: "joint interview"
 verification: "cross-verified"
 confidence: "high"
-topics:
+tags:
   - Kaybedenler Kulübü
   - 1990s
   - Kaan Çaydamlı
