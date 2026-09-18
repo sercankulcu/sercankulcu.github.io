@@ -9,7 +9,6 @@ confidence: "high"
 duration: "28m 44s"
 tags:
   - Varoluşçuluk 101
-  - existentialism
   - depression
   - boredom
   - public persona
@@ -17,8 +16,6 @@ tags:
   - autobiography
   - artificial intelligence
   - music industry
-  - tribute album
-  - touring
   - aging
   - artistic identity
   - self-irony

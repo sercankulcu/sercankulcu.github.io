@@ -9,18 +9,7 @@ confidence: "high"
 tags:
   - artificial intelligence
   - music industry
-  - creative economy
-  - entrepreneurship
-  - artist as business
-  - automation
-  - abundance
-  - copyright
-  - streaming
   - Timur
-  - virtual influencer
-  - Kırılganlar Kralı
-  - future of artists
-  - economic survival
 ---
 
 ## Yakın Gelecekte Sanatçılar ve İş Dünyası Ekonomik Yıkımla Karşılaşacak

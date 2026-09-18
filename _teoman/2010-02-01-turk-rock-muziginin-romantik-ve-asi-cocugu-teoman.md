@@ -8,17 +8,12 @@ verification: "primary"
 confidence: "high"
 tags:
   - İnsanlık Halleri
-  - Çoban Yıldızı
-  - French culture
-  - chanson
   - songwriting
   - music industry
-  - digital music
   - politics
   - Kurdish issue
   - sociology
   - cinema
-  - Turkish rock
   - literature
   - artistic identity
 ---

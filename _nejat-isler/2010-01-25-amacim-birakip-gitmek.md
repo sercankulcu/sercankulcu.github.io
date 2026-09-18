@@ -14,11 +14,9 @@ tags:
   - working conditions
   - celebrity culture
   - withdrawal
-  - alcohol rumors
   - media
   - freedom
   - acting
-  - industry
 ---
 
 ## Amacım Bırakıp Gitmek

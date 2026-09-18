@@ -14,10 +14,7 @@ tags:
   - fidelity
   - home
   - success
-  - honesty
-  - peace
   - masculinity
-  - Keşanlı Ali Destanı
 ---
 
 ## Marie Claire: Public Image and the Man at Home

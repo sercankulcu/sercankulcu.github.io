@@ -9,13 +9,11 @@ confidence: "high"
 duration: "1h 32m"
 tags:
   - songwriting
-  - reading
   - cinema
   - autobiography
   - boredom
   - aging
   - fame
-  - creative projects
   - self-discipline
   - media
   - writing

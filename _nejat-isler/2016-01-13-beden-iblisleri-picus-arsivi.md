@@ -11,16 +11,12 @@ date_note: "The interview was originally published in Picus during the magazine'
 tags:
   - body
   - masculinity
-  - gender
   - fame
   - celebrity
   - religion
   - childhood
   - Eyüp
   - class
-  - clothing
-  - second-hand culture
-  - sexuality
   - mortality
   - public image
   - acting

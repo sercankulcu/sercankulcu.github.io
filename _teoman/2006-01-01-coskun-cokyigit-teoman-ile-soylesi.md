@@ -7,16 +7,10 @@ verification: "primary-archive"
 confidence: "high"
 tags:
   - songwriting
-  - originality
-  - commercial art
   - audience
-  - Turkish language
   - Istanbul
   - identity
-  - Western culture
-  - Turkish culture
   - popularity
-  - artistic authenticity
 ---
 
 ## Teoman ile Söyleşi

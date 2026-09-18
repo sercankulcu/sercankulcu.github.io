@@ -9,20 +9,15 @@ verification: "primary"
 confidence: "high"
 tags:
   - songwriting
-  - final album
-  - 87 songs
   - aging
   - boredom
   - daily life
-  - entertainer identity
   - Varoluşçuluk 101
   - fatherhood
   - daughter
   - education
   - cinema
-  - novel adaptation
   - Generation Z
-  - Generation Alpha
   - depression
   - melancholy
   - artistic legacy

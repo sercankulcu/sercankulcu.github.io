@@ -7,11 +7,7 @@ type: "interview"
 verification: "cross-verified"
 confidence: "high"
 tags:
-  - Gönülçelen
-  - Ruhi
-  - alter ego
   - songwriting
-  - characters
   - death
   - aging
   - childhood
@@ -19,7 +15,6 @@ tags:
   - melancholy
   - irony
   - literature
-  - recording
   - artistic identity
 ---
 

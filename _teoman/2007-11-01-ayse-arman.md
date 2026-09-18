@@ -20,7 +20,6 @@ tags:
   - fame
   - rock
   - songwriting
-  - artistic ambition
 ---
 
 ## Ayşe Arman ile Röportaj

@@ -9,7 +9,6 @@ confidence: "high"
 tags:
   - Kaybedenler Kulübü
   - Kaan Çaydamlı
-  - losers
   - ambition
   - football
   - women

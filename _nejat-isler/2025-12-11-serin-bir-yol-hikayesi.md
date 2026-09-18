@@ -10,16 +10,11 @@ tags:
   - Miras
   - memory
   - youth
-  - road
   - friendship
   - solitude
-  - participation
   - Eyüp
   - death
-  - grandfather
   - acting
-  - empathy
-  - inheritance
   - storytelling
 ---
 

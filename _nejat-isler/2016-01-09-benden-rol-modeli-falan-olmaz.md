@@ -9,12 +9,9 @@ confidence: "high"
 tags:
   - Gümüşlükspor
   - football
-  - championship
-  - role model
   - youth
   - Gezi
   - art
-  - sport
   - culture
   - responsibility
   - amateurism

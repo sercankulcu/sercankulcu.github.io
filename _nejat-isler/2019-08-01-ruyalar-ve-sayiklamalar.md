@@ -7,12 +7,10 @@ verification: "primary"
 confidence: "high"
 tags:
   - writing
-  - Ben Hep Senin Yanındayım
   - Gerçek Hesap Bu!
   - autobiography
   - childhood
   - books
-  - Sahaflar Çarşısı
   - Gümüşlükspor
   - football
   - acting

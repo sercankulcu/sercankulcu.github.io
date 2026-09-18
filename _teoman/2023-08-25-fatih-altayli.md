@@ -8,20 +8,15 @@ verification: "primary"
 confidence: "high"
 duration: "1h 05m"
 tags:
-  - Ben Zargana Deus Ex Machina
   - retirement
-  - return to music
   - aging
   - artistic legacy
   - Necip Fazıl Kısakürek
-  - secularism
-  - conservatism
   - social reconciliation
   - Boğaziçi University
   - sociology
   - youth
   - Istanbul
-  - restlessness
   - relationships
 ---
 

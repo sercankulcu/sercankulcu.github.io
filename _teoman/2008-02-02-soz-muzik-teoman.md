@@ -6,18 +6,11 @@ type: "interview"
 verification: "primary"
 confidence: "high"
 tags:
-  - Söz Müzik Teoman
   - songwriting
   - reinterpretation
   - collaboration
-  - genre
   - authorship
   - artistic identity
-  - Sezen Aksu
-  - Candan Erçetin
-  - Yalın
-  - Nil Karaibrahimgil
-  - Hayko Cepkin
 ---
 
 ## Söz Müzik Teoman

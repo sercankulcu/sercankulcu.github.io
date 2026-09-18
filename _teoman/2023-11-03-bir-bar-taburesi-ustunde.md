@@ -8,16 +8,11 @@ verification: "primary"
 confidence: "high"
 tags:
   - daily life
-  - cafés
   - work
-  - idleness
   - fame
-  - Tarkan
   - memories
-  - favorite songs
   - public persona
   - aging
-  - ordinary life
 ---
 
 ## Bir Bar Taburesi Üstünde

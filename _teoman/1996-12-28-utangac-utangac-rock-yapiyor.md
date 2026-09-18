@@ -7,9 +7,7 @@ verification: "primary"
 confidence: "high"
 tags:
   - early career
-  - first album
   - songwriting
-  - rock music
   - pop music
   - artistic control
   - literature

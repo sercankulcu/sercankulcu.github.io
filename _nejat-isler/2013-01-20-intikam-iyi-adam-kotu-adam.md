@@ -8,13 +8,11 @@ verification: "cross-verified"
 confidence: "high"
 tags:
   - İntikam
-  - Rüzgar
   - discipline
   - good and evil
   - public image
   - women
   - masculinity
-  - domestic life
   - solitude
   - aging
   - Gümüşlük

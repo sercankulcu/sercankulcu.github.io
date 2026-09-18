@@ -7,9 +7,7 @@ confidence: "medium"
 tags:
   - popularity
   - fame
-  - awards
   - rock
-  - pop
   - commercial success
   - audience
   - artistic identity

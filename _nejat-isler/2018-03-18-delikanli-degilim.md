@@ -7,7 +7,6 @@ type: "interview"
 verification: "primary"
 confidence: "high"
 tags:
-  - Kaybedenler Kulübü Yolda
   - Kaan Çaydamlı
   - masculinity
   - public image

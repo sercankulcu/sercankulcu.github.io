@@ -10,15 +10,12 @@ tags:
   - Kaybedenler Kulübü
   - 1990s
   - Kaan Çaydamlı
-  - Yiğit Özşener
   - youth
   - friendship
   - loneliness
-  - consumer culture
   - mortality
   - relationships
   - Istanbul
-  - rock culture
   - public image
 ---
 

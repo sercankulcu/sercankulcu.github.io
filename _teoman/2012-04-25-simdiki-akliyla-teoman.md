@@ -11,12 +11,10 @@ tags:
   - burnout
   - music industry
   - fame
-  - routine
   - identity
   - aging
   - solitude
   - self-discipline
-  - future plans
   - creative exhaustion
 ---
 

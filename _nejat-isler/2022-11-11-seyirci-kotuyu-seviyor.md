@@ -8,7 +8,6 @@ verification: "primary"
 confidence: "high"
 tags:
   - Tamirhane
-  - fatigue
   - Gümüşlük
   - Istanbul
   - Gümüşlükspor
@@ -17,7 +16,6 @@ tags:
   - violence
   - audience
   - acting
-  - sequels
   - aging
   - public image
 ---

@@ -13,7 +13,6 @@ tags:
   - acting
   - public image
   - Nuri Bilge Ceylan
-  - Zeki Demirkubuz
   - politics
   - humor
   - memory

@@ -10,7 +10,6 @@ tags:
   - Barda
   - violence
   - justice
-  - coexistence
   - evil
   - Serdar Akar
   - loneliness

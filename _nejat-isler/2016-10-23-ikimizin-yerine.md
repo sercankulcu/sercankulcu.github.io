@@ -7,7 +7,6 @@ type: "interview"
 verification: "cross-verified"
 confidence: "high"
 tags:
-  - İkimizin Yerine
   - illness
   - recovery
   - body
@@ -16,7 +15,6 @@ tags:
   - courage
   - relationships
   - cinema
-  - return to work
 ---
 
 ## İkimizin Yerine: Beden Değişti, Oyunculuk Devam Etti

@@ -8,15 +8,9 @@ verification: "archived"
 confidence: "medium"
 tags:
   - Onyedi
-  - adolescence
   - songwriting
-  - lyrics
   - album concept
-  - artistic growth
-  - Şebnem Ferah
   - realism
-  - sound
-  - authenticity
 ---
 
 ## On Yedi Yaş Yaşamda Çok Önemli

@@ -10,12 +10,9 @@ tags:
   - football
   - amateurism
   - community
-  - leadership
   - responsibility
   - children
-  - local life
   - Fenerbahçe
-  - organization
   - Gümüşlük
 ---
 

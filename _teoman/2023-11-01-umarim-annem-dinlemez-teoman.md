@@ -10,13 +10,11 @@ tags:
   - relationships
   - sex
   - fidelity
-  - dating
   - nightlife
   - rock star identity
   - aging
   - self-control
   - public persona
-  - intimacy
   - freedom
 ---
 

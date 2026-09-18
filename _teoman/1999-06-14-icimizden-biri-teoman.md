@@ -14,7 +14,6 @@ tags:
   - belonging
   - relationships
   - childhood
-  - gender studies
   - popular culture
 ---
 

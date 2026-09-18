@@ -9,7 +9,6 @@ tags:
   - Ejder Kapanı
   - class
   - labor
-  - unions
   - television
   - working conditions
   - property

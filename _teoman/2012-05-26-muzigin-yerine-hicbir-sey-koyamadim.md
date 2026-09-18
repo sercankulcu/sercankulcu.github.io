@@ -9,19 +9,12 @@ confidence: "high"
 tags:
   - retirement
   - creative exhaustion
-  - concert quality
-  - perfectionism
   - loneliness
   - rock star persona
-  - caricature
   - songwriting
   - artistic legacy
-  - Leonard Cohen
-  - Tom Waits
-  - Bon Jovi
   - cinema
   - music industry
-  - timeless songs
 ---
 
 ## Müziğin Yerine Hiçbir Şey Koyamadım

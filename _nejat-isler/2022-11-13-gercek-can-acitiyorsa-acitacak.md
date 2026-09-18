@@ -10,14 +10,11 @@ tags:
   - Tamirhane
   - reality
   - good and evil
-  - Yeşilçam
   - acting
   - character psychology
   - Eyüp
   - childhood
   - teamwork
-  - rehearsals
-  - social change
   - violence
 ---
 

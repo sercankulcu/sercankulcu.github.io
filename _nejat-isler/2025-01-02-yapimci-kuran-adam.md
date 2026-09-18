@@ -10,7 +10,6 @@ tags:
   - Evcilik
   - producing
   - creative control
-  - story
   - cinema
   - acting
   - directing
