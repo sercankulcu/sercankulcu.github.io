@@ -12,8 +12,6 @@ tags:
   - relationships
   - intelligence
   - pop music
-  - arabesque
-  - Turkish classical music
   - celebrity culture
   - media
   - success

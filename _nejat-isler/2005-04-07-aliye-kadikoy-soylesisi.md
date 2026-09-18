@@ -6,15 +6,9 @@ type: "public panel"
 verification: "archived"
 confidence: "medium"
 tags:
-  - Aliye
   - television
   - family
-  - public discussion
-  - Sanem Çelik
-  - Ayla Algan
-  - Özcan Köknel
   - celebrity
-  - social responsibility
   - early career
 ---
 

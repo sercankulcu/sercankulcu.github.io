@@ -10,18 +10,9 @@ tags:
   - Sayın Bay Rock Yıldızı
   - Timur
   - writing
-  - self-repair
   - Necip Fazıl Kısakürek
   - social reconciliation
-  - polarization
-  - Gaza
-  - Israel
-  - Hamas
-  - political identity
-  - cultural identity
   - aging
-  - public statements
-  - social media
 ---
 
 ## Özel Röportaj — Teoman

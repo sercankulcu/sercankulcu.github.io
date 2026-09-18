@@ -7,7 +7,6 @@ type: "interview"
 verification: "primary"
 confidence: "high"
 tags:
-  - Ben Hep Senin Yanındaydım
   - writing
   - success
   - luck
@@ -15,9 +14,6 @@ tags:
   - women
   - life
   - gravity
-  - social decay
-  - revolution
-  - younger generations
   - fiction
   - fear
 ---

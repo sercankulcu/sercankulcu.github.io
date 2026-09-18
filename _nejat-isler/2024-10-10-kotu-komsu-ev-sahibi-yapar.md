@@ -12,9 +12,7 @@ tags:
   - risk
   - Ümit Ünal
   - acting
-  - financing
   - creative control
-  - festival
   - collaboration
 ---
 

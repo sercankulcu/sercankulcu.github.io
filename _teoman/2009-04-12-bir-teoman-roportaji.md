@@ -10,17 +10,11 @@ tags:
   - İnsanlık Halleri
   - politics
   - Kurdish issue
-  - Ergenekon
   - Turkey
-  - optimism
-  - prostitution
   - fidelity
   - relationships
-  - suicide
-  - Yavuz Çetin
   - music
   - cinema
-  - poetry
   - lifestyle
 ---
 

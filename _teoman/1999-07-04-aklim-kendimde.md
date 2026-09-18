@@ -12,12 +12,10 @@ tags:
   - mother
   - identity
   - fame
-  - self-absorption
   - relationships
   - loneliness
   - children
   - cinema
-  - Orhan Pamuk
   - career
 ---
 

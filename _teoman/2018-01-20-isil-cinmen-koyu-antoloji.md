@@ -12,8 +12,6 @@ tags:
   - melancholy
   - burnout
   - loneliness
-  - fear of future
-  - self-analysis
   - songwriting
   - memory
   - relationships

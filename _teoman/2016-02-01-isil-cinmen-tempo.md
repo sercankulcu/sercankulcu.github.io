@@ -8,16 +8,8 @@ verification: "cross-verified"
 confidence: "high"
 tags:
   - Turkey
-  - political polarization
-  - Erdal Eren
-  - Zekeriya Önge
-  - İki Çocuk
-  - nationalism
-  - political violence
   - identity
   - belonging
-  - pessimism
-  - social psychology
   - irony
 ---
 

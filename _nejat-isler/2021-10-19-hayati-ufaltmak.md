@@ -15,10 +15,7 @@ tags:
   - freedom
   - simplicity
   - public image
-  - politeness
   - acting
-  - comedy
-  - obligation
   - lifestyle
 ---
 

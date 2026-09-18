@@ -11,22 +11,15 @@ tags:
   - father
   - mother
   - masculinity
-  - Zagor
-  - Elvis Presley
   - depression
-  - anger
   - self-control
   - fatherhood
   - daughter
-  - marriage
-  - alcohol
   - sleep
-  - healthy living
   - aging
   - courage
   - public persona
   - legacy
-  - Özkan Uğur
 ---
 
 ## Empati — Teoman

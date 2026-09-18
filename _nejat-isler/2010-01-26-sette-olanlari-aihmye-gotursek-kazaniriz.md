@@ -14,9 +14,6 @@ tags:
   - labor
   - cinema
   - acting
-  - television series
-  - exhaustion
-  - professional freedom
 ---
 
 ## Sette Olanları AİHM’ye Götürsek Kazanırız

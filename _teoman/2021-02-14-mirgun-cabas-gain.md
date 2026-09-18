@@ -17,7 +17,6 @@ tags:
   - meaning
   - success
   - self-discipline
-  - plans
   - songwriting
   - rock star identity
 ---

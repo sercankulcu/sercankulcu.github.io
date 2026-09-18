@@ -11,7 +11,6 @@ publication_note: "Originally published in Episode issue 27; web archive publish
 tags:
   - Saygı
   - Ercüment Çözer
-  - 9,75
   - Behzat Ç.
   - Barda
   - Kaybedenler Kulübü
@@ -24,8 +23,6 @@ tags:
   - 1990s
   - Gezi
   - rock
-  - punk
-  - subculture
 ---
 
 ## Episode: Kötüyü Kötü Oynamıyorum

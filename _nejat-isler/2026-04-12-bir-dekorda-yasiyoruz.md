@@ -8,18 +8,13 @@ type: "video interview"
 verification: "primary"
 confidence: "high"
 tags:
-  - modern life
   - happiness
-  - comfort
   - money
   - simplicity
-  - consumption
   - relationships
   - Miras
   - writing
   - freedom
-  - possessions
-  - public life
 ---
 
 ## Bir Dekorda Yaşıyoruz

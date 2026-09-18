@@ -6,15 +6,11 @@ type: "interview"
 verification: "primary"
 confidence: "high"
 tags:
-  - Gülbeyaz
   - early career
   - fame
   - acting
-  - leading-man image
-  - street vending
   - television
   - public image
-  - professional identity
 ---
 
 ## İşportacıydı Artık Yıldız

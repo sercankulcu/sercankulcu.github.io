@@ -9,13 +9,10 @@ confidence: "high"
 tags:
   - Koyu Antoloji
   - songwriting
-  - creative fatigue
   - retirement
   - artistic legacy
-  - old songs
   - reinterpretation
   - aging
-  - self-criticism
 ---
 
 ## Teoman'dan Arşivlik Albüm: Koyu Antoloji

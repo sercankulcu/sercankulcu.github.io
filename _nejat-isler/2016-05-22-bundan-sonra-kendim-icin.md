@@ -17,7 +17,6 @@ tags:
   - observation
   - music
   - purpose
-  - contribution
 ---
 
 ## Bundan Sonra Artık Kendim İçin Hiçbir Şey Yapmayacağım

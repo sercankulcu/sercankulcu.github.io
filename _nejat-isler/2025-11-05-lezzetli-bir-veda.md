@@ -13,7 +13,6 @@ tags:
   - youth
   - friendship
   - loss
-  - farewell
   - memory
   - Gümüşlük
   - Istanbul
