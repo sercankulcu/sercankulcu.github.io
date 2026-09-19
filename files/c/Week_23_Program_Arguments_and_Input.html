@@ -1,0 +1,402 @@
+---
+layout: without-sidebar
+title: "Week 23 — Program Arguments and Input"
+permalink: /files/c/Week_23_Program_Arguments_and_Input.html
+excerpt: "argc and argv, converting text to numbers with strtol and strtod, validating and rejecting malformed input, and writing programs that compose in a shell pipeline."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Intermediate · Week 23</div>
+  <h1>Program Arguments and Input</h1>
+  <p class="c-wk-lead">A program that only talks to a human at a prompt cannot be scripted, tested, or combined with anything else. This week connects your programs to the command line and to standard input — and takes validation seriously, because every one of those inputs comes from outside your control.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Read command-line arguments and explain the structure of <code>argv</code>.</li>
+      <li>Convert text to numbers with full error detection, and say why <code>atoi</code> cannot.</li>
+      <li>Reject malformed, out-of-range, and missing input with useful messages.</li>
+      <li>Read an arbitrary number of lines from standard input safely.</li>
+      <li>Write a program that behaves correctly inside a shell pipeline.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span><code>argc</code> and <code>argv</code></h2>
+
+<pre><code>int main(int argc, char *argv[])
+{
+    for (int i = 0; i &lt; argc; i++) {
+        printf("argv[%d] = \"%s\"\n", i, argv[i]);
+    }
+    return 0;
+}</code></pre>
+
+<pre><code>$ ./prog hello 42 "two words"
+argv[0] = "./prog"
+argv[1] = "hello"
+argv[2] = "42"
+argv[3] = "two words"</code></pre>
+
+  <p><code>argv</code> is an array of pointers to strings — exactly the shape week 15 introduced. Four facts about it:</p>
+
+  <ul>
+    <li><code>argv[0]</code> is the program name as invoked. Use it in error messages so they identify themselves.</li>
+    <li>Real arguments start at <code>argv[1]</code>, so <code>argc</code> is always at least 1.</li>
+    <li><code>argv[argc]</code> is guaranteed to be <code>NULL</code>, which allows a pointer-walk loop as an alternative to counting.</li>
+    <li><strong>Everything is a string.</strong> The shell has already split the command line on whitespace and removed quotes; <code>42</code> arrives as two characters and a terminator, not as an integer.</li>
+  </ul>
+
+<pre><code>/* two equivalent traversals */
+for (int i = 1; i &lt; argc; i++)        { use(argv[i]); }
+for (char **p = argv + 1; *p; p++)    { use(*p);      }</code></pre>
+
+  <p>Always check <code>argc</code> before indexing. Reading <code>argv[1]</code> when the user supplied no arguments reads the guaranteed <code>NULL</code> and then dereferences it.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Text to number, done properly</h2>
+
+  <p>Week 16 introduced <code>strtol</code>; here is the full argument for it.</p>
+
+  <table>
+    <thead><tr><th></th><th><code>atoi</code></th><th><code>strtol</code></th></tr></thead>
+    <tbody>
+      <tr><td>Reports "not a number"</td><td>No — returns 0</td><td>Yes, via <code>endptr</code></td></tr>
+      <tr><td>Reports trailing rubbish</td><td>No — <code>"12abc"</code> gives 12</td><td>Yes, via <code>endptr</code></td></tr>
+      <tr><td>Reports overflow</td><td>No — undefined behavior</td><td>Yes, via <code>errno</code></td></tr>
+      <tr><td>Handles other bases</td><td>No</td><td>Yes</td></tr>
+    </tbody>
+  </table>
+
+  <p><code>atoi("abc")</code> returns 0, indistinguishable from <code>atoi("0")</code>. There is no combination of checks that recovers the difference. Treat <code>atoi</code> as unusable for input you did not generate yourself.</p>
+
+  <h3>The complete <code>strtol</code> pattern</h3>
+
+<pre><code>#include &lt;stdlib.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;limits.h&gt;
+
+bool parse_int(const char *text, int *out)
+{
+    if (text == NULL || *text == '\0') {
+        return false;                       /* empty */
+    }
+
+    errno = 0;
+    char *end;
+    long value = strtol(text, &amp;end, 10);
+
+    if (end == text)                        return false;  /* no digits   */
+    if (*end != '\0')                       return false;  /* trailing    */
+    if (errno == ERANGE)                    return false;  /* long range  */
+    if (value &lt; INT_MIN || value &gt; INT_MAX) return false;  /* int range   */
+
+    *out = (int)value;
+    return true;
+}</code></pre>
+
+  <p>Every line earns its place. <code>errno = 0</code> before the call is necessary because <code>strtol</code> only ever <em>sets</em> <code>errno</code>; a stale <code>ERANGE</code> from an earlier call would otherwise be misread. And the final range check is separate because <code>strtol</code> returns <code>long</code>, which on Linux is wider than <code>int</code> — without it, <code>"3000000000"</code> parses successfully and then truncates.</p>
+
+  <p><code>strtod</code> follows the identical pattern for floating point, and <code>strtoul</code> for unsigned values — with one trap: <code>strtoul("-1", …)</code> succeeds and returns <code>ULONG_MAX</code>, because negation is applied after conversion. Reject a leading minus yourself.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Reading standard input</h2>
+
+  <p>Week 8 established that <code>scanf</code> is difficult to use safely. The professional pattern is to read a whole line and then parse it, which separates two concerns that <code>scanf</code> conflates.</p>
+
+<pre><code>char line[256];
+while (fgets(line, sizeof line, stdin) != NULL) {
+    line[strcspn(line, "\n")] = '\0';     /* strip the newline */
+    process(line);
+}</code></pre>
+
+  <p><code>fgets</code> reads at most <code>size - 1</code> characters and always terminates, so it cannot overflow. It returns <code>NULL</code> at end of input, which makes the loop condition natural. And because it keeps the trailing newline when the line fits, the <code>strcspn</code> idiom removes it: <code>strcspn(line, "\n")</code> returns the index of the first newline, or the length if there is none, so the assignment is correct either way.</p>
+
+  <h3>Detecting an over-long line</h3>
+  <p>If no newline is present, the line was longer than the buffer and the rest is still waiting:</p>
+
+<pre><code>if (strchr(line, '\n') == NULL &amp;&amp; !feof(stdin)) {
+    /* line was truncated: consume the remainder */
+    int c;
+    while ((c = getchar()) != '\n' &amp;&amp; c != EOF) { }
+}</code></pre>
+
+  <p>Silently processing a truncated line is a real defect — in a configuration parser it can turn a long entry into a different, valid one. Week 26 covers stream state in full.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Behaving well in a pipeline</h2>
+
+  <p>A Unix tool is expected to follow four conventions. Following them costs nothing and makes your program composable:</p>
+
+  <table>
+    <thead><tr><th>Convention</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Results to <code>stdout</code>, diagnostics to <code>stderr</code></td><td><code>prog &gt; out.txt</code> keeps errors visible</td></tr>
+      <tr><td>Exit 0 on success, non-zero on failure</td><td><code>prog &amp;&amp; next</code> works</td></tr>
+      <tr><td>Read <code>stdin</code> when given no file</td><td><code>cat data | prog</code> works</td></tr>
+      <tr><td>Say nothing extra on success</td><td>Output can be piped into another tool</td></tr>
+    </tbody>
+  </table>
+
+  <p>The last is the one people find surprising. A program that prints "Processing complete!" to <code>stdout</code> has corrupted its own output for any consumer. If the message matters, send it to <code>stderr</code>.</p>
+
+<pre><code>fprintf(stderr, "%s: cannot open '%s'\n", argv[0], path);
+return EXIT_FAILURE;</code></pre>
+
+  <p>Prefixing with <code>argv[0]</code> is the standard form: in a long pipeline, an unattributed error message is nearly useless.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Worked example: a numeric filter</h2>
+
+  <p>A tool that reads numbers from standard input, applies a scale and an offset given as arguments, and prints the results — validating everything and composing properly.</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;limits.h&gt;
+
+static const char *program_name = "scale";
+
+static void usage(void)
+{
+    fprintf(stderr,
+        "usage: %s SCALE OFFSET\n"
+        "  reads one number per line from standard input,\n"
+        "  prints value * SCALE + OFFSET to standard output\n",
+        program_name);
+}
+
+/* Full validation: empty, non-numeric, trailing text, out of range. */
+static bool parse_double(const char *text, double *out)
+{
+    if (text == NULL || *text == '\0') {
+        return false;
+    }
+    errno = 0;
+    char *end;
+    double value = strtod(text, &amp;end);
+
+    if (end == text)     return false;      /* no conversion   */
+    while (*end == ' ' || *end == '\t') end++;   /* allow trailing spaces */
+    if (*end != '\0')    return false;      /* trailing rubbish */
+    if (errno == ERANGE) return false;      /* overflow/underflow */
+
+    *out = value;
+    return true;
+}
+
+static bool parse_int(const char *text, int *out)
+{
+    if (text == NULL || *text == '\0') {
+        return false;
+    }
+    errno = 0;
+    char *end;
+    long value = strtol(text, &amp;end, 10);
+
+    if (end == text)                        return false;
+    if (*end != '\0')                       return false;
+    if (errno == ERANGE)                    return false;
+    if (value &lt; INT_MIN || value &gt; INT_MAX) return false;
+
+    *out = (int)value;
+    return true;
+}
+
+int main(int argc, char *argv[])
+{
+    if (argc &gt; 0 &amp;&amp; argv[0] != NULL) {
+        program_name = argv[0];
+    }
+
+    if (argc != 3) {
+        fprintf(stderr, "%s: expected 2 arguments, got %d\n",
+                program_name, argc - 1);
+        usage();
+        return EXIT_FAILURE;
+    }
+
+    double scale, offset;
+    if (!parse_double(argv[1], &amp;scale)) {
+        fprintf(stderr, "%s: SCALE is not a number: \"%s\"\n",
+                program_name, argv[1]);
+        return EXIT_FAILURE;
+    }
+    if (!parse_double(argv[2], &amp;offset)) {
+        fprintf(stderr, "%s: OFFSET is not a number: \"%s\"\n",
+                program_name, argv[2]);
+        return EXIT_FAILURE;
+    }
+
+    char line[256];
+    long line_number = 0;
+    long accepted = 0, rejected = 0;
+
+    while (fgets(line, sizeof line, stdin) != NULL) {
+        line_number++;
+
+        /* Detect a line too long for the buffer. */
+        if (strchr(line, '\n') == NULL &amp;&amp; !feof(stdin)) {
+            fprintf(stderr, "%s: line %ld too long, skipping\n",
+                    program_name, line_number);
+            int c;
+            while ((c = getchar()) != '\n' &amp;&amp; c != EOF) { }
+            rejected++;
+            continue;
+        }
+
+        line[strcspn(line, "\n")] = '\0';
+
+        if (line[0] == '\0' || line[0] == '#') {
+            continue;                        /* blank line or comment */
+        }
+
+        double value;
+        if (!parse_double(line, &amp;value)) {
+            fprintf(stderr, "%s: line %ld: not a number: \"%s\"\n",
+                    program_name, line_number, line);
+            rejected++;
+            continue;
+        }
+
+        printf("%g\n", value * scale + offset);   /* result to stdout */
+        accepted++;
+    }
+
+    if (ferror(stdin)) {
+        fprintf(stderr, "%s: error reading input\n", program_name);
+        return EXIT_FAILURE;
+    }
+
+    fprintf(stderr, "%s: %ld accepted, %ld rejected\n",
+            program_name, accepted, rejected);
+
+    return rejected == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o scale scale.c</code></pre>
+
+  <h3>Exercise it from the shell</h3>
+
+<pre><code>printf '1\n2\n3\n' | ./scale 2 10
+</code></pre>
+<pre><code>12
+14
+16
+scale: 3 accepted, 0 rejected</code></pre>
+
+  <p>Note that the summary went to <code>stderr</code>, so it appeared on the terminal but is not part of the output. Prove it:</p>
+
+<pre><code>printf '1\n2\n3\n' | ./scale 2 10 &gt; results.txt
+cat results.txt</code></pre>
+<pre><code>12
+14
+16</code></pre>
+
+  <p>The results file contains only numbers — which is what lets the tool be chained:</p>
+
+<pre><code>printf '1\n2\n3\n' | ./scale 2 0 | ./scale 10 0 | paste -sd+ | bc</code></pre>
+
+  <h3>Every failure mode, checked</h3>
+
+<pre><code>./scale                        ; echo "status $?"   # too few arguments
+./scale 2                      ; echo "status $?"   # still too few
+./scale two 10                 ; echo "status $?"   # bad SCALE
+printf 'x\n' | ./scale 2 10    ; echo "status $?"   # bad data line
+printf '' | ./scale 2 10       ; echo "status $?"   # empty input
+printf '1e400\n' | ./scale 2 0 ; echo "status $?"   # overflow
+yes 1 | head -1000 | ./scale 1 0 &gt; /dev/null ; echo "status $?"</code></pre>
+
+  <table>
+    <thead><tr><th>Input</th><th>Expected</th></tr></thead>
+    <tbody>
+      <tr><td>No arguments</td><td>Usage on <code>stderr</code>, status 1</td></tr>
+      <tr><td><code>two</code> as SCALE</td><td>Named error, status 1</td></tr>
+      <tr><td>A non-numeric data line</td><td>Line number reported, other lines still processed</td></tr>
+      <tr><td>Empty input</td><td>No output, status 0 — zero lines is not an error</td></tr>
+      <tr><td><code>1e400</code></td><td>Rejected via <code>ERANGE</code>, not silently turned into infinity</td></tr>
+      <tr><td>A 500-character line</td><td>Reported as too long; the remainder is discarded, not misparsed</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Why the over-long line matters</h3>
+
+  <p>Remove the length check and feed it a long line:</p>
+
+<pre><code>python3 -c "print('1' * 300)" | ./scale 1 0</code></pre>
+
+  <p>Without the check, <code>fgets</code> returns the first 255 characters — a perfectly valid number — and the remaining 45 characters become a <em>second</em> line, also a valid number. One input line silently becomes two outputs. In a billing system or a sensor log that is a data-corruption bug, not a formatting one.</p>
+
+  <h3>The <code>atoi</code> comparison</h3>
+
+  <p>Replace <code>parse_double</code> with <code>atof</code> and try the failure cases again. <code>atof("two")</code> returns 0.0 and <code>atof("1e400")</code> returns infinity, both silently. Every rejection in the table above becomes an accepted wrong answer.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Reading <code>argv[1]</code> without checking <code>argc</code></td><td>Dereferences <code>NULL</code></td><td>Check <code>argc</code> first, always.</td></tr>
+      <tr><td>Using <code>atoi</code> on user input</td><td>Failure indistinguishable from 0</td><td><code>strtol</code> with <code>endptr</code> and <code>errno</code>.</td></tr>
+      <tr><td>Forgetting <code>errno = 0</code> before <code>strtol</code></td><td>A stale <code>ERANGE</code> misreported</td><td>Clear it immediately before the call.</td></tr>
+      <tr><td>Not range-checking the <code>long</code> result</td><td>Silent truncation into <code>int</code></td><td>Compare against <code>INT_MIN</code>/<code>INT_MAX</code>.</td></tr>
+      <tr><td>Accepting <code>"12abc"</code></td><td>Trailing rubbish ignored</td><td>Require <code>*end == '\0'</code>.</td></tr>
+      <tr><td>Diagnostics on <code>stdout</code></td><td>Corrupts piped output</td><td>Everything but results goes to <code>stderr</code>.</td></tr>
+      <tr><td>Always returning 0</td><td>Scripts cannot detect failure</td><td>Non-zero on any error.</td></tr>
+      <tr><td>Ignoring a truncated <code>fgets</code> line</td><td>One line silently becomes two records</td><td>Check for the newline and drain the rest.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">7</span>Check yourself</h2>
+
+  <details>
+    <summary>What is <code>argv[argc]</code>, and why is it useful?</summary>
+    <p>It is guaranteed to be <code>NULL</code>. That lets you walk the arguments with a pointer loop terminating on the null entry instead of counting, and it means an out-of-range read of <code>argv[argc]</code> yields <code>NULL</code> rather than garbage — though dereferencing it is still a crash, so check <code>argc</code> before indexing.</p>
+  </details>
+
+  <details>
+    <summary>Why can't <code>atoi</code> be made safe with extra checks?</summary>
+    <p>Because it discards the information you would need. It returns 0 both for the string <code>"0"</code> and for anything unparseable, stops silently at the first non-digit, and has undefined behavior on overflow. No check applied afterwards can recover which case occurred. <code>strtol</code> reports all three through <code>endptr</code> and <code>errno</code>.</p>
+  </details>
+
+  <details>
+    <summary>Why must <code>errno</code> be set to 0 before calling <code>strtol</code>?</summary>
+    <p>Because library functions only ever set <code>errno</code>; nothing clears it. A value left over from an unrelated earlier failure would still be there, so a successful conversion could appear to have overflowed. Clearing it immediately before the call makes the subsequent test meaningful.</p>
+  </details>
+
+  <details>
+    <summary>Why should a successful program print nothing beyond its results?</summary>
+    <p>Because <code>stdout</code> is the channel another program reads. A "done!" line becomes a record in the next tool's input and corrupts it. Progress and summary messages belong on <code>stderr</code>, which stays on the terminal when output is redirected and is ignored by a pipeline.</p>
+  </details>
+
+  <details>
+    <summary>What goes wrong if you ignore that <code>fgets</code> may have truncated a line?</summary>
+    <p>The remainder of the line is still in the stream and is returned by the next call, so one input line becomes two apparently valid records. If both halves happen to parse — as they do for a long run of digits — the program produces wrong output with no error at all. Check for the newline and discard the remainder explicitly.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Where this leads</h2>
+  <p>Week 24 surveys the rest of the standard library — the mathematics, time, and random-number facilities you have not needed until now — and teaches you to read its documentation rather than memorize it. Week 31 then returns to the command line with <code>getopt</code>, environment variables, and layered configuration, turning the filter you just wrote into a properly optioned tool.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_22_Unions_Enums_and_Typedef.html">← Week 22</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_24_Standard_Library_Toolbox.html">Week 24 →</a>
+</div>
+
+</div>

@@ -1,0 +1,605 @@
+---
+layout: without-sidebar
+title: "Week 30 — Function Pointers, Callbacks, and Generic Programming"
+permalink: /files/c/Week_30_Function_Pointers_and_Generic_Programming.html
+excerpt: "Function pointers and callbacks, qsort and bsearch, dispatch tables and polymorphism in C, void * containers, variadic functions with stdarg.h, and _Generic."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Advanced · Week 30</div>
+  <h1>Function Pointers, Callbacks, and Generic Programming</h1>
+  <p class="c-wk-lead">C has no templates, no interfaces, and no overloading. What it has are function pointers and <code>void *</code> — and between them they are enough to build everything those features provide, with the mechanism left visible.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Declare, assign, and call a function pointer, and read its declaration.</li>
+      <li>Use <code>qsort</code> and <code>bsearch</code> with comparators you write.</li>
+      <li>Build a dispatch table and simulate polymorphic behavior.</li>
+      <li>Write a container that works over any element type through <code>void *</code>.</li>
+      <li>Write a variadic function, and explain why it cannot check its arguments.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Function pointers</h2>
+
+  <p>A function has an address, so a pointer can hold it:</p>
+
+<pre><code>int add(int a, int b) { return a + b; }
+
+int (*operation)(int, int) = add;      /* declare and assign */
+int result = operation(3, 4);          /* call through it    */</code></pre>
+
+  <p>Apply week 16's right-left rule to <code>int (*operation)(int, int)</code>: start at <code>operation</code>, the parentheses force left to <code>*</code> — a pointer to — then right to <code>(int, int)</code> — a function taking two ints — then left to <code>int</code> — returning int. The parentheses are essential: without them, <code>int *operation(int, int)</code> declares a function returning <code>int *</code>.</p>
+
+  <p>The <code>&amp;</code> and <code>*</code> are optional in both directions. <code>operation = &amp;add</code> and <code>(*operation)(3, 4)</code> are legal and mean the same as the shorter forms. Most code omits them.</p>
+
+  <p>A <code>typedef</code> makes the type usable:</p>
+
+<pre><code>typedef int (*BinaryOp)(int, int);
+
+BinaryOp operation = add;
+void apply_all(const int *v, size_t n, BinaryOp op);</code></pre>
+
+  <p>This is the one case where hiding a pointer behind a <code>typedef</code> is standard practice, because the raw declaration is genuinely hard to read.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Callbacks and <code>qsort</code></h2>
+
+  <p>A callback is a function you pass to another function so it can call you back. The standard library's sort is the canonical example:</p>
+
+<pre><code>void qsort(void *base, size_t count, size_t size,
+           int (*compare)(const void *, const void *));</code></pre>
+
+  <p><code>qsort</code> knows nothing about your element type. It receives the base address, the number of elements, the size of one, and a function that can order two of them. Everything type-specific lives in the comparator.</p>
+
+<pre><code>static int compare_int(const void *a, const void *b)
+{
+    int x = *(const int *)a;
+    int y = *(const int *)b;
+    return (x &gt; y) - (x &lt; y);      /* -1, 0, or 1 without overflow */
+}
+
+qsort(values, n, sizeof values[0], compare_int);</code></pre>
+
+  <div class="c-wk-trap">
+    <p><strong>Do not write <code>return x - y;</code>.</strong> It is the textbook comparator and it overflows: with <code>x = INT_MAX</code> and <code>y = -1</code> the subtraction is undefined behavior and the sign can come out wrong, so the sort silently produces a wrong order. <code>(x &gt; y) - (x &lt; y)</code> is branch-free, cannot overflow, and yields exactly −1, 0, or 1.</p>
+  </div>
+
+  <p><code>bsearch</code> has the same shape and searches a <em>sorted</em> array with the same comparator:</p>
+
+<pre><code>int key = 42;
+int *found = bsearch(&amp;key, values, n, sizeof values[0], compare_int);</code></pre>
+
+  <p>Two requirements people forget: the array must already be sorted by the same comparator, and the key is passed <em>by address</em>, because the comparator takes <code>const void *</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Dispatch tables</h2>
+
+  <p>An array of function pointers replaces a long <code>switch</code> with a lookup:</p>
+
+<pre><code>typedef struct {
+    const char *name;
+    int (*handler)(int, int);
+} Command;
+
+static const Command commands[] = {
+    { "add", add }, { "sub", sub }, { "mul", mul }
+};
+
+for (size_t i = 0; i &lt; COUNT; i++) {
+    if (strcmp(input, commands[i].name) == 0) {
+        return commands[i].handler(a, b);
+    }
+}</code></pre>
+
+  <p>The advantage is not speed — a <code>switch</code> over small integers compiles to a jump table anyway. It is that the table is <em>data</em>: adding a command is one line in one place, the set can be iterated to produce a help listing, and a plugin can extend it at run time.</p>
+
+  <h3>Polymorphism</h3>
+
+  <p>Put function pointers inside a structure and you have virtual methods:</p>
+
+<pre><code>typedef struct Shape {
+    const char *name;
+    double (*area)(const struct Shape *);
+    double (*perimeter)(const struct Shape *);
+} Shape;
+
+typedef struct {
+    Shape base;            /* must be first: layout matters */
+    double radius;
+} Circle;
+
+static double circle_area(const Shape *s)
+{
+    const Circle *c = (const Circle *)s;      /* safe: base is first */
+    return 3.14159265358979 * c-&gt;radius * c-&gt;radius;
+}</code></pre>
+
+  <p>Because the base structure is the first member, a <code>Circle *</code> and a <code>Shape *</code> point at the same address, so the cast is well defined. This is precisely how C++ implements single inheritance, and how the Linux kernel's device model works — the mechanism is the same, only written out.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Generic containers with <code>void *</code></h2>
+
+  <p>A container that stores elements of unknown type must know three things: where an element is, how large it is, and how to operate on it.</p>
+
+<pre><code>typedef struct {
+    void   *data;          /* raw bytes             */
+    size_t  count;
+    size_t  capacity;
+    size_t  element_size;  /* supplied at creation  */
+} Vector;
+
+static void *element_at(const Vector *v, size_t i)
+{
+    return (char *)v-&gt;data + i * v-&gt;element_size;   /* char *: byte arithmetic */
+}</code></pre>
+
+  <p>The cast to <code>char *</code> is essential. Pointer arithmetic on <code>void *</code> is not standard C — GCC allows it as an extension, treating it as byte arithmetic, but portable code converts to <code>char *</code>, whose element size is 1 by definition.</p>
+
+  <table>
+    <thead><tr><th>Gain</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr><td>One implementation for every type</td><td>No type checking at all</td></tr>
+      <tr><td>Works with any element size</td><td>Every access needs a cast</td></tr>
+      <tr><td>Standard, portable</td><td><code>memcpy</code> per element instead of assignment</td></tr>
+    </tbody>
+  </table>
+
+  <p>The alternative is a macro that generates a typed container per element type — type-safe and fast, at the cost of unreadable macros and duplicated code. Both approaches are used in real projects; <code>void *</code> is the simpler one to get right.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Variadic functions</h2>
+
+<pre><code>#include &lt;stdarg.h&gt;
+
+int sum_all(int count, ...)
+{
+    va_list args;
+    va_start(args, count);          /* last NAMED parameter */
+
+    int total = 0;
+    for (int i = 0; i &lt; count; i++) {
+        total += va_arg(args, int); /* you state the type */
+    }
+
+    va_end(args);
+    return total;
+}</code></pre>
+
+  <p>Three rules. There must be at least one named parameter, and <code>va_start</code> names it. You must state each argument's type in <code>va_arg</code>, because nothing at run time records it. And <code>va_end</code> must be called before returning.</p>
+
+  <p>The function has no way to know how many arguments it received, so the count must arrive some other way — an explicit count, a sentinel value such as <code>NULL</code>, or a format string. That last option is what <code>printf</code> does, and it explains week 8's warning: a wrong specifier makes <code>printf</code> read the wrong number of bytes as the wrong type, and nothing can detect it.</p>
+
+  <p>Arguments also undergo <em>default promotions</em>: <code>float</code> becomes <code>double</code>, and types narrower than <code>int</code> become <code>int</code>. So <code>va_arg(args, float)</code> is always wrong — use <code>double</code>. Likewise <code>va_arg(args, char)</code>; use <code>int</code>.</p>
+
+  <p>To wrap a <code>printf</code>-like function, use the <code>v</code> variants that take a <code>va_list</code>:</p>
+
+<pre><code>void log_message(const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    vfprintf(stderr, fmt, args);    /* vfprintf, not fprintf */
+    va_end(args);
+}</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span><code>_Generic</code></h2>
+
+  <p>C11's <code>_Generic</code> selects an expression based on the <em>type</em> of a controlling expression, at compile time:</p>
+
+<pre><code>#define type_name(x) _Generic((x),        \
+    int:         "int",                   \
+    double:      "double",                \
+    char *:      "char *",                \
+    const char *: "const char *",         \
+    default:     "something else")
+
+#define absolute(x) _Generic((x), \
+    int:    abs,                  \
+    long:   labs,                 \
+    double: fabs)(x)</code></pre>
+
+  <p>This gives type-based dispatch with no runtime cost — the compiler picks one branch and discards the rest. It is how <code>&lt;tgmath.h&gt;</code> provides type-generic mathematics, and it is the closest C comes to overloading.</p>
+
+  <p>The limits are real: it selects on type only, the branches must all be valid expressions, and the syntax becomes unreadable past a handful of cases. Use it for thin wrappers, not as a general dispatch mechanism.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Worked example: the week 19 array, made generic</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdarg.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;math.h&gt;
+
+/* ================= generic vector ================= */
+
+typedef struct {
+    void   *data;
+    size_t  count;
+    size_t  capacity;
+    size_t  element_size;
+} Vector;
+
+static bool vector_init(Vector *v, size_t element_size, size_t capacity)
+{
+    if (capacity == 0) capacity = 4;
+    v-&gt;data = malloc(capacity * element_size);
+    if (v-&gt;data == NULL) return false;
+    v-&gt;count = 0;
+    v-&gt;capacity = capacity;
+    v-&gt;element_size = element_size;
+    return true;
+}
+
+static void vector_destroy(Vector *v)
+{
+    free(v-&gt;data);
+    v-&gt;data = NULL;
+    v-&gt;count = v-&gt;capacity = 0;
+}
+
+static void *vector_at(const Vector *v, size_t i)
+{
+    return (char *)v-&gt;data + i * v-&gt;element_size;   /* byte arithmetic */
+}
+
+static bool vector_push(Vector *v, const void *element)
+{
+    if (v-&gt;count == v-&gt;capacity) {
+        size_t bigger = v-&gt;capacity * 2;
+        void *moved = realloc(v-&gt;data, bigger * v-&gt;element_size);
+        if (moved == NULL) return false;
+        v-&gt;data = moved;
+        v-&gt;capacity = bigger;
+    }
+    memcpy(vector_at(v, v-&gt;count), element, v-&gt;element_size);
+    v-&gt;count++;
+    return true;
+}
+
+/* A callback applied to every element: the visitor pattern in C. */
+static void vector_each(const Vector *v, void (*visit)(const void *, void *),
+                        void *context)
+{
+    for (size_t i = 0; i &lt; v-&gt;count; i++) {
+        visit(vector_at(v, i), context);
+    }
+}
+
+static void vector_sort(Vector *v, int (*cmp)(const void *, const void *))
+{
+    qsort(v-&gt;data, v-&gt;count, v-&gt;element_size, cmp);
+}
+
+/* ================= comparators ================= */
+
+typedef struct { char name[16]; int score; } Student;
+
+/* Never x - y: it overflows. */
+static int cmp_int(const void *a, const void *b)
+{
+    int x = *(const int *)a, y = *(const int *)b;
+    return (x &gt; y) - (x &lt; y);
+}
+
+static int cmp_double(const void *a, const void *b)
+{
+    double x = *(const double *)a, y = *(const double *)b;
+    return (x &gt; y) - (x &lt; y);
+}
+
+static int cmp_student_score(const void *a, const void *b)
+{
+    const Student *x = a, *y = b;
+    return (y-&gt;score &gt; x-&gt;score) - (y-&gt;score &lt; x-&gt;score);   /* descending */
+}
+
+static int cmp_student_name(const void *a, const void *b)
+{
+    return strcmp(((const Student *)a)-&gt;name, ((const Student *)b)-&gt;name);
+}
+
+/* ================= visitors ================= */
+
+static void print_int(const void *e, void *ctx)
+{
+    (void)ctx;
+    printf("%d ", *(const int *)e);
+}
+
+static void sum_int(const void *e, void *ctx)
+{
+    *(long *)ctx += *(const int *)e;
+}
+
+static void print_student(const void *e, void *ctx)
+{
+    (void)ctx;
+    const Student *s = e;
+    printf("    %-10s %3d\n", s-&gt;name, s-&gt;score);
+}
+
+/* ================= dispatch table ================= */
+
+static int op_add(int a, int b) { return a + b; }
+static int op_sub(int a, int b) { return a - b; }
+static int op_mul(int a, int b) { return a * b; }
+
+typedef struct {
+    const char *name;
+    int (*fn)(int, int);
+    const char *help;
+} Command;
+
+static const Command commands[] = {
+    { "add", op_add, "a + b" },
+    { "sub", op_sub, "a - b" },
+    { "mul", op_mul, "a * b" }
+};
+#define COMMAND_COUNT (sizeof commands / sizeof commands[0])
+
+/* ================= polymorphism ================= */
+
+typedef struct Shape {
+    const char *name;
+    double (*area)(const struct Shape *);
+} Shape;
+
+typedef struct { Shape base; double radius; }        Circle;
+typedef struct { Shape base; double w, h; }          Rect;
+
+static double circle_area(const Shape *s)
+{
+    return 3.14159265358979 * ((const Circle *)s)-&gt;radius
+                            * ((const Circle *)s)-&gt;radius;
+}
+static double rect_area(const Shape *s)
+{
+    const Rect *r = (const Rect *)s;
+    return r-&gt;w * r-&gt;h;
+}
+
+/* ================= variadic ================= */
+
+static int sum_all(int count, ...)
+{
+    va_list args;
+    va_start(args, count);
+    int total = 0;
+    for (int i = 0; i &lt; count; i++) {
+        total += va_arg(args, int);
+    }
+    va_end(args);
+    return total;
+}
+
+/* A sentinel-terminated variadic function: no count needed. */
+static void print_all(const char *first, ...)
+{
+    va_list args;
+    va_start(args, first);
+    for (const char *s = first; s != NULL; s = va_arg(args, const char *)) {
+        printf("[%s] ", s);
+    }
+    va_end(args);
+    putchar('\n');
+}
+
+static void log_message(const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    fprintf(stderr, "log: ");
+    vfprintf(stderr, fmt, args);     /* the v-variant takes a va_list */
+    va_end(args);
+}
+
+/* ================= _Generic ================= */
+
+#define type_name(x) _Generic((x),   \
+    int:          "int",             \
+    long:         "long",            \
+    double:       "double",          \
+    char *:       "char *",          \
+    const char *: "const char *",    \
+    default:      "other")
+
+int main(void)
+{
+    puts("== one implementation, three element types ==");
+
+    Vector ints;
+    vector_init(&amp;ints, sizeof(int), 4);
+    int sample[] = { 42, 7, 99, 13, 5, 77 };
+    for (size_t i = 0; i &lt; 6; i++) vector_push(&amp;ints, &amp;sample[i]);
+
+    printf("  unsorted: ");  vector_each(&amp;ints, print_int, NULL);
+    vector_sort(&amp;ints, cmp_int);
+    printf("\n  sorted:   ");  vector_each(&amp;ints, print_int, NULL);
+
+    long total = 0;
+    vector_each(&amp;ints, sum_int, &amp;total);
+    printf("\n  sum via a visitor with context: %ld\n", total);
+
+    int key = 99;
+    int *found = bsearch(&amp;key, ints.data, ints.count, sizeof(int), cmp_int);
+    printf("  bsearch 99: %s\n", found ? "found" : "not found");
+
+    Vector doubles;
+    vector_init(&amp;doubles, sizeof(double), 4);
+    double d[] = { 2.5, 1.0, 3.75 };
+    for (size_t i = 0; i &lt; 3; i++) vector_push(&amp;doubles, &amp;d[i]);
+    vector_sort(&amp;doubles, cmp_double);
+    printf("  doubles sorted: %g %g %g\n",
+           *(double *)vector_at(&amp;doubles, 0),
+           *(double *)vector_at(&amp;doubles, 1),
+           *(double *)vector_at(&amp;doubles, 2));
+
+    Vector students;
+    vector_init(&amp;students, sizeof(Student), 4);
+    Student roster[] = {
+        { "Ada", 95 }, { "Dennis", 88 }, { "Ken", 91 }, { "Grace", 78 }
+    };
+    for (size_t i = 0; i &lt; 4; i++) vector_push(&amp;students, &amp;roster[i]);
+
+    puts("  students by score:");
+    vector_sort(&amp;students, cmp_student_score);
+    vector_each(&amp;students, print_student, NULL);
+    puts("  students by name:");
+    vector_sort(&amp;students, cmp_student_name);
+    vector_each(&amp;students, print_student, NULL);
+    puts("  the same sort and the same container, three element types");
+
+    puts("\n== dispatch table ==");
+    for (size_t i = 0; i &lt; COMMAND_COUNT; i++) {
+        printf("  %-4s (%s): %d\n", commands[i].name, commands[i].help,
+               commands[i].fn(10, 3));
+    }
+
+    puts("\n== polymorphism through a function pointer ==");
+    Circle c = { { "circle", circle_area }, 2.0 };
+    Rect   r = { { "rect",   rect_area   }, 3.0, 4.0 };
+    Shape *shapes[] = { (Shape *)&amp;c, (Shape *)&amp;r };
+    for (size_t i = 0; i &lt; 2; i++) {
+        printf("  %-7s area = %.4f\n", shapes[i]-&gt;name,
+               shapes[i]-&gt;area(shapes[i]));
+    }
+
+    puts("\n== variadic functions ==");
+    printf("  sum_all(3, 1,2,3)       = %d\n", sum_all(3, 1, 2, 3));
+    printf("  sum_all(5, 10,20,30,40,50) = %d\n",
+           sum_all(5, 10, 20, 30, 40, 50));
+    printf("  sentinel-terminated: ");
+    print_all("alpha", "beta", "gamma", NULL);
+    log_message("a wrapped printf, value = %d\n", 42);
+
+    puts("\n== _Generic ==");
+    int i_val = 1; double d_val = 1.0; const char *s_val = "x";
+    printf("  1     is %s\n", type_name(i_val));
+    printf("  1.0   is %s\n", type_name(d_val));
+    printf("  \"x\"   is %s\n", type_name(s_val));
+
+    vector_destroy(&amp;ints);
+    vector_destroy(&amp;doubles);
+    vector_destroy(&amp;students);
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o generic generic.c -lm
+./generic</code></pre>
+
+  <h3>Demonstrate the comparator overflow</h3>
+
+  <p>Replace <code>cmp_int</code> with the textbook version and sort a hostile array:</p>
+
+<pre><code>static int cmp_int_broken(const void *a, const void *b)
+{
+    return *(const int *)a - *(const int *)b;     /* overflows */
+}
+
+int hostile[] = { INT_MAX, -1, 0, INT_MIN, 5 };
+qsort(hostile, 5, sizeof hostile[0], cmp_int_broken);</code></pre>
+
+  <p><code>INT_MAX - (-1)</code> overflows and the sign is wrong, so the sort concludes that <code>INT_MAX</code> is smaller than −1. Build with <code>-fsanitize=undefined</code> and it is reported:</p>
+
+<pre><code>runtime error: signed integer overflow: 2147483647 - -1 cannot be
+represented in type 'int'</code></pre>
+
+  <p>Swap in the subtraction-free form and the same array sorts correctly. This is one of the most widespread bugs in C code that otherwise looks textbook-perfect.</p>
+
+  <h3>See that the type system is genuinely gone</h3>
+
+<pre><code>double wrong = 3.14;
+vector_push(&amp;ints, &amp;wrong);      /* compiles without a murmur */</code></pre>
+
+  <p>The vector copies <code>sizeof(int)</code> bytes out of a <code>double</code> and stores the result as an integer. No warning, no error — the price of <code>void *</code>. This is exactly the check a C++ template or a Rust generic would perform, and it is what the macro-based alternative buys back.</p>
+
+  <h3>Confirm the variadic promotion rule</h3>
+
+<pre><code>static double average(int count, ...)
+{
+    va_list args;
+    va_start(args, count);
+    double total = 0;
+    for (int i = 0; i &lt; count; i++) {
+        total += va_arg(args, float);    /* WRONG: always promoted to double */
+    }
+    va_end(args);
+    return total / count;
+}</code></pre>
+
+  <p>Call it with <code>average(2, 1.5f, 2.5f)</code> and the result is nonsense: the arguments were promoted to <code>double</code> and eight bytes were pushed, while <code>va_arg</code> reads four. Change <code>float</code> to <code>double</code> and it is correct.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>return x - y;</code> in a comparator</td><td>Overflow; wrong sort order</td><td><code>(x &gt; y) - (x &lt; y)</code>.</td></tr>
+      <tr><td><code>int *f(void)</code> when a function pointer was meant</td><td>Declares a function returning a pointer</td><td><code>int (*f)(void)</code> — parentheses.</td></tr>
+      <tr><td>Passing the key by value to <code>bsearch</code></td><td>Compile error or wrong results</td><td>Pass its address.</td></tr>
+      <tr><td><code>bsearch</code> on an unsorted array</td><td>Silently wrong results</td><td>Sort with the same comparator first.</td></tr>
+      <tr><td>Pointer arithmetic on <code>void *</code></td><td>Not standard C</td><td>Cast to <code>char *</code>.</td></tr>
+      <tr><td><code>va_arg(args, float)</code></td><td>Reads four bytes of an eight-byte value</td><td>Use <code>double</code>; likewise <code>int</code> for <code>char</code>.</td></tr>
+      <tr><td>Missing <code>va_end</code></td><td>Undefined behavior on some ABIs</td><td>Always call it before returning.</td></tr>
+      <tr><td>Base struct not first in a "derived" type</td><td>The upcast points at the wrong member</td><td>Put it first.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">9</span>Check yourself</h2>
+
+  <details>
+    <summary>Why must a comparator avoid <code>return x - y;</code>?</summary>
+    <p>Because the subtraction can overflow — <code>INT_MAX - (-1)</code> is undefined behavior — and when it wraps, the sign is wrong, so the sort concludes the larger value is smaller. The result is a silently mis-ordered array. <code>(x &gt; y) - (x &lt; y)</code> computes the same three-way answer without arithmetic that can overflow.</p>
+  </details>
+
+  <details>
+    <summary>How does <code>qsort</code> sort elements of a type it knows nothing about?</summary>
+    <p>It is told everything it needs: the base address, the element count, the size of one element so it can compute addresses and swap bytes, and a comparator that can order any two. All type-specific knowledge lives in the comparator you supply, which casts the <code>const void *</code> arguments back to the real type.</p>
+  </details>
+
+  <details>
+    <summary>Why cast to <code>char *</code> before doing arithmetic on a <code>void *</code>?</summary>
+    <p>Because arithmetic on <code>void *</code> is not standard C — the element size is unknown, so the scaling is undefined. GCC allows it as an extension treating it as bytes, but portable code converts to <code>char *</code>, whose element size the standard fixes at 1, making byte arithmetic explicit and correct everywhere.</p>
+  </details>
+
+  <details>
+    <summary>Why can a variadic function not check its arguments?</summary>
+    <p>Because nothing about the extra arguments survives to run time — no count, no types. The function must be told separately, through an explicit count, a sentinel value, or a format string. <code>va_arg</code> simply reads the number of bytes for the type you name, so a wrong type reads the wrong bytes. This is precisely why a mismatched <code>printf</code> specifier is undefined behavior.</p>
+  </details>
+
+  <details>
+    <summary>Why must the base structure be the first member when simulating inheritance?</summary>
+    <p>Because the standard guarantees that a pointer to a structure, suitably converted, points to its first member and vice versa. With the base first, a <code>Circle *</code> and a <code>Shape *</code> hold the same address, so casting between them is well defined. Put another member first and the cast silently yields a pointer to the wrong bytes.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">10</span>Where this leads</h2>
+  <p>Week 31 applies the callback idea to the outside of the program: parsing command-line options, layering configuration from files and the environment, and designing an interface a shell script can rely on. Then weeks 32 and 33 use the generic container you just built as the foundation for linked structures and an abstract data type.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_29_Building_and_Libraries.html">← Week 29</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_31_Command_Line_Interfaces_and_Environment.html">Week 31 →</a>
+</div>
+
+</div>

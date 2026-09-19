@@ -1,0 +1,525 @@
+---
+layout: without-sidebar
+title: "Week 31 — Command-Line Interfaces and the Environment"
+permalink: /files/c/Week_31_Command_Line_Interfaces_and_Environment.html
+excerpt: "Parsing options by hand and with getopt, exit and atexit, environment variables, layered configuration, and designing an interface a shell script can rely on."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Advanced · Week 31</div>
+  <h1>Command-Line Interfaces and the Environment</h1>
+  <p class="c-wk-lead">Week 23 read arguments. This week designs the interface they belong to: options with conventional spellings, configuration layered from several sources, exit codes a script can branch on, and diagnostics that identify themselves.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Parse short and long options, by hand and with <code>getopt</code>.</li>
+      <li>Use <code>exit</code>, <code>_Exit</code>, and <code>atexit</code>, and say how each differs from returning from <code>main</code>.</li>
+      <li>Read and set environment variables safely.</li>
+      <li>Layer configuration from defaults, a file, the environment, and the command line.</li>
+      <li>Design a tool that behaves correctly when driven by a script.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The conventions</h2>
+
+  <p>Unix option syntax is not a standard, but it is so consistent that departing from it makes a tool feel broken.</p>
+
+  <table>
+    <thead><tr><th>Form</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>-v</code></td><td>A short flag</td></tr>
+      <tr><td><code>-vqn</code></td><td>Several short flags combined</td></tr>
+      <tr><td><code>-o file</code> or <code>-ofile</code></td><td>A short option with an argument</td></tr>
+      <tr><td><code>--verbose</code></td><td>A long flag</td></tr>
+      <tr><td><code>--output=file</code> or <code>--output file</code></td><td>A long option with an argument</td></tr>
+      <tr><td><code>--</code></td><td>End of options; everything after is an operand</td></tr>
+      <tr><td><code>-</code></td><td>By convention, standard input or output</td></tr>
+    </tbody>
+  </table>
+
+  <p>The <code>--</code> separator matters more than it looks: it is the only way to pass a filename that begins with a dash. A tool that does not honour it cannot open a file called <code>-report.txt</code>.</p>
+
+  <p>Two options every tool should have: <code>--help</code>, printing usage and exiting successfully, and <code>--version</code>. Both are what a person tries first.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span><code>getopt</code></h2>
+
+  <p>POSIX provides a parser. It is not in the C standard, but it is available on Linux, macOS, and the BSDs, and it handles combined flags and attached arguments correctly.</p>
+
+<pre><code>#include &lt;unistd.h&gt;
+
+int opt;
+while ((opt = getopt(argc, argv, "vo:n:h")) != -1) {
+    switch (opt) {
+    case 'v': verbose = true;            break;
+    case 'o': output_path = optarg;      break;   /* : means takes an argument */
+    case 'n': count_text  = optarg;      break;
+    case 'h': usage(); return EXIT_SUCCESS;
+    case '?': usage(); return EXIT_FAILURE;       /* unknown or missing arg */
+    }
+}
+
+/* optind now indexes the first operand */
+for (int i = optind; i &lt; argc; i++) {
+    process_file(argv[i]);
+}</code></pre>
+
+  <table>
+    <thead><tr><th>Name</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>optarg</code></td><td>The argument of the option just returned</td></tr>
+      <tr><td><code>optind</code></td><td>Index of the next argument; after the loop, the first operand</td></tr>
+      <tr><td><code>opterr</code></td><td>Set to 0 to suppress <code>getopt</code>'s own error messages</td></tr>
+      <tr><td><code>optopt</code></td><td>The offending character when <code>'?'</code> is returned</td></tr>
+    </tbody>
+  </table>
+
+  <p>A leading <code>:</code> in the option string — <code>":vo:n:h"</code> — makes a missing argument return <code>':'</code> rather than <code>'?'</code>, letting you distinguish "unknown option" from "option needs a value". Combined with <code>opterr = 0</code>, that gives you full control of the messages.</p>
+
+  <p>For long options, GNU provides <code>getopt_long</code> in <code>&lt;getopt.h&gt;</code>. It is not POSIX, so portable code either hand-parses the long forms or accepts the dependency.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Termination</h2>
+
+  <table>
+    <thead><tr><th>Way out</th><th>Runs <code>atexit</code> handlers</th><th>Flushes streams</th></tr></thead>
+    <tbody>
+      <tr><td><code>return</code> from <code>main</code></td><td>Yes</td><td>Yes</td></tr>
+      <tr><td><code>exit(status)</code></td><td>Yes</td><td>Yes</td></tr>
+      <tr><td><code>_Exit(status)</code></td><td>No</td><td>No</td></tr>
+      <tr><td><code>abort()</code></td><td>No</td><td>No; raises <code>SIGABRT</code></td></tr>
+    </tbody>
+  </table>
+
+  <p><code>exit</code> is what you call from deep inside a call chain when there is no sensible way to propagate the failure — though in a library that is almost always the wrong choice, because a library must let its caller decide.</p>
+
+<pre><code>#include &lt;stdlib.h&gt;
+
+static void cleanup(void)
+{
+    remove(temp_path);
+}
+
+atexit(cleanup);        /* registered handlers run in reverse order */</code></pre>
+
+  <p><code>atexit</code> handlers run on normal termination only. They do not run on <code>_Exit</code>, on <code>abort</code>, or on a fatal signal — so they are not a substitute for real cleanup on the error path, and a temporary file can survive a crash. Week 39 covers signal handling.</p>
+
+  <h3>Exit codes</h3>
+  <p>Zero for success, non-zero for failure. Beyond that, a few conventions are widely followed:</p>
+
+  <table>
+    <thead><tr><th>Code</th><th>Conventional meaning</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>Success</td></tr>
+      <tr><td>1</td><td>General failure</td></tr>
+      <tr><td>2</td><td>Misuse: bad options or arguments</td></tr>
+      <tr><td>&gt;128</td><td>Killed by signal (128 + signal number)</td></tr>
+    </tbody>
+  </table>
+
+  <p>Only the low eight bits reach the shell, so <code>exit(256)</code> is seen as 0. Keep codes in 0–125.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>The environment</h2>
+
+<pre><code>#include &lt;stdlib.h&gt;
+
+const char *home = getenv("HOME");        /* NULL if not set */
+if (home == NULL) {
+    home = "/tmp";                        /* a default */
+}</code></pre>
+
+  <p>Three rules. <code>getenv</code> returns <code>NULL</code> for an unset variable, so always have a default. The returned pointer points into the environment block and may be invalidated by a later <code>setenv</code> or <code>putenv</code>, so copy it if you keep it. And the value is entirely under the user's control — treat it exactly as you would treat command-line input, which means validating it.</p>
+
+  <p><code>setenv</code> and <code>unsetenv</code> are POSIX rather than standard C:</p>
+<pre><code>setenv("LANG", "C", 1);       /* 1 = overwrite if already set */
+unsetenv("LANG");</code></pre>
+
+  <div class="c-wk-trap">
+    <p><strong>Environment variables are untrusted input.</strong> A <code>PATH</code> or a config path taken from the environment and used without validation is a classic privilege-escalation vector, which is why setuid programs are required to scrub their environment. Week 38 returns to this; for now, validate environment values with the same care as <code>argv</code>.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Layered configuration</h2>
+
+  <p>A setting can come from four places. Apply them in this order, each overriding the last:</p>
+
+  <ol>
+    <li><strong>Built-in defaults</strong> — the program always works with no configuration at all.</li>
+    <li><strong>A configuration file</strong> — system-wide, then per-user.</li>
+    <li><strong>Environment variables</strong> — per-session.</li>
+    <li><strong>Command-line options</strong> — this invocation, highest priority.</li>
+  </ol>
+
+  <p>The ordering is the whole design. Anything more specific wins, so a user can set a default in a file, override it for a shell session with an environment variable, and override that for one run with a flag — without editing anything.</p>
+
+<pre><code>Config cfg;
+config_set_defaults(&amp;cfg);                 /* 1 */
+config_load_file(&amp;cfg, "/etc/tool.conf");  /* 2 */
+config_load_file(&amp;cfg, user_config_path);  /* 2 */
+config_load_env(&amp;cfg);                     /* 3 */
+config_apply_options(&amp;cfg, argc, argv);    /* 4 */</code></pre>
+
+  <p>Give the tool a way to show the result — <code>--show-config</code> — so a user can find out which layer won. Debugging a setting that "does not take effect" is otherwise miserable.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: a properly optioned filter</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;limits.h&gt;
+#include &lt;unistd.h&gt;
+
+#define VERSION "1.0"
+#define EXIT_USAGE 2
+
+static const char *program_name = "filter";
+
+typedef struct {
+    bool        verbose;
+    long        maximum;
+    const char *output_path;
+    const char *prefix;
+} Config;
+
+static void usage(FILE *to)
+{
+    fprintf(to,
+        "usage: %s [options] [file...]\n"
+        "\n"
+        "  -v            verbose diagnostics on stderr\n"
+        "  -n LIMIT      stop after LIMIT lines (default 0 = unlimited)\n"
+        "  -o FILE       write to FILE instead of stdout\n"
+        "  -p PREFIX     prefix every output line\n"
+        "  -h            show this help and exit\n"
+        "  -V            show the version and exit\n"
+        "\n"
+        "  With no file operands, or with '-', reads standard input.\n"
+        "  Use '--' to end options before a filename beginning with '-'.\n"
+        "\n"
+        "Environment:\n"
+        "  FILTER_PREFIX   default for -p\n"
+        "  FILTER_MAX      default for -n\n"
+        "\n"
+        "Exit status: 0 success, 1 runtime error, %d usage error.\n",
+        program_name, EXIT_USAGE);
+}
+
+static bool parse_long(const char *text, long *out)
+{
+    if (text == NULL || *text == '\0') return false;
+    errno = 0;
+    char *end;
+    long value = strtol(text, &amp;end, 10);
+    if (end == text || *end != '\0' || errno == ERANGE) return false;
+    *out = value;
+    return true;
+}
+
+/* Layer 1: built-in defaults. */
+static void config_defaults(Config *c)
+{
+    c-&gt;verbose     = false;
+    c-&gt;maximum     = 0;
+    c-&gt;output_path = NULL;
+    c-&gt;prefix      = "";
+}
+
+/* Layer 3: the environment, overriding defaults. */
+static bool config_from_env(Config *c)
+{
+    const char *prefix = getenv("FILTER_PREFIX");
+    if (prefix != NULL) {
+        c-&gt;prefix = prefix;
+    }
+
+    const char *max_text = getenv("FILTER_MAX");
+    if (max_text != NULL) {
+        long value;
+        if (!parse_long(max_text, &amp;value) || value &lt; 0) {
+            fprintf(stderr, "%s: FILTER_MAX is not a valid count: \"%s\"\n",
+                    program_name, max_text);
+            return false;          /* environment input is validated too */
+        }
+        c-&gt;maximum = value;
+    }
+    return true;
+}
+
+/* A registered cleanup handler. */
+static char temp_marker[64];
+static void on_exit_cleanup(void)
+{
+    if (temp_marker[0] != '\0') {
+        remove(temp_marker);
+    }
+}
+
+static bool process_stream(FILE *in, FILE *out, const Config *c,
+                           const char *label, long *emitted)
+{
+    char line[512];
+    long count = 0;
+
+    while (fgets(line, sizeof line, in) != NULL) {
+        if (c-&gt;maximum &gt; 0 &amp;&amp; *emitted &gt;= c-&gt;maximum) {
+            break;
+        }
+        if (strchr(line, '\n') == NULL &amp;&amp; !feof(in)) {
+            fprintf(stderr, "%s: %s: line too long, truncating\n",
+                    program_name, label);
+            int ch;
+            while ((ch = fgetc(in)) != '\n' &amp;&amp; ch != EOF) { }
+        }
+        line[strcspn(line, "\n")] = '\0';
+
+        if (fprintf(out, "%s%s\n", c-&gt;prefix, line) &lt; 0) {
+            perror("write");
+            return false;
+        }
+        count++;
+        (*emitted)++;
+    }
+
+    if (ferror(in)) {
+        fprintf(stderr, "%s: %s: read error\n", program_name, label);
+        return false;
+    }
+    if (c-&gt;verbose) {
+        fprintf(stderr, "%s: %s: %ld lines\n", program_name, label, count);
+    }
+    return true;
+}
+
+int main(int argc, char *argv[])
+{
+    if (argc &gt; 0 &amp;&amp; argv[0] != NULL) {
+        program_name = argv[0];
+    }
+    atexit(on_exit_cleanup);
+
+    Config cfg;
+    config_defaults(&amp;cfg);                       /* layer 1 */
+    if (!config_from_env(&amp;cfg)) {                /* layer 3 */
+        return EXIT_USAGE;
+    }
+
+    /* Layer 4: command-line options, highest priority. */
+    opterr = 0;                                  /* our messages, not getopt's */
+    int opt;
+    while ((opt = getopt(argc, argv, ":vn:o:p:hV")) != -1) {
+        switch (opt) {
+        case 'v':
+            cfg.verbose = true;
+            break;
+        case 'n':
+            if (!parse_long(optarg, &amp;cfg.maximum) || cfg.maximum &lt; 0) {
+                fprintf(stderr, "%s: -n needs a non-negative number, got \"%s\"\n",
+                        program_name, optarg);
+                return EXIT_USAGE;
+            }
+            break;
+        case 'o':
+            cfg.output_path = optarg;
+            break;
+        case 'p':
+            cfg.prefix = optarg;
+            break;
+        case 'h':
+            usage(stdout);                       /* help goes to stdout */
+            return EXIT_SUCCESS;
+        case 'V':
+            printf("%s %s\n", program_name, VERSION);
+            return EXIT_SUCCESS;
+        case ':':
+            fprintf(stderr, "%s: option -%c requires an argument\n",
+                    program_name, optopt);
+            usage(stderr);                       /* errors go to stderr */
+            return EXIT_USAGE;
+        case '?':
+        default:
+            fprintf(stderr, "%s: unknown option -%c\n", program_name, optopt);
+            usage(stderr);
+            return EXIT_USAGE;
+        }
+    }
+
+    if (cfg.verbose) {
+        fprintf(stderr, "%s: config: verbose=%d max=%ld out=%s prefix=\"%s\"\n",
+                program_name, cfg.verbose, cfg.maximum,
+                cfg.output_path ? cfg.output_path : "&lt;stdout&gt;", cfg.prefix);
+    }
+
+    FILE *out = stdout;
+    if (cfg.output_path != NULL) {
+        out = fopen(cfg.output_path, "w");
+        if (out == NULL) {
+            fprintf(stderr, "%s: %s: %s\n",
+                    program_name, cfg.output_path, strerror(errno));
+            return EXIT_FAILURE;
+        }
+    }
+
+    int status = EXIT_SUCCESS;
+    long emitted = 0;
+
+    if (optind == argc) {
+        /* No operands: read standard input, as a filter should. */
+        if (!process_stream(stdin, out, &amp;cfg, "-", &amp;emitted)) {
+            status = EXIT_FAILURE;
+        }
+    } else {
+        for (int i = optind; i &lt; argc; i++) {
+            if (strcmp(argv[i], "-") == 0) {
+                if (!process_stream(stdin, out, &amp;cfg, "-", &amp;emitted)) {
+                    status = EXIT_FAILURE;
+                }
+                continue;
+            }
+            FILE *in = fopen(argv[i], "r");
+            if (in == NULL) {
+                fprintf(stderr, "%s: %s: %s\n",
+                        program_name, argv[i], strerror(errno));
+                status = EXIT_FAILURE;
+                continue;                        /* keep going, like grep */
+            }
+            if (!process_stream(in, out, &amp;cfg, argv[i], &amp;emitted)) {
+                status = EXIT_FAILURE;
+            }
+            fclose(in);
+        }
+    }
+
+    if (out != stdout &amp;&amp; fclose(out) != 0) {
+        perror("closing output");
+        status = EXIT_FAILURE;
+    }
+    return status;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o filter filter.c
+</code></pre>
+
+  <h3>Exercise every path</h3>
+
+<pre><code>printf 'a\nb\nc\n' | ./filter
+printf 'a\nb\nc\n' | ./filter -p '&gt; '
+printf 'a\nb\nc\n' | ./filter -n 2
+printf 'a\nb\nc\n' | ./filter -vp '# '          # combined short options
+./filter -h                     ; echo "status $?"
+./filter -V                     ; echo "status $?"
+./filter -x                     ; echo "status $?"   # unknown
+./filter -n                     ; echo "status $?"   # missing argument
+./filter -n abc                 ; echo "status $?"   # bad argument
+./filter no_such_file           ; echo "status $?"
+FILTER_PREFIX='env: ' printf 'x\n' | ./filter        # environment layer
+FILTER_PREFIX='env: ' ./filter -p 'flag: ' &lt;&lt;&lt; x     # flag wins</code></pre>
+
+  <table>
+    <thead><tr><th>Case</th><th>Expected</th></tr></thead>
+    <tbody>
+      <tr><td><code>-h</code></td><td>Usage on <em>stdout</em>, status 0 — help is the requested output</td></tr>
+      <tr><td><code>-x</code></td><td>Message and usage on <em>stderr</em>, status 2</td></tr>
+      <tr><td><code>-n</code> with nothing</td><td>"requires an argument", status 2</td></tr>
+      <tr><td>Missing file</td><td>Named error, continues to the next file, status 1</td></tr>
+      <tr><td><code>FILTER_PREFIX</code> and <code>-p</code></td><td>The flag wins: layer 4 over layer 3</td></tr>
+      <tr><td>No operands</td><td>Reads standard input</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Why help goes to stdout and errors go to stderr</h3>
+
+<pre><code>./filter -h | head -3           # works: help is on stdout
+./filter -x 2&gt; errors.txt       # the error is captured, not the output</code></pre>
+
+  <p>A user who typed <code>--help</code> asked for that text, so it is the program's output and belongs on <code>stdout</code> where it can be piped to a pager. A user who mistyped an option did not ask for anything, so the message is a diagnostic. Getting this backwards is one of the most common flaws in homemade tools.</p>
+
+  <h3>The <code>--</code> separator</h3>
+
+<pre><code>touch -- -weird.txt
+./filter -weird.txt             # fails: parsed as options
+./filter -- -weird.txt          # works</code></pre>
+
+  <p><code>getopt</code> handles <code>--</code> for you, stopping option parsing and leaving <code>optind</code> pointing at the operand. Hand-written parsers usually forget it.</p>
+
+  <h3>Confirm it composes</h3>
+
+<pre><code>seq 1 10 | ./filter -p 'n=' -n 3 | wc -l        # 3
+seq 1 10 | ./filter -v -n 3 2&gt;/dev/null | wc -l # 3, diagnostics discarded
+./filter missing1 missing2 2&gt;/dev/null; echo $? # 1, after trying both</code></pre>
+
+  <p>The last is deliberate: like <code>grep</code> and <code>cat</code>, the tool reports each failure and continues, then exits non-zero. Stopping at the first missing file would be a defensible alternative — but it must be a decision, and it must be documented.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Help printed to <code>stderr</code></td><td>Cannot be piped to a pager</td><td><code>--help</code> goes to <code>stdout</code>; errors to <code>stderr</code>.</td></tr>
+      <tr><td>Not honouring <code>--</code></td><td>Cannot process a file starting with a dash</td><td>Use <code>getopt</code>, which handles it.</td></tr>
+      <tr><td>Ignoring <code>optind</code></td><td>Operands are missed or options reprocessed</td><td>Start the operand loop at <code>optind</code>.</td></tr>
+      <tr><td>Trusting an environment variable</td><td>Injection or crash on bad input</td><td>Validate exactly as you would <code>argv</code>.</td></tr>
+      <tr><td>Keeping the pointer from <code>getenv</code></td><td>Invalidated by a later <code>setenv</code></td><td>Copy the value if you retain it.</td></tr>
+      <tr><td>Relying on <code>atexit</code> for cleanup</td><td>Does not run on a crash or signal</td><td>Clean up explicitly; week 27's single exit path.</td></tr>
+      <tr><td><code>exit</code> called from a library</td><td>Removes the caller's ability to recover</td><td>Return a status; only <code>main</code> decides to exit.</td></tr>
+      <tr><td>Exit codes above 255</td><td>Truncated to the low eight bits</td><td>Stay within 0–125.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why does <code>--help</code> output belong on <code>stdout</code> while an unknown-option message belongs on <code>stderr</code>?</summary>
+    <p>Because <code>--help</code> is what the user asked for — it is the program's output, and they will want to pipe it to a pager or grep it. An error message is a diagnostic about a request that failed; putting it on <code>stderr</code> keeps it visible when output is redirected and keeps it out of any pipeline consuming the results.</p>
+  </details>
+
+  <details>
+    <summary>What does <code>--</code> do, and why must a tool honour it?</summary>
+    <p>It ends option parsing: everything after it is treated as an operand even if it begins with a dash. Without it there is no way to name a file called <code>-report.txt</code>, because the parser would read it as options. <code>getopt</code> implements this automatically and leaves <code>optind</code> pointing past the separator.</p>
+  </details>
+
+  <details>
+    <summary>Why should environment variables be validated as carefully as command-line arguments?</summary>
+    <p>Because they are equally under the user's control, and often under the control of whoever launched the process. An unvalidated path or numeric setting taken from the environment can crash the program or, in a privileged context, redirect it to attacker-chosen files. The only safe assumption is that both sources are hostile.</p>
+  </details>
+
+  <details>
+    <summary>When does an <code>atexit</code> handler fail to run?</summary>
+    <p>On <code>_Exit</code>, on <code>abort</code>, and on any fatal signal — a segmentation fault, or the user pressing Ctrl-C without a handler installed. So <code>atexit</code> is a convenience for normal termination, not a guarantee. Anything that must be cleaned up reliably needs explicit handling on the error path and, for signals, the treatment in week 39.</p>
+  </details>
+
+  <details>
+    <summary>Why layer configuration defaults, file, environment, then command line?</summary>
+    <p>Because specificity should win. A default makes the program work with no setup; a file records a persistent preference; an environment variable scopes a change to one session; a flag applies to exactly one invocation. Each layer overriding the previous means a user can change any setting at the narrowest scope that suits them, without editing anything more permanent.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 32 returns inside the program to build linked data structures — the first place where week 21's self-referential types and week 19's allocation meet. From there week 33 adds trees and hash tables behind the opaque interface of week 28, completing the set of containers a C programmer is expected to be able to write from memory.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_30_Function_Pointers_and_Generic_Programming.html">← Week 30</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_32_Linked_Data_Structures.html">Week 32 →</a>
+</div>
+
+</div>

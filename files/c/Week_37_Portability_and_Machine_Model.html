@@ -1,0 +1,515 @@
+---
+layout: without-sidebar
+title: "Week 37 — Portability and the Machine Model"
+permalink: /files/c/Week_37_Portability_and_Machine_Model.html
+excerpt: "Fixed-width types in stdint.h, endianness and byte-order conversion, alignment with _Alignas and _Alignof, platform differences, UTF-8, and a portable binary record format."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Advanced · Week 37</div>
+  <h1>Portability and the Machine Model</h1>
+  <p class="c-wk-lead">Week 36 covered behavior with no requirements. This week covers behavior that is perfectly defined and simply different somewhere else — type widths, byte order, alignment, character encoding. It is the difference between code that runs here and code that runs everywhere.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Use <code>&lt;stdint.h&gt;</code> and say when a fixed width is required rather than preferred.</li>
+      <li>Detect and convert byte order, and explain why network protocols specify it.</li>
+      <li>Reason about alignment and use <code>_Alignas</code> and <code>_Alignof</code>.</li>
+      <li>Handle UTF-8 correctly without a library.</li>
+      <li>Write a binary format that survives moving between machines.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>What the standard does not fix</h2>
+
+  <table>
+    <thead><tr><th>Property</th><th>Guaranteed</th><th>Varies</th></tr></thead>
+    <tbody>
+      <tr><td><code>sizeof(char)</code></td><td>Exactly 1</td><td>Never</td></tr>
+      <tr><td><code>CHAR_BIT</code></td><td>At least 8</td><td>8 everywhere you will meet</td></tr>
+      <tr><td><code>sizeof(int)</code></td><td>At least 2</td><td>2 on small embedded, 4 elsewhere</td></tr>
+      <tr><td><code>sizeof(long)</code></td><td>At least 4</td><td><strong>4 on Windows, 8 on Linux and macOS</strong></td></tr>
+      <tr><td><code>sizeof(void *)</code></td><td>Nothing</td><td>4 or 8; unrelated to <code>sizeof(int)</code></td></tr>
+      <tr><td>Signedness of plain <code>char</code></td><td>Nothing</td><td>Signed on x86, unsigned on ARM</td></tr>
+      <tr><td>Byte order</td><td>Nothing</td><td>Little-endian on x86 and ARM; big-endian in network protocols</td></tr>
+      <tr><td>Structure padding</td><td>Nothing</td><td>Depends on compiler and target</td></tr>
+    </tbody>
+  </table>
+
+  <p>The <code>long</code> row is the one that catches working programmers. The three mainstream 64-bit data models disagree:</p>
+
+  <table>
+    <thead><tr><th>Model</th><th><code>int</code></th><th><code>long</code></th><th>pointer</th><th>Used by</th></tr></thead>
+    <tbody>
+      <tr><td>LP64</td><td>4</td><td>8</td><td>8</td><td>Linux, macOS, the BSDs</td></tr>
+      <tr><td>LLP64</td><td>4</td><td><strong>4</strong></td><td>8</td><td>64-bit Windows</td></tr>
+      <tr><td>ILP32</td><td>4</td><td>4</td><td>4</td><td>32-bit systems</td></tr>
+    </tbody>
+  </table>
+
+  <p>Code that assumes <code>long</code> holds a pointer or 64 bits works on Linux and breaks on Windows. Use <code>int64_t</code> when you mean 64 bits, and <code>intptr_t</code> when you mean "wide enough for a pointer".</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Fixed-width types</h2>
+
+<pre><code>#include &lt;stdint.h&gt;
+#include &lt;inttypes.h&gt;
+
+int8_t  int16_t  int32_t  int64_t        /* exactly this many bits */
+uint8_t uint16_t uint32_t uint64_t
+int_least16_t                            /* at least 16, smallest available */
+int_fast32_t                             /* at least 32, fastest available */
+intptr_t  uintptr_t                      /* can hold a pointer */
+size_t    ptrdiff_t                      /* sizes and differences */</code></pre>
+
+  <p>Printing them needs the macros from <code>&lt;inttypes.h&gt;</code>, because the underlying type differs by platform:</p>
+
+<pre><code>printf("%" PRId64 "\n", value);      /* int64_t  */
+printf("%" PRIu32 "\n", count);      /* uint32_t */
+printf("%zu\n", size);               /* size_t has its own specifier */</code></pre>
+
+  <p>The syntax is string-literal concatenation: <code>PRId64</code> expands to <code>"ld"</code> or <code>"lld"</code> as appropriate, and the adjacent literals join at compile time.</p>
+
+  <h3>When to use which</h3>
+
+  <table>
+    <thead><tr><th>Use</th><th>When</th></tr></thead>
+    <tbody>
+      <tr><td><code>int</code></td><td>Ordinary arithmetic, loop counters, small values. Still the default.</td></tr>
+      <tr><td><code>size_t</code></td><td>Sizes, counts, array indices</td></tr>
+      <tr><td><code>int32_t</code>, <code>uint8_t</code></td><td>File formats, protocols, hardware registers — anywhere the width is part of the contract</td></tr>
+      <tr><td><code>int_fast32_t</code></td><td>Hot loops where you want at least 32 bits and speed</td></tr>
+      <tr><td><code>intptr_t</code></td><td>Storing a pointer in an integer (rarely needed)</td></tr>
+    </tbody>
+  </table>
+
+  <p>Do not replace every <code>int</code> with <code>int32_t</code>. Fixed widths are for data whose layout is specified; for ordinary arithmetic, <code>int</code> is what the machine prefers and what everyone expects.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Byte order</h2>
+
+  <p>A multi-byte integer can be stored with its least significant byte first (<em>little-endian</em>) or last (<em>big-endian</em>). The value <code>0x12345678</code> in memory:</p>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 620 130" role="img" aria-label="The same 32-bit value stored little-endian and big-endian" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="120" y="20" width="70" height="34" rx="5"/><rect x="192" y="20" width="70" height="34" rx="5"/>
+        <rect x="264" y="20" width="70" height="34" rx="5"/><rect x="336" y="20" width="70" height="34" rx="5"/>
+        <rect x="120" y="70" width="70" height="34" rx="5"/><rect x="192" y="70" width="70" height="34" rx="5"/>
+        <rect x="264" y="70" width="70" height="34" rx="5"/><rect x="336" y="70" width="70" height="34" rx="5"/>
+      </g>
+      <g fill="currentColor" font-size="12.5" text-anchor="middle" font-family="inherit">
+        <text x="155" y="42">78</text><text x="227" y="42">56</text><text x="299" y="42">34</text><text x="371" y="42">12</text>
+        <text x="155" y="92">12</text><text x="227" y="92">34</text><text x="299" y="92">56</text><text x="371" y="92">78</text>
+      </g>
+      <g fill="currentColor" font-size="11.5" font-family="inherit" opacity=".75">
+        <text x="12" y="42">little-endian</text><text x="12" y="92">big-endian</text>
+        <text x="424" y="42">x86, ARM</text><text x="424" y="92">network order</text>
+      </g>
+      <g fill="currentColor" font-size="10.5" text-anchor="middle" opacity=".55" font-family="inherit">
+        <text x="155" y="122">addr+0</text><text x="227" y="122">+1</text><text x="299" y="122">+2</text><text x="371" y="122">+3</text>
+      </g>
+    </svg>
+    <p class="c-wk-cap">Same value, same four bytes, opposite order. Week 26's raw-struct file format depends on which machine wrote it.</p>
+  </div>
+
+  <p>This matters the moment bytes leave your process — a file, a socket, shared memory between different architectures.</p>
+
+<pre><code>#include &lt;arpa/inet.h&gt;        /* POSIX */
+
+uint32_t on_wire = htonl(host_value);     /* host TO network long  */
+uint32_t local   = ntohl(on_wire);        /* network TO host long  */
+uint16_t port    = htons(1234);           /* short version         */</code></pre>
+
+  <p>"Network byte order" is big-endian, fixed by convention since the earliest internet protocols. On a big-endian machine these functions do nothing; on a little-endian one they swap. Calling them unconditionally is correct everywhere, which is the point.</p>
+
+  <p>Without POSIX, do it explicitly — this version does not care what the host order is:</p>
+
+<pre><code>static void store_be32(uint8_t *out, uint32_t v)
+{
+    out[0] = (uint8_t)(v &gt;&gt; 24);
+    out[1] = (uint8_t)(v &gt;&gt; 16);
+    out[2] = (uint8_t)(v &gt;&gt;  8);
+    out[3] = (uint8_t)(v);
+}
+
+static uint32_t load_be32(const uint8_t *in)
+{
+    return ((uint32_t)in[0] &lt;&lt; 24) | ((uint32_t)in[1] &lt;&lt; 16)
+         | ((uint32_t)in[2] &lt;&lt;  8) |  (uint32_t)in[3];
+}</code></pre>
+
+  <p>Shifting works on <em>values</em>, not on the bytes in memory, so the result is identical on either architecture. This is the technique to use for a file format.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Alignment</h2>
+
+  <p>Most architectures require an object's address to be a multiple of its size — an <code>int</code> at a multiple of 4, a <code>double</code> at a multiple of 8. This is where week 22's structure padding came from.</p>
+
+<pre><code>printf("%zu\n", _Alignof(double));        /* usually 8 */
+_Alignas(64) char cache_line[64];         /* aligned to a cache line */</code></pre>
+
+  <p>An unaligned access is a crash on some architectures, and merely slow on x86. Reading a <code>uint32_t</code> straight out of a byte buffer is the usual way to cause one:</p>
+
+<pre><code>uint32_t bad  = *(uint32_t *)(buffer + 1);   /* alignment + aliasing UB */
+
+uint32_t good;
+memcpy(&amp;good, buffer + 1, sizeof good);      /* correct everywhere */</code></pre>
+
+  <p><code>memcpy</code> solves the alignment problem and the strict-aliasing problem from week 36 at the same time, and compiles to the same instruction on a platform that permits the unaligned load. It is the standard answer to "how do I read an integer out of a buffer".</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Text beyond ASCII</h2>
+
+  <p>Week 4 covered ASCII's 128 codes. Turkish needs ş, ğ, ı, ö, ü, ç; other languages need far more. Two approaches exist and one of them has won.</p>
+
+  <p><strong>Wide characters</strong> — <code>wchar_t</code> and <code>&lt;wchar.h&gt;</code> — use a fixed-width type per character. The trouble is that <code>wchar_t</code> is 32 bits on Linux and 16 on Windows, so it is not portable, and 16 bits is not enough for all of Unicode anyway.</p>
+
+  <p><strong>UTF-8</strong> encodes each code point in one to four bytes. It has three properties that made it universal:</p>
+
+  <ul>
+    <li>ASCII is unchanged — a byte below 0x80 means exactly what it always did.</li>
+    <li>No byte of a multi-byte sequence can be mistaken for ASCII, so <code>strchr(s, '/')</code> still works correctly.</li>
+    <li>It is byte-order independent, so no conversion is needed when it travels.</li>
+  </ul>
+
+  <p>The consequence for C is that <code>char *</code> holds UTF-8 perfectly well, and most string code needs no change. What changes is counting:</p>
+
+<pre><code>const char *s = "türkçe";
+strlen(s)          /* 8 BYTES, not 6 characters */</code></pre>
+
+  <p>To count characters, count the bytes that are not continuation bytes. A continuation byte has its top two bits set to <code>10</code>:</p>
+
+<pre><code>static size_t utf8_length(const char *s)
+{
+    size_t chars = 0;
+    for (; *s != '\0'; s++) {
+        if (((unsigned char)*s &amp; 0xC0) != 0x80) {
+            chars++;                       /* not a continuation byte */
+        }
+    }
+    return chars;
+}</code></pre>
+
+  <p>The practical rule: <strong>treat text as bytes wherever you can</strong> — copying, comparing, searching, and writing all work unchanged. Decode only when you must count characters, truncate for display, or change case. And never truncate a UTF-8 string at an arbitrary byte, or you will split a character in half.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: a portable record format</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;inttypes.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stddef.h&gt;
+
+/* ---------- what this machine looks like ---------- */
+
+static bool is_little_endian(void)
+{
+    uint32_t probe = 1;
+    unsigned char first;
+    memcpy(&amp;first, &amp;probe, 1);
+    return first == 1;
+}
+
+/* ---------- explicit big-endian accessors ---------- */
+
+static void store_be16(uint8_t *out, uint16_t v)
+{
+    out[0] = (uint8_t)(v &gt;&gt; 8);
+    out[1] = (uint8_t)(v);
+}
+static void store_be32(uint8_t *out, uint32_t v)
+{
+    out[0] = (uint8_t)(v &gt;&gt; 24); out[1] = (uint8_t)(v &gt;&gt; 16);
+    out[2] = (uint8_t)(v &gt;&gt;  8); out[3] = (uint8_t)(v);
+}
+static void store_be64(uint8_t *out, uint64_t v)
+{
+    for (int i = 0; i &lt; 8; i++) {
+        out[i] = (uint8_t)(v &gt;&gt; (56 - 8 * i));
+    }
+}
+static uint16_t load_be16(const uint8_t *in)
+{
+    return (uint16_t)(((uint16_t)in[0] &lt;&lt; 8) | in[1]);
+}
+static uint32_t load_be32(const uint8_t *in)
+{
+    return ((uint32_t)in[0] &lt;&lt; 24) | ((uint32_t)in[1] &lt;&lt; 16)
+         | ((uint32_t)in[2] &lt;&lt;  8) |  (uint32_t)in[3];
+}
+static uint64_t load_be64(const uint8_t *in)
+{
+    uint64_t v = 0;
+    for (int i = 0; i &lt; 8; i++) v = (v &lt;&lt; 8) | in[i];
+    return v;
+}
+
+/* ---------- the in-memory record ---------- */
+
+#define NAME_BYTES 32
+
+typedef struct {
+    uint32_t id;
+    uint16_t score;
+    uint64_t timestamp;
+    char     name[NAME_BYTES];      /* UTF-8 bytes, NUL padded */
+} Record;
+
+/* ---------- the wire format: fixed offsets, fixed widths, big-endian ----------
+ *   offset  size  field
+ *        0     4  magic   "CREC"
+ *        4     2  version
+ *        6     4  id
+ *       10     2  score
+ *       12     8  timestamp
+ *       20    32  name (UTF-8, NUL padded)
+ *   total 52 bytes, identical on every machine
+ */
+
+#define WIRE_SIZE   52
+#define WIRE_MAGIC  "CREC"
+#define WIRE_VERSION 1
+
+static void record_encode(const Record *r, uint8_t out[WIRE_SIZE])
+{
+    memcpy(out, WIRE_MAGIC, 4);
+    store_be16(out + 4,  WIRE_VERSION);
+    store_be32(out + 6,  r-&gt;id);
+    store_be16(out + 10, r-&gt;score);
+    store_be64(out + 12, r-&gt;timestamp);
+    memset(out + 20, 0, NAME_BYTES);
+    memcpy(out + 20, r-&gt;name, strnlen(r-&gt;name, NAME_BYTES));
+}
+
+static bool record_decode(const uint8_t in[WIRE_SIZE], Record *out)
+{
+    if (memcmp(in, WIRE_MAGIC, 4) != 0) {
+        return false;                       /* not our format */
+    }
+    uint16_t version = load_be16(in + 4);
+    if (version != WIRE_VERSION) {
+        return false;                       /* version check, not a guess */
+    }
+    out-&gt;id        = load_be32(in + 6);
+    out-&gt;score     = load_be16(in + 10);
+    out-&gt;timestamp = load_be64(in + 12);
+    memcpy(out-&gt;name, in + 20, NAME_BYTES);
+    out-&gt;name[NAME_BYTES - 1] = '\0';       /* guarantee termination */
+    return true;
+}
+
+/* ---------- UTF-8 ---------- */
+
+static size_t utf8_length(const char *s)
+{
+    size_t chars = 0;
+    for (; *s != '\0'; s++) {
+        if (((unsigned char)*s &amp; 0xC0) != 0x80) chars++;
+    }
+    return chars;
+}
+
+/* Truncate to at most max_bytes without splitting a character. */
+static size_t utf8_safe_truncate(const char *s, size_t max_bytes)
+{
+    if (strlen(s) &lt;= max_bytes) return strlen(s);
+    size_t cut = max_bytes;
+    while (cut &gt; 0 &amp;&amp; ((unsigned char)s[cut] &amp; 0xC0) == 0x80) {
+        cut--;                              /* back off to a lead byte */
+    }
+    return cut;
+}
+
+int main(void)
+{
+    puts("== this machine ==");
+    printf("  CHAR_BIT assumed 8; sizeof: int %zu, long %zu, void * %zu\n",
+           sizeof(int), sizeof(long), sizeof(void *));
+    printf("  data model  : %s\n",
+           sizeof(long) == 8 ? "LP64 (Linux/macOS)" :
+           sizeof(void *) == 8 ? "LLP64 (Windows)" : "ILP32");
+    printf("  byte order  : %s\n",
+           is_little_endian() ? "little-endian" : "big-endian");
+    printf("  alignment   : int %zu, double %zu, max %zu\n",
+           _Alignof(int), _Alignof(double), _Alignof(max_align_t));
+    printf("  plain char is %s\n", (char)-1 &lt; 0 ? "signed" : "unsigned");
+
+    puts("\n== why a raw struct is not a format ==");
+    printf("  sizeof(Record) = %zu, but the fields total %zu\n",
+           sizeof(Record), (size_t)(4 + 2 + 8 + NAME_BYTES));
+    printf("  offsets: id %zu, score %zu, timestamp %zu, name %zu\n",
+           offsetof(Record, id), offsetof(Record, score),
+           offsetof(Record, timestamp), offsetof(Record, name));
+    printf("  the wire format is a fixed %d bytes on every machine\n",
+           WIRE_SIZE);
+
+    puts("\n== encode and decode ==");
+    Record original = {
+        .id = 0x12345678u,
+        .score = 950,
+        .timestamp = UINT64_C(1735689600),
+        .name = "Ada Lovelace"
+    };
+
+    uint8_t wire[WIRE_SIZE];
+    record_encode(&amp;original, wire);
+
+    printf("  first 20 bytes: ");
+    for (int i = 0; i &lt; 20; i++) printf("%02X ", wire[i]);
+    putchar('\n');
+    puts("  note bytes 6-9 are 12 34 56 78 — most significant first,");
+    puts("  regardless of how this machine stores integers internally");
+
+    Record restored;
+    if (record_decode(wire, &amp;restored)) {
+        printf("  id        : 0x%08" PRIX32 " %s\n", restored.id,
+               restored.id == original.id ? "ok" : "MISMATCH");
+        printf("  score     : %" PRIu16 " %s\n", restored.score,
+               restored.score == original.score ? "ok" : "MISMATCH");
+        printf("  timestamp : %" PRIu64 " %s\n", restored.timestamp,
+               restored.timestamp == original.timestamp ? "ok" : "MISMATCH");
+        printf("  name      : \"%s\"\n", restored.name);
+    }
+
+    puts("\n== rejecting foreign and future data ==");
+    uint8_t alien[WIRE_SIZE] = { 'X','X','X','X' };
+    printf("  wrong magic   : %s\n",
+           record_decode(alien, &amp;restored) ? "accepted (bad)" : "rejected");
+    memcpy(alien, WIRE_MAGIC, 4);
+    store_be16(alien + 4, 99);
+    printf("  future version: %s\n",
+           record_decode(alien, &amp;restored) ? "accepted (bad)" : "rejected");
+
+    puts("\n== unaligned access ==");
+    uint8_t buffer[16] = { 0, 0x12, 0x34, 0x56, 0x78 };
+    uint32_t value;
+    memcpy(&amp;value, buffer + 1, sizeof value);     /* the correct way */
+    printf("  memcpy from an odd offset: 0x%08" PRIX32 "\n", value);
+    puts("  *(uint32_t *)(buffer + 1) would be an alignment and");
+    puts("  aliasing violation; it crashes on some architectures");
+
+    puts("\n== UTF-8 ==");
+    const char *turkish = "türkçe karakterler";
+    printf("  \"%s\"\n", turkish);
+    printf("  strlen      = %zu bytes\n", strlen(turkish));
+    printf("  utf8_length = %zu characters\n", utf8_length(turkish));
+
+    for (size_t limit = 1; limit &lt;= 4; limit++) {
+        size_t cut = utf8_safe_truncate(turkish, limit);
+        printf("  truncate to %zu bytes -&gt; %zu bytes: \"%.*s\"\n",
+               limit, cut, (int)cut, turkish);
+    }
+    puts("  cutting at an arbitrary byte would split a character in half");
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address,undefined -o portable portable.c
+./portable</code></pre>
+
+  <h3>Why the wire format is built this way</h3>
+
+  <p><strong>A magic number.</strong> Four bytes that identify the format, so a wrong file is rejected instead of misread. Every real binary format has one.</p>
+
+  <p><strong>A version field.</strong> Checked, not assumed. Without it, a version 2 file read by a version 1 program silently produces wrong values. With it, the program refuses and says why.</p>
+
+  <p><strong>Fixed widths and fixed offsets.</strong> Nothing depends on <code>sizeof</code> or on the compiler's padding. The record is 52 bytes on a 32-bit ARM board and on a 64-bit x86 server.</p>
+
+  <p><strong>Explicit byte order.</strong> The shift-based accessors operate on values, so they produce the same bytes regardless of host order. Note that the program prints <code>12 34 56 78</code> for <code>0x12345678</code> even though the machine stores it as <code>78 56 34 12</code> internally.</p>
+
+  <h3>Prove the endianness handling</h3>
+
+<pre><code>./portable | grep -A1 'first 20 bytes'
+xxd -l 20 &lt;&lt;&lt; ""            # for comparison with a raw struct dump</code></pre>
+
+  <p>If you have access to a big-endian environment — QEMU can emulate one, which weeks 49 onward use anyway — run the same program there. The debug output for byte order changes; the twenty bytes of wire format do not. That is the whole objective.</p>
+
+<pre><code>qemu-s390x -L /usr/s390x-linux-gnu ./portable_s390x   # big-endian target</code></pre>
+
+  <h3>Break it on purpose</h3>
+
+  <p>Replace <code>record_encode</code> with a raw structure write:</p>
+
+<pre><code>fwrite(&amp;original, sizeof original, 1, f);</code></pre>
+
+  <p>Now the file contains this compiler's padding, this machine's byte order, and this platform's type sizes. It is unreadable on any other configuration, and — worse — readable but <em>wrong</em> on a machine with the same sizes and different byte order. Week 26 used exactly this shortcut; here is the reason it was flagged as unsuitable for exchange.</p>
+
+  <h3>The UTF-8 truncation</h3>
+
+  <p>The output shows that truncating <code>"türkçe"</code> to 2 bytes yields 1 byte, because the <code>ü</code> occupies bytes 1 and 2 and cutting between them would produce invalid UTF-8. Naive truncation is how a database field or a display label ends in a replacement character — and in a protocol it can be a parsing failure rather than a cosmetic one.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Assuming <code>long</code> is 64 bits</td><td>Works on Linux, breaks on Windows</td><td><code>int64_t</code>.</td></tr>
+      <tr><td>Writing a raw struct to a file</td><td>Padding and byte order baked in</td><td>Explicit field-by-field encoding.</td></tr>
+      <tr><td>Forgetting <code>htonl</code> on a socket</td><td>Works between identical machines only</td><td>Convert at every boundary.</td></tr>
+      <tr><td><code>*(uint32_t *)(buf + 1)</code></td><td>Unaligned access and aliasing violation</td><td><code>memcpy</code>.</td></tr>
+      <tr><td><code>%d</code> for an <code>int64_t</code></td><td>Format mismatch on some platforms</td><td><code>PRId64</code> from <code>&lt;inttypes.h&gt;</code>.</td></tr>
+      <tr><td>Storing a byte value in plain <code>char</code></td><td>Signed on x86, unsigned on ARM</td><td><code>uint8_t</code>.</td></tr>
+      <tr><td><code>strlen</code> as a character count</td><td>Wrong for any non-ASCII text</td><td>Count non-continuation bytes.</td></tr>
+      <tr><td>Truncating UTF-8 at a byte boundary</td><td>Invalid sequence; broken display</td><td>Back off to a lead byte.</td></tr>
+      <tr><td>No magic or version in a binary format</td><td>Wrong files silently misread</td><td>Both, and check both.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why is <code>long</code> a poor choice for a 64-bit value?</summary>
+    <p>Because the standard guarantees only 32 bits, and the mainstream 64-bit platforms disagree: it is 8 bytes under LP64 on Linux and macOS and 4 bytes under LLP64 on Windows. Code assuming the wider size compiles on both and produces wrong results on one. <code>int64_t</code> states the requirement exactly.</p>
+  </details>
+
+  <details>
+    <summary>Why do the shift-based encoders work regardless of the host's byte order?</summary>
+    <p>Because shifting operates on the numeric <em>value</em>, not on its representation in memory. <code>v &gt;&gt; 24</code> extracts the most significant byte of the number on any machine, so writing it first always produces big-endian output. A cast-and-copy approach would instead expose whatever the host happens to store.</p>
+  </details>
+
+  <details>
+    <summary>Why use <code>memcpy</code> to read an integer out of a byte buffer?</summary>
+    <p>Because it solves two problems at once: the buffer offset may not satisfy the integer's alignment requirement, which crashes on some architectures, and casting the pointer would violate strict aliasing. <code>memcpy</code> is defined in both respects and compiles to the same single instruction where the hardware permits an unaligned load.</p>
+  </details>
+
+  <details>
+    <summary>What three properties made UTF-8 the universal encoding?</summary>
+    <p>ASCII passes through unchanged, so existing text and existing code keep working; no byte of a multi-byte sequence can be confused with an ASCII character, so byte-oriented searching and splitting stay correct; and it is byte-order independent, so it needs no conversion when it moves between machines.</p>
+  </details>
+
+  <details>
+    <summary>Why must a binary format carry a magic number and a version?</summary>
+    <p>The magic identifies the format so a wrong file is rejected rather than interpreted as garbage. The version lets a reader refuse data written by a newer writer instead of misreading it — the alternative is silently wrong values, which is far worse than an error. Both must be checked, not merely written.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 38 completes the language: the qualifiers <code>volatile</code>, <code>restrict</code>, and <code>register</code>, inline functions, compound literals, anonymous structures, variable-length arrays, and non-local jumps. <code>volatile</code> in particular is the bridge to the embedded weeks, where it stops being an optimization detail and becomes the difference between a working driver and a hanging one.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_36_Undefined_Behavior_and_Secure_Coding.html">← Week 36</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_38_Type_Qualifiers_and_Modern_C.html">Week 38 →</a>
+</div>
+
+</div>

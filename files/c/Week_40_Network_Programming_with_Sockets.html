@@ -1,0 +1,566 @@
+---
+layout: without-sidebar
+title: "Week 40 — Network Programming with Sockets"
+permalink: /files/c/Week_40_Network_Programming_with_Sockets.html
+excerpt: "The client-server model, TCP versus UDP, getaddrinfo and byte order, writing a client and a forking server, message framing, partial transfers and network errors."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Advanced · Week 40</div>
+  <h1>Network Programming with Sockets</h1>
+  <p class="c-wk-lead">A socket is a file descriptor, so everything from week 39 still applies — short transfers, <code>EINTR</code>, <code>close</code>. What is new is that the other end is a different machine, which makes byte order matter and makes message boundaries something you must invent yourself.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Explain the client and server call sequences and what each step does.</li>
+      <li>Resolve a host and port with <code>getaddrinfo</code> rather than hard-coded structures.</li>
+      <li>Write a TCP client and a forking server that survive real network conditions.</li>
+      <li>Frame messages over a stream that has no message boundaries.</li>
+      <li>Handle partial transfers, timeouts, and a peer that disappears.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The model</h2>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 620 190" role="img" aria-label="Client and server socket call sequences" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.4" opacity=".85">
+        <rect x="30" y="18" width="150" height="26" rx="6"/>
+        <rect x="30" y="54" width="150" height="26" rx="6"/>
+        <rect x="30" y="112" width="150" height="26" rx="6"/>
+        <rect x="30" y="148" width="150" height="26" rx="6"/>
+        <rect x="400" y="18" width="180" height="26" rx="6"/>
+        <rect x="400" y="54" width="180" height="26" rx="6"/>
+        <rect x="400" y="90" width="180" height="26" rx="6"/>
+        <rect x="400" y="126" width="180" height="26" rx="6"/>
+      </g>
+      <g fill="currentColor" font-size="11.5" text-anchor="middle" font-family="inherit">
+        <text x="105" y="35">socket()</text><text x="105" y="71">connect()</text>
+        <text x="105" y="129">send() / recv()</text><text x="105" y="165">close()</text>
+        <text x="490" y="35">socket()</text><text x="490" y="71">bind() + listen()</text>
+        <text x="490" y="107">accept()  — blocks</text><text x="490" y="143">send() / recv()</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1.4" opacity=".5">
+        <path d="M182 67h216"/><path d="M390 62l8 5-8 5" fill="none"/>
+        <path d="M398 125h-216"/><path d="M190 120l-8 5 8 5" fill="none"/>
+      </g>
+      <g fill="currentColor" font-size="10.5" text-anchor="middle" opacity=".6" font-family="inherit">
+        <text x="290" y="60">connection request</text>
+        <text x="290" y="145">data, both directions</text>
+        <text x="105" y="8">client</text><text x="490" y="8">server</text>
+      </g>
+    </svg>
+    <p class="c-wk-cap"><code>accept</code> returns a <em>new</em> descriptor for the connection; the listening socket stays open for the next one.</p>
+  </div>
+
+  <table>
+    <thead><tr><th></th><th>TCP (<code>SOCK_STREAM</code>)</th><th>UDP (<code>SOCK_DGRAM</code>)</th></tr></thead>
+    <tbody>
+      <tr><td>Connection</td><td>Established first</td><td>None</td></tr>
+      <tr><td>Delivery</td><td>Reliable, ordered</td><td>Best effort; may be lost, duplicated, reordered</td></tr>
+      <tr><td>Boundaries</td><td><strong>None — a byte stream</strong></td><td>Preserved per datagram</td></tr>
+      <tr><td>Used for</td><td>HTTP, SSH, databases</td><td>DNS, video, games</td></tr>
+    </tbody>
+  </table>
+
+  <p>The third row is the one that surprises people, and section 4 is about nothing else.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Addresses</h2>
+
+  <p>Do not fill in a <code>struct sockaddr_in</code> by hand. <code>getaddrinfo</code> resolves a host and service, handles IPv4 and IPv6 identically, and returns ready-made structures:</p>
+
+<pre><code>#include &lt;sys/socket.h&gt;
+#include &lt;netdb.h&gt;
+
+struct addrinfo hints;
+memset(&amp;hints, 0, sizeof hints);
+hints.ai_family   = AF_UNSPEC;      /* IPv4 or IPv6, whichever resolves */
+hints.ai_socktype = SOCK_STREAM;    /* TCP */
+
+struct addrinfo *list;
+int rc = getaddrinfo("example.com", "8080", &amp;hints, &amp;list);
+if (rc != 0) {
+    fprintf(stderr, "%s\n", gai_strerror(rc));   /* not perror */
+    return -1;
+}
+
+for (struct addrinfo *ai = list; ai != NULL; ai = ai-&gt;ai_next) {
+    int fd = socket(ai-&gt;ai_family, ai-&gt;ai_socktype, ai-&gt;ai_protocol);
+    if (fd &lt; 0) continue;
+    if (connect(fd, ai-&gt;ai_addr, ai-&gt;ai_addrlen) == 0) break;   /* success */
+    close(fd);
+}
+freeaddrinfo(list);                  /* the list is allocated */</code></pre>
+
+  <p>Two details: <code>getaddrinfo</code> returns its own error codes, so use <code>gai_strerror</code> rather than <code>perror</code>; and the result must be released with <code>freeaddrinfo</code>, which is week 19's ownership rule applied to a library.</p>
+
+  <p>Trying each address in turn matters. A host with both IPv6 and IPv4 addresses may be reachable on only one.</p>
+
+  <h3>Byte order</h3>
+
+  <p>Port numbers and addresses travel in network byte order — big-endian, as week 37 established. <code>getaddrinfo</code> handles it for the structures it fills, but any integer <em>you</em> put in a message needs converting:</p>
+
+<pre><code>uint32_t on_wire = htonl(value);
+uint32_t local   = ntohl(on_wire);</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>The server sequence</h2>
+
+<pre><code>int listener = socket(AF_INET6, SOCK_STREAM, 0);
+
+int yes = 1;
+setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &amp;yes, sizeof yes);
+
+bind(listener, addr, addrlen);
+listen(listener, 16);                        /* backlog */
+
+for (;;) {
+    int conn = accept(listener, NULL, NULL); /* a NEW descriptor */
+    handle(conn);
+    close(conn);
+}</code></pre>
+
+  <p><code>SO_REUSEADDR</code> is not optional in practice. After a server exits, the kernel keeps the address in <code>TIME_WAIT</code> for up to two minutes, and <code>bind</code> fails with "Address already in use" — the error every beginner hits on their second run. The option says it is acceptable to rebind.</p>
+
+  <p>The backlog is the queue of completed connections waiting for <code>accept</code>. Beyond it, further connections are refused.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Framing</h2>
+
+  <p>TCP delivers a stream of bytes with <strong>no record boundaries whatsoever</strong>. Three <code>send</code> calls of 10 bytes may arrive as one <code>recv</code> of 30, or as 30 of 1. Nothing preserves your message structure — you must impose it.</p>
+
+  <table>
+    <thead><tr><th>Scheme</th><th>How</th><th>Trade-off</th></tr></thead>
+    <tbody>
+      <tr><td>Delimiter</td><td>Messages end with <code>\n</code></td><td>Simple; the delimiter cannot appear in data</td></tr>
+      <tr><td>Length prefix</td><td>A 4-byte big-endian length, then the payload</td><td>Binary safe; must bound the length</td></tr>
+      <tr><td>Fixed size</td><td>Every message the same</td><td>Trivial; wasteful and inflexible</td></tr>
+    </tbody>
+  </table>
+
+  <div class="c-wk-trap">
+    <p><strong>Bound the declared length.</strong> A length-prefixed protocol that trusts the prefix hands an attacker <code>malloc(0xFFFFFFFF)</code> — or, after an integer overflow, a tiny buffer followed by a huge copy. Check the length against a maximum <em>before</em> allocating. This is week 36's allocation-overflow bug arriving over the network.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Partial transfers and errors</h2>
+
+  <p><code>send</code> and <code>recv</code> may transfer less than requested — more often than local files, because the network is slow and buffers fill. The loop from week 39 is mandatory here:</p>
+
+<pre><code>static ssize_t send_all(int fd, const void *data, size_t n)
+{
+    const char *p = data;
+    size_t sent = 0;
+    while (sent &lt; n) {
+        ssize_t s = send(fd, p + sent, n - sent, MSG_NOSIGNAL);
+        if (s &lt; 0) {
+            if (errno == EINTR) continue;
+            return -1;
+        }
+        sent += (size_t)s;
+    }
+    return (ssize_t)sent;
+}</code></pre>
+
+  <p><code>recv</code> returning 0 means the peer closed the connection in an orderly way — it is not an error and not a short read.</p>
+
+  <table>
+    <thead><tr><th>Condition</th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td><code>recv</code> returns 0</td><td>Peer closed; you are done</td></tr>
+      <tr><td><code>ECONNRESET</code></td><td>Peer vanished abruptly</td></tr>
+      <tr><td><code>EPIPE</code> + <code>SIGPIPE</code></td><td>You wrote to a closed connection</td></tr>
+      <tr><td><code>ETIMEDOUT</code></td><td>No response within the limit</td></tr>
+      <tr><td><code>EINTR</code></td><td>A signal arrived; retry</td></tr>
+    </tbody>
+  </table>
+
+  <p><code>SIGPIPE</code> deserves attention: by default, writing to a connection the peer has closed <strong>terminates your process</strong>. Pass <code>MSG_NOSIGNAL</code> to <code>send</code>, or ignore the signal once at startup — otherwise a client disconnecting at the wrong moment kills your server.</p>
+
+  <h3>Timeouts</h3>
+
+<pre><code>struct timeval tv = { .tv_sec = 5, .tv_usec = 0 };
+setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &amp;tv, sizeof tv);</code></pre>
+
+  <p>Without one, a peer that stops responding blocks you forever. A network program with no timeouts is not finished.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: a line server and its client</h2>
+
+<pre><code>/* echoserver.c — a TCP server, one forked child per connection */
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;signal.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;sys/wait.h&gt;
+#include &lt;netdb.h&gt;
+
+#define BACKLOG      16
+#define MAX_LINE   4096
+
+static volatile sig_atomic_t stop = 0;
+
+static void on_signal(int sig) { (void)sig; stop = 1; }
+
+/* Reap children so they do not become zombies — week 39. */
+static void on_child(int sig)
+{
+    (void)sig;
+    int saved = errno;                      /* waitpid may change errno */
+    while (waitpid(-1, NULL, WNOHANG) &gt; 0) { }
+    errno = saved;
+}
+
+static ssize_t send_all(int fd, const void *data, size_t n)
+{
+    const char *p = data;
+    size_t sent = 0;
+    while (sent &lt; n) {
+        ssize_t s = send(fd, p + sent, n - sent, MSG_NOSIGNAL);
+        if (s &lt; 0) {
+            if (errno == EINTR) continue;
+            return -1;
+        }
+        sent += (size_t)s;
+    }
+    return (ssize_t)sent;
+}
+
+/* Newline framing: accumulate until a '\n' appears. A stream has no
+   message boundaries, so this loop is what creates them. */
+static void serve_connection(int fd)
+{
+    char    buffer[MAX_LINE];
+    size_t  used = 0;
+    long    lines = 0;
+
+    struct timeval tv = { .tv_sec = 30, .tv_usec = 0 };
+    setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &amp;tv, sizeof tv);
+
+    const char *greeting = "ready\n";
+    if (send_all(fd, greeting, strlen(greeting)) &lt; 0) return;
+
+    for (;;) {
+        ssize_t r = recv(fd, buffer + used, sizeof buffer - used, 0);
+
+        if (r == 0) {
+            break;                          /* orderly close: not an error */
+        }
+        if (r &lt; 0) {
+            if (errno == EINTR) continue;
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                send_all(fd, "timeout\n", 8);
+            }
+            break;
+        }
+        used += (size_t)r;
+
+        /* One recv may contain zero, one, or several complete lines. */
+        char *start = buffer;
+        char *nl;
+        while ((nl = memchr(start, '\n', (size_t)(buffer + used - start)))) {
+            size_t len = (size_t)(nl - start);
+            lines++;
+
+            if (len == 4 &amp;&amp; memcmp(start, "quit", 4) == 0) {
+                send_all(fd, "bye\n", 4);
+                return;
+            }
+
+            char out[MAX_LINE + 32];
+            int n = snprintf(out, sizeof out, "%ld: %.*s\n",
+                             lines, (int)len, start);
+            if (n &gt; 0 &amp;&amp; send_all(fd, out, (size_t)n) &lt; 0) return;
+
+            start = nl + 1;
+        }
+
+        /* Move the incomplete remainder to the front. */
+        size_t leftover = (size_t)(buffer + used - start);
+        memmove(buffer, start, leftover);
+        used = leftover;
+
+        if (used == sizeof buffer) {        /* a line longer than the buffer */
+            send_all(fd, "line too long\n", 14);
+            return;
+        }
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    const char *port = (argc &gt; 1) ? argv[1] : "8080";
+
+    struct sigaction sa;
+    memset(&amp;sa, 0, sizeof sa);
+    sa.sa_handler = on_signal;
+    sigaction(SIGINT,  &amp;sa, NULL);
+    sigaction(SIGTERM, &amp;sa, NULL);
+
+    memset(&amp;sa, 0, sizeof sa);
+    sa.sa_handler = on_child;
+    sa.sa_flags   = SA_RESTART | SA_NOCLDSTOP;
+    sigaction(SIGCHLD, &amp;sa, NULL);
+
+    signal(SIGPIPE, SIG_IGN);               /* a closed peer must not kill us */
+
+    struct addrinfo hints;
+    memset(&amp;hints, 0, sizeof hints);
+    hints.ai_family   = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags    = AI_PASSIVE;         /* for bind */
+
+    struct addrinfo *list;
+    int rc = getaddrinfo(NULL, port, &amp;hints, &amp;list);
+    if (rc != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
+        return EXIT_FAILURE;
+    }
+
+    int listener = -1;
+    for (struct addrinfo *ai = list; ai != NULL; ai = ai-&gt;ai_next) {
+        listener = socket(ai-&gt;ai_family, ai-&gt;ai_socktype, ai-&gt;ai_protocol);
+        if (listener &lt; 0) continue;
+
+        int yes = 1;
+        setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &amp;yes, sizeof yes);
+
+        if (bind(listener, ai-&gt;ai_addr, ai-&gt;ai_addrlen) == 0) break;
+        close(listener);
+        listener = -1;
+    }
+    freeaddrinfo(list);
+
+    if (listener &lt; 0) {
+        perror("bind");
+        return EXIT_FAILURE;
+    }
+    if (listen(listener, BACKLOG) &lt; 0) {
+        perror("listen");
+        return EXIT_FAILURE;
+    }
+
+    printf("listening on port %s; Ctrl-C to stop\n", port);
+
+    while (!stop) {
+        int conn = accept(listener, NULL, NULL);
+        if (conn &lt; 0) {
+            if (errno == EINTR) continue;   /* a signal, not a failure */
+            perror("accept");
+            break;
+        }
+
+        pid_t pid = fork();
+        if (pid == 0) {
+            close(listener);                /* the child does not need it */
+            serve_connection(conn);
+            close(conn);
+            _exit(0);                       /* _exit in a child */
+        }
+        close(conn);                        /* the parent does not need it */
+        if (pid &lt; 0) perror("fork");
+    }
+
+    close(listener);
+    puts("\nstopped");
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>/* echoclient.c */
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;netdb.h&gt;
+
+static ssize_t send_all(int fd, const void *data, size_t n)
+{
+    const char *p = data;
+    size_t sent = 0;
+    while (sent &lt; n) {
+        ssize_t s = send(fd, p + sent, n - sent, MSG_NOSIGNAL);
+        if (s &lt; 0) { if (errno == EINTR) continue; return -1; }
+        sent += (size_t)s;
+    }
+    return (ssize_t)sent;
+}
+
+int main(int argc, char *argv[])
+{
+    const char *host = (argc &gt; 1) ? argv[1] : "localhost";
+    const char *port = (argc &gt; 2) ? argv[2] : "8080";
+
+    struct addrinfo hints;
+    memset(&amp;hints, 0, sizeof hints);
+    hints.ai_family   = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+
+    struct addrinfo *list;
+    int rc = getaddrinfo(host, port, &amp;hints, &amp;list);
+    if (rc != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
+        return EXIT_FAILURE;
+    }
+
+    int fd = -1;
+    for (struct addrinfo *ai = list; ai != NULL; ai = ai-&gt;ai_next) {
+        fd = socket(ai-&gt;ai_family, ai-&gt;ai_socktype, ai-&gt;ai_protocol);
+        if (fd &lt; 0) continue;
+        if (connect(fd, ai-&gt;ai_addr, ai-&gt;ai_addrlen) == 0) break;
+        close(fd);
+        fd = -1;
+    }
+    freeaddrinfo(list);
+
+    if (fd &lt; 0) { perror("connect"); return EXIT_FAILURE; }
+
+    struct timeval tv = { .tv_sec = 10, .tv_usec = 0 };
+    setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &amp;tv, sizeof tv);
+
+    char line[1024];
+    while (fgets(line, sizeof line, stdin) != NULL) {
+        if (send_all(fd, line, strlen(line)) &lt; 0) { perror("send"); break; }
+
+        char reply[2048];
+        ssize_t r = recv(fd, reply, sizeof reply - 1, 0);
+        if (r &lt; 0)  { perror("recv"); break; }
+        if (r == 0) { puts("server closed the connection"); break; }
+        reply[r] = '\0';
+        fputs(reply, stdout);
+    }
+
+    close(fd);
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -D_POSIX_C_SOURCE=200809L -Wall -Wextra -g -o echoserver echoserver.c
+gcc -std=c17 -D_POSIX_C_SOURCE=200809L -Wall -Wextra -g -o echoclient echoclient.c
+
+./echoserver 8080 &amp;
+printf 'hello\nworld\nquit\n' | ./echoclient localhost 8080</code></pre>
+
+<pre><code>ready
+1: hello
+2: world
+bye</code></pre>
+
+  <h3>Prove that a stream has no message boundaries</h3>
+
+<pre><code>{ printf 'he'; sleep 0.3; printf 'llo\nwor'; sleep 0.3; printf 'ld\nquit\n'; } \
+    | ./echoclient localhost 8080</code></pre>
+
+  <p>The bytes arrive in three pieces that do not align with lines, and the server still reports exactly two numbered lines. That is the framing loop working: it accumulates, extracts every complete line, and keeps the remainder for the next <code>recv</code>. Remove the <code>memmove</code> and the partial <code>"wor"</code> is lost.</p>
+
+  <p>The other direction is equally real: send a thousand short lines quickly and several will arrive in one <code>recv</code>. The inner <code>while</code> over <code>memchr</code> is why that works.</p>
+
+  <h3>Test the failure modes</h3>
+
+<pre><code>./echoclient localhost 9999            # nothing listening
+./echoclient no.such.host.invalid 8080 # resolution fails
+nc localhost 8080                      # connect with netcat, type, Ctrl-C
+head -c 1000000 /dev/zero | tr '\0' 'x' | ./echoclient localhost 8080</code></pre>
+
+  <table>
+    <thead><tr><th>Test</th><th>Expected</th></tr></thead>
+    <tbody>
+      <tr><td>No listener</td><td><code>connect: Connection refused</code></td></tr>
+      <tr><td>Bad hostname</td><td><code>getaddrinfo:</code> with a name-resolution message</td></tr>
+      <tr><td>Client killed mid-session</td><td>Server child exits; parent keeps serving</td></tr>
+      <tr><td>A line longer than the buffer</td><td><code>line too long</code>, connection closed — not an overflow</td></tr>
+      <tr><td>Two clients at once</td><td>Both served; one child each</td></tr>
+      <tr><td>Thirty seconds of silence</td><td><code>timeout</code>, connection closed</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The three defences that keep the server alive</h3>
+
+  <p><strong><code>SIGPIPE</code> ignored.</strong> Remove <code>signal(SIGPIPE, SIG_IGN)</code>, connect with <code>nc</code>, and kill the client while the server is replying. The server process dies — a client can terminate your service by disconnecting at the right moment.</p>
+
+  <p><strong><code>SIGCHLD</code> reaped.</strong> Remove the handler and run a hundred connections in a loop, then check <code>ps -el | grep defunct</code>. Every one is still there.</p>
+
+  <p><strong><code>SO_REUSEADDR</code>.</strong> Remove it, stop the server, and restart immediately: <code>bind: Address already in use</code> for up to two minutes.</p>
+
+  <h3>Watch the bytes</h3>
+
+<pre><code>sudo tcpdump -i lo -A 'port 8080'</code></pre>
+
+  <p>Seeing your own protocol on the wire is worth doing once. It also makes concrete that nothing in TCP marks where one message ends — only your newline does.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Assuming one <code>send</code> equals one <code>recv</code></td><td>Messages split or merged</td><td>Frame explicitly and accumulate.</td></tr>
+      <tr><td>Ignoring a short <code>send</code></td><td>Silent truncation</td><td>Loop with <code>send_all</code>.</td></tr>
+      <tr><td>Treating <code>recv</code> == 0 as an error</td><td>Misreports an orderly close</td><td>Zero means the peer finished.</td></tr>
+      <tr><td>No <code>SO_REUSEADDR</code></td><td><code>Address already in use</code> on restart</td><td>Set it before <code>bind</code>.</td></tr>
+      <tr><td>Not ignoring <code>SIGPIPE</code></td><td>A disconnecting client kills the server</td><td><code>SIG_IGN</code> or <code>MSG_NOSIGNAL</code>.</td></tr>
+      <tr><td>Not reaping children</td><td>Zombies accumulate</td><td><code>SIGCHLD</code> handler with <code>WNOHANG</code>.</td></tr>
+      <tr><td>Trusting a length prefix</td><td>Huge allocation or overflow</td><td>Bound it before allocating.</td></tr>
+      <tr><td>No timeouts</td><td>A silent peer blocks you forever</td><td><code>SO_RCVTIMEO</code> and <code>SO_SNDTIMEO</code>.</td></tr>
+      <tr><td>Sending integers without conversion</td><td>Works only between identical machines</td><td><code>htonl</code>/<code>ntohl</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why must a TCP protocol define its own message boundaries?</summary>
+    <p>Because TCP delivers a byte stream, not records. The bytes from several <code>send</code> calls may arrive in one <code>recv</code>, and one <code>send</code> may arrive split across many. Nothing in the protocol marks where a message ends, so the application must impose a delimiter, a length prefix, or a fixed size — and accumulate until a complete message is present.</p>
+  </details>
+
+  <details>
+    <summary>What does <code>recv</code> returning 0 mean, and how does it differ from a negative return?</summary>
+    <p>Zero means the peer performed an orderly shutdown — there will be no more data, and this is normal. A negative return means an error, with the reason in <code>errno</code>: <code>ECONNRESET</code> if the peer vanished, <code>EAGAIN</code> on a timeout, <code>EINTR</code> if a signal arrived and you should retry. Treating zero as an error misreports a clean disconnection.</p>
+  </details>
+
+  <details>
+    <summary>Why is <code>SO_REUSEADDR</code> effectively mandatory on a server?</summary>
+    <p>Because after a connection closes the kernel keeps the address in <code>TIME_WAIT</code> for up to two minutes to catch stray packets, and <code>bind</code> on that address fails during the wait. Without the option, restarting a server means waiting; with it, the kernel permits the rebind.</p>
+  </details>
+
+  <details>
+    <summary>How can a client disconnecting kill a server that never crashed?</summary>
+    <p>Writing to a connection whose peer has closed raises <code>SIGPIPE</code>, whose default action is to terminate the process. A client that disconnects while the server is mid-reply therefore kills it. Ignore the signal at startup, or pass <code>MSG_NOSIGNAL</code> to <code>send</code> so the error arrives as <code>EPIPE</code> instead.</p>
+  </details>
+
+  <details>
+    <summary>Why must a length-prefixed protocol bound the declared length?</summary>
+    <p>Because the prefix comes from the peer, who may be hostile. An unbounded value becomes an enormous allocation — a denial of service — or, if the length is multiplied by an element size that overflows, a small buffer followed by a huge copy. Validate the length against a maximum before allocating anything.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>This server forks a process per connection, which is simple and costs a few hundred kilobytes each — fine for tens of clients, hopeless for tens of thousands. Week 47 rewrites it as a single-threaded event loop using <code>epoll</code> and measures the difference. Week 41 first covers the other approach: threads sharing one address space.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_39_Processes_Signals_and_Low_Level_IO.html">← Week 39</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_41_Concurrency_and_Memory_Model.html">Week 41 →</a>
+</div>
+
+</div>

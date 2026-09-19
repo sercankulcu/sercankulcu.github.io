@@ -1,0 +1,420 @@
+---
+layout: without-sidebar
+title: "Week 34 — Performance and Memory Layout"
+permalink: /files/c/Week_34_Performance_and_Memory_Layout.html
+excerpt: "The memory hierarchy and cache behavior, data layout and structure packing, optimization levels, reading the generated assembly, and profiling with perf, gprof and callgrind."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Advanced · Week 34</div>
+  <h1>Performance and Memory Layout</h1>
+  <p class="c-wk-lead">Weeks 32 and 33 produced measurements that big-O could not explain: identical complexity, several times the runtime. The explanation is the memory hierarchy — and once you can see it, most performance work in C turns out to be about data layout rather than clever code.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Explain the cost of a cache miss and why locality dominates arithmetic.</li>
+      <li>Reorganize data so that a loop touches memory sequentially.</li>
+      <li>Read the assembly the compiler produced and see what it optimized.</li>
+      <li>Profile a program with <code>perf</code> or <code>gprof</code> instead of guessing.</li>
+      <li>Say when to stop optimizing and why clarity usually wins.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The memory hierarchy</h2>
+
+  <table>
+    <thead><tr><th>Level</th><th>Typical size</th><th>Latency</th><th>Relative</th></tr></thead>
+    <tbody>
+      <tr><td>Register</td><td>a few hundred bytes</td><td>0 cycles</td><td>1</td></tr>
+      <tr><td>L1 cache</td><td>32–64 KB</td><td>~4 cycles</td><td>4</td></tr>
+      <tr><td>L2 cache</td><td>256 KB – 1 MB</td><td>~12 cycles</td><td>12</td></tr>
+      <tr><td>L3 cache</td><td>8–32 MB</td><td>~40 cycles</td><td>40</td></tr>
+      <tr><td>Main memory</td><td>8–64 GB</td><td>~200 cycles</td><td><strong>200</strong></td></tr>
+      <tr><td>SSD</td><td>terabytes</td><td>~100 000 cycles</td><td>100 000</td></tr>
+    </tbody>
+  </table>
+
+  <p>A main-memory access costs roughly two hundred cycles — enough time to execute several hundred arithmetic instructions. On modern hardware, <strong>the question is rarely how many operations you perform; it is how often you wait for memory</strong>.</p>
+
+  <h3>Cache lines</h3>
+
+  <p>Memory is not fetched a byte at a time. The hardware transfers a whole <em>cache line</em>, almost universally 64 bytes. Read one <code>int</code> and the sixteen around it arrive for free.</p>
+
+  <p>That single fact explains week 32's result. Walking an array touches consecutive addresses, so one miss serves sixteen elements. Walking a linked list follows pointers to scattered allocations, so nearly every step is a fresh miss — sixteen times the memory traffic for the same arithmetic.</p>
+
+  <p>The hardware also <em>prefetches</em>: detecting a sequential pattern, it fetches ahead so the data has arrived before you ask. Prefetchers recognize forward and backward strides. They cannot predict pointer chasing.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Data layout</h2>
+
+  <h3>Loop order</h3>
+<pre><code>/* fast: sequential in memory */
+for (size_t r = 0; r &lt; ROWS; r++)
+    for (size_t c = 0; c &lt; COLS; c++)
+        sum += m[r][c];
+
+/* slow: strides a whole row per step */
+for (size_t c = 0; c &lt; COLS; c++)
+    for (size_t r = 0; r &lt; ROWS; r++)
+        sum += m[r][c];</code></pre>
+
+  <p>Identical results, identical operation count. Week 12 explained row-major layout; this is where it costs you. On a large matrix the difference is commonly five- to tenfold.</p>
+
+  <h3>Structure of arrays</h3>
+
+  <p>When a loop touches one field of many records, the other fields still occupy the cache lines:</p>
+
+<pre><code>/* array of structures — the conventional layout */
+typedef struct { int id; char name[32]; double score; } Student;
+Student students[N];
+for (size_t i = 0; i &lt; N; i++) total += students[i].score;
+/* each 64-byte line carries one score and 40 bytes you did not want */
+
+/* structure of arrays — one array per field */
+typedef struct {
+    int    *id;
+    char  (*name)[32];
+    double *score;
+} Students;
+for (size_t i = 0; i &lt; N; i++) total += s.score[i];
+/* each line carries eight scores */</code></pre>
+
+  <p>This is the standard transformation in numerical and game code. It is also less readable and harder to maintain, so apply it where a profiler says it matters — not everywhere.</p>
+
+  <h3>Field ordering</h3>
+
+  <p>Week 22 showed that declaring members largest-first eliminates padding. The same change helps here: a smaller structure means more records per cache line.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Optimization levels</h2>
+
+  <table>
+    <thead><tr><th>Flag</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>-O0</code></td><td>None. Fast builds, predictable debugging. The default.</td></tr>
+      <tr><td><code>-O1</code></td><td>Cheap optimizations, still reasonable to debug.</td></tr>
+      <tr><td><code>-O2</code></td><td>The usual release setting. Inlining, vectorization, loop transformation.</td></tr>
+      <tr><td><code>-O3</code></td><td>More aggressive; sometimes slower through code growth. Measure.</td></tr>
+      <tr><td><code>-Os</code></td><td>Optimize for size — week 53's default on embedded targets.</td></tr>
+      <tr><td><code>-march=native</code></td><td>Use this machine's instruction set. Not portable to other CPUs.</td></tr>
+    </tbody>
+  </table>
+
+  <p>An unoptimized build is commonly three to ten times slower than <code>-O2</code>. <strong>Never benchmark at <code>-O0</code></strong>: you are measuring the compiler's debugging output, not your program.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>Optimization exposes undefined behavior.</strong> A program relying on signed overflow, strict-aliasing violations, or uninitialized reads can work at <code>-O0</code> and fail at <code>-O2</code>, because the optimizer reasons from the assumption that UB never happens. The bug was always there. Week 37 builds a program that demonstrates exactly this.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Reading the generated assembly</h2>
+
+  <p>You do not need to write assembly to benefit from reading it. The question is usually just "did the compiler do what I hoped?"</p>
+
+<pre><code>gcc -O2 -S -masm=intel prog.c -o prog.s     # generate assembly
+objdump -d --demangle prog.o | less          # disassemble an object file</code></pre>
+
+  <p>Compiler Explorer — linked in the course resources — shows source and assembly side by side with the correspondence colour-coded, which is far easier for learning.</p>
+
+  <p>Four things worth checking:</p>
+
+  <table>
+    <thead><tr><th>Look for</th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td>No <code>call</code> to your small function</td><td>It was inlined</td></tr>
+      <tr><td><code>mov</code> of a constant where you wrote arithmetic</td><td>Computed at compile time</td></tr>
+      <tr><td><code>xmm</code> registers, <code>addps</code>, <code>vpaddd</code></td><td>The loop was vectorized</td></tr>
+      <tr><td>The loop body appearing several times</td><td>It was unrolled</td></tr>
+    </tbody>
+  </table>
+
+  <p>This is how week 15 demonstrated that index and pointer traversal compile identically, and how you confirm that a <code>restrict</code> annotation actually changed anything in week 38.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Profiling</h2>
+
+  <p>Programmers are reliably wrong about where time goes. Measure.</p>
+
+<pre><code># perf — Linux, sampling, no recompilation, very low overhead
+perf stat ./prog
+perf record -g ./prog &amp;&amp; perf report
+
+# gprof — portable, needs instrumentation
+gcc -pg -O2 prog.c -o prog &amp;&amp; ./prog &amp;&amp; gprof ./prog gmon.out | head -30
+
+# callgrind — exact instruction counts, ~50x slower
+valgrind --tool=callgrind ./prog &amp;&amp; callgrind_annotate callgrind.out.*</code></pre>
+
+  <p><code>perf stat</code> is the first command to run. Beyond the elapsed time it reports <em>cache-misses</em> and <em>instructions per cycle</em> — and those two numbers usually identify whether you have a computation problem or a memory problem before you look at anything else.</p>
+
+  <h3>Timing correctly</h3>
+<pre><code>struct timespec t0, t1;
+clock_gettime(CLOCK_MONOTONIC, &amp;t0);
+work();
+clock_gettime(CLOCK_MONOTONIC, &amp;t1);
+double secs = (double)(t1.tv_sec - t0.tv_sec)
+            + (double)(t1.tv_nsec - t0.tv_nsec) / 1e9;</code></pre>
+
+  <p><code>CLOCK_MONOTONIC</code>, not the wall clock, because the wall clock can step backwards. Run each measurement several times and take the minimum — the minimum is the run least disturbed by other activity, and is more stable than the mean.</p>
+
+  <p>Beware the compiler deleting your benchmark: if a result is unused, the whole computation can be removed. Print it, or accumulate into a <code>volatile</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: the same loop, made three times faster</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;time.h&gt;
+
+#define SIZE 1024
+#define REPS 20
+#define RECORDS 2000000
+
+static double now(void)
+{
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC, &amp;t);
+    return (double)t.tv_sec + (double)t.tv_nsec / 1e9;
+}
+
+/* ---------- 1. loop order over a matrix ---------- */
+
+static double sum_row_major(const double *m)
+{
+    double total = 0.0;
+    for (int rep = 0; rep &lt; REPS; rep++)
+        for (size_t r = 0; r &lt; SIZE; r++)
+            for (size_t c = 0; c &lt; SIZE; c++)
+                total += m[r * SIZE + c];         /* sequential */
+    return total;
+}
+
+static double sum_column_major(const double *m)
+{
+    double total = 0.0;
+    for (int rep = 0; rep &lt; REPS; rep++)
+        for (size_t c = 0; c &lt; SIZE; c++)
+            for (size_t r = 0; r &lt; SIZE; r++)
+                total += m[r * SIZE + c];         /* strides 8 KB per step */
+    return total;
+}
+
+/* ---------- 2. array of structures versus structure of arrays ---------- */
+
+typedef struct {
+    int    id;
+    char   name[32];
+    double score;
+} Record;                       /* 48 bytes; we want 8 of them */
+
+typedef struct {
+    int    *id;
+    char  (*name)[32];
+    double *score;
+} Columns;
+
+static double sum_aos(const Record *r, size_t n)
+{
+    double total = 0.0;
+    for (int rep = 0; rep &lt; 20; rep++)
+        for (size_t i = 0; i &lt; n; i++)
+            total += r[i].score;
+    return total;
+}
+
+static double sum_soa(const Columns *c, size_t n)
+{
+    double total = 0.0;
+    for (int rep = 0; rep &lt; 20; rep++)
+        for (size_t i = 0; i &lt; n; i++)
+            total += c-&gt;score[i];
+    return total;
+}
+
+/* ---------- 3. what the optimizer can and cannot see ---------- */
+
+static long sum_to(long n)
+{
+    long total = 0;
+    for (long i = 1; i &lt;= n; i++) total += i;
+    return total;
+}
+
+int main(void)
+{
+    puts("== 1. loop order ==");
+    double *m = malloc((size_t)SIZE * SIZE * sizeof *m);
+    if (m == NULL) return EXIT_FAILURE;
+    for (size_t i = 0; i &lt; (size_t)SIZE * SIZE; i++) m[i] = 1.0;
+    printf("  matrix is %zu MB, cache lines hold %zu doubles\n",
+           (size_t)SIZE * SIZE * sizeof *m / (1024 * 1024), 64 / sizeof(double));
+
+    double t = now();
+    double a = sum_row_major(m);
+    double row_secs = now() - t;
+
+    t = now();
+    double b = sum_column_major(m);
+    double col_secs = now() - t;
+
+    printf("  row-major    : %.4f s  (sum %.0f)\n", row_secs, a);
+    printf("  column-major : %.4f s  (sum %.0f)\n", col_secs, b);
+    printf("  same result, same operation count, %.1fx difference\n",
+           col_secs / row_secs);
+    free(m);
+
+    puts("\n== 2. array of structures versus structure of arrays ==");
+    Record *recs = malloc(RECORDS * sizeof *recs);
+    Columns cols = {
+        .id    = malloc(RECORDS * sizeof *cols.id),
+        .name  = malloc(RECORDS * sizeof *cols.name),
+        .score = malloc(RECORDS * sizeof *cols.score)
+    };
+    if (recs == NULL || cols.id == NULL || cols.name == NULL || cols.score == NULL)
+        return EXIT_FAILURE;
+
+    for (size_t i = 0; i &lt; RECORDS; i++) {
+        recs[i].id = (int)i;  recs[i].score = 1.0;
+        cols.id[i] = (int)i;  cols.score[i] = 1.0;
+    }
+
+    t = now();  double s1 = sum_aos(recs, RECORDS);  double aos_secs = now() - t;
+    t = now();  double s2 = sum_soa(&amp;cols, RECORDS); double soa_secs = now() - t;
+
+    printf("  sizeof(Record) = %zu, so a 64-byte line holds %.1f scores\n",
+           sizeof(Record), 64.0 / (double)sizeof(Record));
+    printf("  array of structures : %.4f s  (sum %.0f)\n", aos_secs, s1);
+    printf("  structure of arrays : %.4f s  (sum %.0f)\n", soa_secs, s2);
+    printf("  %.1fx, purely from how much of each line is useful\n",
+           aos_secs / soa_secs);
+
+    free(recs); free(cols.id); free(cols.name); free(cols.score);
+
+    puts("\n== 3. what the optimizer does ==");
+    t = now();
+    long total = sum_to(100000000L);
+    double loop_secs = now() - t;
+    printf("  sum 1..100000000 = %ld in %.4f s\n", total, loop_secs);
+    puts("  compile at -O2 and inspect the assembly:");
+    puts("    gcc -O2 -S perf.c -o perf.s && grep -A20 'sum_to:' perf.s");
+    puts("  the loop may have become a closed-form multiplication");
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -O2 -o perf perf.c
+./perf</code></pre>
+
+  <h3>Typical results</h3>
+
+  <table>
+    <thead><tr><th>Comparison</th><th>Ratio</th><th>Cause</th></tr></thead>
+    <tbody>
+      <tr><td>Column-major versus row-major</td><td>4–10×</td><td>One cache line used per access instead of eight</td></tr>
+      <tr><td>Array of structures versus columns</td><td>2–4×</td><td>48-byte records; 40 bytes per line wasted</td></tr>
+      <tr><td><code>-O0</code> versus <code>-O2</code></td><td>3–10×</td><td>No inlining, no vectorization, everything spilled</td></tr>
+    </tbody>
+  </table>
+
+  <p>Confirm the diagnosis rather than assuming it:</p>
+
+<pre><code>perf stat -e cache-misses,cache-references,instructions,cycles ./perf</code></pre>
+
+  <p>The column-major phase shows a cache-miss rate an order of magnitude higher than the row-major phase, at essentially the same instruction count. That is the entire explanation, visible as two numbers.</p>
+
+  <h3>Look at the assembly</h3>
+
+<pre><code>gcc -O2 -S perf.c -o perf.s
+sed -n '/^sum_to:/,/ret/p' perf.s</code></pre>
+
+  <p>Depending on the version, GCC may recognize the summation and emit the closed form <code>n(n+1)/2</code> — replacing a hundred million iterations with three instructions. Compare against <code>-O0</code>:</p>
+
+<pre><code>gcc -O0 -S perf.c -o perf0.s
+sed -n '/^sum_to:/,/ret/p' perf0.s      # a literal loop, everything in memory</code></pre>
+
+  <p>Then time both builds. A benchmark run at <code>-O0</code> measures none of this.</p>
+
+  <h3>Profile before optimizing</h3>
+
+<pre><code>perf record -g ./perf
+perf report --stdio | head -20</code></pre>
+
+  <p>The report ranks functions by the share of samples they consumed. Optimize the top entry; everything below it is noise. Amdahl's law is the arithmetic behind that advice: making a function that takes 5% of the runtime twice as fast improves the program by 2.5%, while the same effort on a function taking 60% is worth ten times more.</p>
+
+  <h3>When to stop</h3>
+
+  <p>Four questions, in order. Is it actually too slow — measured against a requirement, not a feeling? Does the profiler agree with your guess about where the time goes? Is there a better algorithm, which usually beats any amount of micro-optimization? And is the speedup worth the loss of clarity, given that the code must be maintained for years?</p>
+
+  <p>Most C is fast enough when it is straightforward and compiled at <code>-O2</code> with sensible data layout. The layout is the part worth thinking about in advance, because it is the part that is hard to change later.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Benchmarking at <code>-O0</code></td><td>Measures the debug build</td><td>Benchmark at <code>-O2</code>.</td></tr>
+      <tr><td>Optimizing without profiling</td><td>Effort spent on 2% of the runtime</td><td><code>perf record</code> first.</td></tr>
+      <tr><td>Column-first matrix traversal</td><td>Several times slower for the same work</td><td>Rows outermost.</td></tr>
+      <tr><td>Discarding the benchmark's result</td><td>The compiler deletes the loop</td><td>Print it or use <code>volatile</code>.</td></tr>
+      <tr><td>Timing with the wall clock</td><td>Clock adjustments corrupt the measurement</td><td><code>CLOCK_MONOTONIC</code>.</td></tr>
+      <tr><td>One measurement</td><td>Noise indistinguishable from signal</td><td>Repeat; take the minimum.</td></tr>
+      <tr><td>Micro-optimizing before fixing the algorithm</td><td>Constant-factor gains on a quadratic loop</td><td>Algorithm first, layout second, instructions last.</td></tr>
+      <tr><td><code>-march=native</code> on shipped binaries</td><td>Crashes on older CPUs</td><td>Only for machines you control.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why can two loops with identical complexity differ by a factor of ten?</summary>
+    <p>Because complexity counts operations and ignores where the data is. Memory is fetched in 64-byte cache lines, so a sequential loop gets sixteen integers per fetch while a strided or pointer-chasing loop may use one. A main-memory access costs around two hundred cycles, so the number of misses dominates the number of instructions.</p>
+  </details>
+
+  <details>
+    <summary>Why is benchmarking at <code>-O0</code> meaningless?</summary>
+    <p>Because an unoptimized build keeps every variable in memory, inlines nothing, and vectorizes nothing — it is typically three to ten times slower than the release build and has different bottlenecks. You would be measuring the compiler's debugging mode, and conclusions drawn from it need not hold for the code you ship.</p>
+  </details>
+
+  <details>
+    <summary>When is a structure of arrays worth the loss of readability?</summary>
+    <p>When a hot loop reads one or two fields from many records and the record is large, so most of each cache line is wasted. Splitting the fields into parallel arrays makes the loop sequential over exactly the data it needs. It is a profiler-driven transformation, not a default — it complicates every other part of the code.</p>
+  </details>
+
+  <details>
+    <summary>Why can a program work at <code>-O0</code> and fail at <code>-O2</code>?</summary>
+    <p>Because the optimizer is entitled to assume the program contains no undefined behavior, and to reason from that assumption. Code relying on signed overflow, an aliasing violation, or an uninitialized read can survive a literal translation and break once the compiler propagates a conclusion the standard permits. The defect was present at both levels; only one exposed it.</p>
+  </details>
+
+  <details>
+    <summary>What should you look at first when a program is too slow?</summary>
+    <p>Whether it is too slow against an actual requirement, and then <code>perf stat</code> — elapsed time, cache misses, and instructions per cycle together say whether the problem is computation or memory. After that, <code>perf record</code> to find which function dominates. Choosing a better algorithm beats micro-optimization, and fixing data layout beats rewriting instructions.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 35 turns from making code fast to keeping it correct: debugging with GDB, unit tests and coverage, static analysis, and a continuous integration configuration that runs the sanitizers on every change. The warning profile assembled in week 29 becomes an enforced gate there.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_33_Trees_Hash_Tables_and_ADTs.html">← Week 33</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_35_Debugging_and_Testing.html">Week 35 →</a>
+</div>
+
+</div>

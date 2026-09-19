@@ -1,0 +1,461 @@
+---
+layout: without-sidebar
+title: "Week 38 — Type Qualifiers, Inlining, and Modern C"
+permalink: /files/c/Week_38_Type_Qualifiers_and_Modern_C.html
+excerpt: "volatile, restrict and register; inline and static inline; compound literals; anonymous structures and unions; variable-length arrays; _Noreturn and setjmp/longjmp."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Advanced · Week 38</div>
+  <h1>Type Qualifiers, Inlining, and Modern C</h1>
+  <p class="c-wk-lead">The features left over — each small, each occasionally essential. Two of them are promises to the optimizer that it cannot verify, one is the bridge to hardware programming, and one is a control-flow construct most C programmers never use and should recognize when they meet it.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Say what <code>volatile</code> actually prevents, and what it does not.</li>
+      <li>Apply <code>restrict</code> correctly and see the difference in the generated code.</li>
+      <li>Use <code>inline</code> and <code>static inline</code> and explain C's inline rules.</li>
+      <li>Write compound literals and anonymous unions where they make code clearer.</li>
+      <li>Say why variable-length arrays are risky and recognize <code>setjmp</code>/<code>longjmp</code>.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span><code>volatile</code></h2>
+
+  <p><code>volatile</code> tells the compiler that an object may change by means it cannot see, so <strong>every read must actually read and every write must actually write</strong>, in program order, with no caching in registers and no elimination of "redundant" accesses.</p>
+
+<pre><code>/* without volatile, the compiler may hoist the load out of the loop */
+while (flag == 0) { }              /* becomes an infinite loop at -O2 */
+
+volatile int flag;
+while (flag == 0) { }              /* re-reads memory every iteration */</code></pre>
+
+  <p>Three legitimate uses, and only three:</p>
+
+  <table>
+    <thead><tr><th>Use</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Memory-mapped hardware registers</td><td>The device changes the value; reading may itself have an effect. Week 50.</td></tr>
+      <tr><td>A variable shared with a signal handler</td><td>Must be <code>volatile sig_atomic_t</code>. Week 39.</td></tr>
+      <tr><td>A variable modified across <code>setjmp</code>/<code>longjmp</code></td><td>Otherwise its value after a jump is indeterminate.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="c-wk-trap">
+    <p><strong><code>volatile</code> is not for threads.</strong> It guarantees the access happens; it guarantees nothing about atomicity, and nothing about ordering relative to other variables. <code>volatile int counter; counter++;</code> is still a data race — the increment is a load, an add, and a store. Use <code>&lt;stdatomic.h&gt;</code>, which week 41 covers. This misconception is widespread and produces bugs that appear only under load.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span><code>restrict</code></h2>
+
+  <p>Week 36 introduced it as a promise: within this scope, the object reached through this pointer is reached through no other. The payoff is visible in the generated code.</p>
+
+<pre><code>void add_plain(int *dst, const int *a, const int *b, size_t n)
+{
+    for (size_t i = 0; i &lt; n; i++) dst[i] = a[i] + b[i];
+}
+
+void add_restrict(int *restrict dst, const int *restrict a,
+                  const int *restrict b, size_t n)
+{
+    for (size_t i = 0; i &lt; n; i++) dst[i] = a[i] + b[i];
+}</code></pre>
+
+  <p>In the first, <code>dst[i]</code> might alias <code>a[i+1]</code>, so the compiler must store and then reload on every iteration — no vectorization. In the second it may load a block of <code>a</code> and <code>b</code>, add them with vector instructions, and store a block.</p>
+
+  <p>The promise is unchecked, and violating it is undefined behavior with no diagnostic. This is exactly the contract that distinguishes <code>memcpy</code> from <code>memmove</code>.</p>
+
+  <h3><code>register</code></h3>
+
+  <p>Obsolete as an optimization — compilers have allocated registers better than humans since the 1980s. It retains one effect: you cannot take the address of a <code>register</code> object, which occasionally documents intent. C23 gives it no new meaning. You will meet it only in old code.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span><code>inline</code></h2>
+
+  <p>C's inline rules differ from C++'s and confuse people reliably.</p>
+
+<pre><code>/* In a header — this is the form to use. */
+static inline int max_int(int a, int b)
+{
+    return a &gt; b ? a : b;
+}</code></pre>
+
+  <p><code>static inline</code> in a header is the practical answer. Each translation unit gets its own copy with internal linkage, so there is no multiple-definition problem and the compiler inlines it freely. This is the modern replacement for a function-like macro, and it fixes both macro hazards from week 28: arguments are evaluated once, and the result is type-checked.</p>
+
+  <p>Plain <code>inline</code> without <code>static</code> provides an <em>inline definition</em> that is not an external definition, so if the compiler chooses not to inline a call you get an undefined reference unless exactly one translation unit also provides an external definition. The rule is unintuitive and the reason most codebases simply write <code>static inline</code>.</p>
+
+  <p>In all cases <code>inline</code> is a hint. The compiler inlines small functions at <code>-O2</code> whether or not you ask, and declines large ones whatever you say.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Compound literals and anonymous members</h2>
+
+  <p>A <em>compound literal</em> creates an unnamed object of a given type, in place:</p>
+
+<pre><code>draw_point((Point){ .x = 3, .y = 4 });          /* no temporary variable */
+
+int *table = (int[]){ 1, 1, 2, 3, 5, 8 };       /* an unnamed array */
+
+config = (Config){ 0 };                          /* reset every field */</code></pre>
+
+  <p>Its lifetime is that of the enclosing block, so returning a pointer to one from a function is the dangling-pointer bug of week 13 in a new costume.</p>
+
+  <p><em>Anonymous structures and unions</em> (C11) let a nested member be accessed as though it were direct — which makes week 22's tagged union considerably more readable:</p>
+
+<pre><code>typedef struct {
+    ValueKind kind;
+    union {                          /* no member name */
+        int    as_int;
+        double as_double;
+    };
+} Value;
+
+v.as_int = 42;                       /* not v.data.as_int */</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Variable-length arrays</h2>
+
+<pre><code>void process(size_t n)
+{
+    int buffer[n];              /* size decided at run time */
+    …
+}</code></pre>
+
+  <p>Added in C99, made optional in C11 — an implementation may define <code>__STDC_NO_VLA__</code> and refuse them, and MSVC never supported them. That alone disqualifies them from portable code.</p>
+
+  <p>The larger problem is that a VLA is on the stack and <strong>there is no way to detect failure</strong>. Week 17 established that stack overflow is a fatal signal, not a return value. A size derived from input turns that into a remotely triggerable crash:</p>
+
+<pre><code>void handle(size_t count)      /* count came from the network */
+{
+    int buffer[count];         /* count = 10000000 kills the process */
+}</code></pre>
+
+  <p>Use <code>malloc</code>, whose failure you can check, or a fixed-size buffer with an explicit bound. VLAs are worth recognizing in existing code and worth avoiding in new code.</p>
+
+  <p>Variably modified <em>parameter</em> types are a different matter and remain useful — week 16's <code>void f(size_t rows, size_t cols, int m[rows][cols])</code> allocates nothing and lets the compiler compute correct offsets.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span><code>_Noreturn</code>, <code>setjmp</code>, and <code>longjmp</code></h2>
+
+<pre><code>_Noreturn void fatal(const char *message)      /* C11; [[noreturn]] in C23 */
+{
+    fprintf(stderr, "fatal: %s\n", message);
+    exit(EXIT_FAILURE);
+}</code></pre>
+
+  <p>Declaring that a function never returns lets the compiler drop the code after a call to it and improves its warnings — no "control reaches end of non-void function" after a call to <code>fatal</code>.</p>
+
+  <h3>Non-local jumps</h3>
+
+<pre><code>#include &lt;setjmp.h&gt;
+
+static jmp_buf recovery;
+
+if (setjmp(recovery) == 0) {
+    deep_call_chain();              /* may longjmp back here */
+} else {
+    /* arrived via longjmp: handle the failure */
+}
+
+/* somewhere far below */
+longjmp(recovery, 1);               /* unwinds straight back */</code></pre>
+
+  <p>This is the closest C has to an exception, and it is a blunt instrument. <code>setjmp</code> records the machine state; <code>longjmp</code> restores it, discarding every intervening frame — <strong>without running any cleanup</strong>. Every file left open and every block allocated between the two is leaked.</p>
+
+  <p>Further rules: the <code>jmp_buf</code> is invalid once the function that called <code>setjmp</code> returns, and any local modified between <code>setjmp</code> and <code>longjmp</code> must be <code>volatile</code> or its value is indeterminate afterwards.</p>
+
+  <p>Legitimate uses are rare — a parser abandoning a deeply nested descent, or a test harness recovering from a failed assertion. Week 27's error contract is the right tool for everything else.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Worked example: seeing the qualifiers work</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;setjmp.h&gt;
+#include &lt;time.h&gt;
+
+#define N 2000000
+#define REPS 50
+
+static double now(void)
+{
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC, &amp;t);
+    return (double)t.tv_sec + (double)t.tv_nsec / 1e9;
+}
+
+/* ---------- restrict ---------- */
+
+static void add_plain(int *dst, const int *a, const int *b, size_t n)
+{
+    for (size_t i = 0; i &lt; n; i++) dst[i] = a[i] + b[i];
+}
+
+static void add_restrict(int *restrict dst, const int *restrict a,
+                         const int *restrict b, size_t n)
+{
+    for (size_t i = 0; i &lt; n; i++) dst[i] = a[i] + b[i];
+}
+
+/* ---------- static inline replaces a macro ---------- */
+
+#define MAX_MACRO(a, b) ((a) &gt; (b) ? (a) : (b))     /* evaluates twice */
+
+static inline int max_int(int a, int b)             /* evaluates once */
+{
+    return a &gt; b ? a : b;
+}
+
+static int side_effect_count = 0;
+static int with_side_effect(int v)
+{
+    side_effect_count++;
+    return v;
+}
+
+/* ---------- compound literals ---------- */
+
+typedef struct { int x, y; } Point;
+
+static int manhattan(Point a, Point b)
+{
+    int dx = a.x - b.x, dy = a.y - b.y;
+    return (dx &lt; 0 ? -dx : dx) + (dy &lt; 0 ? -dy : dy);
+}
+
+/* ---------- anonymous union ---------- */
+
+typedef enum { V_INT, V_DOUBLE, V_TEXT } VKind;
+
+typedef struct {
+    VKind kind;
+    union {                            /* anonymous: C11 */
+        int    as_int;
+        double as_double;
+        char   as_text[16];
+    };
+} Value;
+
+static void value_print(const Value *v)
+{
+    switch (v-&gt;kind) {
+    case V_INT:    printf("  int    %d\n", v-&gt;as_int);       break;
+    case V_DOUBLE: printf("  double %g\n", v-&gt;as_double);    break;
+    case V_TEXT:   printf("  text   \"%s\"\n", v-&gt;as_text);  break;
+    }
+}
+
+/* ---------- _Noreturn ---------- */
+
+_Noreturn static void fatal(const char *msg)
+{
+    fprintf(stderr, "fatal: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+/* ---------- setjmp / longjmp ---------- */
+
+static jmp_buf recovery;
+
+static void level_three(int depth)
+{
+    printf("    level three, depth %d\n", depth);
+    if (depth &gt; 2) {
+        puts("    jumping back, skipping every frame between");
+        longjmp(recovery, depth);       /* no cleanup runs */
+    }
+}
+static void level_two(int depth)   { printf("   level two\n");  level_three(depth); }
+static void level_one(int depth)   { printf("  level one\n");   level_two(depth); }
+
+int main(void)
+{
+    puts("== restrict: the same loop, two contracts ==");
+    int *a   = malloc(N * sizeof *a);
+    int *b   = malloc(N * sizeof *b);
+    int *dst = malloc(N * sizeof *dst);
+    if (a == NULL || b == NULL || dst == NULL) fatal("out of memory");
+
+    for (size_t i = 0; i &lt; N; i++) { a[i] = (int)i; b[i] = (int)(i * 2); }
+
+    double t = now();
+    for (int r = 0; r &lt; REPS; r++) add_plain(dst, a, b, N);
+    double plain_secs = now() - t;
+
+    t = now();
+    for (int r = 0; r &lt; REPS; r++) add_restrict(dst, a, b, N);
+    double restrict_secs = now() - t;
+
+    printf("  without restrict : %.4f s\n", plain_secs);
+    printf("  with restrict    : %.4f s\n", restrict_secs);
+    printf("  ratio %.2fx (check the assembly for vector instructions)\n",
+           plain_secs / restrict_secs);
+    printf("  last element %d, both versions agree\n", dst[N - 1]);
+
+    puts("\n== static inline versus a macro ==");
+    side_effect_count = 0;
+    int m1 = MAX_MACRO(with_side_effect(3), with_side_effect(5));
+    printf("  MAX_MACRO gave %d after %d calls  &lt;-- evaluated twice\n",
+           m1, side_effect_count);
+
+    side_effect_count = 0;
+    int m2 = max_int(with_side_effect(3), with_side_effect(5));
+    printf("  max_int   gave %d after %d calls  &lt;-- evaluated once\n",
+           m2, side_effect_count);
+
+    puts("\n== compound literals ==");
+    printf("  manhattan((0,0),(3,4)) = %d   no temporaries declared\n",
+           manhattan((Point){ .x = 0, .y = 0 }, (Point){ .x = 3, .y = 4 }));
+
+    int *fib = (int[]){ 1, 1, 2, 3, 5, 8, 13 };
+    printf("  an unnamed array: ");
+    for (int i = 0; i &lt; 7; i++) printf("%d ", fib[i]);
+    puts("\n  it lives until the end of this block, and no longer");
+
+    puts("\n== anonymous union ==");
+    Value values[] = {
+        { .kind = V_INT,    .as_int    = 42 },
+        { .kind = V_DOUBLE, .as_double = 3.14 },
+        { .kind = V_TEXT,   .as_text   = "hello" }
+    };
+    for (size_t i = 0; i &lt; 3; i++) value_print(&amp;values[i]);
+    printf("  accessed as v->as_int, not v->data.as_int\n");
+
+    puts("\n== volatile ==");
+    int          normal = 0;
+    volatile int observed = 0;
+    for (int i = 0; i &lt; 3; i++) { normal++; observed++; }
+    printf("  normal = %d, volatile = %d\n", normal, observed);
+    puts("  at -O2 the first may be computed at compile time;");
+    puts("  the volatile one must be loaded and stored three times");
+    puts("  volatile does NOT make ++ atomic — that is week 41");
+
+    puts("\n== setjmp and longjmp ==");
+    int landed = setjmp(recovery);
+    if (landed == 0) {
+        puts("  first pass, descending:");
+        level_one(3);
+        puts("  never reached");
+    } else {
+        printf("  back in main via longjmp with value %d\n", landed);
+        puts("  three frames were discarded and no cleanup ran");
+        puts("  anything they allocated has leaked");
+    }
+
+    puts("\n== why VLAs are avoided ==");
+    size_t safe_size = 100;
+    printf("  a VLA of %zu ints would be fine\n", safe_size);
+    puts("  a VLA of a size taken from input cannot report failure:");
+    puts("  too large and the process dies with no way to catch it");
+    int *heap = malloc(safe_size * sizeof *heap);
+    printf("  malloc can: %s\n", heap ? "allocation checked" : "refused");
+    free(heap);
+
+    free(a); free(b); free(dst);
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -O2 -o modern modern.c
+./modern</code></pre>
+
+  <h3>Confirm <code>restrict</code> in the assembly</h3>
+
+  <p>The timing difference varies by compiler and may be small — GCC sometimes generates a runtime overlap check and two loop versions, recovering most of the gain without the qualifier. The assembly is the reliable evidence:</p>
+
+<pre><code>gcc -O2 -S modern.c -o modern.s
+sed -n '/^add_plain:/,/ret/p'    modern.s | grep -c 'xmm\|ymm'
+sed -n '/^add_restrict:/,/ret/p' modern.s | grep -c 'xmm\|ymm'</code></pre>
+
+  <p>Vector registers appear in the <code>restrict</code> version, and often not in the other. That is the qualifier doing its job: it removed the possibility the compiler had to defend against.</p>
+
+  <h3>Violate the promise</h3>
+
+<pre><code>add_restrict(a, a, b, N);        /* dst and a are the same array */</code></pre>
+
+  <p>This compiles silently and is undefined behavior. The result may be correct, or may be wrong in a way that depends on the vector width. Nothing reports it — which is exactly why <code>restrict</code> must only be applied where you can guarantee the condition.</p>
+
+  <h3>Watch <code>volatile</code> change the generated code</h3>
+
+<pre><code>gcc -O2 -S modern.c -o modern.s
+grep -B3 -A6 'observed' modern.s</code></pre>
+
+  <p>The plain counter is typically folded to a constant; the <code>volatile</code> one produces three loads and three stores. Then try the loop that shows why it matters:</p>
+
+<pre><code>int flag = 0;
+while (flag == 0) { }        /* -O2: the load is hoisted; infinite loop */</code></pre>
+
+  <p>Add <code>volatile</code> and the load returns to the loop body. In week 50 that difference is a driver that works versus a driver that hangs.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>volatile</code> for thread synchronization</td><td>Still a data race; no atomicity</td><td><code>&lt;stdatomic.h&gt;</code> — week 41.</td></tr>
+      <tr><td>Omitting <code>volatile</code> on a hardware register</td><td>Reads cached; the driver hangs</td><td>Week 50 depends on it.</td></tr>
+      <tr><td><code>restrict</code> on pointers that may overlap</td><td>Undefined, no diagnostic</td><td>Promise only what you can guarantee.</td></tr>
+      <tr><td>Plain <code>inline</code> in a header</td><td><code>undefined reference</code> when not inlined</td><td><code>static inline</code>.</td></tr>
+      <tr><td>Returning a pointer to a compound literal</td><td>Dangles at the end of the block</td><td>Return by value, or allocate.</td></tr>
+      <tr><td>A VLA sized from input</td><td>Unstoppable stack overflow</td><td><code>malloc</code>, whose failure you can check.</td></tr>
+      <tr><td><code>longjmp</code> past resources</td><td>Files and allocations leak</td><td>Prefer an error contract — week 27.</td></tr>
+      <tr><td>Non-<code>volatile</code> local across <code>setjmp</code></td><td>Indeterminate value after the jump</td><td>Mark it <code>volatile</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">9</span>Check yourself</h2>
+
+  <details>
+    <summary>What does <code>volatile</code> guarantee, and what does it not?</summary>
+    <p>It guarantees that every read and write in the source produces an actual memory access, in program order, with nothing cached in a register or optimized away. It guarantees nothing about atomicity or about ordering relative to other variables, so it does not make <code>counter++</code> safe between threads. Its real uses are hardware registers, signal-handler flags, and variables live across <code>longjmp</code>.</p>
+  </details>
+
+  <details>
+    <summary>Why does <code>restrict</code> let a loop vectorize?</summary>
+    <p>Without it the compiler must assume the destination could overlap a source, so a store might change a value it is about to load — forcing it to reload every iteration and process one element at a time. <code>restrict</code> removes that possibility, so it may load and add whole blocks with vector instructions.</p>
+  </details>
+
+  <details>
+    <summary>Why is <code>static inline</code> preferred over plain <code>inline</code> in a header?</summary>
+    <p>Because plain <code>inline</code> provides an inline definition that is not an external definition: if the compiler declines to inline a call, the linker needs an external definition that exactly one translation unit must supply. <code>static inline</code> gives each unit its own internal-linkage copy, so there is no multiple-definition problem and no missing-symbol problem.</p>
+  </details>
+
+  <details>
+    <summary>Why should a variable-length array never be sized from external input?</summary>
+    <p>Because it is allocated on the stack and there is no way to detect failure. Exceeding the stack raises a fatal signal rather than returning an error, so a large value from a file or the network becomes a crash the program cannot catch. <code>malloc</code> returns <code>NULL</code>, which you can check and handle.</p>
+  </details>
+
+  <details>
+    <summary>What does <code>longjmp</code> fail to do that makes it dangerous?</summary>
+    <p>It discards every stack frame between the jump and the <code>setjmp</code> without running any cleanup — C has no destructors, so open files stay open and allocated blocks leak. It also requires that locals modified in between be <code>volatile</code>, and that the function containing <code>setjmp</code> has not returned. An explicit error contract is almost always the better tool.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">10</span>Where this leads</h2>
+  <p>The language is now complete — there is no C syntax left to introduce. Week 39 turns to the operating system underneath: file descriptors, processes, signals, and pipes, which are the interface between a C program and everything outside it. <code>volatile sig_atomic_t</code> makes its first real appearance there.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_37_Portability_and_Machine_Model.html">← Week 37</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_39_Processes_Signals_and_Low_Level_IO.html">Week 39 →</a>
+</div>
+
+</div>

@@ -1,0 +1,456 @@
+---
+layout: without-sidebar
+title: "Week 36 — Undefined Behavior and Secure Coding"
+permalink: /files/c/Week_36_Undefined_Behavior_and_Secure_Coding.html
+excerpt: "What undefined behavior is and how optimizers exploit it, strict aliasing and restrict, the difference from implementation-defined behavior, and the vulnerability classes that follow."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Advanced · Week 36</div>
+  <h1>Undefined Behavior and Secure Coding</h1>
+  <p class="c-wk-lead">Undefined behavior is the concept that separates people who write C from people who understand it. It is not "unpredictable output" — it is the withdrawal of all requirements, and an optimizing compiler will reason from its absence in ways that delete your safety checks.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Define undefined behavior precisely and distinguish it from the two neighbouring categories.</li>
+      <li>Explain how an optimizer turns undefined behavior into deleted code.</li>
+      <li>Recognize a strict-aliasing violation and say what <code>restrict</code> promises.</li>
+      <li>Name the vulnerability classes that follow from C's memory model.</li>
+      <li>Write checks that cannot themselves be optimized away.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Three categories, often confused</h2>
+
+  <table>
+    <thead><tr><th>Category</th><th>The standard says</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Unspecified</strong></td><td>Several behaviors are allowed; no record of which</td><td>Order of evaluation of function arguments</td></tr>
+      <tr><td><strong>Implementation-defined</strong></td><td>One behavior, chosen and <em>documented</em> by the implementation</td><td>Whether plain <code>char</code> is signed; <code>sizeof(int)</code></td></tr>
+      <tr><td><strong>Undefined</strong></td><td><em>No requirements whatsoever</em></td><td>Signed overflow, out-of-bounds access, null dereference</td></tr>
+    </tbody>
+  </table>
+
+  <p>The first two are survivable: you can write portable code by not depending on unspecified choices, and you can look up implementation-defined ones. The third is different in kind. The standard imposes no requirement on a program that exhibits it — not on the operation, not on the surrounding code, not on anything that happened before.</p>
+
+  <p>The practical consequence is the part people miss. Undefined behavior does not mean "you get a wrong value here". It means <strong>the compiler may assume it does not occur, and optimize the whole function on that assumption</strong>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>How an optimizer exploits it</h2>
+
+<pre><code>int check(int *p)
+{
+    int value = *p;              /* dereference: if p were null, UB */
+    if (p == NULL) {             /* so the compiler concludes p != NULL */
+        return -1;               /* and deletes this branch entirely */
+    }
+    return value;
+}</code></pre>
+
+  <p>The reasoning is valid. Dereferencing a null pointer is undefined, so a correct program never reaches this code with <code>p == NULL</code>; therefore the test is redundant; therefore it can be removed. Your null check is gone, and at <code>-O0</code> it was still there.</p>
+
+  <p>The same mechanism eliminates overflow checks:</p>
+
+<pre><code>/* A check that cannot work */
+if (a + b &lt; a) {                 /* assumes signed overflow wraps */
+    return ERROR_OVERFLOW;       /* deleted: signed overflow is UB,   */
+}                                /* so a + b &lt; a is assumed false     */
+
+/* A check that works: test before the operation */
+if (b &gt; 0 &amp;&amp; a &gt; INT_MAX - b) {
+    return ERROR_OVERFLOW;
+}
+if (b &lt; 0 &amp;&amp; a &lt; INT_MIN - b) {
+    return ERROR_OVERFLOW;
+}
+int sum = a + b;                 /* now provably safe */</code></pre>
+
+  <p>This is not hypothetical. A 2009 Linux kernel vulnerability arose from exactly this pattern: the compiler removed a null check that followed a dereference, leaving an exploitable hole in code whose source looked correct.</p>
+
+  <div class="c-wk-note">
+    <p><strong>The rule that follows.</strong> Never write a check that detects undefined behavior after the fact. Check the <em>preconditions</em> before performing the operation, so the operation is provably defined. Anything else may be optimized away precisely when it matters.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>The common sources</h2>
+
+  <table>
+    <thead><tr><th>Undefined behavior</th><th>First met in</th></tr></thead>
+    <tbody>
+      <tr><td>Signed integer overflow</td><td>Week 4</td></tr>
+      <tr><td>Array access out of bounds</td><td>Week 12</td></tr>
+      <tr><td>Dereferencing null, dangling, or uninitialized pointers</td><td>Weeks 13, 20</td></tr>
+      <tr><td>Reading an uninitialized variable</td><td>Week 5</td></tr>
+      <tr><td>Use after free, double free</td><td>Week 20</td></tr>
+      <tr><td>Shifting by the width of the type or more</td><td>Week 25</td></tr>
+      <tr><td>Two side effects on one object without a sequence point</td><td>Week 6</td></tr>
+      <tr><td>Modifying a string literal</td><td>Week 14</td></tr>
+      <tr><td>A <code>printf</code> specifier that does not match its argument</td><td>Week 8</td></tr>
+      <tr><td>Strict-aliasing violation</td><td>This week</td></tr>
+    </tbody>
+  </table>
+
+  <p>There are over two hundred in the standard. These ten cover almost everything encountered in practice.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Strict aliasing</h2>
+
+  <p>The <em>strict aliasing rule</em> says an object may only be accessed through an lvalue of a compatible type — with <code>char</code> as the universal exception. The compiler relies on it to know that a write through an <code>int *</code> cannot disturb a <code>float</code>, which allows it to keep values in registers across the store.</p>
+
+<pre><code>/* Violation: reading a float's bytes through an int pointer */
+float f = 1.0f;
+int bits = *(int *)&amp;f;              /* undefined behavior */</code></pre>
+
+  <p>It usually appears to work, which is why it survives in old code. It breaks when the optimizer reorders the load and the store because it has concluded they cannot refer to the same object.</p>
+
+  <p>Two correct ways to reinterpret bytes:</p>
+
+<pre><code>/* 1. memcpy — the standard idiom; optimizes to nothing */
+int bits;
+memcpy(&amp;bits, &amp;f, sizeof bits);
+
+/* 2. a union — explicitly permitted in C (unlike C++) */
+union { float f; int bits; } u = { .f = 1.0f };
+int bits = u.bits;</code></pre>
+
+  <p>The <code>memcpy</code> form looks wasteful and is not: every mainstream compiler recognizes a small fixed-size copy and emits a single register move. Confirm it with week 34's assembly technique.</p>
+
+  <h3><code>restrict</code></h3>
+
+  <p><code>restrict</code> is a promise in the other direction: <em>within this scope, the object reached through this pointer is reached through no other</em>.</p>
+
+<pre><code>void add_arrays(int *restrict dst, const int *restrict a,
+                const int *restrict b, size_t n)
+{
+    for (size_t i = 0; i &lt; n; i++) {
+        dst[i] = a[i] + b[i];
+    }
+}</code></pre>
+
+  <p>Without it the compiler must assume <code>dst</code> might overlap <code>a</code>, so each store could change a later load — and it must reload on every iteration and cannot vectorize. With it, the loop can be vectorized.</p>
+
+  <p>The promise is unchecked. Pass overlapping pointers and the behavior is undefined, with no diagnostic. This is exactly the distinction between <code>memcpy</code> (whose parameters are <code>restrict</code>) and <code>memmove</code> (whose are not), which week 14 introduced from the other side.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>From undefined behavior to vulnerability</h2>
+
+  <table>
+    <thead><tr><th>Class</th><th>Mechanism</th><th>Defence</th></tr></thead>
+    <tbody>
+      <tr><td>Buffer overflow</td><td>Writing past an array overwrites the return address or a function pointer</td><td>Bounded copies; <code>snprintf</code>; check lengths</td></tr>
+      <tr><td>Format string</td><td><code>printf(user_input)</code> lets <code>%n</code> write to memory</td><td><code>printf("%s", user_input)</code></td></tr>
+      <tr><td>Integer overflow</td><td>A size computation wraps; a small buffer is allocated for a large copy</td><td><code>calloc</code>; check before multiplying</td></tr>
+      <tr><td>Use after free</td><td>The attacker arranges for the freed block to be reallocated with chosen contents</td><td><code>NULL</code> after <code>free</code>; clear ownership</td></tr>
+      <tr><td>Off-by-one</td><td>One byte past a buffer overwrites an adjacent length or pointer</td><td>Half-open ranges; sanitizers</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The integer-overflow allocation bug</h3>
+
+<pre><code>/* count comes from the network */
+size_t bytes = count * sizeof(Record);      /* can wrap */
+Record *r = malloc(bytes);                  /* far too small */
+for (size_t i = 0; i &lt; count; i++) {
+    r[i] = read_record();                   /* writes way past the end */
+}</code></pre>
+
+  <p>With <code>sizeof(Record)</code> of 48 and a <code>count</code> near <code>SIZE_MAX / 48</code>, the multiplication wraps to a small number. The allocation succeeds, the loop writes gigabytes, and the attacker chose the data. Two fixes: use <code>calloc(count, sizeof(Record))</code>, which is required to detect the overflow, or check <code>count &gt; SIZE_MAX / sizeof(Record)</code> first.</p>
+
+  <h3>The format-string bug</h3>
+
+<pre><code>printf(user_input);              /* catastrophic */
+printf("%s", user_input);        /* correct */</code></pre>
+
+  <p>If the input contains <code>%s</code>, <code>printf</code> reads an argument that was never passed. If it contains <code>%n</code>, <code>printf</code> <em>writes</em> to an address taken from the stack. This has been a remote-code-execution vector since the 1990s and <code>-Wformat-security</code> catches it.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Defences that work</h2>
+
+  <table>
+    <thead><tr><th>Measure</th><th>Catches</th></tr></thead>
+    <tbody>
+      <tr><td><code>-fsanitize=undefined</code></td><td>Overflow, bad shifts, misalignment, at runtime</td></tr>
+      <tr><td><code>-fsanitize=address</code></td><td>Overruns, use-after-free</td></tr>
+      <tr><td><code>-D_FORTIFY_SOURCE=2 -O2</code></td><td>Some overflows in library calls, cheaply</td></tr>
+      <tr><td><code>-fstack-protector-strong</code></td><td>Stack smashing, via a canary</td></tr>
+      <tr><td><code>-Wformat-security</code></td><td>Non-literal format strings</td></tr>
+      <tr><td><code>-fno-strict-aliasing</code></td><td>Disables the assumption — a workaround, not a fix</td></tr>
+      <tr><td><code>-ftrapv</code></td><td>Traps on signed overflow instead of assuming</td></tr>
+    </tbody>
+  </table>
+
+  <p>And the practices: validate every input at the boundary, bound every copy, use <code>calloc</code> for untrusted counts, prefer <code>snprintf</code>, set pointers to <code>NULL</code> after freeing, and treat every compiler warning as a defect.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Worked example: correct at <code>-O0</code>, broken at <code>-O2</code></h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;limits.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdbool.h&gt;
+
+/* ---------- 1. the overflow check that disappears ---------- */
+
+static bool add_checked_broken(int a, int b, int *out)
+{
+    int sum = a + b;               /* UB on overflow */
+    if (sum &lt; a) {                 /* assumes wrapping; may be deleted */
+        return false;
+    }
+    *out = sum;
+    return true;
+}
+
+static bool add_checked(int a, int b, int *out)
+{
+    if (b &gt; 0 &amp;&amp; a &gt; INT_MAX - b) return false;   /* checked BEFORE */
+    if (b &lt; 0 &amp;&amp; a &lt; INT_MIN - b) return false;
+    *out = a + b;
+    return true;
+}
+
+/* ---------- 2. the null check that disappears ---------- */
+
+static int deref_then_check(int *p)
+{
+    int value = *p;                /* if p were NULL this is UB ... */
+    if (p == NULL) {               /* ... so the compiler may delete this */
+        return -1;
+    }
+    return value;
+}
+
+static int check_then_deref(int *p)
+{
+    if (p == NULL) return -1;      /* the only order that works */
+    return *p;
+}
+
+/* ---------- 3. strict aliasing ---------- */
+
+static uint32_t bits_violating(float f)
+{
+    return *(uint32_t *)&amp;f;        /* undefined behavior */
+}
+
+static uint32_t bits_memcpy(float f)
+{
+    uint32_t bits;
+    memcpy(&amp;bits, &amp;f, sizeof bits);   /* correct, and free at -O2 */
+    return bits;
+}
+
+static uint32_t bits_union(float f)
+{
+    union { float f; uint32_t u; } conv = { .f = f };
+    return conv.u;                    /* correct in C */
+}
+
+/* ---------- 4. the allocation-size overflow ---------- */
+
+typedef struct { int id; char pad[44]; } Record;   /* 48 bytes */
+
+static Record *allocate_broken(size_t count)
+{
+    return malloc(count * sizeof(Record));         /* can wrap */
+}
+
+static Record *allocate_checked(size_t count)
+{
+    if (count &gt; SIZE_MAX / sizeof(Record)) {
+        return NULL;                               /* refuse */
+    }
+    return calloc(count, sizeof(Record));          /* checks as well */
+}
+
+/* ---------- 5. format strings ---------- */
+
+static void print_broken(const char *user)
+{
+    printf(user);                  /* -Wformat-security warns */
+    putchar('\n');
+}
+
+static void print_safe(const char *user)
+{
+    printf("%s\n", user);
+}
+
+int main(void)
+{
+    printf("built at optimization level: ");
+#ifdef __OPTIMIZE__
+    puts("optimized");
+#else
+    puts("-O0");
+#endif
+
+    puts("\n== 1. signed overflow ==");
+    int result = 0;
+    printf("  broken check, INT_MAX + 1 : %s\n",
+           add_checked_broken(INT_MAX, 1, &amp;result) ? "ACCEPTED (wrong)"
+                                                   : "rejected");
+    printf("  correct check, INT_MAX + 1: %s\n",
+           add_checked(INT_MAX, 1, &amp;result) ? "ACCEPTED (wrong)" : "rejected");
+    printf("  correct check, 100 + 200  : %s (%d)\n",
+           add_checked(100, 200, &amp;result) ? "accepted" : "rejected", result);
+    puts("  compile at -O2 and compare: the broken check may vanish");
+
+    puts("\n== 2. null checks ==");
+    int value = 42;
+    printf("  check_then_deref(&amp;value) = %d\n", check_then_deref(&amp;value));
+    printf("  check_then_deref(NULL)   = %d\n", check_then_deref(NULL));
+    puts("  deref_then_check(NULL) is NOT called here: at -O2 the test");
+    puts("  may be gone and it would simply crash");
+
+    puts("\n== 3. strict aliasing ==");
+    float f = 1.0f;
+    printf("  memcpy : 0x%08X\n", bits_memcpy(f));
+    printf("  union  : 0x%08X\n", bits_union(f));
+    printf("  cast   : 0x%08X  &lt;-- undefined behavior, works by luck\n",
+           bits_violating(f));
+    puts("  all three agree today; only two are guaranteed to");
+
+    puts("\n== 4. allocation size overflow ==");
+    size_t huge = SIZE_MAX / 48 + 2;
+    printf("  requesting %zu records of %zu bytes\n", huge, sizeof(Record));
+    printf("  count * sizeof wraps to %zu bytes\n", huge * sizeof(Record));
+    Record *bad = allocate_broken(huge);
+    printf("  malloc(wrapped) : %s  &lt;-- a tiny buffer for a huge count\n",
+           bad ? "SUCCEEDED" : "failed");
+    free(bad);
+    Record *good = allocate_checked(huge);
+    printf("  checked version : %s\n", good ? "succeeded" : "refused");
+    free(good);
+
+    puts("\n== 5. format strings ==");
+    print_safe("a normal message");
+    print_safe("%s %s %s %n");     /* harmless: it is just data */
+    puts("  the same string passed to printf() directly would read");
+    puts("  arguments that were never pushed, and %n would WRITE");
+
+    puts("\n== 6. shifting too far ==");
+    unsigned shift_by = 32;
+    uint32_t one = 1;
+    printf("  1u &lt;&lt; 32 on a 32-bit type is undefined\n");
+    if (shift_by &lt; 32) {           /* the guard that makes it defined */
+        printf("  guarded: %u\n", one &lt;&lt; shift_by);
+    } else {
+        puts("  guarded: refused, as it must be");
+    }
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+  <h3>Run it at both levels and compare</h3>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -Wformat-security -O0 -o ub0 ub.c
+gcc -std=c17 -Wall -Wextra -Wformat-security -O2 -o ub2 ub.c
+./ub0 &gt; out0.txt
+./ub2 &gt; out2.txt
+diff out0.txt out2.txt</code></pre>
+
+  <p>On many GCC versions the "broken check" line differs between the two builds: at <code>-O0</code> the addition wraps and the test happens to catch it; at <code>-O2</code> the compiler has concluded the test can never be true and removed it. Same source, same inputs, different behavior — which is the definition of a program you cannot reason about.</p>
+
+  <h3>Let the sanitizer name it</h3>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=undefined -o ubsan ub.c
+./ubsan</code></pre>
+
+<pre><code>ub.c:14:15: runtime error: signed integer overflow: 2147483647 + 1
+            cannot be represented in type 'int'</code></pre>
+
+  <p>File, line, operation, and values. UBSan is the only practical way to find this class of bug, because nothing else reports it — the program does not crash, it just becomes wrong.</p>
+
+  <h3>See <code>memcpy</code> cost nothing</h3>
+
+<pre><code>gcc -O2 -S ub.c -o ub.s
+sed -n '/bits_memcpy:/,/ret/p' ub.s
+sed -n '/bits_violating:/,/ret/p' ub.s</code></pre>
+
+  <p>Both functions typically compile to the same one or two instructions. The <code>memcpy</code> version is correct and free; the cast version is undefined and no faster. There is no trade-off to make.</p>
+
+  <h3>Watch the format-string warning</h3>
+
+<pre><code>ub.c:118:5: warning: format not a string literal and no format
+            arguments [-Wformat-security]</code></pre>
+
+  <p><code>-Wformat-security</code> is not in <code>-Wall</code> or <code>-Wextra</code>. Add it to the warning profile from week 29 — it catches a vulnerability class for one flag.</p>
+
+  <h3>Confirm the allocation wrap</h3>
+
+  <p>The output prints the requested count, the size of a record, and the wrapped product — a number far smaller than either. <code>malloc</code> succeeds because the request is tiny; the loop that follows would write past the end of a handful of bytes. <code>calloc</code> is required by the standard to detect this and return <code>NULL</code>, which is why it is the right allocator for any count that came from outside your program.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>if (a + b &lt; a)</code> to detect overflow</td><td>Deleted by the optimizer</td><td>Check against <code>INT_MAX - b</code> first.</td></tr>
+      <tr><td>Null check after a dereference</td><td>Deleted by the optimizer</td><td>Check before.</td></tr>
+      <tr><td><code>*(int *)&amp;float_value</code></td><td>Strict-aliasing violation</td><td><code>memcpy</code> or a union.</td></tr>
+      <tr><td><code>malloc(count * size)</code> with untrusted <code>count</code></td><td>Wraps; undersized buffer</td><td><code>calloc</code>, or check the division bound.</td></tr>
+      <tr><td><code>printf(user_string)</code></td><td>Information disclosure or memory write</td><td><code>printf("%s", …)</code>.</td></tr>
+      <tr><td><code>restrict</code> on pointers that may overlap</td><td>Undefined; silently wrong output</td><td>Only promise what you can guarantee.</td></tr>
+      <tr><td>"It works, so it must be correct"</td><td>Breaks on the next compiler version</td><td>Correctness is what the standard guarantees.</td></tr>
+      <tr><td><code>-fno-strict-aliasing</code> as a fix</td><td>Hides the bug; costs performance</td><td>Fix the aliasing violation.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">9</span>Check yourself</h2>
+
+  <details>
+    <summary>What is the difference between undefined and implementation-defined behavior?</summary>
+    <p>Implementation-defined behavior has exactly one outcome, chosen by the implementation and documented — whether <code>char</code> is signed, for instance. You can look it up and rely on it for that platform. Undefined behavior carries no requirements at all: not on the operation, not on surrounding code, not on anything that already happened. The compiler may assume it never occurs.</p>
+  </details>
+
+  <details>
+    <summary>Why does <code>if (a + b &lt; a)</code> fail to detect signed overflow?</summary>
+    <p>Because the addition itself is undefined when it overflows, so the compiler is entitled to assume it does not — and under that assumption <code>a + b &lt; a</code> is false whenever <code>b</code> is non-negative, so the branch is dead code and gets removed. The check must test the operands against <code>INT_MAX</code> before performing the addition.</p>
+  </details>
+
+  <details>
+    <summary>Why is <code>*(int *)&amp;some_float</code> wrong even though it works?</summary>
+    <p>It violates strict aliasing: an object may only be accessed through a compatible type, with <code>char</code> as the exception. The compiler uses that rule to assume an <code>int</code> store cannot affect a <code>float</code>, and may reorder loads and stores accordingly. Use <code>memcpy</code>, which is correct and compiles to the same instruction, or a union, which C explicitly permits.</p>
+  </details>
+
+  <details>
+    <summary>What does <code>restrict</code> promise, and who checks it?</summary>
+    <p>That within the scope, the object accessed through that pointer is not accessed through any other pointer — which lets the compiler keep values in registers and vectorize loops. Nobody checks it. Passing overlapping pointers is undefined behavior with no diagnostic, which is precisely the difference between <code>memcpy</code> and <code>memmove</code>.</p>
+  </details>
+
+  <details>
+    <summary>Why is <code>calloc</code> the right allocator for a count that came from outside the program?</summary>
+    <p>Because it takes the count and element size separately and is required to detect overflow in their product, returning <code>NULL</code> instead of allocating a wrapped, far-too-small block. <code>malloc(count * size)</code> computes the product first, and if it wraps the allocation succeeds at the wrong size — the classic route from an integer overflow to a heap buffer overflow.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">10</span>Where this leads</h2>
+  <p>Week 37 covers the neighbouring category: behavior that is defined but differs between platforms — type widths, byte order, alignment, character encoding. That is what stands between code that runs here and code that runs everywhere, and it is the prerequisite for the portable binary format the embedded weeks depend on.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_35_Debugging_and_Testing.html">← Week 35</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_37_Portability_and_Machine_Model.html">Week 37 →</a>
+</div>
+
+</div>

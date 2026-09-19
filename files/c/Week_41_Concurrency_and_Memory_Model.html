@@ -1,0 +1,505 @@
+---
+layout: without-sidebar
+title: "Week 41 — Concurrency and the C Memory Model"
+permalink: /files/c/Week_41_Concurrency_and_Memory_Model.html
+excerpt: "Threads with C11 and POSIX, race conditions, mutexes and condition variables, thread-local storage, atomics and the memory model, reentrancy, and debugging deadlock."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Advanced · Week 41</div>
+  <h1>Concurrency and the C Memory Model</h1>
+  <p class="c-wk-lead">Week 39's processes were isolated. Threads share one address space, which makes communication free and correctness hard: two threads touching one variable without synchronization is undefined behavior, and the resulting bugs appear only under load.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Create and join threads with both C11 and POSIX interfaces.</li>
+      <li>Recognize a data race and explain why it is undefined behavior rather than merely wrong.</li>
+      <li>Protect shared state with a mutex, and coordinate with a condition variable.</li>
+      <li>Use atomics, and say what the memory model guarantees.</li>
+      <li>Identify non-reentrant library functions and avoid deadlock.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Threads</h2>
+
+  <p>C11 added <code>&lt;threads.h&gt;</code>; POSIX has had pthreads since 1995. The C11 interface is cleaner but less widely implemented — notably absent from glibc until recently and from macOS — so pthreads remains what production code uses.</p>
+
+<pre><code>/* POSIX */
+#include &lt;pthread.h&gt;
+
+static void *worker(void *arg)
+{
+    int id = *(int *)arg;
+    printf("thread %d\n", id);
+    return NULL;
+}
+
+pthread_t t;
+int id = 1;
+pthread_create(&amp;t, NULL, worker, &amp;id);
+pthread_join(t, NULL);                 /* wait for it to finish */</code></pre>
+
+  <p>All threads share the heap, globals, and file descriptors. Each has its own stack, so locals are private. That asymmetry is the whole subject: anything reachable from more than one thread needs protection.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>Passing the address of a loop variable.</strong> <code>pthread_create(&amp;t[i], NULL, worker, &amp;i)</code> passes the address of a variable that keeps changing — every thread reads whatever <code>i</code> holds when it happens to run, and after the loop it may not exist at all. Give each thread its own object: an element of an array, or a small allocated structure.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Data races</h2>
+
+<pre><code>int counter = 0;                       /* shared */
+
+void *increment(void *arg)
+{
+    for (int i = 0; i &lt; 1000000; i++) {
+        counter++;                     /* a data race */
+    }
+    return NULL;
+}</code></pre>
+
+  <p>Run this on four threads and the result is not 4 000 000. <code>counter++</code> is three operations — load, add, store — and two threads interleaving them lose updates.</p>
+
+  <p>The C standard's position is stronger than "you get a wrong number". Two threads accessing the same object without synchronization, where at least one writes, is a <strong>data race and therefore undefined behavior</strong>. The compiler may keep the variable in a register, reorder the accesses, or assume the race cannot happen. Reasoning about which interleaving you got is already the wrong question.</p>
+
+  <p>And, as week 38 said: <code>volatile</code> does not fix this. It forces the accesses to happen; it makes nothing atomic.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Mutexes</h2>
+
+<pre><code>pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+
+pthread_mutex_lock(&amp;lock);
+counter++;                             /* the critical section */
+pthread_mutex_unlock(&amp;lock);</code></pre>
+
+  <p>A mutex guarantees that only one thread is inside the critical section at a time, and — equally important — establishes the ordering that makes one thread's writes visible to the next.</p>
+
+  <table>
+    <thead><tr><th>Rule</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Keep critical sections short</td><td>Every other thread is waiting</td></tr>
+      <tr><td>Never return while holding the lock</td><td>It stays locked forever</td></tr>
+      <tr><td>Always lock multiple mutexes in the same order</td><td>Otherwise: deadlock</td></tr>
+      <tr><td>Do not call unknown code while holding a lock</td><td>It may take the same lock</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Deadlock</h3>
+
+<pre><code>/* thread 1 */            /* thread 2 */
+lock(A);                  lock(B);
+lock(B);   /* waits */    lock(A);   /* waits */</code></pre>
+
+  <p>Each holds what the other needs. Nothing times out; the program simply stops. The standard prevention is a <strong>lock ordering</strong>: assign every mutex a rank and always acquire in increasing rank. If every thread obeys it, a cycle is impossible.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Condition variables</h2>
+
+  <p>A mutex protects data. A condition variable lets a thread <em>wait</em> for the data to reach a state — without spinning.</p>
+
+<pre><code>pthread_mutex_lock(&amp;lock);
+while (queue_is_empty(&amp;q)) {           /* while, not if */
+    pthread_cond_wait(&amp;not_empty, &amp;lock);
+}
+item = queue_pop(&amp;q);
+pthread_mutex_unlock(&amp;lock);</code></pre>
+
+  <p><code>pthread_cond_wait</code> atomically releases the mutex and sleeps; on waking it reacquires the mutex before returning. That atomicity is the point — without it, a signal arriving between the test and the sleep would be missed.</p>
+
+  <p><strong>The loop is mandatory.</strong> A waiting thread can wake without the condition being true: a <em>spurious wakeup</em>, permitted by the standard, or another thread taking the item first. <code>if</code> instead of <code>while</code> produces a bug that appears once a month under load.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Atomics and the memory model</h2>
+
+<pre><code>#include &lt;stdatomic.h&gt;
+
+atomic_int counter = 0;
+atomic_fetch_add(&amp;counter, 1);         /* indivisible */
+counter++;                              /* also atomic for an atomic type */</code></pre>
+
+  <p>For a single counter, an atomic is faster than a mutex — one instruction rather than a system call in the contended case. For anything involving two related values, a mutex is required: two atomic operations are not one atomic operation.</p>
+
+  <h3>Memory ordering</h3>
+
+  <p>Modern processors and compilers reorder memory operations. The C memory model defines what one thread is guaranteed to observe of another.</p>
+
+  <table>
+    <thead><tr><th>Order</th><th>Guarantees</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr><td><code>memory_order_seq_cst</code></td><td>A single total order, visible to all — the default</td><td>Highest</td></tr>
+      <tr><td><code>memory_order_acquire</code> / <code>release</code></td><td>Pairs up to order everything before a release with everything after the matching acquire</td><td>Moderate</td></tr>
+      <tr><td><code>memory_order_relaxed</code></td><td>Atomicity only; no ordering at all</td><td>Lowest</td></tr>
+    </tbody>
+  </table>
+
+  <p>Use the default. Relaxed ordering is correct only in narrow cases — a statistics counter nobody reads until the end — and reasoning about it is genuinely difficult. A wrong choice produces a bug that appears on one processor architecture and not another.</p>
+
+  <h3><code>_Thread_local</code></h3>
+
+<pre><code>_Thread_local int per_thread_errors = 0;   /* one instance per thread */</code></pre>
+
+  <p>Each thread gets its own copy, so no synchronization is needed. This is how <code>errno</code> is implemented on a threaded system.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Reentrancy</h2>
+
+  <p>Several standard library functions keep static state and cannot be called from two threads at once. Week 14's <code>strtok</code> was the first example; there are others.</p>
+
+  <table>
+    <thead><tr><th>Not thread-safe</th><th>Use instead</th></tr></thead>
+    <tbody>
+      <tr><td><code>strtok</code></td><td><code>strtok_r</code></td></tr>
+      <tr><td><code>localtime</code>, <code>gmtime</code></td><td><code>localtime_r</code>, <code>gmtime_r</code></td></tr>
+      <tr><td><code>asctime</code>, <code>ctime</code></td><td><code>asctime_r</code>, <code>ctime_r</code></td></tr>
+      <tr><td><code>rand</code></td><td><code>rand_r</code>, or a per-thread generator</td></tr>
+      <tr><td><code>strerror</code></td><td><code>strerror_r</code></td></tr>
+      <tr><td><code>getenv</code> with concurrent <code>setenv</code></td><td>Read the environment once at startup</td></tr>
+    </tbody>
+  </table>
+
+  <p>The <code>_r</code> suffix means <em>reentrant</em>: the caller supplies the buffer, so there is no shared state. <code>errno</code> itself is thread-local on every modern system, which is why week 27's advice still holds here.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Worked example: a producer-consumer pipeline</h2>
+
+<pre><code>#define _POSIX_C_SOURCE 200809L
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stdatomic.h&gt;
+#include &lt;pthread.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;time.h&gt;
+
+#define QUEUE_CAPACITY 8
+#define PRODUCERS      3
+#define CONSUMERS      2
+#define PER_PRODUCER   2000
+
+/* ---------- 1. the race, demonstrated ---------- */
+
+static long   racy_counter   = 0;
+static atomic_long atomic_counter = 0;
+static long   guarded_counter = 0;
+static pthread_mutex_t guard = PTHREAD_MUTEX_INITIALIZER;
+
+#define BUMPS 200000
+
+static void *bump_all(void *arg)
+{
+    (void)arg;
+    for (int i = 0; i &lt; BUMPS; i++) {
+        racy_counter++;                               /* DATA RACE */
+        atomic_fetch_add(&amp;atomic_counter, 1);         /* atomic     */
+        pthread_mutex_lock(&amp;guard);
+        guarded_counter++;                            /* protected  */
+        pthread_mutex_unlock(&amp;guard);
+    }
+    return NULL;
+}
+
+/* ---------- 2. a bounded blocking queue ---------- */
+
+typedef struct {
+    int             items[QUEUE_CAPACITY];
+    size_t          head, tail, count;
+    bool            closed;
+    pthread_mutex_t lock;
+    pthread_cond_t  not_empty;
+    pthread_cond_t  not_full;
+} Queue;
+
+static void queue_init(Queue *q)
+{
+    q->head = q->tail = q->count = 0;
+    q->closed = false;
+    pthread_mutex_init(&amp;q->lock, NULL);
+    pthread_cond_init(&amp;q->not_empty, NULL);
+    pthread_cond_init(&amp;q->not_full, NULL);
+}
+
+static void queue_destroy(Queue *q)
+{
+    pthread_mutex_destroy(&amp;q->lock);
+    pthread_cond_destroy(&amp;q->not_empty);
+    pthread_cond_destroy(&amp;q->not_full);
+}
+
+static void queue_push(Queue *q, int value)
+{
+    pthread_mutex_lock(&amp;q->lock);
+    while (q->count == QUEUE_CAPACITY &amp;&amp; !q->closed) {
+        pthread_cond_wait(&amp;q->not_full, &amp;q->lock);    /* while, not if */
+    }
+    if (!q->closed) {
+        q->items[q->tail] = value;
+        q->tail = (q->tail + 1) % QUEUE_CAPACITY;
+        q->count++;
+        pthread_cond_signal(&amp;q->not_empty);
+    }
+    pthread_mutex_unlock(&amp;q->lock);
+}
+
+static bool queue_pop(Queue *q, int *out)
+{
+    pthread_mutex_lock(&amp;q->lock);
+    while (q->count == 0 &amp;&amp; !q->closed) {
+        pthread_cond_wait(&amp;q->not_empty, &amp;q->lock);
+    }
+    if (q->count == 0) {                              /* closed and drained */
+        pthread_mutex_unlock(&amp;q->lock);
+        return false;
+    }
+    *out = q->items[q->head];
+    q->head = (q->head + 1) % QUEUE_CAPACITY;
+    q->count--;
+    pthread_cond_signal(&amp;q->not_full);
+    pthread_mutex_unlock(&amp;q->lock);
+    return true;
+}
+
+static void queue_close(Queue *q)
+{
+    pthread_mutex_lock(&amp;q->lock);
+    q->closed = true;
+    pthread_cond_broadcast(&amp;q->not_empty);            /* wake everyone */
+    pthread_cond_broadcast(&amp;q->not_full);
+    pthread_mutex_unlock(&amp;q->lock);
+}
+
+/* ---------- 3. the workers ---------- */
+
+typedef struct { Queue *q; int id; } Worker;
+
+static atomic_long produced = 0;
+static atomic_long consumed = 0;
+static atomic_long checksum = 0;
+
+_Thread_local long my_items = 0;                      /* private per thread */
+
+static void *producer(void *arg)
+{
+    Worker *w = arg;                                  /* its own object */
+    for (int i = 0; i &lt; PER_PRODUCER; i++) {
+        int value = w->id * 1000000 + i;
+        queue_push(w->q, value);
+        atomic_fetch_add(&amp;produced, 1);
+        my_items++;
+    }
+    printf("  producer %d finished, %ld items (thread-local count)\n",
+           w->id, my_items);
+    return NULL;
+}
+
+static void *consumer(void *arg)
+{
+    Worker *w = arg;
+    int value;
+    while (queue_pop(w->q, &amp;value)) {
+        atomic_fetch_add(&amp;consumed, 1);
+        atomic_fetch_add(&amp;checksum, value % 97);
+        my_items++;
+    }
+    printf("  consumer %d finished, %ld items\n", w->id, my_items);
+    return NULL;
+}
+
+int main(void)
+{
+    puts("== 1. three counters, one loop, four threads ==");
+    pthread_t bumpers[4];
+    for (int i = 0; i &lt; 4; i++) pthread_create(&amp;bumpers[i], NULL, bump_all, NULL);
+    for (int i = 0; i &lt; 4; i++) pthread_join(bumpers[i], NULL);
+
+    long expected = 4L * BUMPS;
+    printf("  expected          : %ld\n", expected);
+    printf("  racy (unprotected): %ld  %s\n", racy_counter,
+           racy_counter == expected ? "(lucky this run)" : "&lt;-- updates lost");
+    printf("  atomic            : %ld\n", atomic_load(&amp;atomic_counter));
+    printf("  mutex-protected   : %ld\n", guarded_counter);
+    puts("  the racy result varies between runs; that is what UB looks like");
+
+    puts("\n== 2. producer-consumer with a bounded queue ==");
+    Queue q;
+    queue_init(&amp;q);
+
+    pthread_t pt[PRODUCERS], ct[CONSUMERS];
+    Worker    pw[PRODUCERS], cw[CONSUMERS];
+
+    struct timespec t0;
+    clock_gettime(CLOCK_MONOTONIC, &amp;t0);
+
+    for (int i = 0; i &lt; CONSUMERS; i++) {
+        cw[i] = (Worker){ .q = &amp;q, .id = i };         /* its own object */
+        pthread_create(&amp;ct[i], NULL, consumer, &amp;cw[i]);
+    }
+    for (int i = 0; i &lt; PRODUCERS; i++) {
+        pw[i] = (Worker){ .q = &amp;q, .id = i };
+        pthread_create(&amp;pt[i], NULL, producer, &amp;pw[i]);
+    }
+
+    for (int i = 0; i &lt; PRODUCERS; i++) pthread_join(pt[i], NULL);
+    queue_close(&amp;q);                                   /* now the consumers end */
+    for (int i = 0; i &lt; CONSUMERS; i++) pthread_join(ct[i], NULL);
+
+    struct timespec t1;
+    clock_gettime(CLOCK_MONOTONIC, &amp;t1);
+    double secs = (double)(t1.tv_sec - t0.tv_sec)
+                + (double)(t1.tv_nsec - t0.tv_nsec) / 1e9;
+
+    printf("  produced %ld, consumed %ld, checksum %ld, %.3f s\n",
+           atomic_load(&amp;produced), atomic_load(&amp;consumed),
+           atomic_load(&amp;checksum), secs);
+    printf("  queue capacity was %d, so producers blocked whenever\n",
+           QUEUE_CAPACITY);
+    puts("  consumers fell behind — that is back-pressure, for free");
+
+    queue_destroy(&amp;q);
+
+    puts("\n== 3. reentrancy ==");
+    time_t now = time(NULL);
+    struct tm safe;
+    localtime_r(&amp;now, &amp;safe);                          /* caller's buffer */
+    char stamp[64];
+    strftime(stamp, sizeof stamp, "%H:%M:%S", &amp;safe);
+    printf("  localtime_r : %s\n", stamp);
+    puts("  localtime() returns a pointer to a shared static buffer;");
+    puts("  two threads calling it would overwrite each other's result");
+
+    char text[] = "alpha,beta,gamma";
+    char *save = NULL;
+    printf("  strtok_r    :");
+    for (char *tok = strtok_r(text, ",", &amp;save); tok != NULL;
+         tok = strtok_r(NULL, ",", &amp;save)) {
+        printf(" [%s]", tok);
+    }
+    puts("\n  the save pointer replaces strtok's hidden static state");
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -pthread -o concurrent concurrent.c
+./concurrent</code></pre>
+
+  <p><code>-pthread</code> rather than <code>-lpthread</code>: it sets the required preprocessor definitions as well as linking the library.</p>
+
+  <h3>Let the sanitizer name the race</h3>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -pthread -fsanitize=thread -o concurrent_tsan concurrent.c
+./concurrent_tsan</code></pre>
+
+<pre><code>WARNING: ThreadSanitizer: data race (pid=12345)
+  Write of size 8 at 0x55a... by thread T2:
+    #0 bump_all concurrent.c:28
+
+  Previous write of size 8 at 0x55a... by thread T1:
+    #0 bump_all concurrent.c:28
+
+  Location is global 'racy_counter' of size 8</code></pre>
+
+  <p>It names the variable, both threads, and the line. ThreadSanitizer reports races that did not manifest on this run — it reasons about the synchronization, not about what happened to interleave. That is what makes it worth the five- to fifteen-fold slowdown. Note that it cannot be combined with AddressSanitizer; run them in separate builds.</p>
+
+  <h3>Run the racy counter ten times</h3>
+
+<pre><code>for i in $(seq 10); do ./concurrent | grep 'racy'; done</code></pre>
+
+  <p>Ten different numbers, all below 800 000. Every lost update is one thread's store overwriting another's. Then raise <code>BUMPS</code> and watch the loss grow — and note that at low contention the racy counter is sometimes exactly right, which is precisely why these bugs reach production.</p>
+
+  <h3>Cause a deadlock deliberately</h3>
+
+<pre><code>static pthread_mutex_t a = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t b = PTHREAD_MUTEX_INITIALIZER;
+
+static void *ab(void *_) { (void)_;
+    pthread_mutex_lock(&amp;a); sleep(1); pthread_mutex_lock(&amp;b);
+    pthread_mutex_unlock(&amp;b); pthread_mutex_unlock(&amp;a); return NULL; }
+
+static void *ba(void *_) { (void)_;
+    pthread_mutex_lock(&amp;b); sleep(1); pthread_mutex_lock(&amp;a);
+    pthread_mutex_unlock(&amp;a); pthread_mutex_unlock(&amp;b); return NULL; }</code></pre>
+
+  <p>The program hangs with no message. Attach a debugger to see why:</p>
+
+<pre><code>gdb -p $(pgrep concurrent)
+(gdb) thread apply all bt</code></pre>
+
+  <p>Both threads sit in <code>pthread_mutex_lock</code>, each holding what the other wants. Now make both functions lock <code>a</code> then <code>b</code> — the same order — and the deadlock becomes impossible. That single rule is the whole prevention.</p>
+
+  <h3>Break the condition-variable loop</h3>
+
+  <p>Change <code>while (q-&gt;count == 0 &amp;&amp; !q-&gt;closed)</code> to <code>if</code>. The program usually still works, and occasionally a consumer wakes to find the queue empty, pops garbage, and the counts disagree. Run it a hundred times to see it. This is the shape of a concurrency bug: correct almost always, wrong rarely, and impossible to reproduce on demand — which is why the rule is followed unconditionally rather than tested.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Sharing a variable without a lock</td><td>Data race; undefined behavior</td><td>Mutex, or an atomic type.</td></tr>
+      <tr><td><code>volatile</code> as synchronization</td><td>Still a race</td><td><code>&lt;stdatomic.h&gt;</code> or a mutex.</td></tr>
+      <tr><td><code>if</code> instead of <code>while</code> around <code>cond_wait</code></td><td>Proceeds on a spurious wakeup</td><td>Always loop on the predicate.</td></tr>
+      <tr><td>Locking two mutexes in different orders</td><td>Deadlock, silent</td><td>A global lock ordering.</td></tr>
+      <tr><td>Returning while holding a lock</td><td>Permanently locked</td><td>One exit, or unlock on every path.</td></tr>
+      <tr><td>Passing <code>&amp;i</code> from a loop to a thread</td><td>Every thread sees the same changing value</td><td>Give each its own object.</td></tr>
+      <tr><td><code>strtok</code> or <code>localtime</code> from threads</td><td>Threads corrupt each other's state</td><td>The <code>_r</code> variants.</td></tr>
+      <tr><td>Relaxed memory order without a reason</td><td>Works on x86, fails on ARM</td><td>Default to sequential consistency.</td></tr>
+      <tr><td>Not joining or detaching a thread</td><td>Resource leak</td><td><code>pthread_join</code> or <code>pthread_detach</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">9</span>Check yourself</h2>
+
+  <details>
+    <summary>Why is a data race undefined behavior rather than just a wrong result?</summary>
+    <p>Because the standard withdraws all requirements when two threads access an object concurrently and at least one writes. The compiler may keep the value in a register, reorder the accesses, or optimize on the assumption that the race cannot occur. Reasoning about which interleaving you got presumes a guarantee the language does not give.</p>
+  </details>
+
+  <details>
+    <summary>Why does <code>volatile</code> not make <code>counter++</code> thread-safe?</summary>
+    <p>Because it only forces each read and write to touch memory. The increment is still three separate operations — load, add, store — and another thread can act between them. <code>volatile</code> provides no atomicity and no ordering relative to other variables. Use an atomic type or a mutex.</p>
+  </details>
+
+  <details>
+    <summary>Why must <code>pthread_cond_wait</code> be called inside a <code>while</code> loop?</summary>
+    <p>Because waking does not prove the condition holds. The standard permits spurious wakeups, and another thread may consume the item between the signal and your reacquiring the mutex. Re-testing the predicate after every wake is the only correct pattern; <code>if</code> produces a bug that surfaces rarely and under load.</p>
+  </details>
+
+  <details>
+    <summary>What single rule prevents deadlock between two mutexes?</summary>
+    <p>A consistent global acquisition order: rank every mutex and always lock in increasing rank. Deadlock requires a cycle in the wait-for graph, and a total order makes a cycle impossible. It must be followed by every thread without exception, since one violation reintroduces the possibility.</p>
+  </details>
+
+  <details>
+    <summary>What does the <code>_r</code> suffix mean, and why do those functions exist?</summary>
+    <p>Reentrant: the caller supplies the buffer or the state, so the function keeps none of its own. The originals — <code>strtok</code>, <code>localtime</code>, <code>strerror</code> — return pointers to shared static storage, so two threads calling them overwrite each other's results. The <code>_r</code> variants move that state into the caller and become safe.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">10</span>Where this leads</h2>
+  <p>That completes the Advanced level, and with it the language, the standard library, the operating system interface, and concurrency. The Professional level starts from a different premise: not what C can express, but what working in C with other people actually requires. Week 42 begins by reading excellent C written by someone else.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_40_Network_Programming_with_Sockets.html">← Week 40</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_42_Reading_Excellent_C.html">Week 42 →</a>
+</div>
+
+</div>

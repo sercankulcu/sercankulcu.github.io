@@ -1,0 +1,459 @@
+---
+layout: without-sidebar
+title: "Week 45 — Packaging and Distributing C Libraries"
+permalink: /files/c/Week_45_Packaging_and_Distributing_Libraries.html
+excerpt: "Designing a stable API, soname and symbol versioning, ABI compatibility rules, installation layouts and pkg-config, header hygiene, and deprecating without breaking."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Professional · Week 45</div>
+  <h1>Packaging and Distributing C Libraries</h1>
+  <p class="c-wk-lead">A library that only you can build is a directory of source files. Making it installable — and keeping it installable across versions without breaking programs already compiled against it — is a distinct engineering problem, and ABI compatibility is where most of the difficulty lives.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Design a public header that does not constrain your implementation.</li>
+      <li>Distinguish API from ABI compatibility and classify a change correctly.</li>
+      <li>Set a <code>soname</code> and control which symbols are exported.</li>
+      <li>Install to the conventional layout and supply a <code>pkg-config</code> file.</li>
+      <li>Deprecate and remove functionality without breaking existing users.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The public header</h2>
+
+  <p>Everything in an installed header is a promise. The smaller the header, the more freedom you retain.</p>
+
+<pre><code>#ifndef INTARRAY_H
+#define INTARRAY_H
+
+#include &lt;stddef.h&gt;
+#include &lt;stdbool.h&gt;
+
+#ifdef __cplusplus
+extern "C" {                          /* week 46: C++ callers */
+#endif
+
+#define INTARRAY_VERSION_MAJOR 2
+#define INTARRAY_VERSION_MINOR 3
+#define INTARRAY_VERSION_PATCH 0
+
+typedef struct IntArray IntArray;     /* opaque: no layout promised */
+
+IntArray *intarray_create(size_t initial_capacity);
+void      intarray_destroy(IntArray *a);
+bool      intarray_push(IntArray *a, int value);
+size_t    intarray_count(const IntArray *a);
+
+const char *intarray_version_string(void);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* INTARRAY_H */</code></pre>
+
+  <table>
+    <thead><tr><th>Rule</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Prefix every public name</td><td>C has no namespaces; <code>intarray_</code> is the substitute</td></tr>
+      <tr><td>Opaque types wherever possible</td><td>The layout stays yours — week 28</td></tr>
+      <tr><td>Include only what the header itself needs</td><td>Pulling in <code>&lt;stdio.h&gt;</code> imposes it on every user</td></tr>
+      <tr><td>No <code>static</code> or <code>inline</code> definitions</td><td>They become part of the ABI once a caller compiles them in</td></tr>
+      <tr><td>Version macros <em>and</em> a runtime accessor</td><td>The macro says what you compiled against; the function says what is loaded</td></tr>
+      <tr><td><code>extern "C"</code> guard</td><td>Costs two lines; makes the library usable from C++</td></tr>
+    </tbody>
+  </table>
+
+  <p>That last pair is worth understanding. <code>INTARRAY_VERSION_MINOR</code> is baked into the caller at compile time; <code>intarray_version_string()</code> reports the shared library actually loaded. When they disagree, you have a deployment problem — and without both you cannot detect it.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>API versus ABI</h2>
+
+  <table>
+    <thead><tr><th></th><th>API</th><th>ABI</th></tr></thead>
+    <tbody>
+      <tr><td>Compatible means</td><td>Existing source still compiles</td><td>Existing <em>binaries</em> still run</td></tr>
+      <tr><td>Broken by</td><td>Removing a function, changing a signature</td><td>Anything that changes layout, size, or calling convention</td></tr>
+      <tr><td>Detected</td><td>At compile time, loudly</td><td>At run time, as corruption</td></tr>
+    </tbody>
+  </table>
+
+  <p>ABI is the harder discipline because the breakages are invisible in the header's text.</p>
+
+  <table>
+    <thead><tr><th>Change</th><th>API</th><th>ABI</th></tr></thead>
+    <tbody>
+      <tr><td>Add a new function</td><td>safe</td><td>safe</td></tr>
+      <tr><td>Add a member to an <em>opaque</em> struct</td><td>safe</td><td><strong>safe</strong></td></tr>
+      <tr><td>Add a member to a struct in the header</td><td>safe</td><td><strong>BREAKS</strong> — size changes</td></tr>
+      <tr><td>Reorder members of a visible struct</td><td>safe</td><td><strong>BREAKS</strong> — offsets change</td></tr>
+      <tr><td>Insert an enumerator in the middle</td><td>safe</td><td><strong>BREAKS</strong> — values shift</td></tr>
+      <tr><td>Change a parameter from <code>int</code> to <code>long</code></td><td>usually safe</td><td><strong>BREAKS</strong></td></tr>
+      <tr><td>Add a parameter</td><td>BREAKS</td><td>BREAKS</td></tr>
+      <tr><td>Change <code>int</code> to <code>size_t</code> in a returned struct</td><td>safe</td><td><strong>BREAKS</strong></td></tr>
+      <tr><td>Rename a function</td><td>BREAKS</td><td>BREAKS</td></tr>
+      <tr><td>Make a function <code>static</code></td><td>BREAKS</td><td>BREAKS</td></tr>
+    </tbody>
+  </table>
+
+  <p>Rows two and three are the whole argument for opaque types. If the caller never sees the definition, it never allocates the struct and never computes an offset — so you may add, remove, and reorder members forever.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>An ABI break with no API break is the dangerous one.</strong> The user's code still compiles, so nothing warns. Their existing binary loads the new library, allocates the old size, and writes past the end of every object. The symptom is memory corruption in code that was not recompiled and did not change.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span><code>soname</code> and symbol visibility</h2>
+
+<pre><code>gcc -shared -Wl,-soname,libintarray.so.2 \
+    -o libintarray.so.2.3.0 intarray.o
+
+ln -sf libintarray.so.2.3.0 libintarray.so.2      # runtime link
+ln -sf libintarray.so.2     libintarray.so        # build-time link</code></pre>
+
+  <p>Three names, three jobs:</p>
+
+  <table>
+    <thead><tr><th>Name</th><th>Used by</th></tr></thead>
+    <tbody>
+      <tr><td><code>libintarray.so</code></td><td>The linker at build time, via <code>-lintarray</code></td></tr>
+      <tr><td><code>libintarray.so.2</code></td><td>The dynamic loader at run time — this is the <code>soname</code></td></tr>
+      <tr><td><code>libintarray.so.2.3.0</code></td><td>The actual file</td></tr>
+    </tbody>
+  </table>
+
+  <p>The <code>soname</code> is recorded inside every program linked against the library, and it contains only the major version. So installing 2.4.0 alongside 2.3.0 lets existing programs pick up the new one automatically — while 3.0.0 has <code>soname</code> <code>libintarray.so.3</code> and coexists rather than replacing it. That is how a system can hold two incompatible versions at once.</p>
+
+  <h3>Exporting only what you mean to</h3>
+
+  <p>By default every non-<code>static</code> symbol is exported, which makes internal helpers part of your ABI whether you intended it or not.</p>
+
+<pre><code>gcc -fvisibility=hidden -fPIC -c intarray.c       # hide by default</code></pre>
+
+<pre><code>#define INTARRAY_API __attribute__((visibility("default")))
+
+INTARRAY_API IntArray *intarray_create(size_t capacity);</code></pre>
+
+  <p>Or list them explicitly, which works across compilers:</p>
+
+<pre><code>/* intarray.map */
+INTARRAY_2 {
+    global:
+        intarray_create;
+        intarray_destroy;
+        intarray_push;
+        intarray_count;
+        intarray_version_string;
+    local:
+        *;
+};</code></pre>
+
+<pre><code>gcc -shared -Wl,--version-script=intarray.map -o libintarray.so.2.3.0 …</code></pre>
+
+  <p>Verify the result rather than assuming it:</p>
+
+<pre><code>nm -D --defined-only libintarray.so.2.3.0 | grep ' T '</code></pre>
+
+  <p>Anything in that list is a promise. Week 29's <code>static</code> keyword and this flag are the two mechanisms that keep it short.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Installing</h2>
+
+  <table>
+    <thead><tr><th>Goes to</th><th>What</th></tr></thead>
+    <tbody>
+      <tr><td><code>$(prefix)/include/</code></td><td>Public headers</td></tr>
+      <tr><td><code>$(prefix)/lib/</code></td><td><code>.so</code>, <code>.a</code>, and the symlinks</td></tr>
+      <tr><td><code>$(prefix)/lib/pkgconfig/</code></td><td>The <code>.pc</code> file</td></tr>
+      <tr><td><code>$(prefix)/share/doc/</code></td><td>README, licence, changelog</td></tr>
+    </tbody>
+  </table>
+
+  <p><code>prefix</code> defaults to <code>/usr/local</code>; distributions override it to <code>/usr</code>. Two conventions that packagers require: honour <code>DESTDIR</code>, which stages the install into a temporary root, and never write outside <code>$(DESTDIR)$(prefix)</code>.</p>
+
+  <h3><code>pkg-config</code></h3>
+
+<pre><code>prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: intarray
+Description: A growable integer array
+Version: 2.3.0
+URL: https://example.org/intarray
+Libs: -L${libdir} -lintarray
+Cflags: -I${includedir}</code></pre>
+
+  <p>With that file installed, a consumer never hard-codes a path:</p>
+
+<pre><code>gcc app.c $(pkg-config --cflags --libs intarray) -o app
+pkg-config --modversion intarray
+pkg-config --atleast-version=2.1 intarray &amp;&amp; echo "new enough"</code></pre>
+
+  <p>Two fields matter beyond the obvious. <code>Requires:</code> lists other <code>.pc</code> packages you depend on, so their flags propagate automatically. <code>Libs.private:</code> lists libraries needed only for static linking — omitting it is why some static links fail with undefined references to <code>-lm</code> or <code>-lpthread</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Deprecating</h2>
+
+  <p>Removing a function immediately breaks every user. The sequence that does not:</p>
+
+  <ol>
+    <li><strong>Add the replacement.</strong> Both work; nothing breaks.</li>
+    <li><strong>Mark the old one deprecated.</strong> Users get a compiler warning naming the replacement.</li>
+    <li><strong>Document it in the changelog</strong> with the version in which it will be removed.</li>
+    <li><strong>Wait at least one major cycle.</strong></li>
+    <li><strong>Remove it in a major release</strong>, and say so prominently.</li>
+  </ol>
+
+<pre><code>#if defined(__GNUC__) || defined(__clang__)
+#  define INTARRAY_DEPRECATED(msg) __attribute__((deprecated(msg)))
+#elif defined(_MSC_VER)
+#  define INTARRAY_DEPRECATED(msg) __declspec(deprecated(msg))
+#else
+#  define INTARRAY_DEPRECATED(msg)
+#endif
+
+INTARRAY_DEPRECATED("use intarray_create_ex() instead")
+IntArray *intarray_create(size_t capacity);</code></pre>
+
+  <p>C23 standardizes this as <code>[[deprecated("message")]]</code>.</p>
+
+  <p>When you must change behavior rather than a name, add a new entry point instead of altering the old one — <code>intarray_create_ex</code> alongside <code>intarray_create</code>. It is inelegant, and it is why <code>*_ex</code> and <code>*2</code> suffixes are so common in long-lived C libraries. The alternative is breaking programs you cannot recompile.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: shipping the week 29 library</h2>
+
+  <h3>The Makefile</h3>
+
+<pre><code>NAME     := intarray
+MAJOR    := 2
+MINOR    := 3
+PATCH    := 0
+VERSION  := $(MAJOR).$(MINOR).$(PATCH)
+
+prefix   ?= /usr/local
+libdir   ?= $(prefix)/lib
+includedir ?= $(prefix)/include
+pcdir    ?= $(libdir)/pkgconfig
+
+CC       := gcc
+CFLAGS   := -std=c17 -Wall -Wextra -O2 -fPIC -fvisibility=hidden \
+            -DINTARRAY_BUILD
+LDFLAGS  :=
+
+SONAME   := lib$(NAME).so.$(MAJOR)
+SOFILE   := lib$(NAME).so.$(VERSION)
+ARFILE   := lib$(NAME).a
+
+.PHONY: all clean install uninstall check abi-check
+
+all: $(SOFILE) $(ARFILE) $(NAME).pc
+
+$(NAME).o: $(NAME).c $(NAME).h
+	$(CC) $(CFLAGS) -c $&lt; -o $@
+
+$(SOFILE): $(NAME).o $(NAME).map
+	$(CC) -shared -Wl,-soname,$(SONAME) \
+	      -Wl,--version-script=$(NAME).map \
+	      -o $@ $&lt; $(LDFLAGS)
+	ln -sf $(SOFILE) $(SONAME)
+	ln -sf $(SONAME) lib$(NAME).so
+
+$(ARFILE): $(NAME).o
+	ar rcs $@ $&lt;
+
+$(NAME).pc: $(NAME).pc.in
+	sed -e 's|@prefix@|$(prefix)|g' \
+	    -e 's|@libdir@|$(libdir)|g' \
+	    -e 's|@includedir@|$(includedir)|g' \
+	    -e 's|@VERSION@|$(VERSION)|g' $&lt; &gt; $@
+
+install: all
+	install -d $(DESTDIR)$(includedir) $(DESTDIR)$(libdir) $(DESTDIR)$(pcdir)
+	install -m 644 $(NAME).h  $(DESTDIR)$(includedir)/
+	install -m 755 $(SOFILE)  $(DESTDIR)$(libdir)/
+	install -m 644 $(ARFILE)  $(DESTDIR)$(libdir)/
+	ln -sf $(SOFILE) $(DESTDIR)$(libdir)/$(SONAME)
+	ln -sf $(SONAME) $(DESTDIR)$(libdir)/lib$(NAME).so
+	install -m 644 $(NAME).pc $(DESTDIR)$(pcdir)/
+
+uninstall:
+	rm -f $(DESTDIR)$(includedir)/$(NAME).h
+	rm -f $(DESTDIR)$(libdir)/lib$(NAME).*
+	rm -f $(DESTDIR)$(pcdir)/$(NAME).pc
+
+check: $(SOFILE)
+	@echo "-- exported symbols --"
+	@nm -D --defined-only $(SOFILE) | grep ' T ' || true
+	@echo "-- recorded soname --"
+	@objdump -p $(SOFILE) | grep SONAME
+
+clean:
+	rm -f *.o *.a *.so *.so.* $(NAME).pc</code></pre>
+
+  <h3>Build and inspect</h3>
+
+<pre><code>make
+make check</code></pre>
+
+<pre><code>-- exported symbols --
+0000000000001180 T intarray_count
+0000000000001120 T intarray_create
+0000000000001160 T intarray_destroy
+0000000000001140 T intarray_push
+00000000000011a0 T intarray_version_string
+-- recorded soname --
+  SONAME               libintarray.so.2</code></pre>
+
+  <p>Exactly five symbols. Before adding <code>-fvisibility=hidden</code> and the version script, run the same check: every internal helper appears, and each one you did not intend is a symbol someone can come to depend on.</p>
+
+  <h3>Install into a staging root</h3>
+
+<pre><code>make install DESTDIR=/tmp/stage prefix=/usr
+find /tmp/stage -type f -o -type l | sort</code></pre>
+
+<pre><code>/tmp/stage/usr/include/intarray.h
+/tmp/stage/usr/lib/libintarray.a
+/tmp/stage/usr/lib/libintarray.so
+/tmp/stage/usr/lib/libintarray.so.2
+/tmp/stage/usr/lib/libintarray.so.2.3.0
+/tmp/stage/usr/lib/pkgconfig/intarray.pc</code></pre>
+
+  <p>Nothing outside the staging root, and both symlinks present. That is what a distribution packager needs; getting it wrong is the most common reason a library is hard to package.</p>
+
+  <h3>Consume it from a separate project</h3>
+
+<pre><code>mkdir -p /tmp/consumer &amp;&amp; cd /tmp/consumer
+cat &gt; app.c &lt;&lt;'EOF'
+#include &lt;intarray.h&gt;
+#include &lt;stdio.h&gt;
+
+int main(void)
+{
+    printf("compiled against %d.%d.%d, running %s\n",
+           INTARRAY_VERSION_MAJOR, INTARRAY_VERSION_MINOR,
+           INTARRAY_VERSION_PATCH, intarray_version_string());
+
+    IntArray *a = intarray_create(4);
+    if (a == NULL) return 1;
+    for (int i = 0; i &lt; 10; i++) intarray_push(a, i * i);
+    printf("count %zu\n", intarray_count(a));
+    intarray_destroy(a);
+    return 0;
+}
+EOF
+
+export PKG_CONFIG_PATH=/tmp/stage/usr/lib/pkgconfig
+pkg-config --cflags --libs intarray
+gcc app.c $(pkg-config --cflags --libs intarray) -o app
+LD_LIBRARY_PATH=/tmp/stage/usr/lib ./app
+ldd app | grep intarray</code></pre>
+
+  <p>The consumer's compile line names no paths. It sees only <code>intarray.h</code> and the five functions; the structure definition is not available to it, which is exactly the freedom the opaque type bought.</p>
+
+  <h3>Break the ABI on purpose</h3>
+
+  <p>This is the experiment worth doing, because the failure mode is otherwise hard to believe.</p>
+
+  <p>Temporarily expose the struct in the header:</p>
+
+<pre><code>/* intarray.h — do NOT do this in a real library */
+typedef struct IntArray {
+    int    *data;
+    size_t  count;
+    size_t  capacity;
+} IntArray;</code></pre>
+
+  <p>Rebuild, reinstall, and rebuild the consumer so it compiles against that layout. Now add a field in the middle, bump only PATCH, rebuild the <em>library only</em>, and run the old consumer binary:</p>
+
+<pre><code>typedef struct IntArray {
+    int    *data;
+    size_t  generation;        /* new member, inserted */
+    size_t  count;
+    size_t  capacity;
+} IntArray;</code></pre>
+
+<pre><code>make &amp;&amp; make install DESTDIR=/tmp/stage prefix=/usr
+cd /tmp/consumer &amp;&amp; LD_LIBRARY_PATH=/tmp/stage/usr/lib ./app</code></pre>
+
+  <p>The consumer reads <code>count</code> from the offset where <code>generation</code> now lives, and prints nonsense — or crashes. Nothing was recompiled, no warning appeared, and the version number claimed a patch release. Restore the opaque form and the same experiment changes nothing at all, because the consumer never knew the layout.</p>
+
+  <h3>Check for breaks automatically</h3>
+
+<pre><code>abidiff old/libintarray.so.2.3.0 new/libintarray.so.2.4.0</code></pre>
+
+  <p><code>abidiff</code>, from libabigail, compares the debug information of two builds and reports every ABI-relevant difference. Running it in CI against the previous release is how projects with real compatibility promises keep them — it turns "we think this is safe" into a check.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Exposing a struct in a public header</td><td>Layout frozen; every field change is a major version</td><td>Opaque handle plus accessors.</td></tr>
+      <tr><td>No <code>soname</code></td><td>Incompatible versions cannot coexist</td><td><code>-Wl,-soname,lib…so.MAJOR</code>.</td></tr>
+      <tr><td>Exporting every non-<code>static</code> symbol</td><td>Internals become part of the ABI</td><td><code>-fvisibility=hidden</code> plus a version script.</td></tr>
+      <tr><td>Ignoring <code>DESTDIR</code></td><td>Cannot be packaged</td><td>Prefix every install path with it.</td></tr>
+      <tr><td>Hard-coding <code>/usr/local</code></td><td>Distributions cannot relocate it</td><td>Honour <code>prefix</code>.</td></tr>
+      <tr><td>No <code>pkg-config</code> file</td><td>Users hard-code paths</td><td>Ship a <code>.pc</code>.</td></tr>
+      <tr><td>Omitting <code>Libs.private</code></td><td>Static linking fails with undefined references</td><td>List the private dependencies.</td></tr>
+      <tr><td>Removing a function without deprecating</td><td>Every user breaks at once</td><td>Deprecate, wait a cycle, remove in a major release.</td></tr>
+      <tr><td>Bumping PATCH for an ABI change</td><td>Installed programs corrupt memory</td><td>An ABI break is a MAJOR bump.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>What is the difference between API and ABI compatibility?</summary>
+    <p>API compatibility means existing source still compiles against the new version. ABI compatibility means an already-compiled binary still links and runs correctly against it. A change can preserve the first and break the second — adding a struct member visible in the header, for instance — and that combination is the dangerous one, because nothing warns.</p>
+  </details>
+
+  <details>
+    <summary>Why does an opaque type let you add struct members freely?</summary>
+    <p>Because the caller never sees the definition, so it cannot allocate the struct, cannot compute a member offset, and cannot embed the size in its compiled code. Everything goes through your functions, which are recompiled with the new layout. Expose the definition and all three of those become promises.</p>
+  </details>
+
+  <details>
+    <summary>Why does the <code>soname</code> contain only the major version?</summary>
+    <p>So that compatible updates are picked up automatically and incompatible ones are not. Every program linked against the library records the <code>soname</code>, so installing 2.4.0 over 2.3.0 serves existing binaries, while 3.0.0 has a different <code>soname</code> and installs alongside rather than replacing. That is how two incompatible versions coexist on one system.</p>
+  </details>
+
+  <details>
+    <summary>Why hide symbols by default?</summary>
+    <p>Because every exported symbol is something a user can come to depend on, and removing it later is an ABI break. With default visibility, internal helpers are exported whether you meant them to be or not. Hiding by default and marking the public interface explicitly keeps the promise set equal to the documented one.</p>
+  </details>
+
+  <details>
+    <summary>Why must an install target honour <code>DESTDIR</code>?</summary>
+    <p>Because packagers build into a temporary staging root and then archive it, rather than installing onto the build machine. An install that writes to the real <code>prefix</code> regardless cannot be packaged, and may overwrite files on a system it was never meant to touch.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 46 calls this library from other languages. The <code>extern "C"</code> guard in the header is the first step; the rest is the platform ABI itself — calling conventions, how structures are passed, and who owns memory that crosses a language boundary.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_44_Collaborative_Development_and_Code_Review.html">← Week 44</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_46_ABI_and_Language_Interoperability.html">Week 46 →</a>
+</div>
+
+</div>

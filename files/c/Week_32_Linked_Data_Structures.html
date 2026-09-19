@@ -1,0 +1,533 @@
+---
+layout: without-sidebar
+title: "Week 32 — Linked Data Structures"
+permalink: /files/c/Week_32_Linked_Data_Structures.html
+excerpt: "Nodes and self-referential types, singly, doubly and circular lists, stacks and queues, insertion and removal without special cases, and when a list beats an array."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Advanced · Week 32</div>
+  <h1>Linked Data Structures</h1>
+  <p class="c-wk-lead">A linked list is where week 21's self-referential structure and week 19's allocation meet. It is also the structure most often chosen for the wrong reason — so this week builds it properly and then measures when it is actually the right choice.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Build singly, doubly, and circular linked lists with correct insertion and removal.</li>
+      <li>Remove a node without special-casing the head, using a pointer to a pointer.</li>
+      <li>Implement a stack and a queue on one node type.</li>
+      <li>Reverse a list in place.</li>
+      <li>Say when a list beats an array and demonstrate when it does not.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The node</h2>
+
+<pre><code>typedef struct Node {
+    int          value;
+    struct Node *next;
+} Node;</code></pre>
+
+  <p>Each node holds its data and the address of the next. The list itself is just a pointer to the first node; the end is marked by a <code>next</code> of <code>NULL</code>.</p>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 640 110" role="img" aria-label="Three nodes linked by next pointers ending in NULL" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="60" y="34" width="60" height="40" rx="6"/><rect x="120" y="34" width="42" height="40" rx="6"/>
+        <rect x="230" y="34" width="60" height="40" rx="6"/><rect x="290" y="34" width="42" height="40" rx="6"/>
+        <rect x="400" y="34" width="60" height="40" rx="6"/><rect x="460" y="34" width="42" height="40" rx="6"/>
+      </g>
+      <g fill="currentColor" font-size="13" text-anchor="middle" font-family="inherit">
+        <text x="90" y="59">10</text><text x="260" y="59">20</text><text x="430" y="59">30</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1.5" opacity=".6">
+        <path d="M141 54h89"/><path d="M222 49l8 5-8 5" fill="none"/>
+        <path d="M311 54h89"/><path d="M392 49l8 5-8 5" fill="none"/>
+        <path d="M472 44l18 20M490 44l-18 20"/>
+      </g>
+      <g fill="currentColor" font-size="10.5" text-anchor="middle" opacity=".6" font-family="inherit">
+        <text x="141" y="90">next</text><text x="311" y="90">next</text><text x="481" y="90">NULL</text>
+        <text x="30" y="59">head</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1.5" opacity=".6">
+        <path d="M40 54h20"/><path d="M52 49l8 5-8 5" fill="none"/>
+      </g>
+    </svg>
+    <p class="c-wk-cap">Nodes need not be adjacent in memory — which is both the strength and the weakness.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Insertion and removal</h2>
+
+<pre><code>/* At the front: O(1) */
+bool push_front(Node **head, int value)
+{
+    Node *node = malloc(sizeof *node);
+    if (node == NULL) return false;
+    node-&gt;value = value;
+    node-&gt;next  = *head;
+    *head = node;                     /* modifies the caller's pointer */
+    return true;
+}</code></pre>
+
+  <p>Note the <code>Node **</code>. The function must change the caller's <code>head</code>, so it takes its address — week 15's pointer-to-pointer, in its most common real use.</p>
+
+  <h3>Removal, and the special case</h3>
+
+  <p>Written naively, removal needs a separate branch for the head:</p>
+
+<pre><code>void remove_value(Node **head, int value)
+{
+    if (*head == NULL) return;
+
+    if ((*head)-&gt;value == value) {     /* special case */
+        Node *dead = *head;
+        *head = dead-&gt;next;
+        free(dead);
+        return;
+    }
+    Node *prev = *head;                /* general case */
+    while (prev-&gt;next != NULL &amp;&amp; prev-&gt;next-&gt;value != value) {
+        prev = prev-&gt;next;
+    }
+    if (prev-&gt;next != NULL) {
+        Node *dead = prev-&gt;next;
+        prev-&gt;next = dead-&gt;next;
+        free(dead);
+    }
+}</code></pre>
+
+  <p>The special case exists because the head is stored in a different kind of place from every other link. Track a pointer <em>to the pointer</em> instead and the distinction vanishes:</p>
+
+<pre><code>void remove_value(Node **head, int value)
+{
+    for (Node **link = head; *link != NULL; link = &amp;(*link)-&gt;next) {
+        if ((*link)-&gt;value == value) {
+            Node *dead = *link;
+            *link = dead-&gt;next;
+            free(dead);
+            return;
+        }
+    }
+}</code></pre>
+
+  <p><code>link</code> points at whatever holds the address of the current node — the caller's <code>head</code> for the first, the previous node's <code>next</code> thereafter. Writing through it updates the right place either way. Half the code, no branch, and no way to get the head case wrong.</p>
+
+  <div class="c-wk-note">
+    <p><strong>This idiom is worth internalizing.</strong> Linus Torvalds has described understanding it as the difference between someone who writes C and someone who understands pointers. It generalizes: any time you find yourself special-casing the first element of a linked structure, a pointer to a pointer removes the case.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Doubly linked and circular</h2>
+
+<pre><code>typedef struct DNode {
+    int           value;
+    struct DNode *prev;
+    struct DNode *next;
+} DNode;</code></pre>
+
+  <p>A backward link costs one pointer per node and buys two things: traversal in both directions, and removal of a node in O(1) when you already hold it — no search for the predecessor.</p>
+
+<pre><code>void dlist_remove(DList *l, DNode *node)
+{
+    if (node-&gt;prev != NULL) node-&gt;prev-&gt;next = node-&gt;next;
+    else                    l-&gt;head          = node-&gt;next;
+
+    if (node-&gt;next != NULL) node-&gt;next-&gt;prev = node-&gt;prev;
+    else                    l-&gt;tail          = node-&gt;prev;
+
+    free(node);
+}</code></pre>
+
+  <p>The two special cases are back. A <strong>circular list with a sentinel</strong> removes them: a permanent dummy node whose <code>next</code> and <code>prev</code> close the ring, so every real node always has both neighbours.</p>
+
+<pre><code>/* with a sentinel, removal has no branches at all */
+node-&gt;prev-&gt;next = node-&gt;next;
+node-&gt;next-&gt;prev = node-&gt;prev;
+free(node);</code></pre>
+
+  <p>This is how the Linux kernel's <code>list_head</code> works, and it is the reason its list code has no null checks. The cost is one node's worth of memory per list.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Stacks and queues</h2>
+
+  <p>Both are lists with a restricted interface — which is the point: the restriction is what makes the structure useful.</p>
+
+  <table>
+    <thead><tr><th></th><th>Stack (LIFO)</th><th>Queue (FIFO)</th></tr></thead>
+    <tbody>
+      <tr><td>Add</td><td>push — at the front</td><td>enqueue — at the tail</td></tr>
+      <tr><td>Remove</td><td>pop — from the front</td><td>dequeue — from the head</td></tr>
+      <tr><td>Both O(1) if</td><td>Head pointer only</td><td>Head <em>and</em> tail pointers</td></tr>
+    </tbody>
+  </table>
+
+  <p>A queue without a tail pointer makes enqueue O(n), because every insertion walks to the end. Keeping a tail pointer is the whole design decision — and the thing to get right is updating it when the list becomes empty.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>When a list actually wins</h2>
+
+  <table>
+    <thead><tr><th>Operation</th><th>Array</th><th>Linked list</th></tr></thead>
+    <tbody>
+      <tr><td>Index element <em>i</em></td><td>O(1)</td><td>O(n)</td></tr>
+      <tr><td>Insert at front</td><td>O(n)</td><td>O(1)</td></tr>
+      <tr><td>Insert at back</td><td>O(1) amortized</td><td>O(1) with a tail pointer</td></tr>
+      <tr><td>Insert in the middle, position known</td><td>O(n)</td><td>O(1)</td></tr>
+      <tr><td>Insert in the middle, position searched</td><td>O(n)</td><td>O(n)</td></tr>
+      <tr><td>Memory per element</td><td>The element</td><td>Element + pointer + allocator overhead</td></tr>
+      <tr><td>Cache behavior</td><td>Contiguous</td><td>Scattered</td></tr>
+    </tbody>
+  </table>
+
+  <p>Read the fifth row carefully. The textbook claim that lists are better for middle insertion assumes you already hold a pointer to the position. If you have to <em>find</em> it first, the search dominates and both are O(n) — and the array is faster in practice because the traversal is sequential.</p>
+
+  <p>That is why, on modern hardware, an array wins far more often than complexity tables suggest. Each list node is a separate allocation, typically 32 bytes for 4 bytes of data, scattered across memory so that every step is a potential cache miss. Week 34 measures this directly.</p>
+
+  <p><strong>Use a linked list when</strong> you hold pointers to elements and splice them between containers, when elements must not move because other things point at them, when you are building an intrusive structure as the kernel does, or when a stack or queue is all you need. <strong>Otherwise start with an array.</strong></p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: list, stack, queue, and a measurement</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;time.h&gt;
+
+/* ================= singly linked list ================= */
+
+typedef struct Node {
+    int          value;
+    struct Node *next;
+} Node;
+
+typedef struct {
+    Node   *head;
+    Node   *tail;          /* for O(1) append and enqueue */
+    size_t  count;
+} List;
+
+static void list_init(List *l)
+{
+    l-&gt;head = l-&gt;tail = NULL;
+    l-&gt;count = 0;
+}
+
+static void list_destroy(List *l)
+{
+    Node *n = l-&gt;head;
+    while (n != NULL) {
+        Node *next = n-&gt;next;      /* save before freeing */
+        free(n);
+        n = next;
+    }
+    list_init(l);
+}
+
+static bool list_push_front(List *l, int value)
+{
+    Node *n = malloc(sizeof *n);
+    if (n == NULL) return false;
+    n-&gt;value = value;
+    n-&gt;next  = l-&gt;head;
+    l-&gt;head  = n;
+    if (l-&gt;tail == NULL) l-&gt;tail = n;      /* first node is also the tail */
+    l-&gt;count++;
+    return true;
+}
+
+static bool list_push_back(List *l, int value)
+{
+    Node *n = malloc(sizeof *n);
+    if (n == NULL) return false;
+    n-&gt;value = value;
+    n-&gt;next  = NULL;
+    if (l-&gt;tail != NULL) l-&gt;tail-&gt;next = n;
+    else                 l-&gt;head       = n;
+    l-&gt;tail = n;
+    l-&gt;count++;
+    return true;
+}
+
+/* The pointer-to-pointer idiom: no special case for the head. */
+static bool list_remove(List *l, int value)
+{
+    for (Node **link = &amp;l-&gt;head; *link != NULL; link = &amp;(*link)-&gt;next) {
+        if ((*link)-&gt;value == value) {
+            Node *dead = *link;
+            *link = dead-&gt;next;
+            if (dead == l-&gt;tail) {
+                l-&gt;tail = (link == &amp;l-&gt;head) ? NULL : (Node *)((char *)link -
+                          offsetof(Node, next));
+            }
+            free(dead);
+            l-&gt;count--;
+            return true;
+        }
+    }
+    return false;
+}
+
+/* Reverse in place: three pointers, one pass, no allocation. */
+static void list_reverse(List *l)
+{
+    Node *prev = NULL;
+    Node *curr = l-&gt;head;
+    l-&gt;tail = l-&gt;head;
+    while (curr != NULL) {
+        Node *next = curr-&gt;next;   /* save the rest */
+        curr-&gt;next = prev;          /* flip this link */
+        prev = curr;                /* advance */
+        curr = next;
+    }
+    l-&gt;head = prev;
+}
+
+static void list_print(const List *l, const char *label)
+{
+    printf("  %-12s (%zu)", label, l-&gt;count);
+    for (const Node *n = l-&gt;head; n != NULL; n = n-&gt;next) {
+        printf(" %d", n-&gt;value);
+    }
+    putchar('\n');
+}
+
+/* ================= stack ================= */
+
+typedef struct { List inner; } Stack;
+
+static void stack_init(Stack *s)    { list_init(&amp;s-&gt;inner); }
+static void stack_destroy(Stack *s) { list_destroy(&amp;s-&gt;inner); }
+static bool stack_push(Stack *s, int v) { return list_push_front(&amp;s-&gt;inner, v); }
+
+static bool stack_pop(Stack *s, int *out)
+{
+    Node *top = s-&gt;inner.head;
+    if (top == NULL) return false;
+    *out = top-&gt;value;
+    s-&gt;inner.head = top-&gt;next;
+    if (s-&gt;inner.head == NULL) s-&gt;inner.tail = NULL;
+    free(top);
+    s-&gt;inner.count--;
+    return true;
+}
+
+/* ================= queue ================= */
+
+typedef struct { List inner; } Queue;
+
+static void queue_init(Queue *q)    { list_init(&amp;q-&gt;inner); }
+static void queue_destroy(Queue *q) { list_destroy(&amp;q-&gt;inner); }
+static bool queue_enqueue(Queue *q, int v) { return list_push_back(&amp;q-&gt;inner, v); }
+
+static bool queue_dequeue(Queue *q, int *out)
+{
+    Node *front = q-&gt;inner.head;
+    if (front == NULL) return false;
+    *out = front-&gt;value;
+    q-&gt;inner.head = front-&gt;next;
+    if (q-&gt;inner.head == NULL) q-&gt;inner.tail = NULL;
+    free(front);
+    q-&gt;inner.count--;
+    return true;
+}
+
+/* ================= measurement ================= */
+
+#define N 200000
+
+static double time_list_traversal(void)
+{
+    List l;
+    list_init(&amp;l);
+    for (int i = 0; i &lt; N; i++) list_push_front(&amp;l, i);
+
+    clock_t t0 = clock();
+    long sum = 0;
+    for (int pass = 0; pass &lt; 20; pass++) {
+        for (const Node *n = l.head; n != NULL; n = n-&gt;next) sum += n-&gt;value;
+    }
+    double secs = (double)(clock() - t0) / CLOCKS_PER_SEC;
+    printf("    (list sum %ld)\n", sum);
+    list_destroy(&amp;l);
+    return secs;
+}
+
+static double time_array_traversal(void)
+{
+    int *a = malloc(N * sizeof *a);
+    if (a == NULL) return -1.0;
+    for (int i = 0; i &lt; N; i++) a[i] = i;
+
+    clock_t t0 = clock();
+    long sum = 0;
+    for (int pass = 0; pass &lt; 20; pass++) {
+        for (int i = 0; i &lt; N; i++) sum += a[i];
+    }
+    double secs = (double)(clock() - t0) / CLOCKS_PER_SEC;
+    printf("    (array sum %ld)\n", sum);
+    free(a);
+    return secs;
+}
+
+int main(void)
+{
+    puts("== list operations ==");
+    List l;
+    list_init(&amp;l);
+    for (int i = 1; i &lt;= 5; i++) list_push_back(&amp;l, i * 10);
+    list_print(&amp;l, "built");
+
+    list_push_front(&amp;l, 5);
+    list_print(&amp;l, "push_front");
+
+    printf("  remove 30: %s\n", list_remove(&amp;l, 30) ? "yes" : "no");
+    list_print(&amp;l, "after");
+
+    printf("  remove 5 (the head): %s\n", list_remove(&amp;l, 5) ? "yes" : "no");
+    list_print(&amp;l, "after");
+    puts("  no special case was needed for the head");
+
+    printf("  remove 999: %s\n", list_remove(&amp;l, 999) ? "yes" : "no");
+
+    list_reverse(&amp;l);
+    list_print(&amp;l, "reversed");
+
+    list_destroy(&amp;l);
+
+    puts("\n== stack: last in, first out ==");
+    Stack s;
+    stack_init(&amp;s);
+    for (int i = 1; i &lt;= 4; i++) {
+        stack_push(&amp;s, i);
+        printf("  pushed %d\n", i);
+    }
+    int v;
+    while (stack_pop(&amp;s, &amp;v)) printf("  popped %d\n", v);
+    printf("  pop on empty: %s\n", stack_pop(&amp;s, &amp;v) ? "value" : "refused");
+    stack_destroy(&amp;s);
+
+    puts("\n== queue: first in, first out ==");
+    Queue q;
+    queue_init(&amp;q);
+    for (int i = 1; i &lt;= 4; i++) {
+        queue_enqueue(&amp;q, i);
+        printf("  enqueued %d\n", i);
+    }
+    while (queue_dequeue(&amp;q, &amp;v)) printf("  dequeued %d\n", v);
+    queue_destroy(&amp;q);
+
+    puts("\n== traversal: list versus array ==");
+    double list_secs  = time_list_traversal();
+    double array_secs = time_array_traversal();
+    printf("  %d elements, 20 passes\n", N);
+    printf("  linked list : %.4f s\n", list_secs);
+    printf("  array       : %.4f s\n", array_secs);
+    if (array_secs &gt; 0) {
+        printf("  the array is %.1fx faster for the same operation count\n",
+               list_secs / array_secs);
+    }
+    puts("  same asymptotic complexity; the difference is cache locality");
+
+    printf("\n  memory per element: array %zu bytes, list node %zu bytes\n",
+           sizeof(int), sizeof(Node));
+    puts("  plus allocator overhead of roughly 16 bytes per node");
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+  <p>The <code>list_remove</code> tail fix-up above uses <code>offsetof</code>, which needs <code>&lt;stddef.h&gt;</code>. In production code a doubly linked list avoids the gymnastics entirely; the version here is deliberately kept singly linked to show the pointer-to-pointer idiom in isolation.</p>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o lists lists.c
+./lists</code></pre>
+
+  <h3>What the measurement shows</h3>
+
+  <p>Both traversals are O(n) and execute the same number of additions. The array is typically three to ten times faster. Nothing about the algorithm differs — the array's elements are contiguous, so each cache line fetch brings sixteen integers, while each list node is a separate allocation and every step is a potential cache miss.</p>
+
+  <p>The memory figures make the same point from the other side: 4 bytes of data per element in the array, against 16 bytes of node plus roughly 16 bytes of allocator bookkeeping in the list. Eight times the memory for the same information.</p>
+
+  <p>This is why "use a linked list for frequent insertion" is bad advice without qualification. Measure before choosing, and week 34 shows how.</p>
+
+  <h3>Verify the idiom removes the branch</h3>
+
+  <p>Rewrite <code>list_remove</code> with the naive head special case, then run both against these four inputs: removing the head, removing a middle node, removing the tail, and removing from an empty list. Both versions must behave identically — and the pointer-to-pointer version is half the length with no branch to get wrong.</p>
+
+  <h3>Check for leaks deliberately</h3>
+
+  <p>Delete the <code>list_destroy(&amp;l)</code> call and rerun:</p>
+<pre><code>==1234==ERROR: LeakSanitizer: detected memory leaks
+Direct leak of 96 byte(s) in 6 object(s) allocated from:
+    #1 0x... in list_push_back lists.c:52</code></pre>
+
+  <p>Every node is a separate allocation, so a list is the structure most likely to leak. The <code>init</code>/<code>destroy</code> pairing from week 19 is not optional here.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>free(n); n = n-&gt;next;</code></td><td>Use after free</td><td>Save <code>next</code> before freeing.</td></tr>
+      <tr><td>Losing the head while traversing</td><td>The whole list leaks</td><td>Walk a copy of the pointer.</td></tr>
+      <tr><td>Forgetting to update <code>tail</code></td><td>Append writes after a freed node</td><td>Update it on every insert and remove.</td></tr>
+      <tr><td>Special-casing the head by hand</td><td>Duplicated logic; one branch wrong</td><td>The <code>Node **</code> idiom.</td></tr>
+      <tr><td>Passing <code>Node *</code> where the head must change</td><td>The caller's pointer is unchanged</td><td>Pass <code>Node **</code>.</td></tr>
+      <tr><td>Not freeing nodes</td><td>A leak per node</td><td>Paired <code>destroy</code>.</td></tr>
+      <tr><td>Queue without a tail pointer</td><td>Enqueue becomes O(n)</td><td>Keep both ends.</td></tr>
+      <tr><td>Choosing a list for indexed access</td><td>O(n) per lookup and poor locality</td><td>Use an array.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why does an insertion function take <code>Node **head</code> rather than <code>Node *head</code>?</summary>
+    <p>Because inserting at the front changes which node the caller's <code>head</code> points at, and arguments are copied. Passing the address of the pointer lets the function write through it and update the caller's variable — the same reason <code>scanf</code> needs <code>&amp;</code>, applied to a pointer.</p>
+  </details>
+
+  <details>
+    <summary>How does the <code>Node **link</code> idiom remove the head special case?</summary>
+    <p><code>link</code> points at whatever storage holds the address of the current node: the caller's <code>head</code> for the first node, the previous node's <code>next</code> field thereafter. Writing <code>*link = dead-&gt;next</code> updates the correct location in both cases, so the head is not special and the branch disappears.</p>
+  </details>
+
+  <details>
+    <summary>Why is an array usually faster than a list even when their complexity is identical?</summary>
+    <p>Cache locality. An array's elements are contiguous, so one cache line fetch brings many of them; list nodes are separate allocations scattered across memory, so each step can miss. The operation count is the same but the memory system behaves completely differently, and on modern hardware that dominates.</p>
+  </details>
+
+  <details>
+    <summary>Under what condition is a list genuinely better for middle insertion?</summary>
+    <p>Only when you already hold a pointer to the insertion point. Then the splice is O(1) against the array's O(n) shift. If you must search for the position first, the search is O(n) for both — and the array wins in practice because its traversal is sequential.</p>
+  </details>
+
+  <details>
+    <summary>Why does <code>free(n); n = n-&gt;next;</code> fail?</summary>
+    <p>Because after <code>free</code> the block belongs to the allocator and reading <code>n-&gt;next</code> is a use-after-free. It often appears to work, since the memory has not yet been reused, which is why the bug survives testing. Save the successor in a local variable before freeing.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 33 adds the structures where the pointer work pays off: binary search trees, where recursion from week 18 becomes indispensable, and hash tables, which give constant-time lookup. Both go behind the opaque interface of week 28, and the complexity reasoning that this week's measurement started gets its proper vocabulary.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_31_Command_Line_Interfaces_and_Environment.html">← Week 31</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_33_Trees_Hash_Tables_and_ADTs.html">Week 33 →</a>
+</div>
+
+</div>

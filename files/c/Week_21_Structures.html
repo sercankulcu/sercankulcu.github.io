@@ -1,0 +1,446 @@
+---
+layout: without-sidebar
+title: "Week 21 — Structures"
+permalink: /files/c/Week_21_Structures.html
+excerpt: "Grouping related data into one type: declaration and designated initializers, dot and arrow access, arrays of structures, passing by value versus by pointer, and self-referential types."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Intermediate · Week 21</div>
+  <h1>Structures</h1>
+  <p class="c-wk-lead">An array groups values of one type. A structure groups values of <em>different</em> types under one name — which is how C stops passing six loose parameters around and starts modelling the thing those parameters describe.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Declare and initialize a structure, including with designated initializers.</li>
+      <li>Choose between <code>.</code> and <code>-&gt;</code> without thinking about it.</li>
+      <li>Decide whether to pass a structure by value or by pointer, with a reason.</li>
+      <li>Build and traverse an array of structures.</li>
+      <li>Declare a self-referential type and explain why it must contain a pointer.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Declaring a structure</h2>
+
+<pre><code>struct Point {
+    int x;
+    int y;
+};                       /* the semicolon is required */
+
+struct Point origin;     /* every use needs the keyword 'struct' */</code></pre>
+
+  <p>Having to write <code>struct Point</code> everywhere is tedious, so almost all real code introduces an alias:</p>
+
+<pre><code>typedef struct {
+    int x;
+    int y;
+} Point;
+
+Point origin;            /* now just the name */</code></pre>
+
+  <p>The convention in this course, and in most modern C, is <code>typedef</code> with a capitalized type name. Week 22 covers <code>typedef</code> in its own right.</p>
+
+  <h3>Initializing</h3>
+<pre><code>Point a = { 3, 4 };                 /* positional */
+Point b = { .x = 3, .y = 4 };       /* designated — C99 */
+Point c = { .y = 4 };               /* x is zero-filled */
+Point d = { 0 };                    /* every member zeroed */
+Point e = a;                        /* structures assign by copy */</code></pre>
+
+  <p><strong>Prefer designated initializers.</strong> They are readable without counting, they survive a reordering of the members, and they make it obvious which fields you deliberately left at zero. Positional initialization of a six-member structure is a bug waiting for a maintenance change.</p>
+
+  <p>Note the last line: unlike arrays, structures <em>can</em> be assigned and copied wholesale. <code>e = a</code> copies every member.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Access: <code>.</code> and <code>-&gt;</code></h2>
+
+<pre><code>Point p = { .x = 1, .y = 2 };
+Point *q = &amp;p;
+
+p.x          /* a structure: use dot   */
+q-&gt;x         /* a pointer:   use arrow */
+(*q).x       /* identical to q-&gt;x, and nobody writes it */</code></pre>
+
+  <p><code>-&gt;</code> exists purely because <code>(*q).x</code> is unpleasant, and because the parentheses are mandatory — <code>*q.x</code> parses as <code>*(q.x)</code>, since <code>.</code> binds tighter than <code>*</code>. That is a real source of confusion in old code; the arrow removes it.</p>
+
+  <p>The rule is mechanical: <strong>dot for an object, arrow for a pointer to one</strong>. Since most structures are passed around by pointer, you will write <code>-&gt;</code> far more often.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>By value or by pointer?</h2>
+
+  <p>Structures obey week 11's rule exactly: passing one to a function copies every member.</p>
+
+<pre><code>void move_broken(Point p)      { p.x += 10; }   /* modifies the copy  */
+void move(Point *p)            { p-&gt;x += 10; }  /* modifies the caller's */
+int  area(const Rect *r)       { return r-&gt;w * r-&gt;h; }  /* reads only */</code></pre>
+
+  <table>
+    <thead><tr><th>Pass by value when</th><th>Pass by pointer when</th></tr></thead>
+    <tbody>
+      <tr><td>The structure is small — two or three scalars</td><td>The structure is large</td></tr>
+      <tr><td>The function must not modify it</td><td>The function must modify it</td></tr>
+      <tr><td>You want a private copy to alter freely</td><td>It contains allocations you must not duplicate</td></tr>
+    </tbody>
+  </table>
+
+  <p>The default in practice is <strong>a pointer, with <code>const</code> when the function only reads</strong>. It avoids copying, it is uniform, and the <code>const</code> makes the contract explicit and compiler-checked, exactly as week 16 established.</p>
+
+  <p>Returning a structure by value is fine and common — <code>Point make_point(int x, int y)</code> — because the copy happens once and the caller owns the result with no lifetime question at all.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Nesting and arrays</h2>
+
+<pre><code>typedef struct {
+    Point top_left;
+    Point bottom_right;
+} Rect;
+
+Rect r = {
+    .top_left     = { .x = 0, .y = 0 },
+    .bottom_right = { .x = 4, .y = 3 }
+};
+
+int width = r.bottom_right.x - r.top_left.x;</code></pre>
+
+  <p>Nested members chain with <code>.</code>, or with <code>-&gt;</code> at the first step if you start from a pointer: <code>rp-&gt;top_left.x</code>.</p>
+
+  <h3>Arrays of structures</h3>
+<pre><code>typedef struct {
+    char   name[32];
+    int    score;
+    double average;
+} Student;
+
+Student class[3] = {
+    { .name = "Ada",    .score = 95 },
+    { .name = "Dennis", .score = 88 },
+    { .name = "Ken",    .score = 91 }
+};
+
+for (size_t i = 0; i &lt; 3; i++) {
+    printf("%-10s %3d\n", class[i].name, class[i].score);
+}</code></pre>
+
+  <p>Note that <code>name</code> is an array <em>inside</em> the structure, so the text is stored in the structure itself rather than pointed at. That makes the structure self-contained and copyable — <code>Student b = a;</code> duplicates the name too. The alternative, <code>char *name</code>, stores only a pointer, which is smaller and more flexible but raises the ownership question from week 19 for every copy.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Self-referential structures</h2>
+
+  <p>A structure cannot contain itself — the size would be infinite. It can contain a <em>pointer</em> to itself, which is the basis of every linked structure in week 32.</p>
+
+<pre><code>typedef struct Node {        /* the tag is required here */
+    int          value;
+    struct Node *next;       /* fine: a pointer has a known size */
+} Node;</code></pre>
+
+  <p>The struct tag <code>Node</code> after the <code>struct</code> keyword is necessary because the <code>typedef</code> name does not exist yet inside its own definition. This is one of the few places where the tag cannot be omitted.</p>
+
+<pre><code>Node third  = { .value = 3, .next = NULL };
+Node second = { .value = 2, .next = &amp;third };
+Node first  = { .value = 1, .next = &amp;second };
+
+for (Node *n = &amp;first; n != NULL; n = n-&gt;next) {
+    printf("%d ", n-&gt;value);
+}</code></pre>
+
+  <p>That loop is the shape of every list traversal you will write. Week 32 replaces the stack-allocated nodes with heap allocations and adds insertion and removal.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>What a structure does <em>not</em> support</h2>
+
+  <table>
+    <thead><tr><th>Operation</th><th>Works?</th><th>Instead</th></tr></thead>
+    <tbody>
+      <tr><td>Assignment <code>a = b</code></td><td>Yes</td><td>—</td></tr>
+      <tr><td>Passing and returning by value</td><td>Yes</td><td>—</td></tr>
+      <tr><td>Comparison <code>a == b</code></td><td><strong>No</strong></td><td>Compare members, or <code>memcmp</code> — with care</td></tr>
+      <tr><td>Arithmetic</td><td>No</td><td>Write a function</td></tr>
+      <tr><td>Printing directly</td><td>No</td><td>Write a print function</td></tr>
+    </tbody>
+  </table>
+
+  <div class="c-wk-trap">
+    <p><strong>Do not compare structures with <code>memcmp</code>.</strong> It compares every byte, including the <em>padding</em> the compiler inserts between members for alignment — and padding bytes hold whatever was in that memory, even in two structures whose members are all equal. Two logically identical structures can therefore compare unequal. Compare the members you care about, one by one. Week 22 explains where the padding comes from.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Worked example: records, by value and by pointer</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+
+#define NAME_LEN 32
+
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+typedef struct {
+    Point top_left;
+    Point bottom_right;
+} Rect;
+
+typedef struct {
+    char   name[NAME_LEN];
+    int    score;
+    int    attempts;
+} Student;
+
+/* Small and read-only: by value is fine and reads well. */
+static int manhattan(Point a, Point b)
+{
+    int dx = a.x - b.x;
+    int dy = a.y - b.y;
+    return (dx &lt; 0 ? -dx : dx) + (dy &lt; 0 ? -dy : dy);
+}
+
+/* Read-only: const pointer. No copy, contract enforced. */
+static int rect_area(const Rect *r)
+{
+    return (r-&gt;bottom_right.x - r-&gt;top_left.x)
+         * (r-&gt;bottom_right.y - r-&gt;top_left.y);
+}
+
+/* Modifies: non-const pointer. */
+static void rect_translate(Rect *r, int dx, int dy)
+{
+    r-&gt;top_left.x     += dx;  r-&gt;top_left.y     += dy;
+    r-&gt;bottom_right.x += dx;  r-&gt;bottom_right.y += dy;
+}
+
+/* Returning by value: the caller owns the result, no lifetime question. */
+static Point point_make(int x, int y)
+{
+    return (Point){ .x = x, .y = y };    /* compound literal — week 38 */
+}
+
+/* Structures have no ==; compare what actually matters. */
+static bool point_equal(Point a, Point b)
+{
+    return a.x == b.x &amp;&amp; a.y == b.y;
+}
+
+static void student_print(const Student *s)
+{
+    printf("  %-10s score %3d  attempts %d\n",
+           s-&gt;name, s-&gt;score, s-&gt;attempts);
+}
+
+/* An array of structures, searched and aggregated. */
+static const Student *find_student(const Student *list, size_t n,
+                                   const char *name)
+{
+    for (size_t i = 0; i &lt; n; i++) {
+        if (strcmp(list[i].name, name) == 0) {
+            return &amp;list[i];             /* points into the caller's array */
+        }
+    }
+    return NULL;
+}
+
+static bool class_average(const Student *list, size_t n, double *out)
+{
+    if (n == 0) {
+        return false;
+    }
+    long total = 0;
+    for (size_t i = 0; i &lt; n; i++) {
+        total += list[i].score;
+    }
+    *out = (double)total / (double)n;
+    return true;
+}
+
+/* A self-referential type: the basis of week 32. */
+typedef struct Node {
+    int          value;
+    struct Node *next;
+} Node;
+
+int main(void)
+{
+    puts("== points ==");
+    Point a = { .x = 1, .y = 2 };
+    Point b = point_make(4, 6);
+    printf("  a = (%d,%d), b = (%d,%d), manhattan = %d\n",
+           a.x, a.y, b.x, b.y, manhattan(a, b));
+    printf("  a == b ? %s   (compared member by member)\n",
+           point_equal(a, b) ? "yes" : "no");
+
+    Point copy = a;
+    copy.x = 99;
+    printf("  after copying a and changing the copy: a.x = %d\n", a.x);
+    puts("  structures assign by value — unlike arrays");
+
+    puts("\n== nesting, and const versus mutable pointers ==");
+    Rect r = {
+        .top_left     = { .x = 0, .y = 0 },
+        .bottom_right = { .x = 4, .y = 3 }
+    };
+    printf("  area = %d\n", rect_area(&amp;r));
+    rect_translate(&amp;r, 10, 10);
+    printf("  after translating: top_left = (%d,%d), area = %d\n",
+           r.top_left.x, r.top_left.y, rect_area(&amp;r));
+    puts("  the area is unchanged, as it must be");
+
+    puts("\n== an array of structures ==");
+    Student class[] = {
+        { .name = "Ada",    .score = 95, .attempts = 1 },
+        { .name = "Dennis", .score = 88, .attempts = 2 },
+        { .name = "Ken",    .score = 91, .attempts = 1 },
+        { .name = "Grace",  .score = 78, .attempts = 3 }
+    };
+    const size_t n = sizeof class / sizeof class[0];
+
+    for (size_t i = 0; i &lt; n; i++) {
+        student_print(&amp;class[i]);
+    }
+
+    double average;
+    if (class_average(class, n, &amp;average)) {
+        printf("  average of %zu students: %.2f\n", n, average);
+    }
+
+    const Student *found = find_student(class, n, "Ken");
+    printf("  lookup \"Ken\"  : %s\n",
+           found ? "found" : "not found");
+    if (found != NULL) {
+        student_print(found);
+    }
+    printf("  lookup \"Linus\": %s\n",
+           find_student(class, n, "Linus") ? "found" : "not found");
+
+    puts("\n== sizes and copying cost ==");
+    printf("  sizeof(Point)   = %2zu\n", sizeof(Point));
+    printf("  sizeof(Rect)    = %2zu\n", sizeof(Rect));
+    printf("  sizeof(Student) = %2zu   (%d-byte name plus two ints)\n",
+           sizeof(Student), NAME_LEN);
+    printf("  sizeof(Student *) = %zu — which is why large structures\n",
+           sizeof(Student *));
+    puts("  are passed by pointer");
+
+    puts("\n== self-referential ==");
+    Node third  = { .value = 3, .next = NULL };
+    Node second = { .value = 2, .next = &amp;third };
+    Node first  = { .value = 1, .next = &amp;second };
+    printf("  list: ");
+    for (Node *p = &amp;first; p != NULL; p = p-&gt;next) {
+        printf("%d ", p-&gt;value);
+    }
+    puts("\n  a struct cannot contain itself, but it can point to itself");
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o structs structs.c
+./structs</code></pre>
+
+  <h3>Three things the output shows</h3>
+
+  <p><strong>Structures copy on assignment.</strong> Changing <code>copy.x</code> leaves <code>a.x</code> alone. Arrays do not behave this way — <code>int b[5] = a;</code> does not even compile — which is one of the few places structures are more convenient than arrays.</p>
+
+  <p><strong><code>const</code> is doing real work.</strong> Add <code>r-&gt;top_left.x = 0;</code> inside <code>rect_area</code> and the build fails with <em>assignment of member in read-only object</em>. The signature promised not to modify, and the promise is checked.</p>
+
+  <p><strong>Size drives the calling convention.</strong> <code>Student</code> is 40 bytes; a pointer is 8. Passing forty students by value copies 1.6 KB; passing pointers copies 320 bytes. For <code>Point</code> at 8 bytes the difference is nil, which is why by-value is reasonable there.</p>
+
+  <h3>The <code>memcmp</code> trap, demonstrated</h3>
+
+  <p>Add this and run it:</p>
+
+<pre><code>typedef struct {
+    char  flag;      /* 1 byte, then 3 bytes of padding */
+    int   value;     /* 4 bytes */
+} Padded;
+
+Padded p1, p2;
+memset(&amp;p1, 0x00, sizeof p1);        /* clear all bytes, padding included */
+memset(&amp;p2, 0xFF, sizeof p2);        /* fill all bytes                    */
+p1.flag = 'A'; p1.value = 7;
+p2.flag = 'A'; p2.value = 7;         /* logically identical now */
+
+printf("members equal: %s\n",
+       (p1.flag == p2.flag &amp;&amp; p1.value == p2.value) ? "yes" : "no");
+printf("memcmp equal : %s\n",
+       memcmp(&amp;p1, &amp;p2, sizeof p1) == 0 ? "yes" : "no");
+printf("sizeof(Padded) = %zu, but 1 + 4 = 5\n", sizeof(Padded));</code></pre>
+
+<pre><code>members equal: yes
+memcmp equal : no
+sizeof(Padded) = 8, but 1 + 4 = 5</code></pre>
+
+  <p>Every member matches and <code>memcmp</code> still reports a difference, because the three padding bytes after <code>flag</code> differ. Week 22 explains where those three bytes come from and how to inspect them.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Omitting the semicolon after <code>}</code></td><td>Confusing errors on the next declaration</td><td>A struct definition is a declaration; it needs one.</td></tr>
+      <tr><td>Using <code>.</code> on a pointer</td><td>Compile error, or worse with a cast</td><td>Dot for objects, arrow for pointers.</td></tr>
+      <tr><td><code>*p.x</code> meaning <code>(*p).x</code></td><td>Parses as <code>*(p.x)</code></td><td>Write <code>p-&gt;x</code>.</td></tr>
+      <tr><td>Comparing structures with <code>==</code></td><td>Compile error</td><td>Compare members in a function.</td></tr>
+      <tr><td>Comparing structures with <code>memcmp</code></td><td>Padding makes equal structures differ</td><td>Compare members explicitly.</td></tr>
+      <tr><td>Passing a large structure by value in a loop</td><td>Unnecessary copying</td><td><code>const T *</code>.</td></tr>
+      <tr><td>Positional initializers on a wide struct</td><td>Reordering members silently breaks it</td><td>Designated initializers.</td></tr>
+      <tr><td>Forgetting the tag in a self-referential struct</td><td><code>unknown type name</code></td><td><code>struct Node *next;</code> inside <code>struct Node</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">9</span>Check yourself</h2>
+
+  <details>
+    <summary>Why can you assign one structure to another but not one array to another?</summary>
+    <p>Because a structure is a single object of its type, and C defines assignment for it as a member-by-member copy. An array name decays to a pointer in an assignment context, so <code>a = b</code> would be an attempt to assign to a non-modifiable address. Copy arrays with <code>memcpy</code> or a loop.</p>
+  </details>
+
+  <details>
+    <summary>When should a structure be passed by value?</summary>
+    <p>When it is small — two or three scalars — and the function does not need to modify the caller's copy. Beyond that, pass a pointer, with <code>const</code> if the function only reads. The pointer avoids copying and makes the read-only contract explicit and compiler-checked.</p>
+  </details>
+
+  <details>
+    <summary>Why is <code>memcmp</code> unreliable for comparing structures?</summary>
+    <p>Because it compares padding bytes as well as members. The compiler inserts padding for alignment, and its contents are unspecified — two structures with identical member values can differ in those bytes and compare unequal. Compare the members you care about individually.</p>
+  </details>
+
+  <details>
+    <summary>Why must a self-referential structure contain a pointer rather than an instance?</summary>
+    <p>Because a structure containing itself would have infinite size — the compiler could not compute <code>sizeof</code>. A pointer has a fixed, known size regardless of what it points to, so the type is well defined. This is exactly why every linked data structure in C is built from pointers.</p>
+  </details>
+
+  <details>
+    <summary>Why prefer designated initializers over positional ones?</summary>
+    <p>They state which member each value belongs to, so the code is readable without counting and survives a reordering of the declaration. They also default every unmentioned member to zero, making partial initialization explicit rather than accidental. On a structure with more than about three members, positional initialization is a maintenance hazard.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">10</span>Where this leads</h2>
+  <p>Week 22 completes the picture of user-defined types: enumerations for a closed set of named values, unions for storing one of several things in the same space, <code>typedef</code> in its own right, and the padding rules that explained the <code>memcmp</code> result above. Together they give you everything needed to design the abstract data type of week 33.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_20_Memory_Errors.html">← Week 20</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_22_Unions_Enums_and_Typedef.html">Week 22 →</a>
+</div>
+
+</div>
