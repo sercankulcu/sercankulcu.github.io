@@ -11,7 +11,7 @@ location: "Giresun, Turkey"
 ![procedural programming with c](/images/teaching/teaching-procedural-programming-c.webp){: .align-left width="200" style="float: left; margin-right: 10px;"}
 C is a general-purpose programming language widely used in systems programming, embedded software, operating systems, compilers, and performance-sensitive applications. It combines portable high-level constructs with low-level access to memory and hardware-related operations. C gives programmers substantial control over data representation, memory allocation, and program execution. This control can enable efficient software, but it also requires careful handling of memory, types, and undefined behavior.
 
-This is a complete course in C, designed to take a reader from no prior programming experience to competent, independent, professional C development. It is organized as 42 weekly topics in three levels. **Basic** builds the language core, early programming habits, and the first command-line programs, ending with pointers and strings. **Intermediate** covers memory, aggregate data, files, error handling, modular design, and project workflow. **Advanced** covers libraries and tooling, data structures, performance, undefined behavior, portability, low-level systems interfaces, network programming, and concurrency. Each topic assumes only what earlier topics have already established, and a term project runs alongside the material from the middle of the course onward.
+This is a complete course in C, designed to take a reader from no prior programming experience to competent, independent, professional C development. It is organized as 42 weekly topics in three levels. **Basic** builds the language core, early programming habits, and the first command-line programs, ending with pointers and strings. **Intermediate** covers memory, aggregate data, files, error handling, modular design, and project workflow. **Advanced** covers libraries and tooling, data structures, performance, undefined behavior, portability, low-level systems interfaces, network programming, and concurrency. Each topic assumes only what earlier topics have already established.
 
 ## Ders Öğretim Planı  
 
@@ -520,11 +520,11 @@ There are currently no announcements.
 
 ---
 
-### Week 42: Concurrency, Project, and Review
+### Week 42: Concurrency and the C Memory Model
 - Threads with C11 `<threads.h>` and POSIX threads
 - Race conditions, mutexes, and condition variables
 - Thread-local storage with `_Thread_local`
 - Atomics, `<stdatomic.h>`, and the C memory model
-- Course project, final review, and directions for further study
+- Deadlock, starvation, and debugging concurrent programs
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_42_Concurrency_Project_and_Review.html)
+[🗒️Lecture Notes (HTML)](../files/c/Week_42_Concurrency_and_Memory_Model.html)
