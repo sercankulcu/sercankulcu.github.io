@@ -11,7 +11,7 @@ location: "Giresun, Turkey"
 ![procedural programming with c](/images/teaching/teaching-procedural-programming-c.webp){: .align-left width="200" style="float: left; margin-right: 10px;"}
 C is a general-purpose programming language widely used in systems programming, embedded software, operating systems, compilers, and performance-sensitive applications. It combines portable high-level constructs with low-level access to memory and hardware-related operations. C gives programmers substantial control over data representation, memory allocation, and program execution. This control can enable efficient software, but it also requires careful handling of memory, types, and undefined behavior.
 
-This is a complete course in C, designed to take a reader from no prior programming experience to competent, independent, professional C development. It is organized as 42 weekly topics in three levels. **Basic** builds the language core, early programming habits, and the first command-line programs, ending with pointers and strings. **Intermediate** covers memory, aggregate data, files, error handling, modular design, and project workflow. **Advanced** covers libraries and tooling, data structures, performance, undefined behavior, portability, low-level systems interfaces, network programming, and concurrency. Each topic assumes only what earlier topics have already established.
+This is a complete course in C, designed to take a reader from no prior programming experience to competent, independent, professional C development. It is organized as 56 weekly topics in four levels. **Basic** builds the language core, early programming habits, and the first command-line programs, ending with pointers and strings. **Intermediate** covers memory, aggregate data, files, error handling, modular design, and project workflow. **Advanced** covers libraries and tooling, data structures, performance, undefined behavior, portability, low-level systems interfaces, network programming, and concurrency. **Professional** covers working in existing codebases, collaboration and review, library distribution, language interoperability, scalable I/O, security testing, embedded and bare-metal development, and long-term maintenance. Each topic assumes only what earlier topics have already established.
 
 ## Ders Öğretim Planı  
 
@@ -434,7 +434,7 @@ There are currently no announcements.
 - The memory hierarchy, cache behavior, and locality of reference
 - Data layout, structure packing, and their effect on speed
 - Optimization levels and when to trust the compiler
-- Profiling and measurement
+- Profiling and measurement with `perf`, `gprof`, and `callgrind`
 - Trade-offs between clarity and speed
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_34_Performance_and_Memory_Layout.html)
@@ -513,7 +513,7 @@ There are currently no announcements.
 - The client–server model, TCP versus UDP, and the Berkeley socket API
 - Addresses, ports, byte-order conversion with `htons` and `htonl`, and name resolution with `getaddrinfo`
 - Writing a TCP client: `socket`, `connect`, `send`, and `recv`
-- Writing a TCP server: `bind`, `listen`, `accept`, and serving multiple clients
+- Writing a TCP server: `bind`, `listen`, `accept`, and serving clients with a forked child per connection
 - Message framing, partial reads and writes, timeouts, and network error handling
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_41_Network_Programming_with_Sockets.html)
@@ -528,3 +528,159 @@ There are currently no announcements.
 - Deadlock, starvation, and debugging concurrent programs
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_42_Concurrency_and_Memory_Model.html)
+
+---
+
+## Professional (Weeks 43-56)
+
+### Week 43: Working in an Existing Codebase
+- Navigating unfamiliar C with `grep`, `ctags`, language servers, and call graphs
+- Reading before writing: entry points, data flow, and hidden invariants
+- Following conventions, naming, and error-handling contracts you did not choose
+- Locating a regression with `git bisect`
+- Making a minimal, reviewable change to code you did not write
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_43_Working_in_an_Existing_Codebase.html)
+
+---
+
+### Week 44: Collaborative Development and Code Review
+- Branching, merging, rebasing, and resolving conflicts
+- Pull requests and the review workflow
+- Reviewing C for memory safety, ownership, and undefined behavior
+- Commit hygiene, changelogs, and semantic versioning
+- Issue reports, reproduction cases, and regression tests
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_44_Collaborative_Development_and_Code_Review.html)
+
+---
+
+### Week 45: Packaging and Distributing C Libraries
+- Designing a stable public API and a versioning policy
+- Shared library versioning: `soname`, symbol versioning, and ABI compatibility
+- Installation layouts, `pkg-config`, and consuming a library from another project
+- Header hygiene for published headers: namespacing, includes, and visibility
+- Deprecation, migration paths, and backward compatibility
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_45_Packaging_and_Distributing_Libraries.html)
+
+---
+
+### Week 46: ABI and Interfacing with Other Languages
+- Calling conventions, stack frames, and the platform ABI
+- Name mangling, `extern "C"`, and linking C with C++
+- Exposing a C API to Python with `ctypes` and CFFI, to Rust, and to Java with JNI
+- Passing structures, callbacks, and memory ownership across a language boundary
+- Inline assembly and compiler intrinsics
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_46_ABI_and_Language_Interoperability.html)
+
+---
+
+### Week 47: Event-Driven and Scalable I/O
+- Blocking versus non-blocking file descriptors
+- Multiplexing with `select`, `poll`, and `epoll` or `kqueue`
+- Structuring an event loop
+- Timers and signal handling inside an event loop: `signalfd` and the self-pipe trick
+- Thread pools versus event loops, and the C10K problem
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_47_Event_Driven_and_Scalable_IO.html)
+
+---
+
+### Week 48: Fuzzing and Security Testing
+- Coverage-guided fuzzing with libFuzzer and AFL++
+- Writing a fuzz target and building a seed corpus
+- Combining fuzzing with sanitizers and assertions
+- Triaging crashes, minimizing inputs, and reporting vulnerabilities
+- Threat modeling and conducting a security review of C code
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_48_Fuzzing_and_Security_Testing.html)
+
+---
+
+### Week 49: Embedded C and Cross-Compilation
+- Microcontroller architecture: flash, SRAM, and peripherals
+- Cross-compilers, target triples, and toolchain setup
+- Freestanding versus hosted environments, and life without a full standard library
+- Startup code, the reset vector, and how `main` is reached
+- Building, flashing, and running code on a target board
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_49_Embedded_C_and_Cross_Compilation.html)
+
+---
+
+### Week 50: Memory-Mapped I/O and Hardware Registers
+- The memory map and peripheral register blocks
+- Why hardware registers require `volatile` and what the compiler may otherwise do
+- Register access with bit masks, bit-fields, and register-description structures
+- Writing simple GPIO, timer, and UART drivers
+- Reading a datasheet and a reference manual
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_50_Memory_Mapped_IO_and_Registers.html)
+
+---
+
+### Week 51: Interrupts and Real-Time Behavior
+- The interrupt vector table and interrupt service routines
+- Priorities, nesting, and interrupt latency
+- Sharing data between an ISR and main code: `volatile`, atomics, and critical sections
+- Polling versus interrupts, and input debouncing
+- Measuring and bounding response time
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_51_Interrupts_and_Real_Time_Behavior.html)
+
+---
+
+### Week 52: Linker Scripts and Firmware Memory Layout
+- Sections: `.text`, `.rodata`, `.data`, and `.bss`
+- Linker scripts and placing code and data in specific memory regions
+- The startup sequence: copying `.data` and zeroing `.bss`
+- Stack and heap placement, and detecting stack overflow
+- Inspecting an image with `size`, `objdump`, and map files
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_52_Linker_Scripts_and_Firmware_Layout.html)
+
+---
+
+### Week 53: Constrained-Resource Programming
+- Programming without `malloc`: static allocation, memory pools, and ring buffers
+- Fixed-point arithmetic and avoiding floating point
+- Lookup tables, code size, and optimizing for space with `-Os`
+- Power management and low-power modes
+- Watchdog timers, brown-out detection, and fault handlers
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_53_Constrained_Resource_Programming.html)
+
+---
+
+### Week 54: Real-Time Operating Systems
+- The bare-metal superloop versus an RTOS
+- Tasks, scheduling policies, and priorities
+- Queues, semaphores, and mutexes in an RTOS
+- Priority inversion and how to avoid it
+- Choosing between a superloop, an RTOS, and an event-driven design
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_54_Real_Time_Operating_Systems.html)
+
+---
+
+### Week 55: Embedded Debugging and Testing
+- On-chip debugging over JTAG and SWD with a hardware debugger
+- Tracing on constrained targets: semihosting, logging, and trace buffers
+- Hardware abstraction layers that make firmware testable on a host
+- Host-side unit tests and hardware-in-the-loop testing
+- Observing timing with a logic analyzer and an oscilloscope
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_55_Embedded_Debugging_and_Testing.html)
+
+---
+
+### Week 56: Maintaining Long-Lived C Codebases
+- Reading and modernizing legacy and K&R-era code
+- Writing characterization tests before refactoring
+- Refactoring incrementally without changing observable behavior
+- Migrating between C standards, compilers, and platforms
+- Managing technical debt, deprecation, and long-term support
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_56_Maintaining_Long_Lived_Codebases.html)
