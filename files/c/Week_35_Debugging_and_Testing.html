@@ -1,0 +1,558 @@
+---
+layout: without-sidebar
+title: "Week 35 — Debugging, Testing, and Analysis"
+permalink: /files/c/Week_35_Debugging_and_Testing.html
+excerpt: "GDB breakpoints, watchpoints and backtraces; static analysis; unit testing and coverage in C; reducing a failure to a minimal case; and a continuous integration gate."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Advanced · Week 35</div>
+  <h1>Debugging, Testing, and Analysis</h1>
+  <p class="c-wk-lead">Every tool in this session exists because C will not tell you what is wrong on its own. Used together — warnings, a debugger, static analysis, tests, sanitizers, and a gate that runs them all — they turn C from a language where bugs hide into one where they are found on the day they are written.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Drive GDB: breakpoints, stepping, inspection, watchpoints, and backtraces.</li>
+      <li>Read a core dump from a crash that happened without you.</li>
+      <li>Write unit tests in C and measure which lines they actually exercise.</li>
+      <li>Reduce a failing input to the smallest case that still fails.</li>
+      <li>Configure a build that fails on a warning, a test failure, or a sanitizer report.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The order to apply tools</h2>
+
+  <table>
+    <thead><tr><th>Stage</th><th>Tool</th><th>Catches</th></tr></thead>
+    <tbody>
+      <tr><td>Typing</td><td>Compiler warnings</td><td>Type errors, obvious mistakes — free</td></tr>
+      <tr><td>Before running</td><td>Static analysis</td><td>Null dereferences, leaks on some paths</td></tr>
+      <tr><td>While running</td><td>Sanitizers</td><td>Memory errors, undefined behavior</td></tr>
+      <tr><td>Repeatedly</td><td>Unit tests</td><td>Logic errors; regressions</td></tr>
+      <tr><td>When something fails</td><td>GDB</td><td>Everything else</td></tr>
+      <tr><td>Continuously</td><td>CI</td><td>All of the above, on every change</td></tr>
+    </tbody>
+  </table>
+
+  <p>Cheapest first. A warning costs nothing and is delivered instantly; a debugging session costs an hour. Most of what a beginner debugs with <code>printf</code> would have been a warning under <code>-Wall -Wextra</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>GDB</h2>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -O0 prog.c -o prog     # -g, and -O0 for sanity
+gdb ./prog</code></pre>
+
+  <table>
+    <thead><tr><th>Command</th><th>Does</th></tr></thead>
+    <tbody>
+      <tr><td><code>run</code> / <code>r</code></td><td>Start, optionally with arguments</td></tr>
+      <tr><td><code>break f</code> / <code>b f</code></td><td>Break at a function, a line, or <code>file.c:42</code></td></tr>
+      <tr><td><code>break f if x &gt; 100</code></td><td>Conditional breakpoint</td></tr>
+      <tr><td><code>next</code> / <code>n</code></td><td>One line, stepping over calls</td></tr>
+      <tr><td><code>step</code> / <code>s</code></td><td>One line, stepping into calls</td></tr>
+      <tr><td><code>finish</code></td><td>Run until the current function returns</td></tr>
+      <tr><td><code>continue</code> / <code>c</code></td><td>Run to the next breakpoint</td></tr>
+      <tr><td><code>print x</code> / <code>p *p</code></td><td>Evaluate an expression</td></tr>
+      <tr><td><code>p arr[3]@5</code></td><td>Print five elements starting at index 3</td></tr>
+      <tr><td><code>backtrace</code> / <code>bt</code></td><td>The call stack</td></tr>
+      <tr><td><code>frame 2</code></td><td>Move to a caller's frame</td></tr>
+      <tr><td><code>watch x</code></td><td>Stop when <code>x</code> changes</td></tr>
+      <tr><td><code>info locals</code></td><td>Every local in this frame</td></tr>
+      <tr><td><code>layout src</code></td><td>Split view with source</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The watchpoint</h3>
+
+  <p>This is the command worth learning specifically, because it solves a problem nothing else does: <em>who changed this variable?</em></p>
+
+<pre><code>(gdb) watch total
+Hardware watchpoint 2: total
+(gdb) continue
+Hardware watchpoint 2: total
+Old value = 100
+New value = 0
+update_totals (…) at report.c:88</code></pre>
+
+  <p>The debugger stops at the exact instruction that modified it and shows you the stack. For a variable being corrupted by unrelated code — week 12's out-of-range write, for instance — this is often the only practical approach.</p>
+
+  <h3>Core dumps</h3>
+
+  <p>When a program crashes on a machine you were not watching, the kernel can write its memory image to a file:</p>
+
+<pre><code>ulimit -c unlimited        # enable core dumps for this shell
+./prog                     # crashes
+gdb ./prog core            # examine the corpse
+(gdb) bt
+(gdb) info locals</code></pre>
+
+  <p>The backtrace shows exactly where it died and with what values, without reproducing anything. On systemd systems the file is managed by <code>coredumpctl</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Static analysis</h2>
+
+  <p>Analysis without running the program, so it reaches paths your tests never take.</p>
+
+<pre><code>gcc -fanalyzer -Wall -Wextra -c prog.c      # GCC 10+, built in
+clang --analyze prog.c
+cppcheck --enable=all --std=c17 prog.c
+scan-build make                              # clang, whole project</code></pre>
+
+  <p><code>-fanalyzer</code> is the easiest win: it ships with GCC, needs no extra tool, and finds double frees, use-after-free, null dereferences, and leaks along specific paths — reporting the path it followed, which is what makes the report actionable.</p>
+
+  <p>Expect false positives. A static analyser reasons about all possible paths, including ones your invariants exclude but the code does not state. Triage them, suppress the ones you have verified, and keep the report at zero so that a new entry means something.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Unit tests</h2>
+
+  <p>C has no test framework in the standard library. Frameworks exist — Unity, Check, Criterion, µnit — but a usable harness is about twenty lines, and writing it once makes clear what the frameworks add.</p>
+
+<pre><code>static int tests_run = 0, tests_failed = 0;
+
+#define CHECK(cond) do {                                        \
+    tests_run++;                                                \
+    if (!(cond)) {                                              \
+        tests_failed++;                                         \
+        fprintf(stderr, "FAIL %s:%d: %s\n",                     \
+                __FILE__, __LINE__, #cond);                     \
+    }                                                           \
+} while (0)</code></pre>
+
+  <p>Two details in that macro matter. <code>#cond</code> stringifies the expression so the report shows what was tested — week 28's stringification, earning its place. And <code>do { … } while (0)</code> makes the macro behave as a single statement, so <code>if (x) CHECK(y); else …</code> parses correctly; without it, the semicolon after the closing brace breaks the <code>else</code>.</p>
+
+  <h3>What to test</h3>
+
+  <table>
+    <thead><tr><th>Case</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>The empty input</td><td>Zero elements is where most off-by-ones live</td></tr>
+      <tr><td>One element</td><td>Loops that assume at least two</td></tr>
+      <tr><td>The boundaries</td><td>First, last, and one past — week 10's checklist</td></tr>
+      <tr><td>Failure paths</td><td>Allocation failure, malformed input — untested by default</td></tr>
+      <tr><td>Every bug you fix</td><td>A regression test stops it returning</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Coverage</h3>
+
+<pre><code>gcc --coverage -O0 -o tests tests.c lib.c
+./tests
+gcov lib.c
+# or, readable:
+lcov --capture --directory . --output-file cov.info
+genhtml cov.info --output-directory report</code></pre>
+
+  <p>Coverage tells you which lines ran, which is useful precisely because it exposes the error paths nobody tested. It does not tell you the tests are good — 100% coverage with no assertions proves nothing. Treat a low number as a definite problem and a high number as no evidence either way.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Reducing a failure</h2>
+
+  <p>A crash on a 50 MB input is nearly impossible to reason about. A crash on eleven bytes is nearly impossible to misunderstand. Reduction is a mechanical procedure:</p>
+
+  <ol>
+    <li>Confirm it reproduces reliably. An intermittent failure is usually uninitialized memory or a race; fix the reproducibility first.</li>
+    <li>Halve the input. Does it still fail? Keep the failing half; otherwise keep the other.</li>
+    <li>Repeat until removing anything makes it pass.</li>
+    <li>Remove program options and features the same way.</li>
+  </ol>
+
+  <p><code>creduce</code> and <code>halfempty</code> automate this given a script that reports whether the input still fails. Week 48 produces such inputs by the thousand from a fuzzer, and reduction is what makes them usable.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Continuous integration</h2>
+
+  <p>Every tool above is worthless if it is only run when someone remembers. CI runs them on every change and fails the build when they complain.</p>
+
+<pre><code>name: build and test
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: strict build
+        run: make clean &amp;&amp; make CFLAGS="-std=c17 -Wall -Wextra -Werror -O2"
+
+      - name: sanitizers
+        run: make clean &amp;&amp; make test CFLAGS="-std=c17 -Wall -Wextra -g -O1 -fsanitize=address,undefined"
+
+      - name: static analysis
+        run: make clean &amp;&amp; make CFLAGS="-std=c17 -Wall -Wextra -fanalyzer"
+
+      - name: valgrind
+        run: |
+          sudo apt-get install -y valgrind
+          make clean &amp;&amp; make
+          valgrind --error-exitcode=1 --leak-check=full ./tests
+
+      - name: coverage
+        run: make clean &amp;&amp; make CFLAGS="--coverage -O0" &amp;&amp; ./tests &amp;&amp; gcov *.c</code></pre>
+
+  <p>Two flags make this work as a gate rather than a report. <code>-Werror</code> turns a warning into a failed build. <code>--error-exitcode=1</code> makes Valgrind's findings fail the step — without it, Valgrind prints its report and exits successfully, and nobody reads it.</p>
+
+  <p>Sanitizers also need <code>ASAN_OPTIONS=detect_leaks=1</code> on platforms where leak detection is off by default, and they set a non-zero exit status on a finding, so a test target that runs the instrumented binary fails automatically.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Worked example: testing the week 33 map</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+
+/* ---------- a twenty-line test harness ---------- */
+
+static int tests_run = 0;
+static int tests_failed = 0;
+static const char *current_suite = "";
+
+#define SUITE(name) do { current_suite = (name); \
+    printf("\n-- %s\n", current_suite); } while (0)
+
+#define CHECK(cond) do {                                            \
+    tests_run++;                                                    \
+    if (cond) {                                                     \
+        printf("  ok   %s\n", #cond);                               \
+    } else {                                                        \
+        tests_failed++;                                             \
+        printf("  FAIL %s:%d: %s\n", __FILE__, __LINE__, #cond);    \
+    }                                                               \
+} while (0)
+
+#define CHECK_EQ_INT(actual, expected) do {                         \
+    tests_run++;                                                    \
+    long a_ = (long)(actual), e_ = (long)(expected);                \
+    if (a_ == e_) {                                                 \
+        printf("  ok   %s == %ld\n", #actual, e_);                  \
+    } else {                                                        \
+        tests_failed++;                                             \
+        printf("  FAIL %s:%d: %s was %ld, expected %ld\n",          \
+               __FILE__, __LINE__, #actual, a_, e_);                \
+    }                                                               \
+} while (0)
+
+/* ---------- the unit under test: a small string map ---------- */
+
+typedef struct Entry {
+    char         *key;
+    int           value;
+    struct Entry *next;
+} Entry;
+
+typedef struct {
+    Entry **buckets;
+    size_t  bucket_count;
+    size_t  count;
+} Map;
+
+static size_t hash_string(const char *s)
+{
+    size_t h = 1469598103934665603u;
+    for (; *s != '\0'; s++) { h ^= (unsigned char)*s; h *= 1099511628211u; }
+    return h;
+}
+
+static Map *map_create(size_t buckets)
+{
+    if (buckets == 0) buckets = 8;
+    Map *m = malloc(sizeof *m);
+    if (m == NULL) return NULL;
+    m-&gt;buckets = calloc(buckets, sizeof *m-&gt;buckets);
+    if (m-&gt;buckets == NULL) { free(m); return NULL; }
+    m-&gt;bucket_count = buckets;
+    m-&gt;count = 0;
+    return m;
+}
+
+static void map_destroy(Map *m)
+{
+    if (m == NULL) return;
+    for (size_t b = 0; b &lt; m-&gt;bucket_count; b++) {
+        Entry *e = m-&gt;buckets[b];
+        while (e != NULL) { Entry *n = e-&gt;next; free(e-&gt;key); free(e); e = n; }
+    }
+    free(m-&gt;buckets);
+    free(m);
+}
+
+static bool map_put(Map *m, const char *key, int value)
+{
+    size_t i = hash_string(key) % m-&gt;bucket_count;
+    for (Entry *e = m-&gt;buckets[i]; e != NULL; e = e-&gt;next) {
+        if (strcmp(e-&gt;key, key) == 0) { e-&gt;value = value; return true; }
+    }
+    Entry *e = malloc(sizeof *e);
+    if (e == NULL) return false;
+    size_t bytes = strlen(key) + 1;
+    e-&gt;key = malloc(bytes);
+    if (e-&gt;key == NULL) { free(e); return false; }
+    memcpy(e-&gt;key, key, bytes);
+    e-&gt;value = value;
+    e-&gt;next = m-&gt;buckets[i];
+    m-&gt;buckets[i] = e;
+    m-&gt;count++;
+    return true;
+}
+
+static bool map_get(const Map *m, const char *key, int *out)
+{
+    size_t i = hash_string(key) % m-&gt;bucket_count;
+    for (Entry *e = m-&gt;buckets[i]; e != NULL; e = e-&gt;next) {
+        if (strcmp(e-&gt;key, key) == 0) { *out = e-&gt;value; return true; }
+    }
+    return false;
+}
+
+static bool map_remove(Map *m, const char *key)
+{
+    size_t i = hash_string(key) % m-&gt;bucket_count;
+    for (Entry **link = &amp;m-&gt;buckets[i]; *link != NULL; link = &amp;(*link)-&gt;next) {
+        if (strcmp((*link)-&gt;key, key) == 0) {
+            Entry *dead = *link;
+            *link = dead-&gt;next;
+            free(dead-&gt;key); free(dead);
+            m-&gt;count--;
+            return true;
+        }
+    }
+    return false;
+}
+
+/* ---------- the tests ---------- */
+
+static void test_empty(void)
+{
+    SUITE("an empty map");
+    Map *m = map_create(8);
+    int v = -1;
+    CHECK(m != NULL);
+    CHECK_EQ_INT(m-&gt;count, 0);
+    CHECK(!map_get(m, "absent", &amp;v));
+    CHECK_EQ_INT(v, -1);                  /* untouched on failure */
+    CHECK(!map_remove(m, "absent"));
+    map_destroy(m);
+}
+
+static void test_single(void)
+{
+    SUITE("one entry");
+    Map *m = map_create(8);
+    int v = 0;
+    CHECK(map_put(m, "key", 42));
+    CHECK_EQ_INT(m-&gt;count, 1);
+    CHECK(map_get(m, "key", &amp;v));
+    CHECK_EQ_INT(v, 42);
+    CHECK(!map_get(m, "Key", &amp;v));        /* case sensitive */
+    map_destroy(m);
+}
+
+static void test_replace(void)
+{
+    SUITE("replacing a value");
+    Map *m = map_create(8);
+    int v = 0;
+    map_put(m, "k", 1);
+    CHECK(map_put(m, "k", 2));
+    CHECK_EQ_INT(m-&gt;count, 1);            /* not 2 */
+    map_get(m, "k", &amp;v);
+    CHECK_EQ_INT(v, 2);
+    map_destroy(m);
+}
+
+static void test_collisions(void)
+{
+    SUITE("forced collisions");
+    Map *m = map_create(1);               /* one bucket: everything collides */
+    int v = 0;
+    for (int i = 0; i &lt; 20; i++) {
+        char key[16];
+        snprintf(key, sizeof key, "k%d", i);
+        map_put(m, key, i);
+    }
+    CHECK_EQ_INT(m-&gt;count, 20);
+    CHECK(map_get(m, "k0", &amp;v));   CHECK_EQ_INT(v, 0);
+    CHECK(map_get(m, "k19", &amp;v));  CHECK_EQ_INT(v, 19);
+    CHECK(map_remove(m, "k10"));
+    CHECK(!map_get(m, "k10", &amp;v));
+    CHECK_EQ_INT(m-&gt;count, 19);
+    map_destroy(m);
+}
+
+static void test_edge_keys(void)
+{
+    SUITE("awkward keys");
+    Map *m = map_create(8);
+    int v = 0;
+    CHECK(map_put(m, "", 1));                    /* empty key */
+    CHECK(map_get(m, "", &amp;v));   CHECK_EQ_INT(v, 1);
+
+    char long_key[512];
+    memset(long_key, 'x', sizeof long_key - 1);
+    long_key[sizeof long_key - 1] = '\0';
+    CHECK(map_put(m, long_key, 2));
+    CHECK(map_get(m, long_key, &amp;v)); CHECK_EQ_INT(v, 2);
+
+    CHECK(map_put(m, "türkçe", 3));              /* multibyte UTF-8 */
+    CHECK(map_get(m, "türkçe", &amp;v)); CHECK_EQ_INT(v, 3);
+    map_destroy(m);
+}
+
+static void test_remove_order(void)
+{
+    SUITE("removal from every chain position");
+    const char *keys[] = { "a", "b", "c" };
+    for (int victim = 0; victim &lt; 3; victim++) {
+        Map *m = map_create(1);                  /* all in one chain */
+        for (int i = 0; i &lt; 3; i++) map_put(m, keys[i], i);
+        CHECK(map_remove(m, keys[victim]));
+        CHECK_EQ_INT(m-&gt;count, 2);
+        int v;
+        for (int i = 0; i &lt; 3; i++) {
+            if (i == victim) CHECK(!map_get(m, keys[i], &amp;v));
+            else             CHECK(map_get(m, keys[i], &amp;v));
+        }
+        map_destroy(m);
+    }
+}
+
+int main(void)
+{
+    puts("running tests");
+    test_empty();
+    test_single();
+    test_replace();
+    test_collisions();
+    test_edge_keys();
+    test_remove_order();
+
+    printf("\n%d checks, %d failed\n", tests_run, tests_failed);
+    return tests_failed == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -O1 -fsanitize=address,undefined -o tests tests.c
+./tests ; echo "exit status $?"</code></pre>
+
+  <h3>Why these tests and not others</h3>
+
+  <p><strong>The empty map first.</strong> Zero elements is where off-by-ones live, and it is the case a happy-path test never reaches.</p>
+
+  <p><strong>One bucket, deliberately.</strong> <code>map_create(1)</code> forces every key into the same chain, so the chain-walking code — normally exercised by luck — is exercised on purpose. This is how you test a code path whose occurrence is otherwise probabilistic.</p>
+
+  <p><strong>Removal from each chain position.</strong> Head, middle, and tail are three different situations in linked-list code. Testing only one is testing a third of the function.</p>
+
+  <p><strong>Awkward keys.</strong> The empty string, a 511-byte key, and multibyte UTF-8. Each has broken a real hash table somewhere.</p>
+
+  <p><strong>The exit status.</strong> <code>main</code> returns non-zero when anything failed, which is what makes the suite usable from <code>make test</code> and from CI. A test program that always exits 0 cannot gate anything.</p>
+
+  <h3>Measure the coverage</h3>
+
+<pre><code>gcc -std=c17 --coverage -O0 -o tests_cov tests.c
+./tests_cov
+gcov tests.c | head -5
+less tests.c.gcov      # lines marked ##### were never executed</code></pre>
+
+  <p>Look for <code>#####</code> on the allocation-failure branches inside <code>map_put</code>. No test reaches them, because <code>malloc</code> does not fail on demand. Those are the error paths week 27 warned are the least tested code in any program; reaching them needs a failure-injecting allocator or a fault-injection library.</p>
+
+  <h3>Practise the debugger on a real bug</h3>
+
+  <p>Introduce one, then find it without reading the diff:</p>
+
+<pre><code>/* in map_remove, forget to decrement: */
+/* m-&gt;count--; */</code></pre>
+
+<pre><code>./tests                      # FAIL: m-&gt;count was 3, expected 2
+gdb ./tests
+(gdb) break map_remove
+(gdb) run
+(gdb) finish
+(gdb) print m-&gt;count</code></pre>
+
+  <p>Then try the watchpoint approach instead, which finds it without knowing where to look:</p>
+
+<pre><code>(gdb) break test_remove_order
+(gdb) run
+(gdb) next 4
+(gdb) watch m-&gt;count
+(gdb) continue</code></pre>
+
+  <p>The watchpoint reports every change to the field. When removal happens and no report appears, the missing decrement has identified itself.</p>
+
+  <h3>Run the static analyser</h3>
+
+<pre><code>gcc -fanalyzer -Wall -Wextra -c tests.c -o /dev/null</code></pre>
+
+  <p>On this code it should be quiet. Delete the <code>free(e-&gt;key)</code> in <code>map_destroy</code> and it reports the leak, with the path it followed to reach the conclusion — before the program has been run once.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Debugging an optimized build</td><td>Variables "optimized out"; lines jump</td><td>Debug at <code>-O0 -g</code>.</td></tr>
+      <tr><td>Forgetting <code>-g</code></td><td>No source lines or variable names</td><td>Always build development binaries with it.</td></tr>
+      <tr><td>Testing only the happy path</td><td>Error paths ship untested</td><td>Test empty, boundary, and failure cases.</td></tr>
+      <tr><td>A test suite that always exits 0</td><td>CI cannot detect a failure</td><td>Return non-zero when anything failed.</td></tr>
+      <tr><td>Treating coverage as a quality score</td><td>Tests with no assertions reach 100%</td><td>Use it to find untested paths only.</td></tr>
+      <tr><td>Valgrind without <code>--error-exitcode</code></td><td>Reports findings and exits 0</td><td>Set it so the step fails.</td></tr>
+      <tr><td>Debugging a huge input</td><td>Too much state to reason about</td><td>Reduce it first.</td></tr>
+      <tr><td>Ignoring static-analysis output</td><td>Real findings buried in false positives</td><td>Triage to zero and keep it there.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">9</span>Check yourself</h2>
+
+  <details>
+    <summary>Why debug at <code>-O0</code> rather than <code>-O2</code>?</summary>
+    <p>Because optimization removes variables, merges and reorders lines, and inlines functions, so the debugger reports "optimized out" and the execution point jumps around. At <code>-O0</code> the machine code corresponds to the source line by line. Benchmarking is the reverse case — there <code>-O0</code> is meaningless.</p>
+  </details>
+
+  <details>
+    <summary>What problem does a watchpoint solve that a breakpoint cannot?</summary>
+    <p>Finding <em>who</em> modified a variable when you do not know where the write happens. A breakpoint requires knowing the location; a watchpoint stops at whatever instruction changes the value and shows the stack. For a variable corrupted by an out-of-range write elsewhere, it is often the only practical method.</p>
+  </details>
+
+  <details>
+    <summary>Why force every key into one bucket in a hash-table test?</summary>
+    <p>Because the chain-walking code is otherwise exercised only when collisions happen to occur, which is probabilistic and may not happen at all in a small test. Creating the table with one bucket makes collision handling deterministic, so removal from the head, middle, and tail of a chain can all be tested on purpose.</p>
+  </details>
+
+  <details>
+    <summary>Why is 100% coverage not evidence that the tests are good?</summary>
+    <p>Because coverage records which lines executed, not whether anything was checked. A suite that calls every function and asserts nothing reaches full coverage and detects no bugs. Low coverage is a definite problem — those paths are untested — but high coverage is no evidence in the other direction.</p>
+  </details>
+
+  <details>
+    <summary>Why must a test program return a non-zero exit status on failure?</summary>
+    <p>Because that is the only thing <code>make</code>, a shell script, and a CI system can see. A suite that prints "FAIL" and exits 0 is a report nobody reads; one that exits non-zero fails the build and blocks the change. It is the same exit-status discipline week 23 applied to command-line tools.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">10</span>Where this leads</h2>
+  <p>Week 36 addresses the class of bug that none of these tools reliably catches at <code>-O0</code>: undefined behavior, which can make a correct-looking program fail only once the optimizer believes it. The undefined-behavior sanitizer you have been running alongside AddressSanitizer becomes the main instrument there.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_34_Performance_and_Memory_Layout.html">← Week 34</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_36_Undefined_Behavior_and_Secure_Coding.html">Week 36 →</a>
+</div>
+
+</div>

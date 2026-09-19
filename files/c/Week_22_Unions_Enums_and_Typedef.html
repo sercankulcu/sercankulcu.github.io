@@ -1,0 +1,486 @@
+---
+layout: without-sidebar
+title: "Week 22 — Unions, Enumerations, and Type Aliases"
+permalink: /files/c/Week_22_Unions_Enums_and_Typedef.html
+excerpt: "Enumerations and the switch warning they enable, typedef used well and badly, unions and the tagged-union discipline, structure padding and offsetof."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Intermediate · Week 22</div>
+  <h1>Unions, Enumerations, and Type Aliases</h1>
+  <p class="c-wk-lead">Three small features that finish C's type system. One of them — the enumeration — buys you a genuine static check the language otherwise never offers. Another — the union — is the only place C lets you interpret the same bytes two ways, which is powerful and requires discipline.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Define enumerations and use the compiler warning they unlock.</li>
+      <li>Use <code>typedef</code> where it helps and recognize where it hides too much.</li>
+      <li>Explain what a union is, and why a bare union is almost always wrong.</li>
+      <li>Build a tagged union and access it safely.</li>
+      <li>Explain structure padding, compute member offsets, and reorder members to save space.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Enumerations</h2>
+
+<pre><code>typedef enum {
+    STATE_IDLE,        /* 0 */
+    STATE_RUNNING,     /* 1 */
+    STATE_PAUSED,      /* 2 */
+    STATE_STOPPED      /* 3 */
+} State;
+
+State s = STATE_IDLE;</code></pre>
+
+  <p>An enumeration defines a set of named integer constants. Values start at 0 and increase by one unless you say otherwise:</p>
+
+<pre><code>typedef enum {
+    HTTP_OK        = 200,
+    HTTP_NOT_FOUND = 404,
+    HTTP_ERROR     = 500
+} HttpStatus;
+
+typedef enum {
+    FLAG_READ  = 1 &lt;&lt; 0,    /* 1 */
+    FLAG_WRITE = 1 &lt;&lt; 1,    /* 2 */
+    FLAG_EXEC  = 1 &lt;&lt; 2     /* 4 */
+} Permission;</code></pre>
+
+  <p>The second form gives named bit flags, which week 25 combines with the bitwise operators.</p>
+
+  <h3>The reason to use them</h3>
+
+  <p>Enumerations are not merely tidier than <code>#define</code>. They unlock a compile-time check that C offers nowhere else:</p>
+
+<pre><code>const char *describe(State s)
+{
+    switch (s) {
+    case STATE_IDLE:    return "idle";
+    case STATE_RUNNING: return "running";
+    case STATE_PAUSED:  return "paused";
+    /* STATE_STOPPED not handled, and no default */
+    }
+    return "unknown";
+}</code></pre>
+
+<pre><code>warning: enumeration value 'STATE_STOPPED' not handled in switch [-Wswitch]</code></pre>
+
+  <p>Add a new state to the enumeration a year later and the compiler points at every <code>switch</code> that needs updating. This is genuine static verification, and it is lost the moment you write a <code>default</code> label — so on a switch over an enumeration, <strong>omit <code>default</code> deliberately</strong> and handle the out-of-range case after the switch.</p>
+
+  <div class="c-wk-note">
+    <p><strong>What an enum is, underneath.</strong> Its constants have type <code>int</code>, and the enumeration type itself is some implementation-chosen integer type large enough to hold them. An <code>enum</code> variable can legally hold a value outside the listed set — <code>(State)99</code> compiles — so the <code>switch</code> warning is a help, not a guarantee. C23 lets you fix the underlying type: <code>enum State : unsigned char { … }</code>.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span><code>typedef</code></h2>
+
+  <p><code>typedef</code> introduces an alias for an existing type. It creates no new type — it is a naming device, and the compiler treats the alias and the original as identical.</p>
+
+<pre><code>typedef unsigned long  Timestamp;
+typedef struct Point   Point;
+typedef int          (*Comparator)(const void *, const void *);</code></pre>
+
+  <h3>Where it clearly helps</h3>
+  <ul>
+    <li><strong>Structures</strong>, to avoid writing <code>struct</code> at every use.</li>
+    <li><strong>Function pointers</strong>, where the raw declaration is genuinely hard to read — week 30 relies on this.</li>
+    <li><strong>Portability</strong>, as a single place to change a width. This is exactly what <code>&lt;stdint.h&gt;</code> does with <code>int32_t</code>.</li>
+    <li><strong>Opaque handles</strong>, where the caller must not see the definition — week 33.</li>
+  </ul>
+
+  <h3>Where it hurts</h3>
+<pre><code>typedef int *IntPtr;
+IntPtr a, b;              /* both pointers — surprising, but fine */
+const IntPtr p = q;       /* a CONST POINTER, not a pointer to const */</code></pre>
+
+  <p>Hiding a <code>*</code> behind an alias makes <code>const</code> apply to the pointer rather than the target, which is rarely what the reader expects. The standard library avoids pointer typedefs for exactly this reason, and so should you — with the deliberate exception of opaque handles, where hiding is the point.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Unions</h2>
+
+  <p>A union's members all occupy the <em>same</em> storage. Its size is that of its largest member, and only one member holds a meaningful value at any moment.</p>
+
+<pre><code>union Value {
+    int    as_int;
+    double as_double;
+    char   as_text[16];
+};
+
+union Value v;
+v.as_int = 42;
+printf("%d\n", v.as_int);      /* fine */
+printf("%f\n", v.as_double);   /* garbage: you did not store a double */</code></pre>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 620 150" role="img" aria-label="A struct stores members side by side while a union overlays them in the same space" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="20" y="30" width="70" height="34" rx="6"/><rect x="92" y="30" width="130" height="34" rx="6"/>
+        <rect x="224" y="30" width="70" height="34" rx="6"/>
+      </g>
+      <g fill="currentColor" font-size="11.5" text-anchor="middle" font-family="inherit">
+        <text x="55" y="51">int</text><text x="157" y="51">double</text><text x="259" y="51">char[8]</text>
+        <text x="157" y="20" opacity=".7">struct: 20 bytes, side by side</text>
+      </g>
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="360" y="24" width="130" height="18" rx="4"/>
+        <rect x="360" y="46" width="230" height="18" rx="4"/>
+        <rect x="360" y="68" width="130" height="18" rx="4"/>
+      </g>
+      <g fill="currentColor" font-size="11.5" font-family="inherit">
+        <text x="368" y="37" opacity=".85">int</text>
+        <text x="368" y="59" opacity=".85">double</text>
+        <text x="368" y="81" opacity=".85">char[8]</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1" opacity=".35" stroke-dasharray="3 3">
+        <path d="M360 18v76M590 18v76"/>
+      </g>
+      <text x="475" y="110" fill="currentColor" font-size="11.5" text-anchor="middle" opacity=".75" font-family="inherit">union: 8 bytes, all overlaid — one valid at a time</text>
+    </svg>
+    <p class="c-wk-cap">Reading a member you did not write gives an unspecified value, and is how type punning is done.</p>
+  </div>
+
+  <p>Reading a member other than the one last written is <em>unspecified</em> behavior in C — implementations commonly define it as reinterpreting the bytes, which makes unions the standard way to inspect a value's representation. That is legitimate and useful, and is exactly what week 4's float-byte dump did by another route.</p>
+
+  <p>What is <em>not</em> legitimate is forgetting which member is live. A bare union carries no record of that, so it is almost always wrong on its own.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>The tagged union</h2>
+
+  <p>Pair the union with an enumeration recording which member is valid, and wrap both in a structure. This is the disciplined form, and it is how variant types are built in C.</p>
+
+<pre><code>typedef enum { VAL_INT, VAL_DOUBLE, VAL_TEXT } ValueKind;
+
+typedef struct {
+    ValueKind kind;
+    union {
+        int    as_int;
+        double as_double;
+        char   as_text[24];
+    } data;
+} Value;</code></pre>
+
+  <p>Every access goes through the tag:</p>
+
+<pre><code>void print_value(const Value *v)
+{
+    switch (v-&gt;kind) {
+    case VAL_INT:    printf("%d\n",  v-&gt;data.as_int);    break;
+    case VAL_DOUBLE: printf("%g\n",  v-&gt;data.as_double); break;
+    case VAL_TEXT:   printf("%s\n",  v-&gt;data.as_text);   break;
+    }
+}</code></pre>
+
+  <p>And because the switch covers an enumeration with no <code>default</code>, adding a fourth kind produces a warning here and at every other site that inspects a <code>Value</code>. The tag is what makes the union safe, and the enum is what makes the tag checkable.</p>
+
+  <p>C11 allows the union to be anonymous, which removes the <code>.data</code> step:</p>
+
+<pre><code>typedef struct {
+    ValueKind kind;
+    union {                     /* no name */
+        int    as_int;
+        double as_double;
+    };
+} Value;
+
+v.as_int = 42;                  /* accessed as if it were a direct member */</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Padding, alignment, and <code>offsetof</code></h2>
+
+  <p>Week 21 ended with two structures whose members were all equal comparing unequal under <code>memcmp</code>. Here is why.</p>
+
+  <p>Every type has an <strong>alignment requirement</strong>: an <code>int</code> must usually sit at an address divisible by 4, a <code>double</code> by 8. The compiler inserts unnamed <em>padding</em> bytes between members to satisfy this, and after the last member so that arrays of the structure stay aligned.</p>
+
+<pre><code>struct Wasteful {          /* 24 bytes */
+    char   a;              /* offset 0  */
+                           /* 7 bytes padding */
+    double b;              /* offset 8  */
+    char   c;              /* offset 16 */
+                           /* 7 bytes padding */
+};
+
+struct Tight {             /* 16 bytes */
+    double b;              /* offset 0  */
+    char   a;              /* offset 8  */
+    char   c;              /* offset 9  */
+                           /* 6 bytes padding */
+};</code></pre>
+
+  <p>Same three members, one third less space. The rule of thumb: <strong>declare members from largest to smallest</strong>. On a single structure this is irrelevant; on an array of a million records it is megabytes, and week 34 shows it is also measurably faster because more records fit in a cache line.</p>
+
+  <p><code>offsetof</code>, from <code>&lt;stddef.h&gt;</code>, reports where a member actually sits:</p>
+
+<pre><code>#include &lt;stddef.h&gt;
+printf("%zu\n", offsetof(struct Wasteful, b));   /* 8 */</code></pre>
+
+  <p>The padding bytes have unspecified contents — they are never initialized, not even by <code>= {0}</code> in every implementation. That is what defeated <code>memcmp</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: a variant type and a space audit</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stddef.h&gt;
+#include &lt;stdbool.h&gt;
+
+/* ---------- enumeration with a checkable switch ---------- */
+
+typedef enum {
+    TOKEN_NUMBER,
+    TOKEN_WORD,
+    TOKEN_SYMBOL
+} TokenKind;
+
+/* No default label: adding a TokenKind makes the compiler
+   point at this function. That is the whole reason for the enum. */
+static const char *kind_name(TokenKind k)
+{
+    switch (k) {
+    case TOKEN_NUMBER: return "number";
+    case TOKEN_WORD:   return "word";
+    case TOKEN_SYMBOL: return "symbol";
+    }
+    return "unknown";          /* reached only for an out-of-range value */
+}
+
+/* ---------- tagged union ---------- */
+
+typedef struct {
+    TokenKind kind;
+    union {
+        double as_number;
+        char   as_word[24];
+        char   as_symbol;
+    } data;
+} Token;
+
+static Token token_number(double v)
+{
+    Token t = { .kind = TOKEN_NUMBER };
+    t.data.as_number = v;
+    return t;
+}
+
+static Token token_word(const char *w)
+{
+    Token t = { .kind = TOKEN_WORD };
+    snprintf(t.data.as_word, sizeof t.data.as_word, "%s", w);
+    return t;
+}
+
+static Token token_symbol(char c)
+{
+    Token t = { .kind = TOKEN_SYMBOL };
+    t.data.as_symbol = c;
+    return t;
+}
+
+static void token_print(const Token *t)
+{
+    printf("  %-7s ", kind_name(t-&gt;kind));
+    switch (t-&gt;kind) {
+    case TOKEN_NUMBER: printf("%g\n",  t-&gt;data.as_number); break;
+    case TOKEN_WORD:   printf("\"%s\"\n", t-&gt;data.as_word); break;
+    case TOKEN_SYMBOL: printf("'%c'\n", t-&gt;data.as_symbol); break;
+    }
+}
+
+/* ---------- named bit flags ---------- */
+
+typedef enum {
+    PERM_READ  = 1 &lt;&lt; 0,
+    PERM_WRITE = 1 &lt;&lt; 1,
+    PERM_EXEC  = 1 &lt;&lt; 2
+} Permission;
+
+static void print_permissions(unsigned flags)
+{
+    printf("  %c%c%c  (0x%02X)\n",
+           (flags &amp; PERM_READ)  ? 'r' : '-',
+           (flags &amp; PERM_WRITE) ? 'w' : '-',
+           (flags &amp; PERM_EXEC)  ? 'x' : '-',
+           flags);
+}
+
+/* ---------- padding ---------- */
+
+struct Wasteful { char a; double b; char c; };
+struct Tight    { double b; char a; char c; };
+
+/* ---------- type punning, the legitimate use of a bare union ---------- */
+
+union FloatBits {
+    float    value;
+    uint32_t bits;
+};
+
+int main(void)
+{
+    puts("== tagged union ==");
+    Token tokens[] = {
+        token_number(3.14),
+        token_word("hello"),
+        token_symbol('+'),
+        token_number(42)
+    };
+    const size_t n = sizeof tokens / sizeof tokens[0];
+    for (size_t i = 0; i &lt; n; i++) {
+        token_print(&amp;tokens[i]);
+    }
+    printf("  sizeof(Token) = %zu: a tag plus the largest member\n",
+           sizeof(Token));
+
+    puts("\n== what a bare union looks like when you lose track ==");
+    union { int as_int; float as_float; } raw;
+    raw.as_int = 1065353216;
+    printf("  stored as int   : %d\n", raw.as_int);
+    printf("  read as float   : %g   &lt;-- same bytes, different meaning\n",
+           (double)raw.as_float);
+    puts("  nothing in the union records which member is live");
+
+    puts("\n== bit flags from an enumeration ==");
+    unsigned p = PERM_READ | PERM_WRITE;
+    print_permissions(p);
+    p |= PERM_EXEC;
+    print_permissions(p);
+    p &amp;= ~(unsigned)PERM_WRITE;
+    print_permissions(p);
+
+    puts("\n== padding: same members, different order ==");
+    printf("  sizeof(struct Wasteful) = %zu\n", sizeof(struct Wasteful));
+    printf("    a at %zu, b at %zu, c at %zu\n",
+           offsetof(struct Wasteful, a),
+           offsetof(struct Wasteful, b),
+           offsetof(struct Wasteful, c));
+    printf("  sizeof(struct Tight)    = %zu\n", sizeof(struct Tight));
+    printf("    b at %zu, a at %zu, c at %zu\n",
+           offsetof(struct Tight, b),
+           offsetof(struct Tight, a),
+           offsetof(struct Tight, c));
+    printf("  the members total %zu bytes; the rest is padding\n",
+           sizeof(char) * 2 + sizeof(double));
+    printf("  one million records: %zu MB versus %zu MB\n",
+           sizeof(struct Wasteful) * 1000000 / 1048576,
+           sizeof(struct Tight)    * 1000000 / 1048576);
+
+    puts("\n== why memcmp fails on structures ==");
+    struct Wasteful p1, p2;
+    memset(&amp;p1, 0x00, sizeof p1);
+    memset(&amp;p2, 0xFF, sizeof p2);
+    p1.a = 'A'; p1.b = 1.5; p1.c = 'C';
+    p2.a = 'A'; p2.b = 1.5; p2.c = 'C';
+    printf("  all members equal : %s\n",
+           (p1.a == p2.a &amp;&amp; p1.b == p2.b &amp;&amp; p1.c == p2.c) ? "yes" : "no");
+    printf("  memcmp says equal : %s\n",
+           memcmp(&amp;p1, &amp;p2, sizeof p1) == 0 ? "yes" : "no");
+    puts("  the padding bytes differ, and memcmp compares them too");
+
+    puts("\n== type punning through a union ==");
+    union FloatBits fb;
+    fb.value = 1.0f;
+    printf("  1.0f has the bit pattern 0x%08X\n", fb.bits);
+    fb.bits = 0x40490FDB;
+    printf("  0x40490FDB read as a float is %g\n", (double)fb.value);
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o variants variants.c
+./variants</code></pre>
+
+  <p>The program needs <code>&lt;stdint.h&gt;</code> for <code>uint32_t</code>; add it to the includes. Week 37 covers those fixed-width types properly.</p>
+
+  <h3>Provoke the warning that makes enums worthwhile</h3>
+
+  <p>Add a fourth token kind and rebuild — without touching anything else:</p>
+
+<pre><code>typedef enum {
+    TOKEN_NUMBER,
+    TOKEN_WORD,
+    TOKEN_SYMBOL,
+    TOKEN_STRING          /* new */
+} TokenKind;</code></pre>
+
+<pre><code>variants.c:20:5: warning: enumeration value 'TOKEN_STRING' not handled
+                 in switch [-Wswitch]
+variants.c:58:5: warning: enumeration value 'TOKEN_STRING' not handled
+                 in switch [-Wswitch]</code></pre>
+
+  <p>Two warnings, pointing at exactly the two functions that must be updated. Now add <code>default: return "?";</code> to <code>kind_name</code> and rebuild: one warning disappears — and with it, the guarantee. That is the trade-off, and on a switch over an enumeration it is usually the wrong side to take.</p>
+
+  <h3>Measure the padding yourself</h3>
+
+<pre><code>pahole ./variants          # if installed: prints every struct with its holes</code></pre>
+
+  <p>Without <code>pahole</code>, the <code>offsetof</code> output above tells the same story: <code>Wasteful</code> puts <code>b</code> at offset 8 although <code>a</code> ended at offset 1, so seven bytes are unused. Reordering recovers eight bytes per record — eight megabytes across a million of them.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Adding <code>default</code> to a switch over an enum</td><td>Loses the unhandled-value warning</td><td>Omit it; handle out-of-range after the switch.</td></tr>
+      <tr><td>Reading a union member you did not write</td><td>Unspecified value</td><td>Track the live member with a tag.</td></tr>
+      <tr><td>A bare union in an interface</td><td>Callers cannot know what is valid</td><td>Wrap it in a struct with an enum tag.</td></tr>
+      <tr><td>Assuming <code>sizeof</code> equals the sum of members</td><td>Off by the padding</td><td>Use <code>sizeof</code> and <code>offsetof</code>; never compute by hand.</td></tr>
+      <tr><td>Declaring members smallest-first</td><td>Wasted space, worse cache use</td><td>Largest to smallest.</td></tr>
+      <tr><td><code>typedef int *IntPtr;</code> then <code>const IntPtr</code></td><td>A const pointer, not a pointer to const</td><td>Do not hide <code>*</code> behind a typedef.</td></tr>
+      <tr><td>Writing a struct's bytes to a file directly</td><td>Padding and layout are not portable</td><td>Serialize member by member — week 37.</td></tr>
+      <tr><td>Assuming an enum variable holds only listed values</td><td>It can hold any value of the underlying type</td><td>Validate input before switching on it.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>What does an enumeration give you that a set of <code>#define</code> constants does not?</summary>
+    <p>A compile-time check. A <code>switch</code> over an enumeration with no <code>default</code> label warns about any enumerator you failed to handle, so adding a value later makes the compiler list every site that must be updated. Enumerations also respect scope and are visible to a debugger, neither of which is true of macros.</p>
+  </details>
+
+  <details>
+    <summary>Why is adding a <code>default</code> label to a switch over an enum usually a mistake?</summary>
+    <p>Because it makes every value "handled", which switches the <code>-Wswitch</code> warning off. You trade a static guarantee for a runtime fallback. Handle the genuinely out-of-range case after the switch instead, so the compiler still checks that every named enumerator has a case.</p>
+  </details>
+
+  <details>
+    <summary>Why is a bare union almost always wrong in an interface?</summary>
+    <p>Because nothing in it records which member currently holds a valid value, and reading the wrong one yields an unspecified result. The caller would have to track that separately and correctly. Pairing the union with an enum tag inside a structure makes the state explicit and lets the compiler check every access site.</p>
+  </details>
+
+  <details>
+    <summary>Where does structure padding come from, and how do you avoid most of it?</summary>
+    <p>From alignment requirements: each member must start at an address that is a multiple of its alignment, and the structure is padded at the end so arrays stay aligned. Declaring members from largest to smallest packs them with the fewest gaps — often reducing the size by a third, which matters for large arrays of records.</p>
+  </details>
+
+  <details>
+    <summary>Why can two structures with identical member values fail a <code>memcmp</code>?</summary>
+    <p>Because <code>memcmp</code> compares every byte including padding, whose contents are unspecified and typically hold whatever was previously in that memory. Two structures assigned the same member values can still differ in those gaps. Compare the members individually instead.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>The type system is now complete: scalars, arrays, pointers, structures, unions, enumerations, and aliases. Week 23 puts them to work on the outside world — reading arguments from the command line and validating them — and week 24 surveys the standard library that has been supplying <code>printf</code> and <code>malloc</code> all along.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_21_Structures.html">← Week 21</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_23_Program_Arguments_and_Input.html">Week 23 →</a>
+</div>
+
+</div>

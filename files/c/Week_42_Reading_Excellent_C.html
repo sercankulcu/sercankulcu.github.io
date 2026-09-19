@@ -1,0 +1,331 @@
+---
+layout: without-sidebar
+title: "Week 42 — Reading Excellent C"
+permalink: /files/c/Week_42_Reading_Excellent_C.html
+excerpt: "Why C looks the way it does, why undefined behavior exists, and how to read sqlite, musl, lua, redis and git — recognizing house style, error and ownership conventions."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Professional · Week 42</div>
+  <h1>Reading Excellent C</h1>
+  <p class="c-wk-lead">You have written C for forty-one weeks. Professionals read far more than they write, and the best available teacher is code that has survived twenty years of production use. This week is about reading it — and about why the language has the shape it does.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Explain C's oddities historically rather than memorizing them as rules.</li>
+      <li>Say why undefined behavior exists and what the standard was trading away.</li>
+      <li>Orient yourself in an unfamiliar codebase of a hundred thousand lines.</li>
+      <li>Reconstruct a module's ownership and error conventions from the code alone.</li>
+      <li>Judge which idioms are worth borrowing and which are historical accidents.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Why C looks the way it does</h2>
+
+  <p>Week 2 placed C on a PDP-11 in 1972: a machine with 64 KB of address space, whose compiler had to fit in a fraction of it. Nearly every feature that seems strange is explicable from that context, and knowing the reason converts a rule you memorize into one you can reason about.</p>
+
+  <table>
+    <thead><tr><th>Oddity</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td>Arrays decay to pointers</td><td>Copying an array on every call was unaffordable. Passing an address was one word.</td></tr>
+      <tr><td>Strings end in <code>'\0'</code></td><td>A length prefix costs a byte per string and caps the length. The PDP-11 had a string instruction that stopped on zero.</td></tr>
+      <tr><td>No bounds checking</td><td>A check per access was a measurable fraction of runtime on a machine executing a few hundred thousand instructions per second.</td></tr>
+      <tr><td>Declaration mimics use</td><td><code>int *p</code> means "<code>*p</code> is an int". Elegant in principle; the reason week 16 needed a rule.</td></tr>
+      <tr><td>The preprocessor is textual</td><td>It was a separate program bolted on, not part of the language.</td></tr>
+      <tr><td><code>int</code> has no fixed size</td><td>C had to compile for 16-bit, 18-bit, and 36-bit machines.</td></tr>
+      <tr><td>Integer promotion</td><td>The hardware had no sub-word arithmetic.</td></tr>
+    </tbody>
+  </table>
+
+  <p>These were not oversights. They were the correct engineering decisions for the constraints of 1972, and the reason a language designed for a minicomputer still runs every operating system kernel in production is that most of them turned out to age well.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Why undefined behavior exists</h2>
+
+  <p>Week 36 treated undefined behavior as a hazard. It is also a deliberate design decision, and understanding the trade explains why it will never be removed.</p>
+
+  <p>Consider signed overflow. The committee could have required wrapping. Two costs:</p>
+
+  <ul>
+    <li>Machines that trapped on overflow, or used sign-magnitude, would need extra instructions on every arithmetic operation to produce the mandated behavior.</li>
+    <li>The optimizer could no longer assume <code>i + 1 &gt; i</code>, which is what allows it to promote a loop counter to a register and vectorize.</li>
+  </ul>
+
+  <p>Leaving it undefined pushes the cost onto the one program in a thousand that overflows, instead of onto every program. That is the bargain C makes throughout: <strong>maximum performance on the correct program, no guarantees for the incorrect one</strong>.</p>
+
+  <p>Whether that bargain was right is a live argument — Rust exists largely to answer "no". But it is a coherent position, not an accident, and reading C written by people who understood it is the fastest way to internalize where the edges are.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Where to read</h2>
+
+  <table>
+    <thead><tr><th>Project</th><th>Size</th><th>Read it for</th></tr></thead>
+    <tbody>
+      <tr><td><strong>musl libc</strong></td><td>~80k lines</td><td>The standard library implemented cleanly. Start here: each function is small, self-contained, and something you already know the specification of.</td></tr>
+      <tr><td><strong>SQLite</strong></td><td>~150k lines</td><td>Extreme portability and testing discipline. Its test suite is many times the size of the code.</td></tr>
+      <tr><td><strong>Lua</strong></td><td>~25k lines</td><td>A complete language implementation small enough to read entirely. Exceptional clarity.</td></tr>
+      <tr><td><strong>Redis</strong></td><td>~150k lines</td><td>Data structures and an event loop under real load. <code>sds.c</code> and <code>dict.c</code> are directly comparable to weeks 19 and 33.</td></tr>
+      <tr><td><strong>git</strong></td><td>~250k lines</td><td>A large codebase that grew organically — including the parts that show it.</td></tr>
+      <tr><td><strong>Linux kernel</strong></td><td>millions</td><td>Not for reading whole. Pick one driver, or <code>lib/list.h</code>, which is week 32's sentinel list.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Start with musl. Read <code>src/string/strlen.c</code>, then <code>src/stdlib/qsort.c</code>. You know exactly what these must do, so all your attention goes to <em>how</em> — which is the point.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>How to read a codebase</h2>
+
+  <p>Reading top to bottom does not work past a few thousand lines. Work outside in.</p>
+
+  <ol>
+    <li><strong>Build it first.</strong> A codebase you cannot compile is one you cannot experiment with. Read the README and the build files before any source.</li>
+    <li><strong>Find the entry point.</strong> <code>main</code>, or the exported functions in the public header. The header is the intended summary of what the code does.</li>
+    <li><strong>Map the directories.</strong> Names usually reveal the architecture. Skim it before diving.</li>
+    <li><strong>Pick one path and follow it.</strong> One command, one request, one function call, end to end. Breadth-first reading of a large codebase produces nothing.</li>
+    <li><strong>Run it under a debugger.</strong> A breakpoint and a backtrace answer in seconds what an hour of reading may not.</li>
+  </ol>
+
+<pre><code>grep -rn "function_name" --include='*.c' --include='*.h' .
+ctags -R . &amp;&amp; vim -t function_name        # jump to a definition
+cloc .                                     # size and language breakdown
+git log --oneline -- path/to/file.c        # why this file looks like this
+git log -S "some_symbol" --oneline         # when a symbol appeared
+gdb ./prog  → break f  → run  → bt         # who calls this, actually</code></pre>
+
+  <p>A language server — clangd with a <code>compile_commands.json</code> — gives go-to-definition and find-all-references in an editor, and is worth the setup on anything you will read more than once. Generate the file with <code>cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON</code> or <code>bear -- make</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Reconstructing the conventions</h2>
+
+  <p>Every C project invents answers to the same questions, because the language supplies none. Before changing anything, find the answers — they are rarely documented and always consistent.</p>
+
+  <table>
+    <thead><tr><th>Question</th><th>Where to look</th></tr></thead>
+    <tbody>
+      <tr><td>How are errors reported?</td><td>The return type of any function that can fail. An <code>int</code> code, a <code>bool</code> with an output parameter, or <code>NULL</code>?</td></tr>
+      <tr><td>Who frees what?</td><td>Function names: a <code>_create</code>/<code>_destroy</code> pair, or a caller-supplied buffer. Check three call sites.</td></tr>
+      <tr><td>What are the naming rules?</td><td>Prefixes (<code>sqlite3_</code>, <code>redis_</code>), <code>snake_case</code>, <code>_t</code> suffixes for types.</td></tr>
+      <tr><td>Is cleanup centralized?</td><td>Search for <code>goto cleanup</code> or <code>goto fail</code>. Its presence tells you week 27's idiom is the house style.</td></tr>
+      <tr><td>How is memory allocated?</td><td>Many projects wrap <code>malloc</code> — <code>sqlite3_malloc</code>, <code>zmalloc</code> — for accounting or failure injection.</td></tr>
+      <tr><td>What is public?</td><td>The installed headers. Everything else is internal, whatever its visibility.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Answer these five questions and you can make a change that looks like it belongs. Ignore them and your patch will be rejected on style before anyone reads the logic.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Idioms worth borrowing, and not</h2>
+
+  <table>
+    <thead><tr><th>Borrow</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><code>goto cleanup</code></td><td>One exit path; adding a resource is one line. Week 27.</td></tr>
+      <tr><td>Opaque handles</td><td>The implementation stays changeable. Weeks 28, 33.</td></tr>
+      <tr><td>A prefix on every public name</td><td>C has no namespaces; the prefix is the substitute.</td></tr>
+      <tr><td>A wrapped allocator</td><td>Enables accounting, limits, and failure injection in tests.</td></tr>
+      <tr><td>Intrusive lists</td><td>The kernel's <code>list_head</code>: no allocation per link, no special cases.</td></tr>
+      <tr><td><code>static</code> on everything not exported</td><td>Smaller interface, better optimization. Week 28.</td></tr>
+    </tbody>
+  </table>
+
+  <table>
+    <thead><tr><th>Do not borrow</th><th>Why not</th></tr></thead>
+    <tbody>
+      <tr><td>Clever macros that build control flow</td><td>Undebuggable; the compiler sees only the expansion.</td></tr>
+      <tr><td>Hungarian notation</td><td>Encodes the type in the name, where the compiler already knows it.</td></tr>
+      <tr><td>Single-letter names outside loops</td><td>Made sense when identifiers were expensive. They are not.</td></tr>
+      <tr><td>Deep <code>#ifdef</code> nesting</td><td>Only one configuration is ever compile-checked. Week 28.</td></tr>
+      <tr><td><code>void main()</code>, K&amp;R parameter lists</td><td>Pre-standard; kept only for compatibility.</td></tr>
+      <tr><td>Manual loop unrolling</td><td>The compiler does it better, and the source becomes unreadable.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Age is not quality. A twenty-year-old codebase contains decisions that were right in 2005, workarounds for compilers nobody uses, and genuine mistakes nobody dared touch. Read critically.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Worked example: reading musl's <code>strlen</code></h2>
+
+  <p>Take one function you already understand completely and see what twenty years of care look like.</p>
+
+<pre><code>git clone --depth 1 git://git.musl-libc.org/musl
+cd musl
+wc -l src/string/strlen.c
+cat src/string/strlen.c</code></pre>
+
+  <p>The implementation is roughly this:</p>
+
+<pre><code>#include &lt;string.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;limits.h&gt;
+
+#define ALIGN (sizeof(size_t))
+#define ONES ((size_t)-1/UCHAR_MAX)                  /* 0x0101...01 */
+#define HIGHS (ONES * (UCHAR_MAX/2+1))               /* 0x8080...80 */
+#define HASZERO(x) ((x)-ONES &amp; ~(x) &amp; HIGHS)
+
+size_t strlen(const char *s)
+{
+    const char *a = s;
+    const size_t *w;
+
+    for (; (uintptr_t)s % ALIGN; s++) {
+        if (!*s) return s-a;                         /* byte-at-a-time
+                                                        until aligned */
+    }
+    for (w = (const void *)s; !HASZERO(*w); w++);    /* word at a time */
+
+    for (s = (const void *)w; *s; s++);              /* find the exact byte */
+    return s-a;
+}</code></pre>
+
+  <h3>What it is doing, and why</h3>
+
+  <p>Your week 14 version walked one byte at a time. This one walks eight, using a bit trick to test all eight for a zero simultaneously.</p>
+
+  <p><code>HASZERO</code> is the heart of it. For a word <code>x</code>, <code>x - ONES</code> borrows out of any byte that is zero; <code>~x</code> has the top bit set in any byte whose top bit was clear; the AND with <code>HIGHS</code> keeps only the top bit of each byte. The result is non-zero exactly when some byte of <code>x</code> is zero. One subtraction, two ANDs, one NOT — for eight bytes.</p>
+
+  <p>The first loop exists because a word-sized load at an unaligned address is undefined or slow, exactly as week 37 established. It advances byte by byte only until alignment is reached — at most seven iterations.</p>
+
+  <p>The third loop is needed because the second stops at the <em>word</em> containing the terminator, not the byte.</p>
+
+  <h3>What to take from it</h3>
+
+  <p><strong>The constants are computed, not written.</strong> <code>ONES</code> is derived from <code>sizeof(size_t)</code> and <code>UCHAR_MAX</code>, so the same source is correct on a 32-bit and a 64-bit machine. Week 37's portability discipline, applied to a bit trick.</p>
+
+  <p><strong>The alignment loop is not optional.</strong> It is the difference between fast and undefined.</p>
+
+  <p><strong>It is unreadable without the explanation — and that is acceptable here.</strong> <code>strlen</code> is called billions of times a day, its specification will never change, and it is thirteen lines. The same density in your application code would be indefensible.</p>
+
+  <h3>Measure it against yours</h3>
+
+<pre><code>/* bench.c */
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;time.h&gt;
+
+static size_t naive_strlen(const char *s)
+{
+    const char *p = s;
+    while (*p) p++;
+    return (size_t)(p - s);
+}
+
+int main(void)
+{
+    size_t n = 1000000;
+    char *big = malloc(n + 1);
+    memset(big, 'x', n);
+    big[n] = '\0';
+
+    clock_t t0 = clock();
+    volatile size_t a = 0;
+    for (int i = 0; i &lt; 200; i++) a += naive_strlen(big);
+    double naive = (double)(clock() - t0) / CLOCKS_PER_SEC;
+
+    t0 = clock();
+    volatile size_t b = 0;
+    for (int i = 0; i &lt; 200; i++) b += strlen(big);
+    double library = (double)(clock() - t0) / CLOCKS_PER_SEC;
+
+    printf("naive   %.3f s\nlibrary %.3f s\nratio   %.1fx\n",
+           naive, library, naive / library);
+    free(big);
+    return 0;
+}</code></pre>
+
+<pre><code>gcc -O2 -o bench bench.c &amp;&amp; ./bench</code></pre>
+
+  <p>The library version is typically several times faster on a long string, and glibc's is faster still because it uses SIMD instructions. The lesson is not to write your own — it is that the standard library is not a convenience wrapper, and the gap between "correct" and "correct and fast" is real.</p>
+
+  <h3>Then read something with a design in it</h3>
+
+<pre><code>git clone --depth 1 https://github.com/redis/redis
+sed -n '1,120p' redis/src/sds.h        # a length-prefixed string type
+sed -n '1,80p'  redis/src/dict.h       # an incrementally rehashing hash table</code></pre>
+
+  <p><code>sds</code> is Redis's answer to week 14's null-terminated strings: it stores the length in a header immediately before the characters, so <code>strlen</code> is O(1) and the pointer can still be passed to any C function expecting <code>char *</code>. Read the header and work out how that dual nature is achieved before reading the implementation.</p>
+
+  <p><code>dict.c</code> is week 33's hash table with one addition: rehashing happens incrementally, a few buckets per operation, so no single insertion ever pauses for a full rehash. That matters for a server with latency guarantees — and it is a design consideration your version had no reason to have.</p>
+
+  <h3>Reconstruct the conventions</h3>
+
+  <p>For whichever project you choose, answer section 5's five questions from the code alone, writing the answers down:</p>
+
+<pre><code>grep -rn "goto cleanup\|goto fail\|goto err" src/ | head
+grep -rn "_create\|_free\|_destroy\|_new\|_release" src/*.h | head
+grep -rn "zmalloc\|sqlite3_malloc\|xmalloc" src/ | head -5
+ls include/ 2&gt;/dev/null || grep -l "^[a-z].*(" src/*.h | head</code></pre>
+
+  <p>Then check your conclusions against the project's contributing guide, if it has one. Where the code and the document disagree, the code is what reviewers will enforce.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Reading a large codebase linearly</td><td>Hours spent, nothing retained</td><td>Follow one execution path end to end.</td></tr>
+      <tr><td>Reading without building</td><td>Cannot experiment or verify</td><td>Get it compiling first.</td></tr>
+      <tr><td>Assuming old code is good code</td><td>Copying a 2005 workaround</td><td>Check the history; ask why.</td></tr>
+      <tr><td>Copying a clever idiom without the context</td><td>Unreadable application code</td><td>Density is justified in a hot library function, rarely elsewhere.</td></tr>
+      <tr><td>Ignoring the house conventions</td><td>Patch rejected on style</td><td>Reconstruct them before writing.</td></tr>
+      <tr><td>Starting with the kernel</td><td>Overwhelming; nothing learned</td><td>Start with musl.</td></tr>
+      <tr><td>Reading only the code</td><td>Missing the intent</td><td><code>git log</code> and <code>git blame</code> explain the why.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">9</span>Check yourself</h2>
+
+  <details>
+    <summary>Why do arrays decay to pointers when passed to a function?</summary>
+    <p>Because copying an array on every call was unaffordable on a machine with 64 KB of memory — passing the address costs one word regardless of size. The consequence is everything week 13 covered: <code>sizeof</code> changes inside the function, the length must be passed separately, and a function can modify the caller's data despite pass-by-value.</p>
+  </details>
+
+  <details>
+    <summary>What is C trading away by leaving signed overflow undefined?</summary>
+    <p>Diagnosability, in exchange for performance and portability. Defining it would require extra instructions on machines that trap or use a different representation, and would prevent the optimizer from assuming <code>i + 1 &gt; i</code> — which is what allows loop counters in registers and vectorization. The cost falls on the incorrect program rather than on every program.</p>
+  </details>
+
+  <details>
+    <summary>Why start with musl rather than the Linux kernel?</summary>
+    <p>Because you already know precisely what each musl function must do — you have the specification in your head from forty weeks of using them. That frees all your attention for how it is implemented. The kernel requires learning the domain and the code simultaneously, which is why people bounce off it.</p>
+  </details>
+
+  <details>
+    <summary>What five things should you determine before changing unfamiliar C?</summary>
+    <p>How errors are reported, who owns and frees memory, the naming conventions, whether cleanup is centralized with <code>goto</code>, and which headers constitute the public interface. C supplies none of these, so every project invents its own — consistently, and usually without documenting it.</p>
+  </details>
+
+  <details>
+    <summary>Why is musl's dense <code>strlen</code> good code while the same density in your program would not be?</summary>
+    <p>Because the trade-off differs. <code>strlen</code> is thirteen lines, its specification will never change, and it runs billions of times a day, so unreadability buys a real and permanent gain. Application code changes constantly and is read far more than executed, so the same density costs maintainability for a speedup nobody measured.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">10</span>Where this leads</h2>
+  <p>Week 43 makes this practical: not reading a codebase to learn from it, but navigating one in order to change it — locating a regression with <code>git bisect</code>, understanding enough context to be confident, and making the smallest change that fixes the problem. Week 44 then puts that change through review.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_41_Concurrency_and_Memory_Model.html">← Week 41</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_43_Working_in_an_Existing_Codebase.html">Week 43 →</a>
+</div>
+
+</div>

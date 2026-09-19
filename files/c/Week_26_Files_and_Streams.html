@@ -1,0 +1,471 @@
+---
+layout: without-sidebar
+title: "Week 26 — Files and Streams"
+permalink: /files/c/Week_26_Files_and_Streams.html
+excerpt: "Opening and closing files, text versus binary access, reading line by line, fixed-size binary records and seeking, stream state and error checking, and what buffering explains."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Intermediate · Week 26</div>
+  <h1>Files and Streams</h1>
+  <p class="c-wk-lead">Every file operation in C goes through a <code>FILE *</code> — a buffered stream. Understanding the buffer explains delayed output, lost data on a crash, and why checking <code>feof</code> in a loop condition is wrong. Understanding the error state explains how to know whether your program actually worked.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Open, read, write, and close files with every error path handled.</li>
+      <li>Read a text file line by line without overflowing or truncating.</li>
+      <li>Write and read fixed-size binary records and seek directly to any one.</li>
+      <li>Distinguish end of file from an error, and explain why <code>while (!feof(f))</code> is wrong.</li>
+      <li>Explain buffering and say when you must flush.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Opening and closing</h2>
+
+<pre><code>FILE *f = fopen("data.txt", "r");
+if (f == NULL) {
+    perror("data.txt");              /* prints the reason */
+    return EXIT_FAILURE;
+}
+…
+if (fclose(f) != 0) {
+    perror("closing data.txt");      /* a write may fail here */
+}</code></pre>
+
+  <table>
+    <thead><tr><th>Mode</th><th>Meaning</th><th>If the file exists</th></tr></thead>
+    <tbody>
+      <tr><td><code>"r"</code></td><td>read</td><td>Fails if it does not exist</td></tr>
+      <tr><td><code>"w"</code></td><td>write</td><td><strong>Truncates to zero length</strong></td></tr>
+      <tr><td><code>"a"</code></td><td>append</td><td>Writes always go to the end</td></tr>
+      <tr><td><code>"r+"</code></td><td>read and write</td><td>Must exist; does not truncate</td></tr>
+      <tr><td><code>"w+"</code></td><td>read and write</td><td>Truncates</td></tr>
+      <tr><td><code>"a+"</code></td><td>read and append</td><td>Reads anywhere, writes at the end</td></tr>
+    </tbody>
+  </table>
+
+  <p>Add <code>b</code> for binary: <code>"rb"</code>, <code>"wb"</code>. On Unix it changes nothing; on Windows, text mode translates <code>\n</code> to <code>\r\n</code> on write and back on read, which silently corrupts binary data. Always use <code>b</code> for non-text, for portability.</p>
+
+  <p>Two things people skip. <code>perror</code> prints your message followed by the system's explanation of <code>errno</code> — "No such file or directory" — which turns a useless error into a useful one. And <code>fclose</code> can fail: it flushes buffered data, and that write can hit a full disk. Ignoring its return value on a file you wrote means you may report success after losing data.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Reading text</h2>
+
+  <p>The pattern from week 23, now applied to a file:</p>
+
+<pre><code>char line[256];
+while (fgets(line, sizeof line, f) != NULL) {
+    line[strcspn(line, "\n")] = '\0';
+    process(line);
+}</code></pre>
+
+  <p><code>fgets</code> reads at most <code>size - 1</code> characters, stops at a newline, and always terminates. It returns <code>NULL</code> at end of input or on error — which the loop treats identically, so you must distinguish them afterwards.</p>
+
+  <div class="c-wk-trap">
+    <p><strong><code>while (!feof(f))</code> is wrong.</strong> <code>feof</code> reports whether a <em>previous</em> read already hit the end; it cannot predict. So the loop attempts one read too many, and the last iteration processes stale or uninitialized data. Test the read's return value instead, and consult <code>feof</code> and <code>ferror</code> only after the loop, to find out which ended it.</p>
+  </div>
+
+<pre><code>while (fgets(line, sizeof line, f) != NULL) { … }
+
+if (ferror(f)) {
+    perror("read error");            /* a real failure */
+} else {
+    /* feof(f) is true: normal end of input */
+}</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Writing</h2>
+
+<pre><code>fprintf(f, "%s,%d\n", name, score);     /* formatted, like printf */
+fputs("a line\n", f);                   /* no formatting, no newline added */
+fputc('\n', f);                         /* one character */</code></pre>
+
+  <p><code>fprintf</code> returns the number of characters written, or negative on error. For a file that matters — a report, an export — check it, or at minimum check <code>ferror</code> before closing. A full disk or a broken pipe produces no exception; the call simply fails and your program continues.</p>
+
+  <p>Note that <code>fputs</code> does not append a newline while <code>puts</code> does. That asymmetry catches everyone once.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Binary records and positioning</h2>
+
+<pre><code>size_t fwrite(const void *ptr, size_t size, size_t count, FILE *f);
+size_t fread (      void *ptr, size_t size, size_t count, FILE *f);</code></pre>
+
+  <p>Both return the number of <em>items</em> transferred, not bytes. A short return means end of file or error.</p>
+
+<pre><code>typedef struct { int id; char name[32]; double score; } Record;
+
+Record r = { .id = 1, .score = 95.5 };
+if (fwrite(&amp;r, sizeof r, 1, f) != 1) {
+    perror("write failed");
+}</code></pre>
+
+  <p>Because every record is the same size, the <em>n</em>th record starts at offset <code>n * sizeof(Record)</code> — so you can jump straight to it without reading what precedes it:</p>
+
+<pre><code>fseek(f, (long)(index * sizeof(Record)), SEEK_SET);
+fread(&amp;r, sizeof r, 1, f);</code></pre>
+
+  <table>
+    <thead><tr><th>Call</th><th>Does</th></tr></thead>
+    <tbody>
+      <tr><td><code>fseek(f, off, SEEK_SET)</code></td><td>Move to <code>off</code> from the start</td></tr>
+      <tr><td><code>fseek(f, off, SEEK_CUR)</code></td><td>Move <code>off</code> from the current position</td></tr>
+      <tr><td><code>fseek(f, 0, SEEK_END)</code></td><td>Move to the end — used to find the size</td></tr>
+      <tr><td><code>ftell(f)</code></td><td>Current position, or −1 on error</td></tr>
+      <tr><td><code>rewind(f)</code></td><td>Back to the start and clear the error flags</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>This file format is not portable.</strong> It embeds your machine's integer size, byte order, and structure padding — the padding that week 22 measured. Reading it on another architecture gives nonsense. That is acceptable for a cache or a temporary index and unacceptable for anything exchanged between machines; week 37 builds the portable alternative.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Buffering</h2>
+
+  <p>Writes do not reach the file immediately. The C library collects them in a buffer and writes in blocks, because one large write is far cheaper than a thousand small ones.</p>
+
+  <table>
+    <thead><tr><th>Mode</th><th>Flushed when</th><th>Default for</th></tr></thead>
+    <tbody>
+      <tr><td>Fully buffered</td><td>The buffer fills</td><td>Files</td></tr>
+      <tr><td>Line buffered</td><td>A newline is written</td><td><code>stdout</code> to a terminal</td></tr>
+      <tr><td>Unbuffered</td><td>Immediately</td><td><code>stderr</code></td></tr>
+    </tbody>
+  </table>
+
+  <p>Three consequences you will actually meet.</p>
+
+  <p><strong>A prompt without a newline may not appear</strong> before the program blocks for input — week 8's <code>fflush(stdout)</code>.</p>
+
+  <p><strong>Output can be lost on a crash.</strong> Buffered data that was never flushed is gone. This is why debugging with <code>printf</code> can mislead: the last message before a segmentation fault may never have been written.</p>
+
+  <p><strong><code>stdout</code> changes behavior when redirected.</strong> To a terminal it is line buffered; to a file or a pipe it becomes fully buffered. A program whose output interleaves correctly on screen can produce a different order in a file, because <code>stderr</code> is never buffered while <code>stdout</code> now is.</p>
+
+<pre><code>fflush(f);                          /* flush one stream */
+fflush(NULL);                       /* flush every output stream */
+setvbuf(f, NULL, _IONBF, 0);        /* switch buffering off */</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: text in, binary out, seek back</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;errno.h&gt;
+
+#define NAME_LEN 32
+#define LINE_LEN 256
+
+typedef struct {
+    int    id;
+    char   name[NAME_LEN];
+    double score;
+} Record;
+
+static const char *TEXT_FILE   = "records.csv";
+static const char *BINARY_FILE = "records.dat";
+
+/* ---------- create some input ---------- */
+
+static bool write_sample_text(void)
+{
+    FILE *f = fopen(TEXT_FILE, "w");
+    if (f == NULL) {
+        perror(TEXT_FILE);
+        return false;
+    }
+
+    fputs("# id,name,score\n", f);
+    fprintf(f, "1,Ada,95.5\n");
+    fprintf(f, "2,Dennis,88.0\n");
+    fprintf(f, "3,Ken,91.25\n");
+    fprintf(f, "4,Grace,78.5\n");
+    fputs("bad line with no commas\n", f);
+    fprintf(f, "5,Linus,not-a-number\n");
+
+    if (ferror(f)) {
+        perror("writing " );
+        fclose(f);
+        return false;
+    }
+    if (fclose(f) != 0) {            /* the flush can fail here */
+        perror("closing " );
+        return false;
+    }
+    return true;
+}
+
+/* ---------- read text, one line at a time ---------- */
+
+static bool parse_line(const char *line, Record *out)
+{
+    char name[NAME_LEN];
+    int  id;
+    double score;
+
+    /* %31[^,] reads up to 31 characters that are not a comma */
+    if (sscanf(line, "%d,%31[^,],%lf", &amp;id, name, &amp;score) != 3) {
+        return false;
+    }
+    out-&gt;id = id;
+    snprintf(out-&gt;name, sizeof out-&gt;name, "%s", name);
+    out-&gt;score = score;
+    return true;
+}
+
+static size_t read_text(Record *records, size_t capacity)
+{
+    FILE *f = fopen(TEXT_FILE, "r");
+    if (f == NULL) {
+        perror(TEXT_FILE);
+        return 0;
+    }
+
+    char line[LINE_LEN];
+    size_t count = 0;
+    long line_number = 0;
+
+    while (count &lt; capacity &amp;&amp; fgets(line, sizeof line, f) != NULL) {
+        line_number++;
+
+        if (strchr(line, '\n') == NULL &amp;&amp; !feof(f)) {
+            fprintf(stderr, "  line %ld too long, skipping\n", line_number);
+            int c;
+            while ((c = fgetc(f)) != '\n' &amp;&amp; c != EOF) { }
+            continue;
+        }
+        line[strcspn(line, "\n")] = '\0';
+
+        if (line[0] == '\0' || line[0] == '#') {
+            continue;
+        }
+        if (!parse_line(line, &amp;records[count])) {
+            fprintf(stderr, "  line %ld rejected: \"%s\"\n", line_number, line);
+            continue;
+        }
+        count++;
+    }
+
+    /* Only NOW ask which condition ended the loop. */
+    if (ferror(f)) {
+        perror("reading " );
+    }
+    fclose(f);
+    return count;
+}
+
+/* ---------- write fixed-size binary records ---------- */
+
+static bool write_binary(const Record *records, size_t count)
+{
+    FILE *f = fopen(BINARY_FILE, "wb");      /* b matters on Windows */
+    if (f == NULL) {
+        perror(BINARY_FILE);
+        return false;
+    }
+    size_t written = fwrite(records, sizeof *records, count, f);
+    if (written != count) {
+        fprintf(stderr, "  wrote only %zu of %zu records\n", written, count);
+        fclose(f);
+        return false;
+    }
+    return fclose(f) == 0;
+}
+
+/* ---------- seek directly to record n ---------- */
+
+static bool read_record_at(size_t index, Record *out)
+{
+    FILE *f = fopen(BINARY_FILE, "rb");
+    if (f == NULL) {
+        perror(BINARY_FILE);
+        return false;
+    }
+
+    if (fseek(f, 0, SEEK_END) != 0) {
+        fclose(f);
+        return false;
+    }
+    long size = ftell(f);
+    long total = size / (long)sizeof(Record);
+
+    if ((long)index &gt;= total) {
+        fprintf(stderr, "  index %zu out of range (%ld records)\n",
+                index, total);
+        fclose(f);
+        return false;
+    }
+
+    if (fseek(f, (long)(index * sizeof(Record)), SEEK_SET) != 0) {
+        fclose(f);
+        return false;
+    }
+    bool ok = fread(out, sizeof *out, 1, f) == 1;
+    fclose(f);
+    return ok;
+}
+
+static void print_record(const Record *r)
+{
+    printf("  id=%-3d %-10s %6.2f\n", r-&gt;id, r-&gt;name, r-&gt;score);
+}
+
+int main(void)
+{
+    puts("== writing sample text ==");
+    if (!write_sample_text()) {
+        return EXIT_FAILURE;
+    }
+    puts("  wrote " );
+
+    puts("\n== reading it back, rejecting bad lines ==");
+    Record records[16];
+    size_t count = read_text(records, 16);
+    printf("  accepted %zu records:\n", count);
+    for (size_t i = 0; i &lt; count; i++) {
+        print_record(&amp;records[i]);
+    }
+
+    puts("\n== writing fixed-size binary records ==");
+    if (!write_binary(records, count)) {
+        return EXIT_FAILURE;
+    }
+    printf("  each record is %zu bytes, %zu records = %zu bytes\n",
+           sizeof(Record), count, sizeof(Record) * count);
+
+    puts("\n== seeking directly, without reading what precedes ==");
+    Record one;
+    for (size_t i = 0; i &lt; count; i += 2) {
+        if (read_record_at(i, &amp;one)) {
+            printf("  record %zu: ", i);
+            print_record(&amp;one);
+        }
+    }
+    read_record_at(99, &amp;one);
+
+    puts("\n== buffering ==");
+    printf("  this has no newline and may not appear yet...");
+    fflush(stdout);
+    puts(" [flushed]");
+    fprintf(stderr, "  stderr is unbuffered, so this is never delayed\n");
+    puts("  run './files > out.txt 2>&1' and compare the order");
+
+    puts("\n== why while(!feof(f)) is wrong ==");
+    FILE *f = fopen(TEXT_FILE, "r");
+    if (f != NULL) {
+        char line[LINE_LEN];
+        int bad = 0;
+        while (!feof(f)) {                 /* deliberately wrong */
+            if (fgets(line, sizeof line, f) == NULL) break;
+            bad++;
+        }
+        rewind(f);
+        int good = 0;
+        while (fgets(line, sizeof line, f) != NULL) {
+            good++;
+        }
+        printf("  feof-driven loop needed a break to stay correct: %d\n", bad);
+        printf("  return-value-driven loop: %d lines, no special case\n", good);
+        fclose(f);
+    }
+
+    remove(TEXT_FILE);
+    remove(BINARY_FILE);
+    puts("\n  temporary files removed");
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o files files.c
+./files</code></pre>
+
+  <h3>Three details worth extracting</h3>
+
+  <p><strong><code>%31[^,]</code> in the <code>sscanf</code> format.</strong> It reads up to 31 characters that are not a comma — a bounded scan set. Without the 31 it is as dangerous as a bare <code>%s</code>, and week 8's overflow warning applies. The bound is one less than the array size, to leave room for the terminator.</p>
+
+  <p><strong><code>fclose</code> is checked.</strong> On the write path its return value decides whether the function reports success. A program that ignores it can claim to have written a file that never reached the disk.</p>
+
+  <p><strong>Seeking reads one record, not <em>n</em>.</strong> <code>read_record_at(4, …)</code> touches 48 bytes, not the whole file. For a million-record file that is the difference between microseconds and seconds — which is what fixed-size records buy you, and why variable-length text formats need an index.</p>
+
+  <h3>Experiments</h3>
+
+  <p><strong>See the non-portability.</strong> Print the raw bytes of a record:</p>
+<pre><code>xxd records.dat | head -4</code></pre>
+  <p>Find the integer <code>1</code> stored as <code>01 00 00 00</code> — little-endian — and the padding bytes between <code>name</code> and <code>score</code> holding whatever was in memory. Both are why week 37 exists.</p>
+
+  <p><strong>Break the buffering assumption.</strong></p>
+<pre><code>./files            # stdout to a terminal: line buffered
+./files &gt; out.txt 2&gt;&amp;1
+cat out.txt        # different interleaving of stdout and stderr</code></pre>
+  <p>Redirected, <code>stdout</code> becomes fully buffered while <code>stderr</code> stays unbuffered, so the error lines now appear before output that was logically earlier.</p>
+
+  <p><strong>Lose data on a crash.</strong> Add <code>printf("about to crash\n"); *(int *)0 = 1;</code> at the end and redirect to a file. The message is in the buffer when the process dies, so the file is empty — and the same program prints it when run on a terminal, because the newline flushed a line-buffered stream.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Not checking <code>fopen</code></td><td>Null dereference on the first read</td><td>Check, and use <code>perror</code> to say why.</td></tr>
+      <tr><td><code>while (!feof(f))</code></td><td>One iteration too many; stale data</td><td>Test the read's return value.</td></tr>
+      <tr><td>Ignoring <code>fclose</code>'s result</td><td>Reports success after a failed flush</td><td>Check it on any file you wrote.</td></tr>
+      <tr><td>Opening with <code>"w"</code> to read</td><td>Truncates the file to nothing</td><td><code>"r"</code>, or <code>"r+"</code> to modify.</td></tr>
+      <tr><td>Omitting <code>b</code> for binary on Windows</td><td>Newline translation corrupts data</td><td>Always <code>"rb"</code>/<code>"wb"</code>.</td></tr>
+      <tr><td>Assuming <code>fread</code> returns bytes</td><td>Off by a factor of the item size</td><td>It returns items.</td></tr>
+      <tr><td>Writing structs and reading them elsewhere</td><td>Byte order and padding differ</td><td>Serialize field by field — week 37.</td></tr>
+      <tr><td>Expecting output before a newline</td><td>Prompt invisible; program looks frozen</td><td><code>fflush(stdout)</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why is <code>while (!feof(f))</code> the wrong loop condition?</summary>
+    <p>Because <code>feof</code> reports whether a previous read already reached the end; it cannot look ahead. The condition is therefore still true after the last successful read, so the loop runs once more, the read fails, and the body processes whatever was left in the buffer. Drive the loop on the return value of the read itself, and use <code>feof</code>/<code>ferror</code> afterwards to find out which ended it.</p>
+  </details>
+
+  <details>
+    <summary>Why can <code>fclose</code> fail, and why does that matter?</summary>
+    <p>Because it flushes any buffered data, and that write can fail — a full disk, a broken pipe, a network filesystem error. Data you thought was written is then lost. Ignoring the return value on a file you wrote means your program can report success after losing the user's data.</p>
+  </details>
+
+  <details>
+    <summary>Why is a file of raw structures not portable?</summary>
+    <p>It embeds the writing machine's integer widths, byte order, and the compiler's structure padding — none of which the standard fixes. Reading it on a different architecture or with a different compiler yields wrong values. Such a format is fine for a private cache and unsuitable for anything exchanged between machines.</p>
+  </details>
+
+  <details>
+    <summary>Your program's output appears in a different order when redirected to a file. Why?</summary>
+    <p>Because <code>stdout</code> is line buffered when it goes to a terminal but fully buffered when it goes to a file or pipe, while <code>stderr</code> is always unbuffered. Redirected, the error messages are written immediately while ordinary output waits in the buffer, so the interleaving changes. Flush explicitly if the order matters.</p>
+  </details>
+
+  <details>
+    <summary>What does fixed-size binary records buy you over a text format?</summary>
+    <p>Direct access. Record <em>n</em> starts at offset <code>n × sizeof(Record)</code>, so <code>fseek</code> can jump straight to it without reading anything before it — constant time instead of linear. A variable-length text format has no such property and needs a separate index to match it.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Every function in this week's example returns a status that the caller had to check, and each one cleaned up before returning. Week 27 makes that discipline systematic: one error contract per module, one cleanup path per function, and the <code>goto</code> idiom that lets a function acquire five resources and release exactly the ones it got.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_25_Bit_Level_Operations.html">← Week 25</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_27_Error_Handling.html">Week 27 →</a>
+</div>
+
+</div>

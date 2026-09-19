@@ -1,0 +1,516 @@
+---
+layout: without-sidebar
+title: "Week 39 — Processes, Signals, and Low-Level I/O"
+permalink: /files/c/Week_39_Processes_Signals_and_Low_Level_IO.html
+excerpt: "File descriptors and the open/read/write interface, fork and exec, waiting on children and exit status, signals and async-signal safety, pipes and redirection."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Advanced · Week 39</div>
+  <h1>Processes, Signals, and Low-Level I/O</h1>
+  <p class="c-wk-lead">Below <code>FILE *</code> there is a file descriptor, and below <code>system()</code> there is <code>fork</code> and <code>exec</code>. This week opens the layer where a C program meets the operating system — the interface Unix was written in C to express, and the one every shell is built from.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Use file descriptors directly and say how they relate to <code>FILE *</code>.</li>
+      <li>Create a process with <code>fork</code>, replace it with <code>exec</code>, and collect its status.</li>
+      <li>Avoid zombies and explain what one is.</li>
+      <li>Install a signal handler and say what may legally be done inside it.</li>
+      <li>Connect two processes with a pipe and redirect a descriptor.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>File descriptors</h2>
+
+  <p>A file descriptor is a small non-negative integer indexing a per-process table of open files. Three are open when your program starts:</p>
+
+  <table>
+    <thead><tr><th>Descriptor</th><th>Name</th><th>Stream</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td><code>STDIN_FILENO</code></td><td><code>stdin</code></td></tr>
+      <tr><td>1</td><td><code>STDOUT_FILENO</code></td><td><code>stdout</code></td></tr>
+      <tr><td>2</td><td><code>STDERR_FILENO</code></td><td><code>stderr</code></td></tr>
+    </tbody>
+  </table>
+
+<pre><code>#include &lt;fcntl.h&gt;
+#include &lt;unistd.h&gt;
+
+int fd = open("data.txt", O_RDONLY);
+if (fd &lt; 0) { perror("open"); return EXIT_FAILURE; }
+
+char buffer[4096];
+ssize_t n = read(fd, buffer, sizeof buffer);
+if (n &lt; 0) { perror("read"); }
+
+close(fd);</code></pre>
+
+  <table>
+    <thead><tr><th><code>FILE *</code> (C standard)</th><th>File descriptor (POSIX)</th></tr></thead>
+    <tbody>
+      <tr><td>Buffered</td><td>Unbuffered: every call is a system call</td></tr>
+      <tr><td>Portable to any C implementation</td><td>POSIX only</td></tr>
+      <tr><td>Formatted I/O</td><td>Bytes only</td></tr>
+      <tr><td>Cannot be passed to a child</td><td>Inherited across <code>fork</code> and <code>exec</code></td></tr>
+    </tbody>
+  </table>
+
+  <p>Convert between them with <code>fileno(FILE *)</code> and <code>fdopen(int, mode)</code>. Do not mix buffered and unbuffered access to the same file without flushing — the two layers have separate ideas of the position.</p>
+
+  <div class="c-wk-trap">
+    <p><strong><code>read</code> and <code>write</code> may transfer less than you asked.</strong> A short read is normal at end of file, on a pipe, or on a socket; a short write is normal when a pipe is full. Code that assumes the full count silently loses data. Always loop until the total is satisfied or an error occurs, and treat <code>EINTR</code> — interrupted by a signal — as "retry", not as a failure.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span><code>fork</code></h2>
+
+<pre><code>#include &lt;unistd.h&gt;
+
+pid_t pid = fork();
+
+if (pid &lt; 0) {
+    perror("fork");                 /* failed */
+} else if (pid == 0) {
+    /* child: fork returned 0 */
+} else {
+    /* parent: fork returned the child's process id */
+}</code></pre>
+
+  <p><code>fork</code> duplicates the calling process. Both continue from the same point with the same memory contents, the same open descriptors, and the same variable values — and the <em>only</em> way to tell them apart is the return value.</p>
+
+  <p>The memory is copied lazily: pages are shared until one process writes, at which point that page is duplicated. So <code>fork</code> is cheap, and the two processes are nonetheless fully independent — a variable changed in the child is unchanged in the parent.</p>
+
+  <p>Descriptors, by contrast, are genuinely shared: both processes hold references to the same open file description, including the file position. That sharing is what makes pipes work.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span><code>exec</code> and waiting</h2>
+
+  <p><code>exec</code> replaces the current process image with a different program. It does not return on success — there is nothing to return to.</p>
+
+<pre><code>execlp("ls", "ls", "-l", (char *)NULL);      /* searches PATH */
+perror("execlp");                             /* only reached on failure */
+_exit(127);                                   /* note _exit, not exit */</code></pre>
+
+  <p>The <code>_exit</code> matters: after a failed <code>exec</code> in a child, calling <code>exit</code> would run the parent's <code>atexit</code> handlers and flush the parent's buffered output a second time, producing duplicated text. Use <code>_exit</code> in a child that is abandoning ship.</p>
+
+<pre><code>#include &lt;sys/wait.h&gt;
+
+int status;
+pid_t done = waitpid(pid, &amp;status, 0);
+
+if (WIFEXITED(status)) {
+    printf("exited with %d\n", WEXITSTATUS(status));
+} else if (WIFSIGNALED(status)) {
+    printf("killed by signal %d\n", WTERMSIG(status));
+}</code></pre>
+
+  <h3>Zombies</h3>
+
+  <p>When a child exits, the kernel keeps its exit status until the parent collects it. Until then the child is a <em>zombie</em> — no memory, no code, just a table entry. A parent that never waits accumulates them until the process table fills.</p>
+
+  <p>Three remedies: call <code>waitpid</code> for each child; reap them in a <code>SIGCHLD</code> handler; or set <code>SIGCHLD</code> to <code>SIG_IGN</code>, which tells the kernel you will never ask.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Signals</h2>
+
+  <p>A signal is an asynchronous notification. Your handler runs at an arbitrary point in whatever the program was doing.</p>
+
+  <table>
+    <thead><tr><th>Signal</th><th>Cause</th><th>Default</th></tr></thead>
+    <tbody>
+      <tr><td><code>SIGINT</code></td><td>Ctrl-C</td><td>Terminate</td></tr>
+      <tr><td><code>SIGTERM</code></td><td><code>kill</code></td><td>Terminate</td></tr>
+      <tr><td><code>SIGSEGV</code></td><td>Invalid memory access</td><td>Terminate with a core dump</td></tr>
+      <tr><td><code>SIGCHLD</code></td><td>A child changed state</td><td>Ignored</td></tr>
+      <tr><td><code>SIGPIPE</code></td><td>Wrote to a pipe with no reader</td><td>Terminate</td></tr>
+      <tr><td><code>SIGKILL</code>, <code>SIGSTOP</code></td><td>—</td><td><strong>Cannot be caught</strong></td></tr>
+    </tbody>
+  </table>
+
+<pre><code>#include &lt;signal.h&gt;
+
+static volatile sig_atomic_t should_stop = 0;
+
+static void on_interrupt(int sig)
+{
+    (void)sig;
+    should_stop = 1;              /* the only safe thing to do */
+}
+
+struct sigaction sa = { 0 };
+sa.sa_handler = on_interrupt;
+sigemptyset(&amp;sa.sa_mask);
+sa.sa_flags = SA_RESTART;          /* restart interrupted system calls */
+sigaction(SIGINT, &amp;sa, NULL);</code></pre>
+
+  <p>Use <code>sigaction</code>, not <code>signal</code>: the older interface has behavior that varies between systems, and <code>sigaction</code> lets you control the mask and the restart flag.</p>
+
+  <h3>Async-signal safety</h3>
+
+  <p>A handler can interrupt the program anywhere — including in the middle of <code>malloc</code> updating its data structures. Calling <code>malloc</code> from the handler then corrupts the heap. The same applies to <code>printf</code>, which has its own locks and buffers.</p>
+
+  <p>Only functions the standard lists as <em>async-signal-safe</em> may be called: <code>write</code>, <code>_exit</code>, <code>signal</code>, <code>kill</code>, and a few dozen others. <code>printf</code>, <code>malloc</code>, and <code>free</code> are not among them.</p>
+
+  <p>The practical discipline is to set a flag and return:</p>
+
+<pre><code>static volatile sig_atomic_t should_stop = 0;
+
+while (!should_stop) {
+    do_work();                    /* the real work happens here */
+}
+puts("shutting down cleanly");    /* printf is safe out here */</code></pre>
+
+  <p><code>volatile</code> so the loop actually re-reads it — week 38's first legitimate use. <code>sig_atomic_t</code> because it is the only type guaranteed to be read and written atomically with respect to a signal.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Pipes and redirection</h2>
+
+<pre><code>int fds[2];
+pipe(fds);            /* fds[0] to read, fds[1] to write */</code></pre>
+
+  <p>A pipe is a one-way channel between two descriptors. After <code>fork</code>, both processes hold both ends, so each must close the one it does not use — otherwise the reader never sees end of file, because a writing end is still open in its own process.</p>
+
+  <p><code>dup2</code> makes one descriptor a copy of another, which is how redirection works:</p>
+
+<pre><code>dup2(fds[1], STDOUT_FILENO);      /* the child's stdout becomes the pipe */
+close(fds[1]);</code></pre>
+
+  <p>After this the child's <code>printf</code> writes into the pipe without knowing anything has changed. That is precisely what a shell does for <code>ls | grep foo</code>, and the reason descriptor numbers rather than <code>FILE *</code> are the operating system's currency.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: a miniature shell</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;signal.h&gt;
+#include &lt;sys/wait.h&gt;
+
+/* Set by the handler, read by the loop. Both qualifiers are required. */
+static volatile sig_atomic_t interrupted = 0;
+
+static void on_sigint(int sig)
+{
+    (void)sig;
+    interrupted = 1;
+    /* Nothing else. write() would be safe; printf() would not. */
+}
+
+/* read and write may transfer less than requested; loop. */
+static ssize_t write_all(int fd, const void *data, size_t n)
+{
+    const char *p = data;
+    size_t written = 0;
+    while (written &lt; n) {
+        ssize_t w = write(fd, p + written, n - written);
+        if (w &lt; 0) {
+            if (errno == EINTR) continue;      /* retry, not an error */
+            return -1;
+        }
+        written += (size_t)w;
+    }
+    return (ssize_t)written;
+}
+
+static void describe_status(const char *what, int status)
+{
+    if (WIFEXITED(status)) {
+        printf("  %s exited with %d\n", what, WEXITSTATUS(status));
+    } else if (WIFSIGNALED(status)) {
+        printf("  %s killed by signal %d\n", what, WTERMSIG(status));
+    } else {
+        printf("  %s ended in an unexpected way\n", what);
+    }
+}
+
+/* ---------- 1. fork and exec one command ---------- */
+
+static int run_command(char *const argv[])
+{
+    pid_t pid = fork();
+    if (pid &lt; 0) {
+        perror("fork");
+        return -1;
+    }
+    if (pid == 0) {                      /* child */
+        execvp(argv[0], argv);
+        perror(argv[0]);                 /* only on failure */
+        _exit(127);                      /* _exit, not exit */
+    }
+
+    int status;
+    while (waitpid(pid, &amp;status, 0) &lt; 0) {
+        if (errno != EINTR) { perror("waitpid"); return -1; }
+    }
+    return status;
+}
+
+/* ---------- 2. redirect output to a file ---------- */
+
+static int run_redirected(char *const argv[], const char *path)
+{
+    pid_t pid = fork();
+    if (pid &lt; 0) { perror("fork"); return -1; }
+
+    if (pid == 0) {
+        int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (fd &lt; 0) { perror(path); _exit(126); }
+        if (dup2(fd, STDOUT_FILENO) &lt; 0) { perror("dup2"); _exit(126); }
+        close(fd);                        /* the copy in fd 1 remains */
+        execvp(argv[0], argv);
+        perror(argv[0]);
+        _exit(127);
+    }
+
+    int status;
+    waitpid(pid, &amp;status, 0);
+    return status;
+}
+
+/* ---------- 3. connect two commands with a pipe ---------- */
+
+static int run_pipeline(char *const left[], char *const right[])
+{
+    int fds[2];
+    if (pipe(fds) &lt; 0) { perror("pipe"); return -1; }
+
+    pid_t first = fork();
+    if (first &lt; 0) { perror("fork"); return -1; }
+    if (first == 0) {
+        close(fds[0]);                    /* not reading */
+        dup2(fds[1], STDOUT_FILENO);
+        close(fds[1]);
+        execvp(left[0], left);
+        perror(left[0]);
+        _exit(127);
+    }
+
+    pid_t second = fork();
+    if (second &lt; 0) { perror("fork"); return -1; }
+    if (second == 0) {
+        close(fds[1]);                    /* not writing */
+        dup2(fds[0], STDIN_FILENO);
+        close(fds[0]);
+        execvp(right[0], right);
+        perror(right[0]);
+        _exit(127);
+    }
+
+    /* The parent must close BOTH ends, or the reader never sees EOF. */
+    close(fds[0]);
+    close(fds[1]);
+
+    int s1, s2;
+    waitpid(first,  &amp;s1, 0);
+    waitpid(second, &amp;s2, 0);
+    describe_status("left", s1);
+    describe_status("right", s2);
+    return s2;
+}
+
+int main(void)
+{
+    struct sigaction sa;
+    memset(&amp;sa, 0, sizeof sa);
+    sa.sa_handler = on_sigint;
+    sigemptyset(&amp;sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+    if (sigaction(SIGINT, &amp;sa, NULL) &lt; 0) {
+        perror("sigaction");
+        return EXIT_FAILURE;
+    }
+
+    printf("parent pid %ld\n\n", (long)getpid());
+
+    puts("== 1. fork: two processes, one program ==");
+    pid_t pid = fork();
+    if (pid == 0) {
+        printf("  child : pid %ld, fork returned 0, parent is %ld\n",
+               (long)getpid(), (long)getppid());
+        _exit(3);
+    }
+    int status;
+    waitpid(pid, &amp;status, 0);
+    printf("  parent: fork returned %ld\n", (long)pid);
+    describe_status("child", status);
+
+    puts("\n== 2. memory is copied, descriptors are shared ==");
+    int shared = 100;
+    pid = fork();
+    if (pid == 0) {
+        shared = 999;
+        printf("  child  sees shared = %d\n", shared);
+        _exit(0);
+    }
+    waitpid(pid, NULL, 0);
+    printf("  parent sees shared = %d  (the child's change did not reach us)\n",
+           shared);
+
+    puts("\n== 3. exec replaces the program ==");
+    char *echo_args[] = { "echo", "  hello from execvp", NULL };
+    describe_status("echo", run_command(echo_args));
+
+    puts("\n== 4. a command that does not exist ==");
+    char *missing[] = { "definitely_not_a_command", NULL };
+    describe_status("missing", run_command(missing));
+    puts("  127 is the conventional code for 'command not found'");
+
+    puts("\n== 5. redirection with dup2 ==");
+    char *date_args[] = { "date", "+%Y-%m-%d", NULL };
+    run_redirected(date_args, "shell_out.txt");
+    FILE *f = fopen("shell_out.txt", "r");
+    if (f != NULL) {
+        char line[128];
+        if (fgets(line, sizeof line, f)) printf("  file contains: %s", line);
+        fclose(f);
+    }
+    remove("shell_out.txt");
+
+    puts("\n== 6. a pipeline: seq 1 20 | grep 1 ==");
+    char *left[]  = { "seq", "1", "20", NULL };
+    char *right[] = { "grep", "1", NULL };
+    run_pipeline(left, right);
+
+    puts("\n== 7. low-level write, looped ==");
+    const char *msg = "  written with write(2), not printf\n";
+    write_all(STDOUT_FILENO, msg, strlen(msg));
+
+    puts("\n== 8. signals ==");
+    puts("  press Ctrl-C within three seconds to interrupt the loop");
+    for (int i = 0; i &lt; 30 &amp;&amp; !interrupted; i++) {
+        struct timespec ts = { .tv_sec = 0, .tv_nsec = 100000000L };
+        nanosleep(&amp;ts, NULL);
+    }
+    if (interrupted) {
+        puts("  the handler set a flag; this message is printed out here,");
+        puts("  where printf is safe — inside a handler it would not be");
+    } else {
+        puts("  no interrupt arrived");
+    }
+
+    puts("\n== 9. zombies ==");
+    pid = fork();
+    if (pid == 0) _exit(0);
+    printf("  child %ld has exited but is not yet reaped: it is a zombie\n",
+           (long)pid);
+    puts("  run 'ps -el | grep defunct' in another terminal now");
+    sleep(1);
+    waitpid(pid, NULL, 0);
+    puts("  reaped; the process table entry is gone");
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -D_POSIX_C_SOURCE=200809L -Wall -Wextra -g -o minishell minishell.c
+./minishell</code></pre>
+
+  <p>The <code>-D_POSIX_C_SOURCE=200809L</code> is needed because <code>-std=c17</code> asks for strict standard C, which hides the POSIX declarations. Without it you get implicit-declaration errors for <code>fork</code> and friends — week 11's diagnostic, from an unexpected direction.</p>
+
+  <h3>Four things the output demonstrates</h3>
+
+  <p><strong>Memory is copied, descriptors are shared.</strong> The child sets <code>shared</code> to 999 and the parent still sees 100 — separate address spaces. Yet both write to the same terminal, because descriptor 1 refers to the same open file description in both.</p>
+
+  <p><strong>The parent must close both pipe ends.</strong> Comment out <code>close(fds[1])</code> in the parent and run the pipeline again: <code>grep</code> never terminates, because a write end is still open in the parent, so the pipe never reaches end of file. This is the single most common pipe bug.</p>
+
+  <p><strong>Exit code 127.</strong> The failed <code>execvp</code> child calls <code>_exit(127)</code>, the conventional "command not found" code that shells use. Week 31's exit-code conventions, on the producing side.</p>
+
+  <p><strong>The signal handler does almost nothing.</strong> It sets one flag of type <code>volatile sig_atomic_t</code> and returns. All reporting happens in the main loop, where the standard library is safe to call.</p>
+
+  <h3>Break the signal handler on purpose</h3>
+
+<pre><code>static void on_sigint(int sig)
+{
+    (void)sig;
+    printf("caught it\n");         /* NOT async-signal-safe */
+    char *p = malloc(100);         /* definitely not safe */
+    free(p);
+    interrupted = 1;
+}</code></pre>
+
+  <p>This usually appears to work, which is why the rule is so often ignored. Press Ctrl-C repeatedly while the program is inside <code>malloc</code> and the heap can be corrupted, producing a crash somewhere unrelated later. Run it under <code>-fsanitize=address</code> and hammer the key; the failure mode is exactly the action-at-a-distance of week 20.</p>
+
+  <h3>Watch the zombie</h3>
+
+<pre><code># in another terminal, while the program is in its sleep(1)
+ps -el | grep defunct</code></pre>
+
+  <p>The entry shows state <code>Z</code>. Remove the <code>waitpid</code> and loop the fork a thousand times to watch the process table fill — the reason a long-running server must reap its children.</p>
+
+  <h3>Handle a short write</h3>
+
+  <p><code>write_all</code> loops because a single <code>write</code> may transfer fewer bytes than requested. Prove it by writing several megabytes to a pipe whose reader is slow: the first <code>write</code> returns as soon as the pipe buffer is full, typically after 64 KB. Code that ignores the return value loses the remainder silently.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Not closing unused pipe ends</td><td>The reader never sees end of file</td><td>Close both ends you do not use, in every process.</td></tr>
+      <tr><td>Never calling <code>waitpid</code></td><td>Zombies accumulate</td><td>Reap every child, or ignore <code>SIGCHLD</code>.</td></tr>
+      <tr><td><code>printf</code> or <code>malloc</code> in a signal handler</td><td>Heap corruption; deadlock</td><td>Set a <code>volatile sig_atomic_t</code> flag and return.</td></tr>
+      <tr><td><code>exit</code> instead of <code>_exit</code> in a child</td><td>Parent's buffers flushed twice</td><td><code>_exit</code> after a failed <code>exec</code>.</td></tr>
+      <tr><td>Assuming <code>read</code>/<code>write</code> transfer everything</td><td>Silent data loss</td><td>Loop until complete; retry on <code>EINTR</code>.</td></tr>
+      <tr><td>Ignoring <code>EINTR</code></td><td>Spurious failures once signals are in use</td><td>Retry, or set <code>SA_RESTART</code>.</td></tr>
+      <tr><td>Using <code>signal</code> rather than <code>sigaction</code></td><td>Behavior differs between systems</td><td><code>sigaction</code>.</td></tr>
+      <tr><td>Mixing <code>FILE *</code> and raw descriptors</td><td>Interleaved or lost output</td><td>Flush before switching layers.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>How does a process tell whether it is the parent or the child after <code>fork</code>?</summary>
+    <p>Only by the return value: 0 in the child, the child's process id in the parent, negative on failure. Both continue from the same instruction with identical memory contents, so nothing else distinguishes them. The memory is subsequently independent — a write in one is invisible to the other.</p>
+  </details>
+
+  <details>
+    <summary>Why must both processes close the pipe ends they do not use?</summary>
+    <p>Because the reader sees end of file only when <em>every</em> write end is closed. If the parent keeps its copy of the write end open, the child reading from the pipe blocks forever even after the writer exits. Each process must close both descriptors it does not need, including the parent after forking.</p>
+  </details>
+
+  <details>
+    <summary>What is a zombie process and how do you avoid one?</summary>
+    <p>A child that has exited but whose exit status the parent has not yet collected; the kernel keeps a process-table entry so the status can be reported. Call <code>waitpid</code> for each child, reap them in a <code>SIGCHLD</code> handler, or set <code>SIGCHLD</code> to <code>SIG_IGN</code> to tell the kernel you will never ask.</p>
+  </details>
+
+  <details>
+    <summary>Why may a signal handler not call <code>printf</code>?</summary>
+    <p>Because the handler can interrupt the program at any instruction, including inside <code>printf</code> or <code>malloc</code> while their internal state is inconsistent. Re-entering them then corrupts that state. Only functions the standard designates async-signal-safe may be called; the safe discipline is to set a <code>volatile sig_atomic_t</code> flag and do the work in the main loop.</p>
+  </details>
+
+  <details>
+    <summary>Why does a child that fails to <code>exec</code> call <code>_exit</code> rather than <code>exit</code>?</summary>
+    <p>Because the child inherited a copy of the parent's buffered output and its <code>atexit</code> handlers. <code>exit</code> would flush those buffers and run those handlers a second time, duplicating output and possibly repeating cleanup actions. <code>_exit</code> terminates immediately without either.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 40 extends the descriptor model across a network: a socket is a file descriptor, <code>read</code> and <code>write</code> work on it, and the same short-transfer and <code>EINTR</code> rules apply. The forked-child-per-connection server built there is the direct descendant of this week's pipeline, and week 47 replaces it with an event loop.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_38_Type_Qualifiers_and_Modern_C.html">← Week 38</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_40_Network_Programming_with_Sockets.html">Week 40 →</a>
+</div>
+
+</div>

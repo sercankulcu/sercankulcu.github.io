@@ -1,0 +1,382 @@
+---
+layout: without-sidebar
+title: "Week 29 — Building Programs and Libraries"
+permalink: /files/c/Week_29_Building_and_Libraries.html
+excerpt: "Makefiles and CMake, static libraries with ar and shared libraries, debug and sanitizer build configurations, linking order and symbol resolution with nm and objdump."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Advanced · Week 29</div>
+  <h1>Building Programs and Libraries</h1>
+  <p class="c-wk-lead">Typing compiler commands by hand stops working at about three files. This week replaces them with a build system, turns week 28's module into a real library, and opens the linker up far enough that <code>undefined reference</code> stops being mysterious.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Write a Makefile with automatic dependency tracking and multiple configurations.</li>
+      <li>Write an equivalent CMake configuration and say when each tool is the better choice.</li>
+      <li>Build and link both a static and a shared library.</li>
+      <li>Explain why linking order matters and diagnose an unresolved symbol.</li>
+      <li>Inspect an object file with <code>nm</code> and <code>objdump</code>.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Make</h2>
+
+  <p>A Makefile is a set of rules: a target, the prerequisites it depends on, and the commands to rebuild it. Make rebuilds a target only when a prerequisite is newer.</p>
+
+<pre><code>target: prerequisites
+&lt;TAB&gt;command</code></pre>
+
+  <div class="c-wk-trap">
+    <p><strong>The recipe line must begin with a literal tab.</strong> Spaces produce <code>Makefile:4: *** missing separator. Stop.</code> — the single most common Make error, and invisible in most editors. Configure your editor to keep real tabs in Makefiles.</p>
+  </div>
+
+  <h3>A usable Makefile</h3>
+
+<pre><code>CC      := gcc
+CFLAGS  := -std=c17 -Wall -Wextra -g -MMD -MP
+LDFLAGS :=
+LDLIBS  :=
+
+SRCS := main.c intarray.c
+OBJS := $(SRCS:.c=.o)
+DEPS := $(OBJS:.o=.d)
+TARGET := app
+
+.PHONY: all clean debug release asan test
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(LDFLAGS) $^ -o $@ $(LDLIBS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $&lt; -o $@
+
+debug:   CFLAGS += -O0 -DDEBUG
+debug:   $(TARGET)
+
+release: CFLAGS += -O2 -DNDEBUG
+release: $(TARGET)
+
+asan:    CFLAGS  += -fsanitize=address,undefined -O1
+asan:    LDFLAGS += -fsanitize=address,undefined
+asan:    $(TARGET)
+
+test: asan
+	./$(TARGET)
+
+clean:
+	rm -f $(OBJS) $(DEPS) $(TARGET)
+
+-include $(DEPS)</code></pre>
+
+  <table>
+    <thead><tr><th>Symbol</th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td><code>$@</code></td><td>The target</td></tr>
+      <tr><td><code>$&lt;</code></td><td>The first prerequisite</td></tr>
+      <tr><td><code>$^</code></td><td>All prerequisites</td></tr>
+      <tr><td><code>:=</code></td><td>Immediate assignment (prefer over <code>=</code>)</td></tr>
+      <tr><td><code>.PHONY</code></td><td>These targets are not files</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The two lines that matter most</h3>
+
+  <p><code>-MMD -MP</code> makes the compiler emit a <code>.d</code> file listing every header each source includes. <code>-include $(DEPS)</code> pulls those in as extra rules. The result: editing <code>intarray.h</code> rebuilds every file that includes it. Without this, Make tracks only <code>.c</code> files and a header change silently produces a stale, inconsistent binary — the most confusing class of build bug there is.</p>
+
+  <p><code>.PHONY</code> tells Make that <code>clean</code> is not a file. Without it, a file named <code>clean</code> in the directory would make <code>make clean</code> do nothing.</p>
+
+<pre><code>make            # build
+make -j8        # build with eight parallel jobs
+make asan       # build instrumented
+make clean      # remove products
+make -n         # show the commands without running them</code></pre>
+
+  <h3>Warning profiles</h3>
+
+  <p><code>-Wall -Wextra</code> is a floor, not a ceiling. Several valuable warnings are in neither, and a project decides once which set it holds itself to:</p>
+
+<pre><code># beyond -Wall -Wextra, each of these is worth its noise
+-Wpedantic            strict conformance to the chosen standard
+-Wshadow              a local hiding an outer name
+-Wconversion          implicit narrowing conversions
+-Wsign-conversion     signed and unsigned conversions
+-Wcast-qual           casting away const
+-Wstrict-prototypes   () where (void) was meant
+-Wwrite-strings       string literals typed as char *
+-Wmissing-prototypes  a public function with no declaration</code></pre>
+
+  <p><code>-Wshadow</code> caught a real bug in week 17. <code>-Wconversion</code> catches the silent narrowing of week 7, at the cost of being noisy on existing code. <code>-Wstrict-prototypes</code> enforces week 11's <code>(void)</code> rule. Turn them on early on a new project; on an existing one, add them one at a time and fix the fallout before adding the next.</p>
+
+  <p>The final step is to make warnings fatal:</p>
+
+<pre><code>release: CFLAGS += -Werror</code></pre>
+
+  <p>A warning that nobody fixes is noise, and noise hides the next real warning. Making the build fail is the only mechanism that keeps the count at zero. Apply it in the continuous integration configuration of week 35 rather than in the everyday developer build, so that work in progress is not blocked by an unused variable.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>CMake</h2>
+
+  <p>CMake generates build files rather than building directly, which is how a single configuration produces Makefiles on Linux, Ninja builds, and Visual Studio projects on Windows.</p>
+
+<pre><code>cmake_minimum_required(VERSION 3.16)
+project(intarray_demo C)
+
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
+add_compile_options(-Wall -Wextra)
+
+add_library(intarray STATIC intarray.c)
+target_include_directories(intarray PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_executable(app main.c)
+target_link_libraries(app PRIVATE intarray)
+
+option(ENABLE_ASAN "Build with AddressSanitizer" OFF)
+if(ENABLE_ASAN)
+    target_compile_options(app PRIVATE -fsanitize=address,undefined)
+    target_link_options(app    PRIVATE -fsanitize=address,undefined)
+endif()</code></pre>
+
+<pre><code>cmake -S . -B build
+cmake --build build -j8
+cmake -S . -B build-asan -DENABLE_ASAN=ON
+cmake --build build-asan</code></pre>
+
+  <table>
+    <thead><tr><th>Make</th><th>CMake</th></tr></thead>
+    <tbody>
+      <tr><td>Direct, no extra tool</td><td>Generates for several build systems</td></tr>
+      <tr><td>Unix-centric</td><td>Cross-platform, including Visual Studio</td></tr>
+      <tr><td>You write dependency handling</td><td>Handled for you</td></tr>
+      <tr><td>Fine for a small project</td><td>Standard for anything with dependencies</td></tr>
+    </tbody>
+  </table>
+
+  <p>Learn Make first: it exposes what a build actually is, and CMake ultimately emits one. Use CMake for anything that must build on more than one platform or consume third-party libraries.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Static libraries</h2>
+
+  <p>A static library is an archive of object files. The linker copies the ones you actually use into your executable.</p>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -c intarray.c -o intarray.o
+ar rcs libintarray.a intarray.o          # r=insert c=create s=index
+
+gcc main.c -L. -lintarray -o app         # -L where, -l which
+./app                                    # no runtime dependency</code></pre>
+
+  <p><code>-lintarray</code> means "find <code>libintarray.a</code> or <code>libintarray.so</code>" — the <code>lib</code> prefix and the extension are added for you. <code>-L.</code> adds the current directory to the search path.</p>
+
+  <p>The resulting executable is self-contained: the library's code is inside it, and the <code>.a</code> file is no longer needed to run.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Shared libraries</h2>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -fPIC -c intarray.c -o intarray.o
+gcc -shared intarray.o -o libintarray.so
+
+gcc main.c -L. -lintarray -o app
+LD_LIBRARY_PATH=. ./app                  # must be findable at run time</code></pre>
+
+  <p><code>-fPIC</code> — position-independent code — is required because a shared library can be loaded at any address, so it must not contain absolute addresses. Omit it and the link fails with a relocation error.</p>
+
+  <p>The <code>LD_LIBRARY_PATH</code> is needed because the loader searches standard directories, not the one you built in. That is a development convenience; week 45 covers installing properly and embedding a search path.</p>
+
+  <table>
+    <thead><tr><th></th><th>Static (<code>.a</code>)</th><th>Shared (<code>.so</code>, <code>.dll</code>, <code>.dylib</code>)</th></tr></thead>
+    <tbody>
+      <tr><td>Code lives</td><td>In the executable</td><td>In a separate file</td></tr>
+      <tr><td>Executable size</td><td>Larger</td><td>Smaller</td></tr>
+      <tr><td>Deployment</td><td>One file</td><td>Library must be present</td></tr>
+      <tr><td>Fixing a library bug</td><td>Relink every program</td><td>Replace one file</td></tr>
+      <tr><td>Memory with many users</td><td>One copy each</td><td>Shared between processes</td></tr>
+      <tr><td>Startup</td><td>Immediate</td><td>Dynamic linking cost</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Linking order and symbol resolution</h2>
+
+  <p>The traditional Unix linker processes its arguments left to right, keeping a list of symbols still undefined. When it reaches a library it takes only the members that resolve something currently outstanding — and then moves on.</p>
+
+<pre><code>gcc -lintarray main.c -o app     # FAILS
+gcc main.c -lintarray -o app     # works</code></pre>
+
+  <p>In the first form the library is examined before <code>main.o</code> has introduced any undefined symbols, so nothing is taken from it; by the time <code>main.o</code> needs <code>intarray_create</code>, the library has been passed. <strong>Libraries go after the objects that use them</strong>, and for mutually dependent libraries you may need to list one twice.</p>
+
+  <p>This is also why <code>-lm</code> belongs at the end of the command line, as week 24 noted.</p>
+
+  <h3>Inspecting symbols</h3>
+
+<pre><code>nm intarray.o</code></pre>
+<pre><code>0000000000000000 T intarray_create
+0000000000000120 T intarray_destroy
+0000000000000094 t grow
+                 U malloc
+                 U realloc</code></pre>
+
+  <table>
+    <thead><tr><th>Letter</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>T</code></td><td>Defined here, external (in <code>.text</code>)</td></tr>
+      <tr><td><code>t</code></td><td>Defined here, <code>static</code> — lowercase means local</td></tr>
+      <tr><td><code>U</code></td><td>Undefined: needed from elsewhere</td></tr>
+      <tr><td><code>D</code> / <code>B</code></td><td>Initialized / zero-initialized data</td></tr>
+      <tr><td><code>R</code></td><td>Read-only data</td></tr>
+    </tbody>
+  </table>
+
+  <p>Note <code>grow</code> appearing as lowercase <code>t</code>: week 28's <code>static</code> keyword, visible in the object file. Other translation units cannot link against it, which is exactly what was intended.</p>
+
+<pre><code>nm -D libintarray.so | grep ' T '      # the exported interface
+nm -u main.o                           # what main.o still needs
+objdump -d intarray.o | head -30       # disassemble
+ldd app                                # shared libraries an executable needs</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: one module, four builds</h2>
+
+  <p>Using <code>intarray.h</code>, <code>intarray.c</code>, and <code>main.c</code> from week 28.</p>
+
+  <h3>Build it four ways</h3>
+
+<pre><code># 1. by hand, to remember what the tools automate
+gcc -std=c17 -Wall -Wextra -g -c intarray.c -o intarray.o
+gcc -std=c17 -Wall -Wextra -g -c main.c     -o main.o
+gcc intarray.o main.o -o app_manual
+
+# 2. as a static library
+ar rcs libintarray.a intarray.o
+gcc -std=c17 -Wall -Wextra -g main.c -L. -lintarray -o app_static
+
+# 3. as a shared library
+gcc -std=c17 -Wall -Wextra -g -fPIC -c intarray.c -o intarray_pic.o
+gcc -shared intarray_pic.o -o libintarray.so
+gcc -std=c17 -Wall -Wextra -g main.c -L. -lintarray -o app_shared
+
+# 4. with the Makefile
+make clean &amp;&amp; make asan</code></pre>
+
+<pre><code>ls -l app_manual app_static app_shared
+LD_LIBRARY_PATH=. ./app_shared</code></pre>
+
+  <p>Compare the sizes. The statically linked executable is larger by roughly the size of the library's code; the shared one is smaller but will not run without <code>libintarray.so</code> on the loader's path.</p>
+
+  <h3>Watch incremental rebuilding work — and then fail</h3>
+
+<pre><code>make clean &amp;&amp; make
+touch main.c &amp;&amp; make          # rebuilds main.o only, then relinks
+touch intarray.h &amp;&amp; make      # rebuilds BOTH: the .d files did their job</code></pre>
+
+  <p>Now remove <code>-MMD -MP</code> from <code>CFLAGS</code> and the <code>-include $(DEPS)</code> line, and repeat:</p>
+
+<pre><code>make clean &amp;&amp; make
+touch intarray.h &amp;&amp; make
+make: 'app' is up to date.</code></pre>
+
+  <p>Make does not know the header exists. Change a struct in it and you get an executable whose two halves disagree about the layout — which manifests as memory corruption, not a build error. This is why dependency generation is not optional.</p>
+
+  <h3>Reproduce the linking-order failure</h3>
+
+<pre><code>gcc -std=c17 main.c -L. -lintarray -o ok
+gcc -std=c17 -L. -lintarray main.c -o broken</code></pre>
+
+<pre><code>/usr/bin/ld: /tmp/ccXXXX.o: in function `main':
+main.c:(.text+0x1f): undefined reference to `intarray_create'
+collect2: error: ld returned 1 exit status</code></pre>
+
+  <p>Identical inputs, different order, different outcome. Confirm the library does contain the symbol:</p>
+<pre><code>nm libintarray.a | grep intarray_create</code></pre>
+
+  <h3>Inspect the symbol table</h3>
+
+<pre><code>nm intarray.o | sort -k3
+nm -u main.o
+nm -D libintarray.so | grep ' T '</code></pre>
+
+  <p>Check three things. Every <code>intarray_*</code> function is <code>T</code> — exported. <code>grow</code> is <code>t</code> — local, because it is <code>static</code>. And <code>main.o</code> lists exactly the <code>intarray_*</code> functions it calls as <code>U</code>, which is the precise set the linker must satisfy.</p>
+
+  <p>Then remove <code>static</code> from <code>grow</code>, rebuild, and run <code>nm</code> again: it becomes <code>T</code>, exported from the library, and now collides with any other translation unit that happens to define a function called <code>grow</code>.</p>
+
+  <h3>Compare configurations</h3>
+
+<pre><code>make clean &amp;&amp; make release &amp;&amp; ls -l app &amp;&amp; mv app app_release
+make clean &amp;&amp; make debug   &amp;&amp; ls -l app &amp;&amp; mv app app_debug
+make clean &amp;&amp; make asan    &amp;&amp; ls -l app</code></pre>
+
+  <p>The release build is smallest and has assertions compiled out; the debug build carries symbols; the sanitizer build is several times larger because of the instrumentation. Having all three as named targets means switching costs one word, which is what makes running the instrumented build routine rather than exceptional.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Spaces instead of a tab in a recipe</td><td><code>missing separator</code></td><td>Use a real tab.</td></tr>
+      <tr><td>No header dependency tracking</td><td>Stale objects; inconsistent binary</td><td><code>-MMD -MP</code> plus <code>-include $(DEPS)</code>.</td></tr>
+      <tr><td>Library before the objects that use it</td><td><code>undefined reference</code></td><td>Libraries last.</td></tr>
+      <tr><td>Shared library without <code>-fPIC</code></td><td>Relocation error at link time</td><td>Compile position-independent.</td></tr>
+      <tr><td>Running a shared build without the path</td><td><code>cannot open shared object file</code></td><td><code>LD_LIBRARY_PATH</code>, or install it — week 45.</td></tr>
+      <tr><td>No <code>.PHONY</code></td><td>A file named <code>clean</code> stops the target working</td><td>Declare phony targets.</td></tr>
+      <tr><td>Recursive <code>=</code> where <code>:=</code> was meant</td><td>Re-evaluated on each use; slow and surprising</td><td>Prefer <code>:=</code>.</td></tr>
+      <tr><td>Sanitizer flags only at compile time</td><td>Link errors about missing runtime</td><td>Pass them to the link step too.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why does <code>gcc -lfoo main.c</code> fail where <code>gcc main.c -lfoo</code> works?</summary>
+    <p>Because the linker processes arguments left to right and takes from a library only the members that resolve symbols already known to be undefined. Listed first, the library is examined before <code>main.o</code> has introduced any requirements, so nothing is extracted — and by the time the requirement appears, the library is behind it. Libraries go after the objects that use them.</p>
+  </details>
+
+  <details>
+    <summary>What do <code>-MMD -MP</code> do, and why does a build break without them?</summary>
+    <p>They make the compiler write a dependency file listing every header a source includes, which the Makefile then includes as extra rules. Without them Make sees only <code>.c</code> files, so changing a header rebuilds nothing — leaving object files compiled against different versions of a structure. The result is memory corruption at runtime rather than an error at build time.</p>
+  </details>
+
+  <details>
+    <summary>Why is <code>-fPIC</code> required for a shared library?</summary>
+    <p>Because a shared library may be loaded at a different address in every process, so its code cannot contain absolute addresses. Position-independent code addresses everything relative to the program counter or through an indirection table. Without it, the link fails with a relocation error.</p>
+  </details>
+
+  <details>
+    <summary>In <code>nm</code> output, what is the difference between <code>T</code> and <code>t</code>?</summary>
+    <p>Both mean the symbol is defined in the text section of this object file. Uppercase means external linkage — other translation units can link against it. Lowercase means internal linkage, produced by <code>static</code>, so the name is invisible outside this file. Seeing your helpers as <code>t</code> confirms the encapsulation actually took effect.</p>
+  </details>
+
+  <details>
+    <summary>When would you choose a static library over a shared one?</summary>
+    <p>When single-file deployment matters more than size — a command-line tool distributed on its own, or a program that must run on systems where you cannot install libraries. Shared libraries win when many programs use the same code, when a bug fix should reach them all by replacing one file, or when startup memory across many processes matters.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 30 returns to the code itself, with the abstraction mechanisms C does offer: function pointers, callbacks, generic containers built on <code>void *</code>, variadic functions, and <code>_Generic</code>. Those are what let the <code>IntArray</code> you just packaged become an array of anything — and what make <code>qsort</code> possible at all.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_28_Preprocessor_and_Modular_Programming.html">← Week 28</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_30_Function_Pointers_and_Generic_Programming.html">Week 30 →</a>
+</div>
+
+</div>

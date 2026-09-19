@@ -1,0 +1,432 @@
+---
+layout: without-sidebar
+title: "Week 44 — Collaborative Development and Code Review"
+permalink: /files/c/Week_44_Collaborative_Development_and_Code_Review.html
+excerpt: "Branching, merging and rebasing; the pull request workflow; reviewing C against a memory-safety checklist; commit hygiene and semantic versioning; reproducible issue reports."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Professional · Week 44</div>
+  <h1>Collaborative Development and Code Review</h1>
+  <p class="c-wk-lead">Reviewing C is a different job from reviewing most languages. The compiler catches less, the runtime catches nothing, and the defects that matter — ownership, lifetime, bounds — are invisible in a diff unless you know to look. This week is a checklist and a workflow.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Work on a branch, keep it current, and choose between merge and rebase.</li>
+      <li>Submit a change that a reviewer can evaluate without reconstructing your reasoning.</li>
+      <li>Review C for memory safety, ownership, and undefined behavior systematically.</li>
+      <li>Write commit messages and version numbers that mean something.</li>
+      <li>File a bug report someone can act on.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Branching</h2>
+
+<pre><code>git switch -c fix-config-leak      # branch and switch (modern spelling)
+# … work, commit …
+git push -u origin fix-config-leak</code></pre>
+
+  <p>One branch per change, named after the change. Keep it short-lived: a branch open for three weeks diverges until merging it is its own project.</p>
+
+  <h3>Merge or rebase</h3>
+
+<pre><code>git switch fix-config-leak
+git fetch origin
+git merge origin/main             # preserves history; adds a merge commit
+# or
+git rebase origin/main            # replays your commits; linear history</code></pre>
+
+  <table>
+    <thead><tr><th>Merge</th><th>Rebase</th></tr></thead>
+    <tbody>
+      <tr><td>True history, including the messy parts</td><td>Linear, readable history</td></tr>
+      <tr><td>Safe on a shared branch</td><td><strong>Never on a shared branch</strong> — it rewrites commits</td></tr>
+      <tr><td>Conflicts resolved once</td><td>Conflicts possibly once per commit</td></tr>
+      <tr><td>Bisection sees the merge</td><td>Bisection is cleaner</td></tr>
+    </tbody>
+  </table>
+
+  <p>The workable rule: <strong>rebase your own unpushed work, merge everything else.</strong> Rebasing commits that someone else has pulled rewrites history they already have, and the recovery is unpleasant.</p>
+
+  <p>Before submitting, tidy your own branch:</p>
+
+<pre><code>git rebase -i origin/main         # squash "fix typo" into its parent
+git log --oneline origin/main..   # review what you are about to submit</code></pre>
+
+  <p>Nobody needs to see "wip", "fix typo", and "actually fix it". They need to see one coherent commit per idea.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Submitting a change</h2>
+
+  <p>A pull request has three parts a reviewer reads in order: the title, the description, and the diff. Most of the review's quality is decided before the diff.</p>
+
+<pre><code>Title:  Fix use-after-free when config reload fails
+
+What
+  parse_config() freed the old configuration before validating the
+  new one. A malformed file left the global pointer dangling and the
+  next request dereferenced freed memory.
+
+Why this fix
+  Validate into a temporary, then swap and free. The alternative —
+  copying the old config first — doubles peak memory for a case that
+  should be rare.
+
+Testing
+  New test reloads with a syntax error and checks the old config is
+  still served. Full suite passes under ASan and UBSan.
+
+Risk
+  The swap is not atomic; a concurrent reader could observe either
+  version. That was already true and is out of scope here (#1240).</code></pre>
+
+  <p>The <em>Risk</em> section is the one people omit and reviewers value most. Stating what you did not fix, and why, prevents the review spending its attention rediscovering it.</p>
+
+  <table>
+    <thead><tr><th>Do</th><th>Do not</th></tr></thead>
+    <tbody>
+      <tr><td>One logical change per request</td><td>Bundle a fix with a refactor</td></tr>
+      <tr><td>Under about 400 lines</td><td>Submit 2000 and expect a real review</td></tr>
+      <tr><td>Say how you tested it</td><td>Leave the reviewer to guess</td></tr>
+      <tr><td>Answer every comment</td><td>Silently push a change instead of replying</td></tr>
+      <tr><td>Push fixes as new commits during review</td><td>Force-push mid-review; the reviewer loses their place</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Reviewing C</h2>
+
+  <p>Read the diff twice. Once for what it does, once against this list — in order, because the early items cause the expensive failures.</p>
+
+  <h3>Memory</h3>
+  <ul>
+    <li>Every allocation checked for <code>NULL</code>?</li>
+    <li>Every path — including every early return — frees what it allocated?</li>
+    <li>Any pointer used after <code>free</code>? Set to <code>NULL</code> afterwards?</li>
+    <li><code>realloc</code> assigned to a temporary, not to the original pointer?</li>
+    <li>Ownership stated: who frees the result, and is it documented?</li>
+  </ul>
+
+  <h3>Bounds</h3>
+  <ul>
+    <li>Every array index provably within range?</li>
+    <li>Every buffer write bounded, with the size passed alongside the pointer?</li>
+    <li><code>strcpy</code>, <code>strcat</code>, <code>sprintf</code>, or <code>gets</code> anywhere? Each is a finding.</li>
+    <li>Room for the terminator — length + 1?</li>
+    <li>Loop bounds <code>&lt;</code> rather than <code>&lt;=</code>?</li>
+  </ul>
+
+  <h3>Integers and undefined behavior</h3>
+  <ul>
+    <li>Signed and unsigned compared or mixed in arithmetic?</li>
+    <li>A size computed by multiplication that could overflow?</li>
+    <li>An overflow check performed <em>after</em> the operation?</li>
+    <li>Shift counts bounded by the type's width?</li>
+    <li>Any variable read before it is written?</li>
+  </ul>
+
+  <h3>Errors and concurrency</h3>
+  <ul>
+    <li>Every return value that can fail actually checked?</li>
+    <li><code>errno</code> saved before any intervening call?</li>
+    <li>Shared state accessed without a lock? Locks taken in a consistent order?</li>
+    <li>Any non-reentrant function — <code>strtok</code>, <code>localtime</code> — in threaded code?</li>
+  </ul>
+
+  <div class="c-wk-note">
+    <p><strong>Review the deleted lines too.</strong> A diff draws the eye to additions, but removing a bounds check, a <code>free</code>, or a <code>NULL</code> guard is a defect that appears only in the red half. Read what left as carefully as what arrived.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>How to write a review comment</h2>
+
+  <p>Review the code, never the person. Two formulations of the same finding:</p>
+
+<pre><code>Poor:  You forgot to free buf on the error path.
+
+Good:  Line 47: if parse() fails we return without freeing buf.
+       A goto cleanup here would match the pattern used in
+       load_index() and cover both exits.</code></pre>
+
+  <p>The second names the location, states the consequence, proposes a fix, and cites a precedent in the same codebase. It is also shorter to act on.</p>
+
+  <p>Mark the severity, because not everything is equal:</p>
+
+  <table>
+    <thead><tr><th>Prefix</th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td><strong>blocking</strong></td><td>A defect. Must change before merge.</td></tr>
+      <tr><td><strong>question</strong></td><td>I do not understand; explain or clarify.</td></tr>
+      <tr><td><strong>suggestion</strong></td><td>Would improve it; your call.</td></tr>
+      <tr><td><strong>nit</strong></td><td>Style or typo; ignore if you disagree.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Without the labels, a reviewer's typo comment and their use-after-free comment look identical, and the author has to guess which blocks the merge.</p>
+
+  <p>Two further habits: approve when it is good enough rather than perfect — a review that demands perfection stalls everything — and say what you liked, because a review consisting only of complaints teaches nothing about what to repeat.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Versions and changelogs</h2>
+
+  <p>Semantic versioning — <code>MAJOR.MINOR.PATCH</code> — states what a consumer must do:</p>
+
+  <table>
+    <thead><tr><th>Bump</th><th>When</th><th>Consumer must</th></tr></thead>
+    <tbody>
+      <tr><td>PATCH</td><td>A bug fix, no interface change</td><td>Nothing</td></tr>
+      <tr><td>MINOR</td><td>New functionality, backwards compatible</td><td>Nothing</td></tr>
+      <tr><td>MAJOR</td><td>A breaking change</td><td>Change their code</td></tr>
+    </tbody>
+  </table>
+
+  <p>For a C library the rule is stricter than for most languages, because compatibility has two levels. <strong>API</strong> compatibility means existing source still compiles. <strong>ABI</strong> compatibility means an already-compiled program still links and runs — and that breaks on changes invisible in the header's text, such as adding a member to a struct the caller can see, or reordering enumerators. Week 45 covers the mechanics; here, note only that "I just added a field" can be a major version.</p>
+
+  <p>A changelog is written for users, not from <code>git log</code>:</p>
+
+<pre><code>## 2.3.0 — 2026-09-20
+
+### Added
+- `config_reload()` for reloading without a restart
+
+### Fixed
+- Use-after-free when a config reload failed (#1234)
+- Memory leak in the error path of `index_open()` (#1251)
+
+### Changed
+- `parse_line()` now rejects trailing whitespace. Previously it was
+  silently ignored; scripts relying on that will need updating.</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: a review, in full</h2>
+
+  <p>Here is a patch as submitted. Review it before reading on.</p>
+
+<pre><code>--- a/src/config.c
++++ b/src/config.c
+@@ -40,6 +40,38 @@ static Config *global_config = NULL;
++/* Load a configuration file and install it. */
++int config_reload(const char *path)
++{
++    FILE *f = fopen(path, "r");
++    if (!f) return -1;
++
++    char *buf = malloc(8192);
++    fread(buf, 1, 8192, f);
++
++    free(global_config);
++    global_config = malloc(sizeof(Config));
++
++    char *line = strtok(buf, "\n");
++    while (line) {
++        char key[32], value[64];
++        sscanf(line, "%s = %s", key, value);
++
++        if (strcmp(key, "timeout")) {
++            global_config-&gt;timeout = atoi(value);
++        } else if (strcmp(key, "name") == 0) {
++            strcpy(global_config-&gt;name, value);
++        }
++        line = strtok(NULL, "\n");
++    }
++
++    fclose(f);
++    return 0;
++}</code></pre>
+
+  <h3>The review</h3>
+
+  <p><strong>blocking — line 45: unchecked allocation.</strong> <code>malloc(8192)</code> is not checked, and <code>fread</code> writes to <code>buf</code> immediately. On failure this is a null dereference. Same on line 50 for the <code>Config</code>.</p>
+
+  <p><strong>blocking — line 46: <code>buf</code> is not null-terminated.</strong> <code>fread</code> returns a count that is ignored, and nothing writes a <code>'\0'</code>. <code>strtok</code> then reads past the end of the allocation. Capture the return value and terminate:</p>
+
+<pre><code>size_t n = fread(buf, 1, 8191, f);
+buf[n] = '\0';</code></pre>
+
+  <p><strong>blocking — line 49: the old config is freed before the new one is valid.</strong> This is the defect the change was meant to avoid. If parsing fails, <code>global_config</code> points at freed memory and the next request dereferences it. Build the new config in a local, then swap:</p>
+
+<pre><code>Config *fresh = calloc(1, sizeof *fresh);
+/* … parse into fresh, returning on error … */
+Config *old = global_config;
+global_config = fresh;
+free(old);</code></pre>
+
+  <p><strong>blocking — line 55: <code>strcmp</code> used backwards.</strong> <code>if (strcmp(key, "timeout"))</code> is true when the strings <em>differ</em>. Every non-timeout key sets the timeout. Week 14's trap, and the compiler cannot help.</p>
+
+  <p><strong>blocking — line 54: unbounded <code>sscanf</code>.</strong> <code>%s</code> into <code>char key[32]</code> with no width is a stack buffer overflow from a config file. Use <code>%31s</code> and <code>%63s</code>, and check the return value — a malformed line currently leaves both buffers uninitialized and they are used anyway.</p>
+
+  <p><strong>blocking — line 58: <code>strcpy</code> into a fixed buffer.</strong> Unbounded copy of attacker-controlled text. <code>snprintf(global_config-&gt;name, sizeof global_config-&gt;name, "%s", value)</code>.</p>
+
+  <p><strong>blocking — <code>buf</code> is leaked.</strong> Allocated on line 45, never freed on any path.</p>
+
+  <p><strong>blocking — <code>f</code> is leaked on the early return</strong> at line 43? No — the return precedes the <code>fopen</code> succeeding. But if the <code>malloc</code> check is added as suggested, that new path must close <code>f</code>. This is exactly why week 27 prefers one cleanup label over scattered returns.</p>
+
+  <p><strong>question — is this called from more than one thread?</strong> <code>strtok</code> keeps hidden static state and <code>global_config</code> is swapped without synchronization. If reloads can be concurrent with requests, both are races. <code>strtok_r</code> at minimum.</p>
+
+  <p><strong>suggestion — <code>atoi</code> cannot report failure.</strong> A malformed timeout becomes 0 silently. <code>strtol</code> with <code>endptr</code>, as in <code>parse_port()</code> two files over.</p>
+
+  <p><strong>nit — the comment says what the function does; the interesting part is the ownership.</strong> Worth stating that the caller does not own the result and that the previous config is freed.</p>
+
+  <h3>The revised version</h3>
+
+<pre><code>/* Load a configuration file and install it as the active config.
+ * On failure the previous configuration remains installed and is
+ * unchanged. The caller does not own the result.
+ * Returns 0 on success, -1 on failure with errno set where possible. */
+int config_reload(const char *path)
+{
+    int      status = -1;
+    FILE    *f      = NULL;
+    char    *buf    = NULL;
+    Config  *fresh  = NULL;
+
+    f = fopen(path, "r");
+    if (f == NULL) {
+        goto cleanup;
+    }
+
+    buf = malloc(CONFIG_MAX + 1);
+    if (buf == NULL) {
+        goto cleanup;
+    }
+
+    size_t n = fread(buf, 1, CONFIG_MAX, f);
+    if (ferror(f)) {
+        goto cleanup;
+    }
+    buf[n] = '\0';                       /* fread does not terminate */
+
+    fresh = calloc(1, sizeof *fresh);    /* calloc: every field defined */
+    if (fresh == NULL) {
+        goto cleanup;
+    }
+
+    char *save = NULL;                   /* strtok_r: no hidden state */
+    for (char *line = strtok_r(buf, "\n", &amp;save);
+         line != NULL;
+         line = strtok_r(NULL, "\n", &amp;save)) {
+
+        char key[32], value[64];
+        if (sscanf(line, "%31s = %63s", key, value) != 2) {
+            continue;                    /* skip malformed lines */
+        }
+
+        if (strcmp(key, "timeout") == 0) {
+            long v;
+            if (!parse_long(value, &amp;v) || v &lt; 0) {
+                goto cleanup;            /* refuse rather than default to 0 */
+            }
+            fresh-&gt;timeout = (int)v;
+        } else if (strcmp(key, "name") == 0) {
+            snprintf(fresh-&gt;name, sizeof fresh-&gt;name, "%s", value);
+        }
+    }
+
+    /* Only now is the old configuration replaced. */
+    Config *old = global_config;
+    global_config = fresh;
+    fresh = NULL;                        /* ownership transferred */
+    free(old);
+    status = 0;
+
+cleanup:
+    free(fresh);                         /* NULL unless we failed */
+    free(buf);
+    if (f != NULL) {
+        fclose(f);
+    }
+    return status;
+}</code></pre>
+
+  <h3>What changed, and which week it came from</h3>
+
+  <table>
+    <thead><tr><th>Fix</th><th>From</th></tr></thead>
+    <tbody>
+      <tr><td>Every allocation checked</td><td>Week 19</td></tr>
+      <tr><td>One cleanup label, no leaks on any path</td><td>Week 27</td></tr>
+      <tr><td>Validate before replacing the old config</td><td>Week 20 — use after free</td></tr>
+      <tr><td><code>%31s</code>, <code>snprintf</code> instead of <code>strcpy</code></td><td>Weeks 8, 14</td></tr>
+      <tr><td><code>strcmp(...) == 0</code></td><td>Week 14</td></tr>
+      <tr><td><code>strtol</code> instead of <code>atoi</code></td><td>Week 23</td></tr>
+      <tr><td><code>strtok_r</code></td><td>Week 41</td></tr>
+      <tr><td><code>fread</code> return value used; buffer terminated</td><td>Week 26</td></tr>
+    </tbody>
+  </table>
+
+  <p>Eight blocking findings in twenty-eight lines, and every one is a topic from earlier in this course. That is what makes a checklist worth having: the defects are not exotic, and a reviewer working from memory will miss two or three of them on a Friday afternoon.</p>
+
+  <h3>Practise it</h3>
+
+  <p>Find an open pull request in a C project on GitHub and review it against section 3's list. Write the comments out, even if you do not post them, and then read what the actual reviewers said. The gap between your list and theirs is the most direct feedback available on how you read C.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Rebasing a shared branch</td><td>Rewrites history others have</td><td>Rebase only your own unpushed work.</td></tr>
+      <tr><td>A 2000-line pull request</td><td>Approved without being read</td><td>Split it.</td></tr>
+      <tr><td>Bundling a fix with a refactor</td><td>Cannot be reviewed, reverted, or backported</td><td>Separate commits, separate requests.</td></tr>
+      <tr><td>Reviewing only added lines</td><td>A deleted bounds check slips through</td><td>Read the red half too.</td></tr>
+      <tr><td>Unlabelled review comments</td><td>Author cannot tell a typo from a defect</td><td>blocking / question / suggestion / nit.</td></tr>
+      <tr><td>Reviewing the person</td><td>Defensiveness; worse outcomes</td><td>Name the line and the consequence.</td></tr>
+      <tr><td>Force-pushing mid-review</td><td>Reviewer loses their place</td><td>Add commits; squash at the end.</td></tr>
+      <tr><td>Bumping MINOR for an ABI break</td><td>Installed programs crash</td><td>An ABI break is MAJOR.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>When is rebasing dangerous?</summary>
+    <p>On any branch someone else has pulled. Rebasing creates new commits with new identities, so collaborators' history no longer matches and their next pull produces duplicates or conflicts. Rebase your own unpushed work to tidy it; merge everything else.</p>
+  </details>
+
+  <details>
+    <summary>Why review the deleted lines in a diff?</summary>
+    <p>Because removing code is as capable of introducing a defect as adding it. A deleted bounds check, <code>free</code>, or null guard leaves no trace in the added half, and the eye is drawn to additions. Reviewing the red lines is how those are caught.</p>
+  </details>
+
+  <details>
+    <summary>Why label review comments by severity?</summary>
+    <p>Because a typo and a use-after-free look identical as comments, and the author cannot tell which blocks the merge. Labels also let a reviewer raise minor points without implying they are conditions — which makes it easier to mention them at all.</p>
+  </details>
+
+  <details>
+    <summary>Why can a C library need a MAJOR bump for adding a struct member?</summary>
+    <p>Because if the struct is visible in a public header, callers compiled against the old definition allocated the old size and indexed the old offsets. A new member changes the layout, so an already-compiled program linking against the new library reads and writes the wrong bytes. That is an ABI break even though the source still compiles.</p>
+  </details>
+
+  <details>
+    <summary>Which review finding in the worked example would a compiler have caught?</summary>
+    <p>None of the blocking ones. <code>-Wall</code> might warn about the ignored <code>fread</code> result, and <code>-Wformat</code> about nothing here — but the inverted <code>strcmp</code>, the unbounded <code>%s</code>, the premature <code>free</code>, and the leaked buffer all compile silently. That is precisely why C review needs a checklist rather than a reading.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 45 turns the module you have been reviewing into something other people can install: versioning, <code>soname</code>, symbol visibility, <code>pkg-config</code>, and the ABI rules that decide whether adding a struct member is a patch or a major release.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_43_Working_in_an_Existing_Codebase.html">← Week 43</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_45_Packaging_and_Distributing_Libraries.html">Week 45 →</a>
+</div>
+
+</div>

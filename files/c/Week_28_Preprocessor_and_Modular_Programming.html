@@ -1,0 +1,473 @@
+---
+layout: without-sidebar
+title: "Week 28 — The Preprocessor and Modular Programming"
+permalink: /files/c/Week_28_Preprocessor_and_Modular_Programming.html
+excerpt: "Macros and their pitfalls, conditional compilation, include guards, linkage and multiple definitions, information hiding with static and opaque pointers, and project layout."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Intermediate · Week 28</div>
+  <h1>The Preprocessor and Modular Programming</h1>
+  <p class="c-wk-lead">Everything so far has lived in one file. This week splits a program across several, which raises the two questions that define C's module system: what does a header expose, and what stays invisible. The growable array of week 19 becomes a real module by the end.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Write macros that behave correctly under every argument, and say when to use a function instead.</li>
+      <li>Use conditional compilation and include guards.</li>
+      <li>Explain internal and external linkage, and fix a multiple-definition error.</li>
+      <li>Split a program into header and source files with a deliberate public interface.</li>
+      <li>Hide an implementation completely behind an opaque pointer.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The preprocessor is a text tool</h2>
+
+  <p>Week 2 established that the preprocessor runs before the compiler and knows nothing about C. It obeys the <code>#</code> directives and hands the result on as text.</p>
+
+<pre><code>#define MAX_ITEMS 100          /* object-like macro */
+#define SQUARE(x) ((x) * (x))  /* function-like macro */
+#include &lt;stdio.h&gt;             /* paste in a file */
+#ifdef DEBUG … #endif          /* conditional compilation */</code></pre>
+
+  <h3>Macro pitfalls</h3>
+
+  <p><strong>Parenthesize everything.</strong> Twice: the whole body, and every use of a parameter.</p>
+
+<pre><code>#define SQUARE(x) x * x            /* broken */
+SQUARE(2 + 3)   ->  2 + 3 * 2 + 3  ->  11
+
+#define SQUARE(x) ((x) * (x))      /* correct */
+SQUARE(2 + 3)   ->  ((2 + 3) * (2 + 3))  ->  25</code></pre>
+
+  <p><strong>Beware double evaluation.</strong> A parameter appearing twice in the body is evaluated twice:</p>
+
+<pre><code>#define MAX(a, b) ((a) &gt; (b) ? (a) : (b))
+
+MAX(i++, j)     /* i is incremented once or twice, unpredictably */
+MAX(f(), g())   /* one of the calls happens twice */</code></pre>
+
+  <p>There is no general fix in standard C. This is the strongest argument for using a function: a function evaluates each argument exactly once, and any compiler will inline a small one at <code>-O2</code>.</p>
+
+  <p><strong>Prefer the alternatives.</strong> For a constant, <code>const</code> or an <code>enum</code> — week 5. For a small operation, a <code>static inline</code> function — week 38. Macros remain necessary for conditional compilation, for header guards, for stringification, and for generic code that must work across types (week 30).</p>
+
+  <h3>Stringify and paste</h3>
+<pre><code>#define STRINGIFY(x) #x
+#define CONCAT(a, b) a ## b
+
+STRINGIFY(hello)     /* becomes "hello" */
+CONCAT(my_, var)     /* becomes my_var  */</code></pre>
+
+  <p>The common practical use is a debug macro that reports the expression it evaluated:</p>
+<pre><code>#define TRACE(expr) \
+    fprintf(stderr, "%s:%d: %s = %d\n", __FILE__, __LINE__, #expr, (expr))</code></pre>
+
+  <table>
+    <thead><tr><th>Predefined macro</th><th>Expands to</th></tr></thead>
+    <tbody>
+      <tr><td><code>__FILE__</code></td><td>Current source file name</td></tr>
+      <tr><td><code>__LINE__</code></td><td>Current line number</td></tr>
+      <tr><td><code>__func__</code></td><td>Enclosing function name (C99; an identifier, not a macro)</td></tr>
+      <tr><td><code>__DATE__</code>, <code>__TIME__</code></td><td>Compilation date and time</td></tr>
+      <tr><td><code>__STDC_VERSION__</code></td><td><code>201710L</code> for C17, <code>202311L</code> for C23</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Conditional compilation</h2>
+
+<pre><code>#ifdef DEBUG
+    fprintf(stderr, "state = %d\n", state);
+#endif
+
+#if defined(__linux__)
+    …
+#elif defined(_WIN32)
+    …
+#else
+#   error "unsupported platform"
+#endif</code></pre>
+
+  <p>Enable from the command line with <code>-DDEBUG</code> or <code>-DDEBUG=1</code>. This is how a debug build differs from a release build without maintaining two copies of the source.</p>
+
+  <p>One caution: heavily conditional code is compiled in only one configuration at a time, so the branches you are not building are never checked by the compiler. A block inside <code>#ifdef _WIN32</code> can contain syntax errors that a Linux build never reports. Keep the conditional regions small, and prefer a runtime <code>if</code> when the cost allows it — an <code>if (debug_enabled)</code> is type-checked in every build.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Headers and include guards</h2>
+
+  <p>Without protection, including a header twice defines its types twice:</p>
+
+<pre><code>/* buffer.h */
+#ifndef BUFFER_H
+#define BUFFER_H
+
+…declarations…
+
+#endif /* BUFFER_H */</code></pre>
+
+  <p>The first inclusion defines <code>BUFFER_H</code>; every later one skips the body. <code>#pragma once</code> does the same in one line and is supported by every mainstream compiler, though it is not in the standard. Both are fine; be consistent within a project.</p>
+
+  <h3>What belongs in a header</h3>
+  <table>
+    <thead><tr><th>Header (<code>.h</code>)</th><th>Source (<code>.c</code>)</th></tr></thead>
+    <tbody>
+      <tr><td>Function <em>declarations</em></td><td>Function <em>definitions</em></td></tr>
+      <tr><td><code>typedef</code>s and struct definitions callers need</td><td>Structs only the implementation uses</td></tr>
+      <tr><td><code>#define</code>d constants that are part of the interface</td><td>Internal constants</td></tr>
+      <tr><td><code>extern</code> declarations of shared variables</td><td>The one definition of each</td></tr>
+      <tr><td>Documentation of the contract</td><td><code>static</code> helper functions</td></tr>
+    </tbody>
+  </table>
+
+  <p>A header should include only what its own declarations require, and a source file should include what it uses. Headers that include other headers "just in case" create build-time coupling that is painful to unpick later.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Linkage and the one-definition rule</h2>
+
+  <table>
+    <thead><tr><th>Declaration</th><th>Linkage</th><th>Visible to</th></tr></thead>
+    <tbody>
+      <tr><td><code>int counter;</code> at file scope</td><td>External</td><td>Every translation unit</td></tr>
+      <tr><td><code>static int counter;</code> at file scope</td><td>Internal</td><td>This file only</td></tr>
+      <tr><td><code>extern int counter;</code></td><td>External — a declaration, not a definition</td><td>Refers to a definition elsewhere</td></tr>
+      <tr><td><code>void f(void)</code></td><td>External</td><td>Every translation unit</td></tr>
+      <tr><td><code>static void f(void)</code></td><td>Internal</td><td>This file only</td></tr>
+      <tr><td>Anything inside a function</td><td>None</td><td>That block</td></tr>
+    </tbody>
+  </table>
+
+  <p>The classic error, and its fix:</p>
+
+<pre><code>/* config.h — WRONG */
+int verbose = 0;            /* a DEFINITION in a header */</code></pre>
+<pre><code>/usr/bin/ld: multiple definition of `verbose'</code></pre>
+
+  <p>Every source file that includes the header gets its own definition, and the linker finds several. The correct split:</p>
+
+<pre><code>/* config.h */
+extern int verbose;         /* declaration: this exists somewhere */
+
+/* config.c */
+int verbose = 0;            /* the single definition */</code></pre>
+
+  <p><strong>Mark everything <code>static</code> that is not part of the interface.</strong> It prevents accidental name collisions at link time, lets the compiler optimize more aggressively, and documents intent. A source file whose only non-<code>static</code> names are the ones in its header is a well-formed module.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Information hiding and opaque pointers</h2>
+
+  <p>A header that exposes a struct definition lets callers reach inside it — and once they do, you can never change the layout. The opaque pointer prevents that entirely:</p>
+
+<pre><code>/* buffer.h — the caller sees a name, not a layout */
+typedef struct Buffer Buffer;      /* incomplete type */
+
+Buffer *buffer_create(size_t capacity);
+void    buffer_destroy(Buffer *b);
+bool    buffer_append(Buffer *b, int value);
+size_t  buffer_count(const Buffer *b);</code></pre>
+
+<pre><code>/* buffer.c — the definition lives here and nowhere else */
+struct Buffer {
+    int    *data;
+    size_t  count;
+    size_t  capacity;
+};</code></pre>
+
+  <p>Callers can hold a <code>Buffer *</code> and pass it around, but cannot declare a <code>Buffer</code>, cannot see the members, and cannot depend on the size. You may change the implementation freely — add a field, switch to a linked structure — and every caller still compiles without modification.</p>
+
+  <table>
+    <thead><tr><th>Exposed struct</th><th>Opaque pointer</th></tr></thead>
+    <tbody>
+      <tr><td>Caller can allocate on the stack</td><td>Must call <code>create</code></td></tr>
+      <tr><td>Direct member access; fast</td><td>Accessor functions</td></tr>
+      <tr><td>Layout is frozen forever</td><td>Free to change</td></tr>
+      <tr><td>Recompile all callers on any change</td><td>Callers unaffected</td></tr>
+    </tbody>
+  </table>
+
+  <p>Use the opaque form for anything with an invariant to protect or a future you cannot predict — which week 33 turns into the standard way to build an abstract data type, and week 45 shows is essential for a library whose ABI must stay stable.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: the growable array, as a module</h2>
+
+  <p>Three files. This is the structure week 29 compiles into a library.</p>
+
+  <h3><code>intarray.h</code> — the public interface</h3>
+<pre><code>/* intarray.h — a growable array of int.
+ *
+ * Error contract:
+ *   Functions returning bool give true on success, false on failure;
+ *   on failure the array is left unchanged and usable.
+ *
+ * Ownership:
+ *   intarray_create returns a handle the caller must pass to
+ *   intarray_destroy exactly once. No other function frees anything.
+ */
+#ifndef INTARRAY_H
+#define INTARRAY_H
+
+#include &lt;stddef.h&gt;
+#include &lt;stdbool.h&gt;
+
+typedef struct IntArray IntArray;     /* opaque: no layout exposed */
+
+IntArray *intarray_create(size_t initial_capacity);
+void      intarray_destroy(IntArray *a);
+
+bool      intarray_push(IntArray *a, int value);
+bool      intarray_get(const IntArray *a, size_t index, int *out);
+size_t    intarray_count(const IntArray *a);
+size_t    intarray_capacity(const IntArray *a);
+void      intarray_clear(IntArray *a);
+
+#endif /* INTARRAY_H */</code></pre>
+
+  <h3><code>intarray.c</code> — the implementation</h3>
+<pre><code>#include "intarray.h"
+
+#include &lt;stdlib.h&gt;
+#include &lt;assert.h&gt;
+
+#define DEFAULT_CAPACITY 4          /* internal: not in the header */
+
+struct IntArray {                   /* the definition lives only here */
+    int    *data;
+    size_t  count;
+    size_t  capacity;
+};
+
+/* static: invisible outside this file, no link-time collisions */
+static bool grow(IntArray *a)
+{
+    size_t bigger = a-&gt;capacity * 2;
+    int *moved = realloc(a-&gt;data, bigger * sizeof *moved);
+    if (moved == NULL) {
+        return false;               /* a-&gt;data still valid */
+    }
+    a-&gt;data = moved;
+    a-&gt;capacity = bigger;
+    return true;
+}
+
+IntArray *intarray_create(size_t initial_capacity)
+{
+    if (initial_capacity == 0) {
+        initial_capacity = DEFAULT_CAPACITY;
+    }
+
+    IntArray *a = malloc(sizeof *a);
+    if (a == NULL) {
+        return NULL;
+    }
+    a-&gt;data = malloc(initial_capacity * sizeof *a-&gt;data);
+    if (a-&gt;data == NULL) {
+        free(a);                    /* release what we got */
+        return NULL;
+    }
+    a-&gt;count = 0;
+    a-&gt;capacity = initial_capacity;
+    return a;
+}
+
+void intarray_destroy(IntArray *a)
+{
+    if (a == NULL) {
+        return;                     /* destroy(NULL) is safe, like free */
+    }
+    free(a-&gt;data);
+    free(a);
+}
+
+bool intarray_push(IntArray *a, int value)
+{
+    assert(a != NULL);
+    if (a-&gt;count == a-&gt;capacity &amp;&amp; !grow(a)) {
+        return false;
+    }
+    a-&gt;data[a-&gt;count++] = value;
+    return true;
+}
+
+bool intarray_get(const IntArray *a, size_t index, int *out)
+{
+    assert(a != NULL &amp;&amp; out != NULL);
+    if (index &gt;= a-&gt;count) {
+        return false;
+    }
+    *out = a-&gt;data[index];
+    return true;
+}
+
+size_t intarray_count(const IntArray *a)    { assert(a); return a-&gt;count; }
+size_t intarray_capacity(const IntArray *a) { assert(a); return a-&gt;capacity; }
+void   intarray_clear(IntArray *a)          { assert(a); a-&gt;count = 0; }</code></pre>
+
+  <h3><code>main.c</code> — a caller that cannot see inside</h3>
+<pre><code>#include "intarray.h"
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+/* A debug macro that reports the expression it evaluated. */
+#define TRACE(expr) \
+    fprintf(stderr, "%s:%d: %s = %zu\n", __FILE__, __LINE__, #expr, (size_t)(expr))
+
+int main(void)
+{
+    printf("compiled against C standard %ld\n", __STDC_VERSION__);
+
+    IntArray *a = intarray_create(2);
+    if (a == NULL) {
+        fprintf(stderr, "out of memory\n");
+        return EXIT_FAILURE;
+    }
+
+    for (int i = 1; i &lt;= 9; i++) {
+        if (!intarray_push(a, i * i)) {
+            fprintf(stderr, "push failed\n");
+            intarray_destroy(a);
+            return EXIT_FAILURE;
+        }
+    }
+
+    printf("count = %zu, capacity = %zu\n",
+           intarray_count(a), intarray_capacity(a));
+
+    printf("contents:");
+    for (size_t i = 0; i &lt; intarray_count(a); i++) {
+        int value;
+        if (intarray_get(a, i, &amp;value)) {
+            printf(" %d", value);
+        }
+    }
+    putchar('\n');
+
+    int value;
+    printf("index 99 -&gt; %s\n",
+           intarray_get(a, 99, &amp;value) ? "value" : "refused");
+
+    TRACE(intarray_count(a));
+
+    /* Neither of these compiles — and that is the point:
+     *   IntArray local;          // incomplete type
+     *   printf("%zu", a-&gt;count); // dereferencing an incomplete type
+     */
+
+    intarray_destroy(a);
+    intarray_destroy(NULL);        /* documented as safe */
+    return EXIT_SUCCESS;
+}</code></pre>
+
+  <h3>Building it</h3>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -c intarray.c -o intarray.o
+gcc -std=c17 -Wall -Wextra -g -fsanitize=address -c main.c     -o main.o
+gcc -fsanitize=address intarray.o main.o -o app
+./app</code></pre>
+
+  <p>Two compilations, then a link — week 2's model, now with something to link. Change only <code>main.c</code> and you recompile one file instead of the whole program, which is the practical reason projects are split at all. Week 29 automates this with a Makefile.</p>
+
+  <h3>Prove the encapsulation</h3>
+
+  <p>Add either of the commented lines in <code>main.c</code>:</p>
+
+<pre><code>IntArray local;</code></pre>
+<pre><code>error: storage size of 'local' isn't known</code></pre>
+
+<pre><code>printf("%zu", a-&gt;count);</code></pre>
+<pre><code>error: invalid use of incomplete typedef 'IntArray'</code></pre>
+
+  <p>The caller genuinely cannot reach inside. Now change the implementation — replace the array with a linked list, or add a field — and rebuild <code>intarray.c</code> only. <code>main.o</code> does not even need recompiling, because nothing it depends on changed.</p>
+
+  <h3>Provoke the multiple-definition error</h3>
+
+  <p>Add <code>int shared_counter = 0;</code> to <code>intarray.h</code> and rebuild:</p>
+
+<pre><code>/usr/bin/ld: main.o:(.bss+0x0): multiple definition of `shared_counter';
+             intarray.o:(.bss+0x0): first defined here</code></pre>
+
+  <p>Both translation units included the header and both defined the variable. Change the header to <code>extern int shared_counter;</code> and put <code>int shared_counter = 0;</code> in <code>intarray.c</code> — one declaration everywhere, one definition in exactly one place.</p>
+
+  <h3>See the macro pitfall</h3>
+
+<pre><code>#define SQUARE_BAD(x)  x * x
+#define SQUARE_OK(x)  ((x) * (x))
+
+printf("bad:  %d\n", SQUARE_BAD(2 + 3));   /* 11 */
+printf("good: %d\n", SQUARE_OK(2 + 3));    /* 25 */
+
+int i = 3;
+printf("%d\n", SQUARE_OK(i++));            /* i incremented twice */
+printf("i is now %d\n", i);                /* 5, not 4 */</code></pre>
+
+  <p>Run the preprocessor alone to see exactly what the compiler received:</p>
+<pre><code>gcc -E main.c | tail -40</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Unparenthesized macro body or parameter</td><td>Precedence changes the meaning</td><td>Parenthesize both; prefer a function.</td></tr>
+      <tr><td>A macro parameter used twice</td><td>Double evaluation of side effects</td><td>Use a <code>static inline</code> function.</td></tr>
+      <tr><td>A definition in a header</td><td><code>multiple definition</code> at link time</td><td><code>extern</code> in the header, definition in one <code>.c</code>.</td></tr>
+      <tr><td>Missing include guard</td><td>Redefinition errors</td><td><code>#ifndef</code>/<code>#define</code>/<code>#endif</code>, or <code>#pragma once</code>.</td></tr>
+      <tr><td>No <code>static</code> on helpers</td><td>Names leak; collisions across files</td><td>Anything not in the header is <code>static</code>.</td></tr>
+      <tr><td>Exposing a struct that callers then depend on</td><td>Layout frozen; every change recompiles the world</td><td>Opaque pointer.</td></tr>
+      <tr><td>Semicolon after a macro definition</td><td>It becomes part of the expansion</td><td><code>#define N 10</code>, not <code>#define N 10;</code>.</td></tr>
+      <tr><td>Large <code>#ifdef</code> blocks</td><td>Unbuilt branches never compile-checked</td><td>Keep them small; prefer runtime <code>if</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why is <code>#define SQUARE(x) ((x) * (x))</code> still not equivalent to a function?</summary>
+    <p>Because the parameter appears twice, so any side effect in the argument happens twice — <code>SQUARE(i++)</code> increments <code>i</code> twice. Parentheses fix precedence but not evaluation count. A <code>static inline</code> function evaluates each argument once and is inlined just as effectively at <code>-O2</code>.</p>
+  </details>
+
+  <details>
+    <summary>Why does putting <code>int verbose = 0;</code> in a header cause a link error?</summary>
+    <p>Because the preprocessor pastes the header into every source file that includes it, so each translation unit defines its own <code>verbose</code> and the linker finds several definitions of one external name. Headers declare; exactly one source file defines. Use <code>extern int verbose;</code> in the header.</p>
+  </details>
+
+  <details>
+    <summary>What does <code>static</code> do to a file-scope function, and why use it?</summary>
+    <p>It gives the name internal linkage, so no other translation unit can refer to it. That prevents accidental collisions at link time, documents that the function is an implementation detail, and lets the compiler optimize more aggressively because it can see every call. Everything not in the header should be <code>static</code>.</p>
+  </details>
+
+  <details>
+    <summary>What does an opaque pointer buy you, and what does it cost?</summary>
+    <p>It hides the structure's layout completely, so callers cannot depend on it and you may change the implementation without recompiling them — essential for a library with a stable interface. The costs are that callers must allocate through a create function rather than on the stack, and that every access goes through an accessor rather than reading a member directly.</p>
+  </details>
+
+  <details>
+    <summary>Why keep <code>#ifdef</code> regions small?</summary>
+    <p>Because only one configuration is compiled at a time, so code inside a branch you are not building is never seen by the compiler — it can contain syntax errors, unused variables, or stale API calls that surface only on another platform. Small regions limit the exposure, and a runtime <code>if</code> is type-checked in every build.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>That completes the Intermediate level. You have a module with a public header, a hidden implementation, an error contract, and no leaks. Week 29 opens the Advanced level by building it properly: a Makefile, then CMake, then the same code as a static and a shared library — which is the form week 45 packages and week 46 calls from Python.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_27_Error_Handling.html">← Week 27</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_29_Building_and_Libraries.html">Week 29 →</a>
+</div>
+
+</div>

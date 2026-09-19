@@ -1,0 +1,394 @@
+---
+layout: without-sidebar
+title: "Week 24 — The Standard Library Toolbox"
+permalink: /files/c/Week_24_Standard_Library_Toolbox.html
+excerpt: "math.h and linking with -lm, time.h and measuring elapsed time, pseudo-random numbers and their limits, what the library does not provide, and how to read the standard itself."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Intermediate · Week 24</div>
+  <h1>The Standard Library Toolbox</h1>
+  <p class="c-wk-lead">C's standard library is small by modern standards — about thirty headers, no containers, no networking, no string builder. Knowing precisely what is in it, and what is deliberately not, saves you from reinventing what exists and from expecting what never will.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Use <code>&lt;math.h&gt;</code> correctly, including linking it and handling its error cases.</li>
+      <li>Work with calendar time and measure elapsed time with the right clock.</li>
+      <li>Generate pseudo-random numbers without the modulo bias, and say when not to use them.</li>
+      <li>Name what the standard library does not provide and where to look instead.</li>
+      <li>Read a manual page and the text of the standard to answer a question definitively.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The shape of the library</h2>
+
+  <table>
+    <thead><tr><th>Header</th><th>Provides</th><th>Met in</th></tr></thead>
+    <tbody>
+      <tr><td><code>&lt;stdio.h&gt;</code></td><td>Formatted and file I/O</td><td>Weeks 3, 8, 26</td></tr>
+      <tr><td><code>&lt;stdlib.h&gt;</code></td><td>Allocation, conversion, exit, sorting, random</td><td>Weeks 19, 23</td></tr>
+      <tr><td><code>&lt;string.h&gt;</code></td><td>String and block memory operations</td><td>Week 14</td></tr>
+      <tr><td><code>&lt;math.h&gt;</code></td><td>Floating-point mathematics</td><td>This week</td></tr>
+      <tr><td><code>&lt;time.h&gt;</code></td><td>Calendar time and clocks</td><td>This week</td></tr>
+      <tr><td><code>&lt;ctype.h&gt;</code></td><td>Character classification</td><td>Week 14</td></tr>
+      <tr><td><code>&lt;errno.h&gt;</code></td><td>Error reporting</td><td>Weeks 23, 27</td></tr>
+      <tr><td><code>&lt;limits.h&gt;</code> <code>&lt;float.h&gt;</code></td><td>Type ranges</td><td>Week 5</td></tr>
+      <tr><td><code>&lt;stdint.h&gt;</code></td><td>Fixed-width types</td><td>Week 37</td></tr>
+      <tr><td><code>&lt;assert.h&gt;</code></td><td>Runtime assertions</td><td>Week 27</td></tr>
+      <tr><td><code>&lt;stdarg.h&gt;</code></td><td>Variable argument lists</td><td>Week 30</td></tr>
+      <tr><td><code>&lt;threads.h&gt;</code> <code>&lt;stdatomic.h&gt;</code></td><td>Concurrency</td><td>Week 41</td></tr>
+    </tbody>
+  </table>
+
+  <p>That is essentially all of it. Anything else — a hash table, a socket, a regular expression, a JSON parser — comes from the operating system, from a third-party library, or from you.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span><code>&lt;math.h&gt;</code></h2>
+
+<pre><code>#include &lt;math.h&gt;
+
+sqrt(x)   pow(x, y)   fabs(x)   fmod(x, y)
+sin(x)    cos(x)      tan(x)    atan2(y, x)
+exp(x)    log(x)      log2(x)   log10(x)
+floor(x)  ceil(x)     round(x)  trunc(x)
+fmin(a,b) fmax(a,b)   hypot(a,b)</code></pre>
+
+  <p>All take and return <code>double</code>. Variants suffixed <code>f</code> and <code>l</code> work on <code>float</code> and <code>long double</code>.</p>
+
+  <h3>Linking</h3>
+<pre><code>gcc -std=c17 -Wall -Wextra prog.c -o prog -lm</code></pre>
+
+  <p>On Linux the mathematics functions live in a separate library and the linker must be told. Omit <code>-lm</code> and you get <code>undefined reference to 'sqrt'</code> — week 2's distinction between declaration and definition, in its most common practical form. Note that <code>-lm</code> goes <em>after</em> the source files; linkers process arguments in order.</p>
+
+  <h3>Error handling</h3>
+<pre><code>errno = 0;
+double r = sqrt(-1.0);
+if (errno == EDOM) {
+    /* domain error: the input was outside the function's domain */
+}
+if (isnan(r)) { … }</code></pre>
+
+  <p>Mathematics functions report failure two ways: by setting <code>errno</code> to <code>EDOM</code> (bad input) or <code>ERANGE</code> (result out of range), and by returning <code>NaN</code> or infinity. Week 7's <code>isnan</code> and <code>isinf</code> are usually the more convenient test.</p>
+
+  <div class="c-wk-trap">
+    <p><strong><code>pow</code> is not for small integer powers.</strong> <code>pow(x, 2)</code> is a general-purpose call using logarithms; <code>x * x</code> is one instruction and exact. Worse, <code>pow</code> can return 8.999999999 for <code>pow(2, 3)</code> on some implementations, so <code>(int)pow(2, 3)</code> may be 8 — truncation of a value just below 9. Use multiplication for small powers, and <code>lround</code> if you must convert.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span><code>&lt;time.h&gt;</code></h2>
+
+  <p>Two distinct jobs, easily confused: <em>what time is it</em> and <em>how long did that take</em>.</p>
+
+  <h3>Calendar time</h3>
+<pre><code>time_t now = time(NULL);              /* seconds since the epoch */
+
+struct tm *local = localtime(&amp;now);   /* broken down, local zone */
+struct tm *utc   = gmtime(&amp;now);      /* broken down, UTC        */
+
+char buffer[64];
+strftime(buffer, sizeof buffer, "%Y-%m-%d %H:%M:%S", local);</code></pre>
+
+  <p><code>struct tm</code> has a trap of its own: <code>tm_year</code> counts from 1900 and <code>tm_mon</code> counts from 0. Printing <code>tm-&gt;tm_year</code> directly gives 125 for 2025.</p>
+
+  <p><code>localtime</code> and <code>gmtime</code> return a pointer to a <strong>static</strong> buffer, which the next call overwrites — week 17's static-duration design, with week 41's reentrancy consequences. Two calls in one <code>printf</code> give the same result twice. POSIX provides <code>localtime_r</code>, which writes into a buffer you supply.</p>
+
+  <h3>Measuring elapsed time</h3>
+<pre><code>clock_t start = clock();
+do_work();
+double cpu_seconds = (double)(clock() - start) / CLOCKS_PER_SEC;</code></pre>
+
+  <p><code>clock</code> measures <em>processor</em> time consumed by your program, not wall-clock time. A program that sleeps for ten seconds uses almost no CPU time. For wall-clock duration use <code>time</code> for second resolution, or the POSIX <code>clock_gettime(CLOCK_MONOTONIC, …)</code> for nanoseconds.</p>
+
+  <table>
+    <thead><tr><th>Measuring</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td>CPU consumed</td><td><code>clock()</code></td></tr>
+      <tr><td>Wall-clock, coarse</td><td><code>time()</code>, <code>difftime()</code></td></tr>
+      <tr><td>Wall-clock, precise</td><td><code>clock_gettime(CLOCK_MONOTONIC, …)</code> — POSIX</td></tr>
+      <tr><td>A date to display</td><td><code>localtime</code> + <code>strftime</code></td></tr>
+    </tbody>
+  </table>
+
+  <p><code>CLOCK_MONOTONIC</code> rather than the wall clock is the right choice for intervals, because the wall clock can jump backwards when the system synchronizes time. Week 34 uses it for benchmarking.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Pseudo-random numbers</h2>
+
+<pre><code>#include &lt;stdlib.h&gt;
+#include &lt;time.h&gt;
+
+srand((unsigned)time(NULL));     /* seed once, at start */
+int r = rand();                  /* 0 .. RAND_MAX */</code></pre>
+
+  <p>Three things to know, in order of how often they cause trouble.</p>
+
+  <p><strong>Seed once.</strong> Calling <code>srand</code> inside a loop reseeds the generator, and since <code>time</code> has one-second resolution, every call in the same second produces the identical sequence. The classic symptom is a "random" list where every value is the same.</p>
+
+  <p><strong><code>rand() % n</code> is biased.</strong> If <code>RAND_MAX + 1</code> is not a multiple of <code>n</code>, the lower values occur slightly more often. For a die roll with a large <code>RAND_MAX</code> the bias is negligible; for a large <code>n</code> it is not. The unbiased method rejects the uneven tail:</p>
+
+<pre><code>int uniform(int n)                /* 0 .. n-1, no bias */
+{
+    int limit = RAND_MAX - (RAND_MAX % n);
+    int value;
+    do {
+        value = rand();
+    } while (value &gt;= limit);
+    return value % n;
+}</code></pre>
+
+  <p><strong>It is not secure.</strong> <code>rand</code> is a simple deterministic generator; given a few outputs, the rest are predictable. Never use it for passwords, tokens, keys, or anything an adversary would benefit from guessing. Use the operating system's source — <code>getrandom</code> on Linux, <code>arc4random_buf</code> on the BSDs and macOS. Week 48 revisits this under security review.</p>
+
+  <p>For reproducible tests, seed with a fixed constant. A test that fails only sometimes is worse than no test.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>What is not in the library — and how to find out</h2>
+
+  <table>
+    <thead><tr><th>Not provided</th><th>Where to get it</th></tr></thead>
+    <tbody>
+      <tr><td>Growable arrays, lists, hash tables</td><td>Write them — weeks 19, 32, 33</td></tr>
+      <tr><td>Sockets, threads before C11, processes</td><td>POSIX — weeks 39, 40</td></tr>
+      <tr><td>Regular expressions</td><td>POSIX <code>&lt;regex.h&gt;</code>, or PCRE</td></tr>
+      <tr><td>JSON, XML, compression, TLS</td><td>Third-party libraries</td></tr>
+      <tr><td>A safe string builder</td><td><code>snprintf</code>, or write one</td></tr>
+      <tr><td>Unicode beyond wide characters</td><td>ICU, or handle UTF-8 yourself — week 37</td></tr>
+      <tr><td>Testing framework</td><td>Third-party — week 35</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Reading the documentation</h3>
+
+  <p>Three sources, in increasing order of authority.</p>
+
+  <p><strong>Manual pages</strong> tell you what your system does:</p>
+<pre><code>man 3 strtol        # section 3 is library functions
+man 3 printf
+man -k random       # search by keyword</code></pre>
+  <p>Read the RETURN VALUE and ERRORS sections first — they answer most questions, and they are the ones people skip.</p>
+
+  <p><strong>cppreference</strong> distinguishes what each standard version guarantees, which matters when you target C17 but read about a C23 feature.</p>
+
+  <p><strong>The standard itself</strong> is the final authority. Drafts are freely available from the WG14 site linked in the course resources; N3220 is the current C23 working draft. It is dense but surprisingly navigable: section 7 is the library, and each function has a short Description, Returns, and sometimes a Recommended practice.</p>
+
+  <div class="c-wk-note">
+    <p><strong>When to reach for the standard.</strong> When a question is about what is <em>guaranteed</em> rather than what happens to work. "Is <code>char</code> signed?" — the standard says implementation-defined. "Does <code>free(NULL)</code> work?" — the standard says yes, explicitly. Testing your own compiler answers neither question, because it tells you about one implementation. Weeks 36 and 37 depend heavily on this distinction.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: generate, measure, report</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;math.h&gt;
+#include &lt;time.h&gt;
+
+#define SAMPLES 100000
+#define BUCKETS 10
+
+/* Unbiased 0..n-1, by rejecting the uneven tail of the range. */
+static int uniform(int n)
+{
+    int limit = RAND_MAX - (RAND_MAX % n);
+    int value;
+    do {
+        value = rand();
+    } while (value &gt;= limit);
+    return value % n;
+}
+
+static double mean_of(const double *v, size_t n)
+{
+    double total = 0.0;
+    for (size_t i = 0; i &lt; n; i++) {
+        total += v[i];
+    }
+    return total / (double)n;
+}
+
+static double stddev_of(const double *v, size_t n, double mean)
+{
+    double sum_sq = 0.0;
+    for (size_t i = 0; i &lt; n; i++) {
+        double d = v[i] - mean;
+        sum_sq += d * d;
+    }
+    return sqrt(sum_sq / (double)n);
+}
+
+int main(void)
+{
+    /* --- calendar time --- */
+    puts("== what time is it ==");
+    time_t now = time(NULL);
+    struct tm local = *localtime(&amp;now);     /* copy: the buffer is static */
+    struct tm utc   = *gmtime(&amp;now);
+
+    char stamp[64];
+    strftime(stamp, sizeof stamp, "%Y-%m-%d %H:%M:%S", &amp;local);
+    printf("  local : %s\n", stamp);
+    strftime(stamp, sizeof stamp, "%Y-%m-%d %H:%M:%S UTC", &amp;utc);
+    printf("  utc   : %s\n", stamp);
+    printf("  epoch : %lld seconds\n", (long long)now);
+    printf("  note tm_year is %d (years since 1900) and tm_mon is %d (0-based)\n",
+           local.tm_year, local.tm_mon);
+
+    /* --- random numbers --- */
+    puts("\n== pseudo-random numbers ==");
+    srand((unsigned)now);                   /* seeded ONCE */
+    printf("  RAND_MAX = %d\n", RAND_MAX);
+
+    int buckets[BUCKETS] = { 0 };
+    double *values = malloc(SAMPLES * sizeof *values);
+    if (values == NULL) {
+        return EXIT_FAILURE;
+    }
+
+    clock_t t0 = clock();
+    for (size_t i = 0; i &lt; SAMPLES; i++) {
+        int b = uniform(BUCKETS);
+        buckets[b]++;
+        values[i] = (double)rand() / RAND_MAX;   /* 0.0 .. 1.0 */
+    }
+    double gen_cpu = (double)(clock() - t0) / CLOCKS_PER_SEC;
+
+    puts("  distribution across 10 buckets (expect about 10000 each):");
+    for (int b = 0; b &lt; BUCKETS; b++) {
+        printf("    %d: %6d  ", b, buckets[b]);
+        for (int bar = 0; bar &lt; buckets[b] / 400; bar++) putchar('#');
+        putchar('\n');
+    }
+
+    /* --- statistics, using math.h --- */
+    puts("\n== statistics ==");
+    double m = mean_of(values, SAMPLES);
+    double s = stddev_of(values, SAMPLES, m);
+    printf("  samples        : %d\n", SAMPLES);
+    printf("  mean           : %.6f   (expect 0.5)\n", m);
+    printf("  std deviation  : %.6f   (expect 0.2887)\n", s);
+    printf("  theoretical sd : %.6f\n", 1.0 / sqrt(12.0));
+
+    /* --- measuring time properly --- */
+    puts("\n== cpu time versus wall clock ==");
+    printf("  generating %d samples took %.4f CPU seconds\n",
+           SAMPLES, gen_cpu);
+
+    t0 = clock();
+    time_t wall_start = time(NULL);
+    double waste = 0.0;
+    for (long i = 0; i &lt; 20000000L; i++) {
+        waste += sqrt((double)i);
+    }
+    double busy_cpu  = (double)(clock() - t0) / CLOCKS_PER_SEC;
+    double busy_wall = difftime(time(NULL), wall_start);
+    printf("  busy loop: %.4f CPU seconds, %.0f wall seconds (sum %.0f)\n",
+           busy_cpu, busy_wall, waste);
+    puts("  for a CPU-bound loop these agree; for a sleeping or blocked");
+    puts("  program clock() would report almost nothing");
+
+    /* --- math.h traps --- */
+    puts("\n== math.h details ==");
+    printf("  sqrt(2)       = %.10f\n", sqrt(2.0));
+    printf("  pow(2, 10)    = %g\n", pow(2.0, 10.0));
+    printf("  2*2*2 by hand = %d   (prefer this for small powers)\n", 2*2*2);
+    printf("  fmod(7.5, 2)  = %g   (%% does not work on doubles)\n",
+           fmod(7.5, 2.0));
+    printf("  round(2.5)    = %g, trunc(2.5) = %g, floor(-2.5) = %g\n",
+           round(2.5), trunc(2.5), floor(-2.5));
+
+    errno = 0;
+    double bad = sqrt(-1.0);
+    printf("  sqrt(-1)      = %f, isnan -&gt; %d, errno==EDOM -&gt; %d\n",
+           bad, isnan(bad), errno == EDOM);
+
+    free(values);
+    return EXIT_SUCCESS;
+}</code></pre>
+
+  <p>Add <code>#include &lt;errno.h&gt;</code> for the <code>EDOM</code> check, then:</p>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o toolbox toolbox.c -lm
+./toolbox</code></pre>
+
+  <h3>Three experiments</h3>
+
+  <p><strong>Forget <code>-lm</code>.</strong> Build without it:</p>
+<pre><code>gcc -std=c17 -Wall -Wextra -o toolbox toolbox.c</code></pre>
+<pre><code>/usr/bin/ld: /tmp/cc8Xk2.o: undefined reference to `sqrt'
+collect2: error: ld returned 1 exit status</code></pre>
+  <p>The header declared it; the linker could not find the body. Exactly week 2's four-phase model, and the most common form this error takes in practice.</p>
+
+  <p><strong>Reseed inside the loop.</strong> Move <code>srand((unsigned)time(NULL));</code> into the sample loop and rerun. Every bucket but one drops to zero: within a single second, <code>time</code> returns the same value, so the generator restarts identically every iteration.</p>
+
+  <p><strong>Compare biased and unbiased.</strong> Replace <code>uniform(BUCKETS)</code> with <code>rand() % BUCKETS</code>. With <code>RAND_MAX</code> at 2 147 483 647 and ten buckets the bias is far below the noise, so the histograms look identical — which is the honest result. Now try <code>BUCKETS</code> set to a large value close to <code>RAND_MAX</code> and the skew becomes visible. Knowing when a correction matters is as useful as knowing the correction.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Forgetting <code>-lm</code></td><td><code>undefined reference to 'sqrt'</code></td><td>Add it after the source files.</td></tr>
+      <tr><td><code>srand</code> inside a loop</td><td>The same value repeatedly</td><td>Seed once at program start.</td></tr>
+      <tr><td><code>rand()</code> for tokens or keys</td><td>Predictable output; a security hole</td><td>Use the operating system's random source.</td></tr>
+      <tr><td><code>(int)pow(2, 3)</code></td><td>May be 8 through rounding</td><td>Multiply for small powers, or <code>lround</code>.</td></tr>
+      <tr><td>Keeping the pointer from <code>localtime</code></td><td>Overwritten by the next call</td><td>Copy the <code>struct tm</code>, or use <code>localtime_r</code>.</td></tr>
+      <tr><td>Printing <code>tm_year</code> directly</td><td>125 instead of 2025</td><td>Add 1900; add 1 to <code>tm_mon</code>.</td></tr>
+      <tr><td><code>clock()</code> to measure a sleeping program</td><td>Reports almost zero</td><td><code>clock_gettime(CLOCK_MONOTONIC, …)</code>.</td></tr>
+      <tr><td>Assuming the library has containers</td><td>Wasted search</td><td>It does not. Write them, or take a dependency.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why does <code>#include &lt;math.h&gt;</code> not remove the need for <code>-lm</code>?</summary>
+    <p>Because a header supplies declarations, not definitions. The compiler learns the signature of <code>sqrt</code> and type-checks the call; the function's machine code lives in the maths library, which the linker only searches when told. This is the same declaration-versus-definition split that week 2 traced through the four translation phases.</p>
+  </details>
+
+  <details>
+    <summary>Why does reseeding inside a loop produce identical values?</summary>
+    <p><code>srand</code> resets the generator to a starting state determined entirely by the seed. Seeding with <code>time(NULL)</code>, which changes once per second, restarts the same sequence on every iteration within that second — so each call to <code>rand</code> returns the first value of that sequence. Seed exactly once.</p>
+  </details>
+
+  <details>
+    <summary>What is wrong with <code>rand() % 6</code> for a die roll, and how much does it matter?</summary>
+    <p>If <code>RAND_MAX + 1</code> is not divisible by 6, the low faces occur slightly more often, because the surplus values at the top of the range map onto them. With <code>RAND_MAX</code> above two billion the bias is far below measurement noise for six outcomes; it becomes significant only when the range is a substantial fraction of <code>RAND_MAX</code>. The unbiased fix is to reject the uneven tail before taking the remainder.</p>
+  </details>
+
+  <details>
+    <summary>When does <code>clock()</code> give a misleading answer?</summary>
+    <p>Whenever the program is not doing work — sleeping, waiting on input, blocked on a network read. <code>clock</code> measures processor time consumed, so a program that waits ten seconds reports near zero. For elapsed wall-clock time use <code>time</code>/<code>difftime</code> for coarse resolution or <code>clock_gettime(CLOCK_MONOTONIC, …)</code> for precision.</p>
+  </details>
+
+  <details>
+    <summary>When should you consult the standard rather than test your compiler?</summary>
+    <p>Whenever the question is what is <em>guaranteed</em> rather than what happens to work here. Whether <code>char</code> is signed, whether <code>free(NULL)</code> is safe, whether signed overflow wraps — testing one implementation answers none of these, because a different compiler or optimization level may behave differently. Weeks 36 and 37 are built entirely on that distinction.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 25 drops to the level below the library: the bitwise operators, masks, and bit-fields that let you manipulate individual bits. That is the foundation for the flag handling in week 31, the checksums of week 37, and the hardware registers of week 50 — and it is where week 4's binary representation finally becomes something you operate on directly.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_23_Program_Arguments_and_Input.html">← Week 23</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_25_Bit_Level_Operations.html">Week 25 →</a>
+</div>
+
+</div>

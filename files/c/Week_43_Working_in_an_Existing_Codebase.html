@@ -1,0 +1,365 @@
+---
+layout: without-sidebar
+title: "Week 43 — Working in an Existing Codebase"
+permalink: /files/c/Week_43_Working_in_an_Existing_Codebase.html
+excerpt: "Navigating unfamiliar C with grep, ctags and a language server; reading before writing; following conventions you did not choose; git bisect; and the minimal reviewable change."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Professional · Week 43</div>
+  <h1>Working in an Existing Codebase</h1>
+  <p class="c-wk-lead">Almost no professional work starts from an empty file. It starts from a bug report against two hundred thousand lines nobody currently understands in full. This week is the workflow for that — locating the defect, understanding enough to be confident, and changing as little as possible.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Orient yourself in an unfamiliar codebase within an hour.</li>
+      <li>Find every use of a symbol, and its definition, in seconds.</li>
+      <li>Locate the commit that introduced a regression with <code>git bisect</code>.</li>
+      <li>Infer the invariants a function relies on before modifying it.</li>
+      <li>Produce a change small enough that a reviewer can be certain of it.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The first hour</h2>
+
+  <p>Resist the urge to open the file named in the bug report. Spend the first hour on orientation; it pays for itself immediately.</p>
+
+  <ol>
+    <li><strong>Build it.</strong> Before anything else. A codebase you cannot compile is one you cannot test a hypothesis against.</li>
+    <li><strong>Run the tests.</strong> Note which already fail — otherwise you will spend an afternoon on a failure you did not cause.</li>
+    <li><strong>Read the directory structure.</strong> Five minutes with <code>ls</code> and <code>cloc</code> reveals the architecture.</li>
+    <li><strong>Read the public headers.</strong> They are the intended summary of what the code does.</li>
+    <li><strong>Find the entry point</strong> and follow one path end to end.</li>
+  </ol>
+
+<pre><code>cloc .                          # size, languages, where the weight is
+ls -R src include | head -50
+git log --oneline -20           # what is being worked on now
+git shortlog -sn | head         # who to ask
+wc -l src/*.c | sort -n | tail  # the biggest files are usually the core</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Navigation</h2>
+
+<pre><code># grep, always available
+grep -rn "symbol" --include='*.c' --include='*.h' .
+grep -rn "\bparse_config\b" .              # word boundary: fewer false hits
+grep -rln "TODO\|FIXME\|XXX" src/          # known soft spots
+
+# ctags: jump to definitions
+ctags -R .
+vim -t parse_config                        # or Ctrl-] on the identifier
+
+# a language server: exact, not textual
+bear -- make                               # produce compile_commands.json
+# then clangd in any editor: go to definition, find all references</code></pre>
+
+  <p>The difference matters. <code>grep</code> finds the text <code>count</code> in comments, in other identifiers, and in strings. A language server knows which <code>count</code> you mean, follows it through macros, and finds every reference and no others. On a large codebase that is the difference between a list of four hundred hits and a list of six.</p>
+
+  <table>
+    <thead><tr><th>Question</th><th>Command</th></tr></thead>
+    <tbody>
+      <tr><td>Where is this defined?</td><td><code>ctags</code>, or clangd's go-to-definition</td></tr>
+      <tr><td>Who calls this?</td><td><code>grep -rn</code>, or find-all-references</td></tr>
+      <tr><td>What does this header expose?</td><td><code>grep '^[a-z].*(' header.h</code></td></tr>
+      <tr><td>Who actually calls it at run time?</td><td>A breakpoint and <code>bt</code> in GDB</td></tr>
+      <tr><td>When did this line appear?</td><td><code>git blame</code></td></tr>
+      <tr><td>When did this symbol appear?</td><td><code>git log -S symbol</code></td></tr>
+    </tbody>
+  </table>
+
+  <p>The fourth row deserves emphasis. Static analysis of C is limited by function pointers, macros, and conditional compilation. A breakpoint and a backtrace answer "who calls this" definitively, in one run.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Reading before writing</h2>
+
+  <p>Before changing a function, establish four things. None is usually written down.</p>
+
+  <table>
+    <thead><tr><th>Find out</th><th>How</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Preconditions</strong> — what must be true on entry</td><td>Read three call sites. What do they all check first?</td></tr>
+      <tr><td><strong>Postconditions</strong> — what callers rely on</td><td>What do callers do with the result without checking?</td></tr>
+      <tr><td><strong>Ownership</strong> — who frees what</td><td>Follow one allocation from creation to <code>free</code></td></tr>
+      <tr><td><strong>Error convention</strong> — how failure travels</td><td>The return type, and what the callers test</td></tr>
+    </tbody>
+  </table>
+
+  <p>Three call sites is a rule of thumb worth following literally. One tells you what is possible; three tell you what is normal.</p>
+
+  <div class="c-wk-note">
+    <p><strong>Chesterton's fence.</strong> Code that looks unnecessary usually is not. Before deleting an apparently redundant check, run <code>git log -S</code> on it — a one-line guard often has a commit message naming the bug it fixed. If the history is silent and you still cannot explain it, that is a reason to be careful, not a licence to remove it.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span><code>git bisect</code></h2>
+
+  <p>"It worked in version 2.1 and fails in 2.4" — with four hundred commits in between. Bisection finds the guilty one in about nine steps by binary search over history.</p>
+
+<pre><code>git bisect start
+git bisect bad                  # the current commit is broken
+git bisect good v2.1            # this one worked
+# git checks out a commit in the middle
+make &amp;&amp; ./run_the_test
+git bisect good                 # or: git bisect bad
+# repeat until git names the commit
+git bisect reset                # return to where you started</code></pre>
+
+  <p>Automate it and the whole search takes one command:</p>
+
+<pre><code>git bisect start HEAD v2.1
+git bisect run ./check.sh       # exit 0 = good, non-zero = bad</code></pre>
+
+<pre><code>#!/bin/sh
+# check.sh — exit 0 if the build is good
+make clean &amp;&amp; make &gt;/dev/null 2&gt;&amp;1 || exit 125   # 125 = skip, untestable
+./prog test_input | grep -q "expected output"</code></pre>
+
+  <p>Exit code 125 marks a commit as <em>untestable</em> — it does not build, so it is skipped rather than blamed. Without it, a broken intermediate commit derails the search.</p>
+
+  <p>Bisection is the single highest-leverage technique in this session. Nine builds against reading four hundred diffs, and the result is a specific commit with a message and an author.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>The minimal change</h2>
+
+  <p>Once you know the cause, the temptation is to fix everything nearby. Resist it, for reasons that are practical rather than aesthetic.</p>
+
+  <table>
+    <thead><tr><th>Small change</th><th>Large change</th></tr></thead>
+    <tbody>
+      <tr><td>Reviewed properly</td><td>Approved without being read</td></tr>
+      <tr><td>Bisects cleanly later</td><td>Hides the next regression</td></tr>
+      <tr><td>Reverts cleanly</td><td>Reverting removes the good with the bad</td></tr>
+      <tr><td>Backports to a release branch</td><td>Does not</td></tr>
+    </tbody>
+  </table>
+
+  <p>The rules that follow:</p>
+
+  <ul>
+    <li><strong>One change per commit.</strong> A fix and a cleanup are two commits even if they touch one line each.</li>
+    <li><strong>No drive-by reformatting.</strong> A whitespace change across a file turns a one-line diff into an unreviewable one. If the file needs reformatting, that is a separate commit, ideally its own pull request.</li>
+    <li><strong>Match the local style even where you dislike it.</strong> Consistency within a file beats correctness of style.</li>
+    <li><strong>Add a regression test.</strong> A fix without one will be undone within a year.</li>
+    <li><strong>Explain the why in the commit message.</strong> The diff shows what changed; only you know why.</li>
+  </ul>
+
+<pre><code>Fix use-after-free when config reload fails
+
+parse_config() freed the old config before validating the new one,
+so a malformed file left the global pointer dangling and the next
+request dereferenced freed memory.
+
+Validate first, then swap and free. Adds a regression test that
+reloads with a syntax error and checks the old config survives.
+
+Fixes: #1234</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: a regression, found and fixed</h2>
+
+  <p>Build a small repository with a bug buried in its history, then find it the way you would at work.</p>
+
+<pre><code>mkdir -p bisect-demo &amp;&amp; cd bisect-demo &amp;&amp; git init -q</code></pre>
+
+  <p>Commit 1 — a working version:</p>
+
+<pre><code>cat &gt; stats.c &lt;&lt;'EOF'
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+/* Returns the mean of n values. Caller guarantees n &gt; 0. */
+static double mean(const int *v, size_t n)
+{
+    long total = 0;
+    for (size_t i = 0; i &lt; n; i++) total += v[i];
+    return (double)total / (double)n;
+}
+
+static int maximum(const int *v, size_t n)
+{
+    int best = v[0];
+    for (size_t i = 1; i &lt; n; i++) if (v[i] &gt; best) best = v[i];
+    return best;
+}
+
+int main(int argc, char *argv[])
+{
+    if (argc &lt; 2) { fprintf(stderr, "usage: %s N...\n", argv[0]); return 2; }
+
+    size_t n = (size_t)(argc - 1);
+    int *v = malloc(n * sizeof *v);
+    if (v == NULL) return 1;
+    for (size_t i = 0; i &lt; n; i++) v[i] = atoi(argv[i + 1]);
+
+    printf("count %zu mean %.2f max %d\n", n, mean(v, n), maximum(v, n));
+    free(v);
+    return 0;
+}
+EOF
+cat &gt; check.sh &lt;&lt;'EOF'
+#!/bin/sh
+gcc -std=c17 -Wall -Wextra -o stats stats.c 2>/dev/null || exit 125
+./stats 1 2 3 | grep -q "count 3 mean 2.00 max 3"
+EOF
+chmod +x check.sh
+git add . &amp;&amp; git commit -qm "Add stats tool"</code></pre>
+
+  <p>Now ten commits of ordinary churn, with the bug introduced in the middle:</p>
+
+<pre><code>for i in 1 2 3; do
+  echo "/* comment $i */" &gt;&gt; stats.c
+  git commit -qam "Document internals, part $i"
+done
+
+# the regression: a bounds change that looks like a cleanup
+sed -i 's/for (size_t i = 1; i &lt; n; i++) if (v\[i\]/for (size_t i = 1; i &lt;= n; i++) if (v[i]/' stats.c
+git commit -qam "Simplify the maximum loop"
+
+for i in 4 5 6; do
+  echo "/* comment $i */" &gt;&gt; stats.c
+  git commit -qam "Document internals, part $i"
+done</code></pre>
+
+  <p>Confirm it is broken, then bisect:</p>
+
+<pre><code>./check.sh; echo "check says $?"      # non-zero under a sanitizer build
+
+git bisect start HEAD HEAD~7
+git bisect run ./check.sh</code></pre>
+
+<pre><code>a1b2c3d is the first bad commit
+    Simplify the maximum loop
+
+ stats.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)</code></pre>
+
+  <p>Seven commits, three builds, and the answer is a specific commit with its diff. Reading seven diffs by hand would have worked here; reading four hundred would not, and the procedure is identical.</p>
+
+<pre><code>git bisect reset</code></pre>
+
+  <h3>Make the sanitizer do the detecting</h3>
+
+  <p>The bug reads one element past the end. Without instrumentation the output is often still correct, because the byte past the array happens to be small — the silent case from week 12. Strengthen the check:</p>
+
+<pre><code>cat &gt; check.sh &lt;&lt;'EOF'
+#!/bin/sh
+gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o stats stats.c 2>/dev/null \
+    || exit 125
+./stats 1 2 3 2>&1 | grep -q "count 3 mean 2.00 max 3" || exit 1
+./stats 1 2 3 2>&1 | grep -q "AddressSanitizer" &amp;&amp; exit 1
+exit 0
+EOF</code></pre>
+
+  <p>Now the check fails on the memory error rather than on the visible output, so it catches the commit even when the wrong answer happens to look right. A bisect script is only as good as its test — which is the same point week 35 made about CI.</p>
+
+  <h3>Investigate before fixing</h3>
+
+<pre><code>git show a1b2c3d                       # what exactly changed
+git log -S "i &lt;= n" --oneline          # was this pattern used elsewhere?
+grep -rn "maximum(" .                  # who calls it
+git blame -L 12,20 stats.c             # who wrote the surrounding lines</code></pre>
+
+  <p>Answer the four questions from section 3 before touching anything. <code>maximum</code>'s precondition is <code>n &gt; 0</code> — visible from <code>v[0]</code> in the first line, and from the single caller checking <code>argc &lt; 2</code>. Its postcondition is an element of the array. That is enough to know the fix is the bound and nothing else.</p>
+
+  <h3>The minimal change</h3>
+
+<pre><code>sed -i 's/i &lt;= n; i++) if (v\[i\]/i &lt; n; i++) if (v[i]/' stats.c</code></pre>
+
+  <p>One character. Now resist the four other things you noticed: <code>atoi</code> should be <code>strtol</code> (week 23), <code>mean</code>'s precondition is undocumented, the error message could name the program, and the comments are noise. Every one is a real improvement and none belongs in this commit.</p>
+
+<pre><code>git add stats.c
+git commit -q -F - &lt;&lt;'EOF'
+Fix off-by-one in maximum()
+
+Commit a1b2c3d changed the loop bound from i &lt; n to i &lt;= n while
+simplifying, so maximum() reads one element past the end of the
+array. AddressSanitizer reports a heap-buffer-overflow; without it
+the wrong value is usually plausible, which is why it was not
+noticed in review.
+
+Restore the half-open bound. Adds the sanitizer build to check.sh
+so this class of defect fails the check rather than passing it.
+EOF</code></pre>
+
+  <p>The message says what broke, when, why it was missed, and what prevents a recurrence. A reviewer can approve it without reconstructing any of that.</p>
+
+  <h3>Then open a separate issue for the rest</h3>
+
+<pre><code>git checkout -b cleanup-stats
+# atoi → strtol with error checking, document the preconditions
+git commit -qam "Validate numeric arguments with strtol"</code></pre>
+
+  <p>A separate branch and a separate review. The fix can be merged and backported today; the cleanup can be discussed at leisure. Coupling them delays the fix for the sake of the cleanup, which is the wrong trade every time.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Editing before building and testing</td><td>Blamed for a pre-existing failure</td><td>Establish the baseline first.</td></tr>
+      <tr><td>Reading four hundred diffs by hand</td><td>Hours lost</td><td><code>git bisect run</code>.</td></tr>
+      <tr><td>A bisect script that is too weak</td><td>Blames the wrong commit</td><td>Make the test detect the actual defect.</td></tr>
+      <tr><td>No exit 125 for unbuildable commits</td><td>A broken build is reported as the cause</td><td>Skip them explicitly.</td></tr>
+      <tr><td>Deleting code you do not understand</td><td>Reintroduces an old bug</td><td><code>git log -S</code> first.</td></tr>
+      <tr><td>Reformatting while fixing</td><td>The real change is invisible in the diff</td><td>Separate commits.</td></tr>
+      <tr><td>Fixing without a regression test</td><td>The bug returns</td><td>Add the test in the same commit.</td></tr>
+      <tr><td>A commit message that restates the diff</td><td>The reason is lost forever</td><td>Explain why, not what.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why build and run the tests before reading any code?</summary>
+    <p>To establish a baseline. Without it you cannot distinguish a failure you caused from one that was already there, and you cannot test any hypothesis about the bug. It also forces you to solve the build problems while they are the only problem you have.</p>
+  </details>
+
+  <details>
+    <summary>What does exit code 125 mean to <code>git bisect run</code>?</summary>
+    <p>That this commit cannot be tested — typically it does not build — so it should be skipped rather than judged. Without it, a commit that fails to compile is recorded as bad and the search converges on the wrong change. Any bisect script should return 125 when the build fails.</p>
+  </details>
+
+  <details>
+    <summary>Why read three call sites rather than one before changing a function?</summary>
+    <p>Because one call site shows what is possible and three show what is normal. The preconditions a function relies on are rarely documented; they are visible as the checks every caller performs first. Three samples distinguish a genuine invariant from one caller's local habit.</p>
+  </details>
+
+  <details>
+    <summary>Give two practical reasons a small change is better than a large one.</summary>
+    <p>It is actually reviewed rather than approved unread, and it bisects and reverts cleanly later. A large change that mixes a fix with a cleanup cannot be backported to a release branch, and if it turns out to be wrong, reverting it removes the good parts with the bad.</p>
+  </details>
+
+  <details>
+    <summary>Why does a commit message explain why rather than what?</summary>
+    <p>Because the diff already shows what changed, and shows it more precisely than prose can. What no tool can recover is the reasoning: which bug this fixes, what was tried first, why the obvious alternative was rejected. That is what the next person — often you — needs in two years.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 44 submits this change: branching, the review workflow, and reviewing someone else's C against a memory-safety checklist. The regression test added here is what makes the change reviewable, and the small scope is what makes the review possible at all.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_42_Reading_Excellent_C.html">← Week 42</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_44_Collaborative_Development_and_Code_Review.html">Week 44 →</a>
+</div>
+
+</div>

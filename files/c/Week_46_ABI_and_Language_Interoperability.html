@@ -1,0 +1,502 @@
+---
+layout: without-sidebar
+title: "Week 46 — ABI and Interfacing with Other Languages"
+permalink: /files/c/Week_46_ABI_and_Language_Interoperability.html
+excerpt: "Calling conventions and the platform ABI, name mangling and extern C, calling C from Python, Rust and Java, ownership across a language boundary, and inline assembly."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Professional · Week 46</div>
+  <h1>ABI and Interfacing with Other Languages</h1>
+  <p class="c-wk-lead">C's most common role today is not as an application language but as the layer everything else calls. Python, Rust, Java, Go, and Ruby all speak C's calling convention because it is the one the operating system speaks — which makes designing a C API for foreign callers a distinct skill.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Describe how arguments and return values are actually passed.</li>
+      <li>Explain name mangling and what <code>extern "C"</code> does.</li>
+      <li>Call a C library from Python, Rust, and C++.</li>
+      <li>Design an interface that survives a foreign caller's memory model.</li>
+      <li>Read inline assembly and know when an intrinsic is the better tool.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The calling convention</h2>
+
+  <p>An ABI specifies what the source language does not: which registers carry arguments, who saves what, how the stack is aligned, how a returned structure is delivered. It is fixed per platform, which is what lets code from different compilers and different languages link together.</p>
+
+  <p>On x86-64 System V — Linux, macOS, the BSDs:</p>
+
+  <table>
+    <thead><tr><th>Item</th><th>Where</th></tr></thead>
+    <tbody>
+      <tr><td>Integer and pointer arguments 1–6</td><td><code>rdi rsi rdx rcx r8 r9</code></td></tr>
+      <tr><td>Floating-point arguments 1–8</td><td><code>xmm0</code>–<code>xmm7</code></td></tr>
+      <tr><td>Further arguments</td><td>On the stack, right to left</td></tr>
+      <tr><td>Integer return</td><td><code>rax</code> (and <code>rdx</code> for 128 bits)</td></tr>
+      <tr><td>Floating-point return</td><td><code>xmm0</code></td></tr>
+      <tr><td>A large returned struct</td><td>The caller passes a hidden pointer in <code>rdi</code></td></tr>
+      <tr><td>Callee-saved</td><td><code>rbx rbp r12 r13 r14 r15</code></td></tr>
+    </tbody>
+  </table>
+
+  <p>Windows x64 uses different registers entirely — <code>rcx rdx r8 r9</code> — which is why a library compiled for one does not link against the other. You rarely need the details, but two facts matter in practice: <strong>a small struct may be passed in registers while a large one is passed by hidden pointer</strong>, and that threshold is part of the ABI. Changing a struct from 16 to 24 bytes can change how every function taking it is called, which is week 45's ABI break in its least obvious form.</p>
+
+  <p>Read it yourself with week 34's technique:</p>
+
+<pre><code>gcc -O2 -S -masm=intel example.c -o example.s</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Name mangling and <code>extern "C"</code></h2>
+
+  <p>C exports a function under its own name. C++ cannot, because it permits overloading, so it encodes the parameter types into the symbol:</p>
+
+<pre><code>/* C */    int add(int, int);   →  symbol: add
+/* C++ */  int add(int, int);   →  symbol: _Z3addii</code></pre>
+
+<pre><code>nm -D libfoo.so | c++filt        # decode mangled names</code></pre>
+
+  <p><code>extern "C"</code> tells a C++ compiler to use C linkage — no mangling, C calling convention — which is why the guard belongs in every public C header:</p>
+
+<pre><code>#ifdef __cplusplus
+extern "C" {
+#endif
+    /* declarations */
+#ifdef __cplusplus
+}
+#endif</code></pre>
+
+  <p>The <code>__cplusplus</code> test is required because <code>extern "C"</code> is not valid C. With the guard, one header serves both languages; without it, a C++ program linking your library gets undefined references to mangled names that do not exist.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Designing for foreign callers</h2>
+
+  <p>A C API that is pleasant from C can be unusable from Python. The constraints a foreign language imposes:</p>
+
+  <table>
+    <thead><tr><th>Avoid</th><th>Because</th><th>Instead</th></tr></thead>
+    <tbody>
+      <tr><td>Structs passed by value</td><td>Layout and padding must be replicated exactly</td><td>Opaque pointers</td></tr>
+      <tr><td>Function-like macros</td><td>Invisible outside C</td><td>Real functions</td></tr>
+      <tr><td>Variadic functions</td><td>Most FFIs cannot call them portably</td><td>An array plus a count</td></tr>
+      <tr><td>Returning a pointer to static data</td><td>Unclear lifetime; not thread-safe</td><td>Caller-supplied buffer</td></tr>
+      <tr><td><code>errno</code> for errors</td><td>Thread-local and awkward to read across an FFI</td><td>An explicit return code</td></tr>
+      <tr><td>Callbacks with unclear lifetime</td><td>The garbage collector may move or free the target</td><td>Register and unregister explicitly</td></tr>
+    </tbody>
+  </table>
+
+  <p>The rule that follows: <strong>a good FFI surface is narrow, opaque, and explicit.</strong> Handles rather than structs, return codes rather than <code>errno</code>, and one <code>free</code> function per allocating function.</p>
+
+  <h3>Ownership across the boundary</h3>
+
+  <p>This is where real programs break. Python's garbage collector may free a buffer while your C code still holds the pointer; Rust's borrow checker cannot see into C at all; a Java array may be <em>moved</em> by the collector during a call.</p>
+
+  <ul>
+    <li><strong>C allocates, C frees.</strong> Always export a matching <code>free</code> — <code>intarray_destroy</code>, not the caller's <code>free()</code>. The caller's allocator is not necessarily yours.</li>
+    <li><strong>Caller allocates, caller frees.</strong> Take a buffer and a size. Simplest and safest.</li>
+    <li><strong>Never</strong> return a pointer into memory the other language owns and expect it to stay valid.</li>
+  </ul>
+
+  <div class="c-wk-trap">
+    <p><strong>Never <code>free()</code> a pointer that came from another language's allocator, or let it <code>free()</code> one of yours.</strong> On Windows a library and its caller can be linked against different C runtimes with separate heaps, and crossing them corrupts both. This is why well-designed C libraries always export their own deallocation function.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Worked example: one library, three callers</h2>
+
+  <h3>The C side</h3>
+
+<pre><code>/* mathlib.h */
+#ifndef MATHLIB_H
+#define MATHLIB_H
+
+#include &lt;stddef.h&gt;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef enum {
+    ML_OK = 0,
+    ML_ERR_NULL     = 1,
+    ML_ERR_EMPTY    = 2,
+    ML_ERR_NOMEM    = 3
+} MlStatus;
+
+/* Scalars: the easiest thing to call from anywhere. */
+int    ml_add(int a, int b);
+double ml_mean(const double *values, size_t count, MlStatus *status);
+
+/* A caller-supplied buffer: no ownership question at all. */
+MlStatus ml_scale(const double *in, double *out, size_t count, double factor);
+
+/* C allocates, C frees — the pair must be used together. */
+double  *ml_make_range(double start, double step, size_t count);
+void     ml_free(double *p);
+
+/* An opaque handle: a foreign caller never needs the layout. */
+typedef struct MlAccumulator MlAccumulator;
+
+MlAccumulator *ml_acc_create(void);
+void           ml_acc_destroy(MlAccumulator *acc);
+MlStatus       ml_acc_add(MlAccumulator *acc, double value);
+double         ml_acc_mean(const MlAccumulator *acc);
+size_t         ml_acc_count(const MlAccumulator *acc);
+
+/* A callback: explicit context, no hidden state. */
+typedef int (*MlVisitor)(double value, void *context);
+MlStatus ml_each(const double *values, size_t count,
+                 MlVisitor visit, void *context);
+
+const char *ml_status_string(MlStatus s);
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* MATHLIB_H */</code></pre>
+
+<pre><code>/* mathlib.c */
+#include "mathlib.h"
+#include &lt;stdlib.h&gt;
+
+struct MlAccumulator {          /* definition stays here */
+    double total;
+    size_t count;
+};
+
+int ml_add(int a, int b) { return a + b; }
+
+double ml_mean(const double *values, size_t count, MlStatus *status)
+{
+    if (values == NULL) { if (status) *status = ML_ERR_NULL;  return 0.0; }
+    if (count == 0)     { if (status) *status = ML_ERR_EMPTY; return 0.0; }
+
+    double total = 0.0;
+    for (size_t i = 0; i &lt; count; i++) total += values[i];
+    if (status) *status = ML_OK;
+    return total / (double)count;
+}
+
+MlStatus ml_scale(const double *in, double *out, size_t count, double factor)
+{
+    if (in == NULL || out == NULL) return ML_ERR_NULL;
+    for (size_t i = 0; i &lt; count; i++) out[i] = in[i] * factor;
+    return ML_OK;
+}
+
+double *ml_make_range(double start, double step, size_t count)
+{
+    if (count == 0) return NULL;
+    double *v = malloc(count * sizeof *v);
+    if (v == NULL) return NULL;
+    for (size_t i = 0; i &lt; count; i++) v[i] = start + (double)i * step;
+    return v;                      /* caller must call ml_free */
+}
+
+void ml_free(double *p) { free(p); }
+
+MlAccumulator *ml_acc_create(void)
+{
+    MlAccumulator *a = calloc(1, sizeof *a);
+    return a;
+}
+
+void ml_acc_destroy(MlAccumulator *a) { free(a); }
+
+MlStatus ml_acc_add(MlAccumulator *a, double v)
+{
+    if (a == NULL) return ML_ERR_NULL;
+    a-&gt;total += v;
+    a-&gt;count++;
+    return ML_OK;
+}
+
+double ml_acc_mean(const MlAccumulator *a)
+{
+    return (a == NULL || a-&gt;count == 0) ? 0.0 : a-&gt;total / (double)a-&gt;count;
+}
+
+size_t ml_acc_count(const MlAccumulator *a)
+{
+    return (a == NULL) ? 0 : a-&gt;count;
+}
+
+MlStatus ml_each(const double *values, size_t count,
+                 MlVisitor visit, void *context)
+{
+    if (values == NULL || visit == NULL) return ML_ERR_NULL;
+    for (size_t i = 0; i &lt; count; i++) {
+        if (visit(values[i], context) != 0) break;   /* non-zero stops */
+    }
+    return ML_OK;
+}
+
+const char *ml_status_string(MlStatus s)
+{
+    switch (s) {
+    case ML_OK:        return "ok";
+    case ML_ERR_NULL:  return "null pointer";
+    case ML_ERR_EMPTY: return "empty input";
+    case ML_ERR_NOMEM: return "out of memory";
+    }
+    return "unknown";
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -O2 -fPIC -shared -o libmathlib.so mathlib.c</code></pre>
+
+  <h3>Caller 1 — Python with <code>ctypes</code></h3>
+
+<pre><code># app.py
+import ctypes, os
+
+lib = ctypes.CDLL(os.path.abspath("libmathlib.so"))
+
+# Declare every signature. ctypes assumes int otherwise, and a wrong
+# assumption about a double is silent corruption, not an error.
+lib.ml_add.argtypes = [ctypes.c_int, ctypes.c_int]
+lib.ml_add.restype  = ctypes.c_int
+
+lib.ml_mean.argtypes = [ctypes.POINTER(ctypes.c_double), ctypes.c_size_t,
+                        ctypes.POINTER(ctypes.c_int)]
+lib.ml_mean.restype  = ctypes.c_double
+
+lib.ml_make_range.argtypes = [ctypes.c_double, ctypes.c_double, ctypes.c_size_t]
+lib.ml_make_range.restype  = ctypes.POINTER(ctypes.c_double)
+lib.ml_free.argtypes = [ctypes.POINTER(ctypes.c_double)]
+
+lib.ml_acc_create.restype   = ctypes.c_void_p        # opaque handle
+lib.ml_acc_destroy.argtypes = [ctypes.c_void_p]
+lib.ml_acc_add.argtypes     = [ctypes.c_void_p, ctypes.c_double]
+lib.ml_acc_mean.argtypes    = [ctypes.c_void_p]
+lib.ml_acc_mean.restype     = ctypes.c_double
+
+VISITOR = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_double, ctypes.c_void_p)
+lib.ml_each.argtypes = [ctypes.POINTER(ctypes.c_double), ctypes.c_size_t,
+                        VISITOR, ctypes.c_void_p]
+
+print("ml_add(3, 4) =", lib.ml_add(3, 4))
+
+data = (ctypes.c_double * 5)(1.0, 2.0, 3.0, 4.0, 5.0)
+status = ctypes.c_int()
+print("ml_mean =", lib.ml_mean(data, 5, ctypes.byref(status)),
+      "status", status.value)
+
+# C allocated it, so C must free it.
+p = lib.ml_make_range(0.0, 0.5, 6)
+print("range =", [p[i] for i in range(6)])
+lib.ml_free(p)
+
+acc = lib.ml_acc_create()
+for v in (10.0, 20.0, 30.0):
+    lib.ml_acc_add(acc, v)
+print("accumulator mean =", lib.ml_acc_mean(acc))
+lib.ml_acc_destroy(acc)
+
+# A Python function called back from C. The reference must be kept
+# alive in a variable — if it is garbage collected mid-call, C jumps
+# into freed memory.
+total = [0.0]
+def on_value(value, _ctx):
+    total[0] += value
+    return 0
+callback = VISITOR(on_value)          # keep this name bound
+lib.ml_each(data, 5, callback, None)
+print("visited total =", total[0])</code></pre>
+
+<pre><code>python3 app.py</code></pre>
+
+  <h3>Caller 2 — Rust</h3>
+
+<pre><code>// main.rs
+use std::os::raw::{c_double, c_int, c_void};
+
+#[link(name = "mathlib")]
+extern "C" {
+    fn ml_add(a: c_int, b: c_int) -&gt; c_int;
+    fn ml_mean(values: *const c_double, count: usize,
+               status: *mut c_int) -&gt; c_double;
+    fn ml_make_range(start: c_double, step: c_double,
+                     count: usize) -&gt; *mut c_double;
+    fn ml_free(p: *mut c_double);
+    fn ml_acc_create() -&gt; *mut c_void;
+    fn ml_acc_destroy(acc: *mut c_void);
+    fn ml_acc_add(acc: *mut c_void, value: c_double) -&gt; c_int;
+    fn ml_acc_mean(acc: *const c_void) -&gt; c_double;
+}
+
+fn main() {
+    // Every call is unsafe: Rust cannot verify C's contracts.
+    unsafe {
+        println!("ml_add(3, 4) = {}", ml_add(3, 4));
+
+        let data = [1.0_f64, 2.0, 3.0, 4.0, 5.0];
+        let mut status: c_int = 0;
+        let mean = ml_mean(data.as_ptr(), data.len(), &amp;mut status);
+        println!("ml_mean = {mean} status {status}");
+
+        let p = ml_make_range(0.0, 0.5, 6);
+        let slice = std::slice::from_raw_parts(p, 6);
+        println!("range = {slice:?}");
+        ml_free(p);                       // C's allocator, not Rust's
+
+        let acc = ml_acc_create();
+        for v in [10.0, 20.0, 30.0] {
+            ml_acc_add(acc, v);
+        }
+        println!("accumulator mean = {}", ml_acc_mean(acc));
+        ml_acc_destroy(acc);
+    }
+}</code></pre>
+
+<pre><code>rustc -L . main.rs -o rustapp
+LD_LIBRARY_PATH=. ./rustapp</code></pre>
+
+  <h3>Caller 3 — C++</h3>
+
+<pre><code>// app.cpp
+#include "mathlib.h"        // the extern "C" guard does the work
+#include &lt;iostream&gt;
+#include &lt;memory&gt;
+#include &lt;vector&gt;
+
+int main()
+{
+    std::cout &lt;&lt; "ml_add(3, 4) = " &lt;&lt; ml_add(3, 4) &lt;&lt; '\n';
+
+    std::vector&lt;double&gt; data{ 1.0, 2.0, 3.0, 4.0, 5.0 };
+    MlStatus status;
+    double mean = ml_mean(data.data(), data.size(), &amp;status);
+    std::cout &lt;&lt; "ml_mean = " &lt;&lt; mean
+              &lt;&lt; " (" &lt;&lt; ml_status_string(status) &lt;&lt; ")\n";
+
+    // Wrap the C handle so the destructor cannot be forgotten.
+    auto acc = std::unique_ptr&lt;MlAccumulator, decltype(&amp;ml_acc_destroy)&gt;(
+                   ml_acc_create(), &amp;ml_acc_destroy);
+    for (double v : { 10.0, 20.0, 30.0 }) {
+        ml_acc_add(acc.get(), v);
+    }
+    std::cout &lt;&lt; "accumulator mean = " &lt;&lt; ml_acc_mean(acc.get()) &lt;&lt; '\n';
+
+    return 0;
+}</code></pre>
+
+<pre><code>g++ -std=c++17 app.cpp -L. -lmathlib -o cppapp
+LD_LIBRARY_PATH=. ./cppapp</code></pre>
+
+  <h3>Prove the mangling</h3>
+
+<pre><code>nm -D libmathlib.so | grep ' T ' | head</code></pre>
+<pre><code>0000000000001130 T ml_acc_add
+0000000000001100 T ml_acc_create
+…
+0000000000001110 T ml_add</code></pre>
+
+  <p>Plain names. Now compile the same source as C++ without the guard and look again:</p>
+
+<pre><code>g++ -fPIC -shared -x c++ mathlib.c -o libmangled.so 2&gt;/dev/null
+nm -D libmangled.so | grep ' T ' | head -3
+nm -D libmangled.so | grep ' T ' | head -3 | c++filt</code></pre>
+
+  <p><code>_Z6ml_addii</code> rather than <code>ml_add</code>. No FFI in any language would find it, and that single difference is what the four lines of <code>extern "C"</code> prevent.</p>
+
+  <h3>Break the ownership rule on purpose</h3>
+
+  <p>In the Python script, replace <code>lib.ml_free(p)</code> with nothing and run under a leak checker; then try freeing C's pointer from Python's side. On Linux with one shared libc it may appear to work; on Windows, where the library and the interpreter can use different runtimes, it corrupts the heap. The exported <code>ml_free</code> exists precisely so the caller never has to know which allocator produced the block.</p>
+
+  <p>Then delete the <code>callback = VISITOR(on_value)</code> binding and pass <code>VISITOR(on_value)</code> inline. Python may collect the temporary while C still holds the pointer, and the call jumps into freed memory. Keeping the reference alive for the duration of the call is the FFI equivalent of week 13's dangling pointer.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Inline assembly and intrinsics</h2>
+
+  <p>Occasionally there is no C expression for what you need — a specific instruction, a control register, an atomic primitive the compiler does not expose.</p>
+
+<pre><code>/* GCC extended asm */
+static inline uint64_t read_timestamp(void)
+{
+    uint32_t low, high;
+    __asm__ volatile ("rdtsc" : "=a"(low), "=d"(high));
+    return ((uint64_t)high &lt;&lt; 32) | low;
+}</code></pre>
+
+  <p>The syntax is: instructions, then outputs, then inputs, then clobbers. <code>volatile</code> prevents the compiler moving or eliding it.</p>
+
+  <p><strong>Prefer an intrinsic.</strong> Compiler intrinsics expose the same instructions as ordinary functions, so the optimizer can still schedule and inline around them:</p>
+
+<pre><code>#include &lt;immintrin.h&gt;
+uint64_t t = __rdtsc();                      /* same instruction */
+
+int bits = __builtin_popcount(x);            /* week 25, in one instruction */
+if (__builtin_add_overflow(a, b, &amp;sum)) { }  /* week 36's check, correctly */</code></pre>
+
+  <p>That last one is worth noting: <code>__builtin_add_overflow</code> performs the addition and reports overflow without ever invoking undefined behavior — the problem week 36 spent a section on. C23 standardizes equivalents in <code>&lt;stdckdint.h&gt;</code>.</p>
+
+  <p>Inline assembly is not portable across architectures or even compilers, it blocks optimization, and it is easy to get the constraints wrong. Reach for it only when no intrinsic exists.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>No <code>extern "C"</code> in a public header</td><td>C++ callers get undefined references</td><td>Add the guard.</td></tr>
+      <tr><td>Freeing a foreign allocator's pointer</td><td>Heap corruption, especially on Windows</td><td>Export your own <code>free</code>.</td></tr>
+      <tr><td>Not declaring <code>argtypes</code> in ctypes</td><td>Doubles passed as ints, silently</td><td>Declare every signature.</td></tr>
+      <tr><td>Letting a callback object be collected</td><td>C calls into freed memory</td><td>Keep a reference for the call's duration.</td></tr>
+      <tr><td>Structs by value across an FFI</td><td>Padding must be replicated exactly</td><td>Opaque handles.</td></tr>
+      <tr><td>Variadic functions in an FFI surface</td><td>Most bindings cannot call them</td><td>Array plus count.</td></tr>
+      <tr><td><code>errno</code> as the error channel</td><td>Hard to read across a boundary</td><td>An explicit status return.</td></tr>
+      <tr><td>Inline assembly where an intrinsic exists</td><td>Blocks optimization; not portable</td><td>Use the intrinsic.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">7</span>Check yourself</h2>
+
+  <details>
+    <summary>What does <code>extern "C"</code> actually change?</summary>
+    <p>It tells a C++ compiler to give the declared functions C linkage: no name mangling and the C calling convention. Without it, C++ encodes the parameter types into the symbol name, so the linker looks for <code>_Z3addii</code> while the C library exports <code>add</code>. The <code>__cplusplus</code> guard is required because the syntax is not valid C.</p>
+  </details>
+
+  <details>
+    <summary>Why must a library export its own deallocation function?</summary>
+    <p>Because the caller's allocator may not be yours. On Windows a library and its host can link against different C runtimes with separate heaps, so passing one's pointer to the other's <code>free</code> corrupts both. Exporting <code>ml_free</code> keeps allocation and deallocation inside the same runtime and removes the question entirely.</p>
+  </details>
+
+  <details>
+    <summary>Why prefer opaque handles over structs in an FFI surface?</summary>
+    <p>Because a struct passed by value forces every binding to replicate the layout, padding, and alignment exactly, and any change to it silently breaks every caller. A handle is a pointer — every language can hold one — and the layout stays private, so the implementation remains free to change.</p>
+  </details>
+
+  <details>
+    <summary>What goes wrong if a Python callback object is garbage collected during a C call?</summary>
+    <p>C holds a raw function pointer into memory Python has freed, so the next invocation jumps into reclaimed memory. It is week 13's dangling pointer across a language boundary. The binding must keep a live reference for as long as C may call back — which means assigning it to a variable that outlives the call.</p>
+  </details>
+
+  <details>
+    <summary>Why is <code>__builtin_add_overflow</code> better than checking the sum afterwards?</summary>
+    <p>Because it performs the addition and reports overflow without ever executing the undefined operation, so the optimizer has nothing to assume away. Week 36's after-the-fact check can be deleted precisely because signed overflow is undefined; the builtin sidesteps that entirely, and C23 standardizes the idea in <code>&lt;stdckdint.h&gt;</code>.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Where this leads</h2>
+  <p>Week 47 returns to the socket server of week 40 and rewrites it as a single-threaded event loop with <code>epoll</code>, then measures both under load. That is the last piece of the systems-programming material before the embedded block begins.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_45_Packaging_and_Distributing_Libraries.html">← Week 45</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_47_Event_Driven_and_Scalable_IO.html">Week 47 →</a>
+</div>
+
+</div>

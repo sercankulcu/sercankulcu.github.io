@@ -1,0 +1,525 @@
+---
+layout: without-sidebar
+title: "Week 27 — Error Handling Strategies"
+permalink: /files/c/Week_27_Error_Handling.html
+excerpt: "Checking return values consistently, errno with perror and strerror, assert versus runtime checks, the goto cleanup idiom, and designing an error contract for a whole module."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Intermediate · Week 27</div>
+  <h1>Error Handling Strategies</h1>
+  <p class="c-wk-lead">C has no exceptions. Every failure travels back to the caller as a return value, and every caller must look. What separates robust C from fragile C is not cleverness but consistency: one convention, applied everywhere, with exactly one cleanup path per function.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Name the three kinds of error and say which technique addresses each.</li>
+      <li>Use <code>errno</code>, <code>perror</code>, and <code>strerror</code> correctly, including when to save <code>errno</code>.</li>
+      <li>Decide whether a given check belongs in an <code>assert</code> or in the shipped code.</li>
+      <li>Write a function that acquires several resources and releases exactly the ones it got.</li>
+      <li>Define an error contract that a whole module follows.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Three kinds of error</h2>
+
+  <table>
+    <thead><tr><th>Kind</th><th>Example</th><th>Handled by</th></tr></thead>
+    <tbody>
+      <tr><td>Compile time</td><td>Syntax error, type mismatch</td><td>Fixing the code</td></tr>
+      <tr><td>Link time</td><td><code>undefined reference</code></td><td>Linking the right library — weeks 2, 29</td></tr>
+      <tr><td>Runtime, programmer error</td><td>Null pointer passed where forbidden, index out of range</td><td><code>assert</code> — it is a bug</td></tr>
+      <tr><td>Runtime, environmental</td><td>File missing, disk full, allocation failed</td><td>Return a status; the caller decides</td></tr>
+    </tbody>
+  </table>
+
+  <p>The last two are often confused, and the distinction drives every decision in this session. A file that does not exist is not a bug — it is a legitimate state of the world your program must handle. A null pointer passed to a function that documented it must not be null <em>is</em> a bug, and no amount of runtime handling will make the program correct.</p>
+
+  <p><strong>Environmental failures get error handling. Programmer errors get assertions.</strong></p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Checking return values</h2>
+
+  <p>Every standard library function that can fail says so. The convention varies, which is why a table is worth keeping in view:</p>
+
+  <table>
+    <thead><tr><th>Function</th><th>Failure looks like</th></tr></thead>
+    <tbody>
+      <tr><td><code>malloc</code>, <code>calloc</code>, <code>realloc</code></td><td>returns <code>NULL</code></td></tr>
+      <tr><td><code>fopen</code></td><td>returns <code>NULL</code>, sets <code>errno</code></td></tr>
+      <tr><td><code>fclose</code>, <code>fflush</code></td><td>returns <code>EOF</code></td></tr>
+      <tr><td><code>fgets</code></td><td>returns <code>NULL</code> — check <code>ferror</code> to distinguish from end of file</td></tr>
+      <tr><td><code>fread</code>, <code>fwrite</code></td><td>returns fewer items than requested</td></tr>
+      <tr><td><code>printf</code>, <code>fprintf</code></td><td>returns a negative value</td></tr>
+      <tr><td><code>strtol</code>, <code>strtod</code></td><td>via <code>endptr</code> and <code>errno</code> — week 23</td></tr>
+      <tr><td><code>remove</code>, <code>rename</code></td><td>returns non-zero, sets <code>errno</code></td></tr>
+    </tbody>
+  </table>
+
+  <p>There is no way to be told you forgot. GCC's <code>__attribute__((warn_unused_result))</code> and C23's <code>[[nodiscard]]</code> let you mark your own functions so callers are warned:</p>
+
+<pre><code>[[nodiscard]] bool buffer_append(Buffer *b, const char *text);   /* C23 */</code></pre>
+
+  <p>Use it on anything whose result must not be ignored. It is the only mechanism C offers for enforcing that a caller checks.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span><code>errno</code></h2>
+
+  <p><code>errno</code> is a modifiable lvalue holding the last error code set by a library function. Three rules govern it.</p>
+
+  <p><strong>It is only meaningful after a function has reported failure.</strong> Library functions may set it on success too, so testing it without first seeing a failure indication is meaningless.</p>
+
+  <p><strong>Set it to 0 before calls that need it.</strong> Required for <code>strtol</code> and the mathematics functions, which report range errors only through <code>errno</code>.</p>
+
+  <p><strong>Save it immediately.</strong> Any intervening library call can overwrite it — including the <code>fprintf</code> you are using to report the problem:</p>
+
+<pre><code>if (fopen(path, "r") == NULL) {
+    int saved = errno;                         /* capture first */
+    fprintf(stderr, "opening %s: %s\n", path, strerror(saved));
+    return saved;
+}</code></pre>
+
+  <h3>Reporting it</h3>
+<pre><code>perror("data.txt");
+/* prints: data.txt: No such file or directory */
+
+fprintf(stderr, "%s: %s\n", path, strerror(errno));
+/* the same text, under your control */</code></pre>
+
+  <p><code>perror</code> is convenient and always writes to <code>stderr</code>. <code>strerror</code> returns the message so you can place it in a larger sentence, log it, or send it elsewhere — at the cost of returning a pointer to a static buffer, which the next call overwrites.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Assertions</h2>
+
+<pre><code>#include &lt;assert.h&gt;
+
+void buffer_append(Buffer *b, const char *text)
+{
+    assert(b != NULL);           /* the caller's obligation */
+    assert(text != NULL);
+    …
+}</code></pre>
+
+  <p>If the condition is false, <code>assert</code> prints the expression, the file, and the line, and calls <code>abort</code>. Defining <code>NDEBUG</code> removes every assertion:</p>
+
+<pre><code>gcc -DNDEBUG -O2 …          # assertions compiled out</code></pre>
+
+  <div class="c-wk-trap">
+    <p><strong>Never put a side effect in an assertion.</strong> <code>assert(buffer_append(b, "x"));</code> works in a debug build and silently does nothing in a release build, because the whole expression disappears. This produces a program that works while you are testing it and fails when you ship it — the worst possible failure mode.</p>
+  </div>
+
+  <table>
+    <thead><tr><th>Use <code>assert</code> for</th><th>Use a real check for</th></tr></thead>
+    <tbody>
+      <tr><td>Preconditions your own code must satisfy</td><td>Anything derived from user input, files, or the network</td></tr>
+      <tr><td>Invariants that should be impossible to break</td><td>Allocation results and system call results</td></tr>
+      <tr><td>Documenting an assumption executably</td><td>Conditions the caller is allowed to hit</td></tr>
+    </tbody>
+  </table>
+
+  <h3><code>static_assert</code></h3>
+<pre><code>static_assert(sizeof(int) &gt;= 4, "this code assumes at least 32-bit int");
+static_assert(sizeof(Record) == 48, "Record layout changed unexpectedly");</code></pre>
+  <p>Checked at compile time, costs nothing at runtime, and cannot be disabled. Use it for assumptions about sizes, alignments, and enumeration counts. It is spelled <code>_Static_assert</code> before C23 unless you include <code>&lt;assert.h&gt;</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>The <code>goto</code> cleanup idiom</h2>
+
+  <p>A function that acquires several resources must release exactly the ones it managed to acquire, on every exit path. Written with early returns, the releases multiply:</p>
+
+<pre><code>/* The version everyone writes first */
+bool process(const char *in_path, const char *out_path)
+{
+    FILE *in = fopen(in_path, "r");
+    if (in == NULL) return false;
+
+    FILE *out = fopen(out_path, "w");
+    if (out == NULL) { fclose(in); return false; }
+
+    char *buffer = malloc(BUFSIZE);
+    if (buffer == NULL) { fclose(out); fclose(in); return false; }
+
+    if (!do_work(in, out, buffer)) {
+        free(buffer); fclose(out); fclose(in); return false;
+    }
+
+    free(buffer); fclose(out); fclose(in);
+    return true;
+}</code></pre>
+
+  <p><code>fclose(in)</code> appears four times. Add a fourth resource and it appears five. Every duplicate is a place to forget one — and the error paths are exactly the ones your tests do not cover.</p>
+
+  <p>The idiom that fixes it — and that the Linux kernel, SQLite, and most serious C libraries use throughout:</p>
+
+<pre><code>bool process(const char *in_path, const char *out_path)
+{
+    bool   ok     = false;
+    FILE  *in     = NULL;
+    FILE  *out    = NULL;
+    char  *buffer = NULL;
+
+    in = fopen(in_path, "r");
+    if (in == NULL) {
+        perror(in_path);
+        goto cleanup;
+    }
+
+    out = fopen(out_path, "w");
+    if (out == NULL) {
+        perror(out_path);
+        goto cleanup;
+    }
+
+    buffer = malloc(BUFSIZE);
+    if (buffer == NULL) {
+        goto cleanup;
+    }
+
+    if (!do_work(in, out, buffer)) {
+        goto cleanup;
+    }
+
+    ok = true;
+
+cleanup:
+    free(buffer);                          /* free(NULL) is safe   */
+    if (out != NULL &amp;&amp; fclose(out) != 0) { /* the flush can fail   */
+        ok = false;
+    }
+    if (in != NULL) {
+        fclose(in);
+    }
+    return ok;
+}</code></pre>
+
+  <p>What makes it work: every resource variable is initialized to a null value at the top, so the single cleanup block can unconditionally attempt to release all of them. <code>free(NULL)</code> is defined to do nothing, and the <code>NULL</code> guards handle the file pointers. There is exactly one exit, and adding a fifth resource means adding one acquisition and one release.</p>
+
+  <p>For several resources with distinct cleanup, use cascading labels in reverse order of acquisition:</p>
+
+<pre><code>    …
+    goto cleanup_all;
+
+cleanup_all:
+    free(buffer);
+cleanup_out:
+    fclose(out);
+cleanup_in:
+    fclose(in);
+    return ok;</code></pre>
+
+  <p>Each failure jumps to the label that releases only what has been acquired so far. This is the one place where week 10's warning about <code>goto</code> does not apply — it is the standard C solution to a problem the language gives no other tool for.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>An error contract for a module</h2>
+
+  <p>Individual checks are not enough. A module needs one stated convention, so callers do not have to learn a new one per function.</p>
+
+<pre><code>/* csv.h — error contract
+ *
+ * Every function returns a CsvStatus. CSV_OK means success and
+ * output parameters have been written. Any other value means failure,
+ * and output parameters are untouched.
+ *
+ * On CSV_ERRNO the caller may inspect errno for details.
+ * No function frees anything the caller passed in.
+ * csv_last_message() returns a human-readable description of the
+ * most recent failure on this thread.
+ */
+
+typedef enum {
+    CSV_OK = 0,
+    CSV_ERRNO,          /* a system call failed; see errno */
+    CSV_BAD_FORMAT,     /* the input was malformed         */
+    CSV_TOO_LONG,       /* a line exceeded the limit       */
+    CSV_NO_MEMORY
+} CsvStatus;
+
+const char *csv_status_name(CsvStatus s);</code></pre>
+
+  <p>Four decisions worth copying:</p>
+
+  <ul>
+    <li><strong>A named enumeration, not bare integers.</strong> Week 22's <code>switch</code> warning then tells every caller when you add a status.</li>
+    <li><strong>Success is zero</strong>, matching the rest of C and letting <code>if (status != CSV_OK)</code> read naturally.</li>
+    <li><strong>Output parameters are untouched on failure</strong>, so a caller cannot accidentally use a half-written result.</li>
+    <li><strong>Ownership is stated once</strong>, for the whole module, rather than per function.</li>
+  </ul>
+
+  <p>Write this comment block before the functions, not after. It is the part of the interface that the signatures cannot express.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Worked example: one contract, one cleanup path</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;assert.h&gt;
+#include &lt;stdbool.h&gt;
+
+#define LINE_MAX_LEN 256
+
+/* ---------- the contract ---------- */
+
+typedef enum {
+    FC_OK = 0,
+    FC_ERRNO,
+    FC_BAD_FORMAT,
+    FC_TOO_LONG,
+    FC_NO_MEMORY
+} FcStatus;
+
+static const char *fc_status_name(FcStatus s)
+{
+    switch (s) {                       /* no default: see week 22 */
+    case FC_OK:         return "ok";
+    case FC_ERRNO:      return "system error";
+    case FC_BAD_FORMAT: return "malformed input";
+    case FC_TOO_LONG:   return "line too long";
+    case FC_NO_MEMORY:  return "out of memory";
+    }
+    return "unknown";
+}
+
+/* ---------- the function with four resources ---------- */
+
+/* Copies in_path to out_path, doubling every number it finds.
+   Returns FC_OK on success. On failure, out_path may exist but
+   its contents are unspecified; nothing the caller owns is freed. */
+static FcStatus double_numbers(const char *in_path, const char *out_path,
+                               long *lines_out)
+{
+    assert(in_path  != NULL);          /* programmer error if violated */
+    assert(out_path != NULL);
+    assert(lines_out != NULL);
+
+    FcStatus  status = FC_ERRNO;       /* pessimistic default */
+    FILE     *in     = NULL;
+    FILE     *out    = NULL;
+    char     *buffer = NULL;
+    long      lines  = 0;
+
+    in = fopen(in_path, "r");
+    if (in == NULL) {
+        goto cleanup;
+    }
+
+    out = fopen(out_path, "w");
+    if (out == NULL) {
+        goto cleanup;
+    }
+
+    buffer = malloc(LINE_MAX_LEN);
+    if (buffer == NULL) {
+        status = FC_NO_MEMORY;
+        goto cleanup;
+    }
+
+    while (fgets(buffer, LINE_MAX_LEN, in) != NULL) {
+        lines++;
+
+        if (strchr(buffer, '\n') == NULL &amp;&amp; !feof(in)) {
+            status = FC_TOO_LONG;
+            goto cleanup;
+        }
+        buffer[strcspn(buffer, "\n")] = '\0';
+
+        if (buffer[0] == '\0') {
+            continue;
+        }
+
+        errno = 0;
+        char *end;
+        long value = strtol(buffer, &amp;end, 10);
+        if (end == buffer || *end != '\0' || errno == ERANGE) {
+            status = FC_BAD_FORMAT;
+            goto cleanup;
+        }
+
+        if (fprintf(out, "%ld\n", value * 2) &lt; 0) {
+            status = FC_ERRNO;
+            goto cleanup;
+        }
+    }
+
+    if (ferror(in)) {
+        status = FC_ERRNO;
+        goto cleanup;
+    }
+
+    *lines_out = lines;                /* written only on success */
+    status = FC_OK;
+
+cleanup:
+    free(buffer);                      /* free(NULL) is safe */
+    if (out != NULL &amp;&amp; fclose(out) != 0 &amp;&amp; status == FC_OK) {
+        status = FC_ERRNO;             /* the flush failed */
+    }
+    if (in != NULL) {
+        fclose(in);
+    }
+    return status;
+}
+
+/* ---------- helper to build test inputs ---------- */
+
+static bool make_file(const char *path, const char *contents)
+{
+    FILE *f = fopen(path, "w");
+    if (f == NULL) {
+        return false;
+    }
+    fputs(contents, f);
+    return fclose(f) == 0;
+}
+
+static void try_case(const char *label, const char *contents)
+{
+    const char *in  = "fc_in.txt";
+    const char *out = "fc_out.txt";
+
+    if (contents != NULL &amp;&amp; !make_file(in, contents)) {
+        perror("creating input");
+        return;
+    }
+
+    long lines = -1;
+    FcStatus s = double_numbers(contents == NULL ? "does_not_exist.txt" : in,
+                                out, &amp;lines);
+
+    printf("  %-22s -&gt; %-16s", label, fc_status_name(s));
+    if (s == FC_OK) {
+        printf("(%ld lines)\n", lines);
+    } else if (s == FC_ERRNO) {
+        printf("(%s)\n", strerror(errno));
+    } else {
+        printf("(lines_out untouched: %ld)\n", lines);
+    }
+
+    remove(in);
+    remove(out);
+}
+
+int main(void)
+{
+    puts("== one contract, every failure path exercised ==");
+    try_case("normal input",     "1\n2\n3\n");
+    try_case("blank lines",      "1\n\n2\n");
+    try_case("not a number",     "1\nabc\n");
+    try_case("trailing rubbish", "1\n12xyz\n");
+    try_case("out of range",     "99999999999999999999\n");
+    try_case("missing file",     NULL);
+
+    puts("\n== errno must be saved before reporting ==");
+    errno = 0;
+    FILE *f = fopen("definitely_not_here.txt", "r");
+    if (f == NULL) {
+        int saved = errno;
+        fprintf(stderr, "  captured errno = %d\n", saved);
+        fprintf(stderr, "  message: %s\n", strerror(saved));
+        printf("  errno after the fprintf calls is now %d\n", errno);
+        puts("  which is why the value is captured immediately");
+    }
+
+    puts("\n== assert is for programmer error, not user error ==");
+    puts("  double_numbers asserts its pointers are non-null:");
+    puts("  that is the caller's contract, not a runtime condition.");
+    puts("  A missing file is handled; a null path is a bug.");
+
+    puts("\n== static_assert: checked at compile time ==");
+    static_assert(sizeof(long) &gt;= 4, "long must be at least 32 bits");
+    puts("  sizeof(long) >= 4 verified before the program ran");
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o errors errors.c
+./errors</code></pre>
+
+  <h3>What the design buys</h3>
+
+  <p><strong>Every failure path is exercised</strong> and none of them leaks. Run it under the leak checker and there is no output — including on the paths that failed after opening two files and allocating a buffer. That is the point of the single cleanup block.</p>
+
+  <p><strong><code>lines_out</code> is untouched on failure.</strong> The output shows <code>-1</code> for every failing case, because the assignment happens only on the success path. A caller that ignores the status still cannot mistake stale data for a result.</p>
+
+  <p><strong>Adding a resource is one line in two places.</strong> Try it: add a second buffer, initialize it to <code>NULL</code>, allocate it after the first, and add one <code>free</code> to the cleanup block. Compare that with the early-return version, where you would edit five places.</p>
+
+  <h3>Two experiments</h3>
+
+  <p><strong>Break the assertion.</strong> Call <code>double_numbers(NULL, "out.txt", &amp;lines)</code>:</p>
+<pre><code>errors: errors.c:44: double_numbers: Assertion `in_path != NULL' failed.
+Aborted (core dumped)</code></pre>
+  <p>Now rebuild with <code>-DNDEBUG</code> and the same call segfaults inside <code>fopen</code> instead. The assertion did not make the program correct; it made the bug obvious at the boundary where it was introduced.</p>
+
+  <p><strong>Remove the <code>goto</code> and write it with early returns.</strong> Then delete one <code>fclose(in)</code> from one branch — a single-character-scale mistake — and run under the leak checker with an input that triggers that branch. The leak is reported; the version with one cleanup path had no branch in which to make the mistake.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Ignoring a return value</td><td>Program continues on bad state</td><td>Check every call that can fail; mark yours <code>[[nodiscard]]</code>.</td></tr>
+      <tr><td>Reading <code>errno</code> after other calls</td><td>Overwritten by the reporting code</td><td>Save it immediately.</td></tr>
+      <tr><td>Testing <code>errno</code> without a failure indication</td><td>Meaningless — it may be set on success</td><td>Check the return value first.</td></tr>
+      <tr><td>Side effects inside <code>assert</code></td><td>Disappears under <code>NDEBUG</code></td><td>Never put work in an assertion.</td></tr>
+      <tr><td><code>assert</code> on user input</td><td>Release build accepts bad input silently</td><td>Real checks for anything external.</td></tr>
+      <tr><td>Cleanup duplicated per early return</td><td>One branch forgets a release</td><td>Single cleanup label.</td></tr>
+      <tr><td>Uninitialized resource variables</td><td>Cleanup frees garbage</td><td>Initialize all to <code>NULL</code> at the top.</td></tr>
+      <tr><td>Writing output parameters before validating</td><td>Caller sees half-written results</td><td>Write only on the success path.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">9</span>Check yourself</h2>
+
+  <details>
+    <summary>When is <code>assert</code> the right tool and when is it the wrong one?</summary>
+    <p>Right for conditions that should be impossible if your code is correct — preconditions your own callers must satisfy, invariants within a module. Wrong for anything the program can legitimately encounter: a missing file, a malformed input line, a failed allocation. Assertions vanish under <code>NDEBUG</code>, so relying on one to validate external input means the release build silently accepts it.</p>
+  </details>
+
+  <details>
+    <summary>Why must <code>errno</code> be saved immediately after a failure?</summary>
+    <p>Because any subsequent library call may overwrite it — including the <code>fprintf</code> you use to report the problem. By the time you read it, the value can describe an unrelated event. Copy it into a local variable in the same breath as detecting the failure.</p>
+  </details>
+
+  <details>
+    <summary>Why does the <code>goto cleanup</code> idiom initialize every resource to <code>NULL</code> first?</summary>
+    <p>So the single cleanup block can release all of them unconditionally, regardless of how far the function got. <code>free(NULL)</code> is defined to do nothing and a <code>NULL</code> check guards the rest, so one block correctly handles every failure point. Without the initialization, cleanup would free indeterminate values.</p>
+  </details>
+
+  <details>
+    <summary>What is wrong with duplicating cleanup code in each early return?</summary>
+    <p>Each duplicate is an independent opportunity to forget one release, and error paths are precisely the paths least likely to be tested. Adding a fifth resource means editing every branch. One cleanup label makes correctness structural rather than a matter of vigilance.</p>
+  </details>
+
+  <details>
+    <summary>Why should a module define one error contract rather than per-function conventions?</summary>
+    <p>Because callers otherwise have to learn and remember a different convention for every function, and mixed conventions produce unchecked calls. A single documented rule — what the status values mean, whether output parameters are written on failure, who owns what — makes correct use the obvious use, and a named enumeration lets the compiler warn callers when the set of statuses grows.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">10</span>Where this leads</h2>
+  <p>You can now write a function that is correct on every path. Week 28 scales that up to a program: splitting code across files, deciding what a header exposes and what stays hidden, and turning the growable array of week 19 into a module with a public interface and a private implementation — the last step before it becomes a library in week 29.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_26_Files_and_Streams.html">← Week 26</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_28_Preprocessor_and_Modular_Programming.html">Week 28 →</a>
+</div>
+
+</div>

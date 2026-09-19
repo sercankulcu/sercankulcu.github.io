@@ -1,0 +1,417 @@
+---
+layout: without-sidebar
+title: "Week 25 — Bit-Level Operations"
+permalink: /files/c/Week_25_Bit_Level_Operations.html
+excerpt: "AND, OR, XOR and NOT; arithmetic versus logical shift; setting, clearing, toggling and testing flags; bit-fields and their portability limits; permissions, packing and checksums."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Intermediate · Week 25</div>
+  <h1>Bit-Level Operations</h1>
+  <p class="c-wk-lead">Week 4 showed what a byte contains. This week you operate on it directly — which is how permissions, hardware registers, compression, hashing, and network protocols are all expressed, and why C remains the language they are written in.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Use the six bitwise operators and predict the result on paper.</li>
+      <li>Set, clear, toggle, and test individual bits with the standard idioms.</li>
+      <li>Explain the difference between arithmetic and logical right shift, and when each applies.</li>
+      <li>Pack several small values into one integer and extract them again.</li>
+      <li>Say why bit-fields are convenient and why portable code avoids them.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The operators</h2>
+
+  <table>
+    <thead><tr><th>Operator</th><th>Meaning</th><th>Example (4-bit)</th></tr></thead>
+    <tbody>
+      <tr><td><code>&amp;</code></td><td>AND — 1 only if both are 1</td><td><code>1100 &amp; 1010 = 1000</code></td></tr>
+      <tr><td><code>|</code></td><td>OR — 1 if either is 1</td><td><code>1100 | 1010 = 1110</code></td></tr>
+      <tr><td><code>^</code></td><td>XOR — 1 if they differ</td><td><code>1100 ^ 1010 = 0110</code></td></tr>
+      <tr><td><code>~</code></td><td>NOT — flip every bit</td><td><code>~1100 = 0011</code></td></tr>
+      <tr><td><code>&lt;&lt;</code></td><td>Shift left</td><td><code>0011 &lt;&lt; 1 = 0110</code></td></tr>
+      <tr><td><code>&gt;&gt;</code></td><td>Shift right</td><td><code>1100 &gt;&gt; 1 = 0110</code></td></tr>
+    </tbody>
+  </table>
+
+  <p>These are not the logical operators. <code>&amp;</code> works on every bit independently and yields a number; <code>&amp;&amp;</code> treats its operands as true or false and yields 0 or 1. <code>1 &amp; 2</code> is 0; <code>1 &amp;&amp; 2</code> is 1. Confusing them compiles cleanly and produces wrong answers.</p>
+
+  <h3>Shifting is multiplication and division by powers of two</h3>
+<pre><code>x &lt;&lt; n      /* x * 2^n */
+x &gt;&gt; n      /* x / 2^n, for non-negative x */</code></pre>
+
+  <p>Write the multiplication. Any compiler since the 1990s emits a shift for <code>x * 8</code>, and <code>x * 8</code> says what you mean. Use shifts when you are genuinely manipulating bit positions, not as an optimization.</p>
+
+  <h3>The shift traps</h3>
+  <ul>
+    <li>Shifting by the width of the type or more is <strong>undefined behavior</strong>. <code>x &lt;&lt; 32</code> on a 32-bit <code>int</code> is not zero; it is undefined, and in practice x86 shifts by <code>32 % 32 = 0</code>, leaving <code>x</code> unchanged.</li>
+    <li>Shifting a negative value left is undefined.</li>
+    <li>Right-shifting a <em>negative</em> value is implementation-defined: it may fill with zeros (logical) or with the sign bit (arithmetic). Every mainstream compiler does the arithmetic shift, which preserves the sign — but it is not guaranteed.</li>
+  </ul>
+
+  <p>The rule that follows: <strong>do bit manipulation on unsigned types</strong>. <code>unsigned</code>, or better the fixed-width <code>uint32_t</code> from week 37. Signedness has no meaning when you are treating a value as a row of bits, and it introduces three ways to be undefined.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>The four idioms</h2>
+
+  <p>Almost all bit manipulation is one of these four, written against a mask that selects the bits you care about.</p>
+
+<pre><code>#define FLAG_READ   (1u &lt;&lt; 0)     /* 0001 */
+#define FLAG_WRITE  (1u &lt;&lt; 1)     /* 0010 */
+#define FLAG_EXEC   (1u &lt;&lt; 2)     /* 0100 */
+
+unsigned flags = 0;
+
+flags |=  FLAG_READ;              /* SET    */
+flags &amp;= ~FLAG_READ;              /* CLEAR  */
+flags ^=  FLAG_READ;              /* TOGGLE */
+if (flags &amp; FLAG_READ) { … }      /* TEST   */</code></pre>
+
+  <table>
+    <thead><tr><th>Operation</th><th>Idiom</th><th>Why it works</th></tr></thead>
+    <tbody>
+      <tr><td>Set</td><td><code>x |= mask</code></td><td>OR with 1 forces 1; OR with 0 leaves alone</td></tr>
+      <tr><td>Clear</td><td><code>x &amp;= ~mask</code></td><td>AND with 0 forces 0; AND with 1 leaves alone</td></tr>
+      <tr><td>Toggle</td><td><code>x ^= mask</code></td><td>XOR with 1 flips; XOR with 0 leaves alone</td></tr>
+      <tr><td>Test</td><td><code>x &amp; mask</code></td><td>Non-zero exactly when a selected bit is set</td></tr>
+    </tbody>
+  </table>
+
+  <p>Building masks: <code>1u &lt;&lt; n</code> selects bit <code>n</code>. Several bits are combined with <code>|</code>. A mask of the low <code>n</code> bits is <code>(1u &lt;&lt; n) - 1</code>.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>Parenthesize.</strong> Week 6's precedence table puts <code>&amp;</code>, <code>^</code>, and <code>|</code> <em>below</em> the comparison operators — a design mistake preserved for compatibility. So <code>flags &amp; FLAG_READ == 0</code> parses as <code>flags &amp; (FLAG_READ == 0)</code>, which is <code>flags &amp; 0</code>, which is 0, which is false, always. Write <code>(flags &amp; FLAG_READ) == 0</code>. GCC warns with <code>-Wparentheses</code>; do not ignore it.</p>
+  </div>
+
+  <h3>Testing several bits</h3>
+<pre><code>if ((flags &amp; (FLAG_READ | FLAG_WRITE)) == (FLAG_READ | FLAG_WRITE)) {
+    /* BOTH are set */
+}
+if (flags &amp; (FLAG_READ | FLAG_WRITE)) {
+    /* at least ONE is set */
+}</code></pre>
+  <p>The difference is easy to get wrong and easy to state: comparing against the mask tests "all", comparing against zero tests "any".</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Packing values into one integer</h2>
+
+  <p>When several small quantities travel together — a colour, a date, a hardware register — they can share one word. Two operations: pack with shift-and-OR, unpack with shift-and-mask.</p>
+
+<pre><code>/* Pack an RGB colour into 24 bits. */
+uint32_t rgb = ((uint32_t)r &lt;&lt; 16) | ((uint32_t)g &lt;&lt; 8) | b;
+
+/* Unpack. */
+uint8_t red   = (rgb &gt;&gt; 16) &amp; 0xFF;
+uint8_t green = (rgb &gt;&gt;  8) &amp; 0xFF;
+uint8_t blue  =  rgb        &amp; 0xFF;</code></pre>
+
+  <p>The mask after the shift is essential: without <code>&amp; 0xFF</code>, <code>rgb &gt;&gt; 8</code> still carries the red bits above the green ones.</p>
+
+  <p>This is exactly how a hardware register is written in week 50, how an instruction is encoded, and how a network protocol header is laid out. The pattern does not change; only the field widths do.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Bit-fields</h2>
+
+  <p>C offers syntax for this directly:</p>
+
+<pre><code>struct Flags {
+    unsigned read  : 1;      /* one bit  */
+    unsigned write : 1;
+    unsigned level : 3;      /* three bits, values 0-7 */
+    unsigned       : 0;      /* force alignment to the next unit */
+};
+
+struct Flags f = { .read = 1, .level = 5 };
+if (f.read) { … }</code></pre>
+
+  <p>Readable, type-checked, and the compiler does the shifting. So why does most portable C avoid them?</p>
+
+  <table>
+    <thead><tr><th>Not specified by the standard</th><th>Consequence</th></tr></thead>
+    <tbody>
+      <tr><td>Whether fields are allocated low-to-high or high-to-low</td><td>Layout differs between compilers</td></tr>
+      <tr><td>Whether a field may straddle a storage unit</td><td>Sizes differ</td></tr>
+      <tr><td>The alignment of the allocation unit</td><td>Padding differs</td></tr>
+      <tr><td>Whether plain <code>int</code> fields are signed</td><td>A 1-bit <code>int</code> field can hold 0 and −1</td></tr>
+    </tbody>
+  </table>
+
+  <p>So a bit-field struct cannot be used to describe an external binary format — a file header, a network packet, a hardware register — because the layout is not guaranteed to match. Use explicit masks and shifts for anything that crosses a boundary, and reserve bit-fields for internal storage where only your own code sees them.</p>
+
+  <p>Note also the last item: always write <code>unsigned</code> or <code>signed</code> explicitly on a bit-field. Plain <code>int</code> has implementation-defined signedness here, and a one-bit signed field can hold only 0 and −1, which surprises everyone once.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Worked example: permissions, packing, and popcount</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdint.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;time.h&gt;
+
+/* ---------- named flags ---------- */
+
+typedef enum {
+    PERM_READ    = 1u &lt;&lt; 0,
+    PERM_WRITE   = 1u &lt;&lt; 1,
+    PERM_EXEC    = 1u &lt;&lt; 2,
+    PERM_DELETE  = 1u &lt;&lt; 3,
+    PERM_ALL     = 0x0Fu
+} Permission;
+
+static void print_bits(uint32_t value, int width)
+{
+    for (int bit = width - 1; bit &gt;= 0; bit--) {
+        putchar((value &gt;&gt; bit) &amp; 1u ? '1' : '0');
+        if (bit % 4 == 0 &amp;&amp; bit != 0) putchar(' ');
+    }
+}
+
+static void show_permissions(const char *label, unsigned flags)
+{
+    printf("  %-14s %c%c%c%c  ", label,
+           (flags &amp; PERM_READ)   ? 'r' : '-',
+           (flags &amp; PERM_WRITE)  ? 'w' : '-',
+           (flags &amp; PERM_EXEC)   ? 'x' : '-',
+           (flags &amp; PERM_DELETE) ? 'd' : '-');
+    print_bits(flags, 8);
+    printf("  (0x%02X)\n", flags);
+}
+
+/* ---------- packing ---------- */
+
+static uint32_t rgb_pack(uint8_t r, uint8_t g, uint8_t b)
+{
+    return ((uint32_t)r &lt;&lt; 16) | ((uint32_t)g &lt;&lt; 8) | (uint32_t)b;
+}
+
+static void rgb_unpack(uint32_t rgb, uint8_t *r, uint8_t *g, uint8_t *b)
+{
+    *r = (uint8_t)((rgb &gt;&gt; 16) &amp; 0xFFu);
+    *g = (uint8_t)((rgb &gt;&gt;  8) &amp; 0xFFu);
+    *b = (uint8_t)( rgb        &amp; 0xFFu);
+}
+
+/* ---------- counting set bits, three ways ---------- */
+
+static int popcount_naive(uint32_t v)
+{
+    int count = 0;
+    for (int i = 0; i &lt; 32; i++) {
+        count += (int)((v &gt;&gt; i) &amp; 1u);
+    }
+    return count;                          /* always 32 iterations */
+}
+
+/* Kernighan's method: v &amp; (v-1) clears the lowest set bit,
+   so the loop runs once per SET bit rather than once per bit. */
+static int popcount_kernighan(uint32_t v)
+{
+    int count = 0;
+    while (v != 0) {
+        v &amp;= v - 1;
+        count++;
+    }
+    return count;
+}
+
+/* ---------- a simple checksum ---------- */
+
+static uint32_t checksum(const uint8_t *data, size_t n)
+{
+    uint32_t sum = 0;
+    for (size_t i = 0; i &lt; n; i++) {
+        sum ^= data[i];
+        sum = (sum &lt;&lt; 1) | (sum &gt;&gt; 31);    /* rotate left by one */
+    }
+    return sum;
+}
+
+/* ---------- bit-fields, for internal use only ---------- */
+
+struct Packed {
+    unsigned read  : 1;
+    unsigned write : 1;
+    unsigned level : 3;
+};
+
+int main(void)
+{
+    puts("== the four idioms ==");
+    unsigned flags = 0;
+    show_permissions("start", flags);
+
+    flags |= PERM_READ;                   show_permissions("set read", flags);
+    flags |= PERM_WRITE | PERM_EXEC;      show_permissions("set w+x", flags);
+    flags &amp;= ~(unsigned)PERM_WRITE;       show_permissions("clear write", flags);
+    flags ^= PERM_EXEC;                   show_permissions("toggle exec", flags);
+    flags |= PERM_ALL;                    show_permissions("set all", flags);
+
+    puts("\n== any versus all ==");
+    unsigned rw = PERM_READ | PERM_WRITE;
+    unsigned only_read = PERM_READ;
+    printf("  only_read has ANY of r|w : %s\n",
+           (only_read &amp; rw) ? "yes" : "no");
+    printf("  only_read has ALL of r|w : %s\n",
+           ((only_read &amp; rw) == rw) ? "yes" : "no");
+
+    puts("\n== the precedence trap ==");
+    unsigned f = 0x0C;
+    printf("  f &amp; PERM_EXEC == 0    gives %u   &lt;-- parses as f &amp; (EXEC==0)\n",
+           f &amp; PERM_EXEC == 0);
+    printf("  (f &amp; PERM_EXEC) == 0  gives %d   &lt;-- what you meant\n",
+           (f &amp; PERM_EXEC) == 0);
+
+    puts("\n== packing and unpacking ==");
+    uint32_t colour = rgb_pack(255, 128, 64);
+    printf("  rgb(255,128,64) = 0x%06X  ", colour);
+    print_bits(colour, 24);
+    putchar('\n');
+    uint8_t r, g, b;
+    rgb_unpack(colour, &amp;r, &amp;g, &amp;b);
+    printf("  unpacked        = (%u, %u, %u)\n", r, g, b);
+    printf("  without the mask, (colour &gt;&gt; 8) = 0x%X  &lt;-- red bits still there\n",
+           colour &gt;&gt; 8);
+
+    puts("\n== shifting ==");
+    uint32_t v = 0x0000000Fu;
+    printf("  0x0F &lt;&lt; 4  = 0x%08X   (multiply by 16)\n", v &lt;&lt; 4);
+    printf("  0xF0 &gt;&gt; 4  = 0x%08X   (divide by 16)\n", 0xF0u &gt;&gt; 4);
+    int negative = -16;
+    printf("  -16 &gt;&gt; 2   = %d   (arithmetic shift here, but not guaranteed)\n",
+           negative &gt;&gt; 2);
+    puts("  do bit work on unsigned types and the question does not arise");
+
+    puts("\n== counting set bits ==");
+    uint32_t samples[] = { 0x00000000u, 0x00000001u, 0x0000FFFFu, 0xFFFFFFFFu };
+    for (size_t i = 0; i &lt; 4; i++) {
+        printf("  0x%08X : naive %2d, kernighan %2d\n", samples[i],
+               popcount_naive(samples[i]),
+               popcount_kernighan(samples[i]));
+    }
+
+    clock_t t0 = clock();
+    long total = 0;
+    for (uint32_t i = 0; i &lt; 3000000u; i++) total += popcount_naive(i);
+    double naive_time = (double)(clock() - t0) / CLOCKS_PER_SEC;
+
+    t0 = clock();
+    total = 0;
+    for (uint32_t i = 0; i &lt; 3000000u; i++) total += popcount_kernighan(i);
+    double kern_time = (double)(clock() - t0) / CLOCKS_PER_SEC;
+
+    printf("  3M values: naive %.3fs, Kernighan %.3fs\n",
+           naive_time, kern_time);
+    puts("  v &amp;= v-1 clears the lowest set bit, so the loop runs once per 1");
+
+    puts("\n== a checksum ==");
+    const char *text = "the quick brown fox";
+    printf("  checksum(\"%s\") = 0x%08X\n",
+           text, checksum((const uint8_t *)text, 19));
+    printf("  checksum(\"the quick brown fpx\") = 0x%08X  &lt;-- one byte changed\n",
+           checksum((const uint8_t *)"the quick brown fpx", 19));
+
+    puts("\n== bit-fields: convenient, but not portable ==");
+    struct Packed p = { .read = 1, .write = 0, .level = 5 };
+    printf("  read=%u write=%u level=%u, sizeof = %zu\n",
+           p.read, p.write, p.level, sizeof p);
+    puts("  the standard does not fix the order or the padding,");
+    puts("  so never use a bit-field struct to describe a file or packet format");
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o bits bits.c
+./bits</code></pre>
+
+  <h3>The warning that proves the trap</h3>
+
+<pre><code>bits.c:118:32: warning: suggest parentheses around comparison
+              in operand of '&amp;' [-Wparentheses]</code></pre>
+
+  <p>The output shows <code>f &amp; PERM_EXEC == 0</code> evaluating to 0 while <code>(f &amp; PERM_EXEC) == 0</code> gives 1. Same tokens, opposite meanings, one warning between you and a silent bug.</p>
+
+  <h3>Provoke the undefined shift</h3>
+
+<pre><code>uint32_t x = 1;
+printf("%u\n", x &lt;&lt; 32);     /* undefined behavior */</code></pre>
+
+<pre><code>warning: left shift count &gt;= width of type [-Wshift-count-overflow]</code></pre>
+
+  <p>Run it and you will probably see 1, not 0 — x86 uses only the low five bits of the shift count, so a shift by 32 is a shift by 0. Build with <code>-fsanitize=undefined</code> and it is reported explicitly:</p>
+
+<pre><code>runtime error: shift exponent 32 is too large for 32-bit type</code></pre>
+
+  <h3>Why Kernighan's method is faster</h3>
+
+  <p><code>v &amp; (v - 1)</code> clears the lowest set bit: subtracting 1 flips that bit to 0 and every bit below it to 1, so the AND keeps only the bits above. The loop therefore runs once per set bit rather than once per bit position. For sparse values the difference is large; for <code>0xFFFFFFFF</code> the two are identical. The timing in the output shows it on a realistic mix.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>flags &amp; MASK == 0</code></td><td>Parses as <code>flags &amp; (MASK == 0)</code></td><td>Parenthesize the bitwise operation.</td></tr>
+      <tr><td>Using <code>&amp;&amp;</code> where <code>&amp;</code> was meant</td><td>Compiles; yields 0 or 1 instead of a mask</td><td>Logical for conditions, bitwise for bits.</td></tr>
+      <tr><td>Shifting by the type's width or more</td><td>Undefined; often a no-op on x86</td><td>Guard the shift count.</td></tr>
+      <tr><td>Bit manipulation on signed types</td><td>Implementation-defined right shift; undefined left shift of negatives</td><td>Use <code>unsigned</code> or <code>uint32_t</code>.</td></tr>
+      <tr><td>Forgetting the mask after a shift</td><td>Neighbouring fields leak into the result</td><td><code>(v &gt;&gt; n) &amp; mask</code>.</td></tr>
+      <tr><td><code>x &amp;= ~MASK</code> with a signed <code>MASK</code></td><td>Sign extension sets unintended high bits</td><td>Make the mask unsigned, or cast.</td></tr>
+      <tr><td>Bit-fields for a file or packet layout</td><td>Different layout on another compiler</td><td>Explicit shifts and masks.</td></tr>
+      <tr><td>Plain <code>int</code> bit-fields</td><td>Signedness is implementation-defined</td><td>Always write <code>unsigned</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">7</span>Check yourself</h2>
+
+  <details>
+    <summary>Why is <code>x &amp;= ~mask</code> the way to clear bits?</summary>
+    <p><code>~mask</code> has 0 exactly where <code>mask</code> had 1, and 1 everywhere else. ANDing with 0 forces a bit to 0; ANDing with 1 leaves it unchanged. So the operation clears precisely the selected bits and preserves all the others — which is the requirement.</p>
+  </details>
+
+  <details>
+    <summary>What does <code>flags &amp; FLAG == 0</code> actually compute?</summary>
+    <p><code>flags &amp; (FLAG == 0)</code>, because <code>==</code> binds more tightly than <code>&amp;</code> in C. <code>FLAG == 0</code> is 0 for any non-zero flag, so the whole expression is <code>flags &amp; 0</code>, which is always 0 and therefore always false. Parenthesize the bitwise operation; <code>-Wparentheses</code> warns about it.</p>
+  </details>
+
+  <details>
+    <summary>Why should bit manipulation be done on unsigned types?</summary>
+    <p>Because signedness introduces three problems that have no meaning when you are treating a value as a row of bits: right shift of a negative value is implementation-defined, left shift of a negative value is undefined, and <code>~</code> on a signed value can produce a negative result that sign-extends unexpectedly. Unsigned types have none of these.</p>
+  </details>
+
+  <details>
+    <summary>Why is a bit-field struct unsuitable for describing a network packet?</summary>
+    <p>Because the standard does not fix the allocation order of fields within a unit, whether a field may straddle units, or the alignment and padding of the whole structure. Two compilers can lay out the same declaration differently, so the bytes your program writes need not match what the protocol requires. Use explicit shifts and masks for anything that crosses a boundary.</p>
+  </details>
+
+  <details>
+    <summary>Why does <code>v &amp;= v - 1</code> clear the lowest set bit?</summary>
+    <p>Subtracting 1 turns the lowest set bit into 0 and every bit below it into 1, while leaving the higher bits untouched. ANDing the original with that result keeps only the higher bits — so exactly one set bit disappears per iteration. A counting loop built on it runs once per set bit instead of once per bit position.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Where this leads</h2>
+  <p>Week 26 turns to files and streams — opening, reading, writing, positioning, and the buffering that explains why output sometimes appears late. The binary record format built there is the first place this week's packing matters outside your own process, and week 37 then makes such a format portable across machines with different byte order.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_24_Standard_Library_Toolbox.html">← Week 24</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_26_Files_and_Streams.html">Week 26 →</a>
+</div>
+
+</div>
