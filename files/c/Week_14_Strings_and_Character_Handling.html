@@ -1,0 +1,403 @@
+---
+layout: without-sidebar
+title: "Week 14 — Strings and Character Handling"
+permalink: /files/c/Week_14_Strings_and_Character_Handling.html
+excerpt: "Null-terminated character arrays, string literals and why they are read-only, the string.h functions and their traps, block memory operations, and safe building with snprintf."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Basic · Week 14</div>
+  <h1>Strings and Character Handling</h1>
+  <p class="c-wk-lead">C has no string type. It has a convention: an array of characters with a zero byte marking the end. Everything in <code>&lt;string.h&gt;</code> follows from that single decision, and so does a remarkable share of the security vulnerabilities of the last forty years.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Explain the null terminator and account for it in every buffer you size.</li>
+      <li>Say why writing to a string literal crashes, and how to get a modifiable copy.</li>
+      <li>Use the <code>&lt;string.h&gt;</code> functions correctly, including the ones that are traps.</li>
+      <li>Choose between <code>strcpy</code>, <code>strncpy</code>, and <code>snprintf</code> and justify the choice.</li>
+      <li>Use the block memory functions and explain when <code>memmove</code> is required.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The convention</h2>
+
+  <p>A C string is a sequence of characters followed by <code>'\0'</code>, the character with value zero. Nothing records the length; every function that needs it scans forward until it finds the terminator.</p>
+
+<pre><code>char greeting[6] = { 'h', 'e', 'l', 'l', 'o', '\0' };
+char greeting[]  = "hello";     /* identical — the compiler adds '\0' */</code></pre>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 620 110" role="img" aria-label="The string hello stored as six bytes, the last being the null terminator" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="30" y="28" width="56" height="42" rx="6"/><rect x="90" y="28" width="56" height="42" rx="6"/>
+        <rect x="150" y="28" width="56" height="42" rx="6"/><rect x="210" y="28" width="56" height="42" rx="6"/>
+        <rect x="270" y="28" width="56" height="42" rx="6"/>
+      </g>
+      <g fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 3">
+        <rect x="330" y="28" width="56" height="42" rx="6"/>
+      </g>
+      <g fill="currentColor" font-size="14" text-anchor="middle" font-family="inherit">
+        <text x="58" y="55">'h'</text><text x="118" y="55">'e'</text><text x="178" y="55">'l'</text>
+        <text x="238" y="55">'l'</text><text x="298" y="55">'o'</text><text x="358" y="55">'\0'</text>
+      </g>
+      <g fill="currentColor" font-size="11" text-anchor="middle" opacity=".6" font-family="inherit">
+        <text x="58" y="86">0</text><text x="118" y="86">1</text><text x="178" y="86">2</text>
+        <text x="238" y="86">3</text><text x="298" y="86">4</text><text x="358" y="86">5</text>
+      </g>
+      <g fill="currentColor" font-size="12" opacity=".75" font-family="inherit">
+        <text x="410" y="45">strlen = 5</text>
+        <text x="410" y="63">sizeof = 6</text>
+      </g>
+    </svg>
+    <p class="c-wk-cap">Five characters, six bytes. The gap between <code>strlen</code> and <code>sizeof</code> is the source of most buffer bugs.</p>
+  </div>
+
+  <p>Two consequences follow immediately, and both cost real money every year.</p>
+
+  <p><strong>Length is O(n), not O(1).</strong> <code>strlen</code> walks the whole string. Calling it in a loop condition — <code>for (i = 0; i &lt; strlen(s); i++)</code> — makes an O(n) loop into an O(n²) one. Compute it once.</p>
+
+  <p><strong>Every buffer needs one extra byte.</strong> A buffer for ten characters must be <code>char buf[11]</code>. Off-by-one here is not a wrong answer; it is memory corruption.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Literals are read-only</h2>
+
+<pre><code>char  array[]  = "hello";    /* a modifiable copy in the array   */
+char *pointer  = "hello";    /* a pointer to read-only storage   */
+
+array[0]   = 'H';            /* fine                              */
+pointer[0] = 'H';            /* undefined behavior — usually crash */</code></pre>
+
+  <p>The distinction is not stylistic. The first line creates a six-byte array on the stack and copies the literal into it. The second stores the <em>address</em> of the literal, which lives in a read-only section of the executable — the <code>.rodata</code> section that week 52 inspects directly. Writing there fails at the hardware level.</p>
+
+  <p>Always declare a pointer to a literal as <code>const</code>, so the compiler catches the mistake rather than the operating system:</p>
+
+<pre><code>const char *pointer = "hello";
+pointer[0] = 'H';            /* now a compile error */</code></pre>
+
+  <p>C23 finally made string literals <code>const</code>-qualified by default. Until a codebase is on C23, writing it yourself is the only protection.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>The <code>&lt;string.h&gt;</code> functions</h2>
+
+  <table>
+    <thead><tr><th>Function</th><th>Does</th><th>Watch out for</th></tr></thead>
+    <tbody>
+      <tr><td><code>strlen(s)</code></td><td>Length, excluding the terminator</td><td>O(n); returns <code>size_t</code>, so <code>strlen(s) - 1</code> wraps when empty</td></tr>
+      <tr><td><code>strcpy(dst, src)</code></td><td>Copy including the terminator</td><td>No bound. Overflows silently.</td></tr>
+      <tr><td><code>strncpy(dst, src, n)</code></td><td>Copy at most <code>n</code> bytes</td><td>Does <em>not</em> terminate if <code>src</code> is too long. See below.</td></tr>
+      <tr><td><code>strcmp(a, b)</code></td><td>&lt;0, 0, or &gt;0</td><td>Returns 0 for <em>equal</em> — the opposite of a boolean</td></tr>
+      <tr><td><code>strcat(dst, src)</code></td><td>Append</td><td>No bound, and rescans <code>dst</code> every call</td></tr>
+      <tr><td><code>strchr(s, c)</code></td><td>Pointer to the first <code>c</code>, or <code>NULL</code></td><td>Searches for a <code>char</code>, not a string</td></tr>
+      <tr><td><code>strstr(h, n)</code></td><td>Pointer to the first occurrence of <code>n</code></td><td>Returns a pointer into <code>h</code>, not a copy</td></tr>
+      <tr><td><code>strtok(s, delims)</code></td><td>Split into tokens</td><td><strong>Modifies <code>s</code></strong> and keeps hidden static state</td></tr>
+    </tbody>
+  </table>
+
+  <h3><code>strcmp</code> returns 0 for equal</h3>
+<pre><code>if (strcmp(a, b) == 0) { /* the strings are equal */ }
+if (strcmp(a, b))       { /* the strings DIFFER   */ }</code></pre>
+  <p>The second reads like "if a equals b" and means the opposite. Always compare explicitly against 0.</p>
+
+  <h3><code>strncpy</code> is not the safe <code>strcpy</code></h3>
+  <p>It looks like a bounded copy and is widely used as one. It is not. If the source is at least <code>n</code> bytes, <strong>no terminator is written</strong>, and you are left with an unterminated character array that the next <code>strlen</code> will run off the end of.</p>
+
+<pre><code>char dst[5];
+strncpy(dst, "hello world", 5);   /* dst = "hello" with NO terminator */
+printf("%s\n", dst);              /* reads past the end */</code></pre>
+
+  <p>It also pads with zeros to the full length when the source is shorter, which is wasted work on a large buffer. It was designed in the 1970s for fixed-width database fields, not for safety. Use <code>snprintf</code> instead:</p>
+
+<pre><code>snprintf(dst, sizeof dst, "%s", source);   /* always terminates */</code></pre>
+
+  <h3><code>strtok</code> modifies its input</h3>
+<pre><code>char text[] = "a,b,c";            /* must be modifiable — not a literal */
+char *token = strtok(text, ",");
+while (token != NULL) {
+    puts(token);
+    token = strtok(NULL, ",");    /* NULL means "continue the same string" */
+}
+/* text is now "a\0b\0c" */</code></pre>
+  <p>It writes terminators into your buffer and remembers its position in a hidden static variable, which makes it unusable from two places at once and unsafe with threads. Week 41 returns to this under reentrancy; the thread-safe variant is <code>strtok_r</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Block memory operations</h2>
+
+  <p>These work on raw bytes and know nothing about terminators, so they need an explicit length. They are also the right tool for any array, not just characters.</p>
+
+<pre><code>memcpy(dst, src, n);    /* copy n bytes; regions must not overlap */
+memmove(dst, src, n);   /* copy n bytes; overlap is handled        */
+memset(buf, 0, n);      /* fill n bytes with a value               */
+memcmp(a, b, n);        /* compare n bytes; 0 means equal          */</code></pre>
+
+  <h3>Why both <code>memcpy</code> and <code>memmove</code></h3>
+  <p><code>memcpy</code> promises the regions do not overlap, which lets it copy in whatever order is fastest — several bytes at a time, possibly backwards. Give it overlapping regions and the result is undefined: it may copy a byte it has already overwritten.</p>
+
+<pre><code>char buf[] = "abcdef";
+memcpy(buf + 1, buf, 5);    /* UNDEFINED: regions overlap  */
+memmove(buf + 1, buf, 5);   /* correct: "aabcde"           */</code></pre>
+
+  <p><code>memmove</code> checks the direction and copies accordingly. It is marginally slower and always correct. When in doubt, use it.</p>
+
+  <p><code>memset</code> sets <em>bytes</em>, which is why it is only useful for 0 and for single-byte values. <code>memset(arr, 1, sizeof arr)</code> on an <code>int</code> array does not fill it with ones; it fills every byte with 1, giving elements of <code>0x01010101</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span><code>&lt;ctype.h&gt;</code> and safe construction</h2>
+
+<pre><code>#include &lt;ctype.h&gt;
+
+isalpha(c)  isdigit(c)  isalnum(c)  isspace(c)
+isupper(c)  islower(c)  ispunct(c)
+toupper(c)  tolower(c)</code></pre>
+
+  <p>One subtlety with a real consequence: these take an <code>int</code> whose value must be representable as <code>unsigned char</code>, or be <code>EOF</code>. Passing a plain <code>char</code> that is negative — which happens with byte values above 127 where <code>char</code> is signed, as week 4 noted — is undefined behavior. Cast:</p>
+
+<pre><code>if (isalpha((unsigned char)s[i])) { … }</code></pre>
+
+  <h3>Building strings safely</h3>
+  <p><code>snprintf</code> is the workhorse. It writes at most <code>size</code> bytes including the terminator, always terminates, and returns the length it <em>would</em> have written — which is how you detect truncation.</p>
+
+<pre><code>char line[32];
+int needed = snprintf(line, sizeof line, "%s: %d", name, score);
+
+if (needed &lt; 0) {
+    /* encoding error */
+} else if ((size_t)needed &gt;= sizeof line) {
+    /* truncated: needed bytes were required */
+}</code></pre>
+
+  <p>That return value is the part people miss. A program that ignores it silently produces truncated output, which in a filename or a command is a security problem rather than a cosmetic one.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: a string toolkit, by hand and by library</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;ctype.h&gt;
+#include &lt;stdbool.h&gt;
+
+/* --- written by hand, to show what the library does --- */
+
+static size_t my_strlen(const char *s)
+{
+    const char *start = s;
+    while (*s != '\0') {
+        s++;
+    }
+    return (size_t)(s - start);      /* pointer subtraction: week 15 */
+}
+
+static void my_strcpy(char *dst, const char *src)
+{
+    while ((*dst++ = *src++) != '\0') {
+        /* copies, including the terminator, then stops */
+    }
+}
+
+static int my_strcmp(const char *a, const char *b)
+{
+    while (*a != '\0' &amp;&amp; *a == *b) {
+        a++;
+        b++;
+    }
+    return (unsigned char)*a - (unsigned char)*b;
+}
+
+/* --- a safe copy, which the library does not provide --- */
+
+static bool copy_into(char *dst, size_t dst_size, const char *src)
+{
+    int needed = snprintf(dst, dst_size, "%s", src);
+    return needed &gt;= 0 &amp;&amp; (size_t)needed &lt; dst_size;
+}
+
+static void to_upper_in_place(char *s)
+{
+    for (; *s != '\0'; s++) {
+        *s = (char)toupper((unsigned char)*s);
+    }
+}
+
+static size_t count_words(const char *s)
+{
+    size_t words = 0;
+    bool in_word = false;
+    for (; *s != '\0'; s++) {
+        if (isspace((unsigned char)*s)) {
+            in_word = false;
+        } else if (!in_word) {
+            in_word = true;
+            words++;
+        }
+    }
+    return words;
+}
+
+int main(void)
+{
+    const char *sample = "the quick brown fox";
+
+    puts("== hand-written versus library ==");
+    printf("  my_strlen  = %zu   strlen  = %zu\n",
+           my_strlen(sample), strlen(sample));
+
+    char a[32], b[32];
+    my_strcpy(a, sample);
+    strcpy(b, sample);
+    printf("  my_strcpy  = \"%s\"\n", a);
+    printf("  strcpy     = \"%s\"\n", b);
+
+    printf("  my_strcmp(\"abc\",\"abd\") = %d   strcmp = %d\n",
+           my_strcmp("abc", "abd"), strcmp("abc", "abd"));
+    printf("  equal strings give 0: %d\n", strcmp("same", "same"));
+
+    puts("\n== strlen versus sizeof ==");
+    char buffer[32] = "hello";
+    printf("  strlen(buffer) = %zu   sizeof buffer = %zu\n",
+           strlen(buffer), sizeof buffer);
+    puts("  the difference is room for growth plus the terminator");
+
+    puts("\n== truncation, detected ==");
+    char small[8];
+    if (copy_into(small, sizeof small, "short")) {
+        printf("  \"short\" fitted: \"%s\"\n", small);
+    }
+    if (!copy_into(small, sizeof small, "a much longer string")) {
+        printf("  long string truncated to \"%s\" — and we know it\n", small);
+    }
+
+    puts("\n== strncpy does not always terminate ==");
+    char danger[6];
+    memset(danger, 'X', sizeof danger);      /* poison, to make it visible */
+    strncpy(danger, "hello world", 5);
+    printf("  first five bytes: %.5s\n", danger);
+    printf("  byte 5 is '%c' (%d) — not a terminator\n",
+           danger[5], danger[5]);
+    puts("  printing this with %s would read past the end");
+
+    puts("\n== memmove versus memcpy ==");
+    char overlap[] = "abcdef";
+    memmove(overlap + 1, overlap, 5);
+    printf("  memmove overlapping: %s\n", overlap);
+    puts("  memcpy on the same input is undefined behavior");
+
+    puts("\n== tokenizing modifies the buffer ==");
+    char csv[] = "red,green,blue";
+    printf("  before: %s\n", csv);
+    for (char *tok = strtok(csv, ","); tok != NULL; tok = strtok(NULL, ",")) {
+        printf("    token: %s\n", tok);
+    }
+    printf("  after:  %s   &lt;-- only the first token; commas became '\\0'\n", csv);
+
+    puts("\n== character classification ==");
+    char text[32];
+    strcpy(text, sample);
+    printf("  words in \"%s\" = %zu\n", text, count_words(text));
+    to_upper_in_place(text);
+    printf("  upper-cased: %s\n", text);
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o strings strings.c
+./strings</code></pre>
+
+  <h3>The crash worth causing</h3>
+  <p>Add these two lines and run it:</p>
+
+<pre><code>char *literal = "hello";      /* no const — the compiler allows it */
+literal[0] = 'H';             /* undefined behavior */</code></pre>
+
+<pre><code>Segmentation fault (core dumped)</code></pre>
+
+  <p>Now add <code>const</code> and rebuild:</p>
+<pre><code>const char *literal = "hello";
+literal[0] = 'H';</code></pre>
+<pre><code>error: assignment of read-only location '*literal'</code></pre>
+
+  <p>The same defect, moved from a run-time crash to a compile-time error by one keyword. That is the entire argument for <code>const</code> correctness, which week 16 develops into a discipline.</p>
+
+  <h3>The overflow worth causing</h3>
+<pre><code>char tiny[4];
+strcpy(tiny, "far too long");   /* no bound checking anywhere */</code></pre>
+
+  <p>Without the sanitizer this may appear to work, corrupting a neighbouring variable exactly as week 12's array overflow did. With <code>-fsanitize=address</code>:</p>
+
+<pre><code>==12345==ERROR: AddressSanitizer: stack-buffer-overflow
+WRITE of size 13 at 0x7ffd... thread T0
+    #0 0x... in main strings.c:118</code></pre>
+
+  <p>This is the defect class that produced the Morris worm in 1988 and has not stopped since. Week 36 examines why it is so exploitable.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>char buf[5]; strcpy(buf, "hello");</code></td><td>Six bytes into five: overflow</td><td>Size for length + 1, or use <code>snprintf</code>.</td></tr>
+      <tr><td><code>if (strcmp(a, b))</code></td><td>True when the strings <em>differ</em></td><td><code>strcmp(a, b) == 0</code>.</td></tr>
+      <tr><td>Trusting <code>strncpy</code> to terminate</td><td>Unterminated buffer; later <code>strlen</code> runs off the end</td><td><code>snprintf(dst, sizeof dst, "%s", src)</code>.</td></tr>
+      <tr><td><code>char *p = "x"; p[0] = 'y';</code></td><td>Crash — literals are read-only</td><td>Use an array, or declare <code>const char *</code>.</td></tr>
+      <tr><td><code>strlen</code> in a loop condition</td><td>O(n²) instead of O(n)</td><td>Compute once into a variable.</td></tr>
+      <tr><td><code>strtok</code> on a literal</td><td>Crash — it writes terminators</td><td>Tokenize a modifiable copy.</td></tr>
+      <tr><td><code>memcpy</code> with overlapping regions</td><td>Undefined; garbled result</td><td><code>memmove</code>.</td></tr>
+      <tr><td><code>isalpha(s[i])</code> with signed <code>char</code></td><td>Undefined for bytes above 127</td><td>Cast to <code>unsigned char</code>.</td></tr>
+      <tr><td>Ignoring <code>snprintf</code>'s return value</td><td>Silent truncation</td><td>Compare it against the buffer size.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why must a buffer holding ten characters be declared with size 11?</summary>
+    <p>Because a C string carries no length field; the end is marked by a <code>'\0'</code> byte that occupies storage like any other character. <code>strlen</code> reports the characters before it, so the array must hold length + 1 bytes. Sizing for the length alone is not a wrong answer, it is a buffer overflow.</p>
+  </details>
+
+  <details>
+    <summary>Why does <code>char *p = "hi"; p[0] = 'H';</code> crash while <code>char a[] = "hi"; a[0] = 'H';</code> does not?</summary>
+    <p>The array form copies the literal into modifiable storage that belongs to your function. The pointer form stores the address of the literal itself, which the compiler places in a read-only section of the executable; the write is refused by the memory protection hardware. Declaring such pointers <code>const char *</code> turns the crash into a compile error.</p>
+  </details>
+
+  <details>
+    <summary>Is <code>strncpy</code> the safe version of <code>strcpy</code>?</summary>
+    <p>No. It bounds the number of bytes written, but if the source fills that bound it writes no terminator, leaving an unterminated array that the next string function will read past. It was designed for fixed-width records, not for safety. <code>snprintf</code> always terminates and reports whether truncation occurred.</p>
+  </details>
+
+  <details>
+    <summary>When must you use <code>memmove</code> instead of <code>memcpy</code>?</summary>
+    <p>Whenever the source and destination regions can overlap. <code>memcpy</code> is permitted to assume they do not and may copy in any order, so overlapping input gives undefined results. <code>memmove</code> detects the direction and copies safely, at a negligible cost.</p>
+  </details>
+
+  <details>
+    <summary>Why is calling <code>strlen(s)</code> in a loop condition a performance bug?</summary>
+    <p>Because the length is not stored anywhere — <code>strlen</code> scans to the terminator every time it is called. Evaluating it once per iteration turns an O(n) loop into O(n²). Compute it once before the loop, provided the string does not change inside it.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>That is the Basic level complete. You can build, format, version, and reason about a C program; you know how values are represented, how types convert, how control flows, and how pointers and strings work. Week 15 opens the Intermediate level by developing pointer arithmetic properly — the <code>s - start</code> in <code>my_strlen</code> above was a preview — and weeks 19 and 20 then apply it to memory you allocate yourself.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_13_Introduction_to_Pointers.html">← Week 13</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_15_Pointer_Arithmetic_and_Arrays.html">Week 15 →</a>
+</div>
+
+</div>

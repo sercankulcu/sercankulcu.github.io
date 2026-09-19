@@ -1,0 +1,409 @@
+---
+layout: without-sidebar
+title: "Week 10 — Loops and Flow Control"
+permalink: /files/c/Week_10_Loops_and_Flow_Control.html
+excerpt: "for, while and do-while; loop invariants and termination; nested loops; break, continue and goto; and a systematic way to stop making off-by-one errors."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Basic · Week 10</div>
+  <h1>Loops and Flow Control</h1>
+  <p class="c-wk-lead">Three loop forms, and they are interchangeable — any one can express what the others do. What is not interchangeable is the discipline of knowing why a loop is correct, which is the difference between code that works on your test case and code that works.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Choose between <code>for</code>, <code>while</code>, and <code>do-while</code> for a given task.</li>
+      <li>State a loop's invariant and use it to argue the loop is correct.</li>
+      <li>Reason about half-open ranges and stop making off-by-one errors.</li>
+      <li>Use <code>break</code> and <code>continue</code>, and escape a nested loop cleanly.</li>
+      <li>Say when <code>goto</code> is defensible in C, and why week 27 comes back to it.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The three forms</h2>
+
+  <h3><code>while</code> — test first</h3>
+<pre><code>while (condition) {
+    body
+}</code></pre>
+  <p>Test, then run the body, then test again. If the condition is false initially, the body never runs. Use it when the number of iterations is not known in advance.</p>
+
+  <h3><code>for</code> — the counted loop</h3>
+<pre><code>for (initialization; condition; update) {
+    body
+}</code></pre>
+  <p>Exactly equivalent to:</p>
+<pre><code>initialization;
+while (condition) {
+    body
+    update;
+}</code></pre>
+  <p>The value of <code>for</code> is that all three pieces of loop bookkeeping sit on one line where a reader can check them together. Use it whenever there is a counter.</p>
+
+  <p>All three clauses are optional. <code>for (;;)</code> is the conventional infinite loop — an empty condition is treated as true.</p>
+
+  <h3><code>do-while</code> — test after</h3>
+<pre><code>do {
+    body
+} while (condition);      /* note the semicolon */</code></pre>
+  <p>The body always runs at least once. This is the right shape for "ask, then check whether the answer was acceptable" — the input loop from week 8 is naturally a <code>do-while</code>. It is the least used of the three, and the trailing semicolon is easy to forget.</p>
+
+  <h3>Declaring the counter inside</h3>
+<pre><code>for (int i = 0; i &lt; n; i++) { … }
+/* i does not exist here */</code></pre>
+  <p>A C99 feature, and the right default: the counter is scoped to the loop, so it cannot be accidentally reused afterwards and the name is free for the next loop. Week 2 showed this failing under <code>-std=c89</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Half-open ranges and off-by-one errors</h2>
+
+  <p>The canonical C loop counts from 0 while the index is <em>less than</em> the count:</p>
+
+<pre><code>for (size_t i = 0; i &lt; n; i++) { … }</code></pre>
+
+  <p>This is a <strong>half-open range</strong>, written [0, n): it includes 0 and excludes n. It is not arbitrary convention — it has three properties that eliminate whole categories of mistake.</p>
+
+  <table>
+    <thead><tr><th>Property</th><th>Why it helps</th></tr></thead>
+    <tbody>
+      <tr><td>The number of iterations is <code>n - 0 = n</code></td><td>The count is visible without arithmetic</td></tr>
+      <tr><td>An empty range is <code>i &lt; 0</code>, which is simply false</td><td>Zero elements needs no special case</td></tr>
+      <tr><td>Adjacent ranges join without gaps or overlap</td><td>[0,k) and [k,n) cover [0,n) exactly</td></tr>
+    </tbody>
+  </table>
+
+  <p>Compare with the closed alternative:</p>
+
+<pre><code>for (size_t i = 0; i &lt;= n - 1; i++) { … }   /* same idea, three defects */</code></pre>
+
+  <p>It needs the reader to compute <code>n - 1</code>; it breaks when <code>n</code> is 0, because <code>0 - 1</code> on an unsigned type wraps to an enormous value (week 7); and two adjacent ranges written this way are easy to overlap by one.</p>
+
+  <div class="c-wk-note">
+    <p><strong>The off-by-one checklist.</strong> When a loop is wrong by one, ask three questions in this order. Does the first iteration handle the first element? Does the last iteration handle the last element? Does the loop do the right thing when there are zero elements? Almost every off-by-one error is one of those three, and checking them takes ten seconds.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Loop invariants</h2>
+
+  <p>An invariant is a statement that is true before the loop starts, true after every iteration, and therefore true when the loop ends. Combine it with the exit condition and you have an argument that the loop is correct — not a test that it happened to work.</p>
+
+<pre><code>int maximum = values[0];
+/* invariant: maximum equals the largest of values[0..i-1] */
+for (size_t i = 1; i &lt; n; i++) {
+    if (values[i] &gt; maximum) {
+        maximum = values[i];
+    }
+}
+/* loop ended with i == n, so by the invariant:
+   maximum is the largest of values[0..n-1] — the whole array */</code></pre>
+
+  <p>Writing the invariant as a comment is a genuine technique, not a classroom exercise. It forces the two questions that catch real bugs: is it true before the first iteration — here, that <code>maximum</code> is the largest of a one-element range, which is why the initialization reads <code>values[0]</code> and the loop starts at 1 — and does the body preserve it?</p>
+
+  <p>It also exposes an edge case immediately. The invariant assumes <code>values[0]</code> exists, so this loop is wrong for <code>n == 0</code>. The fix has to be a guard before the loop, and the invariant is what told you so.</p>
+
+  <h3>Termination</h3>
+  <p>An invariant shows the loop computes the right thing <em>if</em> it stops. Termination is a separate obligation: identify a quantity that strictly decreases and cannot go below a bound. In a counting loop it is <code>n - i</code>. In a <code>while</code> loop driven by input it is the number of remaining characters. If you cannot name that quantity, you have not shown the loop terminates.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Nested loops</h2>
+
+<pre><code>for (size_t row = 0; row &lt; rows; row++) {
+    for (size_t col = 0; col &lt; cols; col++) {
+        printf("%4zu", row * col);
+    }
+    putchar('\n');
+}</code></pre>
+
+  <p>The inner loop runs completely for each iteration of the outer one, so the body executes <code>rows × cols</code> times. That multiplication is worth keeping in mind: a nested loop over a thousand-element array is a million operations, and three levels is a billion. Week 33 gives this the name O(n²).</p>
+
+  <p>Give nested counters real names. <code>i</code> and <code>j</code> are fine one level deep; at two levels <code>row</code> and <code>col</code> prevent the single most common nesting bug, which is using the wrong index inside the inner body.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span><code>break</code>, <code>continue</code>, and <code>goto</code></h2>
+
+  <h3><code>break</code></h3>
+  <p>Leaves the innermost enclosing loop or <code>switch</code> immediately.</p>
+<pre><code>size_t found = n;                 /* n means "not found" */
+for (size_t i = 0; i &lt; n; i++) {
+    if (values[i] == target) {
+        found = i;
+        break;
+    }
+}</code></pre>
+
+  <h3><code>continue</code></h3>
+  <p>Skips the rest of the body and goes to the next iteration. In a <code>for</code> loop the update clause still runs; in a <code>while</code> loop it does not, which is a genuine hazard:</p>
+
+<pre><code>size_t i = 0;
+while (i &lt; n) {
+    if (skip(values[i])) {
+        continue;                 /* i never increments — infinite loop */
+    }
+    process(values[i]);
+    i++;
+}</code></pre>
+
+  <p>This is a strong argument for preferring <code>for</code> whenever there is a counter: the update lives in the loop header where <code>continue</code> cannot bypass it.</p>
+
+  <h3>Escaping a nested loop</h3>
+  <p><code>break</code> leaves only one level. The three usual options:</p>
+
+<pre><code>/* 1. A flag — works, but clutters both conditions */
+bool done = false;
+for (size_t r = 0; r &lt; rows &amp;&amp; !done; r++) {
+    for (size_t c = 0; c &lt; cols; c++) {
+        if (grid[r][c] == target) { done = true; break; }
+    }
+}
+
+/* 2. A function — usually the cleanest; return leaves everything */
+static bool contains(int grid[][COLS], size_t rows, int target)
+{
+    for (size_t r = 0; r &lt; rows; r++) {
+        for (size_t c = 0; c &lt; COLS; c++) {
+            if (grid[r][c] == target) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+/* 3. goto — the one case where most C style guides allow it for loops */
+for (size_t r = 0; r &lt; rows; r++) {
+    for (size_t c = 0; c &lt; cols; c++) {
+        if (grid[r][c] == target) {
+            goto found;
+        }
+    }
+}
+puts("not found");
+goto done;
+found:
+puts("found");
+done:
+;</code></pre>
+
+  <p>Option 2 is the right default. If the inner work deserves a name, giving it one solves the control-flow problem as a side effect.</p>
+
+  <h3>About <code>goto</code></h3>
+  <p><code>goto</code> jumps to a label within the same function. Its reputation comes from an era when it was the primary control structure and programs became untraceable. With <code>if</code>, loops, and functions available, that use is obsolete.</p>
+
+  <p>Two uses survive in modern C. Breaking out of nested loops, as above. And — far more important — unwinding resources on an error path, which is the dominant error-handling idiom in the Linux kernel and most serious C libraries:</p>
+
+<pre><code>FILE *in = fopen(path, "r");
+if (in == NULL)          goto fail;
+buf = malloc(size);
+if (buf == NULL)         goto close_in;
+…
+close_in:
+    fclose(in);
+fail:
+    return NULL;</code></pre>
+
+  <p>That pattern is week 27's subject, once you have files and dynamic memory to unwind. Mentioning it now is deliberate: you should not leave this week thinking <code>goto</code> is simply forbidden.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: a sieve and a table</h2>
+
+  <p>Two classic loops, each with its invariant stated and its boundaries tested.</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdbool.h&gt;
+
+#define LIMIT 50
+#define TABLE 9
+
+/* Sieve of Eratosthenes over [2, LIMIT].
+   Invariant: after processing p, every composite with a factor &lt;= p
+   has been marked false. */
+static void print_primes(void)
+{
+    bool is_prime[LIMIT + 1];
+
+    for (size_t i = 0; i &lt;= LIMIT; i++) {
+        is_prime[i] = true;
+    }
+    is_prime[0] = false;
+    is_prime[1] = false;
+
+    for (size_t p = 2; p * p &lt;= LIMIT; p++) {
+        if (!is_prime[p]) {
+            continue;                 /* already crossed out */
+        }
+        /* Start at p*p: smaller multiples of p have a smaller
+           factor and were crossed out in an earlier pass. */
+        for (size_t multiple = p * p; multiple &lt;= LIMIT; multiple += p) {
+            is_prime[multiple] = false;
+        }
+    }
+
+    printf("primes up to %d:\n ", LIMIT);
+    size_t printed = 0;
+    for (size_t i = 2; i &lt;= LIMIT; i++) {
+        if (is_prime[i]) {
+            printf("%4zu", i);
+            if (++printed % 10 == 0) {
+                printf("\n ");
+            }
+        }
+    }
+    putchar('\n');
+}
+
+/* A multiplication table with aligned headers. */
+static void print_table(void)
+{
+    printf("\nmultiplication table\n");
+
+    printf("    ");
+    for (size_t col = 1; col &lt;= TABLE; col++) {
+        printf("%4zu", col);
+    }
+    printf("\n    ");
+    for (size_t col = 1; col &lt;= TABLE; col++) {
+        printf("----");
+    }
+    putchar('\n');
+
+    for (size_t row = 1; row &lt;= TABLE; row++) {
+        printf("%2zu |", row);
+        for (size_t col = 1; col &lt;= TABLE; col++) {
+            printf("%4zu", row * col);
+        }
+        putchar('\n');
+    }
+}
+
+/* Linear search returning the count as "not found",
+   so the caller needs no separate flag. */
+static size_t find(const int values[], size_t n, int target)
+{
+    for (size_t i = 0; i &lt; n; i++) {
+        if (values[i] == target) {
+            return i;
+        }
+    }
+    return n;
+}
+
+int main(void)
+{
+    print_primes();
+    print_table();
+
+    const int data[] = { 4, 8, 15, 16, 23, 42 };
+    const size_t n = sizeof data / sizeof data[0];
+
+    printf("\nsearching %zu values\n", n);
+    const int targets[] = { 15, 99 };
+    for (size_t t = 0; t &lt; 2; t++) {
+        size_t at = find(data, n, targets[t]);
+        if (at == n) {
+            printf("  %d: not found\n", targets[t]);
+        } else {
+            printf("  %d: at index %zu\n", targets[t], at);
+        }
+    }
+
+    /* The boundary case every search must survive. */
+    printf("  empty array: %s\n",
+           find(data, 0, 15) == 0 ? "correctly reports not found" : "BUG");
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o loops loops.c
+./loops</code></pre>
+
+  <h3>Three decisions worth examining</h3>
+
+  <p><strong>Why the sieve's inner loop starts at <code>p * p</code>.</strong> Any multiple of <code>p</code> smaller than <code>p²</code> has a factor smaller than <code>p</code>, so an earlier pass already crossed it out. The comment records the reasoning, because the code alone looks like an arbitrary optimization.</p>
+
+  <p><strong>Why the outer loop stops at <code>p * p &lt;= LIMIT</code>.</strong> Once <code>p</code> exceeds √LIMIT, <code>p²</code> is past the end and the inner loop would not execute at all. The invariant tells you the sieve is already complete at that point.</p>
+
+  <p><strong>Why <code>find</code> returns <code>n</code> for "not found".</strong> There is no index <code>n</code> in a half-open range [0, n), so it is an unambiguous sentinel that costs no extra variable and cannot be confused with a real result. Returning −1 is the other convention, but it forces a signed return type and therefore a signed/unsigned comparison at the call site — week 7's trap.</p>
+
+  <h3>Test the boundaries, not the middle</h3>
+  <p>Change <code>LIMIT</code> to 1, then 2, then 3, and rebuild each time.</p>
+  <table>
+    <thead><tr><th><code>LIMIT</code></th><th>Expected</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>no primes; the final loop must not run</td></tr>
+      <tr><td>2</td><td>just 2; the sieve's outer loop never executes, since 2·2 &gt; 2</td></tr>
+      <tr><td>3</td><td>2 and 3</td></tr>
+      <tr><td>4</td><td>2 and 3; the first crossing-out happens</td></tr>
+    </tbody>
+  </table>
+  <p>A loop that is right in the middle and wrong at the edges is the normal failure mode. Testing 1, 2, and 3 finds more bugs than testing 1000.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>for (i = 0; i &lt;= n; i++)</code> over an array</td><td>Reads one element past the end</td><td>Use <code>&lt;</code>, not <code>&lt;=</code>. Half-open ranges.</td></tr>
+      <tr><td><code>i &lt; n - 1</code> when <code>n</code> is unsigned and 0</td><td>Wraps; loop runs forever</td><td>Write <code>i + 1 &lt; n</code>.</td></tr>
+      <tr><td><code>for (i = 0; i &lt; n; i++);</code></td><td>Empty body; the block runs once</td><td>Delete the semicolon; <code>-Wempty-body</code> warns.</td></tr>
+      <tr><td><code>continue</code> in a <code>while</code> before the increment</td><td>Infinite loop</td><td>Use <code>for</code>, or increment before <code>continue</code>.</td></tr>
+      <tr><td>Modifying the counter inside the body</td><td>Iteration count becomes unpredictable</td><td>Let the header own the counter.</td></tr>
+      <tr><td><code>break</code> expected to leave both loops</td><td>Only the inner loop exits</td><td>Extract a function and <code>return</code>.</td></tr>
+      <tr><td>Forgetting the semicolon after <code>do { } while (c)</code></td><td>Confusing syntax error</td><td>It is required.</td></tr>
+      <tr><td>Comparing floats in the loop condition</td><td>May never terminate</td><td>Count with an integer and compute the float from it.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why is <code>i &lt; n</code> preferred over <code>i &lt;= n - 1</code>?</summary>
+    <p>Three reasons. The iteration count is visible as <code>n</code> with no arithmetic; the empty case <code>n == 0</code> works without a special guard, whereas <code>n - 1</code> on an unsigned type wraps to a huge value; and adjacent half-open ranges tile exactly, with no gap or overlap.</p>
+  </details>
+
+  <details>
+    <summary>What is a loop invariant and what does it buy you?</summary>
+    <p>A statement true before the loop and preserved by every iteration, so it is still true when the loop exits. Combined with the exit condition it yields an argument that the loop computes the right answer — a proof sketch rather than a successful test. Writing it also tends to expose the empty and single-element cases immediately.</p>
+  </details>
+
+  <details>
+    <summary>Why can <code>continue</code> in a <code>while</code> loop cause an infinite loop but not in a <code>for</code> loop?</summary>
+    <p>In a <code>while</code> loop the increment is a statement in the body, and <code>continue</code> jumps past it. In a <code>for</code> loop the update clause is part of the loop header and runs on every <code>continue</code>. This is a concrete reason to prefer <code>for</code> whenever a counter is involved.</p>
+  </details>
+
+  <details>
+    <summary><code>break</code> inside a nested loop only exits one level. What is the best fix?</summary>
+    <p>Extract the nested loops into a function and use <code>return</code>, which leaves every level at once and usually improves the code by naming the operation. A flag works but clutters both conditions, and <code>goto</code> to a label after the loops is acceptable but harder to read.</p>
+  </details>
+
+  <details>
+    <summary>Is <code>goto</code> forbidden in professional C?</summary>
+    <p>No. Its use as general control flow is obsolete, but two patterns are standard practice: escaping nested loops, and unwinding acquired resources on an error path — <code>goto cleanup</code>, which is pervasive in the Linux kernel and most serious C libraries because C has no destructors. Week 27 builds that pattern properly.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>You now have every control structure C offers — there are no others. Week 11 turns to organizing code rather than execution: functions, what happens to the call stack when one is called, and why a function that tries to modify its argument cannot succeed. That last failure is the question week 13 answers with pointers.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_09_Conditional_Statements.html">← Week 9</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_11_Functions.html">Week 11 →</a>
+</div>
+
+</div>

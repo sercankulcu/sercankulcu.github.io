@@ -1,0 +1,401 @@
+---
+layout: without-sidebar
+title: "Week 13 — Introduction to Pointers"
+permalink: /files/c/Week_13_Introduction_to_Pointers.html
+excerpt: "Addresses and the address-of operator, declaring and dereferencing pointers, NULL and wild pointers, void pointers, and why arrays decay when passed to a function."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Basic · Week 13</div>
+  <h1>Introduction to Pointers</h1>
+  <p class="c-wk-lead">Week 1 said memory is a numbered list of bytes. A pointer is simply a variable that holds one of those numbers. Everything difficult about pointers comes not from that idea but from what C lets you do with it — and this week closes three loose ends left open since week 8.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Take the address of a variable and store it, and read the value back through it.</li>
+      <li>Explain what a pointer's type is for, given that every address is the same size.</li>
+      <li>Distinguish a null pointer, an uninitialized pointer, and a dangling pointer.</li>
+      <li>Fix the <code>swap</code> that failed in week 11 and explain the <code>&amp;</code> that <code>scanf</code> demanded in week 8.</li>
+      <li>Explain array decay, and why <code>sizeof</code> changed inside a function in week 12.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Addresses</h2>
+
+  <p>Every object in memory occupies a run of bytes starting at some address. The <strong>address-of operator</strong> <code>&amp;</code> gives you that starting address:</p>
+
+<pre><code>int count = 42;
+printf("value   = %d\n",  count);
+printf("address = %p\n", (void *)&amp;count);</code></pre>
+
+<pre><code>value   = 42
+address = 0x7ffd3c2a4b6c</code></pre>
+
+  <p>The exact number is meaningless and will differ on every run — modern operating systems randomize layout deliberately. What matters is that the variable <em>has</em> an address, and that you can hold it.</p>
+
+  <p>The cast to <code>void *</code> in that <code>printf</code> is required: <code>%p</code> expects a <code>void *</code>, and passing any other pointer type is a mismatch of the kind week 8 warned about.</p>
+
+  <h3>Declaring a pointer</h3>
+<pre><code>int *p = &amp;count;      /* p holds the address of count */</code></pre>
+
+  <p>Read the declaration from the inside out: <code>*p</code> is an <code>int</code>, therefore <code>p</code> is a pointer to <code>int</code>. Week 16 turns that reading rule into a systematic method for declarations far worse than this one.</p>
+
+  <p>The asterisk belongs to the variable, not the type. This matters:</p>
+<pre><code>int* a, b;     /* a is int*, b is a plain int — almost never intended */
+int *a, *b;    /* both are pointers                                    */</code></pre>
+  <p>Writing <code>int *p</code> rather than <code>int* p</code> makes the trap visible, which is why most C style guides — and the standard library's own headers — attach the asterisk to the name.</p>
+
+  <h3>Dereferencing</h3>
+  <p>The <strong>indirection operator</strong> <code>*</code>, applied to a pointer, gives the object it points to:</p>
+
+<pre><code>printf("%d\n", *p);    /* 42 — read through the pointer */
+*p = 99;               /* write through the pointer     */
+printf("%d\n", count); /* 99 — count itself changed     */</code></pre>
+
+  <p>That last line is the whole point. <code>p</code> and <code>count</code> are different variables, but <code>*p</code> and <code>count</code> are the same object.</p>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 640 140" role="img" aria-label="A pointer variable holding the address of an integer variable" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="40" y="40" width="180" height="52" rx="10"/>
+        <rect x="400" y="40" width="180" height="52" rx="10"/>
+      </g>
+      <g fill="currentColor" font-size="12.5" text-anchor="middle" font-family="inherit">
+        <text x="130" y="32" opacity=".65">p  (int *)</text>
+        <text x="130" y="66">0x7ffd…4b6c</text>
+        <text x="130" y="84" opacity=".6">at 0x7ffd…4b60</text>
+        <text x="490" y="32" opacity=".65">count  (int)</text>
+        <text x="490" y="66">42</text>
+        <text x="490" y="84" opacity=".6">at 0x7ffd…4b6c</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1.5" opacity=".6">
+        <path d="M220 66h172"/><path d="M384 61l8 5-8 5" fill="none"/>
+      </g>
+      <g fill="currentColor" font-size="11.5" text-anchor="middle" opacity=".7" font-family="inherit">
+        <text x="306" y="56">*p</text>
+        <text x="306" y="120">p holds an address; *p is the object at that address</text>
+      </g>
+    </svg>
+    <p class="c-wk-cap">Two variables. One holds a number that happens to be the other's address.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Why a pointer has a type</h2>
+
+  <p>Every address is the same size — 8 bytes on a 64-bit machine, whatever it points to. So why does C distinguish <code>int *</code> from <code>char *</code>?</p>
+
+  <p>Two reasons, and both are load-bearing.</p>
+
+  <p><strong>Dereferencing needs to know how many bytes to read.</strong> <code>*p</code> on an <code>int *</code> reads four bytes and interprets them as an integer; on a <code>char *</code> it reads one. The address alone does not say.</p>
+
+  <p><strong>Pointer arithmetic scales by the element size.</strong> Adding 1 to an <code>int *</code> advances four bytes, not one. That is what makes <code>p[i]</code> work, and it is week 15's subject.</p>
+
+  <h3><code>void *</code></h3>
+  <p>A <code>void *</code> is an address with the type deliberately removed. It can hold any object pointer, which makes it the basis of generic code — <code>malloc</code> returns one in week 19, and week 30 builds generic containers on it.</p>
+
+<pre><code>int value = 42;
+void *anything = &amp;value;      /* fine: any object pointer converts */
+int *back = anything;         /* fine in C: converts back implicitly */
+/* *anything;  — error: the compiler does not know what is there */</code></pre>
+
+  <p>You cannot dereference a <code>void *</code> without converting it to a real pointer type first. It is an address you have promised to remember the meaning of yourself.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>The three ways a pointer goes wrong</h2>
+
+  <h3>Uninitialized — the wild pointer</h3>
+<pre><code>int *p;          /* contains garbage, like any uninitialized variable */
+*p = 42;         /* writes to an arbitrary address: undefined behavior */</code></pre>
+  <p>This is week 5's uninitialized-variable problem with a much larger blast radius. A garbage <code>int</code> gives a wrong number; a garbage pointer corrupts memory somewhere unrelated. Always initialize — to a real address, or to <code>NULL</code>.</p>
+
+  <h3>Null</h3>
+<pre><code>int *p = NULL;   /* explicitly points at nothing */
+if (p != NULL) {
+    *p = 42;     /* guarded */
+}</code></pre>
+  <p><code>NULL</code> is a pointer value guaranteed to compare unequal to the address of any object. It is the conventional "no result" return — <code>malloc</code> and <code>fopen</code> both use it — so checking for it is routine rather than defensive.</p>
+
+  <p>Dereferencing <code>NULL</code> is undefined behavior, but in practice it is the <em>good</em> failure: page zero is unmapped on every mainstream operating system, so the program dies immediately with a clear signal rather than corrupting something and continuing. C23 adds <code>nullptr</code>, which is type-safe; <code>NULL</code> remains universal.</p>
+
+  <h3>Dangling</h3>
+<pre><code>int *make_bad(void)
+{
+    int local = 42;
+    return &amp;local;      /* the frame dies at return */
+}</code></pre>
+  <p>The address was valid when it was taken. By the time the caller uses it, week 11's stack frame has been popped and that memory belongs to the next call. GCC warns — <em>function returns address of local variable</em> — and this is the reason week 11 insisted that locals do not survive the return. Week 20 meets the heap version, which the compiler cannot catch.</p>
+
+  <div class="c-wk-note">
+    <p><strong>A habit worth forming now.</strong> Initialize every pointer at declaration, set it to <code>NULL</code> when what it pointed to is gone, and check before dereferencing anything that could legitimately be null. Those three rules prevent most of what weeks 19 and 20 spend their time diagnosing.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Pointers as parameters — the fix for <code>swap</code></h2>
+
+  <p>Week 11 established that arguments are copied, so a function cannot change a caller's variable. The way around it is not to pass the variable but its address: the address is copied, and both copies refer to the same object.</p>
+
+<pre><code>void swap(int *a, int *b)
+{
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int x = 1, y = 2;
+swap(&amp;x, &amp;y);        /* now x == 2, y == 1 */</code></pre>
+
+  <p>Compare with the version that failed. The body is nearly identical; the difference is three asterisks and two ampersands. Nothing about the copying rule changed — what changed is what got copied.</p>
+
+  <p>This also finally explains <code>scanf</code>. <code>scanf("%d", &amp;age)</code> passes the address of <code>age</code> so the function can write into it. Omit the <code>&amp;</code> and you pass the <em>value</em> of <code>age</code> — an uninitialized integer — which <code>scanf</code> treats as an address and writes to. That is why the mistake corrupts memory instead of failing cleanly.</p>
+
+  <p>C has no pass-by-reference. It has pass-by-value applied to addresses, which achieves the same result with the mechanism left visible. Week 16 builds the output-parameter conventions that follow from it.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Array decay</h2>
+
+  <p>Now the two mysteries from week 12.</p>
+
+  <p>In almost every context, <strong>an array name converts to a pointer to its first element</strong>. This conversion is called <em>decay</em>, and it happens silently.</p>
+
+<pre><code>int values[5] = { 1, 2, 3, 4, 5 };
+
+values      /* in most expressions, this means &amp;values[0] */
+*values     /* therefore this is values[0], i.e. 1        */</code></pre>
+
+  <p>Indexing is defined in terms of it: <code>values[i]</code> is exactly <code>*(values + i)</code>. That is not an analogy; it is the definition, and week 15 exploits it.</p>
+
+  <h3>Why <code>sizeof</code> changed</h3>
+  <p>Decay does <em>not</em> happen in three places: as the operand of <code>sizeof</code>, as the operand of <code>&amp;</code>, and for a string literal used to initialize an array. So:</p>
+
+<pre><code>int values[5];
+sizeof values          /* 20 — the array, no decay here */
+
+void f(int values[])   /* the parameter is really int *values */
+{
+    sizeof values      /* 8 — a pointer */
+}</code></pre>
+
+  <p>A function parameter written as <code>int values[]</code> is not an array parameter. C has no array parameters. The compiler silently rewrites it to <code>int *values</code>, which is why the length must be passed separately and why <code>sizeof</code> reports 8.</p>
+
+  <h3>Why a function can modify an array</h3>
+  <p>Because what was copied is a pointer to the caller's memory. The function received an address, and writing through it writes to the original. Pass-by-value was never violated: the <em>pointer</em> was copied faithfully.</p>
+
+<pre><code>void zero_all(int values[], size_t n)   /* really int *values */
+{
+    for (size_t i = 0; i &lt; n; i++) {
+        values[i] = 0;                  /* writes to the caller's array */
+    }
+}</code></pre>
+
+  <p>The two spellings <code>int values[]</code> and <code>int *values</code> are identical to the compiler. Use the bracket form when the parameter conceptually is an array — it documents intent — and the star form when it is a pointer to a single object.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: closing three loose ends</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdbool.h&gt;
+
+/* Week 11's version: swaps two copies, achieves nothing. */
+static void swap_broken(int a, int b)
+{
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+/* The fix: three asterisks and two ampersands at the call site. */
+static void swap(int *a, int *b)
+{
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+/* An output parameter: return a status, write the result through a pointer.
+   This is the convention week 16 develops. */
+static bool safe_divide(int numerator, int denominator, int *out)
+{
+    if (denominator == 0) {
+        return false;
+    }
+    *out = numerator / denominator;
+    return true;
+}
+
+/* Demonstrates decay: sizeof here reports a pointer, not the array. */
+static void show_parameter_size(int values[], size_t n)
+{
+    printf("  inside the function: sizeof values = %zu  (a pointer)\n",
+           sizeof values);
+    printf("  the length had to be passed separately: n = %zu\n", n);
+}
+
+/* Writes through the decayed pointer, so the caller's array changes. */
+static void scale_all(int values[], size_t n, int factor)
+{
+    for (size_t i = 0; i &lt; n; i++) {
+        values[i] *= factor;
+    }
+}
+
+int main(void)
+{
+    puts("== 1. addresses ==");
+    int count = 42;
+    int *p = &amp;count;
+    printf("  count      = %d\n", count);
+    printf("  &amp;count     = %p\n", (void *)&amp;count);
+    printf("  p          = %p\n", (void *)p);
+    printf("  *p         = %d\n", *p);
+    *p = 99;
+    printf("  after *p = 99, count = %d\n", count);
+    printf("  sizeof(int) = %zu, sizeof(int *) = %zu\n",
+           sizeof(int), sizeof(int *));
+
+    puts("\n== 2. swap, broken and fixed ==");
+    int x = 1, y = 2;
+    swap_broken(x, y);
+    printf("  after swap_broken: x=%d y=%d   (unchanged)\n", x, y);
+    swap(&amp;x, &amp;y);
+    printf("  after swap:        x=%d y=%d   (swapped)\n", x, y);
+
+    puts("\n== 3. output parameters ==");
+    int result;
+    if (safe_divide(10, 3, &amp;result)) {
+        printf("  10 / 3 = %d\n", result);
+    }
+    if (!safe_divide(10, 0, &amp;result)) {
+        puts("  10 / 0 refused, and result was left untouched");
+    }
+
+    puts("\n== 4. null and guarded access ==");
+    int *maybe = NULL;
+    printf("  maybe is %s\n", maybe == NULL ? "NULL" : "valid");
+    if (maybe != NULL) {
+        printf("  %d\n", *maybe);
+    } else {
+        puts("  guarded: no dereference attempted");
+    }
+
+    puts("\n== 5. array decay ==");
+    int values[5] = { 1, 2, 3, 4, 5 };
+    const size_t n = sizeof values / sizeof values[0];
+    printf("  where declared: sizeof values = %zu, length = %zu\n",
+           sizeof values, n);
+    show_parameter_size(values, n);
+
+    printf("  values == &amp;values[0]?  %s\n",
+           (void *)values == (void *)&amp;values[0] ? "yes" : "no");
+    printf("  *values = %d, values[0] = %d, *(values + 2) = %d, values[2] = %d\n",
+           *values, values[0], *(values + 2), values[2]);
+
+    puts("\n== 6. a function modifying the caller's array ==");
+    printf("  before: ");
+    for (size_t i = 0; i &lt; n; i++) printf("%d ", values[i]);
+    scale_all(values, n, 10);
+    printf("\n  after:  ");
+    for (size_t i = 0; i &lt; n; i++) printf("%d ", values[i]);
+    puts("\n  pass-by-value was never broken: the pointer was copied");
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o pointers pointers.c
+./pointers</code></pre>
+
+  <h3>What the compiler says</h3>
+  <p>Section 5 of the program provokes a warning you should read rather than silence:</p>
+<pre><code>pointers.c:34:12: warning: 'sizeof' on array function parameter 'values'
+                  will return size of 'int *' [-Wsizeof-array-argument]</code></pre>
+  <p>GCC knows exactly what mistake people make here and says so by name.</p>
+
+  <h3>Two experiments</h3>
+
+  <p><strong>The dangling pointer.</strong> Add this and rebuild:</p>
+<pre><code>static int *make_dangling(void)
+{
+    int local = 42;
+    return &amp;local;
+}
+/* in main: */
+int *bad = make_dangling();
+printf("%d\n", *bad);          /* undefined behavior */</code></pre>
+<pre><code>warning: function returns address of local variable [-Wreturn-local-addr]</code></pre>
+  <p>Run it. It may print 42, may print garbage, may crash. Then run it under <code>-fsanitize=address</code>, which reports <em>stack-use-after-return</em> precisely.</p>
+
+  <p><strong>The missing ampersand.</strong> Change <code>swap(&amp;x, &amp;y)</code> to <code>swap(x, y)</code>:</p>
+<pre><code>error: passing argument 1 of 'swap' makes pointer from integer
+       without a cast [-Wint-conversion]</code></pre>
+  <p>Here the type system catches it. With <code>scanf</code> it cannot, because a variadic function declares nothing about its later arguments — which is exactly why forgetting the <code>&amp;</code> there is so much more dangerous.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>int *p; *p = 5;</code></td><td>Writes to a garbage address</td><td>Initialize to a real address or <code>NULL</code>.</td></tr>
+      <tr><td><code>int* a, b;</code></td><td><code>b</code> is an <code>int</code>, not a pointer</td><td>Write <code>int *a, *b;</code> — one declaration per line is better still.</td></tr>
+      <tr><td>Returning <code>&amp;local</code></td><td>Dangling pointer</td><td>Return by value, or let the caller own the storage.</td></tr>
+      <tr><td>Dereferencing without a null check</td><td>Crash on the failure path</td><td>Check whatever can legitimately be <code>NULL</code>.</td></tr>
+      <tr><td><code>sizeof</code> on an array parameter</td><td>Gives the pointer size</td><td>Pass the length; heed <code>-Wsizeof-array-argument</code>.</td></tr>
+      <tr><td>Omitting <code>&amp;</code> in <code>scanf</code></td><td>Memory corruption, no type error</td><td>Always pass the address.</td></tr>
+      <tr><td><code>printf("%p", p)</code> without a cast</td><td>Format mismatch</td><td><code>(void *)p</code>.</td></tr>
+      <tr><td>Confusing <code>*p = 5</code> with <code>p = 5</code></td><td>The second sets the pointer to address 5</td><td>Read <code>*</code> as "the thing at".</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>If every address is 8 bytes, why does a pointer need a type?</summary>
+    <p>Because the address alone does not say how many bytes to read or how to interpret them, and because pointer arithmetic scales by the element size — adding 1 to an <code>int *</code> moves four bytes. The type is what makes <code>*p</code> and <code>p[i]</code> meaningful.</p>
+  </details>
+
+  <details>
+    <summary>Why does <code>swap(int *a, int *b)</code> work when <code>swap(int a, int b)</code> does not?</summary>
+    <p>Both copy their arguments — the rule never changes. The difference is what is copied: in the second case, the values, so only the copies are exchanged. In the first, the addresses, so <code>*a</code> and <code>*b</code> refer to the caller's own variables and the exchange reaches them.</p>
+  </details>
+
+  <details>
+    <summary>Why is dereferencing <code>NULL</code> better than dereferencing an uninitialized pointer?</summary>
+    <p>Both are undefined behavior, but a null dereference targets an unmapped page on every mainstream system, so the program dies immediately with a clear signal at the point of the error. An uninitialized pointer holds an arbitrary address that may be writable, so the program corrupts something and continues — and the symptom appears far from the cause.</p>
+  </details>
+
+  <details>
+    <summary>What is array decay, and where does it not happen?</summary>
+    <p>In most expressions an array name converts to a pointer to its first element. It does not happen as the operand of <code>sizeof</code>, as the operand of <code>&amp;</code>, or when a string literal initializes a character array. Those three exceptions are why <code>sizeof</code> reports the real array size where it is declared and a pointer size inside a function.</p>
+  </details>
+
+  <details>
+    <summary>If arguments are always copied, how can a function change the contents of an array you passed?</summary>
+    <p>Because the array decayed to a pointer before the call, so what was copied is an address pointing into the caller's memory. Writing through that copy writes to the original array. Pass-by-value is intact; the copied value simply happens to be a reference.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 14 applies all of this to strings, which in C are not a type at all but an array of characters ending in <code>'\0'</code> — and which are therefore handled entirely through the pointers you just met. Week 15 then develops the arithmetic that makes <code>values[i]</code> and <code>*(values + i)</code> the same expression.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_12_Arrays.html">← Week 12</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_14_Strings_and_Character_Handling.html">Week 14 →</a>
+</div>
+
+</div>

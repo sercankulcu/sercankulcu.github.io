@@ -1,0 +1,395 @@
+---
+layout: without-sidebar
+title: "Week 12 — One- and Multi-Dimensional Arrays"
+permalink: /files/c/Week_12_Arrays.html
+excerpt: "Declaring, initializing and traversing arrays; indexing with size_t; what an out-of-range write actually corrupts; two-dimensional arrays and row-major layout."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Basic · Week 12</div>
+  <h1>One- and Multi-Dimensional Arrays</h1>
+  <p class="c-wk-lead">An array is the simplest aggregate C has: a fixed number of elements of one type, laid out end to end in memory. That simplicity is its strength and its danger — the language will not stop you writing past the end, and it will not tell you that you did.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Declare, initialize, and traverse arrays, and compute their length correctly.</li>
+      <li>Explain why <code>size_t</code> is the right index type.</li>
+      <li>Describe exactly what happens on an out-of-range access, and demonstrate it.</li>
+      <li>Work with two-dimensional arrays and explain row-major layout.</li>
+      <li>Write the standard array algorithms: sum, extremes, reversal, linear search.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Declaring and initializing</h2>
+
+<pre><code>int scores[5];                       /* five ints, uninitialized */
+int primes[5] = { 2, 3, 5, 7, 11 };  /* five ints, given values  */
+int zeros[5]  = { 0 };               /* first is 0, rest are 0   */
+int partial[5] = { 1, 2 };           /* 1, 2, 0, 0, 0            */
+int sized[]   = { 4, 8, 15, 16 };    /* length 4, deduced        */</code></pre>
+
+  <p>Two rules in that list are worth stating explicitly. If you supply <em>any</em> initializer, every element you did not mention is set to zero — so <code>{ 0 }</code> is the idiomatic way to zero an entire array. And if you supply no initializer at all, the elements contain garbage, exactly as an uninitialized scalar does in week 5.</p>
+
+  <p>The size must be a constant expression in standard C89. C99 added variable-length arrays, where the size can be a run-time value; they are convenient and carry real hazards, which is why they are deferred to week 38.</p>
+
+  <h3>Computing the length</h3>
+<pre><code>size_t n = sizeof primes / sizeof primes[0];</code></pre>
+
+  <p>The total size divided by the size of one element. Using <code>primes[0]</code> rather than <code>int</code> keeps the expression correct if the element type later changes.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>This only works where the array is declared.</strong> Pass the array to a function and <code>sizeof</code> inside that function gives the size of a <em>pointer</em>, not the array — typically 8 instead of 20. Week 13 explains why. Until then: a function that receives an array must also receive its length as a separate parameter, which is why every function in week 11's worked example took <code>size_t n</code>.</p>
+  </div>
+
+  <h3>Designated initializers</h3>
+<pre><code>int sparse[10] = { [2] = 5, [7] = 9 };   /* C99: others are 0 */</code></pre>
+  <p>Useful for lookup tables where most entries are zero, and far more readable than counting commas. Week 21 uses the same syntax on structures.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Indexing, and why <code>size_t</code></h2>
+
+  <p>Elements are numbered from 0. An array of <code>n</code> elements has valid indices 0 through <code>n-1</code> — the half-open range [0, n) from week 10, which is exactly why the canonical loop is written the way it is.</p>
+
+<pre><code>for (size_t i = 0; i &lt; n; i++) {
+    printf("%d ", values[i]);
+}</code></pre>
+
+  <p>Use <code>size_t</code>, not <code>int</code>, for indices. It is unsigned, so it cannot hold a meaningless negative index; it is guaranteed wide enough for any array the platform can hold; and it is the type <code>sizeof</code> yields, so comparing against a computed length does not mix signedness and trigger week 7's trap.</p>
+
+  <p>The cost is the countdown hazard from week 5. To iterate backwards:</p>
+
+<pre><code>for (size_t i = n; i-- &gt; 0; ) {
+    printf("%d ", values[i]);
+}</code></pre>
+
+  <p>This reads oddly and is worth decoding once. The condition tests <code>i</code> against 0 <em>and then</em> decrements it, so the body sees <code>n-1</code> down to <code>0</code>, and the loop exits when the test sees 0 — before the decrement could wrap. It handles <code>n == 0</code> correctly with no special case.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Out of range: what actually happens</h2>
+
+  <p>C performs no bounds checking. None. <code>values[10]</code> on a five-element array computes an address and reads or writes it, exactly as if you had asked for something legitimate.</p>
+
+  <p>Indexing is defined as address arithmetic: <code>values[i]</code> means the object at address <code>values + i × sizeof(element)</code>. If <code>i</code> is out of range, that address belongs to something else — another variable, saved register state, or the function's return address.</p>
+
+  <table>
+    <thead><tr><th>What you hit</th><th>Symptom</th></tr></thead>
+    <tbody>
+      <tr><td>Padding between variables</td><td>Nothing. The bug hides, possibly for years.</td></tr>
+      <tr><td>Another local variable</td><td>That variable changes for no visible reason.</td></tr>
+      <tr><td>The saved return address</td><td>The program crashes on <code>return</code>, far from the real bug.</td></tr>
+      <tr><td>An unmapped page</td><td>Immediate segmentation fault — the lucky case.</td></tr>
+    </tbody>
+  </table>
+
+  <p>The first row is the worst outcome, not the best. A bug that reliably crashes is a bug you will fix today. A bug that silently corrupts a neighbouring variable is a bug you will chase for a week, and the crash will happen somewhere innocent.</p>
+
+  <p>This is the defect class behind a large share of security vulnerabilities, and the reason weeks 20, 35, and 36 all return to it. The practical defence is tooling:</p>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o prog prog.c
+./prog</code></pre>
+
+  <p>AddressSanitizer instruments every access and reports the exact line, the array, and the offset. It costs roughly a factor of two in speed, which is irrelevant during development. Use it from now on.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Two-dimensional arrays</h2>
+
+<pre><code>int grid[3][4];              /* 3 rows, 4 columns */
+int table[2][3] = {
+    { 1, 2, 3 },
+    { 4, 5, 6 }
+};
+grid[1][2] = 7;              /* row 1, column 2 */</code></pre>
+
+  <p>A two-dimensional array is an array of arrays, and it is stored in <strong>row-major order</strong>: the whole first row, then the whole second, contiguously in memory.</p>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 680 150" role="img" aria-label="A two by three array stored row by row in contiguous memory" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="14" y="20" width="44" height="34" rx="5"/><rect x="60" y="20" width="44" height="34" rx="5"/><rect x="106" y="20" width="44" height="34" rx="5"/>
+        <rect x="14" y="56" width="44" height="34" rx="5"/><rect x="60" y="56" width="44" height="34" rx="5"/><rect x="106" y="56" width="44" height="34" rx="5"/>
+      </g>
+      <g fill="currentColor" font-size="12.5" text-anchor="middle" font-family="inherit">
+        <text x="36" y="42">1</text><text x="82" y="42">2</text><text x="128" y="42">3</text>
+        <text x="36" y="78">4</text><text x="82" y="78">5</text><text x="128" y="78">6</text>
+        <text x="82" y="112" opacity=".65">table[2][3] as written</text>
+      </g>
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="250" y="38" width="46" height="34" rx="5"/><rect x="298" y="38" width="46" height="34" rx="5"/><rect x="346" y="38" width="46" height="34" rx="5"/>
+        <rect x="396" y="38" width="46" height="34" rx="5"/><rect x="444" y="38" width="46" height="34" rx="5"/><rect x="492" y="38" width="46" height="34" rx="5"/>
+      </g>
+      <g stroke="currentColor" stroke-width="1" opacity=".4" stroke-dasharray="4 3"><path d="M394 30v50"/></g>
+      <g fill="currentColor" font-size="12.5" text-anchor="middle" font-family="inherit">
+        <text x="273" y="60">1</text><text x="321" y="60">2</text><text x="369" y="60">3</text>
+        <text x="419" y="60">4</text><text x="467" y="60">5</text><text x="515" y="60">6</text>
+      </g>
+      <g fill="currentColor" font-size="11.5" text-anchor="middle" opacity=".65" font-family="inherit">
+        <text x="321" y="92">row 0</text><text x="467" y="92">row 1</text>
+        <text x="394" y="112">how it is stored: one contiguous block</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1.5" opacity=".5"><path d="M165 55h70"/><path d="M227 50l8 5-8 5" fill="none"/></g>
+    </svg>
+    <p class="c-wk-cap"><code>table[r][c]</code> sits at offset <code>r * 3 + c</code> from the start.</p>
+  </div>
+
+  <p>Row-major layout has a practical consequence that week 34 measures: <strong>iterate rows outermost, columns innermost</strong>. That walks memory in order, and the cache supplies the next elements for free. Reverse the loops and each step jumps a row's width, defeating the cache. On a large matrix the difference can be several times the runtime — same result, same operation count.</p>
+
+<pre><code>/* fast: sequential in memory */
+for (size_t r = 0; r &lt; ROWS; r++)
+    for (size_t c = 0; c &lt; COLS; c++)
+        sum += m[r][c];
+
+/* slow: strides across memory */
+for (size_t c = 0; c &lt; COLS; c++)
+    for (size_t r = 0; r &lt; ROWS; r++)
+        sum += m[r][c];</code></pre>
+
+  <h3>Passing a 2D array to a function</h3>
+  <p>All dimensions except the first must be specified, because the compiler needs the row width to compute offsets:</p>
+
+<pre><code>void print_grid(int g[][4], size_t rows);    /* column count required */
+void print_grid(int (*g)[4], size_t rows);   /* the same declaration  */</code></pre>
+
+  <p>This rigidity is one reason real code often uses a one-dimensional array with manual indexing, <code>m[r * cols + c]</code>, which accepts any shape at run time. Week 19 builds the dynamically allocated version.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Worked example: transpose, and a demonstration of corruption</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdbool.h&gt;
+
+#define ROWS 3
+#define COLS 4
+
+static void print_matrix(const char *label, size_t rows, size_t cols,
+                         const int m[rows][cols])
+{
+    printf("%s (%zux%zu)\n", label, rows, cols);
+    for (size_t r = 0; r &lt; rows; r++) {
+        printf("  ");
+        for (size_t c = 0; c &lt; cols; c++) {
+            printf("%4d", m[r][c]);
+        }
+        putchar('\n');
+    }
+}
+
+static void transpose(size_t rows, size_t cols,
+                      const int src[rows][cols], int dst[cols][rows])
+{
+    for (size_t r = 0; r &lt; rows; r++) {
+        for (size_t c = 0; c &lt; cols; c++) {
+            dst[c][r] = src[r][c];
+        }
+    }
+}
+
+/* Bounds-checked access. Returns false instead of reading out of range. */
+static bool at(const int values[], size_t n, size_t index, int *out)
+{
+    if (index &gt;= n) {
+        return false;
+    }
+    *out = values[index];
+    return true;
+}
+
+static int sum(const int values[], size_t n)
+{
+    int total = 0;
+    for (size_t i = 0; i &lt; n; i++) {
+        total += values[i];
+    }
+    return total;
+}
+
+static void reverse(int values[], size_t n)
+{
+    for (size_t i = 0; i &lt; n / 2; i++) {
+        int temp = values[i];
+        values[i] = values[n - 1 - i];
+        values[n - 1 - i] = temp;
+    }
+}
+
+static size_t find(const int values[], size_t n, int target)
+{
+    for (size_t i = 0; i &lt; n; i++) {
+        if (values[i] == target) {
+            return i;
+        }
+    }
+    return n;                          /* n means "not found" */
+}
+
+int main(void)
+{
+    int m[ROWS][COLS] = {
+        {  1,  2,  3,  4 },
+        {  5,  6,  7,  8 },
+        {  9, 10, 11, 12 }
+    };
+    int t[COLS][ROWS];
+
+    print_matrix("original", ROWS, COLS, m);
+    transpose(ROWS, COLS, m, t);
+    print_matrix("transposed", COLS, ROWS, t);
+
+    puts("\nrow-major layout: the same 12 ints, read linearly");
+    const int *flat = &amp;m[0][0];
+    printf("  ");
+    for (size_t i = 0; i &lt; ROWS * COLS; i++) {
+        printf("%4d", flat[i]);
+    }
+    puts("\n  note the rows appear one after another");
+
+    int values[] = { 4, 8, 15, 16, 23, 42 };
+    const size_t n = sizeof values / sizeof values[0];
+
+    printf("\nsum      = %d\n", sum(values, n));
+    printf("find 23  = index %zu\n", find(values, n, 23));
+    printf("find 99  = %s\n", find(values, n, 99) == n ? "not found" : "found");
+
+    reverse(values, n);
+    printf("reversed = ");
+    for (size_t i = 0; i &lt; n; i++) {
+        printf("%d ", values[i]);
+    }
+    putchar('\n');
+
+    puts("\nbounds-checked access:");
+    int got;
+    printf("  index 2 -&gt; %s", at(values, n, 2, &amp;got) ? "" : "refused\n");
+    if (at(values, n, 2, &amp;got)) printf("%d\n", got);
+    printf("  index 99 -&gt; %s\n", at(values, n, 99, &amp;got) ? "returned a value" : "refused");
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o arrays arrays.c
+./arrays</code></pre>
+
+  <h3>Now corrupt something on purpose</h3>
+
+  <p>Add this function and call it. It demonstrates the table in section 3 rather than describing it.</p>
+
+<pre><code>static void demonstrate_corruption(void)
+{
+    int before = 111;
+    int small[4] = { 1, 2, 3, 4 };
+    int after  = 999;
+
+    printf("\nbefore=%d  after=%d\n", before, after);
+    printf("writing to small[4] and small[5], which do not exist...\n");
+
+    small[4] = 0;                 /* one past the end */
+    small[5] = 0;                 /* two past the end */
+
+    printf("before=%d  after=%d   &lt;-- one of these probably changed\n",
+           before, after);
+}</code></pre>
+
+  <p>Compile without sanitizers first:</p>
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o arrays arrays.c &amp;&amp; ./arrays</code></pre>
+
+  <p>Typically one of <code>before</code> or <code>after</code> becomes 0, depending on how the compiler arranged the stack. There is no error, no warning at run time, and no crash. The program has quietly destroyed a variable that the code you are looking at never mentions.</p>
+
+  <p>Now with the sanitizer:</p>
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o arrays_asan arrays.c
+./arrays_asan</code></pre>
+
+<pre><code>==12345==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffd...
+WRITE of size 4 at 0x7ffd... thread T0
+    #0 0x... in demonstrate_corruption arrays.c:118
+  Address is located in stack of thread T0 at offset 52 in frame
+    'small' (line 112) &lt;== Memory access at offset 52 overflows this variable</code></pre>
+
+  <p>Exact file, exact line, the variable's name, and the offset. That is the difference between an afternoon and ten seconds, and it is available to you for one compiler flag.</p>
+
+  <h3>The <code>sizeof</code> trap, made visible</h3>
+  <p>Add this pair and compare the output:</p>
+
+<pre><code>static void show_sizeof(const int values[])
+{
+    printf("  inside a function: sizeof values   = %zu\n", sizeof values);
+}
+
+/* in main: */
+printf("\nsizeof trap:\n");
+printf("  where declared:    sizeof values   = %zu\n", sizeof values);
+show_sizeof(values);</code></pre>
+
+<pre><code>  where declared:    sizeof values   = 24
+  inside a function: sizeof values   = 8</code></pre>
+
+  <p>Twenty-four bytes for six <code>int</code>s where the array is declared; eight bytes — one pointer — inside the function. GCC even warns: <em>'sizeof' on array function parameter will return size of 'const int *'</em>. Week 13 explains the decay that causes it.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>for (i = 0; i &lt;= n; i++)</code></td><td>Reads or writes one past the end</td><td>Use <code>&lt;</code>. Valid indices are 0 to n−1.</td></tr>
+      <tr><td><code>sizeof</code> on an array parameter</td><td>Gives the pointer size, not the array size</td><td>Pass the length as a separate parameter.</td></tr>
+      <tr><td>Indexing with a signed <code>int</code></td><td>Sign-comparison warnings; negative index possible</td><td>Use <code>size_t</code>.</td></tr>
+      <tr><td><code>for (size_t i = n - 1; i &gt;= 0; i--)</code></td><td>Infinite loop</td><td><code>for (size_t i = n; i-- &gt; 0; )</code>.</td></tr>
+      <tr><td><code>int a[5]; a = b;</code></td><td>Compile error — arrays are not assignable</td><td>Copy elementwise, or use <code>memcpy</code> — week 14.</td></tr>
+      <tr><td>Comparing arrays with <code>==</code></td><td>Compares addresses, not contents</td><td><code>memcmp</code>, or an elementwise loop.</td></tr>
+      <tr><td>Iterating a matrix column-first</td><td>Correct but several times slower</td><td>Rows outermost — week 34 measures it.</td></tr>
+      <tr><td>Omitting the column count when passing a 2D array</td><td>Compile error</td><td><code>void f(int m[][COLS], size_t rows)</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">7</span>Check yourself</h2>
+
+  <details>
+    <summary>Why does <code>sizeof arr / sizeof arr[0]</code> stop working inside a function?</summary>
+    <p>Because the parameter is not an array — it is a pointer to the first element, so <code>sizeof</code> yields the pointer's size. The array's length is simply not available inside the function, which is why every C function taking an array also takes its length. Week 13 explains the conversion that causes this.</p>
+  </details>
+
+  <details>
+    <summary>What does C do when you write to <code>arr[10]</code> on a five-element array?</summary>
+    <p>It computes the address ten elements past the start and writes there, with no check of any kind. What gets destroyed depends on the memory layout: another variable, saved register state, or the return address. The silent cases are the dangerous ones, because the symptom appears far from the cause.</p>
+  </details>
+
+  <details>
+    <summary>Why is <code>size_t</code> preferred over <code>int</code> for array indices?</summary>
+    <p>It is unsigned, so a negative index is not representable; it is guaranteed wide enough for any object the platform supports; and it matches the type of <code>sizeof</code> and of <code>strlen</code>, so comparisons against lengths do not mix signedness and trigger the conversion trap from week 7.</p>
+  </details>
+
+  <details>
+    <summary>What is row-major order and why should you care?</summary>
+    <p>A 2D array is stored one complete row after another in contiguous memory, so <code>m[r][c]</code> sits at offset <code>r * cols + c</code>. It matters for speed: iterating with rows outermost walks memory sequentially and uses the cache well, while column-first strides across memory and can be several times slower for identical work.</p>
+  </details>
+
+  <details>
+    <summary>How do you iterate an array backwards using <code>size_t</code>?</summary>
+    <p><code>for (size_t i = n; i-- &gt; 0; )</code>. The condition compares the current value against 0 and then decrements, so the body sees <code>n-1</code> down to 0 and the loop exits before the counter can wrap below zero. The naive <code>i = n - 1; i &gt;= 0</code> never terminates, because an unsigned value is always at least zero.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Where this leads</h2>
+  <p>Two unexplained things are now outstanding: why <code>sizeof</code> changes inside a function, and why a function can modify an array's contents despite pass-by-value. Both have the same answer, and week 13 gives it. Pointers also repair the <code>swap</code> from week 11, explain the <code>&amp;</code> that <code>scanf</code> has been demanding since week 8, and open the door to strings in week 14.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_11_Functions.html">← Week 11</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_13_Introduction_to_Pointers.html">Week 13 →</a>
+</div>
+
+</div>

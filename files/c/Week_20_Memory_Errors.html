@@ -1,0 +1,399 @@
+---
+layout: without-sidebar
+title: "Week 20 — Memory Errors and Their Diagnosis"
+permalink: /files/c/Week_20_Memory_Errors.html
+excerpt: "Leaks, dangling pointers and use-after-free, double free, and buffer overruns — each one seeded deliberately and then found with AddressSanitizer and Valgrind."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Intermediate · Week 20</div>
+  <h1>Memory Errors and Their Diagnosis</h1>
+  <p class="c-wk-lead">C will not stop you making any of these mistakes, and none of them reliably crashes at the point of the error. What makes heap programming tractable is not care alone but tooling — and the tools are good enough that not using them is the real mistake.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Recognize the five classes of memory error and the symptom each produces.</li>
+      <li>Read an AddressSanitizer report and locate the defect from it.</li>
+      <li>Use Valgrind when recompiling is not an option.</li>
+      <li>Explain why a memory bug's symptom usually appears far from its cause.</li>
+      <li>Adopt the habits that prevent each class rather than detecting it.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The five classes</h2>
+
+  <table>
+    <thead><tr><th>Error</th><th>What it is</th><th>Typical symptom</th></tr></thead>
+    <tbody>
+      <tr><td>Leak</td><td>Allocated, never freed</td><td>Memory grows over hours; eventual failure</td></tr>
+      <tr><td>Use after free</td><td>Access through a pointer after <code>free</code></td><td>Corrupt data, or a crash much later</td></tr>
+      <tr><td>Double free</td><td><code>free</code> called twice on one block</td><td>Allocator abort, or heap corruption</td></tr>
+      <tr><td>Overrun</td><td>Read or write past the end of a block</td><td>A neighbouring value changes silently</td></tr>
+      <tr><td>Invalid free</td><td><code>free</code> on a stack or interior pointer</td><td>Immediate abort</td></tr>
+    </tbody>
+  </table>
+
+  <p>What unites them is <strong>action at a distance</strong>. The line that does the damage and the line that fails are usually far apart, often in unrelated code. A program can write past a buffer for months before a slightly different allocation pattern makes the corruption land somewhere fatal.</p>
+
+  <p>This is why debugging memory errors by reading code and adding <code>printf</code> is so unproductive, and why the tools in section 3 are not optional extras.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Each class in detail</h2>
+
+  <h3>Leak</h3>
+<pre><code>void process(void)
+{
+    char *buffer = malloc(1024);
+    if (something_failed()) {
+        return;                    /* leaked: early return skips the free */
+    }
+    free(buffer);
+}</code></pre>
+
+  <p>Leaks on the error path are by far the most common kind, because the happy path gets tested and the error path does not. A short-lived program can survive leaking — the operating system reclaims everything at exit — but a server or a long-running tool cannot. Week 27's <code>goto</code> cleanup idiom exists precisely to give every path one exit.</p>
+
+  <h3>Use after free</h3>
+<pre><code>free(node);
+printf("%d\n", node-&gt;value);       /* the block may already be reused */</code></pre>
+
+  <p>After <code>free</code>, the block belongs to the allocator, which may hand it to the next <code>malloc</code>. Reading gives stale or foreign data; writing corrupts whatever now lives there. It frequently appears to work, because the allocator has not yet reused the block — which is why it survives testing.</p>
+
+  <p>The defence is a habit: <strong>set the pointer to <code>NULL</code> immediately after freeing</strong>. A later use then crashes instantly at the guilty line instead of corrupting something.</p>
+
+  <h3>Double free</h3>
+<pre><code>free(p);
+…
+free(p);                           /* corrupts the allocator's bookkeeping */</code></pre>
+
+  <p>Usually arises when two pieces of code each believe they own a block — the ownership question from week 19, left unanswered. Modern allocators detect the simple case and abort with a message; the subtle cases silently corrupt the heap. The <code>NULL</code> habit fixes this too, since <code>free(NULL)</code> is defined to do nothing.</p>
+
+  <h3>Overrun</h3>
+<pre><code>int *a = malloc(10 * sizeof *a);
+a[10] = 0;                         /* one past the end */</code></pre>
+
+  <p>Identical in nature to week 12's array overflow, but on the heap the neighbour is usually the allocator's own metadata — the block header recording sizes and links. Corrupting it means the <em>next</em> unrelated <code>malloc</code> or <code>free</code> crashes, with a backtrace pointing at innocent code.</p>
+
+  <h3>Invalid free</h3>
+<pre><code>int local = 5;
+free(&amp;local);                      /* not from malloc */
+
+char *p = malloc(100);
+free(p + 10);                      /* not the start of the block */</code></pre>
+
+  <p>Only a pointer returned by <code>malloc</code>, <code>calloc</code>, or <code>realloc</code> may be freed, and only the exact value returned. Keep the original pointer; walk a copy.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>The tools</h2>
+
+  <h3>AddressSanitizer</h3>
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o prog prog.c
+./prog</code></pre>
+
+  <p>A compiler instrumentation that checks every memory access. It catches overruns, use-after-free, double free, invalid free, and — with LeakSanitizer, which is on by default on Linux — leaks at exit. Costs roughly 2× in speed and 3× in memory, which is irrelevant during development.</p>
+
+  <p>Use it for every build while you are writing code. It is the single highest-value flag in this course.</p>
+
+  <h3>Valgrind</h3>
+<pre><code>valgrind --leak-check=full --track-origins=yes ./prog</code></pre>
+
+  <p>Runs an unmodified binary under emulation, so no recompilation is needed — which matters when you did not build the program. It also detects <em>uninitialized</em> reads, which AddressSanitizer does not; <code>--track-origins=yes</code> then tells you where the uninitialized value came from. The cost is 10–50× slowdown.</p>
+
+  <table>
+    <thead><tr><th></th><th>AddressSanitizer</th><th>Valgrind</th></tr></thead>
+    <tbody>
+      <tr><td>Recompilation</td><td>Required</td><td>Not required</td></tr>
+      <tr><td>Slowdown</td><td>~2×</td><td>10–50×</td></tr>
+      <tr><td>Overruns, use-after-free</td><td>Yes</td><td>Yes</td></tr>
+      <tr><td>Leaks</td><td>Yes</td><td>Yes, in more detail</td></tr>
+      <tr><td>Uninitialized reads</td><td>No (use MemorySanitizer)</td><td>Yes</td></tr>
+      <tr><td>Stack errors</td><td>Yes</td><td>Limited</td></tr>
+    </tbody>
+  </table>
+
+  <p>They are complements. Develop under AddressSanitizer; run Valgrind before a release, and when you need to inspect a binary you cannot rebuild.</p>
+
+  <div class="c-wk-note">
+    <p><strong>Sanitizers do not combine freely.</strong> <code>-fsanitize=address</code> and <code>-fsanitize=memory</code> cannot be used together. <code>-fsanitize=address,undefined</code> does work, and is a good default — the undefined-behavior sanitizer catches the signed overflow and shift errors from weeks 4 and 7. Week 35 puts both into a continuous integration configuration.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Reading a report</h2>
+
+<pre><code>==12345==ERROR: AddressSanitizer: heap-use-after-free on address 0x602000000010
+READ of size 4 at 0x602000000010 thread T0
+    #0 0x55e in main leaky.c:42                     &lt;- where it was USED
+    #1 0x7f2 in __libc_start_main
+
+0x602000000010 is located 0 bytes inside of 40-byte region
+freed by thread T0 here:
+    #0 0x7f8 in free
+    #1 0x55d in main leaky.c:40                     &lt;- where it was FREED
+
+previously allocated by thread T0 here:
+    #0 0x7f9 in malloc
+    #1 0x55c in main leaky.c:36                     &lt;- where it was ALLOCATED</code></pre>
+
+  <p>Read it in four parts:</p>
+
+  <ol>
+    <li><strong>The error type.</strong> <code>heap-use-after-free</code>, <code>heap-buffer-overflow</code>, <code>stack-buffer-overflow</code>, <code>double-free</code> — each names the class from section 1.</li>
+    <li><strong>The access.</strong> <code>READ of size 4</code> tells you what the program was doing.</li>
+    <li><strong>Three stack traces.</strong> Where it was used, where it was freed, where it was allocated. Those three lines are usually the entire diagnosis.</li>
+    <li><strong>The offset.</strong> <code>0 bytes inside of 40-byte region</code>, or <code>4 bytes to the right of</code>, which pinpoints an off-by-one immediately.</li>
+  </ol>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Worked example: five bugs, seeded and found</h2>
+
+  <p>This takes the growable array from week 19 and introduces each defect behind a compile-time switch, so you can enable exactly one and watch the tool describe it.</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+
+/* Build with -DBUG=1 … -DBUG=5 to enable one defect at a time.
+   Build with no -DBUG for the clean version. */
+#ifndef BUG
+#define BUG 0
+#endif
+
+typedef struct {
+    int    *data;
+    size_t  count;
+    size_t  capacity;
+} IntArray;
+
+static bool array_init(IntArray *a, size_t capacity)
+{
+    a-&gt;data = malloc(capacity * sizeof *a-&gt;data);
+    if (a-&gt;data == NULL) {
+        return false;
+    }
+    a-&gt;count = 0;
+    a-&gt;capacity = capacity;
+    return true;
+}
+
+static void array_destroy(IntArray *a)
+{
+    free(a-&gt;data);
+    a-&gt;data = NULL;            /* the habit that prevents bugs 2 and 3 */
+    a-&gt;count = a-&gt;capacity = 0;
+}
+
+static bool array_push(IntArray *a, int value)
+{
+    if (a-&gt;count == a-&gt;capacity) {
+        size_t bigger_capacity = a-&gt;capacity * 2;
+        int *bigger = realloc(a-&gt;data, bigger_capacity * sizeof *bigger);
+        if (bigger == NULL) {
+            return false;
+        }
+        a-&gt;data = bigger;
+        a-&gt;capacity = bigger_capacity;
+    }
+    a-&gt;data[a-&gt;count++] = value;
+    return true;
+}
+
+int main(void)
+{
+    printf("built with BUG=%d\n\n", BUG);
+
+    IntArray a;
+    if (!array_init(&amp;a, 4)) {
+        return EXIT_FAILURE;
+    }
+    for (int i = 1; i &lt;= 6; i++) {
+        array_push(&amp;a, i * 10);
+    }
+    printf("array holds %zu of %zu: ", a.count, a.capacity);
+    for (size_t i = 0; i &lt; a.count; i++) printf("%d ", a.data[i]);
+    putchar('\n');
+
+#if BUG == 1
+    /* LEAK: allocate and forget. */
+    char *forgotten = malloc(64);
+    strcpy(forgotten, "nobody will free me");
+    printf("leaked: %s\n", forgotten);
+    /* no free */
+
+#elif BUG == 2
+    /* USE AFTER FREE. */
+    free(a.data);
+    printf("after free, a.data[0] = %d\n", a.data[0]);
+    a.data = NULL;
+
+#elif BUG == 3
+    /* DOUBLE FREE. */
+    free(a.data);
+    free(a.data);
+    a.data = NULL;
+
+#elif BUG == 4
+    /* HEAP OVERRUN: one element past the end. */
+    printf("writing a.data[%zu] with capacity %zu\n", a.capacity, a.capacity);
+    a.data[a.capacity] = 999;
+
+#elif BUG == 5
+    /* INVALID FREE: not the pointer malloc returned. */
+    free(a.data + 1);
+    a.data = NULL;
+#endif
+
+    array_destroy(&amp;a);
+    puts("finished");
+    return EXIT_SUCCESS;
+}</code></pre>
+
+  <h3>Run each one</h3>
+
+<pre><code>for b in 0 1 2 3 4 5; do
+  gcc -std=c17 -Wall -Wextra -g -fsanitize=address -DBUG=$b -o bug$b bugs.c
+done
+
+./bug0     # clean
+./bug1     # leak
+./bug2     # use after free
+./bug3     # double free
+./bug4     # overrun
+./bug5     # invalid free</code></pre>
+
+  <h3>What each reports</h3>
+
+  <p><strong>BUG=1 — leak.</strong> The program finishes normally, then:</p>
+<pre><code>==1234==ERROR: LeakSanitizer: detected memory leaks
+Direct leak of 64 byte(s) in 1 object(s) allocated from:
+    #1 0x... in main bugs.c:76
+SUMMARY: AddressSanitizer: 64 byte(s) leaked in 1 allocation(s).</code></pre>
+  <p>Note that the output appears only at exit and the exit status becomes non-zero — which is how a leak fails a build in week 35's continuous integration.</p>
+
+  <p><strong>BUG=2 — use after free.</strong> Three traces: used at line 82, freed at line 81, allocated at line 22. Without the sanitizer this program prints <code>10</code> quite happily, because the block has not been reused yet.</p>
+
+  <p><strong>BUG=3 — double free.</strong> <code>attempting double-free on 0x...</code>, with the free site and the original allocation both named. Without the sanitizer, glibc prints <code>free(): double free detected in tcache 2</code> and aborts — useful, but with no indication of where.</p>
+
+  <p><strong>BUG=4 — overrun.</strong> The most instructive one:</p>
+<pre><code>==1234==ERROR: AddressSanitizer: heap-buffer-overflow
+WRITE of size 4 at 0x602000000030 thread T0
+    #0 0x... in main bugs.c:95
+0x602000000030 is located 0 bytes to the right of 32-byte region
+allocated by thread T0 here:
+    #1 0x... in array_push bugs.c:44</code></pre>
+  <p>"0 bytes to the right of a 32-byte region" is an off-by-one stated in the clearest possible terms. Compare with the unsanitized build, which prints <code>finished</code> and exits successfully while having corrupted the allocator's metadata.</p>
+
+  <p><strong>BUG=5 — invalid free.</strong> <code>attempting free on address which was not malloc()-ed</code>, plus the allocation site of the real block.</p>
+
+  <h3>The same bugs under Valgrind</h3>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -DBUG=2 -o bug2_plain bugs.c
+valgrind --leak-check=full ./bug2_plain</code></pre>
+
+<pre><code>==9876== Invalid read of size 4
+==9876==    at 0x...: main (bugs.c:82)
+==9876==  Address 0x4a4b040 is 0 bytes inside a block of size 32 free'd
+==9876==    at 0x...: free
+==9876==    by 0x...: main (bugs.c:81)
+==9876==  Block was alloc'd at
+==9876==    by 0x...: array_push (bugs.c:44)</code></pre>
+
+  <p>The same three facts in different words — and obtained without rebuilding with a special flag, which is what makes Valgrind valuable on binaries you did not compile.</p>
+
+  <h3>One Valgrind catches that AddressSanitizer does not</h3>
+
+<pre><code>int *p = malloc(4 * sizeof *p);
+printf("%d\n", p[0]);          /* reading uninitialized heap memory */
+free(p);</code></pre>
+
+<pre><code>==9876== Conditional jump or move depends on uninitialised value(s)
+==9876==  Uninitialised value was created by a heap allocation
+==9876==    at 0x...: malloc</code></pre>
+
+  <p>AddressSanitizer reports nothing here — the memory is legitimately owned, merely unwritten. This is why the two tools are complements rather than alternatives, and why <code>calloc</code> is worth preferring when you cannot guarantee every byte gets written.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Habits that prevent rather than detect</h2>
+
+  <table>
+    <thead><tr><th>Habit</th><th>Prevents</th></tr></thead>
+    <tbody>
+      <tr><td>Set the pointer to <code>NULL</code> right after <code>free</code></td><td>Use after free, double free</td></tr>
+      <tr><td>Write the <code>free</code> immediately after writing the <code>malloc</code></td><td>Leaks</td></tr>
+      <tr><td>One exit path per function, via <code>goto cleanup</code></td><td>Leaks on error paths — week 27</td></tr>
+      <tr><td>Paired <code>create</code>/<code>destroy</code> functions</td><td>Ambiguous ownership, double free</td></tr>
+      <tr><td>Never <code>free</code> a pointer you did not receive from <code>malloc</code></td><td>Invalid free</td></tr>
+      <tr><td><code>calloc</code> when every byte will not be written</td><td>Uninitialized reads</td></tr>
+      <tr><td>Build with <code>-fsanitize=address,undefined</code> by default</td><td>All of the above, detected on the day you write them</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Early <code>return</code> before the <code>free</code></td><td>Leak on the error path only</td><td>Single cleanup path — week 27.</td></tr>
+      <tr><td>Using a pointer after freeing it</td><td>Stale data, or corruption</td><td>Assign <code>NULL</code> immediately after <code>free</code>.</td></tr>
+      <tr><td>Two owners of one block</td><td>Double free</td><td>Decide ownership once; document it.</td></tr>
+      <tr><td>Freeing an interior pointer</td><td>Immediate abort</td><td>Keep the original; walk a copy.</td></tr>
+      <tr><td>Assuming no crash means no bug</td><td>Corruption survives into production</td><td>Run under a sanitizer before believing it works.</td></tr>
+      <tr><td>Testing only the happy path</td><td>Error-path leaks never exercised</td><td>Test failure injection — week 35.</td></tr>
+      <tr><td>Using a pointer into a block after <code>realloc</code></td><td>Dangling — the block may have moved</td><td>Recompute from the new base pointer.</td></tr>
+      <tr><td>Shipping a release build never run under Valgrind</td><td>Leaks found by users</td><td>Make it part of the release checklist.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why does a memory bug's symptom usually appear far from its cause?</summary>
+    <p>Because the damaging operation is legal at the machine level and produces no immediate failure. An overrun quietly modifies a neighbouring object or the allocator's metadata; a use-after-free reads a block that has not yet been reused. The failure surfaces only when something else touches the corrupted state, which can be much later and in unrelated code.</p>
+  </details>
+
+  <details>
+    <summary>What does setting a pointer to <code>NULL</code> after <code>free</code> buy you?</summary>
+    <p>It converts two silent bugs into immediate, obvious ones. A later use dereferences <code>NULL</code> and crashes at the guilty line instead of reading a reused block; a later <code>free</code> becomes <code>free(NULL)</code>, which is defined to do nothing. It costs one assignment.</p>
+  </details>
+
+  <details>
+    <summary>When would you reach for Valgrind rather than AddressSanitizer?</summary>
+    <p>When you cannot rebuild the binary, and when you need to detect reads of uninitialized memory — which AddressSanitizer does not catch, because the memory is legitimately owned. Valgrind's <code>--track-origins=yes</code> also reports where an uninitialized value came from. The trade-off is a slowdown of 10–50× instead of about 2×.</p>
+  </details>
+
+  <details>
+    <summary>An AddressSanitizer report says "4 bytes to the right of a 32-byte region". What does that tell you?</summary>
+    <p>That the program accessed memory just past the end of a 32-byte allocation — an off-by-one or a loop bound that is too large. The report also names where that block was allocated, so the array and the faulty access are both identified without reading any code.</p>
+  </details>
+
+  <details>
+    <summary>Why is a leak in a short-lived command-line tool less urgent than one in a server?</summary>
+    <p>Because the operating system reclaims the whole address space when a process exits, so a tool that runs for a second and leaks a kilobyte causes no harm. A server runs for weeks and repeats the leaking path millions of times, so the same defect grows without bound until allocation fails. The bug is identical; the consequence is not.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 21 turns to structures, which let you group related data into one object — and which immediately raise a harder version of this week's question, because a structure can own allocations of its own. The create/destroy pattern from week 19 becomes the standard answer, and week 33 makes it an opaque handle where the caller cannot see, or corrupt, the internals at all.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_19_Dynamic_Memory_Allocation.html">← Week 19</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_21_Structures.html">Week 21 →</a>
+</div>
+
+</div>

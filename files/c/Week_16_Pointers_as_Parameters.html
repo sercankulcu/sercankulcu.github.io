@@ -1,0 +1,434 @@
+---
+layout: without-sidebar
+title: "Week 16 — Pointers as Function Parameters"
+permalink: /files/c/Week_16_Pointers_as_Parameters.html
+excerpt: "Output parameters and status returns, const correctness as an enforced contract, the dangling-return trap, and the right-left rule for reading any C declaration."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Intermediate · Week 16</div>
+  <h1>Pointers as Function Parameters</h1>
+  <p class="c-wk-lead">Pointers stop being a mechanism this week and become a design tool. How a function reports failure, what it promises not to modify, who owns the memory it returns — all of that is expressed in its parameter list, and the compiler will enforce most of it if you let it.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Design a function that returns a status and writes its result through an output parameter.</li>
+      <li>Distinguish <code>const char *</code>, <code>char * const</code>, and <code>const char * const</code>, and use the right one.</li>
+      <li>Apply <code>const</code> correctness as a discipline rather than decoration.</li>
+      <li>Return a pointer safely, and recognize every way of doing it unsafely.</li>
+      <li>Read any C declaration using the right-left rule, without guessing.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Output parameters and the status return</h2>
+
+  <p>Week 11 listed three ways a C function can report failure. With pointers available, the most generally useful one can now be written properly: <strong>return a status, write the result through a pointer</strong>.</p>
+
+<pre><code>bool parse_int(const char *text, int *out);</code></pre>
+
+  <p>Read the signature as a contract. The function reads <code>text</code> and will not modify it. It returns <code>true</code> on success, in which case it has written the parsed value to <code>*out</code>. On failure it returns <code>false</code>, and the caller must not rely on <code>*out</code>.</p>
+
+<pre><code>int value;
+if (!parse_int(input, &amp;value)) {
+    fprintf(stderr, "not a number: %s\n", input);
+    return EXIT_FAILURE;
+}
+/* value is trustworthy only inside this branch */</code></pre>
+
+  <p>This is the convention to use when <em>every</em> value is a legitimate result. A function returning a temperature cannot use −1 as a failure code, and cannot use 0 either. Separating "did it work" from "what is the answer" removes the problem entirely.</p>
+
+  <h3>Rules that make output parameters pleasant</h3>
+  <ul>
+    <li>Put output parameters last, after the inputs. This is what the standard library does and what readers expect.</li>
+    <li>Do not write to <code>*out</code> on the failure path. Leaving the caller's variable untouched is easier to reason about than partially filling it.</li>
+    <li>Document whether <code>out</code> may be <code>NULL</code>. If it may, check it. If it may not, say so — and consider <code>assert</code>, which week 27 introduces.</li>
+    <li>One output parameter is fine; three is a signal that the results belong together in a structure, which is week 21.</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span><code>const</code> and what it qualifies</h2>
+
+  <p>With pointers there are two things that could be constant — the pointer, or what it points to — and C can express either.</p>
+
+  <table>
+    <thead><tr><th>Declaration</th><th>Can change the pointer?</th><th>Can change the target?</th></tr></thead>
+    <tbody>
+      <tr><td><code>char *p</code></td><td>yes</td><td>yes</td></tr>
+      <tr><td><code>const char *p</code></td><td>yes</td><td><strong>no</strong></td></tr>
+      <tr><td><code>char * const p</code></td><td><strong>no</strong></td><td>yes</td></tr>
+      <tr><td><code>const char * const p</code></td><td>no</td><td>no</td></tr>
+    </tbody>
+  </table>
+
+  <p>The rule for reading these: <code>const</code> applies to whatever is immediately to its left, unless there is nothing to its left, in which case it applies to what is on its right. So <code>const char *p</code> and <code>char const *p</code> mean the same thing — a pointer to constant characters.</p>
+
+<pre><code>const char *p = "hello";
+p[0] = 'H';        /* error: target is const   */
+p = "world";       /* fine: the pointer is not */
+
+char * const q = buffer;
+q[0] = 'H';        /* fine: target is writable */
+q = other;         /* error: the pointer is const */</code></pre>
+
+  <p>By far the most common and most useful is <code>const char *</code>, and more generally <code>const T *</code> for any parameter the function only reads.</p>
+
+  <h3><code>const</code> correctness as a discipline</h3>
+  <p>The rule is simple: <strong>every pointer parameter that the function does not modify should be <code>const</code></strong>. The benefits compound.</p>
+
+  <p>It <em>documents</em> the interface. <code>void process(const char *in, char *out)</code> tells you which way data flows before you read a line of the body.</p>
+
+  <p>It is <em>enforced</em>. An accidental write is a compile error, not a bug. Contrast with a comment saying "does not modify src", which is unchecked and rots.</p>
+
+  <p>It <em>propagates</em>. A caller holding a <code>const char *</code> cannot pass it to a function taking <code>char *</code>. If you omit <code>const</code> in one place, callers are forced to omit it too, or to cast it away — and a codebase with casts scattered through it has lost the benefit entirely. Add <code>const</code> from the start; retrofitting it is genuinely painful.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>Casting <code>const</code> away.</strong> <code>char *bad = (char *)some_const_pointer;</code> compiles. If the object really is constant — a string literal, for instance — writing through the result is undefined behavior and typically crashes. A cast that removes <code>const</code> is a claim that you know the object is actually writable; if you cannot justify that claim, the cast is a bug.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Returning a pointer</h2>
+
+  <p>A function returning a pointer is making a promise about the lifetime of what it points to. There are exactly four sources, and one of them is always wrong.</p>
+
+  <table>
+    <thead><tr><th>Returned pointer refers to</th><th>Safe?</th><th>Who frees it</th></tr></thead>
+    <tbody>
+      <tr><td>A local variable</td><td><strong>No</strong> — the frame is gone</td><td>—</td></tr>
+      <tr><td>A string literal or other static object</td><td>Yes</td><td>Nobody; it lives forever</td></tr>
+      <tr><td>Memory the caller supplied</td><td>Yes</td><td>The caller, who already owns it</td></tr>
+      <tr><td>Memory from <code>malloc</code></td><td>Yes</td><td>The caller — and this must be documented</td></tr>
+    </tbody>
+  </table>
+
+<pre><code>/* WRONG: the array dies when the function returns */
+char *broken(void)
+{
+    char buffer[32];
+    strcpy(buffer, "hello");
+    return buffer;
+}
+
+/* Fine: the literal has static storage duration */
+const char *describe(int code)
+{
+    return (code == 0) ? "success" : "failure";
+}
+
+/* Fine, and the most common good design: the caller supplies the space */
+bool format_into(char *dst, size_t dst_size, int code)
+{
+    int n = snprintf(dst, dst_size, "code %d", code);
+    return n &gt;= 0 &amp;&amp; (size_t)n &lt; dst_size;
+}
+
+/* Fine, but the caller must free it — say so in the name or a comment */
+char *duplicate(const char *s);   /* caller frees the result */</code></pre>
+
+  <p>The third form is worth adopting as a default. It puts the caller in control of where the memory comes from, it cannot leak, and it works identically whether the buffer is on the stack, in a static, or on the heap. Week 19 covers the fourth, where ownership becomes an explicit part of every interface.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Passing strings and multidimensional arrays</h2>
+
+  <p>A string parameter is a <code>char *</code>, plus <code>const</code> if it is only read:</p>
+<pre><code>size_t count_vowels(const char *s);            /* reads only        */
+void   to_upper_in_place(char *s);             /* modifies in place */
+bool   copy_into(char *dst, size_t dst_size,
+                 const char *src);             /* both directions   */</code></pre>
+
+  <p>Note the pattern in the third: a writable buffer is always accompanied by its size. There is no way to recover it inside the function — week 12 established that <code>sizeof</code> on a parameter gives the pointer size — so the caller must supply it. A function that takes a destination buffer and no size cannot be used safely, which is precisely the defect in <code>strcpy</code>.</p>
+
+  <h3>Two-dimensional arrays</h3>
+<pre><code>void print_grid(size_t rows, size_t cols, const int grid[rows][cols]);</code></pre>
+
+  <p>This C99 form takes the dimensions as earlier parameters and uses them in the array type, which lets the compiler compute offsets correctly for any shape. It is clearer than the older alternatives:</p>
+
+<pre><code>void print_grid(const int grid[][COLS], size_t rows);   /* fixed width  */
+void print_grid(const int (*grid)[COLS], size_t rows);  /* the same     */
+void print_grid(const int *flat, size_t rows, size_t cols); /* manual   */</code></pre>
+
+  <p>The last form — one-dimensional with <code>flat[r * cols + c]</code> — is what most real code uses, because it works for dynamically allocated matrices where the shape is not known until run time. Week 19 builds that.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Reading declarations: the right-left rule</h2>
+
+  <p>C declarations are notoriously hard to read because the syntax mirrors <em>use</em> rather than structure. There is a mechanical procedure, and once you know it nothing is ambiguous.</p>
+
+  <div class="c-wk-note">
+    <p><strong>The rule.</strong> Start at the identifier. Move right as far as you can, then left, alternating, obeying parentheses. Read <code>[]</code> as "array of", <code>()</code> as "function returning", and <code>*</code> as "pointer to".</p>
+  </div>
+
+  <p>Worked through, from easy to unpleasant:</p>
+
+  <table>
+    <thead><tr><th>Declaration</th><th>Reads as</th></tr></thead>
+    <tbody>
+      <tr><td><code>int *p</code></td><td><code>p</code> is a pointer to <code>int</code></td></tr>
+      <tr><td><code>int *p[5]</code></td><td><code>p</code> is an array of 5 pointers to <code>int</code></td></tr>
+      <tr><td><code>int (*p)[5]</code></td><td><code>p</code> is a pointer to an array of 5 <code>int</code></td></tr>
+      <tr><td><code>int *f(void)</code></td><td><code>f</code> is a function returning a pointer to <code>int</code></td></tr>
+      <tr><td><code>int (*f)(void)</code></td><td><code>f</code> is a pointer to a function returning <code>int</code></td></tr>
+      <tr><td><code>char *(*f[3])(int)</code></td><td><code>f</code> is an array of 3 pointers to functions taking <code>int</code> and returning a pointer to <code>char</code></td></tr>
+    </tbody>
+  </table>
+
+  <p>Take the last one step by step. Start at <code>f</code>. To the right is <code>[3]</code> — array of 3. Parentheses close, so go left: <code>*</code> — of pointers to. Now outside the parentheses, right again: <code>(int)</code> — functions taking <code>int</code>. Then left: <code>char *</code> — returning a pointer to <code>char</code>. Done, and nothing was guessed.</p>
+
+  <p>Two practical notes. The <code>cdecl</code> tool, available online and as a package, translates declarations in both directions and is worth using while the rule is still new. And in your own code, a <code>typedef</code> usually beats a virtuoso declaration:</p>
+
+<pre><code>typedef char *(*string_maker)(int);
+string_maker f[3];          /* the same type, comprehensible */</code></pre>
+
+  <p>Week 30 needs this for function pointers, and week 22 covers <code>typedef</code> properly.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: a parser with an honest contract</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;ctype.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;limits.h&gt;
+
+/* Parse a complete decimal integer.
+   Returns true and writes *out only on success.
+   text is read and never modified, which the signature enforces. */
+static bool parse_int(const char *text, int *out)
+{
+    if (text == NULL || out == NULL) {
+        return false;
+    }
+
+    while (isspace((unsigned char)*text)) {
+        text++;
+    }
+    if (*text == '\0') {
+        return false;                       /* empty or all whitespace */
+    }
+
+    errno = 0;
+    char *end = NULL;                       /* strtol writes here */
+    long value = strtol(text, &amp;end, 10);
+
+    if (end == text)      return false;     /* no digits at all      */
+    if (*end != '\0')     return false;     /* trailing rubbish      */
+    if (errno == ERANGE)  return false;     /* out of long's range   */
+    if (value &lt; INT_MIN || value &gt; INT_MAX) return false;
+
+    *out = (int)value;
+    return true;
+}
+
+/* Two results, so two output parameters — and at three it would be a struct. */
+static bool min_max(const int *values, size_t n, int *lo, int *hi)
+{
+    if (values == NULL || n == 0) {
+        return false;
+    }
+    *lo = *hi = values[0];
+    for (size_t i = 1; i &lt; n; i++) {
+        if (values[i] &lt; *lo) *lo = values[i];
+        if (values[i] &gt; *hi) *hi = values[i];
+    }
+    return true;
+}
+
+/* Caller supplies the buffer and its size: cannot leak, cannot overflow. */
+static bool describe_into(char *dst, size_t dst_size, int lo, int hi)
+{
+    int n = snprintf(dst, dst_size, "range %d..%d (span %d)", lo, hi, hi - lo);
+    return n &gt;= 0 &amp;&amp; (size_t)n &lt; dst_size;
+}
+
+/* Safe: the literals have static storage duration. */
+static const char *verdict(int span)
+{
+    if (span == 0)  return "all equal";
+    if (span &lt; 10)  return "tight";
+    if (span &lt; 100) return "moderate";
+    return "wide";
+}
+
+/* const correctness: this reads, so every pointer it takes is const. */
+static size_t count_matching(const int *values, size_t n, int target)
+{
+    size_t found = 0;
+    for (size_t i = 0; i &lt; n; i++) {
+        if (values[i] == target) {
+            found++;
+        }
+    }
+    return found;
+}
+
+int main(void)
+{
+    puts("== parsing, with failure reported rather than guessed ==");
+    const char *inputs[] = { "42", "  -7 ", "abc", "", "12abc", "99999999999" };
+    const size_t input_count = sizeof inputs / sizeof inputs[0];
+
+    int parsed[8];
+    size_t good = 0;
+
+    for (size_t i = 0; i &lt; input_count; i++) {
+        int value;
+        if (parse_int(inputs[i], &amp;value)) {
+            printf("  \"%s\" -&gt; %d\n", inputs[i], value);
+            parsed[good++] = value;
+        } else {
+            printf("  \"%s\" -&gt; rejected\n", inputs[i]);
+        }
+    }
+
+    puts("\n== two outputs ==");
+    int lo, hi;
+    if (min_max(parsed, good, &amp;lo, &amp;hi)) {
+        printf("  lowest %d, highest %d\n", lo, hi);
+
+        char text[64];
+        if (describe_into(text, sizeof text, lo, hi)) {
+            printf("  %s — %s\n", text, verdict(hi - lo));
+        }
+
+        char tiny[8];
+        if (!describe_into(tiny, sizeof tiny, lo, hi)) {
+            printf("  into an 8-byte buffer: truncated to \"%s\", and detected\n",
+                   tiny);
+        }
+    }
+
+    puts("\n== the empty case is a failure, not a wrong answer ==");
+    printf("  min_max on 0 values -&gt; %s\n",
+           min_max(parsed, 0, &amp;lo, &amp;hi) ? "succeeded?!" : "correctly refused");
+
+    puts("\n== const correctness ==");
+    printf("  count of 42 = %zu\n", count_matching(parsed, good, 42));
+    puts("  count_matching takes const int * — the compiler guarantees");
+    puts("  it cannot modify the caller's array, and says so in the signature");
+
+    puts("\n== declarations, read with the right-left rule ==");
+    int   n1 = 5;
+    int  *p1 = &amp;n1;             /* p1: pointer to int                    */
+    int  *a1[3] = { &amp;n1, NULL, NULL };  /* a1: array of 3 pointers to int */
+    int   m[2][3] = { { 1, 2, 3 }, { 4, 5, 6 } };
+    int (*r1)[3] = m;           /* r1: pointer to array of 3 int         */
+
+    printf("  *p1      = %d\n", *p1);
+    printf("  *a1[0]   = %d\n", *a1[0]);
+    printf("  r1[1][2] = %d\n", r1[1][2]);
+    printf("  sizeof a1 = %zu (3 pointers), sizeof *r1 = %zu (3 ints)\n",
+           sizeof a1, sizeof *r1);
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o params params.c
+./params</code></pre>
+
+  <h3>Why <code>parse_int</code> is written that way</h3>
+
+  <p>Compare it with <code>atoi</code>, which is what most textbooks reach for. <code>atoi("abc")</code> returns 0 — indistinguishable from <code>atoi("0")</code>. It cannot report overflow. It has no way to tell you there was trailing garbage. Every one of those is a real defect, and <code>strtol</code> with a checked <code>endptr</code> closes all three.</p>
+
+  <p>The <code>char *end</code> argument is itself an output parameter, written by <code>strtol</code> to say where it stopped. Checking <code>end == text</code> detects "no digits"; checking <code>*end != '\0'</code> detects trailing rubbish. That pattern is worth memorizing — week 23 uses it for command-line arguments and week 48 fuzzes it.</p>
+
+  <h3>Make the compiler enforce <code>const</code></h3>
+
+  <p>Add a write inside a function that promised not to:</p>
+
+<pre><code>static size_t count_matching(const int *values, size_t n, int target)
+{
+    values[0] = 0;        /* add this line */</code></pre>
+
+<pre><code>params.c:82:15: error: assignment of read-only location '*values'</code></pre>
+
+  <p>Not a warning — an error. The contract in the signature is checked by the compiler on every build, for free, forever. That is what distinguishes <code>const</code> from a comment.</p>
+
+  <h3>Watch a dangling return fail</h3>
+
+<pre><code>static char *broken(void)
+{
+    char buffer[32];
+    strcpy(buffer, "hello");
+    return buffer;
+}
+/* in main: */
+printf("%s\n", broken());</code></pre>
+
+<pre><code>warning: function returns address of local variable [-Wreturn-local-addr]</code></pre>
+
+  <p>Run it under the sanitizer and the diagnosis is exact:</p>
+<pre><code>==1234==ERROR: AddressSanitizer: stack-use-after-return</code></pre>
+
+  <p>Then fix it the right way — by making the caller supply the buffer, as <code>describe_into</code> does — and note that the fix changed the interface, not the body. Lifetime is an interface question.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Using a sentinel like −1 where every value is valid</td><td>Failure indistinguishable from a result</td><td>Status return plus an output parameter.</td></tr>
+      <tr><td>Writing to <code>*out</code> before validating</td><td>Caller's variable clobbered on failure</td><td>Write only on the success path.</td></tr>
+      <tr><td>Omitting <code>const</code> on read-only parameters</td><td>Contract unstated; <code>const</code> callers forced to cast</td><td>Add it from the start; retrofitting is painful.</td></tr>
+      <tr><td>Casting <code>const</code> away to silence an error</td><td>Possible write to read-only memory</td><td>Fix the signature instead.</td></tr>
+      <tr><td>Returning a pointer to a local</td><td>Dangling pointer</td><td>Caller-supplied buffer, static data, or <code>malloc</code> with documented ownership.</td></tr>
+      <tr><td>A destination buffer with no size parameter</td><td>Cannot be used safely — the <code>strcpy</code> defect</td><td>Always pass the size alongside.</td></tr>
+      <tr><td>Using <code>atoi</code> for user input</td><td>Cannot distinguish 0 from failure</td><td><code>strtol</code> with <code>endptr</code> and <code>errno</code> checked.</td></tr>
+      <tr><td>Guessing at a declaration's meaning</td><td>Wrong type, confusing errors</td><td>Apply the right-left rule, or introduce a <code>typedef</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>When is a status return plus an output parameter better than returning the value directly?</summary>
+    <p>Whenever every possible value is a legitimate result, so no value is available as a failure sentinel. Returning a temperature, a parsed integer, or a count that may legitimately be zero all fall into this category. Separating "did it succeed" from "what is the answer" also forces the caller to handle failure before touching the result.</p>
+  </details>
+
+  <details>
+    <summary>What is the difference between <code>const char *p</code> and <code>char * const p</code>?</summary>
+    <p>The first is a pointer to constant characters: you may repoint <code>p</code> but not write through it. The second is a constant pointer to writable characters: you may write through it but not repoint it. Read <code>const</code> as qualifying whatever is immediately to its left, or to its right when there is nothing to the left.</p>
+  </details>
+
+  <details>
+    <summary>Why is <code>const</code> better than a comment saying the function does not modify its argument?</summary>
+    <p>Because it is checked. An accidental write becomes a compile error rather than a bug, and the guarantee propagates to callers, who can pass <code>const</code> data without casting. A comment is unverified and drifts out of date; <code>const</code> is re-verified on every build.</p>
+  </details>
+
+  <details>
+    <summary>Which of the four sources of a returned pointer is always wrong, and why?</summary>
+    <p>A pointer to a local variable. The local lives in the function's stack frame, which is discarded on return, so the caller receives an address into memory that now belongs to whatever is called next. It frequently appears to work, because the bytes have not yet been overwritten, which makes it harder to find rather than easier.</p>
+  </details>
+
+  <details>
+    <summary>Read <code>char *(*f[3])(int)</code>.</summary>
+    <p>Start at <code>f</code>, go right to <code>[3]</code> — an array of 3. The parenthesis closes, so go left to <code>*</code> — of pointers to. Outside the parentheses, right to <code>(int)</code> — functions taking an <code>int</code>. Then left to <code>char *</code> — returning a pointer to <code>char</code>. So: an array of three pointers to functions taking an <code>int</code> and returning <code>char *</code>. A <code>typedef</code> would express this far more kindly.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 17 turns from parameters to storage: where variables actually live, how long they last, and what the program's memory map looks like as a single picture. That picture makes week 18's recursion visible in a debugger and is the prerequisite for week 19, where you take memory from the heap and become responsible for giving it back.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_15_Pointer_Arithmetic_and_Arrays.html">← Week 15</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_17_Scope_and_Program_Memory_Layout.html">Week 17 →</a>
+</div>
+
+</div>

@@ -1,0 +1,401 @@
+---
+layout: without-sidebar
+title: "Week 11 — Functions"
+permalink: /files/c/Week_11_Functions.html
+excerpt: "Declaration, definition and calling; prototypes and why they matter; pass-by-value and the call stack; and designing functions with a clear contract for success and failure."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Basic · Week 11</div>
+  <h1>Functions</h1>
+  <p class="c-wk-lead">Functions are how a program stops being one long sequence and becomes a set of named ideas. C's version is simple and has exactly one rule that catches everyone: arguments are copied, always, with no exceptions.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Declare, define, and call functions, and explain what a prototype is for.</li>
+      <li>Describe what happens to the call stack during a call and a return.</li>
+      <li>Explain why a function cannot modify its caller's variable, and what that implies.</li>
+      <li>Decompose a long <code>main</code> into functions with single responsibilities.</li>
+      <li>Design a function contract that reports failure rather than hiding it.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Declaration, definition, call</h2>
+
+  <p>A <strong>definition</strong> provides the body:</p>
+<pre><code>int add(int a, int b)
+{
+    return a + b;
+}</code></pre>
+
+  <p>A <strong>declaration</strong>, also called a prototype, gives only the interface and ends with a semicolon:</p>
+<pre><code>int add(int a, int b);</code></pre>
+
+  <p>A <strong>call</strong> uses it:</p>
+<pre><code>int sum = add(3, 4);</code></pre>
+
+  <p>The compiler reads a file top to bottom and must know a function's interface before it sees a call. Two ways to arrange that: define the function above its first use, or declare it at the top and define it anywhere. The second scales better, and in week 28 the declarations move into a header file.</p>
+
+  <h3>Why prototypes matter</h3>
+  <p>A prototype lets the compiler check the call. Without one, in pre-C99 code, the compiler assumed the function returned <code>int</code> and checked nothing at all:</p>
+
+<pre><code>/* no declaration in scope */
+double result = square(3.0);   /* compiler assumes int square() */</code></pre>
+
+  <p>The argument would be passed as a <code>double</code> but read as an <code>int</code>, and the return value interpreted as an <code>int</code> too. The result is garbage, and in C89 there was no diagnostic. This is the single largest safety improvement C89 made, and modern compilers now reject it:</p>
+
+<pre><code>error: implicit declaration of function 'square'
+       [-Wimplicit-function-declaration]</code></pre>
+
+  <h3><code>void</code> in both positions</h3>
+<pre><code>void print_banner(void);     /* returns nothing, takes nothing */</code></pre>
+
+  <p>Write <code>(void)</code> for an empty parameter list, not <code>()</code>. In C89, empty parentheses mean "unspecified parameters — check nothing", which switches off the very checking prototypes exist to provide. C23 finally made <code>()</code> mean the same as <code>(void)</code>, but the explicit form remains correct everywhere.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>The call stack</h2>
+
+  <p>Week 17 covers program memory layout in full; the part needed now is the stack.</p>
+
+  <p>When a function is called, the machine pushes a <strong>stack frame</strong> containing the arguments, the local variables, and the address to return to. When the function returns, that frame is popped and the memory is reused by the next call.</p>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 640 190" role="img" aria-label="Stack frames for main calling average which calls sum, each frame holding its own locals" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="150" y="20" width="240" height="40" rx="8"/>
+        <rect x="150" y="66" width="240" height="40" rx="8"/>
+        <rect x="150" y="112" width="240" height="40" rx="8"/>
+      </g>
+      <g fill="currentColor" font-size="12.5" font-family="inherit">
+        <text x="166" y="38">sum()</text>
+        <text x="166" y="54" opacity=".6">total, i — return address</text>
+        <text x="166" y="84">average()</text>
+        <text x="166" y="100" opacity=".6">n, result — return address</text>
+        <text x="166" y="130">main()</text>
+        <text x="166" y="146" opacity=".6">values[], count</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1.5" opacity=".55">
+        <path d="M410 40h50M460 40v72M460 112h-50"/>
+        <path d="M418 107l-8 5 8 5" fill="none"/>
+      </g>
+      <g fill="currentColor" font-size="11.5" opacity=".7" font-family="inherit">
+        <text x="470" y="80">return</text>
+        <text x="20" y="40">top</text>
+        <text x="20" y="136">bottom</text>
+        <text x="150" y="176" opacity=".85">each frame is private; returning discards it entirely</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1" opacity=".35">
+        <path d="M60 30v112"/><path d="M56 36l4-8 4 8" fill="none"/>
+      </g>
+    </svg>
+    <p class="c-wk-cap">Frames stack up as calls nest and unwind as they return. Week 18 watches this happen in a debugger.</p>
+  </div>
+
+  <p>Two consequences follow directly, and both matter.</p>
+
+  <p><strong>Local variables do not survive the return.</strong> The frame is gone; the memory belongs to whatever is called next. Returning a pointer to a local is therefore returning a pointer to memory that no longer belongs to you — week 16's "dangling return".</p>
+
+  <p><strong>Deep recursion exhausts the stack.</strong> Each call consumes a frame, and the stack has a fixed size — typically 8 MB on Linux. Week 18 measures exactly how deep you can go.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Pass by value — the rule with no exceptions</h2>
+
+  <p>When you call a function, C copies each argument into the function's parameter. The parameter is a separate variable that happens to start with the same value.</p>
+
+<pre><code>void try_to_double(int n)
+{
+    n = n * 2;             /* modifies the copy */
+}
+
+int main(void)
+{
+    int value = 5;
+    try_to_double(value);
+    printf("%d\n", value); /* 5 — unchanged */
+}</code></pre>
+
+  <p>This is not a limitation to work around casually; it is a guarantee. A function cannot secretly alter the variables you pass it, which makes calls easy to reason about. The cost is that a function which genuinely needs to modify the caller's data must be given something else: the variable's <em>address</em>. That is week 13, and it is why <code>scanf</code> in week 8 required an <code>&amp;</code>.</p>
+
+  <h3>The swap that cannot work</h3>
+<pre><code>void swap(int a, int b)
+{
+    int temp = a;
+    a = b;
+    b = temp;
+}
+/* swaps two copies, then discards both */</code></pre>
+
+  <p>Every C programmer writes this once. It compiles cleanly, runs without error, and does nothing. Keep the file — week 13 fixes it in three characters, and the fix is the clearest possible demonstration of what a pointer is for.</p>
+
+  <div class="c-wk-note">
+    <p><strong>Arrays are the apparent exception.</strong> Pass an array to a function and the function <em>can</em> modify its contents, which looks like a contradiction. It is not: what gets copied is a pointer to the first element, so the copy still refers to the same memory. Week 13 explains this properly under the name "array decay". Note it now so it does not look like magic in week 12.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Designing a function</h2>
+
+  <h3>One job</h3>
+  <p>A function should do one thing that can be named without using "and". <code>read_config_and_connect</code> is two functions. The test is the name: if an honest name needs a conjunction, split it.</p>
+
+  <h3>Reporting failure</h3>
+  <p>C has no exceptions. A function that can fail must say so through its return value or through an output parameter, and the caller must check. Three conventions dominate:</p>
+
+  <table>
+    <thead><tr><th>Convention</th><th>Example</th><th>Use when</th></tr></thead>
+    <tbody>
+      <tr><td>Return the result; use an impossible value for failure</td><td><code>find</code> returns <code>n</code> for not-found</td><td>There is a value outside the valid range</td></tr>
+      <tr><td>Return a status; write the result through a pointer</td><td><code>bool parse_int(const char *s, int *out)</code></td><td>Every value is a legitimate result</td></tr>
+      <tr><td>Return <code>NULL</code> or a negative code</td><td><code>fopen</code>, <code>malloc</code></td><td>Returning a pointer</td></tr>
+    </tbody>
+  </table>
+
+  <p>The second is the most generally useful and the one week 16 develops. Pick one convention per project and apply it everywhere — week 27 turns this into an explicit error contract.</p>
+
+  <h3><code>static</code> for helpers</h3>
+<pre><code>static int helper(int x) { … }</code></pre>
+  <p>Marking a function <code>static</code> restricts its name to the current source file. Use it for everything that is not part of a file's public interface: it prevents name collisions, lets the compiler inline more aggressively, and documents intent. Week 28 makes this the basis of information hiding.</p>
+
+  <h3>Parameters</h3>
+  <ul>
+    <li>Few is better than many. More than four or five usually signals that some of them belong together in a structure — week 21.</li>
+    <li>Mark pointer parameters you do not modify as <code>const</code>. It documents the contract and lets the compiler enforce it. Week 16.</li>
+    <li>Name parameters in the prototype too. <code>int add(int, int);</code> is legal, but <code>int add(int left, int right);</code> tells the reader which is which.</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Worked example: decomposing a long <code>main</code></h2>
+
+  <p>Here is a program that works. It reads scores, computes statistics, and prints a report — all in one function.</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void)
+{
+    int scores[] = { 88, 92, 79, 95, 61, 73, 84 };
+    size_t n = sizeof scores / sizeof scores[0];
+
+    int total = 0;
+    for (size_t i = 0; i &lt; n; i++) total += scores[i];
+    double mean = (double)total / n;
+
+    int hi = scores[0], lo = scores[0];
+    for (size_t i = 1; i &lt; n; i++) {
+        if (scores[i] &gt; hi) hi = scores[i];
+        if (scores[i] &lt; lo) lo = scores[i];
+    }
+
+    int passing = 0;
+    for (size_t i = 0; i &lt; n; i++) if (scores[i] &gt;= 70) passing++;
+
+    printf("n=%zu mean=%.2f hi=%d lo=%d pass=%d\n", n, mean, hi, lo, passing);
+    return 0;
+}</code></pre>
+
+  <p>Nothing is wrong with the output. What is wrong is that no part of it can be reused, tested, or read independently, and the reader must hold the whole thing in their head at once.</p>
+
+  <h3>The same program, decomposed</h3>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdbool.h&gt;
+
+#define PASS_MARK 70
+
+/* Each of these does one thing, has a name that says so,
+   and can be tested on its own. */
+
+static int sum(const int values[], size_t n)
+{
+    int total = 0;
+    for (size_t i = 0; i &lt; n; i++) {
+        total += values[i];
+    }
+    return total;
+}
+
+/* Returns false for an empty array rather than dividing by zero. */
+static bool mean(const int values[], size_t n, double *out)
+{
+    if (n == 0) {
+        return false;
+    }
+    *out = (double)sum(values, n) / (double)n;
+    return true;
+}
+
+static int maximum(const int values[], size_t n)
+{
+    int best = values[0];               /* caller guarantees n &gt; 0 */
+    for (size_t i = 1; i &lt; n; i++) {
+        if (values[i] &gt; best) {
+            best = values[i];
+        }
+    }
+    return best;
+}
+
+static int minimum(const int values[], size_t n)
+{
+    int best = values[0];
+    for (size_t i = 1; i &lt; n; i++) {
+        if (values[i] &lt; best) {
+            best = values[i];
+        }
+    }
+    return best;
+}
+
+static size_t count_at_least(const int values[], size_t n, int threshold)
+{
+    size_t found = 0;
+    for (size_t i = 0; i &lt; n; i++) {
+        if (values[i] &gt;= threshold) {
+            found++;
+        }
+    }
+    return found;
+}
+
+static void print_report(const int values[], size_t n)
+{
+    if (n == 0) {
+        puts("no scores to report");
+        return;
+    }
+
+    double average = 0.0;
+    mean(values, n, &amp;average);          /* cannot fail: n &gt; 0 checked above */
+
+    printf("%-16s %zu\n",     "count",   n);
+    printf("%-16s %.2f\n",    "mean",    average);
+    printf("%-16s %d\n",      "highest", maximum(values, n));
+    printf("%-16s %d\n",      "lowest",  minimum(values, n));
+    printf("%-16s %zu of %zu\n", "passing",
+           count_at_least(values, n, PASS_MARK), n);
+}
+
+int main(void)
+{
+    const int scores[] = { 88, 92, 79, 95, 61, 73, 84 };
+    const size_t n = sizeof scores / sizeof scores[0];
+
+    print_report(scores, n);
+
+    puts("\n-- the empty case, which the original would have divided by zero --");
+    print_report(scores, 0);
+
+    puts("\n-- pass by value --");
+    int value = 5;
+    printf("before: %d\n", value);
+    /* try_to_double(value) would change nothing; see below */
+    printf("after:  %d\n", value);
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o report report.c
+./report</code></pre>
+
+  <h3>What the decomposition bought</h3>
+
+  <p><strong>An edge case became visible.</strong> The original divided by <code>n</code> with no check. Writing <code>mean</code> as its own function with a stated contract forced the question "what if <code>n</code> is zero?", and the answer became part of the interface. Bugs hide in code that is never named.</p>
+
+  <p><strong>Each piece is testable.</strong> <code>maximum</code> can be called with a one-element array, a sorted array, an array of equal values. In week 35 these become actual unit tests; the decomposition is what makes that possible.</p>
+
+  <p><strong><code>const</code> documents and enforces.</strong> Every function that only reads its array says so. Try adding <code>values[0] = 0;</code> inside <code>sum</code> and the compiler refuses — the contract is checked, not merely described.</p>
+
+  <p><strong>The reader can stop early.</strong> Someone who wants to know how the report is laid out reads <code>print_report</code> and nothing else.</p>
+
+  <h3>The swap experiment</h3>
+  <p>Add this and run it. It is the setup for week 13.</p>
+
+<pre><code>static void swap(int a, int b)
+{
+    int temp = a;
+    a = b;
+    b = temp;
+    printf("  inside swap: a=%d b=%d\n", a, b);
+}
+
+/* in main: */
+int x = 1, y = 2;
+printf("before: x=%d y=%d\n", x, y);
+swap(x, y);
+printf("after:  x=%d y=%d\n", x, y);</code></pre>
+
+<pre><code>before: x=1 y=2
+  inside swap: a=2 b=1
+after:  x=1 y=2</code></pre>
+
+  <p>The swap genuinely happened — to the copies. Both frames existed at once, held different values, and then the callee's frame was discarded. Nothing was lost in translation; there was simply never a connection between <code>a</code> and <code>x</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Calling a function before declaring it</td><td><code>implicit declaration</code> error</td><td>Prototype at the top, or define above the call.</td></tr>
+      <tr><td>Writing <code>int f()</code> for no parameters</td><td>Pre-C23, disables argument checking</td><td><code>int f(void)</code>.</td></tr>
+      <tr><td>Expecting a function to modify its argument</td><td>Nothing changes</td><td>Pass the address — week 13.</td></tr>
+      <tr><td>Returning a pointer to a local variable</td><td>Dangling pointer; undefined behavior</td><td>Return by value, or let the caller supply the storage.</td></tr>
+      <tr><td>Ignoring a function's error return</td><td>The program continues on bad data</td><td>Check every return that can fail.</td></tr>
+      <tr><td>Omitting <code>const</code> on read-only pointer parameters</td><td>Contract unstated and unenforced</td><td>Add it; the compiler will check.</td></tr>
+      <tr><td>A function that needs six parameters</td><td>Calls become unreadable and error-prone</td><td>Group related parameters into a struct — week 21.</td></tr>
+      <tr><td>No <code>static</code> on file-local helpers</td><td>Names leak; collisions at link time</td><td>Mark them <code>static</code> — week 28.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">7</span>Check yourself</h2>
+
+  <details>
+    <summary>What is the difference between a declaration and a definition?</summary>
+    <p>A declaration states the interface — name, return type, parameter types — and ends with a semicolon. A definition additionally supplies the body. A program may contain many identical declarations of a function but exactly one definition. Week 28 puts declarations in headers and definitions in source files for precisely this reason.</p>
+  </details>
+
+  <details>
+    <summary>Why write <code>(void)</code> rather than <code>()</code> for an empty parameter list?</summary>
+    <p>Before C23, empty parentheses meant "parameters unspecified", which tells the compiler to check nothing at the call site — the opposite of what a prototype is for. <code>(void)</code> explicitly states that the function takes no arguments, so a call passing any is an error.</p>
+  </details>
+
+  <details>
+    <summary>Why can't a C function modify a variable passed to it?</summary>
+    <p>Because arguments are copied into the parameters. The parameter is a distinct variable in a distinct stack frame; assigning to it changes only the copy, which is discarded on return. To modify the caller's variable the function must be given its address instead — which is what <code>scanf</code>'s <code>&amp;</code> is doing.</p>
+  </details>
+
+  <details>
+    <summary>Why is returning a pointer to a local variable wrong?</summary>
+    <p>The local lives in the function's stack frame, and that frame is discarded when the function returns. The pointer then refers to memory that belongs to whatever is called next. It often appears to work, because the value has not yet been overwritten, which makes the bug worse rather than better.</p>
+  </details>
+
+  <details>
+    <summary>Your function computes an average and the caller passed an empty array. What should it do?</summary>
+    <p>Report failure rather than divide by zero — either by returning a status and writing the result through an output parameter, or by documenting a precondition the caller must satisfy. What it must not do is compute a value that means nothing. Deciding this is part of designing the function, not an afterthought.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Where this leads</h2>
+  <p>Week 12 introduces arrays, which is where the pass-by-value rule appears to break: pass an array to a function and the function can change it. Understanding why that is consistent rather than exceptional requires pointers, which arrive in week 13 — and which also fix the <code>swap</code> you just watched fail.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_10_Loops_and_Flow_Control.html">← Week 10</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_12_Arrays.html">Week 12 →</a>
+</div>
+
+</div>

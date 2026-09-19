@@ -1,0 +1,428 @@
+---
+layout: without-sidebar
+title: "Week 17 — Scope, Lifetime, and Program Memory Layout"
+permalink: /files/c/Week_17_Scope_and_Program_Memory_Layout.html
+excerpt: "Where a name is visible and how long an object lives; static locals; the text, rodata, data, bss, stack and heap regions; and the call stack seen as addresses."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Intermediate · Week 17</div>
+  <h1>Scope, Lifetime, and Program Memory Layout</h1>
+  <p class="c-wk-lead">Two different questions get confused constantly: where a name can be <em>seen</em>, and how long the object it names <em>exists</em>. C answers them separately, and the answers together explain the whole memory map of a running program.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Distinguish scope from storage duration and give an example where they differ.</li>
+      <li>Explain what a <code>static</code> local is and when it is the right tool.</li>
+      <li>Name the six regions of a running program's memory and say what lives in each.</li>
+      <li>Describe a stack frame and explain why locals do not survive a return.</li>
+      <li>Write a program that prints its own memory map.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Scope: where a name is visible</h2>
+
+  <table>
+    <thead><tr><th>Scope</th><th>Extent</th><th>Introduced by</th></tr></thead>
+    <tbody>
+      <tr><td>Block</td><td>From the declaration to the closing brace</td><td>Any declaration inside <code>{ }</code></td></tr>
+      <tr><td>Function</td><td>The whole function body</td><td>Only labels, for <code>goto</code></td></tr>
+      <tr><td>File</td><td>From the declaration to the end of the file</td><td>Declarations outside any function</td></tr>
+      <tr><td>Function prototype</td><td>Within the parameter list</td><td>Parameter names in a declaration</td></tr>
+    </tbody>
+  </table>
+
+<pre><code>int global = 1;              /* file scope: visible below, in this file */
+
+void demo(void)
+{
+    int local = 2;           /* block scope: this function only */
+
+    {
+        int inner = 3;       /* block scope: these braces only  */
+        printf("%d\n", inner);
+    }
+    /* inner does not exist here */
+}</code></pre>
+
+  <p>Declare names in the smallest scope that works. A variable visible only where it is used cannot be accidentally read or written elsewhere, and the reader does not have to search for other uses.</p>
+
+  <h3>Shadowing</h3>
+<pre><code>int count = 10;
+
+void demo(void)
+{
+    int count = 20;          /* shadows the file-scope count */
+    printf("%d\n", count);   /* 20 — the inner one wins      */
+}</code></pre>
+
+  <p>An inner declaration hides an outer one of the same name. This is legal and occasionally intentional, but far more often it is an accident that produces a bug the compiler will not mention unless asked. Turn it on:</p>
+
+<pre><code>gcc -Wshadow …</code></pre>
+
+  <p><code>-Wshadow</code> is not in <code>-Wall</code> or <code>-Wextra</code>. It is worth adding to your standard command line.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Storage duration: how long an object lives</h2>
+
+  <table>
+    <thead><tr><th>Duration</th><th>Lives</th><th>Declared as</th></tr></thead>
+    <tbody>
+      <tr><td>Automatic</td><td>From entry to its block until exit</td><td>A plain local variable</td></tr>
+      <tr><td>Static</td><td>The whole program run</td><td><code>static</code>, or any file-scope variable</td></tr>
+      <tr><td>Allocated</td><td>From <code>malloc</code> until <code>free</code></td><td>Week 19</td></tr>
+      <tr><td>Thread</td><td>The lifetime of one thread</td><td><code>_Thread_local</code> — week 41</td></tr>
+    </tbody>
+  </table>
+
+  <p>Scope and duration are independent, which is the point of separating them. A <code>static</code> local has <em>block scope</em> — only its function can name it — and <em>static duration</em> — it exists for the whole run and keeps its value between calls.</p>
+
+<pre><code>void counter(void)
+{
+    static int calls = 0;    /* initialized once, at program start */
+    calls++;
+    printf("call number %d\n", calls);
+}
+/* 1, 2, 3, … across separate calls */</code></pre>
+
+  <p>Two guarantees worth knowing. A <code>static</code> variable's initializer must be a constant expression and runs once, before <code>main</code>. And any static object without an initializer is <strong>zero-initialized</strong> — unlike an automatic variable, which contains garbage.</p>
+
+  <h3>When a static local is right</h3>
+  <p>For a counter or cache private to one function, it is exactly the tool: file-scope visibility would expose it unnecessarily. The cost is that the function is no longer reentrant — two threads calling it share the variable, and so do two nested calls. <code>strtok</code> from week 14 is the standard library's example of this design and its consequences.</p>
+
+  <h3><code>static</code> at file scope means something else</h3>
+<pre><code>static int helper_count;         /* not visible to other .c files */
+static void helper(void) { … }   /* likewise */</code></pre>
+  <p>Applied to a file-scope name, <code>static</code> restricts <em>linkage</em> rather than duration — the name cannot be referenced from another translation unit. That is week 28's subject, and it is the basis of information hiding in C.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>The memory map of a running program</h2>
+
+  <p>When the operating system loads your executable, it lays out several distinct regions. Every object you have declared so far lives in one of them.</p>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 560 330" role="img" aria-label="Memory regions of a running program from high addresses at the top to low addresses at the bottom" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="150" y="16" width="260" height="42" rx="8"/>
+        <rect x="150" y="64" width="260" height="52" rx="8"/>
+        <rect x="150" y="170" width="260" height="42" rx="8"/>
+        <rect x="150" y="218" width="260" height="34" rx="8"/>
+        <rect x="150" y="258" width="260" height="34" rx="8"/>
+        <rect x="150" y="298" width="260" height="26" rx="8"/>
+      </g>
+      <g fill="currentColor" font-size="12.5" text-anchor="middle" font-family="inherit">
+        <text x="280" y="34">command line, environment</text>
+        <text x="280" y="86">stack</text><text x="280" y="104" opacity=".6">locals, parameters, return addresses</text>
+        <text x="280" y="190">heap</text><text x="280" y="206" opacity=".6">malloc — week 19</text>
+        <text x="280" y="239">.bss — zero-initialized statics</text>
+        <text x="280" y="279">.data — initialized statics</text>
+        <text x="280" y="316">.text and .rodata — code, literals</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1.5" opacity=".55">
+        <path d="M280 120v34"/><path d="M275 146l5 8 5-8" fill="none"/>
+        <path d="M280 166v-12"/><path d="M275 158l5-8 5 8" fill="none"/>
+      </g>
+      <g fill="currentColor" font-size="11" opacity=".6" font-family="inherit">
+        <text x="420" y="34">high addresses</text>
+        <text x="420" y="318">low addresses</text>
+        <text x="20" y="90">grows</text><text x="20" y="104">down</text>
+        <text x="20" y="190">grows</text><text x="20" y="204">up</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1" opacity=".3" stroke-dasharray="3 3">
+        <path d="M150 140h260"/>
+      </g>
+      <text x="280" y="136" fill="currentColor" font-size="10.5" text-anchor="middle" opacity=".55" font-family="inherit">unused gap</text>
+    </svg>
+    <p class="c-wk-cap">The classic layout. Week 52 inspects the same sections in a firmware image with <code>objdump</code>.</p>
+  </div>
+
+  <table>
+    <thead><tr><th>Region</th><th>Holds</th><th>Writable</th><th>Lifetime</th></tr></thead>
+    <tbody>
+      <tr><td><code>.text</code></td><td>Machine code</td><td>No</td><td>Whole run</td></tr>
+      <tr><td><code>.rodata</code></td><td>String literals, <code>const</code> data</td><td>No</td><td>Whole run</td></tr>
+      <tr><td><code>.data</code></td><td>Statics with a non-zero initializer</td><td>Yes</td><td>Whole run</td></tr>
+      <tr><td><code>.bss</code></td><td>Statics initialized to zero</td><td>Yes</td><td>Whole run</td></tr>
+      <tr><td>Heap</td><td><code>malloc</code>'d blocks</td><td>Yes</td><td>Until <code>free</code></td></tr>
+      <tr><td>Stack</td><td>Locals, parameters, return addresses</td><td>Yes</td><td>Until the function returns</td></tr>
+    </tbody>
+  </table>
+
+  <p><code>.bss</code> deserves a note. Zero-initialized statics are not stored in the executable file at all — only their total size is recorded, and the loader zeroes that much memory at startup. A program with a ten-megabyte zeroed array has a tiny executable. Week 52 makes this visible with the <code>size</code> command.</p>
+
+  <p>This map also explains week 14's crash. A string literal lives in <code>.rodata</code>, which the hardware marks read-only; writing there is refused by the memory management unit, not by C.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>The call stack</h2>
+
+  <p>Each function call pushes a <strong>stack frame</strong> containing its parameters, its local variables, and the address to return to. The frame is popped on return.</p>
+
+<pre><code>void inner(int x)
+{
+    int local = x * 2;      /* lives in inner's frame */
+    printf("%d\n", local);
+}                           /* frame popped here      */
+
+void outer(void)
+{
+    int value = 21;         /* lives in outer's frame */
+    inner(value);           /* inner's frame sits above outer's */
+}</code></pre>
+
+  <p>Three consequences, all of which you have already met.</p>
+
+  <p><strong>Locals do not survive the return</strong> — week 11's rule and week 13's dangling pointer. The memory is not erased; it simply belongs to the next call, which is why a use-after-return often appears to work.</p>
+
+  <p><strong>Recursion consumes stack</strong>. Each call is another frame. Week 18 measures how many fit.</p>
+
+  <p><strong>The stack is small and fixed.</strong> Typically 8 MB on Linux, 1 MB on Windows. A large local array can exhaust it on its own:</p>
+
+<pre><code>void reckless(void)
+{
+    int huge[4000000];      /* 16 MB on the stack — crashes */
+    huge[0] = 1;
+}</code></pre>
+
+  <p>There is no error message for this, only a segmentation fault. Anything large belongs on the heap, which is week 19. Check your limit with <code>ulimit -s</code>.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>Stack overflow is not reported gracefully.</strong> The stack grows downward into an unmapped guard page and the program receives a fatal signal. There is no <code>NULL</code> to check and no error code. Sanitizers detect it — <code>-fsanitize=address</code> reports <em>stack-overflow</em> — but the language itself gives you nothing.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>The cost of global state</h2>
+
+  <p>A file-scope variable is visible to every function below it, which sounds convenient and is the reason it is overused.</p>
+
+<pre><code>int total = 0;                    /* everyone can read and write this */
+
+void add(int n)   { total += n; }
+void reset(void)  { total = 0;  }
+int  report(void) { return total; }</code></pre>
+
+  <p>What it costs:</p>
+
+  <ul>
+    <li><strong>Reasoning.</strong> To know what <code>report</code> returns you must know every call to <code>add</code> and <code>reset</code> that has happened. A function taking parameters and returning a value can be understood alone.</li>
+    <li><strong>Testing.</strong> Tests must reset the state between cases, and they cannot run in parallel. Week 35 hits this immediately.</li>
+    <li><strong>Reuse.</strong> There is exactly one <code>total</code>. Handling two independent sums requires rewriting all three functions.</li>
+    <li><strong>Threads.</strong> Two threads calling <code>add</code> concurrently corrupt the value. Week 41.</li>
+  </ul>
+
+  <p>The alternative is to pass state explicitly — a parameter now, a pointer to a structure from week 21 onward:</p>
+
+<pre><code>typedef struct { int total; } Accumulator;
+
+void add(Accumulator *a, int n)   { a-&gt;total += n; }
+void reset(Accumulator *a)        { a-&gt;total = 0;  }
+int  report(const Accumulator *a) { return a-&gt;total; }</code></pre>
+
+  <p>Longer to write and better in every other respect: independent instances, testable in isolation, thread-safe by construction, and the <code>const</code> says which operations are read-only. Week 33 makes this an opaque handle.</p>
+
+  <p>Where a genuinely global resource exists — a log file, a configuration loaded once — make it <code>static</code> at file scope so at least the name does not leak into other translation units.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: a program that prints its own memory map</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+/* .data — initialized, writable, whole-run lifetime */
+int    global_initialized = 42;
+double global_double      = 3.14;
+
+/* .bss — zero-initialized; costs no space in the executable */
+int    global_zero;
+int    big_zero_array[100000];
+
+/* .rodata — read-only */
+const char *const message = "stored in read-only memory";
+const int  lookup[4] = { 1, 2, 3, 4 };
+
+/* file scope but not exported: week 28 */
+static int file_private = 7;
+
+/* A static local: block scope, static duration. */
+static int call_count(void)
+{
+    static int calls = 0;       /* initialized once, before main */
+    return ++calls;
+}
+
+/* Demonstrates that each frame is distinct and reused. */
+static void frame_depth(int depth)
+{
+    int marker = depth;
+    printf("    depth %d: &amp;marker = %p\n", depth, (void *)&amp;marker);
+    if (depth &lt; 3) {
+        frame_depth(depth + 1);
+    }
+}
+
+static void shadowing_demo(void)
+{
+    int file_private = 999;     /* shadows the file-scope one */
+    printf("  inside the function, file_private = %d\n", file_private);
+    printf("  (the file-scope one is still 7, but unreachable by name here)\n");
+}
+
+int main(void)
+{
+    int    local          = 1;
+    char   local_array[64] = "on the stack";
+    void  *heap_block      = malloc(1024);
+
+    if (heap_block == NULL) {
+        fprintf(stderr, "allocation failed\n");
+        return EXIT_FAILURE;
+    }
+
+    puts("== where things live (addresses vary between runs) ==\n");
+    printf("  %-26s %p\n", ".text  (code: main)",      (void *)(void *)main);
+    printf("  %-26s %p\n", ".rodata (string literal)", (void *)message);
+    printf("  %-26s %p\n", ".rodata (const array)",    (void *)lookup);
+    printf("  %-26s %p\n", ".data  (global = 42)",     (void *)&amp;global_initialized);
+    printf("  %-26s %p\n", ".data  (static file var)", (void *)&amp;file_private);
+    printf("  %-26s %p\n", ".bss   (global zero)",     (void *)&amp;global_zero);
+    printf("  %-26s %p\n", ".bss   (big zero array)",  (void *)big_zero_array);
+    printf("  %-26s %p\n", "heap   (malloc 1024)",     heap_block);
+    printf("  %-26s %p\n", "stack  (local int)",       (void *)&amp;local);
+    printf("  %-26s %p\n", "stack  (local array)",     (void *)local_array);
+
+    puts("\n  read the addresses: code and constants lowest, then the");
+    puts("  writable statics, then the heap, with the stack far above");
+
+    puts("\n== automatic versus static duration ==");
+    printf("  call_count() -&gt; %d\n", call_count());
+    printf("  call_count() -&gt; %d\n", call_count());
+    printf("  call_count() -&gt; %d   (the value persisted between calls)\n",
+           call_count());
+
+    puts("\n== zero-initialization ==");
+    printf("  global_zero (static, no initializer) = %d  -- guaranteed 0\n",
+           global_zero);
+    puts("  an uninitialized LOCAL would hold garbage instead");
+
+    puts("\n== stack frames ==");
+    printf("  main's local is at      %p\n", (void *)&amp;local);
+    frame_depth(1);
+    puts("  each frame sits at a lower address; they are popped on return");
+
+    puts("\n== scope and shadowing ==");
+    printf("  at file scope, file_private = %d\n", file_private);
+    shadowing_demo();
+
+    puts("\n== read-only memory ==");
+    printf("  message = \"%s\"\n", message);
+    puts("  writing through it would be refused by the hardware");
+
+    free(heap_block);
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -Wshadow -g -o layout layout.c
+./layout</code></pre>
+
+  <h3>What the compiler adds</h3>
+  <p>Because <code>-Wshadow</code> is on:</p>
+<pre><code>layout.c:52:9: warning: declaration of 'file_private' shadows
+              a global declaration [-Wshadow]</code></pre>
+  <p>That warning is off by default and finds a real class of bug. Add it permanently.</p>
+
+  <h3>Confirm the sections from outside the program</h3>
+
+<pre><code>size layout</code></pre>
+<pre><code>   text	   data	    bss	    dec	    hex	filename
+   3521	    664	 400064	 404249	  62b99	layout</code></pre>
+
+  <p>The <code>bss</code> figure is roughly 400 KB — the 100 000-element zeroed array — yet the executable on disk is only a few kilobytes. Zeroed statics are recorded as a size, not as content. Delete <code>big_zero_array</code>, rebuild, and watch <code>bss</code> collapse.</p>
+
+<pre><code>nm layout | grep -E ' [BDRT] ' | sort</code></pre>
+  <p>The letter in <code>nm</code>'s output is the section: <code>T</code> for text, <code>D</code> for data, <code>B</code> for bss, <code>R</code> for read-only. You can see each variable land exactly where the table in section 3 predicted.</p>
+
+  <h3>Exhaust the stack on purpose</h3>
+
+<pre><code>static void recurse(int depth)
+{
+    char padding[1024];
+    padding[0] = (char)depth;
+    printf("\rdepth %d", depth);
+    recurse(depth + 1);
+}</code></pre>
+
+<pre><code>ulimit -s            # your stack limit in kilobytes
+./layout             # add a call to recurse(1)</code></pre>
+
+  <p>It prints an increasing depth and then dies with a segmentation fault — no message, no chance to recover. Divide your stack limit by 1024 and the depth at which it fails should be close. Week 18 does this arithmetic deliberately.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Returning a pointer to a local</td><td>Dangling pointer once the frame pops</td><td>Caller-supplied buffer, static, or heap.</td></tr>
+      <tr><td>Expecting an uninitialized local to be 0</td><td>Garbage; statics are zeroed, locals are not</td><td>Initialize every local at declaration.</td></tr>
+      <tr><td>A large array as a local</td><td>Stack overflow, no diagnostic</td><td>Use the heap — week 19.</td></tr>
+      <tr><td>Shadowing a variable accidentally</td><td>The wrong object is modified</td><td>Compile with <code>-Wshadow</code>.</td></tr>
+      <tr><td>Globals instead of parameters</td><td>Untestable, unreusable, thread-unsafe</td><td>Pass state explicitly; group it in a struct.</td></tr>
+      <tr><td>A static local in a function called from threads</td><td>Shared state, data race</td><td>Make the state a parameter — week 41.</td></tr>
+      <tr><td>Writing through a pointer to a literal</td><td>Crash: <code>.rodata</code> is read-only</td><td>Declare it <code>const char *</code>.</td></tr>
+      <tr><td>Assuming a static initializer runs at first call</td><td>It runs once, before <code>main</code></td><td>Use a flag if you need lazy initialization.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Give an example where scope and storage duration differ.</summary>
+    <p>A <code>static</code> local variable. Its scope is the block it is declared in — no other function can name it — but its storage duration is the entire program run, so it retains its value between calls. Scope is about visibility of the name; duration is about lifetime of the object.</p>
+  </details>
+
+  <details>
+    <summary>Why is a static variable guaranteed to be zero when an uninitialized local is not?</summary>
+    <p>Statics are allocated once at program start, and the loader zeroes the <code>.bss</code> region before <code>main</code> runs. A local is created by adjusting the stack pointer on each call, which does not clear the memory; whatever the previous call left there remains.</p>
+  </details>
+
+  <details>
+    <summary>Why does a ten-megabyte zeroed global array barely increase the executable's size?</summary>
+    <p>Because it goes in <code>.bss</code>, which records only a size. There is nothing to store — every byte is zero — so the loader simply reserves and clears that much memory at startup. Give the same array a non-zero initializer and it moves to <code>.data</code>, where the contents must actually be in the file.</p>
+  </details>
+
+  <details>
+    <summary>What happens when the stack runs out, and how would you notice?</summary>
+    <p>The stack grows into an unmapped guard page and the program receives a fatal signal — a segmentation fault with no message and no opportunity to recover. There is no return code to check. The usual causes are unbounded recursion and very large local arrays; both are fixed by moving the data to the heap or bounding the depth.</p>
+  </details>
+
+  <details>
+    <summary>Name two concrete costs of using a file-scope variable instead of a parameter.</summary>
+    <p>Any two of: you cannot understand a function without tracing every other function that touches the variable; tests must reset shared state and cannot run in parallel; only one instance can ever exist, so the code cannot be reused for two independent sets of data; and concurrent access from threads corrupts it. Passing state explicitly removes all four.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>You can now picture where every object lives. Week 18 uses the stack half of that picture directly: recursion is the construct that makes frames visible, and you will watch them accumulate and unwind in a debugger. Week 19 then uses the heap half, where lifetime stops being automatic and becomes your responsibility.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_16_Pointers_as_Parameters.html">← Week 16</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_18_Recursion.html">Week 18 →</a>
+</div>
+
+</div>
