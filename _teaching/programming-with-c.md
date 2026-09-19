@@ -13,6 +13,8 @@ C is a general-purpose programming language widely used in systems programming, 
 
 This is a complete course in C, designed to take a reader from no prior programming experience to competent, independent, professional C development. It is organized as 56 weekly topics in four levels. **Basic** builds the language core, early programming habits, and the first command-line programs, ending with pointers and strings. **Intermediate** covers memory, aggregate data, files, error handling, modular design, and project workflow. **Advanced** covers libraries and tooling, data structures, performance, undefined behavior, portability, low-level systems interfaces, network programming, and concurrency. **Professional** covers working in existing codebases, collaboration and review, library distribution, language interoperability, scalable I/O, security testing, embedded and bare-metal development, and long-term maintenance. Each topic assumes only what earlier topics have already established.
 
+Every week is anchored to a worked example that is built and explained in the lecture notes. The examples form a chain rather than a set of isolated exercises: the growable array of week 19 becomes the reusable module of week 28, the library of week 29, the installable package of week 45, and the target of a foreign-language binding in week 46; the socket server of week 40 becomes the event loop of week 47.
+
 ## Ders Öğretim Planı  
 
 [Ders Öğretim Planı (HTML)](../files/c/Ders_Ogretim_Plani.html)
@@ -66,6 +68,8 @@ There are currently no announcements.
 - Writing, compiling, and running a first program
 - Reading and understanding compiler messages
 
+**Worked example:** a first program compiled and run from the command line, then broken on purpose so the compiler's diagnostics can be read and understood.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_01_Computers_and_Toolchain.html)
 
 ---
@@ -76,6 +80,8 @@ There are currently no announcements.
 - C89, C99, C11, C17, and C23, and what each added
 - Translation phases: preprocessing, compilation, assembly, and linking
 - Selecting a standard and useful flags: `-std=`, `-Wall`, `-Wextra`, `-g`
+
+**Worked example:** one source file compiled under `-std=c89` and `-std=c23`, with the preprocessed, assembled, and linked output inspected at each stage.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_02_History_Standards_and_Compilation.html)
 
@@ -89,6 +95,8 @@ There are currently no announcements.
 - Producing output with `printf`
 - Basic source-code workflow: folders, files, Git repositories, commits, and `.gitignore`
 
+**Worked example:** a badly formatted program rewritten for readability and placed under version control with a meaningful first commit.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_03_Program_Structure_and_Style.html)
 
 ---
@@ -99,6 +107,8 @@ There are currently no announcements.
 - Two's complement representation of signed integers
 - IEEE 754 representation of floating-point numbers
 - Character encoding and the ASCII table
+
+**Worked example:** a program that prints an integer in binary, octal, and hexadecimal, and dumps the raw bytes of a `float` to expose its sign, exponent, and mantissa.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_04_Data_Representation.html)
 
@@ -111,6 +121,8 @@ There are currently no announcements.
 - `sizeof`, `size_t`, `<limits.h>`, and `<float.h>`
 - Literals, escape sequences, `const`, and `#define`
 
+**Worked example:** a program that reports the size and value range of every basic type on the host machine, compared with the minimum guarantees the standard actually makes.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_05_Variables_Types_and_Constants.html)
 
 ---
@@ -122,6 +134,8 @@ There are currently no announcements.
 - Precedence, associativity, and parenthesization
 - Evaluation order, sequence points, and side effects
 
+**Worked example:** a set of expressions whose values are predicted on paper and then checked against the program, including one whose evaluation order the standard does not fix.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_06_Operators_and_Expressions.html)
 
 ---
@@ -132,6 +146,9 @@ There are currently no announcements.
 - Explicit conversion with casts
 - Mixing signed and unsigned types
 - Integer overflow, truncation, and floating-point precision
+- Floating-point comparison, accumulated error, and the special values `NaN` and infinity
+
+**Worked example:** a program in which a signed-unsigned comparison loops forever and a sum of decimal fractions fails an equality test, with both diagnosed and repaired.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_07_Type_Conversions.html)
 
@@ -144,6 +161,8 @@ There are currently no announcements.
 - Character-at-a-time input and output with `getchar` and `putchar`
 - Validating user input and reporting input errors clearly
 
+**Worked example:** an interactive prompt that reads numbers, rejects malformed input, clears the input buffer, and never spins forever on bad data.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_08_Input_and_Output.html)
 
 ---
@@ -154,6 +173,8 @@ There are currently no announcements.
 - The conditional (ternary) operator
 - `switch`, `case`, `default`, and fall-through
 - Short-circuit evaluation and common logic errors
+
+**Worked example:** a classifier written twice, once as an `if`/`else if` chain and once as a `switch`, with the trade-offs of each made explicit.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_09_Conditional_Statements.html)
 
@@ -166,6 +187,8 @@ There are currently no announcements.
 - `break`, `continue`, and `goto`
 - Infinite loops and off-by-one errors
 
+**Worked example:** a prime sieve and a formatted multiplication table, with the loop invariant of each stated explicitly and every boundary case checked.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_10_Loops_and_Flow_Control.html)
 
 ---
@@ -176,6 +199,8 @@ There are currently no announcements.
 - Function prototypes and their placement
 - Pass-by-value semantics and the call stack
 - Designing small, single-purpose functions with clear success and failure behavior
+
+**Worked example:** a monolithic program decomposed into named functions, ending with a swap function that fails and a first look at why it cannot work yet.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_11_Functions.html)
 
@@ -188,6 +213,8 @@ There are currently no announcements.
 - Two-dimensional arrays and row-major memory layout
 - Common array algorithms: sum, minimum and maximum, reversal, linear search
 
+**Worked example:** a matrix transpose with explicit bounds checking, and a demonstration of exactly what an out-of-range write corrupts.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_12_Arrays.html)
 
 ---
@@ -199,6 +226,8 @@ There are currently no announcements.
 - Pointer types, `void *`, and type safety
 - Array-to-pointer decay, passing arrays to functions, and why `sizeof` changes inside them
 
+**Worked example:** the failed swap function from week 11 made to work, plus an array-length bug caused by `sizeof` on a parameter, found and explained.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_13_Introduction_to_Pointers.html)
 
 ---
@@ -209,6 +238,8 @@ There are currently no announcements.
 - `<string.h>`: `strlen`, `strcpy`, `strncpy`, `strcmp`, `strcat`, `strchr`, `strstr`, `strtok`
 - Block memory operations: `memcpy`, `memmove`, `memset`, and `memcmp`
 - `<ctype.h>` classification, buffer sizes, truncation, and safe string building with `snprintf`
+
+**Worked example:** a small string toolkit — length, copy, compare, search — written by hand and then replaced with the library versions, including the crash that follows from writing to a string literal.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_14_Strings_and_Character_Handling.html)
 
@@ -223,6 +254,8 @@ There are currently no announcements.
 - Pointers to pointers and arrays of pointers
 - Pointer-based versus index-based idioms
 
+**Worked example:** an array traversal rewritten from indexing to pointer walking, with the readability and the generated code of both versions compared.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_15_Pointer_Arithmetic_and_Arrays.html)
 
 ---
@@ -230,22 +263,28 @@ There are currently no announcements.
 ### Week 16: Pointers as Function Parameters
 - Emulating pass-by-reference
 - Modifying caller variables and output parameters
-- `const` pointers versus pointers to `const`
+- `const` pointers, pointers to `const`, and `const` correctness as a discipline
 - Returning pointers safely and avoiding dangling returns
 - Passing strings and multidimensional arrays
+- Reading and writing complex declarations: the right-left rule and the `cdecl` tool
+
+**Worked example:** a parse function that returns a status code and writes its result through an output parameter, plus a set of hairy declarations decoded one qualifier at a time.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_16_Pointers_as_Parameters.html)
 
 ---
 
-### Week 17: Scope, Lifetime, and Storage Duration
+### Week 17: Scope, Lifetime, and Program Memory Layout
 - Block, file, and function scope
 - Automatic and static storage duration
 - Local variables, global variables, and `static` locals
-- Shadowing and name conflicts
-- The cost of global state and how to avoid it
+- The memory layout of a running program: text, rodata, data, bss, stack, and heap
+- The call stack: frames, parameters, locals, and return addresses
+- Shadowing, name conflicts, and the cost of global state
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_17_Scope_and_Storage_Duration.html)
+**Worked example:** a program that prints the address of a local, a `static`, a global, a string literal, and a heap block, revealing the whole memory map of the process in a single run.
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_17_Scope_and_Program_Memory_Layout.html)
 
 ---
 
@@ -255,6 +294,8 @@ There are currently no announcements.
 - Classic examples: factorial, Fibonacci, Towers of Hanoi, and binary search
 - Recursion depth, stack overflow, and tail calls
 - Recursive versus iterative solutions
+
+**Worked example:** Towers of Hanoi and a recursive binary search stepped through in a debugger, watching the stack frames from week 17 grow and unwind.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_18_Recursion.html)
 
@@ -267,6 +308,8 @@ There are currently no announcements.
 - Growable arrays and dynamically allocated two-dimensional arrays
 - Ownership, lifetime, allocation conventions, and `init`/`destroy` pairs
 
+**Worked example:** a growable array that doubles its capacity with `realloc` and frees cleanly — the data structure the rest of the course keeps coming back to.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_19_Dynamic_Memory_Allocation.html)
 
 ---
@@ -277,6 +320,8 @@ There are currently no announcements.
 - Double free and invalid free
 - Buffer overruns and out-of-bounds access
 - Detecting memory errors with sanitizers and Valgrind
+
+**Worked example:** the week 19 array seeded with a leak, a use-after-free, and a one-byte overrun, each found and fixed with a different tool.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_20_Memory_Errors.html)
 
@@ -289,6 +334,8 @@ There are currently no announcements.
 - Structures as parameters and return values
 - Pointers to structures and self-referential types
 
+**Worked example:** a record type held in an array of records, passed both by value and by pointer, with the copying cost of each measured.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_21_Structures.html)
 
 ---
@@ -300,74 +347,89 @@ There are currently no announcements.
 - Structure padding and `offsetof`
 - Choosing between a structure, a union, and an enumeration
 
+**Worked example:** a tagged union that holds an integer, a double, or a string, and a demonstration of how reordering struct members changes `sizeof`.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_22_Unions_Enums_and_Typedef.html)
 
 ---
 
-### Week 23: Program Arguments and the Standard Library Toolbox
+### Week 23: Program Arguments and Input
 - Program arguments with `argc` and `argv`
 - String-to-number conversion: `atoi`, `strtol`, `strtod`, and the `endptr` argument
-- `<math.h>`: numeric functions and linking with `-lm`
-- `<time.h>`, pseudo-random numbers with `rand` and `srand`, and their limitations
-- Reading library documentation, manual pages, and standard-library reference material
+- Validating arguments and rejecting malformed input
+- Taking input from arguments versus from `stdin`
+- Writing programs that compose well in a shell pipeline
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_23_Program_Arguments_and_Standard_Library.html)
+**Worked example:** a numeric filter that takes its parameters as arguments, validates every one of them, and reads its data from standard input.
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_23_Program_Arguments_and_Input.html)
 
 ---
 
-### Week 24: Bit-Level Operations
+### Week 24: The Standard Library Toolbox
+- `<math.h>`: numeric functions, linking with `-lm`, and floating-point pitfalls
+- `<time.h>`: `time_t`, `struct tm`, formatting, and measuring elapsed time
+- Pseudo-random numbers: `rand`, `srand`, and their limitations
+- What the standard library does and does not provide, and when to reach for a third-party library
+- Reading manual pages, library documentation, and the text of the standard itself
+
+**Worked example:** a program that generates a random data set, computes statistics over it, and reports how long the computation took.
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_24_Standard_Library_Toolbox.html)
+
+---
+
+### Week 25: Bit-Level Operations
 - Bitwise AND, OR, XOR, and NOT
 - Left and right shifts; arithmetic versus logical shift
 - Bit masks: setting, clearing, toggling, and testing flags
 - Bit-fields and their portability limitations
 - Practical uses: permissions, packing, and checksums
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_24_Bit_Level_Operations.html)
+**Worked example:** a permission-flag system and a population-count routine, with several implementations compared for clarity and for speed.
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_25_Bit_Level_Operations.html)
 
 ---
 
-### Week 25: File Input and Output
-- Streams and the `FILE` type
-- `fopen` modes, `fclose`, and text versus binary access
-- `fprintf`, `fscanf`, `fgets`, and `fputs`
+### Week 26: Files and Streams
+- Streams, the `FILE` type, `fopen` modes, and `fclose`
+- Text versus binary access; `fprintf`, `fscanf`, `fgets`, and `fputs`
 - `fread` and `fwrite` for binary records
-- Reading a file line by line, processing tabular data, and handling malformed input
+- Positioning with `fseek`, `ftell`, `rewind`, `fgetpos`, and `fsetpos`
+- Stream state and buffering: `feof`, `ferror`, `clearerr`, `fflush`, and `setvbuf`
+- `stdin`, `stdout`, `stderr`, redirection, temporary files, and portable file-processing pitfalls
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_25_File_Input_and_Output.html)
+**Worked example:** a program that reads a delimited text file line by line, and a second that stores the same data as fixed-size binary records and seeks directly to any one of them.
 
----
-
-### Week 26: File Positioning, Streams, and Errors
-- `fseek`, `ftell`, `rewind`, `fgetpos`, and `fsetpos`
-- `feof`, `ferror`, and `clearerr`
-- Buffering, `fflush`, and `setvbuf`
-- `stdin`, `stdout`, `stderr`, and redirection
-- Temporary files, renaming, removing files, and portable file-processing pitfalls
-
-[🗒️Lecture Notes (HTML)](../files/c/Week_26_File_Positioning_and_Streams.html)
+[🗒️Lecture Notes (HTML)](../files/c/Week_26_Files_and_Streams.html)
 
 ---
 
-### Week 27: The Preprocessor
-- Object-like and function-like macros
-- Macro pitfalls: parenthesization and double evaluation
-- Stringification with `#` and token pasting with `##`
-- Conditional compilation and predefined macros
-- When to prefer a function or a `const` object over a macro
+### Week 27: Error Handling Strategies
+- Compile-time, link-time, and runtime errors
+- Checking function return values consistently
+- Error reporting with `errno`, `perror`, and `strerror`
+- Assertions with `assert` and `_Static_assert`
+- Resource cleanup with the `goto` idiom, error-reporting conventions, and API-level error contracts
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_27_Preprocessor.html)
+**Worked example:** the file reader from week 26 rewritten around a single error contract with one cleanup path, leaking no handle on any failure route.
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_27_Error_Handling.html)
 
 ---
 
-### Week 28: Modular Programming and Multi-File Projects
-- Separating declarations from definitions
-- Designing header and source files
-- Include guards and `#pragma once`
-- `extern`, internal and external linkage, and multiple-definition errors
+### Week 28: The Preprocessor and Modular Programming
+- Object-like and function-like macros; parenthesization and double evaluation
+- Stringification with `#`, token pasting with `##`, conditional compilation, and predefined macros
+- Separating declarations from definitions; designing header and source files
+- Include guards, `#pragma once`, `extern`, linkage, and multiple-definition errors
 - Information hiding with `static` and opaque pointers
 - Project layout, public versus private headers, API documentation, and ownership comments
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_28_Modular_Programming.html)
+**Worked example:** the growable array of week 19 turned into a reusable module with a public header, a hidden implementation, and debug logging the preprocessor can switch off entirely.
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_28_Preprocessor_and_Modular_Programming.html)
 
 ---
 
@@ -381,6 +443,8 @@ There are currently no announcements.
 - Debug and release builds, sanitizer builds, test targets, and warning profiles
 - Linking order, symbol resolution, and inspection with `nm` and `objdump`
 
+**Worked example:** the week 28 module built as both a static and a shared library, driven first by a Makefile and then by an equivalent CMake configuration.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_29_Building_and_Libraries.html)
 
 ---
@@ -393,6 +457,8 @@ There are currently no announcements.
 - Variable argument lists: `va_list`, `va_start`, `va_arg`, `va_end`, and writing a `printf`-like function
 - Type-based selection with `_Generic` and macro-based generic data structures
 
+**Worked example:** the week 19 array generalized to hold any element type through `void *` and a comparison callback, then sorted with `qsort`.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_30_Function_Pointers_and_Generic_Programming.html)
 
 ---
@@ -403,6 +469,8 @@ There are currently no announcements.
 - Environment variables with `getenv` and `setenv`
 - Configuration through arguments, files, and environment variables
 - Designing scriptable, testable interfaces: exit status, `stdout` versus `stderr`, and clear diagnostics
+
+**Worked example:** a filter tool with short and long options, a `--help` screen, configuration layered from file and environment, and exit codes a shell script can act on.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_31_Command_Line_Interfaces_and_Environment.html)
 
@@ -415,6 +483,8 @@ There are currently no announcements.
 - Insertion, deletion, traversal, and reversal
 - The cost of list operations and when a list beats an array
 
+**Worked example:** a doubly linked list and a queue built on one node type, benchmarked against the week 19 array for insertion in the middle.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_32_Linked_Data_Structures.html)
 
 ---
@@ -426,6 +496,8 @@ There are currently no announcements.
 - Time and space complexity: big-O notation and practical cost
 - Designing an abstract data type with an opaque handle and a stable API boundary
 
+**Worked example:** a hash table and a binary search tree placed behind the same opaque interface, with lookup cost measured against each other as the data set grows.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_33_Trees_Hash_Tables_and_ADTs.html)
 
 ---
@@ -434,25 +506,17 @@ There are currently no announcements.
 - The memory hierarchy, cache behavior, and locality of reference
 - Data layout, structure packing, and their effect on speed
 - Optimization levels and when to trust the compiler
+- Reading the compiler's generated assembly with Compiler Explorer and `objdump`
 - Profiling and measurement with `perf`, `gprof`, and `callgrind`
 - Trade-offs between clarity and speed
+
+**Worked example:** a cache-hostile matrix loop rewritten for locality, with the speedup measured and the generated assembly of both versions read side by side.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_34_Performance_and_Memory_Layout.html)
 
 ---
 
-### Week 35: Error Handling Strategies
-- Compile-time, link-time, and runtime errors
-- Checking function return values consistently
-- Error reporting with `errno`, `perror`, and `strerror`
-- Assertions with `assert` and `_Static_assert`
-- Resource cleanup with the `goto` idiom, error-reporting conventions, and API-level error contracts
-
-[🗒️Lecture Notes (HTML)](../files/c/Week_35_Error_Handling.html)
-
----
-
-### Week 36: Debugging, Testing, and Analysis
+### Week 35: Debugging, Testing, and Analysis
 - Compiler warnings as the first line of defense
 - Interactive debugging with GDB: breakpoints, watchpoints, and backtraces
 - Static analysis tools
@@ -460,22 +524,27 @@ There are currently no announcements.
 - Reducing a failure to a minimal reproducible case
 - Continuous integration concepts: automated builds, tests, warnings, and sanitizer runs
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_36_Debugging_and_Testing.html)
+**Worked example:** a test suite for the week 33 abstract data type, run under sanitizers with coverage reporting in a continuous integration configuration.
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_35_Debugging_and_Testing.html)
 
 ---
 
-### Week 37: Undefined Behavior and Secure Coding
+### Week 36: Undefined Behavior and Secure Coding
 - What undefined behavior is and how compilers exploit it
-- Common sources: overflow, aliasing, uninitialized reads, invalid pointers
+- Common sources: overflow, uninitialized reads, and invalid pointers
+- Strict aliasing, type punning, and the role of `restrict`
 - Implementation-defined and unspecified behavior
 - Buffer overflows, format-string flaws, and integer-overflow vulnerabilities
 - Defensive practices and secure-coding guidelines
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_37_Undefined_Behavior_and_Secure_Coding.html)
+**Worked example:** a program that behaves correctly at `-O0` and incorrectly at `-O2` because of undefined behavior, diagnosed with a sanitizer and then corrected.
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_36_Undefined_Behavior_and_Secure_Coding.html)
 
 ---
 
-### Week 38: Portability and the Machine Model
+### Week 37: Portability and the Machine Model
 - Type sizes and fixed-width types in `<stdint.h>`
 - Endianness and byte-order conversion
 - Alignment with `_Alignas` and `_Alignof`, and packed data
@@ -483,51 +552,75 @@ There are currently no announcements.
 - Character encoding: wide characters, `<wchar.h>`, and UTF-8
 - Portable serialization: binary file formats, padding, and versioned records
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_38_Portability_and_Machine_Model.html)
+**Worked example:** a binary record format written on one machine and read back correctly on a machine with the opposite byte order and different alignment rules.
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_37_Portability_and_Machine_Model.html)
 
 ---
 
-### Week 39: Advanced Language Features
+### Week 38: Type Qualifiers, Inlining, and Modern C
 - `volatile`, `restrict`, and `register`
 - `inline` and `static inline`
 - Compound literals, and anonymous structures and unions
 - Variable-length arrays and their trade-offs
 - `_Noreturn` and non-local jumps with `setjmp` and `longjmp`
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_39_Advanced_Language_Features.html)
+**Worked example:** a hot loop compiled with and without `restrict`, the difference read straight from the generated assembly, and a lookup table built as a compound literal.
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_38_Type_Qualifiers_and_Modern_C.html)
 
 ---
 
-### Week 40: Processes, Signals, and Low-Level I/O
+### Week 39: Processes, Signals, and Low-Level I/O
 - File descriptors and the `open`, `read`, `write`, and `close` interface
 - Creating processes with `fork` and `exec`
 - Waiting on child processes, exit status, and `system`
 - Signals, signal handlers, and async-signal safety
 - Pipes and redirection
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_40_Processes_Signals_and_Low_Level_IO.html)
+**Worked example:** a miniature shell that forks, executes a command, connects two commands with a pipe, and handles an interrupt without leaving zombies behind.
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_39_Processes_Signals_and_Low_Level_IO.html)
 
 ---
 
-### Week 41: Network Programming with Sockets
+### Week 40: Network Programming with Sockets
 - The client–server model, TCP versus UDP, and the Berkeley socket API
 - Addresses, ports, byte-order conversion with `htons` and `htonl`, and name resolution with `getaddrinfo`
 - Writing a TCP client: `socket`, `connect`, `send`, and `recv`
 - Writing a TCP server: `bind`, `listen`, `accept`, and serving clients with a forked child per connection
 - Message framing, partial reads and writes, timeouts, and network error handling
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_41_Network_Programming_with_Sockets.html)
+**Worked example:** a line-based TCP server and a matching client talking to each other over a real socket, with partial reads and writes handled correctly.
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_40_Network_Programming_with_Sockets.html)
 
 ---
 
-### Week 42: Concurrency and the C Memory Model
+### Week 41: Concurrency and the C Memory Model
 - Threads with C11 `<threads.h>` and POSIX threads
 - Race conditions, mutexes, and condition variables
 - Thread-local storage with `_Thread_local`
 - Atomics, `<stdatomic.h>`, and the C memory model
+- Reentrancy and thread safety in the standard library: `errno`, `strtok_r`, and `localtime_r`
 - Deadlock, starvation, and debugging concurrent programs
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_42_Concurrency_and_Memory_Model.html)
+**Worked example:** a producer–consumer pipeline guarded by a mutex and a condition variable, with a real data race first exposed by a thread sanitizer and then eliminated.
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_41_Concurrency_and_Memory_Model.html)
+
+---
+
+### Week 42: Reading Excellent C
+- Why C looks the way it does: array decay, null-terminated strings, and declaration-mimics-use
+- Why undefined behavior exists, and what the standard deliberately leaves to the implementation
+- Reading real codebases: sqlite, musl, lua, redis, and git
+- Recognizing house style, error conventions, and ownership conventions in unfamiliar code
+- Extracting idioms worth borrowing, and recognizing ones that should not be
+
+**Worked example:** one self-contained module from a well-regarded open-source C project read end to end, with its memory-ownership rules reconstructed from the code alone.
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_42_Reading_Excellent_C.html)
 
 ---
 
@@ -540,6 +633,8 @@ There are currently no announcements.
 - Locating a regression with `git bisect`
 - Making a minimal, reviewable change to code you did not write
 
+**Worked example:** a real defect located and fixed in an unfamiliar open-source C project, with the change kept as small as the fix allows.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_43_Working_in_an_Existing_Codebase.html)
 
 ---
@@ -550,6 +645,8 @@ There are currently no announcements.
 - Reviewing C for memory safety, ownership, and undefined behavior
 - Commit hygiene, changelogs, and semantic versioning
 - Issue reports, reproduction cases, and regression tests
+
+**Worked example:** a change submitted as a pull request with a regression test, and a review written on someone else's C patch against a memory-safety checklist.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_44_Collaborative_Development_and_Code_Review.html)
 
@@ -562,6 +659,8 @@ There are currently no announcements.
 - Header hygiene for published headers: namespacing, includes, and visibility
 - Deprecation, migration paths, and backward compatibility
 
+**Worked example:** the week 29 library given a version number, a `pkg-config` file, and an install target, then consumed from a separate project that sees only the public header.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_45_Packaging_and_Distributing_Libraries.html)
 
 ---
@@ -572,6 +671,8 @@ There are currently no announcements.
 - Exposing a C API to Python with `ctypes` and CFFI, to Rust, and to Java with JNI
 - Passing structures, callbacks, and memory ownership across a language boundary
 - Inline assembly and compiler intrinsics
+
+**Worked example:** the week 45 library called from Python and from C++, with ownership of every allocation made explicit at the boundary.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_46_ABI_and_Language_Interoperability.html)
 
@@ -584,6 +685,8 @@ There are currently no announcements.
 - Timers and signal handling inside an event loop: `signalfd` and the self-pipe trick
 - Thread pools versus event loops, and the C10K problem
 
+**Worked example:** the week 40 server rewritten as a single-threaded event loop serving thousands of simultaneous connections, then measured against the forking version.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_47_Event_Driven_and_Scalable_IO.html)
 
 ---
@@ -594,6 +697,8 @@ There are currently no announcements.
 - Combining fuzzing with sanitizers and assertions
 - Triaging crashes, minimizing inputs, and reporting vulnerabilities
 - Threat modeling and conducting a security review of C code
+
+**Worked example:** a fuzz target for the input parser of week 23, run until it produces a crash, with the failing input minimized and the defect fixed.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_48_Fuzzing_and_Security_Testing.html)
 
@@ -606,6 +711,8 @@ There are currently no announcements.
 - Startup code, the reset vector, and how `main` is reached
 - Building, flashing, and running code on a target board
 
+**Worked example:** a blinking-LED program cross-compiled, flashed to a microcontroller, and traced from the reset vector to the first line of `main`.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_49_Embedded_C_and_Cross_Compilation.html)
 
 ---
@@ -616,6 +723,8 @@ There are currently no announcements.
 - Register access with bit masks, bit-fields, and register-description structures
 - Writing simple GPIO, timer, and UART drivers
 - Reading a datasheet and a reference manual
+
+**Worked example:** a UART driver written directly against hardware registers from the datasheet, and the same driver breaking as soon as `volatile` is removed.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_50_Memory_Mapped_IO_and_Registers.html)
 
@@ -628,6 +737,8 @@ There are currently no announcements.
 - Polling versus interrupts, and input debouncing
 - Measuring and bounding response time
 
+**Worked example:** a button handler implemented first by polling and then by interrupt, with the response latency of each measured on real hardware.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_51_Interrupts_and_Real_Time_Behavior.html)
 
 ---
@@ -638,6 +749,8 @@ There are currently no announcements.
 - The startup sequence: copying `.data` and zeroing `.bss`
 - Stack and heap placement, and detecting stack overflow
 - Inspecting an image with `size`, `objdump`, and map files
+
+**Worked example:** a firmware image taken apart section by section, its map file read, and a variable deliberately relocated into a different memory region.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_52_Linker_Scripts_and_Firmware_Layout.html)
 
@@ -650,6 +763,8 @@ There are currently no announcements.
 - Power management and low-power modes
 - Watchdog timers, brown-out detection, and fault handlers
 
+**Worked example:** a fixed-size memory pool and a fixed-point filter running with no heap at all, with the code-size cost of each design choice measured.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_53_Constrained_Resource_Programming.html)
 
 ---
@@ -660,6 +775,8 @@ There are currently no announcements.
 - Queues, semaphores, and mutexes in an RTOS
 - Priority inversion and how to avoid it
 - Choosing between a superloop, an RTOS, and an event-driven design
+
+**Worked example:** the same device firmware written first as a superloop and then as a set of RTOS tasks, with the timing behavior of both compared.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_54_Real_Time_Operating_Systems.html)
 
@@ -672,6 +789,8 @@ There are currently no announcements.
 - Host-side unit tests and hardware-in-the-loop testing
 - Observing timing with a logic analyzer and an oscilloscope
 
+**Worked example:** the week 50 driver refactored behind a hardware abstraction layer, unit-tested on the host, and then stepped through on real hardware over SWD.
+
 [🗒️Lecture Notes (HTML)](../files/c/Week_55_Embedded_Debugging_and_Testing.html)
 
 ---
@@ -682,5 +801,7 @@ There are currently no announcements.
 - Refactoring incrementally without changing observable behavior
 - Migrating between C standards, compilers, and platforms
 - Managing technical debt, deprecation, and long-term support
+
+**Worked example:** a piece of legacy C brought under characterization tests, then refactored and migrated to a modern standard with the tests proving the behavior never changed.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_56_Maintaining_Long_Lived_Codebases.html)
