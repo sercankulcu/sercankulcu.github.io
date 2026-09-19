@@ -1,0 +1,440 @@
+---
+layout: without-sidebar
+title: "Week 50 — Memory-Mapped I/O and Hardware Registers"
+permalink: /files/c/Week_50_Memory_Mapped_IO_and_Registers.html
+excerpt: "The peripheral memory map, why registers require volatile, register access with masks and struct overlays, writing GPIO, timer and UART drivers, and reading a reference manual."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Professional · Week 50</div>
+  <h1>Memory-Mapped I/O and Hardware Registers</h1>
+  <p class="c-wk-lead">On a microcontroller, hardware is an address. Writing to <code>0x4000C000</code> transmits a character; reading it receives one. That is the entire interface — and it is also where <code>volatile</code> stops being a curiosity from week 38 and becomes the difference between a working driver and one that hangs.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Read a reference manual's register table and turn it into correct C.</li>
+      <li>Explain precisely what the compiler does to register access without <code>volatile</code>.</li>
+      <li>Choose between macro and struct-overlay styles for register definitions.</li>
+      <li>Write the read-modify-write sequence correctly.</li>
+      <li>Implement a working UART driver against an emulated peripheral.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The memory map</h2>
+
+  <p>A microcontroller's address space is divided between flash, RAM, and <em>peripherals</em>. A peripheral occupies a block of addresses whose bits are wired to hardware rather than to memory cells.</p>
+
+  <table>
+    <thead><tr><th>Region</th><th>Typical range</th><th>Contains</th></tr></thead>
+    <tbody>
+      <tr><td>Flash</td><td><code>0x00000000</code>–</td><td>Code and constants</td></tr>
+      <tr><td>RAM</td><td><code>0x20000000</code>–</td><td>Variables, stack</td></tr>
+      <tr><td>Peripherals</td><td><code>0x40000000</code>–</td><td>UART, GPIO, timers, ADC</td></tr>
+      <tr><td>Core peripherals</td><td><code>0xE0000000</code>–</td><td>Interrupt controller, systick</td></tr>
+    </tbody>
+  </table>
+
+  <p>Three properties distinguish a register from a variable, and each has a consequence in C:</p>
+
+  <ul>
+    <li><strong>It can change without your code writing it.</strong> A received byte appears; a timer counts. The compiler cannot know this.</li>
+    <li><strong>Reading can have an effect.</strong> On many UARTs, reading the data register removes the byte from the receive FIFO. A "redundant" read is not redundant.</li>
+    <li><strong>Writing can have an effect beyond storing.</strong> A bit may be write-one-to-clear, or trigger a transmission.</li>
+  </ul>
+
+  <p>Every one of those violates an assumption the optimizer is otherwise entitled to make.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Why <code>volatile</code> is mandatory</h2>
+
+<pre><code>#define UART_FR (*(uint32_t *)0x4000C018)      /* MISSING volatile */
+
+while (UART_FR &amp; (1u &lt;&lt; 5)) { }                /* wait while FIFO full */</code></pre>
+
+  <p>The compiler reasons: the loop body is empty, nothing in it modifies <code>UART_FR</code>, so the value cannot change. It loads the register once into a register and tests that copy forever. At <code>-O0</code> this often works by accident; at <code>-O2</code> the program hangs on the first full FIFO and never recovers.</p>
+
+<pre><code>#define UART_FR (*(volatile uint32_t *)0x4000C018)   /* correct */</code></pre>
+
+  <p>With <code>volatile</code>, every read in the source is a read of memory, every write is a write, and their order is preserved. That is exactly the guarantee hardware needs — and exactly what week 38 said <code>volatile</code> does and does not provide.</p>
+
+  <table>
+    <thead><tr><th>Without <code>volatile</code>, the compiler may</th><th>Consequence</th></tr></thead>
+    <tbody>
+      <tr><td>Hoist a read out of a loop</td><td>Polling never terminates</td></tr>
+      <tr><td>Delete a write whose value is overwritten</td><td>A command never reaches the device</td></tr>
+      <tr><td>Merge two reads into one</td><td>Only one byte is taken from a FIFO</td></tr>
+      <tr><td>Reorder accesses to different registers</td><td>Enable happens after use</td></tr>
+    </tbody>
+  </table>
+
+  <div class="c-wk-trap">
+    <p><strong><code>volatile</code> is necessary, not sufficient.</strong> It orders accesses as the compiler sees them; it does not prevent the <em>processor</em> reordering them, which matters on a chip with a write buffer or out-of-order execution. Cortex-M is mostly strongly ordered, but where a peripheral requires a completed write before the next access, a memory barrier — <code>__DSB()</code> — is required in addition.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Two styles of register definition</h2>
+
+  <h3>Macros</h3>
+<pre><code>#define UART0_BASE 0x4000C000u
+#define UART_DR    (*(volatile uint32_t *)(UART0_BASE + 0x000))
+#define UART_FR    (*(volatile uint32_t *)(UART0_BASE + 0x018))
+#define UART_CTL   (*(volatile uint32_t *)(UART0_BASE + 0x030))
+
+#define UART_FR_RXFE (1u &lt;&lt; 4)      /* receive FIFO empty */
+#define UART_FR_TXFF (1u &lt;&lt; 5)      /* transmit FIFO full */</code></pre>
+
+  <p>Simple, and what most vendor headers use. The drawbacks are week 28's: no type checking, no scope, and invisible in a debugger.</p>
+
+  <h3>Struct overlay</h3>
+<pre><code>typedef struct {
+    volatile uint32_t DR;        /* 0x000 data          */
+    volatile uint32_t RSR;       /* 0x004 receive status*/
+    uint32_t reserved0[4];       /* 0x008-0x014 gap     */
+    volatile uint32_t FR;        /* 0x018 flags         */
+    uint32_t reserved1;          /* 0x01C               */
+    volatile uint32_t ILPR;      /* 0x020               */
+    volatile uint32_t IBRD;      /* 0x024 baud integer  */
+    volatile uint32_t FBRD;      /* 0x028 baud fraction */
+    volatile uint32_t LCRH;      /* 0x02C line control  */
+    volatile uint32_t CTL;       /* 0x030 control       */
+} UART_Type;
+
+#define UART0 ((UART_Type *)0x4000C000u)
+
+UART0-&gt;DR = 'A';
+while (UART0-&gt;FR &amp; UART_FR_TXFF) { }</code></pre>
+
+  <p>This is what CMSIS and every modern vendor header do. It is type-checked, groups related registers, and shows up in a debugger as a structure whose fields you can inspect. The <code>reserved</code> members are load-bearing: they place each register at the offset the manual specifies, and week 22's padding rules are why they must be written explicitly rather than assumed.</p>
+
+  <p>Note also that <code>volatile</code> goes on each member, not on the pointer. <code>volatile UART_Type *</code> would also work, but marking the members documents that every one of them is hardware.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Reading a reference manual</h2>
+
+  <p>A register is documented as a table of bit fields:</p>
+
+<pre><code>UARTFR — UART Flag Register        offset 0x018, reset 0x90
+
+ Bit  Name   Type  Reset  Description
+   7  TXFE   RO      1    Transmit FIFO empty
+   6  RXFF   RO      0    Receive FIFO full
+   5  TXFF   RO      0    Transmit FIFO full
+   4  RXFE   RO      1    Receive FIFO empty
+   3  BUSY   RO      0    UART busy
+ 2:0  —      RO      0    Reserved</code></pre>
+
+  <table>
+    <thead><tr><th>Type</th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td>RO</td><td>Read only; writes ignored</td></tr>
+      <tr><td>WO</td><td>Write only; reads undefined</td></tr>
+      <tr><td>RW</td><td>Read and write</td></tr>
+      <tr><td>W1C</td><td>Write one to clear — writing 0 does nothing</td></tr>
+      <tr><td>RC</td><td>Cleared by reading</td></tr>
+    </tbody>
+  </table>
+
+  <p>Two of those deserve care. <strong>W1C</strong> inverts the usual read-modify-write: to clear a flag you write a 1 to it, and the read-modify-write idiom below would clear every other pending flag as a side effect — so W1C registers are written directly with just the bit you mean.</p>
+
+  <p><strong>Reserved bits</strong> must usually be preserved. Writing zeros to them can change undocumented behavior, which is the other reason read-modify-write exists.</p>
+
+<pre><code>/* Read-modify-write: change one field, preserve the rest. */
+uint32_t v = UART0-&gt;LCRH;       /* read  */
+v &amp;= ~LCRH_WLEN_MASK;           /* clear the field */
+v |= LCRH_WLEN_8;               /* set the new value */
+UART0-&gt;LCRH = v;                /* write */
+
+/* Write-one-to-clear: do NOT read-modify-write. */
+UART0-&gt;ICR = ICR_RXIC;          /* clears only this flag */</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Worked example: a UART driver, and <code>volatile</code> removed</h2>
+
+  <p>Building on week 49's QEMU setup. Same linker script and startup code; only <code>main.c</code> changes.</p>
+
+<pre><code>/* uart.c — a driver written against the register map */
+#include &lt;stdint.h&gt;
+#include &lt;stdbool.h&gt;
+
+/* ---------- register overlay ---------- */
+
+typedef struct {
+    volatile uint32_t DR;          /* 0x000 data                */
+    volatile uint32_t RSR_ECR;     /* 0x004 receive status      */
+    uint32_t reserved0[4];
+    volatile uint32_t FR;          /* 0x018 flags               */
+    uint32_t reserved1;
+    volatile uint32_t ILPR;        /* 0x020                     */
+    volatile uint32_t IBRD;        /* 0x024 baud, integer part  */
+    volatile uint32_t FBRD;        /* 0x028 baud, fraction      */
+    volatile uint32_t LCRH;        /* 0x02C line control        */
+    volatile uint32_t CTL;         /* 0x030 control             */
+    volatile uint32_t IFLS;        /* 0x034                     */
+    volatile uint32_t IM;          /* 0x038 interrupt mask      */
+    volatile uint32_t RIS;         /* 0x03C raw interrupt status*/
+    volatile uint32_t MIS;         /* 0x040 masked status       */
+    volatile uint32_t ICR;         /* 0x044 interrupt clear W1C */
+} UART_Type;
+
+#define UART0 ((UART_Type *)0x4000C000u)
+
+/* Flag register bits, from the manual's table. */
+#define FR_BUSY  (1u &lt;&lt; 3)
+#define FR_RXFE  (1u &lt;&lt; 4)     /* receive FIFO empty  */
+#define FR_TXFF  (1u &lt;&lt; 5)     /* transmit FIFO full  */
+
+/* Line control bits. */
+#define LCRH_FEN        (1u &lt;&lt; 4)
+#define LCRH_WLEN_MASK  (3u &lt;&lt; 5)
+#define LCRH_WLEN_8     (3u &lt;&lt; 5)
+
+/* Control bits. */
+#define CTL_UARTEN (1u &lt;&lt; 0)
+#define CTL_TXE    (1u &lt;&lt; 8)
+#define CTL_RXE    (1u &lt;&lt; 9)
+
+void uart_init(void)
+{
+    UART0-&gt;CTL = 0;                     /* disable before configuring */
+
+    UART0-&gt;IBRD = 10;                   /* 115200 baud at 18.432 MHz  */
+    UART0-&gt;FBRD = 54;
+
+    /* Read-modify-write: set the word length, preserve everything else. */
+    uint32_t lcrh = UART0-&gt;LCRH;
+    lcrh &amp;= ~LCRH_WLEN_MASK;
+    lcrh |= LCRH_WLEN_8 | LCRH_FEN;
+    UART0-&gt;LCRH = lcrh;
+
+    UART0-&gt;CTL = CTL_UARTEN | CTL_TXE | CTL_RXE;   /* enable last */
+}
+
+void uart_putc(char c)
+{
+    while (UART0-&gt;FR &amp; FR_TXFF) { }     /* poll: needs volatile */
+    UART0-&gt;DR = (uint32_t)(unsigned char)c;
+}
+
+bool uart_getc(char *out)
+{
+    if (UART0-&gt;FR &amp; FR_RXFE) {
+        return false;                   /* nothing waiting */
+    }
+    *out = (char)(UART0-&gt;DR &amp; 0xFFu);   /* reading REMOVES it from the FIFO */
+    return true;
+}
+
+void uart_flush(void)
+{
+    while (UART0-&gt;FR &amp; FR_BUSY) { }     /* wait for the shift register */
+}
+
+void uart_puts(const char *s)
+{
+    for (; *s != '\0'; s++) {
+        if (*s == '\n') uart_putc('\r');
+        uart_putc(*s);
+    }
+}</code></pre>
+
+<pre><code>/* main.c */
+#include &lt;stdint.h&gt;
+#include &lt;stdbool.h&gt;
+
+void uart_init(void);
+void uart_putc(char c);
+bool uart_getc(char *out);
+void uart_puts(const char *s);
+void uart_flush(void);
+
+static void put_hex(uint32_t v)
+{
+    static const char d[] = "0123456789ABCDEF";
+    uart_puts("0x");
+    for (int s = 28; s &gt;= 0; s -= 4) uart_putc(d[(v &gt;&gt; s) &amp; 0xFu]);
+}
+
+/* Deliberately WITHOUT volatile, to be inspected in the disassembly. */
+#define UART_FR_UNSAFE (*(uint32_t *)0x4000C018u)
+
+static void demonstrate_without_volatile(void)
+{
+    uart_puts("reading FR without volatile three times:\n");
+    uint32_t a = UART_FR_UNSAFE;
+    uint32_t b = UART_FR_UNSAFE;
+    uint32_t c = UART_FR_UNSAFE;
+    uart_puts("  "); put_hex(a);
+    uart_puts(" ");  put_hex(b);
+    uart_puts(" ");  put_hex(c);
+    uart_puts("\n  disassemble this function: at -O2 there is likely\n");
+    uart_puts("  ONE load, not three\n");
+}
+
+int main(void)
+{
+    uart_init();
+
+    uart_puts("\n=== memory-mapped I/O ===\n");
+
+    uart_puts("UART base    : "); put_hex(0x4000C000u); uart_puts("\n");
+    uart_puts("FR offset    : 0x018\n");
+    uart_puts("FR value     : "); put_hex(*(volatile uint32_t *)0x4000C018u);
+    uart_puts("\n  bit 4 RXFE set means the receive FIFO is empty\n");
+    uart_puts("  bit 7 TXFE set means the transmit FIFO is empty\n\n");
+
+    demonstrate_without_volatile();
+
+    uart_puts("\ntype characters; they are echoed. 'q' quits to the loop.\n");
+
+    for (;;) {
+        char c;
+        if (uart_getc(&amp;c)) {
+            if (c == 'q') {
+                uart_puts("\nbye\n");
+                break;
+            }
+            uart_puts("got '");
+            uart_putc(c);
+            uart_puts("' = ");
+            put_hex((uint32_t)(unsigned char)c);
+            uart_puts("\n");
+        }
+    }
+
+    uart_flush();
+    for (;;) { }
+}</code></pre>
+
+<pre><code>arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb \
+    -ffreestanding -nostdlib -O2 -Wall -Wextra -g \
+    -T firmware.ld -o firmware.elf startup.c uart.c main.c
+
+qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf</code></pre>
+
+  <p>Type characters and watch them echoed with their hex codes. Quit with <code>q</code>, then Ctrl-A X.</p>
+
+  <h3>Prove that <code>volatile</code> changes the generated code</h3>
+
+  <p>This is the experiment that makes the rule concrete rather than memorized.</p>
+
+<pre><code>arm-none-eabi-objdump -d firmware.elf \
+    | sed -n '/&lt;demonstrate_without_volatile&gt;:/,/^$/p'</code></pre>
+
+  <p>Count the load instructions. Three source-level reads of the same address typically produce <strong>one</strong> <code>ldr</code>, with the result reused — the compiler correctly concluded that a non-<code>volatile</code> object cannot change between reads. On real hardware that means a receive loop takes one byte and then believes the FIFO is permanently in whatever state it saw first.</p>
+
+  <p>Now add <code>volatile</code> to the macro, rebuild, and disassemble again: three loads, in order.</p>
+
+  <h3>Break the polling loop</h3>
+
+  <p>Edit <code>uart_putc</code> to read a non-<code>volatile</code> copy:</p>
+
+<pre><code>void uart_putc(char c)
+{
+    uint32_t *fr = (uint32_t *)0x4000C018u;     /* no volatile */
+    while (*fr &amp; FR_TXFF) { }
+    UART0-&gt;DR = (uint32_t)(unsigned char)c;
+}</code></pre>
+
+<pre><code>arm-none-eabi-gcc … -O0 … &amp;&amp; qemu-system-arm …   # usually still works
+arm-none-eabi-gcc … -O2 … &amp;&amp; qemu-system-arm …   # hangs, or garbles output</code></pre>
+
+  <p>At <code>-O0</code> every access goes to memory anyway, so the bug is invisible. At <code>-O2</code> the load is hoisted out of the loop and the driver waits forever on a stale value. This is the single most common embedded bug, and the reason it is so confusing is that the debug build is fine.</p>
+
+  <h3>Inspect the peripheral from the debugger</h3>
+
+<pre><code># terminal 1
+qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf -S -s
+
+# terminal 2
+gdb-multiarch firmware.elf
+(gdb) target remote :1234
+(gdb) break uart_putc
+(gdb) continue
+(gdb) print/x *(UART_Type *)0x4000C000      # the whole peripheral
+(gdb) print/x UART0-&gt;FR
+(gdb) print/t UART0-&gt;FR                     # binary: read the bits
+(gdb) set var UART0-&gt;DR = 0x41              # write 'A' by hand
+</code></pre>
+
+  <p>The struct overlay pays for itself here: GDB prints the peripheral as a named structure rather than a block of hex. Setting <code>DR</code> from the debugger transmits a character — the hardware responds to a write from any source, which is the clearest possible demonstration that a register is not a variable.</p>
+
+  <h3>Check the offsets are right</h3>
+
+  <p>An overlay with a wrong <code>reserved</code> array silently addresses the wrong registers. Verify it rather than trusting it:</p>
+
+<pre><code>/* add to main, temporarily */
+uart_puts("offsetof FR  : "); put_hex((uint32_t)offsetof(UART_Type, FR));
+uart_puts("\noffsetof CTL : "); put_hex((uint32_t)offsetof(UART_Type, CTL));
+uart_puts("\nsizeof        : "); put_hex((uint32_t)sizeof(UART_Type));</code></pre>
+
+  <p>FR must be <code>0x018</code> and CTL <code>0x030</code>, exactly as the manual states. Week 22's <code>offsetof</code>, used as a correctness check rather than a curiosity — and a <code>static_assert</code> on each offset, as week 27 suggested, turns this into something the compiler verifies on every build.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Omitting <code>volatile</code></td><td>Reads hoisted; polling hangs at <code>-O2</code></td><td>Every register access is <code>volatile</code>.</td></tr>
+      <tr><td>Read-modify-write on a W1C register</td><td>Clears every other pending flag</td><td>Write only the bit you mean.</td></tr>
+      <tr><td>Writing zeros to reserved bits</td><td>Undocumented behavior changes</td><td>Preserve them: read-modify-write.</td></tr>
+      <tr><td>Wrong <code>reserved</code> padding in an overlay</td><td>Every register after the gap is wrong</td><td>Verify with <code>offsetof</code> and <code>static_assert</code>.</td></tr>
+      <tr><td>Reading a data register twice</td><td>Loses a byte — the read is destructive</td><td>Read once into a variable.</td></tr>
+      <tr><td>Configuring after enabling</td><td>The peripheral runs with old settings</td><td>Disable, configure, enable.</td></tr>
+      <tr><td>Testing only at <code>-O0</code></td><td>The bug appears in the release build</td><td>Test at the optimization level you ship.</td></tr>
+      <tr><td>Assuming <code>volatile</code> orders hardware</td><td>Reordering by the processor</td><td>Add a barrier where the manual requires one.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">7</span>Check yourself</h2>
+
+  <details>
+    <summary>Why does a polling loop without <code>volatile</code> hang at <code>-O2</code> but work at <code>-O0</code>?</summary>
+    <p>Because at <code>-O0</code> every access goes to memory anyway, while at <code>-O2</code> the compiler sees that nothing in the empty loop body modifies the object and hoists the load out, testing a cached copy forever. <code>volatile</code> tells it the object can change by means it cannot see, so the load must stay inside the loop.</p>
+  </details>
+
+  <details>
+    <summary>Why must a write-one-to-clear register not be read-modify-written?</summary>
+    <p>Because the read returns every pending flag, and writing that value back writes a 1 to each of them — clearing flags you never intended to acknowledge. W1C registers are written directly with only the bit being cleared; the usual preserve-the-others reasoning is exactly backwards for them.</p>
+  </details>
+
+  <details>
+    <summary>What are the <code>reserved</code> members in a register overlay for?</summary>
+    <p>To place each subsequent register at the byte offset the reference manual specifies. The compiler lays members out consecutively with padding rules of its own, so gaps in the hardware map must be declared explicitly. Getting one wrong silently shifts every register after it, and <code>offsetof</code> with <code>static_assert</code> is how you prove it is right.</p>
+  </details>
+
+  <details>
+    <summary>Why can reading a register twice be a bug?</summary>
+    <p>Because reads can have side effects. On many UARTs, reading the data register removes a byte from the receive FIFO, so a second read consumes a second byte or returns garbage. Registers are not variables: read once into a local and use that.</p>
+  </details>
+
+  <details>
+    <summary>Is <code>volatile</code> enough to guarantee hardware ordering?</summary>
+    <p>No. It constrains the compiler, not the processor. On a core with a write buffer or out-of-order execution, accesses can still be reordered or delayed relative to what the device requires. Where the manual demands a completed write before the next access, a memory barrier such as <code>__DSB()</code> is needed in addition.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Where this leads</h2>
+  <p>Polling a flag in a loop wastes the whole processor waiting. Week 51 replaces it with interrupts — the hardware tells you when it is ready — which brings back week 39's async-signal-safety problem in a harsher form, because an ISR can interrupt any instruction and <code>volatile sig_atomic_t</code> is no longer sufficient.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_49_Embedded_C_and_Cross_Compilation.html">← Week 49</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_51_Interrupts_and_Real_Time_Behavior.html">Week 51 →</a>
+</div>
+
+</div>

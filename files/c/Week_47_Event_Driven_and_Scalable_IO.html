@@ -1,0 +1,604 @@
+---
+layout: without-sidebar
+title: "Week 47 — Event-Driven and Scalable I/O"
+permalink: /files/c/Week_47_Event_Driven_and_Scalable_IO.html
+excerpt: "Blocking versus non-blocking descriptors, select, poll and epoll, structuring an event loop, timers and signals inside it, thread pools versus event loops, and C10K."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Professional · Week 47</div>
+  <h1>Event-Driven and Scalable I/O</h1>
+  <p class="c-wk-lead">Week 40's server forks a process per connection — simple, and hopeless past a few thousand clients. The alternative inverts the control flow: one thread, never blocking, asking the kernel which descriptors are ready. Every high-performance server in production is built this way.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Make a descriptor non-blocking and handle <code>EAGAIN</code> correctly.</li>
+      <li>Choose between <code>select</code>, <code>poll</code>, and <code>epoll</code>, and say why the complexity differs.</li>
+      <li>Structure an event loop with per-connection state.</li>
+      <li>Handle timers and signals inside the loop rather than outside it.</li>
+      <li>Say when a thread pool is the better answer.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Why blocking does not scale</h2>
+
+  <p>A blocking <code>read</code> suspends the calling thread until data arrives. With one thread per connection that is fine — the thread has nothing else to do. The costs appear at scale:</p>
+
+  <table>
+    <thead><tr><th>Model</th><th>Per connection</th><th>Practical ceiling</th></tr></thead>
+    <tbody>
+      <tr><td>Process per connection</td><td>~1 MB plus a <code>fork</code></td><td>a few thousand</td></tr>
+      <tr><td>Thread per connection</td><td>~8 MB of stack reserved, plus scheduling</td><td>tens of thousands</td></tr>
+      <tr><td>Event loop</td><td>a few hundred bytes of state</td><td>hundreds of thousands</td></tr>
+    </tbody>
+  </table>
+
+  <p>The memory is only half of it. Ten thousand runnable threads make the scheduler's work proportional to the connection count, and every context switch costs cache locality — week 34's subject, at the operating system's scale.</p>
+
+  <p>An event loop turns the problem inside out. Instead of <em>waiting</em> for one descriptor, ask the kernel <em>which of these are ready</em>, then service exactly those, then ask again.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Non-blocking descriptors</h2>
+
+<pre><code>#include &lt;fcntl.h&gt;
+
+static bool set_nonblocking(int fd)
+{
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags &lt; 0) return false;
+    return fcntl(fd, F_SETFL, flags | O_NONBLOCK) == 0;
+}</code></pre>
+
+  <p>On a non-blocking descriptor, an operation that would have waited returns −1 with <code>errno</code> set to <code>EAGAIN</code> (or the identical <code>EWOULDBLOCK</code>). That is not an error — it means "nothing right now, ask again later".</p>
+
+<pre><code>ssize_t n = recv(fd, buf, sizeof buf, 0);
+if (n &gt; 0)                                  { /* got data */ }
+else if (n == 0)                            { /* peer closed */ }
+else if (errno == EAGAIN || errno == EWOULDBLOCK) { /* not ready */ }
+else if (errno == EINTR)                    { /* retry */ }
+else                                        { /* real error */ }</code></pre>
+
+  <p>Those five cases are the whole of non-blocking I/O, and treating <code>EAGAIN</code> as a failure is the most common beginner error.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>The three multiplexers</h2>
+
+  <table>
+    <thead><tr><th></th><th><code>select</code></th><th><code>poll</code></th><th><code>epoll</code></th></tr></thead>
+    <tbody>
+      <tr><td>Standard</td><td>POSIX, everywhere</td><td>POSIX, everywhere</td><td>Linux only</td></tr>
+      <tr><td>Descriptor limit</td><td><code>FD_SETSIZE</code>, usually 1024</td><td>none</td><td>none</td></tr>
+      <tr><td>Cost per call</td><td>O(n)</td><td>O(n)</td><td><strong>O(ready)</strong></td></tr>
+      <tr><td>Set rebuilt each call</td><td>yes</td><td>yes</td><td>no — kept in the kernel</td></tr>
+    </tbody>
+  </table>
+
+  <p>The complexity row is the reason <code>epoll</code> exists. With <code>select</code> or <code>poll</code>, every call passes the entire descriptor list to the kernel, which examines all of it — so a server with 10 000 idle connections and one active does 10 000 units of work per event. <code>epoll</code> registers the set once and returns only what is ready.</p>
+
+  <p>The equivalents elsewhere are <code>kqueue</code> on the BSDs and macOS, and IOCP on Windows. Portable code uses libevent, libuv, or libev, which wrap all of them behind one interface. Writing directly to <code>epoll</code> once is still worth doing, because it makes the libraries comprehensible.</p>
+
+<pre><code>#include &lt;sys/epoll.h&gt;
+
+int ep = epoll_create1(0);
+
+struct epoll_event ev = { .events = EPOLLIN, .data.fd = listener };
+epoll_ctl(ep, EPOLL_CTL_ADD, listener, &amp;ev);
+
+struct epoll_event ready[64];
+int n = epoll_wait(ep, ready, 64, timeout_ms);
+for (int i = 0; i &lt; n; i++) {
+    handle(ready[i].data.fd, ready[i].events);
+}</code></pre>
+
+  <h3>Level-triggered and edge-triggered</h3>
+
+  <table>
+    <thead><tr><th>Mode</th><th>Reports</th><th>Requires</th></tr></thead>
+    <tbody>
+      <tr><td>Level-triggered (default)</td><td>Ready <em>while</em> data remains</td><td>Nothing special; safe</td></tr>
+      <tr><td>Edge-triggered (<code>EPOLLET</code>)</td><td>Ready once, when the state <em>changes</em></td><td>Drain until <code>EAGAIN</code>, or the rest is lost</td></tr>
+    </tbody>
+  </table>
+
+  <p>Edge-triggered mode is faster because it reports each event once, and it is unforgiving: read half the available data and you will not be told again. Start level-triggered.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Structuring the loop</h2>
+
+  <p>Blocking code keeps its state on the stack — the local variables of the function handling the connection. An event loop cannot: it returns to the top after each event, so <strong>every connection needs an explicit state object</strong>.</p>
+
+<pre><code>typedef enum { ST_READING_HEADER, ST_READING_BODY, ST_WRITING } State;
+
+typedef struct {
+    int     fd;
+    State   state;
+    char    in[4096];
+    size_t  in_used;
+    char    out[4096];
+    size_t  out_used, out_sent;
+    time_t  last_active;
+} Connection;</code></pre>
+
+  <p>This is the real cost of the model: what was a local variable becomes a field, and what was a sequence of statements becomes a state machine. In exchange you get a thousand connections in one thread with no locking anywhere.</p>
+
+  <p>Two rules that are easy to get wrong:</p>
+
+  <p><strong>Never block inside the loop.</strong> One blocking call — a synchronous DNS lookup, a disk read, a slow <code>malloc</code> — stalls every connection, not one.</p>
+
+  <p><strong>Only ask for writability when you have something to write.</strong> A descriptor is almost always writable, so leaving <code>EPOLLOUT</code> registered makes <code>epoll_wait</code> return immediately, forever. Add it when your output buffer is non-empty and remove it when the buffer drains.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Timers and signals</h2>
+
+  <p>Both need to be part of the loop rather than outside it.</p>
+
+  <p>The simplest timer is the <code>epoll_wait</code> timeout: compute the time until the nearest deadline, pass it, and sweep for expiries when the call returns. Linux also offers <code>timerfd_create</code>, which makes a timer into a descriptor the loop can wait on like any other.</p>
+
+  <p>Signals are harder. Week 39 established that a handler may do almost nothing — so the classic solution makes the signal into an event:</p>
+
+<pre><code>/* the self-pipe trick */
+static int wake[2];                      /* pipe(wake) at startup */
+
+static void on_signal(int sig)
+{
+    (void)sig;
+    char b = 1;
+    ssize_t r = write(wake[1], &amp;b, 1);   /* write IS async-signal-safe */
+    (void)r;
+}
+/* register wake[0] with epoll; the loop now sees signals as events */</code></pre>
+
+  <p>Linux provides <code>signalfd</code>, which does the same thing without the pipe. Either way the signal is handled in the loop's ordinary flow, where the full standard library is available.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: the week 40 server, rewritten</h2>
+
+<pre><code>#define _GNU_SOURCE
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;time.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;fcntl.h&gt;
+#include &lt;signal.h&gt;
+#include &lt;sys/epoll.h&gt;
+#include &lt;sys/socket.h&gt;
+#include &lt;netdb.h&gt;
+
+#define MAX_EVENTS   64
+#define BUF_SIZE   4096
+#define IDLE_LIMIT   30      /* seconds */
+
+typedef struct {
+    int     fd;
+    char    in[BUF_SIZE];
+    size_t  in_used;
+    char    out[BUF_SIZE];
+    size_t  out_used;
+    size_t  out_sent;
+    long    lines;
+    time_t  last_active;
+    bool    closing;
+} Connection;
+
+static Connection *conns[65536];
+static int  epfd     = -1;
+static int  wake[2]  = { -1, -1 };
+static long live     = 0;
+static long peak     = 0;
+static long total    = 0;
+
+/* ---------- signal handling via the self-pipe trick ---------- */
+
+static void on_signal(int sig)
+{
+    (void)sig;
+    char b = 1;
+    ssize_t r = write(wake[1], &amp;b, 1);    /* the only safe call here */
+    (void)r;
+}
+
+static bool set_nonblocking(int fd)
+{
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags &lt; 0) return false;
+    return fcntl(fd, F_SETFL, flags | O_NONBLOCK) == 0;
+}
+
+/* ---------- connection lifecycle ---------- */
+
+static void conn_close(Connection *c)
+{
+    epoll_ctl(epfd, EPOLL_CTL_DEL, c-&gt;fd, NULL);
+    close(c-&gt;fd);
+    conns[c-&gt;fd] = NULL;
+    free(c);
+    live--;
+}
+
+/* Ask for writability only while there is something to write. */
+static void conn_update_interest(Connection *c)
+{
+    struct epoll_event ev = { .data.fd = c-&gt;fd, .events = EPOLLIN };
+    if (c-&gt;out_used &gt; c-&gt;out_sent) {
+        ev.events |= EPOLLOUT;
+    }
+    epoll_ctl(epfd, EPOLL_CTL_MOD, c-&gt;fd, &amp;ev);
+}
+
+static void conn_queue(Connection *c, const char *data, size_t n)
+{
+    if (c-&gt;out_used + n &gt; BUF_SIZE) {      /* client not draining */
+        c-&gt;closing = true;
+        return;
+    }
+    memcpy(c-&gt;out + c-&gt;out_used, data, n);
+    c-&gt;out_used += n;
+}
+
+/* Framing, exactly as in week 40: a stream has no message boundaries. */
+static void conn_process_input(Connection *c)
+{
+    char *start = c-&gt;in;
+    char *nl;
+    while ((nl = memchr(start, '\n', (size_t)(c-&gt;in + c-&gt;in_used - start)))) {
+        size_t len = (size_t)(nl - start);
+        c-&gt;lines++;
+
+        if (len == 4 &amp;&amp; memcmp(start, "quit", 4) == 0) {
+            conn_queue(c, "bye\n", 4);
+            c-&gt;closing = true;
+            break;
+        }
+
+        char reply[BUF_SIZE];
+        int n = snprintf(reply, sizeof reply, "%ld: %.*s\n",
+                         c-&gt;lines, (int)len, start);
+        if (n &gt; 0) conn_queue(c, reply, (size_t)n);
+        start = nl + 1;
+    }
+
+    size_t leftover = (size_t)(c-&gt;in + c-&gt;in_used - start);
+    memmove(c-&gt;in, start, leftover);
+    c-&gt;in_used = leftover;
+
+    if (c-&gt;in_used == BUF_SIZE) {          /* a line longer than the buffer */
+        conn_queue(c, "line too long\n", 14);
+        c-&gt;closing = true;
+    }
+}
+
+static void conn_readable(Connection *c)
+{
+    for (;;) {
+        if (c-&gt;in_used == BUF_SIZE) break;
+
+        ssize_t n = recv(c-&gt;fd, c-&gt;in + c-&gt;in_used,
+                         BUF_SIZE - c-&gt;in_used, 0);
+        if (n &gt; 0) {
+            c-&gt;in_used += (size_t)n;
+            c-&gt;last_active = time(NULL);
+            conn_process_input(c);
+            if (c-&gt;closing) break;
+            continue;                      /* drain: there may be more */
+        }
+        if (n == 0) {                      /* orderly close */
+            c-&gt;closing = true;
+            c-&gt;out_used = c-&gt;out_sent;     /* nothing left to deliver */
+            break;
+        }
+        if (errno == EAGAIN || errno == EWOULDBLOCK) break;   /* normal */
+        if (errno == EINTR) continue;
+        c-&gt;closing = true;                 /* a real error */
+        break;
+    }
+}
+
+static void conn_writable(Connection *c)
+{
+    while (c-&gt;out_sent &lt; c-&gt;out_used) {
+        ssize_t n = send(c-&gt;fd, c-&gt;out + c-&gt;out_sent,
+                         c-&gt;out_used - c-&gt;out_sent, MSG_NOSIGNAL);
+        if (n &gt; 0) {
+            c-&gt;out_sent += (size_t)n;
+            c-&gt;last_active = time(NULL);
+            continue;
+        }
+        if (n &lt; 0 &amp;&amp; (errno == EAGAIN || errno == EWOULDBLOCK)) return;
+        if (n &lt; 0 &amp;&amp; errno == EINTR) continue;
+        c-&gt;closing = true;
+        return;
+    }
+    c-&gt;out_used = c-&gt;out_sent = 0;         /* buffer drained */
+}
+
+static void accept_new(int listener)
+{
+    for (;;) {                             /* accept until EAGAIN */
+        int fd = accept(listener, NULL, NULL);
+        if (fd &lt; 0) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) return;
+            if (errno == EINTR) continue;
+            perror("accept");
+            return;
+        }
+        if (!set_nonblocking(fd)) { close(fd); continue; }
+
+        Connection *c = calloc(1, sizeof *c);
+        if (c == NULL) { close(fd); continue; }
+        c-&gt;fd = fd;
+        c-&gt;last_active = time(NULL);
+        conns[fd] = c;
+
+        struct epoll_event ev = { .events = EPOLLIN, .data.fd = fd };
+        if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &amp;ev) &lt; 0) {
+            close(fd); free(c); conns[fd] = NULL; continue;
+        }
+
+        conn_queue(c, "ready\n", 6);
+        conn_update_interest(c);
+
+        live++; total++;
+        if (live &gt; peak) peak = live;
+    }
+}
+
+static void sweep_idle(void)
+{
+    time_t now = time(NULL);
+    for (int fd = 0; fd &lt; 65536; fd++) {
+        Connection *c = conns[fd];
+        if (c != NULL &amp;&amp; now - c-&gt;last_active &gt; IDLE_LIMIT) {
+            conn_close(c);
+        }
+    }
+}
+
+int main(int argc, char *argv[])
+{
+    const char *port = (argc &gt; 1) ? argv[1] : "8080";
+
+    if (pipe(wake) &lt; 0) { perror("pipe"); return EXIT_FAILURE; }
+    set_nonblocking(wake[0]);
+    set_nonblocking(wake[1]);
+
+    struct sigaction sa;
+    memset(&amp;sa, 0, sizeof sa);
+    sa.sa_handler = on_signal;
+    sa.sa_flags   = SA_RESTART;
+    sigaction(SIGINT,  &amp;sa, NULL);
+    sigaction(SIGTERM, &amp;sa, NULL);
+    signal(SIGPIPE, SIG_IGN);
+
+    struct addrinfo hints;
+    memset(&amp;hints, 0, sizeof hints);
+    hints.ai_family   = AF_INET6;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags    = AI_PASSIVE;
+
+    struct addrinfo *list;
+    int rc = getaddrinfo(NULL, port, &amp;hints, &amp;list);
+    if (rc != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rc));
+        return EXIT_FAILURE;
+    }
+
+    int listener = socket(list-&gt;ai_family, list-&gt;ai_socktype,
+                          list-&gt;ai_protocol);
+    int yes = 1;
+    setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &amp;yes, sizeof yes);
+    if (bind(listener, list-&gt;ai_addr, list-&gt;ai_addrlen) &lt; 0) {
+        perror("bind"); return EXIT_FAILURE;
+    }
+    freeaddrinfo(list);
+
+    set_nonblocking(listener);
+    listen(listener, 512);
+
+    epfd = epoll_create1(0);
+    struct epoll_event ev = { .events = EPOLLIN, .data.fd = listener };
+    epoll_ctl(epfd, EPOLL_CTL_ADD, listener, &amp;ev);
+    ev.data.fd = wake[0];
+    epoll_ctl(epfd, EPOLL_CTL_ADD, wake[0], &amp;ev);
+
+    printf("event loop on port %s, one thread, Ctrl-C to stop\n", port);
+
+    struct epoll_event events[MAX_EVENTS];
+    bool running = true;
+    time_t last_sweep = time(NULL);
+
+    while (running) {
+        int n = epoll_wait(epfd, events, MAX_EVENTS, 1000);
+        if (n &lt; 0) {
+            if (errno == EINTR) continue;
+            perror("epoll_wait");
+            break;
+        }
+
+        for (int i = 0; i &lt; n; i++) {
+            int fd = events[i].data.fd;
+
+            if (fd == listener) {
+                accept_new(listener);
+                continue;
+            }
+            if (fd == wake[0]) {           /* a signal arrived */
+                char drain[64];
+                while (read(wake[0], drain, sizeof drain) &gt; 0) { }
+                running = false;
+                continue;
+            }
+
+            Connection *c = conns[fd];
+            if (c == NULL) continue;
+
+            if (events[i].events &amp; (EPOLLHUP | EPOLLERR)) {
+                conn_close(c);
+                continue;
+            }
+            if (events[i].events &amp; EPOLLIN)  conn_readable(c);
+            if (events[i].events &amp; EPOLLOUT) conn_writable(c);
+
+            if (c-&gt;closing &amp;&amp; c-&gt;out_sent &gt;= c-&gt;out_used) {
+                conn_close(c);              /* flush before closing */
+            } else {
+                conn_update_interest(c);
+            }
+        }
+
+        if (time(NULL) - last_sweep &gt;= 5) {
+            sweep_idle();
+            last_sweep = time(NULL);
+        }
+    }
+
+    for (int fd = 0; fd &lt; 65536; fd++) {
+        if (conns[fd] != NULL) conn_close(conns[fd]);
+    }
+    close(listener);
+    close(epfd);
+    close(wake[0]);
+    close(wake[1]);
+
+    printf("\nserved %ld connections, peak concurrent %ld\n", total, peak);
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -D_GNU_SOURCE -Wall -Wextra -g -o evserver evserver.c
+./evserver 8080 &amp;</code></pre>
+
+  <h3>Compare the two servers under load</h3>
+
+<pre><code># the week 40 forking server
+./echoserver 8081 &amp;
+
+# 500 concurrent clients against each
+time (for i in $(seq 500); do
+        printf 'a\nb\nquit\n' | nc -q1 localhost 8081 &gt;/dev/null &amp;
+      done; wait)
+
+time (for i in $(seq 500); do
+        printf 'a\nb\nquit\n' | nc -q1 localhost 8080 &gt;/dev/null &amp;
+      done; wait)</code></pre>
+
+  <p>Watch the process count while each runs:</p>
+
+<pre><code>ps --no-headers -C echoserver | wc -l     # hundreds
+ps --no-headers -C evserver   | wc -l     # exactly 1</code></pre>
+
+  <p>The forking server creates five hundred processes; the event loop stays at one thread and a few hundred bytes per connection. Raise the count to five thousand and the forking server will typically hit a resource limit while the event loop is still comfortable.</p>
+
+  <h3>Keep many connections open and idle</h3>
+
+<pre><code>for i in $(seq 1000); do (sleep 60 | nc localhost 8080 &gt;/dev/null) &amp; done
+ps -o rss= -C evserver          # resident memory, in kilobytes
+ss -tn state established '( sport = :8080 )' | wc -l</code></pre>
+
+  <p>A thousand idle connections cost the event loop a few megabytes. A thread-per-connection server would have reserved eight gigabytes of stack address space for the same thing.</p>
+
+  <h3>The two bugs this design invites</h3>
+
+  <p><strong>Forgetting to drain.</strong> Change <code>conn_readable</code> to call <code>recv</code> once instead of looping. Under level-triggered <code>epoll</code> it still works — you are told again next time — but each event does less work and throughput drops. Switch to <code>EPOLLET</code> with the loop removed and it breaks outright: data sits in the socket and you are never notified again. Add <code>EPOLLET</code> to the events and try it.</p>
+
+  <p><strong>Leaving <code>EPOLLOUT</code> registered.</strong> Change <code>conn_update_interest</code> to always request <code>EPOLLOUT</code> and watch the CPU:</p>
+
+<pre><code>top -p $(pgrep evserver)</code></pre>
+
+  <p>One connection is enough to pin a core at 100%. The socket is writable, so <code>epoll_wait</code> returns immediately, forever. This is the single most common event-loop bug and it looks like a mysterious performance problem rather than a logic error.</p>
+
+  <h3>Verify the signal path</h3>
+
+  <p>Press Ctrl-C. The handler writes one byte to the pipe; the loop sees <code>wake[0]</code> become readable, drains it, and exits cleanly — closing every connection and printing the statistics. Nothing unsafe happens inside the handler, which is week 39's rule honoured by construction rather than by care.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Event loop or thread pool?</h2>
+
+  <table>
+    <thead><tr><th>Event loop</th><th>Thread pool</th></tr></thead>
+    <tbody>
+      <tr><td>Many connections, little work each</td><td>Fewer connections, heavy work each</td></tr>
+      <tr><td>I/O bound</td><td>CPU bound</td></tr>
+      <tr><td>No locking; one thread</td><td>Uses every core</td></tr>
+      <tr><td>State machines instead of straight-line code</td><td>Straight-line code, plus locks</td></tr>
+      <tr><td>One blocking call stalls everything</td><td>A blocking call stalls one worker</td></tr>
+    </tbody>
+  </table>
+
+  <p>Real servers combine them: an event loop per core, each handling its own connections, with a separate pool for genuinely blocking work such as disk I/O or password hashing. nginx, Redis, and Node.js are all variations on that shape.</p>
+
+  <p>The "C10K problem" — handling ten thousand concurrent connections — was an open question around 2000 precisely because the thread-per-connection model could not reach it. <code>epoll</code> and <code>kqueue</code> were the answer, and the same techniques now carry C10M on commodity hardware.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Treating <code>EAGAIN</code> as an error</td><td>Connections dropped for no reason</td><td>It means "not ready"; try again later.</td></tr>
+      <tr><td><code>EPOLLOUT</code> always registered</td><td>100% CPU on an idle server</td><td>Register it only when output is pending.</td></tr>
+      <tr><td>Not draining under <code>EPOLLET</code></td><td>Data never delivered; the connection hangs</td><td>Loop until <code>EAGAIN</code>.</td></tr>
+      <tr><td>A blocking call inside the loop</td><td>Every connection stalls</td><td>Move it to a worker thread.</td></tr>
+      <tr><td>Doing work in a signal handler</td><td>Undefined behavior</td><td>Self-pipe or <code>signalfd</code>.</td></tr>
+      <tr><td>Freeing a connection still registered</td><td>Use after free on the next event</td><td><code>EPOLL_CTL_DEL</code> before <code>free</code>.</td></tr>
+      <tr><td>No idle timeout</td><td>Dead connections accumulate</td><td>Sweep periodically.</td></tr>
+      <tr><td>Closing before the output drains</td><td>The last reply is lost</td><td>Close once <code>out_sent == out_used</code>.</td></tr>
+      <tr><td>Unbounded output buffering</td><td>A slow client exhausts memory</td><td>Cap it and disconnect.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">9</span>Check yourself</h2>
+
+  <details>
+    <summary>Why is <code>epoll</code> O(ready) while <code>poll</code> is O(n)?</summary>
+    <p>Because <code>poll</code> passes the whole descriptor list on every call, so the kernel must examine each one. <code>epoll</code> registers the set once and keeps it in the kernel, maintaining a ready list as events occur — so a call returns only the descriptors that are ready, regardless of how many are being watched.</p>
+  </details>
+
+  <details>
+    <summary>What does <code>EAGAIN</code> mean and why is it not an error?</summary>
+    <p>On a non-blocking descriptor it means the operation would have blocked — there is no data to read, or no space to write, right now. The correct response is to return to the event loop and wait to be told the descriptor is ready. Treating it as a failure closes connections that are perfectly healthy.</p>
+  </details>
+
+  <details>
+    <summary>Why must you drain a descriptor under edge-triggered mode?</summary>
+    <p>Because edge-triggered <code>epoll</code> reports a transition, not a state: you are told once when data arrives and not again until more arrives. If you read only part of what is available, the remainder sits in the socket with no further notification, and the connection appears to hang. Read in a loop until <code>EAGAIN</code>.</p>
+  </details>
+
+  <details>
+    <summary>Why does leaving <code>EPOLLOUT</code> registered burn a whole core?</summary>
+    <p>Because a socket is writable almost all the time, so <code>epoll_wait</code> returns immediately on every call with nothing useful to do. The loop spins at full speed. Request writability only while the output buffer is non-empty and remove it as soon as the buffer drains.</p>
+  </details>
+
+  <details>
+    <summary>When is a thread pool the better choice?</summary>
+    <p>When the work per connection is CPU-bound rather than I/O-bound, or when it genuinely must block — disk reads, password hashing, a synchronous third-party call. An event loop is one thread, so it cannot use more than one core and one blocking call stalls everything. Real servers usually combine both: an event loop per core plus a pool for blocking work.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">10</span>Where this leads</h2>
+  <p>Week 48 attacks the parsers you have been writing — including this server's framing loop — with a fuzzer, which generates millions of inputs and finds the ones you did not think of. After that the embedded block begins, where the constraints change completely and an event loop becomes a superloop.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_46_ABI_and_Language_Interoperability.html">← Week 46</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_48_Fuzzing_and_Security_Testing.html">Week 48 →</a>
+</div>
+
+</div>

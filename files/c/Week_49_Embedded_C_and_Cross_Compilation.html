@@ -1,0 +1,432 @@
+---
+layout: without-sidebar
+title: "Week 49 — Embedded C and Cross-Compilation"
+permalink: /files/c/Week_49_Embedded_C_and_Cross_Compilation.html
+excerpt: "Microcontroller architecture, cross-compilers and target triples, freestanding versus hosted, startup code and the reset vector, and running a bare-metal image under QEMU."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Professional · Week 49</div>
+  <h1>Embedded C and Cross-Compilation</h1>
+  <p class="c-wk-lead">No operating system, no <code>malloc</code>, no <code>printf</code>, sixty-four kilobytes of RAM, and a compiler producing code for a processor it is not running on. This is where C's original purpose is still its dominant one — and where every assumption of the previous forty-eight weeks has to be re-examined.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Describe a microcontroller's memory and peripherals, and how it differs from a desktop.</li>
+      <li>Install a cross-compiler and explain what a target triple names.</li>
+      <li>Say what a freestanding environment provides and what it does not.</li>
+      <li>Trace execution from the reset vector to the first line of <code>main</code>.</li>
+      <li>Build a bare-metal image and run it under QEMU, with no hardware.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The machine</h2>
+
+  <table>
+    <thead><tr><th></th><th>Desktop</th><th>Microcontroller</th></tr></thead>
+    <tbody>
+      <tr><td>RAM</td><td>8–64 GB</td><td>4 KB – 512 KB</td></tr>
+      <tr><td>Program storage</td><td>SSD, gigabytes</td><td>Flash, 16 KB – 2 MB</td></tr>
+      <tr><td>Clock</td><td>3 GHz, several cores</td><td>16–200 MHz, one core</td></tr>
+      <tr><td>Operating system</td><td>Linux, Windows</td><td>None, or a small RTOS</td></tr>
+      <tr><td>Memory protection</td><td>MMU; a bad pointer faults</td><td>Usually none; a bad pointer corrupts</td></tr>
+      <tr><td>Allocation</td><td><code>malloc</code> freely</td><td>Often forbidden entirely</td></tr>
+      <tr><td>Output</td><td><code>printf</code> to a terminal</td><td>A UART, if you write the driver</td></tr>
+    </tbody>
+  </table>
+
+  <p>Two consequences deserve emphasis now. Without an MMU there is no segmentation fault — a wild pointer writes over another variable, or over a peripheral register, and the program continues doing something else. Week 12's silent corruption is the <em>normal</em> failure mode here, not the unlucky one.</p>
+
+  <p>And code executes from flash while data lives in RAM, which is why the startup sequence in section 4 has work to do before <code>main</code> can run at all.</p>
+
+  <h3>Harvard versus von Neumann</h3>
+
+  <p>A desktop keeps code and data in one address space. Many microcontrollers separate them — flash at <code>0x08000000</code>, RAM at <code>0x20000000</code> on a typical Cortex-M — which is why a <code>const</code> table can stay in flash and cost no RAM, and why a string literal is addressed differently from a buffer.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Cross-compilation</h2>
+
+  <p>A <em>cross-compiler</em> runs on one architecture and produces code for another. Its name encodes the target as a <strong>triple</strong>:</p>
+
+<pre><code>arm-none-eabi-gcc
+│   │    │
+│   │    └── ABI: embedded ABI
+│   └─────── vendor/OS: none — bare metal
+└─────────── architecture: ARM
+
+x86_64-linux-gnu-gcc        # the compiler you have been using
+riscv64-unknown-elf-gcc     # bare-metal RISC-V</code></pre>
+
+<pre><code># Debian/Ubuntu
+sudo apt install gcc-arm-none-eabi qemu-system-arm gdb-multiarch
+
+# Fedora
+sudo dnf install arm-none-eabi-gcc-cs qemu-system-arm
+
+arm-none-eabi-gcc --version</code></pre>
+
+  <p>The whole toolchain is prefixed: <code>arm-none-eabi-objdump</code>, <code>-size</code>, <code>-nm</code>, <code>-gdb</code>. Running the host <code>objdump</code> on an ARM image is a common early confusion — it will refuse, or print nonsense.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Freestanding versus hosted</h2>
+
+  <p>The standard defines two conformance modes, and this is the distinction that matters most this week.</p>
+
+  <table>
+    <thead><tr><th></th><th>Hosted</th><th>Freestanding</th></tr></thead>
+    <tbody>
+      <tr><td>Entry point</td><td><code>main</code>, called for you</td><td>Implementation-defined; you write it</td></tr>
+      <tr><td>Guaranteed headers</td><td>All of them</td><td><code>&lt;float.h&gt; &lt;limits.h&gt; &lt;stdarg.h&gt; &lt;stdbool.h&gt; &lt;stddef.h&gt; &lt;stdint.h&gt;</code> and a few more</td></tr>
+      <tr><td><code>printf</code>, <code>malloc</code>, <code>fopen</code></td><td>Present</td><td><strong>Not guaranteed</strong></td></tr>
+    </tbody>
+  </table>
+
+<pre><code>arm-none-eabi-gcc -ffreestanding -nostdlib …</code></pre>
+
+  <p>Note what <em>is</em> guaranteed: the language itself, the fixed-width types, and the limits. Everything week 37 taught about <code>&lt;stdint.h&gt;</code> applies directly, and it matters more here because <code>int</code> may genuinely be 16 bits on a small part.</p>
+
+  <p>In practice a toolchain like <code>arm-none-eabi</code> ships newlib, which provides a subset — including a <code>printf</code> that will link but calls <code>_write</code>, which you must supply. That is why a first embedded <code>printf</code> so often links cleanly and produces nothing.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>From reset to <code>main</code></h2>
+
+  <p>On a desktop the loader does this work. Bare metal, you write it.</p>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 640 140" role="img" aria-label="Startup sequence from power-on through the reset handler to main" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="8" y="42" width="96" height="44" rx="8"/>
+        <rect x="128" y="42" width="120" height="44" rx="8"/>
+        <rect x="272" y="42" width="120" height="44" rx="8"/>
+        <rect x="416" y="42" width="120" height="44" rx="8"/>
+        <rect x="560" y="42" width="72" height="44" rx="8"/>
+      </g>
+      <g stroke="currentColor" stroke-width="1.5" opacity=".5">
+        <path d="M104 64h24M248 64h24M392 64h24M536 64h24"/>
+        <path d="M120 59l8 5-8 5M264 59l8 5-8 5M408 59l8 5-8 5M552 59l8 5-8 5" fill="none"/>
+      </g>
+      <g fill="currentColor" font-size="11.5" text-anchor="middle" font-family="inherit">
+        <text x="56" y="61">reset</text><text x="56" y="77" opacity=".6">power on</text>
+        <text x="188" y="61">load SP</text><text x="188" y="77" opacity=".6">vector[0]</text>
+        <text x="332" y="61">copy .data</text><text x="332" y="77" opacity=".6">flash → RAM</text>
+        <text x="476" y="61">zero .bss</text><text x="476" y="77" opacity=".6">week 17</text>
+        <text x="596" y="61">main()</text>
+      </g>
+      <text x="320" y="122" fill="currentColor" font-size="11" text-anchor="middle" opacity=".65" font-family="inherit">nothing above happens by itself; the reset handler is code you write</text>
+    </svg>
+    <p class="c-wk-cap">Week 17's <code>.data</code> and <code>.bss</code> regions, initialized by hand.</p>
+  </div>
+
+  <p>On a Cortex-M the processor reads two words from address 0 at reset: the initial stack pointer, then the address of the reset handler. Everything after that is your code.</p>
+
+  <p><code>.data</code> — initialized globals — exists in two places. The initial values live in flash, because RAM is empty at power-on; the variables live in RAM. The startup code copies one to the other. <code>.bss</code> — zero-initialized globals — occupies no flash at all and is simply cleared, which is exactly what week 17's <code>size</code> output showed from the other side.</p>
+
+  <p>Omit either step and the symptoms are memorably strange: globals hold garbage, or hold their values only until something else uses that RAM.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Worked example: bare metal under QEMU</h2>
+
+  <p>The target is <code>lm3s6965evb</code>, a Cortex-M3 machine QEMU emulates and whose UART is trivial to drive. No hardware is required.</p>
+
+  <h3>The linker script</h3>
+
+<pre><code>/* firmware.ld — week 52 covers this properly */
+MEMORY
+{
+    FLASH (rx)  : ORIGIN = 0x00000000, LENGTH = 256K
+    RAM   (rwx) : ORIGIN = 0x20000000, LENGTH = 64K
+}
+
+_stack_top = ORIGIN(RAM) + LENGTH(RAM);     /* stack grows down from the top */
+
+SECTIONS
+{
+    .text : {
+        KEEP(*(.vectors))       /* the vector table must be first */
+        *(.text*)
+        *(.rodata*)             /* constants stay in flash */
+    } &gt; FLASH
+
+    _data_load = LOADADDR(.data);
+
+    .data : {
+        _data_start = .;
+        *(.data*)
+        _data_end = .;
+    } &gt; RAM AT&gt; FLASH           /* lives in RAM, stored in FLASH */
+
+    .bss : {
+        _bss_start = .;
+        *(.bss*)
+        *(COMMON)
+        _bss_end = .;
+    } &gt; RAM
+}</code></pre>
+
+  <p><code>&gt; RAM AT&gt; FLASH</code> is the line that expresses the two-places problem: the section is addressed in RAM but stored in flash.</p>
+
+  <h3>The startup code</h3>
+
+<pre><code>/* startup.c */
+#include &lt;stdint.h&gt;
+
+extern uint32_t _stack_top;
+extern uint32_t _data_load, _data_start, _data_end;
+extern uint32_t _bss_start, _bss_end;
+
+int main(void);
+
+void reset_handler(void)
+{
+    /* 1. copy .data from flash to RAM */
+    uint32_t *src = &amp;_data_load;
+    for (uint32_t *dst = &amp;_data_start; dst &lt; &amp;_data_end; ) {
+        *dst++ = *src++;
+    }
+
+    /* 2. zero .bss */
+    for (uint32_t *p = &amp;_bss_start; p &lt; &amp;_bss_end; ) {
+        *p++ = 0;
+    }
+
+    /* 3. only now may C code with globals run */
+    main();
+
+    for (;;) { }                 /* main must never return */
+}
+
+static void default_handler(void) { for (;;) { } }
+
+/* The vector table: the processor reads [0] and [1] at reset. */
+__attribute__((section(".vectors"), used))
+void (* const vector_table[])(void) = {
+    (void (*)(void))&amp;_stack_top,   /* [0] initial stack pointer */
+    reset_handler,                 /* [1] reset                 */
+    default_handler,               /* NMI                       */
+    default_handler,               /* hard fault                */
+};</code></pre>
+
+  <h3>The program</h3>
+
+<pre><code>/* main.c */
+#include &lt;stdint.h&gt;
+
+/* The UART, straight from the machine's memory map. Week 50
+   explains volatile properly; note it is not optional here. */
+#define UART0_BASE 0x4000C000u
+#define UART_DR   (*(volatile uint32_t *)(UART0_BASE + 0x000))
+#define UART_FR   (*(volatile uint32_t *)(UART0_BASE + 0x018))
+#define UART_FR_TXFF (1u &lt;&lt; 5)          /* transmit FIFO full */
+
+/* Initialized: lives in .data, copied from flash by the startup code. */
+static uint32_t boot_marker = 0xDEADBEEF;
+
+/* Zero-initialized: lives in .bss, cleared by the startup code. */
+static uint32_t counter;
+static uint8_t  buffer[256];
+
+static void uart_putc(char c)
+{
+    while (UART_FR &amp; UART_FR_TXFF) { }   /* wait for space */
+    UART_DR = (uint32_t)c;
+}
+
+static void uart_puts(const char *s)
+{
+    for (; *s != '\0'; s++) {
+        if (*s == '\n') uart_putc('\r');  /* terminals want CR LF */
+        uart_putc(*s);
+    }
+}
+
+/* No printf here: write what you need. */
+static void uart_put_hex(uint32_t v)
+{
+    static const char digits[] = "0123456789ABCDEF";
+    uart_puts("0x");
+    for (int shift = 28; shift &gt;= 0; shift -= 4) {
+        uart_putc(digits[(v &gt;&gt; shift) &amp; 0xFu]);
+    }
+}
+
+static void uart_put_uint(uint32_t v)
+{
+    char tmp[11];
+    int i = 0;
+    if (v == 0) { uart_putc('0'); return; }
+    while (v &gt; 0) { tmp[i++] = (char)('0' + v % 10); v /= 10; }
+    while (i &gt; 0) uart_putc(tmp[--i]);
+}
+
+int main(void)
+{
+    uart_puts("\n=== bare metal, no operating system ===\n");
+
+    uart_puts(".data was copied : ");
+    uart_put_hex(boot_marker);
+    uart_puts(boot_marker == 0xDEADBEEF ? "  correct\n" : "  WRONG\n");
+
+    uart_puts(".bss was zeroed  : counter = ");
+    uart_put_uint(counter);
+    uart_puts(counter == 0 ? "  correct\n" : "  WRONG\n");
+
+    uart_puts("buffer[0]        : ");
+    uart_put_uint(buffer[0]);
+    uart_puts("\n");
+
+    uart_puts("stack address    : ");
+    uint32_t local = 0;
+    uart_put_hex((uint32_t)(uintptr_t)&amp;local);
+    uart_puts("  (RAM, near the top)\n");
+
+    uart_puts("code address     : ");
+    uart_put_hex((uint32_t)(uintptr_t)main);
+    uart_puts("  (flash, low)\n");
+
+    uart_puts("\nsuperloop starts; Ctrl-A X to quit QEMU\n");
+    for (;;) {
+        counter++;
+        if (counter % 2000000u == 0) {
+            uart_puts("tick ");
+            uart_put_uint(counter / 2000000u);
+            uart_puts("\n");
+        }
+    }
+}</code></pre>
+
+  <h3>Build and run</h3>
+
+<pre><code>arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb \
+    -ffreestanding -nostdlib -O2 -Wall -Wextra -g \
+    -T firmware.ld -o firmware.elf startup.c main.c
+
+arm-none-eabi-objcopy -O binary firmware.elf firmware.bin
+arm-none-eabi-size firmware.elf
+
+qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf</code></pre>
+
+<pre><code>=== bare metal, no operating system ===
+.data was copied : 0xDEADBEEF  correct
+.bss was zeroed  : counter = 0  correct
+buffer[0]        : 0
+stack address    : 0x2000FFE8  (RAM, near the top)
+code address     : 0x000000C1  (flash, low)
+
+superloop starts; Ctrl-A X to quit QEMU
+tick 1
+tick 2</code></pre>
+
+  <p>Quit with Ctrl-A then X.</p>
+
+  <h3>Four things the output proves</h3>
+
+  <p><strong>The startup code works.</strong> <code>boot_marker</code> holds its initializer only because <code>reset_handler</code> copied it out of flash; <code>counter</code> is zero only because the same function cleared <code>.bss</code>. Comment out either loop, rebuild, and watch the corresponding line report WRONG — with genuinely arbitrary values, since nothing initializes that RAM.</p>
+
+  <p><strong>The memory map is visible.</strong> The stack sits near <code>0x20010000</code>, the top of the 64 KB RAM region, and grows down; <code>main</code> lives at a low address in flash. Week 17's diagram, with the numbers from the linker script.</p>
+
+  <p><strong>There is no <code>printf</code>.</strong> Formatting a number took twelve lines. That is the ordinary situation on a small target, and it is why embedded code tends to have hand-written output helpers.</p>
+
+  <p><strong>The odd address for <code>main</code>.</strong> <code>0x000000C1</code> is odd because the low bit of a Cortex-M function pointer indicates Thumb instruction encoding — a detail invisible from C and instantly visible here.</p>
+
+  <h3>Inspect the image</h3>
+
+<pre><code>arm-none-eabi-size firmware.elf</code></pre>
+<pre><code>   text    data     bss     dec     hex filename
+   1284       4     264    1552     610 firmware.elf</code></pre>
+
+  <p>1284 bytes of code and constants in flash, 4 bytes of initialized data, 264 bytes of zeroed data. Compare with the same program built for the host: a hosted <code>hello world</code> links megabytes of C library. Here the entire image is smaller than this paragraph's HTML.</p>
+
+<pre><code>arm-none-eabi-objdump -h firmware.elf          # section addresses
+arm-none-eabi-objdump -d firmware.elf | head -30
+arm-none-eabi-nm -n firmware.elf | head -20
+xxd -l 16 firmware.bin                          # the vector table</code></pre>
+
+  <p>The first eight bytes of <code>firmware.bin</code> are the initial stack pointer and the reset handler address, little-endian — the two words the processor reads at power-on. Seeing them is worth more than any description.</p>
+
+  <h3>Debug it with GDB</h3>
+
+<pre><code># terminal 1
+qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf -S -s
+
+# terminal 2
+gdb-multiarch firmware.elf
+(gdb) target remote :1234
+(gdb) break reset_handler
+(gdb) continue
+(gdb) next
+(gdb) print _data_start
+(gdb) break main
+(gdb) continue
+(gdb) print boot_marker</code></pre>
+
+  <p><code>-S</code> halts the machine at reset and <code>-s</code> opens a GDB server on port 1234. You can now single-step the startup code, watch <code>.data</code> being copied word by word, and stop at <code>main</code> — the same debugger workflow as week 35, on a machine that does not exist. Week 55 develops this.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Using the host toolchain on a target image</td><td>Nonsense output or a refusal</td><td>Prefix everything: <code>arm-none-eabi-</code>.</td></tr>
+      <tr><td>Forgetting to copy <code>.data</code></td><td>Initialized globals hold garbage</td><td>The copy loop in the reset handler.</td></tr>
+      <tr><td>Forgetting to zero <code>.bss</code></td><td>Zero-initialized globals do not start at zero</td><td>The clear loop.</td></tr>
+      <tr><td>Vector table not first in flash</td><td>The processor reads a bad stack pointer; nothing runs</td><td><code>KEEP(*(.vectors))</code> at the start of <code>.text</code>.</td></tr>
+      <tr><td>Letting <code>main</code> return</td><td>Execution runs off into undefined memory</td><td>An infinite loop after the call.</td></tr>
+      <tr><td>Expecting <code>printf</code> to work</td><td>Links, prints nothing</td><td>Provide <code>_write</code>, or write your own output.</td></tr>
+      <tr><td>Omitting <code>volatile</code> on a register</td><td>Reads cached; the driver hangs</td><td>Week 50.</td></tr>
+      <tr><td>Assuming a bad pointer will fault</td><td>Silent corruption; no MMU</td><td>Treat every pointer as unchecked.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">7</span>Check yourself</h2>
+
+  <details>
+    <summary>What does the <code>none</code> in <code>arm-none-eabi-gcc</code> mean?</summary>
+    <p>It is the vendor or operating-system field of the target triple, and <code>none</code> means bare metal — there is no operating system. That is what selects a freestanding environment: no process loader, no system calls, and no guarantee of the hosted standard library.</p>
+  </details>
+
+  <details>
+    <summary>Why must the startup code copy <code>.data</code> before calling <code>main</code>?</summary>
+    <p>Because initialized globals live in RAM, which is uninitialized at power-on, while their initial values are stored in flash. Nothing copies one to the other automatically on bare metal. Skip the copy and every initialized global holds whatever the RAM happened to contain.</p>
+  </details>
+
+  <details>
+    <summary>Why does <code>.bss</code> occupy no space in the image?</summary>
+    <p>Because every byte is zero, so only the size needs recording — the startup code clears that much RAM. This is the same property week 17 observed with <code>size</code> on a hosted program; here you write the loop that does it rather than relying on the loader.</p>
+  </details>
+
+  <details>
+    <summary>What does a freestanding implementation guarantee?</summary>
+    <p>The language itself and a small set of headers — <code>&lt;stddef.h&gt;</code>, <code>&lt;stdint.h&gt;</code>, <code>&lt;limits.h&gt;</code>, <code>&lt;stdbool.h&gt;</code>, <code>&lt;stdarg.h&gt;</code>, <code>&lt;float.h&gt;</code> and a few more. It does not guarantee <code>printf</code>, <code>malloc</code>, file I/O, or even that <code>main</code> is the entry point.</p>
+  </details>
+
+  <details>
+    <summary>Why is a wild pointer more dangerous on a microcontroller than on a desktop?</summary>
+    <p>Because there is usually no memory management unit, so there is no invalid address to fault on. The write lands on another variable, on the stack, or on a peripheral register, and execution continues. What is an immediate segmentation fault on a desktop becomes silent corruption with a symptom somewhere else entirely.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Where this leads</h2>
+  <p>The UART macros in this week's example were used without explanation. Week 50 justifies them: what a memory-mapped register is, why <code>volatile</code> is mandatory rather than advisable, and how to turn a reference manual's register table into correct C.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_48_Fuzzing_and_Security_Testing.html">← Week 48</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_50_Memory_Mapped_IO_and_Registers.html">Week 50 →</a>
+</div>
+
+</div>

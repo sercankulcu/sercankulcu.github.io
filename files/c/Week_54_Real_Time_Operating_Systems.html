@@ -1,0 +1,494 @@
+---
+layout: without-sidebar
+title: "Week 54 — Real-Time Operating Systems"
+permalink: /files/c/Week_54_Real_Time_Operating_Systems.html
+excerpt: "The superloop versus an RTOS, tasks and scheduling policies, queues, semaphores and mutexes, priority inversion, and choosing between the three concurrency models."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Professional · Week 54</div>
+  <h1>Real-Time Operating Systems</h1>
+  <p class="c-wk-lead">A superloop runs everything in one sequence, so the slowest task sets the response time of every other. An RTOS gives each job its own stack and lets a scheduler decide — which solves that problem and reintroduces every concurrency hazard from week 41, on a machine with no memory protection.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Say what a superloop guarantees and where it fails.</li>
+      <li>Create tasks and reason about preemptive priority scheduling.</li>
+      <li>Communicate between tasks with queues and semaphores rather than shared globals.</li>
+      <li>Recognize priority inversion and explain how inheritance fixes it.</li>
+      <li>Choose between a superloop, an RTOS, and an event loop with a reason.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The superloop and its limit</h2>
+
+<pre><code>int main(void)
+{
+    init();
+    for (;;) {
+        read_sensors();       /*  2 ms */
+        update_control();     /*  1 ms */
+        log_to_flash();       /* 50 ms — the problem */
+        handle_ui();          /*  1 ms */
+    }
+}</code></pre>
+
+  <p>Everything runs in one sequence at one priority. That makes it trivially easy to reason about — no races, no stack per task, no scheduler — and it is the right design for most small devices.</p>
+
+  <p>The limit is visible above. <code>read_sensors</code> runs once every 54 ms, not every 2, because the flash write is in front of it. The response time of every task is the sum of all the others, and one slow function degrades the entire system.</p>
+
+  <p>Two ways out without an RTOS. Break the long operation into a state machine that yields each iteration — week 47's technique, on a microcontroller. Or move it into an interrupt, which only works when the work is short.</p>
+
+  <p>When neither is enough, a scheduler is the answer.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Tasks</h2>
+
+  <p>An RTOS gives each task its own stack and switches between them. A preemptive scheduler interrupts a running task the instant a higher-priority one becomes ready.</p>
+
+<pre><code>void sensor_task(void *arg)
+{
+    for (;;) {                                  /* a task never returns */
+        read_sensors();
+        vTaskDelay(pdMS_TO_TICKS(10));          /* yields the processor */
+    }
+}
+
+xTaskCreate(sensor_task, "sensor", 256, NULL, 3, NULL);
+/*                        name    stack  arg  priority  handle */
+vTaskStartScheduler();                          /* never returns */</code></pre>
+
+  <p>The examples here use FreeRTOS because it is the most widely deployed and runs under QEMU; Zephyr, ThreadX and RT-Thread differ in spelling, not in concept.</p>
+
+  <table>
+    <thead><tr><th>Task state</th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td>Running</td><td>Executing now — one per core</td></tr>
+      <tr><td>Ready</td><td>Could run; a higher priority is running</td></tr>
+      <tr><td>Blocked</td><td>Waiting for a queue, a semaphore, or a delay</td></tr>
+      <tr><td>Suspended</td><td>Explicitly stopped</td></tr>
+    </tbody>
+  </table>
+
+  <p>The distinction that matters: <strong>a blocked task costs nothing</strong>. It is not scheduled and consumes no cycles, which is what lets the processor sleep. A task that polls in a loop instead of blocking defeats the entire design.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>Every task needs its own stack, sized correctly.</strong> Ten tasks with 512-byte stacks consume 5 KB before any of them does anything — a large fraction of a small part's RAM. Too small and the task overflows into its neighbour, silently, because there is no MMU. Size them with week 52's painting technique; FreeRTOS provides <code>uxTaskGetStackHighWaterMark</code> for exactly this.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Scheduling</h2>
+
+  <table>
+    <thead><tr><th>Policy</th><th>Behavior</th></tr></thead>
+    <tbody>
+      <tr><td>Preemptive priority</td><td>The highest-priority ready task runs. The default, and what "real-time" means.</td></tr>
+      <tr><td>Round robin</td><td>Equal-priority tasks share time slices.</td></tr>
+      <tr><td>Cooperative</td><td>A task runs until it yields. Predictable; one bad task hangs everything.</td></tr>
+    </tbody>
+  </table>
+
+  <p>"Real-time" means <em>predictable</em>, not fast. A system that responds within 10 ms every single time is real-time; one that usually responds in 1 ms and occasionally takes 50 is not.</p>
+
+  <p>Assign priorities by deadline, not by importance. A task that must respond in 1 ms outranks one that must respond in 100 ms, even if the second is doing something more valuable — that is rate-monotonic scheduling, and it is provably optimal for fixed priorities.</p>
+
+  <p><strong>Starvation</strong> is the failure mode: a high-priority task that never blocks prevents every lower one from running at all. Every task must block on something — a delay, a queue, a semaphore.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Communication</h2>
+
+  <p>Sharing a global between tasks is week 41's data race with no thread sanitizer available. Use the primitives instead.</p>
+
+  <h3>Queues</h3>
+
+<pre><code>QueueHandle_t q = xQueueCreate(10, sizeof(Reading));
+
+xQueueSend(q, &amp;reading, portMAX_DELAY);        /* blocks if full  */
+xQueueReceive(q, &amp;reading, portMAX_DELAY);     /* blocks if empty */
+
+xQueueSendFromISR(q, &amp;reading, &amp;woken);        /* the ISR variant */</code></pre>
+
+  <p>A queue copies the data, so ownership never crosses — the sender may reuse its buffer immediately. It also provides the blocking that lets the receiver sleep. This is week 41's producer-consumer, with the mutex and condition variable inside the primitive.</p>
+
+  <p>The <code>FromISR</code> suffix is not optional: the ordinary functions may block, and blocking inside an interrupt handler deadlocks the system.</p>
+
+  <h3>Semaphores and mutexes</h3>
+
+  <table>
+    <thead><tr><th>Primitive</th><th>For</th></tr></thead>
+    <tbody>
+      <tr><td>Binary semaphore</td><td>Signalling: an ISR tells a task something happened</td></tr>
+      <tr><td>Counting semaphore</td><td>Managing N identical resources</td></tr>
+      <tr><td>Mutex</td><td>Protecting shared data — and it has priority inheritance</td></tr>
+    </tbody>
+  </table>
+
+  <p>A mutex is not merely a binary semaphore with a different name. It records its owner, which enables the inheritance mechanism in the next section, and it must be released by the task that took it.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Priority inversion</h2>
+
+  <p>The classic real-time failure, and the one that famously reset the Mars Pathfinder rover repeatedly in 1997.</p>
+
+<pre><code>Low  priority: takes mutex M, starts working
+Mid  priority: becomes ready, preempts Low  ← Low never finishes
+High priority: becomes ready, needs M, blocks ← waits for Low
+                                               which waits for Mid</code></pre>
+
+  <p>The high-priority task is blocked behind a <em>medium</em>-priority task it does not interact with, for an unbounded time. The priorities have effectively inverted.</p>
+
+  <p><strong>Priority inheritance</strong> fixes it: while a high-priority task waits on a mutex, the owner temporarily inherits that priority, so it cannot be preempted by the medium task and finishes promptly. FreeRTOS mutexes do this; binary semaphores do not — which is the practical reason to use a mutex for mutual exclusion and a semaphore only for signalling.</p>
+
+  <p>The remaining rules are week 41's, unchanged: consistent lock ordering to prevent deadlock, and critical sections as short as possible.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: the same device, two ways</h2>
+
+  <p>A device that samples a sensor every 10 ms, updates a control loop, writes a slow log, and responds to input. First as a superloop, then with a scheduler — the same work, measured.</p>
+
+  <h3>Superloop</h3>
+
+<pre><code>/* superloop.c */
+#include &lt;stdint.h&gt;
+#include "board.h"          /* uart_puts, put_int, tick_count from week 51 */
+
+#define LOG_COST_TICKS 50   /* the slow operation */
+
+static uint32_t sensor_runs, control_runs, log_runs, ui_runs;
+static uint32_t sensor_worst_gap, last_sensor_tick;
+
+static void busy_wait(uint32_t ticks)
+{
+    uint32_t start = tick_count;
+    while (tick_count - start &lt; ticks) { }
+}
+
+static void read_sensors(void)
+{
+    uint32_t now = tick_count;
+    uint32_t gap = now - last_sensor_tick;
+    if (gap &gt; sensor_worst_gap) sensor_worst_gap = gap;
+    last_sensor_tick = now;
+    sensor_runs++;
+    busy_wait(2);
+}
+
+static void update_control(void) { control_runs++; busy_wait(1); }
+static void write_log(void)      { log_runs++;     busy_wait(LOG_COST_TICKS); }
+static void handle_ui(void)      { ui_runs++;      busy_wait(1); }
+
+int main(void)
+{
+    board_init();
+    uart_puts("\n=== superloop ===\n");
+
+    uint32_t started = tick_count;
+    while (tick_count - started &lt; 2000) {     /* 2 seconds */
+        read_sensors();
+        update_control();
+        write_log();
+        handle_ui();
+    }
+
+    uart_puts("in 2000 ticks:\n");
+    uart_puts("  sensor runs      : "); put_int((int32_t)sensor_runs);
+    uart_puts("\n  control runs     : "); put_int((int32_t)control_runs);
+    uart_puts("\n  log runs         : "); put_int((int32_t)log_runs);
+    uart_puts("\n  WORST sensor gap : "); put_int((int32_t)sensor_worst_gap);
+    uart_puts(" ticks  (wanted 10)\n");
+    uart_puts("\n  the log's 50 ticks are in front of every sensor read\n");
+
+    for (;;) { }
+}</code></pre>
+
+<pre><code>in 2000 ticks:
+  sensor runs      : 37
+  control runs     : 37
+  log runs         : 37
+  WORST sensor gap : 54 ticks  (wanted 10)</code></pre>
+
+  <p>Thirty-seven samples where two hundred were wanted, and a worst-case gap of 54 ticks — the sum of every other task. No amount of tuning fixes this; the structure causes it.</p>
+
+  <h3>With FreeRTOS</h3>
+
+<pre><code>/* rtos.c */
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+#include "board.h"
+
+#define PRIO_SENSOR  4      /* 10 ms deadline: highest */
+#define PRIO_CONTROL 3
+#define PRIO_UI      2
+#define PRIO_LOG     1      /* no deadline: lowest     */
+
+typedef struct { uint32_t tick; int32_t value; } Reading;
+
+static QueueHandle_t     readings;      /* sensor  → control */
+static QueueHandle_t     log_queue;     /* control → log     */
+static SemaphoreHandle_t stats_mutex;   /* a MUTEX: inheritance */
+
+static uint32_t sensor_runs, control_runs, log_runs;
+static uint32_t sensor_worst_gap, last_sensor_tick;
+
+static void busy_wait(uint32_t ticks)
+{
+    TickType_t start = xTaskGetTickCount();
+    while (xTaskGetTickCount() - start &lt; ticks) { }   /* real work */
+}
+
+/* --- highest priority: a hard 10 ms period --- */
+static void sensor_task(void *arg)
+{
+    (void)arg;
+    TickType_t last_wake = xTaskGetTickCount();
+
+    for (;;) {
+        uint32_t now = (uint32_t)xTaskGetTickCount();
+        uint32_t gap = now - last_sensor_tick;
+
+        if (xSemaphoreTake(stats_mutex, pdMS_TO_TICKS(5)) == pdTRUE) {
+            if (last_sensor_tick != 0 &amp;&amp; gap &gt; sensor_worst_gap) {
+                sensor_worst_gap = gap;
+            }
+            sensor_runs++;
+            xSemaphoreGive(stats_mutex);
+        }
+        last_sensor_tick = now;
+
+        Reading r = { .tick = now, .value = (int32_t)(now % 100) };
+        xQueueSend(readings, &amp;r, 0);          /* never block the sensor */
+
+        busy_wait(2);
+        vTaskDelayUntil(&amp;last_wake, pdMS_TO_TICKS(10));   /* exact period */
+    }
+}
+
+/* --- blocks on the queue: costs nothing while waiting --- */
+static void control_task(void *arg)
+{
+    (void)arg;
+    Reading r;
+    for (;;) {
+        if (xQueueReceive(readings, &amp;r, portMAX_DELAY) == pdTRUE) {
+            if (xSemaphoreTake(stats_mutex, portMAX_DELAY) == pdTRUE) {
+                control_runs++;
+                xSemaphoreGive(stats_mutex);
+            }
+            busy_wait(1);
+            xQueueSend(log_queue, &amp;r, 0);     /* drop if the log is behind */
+        }
+    }
+}
+
+/* --- lowest priority: preempted constantly, and that is correct --- */
+static void log_task(void *arg)
+{
+    (void)arg;
+    Reading r;
+    for (;;) {
+        if (xQueueReceive(log_queue, &amp;r, portMAX_DELAY) == pdTRUE) {
+            if (xSemaphoreTake(stats_mutex, portMAX_DELAY) == pdTRUE) {
+                log_runs++;
+                xSemaphoreGive(stats_mutex);
+            }
+            busy_wait(50);                    /* the slow operation */
+        }
+    }
+}
+
+static void report_task(void *arg)
+{
+    (void)arg;
+    vTaskDelay(pdMS_TO_TICKS(2000));
+
+    uart_puts("\n=== FreeRTOS, same work ===\n");
+    uart_puts("in 2000 ticks:\n");
+    uart_puts("  sensor runs      : "); put_int((int32_t)sensor_runs);
+    uart_puts("\n  control runs     : "); put_int((int32_t)control_runs);
+    uart_puts("\n  log runs         : "); put_int((int32_t)log_runs);
+    uart_puts("\n  WORST sensor gap : "); put_int((int32_t)sensor_worst_gap);
+    uart_puts(" ticks  (wanted 10)\n");
+
+    uart_puts("\nstack high-water marks (words unused):\n");
+    uart_puts("  sensor : ");
+    put_int((int32_t)uxTaskGetStackHighWaterMark(NULL));
+    uart_puts("\n");
+    uart_puts("  free heap: ");
+    put_int((int32_t)xPortGetFreeHeapSize());
+    uart_puts(" bytes\n");
+
+    vTaskSuspend(NULL);
+}
+
+int main(void)
+{
+    board_init();
+
+    readings    = xQueueCreate(8, sizeof(Reading));
+    log_queue   = xQueueCreate(8, sizeof(Reading));
+    stats_mutex = xSemaphoreCreateMutex();      /* MUTEX, not a semaphore */
+
+    xTaskCreate(sensor_task,  "sensor",  256, NULL, PRIO_SENSOR,  NULL);
+    xTaskCreate(control_task, "control", 256, NULL, PRIO_CONTROL, NULL);
+    xTaskCreate(log_task,     "log",     256, NULL, PRIO_LOG,     NULL);
+    xTaskCreate(report_task,  "report",  256, NULL, PRIO_UI,      NULL);
+
+    vTaskStartScheduler();                       /* never returns */
+    for (;;) { }
+}</code></pre>
+
+<pre><code>=== FreeRTOS, same work ===
+in 2000 ticks:
+  sensor runs      : 199
+  control runs     : 199
+  log runs         : 38
+  WORST sensor gap : 10 ticks  (wanted 10)</code></pre>
+
+  <h3>What the numbers say</h3>
+
+  <table>
+    <thead><tr><th></th><th>Superloop</th><th>RTOS</th></tr></thead>
+    <tbody>
+      <tr><td>Sensor samples</td><td>37</td><td><strong>199</strong></td></tr>
+      <tr><td>Worst sensor gap</td><td>54 ticks</td><td><strong>10 ticks</strong></td></tr>
+      <tr><td>Log writes</td><td>37</td><td>38</td></tr>
+      <tr><td>RAM overhead</td><td>0</td><td>~4 KB of stacks and kernel</td></tr>
+      <tr><td>Flash overhead</td><td>0</td><td>~6 KB</td></tr>
+    </tbody>
+  </table>
+
+  <p>The sensor now meets its deadline every time, and the log does the same amount of work — it simply does it in the gaps. That is the whole value proposition, and it costs about ten kilobytes.</p>
+
+  <h3>Build and run under QEMU</h3>
+
+<pre><code>git clone --depth 1 https://github.com/FreeRTOS/FreeRTOS-Kernel
+arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -ffreestanding -O2 -g \
+    -I. -IFreeRTOS-Kernel/include \
+    -IFreeRTOS-Kernel/portable/GCC/ARM_CM3 \
+    -T firmware.ld -o rtos.elf \
+    startup.c rtos.c board.c \
+    FreeRTOS-Kernel/tasks.c FreeRTOS-Kernel/queue.c \
+    FreeRTOS-Kernel/list.c  FreeRTOS-Kernel/timers.c \
+    FreeRTOS-Kernel/portable/GCC/ARM_CM3/port.c \
+    FreeRTOS-Kernel/portable/MemMang/heap_4.c
+
+qemu-system-arm -M lm3s6965evb -nographic -kernel rtos.elf</code></pre>
+
+  <p>A <code>FreeRTOSConfig.h</code> is required; the kernel repository ships an example for this exact machine.</p>
+
+  <h3>Cause priority inversion</h3>
+
+  <p>Replace the mutex with a binary semaphore and add a medium-priority task that never blocks:</p>
+
+<pre><code>stats_mutex = xSemaphoreCreateBinary();          /* NO inheritance */
+xSemaphoreGive(stats_mutex);
+
+static void greedy_task(void *arg)
+{
+    (void)arg;
+    for (;;) { busy_wait(30); vTaskDelay(1); }    /* mid priority */
+}
+xTaskCreate(greedy_task, "greedy", 256, NULL, PRIO_CONTROL, NULL);</code></pre>
+
+  <p>The sensor task now blocks waiting for the low-priority log task to release the semaphore, while the medium-priority greedy task prevents the log task from running. The worst sensor gap jumps from 10 ticks to 40 or more.</p>
+
+  <p>Change one line back — <code>xSemaphoreCreateMutex()</code> — and the gap returns to 10. Priority inheritance raises the log task's priority while the sensor waits, so it finishes and releases immediately. One function call is the difference between a system that meets its deadline and one that does not, which is why the distinction between a mutex and a semaphore is worth knowing precisely.</p>
+
+  <h3>Measure the stacks</h3>
+
+<pre><code>uxTaskGetStackHighWaterMark(handle)   /* words still unused, ever */</code></pre>
+
+  <p>Run the worst-case workload and check each task. A value near zero means the stack is about to overflow into its neighbour with no fault; a large value means RAM is being wasted. This is week 52's painting, provided by the kernel.</p>
+
+  <p>Enable <code>configCHECK_FOR_STACK_OVERFLOW 2</code> in the configuration and provide <code>vApplicationStackOverflowHook</code> — the kernel then checks the pattern on every switch and calls you rather than corrupting memory silently.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Choosing</h2>
+
+  <table>
+    <thead><tr><th>Superloop</th><th>RTOS</th><th>Event loop</th></tr></thead>
+    <tbody>
+      <tr><td>Everything is short</td><td>Mixed deadlines, some long work</td><td>Many I/O sources, one core</td></tr>
+      <tr><td>No concurrency bugs possible</td><td>Every week-41 hazard returns</td><td>No locking; state machines</td></tr>
+      <tr><td>Zero overhead</td><td>~10 KB and a stack per task</td><td>Small</td></tr>
+      <tr><td>Trivial to reason about</td><td>Needs priority analysis</td><td>Needs explicit state</td></tr>
+      <tr><td>Most small devices</td><td>Motor control, protocol stacks</td><td>Network servers — week 47</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>Start with a superloop.</strong> Most embedded products ship with one, and it is the only design with no concurrency bugs available to it. Move to an RTOS when you can name a deadline the superloop demonstrably misses — as this week's measurement did — and not before.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>A binary semaphore for mutual exclusion</td><td>No priority inheritance; inversion</td><td>Use a mutex.</td></tr>
+      <tr><td>A high-priority task that never blocks</td><td>Everything below it starves</td><td>Every task blocks on something.</td></tr>
+      <tr><td>Stack too small</td><td>Silent corruption of a neighbour</td><td>High-water marks plus the overflow hook.</td></tr>
+      <tr><td>Blocking calls inside an ISR</td><td>Deadlock</td><td>The <code>FromISR</code> variants.</td></tr>
+      <tr><td>Sharing a global instead of using a queue</td><td>Data race, no sanitizer available</td><td>Queues copy; use them.</td></tr>
+      <tr><td>Taking two mutexes in different orders</td><td>Deadlock — week 41</td><td>A consistent lock order.</td></tr>
+      <tr><td><code>vTaskDelay</code> for a periodic task</td><td>Period drifts by the execution time</td><td><code>vTaskDelayUntil</code>.</td></tr>
+      <tr><td>Priorities assigned by importance</td><td>Deadlines missed</td><td>By deadline: shortest gets highest.</td></tr>
+      <tr><td>Reaching for an RTOS by default</td><td>10 KB and a class of bugs, for nothing</td><td>Measure the superloop first.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">9</span>Check yourself</h2>
+
+  <details>
+    <summary>What exactly does a superloop get wrong?</summary>
+    <p>Response time. Every task's period is the sum of all the others' execution times, so one slow operation degrades everything — the measurement above showed a 10 ms sensor deadline stretching to 54 ms because a 50 ms log write sat in front of it. Nothing about the individual functions is wrong; the structure imposes the coupling.</p>
+  </details>
+
+  <details>
+    <summary>Why is a mutex not just a binary semaphore?</summary>
+    <p>Because a mutex records its owner, which allows priority inheritance: while a high-priority task waits, the owner temporarily runs at that priority and cannot be preempted by unrelated medium-priority work. A binary semaphore has no owner and no inheritance, so it permits unbounded priority inversion — the Mars Pathfinder failure.</p>
+  </details>
+
+  <details>
+    <summary>What does "real-time" actually mean?</summary>
+    <p>Predictable, not fast. A system that always responds within 10 ms is real-time; one that usually responds in 1 ms and occasionally takes 50 is not, because the guarantee is what matters. That is why worst-case analysis, not average throughput, is the measure of a real-time design.</p>
+  </details>
+
+  <details>
+    <summary>Why must every task block on something?</summary>
+    <p>Because a preemptive priority scheduler runs the highest-priority ready task, so a high-priority task that never blocks never yields and every lower-priority task starves. Blocking on a delay, a queue, or a semaphore is what lets the scheduler run anything else — and it is also what lets the processor sleep.</p>
+  </details>
+
+  <details>
+    <summary>When should you not use an RTOS?</summary>
+    <p>When a superloop meets every deadline. The kernel costs roughly ten kilobytes plus a stack per task, and it reintroduces races, deadlock, priority inversion, and stack overflow on a machine with no memory protection and no thread sanitizer. Adopt it when you can point at a measured deadline that the simpler design misses.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">10</span>Where this leads</h2>
+  <p>Week 55 is about finding out what went wrong on a device you cannot attach a debugger to: on-chip debugging, tracing on a constrained target, hardware abstraction layers that let firmware be tested on a host, and the simulator-in-the-loop setup this whole block has been using.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_53_Constrained_Resource_Programming.html">← Week 53</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_55_Embedded_Debugging_and_Testing.html">Week 55 →</a>
+</div>
+
+</div>

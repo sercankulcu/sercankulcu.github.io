@@ -1,0 +1,532 @@
+---
+layout: without-sidebar
+title: "Week 51 — Interrupts and Real-Time Behavior"
+permalink: /files/c/Week_51_Interrupts_and_Real_Time_Behavior.html
+excerpt: "The vector table and interrupt service routines, priorities and nesting, sharing data between an ISR and main code, polling versus interrupts, and bounding response time."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Professional · Week 51</div>
+  <h1>Interrupts and Real-Time Behavior</h1>
+  <p class="c-wk-lead">Polling burns the whole processor waiting. An interrupt inverts it: the hardware calls you. That inversion brings back week 41's concurrency problems in their sharpest form — an ISR can interrupt any instruction, and there is no mutex to take.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Install an interrupt handler and explain what the processor does on entry.</li>
+      <li>Reason about priorities, nesting, and latency.</li>
+      <li>Share data with an ISR correctly, and say why <code>volatile</code> alone is not enough.</li>
+      <li>Choose between polling and interrupts with a reason.</li>
+      <li>Measure and bound worst-case response time.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>What happens on an interrupt</h2>
+
+  <p>When a peripheral raises an interrupt, the processor finishes the current instruction and then, in hardware:</p>
+
+  <ol>
+    <li>Pushes enough state to resume — on Cortex-M, eight registers.</li>
+    <li>Looks up the handler address in the vector table.</li>
+    <li>Branches to it.</li>
+  </ol>
+
+  <p>Your handler runs, returns, and the hardware restores the state. The interrupted code continues without knowing anything happened.</p>
+
+  <p>On Cortex-M the vector table from week 49 grows past the first four entries:</p>
+
+<pre><code>__attribute__((section(".vectors"), used))
+void (* const vector_table[])(void) = {
+    (void (*)(void))&amp;_stack_top,   /*  0 initial SP        */
+    reset_handler,                 /*  1 reset             */
+    default_handler,               /*  2 NMI               */
+    hard_fault_handler,            /*  3 hard fault        */
+    0, 0, 0, 0, 0, 0, 0,           /*  4-10 reserved       */
+    default_handler,               /* 11 SVCall            */
+    0, 0,
+    default_handler,               /* 14 PendSV            */
+    systick_handler,               /* 15 SysTick           */
+    /* 16 onwards: device peripherals */
+    gpio_a_handler,                /* IRQ 0                */
+    default_handler,               /* IRQ 1                */
+    uart0_handler,                 /* IRQ 5 on this part   */
+};</code></pre>
+
+  <p>Because the processor branches through this table, an entry left at zero means an unhandled interrupt jumps to address 0 — which on Cortex-M is the stack pointer value, and produces an immediate hard fault. Fill every slot with a default handler rather than leaving gaps.</p>
+
+  <p>On Cortex-M an ISR is an ordinary C function taking no arguments and returning <code>void</code>; the hardware handles saving and restoring. On other architectures a compiler attribute such as <code>__attribute__((interrupt))</code> is required to generate the correct prologue and return instruction.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Priorities, nesting, and latency</h2>
+
+  <p>A higher-priority interrupt preempts a lower one. On Cortex-M, <strong>lower numbers mean higher priority</strong> — priority 0 preempts priority 1 — which is the opposite of most people's expectation.</p>
+
+<pre><code>#define NVIC_ISER0  (*(volatile uint32_t *)0xE000E100u)
+#define NVIC_IPR(n) (*(volatile uint8_t  *)(0xE000E400u + (n)))
+
+NVIC_IPR(5) = 0x40;            /* set a priority for IRQ 5 */
+NVIC_ISER0  = (1u &lt;&lt; 5);       /* enable it */</code></pre>
+
+  <p><strong>Latency</strong> is the time from the hardware event to the first instruction of your handler. It is the sum of three things:</p>
+
+  <table>
+    <thead><tr><th>Contribution</th><th>Typical</th><th>Controlled by</th></tr></thead>
+    <tbody>
+      <tr><td>Hardware entry (stacking, vector fetch)</td><td>~12 cycles on Cortex-M</td><td>Fixed</td></tr>
+      <tr><td>Finishing the current instruction</td><td>1–30 cycles</td><td>Avoid long instructions in critical code</td></tr>
+      <tr><td>Waiting for a higher or equal priority ISR</td><td><strong>unbounded</strong></td><td>You — keep handlers short</td></tr>
+      <tr><td>Waiting for a critical section</td><td><strong>unbounded</strong></td><td>You — keep them shorter still</td></tr>
+    </tbody>
+  </table>
+
+  <p>The last two are the whole of real-time engineering. Worst-case latency is not the average; it is what happens when every other handler and every critical section conspire. A system that meets its deadline 99.99% of the time has missed it, if the deadline was a requirement.</p>
+
+  <div class="c-wk-note">
+    <p><strong>The rule for ISRs: do the minimum and return.</strong> Read the byte, set a flag, enqueue the work. Anything longer delays every other interrupt in the system. The pattern is exactly week 39's signal handler, for the same reason and with harder consequences.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Sharing data with an ISR</h2>
+
+  <p>An ISR and the main loop share memory with no scheduler, no mutex, and no way for the main loop to know when it will be interrupted. Three mechanisms, in increasing strength.</p>
+
+  <h3><code>volatile</code>: necessary, not sufficient</h3>
+
+<pre><code>static volatile bool button_pressed = false;
+
+void gpio_a_handler(void) { button_pressed = true; }
+
+/* main */
+while (!button_pressed) { }          /* volatile keeps the load in the loop */</code></pre>
+
+  <p>Without <code>volatile</code> the main loop caches the value and never sees the change — week 50's hoisting, in a different disguise. With it, a single-word flag works.</p>
+
+  <h3>Atomicity: <code>volatile</code> does not provide it</h3>
+
+<pre><code>static volatile uint32_t tick_count;         /* 32-bit: atomic on Cortex-M */
+static volatile uint64_t micros;             /* 64-bit: NOT atomic         */
+
+/* in main, on a 32-bit machine */
+uint64_t now = micros;     /* two loads; an ISR can run between them */</code></pre>
+
+  <p>A 64-bit read on a 32-bit processor is two instructions. If the ISR updates the value between them, you get the low half of one value and the high half of another — a number that was never correct. Week 41's data race, with no thread library in sight.</p>
+
+  <p>Two fixes. Use <code>&lt;stdatomic.h&gt;</code> where the toolchain supports it, or disable interrupts for the two instructions.</p>
+
+  <h3>Critical sections</h3>
+
+<pre><code>static inline uint32_t enter_critical(void)
+{
+    uint32_t primask;
+    __asm__ volatile ("mrs %0, primask" : "=r"(primask));
+    __asm__ volatile ("cpsid i" ::: "memory");     /* disable interrupts */
+    return primask;                                 /* save the old state */
+}
+
+static inline void exit_critical(uint32_t primask)
+{
+    if ((primask &amp; 1u) == 0) {
+        __asm__ volatile ("cpsie i" ::: "memory"); /* restore only if it
+                                                      was enabled before */
+    }
+}
+
+uint32_t state = enter_critical();
+uint64_t now = micros;                 /* now indivisible */
+exit_critical(state);</code></pre>
+
+  <p>Saving and restoring the previous state matters: an unconditional re-enable inside a function called from an ISR would enable interrupts in the middle of a handler. The <code>"memory"</code> clobber prevents the compiler moving accesses across the boundary.</p>
+
+  <p>A critical section blocks <em>every</em> interrupt, so it directly increases worst-case latency for the whole system. Keep them to a handful of instructions.</p>
+
+  <h3>The lock-free alternative</h3>
+
+  <p>A single-producer, single-consumer ring buffer needs no critical section at all, because each index is written by exactly one side:</p>
+
+<pre><code>static volatile uint8_t  rx_buf[64];
+static volatile uint8_t  rx_head;      /* written only by the ISR   */
+static volatile uint8_t  rx_tail;      /* written only by main      */
+
+/* ISR */
+uint8_t next = (uint8_t)((rx_head + 1u) % 64u);
+if (next != rx_tail) {                 /* drop on overflow */
+    rx_buf[rx_head] = byte;
+    rx_head = next;                    /* publish after the data */
+}</code></pre>
+
+  <p>The ordering of that last write matters: the data must be stored before the index that makes it visible. With <code>volatile</code> the compiler preserves the order; on a weakly ordered processor a barrier would also be needed. This structure is the standard way to get data out of an ISR, and week 54's RTOS queue is the general version of it.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Polling or interrupts?</h2>
+
+  <table>
+    <thead><tr><th>Polling</th><th>Interrupts</th></tr></thead>
+    <tbody>
+      <tr><td>Simple; no concurrency</td><td>Concurrent with everything</td></tr>
+      <tr><td>Deterministic timing</td><td>Latency varies with system load</td></tr>
+      <tr><td>Wastes the processor while waiting</td><td>The core can sleep</td></tr>
+      <tr><td>Fine for a fast, predictable device</td><td>Necessary for rare or urgent events</td></tr>
+      <tr><td>Response bounded by the loop period</td><td>Response in microseconds</td></tr>
+    </tbody>
+  </table>
+
+  <p>Polling is not primitive — a tight loop reading a sensor at a known rate is often the right design, and it is far easier to reason about. Interrupts earn their complexity when events are rare, urgent, or when the processor should be asleep between them.</p>
+
+  <h3>Debouncing</h3>
+
+  <p>A mechanical switch does not close once; it bounces for several milliseconds, generating dozens of edges. An interrupt per edge produces dozens of events for one press.</p>
+
+<pre><code>/* In the ISR: ignore anything within the bounce window. */
+void gpio_a_handler(void)
+{
+    uint32_t now = tick_count;
+    if (now - last_press &gt;= DEBOUNCE_TICKS) {
+        last_press = now;
+        button_events++;
+    }
+    GPIO_ICR = PIN_MASK;           /* W1C: acknowledge — week 50 */
+}</code></pre>
+
+  <p>Forgetting that last line is the classic interrupt bug: the peripheral keeps the request asserted, so the handler re-enters immediately and the system appears to hang.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Worked example: polling against interrupts, measured</h2>
+
+  <p>Continuing week 49's QEMU target. SysTick provides a periodic interrupt; the UART provides an asynchronous one.</p>
+
+<pre><code>/* interrupts.c */
+#include &lt;stdint.h&gt;
+#include &lt;stdbool.h&gt;
+
+/* ---------- registers (week 50) ---------- */
+
+typedef struct {
+    volatile uint32_t DR, RSR_ECR;
+    uint32_t r0[4];
+    volatile uint32_t FR;
+    uint32_t r1;
+    volatile uint32_t ILPR, IBRD, FBRD, LCRH, CTL, IFLS, IM, RIS, MIS, ICR;
+} UART_Type;
+
+#define UART0 ((UART_Type *)0x4000C000u)
+#define FR_RXFE (1u &lt;&lt; 4)
+#define FR_TXFF (1u &lt;&lt; 5)
+#define IM_RXIM (1u &lt;&lt; 4)
+#define ICR_RXIC (1u &lt;&lt; 4)
+
+/* SysTick, in the core peripheral region */
+#define SYST_CSR  (*(volatile uint32_t *)0xE000E010u)
+#define SYST_RVR  (*(volatile uint32_t *)0xE000E014u)
+#define SYST_CVR  (*(volatile uint32_t *)0xE000E018u)
+
+/* NVIC */
+#define NVIC_ISER0 (*(volatile uint32_t *)0xE000E100u)
+#define UART0_IRQ  5
+
+/* ---------- shared state ---------- */
+
+/* 32-bit and volatile: a single load or store on this machine. */
+static volatile uint32_t tick_count = 0;
+
+/* 64-bit: NOT atomic on a 32-bit core. Needs a critical section. */
+static volatile uint64_t micros = 0;
+
+/* Single-producer single-consumer ring: no critical section needed. */
+#define RX_SIZE 64
+static volatile uint8_t rx_buf[RX_SIZE];
+static volatile uint8_t rx_head = 0;      /* ISR writes  */
+static volatile uint8_t rx_tail = 0;      /* main writes */
+
+static volatile uint32_t isr_entries = 0;
+static volatile uint32_t rx_dropped  = 0;
+
+/* ---------- critical sections ---------- */
+
+static inline uint32_t enter_critical(void)
+{
+    uint32_t primask;
+    __asm__ volatile ("mrs %0, primask" : "=r"(primask));
+    __asm__ volatile ("cpsid i" ::: "memory");
+    return primask;
+}
+
+static inline void exit_critical(uint32_t primask)
+{
+    if ((primask &amp; 1u) == 0) {
+        __asm__ volatile ("cpsie i" ::: "memory");
+    }
+}
+
+/* ---------- handlers: short, and they acknowledge ---------- */
+
+void systick_handler(void)
+{
+    tick_count++;
+    micros += 1000;          /* read-modify-write of a 64-bit value,
+                                but only this ISR touches it */
+}
+
+void uart0_handler(void)
+{
+    isr_entries++;
+
+    while ((UART0-&gt;FR &amp; FR_RXFE) == 0) {          /* drain the FIFO */
+        uint8_t byte = (uint8_t)(UART0-&gt;DR &amp; 0xFFu);
+
+        uint8_t next = (uint8_t)((rx_head + 1u) % RX_SIZE);
+        if (next == rx_tail) {
+            rx_dropped++;                          /* buffer full */
+        } else {
+            rx_buf[rx_head] = byte;
+            rx_head = next;                        /* publish after the data */
+        }
+    }
+
+    UART0-&gt;ICR = ICR_RXIC;    /* acknowledge, or we re-enter forever */
+}
+
+/* ---------- consumer side ---------- */
+
+static bool rx_get(uint8_t *out)
+{
+    if (rx_tail == rx_head) return false;          /* empty */
+    *out = rx_buf[rx_tail];
+    rx_tail = (uint8_t)((rx_tail + 1u) % RX_SIZE);
+    return true;
+}
+
+/* ---------- output ---------- */
+
+static void putc_raw(char c)
+{
+    while (UART0-&gt;FR &amp; FR_TXFF) { }
+    UART0-&gt;DR = (uint32_t)(unsigned char)c;
+}
+
+static void puts_raw(const char *s)
+{
+    for (; *s; s++) { if (*s == '\n') putc_raw('\r'); putc_raw(*s); }
+}
+
+static void put_uint(uint32_t v)
+{
+    char t[11]; int i = 0;
+    if (v == 0) { putc_raw('0'); return; }
+    while (v) { t[i++] = (char)('0' + v % 10); v /= 10; }
+    while (i) putc_raw(t[--i]);
+}
+
+static void put_u64(uint64_t v)
+{
+    char t[21]; int i = 0;
+    if (v == 0) { putc_raw('0'); return; }
+    while (v) { t[i++] = (char)('0' + (uint32_t)(v % 10)); v /= 10; }
+    while (i) putc_raw(t[--i]);
+}
+
+/* ---------- setup ---------- */
+
+static void systick_init(uint32_t reload)
+{
+    SYST_RVR = reload - 1u;
+    SYST_CVR = 0;
+    SYST_CSR = 0x7u;            /* enable, interrupt, processor clock */
+}
+
+static void uart_irq_init(void)
+{
+    UART0-&gt;IM  = IM_RXIM;       /* interrupt when a byte arrives */
+    UART0-&gt;ICR = 0x7FFu;        /* clear anything pending */
+    NVIC_ISER0 = (1u &lt;&lt; UART0_IRQ);
+}
+
+int main(void)
+{
+    UART0-&gt;CTL = 0;
+    UART0-&gt;IBRD = 10; UART0-&gt;FBRD = 54;
+    UART0-&gt;LCRH = (3u &lt;&lt; 5) | (1u &lt;&lt; 4);
+    UART0-&gt;CTL = 1u | (1u &lt;&lt; 8) | (1u &lt;&lt; 9);
+
+    puts_raw("\n=== interrupts ===\n");
+
+    /* --- 1. polling: the processor is fully occupied --- */
+    puts_raw("\npolling for a character (type one):\n");
+    uint32_t spins = 0;
+    while (UART0-&gt;FR &amp; FR_RXFE) {
+        spins++;                       /* every cycle wasted */
+    }
+    uint8_t first = (uint8_t)(UART0-&gt;DR &amp; 0xFFu);
+    puts_raw("  got '"); putc_raw((char)first);
+    puts_raw("' after "); put_uint(spins); puts_raw(" wasted iterations\n");
+
+    /* --- 2. interrupts: the loop does other work --- */
+    systick_init(18000);               /* about 1 kHz */
+    uart_irq_init();
+    puts_raw("\ninterrupts enabled; type freely, 'q' ends\n");
+
+    uint32_t loop_iterations = 0;
+    uint32_t received = 0;
+    bool     done = false;
+
+    while (!done) {
+        loop_iterations++;             /* real work would go here */
+
+        uint8_t byte;
+        while (rx_get(&amp;byte)) {
+            received++;
+            if (byte == 'q') { done = true; break; }
+            puts_raw("  rx '"); putc_raw((char)byte);
+            puts_raw("' at tick "); put_uint(tick_count); puts_raw("\n");
+        }
+
+        if (tick_count % 5000 == 0 &amp;&amp; tick_count &gt; 0) {
+            puts_raw("  ... 5000 ticks, loop still running\n");
+            while (tick_count % 5000 == 0) { }   /* print once */
+        }
+    }
+
+    /* --- 3. the 64-bit read needs protection --- */
+    puts_raw("\nreading a 64-bit counter:\n");
+
+    uint64_t unsafe = micros;                    /* two loads, interruptible */
+    puts_raw("  without a critical section: "); put_u64(unsafe);
+    puts_raw("\n");
+
+    uint32_t state = enter_critical();
+    uint64_t safe = micros;                      /* indivisible */
+    exit_critical(state);
+    puts_raw("  with one                  : "); put_u64(safe);
+    puts_raw("\n  on a 32-bit core the first is two loads; an ISR\n");
+    puts_raw("  between them yields a value that never existed\n");
+
+    /* --- 4. what it cost --- */
+    puts_raw("\nstatistics\n");
+    puts_raw("  ticks           : "); put_uint(tick_count);  puts_raw("\n");
+    puts_raw("  uart interrupts : "); put_uint(isr_entries); puts_raw("\n");
+    puts_raw("  bytes received  : "); put_uint(received);    puts_raw("\n");
+    puts_raw("  bytes dropped   : "); put_uint(rx_dropped);  puts_raw("\n");
+    puts_raw("  loop iterations : "); put_uint(loop_iterations);
+    puts_raw("\n  the loop kept running the whole time — that is the point\n");
+
+    for (;;) { }
+}</code></pre>
+
+  <p>Add <code>systick_handler</code> and <code>uart0_handler</code> to the vector table from week 49, at indices 15 and 16 + 5.</p>
+
+<pre><code>arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb \
+    -ffreestanding -nostdlib -O2 -Wall -Wextra -g \
+    -T firmware.ld -o firmware.elf startup.c interrupts.c
+
+qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf</code></pre>
+
+  <h3>What the two phases show</h3>
+
+  <p>The polling phase reports millions of wasted iterations for one character. Every one of those cycles was available for other work and was spent asking "is it here yet".</p>
+
+  <p>The interrupt phase runs the main loop continuously while characters arrive. The loop counter keeps climbing, the tick counter advances, and bytes appear — three things happening without any of them waiting for the others.</p>
+
+  <h3>Forget to acknowledge</h3>
+
+  <p>Comment out <code>UART0-&gt;ICR = ICR_RXIC;</code> and rerun. The moment a byte arrives, the system appears to freeze: the peripheral still asserts the request, so the handler returns and is immediately re-entered, forever. The main loop never runs again.</p>
+
+  <p>This is the most common interrupt bug and the symptom — a hang with no crash — gives no clue. Add <code>isr_entries</code> to a watchpoint in GDB and you will see it climbing at millions per second.</p>
+
+  <h3>Remove <code>volatile</code> from <code>tick_count</code></h3>
+
+<pre><code>static uint32_t tick_count = 0;         /* no volatile */
+…
+while (tick_count &lt; 100) { }            /* in main */</code></pre>
+
+  <p>At <code>-O2</code> the loop never exits: the compiler hoisted the load, exactly as in week 50, and no interrupt can change a value held in a register. At <code>-O0</code> it works. This is the same lesson as the UART flag, now with the ISR as the invisible writer.</p>
+
+  <h3>Measure the response time</h3>
+
+<pre><code>/* in the ISR */
+uint32_t entry_cycle = SYST_CVR;     /* SysTick counts down */
+
+/* compare against the value captured when the event was triggered */</code></pre>
+
+  <p>SysTick's current-value register gives a cycle-resolution timer. Capture it at the start of the ISR and compare with a value captured just before the triggering event; the difference is the latency, in processor cycles. Under QEMU the absolute numbers are not those of real silicon, but the <em>relative</em> effect is faithful: add a long critical section to the main loop and watch the worst case grow.</p>
+
+<pre><code>uint32_t s = enter_critical();
+for (volatile int i = 0; i &lt; 10000; i++) { }    /* a terrible idea */
+exit_critical(s);</code></pre>
+
+  <p>Every interrupt in the system is delayed by the whole of that loop. That is why the rule is not "keep critical sections short" as a style preference — it is the mechanism by which one function's carelessness becomes another subsystem's missed deadline.</p>
+
+  <h3>Overflow the ring buffer</h3>
+
+<pre><code>printf 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' \
+    | qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf</code></pre>
+
+  <p><code>rx_dropped</code> becomes non-zero. The buffer is 64 bytes and the main loop consumed slowly, so the ISR had to discard. Dropping is a deliberate choice — the alternatives are blocking in the ISR, which is never acceptable, or an unbounded buffer, which is not available. Choosing and reporting the drop is the correct design; silently overwriting is not.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Not acknowledging the interrupt</td><td>Handler re-enters forever; system hangs</td><td>Clear the source before returning.</td></tr>
+      <tr><td>Missing <code>volatile</code> on shared state</td><td>Main loop never sees the ISR's write</td><td><code>volatile</code> on everything shared.</td></tr>
+      <tr><td>Assuming <code>volatile</code> gives atomicity</td><td>Torn 64-bit reads</td><td>Critical section, or an atomic type.</td></tr>
+      <tr><td>A long ISR</td><td>Every other interrupt is delayed</td><td>Set a flag; do the work in the loop.</td></tr>
+      <tr><td>A long critical section</td><td>Worst-case latency grows for everything</td><td>A handful of instructions only.</td></tr>
+      <tr><td>Unconditionally re-enabling interrupts</td><td>Enables them inside a handler</td><td>Save and restore the previous state.</td></tr>
+      <tr><td>An empty vector table slot</td><td>Unhandled interrupt jumps to address 0</td><td>Fill every entry with a default handler.</td></tr>
+      <tr><td>No debouncing</td><td>Dozens of events per button press</td><td>Ignore edges within the bounce window.</td></tr>
+      <tr><td><code>printf</code> or <code>malloc</code> in an ISR</td><td>Re-entrancy corruption</td><td>Same rule as week 39's signal handlers.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">7</span>Check yourself</h2>
+
+  <details>
+    <summary>Why must an ISR acknowledge the interrupt source?</summary>
+    <p>Because the peripheral keeps its request asserted until told the event has been handled. Returning without clearing it means the processor immediately takes the interrupt again, so the handler re-enters in an endless loop and the main program never runs. The symptom is a hang with no crash and no diagnostic.</p>
+  </details>
+
+  <details>
+    <summary>Why is <code>volatile</code> necessary but not sufficient for ISR-shared data?</summary>
+    <p>Necessary because without it the main loop caches the value in a register and never observes the ISR's write. Insufficient because it says nothing about atomicity: a 64-bit variable on a 32-bit core is read in two instructions, and an interrupt between them yields half of one value and half of another. That needs a critical section or an atomic type.</p>
+  </details>
+
+  <details>
+    <summary>Why does a long critical section hurt the whole system?</summary>
+    <p>Because disabling interrupts blocks every one of them, not just the one you are protecting against. Worst-case latency for every subsystem grows by the length of the longest critical section anywhere in the program — so one careless function can cause another's deadline to be missed.</p>
+  </details>
+
+  <details>
+    <summary>Why does a single-producer single-consumer ring buffer need no lock?</summary>
+    <p>Because each index is written by exactly one side: the ISR advances the head, the main loop advances the tail, and each only reads the other's. No value is ever modified by both, so there is no read-modify-write to be interrupted. The remaining requirement is ordering — the data must be stored before the index that publishes it.</p>
+  </details>
+
+  <details>
+    <summary>When is polling the better choice?</summary>
+    <p>When the event is frequent and predictable, when the timing must be deterministic, or when the code simplicity is worth more than the wasted cycles. A tight loop reading a sensor at a known rate has no concurrency, no shared state, and no latency variance. Interrupts earn their complexity for rare or urgent events, and when the processor should sleep between them.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Where this leads</h2>
+  <p>Week 52 opens the linker script that has been quietly making all of this work — where the vector table lands, why <code>.data</code> is stored in one place and addressed in another, and how to prove from the map file that the image is laid out as intended.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_50_Memory_Mapped_IO_and_Registers.html">← Week 50</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_52_Linker_Scripts_and_Firmware_Layout.html">Week 52 →</a>
+</div>
+
+</div>
