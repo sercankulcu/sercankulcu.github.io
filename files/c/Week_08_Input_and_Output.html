@@ -1,0 +1,380 @@
+---
+layout: without-sidebar
+title: "Week 8 — Formatted Input and Output"
+permalink: /files/c/Week_08_Input_and_Output.html
+excerpt: "printf specifiers, width and precision; scanf and why it is harder than it looks; the input buffer, error recovery, and building a prompt that cannot be broken by bad input."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Basic · Week 8</div>
+  <h1>Formatted Input and Output</h1>
+  <p class="c-wk-lead">Output is straightforward once you know the specifiers. Input is not. <code>scanf</code> is the function most likely to make a beginner's program hang, loop forever, or silently read nothing — and understanding why teaches you more about C than the function itself is worth.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Format output precisely with width, precision, and flags.</li>
+      <li>Match every specifier to its argument type, and explain why a mismatch is undefined behavior.</li>
+      <li>Explain what the input buffer is and why <code>scanf</code> leaves things in it.</li>
+      <li>Check the return value of <code>scanf</code> and recover from malformed input.</li>
+      <li>Write an input loop that cannot be made to hang or spin by any input at all.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span><code>printf</code> in detail</h2>
+
+  <p>A conversion specification has up to five parts, in this order:</p>
+
+<pre><code>%[flags][width][.precision][length]conversion</code></pre>
+
+  <h3>Conversions</h3>
+  <table>
+    <thead><tr><th>Specifier</th><th>Argument type</th><th>Prints</th></tr></thead>
+    <tbody>
+      <tr><td><code>%d</code> <code>%i</code></td><td><code>int</code></td><td>signed decimal</td></tr>
+      <tr><td><code>%u</code></td><td><code>unsigned int</code></td><td>unsigned decimal</td></tr>
+      <tr><td><code>%x</code> <code>%X</code></td><td><code>unsigned int</code></td><td>hexadecimal, lower or upper case</td></tr>
+      <tr><td><code>%o</code></td><td><code>unsigned int</code></td><td>octal</td></tr>
+      <tr><td><code>%f</code></td><td><code>double</code></td><td>fixed notation, 6 decimals by default</td></tr>
+      <tr><td><code>%e</code> <code>%E</code></td><td><code>double</code></td><td>scientific notation</td></tr>
+      <tr><td><code>%g</code> <code>%G</code></td><td><code>double</code></td><td>whichever of <code>%f</code>/<code>%e</code> is shorter</td></tr>
+      <tr><td><code>%c</code></td><td><code>int</code> (promoted char)</td><td>one character</td></tr>
+      <tr><td><code>%s</code></td><td><code>char *</code></td><td>characters up to the terminating <code>'\0'</code></td></tr>
+      <tr><td><code>%p</code></td><td><code>void *</code></td><td>an address</td></tr>
+      <tr><td><code>%%</code></td><td>—</td><td>a literal <code>%</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Length modifiers</h3>
+  <p>These adjust the expected argument size and are not optional when the type is not <code>int</code> or <code>double</code>.</p>
+
+  <table>
+    <thead><tr><th>Write</th><th>For</th></tr></thead>
+    <tbody>
+      <tr><td><code>%ld</code></td><td><code>long</code></td></tr>
+      <tr><td><code>%lld</code></td><td><code>long long</code></td></tr>
+      <tr><td><code>%zu</code></td><td><code>size_t</code></td></tr>
+      <tr><td><code>%hd</code></td><td><code>short</code></td></tr>
+      <tr><td><code>%Lf</code></td><td><code>long double</code></td></tr>
+    </tbody>
+  </table>
+
+  <p>There is no modifier for <code>float</code>, because a <code>float</code> argument is automatically promoted to <code>double</code> when passed to a variadic function. <code>%f</code> is correct for both.</p>
+
+  <h3>Width, precision, and flags</h3>
+<pre><code>printf("[%5d]\n",    42);       /* [   42]  width 5, right aligned */
+printf("[%-5d]\n",   42);       /* [42   ]  left aligned           */
+printf("[%05d]\n",   42);       /* [00042]  zero padded            */
+printf("[%+d]\n",    42);       /* [+42]    always show the sign   */
+printf("[%8.3f]\n",  3.14159);  /* [   3.142]                      */
+printf("[%.2f]\n",   3.14159);  /* [3.14]   two decimals           */
+printf("[%.3s]\n",   "abcdef"); /* [abc]    first three characters */
+printf("[%*d]\n", 6, 42);       /* [    42] width from an argument */</code></pre>
+
+  <p>For <code>%f</code> precision means digits after the point; for <code>%g</code> it means total significant digits; for <code>%s</code> it means a maximum number of characters. Columns line up when you combine width with left alignment, which is how the type table in week 5 was printed.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>A mismatched specifier is undefined behavior, not a formatting quirk.</strong> <code>printf("%d", 3.14)</code> makes <code>printf</code> read an <code>int</code>-sized piece of a <code>double</code>'s bits. <code>printf("%s", 42)</code> makes it treat 42 as an address and read memory there — usually a crash. <code>printf</code> cannot check: it receives no type information at run time, only the promise your format string made. Week 30 explains the variadic mechanism that makes this unavoidable.</p>
+  </div>
+
+  <p>The compiler does check, though, when it can see the format string as a literal. This is one of the most valuable warnings <code>-Wall</code> provides:</p>
+<pre><code>warning: format '%d' expects argument of type 'int',
+         but argument 2 has type 'double' [-Wformat=]</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>The input buffer</h2>
+
+  <p>Before <code>scanf</code> makes sense, the buffer does.</p>
+
+  <p>When you type at a terminal, your keystrokes do not reach the program one at a time. The operating system collects a whole line and hands it over only when you press Enter. That line — <em>including the newline character</em> — sits in a buffer belonging to <code>stdin</code>. Input functions consume characters from that buffer; anything they do not consume stays there for the next call.</p>
+
+  <p>Almost every <code>scanf</code> problem is a consequence of that last sentence.</p>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 700 130" role="img" aria-label="Keyboard input passes into a line buffer; scanf consumes part of it and leaves the rest, including the newline" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="8" y="46" width="110" height="44" rx="10"/>
+        <rect x="190" y="30" width="300" height="44" rx="10"/>
+        <rect x="560" y="46" width="130" height="44" rx="10"/>
+      </g>
+      <g stroke="currentColor" stroke-width="1.5" opacity=".5">
+        <path d="M118 68h72M490 60h70"/>
+        <path d="M182 63l8 5-8 5M552 55l8 5-8 5" fill="none"/>
+      </g>
+      <g stroke="currentColor" stroke-width="1" opacity=".45" stroke-dasharray="4 3">
+        <path d="M341 30v44"/>
+      </g>
+      <g fill="currentColor" font-size="12.5" text-anchor="middle" font-family="inherit">
+        <text x="63" y="66">keyboard</text><text x="63" y="81" opacity=".6">42 ⏎</text>
+        <text x="265" y="55">4 2</text><text x="416" y="55">\n</text>
+        <text x="625" y="66">scanf("%d")</text><text x="625" y="81" opacity=".6">reads 42</text>
+      </g>
+      <g fill="currentColor" font-size="11.5" text-anchor="middle" opacity=".7" font-family="inherit">
+        <text x="265" y="98">consumed</text>
+        <text x="416" y="98">left behind</text>
+        <text x="350" y="120" opacity=".85">the newline is still in the buffer when scanf returns</text>
+      </g>
+    </svg>
+    <p class="c-wk-cap"><code>scanf("%d")</code> stops at the first character that cannot be part of a number — and the newline is one.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span><code>scanf</code> and its three failure modes</h2>
+
+  <p><code>scanf</code> takes a format string and the <em>addresses</em> of the variables to fill:</p>
+
+<pre><code>int age;
+scanf("%d", &amp;age);      /* note the &amp; */</code></pre>
+
+  <p>The <code>&amp;</code> is the address-of operator from week 13. For now, take it as required: <code>scanf</code> must be able to write into your variable, so it needs to know where the variable lives. Forgetting it is the single most common <code>scanf</code> bug, and it corrupts memory rather than failing cleanly.</p>
+
+  <h3>It returns a count, and you must check it</h3>
+  <p><code>scanf</code> returns the number of items it successfully assigned, or <code>EOF</code> if the input ended first.</p>
+
+<pre><code>int age;
+if (scanf("%d", &amp;age) != 1) {
+    fprintf(stderr, "that was not a number\n");
+    return EXIT_FAILURE;
+}</code></pre>
+
+  <p>A program that ignores this return value has no idea whether its variables were filled. If the user types <code>abc</code>, <code>scanf</code> returns 0, <code>age</code> keeps whatever it had before — possibly garbage, per week 5 — and the program proceeds on nonsense.</p>
+
+  <h3>Failure mode 1 — the leftover newline</h3>
+<pre><code>int age;
+char initial;
+
+scanf("%d", &amp;age);      /* consumes 42, leaves '\n'        */
+scanf("%c", &amp;initial);  /* reads '\n' instantly, no pause  */</code></pre>
+
+  <p>The second prompt appears to be skipped. It was not: it read the newline the first call left behind. <code>%d</code>, <code>%f</code>, and <code>%s</code> all skip leading whitespace, but <code>%c</code> does not — it takes whatever is next, including a newline.</p>
+
+  <p>The conventional patch is a space in the format string, which means "skip any whitespace here":</p>
+<pre><code>scanf(" %c", &amp;initial);   /* the leading space fixes it */</code></pre>
+
+  <h3>Failure mode 2 — the infinite loop</h3>
+<pre><code>int n;
+while (scanf("%d", &amp;n) != 1) {
+    puts("please enter a number");
+}</code></pre>
+
+  <p>Type <code>abc</code> and this loop runs forever. <code>scanf</code> encounters <code>a</code>, finds it cannot be part of an integer, returns 0 — and <strong>leaves <code>abc</code> in the buffer</strong>. The next iteration meets the same characters and fails identically, as fast as the processor can manage.</p>
+
+  <p>Recovery requires explicitly discarding the bad input:</p>
+<pre><code>static void discard_line(void)
+{
+    int c;
+    while ((c = getchar()) != '\n' &amp;&amp; c != EOF) {
+        /* throw away the rest of the line */
+    }
+}</code></pre>
+
+  <h3>Failure mode 3 — <code>%s</code> and buffer overflow</h3>
+<pre><code>char name[10];
+scanf("%s", name);      /* no bound: 50 characters will be written */</code></pre>
+
+  <p>This is the same class of defect as <code>gets</code>, which week 1 told you never to use. <code>%s</code> writes until it meets whitespace, with no regard for how large your array is. Always give a width, one less than the array size to leave room for the terminator:</p>
+
+<pre><code>char name[10];
+scanf("%9s", name);     /* at most 9 characters plus '\0' */</code></pre>
+
+  <div class="c-wk-note">
+    <p><strong>What professionals actually do.</strong> Most production C reads a whole line with <code>fgets</code> and then parses it with <code>strtol</code> or <code>sscanf</code>. That separates "get the input" from "interpret the input", which makes error handling straightforward and leaves nothing unpredictable in the buffer. Week 23 builds exactly that. Learn <code>scanf</code> because you will meet it in every textbook and much existing code — then prefer the alternative.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Character-at-a-time input and output</h2>
+
+<pre><code>int c = getchar();      /* one character, or EOF */
+putchar(c);             /* one character out     */</code></pre>
+
+  <p>Note the type: <code>getchar</code> returns <code>int</code>, not <code>char</code>. It must be able to return every possible character <em>and</em> the distinct value <code>EOF</code>, which is negative. Storing the result in a <code>char</code> destroys that distinction and can make the end-of-input test fail — on a machine where plain <code>char</code> is unsigned, it can loop forever.</p>
+
+<pre><code>int c;                             /* correct */
+while ((c = getchar()) != EOF) {
+    putchar(c);
+}</code></pre>
+
+  <p>That loop copies standard input to standard output — the whole of the Unix <code>cat</code> command, and a useful shape to recognize. The extra parentheses around the assignment are required, because <code>=</code> binds looser than <code>!=</code> (week 6).</p>
+
+  <p>End of input from a terminal is Ctrl-D on Linux and macOS, Ctrl-Z then Enter on Windows.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Worked example: an input loop that cannot be broken</h2>
+
+  <p>The goal: read an integer between 1 and 100. Accept correct input, reject everything else with a clear message, and never hang or spin regardless of what is typed — including no input at all.</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdbool.h&gt;
+
+/* Throw away the remainder of the current input line.
+   Returns false if input ended while doing so. */
+static bool discard_line(void)
+{
+    int c;
+    while ((c = getchar()) != '\n') {
+        if (c == EOF) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/* Read one integer in [low, high].
+   Returns false only if input ends; otherwise keeps asking. */
+static bool read_int_in_range(const char *prompt, int low, int high, int *out)
+{
+    for (;;) {
+        printf("%s (%d-%d): ", prompt, low, high);
+        fflush(stdout);
+
+        int value;
+        int converted = scanf("%d", &amp;value);
+
+        if (converted == EOF) {
+            putchar('\n');
+            return false;                    /* Ctrl-D, or piped input ran out */
+        }
+
+        if (converted == 0) {
+            fprintf(stderr, "  not a number — try again\n");
+            if (!discard_line()) {           /* essential: remove the bad text */
+                return false;
+            }
+            continue;
+        }
+
+        if (!discard_line()) {               /* remove the trailing newline
+                                                and anything after the number */
+            return false;
+        }
+
+        if (value &lt; low || value &gt; high) {
+            fprintf(stderr, "  %d is out of range — try again\n", value);
+            continue;
+        }
+
+        *out = value;
+        return true;
+    }
+}
+
+int main(void)
+{
+    int score;
+    if (!read_int_in_range("Enter a score", 1, 100, &amp;score)) {
+        fprintf(stderr, "no input; giving up\n");
+        return EXIT_FAILURE;
+    }
+
+    printf("\n%-12s %s\n", "score", "bar");
+    printf("%-12d ", score);
+    for (int i = 0; i &lt; score / 5; i++) {
+        putchar('#');
+    }
+    printf("\n%-12s %6.1f%%\n", "as percent", (double)score);
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o prompt prompt.c
+./prompt</code></pre>
+
+  <h3>Test it properly</h3>
+  <p>Try each of these. A correct program survives all six.</p>
+
+  <table>
+    <thead><tr><th>Input</th><th>Expected</th></tr></thead>
+    <tbody>
+      <tr><td><code>42</code></td><td>accepted</td></tr>
+      <tr><td><code>abc</code></td><td>rejected once, prompts again — does not spin</td></tr>
+      <tr><td><code>999</code></td><td>rejected as out of range</td></tr>
+      <tr><td><code>42abc</code></td><td>accepts 42, discards the rest of the line</td></tr>
+      <tr><td>Enter on its own</td><td>prompts again</td></tr>
+      <tr><td>Ctrl-D</td><td>exits cleanly with a failure status</td></tr>
+    </tbody>
+  </table>
+
+  <p>And from a script, which is how real programs are usually driven:</p>
+<pre><code>echo "42" | ./prompt          ; echo "exit status $?"
+echo "abc" | ./prompt         ; echo "exit status $?"
+printf "" | ./prompt          ; echo "exit status $?"</code></pre>
+
+  <p>The third case — empty input — is the one hand-testing always misses. <code>scanf</code> returns <code>EOF</code> immediately, and a loop that only checks for 0 would never terminate.</p>
+
+  <h3>Three details worth noting</h3>
+
+  <p><strong><code>fflush(stdout)</code> after the prompt.</strong> Standard output to a terminal is line-buffered, so a prompt with no trailing newline may not appear before the program blocks waiting for input. Flushing forces it out. Week 26 covers buffering properly.</p>
+
+  <p><strong>Errors go to <code>stderr</code>, results to <code>stdout</code>.</strong> That separation lets a user redirect the data without losing the diagnostics — <code>./prompt &gt; results.txt</code> still shows the error messages. Week 31 makes this a design rule.</p>
+
+  <p><strong>Three distinct outcomes, three distinct responses.</strong> <code>EOF</code>, a conversion failure, and a valid-but-out-of-range value are different situations and the code treats them differently. Collapsing them into one "bad input" branch is how programs end up hanging.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>scanf("%d", age)</code> without <code>&amp;</code></td><td>Memory corruption or a crash</td><td>Pass the address. <code>-Wall</code> catches this one.</td></tr>
+      <tr><td>Ignoring <code>scanf</code>'s return value</td><td>Program proceeds on an unassigned variable</td><td>Compare it with the number of items you asked for.</td></tr>
+      <tr><td>Retrying <code>scanf</code> without discarding input</td><td>Infinite loop at full speed</td><td>Consume the rest of the line before retrying.</td></tr>
+      <tr><td><code>scanf("%c", &amp;ch)</code> after <code>%d</code></td><td>Reads the leftover newline</td><td><code>scanf(" %c", &amp;ch)</code> — note the space.</td></tr>
+      <tr><td><code>scanf("%s", buf)</code> with no width</td><td>Buffer overflow</td><td><code>%9s</code> for a 10-byte array.</td></tr>
+      <tr><td><code>char c = getchar();</code></td><td><code>EOF</code> becomes indistinguishable from a character</td><td>Declare <code>int c</code>.</td></tr>
+      <tr><td>Prompt not appearing before input</td><td>Program looks frozen</td><td><code>fflush(stdout)</code>, or end the prompt with <code>\n</code>.</td></tr>
+      <tr><td>Checking only for 0, never <code>EOF</code></td><td>Infinite loop on empty or piped input</td><td>Handle <code>EOF</code> as its own case.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">7</span>Check yourself</h2>
+
+  <details>
+    <summary>Why does the second prompt seem to be skipped when a <code>%c</code> read follows a <code>%d</code> read?</summary>
+    <p>Because <code>%d</code> stops at the newline and leaves it in the input buffer. <code>%c</code> does not skip whitespace, so it immediately consumes that leftover newline and returns without waiting. Writing <code>" %c"</code> — with a leading space — tells <code>scanf</code> to skip whitespace first.</p>
+  </details>
+
+  <details>
+    <summary>Why does <code>while (scanf("%d", &amp;n) != 1) puts("try again");</code> spin forever on letters?</summary>
+    <p><code>scanf</code> stops at the first character it cannot convert and leaves that character in the buffer. Each iteration sees the same offending text, fails identically, and loops. You must explicitly consume the rest of the line before retrying.</p>
+  </details>
+
+  <details>
+    <summary>Why must <code>getchar</code>'s result be stored in an <code>int</code>?</summary>
+    <p>It returns every possible character value plus a distinct <code>EOF</code>, which is negative. A <code>char</code> cannot represent all of those distinctly. Where plain <code>char</code> is unsigned, <code>EOF</code> becomes a positive value and the end-of-input test never succeeds.</p>
+  </details>
+
+  <details>
+    <summary>Why can <code>printf</code> not detect that you passed a <code>double</code> where <code>%d</code> was written?</summary>
+    <p>Because it is a variadic function: at run time it receives no type information about the extra arguments, only the format string's claim about them. It reads bytes according to that claim. The compiler can check when the format string is a literal — which is what <code>-Wformat</code> does — but the function itself cannot. Week 30 builds a variadic function and shows why.</p>
+  </details>
+
+  <details>
+    <summary>Your interactive program works, but breaks when someone pipes input to it. What did you probably forget?</summary>
+    <p>To handle <code>EOF</code>. Interactively the user keeps typing until the program is satisfied; piped input simply runs out, and <code>scanf</code> returns <code>EOF</code> rather than 0. Code that only distinguishes success from conversion failure loops forever once input ends. Always test with <code>printf "" | ./prog</code>.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Where this leads</h2>
+  <p>You can now get data in and out of a program and defend it against bad input. Weeks 9 and 10 give you the control structures to act on that data — conditionals and loops — which turns these fragments into programs that decide and repeat. The input-validation pattern built here returns in week 23, rewritten with <code>fgets</code> and <code>strtol</code>, and again in week 48, where a fuzzer attacks it.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_07_Type_Conversions.html">← Week 7</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_09_Conditional_Statements.html">Week 9 →</a>
+</div>
+
+</div>

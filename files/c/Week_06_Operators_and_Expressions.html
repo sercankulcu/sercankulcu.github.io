@@ -1,0 +1,334 @@
+---
+layout: without-sidebar
+title: "Week 6 — Operators and Expressions"
+permalink: /files/c/Week_06_Operators_and_Expressions.html
+excerpt: "Arithmetic, relational and logical operators; assignment and increment; precedence and associativity; and the difference between what C evaluates and what order it evaluates it in."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Basic · Week 6</div>
+  <h1>Operators and Expressions</h1>
+  <p class="c-wk-lead">Operators are the part of C that looks most familiar and hides the most surprises. Precedence decides what an expression <em>means</em>; evaluation order decides <em>when</em> each piece happens — and C deliberately leaves much of the second unspecified.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Use every arithmetic, relational, and logical operator correctly, including <code>%</code> with negative operands.</li>
+      <li>Predict the result of an expression from the precedence and associativity tables.</li>
+      <li>Explain the difference between <code>i++</code> and <code>++i</code> and when it matters.</li>
+      <li>Explain why short-circuit evaluation is a guarantee you can rely on, and argument evaluation order is not.</li>
+      <li>Recognize an expression whose behavior the standard does not define.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Arithmetic operators</h2>
+
+  <table>
+    <thead><tr><th>Operator</th><th>Meaning</th><th>Example</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td><code>+</code></td><td>addition</td><td><code>7 + 2</code></td><td>9</td></tr>
+      <tr><td><code>-</code></td><td>subtraction</td><td><code>7 - 2</code></td><td>5</td></tr>
+      <tr><td><code>*</code></td><td>multiplication</td><td><code>7 * 2</code></td><td>14</td></tr>
+      <tr><td><code>/</code></td><td>division</td><td><code>7 / 2</code></td><td>3 (integers!)</td></tr>
+      <tr><td><code>%</code></td><td>remainder</td><td><code>7 % 2</code></td><td>1</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Integer division truncates</h3>
+  <p>If both operands are integers, <code>/</code> performs integer division and discards the fractional part. <code>7 / 2</code> is 3, not 3.5, and not 4 — the result is truncated toward zero, never rounded.</p>
+
+  <p>To get a real quotient, at least one operand must be floating point:</p>
+<pre><code>7 / 2          /* 3     */
+7.0 / 2        /* 3.5   */
+(double)7 / 2  /* 3.5   */
+(double)(7/2)  /* 3.0 — too late, truncation already happened */</code></pre>
+
+  <h3><code>%</code> works on integers only</h3>
+  <p><code>7.5 % 2</code> does not compile. For floating point, use <code>fmod</code> from <code>&lt;math.h&gt;</code>.</p>
+
+  <p>The sign of the remainder follows the <em>dividend</em>: <code>-7 % 2</code> is −1, not 1. This is a consequence of truncating division, and it means <code>%</code> is not a modulo operator in the mathematical sense. A common test for evenness, <code>n % 2 == 1</code>, therefore fails for negative odd numbers; write <code>n % 2 != 0</code> instead.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>Division by zero is undefined behavior, not an error value.</strong> Integer <code>x / 0</code> typically crashes the program with a hardware exception. Floating-point division by zero is different: IEEE 754 defines it, and <code>1.0 / 0.0</code> yields infinity. Never assume C will hand you a convenient sentinel — check the divisor.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Relational and logical operators</h2>
+
+  <table>
+    <thead><tr><th>Operator</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>==</code> <code>!=</code></td><td>equal, not equal</td></tr>
+      <tr><td><code>&lt;</code> <code>&lt;=</code> <code>&gt;</code> <code>&gt;=</code></td><td>ordering</td></tr>
+      <tr><td><code>&amp;&amp;</code></td><td>logical and</td></tr>
+      <tr><td><code>||</code></td><td>logical or</td></tr>
+      <tr><td><code>!</code></td><td>logical not</td></tr>
+    </tbody>
+  </table>
+
+  <p>A relational operator produces <code>int</code> 1 for true and 0 for false. In a condition, <strong>zero is false and everything else is true</strong> — so <code>if (count)</code> means "if count is not zero".</p>
+
+  <h3>Short-circuit evaluation is guaranteed</h3>
+  <p><code>&amp;&amp;</code> and <code>||</code> evaluate their left operand first, and if that settles the answer, <strong>the right operand is never evaluated at all</strong>. This is not an optimization; it is required by the standard, and correct C relies on it constantly.</p>
+
+<pre><code>if (divisor != 0 &amp;&amp; total / divisor &gt; 10) { … }</code></pre>
+
+  <p>If <code>divisor</code> is zero, the division never happens. Reverse the two tests and the program crashes. From week 13 onward the same pattern guards pointers:</p>
+
+<pre><code>if (p != NULL &amp;&amp; p-&gt;count &gt; 0) { … }</code></pre>
+
+  <p>The comma operator and the conditional operator also impose an order. Everything else — notably the operands of <code>+</code>, <code>*</code>, and the arguments of a function call — does not.</p>
+
+  <div class="c-wk-trap">
+    <p><strong><code>=</code> is assignment; <code>==</code> is comparison.</strong> <code>if (x = 5)</code> assigns 5 to <code>x</code> and then tests 5, which is true — always. It is legal C, so only a warning saves you. <code>-Wall</code> emits <em>suggest parentheses around assignment used as truth value</em>. Some programmers write <code>if (5 == x)</code> so that a typo becomes a compile error; the modern answer is to trust the warning and never ignore it.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Assignment, compound assignment, increment</h2>
+
+  <p>Assignment in C is an <em>expression</em>, not a statement: it has a value, which is the value assigned. That is why <code>a = b = 0</code> works — it groups right to left.</p>
+
+  <h3>Compound assignment</h3>
+<pre><code>total += 5;     /* total = total + 5  */
+total -= 5;
+total *= 2;
+total /= 2;
+total %= 3;</code></pre>
+
+  <p>These are not merely shorthand. In <code>arr[next_index()] += 1</code> the left operand is evaluated once; writing it out longhand would call <code>next_index()</code> twice.</p>
+
+  <h3>Increment and decrement</h3>
+  <p><code>++</code> and <code>--</code> each come in two forms that differ in what the <em>expression</em> yields:</p>
+
+<pre><code>int i = 5;
+int a = i++;   /* a = 5, i = 6 — post: yields the old value */
+
+int j = 5;
+int b = ++j;   /* b = 6, j = 6 — pre:  yields the new value */</code></pre>
+
+  <p>When the value is discarded — as in the third clause of a <code>for</code> loop — the two are identical, and <code>i++</code> is conventional. When the value is used, choose deliberately.</p>
+
+  <div class="c-wk-note">
+    <p><strong>An old myth.</strong> You may read that <code>++i</code> is faster than <code>i++</code> because the latter must keep a copy. For an <code>int</code> on any compiler released this century, the generated code is identical — you can confirm this yourself with the <code>-S</code> technique from week 2. The advice has real force in C++ for iterator types; in C it does not.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Precedence and associativity</h2>
+
+  <p><strong>Precedence</strong> decides which operator binds tighter: in <code>a + b * c</code>, <code>*</code> binds tighter, so it is <code>a + (b * c)</code>. <strong>Associativity</strong> decides the grouping among operators of equal precedence: <code>a - b - c</code> is <code>(a - b) - c</code> because <code>-</code> is left-associative.</p>
+
+  <table>
+    <thead><tr><th>Precedence</th><th>Operators</th><th>Associativity</th></tr></thead>
+    <tbody>
+      <tr><td>highest</td><td><code>()</code> <code>[]</code> <code>-&gt;</code> <code>.</code> postfix <code>++ --</code></td><td>left to right</td></tr>
+      <tr><td></td><td>unary <code>! ~ ++ -- + -</code> <code>*</code> <code>&amp;</code> <code>sizeof</code> casts</td><td>right to left</td></tr>
+      <tr><td></td><td><code>* / %</code></td><td>left to right</td></tr>
+      <tr><td></td><td><code>+ -</code></td><td>left to right</td></tr>
+      <tr><td></td><td><code>&lt;&lt; &gt;&gt;</code></td><td>left to right</td></tr>
+      <tr><td></td><td><code>&lt; &lt;= &gt; &gt;=</code></td><td>left to right</td></tr>
+      <tr><td></td><td><code>== !=</code></td><td>left to right</td></tr>
+      <tr><td></td><td><code>&amp;</code> then <code>^</code> then <code>|</code></td><td>left to right</td></tr>
+      <tr><td></td><td><code>&amp;&amp;</code> then <code>||</code></td><td>left to right</td></tr>
+      <tr><td></td><td><code>?:</code></td><td>right to left</td></tr>
+      <tr><td></td><td><code>=</code> <code>+=</code> <code>-=</code> …</td><td>right to left</td></tr>
+      <tr><td>lowest</td><td><code>,</code></td><td>left to right</td></tr>
+    </tbody>
+  </table>
+
+  <p>Two rows in that table are responsible for a disproportionate share of real bugs.</p>
+
+  <h3>Bitwise operators bind looser than comparison</h3>
+  <p>This is widely regarded as a design mistake in C, preserved for compatibility:</p>
+<pre><code>if (flags &amp; MASK == 0)     /* means: flags &amp; (MASK == 0)  — wrong */
+if ((flags &amp; MASK) == 0)   /* what you meant                      */</code></pre>
+  <p>Week 25 uses this constantly. Parenthesize bitwise expressions as a reflex.</p>
+
+  <h3>Assignment binds looser than almost everything</h3>
+<pre><code>x = a &lt; b;      /* x = (a &lt; b) — x gets 0 or 1 */</code></pre>
+
+  <div class="c-wk-note">
+    <p><strong>The practical rule.</strong> Memorize three levels — unary tightest, then arithmetic, then comparison, then logical, then assignment — and parenthesize everything else. Nobody is impressed by an unparenthesized expression that requires the table to read. Clear beats clever, and the compiler produces identical code either way.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Evaluation order: the part that is not defined</h2>
+
+  <p>Precedence tells you how an expression is <em>grouped</em>. It says nothing about the <em>order in which the pieces are computed</em>. These are different questions, and conflating them is a classic source of confusion.</p>
+
+  <p>In <code>f() + g()</code>, precedence guarantees the two results are added. It does not guarantee that <code>f</code> runs before <code>g</code>. The compiler may call them in either order, and may choose differently at different optimization levels.</p>
+
+  <p>That is merely <em>unspecified</em> — one of a set of allowed behaviors. Worse is available:</p>
+
+<pre><code>int i = 0;
+int a = i++ + i++;        /* undefined behavior */
+arr[i] = i++;             /* undefined behavior */
+printf("%d %d\n", i++, i++);  /* undefined behavior */</code></pre>
+
+  <p>The rule: if an expression modifies an object more than once, or modifies it and separately reads it for a purpose other than computing the new value, without an intervening <em>sequence point</em>, the behavior is undefined. Not implementation-defined — undefined. The compiler may produce any result at all.</p>
+
+  <h3>Where the sequence points are</h3>
+  <table>
+    <thead><tr><th>Construct</th><th>Ordering guarantee</th></tr></thead>
+    <tbody>
+      <tr><td><code>;</code> end of a full expression</td><td>everything before completes first</td></tr>
+      <tr><td><code>&amp;&amp;</code> and <code>||</code></td><td>left fully evaluated before right; right may be skipped</td></tr>
+      <tr><td><code>?:</code></td><td>condition evaluated first; exactly one branch runs</td></tr>
+      <tr><td><code>,</code> (the comma operator)</td><td>left fully evaluated, its value discarded, then right</td></tr>
+      <tr><td>function call</td><td>all arguments evaluated before the body runs — in <em>unspecified</em> order</td></tr>
+    </tbody>
+  </table>
+
+  <p>Enable <code>-Wall</code> and GCC warns about the obvious cases: <em>operation on 'i' may be undefined</em>. Do not treat that as advisory.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>Why the language is like this.</strong> Leaving evaluation order open lets the compiler reorder computation to use registers and pipelines efficiently — and in 1972, on a PDP-11, that mattered enormously. The cost is that a small set of expressions have no defined meaning. The fix costs nothing: put each side effect in its own statement.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: predict, then verify</h2>
+
+  <p>Write your answers down before running this. The point of the exercise is the gap between your prediction and the output.</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+static int trace(const char *label, int value)
+{
+    printf("  [evaluating %s]\n", label);
+    return value;
+}
+
+int main(void)
+{
+    puts("== integer division and remainder ==");
+    printf("7 / 2        = %d\n",  7 / 2);
+    printf("-7 / 2       = %d\n",  -7 / 2);
+    printf("7 %% 2        = %d\n", 7 % 2);
+    printf("-7 %% 2       = %d\n", -7 % 2);
+    printf("7.0 / 2      = %g\n",  7.0 / 2);
+
+    puts("\n== precedence ==");
+    printf("2 + 3 * 4        = %d\n", 2 + 3 * 4);
+    printf("(2 + 3) * 4      = %d\n", (2 + 3) * 4);
+    printf("10 - 4 - 3       = %d\n", 10 - 4 - 3);
+    printf("1 &lt;&lt; 2 + 3       = %d\n", 1 &lt;&lt; 2 + 3);   /* 1 &lt;&lt; (2+3) */
+    printf("(1 &lt;&lt; 2) + 3     = %d\n", (1 &lt;&lt; 2) + 3);
+
+    puts("\n== the bitwise-versus-comparison trap ==");
+    int flags = 0x0C;          /* 0000 1100 */
+    int mask  = 0x04;          /* 0000 0100 */
+    printf("flags &amp; mask == 0    -&gt; %d   (this is flags &amp; (mask == 0))\n",
+           flags &amp; mask == 0);
+    printf("(flags &amp; mask) == 0  -&gt; %d   (what you meant)\n",
+           (flags &amp; mask) == 0);
+
+    puts("\n== pre versus post increment ==");
+    int i = 5;
+    printf("i++ yields %d, i is now %d\n", i++, i);
+    int j = 5;
+    printf("++j yields %d, j is now %d\n", ++j, j);
+
+    puts("\n== short-circuit is guaranteed ==");
+    int divisor = 0;
+    if (divisor != 0 &amp;&amp; 100 / divisor &gt; 10) {
+        puts("  not reached");
+    }
+    puts("  survived a division by zero that never happened");
+
+    puts("\n== argument order is NOT guaranteed ==");
+    int sum = trace("left", 1) + trace("right", 2);
+    printf("  sum = %d\n", sum);
+    printf("  rerun with -O2 and the two lines may swap\n");
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o expr expr.c
+./expr</code></pre>
+
+  <h3>What the compiler says before you even run it</h3>
+<pre><code>expr.c:31:24: warning: suggest parentheses around comparison in operand of '&amp;'
+              [-Wparentheses]
+expr.c:40:5: warning: operation on 'i' may be undefined [-Wsequence-point]</code></pre>
+
+  <p>Both warnings point at real defects. The second is worth dwelling on: <code>printf("… %d … %d", i++, i)</code> reads <code>i</code> and modifies it within one expression with no sequence point between, so the output is not merely platform-dependent — it is undefined. Fix it by separating the statements:</p>
+
+<pre><code>int old = i;
+i++;
+printf("i++ yields %d, i is now %d\n", old, i);</code></pre>
+
+  <h3>The experiment that makes the point</h3>
+  <p>Rebuild at two optimization levels and compare the last section's output:</p>
+<pre><code>gcc -std=c17 -O0 -o expr0 expr.c &amp;&amp; ./expr0 | tail -4
+gcc -std=c17 -O2 -o expr2 expr.c &amp;&amp; ./expr2 | tail -4</code></pre>
+
+  <p>GCC on x86 typically evaluates function arguments right to left, so you will likely see <code>[evaluating right]</code> first — on both builds, or on only one. Either outcome teaches the lesson: the sum is always 3, but <em>when</em> each side effect happens is the compiler's business, not yours.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>if (x = 5)</code></td><td>Assigns, then always tests true</td><td><code>==</code> for comparison. Never ignore <code>-Wparentheses</code>.</td></tr>
+      <tr><td><code>flags &amp; MASK == 0</code></td><td>Parses as <code>flags &amp; (MASK == 0)</code></td><td>Parenthesize bitwise expressions always.</td></tr>
+      <tr><td><code>n % 2 == 1</code> to test odd</td><td>False for negative odd numbers</td><td><code>n % 2 != 0</code>.</td></tr>
+      <tr><td><code>average = total / count</code> with two <code>int</code>s</td><td>Truncated result</td><td><code>(double)total / count</code>.</td></tr>
+      <tr><td><code>a = i++ + i++</code></td><td>Undefined behavior</td><td>One side effect per statement.</td></tr>
+      <tr><td>Relying on left-to-right argument evaluation</td><td>Works on one compiler, breaks on another</td><td>Compute into named variables first.</td></tr>
+      <tr><td>Dividing without checking the divisor</td><td>Crash on integer division by zero</td><td>Guard with <code>&amp;&amp;</code>, relying on short-circuit.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>What is <code>-7 / 2</code> and <code>-7 % 2</code> in C, and why?</summary>
+    <p>−3 and −1. Integer division truncates toward zero rather than rounding down, so −3.5 becomes −3; the remainder then takes the sign of the dividend so that <code>(a / b) * b + a % b == a</code> still holds. This is why <code>%</code> is a remainder operator, not a mathematical modulo.</p>
+  </details>
+
+  <details>
+    <summary>Why is <code>if (p != NULL &amp;&amp; p-&gt;count &gt; 0)</code> safe but the reverse order is not?</summary>
+    <p>Because <code>&amp;&amp;</code> guarantees short-circuit evaluation: if the left operand is false, the right is never evaluated, so the null pointer is never dereferenced. Written the other way round, the dereference happens first and the program crashes. This is a language guarantee, not an optimization.</p>
+  </details>
+
+  <details>
+    <summary>What is the difference between precedence and evaluation order?</summary>
+    <p>Precedence is about grouping — which operands belong to which operator, and therefore what the expression <em>means</em>. Evaluation order is about timing — when each subexpression is actually computed. C fixes the first completely and leaves much of the second to the compiler, which is why <code>f() + g()</code> has a defined value but no defined call order.</p>
+  </details>
+
+  <details>
+    <summary>Why is <code>arr[i] = i++;</code> undefined rather than merely unpredictable?</summary>
+    <p>Within one expression it both modifies <code>i</code> and reads <code>i</code> for a purpose unrelated to computing the new value, with no sequence point between. The standard does not enumerate the permitted outcomes; it withdraws all requirements, so the compiler may produce anything. Split it into two statements.</p>
+  </details>
+
+  <details>
+    <summary>When do <code>i++</code> and <code>++i</code> behave identically?</summary>
+    <p>Whenever the value of the expression is discarded — most commonly the third clause of a <code>for</code> loop, or a statement consisting of the increment alone. They differ only when the resulting value is used. For an <code>int</code>, the generated machine code is the same either way.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Every example this week used operands of the same type. Week 7 removes that restriction and asks what C does when an <code>int</code> meets an <code>unsigned</code>, or a <code>char</code> meets a <code>double</code>. The answer is a fixed set of conversion rules that run silently before every operation — and the single most common source of bugs that compile without a warning and behave correctly right up until they do not.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_05_Variables_Types_and_Constants.html">← Week 5</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_07_Type_Conversions.html">Week 7 →</a>
+</div>
+
+</div>

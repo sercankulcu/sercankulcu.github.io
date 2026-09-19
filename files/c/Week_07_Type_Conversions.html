@@ -1,0 +1,382 @@
+---
+layout: without-sidebar
+title: "Week 7 — Type Conversions"
+permalink: /files/c/Week_07_Type_Conversions.html
+excerpt: "Integer promotion, the usual arithmetic conversions, explicit casts, the signed-unsigned trap, overflow and truncation, and how to compare floating-point values without being wrong."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Basic · Week 7</div>
+  <h1>Type Conversions</h1>
+  <p class="c-wk-lead">When operands of different types meet, C converts them before doing anything. The rules are fixed, silent, and applied to every expression you write. This is the week that explains bugs which compile without a warning and behave perfectly until the day they do not.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Apply integer promotion and the usual arithmetic conversions to predict an expression's type.</li>
+      <li>Explain why comparing a signed and an unsigned value can produce a mathematically wrong answer.</li>
+      <li>Use a cast deliberately, and recognize when a cast is hiding a bug rather than fixing one.</li>
+      <li>Describe what happens when a value does not fit the type it is assigned to.</li>
+      <li>Compare two floating-point numbers correctly, and detect <code>NaN</code> and infinity.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Conversions happen whether you ask or not</h2>
+
+  <p>C is a statically typed language with a permissive attitude: rather than rejecting an expression whose operands differ, it converts them to a common type and proceeds. These <em>implicit conversions</em> occur in four places:</p>
+
+  <ul>
+    <li>In an arithmetic or comparison expression, to bring both operands to one type.</li>
+    <li>On assignment, to convert the right-hand value to the left-hand type.</li>
+    <li>When passing an argument to a function, to match the parameter type.</li>
+    <li>On <code>return</code>, to match the function's declared return type.</li>
+  </ul>
+
+  <p>Most of the time this is convenient and correct. The remainder of this week is about the cases where it is not.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Integer promotion</h2>
+
+  <p>Before any arithmetic, operands smaller than <code>int</code> are converted to <code>int</code>. This applies to <code>char</code>, <code>signed char</code>, <code>unsigned char</code>, <code>short</code>, <code>unsigned short</code>, and <code>_Bool</code>.</p>
+
+  <p>The reason is historical and practical: early processors had no arithmetic on sub-word operands, so the language defined arithmetic to happen at word width.</p>
+
+<pre><code>char a = 100;
+char b = 100;
+char c = a + b;      /* a and b promoted to int: 200. Stored back
+                        into a char, which cannot hold 200. */</code></pre>
+
+  <p>The addition itself is fine — it happens in <code>int</code> and yields 200. The damage is done on assignment, where 200 is squeezed back into a signed <code>char</code>.</p>
+
+  <p>Promotion also explains something that puzzles beginners:</p>
+
+<pre><code>printf("%zu\n", sizeof(char));      /* 1 */
+printf("%zu\n", sizeof('A'));       /* 4 — in C, 'A' is an int  */
+printf("%zu\n", sizeof(char) + 1);  /* 8? no: size_t arithmetic */</code></pre>
+
+  <p>A character constant such as <code>'A'</code> has type <code>int</code> in C, not <code>char</code>. This differs from C++, and it occasionally matters.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>The usual arithmetic conversions</h2>
+
+  <p>Once both operands are at least <code>int</code>, C brings them to a common type by walking down this list and stopping at the first case that applies:</p>
+
+  <table>
+    <thead><tr><th>Step</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>If either is <code>long double</code>, convert the other to <code>long double</code>.</td></tr>
+      <tr><td>2</td><td>Otherwise if either is <code>double</code>, convert the other to <code>double</code>.</td></tr>
+      <tr><td>3</td><td>Otherwise if either is <code>float</code>, convert the other to <code>float</code>.</td></tr>
+      <tr><td>4</td><td>Otherwise both are integers: apply integer promotion, then convert toward the type of greater rank.</td></tr>
+      <tr><td>5</td><td>If the two have equal rank but differ in signedness, <strong>the signed one is converted to unsigned</strong>.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Step 5 is the one that draws blood. The rest are intuitive: mixing an <code>int</code> with a <code>double</code> gives a <code>double</code>, which is what anyone would expect.</p>
+
+  <p>Worked through:</p>
+<pre><code>int    i = 3;
+double d = 2.0;
+i / 2          /* int / int    -&gt; int    -&gt; 1   */
+i / 2.0        /* int / double -&gt; double -&gt; 1.5 */
+i / d          /* int / double -&gt; double -&gt; 1.5 */
+(i + 1) / 2    /* 4 / 2        -&gt; int    -&gt; 2   */</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>The signed-unsigned trap</h2>
+
+  <p>Here is the single most notorious conversion bug in C:</p>
+
+<pre><code>int      a = -1;
+unsigned b = 1;
+
+if (a &lt; b) {
+    puts("-1 is less than 1");     /* never printed */
+} else {
+    puts("-1 is NOT less than 1"); /* this one runs */
+}</code></pre>
+
+  <p>Both operands have rank <code>int</code>, and one is unsigned, so rule 5 applies: <code>a</code> is converted to <code>unsigned int</code>. In two's complement, −1 becomes 4 294 967 295. That number is not less than 1, so the comparison is false — and it is <em>correct</em> according to the language. The bug is in the program, not the compiler.</p>
+
+  <p>The same mechanism turns loops into infinite loops:</p>
+
+<pre><code>size_t n = 0;
+for (size_t i = 0; i &lt; n - 1; i++) {
+    /* n - 1 is unsigned. 0 - 1 wraps to SIZE_MAX.
+       This loop runs about 18 quintillion times. */
+}</code></pre>
+
+  <p>And it is why <code>strlen</code> returning <code>size_t</code> deserves care:</p>
+
+<pre><code>if (strlen(s) - 1 &gt;= 0)   /* always true: unsigned is never negative */</code></pre>
+
+  <h3>Defences</h3>
+  <ul>
+    <li>Compile with <code>-Wsign-compare</code>, which <code>-Wextra</code> enables. It flags exactly this.</li>
+    <li>Do not mix signedness in one expression. Pick a convention per function and convert at the boundary.</li>
+    <li>Rearrange rather than subtract: write <code>i + 1 &lt; n</code> instead of <code>i &lt; n - 1</code>.</li>
+    <li>Use unsigned types for quantities that genuinely cannot be negative — sizes, indices, bit patterns — and signed types for everything else.</li>
+  </ul>
+
+  <div class="c-wk-trap">
+    <p><strong>Unsigned arithmetic never overflows; it wraps.</strong> That is defined behavior, computed modulo 2<sup>N</sup>. It is not an error, nothing is reported, and the program continues with a wrong value. Signed overflow, by contrast, is undefined behavior — see week 36. Neither is a safety net.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Explicit conversion: the cast</h2>
+
+  <p>A cast forces a conversion:</p>
+<pre><code>double average = (double)total / count;</code></pre>
+
+  <p>Placement matters entirely. <code>(double)total / count</code> converts <code>total</code> first, so the division is <code>double / int</code> → <code>double</code>. <code>(double)(total / count)</code> performs integer division first and then widens the already-truncated result. The parentheses are the whole difference between a correct average and a wrong one.</p>
+
+  <h3>When a cast is right</h3>
+  <ul>
+    <li>Forcing floating-point division between integers, as above.</li>
+    <li>Silencing a legitimate narrowing where you have already checked the range.</li>
+    <li>Converting <code>void *</code> to a typed pointer — week 30.</li>
+    <li>Selecting an overload of a standard function, for example <code>(double)x</code> before a <code>printf("%f")</code>.</li>
+  </ul>
+
+  <h3>When a cast is wrong</h3>
+  <p>A cast tells the compiler "I know what I am doing." If you do not, the cast merely deletes the warning that would have told you. A cast added to make a warning go away, without a reason you could state out loud, is a bug with the alarm disconnected.</p>
+
+<pre><code>/* Wrong: hides a real narrowing problem */
+short s = (short)some_large_int;
+
+/* Right: the check makes the cast honest */
+if (some_large_int &gt;= SHRT_MIN &amp;&amp; some_large_int &lt;= SHRT_MAX) {
+    short s = (short)some_large_int;
+}</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>When the value does not fit</h2>
+
+  <table>
+    <thead><tr><th>Conversion</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td>Larger integer → smaller integer</td><td>The high-order bits are discarded. For unsigned targets this is defined modulo arithmetic; for signed targets it is implementation-defined.</td></tr>
+      <tr><td>Negative → unsigned</td><td>Defined: add 2<sup>N</sup>. −1 becomes the maximum value.</td></tr>
+      <tr><td><code>double</code> → integer</td><td>The fractional part is discarded — truncated toward zero, not rounded. If the value is out of range, the behavior is undefined.</td></tr>
+      <tr><td>Integer → <code>float</code></td><td>May lose precision. A 32-bit <code>int</code> has more significant digits than a <code>float</code> can hold.</td></tr>
+      <tr><td><code>double</code> → <code>float</code></td><td>Rounded to the nearest representable <code>float</code>; may become infinity.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Note the truncation rule for floating point to integer: <code>(int)3.99</code> is 3 and <code>(int)-3.99</code> is −3. To round, use <code>round</code>, <code>floor</code>, or <code>ceil</code> from <code>&lt;math.h&gt;</code> — and remember to link with <code>-lm</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Comparing floating-point values</h2>
+
+  <p>Week 4 established that most decimal fractions have no exact binary representation. The consequence for comparison is direct: <strong>never use <code>==</code> on floating-point values</strong> unless you are comparing against a value you know to be exactly representable, such as 0.0 assigned literally.</p>
+
+  <h3>The naive fix, and why it is not enough</h3>
+<pre><code>if (fabs(a - b) &lt; 1e-9) { … }   /* absolute tolerance */</code></pre>
+  <p>This works when the numbers are near 1. It fails at both extremes: for values around 10⁻¹⁵ every pair compares equal, and for values around 10¹⁵ no pair ever does, because the gap between adjacent representable doubles is already larger than 10⁻⁹.</p>
+
+  <h3>A tolerance that scales</h3>
+<pre><code>#include &lt;math.h&gt;
+#include &lt;float.h&gt;
+#include &lt;stdbool.h&gt;
+
+static bool nearly_equal(double a, double b, double relative)
+{
+    double diff = fabs(a - b);
+    if (diff &lt;= DBL_EPSILON) {      /* handles a == b and both near zero */
+        return true;
+    }
+    double scale = fmax(fabs(a), fabs(b));
+    return diff &lt;= relative * scale;
+}</code></pre>
+
+  <p>Choosing <code>relative</code> is a judgement about your problem, not a property of the language. For values derived from a handful of arithmetic steps, something around <code>1e-9</code> for <code>double</code> is reasonable. For a long accumulation, error grows and the tolerance must grow with it.</p>
+
+  <h3>Accumulated error</h3>
+<pre><code>double sum = 0.0;
+for (int i = 0; i &lt; 10; i++) {
+    sum += 0.1;
+}
+/* sum is 0.99999999999999988898, not 1.0 */</code></pre>
+  <p>Each addition rounds, and the errors do not cancel. Where exactness matters — money, above all — do not use floating point. Store amounts as integer minor units (kuruş, cents) and format for display.</p>
+
+  <h3><code>NaN</code> and infinity</h3>
+<pre><code>#include &lt;math.h&gt;
+
+double x = 0.0 / 0.0;    /* NaN      */
+double y = 1.0 / 0.0;    /* infinity */
+
+isnan(x)      /* true  */
+isinf(y)      /* true  */
+isfinite(y)   /* false */
+(x == x)      /* false — NaN is not equal to itself */</code></pre>
+
+  <p>That last line is the defining property of <code>NaN</code> and a legitimate test for it, though <code>isnan</code> says what you mean. It also means a <code>NaN</code> quietly poisons every comparison: <code>a &lt; b</code>, <code>a &gt; b</code>, and <code>a == b</code> are all false when either is <code>NaN</code>, so a sort can behave bizarrely if one slips into the data.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Worked example: two bugs that compile cleanly</h2>
+
+  <p>Save as <code>convert.c</code>.</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;string.h&gt;
+#include &lt;math.h&gt;
+#include &lt;float.h&gt;
+#include &lt;limits.h&gt;
+
+static bool nearly_equal(double a, double b, double relative)
+{
+    double diff = fabs(a - b);
+    if (diff &lt;= DBL_EPSILON) {
+        return true;
+    }
+    double scale = fmax(fabs(a), fabs(b));
+    return diff &lt;= relative * scale;
+}
+
+int main(void)
+{
+    puts("== bug 1: a comparison that is wrong but not incorrect ==");
+    int      signed_value   = -1;
+    unsigned unsigned_value = 1;
+    printf("  -1 &lt; 1u  evaluates to %d\n", signed_value &lt; unsigned_value);
+    printf("  because -1 converted to unsigned is %u\n",
+           (unsigned)signed_value);
+    printf("  fix: compare in a signed type -&gt; %d\n",
+           signed_value &lt; (int)unsigned_value);
+
+    puts("\n== the loop that would never end ==");
+    const char *empty = "";
+    size_t length = strlen(empty);
+    printf("  strlen(\"\") = %zu\n", length);
+    printf("  length - 1 = %zu   &lt;-- wrapped\n", length - 1);
+    puts("  so  for (i = 0; i &lt; length - 1; i++)  would run ~1.8e19 times");
+    puts("  fix: write  i + 1 &lt; length  instead");
+
+    puts("\n== bug 2: floating point equality ==");
+    double a = 0.1, b = 0.2;
+    printf("  0.1 + 0.2        = %.20f\n", a + b);
+    printf("  == 0.3           -&gt; %s\n", (a + b == 0.3) ? "true" : "false");
+    printf("  nearly_equal     -&gt; %s\n",
+           nearly_equal(a + b, 0.3, 1e-9) ? "true" : "false");
+
+    double sum = 0.0;
+    for (int i = 0; i &lt; 10; i++) {
+        sum += 0.1;
+    }
+    printf("  0.1 added ten times = %.20f\n", sum);
+    printf("  == 1.0           -&gt; %s\n", (sum == 1.0) ? "true" : "false");
+    printf("  nearly_equal     -&gt; %s\n",
+           nearly_equal(sum, 1.0, 1e-9) ? "true" : "false");
+
+    puts("\n== promotion and narrowing ==");
+    char small_a = 100, small_b = 100;
+    printf("  100 + 100 as int  = %d\n", small_a + small_b);
+    printf("  stored in a char  = %d   &lt;-- did not fit\n",
+           (char)(small_a + small_b));
+
+    printf("\n  (int)3.99  = %d      (truncates, never rounds)\n", (int)3.99);
+    printf("  (int)-3.99 = %d\n", (int)-3.99);
+    printf("  lround(3.99) = %ld\n", lround(3.99));
+
+    puts("\n== the average, done wrong and right ==");
+    int total = 7, count = 2;
+    printf("  total / count             = %d\n", total / count);
+    printf("  (double)(total / count)   = %g   &lt;-- cast too late\n",
+           (double)(total / count));
+    printf("  (double)total / count     = %g   &lt;-- correct\n",
+           (double)total / count);
+
+    puts("\n== NaN and infinity ==");
+    double nan_value = 0.0 / 0.0;
+    double inf_value = 1.0 / 0.0;
+    printf("  0.0/0.0 = %f, isnan -&gt; %d, equals itself -&gt; %d\n",
+           nan_value, isnan(nan_value), nan_value == nan_value);
+    printf("  1.0/0.0 = %f, isinf -&gt; %d\n", inf_value, isinf(inf_value));
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o convert convert.c -lm
+./convert</code></pre>
+
+  <p>The <code>-lm</code> is required: <code>&lt;math.h&gt;</code> declares <code>fabs</code> and <code>isnan</code>, but their implementations live in the math library, which the linker does not search unless told. Omit it and you get the <code>undefined reference</code> error from week 2.</p>
+
+  <h3>Read the warnings first</h3>
+<pre><code>convert.c:24:44: warning: comparison of integer expressions of different
+                 signedness: 'int' and 'unsigned int' [-Wsign-compare]</code></pre>
+
+  <p>That one warning is the entire subject of section 4, delivered by the compiler for free. A project that compiles with warnings switched on and then ignores them has paid the cost of the tooling without collecting the benefit.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Comparing <code>int</code> with <code>size_t</code></td><td>Negative values become huge; comparison inverts</td><td>Keep one signedness per expression; heed <code>-Wsign-compare</code>.</td></tr>
+      <tr><td><code>i &lt; length - 1</code> when <code>length</code> is 0</td><td>Wraps to <code>SIZE_MAX</code>; loop never ends</td><td>Write <code>i + 1 &lt; length</code>.</td></tr>
+      <tr><td><code>(double)(a / b)</code></td><td>Integer division already truncated</td><td><code>(double)a / b</code>.</td></tr>
+      <tr><td><code>if (x == 0.1)</code></td><td>Almost always false</td><td>Compare with a scaled tolerance.</td></tr>
+      <tr><td>Adding a cast to silence a warning</td><td>The bug stays, the alarm is gone</td><td>Understand the warning; cast only when you can state why.</td></tr>
+      <tr><td>Using <code>double</code> for money</td><td>Accumulated rounding error</td><td>Store integer minor units.</td></tr>
+      <tr><td>Forgetting <code>-lm</code></td><td><code>undefined reference to 'fabs'</code></td><td>Link the math library.</td></tr>
+      <tr><td>Assuming <code>(int)x</code> rounds</td><td>3.99 becomes 3</td><td>Use <code>lround</code>, <code>floor</code>, or <code>ceil</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">10</span>Check yourself</h2>
+
+  <details>
+    <summary>Why is <code>-1 &lt; 1u</code> false?</summary>
+    <p>Both operands have the rank of <code>int</code> and one is unsigned, so the usual arithmetic conversions convert the signed operand to unsigned. In two's complement −1 becomes 4 294 967 295, which is not less than 1. The comparison is behaving exactly as specified; the defect is mixing signedness in the expression.</p>
+  </details>
+
+  <details>
+    <summary>What is the difference between <code>(double)total / count</code> and <code>(double)(total / count)</code>?</summary>
+    <p>The first converts <code>total</code> before dividing, so the division is performed in <code>double</code> and keeps the fraction. The second divides two integers — truncating immediately — and then widens the already-wrong result. Only the first computes an average correctly.</p>
+  </details>
+
+  <details>
+    <summary>Is <code>char c = a + b;</code> with <code>a</code> and <code>b</code> both 100 an error?</summary>
+    <p>Not a compile error. The operands are promoted to <code>int</code>, the sum 200 is computed correctly, and then it is converted back to <code>char</code> on assignment. If plain <code>char</code> is signed and 8 bits, 200 does not fit and the result is implementation-defined. The arithmetic was never the problem; the storage was.</p>
+  </details>
+
+  <details>
+    <summary>Why is an absolute tolerance such as <code>fabs(a-b) &lt; 1e-9</code> not a general solution?</summary>
+    <p>Because the spacing between representable doubles grows with magnitude. Near 10¹⁵ that spacing already exceeds 10⁻⁹, so no two distinct values ever compare equal; near 10⁻¹⁵ almost every pair does. A tolerance must scale with the size of the values being compared.</p>
+  </details>
+
+  <details>
+    <summary>A sort of your <code>double</code> array produces nonsense. One element is <code>NaN</code>. Why does that break it?</summary>
+    <p>Every comparison involving <code>NaN</code> is false — <code>&lt;</code>, <code>&gt;</code>, and <code>==</code> alike. A comparison function therefore reports that the <code>NaN</code> is neither before nor after nor equal to anything, which violates the ordering the sorting algorithm assumes and can corrupt the whole result. Filter or reject <code>NaN</code> before sorting.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">11</span>Where this leads</h2>
+  <p>You can now predict the type and value of any expression. Week 8 uses that directly: <code>printf</code> and <code>scanf</code> take a format string whose specifiers must match the argument types exactly, and the conversions from this week are precisely what decides whether they do. It is also where you meet the first function that can corrupt memory if you get an argument wrong.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_06_Operators_and_Expressions.html">← Week 6</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_08_Input_and_Output.html">Week 8 →</a>
+</div>
+
+</div>
