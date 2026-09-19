@@ -1,0 +1,347 @@
+---
+layout: without-sidebar
+title: "Week 4 — Data Representation"
+permalink: /files/c/Week_04_Data_Representation.html
+excerpt: "Binary, octal and hexadecimal; bits, bytes and words; two's complement signed integers; IEEE 754 floating point; and character encoding — the physical basis for every C type."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Basic · Week 4</div>
+  <h1>Data Representation</h1>
+  <p class="c-wk-lead">Memory holds bytes, and a byte is just eight bits. Everything else — integers, decimals, letters — is an agreement about how to interpret those bits. C exposes that agreement more directly than most languages, so learning it now prevents a long list of surprises later.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Convert between binary, octal, hexadecimal, and decimal, and say why hexadecimal is used at all.</li>
+      <li>Explain two's complement and why it is the representation every modern machine uses.</li>
+      <li>Describe the three fields of an IEEE 754 floating-point number and explain why <code>0.1 + 0.2 != 0.3</code>.</li>
+      <li>Explain what a character really is to a C program.</li>
+      <li>Write a program that prints the underlying bytes of any value.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Why this week exists</h2>
+
+  <p>A student who skips this material can still write working C for a while. The trouble arrives later, all at once, as a set of apparently unrelated mysteries:</p>
+
+  <ul>
+    <li>Why does adding 1 to the largest <code>int</code> produce a large negative number?</li>
+    <li>Why is <code>0.1 + 0.2 == 0.3</code> false?</li>
+    <li>Why does <code>'A' + 1</code> give <code>'B'</code>?</li>
+    <li>Why is <code>if (x &lt; y)</code> sometimes wrong when one of them is unsigned?</li>
+    <li>Why do people write <code>0xFF</code> instead of <code>255</code>?</li>
+  </ul>
+
+  <p>Every one of these has the same answer: because of how the value is stored. Half an hour on representation now saves a week of confusion in weeks 7, 12, and 25.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Positional number systems</h2>
+
+  <p>Decimal is positional: each digit's contribution depends on its place, and each place is a power of ten. <code>247</code> means 2×10² + 4×10¹ + 7×10⁰. Nothing about that scheme requires ten. Any base works.</p>
+
+  <table>
+    <thead><tr><th>Base</th><th>Digits</th><th>C notation</th><th>Used for</th></tr></thead>
+    <tbody>
+      <tr><td>Binary (2)</td><td>0 1</td><td><code>0b1010</code> (C23)</td><td>What the hardware actually stores</td></tr>
+      <tr><td>Octal (8)</td><td>0–7</td><td><code>0755</code> — a leading zero</td><td>Unix file permissions, and little else</td></tr>
+      <tr><td>Decimal (10)</td><td>0–9</td><td><code>255</code></td><td>Humans</td></tr>
+      <tr><td>Hexadecimal (16)</td><td>0–9 A–F</td><td><code>0xFF</code></td><td>Addresses, bit patterns, colours</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Reading binary</h3>
+  <p><code>1101</code> in binary is 1×8 + 1×4 + 0×2 + 1×1 = 13. Going the other way, repeatedly divide by two and collect the remainders from last to first: 13 ÷ 2 = 6 r1, 6 ÷ 2 = 3 r0, 3 ÷ 2 = 1 r1, 1 ÷ 2 = 0 r1 → 1101.</p>
+
+  <h3>Why hexadecimal</h3>
+  <p>Because sixteen is two to the fourth, <strong>one hex digit is exactly four bits</strong>, always, with no arithmetic required. This makes hex a compact shorthand for bit patterns that a person can convert at sight.</p>
+
+  <table>
+    <thead><tr><th>Hex</th><th>Bits</th><th>Hex</th><th>Bits</th><th>Hex</th><th>Bits</th><th>Hex</th><th>Bits</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>0000</td><td>4</td><td>0100</td><td>8</td><td>1000</td><td>C</td><td>1100</td></tr>
+      <tr><td>1</td><td>0001</td><td>5</td><td>0101</td><td>9</td><td>1001</td><td>D</td><td>1101</td></tr>
+      <tr><td>2</td><td>0010</td><td>6</td><td>0110</td><td>A</td><td>1010</td><td>E</td><td>1110</td></tr>
+      <tr><td>3</td><td>0011</td><td>7</td><td>0111</td><td>B</td><td>1011</td><td>F</td><td>1111</td></tr>
+    </tbody>
+  </table>
+
+  <p>So <code>0x3A</code> is <code>0011 1010</code> without thinking, and one byte is always exactly two hex digits. When week 25 asks you to set bit 5 of a register, you will write <code>0x20</code> and see <code>0010 0000</code> in your head.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>A leading zero means octal.</strong> In C, <code>012</code> is not twelve — it is ten. This bites people writing zero-padded constants such as dates or times. <code>int minutes = 08;</code> does not even compile, because 8 is not an octal digit.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Bits, bytes, and words</h2>
+
+  <p>A <strong>bit</strong> is one binary digit. A <strong>byte</strong> is the smallest individually addressable unit of memory — eight bits on every machine you will realistically meet. Eight bits give 2⁸ = 256 distinct patterns.</p>
+
+  <p>A <strong>word</strong> is the natural size the processor works with: 64 bits on a modern desktop, 32 on many embedded parts. The C type <code>int</code> is usually, but not necessarily, one word.</p>
+
+  <p>In C, <code>sizeof(char)</code> is 1 <em>by definition</em>. All other sizes are measured in units of <code>char</code>. The standard guarantees only minimum ranges, not exact sizes — a point week 37 makes a great deal of. For now:</p>
+
+  <table>
+    <thead><tr><th>Type</th><th>Typical size</th><th>Typical range</th></tr></thead>
+    <tbody>
+      <tr><td><code>char</code></td><td>1 byte</td><td>−128 … 127, or 0 … 255</td></tr>
+      <tr><td><code>short</code></td><td>2 bytes</td><td>−32 768 … 32 767</td></tr>
+      <tr><td><code>int</code></td><td>4 bytes</td><td>−2 147 483 648 … 2 147 483 647</td></tr>
+      <tr><td><code>long</code></td><td>8 bytes (4 on Windows)</td><td>platform dependent</td></tr>
+      <tr><td><code>long long</code></td><td>8 bytes</td><td>about ±9.2 × 10¹⁸</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Signed integers and two's complement</h2>
+
+  <p>Unsigned numbers are easy: the bits are the number. Negative numbers need a convention, and several have been tried.</p>
+
+  <h3>The obvious idea, and why it fails</h3>
+  <p><em>Sign-magnitude</em> reserves the top bit for the sign and treats the rest as the magnitude. It is easy for a human to read, and bad for hardware: it gives two representations of zero (<code>0000</code> and <code>1000</code>), and addition needs special-case logic depending on the signs.</p>
+
+  <h3>Two's complement</h3>
+  <p>The representation every modern machine uses — and, since C23, the only one the C standard permits — is <strong>two's complement</strong>. The rule: the most significant bit carries a <em>negative</em> weight.</p>
+
+  <p>For a 4-bit number the place values are −8, 4, 2, 1:</p>
+
+  <table>
+    <thead><tr><th>Bits</th><th>Arithmetic</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td><code>0000</code></td><td>0</td><td>0</td></tr>
+      <tr><td><code>0111</code></td><td>4+2+1</td><td>7 (largest)</td></tr>
+      <tr><td><code>1000</code></td><td>−8</td><td>−8 (smallest)</td></tr>
+      <tr><td><code>1111</code></td><td>−8+4+2+1</td><td>−1</td></tr>
+      <tr><td><code>1110</code></td><td>−8+4+2</td><td>−2</td></tr>
+    </tbody>
+  </table>
+
+  <p>Two properties make this the winner. There is exactly <strong>one zero</strong>. And <strong>subtraction is just addition</strong>: the same adder circuit handles signed and unsigned operands with no sign test at all. That is why the hardware does it this way, and therefore why C behaves this way.</p>
+
+  <h3>Negating a number</h3>
+  <p>Flip every bit, then add one. For 4-bit 5 = <code>0101</code>: flip to <code>1010</code>, add one → <code>1011</code> = −8+2+1 = −5. Correct.</p>
+
+  <h3>Overflow</h3>
+  <p>The range is asymmetric: there is one more negative value than positive, because zero occupies a slot on the positive side. For a 32-bit <code>int</code> the top value is 2 147 483 647. Add one:</p>
+
+<pre><code>0111 1111 … 1111   =  2147483647
+              + 1
+1000 0000 … 0000   = -2147483648</code></pre>
+
+  <p>The bits simply carried into the sign position. The value wrapped around.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>This wrap-around is undefined behavior for signed types.</strong> Unsigned overflow is defined to wrap; signed overflow is not defined at all, and an optimizing compiler is entitled to assume it never happens. That assumption can delete your bounds check. Week 36 shows a program that behaves differently at <code>-O0</code> and <code>-O2</code> for exactly this reason.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Floating point: IEEE 754</h2>
+
+  <p>Real numbers are stored in a binary version of scientific notation. A <code>float</code> is 32 bits split into three fields:</p>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 700 110" role="img" aria-label="Layout of a 32-bit IEEE 754 float: one sign bit, eight exponent bits, twenty-three mantissa bits" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="10" y="30" width="46" height="42" rx="6"/>
+        <rect x="60" y="30" width="150" height="42" rx="6"/>
+        <rect x="214" y="30" width="476" height="42" rx="6"/>
+      </g>
+      <g fill="currentColor" font-size="12.5" text-anchor="middle" font-family="inherit">
+        <text x="33" y="50">sign</text><text x="33" y="65" opacity=".6">1 bit</text>
+        <text x="135" y="50">exponent</text><text x="135" y="65" opacity=".6">8 bits</text>
+        <text x="452" y="50">mantissa (fraction)</text><text x="452" y="65" opacity=".6">23 bits</text>
+      </g>
+      <g fill="currentColor" font-size="11" text-anchor="middle" opacity=".6" font-family="inherit">
+        <text x="33" y="92">31</text><text x="135" y="92">30 – 23</text><text x="452" y="92">22 – 0</text>
+      </g>
+    </svg>
+    <p class="c-wk-cap">A <code>double</code> uses the same scheme with 1 + 11 + 52 bits.</p>
+  </div>
+
+  <p>The value is roughly <em>sign</em> × 1.<em>mantissa</em> × 2<sup><em>exponent</em>−bias</sup>. The leading 1 is implicit and not stored, which buys one extra bit of precision for free.</p>
+
+  <h3>Why 0.1 is not 0.1</h3>
+  <p>In decimal, one third cannot be written exactly: 0.3333… goes on forever. The same thing happens in binary, but for a different set of numbers. One tenth in binary is <code>0.0001100110011…</code> repeating forever. With only 23 or 52 bits available, it must be cut off. What gets stored is the nearest representable value, which is <em>close to</em> 0.1 but not equal to it.</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+
+int main(void)
+{
+    double a = 0.1, b = 0.2;
+    printf("%.20f\n", a + b);
+    printf("%s\n", (a + b == 0.3) ? "equal" : "not equal");
+    return 0;
+}</code></pre>
+
+<pre><code>0.30000000000000004441
+not equal</code></pre>
+
+  <p>This is not a bug in C, in your compiler, or in your computer. It is a consequence of storing infinitely many real numbers in finitely many bits, and every language using IEEE 754 — Python, Java, JavaScript — behaves identically.</p>
+
+  <p>The practical rule, which week 7 develops: <strong>never compare floating-point values with <code>==</code></strong>. Compare against a tolerance instead.</p>
+
+  <h3>The special values</h3>
+  <p>Some bit patterns are reserved. Infinity results from overflow or division by zero; NaN — Not a Number — results from an undefined operation such as 0.0/0.0. NaN has a property that catches everyone once: <strong>it is not equal to itself</strong>, so <code>x != x</code> is a valid NaN test.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Characters</h2>
+
+  <p>There is no character type in the hardware. A <code>char</code> is a small integer, and the mapping from integer to glyph is a convention. The traditional one is ASCII, which assigns codes 0–127.</p>
+
+  <table>
+    <thead><tr><th>Character</th><th>Decimal</th><th>Hex</th></tr></thead>
+    <tbody>
+      <tr><td><code>'\0'</code> (null)</td><td>0</td><td>0x00</td></tr>
+      <tr><td><code>'\n'</code> (newline)</td><td>10</td><td>0x0A</td></tr>
+      <tr><td>space</td><td>32</td><td>0x20</td></tr>
+      <tr><td><code>'0'</code></td><td>48</td><td>0x30</td></tr>
+      <tr><td><code>'A'</code></td><td>65</td><td>0x41</td></tr>
+      <tr><td><code>'a'</code></td><td>97</td><td>0x61</td></tr>
+    </tbody>
+  </table>
+
+  <p>Because a character is a number, arithmetic on characters works and is occasionally useful. <code>'A' + 1</code> is 66, which is <code>'B'</code>. <code>'7' - '0'</code> is 7, converting a digit character to its value. The gap between upper and lower case is exactly 32, which is a single bit — <code>0x20</code> — and that is why case conversion used to be written as a bitwise operation.</p>
+
+  <p>Two things to carry forward. <code>'\0'</code>, the character with value zero, marks the end of every C string; that is week 14. And ASCII covers only English — Turkish characters such as ş and ğ need more than 127 codes, which is what UTF-8 is for and what week 37 covers.</p>
+
+  <div class="c-wk-note">
+    <p><strong>Plain <code>char</code> has no fixed signedness.</strong> Whether <code>char</code> is signed or unsigned is implementation-defined: it is signed on x86 Linux and unsigned on ARM Linux. Code that stores values above 127 in a plain <code>char</code> and compares them behaves differently on different machines. Say <code>signed char</code> or <code>unsigned char</code> when you mean a small number, and reserve plain <code>char</code> for text.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Worked example: looking at the bytes</h2>
+
+  <p>Nothing makes this concrete like printing the actual bits. Save as <code>bits.c</code>:</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+/* Print the bits of an int, most significant first. */
+static void print_int_bits(int value)
+{
+    for (int bit = 31; bit &gt;= 0; bit--) {
+        putchar((value &gt;&gt; bit) &amp; 1 ? '1' : '0');
+        if (bit % 8 == 0 &amp;&amp; bit != 0) {
+            putchar(' ');
+        }
+    }
+    putchar('\n');
+}
+
+/* Print the raw bytes of any object, lowest address first. */
+static void print_raw_bytes(const void *object, size_t size)
+{
+    const unsigned char *byte = object;
+    for (size_t i = 0; i &lt; size; i++) {
+        printf("%02X ", byte[i]);
+    }
+    putchar('\n');
+}
+
+int main(void)
+{
+    int positive = 13;
+    int negative = -13;
+
+    printf("13  decimal = %d, octal = %o, hex = %X\n", positive, positive, positive);
+    printf("13  bits    = ");  print_int_bits(positive);
+    printf("-13 bits    = ");  print_int_bits(negative);
+
+    printf("\nsum of the two: %d\n", positive + negative);
+
+    float f = 0.1f;
+    printf("\n0.1f occupies %zu bytes: ", sizeof f);
+    print_raw_bytes(&amp;f, sizeof f);
+    printf("0.1f printed to 20 places: %.20f\n", (double)f);
+
+    printf("\n'A' = %d, 'A' + 1 = %c, '7' - '0' = %d\n",
+           'A', 'A' + 1, '7' - '0');
+
+    printf("\nlargest int  = %d\n", 2147483647);
+    printf("plus one     = %d\n", 2147483647 + 1);  /* see the note below */
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o bits bits.c
+./bits</code></pre>
+
+  <h3>What to look for</h3>
+  <p>Compare the bit patterns of 13 and −13. Flip every bit of the first and add one, and you get the second — the negation rule from section 4, visible.</p>
+
+  <p>Look at the four bytes of <code>0.1f</code>. On a typical x86 machine you will see <code>CD CC CC 3D</code>, which is the pattern <code>3DCCCCCD</code> stored <em>backwards</em>. That is little-endian byte order, and it is the subject of week 37.</p>
+
+  <p>Finally, note that GCC warns about <code>2147483647 + 1</code>:</p>
+<pre><code>bits.c:44:42: warning: integer overflow in expression of type 'int'
+              results in '-2147483648' [-Woverflow]</code></pre>
+  <p>The compiler computed the constant at compile time, noticed it overflowed, and told you. This is the warning doing exactly the job week 1 promised it would.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Writing <code>010</code> meaning ten</td><td>The value is 8</td><td>A leading zero means octal. Drop it.</td></tr>
+      <tr><td>Comparing floats with <code>==</code></td><td>Mathematically equal values compare unequal</td><td>Compare <code>fabs(a - b) &lt; tolerance</code>. Week 7 covers choosing the tolerance.</td></tr>
+      <tr><td>Expecting signed overflow to wrap</td><td>Works at <code>-O0</code>, breaks at <code>-O2</code></td><td>Signed overflow is undefined. Use a wider type or check before the operation.</td></tr>
+      <tr><td>Storing a value above 127 in a plain <code>char</code></td><td>Behaves differently on x86 and ARM</td><td>Use <code>unsigned char</code> for byte values.</td></tr>
+      <tr><td>Printing a <code>float</code> with <code>%d</code></td><td>Undefined behavior; nonsense output</td><td>Use <code>%f</code>. Floats are promoted to <code>double</code> when passed to <code>printf</code>.</td></tr>
+      <tr><td>Assuming <code>int</code> is always 32 bits</td><td>Code breaks on another platform</td><td>Use <code>&lt;stdint.h&gt;</code> types when the width matters. Week 37.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">9</span>Check yourself</h2>
+
+  <details>
+    <summary>Why is hexadecimal used so heavily in systems programming rather than decimal?</summary>
+    <p>Because 16 is a power of 2, one hex digit corresponds to exactly four bits with no arithmetic. A byte is always two hex digits, so a hex constant is a compact, directly readable bit pattern. Decimal has no such alignment: converting 200 to bits requires work, while <code>0xC8</code> is <code>1100 1000</code> at sight.</p>
+  </details>
+
+  <details>
+    <summary>What are the two properties that made two's complement win over sign-magnitude?</summary>
+    <p>There is a single representation of zero, and addition and subtraction use the same circuitry for signed and unsigned values with no special case for sign. Hardware simplicity drove the choice, and C's arithmetic behavior follows from it.</p>
+  </details>
+
+  <details>
+    <summary>Is <code>0.1 + 0.2 == 0.3</code> false because of a flaw in C?</summary>
+    <p>No. Neither 0.1 nor 0.2 nor 0.3 has an exact binary representation in a finite number of bits, so each is stored as a nearby value and the rounding errors do not cancel. Every language that uses IEEE 754 shows the same result. Compare with a tolerance instead of <code>==</code>.</p>
+  </details>
+
+  <details>
+    <summary>Why does <code>'7' - '0'</code> give 7?</summary>
+    <p>Characters are small integers. In ASCII the digit characters are consecutive starting at 48, so <code>'7'</code> is 55 and <code>'0'</code> is 48; the difference is the digit's numeric value. The standard guarantees the digits are consecutive, so this idiom is portable — unlike the same trick on letters.</p>
+  </details>
+
+  <details>
+    <summary>Adding 1 to the largest <code>int</code> gives a negative number. Can you rely on that?</summary>
+    <p>No. The bit-level explanation is real — the carry lands in the sign position — but signed overflow is <em>undefined behavior</em> in C, not defined wrap-around. The compiler may assume it cannot happen and optimize accordingly, so the observed result can change with optimization level. Unsigned types are defined to wrap; signed types are not.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">10</span>Where this leads</h2>
+  <p>You now know what is actually in a byte. Week 5 puts names and types on those bytes: how C declares a variable, what each basic type guarantees, and how <code>sizeof</code> and <code>&lt;limits.h&gt;</code> let a program report its own machine's properties. Week 7 then returns to this material to explain what happens when values of different types meet in one expression — which is where the conversions bite.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_03_Program_Structure_and_Style.html">← Week 3</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_05_Variables_Types_and_Constants.html">Week 5 →</a>
+</div>
+
+</div>

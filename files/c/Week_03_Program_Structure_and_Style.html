@@ -1,0 +1,337 @@
+---
+layout: without-sidebar
+title: "Week 3 — Program Structure, Style, and Basic Output"
+permalink: /files/c/Week_03_Program_Structure_and_Style.html
+excerpt: "The anatomy of a C program, what main returns and who reads it, printing with printf, writing code another person can read, and putting your work under version control."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Basic · Week 3</div>
+  <h1>Program Structure, Style, and Basic Output</h1>
+  <p class="c-wk-lead">Every C program has the same skeleton. This week takes it apart piece by piece, introduces the output you will use for the rest of the course, and establishes two habits — readable formatting and version control — that separate people who finish projects from people who abandon them.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Explain every line of a minimal C program, including why <code>main</code> returns a value and who reads it.</li>
+      <li>Use <code>EXIT_SUCCESS</code> and <code>EXIT_FAILURE</code>, and inspect a program's exit status from the shell.</li>
+      <li>Print text and values with <code>printf</code>.</li>
+      <li>Format and name code so that a stranger can read it, and run a formatter to enforce it.</li>
+      <li>Create a Git repository, commit your work, and ignore build products.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The shape of a C program</h2>
+
+  <p>Here is the smallest useful program, annotated:</p>
+
+<pre><code>#include &lt;stdio.h&gt;      /* 1. bring in declarations           */
+#include &lt;stdlib.h&gt;     /*    for EXIT_SUCCESS                */
+
+int main(void)          /* 2. where execution begins          */
+{                       /* 3. the function body opens         */
+    printf("ready\n");  /* 4. one statement, ends in ;        */
+    return EXIT_SUCCESS;/* 5. hand a result back to the shell */
+}                       /*    the body closes                 */</code></pre>
+
+  <p>A C source file is a sequence of <em>declarations</em> and <em>definitions</em> at the outermost level. You cannot put a bare statement outside a function; there is no top-level script. Everything executable lives inside a function body.</p>
+
+  <h3><code>#include</code> and where names come from</h3>
+  <p>C does not know what <code>printf</code> is. Nothing is built in except the language itself — the keywords, the operators, the control structures. Every function you call comes from a library, and before you can call it, the compiler needs its <em>declaration</em>: its name, its return type, and the types of its parameters.</p>
+
+  <p>A header file is a text file full of such declarations. <code>#include &lt;stdio.h&gt;</code> tells the preprocessor to paste that file in at this point, which is why removing the line produced the "implicit declaration" error in week 1.</p>
+
+  <p>The angle brackets mean "look in the system include directories". Quotation marks — <code>#include "myheader.h"</code> — mean "look next to this source file first". You will write your own headers in week 28.</p>
+
+  <table>
+    <thead><tr><th>Header</th><th>What it declares</th><th>First needed</th></tr></thead>
+    <tbody>
+      <tr><td><code>&lt;stdio.h&gt;</code></td><td><code>printf</code>, <code>scanf</code>, <code>fgets</code>, file handling</td><td>Week 3</td></tr>
+      <tr><td><code>&lt;stdlib.h&gt;</code></td><td><code>EXIT_SUCCESS</code>, <code>malloc</code>, <code>free</code>, <code>strtol</code>, <code>exit</code></td><td>Week 3</td></tr>
+      <tr><td><code>&lt;string.h&gt;</code></td><td><code>strlen</code>, <code>strcpy</code>, <code>memcpy</code></td><td>Week 14</td></tr>
+      <tr><td><code>&lt;stdbool.h&gt;</code></td><td><code>bool</code>, <code>true</code>, <code>false</code></td><td>Week 5</td></tr>
+      <tr><td><code>&lt;math.h&gt;</code></td><td><code>sqrt</code>, <code>pow</code>, <code>fabs</code> (link with <code>-lm</code>)</td><td>Week 24</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span><code>main</code> and its return value</h2>
+
+  <p>When the operating system starts your program, it calls <code>main</code>. When <code>main</code> returns, the program ends and the returned integer is handed back to whatever launched it — usually your shell. This value is the program's <strong>exit status</strong>, and it is not decoration: it is how programs tell scripts whether they succeeded.</p>
+
+<pre><code>./hello
+echo $?</code></pre>
+
+  <p><code>$?</code> holds the exit status of the last command. Run it after a successful program and you get <code>0</code>. Run it after a failing one and you get something else.</p>
+
+  <p>By convention, <strong>0 means success and any non-zero value means failure</strong>. This is backwards from most people's intuition, and there is a reason: there is one way to succeed and many ways to fail, so the non-zero values are free to distinguish between them.</p>
+
+  <p><code>&lt;stdlib.h&gt;</code> gives you two names for the common cases:</p>
+<pre><code>return EXIT_SUCCESS;   /* 0 on every platform */
+return EXIT_FAILURE;   /* an implementation-defined non-zero value */</code></pre>
+
+  <p>Use them. <code>return 0;</code> is correct and extremely common, but the named constants say what you mean, and <code>EXIT_FAILURE</code> has no fixed numeric spelling you could write by hand portably.</p>
+
+  <h3>Why this matters early</h3>
+  <p>Shell scripts, build systems, and continuous integration all branch on exit status:</p>
+<pre><code>./myprogram &amp;&amp; echo "worked"
+./myprogram || echo "failed"</code></pre>
+  <p>A program that always returns 0, even when it could not open its input file, is a program that silently breaks every automation around it. Week 31 designs command-line tools properly; the habit starts here.</p>
+
+  <div class="c-wk-note">
+    <p><strong>The two legal forms of <code>main</code>.</strong> <code>int main(void)</code> and <code>int main(int argc, char *argv[])</code>. The second receives the command-line arguments and appears in week 23. Anything else — notably <code>void main()</code>, which some old textbooks show — is not standard C, even where a compiler tolerates it.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Statements, blocks, and punctuation</h2>
+
+  <p>A <strong>statement</strong> is one step. It ends with a semicolon. The semicolon is a terminator, not a separator — every statement gets one, including the last one in a block.</p>
+
+  <p>A <strong>block</strong> is a sequence of statements wrapped in braces. A block can appear anywhere a statement can, and it creates a new scope, which week 17 examines in detail.</p>
+
+<pre><code>{
+    int inner = 1;      /* visible only inside these braces */
+    printf("%d\n", inner);
+}
+/* inner does not exist here */</code></pre>
+
+  <p>C ignores whitespace almost everywhere. The following is legal and compiles to exactly the same program as the annotated version above:</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+int main(void){printf("ready\n");return 0;}</code></pre>
+
+  <p>The compiler does not care. Everyone who ever reads your code does. Which brings us to the real subject of this week.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>The stray semicolon.</strong> <code>if (x &gt; 0);</code> is legal C. The semicolon is an empty statement, so the <code>if</code> controls nothing and the block after it always runs. The compiler will not stop you, though <code>-Wextra</code> may warn. This bug has cost people entire afternoons.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Printing with <code>printf</code></h2>
+
+  <p><code>printf</code> takes a <em>format string</em> and then whatever values that string refers to. Inside the format string, a <code>%</code> introduces a conversion specifier — a placeholder that says "insert the next argument here, formatted this way".</p>
+
+<pre><code>int   count = 42;
+double ratio = 0.5;
+char  grade = 'A';
+
+printf("count = %d\n", count);
+printf("ratio = %f\n", ratio);
+printf("grade = %c\n", grade);
+printf("text  = %s\n", "literal");
+printf("%d items at %f each\n", count, ratio);</code></pre>
+
+  <table>
+    <thead><tr><th>Specifier</th><th>Argument type</th></tr></thead>
+    <tbody>
+      <tr><td><code>%d</code></td><td><code>int</code></td></tr>
+      <tr><td><code>%u</code></td><td><code>unsigned int</code></td></tr>
+      <tr><td><code>%f</code></td><td><code>double</code> (and <code>float</code>, which is promoted)</td></tr>
+      <tr><td><code>%c</code></td><td>a single character</td></tr>
+      <tr><td><code>%s</code></td><td>a string</td></tr>
+      <tr><td><code>%zu</code></td><td><code>size_t</code> — you will need this from week 12</td></tr>
+      <tr><td><code>%%</code></td><td>a literal percent sign</td></tr>
+    </tbody>
+  </table>
+
+  <p>Escape sequences let you write characters you cannot type directly. <code>\n</code> is a newline, <code>\t</code> a tab, <code>\\</code> a backslash, <code>\"</code> a double quote. Each is <em>one</em> character, not two.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>Mismatched specifiers are not caught by the language.</strong> <code>printf("%d\n", 3.5)</code> is undefined behavior: <code>printf</code> will read an <code>int</code>-sized piece of whatever was passed and print nonsense, or worse. GCC with <code>-Wall</code> catches the common cases — another reason that flag is not optional. Week 8 covers the full mechanism and week 30 explains why <code>printf</code> cannot check for itself.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Style: writing for the next reader</h2>
+
+  <p>You will spend far more time reading code than writing it, and most of what you read will have been written by someone else — including yourself six months ago. Style is not decoration; it is the difference between code you can change safely and code you are afraid of.</p>
+
+  <h3>Indentation</h3>
+  <p>Indent one level for each nested block. Four spaces is the most common choice; the Linux kernel uses tabs of width eight. Pick one and never mix them within a file — mixed indentation looks correct in your editor and wrong in everyone else's.</p>
+
+  <h3>Naming</h3>
+  <table>
+    <thead><tr><th>Guideline</th><th>Good</th><th>Poor</th></tr></thead>
+    <tbody>
+      <tr><td>Say what it holds</td><td><code>student_count</code></td><td><code>n2</code></td></tr>
+      <tr><td>Length matches scope</td><td><code>i</code> as a loop index</td><td><code>i</code> as a global</td></tr>
+      <tr><td>Consistent word separation</td><td><code>read_line</code>, <code>line_length</code></td><td><code>read_line</code>, <code>lineLength</code></td></tr>
+      <tr><td>Constants stand out</td><td><code>MAX_STUDENTS</code></td><td><code>maxstudents</code></td></tr>
+      <tr><td>No abbreviation games</td><td><code>average</code></td><td><code>avrg</code></td></tr>
+    </tbody>
+  </table>
+  <p>C traditionally uses <code>snake_case</code> for functions and variables and <code>UPPER_CASE</code> for macros and constants. The standard library follows it; so should you.</p>
+
+  <h3>Comments</h3>
+  <p>Comments should explain <em>why</em>, not <em>what</em>. The code already says what it does.</p>
+<pre><code>x = x + 1;              /* add one to x          — worthless */
+retries = retries + 1;  /* the modem drops the first byte
+                           after power-on, so we retry once */</code></pre>
+  <p>A comment that restates the code is worse than none: it doubles the maintenance burden and eventually contradicts the code it describes.</p>
+
+  <h3>Let a tool do it</h3>
+  <p>Arguing about brace placement is a waste of a life. Install <code>clang-format</code> and let it decide:</p>
+<pre><code>clang-format -style=llvm -i hello.c</code></pre>
+  <p>Put a <code>.clang-format</code> file at the root of a project and every file in it is formatted identically, forever, with no discussion.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: from unreadable to readable</h2>
+
+  <p>Here is a working program. It compiles cleanly and produces correct output.</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+int main(void){int a=5,b=3,c;c=a*b;printf("%d\n",c);
+int d=0;for(int i=1;i&lt;=c;i++){d+=i;}printf("%d\n",d);return 0;}</code></pre>
+
+  <p>Read it and answer: what does it print, and what are the two numbers for? The program works and tells you nothing.</p>
+
+  <p>Now the same computation, rewritten. Nothing about the behavior changed.</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main(void)
+{
+    const int rows = 5;
+    const int columns = 3;
+
+    const int cell_count = rows * columns;
+    printf("cells in the grid: %d\n", cell_count);
+
+    /* Sum 1..cell_count, used later to size the report buffer. */
+    int running_total = 0;
+    for (int i = 1; i &lt;= cell_count; i++) {
+        running_total += i;
+    }
+    printf("triangular number for %d: %d\n", cell_count, running_total);
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+  <p>What changed, concretely:</p>
+  <ul>
+    <li><code>a</code>, <code>b</code>, <code>c</code>, <code>d</code> became names that say what the value is.</li>
+    <li>Values that never change are marked <code>const</code>, so the compiler enforces that.</li>
+    <li>Each statement is on its own line, indented consistently.</li>
+    <li>The output labels itself, so the program is diagnosable without reading its source.</li>
+    <li>The one comment explains a purpose that is not visible from the code.</li>
+    <li><code>EXIT_SUCCESS</code> states the intent of the return value.</li>
+  </ul>
+
+  <p>Verify that the rewrite really is equivalent — the discipline of checking matters more than the belief:</p>
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o ugly ugly.c
+gcc -std=c17 -Wall -Wextra -g -o clean clean.c
+./ugly &gt; a.txt
+./clean | grep -o '[0-9]*$' &gt; b.txt
+diff a.txt b.txt &amp;&amp; echo "same numbers"</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Putting it under version control</h2>
+
+  <p>From this week on, keep your work in Git. Not because the course requires it, but because you will want to know what you changed when something that worked yesterday does not work today — and because week 43's exercise in finding a regression with <code>git bisect</code> only makes sense if you have a history to bisect.</p>
+
+<pre><code>mkdir c-course &amp;&amp; cd c-course
+git init
+git config user.name  "Your Name"
+git config user.email "you@example.com"</code></pre>
+
+  <p>Create a <code>.gitignore</code> before your first commit. Compiled output does not belong in a repository: it is large, it changes on every build, and it is reproducible from the source.</p>
+
+<pre><code># Build products
+*.o
+*.obj
+*.a
+*.so
+*.exe
+a.out
+
+# Binaries without an extension are hard to match by pattern,
+# so keep them in one directory and ignore that.
+/build/
+/bin/
+
+# Editor and OS noise
+*.swp
+.DS_Store
+.vscode/</code></pre>
+
+  <p>Then the loop you will repeat for the next fifty-three weeks:</p>
+
+<pre><code>git status                       # what changed
+git add week03/clean.c           # stage this file
+git commit -m "Week 3: readable rewrite of the grid example"
+git log --oneline                # what has happened so far</code></pre>
+
+  <p>Write commit messages in the imperative mood, describing the change rather than the file: <code>Fix off-by-one in row count</code>, not <code>updated main.c</code>. Your future self is the primary audience, and your future self will be in a hurry.</p>
+
+  <div class="c-wk-note">
+    <p><strong>Commit small and often.</strong> A commit should be one idea. That makes history readable, makes a bad change easy to isolate, and makes <code>git bisect</code> actually useful. Branching, merging, and reviewing arrive in week 44; the single-user habits are enough for now.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Writing <code>void main()</code></td><td>Works on some compilers, rejected by others</td><td><code>int main(void)</code>. It is the only portable spelling for the no-argument form.</td></tr>
+      <tr><td>Forgetting to return a status on the failure path</td><td>The shell sees success even though the program failed</td><td>Return <code>EXIT_FAILURE</code> from every path that did not do its job.</td></tr>
+      <tr><td><code>printf(count)</code> instead of <code>printf("%d\n", count)</code></td><td>Compiler error, or a format-string vulnerability if <code>count</code> were a string</td><td>The first argument is always a format string. Week 36 explains why this is a security issue.</td></tr>
+      <tr><td>Mixing tabs and spaces</td><td>Code looks aligned for you, ragged for everyone else</td><td>Configure your editor to insert spaces, and run <code>clang-format</code>.</td></tr>
+      <tr><td>Committing <code>a.out</code> and <code>.o</code> files</td><td>Repository bloats; every build shows as a change</td><td>Write <code>.gitignore</code> before the first commit.</td></tr>
+      <tr><td>One enormous commit at the end of the week</td><td>History says nothing; a bad change cannot be isolated</td><td>Commit each working step.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">9</span>Check yourself</h2>
+
+  <details>
+    <summary>Why does <code>main</code> return a value, and who reads it?</summary>
+    <p>The value is the program's exit status, returned to whatever started the program — normally the shell. Zero conventionally means success and non-zero means failure, which lets scripts and build systems branch on whether your program worked. Inspect it with <code>echo $?</code>.</p>
+  </details>
+
+  <details>
+    <summary>Your program prints the right answer but returns <code>EXIT_FAILURE</code>. Does it matter?</summary>
+    <p>To a human watching the terminal, no. To anything automated, yes — a build script, a test harness, or a shell pipeline will treat the run as failed and may stop. Exit status is part of your program's interface, not an afterthought.</p>
+  </details>
+
+  <details>
+    <summary>What does <code>#include &lt;stdio.h&gt;</code> actually do?</summary>
+    <p>It instructs the preprocessor to insert the contents of that header at that point in the file. The header contains <em>declarations</em> — names, return types, parameter types — not the function bodies. The bodies live in the C library and are attached later by the linker.</p>
+  </details>
+
+  <details>
+    <summary>If the compiler ignores whitespace, why bother indenting?</summary>
+    <p>Because the compiler is not the audience. Code is read many more times than it is written, and badly formatted code hides bugs — a misplaced brace or an accidental empty statement is invisible in a dense line and obvious in a formatted one. Delegate the decision to <code>clang-format</code> and stop thinking about it.</p>
+  </details>
+
+  <details>
+    <summary>Why should compiled output be kept out of version control?</summary>
+    <p>It is derived data: fully reproducible from the source by running the build. Storing it makes the repository large, makes every build appear as a change, and creates merge conflicts in binary files that cannot be merged. Track the inputs, not the outputs.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">10</span>Where this leads</h2>
+  <p>You can write, build, format, and version a program. Week 4 goes underneath it: how the machine actually stores the numbers and characters you have been printing. That is the foundation for types in week 5 and for the conversion pitfalls in week 7, and it is what makes the bit-level work of week 25 feel obvious rather than arbitrary.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_02_History_Standards_and_Compilation.html">← Week 2</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_04_Data_Representation.html">Week 4 →</a>
+</div>
+
+</div>

@@ -1,0 +1,356 @@
+---
+layout: without-sidebar
+title: "Week 5 — Variables, Types, and Constants"
+permalink: /files/c/Week_05_Variables_Types_and_Constants.html
+excerpt: "Declarations and initialization, the basic types and their modifiers, sizeof and size_t, what limits.h guarantees, and the three ways to say that something never changes."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Basic · Week 5</div>
+  <h1>Variables, Types, and Constants</h1>
+  <p class="c-wk-lead">Last week you saw what a byte holds. This week you give those bytes names and types. A type in C is a promise about two things: how many bytes, and how to interpret them — and the C standard is far looser about the first than most people expect.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Declare and initialize variables of every basic type, and explain what an uninitialized variable contains.</li>
+      <li>Choose between <code>int</code>, <code>long</code>, <code>unsigned</code>, <code>float</code>, <code>double</code>, and <code>bool</code> deliberately.</li>
+      <li>Use <code>sizeof</code> correctly and explain why its result has type <code>size_t</code>.</li>
+      <li>Report your machine's actual type limits using <code>&lt;limits.h&gt;</code> and <code>&lt;float.h&gt;</code>.</li>
+      <li>Say why <code>const</code> and <code>#define</code> are not the same thing, and when to use each.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Declarations and initialization</h2>
+
+  <p>A declaration introduces a name and gives it a type:</p>
+
+<pre><code>int   count;          /* declared, not initialized */
+int   total = 0;      /* declared and initialized  */
+double average = 0.0;
+char  grade = 'B';</code></pre>
+
+  <p>The type comes first, then the name. You can declare several names of the same type at once, though it is usually clearer not to:</p>
+
+<pre><code>int width = 10, height = 20;   /* legal */</code></pre>
+
+  <h3>Identifiers</h3>
+  <p>A name may contain letters, digits, and underscores, and may not begin with a digit. C is case-sensitive: <code>total</code>, <code>Total</code>, and <code>TOTAL</code> are three different names. Keywords such as <code>int</code>, <code>return</code>, and <code>while</code> are reserved.</p>
+
+  <p>Two conventions worth respecting. Names beginning with an underscore followed by a capital letter, and names containing a double underscore, are reserved for the implementation — do not invent your own. And the standard library has already taken a great many ordinary words, so a global variable called <code>index</code> or <code>time</code> can collide in surprising ways.</p>
+
+  <h3>The uninitialized variable</h3>
+  <p>This is the first genuinely dangerous thing in C:</p>
+
+<pre><code>int count;
+printf("%d\n", count);   /* undefined behavior */</code></pre>
+
+  <p>C does not zero your variables. A local variable that you do not initialize contains whatever bytes happened to be at that memory location — leftovers from a previous function call. The value is not random in any useful sense; it is arbitrary, it may be different on each run, and reading it is undefined behavior.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>Why this bites so hard.</strong> Uninitialized memory is often zero by accident during early development, so the bug hides. It surfaces later, on a different machine or after an unrelated change, as behavior nobody can reproduce. <code>-Wall</code> catches many cases (<code>-Wmaybe-uninitialized</code>), and week 20 shows how a sanitizer catches the rest. The cheap defence is to initialize every variable at the point of declaration.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>The basic types</h2>
+
+  <h3>Integers</h3>
+  <p>C has one integer type, <code>int</code>, plus modifiers that adjust its size and signedness.</p>
+
+  <table>
+    <thead><tr><th>Declaration</th><th>Meaning</th><th>Guaranteed minimum range</th></tr></thead>
+    <tbody>
+      <tr><td><code>signed char</code></td><td>smallest integer</td><td>−127 … 127</td></tr>
+      <tr><td><code>unsigned char</code></td><td>non-negative byte</td><td>0 … 255</td></tr>
+      <tr><td><code>short</code></td><td>at least 16 bits</td><td>−32 767 … 32 767</td></tr>
+      <tr><td><code>int</code></td><td>the natural size</td><td>−32 767 … 32 767</td></tr>
+      <tr><td><code>long</code></td><td>at least 32 bits</td><td>−2 147 483 647 … 2 147 483 647</td></tr>
+      <tr><td><code>long long</code></td><td>at least 64 bits</td><td>about ±9.2 × 10¹⁸</td></tr>
+      <tr><td><code>unsigned int</code></td><td>no negatives, one extra bit of range</td><td>0 … 65 535</td></tr>
+    </tbody>
+  </table>
+
+  <p>Read that table carefully. The standard guarantees <code>int</code> can hold only ±32 767. On your laptop it will be 32 bits, but the guarantee is what portable code may rely on — a distinction week 37 turns into a working discipline with <code>&lt;stdint.h&gt;</code>.</p>
+
+  <p><code>signed</code> is the default for <code>int</code>, <code>short</code>, <code>long</code>, so <code>signed int</code> and <code>int</code> are the same type. Plain <code>char</code> is the exception: whether it is signed is implementation-defined, as week 4 noted.</p>
+
+  <h3>Floating point</h3>
+  <table>
+    <thead><tr><th>Type</th><th>Typical size</th><th>Decimal digits of precision</th></tr></thead>
+    <tbody>
+      <tr><td><code>float</code></td><td>4 bytes</td><td>about 7</td></tr>
+      <tr><td><code>double</code></td><td>8 bytes</td><td>about 15</td></tr>
+      <tr><td><code>long double</code></td><td>8, 12, or 16 bytes</td><td>platform dependent</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>Default to <code>double</code>.</strong> A floating-point literal such as <code>3.14</code> is already a <code>double</code>; writing <code>3.14f</code> makes it a <code>float</code>. Modern processors compute in double precision anyway, so <code>float</code> buys memory, not speed, and costs you half your significant digits. Use <code>float</code> when you have millions of values to store or you are on a small embedded target — week 53.</p>
+
+  <h3>Boolean</h3>
+  <p>C had no boolean type until C99. It has one now:</p>
+
+<pre><code>#include &lt;stdbool.h&gt;
+
+bool ready = true;
+bool done  = false;</code></pre>
+
+  <p>Under the hood this is <code>_Bool</code>, and <code>&lt;stdbool.h&gt;</code> provides the friendlier spellings. In C23 <code>bool</code>, <code>true</code>, and <code>false</code> became real keywords and the header is no longer needed — but including it is harmless and keeps the code compiling under C17.</p>
+
+  <p>Before C99, and still in a great deal of existing code, truth is expressed with <code>int</code>: <strong>zero is false, every other value is true</strong>. That rule still governs every <code>if</code> and <code>while</code> you will write, so it is worth internalizing rather than hiding behind <code>bool</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span><code>sizeof</code> and <code>size_t</code></h2>
+
+  <p><code>sizeof</code> reports how many bytes an object or type occupies. It is an operator, not a function, and it is evaluated at compile time.</p>
+
+<pre><code>printf("%zu\n", sizeof(int));    /* parentheses required for a type */
+printf("%zu\n", sizeof count);   /* optional for an expression      */</code></pre>
+
+  <p><code>sizeof(char)</code> is 1 by definition, and every other size is a multiple of it. So <code>sizeof</code> answers "how many <code>char</code>-sized units", which on all mainstream machines means bytes.</p>
+
+  <h3>Why <code>%zu</code> and not <code>%d</code></h3>
+  <p><code>sizeof</code> yields a value of type <code>size_t</code> — an unsigned integer type large enough to hold the size of any object. On a 64-bit machine it is typically 64 bits wide, whereas <code>int</code> is 32. Printing it with <code>%d</code> is a mismatch, which is undefined behavior; <code>%zu</code> is the correct specifier.</p>
+
+  <p><code>size_t</code> is worth taking seriously now, because it is everywhere from here on: it is the type of every array index you should use (week 12), the parameter type of <code>malloc</code> (week 19), and the return type of <code>strlen</code> (week 14).</p>
+
+  <div class="c-wk-trap">
+    <p><strong><code>size_t</code> is unsigned.</strong> A countdown loop written as <code>for (size_t i = n - 1; i &gt;= 0; i--)</code> never terminates: an unsigned value is always greater than or equal to zero, so when <code>i</code> is 0 and decrements, it wraps to an enormous number. You will meet this again in week 7 and again, painfully, in week 12.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Knowing your machine: <code>&lt;limits.h&gt;</code> and <code>&lt;float.h&gt;</code></h2>
+
+  <p>Rather than guessing what your types can hold, ask. Two headers define the answers as compile-time constants.</p>
+
+  <table>
+    <thead><tr><th>Constant</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>CHAR_BIT</code></td><td>bits in a <code>char</code> — 8 everywhere you will meet</td></tr>
+      <tr><td><code>INT_MIN</code>, <code>INT_MAX</code></td><td>range of <code>int</code></td></tr>
+      <tr><td><code>UINT_MAX</code></td><td>largest <code>unsigned int</code></td></tr>
+      <tr><td><code>LONG_MIN</code>, <code>LONG_MAX</code></td><td>range of <code>long</code></td></tr>
+      <tr><td><code>LLONG_MAX</code></td><td>largest <code>long long</code></td></tr>
+      <tr><td><code>FLT_DIG</code>, <code>DBL_DIG</code></td><td>decimal digits of precision</td></tr>
+      <tr><td><code>FLT_EPSILON</code>, <code>DBL_EPSILON</code></td><td>smallest difference from 1.0 that is representable</td></tr>
+    </tbody>
+  </table>
+
+  <p><code>DBL_EPSILON</code> deserves a note now and a full treatment in week 7: it is the standard starting point for choosing the tolerance in a floating-point comparison, because it quantifies exactly how much precision you have.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Literals and escape sequences</h2>
+
+  <p>A literal is a value written directly in the source. Its <em>type</em> is determined by how you write it, which matters more than beginners expect.</p>
+
+  <table>
+    <thead><tr><th>Literal</th><th>Type</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr><td><code>42</code></td><td><code>int</code></td><td></td></tr>
+      <tr><td><code>42U</code></td><td><code>unsigned int</code></td><td></td></tr>
+      <tr><td><code>42L</code></td><td><code>long</code></td><td></td></tr>
+      <tr><td><code>42LL</code></td><td><code>long long</code></td><td></td></tr>
+      <tr><td><code>3.14</code></td><td><code>double</code></td><td>the default for decimals</td></tr>
+      <tr><td><code>3.14f</code></td><td><code>float</code></td><td></td></tr>
+      <tr><td><code>0x2A</code></td><td><code>int</code></td><td>hexadecimal 42</td></tr>
+      <tr><td><code>052</code></td><td><code>int</code></td><td>octal 42 — leading zero</td></tr>
+      <tr><td><code>0b101010</code></td><td><code>int</code></td><td>binary, C23</td></tr>
+      <tr><td><code>'A'</code></td><td><code>int</code> in C, not <code>char</code></td><td>a character constant</td></tr>
+      <tr><td><code>"text"</code></td><td><code>char[5]</code></td><td>four characters plus <code>'\0'</code></td></tr>
+    </tbody>
+  </table>
+
+  <p>The type of a literal decides the type of the expression it sits in. <code>1 / 2</code> is integer division and gives 0; <code>1.0 / 2</code> gives 0.5. This is the most common arithmetic surprise in the language, and week 7 explains the rule behind it.</p>
+
+  <h3>Escape sequences</h3>
+  <table>
+    <thead><tr><th>Escape</th><th>Character</th></tr></thead>
+    <tbody>
+      <tr><td><code>\n</code></td><td>newline</td></tr>
+      <tr><td><code>\t</code></td><td>tab</td></tr>
+      <tr><td><code>\\</code></td><td>backslash</td></tr>
+      <tr><td><code>\'</code> <code>\"</code></td><td>quote characters</td></tr>
+      <tr><td><code>\0</code></td><td>the null character, value 0</td></tr>
+      <tr><td><code>\x41</code></td><td>the character with hex value 41 — <code>'A'</code></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Three ways to say "this never changes"</h2>
+
+  <h3><code>#define</code> — textual substitution</h3>
+<pre><code>#define MAX_STUDENTS 100</code></pre>
+  <p>The preprocessor replaces every occurrence of <code>MAX_STUDENTS</code> with the text <code>100</code> before the compiler runs. There is no variable, no type, and no memory. It works anywhere, including array sizes and <code>#if</code> conditions.</p>
+
+  <h3><code>const</code> — a typed, read-only object</h3>
+<pre><code>const int max_students = 100;</code></pre>
+  <p>This is a real object with a real type that the compiler refuses to let you assign to. It appears in the debugger, participates in type checking, and obeys scope.</p>
+
+  <h3><code>enum</code> — named integer constants</h3>
+<pre><code>enum { MAX_STUDENTS = 100, MAX_COURSES = 20 };</code></pre>
+  <p>Integer constants with no memory cost, usable where a compile-time constant is required. Week 22 covers enumerations properly.</p>
+
+  <table>
+    <thead><tr><th></th><th><code>#define</code></th><th><code>const</code></th><th><code>enum</code></th></tr></thead>
+    <tbody>
+      <tr><td>Type-checked</td><td>no</td><td>yes</td><td>integers only</td></tr>
+      <tr><td>Respects scope</td><td>no</td><td>yes</td><td>yes</td></tr>
+      <tr><td>Visible in a debugger</td><td>no</td><td>yes</td><td>usually</td></tr>
+      <tr><td>Usable as an array size</td><td>yes</td><td>C99 VLA only</td><td>yes</td></tr>
+      <tr><td>Works for non-integers</td><td>yes</td><td>yes</td><td>no</td></tr>
+    </tbody>
+  </table>
+
+  <p>Prefer <code>const</code> for values with a type, and <code>enum</code> for a family of related integers. Reserve <code>#define</code> for things the other two cannot do — which, before week 27, is mostly array sizes in C89-style code.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>A <code>#define</code> is text, and text has no arithmetic.</strong> <code>#define HALF 1/2</code> followed by <code>double x = HALF;</code> gives 0, not 0.5, because the substitution produces integer division. Worse, <code>#define SQUARE(x) x*x</code> makes <code>SQUARE(2+3)</code> expand to <code>2+3*2+3</code> = 11. Week 27 explains the parentheses that fix this and why a function is usually better.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Worked example: a program that describes its own machine</h2>
+
+  <p>Save as <code>types.c</code>. It prints what your compiler actually does, next to what the standard merely promises.</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;limits.h&gt;
+#include &lt;float.h&gt;
+#include &lt;stdbool.h&gt;
+
+int main(void)
+{
+    printf("CHAR_BIT = %d  (bits per byte on this machine)\n\n", CHAR_BIT);
+
+    printf("%-20s %6s  %s\n", "type", "bytes", "range on this machine");
+    printf("%-20s %6zu  %d .. %d\n",
+           "char",           sizeof(char),      CHAR_MIN,  CHAR_MAX);
+    printf("%-20s %6zu  %d .. %d\n",
+           "short",          sizeof(short),     SHRT_MIN,  SHRT_MAX);
+    printf("%-20s %6zu  %d .. %d\n",
+           "int",            sizeof(int),       INT_MIN,   INT_MAX);
+    printf("%-20s %6zu  %ld .. %ld\n",
+           "long",           sizeof(long),      LONG_MIN,  LONG_MAX);
+    printf("%-20s %6zu  %lld .. %lld\n",
+           "long long",      sizeof(long long), LLONG_MIN, LLONG_MAX);
+    printf("%-20s %6zu  0 .. %u\n",
+           "unsigned int",   sizeof(unsigned),  UINT_MAX);
+    printf("%-20s %6zu\n", "float",       sizeof(float));
+    printf("%-20s %6zu\n", "double",      sizeof(double));
+    printf("%-20s %6zu\n", "long double", sizeof(long double));
+    printf("%-20s %6zu\n", "bool",        sizeof(bool));
+    printf("%-20s %6zu\n", "size_t",      sizeof(size_t));
+    printf("%-20s %6zu\n", "void *",      sizeof(void *));
+
+    printf("\nfloat  : %d significant decimal digits, epsilon = %g\n",
+           FLT_DIG, FLT_EPSILON);
+    printf("double : %d significant decimal digits, epsilon = %g\n",
+           DBL_DIG, DBL_EPSILON);
+
+    puts("\n-- what the standard actually guarantees --");
+    puts("char       at least  -127 .. 127");
+    puts("short      at least  -32767 .. 32767");
+    puts("int        at least  -32767 .. 32767");
+    puts("long       at least  -2147483647 .. 2147483647");
+    puts("long long  at least  about +/- 9.2e18");
+
+    puts("\n-- the classic surprise --");
+    printf("1 / 2       = %d\n",  1 / 2);
+    printf("1.0 / 2     = %g\n",  1.0 / 2);
+    printf("7 / 2       = %d\n",  7 / 2);
+    printf("7 %% 2       = %d\n", 7 % 2);
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o types types.c
+./types</code></pre>
+
+  <h3>What to notice</h3>
+
+  <p><strong><code>int</code> is 4 bytes but only 2 are guaranteed.</strong> The gap between the two halves of the output is the entire subject of week 37. Code that assumes the left column instead of the right is code that breaks when it moves.</p>
+
+  <p><strong><code>long</code> is where portability goes wrong.</strong> On 64-bit Linux and macOS it is 8 bytes; on 64-bit Windows it is 4. A great deal of otherwise-correct code has failed on exactly this.</p>
+
+  <p><strong><code>sizeof(void *)</code> tells you the word size.</strong> 8 on a 64-bit machine, 4 on a 32-bit one. This is the number that decides how much memory a process can address.</p>
+
+  <p><strong><code>1 / 2</code> is 0.</strong> Both operands are <code>int</code>, so C performs integer division and discards the remainder. Writing <code>1.0 / 2</code> makes one operand a <code>double</code> and the whole expression follows. Remember this the next time an average comes out wrong.</p>
+
+  <h3>An experiment worth running</h3>
+  <p>Add these two lines and rebuild:</p>
+<pre><code>    int uninitialized;
+    printf("uninitialized = %d\n", uninitialized);</code></pre>
+
+  <p>GCC will warn:</p>
+<pre><code>types.c:52:5: warning: 'uninitialized' is used uninitialized
+              [-Wuninitialized]</code></pre>
+  <p>Run it several times, and at different optimization levels. The value may be 0, may be garbage, and may change. That instability is exactly why the language calls it undefined rather than unspecified.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Reading an uninitialized variable</td><td>Undefined behavior; unreproducible bugs</td><td>Initialize at the point of declaration, always.</td></tr>
+      <tr><td>Printing <code>sizeof</code> with <code>%d</code></td><td>Undefined behavior; wrong number on 64-bit</td><td>Use <code>%zu</code>.</td></tr>
+      <tr><td>Counting down with an unsigned index</td><td>Infinite loop</td><td>Loop upward, or use a signed type, or restructure the condition.</td></tr>
+      <tr><td>Expecting <code>1 / 2</code> to be 0.5</td><td>Silent integer division</td><td>Make one operand floating point: <code>1.0 / 2</code>.</td></tr>
+      <tr><td>Using <code>float</code> by habit</td><td>Seven digits of precision where you needed fifteen</td><td>Default to <code>double</code>.</td></tr>
+      <tr><td><code>#define HALF 1/2</code></td><td>Textual substitution yields integer division</td><td>Parenthesize, or use <code>const double half = 0.5;</code>.</td></tr>
+      <tr><td>Assuming <code>long</code> is 64 bits</td><td>Works on Linux, breaks on Windows</td><td>Use <code>long long</code>, or <code>int64_t</code> from week 37.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">9</span>Check yourself</h2>
+
+  <details>
+    <summary>What does an uninitialized local variable contain?</summary>
+    <p>Whatever bytes were already at that memory location — typically leftovers from earlier function calls. It is not zero, not random in any dependable sense, and reading it is undefined behavior. Initialize every variable where you declare it.</p>
+  </details>
+
+  <details>
+    <summary>Why does <code>sizeof</code> return <code>size_t</code> rather than <code>int</code>?</summary>
+    <p>Because a size cannot be negative and can exceed the range of <code>int</code> on a 64-bit machine. <code>size_t</code> is an unsigned type guaranteed to hold the size of any object. Print it with <code>%zu</code>; using <code>%d</code> is a format mismatch and undefined behavior.</p>
+  </details>
+
+  <details>
+    <summary>Why does <code>for (size_t i = n - 1; i &gt;= 0; i--)</code> never end?</summary>
+    <p><code>size_t</code> is unsigned, so <code>i &gt;= 0</code> is always true. When <code>i</code> reaches 0 and is decremented it wraps to the largest representable value rather than becoming −1. Either loop upward, or write the condition as <code>i-- &gt; 0</code> using the value before the decrement.</p>
+  </details>
+
+  <details>
+    <summary>Give one thing <code>const</code> does that <code>#define</code> cannot, and one thing <code>#define</code> does that <code>const</code> cannot.</summary>
+    <p><code>const</code> has a type, so the compiler type-checks its use, it obeys scope, and a debugger can show it. <code>#define</code> produces a compile-time constant expression usable as a fixed array size in standard C89, where a <code>const int</code> cannot be. That is essentially the only remaining reason to prefer it for plain values.</p>
+  </details>
+
+  <details>
+    <summary>Your program computes an average as <code>int total / int count</code> and gets 3 instead of 3.5. Why, and what is the minimal fix?</summary>
+    <p>Both operands are integers, so C performs integer division and truncates. The minimal fix is to make one operand floating point — <code>(double)total / count</code>. Casting the <em>result</em> instead, as in <code>(double)(total / count)</code>, is too late: the truncation has already happened.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">10</span>Where this leads</h2>
+  <p>You can now name and size every basic value. Week 6 puts those values into expressions: what the operators do, how precedence decides the shape of an expression, and why the order in which C evaluates operands is less fixed than it looks. Week 7 then combines weeks 4, 5, and 6 into the single topic that produces more quiet bugs than any other in the language — what happens when types mix.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_04_Data_Representation.html">← Week 4</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_06_Operators_and_Expressions.html">Week 6 →</a>
+</div>
+
+</div>
