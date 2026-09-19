@@ -1,0 +1,437 @@
+---
+layout: without-sidebar
+title: "Week 19 — Dynamic Memory Allocation"
+permalink: /files/c/Week_19_Dynamic_Memory_Allocation.html
+excerpt: "The heap versus the stack; malloc, calloc, realloc and free; checking every allocation; growable arrays and dynamic matrices; and ownership as part of an interface."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Intermediate · Week 19</div>
+  <h1>Dynamic Memory Allocation</h1>
+  <p class="c-wk-lead">Until now, lifetime has been decided for you: locals die at the closing brace, statics live forever. The heap removes that guarantee and hands you the decision. Everything you build from here — the module of week 28, the library of week 29, the data structures of weeks 32 and 33 — rests on the growable array built in this session.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Say when heap allocation is necessary and when a local would do.</li>
+      <li>Use <code>malloc</code>, <code>calloc</code>, <code>realloc</code>, and <code>free</code> correctly, and check every one.</li>
+      <li>Implement a growable array with amortized constant-time append.</li>
+      <li>Allocate a two-dimensional array two different ways and justify the choice.</li>
+      <li>State an ownership rule for every function that returns or takes a pointer.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Why the heap exists</h2>
+
+  <p>Automatic and static storage cover most needs. Three situations they cannot:</p>
+
+  <ul>
+    <li><strong>The size is not known until run time.</strong> You cannot declare an array before you know how many lines the file has.</li>
+    <li><strong>The object must outlive the function that creates it.</strong> A function that builds a list and returns it cannot put it on the stack — week 13's dangling pointer.</li>
+    <li><strong>The object is too large for the stack.</strong> Week 17's 8 MB limit; a 100 MB buffer has nowhere else to go.</li>
+  </ul>
+
+  <table>
+    <thead><tr><th></th><th>Stack</th><th>Heap</th></tr></thead>
+    <tbody>
+      <tr><td>Size decided</td><td>Compile time</td><td>Run time</td></tr>
+      <tr><td>Lifetime</td><td>Until the block ends</td><td>Until you <code>free</code> it</td></tr>
+      <tr><td>Cost of allocating</td><td>Adjusting a register — essentially free</td><td>A library call; tens to hundreds of cycles</td></tr>
+      <tr><td>Capacity</td><td>A few megabytes</td><td>Most of available memory</td></tr>
+      <tr><td>Cleanup</td><td>Automatic</td><td>Yours, exactly once</td></tr>
+      <tr><td>Failure</td><td>Fatal signal</td><td><code>NULL</code>, which you can handle</td></tr>
+    </tbody>
+  </table>
+
+  <p>The default should still be automatic storage. Reach for the heap when one of the three reasons above applies, not by habit.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>The four functions</h2>
+
+<pre><code>#include &lt;stdlib.h&gt;
+
+void *malloc(size_t size);
+void *calloc(size_t count, size_t size);
+void *realloc(void *ptr, size_t new_size);
+void  free(void *ptr);</code></pre>
+
+  <h3><code>malloc</code></h3>
+<pre><code>int *values = malloc(n * sizeof *values);
+if (values == NULL) {
+    return false;                 /* allocation failed */
+}</code></pre>
+
+  <p>Returns a pointer to <code>size</code> uninitialized bytes, or <code>NULL</code>. Three details in that one line:</p>
+
+  <p><strong><code>sizeof *values</code>, not <code>sizeof(int)</code>.</strong> Writing the size in terms of the pointer means changing the type later cannot desynchronize them. It is the standard idiom and worth adopting immediately.</p>
+
+  <p><strong>No cast.</strong> <code>void *</code> converts implicitly to any object pointer in C. Casting is unnecessary and, before C99, could hide a missing <code>#include &lt;stdlib.h&gt;</code>. (In C++ the cast is required — which is why you will see it in code written to compile as both.)</p>
+
+  <p><strong>The contents are garbage.</strong> Not zero. Reading before writing is undefined behavior, exactly like an uninitialized local.</p>
+
+  <h3><code>calloc</code></h3>
+<pre><code>int *values = calloc(n, sizeof *values);   /* zero-filled */</code></pre>
+  <p>Takes the count and element size separately, and <strong>zeroes the memory</strong>. The separate arguments are not cosmetic: <code>calloc</code> detects overflow in <code>count * size</code> and returns <code>NULL</code>, whereas <code>malloc(count * size)</code> would silently wrap and allocate far too little — a classic vulnerability. Prefer <code>calloc</code> whenever the count comes from outside your program.</p>
+
+  <h3><code>realloc</code></h3>
+<pre><code>int *bigger = realloc(values, new_count * sizeof *values);
+if (bigger == NULL) {
+    free(values);                 /* the original is still valid */
+    return false;
+}
+values = bigger;</code></pre>
+
+  <p>Grows or shrinks a block, preserving the contents up to the smaller of the two sizes. It may return a <em>different</em> address, having copied the data — so any other pointer into the old block is now dangling.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>Never write <code>values = realloc(values, …)</code>.</strong> If it fails it returns <code>NULL</code> while the original block remains allocated. Assigning directly overwrites your only pointer to it, so the memory can never be freed — a leak that occurs precisely when memory is already short. Always use a temporary, as above.</p>
+  </div>
+
+  <h3><code>free</code></h3>
+<pre><code>free(values);
+values = NULL;        /* not required, but a good habit */</code></pre>
+
+  <p>Returns the block to the allocator. <code>free(NULL)</code> is explicitly safe and does nothing, which removes the need for a guard. Setting the pointer to <code>NULL</code> afterwards turns a later use-after-free into an immediate null-pointer crash rather than silent corruption — week 20's subject.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Checking every allocation</h2>
+
+  <p><code>malloc</code> can fail. On a desktop with overcommit it rarely does, which is exactly why unchecked allocations survive into production and then fail on a constrained machine, or under a memory limit, or when a corrupted size request asks for four gigabytes.</p>
+
+<pre><code>/* wrong */
+int *p = malloc(n * sizeof *p);
+p[0] = 1;                         /* if p is NULL, this crashes */
+
+/* right */
+int *p = malloc(n * sizeof *p);
+if (p == NULL) {
+    fprintf(stderr, "out of memory\n");
+    return EXIT_FAILURE;
+}</code></pre>
+
+  <p>One subtlety: <code>malloc(0)</code> may return <code>NULL</code> <em>or</em> a unique pointer that you must still free. Both are conforming. Code that treats <code>NULL</code> as failure will misreport a zero-size request, so guard the zero case explicitly if it can occur.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Ownership</h2>
+
+  <p>C has no garbage collector and no destructors. For every allocated block there must be exactly one <code>free</code>, and deciding <em>who</em> calls it is a design decision that belongs in the interface.</p>
+
+  <p>Make it explicit in one of three ways:</p>
+
+<pre><code>/* 1. The caller owns the result and must free it. */
+char *duplicate_string(const char *s);      /* caller frees */
+
+/* 2. The caller supplies the storage; nobody allocates. */
+bool copy_into(char *dst, size_t dst_size, const char *src);
+
+/* 3. Paired create and destroy — the clearest for anything with state. */
+Buffer *buffer_create(size_t capacity);
+void    buffer_destroy(Buffer *b);</code></pre>
+
+  <p>The third convention is the one to adopt for anything non-trivial. Naming them as a pair makes the obligation visible at the call site, and it scales to types that own several allocations internally — <code>buffer_destroy</code> frees everything, and the caller does not need to know what "everything" is. Week 33 turns this into an opaque handle where the caller <em>cannot</em> know.</p>
+
+  <p>Write the ownership rule down. A one-line comment above the prototype — <code>/* returns a new string; caller frees */</code> — prevents both the leak and the double free, and it costs nothing.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Two ways to allocate a matrix</h2>
+
+<pre><code>/* A: one contiguous block, indexed manually */
+int *m = malloc(rows * cols * sizeof *m);
+m[r * cols + c] = 7;
+free(m);
+
+/* B: an array of row pointers */
+int **m = malloc(rows * sizeof *m);
+for (size_t r = 0; r &lt; rows; r++) {
+    m[r] = malloc(cols * sizeof *m[r]);
+}
+m[r][c] = 7;
+for (size_t r = 0; r &lt; rows; r++) free(m[r]);
+free(m);</code></pre>
+
+  <table>
+    <thead><tr><th></th><th>A — flat</th><th>B — row pointers</th></tr></thead>
+    <tbody>
+      <tr><td>Allocations</td><td>1</td><td>rows + 1</td></tr>
+      <tr><td>Syntax</td><td><code>m[r * cols + c]</code></td><td><code>m[r][c]</code></td></tr>
+      <tr><td>Cache behavior</td><td>Contiguous — fast</td><td>Rows scattered — slower</td></tr>
+      <tr><td>Rows of different lengths</td><td>No</td><td>Yes</td></tr>
+      <tr><td>Freeing</td><td>One call</td><td>A loop, and easy to get wrong</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>Prefer A</strong> unless you genuinely need ragged rows. One allocation, one free, contiguous memory. The slightly uglier indexing is a small price, and it can be hidden behind an accessor function or a macro.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: the growable array</h2>
+
+  <p>This is the data structure the rest of the course keeps returning to. Week 28 turns it into a module with a header; week 29 builds it as a library; week 30 makes it generic; week 45 packages it.</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+
+typedef struct {
+    int    *data;
+    size_t  count;      /* elements in use   */
+    size_t  capacity;   /* elements allocated */
+} IntArray;
+
+/* Paired with array_destroy. After this returns true the caller owns
+   the array and must call array_destroy exactly once. */
+static bool array_init(IntArray *a, size_t initial_capacity)
+{
+    if (initial_capacity == 0) {
+        initial_capacity = 4;
+    }
+    a-&gt;data = malloc(initial_capacity * sizeof *a-&gt;data);
+    if (a-&gt;data == NULL) {
+        a-&gt;count = a-&gt;capacity = 0;
+        return false;
+    }
+    a-&gt;count = 0;
+    a-&gt;capacity = initial_capacity;
+    return true;
+}
+
+static void array_destroy(IntArray *a)
+{
+    free(a-&gt;data);              /* free(NULL) is safe */
+    a-&gt;data = NULL;
+    a-&gt;count = a-&gt;capacity = 0;
+}
+
+/* Doubling gives amortized O(1) append: n appends cost O(n) copies total. */
+static bool array_grow(IntArray *a)
+{
+    size_t new_capacity = a-&gt;capacity * 2;
+
+    int *bigger = realloc(a-&gt;data, new_capacity * sizeof *a-&gt;data);
+    if (bigger == NULL) {
+        return false;           /* a-&gt;data is still valid and still ours */
+    }
+    a-&gt;data = bigger;
+    a-&gt;capacity = new_capacity;
+    return true;
+}
+
+static bool array_push(IntArray *a, int value)
+{
+    if (a-&gt;count == a-&gt;capacity &amp;&amp; !array_grow(a)) {
+        return false;
+    }
+    a-&gt;data[a-&gt;count++] = value;
+    return true;
+}
+
+static bool array_get(const IntArray *a, size_t index, int *out)
+{
+    if (index &gt;= a-&gt;count) {
+        return false;
+    }
+    *out = a-&gt;data[index];
+    return true;
+}
+
+static void array_print(const IntArray *a, const char *label)
+{
+    printf("  %-10s count=%-3zu capacity=%-3zu [", label, a-&gt;count, a-&gt;capacity);
+    for (size_t i = 0; i &lt; a-&gt;count; i++) {
+        printf("%d%s", a-&gt;data[i], i + 1 &lt; a-&gt;count ? " " : "");
+    }
+    puts("]");
+}
+
+/* Caller frees the result. Named so the obligation is hard to miss. */
+static char *duplicate_string(const char *s)
+{
+    size_t bytes = strlen(s) + 1;          /* room for the terminator */
+    char *copy = malloc(bytes);
+    if (copy == NULL) {
+        return NULL;
+    }
+    memcpy(copy, s, bytes);
+    return copy;
+}
+
+int main(void)
+{
+    puts("== growable array ==");
+    IntArray a;
+    if (!array_init(&amp;a, 2)) {
+        fprintf(stderr, "out of memory\n");
+        return EXIT_FAILURE;
+    }
+
+    array_print(&amp;a, "empty");
+    for (int i = 1; i &lt;= 9; i++) {
+        if (!array_push(&amp;a, i * i)) {
+            fprintf(stderr, "out of memory\n");
+            array_destroy(&amp;a);
+            return EXIT_FAILURE;
+        }
+        if (a.count == a.capacity) {
+            array_print(&amp;a, "full");
+        }
+    }
+    array_print(&amp;a, "final");
+    puts("  capacity doubled 2 -&gt; 4 -&gt; 8 -&gt; 16: five reallocations for nine pushes");
+
+    int value;
+    printf("  element 3  : %s", array_get(&amp;a, 3, &amp;value) ? "" : "refused\n");
+    if (array_get(&amp;a, 3, &amp;value)) printf("%d\n", value);
+    printf("  element 99 : %s\n",
+           array_get(&amp;a, 99, &amp;value) ? "returned a value" : "refused");
+
+    array_destroy(&amp;a);
+    puts("  destroyed; calling array_destroy again would also be safe");
+    array_destroy(&amp;a);
+
+    puts("\n== calloc zeroes, malloc does not ==");
+    int *raw = malloc(4 * sizeof *raw);
+    int *zeroed = calloc(4, sizeof *zeroed);
+    if (raw != NULL &amp;&amp; zeroed != NULL) {
+        printf("  malloc: %d %d %d %d   (garbage — do not rely on it)\n",
+               raw[0], raw[1], raw[2], raw[3]);
+        printf("  calloc: %d %d %d %d   (guaranteed zero)\n",
+               zeroed[0], zeroed[1], zeroed[2], zeroed[3]);
+    }
+    free(raw);
+    free(zeroed);
+
+    puts("\n== a flat matrix: one allocation, one free ==");
+    const size_t rows = 3, cols = 4;
+    int *m = malloc(rows * cols * sizeof *m);
+    if (m == NULL) {
+        return EXIT_FAILURE;
+    }
+    for (size_t r = 0; r &lt; rows; r++) {
+        for (size_t c = 0; c &lt; cols; c++) {
+            m[r * cols + c] = (int)(r * cols + c);
+        }
+    }
+    for (size_t r = 0; r &lt; rows; r++) {
+        printf("  ");
+        for (size_t c = 0; c &lt; cols; c++) {
+            printf("%3d", m[r * cols + c]);
+        }
+        putchar('\n');
+    }
+    free(m);
+
+    puts("\n== ownership, stated in the name ==");
+    char *copy = duplicate_string("the caller frees this");
+    if (copy != NULL) {
+        printf("  \"%s\"\n", copy);
+        free(copy);
+    }
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o dynarray dynarray.c
+./dynarray</code></pre>
+
+  <h3>Why doubling</h3>
+
+  <p>Growing by one element per push would copy the whole array every time: <em>n</em> pushes cost <em>n²</em>/2 copies. Doubling copies only when the array is full, and the total work across <em>n</em> pushes is <em>n</em> + <em>n</em>/2 + <em>n</em>/4 + … &lt; 2<em>n</em>. Each push is therefore O(1) <em>amortized</em>, even though individual pushes occasionally cost O(n). Week 33 puts a name to this reasoning.</p>
+
+  <p>The output shows five reallocations for nine pushes. Change the growth to <code>capacity + 1</code> and count again.</p>
+
+  <h3>Confirm there are no leaks</h3>
+
+  <p>AddressSanitizer includes a leak detector, and the program above is clean:</p>
+<pre><code>./dynarray
+(no LeakSanitizer output = nothing leaked)</code></pre>
+
+  <p>Now remove one <code>free</code> — the <code>free(copy)</code> at the end — and run it again:</p>
+<pre><code>==1234==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 22 byte(s) in 1 object(s) allocated from:
+    #0 0x... in malloc
+    #1 0x... in duplicate_string dynarray.c:103
+    #2 0x... in main dynarray.c:176
+
+SUMMARY: AddressSanitizer: 22 byte(s) leaked in 1 allocation(s).</code></pre>
+
+  <p>Exact size, exact allocation site, exact call path. Valgrind gives the same information without recompiling:</p>
+<pre><code>valgrind --leak-check=full ./dynarray</code></pre>
+
+  <h3>The <code>realloc</code> mistake, demonstrated</h3>
+
+  <p>Change <code>array_grow</code> to the tempting one-liner:</p>
+<pre><code>a-&gt;data = realloc(a-&gt;data, new_capacity * sizeof *a-&gt;data);
+if (a-&gt;data == NULL) return false;</code></pre>
+
+  <p>It works, until <code>realloc</code> fails. Then <code>a-&gt;data</code> is <code>NULL</code>, the old block is still allocated, and the only pointer to it has been destroyed. Simulating this is awkward on a desktop, which is the point: the bug is invisible in testing and fires exactly when memory is scarce.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Not checking <code>malloc</code>'s result</td><td>Null dereference under memory pressure</td><td>Check every allocation.</td></tr>
+      <tr><td><code>p = realloc(p, n)</code></td><td>Leak on failure; the only pointer is lost</td><td>Assign to a temporary first.</td></tr>
+      <tr><td>Reading <code>malloc</code>'d memory before writing it</td><td>Undefined behavior; garbage values</td><td>Initialize, or use <code>calloc</code>.</td></tr>
+      <tr><td><code>malloc(count * size)</code> with untrusted <code>count</code></td><td>Integer overflow, undersized buffer</td><td><code>calloc(count, size)</code>, which checks.</td></tr>
+      <tr><td>Forgetting <code>+ 1</code> for a string terminator</td><td>Buffer overflow</td><td><code>malloc(strlen(s) + 1)</code>.</td></tr>
+      <tr><td>Keeping a pointer into a block after <code>realloc</code></td><td>Dangling — the block may have moved</td><td>Recompute pointers from the new base.</td></tr>
+      <tr><td>Unclear ownership</td><td>Double free or leak</td><td>Document it; use create/destroy pairs.</td></tr>
+      <tr><td>Freeing only the row pointers of a 2D array</td><td>Every row leaks</td><td>Free the rows first, then the array. Or use a flat block.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why is <code>malloc(n * sizeof *p)</code> preferred over <code>malloc(n * sizeof(int))</code>?</summary>
+    <p>Because the size is expressed in terms of the pointer being assigned, so changing the element type later cannot leave the size stale. It is also shorter and needs no cast. The same reasoning applies to <code>calloc(n, sizeof *p)</code>.</p>
+  </details>
+
+  <details>
+    <summary>Why does <code>calloc</code> take two arguments instead of one product?</summary>
+    <p>So it can detect overflow in <code>count × size</code> and fail safely. <code>malloc(count * size)</code> computes the product in <code>size_t</code> first, and if that wraps it allocates a small block while the program believes it is large — an integer-overflow vulnerability. It also zeroes the memory, which <code>malloc</code> does not.</p>
+  </details>
+
+  <details>
+    <summary>What is wrong with <code>p = realloc(p, new_size);</code>?</summary>
+    <p>If <code>realloc</code> fails it returns <code>NULL</code> while leaving the original block allocated. Assigning straight to <code>p</code> overwrites the only pointer to that block, so it can never be freed. Assign to a temporary, test it, and only then update <code>p</code>.</p>
+  </details>
+
+  <details>
+    <summary>Why does doubling the capacity give amortized constant-time append?</summary>
+    <p>Because copying happens only when the array is full, and each copy is twice as far from the previous one. The total copying across <em>n</em> appends is <em>n</em> + <em>n</em>/2 + <em>n</em>/4 + … which is less than 2<em>n</em>, so the average cost per append is constant. Growing by a fixed amount instead makes the total quadratic.</p>
+  </details>
+
+  <details>
+    <summary>Who frees the result of a function that returns a pointer?</summary>
+    <p>Whoever the interface says — and the interface must say. The three workable conventions are: the caller frees a returned allocation, the caller supplies the buffer so nothing is allocated, or a paired create/destroy owns everything internally. What must not happen is leaving it unstated, which produces either a leak or a double free.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>You can now allocate and release memory correctly — in code that works. Week 20 is about code that does not: leaks, use-after-free, double free, and overruns, each seeded deliberately into the array you just built and then hunted down with a different tool. Those tools are what make heap programming in C tractable rather than terrifying.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_18_Recursion.html">← Week 18</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_20_Memory_Errors.html">Week 20 →</a>
+</div>
+
+</div>

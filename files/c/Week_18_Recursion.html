@@ -1,0 +1,440 @@
+---
+layout: without-sidebar
+title: "Week 18 — Recursion"
+permalink: /files/c/Week_18_Recursion.html
+excerpt: "Base cases and recursive cases, watching stack frames in a debugger, Towers of Hanoi and binary search, recursion depth and stack overflow, and when to prefer iteration."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Intermediate · Week 18</div>
+  <h1>Recursion</h1>
+  <p class="c-wk-lead">A function that calls itself is not a trick. It is the natural shape for any problem whose structure contains a smaller copy of itself — and it is the construct that makes week 17's stack frames visible, because you can watch them pile up.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Write a recursive function with a correct base case and a case that provably shrinks.</li>
+      <li>Trace a recursive call in a debugger and read the resulting backtrace.</li>
+      <li>Explain why naive Fibonacci is exponential and fix it two ways.</li>
+      <li>Calculate roughly how deep your recursion can go before the stack runs out.</li>
+      <li>Decide between a recursive and an iterative formulation on grounds other than taste.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>The two obligations</h2>
+
+  <p>Every correct recursive function satisfies two conditions. Miss either and it does not terminate.</p>
+
+  <p><strong>A base case</strong> that returns without recursing. It answers the smallest version of the problem directly.</p>
+
+  <p><strong>A recursive case</strong> that calls itself on input strictly closer to the base case. "Smaller" must be measurable and must be guaranteed to decrease, or the recursion is infinite.</p>
+
+<pre><code>long factorial(int n)
+{
+    if (n &lt;= 1) {
+        return 1;              /* base case */
+    }
+    return n * factorial(n - 1);   /* n decreases, so it must reach 1 */
+}</code></pre>
+
+  <p>Note that the base case is <code>n &lt;= 1</code> rather than <code>n == 1</code>. Testing for exact equality is the most common way to write an infinite recursion: call <code>factorial(-1)</code> and a function guarded by <code>n == 1</code> descends forever. Guard the whole range you cannot handle, not the single value you expect.</p>
+
+  <div class="c-wk-note">
+    <p><strong>The termination argument.</strong> Identify a quantity that strictly decreases on every recursive call and is bounded below — here, <code>n</code>. This is the same obligation week 10 imposed on loops, and it is what "provably shrinks" means. If you cannot name that quantity, you have not shown the function terminates.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>What happens on the stack</h2>
+
+  <p>Week 17 established that each call pushes a frame. Recursion pushes one per level, and they all exist simultaneously until the base case is reached.</p>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 640 200" role="img" aria-label="Four stack frames for factorial of four down to factorial of one, then unwinding with return values" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="120" y="14" width="200" height="34" rx="7"/>
+        <rect x="120" y="54" width="200" height="34" rx="7"/>
+        <rect x="120" y="94" width="200" height="34" rx="7"/>
+        <rect x="120" y="134" width="200" height="34" rx="7"/>
+      </g>
+      <g fill="currentColor" font-size="12.5" font-family="inherit">
+        <text x="136" y="36">factorial(1)  base</text>
+        <text x="136" y="76">factorial(2)</text>
+        <text x="136" y="116">factorial(3)</text>
+        <text x="136" y="156">factorial(4)</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1.5" opacity=".55">
+        <path d="M340 31h60"/><path d="M340 71h60"/><path d="M340 111h60"/><path d="M340 151h60"/>
+      </g>
+      <g fill="currentColor" font-size="12" font-family="inherit" opacity=".8">
+        <text x="408" y="36">returns 1</text>
+        <text x="408" y="76">returns 2 × 1 = 2</text>
+        <text x="408" y="116">returns 3 × 2 = 6</text>
+        <text x="408" y="156">returns 4 × 6 = 24</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1" opacity=".35">
+        <path d="M96 148v-120"/><path d="M92 36l4-8 4 8" fill="none"/>
+      </g>
+      <g fill="currentColor" font-size="11" opacity=".6" font-family="inherit">
+        <text x="20" y="90">calls go</text><text x="20" y="104">down</text>
+      </g>
+      <text x="320" y="190" fill="currentColor" font-size="11.5" text-anchor="middle" opacity=".7" font-family="inherit">all four frames exist at once before any of them returns</text>
+    </svg>
+    <p class="c-wk-cap">The multiplications happen on the way <em>out</em>, as the stack unwinds.</p>
+  </div>
+
+  <p>That last point is worth dwelling on. Nothing is multiplied on the way down; each frame is suspended holding its own <code>n</code>, waiting for the answer from below. The work happens during unwinding, which is why the memory cost is proportional to the depth.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Depth and stack overflow</h2>
+
+  <p>Each frame costs memory: the parameters, the locals, the saved return address, and alignment padding. Call it a few dozen bytes for a simple function, more if it has a large local array.</p>
+
+<pre><code>ulimit -s          # stack limit in kilobytes; typically 8192 on Linux</code></pre>
+
+  <p>With 8 MB of stack and roughly 48 bytes per frame, a simple recursion can reach somewhere near 150 000 levels. Add a 1 KB local array to the function and that collapses to about 8 000.</p>
+
+  <p>There is no graceful failure. The stack grows into a guard page and the program receives a fatal signal — no <code>NULL</code> to check, no error to catch. Sanitizers report it clearly:</p>
+
+<pre><code>gcc -fsanitize=address …
+==1234==ERROR: AddressSanitizer: stack-overflow on address 0x7ffc...</code></pre>
+
+  <p>Practical consequence: <strong>recursion depth must be bounded by something you control</strong>. Recursing over a balanced tree of a million nodes is fine — depth about 20. Recursing once per element of a million-element list is not.</p>
+
+  <h3>Tail calls</h3>
+  <p>A <em>tail call</em> is a recursive call whose result is returned directly, with nothing left to do afterwards:</p>
+
+<pre><code>/* not a tail call: the multiplication happens after the call returns */
+return n * factorial(n - 1);
+
+/* tail call: nothing remains after the call */
+return factorial_helper(n - 1, accumulator * n);</code></pre>
+
+  <p>A compiler <em>may</em> turn a tail call into a jump, reusing the current frame instead of pushing a new one — which makes the recursion run in constant stack space. GCC and Clang do this at <code>-O2</code>. But the C standard does not require it, so you cannot rely on it for correctness. Treat it as an optimization you may benefit from, never as a guarantee.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>When recursion is the right shape</h2>
+
+  <table>
+    <thead><tr><th>Problem</th><th>Recursive?</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Sum an array</td><td>No</td><td>A loop is simpler and uses no stack</td></tr>
+      <tr><td>Factorial</td><td>No</td><td>Trivially iterative; recursion is only a teaching example</td></tr>
+      <tr><td>Binary search</td><td>Either</td><td>Depth is log n; both forms read well</td></tr>
+      <tr><td>Towers of Hanoi</td><td>Yes</td><td>The definition is recursive; the iterative version is obscure</td></tr>
+      <tr><td>Tree traversal</td><td>Yes</td><td>A tree contains subtrees — week 33</td></tr>
+      <tr><td>Directory walking</td><td>Yes</td><td>Same structure: directories contain directories</td></tr>
+      <tr><td>Quicksort, mergesort</td><td>Yes</td><td>Divide and conquer; depth is log n</td></tr>
+      <tr><td>Parsing nested expressions</td><td>Yes</td><td>The grammar is recursive</td></tr>
+    </tbody>
+  </table>
+
+  <p>The pattern: use recursion when the <em>data</em> or the <em>definition</em> is recursive, and the depth is logarithmic or otherwise bounded. Use iteration for linear sequences.</p>
+
+  <h3>The Fibonacci trap</h3>
+<pre><code>long fib(int n)
+{
+    if (n &lt;= 1) return n;
+    return fib(n - 1) + fib(n - 2);      /* two calls per level */
+}</code></pre>
+
+  <p>This is the textbook example of recursion and a genuinely terrible program. Each call spawns two more, so the work grows exponentially: <code>fib(40)</code> makes over 300 million calls and takes seconds. <code>fib(50)</code> would take minutes.</p>
+
+  <p>The problem is not recursion but <em>repeated</em> recursion — <code>fib(35)</code> is computed millions of times. Two fixes:</p>
+
+<pre><code>/* memoize: remember what you already computed */
+long fib_memo(int n, long cache[])
+{
+    if (n &lt;= 1)        return n;
+    if (cache[n] != 0) return cache[n];
+    cache[n] = fib_memo(n - 1, cache) + fib_memo(n - 2, cache);
+    return cache[n];
+}
+
+/* or simply iterate: O(n) time, O(1) space */
+long fib_iter(int n)
+{
+    long a = 0, b = 1;
+    for (int i = 0; i &lt; n; i++) {
+        long next = a + b;
+        a = b;
+        b = next;
+    }
+    return a;
+}</code></pre>
+
+  <p>Both are linear. The iterative version is the one to ship.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Worked example: Hanoi, search, and the stack under a debugger</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;time.h&gt;
+
+static long call_counter = 0;
+
+/* --- factorial, to watch frames unwind --- */
+static long factorial(int n, int depth)
+{
+    printf("%*scall  factorial(%d)\n", depth * 2, "", n);
+    long result;
+    if (n &lt;= 1) {
+        result = 1;
+    } else {
+        result = n * factorial(n - 1, depth + 1);
+    }
+    printf("%*sreturn %ld\n", depth * 2, "", result);
+    return result;
+}
+
+/* --- Towers of Hanoi: the definition is itself recursive --- */
+static void hanoi(int disks, char from, char to, char via, int *moves)
+{
+    if (disks == 0) {
+        return;
+    }
+    hanoi(disks - 1, from, via, to, moves);
+    (*moves)++;
+    if (disks &lt;= 3) {                    /* print only the small cases */
+        printf("    move disk %d: %c -&gt; %c\n", disks, from, to);
+    }
+    hanoi(disks - 1, via, to, from, moves);
+}
+
+/* --- binary search, recursive and iterative --- */
+static long bsearch_rec(const int a[], long lo, long hi, int target)
+{
+    if (lo &gt; hi) {
+        return -1;                       /* base case: empty range */
+    }
+    long mid = lo + (hi - lo) / 2;       /* avoids overflow; week 7 */
+    if (a[mid] == target) return mid;
+    if (a[mid] &lt;  target) return bsearch_rec(a, mid + 1, hi, target);
+    return bsearch_rec(a, lo, mid - 1, target);
+}
+
+static long bsearch_iter(const int a[], long n, int target)
+{
+    long lo = 0, hi = n - 1;
+    while (lo &lt;= hi) {
+        long mid = lo + (hi - lo) / 2;
+        if (a[mid] == target) return mid;
+        if (a[mid] &lt;  target) lo = mid + 1;
+        else                  hi = mid - 1;
+    }
+    return -1;
+}
+
+/* --- Fibonacci three ways --- */
+static long fib_naive(int n)
+{
+    call_counter++;
+    if (n &lt;= 1) return n;
+    return fib_naive(n - 1) + fib_naive(n - 2);
+}
+
+static long fib_memo(int n, long cache[])
+{
+    call_counter++;
+    if (n &lt;= 1)        return n;
+    if (cache[n] != 0) return cache[n];
+    cache[n] = fib_memo(n - 1, cache) + fib_memo(n - 2, cache);
+    return cache[n];
+}
+
+static long fib_iter(int n)
+{
+    long a = 0, b = 1;
+    for (int i = 0; i &lt; n; i++) {
+        long next = a + b;
+        a = b;
+        b = next;
+    }
+    return a;
+}
+
+/* --- how deep can we go? --- */
+static int max_depth = 0;
+static void probe(int depth)
+{
+    max_depth = depth;
+    if (depth &lt; 200000) {
+        probe(depth + 1);
+    }
+}
+
+int main(void)
+{
+    puts("== frames build up, then unwind ==");
+    factorial(4, 0);
+
+    puts("\n== Towers of Hanoi ==");
+    for (int disks = 1; disks &lt;= 4; disks++) {
+        int moves = 0;
+        if (disks &lt;= 3) printf("  %d disks:\n", disks);
+        hanoi(disks, 'A', 'C', 'B', &amp;moves);
+        printf("  %d disks -&gt; %d moves (2^%d - 1)\n", disks, moves, disks);
+    }
+
+    puts("\n== binary search: recursive and iterative agree ==");
+    int sorted[] = { 2, 5, 8, 12, 16, 23, 38, 56, 72, 91 };
+    const long n = (long)(sizeof sorted / sizeof sorted[0]);
+    const int targets[] = { 23, 2, 91, 7 };
+    for (size_t i = 0; i &lt; 4; i++) {
+        printf("  %2d -&gt; recursive %2ld, iterative %2ld\n",
+               targets[i],
+               bsearch_rec(sorted, 0, n - 1, targets[i]),
+               bsearch_iter(sorted, n, targets[i]));
+    }
+    printf("  depth for %ld elements is about log2(%ld) = 4\n", n, n);
+
+    puts("\n== the Fibonacci trap ==");
+    const int fn = 30;
+
+    call_counter = 0;
+    clock_t t0 = clock();
+    long r1 = fib_naive(fn);
+    double d1 = (double)(clock() - t0) / CLOCKS_PER_SEC;
+    printf("  naive  fib(%d) = %ld  in %8.4fs, %ld calls\n",
+           fn, r1, d1, call_counter);
+
+    long cache[64];
+    memset(cache, 0, sizeof cache);
+    call_counter = 0;
+    t0 = clock();
+    long r2 = fib_memo(fn, cache);
+    double d2 = (double)(clock() - t0) / CLOCKS_PER_SEC;
+    printf("  memo   fib(%d) = %ld  in %8.4fs, %ld calls\n",
+           fn, r2, d2, call_counter);
+
+    t0 = clock();
+    long r3 = fib_iter(fn);
+    double d3 = (double)(clock() - t0) / CLOCKS_PER_SEC;
+    printf("  iter   fib(%d) = %ld  in %8.4fs, 0 recursive calls\n",
+           fn, r3, d3);
+
+    puts("\n== how deep before the stack runs out ==");
+    puts("  (uncomment the probe call below and watch it die)");
+    /* probe(1); printf("reached %d\n", max_depth); */
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o recur recur.c
+./recur</code></pre>
+
+  <h3>Watch the frames in GDB</h3>
+
+  <p>This is the exercise that makes week 17's diagram real. Break inside the base case and look at the stack.</p>
+
+<pre><code>gdb ./recur
+(gdb) break factorial if n == 1
+(gdb) run
+(gdb) backtrace</code></pre>
+
+<pre><code>#0  factorial (n=1, depth=3) at recur.c:12
+#1  0x... in factorial (n=2, depth=2) at recur.c:17
+#2  0x... in factorial (n=3, depth=1) at recur.c:17
+#3  0x... in factorial (n=4, depth=0) at recur.c:17
+#4  0x... in main () at recur.c:96</code></pre>
+
+  <p>Four frames of the same function, each with its own <code>n</code>, all alive at once. Move between them and inspect their locals:</p>
+
+<pre><code>(gdb) frame 2
+(gdb) print n
+$1 = 3
+(gdb) info frame
+(gdb) finish</code></pre>
+
+  <p><code>info frame</code> prints the frame's address, so you can confirm each sits lower than the one below it — exactly the picture from week 17. <code>finish</code> runs until the current frame returns and shows the value it produced.</p>
+
+  <h3>Find your actual depth limit</h3>
+
+  <p>Uncomment the <code>probe</code> call and run it:</p>
+
+<pre><code>ulimit -s
+./recur
+</code></pre>
+<pre><code>Segmentation fault (core dumped)</code></pre>
+
+  <p>Now find where it died:</p>
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o recur_asan recur.c
+./recur_asan</code></pre>
+<pre><code>==1234==ERROR: AddressSanitizer: stack-overflow on address 0x7ffd...
+    #0 0x... in probe recur.c:104</code></pre>
+
+  <p>Then add <code>char padding[1024];</code> to <code>probe</code> and try again. The depth drops by a factor of roughly twenty. Frame size, not call count, is what consumes the stack.</p>
+
+  <h3>The numbers from the Fibonacci section</h3>
+
+  <p>On a typical machine, <code>fib_naive(30)</code> makes about 2.7 million calls; <code>fib_memo(30)</code> makes 59. Both return 832 040. Raise <code>fn</code> to 40 and the naive version takes seconds while the other two remain instant. The recursion was never the problem — recomputing the same subproblem was.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>No base case</td><td>Infinite recursion, stack overflow</td><td>Write the base case first.</td></tr>
+      <tr><td>Base case tests <code>n == 1</code></td><td>Negative input recurses forever</td><td>Guard the whole range: <code>n &lt;= 1</code>.</td></tr>
+      <tr><td>Recursive call does not shrink the input</td><td>Never reaches the base case</td><td>Name the decreasing quantity explicitly.</td></tr>
+      <tr><td>Recursing once per element of a large list</td><td>Stack overflow</td><td>Iterate; reserve recursion for logarithmic depth.</td></tr>
+      <tr><td>Naive Fibonacci in real code</td><td>Exponential time</td><td>Memoize, or iterate.</td></tr>
+      <tr><td>Large local arrays in a recursive function</td><td>Depth limit collapses</td><td>Allocate once outside and pass a pointer.</td></tr>
+      <tr><td>Relying on tail-call optimization</td><td>Works at <code>-O2</code>, overflows at <code>-O0</code></td><td>C does not guarantee it; bound the depth yourself.</td></tr>
+      <tr><td><code>mid = (lo + hi) / 2</code></td><td>Overflow for large indices</td><td><code>lo + (hi - lo) / 2</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">7</span>Check yourself</h2>
+
+  <details>
+    <summary>What are the two obligations of a correct recursive function?</summary>
+    <p>A base case that returns without recursing, and a recursive case whose argument is strictly closer to that base case. The second requires a quantity you can name that decreases on every call and is bounded below — otherwise you have not shown the recursion terminates.</p>
+  </details>
+
+  <details>
+    <summary>Why is <code>if (n == 1)</code> a worse base case than <code>if (n &lt;= 1)</code>?</summary>
+    <p>Because it only stops on the exact value. Any input that starts below it — a negative number, or zero — skips the base case and recurses away from it forever. Guard the entire range the function cannot handle recursively, not just the value you expect to arrive at.</p>
+  </details>
+
+  <details>
+    <summary>In <code>return n * factorial(n - 1);</code>, when does the multiplication happen?</summary>
+    <p>On the way out. Each frame is suspended holding its own <code>n</code> while the call below it runs; only when that returns can the multiplication be performed. This is why all the frames must coexist and why memory cost is proportional to depth — and it is also why the call is not a tail call.</p>
+  </details>
+
+  <details>
+    <summary>Naive Fibonacci is exponential. Is recursion the problem?</summary>
+    <p>No — repeated recomputation is. Each call spawns two more and the same subproblems are solved millions of times. Memoizing the results makes the same recursive function linear; so does rewriting it as a loop. The structure of the recursion was fine, the lack of memory was not.</p>
+  </details>
+
+  <details>
+    <summary>Roughly how deep can you recurse, and what changes the answer most?</summary>
+    <p>Stack limit divided by frame size — around 150 000 levels for a small function within an 8 MB stack. What changes it most is the frame size: adding a one-kilobyte local array cuts the limit by roughly twenty times. Depth is bounded by memory per call, not by any language limit, and exceeding it kills the process with no diagnostic.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Where this leads</h2>
+  <p>Week 19 moves to the other half of week 17's memory map. On the heap, lifetime is not managed for you: memory you take must be given back, at a moment you choose, exactly once. That responsibility is what makes weeks 19 and 20 the hardest pair in the course — and the recursion you just learned returns in week 33, where trees make it indispensable.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_17_Scope_and_Program_Memory_Layout.html">← Week 17</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_19_Dynamic_Memory_Allocation.html">Week 19 →</a>
+</div>
+
+</div>

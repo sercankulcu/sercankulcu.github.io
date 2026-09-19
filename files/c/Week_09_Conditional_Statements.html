@@ -1,0 +1,405 @@
+---
+layout: without-sidebar
+title: "Week 9 — Conditional Statements"
+permalink: /files/c/Week_09_Conditional_Statements.html
+excerpt: "if, else if and else; the ternary operator; switch with its fall-through rule; and the small set of logic errors that account for most conditional bugs in C."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Basic · Week 9</div>
+  <h1>Conditional Statements</h1>
+  <p class="c-wk-lead">A program that cannot choose is a calculator. Conditionals are how a program decides — and in C they carry a handful of sharp edges that have each caused real, expensive failures.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Write <code>if</code>, <code>else if</code>, and <code>else</code> chains that are correct and readable.</li>
+      <li>Explain what C actually treats as true, and why <code>if (x)</code> works.</li>
+      <li>Use the conditional operator where it clarifies and avoid it where it does not.</li>
+      <li>Write a <code>switch</code> correctly, including deliberate fall-through.</li>
+      <li>Recognize the dangling <code>else</code>, the stray semicolon, and the missing <code>break</code> on sight.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span><code>if</code>, <code>else if</code>, <code>else</code></h2>
+
+<pre><code>if (temperature &gt; 30) {
+    puts("hot");
+} else if (temperature &gt; 20) {
+    puts("warm");
+} else if (temperature &gt; 10) {
+    puts("mild");
+} else {
+    puts("cold");
+}</code></pre>
+
+  <p>The conditions are tested in order and <strong>at most one branch runs</strong>. As soon as one test succeeds, the rest are skipped entirely. That ordering is what makes the chain above correct with such simple tests: by the time the second condition is reached, the program already knows the temperature is not above 30.</p>
+
+  <p>Write the same chain in the wrong order and it silently produces nonsense:</p>
+
+<pre><code>if (temperature &gt; 10) {
+    puts("mild");          /* 35 degrees reports "mild" */
+} else if (temperature &gt; 30) {
+    puts("hot");           /* unreachable */
+}</code></pre>
+
+  <p>The compiler will not warn. Ordering the tests from most specific to least specific is a habit worth forming now.</p>
+
+  <h3>There is no <code>elseif</code> keyword</h3>
+  <p><code>else if</code> is not special syntax. It is an <code>if</code> statement that happens to be the single statement belonging to an <code>else</code>. C allows any statement there, and an <code>if</code> is a statement. Writing the braces out makes this visible:</p>
+
+<pre><code>else {
+    if (temperature &gt; 20) { … }
+}</code></pre>
+
+  <p>Nobody writes it that way, but knowing that is what it means explains the dangling-<code>else</code> problem in section 4.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>What C considers true</h2>
+
+  <p>There is no boolean requirement. A condition is any expression that yields a number, and the rule is the one from week 6: <strong>zero is false, everything else is true</strong>.</p>
+
+<pre><code>if (count)        /* true when count is not zero        */
+if (!count)       /* true when count is zero            */
+if (pointer)      /* true when pointer is not NULL      */
+if (-1)           /* true — non-zero, even though negative */</code></pre>
+
+  <p>These idioms are pervasive in real C, so you must be able to read them. Whether to write them is a style question. <code>if (count != 0)</code> states the intent; <code>if (count)</code> is shorter. For pointers, <code>if (p)</code> is nearly universal and worth adopting; for counts, the explicit comparison usually reads better.</p>
+
+  <p>One place the shorthand is genuinely wrong: comparing floating-point values. <code>if (x)</code> on a <code>double</code> asks whether it is exactly zero, which week 7 warned against.</p>
+
+  <div class="c-wk-trap">
+    <p><strong><code>=</code> versus <code>==</code>, again.</strong> <code>if (status = 0)</code> assigns zero and then tests zero — the branch never runs, and <code>status</code> has been destroyed. It is legal C, so only <code>-Wall</code> saves you. This mistake caused a widely publicised security flaw in Apple's TLS code in 2014; it is not a beginner-only problem.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>The conditional operator</h2>
+
+  <p>C's only ternary operator chooses between two <em>expressions</em>:</p>
+
+<pre><code>int larger = (a &gt; b) ? a : b;
+
+printf("%d item%s\n", n, (n == 1) ? "" : "s");</code></pre>
+
+  <p>It is an expression, so it can appear where a statement cannot — inside a function call, in an initializer, in a <code>return</code>. That is its real value. Exactly one of the two branches is evaluated, like <code>&amp;&amp;</code> and <code>||</code>.</p>
+
+  <p>It stops being helpful when nested:</p>
+
+<pre><code>/* Do not do this */
+char *grade = (s &gt;= 90) ? "A" : (s &gt;= 80) ? "B" : (s &gt;= 70) ? "C" : "F";</code></pre>
+
+  <p>An <code>if</code>/<code>else if</code> chain expresses the same logic in a form that can be read, debugged line by line, and extended. Use the conditional operator for a single either-or choice; reach for <code>if</code> beyond that.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Three classic traps</h2>
+
+  <h3>The stray semicolon</h3>
+<pre><code>if (x &gt; 0);
+{
+    puts("positive");     /* runs unconditionally */
+}</code></pre>
+  <p>The semicolon is an empty statement, and it is the entire body of the <code>if</code>. The block that follows is just a block, executed always. <code>-Wextra</code> emits <em>suggest braces around empty body</em>, which is another reason that flag is not optional.</p>
+
+  <h3>The dangling <code>else</code></h3>
+<pre><code>if (a &gt; 0)
+    if (b &gt; 0)
+        puts("both positive");
+else
+    puts("a is not positive");   /* WRONG: binds to the inner if */</code></pre>
+
+  <p>An <code>else</code> attaches to the <em>nearest unmatched</em> <code>if</code>, regardless of how you indent. Here it belongs to <code>if (b &gt; 0)</code>, so the message prints when <code>a</code> is positive and <code>b</code> is not — the opposite of what the layout suggests. Braces remove the ambiguity permanently:</p>
+
+<pre><code>if (a &gt; 0) {
+    if (b &gt; 0) {
+        puts("both positive");
+    }
+} else {
+    puts("a is not positive");
+}</code></pre>
+
+  <h3>Omitted braces</h3>
+<pre><code>if (error)
+    log_error();
+    return -1;        /* always runs — not part of the if */</code></pre>
+
+  <p>Indentation is not syntax in C. The <code>return</code> executes unconditionally. This is the shape of Apple's "goto fail" bug, and the reason many style guides — including the Linux kernel's, which otherwise permits brace-free single statements — now require braces without exception.</p>
+
+  <div class="c-wk-note">
+    <p><strong>Use braces always.</strong> Even for a single statement. It costs two characters, it survives every future edit that adds a second statement, and it eliminates two of the three traps above outright. Let <code>clang-format</code> from week 3 enforce it.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span><code>switch</code></h2>
+
+  <p><code>switch</code> compares one integer expression against a list of constant values:</p>
+
+<pre><code>switch (command) {
+case 'a':
+    add_item();
+    break;
+case 'd':
+    delete_item();
+    break;
+case 'q':
+    quit();
+    break;
+default:
+    fprintf(stderr, "unknown command '%c'\n", command);
+    break;
+}</code></pre>
+
+  <h3>The rules</h3>
+  <ul>
+    <li>The controlling expression must be an integer type — <code>int</code>, <code>char</code>, an enumeration. Not a <code>double</code>, not a string.</li>
+    <li>Each <code>case</code> label must be a <em>constant expression</em>, known at compile time. <code>case x:</code> where <code>x</code> is a variable does not compile.</li>
+    <li>Labels must be distinct.</li>
+    <li><code>default</code> is optional and may appear anywhere, though the end is conventional.</li>
+  </ul>
+
+  <h3>Fall-through</h3>
+  <p>This is the part that surprises everyone. A <code>case</code> label is a <em>jump target</em>, not a block. Execution enters at the matching label and then continues straight through every following label until it hits a <code>break</code> or the closing brace.</p>
+
+<pre><code>switch (grade) {
+case 'A':
+    puts("excellent");
+    /* no break — falls through */
+case 'B':
+    puts("good");
+    break;
+}</code></pre>
+
+  <p>An <code>'A'</code> prints both lines. Forgetting a <code>break</code> is one of the most common C bugs, and <code>-Wimplicit-fallthrough</code> exists specifically to catch it.</p>
+
+  <p>Deliberate fall-through is genuinely useful for grouping labels:</p>
+
+<pre><code>switch (c) {
+case 'a': case 'e': case 'i': case 'o': case 'u':
+    vowels++;
+    break;
+default:
+    consonants++;
+    break;
+}</code></pre>
+
+  <p>When you fall through on purpose across statements, say so. C23 provides an attribute; a comment has long been the convention and GCC recognizes it:</p>
+
+<pre><code>case 'A':
+    bonus += 10;
+    [[fallthrough]];        /* C23 */
+case 'B':
+    passed = true;
+    break;</code></pre>
+
+  <h3>Declaring a variable inside a <code>switch</code></h3>
+<pre><code>switch (n) {
+case 1:
+    int x = 5;        /* error in C: a label cannot precede a declaration */
+    break;
+}</code></pre>
+  <p>Wrap the case body in braces, which also scopes the variable properly:</p>
+<pre><code>case 1: {
+    int x = 5;
+    …
+    break;
+}</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span><code>switch</code> or <code>if</code>?</h2>
+
+  <table>
+    <thead><tr><th>Use <code>switch</code> when</th><th>Use <code>if</code> when</th></tr></thead>
+    <tbody>
+      <tr><td>Testing one value against several constants</td><td>Testing ranges, or several different variables</td></tr>
+      <tr><td>The value is an integer or enumeration</td><td>The value is a string, a float, or a pointer</td></tr>
+      <tr><td>The cases are a closed, enumerable set</td><td>The conditions are arbitrary expressions</td></tr>
+      <tr><td>You want the compiler to warn about an unhandled <code>enum</code> value</td><td>Order of evaluation matters</td></tr>
+    </tbody>
+  </table>
+
+  <p>That last row is a real advantage. With an enumeration and no <code>default</code>, <code>-Wswitch</code> warns when you add a new enumerator and forget to handle it — a small piece of static checking the language rarely offers. Week 22 relies on it.</p>
+
+  <p>The performance argument you may read — that <code>switch</code> compiles to a jump table and is therefore faster — is real but almost never decisive. The compiler builds a jump table only when the labels are dense, and for a handful of cases the difference is unmeasurable. Choose on clarity.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Worked example: the same classifier, twice</h2>
+
+  <p>A program that reports a letter grade and a short description. Written first with <code>if</code>, then with <code>switch</code>, so the trade-off is concrete rather than theoretical.</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdbool.h&gt;
+
+/* Version 1: ranges. An if chain is the natural fit. */
+static char grade_from_score(int score)
+{
+    if (score &gt;= 90) {
+        return 'A';
+    } else if (score &gt;= 80) {
+        return 'B';
+    } else if (score &gt;= 70) {
+        return 'C';
+    } else if (score &gt;= 60) {
+        return 'D';
+    } else {
+        return 'F';
+    }
+}
+
+/* Version 2: a fixed set of discrete values. switch is the natural fit. */
+static const char *describe(char grade)
+{
+    switch (grade) {
+    case 'A':
+        return "excellent";
+    case 'B':
+        return "good";
+    case 'C':
+        return "satisfactory";
+    case 'D':
+        return "marginal";
+    case 'F':
+        return "failing";
+    default:
+        return "unknown";
+    }
+}
+
+/* Deliberate fall-through, grouping labels that share one action. */
+static bool is_passing(char grade)
+{
+    switch (grade) {
+    case 'A':
+    case 'B':
+    case 'C':
+    case 'D':
+        return true;
+    default:
+        return false;
+    }
+}
+
+int main(void)
+{
+    const int scores[] = { 95, 83, 71, 64, 42, 100, 0 };
+    const size_t count = sizeof scores / sizeof scores[0];
+
+    printf("%-7s %-7s %-15s %s\n", "score", "grade", "description", "passing");
+    for (size_t i = 0; i &lt; count; i++) {
+        char g = grade_from_score(scores[i]);
+        printf("%-7d %-7c %-15s %s\n",
+               scores[i], g, describe(g), is_passing(g) ? "yes" : "no");
+    }
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o grades grades.c
+./grades</code></pre>
+
+  <h3>Why each construct fits where it does</h3>
+
+  <p><code>grade_from_score</code> tests <em>ranges</em>. A <code>switch</code> cannot express <code>score &gt;= 90</code>; you would need ninety-one labels. And the chain depends on ordering — each test is written assuming the earlier ones already failed, which is why <code>score &gt;= 80</code> does not need an upper bound.</p>
+
+  <p><code>describe</code> maps a small closed set of values to results. Every branch does the same kind of thing with a different constant, which is exactly the shape <code>switch</code> was designed for. Written as an <code>if</code> chain it would repeat <code>grade ==</code> five times.</p>
+
+  <p><code>is_passing</code> uses fall-through the way it is meant to be used: four labels sharing one action, no statements between them, no comment needed because the intent is unmistakable.</p>
+
+  <h3>Now introduce the bugs and watch the compiler</h3>
+
+  <p>Make these four changes one at a time and rebuild.</p>
+
+<pre><code>/* 1. drop a break */
+case 'A':
+    return "excellent";
+case 'B':
+    puts("good");        /* change return to puts, remove break */
+case 'C':
+    puts("satisfactory");</code></pre>
+<pre><code>warning: this statement may fall through [-Wimplicit-fallthrough=]</code></pre>
+
+<pre><code>/* 2. stray semicolon */
+if (score &gt;= 90);
+    return 'A';</code></pre>
+<pre><code>warning: suggest braces around empty body in an 'if' statement [-Wempty-body]</code></pre>
+
+<pre><code>/* 3. assignment in a condition */
+if (score = 90) { … }</code></pre>
+<pre><code>warning: suggest parentheses around assignment used as truth value [-Wparentheses]</code></pre>
+
+<pre><code>/* 4. reordered chain — the silent one */
+if (score &gt;= 60)      return 'D';
+else if (score &gt;= 90) return 'A';   /* unreachable */</code></pre>
+<pre><code>(no warning at all)</code></pre>
+
+  <p>Three of the four are caught for free. The fourth — wrong ordering — is perfectly valid C and produces wrong answers silently. That is the category of bug tests exist for, and it is why week 35 spends a session on testing rather than trusting the compiler to find everything.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>if (x = 5)</code></td><td>Assigns, then always true</td><td>Use <code>==</code>; never ignore <code>-Wparentheses</code>.</td></tr>
+      <tr><td><code>if (x &gt; 0);</code></td><td>Empty body; block runs unconditionally</td><td>Delete the semicolon; heed <code>-Wempty-body</code>.</td></tr>
+      <tr><td>Omitting braces on a single statement</td><td>A later edit silently falls outside the <code>if</code></td><td>Always use braces.</td></tr>
+      <tr><td>Dangling <code>else</code></td><td><code>else</code> binds to the inner <code>if</code></td><td>Braces on every nested <code>if</code>.</td></tr>
+      <tr><td>Missing <code>break</code> in a <code>switch</code></td><td>Falls through to the next case</td><td><code>break</code> in every case; mark intentional fall-through.</td></tr>
+      <tr><td><code>switch</code> on a <code>double</code> or a string</td><td>Compile error</td><td>Use <code>if</code>, or <code>strcmp</code> for strings — week 14.</td></tr>
+      <tr><td>Ordering an <code>else if</code> chain loosest-first</td><td>Later branches unreachable; no warning</td><td>Order most specific first, and test the boundaries.</td></tr>
+      <tr><td><code>if (0.1 + 0.2 == 0.3)</code></td><td>False</td><td>Compare with a tolerance — week 7.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">9</span>Check yourself</h2>
+
+  <details>
+    <summary>What does <code>if (count)</code> test?</summary>
+    <p>Whether <code>count</code> is non-zero. C has no boolean requirement for conditions: any numeric expression works, zero is false and every other value — including negatives — is true. It is equivalent to <code>if (count != 0)</code>.</p>
+  </details>
+
+  <details>
+    <summary>Which <code>if</code> does an <code>else</code> belong to when the nesting is ambiguous?</summary>
+    <p>The nearest preceding <code>if</code> that does not already have an <code>else</code>, regardless of indentation. Indentation has no syntactic meaning in C, so code that looks correct can bind the opposite way. Braces on every nested <code>if</code> remove the question entirely.</p>
+  </details>
+
+  <details>
+    <summary>Why does a <code>case</code> without <code>break</code> continue into the next one?</summary>
+    <p>Because <code>case</code> is a label — a jump target — not a block. <code>switch</code> transfers control to the matching label and then execution proceeds normally through whatever follows, including subsequent labels, until a <code>break</code> or the closing brace. This allows label grouping, at the cost of making the missing <code>break</code> an easy mistake.</p>
+  </details>
+
+  <details>
+    <summary>When does <code>switch</code> give you a safety guarantee that <code>if</code> does not?</summary>
+    <p>When switching on an enumeration with no <code>default</code> label: <code>-Wswitch</code> then warns about any enumerator you failed to handle. Add a new value to the enum later and the compiler points at every switch that needs updating. An <code>if</code> chain offers no equivalent check.</p>
+  </details>
+
+  <details>
+    <summary>Your grade chain returns 'D' for a score of 95 and the compiler said nothing. What happened?</summary>
+    <p>The tests are ordered from loosest to strictest, so <code>score &gt;= 60</code> matches first and the later branches are unreachable. This is valid C — the compiler has no way to know the intended semantics — so nothing is reported. Order conditions most specific first, and write tests that check the boundary values.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">10</span>Where this leads</h2>
+  <p>A program can now choose. Week 10 gives it the ability to repeat, which is where loop invariants, off-by-one errors, and the third use of <code>goto</code> appear. Together, conditionals and loops are all the control flow C has — everything after week 10 is about organizing data rather than organizing execution.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_08_Input_and_Output.html">← Week 8</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_10_Loops_and_Flow_Control.html">Week 10 →</a>
+</div>
+
+</div>

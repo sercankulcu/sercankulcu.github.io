@@ -1,0 +1,409 @@
+---
+layout: without-sidebar
+title: "Week 15 — Pointer Arithmetic and Arrays"
+permalink: /files/c/Week_15_Pointer_Arithmetic_and_Arrays.html
+excerpt: "How adding to a pointer scales by the element size, pointer subtraction and ptrdiff_t, traversing with pointers instead of indices, and arrays of pointers."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Intermediate · Week 15</div>
+  <h1>Pointer Arithmetic and Arrays</h1>
+  <p class="c-wk-lead">Week 13 established that <code>values[i]</code> means <code>*(values + i)</code>. This week takes that identity seriously and develops the arithmetic behind it — including the rules that say which pointer operations are legal and which are quietly undefined.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Explain why adding 1 to a pointer advances by the element size rather than one byte.</li>
+      <li>Subtract two pointers and say what <code>ptrdiff_t</code> is for.</li>
+      <li>Traverse an array or string with a moving pointer instead of an index.</li>
+      <li>Build and use arrays of pointers and pointers to pointers.</li>
+      <li>State the rule about the one-past-the-end pointer and why it exists.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Arithmetic scales by the element</h2>
+
+  <p>Adding an integer to a pointer does not add bytes. It advances by that many <em>elements</em>:</p>
+
+<pre><code>int values[5] = { 10, 20, 30, 40, 50 };
+int *p = values;
+
+p + 1      /* four bytes further on, pointing at values[1] */
+p + 3      /* twelve bytes further on, pointing at values[3] */</code></pre>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 660 130" role="img" aria-label="A pointer advancing through an int array, each step moving four bytes" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="40" y="46" width="110" height="40" rx="6"/><rect x="154" y="46" width="110" height="40" rx="6"/>
+        <rect x="268" y="46" width="110" height="40" rx="6"/><rect x="382" y="46" width="110" height="40" rx="6"/>
+        <rect x="496" y="46" width="110" height="40" rx="6"/>
+      </g>
+      <g fill="currentColor" font-size="13" text-anchor="middle" font-family="inherit">
+        <text x="95" y="71">10</text><text x="209" y="71">20</text><text x="323" y="71">30</text>
+        <text x="437" y="71">40</text><text x="551" y="71">50</text>
+      </g>
+      <g fill="currentColor" font-size="11" text-anchor="middle" opacity=".6" font-family="inherit">
+        <text x="95" y="36">p</text><text x="209" y="36">p+1</text><text x="323" y="36">p+2</text>
+        <text x="437" y="36">p+3</text><text x="551" y="36">p+4</text>
+        <text x="95" y="103">1000</text><text x="209" y="103">1004</text><text x="323" y="103">1008</text>
+        <text x="437" y="103">1012</text><text x="551" y="103">1016</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1" opacity=".4" stroke-dasharray="4 3">
+        <rect x="610" y="46" width="34" height="40" rx="6" fill="none"/>
+      </g>
+      <g fill="currentColor" font-size="11" text-anchor="middle" opacity=".6" font-family="inherit">
+        <text x="627" y="36">p+5</text><text x="627" y="71">—</text>
+      </g>
+      <text x="330" y="122" fill="currentColor" font-size="11.5" text-anchor="middle" opacity=".7" font-family="inherit">one-past-the-end is a legal address to form, but not to read</text>
+    </svg>
+    <p class="c-wk-cap">Each step is <code>sizeof(int)</code> bytes. The pointer's type is what supplies the scale.</p>
+  </div>
+
+  <p>Because of this scaling, the two notations are interchangeable:</p>
+
+<pre><code>values[2]      /* 30 */
+*(values + 2)  /* 30 — the same expression, by definition */
+p[2]           /* 30 */
+*(p + 2)       /* 30 */
+2[values]      /* 30 — legal, since a+b == b+a. Never write this. */</code></pre>
+
+  <p>That last line is a genuine curiosity of the language and occasionally appears in puzzles. It follows directly from indexing being defined as addition.</p>
+
+  <h3>Increment and decrement</h3>
+<pre><code>p++;      /* advance one element */
+p--;      /* back one element     */
+p += 3;   /* forward three        */</code></pre>
+
+  <p>Only integers may be added to pointers. Adding two pointers is meaningless and does not compile.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Subtraction and <code>ptrdiff_t</code></h2>
+
+  <p>Subtracting two pointers into the same array yields the number of <em>elements</em> between them:</p>
+
+<pre><code>int *start = &amp;values[1];
+int *end   = &amp;values[4];
+ptrdiff_t gap = end - start;     /* 3, not 12 */</code></pre>
+
+  <p>The result has type <code>ptrdiff_t</code>, from <code>&lt;stddef.h&gt;</code> — a signed integer type wide enough to hold the difference. It is signed because the difference can be negative, which is exactly why it is not <code>size_t</code>. Print it with <code>%td</code>.</p>
+
+  <p>This is how <code>my_strlen</code> in week 14 worked: walk a pointer to the terminator, then subtract the starting position.</p>
+
+  <h3>Comparison</h3>
+  <p>Pointers into the same array may be compared with <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, which gives the idiomatic loop:</p>
+
+<pre><code>for (int *q = values; q &lt; values + n; q++) {
+    printf("%d ", *q);
+}</code></pre>
+
+  <p>Any two pointers may be compared with <code>==</code> and <code>!=</code>, including against <code>NULL</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>The rules you may not break</h2>
+
+  <p>Pointer arithmetic is only defined <strong>within a single array</strong>, plus one position past its end. Outside that, the behavior is undefined — not merely unpredictable.</p>
+
+  <table>
+    <thead><tr><th>Expression</th><th>Legal?</th></tr></thead>
+    <tbody>
+      <tr><td><code>values + 5</code> for a 5-element array</td><td>Yes — one past the end may be formed</td></tr>
+      <tr><td><code>*(values + 5)</code></td><td>No — it may not be dereferenced</td></tr>
+      <tr><td><code>values + 6</code></td><td>No — undefined even without dereferencing</td></tr>
+      <tr><td><code>values - 1</code></td><td>No — before the start is undefined</td></tr>
+      <tr><td>Comparing pointers into two different arrays</td><td>Unspecified with <code>&lt;</code>; fine with <code>==</code></td></tr>
+    </tbody>
+  </table>
+
+  <p>The one-past-the-end allowance exists precisely so the loop above can terminate: <code>q &lt; values + n</code> must be able to form <code>values + n</code>. The standard grants that address and nothing beyond it.</p>
+
+  <div class="c-wk-trap">
+    <p><strong>Why <code>values - 1</code> matters in practice.</strong> A reverse loop written as <code>for (int *q = values + n - 1; q &gt;= values; q--)</code> forms <code>values - 1</code> on the final decrement, before the comparison fails. That is undefined behavior, and on a segmented or checked implementation it can genuinely misbehave. Write it as <code>for (int *q = values + n; q-- &gt; values; )</code> instead — the same shape as the <code>size_t</code> countdown from week 12.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Index or pointer?</h2>
+
+  <p>Both traversals below are correct. Which to write is a real question with a defensible answer.</p>
+
+<pre><code>/* index style */
+for (size_t i = 0; i &lt; n; i++) {
+    total += values[i];
+}
+
+/* pointer style */
+for (const int *q = values; q &lt; values + n; q++) {
+    total += *q;
+}</code></pre>
+
+  <table>
+    <thead><tr><th>Index style</th><th>Pointer style</th></tr></thead>
+    <tbody>
+      <tr><td>The position is available for messages and comparisons</td><td>No index variable to keep in sync</td></tr>
+      <tr><td>Reads naturally to most people</td><td>Natural for strings, where the end is a terminator, not a count</td></tr>
+      <tr><td>Works unchanged for multi-dimensional access</td><td>Historically produced better code</td></tr>
+    </tbody>
+  </table>
+
+  <p>That last row needs qualifying. On 1980s compilers, pointer walking really was faster because address computation was expensive. Modern compilers apply strength reduction and produce identical machine code for both. You can verify this yourself with the <code>-S</code> technique from week 2, and the worked example below does exactly that.</p>
+
+  <p><strong>Prefer index style by default</strong>, and use pointer style where it genuinely reads better — walking a string to its terminator, or advancing through a buffer whose remaining length you track separately.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Pointers to pointers, and arrays of pointers</h2>
+
+  <p>A pointer is an object, so it has an address, so there can be a pointer to it:</p>
+
+<pre><code>int value = 42;
+int *p = &amp;value;
+int **pp = &amp;p;
+
+**pp        /* 42          */
+*pp         /* p, an int * */</code></pre>
+
+  <p>Two places this appears constantly. An <em>array of pointers</em>, typically to strings:</p>
+
+<pre><code>const char *names[] = { "Ada", "Dennis", "Ken" };
+size_t count = sizeof names / sizeof names[0];
+
+for (size_t i = 0; i &lt; count; i++) {
+    printf("%s (%zu characters)\n", names[i], strlen(names[i]));
+}</code></pre>
+
+  <p>The array holds three pointers, each pointing at a literal somewhere in read-only memory. The strings need not be the same length, because the array stores addresses rather than the text. This is exactly the shape of <code>argv</code> in week 23.</p>
+
+  <p>And an <em>output parameter that is itself a pointer</em>, which week 19 needs for reallocation:</p>
+
+<pre><code>static void allocate(int **out, size_t n)
+{
+    *out = malloc(n * sizeof **out);   /* writes into the caller's pointer */
+}
+
+int *data = NULL;
+allocate(&amp;data, 10);</code></pre>
+
+  <p>The rule is the same one as week 13: to modify a caller's variable you pass its address. If the variable is an <code>int *</code>, its address is an <code>int **</code>.</p>
+
+  <div class="c-wk-note">
+    <p><strong><code>int *a[5]</code> versus <code>int (*a)[5]</code>.</strong> The first is an array of five pointers; the second is a pointer to an array of five ints. Brackets bind tighter than the asterisk, so parentheses change the meaning entirely. Week 16 gives the right-left rule that makes such declarations readable rather than memorized.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: the same loop, three ways</h2>
+
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stddef.h&gt;
+
+/* Index style. */
+static long sum_indexed(const int *values, size_t n)
+{
+    long total = 0;
+    for (size_t i = 0; i &lt; n; i++) {
+        total += values[i];
+    }
+    return total;
+}
+
+/* Pointer style: identical machine code on any modern compiler. */
+static long sum_pointer(const int *values, size_t n)
+{
+    long total = 0;
+    for (const int *q = values; q &lt; values + n; q++) {
+        total += *q;
+    }
+    return total;
+}
+
+/* Pointer style where it genuinely fits: no count is available,
+   the terminator ends the walk. */
+static size_t length_of(const char *s)
+{
+    const char *start = s;
+    while (*s != '\0') {
+        s++;
+    }
+    return (size_t)(s - start);
+}
+
+/* Reverse traversal done safely: never forms values - 1. */
+static void print_backwards(const int *values, size_t n)
+{
+    for (const int *q = values + n; q-- &gt; values; ) {
+        printf("%d ", *q);
+    }
+    putchar('\n');
+}
+
+/* An output parameter that is itself a pointer. */
+static void point_at_largest(int *values, size_t n, int **out)
+{
+    if (n == 0) {
+        *out = NULL;
+        return;
+    }
+    int *best = values;
+    for (int *q = values + 1; q &lt; values + n; q++) {
+        if (*q &gt; *best) {
+            best = q;
+        }
+    }
+    *out = best;
+}
+
+int main(void)
+{
+    int values[] = { 10, 20, 30, 40, 50 };
+    const size_t n = sizeof values / sizeof values[0];
+    int *p = values;
+
+    puts("== scaling ==");
+    printf("  sizeof(int)        = %zu\n", sizeof(int));
+    printf("  p                  = %p\n", (void *)p);
+    printf("  p + 1              = %p   (+%td bytes)\n",
+           (void *)(p + 1), (char *)(p + 1) - (char *)p);
+    printf("  p + 3              = %p   (+%td bytes)\n",
+           (void *)(p + 3), (char *)(p + 3) - (char *)p);
+
+    puts("\n== the four spellings of one element ==");
+    printf("  values[2]=%d  *(values+2)=%d  p[2]=%d  *(p+2)=%d\n",
+           values[2], *(values + 2), p[2], *(p + 2));
+
+    puts("\n== subtraction gives elements, not bytes ==");
+    int *first = &amp;values[1];
+    int *last  = &amp;values[4];
+    printf("  &amp;values[4] - &amp;values[1] = %td elements\n", last - first);
+
+    puts("\n== three traversals, one answer ==");
+    printf("  sum_indexed = %ld\n", sum_indexed(values, n));
+    printf("  sum_pointer = %ld\n", sum_pointer(values, n));
+    printf("  backwards:    ");
+    print_backwards(values, n);
+
+    puts("\n== pointer style where it belongs ==");
+    const char *text = "pointer arithmetic";
+    printf("  length_of(\"%s\") = %zu   strlen = %zu\n",
+           text, length_of(text), strlen(text));
+
+    puts("\n== array of pointers ==");
+    const char *names[] = { "Ada", "Dennis", "Ken", "Bjarne" };
+    const size_t names_count = sizeof names / sizeof names[0];
+    printf("  the array holds %zu pointers, %zu bytes total\n",
+           names_count, sizeof names);
+    for (size_t i = 0; i &lt; names_count; i++) {
+        printf("    names[%zu] -&gt; \"%s\" (%zu chars)\n",
+               i, names[i], strlen(names[i]));
+    }
+
+    puts("\n== pointer to pointer as an output parameter ==");
+    int *largest = NULL;
+    point_at_largest(values, n, &amp;largest);
+    if (largest != NULL) {
+        printf("  largest value %d is at index %td\n",
+               *largest, largest - values);
+    }
+
+    puts("\n== one past the end ==");
+    const int *end = values + n;
+    printf("  values + %zu is a legal address to form: %p\n", n, (const void *)end);
+    puts("  dereferencing it would be undefined behavior");
+
+    return EXIT_SUCCESS;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address -o ptrmath ptrmath.c
+./ptrmath</code></pre>
+
+  <h3>Prove that index and pointer style compile the same</h3>
+
+  <p>Do not take the claim on trust. Generate the assembly at <code>-O2</code> and compare the two functions:</p>
+
+<pre><code>gcc -std=c17 -O2 -S ptrmath.c -o ptrmath.s
+sed -n '/sum_indexed:/,/ret/p' ptrmath.s
+sed -n '/sum_pointer:/,/ret/p' ptrmath.s</code></pre>
+
+  <p>On x86-64 with GCC the two bodies are typically instruction-for-instruction identical. The compiler recognizes both as the same loop and emits the same code. Choose the one that reads better, and let week 34 handle the cases where the generated code really does matter.</p>
+
+  <h3>Break a rule on purpose</h3>
+
+<pre><code>/* The reverse loop written the tempting way. */
+for (const int *q = values + n - 1; q &gt;= values; q--) {
+    printf("%d ", *q);
+}</code></pre>
+
+  <p>This appears to work everywhere. It is still undefined: on the final iteration <code>q--</code> forms <code>values - 1</code>, an address before the array. The sanitizer will not report it and the program will not crash — which is precisely why knowing the rule matters more here than testing does. The <code>q-- &gt; values</code> form in the example above never forms that address.</p>
+
+  <p>Now try one the sanitizer <em>will</em> catch:</p>
+<pre><code>printf("%d\n", *(values + n));    /* dereferencing one past the end */</code></pre>
+<pre><code>==1234==ERROR: AddressSanitizer: stack-buffer-overflow
+READ of size 4 at 0x7ffd... 'values' (line 96)</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Expecting <code>p + 1</code> to advance one byte</td><td>It advances <code>sizeof(*p)</code> bytes</td><td>Cast to <code>char *</code> if you really want bytes.</td></tr>
+      <tr><td><code>for (q = v + n - 1; q &gt;= v; q--)</code></td><td>Forms <code>v - 1</code>: undefined</td><td><code>for (q = v + n; q-- &gt; v; )</code>.</td></tr>
+      <tr><td>Dereferencing one past the end</td><td>Out-of-bounds read</td><td>The address may be formed but never read.</td></tr>
+      <tr><td>Printing <code>ptrdiff_t</code> with <code>%d</code></td><td>Format mismatch on 64-bit</td><td><code>%td</code>.</td></tr>
+      <tr><td>Comparing pointers into different arrays with <code>&lt;</code></td><td>Unspecified result</td><td>Only <code>==</code> and <code>!=</code> are meaningful across objects.</td></tr>
+      <tr><td><code>int *a[5]</code> when you meant <code>int (*a)[5]</code></td><td>An array of pointers, not a pointer to an array</td><td>Parenthesize; see week 16's reading rule.</td></tr>
+      <tr><td>Losing the original pointer by incrementing it</td><td>Cannot free or restart</td><td>Walk a copy, keep the original.</td></tr>
+      <tr><td>Believing pointer style is faster</td><td>Less readable code, identical output</td><td>Compare the assembly and stop worrying.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why does <code>p + 1</code> advance four bytes for an <code>int *</code> but one byte for a <code>char *</code>?</summary>
+    <p>Because pointer arithmetic counts elements, not bytes, and the pointer's type supplies the element size. This is what makes <code>p[i]</code> equivalent to <code>*(p + i)</code>: the scaling is exactly what indexing needs. To move by raw bytes, cast to <code>char *</code>, whose element size is 1 by definition.</p>
+  </details>
+
+  <details>
+    <summary>What does subtracting two pointers give, and what type is it?</summary>
+    <p>The number of elements between them, not bytes, with type <code>ptrdiff_t</code> from <code>&lt;stddef.h&gt;</code>. It is signed because the difference can be negative, which is why it is not <code>size_t</code>. Print it with <code>%td</code>. It is only defined for pointers into the same array.</p>
+  </details>
+
+  <details>
+    <summary>Why is forming <code>values + n</code> legal but <code>values + n + 1</code> not?</summary>
+    <p>The standard specifically permits a pointer one past the last element so that loop conditions such as <code>q &lt; values + n</code> can be written. Anything beyond that — or before the first element — is undefined even if you never dereference it, because an implementation is allowed to trap on forming such an address.</p>
+  </details>
+
+  <details>
+    <summary>What is the difference between <code>int *a[5]</code> and <code>int (*a)[5]</code>?</summary>
+    <p>Brackets bind tighter than the asterisk, so the first is an array of five <code>int *</code> — five separate pointers. The parentheses in the second force the pointer to apply first, giving a single pointer to an array of five <code>int</code>. This is the declaration form used when passing a two-dimensional array to a function.</p>
+  </details>
+
+  <details>
+    <summary>Is pointer-style traversal faster than index-style?</summary>
+    <p>Not on any compiler released in the last twenty-five years. Strength reduction turns the indexed form into the same address arithmetic, and the generated assembly is typically identical — which you can confirm with <code>gcc -O2 -S</code>. Choose on readability: index style by default, pointer style for strings and buffers where there is no count to index against.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 16 turns pointers into a design tool rather than a mechanism: output parameters, <code>const</code> correctness as a contract the compiler enforces, the dangling-return trap, and a systematic method for reading declarations like <code>char *(*f[3])(int)</code> without guessing. After that, week 19 hands you memory that you must manage yourself.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_14_Strings_and_Character_Handling.html">← Week 14</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_16_Pointers_as_Parameters.html">Week 16 →</a>
+</div>
+
+</div>
