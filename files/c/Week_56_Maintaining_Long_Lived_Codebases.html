@@ -1,0 +1,508 @@
+---
+layout: without-sidebar
+title: "Week 56 — Maintaining Long-Lived C Codebases"
+permalink: /files/c/Week_56_Maintaining_Long_Lived_Codebases.html
+excerpt: "Reading and modernizing K&R-era code, characterization tests before refactoring, incremental change without altering behavior, migrating standards and compilers, and managing technical debt."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Professional · Week 56</div>
+  <h1>Maintaining Long-Lived C Codebases</h1>
+  <p class="c-wk-lead">C's defining property is that code written in 1985 still compiles and still runs in production. That is the language's greatest strength and the source of its hardest engineering problem: changing something nobody fully understands, without breaking what it currently does.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Read K&amp;R-era C and recognize the constructs that no longer belong in new code.</li>
+      <li>Put untested code under characterization tests before touching it.</li>
+      <li>Refactor incrementally with the behavior pinned at every step.</li>
+      <li>Migrate a codebase across standards and compilers safely.</li>
+      <li>Argue for or against paying down a specific piece of technical debt.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Reading old C</h2>
+
+  <p>A codebase that predates C89 uses constructs the language has since replaced. They are not errors — they still compile — but they mean something subtly different, and knowing which is which is the first skill.</p>
+
+<pre><code>/* K&amp;R parameter declarations: no type checking at the call site */
+int add(a, b)
+    int a;
+    int b;
+{
+    return a + b;
+}
+
+/* implicit int: gone in C99 */
+static count;                    /* means: static int count */
+foo(void) { }                    /* means: int foo(void)    */
+
+/* empty parameter list: "unspecified", not "none" */
+int process();                   /* any arguments accepted, unchecked */</code></pre>
+
+  <table>
+    <thead><tr><th>Old form</th><th>Replacement</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td>K&amp;R parameter lists</td><td>Prototypes</td><td>Calls are type-checked. Removed in C23.</td></tr>
+      <tr><td>Implicit <code>int</code></td><td>Explicit types</td><td>Invalid since C99.</td></tr>
+      <tr><td><code>int f()</code></td><td><code>int f(void)</code></td><td>Week 11: the first disables checking.</td></tr>
+      <tr><td>Casting <code>malloc</code>'s result</td><td>No cast</td><td>Could hide a missing <code>&lt;stdlib.h&gt;</code>.</td></tr>
+      <tr><td><code>char *</code> for a literal</td><td><code>const char *</code></td><td>Week 14: writing through it crashes.</td></tr>
+      <tr><td><code>register</code>, old <code>auto</code></td><td>Delete them</td><td>No effect on any modern compiler.</td></tr>
+      <tr><td><code>gets</code>, <code>strcpy</code>, <code>sprintf</code></td><td><code>fgets</code>, <code>snprintf</code></td><td>Week 14: unbounded writes.</td></tr>
+    </tbody>
+  </table>
+
+  <p>Two warning flags make the audit mechanical:</p>
+
+<pre><code>gcc -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes …</code></pre>
+
+  <div class="c-wk-note">
+    <p><strong>Old is not the same as wrong.</strong> Before modernizing a construct, check whether it is load-bearing. A cast that looks redundant may be silencing a warning on a compiler you do not have; a strange loop may work around a bug in a target you do not build for. Week 43's advice applies: <code>git log -S</code> first, and treat silence in the history as a reason for caution rather than permission.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Characterization tests</h2>
+
+  <p>The rule is unconditional: <strong>do not refactor untested code.</strong> Without tests you cannot distinguish a refactoring from a rewrite that happens to compile.</p>
+
+  <p>But legacy code has no tests, and writing correct ones requires knowing the intended behavior — which is exactly what is missing. The way out is to stop trying. A <em>characterization test</em> records what the code <em>currently</em> does, correct or not:</p>
+
+  <ol>
+    <li>Call the function with a wide range of inputs.</li>
+    <li>Record the outputs, whatever they are.</li>
+    <li>Turn those recordings into assertions.</li>
+    <li>Refactor. Any change in behavior now fails a test.</li>
+  </ol>
+
+  <p>If step 2 reveals something wrong, resist fixing it. Pin the current behavior, complete the refactoring, and fix the bug afterwards as a separate change — week 43's minimal-change discipline. Doing both at once means a failing test cannot tell you which change caused it.</p>
+
+<pre><code>/* Generated from the current implementation, not from the specification. */
+CHECK(legacy_parse("42")      == 42);
+CHECK(legacy_parse("  42  ")  == 42);
+CHECK(legacy_parse("42abc")   == 42);     /* questionable, but current */
+CHECK(legacy_parse("abc")     == 0);      /* indistinguishable from "0" */
+CHECK(legacy_parse("")        == 0);
+CHECK(legacy_parse("99999999999") == -1); /* whatever it actually returns */</code></pre>
+
+  <p>Coverage tells you when you have enough. Run the tests under <code>--coverage</code> from week 35 and add cases until the function is covered; uncovered branches are behavior your tests cannot protect.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Refactoring safely</h2>
+
+  <p>Every step below is small enough to be obviously correct, and the tests run after each one. That is the entire technique.</p>
+
+  <table>
+    <thead><tr><th>Step</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td>Add missing prototypes</td><td>The compiler starts checking calls</td></tr>
+      <tr><td>Turn on warnings, one flag at a time</td><td>Fix the fallout before adding the next</td></tr>
+      <tr><td>Add <code>const</code> where nothing is modified</td><td>Documents and enforces — week 16</td></tr>
+      <tr><td>Mark file-local functions <code>static</code></td><td>Shrinks the interface — week 28</td></tr>
+      <tr><td>Introduce a variable for a repeated expression</td><td>Names a concept; no behavior change</td></tr>
+      <tr><td>Extract a block into a function</td><td>Makes it testable in isolation</td></tr>
+      <tr><td>Replace an unbounded call with a bounded one</td><td>Removes a defect class — week 14</td></tr>
+      <tr><td>Replace a magic number with a named constant</td><td>Explains it</td></tr>
+    </tbody>
+  </table>
+
+  <p>Verify mechanically where you can. For a pure function, compare the compiled output before and after:</p>
+
+<pre><code>gcc -O2 -S old.c -o old.s
+gcc -O2 -S new.c -o new.s
+diff old.s new.s        # identical means the behavior cannot have changed</code></pre>
+
+  <p>When the assembly is unchanged, the refactoring is provably behavior-preserving — a stronger guarantee than any test suite. It works for renaming, extracting constants, and adding <code>const</code>; it will not survive extracting a function, and that is fine.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Migrating standards and compilers</h2>
+
+  <p>Move one step at a time, with the full test suite between each:</p>
+
+<pre><code>-std=c89  →  -std=c99  →  -std=c11  →  -std=c17  →  -std=c23</code></pre>
+
+  <table>
+    <thead><tr><th>Target</th><th>Watch for</th></tr></thead>
+    <tbody>
+      <tr><td>C99</td><td>Implicit <code>int</code> removed; implicit function declarations removed</td></tr>
+      <tr><td>C11</td><td><code>gets</code> removed; VLAs become optional</td></tr>
+      <tr><td>C23</td><td>K&amp;R definitions removed; <code>bool</code>/<code>true</code>/<code>false</code> are keywords</td></tr>
+    </tbody>
+  </table>
+
+  <p>A new compiler is a separate migration, and often more revealing than a new standard — it optimizes differently, so latent undefined behavior surfaces. Week 36's lesson arrives in the form of a build that works with GCC 9 and fails with GCC 14.</p>
+
+<pre><code>gcc -std=c17 -O2 -fsanitize=undefined …      # run the suite under UBSan
+clang -std=c17 -O2 …                          # a second opinion
+gcc -fanalyzer …                              # week 35's static analysis</code></pre>
+
+  <p>Run the tests under sanitizers <em>before</em> the migration. A test suite that passes at <code>-O0</code> on the old compiler and fails at <code>-O2</code> on the new one is usually reporting a bug that was always present.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Technical debt</h2>
+
+  <p>Not all debt is worth repaying. The decision is an engineering judgement with four inputs:</p>
+
+  <table>
+    <thead><tr><th>Ask</th><th>Pay it down when</th></tr></thead>
+    <tbody>
+      <tr><td>How often is this code changed?</td><td>Often. Untouched code costs nothing to leave.</td></tr>
+      <tr><td>How dangerous is it?</td><td>Memory safety and input handling first.</td></tr>
+      <tr><td>What does it block?</td><td>It is preventing work you need to do.</td></tr>
+      <tr><td>What does the fix risk?</td><td>The risk is lower than the status quo.</td></tr>
+    </tbody>
+  </table>
+
+  <p>A gnarly function nobody has edited in eight years, with no known defects, is not a priority regardless of how it reads. An <code>strcpy</code> on network input is, even in code that is otherwise pristine.</p>
+
+  <p>The sustainable approach is the <strong>boy scout rule</strong>: improve slightly whatever you touch, as part of the work you were doing. A rewrite proposed as its own project competes with features and usually loses — and when it wins, it discards years of accumulated bug fixes in favour of code that has never met a user.</p>
+
+  <p>Record what you decide not to do, with the reason. A <code>TODO</code> with no rationale is noise; one that says <em>"unbounded copy, but input is validated by the caller at parse.c:88; fix if that ever changes"</em> is documentation.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: modernizing a 1990s function</h2>
+
+  <p>Here is the code as found. It works, ships, and has no tests.</p>
+
+<pre><code>/* legacy.c — as found */
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+char buf[256];
+int count;
+
+parse_record(line, out_name, out_value)
+char *line;
+char *out_name;
+int *out_value;
+{
+    char *p, *q;
+    int i;
+
+    strcpy(buf, line);
+
+    p = buf;
+    while (*p == ' ' || *p == '\t') p++;
+
+    q = p;
+    while (*q != '=' &amp;&amp; *q != 0) q++;
+    if (*q == 0) return 0;
+
+    *q = 0;
+    i = strlen(p);
+    while (i &gt; 0 &amp;&amp; (p[i-1] == ' ' || p[i-1] == '\t')) { p[i-1] = 0; i--; }
+
+    strcpy(out_name, p);
+
+    q++;
+    while (*q == ' ' || *q == '\t') q++;
+    *out_value = atoi(q);
+
+    count++;
+    return 1;
+}</code></pre>
+
+  <p>Six defects, each from an earlier week: a K&amp;R definition with no prototype, implicit <code>int</code> return, two unbounded <code>strcpy</code> calls, a global buffer that makes it non-reentrant, <code>atoi</code> that cannot report failure, and a global counter nobody asked for.</p>
+
+  <h3>Step 1 — find out what it does</h3>
+
+<pre><code>/* characterize.c — generates the assertions */
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+int parse_record();                 /* no prototype exists yet */
+
+int main(void)
+{
+    const char *inputs[] = {
+        "timeout = 30", "  name = 42  ", "key=7", "noequals",
+        "= 5", "empty =", "x = abc", "x = 99999999999", ""
+    };
+
+    for (size_t i = 0; i &lt; sizeof inputs / sizeof inputs[0]; i++) {
+        char name[256] = { 0 };
+        int  value = -999;
+        char copy[256];
+        snprintf(copy, sizeof copy, "%s", inputs[i]);
+
+        int rc = parse_record(copy, name, &amp;value);
+        printf("CHECK_PARSE(\"%s\", %d, \"%s\", %d);\n",
+               inputs[i], rc, name, value);
+    }
+    return 0;
+}</code></pre>
+
+<pre><code>gcc -w -o characterize characterize.c legacy.c &amp;&amp; ./characterize &gt; pinned.h</code></pre>
+
+<pre><code>CHECK_PARSE("timeout = 30", 1, "timeout", 30);
+CHECK_PARSE("  name = 42  ", 1, "name", 42);
+CHECK_PARSE("key=7", 1, "key", 7);
+CHECK_PARSE("noequals", 0, "", -999);
+CHECK_PARSE("= 5", 1, "", 5);            /* an empty name is accepted */
+CHECK_PARSE("empty =", 1, "empty", 0);   /* missing value becomes 0 */
+CHECK_PARSE("x = abc", 1, "x", 0);       /* atoi cannot say "not a number" */
+CHECK_PARSE("x = 99999999999", 1, "x", …);
+CHECK_PARSE("", 0, "", -999);</code></pre>
+
+  <p>Three of those are wrong. Pin them anyway — the goal right now is a refactoring, and mixing in behavior changes destroys the ability to attribute a failure.</p>
+
+  <h3>Step 2 — a prototype and a test harness</h3>
+
+<pre><code>/* legacy.h */
+#ifndef LEGACY_H
+#define LEGACY_H
+int parse_record(char *line, char *out_name, int *out_value);
+#endif</code></pre>
+
+<pre><code>/* test_legacy.c */
+#include "legacy.h"
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+
+static int checks = 0, failures = 0;
+
+#define CHECK_PARSE(input, want_rc, want_name, want_value) do {        \
+    char line[256], name[256] = { 0 };                                 \
+    int value = -999;                                                  \
+    snprintf(line, sizeof line, "%s", (input));                        \
+    int rc = parse_record(line, name, &amp;value);                         \
+    checks++;                                                          \
+    if (rc != (want_rc) || strcmp(name, (want_name)) != 0              \
+        || value != (want_value)) {                                    \
+        failures++;                                                    \
+        printf("  FAIL \"%s\": rc %d name \"%s\" value %d\n",          \
+               (input), rc, name, value);                              \
+    }                                                                  \
+} while (0)
+
+int main(void)
+{
+    #include "pinned.h"
+    printf("%d checks, %d failed\n", checks, failures);
+    return failures == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+}</code></pre>
+
+  <h3>Step 3 — modernize, one change at a time</h3>
+
+  <p>Run the tests after every single step.</p>
+
+<pre><code>/* 1. a prototype-style definition — behavior identical */
+int parse_record(char *line, char *out_name, int *out_value)
+
+/* 2. mark file-local helpers static, remove the unused global counter */
+
+/* 3. bound the copies: the first real defect fixed */
+snprintf(buf, sizeof buf, "%s", line);
+
+/* 4. remove the global buffer — the function becomes reentrant.
+      This changes the SIGNATURE, so callers must be updated. */
+int parse_record(const char *line, char *out_name, size_t name_size,
+                 int *out_value);
+
+/* 5. replace atoi with strtol, but KEEP the pinned behavior for now:
+      report 0 on failure exactly as before, and record the intent */
+long v;
+*out_value = parse_long(value_start, &amp;v) ? (int)v : 0;   /* TODO: reject */</code></pre>
+
+  <p>Step 5 is the discipline in miniature. <code>strtol</code> can now detect a malformed value, but the function still returns 0 for one — because that is what the tests pin, and changing it is a behavior change belonging to a separate commit with its own review.</p>
+
+  <h3>The result</h3>
+
+<pre><code>/* parser.c — after the refactoring, before the behavior fixes */
+#include "parser.h"
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;limits.h&gt;
+
+#define LINE_MAX_LEN 256
+
+static const char *skip_space(const char *s)
+{
+    while (*s == ' ' || *s == '\t') s++;
+    return s;
+}
+
+static void trim_trailing(char *s)
+{
+    size_t n = strlen(s);
+    while (n &gt; 0 &amp;&amp; (s[n-1] == ' ' || s[n-1] == '\t')) s[--n] = '\0';
+}
+
+static bool parse_long(const char *text, long *out)
+{
+    if (text == NULL || *text == '\0') return false;
+    errno = 0;
+    char *end;
+    long v = strtol(text, &amp;end, 10);
+    if (end == text || errno == ERANGE) return false;
+    *out = v;
+    return true;
+}
+
+/* No globals: safe to call from two threads. */
+bool parse_record(const char *line, char *out_name, size_t name_size,
+                  int *out_value)
+{
+    if (line == NULL || out_name == NULL || out_value == NULL) {
+        return false;
+    }
+
+    char work[LINE_MAX_LEN];
+    if ((size_t)snprintf(work, sizeof work, "%s", line) &gt;= sizeof work) {
+        return false;                       /* too long: refuse, not truncate */
+    }
+
+    char *equals = strchr(work, '=');
+    if (equals == NULL) {
+        return false;
+    }
+    *equals = '\0';
+
+    const char *name = skip_space(work);
+    trim_trailing((char *)name);
+
+    if ((size_t)snprintf(out_name, name_size, "%s", name) &gt;= name_size) {
+        return false;                       /* caller's buffer too small */
+    }
+
+    const char *value_text = skip_space(equals + 1);
+
+    long v;
+    /* TODO(#412): pinned legacy behavior — a malformed value yields 0.
+       Changing this to a rejection is a separate, reviewed change. */
+    *out_value = (parse_long(value_text, &amp;v) &amp;&amp; v &gt;= INT_MIN &amp;&amp; v &lt;= INT_MAX)
+               ? (int)v : 0;
+    return true;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -Wstrict-prototypes -Wold-style-definition \
+    -g -fsanitize=address,undefined -o test_parser test_parser.c parser.c
+./test_parser</code></pre>
+
+<pre><code>9 checks, 0 failed</code></pre>
+
+  <p>Every pinned behavior preserved, and the function is now prototyped, bounded, reentrant, <code>const</code>-correct, and clean under sanitizers.</p>
+
+  <h3>Step 4 — now fix the behavior, separately</h3>
+
+<pre><code>git commit -m "Modernize parse_record without changing behavior"
+git commit -m "Reject malformed values instead of returning 0
+
+parse_record() returned 0 for 'x = abc', indistinguishable from
+'x = 0'. Callers cannot detect the difference. Now returns false.
+
+Updates the two pinned tests that encoded the old behavior, and the
+three call sites that relied on it. Closes #412."</code></pre>
+
+  <p>Two commits. The first is provably behavior-preserving and can be reviewed quickly; the second changes exactly one thing, names the affected callers, and can be reverted alone if it turns out something depended on the old behavior.</p>
+
+  <h3>Prove a step changed nothing</h3>
+
+<pre><code>gcc -O2 -S before.c -o before.s
+gcc -O2 -S after.c  -o after.s
+diff before.s after.s &amp;&amp; echo "identical machine code"</code></pre>
+
+  <p>For step 1 — converting the K&amp;R definition to a prototype — the assembly is typically identical, which is a stronger statement than the tests can make.</p>
+
+  <h3>Then migrate the standard</h3>
+
+<pre><code>for std in c89 c99 c11 c17 c23; do
+    printf "%-5s " $std
+    gcc -std=$std -Wall -Wextra -o /tmp/t test_parser.c parser.c 2&gt;&amp;1 \
+        | head -1 || true
+    /tmp/t &gt;/dev/null &amp;&amp; echo "pass" || echo "FAIL"
+done</code></pre>
+
+  <p>The original fails at C99 — implicit <code>int</code> and the K&amp;R definition are gone — and at C23 even more thoroughly. The refactored version passes at every level, which is the practical measure of having modernized it.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Refactoring without tests</td><td>You cannot tell a refactor from a rewrite</td><td>Characterize first.</td></tr>
+      <tr><td>Fixing bugs while refactoring</td><td>A failing test names no cause</td><td>Pin, refactor, then fix.</td></tr>
+      <tr><td>A rewrite instead of incremental change</td><td>Years of fixes discarded</td><td>Refactor in place.</td></tr>
+      <tr><td>Deleting code you do not understand</td><td>Reintroduces an old defect</td><td><code>git log -S</code> — week 43.</td></tr>
+      <tr><td>Migrating several standards at once</td><td>Failures cannot be attributed</td><td>One step, full suite between.</td></tr>
+      <tr><td>Not running sanitizers before migrating</td><td>A new compiler surfaces old UB</td><td>UBSan on the old compiler first.</td></tr>
+      <tr><td>Modernizing code nobody touches</td><td>Risk with no return</td><td>Prioritize by change frequency and danger.</td></tr>
+      <tr><td>A <code>TODO</code> with no reason</td><td>Noise nobody can act on</td><td>State the condition and the constraint.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>What is a characterization test, and why pin behavior you believe is wrong?</summary>
+    <p>It records what the code currently does rather than what it should do, so a refactoring can be verified even without a specification. Wrong behavior is pinned deliberately: if a test fails during the refactoring you know the refactoring caused it. Fixing the behavior is a separate change with its own commit and its own review.</p>
+  </details>
+
+  <details>
+    <summary>How can you prove a refactoring step changed nothing at all?</summary>
+    <p>Compile before and after at the same optimization level with <code>-S</code> and diff the assembly. Identical output means the observable behavior cannot have changed — a stronger guarantee than any test suite. It works for renames, added <code>const</code>, and prototype conversion; it will not survive extracting a function.</p>
+  </details>
+
+  <details>
+    <summary>Why migrate one standard at a time?</summary>
+    <p>Because each revision removes or changes different things — implicit <code>int</code> at C99, <code>gets</code> at C11, K&amp;R definitions at C23 — and jumping several at once produces a pile of failures with no way to attribute them. One step with the full test suite between makes each failure traceable to a specific change.</p>
+  </details>
+
+  <details>
+    <summary>Why is a rewrite usually worse than incremental refactoring?</summary>
+    <p>Because the existing code encodes years of bug fixes, edge cases, and workarounds that nobody remembers and nothing documents. A rewrite discards all of it and starts with code that has never met a user. Refactoring in place keeps that accumulated knowledge and lets you verify each step against the behavior it must preserve.</p>
+  </details>
+
+  <details>
+    <summary>Which technical debt is worth paying down?</summary>
+    <p>Debt in code that is changed often, or that is dangerous — unbounded copies, unvalidated input, memory-safety hazards — or that is actively blocking work you need to do. A difficult function nobody has edited in years, with no known defects, is not a priority no matter how it reads: the fix carries risk and returns nothing.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>The end of the course</h2>
+
+  <p>Fifty-six weeks ago the first program printed a line. Since then: the machine's model of memory, the language in full through C23, the standard library, the tooling that makes C tractable, data structures, the operating system interface, networking, concurrency, the practices of working with other people, and bare-metal development on a processor with no operating system at all.</p>
+
+  <p>What distinguishes a professional C programmer is not knowledge of syntax — that was weeks 1 to 14. It is the set of habits the rest of the course was actually teaching:</p>
+
+  <ul>
+    <li>Compile with warnings on, and fix every one.</li>
+    <li>Run under sanitizers by default, not when something breaks.</li>
+    <li>Check every return value that can fail.</li>
+    <li>Say who owns every allocation, in the interface.</li>
+    <li>Bound every copy, and validate every input at the boundary.</li>
+    <li>Test the empty case, the boundary case, and the error path.</li>
+    <li>Know the difference between what works and what is guaranteed.</li>
+    <li>Measure before optimizing; read the generated code when it matters.</li>
+    <li>Leave the next reader — usually yourself — something they can change safely.</li>
+  </ul>
+
+  <p>C will not enforce any of these. That is the whole of what makes it difficult, and the whole of what makes the discipline worth having.</p>
+
+  <p>Where to go next: read the codebases from week 42 in earnest, contribute a small fix to one of them using weeks 43 and 44, and pick a domain — systems, embedded, security, or numerical — and go deeper than this course could. The language has been stable for fifty years and will outlast most of what is written about it. That is a reasonable thing to have learned properly.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_55_Embedded_Debugging_and_Testing.html">← Week 55</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <span></span>
+</div>
+
+</div>

@@ -1,0 +1,470 @@
+---
+layout: without-sidebar
+title: "Week 52 — Linker Scripts and Firmware Memory Layout"
+permalink: /files/c/Week_52_Linker_Scripts_and_Firmware_Layout.html
+excerpt: "Sections and memory regions, load address versus virtual address, the startup copy, stack placement and overflow detection, and reading a map file."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Professional · Week 52</div>
+  <h1>Linker Scripts and Firmware Memory Layout</h1>
+  <p class="c-wk-lead">On a hosted system the linker's default script is invisible and correct. On bare metal you write it, and it decides where every byte lands. This week opens the file that weeks 49 through 51 have been quietly relying on.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Write a linker script defining memory regions and section placement.</li>
+      <li>Explain load address versus virtual address, and why <code>.data</code> has both.</li>
+      <li>Define and use symbols that C code can read.</li>
+      <li>Place the stack, and detect an overflow before it corrupts anything.</li>
+      <li>Read a map file and account for every byte of an image.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Sections</h2>
+
+  <p>The compiler does not emit a flat stream of bytes. It sorts everything into named <em>sections</em>, and the linker gathers matching sections from every object file and places each group at an address.</p>
+
+  <table>
+    <thead><tr><th>Section</th><th>Contains</th><th>Lives in</th><th>In the image?</th></tr></thead>
+    <tbody>
+      <tr><td><code>.text</code></td><td>Machine code</td><td>Flash</td><td>Yes</td></tr>
+      <tr><td><code>.rodata</code></td><td><code>const</code> data, string literals</td><td>Flash</td><td>Yes</td></tr>
+      <tr><td><code>.data</code></td><td>Initialized globals</td><td>RAM</td><td><strong>Yes — the initial values</strong></td></tr>
+      <tr><td><code>.bss</code></td><td>Zero-initialized globals</td><td>RAM</td><td>No — only its size</td></tr>
+      <tr><td>Stack</td><td>Locals, call frames</td><td>RAM</td><td>No</td></tr>
+      <tr><td>Heap</td><td><code>malloc</code>, if used at all</td><td>RAM</td><td>No</td></tr>
+    </tbody>
+  </table>
+
+  <p>Week 17 met these on a hosted system, where the loader handles them. Here the same four sections exist and nothing handles them for you.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Load address and virtual address</h2>
+
+  <p>This is the idea the whole script turns on. Most sections live where they are stored. <code>.data</code> does not.</p>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 620 180" role="img" aria-label="Flash holds text, rodata and the initial values of data; RAM holds data and bss after the startup copy" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="24" y="26" width="150" height="34" rx="6"/>
+        <rect x="24" y="62" width="150" height="34" rx="6"/>
+        <rect x="24" y="98" width="150" height="34" rx="6"/>
+        <rect x="420" y="26" width="150" height="34" rx="6"/>
+        <rect x="420" y="62" width="150" height="34" rx="6"/>
+        <rect x="420" y="98" width="150" height="46" rx="6"/>
+      </g>
+      <g fill="currentColor" font-size="11.5" text-anchor="middle" font-family="inherit">
+        <text x="99" y="47">.text</text>
+        <text x="99" y="83">.rodata</text>
+        <text x="99" y="119">.data init values</text>
+        <text x="495" y="47">.data</text>
+        <text x="495" y="83">.bss (zeroed)</text>
+        <text x="495" y="120">stack</text><text x="495" y="136" opacity=".6">grows down</text>
+        <text x="99" y="16" opacity=".7">FLASH  0x00000000</text>
+        <text x="495" y="16" opacity=".7">RAM  0x20000000</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1.5" opacity=".6">
+        <path d="M176 112 C 280 112, 300 46, 416 44"/>
+        <path d="M408 39l8 5-8 6" fill="none"/>
+      </g>
+      <text x="300" y="98" fill="currentColor" font-size="11" text-anchor="middle" opacity=".7" font-family="inherit">copied by the reset handler</text>
+      <text x="310" y="170" fill="currentColor" font-size="11" text-anchor="middle" opacity=".6" font-family="inherit">LMA = where it is stored · VMA = where it is addressed</text>
+    </svg>
+    <p class="c-wk-cap">Week 49's startup loop, seen from the linker's side.</p>
+  </div>
+
+  <ul>
+    <li><strong>VMA</strong> — virtual memory address — is where the code expects the section to be. For <code>.data</code>, RAM.</li>
+    <li><strong>LMA</strong> — load memory address — is where it is actually stored in the image. For <code>.data</code>, flash.</li>
+  </ul>
+
+  <p>For <code>.text</code> and <code>.rodata</code> the two are the same: code executes directly from flash. For <code>.data</code> they differ, and the gap is exactly what the startup copy closes.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>The script</h2>
+
+<pre><code>ENTRY(reset_handler)                 /* the entry symbol, for debuggers */
+
+MEMORY
+{
+    FLASH (rx)  : ORIGIN = 0x00000000, LENGTH = 256K
+    RAM   (rwx) : ORIGIN = 0x20000000, LENGTH = 64K
+}
+
+_stack_size = 4K;
+_heap_size  = 0;                     /* no heap: week 53 */
+
+SECTIONS
+{
+    .text : {
+        KEEP(*(.vectors))            /* must be first, and never discarded */
+        *(.text*)
+        *(.rodata*)
+        . = ALIGN(4);
+        _etext = .;
+    } &gt; FLASH
+
+    .data : {
+        . = ALIGN(4);
+        _data_start = .;
+        *(.data*)
+        . = ALIGN(4);
+        _data_end = .;
+    } &gt; RAM AT&gt; FLASH                /* VMA in RAM, LMA in FLASH */
+
+    _data_load = LOADADDR(.data);    /* where the startup code reads from */
+
+    .bss (NOLOAD) : {
+        . = ALIGN(4);
+        _bss_start = .;
+        *(.bss*)
+        *(COMMON)
+        . = ALIGN(4);
+        _bss_end = .;
+    } &gt; RAM
+
+    .stack (NOLOAD) : {
+        . = ALIGN(8);                /* ARM requires 8-byte stack alignment */
+        _stack_bottom = .;
+        . = . + _stack_size;
+        _stack_top = .;
+    } &gt; RAM
+
+    /* Fail the build rather than the device. */
+    ASSERT(_stack_top &lt;= ORIGIN(RAM) + LENGTH(RAM), "RAM overflow")
+}</code></pre>
+
+  <table>
+    <thead><tr><th>Construct</th><th>Means</th></tr></thead>
+    <tbody>
+      <tr><td><code>MEMORY</code></td><td>Names the physical regions and their sizes</td></tr>
+      <tr><td><code>&gt; FLASH</code></td><td>Place this section in that region</td></tr>
+      <tr><td><code>AT&gt; FLASH</code></td><td>…but store it in this one — sets the LMA</td></tr>
+      <tr><td><code>.</code></td><td>The location counter, assignable</td></tr>
+      <tr><td><code>KEEP(...)</code></td><td>Do not discard even if nothing references it</td></tr>
+      <tr><td><code>NOLOAD</code></td><td>Reserve the space; store nothing in the image</td></tr>
+      <tr><td><code>_symbol = .;</code></td><td>Define a symbol C can refer to</td></tr>
+      <tr><td><code>ASSERT(...)</code></td><td>Fail the link if the condition is false</td></tr>
+    </tbody>
+  </table>
+
+  <p><code>KEEP</code> on the vector table is not optional. With <code>--gc-sections</code> the linker discards anything unreferenced, and nothing in C refers to the vector table — the processor reads it directly. Without <code>KEEP</code> it disappears and the device does not boot.</p>
+
+  <p>The <code>ASSERT</code> is the difference between a link error and a device that runs until the stack meets <code>.bss</code>. Every embedded project should have one.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Linker symbols in C</h2>
+
+  <p>A symbol defined in the script has no storage — the linker records only an <em>address</em>. That makes the C declaration counter-intuitive:</p>
+
+<pre><code>extern uint32_t _data_start;      /* declares a variable AT that address */
+
+uint32_t *p = &amp;_data_start;       /* CORRECT: take its address */
+uint32_t  v = _data_start;        /* WRONG: reads whatever is stored there */</code></pre>
+
+  <p>The value of a linker symbol <em>is</em> its address, so you always want <code>&amp;</code>. Some projects avoid the trap by declaring them as arrays, where the name already decays to an address:</p>
+
+<pre><code>extern uint32_t _data_start[];    /* now _data_start is the address */
+uint32_t *p = _data_start;        /* no &amp; needed, and no way to misuse it */</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Stack placement and overflow</h2>
+
+  <p>The stack grows downward from its top. Place it at the end of RAM and it grows toward <code>.bss</code>; there is no guard page and no fault — week 49's point about the absent MMU.</p>
+
+  <p>Three defences, in increasing cost:</p>
+
+  <p><strong>A painted region.</strong> Fill the stack with a pattern at startup, then check later how far down it has been disturbed. This measures the high-water mark, which tells you how much margin you actually have.</p>
+
+<pre><code>#define STACK_PAINT 0xC0DEC0DEu
+
+void paint_stack(void)               /* called early, before deep calls */
+{
+    uint32_t *p = _stack_bottom;
+    uint32_t marker;
+    while (p &lt; &amp;marker) *p++ = STACK_PAINT;   /* up to the current frame */
+}
+
+size_t stack_used(void)
+{
+    uint32_t *p = _stack_bottom;
+    while (p &lt; _stack_top &amp;&amp; *p == STACK_PAINT) p++;
+    return (size_t)((uint8_t *)_stack_top - (uint8_t *)p);
+}</code></pre>
+
+  <p><strong>A canary.</strong> Reserve a word at the bottom of the stack, set it to a known value, and check it periodically. Cheap, and it detects an overflow after the fact rather than before.</p>
+
+  <p><strong>Hardware.</strong> An MPU region marked no-access below the stack turns an overflow into a fault at the moment it happens. Available on many Cortex-M parts and worth configuring on anything safety-relevant.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: taking an image apart</h2>
+
+<pre><code>/* layout.c — every section populated deliberately */
+#include &lt;stdint.h&gt;
+
+/* Linker symbols, declared as arrays so no &amp; is needed. */
+extern uint32_t _etext[], _data_start[], _data_end[], _data_load[];
+extern uint32_t _bss_start[], _bss_end[];
+extern uint32_t _stack_bottom[], _stack_top[];
+
+/* .rodata — stays in flash, costs no RAM */
+static const char banner[]      = "firmware layout demo";
+static const uint32_t table[16] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
+
+/* .data — initial values in flash, variable in RAM */
+static uint32_t marker   = 0xA5A5A5A5u;
+static uint16_t revision = 42;
+
+/* .bss — no flash cost at all */
+static uint32_t counter;
+static uint8_t  scratch[1024];
+
+/* ---------- UART, from week 50 ---------- */
+
+#define UART0_DR (*(volatile uint32_t *)0x4000C000u)
+#define UART0_FR (*(volatile uint32_t *)0x4000C018u)
+
+static void putc_raw(char c)
+{
+    while (UART0_FR &amp; (1u &lt;&lt; 5)) { }
+    UART0_DR = (uint32_t)(unsigned char)c;
+}
+static void puts_raw(const char *s)
+{
+    for (; *s; s++) { if (*s == '\n') putc_raw('\r'); putc_raw(*s); }
+}
+static void put_hex(uint32_t v)
+{
+    static const char d[] = "0123456789ABCDEF";
+    puts_raw("0x");
+    for (int s = 28; s &gt;= 0; s -= 4) putc_raw(d[(v &gt;&gt; s) &amp; 0xFu]);
+}
+static void put_uint(uint32_t v)
+{
+    char t[11]; int i = 0;
+    if (!v) { putc_raw('0'); return; }
+    while (v) { t[i++] = (char)('0' + v % 10); v /= 10; }
+    while (i) putc_raw(t[--i]);
+}
+
+/* ---------- stack painting ---------- */
+
+#define PAINT 0xC0DEC0DEu
+
+void paint_stack(void)
+{
+    uint32_t here;
+    for (uint32_t *p = _stack_bottom; p &lt; &amp;here; p++) {
+        *p = PAINT;
+    }
+}
+
+static uint32_t stack_used_bytes(void)
+{
+    uint32_t *p = _stack_bottom;
+    while (p &lt; _stack_top &amp;&amp; *p == PAINT) p++;
+    return (uint32_t)((uint8_t *)_stack_top - (uint8_t *)p);
+}
+
+/* Recursion to consume stack on demand. */
+static uint32_t consume(uint32_t depth)
+{
+    volatile uint8_t frame[64];
+    frame[0] = (uint8_t)depth;
+    if (depth == 0) return frame[0];
+    return consume(depth - 1) + frame[0];
+}
+
+int main(void)
+{
+    puts_raw("\n=== firmware layout ===\n\n");
+
+    puts_raw("FLASH\n");
+    puts_raw("  .text + .rodata end : "); put_hex((uint32_t)(uintptr_t)_etext);
+    puts_raw("\n  banner (rodata)     : ");
+    put_hex((uint32_t)(uintptr_t)banner);
+    puts_raw("\n  table  (rodata)     : ");
+    put_hex((uint32_t)(uintptr_t)table);
+    puts_raw("\n  .data initial values: ");
+    put_hex((uint32_t)(uintptr_t)_data_load);
+    puts_raw("   &lt;-- LMA, in flash\n");
+
+    puts_raw("\nRAM\n");
+    puts_raw("  .data  "); put_hex((uint32_t)(uintptr_t)_data_start);
+    puts_raw(" .. ");      put_hex((uint32_t)(uintptr_t)_data_end);
+    puts_raw("   &lt;-- VMA, in RAM\n");
+    puts_raw("  .bss   "); put_hex((uint32_t)(uintptr_t)_bss_start);
+    puts_raw(" .. ");      put_hex((uint32_t)(uintptr_t)_bss_end);
+    puts_raw("\n  stack  "); put_hex((uint32_t)(uintptr_t)_stack_bottom);
+    puts_raw(" .. ");        put_hex((uint32_t)(uintptr_t)_stack_top);
+    puts_raw("\n");
+
+    puts_raw("\nsizes\n");
+    puts_raw("  .data : ");
+    put_uint((uint32_t)((uint8_t *)_data_end - (uint8_t *)_data_start));
+    puts_raw(" bytes  (also occupies that much FLASH)\n");
+    puts_raw("  .bss  : ");
+    put_uint((uint32_t)((uint8_t *)_bss_end - (uint8_t *)_bss_start));
+    puts_raw(" bytes  (zero FLASH)\n");
+    puts_raw("  stack : ");
+    put_uint((uint32_t)((uint8_t *)_stack_top - (uint8_t *)_stack_bottom));
+    puts_raw(" bytes reserved\n");
+
+    puts_raw("\nstartup did its job\n");
+    puts_raw("  marker   = "); put_hex(marker);
+    puts_raw(marker == 0xA5A5A5A5u ? "  .data copied\n" : "  NOT COPIED\n");
+    puts_raw("  revision = "); put_uint(revision); puts_raw("\n");
+    puts_raw("  counter  = "); put_uint(counter);
+    puts_raw(counter == 0 ? "  .bss zeroed\n" : "  NOT ZEROED\n");
+
+    puts_raw("\nstack high-water mark\n");
+    puts_raw("  at entry        : "); put_uint(stack_used_bytes());
+    puts_raw(" bytes\n");
+
+    (void)consume(8);
+    puts_raw("  after 8 frames  : "); put_uint(stack_used_bytes());
+    puts_raw(" bytes\n");
+
+    (void)consume(40);
+    puts_raw("  after 40 frames : "); put_uint(stack_used_bytes());
+    puts_raw(" bytes\n");
+
+    uint32_t reserved = (uint32_t)((uint8_t *)_stack_top -
+                                   (uint8_t *)_stack_bottom);
+    uint32_t used = stack_used_bytes();
+    puts_raw("  headroom        : "); put_uint(reserved - used);
+    puts_raw(" of "); put_uint(reserved); puts_raw(" bytes\n");
+    puts_raw("\n  this is a measurement, not an estimate — which is what\n");
+    puts_raw("  lets you size the stack with evidence\n");
+
+    for (;;) { }
+}</code></pre>
+
+  <p>Call <code>paint_stack()</code> from the reset handler, immediately after zeroing <code>.bss</code> and before calling <code>main</code>.</p>
+
+<pre><code>arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb \
+    -ffreestanding -nostdlib -O2 -Wall -Wextra -g \
+    -T firmware.ld -Wl,-Map=firmware.map \
+    -o firmware.elf startup.c layout.c
+
+qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf</code></pre>
+
+  <h3>Compare the output with the tools</h3>
+
+<pre><code>arm-none-eabi-size firmware.elf</code></pre>
+<pre><code>   text    data     bss     dec     hex filename
+   1632       8    1028    2668     a6c firmware.elf</code></pre>
+
+  <p>Eight bytes of <code>.data</code> — the <code>uint32_t</code> and the <code>uint16_t</code> with padding — and 1028 of <code>.bss</code>, which is the 1024-byte <code>scratch</code> plus <code>counter</code>. The <code>.data</code> figure appears in <em>both</em> flash and RAM; the <code>.bss</code> figure only in RAM. Add <code>= {1}</code> to <code>scratch</code> and watch <code>text</code> grow by a kilobyte as it moves into <code>.data</code>.</p>
+
+<pre><code>arm-none-eabi-objdump -h firmware.elf</code></pre>
+<pre><code>Idx Name      Size      VMA       LMA       File off  Algn
+  0 .text     00000660  00000000  00000000  00010000  2**2
+  1 .data     00000008  20000000  00000660  00020000  2**2
+  2 .bss      00000404  20000008  20000008  00020008  2**2</code></pre>
+
+  <p>There it is, printed by the tool: <code>.text</code> has VMA equal to LMA, and <code>.data</code> does not — VMA <code>0x20000000</code> in RAM, LMA <code>0x00000660</code> in flash. That one row is the entire content of section 2.</p>
+
+  <h3>Read the map file</h3>
+
+<pre><code>grep -A20 'Memory Configuration' firmware.map
+grep -E '^\s+\.(text|data|bss)' firmware.map | head -20
+grep -B2 -A8 '_stack_top' firmware.map</code></pre>
+
+  <p>The map file accounts for every byte: which object file contributed which bytes to which section, at which address. When an image is unexpectedly large, this is where the answer is — usually one function, or a library pulled in by a single call to <code>printf</code>.</p>
+
+<pre><code>arm-none-eabi-nm --size-sort -S firmware.elf | tail -10   # the biggest symbols</code></pre>
+
+  <h3>Move a variable into flash</h3>
+
+<pre><code>__attribute__((section(".rodata"))) static const uint32_t big_table[256] = { … };</code></pre>
+
+  <p>Rebuild and compare <code>size</code>: <code>text</code> grows by a kilobyte and RAM is untouched. On a part with 8 KB of RAM and 64 KB of flash, moving constant tables out of RAM is often the difference between fitting and not.</p>
+
+  <h3>Make the linker catch a mistake</h3>
+
+  <p>Set <code>_stack_size = 128K;</code> in the script and rebuild:</p>
+
+<pre><code>arm-none-eabi-ld: RAM overflow
+collect2: error: ld returned 1 exit status</code></pre>
+
+  <p>The <code>ASSERT</code> turned a device that would have corrupted itself at run time into a build failure. Remove the assertion and the same configuration links cleanly, producing firmware whose stack overlaps <code>.bss</code> — and the symptom would be variables changing value for no reason.</p>
+
+  <h3>Watch the stack grow into the danger zone</h3>
+
+  <p>Raise the recursion depth until the high-water mark approaches the reserved size:</p>
+
+<pre><code>(void)consume(60);   /* 60 frames of 64 bytes plus overhead */</code></pre>
+
+  <p>The reported headroom shrinks toward zero. Push past it and variables in <code>.bss</code> start changing — silently, because nothing is watching. That is the failure this week's painting and <code>ASSERT</code> exist to make visible, and it is why embedded projects size the stack from a measurement rather than a guess.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>No <code>KEEP</code> on the vector table</td><td>Discarded by <code>--gc-sections</code>; device will not boot</td><td><code>KEEP(*(.vectors))</code>.</td></tr>
+      <tr><td>Vector table not first</td><td>The processor reads the wrong initial SP</td><td>Place it at the start of <code>.text</code>.</td></tr>
+      <tr><td>Omitting <code>AT&gt; FLASH</code> on <code>.data</code></td><td>Initial values are never stored in the image</td><td>Set the LMA explicitly.</td></tr>
+      <tr><td>Reading a linker symbol's value</td><td>Reads the memory at that address</td><td>Take its address, or declare it as an array.</td></tr>
+      <tr><td>No RAM-overflow <code>ASSERT</code></td><td>Stack silently overlaps <code>.bss</code></td><td>Add the check to the script.</td></tr>
+      <tr><td>Guessing the stack size</td><td>Either wasted RAM or an overflow in the field</td><td>Paint it and measure.</td></tr>
+      <tr><td>Forgetting <code>ALIGN</code></td><td>Unaligned access faults — week 37</td><td>Align sections to 4, the stack to 8.</td></tr>
+      <tr><td>Large tables without <code>const</code></td><td>They occupy RAM as well as flash</td><td><code>const</code> keeps them in <code>.rodata</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>What is the difference between a section's LMA and VMA, and which section needs both?</summary>
+    <p>The LMA is where the section is stored in the image; the VMA is the address the code expects it at. They are the same for <code>.text</code> and <code>.rodata</code>, which execute from flash. <code>.data</code> needs both: its initial values must be stored in flash because RAM is empty at power-on, but the variables are addressed in RAM — and the startup code copies one to the other.</p>
+  </details>
+
+  <details>
+    <summary>Why does <code>.bss</code> occupy no space in the image?</summary>
+    <p>Because every byte is zero, so there is nothing to store — only the size is recorded, and the startup code clears that much RAM. Give a <code>.bss</code> variable a non-zero initializer and it moves to <code>.data</code>, where the contents must actually be present in flash.</p>
+  </details>
+
+  <details>
+    <summary>Why must the vector table be wrapped in <code>KEEP</code>?</summary>
+    <p>Because nothing in the C code references it — the processor reads it directly from address 0 — so section garbage collection sees an unused section and discards it. Without it the image links successfully and the device fails to boot, which is a particularly unhelpful combination.</p>
+  </details>
+
+  <details>
+    <summary>Why is <code>uint32_t v = _data_start;</code> wrong?</summary>
+    <p>Because a linker symbol has no storage: the linker records only an address, and the declaration <code>extern uint32_t _data_start</code> describes a variable located <em>at</em> that address. Reading it reads whatever bytes are there. You want <code>&amp;_data_start</code> — or declare it as an array, where the name is already the address.</p>
+  </details>
+
+  <details>
+    <summary>How do you size a stack with evidence rather than a guess?</summary>
+    <p>Fill the reserved region with a known pattern at startup, run the worst-case workload, then find the lowest address whose pattern is still intact. The distance from there to the top is the high-water mark. Combined with an <code>ASSERT</code> in the linker script that the regions fit, that converts a guess into a measurement and a build-time check.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 53 takes the constraint seriously: no heap at all. Pool allocators, ring buffers, fixed-point arithmetic instead of floating point, and optimizing for code size — the techniques that let a program fit in the flash and RAM this week's script has been measuring.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_51_Interrupts_and_Real_Time_Behavior.html">← Week 51</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_53_Constrained_Resource_Programming.html">Week 53 →</a>
+</div>
+
+</div>

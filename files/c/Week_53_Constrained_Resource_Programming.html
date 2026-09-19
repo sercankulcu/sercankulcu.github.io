@@ -1,0 +1,577 @@
+---
+layout: without-sidebar
+title: "Week 53 — Constrained-Resource Programming"
+permalink: /files/c/Week_53_Constrained_Resource_Programming.html
+excerpt: "Static allocation, memory pools and ring buffers; fixed-point arithmetic; lookup tables and optimizing for size; low-power modes; watchdogs and fault handlers."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Professional · Week 53</div>
+  <h1>Constrained-Resource Programming</h1>
+  <p class="c-wk-lead">Eight kilobytes of RAM, sixty-four of flash, and a device that must run for a year on a battery without being reset. Every technique this week trades flexibility for predictability — which is the correct trade when failure is not recoverable.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Say why <code>malloc</code> is banned in most embedded standards, and what replaces it.</li>
+      <li>Implement a fixed-block pool allocator with deterministic timing.</li>
+      <li>Do arithmetic in fixed point and know when it is preferable to floating point.</li>
+      <li>Reduce code size deliberately and measure the result.</li>
+      <li>Use a watchdog and write a fault handler that survives a crash usefully.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Why <code>malloc</code> is banned</h2>
+
+  <p>MISRA C, JPL's flight rules, and most automotive and medical standards forbid dynamic allocation after initialization. Four reasons, all of which week 19's desktop allocator gets away with and an embedded one does not.</p>
+
+  <table>
+    <thead><tr><th>Problem</th><th>On a desktop</th><th>On a microcontroller</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Fragmentation</strong></td><td>Gigabytes absorb it</td><td>8 KB does not; a 100-byte request fails with 3 KB free</td></tr>
+      <tr><td><strong>Non-determinism</strong></td><td>Occasional slow <code>malloc</code> is fine</td><td>A 50-microsecond outlier misses a deadline</td></tr>
+      <tr><td><strong>Failure handling</strong></td><td>Report and exit</td><td>There is nowhere to exit to</td></tr>
+      <tr><td><strong>Proof</strong></td><td>Test and ship</td><td>Must show it cannot run out — impossible with a general heap</td></tr>
+    </tbody>
+  </table>
+
+  <p>Fragmentation is the decisive one. A long-running device allocating and freeing different sizes eventually has plenty of free memory in pieces too small to use. On a desktop the process restarts; a device in the field does not.</p>
+
+  <p>The replacement is to <strong>allocate everything at startup and never release it</strong> — or to use fixed-size pools, where fragmentation is impossible by construction.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Static allocation and pools</h2>
+
+  <h3>Static</h3>
+<pre><code>#define MAX_SENSORS 8
+static Sensor sensors[MAX_SENSORS];     /* .bss: exists from power-on */
+static size_t sensor_count = 0;</code></pre>
+
+  <p>Simple, provably bounded, and visible in the <code>size</code> output of week 52. The limit becomes a compile-time constant you can reason about, which is exactly the property the standards require.</p>
+
+  <h3>A fixed-block pool</h3>
+
+  <p>When objects come and go, a pool gives you allocation without fragmentation: every block is the same size, so any free block satisfies any request.</p>
+
+<pre><code>typedef struct Block { struct Block *next; } Block;
+
+static uint8_t  pool_storage[POOL_BLOCKS * POOL_BLOCK_SIZE];
+static Block   *free_list = NULL;
+
+void pool_init(void)
+{
+    free_list = NULL;
+    for (size_t i = 0; i &lt; POOL_BLOCKS; i++) {
+        Block *b = (Block *)&amp;pool_storage[i * POOL_BLOCK_SIZE];
+        b-&gt;next = free_list;                 /* push onto the free list */
+        free_list = b;
+    }
+}
+
+void *pool_alloc(void)                       /* O(1), always */
+{
+    if (free_list == NULL) return NULL;
+    Block *b = free_list;
+    free_list = b-&gt;next;
+    return b;
+}
+
+void pool_free(void *p)                      /* O(1), always */
+{
+    Block *b = p;
+    b-&gt;next = free_list;
+    free_list = b;
+}</code></pre>
+
+  <p>The free list lives <em>inside</em> the free blocks — a block is either in use or holding a <code>next</code> pointer, never both. That costs no extra memory and is the standard trick.</p>
+
+  <p>Both operations are a handful of instructions with no loop, so the timing is identical every call. That determinism is worth as much as the absence of fragmentation.</p>
+
+  <p>If an interrupt can allocate, the list manipulation needs week 51's critical section — it is a read-modify-write on a shared pointer.</p>
+
+  <h3>The ring buffer</h3>
+
+  <p>For streams rather than objects, a ring buffer allocates nothing at all. Week 51 used one between an ISR and the main loop; it is the general answer for bounded queues on a device.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Fixed-point arithmetic</h2>
+
+  <p>Many microcontrollers have no floating-point unit, so a single <code>float</code> multiplication becomes a library call of hundreds of cycles and several kilobytes of linked code.</p>
+
+  <p>Fixed point represents a fraction as an integer with an implied binary point. <em>Q16.16</em> uses 32 bits: 16 for the integer part, 16 for the fraction.</p>
+
+<pre><code>typedef int32_t q16_t;
+
+#define Q16_SHIFT 16
+#define Q16_ONE   (1 &lt;&lt; Q16_SHIFT)
+
+#define INT_TO_Q16(n)   ((q16_t)((n) * Q16_ONE))
+#define Q16_TO_INT(q)   ((int32_t)((q) &gt;&gt; Q16_SHIFT))
+#define FLOAT_TO_Q16(f) ((q16_t)((f) * Q16_ONE))     /* compile time only */
+
+static inline q16_t q16_add(q16_t a, q16_t b) { return a + b; }
+
+static inline q16_t q16_mul(q16_t a, q16_t b)
+{
+    return (q16_t)(((int64_t)a * b) &gt;&gt; Q16_SHIFT);   /* 64-bit intermediate */
+}
+
+static inline q16_t q16_div(q16_t a, q16_t b)
+{
+    return (q16_t)((((int64_t)a) &lt;&lt; Q16_SHIFT) / b);
+}</code></pre>
+
+  <p>Addition and subtraction are plain integer operations. Multiplication needs the 64-bit intermediate: two Q16.16 values multiply to Q32.32, and the shift brings it back. Omit the cast and the product overflows 32 bits for any operands above about 128.</p>
+
+  <table>
+    <thead><tr><th></th><th>Fixed point</th><th><code>float</code> without an FPU</th></tr></thead>
+    <tbody>
+      <tr><td>Multiply</td><td>~3 cycles</td><td>~100 cycles</td></tr>
+      <tr><td>Code size</td><td>Nothing extra</td><td>2–6 KB of library</td></tr>
+      <tr><td>Timing</td><td>Constant</td><td>Varies with the operands</td></tr>
+      <tr><td>Range</td><td>Fixed; overflows silently</td><td>Enormous</td></tr>
+      <tr><td>Precision</td><td>Uniform: 1/65536 everywhere</td><td>Relative: better near zero</td></tr>
+    </tbody>
+  </table>
+
+  <p>Use fixed point when the range of your values is known — sensor readings, percentages, PID coefficients — and floating point when it is not. The uniform precision is often an advantage: a Q16.16 value has the same absolute resolution at 1000 as at 0.001, which a <code>float</code> does not.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Code size</h2>
+
+<pre><code>-Os                      # optimize for size instead of speed
+-ffunction-sections -fdata-sections
+-Wl,--gc-sections        # discard anything unreferenced
+-flto                    # link-time optimization, across files</code></pre>
+
+  <p>The section flags matter more than they look: without them the linker's unit of granularity is the whole object file, so one used function drags in every other function in that file.</p>
+
+  <table>
+    <thead><tr><th>Costs a lot</th><th>Cheaper alternative</th></tr></thead>
+    <tbody>
+      <tr><td><code>printf</code> with floating point</td><td>An integer-only formatter, or your own</td></tr>
+      <tr><td><code>malloc</code> and the heap</td><td>Static allocation</td></tr>
+      <tr><td><code>double</code> arithmetic</td><td><code>float</code>, or fixed point</td></tr>
+      <tr><td>Computing <code>sin</code> at run time</td><td>A <code>const</code> lookup table in flash</td></tr>
+      <tr><td>Non-<code>const</code> tables</td><td><code>const</code> — keeps them out of RAM</td></tr>
+    </tbody>
+  </table>
+
+  <p>Trading flash for RAM and cycles is the characteristic embedded move: a 256-entry sine table costs 512 bytes of flash and turns a library call into an array index.</p>
+
+  <p>Measure rather than guess — week 52's map file and <code>nm --size-sort</code> will usually show one or two symbols dominating.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Surviving failure</h2>
+
+  <h3>Low power</h3>
+
+<pre><code>for (;;) {
+    if (work_pending) { do_work(); }
+    else              { __asm__ volatile ("wfi"); }   /* wait for interrupt */
+}</code></pre>
+
+  <p><code>wfi</code> halts the core until an interrupt arrives. On a battery device this is the difference between weeks and years — a busy-wait loop draws full current doing nothing. Week 51's interrupt-driven design is what makes it possible.</p>
+
+  <h3>The watchdog</h3>
+
+  <p>A hardware timer that resets the device unless the software periodically tells it not to. If the program hangs, the watchdog restarts it.</p>
+
+<pre><code>watchdog_enable(2000);              /* reset if not fed within 2 s */
+
+for (;;) {
+    do_work();
+    watchdog_feed();                /* only on the healthy path */
+}</code></pre>
+
+  <div class="c-wk-trap">
+    <p><strong>Never feed the watchdog from a timer interrupt.</strong> It then keeps being fed while the main loop is deadlocked, which defeats the entire mechanism — the device appears alive and does nothing. Feed it from the main loop, only after confirming the real work happened.</p>
+  </div>
+
+  <h3>Fault handlers</h3>
+
+  <p>Week 49's default handler was an infinite loop. On a real product it should record what happened, because a device in the field cannot be attached to a debugger.</p>
+
+<pre><code>void hard_fault_handler(void)
+{
+    /* The processor stacked eight registers; recover the PC. */
+    uint32_t *frame;
+    __asm__ volatile ("mrs %0, msp" : "=r"(frame));
+
+    crash_log.magic    = CRASH_MAGIC;
+    crash_log.pc       = frame[6];      /* where it faulted */
+    crash_log.lr       = frame[5];      /* who called it */
+    crash_log.psr      = frame[7];
+    crash_log.count++;
+
+    system_reset();
+}</code></pre>
+
+  <p>Place <code>crash_log</code> in a region the linker script marks <code>NOLOAD</code> and the startup code does <em>not</em> clear, and it survives the reset. On the next boot the program can report the faulting address — often enough to identify the bug from the map file alone.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: pool, fixed point, and measurement</h2>
+
+<pre><code>/* constrained.c */
+#include &lt;stdint.h&gt;
+#include &lt;stdbool.h&gt;
+#include &lt;stddef.h&gt;
+
+/* ---------- UART (weeks 50, 52) ---------- */
+#define UART0_DR (*(volatile uint32_t *)0x4000C000u)
+#define UART0_FR (*(volatile uint32_t *)0x4000C018u)
+
+static void putc_raw(char c)
+{
+    while (UART0_FR &amp; (1u &lt;&lt; 5)) { }
+    UART0_DR = (uint32_t)(unsigned char)c;
+}
+static void puts_raw(const char *s)
+{
+    for (; *s; s++) { if (*s == '\n') putc_raw('\r'); putc_raw(*s); }
+}
+static void put_int(int32_t v)
+{
+    char t[12]; int i = 0;
+    if (v &lt; 0) { putc_raw('-'); v = -v; }
+    if (!v) { putc_raw('0'); return; }
+    while (v) { t[i++] = (char)('0' + v % 10); v /= 10; }
+    while (i) putc_raw(t[--i]);
+}
+
+/* ---------- fixed point, Q16.16 ---------- */
+
+typedef int32_t q16_t;
+#define Q16_SHIFT 16
+#define Q16_ONE   (1 &lt;&lt; Q16_SHIFT)
+#define INT_TO_Q16(n) ((q16_t)((n) * Q16_ONE))
+
+static inline q16_t q16_mul(q16_t a, q16_t b)
+{
+    return (q16_t)(((int64_t)a * b) &gt;&gt; Q16_SHIFT);
+}
+static inline q16_t q16_div(q16_t a, q16_t b)
+{
+    return (q16_t)((((int64_t)a) &lt;&lt; Q16_SHIFT) / b);
+}
+
+/* Print a Q16.16 with three decimal places, no floating point. */
+static void put_q16(q16_t q)
+{
+    if (q &lt; 0) { putc_raw('-'); q = -q; }
+    put_int(q &gt;&gt; Q16_SHIFT);
+    putc_raw('.');
+    uint32_t frac = (uint32_t)(q &amp; 0xFFFFu);
+    frac = (frac * 1000u) &gt;&gt; Q16_SHIFT;          /* to thousandths */
+    if (frac &lt; 100) putc_raw('0');
+    if (frac &lt; 10)  putc_raw('0');
+    put_int((int32_t)frac);
+}
+
+/* ---------- a fixed-block pool ---------- */
+
+#define POOL_BLOCKS     8
+#define POOL_BLOCK_SIZE 32
+
+typedef struct Block { struct Block *next; } Block;
+
+static uint8_t pool_storage[POOL_BLOCKS * POOL_BLOCK_SIZE];
+static Block  *free_list;
+static uint32_t pool_in_use;
+static uint32_t pool_peak;
+
+static void pool_init(void)
+{
+    free_list = NULL;
+    for (size_t i = 0; i &lt; POOL_BLOCKS; i++) {
+        Block *b = (Block *)(void *)&amp;pool_storage[i * POOL_BLOCK_SIZE];
+        b-&gt;next = free_list;
+        free_list = b;
+    }
+    pool_in_use = pool_peak = 0;
+}
+
+static void *pool_alloc(void)
+{
+    if (free_list == NULL) return NULL;        /* exhausted, not undefined */
+    Block *b = free_list;
+    free_list = b-&gt;next;
+    pool_in_use++;
+    if (pool_in_use &gt; pool_peak) pool_peak = pool_in_use;
+    return b;
+}
+
+static void pool_free(void *p)
+{
+    if (p == NULL) return;
+    Block *b = p;
+    b-&gt;next = free_list;
+    free_list = b;
+    pool_in_use--;
+}
+
+/* ---------- a ring buffer: no allocation at all ---------- */
+
+#define RING_SIZE 16
+typedef struct {
+    uint8_t data[RING_SIZE];
+    uint8_t head, tail;
+} Ring;
+
+static bool ring_push(Ring *r, uint8_t v)
+{
+    uint8_t next = (uint8_t)((r-&gt;head + 1u) % RING_SIZE);
+    if (next == r-&gt;tail) return false;          /* full: refuse, not grow */
+    r-&gt;data[r-&gt;head] = v;
+    r-&gt;head = next;
+    return true;
+}
+
+static bool ring_pop(Ring *r, uint8_t *out)
+{
+    if (r-&gt;tail == r-&gt;head) return false;
+    *out = r-&gt;data[r-&gt;tail];
+    r-&gt;tail = (uint8_t)((r-&gt;tail + 1u) % RING_SIZE);
+    return true;
+}
+
+/* ---------- a lookup table, in flash ---------- */
+
+/* sin(x) scaled to Q16.16, 16 entries over a quarter turn.
+   const keeps it in .rodata — week 52. */
+static const q16_t sine_table[17] = {
+        0,  6423, 12785, 19024, 25079, 30893, 36409, 41575,
+    46340, 50660, 54491, 57797, 60547, 62714, 64276, 65220, 65536
+};
+
+static q16_t q16_sin_quarter(uint8_t index)     /* 0..16 */
+{
+    return sine_table[index &gt; 16 ? 16 : index];
+}
+
+/* ---------- a PID step, entirely in fixed point ---------- */
+
+typedef struct {
+    q16_t kp, ki, kd;
+    q16_t integral, previous;
+} Pid;
+
+static q16_t pid_step(Pid *p, q16_t setpoint, q16_t measured)
+{
+    q16_t error = setpoint - measured;
+    p-&gt;integral += error;
+
+    q16_t derivative = error - p-&gt;previous;
+    p-&gt;previous = error;
+
+    return q16_mul(p-&gt;kp, error)
+         + q16_mul(p-&gt;ki, p-&gt;integral)
+         + q16_mul(p-&gt;kd, derivative);
+}
+
+int main(void)
+{
+    puts_raw("\n=== constrained resources ===\n");
+
+    /* --- pool --- */
+    puts_raw("\nfixed-block pool: ");
+    put_int(POOL_BLOCKS); puts_raw(" blocks of ");
+    put_int(POOL_BLOCK_SIZE); puts_raw(" bytes\n");
+
+    pool_init();
+    void *held[POOL_BLOCKS + 2];
+    size_t got = 0;
+
+    for (size_t i = 0; i &lt; POOL_BLOCKS + 2; i++) {
+        held[i] = pool_alloc();
+        puts_raw("  alloc "); put_int((int32_t)i);
+        puts_raw(held[i] ? " -&gt; ok\n" : " -&gt; refused (pool exhausted)\n");
+        if (held[i]) got++;
+    }
+
+    puts_raw("  succeeded: "); put_int((int32_t)got);
+    puts_raw(", peak in use: "); put_int((int32_t)pool_peak); puts_raw("\n");
+
+    for (size_t i = 0; i &lt; POOL_BLOCKS + 2; i++) pool_free(held[i]);
+    puts_raw("  after freeing all, in use: ");
+    put_int((int32_t)pool_in_use); puts_raw("\n");
+
+    puts_raw("  allocation is O(1) every time — no search, no coalescing,\n");
+    puts_raw("  and fragmentation is impossible: every block is the same size\n");
+
+    /* --- ring buffer --- */
+    puts_raw("\nring buffer of ");
+    put_int(RING_SIZE); puts_raw(" bytes, allocating nothing\n");
+
+    Ring r = { .head = 0, .tail = 0 };
+    int pushed = 0;
+    for (uint8_t v = 1; v &lt;= 20; v++) {
+        if (ring_push(&amp;r, v)) pushed++;
+    }
+    puts_raw("  pushed "); put_int(pushed);
+    puts_raw(" of 20; the rest were refused\n  drained: ");
+    uint8_t v;
+    while (ring_pop(&amp;r, &amp;v)) { put_int(v); putc_raw(' '); }
+    puts_raw("\n");
+
+    /* --- fixed point --- */
+    puts_raw("\nfixed point, Q16.16\n");
+
+    q16_t a = INT_TO_Q16(3);
+    q16_t b = q16_div(INT_TO_Q16(1), INT_TO_Q16(4));    /* 0.25 */
+
+    puts_raw("  a        = "); put_q16(a); puts_raw("\n");
+    puts_raw("  b        = "); put_q16(b); puts_raw("\n");
+    puts_raw("  a * b    = "); put_q16(q16_mul(a, b)); puts_raw("\n");
+    puts_raw("  a / b    = "); put_q16(q16_div(a, b)); puts_raw("\n");
+    puts_raw("  a + b    = "); put_q16(a + b); puts_raw("\n");
+    puts_raw("  resolution is 1/65536 everywhere, unlike a float\n");
+
+    /* --- lookup table --- */
+    puts_raw("\nsine from a flash table (no library call)\n");
+    for (uint8_t i = 0; i &lt;= 16; i += 4) {
+        puts_raw("  sin("); put_int(i * 90 / 16); puts_raw(" deg) = ");
+        put_q16(q16_sin_quarter(i));
+        puts_raw("\n");
+    }
+    puts_raw("  17 entries = 68 bytes of flash, zero RAM\n");
+
+    /* --- PID --- */
+    puts_raw("\na PID controller in fixed point\n");
+    Pid pid = {
+        .kp = INT_TO_Q16(1),
+        .ki = q16_div(INT_TO_Q16(1), INT_TO_Q16(10)),
+        .kd = q16_div(INT_TO_Q16(1), INT_TO_Q16(20)),
+        .integral = 0, .previous = 0
+    };
+    q16_t setpoint = INT_TO_Q16(100);
+    q16_t measured = 0;
+
+    for (int step = 0; step &lt; 6; step++) {
+        q16_t out = pid_step(&amp;pid, setpoint, measured);
+        measured += q16_div(out, INT_TO_Q16(10));      /* crude plant model */
+        puts_raw("  step "); put_int(step);
+        puts_raw(": output "); put_q16(out);
+        puts_raw(", measured "); put_q16(measured);
+        puts_raw("\n");
+    }
+    puts_raw("  no FPU, no soft-float library, constant timing\n");
+
+    for (;;) {
+        __asm__ volatile ("wfi");        /* sleep until an interrupt */
+    }
+}</code></pre>
+
+<pre><code>arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb \
+    -ffreestanding -nostdlib -Os -Wall -Wextra -g \
+    -ffunction-sections -fdata-sections -Wl,--gc-sections \
+    -T firmware.ld -Wl,-Map=firmware.map \
+    -o firmware.elf startup.c constrained.c
+
+arm-none-eabi-size firmware.elf
+qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf</code></pre>
+
+  <h3>Measure what each choice costs</h3>
+
+  <p><strong>Fixed point against <code>float</code>.</strong> Replace the Q16.16 arithmetic with <code>float</code> and rebuild:</p>
+
+<pre><code>arm-none-eabi-size firmware.elf
+arm-none-eabi-nm --size-sort -S firmware.elf | tail -15</code></pre>
+
+  <p>The image typically grows by two to six kilobytes, and the largest new symbols are <code>__aeabi_fmul</code>, <code>__aeabi_fdiv</code>, and friends — the soft-float library, linked in because the Cortex-M3 has no FPU. On a part with 32 KB of flash that is a fifth of the budget for arithmetic you did not need.</p>
+
+  <p><strong>Optimization level.</strong></p>
+<pre><code>for opt in -O0 -O1 -O2 -O3 -Os; do
+    arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -ffreestanding -nostdlib \
+        $opt -ffunction-sections -fdata-sections -Wl,--gc-sections \
+        -T firmware.ld -o /tmp/f.elf startup.c constrained.c
+    printf "%-4s " $opt; arm-none-eabi-size /tmp/f.elf | tail -1
+done</code></pre>
+
+  <p><code>-Os</code> is usually smallest and <code>-O3</code> largest, sometimes by a factor of two. On a desktop the difference is irrelevant; here it decides whether the firmware fits.</p>
+
+  <p><strong>Section garbage collection.</strong> Drop <code>-ffunction-sections -fdata-sections -Wl,--gc-sections</code> and compare. Unused functions that were previously discarded now remain, because the linker's granularity fell back to whole object files.</p>
+
+  <h3>Exhaust the pool deliberately</h3>
+
+  <p>The program requests ten blocks from a pool of eight. The ninth and tenth are refused — a <code>NULL</code> return the caller must handle, exactly as <code>malloc</code> would, but with a bound you can state at compile time. Raising <code>POOL_BLOCKS</code> changes a number in <code>.bss</code> that <code>size</code> will report; there is no scenario in which the device runs out unexpectedly.</p>
+
+  <h3>Check the fixed-point overflow</h3>
+
+<pre><code>q16_t big = INT_TO_Q16(200);
+puts_raw("200 * 200 = "); put_q16(q16_mul(big, big));</code></pre>
+
+  <p>40 000 does not fit in the 16-bit integer part, so the result is wrong. Fixed point has a fixed range and overflows silently — the price of its speed. Know your value range before choosing the format, and consider Q8.24 or Q24.8 when the balance differs.</p>
+
+  <p>Then remove the <code>(int64_t)</code> cast from <code>q16_mul</code> and try <code>3 * 0.25</code> again: the 32-bit product overflows before the shift, and the answer is nonsense for operands far smaller than the format's stated range.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>malloc</code> in a long-running device</td><td>Fragmentation; allocation fails eventually</td><td>Static allocation or fixed-size pools.</td></tr>
+      <tr><td>Pool operations without a critical section</td><td>Free-list corruption if an ISR allocates</td><td>Guard the list — week 51.</td></tr>
+      <tr><td>No 64-bit intermediate in fixed-point multiply</td><td>Silent overflow at small values</td><td>Cast to <code>int64_t</code> before shifting.</td></tr>
+      <tr><td>Ignoring fixed-point range</td><td>Wraps with no indication</td><td>Choose the Q format from the known range.</td></tr>
+      <tr><td>Non-<code>const</code> lookup tables</td><td>Copied into RAM at startup</td><td><code>const</code> keeps them in flash.</td></tr>
+      <tr><td>Feeding the watchdog from a timer ISR</td><td>Defeats it entirely</td><td>Feed from the main loop, after real work.</td></tr>
+      <tr><td>Busy-waiting instead of <code>wfi</code></td><td>Full current draw doing nothing</td><td>Sleep between interrupts.</td></tr>
+      <tr><td>A fault handler that only spins</td><td>No diagnosis possible from the field</td><td>Record the fault address in retained RAM.</td></tr>
+      <tr><td>Optimizing for size without measuring</td><td>Effort on the wrong symbol</td><td><code>nm --size-sort</code> and the map file.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>Why do embedded coding standards forbid <code>malloc</code> after initialization?</summary>
+    <p>Chiefly fragmentation: a long-running device that allocates and frees varying sizes ends up with free memory in pieces too small to satisfy a request, and there is no process restart to clear it. Allocation time is also unbounded, which breaks real-time deadlines, and failure has nowhere to be reported. Static allocation and fixed-size pools make the worst case provable.</p>
+  </details>
+
+  <details>
+    <summary>Why can a fixed-block pool not fragment?</summary>
+    <p>Because every block is the same size, so any free block satisfies any request. There is no notion of a gap too small to use, no coalescing, and no search — allocation and release are a couple of pointer assignments with identical timing on every call. The trade is that variable-sized objects need a separate pool per size class.</p>
+  </details>
+
+  <details>
+    <summary>Why does <code>q16_mul</code> need a 64-bit intermediate?</summary>
+    <p>Because multiplying two Q16.16 values produces a Q32.32 result, which needs 64 bits before the shift brings it back to Q16.16. Doing the multiplication in 32 bits overflows for operands above roughly 128, long before the format's nominal range is reached — and it overflows silently.</p>
+  </details>
+
+  <details>
+    <summary>When is fixed point preferable to floating point?</summary>
+    <p>When the processor has no FPU and the range of values is known in advance. It avoids a soft-float library of several kilobytes, runs in a few cycles instead of a hundred, and has constant timing. Its uniform absolute precision is also an advantage for sensor and control values, where a float's relative precision is wasted at large magnitudes.</p>
+  </details>
+
+  <details>
+    <summary>Why must a watchdog not be fed from a timer interrupt?</summary>
+    <p>Because the interrupt keeps firing even when the main loop has deadlocked, so the watchdog is satisfied by a device that is doing nothing. The point of the mechanism is to detect that useful work has stopped, which requires feeding it from the code path that performs that work, after it has completed.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 54 introduces an RTOS, which offers tasks, queues, and semaphores — the general versions of this week's pool and ring buffer — and asks when the superloop you have been writing should be replaced by a scheduler.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_52_Linker_Scripts_and_Firmware_Layout.html">← Week 52</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_54_Real_Time_Operating_Systems.html">Week 54 →</a>
+</div>
+
+</div>

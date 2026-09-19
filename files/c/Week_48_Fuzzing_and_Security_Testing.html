@@ -1,0 +1,407 @@
+---
+layout: without-sidebar
+title: "Week 48 — Fuzzing and Security Testing"
+permalink: /files/c/Week_48_Fuzzing_and_Security_Testing.html
+excerpt: "Coverage-guided fuzzing with libFuzzer and AFL++, writing a fuzz target and a seed corpus, combining fuzzing with sanitizers, triaging and minimizing crashes, threat modeling."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Professional · Week 48</div>
+  <h1>Fuzzing and Security Testing</h1>
+  <p class="c-wk-lead">Your tests check the inputs you thought of. A fuzzer generates millions you did not, guided by which ones reach new code — and in C, where a malformed input can be a remote code execution, it is the single most effective testing technique available.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Write a libFuzzer target and run it against your own parser.</li>
+      <li>Explain why coverage guidance makes fuzzing effective rather than random.</li>
+      <li>Combine a fuzzer with sanitizers so failures are detected, not merely survived.</li>
+      <li>Triage a crash and minimize the input that causes it.</li>
+      <li>Threat-model a C program and review it against the resulting list.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Why fuzzing works</h2>
+
+  <p>Random input alone is nearly useless: the chance of generating a valid file header by accident is negligible, so a naive fuzzer spends its life being rejected at the first check.</p>
+
+  <p><strong>Coverage-guided</strong> fuzzing changes the game. The program is instrumented so the fuzzer can see which branches an input reached. An input that reaches new code is kept and mutated further; one that does not is discarded. The result is a search that learns the input format without being told it.</p>
+
+<pre><code>input "AAAA"      → rejected at the magic check          → discard
+input "CREC"      → reached the version check (new!)     → KEEP, mutate
+input "CREC\x01"  → reached the length field (new!)      → KEEP, mutate
+input "CREC\x01\xff\xff\xff\xff" → allocation overflow   → CRASH</code></pre>
+
+  <p>Each step is a small mutation of something that worked. Within minutes a fuzzer can discover a file format that took a person an afternoon to specify — and then explore its edges far more patiently than any person would.</p>
+
+  <p>This is why fuzzing found thousands of bugs in OpenSSL, SQLite, and the Linux kernel, all of which had extensive test suites. Tests encode what the author expected; a fuzzer explores what the author did not.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>Writing a target</h2>
+
+  <p>libFuzzer ships with Clang and needs one function:</p>
+
+<pre><code>#include &lt;stdint.h&gt;
+#include &lt;stddef.h&gt;
+
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
+    parse_thing(data, size);      /* the code under test */
+    return 0;                     /* non-zero is reserved */
+}</code></pre>
+
+<pre><code>clang -g -O1 -fsanitize=fuzzer,address,undefined \
+      -o fuzz_parser fuzz_parser.c parser.c
+./fuzz_parser corpus/ -max_len=4096</code></pre>
+
+  <p>That single command compiles with instrumentation, links the fuzzing engine, and runs. There is no main.</p>
+
+  <table>
+    <thead><tr><th>A good target</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Is deterministic</td><td>The same input must produce the same result, or crashes cannot be reproduced</td></tr>
+      <tr><td>Is fast</td><td>Throughput is everything; aim for thousands of executions per second</td></tr>
+      <tr><td>Touches no global state</td><td>One iteration must not affect the next</td></tr>
+      <tr><td>Frees what it allocates</td><td>Otherwise the leak detector fires on every input</td></tr>
+      <tr><td>Exercises one entry point</td><td>Several targets beat one that branches</td></tr>
+    </tbody>
+  </table>
+
+  <p>Avoid anything involving time, randomness, the network, or the filesystem inside the target. If the code under test needs them, stub them out for the fuzz build.</p>
+
+  <h3>The seed corpus</h3>
+
+  <p>Start the fuzzer with valid examples rather than nothing:</p>
+
+<pre><code>mkdir corpus
+printf 'timeout = 30\nname = server\n' &gt; corpus/valid.conf
+printf '# comment only\n'              &gt; corpus/comment.conf
+printf ''                              &gt; corpus/empty.conf</code></pre>
+
+  <p>Seeds save the fuzzer from rediscovering the format. Include the edge cases you already know — empty, maximum size, each optional field present and absent. A dictionary helps too, giving the mutator the keywords to try:</p>
+
+<pre><code># parser.dict
+kw1="timeout"
+kw2="name"
+kw3="="
+./fuzz_parser corpus/ -dict=parser.dict</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Fuzzing finds nothing without sanitizers</h2>
+
+  <p>This is the point people miss. A fuzzer detects crashes, hangs, and assertion failures. Most C memory bugs produce none of those — week 20's silent corruption runs to completion with a wrong answer.</p>
+
+  <p>Sanitizers convert those silent defects into immediate, loud failures:</p>
+
+  <table>
+    <thead><tr><th>Flag</th><th>Turns into a crash</th></tr></thead>
+    <tbody>
+      <tr><td><code>-fsanitize=address</code></td><td>Overruns, use-after-free, double free, leaks</td></tr>
+      <tr><td><code>-fsanitize=undefined</code></td><td>Signed overflow, bad shifts, misaligned access</td></tr>
+      <tr><td><code>-fsanitize=memory</code></td><td>Uninitialized reads (separate build)</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>Fuzzing without sanitizers finds a fraction of what is there.</strong> The fuzzer supplies the inputs; the sanitizers supply the detection. Neither is useful alone.</p>
+
+  <p>Assertions help too, because a fuzzer treats an abort as a finding. An <code>assert</code> stating an invariant turns a logic error into something the fuzzer can discover — which is an argument for building the fuzz target <em>without</em> <code>NDEBUG</code>.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Triage and minimization</h2>
+
+  <p>When a crash is found, libFuzzer writes the input to <code>crash-&lt;hash&gt;</code>. Reproduce it directly:</p>
+
+<pre><code>./fuzz_parser crash-a1b2c3d4              # replays that one input
+xxd crash-a1b2c3d4 | head</code></pre>
+
+  <p>Then shrink it, because a 4000-byte input tells you nothing:</p>
+
+<pre><code>./fuzz_parser -minimize_crash=1 -runs=100000 crash-a1b2c3d4</code></pre>
+
+  <p>The minimizer repeatedly removes bytes while checking the crash still occurs — week 43's bisection applied to data rather than history. Four thousand bytes typically reduce to fewer than twenty, and the defect is usually obvious once they do.</p>
+
+  <p>Then make it a permanent test:</p>
+
+<pre><code>cp crash-a1b2c3d4 tests/regressions/overflow-in-length-field
+# the test suite replays every file in that directory</code></pre>
+
+  <p>A fuzzer finding the same bug twice is wasted machine time. The corpus of past crashes is as valuable as the code that fixed them.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Threat modeling</h2>
+
+  <p>Fuzzing finds memory-safety bugs. It does not tell you what an attacker wants. Four questions, answered before writing the code:</p>
+
+  <ol>
+    <li><strong>What is worth protecting?</strong> Credentials, user data, the ability to execute code, availability.</li>
+    <li><strong>Where does untrusted input enter?</strong> Command-line arguments, environment, files, the network, and — as week 31 noted — the environment counts.</li>
+    <li><strong>What can go wrong?</strong> For C specifically: memory corruption, integer overflow, injection, resource exhaustion.</li>
+    <li><strong>What stops it?</strong> Validation at the boundary, bounded copies, checked arithmetic, limits on allocation.</li>
+  </ol>
+
+  <p>The <em>trust boundary</em> is the central idea. Data crossing it must be validated exactly once, at the crossing, and everything inside may then assume it is well-formed. Validating repeatedly everywhere produces code where nobody is sure whether the check already happened.</p>
+
+  <table>
+    <thead><tr><th>C-specific threat</th><th>Defence</th><th>Week</th></tr></thead>
+    <tbody>
+      <tr><td>Buffer overflow</td><td>Bounded copies, <code>snprintf</code>, ASan</td><td>14, 20</td></tr>
+      <tr><td>Integer overflow in a size</td><td><code>calloc</code>, explicit range check</td><td>36</td></tr>
+      <tr><td>Format string</td><td><code>printf("%s", user)</code>, <code>-Wformat-security</code></td><td>36</td></tr>
+      <tr><td>Use after free</td><td><code>NULL</code> after <code>free</code>, clear ownership</td><td>19, 20</td></tr>
+      <tr><td>Unbounded allocation</td><td>Cap sizes from untrusted sources</td><td>40</td></tr>
+      <tr><td>Path traversal</td><td>Canonicalize, then verify the prefix</td><td>this week</td></tr>
+      <tr><td>Hash collision denial of service</td><td>Randomized hash seed</td><td>33</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Worked example: fuzzing the week 23 parser</h2>
+
+  <p>Take the configuration parser and attack it. The version below contains three defects deliberately — each one plausible, each one a real pattern.</p>
+
+<pre><code>/* parser.c — with three planted defects */
+#include "parser.h"
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;ctype.h&gt;
+
+#define MAX_NAME 32
+
+struct Config {
+    int    timeout;
+    int    retries;
+    char   name[MAX_NAME];
+    int   *values;
+    size_t value_count;
+};
+
+Config *config_parse(const uint8_t *data, size_t size)
+{
+    Config *c = calloc(1, sizeof *c);
+    if (c == NULL) return NULL;
+
+    char *text = malloc(size + 1);
+    if (text == NULL) { free(c); return NULL; }
+    memcpy(text, data, size);
+    text[size] = '\0';
+
+    char *save = NULL;
+    for (char *line = strtok_r(text, "\n", &amp;save);
+         line != NULL;
+         line = strtok_r(NULL, "\n", &amp;save)) {
+
+        if (line[0] == '#' || line[0] == '\0') continue;
+
+        char *eq = strchr(line, '=');
+        if (eq == NULL) continue;
+        *eq = '\0';
+        char *key   = line;
+        char *value = eq + 1;
+
+        while (*key == ' ')   key++;
+        while (*value == ' ') value++;
+
+        if (strcmp(key, "timeout") == 0) {
+            c-&gt;timeout = atoi(value);                 /* DEFECT 1 */
+        } else if (strcmp(key, "name") == 0) {
+            strcpy(c-&gt;name, value);                   /* DEFECT 2 */
+        } else if (strcmp(key, "values") == 0) {
+            size_t n = (size_t)atoi(value);
+            c-&gt;values = malloc(n * sizeof *c-&gt;values); /* DEFECT 3 */
+            c-&gt;value_count = n;
+            for (size_t i = 0; i &lt; n; i++) c-&gt;values[i] = 0;
+        }
+    }
+
+    free(text);
+    return c;
+}
+
+void config_free(Config *c)
+{
+    if (c == NULL) return;
+    free(c-&gt;values);
+    free(c);
+}</code></pre>
+
+  <h3>The fuzz target</h3>
+
+<pre><code>/* fuzz_parser.c */
+#include "parser.h"
+#include &lt;stdint.h&gt;
+#include &lt;stddef.h&gt;
+
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
+    if (size &gt; 4096) return 0;              /* keep iterations fast */
+
+    Config *c = config_parse(data, size);
+    config_free(c);                          /* free, or the leak checker fires */
+    return 0;
+}</code></pre>
+
+<pre><code>clang -g -O1 -fsanitize=fuzzer,address,undefined \
+      -o fuzz_parser fuzz_parser.c parser.c
+
+mkdir -p corpus
+printf 'timeout = 30\nname = server\n' &gt; corpus/valid
+printf '# comment\n'                   &gt; corpus/comment
+printf 'values = 4\n'                  &gt; corpus/values
+
+./fuzz_parser corpus/ -max_len=4096 -print_final_stats=1</code></pre>
+
+  <h3>What it finds, and how quickly</h3>
+
+  <p><strong>Within seconds — the stack overflow.</strong></p>
+
+<pre><code>==12345==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffd…
+WRITE of size 45 at 0x7ffd… thread T0
+    #0 0x… in strcpy
+    #1 0x… in config_parse parser.c:44
+
+Address is located in stack of thread T0 at offset 32 in frame
+  'c' … 'name' (line 12) &lt;== overflows this variable
+artifact_written: crash-3f2a1b…</code></pre>
+
+  <p><code>strcpy</code> into <code>char name[32]</code> with no bound — week 14's defect, found in the time it takes to generate a long line. It is a classic stack smash: on a real target the return address is next.</p>
+
+  <p><strong>Within a minute — the allocation overflow.</strong></p>
+
+<pre><code>==12346==ERROR: AddressSanitizer: requested allocation size 0x…
+exceeds maximum supported size</code></pre>
+
+  <p>Or, worse on some platforms, no error at all: <code>atoi</code> returns a negative number, the conversion to <code>size_t</code> makes it enormous, the multiplication wraps, <code>malloc</code> succeeds with a tiny block, and the loop writes past it. Week 36's integer-overflow-to-heap-overflow chain, discovered automatically.</p>
+
+  <p><strong>The silent one.</strong> <code>atoi</code> cannot report failure, so <code>timeout = abc</code> becomes 0. No crash, so the fuzzer is blind to it — which is the limitation worth naming. Add an assertion and it becomes findable:</p>
+
+<pre><code>assert(c-&gt;timeout &gt;= 0 &amp;&amp; c-&gt;timeout &lt;= 3600);</code></pre>
+
+  <h3>Minimize each crash</h3>
+
+<pre><code>./fuzz_parser -minimize_crash=1 -runs=100000 crash-3f2a1b…
+xxd minimized-from-3f2a1b…</code></pre>
+
+<pre><code>00000000: 6e61 6d65 203d 2041 4141 4141 4141 4141  name = AAAAAAAAA
+00000010: 4141 4141 4141 4141 4141 4141 4141 4141  AAAAAAAAAAAAAAAA
+00000020: 4141 0a                                  AA.</code></pre>
+
+  <p>Thirty-five bytes, and the defect is unmistakable from the input alone.</p>
+
+  <h3>The fixed parser</h3>
+
+<pre><code>if (strcmp(key, "timeout") == 0) {
+    long v;
+    if (!parse_long(value, &amp;v) || v &lt; 0 || v &gt; 3600) {
+        goto invalid;                          /* refuse, do not default */
+    }
+    c-&gt;timeout = (int)v;
+
+} else if (strcmp(key, "name") == 0) {
+    int n = snprintf(c-&gt;name, sizeof c-&gt;name, "%s", value);
+    if (n &lt; 0 || (size_t)n &gt;= sizeof c-&gt;name) {
+        goto invalid;                          /* reject, do not truncate */
+    }
+
+} else if (strcmp(key, "values") == 0) {
+    long n;
+    if (!parse_long(value, &amp;n) || n &lt; 0 || n &gt; MAX_VALUES) {
+        goto invalid;                          /* bound it BEFORE allocating */
+    }
+    c-&gt;values = calloc((size_t)n, sizeof *c-&gt;values);   /* checks overflow */
+    if (c-&gt;values == NULL &amp;&amp; n &gt; 0) goto invalid;
+    c-&gt;value_count = (size_t)n;
+}</code></pre>
+
+  <p>Three changes, each from an earlier week: <code>strtol</code> with a range check (23), <code>snprintf</code> with truncation detected (14), and a bound before <code>calloc</code> (36). Rebuild and run the fuzzer again for ten minutes — it should find nothing.</p>
+
+  <h3>Keep the crashes as tests</h3>
+
+<pre><code>mkdir -p tests/regressions
+cp minimized-* tests/regressions/
+# and in CI:
+for f in tests/regressions/*; do ./fuzz_parser "$f" || exit 1; done</code></pre>
+
+  <p>Every past crash replays on every build, in milliseconds. This is the highest-value output of a fuzzing session — higher than the fix, because the fix can be undone and the test cannot be undone quietly.</p>
+
+  <h3>Run it continuously</h3>
+
+<pre><code># overnight, with a persistent corpus
+./fuzz_parser corpus/ -max_total_time=28800 -jobs=8 -workers=8
+
+# AFL++, a different mutation strategy — worth running both
+afl-clang-fast -fsanitize=address -o parser_afl parser_afl.c parser.c
+afl-fuzz -i corpus -o findings -- ./parser_afl</code></pre>
+
+  <p>Fuzzing is not a one-off. Projects that take it seriously run it continuously — OSS-Fuzz does exactly this for hundreds of open-source C projects — because new code introduces new paths, and a corpus grown over months explores far deeper than one grown over minutes.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">7</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Fuzzing without sanitizers</td><td>Silent corruption goes undetected</td><td>Always <code>-fsanitize=address,undefined</code>.</td></tr>
+      <tr><td>A slow target</td><td>Hundreds of executions per second instead of thousands</td><td>Remove I/O, cap the input size.</td></tr>
+      <tr><td>Non-deterministic target</td><td>Crashes cannot be reproduced</td><td>No time, randomness, or network.</td></tr>
+      <tr><td>Leaking in the target</td><td>Every input reports a leak</td><td>Free everything each iteration.</td></tr>
+      <tr><td>No seed corpus</td><td>Never gets past the first check</td><td>Provide valid examples and a dictionary.</td></tr>
+      <tr><td>Not minimizing a crash</td><td>4000 bytes of noise to read</td><td><code>-minimize_crash=1</code>.</td></tr>
+      <tr><td>Discarding crash inputs after fixing</td><td>The bug returns unnoticed</td><td>Keep them as regression tests.</td></tr>
+      <tr><td>Fuzzing once before release</td><td>New code is never explored</td><td>Run continuously.</td></tr>
+      <tr><td>Expecting logic errors to be found</td><td>A wrong answer is not a crash</td><td>Add assertions on invariants.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">8</span>Check yourself</h2>
+
+  <details>
+    <summary>What makes coverage-guided fuzzing more effective than random input?</summary>
+    <p>Feedback. The program is instrumented so the fuzzer sees which branches each input reached; inputs that reach new code are kept and mutated further, and the rest are discarded. That turns an astronomically unlikely search into an incremental one, and lets the fuzzer discover an input format it was never told about.</p>
+  </details>
+
+  <details>
+    <summary>Why is fuzzing without sanitizers close to useless in C?</summary>
+    <p>Because a fuzzer can only observe crashes, hangs, and aborts, and most C memory bugs produce none of those — an overrun quietly corrupts a neighbour and the program finishes normally. Sanitizers turn those silent defects into immediate failures, so the fuzzer supplies the inputs and the sanitizer supplies the detection.</p>
+  </details>
+
+  <details>
+    <summary>What are the three properties a fuzz target must have?</summary>
+    <p>Deterministic, so a crash can be reproduced; fast, because throughput determines how much of the input space is explored; and free of state carried between iterations, including leaks, so each input is judged on its own. Time, randomness, network, and filesystem access all violate at least one of these.</p>
+  </details>
+
+  <details>
+    <summary>Why minimize a crashing input before debugging it?</summary>
+    <p>Because a four-thousand-byte input contains mostly irrelevant bytes, and reasoning about it is slow. The minimizer removes bytes while checking the crash persists, typically reducing it to a few dozen — at which point the defect is usually visible from the input alone. It is week 43's bisection applied to data.</p>
+  </details>
+
+  <details>
+    <summary>Why keep the crashing inputs after fixing the bug?</summary>
+    <p>Because they are ready-made regression tests that replay in milliseconds and prove the fix stays. Without them a later refactor can silently reintroduce the defect, and the fuzzer will spend hours rediscovering something you already knew. The saved corpus is often more durable value than the fix itself.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">9</span>Where this leads</h2>
+  <p>Week 49 begins the embedded block. Everything changes: no operating system, no <code>malloc</code>, a few kilobytes of RAM, and a compiler producing code for a different processor than the one it runs on. The discipline built over the last forty-eight weeks is exactly what makes that environment tractable.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_47_Event_Driven_and_Scalable_IO.html">← Week 47</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_49_Embedded_C_and_Cross_Compilation.html">Week 49 →</a>
+</div>
+
+</div>

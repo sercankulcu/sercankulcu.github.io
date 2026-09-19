@@ -1,0 +1,558 @@
+---
+layout: without-sidebar
+title: "Week 55 — Embedded Debugging and Testing"
+permalink: /files/c/Week_55_Embedded_Debugging_and_Testing.html
+excerpt: "Source-level debugging over a gdb server, tracing on constrained targets, hardware abstraction layers that make firmware testable on a host, and simulator-in-the-loop testing."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Professional · Week 55</div>
+  <h1>Embedded Debugging and Testing</h1>
+  <p class="c-wk-lead">No console, no sanitizers, no <code>printf</code> worth the name, and a bug that only appears after six hours in a cold room. Embedded debugging is an engineering discipline in its own right, and most of it is about making the firmware testable somewhere other than the device.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Debug a running image at source level over a gdb server.</li>
+      <li>Choose a tracing mechanism that does not perturb the timing you are measuring.</li>
+      <li>Split firmware so that the logic can be tested on the host.</li>
+      <li>Write host-side tests with a fake hardware layer.</li>
+      <li>Run the real image automatically under a simulator in CI.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>What is missing</h2>
+
+  <table>
+    <thead><tr><th>On the host</th><th>On the device</th></tr></thead>
+    <tbody>
+      <tr><td><code>printf</code> anywhere</td><td>A UART, if you wrote the driver</td></tr>
+      <tr><td>AddressSanitizer</td><td>Nothing — no MMU, no shadow memory</td></tr>
+      <tr><td>Valgrind</td><td>Nothing</td></tr>
+      <tr><td>A crash gives a backtrace</td><td>A crash gives a hang, or a reset</td></tr>
+      <tr><td>Reproduce by rerunning</td><td>May need specific hardware and hours</td></tr>
+      <tr><td>Attach a debugger freely</td><td>Needs a probe, and it changes timing</td></tr>
+    </tbody>
+  </table>
+
+  <p>The strategy that follows: <strong>test as much as possible where the tools are</strong>. Only what genuinely depends on hardware needs to run on hardware, and with the right structure that is a small fraction of the code.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>On-chip debugging</h2>
+
+  <p>A debug probe connects to the processor's built-in debug unit over JTAG or the two-wire SWD, and presents a gdb server. QEMU offers the same interface with <code>-s</code>, which is why everything in this block has been debuggable without hardware.</p>
+
+<pre><code># the simulator, halted at reset
+qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf -S -s
+
+# real hardware, with an ST-Link or J-Link probe
+openocd -f interface/stlink.cfg -f target/stm32f4x.cfg</code></pre>
+
+<pre><code>gdb-multiarch firmware.elf
+(gdb) target remote :1234        # or :3333 for OpenOCD
+(gdb) load                       # program the flash (hardware only)
+(gdb) monitor reset halt
+(gdb) break main
+(gdb) continue</code></pre>
+
+  <p>From there it is week 35's debugger: breakpoints, stepping, <code>backtrace</code>, <code>info locals</code>. Two additions matter here.</p>
+
+  <p><strong>Hardware breakpoints are a scarce resource.</strong> Code in flash cannot be patched with a software breakpoint, so the processor's comparators are used — typically six on Cortex-M, and four watchpoints. GDB will refuse the seventh.</p>
+
+  <p><strong>Halting changes the system.</strong> Stopping the core does not stop a motor, a timer, or a serial peer. Resume after a breakpoint and you may find a UART overrun, a watchdog reset, or a mechanism that has run away. For timing-sensitive code, tracing beats breakpoints.</p>
+
+<pre><code>(gdb) print/x *(UART_Type *)0x4000C000     # a peripheral, as a struct
+(gdb) x/16xw 0x20000000                    # raw memory
+(gdb) info registers
+(gdb) p/x $sp                              # where is the stack now
+(gdb) monitor reset halt                   # OpenOCD: restart cleanly</code></pre>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>Tracing</h2>
+
+  <p>Every tracing mechanism perturbs what it measures. The question is by how much.</p>
+
+  <table>
+    <thead><tr><th>Method</th><th>Cost per event</th><th>Needs</th></tr></thead>
+    <tbody>
+      <tr><td>UART <code>printf</code></td><td>~1 ms — ruins timing</td><td>A UART</td></tr>
+      <tr><td>Semihosting</td><td>~1 ms and halts the core</td><td>A debugger attached</td></tr>
+      <tr><td>RAM trace buffer</td><td><strong>~100 ns</strong></td><td>A few hundred bytes</td></tr>
+      <tr><td>ITM / SWO</td><td>~10 ns</td><td>Cortex-M3+ and a capable probe</td></tr>
+      <tr><td>A GPIO pin toggled</td><td>~5 ns</td><td>A pin and an oscilloscope</td></tr>
+    </tbody>
+  </table>
+
+  <p>The trace buffer is the workhorse: write timestamped events into a circular array in RAM and read it afterwards with the debugger. It is fast enough to leave enabled in production, and it survives a crash if you place it in a region the startup code does not clear — week 52's retained RAM.</p>
+
+<pre><code>typedef struct { uint32_t tick; uint16_t id; uint16_t value; } TraceEvent;
+
+static TraceEvent trace[256];
+static volatile uint8_t trace_index;
+
+static inline void trace_log(uint16_t id, uint16_t value)
+{
+    uint8_t i = trace_index++;              /* wraps at 256 naturally */
+    trace[i].tick  = SYST_CVR;              /* cycle-resolution timer */
+    trace[i].id    = id;
+    trace[i].value = value;
+}</code></pre>
+
+  <p>Then in GDB: <code>print trace</code>, or dump it over the UART on demand. A toggled GPIO pin is even cheaper and, with an oscilloscope or logic analyzer, measures interrupt latency directly — set the pin on ISR entry, clear it on exit, and read the width.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>A hardware abstraction layer</h2>
+
+  <p>This is the structural idea that makes the rest possible. Firmware written as one layer — logic and register access interleaved — can only run on the device. Separate them and most of the code becomes ordinary C.</p>
+
+<pre><code>/* hal.h — the boundary */
+typedef struct {
+    bool     (*uart_read)(uint8_t *out);
+    void     (*uart_write)(uint8_t byte);
+    uint32_t (*ticks)(void);
+    void     (*led_set)(bool on);
+} Hal;
+
+/* logic.h — pure logic, no registers anywhere */
+void protocol_init(Protocol *p, const Hal *hal);
+void protocol_poll(Protocol *p);</code></pre>
+
+  <p>On the device, the <code>Hal</code> is filled with the drivers from week 50. In a host test it is filled with functions that read from an array and record what was written — and the protocol logic, which is where the bugs are, runs under AddressSanitizer with a real test framework.</p>
+
+  <table>
+    <thead><tr><th>Layer</th><th>Tested</th><th>With</th></tr></thead>
+    <tbody>
+      <tr><td>Protocol, state machines, parsing</td><td>On the host</td><td>Week 35's tests, sanitizers, a fuzzer</td></tr>
+      <tr><td>Drivers</td><td>Under the simulator</td><td>Emulated peripherals</td></tr>
+      <tr><td>Timing, electrical behavior</td><td>On hardware</td><td>Oscilloscope, logic analyzer</td></tr>
+    </tbody>
+  </table>
+
+  <p>The goal is to push as much as possible into the first row. Firmware where 80% of the logic is host-testable is a different engineering experience from firmware where none of it is.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Worked example: the week 50 driver, made testable</h2>
+
+  <h3>Split the layer</h3>
+
+<pre><code>/* hal.h */
+#ifndef HAL_H
+#define HAL_H
+#include &lt;stdint.h&gt;
+#include &lt;stdbool.h&gt;
+
+typedef struct {
+    bool     (*uart_read)(void *ctx, uint8_t *out);
+    void     (*uart_write)(void *ctx, uint8_t byte);
+    uint32_t (*ticks)(void *ctx);
+    void     *ctx;
+} Hal;
+#endif</code></pre>
+
+<pre><code>/* protocol.h — the logic under test */
+#ifndef PROTOCOL_H
+#define PROTOCOL_H
+#include "hal.h"
+
+#define PROTO_MAX_LINE 64
+
+typedef enum { PROTO_OK, PROTO_OVERFLOW, PROTO_TIMEOUT } ProtoStatus;
+
+typedef struct {
+    const Hal  *hal;
+    char        line[PROTO_MAX_LINE];
+    uint8_t     used;
+    uint32_t    last_byte_tick;
+    uint32_t    lines_handled;
+    ProtoStatus last_status;
+} Protocol;
+
+void        protocol_init(Protocol *p, const Hal *hal);
+ProtoStatus protocol_poll(Protocol *p);
+#endif</code></pre>
+
+<pre><code>/* protocol.c — no register touches anywhere */
+#include "protocol.h"
+#include &lt;string.h&gt;
+#include &lt;stdio.h&gt;
+
+#define TIMEOUT_TICKS 1000
+
+void protocol_init(Protocol *p, const Hal *hal)
+{
+    memset(p, 0, sizeof *p);
+    p-&gt;hal = hal;
+    p-&gt;last_status = PROTO_OK;
+}
+
+static void reply(Protocol *p, const char *s)
+{
+    for (; *s; s++) p-&gt;hal-&gt;uart_write(p-&gt;hal-&gt;ctx, (uint8_t)*s);
+}
+
+ProtoStatus protocol_poll(Protocol *p)
+{
+    uint8_t byte;
+    uint32_t now = p-&gt;hal-&gt;ticks(p-&gt;hal-&gt;ctx);
+
+    while (p-&gt;hal-&gt;uart_read(p-&gt;hal-&gt;ctx, &amp;byte)) {
+        p-&gt;last_byte_tick = now;
+
+        if (byte == '\n') {
+            p-&gt;line[p-&gt;used] = '\0';
+            char out[PROTO_MAX_LINE + 16];
+            int n = snprintf(out, sizeof out, "%u:%s\n",
+                             (unsigned)++p-&gt;lines_handled, p-&gt;line);
+            if (n &gt; 0) reply(p, out);
+            p-&gt;used = 0;
+            continue;
+        }
+
+        if (p-&gt;used &gt;= PROTO_MAX_LINE - 1) {     /* the bound that matters */
+            reply(p, "overflow\n");
+            p-&gt;used = 0;
+            p-&gt;last_status = PROTO_OVERFLOW;
+            return PROTO_OVERFLOW;
+        }
+        p-&gt;line[p-&gt;used++] = (char)byte;
+    }
+
+    if (p-&gt;used &gt; 0 &amp;&amp; now - p-&gt;last_byte_tick &gt; TIMEOUT_TICKS) {
+        reply(p, "timeout\n");
+        p-&gt;used = 0;
+        p-&gt;last_status = PROTO_TIMEOUT;
+        return PROTO_TIMEOUT;
+    }
+    return PROTO_OK;
+}</code></pre>
+
+  <h3>The device implementation</h3>
+
+<pre><code>/* hal_device.c — only this file knows about registers */
+#include "hal.h"
+
+#define UART0_DR (*(volatile uint32_t *)0x4000C000u)
+#define UART0_FR (*(volatile uint32_t *)0x4000C018u)
+#define SYST_CVR (*(volatile uint32_t *)0xE000E018u)
+
+static bool dev_read(void *ctx, uint8_t *out)
+{
+    (void)ctx;
+    if (UART0_FR &amp; (1u &lt;&lt; 4)) return false;      /* RXFE: empty */
+    *out = (uint8_t)(UART0_DR &amp; 0xFFu);
+    return true;
+}
+
+static void dev_write(void *ctx, uint8_t byte)
+{
+    (void)ctx;
+    while (UART0_FR &amp; (1u &lt;&lt; 5)) { }            /* TXFF: full */
+    UART0_DR = byte;
+}
+
+static uint32_t dev_ticks(void *ctx) { (void)ctx; return SYST_CVR; }
+
+const Hal device_hal = {
+    .uart_read  = dev_read,
+    .uart_write = dev_write,
+    .ticks      = dev_ticks,
+    .ctx        = NULL
+};</code></pre>
+
+  <h3>The fake, and the tests</h3>
+
+<pre><code>/* test_protocol.c — builds and runs on the host */
+#include "protocol.h"
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+static int checks = 0, failures = 0;
+
+#define CHECK(cond) do {                                          \
+    checks++;                                                     \
+    if (!(cond)) { failures++;                                    \
+        printf("  FAIL %s:%d: %s\n", __FILE__, __LINE__, #cond); }\
+    else printf("  ok   %s\n", #cond);                            \
+} while (0)
+
+/* A scripted hardware layer: input from a string, output captured. */
+typedef struct {
+    const char *input;
+    size_t      input_pos;
+    char        output[1024];
+    size_t      output_len;
+    uint32_t    now;                 /* time we control exactly */
+} Fake;
+
+static bool fake_read(void *ctx, uint8_t *out)
+{
+    Fake *f = ctx;
+    if (f-&gt;input[f-&gt;input_pos] == '\0') return false;
+    *out = (uint8_t)f-&gt;input[f-&gt;input_pos++];
+    return true;
+}
+
+static void fake_write(void *ctx, uint8_t byte)
+{
+    Fake *f = ctx;
+    if (f-&gt;output_len &lt; sizeof f-&gt;output - 1) {
+        f-&gt;output[f-&gt;output_len++] = (char)byte;
+        f-&gt;output[f-&gt;output_len] = '\0';
+    }
+}
+
+static uint32_t fake_ticks(void *ctx) { return ((Fake *)ctx)-&gt;now; }
+
+static void fake_init(Fake *f, const char *input, Hal *hal)
+{
+    memset(f, 0, sizeof *f);
+    f-&gt;input = input;
+    hal-&gt;uart_read  = fake_read;
+    hal-&gt;uart_write = fake_write;
+    hal-&gt;ticks      = fake_ticks;
+    hal-&gt;ctx        = f;
+}
+
+static void test_single_line(void)
+{
+    puts("\n-- one line --");
+    Fake f; Hal hal; Protocol p;
+    fake_init(&amp;f, "hello\n", &amp;hal);
+    protocol_init(&amp;p, &amp;hal);
+
+    CHECK(protocol_poll(&amp;p) == PROTO_OK);
+    CHECK(strcmp(f.output, "1:hello\n") == 0);
+    CHECK(p.lines_handled == 1);
+}
+
+static void test_split_across_polls(void)
+{
+    puts("\n-- a line arriving in pieces --");
+    Fake f; Hal hal; Protocol p;
+    fake_init(&amp;f, "hel", &amp;hal);
+    protocol_init(&amp;p, &amp;hal);
+
+    protocol_poll(&amp;p);
+    CHECK(f.output_len == 0);            /* nothing yet: no newline */
+
+    f.input = "lo\n"; f.input_pos = 0;   /* the rest arrives */
+    protocol_poll(&amp;p);
+    CHECK(strcmp(f.output, "1:hello\n") == 0);
+}
+
+static void test_overflow(void)
+{
+    puts("\n-- a line longer than the buffer --");
+    char big[PROTO_MAX_LINE + 20];
+    memset(big, 'x', sizeof big - 2);
+    big[sizeof big - 2] = '\n';
+    big[sizeof big - 1] = '\0';
+
+    Fake f; Hal hal; Protocol p;
+    fake_init(&amp;f, big, &amp;hal);
+    protocol_init(&amp;p, &amp;hal);
+
+    CHECK(protocol_poll(&amp;p) == PROTO_OVERFLOW);
+    CHECK(strstr(f.output, "overflow") != NULL);
+    CHECK(p.used == 0);                  /* reset, not left half-full */
+}
+
+static void test_timeout(void)
+{
+    puts("\n-- a partial line that goes quiet --");
+    Fake f; Hal hal; Protocol p;
+    fake_init(&amp;f, "partial", &amp;hal);
+    protocol_init(&amp;p, &amp;hal);
+
+    f.now = 100;
+    CHECK(protocol_poll(&amp;p) == PROTO_OK);    /* not yet */
+
+    f.now = 100 + 2000;                      /* time advances instantly */
+    CHECK(protocol_poll(&amp;p) == PROTO_TIMEOUT);
+    CHECK(strstr(f.output, "timeout") != NULL);
+}
+
+static void test_several_lines_one_poll(void)
+{
+    puts("\n-- three lines in one burst --");
+    Fake f; Hal hal; Protocol p;
+    fake_init(&amp;f, "a\nb\nc\n", &amp;hal);
+    protocol_init(&amp;p, &amp;hal);
+
+    protocol_poll(&amp;p);
+    CHECK(strcmp(f.output, "1:a\n2:b\n3:c\n") == 0);
+    CHECK(p.lines_handled == 3);
+}
+
+int main(void)
+{
+    puts("host tests for the protocol layer");
+    test_single_line();
+    test_split_across_polls();
+    test_overflow();
+    test_timeout();
+    test_several_lines_one_poll();
+
+    printf("\n%d checks, %d failed\n", checks, failures);
+    return failures == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+}</code></pre>
+
+<pre><code>gcc -std=c17 -Wall -Wextra -g -fsanitize=address,undefined \
+    -o test_protocol test_protocol.c protocol.c
+./test_protocol ; echo "status $?"</code></pre>
+
+  <h3>What the host build buys</h3>
+
+  <p><strong>Sanitizers on firmware logic.</strong> Change the bound to <code>p-&gt;used &gt; PROTO_MAX_LINE - 1</code> — an off-by-one — and rerun. On the device this would silently corrupt whatever follows <code>line</code> in the structure. On the host:</p>
+
+<pre><code>ERROR: AddressSanitizer: stack-buffer-overflow
+WRITE of size 1 at 0x7ffd… in protocol_poll protocol.c:41</code></pre>
+
+  <p>File, line, and the variable. That diagnosis is unavailable on the target at any price.</p>
+
+  <p><strong>Time under your control.</strong> The timeout test sets <code>f.now</code> to a value two thousand ticks later and polls. Testing that path on hardware means waiting; here it takes nanoseconds and is deterministic.</p>
+
+  <p><strong>Input under your control.</strong> The split-line test reproduces a condition that on hardware depends on precise UART timing. As a fake it is two assignments.</p>
+
+  <p><strong>Fuzzing.</strong> Week 48 applies directly, because the logic is now a pure function of its input:</p>
+
+<pre><code>/* fuzz_protocol.c */
+#include "protocol.h"
+#include &lt;string.h&gt;
+
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
+{
+    if (size &gt; 4096) return 0;
+    char *input = malloc(size + 1);
+    memcpy(input, data, size);
+    input[size] = '\0';
+
+    Fake f; Hal hal; Protocol p;
+    fake_init(&amp;f, input, &amp;hal);
+    protocol_init(&amp;p, &amp;hal);
+    for (int i = 0; i &lt; 4; i++) protocol_poll(&amp;p);
+
+    free(input);
+    return 0;
+}</code></pre>
+
+<pre><code>clang -g -O1 -fsanitize=fuzzer,address,undefined \
+      -o fuzz_protocol fuzz_protocol.c protocol.c
+./fuzz_protocol corpus/</code></pre>
+
+  <p>A fuzzer on firmware. That is the payoff of the abstraction layer, and it is not available to code that reads registers inline.</p>
+
+  <h3>Simulator in the loop</h3>
+
+  <p>Host tests cannot cover the driver. Run the real image under QEMU, automatically:</p>
+
+<pre><code>#!/bin/sh
+# run_target_test.sh — exit 0 if the firmware behaves
+set -e
+arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -ffreestanding -nostdlib -O2 -g \
+    -T firmware.ld -o firmware.elf startup.c hal_device.c protocol.c main.c
+
+OUT=$(printf 'hello\nworld\nquit\n' | timeout 10 \
+      qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf)
+
+echo "$OUT" | grep -q '1:hello' || { echo "FAIL: first line";  exit 1; }
+echo "$OUT" | grep -q '2:world' || { echo "FAIL: second line"; exit 1; }
+echo "target test passed"</code></pre>
+
+<pre><code># .github/workflows/firmware.yml
+- name: host tests
+  run: make test-host          # sanitizers, coverage, fuzz corpus
+
+- name: target tests
+  run: ./run_target_test.sh    # the real image, under the simulator
+
+- name: size check
+  run: |
+    arm-none-eabi-size firmware.elf
+    test $(arm-none-eabi-size -A firmware.elf | awk '/\.text/{print $2}') -lt 32768</code></pre>
+
+  <p>Three gates: the logic under sanitizers, the real image under emulation, and a flash budget that fails the build before the part does. Week 35's CI, adapted to a target that is not the build machine.</p>
+
+  <h3>Debug the real image</h3>
+
+<pre><code>qemu-system-arm -M lm3s6965evb -nographic -kernel firmware.elf -S -s &amp;
+gdb-multiarch firmware.elf
+(gdb) target remote :1234
+(gdb) break protocol_poll
+(gdb) continue
+(gdb) print *p
+(gdb) print p-&gt;line
+(gdb) watch p-&gt;used             # who changes it, and when
+(gdb) print/x *(UART_Type *)0x4000C000</code></pre>
+
+  <p>Identical to week 35's workflow, on a machine that does not exist. Once <code>-s</code> is replaced by OpenOCD's port, the same commands drive real silicon — which is what makes the simulator a rehearsal rather than a substitute.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Registers accessed throughout the code</td><td>Nothing can be tested off the device</td><td>A HAL boundary.</td></tr>
+      <tr><td><code>printf</code> debugging timing-sensitive code</td><td>The bug disappears; the timing changed</td><td>A RAM trace buffer or a GPIO pin.</td></tr>
+      <tr><td>Breakpoints in an ISR</td><td>Peripherals overrun while halted</td><td>Trace instead.</td></tr>
+      <tr><td>Testing only on hardware</td><td>Slow cycles; no sanitizers</td><td>Host tests for the logic.</td></tr>
+      <tr><td>A fake that does not model the awkward cases</td><td>Tests pass, the device fails</td><td>Model partial reads, timeouts, errors.</td></tr>
+      <tr><td>No size check in CI</td><td>Discovered when it will not flash</td><td>Fail the build on the budget.</td></tr>
+      <tr><td>Running out of hardware breakpoints</td><td>GDB refuses silently</td><td>Six on Cortex-M; delete unused ones.</td></tr>
+      <tr><td>Clearing retained RAM at startup</td><td>The crash log is gone</td><td><code>NOLOAD</code>, and skip it in the startup loop.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">7</span>Check yourself</h2>
+
+  <details>
+    <summary>Why does a hardware abstraction layer matter more on embedded than elsewhere?</summary>
+    <p>Because it is the only way to run firmware logic where the tools are. With registers accessed inline, nothing can execute off the device — no sanitizers, no fuzzer, no fast test cycle. With a HAL boundary, the protocol and state machines become ordinary C that runs on the host under AddressSanitizer, and only the drivers need the target.</p>
+  </details>
+
+  <details>
+    <summary>Why is <code>printf</code> a poor debugging tool for timing-sensitive firmware?</summary>
+    <p>Because a UART write takes on the order of a millisecond, which is often longer than the event being investigated. The act of observing changes the timing enough to make the bug disappear or move. A RAM trace buffer costs about a hundred nanoseconds per event and a toggled GPIO pin about five.</p>
+  </details>
+
+  <details>
+    <summary>Why can setting a breakpoint in an ISR make things worse?</summary>
+    <p>Because halting the core does not halt the peripherals, the motor, or the serial peer. While you inspect state, a UART overruns, a watchdog fires, or a mechanism runs past its limit — so resuming produces a system in a state that never occurs in normal operation. For interrupt-level code, tracing is the non-destructive alternative.</p>
+  </details>
+
+  <details>
+    <summary>What must a good fake hardware layer model?</summary>
+    <p>The awkward behavior, not just the happy path: reads that return nothing, data arriving split across several polls, time advancing arbitrarily, and error conditions. A fake that always delivers a complete message in one call tests a situation the real device never produces, and the tests then pass while the firmware fails.</p>
+  </details>
+
+  <details>
+    <summary>What are the three gates a firmware CI pipeline should have?</summary>
+    <p>Host tests of the logic under sanitizers, so memory errors are caught with file and line; the real image run under a simulator, so the drivers and startup code are exercised; and a size check against the flash and RAM budget, so a build that will not fit fails in CI rather than at programming time.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Where this leads</h2>
+  <p>Week 56 closes the course with the longest timescale of all: code that outlives its authors. Bringing legacy C under test before changing it, refactoring without altering behavior, migrating across standards and compilers, and deciding what to do about technical debt.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_54_Real_Time_Operating_Systems.html">← Week 54</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_56_Maintaining_Long_Lived_Codebases.html">Week 56 →</a>
+</div>
+
+</div>
