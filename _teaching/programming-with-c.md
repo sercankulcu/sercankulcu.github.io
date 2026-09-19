@@ -4,30 +4,53 @@ collection: teaching
 type: "Undergraduate"
 permalink: /teaching/procedural-programming-with-c
 venue: "Giresun University, Computer Engineering"
-date: 2023-04-04
+date: 2024-09-19
 location: "Giresun, Turkey"
 ---
 
 ![procedural programming with c](/images/teaching/teaching-procedural-programming-c.webp){: .align-left width="200" style="float: left; margin-right: 10px;"}
 C is a general-purpose programming language widely used in systems programming, embedded software, operating systems, compilers, and performance-sensitive applications. It combines portable high-level constructs with low-level access to memory and hardware-related operations. C gives programmers substantial control over data representation, memory allocation, and program execution. This control can enable efficient software, but it also requires careful handling of memory, types, and undefined behavior.
 
-This is a complete course in C, designed to take a reader from no prior programming experience to competent, independent C development. It is organized as 42 weekly topics in three levels. **Basic** builds the language core and the habits of writing correct programs. **Intermediate** covers memory, pointers, aggregate data, and files. **Advanced** covers modular design, data structures, tooling, undefined behavior, portability, and concurrency. Nothing essential to the language or to working with it in practice is left out.
+This is a complete course in C, designed to take a reader from no prior programming experience to competent, independent, professional C development. It is organized as 42 weekly topics in three levels. **Basic** builds the language core, early programming habits, and the first command-line programs, ending with pointers and strings. **Intermediate** covers memory, aggregate data, files, error handling, modular design, and project workflow. **Advanced** covers libraries and tooling, data structures, performance, undefined behavior, portability, low-level systems interfaces, and concurrency. Each topic assumes only what earlier topics have already established, and a term project runs alongside the material from the middle of the course onward.
 
 ## Ders Öğretim Planı  
+
+[Ders Öğretim Planı (HTML)](../files/c/Ders_Ogretim_Plani.html)
 
 ---
 
 ## Announcements  
 
+There are currently no announcements.
+
 ---
 
 ## Course resources  
 
-* V22.0201 Computer Systems Organization [course](https://cs.nyu.edu/~gottlieb/courses/cso/class-notes.html)
+- **references**  
+  [cppreference — C](https://en.cppreference.com/w/c) | 
+  [Beej's Guide to C Programming](https://beej.us/guide/bgc/) | 
+  [comp.lang.c FAQ](http://c-faq.com)
+
+- **course webpages**  
+  [V22.0201 Computer Systems Organization](https://cs.nyu.edu/~gottlieb/courses/cso/class-notes.html)
+
+- **standards**  
+  [ISO/IEC JTC1/SC22/WG14 — the C standards committee](https://www.open-std.org/jtc1/sc22/wg14/)
+
+- **tools**  
+  [GCC documentation](https://gcc.gnu.org/onlinedocs/) | 
+  [GDB documentation](https://sourceware.org/gdb/documentation/) | 
+  [Valgrind](https://valgrind.org) | 
+  [Compiler Explorer](https://godbolt.org)
+
+- **practice**  
+  [Learn-C.org](https://www.learn-c.org) | 
+  [Exercism C track](https://exercism.org/tracks/c)
 
 ---
 
-## Preliminary Materials: 
+## Preliminary Materials
 
 * Prerequisites for preparation [html](../files/c/C_Procedural_Programming_Prerequisites.html)
 * Key figures who have shaped the field [html](../files/c/C_Procedural_Programming_Important_People.html)
@@ -59,11 +82,12 @@ This is a complete course in C, designed to take a reader from no prior programm
 ---
 
 ### Week 3: Program Structure, Style, and Basic Output
-- `main`, its return value, and the program entry point
+- `main`, its return value, `EXIT_SUCCESS`, and `EXIT_FAILURE`
 - `#include` and the standard library
 - Statements, blocks, semicolons, and braces
-- Comments, indentation, naming, and readability
+- Comments, indentation, naming, formatting, and readability
 - Producing output with `printf`
+- Basic source-code workflow: folders, files, Git repositories, commits, and `.gitignore`
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_03_Program_Structure_and_Style.html)
 
@@ -82,9 +106,9 @@ This is a complete course in C, designed to take a reader from no prior programm
 
 ### Week 5: Variables, Types, and Constants
 - Identifiers, declarations, and initialization
-- `int`, `char`, `float`, `double`, and `_Bool`
+- `int`, `char`, `float`, `double`, `_Bool`, and `<stdbool.h>`
 - Type modifiers: `short`, `long`, `signed`, `unsigned`
-- `sizeof`, `<limits.h>`, and `<float.h>`
+- `sizeof`, `size_t`, `<limits.h>`, and `<float.h>`
 - Literals, escape sequences, `const`, and `#define`
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_05_Variables_Types_and_Constants.html)
@@ -118,7 +142,7 @@ This is a complete course in C, designed to take a reader from no prior programm
 - `scanf` and reading user input
 - Input buffer problems and error recovery
 - `getchar`, `putchar`, `puts`, `fgets`, and why `gets` must never be used
-- Validating user input
+- Validating user input and reporting input errors clearly
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_08_Input_and_Output.html)
 
@@ -151,7 +175,7 @@ This is a complete course in C, designed to take a reader from no prior programm
 - Parameters, return values, and `void`
 - Function prototypes and their placement
 - Pass-by-value semantics and the call stack
-- Designing small, single-purpose functions
+- Designing small, single-purpose functions with clear success and failure behavior
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_11_Functions.html)
 
@@ -159,135 +183,135 @@ This is a complete course in C, designed to take a reader from no prior programm
 
 ### Week 12: One- and Multi-Dimensional Arrays
 - Declaring, initializing, and traversing arrays
-- Array bounds and out-of-range access
+- Indexing with `size_t` and respecting array bounds
+- Out-of-range access and its consequences
 - Two-dimensional arrays and row-major memory layout
-- Passing arrays to functions
-- Common array algorithms: sum, minimum and maximum, reversal, search
+- Common array algorithms: sum, minimum and maximum, reversal, linear search
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_12_Arrays.html)
 
 ---
 
-### Week 13: Strings and Character Handling
-- Character arrays, the null terminator, and string literals
-- Reading and printing strings
-- `<string.h>`: `strlen`, `strcpy`, `strncpy`, `strcmp`, `strcat`, `strstr`, `strtok`
-- `<ctype.h>`: character classification and conversion
-- Buffer sizes, truncation, and safe string handling
+### Week 13: Introduction to Pointers
+- Memory addresses and the address-of operator
+- Pointer declaration, initialization, and dereferencing
+- `NULL`, uninitialized, and wild pointers
+- Pointer types, `void *`, and type safety
+- Array-to-pointer decay and passing arrays to functions
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_13_Strings_and_Character_Handling.html)
+[🗒️Lecture Notes (HTML)](../files/c/Week_13_Introduction_to_Pointers.html)
 
 ---
 
-### Week 14: The Standard Library Toolbox
-- `<math.h>`: numeric functions and linking with `-lm`
-- `<stdlib.h>`: `atoi`, `strtol`, `strtod`, `abs`, `div`
-- Pseudo-random numbers: `rand`, `srand`, and their limitations
-- `<time.h>`: dates, timestamps, and measuring elapsed time
-- Reading library documentation and manual pages
+### Week 14: Strings and Character Handling
+- Character arrays, the null terminator, and string literals
+- Reading and printing strings
+- `<string.h>`: `strlen`, `strcpy`, `strncpy`, `strcmp`, `strcat`, `strchr`, `strstr`, `strtok`
+- Block memory operations: `memcpy`, `memmove`, `memset`, and `memcmp`
+- `<ctype.h>` classification, buffer sizes, truncation, and safe string handling
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_14_Standard_Library_Toolbox.html)
+[🗒️Lecture Notes (HTML)](../files/c/Week_14_Strings_and_Character_Handling.html)
 
 ---
 
 ## Intermediate (Weeks 15-28)
 
-### Week 15: Scope, Lifetime, and Storage Classes
-- Block, file, and function scope
-- Automatic and static storage duration
-- Local, global, and `static` variables
-- `extern`, internal linkage, and external linkage
-- Shadowing, name conflicts, and the cost of global state
-
-[🗒️Lecture Notes (HTML)](../files/c/Week_15_Scope_and_Storage_Classes.html)
-
----
-
-### Week 16: Recursion
-- Base cases and recursive cases
-- Call stack behavior and stack frames
-- Classic examples: factorial, Fibonacci, Towers of Hanoi, binary search
-- Recursion depth, stack overflow, and tail calls
-- Recursive versus iterative solutions
-
-[🗒️Lecture Notes (HTML)](../files/c/Week_16_Recursion.html)
-
----
-
-### Week 17: Introduction to Pointers
-- Memory addresses and the address-of operator
-- Pointer declaration, initialization, and dereferencing
-- Null, uninitialized, and wild pointers
-- Pointer types, `void *`, and type safety
-- Inspecting memory with a debugger
-
-[🗒️Lecture Notes (HTML)](../files/c/Week_17_Introduction_to_Pointers.html)
-
----
-
-### Week 18: Pointer Arithmetic and Arrays
+### Week 15: Pointer Arithmetic and Arrays
 - Incrementing, decrementing, and comparing pointers
-- Array-to-pointer decay
 - Pointer subtraction and `ptrdiff_t`
 - Traversing arrays and strings with pointers
 - Pointers to pointers and arrays of pointers
+- Pointer-based versus index-based idioms
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_18_Pointer_Arithmetic_and_Arrays.html)
+[🗒️Lecture Notes (HTML)](../files/c/Week_15_Pointer_Arithmetic_and_Arrays.html)
 
 ---
 
-### Week 19: Pointers as Function Parameters
+### Week 16: Pointers as Function Parameters
 - Emulating pass-by-reference
 - Modifying caller variables and output parameters
 - `const` pointers versus pointers to `const`
 - Returning pointers safely and avoiding dangling returns
-- Passing arrays, strings, and multidimensional arrays
+- Passing strings and multidimensional arrays
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_19_Pointers_as_Parameters.html)
+[🗒️Lecture Notes (HTML)](../files/c/Week_16_Pointers_as_Parameters.html)
 
 ---
 
-### Week 20: Dynamic Memory Allocation
+### Week 17: Scope, Lifetime, and Storage Duration
+- Block, file, and function scope
+- Automatic and static storage duration
+- Local variables, global variables, and `static` locals
+- Shadowing and name conflicts
+- The cost of global state and how to avoid it
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_17_Scope_and_Storage_Duration.html)
+
+---
+
+### Week 18: Recursion
+- Base cases and recursive cases
+- Call stack behavior and stack frames
+- Classic examples: factorial, Fibonacci, Towers of Hanoi, and binary search
+- Recursion depth, stack overflow, and tail calls
+- Recursive versus iterative solutions
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_18_Recursion.html)
+
+---
+
+### Week 19: Dynamic Memory Allocation
 - The heap versus the stack
 - `malloc`, `calloc`, `realloc`, and `free`
 - Checking allocation failures
 - Growable arrays and dynamically allocated two-dimensional arrays
-- Ownership, lifetime, and allocation conventions
+- Ownership, lifetime, allocation conventions, and `init`/`destroy` pairs
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_20_Dynamic_Memory_Allocation.html)
+[🗒️Lecture Notes (HTML)](../files/c/Week_19_Dynamic_Memory_Allocation.html)
 
 ---
 
-### Week 21: Memory Errors and Their Diagnosis
+### Week 20: Memory Errors and Their Diagnosis
 - Memory leaks
 - Dangling pointers and use-after-free
 - Double free and invalid free
 - Buffer overruns and out-of-bounds access
-- Detecting memory errors with Valgrind and sanitizers
+- Detecting memory errors with sanitizers, Valgrind, debugger sessions, and minimal failing examples
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_21_Memory_Errors.html)
+[🗒️Lecture Notes (HTML)](../files/c/Week_20_Memory_Errors.html)
 
 ---
 
-### Week 22: Structures
+### Week 21: Structures
 - Declaration, initialization, and designated initializers
 - Member access with `.` and `->`
 - Nested structures and arrays of structures
 - Structures as parameters and return values
 - Pointers to structures and self-referential types
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_22_Structures.html)
+[🗒️Lecture Notes (HTML)](../files/c/Week_21_Structures.html)
 
 ---
 
-### Week 23: Unions, Enumerations, and Type Aliases
+### Week 22: Unions, Enumerations, and Type Aliases
 - Enumerated types and their underlying representation
 - Type aliases with `typedef`
 - Unions, shared storage, and tagged unions
-- Padding, alignment, and `offsetof`
+- Structure padding and `offsetof`
 - Choosing between a structure, a union, and an enumeration
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_23_Unions_Enums_and_Typedef.html)
+[🗒️Lecture Notes (HTML)](../files/c/Week_22_Unions_Enums_and_Typedef.html)
+
+---
+
+### Week 23: Command-Line Programs and the Standard Library Toolbox
+- Program arguments with `argc` and `argv`
+- Designing well-behaved command-line tools: exit status, `stdin`, `stdout`, `stderr`, and diagnostics
+- String-to-number conversion: `atoi`, `strtol`, `strtod`, and the `endptr` argument
+- `<math.h>`, `<time.h>`, pseudo-random numbers, and common utility functions
+- Reading library documentation, manual pages, and standard-library reference material
+
+[🗒️Lecture Notes (HTML)](../files/c/Week_23_Standard_Library_Toolbox.html)
 
 ---
 
@@ -307,7 +331,7 @@ This is a complete course in C, designed to take a reader from no prior programm
 - `fopen` modes, `fclose`, and text versus binary access
 - `fprintf`, `fscanf`, `fgets`, and `fputs`
 - `fread` and `fwrite` for binary records
-- Reading a file line by line and processing tabular data
+- Reading a file line by line, processing tabular data, and handling malformed input
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_25_File_Input_and_Output.html)
 
@@ -318,7 +342,7 @@ This is a complete course in C, designed to take a reader from no prior programm
 - `feof`, `ferror`, and `clearerr`
 - Buffering, `fflush`, and `setvbuf`
 - `stdin`, `stdout`, `stderr`, and redirection
-- Temporary files, renaming, and removing files
+- Temporary files, renaming, removing files, and portable file-processing pitfalls
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_26_File_Positioning_and_Streams.html)
 
@@ -337,10 +361,11 @@ This is a complete course in C, designed to take a reader from no prior programm
 
 ### Week 28: Modular Programming and Multi-File Projects
 - Separating declarations from definitions
-- Designing header and source files
+- Designing and documenting header and source files
 - Include guards and `#pragma once`
-- Avoiding multiple-definition errors
+- `extern`, internal and external linkage, and multiple-definition errors
 - Information hiding with `static` and opaque pointers
+- Project layout, public versus private headers, API documentation, and ownership comments
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_28_Modular_Programming.html)
 
@@ -351,8 +376,9 @@ This is a complete course in C, designed to take a reader from no prior programm
 ### Week 29: Building Programs and Libraries
 - Compiling and linking multiple translation units
 - Writing and maintaining a Makefile
-- Static libraries with `ar`
-- Shared and dynamic libraries
+- Project configuration with CMake
+- Static libraries with `ar`, and shared and dynamic libraries
+- Debug and release builds, sanitizer builds, test targets, and warning profiles
 - Linking order, symbol resolution, and inspection with `nm` and `objdump`
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_29_Building_and_Libraries.html)
@@ -381,14 +407,14 @@ This is a complete course in C, designed to take a reader from no prior programm
 
 ---
 
-### Week 32: Program Arguments, Processes, and the Environment
-- Program arguments with `argc` and `argv`
-- Parsing command-line options
+### Week 32: Command-Line Interfaces and the Environment
+- Parsing command-line options by hand and with `getopt`
 - Program termination: `exit`, `_Exit`, and `atexit`
 - Environment variables with `getenv` and `setenv`
-- Designing well-behaved command-line tools
+- Configuration through arguments, files, and environment variables
+- Designing scriptable, testable command-line interfaces
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_32_Program_Arguments_and_Processes.html)
+[🗒️Lecture Notes (HTML)](../files/c/Week_32_Program_Arguments_and_Environment.html)
 
 ---
 
@@ -397,7 +423,7 @@ This is a complete course in C, designed to take a reader from no prior programm
 - Singly, doubly, and circular linked lists
 - Stacks and queues
 - Insertion, deletion, traversal, and reversal
-- Memory management and ownership in linked structures
+- The cost of list operations and when a list beats an array
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_33_Linked_Data_Structures.html)
 
@@ -407,21 +433,21 @@ This is a complete course in C, designed to take a reader from no prior programm
 - Binary trees and binary search trees
 - Traversals and recursive tree algorithms
 - Hash functions, collision handling, and hash tables
-- Designing an abstract data type with an opaque handle
-- Choosing an appropriate structure for a problem
+- Time and space complexity: big-O notation and practical cost
+- Designing an abstract data type with an opaque handle, documented ownership, and stable API boundaries
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_34_Trees_Hash_Tables_and_ADTs.html)
 
 ---
 
-### Week 35: Algorithms and Complexity
-- Linear and binary search
-- Bubble, selection, insertion, merge, and quick sort
-- Time and space complexity; big-O notation
-- The standard library `qsort` and `bsearch`
-- Benchmarking and comparing implementations
+### Week 35: Performance and Memory Layout
+- The memory hierarchy, cache behavior, and locality of reference
+- Data layout, structure packing, and their effect on speed
+- Optimization levels and when to trust the compiler
+- Profiling and measurement
+- Trade-offs between clarity and speed
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_35_Algorithms_and_Complexity.html)
+[🗒️Lecture Notes (HTML)](../files/c/Week_35_Performance_and_Memory_Layout.html)
 
 ---
 
@@ -430,7 +456,7 @@ This is a complete course in C, designed to take a reader from no prior programm
 - Checking function return values consistently
 - Error reporting with `errno`, `perror`, and `strerror`
 - Assertions with `assert` and `_Static_assert`
-- Designing error-reporting conventions for a codebase
+- Resource cleanup with the `goto` idiom, error-reporting conventions, and API-level error contracts
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_36_Error_Handling.html)
 
@@ -439,9 +465,10 @@ This is a complete course in C, designed to take a reader from no prior programm
 ### Week 37: Debugging, Testing, and Analysis
 - Compiler warnings as the first line of defense
 - Interactive debugging with GDB: breakpoints, watchpoints, and backtraces
-- Address, undefined-behavior, and leak sanitizers
 - Static analysis tools
 - Unit testing in C and measuring code coverage
+- Reducing a failure to a minimal reproducible case
+- Continuous integration concepts: automated builds, tests, warnings, and sanitizer runs
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_37_Debugging_and_Testing.html)
 
@@ -461,9 +488,10 @@ This is a complete course in C, designed to take a reader from no prior programm
 ### Week 39: Portability and the Machine Model
 - Type sizes and fixed-width types in `<stdint.h>`
 - Endianness and byte-order conversion
-- Alignment, `_Alignas`, `_Alignof`, and packed data
+- Alignment with `_Alignas` and `_Alignof`, and packed data
 - Platform, compiler, and library differences
 - Character encoding: wide characters, `<wchar.h>`, and UTF-8
+- Portable serialization: binary file formats, byte order, padding, and versioned records
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_39_Portability_and_Machine_Model.html)
 
@@ -480,22 +508,22 @@ This is a complete course in C, designed to take a reader from no prior programm
 
 ---
 
-### Week 41: Concurrency, Signals, and Systems Interfaces
-- Signals and signal handlers
-- Processes and low-level file descriptors
-- Threads with C11 `<threads.h>` and POSIX threads
-- Race conditions, mutexes, and condition variables
-- Atomics and the C memory model
+### Week 41: Processes, Signals, and Low-Level I/O
+- File descriptors and the `open`, `read`, `write`, and `close` interface
+- Creating processes with `fork` and `exec`
+- Waiting on child processes, exit status, and `system`
+- Signals, signal handlers, and async-signal safety
+- Pipes, redirection, and an introduction to socket-based network programming
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_41_Concurrency_and_Systems_Interfaces.html)
+[🗒️Lecture Notes (HTML)](../files/c/Week_41_Processes_Signals_and_Low_Level_IO.html)
 
 ---
 
-### Week 42: Performance, Project, and Review
-- The memory hierarchy, cache behavior, and locality of reference
-- Data layout, profiling, and measurement
-- Optimization flags and when to trust the compiler
-- Course project: designing, implementing, documenting, and testing a complete C program
-- Review of the language and directions for further study
+### Week 42: Concurrency, Project, and Review
+- Threads with C11 `<threads.h>` and POSIX threads
+- Race conditions, mutexes, and condition variables
+- Thread-local storage with `_Thread_local`
+- Atomics, `<stdatomic.h>`, and the C memory model
+- Course project, final review, and directions for further study
 
-[🗒️Lecture Notes (HTML)](../files/c/Week_42_Performance_and_Project.html)
+[🗒️Lecture Notes (HTML)](../files/c/Week_42_Concurrency_Project_and_Review.html)
