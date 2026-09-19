@@ -1,0 +1,254 @@
+---
+layout: without-sidebar
+title: "Week 2 — History, Standards, and the Compilation Model"
+permalink: /files/c/Week_02_History_Standards_and_Compilation.html
+excerpt: "Where C came from, what each ISO standard added from C89 to C23, and what the four translation phases actually do to your source file."
+---
+
+<link rel="stylesheet" href="/files/c/week.css">
+
+<div class="c-wk">
+
+<header class="c-wk-hero">
+  <div class="c-wk-eyebrow">Procedural Programming with C · Basic · Week 2</div>
+  <h1>History, Standards, and the Compilation Model</h1>
+  <p class="c-wk-lead">Last week you typed one command and got a program. This week you open that command up. Along the way, the history explains why C makes the choices it does, and the standards explain why the same source file can mean different things to different compilers.</p>
+  <div class="c-wk-goals">
+    <strong>By the end of this week you can</strong>
+    <ul>
+      <li>Explain why C was created and what problem it solved for the Unix authors.</li>
+      <li>Name the major C standards and say what each one added.</li>
+      <li>Run the preprocessor, compiler, assembler, and linker separately and inspect each output.</li>
+      <li>Choose a language standard deliberately with <code>-std=</code> instead of accepting the default.</li>
+      <li>Explain why a program that compiles for a classmate might not compile for you.</li>
+    </ul>
+  </div>
+</header>
+
+<section>
+  <h2><span class="c-wk-num">1</span>Where C came from</h2>
+
+  <p>In 1969 the Bell Labs researchers Ken Thompson and Dennis Ritchie were building an operating system on a spare minicomputer. That system became Unix, and it was written, as all operating systems then were, in assembly language. Assembly is fast and precise, but it is tied to one processor: rewriting Unix for a different machine would have meant rewriting it entirely.</p>
+
+  <p>Thompson had already written a small language called <strong>B</strong>, itself a stripped-down version of <strong>BCPL</strong>, which came from Cambridge. B had one significant limitation: every value was a single machine word. It had no notion of a byte, a character, or a floating-point number. When the lab acquired a PDP-11 — a machine with byte addressing — B no longer fit the hardware.</p>
+
+  <p>Ritchie's response, between 1971 and 1973, was to add a type system to B. Values now had sizes: <code>char</code>, <code>int</code>, <code>float</code>, <code>double</code>. Structures arrived. The result was called C, and in 1973 Unix was rewritten in it. That was the decisive moment: an operating system in a portable language could be moved to a new machine by writing a new compiler rather than a new operating system.</p>
+
+  <div class="c-wk-note">
+    <p><strong>Why this matters for you.</strong> C was designed to be a portable assembler for systems programming in the early 1970s, on machines with a few dozen kilobytes of memory. Almost every feature you will find odd — no bounds checking, null-terminated strings, arrays decaying into pointers, undefined behavior — follows from that goal and those constraints. Week 42 returns to this once you have enough C to appreciate the reasoning.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">2</span>From a book to a standard</h2>
+
+  <p>For its first decade, C had no formal definition. What it had instead was a book: <em>The C Programming Language</em> by Brian Kernighan and Dennis Ritchie, published in 1978. Programmers call that dialect <strong>K&amp;R C</strong>. The book described the language accurately, but a book is not a specification: where it was silent or ambiguous, compiler vendors each decided for themselves, and C began to fragment.</p>
+
+  <p>ANSI convened a committee in 1983 to settle the question. The result, published in 1989, is <strong>ANSI C</strong>, adopted internationally the following year as ISO C. Everyone calls it <strong>C89</strong> or <strong>C90</strong>; they are the same language. This standard introduced the function prototype — declaring a function's parameter types so the compiler can check calls against them — which is the single largest safety improvement in C's history.</p>
+
+  <p>Since then the language has been revised roughly once a decade by working group WG14. Revisions are conservative: C is a language where a twenty-year-old source file is expected to still compile.</p>
+
+  <h3>What each revision added</h3>
+  <table>
+    <thead><tr><th>Standard</th><th>Year</th><th>Notable additions</th></tr></thead>
+    <tbody>
+      <tr><td><strong>C89 / C90</strong></td><td>1989</td><td>Function prototypes, <code>void</code>, <code>const</code>, <code>volatile</code>, a standard library definition. The baseline every C compiler supports.</td></tr>
+      <tr><td><strong>C99</strong></td><td>1999</td><td><code>//</code> comments, declarations anywhere in a block, <code>long long</code>, <code>_Bool</code> with <code>&lt;stdbool.h&gt;</code>, fixed-width types in <code>&lt;stdint.h&gt;</code>, designated initializers, compound literals, variable-length arrays, <code>inline</code>, <code>restrict</code>, <code>snprintf</code>.</td></tr>
+      <tr><td><strong>C11</strong></td><td>2011</td><td>Threads (<code>&lt;threads.h&gt;</code>), atomics (<code>&lt;stdatomic.h&gt;</code>), <code>_Generic</code>, <code>_Static_assert</code>, <code>_Alignas</code> and <code>_Alignof</code>, <code>_Noreturn</code>, anonymous structures and unions.</td></tr>
+      <tr><td><strong>C17 / C18</strong></td><td>2018</td><td>No new features. A maintenance release that fixed defects in C11. If you target C17 you are targeting C11 with the bugs corrected.</td></tr>
+      <tr><td><strong>C23</strong></td><td>2024</td><td><code>bool</code>, <code>true</code>, and <code>false</code> as keywords, <code>nullptr</code>, <code>constexpr</code>, binary literals such as <code>0b1010</code>, digit separators, <code>typeof</code>, attributes such as <code>[[nodiscard]]</code>, and the removal of old K&amp;R-style function definitions.</td></tr>
+    </tbody>
+  </table>
+
+  <p>A practical consequence: most of the "modern C" conveniences you will read about online — declaring a loop variable inside the <code>for</code>, using <code>//</code> for a comment — are C99 features. They are twenty-five years old and universally available, but they are not in C89, and some embedded toolchains still default to C89.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">3</span>The four translation phases</h2>
+
+  <p>When you run <code>gcc -o hello hello.c</code>, GCC is acting as a driver: it runs four separate programs in sequence and quietly deletes the intermediate files. Here is what each one does, and how to stop after it.</p>
+
+  <div class="c-wk-fig">
+    <svg viewBox="0 0 720 150" role="img" aria-label="Four translation phases with their intermediate file types and the flag that stops after each" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="currentColor" stroke-width="1.5" opacity=".85">
+        <rect x="6" y="40" width="150" height="50" rx="10"/>
+        <rect x="186" y="40" width="150" height="50" rx="10"/>
+        <rect x="366" y="40" width="150" height="50" rx="10"/>
+        <rect x="546" y="40" width="168" height="50" rx="10"/>
+      </g>
+      <g stroke="currentColor" stroke-width="1.5" opacity=".55">
+        <path d="M156 65h30M336 65h30M516 65h30"/>
+        <path d="M178 60l8 5-8 5M358 60l8 5-8 5M538 60l8 5-8 5" fill="none"/>
+      </g>
+      <g fill="currentColor" font-size="12.5" text-anchor="middle" font-family="inherit">
+        <text x="81" y="62">preprocessor</text><text x="81" y="79" opacity=".6">cpp → .i</text>
+        <text x="261" y="62">compiler</text><text x="261" y="79" opacity=".6">cc1 → .s</text>
+        <text x="441" y="62">assembler</text><text x="441" y="79" opacity=".6">as → .o</text>
+        <text x="630" y="62">linker</text><text x="630" y="79" opacity=".6">ld → executable</text>
+      </g>
+      <g fill="currentColor" font-size="11.5" text-anchor="middle" opacity=".75" font-family="inherit">
+        <text x="81" y="118">-E</text><text x="261" y="118">-S</text><text x="441" y="118">-c</text><text x="630" y="118">(default)</text>
+      </g>
+      <g stroke="currentColor" stroke-width="1" opacity=".3">
+        <path d="M81 96v12M261 96v12M441 96v12M630 96v12"/>
+      </g>
+    </svg>
+    <p class="c-wk-cap">Each flag stops the driver after one stage and leaves the intermediate file behind.</p>
+  </div>
+
+  <h3>Phase 1 — the preprocessor</h3>
+  <p>The preprocessor is a text manipulator. It knows nothing about C. It obeys the lines beginning with <code>#</code>: it pastes in the contents of included files, substitutes macros, and strips comments. Its output is still C source — just much longer.</p>
+<pre><code>gcc -E hello.c -o hello.i
+wc -l hello.i</code></pre>
+  <p>Expect several hundred to a few thousand lines from a program you wrote five of. Everything after the last <code>#</code> directive is your code; everything before it came from <code>stdio.h</code> and the headers it includes in turn. Scroll to the bottom and you will find your <code>main</code> unchanged.</p>
+
+  <h3>Phase 2 — the compiler proper</h3>
+  <p>This is the stage people mean by "compiling": preprocessed C in, assembly language out. All the type checking, all the optimization, and all the interesting diagnostics happen here.</p>
+<pre><code>gcc -S hello.c -o hello.s
+cat hello.s</code></pre>
+  <p>You are not expected to read assembly yet. Look at it anyway. Find the string <code>Hello, world</code> sitting in a data section, and find the <code>call</code> instruction that invokes <code>printf</code>. Recognizing that your program became <em>this</em> is worth more than understanding every line. Week 34 comes back and reads it properly.</p>
+
+  <h3>Phase 3 — the assembler</h3>
+  <p>The assembler turns assembly text into a binary object file containing real machine instructions.</p>
+<pre><code>gcc -c hello.c -o hello.o
+file hello.o
+nm hello.o</code></pre>
+  <p><code>nm</code> lists the symbols in the object file. You will see <code>T main</code> — a symbol this file <em>defines</em> in the text section — and <code>U printf</code>, a symbol this file <em>uses</em> but does not define. That single letter <code>U</code> is the reason the next phase exists.</p>
+
+  <h3>Phase 4 — the linker</h3>
+  <p>The linker collects object files and libraries, resolves every undefined symbol against a definition somewhere, and writes one executable.</p>
+<pre><code>gcc hello.o -o hello
+./hello</code></pre>
+  <p>This is where <code>printf</code> gets connected to the real implementation inside the C standard library. It is also where the <code>undefined reference</code> error from week 1 came from: the linker searched everywhere it was told to look and found no definition.</p>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">4</span>Worked example: the same file, two standards</h2>
+
+  <p>Save this as <code>era.c</code>. It deliberately uses features from different decades.</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+
+int main(void)
+{
+    /* A C89-era comment. */
+    int total = 0;
+
+    for (int i = 0; i &lt; 5; i++) {   /* declaration inside for: C99 */
+        total += i;
+    }
+
+    printf("total = %d\n", total);
+    return 0;
+}</code></pre>
+
+  <p>Compile it as C89:</p>
+<pre><code>gcc -std=c89 -Wall -Wextra -o era era.c</code></pre>
+<pre><code>era.c: In function 'main':
+era.c:8:5: error: 'for' loop initial declarations are only allowed in C99 or C11 mode
+    8 |     for (int i = 0; i &lt; 5; i++) {
+      |     ^~~
+era.c:8:5: note: use option '-std=c99', '-std=c11' or '-std=gnu99' to compile your code</code></pre>
+
+  <p>Now as C23:</p>
+<pre><code>gcc -std=c23 -Wall -Wextra -o era era.c
+./era</code></pre>
+<pre><code>total = 10</code></pre>
+
+  <p>The file did not change. The <em>language</em> changed. This is worth sitting with: "valid C" is not a single fixed thing, and the question "does this compile?" is incomplete until you say which standard you meant.</p>
+
+  <h3>Now walk it through the phases</h3>
+<pre><code>gcc -std=c23 -E era.c -o era.i     &amp;&amp; wc -l era.i
+gcc -std=c23 -S era.c -o era.s     &amp;&amp; grep -c . era.s
+gcc -std=c23 -c era.c -o era.o     &amp;&amp; nm era.o
+gcc era.o -o era                   &amp;&amp; ./era</code></pre>
+
+  <p>Two things to notice. First, the comment you wrote is gone by the time you look at <code>era.i</code> — the preprocessor removed it, which is why comments cost nothing at run time. Second, the loop may have vanished from <code>era.s</code> entirely if you add <code>-O2</code>: the compiler can compute <code>0+1+2+3+4</code> at compile time and emit the constant 10. Try it.</p>
+
+<pre><code>gcc -std=c23 -O2 -S era.c -o era-opt.s
+grep -n '10\|\$10' era-opt.s</code></pre>
+
+  <div class="c-wk-note">
+    <p><strong>What just happened.</strong> The compiler is not a transcriber. It is allowed to produce any machine code whose observable behavior matches what the standard says your program means. That freedom is what makes C fast, and it is also the reason undefined behavior is so dangerous — a topic week 36 is entirely about.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">5</span>Choosing your flags</h2>
+
+  <p>Settle on a command line now and use it for the rest of the course:</p>
+<pre><code>gcc -std=c17 -Wall -Wextra -g -o prog prog.c</code></pre>
+
+  <table>
+    <thead><tr><th>Flag</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><code>-std=c17</code></td><td>States the language explicitly. Without it you get the compiler's default, which differs between compilers and versions, and which is usually a GNU dialect rather than standard C.</td></tr>
+      <tr><td><code>-Wall</code></td><td>Turns on the common warnings. The name is misleading: it is not all of them.</td></tr>
+      <tr><td><code>-Wextra</code></td><td>Turns on a further set that <code>-Wall</code> omits. Together these two catch a large share of beginner bugs.</td></tr>
+      <tr><td><code>-g</code></td><td>Embeds debugging information so GDB can show you source lines and variable names. Costs nothing at run time.</td></tr>
+      <tr><td><code>-O0</code> … <code>-O2</code></td><td>Optimization level. <code>-O0</code> (the default) while developing, because the debugger behaves predictably; <code>-O2</code> when measuring speed.</td></tr>
+      <tr><td><code>-pedantic</code></td><td>Warns about anything outside the standard you named. Worth switching on once you are comfortable.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="c-wk-trap">
+    <p><strong>gnu17 is not c17.</strong> GCC's default is <code>-std=gnu17</code>, which is C17 plus GNU extensions. Code that relies on those extensions compiles happily for you and fails for someone using a different compiler. Naming the standard explicitly turns a confusing future bug report into a compile error you see today.</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">6</span>Common mistakes</h2>
+  <table>
+    <thead><tr><th>Mistake</th><th>What happens</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Using <code>//</code> comments under <code>-std=c89</code></td><td><code>C++ style comments are not allowed in ISO C90</code></td><td>Use <code>/* … */</code>, or target C99 or later.</td></tr>
+      <tr><td>Declaring a variable in the middle of a block under C89</td><td><code>ISO C90 forbids mixed declarations and code</code></td><td>Same fix. This is the most common reason old toolchains reject modern code.</td></tr>
+      <tr><td>Assuming <code>-E</code> output is an error</td><td>Thousands of lines scroll past</td><td>That is the point. Redirect it: <code>-o file.i</code>.</td></tr>
+      <tr><td>Forgetting <code>-o</code> with <code>-c</code></td><td>Output lands in <code>hello.o</code> anyway</td><td>Harmless here, but be deliberate: name your outputs.</td></tr>
+      <tr><td>Debugging a <code>-O2</code> build and finding variables "optimized out"</td><td>GDB cannot show a value that no longer exists</td><td>Debug at <code>-O0</code>. Week 35 explains why optimized builds confuse debuggers.</td></tr>
+      <tr><td>Believing the C standard specifies <code>int</code> as 32 bits</td><td>Code breaks on another platform</td><td>It specifies a <em>minimum</em> range. Week 37 covers what is actually guaranteed.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="c-wk-check">
+  <h2><span class="c-wk-num">7</span>Check yourself</h2>
+
+  <details>
+    <summary>Why was rewriting Unix in C such a significant event?</summary>
+    <p>Because it decoupled the operating system from the processor. An assembly-language system must be rewritten for each new machine; a C system needs only a C compiler for that machine. Portability through a language, rather than through discipline, is the idea C was built to deliver.</p>
+  </details>
+
+  <details>
+    <summary>Your classmate's program compiles on their laptop and fails on yours with "'for' loop initial declarations are only allowed in C99 or C11 mode". What differs?</summary>
+    <p>The language standard each compiler defaulted to, not the code. Their compiler defaults to a C99-or-later dialect; yours is being invoked in C89 mode. The real fix is not to change the code but for both of you to pass <code>-std=</code> explicitly so the question never arises.</p>
+  </details>
+
+  <details>
+    <summary>What is the difference between <code>-c</code> and <code>-S</code>?</summary>
+    <p><code>-S</code> stops after the compiler proper and leaves human-readable assembly in a <code>.s</code> file. <code>-c</code> goes one stage further, running the assembler, and leaves a binary object file <code>.o</code>. Neither runs the linker, so neither produces a program you can execute.</p>
+  </details>
+
+  <details>
+    <summary><code>nm hello.o</code> shows <code>U printf</code>. What does the <code>U</code> mean and what will resolve it?</summary>
+    <p><code>U</code> means undefined: this object file refers to <code>printf</code> but does not contain its body. The linker resolves it by finding the definition in the C standard library, which it searches automatically. For other libraries you must say so — <code>-lm</code> for the math library, for example.</p>
+  </details>
+
+  <details>
+    <summary>You compile with <code>-O2</code> and the loop disappears from the assembly. Is this a bug?</summary>
+    <p>No. The compiler must preserve your program's observable behavior, not its literal structure. If it can prove the loop always produces 10, it may emit the constant. This latitude is what makes optimizing compilers effective — and what makes undefined behavior so hazardous, because a program with undefined behavior gives the compiler a false premise to reason from.</p>
+  </details>
+</section>
+
+<section>
+  <h2><span class="c-wk-num">8</span>Where this leads</h2>
+  <p>You now know what the build does and which language you are writing. Week 3 turns to the program itself: the anatomy of <code>main</code>, what its return value is for, how to write code that another person can read, and how to put your work under version control so that week 43's lesson on navigating someone else's codebase starts from a habit you already have.</p>
+</section>
+
+<div class="c-wk-next">
+  <a href="Week_01_Computers_and_Toolchain.html">← Week 1</a>
+  <a href="../../teaching/procedural-programming-with-c">Course outline</a>
+  <a href="Week_03_Program_Structure_and_Style.html">Week 3 →</a>
+</div>
+
+</div>
