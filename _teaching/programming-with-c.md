@@ -13,7 +13,7 @@ C is a general-purpose programming language widely used in systems programming, 
 
 This is a complete course in C, designed to take a reader from no prior programming experience to competent, independent, professional C development. It is organized as 56 weekly topics in four levels. **Basic** builds the language core, early programming habits, and the first command-line programs, ending with pointers and strings. **Intermediate** covers memory, aggregate data, files, error handling, modular design, and project workflow. **Advanced** covers libraries and tooling, data structures, performance, undefined behavior, portability, low-level systems interfaces, network programming, and concurrency. **Professional** covers working in existing codebases, collaboration and review, library distribution, language interoperability, scalable I/O, security testing, embedded and bare-metal development, and long-term maintenance. Each topic assumes only what earlier topics have already established.
 
-Every week is anchored to a worked example that is built and explained in the lecture notes. The examples form a chain rather than a set of isolated exercises: the growable array of week 19 becomes the reusable module of week 28, the library of week 29, the installable package of week 45, and the target of a foreign-language binding in week 46; the socket server of week 40 becomes the event loop of week 47.
+Every week is anchored to a worked example that is built and explained in the lecture notes. The examples form a chain rather than a set of isolated exercises: the growable array of week 19 becomes the reusable module of week 28, the library of week 29, the installable package of week 45, and the target of a foreign-language binding in week 46; the socket server of week 40 becomes the event loop of week 47. The embedded material in weeks 49-55 targets an ARM Cortex-M image running under QEMU, so every example can be built and run without physical hardware.
 
 ## Ders Öğretim Planı  
 
@@ -706,25 +706,25 @@ There are currently no announcements.
 
 ### Week 49: Embedded C and Cross-Compilation
 - Microcontroller architecture: flash, SRAM, and peripherals
-- Cross-compilers, target triples, and toolchain setup
+- Cross-compilers, target triples, and toolchain setup with `arm-none-eabi-gcc`
 - Freestanding versus hosted environments, and life without a full standard library
 - Startup code, the reset vector, and how `main` is reached
-- Building, flashing, and running code on a target board
+- Building a bare-metal image and running it under QEMU, with no physical hardware required
 
-**Worked example:** a blinking-LED program cross-compiled, flashed to a microcontroller, and traced from the reset vector to the first line of `main`.
+**Worked example:** a blinking-LED program cross-compiled for an ARM Cortex-M target, run under `qemu-system-arm`, and traced from the reset vector to the first line of `main`.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_49_Embedded_C_and_Cross_Compilation.html)
 
 ---
 
 ### Week 50: Memory-Mapped I/O and Hardware Registers
-- The memory map and peripheral register blocks
+- The memory map and peripheral register blocks of the emulated machine
 - Why hardware registers require `volatile` and what the compiler may otherwise do
 - Register access with bit masks, bit-fields, and register-description structures
 - Writing simple GPIO, timer, and UART drivers
 - Reading a datasheet and a reference manual
 
-**Worked example:** a UART driver written directly against hardware registers from the datasheet, and the same driver breaking as soon as `volatile` is removed.
+**Worked example:** a UART driver written directly against the emulated machine's hardware registers, and the same driver breaking as soon as `volatile` is removed.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_50_Memory_Mapped_IO_and_Registers.html)
 
@@ -735,9 +735,9 @@ There are currently no announcements.
 - Priorities, nesting, and interrupt latency
 - Sharing data between an ISR and main code: `volatile`, atomics, and critical sections
 - Polling versus interrupts, and input debouncing
-- Measuring and bounding response time
+- Measuring and bounding response time in simulated cycles
 
-**Worked example:** a button handler implemented first by polling and then by interrupt, with the response latency of each measured on real hardware.
+**Worked example:** a button handler implemented first by polling and then by interrupt, with the response latency of each measured in simulated cycles.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_51_Interrupts_and_Real_Time_Behavior.html)
 
@@ -776,20 +776,20 @@ There are currently no announcements.
 - Priority inversion and how to avoid it
 - Choosing between a superloop, an RTOS, and an event-driven design
 
-**Worked example:** the same device firmware written first as a superloop and then as a set of RTOS tasks, with the timing behavior of both compared.
+**Worked example:** the same device firmware written first as a superloop and then as a set of FreeRTOS tasks running under the simulator, with the timing behavior of both compared.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_54_Real_Time_Operating_Systems.html)
 
 ---
 
 ### Week 55: Embedded Debugging and Testing
-- On-chip debugging over JTAG and SWD with a hardware debugger
+- Source-level debugging of a running image with GDB attached to the simulator's gdb server
 - Tracing on constrained targets: semihosting, logging, and trace buffers
 - Hardware abstraction layers that make firmware testable on a host
-- Host-side unit tests and hardware-in-the-loop testing
-- Observing timing with a logic analyzer and an oscilloscope
+- Host-side unit tests and simulator-in-the-loop testing
+- Observing timing and peripheral traffic with simulator tracing and instruction counting
 
-**Worked example:** the week 50 driver refactored behind a hardware abstraction layer, unit-tested on the host, and then stepped through on real hardware over SWD.
+**Worked example:** the week 50 driver refactored behind a hardware abstraction layer, unit-tested on the host, and then stepped through inside the simulator under GDB.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_55_Embedded_Debugging_and_Testing.html)
 
