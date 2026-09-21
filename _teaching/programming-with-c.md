@@ -1,8 +1,11 @@
 ---
-title: "Procedural Programming with C"
+title: "Programming with C"
 collection: teaching
 type: "Undergraduate"
-permalink: /teaching/procedural-programming-with-c
+permalink: /teaching/programming-with-c
+redirect_from:
+  - /teaching/procedural-programming-with-c/
+  - /teaching/procedural-programming-with-c
 venue: "Giresun University, Computer Engineering"
 date: 2024-09-19
 location: "Giresun, Turkey"
@@ -26,7 +29,7 @@ Every week is anchored to a worked example that is built and explained in the le
 The whole course as a single PDF: 758 pages, fifty-six chapters in four parts, with the
 worked examples, the figures and the self-check questions and answers in place.
 
-[📕 Procedural Programming with C (PDF, 8.7 MB)](../files/c/Procedural-Programming-with-C.pdf)
+[📕 Programming with C (PDF, 8.7 MB)](../files/c/Programming-with-C.pdf)
 
 It is generated from the notes on this site, so the two never drift apart; the listings are
 the same ones the companion repository compiles on every change.
