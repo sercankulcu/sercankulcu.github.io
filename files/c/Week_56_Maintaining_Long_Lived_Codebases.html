@@ -322,8 +322,30 @@ long v;
 
   <h3>The result</h3>
 
+  <p>The prototype first. Writing it down is most of the change: the compiler can now check every call, which the K&amp;R definition never allowed it to do.</p>
+
+<pre><code>/* parser.h - the modernized parser from step 4.
+ *
+ * legacy.c is the 1990s original; this is the same behavior behind a
+ * prototype the compiler can check.
+ */
+#ifndef PARSER_H
+#define PARSER_H
+
+#include &lt;stddef.h&gt;
+#include &lt;stdbool.h&gt;
+
+/* Parse "name,value" out of line. Writes at most name_size bytes to out_name
+   (always terminated) and the number to out_value. Returns false and leaves
+   the outputs untouched if the line does not parse. */
+bool parse_record(const char *line, char *out_name, size_t name_size,
+                  int *out_value);
+
+#endif /* PARSER_H */</code></pre>
+
 <pre><code>/* parser.c — after the refactoring, before the behavior fixes */
 #include "parser.h"
+#include &lt;stdio.h&gt;
 #include &lt;string.h&gt;
 #include &lt;stdlib.h&gt;
 #include &lt;errno.h&gt;
@@ -388,6 +410,43 @@ bool parse_record(const char *line, char *out_name, size_t name_size,
     *out_value = (parse_long(value_text, &amp;v) &amp;&amp; v &gt;= INT_MIN &amp;&amp; v &lt;= INT_MAX)
                ? (int)v : 0;
     return true;
+}</code></pre>
+
+  <p>The test harness changes with it. The assertions do not: <code>pinned.h</code> is the same file, generated from the legacy behavior before any of this started.</p>
+
+<pre><code>/* test_parser.c - the same pinned assertions, driving the new parser.
+ *
+ * pinned.h is not regenerated. It still records what the legacy code did.
+ * Only the macro body changes, because parse_record now takes the size of
+ * the destination and returns bool. If these assertions still pass, the
+ * rewrite changed no behavior - which is the whole claim being made.
+ */
+#include "parser.h"
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;stdlib.h&gt;
+
+static int checks = 0, failures = 0;
+
+#define CHECK_PARSE(input, want_rc, want_name, want_value) do {         \
+    char line[256], name[256] = { 0 };                                  \
+    int value = -999;                                                   \
+    snprintf(line, sizeof line, "%s", (input));                         \
+    int rc = parse_record(line, name, sizeof name, &amp;value) ? 1 : 0;     \
+    checks++;                                                           \
+    if (rc != (want_rc) || strcmp(name, (want_name)) != 0               \
+        || value != (want_value)) {                                     \
+        failures++;                                                     \
+        printf("  FAIL \"%s\": rc %d name \"%s\" value %d\n",           \
+               (input), rc, name, value);                               \
+    }                                                                   \
+} while (0)
+
+int main(void)
+{
+    #include "pinned.h"
+    printf("%d checks, %d failed\n", checks, failures);
+    return failures == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }</code></pre>
 
 <pre><code>gcc -std=c17 -Wall -Wextra -Wstrict-prototypes -Wold-style-definition \
