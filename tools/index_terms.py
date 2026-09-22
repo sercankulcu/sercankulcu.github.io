@@ -23,7 +23,7 @@ DROP_EXACT = {
  's', 't', 'v', 'm', 'f', 'out', 'in', 'buf', 'size', 'count', 'len', 'value', 'data', 'ptr',
  'head', 'node', 'tmp', 'result', 'flags', 'mask', 'key', 'name', 'path', 'line', 'text', 'end',
  'left', 'right', 'next', 'prev', 'root', 'top', 'low', 'high', 'mid', 'sum', 'total', 'index',
- 'capacity', 'values', 'args', 'argc2', 'this', 'that', 'it',
+ 'capacity', 'values', 'args', 'argc2', 'this', 'that', 'it', 'counter',
 }
 KEEP_SHORT = {'if', 'do', 'or', '0', '1'}          # bunlar asla girmesin
 GENERIC = {'memory', 'parameters', 'the convention', 'the conventions', 'termination', 'tasks', 'scheduling', 'communication', 'branching', 'installing', 'deprecating', 'the node', 'the script', 'sections', 'cmake', 'make', 'gdb', 'tracing', 'choosing', 'the environment', 'signals', 'the shape of the library', 'the memory map', 'the first hour', 'navigation', 'the three forms', 'the four functions', 'the operators', 'the four idioms', 'the two obligations', 'ownership', 'the model', 'addresses', 'framing', 'threads', 'mutexes', 'recursion', 'the call stack', 'unit tests', 'static analysis', 'continuous integration'}
@@ -62,6 +62,7 @@ def acceptable(t):
 
 
 code_used = collections.defaultdict(set)
+code_count = collections.defaultdict(collections.Counter)
 code_taught = collections.defaultdict(set)
 concept = {}
 
@@ -104,12 +105,39 @@ for n, s in NOTES.items():
         t = norm(c)
         if acceptable(t):
             code_used[t].add(n)
+    # "Ogretildigi hafta" kanitini aciklama metninden topla: islenen ornekte bir
+    # islev *kullanilir*, anlatilmaz -- h44 bir kod incelemesinde fread'i dort
+    # kez aniyor, oysa fread'in yeri h26. Yalnizca o bolumu cikar; sonrasindaki
+    # "Common mistakes" hala anlatimdir.
+    prose = re.sub(r'<h2><span class="c-wk-num">\d+</span>Worked example.*?(?=<h2>|\Z)',
+                   '', s, flags=re.S)
+    head_body = re.sub(r'<pre><code>.*?</code></pre>', '', prose, flags=re.S)
+    for c in re.findall(r'<code>(.*?)</code>', head_body, re.S):
+        t = norm(c)
+        if acceptable(t):
+            code_count[t][n] += 1
+
+
+def dominant(counts):
+    """Hicbir baslikta gecmeyen terim icin yedek kural: onu acik ara en cok
+    anlatan haftayi 'ogretildigi hafta' say. Esik bilerek sikidir -- koyu
+    rakam 'burada anlatiliyor' iddiasidir, yanlis isaretlemek bos
+    birakmaktan kotudur. Bu yuzden hem en az 3 gecis hem de ikincinin
+    iki kati aranir; saglamayan terim sahipsiz kalir."""
+    top = counts.most_common(2)
+    if not top:
+        return None
+    w1, c1 = top[0]
+    c2 = top[1][1] if len(top) > 1 else 0
+    return w1 if c1 >= 3 and c1 >= 2 * c2 else None
+
 
 entries = []
 for t, ws in code_used.items():
     tw = sorted(code_taught.get(t, ()))
     if tw or len(ws) >= 3:
-        entries.append((t, tw[0] if tw else None, sorted(ws), 'code'))
+        main = tw[0] if tw else dominant(code_count[t])
+        entries.append((t, main, sorted(ws), 'code'))
 for h, n in concept.items():
     entries.append((h, n, [n], 'concept'))
 

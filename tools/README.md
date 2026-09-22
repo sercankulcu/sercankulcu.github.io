@@ -33,8 +33,17 @@ python tools/index_terms.py
 
 Bir terim yanlış haftaya bağlanıyorsa çare, notu değiştirmek değil,
 `index_terms.py` içindeki `DROP_EXACT` / `GENERIC` / `acceptable()` kurallarını
-düzeltmektir. "Öğretildiği hafta" olarak yalnızca *Worked example* başlığından
-önceki bölgeye bakılır; sonrası uygulamadır, tanım değil.
+düzeltmektir.
+
+"Öğretildiği hafta" iki aşamada bulunur. Önce terim bir bölüm başlığında veya
+hedefler kutusunda geçiyor mu diye bakılır; burada yalnızca *Worked example*
+başlığından öncesi sayılır, çünkü sonrası uygulamadır. Hiçbir başlıkta
+geçmiyorsa `dominant()` devreye girer: terimi açık ara en çok anlatan hafta
+aranır — en az 3 geçiş **ve** ikincinin en az iki katı. Sağlamayan terim
+sahipsiz kalır, çünkü koyu rakam "burada anlatılıyor" iddiasıdır ve yanlış
+işaretlemek boş bırakmaktan kötüdür. Bu sayım işlenen örnek bölümünü dışlar
+(orada işlev *kullanılır*, anlatılmaz) ama sonrasındaki "Common mistakes"
+bölümünü sayar.
 
 Betik ayrıca `week.css` içine dizin stillerini (bir kez) ekler ve her haftanın
 gezinme satırına Index bağlantısını koyar. İkisi de zaten varsa dokunmaz.
