@@ -65,9 +65,7 @@ This website brings together my academic work, software projects, teaching mater
 
 **Explore the site**
 
-[📚 Teaching](/teaching/) · [📄 CV](/cv/) · [🛠️ Apps](/apps/) · [🎮 Games](/games/) · [💻 Posts](/posts/) · [💭 Thoughts](/thoughts/) · [🎬 Fun](/fun/) · [📜 Poems](/poems/) · [🕰️ Memory](/memory/) · [🌍 Humanity](/humanity/) · [🌿 Nature](/nature/) · [✏️ Pencils](/pencils/) · [🔖 Bookmarks](/bookmarks/)
-
-**A small experiment:** [🌊 Sessiz İskele](/apps/sessiz-iskele/) — a foggy morning on a Black Sea pier, drawn pixel by pixel in the browser. No 3D library and no video: a software renderer, a 41-colour palette, and ambience synthesised on the spot.
+[📚 Teaching](/teaching/) · [📄 CV](/cv/) · [🛠️ Apps](/apps/) · [🎮 Games](/games/) · [🎨 Art](/art/) · [💻 Posts](/posts/) · [💭 Thoughts](/thoughts/) · [🎬 Fun](/fun/) · [📜 Poems](/poems/) · [🕰️ Memory](/memory/) · [🌍 Humanity](/humanity/) · [🌿 Nature](/nature/) · [✏️ Pencils](/pencils/) · [🔖 Bookmarks](/bookmarks/)
 
 **Note:** If you believe any content on this website infringes a license or copyright, please contact me. I will review and remove the material promptly if necessary.
 
