@@ -26,10 +26,10 @@ Every week is anchored to a worked example that is built and explained in the le
 
 ## The book
 
-The whole course as a single PDF: 758 pages, fifty-six chapters in four parts, with the
+The whole course as a single PDF: 781 pages, fifty-six chapters in four parts, with the
 worked examples, the figures and the self-check questions and answers in place.
 
-[📕 Programming with C (PDF, 8.7 MB)](../files/c/Programming-with-C.pdf)
+[📕 Programming with C (PDF, 9.7 MB)](../files/c/Programming-with-C.pdf)
 
 It is generated from the notes on this site, so the two never drift apart; the listings are
 the same ones the companion repository compiles on every change.
