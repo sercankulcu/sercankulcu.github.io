@@ -1,0 +1,1072 @@
+---
+layout: without-sidebar
+title: "Sessiz İskele"
+permalink: /apps/sessiz-iskele/
+redirect_from:
+  - /apps/sessiz-iskele.html
+excerpt: "A foggy morning on a Black Sea pier, drawn pixel by pixel in the browser: a software rasteriser, a 41-colour palette and synthesised ambience, looping every 48 seconds."
+---
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+.iskele-app,
+.iskele-app *,
+.iskele-app *::before,
+.iskele-app *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.iskele-app {
+  --isk-frame: #0d1214;
+  --isk-ink: #aebfc1;
+  --isk-dim: #6b7d80;
+  --isk-line: #1e2a2d;
+  --isk-accent: #c3d6d4;
+  width: min(940px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--isk-ink);
+}
+
+.iskele-slate {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.iskele-app .iskele-slate h1 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(20px, 2.6vw, 28px);
+  line-height: 1.2;
+  letter-spacing: .01em;
+  color: var(--isk-accent);
+}
+.iskele-slate .isk-where {
+  font-size: 10px;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+  color: var(--isk-dim);
+  white-space: nowrap;
+}
+.iskele-slate .isk-rule {
+  flex: 1 1 40px;
+  min-width: 24px;
+  height: 1px;
+  background: var(--isk-line);
+  transform: translateY(-5px);
+}
+
+.iskele-screen {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 74vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--isk-frame);
+  border: 1px solid var(--isk-line);
+  overflow: hidden;
+  cursor: pointer;
+}
+.iskele-screen:focus-visible { outline: 2px solid var(--isk-accent); outline-offset: 2px; }
+.iskele-screen canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.iskele-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.iskele-app button.isk-key {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--isk-line);
+  border-radius: 0;
+  color: var(--isk-ink);
+  width: 34px;
+  height: 34px;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  margin: 0;
+  flex: 0 0 auto;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.iskele-app button.isk-key:hover { border-color: #33464a; color: var(--isk-accent); background: transparent; }
+.iskele-app button.isk-key:focus-visible { outline: 2px solid var(--isk-accent); outline-offset: 2px; }
+.iskele-app button.isk-key svg { width: 14px; height: 14px; fill: currentColor; }
+
+.iskele-app input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 1 1 auto;
+  min-width: 60px;
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.iskele-app input[type="range"]:focus-visible { outline: 2px solid var(--isk-accent); outline-offset: 2px; }
+.iskele-app input[type="range"]::-webkit-slider-runnable-track { height: 1px; background: var(--isk-line); }
+.iskele-app input[type="range"]::-moz-range-track { height: 1px; background: var(--isk-line); }
+.iskele-app input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 3px; height: 13px; margin-top: -6px;
+  background: var(--isk-accent); border: 0; border-radius: 0;
+}
+.iskele-app input[type="range"]::-moz-range-thumb {
+  width: 3px; height: 13px;
+  background: var(--isk-accent); border: 0; border-radius: 0;
+}
+
+.iskele-clock {
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--isk-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.iskele-app .iskele-note {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--isk-dim);
+  margin: 0;
+  max-width: 68ch;
+}
+
+@media (max-width: 520px) {
+  .iskele-slate .isk-rule { display: none; }
+}
+</style>
+
+<div class="iskele-app" id="iskele-app">
+
+  <div class="iskele-slate">
+    <h1>Sessiz İskele</h1>
+    <span class="isk-rule"></span>
+    <span class="isk-where">Giresun · 06:40 · sis</span>
+  </div>
+
+  <div class="iskele-screen" id="isk-screen" tabindex="0" aria-label="Sahneyi oynat veya duraklat">
+    <canvas id="isk-stage" width="1280" height="720" aria-label="Sisli bir sabahta Karadeniz iskelesi: bağlı bir taka ile bir kayık, martılar ve uzakta Giresun Adası"></canvas>
+  </div>
+
+  <div class="iskele-bar">
+    <button class="isk-key" id="isk-play" type="button" aria-label="Duraklat" title="Duraklat">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path id="isk-ico-play" d="M4 2h3v12H4zM9 2h3v12H9z"></path></svg>
+    </button>
+    <input type="range" id="isk-scrub" min="0" max="1439" step="1" value="316" aria-label="Zaman">
+    <span class="iskele-clock" id="isk-clock">00:10 / 00:48</span>
+    <button class="isk-key" id="isk-sound" type="button" aria-label="Sesi aç" title="Sesi aç">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path id="isk-ico-sound" d="M3 6h2.5L9 3v10L5.5 10H3zM11.2 5.1l1-1c2.4 2 2.4 5.8 0 7.8l-1-1c1.7-1.5 1.7-4.3 0-5.8z"></path></svg>
+    </button>
+  </div>
+
+  <p class="iskele-note">
+    No 3D library and no video: every frame is drawn into a 320×180 buffer by a software rasteriser written
+    for this scene, reduced to a 41-colour palette, and looped every 48 seconds. The sea is not geometry —
+    each pixel below the horizon is a ray dropped onto the water plane. The ambience is synthesised, not recorded.
+  </p>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ===========================================================================
+  // The film is a pure function of time. Everything below answers one question:
+  // what does the pier look like at second t? Playback merely picks a t.
+  // ===========================================================================
+
+  var TAU = Math.PI * 2;
+  var W = 320, H = 180;               // the negative; everything else is a print
+  var DURATION = 48, FPS = 30;
+  var FRAMES = DURATION * FPS;
+  var SEA_Y = 0, DECK_Y = 1.30;
+  var BOAT_X = -4.00, BOAT_Z = -11.0;
+  var TAKA_X = -3.90, TAKA_Z = -21.0;
+
+  // --- palette ---------------------------------------------------------------
+  // Eight short ramps. A morning on this coast is almost monochrome, so the one
+  // warm note - the red band on a fishing boat - has to carry the whole frame.
+
+  function hex(h) {
+    return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  }
+  function ramp(a, b, n) {
+    var ca = hex(a), cb = hex(b), out = [];
+    for (var i = 0; i < n; i++) {
+      var k = n === 1 ? 0 : i / (n - 1);
+      out.push([ca[0] + (cb[0] - ca[0]) * k, ca[1] + (cb[1] - ca[1]) * k, ca[2] + (cb[2] - ca[2]) * k]);
+    }
+    return out;
+  }
+  var PALETTE = [].concat(
+    ramp("#0b1012", "#27343a", 4),   // shadow under the deck
+    ramp("#2d3b40", "#7e9295", 7),   // sea
+    ramp("#93a8a6", "#edf1ec", 5),   // foam, wet light
+    ramp("#67797f", "#ccd4d2", 6),   // haze and sky
+    ramp("#38291d", "#93744f", 7),   // timber
+    ramp("#26302a", "#5b7050", 4),   // weed on the piles
+    ramp("#5d2f26", "#b55442", 4),   // the boat's red
+    ramp("#665d4c", "#bdb193", 4)    // rope, canvas, net
+  );
+
+  // rgb -> nearest palette entry, through a 32x32x32 lookup cube
+  var LUT = new Uint8Array(32 * 32 * 32 * 3);
+  (function buildLut() {
+    for (var r = 0; r < 32; r++) for (var g = 0; g < 32; g++) for (var b = 0; b < 32; b++) {
+      var R = r * 8.226, G = g * 8.226, B = b * 8.226, best = 0, bd = 1e9;
+      for (var p = 0; p < PALETTE.length; p++) {
+        var c = PALETTE[p];
+        var dr = R - c[0], dg = G - c[1], db = B - c[2];
+        // weighted toward green, the way the eye is
+        var d = dr * dr * 0.5 + dg * dg * 0.7 + db * db * 0.35;
+        if (d < bd) { bd = d; best = p; }
+      }
+      var i = ((r << 10) | (g << 5) | b) * 3, c2 = PALETTE[best];
+      LUT[i] = c2[0]; LUT[i + 1] = c2[1]; LUT[i + 2] = c2[2];
+    }
+  })();
+  var BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+
+  // --- buffers ---------------------------------------------------------------
+
+  var film = document.createElement("canvas");
+  film.width = W; film.height = H;
+  var fctx = film.getContext("2d");
+  var frame = fctx.createImageData(W, H);
+  var px = frame.data;
+  var zbuf = new Float32Array(W * H);
+
+  var stage = document.getElementById("isk-stage");
+  var sctx = stage.getContext("2d");
+
+  // --- weather ---------------------------------------------------------------
+
+  var FOG = [198, 206, 204];
+  var FOGD = 0.0092;
+  var FOGLUT = new Float32Array(1024);
+  for (var i = 0; i < 1024; i++) FOGLUT[i] = 1 - Math.exp(-(i * 0.45) * FOGD);
+  function fogAt(d) { var i = d * 2.2222; return i >= 1023 ? 1 : FOGLUT[i | 0]; }
+
+  var SUN = (function () { var v = [-0.30, 0.20, -0.93], l = Math.hypot(v[0], v[1], v[2]); return [v[0] / l, v[1] / l, v[2] / l]; })();
+  var LX = -0.34, LY = 0.78, LZ = -0.52;   // the light, such as it is
+
+  // --- camera ----------------------------------------------------------------
+
+  var camPos = [0, 0, 0], camF = [0, 0, -1], camR = [1, 0, 0], camU = [0, 1, 0];
+  var WALK_A = 11.0, WALK_B = -27.6;
+  var FOV = 40 * Math.PI / 180, tanH = Math.tan(FOV / 2), aspect = W / H;
+
+  function setCamera(t) {
+    var u = t / DURATION;
+    // the whole loop is one walk: thirty-eight metres of boards, easing away
+    // from a standstill and easing back into one at the far end
+    var s = u * u * (3 - 2 * u);
+    var spd = 4 * u * (1 - u);                          // 0 at both ends, 1 at mid
+    var z = WALK_A + (WALK_B - WALK_A) * s;
+    var gait = ((WALK_A - z) / 0.72) * TAU;             // bob tied to distance, not clock
+    // No lateral sway and no stride-rate terms. Real walking rolls you side to
+    // side once per stride, but the viewer's inner ear is not walking, so that
+    // roll arrives as nothing but eye strain. What is left is a dolly with a
+    // small vertical pulse on each footfall.
+    camPos[0] = -0.06 + 0.030 * Math.sin(u * TAU);
+    camPos[1] = 2.92 + spd * 0.018 * Math.sin(gait);
+    camPos[2] = z;
+    // one slow glance left as the boat comes abeam, spread over fifteen metres
+    var glance = -0.10 * Math.exp(-Math.pow((z - BOAT_Z) / 7.5, 2));
+    var yaw = -0.02 + 0.006 * Math.sin(u * TAU) + glance;
+    var pitch = -0.058 + spd * 0.0025 * Math.sin(gait);
+    var cp = Math.cos(pitch);
+    camF[0] = Math.sin(yaw) * cp; camF[1] = Math.sin(pitch); camF[2] = -Math.cos(yaw) * cp;
+    camR[0] = Math.cos(yaw); camR[1] = 0; camR[2] = Math.sin(yaw);
+    camU[0] = camR[1] * camF[2] - camR[2] * camF[1];
+    camU[1] = camR[2] * camF[0] - camR[0] * camF[2];
+    camU[2] = camR[0] * camF[1] - camR[1] * camF[0];
+    var l = Math.hypot(camU[0], camU[1], camU[2]);
+    camU[0] /= l; camU[1] /= l; camU[2] /= l;
+  }
+
+  // --- sky -------------------------------------------------------------------
+
+  var ZEN = [124, 145, 155], HAZE = [209, 215, 210];
+  function skyInto(dx, dy, dz, out, detail) {
+    var k = dy * 2.7; k = k < 0 ? 0 : (k > 1 ? 1 : k);
+    var e = k * k * (3 - 2 * k);
+    var r = HAZE[0] + (ZEN[0] - HAZE[0]) * e;
+    var g = HAZE[1] + (ZEN[1] - HAZE[1]) * e;
+    var b = HAZE[2] + (ZEN[2] - HAZE[2]) * e;
+    var s = dx * SUN[0] + dy * SUN[1] + dz * SUN[2];
+    if (s > 0) {
+      var s2 = s * s, s4 = s2 * s2, s8 = s4 * s4;
+      var glow = s8 * s4 * 46 + s2 * s2 * 9;
+      r += glow; g += glow * 0.97; b += glow * 0.86;
+    }
+    if (detail) {
+      // cloud is not drawn here so much as implied: two soft horizontal bands
+      var band = Math.sin(dy * 17 - 0.6) * Math.sin(dx * 4.1 + 1.3) * 0.5 + 0.5;
+      var amt = (1 - e) * band * 7;
+      r -= amt * 0.5; g -= amt * 0.3; b -= amt * 0.1;
+    }
+    out[0] = r; out[1] = g; out[2] = b;
+  }
+
+  // --- the sea ---------------------------------------------------------------
+  // Not geometry. For every pixel under the horizon we drop a ray onto y=0 and
+  // ask the swell what it is doing there. The swell is a sum of sines whose
+  // periods all divide the loop, so second 30 is second 0 exactly.
+
+  var WAVES = [
+    // dirx, dirz, freq, amp, cycles-per-loop
+    [0.94, 0.34, 0.55, 0.142, 3],
+    [-0.62, 0.78, 0.93, 0.078, 5],
+    [0.31, 0.95, 2.10, 0.034, 8],
+    [-0.88, 0.47, 3.70, 0.017, 13]
+  ];
+
+  var _sk = [0, 0, 0], _sk2 = [0, 0, 0];
+
+  function drawSkyAndSea(t) {
+    var u = t / DURATION;
+    var ph = [];
+    for (var w = 0; w < WAVES.length; w++) ph.push(TAU * WAVES[w][4] * u);
+
+    var invW = 1 / W, invH = 1 / H;
+    for (var y = 0; y < H; y++) {
+      var ndcy = 1 - ((y + 0.5) * invH) * 2;
+      var uy = ndcy * tanH;
+      for (var x = 0; x < W; x++) {
+        var ndcx = ((x + 0.5) * invW) * 2 - 1;
+        var ux = ndcx * tanH * aspect;
+        var dx = camR[0] * ux + camU[0] * uy + camF[0];
+        var dy = camR[1] * ux + camU[1] * uy + camF[1];
+        var dz = camR[2] * ux + camU[2] * uy + camF[2];
+        var il = 1 / Math.hypot(dx, dy, dz);
+        dx *= il; dy *= il; dz *= il;
+
+        var i = y * W + x, o = i * 4, r, g, b, depth;
+
+        if (dy > -0.0012) {
+          skyInto(dx, dy, dz, _sk, true);
+          r = _sk[0]; g = _sk[1]; b = _sk[2];
+          depth = 1e7;
+        } else {
+          var tt = -camPos[1] / dy;
+          depth = tt * (dx * camF[0] + dy * camF[1] + dz * camF[2]);
+          if (tt > 1400) {
+            skyInto(dx, 0.0006, dz, _sk, true);
+            r = _sk[0]; g = _sk[1]; b = _sk[2];
+            depth = 1e7;
+          } else {
+            var wx = camPos[0] + dx * tt, wz = camPos[2] + dz * tt;
+            var fade = tt > 130 ? 0 : (tt > 45 ? 1 - (tt - 45) / 85 : 1);
+            var hh = 0, gx = 0, gz = 0, n = fade > 0.02 ? 4 : 2;
+            for (var k = 0; k < n; k++) {
+              var wv = WAVES[k];
+              var a = wv[3] * (k >= 2 ? fade : 1);
+              if (a < 0.0006) continue;
+              var p = (wx * wv[0] + wz * wv[1]) * wv[2] + ph[k];
+              hh += a * Math.sin(p);
+              var ca = a * wv[2] * Math.cos(p);
+              gx += ca * wv[0]; gz += ca * wv[1];
+            }
+            var nl = 1 / Math.hypot(-gx, 1, -gz);
+            var nx = -gx * nl, ny = nl, nz = -gz * nl;
+
+            var dn = dx * nx + dy * ny + dz * nz;
+            var rx = dx - 2 * dn * nx, ry = dy - 2 * dn * ny, rz = dz - 2 * dn * nz;
+            skyInto(rx, ry > 0 ? ry : 0, rz, _sk2, false);
+
+            var fres = 1 + dn;                       // dn is negative looking down
+            fres = fres * fres; fres = 0.05 + 0.95 * fres * fres;
+            if (fres > 1) fres = 1;
+
+            var lift = 0.5 + hh * 3.0;               // crests catch the sky
+            var deep = 44 + lift * 9;
+            r = deep * 0.66 + _sk2[0] * fres;
+            g = deep * 0.86 + _sk2[1] * fres;
+            b = deep * 0.92 + _sk2[2] * fres;
+            r *= (1 - fres * 0.62); g *= (1 - fres * 0.62); b *= (1 - fres * 0.62);
+
+            var sp = rx * SUN[0] + ry * SUN[1] + rz * SUN[2];
+            if (sp > 0.9) { var q = (sp - 0.9) * 10; q = q * q * 44; r += q; g += q; b += q * 0.95; }
+
+            // the swell breaks along the piles, and only there
+            var ax = wx < 0 ? -wx : wx;
+            if (ax > 1.28 && ax < 2.24 && wz > -31 && wz < 15 && hh > 0.012) {
+              var f = (hh - 0.012) * 9; if (f > 1) f = 1;
+              f *= 1 - Math.abs(ax - 1.76) * 2.1;
+              if (f > 0) { r += (238 - r) * f * 0.8; g += (243 - g) * f * 0.8; b += (238 - b) * f * 0.8; }
+            }
+          }
+        }
+
+        var fg = depth > 1e6 ? 0 : fogAt(depth);
+        if (fg > 0) { r += (FOG[0] - r) * fg; g += (FOG[1] - g) * fg; b += (FOG[2] - b) * fg; }
+        px[o] = r; px[o + 1] = g; px[o + 2] = b; px[o + 3] = 255;
+        zbuf[i] = depth;
+      }
+    }
+  }
+
+  // --- rasteriser ------------------------------------------------------------
+  // Convex polygons, near-plane clip, 1/z interpolation, z-buffer. Flat shaded:
+  // at this resolution a face is a handful of pixels and wants one colour.
+
+  var NEAR = 0.08;
+  var vBuf = new Float64Array(30), cBuf = new Float64Array(30);
+  var sxA = new Float64Array(10), syA = new Float64Array(10), swA = new Float64Array(10);
+
+  function drawPoly(pts, np, r, g, b) {
+    var i, n = 0;
+    for (i = 0; i < np; i++) {
+      var ox = pts[i * 3] - camPos[0], oy = pts[i * 3 + 1] - camPos[1], oz = pts[i * 3 + 2] - camPos[2];
+      vBuf[n++] = ox * camR[0] + oy * camR[1] + oz * camR[2];
+      vBuf[n++] = ox * camU[0] + oy * camU[1] + oz * camU[2];
+      vBuf[n++] = -(ox * camF[0] + oy * camF[1] + oz * camF[2]);
+    }
+    // clip to z <= -NEAR
+    var m = 0, cnt = np;
+    for (i = 0; i < cnt; i++) {
+      var j = (i + 1) % cnt;
+      var az = vBuf[i * 3 + 2], bz = vBuf[j * 3 + 2];
+      var ain = az <= -NEAR, bin = bz <= -NEAR;
+      if (ain) { cBuf[m++] = vBuf[i * 3]; cBuf[m++] = vBuf[i * 3 + 1]; cBuf[m++] = az; }
+      if (ain !== bin) {
+        var s = (-NEAR - az) / (bz - az);
+        cBuf[m++] = vBuf[i * 3] + (vBuf[j * 3] - vBuf[i * 3]) * s;
+        cBuf[m++] = vBuf[i * 3 + 1] + (vBuf[j * 3 + 1] - vBuf[i * 3 + 1]) * s;
+        cBuf[m++] = -NEAR;
+      }
+    }
+    var nc = m / 3;
+    if (nc < 3) return;
+    for (i = 0; i < nc; i++) {
+      var vz = cBuf[i * 3 + 2], iw = -1 / vz;
+      sxA[i] = (((cBuf[i * 3] * iw) / (tanH * aspect)) * 0.5 + 0.5) * W;
+      syA[i] = (0.5 - ((cBuf[i * 3 + 1] * iw) / tanH) * 0.5) * H;
+      swA[i] = iw;
+    }
+    for (i = 1; i < nc - 1; i++) tri(sxA[0], syA[0], swA[0], sxA[i], syA[i], swA[i], sxA[i + 1], syA[i + 1], swA[i + 1], r, g, b);
+  }
+
+  function tri(x0, y0, w0, x1, y1, w1, x2, y2, w2, r, g, b) {
+    var area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
+    if (area > -1e-9 && area < 1e-9) return;
+    var inv = 1 / area;
+    var minX = Math.floor(Math.min(x0, x1, x2)), maxX = Math.ceil(Math.max(x0, x1, x2));
+    var minY = Math.floor(Math.min(y0, y1, y2)), maxY = Math.ceil(Math.max(y0, y1, y2));
+    if (minX < 0) minX = 0; if (minY < 0) minY = 0;
+    if (maxX > W - 1) maxX = W - 1; if (maxY > H - 1) maxY = H - 1;
+    if (minX > maxX || minY > maxY) return;
+
+    for (var y = minY; y <= maxY; y++) {
+      var pyc = y + 0.5, row = y * W;
+      for (var x = minX; x <= maxX; x++) {
+        var pxc = x + 0.5;
+        var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
+        if (l0 < 0) continue;
+        var l1 = ((x2 - pxc) * (y0 - pyc) - (x0 - pxc) * (y2 - pyc)) * inv;
+        if (l1 < 0) continue;
+        var l2 = 1 - l0 - l1;
+        if (l2 < 0) continue;
+        var w = w0 * l0 + w1 * l1 + w2 * l2;
+        if (w <= 0) continue;
+        var d = 1 / w, idx = row + x;
+        if (d >= zbuf[idx]) continue;
+        zbuf[idx] = d;
+        var fg = fogAt(d), o = idx * 4;
+        px[o] = r + (FOG[0] - r) * fg;
+        px[o + 1] = g + (FOG[1] - g) * fg;
+        px[o + 2] = b + (FOG[2] - b) * fg;
+      }
+    }
+  }
+
+  // --- geometry buffers ------------------------------------------------------
+
+  function Mesh() { this.p = []; this.c = []; }
+  Mesh.prototype.quad = function (ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz, r, g, b) {
+    this.p.push(ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz);
+    this.c.push(r, g, b);
+  };
+  Mesh.prototype.clear = function () { this.p.length = 0; this.c.length = 0; };
+
+  var _pt = new Float64Array(12);
+  function drawMesh(m) {
+    var p = m.p, c = m.c, q = c.length / 3;
+    for (var i = 0; i < q; i++) {
+      var b = i * 12;
+      for (var k = 0; k < 12; k++) _pt[k] = p[b + k];
+      drawPoly(_pt, 4, c[i * 3], c[i * 3 + 1], c[i * 3 + 2]);
+    }
+  }
+
+  function lit(base, nx, ny, nz, jit) {
+    var lam = nx * LX + ny * LY + nz * LZ; if (lam < 0) lam = 0;
+    var k = 0.42 + 0.20 * (ny > 0 ? ny : 0) + 0.52 * lam + (jit || 0);
+    return [base[0] * k, base[1] * k, base[2] * k];
+  }
+
+  // an axis-aligned block, five faces - nothing here is ever seen from below
+  function block(m, x0, y0, z0, x1, y1, z1, base, jit) {
+    var c;
+    c = lit(base, 0, 1, 0, jit); m.quad(x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1, c[0], c[1], c[2]);
+    c = lit(base, 0, 0, 1, jit); m.quad(x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1, c[0], c[1], c[2]);
+    c = lit(base, 0, 0, -1, jit); m.quad(x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, z0, c[0], c[1], c[2]);
+    c = lit(base, -1, 0, 0, jit); m.quad(x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0, c[0], c[1], c[2]);
+    c = lit(base, 1, 0, 0, jit); m.quad(x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1, c[0], c[1], c[2]);
+  }
+
+  // a landmass, built as a row of columns following a hump: at this distance
+  // the fog turns the steps back into a single soft silhouette
+  function ridge(m, cx, z0, z1, halfW, peak, base, seed, steps) {
+    for (var i = 0; i < steps; i++) {
+      var a = (i + 0.5) / steps;
+      var x0 = cx - halfW + (i / steps) * halfW * 2;
+      var x1 = cx - halfW + ((i + 1) / steps) * halfW * 2;
+      var n = Math.sin((i + seed) * 12.9898) * 43758.5453; n = n - Math.floor(n);
+      var h = peak * (0.30 + 0.70 * Math.pow(Math.sin(a * Math.PI), 0.70)) * (0.80 + 0.40 * n);
+      block(m, x0, -1, z0, x1 + 0.02, h, z1, base, 0);
+    }
+  }
+
+  // --- the pier --------------------------------------------------------------
+
+  var WOOD = [103, 85, 65], WOOD_D = [76, 62, 46], WOOD_W = [56, 46, 36];
+  var WEED = [62, 78, 56], IRON = [58, 64, 64];
+  var ROPE = [150, 140, 112], RED = [158, 70, 54], HULL = [131, 116, 92];
+
+  var world = new Mesh();
+  var Z_FAR = -31, Z_NEAR = 15, HALF = 1.78;
+
+  (function buildPier() {
+    var m = world, z, i;
+
+    // deck boards, laid across the walk; each one weathers a little differently
+    var pitch = 0.345, bw = 0.305;
+    var n = Math.round((Z_NEAR - Z_FAR) / pitch);
+    for (i = 0; i < n; i++) {
+      z = Z_FAR + i * pitch;
+      var s = Math.sin(i * 12.9898) * 43758.5453; s = s - Math.floor(s);
+      var wet = z < -20 ? 0.62 : (z < -12 ? 0.80 : 1);          // the far end never dries
+      var base = [WOOD[0] * wet, WOOD[1] * wet, WOOD[2] * wet];
+      var jit = (s - 0.5) * 0.10;
+      var c = lit(base, 0, 1, 0, jit);
+      m.quad(-HALF, DECK_Y, z, HALF, DECK_Y, z, HALF, DECK_Y, z + bw, -HALF, DECK_Y, z + bw, c[0], c[1], c[2]);
+      var c2 = lit(base, 0, 0, 1, jit - 0.06);
+      m.quad(-HALF, DECK_Y - 0.075, z + bw, HALF, DECK_Y - 0.075, z + bw, HALF, DECK_Y, z + bw, -HALF, DECK_Y, z + bw, c2[0], c2[1], c2[2]);
+    }
+
+    // the frame under it
+    block(m, -HALF, 1.03, Z_FAR, -HALF + 0.17, DECK_Y - 0.075, Z_NEAR, WOOD_D, 0);
+    block(m, HALF - 0.17, 1.03, Z_FAR, HALF, DECK_Y - 0.075, Z_NEAR, WOOD_D, 0);
+
+    // piles, in pairs, going down into the water with weed at the tideline
+    for (z = Z_NEAR - 1.2; z > Z_FAR; z -= 3.15) {
+      for (var sgn = -1; sgn <= 1; sgn += 2) {
+        var cx = sgn * (HALF - 0.11);
+        block(m, cx - 0.125, -1.1, z - 0.125, cx + 0.125, 1.06, z + 0.125, WOOD_W, 0.02);
+        block(m, cx - 0.155, -0.10, z - 0.155, cx + 0.155, 0.34, z + 0.155, WEED, 0);
+      }
+      block(m, -HALF, 0.92, z - 0.10, HALF, 1.06, z + 0.10, WOOD_W, 0);
+    }
+
+    // handrail down the landward side only; the sea side stays open
+    for (z = Z_NEAR - 1.2; z > Z_FAR + 1; z -= 1.7) {
+      block(m, HALF - 0.20, DECK_Y, z - 0.05, HALF - 0.06, DECK_Y + 0.92, z + 0.05, WOOD_D, 0.02);
+    }
+    block(m, HALF - 0.21, DECK_Y + 0.80, Z_FAR + 1, HALF - 0.05, DECK_Y + 0.92, Z_NEAR - 1.1, WOOD, 0);
+    block(m, HALF - 0.19, DECK_Y + 0.44, Z_FAR + 1, HALF - 0.07, DECK_Y + 0.53, Z_NEAR - 1.1, WOOD_D, 0);
+
+    // a bollard, a crate, a bucket, a net drying on the rail
+    block(m, -1.32, DECK_Y, -7.9, -1.04, DECK_Y + 0.52, -7.62, WOOD_W, 0.03);
+    block(m, -1.36, DECK_Y + 0.46, -7.94, -1.00, DECK_Y + 0.56, -7.58, WOOD_D, 0);
+    block(m, -1.42, DECK_Y, -4.5, -0.86, DECK_Y + 0.44, -3.94, WOOD_D, 0.04);
+    block(m, -1.38, DECK_Y + 0.40, -4.46, -0.90, DECK_Y + 0.46, -3.98, WOOD, 0);
+    block(m, 0.62, DECK_Y, -2.1, 0.88, DECK_Y + 0.30, -1.84, IRON, 0.05);
+    block(m, HALF - 0.30, DECK_Y + 0.18, -10.6, HALF - 0.06, DECK_Y + 0.86, -9.1, ROPE, -0.06);
+
+    // the end of the boards: a toe board, two corner posts, one rail across
+    block(m, -HALF, DECK_Y, Z_FAR, HALF, DECK_Y + 0.13, Z_FAR + 0.15, WOOD_D, -0.03);
+    block(m, -HALF + 0.03, DECK_Y, Z_FAR + 0.03, -HALF + 0.19, DECK_Y + 0.96, Z_FAR + 0.19, WOOD_D, 0.02);
+    block(m, HALF - 0.19, DECK_Y, Z_FAR + 0.03, HALF - 0.03, DECK_Y + 0.96, Z_FAR + 0.19, WOOD_D, 0.02);
+    block(m, -HALF + 0.03, DECK_Y + 0.83, Z_FAR + 0.06, HALF - 0.03, DECK_Y + 0.95, Z_FAR + 0.16, WOOD, 0);
+
+    // stakes out in the water - net markers, the way this coast marks anything
+    var stakes = [[-4.6, -9.2, 1.05], [-5.9, -15.4, 0.86], [3.9, -18.6, 0.74], [-7.8, -23.0, 0.66], [5.4, -26.5, 0.58]];
+    for (i = 0; i < stakes.length; i++) {
+      var s3 = stakes[i];
+      block(m, s3[0] - 0.055, -0.5, s3[1] - 0.055, s3[0] + 0.055, s3[2], s3[1] + 0.055, WOOD_W, 0);
+    }
+
+    // the island, and behind it the coast: both are only silhouettes at this hour
+    ridge(m, -46, -302, -296, 21, 15.5, [43, 55, 61], 3.1, 13);
+    ridge(m, 118, -432, -424, 112, 21, [55, 67, 73], 7.7, 15);
+    ridge(m, -196, -472, -464, 96, 16, [55, 67, 73], 5.3, 13);
+  })();
+
+  // --- the boat --------------------------------------------------------------
+  // Moored off the sea side, riding the same swell the water is riding.
+
+  var boat = new Mesh();
+
+  function buildBoat(t) {
+    boat.clear();
+    var u = t / DURATION;
+    var roll = 0.085 * Math.sin(u * TAU * 5 + 0.9) + 0.035 * Math.sin(u * TAU * 8);
+    var pitch = 0.045 * Math.sin(u * TAU * 3 + 2.1);
+    var bob = 0.085 * Math.sin(u * TAU * 5 + 0.4) + 0.03 * Math.sin(u * TAU * 8 + 1.7);
+    var yaw = 0.30 + 0.035 * Math.sin(u * TAU * 2 + 0.2);
+    var sr = Math.sin(roll), cr = Math.cos(roll);
+    var sp = Math.sin(pitch), cp = Math.cos(pitch);
+    var sy = Math.sin(yaw), cy = Math.cos(yaw);
+
+    function put(x, y, z, o, k) {
+      var y1 = y * cp - z * sp, z1 = y * sp + z * cp;
+      var x2 = x * cr - y1 * sr, y2 = x * sr + y1 * cr;
+      o[k] = BOAT_X + x2 * cy + z1 * sy;
+      o[k + 1] = 0.02 + bob + y2;
+      o[k + 2] = BOAT_Z - x2 * sy + z1 * cy;
+    }
+    var q = new Float64Array(12);
+    function face(pts, base, nx, ny, nz, jit) {
+      for (var i = 0; i < 4; i++) put(pts[i * 3], pts[i * 3 + 1], pts[i * 3 + 2], q, i * 3);
+      var c = lit(base, nx, ny, nz, jit);
+      boat.quad(q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8], q[9], q[10], q[11], c[0], c[1], c[2]);
+    }
+
+    var L = 1.68, Bw = 0.46, D = 0.36;   // half-length, half-beam, depth
+    // sides, tapered to a point at each end
+    face([-Bw, -D, -L * 0.62, -Bw, 0.06, -L * 0.72, -Bw * 0.18, 0.10, -L, -Bw * 0.10, -D * 0.55, -L * 0.88], HULL, -1, 0.1, 0, 0);
+    face([Bw, -D, -L * 0.62, Bw * 0.10, -D * 0.55, -L * 0.88, Bw * 0.18, 0.10, -L, Bw, 0.06, -L * 0.72], HULL, 1, 0.1, 0, -0.05);
+    face([-Bw, -D, L * 0.78, -Bw, 0.06, L * 0.80, -Bw, 0.06, -L * 0.72, -Bw, -D, -L * 0.62], HULL, -1, 0, 0, 0.02);
+    face([Bw, -D, L * 0.78, Bw, -D, -L * 0.62, Bw, 0.06, -L * 0.72, Bw, 0.06, L * 0.80], HULL, 1, 0, 0, -0.05);
+    // transom, bottom, and the shadow pooled inside her
+    face([-Bw, -D, L * 0.78, Bw, -D, L * 0.78, Bw, 0.06, L * 0.80, -Bw, 0.06, L * 0.80], HULL, 0, 0.1, 1, -0.02);
+    face([-Bw, -D, -L * 0.62, -Bw * 0.10, -D * 0.55, -L * 0.88, Bw * 0.10, -D * 0.55, -L * 0.88, Bw, -D, -L * 0.62], HULL, 0, -0.3, -1, -0.08);
+    face([-Bw * 0.86, -0.02, L * 0.72, Bw * 0.86, -0.02, L * 0.72, Bw * 0.86, -0.02, -L * 0.70, -Bw * 0.86, -0.02, -L * 0.70], [46, 41, 34], 0, 1, 0, 0);
+    // the red band along her gunwale - the only warm thing for a kilometre
+    face([-Bw - 0.012, 0.00, L * 0.79, -Bw - 0.012, 0.06, L * 0.80, -Bw * 0.18 - 0.01, 0.10, -L, -Bw * 0.14, 0.03, -L * 0.98], RED, -1, 0.2, 0, 0);
+    face([Bw + 0.012, 0.00, L * 0.79, Bw * 0.14, 0.03, -L * 0.98, Bw * 0.18 + 0.01, 0.10, -L, Bw + 0.012, 0.06, L * 0.80], RED, 1, 0.2, 0, -0.06);
+    // two thwarts and an oar left across them
+    face([-Bw * 0.9, 0.02, 0.12, Bw * 0.9, 0.02, 0.12, Bw * 0.9, 0.02, -0.04, -Bw * 0.9, 0.02, -0.04], WOOD, 0, 1, 0, 0);
+    face([-Bw * 0.9, 0.02, -0.92, Bw * 0.9, 0.02, -0.92, Bw * 0.9, 0.02, -1.08, -Bw * 0.9, 0.02, -1.08], WOOD, 0, 1, 0, -0.03);
+    face([-0.30, 0.06, 0.16, -0.22, 0.06, 0.16, -0.16, 0.06, -1.24, -0.24, 0.06, -1.24], WOOD_D, 0, 1, 0, 0.04);
+  }
+
+  // A Black Sea taka, moored off the sea side: seven metres, a wheelhouse aft,
+  // and a mast that clears the pier by two metres - the one thing out here tall
+  // enough to hold its shape in the fog from any distance.
+
+  var HULL2 = [171, 175, 166], CABIN = [156, 160, 151], GLASS = [44, 54, 56], TAR = [38, 42, 42];
+
+  function buildTaka(t) {
+    var u = t / DURATION;
+    var roll = 0.030 * Math.sin(u * TAU * 3 + 1.7) + 0.012 * Math.sin(u * TAU * 5 + 0.3);
+    var pit = 0.016 * Math.sin(u * TAU * 2 + 0.6);
+    var bob = 0.055 * Math.sin(u * TAU * 3 + 1.2);
+    var yaw = 0.035;
+    var sr = Math.sin(roll), cr = Math.cos(roll);
+    var sp = Math.sin(pit), cp = Math.cos(pit);
+    var sy = Math.sin(yaw), cy = Math.cos(yaw);
+
+    function put(x, y, z, o, k) {
+      var y1 = y * cp - z * sp, z1 = y * sp + z * cp;
+      var x2 = x * cr - y1 * sr, y2 = x * sr + y1 * cr;
+      o[k] = TAKA_X + x2 * cy + z1 * sy;
+      o[k + 1] = bob + y2;
+      o[k + 2] = TAKA_Z - x2 * sy + z1 * cy;
+    }
+    var q = new Float64Array(12);
+    function face(v, base, nx, ny, nz, jit) {
+      for (var i = 0; i < 4; i++) put(v[i * 3], v[i * 3 + 1], v[i * 3 + 2], q, i * 3);
+      var c = lit(base, nx, ny, nz, jit);
+      boat.quad(q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8], q[9], q[10], q[11], c[0], c[1], c[2]);
+    }
+    function box(x0, y0, z0, x1, y1, z1, base, jit) {
+      face([x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1], base, 0, 1, 0, jit);
+      face([x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1], base, 0, 0, 1, jit);
+      face([x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, z0], base, 0, 0, -1, jit);
+      face([x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0], base, -1, 0, 0, jit);
+      face([x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1], base, 1, 0, 0, jit);
+    }
+
+    var L = 3.5, B = 1.02, D = 0.66, F = 0.62;   // half-length, half-beam, draught, freeboard
+    // the sheer lifts toward a raised bow, the way these are built
+    face([-B, -D, L * 0.92, -B, F, L * 0.92, -B * 0.22, F + 0.42, -L, -B * 0.16, -D * 0.5, -L], HULL2, -1, 0.12, 0, 0.02);
+    face([B, -D, L * 0.92, B * 0.16, -D * 0.5, -L, B * 0.22, F + 0.42, -L, B, F, L * 0.92], HULL2, 1, 0.12, 0, -0.07);
+    face([-B, -D, L * 0.92, B, -D, L * 0.92, B, F, L * 0.92, -B, F, L * 0.92], HULL2, 0, 0.1, 1, -0.03);
+    face([-B, -D, L * 0.92, -B * 0.16, -D * 0.5, -L, B * 0.16, -D * 0.5, -L, B, -D, L * 0.92], TAR, 0, -0.4, -0.9, -0.05);
+    face([-B * 0.92, F - 0.05, L * 0.86, B * 0.92, F - 0.05, L * 0.86, B * 0.2, F + 0.36, -L * 0.96, -B * 0.2, F + 0.36, -L * 0.96], WOOD_D, 0, 1, 0, 0);
+    // the red band along the sheer, and tar at the waterline
+    face([-B - 0.015, F - 0.27, L * 0.93, -B - 0.015, F, L * 0.93, -B * 0.22 - 0.01, F + 0.42, -L, -B * 0.20, F + 0.16, -L], RED, -1, 0.2, 0, 0);
+    face([B + 0.015, F - 0.27, L * 0.93, B * 0.20, F + 0.16, -L, B * 0.22 + 0.01, F + 0.42, -L, B + 0.015, F, L * 0.93], RED, 1, 0.2, 0, -0.07);
+    face([-B - 0.012, -0.10, L * 0.93, -B - 0.012, 0.07, L * 0.93, -B * 0.18, 0.11, -L * 0.99, -B * 0.17, -0.05, -L * 0.99], TAR, -1, 0, 0, 0);
+    face([B + 0.012, -0.10, L * 0.93, B * 0.17, -0.05, -L * 0.99, B * 0.18, 0.11, -L * 0.99, B + 0.012, 0.07, L * 0.93], TAR, 1, 0, 0, -0.06);
+    // wheelhouse aft, its windows, the roof
+    box(-0.72, F - 0.04, 0.58, 0.72, F + 1.16, 2.16, CABIN, 0);
+    box(-0.74, F + 0.52, 0.55, 0.74, F + 0.86, 0.61, GLASS, 0);
+    box(-0.77, F + 0.52, 0.72, -0.71, F + 0.86, 2.02, GLASS, 0);
+    box(0.71, F + 0.52, 0.72, 0.77, F + 0.86, 2.02, GLASS, 0);
+    box(-0.80, F + 1.16, 0.52, 0.80, F + 1.27, 2.22, CABIN, -0.07);
+    // mast and a short derrick swung aft
+    box(-0.06, F + 0.30, -0.62, 0.06, F + 3.05, -0.50, WOOD_D, 0.03);
+    box(-0.035, F + 2.28, -0.60, 0.035, F + 2.36, 0.52, WOOD_D, -0.02);
+    // fenders down the pier side
+    box(B - 0.02, F - 0.36, -0.95, B + 0.15, F - 0.02, -0.78, TAR, 0);
+    box(B - 0.02, F - 0.36, 0.18, B + 0.15, F - 0.02, 0.35, TAR, 0);
+  }
+
+  // the mooring lines, hung from the bollard, drawn as a chain of short billets
+  var rope = new Mesh();
+  function buildRope(t) {
+    rope.clear();
+    var u = t / DURATION;
+    var ax = -1.18, ay = DECK_Y + 0.50, az = -7.76;
+    var bx = BOAT_X + 0.34, by = 0.30 + 0.085 * Math.sin(u * TAU * 5 + 0.4), bz = BOAT_Z - 1.15;
+    var sag = 1.15 + 0.10 * Math.sin(u * TAU * 3);
+    hang(ax, ay, az, bx, by, bz, sag);
+    // and the taka's bow line, up to the pile abreast of her
+    hang(TAKA_X + 0.30, 1.02 + 0.055 * Math.sin(u * TAU * 3 + 1.2), TAKA_Z - 3.3,
+         -1.67, 1.14, TAKA_Z - 4.6, 0.42);
+  }
+
+  function hang(ax, ay, az, bx, by, bz, sag) {
+    var N = 11, prev = null, w = 0.028;
+    for (var i = 0; i <= N; i++) {
+      var k = i / N;
+      var x = ax + (bx - ax) * k, y = ay + (by - ay) * k - Math.sin(k * Math.PI) * sag, z = az + (bz - az) * k;
+      if (prev) {
+        var c = lit(ROPE, 0, 1, 0, -0.05);
+        rope.quad(prev[0] - w, prev[1], prev[2], x - w, y, z, x + w, y, z, prev[0] + w, prev[1], prev[2], c[0], c[1], c[2]);
+        var c2 = lit(ROPE, 0, 0, 1, -0.12);
+        rope.quad(prev[0], prev[1] - w, prev[2], x, y - w, z, x, y + w, z, prev[0], prev[1] + w, prev[2], c2[0], c2[1], c2[2]);
+      }
+      prev = [x, y, z];
+    }
+  }
+
+  // --- birds -----------------------------------------------------------------
+
+  var GULL_A = ["..X.....X..", ".XX.....XX.", "X..XX.XX..X", "....XXX...."];
+  var GULL_B = ["...........", "XX.......XX", "..XX...XX..", "....XXX...."];
+  var PERCH = [".XX.", "XXXX", "XXXX", ".XX."];
+
+  function sprite(rows, wx, wy, wz, scale, r, g, b) {
+    var ox = wx - camPos[0], oy = wy - camPos[1], oz = wz - camPos[2];
+    var vz = -(ox * camF[0] + oy * camF[1] + oz * camF[2]);
+    if (vz > -0.4) return;
+    var vx = ox * camR[0] + oy * camR[1] + oz * camR[2];
+    var vy = ox * camU[0] + oy * camU[1] + oz * camU[2];
+    var iw = -1 / vz, d = -vz;
+    var sx = (((vx * iw) / (tanH * aspect)) * 0.5 + 0.5) * W;
+    var sy = (0.5 - ((vy * iw) / tanH) * 0.5) * H;
+    var hgt = rows.length, wid = rows[0].length;
+    var fg = fogAt(d);
+    var rr = r + (FOG[0] - r) * fg, gg = g + (FOG[1] - g) * fg, bb = b + (FOG[2] - b) * fg;
+    var x0 = Math.round(sx - wid * scale / 2), y0 = Math.round(sy - hgt * scale / 2);
+    for (var j = 0; j < hgt; j++) for (var i = 0; i < wid; i++) {
+      if (rows[j].charAt(i) !== "X") continue;
+      for (var a = 0; a < scale; a++) for (var bqq = 0; bqq < scale; bqq++) {
+        var X = x0 + i * scale + a, Y = y0 + j * scale + bqq;
+        if (X < 0 || Y < 0 || X >= W || Y >= H) continue;
+        var idx = Y * W + X;
+        if (d >= zbuf[idx]) continue;
+        zbuf[idx] = d;
+        var o = idx * 4;
+        px[o] = rr; px[o + 1] = gg; px[o + 2] = bb;
+      }
+    }
+  }
+
+  function drawBirds(t) {
+    var u = t / DURATION;
+    // one crossing the middle distance, wings beating slowly
+    var k = (u * 2 + 0.15) % 1;
+    var gx = -16 + k * 30, gz = -21 + Math.sin(k * 3.1) * 2.4;
+    var gy = 3.4 + Math.sin(k * TAU * 2) * 0.55;
+    sprite((Math.floor(t * 4.5) % 2) ? GULL_A : GULL_B, gx, gy, gz, 1, 44, 50, 52);
+    // another, further out and higher, barely a mark on the sky
+    var k2 = (u * 1 + 0.62) % 1;
+    sprite((Math.floor(t * 3.6) % 2) ? GULL_A : GULL_B, 22 - k2 * 44, 7.1 + Math.sin(k2 * TAU) * 0.8, -58, 1, 92, 101, 104);
+    // and one sitting on the rail, minding the weather
+    // and one on the rail, which gives you about five metres before it leaves
+    var pz = -11.3, gap = camPos[2] - pz;
+    if (gap > 5.2) {
+      sprite(PERCH, HALF - 0.13, DECK_Y + 1.06, pz, 1, 226, 230, 226);
+    } else {
+      var f = (5.2 - gap) / 9; if (f > 1) f = 1;
+      sprite((Math.floor(t * 6.5) % 2) ? GULL_A : GULL_B,
+        HALF - 0.13 + f * 3.4, DECK_Y + 1.06 + f * 4.2, pz - f * 6.5, 1, 198, 205, 203);
+    }
+  }
+
+  // --- mist, grain, and the print ---------------------------------------------
+
+  function veil(t) {
+    var u = t / DURATION;
+    for (var y = 0; y < H; y++) {
+      for (var x = 0; x < W; x++) {
+        var i = y * W + x, d = zbuf[i];
+        if (d < 26) continue;
+        // banks of mist drifting across the middle distance
+        var band = Math.sin((x * 0.021) + u * TAU * 2) * Math.sin(y * 0.14 - 0.4);
+        var a = (band * 0.5 + 0.5);
+        a = a * a * 0.16 * Math.min(1, (d - 26) / 40);
+        if (a <= 0.002) continue;
+        var o = i * 4;
+        px[o] += (FOG[0] - px[o]) * a;
+        px[o + 1] += (FOG[1] - px[o + 1]) * a;
+        px[o + 2] += (FOG[2] - px[o + 2]) * a;
+      }
+    }
+  }
+
+  // Both ends of the walk fade into the weather, so the cut back to the first
+  // board happens inside a bank of fog with the camera already at a standstill.
+  function dissolve(t) {
+    var u = t / DURATION, F = 1.9 / DURATION, a = 0;
+    if (u < F) a = 1 - u / F; else if (u > 1 - F) a = (u - (1 - F)) / F;
+    if (a <= 0.002) return;
+    a = a * a * (3 - 2 * a);
+    for (var i = 0, o = 0; i < W * H; i++, o += 4) {
+      px[o] += (FOG[0] - px[o]) * a;
+      px[o + 1] += (FOG[1] - px[o + 1]) * a;
+      px[o + 2] += (FOG[2] - px[o + 2]) * a;
+    }
+  }
+
+  function print(fr) {
+    var cx = W * 0.5, cy = H * 0.5, rmax = Math.hypot(cx, cy);
+    for (var y = 0; y < H; y++) {
+      var by = (y & 3) * 4, dy2 = (y - cy) / rmax;
+      for (var x = 0; x < W; x++) {
+        var o = (y * W + x) * 4;
+        var dx2 = (x - cx) / rmax;
+        var v = 1 - (dx2 * dx2 + dy2 * dy2) * 0.30;
+        var n = ((x * 7 + y * 13 + fr * 29) % 17) * 0.30 - 2.4;
+        var dth = (BAYER[by + (x & 3)] - 7.5) * 1.45;
+        var r = px[o] * v + n + dth, g = px[o + 1] * v + n + dth, b = px[o + 2] * v + n + dth;
+        r = r < 0 ? 0 : (r > 255 ? 255 : r);
+        g = g < 0 ? 0 : (g > 255 ? 255 : g);
+        b = b < 0 ? 0 : (b > 255 ? 255 : b);
+        var li = ((((r | 0) >> 3) << 10) | (((g | 0) >> 3) << 5) | ((b | 0) >> 3)) * 3;
+        px[o] = LUT[li]; px[o + 1] = LUT[li + 1]; px[o + 2] = LUT[li + 2];
+      }
+    }
+  }
+
+  // --- one frame -------------------------------------------------------------
+
+  function render(fr) {
+    var t = (fr % FRAMES) / FPS;
+    setCamera(t);
+    drawSkyAndSea(t);
+    drawMesh(world);
+    buildBoat(t); buildTaka(t); drawMesh(boat);
+    buildRope(t); drawMesh(rope);
+    drawBirds(t);
+    veil(t);
+    dissolve(t);
+    print(fr);
+    fctx.putImageData(frame, 0, 0);
+    present();
+  }
+
+  function present() {
+    var host = stage.parentNode;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var cw = Math.max(64, host.clientWidth), ch = Math.max(64, host.clientHeight);
+    if (stage.width !== Math.floor(cw * dpr) || stage.height !== Math.floor(ch * dpr)) {
+      stage.width = Math.floor(cw * dpr); stage.height = Math.floor(ch * dpr);
+      stage.style.width = cw + "px"; stage.style.height = ch + "px";
+    }
+    var scale = Math.min(stage.width / W, stage.height / H);
+    var dw = Math.round(W * scale), dh = Math.round(H * scale);
+    sctx.imageSmoothingEnabled = false;
+    sctx.fillStyle = "#0d1214";
+    sctx.fillRect(0, 0, stage.width, stage.height);
+    sctx.drawImage(film, 0, 0, W, H, Math.round((stage.width - dw) / 2), Math.round((stage.height - dh) / 2), dw, dh);
+  }
+
+  // --- ambience ---------------------------------------------------------------
+  // No recordings. Filtered noise for the wash, a formant pair for the gulls,
+  // a resonant creak whenever the boat leans hardest.
+
+  var audio = null;
+  function startAudio() {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    var ctx = new AC();
+    var out = ctx.createGain(); out.gain.value = 0.0001; out.connect(ctx.destination);
+    var soft = ctx.createBiquadFilter(); soft.type = "lowpass"; soft.frequency.value = 3800; soft.connect(out);
+
+    var len = 4 * ctx.sampleRate;
+    var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    var ch = buf.getChannelData(0), last = 0;
+    for (var i = 0; i < len; i++) { var wn = Math.random() * 2 - 1; last = (last + 0.021 * wn) / 1.021; ch[i] = last * 3.4; }
+
+    function noise() { var s = ctx.createBufferSource(); s.buffer = buf; s.loop = true; s.start(); return s; }
+
+    // two overlapping swells, on periods that never quite line up
+    [[7.3, 520, 0.30], [5.1, 900, 0.20]].forEach(function (cfg) {
+      var src = noise();
+      var bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = cfg[1]; bp.Q.value = 0.7;
+      var g = ctx.createGain(); g.gain.value = 0.0001;
+      var lfo = ctx.createOscillator(); lfo.frequency.value = 1 / cfg[0];
+      var lg = ctx.createGain(); lg.gain.value = cfg[2] * 0.5;
+      lfo.connect(lg); lg.connect(g.gain); g.gain.value = cfg[2] * 0.5;
+      lfo.start();
+      src.connect(bp); bp.connect(g); g.connect(soft);
+    });
+
+    // wind off the water, almost subsonic
+    var wsrc = noise();
+    var wlp = ctx.createBiquadFilter(); wlp.type = "lowpass"; wlp.frequency.value = 190;
+    var wg = ctx.createGain(); wg.gain.value = 0.34;
+    wsrc.connect(wlp); wlp.connect(wg); wg.connect(soft);
+
+    function gull(when) {
+      for (var n = 0; n < 3; n++) {
+        var t0 = when + n * 0.29;
+        var o = ctx.createOscillator(); o.type = "sawtooth";
+        var f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 1500; f.Q.value = 4.5;
+        var g = ctx.createGain();
+        o.frequency.setValueAtTime(980, t0);
+        o.frequency.exponentialRampToValueAtTime(1420, t0 + 0.06);
+        o.frequency.exponentialRampToValueAtTime(760, t0 + 0.26);
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.exponentialRampToValueAtTime(0.055, t0 + 0.04);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.3);
+        o.connect(f); f.connect(g); g.connect(soft);
+        o.start(t0); o.stop(t0 + 0.34);
+      }
+    }
+    function creak(when) {
+      var s = ctx.createBufferSource(); s.buffer = buf;
+      var bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 14;
+      bp.frequency.setValueAtTime(420, when);
+      bp.frequency.exponentialRampToValueAtTime(180, when + 0.55);
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, when);
+      g.gain.exponentialRampToValueAtTime(0.10, when + 0.08);
+      g.gain.exponentialRampToValueAtTime(0.0001, when + 0.6);
+      s.connect(bp); bp.connect(g); g.connect(soft);
+      s.start(when); s.stop(when + 0.7);
+    }
+    var timers = [
+      setInterval(function () { if (Math.random() < 0.55) gull(ctx.currentTime + Math.random() * 2); }, 9000),
+      setInterval(function () { creak(ctx.currentTime + Math.random() * 3); }, 7000)
+    ];
+    setTimeout(function () { gull(ctx.currentTime + 1.4); }, 900);
+
+    return { ctx: ctx, out: out, timers: timers };
+  }
+
+  // --- playback ---------------------------------------------------------------
+
+  var btnPlay = document.getElementById("isk-play");
+  var btnSound = document.getElementById("isk-sound");
+  var icoPlay = document.getElementById("isk-ico-play");
+  var icoSound = document.getElementById("isk-ico-sound");
+  var scrub = document.getElementById("isk-scrub");
+  var clock = document.getElementById("isk-clock");
+
+  var PLAY_D = "M4 2l9 6-9 6z", PAUSE_D = "M4 2h3v12H4zM9 2h3v12H9z";
+  var SND_ON = "M3 6h2.5L9 3v10L5.5 10H3zM11.2 5.1l1-1c2.4 2 2.4 5.8 0 7.8l-1-1c1.7-1.5 1.7-4.3 0-5.8z";
+  var SND_OFF = "M3 6h2.5L9 3v10L5.5 10H3zM11 6.4l1.1 1.1 1.1-1.1.9.9-1.1 1.1 1.1 1.1-.9.9-1.1-1.1-1.1 1.1-.9-.9L11.1 8.4 10 7.3z";
+
+  var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var playing = !calm;
+  var fr = Math.round(FRAMES * 0.22), acc = 0, last = 0, soundOn = false;
+
+  function stamp() {
+    var s = Math.floor(fr / FPS);
+    clock.textContent = "00:" + String(s).padStart(2, "0") + " / 00:48";
+    if (scrub.value !== String(fr)) scrub.value = String(fr);
+  }
+
+  function setPlaying(v) {
+    playing = v;
+    icoPlay.setAttribute("d", v ? PAUSE_D : PLAY_D);
+    btnPlay.setAttribute("aria-label", v ? "Duraklat" : "Oynat");
+    btnPlay.title = v ? "Duraklat" : "Oynat";
+    if (audio) audio.ctx[v ? "resume" : "suspend"]();
+  }
+
+  btnPlay.addEventListener("click", function () { setPlaying(!playing); });
+  scrub.addEventListener("input", function () {
+    fr = Number(scrub.value) | 0;
+    render(fr); stamp();
+  });
+  btnSound.addEventListener("click", function () {
+    if (!audio) audio = startAudio();
+    if (!audio) return;
+    soundOn = !soundOn;
+    audio.ctx.resume();
+    audio.out.gain.cancelScheduledValues(audio.ctx.currentTime);
+    audio.out.gain.setTargetAtTime(soundOn ? 0.55 : 0.0001, audio.ctx.currentTime, 0.6);
+    icoSound.setAttribute("d", soundOn ? SND_ON : SND_OFF);
+    btnSound.setAttribute("aria-label", soundOn ? "Sesi kapat" : "Sesi aç");
+    btnSound.title = btnSound.getAttribute("aria-label");
+  });
+  var screenEl = document.getElementById("isk-screen");
+  screenEl.addEventListener("click", function () { setPlaying(!playing); screenEl.focus(); });
+  screenEl.addEventListener("keydown", function (e) {
+    if (e.code === "Space" || e.code === "Enter") { e.preventDefault(); setPlaying(!playing); }
+  });
+  window.addEventListener("resize", function () { present(); });
+
+  var onScreen = true;
+  if (window.IntersectionObserver) {
+    new IntersectionObserver(function (es) {
+      onScreen = es[0].isIntersecting;
+      if (audio) { if (onScreen && playing) audio.ctx.resume(); else audio.ctx.suspend(); }
+    }, { threshold: 0.04 }).observe(document.getElementById("iskele-app"));
+  }
+
+  function loop(now) {
+    if (!last) last = now;
+    var dt = Math.min(0.25, (now - last) / 1000);
+    last = now;
+    if (playing && onScreen) {
+      acc += dt;
+      var step = 1 / FPS, moved = false;
+      while (acc >= step) { acc -= step; fr = (fr + 1) % FRAMES; moved = true; }
+      if (moved) { render(fr); stamp(); }
+    }
+    requestAnimationFrame(loop);
+  }
+
+  icoSound.setAttribute("d", SND_OFF);
+  scrub.max = String(FRAMES - 1);
+  setPlaying(playing);
+  render(fr);
+  stamp();
+  requestAnimationFrame(loop);
+})();
+</script>

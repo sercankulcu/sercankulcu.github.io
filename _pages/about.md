@@ -67,6 +67,8 @@ This website brings together my academic work, software projects, teaching mater
 
 [📚 Teaching](/teaching/) · [📄 CV](/cv/) · [🛠️ Apps](/apps/) · [🎮 Games](/games/) · [💻 Posts](/posts/) · [💭 Thoughts](/thoughts/) · [🎬 Fun](/fun/) · [📜 Poems](/poems/) · [🕰️ Memory](/memory/) · [🌍 Humanity](/humanity/) · [🌿 Nature](/nature/) · [✏️ Pencils](/pencils/) · [🔖 Bookmarks](/bookmarks/)
 
+**A small experiment:** [🌊 Sessiz İskele](/apps/sessiz-iskele/) — a foggy morning on a Black Sea pier, drawn pixel by pixel in the browser. No 3D library and no video: a software renderer, a 41-colour palette, and ambience synthesised on the spot.
+
 **Note:** If you believe any content on this website infringes a license or copyright, please contact me. I will review and remove the material promptly if necessary.
 
 <!--  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="sercankulc" data-description="Support me on Buy me a coffee!" data-message="Thank you for visiting!" data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script> -->
