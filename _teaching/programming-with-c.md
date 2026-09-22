@@ -20,7 +20,7 @@ Every week is anchored to a worked example that is built and explained in the le
 
 ## Ders Öğretim Planı  
 
-[Ders Öğretim Planı (HTML)](../files/c/Ders_Ogretim_Plani.html)
+[Ders Öğretim Planı (HTML)](../files/c/Ders_Ogretim_Plani.html) · [🔎 Index](../files/c/Index.html)
 
 ---
 
