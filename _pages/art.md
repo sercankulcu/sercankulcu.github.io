@@ -84,4 +84,12 @@ They have turned out to be about the same thing. Each one is a place where somet
     <span class="art-meta">Inside a lit tank at two in the morning: caustics on the sand, Snell's window overhead, fish going nowhere · 44 colours · 48 s loop</span>
   </a>
 
+  <a class="art-card" href="/apps/park-guell/">
+    <img src="/images/art/park-guell.png" alt="Gaudí's mosaic bench at Park Güell above Barcelona, drawn in pixels" loading="lazy" width="960" height="540">
+    <span class="art-title">Park Güell</span>
+    <span class="art-meta">Gaudí's bench above Barcelona, rebuilt from a photograph: trencadís laid as thousands of flat shards · 50 colours · 48 s loop</span>
+  </a>
+
 </div>
+
+Park Güell is the only one of these taken from life rather than invented — from a photograph on the terrace, one hot afternoon in Barcelona. The bench was a good fit for the method: trencadís is already a mosaic of irregular flat pieces, and a software rasteriser draws nothing but irregular flat pieces.
