@@ -45,6 +45,11 @@ They have turned out to be about the same thing. Each one is a place where somet
   line-height: 1.25;
 }
 
+.art-card .art-en {
+  font-weight: 400;
+  opacity: 0.65;
+}
+
 .art-card:hover .art-title {
   text-decoration: underline;
 }
@@ -62,25 +67,25 @@ They have turned out to be about the same thing. Each one is a place where somet
 
   <a class="art-card" href="/art/sessiz-iskele/">
     <img src="/images/art/sessiz-iskele.png" alt="A foggy Black Sea pier with a moored fishing boat, drawn in pixels" loading="lazy" width="960" height="540">
-    <span class="art-title">Sessiz İskele</span>
+    <span class="art-title">Sessiz İskele <span class="art-en">· Silent Pier</span></span>
     <span class="art-meta">A foggy morning on a Black Sea pier, walked end to end · 41 colours · 48 s loop</span>
   </a>
 
   <a class="art-card" href="/art/firtinada-fener/">
     <img src="/images/art/firtinada-fener.png" alt="A lighthouse on a rock in a storm, its beam cutting through rain, drawn in pixels" loading="lazy" width="960" height="540">
-    <span class="art-title">Fırtınada Fener</span>
+    <span class="art-title">Fırtınada Fener <span class="art-en">· Lighthouse in the Storm</span></span>
     <span class="art-meta">A lighthouse through a storm: a turning beam, breaking swell, spray and rain · 43 colours · 48 s loop</span>
   </a>
 
   <a class="art-card" href="/art/karli-istasyon/">
     <img src="/images/art/karli-istasyon.png" alt="An empty railway platform under falling snow, lit by sodium lamps, drawn in pixels" loading="lazy" width="960" height="540">
-    <span class="art-title">Karlı İstasyon</span>
+    <span class="art-title">Karlı İstasyon <span class="art-en">· Snowy Station</span></span>
     <span class="art-meta">An empty platform under snow: sodium lamps pooling on the drifts, and a headlight that never arrives · 40 colours · 48 s loop</span>
   </a>
 
   <a class="art-card" href="/art/akvaryum/">
     <img src="/images/art/akvaryum.png" alt="The inside of a lit aquarium: light pooling on the sand, plants, and fish, drawn in pixels" loading="lazy" width="960" height="540">
-    <span class="art-title">Akvaryum</span>
+    <span class="art-title">Akvaryum <span class="art-en">· Aquarium</span></span>
     <span class="art-meta">Inside a lit tank at two in the morning: caustics on the sand, Snell's window overhead, fish going nowhere · 44 colours · 48 s loop</span>
   </a>
 
@@ -92,7 +97,7 @@ They have turned out to be about the same thing. Each one is a place where somet
 
   <a class="art-card" href="/art/gece-laboratuvari/">
     <img src="/images/art/gece-laboratuvari.png" alt="An empty engineering lab at night, lit by an oscilloscope and a rainy window, drawn in pixels" loading="lazy" width="960" height="540">
-    <span class="art-title">Gece Laboratuvarı</span>
+    <span class="art-title">Gece Laboratuvarı <span class="art-en">· Night Lab</span></span>
     <span class="art-meta">An empty lab after midnight: a live trace on the scope, rain on the glass, every light in the room coming from the instruments · 45 colours · 48 s loop</span>
   </a>
 
