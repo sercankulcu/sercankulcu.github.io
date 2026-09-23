@@ -78,4 +78,10 @@ They have turned out to be about the same thing. Each one is a place where somet
     <span class="art-meta">An empty platform under snow: sodium lamps pooling on the drifts, and a headlight that never arrives · 40 colours · 48 s loop</span>
   </a>
 
+  <a class="art-card" href="/apps/akvaryum/">
+    <img src="/images/art/akvaryum.png" alt="The inside of a lit aquarium: light pooling on the sand, plants, and fish, drawn in pixels" loading="lazy" width="960" height="540">
+    <span class="art-title">Akvaryum</span>
+    <span class="art-meta">Inside a lit tank at two in the morning: caustics on the sand, Snell's window overhead, fish going nowhere · 44 colours · 48 s loop</span>
+  </a>
+
 </div>
