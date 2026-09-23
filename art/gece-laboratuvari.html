@@ -68,6 +68,8 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
   color: var(--lab-dim);
   white-space: nowrap;
 }
+.lab-slate .lab-where { text-align: right; }
+.lab-slate .lab-where-en { display: block; margin-top: 2px; opacity: .75; }
 .lab-slate .lab-rule {
   flex: 1 1 40px;
   min-width: 24px;
@@ -204,23 +206,23 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
   <div class="lab-slate">
     <h1>Gece Laboratuvarı <span class="lab-en">Night Lab</span></h1>
     <span class="lab-rule"></span>
-    <span class="lab-where">01:50 · yağmur · kimse yok</span>
+    <span class="lab-where">01:50 · yağmur · kimse yok<span class="lab-where-en" lang="en">rain · nobody here</span></span>
   </div>
 
-  <div class="lab-screen" id="lab-screen" tabindex="0" aria-label="Sahneyi oynat veya duraklat">
-    <canvas id="lab-stage" width="1280" height="720" aria-label="Gece boş bir mühendislik laboratuvarı: osiloskop ekranında canlı bir dalga, breadboard, tüten havya, pencerede yağmur"></canvas>
+  <div class="lab-screen" id="lab-screen" tabindex="0" aria-label="Sahneyi oynat veya duraklat / Play or pause the scene">
+    <canvas id="lab-stage" width="1280" height="720" aria-label="Gece boş bir mühendislik laboratuvarı: osiloskop ekranında canlı bir dalga, breadboard, tüten havya, pencerede yağmur / An empty engineering lab at night: a live wave on the oscilloscope screen, a breadboard, a smoking soldering iron, rain on the window"></canvas>
   </div>
 
   <div class="lab-bar">
-    <button class="lab-key" id="lab-play" type="button" aria-label="Duraklat" title="Duraklat">
+    <button class="lab-key" id="lab-play" type="button" aria-label="Duraklat / Pause" title="Duraklat / Pause (Space)">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path id="lab-ico-play" d="M4 2h3v12H4zM9 2h3v12H9z"></path></svg>
     </button>
-    <input type="range" id="lab-scrub" min="0" max="1439" step="1" value="317" aria-label="Zaman">
+    <input type="range" id="lab-scrub" min="0" max="1439" step="1" value="317" aria-label="Zaman / Time">
     <span class="lab-clock" id="lab-clock">00:10 / 00:48</span>
-    <button class="lab-key" id="lab-sound" type="button" aria-label="Sesi aç" title="Sesi aç (M)">
+    <button class="lab-key" id="lab-sound" type="button" aria-label="Sesi aç / Sound on" title="Sesi aç / Sound on (M)">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path id="lab-ico-sound" d="M3 6h2.5L9 3v10L5.5 10H3zM11.2 5.1l1-1c2.4 2 2.4 5.8 0 7.8l-1-1c1.7-1.5 1.7-4.3 0-5.8z"></path></svg>
     </button>
-    <button class="lab-key" id="lab-full" type="button" aria-label="Tam ekran" title="Tam ekran (F)">
+    <button class="lab-key" id="lab-full" type="button" aria-label="Tam ekran / Fullscreen" title="Tam ekran / Fullscreen (F)">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path id="lab-ico-full" d="M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z"></path></svg>
     </button>
   </div>
@@ -231,12 +233,13 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
 
 </div>
 
+<script src="/assets/js/art-kit.js"></script>
 <script>
 (function () {
   "use strict";
 
-  function hyp2(a, b) { return Math.sqrt(a * a + b * b); }
-  function hyp3(a, b, c) { return Math.sqrt(a * a + b * b + c * c); }
+  var A = ArtKit;
+  var hyp2 = A.hyp2, hyp3 = A.hyp3, hex = A.hex, ramp = A.ramp;
 
   var TAU = Math.PI * 2;
   var W = 320, H = 180;
@@ -246,17 +249,6 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
   var BENCH = 0.92;
   var BACK_Z = -1.62;
 
-  function hex(h) {
-    return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
-  }
-  function ramp(a, b, n) {
-    var ca = hex(a), cb = hex(b), out = [];
-    for (var i = 0; i < n; i++) {
-      var k = n === 1 ? 0 : i / (n - 1);
-      out.push([ca[0] + (cb[0] - ca[0]) * k, ca[1] + (cb[1] - ca[1]) * k, ca[2] + (cb[2] - ca[2]) * k]);
-    }
-    return out;
-  }
   var PALETTE = [].concat(
     ramp("#05080a", "#243033", 5),
     ramp("#2b3a3d", "#7d8f92", 5),
@@ -271,31 +263,13 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     ramp("#5a3c20", "#c9a978", 3)
   );
 
-  var LUT = new Uint8Array(32 * 32 * 32 * 3);
-  (function () {
-    for (var r = 0; r < 32; r++) for (var g = 0; g < 32; g++) for (var b = 0; b < 32; b++) {
-      var R = r * 8.226, G = g * 8.226, B = b * 8.226, best = 0, bd = 1e9;
-      for (var p = 0; p < PALETTE.length; p++) {
-        var c = PALETTE[p];
-        var dr = R - c[0], dg = G - c[1], db = B - c[2];
-        var d = dr * dr * 0.5 + dg * dg * 0.7 + db * db * 0.35;
-        if (d < bd) { bd = d; best = p; }
-      }
-      var i = ((r << 10) | (g << 5) | b) * 3, c2 = PALETTE[best];
-      LUT[i] = c2[0]; LUT[i + 1] = c2[1]; LUT[i + 2] = c2[2];
-    }
-  })();
-  var BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+  var LUT = A.lut(PALETTE);
+  var BAYER = A.BAYER;
 
-  var film = document.createElement("canvas");
-  film.width = W; film.height = H;
-  var fctx = film.getContext("2d");
-  var frame = fctx.createImageData(W, H);
-  var px = frame.data;
-  var zbuf = new Float32Array(W * H);
+  var FILM = A.film(W, H);
+  var film = FILM.canvas, fctx = FILM.ctx, frame = FILM.frame, px = FILM.px;
+  var zbuf = FILM.zbuf;
 
-  var stage = document.getElementById("lab-stage");
-  var sctx = stage.getContext("2d");
 
   var FOG = [10, 14, 16];
   var FOGD = 0.055;
@@ -367,19 +341,7 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     for (i = 1; i < nc - 1; i++) tri(sxA[0], syA[0], swA[0], sxA[i], syA[i], swA[i], sxA[i + 1], syA[i + 1], swA[i + 1], r, g, b);
   }
 
-  /* Columns of row centre q that can lie inside the triangle (±1 px slack; the per-pixel test stays exact). */
-  var _xs = 0, _xe = -1;
-  function rowSpan(q, x0, y0, x1, y1, x2, y2, inv, lo, hi) {
-    var a0 = (x1 * (y2 - q) - x2 * (y1 - q)) * inv, b0 = (y1 - y2) * inv;
-    var a1 = (x2 * (y0 - q) - x0 * (y2 - q)) * inv, b1 = (y2 - y0) * inv;
-    var a2 = 1 - a0 - a1, b2 = -b0 - b1;
-    var pl = -Infinity, ph = Infinity;
-    if (b0 > 1e-12) pl = Math.max(pl, -a0 / b0); else if (b0 < -1e-12) ph = Math.min(ph, -a0 / b0); else if (a0 < -1e-9) ph = -Infinity;
-    if (b1 > 1e-12) pl = Math.max(pl, -a1 / b1); else if (b1 < -1e-12) ph = Math.min(ph, -a1 / b1); else if (a1 < -1e-9) ph = -Infinity;
-    if (b2 > 1e-12) pl = Math.max(pl, -a2 / b2); else if (b2 < -1e-12) ph = Math.min(ph, -a2 / b2); else if (a2 < -1e-9) ph = -Infinity;
-    _xs = Math.max(lo, Math.floor(pl - 0.5));
-    _xe = Math.min(hi, Math.ceil(ph - 0.5));
-  }
+  var rowSpan = A.rowSpan, SPAN = A.span;
 
   function tri(x0, y0, w0, x1, y1, w1, x2, y2, w2, r, g, b) {
     var area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
@@ -393,7 +355,7 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     for (var y = minY; y <= maxY; y++) {
       var pyc = y + 0.5, row = y * W;
       rowSpan(pyc, x0, y0, x1, y1, x2, y2, inv, minX, maxX);
-      for (var x = _xs, xEnd = _xe; x <= xEnd; x++) {
+      for (var x = SPAN.xs, xEnd = SPAN.xe; x <= xEnd; x++) {
         var pxc = x + 0.5;
         var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
         if (l0 < 0) continue;
@@ -414,11 +376,7 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     }
   }
 
-  function Mesh() { this.p = []; this.c = []; }
-  Mesh.prototype.quad = function (ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz, r, g, b) {
-    this.p.push(ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz);
-    this.c.push(r, g, b);
-  };
+  var Mesh = A.Mesh;
 
   var _pt = new Float64Array(12);
   function drawMesh(m) {
@@ -651,20 +609,77 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     });
   }
 
+  /* The city behind the glass: two rows of blocks, their tops as a fraction of window height. */
+  var CITY_N = 44, CITY_NEAR = new Float64Array(CITY_N), CITY_FAR = new Float64Array(CITY_N * 2);
+  (function () {
+    for (var i = 0; i < CITY_N; i++) {
+      var tall = hash(i * 7 + 3) > 0.86 ? 0.16 : 0;
+      CITY_NEAR[i] = 0.80 - hash(i * 13 + 1) * 0.14 - tall;
+    }
+    for (var j = 0; j < CITY_N * 2; j++) CITY_FAR[j] = 0.75 - hash(j * 5 + 11) * 0.09;
+  })();
+  var TOWER_I = 0;
+  for (var ti = 1; ti < CITY_N; ti++) if (CITY_NEAR[ti] < CITY_NEAR[TOWER_I]) TOWER_I = ti;
+
+  /* Drops that run down the glass: column, start phase, speed (whole cycles per loop keep it seamless). */
+  var RUNNERS = [];
+  for (var ri = 0; ri < 6; ri++) RUNNERS.push([0.08 + hash(ri * 19 + 2) * 0.84, hash(ri * 23 + 5), 2 + (ri % 3)]);
+
   function drawWindow(t) {
     var u = t / DURATION;
+    var beacon = frac(u * 24) < 0.12;
     panel(WIN_X0, WIN_Y0, WIN_X1, WIN_Y1, WIN_Z + 0.004, function (uu, v, x, y) {
-      var base = 14 + (1 - v) * 10;
-      var r = base * 0.75, g = base * 1.05, b = base * 1.9;
-      var gl = Math.exp(-Math.pow((v - 0.86) * 4.0, 2)) * 26;
-      r += gl * 0.9; g += gl * 0.8; b += gl * 0.6;
-      var dotSeed = ((uu * 46) | 0) * 31 + ((v * 30) | 0) * 7;
-      if (v > 0.62 && hash(dotSeed) > 0.955) { r += 70; g += 56; b += 30; }
-      var k = frac(hash(((uu * 30) | 0) * 13) + u * (3 + (((uu * 30) | 0) % 4)));
-      var rv = frac(v + k);
-      if (rv < 0.055 && hash(((uu * 30) | 0) * 17) > 0.45) { r += 34; g += 44; b += 56; }
-      var sm = hash(((uu * 60) | 0) * 3 + ((v * 40) | 0) * 11);
-      if (sm > 0.88) { r += 10; g += 12; b += 16; }
+      if (Math.abs(uu - 0.5) < 0.009) { _c[0] = 30; _c[1] = 34; _c[2] = 38; return _c; }
+
+      var su = uu, sv = v, rim = 0, wet = 0;
+      /* Beaded drops: each sits in a cell and magnifies what is behind it. */
+      var cu = uu * 16, cv = v * 10, ci = cu | 0, cj = cv | 0;
+      var hs = hash(ci * 31 + cj * 17 + 7);
+      if (hs > 0.55) {
+        var ox = 0.3 + hash(ci * 11 + cj * 5) * 0.4, oy = 0.3 + hash(ci * 3 + cj * 29) * 0.4;
+        var ddx = cu - ci - ox, ddy = (cv - cj - oy) * 1.6, dd = ddx * ddx + ddy * ddy;
+        var rr = 0.03 + (hs - 0.55) * 0.12;
+        if (dd < rr) {
+          su = uu - ddx / 16 * 0.9; sv = v - ddy / 16 * 0.9;
+          rim = dd > rr * 0.55 ? 1 : 0.35;
+        }
+      }
+      /* Running drops and the wet track they leave above themselves. */
+      for (var k = 0; k < RUNNERS.length; k++) {
+        var R = RUNNERS[k], dx = uu - R[0];
+        if (dx < -0.012 || dx > 0.012) continue;
+        var head = frac(R[1] + u * R[2]) * 1.3 - 0.15;
+        if (v > head + 0.02) continue;
+        if (v > head - 0.02 && Math.abs(dx) < 0.009) { rim = 1; su = uu - dx * 1.4; sv = v - 0.02; }
+        else if (v < head && v > head - 0.35 && Math.abs(dx) < 0.004) wet = 1 - (head - v) / 0.35;
+      }
+
+      /* Sky: dark blue above, sodium glow low over the rooftops. */
+      var r = 12 + sv * 8, g = 16 + sv * 10, b = 30 + sv * 12;
+      var glow = Math.exp(-Math.pow((sv - 0.74) * 5.0, 2));
+      r += glow * 46; g += glow * 30; b += glow * 12;
+
+      var fi = (su * CITY_N * 2) | 0;
+      if (fi >= 0 && fi < CITY_N * 2 && sv > CITY_FAR[fi]) { r = r * 0.55 + 10; g = g * 0.55 + 12; b = b * 0.55 + 18; }
+
+      var ni = (su * CITY_N) | 0;
+      if (ni >= 0 && ni < CITY_N && sv > CITY_NEAR[ni]) {
+        r = 9; g = 11; b = 16;
+        var wx = (su * CITY_N * 4) | 0, wy = (sv * 44) | 0;
+        if ((wx & 3) !== 0 && (wy & 1) === 0) {
+          var hw = hash(wx * 37 + wy * 91);
+          if (hw > 0.78) { var warm = hw > 0.93; r = warm ? 190 : 150; g = warm ? 150 : 150; b = warm ? 80 : 120; }
+        }
+        if (ni === TOWER_I && beacon && sv < CITY_NEAR[ni] + 0.03 && Math.abs(su * CITY_N - ni - 0.5) < 0.25) { r = 230; g = 60; b = 50; }
+      }
+
+      /* Rain falling beyond the glass, faint streaks. */
+      var col = (uu * 30) | 0;
+      var rv = frac(v + frac(hash(col * 13) + u * (3 + (col % 4))));
+      if (rv < 0.05 && hash(col * 17) > 0.5) { r += 16; g += 20; b += 26; }
+
+      if (wet > 0) { r += 12 * wet; g += 15 * wet; b += 20 * wet; }
+      if (rim > 0) { r += 34 * rim; g += 42 * rim; b += 52 * rim; }
       _c[0] = r; _c[1] = g; _c[2] = b;
       return _c;
     });
@@ -771,26 +786,8 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     drawGlows(t);
     print(fr);
     fctx.putImageData(frame, 0, 0);
-    present();
   }
 
-  function present() {
-    var host = stage.parentNode;
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var cw = Math.max(64, host.clientWidth), ch = Math.max(64, host.clientHeight);
-    if (stage.width !== Math.floor(cw * dpr) || stage.height !== Math.floor(ch * dpr)) {
-      stage.width = Math.floor(cw * dpr); stage.height = Math.floor(ch * dpr);
-      stage.style.width = cw + "px"; stage.style.height = ch + "px";
-    }
-    var scale = Math.min(stage.width / W, stage.height / H);
-    var dw = Math.round(W * scale), dh = Math.round(H * scale);
-    sctx.imageSmoothingEnabled = false;
-    sctx.fillStyle = "#0a0e0f";
-    sctx.fillRect(0, 0, stage.width, stage.height);
-    sctx.drawImage(film, 0, 0, W, H, Math.round((stage.width - dw) / 2), Math.round((stage.height - dh) / 2), dw, dh);
-  }
-
-  var audio = null;
   function startAudio() {
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
@@ -846,130 +843,12 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     return { ctx: ctx, out: out, timers: timers };
   }
 
-  var btnPlay = document.getElementById("lab-play");
-  var btnSound = document.getElementById("lab-sound");
-  var icoPlay = document.getElementById("lab-ico-play");
-  var icoSound = document.getElementById("lab-ico-sound");
-  var scrub = document.getElementById("lab-scrub");
-  var clock = document.getElementById("lab-clock");
-
-  var PLAY_D = "M4 2l9 6-9 6z", PAUSE_D = "M4 2h3v12H4zM9 2h3v12H9z";
-  var SND_ON = "M3 6h2.5L9 3v10L5.5 10H3zM11.2 5.1l1-1c2.4 2 2.4 5.8 0 7.8l-1-1c1.7-1.5 1.7-4.3 0-5.8z";
-  var SND_OFF = "M3 6h2.5L9 3v10L5.5 10H3zM11 6.4l1.1 1.1 1.1-1.1.9.9-1.1 1.1 1.1 1.1-.9.9-1.1-1.1-1.1 1.1-.9-.9L11.1 8.4 10 7.3z";
-
-  var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var playing = !calm;
-  var fr = Math.round(FRAMES * 0.22), acc = 0, last = 0, soundOn = false;
-
-  function showTime() {
-    var s = Math.floor(fr / FPS);
-    clock.textContent = "00:" + String(s).padStart(2, "0") + " / 00:48";
-    if (scrub.value !== String(fr)) scrub.value = String(fr);
-  }
-
-  function setPlaying(v) {
-    playing = v;
-    icoPlay.setAttribute("d", v ? PAUSE_D : PLAY_D);
-    btnPlay.setAttribute("aria-label", v ? "Duraklat" : "Oynat");
-    btnPlay.title = v ? "Duraklat" : "Oynat";
-    if (audio) audio.ctx[v ? "resume" : "suspend"]();
-  }
-
-  btnPlay.addEventListener("click", function () { setPlaying(!playing); });
-  scrub.addEventListener("input", function () {
-    fr = Number(scrub.value) | 0;
-    render(fr); showTime();
+  A.mount({
+    prefix: "lab", app: "lab-app",
+    W: W, H: H, fps: FPS, frames: FRAMES,
+    frame0: Math.round(FRAMES * 0.22),
+    film: film, frameColor: "#0a0e0f", gain: 0.55,
+    render: render, startAudio: startAudio
   });
-  function toggleSound() {
-    if (!audio) audio = startAudio();
-    if (!audio) return;
-    soundOn = !soundOn;
-    if (playing && onScreen) audio.ctx.resume();
-    audio.out.gain.cancelScheduledValues(audio.ctx.currentTime);
-    audio.out.gain.setTargetAtTime(soundOn ? 0.55 : 0.0001, audio.ctx.currentTime, 0.6);
-    icoSound.setAttribute("d", soundOn ? SND_ON : SND_OFF);
-    btnSound.setAttribute("aria-label", soundOn ? "Sesi kapat" : "Sesi aç");
-    btnSound.title = btnSound.getAttribute("aria-label") + " (M)";
-  }
-  btnSound.addEventListener("click", toggleSound);
-
-  var screenEl = document.getElementById("lab-screen");
-  var btnFull = document.getElementById("lab-full");
-  var icoFull = document.getElementById("lab-ico-full");
-  var FULL_IN = "M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z";
-  var FULL_OUT = "M5 2h2v5H2V5h3zM9 2h2v3h3v2H9zM2 9h5v5H5v-3H2zM9 9h5v2h-3v3H9z";
-  var canFull = !!(screenEl.requestFullscreen || screenEl.webkitRequestFullscreen);
-  function fullEl() { return document.fullscreenElement || document.webkitFullscreenElement; }
-  function toggleFull() {
-    if (fullEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-    else if (screenEl.requestFullscreen) screenEl.requestFullscreen().catch(function () {});
-    else if (screenEl.webkitRequestFullscreen) screenEl.webkitRequestFullscreen();
-  }
-  function onFullChange() {
-    var on = fullEl() === screenEl;
-    icoFull.setAttribute("d", on ? FULL_OUT : FULL_IN);
-    btnFull.setAttribute("aria-label", on ? "Tam ekrandan çık" : "Tam ekran");
-    btnFull.title = btnFull.getAttribute("aria-label") + " (F)";
-    present();
-  }
-  if (canFull) {
-    btnFull.addEventListener("click", toggleFull);
-    document.addEventListener("fullscreenchange", onFullChange);
-    document.addEventListener("webkitfullscreenchange", onFullChange);
-  } else {
-    btnFull.hidden = true;
-  }
-
-  function seek(sec) {
-    fr = ((fr + sec * FPS) % FRAMES + FRAMES) % FRAMES;
-    render(fr); showTime();
-  }
-
-  screenEl.addEventListener("click", function () { setPlaying(!playing); screenEl.focus(); });
-  screenEl.addEventListener("dblclick", function () { if (canFull) toggleFull(); });
-  document.getElementById("lab-app").addEventListener("keydown", function (e) {
-    if (e.altKey || e.ctrlKey || e.metaKey) return;
-    var tag = e.target.tagName;
-    var k = e.key;
-    if (k === " " || k === "Enter") {
-      if (tag === "BUTTON") return;
-      e.preventDefault(); setPlaying(!playing);
-    } else if ((k === "ArrowLeft" || k === "ArrowRight") && tag !== "INPUT") {
-      e.preventDefault(); seek(k === "ArrowLeft" ? -1 : 1);
-    } else if ((k === "f" || k === "F") && canFull) {
-      e.preventDefault(); toggleFull();
-    } else if (k === "m" || k === "M") {
-      e.preventDefault(); toggleSound();
-    }
-  });
-  window.addEventListener("resize", function () { present(); });
-
-  var onScreen = true;
-  if (window.IntersectionObserver) {
-    new IntersectionObserver(function (es) {
-      onScreen = es[0].isIntersecting;
-      if (audio) { if (onScreen && playing) audio.ctx.resume(); else audio.ctx.suspend(); }
-    }, { threshold: 0.04 }).observe(document.getElementById("lab-app"));
-  }
-
-  function loop(now) {
-    if (!last) last = now;
-    var dt = Math.min(0.25, (now - last) / 1000);
-    last = now;
-    if (playing && onScreen) {
-      acc += dt;
-      var st = 1 / FPS, moved = false;
-      while (acc >= st) { acc -= st; fr = (fr + 1) % FRAMES; moved = true; }
-      if (moved) { render(fr); showTime(); }
-    }
-    requestAnimationFrame(loop);
-  }
-
-  icoSound.setAttribute("d", SND_OFF);
-  scrub.max = String(FRAMES - 1);
-  setPlaying(playing);
-  render(fr);
-  showTime();
-  requestAnimationFrame(loop);
 })();
 </script>

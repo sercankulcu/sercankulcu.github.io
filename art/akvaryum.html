@@ -68,6 +68,8 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
   color: var(--akv-dim);
   white-space: nowrap;
 }
+.akvaryum-slate .akv-where { text-align: right; }
+.akvaryum-slate .akv-where-en { display: block; margin-top: 2px; opacity: .75; }
 .akvaryum-slate .akv-rule {
   flex: 1 1 40px;
   min-width: 24px;
@@ -204,23 +206,23 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
   <div class="akvaryum-slate">
     <h1>Akvaryum <span class="akv-en">Aquarium</span></h1>
     <span class="akv-rule"></span>
-    <span class="akv-where">Salon · 02:10 · cam arkası</span>
+    <span class="akv-where">Salon · 02:10 · cam arkası<span class="akv-where-en" lang="en">living room · behind glass</span></span>
   </div>
 
-  <div class="akvaryum-screen" id="akv-screen" tabindex="0" aria-label="Sahneyi oynat veya duraklat">
-    <canvas id="akv-stage" width="1280" height="720" aria-label="Bir akvaryumun içi: kumda oynayan ışık lekeleri, sallanan bitkiler, yükselen kabarcıklar ve dönüp duran balıklar"></canvas>
+  <div class="akvaryum-screen" id="akv-screen" tabindex="0" aria-label="Sahneyi oynat veya duraklat / Play or pause the scene">
+    <canvas id="akv-stage" width="1280" height="720" aria-label="Bir akvaryumun içi: kumda oynayan ışık lekeleri, sallanan bitkiler, yükselen kabarcıklar ve dönüp duran balıklar / Inside an aquarium: light patterns playing on the sand, swaying plants, rising bubbles and fish circling"></canvas>
   </div>
 
   <div class="akvaryum-bar">
-    <button class="akv-key" id="akv-play" type="button" aria-label="Duraklat" title="Duraklat">
+    <button class="akv-key" id="akv-play" type="button" aria-label="Duraklat / Pause" title="Duraklat / Pause (Space)">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path id="akv-ico-play" d="M4 2h3v12H4zM9 2h3v12H9z"></path></svg>
     </button>
-    <input type="range" id="akv-scrub" min="0" max="1439" step="1" value="259" aria-label="Zaman">
+    <input type="range" id="akv-scrub" min="0" max="1439" step="1" value="259" aria-label="Zaman / Time">
     <span class="akvaryum-clock" id="akv-clock">00:08 / 00:48</span>
-    <button class="akv-key" id="akv-sound" type="button" aria-label="Sesi aç" title="Sesi aç (M)">
+    <button class="akv-key" id="akv-sound" type="button" aria-label="Sesi aç / Sound on" title="Sesi aç / Sound on (M)">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path id="akv-ico-sound" d="M3 6h2.5L9 3v10L5.5 10H3zM11.2 5.1l1-1c2.4 2 2.4 5.8 0 7.8l-1-1c1.7-1.5 1.7-4.3 0-5.8z"></path></svg>
     </button>
-    <button class="akv-key" id="akv-full" type="button" aria-label="Tam ekran" title="Tam ekran (F)">
+    <button class="akv-key" id="akv-full" type="button" aria-label="Tam ekran / Fullscreen" title="Tam ekran / Fullscreen (F)">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path id="akv-ico-full" d="M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z"></path></svg>
     </button>
   </div>
@@ -231,12 +233,13 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
 
 </div>
 
+<script src="/assets/js/art-kit.js"></script>
 <script>
 (function () {
   "use strict";
 
-  function hyp2(a, b) { return Math.sqrt(a * a + b * b); }
-  function hyp3(a, b, c) { return Math.sqrt(a * a + b * b + c * c); }
+  var A = ArtKit;
+  var hyp2 = A.hyp2, hyp3 = A.hyp3, hex = A.hex, ramp = A.ramp;
 
   var TAU = Math.PI * 2;
   var W = 320, H = 180;
@@ -247,17 +250,6 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
   var BACK_Z = -4.6;
   var SIDE_X = 4.6;
 
-  function hex(h) {
-    return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
-  }
-  function ramp(a, b, n) {
-    var ca = hex(a), cb = hex(b), out = [];
-    for (var i = 0; i < n; i++) {
-      var k = n === 1 ? 0 : i / (n - 1);
-      out.push([ca[0] + (cb[0] - ca[0]) * k, ca[1] + (cb[1] - ca[1]) * k, ca[2] + (cb[2] - ca[2]) * k]);
-    }
-    return out;
-  }
   var PALETTE = [].concat(
     ramp("#030d10", "#164047", 5),
     ramp("#1d5560", "#4f9fa0", 6),
@@ -270,31 +262,13 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
     ramp("#101c24", "#8fa3ad", 4)
   );
 
-  var LUT = new Uint8Array(32 * 32 * 32 * 3);
-  (function () {
-    for (var r = 0; r < 32; r++) for (var g = 0; g < 32; g++) for (var b = 0; b < 32; b++) {
-      var R = r * 8.226, G = g * 8.226, B = b * 8.226, best = 0, bd = 1e9;
-      for (var p = 0; p < PALETTE.length; p++) {
-        var c = PALETTE[p];
-        var dr = R - c[0], dg = G - c[1], db = B - c[2];
-        var d = dr * dr * 0.5 + dg * dg * 0.7 + db * db * 0.35;
-        if (d < bd) { bd = d; best = p; }
-      }
-      var i = ((r << 10) | (g << 5) | b) * 3, c2 = PALETTE[best];
-      LUT[i] = c2[0]; LUT[i + 1] = c2[1]; LUT[i + 2] = c2[2];
-    }
-  })();
-  var BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+  var LUT = A.lut(PALETTE);
+  var BAYER = A.BAYER;
 
-  var film = document.createElement("canvas");
-  film.width = W; film.height = H;
-  var fctx = film.getContext("2d");
-  var frame = fctx.createImageData(W, H);
-  var px = frame.data;
-  var zbuf = new Float32Array(W * H);
+  var FILM = A.film(W, H);
+  var film = FILM.canvas, fctx = FILM.ctx, frame = FILM.frame, px = FILM.px;
+  var zbuf = FILM.zbuf;
 
-  var stage = document.getElementById("akv-stage");
-  var sctx = stage.getContext("2d");
 
   var FOG = [22, 68, 76];
   var FOGD = 0.158;
@@ -455,19 +429,7 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
     }
   }
 
-  /* Columns of row centre q that can lie inside the triangle (±1 px slack; the per-pixel test stays exact). */
-  var _xs = 0, _xe = -1;
-  function rowSpan(q, x0, y0, x1, y1, x2, y2, inv, lo, hi) {
-    var a0 = (x1 * (y2 - q) - x2 * (y1 - q)) * inv, b0 = (y1 - y2) * inv;
-    var a1 = (x2 * (y0 - q) - x0 * (y2 - q)) * inv, b1 = (y2 - y0) * inv;
-    var a2 = 1 - a0 - a1, b2 = -b0 - b1;
-    var pl = -Infinity, ph = Infinity;
-    if (b0 > 1e-12) pl = Math.max(pl, -a0 / b0); else if (b0 < -1e-12) ph = Math.min(ph, -a0 / b0); else if (a0 < -1e-9) ph = -Infinity;
-    if (b1 > 1e-12) pl = Math.max(pl, -a1 / b1); else if (b1 < -1e-12) ph = Math.min(ph, -a1 / b1); else if (a1 < -1e-9) ph = -Infinity;
-    if (b2 > 1e-12) pl = Math.max(pl, -a2 / b2); else if (b2 < -1e-12) ph = Math.min(ph, -a2 / b2); else if (a2 < -1e-9) ph = -Infinity;
-    _xs = Math.max(lo, Math.floor(pl - 0.5));
-    _xe = Math.min(hi, Math.ceil(ph - 0.5));
-  }
+  var rowSpan = A.rowSpan, SPAN = A.span;
 
   function tri(x0, y0, w0, x1, y1, w1, x2, y2, w2, r, g, b) {
     var area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
@@ -481,7 +443,7 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
     for (var y = minY; y <= maxY; y++) {
       var pyc = y + 0.5, row = y * W;
       rowSpan(pyc, x0, y0, x1, y1, x2, y2, inv, minX, maxX);
-      for (var x = _xs, xEnd = _xe; x <= xEnd; x++) {
+      for (var x = SPAN.xs, xEnd = SPAN.xe; x <= xEnd; x++) {
         var pxc = x + 0.5;
         var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
         if (l0 < 0) continue;
@@ -514,7 +476,7 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
     for (var y = minY; y <= maxY; y++) {
       var pyc = y + 0.5, row = y * W;
       rowSpan(pyc, x0, y0, x1, y1, x2, y2, inv, minX, maxX);
-      for (var x = _xs, xEnd = _xe; x <= xEnd; x++) {
+      for (var x = SPAN.xs, xEnd = SPAN.xe; x <= xEnd; x++) {
         var pxc = x + 0.5;
         var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
         if (l0 < 0) continue;
@@ -534,12 +496,7 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
     }
   }
 
-  function Mesh() { this.p = []; this.c = []; }
-  Mesh.prototype.quad = function (ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz, r, g, b) {
-    this.p.push(ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz);
-    this.c.push(r, g, b);
-  };
-  Mesh.prototype.clear = function () { this.p.length = 0; this.c.length = 0; };
+  var Mesh = A.Mesh;
 
   var _pt = new Float64Array(12);
   function drawMesh(m) {
@@ -893,26 +850,8 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
     drawBubbles(t);
     print(fr);
     fctx.putImageData(frame, 0, 0);
-    present();
   }
 
-  function present() {
-    var host = stage.parentNode;
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var cw = Math.max(64, host.clientWidth), ch = Math.max(64, host.clientHeight);
-    if (stage.width !== Math.floor(cw * dpr) || stage.height !== Math.floor(ch * dpr)) {
-      stage.width = Math.floor(cw * dpr); stage.height = Math.floor(ch * dpr);
-      stage.style.width = cw + "px"; stage.style.height = ch + "px";
-    }
-    var scale = Math.min(stage.width / W, stage.height / H);
-    var dw = Math.round(W * scale), dh = Math.round(H * scale);
-    sctx.imageSmoothingEnabled = false;
-    sctx.fillStyle = "#071013";
-    sctx.fillRect(0, 0, stage.width, stage.height);
-    sctx.drawImage(film, 0, 0, W, H, Math.round((stage.width - dw) / 2), Math.round((stage.height - dh) / 2), dw, dh);
-  }
-
-  var audio = null;
   function startAudio() {
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
@@ -960,130 +899,12 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
     return { ctx: ctx, out: out, timers: timers };
   }
 
-  var btnPlay = document.getElementById("akv-play");
-  var btnSound = document.getElementById("akv-sound");
-  var icoPlay = document.getElementById("akv-ico-play");
-  var icoSound = document.getElementById("akv-ico-sound");
-  var scrub = document.getElementById("akv-scrub");
-  var clock = document.getElementById("akv-clock");
-
-  var PLAY_D = "M4 2l9 6-9 6z", PAUSE_D = "M4 2h3v12H4zM9 2h3v12H9z";
-  var SND_ON = "M3 6h2.5L9 3v10L5.5 10H3zM11.2 5.1l1-1c2.4 2 2.4 5.8 0 7.8l-1-1c1.7-1.5 1.7-4.3 0-5.8z";
-  var SND_OFF = "M3 6h2.5L9 3v10L5.5 10H3zM11 6.4l1.1 1.1 1.1-1.1.9.9-1.1 1.1 1.1 1.1-.9.9-1.1-1.1-1.1 1.1-.9-.9L11.1 8.4 10 7.3z";
-
-  var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var playing = !calm;
-  var fr = Math.round(FRAMES * 0.18), acc = 0, last = 0, soundOn = false;
-
-  function showTime() {
-    var s = Math.floor(fr / FPS);
-    clock.textContent = "00:" + String(s).padStart(2, "0") + " / 00:48";
-    if (scrub.value !== String(fr)) scrub.value = String(fr);
-  }
-
-  function setPlaying(v) {
-    playing = v;
-    icoPlay.setAttribute("d", v ? PAUSE_D : PLAY_D);
-    btnPlay.setAttribute("aria-label", v ? "Duraklat" : "Oynat");
-    btnPlay.title = v ? "Duraklat" : "Oynat";
-    if (audio) audio.ctx[v ? "resume" : "suspend"]();
-  }
-
-  btnPlay.addEventListener("click", function () { setPlaying(!playing); });
-  scrub.addEventListener("input", function () {
-    fr = Number(scrub.value) | 0;
-    render(fr); showTime();
+  A.mount({
+    prefix: "akv", app: "akvaryum-app",
+    W: W, H: H, fps: FPS, frames: FRAMES,
+    frame0: Math.round(FRAMES * 0.18),
+    film: film, frameColor: "#071013", gain: 0.55,
+    render: render, startAudio: startAudio
   });
-  function toggleSound() {
-    if (!audio) audio = startAudio();
-    if (!audio) return;
-    soundOn = !soundOn;
-    if (playing && onScreen) audio.ctx.resume();
-    audio.out.gain.cancelScheduledValues(audio.ctx.currentTime);
-    audio.out.gain.setTargetAtTime(soundOn ? 0.55 : 0.0001, audio.ctx.currentTime, 0.6);
-    icoSound.setAttribute("d", soundOn ? SND_ON : SND_OFF);
-    btnSound.setAttribute("aria-label", soundOn ? "Sesi kapat" : "Sesi aç");
-    btnSound.title = btnSound.getAttribute("aria-label") + " (M)";
-  }
-  btnSound.addEventListener("click", toggleSound);
-
-  var screenEl = document.getElementById("akv-screen");
-  var btnFull = document.getElementById("akv-full");
-  var icoFull = document.getElementById("akv-ico-full");
-  var FULL_IN = "M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z";
-  var FULL_OUT = "M5 2h2v5H2V5h3zM9 2h2v3h3v2H9zM2 9h5v5H5v-3H2zM9 9h5v2h-3v3H9z";
-  var canFull = !!(screenEl.requestFullscreen || screenEl.webkitRequestFullscreen);
-  function fullEl() { return document.fullscreenElement || document.webkitFullscreenElement; }
-  function toggleFull() {
-    if (fullEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-    else if (screenEl.requestFullscreen) screenEl.requestFullscreen().catch(function () {});
-    else if (screenEl.webkitRequestFullscreen) screenEl.webkitRequestFullscreen();
-  }
-  function onFullChange() {
-    var on = fullEl() === screenEl;
-    icoFull.setAttribute("d", on ? FULL_OUT : FULL_IN);
-    btnFull.setAttribute("aria-label", on ? "Tam ekrandan çık" : "Tam ekran");
-    btnFull.title = btnFull.getAttribute("aria-label") + " (F)";
-    present();
-  }
-  if (canFull) {
-    btnFull.addEventListener("click", toggleFull);
-    document.addEventListener("fullscreenchange", onFullChange);
-    document.addEventListener("webkitfullscreenchange", onFullChange);
-  } else {
-    btnFull.hidden = true;
-  }
-
-  function seek(sec) {
-    fr = ((fr + sec * FPS) % FRAMES + FRAMES) % FRAMES;
-    render(fr); showTime();
-  }
-
-  screenEl.addEventListener("click", function () { setPlaying(!playing); screenEl.focus(); });
-  screenEl.addEventListener("dblclick", function () { if (canFull) toggleFull(); });
-  document.getElementById("akvaryum-app").addEventListener("keydown", function (e) {
-    if (e.altKey || e.ctrlKey || e.metaKey) return;
-    var tag = e.target.tagName;
-    var k = e.key;
-    if (k === " " || k === "Enter") {
-      if (tag === "BUTTON") return;
-      e.preventDefault(); setPlaying(!playing);
-    } else if ((k === "ArrowLeft" || k === "ArrowRight") && tag !== "INPUT") {
-      e.preventDefault(); seek(k === "ArrowLeft" ? -1 : 1);
-    } else if ((k === "f" || k === "F") && canFull) {
-      e.preventDefault(); toggleFull();
-    } else if (k === "m" || k === "M") {
-      e.preventDefault(); toggleSound();
-    }
-  });
-  window.addEventListener("resize", function () { present(); });
-
-  var onScreen = true;
-  if (window.IntersectionObserver) {
-    new IntersectionObserver(function (es) {
-      onScreen = es[0].isIntersecting;
-      if (audio) { if (onScreen && playing) audio.ctx.resume(); else audio.ctx.suspend(); }
-    }, { threshold: 0.04 }).observe(document.getElementById("akvaryum-app"));
-  }
-
-  function loop(now) {
-    if (!last) last = now;
-    var dt = Math.min(0.25, (now - last) / 1000);
-    last = now;
-    if (playing && onScreen) {
-      acc += dt;
-      var st = 1 / FPS, moved = false;
-      while (acc >= st) { acc -= st; fr = (fr + 1) % FRAMES; moved = true; }
-      if (moved) { render(fr); showTime(); }
-    }
-    requestAnimationFrame(loop);
-  }
-
-  icoSound.setAttribute("d", SND_OFF);
-  scrub.max = String(FRAMES - 1);
-  setPlaying(playing);
-  render(fr);
-  showTime();
-  requestAnimationFrame(loop);
 })();
 </script>
