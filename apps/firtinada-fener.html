@@ -155,6 +155,22 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
   .fener-slate .fen-rule { display: none; }
 }
 
+.fener-screen:fullscreen {
+  max-height: none;
+  aspect-ratio: auto;
+  border: 0;
+  cursor: none;
+}
+.fener-screen:-webkit-full-screen { max-height: none; border: 0; }
+
+.fener-keys {
+  margin: -2px 0 0;
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: var(--fen-dim);
+}
+@media (hover: none) { .fener-keys { display: none; } }
+
 .fener-back {
   margin: 0;
   font-size: 12px;
@@ -190,10 +206,15 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
     </button>
     <input type="range" id="fen-scrub" min="0" max="1439" step="1" value="432" aria-label="Zaman">
     <span class="fener-clock" id="fen-clock">00:14 / 00:48</span>
-    <button class="fen-key" id="fen-sound" type="button" aria-label="Sesi aç" title="Sesi aç">
+    <button class="fen-key" id="fen-sound" type="button" aria-label="Sesi aç" title="Sesi aç (M)">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path id="fen-ico-sound" d="M3 6h2.5L9 3v10L5.5 10H3zM11.2 5.1l1-1c2.4 2 2.4 5.8 0 7.8l-1-1c1.7-1.5 1.7-4.3 0-5.8z"></path></svg>
     </button>
+    <button class="fen-key" id="fen-full" type="button" aria-label="Tam ekran" title="Tam ekran (F)">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path id="fen-ico-full" d="M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z"></path></svg>
+    </button>
   </div>
+
+  <p class="fener-keys">Boşluk oynat/duraklat · ← → bir saniye · F tam ekran · M ses</p>
 
   <p class="fener-back"><a href="/art/">← Art</a></p>
 
@@ -202,6 +223,9 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
 <script>
 (function () {
   "use strict";
+
+  function hyp2(a, b) { return Math.sqrt(a * a + b * b); }
+  function hyp3(a, b, c) { return Math.sqrt(a * a + b * b + c * c); }
 
   var TAU = Math.PI * 2;
   var W = 320, H = 180;
@@ -289,7 +313,7 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
     camU[0] = camR[1] * camF[2] - camR[2] * camF[1];
     camU[1] = camR[2] * camF[0] - camR[0] * camF[2];
     camU[2] = camR[0] * camF[1] - camR[1] * camF[0];
-    var l = Math.hypot(camU[0], camU[1], camU[2]);
+    var l = hyp3(camU[0], camU[1], camU[2]);
     camU[0] /= l; camU[1] /= l; camU[2] /= l;
   }
 
@@ -344,7 +368,7 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
         var dx = camR[0] * ux + camU[0] * uy + camF[0];
         var dy = camR[1] * ux + camU[1] * uy + camF[1];
         var dz = camR[2] * ux + camU[2] * uy + camF[2];
-        var il = 1 / Math.hypot(dx, dy, dz);
+        var il = 1 / Math.sqrt(dx * dx + dy * dy + dz * dz);
         dx *= il; dy *= il; dz *= il;
 
         var i = y * W + x, o = i * 4, r, g, b, depth;
@@ -373,8 +397,8 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
               var ca = a * wv[2] * Math.cos(p);
               gx += ca * wv[0]; gz += ca * wv[1];
             }
-            var slope = Math.hypot(gx, gz);
-            var nl = 1 / Math.hypot(-gx, 1, -gz);
+            var slope = hyp2(gx, gz);
+            var nl = 1 / hyp3(-gx, 1, -gz);
             var nx = -gx * nl, ny = nl, nz = -gz * nl;
 
             var dn = dx * nx + dy * ny + dz * nz;
@@ -402,7 +426,7 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
             }
 
             var rdx = wx - ROCK_X, rdz = wz - ROCK_Z;
-            var rd = Math.hypot(rdx, rdz);
+            var rd = hyp2(rdx, rdz);
             if (rd < 26) {
               var ring = 1 - Math.abs(rd - 13.5) / 12.5;
               if (ring > 0) {
@@ -481,6 +505,20 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
     }
   }
 
+  // Columns of row centre q that can lie inside the triangle (±1 px slack; the per-pixel test stays exact).
+  var _xs = 0, _xe = -1;
+  function rowSpan(q, x0, y0, x1, y1, x2, y2, inv, lo, hi) {
+    var a0 = (x1 * (y2 - q) - x2 * (y1 - q)) * inv, b0 = (y1 - y2) * inv;
+    var a1 = (x2 * (y0 - q) - x0 * (y2 - q)) * inv, b1 = (y2 - y0) * inv;
+    var a2 = 1 - a0 - a1, b2 = -b0 - b1;
+    var pl = -Infinity, ph = Infinity;
+    if (b0 > 1e-12) pl = Math.max(pl, -a0 / b0); else if (b0 < -1e-12) ph = Math.min(ph, -a0 / b0); else if (a0 < -1e-9) ph = -Infinity;
+    if (b1 > 1e-12) pl = Math.max(pl, -a1 / b1); else if (b1 < -1e-12) ph = Math.min(ph, -a1 / b1); else if (a1 < -1e-9) ph = -Infinity;
+    if (b2 > 1e-12) pl = Math.max(pl, -a2 / b2); else if (b2 < -1e-12) ph = Math.min(ph, -a2 / b2); else if (a2 < -1e-9) ph = -Infinity;
+    _xs = Math.max(lo, Math.floor(pl - 0.5));
+    _xe = Math.min(hi, Math.ceil(ph - 0.5));
+  }
+
   function tri(x0, y0, w0, x1, y1, w1, x2, y2, w2, r, g, b) {
     var area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
     if (area > -1e-9 && area < 1e-9) return;
@@ -492,7 +530,8 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
     if (minX > maxX || minY > maxY) return;
     for (var y = minY; y <= maxY; y++) {
       var pyc = y + 0.5, row = y * W;
-      for (var x = minX; x <= maxX; x++) {
+      rowSpan(pyc, x0, y0, x1, y1, x2, y2, inv, minX, maxX);
+      for (var x = _xs, xEnd = _xe; x <= xEnd; x++) {
         var pxc = x + 0.5;
         var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
         if (l0 < 0) continue;
@@ -524,7 +563,8 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
     if (minX > maxX || minY > maxY) return;
     for (var y = minY; y <= maxY; y++) {
       var pyc = y + 0.5, row = y * W;
-      for (var x = minX; x <= maxX; x++) {
+      rowSpan(pyc, x0, y0, x1, y1, x2, y2, inv, minX, maxX);
+      for (var x = _xs, xEnd = _xe; x <= xEnd; x++) {
         var pxc = x + 0.5;
         var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
         if (l0 < 0) continue;
@@ -581,6 +621,55 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
     c = lit(base, 1, 0, 0, jit); m.quad(x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1, c[0], c[1], c[2]);
   }
 
+  function hh(v) { return frac(Math.sin(v * 12.9898) * 43758.5453); }
+
+  // Shade a quad from its own normal, flipped to face away from (rx, ry, rz).
+  function litFace(m, base, jit, ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz, rx, ry, rz) {
+    var ux = cx - ax, uy = cy - ay, uz = cz - az;
+    var vx = dx - bx, vy = dy - by, vz = dz - bz;
+    var nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+    var l = Math.sqrt(nx * nx + ny * ny + nz * nz);
+    if (l < 1e-9) return;
+    nx /= l; ny /= l; nz /= l;
+    var fx = (ax + bx + cx + dx) * 0.25 - rx, fy = (ay + by + cy + dy) * 0.25 - ry, fz = (az + bz + cz + dz) * 0.25 - rz;
+    if (nx * fx + ny * fy + nz * fz < 0) { nx = -nx; ny = -ny; nz = -nz; }
+    var c = lit(base, nx, ny, nz, jit);
+    m.quad(ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz, c[0], c[1], c[2]);
+  }
+
+  // Faceted boulder from y0 (under water) to y1: base, waist, shoulder, lumpy cap.
+  var RINGS = [[0, 1.0], [0.72, 0.92], [1.0, 0.52]];
+  function boulder(m, x, z, rx, rz, y0, y1, seed, base, cap) {
+    var N = 6, rot = hh(seed * 3.1) * TAU, ring = [], r, i, j;
+    var hgt = y1 - y0;
+    for (r = 0; r < RINGS.length; r++) {
+      var pts = [];
+      for (i = 0; i < N; i++) {
+        var a = rot + (i + hh(seed * 5 + i) * 0.5) / N * TAU;
+        var jr = RINGS[r][1] * (0.78 + hh(seed * 13 + r * 7 + i) * 0.4);
+        var jy = RINGS[r][0] + (r > 0 ? (hh(seed * 17 + r * 5 + i) - 0.5) * 0.16 : 0);
+        pts.push([x + Math.sin(a) * rx * jr, y0 + jy * hgt, z + Math.cos(a) * rz * jr]);
+      }
+      ring.push(pts);
+    }
+    var cy = y0 + hgt * 0.4;
+    for (r = 0; r < RINGS.length - 1; r++) {
+      for (i = 0; i < N; i++) {
+        j = (i + 1) % N;
+        var p = ring[r][i], q = ring[r][j], s = ring[r + 1][j], t = ring[r + 1][i];
+        litFace(m, cap && r === RINGS.length - 2 ? cap : base, (hh(seed * 23 + r * 11 + i) - 0.5) * 0.12,
+                p[0], p[1], p[2], q[0], q[1], q[2], s[0], s[1], s[2], t[0], t[1], t[2], x, cy, z);
+      }
+    }
+    var top = ring[RINGS.length - 1];
+    var ax = x + (hh(seed) - 0.5) * rx * 0.3, ay = y1 + hgt * 0.03, az = z + (hh(seed + 1) - 0.5) * rz * 0.3;
+    for (i = 0; i < N; i++) {
+      j = (i + 1) % N;
+      litFace(m, cap || base, (hh(seed * 29 + i) - 0.5) * 0.10,
+              top[i][0], top[i][1], top[i][2], top[j][0], top[j][1], top[j][2], ax, ay, az, ax, ay, az, x, cy, z);
+    }
+  }
+
   function crag(m, count, rMin, rMax, hMin, hMax, seed) {
     for (var i = 0; i < count; i++) {
       var h1 = frac(Math.sin((i + seed) * 12.9898) * 43758.5453);
@@ -589,10 +678,9 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
       var a = (i / count) * TAU + (h1 - 0.5) * 0.42;
       var rad = rMin + (rMax - rMin) * h2;
       var hgt = hMin + (hMax - hMin) * h3;
-      var w = 1.1 + h1 * 2.3, d = 1.0 + h3 * 2.1;
+      var w = 1.3 + h1 * 2.5, d = 1.2 + h3 * 2.3;
       var x = Math.sin(a) * rad, z = Math.cos(a) * rad;
-      block(m, x - w, -2.4, z - d, x + w, hgt, z + d, h2 > 0.5 ? ROCK : ROCK_D, (h1 - 0.5) * 0.12);
-      if (hgt < 1.3) block(m, x - w * 0.9, hgt - 0.35, z - d * 0.9, x + w * 0.9, hgt + 0.12, z + d * 0.9, WEED, 0);
+      boulder(m, x, z, w, d, -2.4, hgt, (i + seed) * 7.3, h2 > 0.5 ? ROCK : ROCK_D, hgt < 1.3 ? WEED : null);
     }
   }
 
@@ -629,7 +717,7 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
     crag(m, 20, 4.9, 9.1, 2.6, 9.6, 11.7);
     crag(m, 13, 2.4, 5.6, 5.2, BASE_Y - 0.3, 5.9);
     crag(m, 5, 10.5, 15.5, 5.5, 10.5, 41.7);
-    block(m, -4.9, -2.2, -4.6, 5.2, BASE_Y, 4.9, ROCK, 0.01);
+    drum(m, 0.15, 0.15, -2.2, BASE_Y, 6.6, 5.6, ROCK, 0.01, true);
     crag(m, 9, 4.2, 6.4, 0.2, 1.4, 21.3);
 
     drum(m, 0, 0, BASE_Y, BASE_Y + 1.1, 4.5, 4.2, TOWER_D, -0.04, false);
@@ -787,7 +875,7 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
   }
 
   function print(fr) {
-    var cx = W * 0.5, cy = H * 0.5, rmax = Math.hypot(cx, cy);
+    var cx = W * 0.5, cy = H * 0.5, rmax = hyp2(cx, cy);
     for (var y = 0; y < H; y++) {
       var by = (y & 3) * 4, dy2 = (y - cy) / rmax;
       for (var x = 0; x < W; x++) {
@@ -938,21 +1026,67 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
     fr = Number(scrub.value) | 0;
     render(fr); stamp2();
   });
-  btnSound.addEventListener("click", function () {
+  function toggleSound() {
     if (!audio) audio = startAudio();
     if (!audio) return;
     soundOn = !soundOn;
-    audio.ctx.resume();
+    if (playing && onScreen) audio.ctx.resume();
     audio.out.gain.cancelScheduledValues(audio.ctx.currentTime);
     audio.out.gain.setTargetAtTime(soundOn ? 0.5 : 0.0001, audio.ctx.currentTime, 0.6);
     icoSound.setAttribute("d", soundOn ? SND_ON : SND_OFF);
     btnSound.setAttribute("aria-label", soundOn ? "Sesi kapat" : "Sesi aç");
-    btnSound.title = btnSound.getAttribute("aria-label");
-  });
+    btnSound.title = btnSound.getAttribute("aria-label") + " (M)";
+  }
+  btnSound.addEventListener("click", toggleSound);
+
   var screenEl = document.getElementById("fen-screen");
+  var btnFull = document.getElementById("fen-full");
+  var icoFull = document.getElementById("fen-ico-full");
+  var FULL_IN = "M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z";
+  var FULL_OUT = "M5 2h2v5H2V5h3zM9 2h2v3h3v2H9zM2 9h5v5H5v-3H2zM9 9h5v2h-3v3H9z";
+  var canFull = !!(screenEl.requestFullscreen || screenEl.webkitRequestFullscreen);
+  function fullEl() { return document.fullscreenElement || document.webkitFullscreenElement; }
+  function toggleFull() {
+    if (fullEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else if (screenEl.requestFullscreen) screenEl.requestFullscreen().catch(function () {});
+    else if (screenEl.webkitRequestFullscreen) screenEl.webkitRequestFullscreen();
+  }
+  function onFullChange() {
+    var on = fullEl() === screenEl;
+    icoFull.setAttribute("d", on ? FULL_OUT : FULL_IN);
+    btnFull.setAttribute("aria-label", on ? "Tam ekrandan çık" : "Tam ekran");
+    btnFull.title = btnFull.getAttribute("aria-label") + " (F)";
+    present();
+  }
+  if (canFull) {
+    btnFull.addEventListener("click", toggleFull);
+    document.addEventListener("fullscreenchange", onFullChange);
+    document.addEventListener("webkitfullscreenchange", onFullChange);
+  } else {
+    btnFull.hidden = true;
+  }
+
+  function seek(sec) {
+    fr = ((fr + sec * FPS) % FRAMES + FRAMES) % FRAMES;
+    render(fr); stamp2();
+  }
+
   screenEl.addEventListener("click", function () { setPlaying(!playing); screenEl.focus(); });
-  screenEl.addEventListener("keydown", function (e) {
-    if (e.code === "Space" || e.code === "Enter") { e.preventDefault(); setPlaying(!playing); }
+  screenEl.addEventListener("dblclick", function () { if (canFull) toggleFull(); });
+  document.getElementById("fener-app").addEventListener("keydown", function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var tag = e.target.tagName;
+    var k = e.key;
+    if (k === " " || k === "Enter") {
+      if (tag === "BUTTON") return;
+      e.preventDefault(); setPlaying(!playing);
+    } else if ((k === "ArrowLeft" || k === "ArrowRight") && tag !== "INPUT") {
+      e.preventDefault(); seek(k === "ArrowLeft" ? -1 : 1);
+    } else if ((k === "f" || k === "F") && canFull) {
+      e.preventDefault(); toggleFull();
+    } else if (k === "m" || k === "M") {
+      e.preventDefault(); toggleSound();
+    }
   });
   window.addEventListener("resize", function () { present(); });
 

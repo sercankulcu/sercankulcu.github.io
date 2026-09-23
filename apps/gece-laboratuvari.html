@@ -151,6 +151,22 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
   flex: 0 0 auto;
 }
 
+.lab-screen:fullscreen {
+  max-height: none;
+  aspect-ratio: auto;
+  border: 0;
+  cursor: none;
+}
+.lab-screen:-webkit-full-screen { max-height: none; border: 0; }
+
+.lab-keys {
+  margin: -2px 0 0;
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: var(--lab-dim);
+}
+@media (hover: none) { .lab-keys { display: none; } }
+
 .lab-back {
   margin: .5rem 0 0;
   font-size: 12px;
@@ -190,10 +206,15 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     </button>
     <input type="range" id="lab-scrub" min="0" max="1439" step="1" value="317" aria-label="Zaman">
     <span class="lab-clock" id="lab-clock">00:10 / 00:48</span>
-    <button class="lab-key" id="lab-sound" type="button" aria-label="Sesi aç" title="Sesi aç">
+    <button class="lab-key" id="lab-sound" type="button" aria-label="Sesi aç" title="Sesi aç (M)">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path id="lab-ico-sound" d="M3 6h2.5L9 3v10L5.5 10H3zM11.2 5.1l1-1c2.4 2 2.4 5.8 0 7.8l-1-1c1.7-1.5 1.7-4.3 0-5.8z"></path></svg>
     </button>
+    <button class="lab-key" id="lab-full" type="button" aria-label="Tam ekran" title="Tam ekran (F)">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path id="lab-ico-full" d="M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z"></path></svg>
+    </button>
   </div>
+
+  <p class="lab-keys">Boşluk oynat/duraklat · ← → bir saniye · F tam ekran · M ses</p>
 
   <p class="lab-back"><a href="/art/">← Art</a></p>
 
@@ -202,6 +223,9 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
 <script>
 (function () {
   "use strict";
+
+  function hyp2(a, b) { return Math.sqrt(a * a + b * b); }
+  function hyp3(a, b, c) { return Math.sqrt(a * a + b * b + c * c); }
 
   var TAU = Math.PI * 2;
   var W = 320, H = 180;
@@ -269,15 +293,15 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
   function fogAt(d) { var i = d * 50; return i >= 1023 ? 1 : FOGLUT[i | 0]; }
 
   var camPos = [0, 0, 0], camF = [0, 0, -1], camR = [1, 0, 0], camU = [0, 1, 0];
-  var FOV = 47 * Math.PI / 180, tanH = Math.tan(FOV / 2), aspect = W / H;
+  var FOV = 49 * Math.PI / 180, tanH = Math.tan(FOV / 2), aspect = W / H;
 
   function setCamera(t) {
     var u = t / DURATION;
     var ease = 0.5 - 0.5 * Math.cos(u * TAU);
-    camPos[0] = 0.16 - 0.11 * ease;
+    camPos[0] = 0.30 - 0.11 * ease;
     camPos[1] = 1.22 + 0.016 * Math.sin(u * TAU);
-    camPos[2] = 0.46 - 0.08 * ease;
-    var yaw = -0.118 + 0.009 * Math.sin(u * TAU);
+    camPos[2] = 0.62 - 0.08 * ease;
+    var yaw = 0.02 + 0.009 * Math.sin(u * TAU);
     var pitch = -0.098;
     var cp = Math.cos(pitch);
     camF[0] = Math.sin(yaw) * cp; camF[1] = Math.sin(pitch); camF[2] = -Math.cos(yaw) * cp;
@@ -285,7 +309,7 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     camU[0] = camR[1] * camF[2] - camR[2] * camF[1];
     camU[1] = camR[2] * camF[0] - camR[0] * camF[2];
     camU[2] = camR[0] * camF[1] - camR[1] * camF[0];
-    var l = Math.hypot(camU[0], camU[1], camU[2]);
+    var l = hyp3(camU[0], camU[1], camU[2]);
     camU[0] /= l; camU[1] /= l; camU[2] /= l;
   }
 
@@ -332,6 +356,20 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     for (i = 1; i < nc - 1; i++) tri(sxA[0], syA[0], swA[0], sxA[i], syA[i], swA[i], sxA[i + 1], syA[i + 1], swA[i + 1], r, g, b);
   }
 
+  // Columns of row centre q that can lie inside the triangle (±1 px slack; the per-pixel test stays exact).
+  var _xs = 0, _xe = -1;
+  function rowSpan(q, x0, y0, x1, y1, x2, y2, inv, lo, hi) {
+    var a0 = (x1 * (y2 - q) - x2 * (y1 - q)) * inv, b0 = (y1 - y2) * inv;
+    var a1 = (x2 * (y0 - q) - x0 * (y2 - q)) * inv, b1 = (y2 - y0) * inv;
+    var a2 = 1 - a0 - a1, b2 = -b0 - b1;
+    var pl = -Infinity, ph = Infinity;
+    if (b0 > 1e-12) pl = Math.max(pl, -a0 / b0); else if (b0 < -1e-12) ph = Math.min(ph, -a0 / b0); else if (a0 < -1e-9) ph = -Infinity;
+    if (b1 > 1e-12) pl = Math.max(pl, -a1 / b1); else if (b1 < -1e-12) ph = Math.min(ph, -a1 / b1); else if (a1 < -1e-9) ph = -Infinity;
+    if (b2 > 1e-12) pl = Math.max(pl, -a2 / b2); else if (b2 < -1e-12) ph = Math.min(ph, -a2 / b2); else if (a2 < -1e-9) ph = -Infinity;
+    _xs = Math.max(lo, Math.floor(pl - 0.5));
+    _xe = Math.min(hi, Math.ceil(ph - 0.5));
+  }
+
   function tri(x0, y0, w0, x1, y1, w1, x2, y2, w2, r, g, b) {
     var area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
     if (area > -1e-9 && area < 1e-9) return;
@@ -343,7 +381,8 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     if (minX > maxX || minY > maxY) return;
     for (var y = minY; y <= maxY; y++) {
       var pyc = y + 0.5, row = y * W;
-      for (var x = minX; x <= maxX; x++) {
+      rowSpan(pyc, x0, y0, x1, y1, x2, y2, inv, minX, maxX);
+      for (var x = _xs, xEnd = _xe; x <= xEnd; x++) {
         var pxc = x + 0.5;
         var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
         if (l0 < 0) continue;
@@ -383,17 +422,18 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
   var LAMPS = [];
 
   function litAt(base, nx, ny, nz, cx, cy, cz, jit) {
-    var amb = 0.185 + (jit || 0);
+    var amb = 0.22 + (jit || 0);
     var r = base[0] * amb * 0.56, g = base[1] * amb * 0.74, b = base[2] * amb * 1.00;
     for (var i = 0; i < LAMPS.length; i++) {
       var L = LAMPS[i];
       var dx = L[0] - cx, dy = L[1] - cy, dz = L[2] - cz;
       var d2 = dx * dx + dy * dy + dz * dz;
-      if (d2 > 26) continue;
+      var fall = L[5] || 4.6;
+      if (d2 > (L[5] ? 60 : 26)) continue;
       var d = Math.sqrt(d2);
       var lam = (dx * nx + dy * ny + dz * nz) / d;
       if (lam <= 0) continue;
-      var att = L[3] / (1 + d2 * 4.6);
+      var att = L[3] / (1 + d2 * fall);
       var k = lam * att, C = L[4];
       r += base[0] * k * C[0];
       g += base[1] * k * C[1];
@@ -430,6 +470,22 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     m.quad(x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1, col[0] * 0.8, col[1] * 0.8, col[2] * 0.8);
   }
 
+  // Octagonal mug: outer wall, dark coffee disc inside the rim, and a handle.
+  function mug(m, cx, cz, rad, hgt, base) {
+    var N = 8, y0 = BENCH, y1 = BENCH + hgt, i;
+    for (i = 0; i < N; i++) {
+      var a0 = (i / N) * TAU, a1 = ((i + 1) / N) * TAU, am = (a0 + a1) / 2;
+      var nx = Math.sin(am), nz = Math.cos(am);
+      var c = litAt(base, nx, 0, nz, cx + nx * rad, (y0 + y1) / 2, cz + nz * rad, 0.02);
+      m.quad(cx + Math.sin(a0) * rad, y0, cz + Math.cos(a0) * rad, cx + Math.sin(a1) * rad, y0, cz + Math.cos(a1) * rad,
+             cx + Math.sin(a1) * rad, y1, cz + Math.cos(a1) * rad, cx + Math.sin(a0) * rad, y1, cz + Math.cos(a0) * rad, c[0], c[1], c[2]);
+      var t = litAt([40, 26, 18], 0, 1, 0, cx, y1 - 0.012, cz, 0);
+      m.quad(cx, y1 - 0.012, cz, cx + Math.sin(a0) * rad * 0.9, y1 - 0.012, cz + Math.cos(a0) * rad * 0.9,
+             cx + Math.sin(a1) * rad * 0.9, y1 - 0.012, cz + Math.cos(a1) * rad * 0.9, cx, y1 - 0.012, cz, t[0], t[1], t[2]);
+    }
+    block(m, cx + rad * 0.9, BENCH + hgt * 0.25, cz - 0.008, cx + rad * 1.55, BENCH + hgt * 0.78, cz + 0.008, base, -0.02);
+  }
+
   var SCOPE_X = -0.44, SCOPE_Z = -0.86;
   var SCR_X0 = SCOPE_X - 0.155, SCR_X1 = SCOPE_X + 0.075;
   var SCR_Y0 = BENCH + 0.075, SCR_Y1 = BENCH + 0.235;
@@ -443,14 +499,28 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     LAMPS.push([1.28, 1.64, BACK_Z + 0.04, 3.40, COLD_C]);
     LAMPS.push([0.30, BENCH + 0.035, -0.32, 0.26, RED_C]);
     LAMPS.push([0.86, BENCH + 0.10, -0.50, 0.42, [1.0, 0.42, 0.14]]);
+    // Street light coming in through the window: weak but wide.
+    LAMPS.push([1.35, 1.62, BACK_Z + 0.55, 0.95, COLD_C, 0.45]);
 
     m.quad(-3.4, 0, BACK_Z, 3.4, 0, BACK_Z, 3.4, 2.7, BACK_Z, -3.4, 2.7, BACK_Z, 0, 0, 0);
-    var wc = litAt(WALL, 0, 0, 1, 0, 1.5, BACK_Z, 0);
-    m.quad(-3.4, 0, BACK_Z, 3.4, 0, BACK_Z, 3.4, 2.7, BACK_Z, -3.4, 2.7, BACK_Z, wc[0], wc[1], wc[2]);
+    // Wall and bench top as grids so the instruments' light can pool across them.
+    var gx, gy, GS = 0.12;
+    for (gx = -3.4; gx < 3.4 - 1e-6; gx += GS) {
+      for (gy = 0.78; gy < 2.7 - 1e-6; gy += GS) {
+        var wc = litAt(WALL, 0, 0, 1, gx + GS / 2, gy + GS / 2, BACK_Z, (hash(gx * 91 + gy * 37) - 0.5) * 0.025);
+        m.quad(gx, gy, BACK_Z + 0.001, gx + GS, gy, BACK_Z + 0.001, gx + GS, gy + GS, BACK_Z + 0.001, gx, gy + GS, BACK_Z + 0.001, wc[0], wc[1], wc[2]);
+      }
+    }
 
-    block(m, -3.0, 0.80, BACK_Z + 0.02, 3.0, BENCH, 0.42, TOPD, 0);
-    var tc = litAt(TOP, 0, 1, 0, 0, BENCH, -0.5, 0);
-    m.quad(-3.0, BENCH, BACK_Z + 0.02, 3.0, BENCH, BACK_Z + 0.02, 3.0, BENCH, 0.42, -3.0, BENCH, 0.42, tc[0], tc[1], tc[2]);
+    block(m, -3.0, 0.80, BACK_Z + 0.02, 3.0, BENCH - 0.004, 0.42, TOPD, 0);
+    var TZ0 = BACK_Z + 0.02, TZS = (0.42 - TZ0) / 16;
+    for (gx = -3.0; gx < 3.0 - 1e-6; gx += GS) {
+      for (var tz = 0; tz < 16; tz++) {
+        var z0 = TZ0 + tz * TZS;
+        var tc = litAt(TOP, 0, 1, 0, gx + GS / 2, BENCH, z0 + TZS / 2, (hash(gx * 53 + tz * 17) - 0.5) * 0.03);
+        m.quad(gx, BENCH, z0, gx + GS, BENCH, z0, gx + GS, BENCH, z0 + TZS, gx, BENCH, z0 + TZS, tc[0], tc[1], tc[2]);
+      }
+    }
     block(m, -2.6, 0, 0.18, -2.42, 0.80, 0.36, METAL_D, 0);
     block(m, 2.42, 0, 0.18, 2.60, 0.80, 0.36, METAL_D, 0);
 
@@ -488,7 +558,7 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
 
     block(m, 1.62, BENCH, -0.30, 1.78, BENCH + 0.11, -0.14, PLASTIC, 0.0);
     block(m, -2.05, BENCH, -0.46, -1.80, BENCH + 0.14, -0.20, [70, 74, 72], 0.01);
-    block(m, -0.02, BENCH, -0.14, 0.10, BENCH + 0.10, -0.02, [162, 158, 150], 0.02);
+    mug(m, 0.04, -0.08, 0.052, 0.098, [162, 158, 150]);
 
     var fr2 = litAt(METAL_D, 0, 0, 1, 1.3, 1.6, BACK_Z, 0);
     m.quad(0.60, 1.14, BACK_Z + 0.01, 2.10, 1.14, BACK_Z + 0.01, 2.10, 2.16, BACK_Z + 0.01, 0.60, 2.16, BACK_Z + 0.01, fr2[0], fr2[1], fr2[2]);
@@ -660,7 +730,7 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
   }
 
   function print(fr) {
-    var cx = W * 0.5, cy = H * 0.5, rmax = Math.hypot(cx, cy);
+    var cx = W * 0.5, cy = H * 0.5, rmax = hyp2(cx, cy);
     for (var y = 0; y < H; y++) {
       var by = (y & 3) * 4, dy2 = (y - cy) / rmax;
       for (var x = 0; x < W; x++) {
@@ -799,21 +869,67 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     fr = Number(scrub.value) | 0;
     render(fr); showTime();
   });
-  btnSound.addEventListener("click", function () {
+  function toggleSound() {
     if (!audio) audio = startAudio();
     if (!audio) return;
     soundOn = !soundOn;
-    audio.ctx.resume();
+    if (playing && onScreen) audio.ctx.resume();
     audio.out.gain.cancelScheduledValues(audio.ctx.currentTime);
     audio.out.gain.setTargetAtTime(soundOn ? 0.55 : 0.0001, audio.ctx.currentTime, 0.6);
     icoSound.setAttribute("d", soundOn ? SND_ON : SND_OFF);
     btnSound.setAttribute("aria-label", soundOn ? "Sesi kapat" : "Sesi aç");
-    btnSound.title = btnSound.getAttribute("aria-label");
-  });
+    btnSound.title = btnSound.getAttribute("aria-label") + " (M)";
+  }
+  btnSound.addEventListener("click", toggleSound);
+
   var screenEl = document.getElementById("lab-screen");
+  var btnFull = document.getElementById("lab-full");
+  var icoFull = document.getElementById("lab-ico-full");
+  var FULL_IN = "M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z";
+  var FULL_OUT = "M5 2h2v5H2V5h3zM9 2h2v3h3v2H9zM2 9h5v5H5v-3H2zM9 9h5v2h-3v3H9z";
+  var canFull = !!(screenEl.requestFullscreen || screenEl.webkitRequestFullscreen);
+  function fullEl() { return document.fullscreenElement || document.webkitFullscreenElement; }
+  function toggleFull() {
+    if (fullEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else if (screenEl.requestFullscreen) screenEl.requestFullscreen().catch(function () {});
+    else if (screenEl.webkitRequestFullscreen) screenEl.webkitRequestFullscreen();
+  }
+  function onFullChange() {
+    var on = fullEl() === screenEl;
+    icoFull.setAttribute("d", on ? FULL_OUT : FULL_IN);
+    btnFull.setAttribute("aria-label", on ? "Tam ekrandan çık" : "Tam ekran");
+    btnFull.title = btnFull.getAttribute("aria-label") + " (F)";
+    present();
+  }
+  if (canFull) {
+    btnFull.addEventListener("click", toggleFull);
+    document.addEventListener("fullscreenchange", onFullChange);
+    document.addEventListener("webkitfullscreenchange", onFullChange);
+  } else {
+    btnFull.hidden = true;
+  }
+
+  function seek(sec) {
+    fr = ((fr + sec * FPS) % FRAMES + FRAMES) % FRAMES;
+    render(fr); showTime();
+  }
+
   screenEl.addEventListener("click", function () { setPlaying(!playing); screenEl.focus(); });
-  screenEl.addEventListener("keydown", function (e) {
-    if (e.code === "Space" || e.code === "Enter") { e.preventDefault(); setPlaying(!playing); }
+  screenEl.addEventListener("dblclick", function () { if (canFull) toggleFull(); });
+  document.getElementById("lab-app").addEventListener("keydown", function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var tag = e.target.tagName;
+    var k = e.key;
+    if (k === " " || k === "Enter") {
+      if (tag === "BUTTON") return;
+      e.preventDefault(); setPlaying(!playing);
+    } else if ((k === "ArrowLeft" || k === "ArrowRight") && tag !== "INPUT") {
+      e.preventDefault(); seek(k === "ArrowLeft" ? -1 : 1);
+    } else if ((k === "f" || k === "F") && canFull) {
+      e.preventDefault(); toggleFull();
+    } else if (k === "m" || k === "M") {
+      e.preventDefault(); toggleSound();
+    }
   });
   window.addEventListener("resize", function () { present(); });
 
