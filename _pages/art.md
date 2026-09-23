@@ -90,6 +90,12 @@ They have turned out to be about the same thing. Each one is a place where somet
     <span class="art-meta">Gaudí's bench above Barcelona, rebuilt from a photograph: trencadís laid as thousands of flat shards · 50 colours · 48 s loop</span>
   </a>
 
+  <a class="art-card" href="/apps/gece-laboratuvari/">
+    <img src="/images/art/gece-laboratuvari.png" alt="An empty engineering lab at night, lit by an oscilloscope and a rainy window, drawn in pixels" loading="lazy" width="960" height="540">
+    <span class="art-title">Gece Laboratuvarı</span>
+    <span class="art-meta">An empty lab after midnight: a live trace on the scope, rain on the glass, every light in the room coming from the instruments · 45 colours · 48 s loop</span>
+  </a>
+
 </div>
 
 Park Güell is the only one of these taken from life rather than invented — from a photograph on the terrace, one hot afternoon in Barcelona. The bench was a good fit for the method: trencadís is already a mosaic of irregular flat pieces, and a software rasteriser draws nothing but irregular flat pieces.

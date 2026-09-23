@@ -1,0 +1,848 @@
+---
+layout: without-sidebar
+title: "Gece Laboratuvarı"
+permalink: /apps/gece-laboratuvari/
+header:
+  image: art/gece-laboratuvari.png
+redirect_from:
+  - /apps/gece-laboratuvari.html
+excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the browser: a live trace on the scope, rain on the window, and every light in the room coming from the instruments themselves. Loops every 48 seconds."
+---
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+.page__hero { display: none; }
+
+.lab-app,
+.lab-app *,
+.lab-app *::before,
+.lab-app *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lab-app {
+  --lab-frame: #0a0e0f;
+  --lab-ink: #9fb0a6;
+  --lab-dim: #6d7f75;
+  --lab-line: #1a2621;
+  --lab-accent: #7dd88f;
+  width: min(940px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--lab-ink);
+}
+
+.lab-slate {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.lab-app .lab-slate h1 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(20px, 2.6vw, 28px);
+  line-height: 1.2;
+  letter-spacing: .01em;
+  color: var(--lab-accent);
+}
+.lab-slate .lab-where {
+  font-size: 10px;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+  color: var(--lab-dim);
+  white-space: nowrap;
+}
+.lab-slate .lab-rule {
+  flex: 1 1 40px;
+  min-width: 24px;
+  height: 1px;
+  background: var(--lab-line);
+  transform: translateY(-5px);
+}
+
+.lab-screen {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 74vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--lab-frame);
+  border: 1px solid var(--lab-line);
+  overflow: hidden;
+  cursor: pointer;
+}
+.lab-screen:focus-visible { outline: 2px solid var(--lab-accent); outline-offset: 2px; }
+.lab-screen canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.lab-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.lab-app button.lab-key {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--lab-line);
+  border-radius: 0;
+  color: var(--lab-ink);
+  width: 34px;
+  height: 34px;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  margin: 0;
+  flex: 0 0 auto;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.lab-app button.lab-key:hover { border-color: #2f463b; color: var(--lab-accent); background: transparent; }
+.lab-app button.lab-key:focus-visible { outline: 2px solid var(--lab-accent); outline-offset: 2px; }
+.lab-app button.lab-key svg { width: 14px; height: 14px; fill: currentColor; }
+
+.lab-app input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 1 1 auto;
+  min-width: 60px;
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.lab-app input[type="range"]:focus-visible { outline: 2px solid var(--lab-accent); outline-offset: 2px; }
+.lab-app input[type="range"]::-webkit-slider-runnable-track { height: 1px; background: var(--lab-line); }
+.lab-app input[type="range"]::-moz-range-track { height: 1px; background: var(--lab-line); }
+.lab-app input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 3px; height: 13px; margin-top: -6px;
+  background: var(--lab-accent); border: 0; border-radius: 0;
+}
+.lab-app input[type="range"]::-moz-range-thumb {
+  width: 3px; height: 13px;
+  background: var(--lab-accent); border: 0; border-radius: 0;
+}
+
+.lab-clock {
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--lab-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.lab-back {
+  margin: .5rem 0 0;
+  font-size: 12px;
+  letter-spacing: .06em;
+}
+.lab-back a {
+  color: var(--lab-dim);
+  text-decoration: none;
+  border-bottom: 1px solid var(--lab-line);
+  padding-bottom: 1px;
+}
+.lab-back a:hover {
+  color: var(--lab-accent);
+  border-bottom-color: var(--lab-accent);
+}
+
+@media (max-width: 520px) {
+  .lab-slate .lab-rule { display: none; }
+}
+</style>
+
+<div class="lab-app" id="lab-app">
+
+  <div class="lab-slate">
+    <h1>Gece Laboratuvarı</h1>
+    <span class="lab-rule"></span>
+    <span class="lab-where">01:50 · yağmur · kimse yok</span>
+  </div>
+
+  <div class="lab-screen" id="lab-screen" tabindex="0" aria-label="Sahneyi oynat veya duraklat">
+    <canvas id="lab-stage" width="1280" height="720" aria-label="Gece boş bir mühendislik laboratuvarı: osiloskop ekranında canlı bir dalga, breadboard, tüten havya, pencerede yağmur"></canvas>
+  </div>
+
+  <div class="lab-bar">
+    <button class="lab-key" id="lab-play" type="button" aria-label="Duraklat" title="Duraklat">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path id="lab-ico-play" d="M4 2h3v12H4zM9 2h3v12H9z"></path></svg>
+    </button>
+    <input type="range" id="lab-scrub" min="0" max="1439" step="1" value="317" aria-label="Zaman">
+    <span class="lab-clock" id="lab-clock">00:10 / 00:48</span>
+    <button class="lab-key" id="lab-sound" type="button" aria-label="Sesi aç" title="Sesi aç">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path id="lab-ico-sound" d="M3 6h2.5L9 3v10L5.5 10H3zM11.2 5.1l1-1c2.4 2 2.4 5.8 0 7.8l-1-1c1.7-1.5 1.7-4.3 0-5.8z"></path></svg>
+    </button>
+  </div>
+
+  <p class="lab-back"><a href="/art/">← Art</a></p>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var TAU = Math.PI * 2;
+  var W = 320, H = 180;
+  var DURATION = 48, FPS = 30;
+  var FRAMES = DURATION * FPS;
+
+  var BENCH = 0.92;
+  var BACK_Z = -1.62;
+
+  function hex(h) {
+    return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  }
+  function ramp(a, b, n) {
+    var ca = hex(a), cb = hex(b), out = [];
+    for (var i = 0; i < n; i++) {
+      var k = n === 1 ? 0 : i / (n - 1);
+      out.push([ca[0] + (cb[0] - ca[0]) * k, ca[1] + (cb[1] - ca[1]) * k, ca[2] + (cb[2] - ca[2]) * k]);
+    }
+    return out;
+  }
+  var PALETTE = [].concat(
+    ramp("#05080a", "#243033", 5),
+    ramp("#2b3a3d", "#7d8f92", 5),
+    ramp("#0b2c18", "#3f9a5a", 5),
+    ramp("#5fd47c", "#d8ffe2", 4),
+    ramp("#3a2406", "#d9932c", 5),
+    ramp("#f0b64a", "#ffe6a8", 3),
+    ramp("#4a0e0c", "#e0483a", 3),
+    ramp("#101b28", "#4e6c8e", 5),
+    ramp("#221d18", "#6e6154", 4),
+    ramp("#0d2a18", "#2f5f3a", 3),
+    ramp("#5a3c20", "#c9a978", 3)
+  );
+
+  var LUT = new Uint8Array(32 * 32 * 32 * 3);
+  (function () {
+    for (var r = 0; r < 32; r++) for (var g = 0; g < 32; g++) for (var b = 0; b < 32; b++) {
+      var R = r * 8.226, G = g * 8.226, B = b * 8.226, best = 0, bd = 1e9;
+      for (var p = 0; p < PALETTE.length; p++) {
+        var c = PALETTE[p];
+        var dr = R - c[0], dg = G - c[1], db = B - c[2];
+        var d = dr * dr * 0.5 + dg * dg * 0.7 + db * db * 0.35;
+        if (d < bd) { bd = d; best = p; }
+      }
+      var i = ((r << 10) | (g << 5) | b) * 3, c2 = PALETTE[best];
+      LUT[i] = c2[0]; LUT[i + 1] = c2[1]; LUT[i + 2] = c2[2];
+    }
+  })();
+  var BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+
+  var film = document.createElement("canvas");
+  film.width = W; film.height = H;
+  var fctx = film.getContext("2d");
+  var frame = fctx.createImageData(W, H);
+  var px = frame.data;
+  var zbuf = new Float32Array(W * H);
+
+  var stage = document.getElementById("lab-stage");
+  var sctx = stage.getContext("2d");
+
+  var FOG = [10, 14, 16];
+  var FOGD = 0.055;
+  var FOGLUT = new Float32Array(1024);
+  for (var fi = 0; fi < 1024; fi++) FOGLUT[fi] = 1 - Math.exp(-(fi * 0.02) * FOGD);
+  function fogAt(d) { var i = d * 50; return i >= 1023 ? 1 : FOGLUT[i | 0]; }
+
+  var camPos = [0, 0, 0], camF = [0, 0, -1], camR = [1, 0, 0], camU = [0, 1, 0];
+  var FOV = 47 * Math.PI / 180, tanH = Math.tan(FOV / 2), aspect = W / H;
+
+  function setCamera(t) {
+    var u = t / DURATION;
+    var ease = 0.5 - 0.5 * Math.cos(u * TAU);
+    camPos[0] = 0.16 - 0.11 * ease;
+    camPos[1] = 1.22 + 0.016 * Math.sin(u * TAU);
+    camPos[2] = 0.46 - 0.08 * ease;
+    var yaw = -0.118 + 0.009 * Math.sin(u * TAU);
+    var pitch = -0.098;
+    var cp = Math.cos(pitch);
+    camF[0] = Math.sin(yaw) * cp; camF[1] = Math.sin(pitch); camF[2] = -Math.cos(yaw) * cp;
+    camR[0] = Math.cos(yaw); camR[1] = 0; camR[2] = Math.sin(yaw);
+    camU[0] = camR[1] * camF[2] - camR[2] * camF[1];
+    camU[1] = camR[2] * camF[0] - camR[0] * camF[2];
+    camU[2] = camR[0] * camF[1] - camR[1] * camF[0];
+    var l = Math.hypot(camU[0], camU[1], camU[2]);
+    camU[0] /= l; camU[1] /= l; camU[2] /= l;
+  }
+
+  function clearDark() {
+    for (var i = 0, o = 0; i < W * H; i++, o += 4) {
+      px[o] = FOG[0]; px[o + 1] = FOG[1]; px[o + 2] = FOG[2]; px[o + 3] = 255;
+      zbuf[i] = 1e7;
+    }
+  }
+
+  var NEAR = 0.04;
+  var vBuf = new Float64Array(30), cBuf = new Float64Array(30);
+  var sxA = new Float64Array(10), syA = new Float64Array(10), swA = new Float64Array(10);
+
+  function drawPoly(pts, np, r, g, b) {
+    var i, n = 0;
+    for (i = 0; i < np; i++) {
+      var ox = pts[i * 3] - camPos[0], oy = pts[i * 3 + 1] - camPos[1], oz = pts[i * 3 + 2] - camPos[2];
+      vBuf[n++] = ox * camR[0] + oy * camR[1] + oz * camR[2];
+      vBuf[n++] = ox * camU[0] + oy * camU[1] + oz * camU[2];
+      vBuf[n++] = -(ox * camF[0] + oy * camF[1] + oz * camF[2]);
+    }
+    var m = 0;
+    for (i = 0; i < np; i++) {
+      var j = (i + 1) % np;
+      var az = vBuf[i * 3 + 2], bz = vBuf[j * 3 + 2];
+      var ain = az <= -NEAR, bin = bz <= -NEAR;
+      if (ain) { cBuf[m++] = vBuf[i * 3]; cBuf[m++] = vBuf[i * 3 + 1]; cBuf[m++] = az; }
+      if (ain !== bin) {
+        var s = (-NEAR - az) / (bz - az);
+        cBuf[m++] = vBuf[i * 3] + (vBuf[j * 3] - vBuf[i * 3]) * s;
+        cBuf[m++] = vBuf[i * 3 + 1] + (vBuf[j * 3 + 1] - vBuf[i * 3 + 1]) * s;
+        cBuf[m++] = -NEAR;
+      }
+    }
+    var nc = m / 3;
+    if (nc < 3) return;
+    for (i = 0; i < nc; i++) {
+      var vz = cBuf[i * 3 + 2], iw = -1 / vz;
+      sxA[i] = (((cBuf[i * 3] * iw) / (tanH * aspect)) * 0.5 + 0.5) * W;
+      syA[i] = (0.5 - ((cBuf[i * 3 + 1] * iw) / tanH) * 0.5) * H;
+      swA[i] = iw;
+    }
+    for (i = 1; i < nc - 1; i++) tri(sxA[0], syA[0], swA[0], sxA[i], syA[i], swA[i], sxA[i + 1], syA[i + 1], swA[i + 1], r, g, b);
+  }
+
+  function tri(x0, y0, w0, x1, y1, w1, x2, y2, w2, r, g, b) {
+    var area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
+    if (area > -1e-9 && area < 1e-9) return;
+    var inv = 1 / area;
+    var minX = Math.floor(Math.min(x0, x1, x2)), maxX = Math.ceil(Math.max(x0, x1, x2));
+    var minY = Math.floor(Math.min(y0, y1, y2)), maxY = Math.ceil(Math.max(y0, y1, y2));
+    if (minX < 0) minX = 0; if (minY < 0) minY = 0;
+    if (maxX > W - 1) maxX = W - 1; if (maxY > H - 1) maxY = H - 1;
+    if (minX > maxX || minY > maxY) return;
+    for (var y = minY; y <= maxY; y++) {
+      var pyc = y + 0.5, row = y * W;
+      for (var x = minX; x <= maxX; x++) {
+        var pxc = x + 0.5;
+        var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
+        if (l0 < 0) continue;
+        var l1 = ((x2 - pxc) * (y0 - pyc) - (x0 - pxc) * (y2 - pyc)) * inv;
+        if (l1 < 0) continue;
+        var l2 = 1 - l0 - l1;
+        if (l2 < 0) continue;
+        var w = w0 * l0 + w1 * l1 + w2 * l2;
+        if (w <= 0) continue;
+        var d = 1 / w, idx = row + x;
+        if (d >= zbuf[idx]) continue;
+        zbuf[idx] = d;
+        var fg = fogAt(d), o = idx * 4;
+        px[o] = r + (FOG[0] - r) * fg;
+        px[o + 1] = g + (FOG[1] - g) * fg;
+        px[o + 2] = b + (FOG[2] - b) * fg;
+      }
+    }
+  }
+
+  function Mesh() { this.p = []; this.c = []; }
+  Mesh.prototype.quad = function (ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz, r, g, b) {
+    this.p.push(ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz);
+    this.c.push(r, g, b);
+  };
+
+  var _pt = new Float64Array(12);
+  function drawMesh(m) {
+    var p = m.p, c = m.c, q = c.length / 3;
+    for (var i = 0; i < q; i++) {
+      var b = i * 12;
+      for (var k = 0; k < 12; k++) _pt[k] = p[b + k];
+      drawPoly(_pt, 4, c[i * 3], c[i * 3 + 1], c[i * 3 + 2]);
+    }
+  }
+
+  var LAMPS = [];
+
+  function litAt(base, nx, ny, nz, cx, cy, cz, jit) {
+    var amb = 0.185 + (jit || 0);
+    var r = base[0] * amb * 0.56, g = base[1] * amb * 0.74, b = base[2] * amb * 1.00;
+    for (var i = 0; i < LAMPS.length; i++) {
+      var L = LAMPS[i];
+      var dx = L[0] - cx, dy = L[1] - cy, dz = L[2] - cz;
+      var d2 = dx * dx + dy * dy + dz * dz;
+      if (d2 > 26) continue;
+      var d = Math.sqrt(d2);
+      var lam = (dx * nx + dy * ny + dz * nz) / d;
+      if (lam <= 0) continue;
+      var att = L[3] / (1 + d2 * 4.6);
+      var k = lam * att, C = L[4];
+      r += base[0] * k * C[0];
+      g += base[1] * k * C[1];
+      b += base[2] * k * C[2];
+    }
+    return [r, g, b];
+  }
+
+  function frac(v) { return v - Math.floor(v); }
+  function hash(i) { return frac(Math.sin(i * 12.9898) * 43758.5453); }
+
+  var GREEN_C = [0.42, 1.00, 0.55];
+  var AMBER_C = [1.00, 0.66, 0.24];
+  var COLD_C = [0.44, 0.62, 1.00];
+  var RED_C = [1.00, 0.26, 0.20];
+
+  var METAL = [116, 126, 130], METAL_D = [72, 80, 84], DARK = [44, 50, 52];
+  var TOP = [128, 120, 106], TOPD = [86, 80, 70];
+  var PCB = [46, 96, 58], PLASTIC = [188, 186, 178], WALL = [58, 64, 66];
+
+  var world = new Mesh();
+
+  function block(m, x0, y0, z0, x1, y1, z1, base, jit) {
+    var cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, cz = (z0 + z1) / 2, c;
+    c = litAt(base, 0, 1, 0, cx, y1, cz, jit); m.quad(x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1, c[0], c[1], c[2]);
+    c = litAt(base, 0, 0, 1, cx, cy, z1, jit); m.quad(x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1, c[0], c[1], c[2]);
+    c = litAt(base, 0, 0, -1, cx, cy, z0, jit); m.quad(x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, z0, c[0], c[1], c[2]);
+    c = litAt(base, -1, 0, 0, x0, cy, cz, jit); m.quad(x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0, c[0], c[1], c[2]);
+    c = litAt(base, 1, 0, 0, x1, cy, cz, jit); m.quad(x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1, c[0], c[1], c[2]);
+  }
+
+  function emit(m, x0, y0, z0, x1, y1, z1, col) {
+    m.quad(x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1, col[0], col[1], col[2]);
+    m.quad(x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1, col[0] * 0.8, col[1] * 0.8, col[2] * 0.8);
+  }
+
+  var SCOPE_X = -0.44, SCOPE_Z = -0.86;
+  var SCR_X0 = SCOPE_X - 0.155, SCR_X1 = SCOPE_X + 0.075;
+  var SCR_Y0 = BENCH + 0.075, SCR_Y1 = BENCH + 0.235;
+  var SCR_Z = SCOPE_Z + 0.155;
+
+  (function buildLab() {
+    var m = world, i;
+
+    LAMPS.push([SCOPE_X - 0.04, BENCH + 0.155, SCR_Z + 0.02, 1.15, GREEN_C]);
+    LAMPS.push([-1.18, BENCH + 0.105, -0.66, 0.70, AMBER_C]);
+    LAMPS.push([1.28, 1.64, BACK_Z + 0.04, 3.40, COLD_C]);
+    LAMPS.push([0.30, BENCH + 0.035, -0.32, 0.26, RED_C]);
+    LAMPS.push([0.86, BENCH + 0.10, -0.50, 0.42, [1.0, 0.42, 0.14]]);
+
+    m.quad(-3.4, 0, BACK_Z, 3.4, 0, BACK_Z, 3.4, 2.7, BACK_Z, -3.4, 2.7, BACK_Z, 0, 0, 0);
+    var wc = litAt(WALL, 0, 0, 1, 0, 1.5, BACK_Z, 0);
+    m.quad(-3.4, 0, BACK_Z, 3.4, 0, BACK_Z, 3.4, 2.7, BACK_Z, -3.4, 2.7, BACK_Z, wc[0], wc[1], wc[2]);
+
+    block(m, -3.0, 0.80, BACK_Z + 0.02, 3.0, BENCH, 0.42, TOPD, 0);
+    var tc = litAt(TOP, 0, 1, 0, 0, BENCH, -0.5, 0);
+    m.quad(-3.0, BENCH, BACK_Z + 0.02, 3.0, BENCH, BACK_Z + 0.02, 3.0, BENCH, 0.42, -3.0, BENCH, 0.42, tc[0], tc[1], tc[2]);
+    block(m, -2.6, 0, 0.18, -2.42, 0.80, 0.36, METAL_D, 0);
+    block(m, 2.42, 0, 0.18, 2.60, 0.80, 0.36, METAL_D, 0);
+
+    block(m, SCOPE_X - 0.20, BENCH, SCOPE_Z - 0.16, SCOPE_X + 0.20, BENCH + 0.30, SCOPE_Z + 0.16, METAL_D, 0.01);
+    block(m, SCR_X0 - 0.012, SCR_Y0 - 0.012, SCR_Z - 0.004, SCR_X1 + 0.012, SCR_Y1 + 0.012, SCR_Z + 0.004, DARK, -0.02);
+    for (i = 0; i < 5; i++) {
+      block(m, SCOPE_X + 0.098, BENCH + 0.055 + i * 0.042, SCR_Z - 0.004, SCOPE_X + 0.152, BENCH + 0.082 + i * 0.042, SCR_Z + 0.012, METAL, 0.03);
+    }
+    block(m, SCOPE_X - 0.16, BENCH + 0.252, SCR_Z - 0.10, SCOPE_X - 0.06, BENCH + 0.268, SCR_Z + 0.02, METAL, 0.04);
+
+    block(m, -1.36, BENCH, -0.80, -1.00, BENCH + 0.16, -0.52, METAL_D, 0.01);
+    emit(m, -1.30, BENCH + 0.085, -0.535, -1.20, BENCH + 0.125, -0.52, [236, 158, 56]);
+    emit(m, -1.14, BENCH + 0.085, -0.535, -1.05, BENCH + 0.125, -0.52, [236, 158, 56]);
+    for (i = 0; i < 3; i++) {
+      block(m, -1.33 + i * 0.11, BENCH + 0.03, -0.535, -1.27 + i * 0.11, BENCH + 0.062, -0.515, PLASTIC, 0.02);
+    }
+
+    block(m, 0.10, BENCH, -0.44, 0.52, BENCH + 0.022, -0.20, PLASTIC, 0.01);
+    block(m, 0.20, BENCH + 0.022, -0.40, 0.42, BENCH + 0.030, -0.24, [60, 64, 66], 0.0);
+    for (i = 0; i < 6; i++) {
+      var wx = 0.14 + i * 0.062;
+      var wc3 = [[210, 60, 50], [230, 200, 60], [60, 130, 220], [230, 230, 220], [70, 180, 90], [200, 120, 40]][i];
+      block(m, wx, BENCH + 0.024, -0.40 + (i % 3) * 0.05, wx + 0.012, BENCH + 0.040 + hash(i) * 0.03, -0.26 + (i % 2) * 0.04, wc3, 0.10);
+    }
+    emit(m, 0.285, BENCH + 0.032, -0.325, 0.305, BENCH + 0.046, -0.315, [236, 70, 56]);
+    block(m, 0.56, BENCH, -0.40, 0.74, BENCH + 0.012, -0.22, PCB, 0.02);
+
+    block(m, 0.80, BENCH, -0.62, 0.94, BENCH + 0.05, -0.40, METAL_D, 0.0);
+    block(m, 0.84, BENCH + 0.05, -0.58, 0.90, BENCH + 0.10, -0.44, METAL, 0.02);
+    block(m, 0.855, BENCH + 0.10, -0.54, 0.885, BENCH + 0.155, -0.50, [150, 120, 96], 0.05);
+    emit(m, 0.858, BENCH + 0.150, -0.525, 0.882, BENCH + 0.166, -0.515, [236, 128, 48]);
+
+    block(m, 1.16, BENCH, -0.34, 1.40, BENCH + 0.06, -0.10, [56, 62, 64], 0.01);
+    emit(m, 1.20, BENCH + 0.045, -0.115, 1.36, BENCH + 0.058, -0.10, [120, 190, 140]);
+
+    block(m, 1.62, BENCH, -0.30, 1.78, BENCH + 0.11, -0.14, PLASTIC, 0.0);
+    block(m, -2.05, BENCH, -0.46, -1.80, BENCH + 0.14, -0.20, [70, 74, 72], 0.01);
+    block(m, -0.02, BENCH, -0.14, 0.10, BENCH + 0.10, -0.02, [162, 158, 150], 0.02);
+
+    var fr2 = litAt(METAL_D, 0, 0, 1, 1.3, 1.6, BACK_Z, 0);
+    m.quad(0.60, 1.14, BACK_Z + 0.01, 2.10, 1.14, BACK_Z + 0.01, 2.10, 2.16, BACK_Z + 0.01, 0.60, 2.16, BACK_Z + 0.01, fr2[0], fr2[1], fr2[2]);
+    m.quad(0.66, 1.20, BACK_Z + 0.02, 2.04, 1.20, BACK_Z + 0.02, 2.04, 2.10, BACK_Z + 0.02, 0.66, 2.10, BACK_Z + 0.02, 16, 24, 36);
+  })();
+
+  var WIN_X0 = 0.66, WIN_X1 = 2.04, WIN_Y0 = 1.20, WIN_Y1 = 2.10, WIN_Z = BACK_Z + 0.02;
+
+  function projPt(wx, wy, wz, out) {
+    var ox = wx - camPos[0], oy = wy - camPos[1], oz = wz - camPos[2];
+    var vz = -(ox * camF[0] + oy * camF[1] + oz * camF[2]);
+    if (vz > -0.05) { out[2] = -1; return; }
+    var vx = ox * camR[0] + oy * camR[1] + oz * camR[2];
+    var vy = ox * camU[0] + oy * camU[1] + oz * camU[2];
+    var iw = -1 / vz;
+    out[0] = (((vx * iw) / (tanH * aspect)) * 0.5 + 0.5) * W;
+    out[1] = (0.5 - ((vy * iw) / tanH) * 0.5) * H;
+    out[2] = -vz;
+  }
+
+  var _p0 = [0, 0, 0], _p1 = [0, 0, 0];
+
+  function panel(x0, y0, x1, y1, z, fn) {
+    projPt(x0, y1, z, _p0);
+    projPt(x1, y0, z, _p1);
+    if (_p0[2] < 0 || _p1[2] < 0) return;
+    var sx0 = _p0[0], sy0 = _p0[1], sx1 = _p1[0], sy1 = _p1[1];
+    var d = (_p0[2] + _p1[2]) * 0.5 - 0.004;
+    var ix0 = Math.ceil(Math.min(sx0, sx1)), ix1 = Math.floor(Math.max(sx0, sx1));
+    var iy0 = Math.ceil(Math.min(sy0, sy1)), iy1 = Math.floor(Math.max(sy0, sy1));
+    if (ix0 < 0) ix0 = 0; if (iy0 < 0) iy0 = 0;
+    if (ix1 > W - 1) ix1 = W - 1; if (iy1 > H - 1) iy1 = H - 1;
+    var w = sx1 - sx0, h = sy1 - sy0;
+    if (Math.abs(w) < 0.5 || Math.abs(h) < 0.5) return;
+    for (var y = iy0; y <= iy1; y++) {
+      var v = (y + 0.5 - sy0) / h;
+      for (var x = ix0; x <= ix1; x++) {
+        var uu = (x + 0.5 - sx0) / w;
+        var idx = y * W + x;
+        if (d >= zbuf[idx]) continue;
+        var c = fn(uu, v, x, y);
+        if (!c) continue;
+        zbuf[idx] = d;
+        var o = idx * 4;
+        px[o] = c[0]; px[o + 1] = c[1]; px[o + 2] = c[2];
+      }
+    }
+  }
+
+  var _c = [0, 0, 0];
+  var traceY = new Float64Array(128);
+
+  function drawScope(t) {
+    var u = t / DURATION;
+    var ph = u * TAU * 3;
+    var i;
+    for (i = 0; i < 128; i++) {
+      var k = i / 127;
+      var sq = Math.sin(k * TAU * 2.0 + ph) > 0 ? 1 : -1;
+      var edge = Math.abs(Math.cos(k * TAU * 2.0 + ph));
+      var ring = Math.exp(-edge * 9) * Math.sin(k * 190 + ph * 4) * 0.30;
+      traceY[i] = sq * 0.52 + ring + 0.06 * Math.sin(k * TAU * 7 + ph * 2);
+    }
+    panel(SCR_X0, SCR_Y0, SCR_X1, SCR_Y1, SCR_Z + 0.006, function (uu, v, x, y) {
+      var bg = 10, bgg = 26, bgb = 16;
+      var gx = Math.abs(frac(uu * 10 + 0.5) - 0.5);
+      var gy = Math.abs(frac(v * 8 + 0.5) - 0.5);
+      if (gx < 0.055 || gy < 0.07) { bg = 14; bgg = 44; bgb = 24; }
+      if (Math.abs(v - 0.5) < 0.012 || Math.abs(uu - 0.5) < 0.010) { bg = 18; bgg = 58; bgb = 30; }
+      var ti = (uu * 127) | 0;
+      if (ti < 0) ti = 0; if (ti > 127) ti = 127;
+      var ty = 0.5 - traceY[ti] * 0.42;
+      var dd = Math.abs(v - ty);
+      if (dd < 0.030) { _c[0] = 206; _c[1] = 255; _c[2] = 220; return _c; }
+      if (dd < 0.075) { _c[0] = 90; _c[1] = 208; _c[2] = 124; return _c; }
+      if (dd < 0.16) { _c[0] = 40; _c[1] = 118; _c[2] = 66; return _c; }
+      _c[0] = bg; _c[1] = bgg; _c[2] = bgb;
+      return _c;
+    });
+  }
+
+  function drawWindow(t) {
+    var u = t / DURATION;
+    panel(WIN_X0, WIN_Y0, WIN_X1, WIN_Y1, WIN_Z + 0.004, function (uu, v, x, y) {
+      var base = 14 + (1 - v) * 10;
+      var r = base * 0.75, g = base * 1.05, b = base * 1.9;
+      var gl = Math.exp(-Math.pow((v - 0.86) * 4.0, 2)) * 26;
+      r += gl * 0.9; g += gl * 0.8; b += gl * 0.6;
+      var dotSeed = ((uu * 46) | 0) * 31 + ((v * 30) | 0) * 7;
+      if (v > 0.62 && hash(dotSeed) > 0.955) { r += 70; g += 56; b += 30; }
+      var k = frac(hash(((uu * 30) | 0) * 13) + u * (3 + (((uu * 30) | 0) % 4)));
+      var rv = frac(v + k);
+      if (rv < 0.055 && hash(((uu * 30) | 0) * 17) > 0.45) { r += 34; g += 44; b += 56; }
+      var sm = hash(((uu * 60) | 0) * 3 + ((v * 40) | 0) * 11);
+      if (sm > 0.88) { r += 10; g += 12; b += 16; }
+      _c[0] = r; _c[1] = g; _c[2] = b;
+      return _c;
+    });
+  }
+
+  function stamp(wx, wy, wz, r, g, b, a) {
+    if (a <= 0.02) return;
+    var ox = wx - camPos[0], oy = wy - camPos[1], oz = wz - camPos[2];
+    var vz = -(ox * camF[0] + oy * camF[1] + oz * camF[2]);
+    if (vz > -0.05) return;
+    var vx = ox * camR[0] + oy * camR[1] + oz * camR[2];
+    var vy = ox * camU[0] + oy * camU[1] + oz * camU[2];
+    var iw = -1 / vz, d = -vz;
+    var sx = (((vx * iw) / (tanH * aspect)) * 0.5 + 0.5) * W;
+    var sy = (0.5 - ((vy * iw) / tanH) * 0.5) * H;
+    var X = sx | 0, Y = sy | 0;
+    if (X < 0 || Y < 0 || X >= W || Y >= H) return;
+    var idx = Y * W + X;
+    if (d >= zbuf[idx]) return;
+    var o = idx * 4;
+    px[o] += (r - px[o]) * a;
+    px[o + 1] += (g - px[o + 1]) * a;
+    px[o + 2] += (b - px[o + 2]) * a;
+  }
+
+  function drawSmoke(t) {
+    var u = t / DURATION;
+    for (var i = 0; i < 44; i++) {
+      var h1 = hash(i * 7 + 1), h2 = hash(i * 11 + 2);
+      var cyc = 1 + (i % 2);
+      var k = frac(h1 + u * cyc);
+      var yy = BENCH + 0.165 + k * 0.52;
+      var drift = Math.sin(k * 5.5 + h1 * 6.3 + u * TAU * 2) * (0.020 + k * 0.070);
+      var wx = 0.870 + drift;
+      var wz = -0.518 + Math.cos(k * 4.2 + h2 * 6.3) * (0.008 + k * 0.035);
+      var a = (1 - k) * (1 - k) * 0.30 * (0.6 + h2 * 0.6);
+      stamp(wx, yy, wz, 150, 160, 158, a);
+    }
+  }
+
+  function glow(wx, wy, wz, rad, power, cr, cg, cb) {
+    var ox = wx - camPos[0], oy = wy - camPos[1], oz = wz - camPos[2];
+    var vz = -(ox * camF[0] + oy * camF[1] + oz * camF[2]);
+    if (vz > -0.05) return;
+    var vx = ox * camR[0] + oy * camR[1] + oz * camR[2];
+    var vy = ox * camU[0] + oy * camU[1] + oz * camU[2];
+    var iw = -1 / vz, d = -vz;
+    var sx = (((vx * iw) / (tanH * aspect)) * 0.5 + 0.5) * W;
+    var sy = (0.5 - ((vy * iw) / tanH) * 0.5) * H;
+    var rr = rad / d * 26;
+    if (rr < 1.5) rr = 1.5;
+    var x0 = Math.max(0, Math.floor(sx - rr)), x1 = Math.min(W - 1, Math.ceil(sx + rr));
+    var y0 = Math.max(0, Math.floor(sy - rr)), y1 = Math.min(H - 1, Math.ceil(sy + rr));
+    var inv = 1 / (rr * rr);
+    for (var y = y0; y <= y1; y++) {
+      for (var x = x0; x <= x1; x++) {
+        var ddx = x + 0.5 - sx, ddy = y + 0.5 - sy;
+        var q = 1 - (ddx * ddx + ddy * ddy) * inv;
+        if (q <= 0) continue;
+        var a = q * q * power;
+        var o = (y * W + x) * 4;
+        px[o] += cr * a; px[o + 1] += cg * a; px[o + 2] += cb * a;
+      }
+    }
+  }
+
+  function drawGlows(t) {
+    var u = t / DURATION;
+    glow(SCOPE_X - 0.04, BENCH + 0.155, SCR_Z + 0.02, 0.30, 0.16, 90, 200, 120);
+    glow(1.35, 1.72, WIN_Z, 0.70, 0.10, 70, 100, 150);
+    glow(0.870, BENCH + 0.158, -0.518, 0.05, 0.22, 240, 130, 50);
+    var blink = Math.sin(u * TAU * 24) > 0.2 ? 1 : 0.25;
+    glow(0.295, BENCH + 0.039, -0.320, 0.035, 0.26 * blink, 240, 70, 60);
+  }
+
+  function print(fr) {
+    var cx = W * 0.5, cy = H * 0.5, rmax = Math.hypot(cx, cy);
+    for (var y = 0; y < H; y++) {
+      var by = (y & 3) * 4, dy2 = (y - cy) / rmax;
+      for (var x = 0; x < W; x++) {
+        var o = (y * W + x) * 4;
+        var dx2 = (x - cx) / rmax;
+        var v = 1 - (dx2 * dx2 + dy2 * dy2) * 0.30;
+        var n = ((x * 7 + y * 13 + fr * 29) % 17) * 0.26 - 2.0;
+        var dth = (BAYER[by + (x & 3)] - 7.5) * 1.35;
+        var r = px[o] * v + n + dth, g = px[o + 1] * v + n + dth, b = px[o + 2] * v + n + dth;
+        r = r < 0 ? 0 : (r > 255 ? 255 : r);
+        g = g < 0 ? 0 : (g > 255 ? 255 : g);
+        b = b < 0 ? 0 : (b > 255 ? 255 : b);
+        var li = ((((r | 0) >> 3) << 10) | (((g | 0) >> 3) << 5) | ((b | 0) >> 3)) * 3;
+        px[o] = LUT[li]; px[o + 1] = LUT[li + 1]; px[o + 2] = LUT[li + 2];
+      }
+    }
+  }
+
+  function render(fr) {
+    var t = (fr % FRAMES) / FPS;
+    setCamera(t);
+    clearDark();
+    drawMesh(world);
+    drawWindow(t);
+    drawScope(t);
+    drawSmoke(t);
+    drawGlows(t);
+    print(fr);
+    fctx.putImageData(frame, 0, 0);
+    present();
+  }
+
+  function present() {
+    var host = stage.parentNode;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var cw = Math.max(64, host.clientWidth), ch = Math.max(64, host.clientHeight);
+    if (stage.width !== Math.floor(cw * dpr) || stage.height !== Math.floor(ch * dpr)) {
+      stage.width = Math.floor(cw * dpr); stage.height = Math.floor(ch * dpr);
+      stage.style.width = cw + "px"; stage.style.height = ch + "px";
+    }
+    var scale = Math.min(stage.width / W, stage.height / H);
+    var dw = Math.round(W * scale), dh = Math.round(H * scale);
+    sctx.imageSmoothingEnabled = false;
+    sctx.fillStyle = "#0a0e0f";
+    sctx.fillRect(0, 0, stage.width, stage.height);
+    sctx.drawImage(film, 0, 0, W, H, Math.round((stage.width - dw) / 2), Math.round((stage.height - dh) / 2), dw, dh);
+  }
+
+  var audio = null;
+  function startAudio() {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    var ctx = new AC();
+    var out = ctx.createGain(); out.gain.value = 0.0001; out.connect(ctx.destination);
+    var soft = ctx.createBiquadFilter(); soft.type = "lowpass"; soft.frequency.value = 6000; soft.connect(out);
+
+    var len = 4 * ctx.sampleRate;
+    var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    var ch = buf.getChannelData(0), last = 0;
+    for (var i = 0; i < len; i++) { var wn = Math.random() * 2 - 1; last = (last + 0.028 * wn) / 1.028; ch[i] = last * 3.0; }
+    function noise() { var s = ctx.createBufferSource(); s.buffer = buf; s.loop = true; s.start(); return s; }
+
+    var fan = noise();
+    var flp = ctx.createBiquadFilter(); flp.type = "lowpass"; flp.frequency.value = 620;
+    var fg = ctx.createGain(); fg.gain.value = 0.26;
+    fan.connect(flp); flp.connect(fg); fg.connect(soft);
+
+    var rain = noise();
+    var rhp = ctx.createBiquadFilter(); rhp.type = "highpass"; rhp.frequency.value = 2400;
+    var rg = ctx.createGain(); rg.gain.value = 0.10;
+    rain.connect(rhp); rhp.connect(rg); rg.connect(soft);
+
+    var hum = ctx.createOscillator(); hum.type = "sine"; hum.frequency.value = 100;
+    var humg = ctx.createGain(); humg.gain.value = 0.026;
+    hum.connect(humg); humg.connect(soft); hum.start();
+    var hum2 = ctx.createOscillator(); hum2.type = "sine"; hum2.frequency.value = 200;
+    var humg2 = ctx.createGain(); humg2.gain.value = 0.010;
+    hum2.connect(humg2); humg2.connect(soft); hum2.start();
+
+    var whine = ctx.createOscillator(); whine.type = "sine"; whine.frequency.value = 7800;
+    var wg = ctx.createGain(); wg.gain.value = 0.0035;
+    whine.connect(wg); wg.connect(soft); whine.start();
+
+    function click(when) {
+      var s = ctx.createBufferSource(); s.buffer = buf;
+      var bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 2600; bp.Q.value = 5;
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, when);
+      g.gain.exponentialRampToValueAtTime(0.055, when + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, when + 0.045);
+      s.connect(bp); bp.connect(g); g.connect(soft);
+      s.start(when); s.stop(when + 0.06);
+    }
+    var timers = [setInterval(function () {
+      if (Math.random() < 0.7) {
+        var b0 = ctx.currentTime + Math.random() * 2;
+        click(b0); click(b0 + 0.11);
+      }
+    }, 7000)];
+    setTimeout(function () { click(ctx.currentTime + 1.2); }, 2500);
+
+    return { ctx: ctx, out: out, timers: timers };
+  }
+
+  var btnPlay = document.getElementById("lab-play");
+  var btnSound = document.getElementById("lab-sound");
+  var icoPlay = document.getElementById("lab-ico-play");
+  var icoSound = document.getElementById("lab-ico-sound");
+  var scrub = document.getElementById("lab-scrub");
+  var clock = document.getElementById("lab-clock");
+
+  var PLAY_D = "M4 2l9 6-9 6z", PAUSE_D = "M4 2h3v12H4zM9 2h3v12H9z";
+  var SND_ON = "M3 6h2.5L9 3v10L5.5 10H3zM11.2 5.1l1-1c2.4 2 2.4 5.8 0 7.8l-1-1c1.7-1.5 1.7-4.3 0-5.8z";
+  var SND_OFF = "M3 6h2.5L9 3v10L5.5 10H3zM11 6.4l1.1 1.1 1.1-1.1.9.9-1.1 1.1 1.1 1.1-.9.9-1.1-1.1-1.1 1.1-.9-.9L11.1 8.4 10 7.3z";
+
+  var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var playing = !calm;
+  var fr = Math.round(FRAMES * 0.22), acc = 0, last = 0, soundOn = false;
+
+  function showTime() {
+    var s = Math.floor(fr / FPS);
+    clock.textContent = "00:" + String(s).padStart(2, "0") + " / 00:48";
+    if (scrub.value !== String(fr)) scrub.value = String(fr);
+  }
+
+  function setPlaying(v) {
+    playing = v;
+    icoPlay.setAttribute("d", v ? PAUSE_D : PLAY_D);
+    btnPlay.setAttribute("aria-label", v ? "Duraklat" : "Oynat");
+    btnPlay.title = v ? "Duraklat" : "Oynat";
+    if (audio) audio.ctx[v ? "resume" : "suspend"]();
+  }
+
+  btnPlay.addEventListener("click", function () { setPlaying(!playing); });
+  scrub.addEventListener("input", function () {
+    fr = Number(scrub.value) | 0;
+    render(fr); showTime();
+  });
+  btnSound.addEventListener("click", function () {
+    if (!audio) audio = startAudio();
+    if (!audio) return;
+    soundOn = !soundOn;
+    audio.ctx.resume();
+    audio.out.gain.cancelScheduledValues(audio.ctx.currentTime);
+    audio.out.gain.setTargetAtTime(soundOn ? 0.55 : 0.0001, audio.ctx.currentTime, 0.6);
+    icoSound.setAttribute("d", soundOn ? SND_ON : SND_OFF);
+    btnSound.setAttribute("aria-label", soundOn ? "Sesi kapat" : "Sesi aç");
+    btnSound.title = btnSound.getAttribute("aria-label");
+  });
+  var screenEl = document.getElementById("lab-screen");
+  screenEl.addEventListener("click", function () { setPlaying(!playing); screenEl.focus(); });
+  screenEl.addEventListener("keydown", function (e) {
+    if (e.code === "Space" || e.code === "Enter") { e.preventDefault(); setPlaying(!playing); }
+  });
+  window.addEventListener("resize", function () { present(); });
+
+  var onScreen = true;
+  if (window.IntersectionObserver) {
+    new IntersectionObserver(function (es) {
+      onScreen = es[0].isIntersecting;
+      if (audio) { if (onScreen && playing) audio.ctx.resume(); else audio.ctx.suspend(); }
+    }, { threshold: 0.04 }).observe(document.getElementById("lab-app"));
+  }
+
+  function loop(now) {
+    if (!last) last = now;
+    var dt = Math.min(0.25, (now - last) / 1000);
+    last = now;
+    if (playing && onScreen) {
+      acc += dt;
+      var st = 1 / FPS, moved = false;
+      while (acc >= st) { acc -= st; fr = (fr + 1) % FRAMES; moved = true; }
+      if (moved) { render(fr); showTime(); }
+    }
+    requestAnimationFrame(loop);
+  }
+
+  icoSound.setAttribute("d", SND_OFF);
+  scrub.max = String(FRAMES - 1);
+  setPlaying(playing);
+  render(fr);
+  showTime();
+  requestAnimationFrame(loop);
+})();
+</script>
