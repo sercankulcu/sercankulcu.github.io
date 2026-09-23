@@ -1,10 +1,11 @@
 ---
 layout: without-sidebar
 title: "Park Güell"
-permalink: /apps/park-guell/
+permalink: /art/park-guell/
 header:
   image: art/park-guell.png
 redirect_from:
+  - /apps/park-guell/
   - /apps/park-guell.html
 excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph pixel by pixel in the browser: trencadís laid as thousands of flat shards, haze over the city, looping every 48 seconds."
 ---
@@ -182,6 +183,10 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
 @media (hover: none) { .parkguell-keys { display: none; } }
 
 .parkguell-back {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
   margin: .6rem 0 0;
   font-size: 12px;
   letter-spacing: .06em;
@@ -228,12 +233,7 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
     </button>
   </div>
 
-  <p class="parkguell-keys">Boşluk oynat/duraklat · ← → bir saniye · F tam ekran · M ses</p>
-
-  <p class="parkguell-source">The only one here built from a photograph rather than invented. The original, taken on the terrace:</p>
-  <img class="pg-photo" src="/images/art/park-guell-kaynak.jpg" alt="Photograph of the mosaic bench at Park Güell, Barcelona, with the city and the sea behind" loading="lazy" width="1600" height="1200">
-
-  <p class="parkguell-back"><a href="/art/">← Art</a></p>
+  <p class="parkguell-back"><a href="/art/">← Art</a><a class="parkguell-next" href="/art/gece-laboratuvari/">Sonraki: Gece Laboratuvarı →</a></p>
 
 </div>
 
@@ -506,6 +506,33 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
 
   var _q = new Float64Array(12);
 
+  /* One backrest cell broken into four irregular shards that meet at a jittered inner point. */
+  var _uv = new Float64Array(18);
+  function shardCell(m, a0, a1, r0, r1, y0, y1, pick, seed) {
+    var j = 0.18;
+    _uv[0] = 0; _uv[1] = 0; _uv[2] = 1; _uv[3] = 0; _uv[4] = 1; _uv[5] = 1; _uv[6] = 0; _uv[7] = 1;
+    _uv[8] = 0.5 + (hash(seed + 1) - 0.5) * j * 2; _uv[9] = 0;
+    _uv[10] = 1; _uv[11] = 0.5 + (hash(seed + 2) - 0.5) * j * 2;
+    _uv[12] = 0.5 + (hash(seed + 3) - 0.5) * j * 2; _uv[13] = 1;
+    _uv[14] = 0; _uv[15] = 0.5 + (hash(seed + 4) - 0.5) * j * 2;
+    _uv[16] = 0.3 + hash(seed + 5) * 0.4; _uv[17] = 0.3 + hash(seed + 6) * 0.4;
+    var PIECES = SHARD_PIECES;
+    for (var p = 0; p < 4; p++) {
+      var col = SHARDS[pick];
+      var hp = hash(seed * 3 + p * 11);
+      if (hp > 0.70) col = SHARDS[(hash(seed * 7 + p) * SHARDS.length) | 0];
+      else if (hp > 0.50) col = SHARDS[(pick + (hp > 0.6 ? 1 : SHARDS.length - 1)) % SHARDS.length];
+      var c = lit(col, 0.25, 0.55, 0.78, (hash(seed * 13 + p * 5) - 0.5) * 0.20);
+      for (var v = 0; v < 4; v++) {
+        var k = PIECES[p][v] * 2, u = _uv[k], w = _uv[k + 1];
+        ringPt(a0 + (a1 - a0) * u, r0 + (r1 - r0) * w, y0 + (y1 - y0) * w, _q, v * 3);
+      }
+      m.quad(_q[0], _q[1], _q[2], _q[3], _q[4], _q[5], _q[6], _q[7], _q[8], _q[9], _q[10], _q[11], c[0], c[1], c[2]);
+    }
+  }
+  /* Corner, edge-midpoint and centre indices into _uv for each shard. */
+  var SHARD_PIECES = [[0, 4, 8, 7], [4, 1, 5, 8], [8, 5, 2, 6], [7, 8, 6, 3]];
+
   (function buildBench() {
     var m = world;
     var A0 = 0.54 * Math.PI, A1 = 1.46 * Math.PI, SEG = 78;
@@ -534,11 +561,7 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
         var patch = ((i + row * 2) / 3) | 0;
         var pick = (hash(patch * 13 + row * 41 + 5) * SHARDS.length) | 0;
         if (hash(i * 17 + row * 3) > 0.52) pick = (hash(i * 29 + row * 61) * SHARDS.length) | 0;
-        var sc = SHARDS[pick];
-        var cb = lit(sc, 0.25, 0.55, 0.78, (hash(i * 7 + row * 11) - 0.5) * 0.16);
-        ringPt(a0, r0, y0, _q, 0); ringPt(a1, r0, y0, _q, 3);
-        ringPt(a1, r1, y1, _q, 6); ringPt(a0, r1, y1, _q, 9);
-        m.quad(_q[0], _q[1], _q[2], _q[3], _q[4], _q[5], _q[6], _q[7], _q[8], _q[9], _q[10], _q[11], cb[0], cb[1], cb[2]);
+        shardCell(m, a0, a1, r0, r1, y0, y1, pick, i * 5 + row * 97);
       }
 
       var gl = GLAZE[(hash(((i / 3) | 0) * 19 + 2) * GLAZE.length) | 0];
