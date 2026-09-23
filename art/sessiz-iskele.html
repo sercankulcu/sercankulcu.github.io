@@ -242,19 +242,17 @@ excerpt: "A foggy morning on a Black Sea pier, drawn pixel by pixel in the brows
   var BOAT_X = -4.00, BOAT_Z = -11.0;
   var TAKA_X = -3.90, TAKA_Z = -21.0;
 
-  var PALETTE = [].concat(
-    ramp("#0b1012", "#27343a", 4),
-    ramp("#2d3b40", "#7e9295", 7),
-    ramp("#93a8a6", "#edf1ec", 5),
-    ramp("#67797f", "#ccd4d2", 6),
-    ramp("#38291d", "#93744f", 7),
-    ramp("#26302a", "#5b7050", 4),
-    ramp("#5d2f26", "#b55442", 4),
-    ramp("#665d4c", "#bdb193", 4)
-  );
+  /* Fitted to the scene's own pre-print colours (k-means anchored on the original ramps). */
+  var PALETTE = [
+    "#0c1012", "#1e1c18", "#28241f", "#293439", "#313b3e", "#434c4e", "#4e585a", "#5b6465",
+    "#666f6f", "#788182", "#899393", "#9ca6a5", "#afb9b7", "#c1cbc8", "#dae2dd", "#eaf0ea",
+    "#6f7878", "#808a8b", "#939d9c", "#a6afaf", "#b8c1c0", "#cdd6d2", "#352c24", "#43392d",
+    "#514536", "#60513f", "#755b3e", "#78644d", "#93744f", "#26302a", "#3a4341", "#495b43",
+    "#5b7050", "#5d2f26", "#7a3b2f", "#984839", "#b55442", "#695a47", "#837964", "#a0957b",
+    "#bdb193"
+  ].map(hex);
 
   var LUT = A.lut(PALETTE);
-  var BAYER = A.BAYER;
 
   var FILM = A.film(W, H);
   var film = FILM.canvas, fctx = FILM.ctx, frame = FILM.frame, px = FILM.px;
@@ -785,24 +783,20 @@ excerpt: "A foggy morning on a Black Sea pier, drawn pixel by pixel in the brows
     }
   }
 
+  var PRINT = { vig: 0.30, grain: 0.30, grainOff: 2.4, dither: 1.45 };
+  var BLOOM = null;
+  var CAM = { pos: camPos, F: camF, R: camR, U: camU, tanH: tanH, aspect: aspect };
+  /* Contact shadows on the planks under the crate, the box, the bollard and the rope coil. */
+  function deckShadows() {
+    A.shadow(px, zbuf, W, H, CAM, -1.18, DECK_Y, -7.76, 0.24, 0.24, 0.40);
+    A.shadow(px, zbuf, W, H, CAM, -1.14, DECK_Y, -4.22, 0.40, 0.40, 0.40);
+    A.shadow(px, zbuf, W, H, CAM, 0.75, DECK_Y, -1.97, 0.22, 0.22, 0.45);
+    A.shadow(px, zbuf, W, H, CAM, HALF - 0.18, DECK_Y, -9.85, 0.20, 0.85, 0.35);
+  }
+
   function print(fr) {
-    var cx = W * 0.5, cy = H * 0.5, rmax = hyp2(cx, cy);
-    for (var y = 0; y < H; y++) {
-      var by = (y & 3) * 4, dy2 = (y - cy) / rmax;
-      for (var x = 0; x < W; x++) {
-        var o = (y * W + x) * 4;
-        var dx2 = (x - cx) / rmax;
-        var v = 1 - (dx2 * dx2 + dy2 * dy2) * 0.30;
-        var n = ((x * 7 + y * 13 + fr * 29) % 17) * 0.30 - 2.4;
-        var dth = (BAYER[by + (x & 3)] - 7.5) * 1.45;
-        var r = px[o] * v + n + dth, g = px[o + 1] * v + n + dth, b = px[o + 2] * v + n + dth;
-        r = r < 0 ? 0 : (r > 255 ? 255 : r);
-        g = g < 0 ? 0 : (g > 255 ? 255 : g);
-        b = b < 0 ? 0 : (b > 255 ? 255 : b);
-        var li = ((((r | 0) >> 3) << 10) | (((g | 0) >> 3) << 5) | ((b | 0) >> 3)) * 3;
-        px[o] = LUT[li]; px[o + 1] = LUT[li + 1]; px[o + 2] = LUT[li + 2];
-      }
-    }
+    if (BLOOM) A.bloom(px, W, H, BLOOM);
+    A.print(px, W, H, LUT, fr, PRINT);
   }
 
   function render(fr) {
@@ -810,6 +804,7 @@ excerpt: "A foggy morning on a Black Sea pier, drawn pixel by pixel in the brows
     setCamera(t);
     drawSkyAndSea(t);
     drawMesh(world);
+    deckShadows();
     buildBoat(t); buildTaka(t); drawMesh(boat);
     buildRope(t); drawMesh(rope);
     drawBirds(t);

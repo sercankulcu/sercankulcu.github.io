@@ -246,19 +246,17 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
   var BASE_Y = 8.4;
   var LAMP_Y = 26.6;
 
-  var PALETTE = [].concat(
-    ramp("#05080a", "#222b30", 4),
-    ramp("#1b2730", "#657a83", 7),
-    ramp("#8ea1a6", "#f3f6f4", 6),
-    ramp("#2c353c", "#9fadb1", 7),
-    ramp("#4c565a", "#e2e6e2", 5),
-    ramp("#4e2620", "#b4463a", 4),
-    ramp("#6b5320", "#ffeeb4", 6),
-    ramp("#171f21", "#4a555b", 4)
-  );
+  /* Fitted to the scene's own pre-print colours (k-means anchored on the original ramps). */
+  var PALETTE = [
+    "#05080a", "#111518", "#1b2126", "#242c31", "#1f272c", "#2d353a", "#353e43", "#454d52",
+    "#535d61", "#5f696d", "#6b767b", "#8ea1a6", "#a2b2b5", "#b6c3c5", "#cbd4d5", "#dfe5e4",
+    "#f3f5f3", "#31393e", "#40484c", "#586266", "#656f73", "#7c8688", "#8b9495", "#a0adaf",
+    "#4e575b", "#737d7f", "#989f9c", "#bdc2bf", "#e3e6e1", "#4e2a25", "#703129", "#923b31",
+    "#b4463a", "#6b5320", "#89723e", "#a6915b", "#c3b07a", "#e1cf98", "#fdeeb5", "#171d20",
+    "#293035", "#3b4348", "#495257"
+  ].map(hex);
 
   var LUT = A.lut(PALETTE);
-  var BAYER = A.BAYER;
 
   var FILM = A.film(W, H);
   var film = FILM.canvas, fctx = FILM.ctx, frame = FILM.frame, px = FILM.px;
@@ -835,24 +833,13 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
     }
   }
 
+  var PRINT = { vig: 0.42, grain: 0.34, grainOff: 2.7, dither: 1.5 };
+  var BLOOM = { threshold: 170, strength: 0.8, radius: 4, tint: [1, 0.95, 0.85] };
+  var CAM = { pos: camPos, F: camF, R: camR, U: camU, tanH: tanH, aspect: aspect };
+
   function print(fr) {
-    var cx = W * 0.5, cy = H * 0.5, rmax = hyp2(cx, cy);
-    for (var y = 0; y < H; y++) {
-      var by = (y & 3) * 4, dy2 = (y - cy) / rmax;
-      for (var x = 0; x < W; x++) {
-        var o = (y * W + x) * 4;
-        var dx2 = (x - cx) / rmax;
-        var v = 1 - (dx2 * dx2 + dy2 * dy2) * 0.42;
-        var n = ((x * 7 + y * 13 + fr * 29) % 17) * 0.34 - 2.7;
-        var dth = (BAYER[by + (x & 3)] - 7.5) * 1.5;
-        var r = px[o] * v + n + dth, g = px[o + 1] * v + n + dth, b = px[o + 2] * v + n + dth;
-        r = r < 0 ? 0 : (r > 255 ? 255 : r);
-        g = g < 0 ? 0 : (g > 255 ? 255 : g);
-        b = b < 0 ? 0 : (b > 255 ? 255 : b);
-        var li = ((((r | 0) >> 3) << 10) | (((g | 0) >> 3) << 5) | ((b | 0) >> 3)) * 3;
-        px[o] = LUT[li]; px[o + 1] = LUT[li + 1]; px[o + 2] = LUT[li + 2];
-      }
-    }
+    if (BLOOM) A.bloom(px, W, H, BLOOM);
+    A.print(px, W, H, LUT, fr, PRINT);
   }
 
   function render(fr) {
