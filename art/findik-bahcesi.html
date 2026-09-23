@@ -263,36 +263,55 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
   function fogAt(d) { var i = d * 2.2222; return i >= 1023 ? 1 : FOGLUT[i | 0]; }
 
   /* Late sun from the west-south-west, behind the left shoulder. */
-  var LX = -0.79, LY = 0.57, LZ = 0.22;
-  var SHX = -0.963, SHZ = 0.268;
+  var LX = -0.62, LY = 0.55, LZ = 0.56;
+  var SHX = -0.742, SHZ = 0.670;
   var SUN = [1.50, 1.24, 0.86], SKYF = [0.46, 0.56, 0.70];
 
-  /* Terraced slope: flats every T metres downhill, banks between them. */
-  var T = 5.0, S = 0.24, TA = 0.8, SP = 5.2;
-  function hgt(x, z) {
-    var q = (-z + 0.9 * Math.sin(x * 0.11 + 0.7)) / T;
-    return -S * T * (q - TA * Math.sin(TAU * q) / TAU) + 0.35 * Math.sin(x * 0.09 + 1.3);
+  /* Sine and value-noise tables: the per-pixel passes use no trigonometry. */
+  var SN = new Float32Array(4096);
+  for (var si = 0; si < 4096; si++) SN[si] = Math.sin(si / 4096 * TAU);
+  var SK = 4096 / TAU;
+  function fsin(a) { return SN[(a * SK) & 4095]; }
+  function fcos(a) { return SN[((a * SK) + 1024) & 4095]; }
+  var NT = new Float32Array(65536);
+  for (si = 0; si < 65536; si++) NT[si] = hash(si * 1.618 + 0.37);
+  function vnoise(x, y) {
+    x += 512; y += 512;
+    var ix = x | 0, iy = y | 0, fx = x - ix, fy = y - iy;
+    fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy);
+    var r0 = (iy & 255) << 8, r1 = ((iy + 1) & 255) << 8, c0 = ix & 255, c1 = (ix + 1) & 255;
+    var a = NT[r0 | c0], b = NT[r0 | c1], c = NT[r1 | c0], d = NT[r1 | c1];
+    return a + (b - a) * fx + (c - a) * fy + (a - b - c + d) * fx * fy;
   }
 
-  function h2(x, y) { var n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return n - Math.floor(n); }
-  function vnoise(x, y) {
-    var ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy;
-    fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy);
-    var a = h2(ix, iy), b = h2(ix + 1, iy), c = h2(ix, iy + 1), d = h2(ix + 1, iy + 1);
-    return a + (b - a) * fx + (c - a) * fy + (a - b - c + d) * fx * fy;
+  /* Terraced slope: flats every T metres downhill, banks between them. */
+  var T = 5.0, S = 0.20, TA = 0.8, SP = 5.2;
+  function hgt(x, z) {
+    var q = (-z + 0.9 * fsin(x * 0.11 + 0.7)) / T;
+    return -S * T * (q - TA * fsin(TAU * q) / TAU) + 0.35 * fsin(x * 0.09 + 1.3);
+  }
+  function rnd(v) { return ((v + 1000.5) | 0) - 1000; }
+  var GX = 0, GZ = 0;
+  function hgtGrad(x, z) {
+    var a = x * 0.11 + 0.7, q = (-z + 0.9 * fsin(a)) / T;
+    var dq = -S * T * (1 - TA * fcos(TAU * q));
+    GX = dq * 0.9 * 0.11 * fcos(a) / T + 0.35 * 0.09 * fcos(x * 0.09 + 1.3);
+    GZ = -dq / T;
   }
 
   var camPos = [0, 0, 0], camF = [0, 0, -1], camR = [1, 0, 0], camU = [0, 1, 0];
   var FOV = 41 * Math.PI / 180, tanH = Math.tan(FOV / 2), aspect = W / H;
+  var CAM_Z = -0.2, PITCH = -0.20, YAW = 0;
 
   function setCamera(t) {
     var u = t / DURATION;
     var ease = 0.5 - 0.5 * Math.cos(u * TAU);
     camPos[0] = 0.35 + 0.12 * ease;
-    camPos[2] = 1.0 - 0.40 * ease;
-    camPos[1] = hgt(camPos[0], camPos[2]) + 1.55;
+    camPos[2] = CAM_Z - 0.40 * ease;
+    camPos[1] = hgt(camPos[0], camPos[2]) + 1.45;
     var yaw = 0.05 + 0.012 * Math.sin(u * TAU);
-    var pitch = -0.15;
+    var pitch = PITCH;
+    YAW = yaw;
     var cp = Math.cos(pitch);
     camF[0] = Math.sin(yaw) * cp; camF[1] = Math.sin(pitch); camF[2] = -Math.cos(yaw) * cp;
     camR[0] = Math.cos(yaw); camR[1] = 0; camR[2] = Math.sin(yaw);
@@ -306,73 +325,85 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
   /* Sky, a strip of sea, the headland, a ridge on the left and the lower slopes in haze. */
   var ZEN = [124, 162, 202], HOR = [236, 226, 198];
   var SEA_D = [80, 120, 144], SEA_H = [186, 198, 192];
-  var LAND_T = [150, 162, 140], LAND_B = [112, 134, 102];
+  var HILL_F = [158, 168, 146], HILL_N = [96, 120, 90];
   var U = 0;
-  function bgInto(dx, dy, dz, out) {
-    var az = Math.atan2(dx, -dz), k, n;
-    var sea = -0.050 + 0.004 * Math.sin(az * 9.0 + 1.0) + 0.003 * Math.sin(az * 23.0);
-    var ridge = az < -0.28 ? -0.012 + (-0.28 - az) * 0.40 + 0.006 * Math.sin(az * 37.0) : -1;
-    var head = az > 0.28 ? Math.min(1, (az - 0.28) * 5.0) : 0;
-    var headTop = -0.010 + 0.020 * head * head * (3 - 2 * head) + 0.002 * Math.sin(az * 60.0);
+  function bgInto(az, dy, out) {
+    var k, n, e;
+    var sea = -0.046 + 0.004 * fsin(az * 9.0 + 1.0) + 0.003 * fsin(az * 23.0);
+    var ridge = az < -0.28 ? -0.012 + (-0.28 - az) * 0.40 + 0.010 * (vnoise(az * 18, 3.3) - 0.5) : -1;
+    var head = az > 0.28 ? (az - 0.28) * 5.0 : 0;
+    head = head > 1 ? 1 : head;
+    var headTop = -0.010 + 0.020 * head * head * (3 - 2 * head) + 0.004 * (vnoise(az * 40, 7.7) - 0.5);
     if (dy < ridge) {
-      k = (ridge - dy) * 7; k = k > 1 ? 1 : k;
-      n = vnoise(az * 70, dy * 200);
-      out[0] = 150 + (100 - 150) * k - 10 * n * k;
-      out[1] = 162 + (126 - 162) * k - 8 * n * k;
-      out[2] = 144 + (106 - 144) * k - 6 * n * k;
-      if (ridge - dy < 0.004) { out[0] += 14; out[1] += 10; out[2] += 2; }
+      k = (ridge - dy) * 6; k = k > 1 ? 1 : k;
+      n = vnoise(az * 90, dy * 240);
+      out[0] = 150 + (98 - 150) * k - 12 * n * k;
+      out[1] = 162 + (124 - 162) * k - 10 * n * k;
+      out[2] = 144 + (102 - 144) * k - 7 * n * k;
+      if (ridge - dy < 0.003) { out[0] += 16; out[1] += 12; out[2] += 2; }
       return;
     }
-    if (dy >= 0 && !(head > 0 && dy < headTop)) {
+    if (head > 0 && dy < headTop && dy > sea - 0.01) {
+      k = (headTop - dy) * 30; k = k > 1 ? 1 : k;
+      out[0] = 166 - 26 * k; out[1] = 174 - 20 * k; out[2] = 158 - 14 * k;
+      return;
+    }
+    if (dy >= 0) {
       k = dy * 2.6; k = k > 1 ? 1 : k;
-      var e = k * k * (3 - 2 * k);
-      var warm = -dx * 1.3; warm = warm < 0 ? 0 : (warm > 1 ? 1 : warm); warm *= warm * (1 - e);
+      e = k * k * (3 - 2 * k);
+      var warm = (-az - 0.15) * 1.4; warm = warm < 0 ? 0 : (warm > 1 ? 1 : warm); warm *= warm * (1 - e);
       out[0] = HOR[0] + (ZEN[0] - HOR[0]) * e + 12 * warm;
       out[1] = HOR[1] + (ZEN[1] - HOR[1]) * e + 4 * warm;
       out[2] = HOR[2] + (ZEN[2] - HOR[2]) * e - 10 * warm;
       return;
     }
-    if (head > 0 && dy < headTop) {
-      k = (headTop - dy) * 30; k = k > 1 ? 1 : k;
-      out[0] = 164 - 24 * k; out[1] = 172 - 18 * k; out[2] = 156 - 14 * k;
-      return;
-    }
     if (dy > sea) {
       k = dy / sea;
-      var kk = Math.sqrt(k);
-      var sh = Math.sin(dy * 1500 + Math.sin(az * 30 + U * TAU * 2) * 3 + U * TAU * 6);
+      var kk = k * (1.6 - 0.6 * k);
+      var sh = fsin(dy * 1500 + fsin(az * 30 + U * TAU * 2) * 3 + U * TAU * 6);
       out[0] = SEA_H[0] + (SEA_D[0] - SEA_H[0]) * kk + 6 * sh * k;
       out[1] = SEA_H[1] + (SEA_D[1] - SEA_H[1]) * kk + 6 * sh * k;
       out[2] = SEA_H[2] + (SEA_D[2] - SEA_H[2]) * kk + 5 * sh * k;
-      if (k > 0.9) { out[0] += 30; out[1] += 30; out[2] += 26; }
+      if (k > 0.9) { out[0] += 26; out[1] += 26; out[2] += 22; }
       return;
     }
-    k = (sea - dy) * 4; k = k > 1 ? 1 : k;
-    n = vnoise(az * 110, dy * 330);
-    out[0] = LAND_T[0] + (LAND_B[0] - LAND_T[0]) * k - 12 * n * k;
-    out[1] = LAND_T[1] + (LAND_B[1] - LAND_T[1]) * k - 10 * n * k;
-    out[2] = LAND_T[2] + (LAND_B[2] - LAND_T[2]) * k - 8 * n * k;
+    /* Lower slopes: three hazy layers, each nearer one greener, their crests lit from the west. */
+    var layer = 0, top = sea;
+    for (var L = 1; L <= 3; L++) {
+      var t = sea - 0.010 - L * 0.030 + 0.030 * (vnoise(az * (3 + L * 2) + L * 11, L * 5.3) - 0.5);
+      if (dy < t) { layer = L; top = t; }
+    }
+    k = layer / 3 + (top - dy) * 2.5; k = k > 1 ? 1 : k;
+    n = vnoise(az * (60 + layer * 50), dy * (180 + layer * 150));
+    out[0] = HILL_F[0] + (HILL_N[0] - HILL_F[0]) * k - 14 * n * k;
+    out[1] = HILL_F[1] + (HILL_N[1] - HILL_F[1]) * k - 12 * n * k;
+    out[2] = HILL_F[2] + (HILL_N[2] - HILL_F[2]) * k - 8 * n * k;
+    if (layer > 0 && top - dy < 0.0035) { out[0] += 12; out[1] += 10; out[2] += 3; }
   }
 
   var RX = new Float64Array(W), RY = new Float64Array(H);
   for (var ri = 0; ri < W; ri++) RX[ri] = (((ri + 0.5) / W) * 2 - 1) * tanH * aspect;
   for (ri = 0; ri < H; ri++) RY[ri] = (1 - ((ri + 0.5) / H) * 2) * tanH;
 
+  /* Pitch is fixed and there is no roll, so each pixel keeps its elevation; yaw only shifts azimuth. */
+  var AZ0 = new Float32Array(W * H), EL = new Float32Array(W * H);
+  (function () {
+    var cp = Math.cos(PITCH), sp = Math.sin(PITCH);
+    for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) {
+      var ux = RX[x], uy = RY[y];
+      var dx = ux, dy = sp + cp * uy, dz = -(cp - sp * uy);
+      var l = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      AZ0[y * W + x] = Math.atan2(dx, -dz); EL[y * W + x] = dy / l;
+    }
+  })();
+
   var _sk = [0, 0, 0];
   function drawSky() {
-    for (var y = 0; y < H; y++) {
-      var uy = RY[y];
-      for (var x = 0; x < W; x++) {
-        var ux = RX[x];
-        var dx = camR[0] * ux + camU[0] * uy + camF[0];
-        var dy = camR[1] * ux + camU[1] * uy + camF[1];
-        var dz = camR[2] * ux + camU[2] * uy + camF[2];
-        var il = 1 / Math.sqrt(dx * dx + dy * dy + dz * dz);
-        bgInto(dx * il, dy * il, dz * il, _sk);
-        var i = y * W + x, o = i * 4;
-        px[o] = _sk[0]; px[o + 1] = _sk[1]; px[o + 2] = _sk[2]; px[o + 3] = 255;
-        zbuf[i] = 1e7; matb[i] = 0;
-      }
+    for (var i = 0; i < W * H; i++) {
+      bgInto(AZ0[i] + YAW, EL[i], _sk);
+      var o = i * 4;
+      px[o] = _sk[0]; px[o + 1] = _sk[1]; px[o + 2] = _sk[2]; px[o + 3] = 255;
+      zbuf[i] = 1e7; matb[i] = 0;
     }
   }
 
@@ -380,8 +411,10 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
   var vBuf = new Float64Array(30), cBuf = new Float64Array(30);
   var sxA = new Float64Array(10), syA = new Float64Array(10), swA = new Float64Array(10);
 
-  /* MAT 0: final colour, fogged here. MAT 1: ground, shaded later per pixel. MAT 2: ambient now, sun added later through the leaves. */
-  var MAT = 0, CR = 0, CG = 0, CB = 0, SR = 0, SG = 0, SB = 0;
+  /* MAT 0: final colour, fogged here. MAT 1: ground, shaded later per pixel. MAT 2: ambient now, sun added later through the leaves.
+     MAT 3: leaves, textured and fogged later. */
+  var MAT = 0, CR = 0, CG = 0, CB = 0, SR = 0, SG = 0, SB = 0, OFFX = 0;
+  var offb = new Float32Array(W * H);
 
   function drawPoly(pts, np) {
     var i, n = 0;
@@ -421,15 +454,15 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
     var area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
     if (area > -1e-9 && area < 1e-9) return;
     var inv = 1 / area;
-    var minX = Math.floor(Math.min(x0, x1, x2)), maxX = Math.ceil(Math.max(x0, x1, x2));
-    var minY = Math.floor(Math.min(y0, y1, y2)), maxY = Math.ceil(Math.max(y0, y1, y2));
-    if (minX < 0) minX = 0; if (minY < 0) minY = 0;
-    if (maxX > W - 1) maxX = W - 1; if (maxY > H - 1) maxY = H - 1;
+    var minX = x0 < x1 ? (x0 < x2 ? x0 : x2) : (x1 < x2 ? x1 : x2), maxX = x0 > x1 ? (x0 > x2 ? x0 : x2) : (x1 > x2 ? x1 : x2);
+    var minY = y0 < y1 ? (y0 < y2 ? y0 : y2) : (y1 < y2 ? y1 : y2), maxY = y0 > y1 ? (y0 > y2 ? y0 : y2) : (y1 > y2 ? y1 : y2);
+    minX = minX < 0 ? 0 : minX | 0; minY = minY < 0 ? 0 : minY | 0; maxX = maxX > W - 1 ? W - 1 : (maxX | 0) + 1; maxY = maxY > H - 1 ? H - 1 : (maxY | 0) + 1;
+    var small = maxX - minX < 10;
     if (minX > maxX || minY > maxY) return;
     var mat = MAT, r = CR, g = CG, b = CB;
     for (var y = minY; y <= maxY; y++) {
       var pyc = y + 0.5, row = y * W;
-      rowSpan(pyc, x0, y0, x1, y1, x2, y2, inv, minX, maxX);
+      if (small) { SPAN.xs = minX; SPAN.xe = maxX; } else rowSpan(pyc, x0, y0, x1, y1, x2, y2, inv, minX, maxX);
       for (var x = SPAN.xs, xEnd = SPAN.xe; x <= xEnd; x++) {
         var pxc = x + 0.5;
         var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
@@ -451,10 +484,92 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
           sunb[idx * 3] = SR; sunb[idx * 3 + 1] = SG; sunb[idx * 3 + 2] = SB;
           continue;
         }
+        if (mat === 3) {
+          px[o] = r; px[o + 1] = g; px[o + 2] = b;
+          offb[idx] = OFFX;
+          continue;
+        }
         var fg = fogAt(d);
         px[o] = r + (FOG[0] - r) * fg;
         px[o + 1] = g + (FOG[1] - g) * fg;
         px[o + 2] = b + (FOG[2] - b) * fg;
+      }
+    }
+  }
+
+  /* Gouraud path for the leaf clumps: near-plane clipping carries corner colours, the rasteriser interpolates them. */
+  var gcBuf = new Float64Array(30), gkBuf = new Float64Array(30), gsC = new Float64Array(30);
+  function drawPolyG(pts, cols, np) {
+    var i, n = 0;
+    for (i = 0; i < np; i++) {
+      var ox = pts[i * 3] - camPos[0], oy = pts[i * 3 + 1] - camPos[1], oz = pts[i * 3 + 2] - camPos[2];
+      vBuf[n++] = ox * camR[0] + oy * camR[1] + oz * camR[2];
+      vBuf[n++] = ox * camU[0] + oy * camU[1] + oz * camU[2];
+      vBuf[n++] = -(ox * camF[0] + oy * camF[1] + oz * camF[2]);
+    }
+    var m = 0;
+    for (i = 0; i < np; i++) {
+      var j = (i + 1) % np;
+      var az = vBuf[i * 3 + 2], bz = vBuf[j * 3 + 2];
+      var ain = az <= -NEAR, bin = bz <= -NEAR;
+      if (ain) {
+        gcBuf[m] = vBuf[i * 3]; gcBuf[m + 1] = vBuf[i * 3 + 1]; gcBuf[m + 2] = az;
+        gkBuf[m] = cols[i * 3]; gkBuf[m + 1] = cols[i * 3 + 1]; gkBuf[m + 2] = cols[i * 3 + 2]; m += 3;
+      }
+      if (ain !== bin) {
+        var s = (-NEAR - az) / (bz - az);
+        gcBuf[m] = vBuf[i * 3] + (vBuf[j * 3] - vBuf[i * 3]) * s;
+        gcBuf[m + 1] = vBuf[i * 3 + 1] + (vBuf[j * 3 + 1] - vBuf[i * 3 + 1]) * s;
+        gcBuf[m + 2] = -NEAR;
+        for (var k = 0; k < 3; k++) gkBuf[m + k] = cols[i * 3 + k] + (cols[j * 3 + k] - cols[i * 3 + k]) * s;
+        m += 3;
+      }
+    }
+    var nc = m / 3;
+    if (nc < 3) return;
+    for (i = 0; i < nc; i++) {
+      var vz = gcBuf[i * 3 + 2], iw = -1 / vz;
+      sxA[i] = (((gcBuf[i * 3] * iw) / (tanH * aspect)) * 0.5 + 0.5) * W;
+      syA[i] = (0.5 - ((gcBuf[i * 3 + 1] * iw) / tanH) * 0.5) * H;
+      swA[i] = iw;
+      gsC[i * 3] = gkBuf[i * 3] * iw; gsC[i * 3 + 1] = gkBuf[i * 3 + 1] * iw; gsC[i * 3 + 2] = gkBuf[i * 3 + 2] * iw;
+    }
+    for (i = 1; i < nc - 1; i++) triG(0, i, i + 1);
+  }
+
+  function triG(a, b, c) {
+    var x0 = sxA[a], y0 = syA[a], w0 = swA[a], x1 = sxA[b], y1 = syA[b], w1 = swA[b], x2 = sxA[c], y2 = syA[c], w2 = swA[c];
+    var area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
+    if (area > -1e-9 && area < 1e-9) return;
+    var inv = 1 / area;
+    var r0 = gsC[a * 3], g0 = gsC[a * 3 + 1], b0 = gsC[a * 3 + 2];
+    var r1 = gsC[b * 3], g1 = gsC[b * 3 + 1], b1 = gsC[b * 3 + 2];
+    var r2 = gsC[c * 3], g2 = gsC[c * 3 + 1], b2 = gsC[c * 3 + 2];
+    var minX = x0 < x1 ? (x0 < x2 ? x0 : x2) : (x1 < x2 ? x1 : x2), maxX = x0 > x1 ? (x0 > x2 ? x0 : x2) : (x1 > x2 ? x1 : x2);
+    var minY = y0 < y1 ? (y0 < y2 ? y0 : y2) : (y1 < y2 ? y1 : y2), maxY = y0 > y1 ? (y0 > y2 ? y0 : y2) : (y1 > y2 ? y1 : y2);
+    minX = minX < 0 ? 0 : minX | 0; minY = minY < 0 ? 0 : minY | 0; maxX = maxX > W - 1 ? W - 1 : (maxX | 0) + 1; maxY = maxY > H - 1 ? H - 1 : (maxY | 0) + 1;
+    if (minX > maxX || minY > maxY) return;
+    var small = maxX - minX < 10, off = OFFX;
+    for (var y = minY; y <= maxY; y++) {
+      var pyc = y + 0.5, row = y * W;
+      if (small) { SPAN.xs = minX; SPAN.xe = maxX; } else rowSpan(pyc, x0, y0, x1, y1, x2, y2, inv, minX, maxX);
+      for (var x = SPAN.xs, xEnd = SPAN.xe; x <= xEnd; x++) {
+        var pxc = x + 0.5;
+        var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
+        if (l0 < 0) continue;
+        var l1 = ((x2 - pxc) * (y0 - pyc) - (x0 - pxc) * (y2 - pyc)) * inv;
+        if (l1 < 0) continue;
+        var l2 = 1 - l0 - l1;
+        if (l2 < 0) continue;
+        var w = w0 * l0 + w1 * l1 + w2 * l2;
+        if (w <= 0) continue;
+        var d = 1 / w, idx = row + x;
+        if (d >= zbuf[idx]) continue;
+        zbuf[idx] = d; matb[idx] = 3; offb[idx] = off;
+        var o = idx * 4;
+        px[o] = (r0 * l0 + r1 * l1 + r2 * l2) * d;
+        px[o + 1] = (g0 * l0 + g1 * l1 + g2 * l2) * d;
+        px[o + 2] = (b0 * l0 + b1 * l1 + b2 * l2) * d;
       }
     }
   }
@@ -486,7 +601,11 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
   var _q = new Float64Array(12);
   function drawGround() {
     MAT = 1;
+    var lim = tanH * aspect;
     for (var i = 0; i < GROUND.length; i += 12) {
+      var ox = GROUND[i] - camPos[0], oz = GROUND[i + 2] - camPos[2];
+      var vz = ox * camR[2] - oz * camR[0], vx = ox * camR[0] + oz * camR[2];
+      if (vz < -4 || Math.abs(vx) > (vz > 0 ? vz : 0) * lim + 4) continue;
       for (var k = 0; k < 12; k++) _q[k] = GROUND[i + k];
       drawPoly(_q, 4);
     }
@@ -522,7 +641,7 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
           sw: 0, wob: 0, blobs: [], stems: [],
           leaf: [70 + (hash(sd + 0.8) - 0.5) * 14, 106 + (hash(sd + 0.9) - 0.5) * 14, 36]
         };
-        var nb = zz < 16 ? 16 : (zz < 38 ? 10 : 6), k, c;
+        var nb = zz < 8 ? 34 : (zz < 16 ? 22 : (zz < 38 ? 11 : 6)), k, c;
         for (k = 0; k < nb; k++) {
           var hs = sd * 3.7 + k * 1.31;
           var v = -0.60 + 1.40 * hash(hs + 0.11);
@@ -537,7 +656,7 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
           var sv = 0.40 + 0.80 * (ox * LX + oy * LY + oz * LZ) / b.rx;
           var hf = (v + 0.6) / 1.4;
           b.blobs.push({
-            ox: ox, oy: oy, oz: oz, r: (0.55 + 0.30 * hash(hs + 0.14)) * s * (nb < 8 ? 1.25 : 1),
+            ox: ox, oy: oy, oz: oz, r: (nb > 30 ? 0.36 + 0.22 * hash(hs + 0.14) : (nb > 20 ? 0.45 + 0.26 * hash(hs + 0.14) : 0.55 + 0.30 * hash(hs + 0.14))) * s * (nb < 8 ? 1.25 : 1),
             jv: jv, fp: fp, fj: fj, sv: sv < 0.18 ? 0.18 : (sv > 1 ? 1 : sv),
             hf: 0.62 + 0.38 * hf, hs: 0.35 + 0.65 * hf, ph: hash(hs + 0.15) * TAU
           });
@@ -570,41 +689,44 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
     }
   }
 
-  var UNDER = [168, 184, 150];
-  var BV = new Float64Array(36), TP = new Float64Array(9);
+  var UNDER = [150, 174, 124];
+  var BV = new Float64Array(36), BC = new Float64Array(36), TP = new Float64Array(9), TC = new Float64Array(9);
   function drawBlob(bx, by, bz, bl, leaf, g, u) {
     var r = bl.r, jv = bl.jv, k;
+    var flipT = 1 - 0.38 * g;
     for (k = 0; k < 12; k++) {
-      var s = r * jv[k];
-      BV[k * 3] = bx + ICO_V[k * 3] * s; BV[k * 3 + 1] = by + ICO_V[k * 3 + 1] * s * 0.85; BV[k * 3 + 2] = bz + ICO_V[k * 3 + 2] * s;
+      var s = r * jv[k], nx = ICO_V[k * 3], ny = ICO_V[k * 3 + 1], nz = ICO_V[k * 3 + 2];
+      BV[k * 3] = bx + nx * s; BV[k * 3 + 1] = by + ny * s * 0.85; BV[k * 3 + 2] = bz + nz * s;
+      var lam = nx * LX + ny * LY + nz * LZ; if (lam < 0) lam = 0;
+      var amb = (0.44 + 0.22 * (ny > 0 ? ny : 0.4 * ny)) * bl.hf, sun = lam * bl.sv, j = bl.fj[k];
+      var cr = leaf[0] * j * (SKYF[0] * amb + SUN[0] * sun);
+      var cg = leaf[1] * j * (SKYF[1] * amb + SUN[1] * sun);
+      var cb = leaf[2] * j * (SKYF[2] * amb + SUN[2] * sun);
+      var fl = fsin(u * TAU * 29 + bl.fp[k]) - flipT;
+      if (fl > 0) {
+        var fk = fl * 3; fk = fk > 0.5 ? 0.5 : fk;
+        var ul = (0.40 + 0.55 * sun) * bl.hf;
+        cr += (UNDER[0] * ul - cr) * fk; cg += (UNDER[1] * ul - cg) * fk; cb += (UNDER[2] * ul - cb) * fk;
+      }
+      BC[k * 3] = cr; BC[k * 3 + 1] = cg; BC[k * 3 + 2] = cb;
     }
-    var flipT = 1 - 0.55 * g;
     for (var f = 0; f < 20; f++) {
       var ia = ICO_F[f * 3] * 3, ib = ICO_F[f * 3 + 1] * 3, ic = ICO_F[f * 3 + 2] * 3;
       var ax = BV[ia], ay = BV[ia + 1], az = BV[ia + 2];
       var ux = BV[ib] - ax, uy = BV[ib + 1] - ay, uz = BV[ib + 2] - az;
       var vx = BV[ic] - ax, vy = BV[ic + 1] - ay, vz = BV[ic + 2] - az;
-      var nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+      var fx = uy * vz - uz * vy, fy = uz * vx - ux * vz, fz = ux * vy - uy * vx;
       var mx = ax + (ux + vx) / 3, my = ay + (uy + vy) / 3, mz = az + (uz + vz) / 3;
-      if (nx * (mx - bx) + ny * (my - by) + nz * (mz - bz) < 0) { nx = -nx; ny = -ny; nz = -nz; }
-      if (nx * (mx - camPos[0]) + ny * (my - camPos[1]) + nz * (mz - camPos[2]) > 0) continue;
-      var il = 1 / Math.sqrt(nx * nx + ny * ny + nz * nz); nx *= il; ny *= il; nz *= il;
-      var lam = nx * LX + ny * LY + nz * LZ; if (lam < 0) lam = 0;
-      var amb = (0.36 + 0.22 * (ny > 0 ? ny : 0.4 * ny)) * bl.hf, sun = lam * bl.sv, j = bl.fj[f];
-      var cr = leaf[0] * j * (SKYF[0] * amb + SUN[0] * sun);
-      var cg = leaf[1] * j * (SKYF[1] * amb + SUN[1] * sun);
-      var cb = leaf[2] * j * (SKYF[2] * amb + SUN[2] * sun);
-      var fl = Math.sin(u * TAU * 29 + bl.fp[f]) - flipT;
-      if (fl > 0) {
-        var fk = fl * 4; fk = fk > 0.8 ? 0.8 : fk;
-        var ul = (0.40 + 0.55 * sun) * bl.hf;
-        cr += (UNDER[0] * ul - cr) * fk; cg += (UNDER[1] * ul - cg) * fk; cb += (UNDER[2] * ul - cb) * fk;
-      }
-      CR = cr; CG = cg; CB = cb;
+      var side = fx * (mx - bx) + fy * (my - by) + fz * (mz - bz);
+      var face = fx * (mx - camPos[0]) + fy * (my - camPos[1]) + fz * (mz - camPos[2]);
+      if ((side < 0) === (face < 0)) continue;
       TP[0] = ax; TP[1] = ay; TP[2] = az;
       TP[3] = BV[ib]; TP[4] = BV[ib + 1]; TP[5] = BV[ib + 2];
       TP[6] = BV[ic]; TP[7] = BV[ic + 1]; TP[8] = BV[ic + 2];
-      drawPoly(TP, 3);
+      TC[0] = BC[ia]; TC[1] = BC[ia + 1]; TC[2] = BC[ia + 2];
+      TC[3] = BC[ib]; TC[4] = BC[ib + 1]; TC[5] = BC[ib + 2];
+      TC[6] = BC[ic]; TC[7] = BC[ic + 1]; TC[8] = BC[ic + 2];
+      drawPolyG(TP, TC, 3);
     }
   }
 
@@ -641,7 +763,7 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
       if (Math.abs(vy) > (vz > 0 ? vz : 0) * tanH + m) continue;
       var g = b.g, k;
       for (k = 0; k < b.stems.length; k++) drawStem(b, b.stems[k]);
-      MAT = 0;
+      MAT = 3; OFFX = b.sw;
       for (k = 0; k < b.blobs.length; k++) {
         var bl = b.blobs[k];
         var dx = b.sw * bl.hs + 0.05 * g * Math.sin(u * TAU * 31 + bl.ph);
@@ -653,17 +775,17 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
   }
 
   /* The basket and the folded sack, waiting in the shade between the first two bushes. */
-  var BX = 0.30, BZ = -4.7, SKX = -0.50, SKZ = -4.35;
+  var BX = -0.8, BZ = -5.7, SKX = 0.05, SKZ = -5.25;
   var OBJ = [];
   function objQuad(p, base, nx, ny, nz, amb, jit) {
     setLit(base, nx, ny, nz, amb, jit);
     OBJ.push({ p: new Float64Array(p), c: [CR, CG, CB], s: [SR, SG, SB] });
   }
 
-  var WICKER = [196, 150, 88], WICKER_D = [150, 108, 60], INSIDE = [92, 66, 40], JUTE = [184, 164, 122];
+  var WICKER = [218, 176, 108], WICKER_D = [168, 124, 70], INSIDE = [96, 70, 42], JUTE = [168, 146, 104];
   (function buildBasket() {
     var y0 = hgt(BX, BZ) - 0.03, N = 16, ROWS = 6, R0 = 0.20, R1 = 0.28, HB = 0.40, i, r;
-    var eyeX = 0.41, eyeZ = 0.8, eyeY = hgt(eyeX, eyeZ) + 1.55;
+    var eyeX = 0.41, eyeZ = CAM_Z - 0.2, eyeY = hgt(eyeX, eyeZ) + 1.45;
     for (i = 0; i < N; i++) {
       var a0 = (i / N) * TAU, a1 = ((i + 1) / N) * TAU, am = (a0 + a1) / 2;
       var c0 = Math.cos(a0), s0 = Math.sin(a0), c1 = Math.cos(a1), s1 = Math.sin(a1);
@@ -679,7 +801,7 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
           var weave = ((i + r) & 1) ? WICKER : WICKER_D;
           objQuad(p, weave, nx, ny, nz, 0.46, 0.90 + 0.2 * hash(i * 7 + r));
         } else {
-          objQuad(p, INSIDE, -nx, 0.3, -nz, 0.30 + 0.25 * v1, 0.4 + 0.5 * v1);
+          objQuad(p, INSIDE, -nx, 0.3, -nz, 0.9 + 0.5 * v1, 0.18 + 0.25 * v1);
         }
       }
       var rt = y0 + HB, ri = R1 - 0.025, ro = R1 + 0.03;
@@ -689,22 +811,30 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
     }
   })();
 
-  function box(cx, cy, cz, hx, hy, hz, ang, base, jit) {
-    var ca = Math.cos(ang), sa = Math.sin(ang);
-    function P(lx, ly, lz) { return [cx + lx * ca - lz * sa, cy + ly, cz + lx * sa + lz * ca]; }
-    var c = [P(-hx, -hy, -hz), P(hx, -hy, -hz), P(hx, -hy, hz), P(-hx, -hy, hz), P(-hx, hy, -hz), P(hx, hy, -hz), P(hx, hy, hz), P(-hx, hy, hz)];
-    function F(a, b, d, e, nx, nz, ny) { objQuad(c[a].concat(c[b], c[d], c[e]), base, nx, ny, nz, 0.46, jit); }
-    F(4, 5, 6, 7, 0, 0, 1);
-    F(3, 2, 6, 7, -sa, ca, 0);
-    F(1, 0, 4, 5, sa, -ca, 0);
-    F(0, 3, 7, 4, -ca, -sa, 0);
-    F(2, 1, 5, 6, ca, sa, 0);
+  /* A soft pillow of cloth on the ground: the folded sack is two of these. */
+  function pillow(cx, cy, cz, hx, hz, hy, ang, base, jit, seed) {
+    var ca = Math.cos(ang), sa = Math.sin(ang), NX = 6, NZ = 4, i, j;
+    function P(a, b) {
+      var fa = 1 - a * a, fb = 1 - b * b;
+      var h = hy * Math.sqrt(fa * fb) * (1 + 0.12 * Math.sin(a * 5 + b * 3 + seed));
+      var lx = a * hx, lz = b * hz;
+      return [cx + lx * ca - lz * sa, cy + h, cz + lx * sa + lz * ca];
+    }
+    for (i = 0; i < NX; i++) for (j = 0; j < NZ; j++) {
+      var a0 = -1 + 2 * i / NX, a1 = -1 + 2 * (i + 1) / NX, b0 = -1 + 2 * j / NZ, b1 = -1 + 2 * (j + 1) / NZ;
+      var p0 = P(a0, b0), p1 = P(a1, b0), p2 = P(a1, b1), p3 = P(a0, b1);
+      var ux = p2[0] - p0[0], uy = p2[1] - p0[1], uz = p2[2] - p0[2];
+      var vx = p3[0] - p1[0], vy = p3[1] - p1[1], vz = p3[2] - p1[2];
+      var nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+      if (ny < 0) { nx = -nx; ny = -ny; nz = -nz; }
+      var l = Math.sqrt(nx * nx + ny * ny + nz * nz);
+      objQuad(p0.concat(p1, p2, p3), base, nx / l, ny / l, nz / l, 0.46, jit * (0.94 + 0.12 * hash(seed * 9 + i * 4 + j)));
+    }
   }
   (function buildSack() {
     var y0 = hgt(SKX, SKZ);
-    box(SKX, y0 + 0.04, SKZ, 0.36, 0.045, 0.24, 0.35, JUTE, 0.92);
-    box(SKX + 0.03, y0 + 0.115, SKZ - 0.01, 0.30, 0.035, 0.21, 0.30, JUTE, 1.0);
-    box(SKX - 0.20, y0 + 0.16, SKZ - 0.06, 0.07, 0.012, 0.19, 0.30, [150, 132, 96], 0.95);
+    pillow(SKX, y0 - 0.01, SKZ, 0.38, 0.26, 0.09, 0.35, JUTE, 0.92, 1.0);
+    pillow(SKX + 0.10, y0 + 0.05, SKZ - 0.02, 0.26, 0.23, 0.08, 0.28, JUTE, 1.0, 4.0);
   })();
 
   function drawObjects() {
@@ -720,10 +850,10 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
   function sunVis(x, y, z) {
     var ta = 2.3 / LY;
     var qx = x + LX * ta, qz = z + LZ * ta;
-    var n0 = Math.round((-qz + 0.9 * Math.sin(qx * 0.11 + 0.7)) / T), v = 1;
+    var n0 = rnd((-qz + 0.9 * fsin(qx * 0.11 + 0.7)) / T), v = 1;
     for (var n = n0 - 1; n <= n0 + 1; n++) {
       if (n < N0 || n > N1) continue;
-      var ic = Math.round(qx / SP - 0.5 * (n & 1));
+      var ic = rnd(qx / SP - 0.5 * (n & 1));
       for (var i = ic - 1; i <= ic + 1; i++) {
         if (i < I0 || i > I1) continue;
         var b = GRID[(n - N0) * NI + (i - I0)];
@@ -735,7 +865,7 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
         if (e >= 1) continue;
         var al = (dx * SHX + dz * SHZ) * 0.62, ac = dz * SHX - dx * SHZ;
         var nn = vnoise(al * 2.3 + b.nx, ac * 2.3 + b.nz) * 0.68 + vnoise(al * 5.3 + b.wob, ac * 5.3 - b.wob + b.nz) * 0.32;
-        var th = 0.70 - 0.20 * e;
+        var th = 0.62 - 0.22 * e;
         var lt = (nn - th) * 14; lt = lt < 0 ? 0 : (lt > 1 ? 1 : lt);
         var oc = e < 0.72 ? 1 : 1 - (e - 0.72) / 0.28;
         v *= 1 - oc * (1 - lt) * 0.93;
@@ -748,9 +878,9 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
   /* Contact shadows on the ground: the foot of each bush, the basket and the sack. */
   function contact(x, z) {
     var a = 1, e, f, dx, dz;
-    var n = Math.round((-z + 0.9 * Math.sin(x * 0.11 + 0.7)) / T);
+    var n = rnd((-z + 0.9 * fsin(x * 0.11 + 0.7)) / T);
     if (n >= N0 && n <= N1) {
-      var ic = Math.round(x / SP - 0.5 * (n & 1));
+      var ic = rnd(x / SP - 0.5 * (n & 1));
       for (var i = ic - 1; i <= ic + 1; i++) {
         if (i < I0 || i > I1) continue;
         var b = GRID[(n - N0) * NI + (i - I0)];
@@ -767,37 +897,49 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
     return a;
   }
 
-  var SOIL = [124, 94, 62], GRASS = [92, 118, 48], LITTER = [158, 122, 72];
+  var SOIL = [124, 94, 62], GRASS = [100, 114, 54], LITTER = [158, 122, 72];
   function resolve() {
     for (var y = 0; y < H; y++) {
       var uy = RY[y];
       for (var x = 0; x < W; x++) {
         var idx = y * W + x, m = matb[idx];
         if (m === 0) continue;
-        var ux = RX[x], d = zbuf[idx], o = idx * 4;
+        var ux = RX[x], d = zbuf[idx], o = idx * 4, r, g, b;
         var wx = camPos[0] + (camF[0] + camR[0] * ux + camU[0] * uy) * d;
         var wy = camPos[1] + (camF[1] + camR[1] * ux + camU[1] * uy) * d;
         var wz = camPos[2] + (camF[2] + camR[2] * ux + camU[2] * uy) * d;
-        var vis = sunVis(wx, wy, wz), r, g, b;
-        if (m === 2) {
-          r = px[o] + sunb[idx * 3] * vis; g = px[o + 1] + sunb[idx * 3 + 1] * vis; b = px[o + 2] + sunb[idx * 3 + 2] * vis;
+        if (m === 3) {
+          /* Leaf texture fixed to the swaying bush: bright clusters and dark gaps, fading with distance. */
+          var lx = wx - offb[idx];
+          var n1 = vnoise(lx * 8.0 + wz * 4.7, wy * 9.0 - wz * 3.1);
+          var n2 = vnoise(lx * 17.0 - wz * 11.0 + 40.0, wy * 19.0 + wz * 7.0);
+          var nn = n1 * 0.65 + n2 * 0.35;
+          var kc = 9.0 / d; kc = kc > 1 ? 1 : kc;
+          var tt = (nn - 0.38) * 4.2; tt = tt < 0 ? 0 : (tt > 1 ? 1 : tt);
+          var f = 1 + (tt * 0.78 - 0.30) * kc;
+          r = px[o] * f; g = px[o + 1] * f; b = px[o + 2] * f;
         } else {
-          var e = 0.06, h0 = hgt(wx, wz);
-          var gx = (hgt(wx + e, wz) - h0) / e, gz = (hgt(wx, wz + e) - h0) / e;
-          var il = 1 / Math.sqrt(gx * gx + 1 + gz * gz);
-          var lam = (-gx * LX + LY - gz * LZ) * il; if (lam < 0) lam = 0;
-          var slope = Math.sqrt(gx * gx + gz * gz);
-          var nA = vnoise(wx * 0.55, wz * 0.55), nB = vnoise(wx * 2.7 + 17.0, wz * 2.7);
-          var gr = (nA - 0.42) * 2.6 - (slope - 0.1) * 3.0; gr = gr < 0 ? 0 : (gr > 1 ? 1 : gr);
-          var lt = nB > 0.70 ? (nB - 0.70) * 2.6 : 0;
-          var br = 0.84 + 0.32 * nB;
-          var cr = (SOIL[0] + (GRASS[0] - SOIL[0]) * gr), cg = (SOIL[1] + (GRASS[1] - SOIL[1]) * gr), cb = (SOIL[2] + (GRASS[2] - SOIL[2]) * gr);
-          cr = (cr + (LITTER[0] - cr) * lt) * br; cg = (cg + (LITTER[1] - cg) * lt) * br; cb = (cb + (LITTER[2] - cb) * lt) * br;
-          var ao = contact(wx, wz);
-          var amb = 0.48 * ao, sk = lam * vis * (0.45 + 0.55 * ao);
-          r = cr * (SKYF[0] * amb + SUN[0] * sk);
-          g = cg * (SKYF[1] * amb + SUN[1] * sk);
-          b = cb * (SKYF[2] * amb + SUN[2] * sk);
+          var vis = sunVis(wx, wy, wz);
+          if (m === 2) {
+            r = px[o] + sunb[idx * 3] * vis; g = px[o + 1] + sunb[idx * 3 + 1] * vis; b = px[o + 2] + sunb[idx * 3 + 2] * vis;
+          } else {
+            hgtGrad(wx, wz);
+            var gx = GX, gz = GZ;
+            var g2 = gx * gx + gz * gz, il = 1 - g2 * (0.5 - 0.375 * g2);
+            var lam = (-gx * LX + LY - gz * LZ) * il; if (lam < 0) lam = 0;
+            var slope = g2 * 2.2;
+            var nA = vnoise(wx * 0.55, wz * 0.55), nB = vnoise(wx * 2.7 + 17.0, wz * 2.7);
+            var gr = (nA - 0.42) * 2.6 - (slope - 0.1) * 3.0; gr = gr < 0 ? 0 : (gr > 1 ? 1 : gr);
+            var lt = nB > 0.70 ? (nB - 0.70) * 2.6 : 0;
+            var br = 0.84 + 0.32 * nB;
+            var cr = (SOIL[0] + (GRASS[0] - SOIL[0]) * gr), cg = (SOIL[1] + (GRASS[1] - SOIL[1]) * gr), cb = (SOIL[2] + (GRASS[2] - SOIL[2]) * gr);
+            cr = (cr + (LITTER[0] - cr) * lt) * br; cg = (cg + (LITTER[1] - cg) * lt) * br; cb = (cb + (LITTER[2] - cb) * lt) * br;
+            var ao = contact(wx, wz);
+            var amb = 0.48 * ao, sk = lam * vis * (0.45 + 0.55 * ao);
+            r = cr * (SKYF[0] * amb + SUN[0] * sk);
+            g = cg * (SKYF[1] * amb + SUN[1] * sk);
+            b = cb * (SKYF[2] * amb + SUN[2] * sk);
+          }
         }
         var fg = fogAt(d);
         px[o] = r + (FOG[0] - r) * fg;
@@ -821,11 +963,11 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
     U = u;
     setCamera(t);
     updateWind(u);
-    var T0 = performance.now(); drawSky(); var T1 = performance.now();
-    drawGround(); var T2 = performance.now();
+    drawSky();
+    drawGround();
     drawObjects();
-    drawOrchard(u); var T3 = performance.now();
-    resolve(); var T4 = performance.now(); console.log("sky", (T1-T0).toFixed(1), "gnd", (T2-T1).toFixed(1), "orch", (T3-T2).toFixed(1), "res", (T4-T3).toFixed(1));
+    drawOrchard(u);
+    resolve();
     print(fr);
     fctx.putImageData(frame, 0, 0);
   }
