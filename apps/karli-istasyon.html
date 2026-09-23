@@ -1,0 +1,799 @@
+---
+layout: without-sidebar
+title: "Karlı İstasyon"
+permalink: /apps/karli-istasyon/
+redirect_from:
+  - /apps/karli-istasyon.html
+excerpt: "An empty platform under falling snow, drawn pixel by pixel in the browser: sodium lamps pooling on the snow, a headlight that never arrives, looping every 48 seconds."
+---
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+.istasyon-app,
+.istasyon-app *,
+.istasyon-app *::before,
+.istasyon-app *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.istasyon-app {
+  --ist-frame: #090d14;
+  --ist-ink: #a4b2c4;
+  --ist-dim: #6a788b;
+  --ist-line: #1a2331;
+  --ist-accent: #f0c887;
+  width: min(940px, calc(100% - 24px));
+  margin: .5rem auto 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--ist-ink);
+}
+
+.istasyon-slate {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.istasyon-app .istasyon-slate h1 {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(20px, 2.6vw, 28px);
+  line-height: 1.2;
+  letter-spacing: .01em;
+  color: var(--ist-accent);
+}
+.istasyon-slate .ist-where {
+  font-size: 10px;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+  color: var(--ist-dim);
+  white-space: nowrap;
+}
+.istasyon-slate .ist-rule {
+  flex: 1 1 40px;
+  min-width: 24px;
+  height: 1px;
+  background: var(--ist-line);
+  transform: translateY(-5px);
+}
+
+.istasyon-screen {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-height: 74vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ist-frame);
+  border: 1px solid var(--ist-line);
+  overflow: hidden;
+  cursor: pointer;
+}
+.istasyon-screen:focus-visible { outline: 2px solid var(--ist-accent); outline-offset: 2px; }
+.istasyon-screen canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.istasyon-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.istasyon-app button.ist-key {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--ist-line);
+  border-radius: 0;
+  color: var(--ist-ink);
+  width: 34px;
+  height: 34px;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  margin: 0;
+  flex: 0 0 auto;
+  cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.istasyon-app button.ist-key:hover { border-color: #33455c; color: var(--ist-accent); background: transparent; }
+.istasyon-app button.ist-key:focus-visible { outline: 2px solid var(--ist-accent); outline-offset: 2px; }
+.istasyon-app button.ist-key svg { width: 14px; height: 14px; fill: currentColor; }
+
+.istasyon-app input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 1 1 auto;
+  min-width: 60px;
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.istasyon-app input[type="range"]:focus-visible { outline: 2px solid var(--ist-accent); outline-offset: 2px; }
+.istasyon-app input[type="range"]::-webkit-slider-runnable-track { height: 1px; background: var(--ist-line); }
+.istasyon-app input[type="range"]::-moz-range-track { height: 1px; background: var(--ist-line); }
+.istasyon-app input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 3px; height: 13px; margin-top: -6px;
+  background: var(--ist-accent); border: 0; border-radius: 0;
+}
+.istasyon-app input[type="range"]::-moz-range-thumb {
+  width: 3px; height: 13px;
+  background: var(--ist-accent); border: 0; border-radius: 0;
+}
+
+.istasyon-clock {
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--ist-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 520px) {
+  .istasyon-slate .ist-rule { display: none; }
+}
+</style>
+
+<div class="istasyon-app" id="istasyon-app">
+
+  <div class="istasyon-slate">
+    <h1>Karlı İstasyon</h1>
+    <span class="ist-rule"></span>
+    <span class="ist-where">23:40 · kar · tren yok</span>
+  </div>
+
+  <div class="istasyon-screen" id="ist-screen" tabindex="0" aria-label="Sahneyi oynat veya duraklat">
+    <canvas id="ist-stage" width="1280" height="720" aria-label="Kar yağan boş bir tren peronu: sodyum lambalarının altında ışık havuzları, raylar ve uzakta yaklaşmayan bir far"></canvas>
+  </div>
+
+  <div class="istasyon-bar">
+    <button class="ist-key" id="ist-play" type="button" aria-label="Duraklat" title="Duraklat">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path id="ist-ico-play" d="M4 2h3v12H4zM9 2h3v12H9z"></path></svg>
+    </button>
+    <input type="range" id="ist-scrub" min="0" max="1439" step="1" value="360" aria-label="Zaman">
+    <span class="istasyon-clock" id="ist-clock">00:12 / 00:48</span>
+    <button class="ist-key" id="ist-sound" type="button" aria-label="Sesi aç" title="Sesi aç">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path id="ist-ico-sound" d="M3 6h2.5L9 3v10L5.5 10H3zM11.2 5.1l1-1c2.4 2 2.4 5.8 0 7.8l-1-1c1.7-1.5 1.7-4.3 0-5.8z"></path></svg>
+    </button>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var TAU = Math.PI * 2;
+  var W = 320, H = 180;
+  var DURATION = 48, FPS = 30;
+  var FRAMES = DURATION * FPS;
+
+  var DECK_Y = 0.92;
+  var TRACK_X = -2.35;
+  var GAUGE = 0.72;
+
+  function hex(h) {
+    return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  }
+  function ramp(a, b, n) {
+    var ca = hex(a), cb = hex(b), out = [];
+    for (var i = 0; i < n; i++) {
+      var k = n === 1 ? 0 : i / (n - 1);
+      out.push([ca[0] + (cb[0] - ca[0]) * k, ca[1] + (cb[1] - ca[1]) * k, ca[2] + (cb[2] - ca[2]) * k]);
+    }
+    return out;
+  }
+  var PALETTE = [].concat(
+    ramp("#05070d", "#1b2433", 4),
+    ramp("#232f44", "#7d90ab", 7),
+    ramp("#9cadc2", "#f3f7fb", 6),
+    ramp("#0b1220", "#3b4a63", 5),
+    ramp("#3d2c0c", "#ffd48a", 6),
+    ramp("#101820", "#47555f", 4),
+    ramp("#241d18", "#6d5c4c", 4),
+    ramp("#5a4a2a", "#efd9a6", 4)
+  );
+
+  var LUT = new Uint8Array(32 * 32 * 32 * 3);
+  (function () {
+    for (var r = 0; r < 32; r++) for (var g = 0; g < 32; g++) for (var b = 0; b < 32; b++) {
+      var R = r * 8.226, G = g * 8.226, B = b * 8.226, best = 0, bd = 1e9;
+      for (var p = 0; p < PALETTE.length; p++) {
+        var c = PALETTE[p];
+        var dr = R - c[0], dg = G - c[1], db = B - c[2];
+        var d = dr * dr * 0.5 + dg * dg * 0.7 + db * db * 0.35;
+        if (d < bd) { bd = d; best = p; }
+      }
+      var i = ((r << 10) | (g << 5) | b) * 3, c2 = PALETTE[best];
+      LUT[i] = c2[0]; LUT[i + 1] = c2[1]; LUT[i + 2] = c2[2];
+    }
+  })();
+  var BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+
+  var film = document.createElement("canvas");
+  film.width = W; film.height = H;
+  var fctx = film.getContext("2d");
+  var frame = fctx.createImageData(W, H);
+  var px = frame.data;
+  var zbuf = new Float32Array(W * H);
+
+  var stage = document.getElementById("ist-stage");
+  var sctx = stage.getContext("2d");
+
+  var FOG = [30, 40, 58];
+  var FOGD = 0.0135;
+  var FOGLUT = new Float32Array(1024);
+  for (var fi = 0; fi < 1024; fi++) FOGLUT[fi] = 1 - Math.exp(-(fi * 0.45) * FOGD);
+  function fogAt(d) { var i = d * 2.2222; return i >= 1023 ? 1 : FOGLUT[i | 0]; }
+
+  var camPos = [0, 0, 0], camF = [0, 0, -1], camR = [1, 0, 0], camU = [0, 1, 0];
+  var FOV = 41 * Math.PI / 180, tanH = Math.tan(FOV / 2), aspect = W / H;
+
+  function setCamera(t) {
+    var u = t / DURATION;
+    var ease = 0.5 - 0.5 * Math.cos(u * TAU);
+    camPos[0] = 1.62;
+    camPos[1] = DECK_Y + 1.68;
+    camPos[2] = 9.4 - 2.6 * ease;
+    var yaw = -0.075;
+    var pitch = -0.052;
+    var cp = Math.cos(pitch);
+    camF[0] = Math.sin(yaw) * cp; camF[1] = Math.sin(pitch); camF[2] = -Math.cos(yaw) * cp;
+    camR[0] = Math.cos(yaw); camR[1] = 0; camR[2] = Math.sin(yaw);
+    camU[0] = camR[1] * camF[2] - camR[2] * camF[1];
+    camU[1] = camR[2] * camF[0] - camR[0] * camF[2];
+    camU[2] = camR[0] * camF[1] - camR[1] * camF[0];
+    var l = Math.hypot(camU[0], camU[1], camU[2]);
+    camU[0] /= l; camU[1] /= l; camU[2] /= l;
+  }
+
+  var SKY_LOW = [46, 57, 76], SKY_HIGH = [10, 15, 26];
+  function skyInto(dx, dy, dz, out) {
+    var k = dy * 2.4; k = k < 0 ? 0 : (k > 1 ? 1 : k);
+    var e = k * k * (3 - 2 * k);
+    out[0] = SKY_LOW[0] + (SKY_HIGH[0] - SKY_LOW[0]) * e;
+    out[1] = SKY_LOW[1] + (SKY_HIGH[1] - SKY_LOW[1]) * e;
+    out[2] = SKY_LOW[2] + (SKY_HIGH[2] - SKY_LOW[2]) * e;
+  }
+
+  var _sk = [0, 0, 0];
+  function drawSky() {
+    var invW = 1 / W, invH = 1 / H;
+    for (var y = 0; y < H; y++) {
+      var ndcy = 1 - ((y + 0.5) * invH) * 2;
+      var uy = ndcy * tanH;
+      for (var x = 0; x < W; x++) {
+        var ndcx = ((x + 0.5) * invW) * 2 - 1;
+        var ux = ndcx * tanH * aspect;
+        var dx = camR[0] * ux + camU[0] * uy + camF[0];
+        var dy = camR[1] * ux + camU[1] * uy + camF[1];
+        var dz = camR[2] * ux + camU[2] * uy + camF[2];
+        var il = 1 / Math.hypot(dx, dy, dz);
+        skyInto(dx * il, dy * il, dz * il, _sk);
+        var i = y * W + x, o = i * 4;
+        px[o] = _sk[0]; px[o + 1] = _sk[1]; px[o + 2] = _sk[2]; px[o + 3] = 255;
+        zbuf[i] = 1e7;
+      }
+    }
+  }
+
+  var NEAR = 0.08;
+  var vBuf = new Float64Array(30), cBuf = new Float64Array(30);
+  var sxA = new Float64Array(10), syA = new Float64Array(10), swA = new Float64Array(10);
+
+  function drawPoly(pts, np, r, g, b) {
+    var i, n = 0;
+    for (i = 0; i < np; i++) {
+      var ox = pts[i * 3] - camPos[0], oy = pts[i * 3 + 1] - camPos[1], oz = pts[i * 3 + 2] - camPos[2];
+      vBuf[n++] = ox * camR[0] + oy * camR[1] + oz * camR[2];
+      vBuf[n++] = ox * camU[0] + oy * camU[1] + oz * camU[2];
+      vBuf[n++] = -(ox * camF[0] + oy * camF[1] + oz * camF[2]);
+    }
+    var m = 0;
+    for (i = 0; i < np; i++) {
+      var j = (i + 1) % np;
+      var az = vBuf[i * 3 + 2], bz = vBuf[j * 3 + 2];
+      var ain = az <= -NEAR, bin = bz <= -NEAR;
+      if (ain) { cBuf[m++] = vBuf[i * 3]; cBuf[m++] = vBuf[i * 3 + 1]; cBuf[m++] = az; }
+      if (ain !== bin) {
+        var s = (-NEAR - az) / (bz - az);
+        cBuf[m++] = vBuf[i * 3] + (vBuf[j * 3] - vBuf[i * 3]) * s;
+        cBuf[m++] = vBuf[i * 3 + 1] + (vBuf[j * 3 + 1] - vBuf[i * 3 + 1]) * s;
+        cBuf[m++] = -NEAR;
+      }
+    }
+    var nc = m / 3;
+    if (nc < 3) return;
+    for (i = 0; i < nc; i++) {
+      var vz = cBuf[i * 3 + 2], iw = -1 / vz;
+      sxA[i] = (((cBuf[i * 3] * iw) / (tanH * aspect)) * 0.5 + 0.5) * W;
+      syA[i] = (0.5 - ((cBuf[i * 3 + 1] * iw) / tanH) * 0.5) * H;
+      swA[i] = iw;
+    }
+    for (i = 1; i < nc - 1; i++) tri(sxA[0], syA[0], swA[0], sxA[i], syA[i], swA[i], sxA[i + 1], syA[i + 1], swA[i + 1], r, g, b);
+  }
+
+  function tri(x0, y0, w0, x1, y1, w1, x2, y2, w2, r, g, b) {
+    var area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
+    if (area > -1e-9 && area < 1e-9) return;
+    var inv = 1 / area;
+    var minX = Math.floor(Math.min(x0, x1, x2)), maxX = Math.ceil(Math.max(x0, x1, x2));
+    var minY = Math.floor(Math.min(y0, y1, y2)), maxY = Math.ceil(Math.max(y0, y1, y2));
+    if (minX < 0) minX = 0; if (minY < 0) minY = 0;
+    if (maxX > W - 1) maxX = W - 1; if (maxY > H - 1) maxY = H - 1;
+    if (minX > maxX || minY > maxY) return;
+    for (var y = minY; y <= maxY; y++) {
+      var pyc = y + 0.5, row = y * W;
+      for (var x = minX; x <= maxX; x++) {
+        var pxc = x + 0.5;
+        var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
+        if (l0 < 0) continue;
+        var l1 = ((x2 - pxc) * (y0 - pyc) - (x0 - pxc) * (y2 - pyc)) * inv;
+        if (l1 < 0) continue;
+        var l2 = 1 - l0 - l1;
+        if (l2 < 0) continue;
+        var w = w0 * l0 + w1 * l1 + w2 * l2;
+        if (w <= 0) continue;
+        var d = 1 / w, idx = row + x;
+        if (d >= zbuf[idx]) continue;
+        zbuf[idx] = d;
+        var fg = fogAt(d), o = idx * 4;
+        px[o] = r + (FOG[0] - r) * fg;
+        px[o + 1] = g + (FOG[1] - g) * fg;
+        px[o + 2] = b + (FOG[2] - b) * fg;
+      }
+    }
+  }
+
+  function Mesh() { this.p = []; this.c = []; }
+  Mesh.prototype.quad = function (ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz, r, g, b) {
+    this.p.push(ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz);
+    this.c.push(r, g, b);
+  };
+
+  var _pt = new Float64Array(12);
+  function drawMesh(m) {
+    var p = m.p, c = m.c, q = c.length / 3;
+    for (var i = 0; i < q; i++) {
+      var b = i * 12;
+      for (var k = 0; k < 12; k++) _pt[k] = p[b + k];
+      drawPoly(_pt, 4, c[i * 3], c[i * 3 + 1], c[i * 3 + 2]);
+    }
+  }
+
+  var LAMPS = [];
+  var LAMP_C = [1.00, 0.70, 0.33];
+  var WINDOW_C = [1.00, 0.80, 0.50];
+  var SKY_FILL = [0.42, 0.52, 0.72];
+
+  function litAt(base, nx, ny, nz, cx, cy, cz, jit) {
+    var up = ny > 0 ? ny : 0;
+    var amb = 0.115 + 0.135 * up + (jit || 0);
+    var r = base[0] * amb * SKY_FILL[0] * 2.0;
+    var g = base[1] * amb * SKY_FILL[1] * 2.0;
+    var b = base[2] * amb * SKY_FILL[2] * 2.0;
+    for (var i = 0; i < LAMPS.length; i++) {
+      var L = LAMPS[i];
+      var dx = L[0] - cx, dy = L[1] - cy, dz = L[2] - cz;
+      var d2 = dx * dx + dy * dy + dz * dz;
+      if (d2 > 900) continue;
+      var d = Math.sqrt(d2);
+      var lam = (dx * nx + dy * ny + dz * nz) / d;
+      if (lam <= 0) continue;
+      var att = L[3] / (1 + d2 * 0.085);
+      var k = lam * att;
+      var C = L[4] || LAMP_C;
+      r += base[0] * k * C[0];
+      g += base[1] * k * C[1];
+      b += base[2] * k * C[2];
+    }
+    return [r, g, b];
+  }
+
+  var world = new Mesh();
+
+  function slab(m, x0, y0, z0, x1, y1, z1, base, jit, snowTop, emit) {
+    var cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, cz = (z0 + z1) / 2, c;
+    if (emit) {
+      var e = [base[0] * emit, base[1] * emit, base[2] * emit];
+      m.quad(x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1, e[0], e[1], e[2]);
+      m.quad(x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1, e[0], e[1], e[2]);
+      m.quad(x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, z0, e[0], e[1], e[2]);
+      m.quad(x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0, e[0], e[1], e[2]);
+      m.quad(x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1, e[0], e[1], e[2]);
+      return;
+    }
+    c = litAt(snowTop || base, 0, 1, 0, cx, y1, cz, jit);
+    m.quad(x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1, c[0], c[1], c[2]);
+    c = litAt(base, 0, 0, 1, cx, cy, z1, jit);
+    m.quad(x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1, c[0], c[1], c[2]);
+    c = litAt(base, 0, 0, -1, cx, cy, z0, jit);
+    m.quad(x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, z0, c[0], c[1], c[2]);
+    c = litAt(base, -1, 0, 0, x0, cy, cz, jit);
+    m.quad(x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0, c[0], c[1], c[2]);
+    c = litAt(base, 1, 0, 0, x1, cy, cz, jit);
+    m.quad(x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1, c[0], c[1], c[2]);
+  }
+
+  function plate(m, x0, z0, x1, z1, y, base, jit) {
+    var c = litAt(base, 0, 1, 0, (x0 + x1) / 2, y, (z0 + z1) / 2, jit);
+    m.quad(x0, y, z0, x1, y, z0, x1, y, z1, x0, y, z1, c[0], c[1], c[2]);
+  }
+
+  function frac(v) { return v - Math.floor(v); }
+  function hash(i) { return frac(Math.sin(i * 12.9898) * 43758.5453); }
+
+  var SNOW = [214, 226, 240], SNOW_D = [150, 166, 190];
+  var STONE = [88, 98, 112], IRON = [52, 62, 74], IRON_D = [34, 42, 52];
+  var WOOD = [96, 80, 64], BRICK = [104, 88, 76], RAIL = [126, 134, 146];
+
+  var Z_FAR = -52, Z_NEAR = 12;
+
+  (function buildStation() {
+    var m = world, z, x, i;
+
+    for (i = 0; i < 6; i++) {
+      LAMPS.push([3.45, DECK_Y + 4.15, 7.2 - i * 9.4, 1.55, LAMP_C]);
+    }
+    LAMPS.push([5.35, DECK_Y + 1.75, 1.4, 0.75, WINDOW_C]);
+
+    plate(m, -70, Z_FAR, 70, -330, 0.02, SNOW_D, 0);
+    for (i = 0; i < 22; i++) {
+      var tx = -64 + i * 6.2 + hash(i) * 3.4;
+      var th = 5.5 + hash(i + 40) * 7.5;
+      slab(m, tx - 1.5, 0, -150 - hash(i + 9) * 60, tx + 1.5, th, -146 - hash(i + 9) * 60, [22, 30, 40], 0, [30, 40, 54]);
+    }
+
+    var step = 1.15;
+    for (z = Z_FAR; z < Z_NEAR; z += step) {
+      for (x = -13.0; x < 1.2; x += step) {
+        var j = (hash((x * 31 + z * 7) | 0) - 0.5) * 0.09;
+        plate(m, x, z, x + step, z + step, 0.03, SNOW_D, j);
+      }
+    }
+
+    for (z = Z_FAR; z < Z_NEAR; z += 0.62) {
+      slab(m, TRACK_X - 1.32, 0.02, z, TRACK_X + 1.32, 0.17, z + 0.30, [40, 34, 30], (hash(z | 0) - 0.5) * 0.10, [120, 132, 152]);
+    }
+    slab(m, TRACK_X - GAUGE - 0.05, 0.17, Z_FAR, TRACK_X - GAUGE + 0.05, 0.31, Z_NEAR, RAIL, 0.10, RAIL);
+    slab(m, TRACK_X + GAUGE - 0.05, 0.17, Z_FAR, TRACK_X + GAUGE + 0.05, 0.31, Z_NEAR, RAIL, 0.10, RAIL);
+
+    slab(m, -8.9 - GAUGE - 0.05, 0.17, Z_FAR, -8.9 - GAUGE + 0.05, 0.29, -6, RAIL, 0.06, RAIL);
+    slab(m, -8.9 + GAUGE - 0.05, 0.17, Z_FAR, -8.9 + GAUGE + 0.05, 0.29, -6, RAIL, 0.06, RAIL);
+
+    var pitch = 0.78;
+    for (z = Z_FAR; z < Z_NEAR; z += pitch) {
+      for (x = -0.55; x < 4.6; x += pitch) {
+        var jj = (hash((x * 53 + z * 11) | 0) - 0.5) * 0.10;
+        plate(m, x, z, x + pitch, z + pitch, DECK_Y, SNOW, jj);
+      }
+    }
+    slab(m, -0.62, 0, Z_FAR, -0.42, DECK_Y, Z_NEAR, STONE, -0.02, [196, 208, 226]);
+    slab(m, -0.62, DECK_Y - 0.10, Z_FAR, -0.40, DECK_Y - 0.02, Z_NEAR, [220, 214, 120], 0.10, [220, 214, 120]);
+
+    for (i = 0; i < 6; i++) {
+      z = 7.2 - i * 9.4;
+      slab(m, 3.37, DECK_Y, z - 0.08, 3.53, DECK_Y + 3.95, z + 0.08, IRON, 0.02, IRON);
+      slab(m, 3.30, DECK_Y + 3.95, z - 0.15, 3.60, DECK_Y + 4.06, z + 0.15, IRON_D, 0, [180, 194, 214]);
+      slab(m, 3.20, DECK_Y + 4.06, z - 0.30, 3.70, DECK_Y + 4.26, z + 0.30, [250, 226, 168], 0, null, 1.04);
+    }
+
+    slab(m, 4.55, DECK_Y - 0.05, -3.2, 9.4, DECK_Y + 2.95, 6.4, BRICK, 0, [206, 218, 234]);
+    slab(m, 4.40, DECK_Y + 2.95, -3.6, 9.6, DECK_Y + 3.25, 6.8, WOOD, -0.04, [222, 232, 246]);
+    slab(m, 4.50, DECK_Y + 1.05, 0.7, 4.60, DECK_Y + 2.05, 2.5, [252, 230, 176], 0, null, 0.98);
+    slab(m, 4.50, DECK_Y + 1.05, 3.4, 4.60, DECK_Y + 2.05, 5.0, [70, 74, 66], 0.05, [70, 74, 66]);
+
+    slab(m, 1.55, DECK_Y, -9.6, 1.75, DECK_Y + 0.42, -8.2, IRON_D, 0, SNOW);
+    slab(m, 2.90, DECK_Y, -9.6, 3.10, DECK_Y + 0.42, -8.2, IRON_D, 0, SNOW);
+    slab(m, 1.50, DECK_Y + 0.42, -9.7, 3.15, DECK_Y + 0.52, -8.1, WOOD, 0.03, [214, 226, 242]);
+    slab(m, 1.50, DECK_Y + 0.52, -9.75, 3.15, DECK_Y + 1.10, -9.62, WOOD, 0.01, [214, 226, 242]);
+
+    slab(m, 2.62, DECK_Y, -17.4, 2.78, DECK_Y + 2.05, -17.26, IRON, 0.02, IRON);
+    slab(m, 1.30, DECK_Y + 1.62, -17.44, 4.10, DECK_Y + 2.32, -17.22, [222, 228, 236], 0.10, [230, 238, 248]);
+
+    slab(m, 0.20, DECK_Y, 3.9, 1.05, DECK_Y + 0.95, 4.75, [64, 60, 56], 0.02, [208, 220, 238]);
+  })();
+
+  var FLAKES = 900;
+  function drawSnow(t) {
+    var u = t / DURATION;
+    for (var i = 0; i < FLAKES; i++) {
+      var h1 = hash(i), h2 = hash(i + 700), h3 = hash(i + 1400), h4 = hash(i + 2100);
+      var cyc = 2 + (i % 5);
+      var fall = frac(h3 + u * cyc);
+      var yy = 16.5 - fall * 17.5;
+      if (yy < -0.2) continue;
+      var sway = Math.sin(u * TAU * (3 + (i % 4)) + h1 * 9.0) * 0.55;
+      var wx = -16 + h1 * 32 + sway + fall * 2.6;
+      var wz = camPos[2] + 2 - h2 * 54;
+      var bright = 0.30 + h4 * 0.30;
+      for (var L = 0; L < LAMPS.length; L++) {
+        var Lm = LAMPS[L];
+        var dx = Lm[0] - wx, dy = Lm[1] - yy, dz = Lm[2] - wz;
+        var d2 = dx * dx + dy * dy + dz * dz;
+        if (d2 < 64) bright += Lm[3] * 0.85 / (1 + d2 * 0.22);
+      }
+      if (bright > 1) bright = 1;
+      flake(wx, yy, wz, bright, h4 > 0.82);
+    }
+  }
+
+  function flake(wx, wy, wz, a, big) {
+    var ox = wx - camPos[0], oy = wy - camPos[1], oz = wz - camPos[2];
+    var vz = -(ox * camF[0] + oy * camF[1] + oz * camF[2]);
+    if (vz > -0.5) return;
+    var vx = ox * camR[0] + oy * camR[1] + oz * camR[2];
+    var vy = ox * camU[0] + oy * camU[1] + oz * camU[2];
+    var iw = -1 / vz, d = -vz;
+    var sx = (((vx * iw) / (tanH * aspect)) * 0.5 + 0.5) * W;
+    var sy = (0.5 - ((vy * iw) / tanH) * 0.5) * H;
+    var X = sx | 0, Y = sy | 0;
+    var n = (big && d < 9) ? 2 : 1;
+    for (var j = 0; j < n; j++) for (var i = 0; i < n; i++) {
+      var Xi = X + i, Yi = Y + j;
+      if (Xi < 0 || Yi < 0 || Xi >= W || Yi >= H) continue;
+      var idx = Yi * W + Xi;
+      if (d >= zbuf[idx]) continue;
+      var o = idx * 4;
+      px[o] += (238 - px[o]) * a;
+      px[o + 1] += (245 - px[o + 1]) * a;
+      px[o + 2] += (255 - px[o + 2]) * a;
+    }
+  }
+
+  function glow(wx, wy, wz, rad, power, cr, cg, cb, test) {
+    var ox = wx - camPos[0], oy = wy - camPos[1], oz = wz - camPos[2];
+    var vz = -(ox * camF[0] + oy * camF[1] + oz * camF[2]);
+    if (vz > -0.5) return;
+    var vx = ox * camR[0] + oy * camR[1] + oz * camR[2];
+    var vy = ox * camU[0] + oy * camU[1] + oz * camU[2];
+    var iw = -1 / vz, d = -vz;
+    var sx = (((vx * iw) / (tanH * aspect)) * 0.5 + 0.5) * W;
+    var sy = (0.5 - ((vy * iw) / tanH) * 0.5) * H;
+    var rr = rad / d * 26;
+    if (rr < 1.2) rr = 1.2;
+    if (rr > 90) rr = 90;
+    var x0 = Math.max(0, Math.floor(sx - rr)), x1 = Math.min(W - 1, Math.ceil(sx + rr));
+    var y0 = Math.max(0, Math.floor(sy - rr)), y1 = Math.min(H - 1, Math.ceil(sy + rr));
+    var inv = 1 / (rr * rr);
+    for (var y = y0; y <= y1; y++) {
+      for (var x = x0; x <= x1; x++) {
+        var idx = y * W + x;
+        if (test && d >= zbuf[idx] + 0.35) continue;
+        var ddx = x + 0.5 - sx, ddy = y + 0.5 - sy;
+        var q = 1 - (ddx * ddx + ddy * ddy) * inv;
+        if (q <= 0) continue;
+        var a = q * q * power;
+        var o = idx * 4;
+        px[o] += cr * a; px[o + 1] += cg * a; px[o + 2] += cb * a;
+      }
+    }
+  }
+
+  function drawGlows(t) {
+    var u = t / DURATION;
+    for (var i = 0; i < LAMPS.length; i++) {
+      var L = LAMPS[i];
+      var flick = 1;
+      if (i === 3) flick = 0.55 + 0.45 * Math.abs(Math.sin(u * TAU * 37 + 1.1));
+      if (L[4] === WINDOW_C) {
+        glow(L[0], L[1], L[2], 1.6, 0.16, 255, 205, 128, true);
+      } else {
+        glow(L[0], L[1], L[2], 2.6, 0.30 * flick, 255, 198, 118, true);
+      }
+    }
+    var head = 0.72 + 0.28 * Math.sin(u * TAU * 5);
+    glow(TRACK_X, 1.15, -148, 2.2, 0.55 * head, 255, 244, 214, false);
+    glow(TRACK_X, 1.15, -148, 0.5, 0.75 * head, 255, 250, 232, false);
+  }
+
+  function print(fr) {
+    var cx = W * 0.5, cy = H * 0.5, rmax = Math.hypot(cx, cy);
+    for (var y = 0; y < H; y++) {
+      var by = (y & 3) * 4, dy2 = (y - cy) / rmax;
+      for (var x = 0; x < W; x++) {
+        var o = (y * W + x) * 4;
+        var dx2 = (x - cx) / rmax;
+        var v = 1 - (dx2 * dx2 + dy2 * dy2) * 0.34;
+        var n = ((x * 7 + y * 13 + fr * 29) % 17) * 0.30 - 2.4;
+        var dth = (BAYER[by + (x & 3)] - 7.5) * 1.45;
+        var r = px[o] * v + n + dth, g = px[o + 1] * v + n + dth, b = px[o + 2] * v + n + dth;
+        r = r < 0 ? 0 : (r > 255 ? 255 : r);
+        g = g < 0 ? 0 : (g > 255 ? 255 : g);
+        b = b < 0 ? 0 : (b > 255 ? 255 : b);
+        var li = ((((r | 0) >> 3) << 10) | (((g | 0) >> 3) << 5) | ((b | 0) >> 3)) * 3;
+        px[o] = LUT[li]; px[o + 1] = LUT[li + 1]; px[o + 2] = LUT[li + 2];
+      }
+    }
+  }
+
+  function render(fr) {
+    var t = (fr % FRAMES) / FPS;
+    setCamera(t);
+    drawSky();
+    drawMesh(world);
+    drawGlows(t);
+    drawSnow(t);
+    print(fr);
+    fctx.putImageData(frame, 0, 0);
+    present();
+  }
+
+  function present() {
+    var host = stage.parentNode;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var cw = Math.max(64, host.clientWidth), ch = Math.max(64, host.clientHeight);
+    if (stage.width !== Math.floor(cw * dpr) || stage.height !== Math.floor(ch * dpr)) {
+      stage.width = Math.floor(cw * dpr); stage.height = Math.floor(ch * dpr);
+      stage.style.width = cw + "px"; stage.style.height = ch + "px";
+    }
+    var scale = Math.min(stage.width / W, stage.height / H);
+    var dw = Math.round(W * scale), dh = Math.round(H * scale);
+    sctx.imageSmoothingEnabled = false;
+    sctx.fillStyle = "#090d14";
+    sctx.fillRect(0, 0, stage.width, stage.height);
+    sctx.drawImage(film, 0, 0, W, H, Math.round((stage.width - dw) / 2), Math.round((stage.height - dh) / 2), dw, dh);
+  }
+
+  var audio = null;
+  function startAudio() {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    var ctx = new AC();
+    var out = ctx.createGain(); out.gain.value = 0.0001; out.connect(ctx.destination);
+    var soft = ctx.createBiquadFilter(); soft.type = "lowpass"; soft.frequency.value = 4200; soft.connect(out);
+
+    var len = 4 * ctx.sampleRate;
+    var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    var ch = buf.getChannelData(0), last = 0;
+    for (var i = 0; i < len; i++) { var wn = Math.random() * 2 - 1; last = (last + 0.019 * wn) / 1.019; ch[i] = last * 3.5; }
+    function noise() { var s = ctx.createBufferSource(); s.buffer = buf; s.loop = true; s.start(); return s; }
+
+    var wsrc = noise();
+    var wlp = ctx.createBiquadFilter(); wlp.type = "lowpass"; wlp.frequency.value = 240;
+    var wg = ctx.createGain(); wg.gain.value = 0.40;
+    var wlfo = ctx.createOscillator(); wlfo.frequency.value = 1 / 13;
+    var wlg = ctx.createGain(); wlg.gain.value = 0.16;
+    wlfo.connect(wlg); wlg.connect(wg.gain); wlfo.start();
+    wsrc.connect(wlp); wlp.connect(wg); wg.connect(soft);
+
+    var hsrc = noise();
+    var hb = ctx.createBiquadFilter(); hb.type = "highpass"; hb.frequency.value = 3400;
+    var hg = ctx.createGain(); hg.gain.value = 0.045;
+    hsrc.connect(hb); hb.connect(hg); hg.connect(soft);
+
+    var hum = ctx.createOscillator(); hum.type = "sine"; hum.frequency.value = 100;
+    var humg = ctx.createGain(); humg.gain.value = 0.020;
+    hum.connect(humg); humg.connect(soft); hum.start();
+
+    function railHum(when) {
+      var o = ctx.createOscillator(); o.type = "triangle";
+      var f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 180; f.Q.value = 9;
+      var g = ctx.createGain();
+      o.frequency.setValueAtTime(58, when);
+      o.frequency.linearRampToValueAtTime(74, when + 3.2);
+      g.gain.setValueAtTime(0.0001, when);
+      g.gain.exponentialRampToValueAtTime(0.055, when + 1.3);
+      g.gain.exponentialRampToValueAtTime(0.0001, when + 4.4);
+      o.connect(f); f.connect(g); g.connect(soft);
+      o.start(when); o.stop(when + 4.5);
+    }
+    function creakSnow(when) {
+      var s = ctx.createBufferSource(); s.buffer = buf;
+      var bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 3.4;
+      bp.frequency.setValueAtTime(2200, when);
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, when);
+      g.gain.exponentialRampToValueAtTime(0.05, when + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, when + 0.16);
+      s.connect(bp); bp.connect(g); g.connect(soft);
+      s.start(when); s.stop(when + 0.2);
+    }
+    var timers = [
+      setInterval(function () { railHum(ctx.currentTime + Math.random() * 4); }, 21000),
+      setInterval(function () { if (Math.random() < 0.6) creakSnow(ctx.currentTime + Math.random() * 3); }, 8000)
+    ];
+    setTimeout(function () { railHum(ctx.currentTime + 2.5); }, 3000);
+
+    return { ctx: ctx, out: out, timers: timers };
+  }
+
+  var btnPlay = document.getElementById("ist-play");
+  var btnSound = document.getElementById("ist-sound");
+  var icoPlay = document.getElementById("ist-ico-play");
+  var icoSound = document.getElementById("ist-ico-sound");
+  var scrub = document.getElementById("ist-scrub");
+  var clock = document.getElementById("ist-clock");
+
+  var PLAY_D = "M4 2l9 6-9 6z", PAUSE_D = "M4 2h3v12H4zM9 2h3v12H9z";
+  var SND_ON = "M3 6h2.5L9 3v10L5.5 10H3zM11.2 5.1l1-1c2.4 2 2.4 5.8 0 7.8l-1-1c1.7-1.5 1.7-4.3 0-5.8z";
+  var SND_OFF = "M3 6h2.5L9 3v10L5.5 10H3zM11 6.4l1.1 1.1 1.1-1.1.9.9-1.1 1.1 1.1 1.1-.9.9-1.1-1.1-1.1 1.1-.9-.9L11.1 8.4 10 7.3z";
+
+  var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var playing = !calm;
+  var fr = Math.round(FRAMES * 0.25), acc = 0, last = 0, soundOn = false;
+
+  function showTime() {
+    var s = Math.floor(fr / FPS);
+    clock.textContent = "00:" + String(s).padStart(2, "0") + " / 00:48";
+    if (scrub.value !== String(fr)) scrub.value = String(fr);
+  }
+
+  function setPlaying(v) {
+    playing = v;
+    icoPlay.setAttribute("d", v ? PAUSE_D : PLAY_D);
+    btnPlay.setAttribute("aria-label", v ? "Duraklat" : "Oynat");
+    btnPlay.title = v ? "Duraklat" : "Oynat";
+    if (audio) audio.ctx[v ? "resume" : "suspend"]();
+  }
+
+  btnPlay.addEventListener("click", function () { setPlaying(!playing); });
+  scrub.addEventListener("input", function () {
+    fr = Number(scrub.value) | 0;
+    render(fr); showTime();
+  });
+  btnSound.addEventListener("click", function () {
+    if (!audio) audio = startAudio();
+    if (!audio) return;
+    soundOn = !soundOn;
+    audio.ctx.resume();
+    audio.out.gain.cancelScheduledValues(audio.ctx.currentTime);
+    audio.out.gain.setTargetAtTime(soundOn ? 0.55 : 0.0001, audio.ctx.currentTime, 0.6);
+    icoSound.setAttribute("d", soundOn ? SND_ON : SND_OFF);
+    btnSound.setAttribute("aria-label", soundOn ? "Sesi kapat" : "Sesi aç");
+    btnSound.title = btnSound.getAttribute("aria-label");
+  });
+  var screenEl = document.getElementById("ist-screen");
+  screenEl.addEventListener("click", function () { setPlaying(!playing); screenEl.focus(); });
+  screenEl.addEventListener("keydown", function (e) {
+    if (e.code === "Space" || e.code === "Enter") { e.preventDefault(); setPlaying(!playing); }
+  });
+  window.addEventListener("resize", function () { present(); });
+
+  var onScreen = true;
+  if (window.IntersectionObserver) {
+    new IntersectionObserver(function (es) {
+      onScreen = es[0].isIntersecting;
+      if (audio) { if (onScreen && playing) audio.ctx.resume(); else audio.ctx.suspend(); }
+    }, { threshold: 0.04 }).observe(document.getElementById("istasyon-app"));
+  }
+
+  function loop(now) {
+    if (!last) last = now;
+    var dt = Math.min(0.25, (now - last) / 1000);
+    last = now;
+    if (playing && onScreen) {
+      acc += dt;
+      var step2 = 1 / FPS, moved = false;
+      while (acc >= step2) { acc -= step2; fr = (fr + 1) % FRAMES; moved = true; }
+      if (moved) { render(fr); showTime(); }
+    }
+    requestAnimationFrame(loop);
+  }
+
+  icoSound.setAttribute("d", SND_OFF);
+  scrub.max = String(FRAMES - 1);
+  setPlaying(playing);
+  render(fr);
+  showTime();
+  requestAnimationFrame(loop);
+})();
+</script>
