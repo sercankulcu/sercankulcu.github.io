@@ -7,7 +7,6 @@ header:
 excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel in the browser: one lit window, smoke from the chimney, and fog that climbs the valley and draws back again, looping every 48 seconds."
 ---
 
-
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300&family=IBM+Plex+Mono:wght@400;500&display=swap">
 
 <style>
@@ -246,7 +245,8 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
     ramp("#46474a", "#8d8983", 4),
     ramp("#5c3a1a", "#ffdc9c", 6),
     ramp("#6a6058", "#a99886", 3),
-    ramp("#7a6c78", "#b8a2a0", 3)
+    ramp("#7a6c78", "#b8a2a0", 3),
+    ramp("#636e7a", "#a6aeb8", 4)
   );
 
   var LUT = A.lut(PALETTE);
@@ -254,6 +254,7 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
   var FILM = A.film(W, H);
   var film = FILM.canvas, fctx = FILM.ctx, frame = FILM.frame, px = FILM.px;
   var zbuf = FILM.zbuf;
+  for (var ai0 = 3; ai0 < W * H * 4; ai0 += 4) px[ai0] = 255;
 
   function frac(v) { return v - Math.floor(v); }
   function hash(i) { return frac(Math.sin(i * 12.9898) * 43758.5453); }
@@ -290,12 +291,12 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
     return (a + (b - a) * tx) * (1 - ty) + (c + (d - c) * tx) * ty;
   }
 
-  /* The slope: a knoll under the camera, a gully, the terrace of the house and the brow of the hill behind. */
+  /* The slope: a gully below the viewpoint, the valley falling away to the left, the terrace of the house and the brow of the hill behind. */
   var HX0 = 0.5, HX1 = 6.5, HZ0 = -8.0, HZ1 = -3.0, HCX = 3.5, HCZ = -5.5;
   function rawH(x, z) {
     var h = 5.8 * Math.tanh((-z - 3) / 13);
-    var g = (z - 7) / 4.5, k = (z - 17.5) / 5.2;
-    h += -3.4 * Math.exp(-g * g) + 5.2 * Math.exp(-k * k);
+    var g = (z - 8) / 5.5;
+    h -= 3.0 * Math.exp(-g * g);
     var v = -x - 6; if (v > 0) h -= 0.7 * v * v / (v + 4);
     var r = x - 13; if (r > 0) h += 0.25 * r * r / (r + 6);
     h += 0.32 * Math.sin(x * 0.61 + z * 0.27) * Math.sin(z * 0.47 - x * 0.21);
@@ -312,14 +313,14 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
 
   var camPos = [0, 0, 0], camF = [0, 0, -1], camR = [1, 0, 0], camU = [0, 1, 0];
   var FOV = 44 * Math.PI / 180, tanH = Math.tan(FOV / 2), aspect = W / H;
-  var LOOK = [2.0, HB + 2.6, -6.0];
+  var LOOK = [2.0, HB + 1.5, -6.0];
 
   function setCamera(t) {
     var u = t / DURATION;
     var ease = 0.5 - 0.5 * Math.cos(u * TAU);
     camPos[0] = -4.4 + 0.8 * Math.sin(u * TAU);
     camPos[2] = 18.8 - 1.8 * ease;
-    camPos[1] = hAt(camPos[0], camPos[2]) + 2.1;
+    camPos[1] = HB + 4.2 + 0.2 * Math.sin(u * TAU * 2 + 0.6);
     var fx = LOOK[0] - camPos[0], fy = LOOK[1] - camPos[1] + 0.25 * Math.sin(u * TAU * 2), fz = LOOK[2] - camPos[2];
     var l = hyp3(fx, fy, fz);
     camF[0] = fx / l; camF[1] = fy / l; camF[2] = fz / l;
@@ -336,6 +337,9 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
   function ridgeNear(a) { return 0.118 + 0.040 * Math.sin(a * 4.3 + 2.5) + 0.020 * Math.sin(a * 9.7 + 1.0) + 0.008 * Math.sin(a * 23 + 3.0); }
   function ridgeFar(a) { return 0.178 + 0.046 * Math.sin(a * 3.1 + 0.7) + 0.022 * Math.sin(a * 7.3 + 2.1) + 0.010 * Math.sin(a * 17 + 0.4); }
 
+  var RT = 4096, RT_K = RT / TAU - 1e-6, RNEAR = new Float32Array(RT), RFAR = new Float32Array(RT);
+  for (var ri = 0; ri < RT; ri++) { var ra = ri / RT * TAU - Math.PI; RNEAR[ri] = ridgeNear(ra); RFAR[ri] = ridgeFar(ra); }
+
   function drawSky() {
     var invW = 1 / W, invH = 1 / H;
     for (var y = 0; y < H; y++) {
@@ -347,12 +351,14 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
         var dx = camR[0] * ux + camU[0] * uy + camF[0];
         var dy = camR[1] * ux + camU[1] * uy + camF[1];
         var dz = camR[2] * ux + camU[2] * uy + camF[2];
-        var hz = hyp2(dx, dz), el = dy / hz, az = Math.atan2(dx, -dz);
         var i = y * W + x, o = i * 4, r, g, b, depth;
-        if (el < ridgeNear(az)) {
+        if (zbuf[i] < 1e6) continue;
+        var hz = hyp2(dx, dz), el = dy / hz, az = Math.atan2(dx, -dz);
+        var ai = ((az + Math.PI) * RT_K) | 0;
+        if (el < RNEAR[ai]) {
           var sh = 0.85 + 0.15 * Math.sin(az * 31 + el * 40);
           r = 40 * sh; g = 50 * sh; b = 62 * sh; depth = 120;
-        } else if (el < ridgeFar(az)) {
+        } else if (el < RFAR[ai]) {
           r = 62; g = 72; b = 90; depth = 240;
         } else {
           depth = 1e7;
@@ -432,7 +438,7 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
     if (minX > maxX || minY > maxY) return;
     for (var y = minY; y <= maxY; y++) {
       var pyc = y + 0.5, row = y * W;
-      rowSpan(pyc, x0, y0, x1, y1, x2, y2, inv, minX, maxX);
+      if (maxX - minX > 40) rowSpan(pyc, x0, y0, x1, y1, x2, y2, inv, minX, maxX); else { SPAN.xs = minX; SPAN.xe = maxX; }
       for (var x = SPAN.xs, xEnd = SPAN.xe; x <= xEnd; x++) {
         var pxc = x + 0.5;
         var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
@@ -469,7 +475,7 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
   var SKY_FILL = [0.60, 0.68, 0.86];
   var DUSK = [0.92, 0.70, 0.66], DL = [-0.72, 0.42, -0.55];
   var WIN_C = [1.00, 0.70, 0.38];
-  var WIN = [3.5, HB + 2.75, HZ1 + 0.30, 2.6];
+  var WIN = [3.5, HB + 2.75, HZ1 + 0.30, 4.2];
 
   function litAt(base, nx, ny, nz, cx, cy, cz, jit) {
     var up = ny > 0 ? ny : 0;
@@ -486,7 +492,7 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
       var l2 = (dx * nx + dy * ny + dz * nz) / d;
       var cone = -dz / d;
       if (l2 > 0 && cone > 0) {
-        var k = l2 * front * cone * WIN[3] / (1 + d2 * 0.16);
+        var k = l2 * front * cone * WIN[3] / (1 + d2 * 0.12);
         r += base[0] * k * WIN_C[0]; g += base[1] * k * WIN_C[1]; b += base[2] * k * WIN_C[2];
       }
     }
@@ -523,7 +529,7 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
 
   var world = new A.GMesh();
 
-  var GRASS_A = [66, 92, 52], GRASS_B = [98, 108, 62], PATH = [124, 110, 88], WORN = [96, 96, 70];
+  var GRASS_A = [66, 92, 52], GRASS_B = [98, 108, 62], PATH = [142, 124, 98], WORN = [96, 96, 70];
   var STONE = [112, 108, 102], WOOD = [104, 74, 50], WOOD_D = [66, 46, 32], ROOF = [74, 76, 84];
   var FIR = [30, 50, 38], BARK = [52, 40, 32], GLASS = [34, 40, 50];
   var PATHPTS = [[1.6, -2.7], [1.2, 0.2], [-0.6, 3.4], [-2.2, 6.6], [-2.0, 10.2], [-3.4, 13.8], [-4.2, 17.0], [-5.8, 21.0]];
@@ -542,10 +548,10 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
 
   (function buildTerrain() {
     var xs = [], zs = [], x, z, i, j;
-    for (z = 22; z > -95; z -= (z > -12 ? 0.7 : 0.7 + (-12 - z) * 0.09)) zs.push(z);
+    for (z = 16; z > -75; z -= (z > 3 ? 1.6 : (z > -12 ? 1.0 : 1.2 + (-12 - z) * 0.14))) zs.push(z);
     var left = [], right = [];
-    for (x = 1; x > -85; x -= (x > -9 ? 0.7 : 0.7 + (-9 - x) * 0.11)) left.push(x);
-    for (x = 1.7; x < 110; x += (x < 11 ? 0.7 : 0.7 + (x - 11) * 0.11)) right.push(x);
+    for (x = 1; x > -85; x -= (x > -6 ? 1.0 : 1.4 + (-6 - x) * 0.16)) left.push(x);
+    for (x = 2; x < 110; x += (x < 10 ? 1.0 : 1.4 + (x - 10) * 0.16)) right.push(x);
     xs = left.reverse().concat(right);
     var nxs = xs.length, nzs = zs.length, P = [], C = [];
     for (j = 0; j < nzs; j++) for (i = 0; i < nxs; i++) {
@@ -566,6 +572,8 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
     }
     for (j = 0; j < nzs - 1; j++) for (i = 0; i < nxs - 1; i++) {
       var a = j * nxs + i, b = a + 1, c = a + nxs + 1, d = a + nxs;
+      var ang = Math.atan2(P[a * 3] - REF[0], REF[2] - P[a * 3 + 2]);
+      if (ang < -0.66 || ang > 1.15 || P[a * 3 + 2] > REF[2] - 4) continue;
       world.quadG(P[a * 3], P[a * 3 + 1], P[a * 3 + 2], P[b * 3], P[b * 3 + 1], P[b * 3 + 2],
                   P[c * 3], P[c * 3 + 1], P[c * 3 + 2], P[d * 3], P[d * 3 + 1], P[d * 3 + 2], C[a], C[b], C[c], C[d]);
     }
@@ -654,17 +662,33 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
     box(m, 1.62, B + 0.6, HZ1 + 0.06, 1.67, B + 0.9, HZ1 + 0.1, [30, 26, 24], 0);
     box(m, 0.95, B - 0.2, HZ1, 2.3, B + 0.1, HZ1 + 0.55, [120, 116, 110], 0.02, [132, 128, 120]);
 
-    for (k = 0; k < 6; k++) {
-      var ly = B + 0.05 + (k % 3) * 0.28, lz = -7.4 + Math.floor(k / 3) * 0.0;
-      box(m, OX0 - 0.72, ly, -7.6 + k * 0.0, OX0 - 0.02, ly + 0.26, -4.2, [88 + k * 3, 66, 46], 0.02, [150, 118, 84]);
-      lz = lz + 0;
+    for (k = 0; k < 4; k++) {
+      var ly = B + k * 0.3;
+      box(m, OX0 - 0.72 + k * 0.04, ly, -7.5, OX0 - 0.04, ly + 0.27, -4.4 - k * 0.1, [98 - k * 4, 74, 52], 0.02, [150, 118, 84]);
+    }
+  })();
+
+  /* A split-rail fence along the terrace, open where the path comes up to the door. */
+  (function buildFence() {
+    var m = world, FZ = 0.6, posts = [-3.2, -2.0, -0.8, 0.3, 2.3, 3.5, 4.7, 5.9, 7.1, 8.3, 9.5], i;
+    var POST = [92, 78, 64], RAIL = [110, 92, 72];
+    for (i = 0; i < posts.length; i++) {
+      var x = posts[i], z = FZ + Math.sin(x * 0.7) * 0.15, g = hAt(x, z), top = (i === 3 || i === 4) ? 1.35 : 1.05;
+      box(m, x - 0.07, g - 0.2, z - 0.07, x + 0.07, g + top, z + 0.07, POST, 0.02);
+      if (i === posts.length - 1 || i === 3) continue;
+      var x2 = posts[i + 1], z2 = FZ + Math.sin(x2 * 0.7) * 0.15, g2 = hAt(x2, z2);
+      for (var r = 0; r < 2; r++) {
+        var ya = g + 0.42 + r * 0.42, yb = g2 + 0.42 + r * 0.42;
+        quadN(m, RAIL, 0.02, x, ya, z + 0.08, x2, yb, z2 + 0.08, x2, yb + 0.09, z2 + 0.08, x, ya + 0.09, z + 0.08);
+        quadN(m, RAIL, 0.06, x, ya + 0.09, z + 0.08, x2, yb + 0.09, z2 + 0.08, x2, yb + 0.09, z2 - 0.02, x, ya + 0.09, z - 0.02);
+      }
     }
   })();
 
   var TREES = [[-2.6, -10.5, 7.6, 1.7], [-5.6, -6.8, 6.2, 1.5], [-7.9, -12.5, 8.4, 1.9], [9.8, -9.0, 7.0, 1.6], [11.6, -14.5, 8.8, 1.9], [-0.6, -18.0, 9.0, 1.9], [6.2, -20.0, 8.2, 1.8], [-11.5, -3.0, 6.8, 1.6]];
 
   function fir(m, x, z, hgt, rad, seed) {
-    var g = hAt(x, z), T = 5, N = 8, k, i;
+    var g = hAt(x, z), T = 4, N = 7, k, i;
     box(m, x - 0.12, g - 0.2, z - 0.12, x + 0.12, g + 1.0, z + 0.12, BARK, 0);
     for (k = 0; k < T; k++) {
       var yb = g + 0.7 + k * (hgt - 1.2) / T, yt = yb + (hgt - 0.7) / T * 1.9;
@@ -798,8 +822,8 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
       var y = CHIM[1] + ph * 5.4 - ph * ph * 1.4;
       var z = CHIM[2] - ph * 2.2 + sw * 0.5;
       var rad = 0.22 + ph * 1.5;
-      var al = 0.30 * (1 - ph) * smooth(0, 0.08, ph);
-      var c = 118 + ph * 30;
+      var al = 0.42 * (1 - ph) * smooth(0, 0.08, ph);
+      var c = 128 + ph * 34;
       puff(x, y, z, rad, al, c, c + 2, c + 8);
     }
   }
@@ -808,19 +832,40 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
 
   function drawGlows(t) {
     var f = flick(t / DURATION);
-    glow(WIN[0], WIN[1], WIN[2], 1.3, 0.16 * f, 255, 196, 118);
-    glow(WIN[0], WIN[1], WIN[2], 3.2, 0.07 * f, 255, 176, 96);
+    glow(WIN[0], WIN[1], WIN[2], 1.6, 0.22 * f, 255, 196, 118);
+    glow(WIN[0], WIN[1], WIN[2], 4.0, 0.09 * f, 255, 176, 96);
   }
 
   /*
    * Fog banks: a soft-topped layer whose ceiling rises and falls with the loop, broken up by
    * two noise layers that drift up the slope and across the valley. Integrated along each ray
-   * with seven samples; the lit window scatters warm light into whatever fog is near it.
+   * at half resolution, then spread back with depth-aware weights; the lit window scatters
+   * warm light into whatever fog is near it.
    */
   var FOGC = [124, 134, 146];
-  var SIG = 0.17, NSTEP = 7;
+  var SIG = 0.17, NSTEP = 5;
   var BLUE = A.BLUE;
+  var FW = W >> 1, FH = H >> 1;
+  var fT = new Float32Array(FW * FH), fWm = new Float32Array(FW * FH), fD = new Float32Array(FW * FH), fE = new Uint8Array(FW * FH);
   function fogLevel(u) { return 1.0 + 3.4 * Math.sin(u * TAU * 2 - 2.0) + 1.3 * Math.sin(u * TAU * 3 + 0.9); }
+
+  /* 1-2-1 blur of the half-resolution fog along one axis, only between samples at a similar depth. */
+  var sT = new Float32Array(FW * FH), sW = new Float32Array(FW * FH);
+  function soften(step) {
+    var n = FW * FH, i;
+    for (i = 0; i < n; i++) {
+      var col = i % FW, a = i - step, b = i + step;
+      if (step === 1) { if (col === 0) a = i; if (col === FW - 1) b = i; }
+      else { if (a < 0) a = i; if (b >= n) b = i; }
+      var d = fD[i] > 110 ? 110 : fD[i], lim = d * 0.08;
+      var da = (fD[a] > 110 ? 110 : fD[a]) - d, db = (fD[b] > 110 ? 110 : fD[b]) - d;
+      var wa = (da < lim && da > -lim) ? 1 : 0, wb = (db < lim && db > -lim) ? 1 : 0;
+      var s = 1 / (2 + wa + wb);
+      sT[i] = (fT[i] * 2 + fT[a] * wa + fT[b] * wb) * s;
+      sW[i] = (fWm[i] * 2 + fWm[a] * wa + fWm[b] * wb) * s;
+    }
+    fT.set(sT); fWm.set(sW);
+  }
 
   function drawFog(t) {
     var u = t / DURATION;
@@ -828,17 +873,18 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
     var maxTop = lev + 2.7 + 0.9 + 3.0;
     var cx = camPos[0], cy = camPos[1], cz = camPos[2];
     var wx = WIN[0], wy = WIN[1], wz = WIN[2] + 0.4;
-    var f = flick(u);
-    var invW = 1 / W, invH = 1 / H, ta = tanH * aspect;
-    for (var y = 0; y < H; y++) {
-      var uy = (1 - ((y + 0.5) * invH) * 2) * tanH;
-      for (var x = 0; x < W; x++) {
-        var ux = (((x + 0.5) * invW) * 2 - 1) * ta;
+    var f = flick(u) * 9;
+    var invW = 1 / W, invH = 1 / H, ta = tanH * aspect, x, y;
+    for (y = 0; y < FH; y++) {
+      var uy = (1 - ((y * 2 + 0.5) * invH) * 2) * tanH;
+      for (x = 0; x < FW; x++) {
+        var ux = (((x * 2 + 0.5) * invW) * 2 - 1) * ta;
         var dx = camF[0] + camR[0] * ux + camU[0] * uy;
         var dy = camF[1] + camR[1] * ux + camU[1] * uy;
         var dz = camF[2] + camR[2] * ux + camU[2] * uy;
-        var idx = y * W + x, d = zbuf[idx];
-        var te = d > 150 ? 150 : d;
+        var li = y * FW + x, d = zbuf[y * 2 * W + x * 2];
+        fD[li] = d; fT[li] = 1; fWm[li] = 0;
+        var te = d > 110 ? 110 : d;
         var ye = cy + dy * te;
         if (cy > maxTop && ye > maxTop) continue;
         var jit = BLUE[((y & 63) << 6) | (x & 63)] / 256;
@@ -847,9 +893,18 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
           var q = (s + jit) / NSTEP, tt = te * q * q, wgt = te * 2 * q / NSTEP;
           var Y = cy + dy * tt;
           if (Y > maxTop) continue;
+          if (tt < 5) wgt *= tt / 5;
           var X = cx + dx * tt, Z = cz + dz * tt;
-          var n1 = nz(X * 1.1 + Y * 0.35 - advA, -Z * 1.1 - advA);
-          var n2 = nz(X * 2.3 + 17, -Z * 2.3 + Y * 0.6 - advB);
+          var qx = X * 1.1 + Y * 0.35 - advA, qy = -Z * 1.1 - advA;
+          var ix = Math.floor(qx), iy = Math.floor(qy), fx = qx - ix, fy = qy - iy;
+          var r0 = (iy & 63) << 6, r1 = ((iy + 1) & 63) << 6, c0 = ix & 63, c1 = (ix + 1) & 63;
+          var na = NOISE[r0 | c0], nb = NOISE[r0 | c1], nc = NOISE[r1 | c0];
+          var n1 = na + (nb - na) * fx + (nc - na) * fy + (na - nb - nc + NOISE[r1 | c1]) * fx * fy;
+          qx = X * 2.3 + 17; qy = -Z * 2.3 + Y * 0.6 - advB;
+          ix = Math.floor(qx); iy = Math.floor(qy); fx = qx - ix; fy = qy - iy;
+          r0 = (iy & 63) << 6; r1 = ((iy + 1) & 63) << 6; c0 = ix & 63; c1 = (ix + 1) & 63;
+          na = NOISE[r0 | c0]; nb = NOISE[r0 | c1]; nc = NOISE[r1 | c0];
+          var n2 = na + (nb - na) * fx + (nc - na) * fy + (na - nb - nc + NOISE[r1 | c1]) * fx * fy;
           var lx = (-X - 4) * 0.13; lx = lx < 0 ? 0 : (lx > 3 ? 3 : lx);
           var top = lev + (n1 - 0.5) * 5.4 + (n2 - 0.5) * 1.8 + lx;
           var den = (top - Y) * 0.55;
@@ -860,18 +915,46 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
           var ex = X - wx, ey = Y - wy, ez = Z - wz;
           if (ez > -0.5) warm += den * wgt / (1 + (ex * ex + ey * ey * 1.6 + ez * ez) * 0.22);
         }
-        if (opt <= 0.002) continue;
-        var T = Math.exp(-opt * SIG), o = idx * 4, k = 1 - T;
-        warm *= 9 * f;
-        px[o] = px[o] * T + FOGC[0] * k + warm * 1.0;
-        px[o + 1] = px[o + 1] * T + FOGC[1] * k + warm * 0.66;
-        px[o + 2] = px[o + 2] * T + FOGC[2] * k + warm * 0.32;
+        fT[li] = Math.exp(-opt * SIG); fWm[li] = warm * f;
+      }
+    }
+    soften(1); soften(FW);
+    for (y = 0; y < FH; y++) {
+      var yb = y + 1 < FH ? y + 1 : y;
+      for (x = 0; x < FW; x++) {
+        var xb = x + 1 < FW ? x + 1 : x;
+        var da = fD[y * FW + x], db = fD[y * FW + xb], dc = fD[yb * FW + x], de = fD[yb * FW + xb];
+        var mn = Math.min(da, db, dc, de, 150), mx = Math.min(Math.max(da, db, dc, de), 150);
+        fE[y * FW + x] = mx > mn * 1.08 ? 1 : 0;
+      }
+    }
+    for (y = 0; y < H; y++) {
+      var y0 = y >> 1, y1 = y0 + 1 < FH ? y0 + 1 : y0, wy1 = (y & 1) * 0.5;
+      for (x = 0; x < W; x++) {
+        var x0 = x >> 1, x1 = x0 + 1 < FW ? x0 + 1 : x0, wx1 = (x & 1) * 0.5;
+        var i00 = y0 * FW + x0, i01 = y0 * FW + x1, i10 = y1 * FW + x0, i11 = y1 * FW + x1;
+        if (fT[i00] > 0.998 && fT[i01] > 0.998 && fT[i10] > 0.998 && fT[i11] > 0.998) continue;
+        var idx = y * W + x, dd = zbuf[idx];
+        var a00 = (1 - wx1) * (1 - wy1), a01 = wx1 * (1 - wy1), a10 = (1 - wx1) * wy1, a11 = wx1 * wy1;
+        if (fE[i00]) {
+          if (dd > 150) dd = 150;
+          var id = 1 / dd, e00 = fD[i00] - dd, e01 = fD[i01] - dd, e10 = fD[i10] - dd, e11 = fD[i11] - dd;
+          a00 /= 0.03 + (e00 < 0 ? -e00 : e00) * id; a01 /= 0.03 + (e01 < 0 ? -e01 : e01) * id;
+          a10 /= 0.03 + (e10 < 0 ? -e10 : e10) * id; a11 /= 0.03 + (e11 < 0 ? -e11 : e11) * id;
+        }
+        var sw = 1 / (a00 + a01 + a10 + a11);
+        var T = (fT[i00] * a00 + fT[i01] * a01 + fT[i10] * a10 + fT[i11] * a11) * sw;
+        var wm = (fWm[i00] * a00 + fWm[i01] * a01 + fWm[i10] * a10 + fWm[i11] * a11) * sw;
+        var o = idx * 4, k = 1 - T;
+        px[o] = px[o] * T + FOGC[0] * k + wm;
+        px[o + 1] = px[o + 1] * T + FOGC[1] * k + wm * 0.66;
+        px[o + 2] = px[o + 2] * T + FOGC[2] * k + wm * 0.32;
       }
     }
   }
 
-  var PRINT = { vig: 0.32, grain: 0.28, grainOff: 2.2, dither: 1.45 };
-  var BLOOM = { threshold: 190, strength: 0.85, radius: 4, tint: [1, 0.86, 0.66] };
+  var PRINT = { vig: 0.32, grain: 0.14, grainOff: 1.2, dither: 1.05 };
+  var BLOOM = { threshold: 172, strength: 1.2, radius: 4, tint: [1, 0.84, 0.6] };
 
   function print(fr) {
     if (BLOOM) A.bloom(px, W, H, BLOOM);
@@ -881,8 +964,9 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
   function render(fr) {
     var t = (fr % FRAMES) / FPS;
     setCamera(t);
-    drawSky();
+    zbuf.fill(1e7);
     drawMesh(world);
+    drawSky();
     shadows();
     drawGlows(t);
     drawSmoke(t);
