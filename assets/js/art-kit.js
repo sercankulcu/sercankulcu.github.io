@@ -86,9 +86,9 @@
   var FULL_OUT = "M5 2h2v5H2V5h3zM9 2h2v3h3v2H9zM2 9h5v5H5v-3H2zM9 9h5v2h-3v3H9z";
 
   var L = {
-    pause: "Duraklat / Pause", play: "Oynat / Play",
-    soundOn: "Sesi aç / Sound on", soundOff: "Sesi kapat / Sound off",
-    full: "Tam ekran / Fullscreen", fullExit: "Tam ekrandan çık / Exit fullscreen"
+    pause: "Pause", play: "Play",
+    soundOn: "Sound on", soundOff: "Sound off",
+    full: "Fullscreen", fullExit: "Exit fullscreen"
   };
 
   function two(n) { return String(n).padStart(2, "0"); }
