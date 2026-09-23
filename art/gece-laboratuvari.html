@@ -256,7 +256,6 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
   );
 
   var LUT = A.lut(PALETTE);
-  var BAYER = A.BAYER;
 
   var FILM = A.film(W, H);
   var film = FILM.canvas, fctx = FILM.ctx, frame = FILM.frame, px = FILM.px;
@@ -370,14 +369,99 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
 
   var Mesh = A.Mesh;
 
-  var _pt = new Float64Array(12);
+  /* Gouraud path: near-plane clipping carries corner colours, the rasteriser interpolates them perspective-correctly. */
+  var gcBuf = new Float64Array(30), gkBuf = new Float64Array(30), gsC = new Float64Array(30);
+  function drawPolyG(pts, cols, np) {
+    var i, n = 0;
+    for (i = 0; i < np; i++) {
+      var ox = pts[i * 3] - camPos[0], oy = pts[i * 3 + 1] - camPos[1], oz = pts[i * 3 + 2] - camPos[2];
+      vBuf[n++] = ox * camR[0] + oy * camR[1] + oz * camR[2];
+      vBuf[n++] = ox * camU[0] + oy * camU[1] + oz * camU[2];
+      vBuf[n++] = -(ox * camF[0] + oy * camF[1] + oz * camF[2]);
+    }
+    var m = 0;
+    for (i = 0; i < np; i++) {
+      var j = (i + 1) % np;
+      var az = vBuf[i * 3 + 2], bz = vBuf[j * 3 + 2];
+      var ain = az <= -NEAR, bin = bz <= -NEAR;
+      if (ain) {
+        gcBuf[m] = vBuf[i * 3]; gcBuf[m + 1] = vBuf[i * 3 + 1]; gcBuf[m + 2] = az;
+        gkBuf[m] = cols[i * 3]; gkBuf[m + 1] = cols[i * 3 + 1]; gkBuf[m + 2] = cols[i * 3 + 2]; m += 3;
+      }
+      if (ain !== bin) {
+        var s = (-NEAR - az) / (bz - az);
+        gcBuf[m] = vBuf[i * 3] + (vBuf[j * 3] - vBuf[i * 3]) * s;
+        gcBuf[m + 1] = vBuf[i * 3 + 1] + (vBuf[j * 3 + 1] - vBuf[i * 3 + 1]) * s;
+        gcBuf[m + 2] = -NEAR;
+        for (var k = 0; k < 3; k++) gkBuf[m + k] = cols[i * 3 + k] + (cols[j * 3 + k] - cols[i * 3 + k]) * s;
+        m += 3;
+      }
+    }
+    var nc = m / 3;
+    if (nc < 3) return;
+    for (i = 0; i < nc; i++) {
+      var vz = gcBuf[i * 3 + 2], iw = -1 / vz;
+      sxA[i] = (((gcBuf[i * 3] * iw) / (tanH * aspect)) * 0.5 + 0.5) * W;
+      syA[i] = (0.5 - ((gcBuf[i * 3 + 1] * iw) / tanH) * 0.5) * H;
+      swA[i] = iw;
+      gsC[i * 3] = gkBuf[i * 3] * iw; gsC[i * 3 + 1] = gkBuf[i * 3 + 1] * iw; gsC[i * 3 + 2] = gkBuf[i * 3 + 2] * iw;
+    }
+    for (i = 1; i < nc - 1; i++) triG(0, i, i + 1);
+  }
+
+  function triG(a, b, c) {
+    var x0 = sxA[a], y0 = syA[a], w0 = swA[a], x1 = sxA[b], y1 = syA[b], w1 = swA[b], x2 = sxA[c], y2 = syA[c], w2 = swA[c];
+    var area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
+    if (area > -1e-9 && area < 1e-9) return;
+    var inv = 1 / area;
+    var r0 = gsC[a * 3], g0 = gsC[a * 3 + 1], b0 = gsC[a * 3 + 2];
+    var r1 = gsC[b * 3], g1 = gsC[b * 3 + 1], b1 = gsC[b * 3 + 2];
+    var r2 = gsC[c * 3], g2 = gsC[c * 3 + 1], b2 = gsC[c * 3 + 2];
+    var minX = Math.floor(Math.min(x0, x1, x2)), maxX = Math.ceil(Math.max(x0, x1, x2));
+    var minY = Math.floor(Math.min(y0, y1, y2)), maxY = Math.ceil(Math.max(y0, y1, y2));
+    if (minX < 0) minX = 0; if (minY < 0) minY = 0;
+    if (maxX > W - 1) maxX = W - 1; if (maxY > H - 1) maxY = H - 1;
+    if (minX > maxX || minY > maxY) return;
+    for (var y = minY; y <= maxY; y++) {
+      var pyc = y + 0.5, row = y * W;
+      rowSpan(pyc, x0, y0, x1, y1, x2, y2, inv, minX, maxX);
+      for (var x = SPAN.xs, xEnd = SPAN.xe; x <= xEnd; x++) {
+        var pxc = x + 0.5;
+        var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
+        if (l0 < 0) continue;
+        var l1 = ((x2 - pxc) * (y0 - pyc) - (x0 - pxc) * (y2 - pyc)) * inv;
+        if (l1 < 0) continue;
+        var l2 = 1 - l0 - l1;
+        if (l2 < 0) continue;
+        var w = w0 * l0 + w1 * l1 + w2 * l2;
+        if (w <= 0) continue;
+        var d = 1 / w, idx = row + x;
+        if (d >= zbuf[idx]) continue;
+        zbuf[idx] = d;
+        var r = (r0 * l0 + r1 * l1 + r2 * l2) * d, g = (g0 * l0 + g1 * l1 + g2 * l2) * d, bb = (b0 * l0 + b1 * l1 + b2 * l2) * d;
+        var fg = fogAt(d), o = idx * 4;
+        px[o] = r + (FOG[0] - r) * fg;
+        px[o + 1] = g + (FOG[1] - g) * fg;
+        px[o + 2] = bb + (FOG[2] - bb) * fg;
+      }
+    }
+  }
+
+  var _pt = new Float64Array(12), _pc = new Float64Array(12);
   function drawMesh(m) {
-    var p = m.p, c = m.c, q = c.length / 3;
+    var p = m.p, c = m.c, q = p.length / 12;
     for (var i = 0; i < q; i++) {
       var b = i * 12;
-      for (var k = 0; k < 12; k++) _pt[k] = p[b + k];
-      drawPoly(_pt, 4, c[i * 3], c[i * 3 + 1], c[i * 3 + 2]);
+      for (var k = 0; k < 12; k++) { _pt[k] = p[b + k]; _pc[k] = c[b + k]; }
+      drawPolyG(_pt, _pc, 4);
     }
+  }
+
+  /* A quad lit at each of its corners with one face normal. */
+  function quadLit(m, base, nx, ny, nz, jit, ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz) {
+    m.quadG(ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz,
+            litAt(base, nx, ny, nz, ax, ay, az, jit), litAt(base, nx, ny, nz, bx, by, bz, jit),
+            litAt(base, nx, ny, nz, cx, cy, cz, jit), litAt(base, nx, ny, nz, dx, dy, dz, jit));
   }
 
   var LAMPS = [];
@@ -415,15 +499,15 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
   var TOP = [128, 120, 106], TOPD = [86, 80, 70];
   var PCB = [46, 96, 58], PLASTIC = [188, 186, 178], WALL = [58, 64, 66];
 
-  var world = new Mesh();
+  var world = new A.GMesh();
 
   function block(m, x0, y0, z0, x1, y1, z1, base, jit) {
     var cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, cz = (z0 + z1) / 2, c;
-    c = litAt(base, 0, 1, 0, cx, y1, cz, jit); m.quad(x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1, c[0], c[1], c[2]);
-    c = litAt(base, 0, 0, 1, cx, cy, z1, jit); m.quad(x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1, c[0], c[1], c[2]);
-    c = litAt(base, 0, 0, -1, cx, cy, z0, jit); m.quad(x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, z0, c[0], c[1], c[2]);
-    c = litAt(base, -1, 0, 0, x0, cy, cz, jit); m.quad(x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0, c[0], c[1], c[2]);
-    c = litAt(base, 1, 0, 0, x1, cy, cz, jit); m.quad(x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1, c[0], c[1], c[2]);
+    quadLit(m, base, 0, 1, 0, jit, x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1);
+    quadLit(m, base, 0, 0, 1, jit, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1);
+    quadLit(m, base, 0, 0, -1, jit, x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, z0);
+    quadLit(m, base, -1, 0, 0, jit, x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0);
+    quadLit(m, base, 1, 0, 0, jit, x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1);
   }
 
   function emit(m, x0, y0, z0, x1, y1, z1, col) {
@@ -437,9 +521,11 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     for (i = 0; i < N; i++) {
       var a0 = (i / N) * TAU, a1 = ((i + 1) / N) * TAU, am = (a0 + a1) / 2;
       var nx = Math.sin(am), nz = Math.cos(am);
-      var c = litAt(base, nx, 0, nz, cx + nx * rad, (y0 + y1) / 2, cz + nz * rad, 0.02);
-      m.quad(cx + Math.sin(a0) * rad, y0, cz + Math.cos(a0) * rad, cx + Math.sin(a1) * rad, y0, cz + Math.cos(a1) * rad,
-             cx + Math.sin(a1) * rad, y1, cz + Math.cos(a1) * rad, cx + Math.sin(a0) * rad, y1, cz + Math.cos(a0) * rad, c[0], c[1], c[2]);
+      var s0 = Math.sin(a0), c0 = Math.cos(a0), s1 = Math.sin(a1), c1 = Math.cos(a1);
+      m.quadG(cx + s0 * rad, y0, cz + c0 * rad, cx + s1 * rad, y0, cz + c1 * rad,
+              cx + s1 * rad, y1, cz + c1 * rad, cx + s0 * rad, y1, cz + c0 * rad,
+              litAt(base, s0, 0, c0, cx + s0 * rad, y0, cz + c0 * rad, 0.02), litAt(base, s1, 0, c1, cx + s1 * rad, y0, cz + c1 * rad, 0.02),
+              litAt(base, s1, 0, c1, cx + s1 * rad, y1, cz + c1 * rad, 0.02), litAt(base, s0, 0, c0, cx + s0 * rad, y1, cz + c0 * rad, 0.02));
       var t = litAt([40, 26, 18], 0, 1, 0, cx, y1 - 0.012, cz, 0);
       m.quad(cx, y1 - 0.012, cz, cx + Math.sin(a0) * rad * 0.9, y1 - 0.012, cz + Math.cos(a0) * rad * 0.9,
              cx + Math.sin(a1) * rad * 0.9, y1 - 0.012, cz + Math.cos(a1) * rad * 0.9, cx, y1 - 0.012, cz, t[0], t[1], t[2]);
@@ -468,8 +554,7 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     var gx, gy, GS = 0.12;
     for (gx = -3.4; gx < 3.4 - 1e-6; gx += GS) {
       for (gy = 0.78; gy < 2.7 - 1e-6; gy += GS) {
-        var wc = litAt(WALL, 0, 0, 1, gx + GS / 2, gy + GS / 2, BACK_Z, (hash(gx * 91 + gy * 37) - 0.5) * 0.025);
-        m.quad(gx, gy, BACK_Z + 0.001, gx + GS, gy, BACK_Z + 0.001, gx + GS, gy + GS, BACK_Z + 0.001, gx, gy + GS, BACK_Z + 0.001, wc[0], wc[1], wc[2]);
+        quadLit(m, WALL, 0, 0, 1, 0, gx, gy, BACK_Z + 0.001, gx + GS, gy, BACK_Z + 0.001, gx + GS, gy + GS, BACK_Z + 0.001, gx, gy + GS, BACK_Z + 0.001);
       }
     }
 
@@ -478,8 +563,7 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     for (gx = -3.0; gx < 3.0 - 1e-6; gx += GS) {
       for (var tz = 0; tz < 16; tz++) {
         var z0 = TZ0 + tz * TZS;
-        var tc = litAt(TOP, 0, 1, 0, gx + GS / 2, BENCH, z0 + TZS / 2, (hash(gx * 53 + tz * 17) - 0.5) * 0.03);
-        m.quad(gx, BENCH, z0, gx + GS, BENCH, z0, gx + GS, BENCH, z0 + TZS, gx, BENCH, z0 + TZS, tc[0], tc[1], tc[2]);
+        quadLit(m, TOP, 0, 1, 0, 0, gx, BENCH, z0, gx + GS, BENCH, z0, gx + GS, BENCH, z0 + TZS, gx, BENCH, z0 + TZS);
       }
     }
     block(m, -2.6, 0, 0.18, -2.42, 0.80, 0.36, METAL_D, 0);
@@ -747,24 +831,25 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     glow(0.295, BENCH + 0.039, -0.320, 0.035, 0.26 * blink, 240, 70, 60);
   }
 
+  var PRINT = { vig: 0.30, grain: 0.26, grainOff: 2.0, dither: 1.35 };
+  var BLOOM = { threshold: 120, strength: 0.9, radius: 3, tint: [1, 1, 1] };
+  var CAM = { pos: camPos, F: camF, R: camR, U: camU, tanH: tanH, aspect: aspect };
+  /* Contact shadows where the instruments sit on the bench top. */
+  function benchShadows() {
+    A.shadow(px, zbuf, W, H, CAM, SCOPE_X, BENCH, SCOPE_Z, 0.27, 0.22, 0.55);
+    A.shadow(px, zbuf, W, H, CAM, -1.18, BENCH, -0.66, 0.24, 0.19, 0.50);
+    A.shadow(px, zbuf, W, H, CAM, 0.31, BENCH, -0.32, 0.26, 0.16, 0.30);
+    A.shadow(px, zbuf, W, H, CAM, 0.87, BENCH, -0.51, 0.11, 0.15, 0.45);
+    A.shadow(px, zbuf, W, H, CAM, 1.28, BENCH, -0.22, 0.16, 0.16, 0.45);
+    A.shadow(px, zbuf, W, H, CAM, 1.70, BENCH, -0.22, 0.11, 0.11, 0.45);
+    A.shadow(px, zbuf, W, H, CAM, -1.92, BENCH, -0.33, 0.16, 0.16, 0.45);
+    A.shadow(px, zbuf, W, H, CAM, 0.05, BENCH, -0.08, 0.08, 0.08, 0.55);
+    A.shadow(px, zbuf, W, H, CAM, 0.65, BENCH, -0.31, 0.12, 0.12, 0.25);
+  }
+
   function print(fr) {
-    var cx = W * 0.5, cy = H * 0.5, rmax = hyp2(cx, cy);
-    for (var y = 0; y < H; y++) {
-      var by = (y & 3) * 4, dy2 = (y - cy) / rmax;
-      for (var x = 0; x < W; x++) {
-        var o = (y * W + x) * 4;
-        var dx2 = (x - cx) / rmax;
-        var v = 1 - (dx2 * dx2 + dy2 * dy2) * 0.30;
-        var n = ((x * 7 + y * 13 + fr * 29) % 17) * 0.26 - 2.0;
-        var dth = (BAYER[by + (x & 3)] - 7.5) * 1.35;
-        var r = px[o] * v + n + dth, g = px[o + 1] * v + n + dth, b = px[o + 2] * v + n + dth;
-        r = r < 0 ? 0 : (r > 255 ? 255 : r);
-        g = g < 0 ? 0 : (g > 255 ? 255 : g);
-        b = b < 0 ? 0 : (b > 255 ? 255 : b);
-        var li = ((((r | 0) >> 3) << 10) | (((g | 0) >> 3) << 5) | ((b | 0) >> 3)) * 3;
-        px[o] = LUT[li]; px[o + 1] = LUT[li + 1]; px[o + 2] = LUT[li + 2];
-      }
-    }
+    if (BLOOM) A.bloom(px, W, H, BLOOM);
+    A.print(px, W, H, LUT, fr, PRINT);
   }
 
   function render(fr) {
@@ -772,6 +857,7 @@ excerpt: "An empty engineering lab after midnight, drawn pixel by pixel in the b
     setCamera(t);
     clearDark();
     drawMesh(world);
+    benchShadows();
     drawWindow(t);
     drawScope(t);
     drawSmoke(t);
