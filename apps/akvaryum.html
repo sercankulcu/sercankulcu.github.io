@@ -224,6 +224,9 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
 (function () {
   "use strict";
 
+  function hyp2(a, b) { return Math.sqrt(a * a + b * b); }
+  function hyp3(a, b, c) { return Math.sqrt(a * a + b * b + c * c); }
+
   var TAU = Math.PI * 2;
   var W = 320, H = 180;
   var DURATION = 48, FPS = 30;
@@ -306,7 +309,7 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
     camU[0] = camR[1] * camF[2] - camR[2] * camF[1];
     camU[1] = camR[2] * camF[0] - camR[0] * camF[2];
     camU[2] = camR[0] * camF[1] - camR[1] * camF[0];
-    var l = Math.hypot(camU[0], camU[1], camU[2]);
+    var l = hyp3(camU[0], camU[1], camU[2]);
     camU[0] /= l; camU[1] /= l; camU[2] /= l;
   }
 
@@ -441,6 +444,20 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
     }
   }
 
+  // Columns of row centre q that can lie inside the triangle (±1 px slack; the per-pixel test stays exact).
+  var _xs = 0, _xe = -1;
+  function rowSpan(q, x0, y0, x1, y1, x2, y2, inv, lo, hi) {
+    var a0 = (x1 * (y2 - q) - x2 * (y1 - q)) * inv, b0 = (y1 - y2) * inv;
+    var a1 = (x2 * (y0 - q) - x0 * (y2 - q)) * inv, b1 = (y2 - y0) * inv;
+    var a2 = 1 - a0 - a1, b2 = -b0 - b1;
+    var pl = -Infinity, ph = Infinity;
+    if (b0 > 1e-12) pl = Math.max(pl, -a0 / b0); else if (b0 < -1e-12) ph = Math.min(ph, -a0 / b0); else if (a0 < -1e-9) ph = -Infinity;
+    if (b1 > 1e-12) pl = Math.max(pl, -a1 / b1); else if (b1 < -1e-12) ph = Math.min(ph, -a1 / b1); else if (a1 < -1e-9) ph = -Infinity;
+    if (b2 > 1e-12) pl = Math.max(pl, -a2 / b2); else if (b2 < -1e-12) ph = Math.min(ph, -a2 / b2); else if (a2 < -1e-9) ph = -Infinity;
+    _xs = Math.max(lo, Math.floor(pl - 0.5));
+    _xe = Math.min(hi, Math.ceil(ph - 0.5));
+  }
+
   function tri(x0, y0, w0, x1, y1, w1, x2, y2, w2, r, g, b) {
     var area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
     if (area > -1e-9 && area < 1e-9) return;
@@ -452,7 +469,8 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
     if (minX > maxX || minY > maxY) return;
     for (var y = minY; y <= maxY; y++) {
       var pyc = y + 0.5, row = y * W;
-      for (var x = minX; x <= maxX; x++) {
+      rowSpan(pyc, x0, y0, x1, y1, x2, y2, inv, minX, maxX);
+      for (var x = _xs, xEnd = _xe; x <= xEnd; x++) {
         var pxc = x + 0.5;
         var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
         if (l0 < 0) continue;
@@ -484,7 +502,8 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
     if (minX > maxX || minY > maxY) return;
     for (var y = minY; y <= maxY; y++) {
       var pyc = y + 0.5, row = y * W;
-      for (var x = minX; x <= maxX; x++) {
+      rowSpan(pyc, x0, y0, x1, y1, x2, y2, inv, minX, maxX);
+      for (var x = _xs, xEnd = _xe; x <= xEnd; x++) {
         var pxc = x + 0.5;
         var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
         if (l0 < 0) continue;
@@ -540,7 +559,7 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
     var ux = cx - ax, uy = cy - ay, uz = cz - az;
     var vx = dx - bx, vy = dy - by, vz = dz - bz;
     var nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
-    var l = Math.hypot(nx, ny, nz);
+    var l = hyp3(nx, ny, nz);
     if (l < 1e-9) return;
     nx /= l; ny /= l; nz /= l;
     var fx = (ax + bx + cx + dx) * 0.25 - rx, fy = (ay + by + cy + dy) * 0.25 - ry, fz = (az + bz + cz + dz) * 0.25 - rz;
@@ -587,9 +606,9 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
   // Hexagonal branch along a slightly bent path, tapering from r0 to r1.
   function branch(m, x0, y0, z0, x1, y1, z1, r0, r1, bend, seed) {
     var N = 6, SEG = 4, s, i, j;
-    var ax = x1 - x0, ay = y1 - y0, az = z1 - z0, al = Math.hypot(ax, ay, az);
+    var ax = x1 - x0, ay = y1 - y0, az = z1 - z0, al = hyp3(ax, ay, az);
     ax /= al; ay /= al; az /= al;
-    var ux = -az, uy = 0, uz = ax, ul = Math.hypot(ux, uz) || 1;
+    var ux = -az, uy = 0, uz = ax, ul = hyp2(ux, uz) || 1;
     ux /= ul; uz /= ul;
     var vx = ay * uz - az * uy, vy = az * ux - ax * uz, vz = ax * uy - ay * ux;
     var prev = null;
@@ -714,7 +733,7 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
       var ahead = a + 0.06;
       var hx = (Math.sin(ahead) * rx - 0.2) - cx;
       var hz = (Math.cos(ahead) * rz - 1.9) - cz;
-      var hl = Math.hypot(hx, hz); hx /= hl; hz /= hl;
+      var hl = hyp2(hx, hz); hx /= hl; hz /= hl;
       var beat = Math.sin(u * TAU * 96 + ph * 3) * 0.30;
       fishBody(cx, cy, cz, hx, hz, -hz, hx, size, beat, col);
       eyes.push(cx + hx * 0.62 * size, cy + 0.10 * size, cz + hz * 0.62 * size);
@@ -831,7 +850,7 @@ excerpt: "Inside a lit tank at two in the morning, drawn pixel by pixel in the b
   }
 
   function print(fr) {
-    var cx = W * 0.5, cy = H * 0.5, rmax = Math.hypot(cx, cy);
+    var cx = W * 0.5, cy = H * 0.5, rmax = hyp2(cx, cy);
     for (var y = 0; y < H; y++) {
       var by = (y & 3) * 4, dy2 = (y - cy) / rmax;
       for (var x = 0; x < W; x++) {
