@@ -218,7 +218,7 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
 
   <p class="findik-keys">Space play/pause · ← → one second · F fullscreen · M sound</p>
 
-  <p class="findik-back"><a href="/art/">← Art</a><a class="findik-next" href="/art/sessiz-iskele/">Next: Silent Pier →</a></p>
+  <p class="findik-back"><a href="/art/">← Art</a><a class="findik-next" href="/art/sinav-salonu/">Next: Exam Hall →</a></p>
 
 </div>
 
@@ -265,7 +265,7 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
   /* Late sun from the west-south-west, behind the left shoulder. */
   var LX = -0.62, LY = 0.55, LZ = 0.56;
   var SHX = -0.742, SHZ = 0.670;
-  var SUN = [1.50, 1.24, 0.86], SKYF = [0.46, 0.56, 0.70];
+  var SUN = [1.70, 1.36, 0.86], SKYF = [0.46, 0.56, 0.70];
 
   /* Sine and value-noise tables: the per-pixel passes use no trigonometry. */
   var SN = new Float32Array(4096);
@@ -323,7 +323,7 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
   }
 
   /* Sky, a strip of sea, the headland, a ridge on the left and the lower slopes in haze. */
-  var ZEN = [124, 162, 202], HOR = [236, 226, 198];
+  var ZEN = [120, 160, 204], HOR = [240, 224, 190];
   var SEA_D = [80, 120, 144], SEA_H = [186, 198, 192];
   var HILL_F = [158, 168, 146], HILL_N = [96, 120, 90];
   var U = 0;
@@ -349,12 +349,22 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
       return;
     }
     if (dy >= 0) {
-      k = dy * 2.6; k = k > 1 ? 1 : k;
+      k = dy * 6.5; k = k > 1 ? 1 : k;
       e = k * k * (3 - 2 * k);
       var warm = (-az - 0.15) * 1.4; warm = warm < 0 ? 0 : (warm > 1 ? 1 : warm); warm *= warm * (1 - e);
       out[0] = HOR[0] + (ZEN[0] - HOR[0]) * e + 12 * warm;
       out[1] = HOR[1] + (ZEN[1] - HOR[1]) * e + 4 * warm;
       out[2] = HOR[2] + (ZEN[2] - HOR[2]) * e - 10 * warm;
+      var band = 1 - (dy > 0.09 ? dy - 0.09 : 0.09 - dy) * 13.0;
+      if (band > 0) {
+        var cl = vnoise(az * 5.0 + 3.0, dy * 30.0) * 0.6 + vnoise(az * 14.0, dy * 70.0 + 9.0) * 0.4;
+        cl = (cl - 0.62 + 0.12 * band) * 4.5;
+        if (cl > 0) {
+          cl = cl > 1 ? 1 : cl;
+          var lit = vnoise(az * 14.0 - 0.5, dy * 70.0 + 9.4) > 0.45 ? 250 : 220;
+          out[0] += (lit - out[0]) * cl * 0.8; out[1] += (lit - 10 - out[1]) * cl * 0.8; out[2] += (lit - 34 - out[2]) * cl * 0.8;
+        }
+      }
       return;
     }
     if (dy > sea) {
@@ -398,12 +408,17 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
   })();
 
   var _sk = [0, 0, 0];
+  for (var ai = 3; ai < W * H * 4; ai += 4) px[ai] = 255;
+  function clearFrame() {
+    for (var i = 0; i < W * H; i++) { zbuf[i] = 1e7; matb[i] = 0; }
+  }
+  /* Sky and distant land only where the orchard left the frame open. */
   function drawSky() {
     for (var i = 0; i < W * H; i++) {
+      if (zbuf[i] < 1e7) continue;
       bgInto(AZ0[i] + YAW, EL[i], _sk);
       var o = i * 4;
-      px[o] = _sk[0]; px[o + 1] = _sk[1]; px[o + 2] = _sk[2]; px[o + 3] = 255;
-      zbuf[i] = 1e7; matb[i] = 0;
+      px[o] = _sk[0]; px[o + 1] = _sk[1]; px[o + 2] = _sk[2];
     }
   }
 
@@ -586,10 +601,10 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
   (function buildGround() {
     var zz = -3, x;
     while (zz < 84) {
-      var st = zz < 20 ? 0.5 : (zz < 45 ? 1.0 : 2.0);
-      var sx = zz < 20 ? 1.0 : 2.0;
+      var st = zz < 12 ? 0.5 : (zz < 25 ? 1.0 : (zz < 45 ? 1.5 : 3.0));
+      var sx = zz < 12 ? 1.0 : (zz < 25 ? 1.5 : (zz < 45 ? 2.5 : 4.0));
       var half = (zz + 6) * 0.80 + 5;
-      var z0 = -zz, z1 = -(zz + st + 0.12);
+      var z0 = -zz, z1 = -(zz + st + 0.10 + st * 0.05);
       for (x = Math.floor(-half / sx) * sx; x < half; x += sx) {
         GROUND.push(x, hgt(x, z0), z0, x + sx, hgt(x + sx, z0), z0, x + sx, hgt(x + sx, z1), z1, x, hgt(x, z1), z1);
       }
@@ -622,7 +637,7 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
   var ICO_F = [0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11, 1, 5, 9, 5, 11, 4, 11, 10, 2, 10, 7, 6, 7, 1, 8,
                3, 9, 4, 3, 4, 2, 3, 2, 6, 3, 6, 8, 3, 8, 9, 4, 9, 5, 2, 4, 11, 6, 2, 10, 8, 6, 7, 9, 8, 1];
 
-  var N0 = 1, N1 = 15, I0 = -12, I1 = 12, NI = I1 - I0 + 1;
+  var N0 = 0, N1 = 15, I0 = -12, I1 = 12, NI = I1 - I0 + 1;
   var BUSH = [], GRID = [];
 
   (function buildOrchard() {
@@ -631,7 +646,7 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
         var sd = n * 131 + i * 17 + 7;
         var x = (i + 0.5 * (n & 1)) * SP + (hash(sd + 0.1) - 0.5) * 1.3;
         var zz = n * T - 0.9 * Math.sin(x * 0.11 + 0.7) + (hash(sd + 0.2) - 0.5) * 0.5;
-        if ((n > 1 && hash(sd + 0.3) < 0.07) || Math.abs(x - 0.4) > (zz + 6) * 0.80 + 7) { GRID.push(null); continue; }
+        if ((n > 1 && hash(sd + 0.3) < 0.07) || Math.abs(x - 0.4) > (zz + 6) * 0.80 + 7 || (n === 0 && Math.abs(x - 0.4) < 3.5)) { GRID.push(null); continue; }
         var s = 0.86 + hash(sd + 0.4) * 0.28;
         var y = hgt(x, -zz);
         var b = {
@@ -698,7 +713,7 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
       var s = r * jv[k], nx = ICO_V[k * 3], ny = ICO_V[k * 3 + 1], nz = ICO_V[k * 3 + 2];
       BV[k * 3] = bx + nx * s; BV[k * 3 + 1] = by + ny * s * 0.85; BV[k * 3 + 2] = bz + nz * s;
       var lam = nx * LX + ny * LY + nz * LZ; if (lam < 0) lam = 0;
-      var amb = (0.44 + 0.22 * (ny > 0 ? ny : 0.4 * ny)) * bl.hf, sun = lam * bl.sv, j = bl.fj[k];
+      var amb = (0.52 + 0.22 * (ny > 0 ? ny : 0.4 * ny)) * bl.hf, sun = lam * bl.sv, j = bl.fj[k];
       var cr = leaf[0] * j * (SKYF[0] * amb + SUN[0] * sun);
       var cg = leaf[1] * j * (SKYF[1] * amb + SUN[1] * sun);
       var cb = leaf[2] * j * (SKYF[2] * amb + SUN[2] * sun);
@@ -775,16 +790,16 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
   }
 
   /* The basket and the folded sack, waiting in the shade between the first two bushes. */
-  var BX = -0.8, BZ = -5.7, SKX = 0.05, SKZ = -5.25;
+  var BX = 0.30, BZ = -5.25, SKX = -0.60, SKZ = -5.0, BY = hgt(BX, BZ) - 0.03;
   var OBJ = [];
   function objQuad(p, base, nx, ny, nz, amb, jit) {
     setLit(base, nx, ny, nz, amb, jit);
     OBJ.push({ p: new Float64Array(p), c: [CR, CG, CB], s: [SR, SG, SB] });
   }
 
-  var WICKER = [218, 176, 108], WICKER_D = [168, 124, 70], INSIDE = [96, 70, 42], JUTE = [168, 146, 104];
+  var WICKER = [218, 176, 108], WICKER_D = [168, 124, 70], INSIDE = [96, 70, 42], JUTE = [150, 140, 112];
   (function buildBasket() {
-    var y0 = hgt(BX, BZ) - 0.03, N = 16, ROWS = 6, R0 = 0.20, R1 = 0.28, HB = 0.40, i, r;
+    var y0 = BY, N = 16, ROWS = 7, R0 = 0.21, R1 = 0.27, HB = 0.46, i, r;
     var eyeX = 0.41, eyeZ = CAM_Z - 0.2, eyeY = hgt(eyeX, eyeZ) + 1.45;
     for (i = 0; i < N; i++) {
       var a0 = (i / N) * TAU, a1 = ((i + 1) / N) * TAU, am = (a0 + a1) / 2;
@@ -798,8 +813,8 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
         var ra = R0 + (R1 - R0) * v0, rb = R0 + (R1 - R0) * v1, ya = y0 + HB * v0, yb = y0 + HB * v1;
         var p = [BX + c0 * ra, ya, BZ + s0 * ra, BX + c1 * ra, ya, BZ + s1 * ra, BX + c1 * rb, yb, BZ + s1 * rb, BX + c0 * rb, yb, BZ + s0 * rb];
         if (outside) {
-          var weave = ((i + r) & 1) ? WICKER : WICKER_D;
-          objQuad(p, weave, nx, ny, nz, 0.46, 0.90 + 0.2 * hash(i * 7 + r));
+          var weave = (r & 1) ? WICKER : WICKER_D;
+          objQuad(p, weave, nx, ny, nz, 0.46, (i % 4 === 0 ? 0.80 : 0.94) + 0.12 * hash(i * 7 + r));
         } else {
           objQuad(p, INSIDE, -nx, 0.3, -nz, 0.9 + 0.5 * v1, 0.18 + 0.25 * v1);
         }
@@ -808,6 +823,16 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
       objQuad([BX + c0 * ri, rt + 0.03, BZ + s0 * ri, BX + c1 * ri, rt + 0.03, BZ + s1 * ri, BX + c1 * ro, rt + 0.03, BZ + s1 * ro, BX + c0 * ro, rt + 0.03, BZ + s0 * ro], WICKER, 0, 1, 0, 0.50, 1.05);
       if (outside) objQuad([BX + c0 * ro, rt - 0.04, BZ + s0 * ro, BX + c1 * ro, rt - 0.04, BZ + s1 * ro, BX + c1 * ro, rt + 0.03, BZ + s1 * ro, BX + c0 * ro, rt + 0.03, BZ + s0 * ro], WICKER_D, nx, 0.2, nz, 0.46, 1.0);
       objQuad([BX, y0 + 0.05, BZ, BX + c0 * R0, y0 + 0.05, BZ + s0 * R0, BX + c1 * R0, y0 + 0.05, BZ + s1 * R0, BX, y0 + 0.05, BZ], INSIDE, 0, 1, 0, 0.22, 0.35);
+    }
+    for (var side = 0; side < 2; side++) {
+      var sa0 = side * Math.PI, rh = y0 + HB + 0.02, rr = R1 + 0.035;
+      for (var k = 0; k < 6; k++) {
+        var e0 = sa0 - 0.42 + 0.84 * k / 6, e1 = sa0 - 0.42 + 0.84 * (k + 1) / 6;
+        var h0 = rh + 0.11 * Math.sin(Math.PI * k / 6), h1 = rh + 0.11 * Math.sin(Math.PI * (k + 1) / 6);
+        objQuad([BX + Math.cos(e0) * rr, h0, BZ + Math.sin(e0) * rr, BX + Math.cos(e1) * rr, h1, BZ + Math.sin(e1) * rr,
+                 BX + Math.cos(e1) * rr, h1 + 0.03, BZ + Math.sin(e1) * rr, BX + Math.cos(e0) * rr, h0 + 0.03, BZ + Math.sin(e0) * rr],
+                WICKER_D, Math.cos(sa0), 0.3, 0.2, 0.46, 0.95);
+      }
     }
   })();
 
@@ -851,6 +876,15 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
     var ta = 2.3 / LY;
     var qx = x + LX * ta, qz = z + LZ * ta;
     var n0 = rnd((-qz + 0.9 * fsin(qx * 0.11 + 0.7)) / T), v = 1;
+    var bdx = x - BX, bdz = z - BZ;
+    if (bdx * bdx + bdz * bdz < 1.4 && y < BY + 0.4) {
+      for (var hb = 0.08; hb < 0.46; hb += 0.12) {
+        var tb = (BY + hb - y) / LY;
+        if (tb < 0) continue;
+        var ex = bdx + LX * tb, ez = bdz + LZ * tb;
+        if (ex * ex + ez * ez < 0.058) { v = 0.08; break; }
+      }
+    }
     for (var n = n0 - 1; n <= n0 + 1; n++) {
       if (n < N0 || n > N1) continue;
       var ic = rnd(qx / SP - 0.5 * (n & 1));
@@ -864,8 +898,8 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
         var e = (dx * dx + dz * dz) * b.irr;
         if (e >= 1) continue;
         var al = (dx * SHX + dz * SHZ) * 0.62, ac = dz * SHX - dx * SHZ;
-        var nn = vnoise(al * 2.3 + b.nx, ac * 2.3 + b.nz) * 0.68 + vnoise(al * 5.3 + b.wob, ac * 5.3 - b.wob + b.nz) * 0.32;
-        var th = 0.62 - 0.22 * e;
+        var nn = vnoise(al * 3.6 + b.nx, ac * 3.6 + b.nz) * 0.62 + vnoise(al * 8.0 + b.wob, ac * 8.0 - b.wob + b.nz) * 0.38;
+        var th = 0.68 - 0.22 * e;
         var lt = (nn - th) * 14; lt = lt < 0 ? 0 : (lt > 1 ? 1 : lt);
         var oc = e < 0.72 ? 1 : 1 - (e - 0.72) / 0.28;
         v *= 1 - oc * (1 - lt) * 0.93;
@@ -897,7 +931,7 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
     return a;
   }
 
-  var SOIL = [124, 94, 62], GRASS = [100, 114, 54], LITTER = [158, 122, 72];
+  var SOIL = [140, 104, 66], GRASS = [104, 120, 52], LITTER = [170, 132, 76];
   function resolve() {
     for (var y = 0; y < H; y++) {
       var uy = RY[y];
@@ -929,7 +963,7 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
             var lam = (-gx * LX + LY - gz * LZ) * il; if (lam < 0) lam = 0;
             var slope = g2 * 2.2;
             var nA = vnoise(wx * 0.55, wz * 0.55), nB = vnoise(wx * 2.7 + 17.0, wz * 2.7);
-            var gr = (nA - 0.42) * 2.6 - (slope - 0.1) * 3.0; gr = gr < 0 ? 0 : (gr > 1 ? 1 : gr);
+            var gr = (slope - 0.07) * 5.0 + (nA - 0.47) * 1.9; gr = gr < 0 ? 0 : (gr > 1 ? 1 : gr);
             var lt = nB > 0.70 ? (nB - 0.70) * 2.6 : 0;
             var br = 0.84 + 0.32 * nB;
             var cr = (SOIL[0] + (GRASS[0] - SOIL[0]) * gr), cg = (SOIL[1] + (GRASS[1] - SOIL[1]) * gr), cb = (SOIL[2] + (GRASS[2] - SOIL[2]) * gr);
@@ -949,6 +983,37 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
     }
   }
 
+  /* A few torn leaves carried across by the wind. */
+  var LEAVES = 7;
+  function drawLeaves(u) {
+    for (var i = 0; i < LEAVES; i++) {
+      var h1 = hash(i + 300.1), h2 = hash(i + 310.3), h3 = hash(i + 320.7);
+      var cyc = 5 + (i % 4), f = u * cyc + h1;
+      f -= Math.floor(f);
+      var wz = camPos[2] - 3.2 - h2 * 5.5;
+      var wx = camPos[0] - 7 + f * 14;
+      var wy = hgt(wx, wz) + 2.4 - f * 1.9 + 0.25 * Math.sin(u * TAU * (11 + i) + h3 * 6.0);
+      var ox = wx - camPos[0], oy = wy - camPos[1], oz = wz - camPos[2];
+      var vz = -(ox * camF[0] + oy * camF[1] + oz * camF[2]);
+      if (vz > -0.5) continue;
+      var vx = ox * camR[0] + oy * camR[1] + oz * camR[2];
+      var vy = ox * camU[0] + oy * camU[1] + oz * camU[2];
+      var iw = -1 / vz, d = -vz;
+      var X = ((((vx * iw) / (tanH * aspect)) * 0.5 + 0.5) * W) | 0;
+      var Y = ((0.5 - ((vy * iw) / tanH) * 0.5) * H) | 0;
+      var flash = Math.sin(u * TAU * (37 + i * 3) + h3 * 9.0);
+      var r = flash > 0 ? 206 : 118, g = flash > 0 ? 196 : 132, b = flash > 0 ? 104 : 58;
+      for (var k = 0; k < 2; k++) {
+        var Xi = X + (flash > 0.5 ? k : 0), Yi = Y + (flash > 0.5 ? 0 : k);
+        if (Xi < 0 || Yi < 0 || Xi >= W || Yi >= H) continue;
+        var idx = Yi * W + Xi;
+        if (d >= zbuf[idx]) continue;
+        var o = idx * 4;
+        px[o] = r; px[o + 1] = g; px[o + 2] = b;
+      }
+    }
+  }
+
   var PRINT = { vig: 0.24, grain: 0.24, grainOff: 2.0, dither: 1.5 };
   var BLOOM = null;
   var CAM = { pos: camPos, F: camF, R: camR, U: camU, tanH: tanH, aspect: aspect };
@@ -963,11 +1028,13 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
     U = u;
     setCamera(t);
     updateWind(u);
-    drawSky();
+    clearFrame();
     drawGround();
     drawObjects();
     drawOrchard(u);
+    drawSky();
     resolve();
+    drawLeaves(u);
     print(fr);
     fctx.putImageData(frame, 0, 0);
   }

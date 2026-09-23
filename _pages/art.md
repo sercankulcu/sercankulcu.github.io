@@ -96,4 +96,34 @@ They have turned out to be about the same thing. Each one is a place where somet
     <span class="art-meta">An empty lab after midnight: a live trace on the scope, rain on the glass, every light in the room coming from the instruments · 45 colours · 48 s loop</span>
   </a>
 
+  <a class="art-card" href="/art/bos-durak/">
+    <img src="/images/art/bos-durak.png" alt="A roadside bus shelter on a rainy night with a lit timetable and a street lamp reflected in the wet road, drawn in pixels" loading="lazy" width="960" height="540">
+    <span class="art-title">Empty Bus Stop</span>
+    <span class="art-meta">A bus shelter in the rain at the edge of town: a flickering timetable, one street lamp streaked across the wet asphalt, and headlights that turn away before they reach the stop · 42 colours · 48 s loop</span>
+  </a>
+
+  <a class="art-card" href="/art/kis-limani/">
+    <img src="/images/art/kis-limani.png" alt="A small Black Sea fishing harbour at winter dusk with moored boats and a green harbour light, drawn in pixels" loading="lazy" width="960" height="540">
+    <span class="art-title">Harbour in Winter</span>
+    <span class="art-meta">A small Black Sea harbour at winter dusk: moored boats rocking on the swell, ropes slackening and tightening, and a green harbour light blinking through the sleet for no one · 45 colours · 48 s loop</span>
+  </a>
+
+  <a class="art-card" href="/art/yayla-evi/">
+    <img src="/images/art/yayla-evi.png" alt="A wooden highland house at dusk with one lit window, half hidden in fog, drawn in pixels" loading="lazy" width="960" height="540">
+    <span class="art-title">Highland House</span>
+    <span class="art-meta">A wooden house on a misty highland at dusk: one lit window, smoke from the chimney, and fog that climbs the valley toward a path no one walks up · 48 colours · 48 s loop</span>
+  </a>
+
+  <a class="art-card" href="/art/findik-bahcesi/">
+    <img src="/images/art/findik-bahcesi.png" alt="A hazelnut orchard on a sunny hillside with a harvest basket under the bushes, drawn in pixels" loading="lazy" width="960" height="540">
+    <span class="art-title">Hazel Orchard</span>
+    <span class="art-meta">A hazelnut orchard on a steep hillside above Giresun: late sun dappling the ground through wind-tossed bushes, and a harvest basket waiting for pickers who never come · 46 colours · 48 s loop</span>
+  </a>
+
+  <a class="art-card" href="/art/sinav-salonu/">
+    <img src="/images/art/sinav-salonu.png" alt="An empty lecture hall with sunlight slanting through tall windows onto rows of desks, drawn in pixels" loading="lazy" width="960" height="540">
+    <span class="art-title">Exam Hall</span>
+    <span class="art-meta">An empty lecture hall a minute before the exam: low sun slanting through tall windows, dust turning in the light, and a clock that never reaches nine · 46 colours · 48 s loop</span>
+  </a>
+
 </div>
