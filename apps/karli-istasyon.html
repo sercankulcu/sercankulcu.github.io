@@ -155,6 +155,22 @@ excerpt: "An empty platform under falling snow, drawn pixel by pixel in the brow
   .istasyon-slate .ist-rule { display: none; }
 }
 
+.istasyon-screen:fullscreen {
+  max-height: none;
+  aspect-ratio: auto;
+  border: 0;
+  cursor: none;
+}
+.istasyon-screen:-webkit-full-screen { max-height: none; border: 0; }
+
+.istasyon-keys {
+  margin: -2px 0 0;
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: var(--ist-dim);
+}
+@media (hover: none) { .istasyon-keys { display: none; } }
+
 .istasyon-back {
   margin: 0;
   font-size: 12px;
@@ -190,10 +206,15 @@ excerpt: "An empty platform under falling snow, drawn pixel by pixel in the brow
     </button>
     <input type="range" id="ist-scrub" min="0" max="1439" step="1" value="360" aria-label="Zaman">
     <span class="istasyon-clock" id="ist-clock">00:12 / 00:48</span>
-    <button class="ist-key" id="ist-sound" type="button" aria-label="Sesi aç" title="Sesi aç">
+    <button class="ist-key" id="ist-sound" type="button" aria-label="Sesi aç" title="Sesi aç (M)">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path id="ist-ico-sound" d="M3 6h2.5L9 3v10L5.5 10H3zM11.2 5.1l1-1c2.4 2 2.4 5.8 0 7.8l-1-1c1.7-1.5 1.7-4.3 0-5.8z"></path></svg>
     </button>
+    <button class="ist-key" id="ist-full" type="button" aria-label="Tam ekran" title="Tam ekran (F)">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path id="ist-ico-full" d="M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z"></path></svg>
+    </button>
   </div>
+
+  <p class="istasyon-keys">Boşluk oynat/duraklat · ← → bir saniye · F tam ekran · M ses</p>
 
   <p class="istasyon-back"><a href="/art/">← Art</a></p>
 
@@ -202,6 +223,9 @@ excerpt: "An empty platform under falling snow, drawn pixel by pixel in the brow
 <script>
 (function () {
   "use strict";
+
+  function hyp2(a, b) { return Math.sqrt(a * a + b * b); }
+  function hyp3(a, b, c) { return Math.sqrt(a * a + b * b + c * c); }
 
   var TAU = Math.PI * 2;
   var W = 320, H = 180;
@@ -283,7 +307,7 @@ excerpt: "An empty platform under falling snow, drawn pixel by pixel in the brow
     camU[0] = camR[1] * camF[2] - camR[2] * camF[1];
     camU[1] = camR[2] * camF[0] - camR[0] * camF[2];
     camU[2] = camR[0] * camF[1] - camR[1] * camF[0];
-    var l = Math.hypot(camU[0], camU[1], camU[2]);
+    var l = hyp3(camU[0], camU[1], camU[2]);
     camU[0] /= l; camU[1] /= l; camU[2] /= l;
   }
 
@@ -308,7 +332,7 @@ excerpt: "An empty platform under falling snow, drawn pixel by pixel in the brow
         var dx = camR[0] * ux + camU[0] * uy + camF[0];
         var dy = camR[1] * ux + camU[1] * uy + camF[1];
         var dz = camR[2] * ux + camU[2] * uy + camF[2];
-        var il = 1 / Math.hypot(dx, dy, dz);
+        var il = 1 / Math.sqrt(dx * dx + dy * dy + dz * dz);
         skyInto(dx * il, dy * il, dz * il, _sk);
         var i = y * W + x, o = i * 4;
         px[o] = _sk[0]; px[o + 1] = _sk[1]; px[o + 2] = _sk[2]; px[o + 3] = 255;
@@ -353,6 +377,20 @@ excerpt: "An empty platform under falling snow, drawn pixel by pixel in the brow
     for (i = 1; i < nc - 1; i++) tri(sxA[0], syA[0], swA[0], sxA[i], syA[i], swA[i], sxA[i + 1], syA[i + 1], swA[i + 1], r, g, b);
   }
 
+  // Columns of row centre q that can lie inside the triangle (±1 px slack; the per-pixel test stays exact).
+  var _xs = 0, _xe = -1;
+  function rowSpan(q, x0, y0, x1, y1, x2, y2, inv, lo, hi) {
+    var a0 = (x1 * (y2 - q) - x2 * (y1 - q)) * inv, b0 = (y1 - y2) * inv;
+    var a1 = (x2 * (y0 - q) - x0 * (y2 - q)) * inv, b1 = (y2 - y0) * inv;
+    var a2 = 1 - a0 - a1, b2 = -b0 - b1;
+    var pl = -Infinity, ph = Infinity;
+    if (b0 > 1e-12) pl = Math.max(pl, -a0 / b0); else if (b0 < -1e-12) ph = Math.min(ph, -a0 / b0); else if (a0 < -1e-9) ph = -Infinity;
+    if (b1 > 1e-12) pl = Math.max(pl, -a1 / b1); else if (b1 < -1e-12) ph = Math.min(ph, -a1 / b1); else if (a1 < -1e-9) ph = -Infinity;
+    if (b2 > 1e-12) pl = Math.max(pl, -a2 / b2); else if (b2 < -1e-12) ph = Math.min(ph, -a2 / b2); else if (a2 < -1e-9) ph = -Infinity;
+    _xs = Math.max(lo, Math.floor(pl - 0.5));
+    _xe = Math.min(hi, Math.ceil(ph - 0.5));
+  }
+
   function tri(x0, y0, w0, x1, y1, w1, x2, y2, w2, r, g, b) {
     var area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
     if (area > -1e-9 && area < 1e-9) return;
@@ -364,7 +402,8 @@ excerpt: "An empty platform under falling snow, drawn pixel by pixel in the brow
     if (minX > maxX || minY > maxY) return;
     for (var y = minY; y <= maxY; y++) {
       var pyc = y + 0.5, row = y * W;
-      for (var x = minX; x <= maxX; x++) {
+      rowSpan(pyc, x0, y0, x1, y1, x2, y2, inv, minX, maxX);
+      for (var x = _xs, xEnd = _xe; x <= xEnd; x++) {
         var pxc = x + 0.5;
         var l0 = ((x1 - pxc) * (y2 - pyc) - (x2 - pxc) * (y1 - pyc)) * inv;
         if (l0 < 0) continue;
@@ -531,8 +570,27 @@ excerpt: "An empty platform under falling snow, drawn pixel by pixel in the brow
     slab(m, 2.62, DECK_Y, -17.4, 2.78, DECK_Y + 2.05, -17.26, IRON, 0.02, IRON);
     slab(m, 1.30, DECK_Y + 1.62, -17.44, 4.10, DECK_Y + 2.32, -17.22, [222, 228, 236], 0.10, [230, 238, 248]);
 
-    slab(m, 0.20, DECK_Y, 3.9, 1.05, DECK_Y + 0.95, 4.75, [64, 60, 56], 0.02, [208, 220, 238]);
+    litterBin(m, 0.55, 0.4, 0.26, 0.86);
   })();
+
+  // Octagonal cast-iron bin with a domed cap of snow.
+  function litterBin(m, cx, cz, rad, hgt) {
+    var N = 8, y0 = DECK_Y, y1 = DECK_Y + hgt, i;
+    for (i = 0; i < N; i++) {
+      var a0 = (i / N) * TAU, a1 = ((i + 1) / N) * TAU, am = (a0 + a1) / 2;
+      var s0 = Math.sin(a0), c0 = Math.cos(a0), s1 = Math.sin(a1), c1 = Math.cos(a1);
+      var nx = Math.sin(am), nz = Math.cos(am);
+      var col = litAt(i % 2 ? IRON : IRON_D, nx, 0, nz, cx + nx * rad, (y0 + y1) / 2, cz + nz * rad, 0.02);
+      m.quad(cx + s0 * rad, y0, cz + c0 * rad, cx + s1 * rad, y0, cz + c1 * rad,
+             cx + s1 * rad, y1, cz + c1 * rad, cx + s0 * rad, y1, cz + c0 * rad, col[0], col[1], col[2]);
+      var rim = litAt(IRON_D, nx, 0.3, nz, cx + nx * rad, y1, cz + nz * rad, 0.04);
+      m.quad(cx + s0 * rad * 1.08, y1 - 0.07, cz + c0 * rad * 1.08, cx + s1 * rad * 1.08, y1 - 0.07, cz + c1 * rad * 1.08,
+             cx + s1 * rad * 1.08, y1, cz + c1 * rad * 1.08, cx + s0 * rad * 1.08, y1, cz + c0 * rad * 1.08, rim[0], rim[1], rim[2]);
+      var cap = litAt(SNOW, nx * 0.5, 0.85, nz * 0.5, cx + nx * rad * 0.5, y1 + 0.08, cz + nz * rad * 0.5, (hash(i + 90) - 0.5) * 0.06);
+      m.quad(cx + s0 * rad * 1.1, y1, cz + c0 * rad * 1.1, cx + s1 * rad * 1.1, y1, cz + c1 * rad * 1.1,
+             cx, y1 + 0.13, cz, cx, y1 + 0.13, cz, cap[0], cap[1], cap[2]);
+    }
+  }
 
   var FLAKES = 900;
   function drawSnow(t) {
@@ -628,7 +686,7 @@ excerpt: "An empty platform under falling snow, drawn pixel by pixel in the brow
   }
 
   function print(fr) {
-    var cx = W * 0.5, cy = H * 0.5, rmax = Math.hypot(cx, cy);
+    var cx = W * 0.5, cy = H * 0.5, rmax = hyp2(cx, cy);
     for (var y = 0; y < H; y++) {
       var by = (y & 3) * 4, dy2 = (y - cy) / rmax;
       for (var x = 0; x < W; x++) {
@@ -772,21 +830,67 @@ excerpt: "An empty platform under falling snow, drawn pixel by pixel in the brow
     fr = Number(scrub.value) | 0;
     render(fr); showTime();
   });
-  btnSound.addEventListener("click", function () {
+  function toggleSound() {
     if (!audio) audio = startAudio();
     if (!audio) return;
     soundOn = !soundOn;
-    audio.ctx.resume();
+    if (playing && onScreen) audio.ctx.resume();
     audio.out.gain.cancelScheduledValues(audio.ctx.currentTime);
     audio.out.gain.setTargetAtTime(soundOn ? 0.55 : 0.0001, audio.ctx.currentTime, 0.6);
     icoSound.setAttribute("d", soundOn ? SND_ON : SND_OFF);
     btnSound.setAttribute("aria-label", soundOn ? "Sesi kapat" : "Sesi aç");
-    btnSound.title = btnSound.getAttribute("aria-label");
-  });
+    btnSound.title = btnSound.getAttribute("aria-label") + " (M)";
+  }
+  btnSound.addEventListener("click", toggleSound);
+
   var screenEl = document.getElementById("ist-screen");
+  var btnFull = document.getElementById("ist-full");
+  var icoFull = document.getElementById("ist-ico-full");
+  var FULL_IN = "M2 2h5v2H4v3H2zM9 2h5v5h-2V4H9zM2 9h2v3h3v2H2zM12 9h2v5H9v-2h3z";
+  var FULL_OUT = "M5 2h2v5H2V5h3zM9 2h2v3h3v2H9zM2 9h5v5H5v-3H2zM9 9h5v2h-3v3H9z";
+  var canFull = !!(screenEl.requestFullscreen || screenEl.webkitRequestFullscreen);
+  function fullEl() { return document.fullscreenElement || document.webkitFullscreenElement; }
+  function toggleFull() {
+    if (fullEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else if (screenEl.requestFullscreen) screenEl.requestFullscreen().catch(function () {});
+    else if (screenEl.webkitRequestFullscreen) screenEl.webkitRequestFullscreen();
+  }
+  function onFullChange() {
+    var on = fullEl() === screenEl;
+    icoFull.setAttribute("d", on ? FULL_OUT : FULL_IN);
+    btnFull.setAttribute("aria-label", on ? "Tam ekrandan çık" : "Tam ekran");
+    btnFull.title = btnFull.getAttribute("aria-label") + " (F)";
+    present();
+  }
+  if (canFull) {
+    btnFull.addEventListener("click", toggleFull);
+    document.addEventListener("fullscreenchange", onFullChange);
+    document.addEventListener("webkitfullscreenchange", onFullChange);
+  } else {
+    btnFull.hidden = true;
+  }
+
+  function seek(sec) {
+    fr = ((fr + sec * FPS) % FRAMES + FRAMES) % FRAMES;
+    render(fr); showTime();
+  }
+
   screenEl.addEventListener("click", function () { setPlaying(!playing); screenEl.focus(); });
-  screenEl.addEventListener("keydown", function (e) {
-    if (e.code === "Space" || e.code === "Enter") { e.preventDefault(); setPlaying(!playing); }
+  screenEl.addEventListener("dblclick", function () { if (canFull) toggleFull(); });
+  document.getElementById("istasyon-app").addEventListener("keydown", function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    var tag = e.target.tagName;
+    var k = e.key;
+    if (k === " " || k === "Enter") {
+      if (tag === "BUTTON") return;
+      e.preventDefault(); setPlaying(!playing);
+    } else if ((k === "ArrowLeft" || k === "ArrowRight") && tag !== "INPUT") {
+      e.preventDefault(); seek(k === "ArrowLeft" ? -1 : 1);
+    } else if ((k === "f" || k === "F") && canFull) {
+      e.preventDefault(); toggleFull();
+    } else if (k === "m" || k === "M") {
+      e.preventDefault(); toggleSound();
+    }
   });
   window.addEventListener("resize", function () { present(); });
 
