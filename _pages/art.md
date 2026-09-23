@@ -97,5 +97,3 @@ They have turned out to be about the same thing. Each one is a place where somet
   </a>
 
 </div>
-
-Park Güell is the only one of these taken from life rather than invented — from a photograph on the terrace, one hot afternoon in Barcelona. The bench was a good fit for the method: trencadís is already a mosaic of irregular flat pieces, and a software rasteriser draws nothing but irregular flat pieces.
