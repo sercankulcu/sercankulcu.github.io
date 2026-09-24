@@ -255,9 +255,9 @@ var FOG = new THREE.Color(0xc8d3d8);
 scene.fog = new THREE.FogExp2(FOG, 0.00036);
 
 /* Sky: a deep blue dome with warm haze toward the sun and a few fair-weather clouds over the hills. */
-function skyMat() {
+function skyMat(sunAmt) {
   return new THREE.ShaderMaterial({
-    uniforms: { zen: { value: ZEN }, hor: { value: HOR }, haze: { value: HAZE }, gnd: { value: GND }, sunDir: { value: SUN_DIR }, sunCol: { value: SUNC }, drift: { value: new THREE.Vector2() } },
+    uniforms: { zen: { value: ZEN }, hor: { value: HOR }, haze: { value: HAZE }, gnd: { value: GND }, sunDir: { value: SUN_DIR }, sunCol: { value: SUNC }, drift: { value: new THREE.Vector2() }, sunAmt: { value: sunAmt } },
     vertexShader: [
       "varying vec3 vDir;",
       "void main() {",
@@ -266,7 +266,7 @@ function skyMat() {
       "}"
     ].join("\n"),
     fragmentShader: [
-      "uniform vec3 zen; uniform vec3 hor; uniform vec3 haze; uniform vec3 gnd; uniform vec3 sunDir; uniform vec3 sunCol; uniform vec2 drift;",
+      "uniform vec3 zen; uniform vec3 hor; uniform vec3 haze; uniform vec3 gnd; uniform vec3 sunDir; uniform vec3 sunCol; uniform vec2 drift; uniform float sunAmt;",
       "varying vec3 vDir;",
       "float hs(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }",
       "float vn(vec2 p) { vec2 i = floor(p); vec2 f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(hs(i), hs(i + vec2(1.0, 0.0)), f.x), mix(hs(i + vec2(0.0, 1.0)), hs(i + vec2(1.0, 1.0)), f.x), f.y); }",
@@ -291,7 +291,7 @@ function skyMat() {
       "    c = mix(c, cc, cov * 0.95);",
       "  }",
       "  c = mix(c, gnd, smoothstep(0.0, -0.08, h));",
-      "  c += sunCol * (pow(sd, 6.0) * 0.28 + pow(sd, 60.0) * 0.6 + pow(sd, 2500.0) * 40.0);",
+      "  c += sunCol * sunAmt * (pow(sd, 6.0) * 0.28 + pow(sd, 60.0) * 0.6 + pow(sd, 2500.0) * 40.0);",
       "  gl_FragColor = vec4(c, 1.0);",
       "  #include <tonemapping_fragment>",
       "  #include <colorspace_fragment>",
@@ -300,17 +300,17 @@ function skyMat() {
     side: THREE.BackSide, depthWrite: false, fog: false
   });
 }
-var skyM = skyMat();
+var skyM = skyMat(1.0);
 var sky = new THREE.Mesh(new THREE.SphereGeometry(30000, 48, 24), skyM);
 sky.frustumCulled = false; sky.renderOrder = -1;
 scene.add(sky);
 var pmrem = new THREE.PMREMGenerator(renderer);
 var envScene = new THREE.Scene();
-envScene.add(new THREE.Mesh(new THREE.SphereGeometry(50, 32, 16), skyMat()));
+envScene.add(new THREE.Mesh(new THREE.SphereGeometry(50, 32, 16), skyMat(0.0)));
 var envGround = new THREE.Mesh(new THREE.CircleGeometry(49, 32), new THREE.MeshBasicMaterial({ color: 0x8a7556 }));
 envGround.rotation.x = -Math.PI / 2; envGround.position.y = -1; envScene.add(envGround);
 scene.environment = pmrem.fromScene(envScene, 0.01).texture;
-scene.environmentIntensity = 0.45;
+scene.environmentIntensity = 0.6;
 
 /* ---------- Canvas textures ---------- */
 function canvasTex(w, h, draw, srgb) {
@@ -639,7 +639,7 @@ slab2.position.set(-10.4, -0.2, -17.9);
 
 /* A low dry-stone wall finishes the yard at the back and the right, with a whitewashed coping */
 var capMat = new THREE.MeshStandardMaterial({ color: 0xe2dccd, roughness: 0.85 });
-var WALL_H = 0.72;
+var WALL_H = 0.5;
 function wall(x0, z0, x1, z1) {
   var len = Math.max(Math.abs(x1 - x0), Math.abs(z1 - z0)), tx = stoneTex.clone(), alongX = Math.abs(x1 - x0) > Math.abs(z1 - z0);
   tx.needsUpdate = true; tx.repeat.set(len / 1.4, (WALL_H + 5) / 1.4);
@@ -848,7 +848,7 @@ function updateTarp(u) {
 /* ---------- The nut layer: an even drift in front, raked ridges behind the rake, a small heap ---------- */
 var HX = -0.35, HZ = -0.25, RDX = 0.824, RDZ = 0.567;
 var S_HEAD = HX * RDX + HZ * RDZ, Q_HEAD = -HX * RDZ + HZ * RDX;
-var HEAP_X = -0.3, HEAP_Z = 0.2;
+var HEAP_X = -1.05, HEAP_Z = 0.45;
 function nutD(x, z) {
   var m = Math.min(TW / 2 - Math.abs(x), TD / 2 - Math.abs(z));
   var e = smooth(0.06, 0.4, m + 0.07 * Math.sin(x * 7.1 + z * 3.3) + 0.04 * Math.sin(x * 17.0 - z * 11.0));
@@ -863,11 +863,11 @@ function lay(x, z) {
   var raked = smooth(0.08, -0.25, s) * smooth(1.7, 1.2, Math.abs(q - Q_HEAD));
   var f = 0.5 + 0.5 * Math.cos((q - Q_HEAD) * TAU / 0.2 + 0.25 * Math.sin(s * 2.7));
   var drift = 0.5 + 0.5 * Math.sin(x * 1.3 + 0.4) * Math.sin(z * 1.7 + 1.1);
-  var dx = x - HEAP_X, dz = z - HEAP_Z, heap = Math.exp(-(dx * dx + dz * dz) / 0.11);
+  var dx = x - HEAP_X, dz = z - HEAP_Z, heap = Math.exp(-(dx * dx + dz * dz) / 0.16);
   var dUn = 0.78 + 0.22 * drift, hUn = 0.022 + 0.02 * drift;
   var dRk = 0.12 + 0.88 * Math.pow(f, 1.8), hRk = 0.0 + 0.036 * f;
   LD = Math.min(1, base * (dUn + (dRk - dUn) * raked) + heap * base * 0.9);
-  LH = base * (hUn + (hRk - hUn) * raked) + heap * base * 0.16;
+  LH = base * (hUn + (hRk - hUn) * raked) + heap * base * 0.22;
 }
 var bedGeo = new THREE.PlaneGeometry(TW, TD, 240, 200);
 bedGeo.rotateX(-Math.PI / 2);
@@ -1059,7 +1059,7 @@ var bHandle = toGroup(bucket, new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.005
 bHandle.position.y = 0.3; bHandle.rotation.set(-1.1, 0.4, 0);
 
 /* ---------- Laundry line ---------- */
-var lineA = new THREE.Vector3(-5.35, 2.3, -14.0), lineB = new THREE.Vector3(-1.2, 2.15, -11.4);
+var lineA = new THREE.Vector3(-6.3, 2.3, -12.2), lineB = new THREE.Vector3(-2.7, 2.15, -11.4);
 var pole = add(new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.04, 2.3, 10), new THREE.MeshStandardMaterial({ color: 0x9aa0a4, metalness: 0.4, roughness: 0.5 })), true, false);
 pole.position.set(lineB.x, 1.15, lineB.z);
 var pole2 = add(new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.04, 2.4, 10), new THREE.MeshStandardMaterial({ color: 0x9aa0a4, metalness: 0.4, roughness: 0.5 })), true, false);
@@ -1103,7 +1103,7 @@ function updateCloths(u) {
 }
 
 /* ---------- A ginger-and-white cat curled asleep in the shade of the sacks ---------- */
-var cat = new THREE.Group(); cat.position.set(SACK_X + 0.6 * SHX, 0, SACK_Z + 0.6 * SHZ); cat.rotation.y = -1.25; cat.scale.setScalar(1.2); scene.add(cat);
+var cat = new THREE.Group(); cat.position.set(SACK_X + 0.6 * SHX, 0, SACK_Z + 0.6 * SHZ); cat.rotation.y = -1.4; cat.scale.setScalar(1.35); scene.add(cat);
 var furMat = new THREE.MeshStandardMaterial({ map: furTex, roughness: 0.92 });
 var whiteFur = new THREE.MeshStandardMaterial({ color: 0xf6efe4, roughness: 0.95 });
 var body = toGroup(cat, new THREE.Mesh(new THREE.SphereGeometry(1, 28, 18), furMat), true, true);
@@ -1170,7 +1170,7 @@ for (var wi = 0; wi < WASP_N; wi++) {
 }
 
 /* ---------- Light: a strong warm sun, cool sky from above, warm bounce from the sunlit concrete ---------- */
-var sunL = new THREE.DirectionalLight(0xffd29a, 5.0);
+var sunL = new THREE.DirectionalLight(0xffc88c, 5.2);
 sunL.castShadow = true;
 sunL.shadow.mapSize.set(2048, 2048);
 sunL.shadow.camera.left = -11.5; sunL.shadow.camera.right = 11.5; sunL.shadow.camera.top = 11.5; sunL.shadow.camera.bottom = -11.5;
@@ -1207,7 +1207,7 @@ var shimmer = new ShaderPass({
     "  uv.y += cos(uv.y * 240.0 + uB + uv.x * 17.0) * 0.0005 * band;",
     "  vec4 c = texture2D(tDiffuse, uv);",
     "  vec2 q = vUv - 0.5;",
-    "  c.rgb *= 1.0 - 0.32 * dot(q, q) * 2.0;",
+    "  c.rgb *= (1.0 - 0.32 * dot(q, q) * 2.0) * vec3(1.03, 1.0, 0.95);",
     "  gl_FragColor = c;",
     "}"
   ].join("\n")
@@ -1215,7 +1215,7 @@ var shimmer = new ShaderPass({
 composer.addPass(shimmer);
 composer.addPass(new OutputPass());
 
-/*DBG*/ var DBG = new URLSearchParams(location.search).get("dbg"); window.__d = { sunL: sunL, house: house, cat: cat, camera: camera, THREE: THREE };
+/*DBG*/ var DBG = new URLSearchParams(location.search).get("dbg"); window.__d = { scene: scene, body: body, sunL: sunL, house: house, cat: cat, camera: camera, THREE: THREE };
 /*DBG*/ if (location.search.indexOf("notree") > 0) { treeIM.visible = false; trunk.visible = false; }
 var M4 = new THREE.Matrix4(), Q4 = new THREE.Quaternion(), V4 = new THREE.Vector3(), S4 = new THREE.Vector3(), E4 = new THREE.Euler();
 function render(t) {
@@ -1227,7 +1227,7 @@ function render(t) {
   var sd = SUN_DIR.clone(); sd.x += 0.015 * Math.sin(w); sd.normalize();
   sunL.position.copy(SHADOW_C).addScaledVector(sd, 35);
   sunL.target.position.copy(SHADOW_C);
-  sunL.intensity = 5.0 + 0.08 * Math.sin(w * 4);
+  sunL.intensity = 5.2 + 0.08 * Math.sin(w * 4);
 
   skyM.uniforms.drift.value.set(0.06 * Math.sin(w), 0.04 * Math.cos(w));
   seaMat.uniforms.camPos.value.copy(camera.position);
