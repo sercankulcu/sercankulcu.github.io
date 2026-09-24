@@ -31,6 +31,9 @@ export function mount(o) {
   var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var playing = !calm, onScreen = true, soundOn = false, audio = null;
   var t = o.t0 || 0, last = 0;
+  /* ?t=12 opens the loop paused at that second, for stills and links to a moment. */
+  var q = window.URLSearchParams ? new URLSearchParams(window.location.search) : null;
+  if (q && q.has("t")) { t = (((parseFloat(q.get("t")) || 0) % D) + D) % D; playing = false; }
 
   function resize() {
     var w = Math.max(64, screenEl.clientWidth), h = Math.max(36, screenEl.clientHeight);
