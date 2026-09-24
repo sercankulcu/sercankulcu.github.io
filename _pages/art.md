@@ -138,4 +138,16 @@ They have turned out to be about the same thing. Each one is a place where somet
     <span class="art-meta">A sleeper compartment at night: a reading lamp over worn seats, a glass of tea trembling to the rail joints, and a lit station that flashes past without stopping · 42 colours · 48 s loop</span>
   </a>
 
+  <a class="art-card" href="/art/camasirhane/">
+    <img src="/images/art/camasirhane.png" alt="An empty laundromat at night under fluorescent tubes, with one washer running and rain on the front window, drawn in pixels" loading="lazy" width="960" height="540">
+    <span class="art-title">Laundromat, 3 AM</span>
+    <span class="art-meta">An empty laundromat at three in the morning: one washer tumbling a load no one will collect, under a fluorescent tube that keeps failing · 45 colours · 48 s loop</span>
+  </a>
+
+  <a class="art-card" href="/art/ekim-plaji/">
+    <img src="/images/art/ekim-plaji.png" alt="An empty Black Sea beach in October with folded umbrellas, a lifeguard tower and waves running up the sand, drawn in pixels" loading="lazy" width="960" height="540">
+    <span class="art-title">Beach in October</span>
+    <span class="art-meta">An empty beach in October: folded umbrellas shivering in the wind, a lifeguard tower flying its red flag for no one, and waves that keep running up the sand · 46 colours · 48 s loop</span>
+  </a>
+
 </div>
