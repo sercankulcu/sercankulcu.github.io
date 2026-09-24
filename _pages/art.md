@@ -87,7 +87,7 @@ They have turned out to be about the same thing. Each one is a place where somet
   <a class="art-card" href="/art/park-guell/">
     <img src="/images/art/park-guell.png" alt="Gaudí's mosaic bench at Park Güell above Barcelona, drawn in pixels" loading="lazy" width="960" height="540">
     <span class="art-title">Park Güell</span>
-    <span class="art-meta">Gaudí's bench above Barcelona, rebuilt from a photograph: trencadís laid as thousands of flat shards · 50 colours · 48 s loop</span>
+    <span class="art-meta">Gaudí's bench above Barcelona, rebuilt from a photograph: trencadís laid as thousands of flat shards · 56 colours · 48 s loop</span>
   </a>
 
   <a class="art-card" href="/art/gece-laboratuvari/">
@@ -124,6 +124,18 @@ They have turned out to be about the same thing. Each one is a place where somet
     <img src="/images/art/sinav-salonu.png" alt="An empty lecture hall with sunlight slanting through tall windows onto rows of desks, drawn in pixels" loading="lazy" width="960" height="540">
     <span class="art-title">Exam Hall</span>
     <span class="art-meta">An empty lecture hall a minute before the exam: low sun slanting through tall windows, dust turning in the light, and a clock that never reaches nine · 46 colours · 48 s loop</span>
+  </a>
+
+  <a class="art-card" href="/art/cay-bahcesi/">
+    <img src="/images/art/cay-bahcesi.png" alt="An empty seaside tea garden in the rain with a striped awning, a brass samovar and tipped chairs, drawn in pixels" loading="lazy" width="960" height="540">
+    <span class="art-title">Tea Garden in the Rain</span>
+    <span class="art-meta">An empty tea garden above the sea in the rain: a striped awning dripping over a brass samovar, tipped chairs, and an island fading into the haze · 44 colours · 48 s loop</span>
+  </a>
+
+  <a class="art-card" href="/art/gece-treni/">
+    <img src="/images/art/gece-treni.png" alt="The inside of a night train compartment with a reading lamp, a glass of tea on the table and moonlit hills outside the window, drawn in pixels" loading="lazy" width="960" height="540">
+    <span class="art-title">Night Train</span>
+    <span class="art-meta">A sleeper compartment at night: a reading lamp over worn seats, a glass of tea trembling to the rail joints, and a lit station that flashes past without stopping · 42 colours · 48 s loop</span>
   </a>
 
 </div>
