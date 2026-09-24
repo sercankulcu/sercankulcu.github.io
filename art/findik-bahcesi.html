@@ -637,6 +637,25 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
   var ICO_F = [0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11, 1, 5, 9, 5, 11, 4, 11, 10, 2, 10, 7, 6, 7, 1, 8,
                3, 9, 4, 3, 4, 2, 3, 2, 6, 3, 6, 8, 3, 8, 9, 4, 9, 5, 2, 4, 11, 6, 2, 10, 8, 6, 7, 9, 8, 1];
 
+  /* One subdivision of the icosahedron for clumps that fill much of the screen: 42 corners, 80 faces. */
+  var ICO2_V = ICO_V.slice(), ICO2_F = [], ICO2_P = [];
+  (function () {
+    var mid = {};
+    function m(a, b) {
+      var key = a < b ? a + "_" + b : b + "_" + a;
+      if (mid[key] !== undefined) return mid[key];
+      var x = ICO_V[a * 3] + ICO_V[b * 3], y = ICO_V[a * 3 + 1] + ICO_V[b * 3 + 1], z = ICO_V[a * 3 + 2] + ICO_V[b * 3 + 2];
+      var l = Math.sqrt(x * x + y * y + z * z), k = ICO2_V.length / 3;
+      ICO2_V.push(x / l, y / l, z / l); ICO2_P.push(a, b);
+      mid[key] = k; return k;
+    }
+    for (var f = 0; f < 20; f++) {
+      var a = ICO_F[f * 3], b = ICO_F[f * 3 + 1], c = ICO_F[f * 3 + 2];
+      var ab = m(a, b), bc = m(b, c), ca = m(c, a);
+      ICO2_F.push(a, ab, ca, b, bc, ab, c, ca, bc, ab, bc, ca);
+    }
+  })();
+
   var N0 = 0, N1 = 15, I0 = -12, I1 = 12, NI = I1 - I0 + 1;
   var BUSH = [], GRID = [];
 
@@ -705,19 +724,29 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
   }
 
   var UNDER = [150, 174, 124];
-  var BV = new Float64Array(36), BC = new Float64Array(36), TP = new Float64Array(9), TC = new Float64Array(9);
+  var BV = new Float64Array(126), BC = new Float64Array(126), TP = new Float64Array(9), TC = new Float64Array(9);
   function drawBlob(bx, by, bz, bl, leaf, g, u) {
     var r = bl.r, jv = bl.jv, k;
     var flipT = 1 - 0.38 * g;
-    for (k = 0; k < 12; k++) {
-      var s = r * jv[k], nx = ICO_V[k * 3], ny = ICO_V[k * 3 + 1], nz = ICO_V[k * 3 + 2];
+    var ox0 = bx - camPos[0], oy0 = by - camPos[1], oz0 = bz - camPos[2];
+    var vz0 = ox0 * camF[0] + oy0 * camF[1] + oz0 * camF[2];
+    var fine = vz0 > 0.3 && r / vz0 > 0.11;
+    var V = fine ? ICO2_V : ICO_V, F = fine ? ICO2_F : ICO_F, NV = fine ? 42 : 12, NF = fine ? 80 : 20;
+    for (k = 0; k < NV; k++) {
+      var jk, fjk, fpk;
+      if (k < 12) { jk = jv[k]; fjk = bl.fj[k]; fpk = bl.fp[k]; }
+      else {
+        var pa = ICO2_P[(k - 12) * 2], pb = ICO2_P[(k - 12) * 2 + 1], hk = hash(bl.ph * 37.1 + k * 1.73);
+        jk = (jv[pa] + jv[pb]) * 0.5 * (0.90 + 0.22 * hk); fjk = (bl.fj[pa] + bl.fj[pb]) * 0.5; fpk = bl.fp[pa] + hk;
+      }
+      var s = r * jk, nx = V[k * 3], ny = V[k * 3 + 1], nz = V[k * 3 + 2];
       BV[k * 3] = bx + nx * s; BV[k * 3 + 1] = by + ny * s * 0.85; BV[k * 3 + 2] = bz + nz * s;
       var lam = nx * LX + ny * LY + nz * LZ; if (lam < 0) lam = 0;
-      var amb = (0.52 + 0.22 * (ny > 0 ? ny : 0.4 * ny)) * bl.hf, sun = lam * bl.sv, j = bl.fj[k];
+      var amb = (0.52 + 0.22 * (ny > 0 ? ny : 0.4 * ny)) * bl.hf, sun = lam * bl.sv, j = fjk;
       var cr = leaf[0] * j * (SKYF[0] * amb + SUN[0] * sun);
       var cg = leaf[1] * j * (SKYF[1] * amb + SUN[1] * sun);
       var cb = leaf[2] * j * (SKYF[2] * amb + SUN[2] * sun);
-      var fl = fsin(u * TAU * 29 + bl.fp[k]) - flipT;
+      var fl = fsin(u * TAU * 29 + fpk) - flipT;
       if (fl > 0) {
         var fk = fl * 3; fk = fk > 0.5 ? 0.5 : fk;
         var ul = (0.40 + 0.55 * sun) * bl.hf;
@@ -725,8 +754,8 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
       }
       BC[k * 3] = cr; BC[k * 3 + 1] = cg; BC[k * 3 + 2] = cb;
     }
-    for (var f = 0; f < 20; f++) {
-      var ia = ICO_F[f * 3] * 3, ib = ICO_F[f * 3 + 1] * 3, ic = ICO_F[f * 3 + 2] * 3;
+    for (var f = 0; f < NF; f++) {
+      var ia = F[f * 3] * 3, ib = F[f * 3 + 1] * 3, ic = F[f * 3 + 2] * 3;
       var ax = BV[ia], ay = BV[ia + 1], az = BV[ia + 2];
       var ux = BV[ib] - ax, uy = BV[ib + 1] - ay, uz = BV[ib + 2] - az;
       var vx = BV[ic] - ax, vy = BV[ic + 1] - ay, vz = BV[ic + 2] - az;
@@ -1112,7 +1141,7 @@ excerpt: "A hazelnut orchard on a steep hillside above Giresun, drawn pixel by p
     prefix: "fnd", app: "findik-app",
     W: W, H: H, fps: FPS, frames: FRAMES,
     frame0: Math.round(FRAMES * 0.25),
-    film: film, frameColor: "#10140e", gain: 0.55,
+    film: film, frameColor: "#10140e", gain: 0.804,
     render: render, startAudio: startAudio
   });
 })();
