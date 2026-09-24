@@ -9,6 +9,8 @@ Scenes drawn pixel by pixel in the browser. No 3D library and no video in any of
 
 They have turned out to be about the same thing. Each one is a place where something is expected and nothing comes: the boat stays moored, the train never arrives, the light turns for no one. The weather does the acting.
 
+There is also a separate set of [WebGL studies](/art/webgl/) made with three.js, where those rules are set aside.
+
 <style>
 .art-grid {
   display: grid;
