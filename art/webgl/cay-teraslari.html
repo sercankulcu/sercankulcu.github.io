@@ -246,7 +246,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 var scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x9aa8bc, 0.0046);
+scene.fog = new THREE.FogExp2(0x9aa8bc, 0.0052);
 var camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.5, 2000);
 
 /* Sun low over the far ridges to the right; the light that shades the bushes comes a little more from the side. */
@@ -259,7 +259,7 @@ var U = {
   uMistTop: { value: 10.0 },
   uMistDepth: { value: 9.0 },
   uMistAmt: { value: 0.9 },
-  uMistCool: { value: new THREE.Color(0xb0c2e2) },
+  uMistCool: { value: new THREE.Color(0xc2d0ea) },
   uMistGold: { value: new THREE.Color(0xffd29a) }
 };
 
@@ -277,7 +277,7 @@ var GLSL_COMMON = [
   "  float s = max(dot(d, uSunDir), 0.0);",
   "  vec3 c = mix(hazeCol(d), vec3(0.16, 0.28, 0.56), smoothstep(0.0, 0.5, h));",
   "  c = mix(c, vec3(0.62, 0.52, 0.62), (1.0 - smoothstep(0.0, 0.25, h)) * 0.25 * (1.0 - s));",
-  "  c += vec3(1.0, 0.66, 0.36) * pow(s, 10.0) * 0.9 * (1.0 - smoothstep(0.0, 0.45, h));",
+  "  c += vec3(1.0, 0.64, 0.34) * pow(s, 8.0) * 1.2 * (1.0 - smoothstep(0.0, 0.45, h));",
   "  c += vec3(1.0, 0.82, 0.60) * pow(s, 90.0) * 1.2;",
   "  c += vec3(1.0, 0.93, 0.80) * smoothstep(0.99955, 0.99975, s) * 12.0;",
   "  return c;",
@@ -334,7 +334,7 @@ function hazeify(mat, wind) {
         "gl_FragColor.rgb *= mix(vec3(0.42, 0.52, 0.72), vec3(1.0), vsh) * mix(vec3(1.0), vec3(1.16, 1.0, 0.8), smoothstep(22.0, 36.0, vHfW.y) * (1.0 - smoothstep(130.0, 240.0, fD0)));",
         "float mh = clamp((uMistTop - vHfW.y) / uMistDepth, 0.0, 1.0);",
         "float mn = mistField(vHfW.xz * 0.035);",
-        "float mist = clamp(mh * smoothstep(0.25, 0.75, mn) * 1.2 * uMistAmt * smoothstep(15.0, 60.0, fDist), 0.0, 0.9);",
+        "float mist = clamp(mh * (0.5 + 0.6 * smoothstep(0.25, 0.75, mn)) * uMistAmt * smoothstep(15.0, 60.0, fDist), 0.0, 0.9);",
         "float sw = pow(max(dot(fDir, uSunDir), 0.0), 18.0);",
         "vec3 mcol = mix(uMistCool, uMistGold, clamp(sw * 0.9 + (1.0 - mh) * 0.45 * (0.4 + sw), 0.0, 1.0));",
         "gl_FragColor.rgb = mix(gl_FragColor.rgb, linearToOutputTexel(vec4(toneMapping(mcol), 1.0)).rgb, mist);",
@@ -589,10 +589,10 @@ scene.add(treeMesh);
 
 /* Distant ridges, each one a long crest further back and higher, fading into the haze. */
 var RIDGES = [
-  { z: -200, w: 34, base: -10, amp: 78, seed: 1.3, col: 0x223a2c },
-  { z: -290, w: 44, base: -14, amp: 100, seed: 4.1, col: 0x2a3f40 },
-  { z: -400, w: 56, base: -20, amp: 124, seed: 7.7, col: 0x33465a },
-  { z: -560, w: 80, base: -30, amp: 150, seed: 2.9, col: 0x3d4d66 }
+  { z: -200, w: 34, base: -10, amp: 78, seed: 1.3, col: 0x1c332f },
+  { z: -290, w: 44, base: -14, amp: 100, seed: 4.1, col: 0x263c4a },
+  { z: -400, w: 56, base: -20, amp: 124, seed: 7.7, col: 0x324862 },
+  { z: -560, w: 80, base: -30, amp: 150, seed: 2.9, col: 0x3e5474 }
 ];
 RIDGES.forEach(function (R, ri) {
   var W = 1800, D = R.w * 4;
@@ -635,6 +635,7 @@ box(3.1, 0.1, 2.4, woodMat, 0, -0.02, 0);
 [[-1.45, -1.1], [1.45, -1.1], [-1.45, 1.1], [1.45, 1.1], [0, 1.1], [0, -1.1]].forEach(function (s) { box(0.13, 3.0, 0.13, woodMat, s[0], -1.5, s[1]); });
 shelter.position.set(SH_X, SH_Y, SH_Z);
 shelter.rotation.y = -0.35;
+shelter.scale.setScalar(0.85);
 scene.add(shelter);
 
 var BK = [[0.0, 0.0], [0.30, 0.0], [0.38, 0.12], [0.50, 0.75], [0.53, 0.80], [0.49, 0.80], [0.46, 0.76], [0.35, 0.14], [0.0, 0.12]];
@@ -687,7 +688,7 @@ function mistSheet(x, y, z, w, d, alpha, scale, seed, lift) {
       "  float sw = pow(max(dot(dir, uSunDir), 0.0), 14.0);",
       "  float sh = pow(max(dot(normalize(dir.xz), normalize(uSunDir.xz)), 0.0), 5.0);",
       "  vec3 c = mix(uCool * mix(0.8, 1.05, uLift), uGold * 1.2, clamp(sw * 1.1 + sh * 0.3 * uLift + smoothstep(0.45, 0.85, n) * (0.2 + 0.6 * uLift) * (0.35 + sh), 0.0, 1.0));",
-      "  c *= (0.9 + 0.3 * n) * (0.95 + 0.3 * uLift);",
+      "  c *= (0.95 + 0.3 * n) * (1.1 + 0.35 * uLift);",
       "  float f = 1.0 - exp(-uFogD * uFogD * dist * dist);",
       "  c = mix(c, hazeCol(dir), f * 0.85);",
       "  gl_FragColor = vec4(c, a);",
