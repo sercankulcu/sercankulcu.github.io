@@ -999,7 +999,7 @@ excerpt: "A Black Sea beach out of season, drawn pixel by pixel in the browser: 
   }
 
   /* Breaking crests as real strips standing out of the sea: a back slope, a face and a lip. */
-  var LVN = 70;
+  var LVN = 96;
   var LXv = new Float64Array(LVN), LZv = new Float64Array(LVN), LHv = new Float64Array(LVN), LFw = new Float64Array(LVN), LBw = new Float64Array(LVN);
   var CBk = new Float64Array(LVN * 3), CTp = new Float64Array(LVN * 3), CMd = new Float64Array(LVN * 3), CFb = new Float64Array(LVN * 3);
   var _lc = [0, 0, 0];
@@ -1008,12 +1008,15 @@ excerpt: "A Black Sea beach out of season, drawn pixel by pixel in the browser: 
     shadeGround(x, y, z, dx / l, dy / l, dz / l, l, 0, out);
   }
   function lipVertex(v, x, zc, nm) {
-    var wob = wobAt(x), zw = zc - wob, zb = breakAt(x);
+    var wob = wobAt(x);
+    var along = 0.46 * sin(x * 0.075 + nm * 1.7) + 0.20 * sin(x * 0.19 - nm * 0.8);
+    var zw = zc - wob + along, zb = breakAt(x);
     var brk = (zc - zb) * 0.4; brk = brk < 0 ? 0 : (brk > 1 ? 1 : brk);
     var pre = (zc - Z0) / (zb - Z0); pre = pre < 0 ? 0 : (pre > 1 ? 1 : pre);
     var post = (zc - zb) / (-zb); post = post < 0 ? 0 : (post > 1 ? 1 : post);
     var env = (zc - Z0) / 6; env = env > 1 ? 1 : env;
-    var h = (0.12 + 0.95 * pre * pre) * (1 - 0.8 * post) * (0.8 + 0.4 * vn(x * 0.09 + nm * 7.1, nm * 3.3)) * env;
+    var crest = vn(x * 0.055 + nm * 7.1, nm * 3.3);
+    var h = (0.07 + 0.62 * pre * pre) * (1 - 0.76 * post) * (0.58 + 0.52 * crest) * env;
     var turb = vn(x * 0.9 + nm * 5.0, zc * 0.5 + 9.0);
     h *= 1 + 0.3 * brk * (turb - 0.5);
     var fw = h * (0.5 + 1.8 * (1 - brk)), bw = h * 3.2;
@@ -1024,10 +1027,13 @@ excerpt: "A Black Sea beach out of season, drawn pixel by pixel in the browser: 
     groundAt(x, 0, zw, _lc);
     var cr = _lc[0], cg = _lc[1], cb = _lc[2];
     var tr = cr * 1.05 + 12 * sv, tg = cg * 1.05 + 28 * sv, tb = cb * 1.05 + 22 * sv;
-    CTp[o] = tr + (FOAM[0] * fl - tr) * brk; CTp[o + 1] = tg + (FOAM[1] * fl - tg) * brk; CTp[o + 2] = tb + (FOAM[2] * fl - tb) * brk;
-    var mr = cr * 0.8 + 22 * sv, mg = cg * 0.8 + 50 * sv, mb = cb * 0.8 + 40 * sv, bm = brk * 0.95;
+    var broken = (crest - 0.28) / 0.58; broken = broken < 0 ? 0 : (broken > 1 ? 1 : broken);
+    broken = broken * broken * (3 - 2 * broken);
+    var cap = brk * (0.18 + 0.72 * broken);
+    CTp[o] = tr + (FOAM[0] * fl - tr) * cap; CTp[o + 1] = tg + (FOAM[1] * fl - tg) * cap; CTp[o + 2] = tb + (FOAM[2] * fl - tb) * cap;
+    var mr = cr * 0.8 + 22 * sv, mg = cg * 0.8 + 50 * sv, mb = cb * 0.8 + 40 * sv, bm = cap * 0.82;
     CMd[o] = mr + (FOAM[0] * fl * 0.9 - mr) * bm; CMd[o + 1] = mg + (FOAM[1] * fl * 0.9 - mg) * bm; CMd[o + 2] = mb + (FOAM[2] * fl * 0.9 - mb) * bm;
-    var br = cr * 0.45, bg = cg * 0.52, bb = cb * 0.55, bf = brk * 0.75;
+    var br = cr * 0.45, bg = cg * 0.52, bb = cb * 0.55, bf = cap * 0.62;
     CFb[o] = br + (FOAM[0] * fl * 0.8 - br) * bf; CFb[o + 1] = bg + (FOAM[1] * fl * 0.8 - bg) * bf; CFb[o + 2] = bb + (FOAM[2] * fl * 0.8 - bb) * bf;
   }
   var _qp = new Float64Array(12), _qc = new Float64Array(12);
@@ -1047,7 +1053,7 @@ excerpt: "A Black Sea beach out of season, drawn pixel by pixel in the browser: 
       var zc = Z0 + LAM * (sb - n);
       if (zc <= Z0 || zc >= 0.2) continue;
       var nm = ((n % NW) + NW) % NW, cnt = 0, x = -26;
-      while (x < 175 && cnt < LVN) { lipVertex(cnt, x, zc, nm); cnt++; x += 0.9 + abs(x - cxp) * 0.06; }
+      while (x < 175 && cnt < LVN) { lipVertex(cnt, x, zc, nm); cnt++; x += 0.75 + abs(x - cxp) * 0.035; }
       for (var i = 0; i < cnt - 1; i++) {
         var j = i + 1;
         if (LHv[i] < 0.01 && LHv[j] < 0.01) continue;
@@ -1144,6 +1150,7 @@ excerpt: "A Black Sea beach out of season, drawn pixel by pixel in the browser: 
     drawBackground();
     groundShadows();
     drawBirds();
+    A.grade(px, W, H, { exposure: 0.94, saturation: 0.84, shadows: [0, 7, 14, 0.42], focus: [0.66, 0.34, 0.34, 0.46, 0.07, 2] });
     print(fr);
     fctx.putImageData(frame, 0, 0);
   }
