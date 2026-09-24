@@ -205,6 +205,47 @@
   };
 
   /*
+   * A restrained scene grade, applied before palette reduction. It can cool or warm
+   * shadows and gently hold the edges back around a story point. Coordinates and
+   * radii are normalised, so a scene can keep the same composition at any film size.
+   * p: { exposure, saturation, shadows: [r,g,b,strength], focus: [cx,cy,rx,ry,dim,lift] }
+   */
+  A.grade = function (px, W, H, p) {
+    var exposure = p.exposure == null ? 1 : p.exposure;
+    var saturation = p.saturation == null ? 1 : p.saturation;
+    var shadows = p.shadows || [0, 0, 0, 0];
+    var focus = p.focus || null;
+    for (var y = 0; y < H; y++) {
+      var fy = (y + 0.5) / H;
+      for (var x = 0; x < W; x++) {
+        var o = (y * W + x) * 4;
+        var r = px[o], g = px[o + 1], b = px[o + 2];
+        var lum = r * 0.28 + g * 0.58 + b * 0.14;
+        r = lum + (r - lum) * saturation;
+        g = lum + (g - lum) * saturation;
+        b = lum + (b - lum) * saturation;
+        var sk = (1 - lum / 255) * shadows[3];
+        r = r * exposure + shadows[0] * sk;
+        g = g * exposure + shadows[1] * sk;
+        b = b * exposure + shadows[2] * sk;
+        if (focus) {
+          var dx = ((x + 0.5) / W - focus[0]) / focus[2];
+          var dy = (fy - focus[1]) / focus[3];
+          var d2 = dx * dx + dy * dy;
+          var edge = d2 <= 0.5184 ? 0 : Math.min(1, (d2 - 0.5184) / 1.5552);
+          edge = edge * edge * (3 - 2 * edge);
+          var centre = d2 >= 1 ? 0 : 1 - d2;
+          centre *= centre;
+          var m = 1 - edge * focus[4];
+          var lift = centre * focus[5];
+          r = r * m + lift; g = g * m + lift; b = b * m + lift;
+        }
+        px[o] = r; px[o + 1] = g; px[o + 2] = b;
+      }
+    }
+  };
+
+  /*
    * Soft contact shadow for an object whose footprint is the ellipse (rx, rz) on the
    * horizontal plane y = wy, centred on (wx, wz). The shadow spreads to 1.7x the footprint
    * and fades with a smoothstep. Only pixels whose depth matches that plane are darkened,
