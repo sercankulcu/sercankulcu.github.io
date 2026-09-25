@@ -61,7 +61,7 @@ A second, separate set. Where the [pixel scenes](/art/) limit themselves to a ra
   <a class="art-card" href="/art/webgl/sabah-cayi/">
     <img src="/images/art/webgl/sabah-cayi.png" alt="A tulip-shaped glass of tea on a saucer by a sunlit window, rendered in 3D" loading="lazy" width="960" height="540">
     <span class="art-title">Morning Tea</span>
-    <span class="art-meta">A glass of tea by a window above the sea: light through the tea and the glass, window-bar shadows sliding across the table, steam and dust in the sun · three.js · 48 s loop</span>
+    <span class="art-meta">A glass of tea by a window above the sea: light through the tea and the glass, window-bar shadows sliding across the table, lace curtains stirring, a simit on a plate, steam and dust in the sun · three.js · 48 s loop</span>
   </a>
 
   <a class="art-card" href="/art/webgl/yagmurlu-pencere/">
@@ -73,7 +73,7 @@ A second, separate set. Where the [pixel scenes](/art/) limit themselves to a ra
   <a class="art-card" href="/art/webgl/gece-limani/">
     <img src="/images/art/webgl/gece-limani.png" alt="A fishing harbour at night with lamp reflections on calm water and moored wooden boats, rendered in 3D" loading="lazy" width="960" height="540">
     <span class="art-title">Harbour at Night</span>
-    <span class="art-meta">A small Black Sea fishing harbour at night: long rippling reflections of the quay lamps on calm water, wooden boats at their moorings, a green harbour light blinking under a thin moon · three.js · 48 s loop</span>
+    <span class="art-meta">A small Black Sea fishing harbour at night: old houses with jutting upper floors and tiled roofs, long rippling reflections of the quay lamps on calm water, wooden boats at their moorings, a green harbour light blinking under a thin moon · three.js · 48 s loop</span>
   </a>
 
   <a class="art-card" href="/art/webgl/sisli-orman/">
@@ -85,7 +85,7 @@ A second, separate set. Where the [pixel scenes](/art/) limit themselves to a ra
   <a class="art-card" href="/art/webgl/kar-lambasi/">
     <img src="/images/art/webgl/kar-lambasi.png" alt="Snow falling through the light of an old street lamp beside a snowy house with a lit window, rendered in 3D" loading="lazy" width="960" height="540">
     <span class="art-title">Snow Under a Lamp</span>
-    <span class="art-meta">A quiet side street in heavy snow at night: flakes glowing in the warm cone of an old lamp, a car half buried, icicles over a lit window and footprints to the door slowly filling · three.js · 48 s loop</span>
+    <span class="art-meta">A quiet side street in heavy snow at night: flakes glowing in the warm cone of an old lamp and glinting on the ground, snow-laden pines, a car half buried, icicles over a lit window and footprints to the door slowly filling · three.js · 48 s loop</span>
   </a>
 
   <a class="art-card" href="/art/webgl/alacakaranlik-feneri/">
@@ -103,7 +103,7 @@ A second, separate set. Where the [pixel scenes](/art/) limit themselves to a ra
   <a class="art-card" href="/art/webgl/cay-teraslari/">
     <img src="/images/art/webgl/cay-teraslari.png" alt="Rows of tea bushes on terraced hills with mist in the valley at dawn, rendered in 3D" loading="lazy" width="960" height="540">
     <span class="art-title">Tea Terraces</span>
-    <span class="art-meta">Tea terraces in Rize at dawn: thousands of clipped bushes following the contours, mist breathing in the valley and ridge after ridge fading into blue haze as the first sun turns the rows gold · three.js · 48 s loop</span>
+    <span class="art-meta">Tea terraces in Rize at dawn: thousands of clipped bushes following the contours into stream gullies, white farmhouses on the far slope, an old alder framing the view, mist breathing in the valley and ridge after ridge fading into blue haze as the first sun turns the rows gold · three.js · 48 s loop</span>
   </a>
 
   <a class="art-card" href="/art/webgl/findik-serme/">
@@ -115,7 +115,7 @@ A second, separate set. Where the [pixel scenes](/art/) limit themselves to a ra
   <a class="art-card" href="/art/webgl/denizanalari/">
     <img src="/images/art/webgl/denizanalari.png" alt="Moon jellyfish glowing in deep blue water, rendered in 3D" loading="lazy" width="960" height="540">
     <span class="art-title">Jellyfish</span>
-    <span class="art-meta">A small bloom of moon jellyfish in deep blue water: see-through bells glowing at the rim as they pulse, frilly arms and fine tentacles trailing, light shafts and marine snow · three.js · 48 s loop</span>
+    <span class="art-meta">A small bloom of moon jellyfish in deep blue water: sunlight rippling over see-through bells that glow at the rim as they pulse, a far bloom lost in the haze, frilly arms and fine tentacles trailing, light shafts and marine snow · three.js · 48 s loop</span>
   </a>
 
   <a class="art-card" href="/art/webgl/kaynayan-tencere/">
@@ -133,7 +133,7 @@ A second, separate set. Where the [pixel scenes](/art/) limit themselves to a ra
   <a class="art-card" href="/art/webgl/yayla-gecesi/">
     <img src="/images/art/webgl/yayla-gecesi.png" alt="The Milky Way over a plateau with a glowing tent and a campfire, rendered in 3D" loading="lazy" width="960" height="540">
     <span class="art-title">Night on the Plateau</span>
-    <span class="art-meta">A moonless night on a high plateau: the Milky Way over dark ridges, a tent glowing from a lantern inside, a dying campfire and fireflies blinking in the grass · three.js · 48 s loop</span>
+    <span class="art-meta">A moonless night on a high plateau: the Milky Way over dark ridges, a tent glowing from a lantern inside, a teapot on the stones of a dying campfire and fireflies blinking in the grass · three.js · 48 s loop</span>
   </a>
 
   <a class="art-card" href="/art/webgl/avlu-sonbahar/">

@@ -244,7 +244,7 @@ var scene = new THREE.Scene();
 scene.background = new THREE.Color(0x010204);
 scene.fog = new THREE.FogExp2(0x05080f, 0.0065);
 
-var camera = new THREE.PerspectiveCamera(46, 16 / 9, 0.05, 2400);
+var camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.05, 2400);
 var LOOK = new THREE.Vector3(0.6, 0, -14);
 
 function canvasTex(w, h, draw, srgb) {
@@ -267,8 +267,9 @@ function H(x, z) {
   return h;
 }
 FIRE.y = H(FIRE.x, FIRE.z);
-var CAM_Y = H(0, 0) + 1.55;
-LOOK.y = CAM_Y + 1.2;
+var CAM_Z = -2.6;
+var CAM_Y = H(-0.6, CAM_Z) + 1.4;
+LOOK.y = CAM_Y + 0.55;
 
 var grassTex = canvasTex(512, 512, function (g, w, h) {
   g.fillStyle = "#26301c"; g.fillRect(0, 0, w, h);
@@ -362,7 +363,7 @@ var skyMat = new THREE.ShaderMaterial({
     " float c1 = fbm(d * 5.0 + 2.0); float c2 = fbm(d * 17.0 + 7.0); float c3 = fbm(d * 48.0);",
     " float cloud = smoothstep(0.25, 0.85, c1 * 0.65 + c2 * 0.45) * (0.55 + 0.6 * c3);",
     " float mw = band * (0.25 + 1.1 * cloud) + halo * 0.18;",
-    " float lane = exp(-pow((wb - 0.012 - 0.02 * sin(l * 4.0)) / (wid * 0.32), 2.0));",
+    " float lq = (wb - 0.012 - 0.02 * sin(l * 4.0)) / (wid * 0.32); float lane = exp(-lq * lq);",
     " float riftN = smoothstep(0.30, 0.62, fbm(d * 8.0 + 11.0) * 0.8 + fbm(d * 26.0 + 3.0) * 0.35);",
     " mw *= 1.0 - 0.88 * lane * riftN * smoothstep(-1.6, 0.4, l);",
     " float dust = smoothstep(0.52, 0.78, fbm(d * 13.0 + 21.0));",
@@ -370,7 +371,7 @@ var skyMat = new THREE.ShaderMaterial({
     " mw *= 0.45 + 1.5 * core;",
     " vec3 tint = mix(vec3(0.62, 0.70, 0.92), vec3(1.0, 0.84, 0.64), core * 0.9);",
     " col += tint * mw * 0.085;",
-    " float grain = pow(hs(floor(d * 900.0)), 38.0) * band;",
+    " float grain = pow(max(hs(floor(d * 900.0)), 0.0), 38.0) * band;",
     " col += vec3(0.9, 0.92, 1.0) * grain * 0.25;",
     " col *= smoothstep(-0.12, 0.02, alt);",
     " gl_FragColor = vec4(col, 1.0);",
@@ -538,7 +539,7 @@ var halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: haloTex, color: new 
 halo.position.set(0, 0.3, 0); halo.scale.set(1.7, 1.7, 1);
 fire.add(halo);
 
-var fireLight = new THREE.PointLight(0xff7a30, 9, 40, 2);
+var fireLight = new THREE.PointLight(0xff7a30, 9, 40, 1.5);
 fireLight.position.set(FIRE.x, FIRE.y + 0.9, FIRE.z);
 fireLight.castShadow = true;
 fireLight.shadow.mapSize.set(1024, 1024);
@@ -632,6 +633,67 @@ V3.set(0, 0.45, 1.6).applyEuler(tent.rotation).add(TENT);
 lanternLight.position.copy(V3);
 scene.add(lanternLight);
 
+/* ---------- Camp things in the firelight: a sitting log, a sooty teapot on the stones, a stack of wood, a pack by the tent ---------- */
+var barkTex = canvasTex(256, 128, function (g, w, h) {
+  g.fillStyle = "#2a211a"; g.fillRect(0, 0, w, h);
+  for (var i = 0; i < 700; i++) {
+    var l = Math.floor(30 + hash(i + 1500) * 70);
+    g.fillStyle = "rgba(" + l + "," + Math.floor(l * 0.82) + "," + Math.floor(l * 0.66) + ",0.55)";
+    g.fillRect(hash(i + 1501) * w, hash(i + 1502) * h, 6 + hash(i + 1503) * 40, 1 + hash(i + 1504) * 2.5);
+  }
+  for (i = 0; i < 90; i++) { g.fillStyle = "rgba(10,7,5,0.7)"; g.fillRect(hash(i + 1510) * w, hash(i + 1511) * h, 10 + hash(i + 1512) * 50, 1.5); }
+});
+barkTex.wrapS = barkTex.wrapT = THREE.RepeatWrapping;
+var endTex = canvasTex(128, 128, function (g, w, h) {
+  g.fillStyle = "#8a6a48"; g.fillRect(0, 0, w, h);
+  for (var r = 60; r > 2; r -= 4 + hash(r) * 3) { g.strokeStyle = "rgba(70,46,26," + (0.35 + hash(r + 3) * 0.3) + ")"; g.lineWidth = 1.2; g.beginPath(); g.arc(64, 64, r, 0, TAU); g.stroke(); }
+  g.strokeStyle = "rgba(40,26,14,0.7)"; g.lineWidth = 1.5; g.beginPath(); g.moveTo(64, 64); g.lineTo(118, 50); g.stroke();
+  g.strokeStyle = "#2a1e14"; g.lineWidth = 6; g.beginPath(); g.arc(64, 64, 61, 0, TAU); g.stroke();
+});
+barkTex.repeat.set(3, 1);
+var logBark = new THREE.MeshStandardMaterial({ map: barkTex, bumpMap: barkTex, bumpScale: 5, roughness: 0.95 });
+var logEnd = new THREE.MeshStandardMaterial({ map: endTex, roughness: 0.9 });
+function woodLog(r, len, x, y, z, ry, rz) {
+  var m = new THREE.Mesh(new THREE.CylinderGeometry(r, r * 1.04, len, 18, 1), [logBark, logEnd, logEnd]);
+  m.rotation.set(0, ry, Math.PI / 2 + (rz || 0), "YXZ");
+  m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; scene.add(m); return m;
+}
+var SEAT = new THREE.Vector3(-2.55, 0, -9.3);
+woodLog(0.2, 1.8, SEAT.x, H(SEAT.x, SEAT.z) + 0.15, SEAT.z, 1.0, 0.03);
+var WP = new THREE.Vector3(1.35, 0, -7.7), wpy = H(WP.x, WP.z);
+[[0, 0.07, 0], [0.16, 0.07, 0.02], [0.32, 0.07, -0.01], [0.08, 0.2, 0.01], [0.24, 0.2, 0], [0.16, 0.33, 0.02]].forEach(function (L, i) {
+  woodLog(0.07 + hash(i + 1520) * 0.015, 0.62 + hash(i + 1521) * 0.14, WP.x + L[0] * Math.cos(0.4), wpy + L[1], WP.z - L[0] * Math.sin(0.4), 0.4 + Math.PI / 2 + (hash(i + 1522) - 0.5) * 0.15, 0);
+});
+/* The teapot: a lathe-turned body with spout and handle, blackened below and catching the fire on its shoulder. */
+var potMat = new THREE.MeshStandardMaterial({ color: 0x8a8c90, roughness: 0.38, metalness: 0.85 });
+var sootTex = canvasTex(64, 128, function (g, w, h) {
+  var gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, "#1a1714"); gr.addColorStop(0.45, "#2a2622"); gr.addColorStop(0.7, "#8a8c90"); gr.addColorStop(1, "#b0b2b4");
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+});
+potMat.map = sootTex;
+var teapot = new THREE.Group();
+var PK = [[0, 0], [0.09, 0], [0.12, 0.03], [0.13, 0.09], [0.11, 0.15], [0.07, 0.18], [0.065, 0.2], [0.07, 0.21], [0.0, 0.215]];
+var potBody = new THREE.Mesh(new THREE.LatheGeometry(PK.map(function (q) { return new THREE.Vector2(q[0], q[1]); }), 24), potMat);
+teapot.add(potBody);
+var spout = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.022, 0.16, 8), potMat);
+spout.position.set(0.15, 0.12, 0); spout.rotation.z = -0.85; teapot.add(spout);
+var handle = new THREE.Mesh(new THREE.TorusGeometry(0.07, 0.008, 6, 16, Math.PI), potMat);
+handle.position.set(0, 0.215, 0); handle.rotation.y = Math.PI / 2; teapot.add(handle);
+var knob = new THREE.Mesh(new THREE.SphereGeometry(0.015, 8, 6), potMat); knob.position.y = 0.225; teapot.add(knob);
+teapot.children.forEach(function (m) { m.castShadow = true; m.receiveShadow = true; });
+teapot.position.set(FIRE.x + 0.3, FIRE.y + 0.14, FIRE.z + 0.6); teapot.rotation.y = 2.1; teapot.scale.setScalar(1.35);
+scene.add(teapot);
+/* A rucksack leaning by the tent door. */
+var packMat = new THREE.MeshStandardMaterial({ color: 0x3a4a3e, roughness: 0.85 });
+var pack = new THREE.Group();
+var pb = new THREE.Mesh(new THREE.CapsuleGeometry(0.17, 0.3, 4, 12), packMat); pb.scale.set(1, 1, 0.7); pack.add(pb);
+var pl2 = new THREE.Mesh(new THREE.CapsuleGeometry(0.1, 0.12, 4, 10), packMat); pl2.position.set(0, -0.1, 0.14); pl2.scale.set(1.2, 1, 0.7); pack.add(pl2);
+var roll = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.42, 12), new THREE.MeshStandardMaterial({ color: 0x6a3a22, roughness: 0.8 })); roll.rotation.z = Math.PI / 2; roll.position.y = 0.33; pack.add(roll);
+pack.children.forEach(function (m) { m.castShadow = true; m.receiveShadow = true; });
+V3.set(-0.85, 0, 1.75).applyEuler(new THREE.Euler(0, -0.95, 0)).add(TENT);
+pack.position.set(V3.x, H(V3.x, V3.z) + 0.3, V3.z); pack.rotation.set(-0.25, 0.3, 0.1);
+scene.add(pack);
+
 /* ---------- The yayla hut on the crest: stone footing, plank walls, gable roof, chimney ---------- */
 var HUT = new THREE.Vector3(-9.5, 0, -25);
 HUT.y = H(HUT.x, HUT.z);
@@ -658,7 +720,12 @@ var gGeo = new THREE.ExtrudeGeometry(gShape, { depth: 4.18, bevelEnabled: false 
 gGeo.translate(0, 0, -2.09); gGeo.rotateY(Math.PI / 2);
 var gable = new THREE.Mesh(gGeo, woodMat); gable.position.y = 2.8; gable.castShadow = true; hut.add(gable);
 var chim = new THREE.Mesh(new THREE.BoxGeometry(0.4, 1.1, 0.4), stoneMat); chim.position.set(1.3, 3.7, -0.5); hut.add(chim);
-var win = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.45), new THREE.MeshStandardMaterial({ color: 0x050608, roughness: 0.2, metalness: 0.4 }));
+var winTex = canvasTex(64, 64, function (g, w, h) {
+  var gr = g.createRadialGradient(28, 40, 2, 32, 32, 40); gr.addColorStop(0, "#ffd08a"); gr.addColorStop(0.6, "#b8561c"); gr.addColorStop(1, "#4a1c08");
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  g.fillStyle = "#140c06"; g.fillRect(0, 0, w, 4); g.fillRect(0, h - 4, w, 4); g.fillRect(0, 0, 4, h); g.fillRect(w - 4, 0, 4, h); g.fillRect(30, 0, 4, h); g.fillRect(0, 30, w, 4);
+});
+var win = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.45), new THREE.MeshStandardMaterial({ color: 0x050608, roughness: 0.4, emissive: 0xffffff, emissiveMap: winTex, emissiveIntensity: 0.9 }));
 win.position.set(0.7, 1.9, 1.61); hut.add(win);
 var door = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 1.7), new THREE.MeshStandardMaterial({ color: 0x1a130d, roughness: 0.9 }));
 door.position.set(-1.1, 1.5, 1.61); hut.add(door);
@@ -685,7 +752,7 @@ bladeGeo.translate(0, 0.5, 0);
   for (var k = 0; k < p.count; k++) { var y = p.getY(k); p.setX(k, p.getX(k) * (1 - y * 0.92)); p.setZ(k, y * y * 0.12); }
   bladeGeo.computeVertexNormals();
 })();
-var grassMat = new THREE.MeshStandardMaterial({ color: 0x4a5a30, roughness: 0.85, side: THREE.DoubleSide });
+var grassMat = new THREE.MeshStandardMaterial({ color: 0x566838, roughness: 0.85, side: THREE.DoubleSide });
 var grassU = { value: 0 };
 grassMat.onBeforeCompile = function (sh) {
   sh.uniforms.uSway = grassU;
@@ -700,7 +767,7 @@ for (var gi = 0; gi < GRASS_N; gi++) {
     gx = FIRE.x + (hash(gi * 2 + 1 + tries * 7919) - 0.5) * 26;
     gz = -2.5 - Math.pow(hash(gi * 2 + 2 + tries * 7919), 1.3) * 22;
     tries++;
-  } while (tries < 4 && (Math.hypot(gx - FIRE.x, gz - FIRE.z) < 0.85 || Math.hypot(gx - TENT.x, gz - TENT.z) < 1.3));
+  } while (tries < 4 && (Math.hypot(gx - FIRE.x, gz - FIRE.z) < 0.85 || Math.hypot(gx - TENT.x, gz - TENT.z) < 1.3 || Math.hypot(gx - SEAT.x, gz - SEAT.z) < 0.75 || Math.hypot(gx - WP.x - 0.15, gz - WP.z) < 0.45));
   var gh = 0.18 + hash(gi + 3000) * 0.34;
   V3.set(gx, H(gx, gz) - 0.02, gz);
   E3.set((hash(gi + 4000) - 0.5) * 0.4, hash(gi + 5000) * TAU, (hash(gi + 6000) - 0.5) * 0.4); Q4.setFromEuler(E3);
@@ -734,14 +801,18 @@ var bloom = new UnrealBloomPass(new THREE.Vector2(256, 144), 0.5, 0.25, 0.8);
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
 
-scene.add(new THREE.HemisphereLight(0x3a4c78, 0x0a0c0e, 0.22));
+scene.add(new THREE.HemisphereLight(0x3a4c78, 0x0c0e10, 0.34));
+/* Faint starlight from the sky behind the ridges: just enough to pick out the grass tops and the hut's roofline. */
+var starL = new THREE.DirectionalLight(0x5a6e9e, 0.5);
+starL.position.set(8, 14, -30);
+scene.add(starL);
 
 var POLE = new THREE.Vector3(0, Math.sin(0.72), Math.cos(0.72)).normalize();
 var tmpQ = new THREE.Quaternion(), tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3();
 
 function render(t) {
   var u = t / DURATION, w1 = u * TAU;
-  camera.position.set(-0.6 + 0.18 * Math.sin(w1), CAM_Y + 0.05 * Math.sin(w1 * 2), 0.2 * Math.cos(w1));
+  camera.position.set(-0.6 + 0.18 * Math.sin(w1), CAM_Y + 0.05 * Math.sin(w1 * 2), CAM_Z + 0.2 * Math.cos(w1));
   camera.lookAt(LOOK.x + 0.12 * Math.sin(w1), LOOK.y + 0.06 * Math.cos(w1), LOOK.z);
 
   skyGroup.quaternion.setFromAxisAngle(POLE, 0.012 * Math.sin(w1));

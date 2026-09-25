@@ -302,6 +302,78 @@ var puffTex = canvasTex(128, 128, function (g, w, h) {
   g.fillStyle = gr; g.fillRect(0, 0, w, h);
 });
 
+/* Lime plaster: soft trowel clouds, fine grit, a few hairline cracks; used as colour and a faint bump. */
+var plasterTex = canvasTex(1024, 1024, function (g, w, h) {
+  g.fillStyle = "#d6c9b3"; g.fillRect(0, 0, w, h);
+  var i;
+  for (i = 0; i < 160; i++) {
+    var px = hash(i + 300) * w, py = hash(i + 310) * h, r = 30 + hash(i + 320) * 150, dark = hash(i + 330) > 0.5;
+    var rg = g.createRadialGradient(px, py, 1, px, py, r);
+    rg.addColorStop(0, dark ? "rgba(128,106,80,0.045)" : "rgba(250,242,226,0.09)"); rg.addColorStop(1, "rgba(0,0,0,0)");
+    for (var ox = -1; ox <= 1; ox++) for (var oy = -1; oy <= 1; oy++) { g.fillStyle = rg; g.save(); g.translate(ox * w, oy * h); g.fillRect(px - r, py - r, r * 2, r * 2); g.restore(); }
+  }
+  for (i = 0; i < 22; i++) {
+    var sx = hash(i + 700) * w, sy = hash(i + 710) * h, sa = (hash(i + 720) - 0.5) * 0.8;
+    g.strokeStyle = "rgba(255,248,232,0.06)"; g.lineWidth = 18 + hash(i + 730) * 30;
+    g.beginPath(); g.moveTo(sx, sy); g.quadraticCurveTo(sx + 90, sy + 40 * sa, sx + 200, sy + 60 * sa); g.stroke();
+  }
+  for (i = 0; i < 26000; i++) {
+    var v = hash(i * 1.37 + 5);
+    g.fillStyle = v > 0.5 ? "rgba(96,80,60," + (0.03 + hash(i + 9) * 0.07).toFixed(3) + ")" : "rgba(255,250,238," + (0.03 + hash(i + 11) * 0.07).toFixed(3) + ")";
+    g.fillRect(hash(i * 2.11 + 1) * w, hash(i * 3.07 + 2) * h, 1 + hash(i + 13) * 2, 1 + hash(i + 17) * 2);
+  }
+  g.strokeStyle = "rgba(90,74,56,0.18)"; g.lineWidth = 1;
+  for (var c = 0; c < 3; c++) {
+    var x = hash(c + 900) * w, y = hash(c + 910) * h * 0.8; g.beginPath(); g.moveTo(x, y);
+    for (var s = 0; s < 10; s++) { x += (hash(c * 20 + s + 920) - 0.5) * 26; y += 6 + hash(c * 20 + s + 940) * 12; g.lineTo(x, y); }
+    g.stroke();
+  }
+});
+plasterTex.wrapS = plasterTex.wrapT = THREE.RepeatWrapping;
+/* Box faces get UVs from world position so the plaster runs on without seams around the window opening. */
+function worldUV(geo, sc) {
+  var p = geo.attributes.position, n = geo.attributes.normal, uv = geo.attributes.uv;
+  for (var k = 0; k < p.count; k++) {
+    var nx = Math.abs(n.getX(k)), ny = Math.abs(n.getY(k));
+    if (nx > 0.5) uv.setXY(k, p.getZ(k) * sc, p.getY(k) * sc);
+    else if (ny > 0.5) uv.setXY(k, p.getX(k) * sc, p.getZ(k) * sc);
+    else uv.setXY(k, p.getX(k) * sc, p.getY(k) * sc);
+  }
+  return geo;
+}
+
+/* Machine lace for the curtains: a fine net with scattered flowers and a scalloped hem (white = thread). */
+var laceTex = canvasTex(256, 512, function (g, w, h) {
+  g.fillStyle = "#000"; g.fillRect(0, 0, w, h);
+  g.strokeStyle = "rgba(255,255,255,0.55)"; g.lineWidth = 1;
+  for (var d = -h; d < w + h; d += 5) { g.beginPath(); g.moveTo(d, 0); g.lineTo(d + h * 0.6, h); g.stroke(); g.beginPath(); g.moveTo(d, 0); g.lineTo(d - h * 0.6, h); g.stroke(); }
+  g.fillStyle = "rgba(255,255,255,0.9)"; g.strokeStyle = "rgba(255,255,255,0.8)"; g.lineWidth = 1.2;
+  for (var r = 0; r < 13; r++) for (var q = 0; q < 5; q++) {
+    var fx = (q + 0.5 + (r % 2) * 0.5) * w / 5 + (hash(r * 7 + q) - 0.5) * 8, fy = 20 + r * 34 + (hash(r * 5 + q + 50) - 0.5) * 8;
+    for (var pt = 0; pt < 5; pt++) { var a = pt / 5 * TAU + r; g.beginPath(); g.ellipse(fx + Math.cos(a) * 4.5, fy + Math.sin(a) * 4.5, 3.6, 1.8, a, 0, TAU); g.fill(); }
+    g.beginPath(); g.moveTo(fx, fy + 5); g.quadraticCurveTo(fx + 6, fy + 12, fx + 2, fy + 17); g.stroke();
+  }
+  for (var v = 0; v < 2; v++) { g.fillRect(0, h - 58 + v * 8, w, 2); }
+  g.fillRect(0, h - 38, w, 8);
+  for (var sx = 0; sx < w; sx += 21.333) { g.beginPath(); g.arc(sx + 10.67, h - 30, 10.67, 0, Math.PI); g.fill(); }
+  g.fillStyle = "#000";
+  for (sx = 0; sx < w; sx += 21.333) { g.beginPath(); g.arc(sx + 10.67, h - 28, 5, 0, Math.PI); g.fill(); }
+  g.fillRect(0, h - 18, w, 18);
+  g.fillStyle = "#fff"; g.fillRect(0, 0, w, 8);
+}, false);
+
+/* Simit crust: toasted brown with sesame seeds. */
+var simitTex = canvasTex(512, 128, function (g, w, h) {
+  var gr = g.createLinearGradient(0, 0, 0, h);
+  gr.addColorStop(0, "#8a4a1c"); gr.addColorStop(0.3, "#b0662a"); gr.addColorStop(0.55, "#c98a48"); gr.addColorStop(0.8, "#a45d26"); gr.addColorStop(1, "#8a4a1c");
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  for (var i = 0; i < 900; i++) {
+    var x = hash(i + 1200) * w, y = hash(i + 1300) * h, a = hash(i + 1400) * Math.PI;
+    g.fillStyle = hash(i + 1500) > 0.25 ? "rgba(246,226,176,0.95)" : "rgba(196,150,90,0.9)";
+    g.beginPath(); g.ellipse(x, y, 3.2, 1.6, a, 0, TAU); g.fill();
+  }
+});
+
 function add(mesh, cast, receive) { mesh.castShadow = !!cast; mesh.receiveShadow = !!receive; scene.add(mesh); return mesh; }
 
 /* Room: table, back wall with a window opening, the view, frame bars that throw shadows. */
@@ -310,27 +382,25 @@ var table = add(new THREE.Mesh(new THREE.BoxGeometry(6, 0.12, 3.4),
 table.position.set(0, -0.06, 0.3);
 
 var WALL_Z = -1.55, WIN_X0 = -1.9, WIN_X1 = 0.9, WIN_Y0 = 0.35, WIN_Y1 = 2.1;
-var plaster = new THREE.MeshStandardMaterial({ color: 0xcdbfa8, roughness: 0.92 });
+var plaster = new THREE.MeshStandardMaterial({ color: 0xf4efe6, map: plasterTex, bumpMap: plasterTex, bumpScale: 0.45, roughness: 0.93 });
 function wall(x0, y0, x1, y1) {
-  var m = add(new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, 0.12), plaster), false, true);
-  m.position.set((x0 + x1) / 2, (y0 + y1) / 2, WALL_Z);
+  add(new THREE.Mesh(worldUV(new THREE.BoxGeometry(x1 - x0, y1 - y0, 0.12).translate((x0 + x1) / 2, (y0 + y1) / 2, WALL_Z), 0.42), plaster), false, true);
 }
 wall(-9, -0.2, WIN_X0, 3.6); wall(WIN_X1, -0.2, 9, 3.6); wall(WIN_X0, -0.2, WIN_X1, WIN_Y0); wall(WIN_X0, WIN_Y1, WIN_X1, 3.6);
-var side = add(new THREE.Mesh(new THREE.BoxGeometry(0.12, 3.8, 8), plaster), false, true);
-side.position.set(-3.2, 1.7, 2.4);
+add(new THREE.Mesh(worldUV(new THREE.BoxGeometry(0.12, 3.8, 8).translate(-3.2, 1.7, 2.4), 0.42), plaster), false, true);
 var view = new THREE.Mesh(new THREE.PlaneGeometry(6.4, 3.6), new THREE.MeshBasicMaterial({ map: viewTex }));
 view.position.set(-0.4, 1.35, WALL_Z - 2.2);
 scene.add(view);
 var frameMat = new THREE.MeshStandardMaterial({ color: 0xece6da, roughness: 0.6 });
 function bar(x0, y0, x1, y1) {
-  var m = add(new THREE.Mesh(new THREE.BoxGeometry(Math.max(0.05, x1 - x0), Math.max(0.05, y1 - y0), 0.09), frameMat), true, true);
+  var m = add(new THREE.Mesh(new RoundedBoxGeometry(Math.max(0.05, x1 - x0), Math.max(0.05, y1 - y0), 0.09, 2, 0.014), frameMat), true, true);
   m.position.set((x0 + x1) / 2, (y0 + y1) / 2, WALL_Z + 0.02);
 }
 bar(WIN_X0, WIN_Y0, WIN_X1, WIN_Y0 + 0.07); bar(WIN_X0, WIN_Y1 - 0.07, WIN_X1, WIN_Y1);
 bar(WIN_X0, WIN_Y0, WIN_X0 + 0.07, WIN_Y1); bar(WIN_X1 - 0.07, WIN_Y0, WIN_X1, WIN_Y1);
 bar((WIN_X0 + WIN_X1) / 2 - 0.03, WIN_Y0, (WIN_X0 + WIN_X1) / 2 + 0.03, WIN_Y1);
 bar(WIN_X0, 1.32, WIN_X1, 1.37);
-var sill = add(new THREE.Mesh(new THREE.BoxGeometry(WIN_X1 - WIN_X0 + 0.3, 0.05, 0.34), frameMat), true, true);
+var sill = add(new THREE.Mesh(new RoundedBoxGeometry(WIN_X1 - WIN_X0 + 0.3, 0.05, 0.34, 2, 0.015), frameMat), true, true);
 sill.position.set((WIN_X0 + WIN_X1) / 2, WIN_Y0 - 0.02, WALL_Z + 0.14);
 
 /* A geranium on the sill, its leaves as soft clumps. */
@@ -352,6 +422,64 @@ for (var bi = 0; bi < 18; bi++) {
   var ca = Math.floor(bi / 6), ba = hash(bi + 20) * TAU;
   fl.position.set(-1.43 + ca * 0.08 + Math.cos(ba) * 0.03, WIN_Y0 + 0.47 + ca * 0.02 + hash(bi + 21) * 0.03, WALL_Z + 0.13 + Math.sin(ba) * 0.03);
 }
+
+/* Lace curtains drawn to either side of the window, lit from behind by the morning, stirring in a draught. */
+var laceMat = new THREE.MeshStandardMaterial({ color: 0xfbf6ec, alphaMap: laceTex, transparent: true, depthWrite: false, side: THREE.DoubleSide, roughness: 0.85, emissive: 0xffdcaa, emissiveIntensity: 0.34 });
+var CURT = [], CUR_TOP = 2.26, CUR_BOT = 0.40;
+function curtain(x0, x1, pleats, ph) {
+  var geo = new THREE.PlaneGeometry(x1 - x0, CUR_TOP - CUR_BOT, 24, 30);
+  geo.translate((x0 + x1) / 2, (CUR_TOP + CUR_BOT) / 2, WALL_Z + 0.10);
+  var m = add(new THREE.Mesh(geo, laceMat), false, false);
+  m.renderOrder = 1;
+  CURT.push({ geo: geo, base: Float32Array.from(geo.attributes.position.array), x0: x0, w: x1 - x0, n: pleats, ph: ph });
+}
+curtain(-2.08, -1.56, 5, 0.0);
+curtain(0.44, 1.04, 6, 2.1);
+function updCurtains(u) {
+  for (var c = 0; c < CURT.length; c++) {
+    var C = CURT[c], P = C.geo.attributes.position.array, B = C.base;
+    for (var k = 0; k < P.length; k += 3) {
+      var xn = (B[k] - C.x0) / C.w, s = (CUR_TOP - B[k + 1]) / (CUR_TOP - CUR_BOT);
+      var pl = Math.sin(xn * TAU * C.n) * (0.026 - 0.008 * s);
+      var sway = s * s * (0.030 * Math.sin(u * TAU * 2 + C.ph + xn * 1.8) + 0.012 * Math.sin(u * TAU * 5 + C.ph * 1.7 + xn * 5.0 + s * 3.0));
+      P[k] = B[k] - pl * 0.35 + 0.012 * s * s * Math.sin(u * TAU * 3 + C.ph);
+      P[k + 1] = B[k + 1];
+      P[k + 2] = B[k + 2] + pl + sway;
+    }
+    C.geo.attributes.position.needsUpdate = true;
+    C.geo.computeVertexNormals();
+  }
+}
+var brass = new THREE.MeshStandardMaterial({ color: 0xc9a35a, metalness: 1, roughness: 0.35 });
+var rod = add(new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 3.4, 10), brass), true, false);
+rod.rotation.z = Math.PI / 2; rod.position.set(-0.5, CUR_TOP + 0.02, WALL_Z + 0.10);
+
+/* A small shelf on the wall: a copper cezve and two jars, pepper flakes and honey. */
+var shelfWood = woodTex.clone(); shelfWood.needsUpdate = true; shelfWood.repeat.set(0.4, 0.1);
+var shelfMat = new THREE.MeshStandardMaterial({ map: shelfWood, color: 0xe8d2b8, roughness: 0.6 });
+var SHX = -2.55, SHY = 0.86;
+var shelf = add(new THREE.Mesh(new RoundedBoxGeometry(0.8, 0.035, 0.17, 2, 0.008), shelfMat), true, true);
+shelf.position.set(SHX, SHY, WALL_Z + 0.145);
+[-0.3, 0.3].forEach(function (o) {
+  var br = add(new THREE.Mesh(new RoundedBoxGeometry(0.018, 0.1, 0.1, 1, 0.004), shelfMat), true, true);
+  br.position.set(SHX + o, SHY - 0.065, WALL_Z + 0.11);
+});
+var copper = new THREE.MeshStandardMaterial({ color: 0xc57848, metalness: 1, roughness: 0.32 });
+var CZ = [[0, 0], [0.036, 0], [0.042, 0.008], [0.036, 0.06], [0.034, 0.075], [0.045, 0.095], [0.041, 0.097], [0.029, 0.075], [0.03, 0.06], [0.034, 0.012], [0, 0.012]];
+var cezve = add(new THREE.Mesh(new THREE.LatheGeometry(CZ.map(function (q) { return new THREE.Vector2(q[0], q[1]); }), 28), copper), true, true);
+cezve.position.set(SHX - 0.22, SHY + 0.0175, WALL_Z + 0.15);
+var czh = add(new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.008, 0.012), brass), true, false);
+czh.position.set(SHX - 0.22 + 0.095, SHY + 0.0175 + 0.09, WALL_Z + 0.15); czh.rotation.z = 0.35;
+var jarGlass = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.05, transparent: true, opacity: 0.22, clearcoat: 1, depthWrite: false });
+[[0.02, 0x9c2e14, 0.9, 0x2f5f3a], [0.14, 0xd08a1e, 0.25, 0xb8322a]].forEach(function (j) {
+  var jx = SHX + j[0], jy = SHY + 0.0175;
+  var fillJ = add(new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.034, 0.07, 20), new THREE.MeshStandardMaterial({ color: j[1], roughness: j[2] })), true, true);
+  fillJ.position.set(jx, jy + 0.037, WALL_Z + 0.15);
+  var jar = add(new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.105, 24), jarGlass), false, false);
+  jar.position.set(jx, jy + 0.053, WALL_Z + 0.15); jar.renderOrder = 2;
+  var lid = add(new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.02, 24), new THREE.MeshStandardMaterial({ color: j[3], roughness: 0.45, metalness: 0.3 })), true, true);
+  lid.position.set(jx, jy + 0.115, WALL_Z + 0.15);
+});
 
 /* The tulip glass: one closed lathe, outer wall up to the rim and inner wall back down. */
 var OUT = [[0.0, 0.0], [0.20, 0.0], [0.215, 0.015], [0.19, 0.05], [0.155, 0.17], [0.135, 0.29], [0.145, 0.37], [0.185, 0.51], [0.212, 0.64], [0.218, 0.72]];
@@ -379,7 +507,7 @@ var TEA_TOP = 0.58;
 for (var y = 0.05; y < TEA_TOP; y += 0.02) tea.push(new THREE.Vector2(innerR(y), y));
 tea.push(new THREE.Vector2(innerR(TEA_TOP), TEA_TOP)); tea.push(new THREE.Vector2(0, TEA_TOP));
 tea.unshift(new THREE.Vector2(0, 0.05));
-var teaMat = new THREE.MeshPhysicalMaterial({ color: 0xffe0c0, roughness: 0.04, transmission: 1, thickness: 0.30, ior: 1.34, attenuationColor: 0xd2521a, attenuationDistance: 0.26, emissive: 0x9a3208, emissiveIntensity: 0.0 });
+var teaMat = new THREE.MeshPhysicalMaterial({ color: 0xffe0c0, roughness: 0.14, transmission: 1, thickness: 0.16, ior: 1.34, attenuationColor: 0xc8461a, attenuationDistance: 0.11, emissive: 0x9a3208, emissiveIntensity: 0.0 });
 var teaMesh = add(new THREE.Mesh(new THREE.LatheGeometry(tea, 48), teaMat), true, false);
 teaMesh.position.y = 0.022;
 
@@ -403,6 +531,45 @@ var s1 = add(new THREE.Mesh(new RoundedBoxGeometry(0.075, 0.075, 0.075, 2, 0.01)
 s1.position.set(-0.62, 0.0375, 0.38); s1.rotation.y = 0.4;
 var s2 = add(new THREE.Mesh(new RoundedBoxGeometry(0.075, 0.075, 0.075, 2, 0.01), sugarMat), true, true);
 s2.position.set(-0.54, 0.0375, 0.47); s2.rotation.y = -0.3;
+
+/* Breakfast on a small plate behind: a twisted simit, a slab of white cheese, three olives; crumbs and sesame on the wood. */
+var PL_X = -1.02, PL_Z = -0.42;
+var plate = add(new THREE.Mesh(new THREE.LatheGeometry(sp, 64), porcelain), true, true);
+plate.position.set(PL_X, 0, PL_Z); plate.scale.set(0.66, 1, 0.66);
+var simitGeo = new THREE.TorusGeometry(0.12, 0.038, 22, 80);
+(function () {
+  var p = simitGeo.attributes.position;
+  for (var k = 0; k < p.count; k++) {
+    var x = p.getX(k), y = p.getY(k), z = p.getZ(k), th = Math.atan2(y, x), cx = Math.cos(th) * 0.12, cy = Math.sin(th) * 0.12;
+    var dx = x - cx, dy = y - cy, rr = dx * Math.cos(th) + dy * Math.sin(th), ph = Math.atan2(z, rr);
+    var f = 1 + 0.16 * Math.sin(2 * ph + 10 * th);
+    p.setXYZ(k, cx + dx * f, cy + dy * f, z * f * 0.82);
+  }
+  simitGeo.computeVertexNormals();
+})();
+var simit = add(new THREE.Mesh(simitGeo, new THREE.MeshStandardMaterial({ map: simitTex, bumpMap: simitTex, bumpScale: 1.2, roughness: 0.62 })), true, true);
+simit.rotation.set(Math.PI / 2, 0, 0.6); simit.position.set(PL_X + 0.03, 0.022 + 0.032, PL_Z - 0.02);
+var cheese = add(new THREE.Mesh(new RoundedBoxGeometry(0.085, 0.028, 0.06, 2, 0.006), new THREE.MeshStandardMaterial({ color: 0xf6f3ea, roughness: 0.75 })), true, true);
+cheese.position.set(PL_X + 0.02, 0.022 + 0.014, PL_Z + 0.02); cheese.rotation.y = 0.5;
+var oliveMat = new THREE.MeshPhysicalMaterial({ color: 0x1d1a16, roughness: 0.28, clearcoat: 0.8, clearcoatRoughness: 0.2 });
+[[0.1, 0.12], [0.135, 0.07], [0.075, 0.155]].forEach(function (o, k) {
+  var ol = add(new THREE.Mesh(new THREE.SphereGeometry(0.014, 14, 10), oliveMat), true, true);
+  ol.position.set(PL_X + o[0], 0.028 + 0.011, PL_Z + o[1]); ol.scale.set(1, 0.85, 1.35); ol.rotation.y = k * 1.3;
+});
+var CRUMB_N = 34, crumbs = new THREE.InstancedMesh(new THREE.DodecahedronGeometry(0.006, 0), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 }), CRUMB_N);
+(function () {
+  var m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), s = new THREE.Vector3(), c = new THREE.Color();
+  for (var k = 0; k < CRUMB_N; k++) {
+    var a = hash(k + 2000) * TAU, r = 0.2 + Math.pow(hash(k + 2010), 0.7) * 0.28, seedK = k % 3 === 0;
+    var sz = seedK ? 0.55 : 0.5 + hash(k + 2020) * 1.0;
+    v.set(PL_X + 0.1 + Math.cos(a) * r, 0.003, PL_Z + 0.08 + Math.sin(a) * r * 0.7);
+    e.set(hash(k + 2030) * 3, hash(k + 2040) * 3, 0); q.setFromEuler(e);
+    s.set(sz * (seedK ? 1.6 : 1), sz * (seedK ? 0.5 : 0.7), sz * (seedK ? 0.8 : 1));
+    m.compose(v, q, s); crumbs.setMatrixAt(k, m);
+    crumbs.setColorAt(k, c.set(seedK ? 0xf2dfb0 : (hash(k + 2050) > 0.5 ? 0xb8702e : 0xd9a866)));
+  }
+})();
+crumbs.castShadow = true; crumbs.receiveShadow = true; scene.add(crumbs);
 
 /* Light: low morning sun through the window, a cool fill from the room. */
 var sunL = new THREE.DirectionalLight(0xffd6a0, 3.4);
@@ -442,6 +609,7 @@ function render(t) {
   teaMat.emissiveIntensity = 0.06 + 0.06 * (0.5 + 0.5 * sw);
   camera.position.set(1.55 + 0.10 * Math.sin(u * TAU), 1.02 + 0.03 * Math.sin(u * TAU * 2), 2.35 - 0.12 * Math.cos(u * TAU));
   camera.lookAt(LOOK);
+  updCurtains(u);
   for (var k = 0; k < STEAM.length; k++) {
     var S = STEAM[k], p = frac(S.h + u * S.k);
     var rise = p * 0.95;

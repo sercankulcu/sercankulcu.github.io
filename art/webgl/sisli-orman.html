@@ -254,6 +254,7 @@ function groundY(x, z) {
   var h = 0.34 * Math.sin(x * 0.23 + 1.3) * Math.cos(z * 0.19) + 0.17 * Math.sin(x * 0.61 + z * 0.47) + 0.09 * Math.cos(x * 1.1 - z * 0.8);
   var d = Math.abs(x - pathX(z)), k = smooth(0.5, 2.4, d);
   h = h * (0.3 + 0.7 * k) - 0.07 * (1 - k);
+  h += (0.07 * Math.sin(x * 2.1 + z * 1.3) * Math.sin(z * 2.7 - x * 0.9) + 0.035 * Math.sin(x * 4.3 - z * 3.7) + 0.02 * Math.sin(x * 7.9 + z * 6.1)) * (0.35 + 0.65 * k);
   h += Math.max(0, -x - 3) * 0.16 + Math.max(0, x - 7) * 0.06;
   return h;
 }
@@ -295,6 +296,21 @@ function barkDraw(kind) {
         g.beginPath(); g.ellipse(x, y, 4 + rnd() * 12, 3 + rnd() * 8, 0, 0, TAU); g.fill();
       }
       for (i = 0; i < 180; i++) { g.fillStyle = "rgba(50,52,48,0.35)"; g.fillRect(rnd() * w, rnd() * h, 6 + rnd() * 20, 1.2); }
+      for (i = 0; i < 40; i++) {
+        x = hash(5037 + i * 7.31) * w; y = hash(5074 + i * 7.31) * h * 0.85; var cw = 6 + hash(5111 + i * 7.31) * 14;
+        g.strokeStyle = "rgba(46,46,40,0.45)"; g.lineWidth = 1.2 + hash(5148 + i * 7.31) * 1.6;
+        g.beginPath(); g.moveTo(x - cw, y + cw * 0.5); g.quadraticCurveTo(x, y - cw * 0.2, x + cw, y + cw * 0.5); g.stroke();
+        g.fillStyle = "rgba(48,46,40,0.55)"; g.beginPath(); g.ellipse(x, y + cw * 0.12, cw * 0.18, cw * 0.1, 0, 0, TAU); g.fill();
+      }
+      for (i = 0; i < 26; i++) {
+        x = hash(5185 + i * 7.31) * w; var sw = 3 + hash(5222 + i * 7.31) * 8;
+        var vg = g.createLinearGradient(x - sw, 0, x + sw, 0);
+        vg.addColorStop(0, "rgba(40,50,40,0)"); vg.addColorStop(0.5, "rgba(40,54,40," + (0.1 + hash(5259 + i * 7.31) * 0.16) + ")"); vg.addColorStop(1, "rgba(40,50,40,0)");
+        g.fillStyle = vg; g.fillRect(x - sw, 0, sw * 2, h);
+      }
+      var alg = g.createLinearGradient(0, 0, w, 0);
+      alg.addColorStop(0, "rgba(84,110,60,0)"); alg.addColorStop(0.25, "rgba(84,110,60,0.28)"); alg.addColorStop(0.45, "rgba(84,110,60,0)");
+      g.fillStyle = alg; g.fillRect(0, h * 0.35, w, h * 0.65);
     }
     var mg = g.createLinearGradient(0, h, 0, h * 0.86);
     mg.addColorStop(0, "rgba(58,84,30,0.95)"); mg.addColorStop(0.5, "rgba(70,96,36,0.55)"); mg.addColorStop(1, "rgba(70,96,36,0)");
@@ -360,11 +376,19 @@ var detailTex = canvasTex(512, 512, function (g, w, h) {
 detailTex.wrapS = detailTex.wrapT = THREE.RepeatWrapping;
 detailTex.repeat.set(40, 54);
 
-var groundGeo = new THREE.PlaneGeometry(GW, GD, 170, 230);
+/* The grid is packed densely around the viewer and loosens with distance; UVs stay in world space for the drawn floor. */
+var groundGeo = new THREE.PlaneGeometry(GW, GD, 220, 300);
 groundGeo.rotateX(-Math.PI / 2);
 groundGeo.translate((GX0 + GX1) / 2, 0, (GZ0 + GZ1) / 2);
-var gp = groundGeo.attributes.position;
-for (var gi = 0; gi < gp.count; gi++) gp.setY(gi, groundY(gp.getX(gi), gp.getZ(gi)));
+var gp = groundGeo.attributes.position, guv = groundGeo.attributes.uv, GXC = 1.0;
+for (var gi = 0; gi < gp.count; gi++) {
+  var gx = gp.getX(gi), gzq = (GZ1 - gp.getZ(gi)) / GD;
+  var gside = gx < GXC ? GXC - GX0 : GX1 - GXC, gdx = (gx - GXC) / gside;
+  gx = GXC + Math.sign(gdx) * Math.pow(Math.abs(gdx), 1.45) * gside;
+  var gz = GZ1 - GD * Math.pow(gzq, 1.6);
+  gp.setXYZ(gi, gx, groundY(gx, gz), gz);
+  guv.setXY(gi, (gx - GX0) / GW, 1 - (gz - GZ0) / GD);
+}
 groundGeo.computeVertexNormals();
 var ground = new THREE.Mesh(groundGeo, new THREE.MeshStandardMaterial({ map: groundTex, bumpMap: detailTex, bumpScale: 1.2, roughness: 0.95 }));
 ground.receiveShadow = true;
@@ -413,39 +437,88 @@ for (var tt = 0; tt < 6000 && trees.length < 400; tt++) {
   tryTree(tx, tz, kind, kind === 0 ? 0.2 + rnd() * 0.32 : 0.18 + rnd() * 0.26, kind === 0 ? 24 + rnd() * 10 : 20 + rnd() * 8, false);
 }
 
-function trunkGeo(top) {
-  var geo = new THREE.CylinderGeometry(top, 1, 1, 16, 14);
+/* Trunk shapes: a few variants per species with a pistol-grip curve at the foot, a slow bend, root buttresses and bark ridges in the geometry itself. */
+function trunkGeo(top, kind, vs) {
+  var geo = new THREE.CylinderGeometry(top, 1, 1, 18, 28);
   geo.translate(0, 0.5, 0);
   var p = geo.attributes.position;
+  var grip = (hash(vs + 3) - 0.5) * 1.6, bend = (hash(vs + 4) - 0.5) * 2.4, bdir = hash(vs + 5) * TAU, sd = hash(vs + 6) * 10;
+  var nb = kind === 0 ? 5 : 6;
   for (var i = 0; i < p.count; i++) {
-    var y = Math.pow(p.getY(i), 2.2), x = p.getX(i), z = p.getZ(i), a = Math.atan2(z, x);
-    var yr = y; x *= (1 - (1 - top) * yr) / (1 - (1 - top) * p.getY(i)); z *= (1 - (1 - top) * yr) / (1 - (1 - top) * p.getY(i));
-    var f = 1 + 0.9 * Math.exp(-y * 55) * (0.7 + 0.3 * Math.cos(a * 5));
-    f *= 1 + 0.03 * Math.sin(a * 3 + y * 40);
-    p.setX(i, x * f); p.setZ(i, z * f); p.setY(i, y * 1.0 - 0.012);
+    var y0 = p.getY(i), y = Math.pow(y0, 2.2), x = p.getX(i), z = p.getZ(i), a = Math.atan2(z, x);
+    var sc = (1 - (1 - top) * y) / (1 - (1 - top) * y0); x *= sc; z *= sc;
+    var but = Math.exp(-y * (kind === 0 ? 55 : 38)) * (kind === 0 ? 0.9 : 1.25);
+    var lobe = 0.55 + 0.45 * Math.cos(a * nb + sd + 0.6 * Math.sin(a * 2 + sd));
+    var f = 1 + but * lobe * lobe;
+    if (kind === 0) f *= 1 + 0.05 * Math.sin(a * 9 + sd + 1.4 * Math.sin(y * 90 + a * 2)) + 0.025 * Math.sin(a * 21 + y * 260);
+    else f *= 1 + 0.018 * Math.sin(a * 4 + y * 30 + sd) + 0.01 * Math.sin(a * 7 - y * 70);
+    var off = grip * (1 - Math.exp(-y * 16)) + bend * y * y + 0.12 * Math.sin(y * 11 + sd) * y;
+    p.setX(i, x * f + Math.cos(bdir) * off); p.setZ(i, z * f + Math.sin(bdir) * off); p.setY(i, y - 0.012);
   }
   geo.computeVertexNormals();
   return geo;
 }
 var M4 = new THREE.Matrix4(), Q = new THREE.Quaternion(), V = new THREE.Vector3(), SC = new THREE.Vector3(), EU = new THREE.Euler(), COL = new THREE.Color();
 var trunkMats = [
-  new THREE.MeshStandardMaterial({ map: spruceBark, bumpMap: spruceBark, bumpScale: 2.0, roughness: 0.92 }),
-  new THREE.MeshStandardMaterial({ map: beechBark, bumpMap: beechBark, bumpScale: 0.6, roughness: 0.78 })
+  new THREE.MeshStandardMaterial({ map: spruceBark, bumpMap: spruceBark, bumpScale: 3.0, roughness: 0.92 }),
+  new THREE.MeshStandardMaterial({ map: beechBark, bumpMap: beechBark, bumpScale: 1.4, roughness: 0.74 })
 ];
-var trunkMesh = [];
+var trunkMesh = [], TV = 3;
 [0, 1].forEach(function (kind) {
-  var list = trees.filter(function (t) { return t.kind === kind; });
-  var im = new THREE.InstancedMesh(trunkGeo(kind === 0 ? 0.3 : 0.42), trunkMats[kind], list.length);
-  list.forEach(function (t, i) {
-    EU.set((hash(i + kind * 500) - 0.5) * 0.03, hash(i + 77) * TAU, (hash(i + 99) - 0.5) * 0.03);
-    Q.setFromEuler(EU);
-    M4.compose(V.set(t.x, t.y - 0.15, t.z), Q, SC.set(t.r, t.H, t.r));
+  for (var vr = 0; vr < TV; vr++) {
+    var list = trees.filter(function (t, n) { return t.kind === kind && Math.floor(hash(n * 7 + 1) * TV) === vr; });
+    if (!list.length) continue;
+    var im = new THREE.InstancedMesh(trunkGeo(kind === 0 ? 0.3 : 0.42, kind, kind * 10 + vr), trunkMats[kind], list.length);
+    list.forEach(function (t, i) {
+      var hs = t.x * 3.1 + t.z * 7.7;
+      EU.set((hash(hs) - 0.5) * 0.03, hash(hs + 77) * TAU, (hash(hs + 99) - 0.5) * 0.03);
+      Q.setFromEuler(EU);
+      M4.compose(V.set(t.x, t.y - 0.15, t.z), Q, SC.set(t.r, t.H, t.r));
+      im.setMatrixAt(i, M4);
+      var v = 0.72 + hash(hs * 3 + kind) * 0.4;
+      im.setColorAt(i, COL.setRGB(v, v * (0.96 + hash(hs + 5) * 0.08), v * (0.92 + hash(hs + 6) * 0.1)));
+    });
+    im.castShadow = true; im.receiveShadow = true;
+    scene.add(im); trunkMesh.push(im);
+  }
+});
+
+/* Surface roots running out from the nearer trunks and sinking into the litter. */
+var rootGeo = new THREE.CylinderGeometry(0.12, 1, 1, 8, 6);
+rootGeo.translate(0, 0.5, 0);
+(function () {
+  var p = rootGeo.attributes.position;
+  for (var i = 0; i < p.count; i++) { var y = p.getY(i); p.setX(i, p.getX(i) + 0.35 * Math.sin(y * 5.0) * y); p.setZ(i, p.getZ(i) * 0.7); }
+  rootGeo.rotateZ(-Math.PI / 2);
+  rootGeo.computeVertexNormals();
+})();
+var ROOTS = [];
+trees.forEach(function (t, n) {
+  if (Math.hypot(t.x - CAM_X, t.z - CAM_Z) > 32) return;
+  var nr = t.kind === 0 ? 5 : 6;
+  for (var k = 0; k < nr; k++) {
+    var a = (k / nr) * TAU + hash(n * 5 + k + 60) * 0.8, len = t.r * (2.6 + hash(n + k * 3 + 61) * 2.2);
+    ROOTS.push([t.x + Math.cos(a) * t.r * 0.55, t.z + Math.sin(a) * t.r * 0.55, a, len, t.r * (0.34 + hash(n * 3 + k + 62) * 0.14), t.kind, n * 9 + k]);
+  }
+});
+var rootMats = trunkMats.map(function (m) {
+  var c = m.clone(); c.map = m.map.clone(); c.map.repeat.set(1, 0.1); c.map.needsUpdate = true; c.bumpMap = c.map; return c;
+});
+[0, 1].forEach(function (kind) {
+  var list = ROOTS.filter(function (r) { return r[5] === kind; });
+  if (!list.length) return;
+  var im = new THREE.InstancedMesh(rootGeo, rootMats[kind], list.length);
+  list.forEach(function (r, i) {
+    var gx = r[0] + Math.cos(r[2]) * r[3], gz = r[1] + Math.sin(r[2]) * r[3];
+    var y0 = groundY(r[0], r[1]) + r[4] * 0.35, y1 = groundY(gx, gz) - r[4] * 0.5;
+    EU.set(0, -r[2], Math.atan2(y1 - y0, r[3]), "YZX"); Q.setFromEuler(EU);
+    M4.compose(V.set(r[0], y0, r[1]), Q, SC.set(r[3], r[4], r[4]));
     im.setMatrixAt(i, M4);
-    var v = 0.72 + hash(i * 3 + kind) * 0.4;
-    im.setColorAt(i, COL.setRGB(v, v * (0.96 + hash(i + 5) * 0.08), v * (0.92 + hash(i + 6) * 0.1)));
+    var v = 0.7 + hash(r[6]) * 0.3;
+    im.setColorAt(i, COL.setRGB(v, v, v * 0.95));
   });
   im.castShadow = true; im.receiveShadow = true;
-  scene.add(im); trunkMesh.push(im);
+  scene.add(im);
 });
 
 /* Canopy: layered, ragged spruce tiers and loose beech crowns, with gaps left where the shafts come through. */
@@ -694,8 +767,12 @@ sunL.shadow.bias = -0.0006; sunL.shadow.normalBias = 0.04;
 sunL.position.copy(LIGHT_AT).addScaledVector(SUN, 70);
 sunL.target.position.copy(LIGHT_AT);
 scene.add(sunL); scene.add(sunL.target);
-var hemi = new THREE.HemisphereLight(0xb4c6c4, 0x3a4428, 1.25);
+var hemi = new THREE.HemisphereLight(0xb4c6c4, 0x3a4428, 0.95);
 scene.add(hemi);
+/* Skylight scattered back through the mist from behind the viewer: it models the trunks' shaded sides so they read round, not flat. */
+var fillL = new THREE.DirectionalLight(0xc2cfc8, 0.85);
+fillL.position.set(9, 7, 22); fillL.target.position.set(0, 1, -6);
+scene.add(fillL); scene.add(fillL.target);
 
 /* The glow of the sun itself behind the trees. */
 var glowTex = canvasTex(256, 256, function (g, w, h) {
