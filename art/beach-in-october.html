@@ -741,7 +741,7 @@ excerpt: "A Black Sea beach out of season, drawn pixel by pixel in the browser: 
   var CONC = [150, 148, 140], POLE = [176, 172, 162], CREAM = [228, 216, 190];
   var RED = [212, 82, 64], BLUE = [72, 122, 178], OCHRE = [216, 154, 74];
   var TWHITE = [214, 210, 198], TRED = [182, 72, 58], WOOD = [132, 102, 74], ROOF = [120, 70, 60];
-  var TARP = [92, 124, 114], ROPE = [190, 180, 150], LNG = [226, 224, 216], SLAT = [168, 128, 90];
+  var ROPE = [190, 180, 150], LNG = [226, 224, 216], SLAT = [168, 128, 90];
   var PAINT = [204, 200, 184], SHUT = [150, 156, 160], SIGN = [70, 112, 152], WALL = [162, 160, 152];
 
   var UMB = [];
@@ -846,30 +846,41 @@ excerpt: "A Black Sea beach out of season, drawn pixel by pixel in the browser: 
   }
 
   var STX = 12.3, STZ = 5.1;
-  function tarpStack() {
-    var cx = STX, cz = STZ, gy = BS * cz, hx = 1.05, hz = 0.42, i, j;
-    for (i = 0; i < 3; i++) box(cx - hx + 0.06, gy + 0.03 + i * 0.075, cz - hz + 0.05, cx + hx - 0.06, gy + 0.075 + i * 0.075, cz + hz - 0.05, SLAT, -0.03 * i);
-    function top(a, b) { return gy + 1.02 + 0.05 * sin(a * 2.3 + b * 1.7) - 0.04 * (b * b) + (hash(a * 13 + b * 7 + 3) - 0.5) * 0.05; }
-    var bx0 = cx - hx - 0.06, bx1 = cx + hx + 0.06, bz0 = cz - hz - 0.06, bz1 = cz + hz + 0.06, yb = gy + 0.24;
-    for (i = 0; i < 4; i++) {
-      var xa = cx - hx + i * hx / 2, xb = xa + hx / 2, ia = -1 + i * 0.5, ib = ia + 0.5;
-      for (j = 0; j < 2; j++) {
-        var za = cz - hz + j * hz, zb = za + hz, ja = -1 + j, jb = ja + 1;
-        Q(xa, top(ia, ja), za, xb, top(ib, ja), za, xb, top(ib, jb), zb, xa, top(ia, jb), zb, TARP, (j - 0.5) * 0.3, 1, 0, (hash(i * 5 + j) - 0.5) * 0.1);
+  /* An upturned fishing boat hauled up for the winter: antifouling red on the bottom, white topsides, a blue sheer strake on the sand. */
+  var BOATA = 0.55, HULL = [206, 200, 184], KEEL = [150, 64, 50], STRAKE = [62, 104, 150];
+  function boat() {
+    var cx = STX, cz = STZ, gy = BS * cz, L = 1.95, B = 0.80, D = 0.66, NS = 9, NT = 8, i, k;
+    var ca = Math.cos(BOATA), sa = Math.sin(BOATA);
+    function pt(s, th, out) {
+      var e = s < 0 ? 0.82 + 0.18 * (1 - s * s) : Math.sqrt(1 - Math.pow(s, 2.4));
+      var d = D * (0.9 + 0.1 * (1 - s * s)) + (s > 0 ? 0.10 * s * s * s : 0.04 * s * s);
+      var c = Math.cos(th), sn = Math.sin(th);
+      var lx = s * L, lz = B * e * c * (1 - 0.18 * sn * sn);
+      out[0] = cx + lx * ca - lz * sa; out[1] = gy + 0.03 + d * sn; out[2] = cz + lx * sa + lz * ca;
+    }
+    var P0 = [0, 0, 0], P1 = [0, 0, 0], P2 = [0, 0, 0], P3 = [0, 0, 0];
+    for (i = 0; i < NS; i++) {
+      var s0 = -1 + 2 * i / NS, s1 = -1 + 2 * (i + 1) / NS;
+      if (s1 > 0.999) s1 = 0.999;
+      for (k = 0; k < NT; k++) {
+        var t0 = k / NT * Math.PI, t1 = (k + 1) / NT * Math.PI;
+        pt(s0, t0, P0); pt(s1, t0, P1); pt(s1, t1, P2); pt(s0, t1, P3);
+        var ux = P2[0] - P0[0], uy = P2[1] - P0[1], uz = P2[2] - P0[2], vx = P3[0] - P1[0], vy = P3[1] - P1[1], vz = P3[2] - P1[2];
+        var nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+        var mx = (P0[0] + P2[0]) * 0.5 - cx, my = (P0[1] + P2[1]) * 0.5 - gy, mz = (P0[2] + P2[2]) * 0.5 - cz;
+        if (nx * mx * 0.2 + ny * my + nz * mz < 0) { nx = -nx; ny = -ny; nz = -nz; }
+        var band = (k === 0 || k === NT - 1) ? STRAKE : ((k >= 2 && k <= 5) ? KEEL : HULL);
+        if ((k === 1 || k === 6) && (i & 1)) band = [HULL[0] * 0.94, HULL[1] * 0.94, HULL[2] * 0.93];
+        Q(P0[0], P0[1], P0[2], P1[0], P1[1], P1[2], P2[0], P2[1], P2[2], P3[0], P3[1], P3[2], band, nx, ny, nz, (hash(i * 7 + k) - 0.5) * 0.06);
       }
-      var xc0 = bx0 + (bx1 - bx0) * i / 4, xc1 = bx0 + (bx1 - bx0) * (i + 1) / 4;
-      Q(xc0, yb, bz0, xc1, yb, bz0, xb, top(ib, -1), cz - hz, xa, top(ia, -1), cz - hz, TARP, 0, 0.12, -1, (hash(i + 20) - 0.5) * 0.12);
-      Q(xc1, yb, bz1, xc0, yb, bz1, xa, top(ia, 1), cz + hz, xb, top(ib, 1), cz + hz, TARP, 0, 0.12, 1, (hash(i + 30) - 0.5) * 0.12);
     }
-    Q(bx0, yb, bz1, bx0, yb, bz0, cx - hx, top(-1, -1), cz - hz, cx - hx, top(-1, 1), cz + hz, TARP, -1, 0.12, 0, 0);
-    Q(bx1, yb, bz0, bx1, yb, bz1, cx + hx, top(1, 1), cz + hz, cx + hx, top(1, -1), cz - hz, TARP, 1, 0.12, 0, 0);
-    for (i = 0; i < 2; i++) {
-      var rx = cx - 0.5 + i;
-      box(rx - 0.025, top(-0.5 + i, 0) + 0.005, cz - hz, rx + 0.025, top(-0.5 + i, 0) + 0.03, cz + hz, ROPE, 0);
-      Q(rx - 0.025, yb, bz1 + 0.01, rx + 0.025, yb, bz1 + 0.01, rx + 0.025, top(-0.5 + i, 1), cz + hz + 0.01, rx - 0.025, top(-0.5 + i, 1), cz + hz + 0.01, ROPE, 0, 0.1, 1, 0);
-      Q(rx + 0.025, yb, bz0 - 0.01, rx - 0.025, yb, bz0 - 0.01, rx - 0.025, top(-0.5 + i, -1), cz - hz - 0.01, rx + 0.025, top(-0.5 + i, -1), cz - hz - 0.01, ROPE, 0, 0.1, -1, 0);
+    for (k = 0; k < NT; k++) {
+      pt(-1, k / NT * Math.PI, P0); pt(-1, (k + 1) / NT * Math.PI, P1);
+      Q(cx - L * ca, gy + 0.03, cz - L * sa, P0[0], P0[1], P0[2], P1[0], P1[1], P1[2], cx - L * ca, gy + 0.03, cz - L * sa, [128, 96, 68], -ca, 0.1, -sa, 0);
     }
-    SHB.push([cx - hx, gy, cz - hz, cx + hx, gy + 1.05, cz + hz]);
+    beam(cx - (L + 0.02) * ca, gy + D * 0.94 + 0.04, cz - (L + 0.02) * sa, cx + L * 0.98 * ca, gy + D + 0.14, cz + L * 0.98 * sa, 0.07, [120, 60, 46], 0);
+    var ex = L * 0.6 * Math.abs(ca) + B * 0.5 * Math.abs(sa), ez = L * 0.6 * Math.abs(sa) + B * 0.5 * Math.abs(ca);
+    SHB.push([cx - ex, gy, cz - ez, cx + ex, gy + D * 0.9, cz + ez]);
   }
 
   function loungerStack(cx, cz, n) {
@@ -896,7 +907,7 @@ excerpt: "A Black Sea beach out of season, drawn pixel by pixel in the browser: 
     umbrella(14.0, 8.2, RED, CREAM, 40);
     tower();
     kiosk();
-    tarpStack();
+    boat();
     loungerStack(30.0, 7.8, 5);
     for (z = 2.6; z < 8.7; z += 0.3) {
       var ya = BS * z + 0.05, yb2 = BS * (z + 0.22) + 0.05, jj = (hash(z * 7.1) - 0.5) * 0.16;
@@ -993,11 +1004,6 @@ excerpt: "A Black Sea beach out of season, drawn pixel by pixel in the browser: 
       dq(hx, ya, hz, hx + cos(ang) * fw, ya + 0.08 + 0.06 * sin(ph + 0.7), hz + sin(ang) * fw,
          hx + cos(ang2) * fw * 0.8, yb - 0.05, hz + sin(ang2) * fw * 0.8, hx, yb, hz, M[2], sv, 0.3);
     }
-    var tx0 = STX + 1.0, tz0 = STZ - 0.48, tyb = BS * STZ + 0.24, svt = sunAt(STX, 1, STZ);
-    var th = 0.7 + 0.55 * sin(u * TAU * 150) * (0.4 + 0.6 * GUST);
-    dq(tx0 - 0.45, tyb + 0.02, tz0, tx0 + 0.1, tyb + 0.02, tz0,
-       tx0 + 0.1 + sin(th) * 0.12, tyb - cos(th) * 0.3 + 0.3, tz0 - sin(th) * 0.3,
-       tx0 - 0.45, tyb + 0.3 * (1 - cos(th)) * 0.5, tz0 - sin(th) * 0.18, TARP, svt, 0.2);
   }
 
   /* Breaking crests as real strips standing out of the sea: a back slope, a face and a lip. */
@@ -1125,9 +1131,9 @@ excerpt: "A Black Sea beach out of season, drawn pixel by pixel in the browser: 
   var PRINT = { vig: 0.15, grain: 0.065, grainOff: 0.5, dither: 0.72 };
   var BLOOM = { threshold: 222, strength: 0.42, radius: 3, tint: [1, 0.95, 0.85] };
   var CAM = { pos: camPos, F: camF, R: camR, U: camU, tanH: tanH, aspect: aspect };
-  /* Contact shadows on the sand under the stacks, the kiosk, the tower legs and the umbrella weights. */
+  /* Contact shadows on the sand under the boat and the stack, the kiosk, the tower legs and the umbrella weights. */
   function groundShadows() {
-    A.shadow(px, zbuf, W, H, CAM, STX, BS * STZ, STZ, 1.15, 0.5, 0.35);
+    A.shadow(px, zbuf, W, H, CAM, STX, BS * STZ, STZ, 1.7, 1.5, 0.4);
     A.shadow(px, zbuf, W, H, CAM, 30.0, BS * 7.8, 7.8, 1.0, 0.4, 0.35);
     A.shadow(px, zbuf, W, H, CAM, KX, KGY, KZ, 1.9, 1.4, 0.3);
     for (var i = 0; i < 4; i++) A.shadow(px, zbuf, W, H, CAM, TX + ((i & 1) ? 0.95 : -0.95), TGY, TZ + ((i & 2) ? 0.95 : -0.95), 0.14, 0.14, 0.4);

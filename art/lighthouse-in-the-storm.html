@@ -247,14 +247,14 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
   var BASE_Y = 8.4;
   var LAMP_Y = 26.6;
 
-  /* Fitted to the scene's own pre-print colours (k-means anchored on the original ramps). */
+  /* Fitted to the scene's own pre-print colours (k-means), plus hand-kept highlights. */
   var PALETTE = [
-    "#05080a", "#111518", "#1b2126", "#242c31", "#1f272c", "#2d353a", "#353e43", "#454d52",
-    "#535d61", "#5f696d", "#6b767b", "#8ea1a6", "#a2b2b5", "#b6c3c5", "#cbd4d5", "#dfe5e4",
-    "#f3f5f3", "#31393e", "#40484c", "#586266", "#656f73", "#7c8688", "#8b9495", "#a0adaf",
-    "#4e575b", "#737d7f", "#989f9c", "#bdc2bf", "#e3e6e1", "#4e2a25", "#703129", "#923b31",
-    "#b4463a", "#6b5320", "#89723e", "#a6915b", "#c3b07a", "#e1cf98", "#fdeeb5", "#171d20",
-    "#293035", "#3b4348", "#495257"
+    "#02070e", "#060b13", "#0a1016", "#0e141a", "#12181e", "#151c22", "#191f25", "#1c2228",
+    "#1f252a", "#21282e", "#272a2d", "#242c32", "#262e35", "#2b3135", "#293239", "#2d353a",
+    "#502b29", "#2f383d", "#313b41", "#373c3e", "#343e45", "#374147", "#39444a", "#3e4445",
+    "#3c474e", "#404a50", "#434e55", "#494e4d", "#475359", "#4d585d", "#535e62", "#626154",
+    "#5b6467", "#616b6e", "#6b7273", "#868066", "#7a8281", "#9c9880", "#bbb28d", "#e6dcad",
+    "#7a3028", "#a8443a", "#8ea1a6", "#a9b6b8", "#cbd4d5", "#f3f5f3", "#ffd978", "#fff1c4"
   ].map(hex);
 
   var LUT = A.lut(PALETTE);
@@ -264,8 +264,8 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
   var zbuf = FILM.zbuf;
 
 
-  var FOG = [58, 70, 78];
-  var FOGD = 0.0115;
+  var FOG = [40, 50, 58];
+  var FOGD = 0.0085;
   var FOGLUT = new Float32Array(1024);
   for (var fi = 0; fi < 1024; fi++) FOGLUT[fi] = 1 - Math.exp(-(fi * 0.45) * FOGD);
   function fogAt(d) { var i = d * 2.2222; return i >= 1023 ? 1 : FOGLUT[i | 0]; }
@@ -279,10 +279,10 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
     var u = t / DURATION;
     var ease = 0.5 - 0.5 * Math.cos(u * TAU);
     camPos[0] = -9.2;
-    camPos[1] = 6.55;
-    camPos[2] = 62.0 - 5.0 * ease;
-    var yaw = 0.145;
-    var pitch = 0.055;
+    camPos[1] = 5.2;
+    camPos[2] = 50.0 - 4.0 * ease;
+    var yaw = 0.105;
+    var pitch = 0.16;
     var cp = Math.cos(pitch);
     camF[0] = Math.sin(yaw) * cp; camF[1] = Math.sin(pitch); camF[2] = -Math.cos(yaw) * cp;
     camR[0] = Math.cos(yaw); camR[1] = 0; camR[2] = Math.sin(yaw);
@@ -293,7 +293,7 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
     camU[0] /= l; camU[1] /= l; camU[2] /= l;
   }
 
-  var ZEN = [26, 33, 40], HAZE = [120, 133, 138], BREAK = [196, 199, 190];
+  var ZEN = [12, 17, 24], HAZE = [70, 84, 92], BREAK = [168, 176, 170];
 
   function skyInto(dx, dy, dz, out, u, detail) {
     var k = dy * 1.9; k = k < 0 ? 0 : (k > 1 ? 1 : k);
@@ -309,8 +309,10 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
       var az = Math.atan2(dx, -dz);
       var c1 = Math.sin(az * 3.1 + dy * 9.0 + u * TAU * 2);
       var c2 = Math.sin(az * 6.7 - dy * 15.0 - u * TAU * 3 + 1.4);
-      var amt = (c1 * 0.6 + c2 * 0.4) * (1 - brk) * 13 * (0.35 + e * 0.9);
-      r -= amt; g -= amt * 0.9; b -= amt * 0.7;
+      var c3 = Math.sin(az * 1.7 - dy * 5.0 + u * TAU + 0.6);
+      var amt = (c1 * 0.45 + c2 * 0.3 + c3 * 0.5) * (1 - brk) * 17 * (0.45 + e * 0.8);
+      if (amt < 0) amt *= 1.4;
+      r -= amt; g -= amt * 0.92; b -= amt * 0.8;
     }
     out[0] = r; out[1] = g; out[2] = b;
   }
@@ -333,6 +335,10 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
     for (var w = 0; w < SWELL.length; w++) ph.push(TAU * SWELL[w][4] * u);
     var cph = crashPhase(u);
     var burst = Math.exp(-Math.pow((cph - 0.16) / 0.10, 2));
+    /* How squarely the lamp faces the camera drives its glitter path on the water. */
+    var bAng = u * TAU * BEAM_TURNS, toCam = Math.atan2(camPos[0], camPos[2]);
+    var bDiff = ((bAng - toCam) % TAU + TAU + Math.PI) % TAU - Math.PI;
+    var glint = 60 + 420 * Math.exp(-(bDiff * bDiff) / 0.08);
 
     var invW = 1 / W, invH = 1 / H;
     for (var y = 0; y < H; y++) {
@@ -385,14 +391,22 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
             fres = fres * fres; fres = 0.05 + 0.95 * fres * fres;
             if (fres > 1) fres = 1;
 
-            var lift = 0.5 + hh * 1.35;
-            var deep = 24 + lift * 14;
+            var lift = 0.5 + hh * 1.1;
+            var deep = 10 + lift * 26;
             r = deep * 0.62 + _sk2[0] * fres;
             g = deep * 0.84 + _sk2[1] * fres;
             b = deep * 0.95 + _sk2[2] * fres;
             r *= (1 - fres * 0.55); g *= (1 - fres * 0.55); b *= (1 - fres * 0.55);
 
-            var cap = (slope - 0.37) * 2.9;
+            var lx = -wx, lz = -wz, ll = 1 / Math.sqrt(lx * lx + LAMP_Y * LAMP_Y + lz * lz);
+            var sp = (rx * lx + ry * LAMP_Y + rz * lz) * ll;
+            if (sp > 0.9) {
+              sp = (sp - 0.9) * 10; sp *= sp; sp *= sp;
+              var gl = sp * glint;
+              r += gl; g += gl * 0.86; b += gl * 0.56;
+            }
+
+            var cap = (slope - 0.33) * 2.9;
             if (cap > 0) {
               if (cap > 1) cap = 1;
               cap *= 0.55 + 0.45 * Math.sin(wx * 2.7 + wz * 1.9 + u * TAU * SWELL_CYCLES);
@@ -566,7 +580,8 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
     return [base[0] * k, base[1] * k, base[2] * k];
   }
 
-  var ROCK = [78, 88, 92], ROCK_D = [52, 60, 64], WEED = [34, 46, 41];
+  var ROCK = [56, 64, 70], ROCK_D = [36, 42, 48], WEED = [26, 38, 36];
+
   var TOWER = [196, 202, 199], TOWER_D = [128, 136, 138], BAND = [150, 60, 48];
   var IRON = [44, 52, 56], GLASS = [70, 82, 84];
 
@@ -598,9 +613,9 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
   }
 
   /* Faceted boulder from y0 (under water) to y1: base, waist, shoulder, lumpy cap. */
-  var RINGS = [[0, 1.0], [0.72, 0.92], [1.0, 0.52]];
+  var RINGS = [[0, 1.0], [0.42, 1.04], [0.74, 0.84], [1.0, 0.46]];
   function boulder(m, x, z, rx, rz, y0, y1, seed, base, cap) {
-    var N = 6, rot = hh(seed * 3.1) * TAU, ring = [], r, i, j;
+    var N = 7, rot = hh(seed * 3.1) * TAU, ring = [], r, i, j;
     var hgt = y1 - y0;
     for (r = 0; r < RINGS.length; r++) {
       var pts = [];
@@ -638,7 +653,7 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
       var a = (i / count) * TAU + (h1 - 0.5) * 0.42;
       var rad = rMin + (rMax - rMin) * h2;
       var hgt = hMin + (hMax - hMin) * h3;
-      var w = 1.3 + h1 * 2.5, d = 1.2 + h3 * 2.3;
+      var w = 1.9 + h1 * 2.8, d = 1.8 + h3 * 2.5;
       var x = Math.sin(a) * rad, z = Math.cos(a) * rad;
       boulder(m, x, z, w, d, -2.4, hgt, (i + seed) * 7.3, h2 > 0.5 ? ROCK : ROCK_D, hgt < 1.3 ? WEED : null);
     }
@@ -673,10 +688,10 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
   (function buildIsland() {
     var m = world, i;
 
-    crag(m, 26, 8.6, 14.8, 0.4, 6.6, 3.1);
-    crag(m, 20, 4.9, 9.1, 2.6, 9.6, 11.7);
+    crag(m, 26, 8.6, 14.8, 0.3, 3.4, 3.1);
+    crag(m, 20, 4.9, 9.1, 2.2, 6.4, 11.7);
     crag(m, 13, 2.4, 5.6, 5.2, BASE_Y - 0.3, 5.9);
-    crag(m, 5, 10.5, 15.5, 5.5, 10.5, 41.7);
+    crag(m, 5, 10.5, 15.5, 1.8, 4.6, 41.7);
     drum(m, 0.15, 0.15, -2.2, BASE_Y, 6.6, 5.6, ROCK, 0.01, true);
     crag(m, 9, 4.2, 6.4, 0.2, 1.4, 21.3);
 
@@ -711,7 +726,7 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
   function drawBeam(t) {
     var u = t / DURATION;
     var ang = u * TAU * BEAM_TURNS;
-    var SEG = 9, SPREAD = 0.085, R = 150;
+    var SEG = 9, SPREAD = 0.095, R = 240;
     var sheets = [-0.030, -0.010, 0.010, 0.030];
     var lift = [0.30, 0.62, 0.62, 0.30];
     for (var s = 0; s < sheets.length; s++) {
@@ -724,8 +739,10 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
         beamPts[0] = 0; beamPts[1] = LAMP_Y; beamPts[2] = 0;
         beamPts[3] = Math.sin(a0) * R; beamPts[4] = LAMP_Y + pitch * R; beamPts[5] = Math.cos(a0) * R;
         beamPts[6] = Math.sin(a1) * R; beamPts[7] = LAMP_Y + pitch * R; beamPts[8] = Math.cos(a1) * R;
-        beamInt[0] = 0.40 * lift[s] * edge;
-        beamInt[1] = 0; beamInt[2] = 0;
+        beamInt[0] = 0.70 * lift[s] * edge;
+        beamInt[1] = 0.22 * lift[s] * edge; beamInt[2] = beamInt[1];
+
+
         addPoly(beamPts, 3, beamInt, 255, 226, 150);
       }
     }
@@ -834,7 +851,8 @@ excerpt: "A lighthouse on a rock through a Black Sea storm, drawn pixel by pixel
     }
   }
 
-  var PRINT = { vig: 0.25, grain: 0.085, grainOff: 0.68, dither: 0.75 };
+  var PRINT = { vig: 0.25, grain: 0.045, grainOff: 0.38, dither: 0.6 };
+
   var BLOOM = { threshold: 205, strength: 0.35, radius: 3, tint: [1, 0.97, 0.92] };
   var CAM = { pos: camPos, F: camF, R: camR, U: camU, tanH: tanH, aspect: aspect };
 

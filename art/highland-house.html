@@ -302,6 +302,8 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
     var v = -x - 6; if (v > 0) h -= 0.7 * v * v / (v + 4);
     var r = x - 13; if (r > 0) h += 0.25 * r * r / (r + 6);
     h += 0.32 * Math.sin(x * 0.61 + z * 0.27) * Math.sin(z * 0.47 - x * 0.21);
+    var bz = z - 8.5;
+    if (bz > 0) { var bx = Math.abs(x + 4.4); h += 9.4 * smooth(0, 4.2, bz) * (1 - smooth(6, 13, bx)); }
     return h;
   }
   var HB = rawH(HCX, HCZ);
@@ -550,7 +552,7 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
 
   (function buildTerrain() {
     var xs = [], zs = [], x, z, i, j;
-    for (z = 16; z > -75; z -= (z > 3 ? 1.6 : (z > -12 ? 1.0 : 1.2 + (-12 - z) * 0.14))) zs.push(z);
+    for (z = 20.4; z > -75; z -= (z > 9 ? 0.8 : z > 3 ? 1.6 :(z > -12 ? 1.0 : 1.2 + (-12 - z) * 0.14))) zs.push(z);
     var left = [], right = [];
     for (x = 1; x > -85; x -= (x > -6 ? 1.0 : 1.4 + (-6 - x) * 0.16)) left.push(x);
     for (x = 2; x < 110; x += (x < 10 ? 1.0 : 1.4 + (x - 10) * 0.16)) right.push(x);
@@ -575,7 +577,7 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
     for (j = 0; j < nzs - 1; j++) for (i = 0; i < nxs - 1; i++) {
       var a = j * nxs + i, b = a + 1, c = a + nxs + 1, d = a + nxs;
       var ang = Math.atan2(P[a * 3] - REF[0], REF[2] - P[a * 3 + 2]);
-      if (ang < -0.66 || ang > 1.15 || P[a * 3 + 2] > REF[2] - 4) continue;
+      if (P[a * 3 + 2] > REF[2] - 5 ? Math.abs(P[a * 3] - REF[0]) > 11 : (ang < -0.66 || ang > 1.15)) continue;
       world.quadG(P[a * 3], P[a * 3 + 1], P[a * 3 + 2], P[b * 3], P[b * 3 + 1], P[b * 3 + 2],
                   P[c * 3], P[c * 3 + 1], P[c * 3 + 2], P[d * 3], P[d * 3 + 1], P[d * 3 + 2], C[a], C[b], C[c], C[d]);
     }
@@ -710,10 +712,62 @@ excerpt: "A wooden house on a Black Sea highland at dusk, drawn pixel by pixel i
   }
   (function buildTrees() {
     for (var i = 0; i < TREES.length; i++) fir(world, TREES[i][0], TREES[i][1], TREES[i][2], TREES[i][3], i * 19 + 3);
-    var R = [[-1.2, 14.2, 0.55], [2.6, 12.8, 0.4], [-6.8, 11.5, 0.5], [6.5, -1.0, 0.45]];
-    for (var j = 0; j < R.length; j++) {
-      var x = R[j][0], z = R[j][1], s = R[j][2], g = hAt(x, z);
-      box(world, x - s, g - 0.3, z - s * 0.8, x + s, g + s * 0.9, z + s * 0.8, [102, 100, 98], 0.03, [118, 116, 110]);
+    var R = [[-0.9, 11.6, 0.42], [-1.5, 11.2, 0.22], [2.6, 12.8, 0.4], [-7.4, 12.2, 0.5], [6.5, -1.0, 0.45]];
+    for (var j = 0; j < R.length; j++) boulder(world, R[j][0], R[j][1], R[j][2], j * 7 + 1);
+  })();
+
+  /* A weathered boulder: three jittered rings closing to a rounded top. */
+  function boulder(m, x, z, s, seed) {
+    var g = hAt(x, z) - 0.15, N = 7, RG = [[1.0, 0], [0.92, 0.42], [0.58, 0.78], [0.0, 0.9]], i, k;
+    var ROCK = [104, 102, 100];
+    for (k = 0; k < 3; k++) for (i = 0; i < N; i++) {
+      var a0 = (i + 0.3 * hash(seed + k)) / N * TAU, a1 = (i + 1 + 0.3 * hash(seed + k)) / N * TAU;
+      var j0 = 0.8 + 0.4 * hash(seed * 3 + i), j1 = 0.8 + 0.4 * hash(seed * 3 + (i + 1) % N);
+      var ra = RG[k][0] * s * 1.2, rb = RG[k + 1][0] * s * 1.2, ya = g + RG[k][1] * s * 1.4, yb = g + RG[k + 1][1] * s * 1.4;
+      var sh = 0.85 + 0.3 * hash(seed * 5 + i * 3 + k);
+      quadN(m, [ROCK[0] * sh, ROCK[1] * sh, ROCK[2] * sh], 0.02,
+            x + Math.cos(a0) * ra * j0, ya, z + Math.sin(a0) * ra * j0 * 0.8, x + Math.cos(a1) * ra * j1, ya, z + Math.sin(a1) * ra * j1 * 0.8,
+            x + Math.cos(a1) * rb * j1, yb, z + Math.sin(a1) * rb * j1 * 0.8, x + Math.cos(a0) * rb * j0, yb, z + Math.sin(a0) * rb * j0 * 0.8);
+    }
+  }
+
+  /* The brow the view stands on: tussocks of autumn grass, and an old fence that follows the path down into the fog. */
+  (function buildBrow() {
+    var m = world, i, k;
+    var TUFT_D = [50, 62, 36], TUFT_L = [150, 132, 84];
+    for (i = 0; i < 420; i++) {
+      var x = -9.5 + hash(i * 3.1 + 0.5) * 11, z = 8.6 + hash(i * 5.7 + 0.2) * 8.6;
+      if (hash(i * 1.9 + 7) > 0.35 + 0.65 * (1 - smooth(12.0, 16.0, z))) continue;
+      if (pathDist(x, z) < 0.45) continue;
+      var g = hAt(x, z) - 0.03, ht = 0.16 + 0.26 * hash(i * 2.3 + 4), nb = 3 + ((hash(i * 4.1) * 3) | 0);
+      for (k = 0; k < nb; k++) {
+        var a = hash(i * 7.3 + k * 1.7) * TAU, w = 0.022, lean = 0.06 + 0.12 * hash(i + k * 3.3);
+        var bx = x + Math.cos(a) * 0.06, bz = z + Math.sin(a) * 0.06, tx = bx + Math.cos(a) * lean - 0.08, tz = bz + Math.sin(a) * lean;
+        var cx = Math.sin(a) * w, cz = -Math.cos(a) * w, th = g + ht * (0.75 + 0.35 * hash(i * 9 + k));
+        var top = hash(i * 11 + k) > 0.5 ? TUFT_L : [TUFT_L[0] * 0.8, TUFT_L[1] * 0.82, TUFT_L[2] * 0.7];
+        m.quadG(bx - cx, g, bz - cz, bx + cx, g, bz + cz, tx, th, tz, tx, th, tz,
+                litAt(TUFT_D, 0, 1, 0, bx, g, bz, 0), litAt(TUFT_D, 0, 1, 0, bx, g, bz, 0),
+                litAt(top, -0.5, 0.7, 0.5, tx, th, tz, 0.06), litAt(top, -0.5, 0.7, 0.5, tx, th, tz, 0.06));
+      }
+    }
+    fir(m, -3.4, 5.2, 8.8, 1.7, 91); fir(m, 4.2, 6.6, 8.2, 1.6, 97); fir(m, -7.5, 7.2, 9.4, 1.8, 103);
+    var FP = [[-4.0, 13.0, 0.00], [-3.45, 11.6, 0.05], [-2.95, 10.3, -0.10], [-2.95, 9.1, 0.16], [-3.0, 8.0, 0.0], [-3.05, 7.0, -0.2]];
+    var POST = [88, 76, 62], RAIL = [104, 88, 70];
+    for (i = 0; i < FP.length; i++) {
+      var px0 = FP[i][0], pz0 = FP[i][1], lt = FP[i][2], g0 = hAt(px0, pz0);
+      quadN(m, POST, 0.02, px0 - 0.07, g0 - 0.2, pz0 + 0.07, px0 + 0.07, g0 - 0.2, pz0 + 0.07, px0 + 0.07 + lt, g0 + 1.15, pz0 + 0.07, px0 - 0.07 + lt, g0 + 1.15, pz0 + 0.07);
+      quadN(m, POST, 0.0, px0 + 0.07, g0 - 0.2, pz0 + 0.07, px0 + 0.07, g0 - 0.2, pz0 - 0.07, px0 + 0.07 + lt, g0 + 1.15, pz0 - 0.07, px0 + 0.07 + lt, g0 + 1.15, pz0 + 0.07);
+      quadN(m, POST, 0.06, px0 - 0.07 + lt, g0 + 1.15, pz0 + 0.07, px0 + 0.07 + lt, g0 + 1.15, pz0 + 0.07, px0 + 0.07 + lt, g0 + 1.15, pz0 - 0.07, px0 - 0.07 + lt, g0 + 1.15, pz0 - 0.07);
+      if (i === FP.length - 1) continue;
+      var qx = FP[i + 1][0], qz = FP[i + 1][1], g1 = hAt(qx, qz), ql = FP[i + 1][2];
+      for (var r = 0; r < 2; r++) {
+        if (i === 2 && r === 1) continue;
+        var ya = g0 + 0.45 + r * 0.42, yb = g1 + 0.45 + r * 0.42;
+        if (i === 2) yb = g1 + 0.05;
+        var fa = (ya - g0) / 1.15, fb = (yb - g1) / 1.15;
+        quadN(m, RAIL, 0.02, px0 + 0.08 + lt * fa, ya, pz0, qx + 0.08 + ql * fb, yb, qz, qx + 0.08 + ql * fb, yb + 0.09, qz, px0 + 0.08 + lt * fa, ya + 0.09, pz0);
+        quadN(m, RAIL, 0.06, px0 + 0.08 + lt * fa, ya + 0.09, pz0, qx + 0.08 + ql * fb, yb + 0.09, qz, qx - 0.02 + ql * fb, yb + 0.09, qz, px0 - 0.02 + lt * fa, ya + 0.09, pz0);
+      }
     }
   })();
 
