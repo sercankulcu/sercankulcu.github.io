@@ -9,7 +9,7 @@ location: "Giresun, Turkey"
 ---
 
 ![data structure](/images/teaching/teaching-data-structures.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
-Data structures provide systematic ways to organize, store, and access data. Choosing an appropriate structure directly affects the efficiency of operations such as searching, insertion, deletion, and traversal. This course examines arrays, linked structures, stacks, queues, trees, hash tables, graphs, and sets, with an emphasis on their implementations, complexity, and practical applications.
+Data structures provide systematic ways to organize, store, and access data. Choosing an appropriate structure directly affects the efficiency of operations such as searching, insertion, deletion, and traversal. This course examines arrays, linked lists, stacks, queues, lists, trees, priority queues and heaps, hash tables, search trees, graphs, and sets, with an emphasis on their implementations, complexity, and practical applications.
 
 ## Ders Öğretim Planı  
 [Ders Öğretim Planı (PDF)](../files/data_structures/slides/Bolum_00_Ders_Ogretim_Planı.pdf)
@@ -69,7 +69,7 @@ There are currently no announcements.
 
 ---
 
-## Preliminary Materials: 
+## Preliminary Materials  
 
 * [Important People in Data Structures (HTML)](../files/data_structures/Data_Structures_Important_People.html)
 * [Prerequisites for Data Structures (HTML)](../files/data_structures/Data_Structures_Prerequisites.html)
@@ -146,8 +146,8 @@ A queue follows the First-In-First-Out (FIFO) principle, similar to a line of pe
 A list is an abstract data type representing an ordered sequence of elements. It can grow or shrink dynamically and supports operations such as insertion, deletion, access, and traversal. Lists may be implemented using dynamic arrays, linked structures, or other underlying representations. In Java, commonly used implementations include ArrayList and LinkedList, each offering different performance characteristics.
 
 - [🖼️Sunum-Liste (PDF)](../files/data_structures/slides/Bolum_06_Liste.pdf)
-- [🕹️List ADT Simulator (HTML)](../files/data_structures/slides/Bolum_06_List_ADT.html)
 - [🖼️Sunum-Sorular (PDF)](../files/data_structures/slides/Bolum_06_Sorular.pdf)
+- [🕹️List ADT Simulator (HTML)](../files/data_structures/slides/Bolum_06_List_ADT.html)
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_04_Lists.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders06/src)
 
@@ -187,8 +187,9 @@ A hash table is a data structure that implements an associative array abstract d
 
 
 - [🖼️Sunum-Hash Tabloları (PDF)](../files/data_structures/slides/Bolum_09_Hash_Tablosu.pdf)
-- [🕹️Hash Table Simulator (HTML)](../files/data_structures/slides/Bolum_09_Hash_Table.html)
-- [🕹️Map Simulator (HTML)](../files/data_structures/slides/Bolum_09_Map.html)
+- 🕹️Simulators:
+  - [Hash Table Simulator (HTML)](../files/data_structures/slides/Bolum_09_Hash_Table.html)
+  - [Map Simulator (HTML)](../files/data_structures/slides/Bolum_09_Map.html)
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders09/src)
 
@@ -230,8 +231,8 @@ A set is a collection of distinct elements where order doesn't matter and duplic
 
 - [🖼️Sunum-Kümeler (PDF)](../files/data_structures/slides/Bolum_12_Kumeler.pdf)  
 - 🕹️Simulators:
-  - [🕹️Set ADT Simulator (HTML)](../files/data_structures/slides/Bolum_12_Set_ADT.html)
-  - [🕹️Disjoint Set Union Simulator (HTML)](../files/data_structures/slides/Bolum_12_Disjoint_Set_Union.html)  
+  - [Set ADT Simulator (HTML)](../files/data_structures/slides/Bolum_12_Set_ADT.html)
+  - [Disjoint Set Union Simulator (HTML)](../files/data_structures/slides/Bolum_12_Disjoint_Set_Union.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_05_Maps_Hash_Tables_Sets.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src)  
 
