@@ -521,7 +521,7 @@ excerpt: "A bus shelter on a rainy night at the edge of a small town, drawn pixe
     quadLit(m, base, 0, 0, 1, 0, x0, hgt, z0, x1, hgt, z0, cx, rh, z0, cx, rh, z0);
   }
 
-  var ASPH = [66, 68, 74], MARK = [150, 154, 158], WALK = [84, 86, 90], GRASS = [36, 46, 40];
+  var ASPH = [66, 68, 74], MARK = [150, 154, 158], WALK = [84, 86, 90], GRASS = [50, 62, 52];
   var PINE = [26, 38, 32], STEEL = [78, 86, 96], STEEL_D = [44, 50, 58], GLASS = [52, 66, 78];
   var HEDGE = [30, 42, 34], WALL = [92, 86, 80];
 
@@ -926,6 +926,7 @@ excerpt: "A bus shelter on a rainy night at the edge of a small town, drawn pixe
         var pud = puddleAt(gx, gz), ring = 0;
         var rip = Math.sin(gx * 5.3 + gz * 1.9 + u * TAU * 31) * 0.6 + Math.sin(gz * 8.7 - gx * 3.1 + u * TAU * 23) * 0.4;
         var nz = BLUE[((y & 63) << 6) | (x & 63)] / 255 - 0.5;
+        var pw = 0;
         if (pud >= 0) {
           var pb = (pud | 0) * 15;
           for (var r = 0; r < 5; r++) {
@@ -933,35 +934,32 @@ excerpt: "A bus shelter on a rainy night at the edge of a small town, drawn pixe
             var rw = Math.abs(Math.sqrt(rx * rx + rz * rz) - rf * 0.42);
             if (rw < 0.05) ring += (1 - rw / 0.05) * (1 - rf);
           }
-          hx += rip * 0.5 + ring * 1.5;
-          hy += nz * 1.2 + ring * 2.0;
-        } else {
-          hx += rip * 1.4;
-          hy += nz * (6 + 60 / tt);
+          pw = (pud - (pud | 0)) * 2.2; if (pw > 1) pw = 1;
         }
+        var nz2 = BLUE[(((y + 17) & 63) << 6) | ((x + 29) & 63)] / 255 - 0.5;
+        hx += nz2 * 3.0 * (1 - pw) + rip * (1.4 - 0.9 * pw) + ring * 1.5 + Math.sin(y * 1.3 + u * TAU * 37) * 1.2 * pw;
+        hy += nz * (6 + 60 / tt) * (1 - pw) + (nz * 1.6 + ring * 2.0) * pw;
         var o = idx * 4, rr = 0, rg = 0, rb = 0, mr = 0, mg = 0, mb = 0;
-        var sm = pud >= 0 ? 0 : 2 + 30 / tt, X = hx | 0;
+        var sm = (3 + 40 / tt) * (1 - pw) + 1.6 * pw, X = hx | 0;
         if (X < 0) X = 0; else if (X > W - 1) X = W - 1;
         for (var j = -1; j <= 1; j++) {
-          var Y = (hy + j * sm) | 0, cr, cg, cb;
+          var Y = (hy + (j + 1 - pw) * sm) | 0, cr, cg, cb;
           if (hy < -900 || Y < 0) { cr = SKY_HIGH[0]; cg = SKY_HIGH[1]; cb = SKY_HIGH[2]; }
           else {
             if (Y > H - 1) Y = H - 1;
             var so = (Y * W + X) * 4;
             cr = REF[so]; cg = REF[so + 1]; cb = REF[so + 2];
           }
-          rr += cr; rg += cg; rb += cb;
+          var wj = 1 - 0.5 * j * (1 - pw);
+          rr += cr * wj; rg += cg * wj; rb += cb * wj;
           if (cr + cg > mr + mg) { mr = cr; mg = cg; mb = cb; }
         }
-        if (pud >= 0) { rr *= 0.3333; rg *= 0.3333; rb *= 0.3333; }
-        else {
-          var bl = (mr + mg) * 0.5 - 100; bl = bl > 0 ? bl / 155 : 0;
-          rr = rr * 0.18 + mr * bl * 0.75; rg = rg * 0.18 + mg * bl * 0.75; rb = rb * 0.18 + mb * bl * 0.75;
-        }
+        var bl = (mr + mg) * 0.5 - 100; bl = bl > 0 ? bl / 155 : 0;
+        var ka = 0.18 + 0.1533 * pw, kb = bl * 0.75 * (1 - pw) * (0.4 + 0.9 * BLUE[(x * 5 + 11) & 63] / 255);
+        rr = rr * ka + mr * kb; rg = rg * ka + mg * kb; rb = rb * ka + mb * kb;
         var cv = -dy / Math.sqrt(dx * dx + dy * dy + dz * dz), fv = 1 - cv;
-        var fr, keep;
-        if (pud >= 0) { var edge = pud - (pud | 0); fr = 0.5 + 0.35 * Math.min(1, edge * 3); keep = 1 - fr * 0.8; }
-        else { fr = 0.2 + 0.6 * fv * fv * fv * fv; keep = 1 - fr * 0.45; }
+        var fr0 = 0.2 + 0.6 * fv * fv * fv * fv, fr1 = 0.5 + 0.35 * pw;
+        var fr = fr0 + (fr1 - fr0) * pw, keep = 1 - fr * (0.45 + 0.35 * pw);
         var br = px[o] * keep + rr * fr * 0.82, bg = px[o + 1] * keep + rg * fr * 0.84, bb = px[o + 2] * keep + rb * fr * 0.9;
         if (CAR.on && CAR.head > 0.01) {
           var vx = gx - CAR.x, vz = gz - CAR.z, d2 = vx * vx + vz * vz, fw = (vx * CAR.hx + vz * CAR.hz) / Math.sqrt(d2 + 0.01);

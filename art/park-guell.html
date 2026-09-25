@@ -266,7 +266,7 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
 
 
   var FOG = [196, 214, 220];
-  var FOGD = 0.00092;
+  var FOGD = 0.00078;
   var FOGLUT = new Float32Array(1024);
   for (var fi = 0; fi < 1024; fi++) FOGLUT[fi] = 1 - Math.exp(-(fi * 4) * FOGD);
   function fogAt(d) { var i = d * 0.25; return i >= 1023 ? 1 : FOGLUT[i | 0]; }
@@ -295,30 +295,22 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
   }
 
   var ZEN = [96, 158, 206], HOR = [206, 226, 232];
-  function skyInto(dy, out) {
-    var k = dy * 2.1; k = k < 0 ? 0 : (k > 1 ? 1 : k);
-    var e = k * k * (3 - 2 * k);
-    out[0] = HOR[0] + (ZEN[0] - HOR[0]) * e;
-    out[1] = HOR[1] + (ZEN[1] - HOR[1]) * e;
-    out[2] = HOR[2] + (ZEN[2] - HOR[2]) * e;
-  }
 
-  var _sk = [0, 0, 0];
+  /* The camera never rolls (camR[1] = 0) and its basis is orthonormal, so a ray's height is
+     (camU[1] * uy + camF[1]) / sqrt(ux^2 + uy^2 + 1). */
+  var SKY_UX2 = new Float64Array(W);
+  for (var sxi = 0; sxi < W; sxi++) { var sux = (((sxi + 0.5) / W) * 2 - 1) * tanH * aspect; SKY_UX2[sxi] = sux * sux; }
   function drawSky() {
-    var invW = 1 / W, invH = 1 / H;
+    var invH = 1 / H;
+    var d0 = ZEN[0] - HOR[0], d1 = ZEN[1] - HOR[1], d2 = ZEN[2] - HOR[2];
     for (var y = 0; y < H; y++) {
-      var ndcy = 1 - ((y + 0.5) * invH) * 2;
-      var uy = ndcy * tanH;
+      var uy = (1 - ((y + 0.5) * invH) * 2) * tanH;
+      var dyr = (camU[1] * uy + camF[1]) * 2.1, uy21 = uy * uy + 1;
       for (var x = 0; x < W; x++) {
-        var ndcx = ((x + 0.5) * invW) * 2 - 1;
-        var ux = ndcx * tanH * aspect;
-        var dx = camR[0] * ux + camU[0] * uy + camF[0];
-        var dy = camR[1] * ux + camU[1] * uy + camF[1];
-        var dz = camR[2] * ux + camU[2] * uy + camF[2];
-        var il = 1 / Math.sqrt(dx * dx + dy * dy + dz * dz);
-        skyInto(dy * il, _sk);
+        var k = dyr / Math.sqrt(SKY_UX2[x] + uy21); k = k < 0 ? 0 : (k > 1 ? 1 : k);
+        var e = k * k * (3 - 2 * k);
         var i = y * W + x, o = i * 4;
-        px[o] = _sk[0]; px[o + 1] = _sk[1]; px[o + 2] = _sk[2]; px[o + 3] = 255;
+        px[o] = HOR[0] + d0 * e; px[o + 1] = HOR[1] + d1 * e; px[o + 2] = HOR[2] + d2 * e; px[o + 3] = 255;
         zbuf[i] = 1e7;
       }
     }
@@ -440,6 +432,15 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
     c = lit(base, 1, 0, 0, jit); m.quad(x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1, c[0], c[1], c[2]);
   }
 
+  /* A far block seen from the bench: only its top, its front and the side facing the camera. */
+  function clump(m, x0, y0, z0, x1, y1, z1, base, jit) {
+    var c;
+    c = lit(base, 0, 1, 0, jit); m.quad(x0, y1, z0, x1, y1, z0, x1, y1, z1, x0, y1, z1, c[0], c[1], c[2]);
+    c = lit(base, 0, 0, 1, jit); m.quad(x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1, c[0], c[1], c[2]);
+    if (x0 > 0.3) { c = lit(base, -1, 0, 0, jit); m.quad(x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0, c[0], c[1], c[2]); }
+    else if (x1 < 0.3) { c = lit(base, 1, 0, 0, jit); m.quad(x1, y0, z1, x1, y0, z0, x1, y1, z0, x1, y1, z1, c[0], c[1], c[2]); }
+  }
+
   function ringPt(a, r, y, o, k) {
     o[k] = CX + Math.sin(a) * r;
     o[k + 1] = y;
@@ -450,7 +451,7 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
 
   /* One backrest cell broken into four irregular shards that meet at a jittered inner point. */
   var _uv = new Float64Array(18);
-  function shardCell(m, a0, a1, r0, r1, y0, y1, pick, seed) {
+  function shardCell(m, a0, a1, r0, r1, y0, y1, th, main, seed) {
     var j = 0.18;
     _uv[0] = 0; _uv[1] = 0; _uv[2] = 1; _uv[3] = 0; _uv[4] = 1; _uv[5] = 1; _uv[6] = 0; _uv[7] = 1;
     _uv[8] = 0.5 + (hash(seed + 1) - 0.5) * j * 2; _uv[9] = 0;
@@ -459,12 +460,13 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
     _uv[14] = 0; _uv[15] = 0.5 + (hash(seed + 4) - 0.5) * j * 2;
     _uv[16] = 0.3 + hash(seed + 5) * 0.4; _uv[17] = 0.3 + hash(seed + 6) * 0.4;
     var PIECES = SHARD_PIECES;
+    var am = (a0 + a1) * 0.5, nx = -Math.sin(am) * 0.75, nz = -Math.cos(am) * 0.75;
     for (var p = 0; p < 4; p++) {
-      var col = SHARDS[pick];
       var hp = hash(seed * 3 + p * 11);
-      if (hp > 0.70) col = SHARDS[(hash(seed * 7 + p) * SHARDS.length) | 0];
-      else if (hp > 0.50) col = SHARDS[(pick + (hp > 0.6 ? 1 : SHARDS.length - 1)) % SHARDS.length];
-      var c = lit(col, 0.25, 0.55, 0.78, (hash(seed * 13 + p * 5) - 0.5) * 0.20);
+      var col = SHARDS[th[main]];
+      if (hp > 0.93) col = SHARDS[th[2]];
+      else if (hp > 0.74) col = SHARDS[th[1 - main]];
+      var c = lit(col, nx, 0.55, nz, (hash(seed * 13 + p * 5) - 0.5) * 0.16);
       for (var v = 0; v < 4; v++) {
         var k = PIECES[p][v] * 2, u = _uv[k], w = _uv[k + 1];
         ringPt(a0 + (a1 - a0) * u, r0 + (r1 - r0) * w, y0 + (y1 - y0) * w, _q, v * 3);
@@ -474,6 +476,10 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
   }
   /* Corner, edge-midpoint and centre indices into _uv for each shard. */
   var SHARD_PIECES = [[0, 4, 8, 7], [4, 1, 5, 8], [8, 5, 2, 6], [7, 8, 6, 3]];
+  /* Panels of one ground colour, a partner colour for the top course and centre, and a rare accent. */
+  var THEMES = [[1, 5, 8], [5, 2, 0], [8, 7, 10], [11, 7, 5], [3, 4, 1], [10, 6, 11], [0, 3, 5], [5, 7, 2]];
+  var PANEL_ORDER = [0, 2, 1, 3, 4, 5, 7, 3, 6, 2, 4, 0, 5, 1, 3, 2];
+  var STAGGER = [0, 1, 1, 0, -1];
 
   (function buildBench() {
     var m = world;
@@ -500,10 +506,10 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
         var k0 = row / 5, k1 = (row + 1) / 5;
         var y0 = SEAT_Y + (BACK_Y - SEAT_Y) * k0, y1 = SEAT_Y + (BACK_Y - SEAT_Y) * k1;
         var r0 = rSeat + (rBack - rSeat) * k0, r1 = rSeat + (rBack - rSeat) * k1;
-        var patch = ((i + row * 2) / 3) | 0;
-        var pick = (hash(patch * 13 + row * 41 + 5) * SHARDS.length) | 0;
-        if (hash(i * 17 + row * 3) > 0.52) pick = (hash(i * 29 + row * 61) * SHARDS.length) | 0;
-        shardCell(m, a0, a1, r0, r1, y0, y1, pick, i * 5 + row * 97);
+        var panel = ((i + STAGGER[row]) / 5) | 0;
+        var th = THEMES[PANEL_ORDER[panel % PANEL_ORDER.length]];
+        var main = row === 4 || (row === 2 && (i % 5) === 2) ? 1 : 0;
+        shardCell(m, a0, a1, r0, r1, y0, y1, th, main, i * 5 + row * 97);
       }
 
       var gl = GLAZE[(hash(((i / 3) | 0) * 19 + 2) * GLAZE.length) | 0];
@@ -552,6 +558,21 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
              12000, SEA_Y + 0.3, -4780 - i * 420, -12000, SEA_Y + 0.3, -4780 - i * 420, band[0], band[1], band[2]);
     }
 
+    var gnd = lit([150, 140, 116], 0, 1, 0, -0.06);
+    m.quad(-12000, -58, -4200, 12000, -58, -4200, 12000, -58, -140, -12000, -58, -140, gnd[0], gnd[1], gnd[2]);
+    for (i = 0; i < 48; i++) {
+      var tz = -150 - hash(i * 5 + 1) * hash(i * 5 + 1) * 520;
+      var tx = (hash(i * 5 + 2) - 0.5) * (-tz) * 1.4;
+      var tw = 3 + hash(i * 5 + 3) * 5 + (-tz) * 0.012;
+      if (hash(i * 5 + 4) > 0.45) {
+        var tht = 5 + hash(i * 3 + 7) * 7;
+        clump(m, tx - tw, -58 + tht * 0.3, tz - tw, tx + tw, -58 + tht, tz + tw, i & 1 ? [92, 124, 64] : [64, 96, 54], (hash(i) - 0.5) * 0.1);
+      } else {
+        var hht = 8 + hash(i * 3 + 9) * 14;
+        clump(m, tx - tw * 1.3, -58, tz - tw, tx + tw * 1.3, -58 + hht, tz + tw, hash(i * 7) > 0.6 ? [190, 124, 88] : [214, 198, 168], (hash(i) - 0.5) * 0.1);
+      }
+    }
+
     var rows = [[-620, -58, 34], [-880, -58, 46], [-1260, -58, 62], [-1800, -58, 84], [-2560, -58, 112], [-3500, -58, 150]];
     for (j = 0; j < rows.length; j++) {
       var rz = rows[j][0], ry = rows[j][1], span = rows[j][2];
@@ -568,7 +589,17 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
         var ct = lit(base, 0, 1, 0, (hx - 0.5) * 0.12);
         var cfc = lit(base, 0, 0, 1, (hy2 - 0.5) * 0.12 - 0.05);
         m.quad(bx - bw, bh, rz - span, bx + bw, bh, rz - span, bx + bw, bh, rz + span, bx - bw, bh, rz + span, ct[0], ct[1], ct[2]);
-        m.quad(bx - bw, ry, rz + span, bx + bw, ry, rz + span, bx + bw, bh, rz + span, bx - bw, bh, rz + span, cfc[0], cfc[1], cfc[2]);
+        var cwn = lit(base, 0, 0, 1, (hy2 - 0.5) * 0.12 - 0.20);
+        if (j > 1) {
+          m.quad(bx - bw, ry, rz + span, bx + bw, ry, rz + span, bx + bw, bh, rz + span, bx - bw, bh, rz + span, cfc[0], cfc[1], cfc[2]);
+          continue;
+        }
+        var nf = Math.max(2, Math.min(3, ((bh - ry) / 5) | 0));
+        for (var f = 0; f < nf; f++) {
+          var fy0 = ry + (bh - ry) * (f / nf), fy1 = ry + (bh - ry) * ((f + 1) / nf), fym = fy0 + (fy1 - fy0) * 0.45;
+          m.quad(bx - bw, fy0, rz + span, bx + bw, fy0, rz + span, bx + bw, fym, rz + span, bx - bw, fym, rz + span, cwn[0], cwn[1], cwn[2]);
+          m.quad(bx - bw, fym, rz + span, bx + bw, fym, rz + span, bx + bw, fy1, rz + span, bx - bw, fy1, rz + span, cfc[0], cfc[1], cfc[2]);
+        }
       }
     }
 
@@ -588,17 +619,24 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
       [3.4, 4.8, 0.42, 0.34, [236, 232, 218]],
       [4.8, 5.9, 0.34, 0.26, [60, 104, 176]]
     ];
-    var i, bi;
+    var i, bi, sub;
+    var WHITE = [240, 238, 228];
     for (bi = 0; bi < bands.length; bi++) {
       var B = bands[bi];
-      for (i = 0; i < SIDES; i++) {
-        var a0 = (i / SIDES) * TAU, a1 = ((i + 1) / SIDES) * TAU;
-        var nx = Math.sin((a0 + a1) / 2), nz = Math.cos((a0 + a1) / 2);
-        var c = lit(B[4], nx, 0.16, nz, (hash(bi * 7 + i) - 0.5) * 0.10);
-        m.quad(sx + Math.sin(a0) * B[2], B[0], sz + Math.cos(a0) * B[2],
-               sx + Math.sin(a1) * B[2], B[0], sz + Math.cos(a1) * B[2],
-               sx + Math.sin(a1) * B[3], B[1], sz + Math.cos(a1) * B[3],
-               sx + Math.sin(a0) * B[3], B[1], sz + Math.cos(a0) * B[3], c[0], c[1], c[2]);
+      var blue = B[4][2] > 170, NS = blue ? 2 : 1;
+      for (sub = 0; sub < NS; sub++) {
+        var ya = B[0] + (B[1] - B[0]) * (sub / NS), yb = B[0] + (B[1] - B[0]) * ((sub + 1) / NS);
+        var ra = B[2] + (B[3] - B[2]) * (sub / NS), rb = B[2] + (B[3] - B[2]) * ((sub + 1) / NS);
+        for (i = 0; i < SIDES; i++) {
+          var a0 = (i / SIDES) * TAU, a1 = ((i + 1) / SIDES) * TAU;
+          var nx = Math.sin((a0 + a1) / 2), nz = Math.cos((a0 + a1) / 2);
+          var base = blue && ((i + sub) & 1) ? WHITE : B[4];
+          var c = lit(base, nx, 0.16, nz, (hash(bi * 7 + i) - 0.5) * 0.06 + (base === WHITE ? 0.14 : (blue ? 0 : -0.02)));
+          m.quad(sx + Math.sin(a0) * ra, ya, sz + Math.cos(a0) * ra,
+                 sx + Math.sin(a1) * ra, ya, sz + Math.cos(a1) * ra,
+                 sx + Math.sin(a1) * rb, yb, sz + Math.cos(a1) * rb,
+                 sx + Math.sin(a0) * rb, yb, sz + Math.cos(a0) * rb, c[0], c[1], c[2]);
+        }
       }
     }
     block(m, sx - 0.30, 5.9, sz - 0.30, sx + 0.30, 6.5, sz + 0.30, [188, 180, 160], 0.05);
@@ -611,7 +649,7 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
   })();
 
   var palms = new Mesh();
-  var PALM = [[6.9, -2.4, -8.2, 5.4, 11], [9.6, -3.8, -11.6, 6.6, 23], [-8.0, -3.2, -10.0, 4.8, 31], [-6.2, -1.6, -7.0, 3.6, 43]];
+  var PALM = [[6.9, -2.4, -8.2, 5.4, 11], [9.6, -3.8, -11.6, 6.6, 23]];
 
   /* A frond as an arched rachis with drooping leaflets on both sides, shortest at the ends. */
   var FSEG = 7;
@@ -644,13 +682,21 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
     for (var p = 0; p < PALM.length; p++) {
       var P = PALM[p], bx = P[0], by = P[1], bz = P[2], hgt = P[3], seed = P[4];
       var i;
-      for (i = 0; i < 5; i++) {
-        var k0 = i / 5, k1 = (i + 1) / 5;
-        var c = lit([128, 104, 74], 0.7, 0.3, 0.6, (hash(seed + i) - 0.5) * 0.12);
-        palms.quad(bx - 0.17, by + hgt * k0, bz, bx + 0.17, by + hgt * k0, bz,
-                   bx + 0.14, by + hgt * k1, bz, bx - 0.14, by + hgt * k1, bz, c[0], c[1], c[2]);
+      var lean = (seed & 1 ? 0.55 : -0.45);
+      for (i = 0; i < 10; i++) {
+        var k0 = i / 10, k1 = (i + 1) / 10;
+        var l0 = lean * k0 * k0, l1 = lean * k1 * k1;
+        var w0 = 0.19 - 0.06 * k0, w1 = 0.19 - 0.06 * k1;
+        var c = lit(i & 1 ? [112, 90, 64] : [140, 116, 84], 0.7, 0.3, 0.6, (hash(seed + i) - 0.5) * 0.08);
+        palms.quad(bx + l0 - w0, by + hgt * k0, bz, bx + l0 + w0 * 0.35, by + hgt * k0, bz,
+                   bx + l1 + w1 * 0.35, by + hgt * k1, bz, bx + l1 - w1, by + hgt * k1, bz, c[0], c[1], c[2]);
+        var cs = lit([96, 76, 56], 0.7, 0.3, 0.6, -0.12);
+        palms.quad(bx + l0 + w0 * 0.35, by + hgt * k0, bz, bx + l0 + w0, by + hgt * k0, bz,
+                   bx + l1 + w1, by + hgt * k1, bz, bx + l1 + w1 * 0.35, by + hgt * k1, bz, cs[0], cs[1], cs[2]);
       }
+      bx += lean;
       var top = by + hgt;
+      block(palms, bx - 0.22, top - 0.30, bz - 0.22, bx + 0.22, top + 0.05, bz + 0.22, [70, 88, 44], 0);
       for (i = 0; i < 9; i++) {
         var ang = (i / 9) * TAU + hash(seed * 3 + i) * 0.4;
         var droop = 0.9 + hash(seed * 5 + i) * 0.8;
@@ -877,7 +923,7 @@ excerpt: "Gaudí's serpentine bench above Barcelona, rebuilt from a photograph p
     scratch.set(px);
     var ph = u * TAU * 4;
     for (var y = 0; y < H; y++) {
-      var off = Math.sin(y * 0.62 + ph) * 1.5 + Math.sin(y * 1.41 - ph * 1.7) * 0.8;
+      var off = Math.sin(y * 0.62 + ph) * 1.1 + Math.sin(y * 1.41 - ph * 1.75) * 0.5;
       for (var x = 0; x < W; x++) {
         var idx = y * W + x;
         if (zbuf[idx] < CUT) continue;

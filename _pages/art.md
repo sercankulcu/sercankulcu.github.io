@@ -71,19 +71,19 @@ There is also a separate set of [WebGL studies](/art/webgl/) made with three.js,
   <a class="art-card" href="/art/lighthouse-in-the-storm/">
     <img src="/images/art/lighthouse-in-the-storm.png" alt="A lighthouse on a rock in a storm, its beam cutting through rain, drawn in pixels" loading="lazy" width="960" height="540">
     <span class="art-title">Lighthouse in the Storm</span>
-    <span class="art-meta">A lighthouse through a storm: a turning beam, breaking swell, spray and rain · 43 colours · 48 s loop</span>
+    <span class="art-meta">A lighthouse through a storm: a turning beam, breaking swell, spray and rain · 48 colours · 48 s loop</span>
   </a>
 
   <a class="art-card" href="/art/snowy-station/">
     <img src="/images/art/snowy-station.png" alt="An empty railway platform under falling snow, lit by sodium lamps, drawn in pixels" loading="lazy" width="960" height="540">
     <span class="art-title">Snowy Station</span>
-    <span class="art-meta">An empty platform under snow: sodium lamps pooling on the drifts, and a headlight that never arrives · 40 colours · 48 s loop</span>
+    <span class="art-meta">An empty platform under snow: sodium lamps pooling on the drifts, a lit waiting-room window, and a headlight that never arrives · 40 colours · 48 s loop</span>
   </a>
 
   <a class="art-card" href="/art/aquarium/">
     <img src="/images/art/aquarium.png" alt="The inside of a lit aquarium: light pooling on the sand, plants, and fish, drawn in pixels" loading="lazy" width="960" height="540">
     <span class="art-title">Aquarium</span>
-    <span class="art-meta">Inside a lit tank at two in the morning: caustics on the sand, Snell's window overhead, fish going nowhere · 44 colours · 48 s loop</span>
+    <span class="art-meta">Inside a lit tank at two in the morning: caustics on the sand, Snell's window overhead, fish going nowhere · 50 colours · 48 s loop</span>
   </a>
 
   <a class="art-card" href="/art/park-guell/">
@@ -137,7 +137,7 @@ There is also a separate set of [WebGL studies](/art/webgl/) made with three.js,
   <a class="art-card" href="/art/night-train/">
     <img src="/images/art/night-train.png" alt="The inside of a night train compartment with a reading lamp, a glass of tea on the table and moonlit hills outside the window, drawn in pixels" loading="lazy" width="960" height="540">
     <span class="art-title">Night Train</span>
-    <span class="art-meta">A sleeper compartment at night: a reading lamp over worn seats, a glass of tea trembling to the rail joints, and a lit station that flashes past without stopping · 42 colours · 48 s loop</span>
+    <span class="art-meta">A sleeper compartment at night: a reading lamp over worn seats, a glass of tea trembling to the rail joints, and a lit station that flashes past without stopping · 47 colours · 48 s loop</span>
   </a>
 
   <a class="art-card" href="/art/laundromat/">
