@@ -399,7 +399,7 @@ var skyFrag = [
   "  float hA = (0.011 + 0.005 * sin(az * 23.0 + 1.0) + 0.0025 * sin(az * 61.0 + 0.3)) * smoothstep(-0.66, -0.56, az) * smoothstep(-0.12, -0.26, az);",
   "  float hB = (0.006 + 0.003 * sin(az * 31.0 + 2.0) + 0.0015 * sin(az * 83.0)) * smoothstep(0.30, 0.40, az) * smoothstep(0.80, 0.62, az);",
   "  float hh = max(hA, hB);",
-  "  vec3 hc = skyCol(normalize(vec3(d.x, 0.0, d.z)));",
+  "  vec3 hc = skyCol(normalize(vec3(d.x, 0.0, d.z) + vec3(1e-5, 0.0, 0.0)));",
   "  float hill = smoothstep(hh + 0.0006, hh - 0.0006, d.y) * step(0.0005, hh);",
   "  vec3 hillC = mix(hc, vec3(0.035, 0.035, 0.075), 0.6);",
   "  float cell = floor(az * 420.0); float lh = fract(sin(cell * 91.7) * 43758.5);",
@@ -417,7 +417,7 @@ var skyFrag = [
   "      vec3 off = vec3(h3(c + 1.3), h3(c + 2.7), h3(c + 4.1)) - 0.5;",
   "      float r = length(f - off * 0.5);",
   "      float tw = 0.7 + 0.3 * sin(uU * 6.2831853 * floor(3.0 + h2 * 6.0) + h2 * 40.0);",
-  "      float glowW = pow(max(dot(normalize(d.xz), uW.xz), 0.0), 3.0);",
+  "      float glowW = pow(max(dot(normalize(d.xz + vec2(1e-5, 0.0)), uW.xz), 0.0), 3.0);",
   "      float vis = smoothstep(0.06, 0.5, d.y) * (1.0 - 0.85 * glowW * (1.0 - smoothstep(0.1, 0.5, d.y)));",
   "      col += vec3(0.85, 0.9, 1.0) * smoothstep(0.16, 0.02, r) * (0.5 + 2.2 * pow(h2, 3.0)) * tw * vis;",
   "    }",
@@ -495,7 +495,7 @@ var seaMat = new THREE.ShaderMaterial({
     "  vec3 sd = normalize(vec3(uW.x, 0.03, uW.z));",
     "  col += vec3(1.5, 0.7, 0.25) * pow(max(dot(R, sd), 0.0), 1400.0) * 2.5;",
     "  vec3 L = normalize(uLamp - vW); vec3 H = normalize(L + V);",
-    "  vec2 lh = normalize(vW.xz - uLamp.xz);",
+    "  vec2 lh = normalize(vW.xz - uLamp.xz + vec2(1e-4, 0.0));",
     "  float face = pow(abs(dot(lh, uBeam)), 30.0);",
     "  col += vec3(1.0, 0.82, 0.55) * pow(max(dot(N, H), 0.0), 260.0) * (0.35 + 5.0 * face) * uLampI;",
     "  vec3 Lw = normalize(uWin - vW); vec3 Hw = normalize(Lw + V);",
@@ -512,12 +512,12 @@ var seaMat = new THREE.ShaderMaterial({
     "      float fo = smoothstep(reach, reach - 1.4, off) * env * (0.35 + 0.65 * lace);",
     "      fo += smoothstep(1.1, 0.0, off) * (0.25 + 0.5 * lace);",
     "      float r = (1.0 - ph) * 14.0 + 0.5;",
-    "      fo += exp(-pow((off - r) * 1.4, 2.0)) * smoothstep(0.72, 0.97, ph) * 0.55 * lace;",
+    "      float rq = (off - r) * 1.4; fo += exp(-rq * rq) * smoothstep(0.72, 0.97, ph) * 0.55 * lace;",
     "      fo = clamp(fo, 0.0, 1.0) * (1.0 - smoothstep(120.0, 250.0, dist));",
     "      col = mix(col, vec3(0.42, 0.45, 0.62), fo * 0.95);",
     "    }",
     "  }",
-    "  vec3 fc = skyCol(normalize(vec3(-V.x, 0.0, -V.z)));",
+    "  vec3 fc = skyCol(normalize(vec3(-V.x, 0.0, -V.z) + vec3(1e-5, 0.0, 0.0)));",
     "  float fd = dist * uFogD; col = mix(col, fc, 1.0 - exp(-fd * fd));",
     "  gl_FragColor = vec4(col, 1.0);",
     "  #include <tonemapping_fragment>",
@@ -571,15 +571,80 @@ var SURF_GLSL = [
   "  totalEmissiveRadiance += vec3(0.05, 0.055, 0.08) * sfo;",
   "}"
 ].join("\n");
-function addSurf(mat) {
+/* Rock detail shared by the cliffs and the boulders: a tileable map of fractured plates (height), cracks and lichen,
+   projected three ways in world space so vertical faces are not stretched, used for albedo and for a derivative bump. */
+var rockTex = (function () {
+  var N = 256, c = document.createElement("canvas"); c.width = c.height = N;
+  var g = c.getContext("2d"), img = g.createImageData(N, N), d = img.data, CELLS = 6, pts = [];
+  for (var cy = 0; cy < CELLS; cy++) for (var cx = 0; cx < CELLS; cx++) pts.push([(cx + 0.15 + 0.7 * hash(cx * 17 + cy * 31 + 3)) / CELLS, (cy + 0.15 + 0.7 * hash(cx * 23 + cy * 13 + 7)) / CELLS, hash(cx * 5 + cy * 11 + 1)]);
+  function vn(x, y, per) {
+    var ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy;
+    fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy);
+    function hv(a, b) { a = ((a % per) + per) % per; b = ((b % per) + per) % per; return hash(a * 57 + b * 113 + 0.5); }
+    var a = hv(ix, iy), b = hv(ix + 1, iy), e = hv(ix, iy + 1), f = hv(ix + 1, iy + 1);
+    return a + (b - a) * fx + (e - a) * fy + (a - b - e + f) * fx * fy;
+  }
+  for (var y = 0; y < N; y++) for (var x = 0; x < N; x++) {
+    var u = x / N, v = y / N, f1 = 9, f2 = 9, id = 0;
+    var gcx = Math.floor(u * CELLS), gcy = Math.floor(v * CELLS);
+    for (var oy = -1; oy <= 1; oy++) for (var ox = -1; ox <= 1; ox++) {
+      var qx = gcx + ox, qy = gcy + oy, wx = (qx + CELLS) % CELLS, wy = (qy + CELLS) % CELLS, k = wy * CELLS + wx;
+      var dx = pts[k][0] + (qx - wx) / CELLS - u, dy = pts[k][1] + (qy - wy) / CELLS - v, dd = Math.sqrt(dx * dx + dy * dy);
+      if (dd < f1) { f2 = f1; f1 = dd; id = pts[k][2]; } else if (dd < f2) f2 = dd;
+    }
+    var edge = f2 - f1, n = vn(u * 8, v * 8, 8) * 0.5 + vn(u * 16, v * 16, 16) * 0.3 + vn(u * 32, v * 32, 32) * 0.2;
+    var crack = 1 - sstep(0.0, 0.035 + 0.02 * n, edge);
+    var plate = sstep(0.0, 0.12, edge) * (0.75 + 0.25 * id);
+    var hgt = clamp(0.15 + 0.5 * plate + 0.45 * n - 0.25 * crack, 0, 1);
+    var lich = sstep(0.60, 0.72, vn(u * 5 + 3, v * 5 + 1, 5) * 0.7 + vn(u * 20, v * 20, 20) * 0.3) * (1 - crack);
+    var o = (y * N + x) * 4;
+    d[o] = Math.round(hgt * 255); d[o + 1] = Math.round(crack * 255); d[o + 2] = Math.round(lich * 255); d[o + 3] = 255;
+  }
+  g.putImageData(img, 0, 0);
+  var tx = new THREE.CanvasTexture(c);
+  tx.wrapS = tx.wrapT = THREE.RepeatWrapping; tx.anisotropy = 4;
+  return tx;
+})();
+var ROCK_FRAG_PARS = [
+  "uniform sampler2D uRockT; varying vec3 vSurfN;",
+  "vec4 triRock(vec3 p, vec3 n) { vec3 w = n * n; w = w * w; w /= (w.x + w.y + w.z); return texture2D(uRockT, p.zy) * w.x + texture2D(uRockT, p.xz) * w.y + texture2D(uRockT, p.xy) * w.z; }"
+].join("\n");
+var ROCK_ALBEDO = [
+  "vec3 rkN = normalize(vSurfN);",
+  "vec3 rkP = vSurfW + vec3(0.9 * sin(vSurfW.y * 0.9 + vSurfW.z * 0.31), 0.1 * vSurfW.x + 0.5 * sin(vSurfW.x * 0.23 + vSurfW.z * 0.4), 0.9 * sin(vSurfW.y * 0.8 + vSurfW.x * 0.37));", "vec4 rkA = triRock(rkP * vec3(0.11, 0.2, 0.11), rkN); vec4 rkB = triRock(vSurfW * vec3(0.37, 0.5, 0.37) + 0.37, rkN);",
+  "float rkH = rkA.r * 0.62 + rkB.r * 0.38;",
+  "#ifdef ROCK_ALL",
+  "float rkM = 1.0;",
+  "#else",
+  "float rkM = 1.0 - smoothstep(0.72, 0.86, rkN.y) * smoothstep(2.0, 3.2, vSurfW.y);",
+  "#endif",
+  "float rkDry = smoothstep(0.4, 1.6, vSurfW.y);",
+  "vec3 rkC = diffuseColor.rgb * (0.55 + 0.9 * rkH) * (1.0 - 0.6 * rkA.g - 0.2 * rkB.g);",
+  "rkC = mix(rkC, rkC * vec3(1.7, 1.45, 0.9) + vec3(0.03, 0.022, 0.006), rkA.b * 0.5 * rkDry);",
+  "diffuseColor.rgb = mix(diffuseColor.rgb, rkC, rkM);"
+].join("\n");
+var ROCK_BUMP = [
+  "{",
+  "  vec2 dH = vec2(dFdx(rkH), dFdy(rkH)) * uRockB * rkM;",
+  "  vec3 vSx = dFdx(-vViewPosition), vSy = dFdy(-vViewPosition), vN0 = normal;",
+  "  vec3 R1 = cross(vSy, vN0), R2 = cross(vN0, vSx);",
+  "  float fDet = dot(vSx, R1) * faceDirection;",
+  "  vec3 vGrad = sign(fDet) * (dH.x * R1 + dH.y * R2);",
+  "  normal = normalize(abs(fDet) * vN0 - vGrad);",
+  "}"
+].join("\n");
+function addSurf(mat, bump) {
   mat.onBeforeCompile = function (sh) {
-    sh.uniforms.uU = SURF_U; sh.uniforms.uW = { value: WEST };
-    sh.vertexShader = ["varying vec3 vSurfW;", sh.vertexShader.replace("#include <project_vertex>", ["#include <project_vertex>", "vec4 sw4 = vec4(transformed, 1.0);", "#ifdef USE_INSTANCING", "sw4 = instanceMatrix * sw4;", "#endif", "vSurfW = (modelMatrix * sw4).xyz;"].join("\n"))].join("\n");
-    sh.fragmentShader = [GL_COMMON, "varying vec3 vSurfW;", sh.fragmentShader.replace("#include <color_fragment>", "#include <color_fragment>\n" + SURF_GLSL)].join("\n");
+    sh.uniforms.uU = SURF_U; sh.uniforms.uW = { value: WEST }; sh.uniforms.uRockT = { value: rockTex }; sh.uniforms.uRockB = { value: bump };
+    sh.vertexShader = ["varying vec3 vSurfW; varying vec3 vSurfN;", sh.vertexShader.replace("#include <project_vertex>", ["#include <project_vertex>", "vec4 sw4 = vec4(transformed, 1.0);", "vec3 swn = objectNormal;", "#ifdef USE_INSTANCING", "sw4 = instanceMatrix * sw4;", "swn = mat3(instanceMatrix) * swn;", "#endif", "vSurfW = (modelMatrix * sw4).xyz;", "vSurfN = mat3(modelMatrix) * swn;"].join("\n"))].join("\n");
+    sh.fragmentShader = [GL_COMMON, "varying vec3 vSurfW; uniform float uRockB;", ROCK_FRAG_PARS, sh.fragmentShader
+      .replace("#include <color_fragment>", "#include <color_fragment>\n" + ROCK_ALBEDO + "\n" + SURF_GLSL)
+      .replace("#include <normal_fragment_maps>", "#include <normal_fragment_maps>\n" + ROCK_BUMP)].join("\n");
   };
+  mat.customProgramCacheKey = function () { return mat.defines && mat.defines.ROCK_ALL !== undefined ? "af-rock-all" : "af-rock"; };
   return mat;
 }
-var land = add(new THREE.Mesh(landGeo, addSurf(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0 }))), true, true);
+var land = add(new THREE.Mesh(landGeo, addSurf(new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, metalness: 0 }), 1.6)), true, true);
 
 /* Boulders along the waterline, where the surf breaks. */
 var boulderGeo = new THREE.IcosahedronGeometry(1, 3);
@@ -601,7 +666,9 @@ for (bi = 0; bi < 6000 && BOULDERS.length < 150; bi++) {
   var cx2 = -14 + hash(bi * 5 + 901) * 54, cz2 = -34 + hash(bi * 5 + 902) * 30, fc = landF(cx2, cz2), hc = landH(cx2, cz2);
   if (fc > 1.1 && fc < 4.4 && hc > -0.2 && hc < 3.4 && Math.hypot(cx2 - LH_X, cz2 - LH_Z) > 4.5) BOULDERS.push([cx2, cz2, 0.6 + hash(bi * 5 + 903) * 0.8, bi + 5000, hc]);
 }
-var boulders = new THREE.InstancedMesh(boulderGeo, addSurf(new THREE.MeshStandardMaterial({ color: 0x8a847a, roughness: 0.9, map: grainTex })), BOULDERS.length);
+var boulderMat = new THREE.MeshStandardMaterial({ color: 0x8a847a, roughness: 0.9 });
+boulderMat.defines = { ROCK_ALL: "" };
+var boulders = new THREE.InstancedMesh(boulderGeo, addSurf(boulderMat, 1.6), BOULDERS.length);
 BOULDERS.forEach(function (B, i) {
   if (B[4]) {
     dummy.position.set(B[0], B[4] - B[2] * 0.4, B[1]);

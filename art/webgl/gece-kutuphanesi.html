@@ -241,16 +241,16 @@ function rnd() { seedN += 1; return hash(seedN * 1.618 + 0.37); }
 var renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.25;
+renderer.toneMappingExposure = 1.4;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 var scene = new THREE.Scene();
 scene.background = new THREE.Color(0x05070a);
-scene.fog = new THREE.FogExp2(0x06080c, 0.05);
+scene.fog = new THREE.FogExp2(0x0a0d14, 0.036);
 var pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-scene.environmentIntensity = 0.07;
+scene.environmentIntensity = 0.16;
 
 var camera = new THREE.PerspectiveCamera(41, 16 / 9, 0.05, 90);
 var LOOK = new THREE.Vector3(0.25, 1.05, -4.5);
@@ -424,7 +424,26 @@ var ROOM_X0 = -4.2, ROOM_X1 = 4.0, ROOM_Z0 = -17.5, ROOM_Z1 = 4.6, CEIL = 6.6;
 var floorMat = new THREE.MeshPhysicalMaterial({ map: floorTex, roughness: 0.5, clearcoat: 0.35, clearcoatRoughness: 0.35 });
 var floor = add(new THREE.Mesh(new THREE.PlaneGeometry(ROOM_X1 - ROOM_X0 + 0.6, ROOM_Z1 - ROOM_Z0), floorMat), false, true);
 floor.rotation.x = -Math.PI / 2; floor.position.set((ROOM_X0 + ROOM_X1) / 2, 0, (ROOM_Z0 + ROOM_Z1) / 2);
-var plaster = new THREE.MeshStandardMaterial({ color: 0x4a4238, roughness: 0.93 });
+/* Old lime plaster: soft mottling, damp shadows low down, hairline cracks; the extruded window wall has UVs in metres. */
+var plasterTex = canvasTex(512, 512, function (g, w, h) {
+  g.fillStyle = "#c8bca8"; g.fillRect(0, 0, w, h);
+  for (var i = 0; i < 700; i++) {
+    var x = hash(i + 1200) * w, y = hash(i + 1300) * h, r = 10 + hash(i + 1400) * 60, v = hash(i + 1500);
+    var gr = g.createRadialGradient(x, y, 0, x, y, r);
+    var c0 = v > 0.5 ? "rgba(90,78,62," : "rgba(235,226,210,";
+    gr.addColorStop(0, c0 + (0.05 + hash(i + 1600) * 0.07) + ")"); gr.addColorStop(1, c0 + "0)");
+    g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2);
+  }
+  for (var n = 0; n < 5000; n++) { g.fillStyle = "rgba(60,50,40," + hash(n + 1700) * 0.1 + ")"; g.fillRect(hash(n + 1800) * w, hash(n + 1900) * h, 1.5, 1.5); }
+  g.strokeStyle = "rgba(70,60,48,0.35)"; g.lineWidth = 1;
+  for (var k = 0; k < 7; k++) {
+    var cx = hash(k + 2000) * w, cy = hash(k + 2100) * h; g.beginPath(); g.moveTo(cx, cy);
+    for (var j = 0; j < 9; j++) { cx += (hash(k * 20 + j + 2200) - 0.5) * 30; cy += 8 + hash(k * 20 + j + 2300) * 14; g.lineTo(cx, cy); }
+    g.stroke();
+  }
+});
+plasterTex.wrapS = plasterTex.wrapT = THREE.RepeatWrapping; plasterTex.repeat.set(0.3, 0.3);
+var plaster = new THREE.MeshStandardMaterial({ color: 0x5a5046, map: plasterTex, bumpMap: plasterTex, bumpScale: 0.6, roughness: 0.93 });
 var ceil = add(new THREE.Mesh(new THREE.BoxGeometry(ROOM_X1 - ROOM_X0 + 1.2, 0.3, ROOM_Z1 - ROOM_Z0 + 0.4), new THREE.MeshStandardMaterial({ color: 0x2a241e, roughness: 0.9 })), true, true);
 ceil.position.set((ROOM_X0 + ROOM_X1) / 2 + 0.3, CEIL + 0.15, (ROOM_Z0 + ROOM_Z1) / 2);
 var lwall = add(new THREE.Mesh(new THREE.BoxGeometry(0.2, CEIL, ROOM_Z1 - ROOM_Z0), plaster), true, true);
@@ -780,10 +799,12 @@ var lampSpot = new THREE.SpotLight(0xffbf73, 1.5, 0, 0.95, 1.0, 2);
 lampSpot.position.set(TX + 0.1, SHADE_Y - 0.01, -0.98);
 lampSpot.target.position.set(TX + 0.45, TTOP, -0.6);
 scene.add(lampSpot); scene.add(lampSpot.target);
-var lampGlow = new THREE.PointLight(0xff9c50, 1.0, 9, 2);
+var lampGlow = new THREE.PointLight(0xff9c50, 2.4, 10, 2);
 lampGlow.position.set(TX + 0.22, SHADE_Y - 0.1, -0.9);
 scene.add(lampGlow);
-scene.add(new THREE.HemisphereLight(0x3a4866, 0x1a120c, 0.55));
+scene.add(new THREE.HemisphereLight(0x485a84, 0x2a1c12, 0.95));
+/* Moonlight thrown back off the pale floor and the window wall: a cool, shadowless fill that lets the shelves on the left read. */
+var shelfFill = new THREE.DirectionalLight(0x7d93c8, 1.5); shelfFill.position.set(6, 2.2, -2.5); shelfFill.target.position.set(-4, 2.4, -6.5); scene.add(shelfFill); scene.add(shelfFill.target);
 var bounce = new THREE.DirectionalLight(0x7f95c8, 1.6); bounce.position.set(6, 1.4, 4.5); scene.add(bounce);
 
 /* Moonbeams: prisms swept from each window along the light, faint and additive. */
@@ -894,7 +915,7 @@ function render(t) {
   }
   dGeo.attributes.position.needsUpdate = true; dGeo.attributes.color.needsUpdate = true;
 
-  lampSpot.intensity = 1.15 * (1 + 0.012 * Math.sin(u * TAU * 29));
+  lampSpot.intensity = 1.3 * (1 + 0.012 * Math.sin(u * TAU * 29));
   camera.position.set(-2.9 + 0.1 * s1, 1.85 + 0.03 * Math.sin(u * TAU * 2), 1.2 - 0.12 * c1);
   camera.lookAt(LOOK);
   composer.render();

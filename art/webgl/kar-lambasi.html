@@ -398,6 +398,37 @@ var groundMat = new THREE.MeshStandardMaterial({ color: 0xe9eef6, roughness: 0.8
 bumpTex.repeat.set(24, 38);
 var ground = add(new THREE.Mesh(groundGeo, groundMat), false, true);
 
+/* Glints: tiny ice facets in the snow, each a random mirror in a 1.5 cm cell. They flash only where the
+   lamp's own light actually lands (scaled by the shadowed direct light), and twinkle as the camera drifts. */
+var GLINT_LAMP = { value: new THREE.Vector3(-1.79, 3.37, 0.45) };
+function addGlints(mat, k) {
+  mat.onBeforeCompile = function (sh) {
+    sh.uniforms.uGL = GLINT_LAMP;
+    sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nvarying vec3 vGW;")
+      .replace("#include <worldpos_vertex>", "#include <worldpos_vertex>\nvec4 gw4 = vec4(transformed, 1.0);\n#ifdef USE_INSTANCING\ngw4 = instanceMatrix * gw4;\n#endif\nvGW = (modelMatrix * gw4).xyz;");
+    sh.fragmentShader = sh.fragmentShader.replace("#include <common>", [
+      "#include <common>",
+      "varying vec3 vGW; uniform vec3 uGL;",
+      "vec3 gh3(vec3 p) { p = fract(p * vec3(0.1031, 0.1030, 0.0973)); p += dot(p, p.yxz + 33.33); return fract((p.xxy + p.yxx) * p.zyx); }"
+    ].join("\n")).replace("#include <opaque_fragment>", [
+      "{",
+      "  vec3 gc = floor(vGW * 66.0);",
+      "  vec3 gr = gh3(gc);",
+      "  vec3 gn = normalize(vec3(gr.x - 0.5, 0.45 + gr.y, gr.z - 0.5));",
+      "  vec3 gL = normalize(uGL - vGW);",
+      "  vec3 gV = normalize(cameraPosition - vGW);",
+      "  float gd = max(dot(gn, normalize(gL + gV + vec3(0.0, 1e-4, 0.0))), 0.0);",
+      "  float gg = pow(gd, 900.0) * step(0.55, gh3(gc + 17.0).x);",
+      "  float gi = dot(reflectedLight.directDiffuse, vec3(0.3, 0.59, 0.11));",
+      "  outgoingLight += vec3(1.0, 0.86, 0.66) * gg * min(gi, 4.0) * " + k.toFixed(2) + ";",
+      "}",
+      "#include <opaque_fragment>"
+    ].join("\n"));
+  };
+}
+addGlints(groundMat, 60);
+addGlints(snowMat, 40);
+
 /* Low stone wall along the left side with a snow crest. */
 (function () {
   var stones = [], z = 11, row, s;
@@ -437,27 +468,39 @@ var ground = add(new THREE.Mesh(groundGeo, groundMat), false, true);
 
 /* Pines behind the wall, laden with snow, fading into the snowfall. */
 (function () {
-  var parts = [];
-  for (var k = 0; k < 6; k++) {
-    var r0 = 1.05 - k * 0.16, y0 = 0.8 + k * 0.6;
-    var cg = new THREE.ConeGeometry(r0, 1.0, 18, 4);
-    cg.translate(0, y0 + 0.5, 0);
-    var cols = [], p = cg.attributes.position;
+  /* Nine drooping tiers of boughs: each a cone whose rim is cut into ragged, sagging branch tips,
+     with the rings between pushed in and out so the silhouette reads as needles, not facets.
+     Snow sits on the upper side of each tier; the undersides stay dark green. */
+  var parts = [], NT = 9;
+  for (var k = 0; k < NT; k++) {
+    var f = k / (NT - 1), r0 = 1.12 - f * 0.86, y0 = 0.75 + f * 3.25, th = 0.62 + 0.18 * (1 - f);
+    var cg = new THREE.ConeGeometry(r0, th, 36, 5);
+    cg.translate(0, y0 + th / 2, 0);
+    var cols = [], p = cg.attributes.position, nb = 9 + (k % 3);
     for (var i = 0; i < p.count; i++) {
       var px = p.getX(i), pz = p.getZ(i), py = p.getY(i), an = Math.atan2(pz, px);
-      if (py < y0 + 0.02) { var dr = 1 + 0.18 * Math.sin(an * 7 + k) + 0.1 * Math.sin(an * 13 + k * 2); p.setXYZ(i, px * dr, py - 0.12 * (0.5 + 0.5 * Math.sin(an * 7 + k)), pz * dr); }
-      var sn = smooth(0.25, 0.75, (py - y0) + (hash(i * 3.7 + k) - 0.5) * 0.6);
-      cols.push(0.03 + sn * 0.5, 0.05 + sn * 0.55, 0.05 + sn * 0.64);
+      var hgt = (py - y0) / th;
+      var barg = an * nb * 0.5 + k * 1.7;
+      var bough = Math.abs(Math.sin(barg)) * (0.45 + 0.9 * hash2((((Math.floor(barg / Math.PI)) % nb) + nb) % nb + 11, k * 3 + 1));
+      var tipK = Math.pow(1 - hgt, 2);
+      var dr = 1 + tipK * (0.30 * bough - 0.12 + 0.10 * (vnoise(an * 3 + k * 5, hgt * 4) - 0.5)) + 0.07 * (hash2(an * 40 + k, hgt * 13) - 0.5) * (1 - hgt);
+      var drop = tipK * (0.10 + 0.16 * bough);
+      p.setXYZ(i, px * dr, py - drop, pz * dr);
+      var sn = smooth(0.18, 0.6, hgt + (vnoise(an * 5 + k * 3, hgt * 6) - 0.5) * 0.5) * (0.65 + 0.35 * bough);
+      sn = Math.min(1, sn * (1.1 - 0.3 * f));
+      var gv = 0.8 + 0.4 * hash2(k, an * 7);
+      cols.push(0.022 * gv + sn * 0.55, 0.045 * gv + sn * 0.6, 0.04 * gv + sn * 0.68);
     }
     cg.setAttribute("color", new THREE.Float32BufferAttribute(cols, 3));
+    cg.computeVertexNormals();
     parts.push(cg);
   }
-  var trunk = new THREE.CylinderGeometry(0.08, 0.12, 1.2, 6); trunk.translate(0, 0.6, 0);
-  var tc = []; for (var j = 0; j < trunk.attributes.position.count; j++) tc.push(0.08, 0.06, 0.05);
+  var trunk = new THREE.CylinderGeometry(0.06, 0.13, 1.4, 8); trunk.translate(0, 0.6, 0);
+  var tc = []; for (var j = 0; j < trunk.attributes.position.count; j++) tc.push(0.07, 0.05, 0.04);
   trunk.setAttribute("color", new THREE.Float32BufferAttribute(tc, 3));
+  trunk.computeVertexNormals();
   parts.push(trunk);
-  var tree = mergeGeometries(parts.map(function (g) { return g.toNonIndexed(); }));
-  tree.computeVertexNormals();
+  var tree = mergeGeometries(parts);
   var N = 22, im = new THREE.InstancedMesh(tree, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.9 }), N);
   var o = new THREE.Object3D();
   for (var t = 0; t < N; t++) {
@@ -509,6 +552,7 @@ makeLamp(LAMP.x, LAMP.z, true);
 var FAR_LAMPS = [[-2.55, -13.5], [-2.55, -27]];
 FAR_LAMPS.forEach(function (p) { makeLamp(p[0], p[1], true); });
 var LIGHT_POS = V(LAMP.x + LANT_X, LANT_Y - 0.05, LAMP.z);
+GLINT_LAMP.value.copy(LIGHT_POS);
 
 var halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xffc27a, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
 halo.position.copy(LIGHT_POS); halo.scale.set(1.9, 1.9, 1); scene.add(halo);
@@ -582,11 +626,15 @@ scene.add(cone);
   add(new THREE.Mesh(bg, paint), true, true, g);
   add(new THREE.Mesh(cg, glassM), true, true, g);
   var chrome = new THREE.MeshStandardMaterial({ color: 0xc8ccd0, metalness: 1, roughness: 0.25 });
-  var bump = add(new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 1.66), chrome), true, true, g); bump.position.set(-2.2, 0.45, 0);
+  var bump = add(new THREE.Mesh(new RoundedBoxGeometry(0.1, 0.11, 1.7, 2, 0.035), chrome), true, true, g); bump.position.set(-2.2, 0.45, 0);
   var grille = add(new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.16, 0.8), new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.6 })), false, true, g); grille.position.set(-2.2, 0.66, 0);
-  var hlM = new THREE.MeshPhysicalMaterial({ color: 0xbfc6cc, metalness: 0.1, roughness: 0.05, clearcoat: 1 });
+  for (var gb = 0; gb < 4; gb++) { var gbar = add(new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.012, 0.78), chrome), false, false, g); gbar.position.set(-2.22, 0.6 + gb * 0.04, 0); }
+  var hlM = new THREE.MeshPhysicalMaterial({ color: 0xd8dde2, metalness: 0.1, roughness: 0.05, clearcoat: 1, emissive: 0x28303a, emissiveIntensity: 0.3 });
+  var hlGeo = new THREE.CylinderGeometry(0.068, 0.068, 0.03, 24); hlGeo.rotateZ(Math.PI / 2);
+  var hlRim = new THREE.TorusGeometry(0.07, 0.012, 8, 28); hlRim.rotateY(Math.PI / 2);
   [-0.6, 0.6].forEach(function (z) {
-    var h = add(new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.14, 0.28), hlM), false, true, g); h.position.set(-2.21, 0.66, z);
+    var h = add(new THREE.Mesh(hlGeo, hlM), false, true, g); h.position.set(-2.2, 0.68, z);
+    var hr = add(new THREE.Mesh(hlRim, chrome), false, true, g); hr.position.set(-2.225, 0.68, z);
     var mir = add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.08, 0.06), paint), true, true, g); mir.position.set(-0.8, 0.98, z * 1.42);
   });
   var tyre = new THREE.MeshStandardMaterial({ color: 0x151515, roughness: 0.85 });
@@ -686,18 +734,28 @@ winLight.position.set(4.6, 1.7, HZ + 0.6); scene.add(winLight);
 var winGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xff9a45, transparent: true, opacity: 0.35, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
 winGlow.position.set(4.6, 1.75, HZ + 0.2); winGlow.scale.set(2.6, 2.6, 1); scene.add(winGlow);
 
-/* Houses further down the street, almost lost in the snowfall. */
+/* Houses further down the street, almost lost in the snowfall. The walls carry a faint glow of light
+   bounced off the snow so they read against the night; otherwise only the snow on the roofs showed and
+   seemed to float. The snow sits down over a dark eave and every house has a lit window or two. */
 (function () {
-  var m = new THREE.MeshStandardMaterial({ color: 0x3b3430, roughness: 0.9 });
+  var m = new THREE.MeshStandardMaterial({ color: 0x4a4038, roughness: 0.9, emissive: 0x39445a, emissiveIntensity: 1.0 });
+  var farSnow = snowMat.clone(); farSnow.color = new THREE.Color(0x9aa3b8);
+  var eaveM = new THREE.MeshStandardMaterial({ color: 0x1a1512, roughness: 0.9 });
+  var winM = new THREE.MeshBasicMaterial({ color: new THREE.Color(1.6, 0.8, 0.3) });
+  var dimM = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.55, 0.3, 0.14) });
   [[3.0, -19, 6, 3.2, 5, 1], [-9, -21, 7, 3.6, 6, 0], [4.2, -31, 6, 3.4, 6, 1]].forEach(function (a, i) {
+    var cx = a[0] + a[2] / 2, cz = a[1] - a[4] / 2, top = a[3] + 0.2;
     var b = add(new THREE.Mesh(new THREE.BoxGeometry(a[2], a[3], a[4]), m), false, true);
-    b.position.set(a[0] + a[2] / 2, a[3] / 2 + 0.2, a[1] - a[4] / 2);
-    var s = pillow(a[2] + 0.6, 0.9, a[4] + 0.6, a[0] + a[2] / 2, a[3] + 0.2, a[1] - a[4] / 2, 50 + i);
-    s.castShadow = false;
-    if (a[5]) {
-      var w = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 1.0), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.6, 0.8, 0.3) }));
-      w.position.set(a[0] + 1.6, 1.6, a[1] + 0.01); scene.add(w);
-    }
+    b.position.set(cx, a[3] / 2 + 0.2, cz);
+    var e = add(new THREE.Mesh(new THREE.BoxGeometry(a[2] + 0.5, 0.22, a[4] + 0.5), eaveM), false, false);
+    e.position.set(cx, top - 0.02, cz);
+    var s = pillow(a[2] + 0.6, 0.9, a[4] + 0.6, cx, top + 0.06, cz, 50 + i);
+    s.castShadow = false; s.material = farSnow;
+    var fz = a[1] + 0.01;
+    [[1.6, a[5] ? winM : dimM], [a[2] - 1.6, a[5] ? dimM : winM]].forEach(function (wd) {
+      var w = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 1.0), wd[1]);
+      w.position.set(a[0] + wd[0], 1.6, fz); scene.add(w);
+    });
   });
 })();
 
@@ -709,7 +767,7 @@ var fpFill = new Float32Array(FP_N);
 fpGeo.setAttribute("aFill", new THREE.InstancedBufferAttribute(fpFill, 1));
 var fpMat = new THREE.ShaderMaterial({
   vertexShader: "attribute float aFill; varying vec2 vUv; varying float vF; void main(){ vUv = uv; vF = aFill; gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix * vec4(position,1.0); }",
-  fragmentShader: "varying vec2 vUv; varying float vF; void main(){ vec2 p = vUv - 0.5; float soft = 0.25 + (1.0 - vF) * 0.5; float e1 = length(vec2(p.x / 0.4, (p.y - 0.14) / 0.3)); float e2 = length(vec2(p.x / 0.33, (p.y + 0.27) / 0.2)); float m = max(smoothstep(1.0, 1.0 - soft, e1), smoothstep(1.0, 1.0 - soft, e2)); float d = m * vF * (0.62 + 0.25 * vUv.x); vec3 c = mix(vec3(1.0), vec3(0.42, 0.5, 0.72), d); gl_FragColor = vec4(c, 1.0); }",
+  fragmentShader: "varying vec2 vUv; varying float vF; void main(){ vec2 p = vUv - 0.5; float soft = 0.25 + (1.0 - vF) * 0.5; float e1 = length(vec2(p.x / 0.4, (p.y - 0.14) / 0.3)); float e2 = length(vec2(p.x / 0.33, (p.y + 0.27) / 0.2)); float m = max(1.0 - smoothstep(1.0 - soft, 1.0, e1), 1.0 - smoothstep(1.0 - soft, 1.0, e2)); float d = m * vF * (0.62 + 0.25 * vUv.x); vec3 c = mix(vec3(1.0), vec3(0.42, 0.5, 0.72), d); gl_FragColor = vec4(c, 1.0); }",
   transparent: true, depthWrite: false, blending: THREE.MultiplyBlending, premultipliedAlpha: true,
   polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2
 });
@@ -760,7 +818,7 @@ var flMat = new THREE.ShaderMaterial({
     "  vec3 d = pos - uLamp; float L = length(d);",
     "  float cone = smoothstep(uCosO, uCosI, dot(d / L, uDir)) * step(0.0, -d.y + 0.25);",
     "  vLit = uLit * (cone * 5.5 / (1.0 + L * L * 0.55) + 0.25 / (0.04 + L * L * 3.0));",
-    "  float fog = exp(-pow(uFog * dist, 2.0));",
+    "  float fd = uFog * dist; float fog = exp(-fd * fd);",
     "  float ps = aB.z * uPx / dist;",
     "  gl_PointSize = clamp(ps, 1.0, 48.0);",
     "  vA = aB.w * fog * smoothstep(0.5, 2.2, dist) * min(1.0, ps * ps) * (ps > 48.0 ? 48.0 / ps : 1.0);",
@@ -771,7 +829,7 @@ var flMat = new THREE.ShaderMaterial({
     "varying float vLit; varying float vA;",
     "void main(){",
     "  float r = length(gl_PointCoord - 0.5) * 2.0;",
-    "  float a = smoothstep(1.0, 0.15, r);",
+    "  float a = 1.0 - smoothstep(0.15, 1.0, r);",
     "  vec3 col = vec3(0.24, 0.30, 0.44) + vec3(1.0, 0.74, 0.46) * vLit * 1.6;",
     "  gl_FragColor = vec4(col, a * vA * (0.28 + min(vLit, 1.2) * 0.72));",
     "}"

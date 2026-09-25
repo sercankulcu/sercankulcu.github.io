@@ -226,6 +226,7 @@ import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { mount } from "/assets/js/gl-player.js";
 
 var TAU = Math.PI * 2, DURATION = 48, SRGB = THREE.SRGBColorSpace;
@@ -240,7 +241,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.92;
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(44, 16 / 9, 0.05, 40000);
@@ -690,7 +691,7 @@ function bushGeo(ws, hs) {
   return g;
 }
 var leafMat = new THREE.MeshStandardMaterial({ map: leafTex, roughness: 0.8, bumpMap: leafTex, bumpScale: 2.0, vertexColors: true });
-var NEAR_B = [], FAR_B = [];
+var NEAR_B = [], FAR_B = [], FAR2_B = [];
 seed = 101;
 for (var bx = -150; bx <= 150; bx += 4.6) {
   for (var bz = -200; bz <= 16; bz += 4.6) {
@@ -702,7 +703,7 @@ for (var bx = -150; bx <= 150; bx += 4.6) {
     for (var c = 0; c < nc; c++) {
       var a = rnd() * TAU, rr = rnd() * 1.0 * s;
       var item = { x: x + Math.cos(a) * rr, y: gy + 1.4 * s + rnd() * 1.5 * s, z: z + Math.sin(a) * rr, s: (0.9 + rnd() * 0.7) * s, ry: rnd() * TAU, h: rnd() };
-      (dist < 45 ? NEAR_B : FAR_B).push(item);
+      (dist < 45 ? NEAR_B : dist < 90 ? FAR_B : FAR2_B).push(item);
     }
   }
 }
@@ -719,8 +720,20 @@ function bushMesh(list, geo, cast, mat) {
   scene.add(im);
   return im;
 }
-bushMesh(NEAR_B, bushGeo(18, 12), true);
+/* Near bushes get a ragged leafy edge: small bites taken out of each clump so the sky and the clumps behind show through. */
+var bushHole = canvasTex(512, 512, function (g, w, h) {
+  g.fillStyle = "#fff"; g.fillRect(0, 0, w, h);
+  seed = 131; g.fillStyle = "#000";
+  for (var k = 0; k < 420; k++) {
+    var x = rnd() * w, y = rnd() * h, r = 3 + rnd() * 9, a = rnd() * 3;
+    wrapDraw(w, h, x, y, r * 1.2, function (X, Y) { g.beginPath(); g.ellipse(X, Y, r, r * 0.6, a, 0, TAU); g.fill(); });
+  }
+}, false);
+var leafMatNear = new THREE.MeshStandardMaterial({ map: leafTex, roughness: 0.8, bumpMap: leafTex, bumpScale: 2.0, vertexColors: true, alphaMap: bushHole, alphaTest: 0.5, side: THREE.DoubleSide });
+bushMesh(NEAR_B, bushGeo(18, 12), true, leafMatNear);
 bushMesh(FAR_B, bushGeo(10, 7), false);
+/* Past 90 m a clump is a few pixels across: a coarse ball reads the same and saves millions of vertices a frame. */
+bushMesh(FAR2_B, bushGeo(6, 4), false);
 
 /* A scatter of village houses on the far slopes */
 var VIL = [];
@@ -931,7 +944,8 @@ function huskGeo(N, R) {
   g.computeVertexNormals();
   return g;
 }
-var nutMat = new THREE.MeshPhysicalMaterial({ vertexColors: true, roughness: 0.3, clearcoat: 1.0, clearcoatRoughness: 0.12, envMapIntensity: 1.0 });
+/* A nut is a dozen pixels on screen: a standard material and a coarse mesh look the same as clearcoat on a fine one and cost a quarter as much. */
+var nutMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.26, envMapIntensity: 1.1 });
 var huskMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.72, side: THREE.DoubleSide, envMapIntensity: 0.7 });
 var NEAR_Z = -0.6;
 var NUT_NEAR = [], NUT_MID = [], HUSK_NEAR = [], HUSK_MID = [];
@@ -950,7 +964,7 @@ var NUT_NEAR = [], NUT_MID = [], HUSK_NEAR = [], HUSK_MID = [];
     (near ? NUT_NEAR : NUT_MID).push(item);
     if (inH) (near ? HUSK_NEAR : HUSK_MID).push({ p: item.p, q: item.q, r: r * (1.02 + rnd() * 0.14), c: huskHSL() });
   }
-  while (NUT_NEAR.length < 8500 && tries < 400000) {
+  while (NUT_NEAR.length < 6000 && tries < 400000) {
     tries++;
     var x = (rnd() - 0.5) * TW, z = NEAR_Z + rnd() * (TD / 2 - NEAR_Z);
     lay(x, z);
@@ -958,7 +972,7 @@ var NUT_NEAR = [], NUT_MID = [], HUSK_NEAR = [], HUSK_MID = [];
     place(x, z, true, false);
   }
   tries = 0;
-  while (NUT_MID.length < 9000 && tries < 400000) {
+  while (NUT_MID.length < 5000 && tries < 400000) {
     tries++;
     var x2 = (rnd() - 0.5) * TW, z2 = -TD / 2 + rnd() * (NEAR_Z + TD / 2);
     lay(x2, z2);
@@ -983,28 +997,50 @@ function nutMesh(list, geo, mat, isHusk, cast) {
   tarp.add(im);
   return im;
 }
-nutMesh(NUT_NEAR, nutGeo(14, 10), nutMat, false, true);
+nutMesh(NUT_NEAR, nutGeo(10, 7), nutMat, false, true);
 nutMesh(NUT_MID, nutGeo(8, 6), nutMat, false, false);
-nutMesh(HUSK_NEAR, huskGeo(32, 6), huskMat, true, true);
+nutMesh(HUSK_NEAR, huskGeo(20, 4), huskMat, true, true);
 nutMesh(HUSK_MID, huskGeo(14, 3), huskMat, true, false);
 
 /* ---------- The rake left lying in the nuts ---------- */
-var rakeWood = new THREE.MeshStandardMaterial({ color: 0xd2b184, roughness: 0.62 });
+/* Weathered ash: grain streaks along the length, grey sun-bleached patches, a darker polished grip. */
+var grainTex = canvasTex(128, 1024, function (g, w, h) {
+  g.fillStyle = "#dcbc8c"; g.fillRect(0, 0, w, h);
+  seed = 707;
+  for (var k = 0; k < 140; k++) {
+    var x = rnd() * w, a = 0.05 + rnd() * 0.16, lw = 0.6 + rnd() * 2.2;
+    g.strokeStyle = rnd() > 0.45 ? "rgba(92,62,34," + a + ")" : "rgba(236,214,176," + a + ")"; g.lineWidth = lw;
+    g.beginPath(); g.moveTo(x, 0);
+    for (var y = 0; y <= h; y += 32) g.lineTo(x + Math.sin(y * 0.004 + k) * 3 + Math.sin(y * 0.021 + k * 2) * 1.2, y);
+    g.stroke();
+  }
+  for (var p = 0; p < 18; p++) {
+    var py = rnd() * h, pr = 30 + rnd() * 90, gr = g.createRadialGradient(w / 2, py, 1, w / 2, py, pr);
+    gr.addColorStop(0, "rgba(170,160,140,0.14)"); gr.addColorStop(1, "rgba(170,160,140,0)");
+    g.fillStyle = gr; g.fillRect(0, py - pr, w, pr * 2);
+  }
+  var gp = g.createLinearGradient(0, 0, 0, h * 0.22);
+  gp.addColorStop(0, "rgba(86,54,28,0.55)"); gp.addColorStop(1, "rgba(86,54,28,0)");
+  g.fillStyle = gp; g.fillRect(0, 0, w, h * 0.22);
+});
+var rakeWood = new THREE.MeshStandardMaterial({ map: grainTex, roughness: 0.66, bumpMap: grainTex, bumpScale: 0.5 });
+var headTex = grainTex.clone(); headTex.needsUpdate = true; headTex.repeat.set(0.25, 0.4); headTex.offset.set(0, 0.4);
+var headWood = new THREE.MeshStandardMaterial({ map: headTex, roughness: 0.7, color: 0xe6d6c0 });
 var rake = new THREE.Group();
-var handle = toGroup(rake, new THREE.Mesh(new THREE.CylinderGeometry(0.019, 0.021, 1.9, 12), rakeWood), true, true);
-handle.rotation.z = Math.PI / 2; handle.position.x = 0.95;
-toGroup(rake, new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.72), rakeWood), true, true);
+var handle = toGroup(rake, new THREE.Mesh(new THREE.CylinderGeometry(0.019, 0.021, 1.9, 14, 1), rakeWood), true, true);
+handle.rotation.z = -Math.PI / 2; handle.position.x = 0.95;
+var rhead = toGroup(rake, new THREE.Mesh(new RoundedBoxGeometry(0.05, 0.055, 0.72, 2, 0.012), headWood), true, true);
 for (var tt = 0; tt < 14; tt++) {
-  var tooth = toGroup(rake, new THREE.Mesh(new THREE.CylinderGeometry(0.0065, 0.005, 0.1, 6), rakeWood), true, true);
-  tooth.position.set(-0.012, -0.055, -0.325 + tt * 0.05);
+  var tooth = toGroup(rake, new THREE.Mesh(new THREE.CylinderGeometry(0.0062, 0.0042, 0.12, 7), headWood), true, true);
+  tooth.position.set(-0.03, -0.045, -0.325 + tt * 0.05); tooth.rotation.z = -0.5 + 0.04 * Math.sin(tt * 2.3);
 }
 [-1, 1].forEach(function (sg) {
   var brace = toGroup(rake, new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.34, 6), rakeWood), true, true);
   brace.position.set(0.12, 0.0, sg * 0.11); brace.rotation.set(sg * Math.PI / 2, 0, 0); brace.rotateZ(sg * 0.0); brace.rotation.set(0, 0, 0);
   brace.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0.24, 0, -sg * 0.22).normalize());
 });
-rake.position.set(HX, 0.1, HZ);
-rake.rotation.set(0, -Math.atan2(RDZ, RDX), -0.02);
+rake.position.set(HX, 0.088, HZ);
+rake.rotation.set(0, -Math.atan2(RDZ, RDX), -0.016);
 tarp.add(rake);
 
 /* ---------- Sacks, a crate, a bucket ---------- */
@@ -1064,28 +1100,89 @@ var pole = add(new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.04, 2.3, 10), 
 pole.position.set(lineB.x, 1.15, lineB.z);
 var pole2 = add(new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.04, 2.4, 10), new THREE.MeshStandardMaterial({ color: 0x9aa0a4, metalness: 0.4, roughness: 0.5 })), true, false);
 pole2.position.set(lineA.x, 1.2, lineA.z);
-var wireLen = lineA.distanceTo(lineB);
-var wire = add(new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, wireLen, 4), new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 0.5 })), true, false);
-wire.position.copy(lineA).add(lineB).multiplyScalar(0.5);
-wire.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), lineB.clone().sub(lineA).normalize());
+var wireLen = lineA.distanceTo(lineB), WSAG = 0.13;
+function wsag(f) { return WSAG * 4 * f * (1 - f); }
+(function () {
+  var wp = [];
+  for (var k = 0; k <= 20; k++) { var f = k / 20, q = lineA.clone().lerp(lineB, f); q.y -= wsag(f); wp.push(q); }
+  add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(wp), 40, 0.005, 5, false), new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 0.5 })), true, false);
+})();
+/* Laundry cloths: a hemmed sheet with a crocheted edge, a polka-dot cloth, a striped towel, a printed yazma headscarf, a gingham apron. */
 var clothTex = canvasTex(256, 256, function (g, w, h) {
   g.fillStyle = "#c7382f"; g.fillRect(0, 0, w, h);
   g.fillStyle = "#f2d9a6";
   for (var y = 10; y < h; y += 34) for (var x = 10 + (y % 68 ? 0 : 17); x < w; x += 34) { g.beginPath(); g.arc(x, y, 7, 0, TAU); g.fill(); }
   g.fillStyle = "#1e3f6e"; g.fillRect(0, 0, w, 12); g.fillRect(0, h - 12, w, 12);
 });
-var CLOTHS = [];
-[[0.12, 1.2, 1.15, 0xf3f1ea, null], [0.34, 0.7, 0.55, 0xffffff, clothTex], [0.5, 0.75, 0.6, 0x3b6db3, null], [0.66, 0.6, 0.45, 0xe7b43c, null], [0.82, 0.85, 0.7, 0xd9e4e8, null]].forEach(function (c, i) {
+function weave(g, w, h, a) {
+  for (var y = 0; y < h; y += 3) { g.fillStyle = "rgba(0,0,0," + a + ")"; g.fillRect(0, y, w, 1); }
+  for (var x = 0; x < w; x += 3) { g.fillStyle = "rgba(255,255,255," + a + ")"; g.fillRect(x, 0, 1, h); }
+}
+var sheetTex = canvasTex(512, 512, function (g, w, h) {
+  g.fillStyle = "#f4f2ec"; g.fillRect(0, 0, w, h); weave(g, w, h, 0.03);
+  g.strokeStyle = "rgba(160,170,185,0.6)"; g.lineWidth = 3; g.strokeRect(14, 14, w - 28, h - 28);
+  g.fillStyle = "#c8342c";
+  for (var x = 6; x < w; x += 16) { g.beginPath(); g.moveTo(x, h - 2); g.lineTo(x + 8, h - 16); g.lineTo(x + 16, h - 2); g.fill(); }
+  g.fillStyle = "#2f7a3e"; for (x = 14; x < w; x += 16) { g.beginPath(); g.arc(x, h - 20, 3, 0, TAU); g.fill(); }
+});
+var towelTex = canvasTex(256, 256, function (g, w, h) {
+  g.fillStyle = "#3b6db3"; g.fillRect(0, 0, w, h);
+  [[0.1, 0.16, "#f1eee6"], [0.2, 0.23, "#f1eee6"], [0.77, 0.8, "#f1eee6"], [0.84, 0.9, "#f1eee6"]].forEach(function (b) { g.fillStyle = b[2]; g.fillRect(0, b[0] * h, w, (b[1] - b[0]) * h); });
+  seed = 611; for (var k = 0; k < 9000; k++) { g.fillStyle = rnd() > 0.5 ? "rgba(255,255,255,0.10)" : "rgba(0,0,30,0.12)"; g.fillRect(rnd() * w, rnd() * h, 2, 2); }
+});
+var yazmaTex = canvasTex(256, 256, function (g, w, h) {
+  g.fillStyle = "#e9b43a"; g.fillRect(0, 0, w, h);
+  seed = 621;
+  for (var k = 0; k < 40; k++) {
+    var x = 30 + rnd() * (w - 60), y = 30 + rnd() * (h - 60), c = rnd() > 0.5 ? "#b8322c" : "#3d6b3a";
+    g.fillStyle = c; for (var p = 0; p < 5; p++) { var a = p / 5 * TAU; g.beginPath(); g.arc(x + Math.cos(a) * 5, y + Math.sin(a) * 5, 4, 0, TAU); g.fill(); }
+    g.fillStyle = "#f6e7b8"; g.beginPath(); g.arc(x, y, 2.5, 0, TAU); g.fill();
+  }
+  g.strokeStyle = "#7a2320"; g.lineWidth = 12; g.strokeRect(8, 8, w - 16, h - 16);
+  g.strokeStyle = "#f6e7b8"; g.lineWidth = 2; g.strokeRect(18, 18, w - 36, h - 36);
+});
+var apronTex = canvasTex(256, 256, function (g, w, h) {
+  g.fillStyle = "#eef3f5"; g.fillRect(0, 0, w, h);
+  g.fillStyle = "rgba(70,130,170,0.45)";
+  for (var x = 0; x < w; x += 24) g.fillRect(x, 0, 12, h);
+  for (var y = 0; y < h; y += 24) g.fillRect(0, y, w, 12);
+  weave(g, w, h, 0.04);
+});
+/* Cloth is lit through from behind when the sun is on its far side. */
+var clothSunV = new THREE.Vector3(), clothSunC = new THREE.Color(1.5, 1.3, 1.0);
+function clothMat(map) {
+  var m = new THREE.MeshStandardMaterial({ map: map, roughness: 0.9, side: THREE.DoubleSide });
+  m.onBeforeCompile = function (sh) {
+    sh.uniforms.uSunV = { value: clothSunV }; sh.uniforms.uSunC = { value: clothSunC };
+    sh.fragmentShader = "uniform vec3 uSunV;\nuniform vec3 uSunC;\n" + sh.fragmentShader.replace("#include <lights_fragment_end>",
+      "#include <lights_fragment_end>\nreflectedLight.directDiffuse += diffuseColor.rgb * uSunC * 0.55 * pow(max(0.0, -dot(normal, uSunV)), 0.8);\n");
+  };
+  return m;
+}
+var CLOTHS = [], PEG_M = [];
+[[0.13, 1.2, 1.1, sheetTex], [0.345, 0.66, 0.6, clothTex], [0.51, 0.52, 0.84, towelTex], [0.675, 0.66, 0.66, yazmaTex], [0.845, 0.62, 0.76, apronTex]].forEach(function (c, i) {
   var w = c[1], hh = c[2];
-  var geo = new THREE.PlaneGeometry(w, hh, 10, 10);
-  var mat = new THREE.MeshStandardMaterial({ color: c[3], map: c[4], roughness: 0.85, side: THREE.DoubleSide });
-  var mesh = add(new THREE.Mesh(geo, mat), true, true);
+  var geo = new THREE.PlaneGeometry(w, hh, 14, 12);
+  var mesh = add(new THREE.Mesh(geo, clothMat(c[3])), true, true);
   var at = lineA.clone().lerp(lineB, c[0]);
-  at.y -= 0.03 + 0.25 * Math.sin(Math.PI * c[0]);
+  at.y -= wsag(c[0]) + 0.004;
   mesh.position.copy(at);
   mesh.rotation.y = Math.atan2(-(lineB.z - lineA.z), lineB.x - lineA.x);
-  CLOTHS.push({ m: mesh, geo: geo, base: Float32Array.from(geo.attributes.position.array), w: w, h: hh, ph: i * 1.7 });
+  mesh.updateMatrixWorld();
+  [-0.45, 0.45].forEach(function (e) {
+    var fx = e * w, fq = c[0] + fx / wireLen;
+    PEG_M.push(new THREE.Vector3(fx, -(wsag(fq) - wsag(c[0])) - 0.012, 0.0).applyMatrix4(mesh.matrixWorld));
+  });
+  CLOTHS.push({ m: mesh, geo: geo, base: Float32Array.from(geo.attributes.position.array), w: w, h: hh, ph: i * 1.7, f0: c[0] });
 });
+(function () {
+  var pegs = new THREE.InstancedMesh(new THREE.BoxGeometry(0.014, 0.05, 0.022), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 }), PEG_M.length), m = new THREE.Matrix4(), col = new THREE.Color();
+  for (var k = 0; k < PEG_M.length; k++) {
+    m.makeRotationY(Math.atan2(-(lineB.z - lineA.z), lineB.x - lineA.x)); m.setPosition(PEG_M[k]);
+    pegs.setMatrixAt(k, m); pegs.setColorAt(k, col.set([0xe23b3b, 0x3b7de2, 0x3fb86a, 0xf2c230][k % 4]));
+  }
+  pegs.castShadow = true; scene.add(pegs);
+})();
 function updateCloths(u) {
   var gs = gust(u + 0.04);
   for (var k = 0; k < CLOTHS.length; k++) {
@@ -1093,8 +1190,9 @@ function updateCloths(u) {
     for (var i = 0; i < p.length; i += 3) {
       var x = b[i], y = b[i + 1], s = (C.h / 2 - y) / C.h;
       var wv = Math.sin(x * 4.0 + u * TAU * 7 + C.ph) * 0.05 + Math.sin(y * 5.0 - u * TAU * 11 + C.ph) * 0.03;
+      var droop = wsag(C.f0 + x / wireLen) - wsag(C.f0);
       p[i] = x + s * s * 0.05 * gs * Math.sin(u * TAU * 5 + C.ph);
-      p[i + 1] = y - C.h / 2 + s * s * 0.06 * gs;
+      p[i + 1] = y - C.h / 2 + s * s * 0.06 * gs - droop;
       p[i + 2] = s * (0.08 + 0.26 * gs) * s + s * wv * (0.6 + gs) + 0.025 * Math.sin(x * 15 + C.ph) * (0.4 + s);
     }
     C.geo.attributes.position.needsUpdate = true;
@@ -1183,7 +1281,7 @@ var bounce = new THREE.DirectionalLight(0xf0b87e, 0.5);
 bounce.position.set(-0.5, -0.3, 0.7); scene.add(bounce);
 
 /* ---------- Post: a faint heat shimmer over the far ground and a soft vignette ---------- */
-var rtMain = new THREE.WebGLRenderTarget(16, 9, { type: THREE.HalfFloatType, samples: 4 });
+var rtMain = new THREE.WebGLRenderTarget(16, 9, { type: THREE.HalfFloatType, samples: 2 });
 rtMain.depthTexture = new THREE.DepthTexture(16, 9);
 rtMain.depthTexture.type = THREE.UnsignedIntType;
 var composer = new EffectComposer(renderer, rtMain);
@@ -1207,7 +1305,7 @@ var shimmer = new ShaderPass({
     "  uv.y += cos(uv.y * 240.0 + uB + uv.x * 17.0) * 0.0005 * band;",
     "  vec4 c = texture2D(tDiffuse, uv);",
     "  vec2 q = vUv - 0.5;",
-    "  c.rgb *= (1.0 - 0.32 * dot(q, q) * 2.0) * vec3(1.03, 1.0, 0.95);",
+    "  c.rgb *= (1.0 - 0.18 * dot(q, q) * 2.0) * vec3(1.03, 1.0, 0.95);",
     "  gl_FragColor = c;",
     "}"
   ].join("\n")
@@ -1224,6 +1322,8 @@ function render(t) {
   camera.lookAt(LOOK.x + 0.1 * Math.sin(w + 0.7), LOOK.y + 0.03 * Math.sin(w * 2), LOOK.z);
   /*DBG*/ if (DBG) { var dv = DBG.split(",").map(Number); camera.position.set(dv[0], dv[1], dv[2]); camera.lookAt(dv[3], dv[4], dv[5]); camera.fov = dv[6] || 44; camera.updateProjectionMatrix(); }
 
+  camera.updateMatrixWorld();
+  clothSunV.copy(SUN_DIR).transformDirection(camera.matrixWorldInverse);
   var sd = SUN_DIR.clone(); sd.x += 0.015 * Math.sin(w); sd.normalize();
   sunL.position.copy(SHADOW_C).addScaledVector(sd, 35);
   sunL.target.position.copy(SHADOW_C);
@@ -1367,6 +1467,8 @@ mount({
   prefix: "fsr", app: "serme-app", duration: DURATION, t0: 12,
   renderer: renderer, render: render,
   resize: function (w, h) {
+    /* Eleven thousand nuts are the heaviest thing in the series: on high-density screens render at 1.5x, not 2x. */
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     camera.aspect = w / h; camera.updateProjectionMatrix();
     composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(w, h);
   },

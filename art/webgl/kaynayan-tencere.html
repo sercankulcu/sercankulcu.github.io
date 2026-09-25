@@ -289,17 +289,98 @@ function tiles(bump) {
 var tileTex = tiles(false), tileBump = tiles(true);
 [tileTex, tileBump].forEach(function (t) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3.6 / 0.8, 0.40 / 0.4); });
 
-var plasterTex = canvasTex(512, 512, function (g, w, h) {
-  g.fillStyle = "#cdb897"; g.fillRect(0, 0, w, h);
-  for (var i = 0; i < 900; i++) {
-    var x = hash(i + 1) * w, y = hash(i + 2) * h, r = 4 + hash(i + 3) * 26;
-    var gr = g.createRadialGradient(x, y, 0, x, y, r);
-    var c = hash(i + 4) > 0.5 ? "255,245,220" : "120,95,65";
-    gr.addColorStop(0, "rgba(" + c + ",0.06)"); gr.addColorStop(1, "rgba(" + c + ",0)");
-    g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2);
+/* Old lime plaster: broad patches of repainting, trowel arcs, pits and a few hairline cracks; tileable, with a matching bump map. */
+function plasterDraw(bump) {
+  return function (g, w, h) {
+    function wrap(x, y, r, fn) { for (var ox = -1; ox <= 1; ox++) for (var oy = -1; oy <= 1; oy++) { var X = x + ox * w, Y = y + oy * h; if (X + r < 0 || X - r > w || Y + r < 0 || Y - r > h) continue; fn(X, Y); } }
+    g.fillStyle = bump ? "#808080" : "#cdb897"; g.fillRect(0, 0, w, h);
+    var i;
+    for (i = 0; i < 70; i++) {
+      var bx = hash(i + 1100) * w, by = hash(i + 1101) * h, br = 60 + hash(i + 1102) * 180;
+      var light = hash(i + 1103) > 0.5;
+      wrap(bx, by, br, function (X, Y) {
+        var gr = g.createRadialGradient(X, Y, 0, X, Y, br);
+        var c = bump ? (light ? "255,255,255" : "0,0,0") : (light ? "236,222,192" : "150,122,88");
+        gr.addColorStop(0, "rgba(" + c + "," + (bump ? 0.05 : 0.13) + ")"); gr.addColorStop(1, "rgba(" + c + ",0)");
+        g.fillStyle = gr; g.fillRect(X - br, Y - br, br * 2, br * 2);
+      });
+    }
+    for (i = 0; i < 1600; i++) {
+      var x = hash(i + 1) * w, y = hash(i + 2) * h, r = 4 + hash(i + 3) * 26, c2 = hash(i + 4) > 0.5;
+      wrap(x, y, r, function (X, Y) {
+        var gr2 = g.createRadialGradient(X, Y, 0, X, Y, r);
+        var cc = bump ? (c2 ? "255,255,255" : "0,0,0") : (c2 ? "255,245,220" : "120,95,65");
+        gr2.addColorStop(0, "rgba(" + cc + ",0.06)"); gr2.addColorStop(1, "rgba(" + cc + ",0)");
+        g.fillStyle = gr2; g.fillRect(X - r, Y - r, r * 2, r * 2);
+      });
+    }
+    g.lineCap = "round";
+    for (i = 0; i < 90; i++) {
+      var ax = hash(i + 1200) * w, ay = hash(i + 1201) * h, ar = 40 + hash(i + 1202) * 90, a0 = hash(i + 1203) * TAU;
+      wrap(ax, ay, ar, function (X, Y) {
+        g.strokeStyle = bump ? "rgba(255,255,255,0.10)" : "rgba(245,232,205,0.10)"; g.lineWidth = 2 + hash(i + 1204) * 5;
+        g.beginPath(); g.arc(X, Y, ar, a0, a0 + 0.6 + hash(i + 1205) * 0.9); g.stroke();
+      });
+    }
+    for (i = 0; i < 2500; i++) {
+      g.fillStyle = bump ? "rgba(0,0,0,0.5)" : "rgba(95,75,50,0.28)";
+      g.fillRect(hash(i + 1300) * w, hash(i + 1301) * h, 1 + hash(i + 1302) * 1.5, 1 + hash(i + 1303) * 1.5);
+    }
+    g.strokeStyle = bump ? "rgba(0,0,0,0.8)" : "rgba(90,68,45,0.45)"; g.lineWidth = 1;
+    for (var k = 0; k < 5; k++) {
+      var cx = w * (0.1 + hash(k + 1400) * 0.8), cy = h * (0.1 + hash(k + 1401) * 0.6), ca = hash(k + 1402) * TAU;
+      g.beginPath(); g.moveTo(cx, cy);
+      for (var s = 0; s < 14; s++) { ca += (hash(k * 20 + s + 1403) - 0.5) * 1.1; cx += Math.cos(ca) * 9; cy += Math.abs(Math.sin(ca)) * 9; g.lineTo(cx, cy); }
+      g.stroke();
+    }
+  };
+}
+var plasterTex = canvasTex(1024, 1024, plasterDraw(false));
+var plasterBump = canvasTex(1024, 1024, plasterDraw(true), false);
+[plasterTex, plasterBump].forEach(function (t) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 3); });
+
+/* Soot and grease above the stove: a soft warm stain rising from the burners and spreading under the shelf. */
+var sootTex = canvasTex(256, 512, function (g, w, h) {
+  var gr = g.createRadialGradient(w * 0.5, h * 0.95, 10, w * 0.5, h * 0.8, h * 0.75);
+  gr.addColorStop(0, "rgba(60,38,20,0.55)"); gr.addColorStop(0.45, "rgba(70,45,25,0.25)"); gr.addColorStop(1, "rgba(70,45,25,0)");
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  for (var i = 0; i < 40; i++) {
+    var x = w * (0.2 + hash(i + 1500) * 0.6), y = h * (0.3 + hash(i + 1501) * 0.65), r = 10 + hash(i + 1502) * 40;
+    var g2 = g.createRadialGradient(x, y, 0, x, y, r);
+    g2.addColorStop(0, "rgba(55,35,18," + (0.05 + hash(i + 1503) * 0.08) + ")"); g2.addColorStop(1, "rgba(55,35,18,0)");
+    g.fillStyle = g2; g.fillRect(x - r, y - r, r * 2, r * 2);
   }
 });
-plasterTex.wrapS = plasterTex.wrapT = THREE.RepeatWrapping; plasterTex.repeat.set(3, 3);
+
+/* Oil paint on the cupboard doors: soft vertical brush drag, grime near the bottom, paint rubbed thin by the knob. */
+function doorDraw(bump, wear) {
+  return function (g, w, h) {
+    g.fillStyle = bump ? "#808080" : "#dccfb4"; g.fillRect(0, 0, w, h);
+    for (var i = 0; i < 260; i++) {
+      var x = hash(i + 1600) * w, a = (bump ? 0.04 : 0.015) + hash(i + 1601) * (bump ? 0.06 : 0.035);
+      if (bump) g.strokeStyle = hash(i + 1602) > 0.5 ? "rgba(255,255,255," + a + ")" : "rgba(0,0,0," + a + ")";
+      else g.strokeStyle = hash(i + 1602) > 0.5 ? "rgba(255,250,235," + a + ")" : "rgba(120,100,70," + a + ")";
+      g.lineWidth = 3 + hash(i + 1603) * 8; g.beginPath(); g.moveTo(x, 0);
+      for (var y = 0; y <= h; y += 32) g.lineTo(x + Math.sin(y * 0.02 + i) * 1.5, y);
+      g.stroke();
+    }
+    if (bump) return;
+    var gb = g.createLinearGradient(0, h * 0.65, 0, h);
+    gb.addColorStop(0, "rgba(90,70,45,0)"); gb.addColorStop(1, "rgba(90,70,45,0.2)");
+    g.fillStyle = gb; g.fillRect(0, 0, w, h);
+    if (!wear) return;
+    var gk = g.createRadialGradient(w * 0.9, h * 0.12, 2, w * 0.9, h * 0.12, 60);
+    gk.addColorStop(0, "rgba(130,100,65,0.35)"); gk.addColorStop(1, "rgba(130,100,65,0)");
+    g.fillStyle = gk; g.fillRect(0, 0, w, h);
+    for (var k = 0; k < 7; k++) {
+      var px = w * (0.93 + hash(k + 1700) * 0.06), py = h * (0.05 + hash(k + 1701) * 0.16), pr = 1.5 + hash(k + 1702) * 3;
+      g.fillStyle = "rgba(125,92,58,0.55)"; g.beginPath(); g.ellipse(px, py, pr, pr * (0.5 + hash(k + 1703)), hash(k + 1704) * 3, 0, TAU); g.fill();
+    }
+  };
+}
+var doorPaintTex = canvasTex(512, 512, doorDraw(false, true));
+var panelPaintTex = canvasTex(512, 512, doorDraw(false, false));
+var doorBump = canvasTex(512, 512, doorDraw(true, false), false);
 
 function woodCanvas(base, light, dark, strips) {
   return canvasTex(1024, 256, function (g, w, h) {
@@ -503,7 +584,7 @@ function box(w, h, d, mat, x, y, z, cast, receive, parent) {
 var WZ = -0.6, CT = 0.92, WX0 = 0.3, WX1 = 1.0, WY0 = 1.32, WY1 = 2.04;
 var floor = add(new THREE.Mesh(new THREE.PlaneGeometry(12, 12), new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.6 })), false, true);
 floor.rotation.x = -Math.PI / 2;
-var plaster = new THREE.MeshStandardMaterial({ map: plasterTex, roughness: 0.95 });
+var plaster = new THREE.MeshStandardMaterial({ map: plasterTex, bumpMap: plasterBump, bumpScale: 1.4, roughness: 0.95 });
 function wall(x0, y0, x1, y1) { box(x1 - x0, y1 - y0, 0.1, plaster, (x0 + x1) / 2, (y0 + y1) / 2, WZ - 0.05, false, true); }
 wall(-3, 0, WX0, 3.2); wall(WX1, 0, 4, 3.2); wall(WX0, 0, WX1, WY0); wall(WX0, WY1, WX1, 3.2);
 var reveal = new THREE.MeshStandardMaterial({ color: 0xcfc2a8, roughness: 0.9 });
@@ -513,19 +594,38 @@ box(WX1 - WX0 + 0.06, 0.03, 0.16, reveal, (WX0 + WX1) / 2, WY1 + 0.015, WZ - 0.0
 var splash = add(new THREE.Mesh(new THREE.PlaneGeometry(3.6, 0.40), new THREE.MeshStandardMaterial({ map: tileTex, bumpMap: tileBump, bumpScale: 1.2, roughness: 0.22, metalness: 0 })), false, true);
 splash.position.set(0.15, CT + 0.20, WZ + 0.002);
 var side = box(0.1, 3.2, 5, plaster, -1.5, 1.6, 1.9, false, true);
+var soot = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 2.0), new THREE.MeshStandardMaterial({ map: sootTex, transparent: true, depthWrite: false, roughness: 1, polygonOffset: true, polygonOffsetFactor: -2 }));
+soot.position.set(-1.0, 1.32 + 1.0, WZ + 0.001); soot.receiveShadow = true; scene.add(soot);
+/* A glazed bullnose trim capping the tiles, and a thin oak upstand where the worktop meets them. */
+var trimMat = new THREE.MeshPhysicalMaterial({ color: 0xd9d0b8, roughness: 0.2, clearcoat: 0.8, clearcoatRoughness: 0.15 });
+var trim = add(new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 3.6, 16, 1, false, 0, Math.PI), trimMat), true, true);
+trim.rotation.set(0, 0, Math.PI / 2); trim.rotation.order = "ZYX"; trim.rotateY(-Math.PI / 2); trim.position.set(0.15, CT + 0.40, WZ + 0.001);
+var trimCap = box(3.6, 0.012, 0.012, trimMat, 0.15, CT + 0.405, WZ + 0.006, true, true);
 
 /* Under-counter cupboards and the oak worktop, cut around the sink. */
-var paint = new THREE.MeshStandardMaterial({ color: 0xd9ccb2, roughness: 0.55 });
+var paint = new THREE.MeshStandardMaterial({ color: 0xbfb298, map: panelPaintTex, roughness: 0.6 });
 var kick = new THREE.MeshStandardMaterial({ color: 0x2a211b, roughness: 0.8 });
 box(2.56, 0.8, 0.56, paint, 0.66, 0.48, WZ + 0.28, false, true);
 box(2.56, 0.08, 0.5, kick, 0.66, 0.04, WZ + 0.25, false, true);
 var knobMat = new THREE.MeshStandardMaterial({ color: 0xb08a4a, metalness: 1, roughness: 0.35 });
+/* Frame-and-panel doors in old oil paint: rounded edges catch the lamp, a dark shadow gap rings each raised panel. */
+var gapMat = new THREE.MeshStandardMaterial({ color: 0x55483a, roughness: 0.9 });
+var slabGeo = new RoundedBoxGeometry(0.6, 0.72, 0.022, 3, 0.006), panelGeo = new RoundedBoxGeometry(0.44, 0.56, 0.016, 3, 0.007);
 for (var dI = 0; dI < 4; dI++) {
   var dx = -0.61 + 0.64 * dI + 0.32;
-  var door = box(0.6, 0.72, 0.02, paint, dx, 0.49, WZ + 0.57, true, true);
-  box(0.46, 0.58, 0.012, paint, dx, 0.49, WZ + 0.585, false, true);
+  var dTex = doorPaintTex.clone(), dBump = doorBump.clone();
+  dTex.wrapS = dBump.wrapS = THREE.RepeatWrapping;
+  if (dI % 2) { dTex.repeat.x = dBump.repeat.x = -1; dTex.offset.x = dBump.offset.x = 1; }
+  dTex.offset.y = dBump.offset.y = 0; dTex.needsUpdate = dBump.needsUpdate = true;
+  var dMat = new THREE.MeshStandardMaterial({ map: dTex, bumpMap: dBump, bumpScale: 0.15, roughness: 0.5, color: new THREE.Color(0xfff6e8).offsetHSL(0, 0, (hash(dI + 40) - 0.5) * 0.04) });
+  var door = add(new THREE.Mesh(slabGeo, dMat), true, true); door.position.set(dx, 0.49, WZ + 0.571);
+  box(0.456, 0.576, 0.004, gapMat, dx, 0.49, WZ + 0.583, false, true);
+  var pMat = dMat.clone(); pMat.map = panelPaintTex;
+  var pnl = add(new THREE.Mesh(panelGeo, pMat), true, true); pnl.position.set(dx, 0.49, WZ + 0.585);
   var kn = add(new THREE.Mesh(new THREE.SphereGeometry(0.014, 12, 8), knobMat), true, false);
   kn.position.set(dx + (dI % 2 ? -0.24 : 0.24), 0.76, WZ + 0.6);
+  var kb = add(new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.012, 0.012, 16), knobMat), true, false);
+  kb.rotation.x = Math.PI / 2; kb.position.set(kn.position.x, 0.76, WZ + 0.588);
 }
 var oak = new THREE.MeshStandardMaterial({ map: oakTex, roughness: 0.5 });
 var TH = 0.04, SX0 = 0.43, SX1 = 0.87, SZ0 = WZ + 0.1, SZ1 = WZ + 0.5;

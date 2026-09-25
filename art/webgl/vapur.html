@@ -472,10 +472,12 @@ var seaMat = new THREE.ShaderMaterial({
     "  float along = max(-vW.z - 0.8, 0.0);",
     "  float ax = abs(vW.x);",
     "  float halfw = 1.3 + along * 0.05;",
-    "  float core = exp(-pow(ax / halfw, 2.0) * 1.3) * exp(-along / 170.0) * smoothstep(0.0, 3.0, along);",
+    "  float cq = ax / halfw;",
+    "  float core = exp(-cq * cq * 1.3) * exp(-along / 170.0) * smoothstep(0.0, 3.0, along);",
     "  float kel = along * 0.34;",
     "  float armW = 0.8 + along * 0.035;",
-    "  float arm = exp(-pow((ax - kel) / armW, 2.0)) * exp(-along / 260.0) * smoothstep(6.0, 30.0, along);",
+    "  float aq = (ax - kel) / armW;",
+    "  float arm = exp(-aq * aq) * exp(-along / 260.0) * smoothstep(6.0, 30.0, along);",
     "  float fade = 1.0 - smoothstep(60.0, 700.0, dist);",
     "  float nBig = flowN(vW.xz * vec2(1.0, 0.45), 0.35);",
     "  float nFine = flowN(vW.xz, 1.6);",
@@ -490,7 +492,7 @@ var seaMat = new THREE.ShaderMaterial({
     "  vec3 R = reflect(-V, N); R.y = abs(R.y); R = normalize(R);",
     "  vec3 refl = skyCol(R);",
     "  float cs = clamp(dot(N, V), 0.0, 1.0);",
-    "  float F = 0.02 + 0.98 * pow(1.0 - cs, 5.0);",
+    "  float F = 0.02 + 0.98 * pow(max(1.0 - cs, 0.0), 5.0);",
     "  vec3 body = vec3(0.010, 0.030, 0.042);",
     "  vec3 wash = vec3(0.05, 0.16, 0.16);",
     "  body = mix(body, wash, clamp(core * 1.2, 0.0, 1.0));",
@@ -523,33 +525,99 @@ scene.add(ship);
 ship.add(camera);
 function add(mesh, cast, receive, parent) { mesh.castShadow = !!cast; mesh.receiveShadow = !!receive; (parent || ship).add(mesh); return mesh; }
 
-var paintTex = canvasTex(1024, 64, function (g, w, h) {
-  g.fillStyle = "#eeebe4"; g.fillRect(0, 0, w, h);
-  for (var i = 0; i < 400; i++) {
-    g.fillStyle = hash(i + 3) > 0.5 ? "rgba(255,255,255,0.35)" : "rgba(150,140,125,0.10)";
-    g.fillRect(hash(i + 1) * w, hash(i + 2) * h, 2 + hash(i + 4) * 30, 1 + hash(i + 5) * 2);
-  }
-  for (var k = 0; k < 14; k++) {
-    var x = hash(k + 40) * w, y = hash(k + 41) * h;
-    var gr = g.createRadialGradient(x, y, 0, x, y, 5 + hash(k + 42) * 8);
-    gr.addColorStop(0, "rgba(120,80,50,0.35)"); gr.addColorStop(1, "rgba(120,80,50,0)");
-    g.fillStyle = gr; g.fillRect(x - 14, y - 14, 28, 28);
-  }
-});
-var paint = new THREE.MeshPhysicalMaterial({ map: paintTex, color: 0xffffff, roughness: 0.38, clearcoat: 0.4, clearcoatRoughness: 0.3 });
+/* Rail paint: many coats of ferry white, chipped to an older sea-green coat and to rust, with brush drag and grime; a matching bump map. */
+function paintDraw(bump) {
+  return function (g, w, h) {
+    g.fillStyle = bump ? "#c8c8c8" : "#eeebe4"; g.fillRect(0, 0, w, h);
+    var i, x, y;
+    for (i = 0; i < 700; i++) {
+      x = hash(i + 1) * w; y = hash(i + 2) * h;
+      if (bump) g.fillStyle = hash(i + 3) > 0.5 ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.08)";
+      else g.fillStyle = hash(i + 3) > 0.5 ? "rgba(255,255,255,0.35)" : "rgba(150,140,125,0.10)";
+      g.fillRect(x, y, 4 + hash(i + 4) * 60, 1 + hash(i + 5) * 1.5);
+    }
+    if (!bump) {
+      for (i = 0; i < 60; i++) {
+        x = hash(i + 300) * w; y = hash(i + 301) * h;
+        var gr0 = g.createRadialGradient(x, y, 0, x, y, 10 + hash(i + 302) * 40);
+        gr0.addColorStop(0, "rgba(110,90,70,0.10)"); gr0.addColorStop(1, "rgba(110,90,70,0)");
+        g.fillStyle = gr0; g.fillRect(x - 50, y - 50, 100, 100);
+      }
+    }
+    for (var k = 0; k < 70; k++) {
+      x = hash(k + 40) * w; y = hash(k + 41) * h;
+      var big = hash(k + 43) > 0.88, rx = (big ? 4 : 1.5) + hash(k + 42) * (big ? 7 : 3), ry = rx * (1.2 + hash(k + 44) * 1.0);
+      g.beginPath();
+      for (var s = 0; s < 9; s++) {
+        var a = s / 9 * TAU, f = 0.6 + hash(k * 9 + s) * 0.6;
+        g.lineTo(x + Math.cos(a) * rx * f, y + Math.sin(a) * ry * f);
+      }
+      g.closePath();
+      if (bump) { g.fillStyle = "#555"; g.fill(); continue; }
+      g.fillStyle = "#9fbcb2"; g.fill();
+      if (hash(k + 46) > 0.45) { g.save(); g.translate(x, y); g.scale(0.42, 0.42); g.translate(-x, -y);
+      g.fillStyle = hash(k + 45) > 0.5 ? "#8a5a3a" : "#76503a"; g.fill(); g.restore(); }
+      if (big) {
+        var st = g.createLinearGradient(0, y, 0, Math.min(h, y + 26));
+        st.addColorStop(0, "rgba(140,70,30,0.35)"); st.addColorStop(1, "rgba(140,70,30,0)");
+        g.fillStyle = st; g.fillRect(x - 1.5, y, 3, 26);
+      }
+    }
+  };
+}
+var paintTex = canvasTex(2048, 128, paintDraw(false));
+var paintBump = canvasTex(2048, 128, paintDraw(true), false);
+var paint = new THREE.MeshPhysicalMaterial({ map: paintTex, bumpMap: paintBump, bumpScale: 0.6, color: 0xffffff, roughness: 0.38, clearcoat: 0.4, clearcoatRoughness: 0.3 });
+var paintTexV = paintTex.clone(), paintBumpV = paintBump.clone();
+[paintTexV, paintBumpV].forEach(function (tx) { tx.wrapS = tx.wrapT = THREE.RepeatWrapping; tx.repeat.set(0.06, 8); tx.needsUpdate = true; });
+var paintPost = paint.clone(); paintPost.map = paintTexV; paintPost.bumpMap = paintBumpV;
 
-var woodTex = canvasTex(1024, 128, function (g, w, h) {
-  g.fillStyle = "#8a5a33"; g.fillRect(0, 0, w, h);
-  for (var i = 0; i < 120; i++) {
-    var y = hash(i + 1) * h, a = 0.06 + hash(i + 7) * 0.14;
-    g.strokeStyle = hash(i + 5) > 0.5 ? "rgba(50,26,10," + a + ")" : "rgba(190,130,80," + a + ")";
-    g.lineWidth = 0.6 + hash(i + 3) * 1.6; g.beginPath();
-    for (var x = 0; x <= w; x += 16) g.lineTo(x, y + Math.sin(x * 0.008 + i) * 3 + Math.sin(x * 0.03 + i * 3));
-    g.stroke();
-  }
-});
-woodTex.wrapS = woodTex.wrapT = THREE.RepeatWrapping;
-var wood = new THREE.MeshPhysicalMaterial({ map: woodTex, roughness: 0.42, clearcoat: 0.6, clearcoatRoughness: 0.25 });
+/* Bench slats: iroko under old varnish, fine straight grain with a few cathedral figures, the varnish worn pale along the top edge where hands and backs rub. */
+function woodDraw(bump) {
+  return function (g, w, h) {
+    var i, x, y;
+    if (bump) { g.fillStyle = "#808080"; g.fillRect(0, 0, w, h); }
+    else {
+      var bg = g.createLinearGradient(0, 0, w, 0);
+      bg.addColorStop(0, "#8c5d36"); bg.addColorStop(0.3, "#9a6a3e"); bg.addColorStop(0.55, "#86552f"); bg.addColorStop(0.8, "#a0703f"); bg.addColorStop(1, "#8c5d36");
+      g.fillStyle = bg; g.fillRect(0, 0, w, h);
+    }
+    for (i = 0; i < 260; i++) {
+      y = hash(i + 1) * h; var a = 0.05 + hash(i + 7) * 0.16;
+      if (bump) g.strokeStyle = hash(i + 5) > 0.5 ? "rgba(0,0,0," + a + ")" : "rgba(255,255,255," + a * 0.6 + ")";
+      else g.strokeStyle = hash(i + 5) > 0.5 ? "rgba(52,26,10," + a + ")" : "rgba(200,140,85," + a + ")";
+      g.lineWidth = 0.5 + hash(i + 3) * 1.4; g.beginPath();
+      for (x = 0; x <= w; x += 16) g.lineTo(x, y + Math.sin(x * 0.004 + i) * 4 + Math.sin(x * 0.021 + i * 3) * 1.2);
+      g.stroke();
+    }
+    for (var k = 0; k < 14; k++) {
+      var cx = hash(k + 900) * w, cy = h * (0.3 + hash(k + 901) * 0.4);
+      for (var r = 0; r < 7; r++) {
+        g.strokeStyle = bump ? "rgba(0,0,0,0.12)" : "rgba(60,30,12," + (0.10 + hash(k * 7 + r) * 0.1) + ")"; g.lineWidth = 1.2;
+        g.beginPath(); g.ellipse(cx, cy, 30 + r * 22, 5 + r * 5, 0, Math.PI * 1.05, Math.PI * 1.95); g.stroke();
+      }
+    }
+    if (!bump) {
+      var tw = g.createLinearGradient(0, 0, 0, h);
+      tw.addColorStop(0, "rgba(225,190,140,0.32)"); tw.addColorStop(0.25, "rgba(225,190,140,0.0)"); tw.addColorStop(0.85, "rgba(40,20,8,0)"); tw.addColorStop(1, "rgba(40,20,8,0.3)");
+      g.fillStyle = tw; g.fillRect(0, 0, w, h);
+      for (i = 0; i < 90; i++) {
+        g.fillStyle = "rgba(230,200,150," + (0.08 + hash(i + 950) * 0.12) + ")";
+        g.fillRect(hash(i + 951) * w, hash(i + 952) * h * 0.3, 10 + hash(i + 953) * 70, 1 + hash(i + 954) * 2);
+      }
+    }
+  };
+}
+var woodTex = canvasTex(2048, 256, woodDraw(false));
+var woodBump = canvasTex(2048, 256, woodDraw(true), false);
+woodTex.wrapS = woodTex.wrapT = woodBump.wrapS = woodBump.wrapT = THREE.RepeatWrapping;
+var wood = new THREE.MeshPhysicalMaterial({ map: woodTex, bumpMap: woodBump, bumpScale: 0.5, roughness: 0.42, clearcoat: 0.6, clearcoatRoughness: 0.25 });
+function slatMat(j) {
+  var m = wood.clone(), tx = woodTex.clone(), tb = woodBump.clone();
+  tx.offset.x = tb.offset.x = hash(j + 77); tx.needsUpdate = tb.needsUpdate = true;
+  m.map = tx; m.bumpMap = tb; m.color.setHSL(0.08, 0.3, 0.9 + hash(j + 78) * 0.1);
+  return m;
+}
 
 /* Rail: a broad white cap (the ledge), posts, a middle bar. */
 var LEDGE_Y = 4.05;
@@ -557,20 +625,23 @@ var ledge = add(new THREE.Mesh(new RoundedBoxGeometry(7, 0.05, 0.2, 3, 0.014), p
 ledge.position.set(0, LEDGE_Y - 0.025, 0);
 var postGeo = new THREE.CylinderGeometry(0.024, 0.026, 1.05, 16);
 [-1.35, -0.42, 0.98, 2.2].forEach(function (px) {
-  var p = add(new THREE.Mesh(postGeo, paint), true, true);
+  var p = add(new THREE.Mesh(postGeo, paintPost), true, true);
   p.position.set(px, LEDGE_Y - 0.55, -0.02);
 });
-var bar = add(new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 7, 12), paint), true, true);
+var bar = add(new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 7, 12), paintPost), true, true);
 bar.rotation.z = Math.PI / 2; bar.position.set(0, 3.5, -0.02);
-var bar2 = add(new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 7, 12), paint), true, true);
+var bar2 = add(new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 7, 12), paintPost), true, true);
 bar2.rotation.z = Math.PI / 2; bar2.position.set(0, 3.15, -0.02);
 
 /* The bench backrest along the rail: varnished slats on dark iron brackets. */
 var iron = new THREE.MeshStandardMaterial({ color: 0x1d1a18, roughness: 0.55, metalness: 0.6 });
+var brassMat = new THREE.MeshStandardMaterial({ color: 0xb08a48, roughness: 0.35, metalness: 1 });
 [3.79, 3.88, 3.97].forEach(function (sy, j) {
   var s = add(new THREE.Mesh(new RoundedBoxGeometry(3.3, 0.072, 0.022, 2, 0.007), wood), true, true);
   s.position.set(1.6, sy, 0.24 - (sy - 3.79) * 0.12); s.rotation.x = -0.12;
-  s.material = wood;
+  s.material = slatMat(j);
+  var sc = add(new THREE.Mesh(new THREE.CylinderGeometry(0.0055, 0.0055, 0.004, 12), brassMat), false, false);
+  sc.rotation.x = Math.PI / 2 - 0.12; sc.position.set(0.0, sy, 0.24 - (sy - 3.79) * 0.12 + 0.012);
 });
 [0.0, 1.1, 2.2].forEach(function (bx) {
   var b = add(new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.5, 0.03), iron), true, true);
@@ -584,14 +655,16 @@ var ringTex = canvasTex(512, 64, function (g, w, h) {
 });
 var ringMat = new THREE.MeshPhysicalMaterial({ map: ringTex, roughness: 0.55, clearcoat: 0.3 });
 var ring = add(new THREE.Mesh(new THREE.TorusGeometry(0.27, 0.068, 24, 72), ringMat), true, true);
-ring.position.set(-0.52, 3.98, 0.34); ring.rotation.set(0.04, 0.75, 0.06);
-var pillar = add(new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.042, 3.4, 20), paint), true, true);
+ring.position.set(-0.27, 3.79, -0.2); ring.rotation.set(-0.05, 0.12, 0.04);
+var pillar = add(new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.042, 3.4, 20), paintPost), true, true);
 pillar.position.set(-0.66, 4.7, 0.24);
 var ropeMat = new THREE.MeshStandardMaterial({ color: 0xd8cdb8, roughness: 0.9 });
 var rope = add(new THREE.Mesh(new THREE.TorusGeometry(0.27, 0.011, 8, 96), ropeMat), true, false);
 rope.position.copy(ring.position); rope.rotation.copy(ring.rotation); rope.scale.setScalar(1.28);
-var hang = add(new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.16, 6), ropeMat), true, false);
-hang.position.set(-0.6, 4.34, 0.28);
+var hook = add(new THREE.Mesh(new RoundedBoxGeometry(0.035, 0.018, 0.13, 2, 0.006), iron), true, true);
+hook.position.set(-0.27, 4.0, -0.155);
+var hookTip = add(new THREE.Mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.05, 8), iron), true, false);
+hookTip.position.set(-0.27, 4.02, -0.215);
 
 /* The tulip glass, as in Morning Tea but at true size: a clear shell and the tea inside. */
 var OUT = [[0.0, 0.0], [0.20, 0.0], [0.215, 0.015], [0.19, 0.05], [0.155, 0.17], [0.135, 0.29], [0.145, 0.37], [0.185, 0.51], [0.212, 0.64], [0.218, 0.72]];
@@ -653,6 +726,19 @@ var simitTex = canvasTex(512, 128, function (g, w, h) {
 var simitMat = new THREE.MeshStandardMaterial({ map: simitTex, roughness: 0.75, bumpMap: simitTex, bumpScale: 1.5 });
 var simit = add(new THREE.Mesh(new THREE.TorusGeometry(0.062, 0.0135, 20, 64), simitMat), true, true);
 simit.rotation.x = -Math.PI / 2; simit.scale.set(1, 1, 0.72); simit.position.set(0.5, LEDGE_Y + 0.015, 0.01);
+
+/* Two sugar cubes in their paper wrappers, the ferry buffet's red print on them. */
+var sugarTex = canvasTex(128, 64, function (g, w, h) {
+  g.fillStyle = "#f4f1ea"; g.fillRect(0, 0, w, h);
+  g.fillStyle = "#c0392b"; g.fillRect(0, 26, w, 12);
+  g.fillStyle = "#f4f1ea"; for (var k = 0; k < 6; k++) g.fillRect(8 + k * 20, 29, 10, 6);
+  for (var i = 0; i < 40; i++) { g.fillStyle = "rgba(120,110,95,0.12)"; g.fillRect(hash(i + 600) * w, hash(i + 601) * h, 12, 1); }
+});
+var sugarMat = new THREE.MeshStandardMaterial({ map: sugarTex, roughness: 0.85 });
+[[0.14, 0.04, 0.5], [0.165, 0.062, -0.35]].forEach(function (q) {
+  var sg = add(new THREE.Mesh(new RoundedBoxGeometry(0.024, 0.016, 0.017, 2, 0.003), sugarMat), true, true);
+  sg.position.set(q[0], LEDGE_Y + 0.008, q[1]); sg.rotation.y = q[2];
+});
 
 /* ---------- Light: the low sun across the water, the sky as fill ---------- */
 var sunL = new THREE.DirectionalLight(0xffc98a, 3.6);

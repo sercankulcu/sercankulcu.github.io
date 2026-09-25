@@ -339,7 +339,7 @@ var cobC = mk(1024, 1024), cobB = mk(1024, 1024);
 (function () {
   var R = rng(31), g = cobC.g, b = cobB.g, W = 1024, N = 12, cell = W / N;
   var pal = ["#8f8474", "#9c8c77", "#7f766a", "#a59682", "#877b6d", "#716a60", "#958a7a", "#aa9a84"];
-  g.fillStyle = "#4b3d2f"; g.fillRect(0, 0, W, W);
+  g.fillStyle = "#5a4b3b"; g.fillRect(0, 0, W, W);
   b.fillStyle = "#000000"; b.fillRect(0, 0, W, W);
   for (var j = 0; j < N; j++) for (var i = 0; i < N; i++) {
     var cx = (i + 0.5 + (j % 2) * 0.5) * cell + (R() - 0.5) * 14, cy = (j + 0.5) * cell + (R() - 0.5) * 14;
@@ -379,26 +379,35 @@ var woodTex = canvasTex(512, 512, function (g, w, h) {
   grain(g, w, h, R, 8000, 0.1);
 });
 
-var barkTex = canvasTex(512, 512, function (g, w, h) {
-  var R = rng(51), cols = ["#8e8766", "#d3c9a8", "#7a735c", "#a79c7a", "#c2b690", "#6d6752"];
-  g.fillStyle = "#b3a886"; g.fillRect(0, 0, w, h);
-  for (var i = 0; i < 260; i++) {
-    var x = R() * w, y = R() * h, rx = 10 + R() * 45, ry = 8 + R() * 30, rot = R() * Math.PI, col = cols[Math.floor(R() * cols.length)];
-    g.globalAlpha = 0.55 + R() * 0.4;
-    wrapDraw(w, h, x, y, rx, function (X, Y) {
-      g.beginPath();
-      for (var k = 0; k < 12; k++) {
-        var a = k / 12 * TAU, f = 0.75 + R() * 0.35;
-        var px = X + Math.cos(a + rot) * rx * f, py = Y + Math.sin(a + rot) * ry * f;
-        if (k === 0) g.moveTo(px, py); else g.lineTo(px, py);
-      }
-      g.closePath(); g.fillStyle = col; g.fill();
-    });
+/* Plane-tree bark: exfoliating jigsaw plates in olive, khaki and fresh cream, soft-edged, with thin dark rims where a plate has lifted. */
+var barkPlates = (function () {
+  var R = rng(51), out = [], cols = ["#8b8466", "#cfc4a0", "#7c765e", "#a39a78", "#bdb28c", "#6f6a55", "#d8cfae", "#94906e"];
+  for (var i = 0; i < 90; i++) {
+    var rx = 30 + R() * 70, ry = 22 + R() * 45, pts = [], rot = R() * Math.PI;
+    for (var k = 0; k < 14; k++) { var a = k / 14 * TAU; pts.push([Math.cos(a + rot) * rx * (0.7 + R() * 0.4), Math.sin(a + rot) * ry * (0.7 + R() * 0.4)]); }
+    out.push({ x: R() * 512, y: R() * 512, r: rx, p: pts, c: cols[Math.floor(R() * cols.length)], rim: R() < 0.22 });
   }
-  g.globalAlpha = 1;
-  grain(g, w, h, R, 10000, 0.12);
-});
-barkTex.repeat.set(1, 2);
+  return out;
+})();
+function barkDraw(bump) {
+  return function (g, w, h) {
+    var R = rng(52);
+    g.fillStyle = bump ? "#707070" : "#a89e7e"; g.fillRect(0, 0, w, h);
+    barkPlates.forEach(function (P, n) {
+      wrapDraw(w, h, P.x, P.y, P.r * 1.2, function (X, Y) {
+        g.beginPath();
+        P.p.forEach(function (q, k) { if (k === 0) g.moveTo(X + q[0], Y + q[1]); else g.lineTo(X + q[0], Y + q[1]); });
+        g.closePath();
+        if (bump) { var lv = 118 + (n % 5) * 8; g.fillStyle = "rgb(" + lv + "," + lv + "," + lv + ")"; g.fill(); }
+        else { g.filter = "blur(3px)"; g.fillStyle = P.c; g.globalAlpha = 0.8; g.fill(); g.filter = "none"; g.globalAlpha = 1; }
+        if (P.rim) { g.strokeStyle = bump ? "rgba(0,0,0,0.5)" : "rgba(70,62,46,0.3)"; g.lineWidth = bump ? 2 : 1.1; g.stroke(); }
+      });
+    });
+    if (!bump) grain(g, w, h, R, 9000, 0.07);
+  };
+}
+var barkTex = canvasTex(512, 512, barkDraw(false));
+var barkBump = canvasTex(512, 512, barkDraw(true), false);
 
 var limeTex = canvasTex(512, 512, function (g, w, h) {
   var R = rng(61);
@@ -586,7 +595,7 @@ function segGeo(a, b, r0, r1, n) {
 function V(x, y, z) { return new THREE.Vector3(x, y, z); }
 
 /* Ground. */
-var ground = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), std({ map: cobTex, bumpMap: cobBump, bumpScale: 3, roughness: 0.88, color: 0xf0e8dc }));
+var ground = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), std({ map: cobTex, bumpMap: cobBump, bumpScale: 2.2, roughness: 0.88, color: 0xf0e8dc }));
 ground.rotation.x = -Math.PI / 2; ground.position.set(2, 0, 3); ground.receiveShadow = true;
 scene.add(ground);
 
@@ -813,15 +822,40 @@ for (var di = 0; di < 10; di++) {
 }
 
 /* The plane tree: mottled trunk, limbs grown recursively, leaves as instanced palmate blades. */
-var barkMat = std({ map: barkTex, color: 0xa89c88, roughness: 0.85 });
+var barkMat = std({ map: barkTex, bumpMap: barkBump, bumpScale: 1.2, color: 0xc2baa6, roughness: 0.85 });
 var R = rng(7);
 var FORK = V(TREE.x - 0.12, 2.75, TREE.z - 0.05);
+/* The trunk: one sweep from buttressed roots to the fork, with a slight lean, lumps and five root flares running into the soil. */
 (function () {
-  var X = TREE.x, Z = TREE.z;
-  var tg = [segGeo(V(X, -0.1, Z), V(X - 0.02, 0.4, Z - 0.01), 0.68, 0.42, 16),
-    segGeo(V(X - 0.02, 0.35, Z - 0.01), V(X - 0.06, 1.6, Z - 0.03), 0.42, 0.36, 16),
-    segGeo(V(X - 0.06, 1.5, Z - 0.03), FORK, 0.36, 0.31, 16)];
-  var t = new THREE.Mesh(mergeGeometries(tg), barkMat); t.castShadow = t.receiveShadow = true; scene.add(t);
+  var X = TREE.x, Z = TREE.z, NY = 40, NA = 48, pos = [], uvs = [], idx = [], Y0 = -0.12, Y1 = FORK.y + 0.4;
+  function rad(y) {
+    var t = Math.min(1, Math.max(0, (y - Y0) / (FORK.y - Y0)));
+    var r = 0.43 - 0.12 * t + 0.03 * Math.sin(t * 7.0) - 0.02 * t * t;
+    if (y > FORK.y - 0.2) r -= (y - FORK.y + 0.2) * 0.32;
+    return r + 0.28 * Math.exp(-(y - Y0) / 0.28);
+  }
+  for (var iy = 0; iy <= NY; iy++) {
+    var y = Y0 + (Y1 - Y0) * iy / NY, t = (y - Y0) / (FORK.y - Y0);
+    var cx = X + (FORK.x - X) * t + 0.05 * Math.sin(t * Math.PI), cz = Z + (FORK.z - Z) * t - 0.03 * Math.sin(t * Math.PI * 1.3);
+    var root = Math.exp(-(y - Y0) / 0.32), r0 = rad(y);
+    for (var ia = 0; ia <= NA; ia++) {
+      var th = ia / NA * TAU;
+      var lobe = Math.pow(Math.max(0, Math.cos(th * 5 + 0.7 + 0.25 * Math.sin(th * 3))), 3);
+      var lump = 0.022 * Math.sin(th * 3 + y * 2.1) + 0.014 * Math.sin(th * 7 + y * 5.3 + 1.0) + 0.01 * Math.sin(th * 11 - y * 3.0);
+      var r = r0 * (1 + 0.55 * root * lobe - 0.1 * root) + lump * (0.6 + 0.4 * (1 - t));
+      pos.push(cx + Math.cos(th) * r, y, cz + Math.sin(th) * r);
+      uvs.push(ia / NA * 2, y * 0.62);
+    }
+  }
+  for (iy = 0; iy < NY; iy++) for (var ib = 0; ib < NA; ib++) {
+    var a0 = iy * (NA + 1) + ib, a1 = a0 + 1, b0 = a0 + NA + 1, b1 = b0 + 1;
+    idx.push(a0, b0, a1, a1, b0, b1);
+  }
+  var tg = new THREE.BufferGeometry();
+  tg.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  tg.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+  tg.setIndex(idx); tg.computeVertexNormals();
+  var t = new THREE.Mesh(tg, barkMat); t.castShadow = t.receiveShadow = true; scene.add(t);
 })();
 var leafGeo = (function () {
   var sh = new THREE.Shape(), N = 44, LOBE = [[-1.35, 0.55], [-0.68, 0.82], [0, 1], [0.68, 0.82], [1.35, 0.55]];
@@ -893,8 +927,24 @@ LAZ.forEach(function (az0, li) {
   });
   im.castShadow = true; im.receiveShadow = true;
   grp.add(im);
-  LIMBS.push({ g: grp, ph: R() * TAU });
+  LIMBS.push({ g: grp, ph: R() * TAU, im: im });
 });
+/* Depth in the crown: leaves deep inside and low under the canopy sit in each other's shade, so darken them; the outer shell keeps its colour. */
+(function () {
+  var cx = 0, cz = 0, rmax = 0, ymin = 1e9, ymax = -1e9, M = new THREE.Matrix4(), P = new THREE.Vector3(), C = new THREE.Color();
+  TIPS.forEach(function (tp) { cx += tp.x / TIPS.length; cz += tp.z / TIPS.length; ymin = Math.min(ymin, tp.y); ymax = Math.max(ymax, tp.y); });
+  TIPS.forEach(function (tp) { rmax = Math.max(rmax, Math.hypot(tp.x - cx, tp.z - cz)); });
+  rmax += 0.6;
+  LIMBS.forEach(function (Lb) {
+    for (var n = 0; n < Lb.im.count; n++) {
+      Lb.im.getMatrixAt(n, M); P.setFromMatrixPosition(M).add(FORK);
+      var dh = Math.hypot(P.x - cx, P.z - cz) / rmax, hv = (P.y - ymin) / Math.max(0.5, ymax - ymin);
+      var k = (0.42 + 0.58 * smooth(0.15, 0.9, dh)) * (0.72 + 0.28 * smooth(-0.3, 0.9, hv));
+      Lb.im.getColorAt(n, C); C.multiplyScalar(k); C.offsetHSL(-0.012 * (1 - k), 0.04 * (1 - k), 0); Lb.im.setColorAt(n, C);
+    }
+    Lb.im.instanceColor.needsUpdate = true;
+  });
+})();
 
 /* Wind: gusts that sweep across the court toward the fountain wall, three per loop. */
 function gust(x, z, u) {
@@ -903,7 +953,7 @@ function gust(x, z, u) {
 }
 
 /* Falling leaves: each on its own whole-number cycle count, from a branch tip to the stones. */
-var FALL_N = 150, FALL = [], RF = rng(17);
+var FALL_N = 90, FALL = [], RF = rng(17);
 var fallMesh = new THREE.InstancedMesh(leafGeo, leafMat, FALL_N);
 fallMesh.castShadow = true; fallMesh.frustumCulled = false;
 for (var fi = 0; fi < FALL_N; fi++) {
@@ -930,7 +980,7 @@ function carpetPose(c, dx, dy, dz, tilt, spin) {
 for (var ci = 0, tries = 0; ci < CARPET_N && tries < 200000; tries++) {
   var x = -5.75 + RC() * 14, z = -4.75 + RC() * 14;
   var dT = Math.hypot(x - TREE.x, z - TREE.z);
-  var wgt = 0.18 + 0.9 * Math.exp(-dT * dT / 10) + 0.8 * Math.exp(-(x + 5.8) * 2.2) + 0.7 * Math.exp(-(z + 4.8) * 2.2) + 0.25 * Math.exp(-Math.pow(x + 3, 2) / 6);
+  var wgt = 0.12 + 0.9 * Math.exp(-dT * dT / 10) + 0.8 * Math.exp(-(x + 5.8) * 2.2) + 0.7 * Math.exp(-(z + 4.8) * 2.2) + 0.25 * Math.exp(-Math.pow(x + 3, 2) / 6);
   if (dT < 1.18 && dT > 0.95) continue;
   if (x < -4.9 && Math.abs(z - 0.1) < 1.0) continue;
   if (RC() * 2.1 > wgt) continue;

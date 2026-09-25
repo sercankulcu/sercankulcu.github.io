@@ -244,7 +244,7 @@ var LOOK = new THREE.Vector3(0.1, 0.7, -9);
 
 /* Everything in the water is additive with no depth writes, so draw order never matters:
    jellies, light shafts and snow simply add light over the gradient behind them. */
-var NJ = 8;
+var NJ = 12;
 var JD = [
   /* x, y, z, scale, pulses per loop, phase, tilt x, tilt z, spin */
   [1.05, 0.35, -4.6, 0.62, 24, 0.00, 0.40, -0.22, 0.3],
@@ -254,14 +254,19 @@ var JD = [
   [-5.2, -1.0, -10.5, 0.56, 28, 0.82, 0.05, 0.45, 2.6],
   [6.4, -0.3, -16.0, 0.64, 18, 0.45, 0.30, -0.30, 1.5],
   [2.0, 5.0, -21.0, 0.72, 24, 0.70, 0.18, 0.18, 0.2],
-  [-5.0, 4.4, -19.0, 0.70, 20, 0.28, 0.12, 0.30, 3.1]
+  [-5.0, 4.4, -19.0, 0.70, 20, 0.28, 0.12, 0.30, 3.1],
+  /* a far bloom, deep in the haze, for scale */
+  [-9.5, -3.6, -27.0, 0.66, 22, 0.52, 0.20, 0.25, 0.9],
+  [9.5, -4.2, -30.0, 0.70, 26, 0.09, 0.26, -0.20, 2.2],
+  [-0.8, -6.2, -31.0, 0.62, 18, 0.91, 0.30, 0.10, 1.7],
+  [11.5, 6.5, -33.0, 0.74, 24, 0.33, 0.10, -0.35, 0.4]
 ];
 var uM = [], uPC = [];
 for (var j = 0; j < NJ; j++) { uM.push(new THREE.Matrix4()); uPC.push(new THREE.Vector2()); }
 var shared = { uM: { value: uM }, uPC: { value: uPC }, uU: { value: 0 } };
 
 var COMMON = [
-  "#define NJ 8",
+  "#define NJ 12",
   "uniform mat4 uM[NJ];",
   "uniform vec2 uPC[NJ];",
   "uniform float uU;",
@@ -346,7 +351,7 @@ var shaftMat = addMat(
     "  float c = pow(abs(dot(normalize(vN), V)), 4.0);",
     "  float h = smoothstep(-16.0, 18.0, vW.y);",
     "  float fl = 0.62 + 0.38 * sin(uU * TAU * vSh.x + vSh.y + vW.y * 0.08);",
-    "  vec3 col = vec3(0.16, 0.42, 0.55) * c * h * h * fl * 0.07;",
+    "  vec3 col = vec3(0.16, 0.42, 0.55) * c * h * h * fl * 0.09;",
     "  float d = length(vW - cameraPosition);",
     "  col *= exp(-d * 0.018) * smoothstep(2.0, 8.0, d);",
     "  gl_FragColor = vec4(col, 1.0);",
@@ -435,6 +440,16 @@ var bellMat = addMat(
     "  vec3 col = bellCol * (0.016 + 0.040 * sss + 0.62 * fr);",
     "  col += vec3(0.80, 0.58, 0.95) * gon * 0.20 * (0.6 + 0.4 * nd);",
     "  col += vec3(0.65, 0.82, 1.0) * (canal * 0.06 + margin * 0.30);",
+    "  vec2 cp = vW.xz * 7.0 + vW.y * 1.5;",
+    "  float cw1 = sin(cp.x + 1.3 * sin(cp.y * 1.21 + uU * TAU * 2.0) + uU * TAU * 3.0);",
+    "  float cw2 = sin(cp.y * 1.07 + 1.2 * sin(cp.x * 0.93 - uU * TAU * 3.0) - uU * TAU * 2.0);",
+    "  float ca1 = 1.0 - abs(cw1), ca2 = 1.0 - abs(cw2);",
+    "  ca1 = ca1 * ca1; ca1 = ca1 * ca1; ca1 = ca1 * ca1;",
+    "  ca2 = ca2 * ca2; ca2 = ca2 * ca2; ca2 = ca2 * ca2;",
+    "  float cau = 0.5 * (ca1 + ca2) + 1.5 * ca1 * ca2;",
+    "  float crown = 1.0 - smoothstep(0.35, 0.92, s);",
+    "  col += vec3(0.55, 0.80, 0.95) * cau * crown * (0.35 + 0.65 * nd) * 0.20;",
+    "  col += vec3(0.30, 0.50, 0.70) * crown * crown * 0.012;",
     "  col *= gl_FrontFacing ? 1.0 : 0.55;",
     "  col *= 1.0 + 0.35 * vC;",
     "  gl_FragColor = vec4(fogFade(col, vW), 1.0);",
@@ -494,9 +509,12 @@ var armMat = addMat(
     "varying vec3 vW; varying vec2 vLW;",
     "void main() {",
     "  float l = vLW.x, w = abs(vLW.y);",
-    "  float edge = 0.25 + 0.75 * pow(w, 3.0);",
+    "  float w2 = w * w;",
+    "  float edge = 0.22 + 1.1 * w2 * w2;",
+    "  float frill = 0.5 + 0.5 * sin(l * 90.0 + w * 4.0);",
+    "  edge += 0.35 * smoothstep(0.75, 1.0, w) * frill;",
     "  float fade = (1.0 - smoothstep(0.55, 1.0, l)) * smoothstep(0.0, 0.08, l);",
-    "  vec3 col = vec3(0.58, 0.62, 0.88) * edge * fade * 0.16;",
+    "  vec3 col = mix(vec3(0.58, 0.62, 0.90), vec3(0.85, 0.66, 0.92), 0.35 * (1.0 - w)) * edge * fade * 0.19;",
     "  gl_FragColor = vec4(fogFade(col, vW), 1.0);",
     "}"
   ].join("\n"), THREE.DoubleSide);
@@ -505,10 +523,10 @@ arms.frustumCulled = false; arms.renderOrder = 2;
 scene.add(arms);
 
 /* Tentacles: a fine fringe of lines hanging from the rim, trailing the pulse wave. */
-var TN = 72, TS = 18;
+var TN = 112, TS = 18;
 var tenP = [], tenT = [], tenI = [];
 for (j = 0; j < NJ; j++) for (var ti = 0; ti < TN; ti++) {
-  var ta = (ti + hash(ti + j * 91) * 0.6) / TN * TAU, tl = 0.28 + hash(ti * 3 + j * 17) * 0.42;
+  var ta = (ti + hash(ti + j * 91) * 0.6) / TN * TAU, tl = 0.30 + Math.pow(hash(ti * 3 + j * 17), 1.6) * 0.62;
   for (var sg = 0; sg < TS; sg++) {
     tenP.push(0, 0, 0, 0, 0, 0);
     tenT.push(ta, sg / TS, tl, ta, (sg + 1) / TS, tl);
@@ -590,7 +608,7 @@ var snowMat = addMat(
     "varying float vA; varying vec3 vW;",
     "void main() {",
     "  float d = length(gl_PointCoord - 0.5) * 2.0;",
-    "  float m = smoothstep(1.0, 0.2, d);",
+    "  float m = 1.0 - smoothstep(0.2, 1.0, d);",
     "  vec3 col = vec3(0.55, 0.72, 0.80) * m * vA * 0.30;",
     "  gl_FragColor = vec4(fogFade(col, vW), 1.0);",
     "}"

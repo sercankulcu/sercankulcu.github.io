@@ -392,7 +392,7 @@ var cabinLitTex = canvasTex(128, 128, function (g, w, h) {
 
 /* Harbour-front house facades: plaster, windows, some lit; the emissive map carries only the lit ones. */
 function facade(seed, floors, cols, wall, litP, shopLit) {
-  var W = 512, H = 512, lit = [];
+  var W = 512, H = 512, lit = [], all = [];
   var map = canvasTex(W, H, function (g) {
     g.fillStyle = wall; g.fillRect(0, 0, W, H);
     for (var s = 0; s < 120; s++) {
@@ -411,8 +411,27 @@ function facade(seed, floors, cols, wall, litP, shopLit) {
       g.fillStyle = "rgba(230,225,215,0.5)"; g.fillRect(x + ww / 2 - 2, y, 4, wh);
       if (!shop) g.fillRect(x, y + wh * 0.42, ww, 3);
       if (on) lit.push([x, y, ww, wh, shop]);
+      all.push([x, y, ww, wh, shop, f, c, on]);
     }
+    for (var f2 = 1; f2 < floors; f2++) { g.fillStyle = "rgba(255,250,240,0.10)"; g.fillRect(0, f2 * ch - 6, W, 5); g.fillStyle = "rgba(0,0,0,0.18)"; g.fillRect(0, f2 * ch - 1, W, 3); }
+    var dirt = g.createLinearGradient(0, H * 0.7, 0, H);
+    dirt.addColorStop(0, "rgba(30,26,22,0)"); dirt.addColorStop(1, "rgba(30,26,22,0.35)");
+    g.fillStyle = dirt; g.fillRect(0, H * 0.7, W, H * 0.3);
   });
+  /* Relief for the bump map: recessed openings, raised sills, shutters and string courses between floors. */
+  var bump = canvasTex(W, H, function (g) {
+    g.fillStyle = "#8a8a8a"; g.fillRect(0, 0, W, H);
+    for (var s2 = 0; s2 < 900; s2++) { var v2 = 110 + hash(seed * 5 + s2) * 50; g.fillStyle = rgba(v2, v2, v2, 0.25); g.fillRect(hash(seed + s2 * 3) * W, hash(seed + s2 * 7) * H, 2 + hash(s2) * 6, 2 + hash(s2 + 2) * 6); }
+    var ch2 = H / floors;
+    for (var f3 = 1; f3 < floors; f3++) { g.fillStyle = "#d8d8d8"; g.fillRect(0, f3 * ch2 - 6, W, 6); }
+    for (var i = 0; i < all.length; i++) {
+      var A = all[i];
+      g.fillStyle = "#b8b8b8"; g.fillRect(A[0] - 5, A[1] - 5, A[2] + 10, 5);
+      g.fillStyle = "#1a1a1a"; g.fillRect(A[0], A[1], A[2], A[3]);
+      g.fillStyle = "#e0e0e0"; g.fillRect(A[0] - 8, A[1] + A[3], A[2] + 16, 7);
+      if (!A[7] && !A[4]) { g.fillStyle = "#a8a8a8"; g.fillRect(A[0] - A[2] * 0.36, A[1], A[2] * 0.32, A[3]); g.fillRect(A[0] + A[2] * 1.04, A[1], A[2] * 0.32, A[3]); }
+    }
+  }, false);
   var emi = canvasTex(W, H, function (g) {
     g.fillStyle = "#000"; g.fillRect(0, 0, W, H);
     for (var i = 0; i < lit.length; i++) {
@@ -425,7 +444,47 @@ function facade(seed, floors, cols, wall, litP, shopLit) {
       if (!L[4]) g.fillRect(L[0], L[1] + L[3] * 0.42, L[2], 3);
     }
   });
-  return { map: map, emi: emi };
+  return { map: map, emi: emi, bump: bump, wins: all, floors: floors, cols: cols };
+}
+
+/* Terracotta roof tiles in courses; the roof UVs run along the eaves and up the slope in metres. */
+var tileTex = canvasTex(256, 256, function (g, w, h) {
+  g.fillStyle = "#5a2a1c"; g.fillRect(0, 0, w, h);
+  for (var r = 0; r < 8; r++) for (var c = 0; c < 10; c++) {
+    var x = c * 25.6 + (r % 2) * 12.8, y = r * 32, v = hash(r * 31 + c * 7 + 900);
+    var gr = g.createLinearGradient(x, 0, x + 25.6, 0);
+    var base = [120 + v * 40, 58 + v * 22, 40 + v * 12];
+    gr.addColorStop(0, rgba(base[0] * 0.7, base[1] * 0.7, base[2] * 0.7, 1)); gr.addColorStop(0.5, rgba(base[0], base[1], base[2], 1)); gr.addColorStop(1, rgba(base[0] * 0.6, base[1] * 0.6, base[2] * 0.6, 1));
+    g.fillStyle = gr; g.fillRect(x, y, 25.6, 30); g.fillRect(x - w, y, 25.6, 30);
+    g.fillStyle = "rgba(20,10,6,0.55)"; g.fillRect(x, y + 27, 25.6, 5); g.fillRect(x - w, y + 27, 25.6, 5);
+    if (hash(r * 13 + c + 950) > 0.8) { g.fillStyle = "rgba(60,70,50,0.35)"; g.fillRect(x + 3, y + 4, 18, 20); }
+  }
+});
+tileTex.wrapS = tileTex.wrapT = THREE.RepeatWrapping;
+function hipRoof(W, D, Hr, o) {
+  var hw = W / 2 + o, hd = D / 2 + o, pos = [], uv = [], tri = [];
+  var ridgeX = W >= D, rl = ridgeX ? Math.max(0, hw - hd) : Math.max(0, hd - hw);
+  var A = [-hw, 0, -hd], B = [hw, 0, -hd], Cc = [hw, 0, hd], Dd = [-hw, 0, hd];
+  var R1 = ridgeX ? [-rl, Hr, 0] : [0, Hr, -rl], R2 = ridgeX ? [rl, Hr, 0] : [0, Hr, rl];
+  if (ridgeX) { tri.push([Dd, Cc, R2], [Dd, R2, R1], [B, A, R1], [B, R1, R2], [Cc, B, R2], [A, Dd, R1]); }
+  else { tri.push([Cc, B, R1], [Cc, R1, R2], [A, Dd, R2], [A, R2, R1], [Dd, Cc, R2], [B, A, R1]); }
+  for (var i = 0; i < tri.length; i++) {
+    var T = tri[i];
+    var e1 = new THREE.Vector3(T[1][0] - T[0][0], T[1][1] - T[0][1], T[1][2] - T[0][2]), e2 = new THREE.Vector3(T[2][0] - T[0][0], T[2][1] - T[0][1], T[2][2] - T[0][2]);
+    var n = e1.clone().cross(e2).normalize(), useX = Math.abs(n.z) > Math.abs(n.x);
+    var eave = useX ? hd : hw, run = Math.max(0.01, eave - 0.0);
+    for (var k = 0; k < 3; k++) {
+      var P = T[k]; pos.push(P[0], P[1], P[2]);
+      var horiz = useX ? Math.abs(P[2]) : Math.abs(P[0]);
+      var slopeLen = Math.sqrt(run * run + Hr * Hr) * (eave - horiz) / run;
+      uv.push((useX ? P[0] : P[2]) * 0.55, slopeLen * 0.55);
+    }
+  }
+  var g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+  g.computeVertexNormals();
+  return g;
 }
 
 var moonTex = canvasTex(256, 256, function (g, w, h) {
@@ -620,23 +679,93 @@ var copeMat = new THREE.MeshStandardMaterial({ color: 0x8a8378, roughness: 0.8 }
 var cope1 = add(new THREE.Mesh(new THREE.BoxGeometry(20.3, 0.14, 0.5), copeMat), true, true); cope1.position.set(-5.85, QTOP + 0.07, -20.15);
 var cope2 = add(new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.14, 42), copeMat), true, true); cope2.position.set(-16.15, QTOP + 0.07, 0.8);
 
-/* Harbour-front buildings along the back of the quay */
-var plasterSide = new THREE.MeshStandardMaterial({ color: 0x5f5850, roughness: 0.95 });
-var roofMat = new THREE.MeshStandardMaterial({ color: 0x4a2a20, roughness: 0.85 });
+/* Harbour-front buildings along the back of the quay: relief-mapped facades, a cornice and plinth, balconies,
+   hipped tile roofs with overhanging eaves, chimneys and an awning over each lit shop. */
+var plasterTex = canvasTex(256, 256, function (g, w, h) {
+  g.fillStyle = "#8a8074"; g.fillRect(0, 0, w, h);
+  for (var s = 0; s < 500; s++) { g.fillStyle = "rgba(40,36,30," + (0.04 + hash(s + 1200) * 0.08) + ")"; g.fillRect(hash(s + 1300) * w, hash(s + 1400) * h, 4 + hash(s) * 30, 3 + hash(s + 1) * 40); }
+});
+var plasterSide = new THREE.MeshStandardMaterial({ color: 0x8a8278, map: plasterTex, bumpMap: plasterTex, bumpScale: 0.8, roughness: 0.95 });
+var roofMat = new THREE.MeshStandardMaterial({ map: tileTex, bumpMap: tileTex, bumpScale: 1.5, color: 0xb89080, roughness: 0.8, side: THREE.DoubleSide });
+var trimMat = new THREE.MeshStandardMaterial({ color: 0xa49a8a, roughness: 0.85 });
+var railTex = canvasTex(256, 64, function (g, w, h) {
+  g.clearRect(0, 0, w, h); g.fillStyle = "#fff";
+  g.fillRect(0, 0, w, 6); g.fillRect(0, h - 5, w, 5);
+  for (var x = 4; x < w; x += 16) g.fillRect(x, 0, 3, h);
+}, false);
+var railMatB = new THREE.MeshStandardMaterial({ color: 0x1a1c1e, alphaMap: railTex, alphaTest: 0.5, metalness: 0.6, roughness: 0.5, side: THREE.DoubleSide });
+var awnTex = canvasTex(128, 64, function (g, w, h) {
+  for (var i = 0; i < 8; i++) { g.fillStyle = i % 2 ? "#e8e0cc" : "#9c2a22"; g.fillRect(i * 16, 0, 16, h); }
+  g.fillStyle = "rgba(0,0,0,0.25)"; g.fillRect(0, h - 10, w, 10);
+});
+var awnMat = new THREE.MeshStandardMaterial({ map: awnTex, roughness: 0.9, side: THREE.DoubleSide });
 var WALLS = ["#b9ab96", "#c7b8a0", "#a9a28f", "#c4a98c", "#b7b3a8", "#caa98f", "#9fa39a", "#bfb195"];
+function frontV(geo, v0, v1) {
+  var uv = geo.attributes.uv;
+  for (var i = 16; i < 20; i++) uv.setY(i, v0 + uv.getY(i) * (v1 - v0));
+  return geo;
+}
+var roofParts = [], trimParts = [], railParts = [], awnParts = [], chimParts = [];
 var bx = -40, bi = 0;
 while (bx < 16) {
   var bw = 5 + hash(bi + 101) * 3.5, bh = 5.9 + Math.floor(hash(bi + 131) * 2.4) * 2.8, bd = 8;
   var floors = Math.round(bh / 2.9), cols = Math.max(2, Math.round(bw / 2.1));
   var fc = facade(bi * 17 + 5, floors, cols, WALLS[bi % WALLS.length], 0.1 + hash(bi + 7) * 0.16, bi === 5 || bi === 9);
-  var front = new THREE.MeshStandardMaterial({ map: fc.map, emissiveMap: fc.emi, emissive: 0xffffff, emissiveIntensity: 1.5, roughness: 0.92 });
-  var b = add(new THREE.Mesh(new THREE.BoxGeometry(bw, bh, bd), [plasterSide, plasterSide, plasterSide, plasterSide, front, plasterSide]), true, true);
+  var front = new THREE.MeshStandardMaterial({ map: fc.map, emissiveMap: fc.emi, emissive: 0xffffff, emissiveIntensity: 1.5, bumpMap: fc.bump, bumpScale: 2.2, roughness: 0.92 });
   var bz = (bx + bw / 2 < 3 ? -32.2 : -41) - hash(bi + 41) * 1.0;
-  b.position.set(bx + bw / 2, QTOP + bh / 2, bz);
-  var rf = add(new THREE.Mesh(new THREE.ConeGeometry(1, 1, 4), roofMat), false, false);
-  rf.rotation.y = Math.PI / 4; rf.scale.set(bw * 0.74, 1.6 + hash(bi) * 0.6, bd * 0.74); rf.position.set(bx + bw / 2, QTOP + bh + 0.8, bz);
+  var cx = bx + bw / 2, fz = bz + bd / 2, top = QTOP + bh, BM = [plasterSide, plasterSide, plasterSide, plasterSide, front, plasterSide];
+  /* Many old harbour houses carry their upper floors out over the street (cumba) on timber brackets. */
+  var proj = fc.floors >= 2 && hash(bi + 23) > 0.4 ? 0.6 : 0, gh = bh / fc.floors;
+  if (proj) {
+    var gGeo = frontV(new THREE.BoxGeometry(bw, gh, bd), 0, gh / bh), uGeo = frontV(new THREE.BoxGeometry(bw, bh - gh, bd + proj), gh / bh, 1);
+    add(new THREE.Mesh(gGeo, BM), true, true).position.set(cx, QTOP + gh / 2, bz);
+    add(new THREE.Mesh(uGeo, BM), true, true).position.set(cx, QTOP + gh + (bh - gh) / 2, bz + proj / 2);
+    for (var kb = 0; kb <= fc.cols; kb++) {
+      var kx = cx - bw / 2 + 0.12 + kb * (bw - 0.24) / fc.cols;
+      var brk = new THREE.BoxGeometry(0.14, 0.14, proj + 0.1); brk.translate(kx, QTOP + gh - 0.07, fz + proj / 2 - 0.05); trimParts.push(brk);
+      var brs = new THREE.BoxGeometry(0.1, 0.1, 0.8); brs.rotateX(-0.7); brs.translate(kx, QTOP + gh - 0.38, fz + 0.28); trimParts.push(brs);
+    }
+    trimParts.push(new THREE.BoxGeometry(bw + 0.06, 0.12, 0.08).translate(cx, QTOP + gh + 0.04, fz + proj + 0.02));
+  } else {
+    add(new THREE.Mesh(new THREE.BoxGeometry(bw, bh, bd), BM), true, true).position.set(cx, QTOP + bh / 2, bz);
+  }
+  var rH = 1.5 + hash(bi) * 0.6, rg = hipRoof(bw, bd + proj, rH, 0.45);
+  rg.translate(cx, top + 0.2, bz + proj / 2); roofParts.push(rg);
+  trimParts.push(new THREE.BoxGeometry(bw + 0.7, 0.2, bd + proj + 0.7).translate(cx, top + 0.1, bz + proj / 2));
+  trimParts.push(new THREE.BoxGeometry(bw + 0.12, 0.55, 0.1).translate(cx, QTOP + 0.27, fz + 0.05));
+  if (hash(bi + 17) > 0.35) chimParts.push(new THREE.BoxGeometry(0.55, 1.6, 0.55).translate(cx + (hash(bi + 18) - 0.5) * bw * 0.5, top + rH * 0.6 + 0.4, bz + (hash(bi + 19) - 0.5) * bd * 0.4));
+  for (var wq = 0; wq < fc.wins.length; wq++) {
+    var Wn = fc.wins[wq];
+    var wx0 = cx - bw / 2 + Wn[0] / 512 * bw, wx1 = cx - bw / 2 + (Wn[0] + Wn[2]) / 512 * bw;
+    var wy0 = top - (Wn[1] + Wn[3]) / 512 * bh, wy1 = top - Wn[1] / 512 * bh;
+    var fz = bz + bd / 2 + (Wn[4] ? 0 : proj);
+    if (Wn[4]) {
+      if (Wn[7]) {
+        var ag = new THREE.PlaneGeometry(wx1 - wx0 + 0.6, 1.1); ag.rotateX(-Math.PI / 2 + 0.42); ag.translate((wx0 + wx1) / 2, wy1 + 0.2, fz + 0.5); awnParts.push(ag);
+      }
+      continue;
+    }
+    if (Wn[5] === fc.floors - 2 && hash(bi * 7 + Wn[6] + 300) > 0.45) {
+      var bwid = wx1 - wx0 + 0.9;
+      trimParts.push(new THREE.BoxGeometry(bwid, 0.12, 0.75).translate((wx0 + wx1) / 2, wy0 - 0.08, fz + 0.37));
+      var rf = new THREE.PlaneGeometry(bwid, 0.9); rf.translate((wx0 + wx1) / 2, wy0 + 0.42, fz + 0.73); railParts.push(rf);
+      var rs1 = new THREE.PlaneGeometry(0.72, 0.9); rs1.rotateY(Math.PI / 2); rs1.translate(wx0 - 0.45, wy0 + 0.42, fz + 0.37); railParts.push(rs1);
+      var rs2 = rs1.clone(); rs2.translate(bwid, 0, 0); railParts.push(rs2);
+    } else {
+      trimParts.push(new THREE.BoxGeometry(wx1 - wx0 + 0.16, 0.07, 0.14).translate((wx0 + wx1) / 2, wy0 - 0.03, fz + 0.07));
+    }
+  }
   bx += bw + 0.15 + hash(bi + 3) * 0.6; bi++;
 }
+add(new THREE.Mesh(mergeGeometries(roofParts), roofMat), true, true);
+add(new THREE.Mesh(mergeGeometries(trimParts), trimMat), true, true);
+add(new THREE.Mesh(mergeGeometries(chimParts), plasterSide), true, true);
+add(new THREE.Mesh(mergeGeometries(railParts), railMatB), true, false);
+if (awnParts.length) add(new THREE.Mesh(mergeGeometries(awnParts), awnMat), true, true);
+/* The quay lamps together throw a low warm wash up the house fronts, so the relief and the overhangs read. */
+var frontWash = new THREE.DirectionalLight(0xffb27a, 0.22);
+frontWash.position.set(-4, 0.5, 30); frontWash.target.position.set(-8, 5, -30);
+scene.add(frontWash); scene.add(frontWash.target);
 
 /* ---------- Hillside town ---------- */
 function hillH(x, z) {
@@ -657,7 +786,7 @@ for (var hi = 0; hi < hp.count; hi++) {
 hillGeo.computeVertexNormals();
 add(new THREE.Mesh(hillGeo, new THREE.MeshStandardMaterial({ color: 0x1d2419, roughness: 1 })), false, true);
 
-var HOUSE_N = 420, houseGeo = new THREE.BoxGeometry(1, 1, 1), roofGeo = new THREE.ConeGeometry(0.72, 1, 4);
+var HOUSE_N = 420, houseGeo = new THREE.BoxGeometry(1, 1, 1), roofGeo = new THREE.ConeGeometry(0.8, 1, 4);
 roofGeo.rotateY(Math.PI / 4);
 var houses = new THREE.InstancedMesh(houseGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95 }), HOUSE_N);
 var roofs = new THREE.InstancedMesh(roofGeo, new THREE.MeshStandardMaterial({ color: 0x5a2c20, roughness: 0.9 }), HOUSE_N);
