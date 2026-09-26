@@ -50,7 +50,120 @@
        <div class="ds-deck__step">…</div> …
      </div>
      replace (default): only the current step is visible.
-     build: steps up to the current one stay visible (bullet builds). */
+     build: steps up to the current one stay visible (bullet builds).
+     Every step set gets ‹ Adım k/n › controls and a ▶ autoplay button.
+
+     ---------- code trace ----------
+     <div class="ds-trace">
+       <pre class="ds-trace__code">java code (spans must not cross lines)</pre>
+       <div class="ds-trace__vars"></div>    (optional: filled from data-vars)
+       <div class="ds-trace__stack"></div>   (optional: filled from data-stack)
+       <div class="ds-trace__out"></div>     (optional: filled from data-out)
+       <div class="ds-deck__steps">
+         <div class="ds-deck__step" data-line="3" data-vars="i=0; s=7; a=[7, 2, 9]"
+              data-stack="main() | toplam(a)" data-out="7 2">
+           …visual (svg)… <p class="ds-deck__stepnote">what happens now</p>
+         </div>
+       </div>
+     </div>
+     data-line: current line(s) "3" or "3,4" (1-based); the previous step's line stays faintly marked.
+     data-vars: "name=value; …" — values changed since the previous step are highlighted.
+     data-stack: call frames bottom → top separated by "|".  data-out: whole console text so far ("\n" = newline). */
+  const AUTOPLAY_MS = 1400;
+  let playing = null;
+
+  function stopPlay() {
+    if (!playing) return;
+    clearInterval(playing.timer);
+    const btn = playing.set.nav.querySelector("[data-play]");
+    btn.textContent = "▶";
+    btn.setAttribute("aria-label", "Adımları otomatik oynat");
+    playing = null;
+  }
+
+  function startPlay(set) {
+    stopPlay();
+    if (set.index >= set.steps.length - 1) setStep(set, 0);
+    const btn = set.nav.querySelector("[data-play]");
+    btn.textContent = "❚❚";
+    btn.setAttribute("aria-label", "Otomatik oynatmayı durdur");
+    playing = { set: set, timer: setInterval(function () {
+      if (set.index >= set.steps.length - 1) { stopPlay(); return; }
+      setStep(set, set.index + 1);
+    }, AUTOPLAY_MS) };
+  }
+
+  function initTrace(tr) {
+    const pre = tr.querySelector(".ds-trace__code");
+    if (pre && !pre.dataset.ready) {
+      pre.innerHTML = pre.innerHTML.replace(/\n$/, "").split("\n").map(function (line, k) {
+        return '<span class="ds-trace__ln" data-n="' + (k + 1) + '">' + (line || " ") + "</span>";
+      }).join("");
+      pre.dataset.ready = "1";
+    }
+    return {
+      lines: pre ? Array.from(pre.querySelectorAll(".ds-trace__ln")) : [],
+      vars: tr.querySelector(".ds-trace__vars"),
+      stack: tr.querySelector(".ds-trace__stack"),
+      out: tr.querySelector(".ds-trace__out")
+    };
+  }
+
+  function parseVars(txt) {
+    const list = [];
+    (txt || "").split(";").forEach(function (part) {
+      const i = part.indexOf("=");
+      if (i < 0) return;
+      const name = part.slice(0, i).trim();
+      if (name) list.push([name, part.slice(i + 1).trim()]);
+    });
+    return list;
+  }
+
+  function esc(t) {
+    return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function lineList(step) {
+    return step ? (step.dataset.line || "").split(",").map(Number).filter(Boolean) : [];
+  }
+
+  function updateTrace(t, step, prevStep) {
+    const cur = lineList(step), prv = lineList(prevStep);
+    let first = null;
+    t.lines.forEach(function (ln, k) {
+      const n = k + 1, on = cur.indexOf(n) >= 0;
+      ln.classList.toggle("is-current", on);
+      ln.classList.toggle("is-prev", !on && prv.indexOf(n) >= 0);
+      if (on && !first) first = ln;
+    });
+    if (first) {
+      const pre = first.parentElement;
+      if (first.offsetTop < pre.scrollTop || first.offsetTop + first.offsetHeight > pre.scrollTop + pre.clientHeight) {
+        pre.scrollTop = Math.max(0, first.offsetTop - pre.clientHeight / 3);
+      }
+    }
+    if (t.vars) {
+      const now = parseVars(step.dataset.vars);
+      const before = {};
+      parseVars(prevStep && prevStep.dataset.vars).forEach(function (v) { before[v[0]] = v[1]; });
+      t.vars.innerHTML = '<div class="ds-trace__title">Değişkenler</div>' + (now.length ? now.map(function (v) {
+        const changed = prevStep && before[v[0]] !== v[1];
+        return '<div class="ds-trace__var' + (changed ? " is-changed" : "") + '"><span>' + esc(v[0]) + "</span><b>" + esc(v[1]) + "</b></div>";
+      }).join("") : '<div class="ds-trace__empty">—</div>');
+    }
+    if (t.stack) {
+      const frames = (step.dataset.stack || "").split("|").map(function (f) { return f.trim(); }).filter(Boolean);
+      t.stack.innerHTML = '<div class="ds-trace__title">Çağrı yığını</div>' + (frames.length ? frames.slice().reverse().map(function (f, k) {
+        return '<div class="ds-trace__frame' + (k === 0 ? " is-top" : "") + '">' + esc(f) + "</div>";
+      }).join("") : '<div class="ds-trace__empty">boş</div>');
+    }
+    if (t.out) {
+      const txt = (step.dataset.out || "").replace(/\\n/g, "\n");
+      t.out.innerHTML = '<div class="ds-trace__title">Çıktı</div><pre>' + (txt ? esc(txt) : " ") + "</pre>";
+    }
+  }
+
   const stepSets = slides.map(function (slide) {
     return Array.from(slide.querySelectorAll(".ds-deck__steps")).map(function (box) {
       const steps = Array.from(box.children).filter(function (c) { return c.classList.contains("ds-deck__step"); });
@@ -58,12 +171,20 @@
       nav.className = "ds-deck__stepnav";
       nav.innerHTML = '<button type="button" class="ds-deck__button ds-deck__button--sm" data-step="-1" aria-label="Önceki adım">‹</button>' +
         '<span class="ds-deck__stepcount" aria-live="polite"></span>' +
-        '<button type="button" class="ds-deck__button ds-deck__button--sm" data-step="1" aria-label="Sonraki adım">›</button>';
+        '<button type="button" class="ds-deck__button ds-deck__button--sm" data-step="1" aria-label="Sonraki adım">›</button>' +
+        '<button type="button" class="ds-deck__button ds-deck__button--sm" data-play aria-label="Adımları otomatik oynat">▶</button>';
       box.appendChild(nav);
-      const set = { box: box, steps: steps, nav: nav, index: 0, build: box.dataset.mode === "build" };
+      const tr = box.closest(".ds-trace");
+      const set = { box: box, steps: steps, nav: nav, index: 0, build: box.dataset.mode === "build", trace: tr ? initTrace(tr) : null };
       nav.addEventListener("click", function (e) {
-        const d = e.target.dataset && e.target.dataset.step;
-        if (d) setStep(set, set.index + parseInt(d, 10));
+        const b = e.target.closest("button");
+        if (!b) return;
+        if (b.hasAttribute("data-play")) {
+          if (playing && playing.set === set) stopPlay(); else startPlay(set);
+          return;
+        }
+        stopPlay();
+        setStep(set, set.index + parseInt(b.dataset.step, 10));
       });
       return set;
     });
@@ -79,6 +200,7 @@
     set.nav.querySelector(".ds-deck__stepcount").textContent = "Adım " + (set.index + 1) + " / " + set.steps.length;
     set.nav.querySelector('[data-step="-1"]').disabled = set.index === 0;
     set.nav.querySelector('[data-step="1"]').disabled = set.index === set.steps.length - 1;
+    if (set.trace) updateTrace(set.trace, set.steps[set.index], set.index > 0 ? set.steps[set.index - 1] : null);
   }
 
   /* first step set on the slide that still has steps left in the given direction */
@@ -90,12 +212,14 @@
   }
 
   function go(dir) {
+    stopPlay();
     const set = pendingSet(dir);
     if (set) setStep(set, set.index + dir);
     else show(current + dir, true, dir < 0);
   }
 
   function show(index, updateHash, atEnd) {
+    stopPlay();
     current = Math.max(0, Math.min(slides.length - 1, index));
     slides.forEach(function (slide, i) {
       const active = i === current;
