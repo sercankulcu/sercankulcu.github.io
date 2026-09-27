@@ -11,6 +11,8 @@
   const jump = document.getElementById("ds-deck-jump");
   const full = document.getElementById("ds-deck-full");
   const sectionLabel = document.getElementById("ds-deck-section");
+  /* Turkish casing for text-transform (i → İ, ı → I) even if the page itself is lang="en" */
+  if (!deck.getAttribute("lang")) deck.setAttribute("lang", "tr");
   const W = 800, H = 600, FLUID_BELOW = 560;
   let current = 0;
 
