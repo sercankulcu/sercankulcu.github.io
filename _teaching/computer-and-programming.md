@@ -61,9 +61,13 @@ Computers process data by following precise instructions and help solve practica
 
 - [🖼️Sunum - Temel Kavramlar (HTML)](../files/computer/slides/Bolum_01_Temel_Kavramlar.html)
 - [🖼️Sunum - Temel Kavramlar (pdf)](../files/computer/Bolum_01_Temel_kavramlar.pdf)
+- [🖼️Sunum - İnternet (HTML)](../files/computer/slides/Bolum_01_Internet.html)
 - [🖼️Sunum - İnternet (pdf)](../files/computer/Bolum_01_Internet.pdf)
+- [🖼️Sunum - Donanım (HTML)](../files/computer/slides/Bolum_01_Donanim.html)
 - [🖼️Sunum - Donanım (pdf)](../files/computer/Bolum_01_Donanim.pdf)
+- [🖼️Sunum - Bilgisayarlar (HTML)](../files/java/slides/Bolum_01_Bilgisayarlar.html)
 - [🖼️Sunum - Bilgisayarlar (pdf)](../files/java/slides/Bolum_01_Bilgisayarlar.pdf)
+- [🖼️Sunum - Hesaplama (HTML)](../files/java/slides/Bolum_01_Hesaplama_Hesaplamali_Dusunme.html)
 - [🖼️Sunum - Hesaplama (pdf)](../files/java/slides/Bolum_01_Hesaplama_Hesaplamali_Dusunme.pdf)
 
 ---
