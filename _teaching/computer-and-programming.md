@@ -59,6 +59,7 @@ There are currently no announcements.
 
 Computers process data by following precise instructions and help solve practical problems. This chapter introduces computer hardware, internet basics, and computational thinking.
 
+- [🖼️Sunum - Temel Kavramlar (HTML)](../files/computer/slides/Bolum_01_Temel_Kavramlar.html)
 - [🖼️Sunum - Temel Kavramlar (pdf)](../files/computer/Bolum_01_Temel_kavramlar.pdf)
 - [🖼️Sunum - İnternet (pdf)](../files/computer/Bolum_01_Internet.pdf)
 - [🖼️Sunum - Donanım (pdf)](../files/computer/Bolum_01_Donanim.pdf)
