@@ -57,7 +57,7 @@ There are currently no announcements.
 
 ## Chapter 1: Computer Fundamentals and Computational Thinking
 
-A computer is a remarkable electronic device that has revolutionized the way we live, work, and communicate. At its core, it's a machine that processes information using a series of precise instructions called programs. Programming is the art and science of creating these instructions, allowing us to harness the computer's incredible power to solve problems, automate tasks, and create innovative solutions. Through programming languages - which act as bridges between human thinking and machine operations - we can command computers to perform complex calculations, manage vast amounts of data, and create everything from mobile apps to artificial intelligence systems. This fascinating field combines logical thinking, creativity, and problem-solving skills, making it both challenging and incredibly rewarding for those who venture into it.
+Computers process data by following precise instructions and help solve practical problems. This chapter introduces computer hardware, internet basics, and computational thinking.
 
 - [🖼️Sunum - Temel Kavramlar (pdf)](../files/computer/Bolum_01_Temel_kavramlar.pdf)
 - [🖼️Sunum - İnternet (pdf)](../files/computer/Bolum_01_Internet.pdf)
@@ -69,7 +69,7 @@ A computer is a remarkable electronic device that has revolutionized the way we 
 
 ## Chapter 2: Operating Systems
 
-An operating system manages hardware resources and provides common services for applications. It coordinates processes, memory, files, storage devices, input/output operations, user accounts, permissions, and communication with peripheral devices. Systems such as Windows, macOS, and Linux also provide interfaces through which users and applications interact with the computer.
+An operating system manages hardware resources and provides services for applications. This chapter covers processes, memory, files, devices, permissions, and user interaction.
 
 - [🖼️Sunum - İşletim Sistemleri (pdf)](../files/computer/Bolum_02_İsletim_sistemleri.pdf)
 - [🖼️Sunum - Windows (pdf)](../files/computer/Bolum_02_Windows.pdf)
@@ -78,7 +78,7 @@ An operating system manages hardware resources and provides common services for 
 
 ## Chapter 3: Office Applications
 
-Office applications include word processors for creating structured documents, spreadsheets for organizing and analyzing data, and presentation tools for communicating information visually. Although this course uses Microsoft Word, Excel, and PowerPoint, the underlying concepts apply to other productivity suites as well.
+Office applications help users create documents, analyze data, and present information. This chapter covers the core features of Microsoft Word, Excel, and PowerPoint.
 
 - [🖼️Sunum - Word (pdf)](../files/computer/Bolum_03_Word.pdf)
 - [🖼️Sunum - Excel (pdf)](../files/computer/Bolum_03_Excel.pdf)
