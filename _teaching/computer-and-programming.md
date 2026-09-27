@@ -76,7 +76,9 @@ Computers process data by following precise instructions and help solve practica
 
 An operating system manages hardware resources and provides services for applications. This chapter covers processes, memory, files, devices, permissions, and user interaction.
 
+- [🖼️Sunum - İşletim Sistemleri (HTML)](../files/computer/slides/Bolum_02_Isletim_Sistemleri.html)
 - [🖼️Sunum - İşletim Sistemleri (pdf)](../files/computer/Bolum_02_İsletim_sistemleri.pdf)
+- [🖼️Sunum - Windows (HTML)](../files/computer/slides/Bolum_02_Windows.html)
 - [🖼️Sunum - Windows (pdf)](../files/computer/Bolum_02_Windows.pdf)
 
 ---
