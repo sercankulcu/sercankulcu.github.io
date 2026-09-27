@@ -100,8 +100,11 @@ Office applications help users create documents, analyze data, and present infor
 
 Programming turns problem-solving steps into instructions that a computer can execute. This chapter introduces algorithms, pseudocode, flowcharts, and the basic structure of a Java program.
 
+- [🖥️Sunum - Programlamaya Giriş (HTML)](../files/computer/slides/Bolum_04_Programlama.html)
 - [🖼️Sunum - Programlamaya Giriş (pdf)](../files/computer/Bolum_04_Programlama.pdf)
+- [🖥️Sunum - Algoritmalar (HTML)](../files/java/slides/Bolum_01_Algoritmalar.html)
 - [🖼️Sunum - Algoritmalar (pdf)](../files/java/slides/Bolum_01_Algoritmalar.pdf)
+- [🖥️Sunum - Akış Diyagramları (HTML)](../files/java/slides/Bolum_01_Akis_Diyagramlari.html)
 - [🖼️Sunum - Akış Diyagramları (pdf)](../files/java/slides/Bolum_01_Akis_Diyagramlari.pdf)
 - [🗒️Lecture Notes (pdf)](../files/java/Chapter_01_Introduction.pdf)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders01/src)
@@ -112,6 +115,7 @@ Programming turns problem-solving steps into instructions that a computer can ex
 
 A Java program is organized into classes and methods. This chapter covers the development environment, compilation, execution, and the structure of a simple console application.
 
+- [🖥️Sunum - Java Programlama Temelleri (HTML)](../files/java/slides/Bolum_02_Programlama.html)
 - [🖼️Sunum - Java Programlama Temelleri (pdf)](../files/java/slides/Bolum_02_Programlama.pdf)
 - [🗒️Lecture Notes (pdf)](../files/java/Chapter_02_Basic_Syntax_and_Data_Types.pdf)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders02/src)
@@ -122,6 +126,7 @@ A Java program is organized into classes and methods. This chapter covers the de
 
 Variables store values that a program uses and modifies. This chapter covers Java data types, declarations, assignments, expressions, operators, and basic type conversion.
 
+- [🖥️Sunum - Söz Dizimi (HTML)](../files/java/slides/Bolum_02_Soz_Dizimi_Kurallari.html)
 - [🖼️Sunum - Söz Dizimi (pdf)](../files/java/slides/Bolum_02_Soz_Dizimi_Kurallari.pdf)
 - [🗒️Lecture Notes (pdf)](../files/java/Chapter_02_Basic_Syntax_and_Data_Types.pdf)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders02/src)
@@ -132,7 +137,9 @@ Variables store values that a program uses and modifies. This chapter covers Jav
 
 Conditional statements allow a program to choose between different actions. This chapter introduces boolean expressions, comparison operators, `if`, `else if`, `else`, and `switch`.
 
+- [🖥️Sunum - Kontrol Yapıları (HTML)](../files/java/slides/Bolum_03_Kontrol_Yapilari.html)
 - [🖼️Sunum - Kontrol Yapıları (pdf)](../files/java/slides/Bolum_03_Kontrol_Yapilari.pdf)
+- [🖥️Sunum - Örnek Çıktılar (HTML)](../files/java/slides/Bolum_03_Ornek_Ciktilar.html)
 - [🖼️Sunum - Örnek Çıktılar (pdf)](../files/java/slides/Bolum_03_Ornek_Ciktilar.pdf)
 - [🗒️Lecture Notes (pdf)](../files/java/Chapter_03_Control_Structures.pdf)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src)
@@ -143,6 +150,7 @@ Conditional statements allow a program to choose between different actions. This
 
 Loops repeat a block of code while a condition remains true or for a known number of steps. This chapter covers `while`, `do-while`, and `for` loops together with counters, accumulators, and nested loops.
 
+- [🖥️Sunum - Örnek Uygulamalar (HTML)](../files/java/slides/Bolum_03_Ornekler.html)
 - [🖼️Sunum - Örnek Uygulamalar (pdf)](../files/java/slides/Bolum_03_Ornekler.pdf)
 - [🗒️Lecture Notes (pdf)](../files/java/Chapter_03_Control_Structures.pdf)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src)
@@ -153,7 +161,9 @@ Loops repeat a block of code while a condition remains true or for a known numbe
 
 Methods divide a program into reusable operations. This chapter covers method declarations, parameters, return values, scope, and method calls.
 
+- [🖥️Sunum - Fonksiyonlar (HTML)](../files/java/slides/Bolum_03_Fonksiyonlar.html)
 - [🖼️Sunum - Fonksiyonlar (pdf)](../files/java/slides/Bolum_03_Fonksiyonlar.pdf)
+- [🖥️Sunum - Örnek Fonksiyonlar (HTML)](../files/java/slides/Bolum_03_Ornek_Fonksiyonlar.html)
 - [🖼️Sunum - Örnek Fonksiyonlar (pdf)](../files/java/slides/Bolum_03_Ornek_Fonksiyonlar.pdf)
 - [🗒️Lecture Notes (pdf)](../files/java/Chapter_03_Control_Structures.pdf)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src)
@@ -164,6 +174,7 @@ Methods divide a program into reusable operations. This chapter covers method de
 
 A recursive method solves a problem by calling itself with a smaller input. This chapter focuses on base cases, recursive cases, call-stack behavior, and tracing recursive executions.
 
+- [🖥️Sunum - Özyineleme (HTML)](../files/java/slides/Bolum_03_Ozyineleme.html)
 - [🖼️Sunum - Özyineleme (pdf)](../files/java/slides/Bolum_03_Ozyineleme.pdf)
 - [🗒️Lecture Notes (pdf)](../files/java/Chapter_03_Control_Structures.pdf)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src)
@@ -174,6 +185,7 @@ A recursive method solves a problem by calling itself with a smaller input. This
 
 Arrays store a fixed number of values of the same type and provide indexed access to each element. This chapter covers array creation, traversal, searching, updating, and common boundary errors.
 
+- [🖥️Sunum - Diziler (HTML)](../files/java/slides/Bolum_05_Diziler.html)
 - [🖼️Sunum - Diziler (pdf)](../files/java/slides/Bolum_05_Diziler.pdf)
 - [🗒️Lecture Notes (pdf)](../files/java/Chapter_05_Arrays_And_Collections.pdf)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders05/src)
@@ -184,6 +196,7 @@ Arrays store a fixed number of values of the same type and provide indexed acces
 
 Strings represent sequences of characters and are used to process textual data. This chapter covers string creation, comparison, searching, slicing, formatting, and commonly used Java `String` methods.
 
+- [🖥️Sunum - Dizgi (HTML)](../files/java/slides/Bolum_05_Dizgi.html)
 - [🖼️Sunum - Dizgi (pdf)](../files/java/slides/Bolum_05_Dizgi.pdf)
 - [🗒️Lecture Notes (pdf)](../files/java/Chapter_05_Arrays_And_Collections.pdf)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders05/src)
