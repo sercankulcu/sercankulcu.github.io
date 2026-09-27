@@ -87,8 +87,11 @@ An operating system manages hardware resources and provides services for applica
 
 Office applications help users create documents, analyze data, and present information. This chapter covers the core features of Microsoft Word, Excel, and PowerPoint.
 
+- [🖥️Sunum - Word (HTML)](../files/computer/slides/Bolum_03_Word.html)
 - [🖼️Sunum - Word (pdf)](../files/computer/Bolum_03_Word.pdf)
+- [🖥️Sunum - Excel (HTML)](../files/computer/slides/Bolum_03_Excel.html)
 - [🖼️Sunum - Excel (pdf)](../files/computer/Bolum_03_Excel.pdf)
+- [🖥️Sunum - PowerPoint (HTML)](../files/computer/slides/Bolum_03_PowerPoint.html)
 - [🖼️Sunum - PowerPoint (pdf)](../files/computer/Bolum_03_PowerPoint.pdf)
 
 ---
