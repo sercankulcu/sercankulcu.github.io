@@ -86,9 +86,9 @@ Office applications include word processors for creating structured documents, s
 
 ---
 
-## Chapter 4: Introduction to Programming and Java
+## Chapter 4: Introduction to Programming and Algorithms
 
-Programming is the art and science of instructing computers to perform specific tasks through carefully crafted sets of instructions. It serves as the foundation for all software development, from simple mobile apps to complex enterprise systems. Programming languages like Python, Java, and JavaScript provide different approaches to solving computational problems, each with its own syntax and capabilities. The field encompasses fundamental concepts such as variables, control structures, data types, and algorithms, which combine to create powerful software solutions. Learning to program develops critical thinking skills, problem-solving abilities, and logical reasoning, while opening doors to careers in software development, data science, artificial intelligence, and many other technology-driven fields.
+Programming turns problem-solving steps into instructions that a computer can execute. This chapter introduces algorithms, pseudocode, flowcharts, and the basic structure of a Java program.
 
 - [🖼️Sunum - Programlamaya Giriş (pdf)](../files/computer/Bolum_04_Programlama.pdf)
 - [🖼️Sunum - Algoritmalar (pdf)](../files/java/slides/Bolum_01_Algoritmalar.pdf)
@@ -98,46 +98,82 @@ Programming is the art and science of instructing computers to perform specific 
 
 ---
 
-## Chapter 5: Basic Syntax and Data Types
+## Chapter 5: Java Setup and First Program
 
-Understanding the fundamental syntax and data types of Java is essential for building effective and efficient software systems, as it provides the building blocks for defining program logic, manipulating data, and communicating with external resources.
+A Java program is organized into classes and methods. This chapter covers the development environment, compilation, execution, and the structure of a simple console application.
 
 - [🖼️Sunum - Java Programlama Temelleri (pdf)](../files/java/slides/Bolum_02_Programlama.pdf)
+- [🗒️Lecture Notes (pdf)](../files/java/Chapter_02_Basic_Syntax_and_Data_Types.pdf)
+- [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders02/src)
+
+---
+
+## Chapter 6: Variables, Data Types, and Operators
+
+Variables store values that a program uses and modifies. This chapter covers Java data types, declarations, assignments, expressions, operators, and basic type conversion.
+
 - [🖼️Sunum - Söz Dizimi (pdf)](../files/java/slides/Bolum_02_Soz_Dizimi_Kurallari.pdf)
 - [🗒️Lecture Notes (pdf)](../files/java/Chapter_02_Basic_Syntax_and_Data_Types.pdf)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders02/src)
 
 ---
 
-## Chapter 6: Control Structures
+## Chapter 7: Conditional Statements
 
-Control structures, which include conditional statements and loops, provide a powerful mechanism for controlling the flow of execution in a Java program, enabling developers to create complex, dynamic behaviors and respond to a wide range of inputs and events.
+Conditional statements allow a program to choose between different actions. This chapter introduces boolean expressions, comparison operators, `if`, `else if`, `else`, and `switch`.
 
 - [🖼️Sunum - Kontrol Yapıları (pdf)](../files/java/slides/Bolum_03_Kontrol_Yapilari.pdf)
-- [🖼️Sunum - Örnek Uygulamalar (pdf)](../files/java/slides/Bolum_03_Ornekler.pdf)
-- [🖼️Sunum - Örnek Fonksiyonlar (pdf)](../files/java/slides/Bolum_03_Ornek_Fonksiyonlar.pdf)
 - [🖼️Sunum - Örnek Çıktılar (pdf)](../files/java/slides/Bolum_03_Ornek_Ciktilar.pdf)
 - [🗒️Lecture Notes (pdf)](../files/java/Chapter_03_Control_Structures.pdf)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src)
 
 ---
 
-## Chapter 7: Methods and Recursion
+## Chapter 8: Loops
 
-Methods are reusable blocks of code defined within classes. They improve program organization, readability, and maintainability by encapsulating specific operations. A method may receive values through parameters and may return a result. Recursive methods solve problems by calling themselves with progressively smaller inputs.
+Loops repeat a block of code while a condition remains true or for a known number of steps. This chapter covers `while`, `do-while`, and `for` loops together with counters, accumulators, and nested loops.
+
+- [🖼️Sunum - Örnek Uygulamalar (pdf)](../files/java/slides/Bolum_03_Ornekler.pdf)
+- [🗒️Lecture Notes (pdf)](../files/java/Chapter_03_Control_Structures.pdf)
+- [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src)
+
+---
+
+## Chapter 9: Methods
+
+Methods divide a program into reusable operations. This chapter covers method declarations, parameters, return values, scope, and method calls.
 
 - [🖼️Sunum - Fonksiyonlar (pdf)](../files/java/slides/Bolum_03_Fonksiyonlar.pdf)
+- [🖼️Sunum - Örnek Fonksiyonlar (pdf)](../files/java/slides/Bolum_03_Ornek_Fonksiyonlar.pdf)
+- [🗒️Lecture Notes (pdf)](../files/java/Chapter_03_Control_Structures.pdf)
+- [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src)
+
+---
+
+## Chapter 10: Recursion
+
+A recursive method solves a problem by calling itself with a smaller input. This chapter focuses on base cases, recursive cases, call-stack behavior, and tracing recursive executions.
+
 - [🖼️Sunum - Özyineleme (pdf)](../files/java/slides/Bolum_03_Ozyineleme.pdf)
 - [🗒️Lecture Notes (pdf)](../files/java/Chapter_03_Control_Structures.pdf)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src)
 
 ---
 
-## Chapter 8: Arrays and Strings
+## Chapter 11: Arrays
 
-Arrays store a fixed number of elements of the same type and provide efficient indexed access. They are useful when the required size is known in advance, but inserting or removing elements may require additional work because an array cannot dynamically change its length.
+Arrays store a fixed number of values of the same type and provide indexed access to each element. This chapter covers array creation, traversal, searching, updating, and common boundary errors.
 
 - [🖼️Sunum - Diziler (pdf)](../files/java/slides/Bolum_05_Diziler.pdf)
+- [🗒️Lecture Notes (pdf)](../files/java/Chapter_05_Arrays_And_Collections.pdf)
+- [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders05/src)
+
+---
+
+## Chapter 12: Strings
+
+Strings represent sequences of characters and are used to process textual data. This chapter covers string creation, comparison, searching, slicing, formatting, and commonly used Java `String` methods.
+
 - [🖼️Sunum - Dizgi (pdf)](../files/java/slides/Bolum_05_Dizgi.pdf)
 - [🗒️Lecture Notes (pdf)](../files/java/Chapter_05_Arrays_And_Collections.pdf)
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders05/src)
