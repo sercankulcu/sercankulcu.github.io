@@ -11,16 +11,6 @@ location: "Giresun, Turkey"
 ![data structures and algorithms with c](/images/teaching/teaching-data-structures.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
 This course studies data structures and algorithms through their memory representation and their implementation in C. Each topic is developed from the abstract data type to a working C99/C11 implementation with pointers, dynamic memory, and structures, together with its complexity analysis. The course covers arrays and structures, linked lists, stacks, queues, lists, trees, priority queues and heaps, hash tables, search trees, graphs, sets and union-find, as well as recursion, backtracking, spanning trees, shortest paths, and sorting algorithms.
 
-## Ders Planı
-[C ile Veri Yapıları ve Algoritmalar - Ders Planı (HTML)](../files/dsa_c/slides/Ders_Plani.html)
-
----
-
-## Course resources
-
-- Veri Yapıları ve Algoritmalar 1 — Mustafa Ege [(pdf)](../files/dsa_c/Veri_Yapilari_ve_Algoritmalar_1_Mustafa_Ege.pdf)
-- Veri Yapıları ve Algoritmalar 2 — Mustafa Ege [(pdf)](../files/dsa_c/Veri_Yapilari_ve_Algoritmalar_2_Mustafa_Ege.pdf)
-
 ---
 
 ## Chapter 1: Introduction and Algorithm Analysis
