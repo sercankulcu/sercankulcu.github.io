@@ -57,7 +57,7 @@ Algorithmic game theory studies strategic interaction through the lens of comput
 
 Game theory is a mathematical framework used to analyze and understand strategic interactions between rational decision-makers. It provides a systematic way of studying situations where the outcome of one person's decision depends on the actions of others.
 
-- [🖼️Slides (PDF)](../files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri.pdf) | [Slides (HTML)](../files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri.html)
+- [🖼️Slides (HTML)](../files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri.html)
 - [🕹️Guess the Average Game (HTML)](../files/agt/slides/Chapter_01_Guess_Avarage.html)
 - [🕹️TicTacToe Game (HTML)](../files/agt/slides/Chapter_01_TicTacToe.html)
 - [🕹️Nim Game (HTML)](../files/agt/slides/Chapter_01_Nim.html)
@@ -73,7 +73,7 @@ Game theory is a mathematical framework used to analyze and understand strategic
 
 Algorithmic game theory is an interdisciplinary field that combines concepts from game theory and computer science. It focuses on the study of strategic interactions in computational settings and aims to design efficient algorithms and computational models for analyzing and solving games.
 
-- [🖼️Slides (PDF)](../files/agt/slides/Bolum_02_Oyun_Kuramina_Giris.pdf) | [Slides (HTML)](../files/agt/slides/Bolum_02_Oyun_Kuramina_Giris.html)
+- [🖼️Slides (HTML)](../files/agt/slides/Bolum_02_Oyun_Kuramina_Giris.html)
 - [🕹️Othello Game (HTML)](../files/agt/slides/Chapter_02_Othello.html)
 - [🕹️Hex Game (HTML)](../files/agt/slides/Chapter_02_Hex.html)
 - [🕹️Reversi Game (HTML)](../files/agt/slides/Chapter_02_Reversi.html)
@@ -87,7 +87,7 @@ Algorithmic game theory is an interdisciplinary field that combines concepts fro
 
 Nash equilibrium is a central concept in game theory that captures the notion of strategic behavior and stable outcomes in games. It refers to a set of strategies, one for each player, where no player has an incentive to unilaterally deviate from their chosen strategy, assuming all other players stick to their strategies. A Nash equilibrium may involve pure strategies or probability distributions over strategies, known as mixed strategies.
 
-- [🖼️Slides (PDF)](../files/agt/slides/Bolum_03_Nash_Dengesi.pdf) | [Slides (HTML)](../files/agt/slides/Bolum_03_Nash_Dengesi.html)
+- [🖼️Slides (HTML)](../files/agt/slides/Bolum_03_Nash_Dengesi.html)
 - [🕹️Prisoner's Dilemma (HTML)](../files/agt/slides/Chapter_03_Prisoners_Dilemma.html)
 - [🕹️Matrix Nash (HTML)](../files/agt/slides/Chapter_03_Matrix-Nash.html)
 - [🕹️Rock–Paper–Scissors Game (HTML)](../files/agt/slides/Chapter_03_Rock_Scissors_Paper.html)
@@ -105,7 +105,7 @@ Nash equilibrium is a central concept in game theory that captures the notion of
 
 Mechanism design is a field of study within game theory and economics that focuses on designing rules or mechanisms to achieve desired outcomes in strategic settings. It involves designing incentive-compatible mechanisms that align the self-interests of individual participants with the desired collective goals. Mechanism design asks how rules can be constructed so that self-interested participants reveal useful information and produce desirable outcomes. Common objectives include incentive compatibility, individual rationality, efficiency, revenue, and social welfare.
 
-- [🖼️Slides (PDF)](../files/agt/slides/Bolum_04_Mekanizma.pdf) | [Slides (HTML)](../files/agt/slides/Bolum_04_Mekanizma.html)
+- [🖼️Slides (HTML)](../files/agt/slides/Bolum_04_Mekanizma.html)
 - [🕹️Poker Game (HTML)](../files/agt/slides/Chapter_04_Poker/poker.html)
 - [🕹️Stable Matching (HTML)](../files/agt/slides/Chapter_04_Stable-Matching.html)
 - [🕹️Ultimatum Game (HTML)](../files/agt/slides/Chapter_04_Ultimatum-Game.html)
@@ -120,7 +120,7 @@ Mechanism design is a field of study within game theory and economics that focus
 
 Auctions and market design are closely related fields that utilize principles from economics, game theory, and mechanism design to study the allocation of goods, resources, and services in various settings. Both areas aim to create efficient and fair mechanisms for matching buyers and sellers, determining prices, and optimizing resource allocation.
 
-- [🖼️Slides (PDF)](../files/agt/slides/Bolum_05_Acik_Arttirma.pdf) | [Slides (HTML)](../files/agt/slides/Bolum_05_Acik_Arttirma.html)
+- [🖼️Slides (HTML)](../files/agt/slides/Bolum_05_Acik_Arttirma.html)
 - [English Auction Simulator](../files/agt/slides/Chapter_05_english-auction-simulator.html) | 
   [Dutch Auction Simulator](../files/agt/slides/Chapter_05_dutch-auction-simulator.html) | 
   [First-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_first-price-auction-simulator.html) | 
@@ -136,7 +136,7 @@ Auctions and market design are closely related fields that utilize principles fr
 
 Social choice theory is a branch of economics and political science that studies methods for aggregating individual preferences or opinions into a collective choice. It explores the challenges and possibilities of making decisions on behalf of a group or society based on the preferences of its members. Voting systems are one of the key tools analyzed in social choice theory.
 
-- [🖼️Slides (PDF)](../files/agt/slides/Bolum_06_Oylama.pdf) | [Slides (HTML)](../files/agt/slides/Bolum_06_Oylama.html)
+- [🖼️Slides (HTML)](../files/agt/slides/Bolum_06_Oylama.html)
 - [🕹️Facility Location Mechanism (HTML)](../files/agt/slides/Chapter_06_Facility_Location.html)
 - [🕹️Voting Rules (HTML)](../files/agt/slides/Chapter_06_Voting-Rules.html)
 - [🕹️Condorcet Voting (HTML)](../files/agt/slides/Chapter_06_Condorcet-Voting-Paradox.html)
@@ -149,7 +149,7 @@ Social choice theory is a branch of economics and political science that studies
 
 Multi-agent systems refer to scenarios where multiple self-interested agents interact and make decisions in a shared environment. Multi-agent systems are analyzed to understand the strategic behavior of agents, optimize outcomes, and design mechanisms that align individual incentives with system objectives.
 
-- [🖼️Slides (PDF)](../files/agt/slides/Bolum_07_Coklu_Ajan.pdf) | [Slides (HTML)](../files/agt/slides/Bolum_07_Coklu_Ajan.html)
+- [🖼️Slides (HTML)](../files/agt/slides/Bolum_07_Coklu_Ajan.html)
 - [🕹️Checkers Game (HTML)](../files/agt/slides/Chapter_07_Checkers.html)
 - [🕹️Public Goods Game (HTML)](../files/agt/slides/Chapter_07_Public-Goods-Game.html)
 - [🕹️Shapley Coalition Game (HTML)](../files/agt/slides/Chapter_07_Shapley-Coalition-Game.html)
@@ -162,7 +162,7 @@ Multi-agent systems refer to scenarios where multiple self-interested agents int
 
 In algorithmic game theory, network design and routing are studied with a focus on understanding the strategic behavior of self-interested agents and optimizing network efficiency and fairness. Selfish routing games illustrate how individually optimal route choices can produce globally inefficient traffic patterns.
 
-- [🖼️Slides (PDF)](../files/agt/slides/Bolum_08_Ag_Tasarimi.pdf) | [Slides (HTML)](../files/agt/slides/Bolum_08_Ag_Tasarimi.html)
+- [🖼️Slides (HTML)](../files/agt/slides/Bolum_08_Ag_Tasarimi.html)
 - [🕹️Traffic lights simulator (HTML)](../files/agt/slides/Chapter_08_Traffic_Lights.html)
 - [🕹️Selfish Routing (HTML)](../files/agt/slides/Chapter_08_Selfish-Routing.html) 
 - [🕹️Braess Paradox (HTML)](../files/agt/slides/Chapter_08_Braess-Paradox-Visualizer.html) 
@@ -176,7 +176,7 @@ In algorithmic game theory, network design and routing are studied with a focus 
 
 In algorithmic game theory, online platforms are studied as environments where self-interested agents interact and make decisions in the pursuit of their own objectives. Online platforms encompass various digital platforms, such as e-commerce platforms, social media platforms, ride-sharing platforms, and online auctions.
 
-- [🖼️Slides (PDF)](../files/agt/slides/Bolum_09_Cevrimici_Platform.pdf) | [Slides (HTML)](../files/agt/slides/Bolum_09_Cevrimici_Platform.html)
+- [🖼️Slides (HTML)](../files/agt/slides/Bolum_09_Cevrimici_Platform.html)
 - [🕹️Two Sided Platform Pricing (HTML)](../files/agt/slides/Chapter_09_Two-Sided-Platform-Pricing.html) 
 - [🕹️Sponsored Search Ad Auction (HTML)](../files/agt/slides/Chapter_09_Sponsored-Search-Ad-Auction-Game.html) 
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_11_Online_Platforms.pdf)
@@ -188,7 +188,7 @@ In algorithmic game theory, online platforms are studied as environments where s
 
 Algorithmic fairness studies how decisions and resource allocations affect different individuals or groups. Algorithmic ethics considers the broader responsibilities, harms, transparency, accountability, and societal consequences of computational mechanisms.
 
-- [🖼️Slides (PDF)](../files/agt/slides/Bolum_10_Algoritmik_Etik.pdf) | [Slides (HTML)](../files/agt/slides/Bolum_10_Algoritmik_Etik.html)
+- [🖼️Slides (HTML)](../files/agt/slides/Bolum_10_Algoritmik_Etik.html)
 - [🕹️Backgammon Game (HTML)](../files/agt/slides/Chapter_10_Backgammon.html)
 - [🕹️Fair Division Game (HTML)](../files/agt/slides/Chapter_10_Fair-Division-Game.html)
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_07_Algorithmic_Fairness_and_Ethics.pdf)
@@ -200,7 +200,7 @@ Algorithmic fairness studies how decisions and resource allocations affect diffe
 
 Price of Anarchy (PoA) is a measure that quantifies the loss of efficiency in a system due to the selfish behavior of individual agents. It evaluates the impact of strategic decision-making on the overall performance or welfare of a system. The Price of Anarchy compares the social welfare or cost of the worst equilibrium with that of an optimal centrally coordinated outcome.
 
-- [🖼️Slides (PDF)](../files/agt/slides/Bolum_11_Anarsi.pdf) | [Slides (HTML)](../files/agt/slides/Bolum_11_Anarsi.html)
+- [🖼️Slides (HTML)](../files/agt/slides/Bolum_11_Anarsi.html)
 - [🕹️Load Balancing Price of Anarchy (HTML)](../files/agt/slides/Chapter_11_Load-Balancing-Price-of-Anarchy-Game.html) 
 - [🗒️Lecture Notes (PDF)](../files/agt/Chapter_09_Price_of_Anarchy_and_Efficiency.pdf)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
@@ -211,7 +211,7 @@ Price of Anarchy (PoA) is a measure that quantifies the loss of efficiency in a 
 
 Learning and adaptation play a significant role in algorithmic game theory by addressing how self-interested agents can improve their decision-making strategies over time and adapt to changing environments.
 
-- [🖼️Slides (PDF)](../files/agt/slides/Bolum_12_Ogrenme.pdf) | [Slides (HTML)](../files/agt/slides/Bolum_12_Ogrenme.html)
+- [🖼️Slides (HTML)](../files/agt/slides/Bolum_12_Ogrenme.html)
 - [🕹️Multi Armed Bandit](../files/agt/slides/Chapter_12_Multi-Armed-Bandit.html)
 - [🕹️Repeated Prisoners Dilemma](../files/agt/slides/Chapter_12_Repeated-Prisoners-Dilemma-Tournament.html)
 - [🕹️Replicator Dynamics](../files/agt/slides/Chapter_12_Replicator-Dynamics.html)
@@ -225,7 +225,7 @@ Learning and adaptation play a significant role in algorithmic game theory by ad
 
 Decision-making is a central concept that focuses on how self-interested agents make choices or decisions in strategic situations. Decision-making in algorithmic game theory involves analyzing the strategic interactions among agents, understanding their preferences and objectives, and designing mechanisms and algorithms to optimize outcomes.
 
-- [🖼️Slides (PDF)](../files/agt/slides/Bolum_13_Karar_Alma.pdf) | [Slides (HTML)](../files/agt/slides/Bolum_13_Karar_Alma.html)
+- [🖼️Slides (HTML)](../files/agt/slides/Bolum_13_Karar_Alma.html)
 - [🕹️Bayesian Decision Lab](../files/agt/slides/Chapter_13_Bayesian-Decision-Lab.html)
 - [🕹️Blackjack Game](../files/agt/slides/Chapter_13_Blackjack.html)
 - [🕹️HOKM Game](../files/agt/slides/Chapter_13_Hokm.html)
@@ -241,7 +241,7 @@ Decision-making is a central concept that focuses on how self-interested agents 
 
 Algorithmic game theory is a rapidly evolving field that continues to explore new directions and address emerging challenges.
 
-- [🖼️Slides (PDF)](../files/agt/slides/Bolum_14_Gelecek.pdf) | [Slides (HTML)](../files/agt/slides/Bolum_14_Gelecek.html)
+- [🖼️Slides (HTML)](../files/agt/slides/Bolum_14_Gelecek.html)
 - [🕹️Age of Çotanak (HTML)](../files/agt/slides/Chapter_14_Age-of-Cotanak.html) 
 - [🕹️AI Agent Strategy Tournement (HTML)](../files/agt/slides/Chapter_14_Ai-Agent-Strategy-Tournament.html) 
 - [Student Projects](../files/agt/slides/Chapter_14_Student_Projects.html)
