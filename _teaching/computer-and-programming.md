@@ -11,9 +11,6 @@ location: "Giresun, Turkey"
 ![computer and programming](/images/teaching/teaching-computer-and-programming.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
 Modern computing encompasses a vast ecosystem of interconnected technologies and tools that have become integral to our daily lives. Computers are sophisticated electronic devices managed by operating systems, which serve as the interface between hardware and software. The Internet has transformed these individual machines into a global network, enabling instantaneous communication and access to unlimited information and services. In our professional lives, we regularly interact with office programs such as word processors, spreadsheets, and presentation software, which have digitized and streamlined workplace tasks. Behind all these tools lies the art of programming - the fundamental skill of creating software by writing instructions in various programming languages. 
 
-## Ders Öğretim Planı
-[Ders Öğretim Planı (pdf)](../files/computer/Bolum_00_Ders_Ogretim_Planı.pdf)
-
 ---
 
 ## Announcements
@@ -96,66 +93,64 @@ Programming turns problem-solving steps into instructions that a computer can ex
 
 ---
 
-## Chapter 5: Java Setup and First Program
+## Chapter 5: Introduction to Java and the First Program
 
-A Java program is organized into classes and methods. This chapter covers the development environment, compilation, execution, and the structure of a simple console application.
+A Java program is written as plain-text source code, compiled to bytecode, and executed on the JVM. This chapter covers the development tools, the structure of a Java source file, compiling and running a first program, statements and blocks, comments, and error types.
 
-- [🖥️Sunum - Java Programlama Temelleri (HTML)](../files/computer/slides/Bolum_05_Programlama.html)
+- [🖥️Sunum - Java'ya Giriş ve İlk Program (HTML)](../files/computer/slides/Bolum_05_Java_ve_Ilk_Program.html)
 
 ---
 
 ## Chapter 6: Variables, Data Types, and Operators
 
-Variables store values that a program uses and modifies. This chapter covers Java data types, declarations, assignments, expressions, operators, and basic type conversion.
+Variables store values that a program uses and modifies. This chapter covers Java primitive types, declarations, assignments, type conversion, arithmetic, comparison, and logical operators, as well as reading input with `Scanner` and formatted output with `printf`.
 
-- [🖥️Sunum - Söz Dizimi (HTML)](../files/computer/slides/Bolum_06_Soz_Dizimi_Kurallari.html)
+- [🖥️Sunum - Değişkenler, Veri Türleri ve Operatörler (HTML)](../files/computer/slides/Bolum_06_Degiskenler_ve_Operatorler.html)
 
 ---
 
 ## Chapter 7: Conditional Statements
 
-Conditional statements allow a program to choose between different actions. This chapter introduces boolean expressions, comparison operators, `if`, `else if`, `else`, and `switch`.
+Conditional statements allow a program to choose between different actions. This chapter introduces boolean conditions, `if`, `else if`, `else`, nested decisions, and `switch`, followed by short worked examples.
 
-- [🖥️Sunum - Kontrol Yapıları (HTML)](../files/computer/slides/Bolum_07_Kontrol_Yapilari.html)
-- [🖥️Sunum - Örnek Çıktılar (HTML)](../files/computer/slides/Bolum_07_Ornek_Ciktilar.html)
+- [🖥️Sunum - Koşullu İfadeler (HTML)](../files/computer/slides/Bolum_07_Kosullu_Ifadeler.html)
 
 ---
 
 ## Chapter 8: Loops
 
-Loops repeat a block of code while a condition remains true or for a known number of steps. This chapter covers `while`, `do-while`, and `for` loops together with counters, accumulators, and nested loops.
+Loops repeat a block of code while a condition remains true or for a known number of steps. This chapter covers `for`, `while`, and `do-while` loops, `break` and `continue`, counters and accumulators, nested loops, and pattern-printing examples.
 
-- [🖥️Sunum - Örnek Uygulamalar (HTML)](../files/computer/slides/Bolum_08_Ornekler.html)
+- [🖥️Sunum - Döngüler (HTML)](../files/computer/slides/Bolum_08_Donguler.html)
 
 ---
 
 ## Chapter 9: Methods
 
-Methods divide a program into reusable operations. This chapter covers method declarations, parameters, return values, scope, and method calls.
+Methods divide a program into reusable operations. This chapter covers method declarations and calls, parameters, return values, overloading, scope, and method design, with worked examples of small reusable methods.
 
-- [🖥️Sunum - Fonksiyonlar (HTML)](../files/computer/slides/Bolum_09_Fonksiyonlar.html)
-- [🖥️Sunum - Örnek Fonksiyonlar (HTML)](../files/computer/slides/Bolum_09_Ornek_Fonksiyonlar.html)
-
----
-
-## Chapter 10: Recursion
-
-A recursive method solves a problem by calling itself with a smaller input. This chapter focuses on base cases, recursive cases, call-stack behavior, and tracing recursive executions.
-
-- [🖥️Sunum - Özyineleme (HTML)](../files/computer/slides/Bolum_10_Ozyineleme.html)
+- [🖥️Sunum - Metotlar (HTML)](../files/computer/slides/Bolum_09_Metotlar.html)
 
 ---
 
-## Chapter 11: Arrays
+## Chapter 10: Arrays
 
-Arrays store a fixed number of values of the same type and provide indexed access to each element. This chapter covers array creation, traversal, searching, updating, and common boundary errors.
+Arrays store a fixed number of values of the same type and provide indexed access to each element. This chapter covers array creation, traversal, searching, copying, two-dimensional arrays, and common boundary errors.
 
-- [🖥️Sunum - Diziler (HTML)](../files/computer/slides/Bolum_11_Diziler.html)
+- [🖥️Sunum - Diziler (HTML)](../files/computer/slides/Bolum_10_Diziler.html)
 
 ---
 
-## Chapter 12: Strings
+## Chapter 11: Strings
 
-Strings represent sequences of characters and are used to process textual data. This chapter covers string creation, comparison, searching, slicing, formatting, and commonly used Java `String` methods.
+Strings represent sequences of characters and are used to process textual data. This chapter covers string creation, immutability, indexing, comparison, commonly used `String` methods, `StringBuilder`, and formatted output.
 
-- [🖥️Sunum - Dizgi (HTML)](../files/computer/slides/Bolum_12_Dizgi.html)
+- [🖥️Sunum - Dizgiler (HTML)](../files/computer/slides/Bolum_11_Dizgiler.html)
+
+---
+
+## Chapter 12: Recursion
+
+A recursive method solves a problem by calling itself with a smaller input. This chapter focuses on base cases, recursive cases, call-stack behavior, tracing recursive executions, and comparing recursion with loops and memoization.
+
+- [🖥️Sunum - Özyineleme (HTML)](../files/computer/slides/Bolum_12_Ozyineleme.html)
