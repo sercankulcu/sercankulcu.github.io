@@ -56,11 +56,11 @@ There are currently no announcements.
 
 Computers process data by following precise instructions and help solve practical problems. This chapter introduces computer hardware, internet basics, and computational thinking.
 
-- [🖼️Sunum - Temel Kavramlar (HTML)](../files/computer/slides/Bolum_01_Temel_Kavramlar.html)
-- [🖼️Sunum - İnternet (HTML)](../files/computer/slides/Bolum_01_Internet.html)
-- [🖼️Sunum - Donanım (HTML)](../files/computer/slides/Bolum_01_Donanim.html)
-- [🖼️Sunum - Bilgisayarlar (HTML)](../files/computer/slides/Bolum_01_Bilgisayarlar.html)
-- [🖼️Sunum - Hesaplama (HTML)](../files/computer/slides/Bolum_01_Hesaplama_Hesaplamali_Dusunme.html)
+- [🖥️Sunum - Temel Kavramlar (HTML)](../files/computer/slides/Bolum_01_Temel_Kavramlar.html)
+- [🖥️Sunum - İnternet (HTML)](../files/computer/slides/Bolum_01_Internet.html)
+- [🖥️Sunum - Donanım (HTML)](../files/computer/slides/Bolum_01_Donanim.html)
+- [🖥️Sunum - Bilgisayarlar (HTML)](../files/computer/slides/Bolum_01_Bilgisayarlar.html)
+- [🖥️Sunum - Hesaplama (HTML)](../files/computer/slides/Bolum_01_Hesaplama_Hesaplamali_Dusunme.html)
 
 ---
 
@@ -68,8 +68,8 @@ Computers process data by following precise instructions and help solve practica
 
 An operating system manages hardware resources and provides services for applications. This chapter covers processes, memory, files, devices, permissions, and user interaction.
 
-- [🖼️Sunum - İşletim Sistemleri (HTML)](../files/computer/slides/Bolum_02_Isletim_Sistemleri.html)
-- [🖼️Sunum - Windows (HTML)](../files/computer/slides/Bolum_02_Windows.html)
+- [🖥️Sunum - İşletim Sistemleri (HTML)](../files/computer/slides/Bolum_02_Isletim_Sistemleri.html)
+- [🖥️Sunum - Windows (HTML)](../files/computer/slides/Bolum_02_Windows.html)
 
 ---
 
