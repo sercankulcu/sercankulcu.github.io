@@ -58,7 +58,6 @@ There are currently no announcements.
 
 * [Important People in Data Structures (HTML)](../files/data_structures/Data_Structures_Important_People.html)
 * [Prerequisites for Data Structures (HTML)](../files/data_structures/Data_Structures_Prerequisites.html)
-* [C ile Veri Yapıları ve Algoritmalar (HTML)](../files/data_structures/c/C_Veri_Yapilari_Ders_Plani.html)
 
 ---
 
