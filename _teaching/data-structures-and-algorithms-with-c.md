@@ -4,7 +4,7 @@ collection: teaching
 type: "Undergraduate"
 permalink: /teaching/data-structures-and-algorithms-with-c
 venue: "Giresun University, Computer Engineering"
-date: 2026-09-28
+date: 2025-09-28
 location: "Giresun, Turkey"
 ---
 
