@@ -26,18 +26,6 @@ There are currently no announcements.
   [Data Structures and Algorithms Made Easy](https://www.amazon.com/gp/product/819324527X) | 
   [Algorithms Unlocked](https://www.amazon.com/gp/product/0262518805)
 
-- **course webpages**  
-  [CS-61B](https://sp23.datastructur.es) | 
-  [CENG-213](https://user.ceng.metu.edu.tr/~ys/ceng213-ds)
-
-- **youtube**  
-  [Data Structures Easy to Advanced Course](https://www.youtube.com/watch?v=RBSGKlAvoiM)
-
-- **lecture notes**  
-  [Mustafa Ege (1)](../files/data_structures/Veri_Yapilari_ve_Algoritmalar_1_Mustafa_Ege.pdf) | 
-  [Mustafa Ege (2)](../files/data_structures/Veri_Yapilari_ve_Algoritmalar_2_Mustafa_Ege.pdf) | 
-  [Aybars Uğur](../files/data_structures/Veri_Yapilari_Aybars_Ugur.pdf)
-
 - **github**  
   [The Algorithms](https://github.com/TheAlgorithms/Java) | 
   [DSA Bootcamp](https://github.com/kunal-kushwaha/DSA-Bootcamp-Java) | 
@@ -70,6 +58,7 @@ There are currently no announcements.
 
 * [Important People in Data Structures (HTML)](../files/data_structures/Data_Structures_Important_People.html)
 * [Prerequisites for Data Structures (HTML)](../files/data_structures/Data_Structures_Prerequisites.html)
+* [C ile Veri Yapıları (HTML)](../files/data_structures/c/C_Veri_Yapilari_Ders_Plani.html)
 
 ---
 
