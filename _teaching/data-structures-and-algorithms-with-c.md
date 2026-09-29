@@ -15,7 +15,7 @@ This course studies data structures and algorithms through their memory represen
 
 ## Chapter 1: Introduction and Algorithm Analysis
 
-Data, abstraction, correctness, and cost. This chapter introduces abstract data types and the asymptotic analysis used throughout the course.
+The system life cycle, algorithms and abstract data types in C, selection sort, and performance analysis: space and time complexity, step counting, asymptotic notation (O, Ω, Θ), practical complexities, magic squares, and measuring running time.
 
 - [🖼️Sunum - Giriş ve Algoritma Analizi (HTML)](../files/dsa_c/slides/Bolum_01_Giris_Algoritma_Analizi.html)
 
@@ -23,7 +23,7 @@ Data, abstraction, correctness, and cost. This chapter introduces abstract data 
 
 ## Chapter 2: Arrays and Structures
 
-Contiguous memory, records, and sparse representations in C.
+Arrays and pointers in C, dynamic and two-dimensional arrays, row- and column-major address calculation, triangular and band matrices, structures, unions, and strings.
 
 - [🖼️Sunum - Diziler ve Yapılar (HTML)](../files/dsa_c/slides/Bolum_02_Diziler_ve_Yapilar.html)
 
@@ -31,7 +31,7 @@ Contiguous memory, records, and sparse representations in C.
 
 ## Chapter 3: Linked Lists
 
-Nodes, links, and dynamic structures built with pointers and dynamic memory.
+Singly linked lists with malloc and free: insertion, deletion, search, reversal, and concatenation; circular and doubly linked lists, header nodes, the available-space list, and Floyd's cycle detection.
 
 - [🖼️Sunum - Bağlı Listeler (HTML)](../files/dsa_c/slides/Bolum_03_Bagli_Listeler.html)
 
@@ -39,7 +39,7 @@ Nodes, links, and dynamic structures built with pointers and dynamic memory.
 
 ## Chapter 4: Stacks
 
-LIFO order, the call stack, and expression processing.
+The stack ADT with array and linked implementations, overflow and underflow, growing stacks, activation records on the call stack, and multiple stacks in one array.
 
 - [🖼️Sunum - Yığınlar (HTML)](../files/dsa_c/slides/Bolum_04_Yiginlar.html)
 
@@ -47,7 +47,7 @@ LIFO order, the call stack, and expression processing.
 
 ## Chapter 5: Queues
 
-FIFO order, circular buffers, and service queues.
+The queue ADT, the drift problem of linear queues, circular queues and ways to tell full from empty, linked queues, deques, and round-robin scheduling.
 
 - [🖼️Sunum - Kuyruklar (HTML)](../files/dsa_c/slides/Bolum_05_Kuyruklar.html)
 
@@ -55,7 +55,7 @@ FIFO order, circular buffers, and service queues.
 
 ## Chapter 6: List ADT and Generalized Lists
 
-The list contract, its implementations, and recursive list structures.
+The list ADT and its array and linked implementations; generalized lists: representation, copying, equality, traversal, depth, and reversal, with shared lists and reference counting.
 
 - [🖼️Sunum - Liste ADT ve Genelleştirilmiş Listeler (HTML)](../files/dsa_c/slides/Bolum_06_Liste_ADT_ve_Genellestirilmis_Listeler.html)
 
@@ -63,7 +63,7 @@ The list contract, its implementations, and recursive list structures.
 
 ## Chapter 7: Trees
 
-Hierarchies, binary tree representation, and traversals.
+Tree terminology, binary trees in arrays and with links, recursive and iterative traversals, level-order traversal, expression trees, copying, equality, and swapping children.
 
 - [🖼️Sunum - Ağaçlar (HTML)](../files/dsa_c/slides/Bolum_07_Agaclar.html)
 
@@ -71,7 +71,7 @@ Hierarchies, binary tree representation, and traversals.
 
 ## Chapter 8: Priority Queues and Heaps
 
-Fast access to the largest or smallest element on a complete binary tree.
+Why priority queues are needed, insertion into and deletion from a max heap, building a heap in O(n), and a comparison with arrays and lists.
 
 - [🖼️Sunum - Öncelik Kuyruğu ve Heap (HTML)](../files/dsa_c/slides/Bolum_08_Oncelik_Kuyrugu_ve_Heap.html)
 
@@ -79,7 +79,7 @@ Fast access to the largest or smallest element on a complete binary tree.
 
 ## Chapter 9: Hash Tables
 
-From keys to addresses, collisions, and collision resolution.
+Hash functions (division, multiplication, folding, strings), collisions, open addressing with linear and quadratic probing and double hashing, chaining, deletion with tombstones, load factor, and rehashing.
 
 - [🖼️Sunum - Hash Tabloları (HTML)](../files/dsa_c/slides/Bolum_09_Hash_Tablolari.html)
 
@@ -87,7 +87,7 @@ From keys to addresses, collisions, and collision resolution.
 
 ## Chapter 10: Search Trees
 
-Binary search tree order, deletion, and balancing.
+Binary search trees: insertion, iterative and recursive search, depth, and four deletion methods; AVL trees and rotations, with a look at red-black trees and B-trees.
 
 - [🖼️Sunum - Arama Ağaçları (HTML)](../files/dsa_c/slides/Bolum_10_Arama_Agaclari.html)
 
@@ -95,7 +95,7 @@ Binary search tree order, deletion, and balancing.
 
 ## Chapter 11: Graphs
 
-Relations, graph traversals, and path problems.
+Graph definitions and terminology; adjacency matrices, adjacency lists, sequential, orthogonal, and multilist representations; depth-first and breadth-first search and connected components.
 
 - [🖼️Sunum - Çizgeler (HTML)](../files/dsa_c/slides/Bolum_11_Cizgeler.html)
 
@@ -103,7 +103,7 @@ Relations, graph traversals, and path problems.
 
 ## Chapter 12: Sets and Union-Find
 
-Membership, union, and disjoint components.
+Disjoint sets with union and find: the parent array, the weighting rule, the collapsing rule, their analysis, and the Ackermann function.
 
 - [🖼️Sunum - Kümeler ve Union-Find (HTML)](../files/dsa_c/slides/Bolum_12_Kumeler_ve_Union_Find.html)
 
@@ -111,7 +111,7 @@ Membership, union, and disjoint components.
 
 ## Chapter 13: Recursion, Binary Search, and Backtracking
 
-Recursive problem solving, binary search, and systematic search with backtracking.
+Recursion and the call stack, iterative and recursive binary search, the Towers of Hanoi, permutations, satisfiability, the knight's tour, n-queens, and subset generation.
 
 - [🖼️Sunum - Özyineleme, İkili Arama ve Geri İzleme (HTML)](../files/dsa_c/slides/Bolum_13_Ozyineleme_Ikili_Arama_ve_Geri_Izleme.html)
 
@@ -119,7 +119,7 @@ Recursive problem solving, binary search, and systematic search with backtrackin
 
 ## Chapter 14: Polynomials and Sparse Matrices
 
-Applications of arrays and linked lists to polynomial arithmetic and sparse matrices.
+Polynomial representations and addition and multiplication, sparse matrices as triples, transpose and fast transpose, and sparse matrix multiplication.
 
 - [🖼️Sunum - Polinomlar ve Seyrek Matrisler (HTML)](../files/dsa_c/slides/Bolum_14_Polinomlar_ve_Seyrek_Matrisler.html)
 
@@ -127,7 +127,7 @@ Applications of arrays and linked lists to polynomial arithmetic and sparse matr
 
 ## Chapter 15: Stack and Queue Applications
 
-Stacks and queues as the working memory of algorithms: postfix expression evaluation and maze solving with backtracking.
+Maze solving with a stack, infix, postfix, and prefix notations, postfix evaluation, infix-to-postfix conversion, and balanced parentheses.
 
 - [🖼️Sunum - Yığın ve Kuyruk Uygulamaları (HTML)](../files/dsa_c/slides/Bolum_15_Yigin_ve_Kuyruk_Uygulamalari.html)
 
@@ -135,7 +135,7 @@ Stacks and queues as the working memory of algorithms: postfix expression evalua
 
 ## Chapter 16: Threaded Binary Trees
 
-Using empty links as threads for traversal without a stack.
+Threaded binary trees: construction rules, inorder successor, stackless traversal, insertion into a threaded tree, and Morris traversal.
 
 - [🖼️Sunum - Kılavuzlu İkili Ağaçlar (HTML)](../files/dsa_c/slides/Bolum_16_Kilavuzlu_Ikili_Agaclar.html)
 
@@ -143,7 +143,7 @@ Using empty links as threads for traversal without a stack.
 
 ## Chapter 17: Minimum Spanning Trees
 
-Spanning trees and the Kruskal and Prim algorithms.
+Spanning trees, minimum-cost spanning trees, the greedy method, Kruskal's algorithm with union-find, Prim's algorithm, and Borůvka's algorithm.
 
 - [🖼️Sunum - Minimum Yayılım Ağaçları (HTML)](../files/dsa_c/slides/Bolum_17_Minimum_Yayilim_Agaclari.html)
 
@@ -151,7 +151,7 @@ Spanning trees and the Kruskal and Prim algorithms.
 
 ## Chapter 18: Shortest Paths and Activity Networks
 
-Dijkstra's algorithm with distance and predecessor arrays, edge relaxation, and topological ordering of activity networks.
+Single-source shortest paths with Dijkstra's algorithm, Bellman-Ford, and Floyd-Warshall; activity networks, topological ordering, earliest and latest times, slack, and critical paths.
 
 - [🖼️Sunum - En Kısa Yol ve Aktivite Ağları (HTML)](../files/dsa_c/slides/Bolum_18_En_Kisa_Yol_ve_Aktivite_Aglari.html)
 
@@ -159,7 +159,7 @@ Dijkstra's algorithm with distance and predecessor arrays, edge relaxation, and 
 
 ## Chapter 19: Basic Sorting Algorithms
 
-Insertion sort and selection sort, the sorting routine contract in C, and choosing a method by data distribution.
+Selection, insertion, bubble, counting, and shell sort, stability, the average-case analysis of insertion sort, and the lower bound for comparison sorting.
 
 - [🖼️Sunum - Temel Sıralama Algoritmaları (HTML)](../files/dsa_c/slides/Bolum_19_Temel_Siralama_Algoritmalari.html)
 
@@ -167,6 +167,6 @@ Insertion sort and selection sort, the sorting routine contract in C, and choosi
 
 ## Chapter 20: Advanced Sorting Algorithms
 
-Divide-and-conquer sorting: the merge step of merge sort and partitioning in quick sort, with their complexity.
+Quick sort and its average-case analysis, non-recursive and median-of-three quick sort, merge sort, heap sort, radix sort, qsort in C, and hybrid sorting algorithms.
 
 - [🖼️Sunum - İleri Sıralama Algoritmaları (HTML)](../files/dsa_c/slides/Bolum_20_Ileri_Siralama_Algoritmalari.html)
