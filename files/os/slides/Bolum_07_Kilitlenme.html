@@ -1007,6 +1007,24 @@ Finish[i] ← <span class="kw">false</span>
   </table>
 </section>
 
+<section class="ds-deck__slide" data-title="Kilitlenme Dışı Hatalar: Atomiklik ve Sıra" data-section="Diğer Sorunlar">
+  <p class="ds-deck__kicker">Diğer Sorunlar</p>
+  <h2>Kilitlenme Dışı Hatalar: Atomiklik ve Sıra</h2>
+  <p class="ds-deck__small" style="margin:0 0 6px">En yaygın eşzamanlılık hatası kilitlenme değildir: MySQL, Apache, Mozilla ve OpenOffice’te incelenen 105 hatanın 74’ü kilitlenme dışıdır ve neredeyse hepsi iki kalıba uyar (Lu ve ark., 2008).</p>
+  <div class="ds-deck__grid ds-deck__grid--2 ds-deck__small" style="gap:10px;font-size:14px">
+    <div class="ds-deck__card"><strong>Atomiklik ihlali</strong>Birlikte atomik olması gereken iki erişimin arasına başka bir iş parçacığı girer.<pre class="is-tight" style="font-size:12px;margin:4px 0"><span class="cm">/* T1 */</span>
+<span class="kw">if</span> (oturum-&gt;ad != NULL)
+    puts(oturum-&gt;ad);  <span class="cm">/* artık NULL? */</span>
+<span class="cm">/* T2 */</span>
+oturum-&gt;ad = NULL;</pre><b>Çare:</b> sınama ile kullanımı ve T2’nin yazmasını <em>aynı</em> mutex altına almak.</div>
+    <div class="ds-deck__card"><strong>Sıra ihlali</strong>“A, B’den önce olur” diye varsayılır ama bu sıra hiçbir şeyle zorlanmaz.<pre class="is-tight" style="font-size:12px;margin:4px 0"><span class="cm">/* T1: baslat() */</span>
+isci = thread_olustur(govde);
+<span class="cm">/* T2: govde(), yeni iş parçacığı */</span>
+d = isci-&gt;durum;  <span class="cm">/* isci atandı mı? */</span></pre><b>Çare:</b> <code>hazir</code> bayrağı ve koşul değişkeni. T2 <code>while (!hazir) wait</code>, T1 atamadan sonra <code>hazir = 1; signal</code> yapar (ya da 0’dan başlayan semafor).</div>
+  </div>
+  <div class="ds-deck__callout ds-deck__small" style="margin-top:8px">Yanılgı: “her erişim kilitliyse kod doğrudur.” Erişimler <em>tek tek</em> kilitli olsa da aralarında kilit bırakılıyorsa atomiklik ihlali sürer; ThreadSanitizer gibi veri yarışı araçları bunu görmeyebilir.</div>
+</section>
+
 <section class="ds-deck__slide" data-title="Java’da Kilitlenme" data-section="Pratikte Kilitlenme">
   <p class="ds-deck__kicker">Pratikte Kilitlenme · Kodu adım adım çalıştır</p>
   <h2>Java’da Kilitlenme</h2>
@@ -1038,6 +1056,42 @@ t1.start(); t2.start();</pre>
     </div>
   </div>
   <p class="ds-deck__foot"><code>uyu(10)</code> zamanlamayı çok olası kılar ama garanti etmez. <code>CountDownLatch</code> ile iki ilk kilit alınana dek bekletilen sürüm JDK 21’de her çalıştırmada kilitlendi.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Kapsülleme Kilit Sırasını Gizler" data-section="Pratikte Kilitlenme">
+  <p class="ds-deck__kicker">Pratikte Kilitlenme · Adım adım</p>
+  <h2>Kapsülleme Kilit Sırasını Gizler</h2>
+  <div class="ds-deck__two" style="grid-template-columns:minmax(0,1fr) 290px;gap:12px;align-items:start">
+  <div>
+<pre class="is-tight" style="font-size:11.6px"><span class="kw">var</span> a = Collections.synchronizedList(
+          <span class="kw">new</span> ArrayList&lt;Integer&gt;());
+<span class="kw">var</span> b = Collections.synchronizedList(
+          <span class="kw">new</span> ArrayList&lt;Integer&gt;());
+<span class="cm">/* a.addAll(b) içeride:             */</span>
+<span class="cm">/* synchronized (a) { b.toArray() }  */</span>
+<span class="cm">/*   → synchronized (b) { ... }      */</span>
+<span class="kw">new</span> Thread(() -&gt; a.addAll(b)).start();
+<span class="kw">new</span> Thread(() -&gt; b.addAll(a)).start();
+
+<span class="cm">/* Düzeltme: kopyayı kilit dışında al */</span>
+Integer[] k = b.toArray(<span class="kw">new</span> Integer[0]);
+a.addAll(Arrays.asList(k));</pre>
+  <table class="ds-deck__table ds-deck__small" style="font-size:13px;margin-top:6px">
+    <thead><tr><th>Çapraz çağrı</th><th>JDK 8</th><th>JDK 21</th></tr></thead>
+    <tbody>
+      <tr><td><code>Vector</code>: <code>a.addAll(b)</code> ‖ <code>b.addAll(a)</code></td><td>10/10</td><td>0/10</td></tr>
+      <tr><td><code>synchronizedList</code>: aynı</td><td>10/10</td><td>10/10</td></tr>
+      <tr><td>Düzeltilmiş sürüm</td><td>0/10</td><td>0/10</td></tr>
+    </tbody>
+  </table>
+  </div>
+<div class="ds-deck__steps">
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 300 210" role="img" aria-label="İki iş parçacığı iki listenin kilitlerini ters sırada alır ve döngü oluşur." style="max-width:300px"><defs><marker id="os07k-m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" style="fill:var(--ds-link)"/></marker></defs><circle class="box" cx="60" cy="50" r="24"/><text class="txt" x="60" y="55" text-anchor="middle" style="font-size:14px;">T1</text><circle class="box" cx="240" cy="160" r="24"/><text class="txt" x="240" y="165" text-anchor="middle" style="font-size:14px;">T2</text><rect class="soft" x="206" y="30" width="68" height="40" rx="4"/><text class="txt" x="240" y="48" text-anchor="middle" style="font-size:14px;">a</text><text class="lbl" x="240" y="63" text-anchor="middle" style="font-size:11px;">kilidi</text><rect class="soft" x="26" y="140" width="68" height="40" rx="4"/><text class="txt" x="60" y="158" text-anchor="middle" style="font-size:14px;">b</text><text class="lbl" x="60" y="173" text-anchor="middle" style="font-size:11px;">kilidi</text><path class="line" d="M206 50 L86 50" style="stroke:var(--ds-link);" marker-end="url(#os07k-m1)"/><text class="lbl" x="146" y="42" text-anchor="middle" style="font-size:11.5px;">tutar</text></svg><p class="ds-deck__stepnote">T1: <code>a.addAll(b)</code> sarmalayıcıda önce <b>a</b>’nın kilidini alır.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 300 210" role="img" aria-label="İki iş parçacığı iki listenin kilitlerini ters sırada alır ve döngü oluşur." style="max-width:300px"><defs><marker id="os07k-m2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" style="fill:var(--ds-link)"/></marker><marker id="os07k-m3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" style="fill:var(--ds-link)"/></marker></defs><circle class="box" cx="60" cy="50" r="24"/><text class="txt" x="60" y="55" text-anchor="middle" style="font-size:14px;">T1</text><circle class="box" cx="240" cy="160" r="24"/><text class="txt" x="240" y="165" text-anchor="middle" style="font-size:14px;">T2</text><rect class="soft" x="206" y="30" width="68" height="40" rx="4"/><text class="txt" x="240" y="48" text-anchor="middle" style="font-size:14px;">a</text><text class="lbl" x="240" y="63" text-anchor="middle" style="font-size:11px;">kilidi</text><rect class="soft" x="26" y="140" width="68" height="40" rx="4"/><text class="txt" x="60" y="158" text-anchor="middle" style="font-size:14px;">b</text><text class="lbl" x="60" y="173" text-anchor="middle" style="font-size:11px;">kilidi</text><path class="line" d="M206 50 L86 50" style="stroke:var(--ds-link);" marker-end="url(#os07k-m2)"/><text class="lbl" x="146" y="42" text-anchor="middle" style="font-size:11.5px;">tutar</text><path class="line" d="M94 160 L214 160" style="stroke:var(--ds-link);" marker-end="url(#os07k-m3)"/><text class="lbl" x="154" y="178" text-anchor="middle" style="font-size:11.5px;">tutar</text></svg><p class="ds-deck__stepnote">Aynı anda T2: <code>b.addAll(a)</code> önce <b>b</b>’nin kilidini alır.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 300 210" role="img" aria-label="İki iş parçacığı iki listenin kilitlerini ters sırada alır ve döngü oluşur." style="max-width:300px"><defs><marker id="os07k-m4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" style="fill:var(--ds-link)"/></marker><marker id="os07k-m5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" style="fill:var(--ds-link)"/></marker><marker id="os07k-m6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker><marker id="os07k-m7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" style="fill:var(--ds-bad)"/></marker></defs><circle class="box" cx="60" cy="50" r="24"/><text class="txt" x="60" y="55" text-anchor="middle" style="font-size:14px;">T1</text><circle class="box" cx="240" cy="160" r="24"/><text class="txt" x="240" y="165" text-anchor="middle" style="font-size:14px;">T2</text><rect class="soft" x="206" y="30" width="68" height="40" rx="4"/><text class="txt" x="240" y="48" text-anchor="middle" style="font-size:14px;">a</text><text class="lbl" x="240" y="63" text-anchor="middle" style="font-size:11px;">kilidi</text><rect class="soft" x="26" y="140" width="68" height="40" rx="4"/><text class="txt" x="60" y="158" text-anchor="middle" style="font-size:14px;">b</text><text class="lbl" x="60" y="173" text-anchor="middle" style="font-size:11px;">kilidi</text><path class="line" d="M206 50 L86 50" style="stroke:var(--ds-link);" marker-end="url(#os07k-m4)"/><text class="lbl" x="146" y="42" text-anchor="middle" style="font-size:11.5px;">tutar</text><path class="line" d="M94 160 L214 160" style="stroke:var(--ds-link);" marker-end="url(#os07k-m5)"/><text class="lbl" x="154" y="178" text-anchor="middle" style="font-size:11.5px;">tutar</text><path class="line" d="M60 76 L60 138" style="stroke:var(--ds-bad);stroke-dasharray:6 4;" marker-end="url(#os07k-m6)"/><text class="lbl" x="68" y="108" text-anchor="start" style="font-size:11.5px;fill:var(--ds-bad);">ister</text><path class="line" d="M240 134 L240 72" style="stroke:var(--ds-bad);stroke-dasharray:6 4;" marker-end="url(#os07k-m7)"/><text class="lbl" x="232" y="108" text-anchor="end" style="font-size:11.5px;fill:var(--ds-bad);">ister</text><text class="txt" x="150" y="202" text-anchor="middle" style="font-size:13px;fill:var(--ds-bad);">döngü: kilitlenme</text></svg><p class="ds-deck__stepnote">İçeride <code>b.toArray()</code> ve <code>a.toArray()</code> çağrılır: her biri ötekinin kilidini ister.</p></div>
+</div>
+  </div>
+  <p class="ds-deck__foot">Tablo: iki iş parçacığı × 200.000 tur, 10 denemede kilitlenen sayısı. Çağıran kodda hiç kilit görünmez; sıra kütüphanenin içindedir. JDK 21’de <code>Vector.addAll</code> argümanın <code>toArray()</code>’ini kilidi almadan çağırır, JDK 8’de yöntemin tamamı <code>synchronized</code> idi. Kural: kilit tutarken dışarıdan gelen bir nesnenin yöntemini çağırmayın.</p>
 </section>
 
 <section class="ds-deck__slide" data-title="Kilitlenmeyi Bulmak: jstack" data-section="Pratikte Kilitlenme">
@@ -1123,6 +1177,29 @@ T2 bekliyor, kilit sahibi T1</pre>
     <li>Güvensiz durum kilitlenme değildir ama bitiş garantisi yoktur.</li>
     <li>Pratikte en etkili araç: <strong>kilit sıralaması</strong> + zaman aşımlı deneme + araçlarla (lockdep, jstack, TSan) denetim.</li>
   </ul>
+</section>
+
+<section class="ds-deck__slide" data-title="Alıştırma: Hatayı Sınıflandır" data-section="Özet">
+  <p class="ds-deck__kicker">Alıştırmalar</p>
+  <h2>Alıştırma: Hatayı Sınıflandır</h2>
+  <p class="ds-deck__small" style="margin:0 0 4px">Her durumu sınıflandırın: <b>kilitlenme</b>, <b>canlı kilit</b>, <b>atomiklik ihlali</b> ya da <b>sıra ihlali</b>. Çareyi de söyleyin.</p>
+  <ol class="ds-deck__small" style="font-size:14px;line-height:1.3;margin-top:0">
+    <li>İş parçacığı güvenli bir kuyrukta iki tüketici: <code>if (!q.isEmpty()) x = q.remove();</code></li>
+    <li>Ana iş parçacığı önce işçiyi başlatır, sonra <code>tampon = malloc(N)</code> yapar; işçi ilk satırda <code>tampon[0]</code>’a yazar.</li>
+    <li><code>transfer(x, y)</code> ile <code>transfer(y, x)</code> aynı anda; her biri önce kaynak, sonra hedef hesabı kilitler.</li>
+    <li>İki iş parçacığı <code>lock(A); if (!trylock(B)) { unlock(A); usleep(10); yeniden dene; }</code> yapar; öteki önce B’yi alır. Bekleme hep 10 µs.</li>
+    <li>2 CPU ve 4 iş parçacığı: T1 ve T2 hem L1 hem L2’yi, T3 yalnız L2’yi kullanır, T4 kilit kullanmaz. Kilitleri bilen bir zamanlayıcı kilitlenmeyi nasıl önler?</li>
+  </ol>
+  <details class="ds-deck__answers">
+    <summary>Cevaplar</summary>
+    <ol style="font-size:13.5px;line-height:1.3">
+      <li>Atomiklik ihlali: iki çağrı ayrı ayrı güvenli ama arada öteki öğeyi alabilir. Çare: tek atomik işlem (<code>poll()</code>) ya da ikisini aynı kilit altına almak.</li>
+      <li>Sıra ihlali: işçi <code>tampon</code> atanmadan çalışabilir. Çare: önce tahsis edip sonra başlatmak ya da bayrak + koşul değişkeni.</li>
+      <li>Kilitlenme (döngüsel bekleme). Çare: kilitleri hesap numarası sırasıyla almak.</li>
+      <li>Canlı kilit: ikisi aynı ritimde alıp bırakır. Çare: rastgele, giderek artan bekleme ya da kilit sıralaması.</li>
+      <li>T1 ile T2 asla aynı anda çalıştırılmaz (aynı CPU’da ardışık). T3 tek kilit istediği için tut ve bekle oluşturamaz, T4 serbesttir. Bedeli: daha az paralellik ve önceden bilinmesi gereken kilit bilgisi.</li>
+    </ol>
+  </details>
 </section>
 
 <section class="ds-deck__slide" data-title="Kontrol Soruları" data-section="Özet">
