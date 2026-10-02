@@ -48,42 +48,12 @@ No current announcements.
 
 ---
 
-## Past Exams  
-
-- **2025-2026**  
-  [vize](../files/os/slides/2025-2026-os-vize-cevaplar.pdf) | 
-  [final](../files/os/slides/2025-2026-os-final-cevaplar.pdf)
-
-- **2024-2025**  
-  [vize](../files/os/slides/2024-2025-os-vize-cevaplar.pdf) | 
-  [telafi](../files/os/slides/2024-2025-os-telafi-cevaplar.pdf) | 
-  [final](../files/os/slides/2024-2025-os-final-cevaplar.pdf) | 
-  [but](../files/os/slides/2024-2025-os-butunleme-cevaplar.pdf)
-
-- **2023-2024**  
-  [vize](../files/os/slides/2023-2024-os-vize-cevap.pdf) | 
-  [telafi](../files/os/slides/2023-2024-os-telafi-cevaplar.pdf) | 
-  [final-a](../files/os/slides/2023-2024-os-final-a-cevaplar.pdf) | 
-  [final-b](../files/os/slides/2023-2024-os-final-b-cevaplar.pdf) | 
-  [but](../files/os/slides/2023-2024-os-butunleme-cevap.pdf)
-
-- **2022-2023**  
-  [vize](../files/os/slides/2022-2023-os-vize-cevaplar.pdf) | 
-  [final](../files/os/slides/2022-2023-os-final-cevaplar.pdf) 
-
-- **Questions & Answers**  
-  [midterm (HTML)](../files/os/slides/os_midterm_mcq.html) | 
-  [final (HTML)](../files/os/slides/os_final_mcq.html)
-
----
-
 ## Preliminary Materials: 
 
 The world of operating systems is introduced as a key aspect of modern computing. Fundamental concepts, design principles, and implementation techniques are explored to highlight how interaction between hardware and software is enabled.
 
 * Prerequisites for preparation [(HTML))](../files/os/Prerequisites_for_Operating_Systems.html)
 * Key figures who have shaped the field [(HTML)](../files/os/Pioneers_of_Operating_Systems.html)
-* Questions & Answers from OSTEP [(HTML)](../files/os/QA_from_OSTEP.pdf)
 
 ---
 
@@ -97,7 +67,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter01/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01) 
-- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_1_Introduction.pdf)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_01_Giris_Sorular.html)
 
 ---
 
@@ -114,7 +84,7 @@ The design and organization of an operating system's internal components and mec
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter02/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab02) 
-- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_2_Structures.pdf)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_02_Yapilar_Sorular.html)
 
 ---
 
@@ -129,7 +99,7 @@ Processes serve as the cornerstone of multi-tasking and concurrency, enabling mu
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter03/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab03) 
-- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_3_Processes.pdf)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_03_Surecler_Sorular.html)
 
 ---
 
@@ -142,7 +112,7 @@ Threads, as lightweight execution units within a process, provide a powerful mec
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter04/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab04) 
-- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_4_Threads.pdf)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_04_Is_Parcaciklari_Sorular.html)
 
 ---
 
@@ -156,7 +126,7 @@ CPU scheduling is a critical component of any operating system, responsible for 
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter05/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab05) 
-- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_5_Scheduling.pdf)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_05_Cizelgeleme_Sorular.html)
 
 ---
 
@@ -170,7 +140,7 @@ In a multi-threaded or multi-process environment, synchronization mechanisms pro
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter06/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab06) 
-- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_6_Synchronization.pdf)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_06_Senkronizasyon_Sorular.html)
 
 ---
 
@@ -184,7 +154,7 @@ A deadlock occurs when a set of processes or threads waits indefinitely for reso
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter07/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab07) 
-- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_7_Deadlocks.pdf)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_07_Kilitlenme_Sorular.html)
 
 ---
 
@@ -198,7 +168,7 @@ Memory management, which involves the allocation, monitoring, and protection of 
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter08/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab08) 
-- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_8_Memory_management.pdf)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_08_Bellek_Yonetimi_Sorular.html)
 
 ---
 
@@ -213,7 +183,7 @@ Virtual memory gives each process an isolated virtual address space and maps vir
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter09/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab09) 
-- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_9_Virtual_memory.pdf)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_09_Sanal_Bellek_Sorular.html)
 
 ---
 
@@ -227,7 +197,7 @@ File systems organize named data and metadata and provide abstractions for stori
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter10/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab10) 
-- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_10_File_systems.pdf)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_10_Dosya_Sistemleri_Sorular.html)
 
 ---
 
@@ -242,7 +212,7 @@ The operating system manages communication between applications and hardware or 
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter11/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab11) 
-- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_11_Input_output.pdf)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_11_Giris_Cikis_Sorular.html)
 
 ---
 
@@ -255,7 +225,7 @@ Multiprocessor systems introduce challenges involving parallel scheduling, cache
   [Multicore Scheduling & Load Balancing Simulator (HTML)](../files/os/slides/Chapter_12_Multicore_Scheduling.html)
 - 💻Lab:
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter12/src)
-- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_12_Multiple_processor_systems.pdf)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_12_Cok_Islemcili_Sistemler_Sorular.html)
 
 ---
 
@@ -268,7 +238,7 @@ Security is a critical concern in modern computing environments, and operating s
   [OS Protection & Permissions Lab (HTML)](../files/os/slides/Chapter_13_Permissions_Security.html)
 - 💻Lab:
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter13/src)
-- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_13_Security.pdf)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_13_Guvenlik_Sorular.html)
 
 ---
 
@@ -280,7 +250,7 @@ With the growing demand for multimedia applications such as audio and video play
 - [🗒️Lecture Notes (pdf)](../files/os/notes/Chapter_14_Multimedia.pdf)
 - 💻Lab:
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter14/src)
-- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_14_Multimedia.pdf)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_14_Coklu_Ortam_Sorular.html)
 
 ---
 
@@ -293,7 +263,7 @@ Operating system design involves the careful consideration of a wide range of fa
   [RTOS (HTML)](../files/os/slides/Chapter_15_RTOS.html) | 
   [Real-Time Scheduling Simulator (HTML)](../files/os/slides/Chapter_15_Real_Time_Scheduling.html) | 
   [Testing and Debugging (HTML)](../files/os/slides/Chapter_15_Testing_Debugging.html)
-- [🖋️Question & answers (pdf)](../files/os/questions/Chapter_15_Operating_system_design.pdf)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_15_Isletim_Sistemi_Tasarimi_Sorular.html)
 
 ---
 
@@ -302,3 +272,4 @@ Operating system design involves the careful consideration of a wide range of fa
 **UNIX - Linux**
 - [🖼️Sunum [TR] (HTML)](../files/os/slides/Bolum_16_Linux.html) | 
   [Linux Process Explorer (HTML)](../files/os/slides/Chapter_16_Linux_Process_Explorer.html)
+- [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_16_Linux_Sorular.html)

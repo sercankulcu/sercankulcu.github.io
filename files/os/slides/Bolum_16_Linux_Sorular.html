@@ -1,0 +1,557 @@
+---
+layout: without-sidebar
+title: "Bölüm 16: Linux — Çalışma Soruları"
+permalink: /files/os/slides/Bolum_16_Linux_Sorular.html
+excerpt: "İşletim Sistemleri dersi Bölüm 16 çalışma soruları: UNIX ve Linux tarihçesi, kabuk boru hatları ve yönlendirme, fork, exec ve wait izleme, sinyaller, zombi ve yetim süreçler, clone, çizelgeleme sınıfları ve EEVDF ağırlıkları, önyükleme, /proc ve /proc/[pid] dosyaları, sert ve sembolik bağlar, ext4 günlükleme, chmod ve umask hesapları, özel izin bitleri, ad alanları ve cgroups; cevaplı ve adım adım çözümlü."
+---
+
+<link rel="stylesheet" href="deck/deck.css">
+<style>
+.ds-deck .ds-deck__step > svg.ds-svg, .ds-deck .q16-fig > svg.ds-svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+.ds-deck .ds-deck__card strong { display: inline; margin: 0; font-size: inherit; }
+.ds-deck .ds-deck__card > strong:first-child { display: block; margin-bottom: 3px; font-size: 17px; }
+.ds-deck .ds-deck__card p { margin: 0 0 4px; }
+.ds-deck .ds-svg .soft { fill: var(--ds-surface-strong); stroke: var(--ds-border); stroke-width: 1.5; }
+.ds-deck .ds-svg .hot { fill: var(--ds-hot); stroke: #d4851a; stroke-width: 1.5; }
+.ds-deck .ds-svg .bad { fill: color-mix(in srgb, var(--ds-bad) 20%, var(--ds-bg)); stroke: var(--ds-bad); stroke-width: 1.5; }
+.ds-deck .ds-svg .good { fill: color-mix(in srgb, var(--ds-good) 20%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 1.5; }
+.ds-deck .ds-svg .mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-deck .ds-svg .q16-c1 { fill: color-mix(in srgb, #3b82f6 28%, var(--ds-bg)); stroke: #3b82f6; stroke-width: 1.5; }
+.ds-deck .ds-svg .q16-c2 { fill: color-mix(in srgb, #22a05a 28%, var(--ds-bg)); stroke: #22a05a; stroke-width: 1.5; }
+.ds-deck .ds-svg .q16-c3 { fill: color-mix(in srgb, #e9a23b 34%, var(--ds-bg)); stroke: #d4851a; stroke-width: 1.5; }
+.ds-deck .ds-svg .q16-c4 { fill: color-mix(in srgb, #8b5cf6 28%, var(--ds-bg)); stroke: #8b5cf6; stroke-width: 1.5; }
+.ds-deck .ds-svg .q16-c5 { fill: color-mix(in srgb, #e76f51 30%, var(--ds-bg)); stroke: #e76f51; stroke-width: 1.5; }
+.ds-deck .ds-svg .q16-idle { fill: var(--ds-surface-strong); stroke: var(--ds-border); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.ds-deck .ds-svg .q16-fut { fill: none; stroke: var(--ds-border); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.ds-deck .ds-svg .q16-cur { stroke: #d4851a; stroke-width: 3; }
+.ds-deck .ds-svg .q16-now { stroke: var(--ds-accent); stroke-width: 1.6; stroke-dasharray: 5 3; fill: none; }
+.ds-deck .ds-svg .q16-t { fill: var(--ds-text); font: 600 13px system-ui, sans-serif; }
+.ds-deck .ds-svg .q16-tk { fill: var(--ds-muted); font: 12px system-ui, sans-serif; }
+.ds-deck .ds-svg .q16-acc { fill: var(--ds-accent); font: 700 13px system-ui, sans-serif; }
+.ds-deck .q16-q { margin: 0 0 8px; padding: 7px 12px; border-left: 4px solid var(--ds-accent); background: var(--ds-surface-strong); border-radius: 0 10px 10px 0; font-size: 16.5px; line-height: 1.42; }
+.ds-deck .q16-q p { margin: 0 0 4px; }
+.ds-deck .q16-q p:last-child { margin-bottom: 0; }
+.ds-deck .q16-fmt { display: inline-block; margin-right: 6px; padding: 0 8px; border: 1.5px solid var(--ds-border); border-radius: 999px; background: var(--ds-bg); color: var(--ds-muted); font-size: 12.5px; font-weight: 700; letter-spacing: .03em; vertical-align: 1px; }
+.ds-deck .ds-deck__slide ol.q16-opts { margin: 0; padding-left: 30px; list-style: upper-alpha; font-size: 16px; line-height: 1.35; }
+.ds-deck .ds-deck__slide ol.q16-opts li { margin: 3px 0; }
+.ds-deck .ds-deck__slide ol.q16-opts li::marker { font-weight: 700; }
+.ds-deck .q16-ans { margin-top: 10px; }
+.ds-deck .q16-ans p { margin: 6px 0 0; line-height: 1.4; }
+.ds-deck .q16-ans ul, .ds-deck .q16-ans ol { margin-top: 4px; padding-left: 20px; line-height: 1.36; }
+.ds-deck .q16-ans li { margin: 2px 0; }
+.ds-deck .q16-ans .ds-deck__table { font-size: 14px; margin-top: 6px; }
+.ds-deck .q16-ans .ds-deck__table td, .ds-deck .q16-ans .ds-deck__table th { padding: 3px 7px; }
+.ds-deck .q16-ok { color: var(--ds-good); font-weight: 700; }
+.ds-deck .q16-tight td, .ds-deck .q16-tight th { padding: 3px 8px; }
+.ds-deck .q16-tight { font-size: 14.5px; }
+.ds-deck .q16-given { margin: 0 0 6px; font-size: 15px; }
+.ds-deck .q16-tr { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); grid-template-areas: "code steps" "code col"; row-gap: 8px; align-items: start; }
+.ds-deck .q16-tr > .ds-trace__code { grid-area: code; }
+.ds-deck .q16-tr > .ds-deck__steps { grid-area: steps; }
+.ds-deck .q16-tr > .ds-trace__col { grid-area: col; }
+.ds-deck .q16-tr pre.ds-trace__code { font-size: 12.5px; }
+.ds-deck .q16-tr .ds-deck__step > svg.ds-svg { margin: 0; }
+.ds-deck .q16-tr .ds-deck__stepnote { min-height: 44px; font-size: 14.5px; line-height: 1.35; text-align: left; }
+.ds-deck .q16-tr .ds-deck__stepnav { margin-top: 2px; }
+.ds-deck .q16-steps .ds-deck__stepnote { font-size: 15px; line-height: 1.35; min-height: 42px; }
+.ds-deck .q16-mist li { margin: 3px 0; }
+.ds-deck .q16-side { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: start; gap: 14px; }
+.ds-deck .q16-side pre { margin: 0; }
+</style>
+
+<div class="ds-deck" id="ds-deck" lang="tr">
+  <div class="ds-deck__screen" id="ds-deck-screen" tabindex="0" aria-roledescription="sunum" aria-label="Bölüm 16: Linux Çalışma Soruları sunumu">
+    <div class="ds-deck__stage" id="ds-deck-stage">
+      <div class="ds-deck__progress" aria-hidden="true"><span id="ds-deck-progress"></span></div>
+
+      <div class="ds-deck__viewport" aria-live="polite">
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="Bölüm 16: Linux" data-section="">
+  <h1>Bölüm 16: Linux</h1>
+  <div class="ds-deck__subtitle">İşletim Sistemleri · Çalışma Soruları</div>
+  <div class="ds-deck__agenda" aria-label="Soruların konuları"><span>Tarihçe ve Kabuk</span><span>Süreçler ve Sinyaller</span><span>Çizelgeleme ve Önyükleme</span><span>/proc ve Süreç Bilgisi</span><span>Dosya Sistemleri</span><span>İzinler ve Konteynerler</span></div>
+  <small>Sercan KÜLCÜ · Giresun Üniversitesi</small>
+</section>
+
+<section class="ds-deck__slide" data-title="Nasıl çalışalım?" data-section="Giriş">
+  <p class="ds-deck__kicker">Giriş</p>
+  <h2>Nasıl Çalışalım?</h2>
+  <div class="ds-deck__grid ds-deck__grid--3 ds-deck__grid--roomy">
+    <div class="ds-deck__card"><strong>1 · Önce çözün</strong>Her slaytta bir soru var. Cevabı açmadan önce kâğıda kendi cevabınızı ve gerekçenizi yazın.</div>
+    <div class="ds-deck__card"><strong>2 · Sonra açın</strong>“Cevabı göster” kutusu doğru seçeneği ve kısa bir açıklamayı verir. Yanlış seçeneklerin neden yanlış olduğunu da düşünün.</div>
+    <div class="ds-deck__card"><strong>3 · Adım adım izleyin</strong>Hesap ve kod sorularından sonra gelen “Adım Adım Çözüm” slaytında ‹ › düğmeleriyle çözümü ilerletin.</div>
+  </div>
+  <p class="ds-deck__foot">Kurallar (aksi belirtilmedikçe): komutlar bash kabuğunda, sıradan bir kullanıcıyla çalıştırılır; C örneklerinde gerekli başlık dosyaları eklenmiş kabul edilir ve sistem çağrıları başarılıdır.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 1: Linux Nasıl Doğdu?" data-section="Tarihçe ve Kabuk">
+  <p class="ds-deck__kicker">Soru 1 · Tarihçe ve Kabuk</p>
+  <h2>Linux Nasıl Doğdu?</h2>
+  <div class="q16-q"><span class="q16-fmt">Çoktan seçmeli</span><p>Linux çekirdeğinin ortaya çıkışı için hangisi doğrudur?</p></div>
+  <ol class="q16-opts"><li>AT&amp;T’nin UNIX kaynak kodunun doğrudan kopyalanmasıyla yazıldı.</li><li>Linus Torvalds çekirdeği MINIX üzerinde geliştirdi; çekirdek GNU projesinin derleyici, kabuk ve araçlarıyla birleşerek kullanılabilir bir sistem oldu.</li><li>Berkeley’deki BSD ekibinin bir alt projesidir.</li><li>Tanenbaum’un yazdığı MINIX’in yeni adıdır.</li><li>Baştan bir mikroçekirdek olarak tasarlandı.</li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> Linus Torvalds çekirdeği MINIX üzerinde geliştirdi; çekirdek GNU projesinin derleyici, kabuk ve araçlarıyla birleşerek kullanılabilir bir sistem oldu.</p>
+    <p>Linux UNIX kodu içermez; POSIX arayüzünü yeniden gerçekler. Tanenbaum MINIX’i öğretim için yazmıştı; Torvalds onun üzerinde kendi monolitik çekirdeğini geliştirdi ve GNU araçlarıyla birleştirdi. Bu yüzden tam sistem için “GNU/Linux” adı da kullanılır.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 2: “Linux” Neyin Adı?" data-section="Tarihçe ve Kabuk">
+  <p class="ds-deck__kicker">Soru 2 · Tarihçe ve Kabuk</p>
+  <h2>“Linux” Neyin Adı?</h2>
+  <div class="q16-q"><span class="q16-fmt">Doğru / Yanlış</span><p>Aşağıdaki ifade doğru mu, yanlış mı? Gerekçenizi yazın.</p><p><em>““Linux” sözcüğü tam anlamıyla Ubuntu, Fedora ya da Pardus gibi bir dağıtımın bütününün adıdır.”</em></p></div>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Yanlış.</strong> Linux tam olarak yalnızca <strong>çekirdeğin</strong> adıdır. Dağıtım çekirdeğe C kütüphanesi (glibc, musl), kabuk ve araçlar, paket yöneticisi (apt, dnf, pacman), init sistemi (systemd) ve masaüstü ekler. Android de Linux çekirdeğini kullanır ama GNU kullanıcı alanı yoktur.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 3: Boru Hattının Çıktısı" data-section="Tarihçe ve Kabuk">
+  <p class="ds-deck__kicker">Soru 3 · Tarihçe ve Kabuk</p>
+  <h2>Boru Hattının Çıktısı</h2>
+  <div class="q16-q"><span class="q16-fmt">Kod izleme</span><p>Aşağıdaki komut ne yazdırır? <code>sort</code> komutu <code>uniq -c</code>’den önce neden gereklidir?</p><pre style="margin:4px 0 0;font-size:13px">printf "b\na\nb\nc\na\nb\n" | sort | uniq -c | sort -rn | head -1</pre></div>
+  <ol class="q16-opts"><li><code>3 b</code></li><li><code>2 a</code></li><li><code>1 c</code></li><li><code>3 a</code></li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: A)</strong> <code>3 b</code></p>
+    <pre>      3 b</pre>
+    <p><code>uniq -c</code> yalnızca <strong>ardışık</strong> tekrarları sayar; önce <code>sort</code> aynı satırları yan yana getirmezse b’ler üç ayrı grup olarak sayılırdı. <code>sort -rn</code> sayıya göre büyükten küçüğe dizer, <code>head -1</code> ilk satırı alır.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 3: Adım Adım Çözüm" data-section="Tarihçe ve Kabuk">
+  <p class="ds-deck__kicker">Soru 3 · Çözüm</p>
+  <h2>Adım Adım Çözüm</h2>
+  <p class="q16-given">Kabuk 5 süreç ve 4 boru kurar; her aşama yalnızca kendi stdin’ini okur, stdout’una yazar.</p>
+  <div class="ds-deck__steps q16-steps">
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 720 148" role="img" aria-label="printf ve sort" style="max-width:720px"><rect class="hot" x="4" y="4" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="21" text-anchor="start" style="font-size:15px">printf → b a b c a b</text><rect class="hot" x="4" y="32" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="49" text-anchor="start" style="font-size:15px">sort → a a b b b c</text><rect class="soft" x="4" y="60" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="77" text-anchor="start" style="font-size:15px">uniq -c → 2 a | 3 b | 1 c</text><rect class="soft" x="4" y="88" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="105" text-anchor="start" style="font-size:15px">sort -rn → 3 b | 2 a | 1 c</text><rect class="soft" x="4" y="116" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="133" text-anchor="start" style="font-size:15px">head -1 → 3 b</text></svg><p class="ds-deck__stepnote">printf altı satır üretir; sort tüm girdiyi okuduktan sonra sıralı yazar.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 720 148" role="img" aria-label="uniq -c" style="max-width:720px"><rect class="good" x="4" y="4" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="21" text-anchor="start" style="font-size:15px">printf → b a b c a b</text><rect class="good" x="4" y="32" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="49" text-anchor="start" style="font-size:15px">sort → a a b b b c</text><rect class="hot" x="4" y="60" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="77" text-anchor="start" style="font-size:15px">uniq -c → 2 a | 3 b | 1 c</text><rect class="soft" x="4" y="88" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="105" text-anchor="start" style="font-size:15px">sort -rn → 3 b | 2 a | 1 c</text><rect class="soft" x="4" y="116" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="133" text-anchor="start" style="font-size:15px">head -1 → 3 b</text></svg><p class="ds-deck__stepnote">uniq -c ardışık aynı satırları sayıp “sayı satır” biçiminde yazar.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 720 148" role="img" aria-label="sort -rn ve head" style="max-width:720px"><rect class="good" x="4" y="4" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="21" text-anchor="start" style="font-size:15px">printf → b a b c a b</text><rect class="good" x="4" y="32" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="49" text-anchor="start" style="font-size:15px">sort → a a b b b c</text><rect class="good" x="4" y="60" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="77" text-anchor="start" style="font-size:15px">uniq -c → 2 a | 3 b | 1 c</text><rect class="hot" x="4" y="88" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="105" text-anchor="start" style="font-size:15px">sort -rn → 3 b | 2 a | 1 c</text><rect class="hot" x="4" y="116" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="133" text-anchor="start" style="font-size:15px">head -1 → 3 b</text></svg><p class="ds-deck__stepnote">Sayıya göre ters sıralanır (-n sayısal, -r ters); head -1 en sık satırı bırakır: 3 b.</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 4: Yönlendirmenin Sırası" data-section="Tarihçe ve Kabuk">
+  <p class="ds-deck__kicker">Soru 4 · Tarihçe ve Kabuk</p>
+  <h2>Yönlendirmenin Sırası</h2>
+  <div class="q16-q"><span class="q16-fmt">Çoktan seçmeli</span><p><code>/yok</code> dizini mevcut değil. Hangi komutta <code>ls</code>’in hata mesajı <strong>ekrana</strong> yazılır, dosyaya gitmez?</p></div>
+  <ol class="q16-opts"><li><code>ls /yok /tmp &gt; cikti.txt 2&gt;&amp;1</code></li><li><code>ls /yok /tmp 2&gt;&amp;1 &gt; cikti.txt</code></li><li><code>ls /yok /tmp &amp;&gt; cikti.txt</code></li><li><code>ls /yok /tmp 2&gt; cikti.txt</code></li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> <code>ls /yok /tmp 2&gt;&amp;1 &gt; cikti.txt</code></p>
+    <p>Yönlendirmeler soldan sağa uygulanır. B’de <code>2&gt;&amp;1</code> önce stderr’i stdout’un <em>o anki</em> hedefine (terminal) kopyalar; ardından yalnızca stdout dosyaya çevrilir. A’da önce stdout dosyaya gider, sonra stderr ona eşlenir; C ikisini birden, D yalnız stderr’i dosyaya yollar.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 5: Boru Uçlarını Kapatmak" data-section="Tarihçe ve Kabuk">
+  <p class="ds-deck__kicker">Soru 5 · Tarihçe ve Kabuk</p>
+  <h2>Boru Uçlarını Kapatmak</h2>
+  <div class="q16-q"><span class="q16-fmt">Açık uçlu</span><p>Kabuk <code>ls | wc -l</code> satırını <code>pipe</code>, <code>fork</code>, <code>dup2</code> ve <code>exec</code> ile kurar. Adımları sırayla yazın. Kabuk kendi elindeki yazma ucunu kapatmayı unutursa ne olur?</p></div>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <ol><li><code>pipe(fd)</code>: okuma ucu (ör. 3) ve yazma ucu (4).</li><li>1. çocuk: <code>dup2(4, 1)</code>, fazla uçları kapatır, <code>exec("ls")</code>.</li><li>2. çocuk: <code>dup2(3, 0)</code>, fazla uçları kapatır, <code>exec("wc")</code>.</li><li>Kabuk iki ucu da kapatır ve iki çocuğu <code>wait</code> ile bekler.</li></ol>    <p>Yazma ucu herhangi bir süreçte açık kaldıkça <code>wc</code> <strong>EOF görmez</strong>: <code>ls</code> bitse bile <code>wc</code> sonsuza dek bekler, kabuk da onu.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 6: fork Sonrası Değişkenler" data-section="Süreçler ve Sinyaller">
+  <p class="ds-deck__kicker">Soru 6 · Süreçler ve Sinyaller</p>
+  <h2>fork Sonrası Değişkenler</h2>
+  <div class="q16-q"><span class="q16-fmt">Kod izleme</span><p>Program ne yazdırır? Çıktı sırası her çalıştırmada aynı mıdır?</p></div>
+  <div class="ds-deck__two q16-side"><pre style="font-size:12.5px">int main(void) {
+    int x = 5;
+    pid_t p = fork();
+    if (p == 0) {
+        x += 10;
+        printf("çocuk %d\n", x);
+        exit(0);
+    }
+    waitpid(p, NULL, 0);
+    x -= 1;
+    printf("ebeveyn %d\n", x);
+    return 0;
+}</pre><div>  <ol class="q16-opts"><li><code>çocuk 15</code>, <code>ebeveyn 14</code></li><li><code>çocuk 15</code>, <code>ebeveyn 4</code></li><li><code>ebeveyn 4</code>, <code>çocuk 15</code> (sıra belirsiz)</li><li><code>çocuk 15</code>, <code>ebeveyn 5</code></li></ol>
+<details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> <code>çocuk 15</code>, <code>ebeveyn 4</code></p>
+    <pre>çocuk 15
+ebeveyn 4</pre>
+    <p>fork sonrası iki sürecin ayrı adres uzayı vardır (COW): çocuğun <code>x += 10</code>’u ebeveyni etkilemez. Ebeveyn <code>waitpid</code>’de çocuğu beklediği için sıra <strong>her zaman</strong> aynıdır.</p>
+</details></div></div>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 6: Adım Adım Çözüm" data-section="Süreçler ve Sinyaller">
+  <p class="ds-deck__kicker">Soru 6 · Çözüm</p>
+  <h2>Adım Adım Çözüm</h2>
+  <p class="q16-given">E: ebeveyn (PID 700), Ç: çocuk (PID 701). fork bir kez çağrılır, iki kez döner.</p>
+  <div class="ds-trace q16-tr">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="2" data-vars="E.x=5" data-out=""><p class="ds-deck__stepnote">Tek süreç var; x = 5.</p></div>
+<div class="ds-deck__step" data-line="3" data-vars="E.x=5; E.p=701; Ç.x=5; Ç.p=0" data-out=""><p class="ds-deck__stepnote">fork: ebeveynde p = çocuğun PID’i, çocukta p = 0. Sayfalar paylaşılır, yazılınca kopyalanır.</p></div>
+<div class="ds-deck__step" data-line="9" data-vars="E.x=5; E=bekliyor; Ç.x=5" data-out=""><p class="ds-deck__stepnote">Hangisi önce CPU alırsa alsın, ebeveyn çocuk bitene kadar waitpid’de bloke kalır.</p></div>
+<div class="ds-deck__step" data-line="5,6" data-vars="E.x=5; E=bekliyor; Ç.x=15" data-out="çocuk 15"><p class="ds-deck__stepnote">Çocuk kendi x kopyasını 15 yapar ve yazar. Ebeveynin x’i hâlâ 5.</p></div>
+<div class="ds-deck__step" data-line="7" data-vars="E.x=5; Ç=zombi" data-out="çocuk 15"><p class="ds-deck__stepnote">Çocuk biter; çıkış durumu okunana kadar zombidir, ebeveyne SIGCHLD gider.</p></div>
+<div class="ds-deck__step" data-line="10,11" data-vars="E.x=4" data-out="çocuk 15
+ebeveyn 4"><p class="ds-deck__stepnote">waitpid döner, zombi toplanır. Ebeveyn x’i 4 yapar ve yazar.</p></div>
+</div>
+<pre class="ds-trace__code">int main(void) {
+    int x = 5;
+    pid_t p = fork();
+    if (p == 0) {
+        x += 10;
+        printf("çocuk %d\n", x);
+        exit(0);
+    }
+    waitpid(p, NULL, 0);
+    x -= 1;
+    printf("ebeveyn %d\n", x);
+    return 0;
+}</pre>
+<div class="ds-trace__col"><div class="ds-trace__vars"></div><div class="ds-trace__out"></div></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 7: Kaç Süreç Oluşur?" data-section="Süreçler ve Sinyaller">
+  <p class="ds-deck__kicker">Soru 7 · Süreçler ve Sinyaller</p>
+  <h2>Kaç Süreç Oluşur?</h2>
+  <div class="q16-q"><span class="q16-fmt">Kod izleme</span><p><code>main</code> içinde yalnızca aşağıdaki iki satır var. Program sonunda kaç tane <code>x</code> yazılır (ilk süreç dahil kaç süreç çalışır)?</p><pre style="margin:4px 0 0;font-size:13px">if (fork() &amp;&amp; fork())
+    fork();
+printf("x\n");</pre></div>
+  <ol class="q16-opts"><li>3</li><li>4</li><li>6</li><li>8</li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> 4</p>
+    <p><strong>4</strong>. <code>&amp;&amp;</code> kısa devre yapar: ilk fork’ta çocuk 0 alır, koşul yanlıştır, başka fork yapmaz. Ebeveyn ikinci fork’u yapar; oradaki çocuk da 0 alıp çıkar. Yalnız ilk süreç üçüncü fork’a ulaşır. Toplam: ilk süreç + 3 çocuk = 4 süreç, 4 satır.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 7: Adım Adım Çözüm" data-section="Süreçler ve Sinyaller">
+  <p class="ds-deck__kicker">Soru 7 · Çözüm</p>
+  <h2>Adım Adım Çözüm</h2>
+  <p class="q16-given">a &amp;&amp; b: a yanlışsa (0) b hiç değerlendirilmez. fork çocuğa 0, ebeveyne pozitif PID döndürür.</p>
+  <div class="ds-deck__steps q16-steps">
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 720 120" role="img" aria-label="Birinci fork" style="max-width:720px"><rect class="hot" x="4" y="4" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="21" text-anchor="start" style="font-size:15px">fork #1: P → Ç1 (Ç1’de sonuç 0 → koşul yanlış)</text><rect class="soft" x="4" y="32" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="49" text-anchor="start" style="font-size:15px">fork #2: yalnız P yapar → Ç2 (Ç2’de 0 → yanlış)</text><rect class="soft" x="4" y="60" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="77" text-anchor="start" style="font-size:15px">koşul P’de doğru → fork #3: P → Ç3</text><rect class="soft" x="4" y="88" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="105" text-anchor="start" style="font-size:15px">printf: P, Ç1, Ç2, Ç3 → 4 satır</text></svg><p class="ds-deck__stepnote">İlk fork iki süreç yaratır. Çocukta sonuç 0 olduğundan <code>&amp;&amp;</code> kısa devre yapar: Ç1 doğrudan printf’e gider.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 720 120" role="img" aria-label="İkinci fork" style="max-width:720px"><rect class="good" x="4" y="4" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="21" text-anchor="start" style="font-size:15px">fork #1: P → Ç1 (Ç1’de sonuç 0 → koşul yanlış)</text><rect class="hot" x="4" y="32" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="49" text-anchor="start" style="font-size:15px">fork #2: yalnız P yapar → Ç2 (Ç2’de 0 → yanlış)</text><rect class="soft" x="4" y="60" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="77" text-anchor="start" style="font-size:15px">koşul P’de doğru → fork #3: P → Ç3</text><rect class="soft" x="4" y="88" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="105" text-anchor="start" style="font-size:15px">printf: P, Ç1, Ç2, Ç3 → 4 satır</text></svg><p class="ds-deck__stepnote">Ebeveynde ilk sonuç pozitif; ikinci fork çağrılır. Ç2’de sonuç 0, koşul yanlış.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 720 120" role="img" aria-label="Üçüncü fork" style="max-width:720px"><rect class="good" x="4" y="4" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="21" text-anchor="start" style="font-size:15px">fork #1: P → Ç1 (Ç1’de sonuç 0 → koşul yanlış)</text><rect class="good" x="4" y="32" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="49" text-anchor="start" style="font-size:15px">fork #2: yalnız P yapar → Ç2 (Ç2’de 0 → yanlış)</text><rect class="hot" x="4" y="60" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="77" text-anchor="start" style="font-size:15px">koşul P’de doğru → fork #3: P → Ç3</text><rect class="hot" x="4" y="88" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="105" text-anchor="start" style="font-size:15px">printf: P, Ç1, Ç2, Ç3 → 4 satır</text></svg><p class="ds-deck__stepnote">Yalnız P’de iki sonuç da pozitif: üçüncü fork Ç3’ü yaratır. printf’i 4 süreç çalıştırır.</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 8: Yakalanamayan Sinyal" data-section="Süreçler ve Sinyaller">
+  <p class="ds-deck__kicker">Soru 8 · Süreçler ve Sinyaller</p>
+  <h2>Yakalanamayan Sinyal</h2>
+  <div class="q16-q"><span class="q16-fmt">Çoktan seçmeli</span><p>Bir süreç <code>sigaction</code> ile aşağıdaki sinyallerden hangisi için işleyici <strong>kuramaz</strong> ya da onu yok sayamaz?</p></div>
+  <ol class="q16-opts"><li>SIGINT (Ctrl-C)</li><li>SIGTERM (<code>kill</code> komutunun varsayılanı)</li><li>SIGKILL (<code>kill -9</code>)</li><li>SIGHUP</li><li>SIGUSR1</li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: C)</strong> SIGKILL (<code>kill -9</code>)</p>
+    <p>SIGKILL ve SIGSTOP yakalanamaz, engellenemez, yok sayılamaz; yöneticinin süreci her durumda durdurabilmesi için. <code>kill PID</code> varsayılan olarak SIGTERM (15) gönderir: süreç kaynaklarını temizleyip nazikçe çıkabilir. Önce SIGTERM, ancak gerekirse SIGKILL denenmelidir.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 9: Çocuk Bitince Ne Kalır?" data-section="Süreçler ve Sinyaller">
+  <p class="ds-deck__kicker">Soru 9 · Süreçler ve Sinyaller</p>
+  <h2>Çocuk Bitince Ne Kalır?</h2>
+  <div class="q16-q"><span class="q16-fmt">Doğru / Yanlış</span><p>Aşağıdaki ifade doğru mu, yanlış mı? Gerekçenizi yazın.</p><p><em>“Ebeveyni henüz wait çağırmamışken sonlanan bir çocuk süreç, çekirdek tablolarından hemen ve tamamen silinir.”</em></p></div>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Yanlış.</strong> Çocuğun belleği ve dosyaları serbest bırakılır, ama PID’i ve çıkış durumu ebeveyn okuyana kadar saklanır: süreç <strong>zombi</strong> (Z) olur. Ebeveyn hiç beklemezse zombiler birikir; ebeveyn ölürse çocuk PID 1’e (ya da bir alt toplayıcıya) devredilir ve orada toplanır.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 10: Süreç ve İş Parçacığı Linux’ta" data-section="Süreçler ve Sinyaller">
+  <p class="ds-deck__kicker">Soru 10 · Süreçler ve Sinyaller</p>
+  <h2>Süreç ve İş Parçacığı Linux’ta</h2>
+  <div class="q16-q"><span class="q16-fmt">Çoktan seçmeli</span><p>Linux’ta süreç ile iş parçacığı arasındaki ilişki için hangisi doğrudur?</p></div>
+  <ol class="q16-opts"><li>Çekirdekte iş parçacıkları için ayrı, süreçlerden tamamen farklı bir yapı vardır.</li><li>İkisi de bir görevdir (<code>task_struct</code>); fark <code>clone()</code> bayraklarıyla neyin paylaşıldığıdır. İş parçacıkları <code>CLONE_VM</code>, <code>CLONE_FILES</code>, <code>CLONE_SIGHAND</code>, <code>CLONE_THREAD</code> ile adres uzayını ve tanımlayıcıları paylaşır, aynı TGID’dedir.</li><li>İş parçacıkları yalnızca kullanıcı alanında vardır; çekirdek onları bilmez (N:1 model).</li><li>fork() ile oluşturulan çocuk ebeveynle aynı adres uzayını paylaşır.</li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> İkisi de bir görevdir (<code>task_struct</code>); fark <code>clone()</code> bayraklarıyla neyin paylaşıldığıdır. İş parçacıkları <code>CLONE_VM</code>, <code>CLONE_FILES</code>, <code>CLONE_SIGHAND</code>, <code>CLONE_THREAD</code> ile adres uzayını ve tanımlayıcıları paylaşır, aynı TGID’dedir.</p>
+    <p>NPTL 1:1 modelidir: her pthread bir çekirdek görevidir. Kullanıcının gördüğü PID aslında TGID’dir. fork ise her yapının kopyasını alan (bellek COW) bir clone’dur.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 11: Hangi Sınıf Önce?" data-section="Çizelgeleme ve Önyükleme">
+  <p class="ds-deck__kicker">Soru 11 · Çizelgeleme ve Önyükleme</p>
+  <h2>Hangi Sınıf Önce?</h2>
+  <div class="q16-q"><span class="q16-fmt">Çoktan seçmeli</span><p>Aynı CPU’da aynı anda üç görev hazır: biri <code>SCHED_DEADLINE</code>, biri <code>SCHED_FIFO</code> (öncelik 50), biri normal (<code>SCHED_OTHER</code>, nice −20). Çizelgeleyici önce hangisini çalıştırır?</p></div>
+  <ol class="q16-opts"><li>nice −20 olan normal görev, çünkü nice değeri en düşüktür</li><li>SCHED_FIFO görevi</li><li>SCHED_DEADLINE görevi</li><li>Üçü eşit pay alır</li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: C)</strong> SCHED_DEADLINE görevi</p>
+    <p>Çizelgeleme sınıfları sırayla sorulur: deadline &gt; gerçek zamanlı (FIFO/RR) &gt; adil (EEVDF) &gt; boşta. Üst sınıfta hazır görev varken alttakiler beklemek zorundadır. nice yalnızca adil sınıfın <em>içindeki</em> payı etkiler.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 12: nice ve Sanal Çalışma Süresi" data-section="Çizelgeleme ve Önyükleme">
+  <p class="ds-deck__kicker">Soru 12 · Çizelgeleme ve Önyükleme</p>
+  <h2>nice ve Sanal Çalışma Süresi</h2>
+  <div class="q16-q"><span class="q16-fmt">Hesaplama</span><p>Adil sınıfta ağırlıklar: nice 0 → 1024, nice 5 → 335, nice −5 → 3121. Sanal çalışma süresi artışı Δv = gerçek süre × 1024 / ağırlık. (a) Her görev 6 ms çalışırsa vruntime’ı ne kadar ilerler? (b) Sürekli hazır bir nice 0 ve bir nice 5 görevi tek CPU’yu yaklaşık hangi oranda paylaşır?</p></div>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <ul><li>(a) nice 0: 6 × 1024 / 1024 = <strong>6 ms</strong>; nice 5: 6 × 1024 / 335 ≈ <strong>18,34 ms</strong>; nice −5: 6 × 1024 / 3121 ≈ <strong>1,97 ms</strong>.</li><li>(b) Pay ağırlıkla orantılıdır: 1024 / (1024 + 335) ≈ <strong>%75,3</strong> ve 335 / 1359 ≈ <strong>%24,7</strong>.</li></ul>    <p>Düşük ağırlıklı görevin vruntime’ı hızlı ilerlediği için daha seyrek seçilir; EEVDF ayrıca yalnızca “uygun” (v ≤ V) görevler arasında en erken sanal son tarihi seçer.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 12: Adım Adım Çözüm" data-section="Çizelgeleme ve Önyükleme">
+  <p class="ds-deck__kicker">Soru 12 · Çözüm</p>
+  <h2>Adım Adım Çözüm</h2>
+  <p class="q16-given">Sanal zaman, gerçek zamanın ağırlıkla ölçeklenmiş hâlidir; çizelgeleyici geride kalanı öne alır.</p>
+  <div class="ds-deck__steps q16-steps">
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 720 120" role="img" aria-label="nice 0" style="max-width:720px"><rect class="hot" x="4" y="4" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="21" text-anchor="start" style="font-size:15px">nice 0: Δv = 6 × 1024 / 1024 = 6 ms</text><rect class="soft" x="4" y="32" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="49" text-anchor="start" style="font-size:15px">nice 5: Δv = 6 × 1024 / 335 ≈ 18,34 ms</text><rect class="soft" x="4" y="60" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="77" text-anchor="start" style="font-size:15px">nice −5: Δv = 6 × 1024 / 3121 ≈ 1,97 ms</text><rect class="soft" x="4" y="88" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="105" text-anchor="start" style="font-size:15px">pay = 1024 / (1024 + 335) ≈ %75,3</text></svg><p class="ds-deck__stepnote">nice 0 için ağırlık 1024: sanal zaman gerçek zamanla aynı hızda ilerler.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 720 120" role="img" aria-label="nice 5 ve −5" style="max-width:720px"><rect class="good" x="4" y="4" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="21" text-anchor="start" style="font-size:15px">nice 0: Δv = 6 × 1024 / 1024 = 6 ms</text><rect class="hot" x="4" y="32" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="49" text-anchor="start" style="font-size:15px">nice 5: Δv = 6 × 1024 / 335 ≈ 18,34 ms</text><rect class="hot" x="4" y="60" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="77" text-anchor="start" style="font-size:15px">nice −5: Δv = 6 × 1024 / 3121 ≈ 1,97 ms</text><rect class="soft" x="4" y="88" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="105" text-anchor="start" style="font-size:15px">pay = 1024 / (1024 + 335) ≈ %75,3</text></svg><p class="ds-deck__stepnote">nice 5 görev aynı 6 ms için ≈ 3 kat, nice −5 görev ≈ 3 kat yavaş “yaşlanır”.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 720 120" role="img" aria-label="CPU payı" style="max-width:720px"><rect class="good" x="4" y="4" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="21" text-anchor="start" style="font-size:15px">nice 0: Δv = 6 × 1024 / 1024 = 6 ms</text><rect class="good" x="4" y="32" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="49" text-anchor="start" style="font-size:15px">nice 5: Δv = 6 × 1024 / 335 ≈ 18,34 ms</text><rect class="good" x="4" y="60" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="77" text-anchor="start" style="font-size:15px">nice −5: Δv = 6 × 1024 / 3121 ≈ 1,97 ms</text><rect class="hot" x="4" y="88" width="712" height="24" rx="6"/><text class="txt mono" x="16" y="105" text-anchor="start" style="font-size:15px">pay = 1024 / (1024 + 335) ≈ %75,3</text></svg><p class="ds-deck__stepnote">Uzun vadede her görev ağırlığı oranında CPU alır: ≈ %75 ve ≈ %25.</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 13: Önyükleme Sırası" data-section="Çizelgeleme ve Önyükleme">
+  <p class="ds-deck__kicker">Soru 13 · Çizelgeleme ve Önyükleme</p>
+  <h2>Önyükleme Sırası</h2>
+  <div class="q16-q"><span class="q16-fmt">Çoktan seçmeli</span><p>Bir Linux makinesinin açılışı için doğru sıra hangisidir?</p></div>
+  <ol class="q16-opts"><li>systemd → UEFI → önyükleyici → çekirdek → initramfs</li><li>UEFI ürün yazılımı → önyükleyici (çekirdek + initramfs yüklenir) → çekirdek başlatma → initramfs gerçek kökü bağlar → PID 1 (systemd) servisleri başlatır → giriş</li><li>Önyükleyici → UEFI → systemd → çekirdek → giriş</li><li>Çekirdek → UEFI → initramfs → önyükleyici → systemd</li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> UEFI ürün yazılımı → önyükleyici (çekirdek + initramfs yüklenir) → çekirdek başlatma → initramfs gerçek kökü bağlar → PID 1 (systemd) servisleri başlatır → giriş</p>
+    <p>initramfs, kök dosya sistemini bağlamak için gereken sürücüleri (NVMe, RAID, şifreli disk) çekirdek bağlamadan önce RAM’de sağlar ve <code>switch_root</code> yapar. Güvenli önyükleme açıksa her aşama bir sonrakinin imzasını doğrular.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 14: Boyutu Sıfır Görünen Dosya" data-section="/proc ve Süreç Bilgisi">
+  <p class="ds-deck__kicker">Soru 14 · /proc ve Süreç Bilgisi</p>
+  <h2>Boyutu Sıfır Görünen Dosya</h2>
+  <div class="q16-q"><span class="q16-fmt">Çoktan seçmeli</span><p><code>ls -l /proc/meminfo</code> dosya boyutunu 0 gösteriyor, ama <code>cat /proc/meminfo</code> onlarca satır yazıyor. Bunun nedeni nedir?</p></div>
+  <ol class="q16-opts"><li>Dosya sıkıştırılmış olarak diskte saklanır.</li><li><code>/proc</code> diskte yer kaplamayan sanal bir dosya sistemidir (procfs); içerik her okumada çekirdek tarafından o anki değerlerle üretilir.</li><li>Dosya yalnızca root’a görünür olduğu için boyutu gizlenir.</li><li><code>ls</code> komutu metin dosyalarının boyutunu göstermez.</li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> <code>/proc</code> diskte yer kaplamayan sanal bir dosya sistemidir (procfs); içerik her okumada çekirdek tarafından o anki değerlerle üretilir.</p>
+    <p>procfs’teki dosyalar çekirdek veri yapılarına açılan pencerelerdir: ps, top ve free verilerini buradan okur. Aynı fikir “her şey dosyadır” ilkesinin bir uygulamasıdır; ayrıntılı aygıt modeli ise <code>/sys</code> (sysfs) altındadır.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 15: Açık Dosyaları Nerede Görürüz?" data-section="/proc ve Süreç Bilgisi">
+  <p class="ds-deck__kicker">Soru 15 · /proc ve Süreç Bilgisi</p>
+  <h2>Açık Dosyaları Nerede Görürüz?</h2>
+  <div class="q16-q"><span class="q16-fmt">Çoktan seçmeli</span><p>PID’i 4321 olan bir sunucu sürecinin şu an hangi dosyaları ve soketleri açık tuttuğunu görmek istiyorsunuz. En doğrudan kaynak hangisidir?</p></div>
+  <ol class="q16-opts"><li><code>/proc/4321/maps</code></li><li><code>/proc/4321/fd/</code> dizini</li><li><code>/proc/sys/fs/file-max</code></li><li><code>/proc/filesystems</code></li><li><code>/etc/fstab</code></li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> <code>/proc/4321/fd/</code> dizini</p>
+    <p><code>/proc/PID/fd/</code> altında her açık dosya tanımlayıcısı için bir sembolik bağ bulunur (0, 1, 2, 3 …); hedefi dosya yolunu ya da <code>socket:[…]</code> biçimini gösterir. <code>maps</code> bellek eşlemelerini, <code>file-max</code> sistem geneli sınırı, <code>filesystems</code> desteklenen dosya sistemi türlerini verir.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 16: Yanlış Eşleştirme" data-section="/proc ve Süreç Bilgisi">
+  <p class="ds-deck__kicker">Soru 16 · /proc ve Süreç Bilgisi</p>
+  <h2>Yanlış Eşleştirme</h2>
+  <div class="q16-q"><span class="q16-fmt">Çoktan seçmeli</span><p>Aşağıdaki <code>/proc</code> yolu ile içeriği eşleştirmelerinden hangisi <strong>yanlıştır</strong>?</p></div>
+  <ol class="q16-opts"><li><code>/proc/PID/maps</code> → sürecin sanal bellek bölgeleri (kod, öbek, yığın, kütüphaneler) ve izinleri</li><li><code>/proc/PID/status</code> → durum, PPid, uid/gid, bellek kullanımı gibi okunabilir özet</li><li><code>/proc/PID/cmdline</code> → süreci başlatan komut satırı argümanları</li><li><code>/proc/sys/vm/swappiness</code> → çalışırken okunup değiştirilebilen bir çekirdek parametresi</li><li><code>/proc/loadavg</code> → çekirdek sürümü ve derleyici bilgisi</li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: E)</strong> <code>/proc/loadavg</code> → çekirdek sürümü ve derleyici bilgisi</p>
+    <p><code>/proc/loadavg</code> son 1, 5 ve 15 dakikanın yük ortalamalarını ve çalışabilir/toplam görev sayısını verir. Çekirdek sürümü ve derleme bilgisi <code>/proc/version</code> dosyasındadır.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 17: /proc/self Kimi Gösterir?" data-section="/proc ve Süreç Bilgisi">
+  <p class="ds-deck__kicker">Soru 17 · /proc ve Süreç Bilgisi</p>
+  <h2>/proc/self Kimi Gösterir?</h2>
+  <div class="q16-q"><span class="q16-fmt">Kod izleme</span><p>Kabukta <code>echo $$</code> komutu <code>4100</code> yazdırıyor. Ardından aşağıdaki komut çalıştırılıyor. Çıkan <code>Pid</code> ve <code>PPid</code> değerleri için hangisi doğrudur?</p><pre style="margin:4px 0 0;font-size:13px">cat /proc/self/status | grep -E "^(Pid|PPid):"</pre></div>
+  <ol class="q16-opts"><li><code>Pid</code> 4100, <code>PPid</code> 1</li><li><code>Pid</code> cat’in PID’i (4100 değil), <code>PPid</code> 4100</li><li><code>Pid</code> grep’in PID’i, <code>PPid</code> cat’in PID’i</li><li><code>Pid</code> 4100, <code>PPid</code> 4100</li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> <code>Pid</code> cat’in PID’i (4100 değil), <code>PPid</code> 4100</p>
+    <p><code>/proc/self</code>, dosyayı açan sürecin kendi dizinidir; dosyayı <code>cat</code> açar. Kabuk boru hattındaki her komut için ayrı çocuk süreç oluşturduğundan <code>Pid</code> cat’in yeni PID’idir, <code>PPid</code> ise kabuğun PID’i olan <strong>4100</strong>’dür.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 18: Çekirdek Parametresini Değiştirmek" data-section="/proc ve Süreç Bilgisi">
+  <p class="ds-deck__kicker">Soru 18 · /proc ve Süreç Bilgisi</p>
+  <h2>Çekirdek Parametresini Değiştirmek</h2>
+  <div class="q16-q"><span class="q16-fmt">Çoktan seçmeli</span><p>Hangi komut, root olarak çalıştırıldığında <code>sysctl -w vm.swappiness=10</code> ile <strong>aynı</strong> etkiyi yapar?</p></div>
+  <ol class="q16-opts"><li><code>echo 10 &gt; /proc/sys/vm/swappiness</code></li><li><code>echo 10 &gt; /proc/meminfo</code></li><li><code>echo vm.swappiness=10 &gt;&gt; /proc/version</code></li><li><code>chmod 10 /proc/sys/vm</code></li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: A)</strong> <code>echo 10 &gt; /proc/sys/vm/swappiness</code></p>
+    <p>sysctl adındaki noktalar <code>/proc/sys</code> altındaki dizin ayırıcılarına karşılık gelir. Bu değişiklik bir sonraki açılışa kadar geçerlidir; kalıcı olması için <code>/etc/sysctl.d/</code> altındaki bir dosyaya yazılır. <code>meminfo</code> ve <code>version</code> salt okunurdur.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 19: Yetim Sürecin Ebeveyni" data-section="/proc ve Süreç Bilgisi">
+  <p class="ds-deck__kicker">Soru 19 · /proc ve Süreç Bilgisi</p>
+  <h2>Yetim Sürecin Ebeveyni</h2>
+  <div class="q16-q"><span class="q16-fmt">Doğru / Yanlış</span><p>Aşağıdaki ifade doğru mu, yanlış mı? Gerekçenizi yazın.</p><p><em>“Ebeveyni sonlanan ama kendisi çalışmaya devam eden bir sürecin PPID değeri 0 olur ve süreç ağacının dışında kalır.”</em></p></div>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Yanlış.</strong> Yetim süreç ölmeden önce yeniden ebeveynlenir: PID 1’e (systemd) ya da kendini “alt toplayıcı” ilan etmiş bir sürece devredilir; PPID buna göre güncellenir. Böylece çocuk bittiğinde onu <code>wait</code> ile toplayacak biri her zaman vardır. <code>pstree -p</code> ve <code>ps -ef --forest</code> bu ebeveyn–çocuk ilişkisini ağaç olarak gösterir.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 20: Her Şey Dosyadır" data-section="/proc ve Süreç Bilgisi">
+  <p class="ds-deck__kicker">Soru 20 · /proc ve Süreç Bilgisi</p>
+  <h2>Her Şey Dosyadır</h2>
+  <div class="q16-q"><span class="q16-fmt">Açık uçlu</span><p>Linux süreç ve çekirdek bilgisini neden özel sistem çağrıları yerine <code>/proc</code> ve <code>/sys</code> altında <em>dosya</em> olarak sunar? Bu tasarımın iki yararını ve bir sınırını yazın.</p></div>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <ul><li><strong>Yarar 1:</strong> aynı araçlar her yerde çalışır: <code>cat</code>, <code>grep</code>, kabuk betikleri, yönlendirme. Yeni bir bilgi için yeni sistem çağrısı gerekmez.</li><li><strong>Yarar 2:</strong> erişim denetimi dosya izinleriyle yapılır (ör. başka kullanıcının <code>/proc/PID/environ</code>’u okunamaz; <code>/proc/sys</code>’e yalnız root yazar).</li><li><strong>Sınır:</strong> metin biçimini her okumada ayrıştırmak yavaştır ve biçim değişirse araçlar bozulabilir; bazı aygıt işlemleri dosya modeline sığmaz ve <code>ioctl</code> gibi “kaçış kapılarına” yığılır.</li></ul>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 21: Sert ve Sembolik Bağ" data-section="Dosya Sistemleri">
+  <p class="ds-deck__kicker">Soru 21 · Dosya Sistemleri</p>
+  <h2>Sert ve Sembolik Bağ</h2>
+  <div class="q16-q"><span class="q16-fmt">Kod izleme</span><p>Komutlar sırayla çalıştırılıyor (<code>stat -c %h</code> sert bağ sayısını yazar). Çıktıyı yazın.</p></div>
+  <div class="ds-deck__two q16-side"><pre style="font-size:12.5px">echo veri &gt; a.txt
+ln a.txt b.txt
+ln -s a.txt c.txt
+stat -c %h b.txt
+rm a.txt
+stat -c %h b.txt
+cat b.txt
+cat c.txt</pre><div>  <ol class="q16-opts"><li>2, 1, veri, hata (c.txt sarkar)</li><li>2, 2, veri, veri</li><li>1, 1, hata, veri</li><li>2, 1, hata, hata</li></ol>
+<details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: A)</strong> 2, 1, veri, hata (c.txt sarkar)</p>
+    <p>Son satır: “Böyle bir dosya ya da dizin yok”. Sert bağ aynı i-node’a ikinci addır: <code>rm</code> bir adı siler, sayaç 1’e iner, veri kalır. Sembolik bağ hedefin <em>yolunu</em> tutar; hedef silinince sarkar.</p>
+</details></div></div>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 21: Adım Adım Çözüm" data-section="Dosya Sistemleri">
+  <p class="ds-deck__kicker">Soru 21 · Çözüm</p>
+  <h2>Adım Adım Çözüm</h2>
+  <p class="q16-given">i-node 500: verinin bulunduğu i-node. c.txt kendi i-node’u olan küçük bir dosyadır, içinde “a.txt” yolu yazar.</p>
+  <div class="ds-trace q16-tr">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="1" data-vars="a.txt=i500; nlink=1" data-out=""><p class="ds-deck__stepnote">a.txt oluşturulur; i-node 500, bağ sayısı 1.</p></div>
+<div class="ds-deck__step" data-line="2" data-vars="a.txt=i500; b.txt=i500; nlink=2" data-out=""><p class="ds-deck__stepnote">Sert bağ: b.txt dizine aynı i-node numarasıyla eklenir.</p></div>
+<div class="ds-deck__step" data-line="3" data-vars="a.txt=i500; b.txt=i500; c.txt=→a.txt; nlink=2" data-out=""><p class="ds-deck__stepnote">Sembolik bağ: ayrı bir i-node, içeriği hedef yol. i500’ün sayacı değişmez.</p></div>
+<div class="ds-deck__step" data-line="4" data-vars="nlink=2" data-out="2"><p class="ds-deck__stepnote">b.txt’nin i-node’unda bağ sayısı 2.</p></div>
+<div class="ds-deck__step" data-line="5,6" data-vars="b.txt=i500; c.txt=→a.txt; nlink=1" data-out="2
+1"><p class="ds-deck__stepnote">rm (unlink) a.txt adını siler; sayaç 1. Veri, sayaç 0 olana ve açık fd kalmayana kadar serbest bırakılmaz.</p></div>
+<div class="ds-deck__step" data-line="7" data-vars="b.txt=i500; nlink=1" data-out="2
+1
+veri"><p class="ds-deck__stepnote">b.txt veriye hâlâ ulaşır.</p></div>
+<div class="ds-deck__step" data-line="8" data-vars="b.txt=i500; c.txt=sarkık bağ" data-out="2
+1
+veri
+cat: c.txt: Böyle bir dosya ya da dizin yok"><p class="ds-deck__stepnote">c.txt “a.txt” yolunu çözmeye çalışır; ad yok: bağ sarkar.</p></div>
+</div>
+<pre class="ds-trace__code">echo veri &gt; a.txt
+ln a.txt b.txt
+ln -s a.txt c.txt
+stat -c %h b.txt
+rm a.txt
+stat -c %h b.txt
+cat b.txt
+cat c.txt</pre>
+<div class="ds-trace__col"><div class="ds-trace__vars"></div><div class="ds-trace__out"></div></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 22: Paylaşılan Dosya Konumu" data-section="Dosya Sistemleri">
+  <p class="ds-deck__kicker">Soru 22 · Dosya Sistemleri</p>
+  <h2>Paylaşılan Dosya Konumu</h2>
+  <div class="q16-q"><span class="q16-fmt">Hesaplama</span><p>Bir süreç <code>fd = open("kayit.dat", O_RDONLY)</code> yapıyor, ardından <code>read(fd, buf, 100)</code>. Sonra <code>fork()</code> çağrılıyor; çocuk <code>read(fd, buf, 40)</code> yapıp çıkıyor. Ebeveyn çocuğu bekledikten sonra <code>lseek(fd, 0, SEEK_CUR)</code> çağırırsa ne döner?</p></div>
+  <ol class="q16-opts"><li>100</li><li>140</li><li>40</li><li>0</li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> 140</p>
+    <p><strong>140</strong>. fork çocuğa tanımlayıcı tablosunun kopyasını verir, ama iki tablo da <em>aynı</em> açık dosya nesnesini (struct file) gösterir; konum (f_pos) bu nesnededir. Çocuğun 40 baytlık okuması ebeveynin konumunu da ilerletir. İlgisiz bir süreç dosyayı ayrıca açsaydı kendi konumu olurdu.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 23: ext4 Sıralı Günlükleme" data-section="Dosya Sistemleri">
+  <p class="ds-deck__kicker">Soru 23 · Dosya Sistemleri</p>
+  <h2>ext4 Sıralı Günlükleme</h2>
+  <div class="q16-q"><span class="q16-fmt">Çoktan seçmeli</span><p>ext4’ün varsayılan <code>data=ordered</code> kipinde bir dosyaya yazılıp <code>fsync</code> yapıldığında hangisi doğrudur?</p></div>
+  <ol class="q16-opts"><li>Veri de üst veri de önce günlüğe, sonra asıl yerlerine yazılır.</li><li>Veri blokları önce asıl yerlerine yazılır; üst veri (i-node, bit eşlem, extent) günlüğe bir işlem olarak yazılır ve commit kaydıyla kalıcı olur.</li><li>Hiçbir şey günlüğe yazılmaz; çökme sonrası tam fsck taraması yapılır.</li><li>Yalnızca veri blokları günlüğe yazılır; üst veri hiç korunmaz.</li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> Veri blokları önce asıl yerlerine yazılır; üst veri (i-node, bit eşlem, extent) günlüğe bir işlem olarak yazılır ve commit kaydıyla kalıcı olur.</p>
+    <p>Veri önce yazıldığı için üst veri hiçbir zaman çöp içeren bir bloğu göstermez. Çökme sonrası commit’li işlemler yeniden oynatılır, yarım kalanlar atılır; saniyeler içinde tutarlılık sağlanır. <code>data=journal</code> veriyi de günlüğe yazar (en güvenli, en yavaş).</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 24: st_ctime Oluşturma mı?" data-section="Dosya Sistemleri">
+  <p class="ds-deck__kicker">Soru 24 · Dosya Sistemleri</p>
+  <h2>st_ctime Oluşturma mı?</h2>
+  <div class="q16-q"><span class="q16-fmt">Doğru / Yanlış</span><p>Aşağıdaki ifade doğru mu, yanlış mı? Gerekçenizi yazın.</p><p><em>“<code>stat</code> çıktısındaki <code>st_ctime</code> alanı dosyanın oluşturulduğu (creation) zamanı gösterir.”</em></p></div>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Yanlış.</strong> <code>st_ctime</code> i-node’un son <em>değişme</em> (change) zamanıdır: izin, sahip, bağ sayısı ya da içerik değiştiğinde güncellenir. <code>st_mtime</code> son içerik değişikliği, <code>st_atime</code> son erişimdir. Oluşturma zamanı yalnızca <code>statx()</code> ile (<code>stx_btime</code>) ve destekleyen dosya sistemlerinde alınabilir.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 25: umask Hesabı" data-section="İzinler ve Konteynerler">
+  <p class="ds-deck__kicker">Soru 25 · İzinler ve Konteynerler</p>
+  <h2>umask Hesabı</h2>
+  <div class="q16-q"><span class="q16-fmt">Hesaplama</span><p><code>umask 033</code> iken (a) <code>touch not.txt</code> ile oluşan dosyanın ve (b) <code>mkdir arsiv</code> ile oluşan dizinin izinleri nedir? (c) “666 − 033 = 633” hesabı neden yanlıştır?</p></div>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <ul><li>(a) 666 &amp; ~033 = <strong>644</strong> → <code>rw-r--r--</code>.</li><li>(b) 777 &amp; ~033 = <strong>744</strong> → <code>rwxr--r--</code>.</li><li>(c) umask bir <strong>bit maskesidir</strong>: maskedeki bitler silinir, çıkarma yapılmaz. 033’ün x bitleri dosyada zaten yoktur; çıkarma 633’ü (<code>rw--wx-wx</code>) verir ve yanlış bitleri açar.</li></ul>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 25: Adım Adım Çözüm" data-section="İzinler ve Konteynerler">
+  <p class="ds-deck__kicker">Soru 25 · Çözüm</p>
+  <h2>Adım Adım Çözüm</h2>
+  <p class="q16-given">Yeni dosya 666, yeni dizin 777 ister; umask’ta 1 olan bitler kapatılır: istenen &amp; ~umask.</p>
+  <div class="ds-deck__steps q16-steps">
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 464 86" role="img" aria-label="İstenen 666" style="max-width:464px"><rect class="good" x="10" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="30" y="48" text-anchor="middle" style="font-size:15px">r</text><text class="lbl" x="30" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="good" x="56" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="76" y="48" text-anchor="middle" style="font-size:15px">w</text><text class="lbl" x="76" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="box" x="102" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="122" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="122" y="77" text-anchor="middle" style="font-size:12.5px">0</text><rect class="good" x="160" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="180" y="48" text-anchor="middle" style="font-size:15px">r</text><text class="lbl" x="180" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="good" x="206" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="226" y="48" text-anchor="middle" style="font-size:15px">w</text><text class="lbl" x="226" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="box" x="252" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="272" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="272" y="77" text-anchor="middle" style="font-size:12.5px">0</text><rect class="good" x="310" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="330" y="48" text-anchor="middle" style="font-size:15px">r</text><text class="lbl" x="330" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="good" x="356" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="376" y="48" text-anchor="middle" style="font-size:15px">w</text><text class="lbl" x="376" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="box" x="402" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="422" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="422" y="77" text-anchor="middle" style="font-size:12.5px">0</text><text class="lbl" x="76" y="15" text-anchor="middle" style="font-size:12.5px">sahip</text><text class="lbl" x="226" y="15" text-anchor="middle" style="font-size:12.5px">grup</text><text class="lbl" x="376" y="15" text-anchor="middle" style="font-size:12.5px">diğer</text></svg><p class="ds-deck__stepnote">Dosya için istenen izin 666 = <code>rw-rw-rw-</code>.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 464 86" role="img" aria-label="umask 033" style="max-width:464px"><rect class="box" x="10" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="30" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="30" y="77" text-anchor="middle" style="font-size:12.5px">0</text><rect class="box" x="56" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="76" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="76" y="77" text-anchor="middle" style="font-size:12.5px">0</text><rect class="box" x="102" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="122" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="122" y="77" text-anchor="middle" style="font-size:12.5px">0</text><rect class="box" x="160" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="180" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="180" y="77" text-anchor="middle" style="font-size:12.5px">0</text><rect class="hot" x="206" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="226" y="48" text-anchor="middle" style="font-size:15px">w</text><text class="lbl" x="226" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="hot" x="252" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="272" y="48" text-anchor="middle" style="font-size:15px">x</text><text class="lbl" x="272" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="box" x="310" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="330" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="330" y="77" text-anchor="middle" style="font-size:12.5px">0</text><rect class="hot" x="356" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="376" y="48" text-anchor="middle" style="font-size:15px">w</text><text class="lbl" x="376" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="hot" x="402" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="422" y="48" text-anchor="middle" style="font-size:15px">x</text><text class="lbl" x="422" y="77" text-anchor="middle" style="font-size:12.5px">1</text><text class="lbl" x="76" y="15" text-anchor="middle" style="font-size:12.5px">sahip</text><text class="lbl" x="226" y="15" text-anchor="middle" style="font-size:12.5px">grup</text><text class="lbl" x="376" y="15" text-anchor="middle" style="font-size:12.5px">diğer</text></svg><p class="ds-deck__stepnote">umask 033 = 000 011 011: grup ve diğerlerinde w ve x bitleri silinecek (turuncu).</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 464 86" role="img" aria-label="Dosya 644" style="max-width:464px"><rect class="good" x="10" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="30" y="48" text-anchor="middle" style="font-size:15px">r</text><text class="lbl" x="30" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="good" x="56" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="76" y="48" text-anchor="middle" style="font-size:15px">w</text><text class="lbl" x="76" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="box" x="102" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="122" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="122" y="77" text-anchor="middle" style="font-size:12.5px">0</text><rect class="good" x="160" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="180" y="48" text-anchor="middle" style="font-size:15px">r</text><text class="lbl" x="180" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="box" x="206" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="226" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="226" y="77" text-anchor="middle" style="font-size:12.5px">0</text><rect class="box" x="252" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="272" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="272" y="77" text-anchor="middle" style="font-size:12.5px">0</text><rect class="good" x="310" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="330" y="48" text-anchor="middle" style="font-size:15px">r</text><text class="lbl" x="330" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="box" x="356" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="376" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="376" y="77" text-anchor="middle" style="font-size:12.5px">0</text><rect class="box" x="402" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="422" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="422" y="77" text-anchor="middle" style="font-size:12.5px">0</text><text class="lbl" x="76" y="15" text-anchor="middle" style="font-size:12.5px">sahip</text><text class="lbl" x="226" y="15" text-anchor="middle" style="font-size:12.5px">grup</text><text class="lbl" x="376" y="15" text-anchor="middle" style="font-size:12.5px">diğer</text></svg><p class="ds-deck__stepnote">(a) 666 &amp; ~033: grup ve diğerlerinin w biti kapanır, x zaten yoktu → 644 = <code>rw-r--r--</code>.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 464 86" role="img" aria-label="Dizin 744" style="max-width:464px"><rect class="good" x="10" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="30" y="48" text-anchor="middle" style="font-size:15px">r</text><text class="lbl" x="30" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="good" x="56" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="76" y="48" text-anchor="middle" style="font-size:15px">w</text><text class="lbl" x="76" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="good" x="102" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="122" y="48" text-anchor="middle" style="font-size:15px">x</text><text class="lbl" x="122" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="good" x="160" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="180" y="48" text-anchor="middle" style="font-size:15px">r</text><text class="lbl" x="180" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="box" x="206" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="226" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="226" y="77" text-anchor="middle" style="font-size:12.5px">0</text><rect class="box" x="252" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="272" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="272" y="77" text-anchor="middle" style="font-size:12.5px">0</text><rect class="good" x="310" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="330" y="48" text-anchor="middle" style="font-size:15px">r</text><text class="lbl" x="330" y="77" text-anchor="middle" style="font-size:12.5px">1</text><rect class="box" x="356" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="376" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="376" y="77" text-anchor="middle" style="font-size:12.5px">0</text><rect class="box" x="402" y="24" width="40" height="36" rx="4"/><text class="txt mono" x="422" y="48" text-anchor="middle" style="font-size:15px">-</text><text class="lbl" x="422" y="77" text-anchor="middle" style="font-size:12.5px">0</text><text class="lbl" x="76" y="15" text-anchor="middle" style="font-size:12.5px">sahip</text><text class="lbl" x="226" y="15" text-anchor="middle" style="font-size:12.5px">grup</text><text class="lbl" x="376" y="15" text-anchor="middle" style="font-size:12.5px">diğer</text></svg><p class="ds-deck__stepnote">(b) Dizin: 777 &amp; ~033 → 744 = <code>rwxr--r--</code>. Grup ve diğerleri dizini listeleyebilir ama içine giremez (x yok).</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 26: Sembolik chmod" data-section="İzinler ve Konteynerler">
+  <p class="ds-deck__kicker">Soru 26 · İzinler ve Konteynerler</p>
+  <h2>Sembolik chmod</h2>
+  <div class="q16-q"><span class="q16-fmt">Hesaplama</span><p>İzni <code>rw-r-----</code> (640) olan bir dosyaya <code>chmod u+x,g+w,o+r dosya</code> uygulanıyor. Yeni izin sekizli ve sembolik olarak nedir?</p></div>
+  <ol class="q16-opts"><li><code>764</code>, <code>rwxrw-r--</code></li><li><code>751</code>, <code>rwxr-x--x</code></li><li><code>744</code>, <code>rwxr--r--</code></li><li><code>124</code>, <code>--x-w-r--</code></li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: A)</strong> <code>764</code>, <code>rwxrw-r--</code></p>
+    <p>Sembolik kip mevcut bitlere ekleme yapar: sahip <code>rw-</code> + x = <code>rwx</code> (7), grup <code>r--</code> + w = <code>rw-</code> (6), diğer <code>---</code> + r = <code>r--</code> (4) → <strong>764</strong>, <code>rwxrw-r--</code>. Sekizli <code>chmod 764</code> ise eski bitlere bakmadan doğrudan atama yapar.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 27: Özel İzin Bitleri" data-section="İzinler ve Konteynerler">
+  <p class="ds-deck__kicker">Soru 27 · İzinler ve Konteynerler</p>
+  <h2>Özel İzin Bitleri</h2>
+  <div class="q16-q"><span class="q16-fmt">Çoktan seçmeli</span><p>Sekizli izin ile <code>ls -l</code> gösterimi eşleştirmelerinden hangisi <strong>yanlıştır</strong>?</p></div>
+  <ol class="q16-opts"><li><code>4755</code> → <code>rwsr-xr-x</code> (setuid)</li><li><code>1777</code> → <code>rwxrwxrwt</code> (yapışkan bit)</li><li><code>2750</code> → <code>rwsr-x---</code> (setgid)</li><li><code>4644</code> → <code>rwSr--r--</code> (setuid, sahipte x yok)</li><li><code>0640</code> → <code>rw-r-----</code></li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: C)</strong> <code>2750</code> → <code>rwsr-x---</code> (setgid)</p>
+    <p>setgid (2xxx) <em>grup</em> üçlüsünün x yerinde görünür: 2750 → <code>rwxr-s---</code>. Küçük s/t altta x olduğunu, büyük S/T x olmadığını gösterir. Yapışkan bit /tmp’de herkesin yazıp yalnız kendi dosyasını silebilmesini sağlar.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 28: İzin Denetiminin Sırası" data-section="İzinler ve Konteynerler">
+  <p class="ds-deck__kicker">Soru 28 · İzinler ve Konteynerler</p>
+  <h2>İzin Denetiminin Sırası</h2>
+  <div class="q16-q"><span class="q16-fmt">Çoktan seçmeli</span><p><code>proje.txt</code> dosyasının izni <code>----rwxr--</code> (0074), sahibi <code>ali</code>, grubu <code>dev</code>. Ali de <code>dev</code> grubunun üyesi. <code>ali</code>, <code>veli</code> (dev üyesi) ve <code>ayse</code> (başka grup) dosyayı okumaya çalışıyor. Kimler okuyabilir?</p></div>
+  <ol class="q16-opts"><li>Üçü de</li><li>Yalnız veli ve ayse</li><li>Yalnız ali ve veli</li><li>Yalnız veli</li><li>Hiçbiri</li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> Yalnız veli ve ayse</p>
+    <p>Çekirdek ilk eşleşen sınıfa bakar: euid sahibe eşitse <em>yalnız</em> sahip bitleri (<code>---</code>) kullanılır ve grup üyeliği hiç denetlenmez → ali okuyamaz. veli grup bitlerini (<code>rwx</code>), ayse diğer bitlerini (<code>r--</code>) alır; ikisi de okur. (Sahip izni chmod ile kendine geri verebilir.)</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 29: Ad Alanı mı, cgroup mu?" data-section="İzinler ve Konteynerler">
+  <p class="ds-deck__kicker">Soru 29 · İzinler ve Konteynerler</p>
+  <h2>Ad Alanı mı, cgroup mu?</h2>
+  <div class="q16-q"><span class="q16-fmt">Çoktan seçmeli</span><p>Bir konteynerin (a) yalnızca kendi süreçlerini görmesini ve kendi içinde PID 1 olmasını, (b) en fazla 512 MB bellek kullanabilmesini hangi Linux özellikleri sağlar?</p></div>
+  <ol class="q16-opts"><li>(a) cgroup, (b) PID ad alanı</li><li>(a) PID ad alanı, (b) cgroup <code>memory.max</code></li><li>(a) seccomp, (b) chroot</li><li>(a) SELinux, (b) ulimit</li><li>(a) ve (b) ikisi de ağ ad alanı</li></ol>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> (a) PID ad alanı, (b) cgroup <code>memory.max</code></p>
+    <p>Ad alanları <em>ne görüleceğini</em> (PID, bağlama, ağ, ana makine adı, kullanıcı eşlemesi), cgroups <em>ne kadar kullanılacağını</em> (cpu.max, memory.max, pids.max) belirler. seccomp sistem çağrılarını, SELinux/AppArmor erişimi kısıtlar; hepsi birlikte konteyneri oluşturur.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 30: Konteynerdeki PID 1" data-section="İzinler ve Konteynerler">
+  <p class="ds-deck__kicker">Soru 30 · İzinler ve Konteynerler</p>
+  <h2>Konteynerdeki PID 1</h2>
+  <div class="q16-q"><span class="q16-fmt">Doğru / Yanlış</span><p>Aşağıdaki ifade doğru mu, yanlış mı? Gerekçenizi yazın.</p><p><em>“Konteyner içinde PID 1 olarak görünen uygulama, konak makinede de PID 1’dir ve konağın systemd sürecinin yerini alır.”</em></p></div>
+  <details class="ds-deck__answers q16-ans"><summary>Cevabı göster</summary>
+    <p><strong>Yanlış.</strong> PID ad alanı yalnızca bir <em>görünüm</em> sağlar: içeride PID 1 olan süreç konakta sıradan bir PID’e (ör. 48213) sahiptir; konaktaki PID 1 systemd’dir. Konteynerler konak çekirdeğini paylaşır: VM’den çok hafiftir, ama bir çekirdek açığı tüm konteynerleri etkileyebilir.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Özet: Sık Yapılan Hatalar" data-section="Özet">
+  <p class="ds-deck__kicker">Özet</p>
+  <h2>Özet: Sık Yapılan Hatalar</h2>
+  <ul class="ds-deck__small q16-mist"><li><code>uniq</code>’in tüm tekrarları saydığını sanmak: yalnız ardışık satırları birleştirir; önce <code>sort</code> gerekir.</li><li>Yönlendirme sırasını önemsiz saymak: <code>2&gt;&amp;1 &gt; dosya</code> ile <code>&gt; dosya 2&gt;&amp;1</code> farklıdır.</li><li>fork sonrası değişkenlerin paylaşıldığını düşünmek: bellek ayrıdır (COW); açık dosya nesnesi ve konumu ise paylaşılır.</li><li><code>/proc</code>’u diskteki bir dizin sanmak: çekirdeğin o anki durumunu üreten sanal dosya sistemidir; <code>/proc/self</code> onu açan süreçtir.</li><li>umask’ı izinden çıkarmak: umask bit temizler (istenen &amp; ~umask); 666 − 033 hesabı yanlış bitleri açar.</li><li>Sahibin grup veya diğer bitlerinden de yararlanabildiğini sanmak: ilk eşleşen sınıf (sahip → grup → diğer) kazanır.</li><li>Sert bağ ile sembolik bağı karıştırmak: sert bağ aynı i-node’dur, dosya sistemi sınırını aşamaz; sembolik bağ yolu tutar ve sarkabilir.</li></ul>
+</section>
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="Son" data-section="">
+  <h1>Son</h1>
+  <div class="ds-deck__subtitle">Bölüm 16: Linux</div>
+  <small>Dersin son çalışma seti</small>
+</section>
+
+      </div>
+
+      <div class="ds-deck__bar">
+        <button class="ds-deck__button" type="button" id="ds-deck-prev" aria-label="Önceki slayt">←</button>
+        <span class="ds-deck__counter" id="ds-deck-counter">1 / 1</span>
+        <button class="ds-deck__button" type="button" id="ds-deck-next" aria-label="Sonraki slayt">→</button>
+        <span class="ds-deck__section" id="ds-deck-section"></span>
+        <select class="ds-deck__select" id="ds-deck-jump" aria-label="Slayta git"></select>
+        <button class="ds-deck__button" type="button" id="ds-deck-full" aria-label="Tam ekran">⛶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="deck/deck.js"></script>
