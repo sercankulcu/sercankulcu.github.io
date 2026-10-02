@@ -11,41 +11,6 @@ location: "Giresun, Turkey"
 ![operating systems](/images/teaching/teaching-operating-systems.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
 Operating systems are a fundamental part of modern computing. Operating systems manage hardware resources and provide abstractions and services for application software. They coordinate processor time, memory, storage, devices, and communication while supporting protection, isolation, and controlled resource sharing. An operating system provides a platform for programs to run. It acts as a bridge between hardware and software applications. This ensures that applications can interact with hardware using a standardized interface. The operating system handles tasks like memory management, process scheduling, and input/output operations. Without it, a computer is just a collection of hardware components.
 
-## Ders Öğretim Planı
-[Ders Öğretim Planı (PDF)](../files/os/slides/Bolum_00_Ders_Ogretim_Planı.pdf)
-
----
-
-## Announcements
-
-No current announcements.
-
----
-
-## Course resources:
-
-- **ebook**  
-[Modern Operating Systems, Andrew S. Tanenbaum](https://www.amazon.com/Modern-Operating-Systems-Andrew-Tanenbaum/dp/013359162X) | 
-[Operating System Concepts — Abraham Silberschatz et al.](https://www.os-book.com/OS10/index.html) | 
-[Operating Systems: Three Easy Pieces](https://pages.cs.wisc.edu/~remzi/OSTEP)
-
-- **pdf**  
-[Bilgisayar İşletim Sistemleri, Ali Saatçi](../files/os/Book_Bilgisayar_İsletim_Sistemleri.pdf) | 
-[İşletim Sistemleri, İbrahim Türkoğlu](../files/os/Book_Firat_Isletim_Sistemleri.pdf) | 
-[Operating Systems, Bighnaraj Naik](../files/os/Book_Operating_Systems_Naik.pdf) | 
-[Putting the You in CPU](../files/os/Putting_the_You_in_CPU.pdf) | 
-[Operating Systems From 0 to 1](../files/os/Book_Operating_Systems_From_0_to_1.pdf)
-
-- **youtube**  
-[Kemal Bıçakcı](https://www.youtube.com/watch?v=sqtkwd09KXs&list=PLmPsb7nQhv7NLRWdIiDVNBDCMOtuUn6WZ) | 
-[Sadi Evren Şeker](https://www.youtube.com/watch?v=r2q_XRKrqHQ&list=PLh9ECzBB8tJO9eiwfQbcA2ThMbUSkbOWf) | 
-[Tuna Tuğcu](https://www.youtube.com/playlist?list=PLtZND_ssWL-urkZYXn9k4OpQ-73a5t6Qn) | 
-[CS 162 Berkeley](https://www.youtube.com/playlist?list=PLF2K2xZjNEf97A_uBCwEl61sdxWVP7VWC)
-
-- **website**  
-[CSCI-UA.202 Operating Systems](https://cs.nyu.edu/~gottlieb/courses/os202/class-notes.html) | 
-[Operating System Development](https://wiki.osdev.org/Main_Page)
-
 ---
 
 ## Preliminary Materials: 
