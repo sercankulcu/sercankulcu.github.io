@@ -27,7 +27,6 @@ The world of operating systems is introduced as a key aspect of modern computing
 As the bridge between hardware and software, operating systems serve as the foundation for modern computing, providing the necessary abstractions and services to enable applications to run efficiently and securely on diverse hardware platforms. 
 
 - [🖼️Sunum [TR] (HTML)](../files/os/slides/Bolum_01_Giris.html)
-- [🕹️Boot Process (HTML)](../files/os/slides/Chapter_01_Boot_Process.html)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter01/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01) 
@@ -40,10 +39,6 @@ As the bridge between hardware and software, operating systems serve as the foun
 The design and organization of an operating system's internal components and mechanisms, collectively referred to as its structure, play a critical role in determining its performance, reliability, and functionality.
 
 - [🖼️Sunum [TR] (HTML)](../files/os/slides/Bolum_02_Yapilar.html)
-- [🕹️Device Drivers (HTML)](../files/os/slides/Chapter_02_Device_Drivers.html) | 
-  [Kernel-User Mode (HTML)](../files/os/slides/Chapter_02_Kernel_and_User_Mode.html) | 
-  [System Calls (HTML)](../files/os/slides/Chapter_02_System_Calls.html) | 
-  [Virtualization (HTML)](../files/os/slides/Chapter_02_Virtualization.html)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter02/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab02) 
@@ -56,8 +51,6 @@ The design and organization of an operating system's internal components and mec
 Processes serve as the cornerstone of multi-tasking and concurrency, enabling multiple applications to execute simultaneously while sharing resources efficiently and securely.
 
 - [🖼️Sunum [TR] (HTML)](../files/os/slides/Bolum_03_Surecler.html)
-- [🕹️Concurrency (HTML)](../files/os/slides/Chapter_03_Concurrency.html) | 
-  [IPC (HTML)](../files/os/slides/Chapter_03_IPC.html)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter03/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab03) 
@@ -148,7 +141,6 @@ Virtual memory gives each process an isolated virtual address space and maps vir
 File systems organize named data and metadata and provide abstractions for storing, retrieving, protecting, and sharing information across persistent, networked, virtual, or memory-backed storage.
 
 - [🖼️Sunum [TR] (HTML)](../files/os/slides/Bolum_10_Dosya_Sistemleri.html)
-- [🕹️FS Implementation (HTML)](../files/os/slides/Chapter_10_File_System_Implementation.html)
 - 💻Lab:  
   - [java examples](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter10/src)
   - [c examples](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab10) 
@@ -210,9 +202,7 @@ With the growing demand for multimedia applications such as audio and video play
 Operating system design involves the careful consideration of a wide range of factors, including performance, reliability, security, compatibility, and usability, and requires a deep understanding of the underlying hardware and software components, as well as the needs and expectations of end-users and developers. 
 
 - [🖼️Sunum [TR] (HTML)](../files/os/slides/Bolum_15_Isletim_Sistemi_Tasarimi.html)
-- [🕹️RTOS (HTML)](../files/os/slides/Chapter_15_RTOS.html) | 
-  [Real-Time Scheduling Simulator (HTML)](../files/os/slides/Chapter_15_Real_Time_Scheduling.html) | 
-  [Testing and Debugging (HTML)](../files/os/slides/Chapter_15_Testing_Debugging.html)
+- [🕹️Real-Time Scheduling Simulator (HTML)](../files/os/slides/Chapter_15_Real_Time_Scheduling.html)
 - [🖋️Çalışma Soruları [TR] (HTML)](../files/os/slides/Bolum_15_Isletim_Sistemi_Tasarimi_Sorular.html)
 
 ---
