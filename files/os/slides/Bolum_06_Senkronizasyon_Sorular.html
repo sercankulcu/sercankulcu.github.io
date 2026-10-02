@@ -1,0 +1,564 @@
+---
+layout: without-sidebar
+title: "Bölüm 6: Senkronizasyon — Çalışma Soruları"
+permalink: /files/os/slides/Bolum_06_Senkronizasyon_Sorular.html
+excerpt: "İşletim Sistemleri dersi Bölüm 6 çalışma soruları: yarış durumu, kritik bölge koşulları, TSL ve Peterson kod izleme, spinlock ve meşgul bekleme, mutex ve semafor, semafor izleme, sınırlı tampon, okur-yazar, yemek yiyen filozoflar, öncelik terslemesi ve canlı kilit; cevaplı ve adım adım çözümlü."
+---
+
+<link rel="stylesheet" href="deck/deck.css">
+<style>
+.ds-deck .ds-deck__step > svg.ds-svg, .ds-deck .q06-fig > svg.ds-svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+.ds-deck .ds-deck__card strong { display: inline; margin: 0; font-size: inherit; }
+.ds-deck .ds-deck__card > strong:first-child { display: block; margin-bottom: 3px; font-size: 17px; }
+.ds-deck .ds-deck__card p { margin: 0 0 4px; }
+.ds-deck .ds-svg .soft { fill: var(--ds-surface-strong); stroke: var(--ds-border); stroke-width: 1.5; }
+.ds-deck .ds-svg .hot { fill: var(--ds-hot); stroke: #d4851a; stroke-width: 1.5; }
+.ds-deck .ds-svg .bad { fill: color-mix(in srgb, var(--ds-bad) 20%, var(--ds-bg)); stroke: var(--ds-bad); stroke-width: 1.5; }
+.ds-deck .ds-svg .good { fill: color-mix(in srgb, var(--ds-good) 20%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 1.5; }
+.ds-deck .ds-svg .mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-deck .ds-svg .q06-c1 { fill: color-mix(in srgb, #3b82f6 28%, var(--ds-bg)); stroke: #3b82f6; stroke-width: 1.5; }
+.ds-deck .ds-svg .q06-c2 { fill: color-mix(in srgb, #22a05a 28%, var(--ds-bg)); stroke: #22a05a; stroke-width: 1.5; }
+.ds-deck .ds-svg .q06-c3 { fill: color-mix(in srgb, #e9a23b 34%, var(--ds-bg)); stroke: #d4851a; stroke-width: 1.5; }
+.ds-deck .ds-svg .q06-c4 { fill: color-mix(in srgb, #8b5cf6 28%, var(--ds-bg)); stroke: #8b5cf6; stroke-width: 1.5; }
+.ds-deck .ds-svg .q06-c5 { fill: color-mix(in srgb, #e76f51 30%, var(--ds-bg)); stroke: #e76f51; stroke-width: 1.5; }
+.ds-deck .ds-svg .q06-idle { fill: var(--ds-surface-strong); stroke: var(--ds-border); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.ds-deck .ds-svg .q06-fut { fill: none; stroke: var(--ds-border); stroke-width: 1.2; stroke-dasharray: 5 4; }
+.ds-deck .ds-svg .q06-cur { stroke: #d4851a; stroke-width: 3; }
+.ds-deck .ds-svg .q06-now { stroke: var(--ds-accent); stroke-width: 1.6; stroke-dasharray: 5 3; fill: none; }
+.ds-deck .ds-svg .q06-t { fill: var(--ds-text); font: 600 13px system-ui, sans-serif; }
+.ds-deck .ds-svg .q06-tk { fill: var(--ds-muted); font: 12px system-ui, sans-serif; }
+.ds-deck .ds-svg .q06-acc { fill: var(--ds-accent); font: 700 13px system-ui, sans-serif; }
+.ds-deck .q06-q { margin: 0 0 8px; padding: 7px 12px; border-left: 4px solid var(--ds-accent); background: var(--ds-surface-strong); border-radius: 0 10px 10px 0; font-size: 16.5px; line-height: 1.42; }
+.ds-deck .q06-q p { margin: 0 0 4px; }
+.ds-deck .q06-q p:last-child { margin-bottom: 0; }
+.ds-deck .q06-fmt { display: inline-block; margin-right: 6px; padding: 0 8px; border: 1.5px solid var(--ds-border); border-radius: 999px; background: var(--ds-bg); color: var(--ds-muted); font-size: 12.5px; font-weight: 700; letter-spacing: .03em; vertical-align: 1px; }
+.ds-deck .ds-deck__slide ol.q06-opts { margin: 0; padding-left: 30px; list-style: upper-alpha; font-size: 16px; line-height: 1.35; }
+.ds-deck .ds-deck__slide ol.q06-opts li { margin: 3px 0; }
+.ds-deck .ds-deck__slide ol.q06-opts li::marker { font-weight: 700; }
+.ds-deck .q06-ans { margin-top: 10px; }
+.ds-deck .q06-ans p { margin: 6px 0 0; line-height: 1.4; }
+.ds-deck .q06-ans ul, .ds-deck .q06-ans ol { margin-top: 4px; padding-left: 20px; line-height: 1.36; }
+.ds-deck .q06-ans li { margin: 2px 0; }
+.ds-deck .q06-ans .ds-deck__table { font-size: 14px; margin-top: 6px; }
+.ds-deck .q06-ans .ds-deck__table td, .ds-deck .q06-ans .ds-deck__table th { padding: 3px 7px; }
+.ds-deck .q06-ok { color: var(--ds-good); font-weight: 700; }
+.ds-deck .q06-tight td, .ds-deck .q06-tight th { padding: 3px 8px; }
+.ds-deck .q06-tight { font-size: 14.5px; }
+.ds-deck .q06-given { margin: 0 0 6px; font-size: 15px; }
+.ds-deck .q06-tr { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); grid-template-areas: "code steps" "code col"; row-gap: 8px; align-items: start; }
+.ds-deck .q06-tr > .ds-trace__code { grid-area: code; }
+.ds-deck .q06-tr > .ds-deck__steps { grid-area: steps; }
+.ds-deck .q06-tr > .ds-trace__col { grid-area: col; }
+.ds-deck .q06-tr pre.ds-trace__code { font-size: 12.5px; }
+.ds-deck .q06-tr .ds-deck__step > svg.ds-svg { margin: 0; }
+.ds-deck .q06-tr .ds-deck__stepnote { min-height: 44px; font-size: 14.5px; line-height: 1.35; text-align: left; }
+.ds-deck .q06-tr .ds-deck__stepnav { margin-top: 2px; }
+.ds-deck .q06-steps .ds-deck__stepnote { font-size: 15px; line-height: 1.35; min-height: 42px; }
+.ds-deck .q06-mist li { margin: 3px 0; }
+.ds-deck .q06-side { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: start; gap: 14px; }
+.ds-deck .q06-side pre { margin: 0; }
+</style>
+
+<div class="ds-deck" id="ds-deck" lang="tr">
+  <div class="ds-deck__screen" id="ds-deck-screen" tabindex="0" aria-roledescription="sunum" aria-label="Bölüm 6: Senkronizasyon Çalışma Soruları sunumu">
+    <div class="ds-deck__stage" id="ds-deck-stage">
+      <div class="ds-deck__progress" aria-hidden="true"><span id="ds-deck-progress"></span></div>
+
+      <div class="ds-deck__viewport" aria-live="polite">
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="Bölüm 6: Senkronizasyon" data-section="">
+  <h1>Bölüm 6: Senkronizasyon</h1>
+  <div class="ds-deck__subtitle">İşletim Sistemleri · Çalışma Soruları</div>
+  <div class="ds-deck__agenda" aria-label="Soruların konuları"><span>Yarış Durumu ve Kritik Bölge</span><span>Donanım Desteği ve Spinlock</span><span>Semafor ve Mutex</span><span>Klasik Problemler</span><span>Öncelik Terslemesi ve Canlılık</span></div>
+  <small>Sercan KÜLCÜ · Giresun Üniversitesi</small>
+</section>
+
+<section class="ds-deck__slide" data-title="Nasıl çalışalım?" data-section="Giriş">
+  <p class="ds-deck__kicker">Giriş</p>
+  <h2>Nasıl Çalışalım?</h2>
+  <div class="ds-deck__grid ds-deck__grid--3 ds-deck__grid--roomy">
+    <div class="ds-deck__card"><strong>1 · Önce çözün</strong>Her slaytta bir soru var. Cevabı açmadan önce kâğıda kendi cevabınızı ve gerekçenizi yazın.</div>
+    <div class="ds-deck__card"><strong>2 · Sonra açın</strong>“Cevabı göster” kutusu doğru seçeneği ve kısa bir açıklamayı verir. Yanlış seçeneklerin neden yanlış olduğunu da düşünün.</div>
+    <div class="ds-deck__card"><strong>3 · Adım adım izleyin</strong>Hesap ve kod sorularından sonra gelen “Adım Adım Çözüm” slaytında ‹ › düğmeleriyle çözümü ilerletin.</div>
+  </div>
+  <p class="ds-deck__foot">Kod sorularında satırlar elle izlenir; her adım tek bir makine işlemi kabul edilir. Semaforlarda <code>wait</code> (P, down) değeri 1 azaltır ve sonuç negatifse çağıranı bloke eder; <code>signal</code> (V, up) değeri 1 artırır ve bekleyen varsa birini uyandırır.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 1: Kaybolan Artışlar" data-section="Yarış Durumu ve Kritik Bölge">
+  <p class="ds-deck__kicker">Soru 1 · Yarış Durumu ve Kritik Bölge</p>
+  <h2>Kaybolan Artışlar</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p>İki iş parçacığı, paylaşılan <code>sayac</code> değişkenini kilitsiz olarak 500’er kez artırıyor. Program her çalıştırmada 1000 yerine 734, 912 gibi farklı sonuçlar veriyor. Bu olgunun adı nedir?</p></div>
+  <ol class="q06-opts"><li>Kilitlenme (deadlock)</li><li>Yarış durumu (race condition)</li><li>Açlık (starvation)</li><li>Canlı kilit (livelock)</li><li>Öncelik terslemesi</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> Yarış durumu (race condition)</p>
+    <p>Sonuç, paylaşılan veriye eşzamanlı erişimlerin sırasına bağlıdır: <code>sayac++</code> oku–artır–yaz adımlarına ayrılır ve araya giren iş parçacığının güncellemesi kaybolur. Çözüm, artırmayı kritik bölge olarak korumak ya da atomik artırma kullanmaktır.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 2: Araya Girme İzleme" data-section="Yarış Durumu ve Kritik Bölge">
+  <p class="ds-deck__kicker">Soru 2 · Yarış Durumu ve Kritik Bölge</p>
+  <h2>Araya Girme İzleme</h2>
+  <div class="q06-q"><span class="q06-fmt">Kod izleme</span><p>Başlangıçta <code>sayac = 5</code>. T1 <code>sayac = sayac + 1</code>, T2 <code>sayac = sayac + 2</code> çalıştırır; her biri LOAD, ADD, STORE olarak derlenir. Sıra: T1 LOAD, T2 LOAD, T2 ADD, T2 STORE, T1 ADD, T1 STORE. Son değer nedir? Tüm olası son değerler nelerdir?</p></div>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p>Son değer <strong>6</strong>: T1 eski değeri (5) okuduğu için T2’nin yazdığı 7’nin üzerine 6 yazar; T2’nin güncellemesi kaybolur. Olası sonuçlar <strong>6, 7, 8</strong>’dir: sıralı çalışırlarsa 8, T1’in güncellemesi kaybolursa 7, T2’ninki kaybolursa 6.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 2: Adım Adım Çözüm" data-section="Yarış Durumu ve Kritik Bölge">
+  <p class="ds-deck__kicker">Soru 2 · Çözüm</p>
+  <h2>Adım Adım Çözüm</h2>
+  <p class="q06-given">Her satır tek bir makine işlemidir; R1 ve R2 iş parçacıklarının kendi yazmaçlarıdır.</p>
+  <div class="ds-trace q06-tr">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="" data-vars="sayac=5" data-out=""><p class="ds-deck__stepnote">Başlangıç: <code>sayac</code> = 5; iki iş parçacığı da artırma yapacak.</p></div>
+<div class="ds-deck__step" data-line="1" data-vars="sayac=5; R1=5" data-out=""><p class="ds-deck__stepnote">T1 değeri yazmacına okur (5). Ardından zamanlayıcı T2’ye geçer.</p></div>
+<div class="ds-deck__step" data-line="2" data-vars="sayac=5; R1=5; R2=5" data-out=""><p class="ds-deck__stepnote">T2 de 5 okur: iki iş parçacığı aynı eski değeri tutuyor.</p></div>
+<div class="ds-deck__step" data-line="3,4" data-vars="sayac=7; R1=5; R2=7" data-out=""><p class="ds-deck__stepnote">T2 artırır ve 7 yazar.</p></div>
+<div class="ds-deck__step" data-line="5,6" data-vars="sayac=6; R1=6; R2=7" data-out=""><p class="ds-deck__stepnote">T1 elindeki eski 5’i artırıp 6 yazar: T2’nin +2’si <strong>kayboldu</strong>.</p></div>
+</div>
+<pre class="ds-trace__code">T1: LOAD  R1, sayac
+T2: LOAD  R2, sayac
+T2: ADD   R2, 2
+T2: STORE sayac, R2
+T1: ADD   R1, 1
+T1: STORE sayac, R1</pre>
+<div class="ds-trace__col"><div class="ds-trace__vars"></div></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 3: Çözümün Üç Koşulu" data-section="Yarış Durumu ve Kritik Bölge">
+  <p class="ds-deck__kicker">Soru 3 · Yarış Durumu ve Kritik Bölge</p>
+  <h2>Çözümün Üç Koşulu</h2>
+  <div class="q06-q"><span class="q06-fmt">Açık uçlu</span><p>Kritik bölge problemine bir çözümün sağlaması gereken üç koşulu yazın. “Sınırlı bekleme” koşulunu kesin biçimde tanımlayın.</p></div>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <ol><li><strong>Karşılıklı dışlama:</strong> Aynı anda en fazla bir süreç kritik bölgesinde olabilir.</li><li><strong>İlerleme:</strong> Kritik bölgede kimse yokken, girmek isteyenler arasından seçim sonsuza ertelenemez ve seçime yalnızca girmek isteyenler katılır.</li><li><strong>Sınırlı bekleme:</strong> Bir süreç giriş isteğinde bulunduktan sonra, isteği karşılanana dek <em>diğer süreçlerin kritik bölgeye kaç kez girebileceğinin</em> bir üst sınırı vardır; bu açlığı önler.</li></ol>    <p>Ayrıca hiçbir varsayım CPU sayısı ya da hızı üzerine kurulmamalıdır.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 4: Kilit Gerekmeyen Durum" data-section="Yarış Durumu ve Kritik Bölge">
+  <p class="ds-deck__kicker">Soru 4 · Yarış Durumu ve Kritik Bölge</p>
+  <h2>Kilit Gerekmeyen Durum</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p>Bir yapılandırma tablosu program başlarken bir kez dolduruluyor, ardından 8 iş parçacığı onu yalnızca okuyor; tabloya bir daha yazılmıyor. Hangisi doğrudur?</p></div>
+  <ol class="q06-opts"><li>Her okuma bir mutex ile korunmalıdır, yoksa yarış durumu oluşur.</li><li>Okumalar için senkronizasyon gerekmez; hiçbir iş parçacığı veriyi değiştirmiyor.</li><li>Tablo bir semaforla korunmalı ve semaforun başlangıç değeri 0 olmalıdır.</li><li>Yalnızca tek çekirdekli makinelerde güvenlidir.</li><li>Okuyucular birbirini kilitlenmeye sokabilir.</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> Okumalar için senkronizasyon gerekmez; hiçbir iş parçacığı veriyi değiştirmiyor.</p>
+    <p>Yarış durumu için en az bir erişimin <strong>yazma</strong> olması gerekir. Yalnızca okunan veri eşzamanlı olarak güvenle paylaşılır (tablonun doldurulması iş parçacıkları başlamadan bitmiş olmalıdır).</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 5: Hangisi Eşzamanlılık Sorunu Değil?" data-section="Yarış Durumu ve Kritik Bölge">
+  <p class="ds-deck__kicker">Soru 5 · Yarış Durumu ve Kritik Bölge</p>
+  <h2>Hangisi Eşzamanlılık Sorunu Değil?</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p>Aşağıdakilerden hangisi eşzamanlı (concurrent) programlarda karşılaşılan bir sorun <strong>değildir</strong>?</p></div>
+  <ol class="q06-opts"><li>Kilitlenme</li><li>Canlı kilit</li><li>Yarış durumu</li><li>Açlık</li><li>Belady anomalisi</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: E)</strong> Belady anomalisi</p>
+    <p>Belady anomalisi FIFO sayfa değiştirmede çerçeve sayısı artarken sayfa hatasının da artabilmesidir (Bölüm 9); eşzamanlılıkla ilgisi yoktur. Diğer dördü birden çok iş parçacığının etkileşiminden doğar.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 6: Hangisi Senkronizasyon Aracı Değil?" data-section="Yarış Durumu ve Kritik Bölge">
+  <p class="ds-deck__kicker">Soru 6 · Yarış Durumu ve Kritik Bölge</p>
+  <h2>Hangisi Senkronizasyon Aracı Değil?</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p>Aşağıdakilerden hangisi bir senkronizasyon aracı (ilkeli) <strong>değildir</strong>?</p></div>
+  <ol class="q06-opts"><li>Sayan semafor</li><li>Monitör</li><li>Koşul değişkeni</li><li>Okur-yazar kilidi</li><li>Önbellek satırı (cache line)</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: E)</strong> Önbellek satırı (cache line)</p>
+    <p>Önbellek satırı, belleğin önbellekte taşındığı donanım birimidir; erişimi düzenlemez. Semafor, monitör, koşul değişkeni ve okur-yazar kilidi paylaşılan kaynağa erişimi koordine eden araçlardır.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 7: Kesmeleri Kapatmak" data-section="Yarış Durumu ve Kritik Bölge">
+  <p class="ds-deck__kicker">Soru 7 · Yarış Durumu ve Kritik Bölge</p>
+  <h2>Kesmeleri Kapatmak</h2>
+  <div class="q06-q"><span class="q06-fmt">Doğru / Yanlış</span><p>Aşağıdaki ifade doğru mu, yanlış mı? Gerekçenizi yazın.</p><p><em>“Kullanıcı programlarının kritik bölgeye girerken kesmeleri kapatması, hem tek hem çok çekirdekli sistemler için iyi bir çözümdür.”</em></p></div>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Yanlış.</strong> Kesmeleri kapatmak ayrıcalıklı bir işlemdir; kullanıcıya verilirse süreç bir daha açmayarak sistemi ele geçirebilir. Çok çekirdekte de işe yaramaz: yalnızca kendi çekirdeğindeki kesmeler kapanır, diğer çekirdekler belleğe erişmeye devam eder. Yöntem yalnızca çekirdeğin kendi içinde, çok kısa bölümler için kullanılır.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 8: Dönerek Bekleyen Kilit" data-section="Donanım Desteği ve Spinlock">
+  <p class="ds-deck__kicker">Soru 8 · Donanım Desteği ve Spinlock</p>
+  <h2>Dönerek Bekleyen Kilit</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p>Kilidi alamayan iş parçacığı uyumuyor; bir döngü içinde kilit değişkenini durmadan yeniden sınıyor. Bu davranış hangi yapıya özgüdür?</p></div>
+  <ol class="q06-opts"><li>Futex tabanlı mutex</li><li>Koşul değişkeni</li><li>Döngüsel kilit (spinlock)</li><li>Monitör</li><li>Mesaj kuyruğu</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: C)</strong> Döngüsel kilit (spinlock)</p>
+    <p>Spinlock <strong>meşgul bekleme</strong> (busy waiting) yapar: bekleyen CPU’yu bırakmaz. Mutex, koşul değişkeni ve monitörde bekleyen iş parçacığı uyutulur ve kuyruğa alınır; CPU başkasına verilir.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 9: Spinlock Ne Zaman Mantıklı?" data-section="Donanım Desteği ve Spinlock">
+  <p class="ds-deck__kicker">Soru 9 · Donanım Desteği ve Spinlock</p>
+  <h2>Spinlock Ne Zaman Mantıklı?</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p>Spinlock hangi durumda uyuyan bir mutex’ten <strong>daha uygun</strong> olur?</p></div>
+  <ol class="q06-opts"><li>Tek çekirdekli bir makinede, kilit uzun süre tutulurken</li><li>Kilit tutulurken disk G/Ç’si bekleniyorsa</li><li>Çok çekirdekli makinede, kritik bölge iki bağlam değiştirmeden daha kısa sürüyorsa</li><li>Kullanıcı arayüzü iş parçacığında, saniyelerce süren işlemlerde</li><li>Bekleyen iş parçacığı sayısı çok fazlaysa</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: C)</strong> Çok çekirdekli makinede, kritik bölge iki bağlam değiştirmeden daha kısa sürüyorsa</p>
+    <p>Kısa beklemede dönmek, uyuyup uyanmanın (iki bağlam değiştirme) maliyetinden ucuzdur. Tek çekirdekte dönen iş parçacığı kilidi tutanın çalışmasını engeller; uzun beklemede ise CPU çevrimleri boşa harcanır.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 10: TSL ile Kilit" data-section="Donanım Desteği ve Spinlock">
+  <p class="ds-deck__kicker">Soru 10 · Donanım Desteği ve Spinlock</p>
+  <h2>TSL ile Kilit</h2>
+  <div class="q06-q"><span class="q06-fmt">Kod izleme</span><p>Kilit <code>while (test_and_set(&amp;kilit)) ;</code> ile alınıyor, <code>kilit = 0</code> ile bırakılıyor (başlangıçta 0). T1 kilidi alıyor; ardından T2 deniyor ve T1 kilidi bırakana kadar 3 tur dönüyor; sonra T2 kilidi alıyor. Çalışan TSL çağrılarının döndürdüğü değerler sırasıyla nedir? T2 kaç kez TSL çalıştırır?</p></div>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p>Dönüş değerleri <strong>0, 1, 1, 1, 0</strong>. T1’in tek çağrısı 0 döner (kilit boştu, artık 1). T2’nin ilk üç çağrısı 1 döner (kilit dolu); T1 <code>kilit = 0</code> yaptıktan sonraki çağrı 0 döner. T2 toplam <strong>4</strong> kez TSL çalıştırır. TSL eski değeri döndürüp 1 yazmayı tek atomik adımda yapar.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 10: Adım Adım Çözüm" data-section="Donanım Desteği ve Spinlock">
+  <p class="ds-deck__kicker">Soru 10 · Çözüm</p>
+  <h2>Adım Adım Çözüm</h2>
+  <p class="q06-given">T1 ve T2 aynı fonksiyonları çağırır; TSL tek atomik komuttur.</p>
+  <div class="ds-trace q06-tr">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="1" data-vars="kilit=0" data-out=""><p class="ds-deck__stepnote">Kilit boş.</p></div>
+<div class="ds-deck__step" data-line="4" data-vars="kilit=1; T1 TSL=0" data-out="0"><p class="ds-deck__stepnote">T1: TSL 0 döndürür ve kilidi 1 yapar → döngüden çıkar, kritik bölgeye girer.</p></div>
+<div class="ds-deck__step" data-line="4,5" data-vars="kilit=1; T2 TSL=1" data-out="0 1"><p class="ds-deck__stepnote">T2: TSL 1 döner (kilit doluydu); 1 yeniden yazılır. T2 döner.</p></div>
+<div class="ds-deck__step" data-line="4,5" data-vars="kilit=1; T2 TSL=1" data-out="0 1 1 1"><p class="ds-deck__stepnote">T2 iki tur daha döner: CPU çevrimleri yararlı iş yapılmadan harcanır.</p></div>
+<div class="ds-deck__step" data-line="8" data-vars="kilit=0" data-out="0 1 1 1"><p class="ds-deck__stepnote">T1 kritik bölgeden çıkar: <code>kilit = 0</code>.</p></div>
+<div class="ds-deck__step" data-line="4" data-vars="kilit=1; T2 TSL=0" data-out="0 1 1 1 0"><p class="ds-deck__stepnote">T2’nin dördüncü TSL çağrısı 0 döner → T2 kritik bölgeye girer.</p></div>
+</div>
+<pre class="ds-trace__code">int kilit = 0;
+
+void gir(void) {
+  while (test_and_set(&amp;kilit))
+    ;  /* dön */
+}
+void cik(void) {
+  kilit = 0;
+}</pre>
+<div class="ds-trace__col"><div class="ds-trace__vars"></div><div class="ds-trace__out"></div></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 11: Peterson: Kim Girer?" data-section="Donanım Desteği ve Spinlock">
+  <p class="ds-deck__kicker">Soru 11 · Donanım Desteği ve Spinlock</p>
+  <h2>Peterson: Kim Girer?</h2>
+  <div class="q06-q"><span class="q06-fmt">Kod izleme</span><p>Peterson algoritmasında P0 ve P1 aynı anda girmek istiyor. Sıra: P0 <code>flag[0] = 1</code>; P1 <code>flag[1] = 1</code>; P1 <code>turn = 0</code>; P0 <code>turn = 1</code>; sonra ikisi de <code>while</code> koşulunu sınıyor. Kritik bölgeye hangisi girer, neden?</p></div>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>P1 girer.</strong> <code>turn</code>’e son yazan P0 olduğu için <code>turn = 1</code> kalır. P0’ın koşulu <code>flag[1] &amp;&amp; turn == 1</code> doğrudur → P0 bekler. P1’in koşulu <code>flag[0] &amp;&amp; turn == 0</code> yanlıştır → P1 girer. Sırayı karşıya son veren bekler; bu, ikisinin aynı anda girmesini engeller.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 11: Adım Adım Çözüm" data-section="Donanım Desteği ve Spinlock">
+  <p class="ds-deck__kicker">Soru 11 · Çözüm</p>
+  <h2>Adım Adım Çözüm</h2>
+  <p class="q06-given">i: kendi numarası, j = 1 − i: karşı taraf. Satırlar iki süreçte de aynı koddur.</p>
+  <div class="ds-trace q06-tr">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="1,2" data-vars="flag=[0, 0]; turn=?" data-out=""><p class="ds-deck__stepnote">Başlangıç: kimse girmek istemiyor.</p></div>
+<div class="ds-deck__step" data-line="6" data-vars="flag=[1, 0]; turn=?" data-out=""><p class="ds-deck__stepnote">P0 (i = 0) niyetini bildirir.</p></div>
+<div class="ds-deck__step" data-line="6" data-vars="flag=[1, 1]; turn=?" data-out=""><p class="ds-deck__stepnote">P1 (i = 1) de niyetini bildirir.</p></div>
+<div class="ds-deck__step" data-line="7" data-vars="flag=[1, 1]; turn=0" data-out=""><p class="ds-deck__stepnote">P1 sırayı P0’a verir: <code>turn = 0</code>.</p></div>
+<div class="ds-deck__step" data-line="7" data-vars="flag=[1, 1]; turn=1" data-out=""><p class="ds-deck__stepnote">P0 sırayı P1’e verir: <code>turn = 1</code> (son yazan P0).</p></div>
+<div class="ds-deck__step" data-line="8,9" data-vars="flag=[1, 1]; turn=1; P0=bekler" data-out=""><p class="ds-deck__stepnote">P0: <code>flag[1] = 1</code> ve <code>turn == 1</code> → koşul doğru, P0 döner.</p></div>
+<div class="ds-deck__step" data-line="8" data-vars="flag=[1, 1]; turn=1; P0=bekler; P1=KB" data-out=""><p class="ds-deck__stepnote">P1: <code>turn == 0</code> yanlış → döngüden çıkar ve kritik bölgeye girer.</p></div>
+<div class="ds-deck__step" data-line="11" data-vars="flag=[1, 0]; turn=1; P0=KB" data-out=""><p class="ds-deck__stepnote">P1 çıkınca <code>flag[1] = 0</code>; P0’ın koşulu yanlışlanır ve P0 girer.</p></div>
+</div>
+<pre class="ds-trace__code">int flag[2] = {0, 0};
+int turn;
+
+void gir(int i) {
+  int j = 1 - i;
+  flag[i] = 1;     /* niyetliyim */
+  turn = j;        /* sıra sende */
+  while (flag[j] &amp;&amp; turn == j)
+    ;
+}
+void cik(int i) { flag[i] = 0; }</pre>
+<div class="ds-trace__col"><div class="ds-trace__vars"></div></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 12: Peterson Bugün" data-section="Donanım Desteği ve Spinlock">
+  <p class="ds-deck__kicker">Soru 12 · Donanım Desteği ve Spinlock</p>
+  <h2>Peterson Bugün</h2>
+  <div class="q06-q"><span class="q06-fmt">Doğru / Yanlış</span><p>Aşağıdaki ifade doğru mu, yanlış mı? Gerekçenizi yazın.</p><p><em>“Peterson algoritması, modern çok çekirdekli işlemcilerde ek önlem almadan yazıldığı gibi doğru çalışır.”</em></p></div>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Yanlış.</strong> Derleyici ve işlemci, birbirinden bağımsız görünen <code>flag[i] = 1</code> yazmasıyla <code>flag[j]</code> okumasının sırasını değiştirebilir (yazma tamponu). İki süreç de karşının bayrağını 0 görüp birlikte girebilir. Doğru çalışması için bellek bariyeri ya da atomik (ör. <code>volatile</code>/<code>atomic</code>) değişkenler gerekir.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 13: CAS’ın Anlamı" data-section="Donanım Desteği ve Spinlock">
+  <p class="ds-deck__kicker">Soru 13 · Donanım Desteği ve Spinlock</p>
+  <h2>CAS’ın Anlamı</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p><code>compare_and_swap(&amp;v, beklenen, yeni)</code> komutu için hangisi doğrudur?</p></div>
+  <ol class="q06-opts"><li>v’yi her zaman <em>yeni</em> yapar ve hiçbir şey döndürmez.</li><li>v == beklenen ise v’ye yeni değeri yazar; her durumda v’nin eski değerini döndürür ve bunu tek atomik adımda yapar.</li><li>v’yi beklenen ile karşılaştırır, eşitse çağıranı uyutur.</li><li>Yalnızca tek çekirdekli işlemcilerde atomiktir.</li><li>Bir sistem çağrısıdır; çekirdek kipine geçmeden kullanılamaz.</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> v == beklenen ise v’ye yeni değeri yazar; her durumda v’nin eski değerini döndürür ve bunu tek atomik adımda yapar.</p>
+    <p>CAS, kilitsiz algoritmaların temelidir: <code>do { eski = v; } while (CAS(&amp;v, eski, eski + 1) != eski);</code> döngüsü araya başka yazma girerse yeniden dener. Kullanıcı kipinde çalışan sıradan bir komuttur (x86’da <code>LOCK CMPXCHG</code>).</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 14: Mutex ile Semafor" data-section="Semafor ve Mutex">
+  <p class="ds-deck__kicker">Soru 14 · Semafor ve Mutex</p>
+  <h2>Mutex ile Semafor</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p>Mutex ile sayan semafor arasındaki fark için en doğru ifade hangisidir?</p></div>
+  <ol class="q06-opts"><li>Semafor yalnızca 0 ve 1 değerlerini alabilir; mutex ise herhangi bir tamsayıyı.</li><li>Mutex’in sahibi vardır ve yalnızca kilitleyen açar; sayan semaforun sahibi yoktur ve değeri N özdeş kaynağı sayabilir.</li><li>Semafor her zaman meşgul bekleme yapar, mutex hiçbir zaman yapmaz.</li><li>Mutex yalnızca süreçler arasında, semafor yalnızca iş parçacıkları arasında kullanılır.</li><li>İkisi arasında kavramsal hiçbir fark yoktur.</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> Mutex’in sahibi vardır ve yalnızca kilitleyen açar; sayan semaforun sahibi yoktur ve değeri N özdeş kaynağı sayabilir.</p>
+    <p>Mutex karşılıklı dışlama için ikili bir kilittir (kilitli/açık) ve sahiplik taşır. Sayan semafor N’e kadar eşzamanlı erişime izin verebilir ve <code>signal</code>’ı başka bir iş parçacığı yapabilir; bu yüzden sıralama/haber verme için de kullanılır.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 15: Bağlantı Havuzu" data-section="Semafor ve Mutex">
+  <p class="ds-deck__kicker">Soru 15 · Semafor ve Mutex</p>
+  <h2>Bağlantı Havuzu</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p>Bir veritabanına aynı anda en fazla 5 bağlantı açılmasına izin verilecek. Her iş parçacığı bağlanmadan önce <code>wait(S)</code>, bağlantıyı kapatınca <code>signal(S)</code> çağırıyor. S’nin başlangıç değeri ne olmalıdır?</p></div>
+  <ol class="q06-opts"><li>0</li><li>1</li><li>4</li><li>5</li><li>6</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: D)</strong> 5</p>
+    <p>Sayan semaforun başlangıç değeri, aynı anda kullanılabilecek kaynak sayısıdır. 5 iş parçacığı geçer, altıncı <code>wait</code> değeri negatife düşürür ve bloke olur. Başlangıç 1 karşılıklı dışlama, 0 ise sıralama kalıbı içindir.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 16: Semafor İzleme" data-section="Semafor ve Mutex">
+  <p class="ds-deck__kicker">Soru 16 · Semafor ve Mutex</p>
+  <h2>Semafor İzleme</h2>
+  <div class="q06-q"><span class="q06-fmt">Hesaplama</span><p>Sayan semafor S = 2 ile başlıyor; bekleme kuyruklu gerçekleme kullanılıyor (değer negatife inebilir). Sıra: P1 wait, P2 wait, P3 wait, P4 wait, P1 signal, P5 wait, P2 signal. Sonunda S kaçtır? Kimler kaynağı kullanıyor, kimler bekliyor?</p></div>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p>Son değer <strong>S = −1</strong>. Kaynakta <strong>P3 ve P4</strong>, kuyrukta <strong>P5</strong> var. Negatif değerin mutlak değeri bekleyen süreç sayısına eşittir.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 16: Adım Adım Çözüm" data-section="Semafor ve Mutex">
+  <p class="ds-deck__kicker">Soru 16 · Çözüm</p>
+  <h2>Adım Adım Çözüm</h2>
+  <p class="q06-given">wait: S ← S − 1; S &lt; 0 ise bloke. signal: S ← S + 1; S ≤ 0 ise kuyruktan birini uyandır.</p>
+  <div class="ds-deck__steps q06-steps">
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 620 72" role="img" aria-label="Semafor durumu" style="max-width:620px"><text class="lbl" x="40" y="16" text-anchor="middle" style="font-size:13px">S</text><rect class="box" x="10" y="22" width="60" height="44" rx="6"/><text class="txt" x="40" y="51" text-anchor="middle" style="font-size:20px">2</text><text class="lbl" x="100" y="16" text-anchor="start" style="font-size:13px">Bekleme kuyruğu</text><rect class="soft" x="100" y="22" width="230" height="44" rx="6"/><text class="lbl" x="215" y="49" text-anchor="middle" style="font-size:13px">(boş)</text><text class="lbl" x="370" y="16" text-anchor="start" style="font-size:13px">Kritik bölgede / kaynakta</text><rect class="soft" x="370" y="22" width="230" height="44" rx="6"/><text class="lbl" x="485" y="49" text-anchor="middle" style="font-size:13px">(kimse yok)</text></svg><p class="ds-deck__stepnote">Başlangıç: S = 2, iki kaynak boşta.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 620 72" role="img" aria-label="Semafor durumu" style="max-width:620px"><text class="lbl" x="40" y="16" text-anchor="middle" style="font-size:13px">S</text><rect class="box" x="10" y="22" width="60" height="44" rx="6"/><text class="txt" x="40" y="51" text-anchor="middle" style="font-size:20px">0</text><text class="lbl" x="100" y="16" text-anchor="start" style="font-size:13px">Bekleme kuyruğu</text><rect class="soft" x="100" y="22" width="230" height="44" rx="6"/><text class="lbl" x="215" y="49" text-anchor="middle" style="font-size:13px">(boş)</text><text class="lbl" x="370" y="16" text-anchor="start" style="font-size:13px">Kritik bölgede / kaynakta</text><rect class="good" x="370" y="22" width="54" height="44" rx="6"/><text class="txt" x="397" y="49" text-anchor="middle" style="font-size:14px">P1</text><rect class="good" x="430" y="22" width="54" height="44" rx="6"/><text class="txt" x="457" y="49" text-anchor="middle" style="font-size:14px">P2</text></svg><p class="ds-deck__stepnote">P1 wait → 1, P2 wait → 0: ikisi de geçer.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 620 72" role="img" aria-label="Semafor durumu" style="max-width:620px"><text class="lbl" x="40" y="16" text-anchor="middle" style="font-size:13px">S</text><rect class="hot" x="10" y="22" width="60" height="44" rx="6"/><text class="txt" x="40" y="51" text-anchor="middle" style="font-size:20px">−2</text><text class="lbl" x="100" y="16" text-anchor="start" style="font-size:13px">Bekleme kuyruğu</text><rect class="bad" x="100" y="22" width="54" height="44" rx="6"/><text class="txt" x="127" y="49" text-anchor="middle" style="font-size:14px">P3</text><rect class="bad" x="160" y="22" width="54" height="44" rx="6"/><text class="txt" x="187" y="49" text-anchor="middle" style="font-size:14px">P4</text><text class="lbl" x="370" y="16" text-anchor="start" style="font-size:13px">Kritik bölgede / kaynakta</text><rect class="good" x="370" y="22" width="54" height="44" rx="6"/><text class="txt" x="397" y="49" text-anchor="middle" style="font-size:14px">P1</text><rect class="good" x="430" y="22" width="54" height="44" rx="6"/><text class="txt" x="457" y="49" text-anchor="middle" style="font-size:14px">P2</text></svg><p class="ds-deck__stepnote">P3 wait → −1, P4 wait → −2: ikisi de bloke olur ve kuyruğa girer.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 620 72" role="img" aria-label="Semafor durumu" style="max-width:620px"><text class="lbl" x="40" y="16" text-anchor="middle" style="font-size:13px">S</text><rect class="hot" x="10" y="22" width="60" height="44" rx="6"/><text class="txt" x="40" y="51" text-anchor="middle" style="font-size:20px">−1</text><text class="lbl" x="100" y="16" text-anchor="start" style="font-size:13px">Bekleme kuyruğu</text><rect class="bad" x="100" y="22" width="54" height="44" rx="6"/><text class="txt" x="127" y="49" text-anchor="middle" style="font-size:14px">P4</text><text class="lbl" x="370" y="16" text-anchor="start" style="font-size:13px">Kritik bölgede / kaynakta</text><rect class="good" x="370" y="22" width="54" height="44" rx="6"/><text class="txt" x="397" y="49" text-anchor="middle" style="font-size:14px">P2</text><rect class="good" x="430" y="22" width="54" height="44" rx="6"/><text class="txt" x="457" y="49" text-anchor="middle" style="font-size:14px">P3</text></svg><p class="ds-deck__stepnote">P1 signal → −1 (≤ 0): kuyruğun başındaki P3 uyandırılır ve kaynağı alır.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 620 72" role="img" aria-label="Semafor durumu" style="max-width:620px"><text class="lbl" x="40" y="16" text-anchor="middle" style="font-size:13px">S</text><rect class="hot" x="10" y="22" width="60" height="44" rx="6"/><text class="txt" x="40" y="51" text-anchor="middle" style="font-size:20px">−2</text><text class="lbl" x="100" y="16" text-anchor="start" style="font-size:13px">Bekleme kuyruğu</text><rect class="bad" x="100" y="22" width="54" height="44" rx="6"/><text class="txt" x="127" y="49" text-anchor="middle" style="font-size:14px">P4</text><rect class="bad" x="160" y="22" width="54" height="44" rx="6"/><text class="txt" x="187" y="49" text-anchor="middle" style="font-size:14px">P5</text><text class="lbl" x="370" y="16" text-anchor="start" style="font-size:13px">Kritik bölgede / kaynakta</text><rect class="good" x="370" y="22" width="54" height="44" rx="6"/><text class="txt" x="397" y="49" text-anchor="middle" style="font-size:14px">P2</text><rect class="good" x="430" y="22" width="54" height="44" rx="6"/><text class="txt" x="457" y="49" text-anchor="middle" style="font-size:14px">P3</text></svg><p class="ds-deck__stepnote">P5 wait → −2: P5 de kuyruğa girer.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 620 72" role="img" aria-label="Semafor durumu" style="max-width:620px"><text class="lbl" x="40" y="16" text-anchor="middle" style="font-size:13px">S</text><rect class="hot" x="10" y="22" width="60" height="44" rx="6"/><text class="txt" x="40" y="51" text-anchor="middle" style="font-size:20px">−1</text><text class="lbl" x="100" y="16" text-anchor="start" style="font-size:13px">Bekleme kuyruğu</text><rect class="bad" x="100" y="22" width="54" height="44" rx="6"/><text class="txt" x="127" y="49" text-anchor="middle" style="font-size:14px">P5</text><text class="lbl" x="370" y="16" text-anchor="start" style="font-size:13px">Kritik bölgede / kaynakta</text><rect class="good" x="370" y="22" width="54" height="44" rx="6"/><text class="txt" x="397" y="49" text-anchor="middle" style="font-size:14px">P3</text><rect class="good" x="430" y="22" width="54" height="44" rx="6"/><text class="txt" x="457" y="49" text-anchor="middle" style="font-size:14px">P4</text></svg><p class="ds-deck__stepnote">P2 signal → −1: P4 uyanır. Son durum: S = −1, kaynakta P3 ve P4, kuyrukta P5.</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 17: Semaforun Son Değeri" data-section="Semafor ve Mutex">
+  <p class="ds-deck__kicker">Soru 17 · Semafor ve Mutex</p>
+  <h2>Semaforun Son Değeri</h2>
+  <div class="q06-q"><span class="q06-fmt">Hesaplama</span><p>Başlangıç değeri 3 olan bir semaforda toplam 5 <code>wait</code> ve 2 <code>signal</code> işlemi yapılıyor (signal’ları kaynağı kullanmakta olan süreçler yapıyor). İşlemler hangi sırayla gelirse gelsin, sonunda semaforun değeri ve bekleyen süreç sayısı nedir?</p></div>
+  <ol class="q06-opts"><li>−2; 2 süreç bekler</li><li>0; kimse beklemez</li><li>0; 2 süreç bekler</li><li>1; kimse beklemez</li><li>Sıraya bağlıdır, söylenemez</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> 0; kimse beklemez</p>
+    <p>Değer 3 − 5 + 2 = <strong>0</strong>; her işlem değeri tam 1 değiştirdiği için sıra sonucu etkilemez. Değer negatif değilse kuyrukta kimse yoktur: <strong>bekleyen 0</strong>. (Sıra yalnızca ara durumları, örneğin kimin ne kadar beklediğini değiştirir.)</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 18: Sırayı Semaforla Kurmak" data-section="Semafor ve Mutex">
+  <p class="ds-deck__kicker">Soru 18 · Semafor ve Mutex</p>
+  <h2>Sırayı Semaforla Kurmak</h2>
+  <div class="q06-q"><span class="q06-fmt">Açık uçlu</span><p>P1’deki <code>A()</code> çağrısı, P2’deki <code>B()</code> çağrısından <strong>önce</strong> tamamlanmalı; süreçler herhangi bir sırayla başlayabilir. Tek bir semaforla çözümü yazın ve başlangıç değerini gerekçelendirin.</p></div>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+<pre>semafor s = 0;
+/* P1 */  A();  signal(s);
+/* P2 */  wait(s);  B();</pre>    <p>Başlangıç <strong>0</strong>: P2 önce gelirse <code>wait</code> onu bloke eder; P1 <code>A()</code>’yı bitirip <code>signal</code> yapınca P2 uyanır. P1 önce gelirse değer 1 olur ve P2 beklemeden geçer. Başlangıç 1 olsaydı P2 hiç beklemezdi.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 19: Ters Sıralı down" data-section="Semafor ve Mutex">
+  <p class="ds-deck__kicker">Soru 19 · Semafor ve Mutex</p>
+  <h2>Ters Sıralı down</h2>
+  <div class="q06-q"><span class="q06-fmt">Kod izleme</span><p>Sınırlı tamponlu üretici-tüketici çözümünde üretici yanlışlıkla önce <code>down(&amp;mutex)</code>, sonra <code>down(&amp;bos)</code> yapıyor (tüketici doğru sırada). Tampon tamamen doluyken üretici çalışırsa ne olur?</p></div>
+  <ol class="q06-opts"><li>Hiçbir şey olmaz; üretici bekler ve tüketici yer açınca devam eder.</li><li>Kilitlenme olur: üretici mutex’i tutarak bos’ta uyur, tüketici mutex’te bloke olur.</li><li>Tampon taşar ve bir öğe kaybolur.</li><li>Tüketici boş bir tampondan okur.</li><li>Üretici meşgul beklemeye girer ama sonunda devam eder.</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> Kilitlenme olur: üretici mutex’i tutarak bos’ta uyur, tüketici mutex’te bloke olur.</p>
+    <p><strong>Kilitlenme.</strong> Üretici mutex’i alır, <code>bos = 0</code> olduğu için <code>down(&amp;bos)</code>’ta mutex’i tutarak uyur. Tüketici <code>down(&amp;dolu)</code>’dan geçer ama <code>down(&amp;mutex)</code>’ta bloke olur. Üretici tüketicinin yer açmasını, tüketici üreticinin mutex’i bırakmasını bekler. Doğrusu önce sayan semafor, sonra mutex’tir.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 19: Adım Adım Çözüm" data-section="Semafor ve Mutex">
+  <p class="ds-deck__kicker">Soru 19 · Çözüm</p>
+  <h2>Adım Adım Çözüm</h2>
+  <p class="q06-given">N = 2’lik tampon dolu: <code>bos = 0</code>, <code>dolu = 2</code>, <code>mutex = 1</code>. Üreticide iki <code>down</code> yer değiştirmiş.</p>
+  <div class="ds-trace q06-tr">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="" data-vars="bos=0; dolu=2; mutex=1" data-out=""><p class="ds-deck__stepnote">Tampon dolu: üretici yer, tüketici mutex bekleyecek mi?</p></div>
+<div class="ds-deck__step" data-line="2" data-vars="bos=0; dolu=2; mutex=0" data-out=""><p class="ds-deck__stepnote">Üretici mutex’i alır (1 → 0).</p></div>
+<div class="ds-deck__step" data-line="3" data-vars="bos=0; dolu=2; mutex=0; üretici=uyur" data-out=""><p class="ds-deck__stepnote"><code>bos</code> 0 → üretici bloke olur, mutex’i <strong>bırakmadan</strong> uyur.</p></div>
+<div class="ds-deck__step" data-line="9" data-vars="bos=0; dolu=1; mutex=0; üretici=uyur" data-out=""><p class="ds-deck__stepnote">Tüketici çalışır: <code>dolu</code> 2 → 1, geçer.</p></div>
+<div class="ds-deck__step" data-line="10" data-vars="bos=0; dolu=1; mutex=0; üretici=uyur; tüketici=uyur" data-out=""><p class="ds-deck__stepnote"><code>mutex</code> 0 → tüketici de bloke olur. İkisi birbirini bekliyor: <strong>kilitlenme</strong>.</p></div>
+</div>
+<pre class="ds-trace__code">void uretici(void) {
+  down(&amp;mutex);   /* HATA: sıra ters */
+  down(&amp;bos);
+  koy(oge);
+  up(&amp;mutex);
+  up(&amp;dolu);
+}
+void tuketici(void) {
+  down(&amp;dolu);
+  down(&amp;mutex);
+  al();
+  up(&amp;mutex);
+  up(&amp;bos);
+}</pre>
+<div class="ds-trace__col"><div class="ds-trace__vars"></div></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 20: Koşul Değişkeninde Bekleme" data-section="Semafor ve Mutex">
+  <p class="ds-deck__kicker">Soru 20 · Semafor ve Mutex</p>
+  <h2>Koşul Değişkeninde Bekleme</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p>Bir iş parçacığı mutex’i tutarken <code>pthread_cond_wait(&amp;c, &amp;m)</code> çağırıyor. Bu çağrı ne yapar?</p></div>
+  <ol class="q06-opts"><li>Mutex’i tutmaya devam eder ve koşul doğru olana kadar döner.</li><li>Mutex’i atomik olarak bırakıp uyur; uyandırıldığında dönmeden önce mutex’i yeniden alır.</li><li>Mutex’i bırakır ve uyandığında mutex’siz devam eder.</li><li>Koşulu kendisi sınar; yanlışsa hata döndürür.</li><li>Diğer tüm bekleyenleri uyandırır.</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> Mutex’i atomik olarak bırakıp uyur; uyandırıldığında dönmeden önce mutex’i yeniden alır.</p>
+    <p>Bırakma ve uyuma tek atomik adımdır; böylece arada gelen <code>signal</code> kaybolmaz. Dönüşte mutex yeniden tutulduğundan koşul güvenle yeniden sınanabilir.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 21: if Yeterli mi?" data-section="Semafor ve Mutex">
+  <p class="ds-deck__kicker">Soru 21 · Semafor ve Mutex</p>
+  <h2>if Yeterli mi?</h2>
+  <div class="q06-q"><span class="q06-fmt">Doğru / Yanlış</span><p>Aşağıdaki ifade doğru mu, yanlış mı? Gerekçenizi yazın.</p><p><em>“Mesa anlamlı koşul değişkenlerinde <code>wait</code>’ten dönen iş parçacığı koşulun doğru olduğundan emin olabilir; bu yüzden <code>while</code> yerine <code>if</code> ile sınamak yeterlidir.”</em></p></div>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Yanlış.</strong> Mesa anlamında <code>signal</code> yalnızca bir ipucudur: uyanan iş parçacığı mutex’i yeniden alana kadar başka biri koşulu bozmuş olabilir; ayrıca sahte (spurious) uyanmalar olabilir. Koşul her zaman <code>while</code> döngüsünde yeniden sınanmalıdır.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 22: Yedi Filozof" data-section="Klasik Problemler">
+  <p class="ds-deck__kicker">Soru 22 · Klasik Problemler</p>
+  <h2>Yedi Filozof</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p>Yuvarlak masada 7 filozof ve aralarında 7 çatal var; her filozof yemek için sağındaki ve solundaki iki çatala ihtiyaç duyuyor. Aynı anda <strong>en fazla</strong> kaç filozof yemek yiyebilir?</p></div>
+  <ol class="q06-opts"><li>1</li><li>2</li><li>3</li><li>4</li><li>7</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: C)</strong> 3</p>
+    <p>Her yiyen filozof 2 çatal tutar ve yan yana iki filozof aynı anda yiyemez: ⌊7 / 2⌋ = <strong>3</strong>. Çatallar paylaşılan kaynakları, filozoflar bu kaynaklar için yarışan süreçleri temsil eder.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 23: Filozoflar ve Kilitlenme" data-section="Klasik Problemler">
+  <p class="ds-deck__kicker">Soru 23 · Klasik Problemler</p>
+  <h2>Filozoflar ve Kilitlenme</h2>
+  <div class="q06-q"><span class="q06-fmt">Açık uçlu</span><p>Her filozofun önce sol, sonra sağ çatalı aldığı naif çözüm neden kilitlenebilir? Kilitlenmeyi önleyen üç farklı yaklaşım yazın.</p></div>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p>Herkes aynı anda sol çatalını alırsa her filozof bir çatal tutup komşusunun çatalını bekler: döngüsel bekleme → <strong>kilitlenme</strong>.</p>    <ul><li><strong>Sıralama:</strong> Çatallar numaralanır, her filozof önce küçük numaralıyı alır (ya da bir filozof ters sırayla alır); döngü kırılır.</li><li><strong>Masaya en çok N − 1 kişi:</strong> Başlangıcı N − 1 olan bir semaforla oturanlar sınırlanır; en az biri iki çatalı alabilir.</li><li><strong>İkisini birden al:</strong> Filozof iki çatal da boşsa ikisini mutex altında atomik olarak alır; yoksa bekler (durum dizisi + filozof başına semafor).</li></ul>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 24: Okur Öncelikli Çözüm" data-section="Klasik Problemler">
+  <p class="ds-deck__kicker">Soru 24 · Klasik Problemler</p>
+  <h2>Okur Öncelikli Çözüm</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p>Okur öncelikli okur-yazar çözümünde üç okur veriyi okurken bir yazar geliyor; ardından sürekli yeni okurlar gelmeye devam ediyor. Ne olur?</p></div>
+  <ol class="q06-opts"><li>Yazar hemen girer, okurlar dışarı atılır.</li><li>Yeni okurlar da girebildiği için yazar süresiz bekleyebilir (yazar açlığı).</li><li>Okurlar ve yazar aynı anda çalışır.</li><li>Sistem kilitlenir.</li><li>Yeni gelen okurlar yazarın arkasında bekler.</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> Yeni okurlar da girebildiği için yazar süresiz bekleyebilir (yazar açlığı).</p>
+    <p>Okur öncelikli çözümde içeride okur olduğu sürece yeni okurlar beklemeden girer; okur akışı kesilmezse yazar hiç giremez. Yazar öncelikli çözüm bunu tersine çevirir ve okurları aç bırakabilir; adil çözümler geliş sırasını korur.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 25: Tur Sonu Buluşması" data-section="Klasik Problemler">
+  <p class="ds-deck__kicker">Soru 25 · Klasik Problemler</p>
+  <h2>Tur Sonu Buluşması</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p>4 iş parçacığı bir matrisin farklı satırlarını işliyor; bir sonraki tura ancak <strong>hepsi</strong> mevcut turu bitirdiğinde geçilebilir. Bunun için en uygun araç hangisidir?</p></div>
+  <ol class="q06-opts"><li>Spinlock</li><li>Bariyer (barrier)</li><li>Okur-yazar kilidi</li><li>İkili semafor ile karşılıklı dışlama</li><li>Atomik artırma</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> Bariyer (barrier)</p>
+    <p>Bariyer, katılımcıların tümü aynı noktaya gelene kadar her birini bekletir; son gelen hepsini serbest bırakır. Diğer araçlar karşılıklı dışlama ya da sayma sağlar, “herkes gelsin” koşulunu doğrudan kurmaz.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 26: Bir Ters Senaryo" data-section="Öncelik Terslemesi ve Canlılık">
+  <p class="ds-deck__kicker">Soru 26 · Öncelik Terslemesi ve Canlılık</p>
+  <h2>Bir Ters Senaryo</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p>Düşük öncelikli L bir kilidi tutuyor. Yüksek öncelikli H aynı kilidi isteyip bloke oluyor. Bu sırada kilitle ilgisi olmayan orta öncelikli M gelip uzun süre CPU’yu kullanıyor; H, M bitene kadar ilerleyemiyor. Bu durumun adı ve tipik çözümü nedir?</p></div>
+  <ol class="q06-opts"><li>Kilitlenme; süreçlerden biri sonlandırılır.</li><li>Öncelik terslemesi; öncelik kalıtımı (L geçici olarak H’nin önceliğini alır).</li><li>Konvoy etkisi; FCFS’e geçilir.</li><li>Canlı kilit; rastgele geri çekilme uygulanır.</li><li>Yarış durumu; kilit kaldırılır.</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> Öncelik terslemesi; öncelik kalıtımı (L geçici olarak H’nin önceliğini alır).</p>
+    <p>Yüksek öncelikli süreç, düşük öncelikli bir sürecin (ve onu kesen orta öncelikli işlerin) arkasında kalır: <strong>öncelik terslemesi</strong>. Öncelik kalıtımıyla L kilidi tutarken H’nin önceliğiyle çalışır, M onu kesemez.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 27: Terslemeyi Hesaplamak" data-section="Öncelik Terslemesi ve Canlılık">
+  <p class="ds-deck__kicker">Soru 27 · Öncelik Terslemesi ve Canlılık</p>
+  <h2>Terslemeyi Hesaplamak</h2>
+  <div class="q06-q"><span class="q06-fmt">Hesaplama</span><p>Kesmeli öncelik çizelgelemesi. L (düşük) t = 0’da kilidi alır, kritik bölgesi 3 birim sürer. H (yüksek) t = 1’de gelir, hemen kilidi ister; kilit alındıktan sonra 2 birim çalışır. M (orta) t = 2’de gelir, 6 birim çalışır, kilide ihtiyacı yoktur. Öncelik kalıtımı olmadan ve varken H kilidi kaç birim bekler, H ne zaman biter?</p></div>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <ul><li><strong>Kalıtım yok:</strong> L 0–2, M 2–8 (L’yi keser), L 8–9 kilidi bırakır, H 9–11. H <strong>8 birim</strong> bekler, t = 11’de biter.</li><li><strong>Kalıtım var:</strong> t = 1’de L, H’nin önceliğini alır; M onu kesemez. L 0–3, H 3–5, M 5–11. H <strong>2 birim</strong> bekler, t = 5’te biter.</li></ul>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 27: Adım Adım Çözüm" data-section="Öncelik Terslemesi ve Canlılık">
+  <p class="ds-deck__kicker">Soru 27 · Çözüm</p>
+  <h2>Adım Adım Çözüm</h2>
+  <p class="q06-given">KB: L’nin kilitli kritik bölgesi. Kırmızı: H’nin kilit için bloke kaldığı süre.</p>
+  <div class="ds-deck__steps q06-steps">
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 720 136" role="img" aria-label="Öncelik kalıtımı yokken zaman çizelgesi, t = 2" style="max-width:720px"><text class="txt" x="50" y="27" text-anchor="end" style="font-size:14px">H</text><path class="axis" d="M60 38 H700"/><rect class="bad" x="118.18" y="12" width="58.18" height="24" rx="0"/><text class="q06-t" x="147.27" y="29" text-anchor="middle" style="font-size:12px">bekler</text><text class="txt" x="50" y="63" text-anchor="end" style="font-size:14px">M</text><path class="axis" d="M60 74 H700"/><text class="txt" x="50" y="99" text-anchor="end" style="font-size:14px">L</text><path class="axis" d="M60 110 H700"/><rect class="hot" x="60" y="84" width="116.36" height="24" rx="0"/><text class="q06-t" x="118.18" y="101" text-anchor="middle" style="font-size:12px">KB</text><text class="q06-tk" x="60" y="128" text-anchor="middle" style="font-size:12px">0</text><text class="q06-tk" x="118.18" y="128" text-anchor="middle" style="font-size:12px">1</text><text class="q06-tk" x="176.36" y="128" text-anchor="middle" style="font-size:12px">2</text><text class="q06-tk" x="234.55" y="128" text-anchor="middle" style="font-size:12px">3</text><text class="q06-tk" x="292.73" y="128" text-anchor="middle" style="font-size:12px">4</text><text class="q06-tk" x="350.91" y="128" text-anchor="middle" style="font-size:12px">5</text><text class="q06-tk" x="409.09" y="128" text-anchor="middle" style="font-size:12px">6</text><text class="q06-tk" x="467.27" y="128" text-anchor="middle" style="font-size:12px">7</text><text class="q06-tk" x="525.45" y="128" text-anchor="middle" style="font-size:12px">8</text><text class="q06-tk" x="583.64" y="128" text-anchor="middle" style="font-size:12px">9</text><text class="q06-tk" x="641.82" y="128" text-anchor="middle" style="font-size:12px">10</text><text class="q06-tk" x="700" y="128" text-anchor="middle" style="font-size:12px">11</text><path class="q06-now" d="M176.36 4 L176.36 116"/></svg><p class="ds-deck__stepnote">t = 1: H gelir, kilidi ister ve bloke olur; L kritik bölgesine devam eder. t = 2’de M gelir.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 720 136" role="img" aria-label="Öncelik kalıtımı yokken zaman çizelgesi, t = 8" style="max-width:720px"><text class="txt" x="50" y="27" text-anchor="end" style="font-size:14px">H</text><path class="axis" d="M60 38 H700"/><rect class="bad" x="118.18" y="12" width="407.27" height="24" rx="0"/><text class="q06-t" x="321.82" y="29" text-anchor="middle" style="font-size:12px">bekler</text><text class="txt" x="50" y="63" text-anchor="end" style="font-size:14px">M</text><path class="axis" d="M60 74 H700"/><rect class="q06-c4" x="176.36" y="48" width="349.09" height="24" rx="0"/><text class="txt" x="50" y="99" text-anchor="end" style="font-size:14px">L</text><path class="axis" d="M60 110 H700"/><rect class="hot" x="60" y="84" width="116.36" height="24" rx="0"/><text class="q06-t" x="118.18" y="101" text-anchor="middle" style="font-size:12px">KB</text><text class="q06-tk" x="60" y="128" text-anchor="middle" style="font-size:12px">0</text><text class="q06-tk" x="118.18" y="128" text-anchor="middle" style="font-size:12px">1</text><text class="q06-tk" x="176.36" y="128" text-anchor="middle" style="font-size:12px">2</text><text class="q06-tk" x="234.55" y="128" text-anchor="middle" style="font-size:12px">3</text><text class="q06-tk" x="292.73" y="128" text-anchor="middle" style="font-size:12px">4</text><text class="q06-tk" x="350.91" y="128" text-anchor="middle" style="font-size:12px">5</text><text class="q06-tk" x="409.09" y="128" text-anchor="middle" style="font-size:12px">6</text><text class="q06-tk" x="467.27" y="128" text-anchor="middle" style="font-size:12px">7</text><text class="q06-tk" x="525.45" y="128" text-anchor="middle" style="font-size:12px">8</text><text class="q06-tk" x="583.64" y="128" text-anchor="middle" style="font-size:12px">9</text><text class="q06-tk" x="641.82" y="128" text-anchor="middle" style="font-size:12px">10</text><text class="q06-tk" x="700" y="128" text-anchor="middle" style="font-size:12px">11</text><path class="q06-now" d="M525.45 4 L525.45 116"/></svg><p class="ds-deck__stepnote">Kalıtım yok: M, L’den yüksek öncelikli olduğu için L’yi keser ve 6 birim çalışır. H, hiç ilgisi olmayan M’yi bekliyor.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 720 136" role="img" aria-label="Öncelik kalıtımı yokken zaman çizelgesi, tamamı" style="max-width:720px"><text class="txt" x="50" y="27" text-anchor="end" style="font-size:14px">H</text><path class="axis" d="M60 38 H700"/><rect class="bad" x="118.18" y="12" width="465.45" height="24" rx="0"/><text class="q06-t" x="350.91" y="29" text-anchor="middle" style="font-size:12px">bekler</text><rect class="q06-c2" x="583.64" y="12" width="116.36" height="24" rx="0"/><text class="txt" x="50" y="63" text-anchor="end" style="font-size:14px">M</text><path class="axis" d="M60 74 H700"/><rect class="q06-c4" x="176.36" y="48" width="349.09" height="24" rx="0"/><text class="txt" x="50" y="99" text-anchor="end" style="font-size:14px">L</text><path class="axis" d="M60 110 H700"/><rect class="hot" x="60" y="84" width="116.36" height="24" rx="0"/><text class="q06-t" x="118.18" y="101" text-anchor="middle" style="font-size:12px">KB</text><rect class="hot" x="525.45" y="84" width="58.18" height="24" rx="0"/><text class="q06-t" x="554.55" y="101" text-anchor="middle" style="font-size:12px">KB</text><text class="q06-tk" x="60" y="128" text-anchor="middle" style="font-size:12px">0</text><text class="q06-tk" x="118.18" y="128" text-anchor="middle" style="font-size:12px">1</text><text class="q06-tk" x="176.36" y="128" text-anchor="middle" style="font-size:12px">2</text><text class="q06-tk" x="234.55" y="128" text-anchor="middle" style="font-size:12px">3</text><text class="q06-tk" x="292.73" y="128" text-anchor="middle" style="font-size:12px">4</text><text class="q06-tk" x="350.91" y="128" text-anchor="middle" style="font-size:12px">5</text><text class="q06-tk" x="409.09" y="128" text-anchor="middle" style="font-size:12px">6</text><text class="q06-tk" x="467.27" y="128" text-anchor="middle" style="font-size:12px">7</text><text class="q06-tk" x="525.45" y="128" text-anchor="middle" style="font-size:12px">8</text><text class="q06-tk" x="583.64" y="128" text-anchor="middle" style="font-size:12px">9</text><text class="q06-tk" x="641.82" y="128" text-anchor="middle" style="font-size:12px">10</text><text class="q06-tk" x="700" y="128" text-anchor="middle" style="font-size:12px">11</text></svg><p class="ds-deck__stepnote">L 8–9’da kritik bölgeyi bitirip kilidi bırakır; H 9–11 çalışır. H’nin bekleme süresi 8 birim.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 720 136" role="img" aria-label="Öncelik kalıtımı varken zaman çizelgesi" style="max-width:720px"><text class="txt" x="50" y="27" text-anchor="end" style="font-size:14px">H</text><path class="axis" d="M60 38 H700"/><rect class="bad" x="118.18" y="12" width="116.36" height="24" rx="0"/><text class="q06-t" x="176.36" y="29" text-anchor="middle" style="font-size:12px">bekler</text><rect class="q06-c2" x="234.55" y="12" width="116.36" height="24" rx="0"/><text class="txt" x="50" y="63" text-anchor="end" style="font-size:14px">M</text><path class="axis" d="M60 74 H700"/><rect class="q06-c4" x="350.91" y="48" width="349.09" height="24" rx="0"/><text class="txt" x="50" y="99" text-anchor="end" style="font-size:14px">L</text><path class="axis" d="M60 110 H700"/><rect class="hot" x="60" y="84" width="174.55" height="24" rx="0"/><text class="q06-t" x="147.27" y="101" text-anchor="middle" style="font-size:12px">KB</text><text class="q06-tk" x="60" y="128" text-anchor="middle" style="font-size:12px">0</text><text class="q06-tk" x="118.18" y="128" text-anchor="middle" style="font-size:12px">1</text><text class="q06-tk" x="176.36" y="128" text-anchor="middle" style="font-size:12px">2</text><text class="q06-tk" x="234.55" y="128" text-anchor="middle" style="font-size:12px">3</text><text class="q06-tk" x="292.73" y="128" text-anchor="middle" style="font-size:12px">4</text><text class="q06-tk" x="350.91" y="128" text-anchor="middle" style="font-size:12px">5</text><text class="q06-tk" x="409.09" y="128" text-anchor="middle" style="font-size:12px">6</text><text class="q06-tk" x="467.27" y="128" text-anchor="middle" style="font-size:12px">7</text><text class="q06-tk" x="525.45" y="128" text-anchor="middle" style="font-size:12px">8</text><text class="q06-tk" x="583.64" y="128" text-anchor="middle" style="font-size:12px">9</text><text class="q06-tk" x="641.82" y="128" text-anchor="middle" style="font-size:12px">10</text><text class="q06-tk" x="700" y="128" text-anchor="middle" style="font-size:12px">11</text></svg><p class="ds-deck__stepnote">Kalıtım var: L, t = 1’den itibaren H’nin önceliğiyle çalışır, 3’te kilidi bırakır; H 3–5, M 5–11. H yalnızca 2 birim bekler.</p></div>
+  </div>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 28: Tersleme Bir Kilitlenme mi?" data-section="Öncelik Terslemesi ve Canlılık">
+  <p class="ds-deck__kicker">Soru 28 · Öncelik Terslemesi ve Canlılık</p>
+  <h2>Tersleme Bir Kilitlenme mi?</h2>
+  <div class="q06-q"><span class="q06-fmt">Doğru / Yanlış</span><p>Aşağıdaki ifade doğru mu, yanlış mı? Gerekçenizi yazın.</p><p><em>“Öncelik terslemesi bir kilitlenme türüdür; dışarıdan müdahale edilmezse ilgili süreçler sonsuza dek bekler.”</em></p></div>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Yanlış.</strong> Terslemede döngüsel bekleme yoktur: orta öncelikli işler bitince L çalışır, kilidi bırakır ve H ilerler. Sorun, H’nin <strong>sınırsız ve öngörülemez</strong> gecikmesidir; gerçek zamanlı sistemlerde son teslimlerin kaçmasına yol açar. Çözümler: öncelik kalıtımı, öncelik tavanı protokolü.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 29: Kibar İş Parçacıkları" data-section="Öncelik Terslemesi ve Canlılık">
+  <p class="ds-deck__kicker">Soru 29 · Öncelik Terslemesi ve Canlılık</p>
+  <h2>Kibar İş Parçacıkları</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p>İki iş parçacığı ikişer kilit istiyor. Her biri ikinci kilidi alamayınca elindekini bırakıp hemen yeniden deniyor. İkisi de sürekli çalışıyor ama hiçbiri işini bitiremiyor. Durumun adı ve uygun çözüm nedir?</p></div>
+  <ol class="q06-opts"><li>Kilitlenme; kaynak sıralaması</li><li>Canlı kilit (livelock); yeniden denemeden önce rastgele süre beklemek (geri çekilme)</li><li>Öncelik terslemesi; öncelik kalıtımı</li><li>Yarış durumu; atomik değişken</li><li>Açlık; yaşlanma</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: B)</strong> Canlı kilit (livelock); yeniden denemeden önce rastgele süre beklemek (geri çekilme)</p>
+    <p>Canlı kilitte süreçler bloke değildir, durum değiştirip dururlar ama ilerleme yoktur. Rastgele ya da üstel geri çekilme, iki tarafın aynı anda yeniden denemesini bozarak birinin ilerlemesini sağlar. Öncelik kalıtımı canlı kilidi değil terslemeyi çözer.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 30: Kilidin Yan Etkisi Değil" data-section="Öncelik Terslemesi ve Canlılık">
+  <p class="ds-deck__kicker">Soru 30 · Öncelik Terslemesi ve Canlılık</p>
+  <h2>Kilidin Yan Etkisi Değil</h2>
+  <div class="q06-q"><span class="q06-fmt">Çoktan seçmeli</span><p>Aşağıdakilerden hangisi kilit kullanımının yol açabileceği sorunlardan biri <strong>değildir</strong>?</p></div>
+  <ol class="q06-opts"><li>Kilitlenme</li><li>Öncelik terslemesi</li><li>Spinlock’ta meşgul bekleme ile CPU israfı</li><li>Kilit çekişmesi nedeniyle ölçeklenememe</li><li>Dış parçalanma</li></ol>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Doğru cevap: E)</strong> Dış parçalanma</p>
+    <p>Dış parçalanma bellek tahsisinin sorunudur (Bölüm 8). İlk dördü kilitlerin doğrudan sonuçlarıdır; çekişmeyi azaltmak için kritik bölgeler kısa tutulur ve kilitler inceltilir (ör. çekirdek başına sayaç).</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Soru 31: İki ATM" data-section="Öncelik Terslemesi ve Canlılık">
+  <p class="ds-deck__kicker">Soru 31 · Öncelik Terslemesi ve Canlılık</p>
+  <h2>İki ATM</h2>
+  <div class="q06-q"><span class="q06-fmt">Açık uçlu</span><p>Bir hesapta 1000 TL var. İki ATM aynı anda bu hesaptan 800’er TL çekmeye çalışıyor; her biri “bakiye ≥ tutar ise bakiye ← bakiye − tutar” yapıyor. Kritik bölgeyi belirleyin, hatalı bir araya girme senaryosu verin ve düzeltin.</p></div>
+  <details class="ds-deck__answers q06-ans"><summary>Cevabı göster</summary>
+    <p><strong>Kritik bölge:</strong> bakiyenin okunmasından, sınanmasından güncellenmesine kadar olan bölüm.</p>    <p><strong>Hata:</strong> ATM1 1000’i okuyup koşulu doğru bulur; araya ATM2 girer, o da 1000’i okur. İkisi de 800 öder: hesap −600’e düşer ya da bir güncelleme kaybolup bakiye 200 görünür.</p>    <p><strong>Düzeltme:</strong> sınama ve güncellemeyi aynı kilit altında tek bir bütün olarak yapmak (hesap başına mutex ya da veritabanı işlemi). Böylece ikinci ATM güncel 200’ü görür ve reddeder.</p>
+  </details>
+</section>
+
+<section class="ds-deck__slide" data-title="Özet: Sık Yapılan Hatalar" data-section="Özet">
+  <p class="ds-deck__kicker">Özet</p>
+  <h2>Özet: Sık Yapılan Hatalar</h2>
+  <ul class="ds-deck__small q06-mist"><li>Mutex ile ikili semaforu tamamen aynı sanmak: mutex’i yalnızca kilitleyen açar; semafora başka bir iş parçacığı <code>signal</code> verebilir.</li><li>Sayan semaforun başlangıç değerini 1 yazmak: değer, aynı anda izin verilen kaynak sayısıdır; sıralama kalıbında 0’dır.</li><li>Sınırlı tamponda <code>down</code> sırasını değiştirmek: önce sayan semafor, sonra mutex; ters sıra kilitlenme yaratır.</li><li>Koşul değişkenini <code>if</code> ile sınamak: Mesa anlamında daima <code>while</code>.</li><li>Spinlock’u tek çekirdekte ya da uzun beklemede kullanmak: CPU boşa döner, kilit sahibinin çalışması gecikir.</li><li>Öncelik terslemesini kilitlenme, canlı kilidi açlık sanmak; çözümleri karıştırmak (kalıtım ↔ geri çekilme).</li></ul>
+</section>
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="Son" data-section="">
+  <h1>Son</h1>
+  <div class="ds-deck__subtitle">Bölüm 6: Senkronizasyon</div>
+  <small>Sonraki: Bölüm 7 Çalışma Soruları</small>
+</section>
+
+      </div>
+
+      <div class="ds-deck__bar">
+        <button class="ds-deck__button" type="button" id="ds-deck-prev" aria-label="Önceki slayt">←</button>
+        <span class="ds-deck__counter" id="ds-deck-counter">1 / 1</span>
+        <button class="ds-deck__button" type="button" id="ds-deck-next" aria-label="Sonraki slayt">→</button>
+        <span class="ds-deck__section" id="ds-deck-section"></span>
+        <select class="ds-deck__select" id="ds-deck-jump" aria-label="Slayta git"></select>
+        <button class="ds-deck__button" type="button" id="ds-deck-full" aria-label="Tam ekran">⛶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="deck/deck.js"></script>
