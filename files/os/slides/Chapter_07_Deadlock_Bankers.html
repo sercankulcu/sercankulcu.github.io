@@ -2,492 +2,837 @@
 layout: without-sidebar
 title: "Deadlock & Banker's Algorithm Simulator"
 permalink: /files/os/slides/Chapter_07_Deadlock_Bankers.html
-excerpt: "An interactive deadlock and Banker's Algorithm simulator with allocation, maximum, need, available resources, safe-sequence analysis, and step-by-step checks."
+excerpt: "An interactive Banker's Algorithm simulator with Allocation, Max, Need and Available heat tables, an animated safety check, and step-by-step resource requests."
 ---
 
 <style>
-.bankers-lab{
-  --bk-line:var(--global-border-color);
-  --bk-accent:var(--global-link-color);
-  --bk-text:var(--global-text-color);
-  --bk-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
-  --bk-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
-  --bk-field:color-mix(in srgb,var(--global-text-color) 65%,var(--global-bg-color));
-  --bk-btn:color-mix(in srgb,var(--global-link-color) 62%,#000);
-  max-width:1180px;margin:0 auto;color:var(--bk-text);
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+body:has(.osim) .page__footer{display:none}
+body:has(.osim){padding-bottom:0 !important;margin-bottom:0 !important}
+body:has(.osim) .page__meta{display:none}
+.osim{
+  --o-bg:var(--global-bg-color,#fff);
+  --o-fg:var(--global-text-color,#333);
+  --o-link:var(--global-link-color,#2a7ab0);
+  --o-muted:color-mix(in srgb,var(--o-fg) 82%,var(--o-bg));
+  --o-line:color-mix(in srgb,var(--o-fg) 66%,var(--o-bg));
+  --o-soft:color-mix(in srgb,var(--o-fg) 16%,var(--o-bg));
+  --o-surf:color-mix(in srgb,var(--o-fg) 5%,var(--o-bg));
+  --o-cell:color-mix(in srgb,var(--o-fg) 9%,var(--o-bg));
+  --o-pri:color-mix(in srgb,var(--o-link) 62%,#000);
+  --o-acc:color-mix(in srgb,var(--o-link) 65%,var(--o-fg));
+  --o-hit:color-mix(in srgb,#0072b2 60%,var(--o-fg));
+  --o-flt:color-mix(in srgb,#d55e00 60%,var(--o-fg));
+  --o-hit-bg:color-mix(in srgb,var(--o-hit) 20%,var(--o-bg));
+  --o-flt-bg:color-mix(in srgb,var(--o-flt) 20%,var(--o-bg));
+  --o-dur:420ms;
+  position:relative;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;
+  height:var(--osim-h,calc(100vh - 112px));min-height:420px;padding:8px;border-radius:16px;
+  background:var(--o-surf);color:var(--o-fg);overflow:hidden;
+  font:15px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-variant-numeric:tabular-nums;
 }
-.bankers-lab *{box-sizing:border-box}
-.bankers-lab h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0}
-.bankers-lab .lead{max-width:900px;color:var(--bk-muted)}
-.bankers-lab .panel{margin-top:1rem;padding:1rem;border:1px solid var(--bk-line);border-radius:18px;background:var(--global-bg-color)}
-.bankers-lab .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
-.bankers-lab label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
-.bankers-lab input,.bankers-lab select,.bankers-lab button{
-  font:inherit;border:1px solid var(--bk-field);border-radius:10px;padding:.6rem .7rem;background:var(--global-bg-color);color:var(--bk-text);max-width:100%
+.osim *,.osim *::before,.osim *::after{box-sizing:border-box;transition:none}
+.osim [hidden]{display:none !important}
+.osim table,.osim thead,.osim tbody,.osim tr,.osim th,.osim td{color:var(--o-fg);background:transparent;border-color:var(--o-soft)}
+.osim:fullscreen{height:100vh;border-radius:0;padding:12px}
+.osim::backdrop{background:var(--o-bg)}
+.osim h1,.osim h3,.osim p{margin:0;padding:0}
+.osim .osim-title{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;line-height:1.1;white-space:nowrap;margin-right:4px;color:var(--o-fg)}
+.osim .osim-title svg{width:22px;height:22px;color:var(--o-acc)}
+.osim button{font:inherit;color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:9px;
+  height:34px;padding:0 11px;margin:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  font-weight:650;font-size:14px;line-height:1;white-space:nowrap;box-shadow:none}
+.osim button:hover{background:var(--o-cell)}
+.osim button:disabled{opacity:.45;cursor:not-allowed}
+.osim button:focus-visible,.osim input:focus-visible{outline:2px solid var(--o-fg);outline-offset:2px}
+.osim button.osim-pri,.osim button[aria-pressed="true"]{background:var(--o-pri);border-color:var(--o-pri);color:#fff;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--o-fg) 70%,transparent)}
+.osim .osim-ib{width:34px;padding:0}
+.osim svg{width:18px;height:18px;flex:none;overflow:visible}
+.osim svg.fi{fill:currentColor;stroke:none}
+.osim svg.st{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.osim .osim-bar{position:relative;display:flex;flex-direction:column;gap:7px;padding:8px 10px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0}
+.osim .osim-lbl{font-size:12px;font-weight:700;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em}
+.osim .osim-seg{display:inline-flex;border:1px solid var(--o-line);border-radius:10px;padding:2px;gap:2px;background:var(--o-bg)}
+.osim .osim-seg button{border:0;height:30px;border-radius:8px;padding:0 10px}
+.osim .osim-seg-sm button{padding:0 9px;font-size:13px}
+.osim .osim-grp{display:inline-flex;align-items:center;gap:3px}
+.osim .osim-num{min-width:22px;text-align:center;font-weight:800;font-size:17px}
+.osim .osim-spacer{flex:1}
+.osim input[type="range"]{width:78px;height:20px;padding:0;margin:0;border:0;background:transparent;box-shadow:none;accent-color:var(--o-pri);display:inline-block;vertical-align:middle}
+.osim .osim-speedv{font-size:13px;font-weight:700;min-width:34px}
+.osim .osim-alert{position:absolute;left:10px;top:calc(100% + 6px);z-index:30;max-width:min(560px,90%);padding:7px 11px;border-radius:9px;
+  background:var(--o-bg);color:var(--o-fg);border:2px solid var(--o-flt);font-size:13.5px;font-weight:650;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.osim .osim-alert:empty{display:none}
+.osim .osim-stage{position:relative;flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:8px}
+.osim .osim-viz{position:relative;min-width:0;min-height:0;overflow:hidden;background:var(--o-bg);border-radius:12px;padding:8px 10px;box-shadow:0 0 0 1px var(--o-soft);display:flex;flex-direction:column;gap:8px}
+.osim .osim-side{display:flex;flex-direction:column;gap:6px;min-height:0;min-width:0;padding:10px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft);overflow:hidden}
+.osim .osim-sh{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.osim .osim-sh b{font-size:14.5px}
+.osim .osim-sh span{font-size:12px;color:var(--o-muted);font-weight:650}
+.osim .osim-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:7px 10px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-narr{flex:1;min-width:220px;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.osim .osim-k{display:inline-block;padding:1px 7px;border-radius:6px;font-weight:800}
+.osim .osim-k.h{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-k.x{background:var(--o-flt-bg);box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .osim-stats{display:flex;gap:6px;flex-wrap:wrap}
+.osim .osim-stat{display:inline-flex;gap:5px;height:28px;align-items:center;padding:0 9px;border-radius:8px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft);font-size:12.5px;font-weight:650;color:var(--o-muted)}
+.osim .osim-stat b{font-size:15px;color:var(--o-fg)}
+.osim .osim-stat.h{box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-panel{position:absolute;z-index:20;top:0;right:0;bottom:0;width:min(420px,100%);display:flex;flex-direction:column;gap:10px;padding:12px 14px;
+  background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-line),0 10px 30px rgba(0,0,0,.22);overflow:auto}
+.osim .osim-panel[hidden]{display:none}
+.osim .osim-ph{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.osim .osim-ph b{font-size:15px}
+.osim .osim-ph span{font-size:12.5px;color:var(--o-muted);font-weight:650}
+.osim .osim-sub{font-size:12px;font-weight:750;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em}
+.osim .osim-help dl{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;margin:0;font-size:13.5px}
+.osim .osim-help dt{font-weight:800}
+.osim .osim-help dd{margin:0}
+.osim .osim-legend{display:flex;flex-wrap:wrap;gap:6px;font-size:12.5px;font-weight:650}
+.osim .osim-legend span{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:7px}
+.osim kbd{font:inherit;font-size:12px;font-weight:750;padding:1px 5px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--o-line)}
+.osim .osim-stage{grid-template-columns:minmax(0,1fr) 290px}
+
+/* ---- banker: vectors ---- */
+.osim .bk-top{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;flex:none}
+.osim .bk-vec{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:10px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft)}
+.osim .bk-vec>span{font-size:11.5px;font-weight:750;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em;margin-right:2px}
+.osim .bk-vec.work{box-shadow:inset 0 0 0 2px var(--o-acc);background:var(--o-bg)}
+.osim .bk-vec.req{box-shadow:inset 0 0 0 2px var(--o-pri);background:var(--o-bg)}
+.osim .vc{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:38px;height:42px;padding:0 4px;border-radius:7px;background:var(--o-bg);box-shadow:inset 0 0 0 1px var(--o-line)}
+.osim .vc i{font-style:normal;font-size:10.5px;font-weight:750;color:var(--o-muted);line-height:1}
+.osim .vc b{font-size:19px;font-weight:850;line-height:1.1}
+.osim .vc input{width:34px;height:22px;margin:0;padding:0;border:0;border-bottom:1.5px solid var(--o-line);border-radius:0;background:transparent;color:var(--o-fg);font:inherit;font-size:17px;font-weight:850;text-align:center;box-shadow:none}
+.osim .vc input[aria-invalid="true"],.osim .bk-c input[aria-invalid="true"]{background:var(--o-flt-bg);outline:2px dashed var(--o-flt)}
+.osim .vc .plus{position:absolute;top:-9px;right:-6px;padding:0 4px;border-radius:5px;background:var(--o-hit-bg);box-shadow:0 0 0 1.5px var(--o-hit);font-size:11px;font-weight:850;color:var(--o-fg)}
+.osim .vc .plus.on{animation:bk-up var(--o-dur) ease-out both}
+@keyframes bk-up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.osim .vc.ok,.osim .bk-c.ok{box-shadow:inset 0 0 0 2.5px var(--o-hit)}
+.osim .vc.no,.osim .bk-c.no{box-shadow:inset 0 0 0 2.5px var(--o-flt);background:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--o-flt) 14%,transparent) 5px 8px),var(--o-flt-bg)}
+.osim .vc.ok::after,.osim .vc.no::after,.osim .bk-c.ok::after,.osim .bk-c.no::after{position:absolute;top:2px;left:4px;font-size:10.5px;font-weight:900;line-height:1}
+.osim .vc.ok::after,.osim .bk-c.ok::after{content:"\2713"}
+.osim .vc.no::after,.osim .bk-c.no::after{content:"\2717"}
+.osim .vc.chg b,.osim .bk-c.chg b{animation:sy-pop2 var(--o-dur) ease-out}
+.osim .vc.chg,.osim .bk-c.chg{outline:2px dashed var(--o-acc);outline-offset:-4px}
+@keyframes sy-pop2{from{transform:scale(1.5)}to{transform:none}}
+.osim .bk-pill{margin-left:auto;align-self:center;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:9px;font-weight:800;font-size:14.5px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-line)}
+.osim .bk-pill.ok{background:var(--o-hit-bg);box-shadow:inset 0 0 0 2px var(--o-hit)}
+.osim .bk-pill.no{background:var(--o-flt-bg);box-shadow:inset 0 0 0 2px var(--o-flt)}
+
+/* ---- banker: matrix ---- */
+.osim .bk-mwrap{position:relative;flex:1;min-height:0;overflow:auto;scrollbar-width:thin}
+.osim .bk-m{display:grid;gap:3px;align-content:start;min-width:min-content}
+.osim .bk-h{display:flex;align-items:end;justify-content:center;font-size:12px;font-weight:800;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em;padding-bottom:2px;border-bottom:2px solid var(--o-line);white-space:nowrap}
+.osim .bk-h.r{border:0;font-size:12.5px;color:var(--o-fg);padding:0;align-items:center}
+.osim .bk-p{position:relative;display:flex;align-items:center;justify-content:flex-start;gap:4px;padding-left:4px;border-radius:7px;font-weight:850;font-size:15px}
+.osim .bk-p.cur{background:var(--o-pri);color:#fff}
+.osim .bk-c{position:relative;display:flex;align-items:center;justify-content:center;border-radius:7px;background:color-mix(in srgb,var(--o-link) var(--h,0%),var(--o-bg));box-shadow:inset 0 0 0 1px var(--o-soft);font-weight:800;font-size:var(--fs,17px)}
+.osim .bk-c input{width:100%;height:100%;margin:0;padding:0;border:0;background:transparent;color:var(--o-fg);-webkit-text-fill-color:currentColor;opacity:1;font:inherit;font-weight:800;text-align:center;box-shadow:none;border-radius:7px}
+.osim .bk-c input:hover{box-shadow:inset 0 0 0 1.5px var(--o-line)}
+.osim .bk-c input[readonly]{cursor:default}
+.osim .bk-c input[readonly]:hover{box-shadow:none}
+.osim .bk-c.need{box-shadow:inset 0 0 0 1px var(--o-line)}
+.osim .rowcur{outline:2.5px solid var(--o-acc);outline-offset:1px}
+.osim .bk-c.fin,.osim .bk-p.fin{background:var(--o-cell);color:color-mix(in srgb,var(--o-fg) 90%,var(--o-bg))}
+.osim .bk-c.fin input{color:color-mix(in srgb,var(--o-fg) 90%,var(--o-bg))}
+.osim .bk-c.rel{box-shadow:inset 0 0 0 2.5px var(--o-hit)}
+.osim .bk-s{display:flex;align-items:center;justify-content:flex-start;padding-left:6px;font-size:13px;font-weight:800;white-space:nowrap}
+.osim .bk-s .osim-k{padding:2px 7px}
+.osim .bk-seq{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:none;min-height:36px;padding:4px 8px;border-radius:10px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft)}
+.osim .bk-seq>span{font-size:11.5px;font-weight:750;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em}
+.osim .bk-seq b{display:inline-flex;align-items:center;height:26px;padding:0 9px;border-radius:7px;background:var(--o-hit-bg);box-shadow:inset 0 0 0 2px var(--o-hit);font-size:14px}
+.osim .bk-seq b.new{animation:bk-in var(--o-dur) ease-out both}
+.osim .bk-seq em{font-style:normal;font-weight:800;color:var(--o-muted)}
+.osim .bk-seq .no{background:var(--o-flt-bg);box-shadow:inset 0 0 0 2px var(--o-flt)}
+@keyframes bk-in{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+
+/* ---- banker: side ---- */
+.osim .bk-form{display:flex;flex-direction:column;gap:6px}
+.osim .bk-form .r1{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.osim .bk-form select{height:32px;font:inherit;font-weight:750;font-size:14px;color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:8px;padding:0 6px}
+.osim .bk-form .rv{display:flex;gap:4px;flex-wrap:wrap}
+.osim .bk-form .rv label{display:flex;flex-direction:column;align-items:center;font-size:11px;font-weight:750;color:var(--o-muted)}
+.osim .bk-form .rv input{width:34px;height:30px;margin:0;padding:0;text-align:center;font:inherit;font-weight:800;font-size:15px;color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:7px;box-shadow:none}
+.osim .bk-form .rv input[aria-invalid="true"]{border:2px dashed var(--o-flt);background:var(--o-flt-bg)}
+.osim .bk-list{display:flex;flex-direction:column;gap:3px}
+.osim .bk-li{display:grid;grid-template-columns:24px 1fr;gap:6px;align-items:center;padding:3px 5px;border-radius:7px;font-size:13px;font-weight:650}
+.osim .bk-li i{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px;font-weight:900;box-shadow:inset 0 0 0 1.5px var(--o-line);color:var(--o-muted)}
+.osim .bk-li.ok i{background:var(--o-hit-bg);box-shadow:inset 0 0 0 2px var(--o-hit);color:var(--o-fg)}
+.osim .bk-li.no i{background:var(--o-flt-bg);box-shadow:inset 0 0 0 2px var(--o-flt);color:var(--o-fg)}
+.osim .bk-li.on{background:var(--o-surf);box-shadow:inset 0 0 0 1.5px var(--o-acc);font-weight:800}
+.osim .bk-li.on i{color:var(--o-fg)}
+.osim .bk-cmpd{display:flex;flex-direction:column;gap:3px;padding:6px 8px;border-radius:9px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft);font-size:13.5px;font-weight:650}
+.osim .bk-cmpd b{font-size:14px}
+.osim .bk-cmpd .cr{display:grid;grid-template-columns:22px 1fr 22px;gap:4px;align-items:center}
+.osim .bk-cmpd .cr span:last-child{text-align:center;font-weight:900}
+.osim .bk-fl{display:flex;gap:4px;flex-wrap:wrap}
+.osim .bk-fl span{display:inline-flex;align-items:center;gap:3px;height:24px;padding:0 6px;border-radius:6px;font-size:12.5px;font-weight:800;box-shadow:inset 0 0 0 1px var(--o-line)}
+.osim .bk-fl span.ok{background:var(--o-hit-bg);box-shadow:inset 0 0 0 2px var(--o-hit)}
+.osim .bk-side-sub{font-size:12px;font-weight:750;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em}
+
+/* ---- compare ---- */
+.osim .bk-wi{border-collapse:separate;border-spacing:3px;font-size:13px}
+.osim .bk-wi th{font-weight:800;padding:2px 4px}
+.osim .bk-wi td{padding:0}
+.osim .bk-wi button{width:44px;height:30px;padding:0;font-size:13px;font-weight:850;border-radius:7px}
+.osim .bk-wi button.g{background:var(--o-hit-bg);box-shadow:inset 0 0 0 2px var(--o-hit);border:0}
+.osim .bk-wi button.d{background:var(--o-flt-bg);box-shadow:inset 0 0 0 2px var(--o-flt);border:0}
+.osim .bk-wi button.w{border:2px dashed var(--o-line)}
+.osim .bk-wi button.e{border:1px solid var(--o-soft);color:var(--o-muted)}
+.osim .bk-note{font-size:13px;font-weight:650}
+
+@media (min-width:1000px){.osim{width:min(1640px,calc(100vw - 48px));margin-left:calc(50% - min(820px,50vw - 24px))}}
+@media (min-width:1500px){.osim .osim-stage{grid-template-columns:minmax(0,1fr) 320px}}
+@media (max-width:1100px){.osim .osim-stage{grid-template-columns:minmax(0,1fr) 260px}.osim .osim-title span{display:none}}
+@media (max-width:900px){.osim .osim-stage{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 220px}}
+@media (max-width:600px){
+  .osim{height:auto;min-height:0;overflow:visible;padding:6px}
+  .osim .osim-stage{grid-template-rows:auto auto}
+  .osim .bk-mwrap{flex:none}
+  .osim .osim-side{height:auto}
+  .osim .bk-pill{margin-left:0}
+  .osim .bk-m{gap:2px}
+  .osim .bk-s .osim-k{font-size:0;padding:2px 4px}
+  .osim .bk-s .osim-k::first-letter{font-size:13px}
+  .osim .osim-spacer{display:none}
+  .osim .osim-seg{flex-wrap:wrap}
+  .osim .osim-narr{white-space:normal;min-width:0;flex-basis:100%}
+  .osim .osim-panel{position:fixed;inset:auto 6px 6px 6px;width:auto;max-height:80vh}
 }
-.bankers-lab button{cursor:pointer;font-weight:800}
-.bankers-lab button.primary{background:var(--bk-btn);color:#fff;border-color:var(--bk-btn)}
-.bankers-lab .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
-.bankers-lab .table-wrap{overflow-x:auto;margin-top:1rem}
-.bankers-lab table{width:100%;border-collapse:collapse;min-width:760px}
-.bankers-lab th,.bankers-lab td{border:1px solid var(--bk-line);padding:.5rem;text-align:center}
-.bankers-lab th{background:var(--bk-soft)}
-.bankers-lab td input{width:62px;text-align:center}
-.bankers-lab .vectors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem}
-.bankers-lab .vector{padding:.8rem;border:1px solid var(--bk-line);border-radius:14px;background:var(--bk-soft)}
-.bankers-lab .vector b{display:block;margin-bottom:.4rem}
-.bankers-lab .chips{display:flex;gap:.4rem;flex-wrap:wrap}
-.bankers-lab .chip{padding:.35rem .55rem;border-radius:999px;background:var(--global-bg-color);border:1px solid var(--bk-line);font-weight:800}
-.bankers-lab .status{padding:.85rem;border-radius:14px;border:1px solid var(--bk-line);background:var(--bk-soft);margin-top:1rem}
-.bankers-lab .status.good{border-left:5px solid #0f8a6a}
-.bankers-lab .status.bad{border-left:5px solid #b42318}
-.bankers-lab .steps{margin-top:1rem;display:grid;gap:.6rem}
-.bankers-lab .step{padding:.75rem;border:1px solid var(--bk-line);border-radius:12px;background:var(--global-bg-color)}
-.bankers-lab .step.done{background:var(--bk-soft)}
-.bankers-lab .note{color:var(--bk-muted);font-size:.88rem}
-.bankers-lab .status.wait{border-left:5px solid #b7791f}
-.bankers-lab .step.pending{display:none}
-.bankers-lab .step.good{border-left:5px solid #0f8a6a}
-.bankers-lab .step.bad{border-left:5px solid #b42318}
-.bankers-lab .step.wait{border-left:5px solid #b7791f}
-.bankers-lab .req-row{display:flex;flex-wrap:wrap;gap:.8rem;align-items:flex-end}
-.bankers-lab .req-row label{min-width:0}
-.bankers-lab .inline-in{display:inline-flex;flex-direction:row;align-items:center;gap:.3rem}
-.bankers-lab .inline-in input{width:68px}
-.bankers-lab .msg{margin-top:.8rem;padding:.7rem .85rem;border-radius:10px;border:1px solid #c0392b;border-left-width:5px;background:color-mix(in srgb,#c0392b 9%,var(--global-bg-color));font-weight:700}
-.bankers-lab .msg:empty{display:none}
-@media(max-width:900px){.bankers-lab .controls,.bankers-lab .vectors{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.bankers-lab .controls,.bankers-lab .vectors{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){
+  .osim *,.osim *::before,.osim *::after{animation:none !important;transition:none !important}
+}
 </style>
 
-<div class="bankers-lab">
-  <div>
-    <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--bk-accent)">Operating Systems · Chapter 7</div>
-    <h1>Deadlock & Banker’s Algorithm Simulator</h1>
-    <p class="lead">Edit Allocation, Maximum, and Available resources. The simulator computes Need = Maximum − Allocation and checks whether the system is in a safe state.</p>
+<div class="osim" id="osim-bk">
+  <div class="osim-bar">
+    <div class="osim-row">
+      <h1 class="osim-title"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 10l9-6 9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg><span>Banker’s Algorithm</span></h1>
+      <div class="osim-seg" role="group" aria-label="Mode" id="bk-modes">
+        <button type="button" data-mode="safety" title="Safety algorithm: find a safe sequence">Safety check</button>
+        <button type="button" data-mode="request" title="Resource-request algorithm for one process">Request</button>
+      </div>
+      <div class="osim-grp" role="group" aria-label="Playback">
+        <button type="button" class="osim-ib" data-act="first" aria-label="First step (Home)" title="First (Home)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="5" width="2.6" height="14" rx="1"/><path d="M13 6v12l-6-6z"/><path d="M20 6v12l-6-6z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="prev" aria-label="Previous step (Left arrow)" title="Back (&#8592;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="5" width="2.6" height="14" rx="1"/><path d="M18 6v12l-8-6z"/></svg></button>
+        <button type="button" class="osim-ib osim-pri" data-act="play" id="bk-play" aria-label="Play (Space)" title="Play / pause (Space)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path id="bk-playicon" d="M8 5l11 7-11 7z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="next" aria-label="Next step (Right arrow)" title="Step (&#8594;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6v12l8-6z"/><rect x="16.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+        <button type="button" class="osim-ib" data-act="last" aria-label="Last step (End)" title="Last (End)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6v12l6-6z"/><path d="M11 6v12l6-6z"/><rect x="17.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+      </div>
+      <div class="osim-grp">
+        <span class="osim-lbl" id="bk-speed-l">Speed</span>
+        <input type="range" id="bk-speed" min="0" max="6" step="1" value="2" aria-labelledby="bk-speed-l" aria-valuetext="1 step per second">
+        <span class="osim-speedv" id="bk-speedv">1/s</span>
+      </div>
+      <span class="osim-spacer"></span>
+      <button type="button" data-act="compare" id="bk-cmpbtn" aria-expanded="false" aria-controls="bk-compare"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 20h16M7 16v-5M12 16V6M17 16v-8"/></svg>What-if</button>
+      <button type="button" class="osim-ib" data-act="help" id="bk-helpbtn" aria-expanded="false" aria-controls="bk-help" aria-label="Help and legend" title="Help">?</button>
+      <button type="button" class="osim-ib" data-act="fs" id="bk-fs" aria-label="Fullscreen" title="Fullscreen"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path id="bk-fsicon" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    </div>
+    <div class="osim-row">
+      <span class="osim-lbl">Scenario</span>
+      <div class="osim-seg osim-seg-sm" role="group" aria-label="Scenario" id="bk-scen">
+        <button type="button" data-scen="classic" title="Textbook example: 5 processes, A B C">Classic</button>
+        <button type="button" data-scen="unsafe" title="No process can finish">Unsafe</button>
+        <button type="button" data-scen="simple" title="3 processes, 2 resources">Small</button>
+        <button type="button" data-scen="random" title="Random safe-or-unsafe state">Random</button>
+      </div>
+      <div class="osim-grp" role="group" aria-label="Processes" title="Processes (1–10)">
+        <span class="osim-lbl">Processes</span>
+        <button type="button" class="osim-ib" data-act="pminus" aria-label="Fewer processes"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 12h12"/></svg></button>
+        <span class="osim-num" id="bk-p" aria-live="polite">5</span>
+        <button type="button" class="osim-ib" data-act="pplus" aria-label="More processes"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6v12M6 12h12"/></svg></button>
+      </div>
+      <div class="osim-grp" role="group" aria-label="Resource types" title="Resource types (1–10)">
+        <span class="osim-lbl">Resources</span>
+        <button type="button" class="osim-ib" data-act="rminus" aria-label="Fewer resource types"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 12h12"/></svg></button>
+        <span class="osim-num" id="bk-r" aria-live="polite">3</span>
+        <button type="button" class="osim-ib" data-act="rplus" aria-label="More resource types"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6v12M6 12h12"/></svg></button>
+      </div>
+    </div>
+    <div class="osim-alert" id="bk-alert" role="alert"></div>
   </div>
 
-  <section class="panel">
-    <div class="controls">
-      <label>Processes
-        <input id="procCount" type="number" min="1" max="10" step="1" value="5">
-      </label>
-      <label>Resource types
-        <input id="resCount" type="number" min="1" max="10" step="1" value="3">
-      </label>
-      <label>Scenario
-        <select id="scenario">
-          <option value="classic">Classic safe example</option>
-          <option value="unsafe">Unsafe example</option>
-          <option value="simple">Small example</option>
-        </select>
-      </label>
-      <label>&nbsp;
-        <button id="loadScenario">Load scenario</button>
-      </label>
+  <div class="osim-stage">
+    <div class="osim-viz" id="bk-viz">
+      <div class="bk-top" id="bk-top"></div>
+      <div class="bk-mwrap" id="bk-mwrap"><div class="bk-m" id="bk-m" role="table" aria-label="Allocation, Max and Need matrices"></div></div>
+      <div class="bk-seq" id="bk-seq" aria-label="Safe sequence"></div>
     </div>
-    <div class="actions">
-      <button id="rebuild">Rebuild blank</button>
-      <button id="analyze" class="primary">Analyze safety</button>
-      <button id="step">Next Banker step</button>
-      <button id="resetSteps">Reset steps</button>
+    <aside class="osim-side" aria-label="Algorithm state" id="bk-side"></aside>
+    <div class="osim-panel" id="bk-compare" hidden aria-label="What-if requests"></div>
+    <div class="osim-panel osim-help" id="bk-help" hidden aria-label="Help">
+      <div class="osim-ph"><b>Help</b><button type="button" class="osim-ib" data-act="help" aria-label="Close help"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <dl>
+        <dt>Need</dt><dd>Max − Allocation</dd>
+        <dt>Work</dt><dd>Starts as Available; a finishing process returns its Allocation.</dd>
+        <dt>Safe</dt><dd>Some order lets every process finish.</dd>
+        <dt>Unsafe</dt><dd>No such order; deadlock is possible, not certain.</dd>
+        <dt>Scan</dt><dd>P0, P1, … in order; passes repeat until no progress.</dd>
+        <dt>Request</dt><dd>≤ Need, else error. ≤ Available, else wait. Pretend to allocate; keep only if safe.</dd>
+      </dl>
+      <div class="osim-sub">Legend</div>
+      <div class="osim-legend">
+        <span style="background:color-mix(in srgb,var(--o-link) 34%,var(--o-bg))">darker = larger value</span>
+        <span style="box-shadow:inset 0 0 0 2px var(--o-hit)">&#10003; fits</span>
+        <span style="background:var(--o-flt-bg);box-shadow:inset 0 0 0 2px var(--o-flt)">&#10007; too large</span>
+        <span style="outline:2px dashed var(--o-acc);outline-offset:-3px">changed</span>
+        <span style="background:var(--o-cell)">finished</span>
+      </div>
+      <div class="osim-sub">Keys</div>
+      <div class="osim-legend"><span><kbd>&#8592;</kbd><kbd>&#8594;</kbd> step</span><span><kbd>Space</kbd> play</span><span><kbd>Home</kbd><kbd>End</kbd></span><span><kbd>Esc</kbd> close</span></div>
     </div>
-    <div id="msg" class="msg" role="alert" aria-live="assertive"></div>
-    <p class="note">Processes: 1–10 (named P0, P1, …; the course slides call them T0, T1, …). Resource types: 1–10 (labelled A–J). All matrix values must be whole numbers ≥ 0.</p>
-  </section>
+  </div>
 
-  <section class="panel">
-    <h2>Resource Matrices</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th rowspan="2">Process</th>
-            <th id="allocHead">Allocation</th>
-            <th id="maxHead">Maximum</th>
-            <th id="needHead">Need</th>
-          </tr>
-          <tr id="resourceNames"></tr>
-        </thead>
-        <tbody id="matrixBody"></tbody>
-      </table>
+  <div class="osim-foot">
+    <p class="osim-narr" id="bk-narr" aria-live="polite"></p>
+    <div class="osim-stats">
+      <span class="osim-stat" title="Current step / steps">Step <b id="bk-ss">0/0</b></span>
+      <span class="osim-stat h" title="Processes finished in the safety check">&#10003; Finished <b id="bk-sf">0/0</b></span>
+      <span class="osim-stat" id="bk-sv" title="Result">State <b id="bk-svb">&#8211;</b></span>
     </div>
-    <h3>Available</h3>
-    <div id="availableInputs" class="chips"></div>
-  </section>
-
-  <section class="panel">
-    <h2>Banker Analysis</h2>
-    <div class="vectors">
-      <div class="vector"><b>Current Work vector</b><div id="workVector" class="chips"></div></div>
-      <div class="vector"><b>Safe sequence</b><div id="safeSequence" class="chips"></div></div>
-      <div class="vector"><b>Unfinished processes</b><div id="unfinished" class="chips"></div></div>
-    </div>
-    <div id="status" class="status">Run the analysis to evaluate the system state.</div>
-    <div id="steps" class="steps"></div>
-  </section>
-
-  <section class="panel">
-    <h2>Resource-Request Algorithm</h2>
-    <p class="note">Choose a process and a request vector. The request is checked against Need and Available, tentatively granted, and then the safety algorithm decides whether to keep it (grant) or roll it back (deny). A granted request updates the matrices above.</p>
-    <div class="req-row">
-      <label>Process
-        <select id="reqProc"></select>
-      </label>
-      <div><div style="font-size:.9rem;font-weight:800;margin-bottom:.35rem">Request vector</div><div id="reqInputs" class="chips"></div></div>
-    </div>
-    <div class="actions">
-      <button id="reqRun" class="primary">Check request</button>
-      <button id="reqStep">Next request step</button>
-      <button id="reqReset">Reset request</button>
-    </div>
-    <div id="reqStatus" class="status">Enter a request and press “Check request” (all steps) or “Next request step”.</div>
-    <div id="reqSteps" class="steps"></div>
-  </section>
-
-  <section class="panel">
-    <h2>How Banker’s Algorithm Works</h2>
-    <p><strong>1.</strong> Compute <code>Need = Maximum − Allocation</code>.</p>
-    <p><strong>2.</strong> Set <code>Work = Available</code> and mark every process unfinished.</p>
-    <p><strong>3.</strong> Find an unfinished process whose Need is less than or equal to Work.</p>
-    <p><strong>4.</strong> Pretend that process finishes, then add its Allocation back into Work.</p>
-    <p><strong>5.</strong> If every process can finish, the state is safe. Otherwise, no safe sequence exists from the current state.</p>
-    <p><strong>Tie rule:</strong> this simulator scans P0, P1, … in index order and, during each pass, lets every process whose Need fits in Work finish; passes repeat until no process can proceed. Other scan orders can yield a different (equally valid) safe sequence.</p>
-    <p><strong>Resource request by Pi:</strong> (1) if Request &gt; Need, raise an error (the process exceeded its maximum claim); (2) if Request &gt; Available, Pi must wait; (3) otherwise pretend to allocate: Available −= Request, Allocation[i] += Request, Need[i] −= Request; (4) run the safety algorithm — if the new state is safe, grant the request; otherwise restore the old state and Pi waits.</p>
-    <p class="note">A safe state guarantees that no deadlock will occur: there is at least one completion order in which every process can finish. An unsafe state does not necessarily mean a deadlock has occurred; it only means the system can no longer guarantee to avoid one.</p>
-  </section>
+  </div>
 </div>
 
 <script>
 (function(){
 "use strict";
-const root=document.querySelector(".bankers-lab");
-if(!root)return;
+var root=document.getElementById("osim-bk");
+if(!root){return;}
+var $=function(id){return document.getElementById(id);};
 
-const procCount=root.querySelector("#procCount");
-const resCount=root.querySelector("#resCount");
-const body=root.querySelector("#matrixBody");
-const names=root.querySelector("#resourceNames");
-const availWrap=root.querySelector("#availableInputs");
-const status=root.querySelector("#status");
-const workVector=root.querySelector("#workVector");
-const safeSequence=root.querySelector("#safeSequence");
-const unfinished=root.querySelector("#unfinished");
-const stepsWrap=root.querySelector("#steps");
-const msg=root.querySelector("#msg");
-const reqProc=root.querySelector("#reqProc");
-const reqInputs=root.querySelector("#reqInputs");
-const reqStatus=root.querySelector("#reqStatus");
-const reqSteps=root.querySelector("#reqSteps");
-const MAXN=10,MAXV=999;
-
-let stepState=null;
-let reqState=null;
-let dims={p:5,r:3};
-
-const scenarios={
- classic:{
-  p:5,r:3,
-  allocation:[[0,1,0],[2,0,0],[3,0,2],[2,1,1],[0,0,2]],
-  maximum:[[7,5,3],[3,2,2],[9,0,2],[2,2,2],[4,3,3]],
-  available:[3,3,2]
- },
- unsafe:{
-  p:4,r:3,
-  allocation:[[1,0,1],[1,2,0],[1,1,1],[0,0,2]],
-  maximum:[[3,2,2],[2,2,2],[3,3,3],[2,2,3]],
-  available:[0,0,0]
- },
- simple:{
-  p:3,r:2,
-  allocation:[[1,0],[0,1],[1,1]],
-  maximum:[[2,1],[1,2],[2,2]],
-  available:[1,1]
- }
+var SCEN={
+ classic:{p:5,r:3,allocation:[[0,1,0],[2,0,0],[3,0,2],[2,1,1],[0,0,2]],maximum:[[7,5,3],[3,2,2],[9,0,2],[2,2,2],[4,3,3]],available:[3,3,2]},
+ unsafe:{p:4,r:3,allocation:[[1,0,1],[1,2,0],[1,1,1],[0,0,2]],maximum:[[3,2,2],[2,2,2],[3,3,3],[2,2,3]],available:[0,0,0]},
+ simple:{p:3,r:2,allocation:[[1,0],[0,1],[1,1]],maximum:[[2,1],[1,2],[2,2]],available:[1,1]}
 };
+var MAXN=10,MAXV=99;
+var SPEEDS=[0.5,0.75,1,1.5,2,3,4];
+var PHASES=["Request ≤ Need","Request ≤ Available","Pretend to allocate","Safety check","Grant or roll back"];
+var narrow=window.matchMedia?window.matchMedia("(max-width: 600px)"):{matches:false};
+var reduce=window.matchMedia?window.matchMedia("(prefers-reduced-motion: reduce)"):{matches:false};
+var st={mode:"safety",scen:"classic",p:5,r:3,a:[],m:[],av:[],req:{i:1,v:["1","0","2"]},plan:[],step:0,playing:false,timer:0,speed:1,committed:false,outcome:null,valid:true};
 
-function resourceLabel(i){return String.fromCharCode(65+i);}
-function vec(v){return "["+v.join(", ")+"]";}
-function chips(v){return v.map((x,i)=>`<span class="chip">${resourceLabel(i)}=${x}</span>`).join("");}
-function setMsg(t){msg.textContent=t||"";}
-function val(x,d){return (d&&d[x[0]]!==undefined&&d[x[0]][x[1]]!==undefined)?d[x[0]][x[1]]:0;}
+function L(j){return String.fromCharCode(65+j);}
+function vec(v){return "("+v.join(",")+")";}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function interval(){return 1000/st.speed;}
+function dur(){return Math.round(Math.max(150,Math.min(560,interval()*0.6)));}
+function alertMsg(t){$("bk-alert").textContent=t||"";}
+function clone(m){return m.map(function(r){return r.slice();});}
+function needOf(a,m){return m.map(function(row,i){return row.map(function(v,j){return v-a[i][j];});});}
 
-function parseCount(input,label){
- const raw=String(input.value).trim();
- if(!/^\d+$/.test(raw)||+raw<1||+raw>MAXN)throw new Error(label+" must be a whole number from 1 to "+MAXN+".");
- return +raw;
-}
-
-function build(p,r,data){
- dims={p,r};
- procCount.value=p;resCount.value=r;
- names.innerHTML="";
- ["Allocation","Maximum","Need"].forEach(()=>{
-   for(let j=0;j<r;j++){
-     const th=document.createElement("th");
-     th.textContent=resourceLabel(j);
-     names.appendChild(th);
-   }
- });
- ["allocHead","maxHead","needHead"].forEach(id=>root.querySelector("#"+id).colSpan=r);
- body.innerHTML="";
- for(let i=0;i<p;i++){
-   const tr=document.createElement("tr");
-   let html=`<td><strong>P${i}</strong></td>`;
-   for(let j=0;j<r;j++)html+=`<td><input class="alloc" data-r="${j}" type="number" min="0" step="1" aria-label="Allocation P${i} ${resourceLabel(j)}" value="${val([i,j],data&&data.allocation)}"></td>`;
-   for(let j=0;j<r;j++)html+=`<td><input class="max" data-r="${j}" type="number" min="0" step="1" aria-label="Maximum P${i} ${resourceLabel(j)}" value="${val([i,j],data&&data.maximum)}"></td>`;
-   for(let j=0;j<r;j++)html+=`<td class="need" data-r="${j}">0</td>`;
-   tr.innerHTML=html;body.appendChild(tr);
- }
- availWrap.innerHTML="";
- for(let j=0;j<r;j++){
-   const label=document.createElement("label");
-   label.className="inline-in";
-   const av=data&&data.available&&data.available[j]!==undefined?data.available[j]:0;
-   label.innerHTML=`${resourceLabel(j)} <input class="available" data-r="${j}" type="number" min="0" step="1" aria-label="Available ${resourceLabel(j)}" value="${av}">`;
-   availWrap.appendChild(label);
- }
- reqProc.innerHTML="";
- for(let i=0;i<p;i++){const o=document.createElement("option");o.value=i;o.textContent="P"+i;reqProc.appendChild(o);}
- reqInputs.innerHTML="";
- for(let j=0;j<r;j++){
-   const label=document.createElement("label");
-   label.className="inline-in";
-   label.innerHTML=`${resourceLabel(j)} <input class="req" data-r="${j}" type="number" min="0" step="1" aria-label="Request ${resourceLabel(j)}" value="0">`;
-   reqInputs.appendChild(label);
- }
- setMsg("");
- resetOutputs();
- resetRequest();
- updateNeeds();
-}
-
-function readNum(x,what){
- const raw=String(x.value).trim();
- if(raw===""||x.validity.badInput||!/^\d+$/.test(raw)||+raw>MAXV)throw new Error(what+" must be a whole number from 0 to "+MAXV+".");
- return +raw;
-}
-function matrix(selector,what){
- return [...body.rows].map((row,i)=>[...row.querySelectorAll(selector)].map((x,j)=>readNum(x,what+" P"+i+" "+resourceLabel(j))));
-}
-function available(){
- return [...root.querySelectorAll(".available")].map((x,j)=>readNum(x,"Available "+resourceLabel(j)));
-}
-function updateNeeds(){
- [...body.rows].forEach(row=>{
-   const a=[...row.querySelectorAll(".alloc")],m=[...row.querySelectorAll(".max")];
-   [...row.querySelectorAll(".need")].forEach((cell,j)=>{
-     const d=(+m[j].value)-(+a[j].value);
-     cell.textContent=Number.isFinite(d)?d:"?";
-   });
- });
-}
-
-function readState(){
- const a=matrix(".alloc","Allocation"),m=matrix(".max","Maximum"),av=available();
- for(let i=0;i<a.length;i++)for(let j=0;j<a[i].length;j++)
-   if(a[i][j]>m[i][j])throw new Error(`P${i}: Allocation cannot exceed Maximum for resource ${resourceLabel(j)}.`);
- const need=m.map((row,i)=>row.map((v,j)=>v-a[i][j]));
- return {a,m,av,need};
-}
-
-/* Safety algorithm: repeated passes over P0..Pn-1 in index order. */
+/* ---------- safety algorithm (same scan as the verified version), expanded into animation frames ---------- */
+/* Repeated passes over P0..Pn-1 in index order; every process whose Need fits in Work finishes in that pass. */
 function safety(a,need,av){
- const work=[...av],finish=Array(a.length).fill(false),seq=[],trace=[];
- let progress=true,guard=0;
+ var work=av.slice(),finish=a.map(function(){return false;}),seq=[],progress=true,guard=0,i,j;
  while(progress&&guard++<=a.length){
    progress=false;
-   for(let i=0;i<a.length;i++){
-     if(finish[i])continue;
-     if(need[i].every((v,j)=>v<=work[j])){
-       const before=[...work];
-       for(let j=0;j<work.length;j++)work[j]+=a[i][j];
+   for(i=0;i<a.length;i++){
+     if(finish[i]){continue;}
+     if(need[i].every(function(v,k){return v<=work[k];})){
+       for(j=0;j<work.length;j++){work[j]+=a[i][j];}
        finish[i]=true;seq.push(i);progress=true;
-       trace.push({p:i,before,need:[...need[i]],after:[...work]});
      }
    }
  }
- return {work,finish,seq,trace,safe:finish.every(Boolean)};
+ return {work:work,finish:finish,seq:seq,safe:finish.every(Boolean)};
 }
-
-function analyzeData(){
- const st=readState();
- return Object.assign(st,safety(st.a,st.need,st.av));
-}
-
-function renderAnalysis(result){
- [...body.rows].forEach((row,i)=>{
-   [...row.querySelectorAll(".need")].forEach((cell,j)=>cell.textContent=result.need[i][j]);
- });
- workVector.innerHTML=chips(result.work);
- safeSequence.innerHTML=result.seq.length?result.seq.map(i=>`<span class="chip">P${i}</span>`).join(""):"<span class='chip'>None</span>";
- unfinished.innerHTML=result.finish.map((f,i)=>!f?`<span class="chip">P${i}</span>`:"").join("")||"<span class='chip'>None</span>";
- status.className="status "+(result.safe?"good":"bad");
- status.innerHTML=result.safe
-   ? `<strong>Safe state.</strong> One safe sequence is ${result.seq.map(i=>"P"+i).join(" → ")}.`
-   : `<strong>Unsafe state.</strong> The remaining processes cannot all be guaranteed to finish with the current Available resources. This does not necessarily mean a deadlock has occurred.`;
- stepsWrap.innerHTML="";
- result.trace.forEach((t,k)=>{
-   const d=document.createElement("div");
-   d.className="step";
-   d.textContent=`Step ${k+1}: P${t.p} can finish because Need ${vec(t.need)} ≤ Work ${vec(t.before)}. After release, Work = ${vec(t.after)}.`;
-   stepsWrap.appendChild(d);
- });
- if(!result.safe){
-   const d=document.createElement("div");
-   d.className="step bad";
-   d.textContent=`No unfinished process has Need ≤ Work ${vec(result.work)}: ${result.finish.map((f,i)=>f?null:"P"+i).filter(Boolean).join(", ")} cannot be guaranteed to finish.`;
-   stepsWrap.appendChild(d);
+function safetyFrames(a,m,av,base){
+ var need=needOf(a,m),work=av.slice(),finish=a.map(function(){return false;}),seq=[],fr=[],progress=true,guard=0,i,j,pass=0;
+ function F(o){var f={a:a,m:m,need:need,av:av,work:work.slice(),finish:finish.slice(),seq:seq.slice(),row:-1};for(var k in base){f[k]=base[k];}for(k in o){f[k]=o[k];}fr.push(f);}
+ F({kind:"init",narr:"Work = Available "+vec(av)+" · scan P0…P"+(a.length-1)});
+ while(progress&&guard++<=a.length){
+   progress=false;pass++;
+   for(i=0;i<a.length;i++){
+     if(finish[i]){continue;}
+     var before=work.slice();
+     var cmp=need[i].map(function(v,k){return v<=work[k];});
+     if(cmp.every(Boolean)){
+       for(j=0;j<work.length;j++){work[j]+=a[i][j];}
+       finish[i]=true;seq.push(i);progress=true;
+       F({kind:"pass",row:i,cmp:cmp,before:before,added:a[i].slice(),pass:pass,narr:"<span class=\"osim-k h\">✓ P"+i+"</span> Need "+vec(need[i])+" ≤ Work "+vec(before)+" → Work "+vec(work)});
+     }else{
+       F({kind:"fail",row:i,cmp:cmp,before:before,pass:pass,narr:"<span class=\"osim-k x\">✗ P"+i+"</span> Need "+vec(need[i])+" exceeds Work "+vec(before)+" · skip"});
+     }
+   }
  }
- stepState={trace:result.trace,index:0,result};
+ var safe=finish.every(Boolean);
+ F({kind:"end",safe:safe,narr:safe?"<span class=\"osim-k h\">✓ Safe</span> sequence "+seq.map(function(k){return "P"+k;}).join(" → "):"<span class=\"osim-k x\">✗ Unsafe</span> "+finish.map(function(f,k){return f?null:"P"+k;}).filter(function(x){return x;}).join(", ")+" cannot finish"});
+ return fr;
 }
-
-function resetOutputs(){
- status.className="status";
- status.textContent="Run the analysis to evaluate the system state.";
- workVector.innerHTML="";safeSequence.innerHTML="";unfinished.innerHTML="";stepsWrap.innerHTML="";
- stepState=null;
-}
-
-function runAnalyze(){
- setMsg("");
- try{renderAnalysis(analyzeData());}
- catch(e){resetOutputs();setMsg(e.message);}
-}
-
-function nextStep(){
- setMsg("");
- try{
-   if(!stepState){const r=analyzeData();renderAnalysis(r);}
-   if(!stepState.trace.length)return;
-   [...stepsWrap.children].forEach(x=>x.classList.remove("done"));
-   const upto=Math.min(stepState.index,stepState.trace.length-1);
-   for(let i=0;i<=upto;i++)stepsWrap.children[i].classList.add("done");
-   workVector.innerHTML=chips(stepState.trace[upto].after);
-   stepState.index=Math.min(stepState.index+1,stepState.trace.length);
- }catch(e){resetOutputs();setMsg(e.message);}
-}
-
-/* ---------- Resource-request algorithm ---------- */
-function resetRequest(){
- reqState=null;
- reqSteps.innerHTML="";
- reqStatus.className="status";
- reqStatus.textContent="Enter a request and press “Check request” (all steps) or “Next request step”.";
-}
-
-function planRequest(){
- const st=readState();
- const i=+reqProc.value;
- if(!(i>=0&&i<st.a.length))throw new Error("Choose a process.");
- const req=[...reqInputs.querySelectorAll(".req")].map((x,j)=>readNum(x,"Request "+resourceLabel(j)));
- if(req.every(v=>v===0))throw new Error("The request vector is all zeros; enter at least one positive value.");
- const P="P"+i,steps=[];
- const leNeed=req.every((v,j)=>v<=st.need[i][j]);
- steps.push({cls:leNeed?"good":"bad",text:`Step 1: Request[${P}] ${vec(req)} ≤ Need[${P}] ${vec(st.need[i])}? ${leNeed?"Yes.":"No — error: the process has exceeded its maximum claim."}`});
- if(!leNeed)return {outcome:"error",steps,i,req,
-   summary:`<strong>Error.</strong> ${P} requested ${vec(req)} but its remaining Need is only ${vec(st.need[i])}. The request is rejected.`};
- const leAv=req.every((v,j)=>v<=st.av[j]);
- steps.push({cls:leAv?"good":"wait",text:`Step 2: Request[${P}] ${vec(req)} ≤ Available ${vec(st.av)}? ${leAv?"Yes.":"No — the resources are not available, so "+P+" must wait."}`});
- if(!leAv)return {outcome:"wait",steps,i,req,
-   summary:`<strong>${P} must wait.</strong> Request ${vec(req)} exceeds Available ${vec(st.av)}. The state is unchanged.`};
- const av2=st.av.map((v,j)=>v-req[j]);
- const a2=st.a.map((row,k)=>k===i?row.map((v,j)=>v+req[j]):[...row]);
- const need2=st.need.map((row,k)=>k===i?row.map((v,j)=>v-req[j]):[...row]);
- steps.push({cls:"",text:`Step 3: Pretend to allocate. Available = ${vec(st.av)} − ${vec(req)} = ${vec(av2)}; Allocation[${P}] = ${vec(a2[i])}; Need[${P}] = ${vec(need2[i])}.`});
- const s=safety(a2,need2,av2);
- const trace=s.trace.map(t=>`P${t.p} (Need ${vec(t.need)} ≤ Work ${vec(t.before)} → Work ${vec(t.after)})`).join("; ");
- steps.push({cls:s.safe?"good":"bad",text:`Step 4: Run the safety algorithm on the new state, starting with Work = ${vec(av2)}. `+(trace?trace+". ":"")+(s.safe?`Safe sequence: ${s.seq.map(k=>"P"+k).join(", ")}.`:`Stuck: ${s.finish.map((f,k)=>f?null:"P"+k).filter(Boolean).join(", ")} cannot finish with Work ${vec(s.work)} — the new state would be unsafe.`)});
+/* Resource-request algorithm (same checks as the verified version) as frames. */
+function requestFrames(a,m,av,i,req){
+ var need=needOf(a,m),P="P"+i,fr=[],r=av.length;
+ function F(o){var f={a:a,m:m,need:need,av:av,work:null,finish:null,seq:[],row:i,req:req,phase:0};for(var k in o){f[k]=o[k];}fr.push(f);}
+ F({kind:"rinit",phase:-1,narr:P+" requests "+vec(req)+" · check it"});
+ var c1=req.map(function(v,j){return v<=need[i][j];});
+ if(!c1.every(Boolean)){F({kind:"rneed",phase:0,cmpN:c1,res:"error",narr:"<span class=\"osim-k x\">✗ Error</span> Request "+vec(req)+" exceeds Need "+vec(need[i])});return {frames:fr,outcome:"error"};}
+ F({kind:"rneed",phase:0,cmpN:c1,narr:"<span class=\"osim-k h\">✓</span> Request "+vec(req)+" ≤ Need "+vec(need[i])});
+ var c2=req.map(function(v,j){return v<=av[j];});
+ if(!c2.every(Boolean)){F({kind:"ravail",phase:1,cmpA:c2,res:"wait",narr:"<span class=\"osim-k x\">⏸ "+P+" must wait</span> Request exceeds Available "+vec(av)});return {frames:fr,outcome:"wait"};}
+ F({kind:"ravail",phase:1,cmpA:c2,narr:"<span class=\"osim-k h\">✓</span> Request "+vec(req)+" ≤ Available "+vec(av)});
+ var av2=av.map(function(v,j){return v-req[j];});
+ var a2=a.map(function(row,k){return k===i?row.map(function(v,j){return v+req[j];}):row.slice();});
+ F({kind:"pretend",phase:2,a:a2,need:needOf(a2,m),av:av2,chg:true,narr:"Pretend: Available "+vec(av2)+", Allocation["+P+"] "+vec(a2[i])});
+ var sf=safetyFrames(a2,m,av2,{phase:3,req:req,reqRow:i,chgRow:i});
+ sf.forEach(function(f){fr.push(f);});
+ var s=safety(a2,needOf(a2,m),av2);
  if(s.safe){
-   steps.push({cls:"good",text:`Step 5: The new state is safe, so the request is granted. The matrices above now show Allocation[${P}] = ${vec(a2[i])} and Available = ${vec(av2)}.`});
-   return {outcome:"granted",steps,i,req,a2,av2,seq:s.seq,
-     summary:`<strong>Request granted.</strong> ${P} receives ${vec(req)}. New Available = ${vec(av2)}; safe sequence ${s.seq.map(k=>"P"+k).join(" → ")}.`};
+   F({kind:"grant",phase:4,a:a2,need:needOf(a2,m),av:av2,work:s.work,finish:s.finish,seq:s.seq,res:"granted",a2:a2,av2:av2,narr:"<span class=\"osim-k h\">✓ Granted</span> "+P+" gets "+vec(req)+" · safe: "+s.seq.map(function(k){return "P"+k;}).join(",")});
+   return {frames:fr,outcome:"granted",seq:s.seq};
  }
- steps.push({cls:"bad",text:`Step 5: The new state is unsafe, so the request is denied and the old state is restored (Available = ${vec(st.av)}, Allocation[${P}] = ${vec(st.a[i])}). ${P} must wait.`});
- return {outcome:"denied",steps,i,req,
-   summary:`<strong>Request denied.</strong> Granting ${vec(req)} to ${P} would leave the system in an unsafe state; the allocation was rolled back and ${P} waits.`};
+ F({kind:"deny",phase:4,work:s.work,finish:s.finish,seq:s.seq,res:"denied",rolled:true,narr:"<span class=\"osim-k x\">✗ Denied</span> unsafe · rolled back, "+P+" waits"});
+ return {frames:fr,outcome:"denied"};
+}
+function requestOutcome(a,m,av,i,req){
+ var need=needOf(a,m);
+ if(!req.every(function(v,j){return v<=need[i][j];})){return "error";}
+ if(!req.every(function(v,j){return v<=av[j];})){return "wait";}
+ var av2=av.map(function(v,j){return v-req[j];});
+ var a2=a.map(function(row,k){return k===i?row.map(function(v,j){return v+req[j];}):row.slice();});
+ return safety(a2,needOf(a2,m),av2).safe?"granted":"denied";
 }
 
-function commitRequest(plan){
- const row=body.rows[plan.i];
- [...row.querySelectorAll(".alloc")].forEach((x,j)=>x.value=plan.a2[plan.i][j]);
- [...root.querySelectorAll(".available")].forEach((x,j)=>x.value=plan.av2[j]);
- updateNeeds();
- try{renderAnalysis(analyzeData());}catch(e){setMsg(e.message);}
+/* ---------- state building ---------- */
+function loadScen(s){
+ var d;
+ if(s==="random"){
+   var p=5,r=3,ai,mi;d={p:p,r:r,allocation:[],maximum:[],available:[]};
+   for(var i=0;i<p;i++){ai=[];mi=[];for(var j=0;j<r;j++){var x=Math.floor(Math.random()*4);ai.push(x);mi.push(x+Math.floor(Math.random()*6));}d.allocation.push(ai);d.maximum.push(mi);}
+   for(j=0;j<r;j++){d.available.push(Math.floor(Math.random()*5));}
+ }else{d=SCEN[s];}
+ st.p=d.p;st.r=d.r;st.a=clone(d.allocation);st.m=clone(d.maximum);st.av=d.available.slice();st.scen=s;
+ st.req={i:s==="classic"?1:0,v:s==="classic"?["1","0","2"]:d.available.map(function(){return "0";})};
+ if(s==="classic"){st.req.v=["1","0","2"];}
+ st.committed=false;
 }
-
-function showRequest(upto){
- const plan=reqState.plan;
- [...reqSteps.children].forEach((d,k)=>d.classList.toggle("pending",k>upto));
- [...reqSteps.children].forEach((d,k)=>d.classList.toggle("done",k<=upto));
- if(upto>=plan.steps.length-1){
-   reqStatus.className="status "+({granted:"good",denied:"bad",error:"bad",wait:"wait"}[plan.outcome]);
-   reqStatus.innerHTML=plan.summary;
-   if(plan.outcome==="granted"&&!reqState.committed){reqState.committed=true;commitRequest(plan);}
- }else{
-   reqStatus.className="status";
-   reqStatus.textContent=`Checking request of P${plan.i}: step ${upto+1} of ${plan.steps.length}. Press “Next request step” to continue.`;
- }
+function resize(p,r){
+ p=clamp(p,1,MAXN);r=clamp(r,1,MAXN);
+ var fix=function(mat){var out=[];for(var i=0;i<p;i++){var row=[];for(var j=0;j<r;j++){row.push(mat[i]&&mat[i][j]!==undefined?mat[i][j]:0);}out.push(row);}return out;};
+ st.a=fix(st.a);st.m=fix(st.m);
+ var av=[];for(var j=0;j<r;j++){av.push(st.av[j]!==undefined?st.av[j]:0);}st.av=av;
+ var rv=[];for(j=0;j<r;j++){rv.push(st.req.v[j]!==undefined?st.req.v[j]:"0");}st.req.v=rv;
+ if(st.req.i>=p){st.req.i=0;}
+ st.p=p;st.r=r;st.scen=null;
 }
-
+function checkBase(){
+ for(var i=0;i<st.p;i++){for(var j=0;j<st.r;j++){
+   if(st.a[i][j]>st.m[i][j]){return {msg:"P"+i+" "+L(j)+": Allocation "+st.a[i][j]+" exceeds Max "+st.m[i][j]+".",cell:"a"+i+"_"+j};}
+ }}
+ return null;
+}
+function replan(){
+ pause();
+ var bad=checkBase();
+ st.valid=!bad;
+ if(bad){alertMsg(bad.msg);st.plan=[];st.step=0;draw(false);markBad(bad.cell);return;}
+ alertMsg("");
+ st.outcome=null;
+ if(st.mode==="safety"){st.plan=safetyFrames(st.a,st.m,st.av,{});}
+ else{st.plan=[{kind:"idle",a:st.a,m:st.m,need:needOf(st.a,st.m),av:st.av,work:null,finish:null,seq:[],row:st.req.i,phase:-2,narr:"Pick a process and request, then press Check"}];}
+ st.step=0;st.committed=false;
+ buildMatrix();draw(false);renderCompare();
+}
 function startRequest(){
- const plan=planRequest();
- reqSteps.innerHTML="";
- plan.steps.forEach(s=>{
-   const d=document.createElement("div");
-   d.className="step pending"+(s.cls?" "+s.cls:"");
-   d.textContent=s.text;
-   reqSteps.appendChild(d);
- });
- reqState={plan,shown:-1,committed:false};
+ var vals=[],bad=-1;
+ st.req.v.forEach(function(s,j){var t=String(s).trim();if(!/^\d{1,2}$/.test(t)&&bad<0){bad=j;}vals.push(+t);});
+ root.querySelectorAll(".bk-form .rv input").forEach(function(x,j){x.setAttribute("aria-invalid",String(j===bad));});
+ if(bad>=0){alertMsg("Request "+L(bad)+" must be a whole number 0–"+MAXV+".");return;}
+ if(vals.every(function(v){return v===0;})){alertMsg("The request is all zeros; enter at least one positive value.");return;}
+ if(checkBase()){replan();return;}
+ alertMsg("");
+ var r=requestFrames(st.a,st.m,st.av,st.req.i,vals);
+ st.plan=r.frames;st.outcome=r.outcome;st.step=0;st.committed=false;
+ buildMatrix();draw(false);
+ play();
 }
-
-function requestRunAll(){
- setMsg("");
- try{
-   if(!reqState||reqState.committed||reqState.shown>=reqState.plan.steps.length-1)startRequest();
-   reqState.shown=reqState.plan.steps.length-1;
-   showRequest(reqState.shown);
- }catch(e){resetRequest();setMsg(e.message);}
-}
-
-function requestStep(){
- setMsg("");
- try{
-   if(!reqState||reqState.shown>=reqState.plan.steps.length-1)startRequest();
-   reqState.shown++;
-   showRequest(reqState.shown);
- }catch(e){resetRequest();setMsg(e.message);}
-}
-
-function rebuildFromInputs(){
- try{
-   const p=parseCount(procCount,"Processes"),r=parseCount(resCount,"Resource types");
-   build(p,r,null);
- }catch(e){
-   procCount.value=dims.p;resCount.value=dims.r;
-   setMsg(e.message);
+function maybeCommit(){
+ var f=st.plan[st.step];
+ if(f&&f.kind==="grant"&&!st.committed&&st.step===st.plan.length-1){
+   st.committed=true;st.a=clone(f.a2);st.av=f.av2.slice();st.scen=null;
  }
 }
 
-root.addEventListener("input",e=>{
- if(e.target.matches(".alloc,.max"))updateNeeds();
- if(e.target.matches(".alloc,.max,.available")){resetOutputs();resetRequest();}
- if(e.target.matches(".req"))resetRequest();
-});
-reqProc.addEventListener("change",resetRequest);
-root.querySelector("#rebuild").addEventListener("click",rebuildFromInputs);
-root.querySelector("#analyze").addEventListener("click",runAnalyze);
-root.querySelector("#step").addEventListener("click",nextStep);
-root.querySelector("#resetSteps").addEventListener("click",()=>{if(stepState){stepState.index=0;[...stepsWrap.children].forEach(x=>x.classList.remove("done"));workVector.innerHTML=chips(stepState.result.av);}});
-root.querySelector("#loadScenario").addEventListener("click",()=>{const s=scenarios[root.querySelector("#scenario").value];build(s.p,s.r,s);});
-root.querySelector("#reqRun").addEventListener("click",requestRunAll);
-root.querySelector("#reqStep").addEventListener("click",requestStep);
-root.querySelector("#reqReset").addEventListener("click",()=>{setMsg("");resetRequest();});
-procCount.addEventListener("change",rebuildFromInputs);
-resCount.addEventListener("change",rebuildFromInputs);
+/* ---------- matrix view ---------- */
+var mat=$("bk-m"),mwrap=$("bk-mwrap");
+function buildMatrix(){
+ var p=st.p,r=st.r,h="",i,j;
+ var cw=narrow.matches?"22px":"34px",gp=narrow.matches?"5px":"10px";
+ var cols="minmax("+(narrow.matches?34:46)+"px,auto) repeat("+r+",minmax("+cw+",1fr)) "+gp+" repeat("+r+",minmax("+cw+",1fr)) "+gp+" repeat("+r+",minmax("+cw+",1fr)) minmax("+(narrow.matches?30:78)+"px,auto)";
+ mat.style.gridTemplateColumns=cols;
+ var H=mwrap.clientHeight||300,rowH=clamp(Math.floor((H-50-3*p)/p),24,52);
+ mat.style.gridTemplateRows="20px 20px repeat("+p+","+rowH+"px)";
+ mat.style.setProperty("--fs",Math.round(clamp(rowH*0.45,13,21))+"px");
+ h+="<div></div><div class=\"bk-h\" style=\"grid-column:span "+r+"\" title=\"Resources each process holds\">Allocation</div><div></div><div class=\"bk-h\" style=\"grid-column:span "+r+"\" title=\"Maximum claim\">Max</div><div></div><div class=\"bk-h\" style=\"grid-column:span "+r+"\" title=\"Need = Max − Allocation\">Need</div><div></div>";
+ h+="<div></div>";
+ for(var g=0;g<3;g++){for(j=0;j<r;j++){h+="<div class=\"bk-h r\">"+L(j)+"</div>";}if(g<2){h+="<div></div>";}}
+ h+="<div></div>";
+ for(i=0;i<p;i++){
+   h+="<div class=\"bk-p\" data-p=\""+i+"\" role=\"rowheader\">P"+i+"</div>";
+   for(j=0;j<r;j++){h+="<div class=\"bk-c\" data-c=\"a"+i+"_"+j+"\"><input type=\"text\" inputmode=\"numeric\" maxlength=\"2\" data-k=\"a\" data-i=\""+i+"\" data-j=\""+j+"\" aria-label=\"Allocation P"+i+" "+L(j)+"\" autocomplete=\"off\"></div>";}
+   h+="<div></div>";
+   for(j=0;j<r;j++){h+="<div class=\"bk-c\" data-c=\"m"+i+"_"+j+"\"><input type=\"text\" inputmode=\"numeric\" maxlength=\"2\" data-k=\"m\" data-i=\""+i+"\" data-j=\""+j+"\" aria-label=\"Max P"+i+" "+L(j)+"\" autocomplete=\"off\"></div>";}
+   h+="<div></div>";
+   for(j=0;j<r;j++){h+="<div class=\"bk-c need\" data-c=\"n"+i+"_"+j+"\" title=\"Need P"+i+" "+L(j)+"\"><b></b></div>";}
+   h+="<div class=\"bk-s\" data-s=\""+i+"\"></div>";
+ }
+ mat.innerHTML=h;
+}
+function markBad(cell){var c=mat.querySelector("[data-c=\""+cell+"\"] input");if(c){c.setAttribute("aria-invalid","true");}}
+function heat(v,mx){return mx>0?Math.round(4+30*v/mx):4;}
+function renderMatrix(anim){
+ var f=st.plan[st.step];
+ var a=f?f.a:st.a,m=f?f.m:st.m,need=f?f.need:needOf(st.a,st.m);
+ var p=st.p,r=st.r,i,j,mx=1;
+ for(i=0;i<p;i++){for(j=0;j<r;j++){mx=Math.max(mx,a[i][j],m[i][j],Math.max(0,need[i][j]));}}
+ var editable=st.mode==="safety";
+ var row=f?f.row:-1,fin=f&&f.finish?f.finish:null;
+ var showCmp=f&&(f.kind==="pass"||f.kind==="fail");
+ for(i=0;i<p;i++){
+   var isFin=fin&&fin[i]&&!(f.kind==="pass"&&f.row===i);
+   var pl=mat.querySelector("[data-p=\""+i+"\"]");
+   pl.className="bk-p"+(i===row?" cur":"")+(isFin?" fin":"");
+   var order=f&&f.seq?f.seq.indexOf(i):-1;
+   pl.textContent="P"+i+(order>=0&&isFin?" ✓":"");
+   for(j=0;j<r;j++){
+     var ca=mat.querySelector("[data-c=\"a"+i+"_"+j+"\"]"),cm=mat.querySelector("[data-c=\"m"+i+"_"+j+"\"]"),cn=mat.querySelector("[data-c=\"n"+i+"_"+j+"\"]");
+     var ia=ca.querySelector("input"),im=cm.querySelector("input");
+     if(document.activeElement!==ia){ia.value=a[i][j];}
+     if(document.activeElement!==im){im.value=m[i][j];}
+     ia.readOnly=!editable;im.readOnly=!editable;
+     ia.setAttribute("aria-invalid","false");im.setAttribute("aria-invalid","false");
+     ca.style.setProperty("--h",heat(a[i][j],mx)+"%");cm.style.setProperty("--h",heat(m[i][j],mx)+"%");
+     cn.style.setProperty("--h",heat(Math.max(0,need[i][j]),mx)+"%");
+     cn.querySelector("b").textContent=need[i][j];
+     var cls="";
+     if(showCmp&&f.row===i){cls=f.cmp[j]?" ok":" no";}
+     if(f&&f.kind==="rneed"&&i===row){cls=f.cmpN[j]?" ok":" no";}
+     var chgA=f&&f.kind==="pretend"&&i===row;
+     cn.className="bk-c need"+cls+(isFin?" fin":"")+(chgA&&anim?" chg":"")+(chgA&&!anim?" chg":"");
+     ca.className="bk-c"+(isFin?" fin":"")+(f&&f.kind==="pass"&&f.row===i?" rel":"")+(chgA?" chg":"");
+     cm.className="bk-c"+(isFin?" fin":"");
+     ca.title="Allocation P"+i+" "+L(j)+" = "+a[i][j];cm.title="Max P"+i+" "+L(j)+" = "+m[i][j];
+   }
+   var s=mat.querySelector("[data-s=\""+i+"\"]"),sh="";
+   if(f&&f.kind==="pass"&&f.row===i){sh="<span class=\"osim-k h\">✓ finish</span>";}
+   else if(f&&f.kind==="fail"&&f.row===i){sh="<span class=\"osim-k x\">✗ wait</span>";}
+   else if(isFin){sh="#"+(order+1);}
+   else if(f&&f.kind==="end"&&!f.safe){sh="<span class=\"osim-k x\">✗ stuck</span>";}
+   s.innerHTML=sh;
+ }
+ mat.querySelectorAll(".bk-c").forEach(function(c){c.classList.remove("rowcur");});
+ if(row>=0&&f&&f.kind!=="idle"){mat.querySelectorAll("[data-c^=\"n"+row+"_\"]").forEach(function(c){c.classList.add("rowcur");});}
+}
 
-build(scenarios.classic.p,scenarios.classic.r,scenarios.classic);
+/* ---------- top vectors, sequence, side ---------- */
+function vcells(v,opt){
+ var h="";
+ v.forEach(function(x,j){
+   var cls=opt&&opt.cmp?(opt.cmp[j]?" ok":" no"):"";
+   if(opt&&opt.chg){cls+=" chg";}
+   var plus=opt&&opt.add&&opt.add[j]>0?"<span class=\"plus"+(opt.anim?" on":"")+"\">+"+opt.add[j]+"</span>":"";
+   if(opt&&opt.input){h+="<div class=\"vc"+cls+"\"><i>"+L(j)+"</i><input type=\"text\" inputmode=\"numeric\" maxlength=\"2\" data-k=\"av\" data-j=\""+j+"\" value=\""+x+"\" aria-label=\"Available "+L(j)+"\" autocomplete=\"off\"></div>";}
+   else{h+="<div class=\"vc"+cls+"\"><i>"+L(j)+"</i><b>"+x+"</b>"+plus+"</div>";}
+ });
+ return h;
+}
+function renderTop(anim){
+ var f=st.plan[st.step],top=$("bk-top"),h="";
+ var editable=st.mode==="safety"&&(!f||f.kind==="init");
+ var av=f?f.av:st.av;
+ var cmpA=f&&f.kind==="ravail"?f.cmpA:null;
+ if(document.activeElement&&document.activeElement.getAttribute&&document.activeElement.getAttribute("data-k")==="av"&&editable){return;}
+ h+="<div class=\"bk-vec\" title=\"Available resources\"><span>Available</span>"+vcells(av,{input:editable,cmp:cmpA,chg:f&&f.kind==="pretend"})+"</div>";
+ if(f&&f.work){
+   var showCmp=f.kind==="pass"||f.kind==="fail";
+   h+="<div class=\"bk-vec work\" title=\"Work vector\"><span>Work</span>"+vcells(f.work,{cmp:showCmp&&f.kind==="fail"?f.cmp:null,add:f.kind==="pass"?f.added:null,anim:anim})+"</div>";
+ }
+ if(st.mode==="request"&&f&&f.req){
+   h+="<div class=\"bk-vec req\" title=\"Request vector\"><span>Request P"+(f.reqRow!=null?f.reqRow:f.row)+"</span>"+vcells(f.req,{cmp:f.kind==="rneed"?f.cmpN:(f.kind==="ravail"?f.cmpA:null)})+"</div>";
+ }
+ var pill="",pc="";
+ if(f&&f.kind==="end"&&st.mode==="safety"){pill=f.safe?"✓ Safe":"✗ Unsafe";pc=f.safe?"ok":"no";}
+ else if(f&&f.res){pill={granted:"✓ Granted",denied:"✗ Denied · rolled back",wait:"⏸ Must wait",error:"✗ Exceeds need"}[f.res];pc=f.res==="granted"?"ok":"no";}
+ else if(f&&f.kind==="end"){pill=f.safe?"✓ New state safe":"✗ New state unsafe";pc=f.safe?"ok":"no";}
+ if(pill){h+="<div class=\"bk-pill "+pc+"\">"+pill+"</div>";}
+ top.innerHTML=h;
+}
+var lastSeqLen=0;
+function renderSeq(anim){
+ var f=st.plan[st.step],seq=f&&f.seq?f.seq:[],h="<span>Safe sequence</span>";
+ if(!f||!f.work&&!(f.kind==="grant"||f.kind==="deny")){h+="<em>–</em>";}
+ else{
+   seq.forEach(function(k,x){h+=(x?"<em>→</em>":"")+"<b class=\""+(anim&&x===seq.length-1&&seq.length>lastSeqLen?"new":"")+"\">P"+k+"</b>";});
+   if(f.kind==="end"&&!f.safe||f.kind==="deny"){h+=(seq.length?"<em>→</em>":"")+"<b class=\"no\">✗ stuck</b>";}
+   if(!seq.length&&f.kind!=="end"&&f.kind!=="deny"){h+="<em>empty</em>";}
+ }
+ lastSeqLen=seq.length;
+ $("bk-seq").innerHTML=h;
+}
+function renderSide(){
+ var f=st.plan[st.step],side=$("bk-side"),h="",p=st.p;
+ if(st.mode==="request"){
+   h+="<div class=\"osim-sh\"><b>Request</b><span>process + vector</span></div><div class=\"bk-form\"><div class=\"r1\"><label class=\"osim-lbl\" for=\"bk-rp\">Process</label><select id=\"bk-rp\">";
+   for(var i=0;i<p;i++){h+="<option value=\""+i+"\""+(i===st.req.i?" selected":"")+">P"+i+"</option>";}
+   h+="</select><button type=\"button\" class=\"osim-pri\" data-act=\"check\" title=\"Run the resource-request algorithm\">Check ▶</button></div><div class=\"rv\">";
+   st.req.v.forEach(function(v,j){h+="<label>"+L(j)+"<input type=\"text\" inputmode=\"numeric\" maxlength=\"2\" data-k=\"rq\" data-j=\""+j+"\" value=\""+esc(v)+"\" aria-label=\"Request "+L(j)+"\" autocomplete=\"off\"></label>";});
+   h+="</div></div><div class=\"bk-side-sub\">Steps</div><div class=\"bk-list\">";
+   var ph=f?f.phase:-2;
+   PHASES.forEach(function(name,k){
+     var cls="",ic=String(k+1);
+     if(f&&ph>k){cls="ok";ic="✓";}
+     if(f&&ph===k){
+       cls="on";
+       if(f.res==="error"||f.res==="wait"||f.res==="denied"){cls="on no";ic=f.res==="wait"?"⏸":"✗";}
+       else if(f.res==="granted"){cls="on ok";ic="✓";}
+       else if(f.kind==="end"){cls="on "+(f.safe?"ok":"no");ic=f.safe?"✓":"✗";}
+     }
+     h+="<div class=\"bk-li "+cls+"\"><i aria-hidden=\"true\">"+ic+"</i><span>"+name+"</span></div>";
+   });
+   h+="</div>";
+ }else{
+   h+="<div class=\"osim-sh\"><b>Safety check</b><span>"+(f&&f.pass?"pass "+f.pass:"")+"</span></div>";
+ }
+ if(f&&(f.kind==="pass"||f.kind==="fail")){
+   h+="<div class=\"bk-cmpd\"><b>Need[P"+f.row+"] ≤ Work ?</b>";
+   f.need[f.row].forEach(function(v,j){h+="<div class=\"cr\"><span>"+L(j)+"</span><span>"+v+" ≤ "+f.before[j]+"</span><span>"+(f.cmp[j]?"✓":"✗")+"</span></div>";});
+   h+="</div>";
+ }else if(f&&f.kind==="rneed"){
+   h+="<div class=\"bk-cmpd\"><b>Request ≤ Need[P"+f.row+"] ?</b>";
+   f.req.forEach(function(v,j){h+="<div class=\"cr\"><span>"+L(j)+"</span><span>"+v+" ≤ "+f.need[f.row][j]+"</span><span>"+(f.cmpN[j]?"✓":"✗")+"</span></div>";});
+   h+="</div>";
+ }else if(f&&f.kind==="ravail"){
+   h+="<div class=\"bk-cmpd\"><b>Request ≤ Available ?</b>";
+   f.req.forEach(function(v,j){h+="<div class=\"cr\"><span>"+L(j)+"</span><span>"+v+" ≤ "+f.av[j]+"</span><span>"+(f.cmpA[j]?"✓":"✗")+"</span></div>";});
+   h+="</div>";
+ }
+ if(f&&f.finish){
+   h+="<div class=\"bk-side-sub\">Finish</div><div class=\"bk-fl\">";
+   f.finish.forEach(function(x,k){h+="<span class=\""+(x?"ok":"")+"\" title=\"P"+k+(x?" can finish":" not finished")+"\">"+(x?"✓":"○")+" P"+k+"</span>";});
+   h+="</div>";
+ }
+ var focusK=document.activeElement&&document.activeElement.getAttribute?document.activeElement.getAttribute("data-k"):null;
+ var fj=focusK==="rq"?document.activeElement.getAttribute("data-j"):null;
+ side.innerHTML=h;
+ if(fj!=null){var t=side.querySelector("input[data-k=rq][data-j=\""+fj+"\"]");if(t){t.focus();var L2=t.value.length;t.setSelectionRange(L2,L2);}}
+}
+function renderStats(){
+ var f=st.plan[st.step],n=st.plan.length;
+ $("bk-ss").textContent=n?st.step+"/"+(n-1):"–";
+ var fin=f&&f.finish?f.finish.filter(Boolean).length:0;
+ $("bk-sf").textContent=fin+"/"+st.p;
+ var res="–",cls="osim-stat";
+ if(f&&st.mode==="safety"&&f.kind==="end"){res=f.safe?"✓ safe":"✗ unsafe";cls+=f.safe?" h":" x";}
+ else if(f&&f.res){res={granted:"✓ granted",denied:"✗ denied",wait:"⏸ wait",error:"✗ error"}[f.res];cls+=f.res==="granted"?" h":" x";}
+ $("bk-svb").textContent=res;$("bk-sv").className=cls;
+ var narr=!st.valid?"Fix the highlighted cell":(f?f.narr:"");
+ if(f&&st.step===0&&f.kind==="init"){narr+=" · press ▶";}
+ $("bk-narr").innerHTML=narr;
+}
+function renderControls(){
+ root.querySelectorAll("#bk-modes button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-mode")===st.mode));});
+ root.querySelectorAll("#bk-scen button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-scen")===st.scen));});
+ $("bk-p").textContent=st.p;$("bk-r").textContent=st.r;
+ root.querySelector("[data-act=pminus]").disabled=st.p<=1;
+ root.querySelector("[data-act=pplus]").disabled=st.p>=MAXN;
+ root.querySelector("[data-act=rminus]").disabled=st.r<=1;
+ root.querySelector("[data-act=rplus]").disabled=st.r>=MAXN;
+ var last=st.plan.length-1,atEnd=st.step>=last;
+ root.querySelector("[data-act=prev]").disabled=st.step<=0;
+ root.querySelector("[data-act=first]").disabled=st.step<=0;
+ root.querySelector("[data-act=next]").disabled=atEnd;
+ root.querySelector("[data-act=last]").disabled=atEnd;
+ root.querySelector("[data-act=play]").disabled=last<=0;
+ $("bk-playicon").setAttribute("d",st.playing?"M6.5 5h4v14h-4zM13.5 5h4v14h-4z":"M8 5l11 7-11 7z");
+ $("bk-play").setAttribute("aria-label",st.playing?"Pause (Space)":"Play (Space)");
+}
+function draw(anim){
+ root.style.setProperty("--o-dur",dur()+"ms");
+ if(st.plan.length){maybeCommit();}
+ if(mat.childElementCount){renderMatrix(anim);}
+ renderTop(anim);renderSeq(anim);renderSide();renderStats();renderControls();
+}
+
+/* ---------- compare (what-if) ---------- */
+var cmp=$("bk-compare");
+function renderCompare(){
+ if(cmp.hidden){return;}
+ var h="<div class=\"osim-ph\"><div><b>What-if</b> <span>request 1 unit</span></div><button type=\"button\" class=\"osim-ib\" data-act=\"compare\" aria-label=\"Close what-if\"><svg class=\"st\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M6 6l12 12M18 6L6 18\"/></svg></button></div>";
+ if(checkBase()){cmp.innerHTML=h+"<p class=\"bk-note\">Fix the matrices first.</p>";return;}
+ var s=safety(st.a,needOf(st.a,st.m),st.av);
+ h+="<p class=\"bk-note\">Current state: <span class=\"osim-k "+(s.safe?"h":"x")+"\">"+(s.safe?"✓ safe":"✗ unsafe")+"</span> "+(s.safe?s.seq.map(function(k){return "P"+k;}).join(" → "):"")+"</p>";
+ h+="<table class=\"bk-wi\"><thead><tr><th></th>";
+ for(var j=0;j<st.r;j++){h+="<th>+1 "+L(j)+"</th>";}
+ h+="</tr></thead><tbody>";
+ var SYM={granted:["g","✓"],denied:["d","✗"],wait:["w","⏸"],error:["e","!"]};
+ var TXT={granted:"granted",denied:"denied (unsafe)",wait:"must wait",error:"exceeds need"};
+ for(var i=0;i<st.p;i++){
+   h+="<tr><th>P"+i+"</th>";
+   for(j=0;j<st.r;j++){
+     var req=[];for(var k=0;k<st.r;k++){req.push(k===j?1:0);}
+     var o=requestOutcome(st.a,st.m,st.av,i,req);
+     h+="<td><button type=\"button\" class=\""+SYM[o][0]+"\" data-wi=\""+i+"_"+j+"\" title=\"P"+i+" requests 1 "+L(j)+": "+TXT[o]+"\" aria-label=\"P"+i+" +1 "+L(j)+": "+TXT[o]+"\">"+SYM[o][1]+"</button></td>";
+   }
+   h+="</tr>";
+ }
+ h+="</tbody></table><div class=\"osim-legend\"><span>✓ granted</span><span>✗ unsafe</span><span>⏸ wait</span><span>! exceeds need</span></div><p class=\"bk-note\">Click a cell to animate that request.</p>";
+ cmp.innerHTML=h;
+}
+cmp.addEventListener("click",function(e){
+ var b=e.target.closest("button[data-wi]");if(!b){return;}
+ var ij=b.getAttribute("data-wi").split("_");
+ st.req.i=+ij[0];st.req.v=st.req.v.map(function(x,k){return k===+ij[1]?"1":"0";});
+ togglePanel("bk-compare",false);
+ st.mode="request";startRequest();
+});
+function togglePanel(id,force){
+ var p=$(id),other=id==="bk-compare"?$("bk-help"):$("bk-compare");
+ var open=force!=null?force:p.hidden;
+ p.hidden=!open;
+ if(open){other.hidden=true;}
+ $("bk-cmpbtn").setAttribute("aria-expanded",String(!$("bk-compare").hidden));
+ $("bk-helpbtn").setAttribute("aria-expanded",String(!$("bk-help").hidden));
+ if(id==="bk-compare"&&open){renderCompare();}
+}
+
+/* ---------- editing ---------- */
+root.addEventListener("input",function(e){
+ var x=e.target,k=x.getAttribute&&x.getAttribute("data-k");if(!k){return;}
+ var j=+x.getAttribute("data-j");
+ if(k==="rq"){st.req.v[j]=x.value;alertMsg("");x.setAttribute("aria-invalid","false");return;}
+ var t=x.value.trim();
+ if(!/^\d{1,2}$/.test(t)){x.setAttribute("aria-invalid","true");alertMsg("Values must be whole numbers 0–"+MAXV+".");return;}
+ x.setAttribute("aria-invalid","false");
+ var v=+t;
+ if(k==="av"){st.av[j]=v;}
+ else{var i=+x.getAttribute("data-i");(k==="a"?st.a:st.m)[i][j]=v;}
+ st.scen=null;
+ var bad=checkBase();
+ if(bad){st.valid=false;alertMsg(bad.msg);markBad(bad.cell);pause();renderControls();renderStats();return;}
+ st.valid=true;alertMsg("");
+ st.plan=safetyFrames(st.a,st.m,st.av,{});st.step=0;
+ draw(false);renderCompare();
+});
+root.addEventListener("change",function(e){
+ if(e.target.id==="bk-rp"){st.req.i=+e.target.value;if(st.mode==="request"){replan();}}
+});
+root.addEventListener("keydown",function(e){
+ if(e.key==="Enter"&&e.target.getAttribute&&e.target.getAttribute("data-k")==="rq"){e.preventDefault();startRequest();}
+});
+
+/* ---------- transport ---------- */
+function go(step,anim){
+ var prev=st.step;
+ st.step=clamp(step,0,Math.max(0,st.plan.length-1));
+ draw(!!anim&&!reduce.matches&&st.step===prev+1);
+}
+function tick(){
+ if(!st.playing){return;}
+ if(st.step>=st.plan.length-1){pause();return;}
+ go(st.step+1,true);
+ if(st.step>=st.plan.length-1){pause();return;}
+ st.timer=setTimeout(tick,interval());
+}
+function play(){
+ if(st.playing||st.plan.length<2){return;}
+ if(st.step>=st.plan.length-1){go(0,false);}
+ st.playing=true;renderControls();
+ st.timer=setTimeout(tick,Math.min(400,interval()));
+}
+function pause(){st.playing=false;clearTimeout(st.timer);renderControls();}
+function togglePlay(){if(st.playing){pause();}else{play();}}
+
+root.addEventListener("click",function(e){
+ var b=e.target.closest("button");
+ if(!b||!root.contains(b)||b.disabled||b.hasAttribute("data-wi")){return;}
+ if(b.hasAttribute("data-mode")){st.mode=b.getAttribute("data-mode");replan();return;}
+ if(b.hasAttribute("data-scen")){loadScen(b.getAttribute("data-scen"));replan();return;}
+ switch(b.getAttribute("data-act")){
+   case "pminus":resize(st.p-1,st.r);replan();break;
+   case "pplus":resize(st.p+1,st.r);replan();break;
+   case "rminus":resize(st.p,st.r-1);replan();break;
+   case "rplus":resize(st.p,st.r+1);replan();break;
+   case "check":startRequest();break;
+   case "first":pause();go(0,false);break;
+   case "prev":pause();go(st.step-1,false);break;
+   case "next":pause();go(st.step+1,true);break;
+   case "last":pause();go(st.plan.length-1,false);break;
+   case "play":togglePlay();break;
+   case "compare":togglePanel("bk-compare");break;
+   case "help":togglePanel("bk-help");break;
+   case "fs":toggleFs();break;
+ }
+});
+var speed=$("bk-speed");
+speed.addEventListener("input",function(){
+ st.speed=SPEEDS[+speed.value];
+ $("bk-speedv").textContent=st.speed+"/s";
+ speed.setAttribute("aria-valuetext",st.speed+" steps per second");
+ root.style.setProperty("--o-dur",dur()+"ms");
+ if(st.playing){clearTimeout(st.timer);st.timer=setTimeout(tick,interval());}
+});
+document.addEventListener("keydown",function(e){
+ if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey){return;}
+ var t=e.target,tag=t&&t.tagName;
+ if(e.key==="Escape"){
+   if(!$("bk-compare").hidden||!$("bk-help").hidden){togglePanel("bk-compare",false);togglePanel("bk-help",false);}
+   else if((tag==="INPUT"||tag==="SELECT")&&root.contains(t)){t.blur();}
+   return;
+ }
+ if(tag==="TEXTAREA"||tag==="SELECT"||(t&&t.isContentEditable)){return;}
+ if(tag==="INPUT"&&t.type!=="range"&&!t.readOnly){return;}
+ if(tag==="INPUT"&&t.type==="range"&&e.key!==" "){return;}
+ if(t&&t!==document.body&&!root.contains(t)&&t.closest&&t.closest("a,button,input")){return;}
+ switch(e.key){
+   case "ArrowRight":e.preventDefault();pause();go(st.step+1,true);break;
+   case "ArrowLeft":e.preventDefault();pause();go(st.step-1,false);break;
+   case " ":case "Spacebar":e.preventDefault();togglePlay();break;
+   case "Home":e.preventDefault();pause();go(0,false);break;
+   case "End":e.preventDefault();pause();go(st.plan.length-1,false);break;
+ }
+});
+
+/* ---------- fullscreen + fit to viewport ---------- */
+var fsBtn=$("bk-fs");
+function fsEl(){return document.fullscreenElement||document.webkitFullscreenElement||null;}
+function toggleFs(){
+ if(fsEl()){(document.exitFullscreen||document.webkitExitFullscreen).call(document);}
+ else{var req=root.requestFullscreen||root.webkitRequestFullscreen;if(req){req.call(root);}}
+}
+if(!(root.requestFullscreen||root.webkitRequestFullscreen)){fsBtn.hidden=true;}
+function onFs(){
+ var on=fsEl()===root;
+ $("bk-fsicon").setAttribute("d",on?"M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5":"M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5");
+ fsBtn.setAttribute("aria-label",on?"Exit fullscreen":"Fullscreen");
+ fit();
+}
+document.addEventListener("fullscreenchange",onFs);
+document.addEventListener("webkitfullscreenchange",onFs);
+function docTop(el){var y=0;while(el){y+=el.offsetTop;el=el.offsetParent;}return y;}
+var lastFit="";
+function fit(){
+ if(fsEl()===root||window.innerWidth<=600){root.style.removeProperty("--osim-h");}
+ else{
+   var h=Math.max(420,Math.floor(window.innerHeight-docTop(root)-12));
+   root.style.setProperty("--osim-h",h+"px");
+   var over=document.documentElement.scrollHeight-window.innerHeight;
+   if(over>0){root.style.setProperty("--osim-h",Math.max(420,h-over)+"px");}
+ }
+ if(narrow.matches){mwrap.style.height=(60+st.p*34)+"px";}else{mwrap.style.height="";}
+ var key=mwrap.clientWidth+"x"+mwrap.clientHeight+"x"+st.p;
+ if(key!==lastFit){lastFit=key;buildMatrix();draw(false);}
+}
+window.addEventListener("resize",fit);
+window.addEventListener("load",fit);
+if(window.ResizeObserver){new ResizeObserver(function(){fit();}).observe(mwrap);}
+
+/* ---------- init ---------- */
+loadScen("classic");
+replan();
+fit();
+setTimeout(fit,400);
 })();
 </script>
