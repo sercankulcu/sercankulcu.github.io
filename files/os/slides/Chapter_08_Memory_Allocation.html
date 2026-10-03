@@ -12,6 +12,8 @@ excerpt: "An interactive memory allocation simulator for First Fit, Best Fit, Wo
   --ma-text:var(--global-text-color);
   --ma-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
   --ma-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  --ma-field:color-mix(in srgb,var(--global-text-color) 65%,var(--global-bg-color));
+  --ma-btn:color-mix(in srgb,var(--global-link-color) 62%,#000);
   max-width:1180px;margin:0 auto;color:var(--ma-text);
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
@@ -22,18 +24,23 @@ excerpt: "An interactive memory allocation simulator for First Fit, Best Fit, Wo
 .mem-alloc .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
 .mem-alloc label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
 .mem-alloc input,.mem-alloc select,.mem-alloc button{
-  font:inherit;border:1px solid var(--ma-line);border-radius:10px;padding:.62rem .7rem;background:var(--global-bg-color);color:var(--ma-text)
+  font:inherit;border:1px solid var(--ma-field);border-radius:10px;padding:.62rem .7rem;background:var(--global-bg-color);color:var(--ma-text);max-width:100%
 }
 .mem-alloc button{cursor:pointer;font-weight:800}
-.mem-alloc button.primary{background:var(--ma-accent);color:#fff;border-color:var(--ma-accent)}
+.mem-alloc button.primary{background:var(--ma-btn);color:#fff;border-color:var(--ma-btn)}
 .mem-alloc .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
-.mem-alloc .memory{display:flex;min-height:160px;border:1px solid var(--ma-line);border-radius:14px;overflow:hidden;margin-top:1rem}
-.mem-alloc .block{min-width:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.5rem;border-right:1px solid var(--ma-line);text-align:center}
+.mem-alloc .memory{display:flex;min-height:160px;border:1px solid var(--ma-line);border-radius:14px;overflow-x:auto;overflow-y:hidden;margin-top:1rem}
+.mem-alloc .block{flex-shrink:0;flex-basis:0;min-width:56px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.5rem;border-right:1px solid var(--ma-line);text-align:center}
 .mem-alloc .block.free{background:var(--ma-soft)}
 .mem-alloc .block.used{background:color-mix(in srgb,var(--ma-accent) 16%,var(--global-bg-color))}
 .mem-alloc .block:last-child{border-right:0}
 .mem-alloc .block strong{font-size:.9rem}
 .mem-alloc .block span{font-size:.78rem;color:var(--ma-muted)}
+.mem-alloc .block.sys{background:repeating-linear-gradient(45deg,var(--global-bg-color) 0 6px,var(--ma-soft) 6px 12px)}
+.mem-alloc .block.cursor{box-shadow:inset 0 4px 0 var(--ma-btn)}
+.mem-alloc .block strong,.mem-alloc .block span{overflow-wrap:anywhere;max-width:100%}
+.mem-alloc .msg{margin-top:.8rem;padding:.7rem .85rem;border-radius:10px;border:1px solid #c0392b;border-left-width:5px;background:color-mix(in srgb,#c0392b 9%,var(--global-bg-color));font-weight:700}
+.mem-alloc .msg:empty{display:none}
 .mem-alloc .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin-top:1rem}
 .mem-alloc .metric{padding:.85rem;border:1px solid var(--ma-line);border-radius:14px;background:var(--ma-soft)}
 .mem-alloc .metric b{display:block;font-size:1.15rem;margin-top:.2rem}
@@ -44,7 +51,7 @@ excerpt: "An interactive memory allocation simulator for First Fit, Best Fit, Wo
 .mem-alloc .log{margin-top:1rem;max-height:230px;overflow:auto;border:1px solid var(--ma-line);border-radius:12px;padding:.8rem;background:var(--ma-soft);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86rem}
 .mem-alloc .note{color:var(--ma-muted);font-size:.88rem}
 @media(max-width:900px){.mem-alloc .controls,.mem-alloc .metrics{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.mem-alloc .controls,.mem-alloc .metrics{grid-template-columns:1fr}.mem-alloc .memory{overflow-x:auto}}
+@media(max-width:600px){.mem-alloc .controls,.mem-alloc .metrics{grid-template-columns:1fr}}
 </style>
 
 <div class="mem-alloc">
@@ -65,10 +72,10 @@ excerpt: "An interactive memory allocation simulator for First Fit, Best Fit, Wo
         </select>
       </label>
       <label>Process ID
-        <input id="pid" value="P1">
+        <input id="pid" value="P1" maxlength="12">
       </label>
       <label>Process size
-        <input id="size" type="number" min="1" value="120">
+        <input id="size" type="number" min="1" step="1" value="120">
       </label>
       <label>Scenario
         <select id="scenario">
@@ -83,11 +90,13 @@ excerpt: "An interactive memory allocation simulator for First Fit, Best Fit, Wo
       <button id="loadScenario">Load scenario</button>
       <button id="reset">Reset</button>
     </div>
+    <div id="msg" class="msg" role="alert" aria-live="assertive"></div>
   </section>
 
   <section class="panel">
     <h2>Memory Map</h2>
     <div id="memory" class="memory"></div>
+    <p class="note" id="cursorNote"></p>
     <div class="metrics">
       <div class="metric">Total free memory<b id="totalFree">–</b></div>
       <div class="metric">Largest free block<b id="largestHole">–</b></div>
@@ -116,7 +125,8 @@ excerpt: "An interactive memory allocation simulator for First Fit, Best Fit, Wo
     <p><strong>First Fit:</strong> choose the first hole large enough.</p>
     <p><strong>Best Fit:</strong> choose the smallest hole that can satisfy the request.</p>
     <p><strong>Worst Fit:</strong> choose the largest available hole.</p>
-    <p><strong>Next Fit:</strong> like First Fit, but continue searching from the previous allocation position.</p>
+    <p><strong>Next Fit:</strong> like First Fit, but the search starts at the address right after the previous allocation (including the leftover part of the hole that was just split) and wraps around to the beginning of memory. The cursor is stored as an address, so freeing and coalescing do not move it; if the cursor lies inside a coalesced hole, that whole hole is examined first.</p>
+    <p class="note">Hatched SYS blocks are reserved by the operating system and cannot be freed; user process IDs may not start with “SYS”. Block widths are proportional to their size (very small blocks keep a minimum width so their labels stay readable).</p>
     <p class="note">External fragmentation is approximated here as total free memory minus the largest free block. A high value means free space is split across many smaller holes.</p>
   </section>
 </div>
@@ -134,6 +144,8 @@ const alg=root.querySelector("#algorithm");
 const pidInput=root.querySelector("#pid");
 const sizeInput=root.querySelector("#size");
 const scenario=root.querySelector("#scenario");
+const msg=root.querySelector("#msg");
+const cursorNote=root.querySelector("#cursorNote");
 
 let blocks=[];
 let nextCursor=0;
@@ -144,17 +156,26 @@ const scenarios={
   large:[320,180,420,260]
 };
 
+function esc(s){
+  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+function setMsg(t){msg.textContent=t||"";}
+function isSys(b){return b.type==="used"&&b.sys===true;}
+function totalSize(){return blocks.reduce((s,b)=>s+b.size,0);}
+
 function init(sizes){
   blocks=[];
   sizes.forEach((size,i)=>{
     if(i>0){
-      blocks.push({type:"used",pid:"SYS"+i,size:40,start:0});
+      blocks.push({type:"used",pid:"SYS"+i,sys:true,size:40,start:0});
     }
     blocks.push({type:"free",size,start:0});
   });
   recalcStarts();
   nextCursor=0;
   logEl.innerHTML="";
+  setMsg("");
+  pidInput.value="P1";
   addLog("Scenario loaded.");
   render();
 }
@@ -164,40 +185,50 @@ function recalcStarts(){
   blocks.forEach(b=>{b.start=p;p+=b.size;});
 }
 
-function addLog(msg){
+function addLog(text){
   const d=document.createElement("div");
-  d.textContent=msg;
+  d.textContent=text;
   logEl.appendChild(d);
   logEl.scrollTop=logEl.scrollHeight;
 }
 
-function candidateIndices(size){
-  return blocks.map((b,i)=>b.type==="free"&&b.size>=size?i:-1).filter(i=>i>=0);
-}
-
+/* Returns the index (in blocks) of the hole chosen by the current algorithm, or -1. */
 function chooseIndex(size){
-  const ids=candidateIndices(size);
-  if(!ids.length)return -1;
-  if(alg.value==="first")return ids[0];
-  if(alg.value==="best")return ids.sort((a,b)=>blocks[a].size-blocks[b].size)[0];
-  if(alg.value==="worst")return ids.sort((a,b)=>blocks[b].size-blocks[a].size)[0];
-  const n=blocks.length;
-  for(let off=0;off<n;off++){
-    const i=(nextCursor+off)%n;
-    if(blocks[i].type==="free"&&blocks[i].size>=size)return i;
+  const holes=blocks.map((b,i)=>b.type==="free"?i:-1).filter(i=>i>=0);
+  const fits=holes.filter(i=>blocks[i].size>=size);
+  if(!fits.length)return -1;
+  if(alg.value==="first")return fits[0];
+  if(alg.value==="best")return fits.reduce((m,i)=>blocks[i].size<blocks[m].size?i:m,fits[0]);
+  if(alg.value==="worst")return fits.reduce((m,i)=>blocks[i].size>blocks[m].size?i:m,fits[0]);
+  let k=holes.findIndex(i=>blocks[i].start+blocks[i].size>nextCursor);
+  if(k<0)k=0;
+  for(let off=0;off<holes.length;off++){
+    const i=holes[(k+off)%holes.length];
+    if(blocks[i].size>=size)return i;
   }
   return -1;
 }
 
+function bumpPid(pid){
+  const m=/^(.*?)(\d+)$/.exec(pid);
+  if(!m)return pid;
+  let n=+m[2]+1,cand=m[1]+n;
+  while(blocks.some(b=>b.type==="used"&&b.pid===cand)){n++;cand=m[1]+n;}
+  return cand;
+}
+
 function allocate(){
+  setMsg("");
   const pid=pidInput.value.trim();
-  const size=+sizeInput.value;
-  if(!pid){alert("Enter a process ID.");return;}
-  if(!Number.isFinite(size)||size<=0){alert("Process size must be greater than 0.");return;}
-  if(blocks.some(b=>b.type==="used"&&b.pid===pid)){alert("Process ID already exists.");return;}
+  const raw=sizeInput.value.trim();
+  if(!pid){setMsg("Enter a process ID.");return;}
+  if(/^sys/i.test(pid)){setMsg("Process IDs starting with \"SYS\" are reserved for operating-system blocks.");return;}
+  if(raw===""||sizeInput.validity.badInput||!/^\d+$/.test(raw)||+raw<1){setMsg("Process size must be a whole number greater than 0.");return;}
+  const size=+raw;
+  if(blocks.some(b=>b.type==="used"&&b.pid===pid)){setMsg("Process ID \""+pid+"\" already exists.");return;}
 
   const idx=chooseIndex(size);
-  if(idx<0){addLog(pid+" cannot be allocated: no hole is large enough.");render();return;}
+  if(idx<0){addLog(pid+" ("+size+") cannot be allocated: no hole is large enough.");setMsg(pid+" cannot be allocated: no single hole of "+size+" units is available.");render();return;}
 
   const hole=blocks[idx];
   const used={type:"used",pid,size,start:hole.start};
@@ -206,17 +237,20 @@ function allocate(){
   if(rest>0)replacement.push({type:"free",size:rest,start:hole.start+size});
   blocks.splice(idx,1,...replacement);
   recalcStarts();
-  if(alg.value==="next")nextCursor=(idx+replacement.length)%blocks.length;
-  addLog(pid+" allocated "+size+" units using "+alg.options[alg.selectedIndex].text+".");
+  nextCursor=used.start+size;
+  if(nextCursor>=totalSize())nextCursor=0;
+  addLog(pid+" allocated "+size+" units at address "+used.start+" using "+alg.options[alg.selectedIndex].text+".");
+  pidInput.value=bumpPid(pid);
   render();
 }
 
 function freePid(pid){
-  const idx=blocks.findIndex(b=>b.type==="used"&&b.pid===pid);
+  const idx=blocks.findIndex(b=>b.type==="used"&&!b.sys&&b.pid===pid);
   if(idx<0)return;
+  setMsg("");
   blocks[idx]={type:"free",size:blocks[idx].size,start:blocks[idx].start};
   mergeFree();
-  addLog(pid+" deallocated.");
+  addLog(pid+" deallocated; adjacent holes coalesced.");
   render();
 }
 
@@ -232,29 +266,33 @@ function mergeFree(){
 
 function render(){
   memoryEl.innerHTML="";
-  const total=blocks.reduce((s,b)=>s+b.size,0);
+  const cursorBlock=blocks.find(b=>b.type==="free"&&b.start+b.size>nextCursor);
   blocks.forEach(b=>{
     const d=document.createElement("div");
-    d.className="block "+(b.type==="free"?"free":"used");
-    d.style.flex=Math.max(1,b.size/Math.max(1,total));
+    d.className="block "+(b.type==="free"?"free":"used")+(isSys(b)?" sys":"")+(alg.value==="next"&&b===cursorBlock?" cursor":"");
+    d.style.flexGrow=b.size;
+    d.title=(b.type==="free"?"Free":b.pid)+": "+b.size+" units, addresses "+b.start+"–"+(b.start+b.size-1);
     d.innerHTML=b.type==="free"
-      ? `<strong>Free</strong><span>${b.size} units</span>`
-      : `<strong>${b.pid}</strong><span>${b.size} units</span>`;
+      ? `<strong>Free</strong><span>${b.size} units</span><span>@${b.start}</span>`
+      : `<strong>${esc(b.pid)}</strong><span>${b.size} units</span><span>@${b.start}</span>`;
     memoryEl.appendChild(d);
   });
+  cursorNote.textContent=alg.value==="next"?"Next Fit cursor: the next search starts at address "+nextCursor+" (marked hole).":"";
 
   allocBody.innerHTML="";
-  blocks.filter(b=>b.type==="used"&&!b.pid.startsWith("SYS")).forEach(b=>{
+  blocks.filter(b=>b.type==="used"&&!b.sys).forEach(b=>{
     const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${b.pid}</td><td>${b.size}</td><td>${b.start}</td><td>${b.start+b.size-1}</td><td><button type="button">Free</button></td>`;
-    tr.querySelector("button").addEventListener("click",()=>freePid(b.pid));
+    tr.innerHTML=`<td>${esc(b.pid)}</td><td>${b.size}</td><td>${b.start}</td><td>${b.start+b.size-1}</td><td><button type="button">Free</button></td>`;
+    const btn=tr.querySelector("button");
+    btn.setAttribute("aria-label","Free "+b.pid);
+    btn.addEventListener("click",()=>freePid(b.pid));
     allocBody.appendChild(tr);
   });
 
   const free=blocks.filter(b=>b.type==="free");
   const totalFree=free.reduce((s,b)=>s+b.size,0);
   const largest=free.length?Math.max(...free.map(b=>b.size)):0;
-  const allocCount=blocks.filter(b=>b.type==="used"&&!b.pid.startsWith("SYS")).length;
+  const allocCount=blocks.filter(b=>b.type==="used"&&!b.sys).length;
   root.querySelector("#totalFree").textContent=totalFree;
   root.querySelector("#largestHole").textContent=largest;
   root.querySelector("#externalFrag").textContent=Math.max(0,totalFree-largest);
@@ -264,6 +302,7 @@ function render(){
 root.querySelector("#allocate").addEventListener("click",allocate);
 root.querySelector("#loadScenario").addEventListener("click",()=>init(scenarios[scenario.value]));
 root.querySelector("#reset").addEventListener("click",()=>init(scenarios.default));
+alg.addEventListener("change",()=>{setMsg("");render();});
 
 init(scenarios.default);
 })();

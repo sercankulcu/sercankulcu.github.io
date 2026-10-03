@@ -12,20 +12,24 @@ excerpt: "An interactive page replacement simulator for FIFO, Optimal, LRU, LFU,
   --pr-text:var(--global-text-color);
   --pr-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
   --pr-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  --pr-field:color-mix(in srgb,var(--global-text-color) 65%,var(--global-bg-color));
+  --pr-btn:color-mix(in srgb,var(--global-link-color) 62%,#000);
   max-width:1180px;margin:0 auto;color:var(--pr-text);
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 .page-repl *{box-sizing:border-box}
-.page-repl h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0}
+.page-repl h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0;overflow-wrap:anywhere}
 .page-repl .lead{max-width:900px;color:var(--pr-muted)}
 .page-repl .panel{margin-top:1rem;padding:1rem;border:1px solid var(--pr-line);border-radius:18px;background:var(--global-bg-color)}
 .page-repl .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
 .page-repl label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
 .page-repl input,.page-repl select,.page-repl button{
-  font:inherit;border:1px solid var(--pr-line);border-radius:10px;padding:.62rem .7rem;background:var(--global-bg-color);color:var(--pr-text)
+  font:inherit;border:1px solid var(--pr-field);border-radius:10px;padding:.62rem .7rem;background:var(--global-bg-color);color:var(--pr-text);max-width:100%
 }
 .page-repl button{cursor:pointer;font-weight:800}
-.page-repl button.primary{background:var(--pr-accent);color:#fff;border-color:var(--pr-accent)}
+.page-repl button.primary{background:var(--pr-btn);color:#fff;border-color:var(--pr-btn)}
+.page-repl .msg{margin-top:.8rem;padding:.7rem .85rem;border-radius:10px;border:1px solid #c0392b;border-left-width:5px;background:color-mix(in srgb,#c0392b 9%,var(--global-bg-color));font-weight:700}
+.page-repl .msg:empty{display:none}
 .page-repl .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
 .page-repl .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin-top:1rem}
 .page-repl .metric{padding:.85rem;border:1px solid var(--pr-line);border-radius:14px;background:var(--pr-soft)}
@@ -66,11 +70,11 @@ excerpt: "An interactive page replacement simulator for FIFO, Optimal, LRU, LFU,
         <input id="frames" type="number" min="1" max="8" value="3">
       </label>
       <label>Reference string
-        <input id="refs" value="7 0 1 2 0 3 0 4 2 3 0 3 2">
+        <input id="refs" value="7 0 1 2 0 3 0 4 2 3 0 3 2 1 2 0 1 7 0 1" aria-describedby="refsHelp">
       </label>
       <label>Scenario
         <select id="scenario">
-          <option value="default">Classic</option>
+          <option value="default">Classic (20 references)</option>
           <option value="belady">Belady anomaly</option>
           <option value="locality">Locality-heavy</option>
         </select>
@@ -81,6 +85,8 @@ excerpt: "An interactive page replacement simulator for FIFO, Optimal, LRU, LFU,
       <button id="loadScenario">Load scenario</button>
       <button id="compareAll">Compare all</button>
     </div>
+    <div id="msg" class="msg" role="alert" aria-live="assertive"></div>
+    <p id="refsHelp" class="note">Page numbers are non-negative integers separated by spaces or commas (at most 60 references).</p>
   </section>
 
   <section class="panel">
@@ -104,11 +110,11 @@ excerpt: "An interactive page replacement simulator for FIFO, Optimal, LRU, LFU,
   <section class="panel">
     <h2>Algorithm Guide</h2>
     <p><strong>FIFO:</strong> removes the page that entered memory earliest.</p>
-    <p><strong>Optimal:</strong> removes the page whose next use is farthest in the future. It is a theoretical benchmark because real systems do not know future references.</p>
+    <p><strong>Optimal:</strong> removes the page whose next use is farthest in the future (if several pages are never used again, the one in the lowest frame is chosen). It is a theoretical benchmark because real systems do not know future references.</p>
     <p><strong>LRU:</strong> removes the page that has not been used for the longest time.</p>
-    <p><strong>LFU:</strong> removes the page with the lowest reference count; ties are broken by oldest recent use.</p>
-    <p><strong>Second Chance / Clock:</strong> approximates LRU using a reference bit and a circular pointer.</p>
-    <p class="note">Try the Belady anomaly scenario with FIFO and compare 3 vs 4 frames. FIFO can sometimes produce more faults when given more memory.</p>
+    <p><strong>LFU:</strong> removes the page with the lowest reference count; ties are broken by least recent use (LRU). Variant used here: a page's counter starts at 1 when it is loaded and is <em>reset</em> when the page is evicted, so history is not kept for pages that are not in memory.</p>
+    <p><strong>Second Chance / Clock:</strong> approximates LRU using a reference bit and a circular pointer. A newly loaded page gets R = 1 and the hand advances past it; a hit sets R = 1; on a fault the hand clears R = 1 bits until it finds R = 0.</p>
+    <p class="note">With the Classic string and 3 frames: FIFO 15, Optimal 9, LRU 12, Clock 14 faults. Try the Belady anomaly scenario with FIFO and compare 3 vs 4 frames. FIFO can sometimes produce more faults when given more memory.</p>
   </section>
 </div>
 
@@ -125,16 +131,22 @@ const table=root.querySelector("#resultTable");
 const compare=root.querySelector("#compare");
 
 const scenarios={
-  default:"7 0 1 2 0 3 0 4 2 3 0 3 2",
+  default:"7 0 1 2 0 3 0 4 2 3 0 3 2 1 2 0 1 7 0 1",
   belady:"1 2 3 4 1 2 5 1 2 3 4 5",
   locality:"1 2 3 2 1 2 4 1 2 3 2 1 5 1 2"
 };
 
+const msg=root.querySelector("#msg");
+function showMsg(text){msg.textContent=text||"";}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
 function parseRefs(){
-  return refsInput.value.trim().split(/[\s,]+/).filter(Boolean).map(x=>{
-    const n=Number(x);
-    if(!Number.isFinite(n))throw new Error("Reference string must contain numbers only.");
-    return n;
+  const parts=refsInput.value.trim().split(/[\s,]+/).filter(Boolean);
+  if(!parts.length)throw new Error("Enter a reference string (for example: 7 0 1 2 0 3).");
+  if(parts.length>60)throw new Error("Use at most 60 references.");
+  return parts.map(x=>{
+    if(!/^\d+$/.test(x))throw new Error("Reference string must contain non-negative integers only (found “"+x+"”).");
+    return Number(x);
   });
 }
 function frameCount(){
@@ -212,6 +224,7 @@ function runLFU(refs,n){
           if(fp<fv||(fp===fv&&(last.get(p)??-1)<(last.get(victim)??-1)))victim=p;
         });
         frames[frames.indexOf(victim)]=page;
+        freq.delete(victim);
       }
     }
     freq.set(page,(freq.get(page)??0)+1);
@@ -245,6 +258,7 @@ function simulate(mode,refs,n){
 }
 
 function render(mode){
+  showMsg("");
   try{
     const refs=parseRefs(),n=frameCount(),steps=simulate(mode,refs,n);
     const faults=steps.filter(s=>!s.hit).length,hits=steps.length-faults;
@@ -255,21 +269,26 @@ function render(mode){
 
     table.innerHTML="";
     const head=document.createElement("tr");
-    head.innerHTML="<th>Reference</th>"+refs.map(x=>`<th>${x}</th>`).join("");
+    head.innerHTML="<th>Reference</th>"+refs.map(x=>`<th>${esc(x)}</th>`).join("");
     table.appendChild(head);
 
     for(let f=0;f<n;f++){
       const tr=document.createElement("tr");
-      tr.innerHTML=`<th>Frame ${f+1}</th>`+steps.map(s=>`<td>${s.frames[f]??"–"}</td>`).join("");
+      tr.innerHTML=`<th>Frame ${f+1}</th>`+steps.map(s=>`<td>${s.frames[f]==null?"–":esc(s.frames[f])}</td>`).join("");
       table.appendChild(tr);
     }
     const last=document.createElement("tr");
     last.innerHTML="<th>Result</th>"+steps.map(s=>`<td class="${s.hit?"hit":"fault"}">${s.hit?"Hit":"Fault"}</td>`).join("");
     table.appendChild(last);
-  }catch(e){alert(e.message);}
+  }catch(e){
+    showMsg(e.message);
+    ["#faults","#hits","#faultRate","#hitRate"].forEach(s=>root.querySelector(s).textContent="–");
+    table.innerHTML="";
+  }
 }
 
 function compareAll(){
+  showMsg("");
   try{
     const refs=parseRefs(),n=frameCount();
     compare.innerHTML="";
@@ -281,7 +300,7 @@ function compareAll(){
       d.innerHTML=`${label}<b>${faults}</b><span>faults</span>`;
       compare.appendChild(d);
     });
-  }catch(e){alert(e.message);}
+  }catch(e){showMsg(e.message);compare.innerHTML="";}
 }
 
 root.querySelector("#run").addEventListener("click",()=>render(alg.value));
