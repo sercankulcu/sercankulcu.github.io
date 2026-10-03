@@ -2,382 +2,982 @@
 layout: without-sidebar
 title: "CPU Scheduling Simulator"
 permalink: /files/os/slides/Chapter_05_CPU_Scheduling.html
-excerpt: "An interactive CPU scheduling simulator for FCFS, SJF, SRTF, non-preemptive and preemptive Priority, and Round Robin with Gantt charts and performance metrics."
+excerpt: "An interactive CPU scheduling simulator for FCFS, SJF, SRTF, non-preemptive and preemptive Priority, and Round Robin with an animated Gantt chart, ready queue, and metric comparison."
 ---
 
 <style>
-.cpu-sim{
-  --cs-line:var(--global-border-color);
-  --cs-accent:var(--global-link-color);
-  --cs-text:var(--global-text-color);
-  --cs-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
-  --cs-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
-  --cs-field:color-mix(in srgb,var(--global-text-color) 65%,var(--global-bg-color));
-  --cs-btn:color-mix(in srgb,var(--global-link-color) 62%,#000);
-  max-width:1180px;margin:0 auto;color:var(--cs-text);
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+body:has(.osim) .page__footer{display:none}
+body:has(.osim){padding-bottom:0}
+.osim{
+  --o-bg:var(--global-bg-color,#fff);
+  --o-fg:var(--global-text-color,#333);
+  --o-link:var(--global-link-color,#2a7ab0);
+  --o-muted:color-mix(in srgb,var(--o-fg) 82%,var(--o-bg));
+  --o-line:color-mix(in srgb,var(--o-fg) 66%,var(--o-bg));
+  --o-soft:color-mix(in srgb,var(--o-fg) 16%,var(--o-bg));
+  --o-surf:color-mix(in srgb,var(--o-fg) 5%,var(--o-bg));
+  --o-cell:color-mix(in srgb,var(--o-fg) 9%,var(--o-bg));
+  --o-pri:color-mix(in srgb,var(--o-link) 62%,#000);
+  --o-acc:color-mix(in srgb,var(--o-link) 65%,var(--o-fg));
+  --o-hit:color-mix(in srgb,#0072b2 60%,var(--o-fg));
+  --o-flt:color-mix(in srgb,#d55e00 60%,var(--o-fg));
+  --o-hit-bg:color-mix(in srgb,var(--o-hit) 20%,var(--o-bg));
+  --o-flt-bg:color-mix(in srgb,var(--o-flt) 20%,var(--o-bg));
+  --o-dur:420ms;
+  position:relative;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;
+  height:var(--osim-h,calc(100vh - 112px));min-height:420px;padding:8px;border-radius:16px;
+  background:var(--o-surf);color:var(--o-fg);overflow:hidden;
+  font:15px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-variant-numeric:tabular-nums;
 }
-.cpu-sim *{box-sizing:border-box}
-.cpu-sim h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0;overflow-wrap:anywhere}
-.cpu-sim .lead{color:var(--cs-muted);max-width:850px}
-.cpu-sim .panel{border:1px solid var(--cs-line);border-radius:18px;padding:1rem;margin-top:1rem;background:var(--global-bg-color);min-width:0}
-.cpu-sim .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
-.cpu-sim label{display:flex;flex-direction:column;gap:.35rem;font-weight:700;font-size:.9rem}
-.cpu-sim input,.cpu-sim select,.cpu-sim button{
-  font:inherit;border:1px solid var(--cs-field);border-radius:10px;padding:.62rem .7rem;
-  background:var(--global-bg-color);color:var(--cs-text);max-width:100%
+.osim *,.osim *::before,.osim *::after{box-sizing:border-box;transition:none}
+.osim:fullscreen{height:100vh;border-radius:0;padding:12px}
+.osim::backdrop{background:var(--o-bg)}
+.osim h1,.osim h3,.osim p{margin:0;padding:0}
+.osim .osim-title{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;line-height:1.1;white-space:nowrap;margin-right:4px;color:var(--o-fg)}
+.osim .osim-title svg{width:22px;height:22px;color:var(--o-acc)}
+.osim button{font:inherit;color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:9px;
+  height:34px;padding:0 11px;margin:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  font-weight:650;font-size:14px;line-height:1;white-space:nowrap;box-shadow:none}
+.osim button:hover{background:var(--o-cell)}
+.osim button:disabled{opacity:.45;cursor:not-allowed}
+.osim button:focus-visible,.osim input:focus-visible{outline:2px solid var(--o-fg);outline-offset:2px}
+.osim button.osim-pri,.osim button[aria-pressed="true"]{background:var(--o-pri);border-color:var(--o-pri);color:#fff;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--o-fg) 70%,transparent)}
+.osim .osim-ib{width:34px;padding:0}
+.osim svg{width:18px;height:18px;flex:none;overflow:visible}
+.osim svg.fi{fill:currentColor;stroke:none}
+.osim svg.st{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.osim .osim-bar{position:relative;display:flex;flex-direction:column;gap:7px;padding:8px 10px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0}
+.osim .osim-lbl{font-size:12px;font-weight:700;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em}
+.osim .osim-seg{display:inline-flex;border:1px solid var(--o-line);border-radius:10px;padding:2px;gap:2px;background:var(--o-bg)}
+.osim .osim-seg button{border:0;height:30px;border-radius:8px;padding:0 10px}
+.osim .osim-seg-sm button{padding:0 9px;font-size:13px}
+.osim .osim-grp{display:inline-flex;align-items:center;gap:3px}
+.osim .osim-num{min-width:22px;text-align:center;font-weight:800;font-size:17px}
+.osim .osim-spacer{flex:1}
+.osim input[type="range"]{width:78px;height:20px;padding:0;margin:0;border:0;background:transparent;box-shadow:none;accent-color:var(--o-pri);display:inline-block;vertical-align:middle}
+.osim .osim-speedv{font-size:13px;font-weight:700;min-width:34px}
+.osim .osim-alert{position:absolute;left:10px;top:calc(100% + 6px);z-index:30;max-width:min(560px,90%);padding:7px 11px;border-radius:9px;
+  background:var(--o-bg);color:var(--o-fg);border:2px solid var(--o-flt);font-size:13.5px;font-weight:650;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.osim .osim-alert:empty{display:none}
+.osim .osim-stage{position:relative;flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:8px}
+.osim .osim-viz{position:relative;min-width:0;min-height:0;overflow:hidden;background:var(--o-bg);border-radius:12px;padding:8px 10px;box-shadow:0 0 0 1px var(--o-soft);display:flex;flex-direction:column;gap:8px}
+.osim .osim-side{display:flex;flex-direction:column;gap:6px;min-height:0;min-width:0;padding:10px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft);overflow:hidden}
+.osim .osim-sh{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.osim .osim-sh b{font-size:14.5px}
+.osim .osim-sh span{font-size:12px;color:var(--o-muted);font-weight:650}
+.osim .osim-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:7px 10px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-narr{flex:1;min-width:220px;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.osim .osim-k{display:inline-block;padding:1px 7px;border-radius:6px;font-weight:800}
+.osim .osim-k.h{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-k.x{background:var(--o-flt-bg);box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .osim-stats{display:flex;gap:6px;flex-wrap:wrap}
+.osim .osim-stat{display:inline-flex;gap:5px;height:28px;align-items:center;padding:0 9px;border-radius:8px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft);font-size:12.5px;font-weight:650;color:var(--o-muted)}
+.osim .osim-stat b{font-size:15px;color:var(--o-fg)}
+.osim .osim-stat.h{box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-panel{position:absolute;z-index:20;top:0;right:0;bottom:0;width:min(420px,100%);display:flex;flex-direction:column;gap:10px;padding:12px 14px;
+  background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-line),0 10px 30px rgba(0,0,0,.22);overflow:auto}
+.osim .osim-panel[hidden]{display:none}
+.osim .osim-ph{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.osim .osim-ph b{font-size:15px}
+.osim .osim-ph span{font-size:12.5px;color:var(--o-muted);font-weight:650}
+.osim .osim-sub{font-size:12px;font-weight:750;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em}
+.osim .osim-help dl{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;margin:0;font-size:13.5px}
+.osim .osim-help dt{font-weight:800}
+.osim .osim-help dd{margin:0}
+.osim .osim-legend{display:flex;flex-wrap:wrap;gap:6px;font-size:12.5px;font-weight:650}
+.osim .osim-legend span{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:7px}
+.osim kbd{font:inherit;font-size:12px;font-weight:750;padding:1px 5px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--o-line)}
+
+/* ---- CPU scheduling: lanes ---- */
+.osim .cs-lanes{position:relative;flex:none;height:180px}
+.osim .cs-lane{position:absolute;top:0;bottom:0;border-radius:10px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft)}
+.osim .cs-lane.up{background:transparent;box-shadow:none;border:1.5px dashed var(--o-line)}
+.osim .cs-lane.cpu{background:var(--o-bg);box-shadow:inset 0 0 0 2.5px var(--o-acc)}
+.osim .cs-lane h3{position:absolute;top:5px;left:8px;right:6px;font-size:11.5px;font-weight:750;line-height:1.2;text-transform:uppercase;letter-spacing:.04em;color:var(--o-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.osim .cs-lane .sub{position:absolute;bottom:5px;left:8px;right:6px;font-size:11.5px;font-weight:650;color:var(--o-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.osim .cs-lane.cpu .sub{text-align:center;color:var(--o-fg);font-weight:750}
+.osim .cs-arrow{position:absolute;width:0;height:0;border:7px solid transparent;border-left:10px solid var(--o-line);margin-top:-7px}
+.osim .pchip{position:absolute;left:0;top:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:9px;
+  background:color-mix(in srgb,var(--pc) 24%,var(--o-bg));box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--pc) 55%,var(--o-fg));color:var(--o-fg);transform-origin:0 0}
+.osim .pchip.mv{transition:transform var(--o-dur) ease,opacity var(--o-dur) ease}
+.osim .pchip b{font-size:15px;font-weight:800;line-height:1}
+.osim .pchip .k{font-size:11px;font-weight:750;line-height:1}
+.osim .pchip .pb{display:block;width:70%;height:4px;border-radius:2px;background:color-mix(in srgb,var(--o-fg) 18%,transparent);overflow:hidden}
+.osim .pchip .pb span{display:block;height:100%;width:0;background:var(--o-fg)}
+.osim .pchip.fut{background:var(--o-bg);box-shadow:inset 0 0 0 1.5px var(--o-line);border:0}
+.osim .pchip.fut b{color:var(--o-muted)}
+.osim .pchip.done::after{content:"\2713";position:absolute;top:2px;right:4px;font-size:11px;font-weight:900}
+.osim .pchip.run{z-index:3;box-shadow:inset 0 0 0 3px color-mix(in srgb,var(--pc) 55%,var(--o-fg)),0 3px 10px rgba(0,0,0,.2)}
+.osim .pchip.pre{outline:2px dashed var(--o-flt);outline-offset:2px}
+.osim .pchip.newin{outline:2px solid var(--o-acc);outline-offset:2px}
+
+/* ---- CPU scheduling: Gantt ---- */
+.osim .cs-gbox{position:relative;flex:1;min-height:0;display:flex}
+.osim .cs-glabs{position:relative;flex:none;width:58px}
+.osim .cs-glab{position:absolute;left:0;right:6px;display:flex;align-items:center;justify-content:flex-end;gap:5px;font-size:13px;font-weight:750;white-space:nowrap}
+.osim .cs-glab i{display:inline-block;width:10px;height:10px;border-radius:3px;background:color-mix(in srgb,var(--pc) 24%,var(--o-bg));box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--pc) 55%,var(--o-fg))}
+.osim .cs-glab.cpu{font-weight:800;color:var(--o-fg)}
+.osim .cs-glab.on{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
+.osim .cs-gwrap{position:relative;flex:1;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
+.osim .cs-gantt{position:relative;height:100%}
+.osim .cs-row{position:absolute;left:0;right:0;border-radius:6px;background:var(--o-surf)}
+.osim .cs-grid{position:absolute;left:0;top:0;pointer-events:none;background-image:repeating-linear-gradient(90deg,var(--o-soft) 0 1px,transparent 1px var(--u,20px))}
+.osim .gb{position:absolute;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:5px;font-weight:800;font-size:13px;white-space:nowrap;clip-path:inset(0 100% 0 0)}
+.osim .cs-gantt.mv .gb{transition:clip-path var(--o-dur) linear}
+.osim .gb.run{background:color-mix(in srgb,var(--pc) 26%,var(--o-bg));box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--pc) 55%,var(--o-fg))}
+.osim .gb.wt{background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--o-fg) 30%,transparent) 0 1.5px,transparent 1.5px 6px);box-shadow:inset 0 0 0 1px var(--o-line)}
+.osim .gb.idle{background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--o-fg) 22%,transparent) 0 1.5px,transparent 1.5px 7px);box-shadow:inset 0 0 0 1px var(--o-line);color:var(--o-muted);font-weight:650;font-size:12px}
+.osim .gm{position:absolute;z-index:2;width:0;height:0;pointer-events:none}
+.osim .gm.ar{border:6px solid transparent;border-top:8px solid var(--o-acc);margin-left:-6px}
+.osim .gm.ar.fut{border-top-color:var(--o-line)}
+.osim .gm.fin{width:18px;height:18px;margin-left:-9px;border-radius:50%;background:var(--o-bg);box-shadow:inset 0 0 0 2px var(--o-hit);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;line-height:1;opacity:0}
+.osim .gm.fin.on{opacity:1}
+.osim .cs-tick{position:absolute;bottom:0;height:18px;font-size:11.5px;font-weight:700;color:var(--o-muted);transform:translateX(-50%);white-space:nowrap}
+.osim .cs-tick::before{content:"";position:absolute;left:50%;top:-4px;width:1px;height:4px;background:var(--o-line)}
+.osim .cs-cur{position:absolute;z-index:4;top:0;width:0;border-left:2px solid var(--o-acc);pointer-events:none}
+.osim .cs-cur span{position:absolute;top:0;left:3px;padding:1px 5px;border-radius:5px;background:var(--o-pri);color:#fff;font-size:11.5px;font-weight:800;white-space:nowrap}
+.osim .cs-gantt.mv .cs-cur{transition:left var(--o-dur) linear}
+.osim .cs-fade{position:absolute;top:0;bottom:18px;right:0;z-index:1;background:color-mix(in srgb,var(--o-bg) 55%,transparent);pointer-events:none}
+
+/* ---- CPU scheduling: process table ---- */
+.osim .cs-tab{display:flex;flex-direction:column;gap:3px;min-height:0;overflow-y:auto;scrollbar-width:thin}
+.osim .cs-tr{display:grid;grid-template-columns:12px minmax(0,1.35fr) repeat(3,minmax(0,1fr)) repeat(3,minmax(0,.9fr)) 22px;gap:3px;align-items:center;padding:2px 3px;border-radius:8px}
+.osim .cs-tr.hd{font-size:11.5px;font-weight:750;color:var(--o-muted);text-transform:uppercase;padding-top:0;padding-bottom:0}
+.osim .cs-tr.hd span{text-align:center}
+.osim .cs-tr .sw{width:10px;height:22px;border-radius:3px;background:color-mix(in srgb,var(--pc) 24%,var(--o-bg));box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--pc) 55%,var(--o-fg))}
+.osim .cs-tr input{display:block;width:100%;min-width:0;height:28px;margin:0;padding:0 2px;text-align:center;font:inherit;font-weight:700;font-size:13.5px;
+  color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:7px;box-shadow:none}
+.osim .cs-tr input[aria-invalid="true"]{border:2px dashed var(--o-flt);background:var(--o-flt-bg)}
+.osim .cs-tr .m{text-align:center;font-size:13.5px;font-weight:750}
+.osim .cs-tr .m.na{color:var(--o-muted);font-weight:600}
+.osim .cs-tr button{width:22px;height:24px;padding:0;border-radius:6px;font-size:15px}
+.osim .cs-tr.run{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .cs-tr.done .m{color:var(--o-fg)}
+.osim .cs-avg{display:grid;grid-template-columns:12px minmax(0,1.35fr) repeat(3,minmax(0,1fr)) repeat(3,minmax(0,.9fr)) 22px;gap:3px;padding:4px 3px 0;border-top:1px solid var(--o-line);font-size:13px;font-weight:800}
+.osim .cs-avg span{text-align:center}
+.osim .cs-avg span.l{grid-column:2 / 6;text-align:right;padding-right:6px;font-size:12px;color:var(--o-muted);font-weight:750;text-transform:uppercase}
+.osim .cs-key{font-size:12px;color:var(--o-muted);font-weight:650;margin-top:auto}
+
+/* ---- compare ---- */
+.osim .cs-cmp{display:flex;flex-direction:column;gap:6px}
+.osim .cs-cg{display:grid;grid-template-columns:76px 1fr;gap:2px 8px;align-items:center;padding:4px 6px;border-radius:8px;border:0;background:transparent;width:100%;height:auto;text-align:left;font-weight:650}
+.osim .cs-cg:hover{background:var(--o-surf)}
+.osim .cs-cg[aria-pressed="true"]{background:var(--o-surf);color:var(--o-fg);box-shadow:inset 0 0 0 2px var(--o-acc)}
+.osim .cs-cg .nm{grid-row:1 / 4;font-weight:800;font-size:14px}
+.osim .cs-cb{display:flex;align-items:center;gap:6px;height:13px}
+.osim .cs-cb i{display:block;height:11px;border-radius:0 3px 3px 0;min-width:2px;box-shadow:inset 0 0 0 1.5px var(--o-fg)}
+.osim .cs-cb i.w{background:var(--o-pri)}
+.osim .cs-cb i.t{background:repeating-linear-gradient(135deg,var(--o-line) 0 2px,var(--o-bg) 2px 5px)}
+.osim .cs-cb i.r{background:radial-gradient(circle,var(--o-fg) 1.2px,transparent 1.5px) 0 0/5px 5px,var(--o-bg)}
+.osim .cs-cb em{font-style:normal;font-size:12px;font-weight:800}
+.osim .cs-lg{display:flex;gap:10px;font-size:12.5px;font-weight:700}
+.osim .cs-lg span{display:inline-flex;align-items:center;gap:5px}
+.osim .cs-lg i{display:inline-block;width:18px;height:11px;box-shadow:inset 0 0 0 1.5px var(--o-fg);border-radius:2px}
+.osim .cs-qt{border-collapse:collapse;font-size:13px;width:100%}
+.osim .cs-qt th,.osim .cs-qt td{padding:3px 5px;text-align:center;border-bottom:1px solid var(--o-soft)}
+.osim .cs-qt tr.on td{font-weight:800;background:var(--o-hit-bg)}
+.osim .cs-best{font-size:13px;font-weight:650}
+
+@media (min-width:1000px){.osim{width:min(1640px,calc(100vw - 48px));margin-left:calc(50% - min(820px,50vw - 24px))}}
+@media (min-width:1500px){.osim .osim-stage{grid-template-columns:minmax(0,1fr) 330px}}
+@media (max-width:1100px){.osim .osim-stage{grid-template-columns:minmax(0,1fr) 280px}.osim .osim-title span{display:none}}
+@media (max-width:900px){.osim .osim-stage{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 210px}}
+@media (max-width:600px){
+  .osim{height:auto;min-height:0;overflow:visible;padding:6px}
+  .osim .osim-stage{grid-template-rows:auto auto}
+  .osim .osim-viz{height:auto}
+  .osim .cs-gbox{flex:none}
+  .osim .osim-side{height:auto;max-height:none}
+  .osim .osim-spacer{display:none}
+  .osim .osim-seg{flex-wrap:wrap}
+  .osim .osim-narr{white-space:normal;min-width:0;flex-basis:100%}
+  .osim .osim-panel{position:fixed;inset:auto 6px 6px 6px;width:auto;max-height:80vh}
 }
-.cpu-sim button{cursor:pointer;font-weight:800}
-.cpu-sim button.primary{background:var(--cs-btn);color:#fff;border-color:var(--cs-btn)}
-.cpu-sim .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
-.cpu-sim .table-wrap{overflow-x:auto;margin-top:1rem}
-.cpu-sim table{width:100%;border-collapse:collapse;min-width:760px}
-.cpu-sim th,.cpu-sim td{border:1px solid var(--cs-line);padding:.55rem;text-align:center}
-.cpu-sim th{background:var(--cs-soft)}
-.cpu-sim td input{width:88px;text-align:center}
-.cpu-sim td input.bad{outline:2px solid #c0392b;outline-offset:1px}
-.cpu-sim .gantt{display:flex;align-items:stretch;overflow-x:auto;padding:.5rem 0;min-height:92px}
-.cpu-sim .gblock{flex-basis:0;min-width:64px;border:1px solid var(--cs-line);display:flex;flex-direction:column;justify-content:center;align-items:center;padding:.5rem;background:var(--cs-soft)}
-.cpu-sim .gblock.idle{opacity:.65}
-.cpu-sim .glabel{font-weight:900}
-.cpu-sim .gtime{font-size:.75rem;color:var(--cs-muted);margin-top:.25rem;white-space:nowrap}
-.cpu-sim .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin-top:1rem}
-.cpu-sim .metric{border:1px solid var(--cs-line);border-radius:14px;padding:.85rem;background:var(--cs-soft)}
-.cpu-sim .metric b{display:block;font-size:1.15rem;margin-top:.2rem}
-.cpu-sim .note{color:var(--cs-muted);font-size:.88rem;margin-top:.8rem}
-.cpu-sim .msg{margin-top:.8rem;padding:.7rem .85rem;border-radius:10px;border:1px solid #c0392b;border-left-width:5px;background:color-mix(in srgb,#c0392b 9%,var(--global-bg-color));font-weight:700}
-.cpu-sim .msg:empty{display:none}
-.cpu-sim .hidden{display:none!important}
-@media(max-width:900px){.cpu-sim .controls,.cpu-sim .metrics{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.cpu-sim .controls,.cpu-sim .metrics{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){
+  .osim *,.osim *::before,.osim *::after{animation:none !important;transition:none !important}
+}
 </style>
 
-<div class="cpu-sim">
-  <div>
-    <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--cs-accent)">Operating Systems · Chapter 5</div>
-    <h1>CPU Scheduling Simulator</h1>
-    <p class="lead">Compare how different CPU scheduling algorithms order processes and how that choice changes waiting time, turnaround time, response time, and completion time.</p>
+<div class="osim" id="osim-cpu">
+  <div class="osim-bar">
+    <div class="osim-row">
+      <h1 class="osim-title"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg><span>CPU Scheduling</span></h1>
+      <div class="osim-seg" role="group" aria-label="Algorithm" id="cs-algos">
+        <button type="button" data-algo="fcfs" title="First-Come, First-Served: run in arrival order">FCFS</button>
+        <button type="button" data-algo="sjf" title="Shortest Job First (non-preemptive): shortest burst among arrived">SJF</button>
+        <button type="button" data-algo="srtf" title="Shortest Remaining Time First: preemptive SJF">SRTF</button>
+        <button type="button" data-algo="prio" title="Priority (non-preemptive): smallest number first">Priority</button>
+        <button type="button" data-algo="pprio" title="Preemptive Priority: a strictly higher priority arrival preempts">P-Priority</button>
+        <button type="button" data-algo="rr" title="Round Robin: at most one quantum per turn">RR</button>
+      </div>
+      <div class="osim-grp" role="group" aria-label="Playback">
+        <button type="button" class="osim-ib" data-act="first" aria-label="First step (Home)" title="First (Home)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="5" width="2.6" height="14" rx="1"/><path d="M13 6v12l-6-6z"/><path d="M20 6v12l-6-6z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="prev" aria-label="Previous step (Left arrow)" title="Back (&#8592;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="5" width="2.6" height="14" rx="1"/><path d="M18 6v12l-8-6z"/></svg></button>
+        <button type="button" class="osim-ib osim-pri" data-act="play" id="cs-play" aria-label="Play (Space)" title="Play / pause (Space)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path id="cs-playicon" d="M8 5l11 7-11 7z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="next" aria-label="Next step (Right arrow)" title="Step (&#8594;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6v12l8-6z"/><rect x="16.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+        <button type="button" class="osim-ib" data-act="last" aria-label="Last step (End)" title="Last (End)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6v12l6-6z"/><path d="M11 6v12l6-6z"/><rect x="17.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+      </div>
+      <div class="osim-grp">
+        <span class="osim-lbl" id="cs-speed-l">Speed</span>
+        <input type="range" id="cs-speed" min="0" max="6" step="1" value="2" aria-labelledby="cs-speed-l" aria-valuetext="2 time units per second">
+        <span class="osim-speedv" id="cs-speedv">2/s</span>
+      </div>
+      <span class="osim-spacer"></span>
+      <button type="button" data-act="compare" id="cs-cmpbtn" aria-expanded="false" aria-controls="cs-compare"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 20h16M7 16v-5M12 16V6M17 16v-8"/></svg>Compare</button>
+      <button type="button" class="osim-ib" data-act="help" id="cs-helpbtn" aria-expanded="false" aria-controls="cs-help" aria-label="Help and legend" title="Help">?</button>
+      <button type="button" class="osim-ib" data-act="fs" id="cs-fs" aria-label="Fullscreen" title="Fullscreen"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path id="cs-fsicon" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    </div>
+    <div class="osim-row">
+      <span class="osim-lbl">Scenario</span>
+      <div class="osim-seg osim-seg-sm" role="group" aria-label="Scenario" id="cs-scen">
+        <button type="button" data-scen="course" title="P1(0,8,2) P2(1,4,3) P3(2,9,1) P4(3,5,4)">Course</button>
+        <button type="button" data-scen="short" title="Short jobs arrive while a long job runs">Short jobs</button>
+        <button type="button" data-scen="priority" title="High-priority jobs arrive later">Priority clash</button>
+        <button type="button" data-scen="rr" title="Equal priorities, Round Robin with q = 2">RR demo</button>
+        <button type="button" data-scen="random" title="4–6 random processes">Random</button>
+      </div>
+      <div class="osim-grp" role="group" aria-label="Round Robin quantum" title="Round Robin time quantum">
+        <span class="osim-lbl">Quantum</span>
+        <button type="button" class="osim-ib" data-act="qminus" aria-label="Smaller quantum"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 12h12"/></svg></button>
+        <span class="osim-num" id="cs-q" aria-live="polite">2</span>
+        <button type="button" class="osim-ib" data-act="qplus" aria-label="Larger quantum"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6v12M6 12h12"/></svg></button>
+      </div>
+    </div>
+    <div class="osim-alert" id="cs-alert" role="alert"></div>
   </div>
 
-  <section class="panel">
-    <div class="controls">
-      <label>Algorithm
-        <select id="algorithm">
-          <option value="fcfs">FCFS</option>
-          <option value="sjf">SJF (Non-preemptive)</option>
-          <option value="srtf">SRTF (Preemptive)</option>
-          <option value="priority">Priority (Non-preemptive)</option>
-          <option value="ppriority">Priority (Preemptive)</option>
-          <option value="rr">Round Robin</option>
-        </select>
-      </label>
-      <label id="quantumWrap" class="hidden">Quantum
-        <input id="quantum" type="number" min="1" step="1" value="2">
-      </label>
-      <label>Scenario
-        <select id="scenario">
-          <option value="default">Course example (P1–P4)</option>
-          <option value="short">Short jobs arrive later</option>
-          <option value="priority">Priority conflict</option>
-          <option value="rr">Round Robin demo</option>
-        </select>
-      </label>
-      <label>&nbsp;
-        <button id="loadScenario">Load scenario</button>
-      </label>
+  <div class="osim-stage">
+    <div class="osim-viz" id="cs-viz">
+      <div class="cs-lanes" id="cs-lanes" aria-label="Process states">
+        <div class="cs-lane up" id="cs-l-up"><h3>Not arrived</h3></div>
+        <div class="cs-lane rq" id="cs-l-rq"><h3 id="cs-rq-h">Ready queue</h3><div class="sub" id="cs-rq-s"></div></div>
+        <div class="cs-arrow" id="cs-arrow" aria-hidden="true"></div>
+        <div class="cs-lane cpu" id="cs-l-cpu"><h3>CPU</h3><div class="sub" id="cs-cpu-s"></div></div>
+        <div class="cs-lane dn" id="cs-l-dn"><h3>Finished</h3></div>
+      </div>
+      <div class="cs-gbox" id="cs-gbox">
+        <div class="cs-glabs" id="cs-glabs" aria-hidden="true"></div>
+        <div class="cs-gwrap" id="cs-gwrap"><div class="cs-gantt" id="cs-gantt" role="img" aria-label="Gantt chart"></div></div>
+      </div>
     </div>
-
-    <div class="actions">
-      <button id="addProcess">+ Add process</button>
-      <button id="run" class="primary">Run simulation</button>
-      <button id="reset">Reset</button>
+    <aside class="osim-side" aria-label="Process table">
+      <div class="osim-sh"><b>Processes</b><span>arrival · burst · priority</span><button type="button" class="osim-ib" data-act="add" id="cs-add" aria-label="Add process" title="Add process"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6v12M6 12h12"/></svg></button></div>
+      <div class="cs-tab" id="cs-tab" role="table" aria-label="Processes and results"></div>
+      <div class="cs-avg" id="cs-avg" aria-live="off"></div>
+      <div class="cs-key">W wait · T turnaround · R response</div>
+    </aside>
+    <div class="osim-panel" id="cs-compare" hidden aria-label="Compare all algorithms"></div>
+    <div class="osim-panel osim-help" id="cs-help" hidden aria-label="Help">
+      <div class="osim-ph"><b>Help</b><button type="button" class="osim-ib" data-act="help" aria-label="Close help"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <dl>
+        <dt>FCFS</dt><dd>Run in arrival order, to completion.</dd>
+        <dt>SJF</dt><dd>Shortest burst among arrived; no preemption.</dd>
+        <dt>SRTF</dt><dd>Shortest remaining time; arrivals can preempt.</dd>
+        <dt>Priority</dt><dd>Smallest number first; no preemption.</dd>
+        <dt>P-Priority</dt><dd>A strictly higher priority arrival preempts.</dd>
+        <dt>RR</dt><dd>One quantum per turn, then back of the queue.</dd>
+        <dt>Ties</dt><dd>Earlier arrival, then table order. RR: arrivals queue before the preempted process.</dd>
+      </dl>
+      <div class="osim-sub">Metrics</div>
+      <dl>
+        <dt>T</dt><dd>Turnaround = completion − arrival</dd>
+        <dt>W</dt><dd>Waiting = turnaround − burst</dd>
+        <dt>R</dt><dd>Response = first run − arrival</dd>
+      </dl>
+      <div class="osim-sub">Legend</div>
+      <div class="osim-legend">
+        <span><i class="gm ar" style="position:static;margin:0 0 -4px 0"></i>arrival</span>
+        <span style="box-shadow:inset 0 0 0 1px var(--o-line);background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--o-fg) 30%,transparent) 0 1.5px,transparent 1.5px 6px)">waiting</span>
+        <span style="box-shadow:inset 0 0 0 2px var(--o-line)">running</span>
+        <span style="box-shadow:inset 0 0 0 2px var(--o-hit)">&#10003; finished</span>
+        <span style="outline:2px dashed var(--o-flt);outline-offset:-3px">preempted</span>
+      </div>
+      <div class="osim-sub">Keys</div>
+      <div class="osim-legend"><span><kbd>&#8592;</kbd><kbd>&#8594;</kbd> step</span><span><kbd>Space</kbd> play</span><span><kbd>Home</kbd><kbd>End</kbd></span><span><kbd>Esc</kbd> close</span></div>
     </div>
-    <div id="msg" class="msg" role="alert" aria-live="assertive"></div>
+  </div>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Process</th><th>Arrival</th><th>Burst</th><th>Priority</th><th>Completion</th><th>Turnaround</th><th>Waiting</th><th>Response</th><th aria-label="Remove"></th></tr>
-        </thead>
-        <tbody id="processBody"></tbody>
-      </table>
+  <div class="osim-foot">
+    <p class="osim-narr" id="cs-narr" aria-live="polite"></p>
+    <div class="osim-stats">
+      <span class="osim-stat" title="Current time / total time">Time <b id="cs-st">0/0</b></span>
+      <span class="osim-stat h" title="Finished processes">&#10003; Done <b id="cs-sd">0/0</b></span>
+      <span class="osim-stat" title="Average waiting time of finished processes">Avg W <b id="cs-sw">&#8211;</b></span>
+      <span class="osim-stat" title="Average turnaround time of finished processes">Avg T <b id="cs-sa">&#8211;</b></span>
+      <span class="osim-stat" title="Average response time of finished processes">Avg R <b id="cs-sr">&#8211;</b></span>
     </div>
-    <p class="note">Arrival and priority must be whole numbers ≥ 0; burst must be a whole number ≥ 1 (all values ≤ 1000).</p>
-  </section>
-
-  <section class="panel">
-    <h2>Gantt Chart</h2>
-    <div id="gantt" class="gantt"></div>
-    <p class="note">Priority: smaller number means higher priority; ties go to the earlier arrival, then to the row order. SRTF always selects the process with the shortest remaining CPU burst. In Round Robin, a process arriving at the same moment a quantum expires joins the ready queue before the preempted process.</p>
-  </section>
-
-  <section class="panel">
-    <h2>Performance Metrics</h2>
-    <div class="metrics">
-      <div class="metric">Average waiting time<b id="avgWait">–</b></div>
-      <div class="metric">Average turnaround time<b id="avgTat">–</b></div>
-      <div class="metric">Average response time<b id="avgResp">–</b></div>
-      <div class="metric">Total finish time<b id="finishTime">–</b></div>
-    </div>
-  </section>
-
-  <section class="panel">
-    <h2>How to read the algorithms</h2>
-    <p><strong>FCFS:</strong> runs processes in arrival order. Simple, but a long job can delay everything behind it.</p>
-    <p><strong>SJF:</strong> among arrived processes, chooses the shortest burst. It usually reduces average waiting time, but long jobs may wait.</p>
-    <p><strong>SRTF:</strong> preemptive SJF. A newly arrived shorter job can interrupt the running process.</p>
-    <p><strong>Priority (non-preemptive):</strong> when the CPU becomes free, chooses the highest-priority arrived process and lets it finish. Lower numeric values mean higher priority.</p>
-    <p><strong>Priority (preemptive):</strong> a newly arrived process with a strictly higher priority (smaller number) interrupts the running process.</p>
-    <p><strong>Round Robin:</strong> each ready process receives at most one quantum before returning to the ready queue.</p>
-  </section>
+  </div>
 </div>
 
 <script>
 (function(){
 "use strict";
-const root=document.querySelector(".cpu-sim");
-if(!root)return;
-const body=root.querySelector("#processBody");
-const alg=root.querySelector("#algorithm");
-const quantumWrap=root.querySelector("#quantumWrap");
-const quantum=root.querySelector("#quantum");
-const gantt=root.querySelector("#gantt");
-const scenario=root.querySelector("#scenario");
-const msg=root.querySelector("#msg");
-const MAXV=1000;
+var root=document.getElementById("osim-cpu");
+if(!root){return;}
+var $=function(id){return document.getElementById(id);};
 
-let nextId=1;
-
-const scenarios={
- default:[["P1",0,8,2],["P2",1,4,3],["P3",2,9,1],["P4",3,5,4]],
- short:[["P1",0,9,3],["P2",2,2,2],["P3",4,1,1],["P4",5,3,2]],
- priority:[["P1",0,4,3],["P2",1,5,1],["P3",2,2,2],["P4",4,3,1]],
- rr:[["P1",0,5,1],["P2",1,4,1],["P3",2,2,1],["P4",4,3,1]]
+var ALGOS=["fcfs","sjf","srtf","prio","pprio","rr"];
+var NAMES={fcfs:"FCFS",sjf:"SJF",srtf:"SRTF",prio:"Priority",pprio:"P-Priority",rr:"RR"};
+var RQSUB={fcfs:"arrival order",sjf:"shortest burst first",srtf:"shortest remaining first",prio:"priority (low number first)",pprio:"priority (low number first)",rr:"FIFO"};
+var COLORS=["#0072b2","#e69f00","#009e73","#cc79a7","#56b4e9","#d55e00","#7b5fb0","#a89a00"];
+var SCEN={
+  course:[["P1",0,8,2],["P2",1,4,3],["P3",2,9,1],["P4",3,5,4]],
+  short:[["P1",0,9,3],["P2",2,2,2],["P3",4,1,1],["P4",5,3,2]],
+  priority:[["P1",0,4,3],["P2",1,5,1],["P3",2,2,2],["P4",4,3,1]],
+  rr:[["P1",0,5,1],["P2",1,4,1],["P3",2,2,1],["P4",4,3,1]]
 };
+var LIM={n:8,arr:50,burst:20,prio:99,q:10};
+var SPEEDS=[0.5,1,2,3,4,6,10];
+var narrow=window.matchMedia?window.matchMedia("(max-width: 600px)"):{matches:false};
+var reduce=window.matchMedia?window.matchMedia("(prefers-reduced-motion: reduce)"):{matches:false};
 
-function esc(s){
- return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
-}
+var st={algo:"fcfs",q:2,rows:[],scen:"course",step:0,playing:false,timer:0,speed:2,ps:[],run:null};
 
-function row(p){
- const tr=document.createElement("tr");
- tr.innerHTML=`<td><input class="pid" maxlength="12" aria-label="Process name"></td>
- <td><input class="arrival" type="number" min="0" step="1" aria-label="Arrival time"></td>
- <td><input class="burst" type="number" min="1" step="1" aria-label="Burst time"></td>
- <td><input class="priority" type="number" min="0" step="1" aria-label="Priority"></td>
- <td class="completion">–</td><td class="tat">–</td><td class="wait">–</td><td class="response">–</td>
- <td><button type="button" class="remove" aria-label="Remove process">×</button></td>`;
- tr.querySelector(".pid").value=p[0];
- tr.querySelector(".arrival").value=p[1];
- tr.querySelector(".burst").value=p[2];
- tr.querySelector(".priority").value=p[3];
- const name=()=>tr.querySelector(".pid").value.trim()||"process";
- const rm=tr.querySelector(".remove");
- rm.setAttribute("aria-label","Remove "+name());
- tr.querySelector(".pid").addEventListener("input",()=>rm.setAttribute("aria-label","Remove "+name()));
- rm.addEventListener("click",()=>{tr.remove();clearResults();});
- body.appendChild(tr);
-}
-
-function load(data){
- body.innerHTML="";
- data.forEach(row);
- nextId=data.length+1;
- clearResults();
-}
-
-function setMsg(t){msg.textContent=t||"";}
-
-function clearResults(){
- gantt.innerHTML="";
- root.querySelector("#avgWait").textContent="–";
- root.querySelector("#avgTat").textContent="–";
- root.querySelector("#avgResp").textContent="–";
- root.querySelector("#finishTime").textContent="–";
- [...body.rows].forEach(r=>["completion","tat","wait","response"].forEach(c=>r.querySelector("."+c).textContent="–"));
-}
-
-function parseField(input,label,pname,min){
- const raw=input.value.trim();
- if(raw===""||input.validity.badInput){input.classList.add("bad");throw new Error(pname+": "+label+" is empty or not a number.");}
- if(!/^\d+$/.test(raw)){input.classList.add("bad");throw new Error(pname+": "+label+" must be a whole number (got \""+raw+"\").");}
- const v=Number(raw);
- if(v<min||v>MAXV){input.classList.add("bad");throw new Error(pname+": "+label+" must be between "+min+" and "+MAXV+".");}
- return v;
-}
-
-function read(){
- body.querySelectorAll("input.bad").forEach(x=>x.classList.remove("bad"));
- const rows=[...body.rows];
- if(!rows.length)throw new Error("Add at least one process.");
- const seen=new Set();
- return rows.map((r,i)=>{
-   const id=r.querySelector(".pid").value.trim()||("P"+(i+1));
-   if(seen.has(id)){r.querySelector(".pid").classList.add("bad");throw new Error("Process names must be unique (\""+id+"\" appears twice).");}
-   seen.add(id);
-   return {
-     i,id,
-     arrival:parseField(r.querySelector(".arrival"),"Arrival",id,0),
-     burst:parseField(r.querySelector(".burst"),"Burst",id,1),
-     priority:parseField(r.querySelector(".priority"),"Priority",id,0)
-   };
- });
-}
-
+/* ---------- scheduling algorithms (verified logic from the previous version) ---------- */
 function guardLimit(ps){
- return ps.reduce((s,p)=>s+p.burst,0)+Math.max(...ps.map(p=>p.arrival))+ps.length*2+10;
+ return ps.reduce(function(s,p){return s+p.burst;},0)+Math.max.apply(null,ps.map(function(p){return p.arrival;}))+ps.length*2+10;
 }
 function guardCheck(n,limit){
- if(n>limit)throw new Error("Simulation stopped: iteration limit exceeded (please check the inputs).");
+ if(n>limit){throw new Error("Simulation stopped: iteration limit exceeded.");}
 }
-
 function pushSeg(segs,id,start,end){
- if(end<=start)return;
- const last=segs[segs.length-1];
- if(last&&last.id===id&&last.end===start)last.end=end;
- else segs.push({id,start,end});
+ if(end<=start){return;}
+ var last=segs[segs.length-1];
+ if(last&&last.id===id&&last.end===start){last.end=end;}
+ else{segs.push({id:id,start:start,end:end});}
 }
-
 function simulateFCFS(ps){
- const order=[...ps].sort((a,b)=>a.arrival-b.arrival||a.i-b.i), seg=[],res={}; let t=0;
- for(const p of order){
+ var order=ps.slice().sort(function(a,b){return a.arrival-b.arrival||a.i-b.i;}),seg=[],res={},t=0;
+ order.forEach(function(p){
    if(t<p.arrival){pushSeg(seg,"Idle",t,p.arrival);t=p.arrival;}
-   const start=t;t+=p.burst;pushSeg(seg,p.id,start,t);
+   var start=t;t+=p.burst;pushSeg(seg,p.id,start,t);
    res[p.i]={completion:t,response:start-p.arrival};
- }
- return {seg,res};
+ });
+ return {seg:seg,res:res};
 }
-
 function simulateNonPreemptive(ps,mode){
- const done=new Set(),seg=[],res={},limit=guardLimit(ps);
- let t=0,it=0;
+ var done=new Set(),seg=[],res={},limit=guardLimit(ps),t=0,it=0;
  while(done.size<ps.length){
    guardCheck(++it,limit);
-   const ready=ps.filter(p=>!done.has(p.i)&&p.arrival<=t);
+   var ready=ps.filter(function(p){return !done.has(p.i)&&p.arrival<=t;});
    if(!ready.length){
-     const next=Math.min(...ps.filter(p=>!done.has(p.i)).map(p=>p.arrival));
+     var next=Math.min.apply(null,ps.filter(function(p){return !done.has(p.i);}).map(function(p){return p.arrival;}));
      pushSeg(seg,"Idle",t,next);t=next;continue;
    }
-   ready.sort((a,b)=>{
-     if(mode==="sjf")return a.burst-b.burst||a.arrival-b.arrival||a.i-b.i;
+   ready.sort(function(a,b){
+     if(mode==="sjf"){return a.burst-b.burst||a.arrival-b.arrival||a.i-b.i;}
      return a.priority-b.priority||a.arrival-b.arrival||a.i-b.i;
    });
-   const p=ready[0],start=t;t+=p.burst;pushSeg(seg,p.id,start,t);
+   var p=ready[0],start=t;t+=p.burst;pushSeg(seg,p.id,start,t);
    res[p.i]={completion:t,response:start-p.arrival};done.add(p.i);
  }
- return {seg,res};
+ return {seg:seg,res:res};
 }
-
 /* Unit-time preemptive simulation; key selects the next process (SRTF or preemptive priority). */
 function simulatePreemptive(ps,key){
- const rem=new Map(ps.map(p=>[p.i,p.burst])),first={},res={},seg=[],limit=guardLimit(ps);
- let completed=0,it=0,t=0;
+ var rem=new Map(ps.map(function(p){return [p.i,p.burst];})),first={},res={},seg=[],limit=guardLimit(ps),completed=0,it=0,t=0;
  while(completed<ps.length){
    guardCheck(++it,limit);
-   const ready=ps.filter(p=>p.arrival<=t&&rem.get(p.i)>0);
+   var ready=ps.filter(function(p){return p.arrival<=t&&rem.get(p.i)>0;});
    if(!ready.length){
-     const next=Math.min(...ps.filter(p=>rem.get(p.i)>0).map(p=>p.arrival));
+     var next=Math.min.apply(null,ps.filter(function(p){return rem.get(p.i)>0;}).map(function(p){return p.arrival;}));
      pushSeg(seg,"Idle",t,next);t=next;continue;
    }
-   ready.sort((a,b)=>key(a,rem)-key(b,rem)||a.arrival-b.arrival||a.i-b.i);
-   const p=ready[0];
-   if(first[p.i]===undefined)first[p.i]=t;
+   ready.sort(function(a,b){return key(a,rem)-key(b,rem)||a.arrival-b.arrival||a.i-b.i;});
+   var p=ready[0];
+   if(first[p.i]===undefined){first[p.i]=t;}
    pushSeg(seg,p.id,t,t+1);
    rem.set(p.i,rem.get(p.i)-1);t++;
    if(rem.get(p.i)<=0){completed++;res[p.i]={completion:t,response:first[p.i]-p.arrival};}
  }
- return {seg,res};
+ return {seg:seg,res:res};
 }
-
-function simulateRR(ps,q){
- const sorted=[...ps].sort((a,b)=>a.arrival-b.arrival||a.i-b.i);
- const rem=new Map(ps.map(p=>[p.i,p.burst])),first={},res={},seg=[],queue=[],limit=guardLimit(ps);
- let idx=0,t=0,completed=0,it=0;
-
+/* trace (optional) records each turn and the ready queue right after dispatch, for the animation. */
+function simulateRR(ps,q,trace){
+ var sorted=ps.slice().sort(function(a,b){return a.arrival-b.arrival||a.i-b.i;});
+ var rem=new Map(ps.map(function(p){return [p.i,p.burst];})),first={},res={},seg=[],queue=[],limit=guardLimit(ps);
+ var idx=0,t=0,completed=0,it=0;
  function addArrivals(){
-   while(idx<sorted.length&&sorted[idx].arrival<=t)queue.push(sorted[idx++]);
+   while(idx<sorted.length&&sorted[idx].arrival<=t){queue.push(sorted[idx++]);}
  }
  addArrivals();
  while(completed<ps.length){
    guardCheck(++it,limit);
    if(!queue.length){
-     const next=sorted[idx].arrival;pushSeg(seg,"Idle",t,next);t=next;addArrivals();continue;
+     var next=sorted[idx].arrival;pushSeg(seg,"Idle",t,next);t=next;addArrivals();continue;
    }
-   const p=queue.shift();
-   if(first[p.i]===undefined)first[p.i]=t;
-   const run=Math.min(q,rem.get(p.i)),start=t;t+=run;pushSeg(seg,p.id,start,t);
+   var p=queue.shift();
+   var snap=queue.map(function(x){return x.i;});
+   if(first[p.i]===undefined){first[p.i]=t;}
+   var run=Math.min(q,rem.get(p.i)),start=t;t+=run;pushSeg(seg,p.id,start,t);
+   if(trace){trace.push({i:p.i,start:start,end:t,snap:snap});}
    rem.set(p.i,rem.get(p.i)-run);
    addArrivals();
-   if(rem.get(p.i)>0)queue.push(p);
+   if(rem.get(p.i)>0){queue.push(p);}
    else{completed++;res[p.i]={completion:t,response:first[p.i]-p.arrival};}
  }
- return {seg,res};
+ return {seg:seg,res:res};
+}
+function runAlgo(algo,ps,q,trace){
+  switch(algo){
+    case "fcfs":return simulateFCFS(ps);
+    case "sjf":return simulateNonPreemptive(ps,"sjf");
+    case "srtf":return simulatePreemptive(ps,function(p,rem){return rem.get(p.i);});
+    case "prio":return simulateNonPreemptive(ps,"priority");
+    case "pprio":return simulatePreemptive(ps,function(p){return p.priority;});
+    default:return simulateRR(ps,q,trace);
+  }
+}
+function metricsOf(ps,out){
+  var per=[],sw=0,stt=0,sr=0;
+  ps.forEach(function(p){
+    var m=out.res[p.i],tat=m.completion-p.arrival,w=tat-p.burst;
+    per[p.i]={c:m.completion,t:tat,w:w,r:m.response};
+    sw+=w;stt+=tat;sr+=m.response;
+  });
+  var n=ps.length;
+  return {per:per,w:sw/n,t:stt/n,r:sr/n};
 }
 
+/* ---------- per-instant timeline for the animation ---------- */
+function buildRun(algo,ps,q){
+  var trace=[],out=runAlgo(algo,ps,q,trace),m=metricsOf(ps,out),byName={},T=0,k,t;
+  ps.forEach(function(p){byName[p.id]=p.i;T=Math.max(T,m.per[p.i].c);});
+  var unit=[];for(t=0;t<T;t++){unit.push(-1);}
+  var segs=out.seg.map(function(s){
+    var idx=s.id==="Idle"?-1:byName[s.id];
+    for(var u=s.start;u<s.end;u++){unit[u]=idx;}
+    return {p:idx,s:s.start,e:s.end};
+  });
+  var chunkAt={};trace.forEach(function(c){chunkAt[c.start]=c;});
+  var key={
+    fcfs:function(a,b){return a.arrival-b.arrival||a.i-b.i;},
+    sjf:function(a,b){return a.burst-b.burst||a.arrival-b.arrival||a.i-b.i;},
+    prio:function(a,b){return a.priority-b.priority||a.arrival-b.arrival||a.i-b.i;}
+  };
+  key.pprio=key.prio;
+  var rem=ps.map(function(p){return p.burst;}),states=[],chunk=null,firstRun=ps.map(function(){return -1;});
+  for(k=0;k<=T;k++){
+    if(k>0&&unit[k-1]>=0){rem[unit[k-1]]--;}
+    var cpu=k<T?unit[k]:-1,ready;
+    if(cpu>=0&&firstRun[cpu]<0){firstRun[cpu]=k;}
+    if(algo==="rr"){
+      if(chunkAt[k]){chunk=chunkAt[k];}else if(chunk&&k>=chunk.end){chunk=null;}
+      ready=[];
+      if(chunk){
+        ready=chunk.snap.slice();
+        ps.filter(function(p){return p.arrival>chunk.start&&p.arrival<=k;}).sort(key.fcfs).forEach(function(p){ready.push(p.i);});
+      }
+    }else{
+      var kf=algo==="srtf"?function(a,b){return rem[a.i]-rem[b.i]||a.arrival-b.arrival||a.i-b.i;}:key[algo];
+      ready=ps.filter(function(p){return p.arrival<=k&&rem[p.i]>0&&p.i!==cpu;}).sort(kf).map(function(p){return p.i;});
+    }
+    var prev=k>0?unit[k-1]:-1;
+    var ev={arr:[],fin:[],prev:prev,cur:cpu,qexp:false,again:false};
+    ps.forEach(function(p){if(p.arrival===k){ev.arr.push(p.i);}if(m.per[p.i].c===k){ev.fin.push(p.i);}});
+    if(algo==="rr"&&chunkAt[k]&&k>0){
+      var pc=trace[trace.indexOf(chunkAt[k])-1];
+      if(pc&&pc.end===k&&rem[pc.i]>0){ev.qexp=true;ev.again=pc.i===chunkAt[k].i;}
+    }
+    states.push({k:k,cpu:cpu,ready:ready,rem:rem.slice(),ev:ev,qused:algo==="rr"&&chunk?k-chunk.start:0});
+  }
+  return {algo:algo,q:q,T:T,unit:unit,segs:segs,m:m,states:states};
+}
+
+/* ---------- helpers ---------- */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
 function fmt(x){return (Math.round(x*100)/100).toFixed(2);}
-
-function render(ps,out){
- const byIndex=out.res;
- let sw=0,st=0,sr=0,maxC=0;
- [...body.rows].forEach((r,i)=>{
-   const p=ps[i],m=byIndex[p.i],tat=m.completion-p.arrival,wait=tat-p.burst;
-   r.querySelector(".completion").textContent=m.completion;
-   r.querySelector(".tat").textContent=tat;
-   r.querySelector(".wait").textContent=wait;
-   r.querySelector(".response").textContent=m.response;
-   sw+=wait;st+=tat;sr+=m.response;maxC=Math.max(maxC,m.completion);
- });
- const n=ps.length;
- root.querySelector("#avgWait").textContent=fmt(sw/n);
- root.querySelector("#avgTat").textContent=fmt(st/n);
- root.querySelector("#avgResp").textContent=fmt(sr/n);
- root.querySelector("#finishTime").textContent=maxC;
-
- gantt.innerHTML="";
- out.seg.forEach(s=>{
-   const d=document.createElement("div");
-   d.className="gblock"+(s.id==="Idle"?" idle":"");
-   d.style.flexGrow=Math.max(1,s.end-s.start);
-   d.innerHTML=`<div class="glabel">${esc(s.id)}</div><div class="gtime">${s.start} → ${s.end}</div>`;
-   gantt.appendChild(d);
- });
+function interval(){return 1000/st.speed;}
+function dur(){return Math.round(Math.max(120,Math.min(520,interval()*0.8)));}
+function alertMsg(t){$("cs-alert").textContent=t||"";}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function nm(i){return st.ps[i]?st.ps[i].id:"?";}
+function list(ids){
+  var a=ids.map(nm);
+  if(a.length>3){return a.slice(0,2).join(", ")+" +"+(a.length-2);}
+  return a.join(", ");
 }
 
-function run(){
- setMsg("");
- try{
-   const ps=read();
-   let out;
-   switch(alg.value){
-     case "fcfs":out=simulateFCFS(ps);break;
-     case "sjf":out=simulateNonPreemptive(ps,"sjf");break;
-     case "srtf":out=simulatePreemptive(ps,(p,rem)=>rem.get(p.i));break;
-     case "priority":out=simulateNonPreemptive(ps,"priority");break;
-     case "ppriority":out=simulatePreemptive(ps,p=>p.priority);break;
-     case "rr":{
-       const raw=quantum.value.trim();
-       if(!/^\d+$/.test(raw)||+raw<1||+raw>MAXV)throw new Error("Quantum must be a whole number between 1 and "+MAXV+".");
-       out=simulateRR(ps,+raw);break;
-     }
-     default:throw new Error("Unknown algorithm.");
-   }
-   render(ps,out);
- }catch(e){clearResults();setMsg(e.message);}
+/* ---------- process table ---------- */
+var tab=$("cs-tab");
+function renderTable(focus){
+  var h="<div class=\"cs-tr hd\" role=\"row\"><span></span><span role=\"columnheader\">Name</span><span role=\"columnheader\" title=\"Arrival time\">Arr</span><span role=\"columnheader\" title=\"CPU burst\">Bur</span><span role=\"columnheader\" title=\"Priority (lower = higher)\">Pri</span><span role=\"columnheader\" title=\"Waiting time\">W</span><span role=\"columnheader\" title=\"Turnaround time\">T</span><span role=\"columnheader\" title=\"Response time\">R</span><span></span></div>";
+  st.rows.forEach(function(r,i){
+    h+="<div class=\"cs-tr\" role=\"row\" data-row=\""+i+"\" style=\"--pc:"+COLORS[i%COLORS.length]+"\"><span class=\"sw\" aria-hidden=\"true\"></span>"+
+      "<input type=\"text\" maxlength=\"6\" data-f=\"0\" data-i=\""+i+"\" aria-label=\"Name of process "+(i+1)+"\" value=\""+esc(r[0])+"\" autocomplete=\"off\" spellcheck=\"false\">"+
+      "<input type=\"text\" inputmode=\"numeric\" maxlength=\"2\" data-f=\"1\" data-i=\""+i+"\" aria-label=\"Arrival of "+esc(r[0])+"\" value=\""+esc(r[1])+"\" autocomplete=\"off\">"+
+      "<input type=\"text\" inputmode=\"numeric\" maxlength=\"2\" data-f=\"2\" data-i=\""+i+"\" aria-label=\"Burst of "+esc(r[0])+"\" value=\""+esc(r[2])+"\" autocomplete=\"off\">"+
+      "<input type=\"text\" inputmode=\"numeric\" maxlength=\"2\" data-f=\"3\" data-i=\""+i+"\" aria-label=\"Priority of "+esc(r[0])+"\" value=\""+esc(r[3])+"\" autocomplete=\"off\">"+
+      "<span class=\"m na\" role=\"cell\">–</span><span class=\"m na\" role=\"cell\">–</span><span class=\"m na\" role=\"cell\">–</span>"+
+      "<button type=\"button\" data-act=\"rm\" data-i=\""+i+"\" aria-label=\"Remove "+esc(r[0])+"\" title=\"Remove\""+(st.rows.length<=1?" disabled":"")+">×</button></div>";
+  });
+  tab.innerHTML=h;
+  $("cs-add").disabled=st.rows.length>=LIM.n;
+  if(focus!=null){var f=tab.querySelector("input[data-i=\""+focus+"\"][data-f=\"0\"]");if(f){f.focus();f.select();}}
+}
+function validate(){
+  var ins=tab.querySelectorAll("input"),bad=null,seen={},ps=[];
+  ins.forEach(function(x){x.setAttribute("aria-invalid","false");});
+  function fail(i,f,msg){if(!bad){bad=msg;var e=tab.querySelector("input[data-i=\""+i+"\"][data-f=\""+f+"\"]");if(e){e.setAttribute("aria-invalid","true");}}}
+  st.rows.forEach(function(r,i){
+    var name=String(r[0]).trim(),label=name||"Row "+(i+1);
+    if(!name){fail(i,0,"Row "+(i+1)+": name is empty.");}
+    else if(seen[name]){fail(i,0,"Names must be unique (“"+name+"” twice).");}
+    seen[name]=1;
+    var lims=[null,[0,LIM.arr,"Arrival"],[1,LIM.burst,"Burst"],[0,LIM.prio,"Priority"]],v=[];
+    for(var f=1;f<4;f++){
+      var raw=String(r[f]).trim(),L=lims[f];
+      if(!/^\d{1,2}$/.test(raw)||+raw<L[0]||+raw>L[1]){fail(i,f,label+": "+L[2]+" must be a whole number "+L[0]+"–"+L[1]+".");}
+      v[f]=+raw;
+    }
+    ps.push({i:i,id:name,arrival:v[1],burst:v[2],priority:v[3]});
+  });
+  if(bad){alertMsg(bad);return null;}
+  alertMsg("");
+  return ps;
+}
+function markTable(){
+  var s=curState(),run=st.run;
+  tab.querySelectorAll(".cs-tr[data-row]").forEach(function(row){
+    var i=+row.getAttribute("data-row"),ms=row.querySelectorAll(".m");
+    var ok=run&&st.ps[i]&&s;
+    var done=ok&&run.m.per[i].c<=s.k;
+    row.classList.toggle("run",!!(ok&&s.cpu===i));
+    row.classList.toggle("done",!!done);
+    var vals=done?[run.m.per[i].w,run.m.per[i].t,run.m.per[i].r]:["–","–","–"];
+    ms.forEach(function(e,j){e.textContent=vals[j];e.classList.toggle("na",!done);});
+  });
+  var a=averages();
+  $("cs-avg").innerHTML="<span></span><span class=\"l\">Average</span><span>"+a.w+"</span><span>"+a.t+"</span><span>"+a.r+"</span><span></span>";
+}
+function averages(){
+  var s=curState(),run=st.run,n=0,w=0,t=0,r=0;
+  if(run&&s){st.ps.forEach(function(p){var m=run.m.per[p.i];if(m.c<=s.k){n++;w+=m.w;t+=m.t;r+=m.r;}});}
+  return n?{n:n,w:fmt(w/n),t:fmt(t/n),r:fmt(r/n)}:{n:0,w:"–",t:"–",r:"–"};
+}
+tab.addEventListener("input",function(e){
+  var x=e.target;if(x.tagName!=="INPUT"){return;}
+  var i=+x.getAttribute("data-i"),f=+x.getAttribute("data-f");
+  st.rows[i][f]=x.value;
+  st.scen=null;
+  if(f===0){var b=tab.querySelector("button[data-i=\""+i+"\"]");if(b){b.setAttribute("aria-label","Remove "+x.value);}}
+  apply(true);
+});
+
+/* ---------- lanes ---------- */
+var lanes=$("cs-lanes"),chips=[];
+function buildChips(){
+  chips.forEach(function(c){c.remove();});
+  chips=st.ps.map(function(p){
+    var el=document.createElement("div");
+    el.className="pchip";
+    el.style.setProperty("--pc",COLORS[p.i%COLORS.length]);
+    el.innerHTML="<b>"+esc(p.id)+"</b><span class=\"k\"></span><span class=\"pb\"><span></span></span>";
+    lanes.appendChild(el);
+    return el;
+  });
+}
+var geo=null;
+function layoutLaneBoxes(){
+  var W=lanes.clientWidth,H=lanes.clientHeight,g=8;
+  var wUp=Math.round(W*0.2),wCpu=Math.round(W*0.15),wDn=Math.round(W*0.19);
+  var wRq=W-wUp-wCpu-wDn-3*g-14;
+  var x=0,boxes={};
+  [["up",wUp],["rq",wRq],["cpu",wCpu],["dn",wDn]].forEach(function(b){
+    boxes[b[0]]={x:x,w:b[1]};
+    var el=$("cs-l-"+b[0]);el.style.left=x+"px";el.style.width=b[1]+"px";
+    x+=b[1]+g+(b[0]==="rq"?14:0);
+  });
+  var ar=$("cs-arrow");ar.style.left=(boxes.rq.x+boxes.rq.w+3)+"px";ar.style.top=Math.round(H/2)+"px";
+  var ch=Math.round(clamp((H-44)*0.62,30,54)),cw=Math.round(ch*1.18);
+  geo={W:W,H:H,b:boxes,ch:ch,cw:cw};
+  chips.forEach(function(c){c.style.width=cw+"px";c.style.height=ch+"px";});
+}
+function gridPos(box,idx,count){
+  var pad=8,top=24,bottom=8,avail=geo.H-top-bottom,cw=geo.cw,ch=geo.ch;
+  var rows=Math.max(1,Math.min(Math.floor((avail+4)/(ch+4)),Math.ceil(count/Math.max(1,Math.floor((box.w-2*pad+4)/(cw+4))))));
+  var perRow=Math.ceil(count/rows);
+  var sx=perRow>1?Math.min(cw+4,(box.w-2*pad-cw)/(perRow-1)):0;
+  var r=Math.floor(idx/perRow),c=idx%perRow;
+  var sy=rows>1?Math.min(ch+4,(avail-ch)/(rows-1)):0;
+  var y0=top+(rows===1?(avail-ch)/2:0);
+  return [box.x+pad+c*sx,y0+r*sy];
+}
+function placeChips(anim){
+  if(!geo||!st.run){return;}
+  var s=curState(),run=st.run,ps=st.ps,b=geo.b,cw=geo.cw,ch=geo.ch,big=1.18;
+  var up=ps.filter(function(p){return p.arrival>s.k;}).sort(function(a,c){return a.arrival-c.arrival||a.i-c.i;}).map(function(p){return p.i;});
+  var dn=ps.filter(function(p){return run.m.per[p.i].c<=s.k;}).sort(function(a,c){return run.m.per[a.i].c-run.m.per[c.i].c||a.i-c.i;}).map(function(p){return p.i;});
+  var pos={};
+  up.forEach(function(i,j){pos[i]={xy:gridPos(b.up,j,up.length),cls:"fut",sc:1};});
+  dn.forEach(function(i,j){pos[i]={xy:gridPos(b.dn,j,dn.length),cls:"done",sc:1};});
+  var n=s.ready.length,pad=8,inner=b.rq.w-2*pad;
+  var sp=n>1?Math.min(cw+6,(inner-cw)/(n-1)):0;
+  s.ready.forEach(function(i,j){
+    pos[i]={xy:[b.rq.x+b.rq.w-pad-cw-j*sp,(geo.H-ch)/2+2],cls:"wait",sc:1};
+  });
+  if(s.cpu>=0){pos[s.cpu]={xy:[b.cpu.x+(b.cpu.w-cw*big)/2,(geo.H-ch*big)/2],cls:"run",sc:big};}
+  var ev=s.ev;
+  chips.forEach(function(el,i){
+    var p=pos[i]||{xy:[b.up.x+8,24],cls:"fut",sc:1};
+    el.classList.toggle("mv",!!anim);
+    el.style.transform="translate("+Math.round(p.xy[0])+"px,"+Math.round(p.xy[1])+"px) scale("+p.sc+")";
+    el.className="pchip"+(anim?" mv":"")+" "+p.cls+(ev.prev===i&&ev.cur!==i&&ev.fin.indexOf(i)<0&&s.k>0?" pre":"")+(ev.arr.indexOf(i)>=0&&s.k>0?" newin":"");
+    el.style.zIndex=p.cls==="run"?3:(p.cls==="wait"?2+(n-s.ready.indexOf(i))/100:2);
+    var P=ps[i],k=el.querySelector(".k"),done=P.burst-s.rem[i];
+    if(p.cls==="fut"){k.textContent="@"+P.arrival;}
+    else if(p.cls==="done"){k.textContent="t="+run.m.per[i].c;}
+    else if(run.algo==="sjf"){k.textContent="b"+P.burst;}
+    else if(run.algo==="prio"||run.algo==="pprio"){k.textContent="p"+P.priority+" · "+s.rem[i]+" left";}
+    else{k.textContent=s.rem[i]+" left";}
+    el.querySelector(".pb span").style.width=Math.round(100*done/P.burst)+"%";
+    el.title=P.id+": arrival "+P.arrival+", burst "+P.burst+", priority "+P.priority+", remaining "+s.rem[i];
+  });
+  $("cs-rq-s").textContent=n?RQSUB[run.algo]+" · head →":"empty";
+  var cs=$("cs-cpu-s");
+  if(s.cpu<0){cs.textContent=s.k>=run.T?"all done":"idle";}
+  else if(run.algo==="rr"){cs.textContent="q "+(s.qused+1)+"/"+run.q;}
+  else{cs.textContent=s.rem[s.cpu]+" left";}
 }
 
-alg.addEventListener("change",()=>{quantumWrap.classList.toggle("hidden",alg.value!=="rr");clearResults();setMsg("");});
-root.querySelector("#addProcess").addEventListener("click",()=>{
- const used=new Set([...body.querySelectorAll(".pid")].map(x=>x.value.trim()));
- while(used.has("P"+nextId))nextId++;
- row(["P"+nextId++,0,1,1]);clearResults();
+/* ---------- Gantt ---------- */
+var gbox=$("cs-gbox"),gwrap=$("cs-gwrap"),gantt=$("cs-gantt"),glabs=$("cs-glabs"),gl=null;
+function buildGantt(){
+  var run=st.run;if(!run){return;}
+  var ps=st.ps,n=ps.length,T=run.T,axis=20;
+  if(narrow.matches){gbox.style.height=(axis+Math.round(30*(n+1.3))+12)+"px";}else{gbox.style.height="";}
+  var W=gwrap.clientWidth,H=gwrap.clientHeight;
+  var rh=clamp(Math.floor((H-axis-4)/(n+1.35)),16,58),cpuH=Math.round(rh*1.35);
+  var u=clamp((W-16)/Math.max(1,T),7,90);
+  var gw=Math.round(u*T+16),x0=4;
+  gl={u:u,x0:x0,rh:rh,cpuH:cpuH,T:T,gw:gw,blocks:[]};
+  var h="<div class=\"cs-grid\" style=\"left:"+x0+"px;width:"+Math.round(u*T)+"px;height:"+(cpuH+n*rh)+"px;--u:"+u.toFixed(2)+"px\"></div>";
+  var lab="<div class=\"cs-glab cpu\" style=\"top:0;height:"+cpuH+"px\">CPU</div>";
+  h+="<div class=\"cs-row\" style=\"top:1px;height:"+(cpuH-2)+"px;width:"+(gw-2)+"px\"></div>";
+  var bi=0;
+  function block(cls,s,e,top,hh,pc,label,title){
+    var w=(e-s)*u;
+    h+="<div class=\"gb "+cls+"\" data-b=\""+(bi++)+"\" style=\"left:"+(x0+s*u+1).toFixed(1)+"px;top:"+top+"px;width:"+Math.max(1,w-2).toFixed(1)+"px;height:"+hh+"px"+(pc?";--pc:"+pc:"")+"\" title=\""+esc(title)+"\">"+(w>=24&&label?esc(label):"")+"</div>";
+    gl.blocks.push({s:s,e:e});
+  }
+  run.segs.forEach(function(sg){
+    if(sg.p<0){block("idle",sg.s,sg.e,4,cpuH-8,"","idle","Idle "+sg.s+"–"+sg.e);}
+    else{block("run",sg.s,sg.e,4,cpuH-8,COLORS[sg.p%COLORS.length],ps[sg.p].id,ps[sg.p].id+" runs "+sg.s+"–"+sg.e);}
+  });
+  ps.forEach(function(p,r){
+    var top=cpuH+r*rh,pc=COLORS[p.i%COLORS.length],m=run.m.per[p.i];
+    lab+="<div class=\"cs-glab\" data-p=\""+p.i+"\" style=\"top:"+top+"px;height:"+rh+"px;--pc:"+pc+"\"><i></i>"+esc(p.id)+"</div>";
+    if(r%2===0){h+="<div class=\"cs-row\" style=\"top:"+(top+1)+"px;height:"+(rh-2)+"px;width:"+(gw-2)+"px;opacity:.6\"></div>";}
+    var t=p.arrival,ws=-1;
+    for(t=p.arrival;t<=m.c;t++){
+      var waiting=t<m.c&&run.unit[t]!==p.i;
+      if(waiting&&ws<0){ws=t;}
+      if(!waiting&&ws>=0){block("wt",ws,t,top+Math.round(rh*0.3),Math.max(6,Math.round(rh*0.4)),"","","waiting "+ws+"–"+t);ws=-1;}
+    }
+    run.segs.forEach(function(sg){
+      if(sg.p===p.i){block("run",sg.s,sg.e,top+Math.round(rh*0.12),Math.round(rh*0.76),pc,"",p.id+" runs "+sg.s+"–"+sg.e);}
+    });
+    h+="<i class=\"gm ar\" data-ar=\""+p.i+"\" style=\"left:"+(x0+p.arrival*u).toFixed(1)+"px;top:"+(top+1)+"px\" title=\""+esc(p.id)+" arrives at "+p.arrival+"\"></i>";
+    h+="<i class=\"gm fin\" data-fin=\""+p.i+"\" style=\"left:"+(x0+m.c*u).toFixed(1)+"px;top:"+(top+Math.round(rh/2)-9)+"px\" title=\""+esc(p.id)+" finishes at "+m.c+"\">&#10003;</i>";
+  });
+  var steps=[1,2,5,10,20,25,50,100],ts=1;
+  for(var i=0;i<steps.length;i++){ts=steps[i];if(ts*u>=28){break;}}
+  for(var t2=0;t2<=T;t2+=ts){if(T-t2<ts*0.6&&t2!==T&&t2!==0){continue;}h+="<span class=\"cs-tick\" style=\"left:"+(x0+t2*u).toFixed(1)+"px\">"+t2+"</span>";}
+  if(T%ts!==0){h+="<span class=\"cs-tick\" style=\"left:"+(x0+T*u).toFixed(1)+"px\">"+T+"</span>";}
+  h+="<div class=\"cs-fade\" id=\"cs-fade\"></div>";
+  h+="<div class=\"cs-cur\" id=\"cs-cur\" style=\"height:"+(cpuH+n*rh+2)+"px\"><span id=\"cs-curl\"></span></div>";
+  gantt.style.width=gw+"px";
+  gantt.innerHTML=h;
+  glabs.innerHTML=lab;
+}
+function placeGantt(anim){
+  if(!gl||!st.run){return;}
+  var s=curState(),k=s.k,u=gl.u,x0=gl.x0;
+  gantt.classList.toggle("mv",!!anim);
+  if(!anim){void gantt.offsetWidth;}
+  var bs=gantt.querySelectorAll(".gb");
+  bs.forEach(function(el,i){
+    var b=gl.blocks[i],vis=clamp(k,b.s,b.e)-b.s,hid=(b.e-b.s-vis)*u;
+    el.style.clipPath=vis<=0?"inset(0 100% 0 0)":"inset(0 "+Math.max(0,hid).toFixed(1)+"px 0 0)";
+  });
+  gantt.querySelectorAll(".gm.ar").forEach(function(el){el.classList.toggle("fut",+st.ps[+el.getAttribute("data-ar")].arrival>k);});
+  gantt.querySelectorAll(".gm.fin").forEach(function(el){el.classList.toggle("on",st.run.m.per[+el.getAttribute("data-fin")].c<=k);});
+  glabs.querySelectorAll(".cs-glab[data-p]").forEach(function(el){el.classList.toggle("on",+el.getAttribute("data-p")===s.cpu);});
+  var x=x0+k*u;
+  var cur=$("cs-cur");cur.style.left=x.toFixed(1)+"px";
+  $("cs-curl").textContent="t="+k;
+  $("cs-curl").style.left=(k>gl.T*0.85&&k>3)?"auto":"3px";
+  $("cs-curl").style.right=(k>gl.T*0.85&&k>3)?"3px":"auto";
+  var fade=$("cs-fade");fade.style.left=Math.min(gl.gw,x+1)+"px";
+  var vl=gwrap.scrollLeft,vw=gwrap.clientWidth;
+  if(x<vl+30||x>vl+vw-40){
+    var target=Math.max(0,x-vw/2);
+    if(gwrap.scrollTo){gwrap.scrollTo({left:target,behavior:reduce.matches||!anim?"auto":"smooth"});}else{gwrap.scrollLeft=target;}
+  }
+}
+
+/* ---------- narration ---------- */
+function narration(){
+  var run=st.run,s=curState();
+  if(!run||!s){return "Fix the process table to run the simulation";}
+  var ev=s.ev,parts=[];
+  if(s.k===0&&!st.playing&&st.step===0&&s.cpu>=0){
+    parts.push(ev.arr.length?list(ev.arr)+" arrive"+(ev.arr.length===1?"s":""):"");
+    parts.push("<b>"+esc(nm(s.cpu))+"</b> starts");
+    return "t=0 · "+parts.filter(Boolean).join(" · ")+" · press ▶";
+  }
+  if(s.k>=run.T){return "t="+run.T+" · <span class=\"osim-k h\">✓ all done</span> · avg wait "+fmt(run.m.w);}
+  if(ev.fin.length){parts.push("<span class=\"osim-k h\">✓ "+esc(list(ev.fin))+" done</span>");}
+  if(ev.arr.length){parts.push(esc(list(ev.arr))+" arrive"+(ev.arr.length===1?"s":""));}
+  var pv=ev.prev,cu=ev.cur,preempted=pv>=0&&cu!==pv&&ev.fin.indexOf(pv)<0;
+  if(ev.qexp){
+    parts.push("<span class=\"osim-k x\">"+esc(nm(ev.again?cu:pv))+" quantum expired</span>");
+    if(ev.again){parts.push("runs again");}
+    else if(cu>=0){parts.push("<b>"+esc(nm(cu))+"</b> runs");}
+  }else if(preempted){
+    parts.push("<span class=\"osim-k x\"><b>"+esc(nm(cu))+"</b> preempts "+esc(nm(pv))+"</span>");
+  }else if(cu>=0&&cu!==pv){
+    parts.push("<b>"+esc(nm(cu))+"</b> dispatched");
+  }else if(cu<0){
+    parts.push("CPU idle");
+  }else if(!parts.length){
+    parts.push("<b>"+esc(nm(cu))+"</b> runs · "+s.rem[cu]+" left");
+  }else{
+    parts.push(esc(nm(cu))+" keeps CPU");
+  }
+  return "t="+s.k+" · "+parts.join(" · ");
+}
+
+/* ---------- compare ---------- */
+var cmp=$("cs-compare");
+function renderCompare(){
+  if(cmp.hidden||!st.ps.length||!st.run){return;}
+  var ps=st.ps,res={},mx=1;
+  ALGOS.forEach(function(a){var m=metricsOf(ps,runAlgo(a,ps,st.q));res[a]=m;mx=Math.max(mx,m.w,m.t,m.r);});
+  var h="<div class=\"osim-ph\"><div><b>Compare all</b> <span>"+ps.length+" processes · RR q="+st.q+"</span></div><button type=\"button\" class=\"osim-ib\" data-act=\"compare\" aria-label=\"Close compare\"><svg class=\"st\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M6 6l12 12M18 6L6 18\"/></svg></button></div>";
+  h+="<div class=\"cs-lg\" aria-hidden=\"true\"><span><i class=\"w\" style=\"background:var(--o-pri)\"></i>Avg W</span><span><i style=\"background:repeating-linear-gradient(135deg,var(--o-line) 0 2px,var(--o-bg) 2px 5px)\"></i>Avg T</span><span><i style=\"background:radial-gradient(circle,var(--o-fg) 1.2px,transparent 1.5px) 0 0/5px 5px,var(--o-bg)\"></i>Avg R</span></div>";
+  h+="<div class=\"osim-sub\">Averages (lower is better)</div><div class=\"cs-cmp\">";
+  var best={w:Infinity,t:Infinity,r:Infinity};
+  ALGOS.forEach(function(a){["w","t","r"].forEach(function(k){best[k]=Math.min(best[k],res[a][k]);});});
+  ALGOS.forEach(function(a){
+    var m=res[a],lab=a==="rr"?"RR q="+st.q:NAMES[a];
+    h+="<button type=\"button\" class=\"cs-cg\" data-algo=\""+a+"\" aria-pressed=\""+(a===st.algo)+"\" title=\""+lab+": W "+fmt(m.w)+", T "+fmt(m.t)+", R "+fmt(m.r)+"\"><span class=\"nm\">"+lab+"</span>";
+    [["w","W"],["t","T"],["r","R"]].forEach(function(k){
+      h+="<span class=\"cs-cb\"><i class=\""+k[0]+"\" style=\"width:"+(70*m[k[0]]/mx).toFixed(1)+"%\"></i><em>"+(m[k[0]]===best[k[0]]?"★ ":"")+fmt(m[k[0]])+"</em></span>";
+    });
+    h+="</button>";
+  });
+  h+="</div><div class=\"osim-sub\">Round Robin quantum sweep</div><table class=\"cs-qt\"><thead><tr><th>q</th><th>Avg W</th><th>Avg T</th><th>Avg R</th></tr></thead><tbody>";
+  for(var q=1;q<=6;q++){
+    var mq=metricsOf(ps,simulateRR(ps,q));
+    h+="<tr"+(q===st.q?" class=\"on\"":"")+"><td>"+q+"</td><td>"+fmt(mq.w)+"</td><td>"+fmt(mq.t)+"</td><td>"+fmt(mq.r)+"</td></tr>";
+  }
+  h+="</tbody></table><p class=\"cs-best\">★ best value in each metric</p>";
+  cmp.innerHTML=h;
+}
+cmp.addEventListener("click",function(e){
+  var b=e.target.closest("button[data-algo]");
+  if(b){setAlgo(b.getAttribute("data-algo"));}
 });
-root.querySelector("#run").addEventListener("click",run);
-root.querySelector("#reset").addEventListener("click",()=>{load(scenarios.default);setMsg("");});
-root.querySelector("#loadScenario").addEventListener("click",()=>{
- load(scenarios[scenario.value]);setMsg("");
- if(scenario.value==="rr"){alg.value="rr";quantumWrap.classList.remove("hidden");quantum.value=2;}
+function togglePanel(id,force){
+  var p=$(id),other=id==="cs-compare"?$("cs-help"):$("cs-compare");
+  var open=force!=null?force:p.hidden;
+  p.hidden=!open;
+  if(open){other.hidden=true;}
+  $("cs-cmpbtn").setAttribute("aria-expanded",String(!$("cs-compare").hidden));
+  $("cs-helpbtn").setAttribute("aria-expanded",String(!$("cs-help").hidden));
+  if(id==="cs-compare"&&open){renderCompare();}
+}
+
+/* ---------- state, transport ---------- */
+function curState(){return st.run?st.run.states[Math.min(st.step,st.run.T)]:null;}
+function maxStep(){return st.run?st.run.T:0;}
+function renderStats(){
+  var run=st.run,s=curState(),a=averages();
+  $("cs-st").textContent=run?s.k+"/"+run.T:"–";
+  $("cs-sd").textContent=run?a.n+"/"+st.ps.length:"–";
+  $("cs-sw").textContent=a.w;$("cs-sa").textContent=a.t;$("cs-sr").textContent=a.r;
+  $("cs-narr").innerHTML=narration();
+}
+function renderControls(){
+  root.querySelectorAll("#cs-algos button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-algo")===st.algo));});
+  root.querySelectorAll("#cs-scen button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-scen")===st.scen));});
+  $("cs-q").textContent=st.q;
+  root.querySelector("[data-act=qminus]").disabled=st.q<=1;
+  root.querySelector("[data-act=qplus]").disabled=st.q>=LIM.q;
+  var atEnd=!st.run||st.step>=maxStep();
+  root.querySelector("[data-act=prev]").disabled=!st.run||st.step<=0;
+  root.querySelector("[data-act=first]").disabled=!st.run||st.step<=0;
+  root.querySelector("[data-act=next]").disabled=atEnd;
+  root.querySelector("[data-act=last]").disabled=atEnd;
+  root.querySelector("[data-act=play]").disabled=!st.run;
+  $("cs-playicon").setAttribute("d",st.playing?"M6.5 5h4v14h-4zM13.5 5h4v14h-4z":"M8 5l11 7-11 7z");
+  $("cs-play").setAttribute("aria-label",st.playing?"Pause (Space)":"Play (Space)");
+  $("cs-rq-h").textContent=st.algo==="rr"?"Ready queue (FIFO)":"Ready queue";
+}
+function draw(anim){
+  root.style.setProperty("--o-dur",dur()+"ms");
+  placeChips(anim);
+  placeGantt(anim);
+  markTable();
+  renderStats();
+  renderControls();
+}
+function rebuild(){
+  layoutLaneBoxes();
+  buildGantt();
+  draw(false);
+}
+function apply(keepStep){
+  var ps=validate();
+  if(!ps){pause();renderControls();return;}
+  var run;
+  try{run=buildRun(st.algo,ps,st.q);}catch(err){alertMsg(err.message);return;}
+  var sameShape=st.ps.length===ps.length&&st.ps.every(function(p,i){return p.id===ps[i].id;});
+  st.ps=ps;st.run=run;
+  st.step=keepStep?Math.min(st.step,run.T):0;
+  if(!sameShape||chips.length!==ps.length){buildChips();}
+  else{chips.forEach(function(c,i){c.querySelector("b").textContent=ps[i].id;});}
+  rebuild();
+  renderCompare();
+}
+function go(step,anim){
+  var prev=st.step;
+  st.step=clamp(step,0,maxStep());
+  draw(!!anim&&!reduce.matches&&st.step===prev+1);
+}
+function tick(){
+  if(!st.playing){return;}
+  if(st.step>=maxStep()){pause();return;}
+  go(st.step+1,true);
+  if(st.step>=maxStep()){pause();return;}
+  st.timer=setTimeout(tick,interval());
+}
+function play(){
+  if(st.playing||!st.run){return;}
+  if(st.step>=maxStep()){go(0,false);}
+  st.playing=true;renderControls();
+  st.timer=setTimeout(tick,Math.min(300,interval()));
+  renderStats();
+}
+function pause(){st.playing=false;clearTimeout(st.timer);renderControls();}
+function togglePlay(){if(st.playing){pause();}else{play();}}
+function setAlgo(a){if(a===st.algo){return;}st.algo=a;apply(false);renderControls();}
+function setQ(q){q=clamp(q,1,LIM.q);if(q===st.q){return;}st.q=q;if(st.algo==="rr"){apply(false);}else{renderControls();renderCompare();}}
+function setScen(s){
+  pause();
+  var rows;
+  if(s==="random"){
+    rows=[];var n=4+Math.floor(Math.random()*3);
+    for(var i=0;i<n;i++){rows.push(["P"+(i+1),String(Math.floor(Math.random()*9)),String(1+Math.floor(Math.random()*9)),String(1+Math.floor(Math.random()*5))]);}
+  }else{rows=SCEN[s].map(function(r){return r.map(String);});}
+  st.rows=rows;st.scen=s;
+  if(s==="rr"){st.algo="rr";st.q=2;}
+  renderTable();apply(false);renderControls();
+}
+
+root.addEventListener("click",function(e){
+  var b=e.target.closest("button");
+  if(!b||!root.contains(b)||b.disabled){return;}
+  if(b.closest("#cs-compare")&&b.hasAttribute("data-algo")){return;}
+  if(b.hasAttribute("data-algo")&&b.closest("#cs-algos")){setAlgo(b.getAttribute("data-algo"));return;}
+  if(b.hasAttribute("data-scen")){setScen(b.getAttribute("data-scen"));return;}
+  switch(b.getAttribute("data-act")){
+    case "qminus":setQ(st.q-1);break;
+    case "qplus":setQ(st.q+1);break;
+    case "first":pause();go(0,false);break;
+    case "prev":pause();go(st.step-1,false);break;
+    case "next":pause();go(st.step+1,true);break;
+    case "last":pause();go(maxStep(),false);break;
+    case "play":togglePlay();break;
+    case "compare":togglePanel("cs-compare");break;
+    case "help":togglePanel("cs-help");break;
+    case "fs":toggleFs();break;
+    case "add":
+      if(st.rows.length<LIM.n){
+        var used={},k=1;st.rows.forEach(function(r){used[String(r[0]).trim()]=1;});
+        while(used["P"+k]){k++;}
+        st.rows.push(["P"+k,"0","3","1"]);st.scen=null;pause();renderTable(st.rows.length-1);apply(false);
+      }
+      break;
+    case "rm":
+      if(st.rows.length>1){st.rows.splice(+b.getAttribute("data-i"),1);st.scen=null;pause();renderTable();apply(false);}
+      break;
+  }
 });
-body.addEventListener("input",()=>clearResults());
-load(scenarios.default);
+var speed=$("cs-speed");
+speed.addEventListener("input",function(){
+  st.speed=SPEEDS[+speed.value];
+  $("cs-speedv").textContent=st.speed+"/s";
+  speed.setAttribute("aria-valuetext",st.speed+" time units per second");
+  root.style.setProperty("--o-dur",dur()+"ms");
+  if(st.playing){clearTimeout(st.timer);st.timer=setTimeout(tick,interval());}
+});
+
+document.addEventListener("keydown",function(e){
+  if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey){return;}
+  var t=e.target,tag=t&&t.tagName;
+  if(e.key==="Escape"){
+    if(!$("cs-compare").hidden||!$("cs-help").hidden){togglePanel("cs-compare",false);togglePanel("cs-help",false);}
+    else if(tag==="INPUT"&&root.contains(t)){t.blur();}
+    return;
+  }
+  if(tag==="TEXTAREA"||tag==="SELECT"||(t&&t.isContentEditable)){return;}
+  if(tag==="INPUT"&&t.type!=="range"){return;}
+  if(tag==="INPUT"&&t.type==="range"&&e.key!==" "){return;}
+  if(t&&t!==document.body&&!root.contains(t)&&t.closest&&t.closest("a,button,input")){return;}
+  switch(e.key){
+    case "ArrowRight":e.preventDefault();pause();go(st.step+1,true);break;
+    case "ArrowLeft":e.preventDefault();pause();go(st.step-1,false);break;
+    case " ":case "Spacebar":e.preventDefault();togglePlay();break;
+    case "Home":e.preventDefault();pause();go(0,false);break;
+    case "End":e.preventDefault();pause();go(maxStep(),false);break;
+  }
+});
+
+/* ---------- fullscreen + fit to viewport ---------- */
+var fsBtn=$("cs-fs");
+function fsEl(){return document.fullscreenElement||document.webkitFullscreenElement||null;}
+function toggleFs(){
+  if(fsEl()){(document.exitFullscreen||document.webkitExitFullscreen).call(document);}
+  else{var req=root.requestFullscreen||root.webkitRequestFullscreen;if(req){req.call(root);}}
+}
+if(!(root.requestFullscreen||root.webkitRequestFullscreen)){fsBtn.hidden=true;}
+function onFs(){
+  var on=fsEl()===root;
+  $("cs-fsicon").setAttribute("d",on?"M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5":"M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5");
+  fsBtn.setAttribute("aria-label",on?"Exit fullscreen":"Fullscreen");
+  fit();
+}
+document.addEventListener("fullscreenchange",onFs);
+document.addEventListener("webkitfullscreenchange",onFs);
+function docTop(el){var y=0;while(el){y+=el.offsetTop;el=el.offsetParent;}return y;}
+var lastFit="";
+function fit(){
+  if(fsEl()===root||window.innerWidth<=600){root.style.removeProperty("--osim-h");}
+  else{
+    var h=Math.max(420,Math.floor(window.innerHeight-docTop(root)-12));
+    root.style.setProperty("--osim-h",h+"px");
+    var over=document.documentElement.scrollHeight-window.innerHeight;
+    if(over>0){root.style.setProperty("--osim-h",Math.max(420,h-over)+"px");}
+  }
+  var vz=$("cs-viz");
+  var lh=narrow.matches?150:Math.round(clamp(vz.clientHeight*0.34,120,230));
+  lanes.style.height=lh+"px";
+  var key=root.clientWidth+"x"+root.clientHeight+"x"+vz.clientWidth+"x"+vz.clientHeight;
+  if(key!==lastFit){lastFit=key;rebuild();}
+}
+window.addEventListener("resize",fit);
+window.addEventListener("load",fit);
+if(window.ResizeObserver){new ResizeObserver(function(){fit();}).observe($("cs-viz"));}
+
+/* ---------- init ---------- */
+st.rows=SCEN.course.map(function(r){return r.map(String);});
+renderTable();
+apply(false);
+fit();
+setTimeout(fit,400);
 })();
 </script>
