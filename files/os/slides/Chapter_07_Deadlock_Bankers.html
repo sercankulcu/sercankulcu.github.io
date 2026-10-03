@@ -12,6 +12,8 @@ excerpt: "An interactive deadlock and Banker's Algorithm simulator with allocati
   --bk-text:var(--global-text-color);
   --bk-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
   --bk-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
+  --bk-field:color-mix(in srgb,var(--global-text-color) 65%,var(--global-bg-color));
+  --bk-btn:color-mix(in srgb,var(--global-link-color) 62%,#000);
   max-width:1180px;margin:0 auto;color:var(--bk-text);
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
@@ -22,10 +24,10 @@ excerpt: "An interactive deadlock and Banker's Algorithm simulator with allocati
 .bankers-lab .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
 .bankers-lab label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
 .bankers-lab input,.bankers-lab select,.bankers-lab button{
-  font:inherit;border:1px solid var(--bk-line);border-radius:10px;padding:.6rem .7rem;background:var(--global-bg-color);color:var(--bk-text)
+  font:inherit;border:1px solid var(--bk-field);border-radius:10px;padding:.6rem .7rem;background:var(--global-bg-color);color:var(--bk-text);max-width:100%
 }
 .bankers-lab button{cursor:pointer;font-weight:800}
-.bankers-lab button.primary{background:var(--bk-accent);color:#fff;border-color:var(--bk-accent)}
+.bankers-lab button.primary{background:var(--bk-btn);color:#fff;border-color:var(--bk-btn)}
 .bankers-lab .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
 .bankers-lab .table-wrap{overflow-x:auto;margin-top:1rem}
 .bankers-lab table{width:100%;border-collapse:collapse;min-width:760px}
@@ -44,6 +46,17 @@ excerpt: "An interactive deadlock and Banker's Algorithm simulator with allocati
 .bankers-lab .step{padding:.75rem;border:1px solid var(--bk-line);border-radius:12px;background:var(--global-bg-color)}
 .bankers-lab .step.done{background:var(--bk-soft)}
 .bankers-lab .note{color:var(--bk-muted);font-size:.88rem}
+.bankers-lab .status.wait{border-left:5px solid #b7791f}
+.bankers-lab .step.pending{display:none}
+.bankers-lab .step.good{border-left:5px solid #0f8a6a}
+.bankers-lab .step.bad{border-left:5px solid #b42318}
+.bankers-lab .step.wait{border-left:5px solid #b7791f}
+.bankers-lab .req-row{display:flex;flex-wrap:wrap;gap:.8rem;align-items:flex-end}
+.bankers-lab .req-row label{min-width:0}
+.bankers-lab .inline-in{display:inline-flex;flex-direction:row;align-items:center;gap:.3rem}
+.bankers-lab .inline-in input{width:68px}
+.bankers-lab .msg{margin-top:.8rem;padding:.7rem .85rem;border-radius:10px;border:1px solid #c0392b;border-left-width:5px;background:color-mix(in srgb,#c0392b 9%,var(--global-bg-color));font-weight:700}
+.bankers-lab .msg:empty{display:none}
 @media(max-width:900px){.bankers-lab .controls,.bankers-lab .vectors{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.bankers-lab .controls,.bankers-lab .vectors{grid-template-columns:1fr}}
 </style>
@@ -58,10 +71,10 @@ excerpt: "An interactive deadlock and Banker's Algorithm simulator with allocati
   <section class="panel">
     <div class="controls">
       <label>Processes
-        <input id="procCount" type="number" min="2" max="8" value="5">
+        <input id="procCount" type="number" min="1" max="10" step="1" value="5">
       </label>
       <label>Resource types
-        <input id="resCount" type="number" min="1" max="5" value="3">
+        <input id="resCount" type="number" min="1" max="10" step="1" value="3">
       </label>
       <label>Scenario
         <select id="scenario">
@@ -80,6 +93,8 @@ excerpt: "An interactive deadlock and Banker's Algorithm simulator with allocati
       <button id="step">Next Banker step</button>
       <button id="resetSteps">Reset steps</button>
     </div>
+    <div id="msg" class="msg" role="alert" aria-live="assertive"></div>
+    <p class="note">Processes: 1–10 (named P0, P1, …; the course slides call them T0, T1, …). Resource types: 1–10 (labelled A–J). All matrix values must be whole numbers ≥ 0.</p>
   </section>
 
   <section class="panel">
@@ -114,13 +129,33 @@ excerpt: "An interactive deadlock and Banker's Algorithm simulator with allocati
   </section>
 
   <section class="panel">
+    <h2>Resource-Request Algorithm</h2>
+    <p class="note">Choose a process and a request vector. The request is checked against Need and Available, tentatively granted, and then the safety algorithm decides whether to keep it (grant) or roll it back (deny). A granted request updates the matrices above.</p>
+    <div class="req-row">
+      <label>Process
+        <select id="reqProc"></select>
+      </label>
+      <div><div style="font-size:.9rem;font-weight:800;margin-bottom:.35rem">Request vector</div><div id="reqInputs" class="chips"></div></div>
+    </div>
+    <div class="actions">
+      <button id="reqRun" class="primary">Check request</button>
+      <button id="reqStep">Next request step</button>
+      <button id="reqReset">Reset request</button>
+    </div>
+    <div id="reqStatus" class="status">Enter a request and press “Check request” (all steps) or “Next request step”.</div>
+    <div id="reqSteps" class="steps"></div>
+  </section>
+
+  <section class="panel">
     <h2>How Banker’s Algorithm Works</h2>
     <p><strong>1.</strong> Compute <code>Need = Maximum − Allocation</code>.</p>
     <p><strong>2.</strong> Set <code>Work = Available</code> and mark every process unfinished.</p>
     <p><strong>3.</strong> Find an unfinished process whose Need is less than or equal to Work.</p>
     <p><strong>4.</strong> Pretend that process finishes, then add its Allocation back into Work.</p>
     <p><strong>5.</strong> If every process can finish, the state is safe. Otherwise, no safe sequence exists from the current state.</p>
-    <p class="note">A safe state does not mean deadlock has already occurred; it means the system still has at least one completion order that avoids deadlock.</p>
+    <p><strong>Tie rule:</strong> this simulator scans P0, P1, … in index order and, during each pass, lets every process whose Need fits in Work finish; passes repeat until no process can proceed. Other scan orders can yield a different (equally valid) safe sequence.</p>
+    <p><strong>Resource request by Pi:</strong> (1) if Request &gt; Need, raise an error (the process exceeded its maximum claim); (2) if Request &gt; Available, Pi must wait; (3) otherwise pretend to allocate: Available −= Request, Allocation[i] += Request, Need[i] −= Request; (4) run the safety algorithm — if the new state is safe, grant the request; otherwise restore the old state and Pi waits.</p>
+    <p class="note">A safe state guarantees that no deadlock will occur: there is at least one completion order in which every process can finish. An unsafe state does not necessarily mean a deadlock has occurred; it only means the system can no longer guarantee to avoid one.</p>
   </section>
 </div>
 
@@ -140,8 +175,16 @@ const workVector=root.querySelector("#workVector");
 const safeSequence=root.querySelector("#safeSequence");
 const unfinished=root.querySelector("#unfinished");
 const stepsWrap=root.querySelector("#steps");
+const msg=root.querySelector("#msg");
+const reqProc=root.querySelector("#reqProc");
+const reqInputs=root.querySelector("#reqInputs");
+const reqStatus=root.querySelector("#reqStatus");
+const reqSteps=root.querySelector("#reqSteps");
+const MAXN=10,MAXV=999;
 
 let stepState=null;
+let reqState=null;
+let dims={p:5,r:3};
 
 const scenarios={
  classic:{
@@ -165,75 +208,99 @@ const scenarios={
 };
 
 function resourceLabel(i){return String.fromCharCode(65+i);}
+function vec(v){return "["+v.join(", ")+"]";}
+function chips(v){return v.map((x,i)=>`<span class="chip">${resourceLabel(i)}=${x}</span>`).join("");}
+function setMsg(t){msg.textContent=t||"";}
+function val(x,d){return (d&&d[x[0]]!==undefined&&d[x[0]][x[1]]!==undefined)?d[x[0]][x[1]]:0;}
+
+function parseCount(input,label){
+ const raw=String(input.value).trim();
+ if(!/^\d+$/.test(raw)||+raw<1||+raw>MAXN)throw new Error(label+" must be a whole number from 1 to "+MAXN+".");
+ return +raw;
+}
 
 function build(p,r,data){
+ dims={p,r};
  procCount.value=p;resCount.value=r;
  names.innerHTML="";
- ["Allocation","Maximum","Need"].forEach(group=>{
+ ["Allocation","Maximum","Need"].forEach(()=>{
    for(let j=0;j<r;j++){
      const th=document.createElement("th");
      th.textContent=resourceLabel(j);
      names.appendChild(th);
    }
  });
+ ["allocHead","maxHead","needHead"].forEach(id=>root.querySelector("#"+id).colSpan=r);
  body.innerHTML="";
  for(let i=0;i<p;i++){
    const tr=document.createElement("tr");
    let html=`<td><strong>P${i}</strong></td>`;
-   for(let j=0;j<r;j++)html+=`<td><input class="alloc" data-r="${j}" type="number" min="0" value="${data?.allocation?.[i]?.[j]??0}"></td>`;
-   for(let j=0;j<r;j++)html+=`<td><input class="max" data-r="${j}" type="number" min="0" value="${data?.maximum?.[i]?.[j]??0}"></td>`;
+   for(let j=0;j<r;j++)html+=`<td><input class="alloc" data-r="${j}" type="number" min="0" step="1" aria-label="Allocation P${i} ${resourceLabel(j)}" value="${val([i,j],data&&data.allocation)}"></td>`;
+   for(let j=0;j<r;j++)html+=`<td><input class="max" data-r="${j}" type="number" min="0" step="1" aria-label="Maximum P${i} ${resourceLabel(j)}" value="${val([i,j],data&&data.maximum)}"></td>`;
    for(let j=0;j<r;j++)html+=`<td class="need" data-r="${j}">0</td>`;
    tr.innerHTML=html;body.appendChild(tr);
  }
  availWrap.innerHTML="";
  for(let j=0;j<r;j++){
    const label=document.createElement("label");
-   label.style.display="inline-flex";
-   label.style.flexDirection="row";
-   label.style.alignItems="center";
-   label.innerHTML=`${resourceLabel(j)} <input class="available" data-r="${j}" type="number" min="0" value="${data?.available?.[j]??0}" style="width:68px">`;
+   label.className="inline-in";
+   const av=data&&data.available&&data.available[j]!==undefined?data.available[j]:0;
+   label.innerHTML=`${resourceLabel(j)} <input class="available" data-r="${j}" type="number" min="0" step="1" aria-label="Available ${resourceLabel(j)}" value="${av}">`;
    availWrap.appendChild(label);
  }
+ reqProc.innerHTML="";
+ for(let i=0;i<p;i++){const o=document.createElement("option");o.value=i;o.textContent="P"+i;reqProc.appendChild(o);}
+ reqInputs.innerHTML="";
+ for(let j=0;j<r;j++){
+   const label=document.createElement("label");
+   label.className="inline-in";
+   label.innerHTML=`${resourceLabel(j)} <input class="req" data-r="${j}" type="number" min="0" step="1" aria-label="Request ${resourceLabel(j)}" value="0">`;
+   reqInputs.appendChild(label);
+ }
+ setMsg("");
  resetOutputs();
+ resetRequest();
  updateNeeds();
 }
 
-function matrix(selector){
- return [...body.rows].map(row=>[...row.querySelectorAll(selector)].map(x=>+x.value));
+function readNum(x,what){
+ const raw=String(x.value).trim();
+ if(raw===""||x.validity.badInput||!/^\d+$/.test(raw)||+raw>MAXV)throw new Error(what+" must be a whole number from 0 to "+MAXV+".");
+ return +raw;
+}
+function matrix(selector,what){
+ return [...body.rows].map((row,i)=>[...row.querySelectorAll(selector)].map((x,j)=>readNum(x,what+" P"+i+" "+resourceLabel(j))));
 }
 function available(){
- return [...root.querySelectorAll(".available")].map(x=>+x.value);
+ return [...root.querySelectorAll(".available")].map((x,j)=>readNum(x,"Available "+resourceLabel(j)));
 }
 function updateNeeds(){
- const a=matrix(".alloc"),m=matrix(".max");
- [...body.rows].forEach((row,i)=>{
+ [...body.rows].forEach(row=>{
+   const a=[...row.querySelectorAll(".alloc")],m=[...row.querySelectorAll(".max")];
    [...row.querySelectorAll(".need")].forEach((cell,j)=>{
-     cell.textContent=Math.max(0,(m[i]?.[j]??0)-(a[i]?.[j]??0));
+     const d=(+m[j].value)-(+a[j].value);
+     cell.textContent=Number.isFinite(d)?d:"?";
    });
  });
 }
 
-function validate(a,m,av){
- for(let i=0;i<a.length;i++){
-   for(let j=0;j<a[i].length;j++){
-     if(a[i][j]<0||m[i][j]<0||av[j]<0)throw new Error("Resource values cannot be negative.");
-     if(a[i][j]>m[i][j])throw new Error(`P${i}: Allocation cannot exceed Maximum for resource ${resourceLabel(j)}.`);
-   }
- }
+function readState(){
+ const a=matrix(".alloc","Allocation"),m=matrix(".max","Maximum"),av=available();
+ for(let i=0;i<a.length;i++)for(let j=0;j<a[i].length;j++)
+   if(a[i][j]>m[i][j])throw new Error(`P${i}: Allocation cannot exceed Maximum for resource ${resourceLabel(j)}.`);
+ const need=m.map((row,i)=>row.map((v,j)=>v-a[i][j]));
+ return {a,m,av,need};
 }
 
-function analyzeData(){
- const a=matrix(".alloc"),m=matrix(".max"),av=available();
- validate(a,m,av);
- const need=m.map((row,i)=>row.map((v,j)=>v-a[i][j]));
+/* Safety algorithm: repeated passes over P0..Pn-1 in index order. */
+function safety(a,need,av){
  const work=[...av],finish=Array(a.length).fill(false),seq=[],trace=[];
- let progress=true;
- while(progress){
+ let progress=true,guard=0;
+ while(progress&&guard++<=a.length){
    progress=false;
    for(let i=0;i<a.length;i++){
      if(finish[i])continue;
-     const can=need[i].every((v,j)=>v<=work[j]);
-     if(can){
+     if(need[i].every((v,j)=>v<=work[j])){
        const before=[...work];
        for(let j=0;j<work.length;j++)work[j]+=a[i][j];
        finish[i]=true;seq.push(i);progress=true;
@@ -241,27 +308,38 @@ function analyzeData(){
      }
    }
  }
- return {a,m,av,need,work,finish,seq,trace,safe:finish.every(Boolean)};
+ return {work,finish,seq,trace,safe:finish.every(Boolean)};
+}
+
+function analyzeData(){
+ const st=readState();
+ return Object.assign(st,safety(st.a,st.need,st.av));
 }
 
 function renderAnalysis(result){
  [...body.rows].forEach((row,i)=>{
    [...row.querySelectorAll(".need")].forEach((cell,j)=>cell.textContent=result.need[i][j]);
  });
- workVector.innerHTML=result.work.map((v,i)=>`<span class="chip">${resourceLabel(i)}=${v}</span>`).join("");
+ workVector.innerHTML=chips(result.work);
  safeSequence.innerHTML=result.seq.length?result.seq.map(i=>`<span class="chip">P${i}</span>`).join(""):"<span class='chip'>None</span>";
  unfinished.innerHTML=result.finish.map((f,i)=>!f?`<span class="chip">P${i}</span>`:"").join("")||"<span class='chip'>None</span>";
  status.className="status "+(result.safe?"good":"bad");
  status.innerHTML=result.safe
    ? `<strong>Safe state.</strong> One safe sequence is ${result.seq.map(i=>"P"+i).join(" → ")}.`
-   : `<strong>Unsafe state.</strong> The remaining processes cannot all be guaranteed to finish with the current Available resources.`;
+   : `<strong>Unsafe state.</strong> The remaining processes cannot all be guaranteed to finish with the current Available resources. This does not necessarily mean a deadlock has occurred.`;
  stepsWrap.innerHTML="";
  result.trace.forEach((t,k)=>{
    const d=document.createElement("div");
    d.className="step";
-   d.textContent=`Step ${k+1}: P${t.p} can finish because Need [${t.need.join(", ")}] ≤ Work [${t.before.join(", ")}]. After release, Work = [${t.after.join(", ")}].`;
+   d.textContent=`Step ${k+1}: P${t.p} can finish because Need ${vec(t.need)} ≤ Work ${vec(t.before)}. After release, Work = ${vec(t.after)}.`;
    stepsWrap.appendChild(d);
  });
+ if(!result.safe){
+   const d=document.createElement("div");
+   d.className="step bad";
+   d.textContent=`No unfinished process has Need ≤ Work ${vec(result.work)}: ${result.finish.map((f,i)=>f?null:"P"+i).filter(Boolean).join(", ")} cannot be guaranteed to finish.`;
+   stepsWrap.appendChild(d);
+ }
  stepState={trace:result.trace,index:0,result};
 }
 
@@ -273,34 +351,142 @@ function resetOutputs(){
 }
 
 function runAnalyze(){
+ setMsg("");
  try{renderAnalysis(analyzeData());}
- catch(e){alert(e.message);}
+ catch(e){resetOutputs();setMsg(e.message);}
 }
 
 function nextStep(){
+ setMsg("");
  try{
    if(!stepState){const r=analyzeData();renderAnalysis(r);}
    if(!stepState.trace.length)return;
    [...stepsWrap.children].forEach(x=>x.classList.remove("done"));
    const upto=Math.min(stepState.index,stepState.trace.length-1);
    for(let i=0;i<=upto;i++)stepsWrap.children[i].classList.add("done");
-   const t=stepState.trace[upto];
-   workVector.innerHTML=t.after.map((v,i)=>`<span class="chip">${resourceLabel(i)}=${v}</span>`).join("");
+   workVector.innerHTML=chips(stepState.trace[upto].after);
    stepState.index=Math.min(stepState.index+1,stepState.trace.length);
- }catch(e){alert(e.message);}
+ }catch(e){resetOutputs();setMsg(e.message);}
+}
+
+/* ---------- Resource-request algorithm ---------- */
+function resetRequest(){
+ reqState=null;
+ reqSteps.innerHTML="";
+ reqStatus.className="status";
+ reqStatus.textContent="Enter a request and press “Check request” (all steps) or “Next request step”.";
+}
+
+function planRequest(){
+ const st=readState();
+ const i=+reqProc.value;
+ if(!(i>=0&&i<st.a.length))throw new Error("Choose a process.");
+ const req=[...reqInputs.querySelectorAll(".req")].map((x,j)=>readNum(x,"Request "+resourceLabel(j)));
+ if(req.every(v=>v===0))throw new Error("The request vector is all zeros; enter at least one positive value.");
+ const P="P"+i,steps=[];
+ const leNeed=req.every((v,j)=>v<=st.need[i][j]);
+ steps.push({cls:leNeed?"good":"bad",text:`Step 1: Request[${P}] ${vec(req)} ≤ Need[${P}] ${vec(st.need[i])}? ${leNeed?"Yes.":"No — error: the process has exceeded its maximum claim."}`});
+ if(!leNeed)return {outcome:"error",steps,i,req,
+   summary:`<strong>Error.</strong> ${P} requested ${vec(req)} but its remaining Need is only ${vec(st.need[i])}. The request is rejected.`};
+ const leAv=req.every((v,j)=>v<=st.av[j]);
+ steps.push({cls:leAv?"good":"wait",text:`Step 2: Request[${P}] ${vec(req)} ≤ Available ${vec(st.av)}? ${leAv?"Yes.":"No — the resources are not available, so "+P+" must wait."}`});
+ if(!leAv)return {outcome:"wait",steps,i,req,
+   summary:`<strong>${P} must wait.</strong> Request ${vec(req)} exceeds Available ${vec(st.av)}. The state is unchanged.`};
+ const av2=st.av.map((v,j)=>v-req[j]);
+ const a2=st.a.map((row,k)=>k===i?row.map((v,j)=>v+req[j]):[...row]);
+ const need2=st.need.map((row,k)=>k===i?row.map((v,j)=>v-req[j]):[...row]);
+ steps.push({cls:"",text:`Step 3: Pretend to allocate. Available = ${vec(st.av)} − ${vec(req)} = ${vec(av2)}; Allocation[${P}] = ${vec(a2[i])}; Need[${P}] = ${vec(need2[i])}.`});
+ const s=safety(a2,need2,av2);
+ const trace=s.trace.map(t=>`P${t.p} (Need ${vec(t.need)} ≤ Work ${vec(t.before)} → Work ${vec(t.after)})`).join("; ");
+ steps.push({cls:s.safe?"good":"bad",text:`Step 4: Run the safety algorithm on the new state, starting with Work = ${vec(av2)}. `+(trace?trace+". ":"")+(s.safe?`Safe sequence: ${s.seq.map(k=>"P"+k).join(", ")}.`:`Stuck: ${s.finish.map((f,k)=>f?null:"P"+k).filter(Boolean).join(", ")} cannot finish with Work ${vec(s.work)} — the new state would be unsafe.`)});
+ if(s.safe){
+   steps.push({cls:"good",text:`Step 5: The new state is safe, so the request is granted. The matrices above now show Allocation[${P}] = ${vec(a2[i])} and Available = ${vec(av2)}.`});
+   return {outcome:"granted",steps,i,req,a2,av2,seq:s.seq,
+     summary:`<strong>Request granted.</strong> ${P} receives ${vec(req)}. New Available = ${vec(av2)}; safe sequence ${s.seq.map(k=>"P"+k).join(" → ")}.`};
+ }
+ steps.push({cls:"bad",text:`Step 5: The new state is unsafe, so the request is denied and the old state is restored (Available = ${vec(st.av)}, Allocation[${P}] = ${vec(st.a[i])}). ${P} must wait.`});
+ return {outcome:"denied",steps,i,req,
+   summary:`<strong>Request denied.</strong> Granting ${vec(req)} to ${P} would leave the system in an unsafe state; the allocation was rolled back and ${P} waits.`};
+}
+
+function commitRequest(plan){
+ const row=body.rows[plan.i];
+ [...row.querySelectorAll(".alloc")].forEach((x,j)=>x.value=plan.a2[plan.i][j]);
+ [...root.querySelectorAll(".available")].forEach((x,j)=>x.value=plan.av2[j]);
+ updateNeeds();
+ try{renderAnalysis(analyzeData());}catch(e){setMsg(e.message);}
+}
+
+function showRequest(upto){
+ const plan=reqState.plan;
+ [...reqSteps.children].forEach((d,k)=>d.classList.toggle("pending",k>upto));
+ [...reqSteps.children].forEach((d,k)=>d.classList.toggle("done",k<=upto));
+ if(upto>=plan.steps.length-1){
+   reqStatus.className="status "+({granted:"good",denied:"bad",error:"bad",wait:"wait"}[plan.outcome]);
+   reqStatus.innerHTML=plan.summary;
+   if(plan.outcome==="granted"&&!reqState.committed){reqState.committed=true;commitRequest(plan);}
+ }else{
+   reqStatus.className="status";
+   reqStatus.textContent=`Checking request of P${plan.i}: step ${upto+1} of ${plan.steps.length}. Press “Next request step” to continue.`;
+ }
+}
+
+function startRequest(){
+ const plan=planRequest();
+ reqSteps.innerHTML="";
+ plan.steps.forEach(s=>{
+   const d=document.createElement("div");
+   d.className="step pending"+(s.cls?" "+s.cls:"");
+   d.textContent=s.text;
+   reqSteps.appendChild(d);
+ });
+ reqState={plan,shown:-1,committed:false};
+}
+
+function requestRunAll(){
+ setMsg("");
+ try{
+   if(!reqState||reqState.committed||reqState.shown>=reqState.plan.steps.length-1)startRequest();
+   reqState.shown=reqState.plan.steps.length-1;
+   showRequest(reqState.shown);
+ }catch(e){resetRequest();setMsg(e.message);}
+}
+
+function requestStep(){
+ setMsg("");
+ try{
+   if(!reqState||reqState.shown>=reqState.plan.steps.length-1)startRequest();
+   reqState.shown++;
+   showRequest(reqState.shown);
+ }catch(e){resetRequest();setMsg(e.message);}
+}
+
+function rebuildFromInputs(){
+ try{
+   const p=parseCount(procCount,"Processes"),r=parseCount(resCount,"Resource types");
+   build(p,r,null);
+ }catch(e){
+   procCount.value=dims.p;resCount.value=dims.r;
+   setMsg(e.message);
+ }
 }
 
 root.addEventListener("input",e=>{
  if(e.target.matches(".alloc,.max"))updateNeeds();
- if(e.target.matches(".alloc,.max,.available"))resetOutputs();
+ if(e.target.matches(".alloc,.max,.available")){resetOutputs();resetRequest();}
+ if(e.target.matches(".req"))resetRequest();
 });
-root.querySelector("#rebuild").addEventListener("click",()=>build(+procCount.value,+resCount.value,null));
+reqProc.addEventListener("change",resetRequest);
+root.querySelector("#rebuild").addEventListener("click",rebuildFromInputs);
 root.querySelector("#analyze").addEventListener("click",runAnalyze);
 root.querySelector("#step").addEventListener("click",nextStep);
-root.querySelector("#resetSteps").addEventListener("click",()=>{if(stepState){stepState.index=0;[...stepsWrap.children].forEach(x=>x.classList.remove("done"));workVector.innerHTML=stepState.result.av.map((v,i)=>`<span class="chip">${resourceLabel(i)}=${v}</span>`).join("");}});
+root.querySelector("#resetSteps").addEventListener("click",()=>{if(stepState){stepState.index=0;[...stepsWrap.children].forEach(x=>x.classList.remove("done"));workVector.innerHTML=chips(stepState.result.av);}});
 root.querySelector("#loadScenario").addEventListener("click",()=>{const s=scenarios[root.querySelector("#scenario").value];build(s.p,s.r,s);});
-procCount.addEventListener("change",()=>build(+procCount.value,+resCount.value,null));
-resCount.addEventListener("change",()=>build(+procCount.value,+resCount.value,null));
+root.querySelector("#reqRun").addEventListener("click",requestRunAll);
+root.querySelector("#reqStep").addEventListener("click",requestStep);
+root.querySelector("#reqReset").addEventListener("click",()=>{setMsg("");resetRequest();});
+procCount.addEventListener("change",rebuildFromInputs);
+resCount.addEventListener("change",rebuildFromInputs);
 
 build(scenarios.classic.p,scenarios.classic.r,scenarios.classic);
 })();
