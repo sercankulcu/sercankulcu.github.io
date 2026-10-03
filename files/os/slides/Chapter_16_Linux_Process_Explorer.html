@@ -2,182 +2,318 @@
 layout: without-sidebar
 title: "Linux Process Explorer"
 permalink: /files/os/slides/Chapter_16_Linux_Process_Explorer.html
-excerpt: "An interactive Linux process explorer for learning ps, top, /proc, PID and PPID relationships, process trees, file descriptors, and memory maps."
+excerpt: "An interactive Linux process explorer: an animated process tree with fork, kill, zombies, wait and re-parenting to PID 1, a ps/top table, and a /proc/<pid> inspector."
 ---
 
 <style>
-.linux-proc{
-  --lp-line:var(--global-border-color);
-  --lp-accent:var(--global-link-color);
-  --lp-text:var(--global-text-color);
-  --lp-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
-  --lp-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
-  --lp-field:color-mix(in srgb,var(--global-text-color) 65%,var(--global-bg-color));
-  --lp-btn:color-mix(in srgb,var(--global-link-color) 62%,#000);
-  max-width:1180px;margin:0 auto;color:var(--lp-text);
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+body:has(.osim) .page__footer{display:none}
+body:has(.osim){padding-bottom:0 !important;margin-bottom:0 !important}
+body:has(.osim) .page__meta{display:none}
+.osim{
+  --o-bg:var(--global-bg-color,#fff);
+  --o-fg:var(--global-text-color,#333);
+  --o-link:var(--global-link-color,#2a7ab0);
+  --o-muted:color-mix(in srgb,var(--o-fg) 82%,var(--o-bg));
+  --o-line:color-mix(in srgb,var(--o-fg) 66%,var(--o-bg));
+  --o-soft:color-mix(in srgb,var(--o-fg) 16%,var(--o-bg));
+  --o-surf:color-mix(in srgb,var(--o-fg) 5%,var(--o-bg));
+  --o-cell:color-mix(in srgb,var(--o-fg) 9%,var(--o-bg));
+  --o-pri:color-mix(in srgb,var(--o-link) 62%,#000);
+  --o-acc:color-mix(in srgb,var(--o-link) 65%,var(--o-fg));
+  --o-hit:color-mix(in srgb,#0072b2 60%,var(--o-fg));
+  --o-flt:color-mix(in srgb,#d55e00 60%,var(--o-fg));
+  --o-hit-bg:color-mix(in srgb,var(--o-hit) 20%,var(--o-bg));
+  --o-flt-bg:color-mix(in srgb,var(--o-flt) 20%,var(--o-bg));
+  --o-dur:420ms;
+  position:relative;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;
+  height:var(--osim-h,calc(100vh - 112px));min-height:420px;padding:8px;border-radius:16px;
+  background:var(--o-surf);color:var(--o-fg);overflow:hidden;
+  font:15px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-variant-numeric:tabular-nums;
 }
-.linux-proc *{box-sizing:border-box}
-.linux-proc h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0;overflow-wrap:anywhere}
-.linux-proc .lead{max-width:920px;color:var(--lp-muted)}
-.linux-proc .panel{margin-top:1rem;padding:1rem;border:1px solid var(--lp-line);border-radius:18px;background:var(--global-bg-color);min-width:0}
-.linux-proc .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
-.linux-proc label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
-.linux-proc select,.linux-proc input,.linux-proc button{
-  font:inherit;border:1px solid var(--lp-field);border-radius:10px;padding:.62rem .7rem;background:var(--global-bg-color);color:var(--lp-text);max-width:100%
+.osim *,.osim *::before,.osim *::after{box-sizing:border-box;transition:none}
+.osim [hidden]{display:none !important}
+.osim table,.osim thead,.osim tbody,.osim tr,.osim th,.osim td{color:var(--o-fg);background:transparent;border-color:var(--o-soft)}
+.osim:fullscreen{height:100vh;border-radius:0;padding:12px}
+.osim::backdrop{background:var(--o-bg)}
+.osim h1,.osim h3,.osim p{margin:0;padding:0}
+.osim .osim-title{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;line-height:1.1;white-space:nowrap;margin-right:4px;color:var(--o-fg)}
+.osim .osim-title svg{width:22px;height:22px;color:var(--o-acc)}
+.osim button{font:inherit;color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:9px;
+  height:34px;padding:0 11px;margin:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  font-weight:650;font-size:14px;line-height:1;white-space:nowrap;box-shadow:none}
+.osim button:hover{background:var(--o-cell)}
+.osim button:disabled{opacity:.45;cursor:not-allowed}
+.osim button:focus-visible,.osim input:focus-visible{outline:2px solid var(--o-fg);outline-offset:2px}
+.osim button.osim-pri,.osim button[aria-pressed="true"]{background:var(--o-pri);border-color:var(--o-pri);color:#fff;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--o-fg) 70%,transparent)}
+.osim .osim-ib{width:34px;padding:0}
+.osim svg{width:18px;height:18px;flex:none;overflow:visible}
+.osim svg.fi{fill:currentColor;stroke:none}
+.osim svg.st{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.osim .osim-bar{position:relative;display:flex;flex-direction:column;gap:7px;padding:8px 10px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0}
+.osim .osim-lbl{font-size:12px;font-weight:700;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em}
+.osim .osim-seg{display:inline-flex;border:1px solid var(--o-line);border-radius:10px;padding:2px;gap:2px;background:var(--o-bg)}
+.osim .osim-seg button{border:0;height:30px;border-radius:8px;padding:0 10px}
+.osim .osim-seg-sm button{padding:0 9px;font-size:13px}
+.osim .osim-grp{display:inline-flex;align-items:center;gap:3px}
+.osim .osim-num{min-width:22px;text-align:center;font-weight:800;font-size:17px}
+.osim .osim-spacer{flex:1}
+.osim input[type="range"]{width:78px;height:20px;padding:0;margin:0;border:0;background:transparent;box-shadow:none;accent-color:var(--o-pri);display:inline-block;vertical-align:middle}
+.osim .osim-speedv{font-size:13px;font-weight:700;min-width:34px}
+.osim .osim-alert{position:absolute;left:10px;top:calc(100% + 6px);z-index:30;max-width:min(560px,90%);padding:7px 11px;border-radius:9px;
+  background:var(--o-bg);color:var(--o-fg);border:2px solid var(--o-flt);font-size:13.5px;font-weight:650;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.osim .osim-alert:empty{display:none}
+.osim .osim-stage{position:relative;flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:8px}
+.osim .osim-viz{position:relative;min-width:0;min-height:0;overflow:hidden;background:var(--o-bg);border-radius:12px;padding:8px 10px;box-shadow:0 0 0 1px var(--o-soft);display:flex;flex-direction:column;gap:8px}
+.osim .osim-side{display:flex;flex-direction:column;gap:6px;min-height:0;min-width:0;padding:10px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft);overflow:hidden}
+.osim .osim-sh{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.osim .osim-sh b{font-size:14.5px}
+.osim .osim-sh span{font-size:12px;color:var(--o-muted);font-weight:650}
+.osim .osim-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:7px 10px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-narr{flex:1;min-width:220px;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.osim .osim-k{display:inline-block;padding:1px 7px;border-radius:6px;font-weight:800}
+.osim .osim-k.h{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-k.x{background:var(--o-flt-bg);box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .osim-stats{display:flex;gap:6px;flex-wrap:wrap}
+.osim .osim-stat{display:inline-flex;gap:5px;height:28px;align-items:center;padding:0 9px;border-radius:8px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft);font-size:12.5px;font-weight:650;color:var(--o-muted)}
+.osim .osim-stat b{font-size:15px;color:var(--o-fg)}
+.osim .osim-stat.h{box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-panel{position:absolute;z-index:20;top:0;right:0;bottom:0;width:min(420px,100%);display:flex;flex-direction:column;gap:10px;padding:12px 14px;
+  background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-line),0 10px 30px rgba(0,0,0,.22);overflow:auto}
+.osim .osim-panel[hidden]{display:none}
+.osim .osim-ph{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.osim .osim-ph b{font-size:15px}
+.osim .osim-ph span{font-size:12.5px;color:var(--o-muted);font-weight:650}
+.osim .osim-sub{font-size:12px;font-weight:750;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em}
+.osim .osim-help dl{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;margin:0;font-size:13.5px}
+.osim .osim-help dt{font-weight:800}
+.osim .osim-help dd{margin:0}
+.osim .osim-legend{display:flex;flex-wrap:wrap;gap:6px;font-size:12.5px;font-weight:650}
+.osim .osim-legend span{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:7px}
+.osim kbd{font:inherit;font-size:12px;font-weight:750;padding:1px 5px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--o-line)}
+.osim{--u-root:color-mix(in srgb,#cc79a7 55%,var(--o-fg));--u-alice:color-mix(in srgb,#0072b2 55%,var(--o-fg));--u-bob:color-mix(in srgb,#e69f00 55%,var(--o-fg));--u-other:color-mix(in srgb,#009e73 55%,var(--o-fg))}
+
+/* ---- process tree ---- */
+.osim .lp-tree{position:relative;flex:1;min-height:0;overflow:auto;scrollbar-width:thin;border-radius:10px}
+.osim .lp-inner{position:relative}
+.osim .lp-edges{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.osim .lp-edges path{fill:none;stroke:var(--o-line);stroke-width:2}
+.osim .lp-edges path.moved{stroke:var(--o-acc);stroke-width:2.6;stroke-dasharray:6 4}
+.osim .lp-edges path.newe{stroke:var(--o-acc);stroke-width:2.6}
+.osim .lp-edges path.dim{opacity:.35}
+.osim .lp-node{position:absolute;left:0;top:0;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;column-gap:7px;align-items:center;
+  padding:4px 8px 4px 6px;border-radius:9px;background:var(--o-bg);color:var(--o-fg);cursor:pointer;transform-origin:0 50%;
+  box-shadow:inset 0 0 0 1.5px var(--o-line);border-left:5px solid var(--uc,var(--o-line));outline:none;user-select:none;will-change:transform}
+.osim .lp-node .ic{grid-row:1 / 3;display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;box-shadow:inset 0 0 0 1.5px var(--o-line);background:var(--o-surf)}
+.osim .lp-node .ic svg{width:14px;height:14px}
+.osim .lp-node .l1{display:flex;align-items:baseline;gap:6px;min-width:0;font-size:14px;line-height:1.15;white-space:nowrap}
+.osim .lp-node .l1 b{font-weight:800}
+.osim .lp-node .l1 span{overflow:hidden;text-overflow:ellipsis;font-weight:650}
+.osim .lp-node .l2{font-size:11.5px;font-weight:650;color:var(--o-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
+.osim .lp-node.cmp{grid-template-rows:auto}
+.osim .lp-node.cmp .ic{grid-row:auto;width:20px;height:20px}
+.osim .lp-node.cmp .l2{display:none}
+.osim .lp-node.st-R .ic{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .lp-node.st-Z{background:repeating-linear-gradient(135deg,var(--o-flt-bg) 0 3px,var(--o-bg) 3px 7px);box-shadow:inset 0 0 0 2px var(--o-flt);border-left-style:dashed}
+.osim .lp-node.st-Z .ic{background:var(--o-flt-bg);box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .lp-node.st-Z .l1 span{font-style:italic}
+.osim .lp-node:hover{background-color:var(--o-cell)}
+.osim .lp-node.sel{box-shadow:inset 0 0 0 3px var(--o-acc),0 4px 14px rgba(0,0,0,.18);z-index:3}
+.osim .lp-node:focus-visible{outline:2px solid var(--o-fg);outline-offset:3px}
+.osim .lp-node.dim{opacity:.38}
+.osim .lp-node.hit{box-shadow:inset 0 0 0 1.5px var(--o-line),0 0 0 3px color-mix(in srgb,var(--o-acc) 55%,transparent)}
+.osim .lp-node.sel.hit{box-shadow:inset 0 0 0 3px var(--o-acc),0 0 0 3px color-mix(in srgb,var(--o-acc) 55%,transparent)}
+.osim .lp-node .lk{width:11px;height:11px;margin-left:auto;align-self:center;color:var(--o-muted)}
+.osim .lp-search{height:32px;width:170px;max-width:100%;margin:0;padding:0 9px;font:inherit;font-size:14px;color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:9px;box-shadow:none}
+.osim .lp-search:focus-visible{outline:2px solid var(--o-fg);outline-offset:2px}
+.osim .lp-search[aria-invalid="true"]{border:2px dashed var(--o-flt);background:var(--o-flt-bg)}
+
+/* ---- /proc drawer ---- */
+.osim .lp-drawer{flex:none;display:flex;flex-direction:column;gap:6px;min-height:0;padding:7px 9px;border-radius:10px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft)}
+.osim .lp-drawer .osim-sh{flex-wrap:wrap;justify-content:flex-start}
+.osim .lp-drawer .osim-sh>button{margin-left:auto}
+.osim .lp-drawer .osim-sh code{font:inherit;font-weight:800;font-size:14px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.osim .lp-pre{flex:1;min-height:0;margin:0;padding:7px 9px;overflow:auto;border-radius:8px;background:var(--o-bg);color:var(--o-fg);box-shadow:inset 0 0 0 1px var(--o-soft);
+  font:12.5px/1.35 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre;tab-size:9;scrollbar-width:thin}
+.osim .lp-pre .c{color:var(--o-muted)}
+.osim .lp-pre .k{font-weight:800}
+.osim .lp-note{font-size:11.5px;font-weight:700;color:var(--o-muted)}
+
+/* ---- ps table ---- */
+.osim .lp-ps{display:flex;flex-direction:column;gap:1px;min-height:0;overflow-y:auto;flex:1;scrollbar-width:thin;font-size:13px}
+.osim .lp-tr{display:grid;grid-template-columns:36px 38px 50px 14px 38px 40px minmax(0,1fr);gap:3px;align-items:center;padding:3px 4px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.osim .lp-tr span{overflow:hidden;text-overflow:ellipsis}
+.osim .lp-tr span.n{text-align:right}
+.osim .lp-tr.hd{cursor:default;font-size:11px;font-weight:750;color:var(--o-muted);text-transform:uppercase;position:sticky;top:0;background:var(--o-bg);z-index:1}
+.osim .lp-tr:not(.hd):hover{background:var(--o-cell)}
+.osim .lp-tr.sel{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit);font-weight:750}
+.osim .lp-tr.z span{font-style:italic}
+.osim .lp-tr:focus-visible{outline:2px solid var(--o-fg);outline-offset:-2px}
+.osim .lp-tr .ud{display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--uc);margin-right:3px}
+.osim .lp-sum{font-size:12px;font-weight:700;color:var(--o-muted);padding-top:4px;border-top:1px solid var(--o-soft)}
+.osim .lp-empty{padding:8px;font-size:13px;color:var(--o-muted);font-weight:650}
+.osim .osim-stat svg{width:13px;height:13px}
+.osim .osim-stat.z{box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+
+@media (min-width:1000px){.osim{width:min(1640px,calc(100vw - 48px));margin-left:calc(50% - min(820px,50vw - 24px))}}
+.osim .osim-stage{grid-template-columns:minmax(0,1fr) 330px}
+@media (min-width:1500px){.osim .osim-stage{grid-template-columns:minmax(0,1fr) 380px}}
+@media (max-width:1400px){.osim .osim-speedv,.osim .lp-actt{display:none}}
+@media (max-width:1100px){.osim .osim-stage{grid-template-columns:minmax(0,1fr) 300px}.osim .osim-title span{display:none}}
+@media (max-width:900px){.osim .osim-stage{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 220px}}
+@media (max-width:600px){
+  .osim{height:auto;min-height:0;overflow:visible;padding:6px}
+  .osim .osim-stage{grid-template-rows:auto auto}
+  .osim .osim-viz{height:auto}
+  .osim .lp-tree{flex:none}
+  .osim .lp-drawer{height:auto !important}
+  .osim .lp-pre{max-height:260px}
+  .osim .osim-side{height:auto;max-height:none}
+  .osim .lp-ps{max-height:300px}
+  .osim .osim-spacer{display:none}
+  .osim .osim-seg{flex-wrap:wrap}
+  .osim .lp-search{width:100%}
+  .osim .osim-narr{white-space:normal;min-width:0;flex-basis:100%}
+  .osim .osim-panel{position:fixed;inset:auto 6px 6px 6px;width:auto;max-height:80vh}
 }
-.linux-proc button{cursor:pointer;font-weight:800}
-.linux-proc button.primary{background:var(--lp-btn);color:#fff;border-color:var(--lp-btn)}
-.linux-proc button:disabled{opacity:.55;cursor:not-allowed}
-.linux-proc .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
-.linux-proc .layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:1rem}
-.linux-proc .layout>div{min-width:0}
-.linux-proc .table-wrap{overflow-x:auto;max-width:100%}
-.linux-proc table{width:100%;border-collapse:collapse;min-width:560px}
-.linux-proc th,.linux-proc td{border:1px solid var(--lp-line);padding:.5rem;text-align:center}
-.linux-proc th{background:var(--lp-soft)}
-.linux-proc tbody tr{cursor:pointer}
-.linux-proc tr.selected{background:color-mix(in srgb,var(--lp-accent) 16%,var(--global-bg-color));font-weight:700}
-.linux-proc tbody tr:focus-visible,.linux-proc .tree-item:focus-visible{outline:3px solid var(--lp-text);outline-offset:-3px}
-.linux-proc .tree{display:grid;gap:.45rem}
-.linux-proc .tree-item{padding:.55rem .7rem;border:1px solid var(--lp-line);border-radius:10px;background:var(--global-bg-color);cursor:pointer;overflow-wrap:anywhere}
-.linux-proc .tree-item.selected{outline:2px solid var(--lp-btn);background:color-mix(in srgb,var(--lp-accent) 12%,var(--global-bg-color))}
-.linux-proc .tree-item.dim{opacity:.5;cursor:default}
-.linux-proc .terminal{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--lp-soft);border:1px solid var(--lp-line);border-radius:12px;padding:.8rem;white-space:pre;min-height:220px;overflow:auto;max-width:100%;font-size:.86rem}
-.linux-proc .details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
-.linux-proc .card{padding:.8rem;border:1px solid var(--lp-line);border-radius:14px;background:var(--lp-soft);min-width:0}
-.linux-proc .card b{display:block;font-size:1.05rem;margin-top:.2rem;overflow-wrap:anywhere}
-.linux-proc .fd-list,.linux-proc .map-list{display:grid;gap:.4rem;margin-top:.6rem}
-.linux-proc .entry{padding:.5rem .6rem;border:1px solid var(--lp-line);border-radius:10px;background:var(--global-bg-color);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.84rem;overflow-x:auto;white-space:pre}
-.linux-proc .msg{margin-top:.8rem;padding:.7rem .85rem;border-radius:10px;border:1px solid #c0392b;border-left-width:5px;background:color-mix(in srgb,#c0392b 9%,var(--global-bg-color));font-weight:700}
-.linux-proc .msg.info{border-color:var(--lp-btn);background:var(--lp-soft)}
-.linux-proc .msg:empty{display:none}
-.linux-proc .note{color:var(--lp-muted);font-size:.88rem}
-@media(max-width:900px){.linux-proc .controls,.linux-proc .details{grid-template-columns:repeat(2,minmax(0,1fr))}.linux-proc .layout{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:600px){.linux-proc .controls,.linux-proc .details{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){
+  .osim *,.osim *::before,.osim *::after{animation:none !important;transition:none !important}
+}
 </style>
 
-<div class="linux-proc">
-  <div>
-    <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--lp-accent)">Operating Systems · Chapter 16</div>
-    <h1>Linux Process Explorer</h1>
-    <p class="lead">Explore a simulated Linux process table and connect command-line tools such as <code>ps</code>, <code>top</code>, and <code>/proc</code> to kernel process concepts.</p>
+<div class="osim" id="osim-lp">
+  <div class="osim-bar">
+    <div class="osim-row">
+      <h1 class="osim-title"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M12 15h5"/></svg><span>Linux Process Explorer</span></h1>
+      <div class="osim-seg" role="group" aria-label="Scenario" id="lp-scen">
+        <button type="button" data-scen="system" title="A small desktop system: systemd, sshd, bash, python3, code, node">System</button>
+        <button type="button" data-scen="demo" title="Recorded demo: fork, kill, zombie, wait, orphan adoption by PID 1 (press Play)">Demo</button>
+      </div>
+      <div class="osim-grp" role="group" aria-label="History playback">
+        <button type="button" class="osim-ib" data-act="first" aria-label="First step (Home)" title="First (Home)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="5" width="2.6" height="14" rx="1"/><path d="M13 6v12l-6-6z"/><path d="M20 6v12l-6-6z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="prev" aria-label="Previous step (Left arrow)" title="Back (&#8592;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="5" width="2.6" height="14" rx="1"/><path d="M18 6v12l-8-6z"/></svg></button>
+        <button type="button" class="osim-ib osim-pri" data-act="play" id="lp-play" aria-label="Play (Space)" title="Play / pause (Space)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path id="lp-playicon" d="M8 5l11 7-11 7z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="next" aria-label="Next step (Right arrow)" title="Step (&#8594;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6v12l8-6z"/><rect x="16.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+        <button type="button" class="osim-ib" data-act="last" aria-label="Last step (End)" title="Last (End)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6v12l6-6z"/><path d="M11 6v12l6-6z"/><rect x="17.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+      </div>
+      <div class="osim-grp">
+        <span class="osim-lbl" id="lp-speed-l">Speed</span>
+        <input type="range" id="lp-speed" min="0" max="3" step="1" value="1" aria-labelledby="lp-speed-l" aria-valuetext="1 step per second">
+        <span class="osim-speedv" id="lp-speedv">1/s</span>
+      </div>
+      <span class="osim-spacer"></span>
+      <button type="button" data-act="proc" id="lp-procbtn" aria-expanded="true" aria-controls="lp-drawer" title="Show or hide the /proc inspector (Enter on a node)"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 4h10l6 6v10H4zM14 4v6h6M8 14h8M8 17h5"/></svg>/proc</button>
+      <button type="button" class="osim-ib" data-act="help" id="lp-helpbtn" aria-expanded="false" aria-controls="lp-help" aria-label="Help and legend" title="Help">?</button>
+      <button type="button" class="osim-ib" data-act="fs" id="lp-fs" aria-label="Fullscreen" title="Fullscreen"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path id="lp-fsicon" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    </div>
+    <div class="osim-row">
+      <span class="osim-lbl">Selected</span>
+      <div class="osim-grp" role="group" aria-label="Process actions">
+        <button type="button" data-act="fork" id="lp-fork" title="fork(): create a child copy of the selected process"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="6" r="2.4"/><circle cx="12" cy="19" r="2.4"/><path d="M6 8.5v1.5a4 4 0 004 4h4a4 4 0 004-4V8.5M12 14v2.6"/></svg>fork()</button>
+        <button type="button" data-act="kill" id="lp-kill" title="kill -9: the process exits; its children are adopted by PID 1"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8"/><path d="M9 9l6 6M15 9l-6 6"/></svg>kill<span class="lp-actt">&#160;-9</span></button>
+        <button type="button" data-act="wait" id="lp-wait" title="wait(): the selected parent reaps its zombie children (or the zombie's parent does)"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 3h10M7 21h10M8 3c0 5 8 5 8 9s-8 4-8 9M16 3c0 5-8 5-8 9"/></svg>wait()</button>
+        <button type="button" data-act="refresh" id="lp-refresh" title="top refresh: CPU %, MEM % and R/S states change"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 12a8 8 0 11-2.3-5.6M20 4v5h-5"/></svg>refresh</button>
+      </div>
+      <span class="osim-lbl">User</span>
+      <div class="osim-seg osim-seg-sm" role="group" aria-label="Filter by user" id="lp-users">
+        <button type="button" data-user="all">All</button>
+        <button type="button" data-user="root">root</button>
+        <button type="button" data-user="alice">alice</button>
+        <button type="button" data-user="bob">bob</button>
+      </div>
+      <input type="search" class="lp-search" id="lp-q" placeholder="Filter: command or PID" aria-label="Filter by command or PID" autocomplete="off" spellcheck="false" maxlength="24">
+    </div>
+    <div class="osim-alert" id="lp-alert" role="alert"></div>
   </div>
 
-  <section class="panel">
-    <div class="controls">
-      <label>View
-        <select id="view">
-          <option value="ps">ps-style table</option>
-          <option value="top">top-style view</option>
-          <option value="proc">/proc view</option>
-        </select>
-      </label>
-      <label>Sort by
-        <select id="sort">
-          <option value="pid">PID</option>
-          <option value="cpu">CPU %</option>
-          <option value="mem">Memory %</option>
-        </select>
-      </label>
-      <label>Filter user
-        <select id="userFilter">
-          <option value="all">All users</option>
-          <option value="root">root</option>
-          <option value="alice">alice</option>
-          <option value="bob">bob</option>
-        </select>
-      </label>
-      <label>Search
-        <input id="search" placeholder="bash, python, sshd…" autocomplete="off">
-      </label>
-    </div>
-    <div class="actions">
-      <button id="refresh" class="primary">Simulate refresh</button>
-      <button id="spawn">fork() selected process</button>
-      <button id="kill">Terminate selected</button>
-      <button id="reset">Reset scenario</button>
-    </div>
-    <div id="msg" class="msg" role="alert" aria-live="assertive"></div>
-    <p class="note">Select a process by clicking it, or focus a row / tree item with Tab and press Enter or Space. <em>fork()</em> creates a child that is a copy of the selected process: same user (UID), same program and memory map, and a copy of its open file descriptors.</p>
-  </section>
-
-  <section class="panel layout">
-    <div>
-      <h2>Process Table</h2>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>PID</th><th>PPID</th><th>USER</th><th>STAT</th><th>CPU%</th><th>MEM%</th><th>COMMAND</th></tr></thead>
-          <tbody id="procBody"></tbody>
-        </table>
+  <div class="osim-stage">
+    <div class="osim-viz" id="lp-viz">
+      <div class="lp-tree" id="lp-tree"><div class="lp-inner" id="lp-inner" role="tree" aria-label="Process tree"><svg class="lp-edges" id="lp-edges" aria-hidden="true" focusable="false"></svg></div></div>
+      <div class="lp-drawer" id="lp-drawer">
+        <div class="osim-sh"><code id="lp-path">/proc/1/status</code>
+          <div class="osim-seg osim-seg-sm" role="group" aria-label="/proc file" id="lp-tabs">
+            <button type="button" data-tab="status" title="/proc/&lt;pid&gt;/status (excerpt)">status</button>
+            <button type="button" data-tab="fd" title="/proc/&lt;pid&gt;/fd (simplified)">fd</button>
+            <button type="button" data-tab="maps" title="/proc/&lt;pid&gt;/maps (shortened)">maps</button>
+          </div>
+          <span class="lp-note" id="lp-pnote">excerpt</span>
+          <button type="button" class="osim-ib" data-act="proc" aria-label="Close /proc inspector" title="Close (Esc)"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        </div>
+        <pre class="lp-pre" id="lp-pre" tabindex="0" aria-label="/proc file contents"></pre>
       </div>
     </div>
-    <div>
-      <h2>Process Tree</h2>
-      <div id="tree" class="tree"></div>
-      <p class="note">Faded entries are hidden by the current filter and cannot be selected.</p>
+    <aside class="osim-side" aria-label="Process table">
+      <div class="osim-sh"><b>ps</b>
+        <div class="osim-seg osim-seg-sm" role="group" aria-label="Sort processes by" id="lp-sort">
+          <button type="button" data-sort="pid">PID</button>
+          <button type="button" data-sort="cpu">%CPU</button>
+          <button type="button" data-sort="mem">%MEM</button>
+        </div>
+      </div>
+      <div class="lp-ps" id="lp-ps" role="grid" aria-label="Process table"></div>
+      <div class="lp-sum" id="lp-sum"></div>
+    </aside>
+    <div class="osim-panel osim-help" id="lp-help" hidden aria-label="Help">
+      <div class="osim-ph"><b>Help</b><button type="button" class="osim-ib" data-act="help" aria-label="Close help"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <dl>
+        <dt>PID / PPID</dt><dd>Process ID / parent's process ID.</dd>
+        <dt>fork()</dt><dd>New child: new PID, same UID/GID, program, fd copies and (copy-on-write) memory.</dd>
+        <dt>kill -9</dt><dd>The process exits; its children are re-parented to PID 1.</dd>
+        <dt>Zombie</dt><dd>Exited process (Z) kept until its parent calls wait().</dd>
+        <dt>wait()</dt><dd>The parent collects the exit status; the zombie disappears.</dd>
+        <dt>PID 1</dt><dd>systemd: adopts orphans and reaps them at once; protected here.</dd>
+        <dt>STAT</dt><dd>R running · S sleeping · Z zombie.</dd>
+        <dt>/proc</dt><dd>Kernel view per process. Uid/Gid list real, effective, saved, filesystem IDs.</dd>
+      </dl>
+      <div class="osim-sub">Legend</div>
+      <div class="osim-legend">
+        <span style="box-shadow:inset 0 0 0 1.5px var(--o-hit);background:var(--o-hit-bg)">&#9654; R running</span>
+        <span style="box-shadow:inset 0 0 0 1.5px var(--o-line)">&#9790; S sleeping</span>
+        <span style="box-shadow:inset 0 0 0 2px var(--o-flt);background:repeating-linear-gradient(135deg,var(--o-flt-bg) 0 3px,var(--o-bg) 3px 7px)">&#10007; Z zombie</span>
+        <span style="box-shadow:inset 0 0 0 1.5px var(--o-line);border-left:5px solid var(--u-root)">root</span>
+        <span style="box-shadow:inset 0 0 0 1.5px var(--o-line);border-left:5px solid var(--u-alice)">alice</span>
+        <span style="box-shadow:inset 0 0 0 1.5px var(--o-line);border-left:5px solid var(--u-bob)">bob</span>
+        <span><svg viewBox="0 0 40 12" style="width:40px;height:12px" aria-hidden="true"><path d="M2 6h36" stroke="currentColor" stroke-width="2.4" stroke-dasharray="6 4"/></svg>re-parented</span>
+      </div>
+      <div class="osim-sub">Keys</div>
+      <div class="osim-legend"><span>Tree: <kbd>&#8593;</kbd><kbd>&#8595;</kbd> move <kbd>&#8592;</kbd> parent <kbd>&#8594;</kbd> child <kbd>Enter</kbd> /proc</span><span>Elsewhere: <kbd>&#8592;</kbd><kbd>&#8594;</kbd> history</span><span><kbd>Space</kbd> play</span><span><kbd>Esc</kbd> close</span></div>
+      <p class="lp-note">Simulated system with illustrative values; it does not read your computer.</p>
     </div>
-  </section>
+  </div>
 
-  <section class="panel">
-    <h2>Command Output</h2>
-    <div id="terminal" class="terminal" tabindex="0" aria-label="Simulated command output"></div>
-  </section>
-
-  <section class="panel">
-    <h2>Selected Process</h2>
-    <div class="details">
-      <div class="card">PID / PPID<b id="pidInfo">–</b></div>
-      <div class="card">User (UID) / State<b id="userState">–</b></div>
-      <div class="card">CPU / Memory<b id="usage">–</b></div>
-      <div class="card">Command<b id="command">–</b></div>
+  <div class="osim-foot">
+    <p class="osim-narr" id="lp-narr" aria-live="polite"></p>
+    <div class="osim-stats">
+      <span class="osim-stat" title="History step / total steps">Step <b id="lp-ss">0/0</b></span>
+      <span class="osim-stat" title="Processes in the table">Tasks <b id="lp-sn">0</b></span>
+      <span class="osim-stat h" title="Running (R)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4l13 8-13 8z"/></svg>R <b id="lp-sr">0</b></span>
+      <span class="osim-stat" title="Sleeping (S)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>S <b id="lp-sl">0</b></span>
+      <span class="osim-stat z" title="Zombies (Z)"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>Z <b id="lp-sz">0</b></span>
     </div>
-
-    <h3>File Descriptors</h3>
-    <div id="fdList" class="fd-list"></div>
-
-    <h3>Memory Map <span class="note">(address range, permissions, offset, device, inode, path)</span></h3>
-    <div id="mapList" class="map-list"></div>
-  </section>
-
-  <section class="panel">
-    <h2>Concept Guide</h2>
-    <p><strong>PID:</strong> unique process identifier. <strong>PPID:</strong> identifier of the parent process.</p>
-    <p><strong>Process tree:</strong> shows how processes are created from parent processes, often starting from PID 1. When a parent terminates, its children are re-parented ("adopted") by PID 1.</p>
-    <p><strong>fork():</strong> the child gets a new PID, its PPID is the parent's PID, and it inherits the parent's real and effective UID/GID, a copy of the file-descriptor table, and a (copy-on-write) copy of the address space. Only a later <code>exec()</code> replaces the program; only privileged code can change the UID.</p>
-    <p><strong><code>/proc/&lt;pid&gt;</code>:</strong> a virtual filesystem interface exposing process state, memory mappings, open file descriptors, command-line arguments, and more. <code>/proc/&lt;pid&gt;/status</code> shows <code>State: S (sleeping)</code>, and <code>Uid:</code>/<code>Gid:</code> with four numeric fields (real, effective, saved, filesystem).</p>
-    <p><strong>File descriptors:</strong> small integers referring to open files, pipes, sockets, terminals, and other I/O objects.</p>
-    <p><strong>Memory map:</strong> regions such as executable text, heap, shared libraries, memory-mapped files, and stack. Each line of <code>/proc/&lt;pid&gt;/maps</code> shows the address range, permissions (r, w, x, p = private / s = shared), file offset, device (major:minor), inode, and path.</p>
-    <p class="note">This page simulates Linux concepts and command output; the values are illustrative and the maps are shortened to a few regions. It does not inspect or control the visitor's actual operating system.</p>
-  </section>
+  </div>
 </div>
 
 <script>
 (function(){
 "use strict";
-const root=document.querySelector(".linux-proc");
-if(!root)return;
-const $=s=>root.querySelector(s);
+var root=document.getElementById("osim-lp");
+if(!root){return;}
+var $=function(id){return document.getElementById(id);};
 
-const body=$("#procBody");
-const tree=$("#tree");
-const terminal=$("#terminal");
-const view=$("#view");
-const sort=$("#sort");
-const userFilter=$("#userFilter");
-const search=$("#search");
-const msg=$("#msg");
-const spawnBtn=$("#spawn");
-const killBtn=$("#kill");
-
-const UIDS={root:0,alice:1000,bob:1001};
-const STATES={R:"R (running)",S:"S (sleeping)",D:"D (disk sleep)",T:"T (stopped)",Z:"Z (zombie)"};
-let processes=[],selectedPid=1,nextPid=2200;
-
-function esc(s){
-  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
-}
-function setMsg(t,info){msg.textContent=t||"";msg.classList.toggle("info",!!info);}
+var UIDS={root:0,alice:1000,bob:1001};
+var UCOL={root:"var(--u-root)",alice:"var(--u-alice)",bob:"var(--u-bob)"};
+var STATES={R:"R (running)",S:"S (sleeping)",D:"D (disk sleep)",T:"T (stopped)",Z:"Z (zombie)"};
+var WORD={R:"running",S:"sleeping",D:"disk sleep",T:"stopped",Z:"zombie"};
+var MAXP=30,SPEEDS=[0.5,1,2,3];
+var ICON={
+  R:"<svg class=\"fi\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M7 4l13 8-13 8z\"/></svg>",
+  S:"<svg class=\"fi\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z\"/></svg>",
+  Z:"<svg class=\"st\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M6 6l12 12M18 6L6 18\"/></svg>"
+};
+var LOCK="<svg class=\"lk st\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><rect x=\"5\" y=\"11\" width=\"14\" height=\"10\" rx=\"2\"/><path d=\"M8 11V7a4 4 0 018 0v4\"/></svg>";
+var narrow=window.matchMedia?window.matchMedia("(max-width: 600px)"):{matches:false};
+var reduce=window.matchMedia?window.matchMedia("(prefers-reduced-motion: reduce)"):{matches:false};
 
 function defaults(){
   return [
@@ -221,172 +357,523 @@ function defaults(){
   ];
 }
 
-function reset(){
-  processes=defaults();selectedPid=1;nextPid=2200;setMsg("");
-  render();
-}
+var st={hist:[],step:0,sel:1,user:"all",q:"",sort:"pid",tab:"status",drawer:true,help:false,playing:false,timer:0,speed:1,scen:"system"};
 
-function matches(p){
-  const q=search.value.trim().toLowerCase();
-  return (userFilter.value==="all"||p.user===userFilter.value)&&(!q||p.cmd.toLowerCase().includes(q)||String(p.pid).includes(q));
-}
-function selected(){return selectedPid===null?null:(processes.find(p=>p.pid===selectedPid)||null);}
-
-function visible(){
-  return processes.filter(matches).sort((a,b)=>{
-    if(sort.value==="cpu")return b.cpu-a.cpu||a.pid-b.pid;
-    if(sort.value==="mem")return b.mem-a.mem||a.pid-b.pid;
-    return a.pid-b.pid;
-  });
-}
-
-function select(pid,where){
-  selectedPid=pid;setMsg("");render();
-  if(where){
-    const el=root.querySelector(where+'[data-pid="'+pid+'"]');
-    if(el)el.focus();
-  }
-}
-function keySelect(e,pid,where){
-  if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){e.preventDefault();select(pid,where);}
-}
-
-function renderTable(){
-  body.innerHTML="";
-  visible().forEach(p=>{
-    const tr=document.createElement("tr");
-    const sel=p.pid===selectedPid;
-    if(sel)tr.classList.add("selected");
-    tr.tabIndex=0;
-    tr.dataset.pid=p.pid;
-    tr.setAttribute("aria-selected",sel?"true":"false");
-    tr.setAttribute("aria-label","PID "+p.pid+", "+p.cmd+", user "+p.user+(sel?", selected":""));
-    tr.innerHTML="<td>"+p.pid+"</td><td>"+p.ppid+"</td><td>"+esc(p.user)+"</td><td>"+esc(p.stat)+"</td><td>"+p.cpu.toFixed(1)+"</td><td>"+p.mem.toFixed(1)+"</td><td>"+esc(p.cmd)+"</td>";
-    tr.addEventListener("click",()=>select(p.pid));
-    tr.addEventListener("keydown",e=>keySelect(e,p.pid,"#procBody tr"));
-    body.appendChild(tr);
-  });
-  if(!body.children.length)body.innerHTML='<tr><td colspan="7">No process matches the filter.</td></tr>';
-}
-
-function treeHtml(pid,depth,seen){
-  if(seen.has(pid))return "";
-  seen.add(pid);
-  const p=processes.find(x=>x.pid===pid);
-  if(!p)return "";
-  const ok=matches(p),sel=p.pid===selectedPid;
-  let html='<div class="tree-item'+(sel?" selected":"")+(ok?"":" dim")+'" data-pid="'+p.pid+'" style="margin-left:'+(depth*18)+'px"'+
-    (ok?' tabindex="0" role="button" aria-pressed="'+(sel?"true":"false")+'"':' aria-disabled="true"')+'>'+
-    (depth?"└ ":"")+p.pid+" · "+esc(p.cmd)+' <span class="note">('+esc(p.user)+')</span></div>';
-  processes.filter(x=>x.ppid===pid).sort((a,b)=>a.pid-b.pid).forEach(c=>{html+=treeHtml(c.pid,depth+1,seen);});
-  return html;
-}
-
-function renderTree(){
-  const roots=processes.filter(p=>p.ppid===0||!processes.some(x=>x.pid===p.ppid)).sort((a,b)=>a.pid-b.pid);
-  const seen=new Set();
-  tree.innerHTML=roots.map(r=>treeHtml(r.pid,0,seen)).join("");
-  tree.querySelectorAll('.tree-item[tabindex]').forEach(el=>{
-    const pid=+el.dataset.pid;
-    el.addEventListener("click",()=>select(pid));
-    el.addEventListener("keydown",e=>keySelect(e,pid,"#tree .tree-item"));
-  });
-}
-
+/* ---------- helpers ---------- */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function alertMsg(t){$("lp-alert").textContent=t||"";}
+function uid(u){return UIDS[u]===undefined?65534:UIDS[u];}
 function comm(p){return p.cmd.split(" ")[0].slice(0,15);}
-
-function renderTerminal(){
-  const arr=visible();
-  if(view.value==="top"){
-    const totalCpu=processes.reduce((s,p)=>s+p.cpu,0).toFixed(1);
-    const running=processes.filter(p=>p.stat==="R").length;
-    terminal.textContent="top - simulated\nTasks: "+processes.length+" total, "+running+" running, "+(processes.length-running)+" sleeping\n%Cpu(s): "+totalCpu+" us\n\n"+
-      "  PID USER       %CPU  %MEM S COMMAND\n"+
-      arr.map(p=>String(p.pid).padStart(5)+" "+p.user.padEnd(9)+" "+p.cpu.toFixed(1).padStart(5)+" "+p.mem.toFixed(1).padStart(5)+" "+p.stat+" "+comm(p)).join("\n");
-  }else if(view.value==="proc"){
-    const p=selected();
-    if(!p){terminal.textContent="No process selected.";return;}
-    const u=UIDS[p.user]===undefined?65534:UIDS[p.user];
-    terminal.textContent="$ cat /proc/"+p.pid+"/status   (excerpt)\n"+
-      "Name:\t"+comm(p)+"\nState:\t"+(STATES[p.stat]||p.stat)+"\nTgid:\t"+p.pid+"\nPid:\t"+p.pid+"\nPPid:\t"+p.ppid+
-      "\nUid:\t"+u+"\t"+u+"\t"+u+"\t"+u+"\nGid:\t"+u+"\t"+u+"\t"+u+"\t"+u+"\nThreads:\t1\n\n"+
-      "$ ls -l /proc/"+p.pid+"/fd   (simplified: name -> target)\n"+p.fds.join("\n")+"\n\n"+
-      "$ cat /proc/"+p.pid+"/maps   (shortened)\n"+p.maps.join("\n");
-  }else{
-    terminal.textContent="$ ps -eo pid,ppid,user,stat,%cpu,%mem,args\n  PID  PPID USER     STAT %CPU %MEM COMMAND\n"+
-      arr.map(p=>String(p.pid).padStart(5)+" "+String(p.ppid).padStart(5)+" "+p.user.padEnd(8)+" "+p.stat.padEnd(4)+" "+p.cpu.toFixed(1).padStart(4)+" "+p.mem.toFixed(1).padStart(4)+" "+p.cmd).join("\n");
-  }
+function label(p){return p.stat==="Z"?"["+comm(p)+"] <defunct>":p.cmd;}
+function find(ps,pid){for(var i=0;i<ps.length;i++){if(ps[i].pid===pid){return ps[i];}}return null;}
+function clone(ps){return ps.map(function(p){return {pid:p.pid,ppid:p.ppid,user:p.user,stat:p.stat,cpu:p.cpu,mem:p.mem,cmd:p.cmd,fds:p.fds.slice(),maps:p.maps.slice()};});}
+function plist(a){if(a.length>2){return a.slice(0,2).join(", ")+" +"+(a.length-2);}return a.join(", ");}
+function cur(){return st.hist[st.step];}
+function procs(){return cur().procs;}
+function selected(){return st.sel==null?null:find(procs(),st.sel);}
+function matches(p){
+  var q=st.q.trim().toLowerCase();
+  return (st.user==="all"||p.user===st.user)&&(!q||p.cmd.toLowerCase().indexOf(q)>=0||String(p.pid).indexOf(q)>=0);
 }
+function filtering(){return st.user!=="all"||st.q.trim()!=="";}
+function interval(){return 1000/st.speed;}
+function dur(){return Math.round(Math.max(260,Math.min(700,interval()*0.7)));}
 
-function renderDetails(){
-  const p=selected();
-  spawnBtn.disabled=!p;
-  killBtn.disabled=!p||p.pid===1;
-  if(!p){
-    ["pidInfo","userState","usage","command"].forEach(id=>{$("#"+id).textContent="–";});
-    $("#fdList").innerHTML='<div class="note">No process selected.</div>';
-    $("#mapList").innerHTML="";
-    return;
-  }
-  $("#pidInfo").textContent=p.pid+" / "+p.ppid;
-  $("#userState").textContent=p.user+" ("+UIDS[p.user]+") / "+(STATES[p.stat]||p.stat);
-  $("#usage").textContent=p.cpu.toFixed(1)+"% / "+p.mem.toFixed(1)+"%";
-  $("#command").textContent=p.cmd;
-  $("#fdList").innerHTML=p.fds.map(x=>'<div class="entry">'+esc(x)+"</div>").join("");
-  $("#mapList").innerHTML=p.maps.map(x=>'<div class="entry">'+esc(x)+"</div>").join("");
+/* ---------- simulation rules (fork / exit / wait / refresh) ---------- */
+function opFork(s,pid){
+  var ps=clone(s.procs),p=find(ps,pid);
+  if(!p){return "Select a process to fork first.";}
+  if(p.stat==="Z"){return "PID "+p.pid+" is a zombie: it has exited and cannot fork.";}
+  if(ps.length>=MAXP){return "Process limit reached: at most "+MAXP+" processes in this simulation.";}
+  var c={pid:s.nextPid,ppid:p.pid,user:p.user,stat:"R",cpu:0,mem:p.mem,cmd:p.cmd,fds:p.fds.slice(),maps:p.maps.slice()};
+  ps.push(c);
+  return {procs:ps,nextPid:s.nextPid+1,sel:c.pid,op:{type:"fork",pid:p.pid,child:c.pid},
+    narr:"fork(): <b>"+p.pid+"</b> → child <b>"+c.pid+"</b>, inherits UID "+uid(p.user)};
 }
-
-function render(){
-  if(selectedPid!==null){
-    const p=processes.find(x=>x.pid===selectedPid);
-    if(!p||!matches(p))selectedPid=null;
-  }
-  renderTable();renderTree();renderTerminal();renderDetails();
+function opKill(s,pid){
+  var ps=clone(s.procs),p=find(ps,pid);
+  if(!p){return "Select a process to kill first.";}
+  if(p.pid===1){return "PID 1 (systemd) is protected: the system cannot run without init.";}
+  if(p.stat==="Z"){return "PID "+p.pid+" is already a zombie; its parent "+p.ppid+" must call wait().";}
+  var kids=ps.filter(function(x){return x.ppid===p.pid;}).sort(function(a,b){return a.pid-b.pid;});
+  kids.forEach(function(k){k.ppid=1;});
+  var reaped=kids.filter(function(k){return k.stat==="Z";}).map(function(k){return k.pid;});
+  var parent=find(ps,p.ppid),zombie=!!parent&&p.ppid!==1;
+  if(zombie){p.stat="Z";p.cpu=0;p.mem=0;p.fds=[];p.maps=[];}
+  else{reaped.push(p.pid);}
+  ps=ps.filter(function(x){return reaped.indexOf(x.pid)<0;});
+  var adopted=kids.map(function(k){return k.pid;}),live=kids.filter(function(k){return k.stat!=="Z";}).map(function(k){return k.pid;}),zk=kids.filter(function(k){return k.stat==="Z";}).map(function(k){return k.pid;});
+  var nn=function(a){return a.length>1?a.length+" children":String(a[0]);};
+  var tail;
+  if(live.length&&zk.length){tail=" · "+nn(live)+" adopted, zombie "+nn(zk)+" reaped";}
+  else if(live.length){tail=" · "+nn(live)+" adopted by PID 1";}
+  else if(zk.length){tail=" · init reaps zombie "+nn(zk);}
+  else{tail=zombie?" until "+p.ppid+" calls wait()":", reaped by init";}
+  return {procs:ps,nextPid:s.nextPid,sel:zombie?p.pid:(parent?parent.pid:1),op:{type:"kill",pid:p.pid,zombie:zombie,adopted:adopted,reaped:reaped},
+    narr:"kill -9 <b>"+p.pid+"</b> → "+(zombie?"<span class=\"osim-k x\">zombie</span>":"exits")+tail};
 }
-
-function refresh(){
-  processes.forEach(p=>{
+function opWait(s,pid){
+  var ps=clone(s.procs),p=find(ps,pid);
+  if(!p){return "Select a parent process (or a zombie) first.";}
+  var par=p.stat==="Z"?find(ps,p.ppid):p;
+  if(!par){return "PID "+p.pid+" has no parent to call wait().";}
+  var z=ps.filter(function(x){return x.ppid===par.pid&&x.stat==="Z";}).map(function(x){return x.pid;});
+  if(!z.length){return "PID "+par.pid+" has no zombie children to reap.";}
+  ps=ps.filter(function(x){return z.indexOf(x.pid)<0;});
+  return {procs:ps,nextPid:s.nextPid,sel:par.pid,op:{type:"wait",pid:par.pid,reaped:z},
+    narr:"wait(): <b>"+par.pid+"</b> reaps zombie "+plist(z)};
+}
+function opRefresh(s){
+  var ps=clone(s.procs);
+  ps.forEach(function(p){
+    if(p.stat==="Z"){return;}
     p.cpu=Math.max(0,Math.min(99,p.cpu+(Math.random()*4-2)));
     p.mem=Math.max(.1,Math.min(99,p.mem+(Math.random()*.4-.2)));
     p.stat=Math.random()>.75?"R":"S";
   });
-  render();
+  return {procs:ps,nextPid:s.nextPid,sel:st.sel,op:{type:"refresh"},narr:"top refresh: CPU, memory and R/S states change"};
+}
+function base(narr){return {procs:defaults(),nextPid:2200,sel:1,op:null,narr:narr};}
+
+/* ---------- tree layout ---------- */
+var tree=$("lp-tree"),inner=$("lp-inner"),edgesSvg=$("lp-edges");
+function layout(ps){
+  var kids={},has={};
+  ps.forEach(function(p){has[p.pid]=1;(kids[p.ppid]=kids[p.ppid]||[]).push(p);});
+  Object.keys(kids).forEach(function(k){kids[k].sort(function(a,b){return a.pid-b.pid;});});
+  var roots=ps.filter(function(p){return !has[p.ppid];}).sort(function(a,b){return a.pid-b.pid;});
+  var slot=0,pos={},maxD=0,order=[];
+  function dfs(p,d){
+    order.push(p.pid);maxD=Math.max(maxD,d);
+    var ch=kids[p.pid]||[],y;
+    if(!ch.length){y=slot++;}
+    else{var ys=ch.map(function(c){return dfs(c,d+1);});y=(ys[0]+ys[ys.length-1])/2;}
+    pos[p.pid]={d:d,slot:y};
+    return y;
+  }
+  roots.forEach(function(r){dfs(r,0);});
+  var leaves=Math.max(1,slot),nm=narrow.matches;
+  var W=Math.max(220,tree.clientWidth-4),H=Math.max(120,tree.clientHeight-4);
+  var cw=clamp(Math.floor((W-16)/(maxD+1))-30,96,210);
+  var colW=maxD?Math.min(cw+120,(W-16-cw)/maxD):0;
+  if(maxD&&colW<cw+24){cw=Math.max(88,Math.floor(colW-24));if(colW<cw+24){colW=cw+24;}}
+  if(nm){cw=128;colW=maxD?cw+22:0;}
+  var rowH=nm?42:clamp(Math.floor((H-12)/leaves),32,78);
+  var ch=clamp(rowH-12,24,50),cmp=ch<40;
+  var cH=12+leaves*rowH,cW=16+cw+maxD*colW;
+  var offY=nm?6:Math.max(6,(H-cH)/2+6);
+  ps.forEach(function(p){var q=pos[p.pid];q.x=Math.round(8+q.d*colW);q.y=Math.round(offY+q.slot*rowH+(rowH-ch)/2);});
+  return {pos:pos,cw:cw,ch:ch,cmp:cmp,W:Math.max(W,Math.ceil(cW)),H:Math.ceil(Math.max(nm?cH:H,cH+offY-6)),order:order,kids:kids,cH:cH};
 }
 
-function spawn(){
-  const parent=selected();
-  if(!parent){setMsg("Select a process to fork first.");return;}
-  const pid=nextPid++;
-  processes.push({
-    pid,ppid:parent.pid,user:parent.user,stat:"R",cpu:0,mem:parent.mem,cmd:parent.cmd,
-    fds:parent.fds.slice(),maps:parent.maps.slice()
+/* ---------- tree rendering with tweened fork / exit / re-parent animation ---------- */
+var nodeEls={},edgeEls={},disp={},tw=null,lastL=null,L=null;
+function aOut(d,G){return [d.x+G.cw*d.s,d.y+G.ch/2];}
+function aIn(d,G){return [d.x,d.y+G.ch/2];}
+function lerp(a,b,t){return a+(b-a)*t;}
+function curve(s,e){var dx=Math.max(14,(e[0]-s[0])/2);return "M"+s[0].toFixed(1)+" "+s[1].toFixed(1)+"C"+(s[0]+dx).toFixed(1)+" "+s[1].toFixed(1)+" "+(e[0]-dx).toFixed(1)+" "+e[1].toFixed(1)+" "+e[0].toFixed(1)+" "+e[1].toFixed(1);}
+function fillNode(el,p,G,ps){
+  var sel=p.pid===st.sel,f=filtering(),m=matches(p);
+  el.className="lp-node st-"+p.stat+(sel?" sel":"")+(f&&!m?" dim":"")+(f&&m?" hit":"")+(G.cmp?" cmp":"");
+  el.style.setProperty("--uc",UCOL[p.user]||"var(--u-other)");
+  el.style.width=G.cw+"px";el.style.height=G.ch+"px";
+  el.setAttribute("data-pid",p.pid);
+  el.setAttribute("data-ppid",p.ppid);
+  el.setAttribute("data-stat",p.stat);
+  el.setAttribute("data-user",p.user);
+  el.setAttribute("role","treeitem");
+  el.setAttribute("aria-level",String(G.pos[p.pid].d+1));
+  el.setAttribute("aria-selected",String(sel));
+  var nk=(G.kids[p.pid]||[]).length;
+  el.setAttribute("aria-label","PID "+p.pid+", "+label(p)+", user "+p.user+" UID "+uid(p.user)+", "+WORD[p.stat]+", parent "+p.ppid+(nk?", "+nk+" child"+(nk>1?"ren":""):"")+(p.pid===1?", protected":""));
+  el.title="PID "+p.pid+" · PPID "+p.ppid+" · "+p.user+" (UID "+uid(p.user)+") · "+STATES[p.stat]+(p.pid===1?" · protected":"");
+  el.innerHTML="<span class=\"ic\">"+ICON[p.stat]+"</span><span class=\"l1\"><b>"+p.pid+"</b><span>"+esc(label(p))+"</span>"+(p.pid===1?LOCK:"")+"</span><span class=\"l2\">"+esc(p.user)+" · uid "+uid(p.user)+" · "+WORD[p.stat]+"</span>";
+}
+function finishTween(){
+  if(!tw){return;}
+  cancelAnimationFrame(tw.raf);
+  tw.frame(1);
+  tw.gone.forEach(function(pid){if(nodeEls[pid]){nodeEls[pid].remove();delete nodeEls[pid];}});
+  tw.goneE.forEach(function(pid){if(edgeEls[pid]){edgeEls[pid].remove();delete edgeEls[pid];}});
+  var nd={};Object.keys(tw.to).forEach(function(k){if(tw.gone.indexOf(+k)<0){nd[k]=tw.to[k];}});
+  disp=nd;tw=null;
+}
+function renderTree(anim){
+  finishTween();
+  var s=cur(),ps=s.procs,G=layout(ps),op=s.op||{};
+  L=G;
+  if(narrow.matches){tree.style.height=(G.cH+8)+"px";}else{tree.style.height="";}
+  inner.style.width=G.W+"px";inner.style.height=G.H+"px";
+  edgesSvg.setAttribute("width",G.W);edgesSvg.setAttribute("height",G.H);
+  var from={},to={},present={},gone=[],goneE=[],eFrom={},cpos={};
+  ps.forEach(function(p){
+    present[p.pid]=1;
+    var t=G.pos[p.pid];to[p.pid]={x:t.x,y:t.y,s:1,o:1};
+    var el=nodeEls[p.pid];
+    if(!el){
+      el=document.createElement("div");
+      inner.appendChild(el);nodeEls[p.pid]=el;
+      var pd=disp[p.ppid]||G.pos[p.ppid];
+      from[p.pid]=pd?{x:pd.x+G.cw*0.35,y:pd.y,s:0.15,o:0}:{x:t.x,y:t.y,s:0.15,o:0};
+    }else{
+      var d=disp[p.pid];
+      from[p.pid]=d?{x:d.x,y:d.y,s:d.s,o:d.o}:{x:t.x,y:t.y,s:1,o:1};
+    }
+    fillNode(el,p,G,ps);
   });
-  selectedPid=pid;
-  setMsg("fork(): PID "+parent.pid+" created child PID "+pid+" (user "+parent.user+", same program, copied fds and memory map).",true);
-  render();
+  Object.keys(nodeEls).forEach(function(k){
+    var pid=+k;
+    if(!present[pid]){gone.push(pid);var d=disp[pid]||{x:0,y:0,s:1,o:1};from[pid]={x:d.x,y:d.y,s:d.s,o:d.o};to[pid]={x:d.x+6,y:d.y,s:0.55,o:0};nodeEls[pid].className+=" dim";nodeEls[pid].removeAttribute("tabindex");nodeEls[pid].setAttribute("aria-hidden","true");}
+  });
+  var adopted=op.type==="kill"?op.adopted:[];
+  ps.forEach(function(p){
+    if(!present[p.ppid]){return;}
+    var e=edgeEls[p.pid];
+    if(!e){
+      e=document.createElementNS(edgesSvg.namespaceURI,"path");
+      edgesSvg.appendChild(e);edgeEls[p.pid]=e;e.setAttribute("data-pp",p.ppid);
+    }else{
+      var old=+e.getAttribute("data-pp");
+      if(old!==p.ppid){var od=disp[old];if(od&&lastL){eFrom[p.pid]=aOut(od,lastL);}e.setAttribute("data-pp",p.ppid);}
+    }
+    var cls=[];
+    if(adopted.indexOf(p.pid)>=0){cls.push("moved");}
+    if(op.type==="fork"&&op.child===p.pid){cls.push("newe");}
+    if(filtering()&&!matches(p)){cls.push("dim");}
+    e.setAttribute("class",cls.join(" "));
+    e.setAttribute("data-child",p.pid);
+  });
+  Object.keys(edgeEls).forEach(function(k){var c=+k;if(!present[c]||!present[+edgeEls[c].getAttribute("data-pp")]){if(goneE.indexOf(c)<0){goneE.push(c);}}});
+  function frame(t){
+    var e=t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+    Object.keys(from).forEach(function(k){
+      var a=from[k],b=to[k],d={x:lerp(a.x,b.x,e),y:lerp(a.y,b.y,e),s:lerp(a.s,b.s,e),o:lerp(a.o,b.o,e)};
+      cpos[k]=d;
+      var el=nodeEls[k];
+      if(el){el.style.transform="translate("+d.x.toFixed(1)+"px,"+d.y.toFixed(1)+"px) scale("+d.s.toFixed(3)+")";el.style.opacity=d.o.toFixed(3);}
+    });
+    Object.keys(edgeEls).forEach(function(k){
+      var c=+k,el=edgeEls[k],pp=+el.getAttribute("data-pp"),cd=cpos[c],pd=cpos[pp];
+      if(!cd){return;}
+      var src;
+      if(eFrom[c]&&pd){var tgt=aOut(pd,G);src=[lerp(eFrom[c][0],tgt[0],e),lerp(eFrom[c][1],tgt[1],e)];}
+      else if(pd){src=aOut(pd,G);}
+      else{return;}
+      el.setAttribute("d",curve(src,aIn(cd,G)));
+      el.style.opacity=Math.min(cd.o,pd?pd.o:1).toFixed(3);
+    });
+  }
+  tw={from:from,to:to,gone:gone,goneE:goneE,frame:frame,raf:0};
+  lastL=G;
+  if(!anim||reduce.matches){finishTween();}
+  else{
+    var t0=performance.now(),D=dur();
+    var loop=function(now){
+      if(!tw||tw.frame!==frame){return;}
+      var t=Math.min(1,(now-t0)/D);
+      frame(t);
+      if(t<1){tw.raf=requestAnimationFrame(loop);}else{finishTween();}
+    };
+    frame(0);
+    tw.raf=requestAnimationFrame(loop);
+  }
+  var focusPid=st.sel!=null&&present[st.sel]?st.sel:1;
+  ps.forEach(function(p){nodeEls[p.pid].tabIndex=p.pid===focusPid?0:-1;});
+  inner.setAttribute("aria-activedescendant","");
 }
 
-function killSelected(){
-  const p=selected();
-  if(!p){setMsg("Select a process to terminate first.");return;}
-  if(p.pid===1){setMsg("PID 1 (init/systemd) is protected in this simulation.");return;}
-  const children=processes.filter(x=>x.ppid===p.pid);
-  children.forEach(c=>{c.ppid=1;});
-  processes=processes.filter(x=>x.pid!==p.pid);
-  selectedPid=null;
-  setMsg("Terminated PID "+p.pid+(children.length?"; "+children.length+" child process"+(children.length===1?" was":"es were")+" re-parented to PID 1.":"."),true);
-  render();
+/* ---------- ps table ---------- */
+var psEl=$("lp-ps");
+function visibleRows(){
+  return procs().filter(matches).sort(function(a,b){
+    if(st.sort==="cpu"){return b.cpu-a.cpu||a.pid-b.pid;}
+    if(st.sort==="mem"){return b.mem-a.mem||a.pid-b.pid;}
+    return a.pid-b.pid;
+  });
+}
+function renderTable(){
+  var rows=visibleRows(),focusPid=null;
+  rows.forEach(function(p){if(p.pid===st.sel){focusPid=p.pid;}});
+  if(focusPid===null&&rows.length){focusPid=rows[0].pid;}
+  var h="<div class=\"lp-tr hd\" role=\"row\"><span class=\"n\" role=\"columnheader\">PID</span><span class=\"n\" role=\"columnheader\">PPID</span><span role=\"columnheader\">USER</span><span role=\"columnheader\" title=\"State\">S</span><span class=\"n\" role=\"columnheader\">%CPU</span><span class=\"n\" role=\"columnheader\">%MEM</span><span role=\"columnheader\">COMMAND</span></div>";
+  rows.forEach(function(p){
+    var sel=p.pid===st.sel;
+    h+="<div class=\"lp-tr"+(sel?" sel":"")+(p.stat==="Z"?" z":"")+"\" role=\"row\" data-pid=\""+p.pid+"\" tabindex=\""+(p.pid===focusPid?0:-1)+"\" aria-selected=\""+sel+"\" style=\"--uc:"+(UCOL[p.user]||"var(--u-other)")+"\">"+
+      "<span class=\"n\" role=\"gridcell\">"+p.pid+"</span><span class=\"n\" role=\"gridcell\">"+p.ppid+"</span><span role=\"gridcell\"><i class=\"ud\" aria-hidden=\"true\"></i>"+esc(p.user)+"</span><span role=\"gridcell\">"+esc(p.stat)+"</span>"+
+      "<span class=\"n\" role=\"gridcell\">"+p.cpu.toFixed(1)+"</span><span class=\"n\" role=\"gridcell\">"+p.mem.toFixed(1)+"</span><span role=\"gridcell\" title=\""+esc(label(p))+"\">"+esc(label(p))+"</span></div>";
+  });
+  if(!rows.length){h+="<div class=\"lp-empty\">No process matches the filter.</div>";}
+  psEl.innerHTML=h;
+  var ps=procs(),r=0,s=0,z=0;
+  ps.forEach(function(p){if(p.stat==="R"){r++;}else if(p.stat==="Z"){z++;}else{s++;}});
+  $("lp-sum").textContent="Tasks: "+ps.length+" total, "+r+" running, "+s+" sleeping, "+z+" zombie"+(filtering()?" · "+rows.length+" shown":"");
+  $("lp-sn").textContent=ps.length;$("lp-sr").textContent=r;$("lp-sl").textContent=s;$("lp-sz").textContent=z;
+  var se=psEl.querySelector(".lp-tr.sel");
+  if(se){var top=se.offsetTop-psEl.offsetTop,ph=psEl.clientHeight;if(top<psEl.scrollTop+24||top>psEl.scrollTop+ph-30){psEl.scrollTop=Math.max(0,top-ph/2);}}
 }
 
-view.addEventListener("change",render);
-sort.addEventListener("change",render);
-userFilter.addEventListener("change",render);
-search.addEventListener("input",render);
-$("#refresh").addEventListener("click",refresh);
-spawnBtn.addEventListener("click",spawn);
-killBtn.addEventListener("click",killSelected);
-$("#reset").addEventListener("click",reset);
+/* ---------- /proc inspector ---------- */
+function renderDrawer(){
+  var dr=$("lp-drawer");
+  dr.hidden=!st.drawer;
+  $("lp-procbtn").setAttribute("aria-expanded",String(st.drawer));
+  $("lp-procbtn").setAttribute("aria-pressed",String(st.drawer));
+  root.querySelectorAll("#lp-tabs button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-tab")===st.tab));});
+  if(!st.drawer){return;}
+  var p=selected(),pre=$("lp-pre"),K=function(k){return "<span class=\"k\">"+k+"</span>";},C=function(t){return "<span class=\"c\">"+esc(t)+"</span>";};
+  var notes={status:"excerpt",fd:"simplified: fd -> target",maps:"shortened"};
+  $("lp-pnote").textContent=notes[st.tab];
+  if(!p){$("lp-path").textContent="/proc/<pid>/"+st.tab;pre.innerHTML=C("No process selected.");return;}
+  $("lp-path").textContent="/proc/"+p.pid+"/"+st.tab;
+  var u=uid(p.user),h;
+  if(st.tab==="status"){
+    h=K("Name:")+"\t"+esc(comm(p))+"\n"+K("State:")+"\t"+esc(STATES[p.stat]||p.stat)+"\n"+K("Tgid:")+"\t"+p.pid+"\n"+K("Pid:")+"\t"+p.pid+"\n"+K("PPid:")+"\t"+p.ppid+"\n"+
+      K("Uid:")+"\t"+u+"\t"+u+"\t"+u+"\t"+u+"\n"+K("Gid:")+"\t"+u+"\t"+u+"\t"+u+"\t"+u+"\n"+K("Threads:")+"\t1"+(p.stat==="Z"?"\n"+C("(exited; waiting for parent "+p.ppid+" to call wait())"):"");
+  }else if(st.tab==="fd"){
+    h=p.fds.length?p.fds.map(esc).join("\n"):C("(empty: a zombie has closed all its file descriptors)");
+  }else{
+    h=p.maps.length?p.maps.map(esc).join("\n"):C("(empty: a zombie has no address space)");
+  }
+  pre.innerHTML=h;
+}
 
-reset();
+/* ---------- narration, stats, controls ---------- */
+function renderStats(){
+  var s=cur(),n=st.hist.length-1;
+  $("lp-ss").textContent=st.step+"/"+n;
+  $("lp-narr").innerHTML=s.narr;
+}
+function renderControls(){
+  root.querySelectorAll("#lp-scen button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-scen")===st.scen));});
+  root.querySelectorAll("#lp-users button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-user")===st.user));});
+  root.querySelectorAll("#lp-sort button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-sort")===st.sort));});
+  var n=st.hist.length-1,atEnd=st.step>=n;
+  root.querySelector("[data-act=prev]").disabled=st.step<=0;
+  root.querySelector("[data-act=first]").disabled=st.step<=0;
+  root.querySelector("[data-act=next]").disabled=atEnd;
+  root.querySelector("[data-act=last]").disabled=atEnd;
+  root.querySelector("[data-act=play]").disabled=n<1;
+  $("lp-playicon").setAttribute("d",st.playing?"M6.5 5h4v14h-4zM13.5 5h4v14h-4z":"M8 5l11 7-11 7z");
+  $("lp-play").setAttribute("aria-label",st.playing?"Pause (Space)":"Play (Space)");
+  var p=selected();
+  ["lp-fork","lp-kill","lp-wait"].forEach(function(id){$(id).disabled=!p;});
+  $("lp-helpbtn").setAttribute("aria-expanded",String(!$("lp-help").hidden));
+}
+function render(anim){
+  if(st.sel!=null&&!find(procs(),st.sel)){st.sel=null;}
+  renderTree(anim);
+  renderTable();
+  renderDrawer();
+  renderStats();
+  renderControls();
+}
+
+/* ---------- history ---------- */
+function commit(res){
+  if(typeof res==="string"){alertMsg(res);return false;}
+  alertMsg("");
+  pause();
+  st.hist=st.hist.slice(0,st.step+1);
+  st.hist.push(res);
+  st.step=st.hist.length-1;
+  st.sel=res.sel;
+  render(true);
+  return true;
+}
+function go(step,anim){
+  var prev=st.step;
+  st.step=clamp(step,0,st.hist.length-1);
+  if(st.step!==prev){st.sel=cur().sel;alertMsg("");}
+  render(!!anim&&Math.abs(st.step-prev)===1);
+}
+function tick(){
+  if(!st.playing){return;}
+  if(st.step>=st.hist.length-1){pause();return;}
+  go(st.step+1,true);
+  if(st.step>=st.hist.length-1){pause();return;}
+  st.timer=setTimeout(tick,interval());
+}
+function play(){
+  if(st.playing||st.hist.length<2){return;}
+  if(st.step>=st.hist.length-1){go(0,false);}
+  st.playing=true;renderControls();
+  st.timer=setTimeout(tick,Math.min(400,interval()));
+}
+function pause(){st.playing=false;clearTimeout(st.timer);renderControls();}
+function togglePlay(){if(st.playing){pause();}else{play();}}
+function setScen(sc){
+  st.playing=false;clearTimeout(st.timer);
+  st.scen=sc;alertMsg("");
+  if(sc==="demo"){
+    var h=[base("Demo · press ▶ to replay fork, kill, zombie and wait")];
+    var seq=[["fork",812],["fork",2200],["kill",2200],["wait",812],["kill",934],["kill",812]];
+    seq.forEach(function(x){
+      var s=h[h.length-1],r=x[0]==="fork"?opFork(s,x[1]):x[0]==="kill"?opKill(s,x[1]):opWait(s,x[1]);
+      if(typeof r!=="string"){h.push(r);}
+    });
+    st.hist=h;
+  }else{
+    st.hist=[base("Select a process, then fork(), kill -9 or wait()")];
+  }
+  st.step=0;st.sel=1;
+  Object.keys(nodeEls).forEach(function(k){nodeEls[k].remove();});
+  Object.keys(edgeEls).forEach(function(k){edgeEls[k].remove();});
+  nodeEls={};edgeEls={};disp={};tw=null;
+  render(false);
+}
+
+/* ---------- selection & keyboard on the tree / table ---------- */
+function select(pid,focusWhere){
+  st.sel=pid;alertMsg("");
+  render(false);
+  if(focusWhere==="tree"&&nodeEls[pid]){nodeEls[pid].focus();}
+  if(focusWhere==="table"){var r=psEl.querySelector(".lp-tr[data-pid=\""+pid+"\"]");if(r){r.focus();}}
+}
+inner.addEventListener("click",function(e){
+  var n=e.target.closest(".lp-node");
+  if(!n||!n.hasAttribute("tabindex")){return;}
+  select(+n.getAttribute("data-pid"),"tree");
+});
+inner.addEventListener("dblclick",function(e){
+  var n=e.target.closest(".lp-node");
+  if(n){st.drawer=true;render(false);fit();}
+});
+inner.addEventListener("keydown",function(e){
+  var n=e.target.closest&&e.target.closest(".lp-node");
+  if(!n||!L){return;}
+  var pid=+n.getAttribute("data-pid"),ps=procs(),p=find(ps,pid);
+  if(!p){return;}
+  var ord=L.order,i=ord.indexOf(pid),to=null;
+  switch(e.key){
+    case "ArrowDown":to=ord[Math.min(ord.length-1,i+1)];break;
+    case "ArrowUp":to=ord[Math.max(0,i-1)];break;
+    case "ArrowLeft":to=find(ps,p.ppid)?p.ppid:pid;break;
+    case "ArrowRight":to=(L.kids[pid]&&L.kids[pid].length)?L.kids[pid][0].pid:pid;break;
+    case "Home":to=ord[0];break;
+    case "End":to=ord[ord.length-1];break;
+    case "Enter":e.preventDefault();e.stopPropagation();st.sel=pid;st.drawer=!st.drawer;render(false);fit();if(nodeEls[pid]){nodeEls[pid].focus();}return;
+    case " ":case "Spacebar":e.preventDefault();e.stopPropagation();select(pid,"tree");return;
+    default:return;
+  }
+  e.preventDefault();e.stopPropagation();
+  select(to,"tree");
+});
+psEl.addEventListener("click",function(e){
+  var r=e.target.closest(".lp-tr[data-pid]");
+  if(r){select(+r.getAttribute("data-pid"),"table");}
+});
+psEl.addEventListener("keydown",function(e){
+  var r=e.target.closest&&e.target.closest(".lp-tr[data-pid]");
+  if(!r){return;}
+  var rows=[].slice.call(psEl.querySelectorAll(".lp-tr[data-pid]")),i=rows.indexOf(r),to=null;
+  if(e.key==="ArrowDown"){to=rows[Math.min(rows.length-1,i+1)];}
+  else if(e.key==="ArrowUp"){to=rows[Math.max(0,i-1)];}
+  else if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){to=r;}
+  else{return;}
+  e.preventDefault();e.stopPropagation();
+  select(+to.getAttribute("data-pid"),"table");
+});
+
+/* ---------- toolbar ---------- */
+root.addEventListener("click",function(e){
+  var b=e.target.closest("button");
+  if(!b||!root.contains(b)||b.disabled){return;}
+  if(b.hasAttribute("data-scen")){setScen(b.getAttribute("data-scen"));return;}
+  if(b.hasAttribute("data-user")){st.user=b.getAttribute("data-user");checkFilter();render(false);return;}
+  if(b.hasAttribute("data-sort")){st.sort=b.getAttribute("data-sort");render(false);return;}
+  if(b.hasAttribute("data-tab")){st.tab=b.getAttribute("data-tab");renderDrawer();return;}
+  switch(b.getAttribute("data-act")){
+    case "first":pause();go(0,false);break;
+    case "prev":pause();go(st.step-1,true);break;
+    case "next":pause();go(st.step+1,true);break;
+    case "last":pause();go(st.hist.length-1,false);break;
+    case "play":togglePlay();break;
+    case "fork":commit(opFork(cur(),st.sel));break;
+    case "kill":commit(opKill(cur(),st.sel));break;
+    case "wait":commit(opWait(cur(),st.sel));break;
+    case "refresh":commit(opRefresh(cur()));break;
+    case "proc":st.drawer=!st.drawer;render(false);fit();break;
+    case "help":$("lp-help").hidden=!$("lp-help").hidden;renderControls();break;
+    case "fs":toggleFs();break;
+  }
+});
+var qEl=$("lp-q");
+function checkFilter(){
+  var any=procs().some(matches);
+  qEl.setAttribute("aria-invalid",String(!any&&st.q.trim()!==""));
+  if(!any){alertMsg("No process matches "+(st.q.trim()?"“"+st.q.trim()+"”":"")+(st.user!=="all"?" for user "+st.user:"")+".");}
+  else{alertMsg("");}
+}
+qEl.addEventListener("input",function(){st.q=qEl.value;checkFilter();render(false);});
+var speed=$("lp-speed");
+speed.addEventListener("input",function(){
+  st.speed=SPEEDS[+speed.value];
+  $("lp-speedv").textContent=st.speed+"/s";
+  speed.setAttribute("aria-valuetext",st.speed+" step"+(st.speed===1?"":"s")+" per second");
+  if(st.playing){clearTimeout(st.timer);st.timer=setTimeout(tick,interval());}
+});
+
+document.addEventListener("keydown",function(e){
+  if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey){return;}
+  var t=e.target,tag=t&&t.tagName;
+  if(e.key==="Escape"){
+    if(!$("lp-help").hidden){$("lp-help").hidden=true;renderControls();}
+    else if(tag==="INPUT"&&root.contains(t)){t.blur();}
+    else if(st.drawer&&root.contains(t)){st.drawer=false;render(false);fit();}
+    return;
+  }
+  if(tag==="TEXTAREA"||tag==="SELECT"||(t&&t.isContentEditable)){return;}
+  if(tag==="INPUT"&&t.type!=="range"){return;}
+  if(tag==="INPUT"&&t.type==="range"&&e.key!==" "){return;}
+  if(t&&t!==document.body&&!root.contains(t)&&t.closest&&t.closest("a,button,input")){return;}
+  switch(e.key){
+    case "ArrowRight":e.preventDefault();pause();go(st.step+1,true);break;
+    case "ArrowLeft":e.preventDefault();pause();go(st.step-1,true);break;
+    case " ":case "Spacebar":e.preventDefault();togglePlay();break;
+    case "Home":e.preventDefault();pause();go(0,false);break;
+    case "End":e.preventDefault();pause();go(st.hist.length-1,false);break;
+  }
+});
+
+/* ---------- fullscreen + fit to viewport ---------- */
+var fsBtn=$("lp-fs");
+function fsEl(){return document.fullscreenElement||document.webkitFullscreenElement||null;}
+function toggleFs(){
+  if(fsEl()){(document.exitFullscreen||document.webkitExitFullscreen).call(document);}
+  else{var req=root.requestFullscreen||root.webkitRequestFullscreen;if(req){req.call(root);}}
+}
+if(!(root.requestFullscreen||root.webkitRequestFullscreen)){fsBtn.hidden=true;}
+function onFs(){
+  var on=fsEl()===root;
+  $("lp-fsicon").setAttribute("d",on?"M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5":"M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5");
+  fsBtn.setAttribute("aria-label",on?"Exit fullscreen":"Fullscreen");
+  fit();
+}
+document.addEventListener("fullscreenchange",onFs);
+document.addEventListener("webkitfullscreenchange",onFs);
+function docTop(el){var y=0;while(el){y+=el.offsetTop;el=el.offsetParent;}return y;}
+var lastFit="";
+function fit(){
+  if(fsEl()===root||window.innerWidth<=600){root.style.removeProperty("--osim-h");}
+  else{
+    var h=Math.max(420,Math.floor(window.innerHeight-docTop(root)-12));
+    root.style.setProperty("--osim-h",h+"px");
+    var over=document.documentElement.scrollHeight-window.innerHeight;
+    if(over>0){root.style.setProperty("--osim-h",Math.max(420,h-over)+"px");}
+  }
+  var vz=$("lp-viz"),dr=$("lp-drawer");
+  if(!narrow.matches){dr.style.height=Math.round(clamp(vz.clientHeight*0.38,130,250))+"px";}else{dr.style.height="";}
+  var key=root.clientWidth+"x"+root.clientHeight+"x"+vz.clientWidth+"x"+vz.clientHeight+"x"+st.drawer;
+  if(key!==lastFit){lastFit=key;renderTree(false);}
+}
+window.addEventListener("resize",fit);
+window.addEventListener("load",fit);
+if(window.ResizeObserver){new ResizeObserver(function(){fit();}).observe($("lp-viz"));}
+
+/* ---------- init ---------- */
+setScen("system");
+fit();
+setTimeout(fit,400);
 })();
 </script>

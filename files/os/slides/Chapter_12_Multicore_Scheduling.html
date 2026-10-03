@@ -6,399 +6,924 @@ excerpt: "An interactive multicore scheduling simulator comparing shared and per
 ---
 
 <style>
-.multi-core{
-  --mc-line:var(--global-border-color);
-  --mc-accent:var(--global-link-color);
-  --mc-text:var(--global-text-color);
-  --mc-muted:color-mix(in srgb,var(--global-text-color) 62%,transparent);
-  --mc-soft:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
-  --mc-field:color-mix(in srgb,var(--global-text-color) 65%,var(--global-bg-color));
-  --mc-btn:color-mix(in srgb,var(--global-link-color) 62%,#000);
-  max-width:1180px;margin:0 auto;color:var(--mc-text);
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+body:has(.osim) .page__footer{display:none}
+body:has(.osim){padding-bottom:0 !important;margin-bottom:0 !important}
+.osim{
+  --o-bg:var(--global-bg-color,#fff);
+  --o-fg:var(--global-text-color,#333);
+  --o-link:var(--global-link-color,#2a7ab0);
+  --o-muted:color-mix(in srgb,var(--o-fg) 82%,var(--o-bg));
+  --o-line:color-mix(in srgb,var(--o-fg) 66%,var(--o-bg));
+  --o-soft:color-mix(in srgb,var(--o-fg) 16%,var(--o-bg));
+  --o-surf:color-mix(in srgb,var(--o-fg) 5%,var(--o-bg));
+  --o-cell:color-mix(in srgb,var(--o-fg) 9%,var(--o-bg));
+  --o-pri:color-mix(in srgb,var(--o-link) 62%,#000);
+  --o-acc:color-mix(in srgb,var(--o-link) 65%,var(--o-fg));
+  --o-hit:color-mix(in srgb,#0072b2 60%,var(--o-fg));
+  --o-flt:color-mix(in srgb,#d55e00 60%,var(--o-fg));
+  --o-hit-bg:color-mix(in srgb,var(--o-hit) 20%,var(--o-bg));
+  --o-flt-bg:color-mix(in srgb,var(--o-flt) 20%,var(--o-bg));
+  --o-dur:420ms;
+  position:relative;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;
+  height:var(--osim-h,calc(100vh - 112px));min-height:420px;padding:8px;border-radius:16px;
+  background:var(--o-surf);color:var(--o-fg);overflow:hidden;
+  font:15px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-variant-numeric:tabular-nums;
 }
-.multi-core *{box-sizing:border-box}
-.multi-core h1{font-size:clamp(2.1rem,5vw,3.8rem);margin:.4rem 0;overflow-wrap:anywhere}
-.multi-core .lead{max-width:920px;color:var(--mc-muted)}
-.multi-core .panel{margin-top:1rem;padding:1rem;border:1px solid var(--mc-line);border-radius:18px;background:var(--global-bg-color);min-width:0}
-.multi-core .controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
-.multi-core label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:800}
-.multi-core select,.multi-core input,.multi-core button{
-  font:inherit;border:1px solid var(--mc-field);border-radius:10px;padding:.62rem .7rem;background:var(--global-bg-color);color:var(--mc-text);max-width:100%
+.osim *,.osim *::before,.osim *::after{box-sizing:border-box;transition:none}
+.osim:fullscreen{height:100vh;border-radius:0;padding:12px}
+.osim::backdrop{background:var(--o-bg)}
+.osim h1,.osim p{margin:0;padding:0}
+.osim .osim-title{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;line-height:1.1;white-space:nowrap;margin-right:4px;color:var(--o-fg)}
+.osim .osim-title svg{width:22px;height:22px;color:var(--o-acc)}
+.osim button{font:inherit;color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:9px;
+  height:34px;padding:0 11px;margin:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  font-weight:650;font-size:14px;line-height:1;white-space:nowrap;box-shadow:none}
+.osim button:hover{background:var(--o-cell)}
+.osim button:disabled{opacity:.45;cursor:not-allowed}
+.osim button:focus-visible,.osim input:focus-visible,.osim [tabindex]:focus-visible{outline:2px solid var(--o-fg);outline-offset:2px}
+.osim button.osim-pri,.osim button[aria-pressed="true"]{background:var(--o-pri);border-color:var(--o-pri);color:#fff;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--o-fg) 70%,transparent)}
+.osim .osim-ib{width:34px;padding:0}
+.osim svg{width:18px;height:18px;flex:none;overflow:visible}
+.osim svg.fi{fill:currentColor;stroke:none}
+.osim svg.st{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.osim .osim-bar{position:relative;display:flex;flex-direction:column;gap:7px;padding:8px 10px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0}
+.osim .osim-lbl{font-size:12px;font-weight:700;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em}
+.osim .osim-seg{display:inline-flex;border:1px solid var(--o-line);border-radius:10px;padding:2px;gap:2px;background:var(--o-bg)}
+.osim .osim-seg button{border:0;height:30px;border-radius:8px;padding:0 10px}
+.osim .osim-seg-sm button{padding:0 9px;font-size:13px}
+.osim .osim-grp{display:inline-flex;align-items:center;gap:3px}
+.osim .osim-spacer{flex:1}
+.osim input[type="range"]{width:78px;height:20px;padding:0;margin:0;border:0;background:transparent;box-shadow:none;accent-color:var(--o-pri);display:inline-block;vertical-align:middle}
+.osim .osim-speedv{font-size:13px;font-weight:700;min-width:42px}
+.osim .osim-chips{display:flex;gap:4px;flex:1;min-width:120px;overflow-x:auto;padding:2px;scrollbar-width:thin}
+.osim .osim-chip{position:relative;flex:none}
+.osim .osim-chip input{display:block;width:4em;height:30px;margin:0;padding:0 3px;text-align:center;font:inherit;font-weight:750;font-size:14px;
+  color:var(--o-fg);background:var(--o-bg);border:1px solid var(--o-line);border-radius:8px;box-shadow:none}
+.osim .osim-chip input:hover{border-color:var(--o-fg)}
+.osim .osim-chip.fr input{border-style:dashed}
+.osim .osim-chip.cur input{background:var(--o-pri);border-color:var(--o-pri);color:#fff;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--o-fg) 70%,transparent)}
+.osim .osim-chip.done input{background:var(--o-cell)}
+.osim .osim-chip input[aria-invalid="true"]{border:2px dashed var(--o-flt);background:var(--o-flt-bg);color:var(--o-fg)}
+.osim .osim-alert{position:absolute;left:10px;top:calc(100% + 6px);z-index:30;max-width:min(560px,90%);padding:7px 11px;border-radius:9px;
+  background:var(--o-bg);color:var(--o-fg);border:2px solid var(--o-flt);font-size:13.5px;font-weight:650;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.osim .osim-alert:empty{display:none}
+.osim .osim-stage{position:relative;flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:8px}
+.osim .osim-viz{position:relative;min-width:0;min-height:0;overflow:hidden;background:var(--o-bg);border-radius:12px;padding:10px 14px 8px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-side{display:flex;flex-direction:column;gap:8px;min-height:0;min-width:0;padding:10px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft);overflow:hidden}
+.osim .osim-sh{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.osim .osim-sh b{font-size:14.5px}
+.osim .osim-sh span{font-size:12px;color:var(--o-muted);font-weight:650}
+.osim .osim-state{position:relative;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
+.osim .osim-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--o-muted);font-size:13px;font-weight:650}
+.osim .it{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:7px;padding:0 6px;border-radius:9px;background:var(--o-surf)}
+.osim .it.mv{transition:transform var(--o-dur) ease}
+.osim .it .rk{font-size:12px;font-weight:750;color:var(--o-muted);min-width:40px;text-align:right}
+.osim .it .tile{flex:none;display:flex;align-items:center;justify-content:center;min-width:42px;padding:0 4px;height:calc(100% - 8px);max-height:34px;border-radius:7px;
+  font-weight:800;font-size:15px;background:var(--o-cell);box-shadow:inset 0 0 0 1px var(--o-line)}
+.osim .it .track{flex:1;height:8px;border-radius:4px;background:var(--o-soft);overflow:hidden;min-width:20px}
+.osim .it .fill{display:block;height:100%;width:0;border-radius:4px;background:var(--o-acc)}
+.osim .it .fill.mv{transition:width var(--o-dur) ease}
+.osim .it .tag{flex:none;min-width:22px;text-align:center;font-size:13px;font-weight:900;color:var(--o-fg)}
+.osim .it.ok .tile{background:var(--o-hit-bg);box-shadow:inset 0 0 0 2px var(--o-hit)}
+.osim .it.no .tile{background:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--o-flt) 14%,transparent) 5px 8px),var(--o-flt-bg);box-shadow:inset 0 0 0 2px var(--o-flt)}
+.osim .it.best,.osim .it.pick{box-shadow:inset 0 0 0 2px var(--o-acc)}
+.osim .it.chg .tile{background:var(--o-hit-bg);box-shadow:inset 0 0 0 2px var(--o-hit)}
+.osim .it.enter{animation:osim-enter var(--o-dur) ease-out both}
+@keyframes osim-enter{from{opacity:0;margin-left:-30px}to{opacity:1;margin-left:0}}
+.osim .osim-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:7px 10px;background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-soft)}
+.osim .osim-narr{flex:1;min-width:220px;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.osim .osim-k{display:inline-block;padding:1px 7px;border-radius:6px;font-weight:800}
+.osim .osim-k.h{background:var(--o-hit-bg);box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-k.x{background:var(--o-flt-bg);box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .osim-stats{display:flex;gap:6px;flex-wrap:wrap}
+.osim .osim-stat{display:inline-flex;gap:5px;height:28px;align-items:center;padding:0 9px;border-radius:8px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft);font-size:12.5px;font-weight:650;color:var(--o-muted)}
+.osim .osim-stat b{font-size:15px;color:var(--o-fg)}
+.osim .osim-stat.x{box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .osim-stat.h{box-shadow:inset 0 0 0 1.5px var(--o-hit)}
+.osim .osim-panel{position:absolute;z-index:20;top:0;right:0;bottom:0;width:min(380px,100%);display:flex;flex-direction:column;gap:10px;padding:12px 14px;
+  background:var(--o-bg);border-radius:12px;box-shadow:0 0 0 1px var(--o-line),0 10px 30px rgba(0,0,0,.22);overflow:auto}
+.osim .osim-panel[hidden]{display:none}
+.osim .osim-ph{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.osim .osim-ph b{font-size:15px}
+.osim .osim-ph span{font-size:12.5px;color:var(--o-muted);font-weight:650}
+.osim .osim-sub{font-size:12px;font-weight:750;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em}
+.osim .osim-help dl{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;margin:0;font-size:13.5px}
+.osim .osim-help dt{font-weight:800}
+.osim .osim-help dd{margin:0}
+.osim .osim-legend{display:flex;flex-wrap:wrap;gap:6px;font-size:12.5px;font-weight:650}
+.osim .osim-legend span{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:7px}
+.osim kbd{font:inherit;font-size:12px;font-weight:750;padding:1px 5px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--o-line)}
+
+.osim .osim-bars{display:flex;flex-direction:column;gap:5px}
+.osim .osim-bars button{width:100%;height:32px;border:0;background:transparent;padding:0 4px;justify-content:flex-start;gap:8px;border-radius:8px}
+.osim .osim-bars button:hover{background:var(--o-surf)}
+.osim .osim-bars button[aria-pressed="true"]{background:var(--o-surf);color:var(--o-fg);box-shadow:inset 0 0 0 2px var(--o-acc)}
+.osim .osim-bars .bl{width:56px;text-align:left;font-weight:750}
+.osim .osim-bars .bt{flex:1;height:14px;display:block}
+.osim .osim-bars .bf{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--o-line);min-width:3px}
+.osim .osim-bars button[aria-pressed="true"] .bf{background:var(--o-pri)}
+.osim .osim-bars .bv{width:42px;text-align:right;font-weight:800}
+.osim .osim-cap{font-size:13px;font-weight:650}
+.osim .osim-num{min-width:22px;text-align:center;font-weight:800;font-size:17px}
+.osim .osim-seg button[aria-disabled="true"]{opacity:.5}
+
+/* ---- multicore scheduling specific ---- */
+.osim .mc-viz{padding:6px 8px 4px}
+.osim .mc-svg{position:absolute;left:8px;top:6px;overflow:visible;font-family:inherit}
+.osim .mc-layer{position:absolute;left:8px;top:6px;pointer-events:none}
+.osim .mc-t0{--tc:#0072b2}.osim .mc-t1{--tc:#e69f00}.osim .mc-t2{--tc:#009e73}.osim .mc-t3{--tc:#cc79a7}
+.osim .mc-t4{--tc:#56b4e9}.osim .mc-t5{--tc:#d55e00}.osim .mc-t6{--tc:#f0e442}.osim .mc-t7{--tc:#999999}
+.osim .mc-chip{position:absolute;left:0;top:0;display:flex;align-items:center;justify-content:center;gap:3px;border-radius:8px;
+  background:color-mix(in srgb,var(--tc) 30%,var(--o-bg));box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--tc) 72%,var(--o-fg));
+  color:var(--o-fg);font-weight:850;font-size:13.5px;line-height:1;white-space:nowrap;overflow:hidden}
+.osim .mc-chip.mv{transition:transform var(--o-dur) ease,width var(--o-dur) ease,opacity var(--o-dur) ease}
+.osim .mc-chip i{font-style:normal;font-weight:700;font-size:11.5px;color:var(--o-fg)}
+.osim .mc-chip svg{width:12px;height:12px}
+.osim .mc-chip.head{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--tc) 72%,var(--o-fg)),0 0 0 2px var(--o-fg)}
+.osim .mc-chip.leave{opacity:0}
+.osim .mc-chip.enter{animation:mc-in var(--o-dur) ease-out both}
+@keyframes mc-in{from{opacity:0}to{opacity:1}}
+.osim .mc-svg .qbox{fill:var(--o-surf);stroke:var(--o-line);stroke-width:1.2;stroke-dasharray:4 3}
+.osim .mc-svg .qlbl{fill:var(--o-muted);font-size:11.5px;font-weight:750}
+.osim .mc-svg .lane{fill:var(--o-surf);stroke:var(--o-soft);stroke-width:1}
+.osim .mc-svg .core{fill:var(--o-fg);font-size:14px;font-weight:850}
+.osim .mc-svg .cst{fill:var(--o-muted);font-size:11.5px;font-weight:700}
+.osim .mc-svg .tick{fill:var(--o-muted);font-size:11.5px;font-weight:700;text-anchor:middle}
+.osim .mc-svg .grid{stroke:var(--o-soft);stroke-width:1}
+.osim .mc-svg .cell{stroke-width:1.6}
+.osim .mc-svg .cell.new{animation:mc-grow var(--o-dur) ease-out both;transform-box:fill-box;transform-origin:left center}
+@keyframes mc-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.osim .mc-svg .cl{fill:var(--o-fg);font-size:12px;font-weight:850;text-anchor:middle;pointer-events:none}
+.osim .mc-svg .idle{fill:url(#mc-idle);stroke:none}
+.osim .mc-svg .cur{fill:none;stroke:var(--o-fg);stroke-width:2;rx:4}
+.osim .mc-svg .arc{fill:none;stroke:var(--o-flt);stroke-width:1.6;stroke-dasharray:4 3;opacity:.9}
+.osim .mc-svg .arc.now{stroke-width:3;stroke-dasharray:none;opacity:1}
+.osim .mc-svg .arc.now.draw{stroke-dasharray:var(--len) var(--len);animation:mc-draw var(--o-dur) ease-out both}
+@keyframes mc-draw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
+.osim .mc-svg marker path{fill:var(--o-flt)}
+.osim .mc-svg #mc-ah2 path{fill:var(--o-hit)}
+.osim .mc-svg .mv{fill:none;stroke:var(--o-hit);stroke-width:2.5;stroke-dasharray:6 4}
+.osim .mc-svg .ok{fill:var(--o-fg);font-size:12px;font-weight:900;text-anchor:middle}
+.osim .mc-svg .pat-a{fill:var(--o-bg)}
+.osim .mc-svg .pat-b{stroke:var(--o-soft);stroke-width:2}
+.osim .mc-svg .arrow{fill:none;stroke:var(--o-line);stroke-width:1.6}
+.osim .mc-in input{width:3.4em}
+.osim .mc-tog[aria-pressed="false"]{border-style:dashed}
+.osim .mc-load{display:flex;flex-direction:column;gap:4px}
+.osim .mc-lr{display:grid;grid-template-columns:28px 1fr 24px;gap:6px;align-items:center;font-size:12.5px;font-weight:750}
+.osim .mc-lr .track{height:12px;border-radius:4px;background:var(--o-soft);overflow:hidden}
+.osim .mc-lr .fill{display:block;height:100%;border-radius:4px;background:var(--o-acc);transition:width var(--o-dur) ease}
+.osim .mc-lr.max .fill{background:repeating-linear-gradient(135deg,var(--o-flt) 0 3px,var(--o-flt-bg) 3px 7px);box-shadow:inset 0 0 0 1.5px var(--o-flt)}
+.osim .mc-lr b{text-align:right}
+.osim .mc-meter{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:9px;background:var(--o-surf);box-shadow:inset 0 0 0 1px var(--o-soft);font-size:12.5px;font-weight:700;color:var(--o-muted)}
+.osim .mc-meter b{font-size:20px;color:var(--o-fg)}
+.osim .mc-meter.bad{box-shadow:inset 0 0 0 2px var(--o-flt)}
+.osim .mc-tasks{display:flex;flex-direction:column;gap:4px}
+.osim .mc-tr{display:grid;grid-template-columns:40px 50px 1fr 30px 18px;gap:6px;align-items:center;font-size:12.5px;font-weight:700;min-height:26px}
+.osim .mc-tr .sw{display:flex;align-items:center;justify-content:center;height:24px;border-radius:7px;font-weight:850;font-size:13px;
+  background:color-mix(in srgb,var(--tc) 30%,var(--o-bg));box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--tc) 72%,var(--o-fg))}
+.osim .mc-tr .track{height:10px;border-radius:4px;background:var(--o-soft);overflow:hidden}
+.osim .mc-tr .fill{display:block;height:100%;border-radius:4px;background:var(--o-hit);transition:width var(--o-dur) ease}
+.osim .mc-tr .pn{display:inline-flex;align-items:center;gap:2px;color:var(--o-fg)}
+.osim .mc-tr .pn svg{width:12px;height:12px}
+.osim .mc-tr.done{color:var(--o-muted)}
+.osim .mc-tr.done .sw{text-decoration:line-through}
+.osim .mc-tr .stt{text-align:center;font-weight:900}
+.osim .mc-cmp{display:flex;flex-direction:column;gap:6px}
+.osim .mc-cmp button{width:100%;height:auto;flex-direction:column;align-items:stretch;gap:3px;padding:6px 8px;border:0;background:transparent;border-radius:9px}
+.osim .mc-cmp button:hover{background:var(--o-surf)}
+.osim .mc-cmp button[aria-pressed="true"]{background:var(--o-surf);color:var(--o-fg);box-shadow:inset 0 0 0 2px var(--o-acc)}
+.osim .mc-cmp .nm{font-weight:850;text-align:left;font-size:14px}
+.osim .mc-cmp .br{display:grid;grid-template-columns:84px 1fr 34px;gap:6px;align-items:center;font-size:12.5px;font-weight:650}
+.osim .mc-cmp .bt{height:11px;display:block}
+.osim .mc-cmp .bf{display:block;height:100%;min-width:3px;border-radius:0 4px 4px 0;background:var(--o-line)}
+.osim .mc-cmp button[aria-pressed="true"] .bf{background:var(--o-pri)}
+.osim .mc-cmp .bv{text-align:right;font-weight:850;font-size:14px}
+.osim .lg-mig{border-bottom:3px solid var(--o-flt)}
+.osim .lg-mv{border-bottom:2.5px dashed var(--o-hit)}
+.osim .lg-idle{background:repeating-linear-gradient(135deg,var(--o-bg) 0 3px,var(--o-soft) 3px 5px);box-shadow:inset 0 0 0 1px var(--o-line)}
+.osim .lg-head{box-shadow:inset 0 0 0 2px var(--o-fg)}
+.osim .mc-tr .sw{color:var(--o-fg)}
+@media (min-width:1000px){.osim{width:min(1640px,calc(100vw - 48px));margin-left:calc(50% - min(820px,50vw - 24px))}}
+@media (min-width:1300px){.osim .osim-stage{grid-template-columns:minmax(0,1fr) 270px}}
+@media (max-width:1500px){.osim .osim-title span{display:none}}
+@media (max-width:1100px){.osim .osim-stage{grid-template-columns:minmax(0,1fr) 210px}}
+@media (max-width:900px){.osim .osim-stage{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) var(--osim-side-h,190px)}.osim .osim-side{overflow-y:auto}}
+@media (max-width:600px){
+  .osim{height:auto;min-height:0;overflow:visible;padding:6px}
+  .osim .osim-stage{grid-template-rows:auto auto}
+  .osim .osim-viz{height:var(--osim-viz-m,440px)}
+  .osim .osim-side{height:auto;overflow:visible}
+  .osim .osim-state{overflow:visible}
+  .osim .osim-spacer{display:none}
+  .osim .osim-seg{flex-wrap:wrap}
+  .osim .osim-narr{white-space:normal;min-width:0;flex-basis:100%}
+  .osim .osim-panel{position:fixed;inset:auto 6px 6px 6px;width:auto;max-height:80vh}
 }
-.multi-core button{cursor:pointer;font-weight:800}
-.multi-core button.primary{background:var(--mc-btn);color:#fff;border-color:var(--mc-btn)}
-.multi-core button:disabled,.multi-core input:disabled{opacity:.55;cursor:not-allowed}
-.multi-core .actions{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.9rem}
-.multi-core .cores{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem;margin-top:1rem}
-.multi-core .core{border:1px solid var(--mc-line);border-radius:16px;padding:.9rem;background:var(--mc-soft);min-height:150px;min-width:0}
-.multi-core .core h3{margin:0 0 .55rem}
-.multi-core .task{padding:.45rem .55rem;border:1px solid var(--mc-line);border-radius:9px;background:var(--global-bg-color);margin:.35rem 0;font-size:.84rem;overflow-wrap:anywhere}
-.multi-core .task.running{outline:2px solid var(--mc-btn)}
-.multi-core .task.empty{color:var(--mc-muted)}
-.multi-core .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.7rem;margin-top:1rem}
-.multi-core .metric{padding:.8rem;border:1px solid var(--mc-line);border-radius:14px;background:var(--mc-soft)}
-.multi-core .metric b{display:block;font-size:1.1rem;margin-top:.2rem}
-.multi-core .table-wrap{position:relative;overflow-x:auto;margin-top:1rem;max-width:100%}
-.multi-core table{width:100%;border-collapse:collapse;min-width:680px}
-.multi-core th,.multi-core td{border:1px solid var(--mc-line);padding:.5rem;text-align:center}
-.multi-core th{background:var(--mc-soft)}
-.multi-core td input{width:72px;text-align:center}
-.multi-core .hint{display:block;font-size:.75rem;color:var(--mc-muted);margin-top:.2rem}
-.multi-core .msg{margin-top:.8rem;padding:.7rem .85rem;border-radius:10px;border:1px solid #c0392b;border-left-width:5px;background:color-mix(in srgb,#c0392b 9%,var(--global-bg-color));font-weight:700}
-.multi-core .msg:empty{display:none}
-.multi-core .log{margin-top:1rem;max-height:240px;overflow:auto;border:1px solid var(--mc-line);border-radius:12px;padding:.8rem;background:var(--mc-soft);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.85rem;overflow-wrap:anywhere}
-.multi-core .note{color:var(--mc-muted);font-size:.88rem}
-@media(max-width:1000px){.multi-core .cores{grid-template-columns:repeat(2,minmax(0,1fr))}.multi-core .controls,.multi-core .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:600px){.multi-core .cores,.multi-core .controls,.multi-core .metrics{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:1400px){.osim .osim-cmpt,.osim .osim-speedv,.osim .osim-title span{display:none}}
+@media (prefers-reduced-motion:reduce){
+  .osim *,.osim *::before,.osim *::after{animation:none !important;transition:none !important}
+}
 </style>
 
-<div class="multi-core">
-  <div>
-    <div style="font-size:.78rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--mc-accent)">Operating Systems · Chapter 12</div>
-    <h1>Multicore Scheduling & Load Balancing Simulator</h1>
-    <p class="lead">Explore how tasks are distributed across multiple CPU cores. Compare a global shared queue with per-core queues, and observe the effects of processor affinity and load balancing.</p>
+<div class="osim" id="osim-mc">
+  <div class="osim-bar">
+    <div class="osim-row">
+      <h1 class="osim-title"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg><span>Multicore Scheduling</span></h1>
+      <div class="osim-grp" role="group" aria-label="CPU cores">
+        <span class="osim-lbl">Cores</span>
+        <button type="button" class="osim-ib" data-act="cminus" aria-label="Fewer cores"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 12h12"/></svg></button>
+        <span class="osim-num" id="mc-n" aria-live="polite">4</span>
+        <button type="button" class="osim-ib" data-act="cplus" aria-label="More cores"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6v12M6 12h12"/></svg></button>
+      </div>
+      <div class="osim-seg" role="group" aria-label="Queue model" id="mc-model">
+        <button type="button" data-model="shared" title="One global ready queue; idle cores pull from it">Shared</button>
+        <button type="button" data-model="percore" title="Each core has its own ready queue">Per-core</button>
+      </div>
+      <button type="button" class="mc-tog" id="mc-bal" data-act="bal" aria-pressed="true" title="Per-core queues: one balancing pass at the start of every tick"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v16M5 8h14M5 8l-3 6h6zM19 8l-3 6h6z"/></svg>Balance</button>
+      <button type="button" data-act="rebal" id="mc-rebal" title="Run one load-balancing pass now"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9h13l-3-3M20 15H7l3 3"/></svg>Rebalance now</button>
+      <div class="osim-grp" role="group" aria-label="Playback">
+        <button type="button" class="osim-ib" data-act="first" aria-label="First step (Home)" title="First (Home)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="5" width="2.6" height="14" rx="1"/><path d="M13 6v12l-6-6z"/><path d="M20 6v12l-6-6z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="prev" aria-label="Previous tick (Left arrow)" title="Back (&#8592;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="5" y="5" width="2.6" height="14" rx="1"/><path d="M18 6v12l-8-6z"/></svg></button>
+        <button type="button" class="osim-ib osim-pri" data-act="play" id="mc-play" aria-label="Play (Space)" title="Play / pause (Space)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path id="mc-playicon" d="M8 5l11 7-11 7z"/></svg></button>
+        <button type="button" class="osim-ib" data-act="next" aria-label="Next tick (Right arrow)" title="Tick (&#8594;)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6v12l8-6z"/><rect x="16.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+        <button type="button" class="osim-ib" data-act="last" aria-label="Run to completion (End)" title="Run to end (End)"><svg class="fi" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 6v12l6-6z"/><path d="M11 6v12l6-6z"/><rect x="17.4" y="5" width="2.6" height="14" rx="1"/></svg></button>
+      </div>
+      <div class="osim-grp">
+        <span class="osim-lbl" id="mc-speed-l">Speed</span>
+        <input type="range" id="mc-speed" min="0" max="6" step="1" value="2" aria-labelledby="mc-speed-l" aria-valuetext="1.5 ticks per second">
+        <span class="osim-speedv" id="mc-speedv">1.5/s</span>
+      </div>
+      <span class="osim-spacer"></span>
+      <button type="button" data-act="compare" id="mc-cmpbtn" aria-label="Compare queue models" aria-expanded="false" aria-controls="mc-compare"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 20h16M7 16v-5M12 16V6M17 16v-8"/></svg><span class="osim-cmpt">Compare</span></button>
+      <button type="button" class="osim-ib" data-act="help" id="mc-helpbtn" aria-expanded="false" aria-controls="mc-help" aria-label="Help and legend" title="Help">?</button>
+      <button type="button" class="osim-ib" data-act="fs" id="mc-fs" aria-label="Fullscreen" title="Fullscreen"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path id="mc-fsicon" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    </div>
+    <div class="osim-row">
+      <div class="osim-grp">
+        <span class="osim-lbl">Affinity</span>
+        <div class="osim-seg osim-seg-sm" role="group" aria-label="Processor affinity" id="mc-aff">
+          <button type="button" data-aff="none" title="No affinity">None</button>
+          <button type="button" data-aff="soft" title="Soft: prefer the core the task last ran on">Soft</button>
+          <button type="button" data-aff="hard" title="Hard: the task runs only on its preferred core">Hard</button>
+        </div>
+      </div>
+      <span class="osim-lbl" id="mc-t-l" title="work@preferred core">Tasks <span style="text-transform:none">(work@core)</span></span>
+      <div class="osim-chips" id="mc-chips" role="list" aria-labelledby="mc-t-l"></div>
+      <button type="button" class="osim-ib" data-act="add" id="mc-add" aria-label="Add task" title="Add task"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6v12M6 12h12"/></svg></button>
+      <button type="button" class="osim-ib" data-act="clear" aria-label="Clear tasks" title="Clear (then type or paste)"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
+      <div class="osim-seg osim-seg-sm" role="group" aria-label="Presets" id="mc-presets">
+        <button type="button" data-preset="default" title="T1 6@0, T2 4@1, T3 8@2, T4 3@0, T5 5@3">Default</button>
+        <button type="button" data-preset="skewed" title="All tasks prefer core 0">Skewed</button>
+        <button type="button" data-preset="random" title="6 random tasks">Random</button>
+      </div>
+    </div>
+    <div class="osim-alert" id="mc-alert" role="alert"></div>
   </div>
 
-  <section class="panel">
-    <div class="controls">
-      <label>CPU cores
-        <select id="coresCount">
-          <option value="2">2 cores</option>
-          <option value="4" selected>4 cores</option>
-          <option value="8">8 cores</option>
-        </select>
-      </label>
-      <label>Queue model
-        <select id="queueModel">
-          <option value="shared">Shared global queue</option>
-          <option value="percore">Per-core queues</option>
-        </select>
-      </label>
-      <label>Processor affinity
-        <select id="affinityMode">
-          <option value="none">No affinity</option>
-          <option value="soft">Soft affinity</option>
-          <option value="hard">Hard affinity</option>
-        </select>
-      </label>
-      <label>Load balancing
-        <select id="balancing">
-          <option value="on">Enabled</option>
-          <option value="off">Disabled</option>
-        </select>
-      </label>
+  <div class="osim-stage">
+    <div class="osim-viz mc-viz" id="mc-viz">
+      <svg class="mc-svg" id="mc-svg" role="img" aria-label="Per-core Gantt timeline with ready queues"></svg>
+      <div class="mc-layer" id="mc-layer" aria-hidden="true"></div>
     </div>
-    <div class="actions">
-      <button id="addTask">+ Add task</button>
-      <button id="step" class="primary">Run one tick</button>
-      <button id="run10">Run 10 ticks</button>
-      <button id="rebalance">Rebalance now</button>
-      <button id="reset">Reset scenario</button>
+    <aside class="osim-side" aria-label="Load and tasks">
+      <div class="osim-sh"><b>Load</b><span id="mc-loadsub">queue lengths</span></div>
+      <div class="mc-meter" id="mc-meter" title="Imbalance = longest minus shortest per-core queue"><span>Imbalance</span><b id="mc-imb">0</b></div>
+      <div class="mc-load" id="mc-load"></div>
+      <div class="osim-sh"><b>Tasks</b><span>pin = preferred core</span></div>
+      <div class="osim-state"><div class="mc-tasks" id="mc-tasks"></div></div>
+    </aside>
+    <div class="osim-panel" id="mc-compare" hidden aria-label="Compare queue models"></div>
+    <div class="osim-panel osim-help" id="mc-help" hidden aria-label="Help">
+      <div class="osim-ph"><b>Help</b><button type="button" class="osim-ib" data-act="help" aria-label="Close help"><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <dl>
+        <dt>Tick</dt><dd>Each core runs its queue head for 1 tick, then re-queues it (RR, q = 1).</dd>
+        <dt>Shared</dt><dd>One global queue; idle cores pull from it.</dd>
+        <dt>Per-core</dt><dd>Each core keeps its own persistent queue.</dd>
+        <dt>Balance</dt><dd>Busiest → idlest queue while lengths differ by more than 1.</dd>
+        <dt>Migration</dt><dd>Task runs on a different core than last time (counted once).</dd>
+        <dt>Soft</dt><dd>Prefer the last core; may migrate.</dd>
+        <dt>Hard</dt><dd>Only the preferred core; never moved.</dd>
+        <dt>Config</dt><dd>Changing cores, model, affinity or tasks restarts at tick 0.</dd>
+      </dl>
+      <div class="osim-sub">Legend</div>
+      <div class="osim-legend">
+        <span class="lg-mig">&#8631; migration</span>
+        <span class="lg-mv">balance move</span>
+        <span class="lg-idle">idle core</span>
+        <span class="lg-head">queue head</span>
+        <span>&#10003; finished</span>
+        <span><svg class="st" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="width:13px;height:13px"><path d="M9 3h6l-1 6 3 3H7l3-3zM12 12v9"/></svg> affinity</span>
+      </div>
+      <div class="osim-sub">Keys</div>
+      <div class="osim-legend"><span><kbd>&#8592;</kbd><kbd>&#8594;</kbd> tick</span><span><kbd>Space</kbd> play</span><span><kbd>Home</kbd><kbd>End</kbd></span><span><kbd>Esc</kbd> close</span></div>
     </div>
-    <div id="msg" class="msg" role="alert" aria-live="assertive"></div>
-    <p class="note">Each core runs the task at the head of its queue for one tick and then puts it back at the tail (round robin, quantum = 1 tick). With per-core queues and load balancing enabled, one balancing pass runs at the start of every tick; <em>Rebalance now</em> runs an extra pass immediately. Changing the core count, queue model, or affinity rebuilds the queues from the preferred cores.</p>
-  </section>
+  </div>
 
-  <section class="panel">
-    <h2>Task Set</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Task</th><th>Work units</th><th>Preferred core</th><th>Last core</th><th>Remaining</th><th>State</th><th><span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Remove</span></th></tr></thead>
-        <tbody id="taskBody"></tbody>
-      </table>
+  <div class="osim-foot">
+    <p class="osim-narr" id="mc-narr" aria-live="polite"></p>
+    <div class="osim-stats">
+      <span class="osim-stat" title="Current tick">Tick <b id="mc-st">0</b></span>
+      <span class="osim-stat h" title="Completed tasks">Done <b id="mc-sd">0/0</b></span>
+      <span class="osim-stat x" title="Task migrations so far">Migrations <b id="mc-sm">0</b></span>
+      <span class="osim-stat" title="Longest minus shortest per-core queue">Imbalance <b id="mc-si">0</b></span>
+      <span class="osim-stat" title="Ticks until all tasks finish">Makespan <b id="mc-sk">&#8211;</b></span>
     </div>
-  </section>
-
-  <section class="panel">
-    <h2>Core State</h2>
-    <div id="cores" class="cores"></div>
-    <div class="metrics">
-      <div class="metric">Tick<b id="tick">0</b></div>
-      <div class="metric">Completed tasks<b id="completed">0</b></div>
-      <div class="metric">Task migrations<b id="migrations">0</b></div>
-      <div class="metric">Load imbalance<b id="imbalance">0</b></div>
-    </div>
-    <p class="note"><strong>Migration</strong> (as counted here): a task runs on a different core than the one it ran on last time. It is counted exactly once, at the moment the task runs. Moving a queued task to another core's queue is logged as a <em>move</em>; it only becomes a migration if the task had already run somewhere else. <strong>Load imbalance</strong> = longest minus shortest per-core queue (always 0 with a shared queue).</p>
-  </section>
-
-  <section class="panel">
-    <h2>Scheduler Log</h2>
-    <div id="log" class="log"></div>
-  </section>
-
-  <section class="panel">
-    <h2>Concept Guide</h2>
-    <p><strong>Shared queue:</strong> all idle cores pull work from one global ready queue. Balancing is simple, but the shared queue can become a synchronization bottleneck.</p>
-    <p><strong>Per-core queues:</strong> each core maintains its own ready queue. This improves locality and scalability but may create uneven load.</p>
-    <p><strong>Soft affinity:</strong> the scheduler prefers keeping a task on the core it last ran on (its cache is warm there) but may migrate it. In this simulator a shared-queue core first looks for a task that last ran on it, and load balancing prefers to move tasks that are not cache-warm on the busy core.</p>
-    <p><strong>Hard affinity:</strong> the task is constrained to its preferred core; it never runs anywhere else and load balancing cannot move it.</p>
-    <p><strong>Load balancing:</strong> moves queued tasks from the busiest core's queue to the least busy one while their lengths differ by more than one.</p>
-    <p class="note">If you reduce the core count, a preference for a core that no longer exists is shown clamped to the highest available core; the original preference is kept and comes back when you add cores again. This is a conceptual scheduler model. Real kernels consider priorities, NUMA topology, cache hierarchy, interrupts, power states, and many other factors.</p>
-  </section>
+  </div>
 </div>
 
 <script>
 (function(){
 "use strict";
-const root=document.querySelector(".multi-core");
-if(!root)return;
-const $=s=>root.querySelector(s);
+var root=document.getElementById("osim-mc");
+if(!root){return;}
+var $=function(id){return document.getElementById(id);};
 
-const coresCount=$("#coresCount");
-const queueModel=$("#queueModel");
-const affinityMode=$("#affinityMode");
-const balancing=$("#balancing");
-const taskBody=$("#taskBody");
-const coresEl=$("#cores");
-const logEl=$("#log");
-const msg=$("#msg");
+var DEFAULT=["6@0","4@1","8@2","3@0","5@3"];
+var SKEWED=["5@0","3@0","6@0","4@0","2@0","5@0"];
+var SPEEDS=[0.5,1,1.5,2,3,4,6];
+var MAX_TASKS=12,MAX_WORK=30,MAX_TICKS=999;
+var reduce=window.matchMedia?window.matchMedia("(prefers-reduced-motion: reduce)"):{matches:false};
+var PIN="<svg class=\"st\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M9 3h6l-1 6 3 3H7l3-3zM12 12v9\"/></svg>";
+var PINF="<svg class=\"fi\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M9 3h6l-1 6 3 3H7l3-3z\"/><rect x=\"11\" y=\"11\" width=\"2\" height=\"10\" rx=\"1\"/></svg>";
 
-/* Persistent scheduler state: queues are only rebuilt on reset or configuration change. */
-let tasks=[],tick=0,migrations=0,nextId=1,queues=[],globalQ=[];
+var st={cfg:{n:4,model:"percore",aff:"none",bal:true},spec:[],chips:DEFAULT.slice(),preset:"default",step:0,hist:[],playing:false,timer:0,speed:1.5};
 
-function esc(s){
-  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+/* ---------- scheduler (verified logic, operating on a state object S and config K) ----------
+   Queues persist between ticks; they are rebuilt only when the scenario (re)starts. */
+function mk(id,work,pref,idx){return {id:id,idx:idx,work:work,remaining:work,pref:pref,state:"ready",core:null,last:null};}
+function effPref(K,t){return Math.min(t.pref,K.n-1);}
+function homeCore(K,t){
+  if(K.aff==="soft"&&t.last!==null&&t.last<K.n){return t.last;}
+  return effPref(K,t);
 }
-function setMsg(t){msg.textContent=t||"";}
-function nCores(){return +coresCount.value;}
-function shared(){return queueModel.value==="shared";}
-function effPref(t){return Math.min(t.pref,nCores()-1);}
-
-function mk(id,work,pref){return {id,work,remaining:work,pref,state:"ready",core:null,last:null};}
-function defaultTasks(){
-  return [mk("T1",6,0),mk("T2",4,1),mk("T3",8,2),mk("T4",3,0),mk("T5",5,3)];
+function buildQueues(K,S){
+  S.queues=[];for(var i=0;i<K.n;i++){S.queues.push([]);}
+  S.globalQ=[];
+  var live=S.tasks.filter(function(t){return t.state!=="done";});
+  live.forEach(function(t){if(t.state==="running"){t.state="ready";t.core=null;}});
+  if(K.model==="shared"){S.globalQ=live.slice();return;}
+  live.forEach(function(t){S.queues[homeCore(K,t)].push(t);});
 }
-
-function addLog(text){
-  const d=document.createElement("div");
-  d.textContent="["+tick+"] "+text;
-  logEl.appendChild(d);
-  logEl.scrollTop=logEl.scrollHeight;
-}
-
-function homeCore(t){
-  if(affinityMode.value==="soft"&&t.last!==null&&t.last<nCores())return t.last;
-  return effPref(t);
-}
-
-function buildQueues(){
-  const n=nCores();
-  queues=Array.from({length:n},()=>[]);
-  globalQ=[];
-  const live=tasks.filter(t=>t.state!=="done");
-  live.forEach(t=>{if(t.state==="running"){t.state="ready";t.core=null;}});
-  if(shared()){globalQ=live.slice();return;}
-  live.forEach(t=>queues[homeCore(t)].push(t));
-}
-
-function removeFromQueues(t){
-  queues.forEach(q=>{const i=q.indexOf(t);if(i>=0)q.splice(i,1);});
-  const g=globalQ.indexOf(t);if(g>=0)globalQ.splice(g,1);
-}
-
-/* One balancing pass: move tasks from the longest to the shortest queue while the difference exceeds one. */
-function balanceQueues(){
-  let moved=0;
-  const mode=affinityMode.value;
-  for(let guard=0;guard<1000;guard++){
-    let maxI=0,minI=0;
-    for(let i=1;i<queues.length;i++){
-      if(queues[i].length>queues[maxI].length)maxI=i;
-      if(queues[i].length<queues[minI].length)minI=i;
+/* one balancing pass: move tasks from the longest to the shortest queue while the difference exceeds one */
+function balanceQueues(K,S,moves){
+  var q=S.queues,moved=0,mode=K.aff;
+  for(var guard=0;guard<1000;guard++){
+    var maxI=0,minI=0,i;
+    for(i=1;i<q.length;i++){
+      if(q[i].length>q[maxI].length){maxI=i;}
+      if(q[i].length<q[minI].length){minI=i;}
     }
-    if(queues[maxI].length-queues[minI].length<=1)break;
-    const q=queues[maxI];
-    let idx=-1;
+    if(q[maxI].length-q[minI].length<=1){break;}
+    var src=q[maxI],idx=-1;
     if(mode==="hard"){
-      for(let i=q.length-1;i>=0;i--)if(effPref(q[i])===minI){idx=i;break;}
+      for(i=src.length-1;i>=0;i--){if(effPref(K,src[i])===minI){idx=i;break;}}
     }else if(mode==="soft"){
-      for(let i=q.length-1;i>=0;i--)if(q[i].last!==maxI){idx=i;break;}
-      if(idx<0)idx=q.length-1;
-    }else idx=q.length-1;
-    if(idx<0)break;
-    const t=q.splice(idx,1)[0];
-    queues[minI].push(t);moved++;
-    addLog(t.id+" moved from Core "+maxI+"'s queue to Core "+minI+"'s queue (load balancing).");
+      for(i=src.length-1;i>=0;i--){if(src[i].last!==maxI){idx=i;break;}}
+      if(idx<0){idx=src.length-1;}
+    }else{idx=src.length-1;}
+    if(idx<0){break;}
+    var t=src.splice(idx,1)[0];
+    q[minI].push(t);moved++;
+    moves.push({id:t.id,from:maxI,to:minI});
   }
   return moved;
 }
-
-function runOn(t,c){
-  if(t.last!==null&&t.last!==c){
-    migrations++;
-    addLog(t.id+" migrated: last ran on Core "+t.last+", now runs on Core "+c+".");
-  }
+function runOn(K,S,t,c,rec){
+  var mig=-1;
+  if(t.last!==null&&t.last!==c){S.migrations++;mig=t.last;}
   t.last=c;t.core=c;t.state="running";t.remaining--;
-  addLog(t.id+" runs on Core "+c+". Remaining work: "+t.remaining+".");
-  if(t.remaining<=0){t.state="done";t.core=null;addLog(t.id+" completed.");return false;}
+  var done=t.remaining<=0;
+  rec.runs.push({c:c,id:t.id,idx:t.idx,mig:mig,done:done});
+  if(done){t.state="done";t.core=null;return false;}
   return true;
 }
-
-function pickShared(c){
-  if(!globalQ.length)return -1;
-  const m=affinityMode.value;
-  if(m==="hard")return globalQ.findIndex(t=>effPref(t)===c);
-  if(m==="soft"){
-    const i=globalQ.findIndex(t=>t.last===c||(t.last===null&&effPref(t)===c));
-    if(i>=0)return i;
+function pickShared(K,S,c){
+  var g=S.globalQ;
+  if(!g.length){return -1;}
+  if(K.aff==="hard"){return g.findIndex(function(t){return effPref(K,t)===c;});}
+  if(K.aff==="soft"){
+    var i=g.findIndex(function(t){return t.last===c||(t.last===null&&effPref(K,t)===c);});
+    if(i>=0){return i;}
   }
   return 0;
 }
-
-function runTick(){
-  const n=nCores();
-  tasks.forEach(t=>{if(t.state==="running"){t.state="ready";t.core=null;}});
-  tick++;
-  if(shared()){
-    const back=[];
-    for(let c=0;c<n;c++){
-      const idx=pickShared(c);
-      if(idx<0)continue;
-      const t=globalQ.splice(idx,1)[0];
-      if(runOn(t,c))back.push(t);
+function runTick(K,S){
+  S.tasks.forEach(function(t){if(t.state==="running"){t.state="ready";t.core=null;}});
+  S.tick++;
+  var rec={kind:"tick",runs:[],moves:[]},c,t;
+  if(K.model==="shared"){
+    var back=[];
+    for(c=0;c<K.n;c++){
+      var idx=pickShared(K,S,c);
+      if(idx<0){continue;}
+      t=S.globalQ.splice(idx,1)[0];
+      if(runOn(K,S,t,c,rec)){back.push(t);}
     }
-    back.forEach(t=>globalQ.push(t));
+    back.forEach(function(x){S.globalQ.push(x);});
   }else{
-    if(balancing.value==="on")balanceQueues();
-    for(let c=0;c<n;c++){
-      const t=queues[c].shift();
-      if(!t)continue;
-      if(runOn(t,c))queues[c].push(t);
+    if(K.bal){balanceQueues(K,S,rec.moves);}
+    for(c=0;c<K.n;c++){
+      t=S.queues[c].shift();
+      if(!t){continue;}
+      if(runOn(K,S,t,c,rec)){S.queues[c].push(t);}
     }
   }
-  update();
+  S.gantt.push(rec.runs);
+  S.rec=rec;
+  S.peak=Math.max(S.peak,imbalance(K,S));
+  return S;
+}
+function imbalance(K,S){
+  if(K.model==="shared"||!S.queues.length){return 0;}
+  var lens=S.queues.map(function(q){return q.length;});
+  return Math.max.apply(null,lens)-Math.min.apply(null,lens);
+}
+function allDone(S){return S.tasks.every(function(t){return t.state==="done";});}
+function initial(K,spec){
+  var S={tasks:spec.map(function(s,i){return mk("T"+(i+1),s.work,s.pref,i);}),queues:[],globalQ:[],tick:0,migrations:0,gantt:[],rec:{kind:"start",runs:[],moves:[]},peak:0};
+  buildQueues(K,S);
+  S.peak=imbalance(K,S);
+  return S;
+}
+function clone(S){
+  var map={},tasks=S.tasks.map(function(t){var c={};for(var k in t){c[k]=t[k];}map[t.id]=c;return c;});
+  return {tasks:tasks,queues:S.queues.map(function(q){return q.map(function(t){return map[t.id];});}),globalQ:S.globalQ.map(function(t){return map[t.id];}),
+    tick:S.tick,migrations:S.migrations,gantt:S.gantt.slice(),rec:S.rec,peak:S.peak};
+}
+function runAll(K,spec){
+  var S=initial(K,spec),idle=0;
+  while(!allDone(S)&&S.tick<MAX_TICKS){runTick(K,S);idle+=K.n-S.rec.runs.length;}
+  return {makespan:S.tick,migrations:S.migrations,peak:S.peak,idle:idle};
 }
 
-function manualRebalance(){
-  if(shared()){addLog("Manual rebalance applies only to per-core queues.");return;}
-  const moved=balanceQueues();
-  addLog("Manual load-balance pass completed ("+moved+" task"+(moved===1?"":"s")+" moved).");
-  update();
+/* ---------- history (one snapshot per tick, so stepping back is exact) ---------- */
+function cur(){return st.hist[st.step];}
+function restart(){
+  pause();
+  st.hist=[initial(st.cfg,st.spec)];st.step=0;
+  draw(false);renderCompare();
 }
-
-/* Table: rebuilt only on structural changes; per-tick updates touch cells in place so inputs keep focus. */
-function renderTable(){
-  taskBody.innerHTML="";
-  tasks.forEach(t=>{
-    const tr=document.createElement("tr");
-    tr.dataset.id=t.id;
-    const id=esc(t.id);
-    tr.innerHTML='<td><strong>'+id+'</strong></td>'+
-      '<td><input class="work" type="number" min="1" step="1" aria-label="Work units for '+id+'"></td>'+
-      '<td><input class="pref" type="number" min="0" step="1" aria-label="Preferred core for '+id+'"><span class="hint"></span></td>'+
-      '<td class="lastc"></td><td class="remaining"></td><td class="state"></td>'+
-      '<td><button type="button" class="del" aria-label="Remove '+id+'">×</button></td>';
-    const work=tr.querySelector(".work"),pref=tr.querySelector(".pref");
-    work.value=t.work;pref.value=effPref(t);
-    work.addEventListener("change",()=>{
-      const v=Number(work.value),executed=t.work-t.remaining;
-      if(!Number.isInteger(v)||v<1){setMsg("Work units for "+t.id+" must be a positive integer.");work.value=t.work;return;}
-      if(v<=executed){setMsg(t.id+" has already executed "+executed+" unit"+(executed===1?"":"s")+"; work must be larger than that.");work.value=t.work;return;}
-      setMsg("");
-      t.work=v;t.remaining=v-executed;
-      update();
-    });
-    pref.addEventListener("change",()=>{
-      const v=Number(pref.value),n=nCores();
-      if(!Number.isInteger(v)||v<0||v>n-1){setMsg("Preferred core for "+t.id+" must be an integer from 0 to "+(n-1)+".");pref.value=effPref(t);return;}
-      setMsg("");
-      t.pref=v;
-      if(!shared()&&t.state!=="done"){
-        removeFromQueues(t);
-        if(t.state==="running"){t.state="ready";t.core=null;}
-        queues[v].push(t);
-        addLog(t.id+" preference set to Core "+v+"; task moved to Core "+v+"'s queue.");
-      }else addLog(t.id+" preference set to Core "+v+".");
-      update();
-    });
-    tr.querySelector(".del").addEventListener("click",()=>{
-      tasks=tasks.filter(x=>x!==t);removeFromQueues(t);
-      addLog(t.id+" removed.");
-      renderTable();update();
-    });
-    taskBody.appendChild(tr);
-  });
-}
-
-function updateTable(){
-  const n=nCores();
-  tasks.forEach(t=>{
-    const tr=taskBody.querySelector('tr[data-id="'+t.id+'"]');
-    if(!tr)return;
-    const work=tr.querySelector(".work"),pref=tr.querySelector(".pref");
-    if(document.activeElement!==work)work.value=t.work;
-    work.disabled=t.state==="done";
-    pref.max=n-1;
-    if(document.activeElement!==pref)pref.value=effPref(t);
-    tr.querySelector(".hint").textContent=t.pref!==effPref(t)?"(prefers Core "+t.pref+")":"";
-    tr.querySelector(".lastc").textContent=t.last===null?"–":"Core "+t.last;
-    tr.querySelector(".remaining").textContent=t.remaining;
-    tr.querySelector(".state").textContent=t.state;
-  });
-}
-
-function renderCores(){
-  const n=nCores();
-  let html="";
-  for(let c=0;c<n;c++){
-    html+='<div class="core"><h3>Core '+c+'</h3>';
-    const running=tasks.find(t=>t.state==="running"&&t.core===c);
-    if(running)html+='<div class="task running">Ran last tick: '+esc(running.id)+' ('+(running.remaining)+' left)</div>';
-    if(shared()){
-      if(c===0)html+='<div class="task">Global queue: '+(globalQ.map(t=>esc(t.id)).join(", ")||"empty")+'</div>';
-      else html+='<div class="task empty">Pulls from global queue</div>';
-    }else{
-      const q=queues[c]||[];
-      html+=q.length?'<div class="note">Queue (head first):</div>'+q.map((t,i)=>'<div class="task">'+(i===0?"next: ":"")+esc(t.id)+' · '+t.remaining+' left</div>').join(""):'<div class="task empty">Queue empty</div>';
-    }
-    html+='</div>';
+function ensure(k){
+  while(st.hist.length-1<k){
+    var last=st.hist[st.hist.length-1];
+    if(allDone(last)||last.tick>=MAX_TICKS){break;}
+    st.hist.push(runTick(st.cfg,clone(last)));
   }
-  coresEl.innerHTML=html;
+}
+function atEnd(){var S=cur();return allDone(S)||S.tick>=MAX_TICKS;}
+function predictedEnd(){
+  var S=st.hist[st.hist.length-1];
+  if(allDone(S)){return S.tick;}
+  var P=clone(S);
+  while(!allDone(P)&&P.tick<MAX_TICKS){runTick(st.cfg,P);}
+  return P.tick;
 }
 
-function update(){
-  updateTable();
-  renderCores();
-  const imbalance=shared()||!queues.length?0:Math.max(...queues.map(q=>q.length))-Math.min(...queues.map(q=>q.length));
-  $("#tick").textContent=tick;
-  $("#completed").textContent=tasks.filter(t=>t.state==="done").length+" / "+tasks.length;
-  $("#migrations").textContent=migrations;
-  $("#imbalance").textContent=imbalance;
-  $("#rebalance").disabled=shared();
+/* ---------- helpers ---------- */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
+function interval(){return 1000/st.speed;}
+function dur(){return Math.round(Math.max(160,Math.min(620,interval()*0.75)));}
+function alertMsg(t){$("mc-alert").textContent=t||"";}
+function f1(v){return v.toFixed(1);}
+function taskById(S,id){for(var i=0;i<S.tasks.length;i++){if(S.tasks[i].id===id){return S.tasks[i];}}return null;}
+
+/* ---------- visualization ---------- */
+var svg=$("mc-svg"),layer=$("mc-layer"),viz=$("mc-viz"),chipEls=new Map(),G=null;
+function geom(){
+  var W=Math.max(300,viz.clientWidth-16),H=Math.max(220,viz.clientHeight-10),n=st.cfg.n;
+  var top=24,gap=n>4?4:7,lh=Math.min(120,(H-top-4-gap*(n-1))/n);
+  var Lw=W<560?40:52,Qw=Math.max(110,Math.min(300,W*0.27)),x0=Lw+Qw+16;
+  return {W:W,H:H,n:n,top:top,gap:gap,lh:lh,Lw:Lw,Qw:Qw,qx:Lw+4,x0:x0,gw:W-x0-6,y:function(c){return top+c*(lh+gap);}};
+}
+function render(anim){
+  var S=cur(),K=st.cfg,g=geom();G=g;
+  var cols=Math.max(8,predictedEnd(),S.tick),cw=g.gw/cols;
+  g.cw=cw;
+  svg.style.width=g.W+"px";svg.style.height=g.H+"px";
+  svg.setAttribute("viewBox","0 0 "+g.W+" "+g.H);
+  layer.style.width=g.W+"px";layer.style.height=g.H+"px";
+  var h="<defs><pattern id=\"mc-idle\" width=\"6\" height=\"6\" patternUnits=\"userSpaceOnUse\" patternTransform=\"rotate(45)\"><rect class=\"pat-a\" width=\"6\" height=\"6\"/><line class=\"pat-b\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"6\"/></pattern>"+
+    "<marker id=\"mc-ah\" viewBox=\"0 0 10 10\" refX=\"8\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\"/></marker>"+
+    "<marker id=\"mc-ah2\" viewBox=\"0 0 10 10\" refX=\"8\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M0 0L10 5L0 10z\"/></marker></defs>";
+  /* tick axis */
+  var every=cw>=26?1:cw>=13?2:cw>=6?5:10;
+  for(var t=1;t<=cols;t++){
+    var tx=g.x0+(t-0.5)*cw;
+    if(t%every===0||t===1){h+="<text class=\"tick\" x=\""+f1(tx)+"\" y=\"14\">"+t+"</text>";}
+  }
+  h+="<text class=\"qlbl\" x=\""+f1(g.qx)+"\" y=\"14\">"+(K.model==="shared"?"shared ready queue":"ready queues (head →)")+"</text>";
+  h+="<text class=\"qlbl\" x=\""+f1(g.W-6)+"\" y=\"14\" text-anchor=\"end\" style=\"display:none\">tick</text>";
+  var lastRuns=S.tick>0?S.gantt[S.tick-1]:[];
+  for(var c=0;c<g.n;c++){
+    var y=g.y(c);
+    var run=null;lastRuns.forEach(function(r){if(r.c===c){run=r;}});
+    h+="<text class=\"core\" x=\"4\" y=\""+f1(y+g.lh/2+(g.lh>34?-1:5))+"\">C"+c+"</text>";
+    if(g.lh>34){h+="<text class=\"cst\" x=\"4\" y=\""+f1(y+g.lh/2+14)+"\">"+(S.tick===0?"":run?"▶ "+run.id:"idle")+"</text>";}
+    h+="<rect class=\"lane\" x=\""+f1(g.x0)+"\" y=\""+f1(y)+"\" width=\""+f1(g.gw)+"\" height=\""+f1(g.lh)+"\" rx=\"6\"/>";
+    if(K.model!=="shared"){h+="<rect class=\"qbox\" x=\""+f1(g.qx)+"\" y=\""+f1(y)+"\" width=\""+f1(g.Qw)+"\" height=\""+f1(g.lh)+"\" rx=\"8\"/>";
+      h+="<path class=\"arrow\" d=\"M"+f1(g.qx+g.Qw+3)+" "+f1(y+g.lh/2)+"h8m-4 -4l4 4l-4 4\"/>";}
+  }
+  if(K.model==="shared"){
+    var sy=g.y(0),sh=g.y(g.n-1)+g.lh-sy;
+    h+="<rect class=\"qbox\" x=\""+f1(g.qx)+"\" y=\""+f1(sy)+"\" width=\""+f1(g.Qw)+"\" height=\""+f1(sh)+"\" rx=\"10\"/>";
+    for(c=0;c<g.n;c++){var yy=g.y(c)+g.lh/2;h+="<path class=\"arrow\" d=\"M"+f1(g.qx+g.Qw+3)+" "+f1(yy)+"h8m-4 -4l4 4l-4 4\"/>";}
+  }
+  /* gantt cells */
+  for(t=1;t<=S.tick;t++){
+    var runs=S.gantt[t-1],busy={};
+    runs.forEach(function(r){busy[r.c]=r;});
+    for(c=0;c<g.n;c++){
+      var x=g.x0+(t-1)*cw,yc=g.y(c)+2,hh=g.lh-4,r=busy[c],isNew=anim&&t===S.tick;
+      if(!r){h+="<rect class=\"idle"+(isNew?" cell new":"")+"\" x=\""+f1(x+1)+"\" y=\""+f1(yc)+"\" width=\""+f1(Math.max(1,cw-2))+"\" height=\""+f1(hh)+"\" rx=\"3\" data-t=\""+t+"\" data-c=\""+c+"\" data-id=\"\"><title>Tick "+t+", C"+c+": idle</title></rect>";continue;}
+      h+="<rect class=\"cell mc-t"+(r.idx%8)+(isNew?" new":"")+"\" style=\"fill:color-mix(in srgb,var(--tc) 30%,var(--o-bg));stroke:color-mix(in srgb,var(--tc) 72%,var(--o-fg))\" x=\""+f1(x+1)+"\" y=\""+f1(yc)+"\" width=\""+f1(Math.max(1,cw-2))+"\" height=\""+f1(hh)+"\" rx=\"4\" data-t=\""+t+"\" data-c=\""+c+"\" data-id=\""+r.id+"\"><title>Tick "+t+", C"+c+": "+r.id+(r.mig>=0?" (migrated from C"+r.mig+")":"")+(r.done?" finished":"")+"</title></rect>";
+      if(cw>=24){h+="<text class=\"cl\" x=\""+f1(x+cw/2)+"\" y=\""+f1(yc+hh/2+(r.done&&hh>30?-2:4))+"\">"+r.id+"</text>";}
+      if(r.done&&cw>=12){h+="<text class=\"ok\" x=\""+f1(x+cw/2)+"\" y=\""+f1(yc+hh-4)+"\">✓</text>";}
+    }
+  }
+  if(S.tick>0){
+    h+="<rect class=\"cur\" x=\""+f1(g.x0+(S.tick-1)*cw)+"\" y=\""+f1(g.y(0)-2)+"\" width=\""+f1(cw)+"\" height=\""+f1(g.y(g.n-1)+g.lh-g.y(0)+4)+"\" rx=\"4\"/>";
+  }
+  /* migration arcs */
+  var lastAt={};
+  for(t=1;t<=S.tick;t++){
+    S.gantt[t-1].forEach(function(r){
+      if(r.mig>=0&&lastAt[r.id]){
+        var p=lastAt[r.id],x1=g.x0+p.t*cw-Math.min(8,cw*0.3),y1=g.y(p.c)+g.lh/2,x2=g.x0+(t-1)*cw+Math.min(10,cw*0.35),y2=g.y(r.c)+g.lh/2;
+        var now=t===S.tick,dx=Math.max(12,(x2-x1)*0.5),len=Math.round(Math.hypot(x2-x1,y2-y1)*1.3+20);
+        h+="<path class=\"arc"+(now?" now"+(anim?" draw":""):"")+"\" style=\"--len:"+len+"\" marker-end=\"url(#mc-ah)\" d=\"M"+f1(x1)+" "+f1(y1)+"C"+f1(x1+dx)+" "+f1(y1)+" "+f1(x2-dx)+" "+f1(y2)+" "+f1(x2)+" "+f1(y2+(y2>y1?-6:6))+"\"><title>"+r.id+" migrated C"+r.mig+" → C"+r.c+" at tick "+t+"</title></path>";
+      }
+      lastAt[r.id]={t:t,c:r.c};
+    });
+  }
+  /* balancing moves of the current step (queue to queue) */
+  if(K.model!=="shared"&&S.rec&&S.rec.moves.length){
+    S.rec.moves.forEach(function(m,i){
+      var ax=g.qx+g.Qw-10-i*8,ay1=g.y(m.from)+g.lh/2,ay2=g.y(m.to)+g.lh/2;
+      h+="<path class=\"mv\" marker-end=\"url(#mc-ah2)\" d=\"M"+f1(ax)+" "+f1(ay1)+"C"+f1(ax+22)+" "+f1(ay1)+" "+f1(ax+22)+" "+f1(ay2)+" "+f1(ax)+" "+f1(ay2+(ay2>ay1?-5:5))+"\"><title>"+m.id+" moved C"+m.from+" → C"+m.to+" queue</title></path>";
+    });
+  }
+  svg.innerHTML=h;
+  svg.setAttribute("aria-label","Tick "+S.tick+". "+lastRuns.map(function(r){return "C"+r.c+" ran "+r.id;}).join(", "));
+  renderChips(S,g,anim);
+}
+function placeChips(S,g){
+  var K=st.cfg,out=[];
+  if(K.model==="shared"){
+    var q=S.globalQ,sy=g.y(0)+8,sh=g.y(g.n-1)+g.lh-sy-8,cwid=Math.min(58,Math.max(34,(g.Qw-14)/3-4));
+    var per=Math.max(1,Math.floor((g.Qw-12)/(cwid+4))),rows=Math.ceil(q.length/per)||1,chh=Math.max(20,Math.min(30,(sh-(rows-1)*4)/rows));
+    q.forEach(function(t,i){out.push({t:t,x:g.qx+8+(i%per)*(cwid+4),y:sy+Math.floor(i/per)*(chh+4),w:cwid,h:chh,head:i===0});});
+  }else{
+    S.queues.forEach(function(q,c){
+      var y=g.y(c),chh=Math.max(18,Math.min(32,g.lh-12)),w=Math.min(58,Math.max(22,(g.Qw-12-(q.length-1)*4)/Math.max(1,q.length)));
+      q.forEach(function(t,i){out.push({t:t,x:g.qx+6+i*(w+4),y:y+(g.lh-chh)/2,w:w,h:chh,head:i===0});});
+    });
+  }
+  return out;
+}
+function renderChips(S,g,anim){
+  var K=st.cfg,pl=placeChips(S,g),seen={};
+  pl.forEach(function(p){
+    var t=p.t,el=chipEls.get(t.id),isNew=false;
+    seen[t.id]=1;
+    if(!el){isNew=true;el=document.createElement("div");layer.appendChild(el);chipEls.set(t.id,el);}
+    el.className="mc-chip mc-t"+(t.idx%8)+(p.head?" head":"")+(anim&&!isNew&&!reduce.matches?" mv":"")+(isNew&&anim?" enter":"");
+    var pin="";
+    if(K.aff!=="none"&&p.w>=40){pin=(K.aff==="hard"?PINF:PIN)+(K.aff==="hard"?effPref(K,t):homeCore(K,t));}
+    el.innerHTML="<b>"+t.id+"</b>"+(p.w>=46&&!pin?"<i>"+t.remaining+"</i>":"")+pin;
+    el.title=t.id+": "+t.remaining+" left, prefers C"+effPref(K,t)+(t.last!==null?", last ran on C"+t.last:"");
+    el.style.width=f1(p.w)+"px";el.style.height=f1(p.h)+"px";
+    el.style.transform="translate("+f1(p.x)+"px,"+f1(p.y)+"px)";
+  });
+  chipEls.forEach(function(el,id){
+    if(seen[id]){return;}
+    chipEls.delete(id);
+    if(anim&&!reduce.matches){el.classList.add("mv");el.classList.add("leave");setTimeout(function(){el.remove();},dur()+40);}else{el.remove();}
+  });
+}
+function resetChips(){chipEls.forEach(function(el){el.remove();});chipEls.clear();}
+
+/* ---------- side panel ---------- */
+function renderSide(){
+  var S=cur(),K=st.cfg,imb=imbalance(K,S),h="";
+  $("mc-imb").textContent=K.model==="shared"?"0 (shared)":imb;
+  $("mc-meter").classList.toggle("bad",imb>1);
+  if(K.model==="shared"){
+    $("mc-loadsub").textContent="one global queue";
+    h="<div class=\"mc-lr\"><span>All</span><span class=\"track\"><span class=\"fill\" style=\"width:"+Math.min(100,100*S.globalQ.length/Math.max(1,S.tasks.length))+"%\"></span></span><b>"+S.globalQ.length+"</b></div>";
+  }else{
+    $("mc-loadsub").textContent="queue lengths";
+    var mx=Math.max(1,Math.max.apply(null,S.queues.map(function(q){return q.length;}))),big=Math.max.apply(null,S.queues.map(function(q){return q.length;}));
+    S.queues.forEach(function(q,c){
+      h+="<div class=\"mc-lr"+(imb>1&&q.length===big?" max":"")+"\" title=\"Core "+c+": "+q.length+" queued\"><span>C"+c+"</span><span class=\"track\"><span class=\"fill\" style=\"width:"+(100*q.length/mx).toFixed(0)+"%\"></span></span><b>"+q.length+"</b></div>";
+    });
+  }
+  $("mc-load").innerHTML=h;
+  var lastRuns=S.tick>0?S.gantt[S.tick-1]:[],ran={};lastRuns.forEach(function(r){ran[r.id]=r.c;});
+  h="";
+  S.tasks.forEach(function(t){
+    var p=effPref(K,t),dn=t.state==="done",stt=dn?"✓":ran[t.id]!=null?"▶":"…";
+    h+="<div class=\"mc-tr mc-t"+(t.idx%8)+(dn?" done":"")+"\" title=\""+t.id+": work "+t.work+", prefers C"+p+(t.pref!==p?" (C"+t.pref+" clamped)":"")+", last C"+(t.last===null?"–":t.last)+"\">"+
+      "<span class=\"sw\">"+t.id+"</span><span class=\"pn\">"+(K.aff==="hard"?PINF:PIN)+"C"+p+"</span>"+
+      "<span class=\"track\"><span class=\"fill\" style=\"width:"+(100*(t.work-t.remaining)/t.work).toFixed(0)+"%\"></span></span><span>"+(t.work-t.remaining)+"/"+t.work+"</span><span class=\"stt\">"+stt+"</span></div>";
+  });
+  $("mc-tasks").innerHTML=h;
 }
 
-function reset(){
-  tasks=defaultTasks();
-  tick=0;migrations=0;nextId=6;logEl.innerHTML="";setMsg("");
-  buildQueues();
-  renderTable();update();
+/* ---------- narration + stats ---------- */
+function narration(){
+  var S=cur(),K=st.cfg,r=S.rec,parts=[];
+  if(r.kind==="start"){return K.n+" core"+(K.n>1?"s":"")+" · "+(K.model==="shared"?"shared queue":"per-core queues")+" · press <b>▶</b> or <kbd>→</kbd>";}
+  if(r.kind==="rebal"){
+    if(!r.moves.length){return "Rebalance now: queues already balanced";}
+    return "Rebalance now: <span class=\"osim-k h\">"+r.moves[0].id+" C"+r.moves[0].from+"→C"+r.moves[0].to+"</span>"+(r.moves.length>1?" +"+(r.moves.length-1)+" more":"");
+  }
+  var head="<b>Tick "+S.tick+"</b> · ",migs=r.runs.filter(function(x){return x.mig>=0;}),dn=r.runs.filter(function(x){return x.done;});
+  if(migs.length){parts.push("<span class=\"osim-k x\">↷ "+migs[0].id+" C"+migs[0].mig+"→C"+migs[0].c+"</span>"+(migs.length>1?" +"+(migs.length-1):""));}
+  else if(r.moves.length){parts.push("balanced <span class=\"osim-k h\">"+r.moves[0].id+" C"+r.moves[0].from+"→C"+r.moves[0].to+"</span>");}
+  else if(dn.length){parts.push(dn.map(function(x){return x.id;}).join(", ")+" finished ✓");}
+  else{parts.push(r.runs.length+"/"+K.n+" cores busy");}
+  if(allDone(S)){parts.push("all done");}
+  return head+parts.join(" · ");
+}
+function renderStats(){
+  var S=cur(),K=st.cfg;
+  $("mc-st").textContent=S.tick;
+  $("mc-sd").textContent=S.tasks.filter(function(t){return t.state==="done";}).length+"/"+S.tasks.length;
+  $("mc-sm").textContent=S.migrations;
+  $("mc-si").textContent=imbalance(K,S);
+  $("mc-sk").textContent=allDone(S)?S.tick:"–";
+  $("mc-narr").innerHTML=narration();
 }
 
-function reconfigure(what){
-  buildQueues();
-  addLog(what+" changed: queues rebuilt from preferred cores.");
-  renderTable();update();
+/* ---------- compare ---------- */
+var cmp=$("mc-compare");
+var CMP=[{model:"shared",bal:false,name:"Shared queue"},{model:"percore",bal:false,name:"Per-core, no balancing"},{model:"percore",bal:true,name:"Per-core + balancing"}];
+function renderCompare(){
+  if(cmp.hidden){return;}
+  var K=st.cfg,res=CMP.map(function(c){return runAll({n:K.n,model:c.model,aff:K.aff,bal:c.bal},st.spec);});
+  var mk_=1,mm=1,mi=1;res.forEach(function(r){mk_=Math.max(mk_,r.makespan);mm=Math.max(mm,r.migrations);mi=Math.max(mi,r.peak);});
+  var h="<div class=\"osim-ph\"><div><b>Compare</b> <span>"+K.n+" cores · affinity "+K.aff+"</span></div><button type=\"button\" class=\"osim-ib\" data-act=\"compare\" aria-label=\"Close compare\"><svg class=\"st\" viewBox=\"0 0 24 24\" aria-hidden=\"true\" focusable=\"false\"><path d=\"M6 6l12 12M18 6L6 18\"/></svg></button></div>";
+  h+="<div class=\"osim-sub\">Run to completion (lower is better)</div><div class=\"mc-cmp\">";
+  res.forEach(function(r,i){
+    var c=CMP[i],on=K.model===c.model&&(c.model==="shared"||K.bal===c.bal);
+    function bar(lbl,v,m,key){return "<span class=\"br\"><span>"+lbl+"</span><span class=\"bt\"><span class=\"bf\" style=\"width:"+(100*v/m).toFixed(1)+"%\"></span></span><span class=\"bv\" data-v=\""+key+"\">"+v+"</span></span>";}
+    h+="<button type=\"button\" data-cmp=\""+i+"\" aria-pressed=\""+on+"\" title=\""+c.name+": makespan "+r.makespan+", migrations "+r.migrations+", peak imbalance "+r.peak+", idle core-ticks "+r.idle+"\"><span class=\"nm\">"+c.name+"</span>"+
+      bar("Makespan",r.makespan,mk_,"makespan")+bar("Migrations",r.migrations,mm,"migrations")+bar("Peak imbal.",r.peak,mi,"peak")+"</button>";
+  });
+  h+="</div><p class=\"osim-cap\">Same tasks, cores and affinity. Click a row to load it.</p>";
+  cmp.innerHTML=h;
 }
-
-$("#addTask").addEventListener("click",()=>{
-  const n=nCores();
-  const t=mk("T"+nextId,4,(nextId-1)%n);
-  nextId++;
-  tasks.push(t);
-  if(shared())globalQ.push(t);else queues[effPref(t)].push(t);
-  addLog(t.id+" added (preferred Core "+t.pref+").");
-  renderTable();update();
+cmp.addEventListener("click",function(e){
+  var b=e.target.closest("button[data-cmp]");if(!b){return;}
+  var c=CMP[+b.getAttribute("data-cmp")];
+  st.cfg.model=c.model;if(c.model!=="shared"){st.cfg.bal=c.bal;}
+  resetChips();restart();renderCompare();
 });
-$("#step").addEventListener("click",runTick);
-$("#run10").addEventListener("click",()=>{for(let i=0;i<10;i++)runTick();});
-$("#rebalance").addEventListener("click",manualRebalance);
-$("#reset").addEventListener("click",reset);
-coresCount.addEventListener("change",()=>reconfigure("Core count"));
-queueModel.addEventListener("change",()=>reconfigure("Queue model"));
-affinityMode.addEventListener("change",()=>reconfigure("Affinity mode"));
-balancing.addEventListener("change",()=>{addLog("Load balancing "+(balancing.value==="on"?"enabled":"disabled")+".");update();});
+function togglePanel(id,force){
+  var p=$(id),other=id==="mc-compare"?$("mc-help"):$("mc-compare");
+  var open=force!=null?force:p.hidden;
+  p.hidden=!open;if(open){other.hidden=true;}
+  $("mc-cmpbtn").setAttribute("aria-expanded",String(!$("mc-compare").hidden));
+  $("mc-helpbtn").setAttribute("aria-expanded",String(!$("mc-help").hidden));
+  if(id==="mc-compare"&&open){renderCompare();}
+}
 
-reset();
+/* ---------- task chips ---------- */
+var chipsBox=$("mc-chips");
+function chipWidth(inp){inp.style.width=(Math.max(3,inp.value.length)*0.62+1.3)+"em";}
+function renderTaskChips(focusIdx){
+  chipsBox.innerHTML="";
+  st.chips.forEach(function(v,i){
+    var w=document.createElement("span");w.className="osim-chip";w.setAttribute("role","listitem");
+    var inp=document.createElement("input");
+    inp.type="text";inp.maxLength=5;inp.value=v;inp.autocomplete="off";inp.spellcheck=false;
+    inp.setAttribute("aria-label","Task T"+(i+1)+" (work@core)");inp.setAttribute("data-i",i);inp.title="T"+(i+1)+": work@preferred core";
+    chipWidth(inp);w.appendChild(inp);chipsBox.appendChild(w);
+  });
+  $("mc-add").disabled=st.chips.length>=MAX_TASKS;
+  if(focusIdx!=null){var t=chipsBox.querySelectorAll("input")[focusIdx];if(t){t.focus();t.select();}}
+}
+function validate(){
+  var ins=chipsBox.querySelectorAll("input"),vals=st.chips.map(function(s){return s.trim();}),bad=-1,spec=[];
+  vals.forEach(function(s,i){
+    var m=/^(\d{1,2})@(\d)$/.exec(s),ok=s===""||(m&&+m[1]>=1&&+m[1]<=MAX_WORK&&+m[2]<=7);
+    if(ins[i]){ins[i].setAttribute("aria-invalid",ok?"false":"true");}
+    if(!ok&&bad<0){bad=i;}
+    if(ok&&s!==""){spec.push({work:+m[1],pref:+m[2]});}
+  });
+  if(bad>=0){alertMsg("Task "+(bad+1)+": “"+vals[bad]+"” must be work@core, work 1–"+MAX_WORK+", core 0–7 (e.g. 6@0).");return null;}
+  if(!spec.length){alertMsg("Enter at least one task, e.g. 6@0.");return null;}
+  if(spec.length>MAX_TASKS){alertMsg("At most "+MAX_TASKS+" tasks.");return null;}
+  alertMsg("");
+  return spec;
+}
+function sameSpec(a,b){return a.length===b.length&&a.every(function(x,i){return x.work===b[i].work&&x.pref===b[i].pref;});}
+function applyChips(){
+  var spec=validate();if(!spec){return;}
+  if(!sameSpec(spec,st.spec)){st.spec=spec;st.preset=null;resetChips();restart();renderControls();}
+}
+function splitInto(i,text){
+  var parts=text.split(/[\s,;]+/).filter(Boolean);
+  var next=st.chips.slice(0,i).concat(parts,st.chips.slice(i+1));
+  if(next.filter(function(s){return s.trim()!=="";}).length>MAX_TASKS){alertMsg("At most "+MAX_TASKS+" tasks.");return;}
+  st.chips=next;renderTaskChips(Math.min(i+parts.length-1,next.length-1));applyChips();
+}
+chipsBox.addEventListener("input",function(e){
+  var inp=e.target;if(inp.tagName!=="INPUT"){return;}
+  var i=+inp.getAttribute("data-i");
+  if(/[\s,;]/.test(inp.value)){splitInto(i,inp.value);return;}
+  st.chips[i]=inp.value;chipWidth(inp);applyChips();
+});
+chipsBox.addEventListener("paste",function(e){
+  var inp=e.target;if(inp.tagName!=="INPUT"){return;}
+  var txt=(e.clipboardData||window.clipboardData).getData("text");
+  if(/[\s,;]/.test(txt.trim())){e.preventDefault();splitInto(+inp.getAttribute("data-i"),txt.trim());}
+});
+chipsBox.addEventListener("keydown",function(e){
+  var inp=e.target;if(inp.tagName!=="INPUT"){return;}
+  var i=+inp.getAttribute("data-i"),ins=chipsBox.querySelectorAll("input");
+  if(e.key==="Enter"||e.key===" "||e.key===","){
+    e.preventDefault();
+    if(i===ins.length-1){if(st.chips.length<MAX_TASKS&&inp.value.trim()!==""){st.chips.push("");renderTaskChips(i+1);}}
+    else{ins[i+1].focus();ins[i+1].select();}
+  }else if(e.key==="Backspace"&&inp.value===""&&st.chips.length>1){
+    e.preventDefault();st.chips.splice(i,1);renderTaskChips(Math.max(0,i-1));applyChips();
+  }else if(e.key==="ArrowLeft"&&inp.selectionStart===0&&i>0){
+    e.preventDefault();ins[i-1].focus();ins[i-1].select();
+  }else if(e.key==="ArrowRight"&&inp.selectionEnd===inp.value.length&&i<ins.length-1){
+    e.preventDefault();ins[i+1].focus();ins[i+1].select();
+  }else if(e.key==="Escape"){inp.blur();}
+});
+chipsBox.addEventListener("focusout",function(e){
+  var inp=e.target;if(inp.tagName!=="INPUT"){return;}
+  setTimeout(function(){
+    if(chipsBox.contains(document.activeElement)){return;}
+    var before=st.chips.length;
+    st.chips=st.chips.filter(function(s){return s.trim()!=="";});
+    if(!st.chips.length){st.chips=st.spec.map(function(s){return s.work+"@"+s.pref;});}
+    if(st.chips.length!==before){renderTaskChips();applyChips();}
+  },0);
+});
+function setPreset(p){
+  pause();st.preset=p;
+  if(p==="default"){st.chips=DEFAULT.slice();}
+  else if(p==="skewed"){st.chips=SKEWED.slice();}
+  else{st.chips=[];for(var i=0;i<6;i++){st.chips.push((2+Math.floor(Math.random()*7))+"@"+Math.floor(Math.random()*st.cfg.n));}}
+  renderTaskChips();
+  var spec=validate();if(spec){st.spec=spec;}
+  resetChips();restart();
+}
+
+/* ---------- controls + transport ---------- */
+function renderControls(){
+  var K=st.cfg;
+  $("mc-n").textContent=K.n;
+  root.querySelector("[data-act=cminus]").disabled=K.n<=1;
+  root.querySelector("[data-act=cplus]").disabled=K.n>=8;
+  root.querySelectorAll("#mc-model button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-model")===K.model));});
+  root.querySelectorAll("#mc-aff button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-aff")===K.aff));});
+  root.querySelectorAll("#mc-presets button").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-preset")===st.preset));});
+  var bal=$("mc-bal");bal.setAttribute("aria-pressed",String(K.bal));bal.disabled=K.model==="shared";
+  $("mc-rebal").disabled=K.model==="shared"||atEnd();
+  var end=atEnd();
+  root.querySelector("[data-act=prev]").disabled=st.step<=0;
+  root.querySelector("[data-act=first]").disabled=st.step<=0;
+  root.querySelector("[data-act=next]").disabled=end;
+  root.querySelector("[data-act=last]").disabled=end;
+  $("mc-playicon").setAttribute("d",st.playing?"M6.5 5h4v14h-4zM13.5 5h4v14h-4z":"M8 5l11 7-11 7z");
+  $("mc-play").setAttribute("aria-label",st.playing?"Pause (Space)":"Play (Space)");
+}
+function draw(anim){
+  root.style.setProperty("--o-dur",dur()+"ms");
+  render(anim);renderSide();renderStats();renderControls();
+}
+function go(step,anim){
+  var prev=st.step;
+  step=Math.max(0,step);
+  ensure(step);
+  st.step=Math.min(step,st.hist.length-1);
+  draw(!!anim&&!reduce.matches&&st.step===prev+1);
+}
+function goEnd(){ensure(MAX_TICKS+1);go(st.hist.length-1,false);}
+function tick(){
+  if(!st.playing){return;}
+  if(atEnd()){pause();return;}
+  go(st.step+1,true);
+  if(atEnd()){st.playing=false;renderControls();return;}
+  st.timer=setTimeout(tick,interval());
+}
+function play(){if(st.playing){return;}if(atEnd()){go(0,false);}st.playing=true;renderControls();tick();}
+function pause(){st.playing=false;clearTimeout(st.timer);if(st.hist.length){renderControls();}}
+function togglePlay(){if(st.playing){pause();}else{play();}}
+function rebalanceNow(){
+  if(st.cfg.model==="shared"){return;}
+  pause();
+  var S=clone(cur()),moves=[];
+  balanceQueues(st.cfg,S,moves);
+  S.rec={kind:"rebal",runs:[],moves:moves};
+  S.peak=Math.max(S.peak,imbalance(st.cfg,S));
+  st.hist=st.hist.slice(0,st.step);st.hist.push(S);
+  draw(!reduce.matches);
+}
+function reconf(fn){fn();resetChips();restart();}
+
+root.addEventListener("click",function(e){
+  var b=e.target.closest("button");
+  if(!b||!root.contains(b)||b.disabled){return;}
+  if(b.closest("#mc-compare")){return;}
+  var K=st.cfg;
+  if(b.hasAttribute("data-model")){var m=b.getAttribute("data-model");if(m!==K.model){reconf(function(){K.model=m;});}return;}
+  if(b.hasAttribute("data-aff")){var a=b.getAttribute("data-aff");if(a!==K.aff){reconf(function(){K.aff=a;});}return;}
+  if(b.hasAttribute("data-preset")){setPreset(b.getAttribute("data-preset"));return;}
+  switch(b.getAttribute("data-act")){
+    case "cminus":if(K.n>1){reconf(function(){K.n--;});}break;
+    case "cplus":if(K.n<8){reconf(function(){K.n++;});}break;
+    case "bal":pause();K.bal=!K.bal;st.hist=st.hist.slice(0,st.step+1);draw(false);renderCompare();break;
+    case "rebal":rebalanceNow();break;
+    case "first":pause();go(0,false);break;
+    case "prev":pause();go(st.step-1,false);break;
+    case "next":pause();go(st.step+1,true);break;
+    case "last":pause();goEnd();break;
+    case "play":togglePlay();break;
+    case "compare":togglePanel("mc-compare");break;
+    case "help":togglePanel("mc-help");break;
+    case "fs":toggleFs();break;
+    case "clear":pause();alertMsg("");st.chips=[""];renderTaskChips(0);break;
+    case "add":
+      if(st.chips.length<MAX_TASKS){st.chips=st.chips.filter(function(s){return s.trim()!=="";});st.chips.push("4@"+(st.chips.length%K.n));renderTaskChips(st.chips.length-1);applyChips();}
+      break;
+  }
+});
+var speed=$("mc-speed");
+speed.addEventListener("input",function(){
+  st.speed=SPEEDS[+speed.value];
+  $("mc-speedv").textContent=st.speed+"/s";
+  speed.setAttribute("aria-valuetext",st.speed+" ticks per second");
+  root.style.setProperty("--o-dur",dur()+"ms");
+  if(st.playing){clearTimeout(st.timer);st.timer=setTimeout(tick,interval());}
+});
+
+document.addEventListener("keydown",function(e){
+  if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey){return;}
+  var t=e.target,tag=t&&t.tagName;
+  if(e.key==="Escape"){
+    if(!$("mc-compare").hidden||!$("mc-help").hidden){togglePanel("mc-compare",false);togglePanel("mc-help",false);}
+    return;
+  }
+  if(tag==="TEXTAREA"||tag==="SELECT"||(t&&t.isContentEditable)){return;}
+  if(tag==="INPUT"&&t.type!=="range"){return;}
+  if(tag==="INPUT"&&t.type==="range"&&e.key!==" "){return;}
+  if(t&&t!==document.body&&!root.contains(t)&&t.closest&&t.closest("a,button,input")){return;}
+  switch(e.key){
+    case "ArrowRight":e.preventDefault();pause();go(st.step+1,true);break;
+    case "ArrowLeft":e.preventDefault();pause();go(st.step-1,false);break;
+    case " ":case "Spacebar":e.preventDefault();togglePlay();break;
+    case "Home":e.preventDefault();pause();go(0,false);break;
+    case "End":e.preventDefault();pause();goEnd();break;
+  }
+});
+
+/* ---------- fullscreen + fit to viewport ---------- */
+var fsBtn=$("mc-fs");
+function fsEl(){return document.fullscreenElement||document.webkitFullscreenElement||null;}
+function toggleFs(){
+  if(fsEl()){(document.exitFullscreen||document.webkitExitFullscreen).call(document);}
+  else{var req=root.requestFullscreen||root.webkitRequestFullscreen;if(req){req.call(root);}}
+}
+if(!(root.requestFullscreen||root.webkitRequestFullscreen)){fsBtn.hidden=true;}
+function onFs(){
+  var on=fsEl()===root;
+  $("mc-fsicon").setAttribute("d",on?"M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5":"M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5");
+  fsBtn.setAttribute("aria-label",on?"Exit fullscreen":"Fullscreen");
+  fit();
+}
+document.addEventListener("fullscreenchange",onFs);
+document.addEventListener("webkitfullscreenchange",onFs);
+function docTop(el){var y=0;while(el){y+=el.offsetTop;el=el.offsetParent;}return y;}
+var lastFit="";
+function fit(){
+  if(fsEl()===root||window.innerWidth<=600){root.style.removeProperty("--osim-h");}
+  else{
+    var h=Math.max(420,Math.floor(window.innerHeight-docTop(root)-12));
+    root.style.setProperty("--osim-h",h+"px");
+    var over=document.documentElement.scrollHeight-window.innerHeight;
+    if(over>0&&h-over>=420){root.style.setProperty("--osim-h",(h-over)+"px");}
+  }
+  var key=viz.clientWidth+"x"+viz.clientHeight;
+  if(key!==lastFit&&st.hist.length){lastFit=key;render(false);}
+}
+window.addEventListener("resize",fit);
+window.addEventListener("load",fit);
+if(window.ResizeObserver){new ResizeObserver(function(){fit();}).observe(viz);}
+
+/* ---------- init ---------- */
+renderTaskChips();
+st.spec=validate()||[];
+restart();
+fit();
+setTimeout(fit,400);
 })();
 </script>
