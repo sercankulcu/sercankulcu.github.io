@@ -1,4 +1,4 @@
-/* Bölüm 9 Aygıt Kontrolü: trafik lambası bit düzenleyici ve termostat simülatörü */
+/* Bölüm 9 Aygıt Kontrolü: trafik lambası bit düzenleyici, termostat simülatörü ve 8255 kontrol sözcüğü oluşturucu */
 (function () {
   var NS = "http://www.w3.org/2000/svg";
   function hex4(v) { return ("0000" + (v & 0xFFFF).toString(16).toUpperCase()).slice(-4) + "h"; }
@@ -133,5 +133,89 @@
       }, 250);
     });
     show(parseInt(slider.value, 10));
+  });
+
+  /* ---------- 8255 kontrol sözcüğü oluşturucu ---------- */
+  var PPI = [
+    { bit: 4, name: "Port A", pins: "PA7–PA0", addr: "310h", y: 46 },
+    { bit: 3, name: "Port C üst", pins: "PC7–PC4", addr: "312h", y: 100 },
+    { bit: 1, name: "Port B", pins: "PB7–PB0", addr: "311h", y: 154 },
+    { bit: 0, name: "Port C alt", pins: "PC3–PC0", addr: "312h", y: 208 }
+  ];
+  var CWNAME = ["PC alt", "PB", "B mod", "PC üst", "PA", "A mod", "A mod", "mod"];
+  function hex2(v) { return ("0" + (v & 0xFF).toString(16).toUpperCase()).slice(-2); }
+  function bin8(v) { return ("0000000" + (v & 0xFF).toString(2)).slice(-8); }
+
+  function ppiSvg(cw) {
+    var bsr = !(cw & 0x80);
+    var p = ['<defs><marker id="m09p-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs>',
+      '<rect class="box" x="20" y="20" width="110" height="214" rx="6"/>',
+      '<text class="txt" x="75" y="130" text-anchor="middle">8255</text>'];
+    PPI.forEach(function (g) {
+      var input = (cw >> g.bit) & 1;
+      var d = input ? "M270 " + g.y + " H134" : "M132 " + g.y + " H268";
+      p.push('<path class="line" d="' + d + '" marker-end="url(#m09p-ah)"' + (bsr ? ' style="opacity:.35"' : "") + "/>");
+      p.push('<text class="lbl mono" x="200" y="' + (g.y - 7) + '" text-anchor="middle">' + g.pins + "</text>");
+      p.push('<text class="txt" x="200" y="' + (g.y + 20) + '" text-anchor="middle" style="font-size:13px">' + (bsr ? "—" : input ? "giriş" : "çıkış") + "</text>");
+    });
+    return '<svg class="ds-svg" xmlns="' + NS + '" viewBox="0 0 280 250" role="img" aria-label="8255 port yönleri, kontrol sözcüğü ' + hex2(cw) + 'h" style="max-width:290px;width:100%">' + p.join("") + "</svg>";
+  }
+
+  document.querySelectorAll('.ds-deck [data-demo="m09-ppi"]').forEach(function (demo) {
+    var svgBox = demo.querySelector(".m09-svg"), dirs = demo.querySelector(".m09-dirs");
+    var cwBox = demo.querySelector(".m09-cw"), code = demo.querySelector(".m09-code");
+    var inp = demo.querySelector('[data-in="cw"]'), status = demo.querySelector(".ds-deck__status");
+    var cw = 0x82, btns = [];
+    PPI.forEach(function (g) {
+      var lab = document.createElement("span");
+      lab.textContent = g.name + " (" + g.pins + ")";
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "ds-deck__button ds-deck__button--sm";
+      b.addEventListener("click", function () { cw = (cw | 0x80) ^ (1 << g.bit); draw(true); });
+      dirs.appendChild(lab);
+      dirs.appendChild(b);
+      btns.push(b);
+    });
+    function draw(fromButtons) {
+      if (fromButtons || document.activeElement !== inp) inp.value = hex2(cw);
+      svgBox.innerHTML = ppiSvg(cw);
+      var html = "";
+      for (var i = 7; i >= 0; i--) {
+        html += '<span title="D' + i + '"><span class="b' + ((cw >> i) & 1 ? " is-on" : "") + '">' + ((cw >> i) & 1) + "</span>" + CWNAME[i] + "</span>";
+      }
+      cwBox.innerHTML = html;
+      var bsr = !(cw & 0x80);
+      PPI.forEach(function (g, k) {
+        btns[k].textContent = bsr ? "—" : (cw >> g.bit) & 1 ? "giriş (1)" : "çıkış (0)";
+        btns[k].classList.toggle("is-on", !bsr && ((cw >> g.bit) & 1) === 1);
+      });
+      var lines = ["mov dx, 313h   ; kontrol yazmacı", "mov al, " + hex2(cw) + "h    ; " + bin8(cw) + "b", "out dx, al"];
+      if (bsr) {
+        var n = (cw >> 1) & 7, v = cw & 1;
+        status.innerHTML = "D7 = 0: <b>bit kur/sil</b> (BSR) sözcüğü. Port yönleri değişmez; yalnız <b>PC" + n + " ← " + v + "</b> olur." +
+          ((cw & 0x70) ? " (D6–D4 kullanılmaz.)" : "");
+        lines[1] = "mov al, " + hex2(cw) + "h    ; PC" + n + " = " + v;
+      } else {
+        var parts = PPI.map(function (g) { return g.name + " <b>" + ((cw >> g.bit) & 1 ? "giriş" : "çıkış") + "</b>"; });
+        var ma = (cw >> 5) & 3, mb = (cw >> 2) & 1, warn = "";
+        if (ma || mb) warn = "<br>A grubu mod " + (ma > 1 ? 2 : ma) + ", B grubu mod " + mb + ": el sıkışmalı modlar; burada yalnız mod 0 yönleri gösterilir.";
+        status.innerHTML = parts.join(" · ") + warn;
+        PPI.forEach(function (g) {
+          if (g.bit === 0 && ((cw >> 3) & 1) === ((cw >> 0) & 1)) return;
+          var isIn = (cw >> g.bit) & 1;
+          var nm = g.bit === 3 && ((cw >> 3) & 1) === (cw & 1) ? "Port C" : g.name;
+          lines.push("; " + nm + " (DX = " + g.addr + "): " + (isIn ? "in  al, dx" : "out dx, al"));
+        });
+      }
+      code.textContent = lines.join("\n");
+    }
+    inp.addEventListener("input", function () {
+      var t = inp.value.trim();
+      if (/^[0-9a-fA-F]{1,2}$/.test(t)) { cw = parseInt(t, 16); draw(false); }
+    });
+    inp.addEventListener("keydown", function (e) { e.stopPropagation(); });
+    inp.addEventListener("blur", function () { inp.value = hex2(cw); });
+    draw(true);
   });
 })();

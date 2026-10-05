@@ -1,4 +1,4 @@
-/* Bölüm 11: Kesme Fonksiyonları demoları (öznitelik gezgini, klavye gezgini) */
+/* Bölüm 11: Kesme Fonksiyonları demoları (öznitelik gezgini, klavye gezgini, piksel adresi gezgini) */
 (function () {
   function hex(v, n) { var s = v.toString(16).toUpperCase(); while (s.length < n) s = "0" + s; return s + "h"; }
   var NAMES = ["siyah", "mavi", "yeşil", "camgöbeği", "kırmızı", "eflatun", "kahverengi", "açık gri",
@@ -91,5 +91,65 @@
       status.innerHTML = "<b>" + e.code + "</b>" + shown + note;
     });
     inp.addEventListener("input", function () { inp.value = ""; });
+  });
+
+  /* ---------- mod 13h piksel adresi gezgini ---------- */
+  document.querySelectorAll('.ds-deck [data-demo="m11-pix"]').forEach(function (demo) {
+    var cv = demo.querySelector("canvas");
+    var ctx = cv.getContext("2d");
+    var out = demo.querySelector('[data-out="addr"]');
+    var status = demo.querySelector(".ds-deck__status");
+    var timer = null;
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function clear() {
+      if (timer) { clearInterval(timer); timer = null; }
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(0, 0, 320, 200);
+    }
+    function plot(off, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(off % 320, Math.floor(off / 320), 1, 1);
+    }
+    function show(x, y, extra) {
+      var off = y * 320 + x;
+      out.innerHTML = "(" + x + ", " + y + ") → " + y + " · 320 + " + x + " = <b>" + hex(off, 4) + "</b> · A000:" + hex(off, 4).slice(0, 4) +
+        " = fiziksel <b>" + hex(0xA0000 + off, 5) + "</b>";
+      status.innerHTML = extra || "";
+    }
+    function line(start, step, color, label) {
+      clear();
+      var n = 0, di = start;
+      function one() {
+        plot(di, color);
+        var x = di % 320, y = Math.floor(di / 320);
+        show(x, y, label + " · adım " + (n + 1) + "/200 · DI = <b>" + hex(di, 4) + "</b>");
+        n++;
+        di += step;
+      }
+      if (reduce) { while (n < 200) one(); return; }
+      timer = setInterval(function () {
+        for (var k = 0; k < 4 && n < 200; k++) one();
+        if (n >= 200) { clearInterval(timer); timer = null; }
+      }, 16);
+    }
+    cv.addEventListener("click", function (e) {
+      var r = cv.getBoundingClientRect();
+      var x = Math.min(319, Math.max(0, Math.floor((e.clientX - r.left) * 320 / r.width)));
+      var y = Math.min(199, Math.max(0, Math.floor((e.clientY - r.top) * 200 / r.height)));
+      if (timer) { clearInterval(timer); timer = null; }
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(x, y, 1, 1);
+      show(x, y, "Renk 0Fh (beyaz). <code>mov es:[" + hex(y * 320 + x, 4) + "], al</code> ya da INT 10h/0Ch ile CX = " + x + ", DX = " + y + ".");
+    });
+    demo.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-act]");
+      if (!b) return;
+      if (b.dataset.act === "diag") line(0, 0x141, "#FFFF55", "Sol üstten: <code>add di, 141h</code>");
+      else if (b.dataset.act === "anti") line(0x13F, 0x13F, "#55FFFF", "Sağ üstten: <code>add di, 13Fh</code>");
+      else { clear(); out.innerHTML = ""; status.innerHTML = "Ekran temizlendi (renk 0)."; }
+    });
+    clear();
+    show(100, 50, "Bir piksele tıklayın ya da köşegen çizdirin.");
   });
 })();
