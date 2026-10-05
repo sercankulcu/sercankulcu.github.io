@@ -2,356 +2,889 @@
 layout: without-sidebar
 title: "Infix to Prefix Converter"
 permalink: /files/data_structures/slides/Bolum_04_Infix_to_Prefix.html
-excerpt: "Interactive infix-to-prefix converter with tokenization, operator-stack visualization, validation, and step-by-step playback."
+excerpt: "Compact interactive infix-to-prefix simulator."
 ---
 
 <style>
-.ds-prefix,.ds-prefix *,.ds-prefix *::before,.ds-prefix *::after{box-sizing:border-box}
-.ds-prefix{
-  width:min(1160px,100%);margin:0 auto 2rem;color:var(--global-text-color);
-  --ds-surface:color-mix(in srgb,var(--global-link-color) 2.5%,var(--global-bg-color));
-  --ds-surface-strong:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
-  --ds-border:color-mix(in srgb,var(--global-link-color) 38%,var(--global-border-color));
-  --ds-shadow:0 8px 24px rgba(15,23,42,.065);
-  --ds-shadow-soft:0 3px 10px rgba(15,23,42,.045)
+.prefix-sim,
+.prefix-sim *,
+.prefix-sim *::before,
+.prefix-sim *::after { box-sizing: border-box; }
+
+.prefix-sim {
+  --sim-bg: var(--global-bg-color, #ffffff);
+  --sim-text: var(--global-text-color, #2f3437);
+  --sim-accent: var(--global-link-color, #2a7ae2);
+  --sim-border: var(--global-border-color, #d9dee3);
+  --sim-soft: color-mix(in srgb, var(--sim-accent) 6%, var(--sim-bg));
+  --sim-softer: color-mix(in srgb, var(--sim-accent) 2.5%, var(--sim-bg));
+  --sim-ok: #15803d;
+  --sim-warn: #d97706;
+  --sim-danger: #b91c1c;
+
+  width: min(780px, calc(100vw - 18px));
+  height: min(548px, calc(100vh - 58px));
+  min-height: 470px;
+  margin: 6px auto 0;
+  padding: 10px;
+  color: var(--sim-text);
+  font-family: inherit;
+  overflow: hidden;
 }
-.ds-prefix__hero,.ds-prefix__panel,.ds-prefix__tokens,.ds-prefix__stack-panel,.ds-prefix__process,.ds-prefix__card,.ds-prefix__table-panel,.ds-prefix__code-panel,.ds-prefix__status{
-  border:1.5px solid var(--ds-border);background:var(--ds-surface)
+
+.prefix-shell {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  gap: 8px;
 }
-.ds-prefix__hero{padding:1.35rem;border-radius:16px;background:var(--ds-surface-strong);box-shadow:var(--ds-shadow)}
-.ds-prefix__hero h1{margin:0 0 .55rem;text-align:center;color:var(--global-text-color);font-size:clamp(1.65rem,4vw,2.3rem)}
-.ds-prefix__hero p{width:100%;margin:0;max-width:none;line-height:1.65;text-align:justify;text-justify:inter-word;opacity:.86}
-.ds-prefix__metrics,.ds-prefix__stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem}
-.ds-prefix__metrics{margin-top:1rem}.ds-prefix__metric,.ds-prefix__stat{padding:.8rem;border:1.5px solid var(--ds-border);border-radius:10px;background:var(--ds-surface);box-shadow:var(--ds-shadow-soft)}
-.ds-prefix__metric strong,.ds-prefix__stat strong{display:block;margin-bottom:.15rem}
-.ds-prefix__section{margin-top:1.4rem}.ds-prefix__section h2{margin:0 0 .7rem;color:var(--global-text-color);font-size:1.2rem}
-.ds-prefix__panel{display:grid;gap:.8rem;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow-soft)}
-.ds-prefix__group{display:grid;grid-template-columns:minmax(240px,2fr) repeat(4,minmax(115px,1fr));gap:.6rem;align-items:end}
-.ds-prefix__field{display:grid;gap:.3rem}.ds-prefix__field label,.ds-prefix__speed label{font-size:.86rem;font-weight:800}
-.ds-prefix input{width:100%;min-height:42px;padding:.55rem .65rem;border:1.5px solid var(--ds-border);border-radius:9px;background:var(--ds-surface);color:var(--global-text-color);font:inherit}
-.ds-prefix input:focus-visible,.ds-prefix button:focus-visible{outline:3px solid color-mix(in srgb,var(--global-link-color) 30%,transparent);outline-offset:2px}
-.ds-prefix__btn{min-height:42px;padding:.55rem .75rem;border:1px solid var(--global-link-color);border-radius:9px;background:var(--global-link-color);color:#fff;font:inherit;font-weight:800;cursor:pointer}
-.ds-prefix__btn:hover:not(:disabled){filter:brightness(1.08)}.ds-prefix__btn--secondary{border-color:var(--ds-border);background:var(--ds-surface);color:var(--global-text-color)}.ds-prefix__btn--danger{border-color:#b91c1c;background:#b91c1c}.ds-prefix__btn:disabled{cursor:not-allowed;opacity:.5}
-.ds-prefix__speed{display:grid;grid-template-columns:minmax(130px,auto) 1fr auto;gap:.65rem;align-items:center}.ds-prefix__speed output{min-width:70px;text-align:right;font-size:.85rem;font-weight:800}
-.ds-prefix__tokens{min-height:64px;margin-top:1rem;padding:.75rem;display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}
-.ds-prefix__token{min-width:38px;min-height:38px;padding:.35rem .6rem;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--ds-border);border-radius:8px;background:var(--ds-surface);font-family:Consolas,Monaco,monospace;font-weight:800}
-.ds-prefix__token.is-current{background:#fef3c7;border-color:#d97706;color:#3f2a00;transform:scale(1.06)}.ds-prefix__token.is-processed{background:#dcfce7;border-color:#15803d;color:#14532d}
-.ds-prefix__workspace{display:grid;grid-template-columns:minmax(230px,.55fr) minmax(320px,1.45fr);gap:.8rem;margin-top:.8rem}
-.ds-prefix__stack-panel,.ds-prefix__process{min-width:0;padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow)}
-.ds-prefix__stack-panel h3,.ds-prefix__process h3{margin:0 0 .65rem;font-size:1rem}
-.ds-prefix__stack{min-height:280px;padding:.6rem;display:flex;flex-direction:column-reverse;justify-content:flex-start;gap:.4rem;border:4px solid color-mix(in srgb,var(--global-text-color) 55%,var(--global-border-color));border-top:0;border-radius:0 0 10px 10px;background:color-mix(in srgb,var(--global-text-color) 4%,var(--global-bg-color))}
-.ds-prefix__stack-item{min-height:44px;padding:.4rem .65rem;display:flex;align-items:center;justify-content:center;border:2px solid color-mix(in srgb,var(--global-link-color) 85%,var(--global-border-color));border-radius:8px;background:var(--ds-surface);font-family:Consolas,Monaco,monospace;font-weight:800}
-.ds-prefix__stack-empty{margin:auto;text-align:center;opacity:.58}.ds-prefix__stack-top{margin-top:.55rem;text-align:center;color:var(--global-link-color);font-weight:800}
-.ds-prefix__message{min-height:72px;padding:.85rem;border:1.5px solid var(--ds-border);border-radius:10px;background:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));font-weight:800}
-.ds-prefix__expr{margin-top:.7rem;padding:.8rem;border:1.5px solid var(--ds-border);border-radius:10px;background:var(--ds-surface)}.ds-prefix__expr strong{display:block;margin-bottom:.35rem}.ds-prefix__value{min-height:38px;padding:.45rem .6rem;overflow-wrap:anywhere;border-radius:7px;background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color));font-family:Consolas,Monaco,monospace;font-size:1.02rem}
-.ds-prefix__status{min-height:3rem;margin:.8rem 0 0;padding:.85rem;border-radius:10px;box-shadow:var(--ds-shadow-soft);font-weight:800}.ds-prefix__status.is-success{color:#15803d}.ds-prefix__status.is-error{color:#b91c1c}
-.ds-prefix__stats{margin-top:.8rem}.ds-prefix__stat strong{font-size:.75rem;opacity:.65}
-.ds-prefix__lower{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:.8rem}.ds-prefix__table-panel,.ds-prefix__code-panel{min-width:0;padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}.ds-prefix__table-panel h3,.ds-prefix__code-panel h3{margin:0 0 .55rem;font-size:1rem}
-.ds-prefix__table-scroll{overflow-x:auto}.ds-prefix table{width:100%;border-collapse:collapse;font-size:.86rem}.ds-prefix th,.ds-prefix td{padding:.6rem;border:1.5px solid var(--ds-border);text-align:left}.ds-prefix th{background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color))}.ds-prefix tr.is-active{background:#fef3c7;color:#3f2a00}.ds-prefix tr.is-done{background:#dcfce7;color:#14532d}
-.ds-prefix__code{padding:.9rem;overflow-x:auto;border-radius:10px;background:#0f172a;color:#e2e8f0}.ds-prefix__code pre{margin:0;white-space:pre-wrap;font-family:Consolas,Monaco,monospace;font-size:.84rem}
-.ds-prefix__cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}.ds-prefix__card{padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}.ds-prefix__card h3{margin:0 0 .45rem;color:var(--global-text-color);font-size:1rem}.ds-prefix__card p{margin:0;font-size:.9rem;line-height:1.55;opacity:.78}
-@media(max-width:900px){.ds-prefix__group{grid-template-columns:repeat(2,minmax(0,1fr))}.ds-prefix__field{grid-column:1/-1}.ds-prefix__workspace,.ds-prefix__lower{grid-template-columns:1fr}}
-@media(max-width:760px){.ds-prefix__hero p{text-align:left}.ds-prefix__metrics,.ds-prefix__stats,.ds-prefix__cards{grid-template-columns:repeat(2,minmax(0,1fr))}.ds-prefix__speed{grid-template-columns:1fr}.ds-prefix__speed output{text-align:left}}
-@media(max-width:500px){.ds-prefix__group,.ds-prefix__metrics,.ds-prefix__stats,.ds-prefix__cards{grid-template-columns:1fr}.ds-prefix__field{grid-column:auto}}
-@media(prefers-color-scheme:dark){.ds-prefix{--ds-surface:var(--global-bg-color);--ds-surface-strong:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));--ds-border:color-mix(in srgb,var(--global-border-color) 85%,var(--global-text-color));--ds-shadow:none;--ds-shadow-soft:none}}
-@media(prefers-reduced-motion:reduce){.ds-prefix *,.ds-prefix *::before,.ds-prefix *::after{transition-duration:.001ms!important;animation-duration:.001ms!important}}
+
+.prefix-title {
+  margin: 0;
+  color: var(--sim-text);
+  text-align: center;
+  font-size: 1.45rem;
+  line-height: 1.15;
+}
+
+.prefix-controls {
+  padding: 8px;
+  border: 1px solid var(--sim-border);
+  border-radius: 10px;
+  background: var(--sim-softer);
+}
+
+.prefix-row {
+  display: grid;
+  grid-template-columns: minmax(250px, 2.4fr) repeat(6, minmax(0, 1fr));
+  gap: 5px;
+  align-items: end;
+}
+
+.prefix-field {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.prefix-field label {
+  display: block;
+  margin: 0 !important;
+  padding: 0;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.prefix-field input {
+  width: 100%;
+  height: 31px;
+  min-height: 31px;
+  margin: 0 !important;
+  padding: 3px 7px;
+  border: 1px solid var(--sim-border);
+  border-radius: 6px;
+  background: var(--sim-bg);
+  color: var(--sim-text);
+  font: inherit;
+  line-height: 1;
+  vertical-align: top;
+}
+
+.prefix-btn {
+  height: 31px;
+  min-height: 31px;
+  margin: 0 !important;
+  padding: 0 5px;
+  border: 1px solid var(--sim-accent);
+  border-radius: 6px;
+  background: var(--sim-accent);
+  color: #fff;
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: end;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: transform .12s ease, filter .12s ease;
+}
+
+.prefix-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.prefix-btn:disabled {
+  cursor: not-allowed;
+  opacity: .45;
+}
+
+.prefix-btn.success {
+  background: var(--sim-ok);
+  border-color: var(--sim-ok);
+}
+
+.prefix-btn.danger {
+  background: var(--sim-danger);
+  border-color: var(--sim-danger);
+}
+
+.prefix-tokens {
+  min-height: 47px;
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+  border: 1px solid var(--sim-border);
+  border-radius: 10px;
+  background: var(--sim-bg);
+  overflow: hidden;
+}
+
+.prefix-token {
+  min-width: 31px;
+  height: 31px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--sim-border);
+  border-radius: 6px;
+  background: var(--sim-soft);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 11px;
+  font-weight: 800;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.prefix-token.current {
+  background: #fef3c7;
+  border-color: var(--sim-warn);
+  color: #4a3100;
+  transform: translateY(-2px);
+}
+
+.prefix-token.processed {
+  background: #dcfce7;
+  border-color: var(--sim-ok);
+  color: #14532d;
+}
+
+.prefix-stage {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.prefix-stack-panel,
+.prefix-process {
+  min-height: 0;
+  border: 1px solid var(--sim-border);
+  border-radius: 10px;
+  background: var(--sim-bg);
+  overflow: hidden;
+}
+
+.prefix-stack-panel {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 8px;
+}
+
+.prefix-mini-title {
+  margin: 0 0 5px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  opacity: .65;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.prefix-stack {
+  min-height: 0;
+  padding: 7px;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  gap: 5px;
+  border: 3px solid color-mix(in srgb, var(--sim-text) 45%, var(--sim-border));
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: color-mix(in srgb, var(--sim-text) 3%, var(--sim-bg));
+  overflow: hidden;
+}
+
+.prefix-stack-item {
+  min-height: 31px;
+  padding: 3px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--sim-accent);
+  border-radius: 6px;
+  background: var(--sim-soft);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.prefix-stack-item.top {
+  background: #fef3c7;
+  border-color: var(--sim-warn);
+  color: #4a3100;
+}
+
+.prefix-stack-empty {
+  margin: auto;
+  text-align: center;
+  font-size: 11px;
+  opacity: .55;
+}
+
+.prefix-stack-top {
+  margin-top: 5px;
+  text-align: center;
+  color: var(--sim-accent);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.prefix-process {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+}
+
+.prefix-message {
+  min-height: 37px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--sim-border);
+  background: var(--sim-softer);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.prefix-output-area {
+  min-height: 0;
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  padding: 8px 10px;
+}
+
+.prefix-output-box {
+  width: min(430px, 100%);
+  padding: 7px 9px;
+  border: 1px solid var(--sim-border);
+  border-radius: 7px;
+  background: var(--sim-softer);
+}
+
+.prefix-output-box strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 9px;
+  opacity: .6;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.prefix-value {
+  min-height: 25px;
+  overflow-wrap: anywhere;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.prefix-result {
+  padding: 7px 10px;
+  border-top: 1px solid var(--sim-border);
+  background: color-mix(in srgb, var(--sim-ok) 6%, var(--sim-bg));
+}
+
+.prefix-result strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--sim-ok);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.prefix-status {
+  min-height: 31px;
+  padding: 6px 10px;
+  border-top: 1px solid var(--sim-border);
+  background: var(--sim-softer);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.prefix-status.success { color: var(--sim-ok); }
+.prefix-status.error { color: var(--sim-danger); }
+.prefix-status.warning { color: var(--sim-warn); }
+
+.prefix-footer {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, .8fr);
+  gap: 5px;
+}
+
+.prefix-stat {
+  min-width: 0;
+  padding: 5px 7px;
+  border: 1px solid var(--sim-border);
+  border-radius: 7px;
+  background: var(--sim-softer);
+  font-size: 10.5px;
+  line-height: 1.2;
+}
+
+.prefix-stat strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 9px;
+  opacity: .6;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+@media (max-width: 700px) {
+  .prefix-sim {
+    width: calc(100vw - 10px);
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .prefix-shell { grid-template-rows: auto; }
+
+  .prefix-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .prefix-field { grid-column: 1 / -1; }
+
+  .prefix-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .prefix-stack-panel { min-height: 180px; }
+  .prefix-process { min-height: 230px; }
+
+  .prefix-tokens {
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+
+  .prefix-footer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-height: 620px) and (min-width: 701px) {
+  .prefix-sim {
+    height: calc(100vh - 48px);
+    padding-top: 4px;
+  }
+
+  .prefix-title { font-size: 1.25rem; }
+  .prefix-controls { padding: 6px; }
+  .prefix-btn, .prefix-field input { height: 28px; min-height: 28px; }
+  .prefix-tokens { min-height: 41px; padding-top: 4px; padding-bottom: 4px; }
+  .prefix-token { height: 27px; min-width: 28px; }
+  .prefix-stack-item { min-height: 27px; }
+  .prefix-status { min-height: 27px; padding: 5px 8px; }
+}
+
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .ds-prefix__token.is-current { background: #451a03; border-color: #f59e0b; color: #fef3c7; }
-  :root:not([data-theme="light"]) .ds-prefix__token.is-processed { background: #052e16; border-color: #22c55e; color: #dcfce7; }
-  :root:not([data-theme="light"]) .ds-prefix tr.is-active { background: #451a03; color: #fef3c7; }
-  :root:not([data-theme="light"]) .ds-prefix tr.is-done { background: #052e16; color: #dcfce7; }
+  :root:not([data-theme="light"]) .prefix-token.current,
+  :root:not([data-theme="light"]) .prefix-stack-item.top {
+    background: #451a03;
+    color: #fef3c7;
+    border-color: #f59e0b;
+  }
+
+  :root:not([data-theme="light"]) .prefix-token.processed {
+    background: #052e16;
+    color: #dcfce7;
+    border-color: #22c55e;
+  }
 }
-:root[data-theme="dark"] .ds-prefix__token.is-current { background: #451a03; border-color: #f59e0b; color: #fef3c7; }
-:root[data-theme="dark"] .ds-prefix__token.is-processed { background: #052e16; border-color: #22c55e; color: #dcfce7; }
-:root[data-theme="dark"] .ds-prefix tr.is-active { background: #451a03; color: #fef3c7; }
-:root[data-theme="dark"] .ds-prefix tr.is-done { background: #052e16; color: #dcfce7; }
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) .ds-prefix__code { background: #1e293b; }
+
+:root[data-theme="dark"] .prefix-token.current,
+:root[data-theme="dark"] .prefix-stack-item.top {
+  background: #451a03;
+  color: #fef3c7;
+  border-color: #f59e0b;
 }
-:root[data-theme="light"] .ds-prefix__code { background: #1e293b; }
+
+:root[data-theme="dark"] .prefix-token.processed {
+  background: #052e16;
+  color: #dcfce7;
+  border-color: #22c55e;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prefix-sim *,
+  .prefix-sim *::before,
+  .prefix-sim *::after {
+    transition-duration: .001ms !important;
+    animation-duration: .001ms !important;
+  }
+}
 </style>
 
-<div class="ds-prefix">
-  <section class="ds-prefix__hero">
-    <h1>Infix to Prefix Converter</h1>
-    <p>
-      In infix notation, operators appear between operands, such as A + B. In prefix notation, the operator appears
-      before its operands, such as + A B. Prefix expressions encode evaluation order directly and therefore do not
-      require parentheses during evaluation.
-    </p>
-    <div class="ds-prefix__metrics">
-      <div class="ds-prefix__metric"><strong>Tokenization</strong>O(n)</div>
-      <div class="ds-prefix__metric"><strong>Conversion</strong>O(n)</div>
-      <div class="ds-prefix__metric"><strong>Auxiliary space</strong>O(n)</div>
-      <div class="ds-prefix__metric"><strong>Operators</strong>+ − × ÷ ^</div>
-    </div>
-  </section>
+<div class="prefix-sim">
+  <div class="prefix-shell">
+    <h1 class="prefix-title">Infix to Prefix Simulator</h1>
 
-  <section class="ds-prefix__section">
-    <h2>Expression and playback controls</h2>
-    <div class="ds-prefix__panel">
-      <div class="ds-prefix__group">
-        <div class="ds-prefix__field">
-          <label for="ds-prefix-input">Infix expression</label>
-          <input id="ds-prefix-input" type="text" value="A + B * C" spellcheck="false">
+    <div class="prefix-controls">
+      <div class="prefix-row">
+        <div class="prefix-field">
+          <label for="prefix-input">Infix expression</label>
+          <input id="prefix-input" type="text" value="A + B * C" spellcheck="false">
         </div>
-        <button class="ds-prefix__btn" id="ds-prefix-load" type="button">Convert</button>
-        <button class="ds-prefix__btn" id="ds-prefix-example" type="button">Example</button>
-        <button class="ds-prefix__btn" id="ds-prefix-prev" type="button">Previous Step</button>
-        <button class="ds-prefix__btn" id="ds-prefix-next" type="button">Next Step</button>
-      </div>
-      <div class="ds-prefix__group">
-        <button class="ds-prefix__btn" id="ds-prefix-auto" type="button">Auto Run</button>
-        <button class="ds-prefix__btn ds-prefix__btn--danger" id="ds-prefix-reset" type="button">Reset</button>
-      </div>
-      <div class="ds-prefix__speed">
-        <label for="ds-prefix-speed">Animation speed</label>
-        <input id="ds-prefix-speed" type="range" min="100" max="1200" step="100" value="500">
-        <output id="ds-prefix-speed-output">500 ms</output>
+        <button class="prefix-btn" id="prefix-convert" type="button">Convert</button>
+        <button class="prefix-btn" id="prefix-example" type="button">Example</button>
+        <button class="prefix-btn" id="prefix-prev" type="button">Previous</button>
+        <button class="prefix-btn" id="prefix-next" type="button">Next</button>
+        <button class="prefix-btn success" id="prefix-auto" type="button">Auto Run</button>
+        <button class="prefix-btn danger" id="prefix-reset" type="button">Reset</button>
+        <button class="prefix-btn danger" id="prefix-cancel" type="button">Cancel</button>
       </div>
     </div>
 
-    <div class="ds-prefix__tokens" id="ds-prefix-tokens" aria-label="Expression tokens"></div>
+    <div class="prefix-tokens" id="prefix-tokens" aria-label="Expression tokens"></div>
 
-    <div class="ds-prefix__workspace">
-      <div class="ds-prefix__stack-panel">
-        <h3>Operator stack</h3>
-        <div class="ds-prefix__stack" id="ds-prefix-stack"></div>
-        <div class="ds-prefix__stack-top" id="ds-prefix-stack-top">TOP</div>
+    <div class="prefix-stage">
+      <div class="prefix-stack-panel">
+        <div class="prefix-mini-title">Operator Stack</div>
+        <div class="prefix-stack" id="prefix-stack"></div>
+        <div class="prefix-stack-top" id="prefix-stack-top">TOP</div>
       </div>
 
-      <div class="ds-prefix__process">
-        <h3>Current conversion state</h3>
-        <div class="ds-prefix__message" id="ds-prefix-message"></div>
-        <div class="ds-prefix__expr">
-          <strong>Temporary output (right-to-left scan)</strong>
-          <div class="ds-prefix__value" id="ds-prefix-temp">—</div>
+      <div class="prefix-process">
+        <div class="prefix-message" id="prefix-message">Ready.</div>
+
+        <div class="prefix-output-area">
+          <div class="prefix-output-box">
+            <strong>Scan</strong>
+            <div class="prefix-value" id="prefix-scan">—</div>
+          </div>
+          <div class="prefix-output-box">
+            <strong>Temporary output</strong>
+            <div class="prefix-value" id="prefix-temp">—</div>
+          </div>
         </div>
-        <div class="ds-prefix__expr">
+
+        <div class="prefix-result">
           <strong>Prefix result</strong>
-          <div class="ds-prefix__value" id="ds-prefix-result">—</div>
+          <div class="prefix-value" id="prefix-result">—</div>
+        </div>
+
+        <div class="prefix-status" id="prefix-status" aria-live="polite">
+          Convert the expression to create the steps.
         </div>
       </div>
     </div>
 
-    <p class="ds-prefix__status" id="ds-prefix-status" role="status" aria-live="polite">
-      Convert the expression, then use Next Step to inspect the algorithm.
-    </p>
-
-    <div class="ds-prefix__stats">
-      <div class="ds-prefix__stat"><strong>Current step</strong><span id="ds-prefix-step">0 / 0</span></div>
-      <div class="ds-prefix__stat"><strong>Tokens</strong><span id="ds-prefix-count">0</span></div>
-      <div class="ds-prefix__stat"><strong>Stack operations</strong><span id="ds-prefix-ops">0</span></div>
-      <div class="ds-prefix__stat"><strong>Complexity</strong>O(n)</div>
+    <div class="prefix-footer">
+      <div class="prefix-stat"><strong>Operation</strong><span id="prefix-operation">Idle</span></div>
+      <div class="prefix-stat"><strong>Step</strong><span id="prefix-step">0 / 0</span></div>
+      <div class="prefix-stat"><strong>Tokens</strong><span id="prefix-count">0</span></div>
+      <div class="prefix-stat"><strong>Stack ops</strong><span id="prefix-ops">0</span></div>
     </div>
-
-    <div class="ds-prefix__lower">
-      <div class="ds-prefix__table-panel">
-        <h3>Step table</h3>
-        <div class="ds-prefix__table-scroll">
-          <table>
-            <thead><tr><th>Step</th><th>Token</th><th>Action</th></tr></thead>
-            <tbody id="ds-prefix-table"></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="ds-prefix__code-panel">
-        <h3>Core idea</h3>
-        <div class="ds-prefix__code"><pre>scan tokens from right to left
-
-operand:
-  append to temporary output
-
-operator:
-  pop higher-precedence operators
-  push current operator
-
-parentheses:
-  reverse their stack behavior
-
-finally:
-  pop remaining operators
-  reverse temporary output
-  → prefix expression</pre></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="ds-prefix__section">
-    <h2>Key ideas</h2>
-    <div class="ds-prefix__cards">
-      <article class="ds-prefix__card"><h3>Precedence</h3><p>Multiplication and division bind more strongly than addition and subtraction; exponentiation has the highest supported precedence.</p></article>
-      <article class="ds-prefix__card"><h3>Associativity</h3><p>Exponentiation is right-associative. The stack rule must treat equal-precedence exponent operators differently.</p></article>
-      <article class="ds-prefix__card"><h3>Why a stack?</h3><p>Operators must wait until enough of the expression has been scanned to determine when they belong in the output.</p></article>
-      <article class="ds-prefix__card"><h3>Linear complexity</h3><p>Each token is processed once, while each operator is pushed and popped at most once.</p></article>
-    </div>
-  </section>
+  </div>
 </div>
 
 <script>
 (() => {
   "use strict";
-  const root=document.querySelector(".ds-prefix");
-  if(!root)return;
-  const q=id=>root.querySelector("#"+id);
 
-  const el={
-    input:q("ds-prefix-input"),speed:q("ds-prefix-speed"),speedOutput:q("ds-prefix-speed-output"),
-    tokens:q("ds-prefix-tokens"),stack:q("ds-prefix-stack"),stackTop:q("ds-prefix-stack-top"),
-    message:q("ds-prefix-message"),temp:q("ds-prefix-temp"),result:q("ds-prefix-result"),
-    status:q("ds-prefix-status"),step:q("ds-prefix-step"),count:q("ds-prefix-count"),
-    ops:q("ds-prefix-ops"),table:q("ds-prefix-table")
+  const $ = id => document.getElementById(id);
+
+  const el = {
+    input: $("prefix-input"),
+    convert: $("prefix-convert"),
+    example: $("prefix-example"),
+    prev: $("prefix-prev"),
+    next: $("prefix-next"),
+    auto: $("prefix-auto"),
+    reset: $("prefix-reset"),
+    cancel: $("prefix-cancel"),
+    tokens: $("prefix-tokens"),
+    stack: $("prefix-stack"),
+    stackTop: $("prefix-stack-top"),
+    message: $("prefix-message"),
+    scan: $("prefix-scan"),
+    temp: $("prefix-temp"),
+    result: $("prefix-result"),
+    status: $("prefix-status"),
+    operation: $("prefix-operation"),
+    step: $("prefix-step"),
+    count: $("prefix-count"),
+    ops: $("prefix-ops")
   };
-  const btn={
-    load:q("ds-prefix-load"),example:q("ds-prefix-example"),prev:q("ds-prefix-prev"),
-    next:q("ds-prefix-next"),auto:q("ds-prefix-auto"),reset:q("ds-prefix-reset")
-  };
 
-  let tokens=[],steps=[],cursor=0,autoToken=0,autoRunning=false;
+  const DELAY = 300;
+  const MAX_TOKENS = 16;
+  const examples = [
+    "A + B * C",
+    "( A + B ) * C",
+    "A * ( B + C ) / D",
+    "A ^ B ^ C",
+    "( A + B ) * ( C - D )"
+  ];
 
-  const precedence=op=>({"+":1,"-":1,"*":2,"/":2,"^":3}[op]||0);
-  const isOperator=t=>["+", "-", "*", "/", "^"].includes(t);
-  const isOperand=t=>/^[A-Za-z_][A-Za-z0-9_]*$/.test(t)||/^\d+(?:\.\d+)?$/.test(t);
+  let exampleIndex = 0;
+  let tokens = [];
+  let scanTokens = [];
+  let frames = [];
+  let frameIndex = 0;
+  let running = false;
+  let tokenId = 0;
 
-  function tokenize(text){
-    const out=[];let i=0;
-    while(i<text.length){
-      const c=text[i];
-      if(/\s/.test(c)){i++;continue}
-      if(/[A-Za-z_]/.test(c)){
-        let s=c;i++;
-        while(i<text.length&&/[A-Za-z0-9_]/.test(text[i]))s+=text[i++];
-        out.push(s);continue;
-      }
-      if(/\d|\./.test(c)){
-        let s=c;i++;
-        while(i<text.length&&/[\d.]/.test(text[i]))s+=text[i++];
-        if(!/^\d+(?:\.\d+)?$/.test(s))throw new Error(`Invalid number: ${s}`);
-        out.push(s);continue;
-      }
-      if("+-*/^()".includes(c)){out.push(c);i++;continue}
-      throw new Error(`Unsupported character: ${c}`);
-    }
-    if(!out.length)throw new Error("Enter an expression.");
-    return out;
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const operators = new Set(["+", "-", "*", "/", "^"]);
+
+  function precedence(op) {
+    return ({ "+": 1, "-": 1, "*": 2, "/": 2, "^": 3 })[op] || 0;
   }
 
-  function validate(ts){
-    let balance=0,expectOperand=true;
-    ts.forEach(t=>{
-      if(t==="("){if(!expectOperand)throw new Error("Missing operator before '('.");balance++;expectOperand=true}
-      else if(t===")"){if(expectOperand)throw new Error("Unexpected ')'.");balance--;if(balance<0)throw new Error("Unbalanced parentheses.");expectOperand=false}
-      else if(isOperand(t)){if(!expectOperand)throw new Error(`Missing operator before ${t}.`);expectOperand=false}
-      else if(isOperator(t)){if(expectOperand)throw new Error(`Operator ${t} is missing a left operand.`);expectOperand=true}
-      else throw new Error(`Invalid token: ${t}`);
-    });
-    if(balance!==0)throw new Error("Unbalanced parentheses.");
-    if(expectOperand)throw new Error("Expression cannot end with an operator.");
+  function isOperand(token) {
+    return /^[A-Za-z0-9_]+(?:\.[0-9]+)?$/.test(token);
   }
 
-  function buildSteps(ts){
-    const stack=[],output=[],frames=[];
-    let stackOps=0;
-    frames.push({index:null,stack:[...stack],output:[...output],action:"Ready to scan from right to left.",stackOps});
-    for(let i=ts.length-1;i>=0;i--){
-      const token=ts[i];
-      if(isOperand(token)){
-        output.push(token);
-        frames.push({index:i,stack:[...stack],output:[...output],action:`Operand ${token}: append it to temporary output.`,stackOps});
-      } else if(token===")"){
-        stack.push(token);stackOps++;
-        frames.push({index:i,stack:[...stack],output:[...output],action:"Right parenthesis: push it onto the operator stack.",stackOps});
-      } else if(token==="("){
-        while(stack.length&&stack[stack.length-1]!==")"){output.push(stack.pop());stackOps++}
-        if(!stack.length)throw new Error("Unbalanced parentheses.");
-        stack.pop();stackOps++;
-        frames.push({index:i,stack:[...stack],output:[...output],action:"Left parenthesis: pop operators until the matching right parenthesis.",stackOps});
+  function tokenize(expression) {
+    const compact = expression.trim();
+    if (!compact) return null;
+
+    const found = compact.match(/[A-Za-z_][A-Za-z0-9_]*|\d+(?:\.\d+)?|[()+\-*/^]/g);
+    if (!found) return null;
+
+    const rebuilt = found.join("").replace(/\s+/g, "");
+    const original = compact.replace(/\s+/g, "");
+
+    if (rebuilt !== original || found.length > MAX_TOKENS) return null;
+    return found;
+  }
+
+  function validate(list) {
+    let balance = 0;
+    let expectOperand = true;
+
+    for (const token of list) {
+      if (isOperand(token)) {
+        if (!expectOperand) return false;
+        expectOperand = false;
+      } else if (token === "(") {
+        if (!expectOperand) return false;
+        balance++;
+      } else if (token === ")") {
+        if (expectOperand || balance <= 0) return false;
+        balance--;
+        expectOperand = false;
+      } else if (operators.has(token)) {
+        if (expectOperand) return false;
+        expectOperand = true;
       } else {
-        while(stack.length&&isOperator(stack[stack.length-1])&&(
-          precedence(stack[stack.length-1])>precedence(token) ||
-          (precedence(stack[stack.length-1])===precedence(token)&&token==="^")
-        )){
-          output.push(stack.pop());stackOps++;
-        }
-        stack.push(token);stackOps++;
-        frames.push({index:i,stack:[...stack],output:[...output],action:`Operator ${token}: apply precedence rules, then push it.`,stackOps});
+        return false;
       }
     }
-    while(stack.length){
-      const op=stack.pop();
-      if(op==="("||op===")")throw new Error("Unbalanced parentheses.");
-      output.push(op);stackOps++;
-      frames.push({index:null,stack:[...stack],output:[...output],action:`Drain operator ${op} from the stack.`,stackOps});
-    }
-    const prefix=[...output].reverse();
-    frames.push({index:null,stack:[],output:[...output],prefix,action:"Reverse the temporary output to obtain the prefix expression.",stackOps});
-    return frames;
+
+    return balance === 0 && !expectOperand;
   }
 
-  function render(){
-    const frame=steps[cursor]||{stack:[],output:[],action:"",stackOps:0};
-    el.tokens.innerHTML=tokens.map((t,i)=>{
-      const processed=frame.index===null?false:(i>frame.index);
-      return `<span class="ds-prefix__token ${i===frame.index?"is-current":processed?"is-processed":""}">${t}</span>`;
-    }).join("");
+  function shouldPop(top, current) {
+    if (!operators.has(top)) return false;
+    const pt = precedence(top);
+    const pc = precedence(current);
 
-    if(!frame.stack.length){
-      el.stack.innerHTML='<p class="ds-prefix__stack-empty">Stack is empty.</p>';
-      el.stackTop.textContent="TOP = empty";
-    }else{
-      el.stack.innerHTML=frame.stack.map(op=>`<div class="ds-prefix__stack-item">${op}</div>`).join("");
-      el.stackTop.textContent=`TOP → ${frame.stack[frame.stack.length-1]}`;
-    }
-
-    el.message.textContent=frame.action||"—";
-    el.temp.textContent=frame.output.length?frame.output.join(" "):"—";
-    el.result.textContent=frame.prefix?frame.prefix.join(" "):"—";
-    el.step.textContent=`${cursor} / ${Math.max(0,steps.length-1)}`;
-    el.count.textContent=String(tokens.length);
-    el.ops.textContent=String(frame.stackOps||0);
-
-    el.table.innerHTML=steps.slice(1).map((s,i)=>`
-      <tr class="${i+1===cursor?"is-active":i+1<cursor?"is-done":""}">
-        <td>${i+1}</td><td>${s.index==null?"—":tokens[s.index]}</td><td>${s.action}</td>
-      </tr>`).join("");
-
-    const complete=steps.length&&cursor===steps.length-1;
-    el.status.textContent=complete?`Prefix: ${frame.prefix.join(" ")}`:"Use Next Step to continue the conversion.";
-    el.status.className="ds-prefix__status"+(complete?" is-success":"");
-
-    btn.prev.disabled=cursor===0||autoRunning;
-    btn.next.disabled=!steps.length||cursor===steps.length-1||autoRunning;
-    btn.auto.disabled=!steps.length||cursor===steps.length-1||autoRunning;
-    btn.load.disabled=btn.example.disabled=autoRunning;
-    el.input.disabled=autoRunning;
+    // Reversed-expression postfix conversion:
+    // original ^ becomes left-associative; other operators become right-associative.
+    return pt > pc || (pt === pc && current === "^");
   }
 
-  function setup(text){
-    autoToken++;autoRunning=false;
-    try{
-      tokens=tokenize(text);validate(tokens);steps=buildSteps(tokens);cursor=0;render();
-    }catch(e){
-      steps=[];tokens=[];cursor=0;
-      el.tokens.innerHTML="";el.stack.innerHTML="";el.message.textContent="—";el.temp.textContent="—";el.result.textContent="—";
-      el.status.textContent=e.message;el.status.className="ds-prefix__status is-error";
-      el.step.textContent="0 / 0";el.count.textContent="0";el.ops.textContent="0";el.table.innerHTML="";
+  function buildFrames(list) {
+    const reversed = [...list]
+      .reverse()
+      .map(token => token === "(" ? ")" : token === ")" ? "(" : token);
+
+    const output = [];
+    const stack = [];
+    const result = [];
+    let stackOps = 0;
+
+    const snapshot = (currentIndex, message, final = false) => {
+      result.push({
+        currentIndex,
+        stack: [...stack],
+        output: [...output],
+        stackOps,
+        message,
+        final,
+        prefix: final ? [...output].reverse() : []
+      });
+    };
+
+    snapshot(-1, "Ready to scan from right to left.");
+
+    for (let i = 0; i < reversed.length; i++) {
+      const current = reversed[i];
+
+      if (isOperand(current)) {
+        output.push(current);
+        snapshot(i, `Operand ${current} → output.`);
+        continue;
+      }
+
+      if (current === "(") {
+        stack.push(current);
+        stackOps++;
+        snapshot(i, "Opening parenthesis → push.");
+        continue;
+      }
+
+      if (current === ")") {
+        while (stack.length && stack[stack.length - 1] !== "(") {
+          output.push(stack.pop());
+          stackOps++;
+        }
+
+        if (!stack.length) throw new Error("Mismatched parentheses.");
+        stack.pop();
+        stackOps++;
+        snapshot(i, "Closing parenthesis → pop until matching parenthesis.");
+        continue;
+      }
+
+      while (stack.length && shouldPop(stack[stack.length - 1], current)) {
+        output.push(stack.pop());
+        stackOps++;
+      }
+
+      stack.push(current);
+      stackOps++;
+      snapshot(i, `Operator ${current} processed.`);
+    }
+
+    while (stack.length) {
+      const top = stack.pop();
+      if (top === "(" || top === ")") throw new Error("Mismatched parentheses.");
+      output.push(top);
+      stackOps++;
+      snapshot(reversed.length, `Pop ${top} from stack.`);
+    }
+
+    snapshot(reversed.length, "Conversion complete.", true);
+
+    return { reversed, frames: result };
+  }
+
+  function setStatus(text, type = "") {
+    el.status.textContent = text;
+    el.status.className = "prefix-status" + (type ? " " + type : "");
+  }
+
+  function setRunning(value) {
+    running = value;
+    [el.convert, el.example, el.prev, el.next, el.auto, el.reset]
+      .forEach(button => button.disabled = value);
+    el.cancel.disabled = !value;
+  }
+
+  function currentFrame() {
+    return frames[Math.max(0, Math.min(frameIndex, frames.length - 1))];
+  }
+
+  function render() {
+    const frame = currentFrame();
+
+    el.tokens.innerHTML = "";
+    scanTokens.forEach((token, index) => {
+      const node = document.createElement("div");
+      node.className = "prefix-token";
+      if (index === frame.currentIndex && frame.currentIndex < scanTokens.length) {
+        node.classList.add("current");
+      } else if (frame.currentIndex >= 0 && index < frame.currentIndex) {
+        node.classList.add("processed");
+      }
+      node.textContent = token;
+      el.tokens.appendChild(node);
+    });
+
+    el.stack.innerHTML = "";
+    if (!frame.stack.length) {
+      const empty = document.createElement("div");
+      empty.className = "prefix-stack-empty";
+      empty.textContent = "Empty";
+      el.stack.appendChild(empty);
+      el.stackTop.textContent = "TOP";
+    } else {
+      frame.stack.forEach((operator, index) => {
+        const item = document.createElement("div");
+        item.className = "prefix-stack-item";
+        if (index === frame.stack.length - 1) item.classList.add("top");
+        item.textContent = operator;
+        el.stack.appendChild(item);
+      });
+      el.stackTop.textContent = `TOP = ${frame.stack[frame.stack.length - 1]}`;
+    }
+
+    el.message.textContent = frame.message;
+    el.scan.textContent = scanTokens.length ? scanTokens.join(" ") : "—";
+    el.temp.textContent = frame.output.length ? frame.output.join(" ") : "—";
+    el.result.textContent = frame.final && frame.prefix.length
+      ? frame.prefix.join(" ")
+      : "—";
+
+    el.step.textContent = `${frameIndex} / ${Math.max(0, frames.length - 1)}`;
+    el.count.textContent = tokens.length;
+    el.ops.textContent = frame.stackOps;
+
+    el.prev.disabled = running || frameIndex <= 0;
+    el.next.disabled = running || frameIndex >= frames.length - 1;
+    el.cancel.disabled = !running;
+  }
+
+  function convertExpression(message = "Steps created.") {
+    const parsed = tokenize(el.input.value);
+
+    if (!parsed) {
+      setStatus(`Use at most ${MAX_TOKENS} valid tokens.`, "error");
+      return false;
+    }
+
+    if (!validate(parsed)) {
+      setStatus("Invalid infix expression.", "error");
+      return false;
+    }
+
+    try {
+      const built = buildFrames(parsed);
+      tokens = parsed;
+      scanTokens = built.reversed;
+      frames = built.frames;
+      frameIndex = 0;
+      tokenId++;
+      running = false;
+      el.operation.textContent = "Idle";
+      setRunning(false);
+      render();
+      setStatus(message, "success");
+      return true;
+    } catch (error) {
+      setStatus(error.message || "Conversion failed.", "error");
+      return false;
     }
   }
 
-  btn.load.addEventListener("click",()=>setup(el.input.value));
-  btn.example.addEventListener("click",()=>{el.input.value="(A + B) * (C - D) ^ E";setup(el.input.value)});
-  btn.reset.addEventListener("click",()=>{autoToken++;autoRunning=false;cursor=0;render()});
-  btn.next.addEventListener("click",()=>{if(cursor<steps.length-1){cursor++;render()}});
-  btn.prev.addEventListener("click",()=>{if(cursor>0){cursor--;render()}});
-  btn.auto.addEventListener("click",async()=>{
-    autoRunning=true;const token=++autoToken;render();
-    while(cursor<steps.length-1&&token===autoToken){
-      cursor++;render();
-      await new Promise(r=>setTimeout(r,Number(el.speed.value)));
+  function example() {
+    exampleIndex = (exampleIndex + 1) % examples.length;
+    el.input.value = examples[exampleIndex];
+    convertExpression("Example loaded.");
+  }
+
+  function previous() {
+    if (running || frameIndex <= 0) return;
+    frameIndex--;
+    el.operation.textContent = "Previous";
+    render();
+    setStatus(currentFrame().message);
+  }
+
+  function next() {
+    if (running || frameIndex >= frames.length - 1) return;
+    frameIndex++;
+    el.operation.textContent = "Next";
+    render();
+
+    if (currentFrame().final) {
+      setStatus(`Prefix: ${currentFrame().prefix.join(" ")}`, "success");
+    } else {
+      setStatus(currentFrame().message);
     }
-    if(token===autoToken){autoRunning=false;render()}
-  });
-  el.speed.addEventListener("input",()=>{el.speedOutput.textContent=`${el.speed.value} ms`});
-  setup(el.input.value);
+  }
+
+  async function autoRun() {
+    if (!frames.length && !convertExpression()) return;
+
+    if (frameIndex >= frames.length - 1) {
+      frameIndex = 0;
+      render();
+    }
+
+    tokenId++;
+    const localToken = tokenId;
+    running = true;
+    el.operation.textContent = "Auto Run";
+    setRunning(true);
+
+    try {
+      while (frameIndex < frames.length - 1) {
+        await wait(DELAY);
+        if (localToken !== tokenId) throw new Error("cancelled");
+        frameIndex++;
+        render();
+        setStatus(currentFrame().message);
+      }
+
+      if (localToken !== tokenId) return;
+      running = false;
+      setRunning(false);
+      el.operation.textContent = "Idle";
+      setStatus(`Prefix: ${currentFrame().prefix.join(" ")}`, "success");
+    } catch (error) {
+      if (error?.message !== "cancelled") {
+        running = false;
+        setRunning(false);
+        el.operation.textContent = "Idle";
+        setStatus("Operation stopped.", "error");
+      }
+    }
+  }
+
+  function reset() {
+    tokenId++;
+    running = false;
+    frameIndex = 0;
+    el.operation.textContent = "Idle";
+    setRunning(false);
+    render();
+    setStatus("Simulation reset.");
+  }
+
+  function cancel() {
+    if (!running) return;
+    tokenId++;
+    running = false;
+    setRunning(false);
+    el.operation.textContent = "Idle";
+    render();
+    setStatus("Auto run cancelled.");
+  }
+
+  el.convert.addEventListener("click", () => convertExpression());
+  el.example.addEventListener("click", example);
+  el.prev.addEventListener("click", previous);
+  el.next.addEventListener("click", next);
+  el.auto.addEventListener("click", autoRun);
+  el.reset.addEventListener("click", reset);
+  el.cancel.addEventListener("click", cancel);
+
+  convertExpression("Ready.");
 })();
 </script>
