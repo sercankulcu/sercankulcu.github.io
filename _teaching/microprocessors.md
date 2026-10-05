@@ -12,7 +12,7 @@ location: "Giresun, Turkey"
 Microprocessors execute instructions, process data, and coordinate the operations of modern computing systems. The 8086 architecture provides a useful foundation for studying processor organization, registers, memory access, instruction execution, and low-level programming. The 8086 is an early member of the x86 family. Although modern x86-64 processors are substantially more complex, the 8086 remains useful for introducing registers, segmentation, instruction execution, addressing modes, interrupts, and assembly programming.
 
 ## Ders Öğretim Planı
-- [Ders Öğretim Planı (HTML)](../files/microprocessors/slides/Bolum_00_Ders_Ogretim_Planı.html) · [PDF](../files/microprocessors/slides/Bolum_00_Ders_Ogretim_Planı.pdf)
+- [Ders Öğretim Planı (HTML)](../files/microprocessors/slides/Bolum_00_Ders_Ogretim_Planı.html)
 
 ---
 
@@ -43,8 +43,8 @@ There are currently no announcements.
   [bütünleme (pdf)](../files/microprocessors/slides/2023-2024-microprocessor-butunleme-cevap.pdf)
   
 - **Soru Cevap**  
-  [vize (HTML)](../files/microprocessors/slides/Bolum_12_Soru_Cevap.html) · [PDF](../files/microprocessors/slides/Bolum_12_Soru_Cevap.html) · [PDF](../files/microprocessors/slides/Bolum_12_Soru_Cevap.pdf) |
-  [final (HTML)](../files/microprocessors/slides/Bolum_13_Soru_Cevap.html) · [PDF](../files/microprocessors/slides/Bolum_13_Soru_Cevap.html) · [PDF](../files/microprocessors/slides/Bolum_13_Soru_Cevap.pdf)
+  [vize (pdf)](../files/microprocessors/slides/Bolum_12_Soru_Cevap.pdf) | 
+  [final (pdf)](../files/microprocessors/slides/Bolum_13_Soru_Cevap.pdf)
 
 ---
 
@@ -59,9 +59,9 @@ There are currently no announcements.
 
 This chapter provides a foundational overview of microprocessor basics. It introduces the fundamental concepts of microprocessors and explores the significance of the 8086 architecture in computer systems. The content focuses on essential principles, helping students grasp the core workings of microprocessors.
 
-- [🖼️Sunum - Giriş (HTML)](../files/microprocessors/slides/Bolum_01_Giris.html) · [PDF](../files/microprocessors/slides/Bolum_01_Giris.pdf)
-- [🖼️Sunum - Mimari (HTML)](../files/microprocessors/slides/Bolum_01_8086_Mimarisi.html) · [PDF](../files/microprocessors/slides/Bolum_01_8086_Mimarisi.pdf)
-- [🖼️Sunum - Programlama Dilleri (HTML)](../files/microprocessors/slides/Bolum_01_Programlama_Dilleri.html) · [PDF](../files/microprocessors/slides/Bolum_01_Programlama_Dilleri.pdf)
+- [🖼️Sunum - Giriş (HTML)](../files/microprocessors/slides/Bolum_01_Giris.html)
+- [🖼️Sunum - Mimari (HTML)](../files/microprocessors/slides/Bolum_01_8086_Mimarisi.html)
+- [🖼️Sunum - Programlama Dilleri (HTML)](../files/microprocessors/slides/Bolum_01_Programlama_Dilleri.html)
 
 ---
 
@@ -69,8 +69,8 @@ This chapter provides a foundational overview of microprocessor basics. It intro
 
 Registers are small, high-speed storage locations used during instruction execution. This chapter introduces the general-purpose, segment, pointer, index, and status registers of the 8086. It also examines the processor's external pins, including address, data, control, interrupt, and timing signals.
 
-- [🖼️Sunum - Pinler (HTML)](../files/microprocessors/slides/Bolum_02_8086_Pinler.html) · [PDF](../files/microprocessors/slides/Bolum_02_8086_Pinler.pdf)
-- [🖼️Sunum - Yazmaçlar (HTML)](../files/microprocessors/slides/Bolum_02_8086_Yazmaclar.html) · [PDF](../files/microprocessors/slides/Bolum_02_8086_Yazmaclar.pdf)
+- [🖼️Sunum - Pinler (HTML)](../files/microprocessors/slides/Bolum_02_8086_Pinler.html)
+- [🖼️Sunum - Yazmaçlar (HTML)](../files/microprocessors/slides/Bolum_02_8086_Yazmaclar.html)
 
 ---
 
@@ -79,8 +79,8 @@ Registers are small, high-speed storage locations used during instruction execut
 Understanding numbering systems, which include binary and hexadecimal, is crucial for effectively handling data in microprocessor contexts. At the same time, the section examines the characteristics and importance of assembly language, explaining its role. Assembly language provides symbolic representations of machine instructions,
 registers, memory operands, and control-flow operations. An assembler translates the source code into machine code that the processor can execute.
 
-- [🖼️Sunum - Sayı Sistemleri (HTML)](../files/microprocessors/slides/Bolum_03_Sayi_Sistemleri.html) · [PDF](../files/microprocessors/slides/Bolum_03_Sayi_Sistemleri.pdf)
-- [🖼️Sunum - Assembly Dili (HTML)](../files/microprocessors/slides/Bolum_03_Assembly.html) · [PDF](../files/microprocessors/slides/Bolum_03_Assembly.pdf)
+- [🖼️Sunum - Sayı Sistemleri (HTML)](../files/microprocessors/slides/Bolum_03_Sayi_Sistemleri.html)
+- [🖼️Sunum - Assembly Dili (HTML)](../files/microprocessors/slides/Bolum_03_Assembly.html)
 
 ---
 
@@ -88,8 +88,8 @@ registers, memory operands, and control-flow operations. An assembler translates
 
 Understanding the details of memory access is important, as it dictates how data is stored and retrieved. This chapter examines how the 8086 addresses memory using segment and offset values. It introduces physical address calculation, memory operands, data declarations, variable sizes, and the movement of data between registers and memory.
 
-- [🖼️Sunum - Bellek Erişimi (HTML)](../files/microprocessors/slides/Bolum_04_Bellek_Erisimi.html) · [PDF](../files/microprocessors/slides/Bolum_04_Bellek_Erisimi.pdf)
-- [🖼️Sunum - Değişkenler (HTML)](../files/microprocessors/slides/Bolum_04_Degiskenler.html) · [PDF](../files/microprocessors/slides/Bolum_04_Degiskenler.pdf)
+- [🖼️Sunum - Bellek Erişimi (HTML)](../files/microprocessors/slides/Bolum_04_Bellek_Erisimi.html)
+- [🖼️Sunum - Değişkenler (HTML)](../files/microprocessors/slides/Bolum_04_Degiskenler.html)
 
 ---
 
@@ -97,8 +97,8 @@ Understanding the details of memory access is important, as it dictates how data
 
 Interrupts, as a pivotal mechanism, play a crucial role in managing the flow of execution and responding to external events. This chapter explores the concepts and functionalities associated with interrupts, and it covers common functions encapsulated in the emu8086.inc library.
 
-- [🖼️Sunum - Kesmeler (HTML)](../files/microprocessors/slides/Bolum_05_Kesmeler.html) · [PDF](../files/microprocessors/slides/Bolum_05_Kesmeler.pdf)
-- [🖼️Sunum - Kütüphane (HTML)](../files/microprocessors/slides/Bolum_05_Kutuphane.html) · [PDF](../files/microprocessors/slides/Bolum_05_Kutuphane.pdf)
+- [🖼️Sunum - Kesmeler (HTML)](../files/microprocessors/slides/Bolum_05_Kesmeler.html)
+- [🖼️Sunum - Kütüphane (HTML)](../files/microprocessors/slides/Bolum_05_Kutuphane.html)
 
 ---
 
@@ -106,7 +106,7 @@ Interrupts, as a pivotal mechanism, play a crucial role in managing the flow of 
 
 Arithmetic and logic instructions are essential for performing mathematical operations and logical comparisons. This chapter covers arithmetic, logical, shift, and rotate instructions. It also examines how these operations affect status flags such as Carry, Zero, Sign, Overflow, and Parity, which are later used by conditional jumps.
 
-- [🖼️Sunum - Aritmetik ve Mantıksal İşlemler (HTML)](../files/microprocessors/slides/Bolum_06_Aritmetik_Mantik.html) · [PDF](../files/microprocessors/slides/Bolum_06_Aritmetik_Mantik.pdf)
+- [🖼️Sunum - Aritmetik ve Mantıksal İşlemler (HTML)](../files/microprocessors/slides/Bolum_06_Aritmetik_Mantik.html)
 
 ---
 
@@ -115,8 +115,8 @@ Arithmetic and logic instructions are essential for performing mathematical oper
 Flow control mechanisms determine the sequence of execution within a program. This chapter also introduces procedures, which are modular and reusable code
 blocks that support structured assembly-language programming.
 
-- [🖼️Sunum - Akış Kontrolü (HTML)](../files/microprocessors/slides/Bolum_07_Akis_Kontrol.html) · [PDF](../files/microprocessors/slides/Bolum_07_Akis_Kontrol.pdf)
-- [🖼️Sunum - Prosedürler (HTML)](../files/microprocessors/slides/Bolum_07_Prosedurler.html) · [PDF](../files/microprocessors/slides/Bolum_07_Prosedurler.pdf)
+- [🖼️Sunum - Akış Kontrolü (HTML)](../files/microprocessors/slides/Bolum_07_Akis_Kontrol.html)
+- [🖼️Sunum - Prosedürler (HTML)](../files/microprocessors/slides/Bolum_07_Prosedurler.html)
 
 ---
 
@@ -124,8 +124,8 @@ blocks that support structured assembly-language programming.
 
 The 8086 stack is addressed through the SS and SP registers. It stores return addresses, saved register values, parameters, and temporary data during procedure calls. This chapter covers PUSH, POP, CALL, RET, and stack discipline. Concurrently, macros encapsulate and reuse code blocks efficiently. Unlike procedures, macros are expanded by the assembler at each point of use. This may reduce call overhead but can increase program size.
 
-- [🖼️Sunum - Yığın (HTML)](../files/microprocessors/slides/Bolum_08_Yigin.html) · [PDF](../files/microprocessors/slides/Bolum_08_Yigin.pdf)
-- [🖼️Sunum - Makrolar (HTML)](../files/microprocessors/slides/Bolum_08_Makrolar.html) · [PDF](../files/microprocessors/slides/Bolum_08_Makrolar.pdf)
+- [🖼️Sunum - Yığın (HTML)](../files/microprocessors/slides/Bolum_08_Yigin.html)
+- [🖼️Sunum - Makrolar (HTML)](../files/microprocessors/slides/Bolum_08_Makrolar.html)
 
 ---
 
@@ -133,7 +133,7 @@ The 8086 stack is addressed through the SS and SP registers. It stores return ad
 
 This chapter introduces input/output ports and the IN and OUT instructions. It examines how assembly programs communicate with external devices and how device status, control, and data registers are accessed.
 
-- [🖼️Sunum - Aygıt Kontrolü (HTML)](../files/microprocessors/slides/Bolum_09_Aygit_Kontrolu.html) · [PDF](../files/microprocessors/slides/Bolum_09_Aygit_Kontrolu.pdf)
+- [🖼️Sunum - Aygıt Kontrolü (HTML)](../files/microprocessors/slides/Bolum_09_Aygit_Kontrolu.html)
 
 ---
 
@@ -141,7 +141,7 @@ This chapter introduces input/output ports and the IN and OUT instructions. It e
 
 The 8086 instruction set defines the operations the microprocessor can execute, covering their classifications, formats, and practical applications.
 
-- [🖼️Sunum - Komut Kümesi (HTML)](../files/microprocessors/slides/Bolum_10_Komut_Kumesi.html) · [PDF](../files/microprocessors/slides/Bolum_10_Komut_Kumesi.pdf)
+- [🖼️Sunum - Komut Kümesi (HTML)](../files/microprocessors/slides/Bolum_10_Komut_Kumesi.html)
 
 ---
 
@@ -149,4 +149,4 @@ The 8086 instruction set defines the operations the microprocessor can execute, 
 
 This chapter covers BIOS and DOS interrupt services, their register parameters, character and string output, keyboard input, and program termination. These services are provided by system software through the 8086 interrupt mechanism.
 
-- [🖼️Sunum - Kesme Fonksiyonları (HTML)](../files/microprocessors/slides/Bolum_11_Kesme_Fonksiyonlari.html) · [PDF](../files/microprocessors/slides/Bolum_11_Kesme_Fonksiyonlari.pdf)
+- [🖼️Sunum - Kesme Fonksiyonları (HTML)](../files/microprocessors/slides/Bolum_11_Kesme_Fonksiyonlari.html)

@@ -1,0 +1,638 @@
+---
+layout: without-sidebar
+title: "Bölüm 8: Makrolar"
+permalink: /files/microprocessors/slides/Bolum_08_Makrolar.html
+excerpt: "Mikroişlemciler dersi Bölüm 8 sunumu: makro tanımlama ve genişletme, parametreler, makro ile prosedür karşılaştırması, LOCAL yönergesi, PUTC ve POWER makroları, emu8086.inc kütüphanesi."
+---
+
+<link rel="stylesheet" href="deck/deck.css">
+<style>
+
+.ds-deck .ds-svg .mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-deck .ds-deck__card strong { display: inline; margin: 0; font-size: inherit; }
+.ds-deck .ds-deck__card > strong:first-child { display: block; margin-bottom: 3px; font-size: 17px; }
+.ds-deck .ds-deck__step > svg.ds-svg { display: block; margin: 0 auto; height: auto; }
+.ds-deck .ds-trace.m-side { grid-template-columns: minmax(0, var(--m-cw, 300px)) minmax(0, 1fr); column-gap: 14px; row-gap: 6px; }
+.ds-deck .m-side > .ds-deck__steps { grid-column: 2; grid-row: 1; }
+.ds-deck .m-side > pre.ds-trace__code { grid-column: 1; grid-row: 1 / span 2; }
+.ds-deck .m-side > .ds-trace__col { grid-column: 2; grid-row: 2; }
+.ds-deck .m-side .ds-deck__stepnote { min-height: 42px; margin-top: 2px; font-size: 15px; line-height: 1.35; }
+.ds-deck .m-side .ds-deck__stepnav { margin-top: 2px; }
+.ds-deck .m08-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+.ds-deck .m08-cols pre { font-size: 14px; }
+.ds-deck .m08-stk { display: flex; flex-direction: column-reverse; width: 132px; min-height: 186px; padding: 3px; border: 2px solid var(--ds-link); border-top: 0; border-radius: 0 0 8px 8px; gap: 3px; }
+.ds-deck .m08-stk span { display: block; padding: 3px 0; border: 1.5px solid var(--ds-link); border-radius: 4px; background: var(--ds-node); text-align: center; font: 600 14px ui-monospace, Consolas, monospace; }
+.ds-deck .m08-stk span.is-top { background: var(--ds-hot); }
+.ds-deck .m08-regs { display: grid; grid-template-columns: auto auto; gap: 6px 10px; align-items: center; font: 600 15px ui-monospace, Consolas, monospace; }
+.ds-deck .m08-regs input { width: 86px; padding: 3px 6px; border: 1.5px solid var(--ds-border); border-radius: 6px; background: var(--ds-bg); color: var(--ds-text); font: inherit; }
+.ds-deck .m08-demo { display: grid; grid-template-columns: 190px 170px 1fr; gap: 16px; align-items: start; }
+.ds-deck .m08-demo .ds-deck__ops { justify-content: flex-start; }
+.ds-deck .m08-log { max-height: 210px; overflow: hidden; font: 13.5px ui-monospace, Consolas, monospace; color: var(--ds-muted); }
+
+.ds-deck .m08-mx { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+.ds-deck .m08-mx pre { font-size: 13.5px; min-height: 150px; }
+.ds-deck .m08-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 15px; }
+.ds-deck .m08-form input, .ds-deck .m08-form select { width: 74px; padding: 3px 6px; border: 1.5px solid var(--ds-border); border-radius: 6px; background: var(--ds-bg); color: var(--ds-text); font: 14px ui-monospace, Consolas, monospace; }
+.ds-deck .m08-form select { width: auto; }
+.ds-deck .m08-exp .ds-deck__step pre { font-size: 14px; }
+.ds-deck .m08-exp .hl { background: var(--ds-hot); border-radius: 3px; }
+
+</style>
+
+<div class="ds-deck" id="ds-deck" lang="tr">
+  <div class="ds-deck__screen" id="ds-deck-screen" tabindex="0" aria-roledescription="sunum" aria-label="Bölüm 8: Makrolar sunumu">
+    <div class="ds-deck__stage" id="ds-deck-stage">
+      <div class="ds-deck__progress" aria-hidden="true"><span id="ds-deck-progress"></span></div>
+
+      <div class="ds-deck__viewport" aria-live="polite">
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="Bölüm 8: Makrolar" data-section="">
+<h1>Bölüm 8: Makrolar</h1>
+<div class="ds-deck__subtitle">Mikroişlemciler</div>
+<div class="ds-deck__agenda" aria-label="Bölüm içeriği"><span>Makro kavramı</span><span>MACRO / ENDM</span><span>Genişletme</span><span>Parametre tuzakları</span><span>Makro ve prosedür</span><span>Boyut hesabı</span><span>LOCAL</span><span>PUTC</span><span>POWER</span><span>emu8086.inc</span></div>
+<small>Sercan KÜLCÜ · Giresun Üniversitesi · Elektrik-Elektronik Mühendisliği</small>
+</section>
+<section class="ds-deck__slide" data-title="Öğrenme Çıktıları" data-section="Giriş">
+<p class="ds-deck__kicker">Giriş</p>
+<h2>Öğrenme Çıktıları</h2>
+<div class="ds-deck__grid ds-deck__grid--2">
+<div class="ds-deck__card"><strong>Makro tanımı</strong><p><code>MACRO</code> / <code>ENDM</code> ile parametreli makro yazmak.</p></div>
+<div class="ds-deck__card"><strong>Genişletme</strong><p>Derleyicinin makro çağrısını nasıl metin olarak açtığını izlemek.</p></div>
+<div class="ds-deck__card"><strong>Makro mu, prosedür mü?</strong><p>Boyut, hız ve kullanım açısından iki yöntemi karşılaştırıp doğru olanı seçmek.</p></div>
+<div class="ds-deck__card"><strong>LOCAL</strong><p>Etiket içeren makrolarda <i>Duplicate declaration</i> hatasını önlemek.</p></div>
+<div class="ds-deck__card"><strong>Uygulama</strong><p>PUTC (ekrana karakter) ve POWER (üs alma) makrolarını adım adım çalıştırmak.</p></div>
+<div class="ds-deck__card"><strong>Tuzaklar</strong><p>Parametre yan etkileri, yazmaç bozulması ve sınır durumlarını fark etmek.</p></div>
+</div>
+</section>
+<section class="ds-deck__slide" data-title="Makrolar" data-section="Makro Kavramı">
+<p class="ds-deck__kicker">Makro Kavramı</p>
+<h2>Makrolar</h2>
+<div class="ds-deck__two ds-deck__two--wide-left ds-deck__two--center">
+<ul class="ds-deck__small">
+<li>Makrolar <b>prosedürlere benzer</b>: tekrar eden bir kod parçasına ad verir.</li>
+<li>Ancak çalışma zamanında çağrılmazlar; <b>derleme aşamasında</b> gerçek komutlarla değiştirilen geçici yapılardır.</li>
+<li>Kod içinde kullanılmayan makrolar görmezden gelinir: makine koduna hiçbir bayt eklemezler.</li>
+<li>Makrolar, prosedürlerden farklı olarak, <b>kullanıldıkları kodun üzerinde</b> (önce) tanımlanmalıdır; derleyici makroyu tanımadan çağrıyı açamaz.</li>
+</ul>
+<svg class="ds-svg" viewBox="0 0 360 226" role="img" aria-label="Makro çağrısı derleyicide gerçek komutlara açılır" style="max-width:340px"><defs><marker id="m8ah130" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="20" width="130" height="60" rx="6"/><text class="txt" x="75" y="46" text-anchor="middle">Kaynak kod</text><text class="lbl mono" x="75" y="66" text-anchor="middle">PUTC 'A'</text><path class="line" d="M144 50 H186" marker-end="url(#m8ah130)"/><rect class="box" x="190" y="20" width="130" height="60" rx="6" style="fill:var(--ds-hot)"/><text class="txt" x="255" y="46" text-anchor="middle">Derleyici</text><text class="lbl" x="255" y="66" text-anchor="middle">makroyu açar</text><path class="line" d="M255 84 V116" marker-end="url(#m8ah130)"/><rect class="box" x="160" y="120" width="190" height="96" rx="6"/><text class="lbl mono" x="172" y="142">push ax</text><text class="lbl mono" x="172" y="160">mov al, 'A'</text><text class="lbl mono" x="172" y="178">mov ah, 0Eh</text><text class="lbl mono" x="172" y="196">int 10h / pop ax</text><text class="lbl" x="10" y="160">makine kodu</text><text class="lbl" x="10" y="178">(çağrı yok)</text></svg>
+</div>
+</section>
+<section class="ds-deck__slide" data-title="Makro Tanımlama" data-section="Makro Kavramı">
+<p class="ds-deck__kicker">Makro Kavramı</p>
+<h2>Makro Tanımlama</h2>
+<pre style="font-size:18px;width:460px;margin:0 auto">name    <span class="kw">MACRO</span>  [parametreler,...]
+        &lt;komutlar&gt;
+        <span class="kw">ENDM</span></pre>
+<div class="ds-deck__grid ds-deck__grid--3" style="margin-top:14px">
+<div class="ds-deck__card"><strong>name</strong>Makronun adı; çağırırken komut gibi yazılır.</div>
+<div class="ds-deck__card"><strong>parametreler</strong>Virgülle ayrılmış biçimsel adlar (isteğe bağlı). Çağrıdaki değerler bunların <b>yerine metin olarak</b> konur.</div>
+<div class="ds-deck__card"><strong>ENDM</strong>Makro gövdesini bitirir. Prosedürdeki gibi ad tekrar yazılmaz.</div>
+</div>
+<div class="ds-deck__callout" style="margin-top:12px">Parametreler yazmaç, bellek ya da sabit olabilir: derleyici yalnızca metni değiştirir; sonuçta oluşan komutun geçerli olup olmadığına <b>genişletmeden sonra</b> bakılır.</div>
+</section>
+<section class="ds-deck__slide" data-title="Makro Genişletme" data-section="Makro Kavramı">
+<p class="ds-deck__kicker">Makro Kavramı</p>
+<h2>Makro Genişletme Adım Adım</h2>
+<div class="m08-exp"><div class="ds-deck__steps">
+<div class="ds-deck__step"><pre>MyMacro  <span class="kw">MACRO</span>  p1, p2, p3
+         <span class="kw">MOV</span> AX, p1
+         <span class="kw">MOV</span> BX, p2
+         <span class="kw">MOV</span> CX, p3
+<span class="kw">ENDM</span></pre><p class="ds-deck__stepnote">Önce <b>tanım</b>: derleyici MyMacro'yu ve p1, p2, p3 parametrelerini öğrenir; henüz kod üretmez.</p></div>
+<div class="ds-deck__step"><div class="m08-mx"><pre><span class="kw">MyMacro 1, 2, 3</span></pre><pre><span class="cm">MOV AX, p1</span>
+<span class="cm">MOV BX, p2</span>
+<span class="cm">MOV CX, p3</span></pre></div><p class="ds-deck__stepnote"><code>MyMacro 1, 2, 3</code>: p1 = 1, p2 = 2, p3 = 3.</p></div>
+<div class="ds-deck__step"><div class="m08-mx"><pre><span class="kw">MyMacro 1, 2, 3</span></pre><pre>MOV AX, <span class="hl">1</span>
+<span class="cm">MOV BX, p2</span>
+<span class="cm">MOV CX, p3</span></pre></div><p class="ds-deck__stepnote">1. satır: <code>MOV AX, p1</code> → <code>MOV AX, 1</code>.</p></div>
+<div class="ds-deck__step"><div class="m08-mx"><pre><span class="kw">MyMacro 1, 2, 3</span></pre><pre>MOV AX, <span class="hl">1</span>
+MOV BX, <span class="hl">2</span>
+<span class="cm">MOV CX, p3</span></pre></div><p class="ds-deck__stepnote">2. satır: <code>MOV BX, p2</code> → <code>MOV BX, 2</code>.</p></div>
+<div class="ds-deck__step"><div class="m08-mx"><pre><span class="kw">MyMacro 1, 2, 3</span></pre><pre>MOV AX, <span class="hl">1</span>
+MOV BX, <span class="hl">2</span>
+MOV CX, <span class="hl">3</span></pre></div><p class="ds-deck__stepnote">3. satır: <code>MOV CX, p3</code> → <code>MOV CX, 3</code>.</p></div>
+<div class="ds-deck__step"><div class="m08-mx"><pre><span class="kw">MyMacro 4, 5, DX</span></pre><pre><span class="cm">MOV AX, p1</span>
+<span class="cm">MOV BX, p2</span>
+<span class="cm">MOV CX, p3</span></pre></div><p class="ds-deck__stepnote"><code>MyMacro 4, 5, DX</code>: p1 = 4, p2 = 5, p3 = DX.</p></div>
+<div class="ds-deck__step"><div class="m08-mx"><pre><span class="kw">MyMacro 4, 5, DX</span></pre><pre>MOV AX, <span class="hl">4</span>
+<span class="cm">MOV BX, p2</span>
+<span class="cm">MOV CX, p3</span></pre></div><p class="ds-deck__stepnote">1. satır: <code>MOV AX, p1</code> → <code>MOV AX, 4</code>.</p></div>
+<div class="ds-deck__step"><div class="m08-mx"><pre><span class="kw">MyMacro 4, 5, DX</span></pre><pre>MOV AX, <span class="hl">4</span>
+MOV BX, <span class="hl">5</span>
+<span class="cm">MOV CX, p3</span></pre></div><p class="ds-deck__stepnote">2. satır: <code>MOV BX, p2</code> → <code>MOV BX, 5</code>.</p></div>
+<div class="ds-deck__step"><div class="m08-mx"><pre><span class="kw">MyMacro 4, 5, DX</span></pre><pre>MOV AX, <span class="hl">4</span>
+MOV BX, <span class="hl">5</span>
+MOV CX, <span class="hl">DX</span></pre></div><p class="ds-deck__stepnote">3. satır: <code>MOV CX, p3</code> → <code>MOV CX, DX</code>.</p></div>
+<div class="ds-deck__step"><pre><span class="kw">MOV</span> AX, 00001h
+<span class="kw">MOV</span> BX, 00002h
+<span class="kw">MOV</span> CX, 00003h
+<span class="kw">MOV</span> AX, 00004h
+<span class="kw">MOV</span> BX, 00005h
+<span class="kw">MOV</span> CX, DX
+<span class="kw">RET</span></pre><p class="ds-deck__stepnote">Sonuç (emu8086'nın gösterdiği gibi): iki çağrı <b>6 komuta</b> açıldı. Sabitler hex olarak gösterilir.</p></div>
+</div></div>
+</section>
+<section class="ds-deck__slide" data-title="MyMacro Çalışırken" data-section="Makro Kavramı">
+<p class="ds-deck__kicker">Makro Kavramı · Kodu adım adım çalıştır</p>
+<h2>Açılmış Kodu Çalıştırmak</h2>
+<div class="ds-trace m-side" style="--m-cw:330px">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="1" data-vars="AX=0000h; BX=0000h; CX=0012h; DX=0000h; SP=FFFEh"><p class="ds-deck__stepnote">Yükleme sonrası CX = <b>0012h</b>: programın boyutu 5 × 3 + 2 + 1 = 18 bayt. SP = FFFEh.</p></div>
+<div class="ds-deck__step" data-line="2" data-vars="AX=0001h; BX=0000h; CX=0012h; DX=0000h; SP=FFFEh"><p class="ds-deck__stepnote">AX = 0001h.</p></div>
+<div class="ds-deck__step" data-line="3" data-vars="AX=0001h; BX=0002h; CX=0012h; DX=0000h; SP=FFFEh"><p class="ds-deck__stepnote">BX = 0002h.</p></div>
+<div class="ds-deck__step" data-line="4" data-vars="AX=0001h; BX=0002h; CX=0003h; DX=0000h; SP=FFFEh"><p class="ds-deck__stepnote">CX = 0003h. Birinci çağrı bitti; hiçbir CALL/RET yok.</p></div>
+<div class="ds-deck__step" data-line="5" data-vars="AX=0004h; BX=0002h; CX=0003h; DX=0000h; SP=FFFEh"><p class="ds-deck__stepnote">AX = 0004h.</p></div>
+<div class="ds-deck__step" data-line="6" data-vars="AX=0004h; BX=0005h; CX=0003h; DX=0000h; SP=FFFEh"><p class="ds-deck__stepnote">BX = 0005h.</p></div>
+<div class="ds-deck__step" data-line="7" data-vars="AX=0004h; BX=0005h; CX=0000h; DX=0000h; SP=FFFEh"><p class="ds-deck__stepnote">CX ← DX = 0000h (DX başlangıçta sıfır).</p></div>
+<div class="ds-deck__step" data-line="8" data-vars="AX=0004h; BX=0005h; CX=0000h; DX=0000h; SP=0000h"><p class="ds-deck__stepnote">RET: program biter.</p></div>
+</div>
+<pre class="ds-trace__code"><span class="kw">ORG</span> 100h
+<span class="kw">MOV</span> AX, 00001h   <span class="cm">; MyMacro 1, 2, 3</span>
+<span class="kw">MOV</span> BX, 00002h
+<span class="kw">MOV</span> CX, 00003h
+<span class="kw">MOV</span> AX, 00004h   <span class="cm">; MyMacro 4, 5, DX</span>
+<span class="kw">MOV</span> BX, 00005h
+<span class="kw">MOV</span> CX, DX
+<span class="kw">RET</span></pre>
+<div class="ds-trace__col"><div class="ds-trace__vars"></div></div>
+</div><p class="ds-deck__foot">SP hiç değişmedi: makro yığın kullanmaz (gövdesinde PUSH/POP yoksa). Prosedürde CALL/RET SP'yi değiştirirdi.</p>
+</section>
+<section class="ds-deck__slide" data-title="Parametre Tuzağı" data-section="Makro Kavramı">
+<p class="ds-deck__kicker">Makro Kavramı · Kodu adım adım çalıştır</p>
+<h2>Tuzak: Parametreler Metindir</h2>
+<div class="ds-trace m-side" style="--m-cw:330px">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="1" data-vars="AX=0000h; BX=0000h; CX=0000h"><p class="ds-deck__stepnote"><code>MyMacro BX, AX, 0</code> çağrısının amacı: AX ← BX, BX ← AX (takas) sanılıyor.</p></div>
+<div class="ds-deck__step" data-line="2" data-vars="AX=1111h; BX=0000h; CX=0000h"><p class="ds-deck__stepnote">AX = 1111h.</p></div>
+<div class="ds-deck__step" data-line="3" data-vars="AX=1111h; BX=2222h; CX=0000h"><p class="ds-deck__stepnote">BX = 2222h.</p></div>
+<div class="ds-deck__step" data-line="4" data-vars="AX=2222h; BX=2222h; CX=0000h"><p class="ds-deck__stepnote">Makronun 1. satırı: <code>MOV AX, p1</code> → <code>MOV AX, BX</code> → AX = 2222h.</p></div>
+<div class="ds-deck__step" data-line="5" data-vars="AX=2222h; BX=2222h; CX=0000h"><p class="ds-deck__stepnote">2. satır: <code>MOV BX, AX</code>. Programcı “eski AX” (1111h) bekliyordu ama AX bir önceki satırda değişti → BX = <b>2222h</b>.</p></div>
+<div class="ds-deck__step" data-line="6" data-vars="AX=2222h; BX=2222h; CX=0000h"><p class="ds-deck__stepnote">CX = 0.</p></div>
+<div class="ds-deck__step" data-line="7" data-vars="AX=2222h; BX=2222h; CX=0000h"><p class="ds-deck__stepnote">Sonuç: AX = BX = 2222h. 1111h kayboldu.</p></div>
+</div>
+<pre class="ds-trace__code"><span class="kw">ORG</span> 100h
+<span class="kw">MOV</span>  AX, 1111h
+<span class="kw">MOV</span>  BX, 2222h
+<span class="kw">MOV</span>  AX, BX  <span class="cm">; MyMacro BX,AX,0</span>
+<span class="kw">MOV</span>  BX, AX  <span class="cm">; p2 = AX (bozuk!)</span>
+<span class="kw">MOV</span>  CX, 0
+<span class="kw">RET</span></pre>
+<div class="ds-trace__col"><div class="ds-trace__vars"></div></div>
+</div><p class="ds-deck__foot">Makro parametresi bir değişken değil, yerine konan bir metindir: değeri, kullanıldığı satırda okunur. Makro gövdesinin değiştirdiği yazmaçları parametre olarak geçirmeyin.</p>
+</section>
+<section class="ds-deck__slide" data-title="Makro Genişletici" data-section="Makro Kavramı">
+<p class="ds-deck__kicker">Makro Kavramı</p>
+<h2>Etkileşimli Makro Genişletici</h2>
+<div class="ds-deck__demo" data-demo="m08-macro" style="align-items:stretch">
+<div class="m08-form">
+<label>Makro <select data-k="macro"><option value="my">MyMacro p1, p2, p3</option><option value="putc">PUTC char</option><option value="power">POWER b, e, r</option></select></label>
+<label>1. <input data-k="a1" value="1"></label><label>2. <input data-k="a2" value="2"></label><label>3. <input data-k="a3" value="3"></label>
+<label>kullanım sayısı <input data-k="n" value="1" type="number" min="1" max="200" style="width:64px"></label>
+</div>
+<div class="m08-mx"><div><div class="ds-deck__small"><b>Çağrı</b></div><pre data-o="call"></pre></div><div><div class="ds-deck__small"><b>Derleyicinin ürettiği kod</b></div><pre data-o="exp"></pre></div></div>
+<div class="ds-deck__status" aria-live="polite"></div>
+</div>
+<p class="ds-deck__foot">Boyut karşılaştırması: aynı gövde bir prosedür olsaydı gövde + RET bir kez yazılır, her kullanım yalnızca 3 baytlık bir CALL olurdu.</p>
+</section>
+<section class="ds-deck__slide" data-title="Prosedür Özellikleri" data-section="Makro ve Prosedür">
+<p class="ds-deck__kicker">Makro ve Prosedür</p>
+<h2>Prosedür Özellikleri</h2>
+<div class="ds-deck__two ds-deck__two--wide-left">
+<ul class="ds-deck__small">
+<li>Prosedür <code>CALL</code> komutu ile çağrılır.</li>
+<li>Prosedür belleğin belirli bir adresinde <b>tek kopya</b> olarak bulunur.</li>
+<li>Çağrıldığında CPU kontrolü bu bölgeye aktarır; <code>RET</code> ile kontrol programın ana kısmına geri döner.</li>
+<li>Dönüş adresini saklamak için <b>yığın</b> kullanılır.</li>
+<li>Aynı prosedür 100 kez çağrılırsa dosya boyutu çok az artar: yakın <code>CALL</code> komutu yalnızca <b>3 bayt</b> yer kaplar.</li>
+<li>Parametre geçirmek için yığın veya yazmaçlar kullanılır.</li>
+<li>Prosedür, adı ve <code>ENDP</code> yönergesiyle sonlandırılır.</li>
+</ul>
+<pre>YAZ_A <span class="kw">PROC</span>
+      <span class="kw">PUSH</span> AX
+      <span class="kw">MOV</span>  AL, 'A'
+      <span class="kw">MOV</span>  AH, 0Eh
+      <span class="kw">INT</span>  10h
+      <span class="kw">POP</span>  AX
+      <span class="kw">RET</span>
+YAZ_A <span class="kw">ENDP</span>
+
+      <span class="kw">CALL</span> YAZ_A  <span class="cm">; 3 bayt</span>
+      <span class="kw">CALL</span> YAZ_A  <span class="cm">; 3 bayt</span></pre>
+</div>
+</section>
+<section class="ds-deck__slide" data-title="Makro Özellikleri" data-section="Makro ve Prosedür">
+<p class="ds-deck__kicker">Makro ve Prosedür</p>
+<h2>Makro Özellikleri</h2>
+<div class="ds-deck__two ds-deck__two--wide-left">
+<ul class="ds-deck__small">
+<li>Makro sadece <b>adı yazılarak</b> kullanılır (CALL yok).</li>
+<li>Makrolar program kodunda <b>doğrudan genişletilir</b>.</li>
+<li>Aynı makro 100 kez kullanılırsa derleyici makroyu 100 kez genişletir; yürütülebilir dosyanın boyutu giderek büyür.</li>
+<li>Parametre geçirmek için makro adının ardından değerler yazılır.</li>
+<li>Makroyu sonlandırmak için <code>ENDM</code> yönergesi yeterlidir.</li>
+<li>Makro tanımında etiketler varsa ve makro birden fazla kez kullanılırsa <b>Duplicate declaration</b> hatası alınabilir; değişken, etiket ve prosedür adları için <code>LOCAL</code> yönergesi kullanılır.</li>
+</ul>
+<pre>PUTC <span class="kw">MACRO</span> char
+     <span class="kw">PUSH</span> AX
+     <span class="kw">MOV</span>  AL, char
+     <span class="kw">MOV</span>  AH, 0Eh
+     <span class="kw">INT</span>  10h
+     <span class="kw">POP</span>  AX
+<span class="kw">ENDM</span>
+
+     PUTC 'A'  <span class="cm">; 8 bayt</span>
+     PUTC 'B'  <span class="cm">; 8 bayt</span></pre>
+</div>
+</section>
+<section class="ds-deck__slide" data-title="Karşılaştırma" data-section="Makro ve Prosedür">
+<p class="ds-deck__kicker">Makro ve Prosedür</p>
+<h2>Makro mu, Prosedür mü?</h2>
+<table class="ds-deck__table ds-deck__small">
+<thead><tr><th>Ölçüt</th><th>Makro</th><th>Prosedür</th></tr></thead>
+<tbody>
+<tr><td>Ne zaman işlenir?</td><td>Derleme zamanı (metin değiştirme)</td><td>Çalışma zamanı (CALL/RET)</td></tr>
+<tr><td>Kullanım</td><td><code>PUTC 'A'</code></td><td><code>CALL YAZ_A</code></td></tr>
+<tr><td>Kod boyutu</td><td>Her kullanımda gövde kadar artar</td><td>Gövde 1 kez + her çağrı 3 bayt</td></tr>
+<tr><td>Hız</td><td>Daha hızlı (CALL/RET ve yığın erişimi yok)</td><td>Her çağrıda CALL + RET maliyeti</td></tr>
+<tr><td>Parametre</td><td>Ad sonrası değerler, metin olarak</td><td>Yazmaç ya da yığın</td></tr>
+<tr><td>Yığın</td><td>Kullanmaz (gövde kullanmadıkça)</td><td>Dönüş adresi için kullanır</td></tr>
+<tr><td>Tanım yeri</td><td>Kullanımdan <b>önce</b></td><td>Herhangi bir yerde</td></tr>
+<tr><td>Bitiş</td><td><code>ENDM</code></td><td><code>ad ENDP</code></td></tr>
+<tr><td>Etiketler</td><td><code>LOCAL</code> gerekir</td><td>Sorun yok (tek kopya)</td></tr>
+</tbody></table>
+<p class="ds-deck__foot">Kural: kısa ve sık kullanılan, hız gerektiren kod → makro; uzun ve çok yerde kullanılan kod → prosedür. İkisi birlikte de kullanılabilir: makro, parametreleri yazmaçlara koyup bir prosedürü çağırabilir.</p>
+</section>
+<section class="ds-deck__slide" data-title="Boyut Hesabı" data-section="Makro ve Prosedür">
+<p class="ds-deck__kicker">Makro ve Prosedür</p>
+<h2>Boyut Hesabı: 1, 10 ve 100 Kullanım</h2>
+<div class="ds-deck__steps">
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 680 190" role="img" aria-label="Makro ve prosedür kod boyutu" style="max-width:680px"><defs><marker id="m8ah131" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="10" y="16">Kod boyutu (bayt) · PUTC gövdesi 8 bayt; prosedür = aynı 8 bayt + RET (1 bayt)</text><text class="txt" x="10" y="56">1 kullanım</text><rect class="box" x="110" y="30" width="4" height="20" rx="2" style="fill:var(--ds-hot)"/><text class="lbl" x="120" y="45">makro: 1 × 8 = 8</text><rect class="box" x="110" y="54" width="6" height="20" rx="2"/><text class="lbl" x="122" y="69">prosedür: 9 + 1 × 3 = 12</text></svg><p class="ds-deck__stepnote">1 kullanım: makro 8 bayt; prosedür 8 bayt gövde + 1 bayt RET + 3 bayt CALL = 12 bayt. Burada makro <b>daha küçük</b>.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 680 190" role="img" aria-label="Makro ve prosedür kod boyutu" style="max-width:680px"><defs><marker id="m8ah132" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="10" y="16">Kod boyutu (bayt) · PUTC gövdesi 8 bayt; prosedür = aynı 8 bayt + RET (1 bayt)</text><text class="txt" x="10" y="56">1 kullanım</text><rect class="box" x="110" y="30" width="4" height="20" rx="2" style="fill:var(--ds-hot)"/><text class="lbl" x="120" y="45">makro: 1 × 8 = 8</text><rect class="box" x="110" y="54" width="6" height="20" rx="2"/><text class="lbl" x="122" y="69">prosedür: 9 + 1 × 3 = 12</text><text class="txt" x="10" y="108">10 kullanım</text><rect class="box" x="110" y="82" width="40" height="20" rx="2" style="fill:var(--ds-hot)"/><text class="lbl" x="156" y="97">makro: 10 × 8 = 80</text><rect class="box" x="110" y="106" width="20" height="20" rx="2"/><text class="lbl" x="136" y="121">prosedür: 9 + 10 × 3 = 39</text></svg><p class="ds-deck__stepnote">10 kullanım: makro 80 bayt; prosedür 9 + 30 = 39 bayt.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 680 190" role="img" aria-label="Makro ve prosedür kod boyutu" style="max-width:680px"><defs><marker id="m8ah133" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="lbl" x="10" y="16">Kod boyutu (bayt) · PUTC gövdesi 8 bayt; prosedür = aynı 8 bayt + RET (1 bayt)</text><text class="txt" x="10" y="56">1 kullanım</text><rect class="box" x="110" y="30" width="4" height="20" rx="2" style="fill:var(--ds-hot)"/><text class="lbl" x="120" y="45">makro: 1 × 8 = 8</text><rect class="box" x="110" y="54" width="6" height="20" rx="2"/><text class="lbl" x="122" y="69">prosedür: 9 + 1 × 3 = 12</text><text class="txt" x="10" y="108">10 kullanım</text><rect class="box" x="110" y="82" width="40" height="20" rx="2" style="fill:var(--ds-hot)"/><text class="lbl" x="156" y="97">makro: 10 × 8 = 80</text><rect class="box" x="110" y="106" width="20" height="20" rx="2"/><text class="lbl" x="136" y="121">prosedür: 9 + 10 × 3 = 39</text><text class="txt" x="10" y="160">100 kullanım</text><rect class="box" x="110" y="134" width="400" height="20" rx="2" style="fill:var(--ds-hot)"/><text class="lbl" x="516" y="149">makro: 100 × 8 = 800</text><rect class="box" x="110" y="158" width="154" height="20" rx="2"/><text class="lbl" x="270" y="173">prosedür: 9 + 100 × 3 = 309</text></svg><p class="ds-deck__stepnote">100 kullanım: makro 800 bayt; prosedür 9 + 300 = 309 bayt. Fark kullanım sayısıyla büyür.</p></div>
+</div><div class="ds-deck__callout" style="margin-top:8px">Hız tarafında tersi geçerlidir: her CALL + RET çifti 8086'da yaklaşık 19 + 8 = 27 saat çevrimi ve iki yığın erişimi ekler. Makroda bu maliyet yoktur.</div>
+</section>
+<section class="ds-deck__slide" data-title="Karar Alıştırması" data-section="Makro ve Prosedür">
+<p class="ds-deck__kicker">Makro ve Prosedür</p>
+<h2>Karar Alıştırması: Makro mu, Prosedür mü?</h2>
+<div class="ds-deck__steps" data-mode="build">
+<div class="ds-deck__step"><p class="ds-deck__stepnote">Her durum için makro mu, prosedür mü seçerdiniz? ›  ile cevapları açın.</p></div>
+<div class="ds-deck__step"><p class="ds-deck__stepnote"><b>1. Ekrana tek karakter yazmak, 200 yerde</b> → kısa gövde (8 bayt) ama 200 kopya = 1600 bayt. Prosedür 9 + 600 = 609 bayt. Boyut önemliyse <b>prosedür</b>; hız önemliyse makro.</p></div>
+<div class="ds-deck__step"><p class="ds-deck__stepnote"><b>2. İki yazmacı takas eden 1 satırlık iş</b> → <code>XCHG</code> zaten tek komut; makro okunabilirlik için yeterli, prosedür gereksiz yük (<b>makro</b>).</p></div>
+<div class="ds-deck__step"><p class="ds-deck__stepnote"><b>3. 300 baytlık sıralama algoritması, 3 yerde</b> → makro 900 bayt, prosedür 300 + 9 bayt: açıkça <b>prosedür</b>.</p></div>
+<div class="ds-deck__step"><p class="ds-deck__stepnote"><b>4. Sıkı bir döngü içinde her turda yapılan 2 komutluk iş</b> → CALL/RET maliyeti işin kendisinden büyük: <b>makro</b>.</p></div>
+<div class="ds-deck__step"><p class="ds-deck__stepnote"><b>5. Parametreleri yazmaçlara koyup ortak kodu çağırmak</b> → ikisi birlikte: makro <code>YAZ_SAYI x</code> → <code>MOV AX, x</code> + <code>CALL print_num</code> (emu8086.inc de böyle çalışır).</p></div>
+</div>
+</section>
+<section class="ds-deck__slide" data-title="Etiket Sorunu" data-section="Etiketler ve LOCAL">
+<p class="ds-deck__kicker">Etiketler ve LOCAL</p>
+<h2>Etiket İçeren Makrolar: Sorun</h2>
+<div class="ds-deck__two">
+<div><p class="ds-deck__small">Gövdesinde etiket olan bir makro iki kez kullanılırsa, genişletme sonucu aynı etiket <b>iki kez</b> tanımlanmış olur:</p>
+<pre>BEKLE <span class="kw">MACRO</span>
+ilk:  <span class="kw">DEC</span> CX
+      <span class="kw">JNZ</span> ilk
+<span class="kw">ENDM</span>
+
+<span class="kw">MOV</span> CX, 5
+BEKLE
+<span class="kw">MOV</span> CX, 9
+BEKLE</pre></div>
+<div><p class="ds-deck__small">Derleyicinin gördüğü:</p>
+<pre><span class="kw">MOV</span> CX, 5
+ilk:  <span class="kw">DEC</span> CX    <span class="cm">; 1. kopya</span>
+      <span class="kw">JNZ</span> ilk
+<span class="kw">MOV</span> CX, 9
+ilk:  <span class="kw">DEC</span> CX    <span class="cm">; 2. kopya !</span>
+      <span class="kw">JNZ</span> ilk</pre>
+<div class="ds-deck__callout" style="margin-top:8px">emu8086: <b>Duplicate declaration</b> hatası. Hangi <code>ilk:</code>'e atlanacağı belirsizdir.</div></div>
+</div>
+</section>
+<section class="ds-deck__slide" data-title="LOCAL Yönergesi" data-section="Etiketler ve LOCAL">
+<p class="ds-deck__kicker">Etiketler ve LOCAL</p>
+<h2>Çözüm: LOCAL Yönergesi</h2>
+<div class="ds-deck__two">
+<pre>MyMacro2 <span class="kw">MACRO</span>
+    <span class="kw">LOCAL</span> label1, label2
+    <span class="kw">CMP</span>  AX, 2
+    <span class="kw">JE</span>   label1
+    <span class="kw">CMP</span>  AX, 3
+    <span class="kw">JE</span>   label2
+label1:
+    <span class="kw">INC</span>  AX
+label2:
+    <span class="kw">ADD</span>  AX, 2
+<span class="kw">ENDM</span></pre>
+<div>
+<ul class="ds-deck__small">
+<li><code>LOCAL</code>, makro gövdesinin <b>ilk satırı</b> olmalıdır (MACRO satırından hemen sonra).</li>
+<li>Listelenen adlar her genişletmede derleyici tarafından <b>benzersiz</b> adlarla değiştirilir (MASM'da <code>??0000</code>, <code>??0001</code>, …).</li>
+<li>Etiketler, değişkenler ve makro içindeki prosedür adları için kullanılabilir.</li>
+</ul>
+<table class="ds-deck__table ds-deck__small" style="margin-top:8px">
+<thead><tr><th>Kullanım</th><th>label1</th><th>label2</th></tr></thead>
+<tbody><tr><td>1. MyMacro2</td><td><code>??0000</code></td><td><code>??0001</code></td></tr>
+<tr><td>2. MyMacro2</td><td><code>??0002</code></td><td><code>??0003</code></td></tr></tbody></table>
+</div>
+</div>
+</section>
+<section class="ds-deck__slide" data-title="MyMacro2 Çalışırken" data-section="Etiketler ve LOCAL">
+<p class="ds-deck__kicker">Etiketler ve LOCAL · Kodu adım adım çalıştır</p>
+<h2>MyMacro2'yi Çalıştırmak (AX = 2)</h2>
+<div class="ds-trace m-side" style="--m-cw:330px">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="1" data-vars="AX=0000h; ZF=0; CF=0"><p class="ds-deck__stepnote">Etiketler LOCAL ile benzersiz adlara dönüştürülmüş hâli.</p></div>
+<div class="ds-deck__step" data-line="2" data-vars="AX=0002h; ZF=0; CF=0"><p class="ds-deck__stepnote">AX = 2.</p></div>
+<div class="ds-deck__step" data-line="3" data-vars="AX=0002h; ZF=1; CF=0"><p class="ds-deck__stepnote">CMP AX, 2: 2 − 2 = 0 → <b>ZF = 1</b>.</p></div>
+<div class="ds-deck__step" data-line="4" data-vars="AX=0002h; ZF=1; CF=0"><p class="ds-deck__stepnote">JE: ZF = 1 olduğundan <b>??0000</b>'a (label1) atlanır.</p></div>
+<div class="ds-deck__step" data-line="8" data-vars="AX=0003h; ZF=0; CF=0"><p class="ds-deck__stepnote">INC AX → AX = 3.</p></div>
+<div class="ds-deck__step" data-line="10" data-vars="AX=0005h; ZF=0; CF=0"><p class="ds-deck__stepnote">ADD AX, 2 → AX = <b>5</b>.</p></div>
+<div class="ds-deck__step" data-line="11" data-vars="AX=0005h; ZF=0; CF=0"><p class="ds-deck__stepnote">Program biter.</p></div>
+</div>
+<pre class="ds-trace__code"><span class="kw">ORG</span> 100h
+<span class="kw">MOV</span>  AX, 2       <span class="cm">; MyMacro2 öncesi</span>
+<span class="kw">CMP</span>  AX, 2       <span class="cm">; MyMacro2 başlar</span>
+<span class="kw">JE</span>   ??0000
+<span class="kw">CMP</span>  AX, 3
+<span class="kw">JE</span>   ??0001
+??0000:
+<span class="kw">INC</span>  AX
+??0001:
+<span class="kw">ADD</span>  AX, 2       <span class="cm">; MyMacro2 biter</span>
+<span class="kw">RET</span></pre>
+<div class="ds-trace__col"><div class="ds-trace__vars"></div></div>
+</div><p class="ds-deck__foot">Deneyin: AX = 3 → label2'ye atlar, AX = 5 olur. AX = 7 → hiçbir atlama yok, label1'e düşer: INC + ADD → AX = 10.</p>
+</section>
+<section class="ds-deck__slide" data-title="Ekrana Karakter Yazdırma" data-section="PUTC Makrosu">
+<p class="ds-deck__kicker">PUTC Makrosu</p>
+<h2>PUTC: Ekrana Karakter Yazdırma</h2>
+<div class="ds-deck__two">
+<pre><span class="cm">; karakter yazar, imleci ilerletir</span>
+PUTC  <span class="kw">MACRO</span>  char
+      <span class="kw">push</span>  ax
+      <span class="kw">mov</span>   al, char
+      <span class="kw">mov</span>   ah, 0eh
+      <span class="kw">int</span>   10h
+      <span class="kw">pop</span>   ax
+<span class="kw">ENDM</span>
+
+<span class="kw">ORG</span>  100h
+START:
+      PUTC  'A'
+      PUTC  'B'
+      <span class="kw">RET</span>            <span class="cm">; eklendi</span></pre>
+<div><ul class="ds-deck__small">
+<li>Makro, <code>char</code> parametresindeki karakteri yazar ve imleci bir sağa ilerletir.</li>
+<li><code>INT 10h</code>, <code>AH = 0Eh</code>: BIOS <b>teletype</b> çıkışı. AL'deki karakter imleç konumuna yazılır; 0Dh, 0Ah, 07h, 08h gibi denetim karakterleri yorumlanır.</li>
+<li><code>push ax</code> / <code>pop ax</code>: makro AX'i kullandığı için çağıranın AX değerini korur. Makronun “görünmez” yan etkisi kalmaz.</li>
+<li>Bu makro <code>emu8086.inc</code> kütüphanesindeki PUTC makrosunun aynısıdır.</li>
+</ul>
+<div class="ds-deck__callout" style="margin-top:8px">Kaynak kodda <code>PUTC 'B'</code>'den sonra <code>RET</code> yoktu; program sonundaki rastgele baytları çalıştırmaya devam ederdi. Buraya <code>RET</code> eklendi.</div></div>
+</div>
+</section>
+<section class="ds-deck__slide" data-title="PUTC Çalışırken" data-section="PUTC Makrosu">
+<p class="ds-deck__kicker">PUTC Makrosu · Kodu adım adım çalıştır</p>
+<h2>PUTC 'A' ve PUTC 'B' Çalışırken</h2>
+<div class="ds-trace m-side" style="--m-cw:300px">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="1" data-vars="AX=0000h; SP=FFFEh" data-out=""><svg class="ds-svg" viewBox="0 0 330 105" role="img" aria-label="Yığın belleği, SP=FFFEh" style="max-width:330px;max-height:105px"><defs><marker id="m8ah134" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFFA</text><rect class="box-empty" x="92" y="35" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="52" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFC</text><rect class="box" x="92" y="60" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="77" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFE</text><path class="line" d="M256 72 L216 72" marker-end="url(#m8ah134)"/><text class="txt" x="260" y="77" style="fill:var(--ds-link)">SP</text><text class="lbl" x="151" y="101" text-anchor="middle">SS:ofset · küçük adres yukarıda</text></svg><p class="ds-deck__stepnote">Yükleme sonrası CX = <b>0011h</b>: 2 kopya × 8 bayt + RET = 17 bayt (kaynaktaki RET'siz sürümde 0010h). Ekran boş.</p></div>
+<div class="ds-deck__step" data-line="2" data-vars="AX=0000h; SP=FFFCh" data-out=""><svg class="ds-svg" viewBox="0 0 330 105" role="img" aria-label="Yığın belleği, SP=FFFCh" style="max-width:330px;max-height:105px"><defs><marker id="m8ah135" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFFA</text><rect class="box" x="92" y="35" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="52" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFC</text><path class="line" d="M256 47 L216 47" marker-end="url(#m8ah135)"/><text class="txt" x="260" y="52" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFE</text><text class="lbl" x="151" y="101" text-anchor="middle">SS:ofset · küçük adres yukarıda</text></svg><p class="ds-deck__stepnote">AX (0000h) yığına saklanır; SP = FFFCh.</p></div>
+<div class="ds-deck__step" data-line="3" data-vars="AX=0041h; SP=FFFCh" data-out=""><svg class="ds-svg" viewBox="0 0 330 105" role="img" aria-label="Yığın belleği, SP=FFFCh" style="max-width:330px;max-height:105px"><defs><marker id="m8ah136" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFFA</text><rect class="box" x="92" y="35" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="52" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFC</text><path class="line" d="M256 47 L216 47" marker-end="url(#m8ah136)"/><text class="txt" x="260" y="52" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFE</text><text class="lbl" x="151" y="101" text-anchor="middle">SS:ofset · küçük adres yukarıda</text></svg><p class="ds-deck__stepnote">AL = 41h ('A').</p></div>
+<div class="ds-deck__step" data-line="4" data-vars="AX=0E41h; SP=FFFCh" data-out=""><svg class="ds-svg" viewBox="0 0 330 105" role="img" aria-label="Yığın belleği, SP=FFFCh" style="max-width:330px;max-height:105px"><defs><marker id="m8ah137" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFFA</text><rect class="box" x="92" y="35" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="52" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFC</text><path class="line" d="M256 47 L216 47" marker-end="url(#m8ah137)"/><text class="txt" x="260" y="52" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFE</text><text class="lbl" x="151" y="101" text-anchor="middle">SS:ofset · küçük adres yukarıda</text></svg><p class="ds-deck__stepnote">AH = 0Eh → AX = 0E41h.</p></div>
+<div class="ds-deck__step" data-line="5" data-vars="AX=0E41h; SP=FFFCh" data-out="A"><svg class="ds-svg" viewBox="0 0 330 105" role="img" aria-label="Yığın belleği, SP=FFFCh" style="max-width:330px;max-height:105px"><defs><marker id="m8ah138" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFFA</text><rect class="box" x="92" y="35" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="52" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFC</text><path class="line" d="M256 47 L216 47" marker-end="url(#m8ah138)"/><text class="txt" x="260" y="52" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFE</text><text class="lbl" x="151" y="101" text-anchor="middle">SS:ofset · küçük adres yukarıda</text></svg><p class="ds-deck__stepnote">INT 10h: ekrana <b>A</b> yazılır, imleç ilerler.</p></div>
+<div class="ds-deck__step" data-line="6" data-vars="AX=0000h; SP=FFFEh" data-out="A"><svg class="ds-svg" viewBox="0 0 330 105" role="img" aria-label="Yığın belleği, SP=FFFEh" style="max-width:330px;max-height:105px"><defs><marker id="m8ah139" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFFA</text><rect class="box-empty" x="92" y="35" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="52" text-anchor="middle" style="opacity:.45">0000h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFC</text><rect class="box" x="92" y="60" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="77" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFE</text><path class="line" d="M256 72 L216 72" marker-end="url(#m8ah139)"/><text class="txt" x="260" y="77" style="fill:var(--ds-link)">SP</text><text class="lbl" x="151" y="101" text-anchor="middle">SS:ofset · küçük adres yukarıda</text></svg><p class="ds-deck__stepnote">AX eski değerine (0000h) döner; SP = FFFEh.</p></div>
+<div class="ds-deck__step" data-line="7" data-vars="AX=0000h; SP=FFFCh" data-out="A"><svg class="ds-svg" viewBox="0 0 330 105" role="img" aria-label="Yığın belleği, SP=FFFCh" style="max-width:330px;max-height:105px"><defs><marker id="m8ah140" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFFA</text><rect class="box" x="92" y="35" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="52" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFC</text><path class="line" d="M256 47 L216 47" marker-end="url(#m8ah140)"/><text class="txt" x="260" y="52" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFE</text><text class="lbl" x="151" y="101" text-anchor="middle">SS:ofset · küçük adres yukarıda</text></svg><p class="ds-deck__stepnote">İkinci kopya: AX yine saklanır.</p></div>
+<div class="ds-deck__step" data-line="8" data-vars="AX=0042h; SP=FFFCh" data-out="A"><svg class="ds-svg" viewBox="0 0 330 105" role="img" aria-label="Yığın belleği, SP=FFFCh" style="max-width:330px;max-height:105px"><defs><marker id="m8ah141" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFFA</text><rect class="box" x="92" y="35" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="52" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFC</text><path class="line" d="M256 47 L216 47" marker-end="url(#m8ah141)"/><text class="txt" x="260" y="52" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFE</text><text class="lbl" x="151" y="101" text-anchor="middle">SS:ofset · küçük adres yukarıda</text></svg><p class="ds-deck__stepnote">AL = 42h ('B').</p></div>
+<div class="ds-deck__step" data-line="9" data-vars="AX=0E42h; SP=FFFCh" data-out="A"><svg class="ds-svg" viewBox="0 0 330 105" role="img" aria-label="Yığın belleği, SP=FFFCh" style="max-width:330px;max-height:105px"><defs><marker id="m8ah142" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFFA</text><rect class="box" x="92" y="35" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="52" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFC</text><path class="line" d="M256 47 L216 47" marker-end="url(#m8ah142)"/><text class="txt" x="260" y="52" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFE</text><text class="lbl" x="151" y="101" text-anchor="middle">SS:ofset · küçük adres yukarıda</text></svg><p class="ds-deck__stepnote">AX = 0E42h.</p></div>
+<div class="ds-deck__step" data-line="10" data-vars="AX=0E42h; SP=FFFCh" data-out="AB"><svg class="ds-svg" viewBox="0 0 330 105" role="img" aria-label="Yığın belleği, SP=FFFCh" style="max-width:330px;max-height:105px"><defs><marker id="m8ah143" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFFA</text><rect class="box" x="92" y="35" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="52" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFC</text><path class="line" d="M256 47 L216 47" marker-end="url(#m8ah143)"/><text class="txt" x="260" y="52" style="fill:var(--ds-link)">SP</text><rect class="box" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFE</text><text class="lbl" x="151" y="101" text-anchor="middle">SS:ofset · küçük adres yukarıda</text></svg><p class="ds-deck__stepnote">INT 10h: ekranda <b>AB</b>.</p></div>
+<div class="ds-deck__step" data-line="11" data-vars="AX=0000h; SP=FFFEh" data-out="AB"><svg class="ds-svg" viewBox="0 0 330 105" role="img" aria-label="Yığın belleği, SP=FFFEh" style="max-width:330px;max-height:105px"><defs><marker id="m8ah144" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box-empty" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle" style="opacity:.45">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFFA</text><rect class="box-empty" x="92" y="35" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="52" text-anchor="middle" style="opacity:.45">0000h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFC</text><rect class="box" x="92" y="60" width="118" height="25" rx="2" style="fill:var(--ds-hot)"/><text class="txt mono" x="151" y="77" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFE</text><path class="line" d="M256 72 L216 72" marker-end="url(#m8ah144)"/><text class="txt" x="260" y="77" style="fill:var(--ds-link)">SP</text><text class="lbl" x="151" y="101" text-anchor="middle">SS:ofset · küçük adres yukarıda</text></svg><p class="ds-deck__stepnote">AX = 0000h; makro çağıranın AX'ini bozmadı.</p></div>
+<div class="ds-deck__step" data-line="12" data-vars="AX=0000h; SP=0000h" data-out="AB"><svg class="ds-svg" viewBox="0 0 330 105" role="img" aria-label="Yığın belleği, SP=0000h" style="max-width:330px;max-height:105px"><defs><marker id="m8ah145" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="92" y="10" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="27" text-anchor="middle">····</text><text class="lbl mono" x="84" y="27" text-anchor="end">FFFA</text><rect class="box" x="92" y="35" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="52" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="52" text-anchor="end">FFFC</text><rect class="box" x="92" y="60" width="118" height="25" rx="2"/><text class="txt mono" x="151" y="77" text-anchor="middle">0000h</text><text class="lbl mono" x="84" y="77" text-anchor="end">FFFE</text><text class="lbl" x="151" y="101" text-anchor="middle">SS:ofset · küçük adres yukarıda</text></svg><p class="ds-deck__stepnote">RET: program biter.</p></div>
+</div>
+<pre class="ds-trace__code"><span class="kw">ORG</span>  100h
+<span class="kw">push</span> ax          <span class="cm">; PUTC 'A'</span>
+<span class="kw">mov</span>  al, 'A'
+<span class="kw">mov</span>  ah, 0eh
+<span class="kw">int</span>  10h
+<span class="kw">pop</span>  ax
+<span class="kw">push</span> ax          <span class="cm">; PUTC 'B'</span>
+<span class="kw">mov</span>  al, 'B'
+<span class="kw">mov</span>  ah, 0eh
+<span class="kw">int</span>  10h
+<span class="kw">pop</span>  ax
+<span class="kw">RET</span></pre>
+<div class="ds-trace__col"><div class="ds-trace__vars"></div><div class="ds-trace__out"></div></div>
+</div><p class="ds-deck__foot">emu8086 ekran penceresinde (80×25) çıktı: AB. Her PUTC kopyası 8 bayt: 50 B0 41 B4 0E CD 10 58.</p>
+</section>
+<section class="ds-deck__slide" data-title="Üs Alma Makrosu" data-section="POWER Makrosu">
+<p class="ds-deck__kicker">POWER Makrosu</p>
+<h2>Üs Alma: POWER Makrosu</h2>
+<div class="ds-deck__two">
+<pre>POWER <span class="kw">macro</span> b, e, r
+    <span class="kw">mov</span> ax, 1        <span class="cm">; geçici sonuç = 1</span>
+    <span class="kw">mov</span> cx, e        <span class="cm">; üs → CX</span>
+    <span class="kw">mov</span> bx, b        <span class="cm">; taban → BX</span>
+powerloop:
+    <span class="kw">mul</span> bx           <span class="cm">; DX:AX = AX * BX</span>
+    <span class="kw">loop</span> powerloop   <span class="cm">; e kez tekrarla</span>
+    <span class="kw">mov</span> r, ax        <span class="cm">; sonucu yaz</span>
+<span class="kw">endm</span></pre>
+<div><pre><span class="kw">ORG</span> 100h
+start:
+    POWER base, exponent, result
+    <span class="kw">ret</span>
+base     <span class="kw">dw</span> 2     <span class="cm">; taban</span>
+exponent <span class="kw">dw</span> 3     <span class="cm">; üs</span>
+result   <span class="kw">dw</span> ?     <span class="cm">; sonuç</span></pre>
+<ul class="ds-deck__small" style="margin-top:8px">
+<li>Sonuç r = b<sup>e</sup>: AX'i 1 ile başlatıp e kez taban ile çarpar.</li>
+<li><code>MUL BX</code>: DX:AX ← AX × BX (işaretsiz). <b>DX de değişir!</b></li>
+<li><code>LOOP</code>: CX'i 1 azaltır, CX ≠ 0 ise etikete atlar.</li>
+</ul></div>
+</div>
+</section>
+<section class="ds-deck__slide" data-title="POWER Çalışırken" data-section="POWER Makrosu">
+<p class="ds-deck__kicker">POWER Makrosu · Kodu adım adım çalıştır</p>
+<h2>POWER 2, 3 Adım Adım</h2>
+<div class="ds-trace m-side" style="--m-cw:330px">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="1" data-vars="AX=0000h; BX=0000h; CX=0000h; DX=0000h; [0117h]=0000h; CF=0"><p class="ds-deck__stepnote">Veriler kodun hemen arkasında: base = 0113h, exponent = 0115h, result = 0117h (kod 19 bayt).</p></div>
+<div class="ds-deck__step" data-line="2" data-vars="AX=0001h; BX=0000h; CX=0000h; DX=0000h; [0117h]=0000h; CF=0"><p class="ds-deck__stepnote">AX = 1 (geçici sonuç).</p></div>
+<div class="ds-deck__step" data-line="3" data-vars="AX=0001h; BX=0000h; CX=0003h; DX=0000h; [0117h]=0000h; CF=0"><p class="ds-deck__stepnote">CX ← [0115h] = <b>3</b> (üs).</p></div>
+<div class="ds-deck__step" data-line="4" data-vars="AX=0001h; BX=0002h; CX=0003h; DX=0000h; [0117h]=0000h; CF=0"><p class="ds-deck__stepnote">BX ← [0113h] = <b>2</b> (taban).</p></div>
+<div class="ds-deck__step" data-line="6" data-vars="AX=0002h; BX=0002h; CX=0003h; DX=0000h; [0117h]=0000h; CF=0"><p class="ds-deck__stepnote">1. tur: DX:AX = 1 × 2 = <b>0002h</b>.</p></div>
+<div class="ds-deck__step" data-line="7" data-vars="AX=0002h; BX=0002h; CX=0002h; DX=0000h; [0117h]=0000h; CF=0"><p class="ds-deck__stepnote">LOOP: CX = 2 ≠ 0 → powerloop.</p></div>
+<div class="ds-deck__step" data-line="6" data-vars="AX=0004h; BX=0002h; CX=0002h; DX=0000h; [0117h]=0000h; CF=0"><p class="ds-deck__stepnote">2. tur: AX = 2 × 2 = <b>0004h</b>.</p></div>
+<div class="ds-deck__step" data-line="7" data-vars="AX=0004h; BX=0002h; CX=0001h; DX=0000h; [0117h]=0000h; CF=0"><p class="ds-deck__stepnote">LOOP: CX = 1 → powerloop.</p></div>
+<div class="ds-deck__step" data-line="6" data-vars="AX=0008h; BX=0002h; CX=0001h; DX=0000h; [0117h]=0000h; CF=0"><p class="ds-deck__stepnote">3. tur: AX = 4 × 2 = <b>0008h</b>.</p></div>
+<div class="ds-deck__step" data-line="7" data-vars="AX=0008h; BX=0002h; CX=0000h; DX=0000h; [0117h]=0000h; CF=0"><p class="ds-deck__stepnote">LOOP: CX = 0 → döngüden çık.</p></div>
+<div class="ds-deck__step" data-line="8" data-vars="AX=0008h; BX=0002h; CX=0000h; DX=0000h; [0117h]=0008h; CF=0"><p class="ds-deck__stepnote">result ← AX: [0117h] = <b>0008h</b> = 2<sup>3</sup>.</p></div>
+<div class="ds-deck__step" data-line="9" data-vars="AX=0008h; BX=0002h; CX=0000h; DX=0000h; [0117h]=0008h; CF=0"><p class="ds-deck__stepnote">RET: program biter.</p></div>
+</div>
+<pre class="ds-trace__code"><span class="kw">ORG</span> 100h
+<span class="kw">mov</span> ax, 1        <span class="cm">; POWER açılımı</span>
+<span class="kw">mov</span> cx, exponent
+<span class="kw">mov</span> bx, base
+powerloop:
+<span class="kw">mul</span> bx
+<span class="kw">loop</span> powerloop
+<span class="kw">mov</span> result, ax
+<span class="kw">ret</span>
+base     <span class="kw">dw</span> 2    <span class="cm">; 0113h</span>
+exponent <span class="kw">dw</span> 3    <span class="cm">; 0115h</span>
+result   <span class="kw">dw</span> ?    <span class="cm">; 0117h</span></pre>
+<div class="ds-trace__col"><div class="ds-trace__vars"></div></div>
+</div><p class="ds-deck__foot">MUL sonrası DX = 0 olduğundan CF = OF = 0. Sonuç 16 biti aşsaydı (ör. 2<sup>16</sup>) DX ≠ 0 ve CF = 1 olurdu; makro yalnızca AX'i sakladığı için sonuç yanlış olurdu.</p>
+</section>
+<section class="ds-deck__slide" data-title="POWER: Tuzaklar" data-section="POWER Makrosu">
+<p class="ds-deck__kicker">POWER Makrosu</p>
+<h2>POWER Makrosunun Tuzakları</h2>
+<div class="ds-deck__two">
+<div class="ds-deck__grid ds-deck__small" style="gap:7px">
+<div class="ds-deck__card"><strong>1. Üs = 0</strong>CX = 0 iken <code>LOOP</code> önce CX'i azaltır: FFFFh → döngü <b>65 536 kez</b> döner; b<sup>0</sup> = 1 olmalıydı. Çözüm: <code>JCXZ</code>.</div>
+<div class="ds-deck__card"><strong>2. Etiket</strong><code>powerloop</code> LOCAL değil: ikinci kullanımda <i>Duplicate declaration</i>.</div>
+<div class="ds-deck__card"><strong>3. Yazmaç bozulması</strong>AX, BX, CX ve (MUL yüzünden) DX değişir.</div>
+<div class="ds-deck__card"><strong>4. Taşma</strong>Sonuç 65 535'i aşarsa yüksek kısım DX'te kalır ve yazılmaz.</div>
+</div>
+<div><p class="ds-deck__small" style="margin:0 0 4px"><b>Düzeltilmiş sürüm:</b></p>
+<pre class="is-tight">POWER <span class="kw">MACRO</span> b, e, r
+      <span class="kw">LOCAL</span> p_loop, p_end
+      <span class="kw">PUSH</span> BX
+      <span class="kw">PUSH</span> CX
+      <span class="kw">PUSH</span> DX
+      <span class="kw">MOV</span>  AX, 1
+      <span class="kw">MOV</span>  CX, e
+      <span class="kw">MOV</span>  BX, b
+      JCXZ p_end   <span class="cm">; e = 0 → 1</span>
+p_loop: <span class="kw">MUL</span> BX
+      <span class="kw">LOOP</span> p_loop
+p_end: <span class="kw">MOV</span> r, AX
+      <span class="kw">POP</span>  DX
+      <span class="kw">POP</span>  CX
+      <span class="kw">POP</span>  BX
+<span class="kw">ENDM</span></pre></div>
+</div>
+</section>
+<section class="ds-deck__slide" data-title="İç İçe Makrolar" data-section="POWER Makrosu">
+<p class="ds-deck__kicker">POWER Makrosu</p>
+<h2>İç İçe Makrolar</h2>
+<div class="ds-deck__steps">
+<div class="ds-deck__step"><div class="m08-mx"><pre>PRINT2 <span class="kw">MACRO</span> c1, c2
+       PUTC c1
+       PUTC c2
+<span class="kw">ENDM</span>
+
+PRINT2 'O', 'K'</pre><pre><span class="cm">; 1. düzey: PRINT2 açılır</span>
+PUTC 'O'
+PUTC 'K'</pre></div><p class="ds-deck__stepnote">Önce dıştaki makro açılır: gövdedeki iki satır da birer <b>makro çağrısıdır</b>.</p></div>
+<div class="ds-deck__step"><div class="m08-mx"><pre>PRINT2 <span class="kw">MACRO</span> c1, c2
+       PUTC c1
+       PUTC c2
+<span class="kw">ENDM</span>
+
+PRINT2 'O', 'K'</pre><pre><span class="cm">; 2. düzey: PUTC'ler açılır</span>
+<span class="kw">push</span> ax
+<span class="kw">mov</span>  al, 'O'
+<span class="kw">mov</span>  ah, 0eh
+<span class="kw">int</span>  10h
+<span class="kw">pop</span>  ax
+<span class="kw">push</span> ax
+<span class="kw">mov</span>  al, 'K'
+<span class="kw">mov</span>  ah, 0eh
+<span class="kw">int</span>  10h
+<span class="kw">pop</span>  ax</pre></div><p class="ds-deck__stepnote">Derleyici iç makroları da açar: tek satırlık çağrı <b>10 komut</b> (16 bayt) üretir. Ekranda: OK.</p></div>
+</div><p class="ds-deck__foot">PUTC, PRINT2'den önce tanımlanmış olmalıdır. Bir makro kendini çağırırsa (özyineleme) koşullu derleme olmadan genişletme hiç bitmez.</p>
+</section>
+<section class="ds-deck__slide" data-title="Makro Kütüphaneleri" data-section="POWER Makrosu">
+<p class="ds-deck__kicker">POWER Makrosu</p>
+<h2>Makro Kütüphaneleri: emu8086.inc</h2>
+<div class="ds-deck__two ds-deck__two--wide-left">
+<div><ul class="ds-deck__small">
+<li>Sık kullanılan makrolar ayrı bir dosyada toplanır ve <code>INCLUDE</code> ile programa eklenir.</li>
+<li>Kullanılmayan makrolar kod üretmediği için büyük bir kütüphaneyi eklemek dosyayı büyütmez.</li>
+<li>Makrolar başka makroları çağırabilir (iç içe genişletme).</li>
+<li>Kütüphane, makroların yanında <code>DEFINE_...</code> makrolarıyla prosedürler de sunar (ör. <code>DEFINE_SCAN_NUM</code>): ikisi birlikte kullanılır.</li>
+</ul></div>
+<table class="ds-deck__table ds-deck__small">
+<thead><tr><th>Makro</th><th>İşlev</th></tr></thead>
+<tbody>
+<tr><td><code>PUTC ch</code></td><td>Tek karakter yazar</td></tr>
+<tr><td><code>PRINT 'metin'</code></td><td>Metin yazar</td></tr>
+<tr><td><code>PRINTN 'metin'</code></td><td>Metin + yeni satır</td></tr>
+<tr><td><code>GOTOXY x, y</code></td><td>İmleci taşır</td></tr>
+<tr><td><code>CURSOROFF</code></td><td>İmleci gizler</td></tr>
+</tbody></table>
+</div>
+<pre style="margin-top:10px;width:330px">include 'emu8086.inc'
+<span class="kw">ORG</span> 100h
+    GOTOXY 10, 5
+    PRINT 'Merhaba'
+    PUTC  '!'
+    <span class="kw">RET</span></pre>
+</section>
+<section class="ds-deck__slide" data-title="Özet" data-section="Özet">
+<p class="ds-deck__kicker">Özet</p>
+<h2>Özet</h2>
+<table class="ds-deck__table ds-deck__small">
+<thead><tr><th>Konu</th><th>Hatırlanacak nokta</th></tr></thead>
+<tbody>
+<tr><td>Tanım</td><td><code>ad MACRO p1, p2 … ENDM</code>; kullanımdan önce tanımlanır.</td></tr>
+<tr><td>Genişletme</td><td>Derleme zamanında metin değiştirme; çalışma zamanında CALL yok.</td></tr>
+<tr><td>Parametreler</td><td>Metin olarak yerine konur; değerleri kullanıldıkları satırda okunur.</td></tr>
+<tr><td>Boyut / hız</td><td>Makro: her kullanımda gövde kadar büyür, daha hızlıdır. Prosedür: 3 bayt CALL, CALL/RET maliyeti.</td></tr>
+<tr><td>LOCAL</td><td>Etiketlerin her genişletmede benzersiz olması için gövdenin ilk satırı.</td></tr>
+<tr><td>Yan etkiler</td><td>Makronun değiştirdiği yazmaçları PUSH/POP ile koruyun (PUTC gibi).</td></tr>
+<tr><td>Sınır durumları</td><td>LOOP'tan önce CX = 0 kontrolü (JCXZ).</td></tr>
+</tbody></table>
+</section>
+<section class="ds-deck__slide" data-title="Alıştırmalar" data-section="Özet">
+<p class="ds-deck__kicker">Özet</p>
+<h2>Alıştırmalar</h2>
+<ol class="ds-deck__small">
+<li><code>MyMacro AX, BX, CX</code> çağrısının genişletilmiş hâlini yazın. Hangi satır gereksizdir?</li>
+<li>İki word değişkeni toplayıp üçüncüsüne yazan <code>TOPLA a, b, c</code> makrosunu yazın.</li>
+<li>PUTC makrosu 50 kez, aynı işi yapan prosedür 50 kez çağrılırsa kod boyutları ne olur?</li>
+<li>POWER makrosu <code>POWER base, exponent, result</code> ile iki kez kullanıldığında hangi hata alınır? Nasıl düzeltilir?</li>
+<li>exponent = 0 iken orijinal POWER makrosu kaç kez MUL çalıştırır?</li>
+<li>Bir makronun AX dışında hiçbir yazmacı bozmaması için hangi komutlar eklenmelidir?</li>
+</ol>
+<details class="ds-deck__answers"><summary>Cevaplar</summary>
+<ol>
+<li><code>MOV AX, AX</code> / <code>MOV BX, BX</code> / <code>MOV CX, CX</code>: üçü de etkisizdir (derlenir ama hiçbir şey değiştirmez).</li>
+<li><code>TOPLA MACRO a, b, c</code> / <code>MOV AX, a</code> / <code>ADD AX, b</code> / <code>MOV c, AX</code> / <code>ENDM</code> (bellek–bellek işlemi olmadığı için AX aracı).</li>
+<li>Makro: 50 × 8 = 400 bayt. Prosedür: 9 + 50 × 3 = 159 bayt.</li>
+<li><i>Duplicate declaration</i> (powerloop). <code>LOCAL powerloop</code> eklenir.</li>
+<li>65 536 kez (CX: 0 → FFFFh → … → 0).</li>
+<li>Gövdenin başında kullanılan yazmaçlar için PUSH, sonunda ters sırada POP.</li>
+</ol></details>
+</section>
+<section class="ds-deck__slide" data-title="Kaynaklar" data-section="Özet">
+<p class="ds-deck__kicker">Özet</p>
+<h2>Kaynaklar</h2>
+<ul>
+<li>emu8086 yardım belgeleri: <em>8086 Assembler Tutorial, Part 10 (Macros)</em> ve <code>emu8086.inc</code>.</li>
+<li>Microsoft, <em>MASM Programmer's Guide</em> — MACRO, ENDM, LOCAL yönergeleri.</li>
+<li>K. R. Irvine, <em>Assembly Language for x86 Processors</em>, 7. baskı, Pearson, 2014 — Bölüm 10 (Makrolar).</li>
+<li>B. B. Brey, <em>The Intel Microprocessors</em>, 8. baskı, Pearson, 2009.</li>
+</ul>
+</section>
+<section class="ds-deck__slide ds-deck__slide--title" data-title="Son" data-section="">
+<h1>Son</h1>
+<div class="ds-deck__subtitle">Bölüm 8: Makrolar</div>
+<small>Sonraki bölüm: Bölüm 9: Aygıt Kontrolü</small>
+</section>
+
+      </div>
+
+      <div class="ds-deck__bar">
+        <button class="ds-deck__button" type="button" id="ds-deck-prev" aria-label="Önceki slayt">←</button>
+        <span class="ds-deck__counter" id="ds-deck-counter">1 / 1</span>
+        <button class="ds-deck__button" type="button" id="ds-deck-next" aria-label="Sonraki slayt">→</button>
+        <span class="ds-deck__section" id="ds-deck-section">Sercan KÜLCÜ, Tüm hakları saklıdır.</span>
+        <select class="ds-deck__select" id="ds-deck-jump" aria-label="Slayta git"></select>
+        <button class="ds-deck__button" type="button" id="ds-deck-full" aria-label="Tam ekran">⛶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="deck/deck.js"></script>
+<script src="deck/Bolum_08_Makrolar.js"></script>
