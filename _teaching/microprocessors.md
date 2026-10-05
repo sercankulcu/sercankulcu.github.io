@@ -26,8 +26,8 @@ Each chapter comes with interactive HTML presentations that include step-by-step
 
 Worked questions with answers and step-by-step solutions for exam preparation.
 
-- [📝Vize Çalışma Soruları (HTML)](../files/microprocessors/slides/Bolum_12_Vize_Sorulari.html): Chapters 1–5
-- [📝Final Çalışma Soruları (HTML)](../files/microprocessors/slides/Bolum_13_Final_Sorulari.html): code tracing over the whole course, with emphasis on Chapters 6–11
+- [📝Vize Çalışma Soruları (HTML)](../files/microprocessors/slides/Bolum_12_Vize_Sorulari.html)
+- [📝Final Çalışma Soruları (HTML)](../files/microprocessors/slides/Bolum_13_Final_Sorulari.html)
 
 ---
 
