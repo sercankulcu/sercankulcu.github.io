@@ -11,13 +11,6 @@ location: "Giresun, Turkey"
 ![microprocessor](/images/teaching/teaching-microprocessors.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
 Microprocessors execute instructions, process data, and coordinate the operations of modern computing systems. The 8086 architecture provides a useful foundation for studying processor organization, registers, memory access, instruction execution, and low-level programming. The 8086 is an early member of the x86 family. Although modern x86-64 processors are substantially more complex, the 8086 remains useful for introducing registers, segmentation, instruction execution, addressing modes, interrupts, and assembly programming.
 
-## Ders Öğretim Planı
-- [Ders Öğretim Planı (HTML)](../files/microprocessors/slides/Bolum_00_Ders_Ogretim_Planı.html)
-
----
-
-[Tüm etkileşimli sunumlar](../files/microprocessors/slides/index.html)
-
 ## Announcements
 
 There are currently no announcements.
@@ -35,16 +28,10 @@ There are currently no announcements.
 
 ---
 
-## Past Exams:
+## Çalışma Soruları:
 
-- **2023-2024**  
-  [vize (pdf)](../files/microprocessors/slides/2023-2024-microprocessor-vize-cevap.pdf) | 
-  [final (pdf)](../files/microprocessors/slides/2023-2024-microprocessor-final-cevap.pdf) | 
-  [bütünleme (pdf)](../files/microprocessors/slides/2023-2024-microprocessor-butunleme-cevap.pdf)
-  
-- **Soru Cevap**  
-  [vize (pdf)](../files/microprocessors/slides/Bolum_12_Soru_Cevap.pdf) | 
-  [final (pdf)](../files/microprocessors/slides/Bolum_13_Soru_Cevap.pdf)
+- [📝Vize Çalışma Soruları (HTML)](../files/microprocessors/slides/Bolum_12_Vize_Sorulari.html)
+- [📝Final Çalışma Soruları (HTML)](../files/microprocessors/slides/Bolum_13_Final_Sorulari.html)
 
 ---
 
