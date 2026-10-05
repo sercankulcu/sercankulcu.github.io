@@ -13,20 +13,12 @@ Microprocessors execute instructions, process data, and coordinate the operation
 
 Each chapter comes with interactive HTML presentations that include step-by-step animations, 8086 code traces showing register, flag, and stack values, and small in-browser demos. Use the arrow keys or space bar to move through the slides and **F** for full screen.
 
-## Announcements
-
-There are currently no announcements.
-
 ---
 
 ## The Resources
 
 - [Emu8086 Microprocessor Emulator](https://emu8086-microprocessor-emulator.en.softonic.com/)
-- [CPU Emulator](../files/microprocessors/CPU_Emulator/emulator.html) adapted [from](https://www.cmpe.boun.edu.tr/~tugcu/animations/cpu-simulator/cpu-simulator.html)
-- Barry B. Brey, *The Intel Microprocessors*, Pearson.
-- Topaloğlu, Nurettin, *X86 Tabanlı Mikroişlemci Mimarisi ve Assembly Dili*, Seçkin Yayınevi.
-- [Mikroişlemcilere Giriş Assembler ile Yazılım ve Arayüz - Mehmet Bodur (pdf)](../files/microprocessors/Mikroislemcilere_giris.pdf)
-- [Intel 8086 ile Mikroişlemci Programlamaya Giriş - Şadi Çağatay Öztürk (pdf)](../files/microprocessors/Intel_8086_ile.pdf)
+- [CPU Simulator](../files/microprocessors/slides/CPU_Simulator.html)
 
 ---
 
