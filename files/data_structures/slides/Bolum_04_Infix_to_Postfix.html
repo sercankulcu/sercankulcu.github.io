@@ -2,565 +2,884 @@
 layout: without-sidebar
 title: "Infix to Postfix Converter"
 permalink: /files/data_structures/slides/Bolum_04_Infix_to_Postfix.html
-excerpt: "Interactive infix-to-postfix converter with validation, tokenization, operator-stack visualization, and step-by-step playback."
+excerpt: "Compact interactive infix-to-postfix simulator."
 ---
 
 <style>
-.ds-postfix,.ds-postfix *,.ds-postfix *::before,.ds-postfix *::after{box-sizing:border-box}
-.ds-postfix{
-  width:min(1160px,100%);margin:0 auto 2rem;color:var(--global-text-color);
-  --ds-surface:color-mix(in srgb,var(--global-link-color) 2.5%,var(--global-bg-color));
-  --ds-surface-strong:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
-  --ds-border:color-mix(in srgb,var(--global-link-color) 38%,var(--global-border-color));
-  --ds-shadow:0 8px 24px rgba(15,23,42,.065);
-  --ds-shadow-soft:0 3px 10px rgba(15,23,42,.045)
+.postfix-sim,
+.postfix-sim *,
+.postfix-sim *::before,
+.postfix-sim *::after { box-sizing: border-box; }
+
+.postfix-sim {
+  --sim-bg: var(--global-bg-color, #ffffff);
+  --sim-text: var(--global-text-color, #2f3437);
+  --sim-accent: var(--global-link-color, #2a7ae2);
+  --sim-border: var(--global-border-color, #d9dee3);
+  --sim-soft: color-mix(in srgb, var(--sim-accent) 6%, var(--sim-bg));
+  --sim-softer: color-mix(in srgb, var(--sim-accent) 2.5%, var(--sim-bg));
+  --sim-ok: #15803d;
+  --sim-warn: #d97706;
+  --sim-danger: #b91c1c;
+
+  width: min(780px, calc(100vw - 18px));
+  height: min(548px, calc(100vh - 58px));
+  min-height: 470px;
+  margin: 6px auto 0;
+  padding: 10px;
+  color: var(--sim-text);
+  font-family: inherit;
+  overflow: hidden;
 }
-.ds-postfix__hero,.ds-postfix__panel,.ds-postfix__tokens,.ds-postfix__stack-panel,.ds-postfix__process,.ds-postfix__card,.ds-postfix__table-panel,.ds-postfix__code-panel,.ds-postfix__status{
-  border:1.5px solid var(--ds-border);background:var(--ds-surface)
+
+.postfix-shell {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  gap: 8px;
 }
-.ds-postfix__hero{padding:1.35rem;border-radius:16px;background:var(--ds-surface-strong);box-shadow:var(--ds-shadow)}
-.ds-postfix__hero h1{margin:0 0 .55rem;text-align:center;color:var(--global-text-color);font-size:clamp(1.65rem,4vw,2.3rem)}
-.ds-postfix__hero p{width:100%;margin:0;max-width:none;line-height:1.65;text-align:justify;text-justify:inter-word;opacity:.86}
-.ds-postfix__metrics,.ds-postfix__stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem}
-.ds-postfix__metrics{margin-top:1rem}.ds-postfix__metric,.ds-postfix__stat{padding:.8rem;border:1.5px solid var(--ds-border);border-radius:10px;background:var(--ds-surface);box-shadow:var(--ds-shadow-soft)}
-.ds-postfix__metric strong,.ds-postfix__stat strong{display:block;margin-bottom:.15rem}
-.ds-postfix__section{margin-top:1.4rem}.ds-postfix__section h2{margin:0 0 .7rem;color:var(--global-text-color);font-size:1.2rem}
-.ds-postfix__panel{display:grid;gap:.8rem;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow-soft)}
-.ds-postfix__group{display:grid;grid-template-columns:minmax(240px,2fr) repeat(4,minmax(115px,1fr));gap:.6rem;align-items:end}
-.ds-postfix__group--examples{grid-template-columns:minmax(240px,2fr) repeat(2,minmax(120px,1fr))}
-.ds-postfix__field{display:grid;gap:.3rem}.ds-postfix__field label,.ds-postfix__speed label{font-size:.86rem;font-weight:800}
-.ds-postfix input,.ds-postfix select{width:100%;min-height:42px;padding:.55rem .65rem;border:1.5px solid var(--ds-border);border-radius:9px;background:var(--ds-surface);color:var(--global-text-color);font:inherit}
-.ds-postfix input:focus-visible,.ds-postfix select:focus-visible,.ds-postfix button:focus-visible{outline:3px solid color-mix(in srgb,var(--global-link-color) 30%,transparent);outline-offset:2px}
-.ds-postfix__btn{min-height:42px;padding:.55rem .75rem;border:1px solid var(--global-link-color);border-radius:9px;background:var(--global-link-color);color:#fff;font:inherit;font-weight:800;cursor:pointer}
-.ds-postfix__btn:hover:not(:disabled){filter:brightness(1.08)}.ds-postfix__btn--secondary{border-color:var(--ds-border);background:var(--ds-surface);color:var(--global-text-color)}.ds-postfix__btn--danger{border-color:#b91c1c;background:#b91c1c}.ds-postfix__btn:disabled{cursor:not-allowed;opacity:.5}
-.ds-postfix__speed{display:grid;grid-template-columns:minmax(130px,auto) 1fr auto;gap:.65rem;align-items:center}.ds-postfix__speed output{min-width:70px;text-align:right;font-size:.85rem;font-weight:800}
-.ds-postfix__tokens{min-height:64px;margin-top:1rem;padding:.75rem;display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}
-.ds-postfix__token{min-width:38px;min-height:38px;padding:.35rem .6rem;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--ds-border);border-radius:8px;background:var(--ds-surface);font-family:Consolas,Monaco,monospace;font-weight:800}
-.ds-postfix__token.is-current{background:#fef3c7;border-color:#d97706;color:#3f2a00;transform:scale(1.06)}.ds-postfix__token.is-processed{background:#dcfce7;border-color:#15803d;color:#14532d}
-.ds-postfix__workspace{display:grid;grid-template-columns:minmax(230px,.55fr) minmax(320px,1.45fr);gap:.8rem;margin-top:.8rem}
-.ds-postfix__stack-panel,.ds-postfix__process{min-width:0;padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow)}
-.ds-postfix__stack-panel h3,.ds-postfix__process h3{margin:0 0 .65rem;font-size:1rem}
-.ds-postfix__stack{min-height:280px;padding:.6rem;display:flex;flex-direction:column-reverse;justify-content:flex-start;gap:.4rem;border:4px solid color-mix(in srgb,var(--global-text-color) 55%,var(--global-border-color));border-top:0;border-radius:0 0 10px 10px;background:color-mix(in srgb,var(--global-text-color) 4%,var(--global-bg-color))}
-.ds-postfix__stack-item{min-height:44px;padding:.4rem .65rem;display:flex;align-items:center;justify-content:center;border:2px solid color-mix(in srgb,var(--global-link-color) 85%,var(--global-border-color));border-radius:8px;background:var(--ds-surface);font-family:Consolas,Monaco,monospace;font-weight:800}
-.ds-postfix__stack-empty{margin:auto;text-align:center;opacity:.58}.ds-postfix__stack-top{margin-top:.55rem;text-align:center;color:var(--global-link-color);font-weight:800}
-.ds-postfix__message{min-height:72px;padding:.85rem;border:1.5px solid var(--ds-border);border-radius:10px;background:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));font-weight:800}
-.ds-postfix__expr{margin-top:.7rem;padding:.8rem;border:1.5px solid var(--ds-border);border-radius:10px;background:var(--ds-surface)}.ds-postfix__expr strong{display:block;margin-bottom:.35rem}.ds-postfix__value{min-height:38px;padding:.45rem .6rem;overflow-wrap:anywhere;border-radius:7px;background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color));font-family:Consolas,Monaco,monospace;font-size:1.02rem}
-.ds-postfix__status{min-height:3rem;margin:.8rem 0 0;padding:.85rem;border-radius:10px;box-shadow:var(--ds-shadow-soft);font-weight:800}.ds-postfix__status.is-success{color:#15803d}.ds-postfix__status.is-error{color:#b91c1c}
-.ds-postfix__stats{margin-top:.8rem}.ds-postfix__stat strong{font-size:.75rem;opacity:.65}
-.ds-postfix__lower{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:.8rem}.ds-postfix__table-panel,.ds-postfix__code-panel{min-width:0;padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}.ds-postfix__table-panel h3,.ds-postfix__code-panel h3{margin:0 0 .55rem;font-size:1rem}
-.ds-postfix__table-scroll{overflow-x:auto}.ds-postfix table{width:100%;border-collapse:collapse;font-size:.86rem}.ds-postfix th,.ds-postfix td{padding:.6rem;border:1.5px solid var(--ds-border);text-align:left}.ds-postfix th{background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color))}.ds-postfix tr.is-active{background:#fef3c7;color:#3f2a00}.ds-postfix tr.is-done{background:#dcfce7;color:#14532d}
-.ds-postfix__code{padding:.9rem;overflow-x:auto;border-radius:10px;background:#0f172a;color:#e2e8f0}.ds-postfix__code pre{margin:0;white-space:pre-wrap;font-family:Consolas,Monaco,monospace;font-size:.84rem}
-.ds-postfix__cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}.ds-postfix__card{padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}.ds-postfix__card h3{margin:0 0 .45rem;color:var(--global-text-color);font-size:1rem}.ds-postfix__card p{margin:0;font-size:.9rem;line-height:1.55;opacity:.78}
-@media(max-width:900px){.ds-postfix__group,.ds-postfix__group--examples{grid-template-columns:repeat(2,minmax(0,1fr))}.ds-postfix__field{grid-column:1/-1}.ds-postfix__workspace,.ds-postfix__lower{grid-template-columns:1fr}}
-@media(max-width:760px){.ds-postfix__hero p{text-align:left}.ds-postfix__metrics,.ds-postfix__stats,.ds-postfix__cards{grid-template-columns:repeat(2,minmax(0,1fr))}.ds-postfix__speed{grid-template-columns:1fr}.ds-postfix__speed output{text-align:left}}
-@media(max-width:500px){.ds-postfix__group,.ds-postfix__group--examples,.ds-postfix__metrics,.ds-postfix__stats,.ds-postfix__cards{grid-template-columns:1fr}.ds-postfix__field{grid-column:auto}}
-@media(prefers-color-scheme:dark){.ds-postfix{--ds-surface:var(--global-bg-color);--ds-surface-strong:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));--ds-border:color-mix(in srgb,var(--global-border-color) 85%,var(--global-text-color));--ds-shadow:none;--ds-shadow-soft:none}}
-@media(prefers-reduced-motion:reduce){.ds-postfix *,.ds-postfix *::before,.ds-postfix *::after{transition-duration:.001ms!important;animation-duration:.001ms!important}}
+
+.postfix-title {
+  margin: 0;
+  color: var(--sim-text);
+  text-align: center;
+  font-size: 1.45rem;
+  line-height: 1.15;
+}
+
+.postfix-controls {
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--sim-border);
+  border-radius: 10px;
+  background: var(--sim-softer);
+}
+
+.postfix-row {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 5px;
+  align-items: end;
+}
+
+.postfix-field {
+  display: grid;
+  grid-column: span 6;
+  gap: 2px;
+  min-width: 0;
+}
+
+.postfix-field label {
+  display: block;
+  margin: 0 !important;
+  padding: 0;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.postfix-field input {
+  width: 100%;
+  height: 31px;
+  min-height: 31px;
+  margin: 0 !important;
+  padding: 3px 7px;
+  border: 1px solid var(--sim-border);
+  border-radius: 6px;
+  background: var(--sim-bg);
+  color: var(--sim-text);
+  font: inherit;
+  line-height: 1;
+  vertical-align: top;
+}
+
+.postfix-btn {
+  height: 31px;
+  min-height: 31px;
+  margin: 0 !important;
+  padding: 0 6px;
+  border: 1px solid var(--sim-accent);
+  border-radius: 6px;
+  background: var(--sim-accent);
+  color: #fff;
+  font: inherit;
+  font-size: 10.8px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: end;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: transform .12s ease, filter .12s ease;
+}
+
+.postfix-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.postfix-btn:disabled {
+  cursor: not-allowed;
+  opacity: .45;
+}
+
+.postfix-btn.success {
+  background: var(--sim-ok);
+  border-color: var(--sim-ok);
+}
+
+.postfix-btn.danger {
+  background: var(--sim-danger);
+  border-color: var(--sim-danger);
+}
+
+.span2 { grid-column: span 2; }
+
+.postfix-tokens {
+  min-height: 47px;
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+  border: 1px solid var(--sim-border);
+  border-radius: 10px;
+  background: var(--sim-bg);
+  overflow: hidden;
+}
+
+.postfix-token {
+  min-width: 31px;
+  height: 31px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--sim-border);
+  border-radius: 6px;
+  background: var(--sim-soft);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 11px;
+  font-weight: 800;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.postfix-token.current {
+  background: #fef3c7;
+  border-color: var(--sim-warn);
+  color: #4a3100;
+  transform: translateY(-2px);
+}
+
+.postfix-token.processed {
+  background: #dcfce7;
+  border-color: var(--sim-ok);
+  color: #14532d;
+}
+
+.postfix-stage {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.postfix-stack-panel,
+.postfix-process {
+  min-height: 0;
+  border: 1px solid var(--sim-border);
+  border-radius: 10px;
+  background: var(--sim-bg);
+  overflow: hidden;
+}
+
+.postfix-stack-panel {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 8px;
+}
+
+.postfix-mini-title {
+  margin: 0 0 5px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  opacity: .65;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.postfix-stack {
+  min-height: 0;
+  padding: 7px;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  gap: 5px;
+  border: 3px solid color-mix(in srgb, var(--sim-text) 45%, var(--sim-border));
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: color-mix(in srgb, var(--sim-text) 3%, var(--sim-bg));
+  overflow: hidden;
+}
+
+.postfix-stack-item {
+  min-height: 31px;
+  padding: 3px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--sim-accent);
+  border-radius: 6px;
+  background: var(--sim-soft);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.postfix-stack-item.top {
+  background: #fef3c7;
+  border-color: var(--sim-warn);
+  color: #4a3100;
+}
+
+.postfix-stack-empty {
+  margin: auto;
+  text-align: center;
+  font-size: 11px;
+  opacity: .55;
+}
+
+.postfix-stack-top {
+  margin-top: 5px;
+  text-align: center;
+  color: var(--sim-accent);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.postfix-process {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+}
+
+.postfix-message {
+  min-height: 37px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--sim-border);
+  background: var(--sim-softer);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.postfix-output-area {
+  min-height: 0;
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  padding: 8px 10px;
+}
+
+.postfix-output-box {
+  width: min(430px, 100%);
+  padding: 7px 9px;
+  border: 1px solid var(--sim-border);
+  border-radius: 7px;
+  background: var(--sim-softer);
+}
+
+.postfix-output-box strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 9px;
+  opacity: .6;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.postfix-value {
+  min-height: 25px;
+  overflow-wrap: anywhere;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.postfix-result {
+  padding: 7px 10px;
+  border-top: 1px solid var(--sim-border);
+  background: color-mix(in srgb, var(--sim-ok) 6%, var(--sim-bg));
+}
+
+.postfix-result strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--sim-ok);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+.postfix-status {
+  min-height: 31px;
+  padding: 6px 10px;
+  border-top: 1px solid var(--sim-border);
+  background: var(--sim-softer);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.postfix-status.success { color: var(--sim-ok); }
+.postfix-status.error { color: var(--sim-danger); }
+.postfix-status.warning { color: var(--sim-warn); }
+
+.postfix-footer {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, .8fr);
+  gap: 5px;
+}
+
+.postfix-stat {
+  min-width: 0;
+  padding: 5px 7px;
+  border: 1px solid var(--sim-border);
+  border-radius: 7px;
+  background: var(--sim-softer);
+  font-size: 10.5px;
+  line-height: 1.2;
+}
+
+.postfix-stat strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 9px;
+  opacity: .6;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+
+@media (max-width: 700px) {
+  .postfix-sim {
+    width: calc(100vw - 10px);
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .postfix-shell { grid-template-rows: auto; }
+  .postfix-row { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .postfix-field { grid-column: span 6; }
+  .span2 { grid-column: span 2; }
+
+  .postfix-stage { grid-template-columns: 1fr; }
+  .postfix-stack-panel { min-height: 180px; }
+  .postfix-process { min-height: 230px; }
+
+  .postfix-tokens {
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+
+  .postfix-footer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-height: 620px) and (min-width: 701px) {
+  .postfix-sim {
+    height: calc(100vh - 48px);
+    padding-top: 4px;
+  }
+
+  .postfix-title { font-size: 1.25rem; }
+  .postfix-controls { padding: 6px; gap: 5px; }
+  .postfix-btn, .postfix-field input { height: 28px; min-height: 28px; }
+  .postfix-tokens { min-height: 41px; padding-top: 4px; padding-bottom: 4px; }
+  .postfix-token { height: 27px; min-width: 28px; }
+  .postfix-stack-item { min-height: 27px; }
+  .postfix-status { min-height: 27px; padding: 5px 8px; }
+}
+
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .ds-postfix__token.is-current { background: #451a03; border-color: #f59e0b; color: #fef3c7; }
-  :root:not([data-theme="light"]) .ds-postfix__token.is-processed { background: #052e16; border-color: #22c55e; color: #dcfce7; }
-  :root:not([data-theme="light"]) .ds-postfix tr.is-active { background: #451a03; color: #fef3c7; }
-  :root:not([data-theme="light"]) .ds-postfix tr.is-done { background: #052e16; color: #dcfce7; }
+  :root:not([data-theme="light"]) .postfix-token.current,
+  :root:not([data-theme="light"]) .postfix-stack-item.top {
+    background: #451a03;
+    color: #fef3c7;
+    border-color: #f59e0b;
+  }
+
+  :root:not([data-theme="light"]) .postfix-token.processed {
+    background: #052e16;
+    color: #dcfce7;
+    border-color: #22c55e;
+  }
 }
-:root[data-theme="dark"] .ds-postfix__token.is-current { background: #451a03; border-color: #f59e0b; color: #fef3c7; }
-:root[data-theme="dark"] .ds-postfix__token.is-processed { background: #052e16; border-color: #22c55e; color: #dcfce7; }
-:root[data-theme="dark"] .ds-postfix tr.is-active { background: #451a03; color: #fef3c7; }
-:root[data-theme="dark"] .ds-postfix tr.is-done { background: #052e16; color: #dcfce7; }
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) .ds-postfix__code { background: #1e293b; }
+
+:root[data-theme="dark"] .postfix-token.current,
+:root[data-theme="dark"] .postfix-stack-item.top {
+  background: #451a03;
+  color: #fef3c7;
+  border-color: #f59e0b;
 }
-:root[data-theme="light"] .ds-postfix__code { background: #1e293b; }
+
+:root[data-theme="dark"] .postfix-token.processed {
+  background: #052e16;
+  color: #dcfce7;
+  border-color: #22c55e;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .postfix-sim *,
+  .postfix-sim *::before,
+  .postfix-sim *::after {
+    transition-duration: .001ms !important;
+    animation-duration: .001ms !important;
+  }
+}
 </style>
 
-<div class="ds-postfix">
-  <section class="ds-postfix__hero">
-    <h1>Infix to Postfix Converter</h1>
-    <p>
-      In infix notation, operators appear between operands, such as A + B. In postfix notation, operators appear
-      after their operands, such as A B +. Postfix notation removes the need for parentheses during evaluation
-      because precedence has already been encoded in the token order.
-    </p>
-    <div class="ds-postfix__metrics">
-      <div class="ds-postfix__metric"><strong>Tokenization</strong>O(n)</div>
-      <div class="ds-postfix__metric"><strong>Conversion</strong>O(n)</div>
-      <div class="ds-postfix__metric"><strong>Auxiliary space</strong>O(n)</div>
-      <div class="ds-postfix__metric"><strong>Algorithm</strong>Shunting Yard</div>
-    </div>
-  </section>
+<div class="postfix-sim">
+  <div class="postfix-shell">
+    <h1 class="postfix-title">Infix to Postfix Simulator</h1>
 
-  <section class="ds-postfix__section">
-    <h2>Expression and playback controls</h2>
-    <div class="ds-postfix__panel">
-      <div class="ds-postfix__group">
-        <div class="ds-postfix__field">
-          <label for="ds-postfix-input">Infix expression</label>
-          <input id="ds-postfix-input" type="text" value="A + B * C" spellcheck="false">
+    <div class="postfix-controls">
+      <div class="postfix-row">
+        <div class="postfix-field">
+          <label for="postfix-input">Infix expression</label>
+          <input id="postfix-input" type="text" value="A + B * C" spellcheck="false">
         </div>
-        <button class="ds-postfix__btn" id="ds-postfix-convert" type="button">Convert</button>
-        <button class="ds-postfix__btn" id="ds-postfix-prev" type="button">Previous</button>
-        <button class="ds-postfix__btn" id="ds-postfix-next" type="button">Next</button>
-        <button class="ds-postfix__btn" id="ds-postfix-auto" type="button">Auto Play</button>
+        <button class="postfix-btn span2" id="postfix-convert" type="button">Convert</button>
+        <button class="postfix-btn span2" id="postfix-example" type="button">Example</button>
+        <button class="postfix-btn danger span2" id="postfix-reset" type="button">Reset</button>
       </div>
 
-      <div class="ds-postfix__group ds-postfix__group--examples">
-        <div class="ds-postfix__field">
-          <label for="ds-postfix-example">Example expression</label>
-          <select id="ds-postfix-example">
-            <option value="A + B * C">A + B * C</option>
-            <option value="(A + B) * C">(A + B) * C</option>
-            <option value="A + B * C - D / E">A + B * C - D / E</option>
-            <option value="A ^ B ^ C">A ^ B ^ C</option>
-            <option value="(A + B) * (C - D)"> (A + B) * (C - D) </option>
-          </select>
-        </div>
-        <button class="ds-postfix__btn" id="ds-postfix-load-example" type="button">Load Example</button>
-        <button class="ds-postfix__btn ds-postfix__btn--danger" id="ds-postfix-reset" type="button">Reset</button>
-      </div>
-
-      <div class="ds-postfix__speed">
-        <label for="ds-postfix-speed">Animation speed</label>
-        <input id="ds-postfix-speed" type="range" min="100" max="1200" step="100" value="500">
-        <output id="ds-postfix-speed-output">500 ms</output>
+      <div class="postfix-row">
+        <button class="postfix-btn span2" id="postfix-prev" type="button">Previous</button>
+        <button class="postfix-btn span2" id="postfix-next" type="button">Next</button>
+        <button class="postfix-btn success span2" id="postfix-auto" type="button">Auto Run</button>
+        <button class="postfix-btn danger span2" id="postfix-cancel" type="button">Cancel</button>
       </div>
     </div>
 
-    <div class="ds-postfix__tokens" id="ds-postfix-tokens" aria-label="Expression tokens"></div>
+    <div class="postfix-tokens" id="postfix-tokens" aria-label="Expression tokens"></div>
 
-    <div class="ds-postfix__workspace">
-      <div class="ds-postfix__stack-panel">
-        <h3>Operator stack</h3>
-        <div class="ds-postfix__stack" id="ds-postfix-stack"></div>
-        <div class="ds-postfix__stack-top" id="ds-postfix-stack-top">TOP</div>
+    <div class="postfix-stage">
+      <div class="postfix-stack-panel">
+        <div class="postfix-mini-title">Operator Stack</div>
+        <div class="postfix-stack" id="postfix-stack"></div>
+        <div class="postfix-stack-top" id="postfix-stack-top">TOP</div>
       </div>
 
-      <div class="ds-postfix__process">
-        <h3>Current conversion state</h3>
-        <div class="ds-postfix__message" id="ds-postfix-message"></div>
-        <div class="ds-postfix__expr">
-          <strong>Postfix output</strong>
-          <div class="ds-postfix__value" id="ds-postfix-output">—</div>
+      <div class="postfix-process">
+        <div class="postfix-message" id="postfix-message">Ready.</div>
+
+        <div class="postfix-output-area">
+          <div class="postfix-output-box">
+            <strong>Scan</strong>
+            <div class="postfix-value" id="postfix-scan">—</div>
+          </div>
+          <div class="postfix-output-box">
+            <strong>Temporary output</strong>
+            <div class="postfix-value" id="postfix-temp">—</div>
+          </div>
+        </div>
+
+        <div class="postfix-result">
+          <strong>Postfix result</strong>
+          <div class="postfix-value" id="postfix-result">—</div>
+        </div>
+
+        <div class="postfix-status" id="postfix-status" aria-live="polite">
+          Convert the expression to create the steps.
         </div>
       </div>
     </div>
 
-    <p class="ds-postfix__status" id="ds-postfix-status" role="status" aria-live="polite">
-      Convert the expression, then use Next to inspect the Shunting Yard algorithm.
-    </p>
-
-    <div class="ds-postfix__stats">
-      <div class="ds-postfix__stat"><strong>Current step</strong><span id="ds-postfix-step">0 / 0</span></div>
-      <div class="ds-postfix__stat"><strong>Tokens</strong><span id="ds-postfix-count">0</span></div>
-      <div class="ds-postfix__stat"><strong>Stack operations</strong><span id="ds-postfix-ops">0</span></div>
-      <div class="ds-postfix__stat"><strong>Complexity</strong>O(n)</div>
+    <div class="postfix-footer">
+      <div class="postfix-stat"><strong>Operation</strong><span id="postfix-operation">Idle</span></div>
+      <div class="postfix-stat"><strong>Step</strong><span id="postfix-step">0 / 0</span></div>
+      <div class="postfix-stat"><strong>Tokens</strong><span id="postfix-count">0</span></div>
+      <div class="postfix-stat"><strong>Stack ops</strong><span id="postfix-ops">0</span></div>
     </div>
-
-    <div class="ds-postfix__lower">
-      <div class="ds-postfix__table-panel">
-        <h3>Step table</h3>
-        <div class="ds-postfix__table-scroll">
-          <table>
-            <thead><tr><th>Step</th><th>Token</th><th>Action</th></tr></thead>
-            <tbody id="ds-postfix-table"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="ds-postfix__code-panel">
-        <h3>Shunting Yard core</h3>
-        <div class="ds-postfix__code"><pre>for token from left to right:
-
-operand:
-  append to output
-
-operator:
-  pop operators with higher precedence
-  pop equal precedence if left-associative
-  push current operator
-
-"(":
-  push onto stack
-
-")":
-  pop until "("
-
-finally:
-  pop remaining operators</pre></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="ds-postfix__section">
-    <h2>Key ideas</h2>
-    <div class="ds-postfix__cards">
-      <article class="ds-postfix__card"><h3>Precedence</h3><p>Higher-precedence operators must reach the output before lower-precedence operators that follow them.</p></article>
-      <article class="ds-postfix__card"><h3>Associativity</h3><p>Addition, subtraction, multiplication, and division are left-associative; exponentiation is right-associative.</p></article>
-      <article class="ds-postfix__card"><h3>Parentheses</h3><p>Parentheses temporarily control the operator stack but never appear in the final postfix expression.</p></article>
-      <article class="ds-postfix__card"><h3>Linear complexity</h3><p>Each token is processed once, while each operator is pushed and popped at most once.</p></article>
-    </div>
-  </section>
+  </div>
 </div>
 
 <script>
 (() => {
   "use strict";
 
-  const root = document.querySelector(".ds-postfix");
-  if (!root) return;
-
-  const q = id => root.querySelector("#" + id);
+  const $ = id => document.getElementById(id);
 
   const el = {
-    input: q("ds-postfix-input"),
-    example: q("ds-postfix-example"),
-    speed: q("ds-postfix-speed"),
-    speedOutput: q("ds-postfix-speed-output"),
-    tokens: q("ds-postfix-tokens"),
-    stack: q("ds-postfix-stack"),
-    stackTop: q("ds-postfix-stack-top"),
-    message: q("ds-postfix-message"),
-    output: q("ds-postfix-output"),
-    status: q("ds-postfix-status"),
-    step: q("ds-postfix-step"),
-    count: q("ds-postfix-count"),
-    ops: q("ds-postfix-ops"),
-    table: q("ds-postfix-table")
+    input: $("postfix-input"),
+    convert: $("postfix-convert"),
+    example: $("postfix-example"),
+    prev: $("postfix-prev"),
+    next: $("postfix-next"),
+    auto: $("postfix-auto"),
+    reset: $("postfix-reset"),
+    cancel: $("postfix-cancel"),
+    tokens: $("postfix-tokens"),
+    stack: $("postfix-stack"),
+    stackTop: $("postfix-stack-top"),
+    message: $("postfix-message"),
+    scan: $("postfix-scan"),
+    temp: $("postfix-temp"),
+    result: $("postfix-result"),
+    status: $("postfix-status"),
+    operation: $("postfix-operation"),
+    step: $("postfix-step"),
+    count: $("postfix-count"),
+    ops: $("postfix-ops")
   };
 
-  const btn = {
-    convert: q("ds-postfix-convert"),
-    prev: q("ds-postfix-prev"),
-    next: q("ds-postfix-next"),
-    auto: q("ds-postfix-auto"),
-    loadExample: q("ds-postfix-load-example"),
-    reset: q("ds-postfix-reset")
-  };
+  const DELAY = 300;
+  const MAX_TOKENS = 16;
+  const examples = [
+    "A + B * C",
+    "( A + B ) * C",
+    "A + B * C - D / E",
+    "A ^ B ^ C",
+    "( A + B ) * ( C - D )"
+  ];
 
+  let exampleIndex = 0;
   let tokens = [];
-  let steps = [];
-  let cursor = 0;
-  let autoToken = 0;
-  let autoRunning = false;
+  let frames = [];
+  let frameIndex = 0;
+  let running = false;
+  let tokenId = 0;
 
-  const precedence = op => ({"+":1,"-":1,"*":2,"/":2,"^":3}[op] || 0);
-  const isOperator = t => ["+","-","*","/","^"].includes(t);
-  const isOperand = t => /^[A-Za-z_][A-Za-z0-9_]*$/.test(t) || /^\d+(?:\.\d+)?$/.test(t);
-  const isRightAssociative = op => op === "^";
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const operators = new Set(["+", "-", "*", "/", "^"]);
 
-  function tokenize(text) {
-    const out = [];
-    let i = 0;
-
-    while (i < text.length) {
-      const c = text[i];
-
-      if (/\s/.test(c)) {
-        i++;
-        continue;
-      }
-
-      if (/[A-Za-z_]/.test(c)) {
-        let s = c;
-        i++;
-        while (i < text.length && /[A-Za-z0-9_]/.test(text[i])) s += text[i++];
-        out.push(s);
-        continue;
-      }
-
-      if (/\d|\./.test(c)) {
-        let s = c;
-        i++;
-        while (i < text.length && /[\d.]/.test(text[i])) s += text[i++];
-        if (!/^\d+(?:\.\d+)?$/.test(s)) throw new Error(`Invalid number: ${s}`);
-        out.push(s);
-        continue;
-      }
-
-      if ("+-*/^()".includes(c)) {
-        out.push(c);
-        i++;
-        continue;
-      }
-
-      throw new Error(`Unsupported character: ${c}`);
-    }
-
-    if (!out.length) throw new Error("Enter an expression.");
-    return out;
+  function precedence(op) {
+    return ({ "+": 1, "-": 1, "*": 2, "/": 2, "^": 3 })[op] || 0;
   }
 
-  function validate(ts) {
+  function isOperand(token) {
+    return /^[A-Za-z0-9_]+(?:\.[0-9]+)?$/.test(token);
+  }
+
+  function tokenize(expression) {
+    const text = expression.trim();
+    if (!text) return null;
+
+    const found = text.match(/[A-Za-z_][A-Za-z0-9_]*|\d+(?:\.\d+)?|[()+\-*/^]/g);
+    if (!found) return null;
+
+    const rebuilt = found.join("").replace(/\s+/g, "");
+    const original = text.replace(/\s+/g, "");
+
+    if (rebuilt !== original || found.length > MAX_TOKENS) return null;
+    return found;
+  }
+
+  function validate(list) {
     let balance = 0;
     let expectOperand = true;
 
-    ts.forEach(t => {
-      if (t === "(") {
-        if (!expectOperand) throw new Error("Missing operator before '('.");
+    for (const token of list) {
+      if (isOperand(token)) {
+        if (!expectOperand) return false;
+        expectOperand = false;
+      } else if (token === "(") {
+        if (!expectOperand) return false;
         balance++;
-        expectOperand = true;
-      } else if (t === ")") {
-        if (expectOperand) throw new Error("Unexpected ')'.");
+      } else if (token === ")") {
+        if (expectOperand || balance <= 0) return false;
         balance--;
-        if (balance < 0) throw new Error("Unbalanced parentheses.");
         expectOperand = false;
-      } else if (isOperand(t)) {
-        if (!expectOperand) throw new Error(`Missing operator before ${t}.`);
-        expectOperand = false;
-      } else if (isOperator(t)) {
-        if (expectOperand) throw new Error(`Operator ${t} is missing a left operand.`);
+      } else if (operators.has(token)) {
+        if (expectOperand) return false;
         expectOperand = true;
       } else {
-        throw new Error(`Invalid token: ${t}`);
+        return false;
       }
-    });
+    }
 
-    if (balance !== 0) throw new Error("Unbalanced parentheses.");
-    if (expectOperand) throw new Error("Expression cannot end with an operator.");
+    return balance === 0 && !expectOperand;
   }
 
-  function buildSteps(ts) {
-    const stack = [];
+  function shouldPop(top, current) {
+    if (!operators.has(top)) return false;
+
+    const topP = precedence(top);
+    const curP = precedence(current);
+
+    return topP > curP || (topP === curP && current !== "^");
+  }
+
+  function buildFrames(list) {
     const output = [];
-    const frames = [];
+    const stack = [];
+    const result = [];
     let stackOps = 0;
 
-    frames.push({
-      index: null,
-      stack: [...stack],
-      output: [...output],
-      action: "Ready to scan from left to right.",
-      stackOps
-    });
+    const snapshot = (currentIndex, message, final = false) => {
+      result.push({
+        currentIndex,
+        stack: [...stack],
+        output: [...output],
+        stackOps,
+        message,
+        final
+      });
+    };
 
-    ts.forEach((token, i) => {
-      if (isOperand(token)) {
-        output.push(token);
-        frames.push({
-          index: i,
-          stack: [...stack],
-          output: [...output],
-          action: `Operand ${token}: append it directly to the postfix output.`,
-          stackOps
-        });
-        return;
+    snapshot(-1, "Ready to scan from left to right.");
+
+    for (let i = 0; i < list.length; i++) {
+      const current = list[i];
+
+      if (isOperand(current)) {
+        output.push(current);
+        snapshot(i, `Operand ${current} → output.`);
+        continue;
       }
 
-      if (token === "(") {
-        stack.push(token);
+      if (current === "(") {
+        stack.push(current);
         stackOps++;
-        frames.push({
-          index: i,
-          stack: [...stack],
-          output: [...output],
-          action: "Left parenthesis: push it onto the operator stack.",
-          stackOps
-        });
-        return;
+        snapshot(i, "Opening parenthesis → push.");
+        continue;
       }
 
-      if (token === ")") {
+      if (current === ")") {
         while (stack.length && stack[stack.length - 1] !== "(") {
           output.push(stack.pop());
           stackOps++;
         }
 
-        if (!stack.length) throw new Error("Unbalanced parentheses.");
-
+        if (!stack.length) throw new Error("Mismatched parentheses.");
         stack.pop();
         stackOps++;
-
-        frames.push({
-          index: i,
-          stack: [...stack],
-          output: [...output],
-          action: "Right parenthesis: pop operators until the matching left parenthesis.",
-          stackOps
-        });
-        return;
+        snapshot(i, "Closing parenthesis → pop until matching parenthesis.");
+        continue;
       }
 
-      while (
-        stack.length &&
-        isOperator(stack[stack.length - 1]) &&
-        (
-          precedence(stack[stack.length - 1]) > precedence(token) ||
-          (
-            precedence(stack[stack.length - 1]) === precedence(token) &&
-            !isRightAssociative(token)
-          )
-        )
-      ) {
+      while (stack.length && shouldPop(stack[stack.length - 1], current)) {
         output.push(stack.pop());
         stackOps++;
       }
 
-      stack.push(token);
+      stack.push(current);
       stackOps++;
-
-      frames.push({
-        index: i,
-        stack: [...stack],
-        output: [...output],
-        action: `Operator ${token}: apply precedence and associativity rules, then push it.`,
-        stackOps
-      });
-    });
-
-    while (stack.length) {
-      const op = stack.pop();
-
-      if (op === "(" || op === ")") throw new Error("Unbalanced parentheses.");
-
-      output.push(op);
-      stackOps++;
-
-      frames.push({
-        index: null,
-        stack: [...stack],
-        output: [...output],
-        action: `Drain operator ${op} from the stack to the postfix output.`,
-        stackOps
-      });
+      snapshot(i, `Operator ${current} processed.`);
     }
 
-    frames.push({
-      index: null,
-      stack: [],
-      output: [...output],
-      action: "Conversion complete.",
-      stackOps,
-      complete: true
-    });
+    while (stack.length) {
+      const top = stack.pop();
+      if (top === "(" || top === ")") throw new Error("Mismatched parentheses.");
+      output.push(top);
+      stackOps++;
+      snapshot(list.length, `Pop ${top} from stack.`);
+    }
 
-    return frames;
+    snapshot(list.length, "Conversion complete.", true);
+    return result;
+  }
+
+  function setStatus(text, type = "") {
+    el.status.textContent = text;
+    el.status.className = "postfix-status" + (type ? " " + type : "");
+  }
+
+  function setRunning(value) {
+    running = value;
+    [el.convert, el.example, el.prev, el.next, el.auto, el.reset]
+      .forEach(button => button.disabled = value);
+    el.cancel.disabled = !value;
+  }
+
+  function currentFrame() {
+    return frames[Math.max(0, Math.min(frameIndex, frames.length - 1))];
   }
 
   function render() {
-    const frame = steps[cursor] || {
-      stack: [],
-      output: [],
-      action: "",
-      stackOps: 0
-    };
+    const frame = currentFrame();
 
-    el.tokens.innerHTML = tokens.map((t, i) => {
-      const processed = frame.index === null ? false : i < frame.index;
-      return `<span class="ds-postfix__token ${i === frame.index ? "is-current" : processed ? "is-processed" : ""}">${t}</span>`;
-    }).join("");
+    el.tokens.innerHTML = "";
+    tokens.forEach((token, index) => {
+      const node = document.createElement("div");
+      node.className = "postfix-token";
 
+      if (index === frame.currentIndex && frame.currentIndex < tokens.length) {
+        node.classList.add("current");
+      } else if (frame.currentIndex >= 0 && index < frame.currentIndex) {
+        node.classList.add("processed");
+      }
+
+      node.textContent = token;
+      el.tokens.appendChild(node);
+    });
+
+    el.stack.innerHTML = "";
     if (!frame.stack.length) {
-      el.stack.innerHTML = '<p class="ds-postfix__stack-empty">Stack is empty.</p>';
-      el.stackTop.textContent = "TOP = empty";
+      const empty = document.createElement("div");
+      empty.className = "postfix-stack-empty";
+      empty.textContent = "Empty";
+      el.stack.appendChild(empty);
+      el.stackTop.textContent = "TOP";
     } else {
-      el.stack.innerHTML = frame.stack.map(op => `<div class="ds-postfix__stack-item">${op}</div>`).join("");
-      el.stackTop.textContent = `TOP → ${frame.stack[frame.stack.length - 1]}`;
+      frame.stack.forEach((operator, index) => {
+        const item = document.createElement("div");
+        item.className = "postfix-stack-item";
+        if (index === frame.stack.length - 1) item.classList.add("top");
+        item.textContent = operator;
+        el.stack.appendChild(item);
+      });
+
+      el.stackTop.textContent = `TOP = ${frame.stack[frame.stack.length - 1]}`;
     }
 
-    el.message.textContent = frame.action || "—";
-    el.output.textContent = frame.output.length ? frame.output.join(" ") : "—";
-    el.step.textContent = `${cursor} / ${Math.max(0, steps.length - 1)}`;
-    el.count.textContent = String(tokens.length);
-    el.ops.textContent = String(frame.stackOps || 0);
+    el.message.textContent = frame.message;
+    el.scan.textContent = tokens.length ? tokens.join(" ") : "—";
+    el.temp.textContent = frame.output.length ? frame.output.join(" ") : "—";
+    el.result.textContent = frame.final && frame.output.length
+      ? frame.output.join(" ")
+      : "—";
 
-    el.table.innerHTML = steps.slice(1).map((s, i) => `
-      <tr class="${i + 1 === cursor ? "is-active" : i + 1 < cursor ? "is-done" : ""}">
-        <td>${i + 1}</td>
-        <td>${s.index == null ? "—" : tokens[s.index]}</td>
-        <td>${s.action}</td>
-      </tr>
-    `).join("");
+    el.step.textContent = `${frameIndex} / ${Math.max(0, frames.length - 1)}`;
+    el.count.textContent = tokens.length;
+    el.ops.textContent = frame.stackOps;
 
-    const complete = steps.length && cursor === steps.length - 1;
-
-    el.status.textContent = complete
-      ? `Postfix: ${frame.output.join(" ")}`
-      : "Use Next to continue the conversion.";
-
-    el.status.className = "ds-postfix__status" + (complete ? " is-success" : "");
-
-    btn.prev.disabled = cursor === 0 || autoRunning;
-    btn.next.disabled = !steps.length || cursor === steps.length - 1 || autoRunning;
-    btn.auto.disabled = !steps.length || cursor === steps.length - 1 || autoRunning;
-    btn.convert.disabled = btn.loadExample.disabled = autoRunning;
-    el.input.disabled = el.example.disabled = autoRunning;
+    el.prev.disabled = running || frameIndex <= 0;
+    el.next.disabled = running || frameIndex >= frames.length - 1;
+    el.cancel.disabled = !running;
   }
 
-  function setup(text) {
-    autoToken++;
-    autoRunning = false;
+  function convertExpression(message = "Steps created.") {
+    const parsed = tokenize(el.input.value);
+
+    if (!parsed) {
+      setStatus(`Use at most ${MAX_TOKENS} valid tokens.`, "error");
+      return false;
+    }
+
+    if (!validate(parsed)) {
+      setStatus("Invalid infix expression.", "error");
+      return false;
+    }
 
     try {
-      tokens = tokenize(text);
-      validate(tokens);
-      steps = buildSteps(tokens);
-      cursor = 0;
+      tokens = parsed;
+      frames = buildFrames(parsed);
+      frameIndex = 0;
+      tokenId++;
+      running = false;
+      el.operation.textContent = "Idle";
+      setRunning(false);
       render();
+      setStatus(message, "success");
+      return true;
     } catch (error) {
-      tokens = [];
-      steps = [];
-      cursor = 0;
-
-      el.tokens.innerHTML = "";
-      el.stack.innerHTML = "";
-      el.message.textContent = "—";
-      el.output.textContent = "—";
-      el.table.innerHTML = "";
-      el.step.textContent = "0 / 0";
-      el.count.textContent = "0";
-      el.ops.textContent = "0";
-      el.status.textContent = error.message;
-      el.status.className = "ds-postfix__status is-error";
+      setStatus(error.message || "Conversion failed.", "error");
+      return false;
     }
   }
 
-  btn.convert.addEventListener("click", () => setup(el.input.value));
+  function example() {
+    exampleIndex = (exampleIndex + 1) % examples.length;
+    el.input.value = examples[exampleIndex];
+    convertExpression("Example loaded.");
+  }
 
-  btn.loadExample.addEventListener("click", () => {
-    el.input.value = el.example.value.trim();
-    setup(el.input.value);
-  });
-
-  btn.reset.addEventListener("click", () => {
-    autoToken++;
-    autoRunning = false;
-    cursor = 0;
+  function previous() {
+    if (running || frameIndex <= 0) return;
+    frameIndex--;
+    el.operation.textContent = "Previous";
     render();
-  });
+    setStatus(currentFrame().message);
+  }
 
-  btn.next.addEventListener("click", () => {
-    if (cursor < steps.length - 1) {
-      cursor++;
-      render();
-    }
-  });
-
-  btn.prev.addEventListener("click", () => {
-    if (cursor > 0) {
-      cursor--;
-      render();
-    }
-  });
-
-  btn.auto.addEventListener("click", async () => {
-    autoRunning = true;
-    const token = ++autoToken;
+  function next() {
+    if (running || frameIndex >= frames.length - 1) return;
+    frameIndex++;
+    el.operation.textContent = "Next";
     render();
 
-    while (cursor < steps.length - 1 && token === autoToken) {
-      cursor++;
+    if (currentFrame().final) {
+      setStatus(`Postfix: ${currentFrame().output.join(" ")}`, "success");
+    } else {
+      setStatus(currentFrame().message);
+    }
+  }
+
+  async function autoRun() {
+    if (!frames.length && !convertExpression()) return;
+
+    if (frameIndex >= frames.length - 1) {
+      frameIndex = 0;
       render();
-      await new Promise(resolve => setTimeout(resolve, Number(el.speed.value)));
     }
 
-    if (token === autoToken) {
-      autoRunning = false;
-      render();
+    tokenId++;
+    const localToken = tokenId;
+    running = true;
+    el.operation.textContent = "Auto Run";
+    setRunning(true);
+
+    try {
+      while (frameIndex < frames.length - 1) {
+        await wait(DELAY);
+        if (localToken !== tokenId) throw new Error("cancelled");
+        frameIndex++;
+        render();
+        setStatus(currentFrame().message);
+      }
+
+      if (localToken !== tokenId) return;
+      running = false;
+      setRunning(false);
+      el.operation.textContent = "Idle";
+      setStatus(`Postfix: ${currentFrame().output.join(" ")}`, "success");
+    } catch (error) {
+      if (error?.message !== "cancelled") {
+        running = false;
+        setRunning(false);
+        el.operation.textContent = "Idle";
+        setStatus("Operation stopped.", "error");
+      }
     }
-  });
+  }
 
-  el.speed.addEventListener("input", () => {
-    el.speedOutput.textContent = `${el.speed.value} ms`;
-  });
+  function reset() {
+    tokenId++;
+    running = false;
+    frameIndex = 0;
+    el.operation.textContent = "Idle";
+    setRunning(false);
+    render();
+    setStatus("Simulation reset.");
+  }
 
-  setup(el.input.value);
+  function cancel() {
+    if (!running) return;
+    tokenId++;
+    running = false;
+    setRunning(false);
+    el.operation.textContent = "Idle";
+    render();
+    setStatus("Auto run cancelled.");
+  }
+
+  el.convert.addEventListener("click", () => convertExpression());
+  el.example.addEventListener("click", example);
+  el.prev.addEventListener("click", previous);
+  el.next.addEventListener("click", next);
+  el.auto.addEventListener("click", autoRun);
+  el.reset.addEventListener("click", reset);
+  el.cancel.addEventListener("click", cancel);
+
+  convertExpression("Ready.");
 })();
 </script>
