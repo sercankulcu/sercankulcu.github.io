@@ -1,0 +1,358 @@
+---
+layout: without-sidebar
+title: "Bölüm 5: emu8086.inc Kütüphanesi"
+permalink: /files/microprocessors/slides/Bolum_05_Kutuphane.html
+excerpt: "Mikroişlemciler dersi Bölüm 5 sunumu: emu8086.inc kütüphanesi, INCLUDE direktifi, PUTC, GOTOXY, PRINT, PRINTN, CURSOROFF ve CURSORON makroları, PRINT_STRING, PTHIS, GET_STRING, CLEAR_SCREEN, SCAN_NUM, PRINT_NUM ve PRINT_NUM_UNS prosedürleri, CALL ve RET, makro ile prosedür karşılaştırması."
+---
+
+<link rel="stylesheet" href="deck/deck.css">
+<style>
+.ds-deck .ds-svg .mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+.ds-deck .ds-deck__card strong { display: inline; margin: 0; font-size: inherit; }
+.ds-deck .ds-deck__card > strong:first-child { display: block; margin-bottom: 3px; font-size: 17px; }
+.ds-deck .ds-deck__step > svg.ds-svg { display: block; width: 100%; height: auto; margin: 0 auto; }
+.ds-deck .ds-trace.m05l-side { grid-template-columns: minmax(0, var(--m05l-cw, 330px)) minmax(0, 1fr); column-gap: 14px; row-gap: 6px; }
+.ds-deck .m05l-side > .ds-deck__steps { grid-column: 2; grid-row: 1; }
+.ds-deck .m05l-side > pre.ds-trace__code { grid-column: 1; grid-row: 1 / span 2; }
+.ds-deck .m05l-side > .ds-trace__col { grid-column: 2; grid-row: 2; }
+.ds-deck .m05l-side .ds-deck__stepnote { margin-top: 4px; min-height: 44px; font-size: 15px; line-height: 1.35; }
+.ds-deck .m05l-side .ds-deck__stepnav { margin-top: 2px; }
+.ds-deck.is-fluid .m05l-side > * { grid-column: auto !important; grid-row: auto !important; }
+.ds-deck .m05l-pre { font-size: 13.5px; line-height: 1.42; }
+.ds-deck .m05l-demo input, .ds-deck .m05l-demo select { height: 32px; padding: 0 8px; border: 1.5px solid var(--ds-border); border-radius: 8px; background: var(--ds-surface); color: var(--ds-text); font: inherit; font-size: 15px; }
+.ds-deck .m05l-demo label { display: inline-flex; align-items: center; gap: 6px; color: var(--ds-muted); font-size: 14.5px; }
+.ds-deck .m05l-demo .ds-deck__status { font-family: ui-monospace, Consolas, monospace; }
+.ds-deck .m05l-scr { background: #10141c; color: #e6edf3; font-family: ui-monospace, Consolas, monospace; border-radius: 8px; padding: 8px 10px; white-space: pre; font-size: 14px; line-height: 1.35; }
+
+.ds-deck .m05l-xy { display: grid; grid-template-columns: repeat(80, 8px); grid-auto-rows: 10px; border: 1.5px solid var(--ds-border); background: #10141c; cursor: crosshair; }
+.ds-deck .m05l-xy span { border-right: 1px solid rgba(255,255,255,.04); border-bottom: 1px solid rgba(255,255,255,.04); color: #e6edf3; font: 9px/10px ui-monospace, Consolas, monospace; text-align: center; overflow: hidden; }
+.ds-deck .m05l-xy span.is-cur { background: #e9a23b; color: #10141c; }
+.ds-deck .m05l-num-out { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; }
+.ds-deck .m05l-num-out > div { padding: 8px 10px; border: 1.5px solid var(--ds-border); border-radius: 10px; background: var(--ds-surface); font-size: 14.5px; }
+.ds-deck .m05l-num-out b { display: block; color: var(--ds-muted); font-size: 12px; letter-spacing: .05em; text-transform: uppercase; }
+.ds-deck .m05l-num-out code { font-size: 17px; }
+</style>
+
+<div class="ds-deck" id="ds-deck" lang="tr">
+  <div class="ds-deck__screen" id="ds-deck-screen" tabindex="0" aria-roledescription="sunum" aria-label="Bölüm 5: emu8086.inc Kütüphanesi sunumu">
+    <div class="ds-deck__stage" id="ds-deck-stage">
+      <div class="ds-deck__progress" aria-hidden="true"><span id="ds-deck-progress"></span></div>
+
+      <div class="ds-deck__viewport" aria-live="polite">
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="Bölüm 5: emu8086.inc Kütüphanesi" data-section="">
+  <h1>Bölüm 5: emu8086.inc Kütüphanesi</h1>
+  <div class="ds-deck__subtitle">Mikroişlemciler</div>
+  <div class="ds-deck__agenda" aria-label="Bölüm içeriği"><span>INCLUDE direktifi</span><span>Makrolar</span><span>PUTC · GOTOXY</span><span>PRINT · PRINTN</span><span>İmleç makroları</span><span>Prosedürler</span><span>Sayı okuma / yazma</span><span>PTHIS ve yığın</span><span>CALL ve RET</span><span>Makro mu, prosedür mü?</span></div>
+  <small>Sercan KÜLCÜ · Giresun Üniversitesi · Elektrik-Elektronik Mühendisliği</small>
+</section>
+
+<section class="ds-deck__slide" data-title="Öğrenme Çıktıları" data-section="Giriş">
+  <p class="ds-deck__kicker">Giriş</p>
+  <h2>Öğrenme Çıktıları</h2>
+<div class="ds-deck__grid ds-deck__grid--2 ds-deck__grid--roomy"><div class="ds-deck__card"><strong>INCLUDE</strong><p>Bir kütüphane dosyasını kaynağa eklemeyi ve derleyicinin dosyayı nerede aradığını açıklamak.</p></div><div class="ds-deck__card"><strong>Makrolar</strong><p><code>PUTC</code>, <code>GOTOXY</code>, <code>PRINT</code>, <code>PRINTN</code> gibi makroların neye genişlediğini göstermek.</p></div><div class="ds-deck__card"><strong>Prosedürler</strong><p><code>DEFINE_…</code> ve <code>CALL</code> ile hazır prosedürleri (sayı okuma/yazma, dizge yazdırma) kullanmak.</p></div><div class="ds-deck__card"><strong>CALL / RET</strong><p>Yığın üzerinden dönüş adresinin nasıl saklandığını izlemek; makro ile prosedürü boyut ve hız açısından karşılaştırmak.</p></div></div>
+</section>
+
+<section class="ds-deck__slide" data-title="Ortak Fonksiyonlar Kütüphanesi" data-section="Kütüphane ve INCLUDE">
+  <p class="ds-deck__kicker">Kütüphane ve INCLUDE</p>
+  <h2>Ortak Fonksiyonlar Kütüphanesi</h2>
+<ul class="ds-deck__small"><li>Programlamayı kolaylaştırmak için sık kullanılan bazı işlevler hazır olarak bulunur.</li><li>Başka dosyalarda tanımlanan işlevler <strong>INCLUDE</strong> direktifi ile kullanılır.</li><li><code>emu8086.inc</code> içindeki herhangi bir işlevi kullanmak için kaynak dosyanın başına <code>include 'emu8086.inc'</code> yazılır.</li><li>Bu kütüphane, emu8086 platformunda sık kullanılan ekran, klavye ve sayı işlevlerini içerir.</li></ul>
+<div class="ds-deck__figure"><svg class="ds-svg" viewBox="0 0 720 150" role="img" aria-label="include satırı önce kaynak dosyanın klasöründe, bulunamazsa Inc klasöründe aranır." style="max-width:720px"><defs><marker id="m05l-m1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><rect class="box" x="10" y="40" width="170" height="50" rx="3"/><text class="txt mono" x="95" y="62" text-anchor="middle">include</text><text class="txt mono" x="95" y="80" text-anchor="middle" style="font-size:13px">'emu8086.inc'</text><path class="line" d="M180 65 L236 65" marker-end="url(#m05l-m1)"/><rect class="box" x="240" y="30" width="190" height="70" rx="3" style="fill:var(--ds-hot);"/><text class="txt" x="335" y="58" text-anchor="middle" style="font-size:14px">1. kaynak dosyanın</text><text class="txt" x="335" y="78" text-anchor="middle" style="font-size:14px">klasörü</text><path class="line" d="M430 65 L486 65" marker-end="url(#m05l-m1)"/><text class="lbl" x="458" y="56" text-anchor="middle">yoksa</text><rect class="box" x="490" y="30" width="210" height="70" rx="3"/><text class="txt" x="595" y="58" text-anchor="middle" style="font-size:14px">2. emu8086 kurulumundaki</text><text class="txt" x="595" y="78" text-anchor="middle" style="font-size:14px">Inc klasörü</text><text class="lbl" x="335" y="128" text-anchor="middle" style="font-size:14px">bulunan dosyanın içeriği, include satırının yerine eklenir</text></svg></div>
+<p class="ds-deck__foot">INCLUDE bir <em>direktiftir</em>: işlemci komutu üretmez, derleme sırasında metin ekler.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Kütüphanede Neler Var?" data-section="Kütüphane ve INCLUDE">
+  <p class="ds-deck__kicker">Kütüphane ve INCLUDE</p>
+  <h2>Kütüphanede Neler Var?</h2>
+<div class="ds-deck__grid ds-deck__grid--2"><div class="ds-deck__card"><strong>Makrolar · doğrudan kullanılır</strong><table class="ds-deck__table" style="font-size:14.5px;margin-top:6px"><thead><tr><th>Makro</th><th>Görev</th></tr></thead><tbody><tr><td><code>PUTC char</code></td><td>tek karakter yaz</td></tr><tr><td><code>GOTOXY col, row</code></td><td>imleci konumlandır</td></tr><tr><td><code>PRINT string</code></td><td>dizge yaz</td></tr><tr><td><code>PRINTN string</code></td><td>dizge yaz + yeni satır</td></tr><tr><td><code>CURSOROFF</code></td><td>imleci gizle</td></tr><tr><td><code>CURSORON</code></td><td>imleci göster</td></tr></tbody></table></div><div class="ds-deck__card"><strong>Prosedürler · DEFINE_ + CALL</strong><table class="ds-deck__table" style="font-size:14.5px;margin-top:6px"><thead><tr><th>Prosedür</th><th>Görev</th></tr></thead><tbody><tr><td><code>PRINT_STRING</code></td><td>DS:SI'deki dizgeyi yaz</td></tr><tr><td><code>PTHIS</code></td><td>CALL'dan sonraki dizgeyi yaz</td></tr><tr><td><code>GET_STRING</code></td><td>klavyeden dizge oku</td></tr><tr><td><code>CLEAR_SCREEN</code></td><td>ekranı temizle</td></tr><tr><td><code>SCAN_NUM</code></td><td>sayı oku → CX</td></tr><tr><td><code>PRINT_NUM</code></td><td>AX'i işaretli yaz</td></tr><tr><td><code>PRINT_NUM_UNS</code></td><td>AX'i işaretsiz yaz</td></tr></tbody></table></div></div><div class="ds-deck__callout" style="font-size:15.5px">Makrolar kullanıldıkları yere <strong>kopyalanır</strong>; prosedürler bir kez tanımlanır ve <code>CALL</code> ile <strong>çağrılır</strong>.</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Ekran Makroları" data-section="Makrolar">
+  <p class="ds-deck__kicker">Makrolar</p>
+  <h2>Ekran Makroları</h2>
+<table class="ds-deck__table" style="font-size:15.5px"><thead><tr><th>Makro</th><th>Ne yapar?</th><th>Arka planda</th></tr></thead><tbody><tr><td><code>PUTC char</code></td><td>Geçerli imleç konumuna bir ASCII karakter yazar.</td><td><code>INT 10h</code>, AH = 0Eh</td></tr><tr><td><code>GOTOXY col, row</code></td><td>İmleci verilen sütun ve satıra konumlandırır.</td><td><code>INT 10h</code>, AH = 02h</td></tr><tr><td><code>PRINT string</code></td><td>Verilen dizgeyi yazar.</td><td>0Eh ile karakter karakter</td></tr><tr><td><code>PRINTN string</code></td><td>PRINT ile aynı; sonuna CR + LF (13, 10) ekleyerek yeni satıra geçer.</td><td>0Eh ile karakter karakter</td></tr><tr><td><code>CURSOROFF</code></td><td>Metin imlecini kapatır (gizler).</td><td><code>INT 10h</code>, AH = 01h</td></tr><tr><td><code>CURSORON</code></td><td>Metin imlecini açar.</td><td><code>INT 10h</code>, AH = 01h</td></tr></tbody></table><div class="ds-deck__callout" style="font-size:15.5px">Makro parametreleri sabit, yazmaç ya da değişken olabilir: <code>PUTC 65</code>, <code>PUTC 'B'</code>, <code>PUTC AL</code>.</div>
+</section>
+
+<section class="ds-deck__slide" data-title="PUTC ve GOTOXY Neye Genişler?" data-section="Makrolar">
+  <p class="ds-deck__kicker">Makrolar</p>
+  <h2>PUTC ve GOTOXY Neye Genişler?</h2>
+<div class="ds-deck__two">
+<div><h3>PUTC 'A'</h3><pre class="m05l-pre"><span class="kw">PUSH</span> AX        <span class="cm">; AX&#x27;i koru</span>
+<span class="kw">MOV</span>  AL, &#x27;A&#x27;   <span class="cm">; parametre</span>
+<span class="kw">MOV</span>  AH, 0Eh   <span class="cm">; teletype</span>
+<span class="kw">INT</span>  10h
+<span class="kw">POP</span>  AX        <span class="cm">; AX geri</span></pre>
+<p class="ds-deck__small" style="margin-top:6px">5 komut, <strong>8 bayt</strong>. Yazmaçlar korunur; çağıran kod etkilenmez.</p></div>
+<div><h3>GOTOXY 10, 5</h3><pre class="m05l-pre"><span class="kw">PUSH</span> AX
+<span class="kw">PUSH</span> BX
+<span class="kw">PUSH</span> DX
+<span class="kw">MOV</span>  AH, 02h   <span class="cm">; imleç konumla</span>
+<span class="kw">MOV</span>  DH, 5     <span class="cm">; satır (row)</span>
+<span class="kw">MOV</span>  DL, 10    <span class="cm">; sütun (col)</span>
+<span class="kw">MOV</span>  BH, 0     <span class="cm">; sayfa 0</span>
+<span class="kw">INT</span>  10h
+<span class="kw">POP</span>  DX
+<span class="kw">POP</span>  BX
+<span class="kw">POP</span>  AX</pre></div>
+</div>
+<div class="ds-deck__callout" style="font-size:15.5px">Parametre sırası <strong>sütun, satır</strong>dır (x, y); BIOS'ta sütun <strong>DL</strong>'ye, satır <strong>DH</strong>'ye gider. Sol üst köşe (0, 0), sağ alt köşe (79, 24).</div>
+</section>
+
+<section class="ds-deck__slide" data-title="PRINT Neye Genişler?" data-section="Makrolar">
+  <p class="ds-deck__kicker">Makrolar</p>
+  <h2>PRINT Neye Genişler?</h2>
+<div class="ds-deck__two ds-deck__two--wide-left">
+<pre class="m05l-pre" style="font-size:12.5px"><span class="kw">PUSH</span> AX
+<span class="kw">PUSH</span> SI
+<span class="kw">JMP</span>  skip_dcl          <span class="cm">; veriyi atla</span>
+s_dcl <span class="kw">DB</span> &#x27;Hello World!&#x27;, 0
+skip_dcl:
+<span class="kw">LEA</span>  SI, s_dcl
+next_char:
+<span class="kw">MOV</span>  AL, CS:[SI]       <span class="cm">; karakteri al</span>
+<span class="kw">CMP</span>  AL, 0
+<span class="kw">JZ</span>   printed           <span class="cm">; 0 → bitti</span>
+<span class="kw">INC</span>  SI
+<span class="kw">MOV</span>  AH, 0Eh
+<span class="kw">INT</span>  10h
+<span class="kw">JMP</span>  next_char
+printed:
+<span class="kw">POP</span>  SI
+<span class="kw">POP</span>  AX</pre>
+<ul class="ds-deck__small"><li>Dizge, makronun açıldığı yere, <strong>kodun içine</strong> gömülür; <code>JMP</code> ile üzerinden atlanır.</li><li>Sonuna <strong>0</strong> eklenir (null ile sonlanan dizge).</li><li>Etiketler <code>LOCAL</code> tanımlıdır: makro her açılışta yeni adlar alır, çakışma olmaz.</li><li>Veri kod kesiminde olduğu için <code>CS:[SI]</code> kesim öneki kullanılır.</li><li>PRINTN'de dizge <code>DB sdat, 13, 10, 0</code> olarak tanımlanır.</li></ul>
+</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Örnek: Makrolarla Ekran" data-section="Makrolar">
+  <p class="ds-deck__kicker">Makrolar · Kodu adım adım çalıştır</p>
+  <h2>Kod İzleme: PRINT, GOTOXY, PUTC</h2>
+<div class="ds-trace m05l-side" style="--m05l-cw:395px">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="1" data-vars="sütun=0; satır=0" data-out=""><svg class="ds-svg" viewBox="0 0 354 180" role="img" aria-label="boş ekran" style="max-width:354px"><text class="lbl" x="38.0" y="12" text-anchor="middle" style="font-size:10px">0</text><text class="lbl" x="118.0" y="12" text-anchor="middle" style="font-size:10px">5</text><text class="lbl" x="198.0" y="12" text-anchor="middle" style="font-size:10px">10</text><text class="lbl" x="278.0" y="12" text-anchor="middle" style="font-size:10px">15</text><text class="lbl" x="20" y="44" text-anchor="end" style="font-size:10px">0</text><text class="lbl" x="20" y="64" text-anchor="end" style="font-size:10px">1</text><text class="lbl" x="20" y="84" text-anchor="end" style="font-size:10px">2</text><text class="lbl" x="20" y="104" text-anchor="end" style="font-size:10px">3</text><text class="lbl" x="20" y="124" text-anchor="end" style="font-size:10px">4</text><text class="lbl" x="20" y="144" text-anchor="end" style="font-size:10px">5</text><text class="lbl" x="20" y="164" text-anchor="end" style="font-size:10px">6</text><rect class="box-empty" x="30" y="18" width="320" height="140" rx="2"/><rect class="box" x="30" y="18" width="16" height="20" rx="1" style="fill:var(--ds-hot);"/><text class="lbl" x="350" y="174" text-anchor="end" style="font-size:11px">… 80 × 25</text></svg><p class="ds-deck__stepnote"><code>include</code>: makro tanımları derleme sırasında eklenir; kod üretilmez.</p></div>
+<div class="ds-deck__step" data-line="2" data-vars="sütun=0; satır=0" data-out=""><svg class="ds-svg" viewBox="0 0 354 180" role="img" aria-label="boş ekran" style="max-width:354px"><text class="lbl" x="38.0" y="12" text-anchor="middle" style="font-size:10px">0</text><text class="lbl" x="118.0" y="12" text-anchor="middle" style="font-size:10px">5</text><text class="lbl" x="198.0" y="12" text-anchor="middle" style="font-size:10px">10</text><text class="lbl" x="278.0" y="12" text-anchor="middle" style="font-size:10px">15</text><text class="lbl" x="20" y="44" text-anchor="end" style="font-size:10px">0</text><text class="lbl" x="20" y="64" text-anchor="end" style="font-size:10px">1</text><text class="lbl" x="20" y="84" text-anchor="end" style="font-size:10px">2</text><text class="lbl" x="20" y="104" text-anchor="end" style="font-size:10px">3</text><text class="lbl" x="20" y="124" text-anchor="end" style="font-size:10px">4</text><text class="lbl" x="20" y="144" text-anchor="end" style="font-size:10px">5</text><text class="lbl" x="20" y="164" text-anchor="end" style="font-size:10px">6</text><rect class="box-empty" x="30" y="18" width="320" height="140" rx="2"/><rect class="box" x="30" y="18" width="16" height="20" rx="1" style="fill:var(--ds-hot);"/><text class="lbl" x="350" y="174" text-anchor="end" style="font-size:11px">… 80 × 25</text></svg><p class="ds-deck__stepnote"><code>ORG 100h</code>: COM programı 100h'den başlar.</p></div>
+<div class="ds-deck__step" data-line="3" data-vars="sütun=12; satır=0" data-out="Hello World!"><svg class="ds-svg" viewBox="0 0 354 180" role="img" aria-label="Hello World! satır 0" style="max-width:354px"><text class="lbl" x="38.0" y="12" text-anchor="middle" style="font-size:10px">0</text><text class="lbl" x="118.0" y="12" text-anchor="middle" style="font-size:10px">5</text><text class="lbl" x="198.0" y="12" text-anchor="middle" style="font-size:10px">10</text><text class="lbl" x="278.0" y="12" text-anchor="middle" style="font-size:10px">15</text><text class="lbl" x="20" y="44" text-anchor="end" style="font-size:10px">0</text><text class="lbl" x="20" y="64" text-anchor="end" style="font-size:10px">1</text><text class="lbl" x="20" y="84" text-anchor="end" style="font-size:10px">2</text><text class="lbl" x="20" y="104" text-anchor="end" style="font-size:10px">3</text><text class="lbl" x="20" y="124" text-anchor="end" style="font-size:10px">4</text><text class="lbl" x="20" y="144" text-anchor="end" style="font-size:10px">5</text><text class="lbl" x="20" y="164" text-anchor="end" style="font-size:10px">6</text><rect class="box-empty" x="30" y="18" width="320" height="140" rx="2"/><rect class="box" x="222" y="18" width="16" height="20" rx="1" style="fill:var(--ds-hot);"/><text class="txt mono" x="38.0" y="33" text-anchor="middle" style="font-size:14px">H</text><text class="txt mono" x="54.0" y="33" text-anchor="middle" style="font-size:14px">e</text><text class="txt mono" x="70.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="86.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="102.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="118.0" y="33" text-anchor="middle" style="font-size:14px"> </text><text class="txt mono" x="134.0" y="33" text-anchor="middle" style="font-size:14px">W</text><text class="txt mono" x="150.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="166.0" y="33" text-anchor="middle" style="font-size:14px">r</text><text class="txt mono" x="182.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="198.0" y="33" text-anchor="middle" style="font-size:14px">d</text><text class="txt mono" x="214.0" y="33" text-anchor="middle" style="font-size:14px">!</text><text class="lbl" x="350" y="174" text-anchor="end" style="font-size:11px">… 80 × 25</text></svg><p class="ds-deck__stepnote"><code>PRINT</code>: 12 karakter (0–11. sütun) yazılır; imleç 12. sütunda.</p></div>
+<div class="ds-deck__step" data-line="4" data-vars="sütun=10; satır=5" data-out="Hello World!"><svg class="ds-svg" viewBox="0 0 354 180" role="img" aria-label="imleç 10,5" style="max-width:354px"><text class="lbl" x="38.0" y="12" text-anchor="middle" style="font-size:10px">0</text><text class="lbl" x="118.0" y="12" text-anchor="middle" style="font-size:10px">5</text><text class="lbl" x="198.0" y="12" text-anchor="middle" style="font-size:10px">10</text><text class="lbl" x="278.0" y="12" text-anchor="middle" style="font-size:10px">15</text><text class="lbl" x="20" y="44" text-anchor="end" style="font-size:10px">0</text><text class="lbl" x="20" y="64" text-anchor="end" style="font-size:10px">1</text><text class="lbl" x="20" y="84" text-anchor="end" style="font-size:10px">2</text><text class="lbl" x="20" y="104" text-anchor="end" style="font-size:10px">3</text><text class="lbl" x="20" y="124" text-anchor="end" style="font-size:10px">4</text><text class="lbl" x="20" y="144" text-anchor="end" style="font-size:10px">5</text><text class="lbl" x="20" y="164" text-anchor="end" style="font-size:10px">6</text><rect class="box-empty" x="30" y="18" width="320" height="140" rx="2"/><rect class="box" x="190" y="118" width="16" height="20" rx="1" style="fill:var(--ds-hot);"/><text class="txt mono" x="38.0" y="33" text-anchor="middle" style="font-size:14px">H</text><text class="txt mono" x="54.0" y="33" text-anchor="middle" style="font-size:14px">e</text><text class="txt mono" x="70.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="86.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="102.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="118.0" y="33" text-anchor="middle" style="font-size:14px"> </text><text class="txt mono" x="134.0" y="33" text-anchor="middle" style="font-size:14px">W</text><text class="txt mono" x="150.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="166.0" y="33" text-anchor="middle" style="font-size:14px">r</text><text class="txt mono" x="182.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="198.0" y="33" text-anchor="middle" style="font-size:14px">d</text><text class="txt mono" x="214.0" y="33" text-anchor="middle" style="font-size:14px">!</text><text class="lbl" x="350" y="174" text-anchor="end" style="font-size:11px">… 80 × 25</text></svg><p class="ds-deck__stepnote"><code>GOTOXY 10, 5</code>: imleç 10. sütun, 5. satıra taşınır. Ekrana bir şey yazılmaz.</p></div>
+<div class="ds-deck__step" data-line="5" data-vars="sütun=11; satır=5" data-out="Hello World!\n\n\n\n\n          A"><svg class="ds-svg" viewBox="0 0 354 180" role="img" aria-label="A yazıldı" style="max-width:354px"><text class="lbl" x="38.0" y="12" text-anchor="middle" style="font-size:10px">0</text><text class="lbl" x="118.0" y="12" text-anchor="middle" style="font-size:10px">5</text><text class="lbl" x="198.0" y="12" text-anchor="middle" style="font-size:10px">10</text><text class="lbl" x="278.0" y="12" text-anchor="middle" style="font-size:10px">15</text><text class="lbl" x="20" y="44" text-anchor="end" style="font-size:10px">0</text><text class="lbl" x="20" y="64" text-anchor="end" style="font-size:10px">1</text><text class="lbl" x="20" y="84" text-anchor="end" style="font-size:10px">2</text><text class="lbl" x="20" y="104" text-anchor="end" style="font-size:10px">3</text><text class="lbl" x="20" y="124" text-anchor="end" style="font-size:10px">4</text><text class="lbl" x="20" y="144" text-anchor="end" style="font-size:10px">5</text><text class="lbl" x="20" y="164" text-anchor="end" style="font-size:10px">6</text><rect class="box-empty" x="30" y="18" width="320" height="140" rx="2"/><rect class="box" x="206" y="118" width="16" height="20" rx="1" style="fill:var(--ds-hot);"/><text class="txt mono" x="38.0" y="33" text-anchor="middle" style="font-size:14px">H</text><text class="txt mono" x="54.0" y="33" text-anchor="middle" style="font-size:14px">e</text><text class="txt mono" x="70.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="86.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="102.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="118.0" y="33" text-anchor="middle" style="font-size:14px"> </text><text class="txt mono" x="134.0" y="33" text-anchor="middle" style="font-size:14px">W</text><text class="txt mono" x="150.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="166.0" y="33" text-anchor="middle" style="font-size:14px">r</text><text class="txt mono" x="182.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="198.0" y="33" text-anchor="middle" style="font-size:14px">d</text><text class="txt mono" x="214.0" y="33" text-anchor="middle" style="font-size:14px">!</text><text class="txt mono" x="198.0" y="133" text-anchor="middle" style="font-size:14px">A</text><text class="lbl" x="350" y="174" text-anchor="end" style="font-size:11px">… 80 × 25</text></svg><p class="ds-deck__stepnote"><code>PUTC 65</code>: 65 = 41h = 'A' yazılır, imleç 11. sütuna geçer.</p></div>
+<div class="ds-deck__step" data-line="6" data-vars="sütun=12; satır=5" data-out="Hello World!\n\n\n\n\n          AB"><svg class="ds-svg" viewBox="0 0 354 180" role="img" aria-label="B yazıldı" style="max-width:354px"><text class="lbl" x="38.0" y="12" text-anchor="middle" style="font-size:10px">0</text><text class="lbl" x="118.0" y="12" text-anchor="middle" style="font-size:10px">5</text><text class="lbl" x="198.0" y="12" text-anchor="middle" style="font-size:10px">10</text><text class="lbl" x="278.0" y="12" text-anchor="middle" style="font-size:10px">15</text><text class="lbl" x="20" y="44" text-anchor="end" style="font-size:10px">0</text><text class="lbl" x="20" y="64" text-anchor="end" style="font-size:10px">1</text><text class="lbl" x="20" y="84" text-anchor="end" style="font-size:10px">2</text><text class="lbl" x="20" y="104" text-anchor="end" style="font-size:10px">3</text><text class="lbl" x="20" y="124" text-anchor="end" style="font-size:10px">4</text><text class="lbl" x="20" y="144" text-anchor="end" style="font-size:10px">5</text><text class="lbl" x="20" y="164" text-anchor="end" style="font-size:10px">6</text><rect class="box-empty" x="30" y="18" width="320" height="140" rx="2"/><rect class="box" x="222" y="118" width="16" height="20" rx="1" style="fill:var(--ds-hot);"/><text class="txt mono" x="38.0" y="33" text-anchor="middle" style="font-size:14px">H</text><text class="txt mono" x="54.0" y="33" text-anchor="middle" style="font-size:14px">e</text><text class="txt mono" x="70.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="86.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="102.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="118.0" y="33" text-anchor="middle" style="font-size:14px"> </text><text class="txt mono" x="134.0" y="33" text-anchor="middle" style="font-size:14px">W</text><text class="txt mono" x="150.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="166.0" y="33" text-anchor="middle" style="font-size:14px">r</text><text class="txt mono" x="182.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="198.0" y="33" text-anchor="middle" style="font-size:14px">d</text><text class="txt mono" x="214.0" y="33" text-anchor="middle" style="font-size:14px">!</text><text class="txt mono" x="198.0" y="133" text-anchor="middle" style="font-size:14px">A</text><text class="txt mono" x="214.0" y="133" text-anchor="middle" style="font-size:14px">B</text><text class="lbl" x="350" y="174" text-anchor="end" style="font-size:11px">… 80 × 25</text></svg><p class="ds-deck__stepnote"><code>PUTC 'B'</code>: karakter sabiti doğrudan verilebilir.</p></div>
+<div class="ds-deck__step" data-line="7" data-vars="sütun=12; satır=5" data-out="Hello World!\n\n\n\n\n          AB"><svg class="ds-svg" viewBox="0 0 354 180" role="img" aria-label="son" style="max-width:354px"><text class="lbl" x="38.0" y="12" text-anchor="middle" style="font-size:10px">0</text><text class="lbl" x="118.0" y="12" text-anchor="middle" style="font-size:10px">5</text><text class="lbl" x="198.0" y="12" text-anchor="middle" style="font-size:10px">10</text><text class="lbl" x="278.0" y="12" text-anchor="middle" style="font-size:10px">15</text><text class="lbl" x="20" y="44" text-anchor="end" style="font-size:10px">0</text><text class="lbl" x="20" y="64" text-anchor="end" style="font-size:10px">1</text><text class="lbl" x="20" y="84" text-anchor="end" style="font-size:10px">2</text><text class="lbl" x="20" y="104" text-anchor="end" style="font-size:10px">3</text><text class="lbl" x="20" y="124" text-anchor="end" style="font-size:10px">4</text><text class="lbl" x="20" y="144" text-anchor="end" style="font-size:10px">5</text><text class="lbl" x="20" y="164" text-anchor="end" style="font-size:10px">6</text><rect class="box-empty" x="30" y="18" width="320" height="140" rx="2"/><rect class="box" x="222" y="118" width="16" height="20" rx="1" style="fill:var(--ds-hot);"/><text class="txt mono" x="38.0" y="33" text-anchor="middle" style="font-size:14px">H</text><text class="txt mono" x="54.0" y="33" text-anchor="middle" style="font-size:14px">e</text><text class="txt mono" x="70.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="86.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="102.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="118.0" y="33" text-anchor="middle" style="font-size:14px"> </text><text class="txt mono" x="134.0" y="33" text-anchor="middle" style="font-size:14px">W</text><text class="txt mono" x="150.0" y="33" text-anchor="middle" style="font-size:14px">o</text><text class="txt mono" x="166.0" y="33" text-anchor="middle" style="font-size:14px">r</text><text class="txt mono" x="182.0" y="33" text-anchor="middle" style="font-size:14px">l</text><text class="txt mono" x="198.0" y="33" text-anchor="middle" style="font-size:14px">d</text><text class="txt mono" x="214.0" y="33" text-anchor="middle" style="font-size:14px">!</text><text class="txt mono" x="198.0" y="133" text-anchor="middle" style="font-size:14px">A</text><text class="txt mono" x="214.0" y="133" text-anchor="middle" style="font-size:14px">B</text><text class="lbl" x="350" y="174" text-anchor="end" style="font-size:11px">… 80 × 25</text></svg><p class="ds-deck__stepnote"><code>RET</code>: DOS'a dönüş. <code>END</code> yalnızca derleyiciye “kaynak bitti” der.</p></div>
+</div>
+<pre class="ds-trace__code" style="font-size:12px"><span class="kw">include</span> emu8086.<span class="kw">inc</span>
+<span class="kw">ORG</span>    100h
+<span class="kw">PRINT</span> &#x27;Hello World!&#x27;
+<span class="kw">GOTOXY</span> 10, 5
+<span class="kw">PUTC</span> 65           <span class="cm">; 65 - is an ASCII code for &#x27;A&#x27;</span>
+<span class="kw">PUTC</span> &#x27;B&#x27;
+<span class="kw">RET</span>               <span class="cm">; return to operating system.</span>
+<span class="kw">END</span>               <span class="cm">; directive to stop the compiler.</span></pre>
+<div class="ds-trace__col"><div class="ds-trace__vars"></div></div>
+</div>
+</section>
+
+<section class="ds-deck__slide" data-title="PRINTN ve İmleç Makroları" data-section="Makrolar">
+  <p class="ds-deck__kicker">Makrolar</p>
+  <h2>PRINTN ve İmleç Makroları</h2>
+<div class="ds-deck__grid ds-deck__grid--2"><div class="ds-deck__card"><strong>PRINT ile PRINTN</strong><p><code>PRINT 'a'</code> ardından <code>PRINT 'b'</code> → <code>ab</code> aynı satırda.</p><p><code>PRINTN 'a'</code> ardından <code>PRINT 'b'</code> → <code>a</code> ve alt satırda <code>b</code>.</p><p style='margin-top:6px'><strong>CR</strong> (13) imleci satır başına, <strong>LF</strong> (10) bir alt satıra götürür; yeni satır için ikisi birden gerekir.</p></div><div class="ds-deck__card"><strong>CURSOROFF / CURSORON</strong><p>İmleç şeklini ayarlayan <code>INT 10h</code>, AH = 01h kullanılır: CH = başlangıç, CL = bitiş tarama satırı.</p><p>CH'nin 5. biti 1 yapılınca imleç <strong>gizlenir</strong>; CURSORON normal şekli geri yükler.</p><p style='margin-top:6px'>Oyun veya menü ekranlarında yanıp sönen imleci saklamak için kullanılır.</p></div></div><pre class="m05l-pre" style="margin-top:12px"><span class="kw">PRINTN</span> &#x27;Ad Soyad:&#x27;   <span class="cm">; yazıp alt satıra geç</span>
+<span class="kw">CURSOROFF</span>
+<span class="kw">GOTOXY</span> 30, 12
+<span class="kw">PRINT</span> &#x27;Merhaba&#x27;
+<span class="kw">CURSORON</span></pre>
+</section>
+
+<section class="ds-deck__slide" data-title="Demo: GOTOXY Ekranı" data-section="Makrolar">
+  <p class="ds-deck__kicker">Makrolar</p>
+  <h2>Demo: GOTOXY Ekranı</h2>
+<p class="ds-deck__small">80 × 25 metin ekranında bir hücreye tıklayın: imleci oraya götüren makro, BIOS yazmaçları ve video belleğindeki karşılığı gösterilir.</p>
+<div class="ds-deck__demo m05l-demo" data-demo="m05l-xy">
+  <div class="ds-deck__ops"><label>PUTC karakteri <input type="text" value="A" maxlength="1" size="3" aria-label="Yazılacak karakter"></label>
+  <button class="ds-deck__button ds-deck__button--sm" type="button" data-op="clear">temizle</button></div>
+  <div class="m05l-xy" role="grid" aria-label="80 sütun 25 satır ekran"></div>
+  <div class="ds-deck__status" aria-live="polite"></div>
+</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Prosedür Kullanımı: DEFINE_ ve CALL" data-section="Prosedürler">
+  <p class="ds-deck__kicker">Prosedürler</p>
+  <h2>Prosedür Kullanımı: DEFINE_ ve CALL</h2>
+<div class="ds-deck__two ds-deck__two--wide-right">
+<pre class="m05l-pre"><span class="kw">include</span> &#x27;emu8086.inc&#x27;
+<span class="kw">ORG</span> 100h
+    ...
+    <span class="kw">CALL</span> print_num   <span class="cm">; kullan</span>
+    ...
+<span class="kw">RET</span>
+
+<span class="kw">DEFINE_PRINT_NUM</span>    <span class="cm">; tanımla</span>
+<span class="kw">DEFINE_PRINT_NUM_UNS</span>
+<span class="kw">END</span></pre>
+<ul class="ds-deck__small"><li>Her prosedür, <code>END</code> direktifinden önce kendi <code>DEFINE_…</code> makrosuyla <strong>bir kez</strong> tanımlanmalıdır.</li><li><code>DEFINE_…</code> makrosu, prosedürün kodunu bulunduğu yere açar.</li><li>Tanımlar genellikle <code>RET</code>'ten sonra konur: aksi hâlde işlemci akış içinde prosedür koduna girer.</li><li>Kodda prosedür adıyla <code>CALL</code> yapılır; adlar küçük harfle yazılır (<code>print_num</code>).</li><li><code>PRINT_NUM</code>, işini yaparken <code>PRINT_NUM_UNS</code>'yi çağırır; ikisi birlikte tanımlanmalıdır.</li></ul>
+</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Dizge Prosedürleri" data-section="Prosedürler">
+  <p class="ds-deck__kicker">Prosedürler</p>
+  <h2>Dizge Prosedürleri</h2>
+<div class="ds-deck__grid ds-deck__grid--2"><div class="ds-deck__card"><strong>PRINT_STRING</strong><ul><li>Null (0) ile sonlanan dizgeyi geçerli imleç konumuna yazar.</li><li>Dizgenin adresi <strong>DS:SI</strong>'den alınır.</li><li>Tanım: <code>DEFINE_PRINT_STRING</code>.</li></ul><pre class="m05l-pre" style="margin-top:6px"><span class="kw">LEA</span>  SI, msg
+<span class="kw">CALL</span> print_string
+msg <span class="kw">DB</span> &#x27;Merhaba&#x27;, 0</pre></div><div class="ds-deck__card"><strong>PTHIS</strong><ul><li>Null ile sonlanan dizgeyi yazar.</li><li>Dizgenin adresini <strong>yığından</strong> alır: dizge, <code>CALL</code>'dan hemen sonra tanımlanır.</li><li>Tanım: <code>DEFINE_PTHIS</code>.</li></ul><pre class="m05l-pre" style="margin-top:6px"><span class="kw">CALL</span> pthis
+<span class="kw">DB</span> &#x27;Merhaba&#x27;, 0
+<span class="cm">; buradan devam eder</span></pre></div></div><div class="ds-deck__callout" style="font-size:15.5px">PRINT makrosu her kullanımda kodu kopyalar; PRINT_STRING ve PTHIS ise tek kopya kodla istenen sayıda dizge yazar.</div>
+</section>
+
+<section class="ds-deck__slide" data-title="GET_STRING ve CLEAR_SCREEN" data-section="Prosedürler">
+  <p class="ds-deck__kicker">Prosedürler</p>
+  <h2>GET_STRING ve CLEAR_SCREEN</h2>
+<div class="ds-deck__two">
+<div><div class="ds-deck__card"><strong>GET_STRING</strong><ul class="ds-deck__small"><li>Kullanıcıdan null ile sonlanan bir dizge alır.</li><li>Dizge <strong>DS:DI</strong>'deki tampona (buffer) yazılır.</li><li><strong>DX</strong> = tampon boyutu; sona 0 eklendiği için en fazla DX − 1 karakter alınır.</li><li><strong>Enter</strong> tuşuna basılınca giriş durur.</li><li>Tanım: <code>DEFINE_GET_STRING</code>.</li></ul></div></div>
+<div><div class="ds-deck__card"><strong>CLEAR_SCREEN</strong><ul class="ds-deck__small"><li>Ekranı temizler ve imleci en üste (0, 0) taşır.</li><li>Tanım: <code>DEFINE_CLEAR_SCREEN</code>.</li></ul></div>
+<pre class="m05l-pre" style="margin-top:10px"><span class="kw">LEA</span>  DI, ad          <span class="cm">; tampon</span>
+<span class="kw">MOV</span>  DX, 20          <span class="cm">; boyut</span>
+<span class="kw">CALL</span> get_string
+<span class="kw">CALL</span> clear_screen
+<span class="kw">LEA</span>  SI, ad
+<span class="kw">CALL</span> print_string
+<span class="kw">RET</span>
+ad <span class="kw">DB</span> 20 DUP(0)</pre></div>
+</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Sayı Prosedürleri" data-section="Prosedürler">
+  <p class="ds-deck__kicker">Prosedürler</p>
+  <h2>Sayı Prosedürleri</h2>
+<table class="ds-deck__table" style="font-size:15px"><thead><tr><th>Prosedür</th><th>Ne yapar?</th><th>Girdi / çıktı</th><th>Tanım</th></tr></thead><tbody><tr><td><code>SCAN_NUM</code></td><td>Klavyeden çok haneli, <strong>işaretli</strong> bir sayı okur (Enter ile biter).</td><td>çıktı: <strong>CX</strong></td><td><code>DEFINE_SCAN_NUM</code></td></tr><tr><td><code>PRINT_NUM</code></td><td>AX'teki <strong>işaretli</strong> sayıyı onluk olarak yazar.</td><td>girdi: <strong>AX</strong></td><td><code>DEFINE_PRINT_NUM</code> + <code>DEFINE_PRINT_NUM_UNS</code></td></tr><tr><td><code>PRINT_NUM_UNS</code></td><td>AX'teki <strong>işaretsiz</strong> sayıyı yazar.</td><td>girdi: <strong>AX</strong></td><td><code>DEFINE_PRINT_NUM_UNS</code></td></tr></tbody></table><div class="ds-deck__grid ds-deck__grid--3 ds-deck__small"><div class="ds-deck__card"><strong>İşaretli aralık</strong><p>16 bit: −32 768 … 32 767</p></div><div class="ds-deck__card"><strong>İşaretsiz aralık</strong><p>16 bit: 0 … 65 535</p></div><div class="ds-deck__card"><strong>Aynı bitler</strong><p><code>FFE7h</code> = −25 (işaretli) = 65 511 (işaretsiz)</p></div></div>
+</section>
+
+<section class="ds-deck__slide" data-title="Demo: PRINT_NUM ve PRINT_NUM_UNS" data-section="Prosedürler">
+  <p class="ds-deck__kicker">Prosedürler</p>
+  <h2>Demo: PRINT_NUM ve PRINT_NUM_UNS</h2>
+<p>AX'e bir değer verin (onluk, negatif ya da <code>h</code> ekli onaltılık): iki prosedürün ekrana ne yazacağını görün.</p>
+<div class="ds-deck__demo m05l-demo" data-demo="m05l-num">
+  <div class="ds-deck__ops"><label>AX = <input type="text" value="-25" size="10" aria-label="AX değeri"></label>
+  <button class="ds-deck__button ds-deck__button--sm" type="button" data-v="-25">−25</button>
+  <button class="ds-deck__button ds-deck__button--sm" type="button" data-v="32767">32767</button>
+  <button class="ds-deck__button ds-deck__button--sm" type="button" data-v="8000h">8000h</button>
+  <button class="ds-deck__button ds-deck__button--sm" type="button" data-v="FFFFh">FFFFh</button></div>
+  <div class="m05l-num-out"></div>
+  <div class="ds-deck__status" aria-live="polite"></div>
+</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Örnek: Sayı Oku ve Yazdır" data-section="Örnek Program">
+  <p class="ds-deck__kicker">Örnek Program · Kodu adım adım çalıştır</p>
+  <h2>Kod İzleme: Sayı Oku ve Yazdır</h2>
+<div class="ds-trace m05l-side" style="--m05l-cw:400px">
+<div class="ds-deck__steps">
+<div class="ds-deck__step" data-line="3" data-vars="SI=msg1; CX=0000h; AX=0000h; SP=FFFEh" data-out="" data-stack="main"><p class="ds-deck__stepnote"><code>LEA SI, msg1</code>: SI ← msg1 dizgesinin bağıl konumu (offset).</p></div>
+<div class="ds-deck__step" data-line="4" data-vars="SI=msg1; CX=0000h; AX=0000h; SP=FFFCh" data-out="Enter the number: " data-stack="main | print_string"><p class="ds-deck__stepnote"><code>CALL print_string</code>: dönüş adresi yığına itilir (SP = FFFCh); prosedür DS:SI'deki dizgeyi 0'a kadar yazar.</p></div>
+<div class="ds-deck__step" data-line="5" data-vars="SI=msg1; CX=0000h; AX=0000h; SP=FFFCh" data-out="Enter the number: -25" data-stack="main | scan_num"><p class="ds-deck__stepnote"><code>CALL scan_num</code>: kullanıcı <b>-25</b> yazıp Enter'a basar; karakterler ekrana yankılanır.</p></div>
+<div class="ds-deck__step" data-line="5" data-vars="SI=msg1; CX=FFE7h; AX=0000h; SP=FFFEh" data-out="Enter the number: -25" data-stack="main"><p class="ds-deck__stepnote">Dönüş: <b>CX = FFE7h</b> = −25 (ikiye tümleyen). SP yeniden FFFEh.</p></div>
+<div class="ds-deck__step" data-line="6" data-vars="SI=msg1; CX=FFE7h; AX=FFE7h; SP=FFFEh" data-out="Enter the number: -25" data-stack="main"><p class="ds-deck__stepnote"><code>MOV AX, CX</code>: PRINT_NUM sayıyı AX'te bekler.</p></div>
+<div class="ds-deck__step" data-line="7" data-vars="SI=msg1; CX=FFE7h; AX=FFE7h; SP=FFFCh" data-out="Enter the number: -25" data-stack="main | pthis"><p class="ds-deck__stepnote"><code>CALL pthis</code>: yığına itilen “dönüş adresi” aslında bir sonraki satırdaki <b>dizgenin adresidir</b>.</p></div>
+<div class="ds-deck__step" data-line="8" data-vars="SI=msg1; CX=FFE7h; AX=FFE7h; SP=FFFCh" data-out="Enter the number: -25\nYou have entered: " data-stack="main | pthis"><p class="ds-deck__stepnote">PTHIS dizgeyi yazar: 13, 10 (yeni satır) ve “You have entered: ”. Sonra dönüş adresini 0'ın ötesine taşır.</p></div>
+<div class="ds-deck__step" data-line="9" data-vars="SI=msg1; CX=FFE7h; AX=FFE7h; SP=FFFCh" data-out="Enter the number: -25\nYou have entered: -25" data-stack="main | print_num"><p class="ds-deck__stepnote">Dönüş, dizgenin <b>sonrasına</b> yapılır. <code>CALL print_num</code>: AX = FFE7h işaretli yazılır.</p></div>
+<div class="ds-deck__step" data-line="10" data-vars="SI=msg1; CX=FFE7h; AX=FFE7h; SP=FFFEh" data-out="Enter the number: -25\nYou have entered: -25" data-stack="main"><p class="ds-deck__stepnote"><code>RET</code>: DOS'a dönüş. Satır 11–17 veri ve prosedür tanımlarıdır, akışta çalıştırılmaz.</p></div>
+</div>
+<pre class="ds-trace__code" style="font-size:11.5px"><span class="kw">include</span> &#x27;emu8086.inc&#x27;
+<span class="kw">ORG</span>    100h
+<span class="kw">LEA</span>    SI, msg1       <span class="cm">; ask for the number</span>
+<span class="kw">CALL</span>   print_string   <span class="cm">;</span>
+<span class="kw">CALL</span>   scan_num       <span class="cm">; get number in CX.</span>
+<span class="kw">MOV</span>    AX, CX         <span class="cm">; copy the number to AX.</span>
+<span class="kw">CALL</span>   pthis          <span class="cm">; print the following string:</span>
+<span class="kw">DB</span>  13, 10, &#x27;You have entered: &#x27;, 0
+<span class="kw">CALL</span>   print_num      <span class="cm">; print number in AX.</span>
+<span class="kw">RET</span>                   <span class="cm">; return to operating system.</span>
+msg1   <span class="kw">DB</span>  &#x27;Enter the number: &#x27;, 0
+<span class="kw">DEFINE_SCAN_NUM</span>
+<span class="kw">DEFINE_PRINT_STRING</span>
+<span class="kw">DEFINE_PRINT_NUM</span>
+<span class="kw">DEFINE_PRINT_NUM_UNS</span>  <span class="cm">; required for print_num.</span>
+<span class="kw">DEFINE_PTHIS</span>
+<span class="kw">END</span>                   <span class="cm">; directive to stop the compiler.</span></pre>
+<div class="ds-trace__col"><div class="ds-trace__vars"></div><div class="ds-trace__stack"></div><div class="ds-trace__out"></div></div>
+</div>
+</section>
+
+<section class="ds-deck__slide" data-title="PTHIS Nasıl Çalışır?" data-section="Örnek Program">
+  <p class="ds-deck__kicker">Örnek Program</p>
+  <h2>PTHIS Nasıl Çalışır?</h2>
+<div class="ds-deck__steps">
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 520 116" role="img" aria-label="CALL pthis öncesi" style="max-width:720px"><rect class="box" x="10" y="30" width="90" height="32" rx="3"/><text class="txt mono" x="55.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL pthis</text><rect class="box" x="100" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="115.0" y="51" text-anchor="middle" style="font-size:12.5px">0D</text><rect class="box" x="130" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="145.0" y="51" text-anchor="middle" style="font-size:12.5px">0A</text><rect class="box" x="160" y="30" width="190" height="32" rx="3"/><text class="txt mono" x="255.0" y="51" text-anchor="middle" style="font-size:12.5px">&#x27;You have entered: &#x27;</text><rect class="box" x="350" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="365.0" y="51" text-anchor="middle" style="font-size:12.5px">00</text><rect class="box" x="380" y="30" width="120" height="32" rx="3"/><text class="txt mono" x="440.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL print_num</text><text class="lbl" x="10" y="20" text-anchor="start">kod kesimi (bellek, soldan sağa artan adres)</text><text class="lbl" x="10" y="98" text-anchor="start">yığın:</text><rect class="box" x="60" y="78" width="170" height="30" rx="3"/><text class="txt mono" x="145" y="98" text-anchor="middle" style="font-size:13px">—</text><text class="txt" x="240" y="98" text-anchor="start" style="fill:var(--ds-link);font-size:14px">← SP = FFFEh</text></svg><p class="ds-deck__stepnote">Bellekte <code>CALL pthis</code>'in hemen ardından dizge baytları gelir; dizge 0 ile biter.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 520 116" role="img" aria-label="PTHIS bellek ve yığın" style="max-width:720px"><rect class="box" x="10" y="30" width="90" height="32" rx="3"/><text class="txt mono" x="55.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL pthis</text><rect class="box" x="100" y="30" width="30" height="32" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="115.0" y="51" text-anchor="middle" style="font-size:12.5px">0D</text><rect class="box" x="130" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="145.0" y="51" text-anchor="middle" style="font-size:12.5px">0A</text><rect class="box" x="160" y="30" width="190" height="32" rx="3"/><text class="txt mono" x="255.0" y="51" text-anchor="middle" style="font-size:12.5px">&#x27;You have entered: &#x27;</text><rect class="box" x="350" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="365.0" y="51" text-anchor="middle" style="font-size:12.5px">00</text><rect class="box" x="380" y="30" width="120" height="32" rx="3"/><text class="txt mono" x="440.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL print_num</text><text class="lbl" x="10" y="20" text-anchor="start">kod kesimi (bellek, soldan sağa artan adres)</text><text class="lbl" x="10" y="98" text-anchor="start">yığın:</text><rect class="box" x="60" y="78" width="170" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="145" y="98" text-anchor="middle" style="font-size:13px">adres(0Dh)</text><text class="txt" x="240" y="98" text-anchor="start" style="fill:var(--ds-link);font-size:14px">← SP = FFFCh</text></svg><p class="ds-deck__stepnote"><code>CALL</code>, “sonraki komutun” adresini iter. Bu adres, dizgenin ilk baytı olan <b>0Dh</b>'nin adresidir.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 520 116" role="img" aria-label="PTHIS bellek ve yığın" style="max-width:720px"><rect class="box" x="10" y="30" width="90" height="32" rx="3"/><text class="txt mono" x="55.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL pthis</text><rect class="box" x="100" y="30" width="30" height="32" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="115.0" y="51" text-anchor="middle" style="font-size:12.5px">0D</text><rect class="box" x="130" y="30" width="30" height="32" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="145.0" y="51" text-anchor="middle" style="font-size:12.5px">0A</text><rect class="box" x="160" y="30" width="190" height="32" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="255.0" y="51" text-anchor="middle" style="font-size:12.5px">&#x27;You have entered: &#x27;</text><rect class="box" x="350" y="30" width="30" height="32" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="365.0" y="51" text-anchor="middle" style="font-size:12.5px">00</text><rect class="box" x="380" y="30" width="120" height="32" rx="3"/><text class="txt mono" x="440.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL print_num</text><text class="lbl" x="10" y="20" text-anchor="start">kod kesimi (bellek, soldan sağa artan adres)</text><text class="lbl" x="10" y="98" text-anchor="start">yığın:</text><rect class="box" x="60" y="78" width="170" height="30" rx="3"/><text class="txt mono" x="145" y="98" text-anchor="middle" style="font-size:13px">adres(0Dh)</text><text class="txt" x="240" y="98" text-anchor="start" style="fill:var(--ds-link);font-size:14px">← SP = FFFCh</text></svg><p class="ds-deck__stepnote">PTHIS yığındaki adresi okur ve oradan itibaren baytları 0'a kadar ekrana yazar.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 520 116" role="img" aria-label="PTHIS bellek ve yığın" style="max-width:720px"><rect class="box" x="10" y="30" width="90" height="32" rx="3"/><text class="txt mono" x="55.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL pthis</text><rect class="box" x="100" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="115.0" y="51" text-anchor="middle" style="font-size:12.5px">0D</text><rect class="box" x="130" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="145.0" y="51" text-anchor="middle" style="font-size:12.5px">0A</text><rect class="box" x="160" y="30" width="190" height="32" rx="3"/><text class="txt mono" x="255.0" y="51" text-anchor="middle" style="font-size:12.5px">&#x27;You have entered: &#x27;</text><rect class="box" x="350" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="365.0" y="51" text-anchor="middle" style="font-size:12.5px">00</text><rect class="box" x="380" y="30" width="120" height="32" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="440.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL print_num</text><text class="lbl" x="10" y="20" text-anchor="start">kod kesimi (bellek, soldan sağa artan adres)</text><text class="lbl" x="10" y="98" text-anchor="start">yığın:</text><rect class="box" x="60" y="78" width="170" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="145" y="98" text-anchor="middle" style="font-size:13px">adres(CALL print_num)</text><text class="txt" x="240" y="98" text-anchor="start" style="fill:var(--ds-link);font-size:14px">← SP = FFFCh</text></svg><p class="ds-deck__stepnote">Yığındaki adres, 0 baytının bir ötesiyle değiştirilir: artık <code>CALL print_num</code>'u gösterir.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 520 116" role="img" aria-label="PTHIS bellek ve yığın" style="max-width:720px"><rect class="box" x="10" y="30" width="90" height="32" rx="3"/><text class="txt mono" x="55.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL pthis</text><rect class="box" x="100" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="115.0" y="51" text-anchor="middle" style="font-size:12.5px">0D</text><rect class="box" x="130" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="145.0" y="51" text-anchor="middle" style="font-size:12.5px">0A</text><rect class="box" x="160" y="30" width="190" height="32" rx="3"/><text class="txt mono" x="255.0" y="51" text-anchor="middle" style="font-size:12.5px">&#x27;You have entered: &#x27;</text><rect class="box" x="350" y="30" width="30" height="32" rx="3"/><text class="txt mono" x="365.0" y="51" text-anchor="middle" style="font-size:12.5px">00</text><rect class="box" x="380" y="30" width="120" height="32" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="440.0" y="51" text-anchor="middle" style="font-size:12.5px">CALL print_num</text><text class="lbl" x="10" y="20" text-anchor="start">kod kesimi (bellek, soldan sağa artan adres)</text><text class="lbl" x="10" y="98" text-anchor="start">yığın:</text><rect class="box" x="60" y="78" width="170" height="30" rx="3"/><text class="txt mono" x="145" y="98" text-anchor="middle" style="font-size:13px">—</text><text class="txt" x="240" y="98" text-anchor="start" style="fill:var(--ds-link);font-size:14px">← SP = FFFEh</text></svg><p class="ds-deck__stepnote"><code>RET</code>: işlemci dizgeyi <b>atlayıp</b> <code>CALL print_num</code>'dan devam eder. Veri komut sanılıp çalıştırılmaz.</p></div>
+</div><div class="ds-deck__callout" style="font-size:15.5px">Bu teknik, dönüş adresinin yığında saklandığı bilgisine dayanır. Benzer şekilde PRINT makrosu da veriyi kod içine gömer ama <code>JMP</code> ile atlar.</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Sık Yapılan Hatalar" data-section="Örnek Program">
+  <p class="ds-deck__kicker">Örnek Program</p>
+  <h2>Sık Yapılan Hatalar</h2>
+<div class="ds-deck__grid ds-deck__grid--2"><div class="ds-deck__card"><strong>DEFINE_ unutmak</strong><p><code>CALL scan_num</code> var ama <code>DEFINE_SCAN_NUM</code> yoksa derleyici etiketi bulamaz: <em>undefined</em> hatası.</p></div><div class="ds-deck__card"><strong>DEFINE_'yi akışa koymak</strong><p>Tanımlar <code>ORG 100h</code>'nin hemen altına konursa işlemci prosedür kodunu ana program sanarak çalıştırır. Yeri: <code>RET</code> ile <code>END</code> arası.</p></div><div class="ds-deck__card"><strong>Dizgeyi 0 ile bitirmemek</strong><p>PRINT_STRING ve PTHIS 0 görene kadar yazar; 0 yoksa bellekteki rastgele baytlar ekrana dökülür.</p></div><div class="ds-deck__card"><strong>Yazmaçları varsaymak</strong><p>Prosedürler sonuçlarını belirli yazmaçlarda döndürür (SCAN_NUM → CX). Başka yazmaçtaki değerin korunduğu belgede yazmıyorsa varsayılmamalıdır.</p></div></div>
+</section>
+
+<section class="ds-deck__slide" data-title="CALL Komutu" data-section="CALL Komutu">
+  <p class="ds-deck__kicker">CALL Komutu</p>
+  <h2>CALL Komutu</h2>
+<ul><li>Derleyici ilk aşamada <code>DEFINE_…</code> tanımlarını işler; bunlar <strong>prosedürlere genişleyen</strong> normal makrolardır.</li><li><code>CALL</code> talimatı prosedürleri çağırmak için kullanılır.</li><li>Derleyici <code>CALL</code>'daki prosedür adını, prosedürün bulunduğu <strong>adrese</strong> dönüştürür.</li><li><code>CALL</code> yürütüldüğünde dönüş adresi yığına itilir ve kontrol prosedüre aktarılır; prosedür <code>RET</code> ile geri döner.</li><li>Prosedür kodu dosyada <strong>bir kez</strong> bulunur: aynı prosedür 100 kez çağrılsa da gövdesi çoğalmaz; her çağrı yalnızca 3 baytlık bir <code>CALL</code> ekler.</li><li>Bu yaklaşım yürütülebilir dosyanın boyutunu küçük tutar.</li></ul>
+</section>
+
+<section class="ds-deck__slide" data-title="CALL ve RET Adım Adım" data-section="CALL Komutu">
+  <p class="ds-deck__kicker">CALL Komutu</p>
+  <h2>CALL ve RET Adım Adım</h2>
+<div class="ds-deck__steps">
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 420 122" role="img" aria-label="CALL öncesi" style="max-width:560px"><text class="txt mono" x="30" y="40.0" text-anchor="end" style="font-size:14px">IP</text><rect class="box" x="36" y="20" width="80" height="30" rx="3"/><text class="txt mono" x="76.0" y="40.0" text-anchor="middle">0110h</text><text class="txt mono" x="30" y="84.0" text-anchor="end" style="font-size:14px">SP</text><rect class="box" x="36" y="64" width="80" height="30" rx="3"/><text class="txt mono" x="76.0" y="84.0" text-anchor="middle">FFFEh</text><text class="lbl" x="300" y="14" text-anchor="middle">yığın</text><text class="txt mono" x="250" y="42" text-anchor="end" style="font-size:13px">FFFAh</text><rect class="box" x="260" y="22" width="90" height="30" rx="3"/><text class="txt mono" x="305" y="42" text-anchor="middle" style="font-size:13.5px"></text><text class="txt mono" x="250" y="74" text-anchor="end" style="font-size:13px">FFFCh</text><rect class="box" x="260" y="54" width="90" height="30" rx="3"/><text class="txt mono" x="305" y="74" text-anchor="middle" style="font-size:13.5px"></text><text class="txt mono" x="250" y="106" text-anchor="end" style="font-size:13px">FFFEh</text><rect class="box" x="260" y="86" width="90" height="30" rx="3"/><text class="txt mono" x="305" y="106" text-anchor="middle" style="font-size:13.5px"></text><text class="txt" x="358" y="106" text-anchor="start" style="fill:var(--ds-link)">← SP</text></svg><p class="ds-deck__stepnote"><code>CALL print_num</code> 0110h adresinde, 3 bayt (E8 + 16 bit bağıl uzaklık). Sonraki komut 0113h'de. (Örnek adresler.)</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 420 122" role="img" aria-label="CALL ve RET" style="max-width:560px"><text class="txt mono" x="30" y="40.0" text-anchor="end" style="font-size:14px">IP</text><rect class="box" x="36" y="20" width="80" height="30" rx="3"/><text class="txt mono" x="76.0" y="40.0" text-anchor="middle">0110h</text><text class="txt mono" x="30" y="84.0" text-anchor="end" style="font-size:14px">SP</text><rect class="box" x="36" y="64" width="80" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="76.0" y="84.0" text-anchor="middle">FFFCh</text><text class="lbl" x="300" y="14" text-anchor="middle">yığın</text><text class="txt mono" x="250" y="42" text-anchor="end" style="font-size:13px">FFFAh</text><rect class="box" x="260" y="22" width="90" height="30" rx="3"/><text class="txt mono" x="305" y="42" text-anchor="middle" style="font-size:13.5px"></text><text class="txt mono" x="250" y="74" text-anchor="end" style="font-size:13px">FFFCh</text><rect class="box" x="260" y="54" width="90" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="305" y="74" text-anchor="middle" style="font-size:13.5px">0113h</text><text class="txt" x="358" y="74" text-anchor="start" style="fill:var(--ds-link)">← SP</text><text class="txt mono" x="250" y="106" text-anchor="end" style="font-size:13px">FFFEh</text><rect class="box" x="260" y="86" width="90" height="30" rx="3"/><text class="txt mono" x="305" y="106" text-anchor="middle" style="font-size:13.5px"></text></svg><p class="ds-deck__stepnote">1) SP ← SP − 2, dönüş adresi <b>0113h</b> yığına yazılır.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 420 122" role="img" aria-label="CALL ve RET" style="max-width:560px"><text class="txt mono" x="30" y="40.0" text-anchor="end" style="font-size:14px">IP</text><rect class="box" x="36" y="20" width="80" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="76.0" y="40.0" text-anchor="middle">0200h</text><text class="txt mono" x="30" y="84.0" text-anchor="end" style="font-size:14px">SP</text><rect class="box" x="36" y="64" width="80" height="30" rx="3"/><text class="txt mono" x="76.0" y="84.0" text-anchor="middle">FFFCh</text><text class="lbl" x="300" y="14" text-anchor="middle">yığın</text><text class="txt mono" x="250" y="42" text-anchor="end" style="font-size:13px">FFFAh</text><rect class="box" x="260" y="22" width="90" height="30" rx="3"/><text class="txt mono" x="305" y="42" text-anchor="middle" style="font-size:13.5px"></text><text class="txt mono" x="250" y="74" text-anchor="end" style="font-size:13px">FFFCh</text><rect class="box" x="260" y="54" width="90" height="30" rx="3"/><text class="txt mono" x="305" y="74" text-anchor="middle" style="font-size:13.5px">0113h</text><text class="txt" x="358" y="74" text-anchor="start" style="fill:var(--ds-link)">← SP</text><text class="txt mono" x="250" y="106" text-anchor="end" style="font-size:13px">FFFEh</text><rect class="box" x="260" y="86" width="90" height="30" rx="3"/><text class="txt mono" x="305" y="106" text-anchor="middle" style="font-size:13.5px"></text></svg><p class="ds-deck__stepnote">2) IP ← prosedürün adresi (ör. 0200h). Prosedür çalışır.</p></div>
+<div class="ds-deck__step"><svg class="ds-svg" viewBox="0 0 420 122" role="img" aria-label="CALL ve RET" style="max-width:560px"><text class="txt mono" x="30" y="40.0" text-anchor="end" style="font-size:14px">IP</text><rect class="box" x="36" y="20" width="80" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="76.0" y="40.0" text-anchor="middle">0113h</text><text class="txt mono" x="30" y="84.0" text-anchor="end" style="font-size:14px">SP</text><rect class="box" x="36" y="64" width="80" height="30" rx="3" style="fill:var(--ds-hot);"/><text class="txt mono" x="76.0" y="84.0" text-anchor="middle">FFFEh</text><text class="lbl" x="300" y="14" text-anchor="middle">yığın</text><text class="txt mono" x="250" y="42" text-anchor="end" style="font-size:13px">FFFAh</text><rect class="box" x="260" y="22" width="90" height="30" rx="3"/><text class="txt mono" x="305" y="42" text-anchor="middle" style="font-size:13.5px"></text><text class="txt mono" x="250" y="74" text-anchor="end" style="font-size:13px">FFFCh</text><rect class="box" x="260" y="54" width="90" height="30" rx="3"/><text class="txt mono" x="305" y="74" text-anchor="middle" style="font-size:13.5px">0113h</text><text class="txt mono" x="250" y="106" text-anchor="end" style="font-size:13px">FFFEh</text><rect class="box" x="260" y="86" width="90" height="30" rx="3"/><text class="txt mono" x="305" y="106" text-anchor="middle" style="font-size:13.5px"></text><text class="txt" x="358" y="106" text-anchor="start" style="fill:var(--ds-link)">← SP</text></svg><p class="ds-deck__stepnote"><code>RET</code>: IP ← [SP] = 0113h, SP ← SP + 2. Ana program kaldığı yerden sürer.</p></div>
+</div><div class="ds-deck__callout" style="font-size:15.5px">Prosedür içinde <code>PUSH</code> edilen her değer <code>RET</code>'ten önce <code>POP</code> edilmelidir; yoksa RET yanlış adrese döner.</div>
+</section>
+
+<section class="ds-deck__slide" data-title="Makro mu, Prosedür mü?" data-section="CALL Komutu">
+  <p class="ds-deck__kicker">CALL Komutu</p>
+  <h2>Makro mu, Prosedür mü?</h2>
+<div class="ds-deck__figure" style="margin:0 0 8px"><svg class="ds-svg" viewBox="0 0 720 170" role="img" aria-label="Makro her kullanımda kodu kopyalar; prosedürde tek kopya kod vardır ve her çağrı 3 baytlık CALL&#x27;dır." style="max-width:720px"><defs><marker id="m05l-m2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 z"/></marker></defs><text class="txt" x="170" y="16" text-anchor="middle">3 × PUTC (makro)</text><rect class="box" x="20" y="30" width="96" height="40" rx="3" style="fill:var(--ds-hot);"/><text class="lbl" x="68" y="55" text-anchor="middle">8 bayt kod</text><rect class="box" x="124" y="30" width="96" height="40" rx="3" style="fill:var(--ds-hot);"/><text class="lbl" x="172" y="55" text-anchor="middle">8 bayt kod</text><rect class="box" x="228" y="30" width="96" height="40" rx="3" style="fill:var(--ds-hot);"/><text class="lbl" x="276" y="55" text-anchor="middle">8 bayt kod</text><text class="lbl" x="170" y="96" text-anchor="middle">toplam 24 bayt; her kullanım +8</text><text class="txt" x="540" y="16" text-anchor="middle">3 × CALL (prosedür)</text><rect class="box" x="400" y="30" width="56" height="40" rx="3"/><text class="lbl" x="428" y="55" text-anchor="middle">CALL</text><rect class="box" x="464" y="30" width="56" height="40" rx="3"/><text class="lbl" x="492" y="55" text-anchor="middle">CALL</text><rect class="box" x="528" y="30" width="56" height="40" rx="3"/><text class="lbl" x="556" y="55" text-anchor="middle">CALL</text><rect class="box" x="470" y="110" width="150" height="40" rx="3" style="fill:var(--ds-hot);"/><text class="lbl" x="545" y="135" text-anchor="middle">prosedür (1 kopya)</text><path class="line" d="M428 70 L500 106" marker-end="url(#m05l-m2)"/><path class="line" d="M492 70 L520 106" marker-end="url(#m05l-m2)"/><path class="line" d="M556 70 L540 106" marker-end="url(#m05l-m2)"/><text class="lbl" x="540" y="166" text-anchor="middle">her kullanım +3 bayt</text></svg></div>
+<table class="ds-deck__table" style="font-size:14.5px"><thead><tr><th>Ölçüt</th><th>Makro</th><th>Prosedür</th></tr></thead><tbody><tr><td>Ne zaman işlenir?</td><td>derleme sırasında metin olarak açılır</td><td>çalışma sırasında CALL ile çağrılır</td></tr><tr><td>Kod boyutu</td><td>her kullanımda kopya</td><td>tek kopya + çağrı başına 3 bayt</td></tr><tr><td>Hız</td><td>CALL/RET yükü yok, biraz daha hızlı</td><td>her çağrıda yığın işlemi</td></tr><tr><td>Parametre</td><td>makro argümanları</td><td>yazmaçlar veya yığın</td></tr><tr><td>emu8086.inc</td><td>PUTC, GOTOXY, PRINT …</td><td>PRINT_NUM, SCAN_NUM … (DEFINE_ gerekli)</td></tr></tbody></table>
+</section>
+
+<section class="ds-deck__slide" data-title="Özet" data-section="Özet">
+  <p class="ds-deck__kicker">Özet</p>
+  <h2>Özet</h2>
+<div class="ds-deck__grid ds-deck__grid--2 ds-deck__grid--roomy"><div class="ds-deck__card"><strong>INCLUDE</strong><p><code>include 'emu8086.inc'</code>: önce kaynak klasörü, sonra Inc klasörü aranır.</p></div><div class="ds-deck__card"><strong>Makrolar</strong><p>PUTC, GOTOXY (col, row), PRINT, PRINTN, CURSOROFF, CURSORON: INT 10h üzerine kurulu, kullanıldıkları yere açılır.</p></div><div class="ds-deck__card"><strong>Prosedürler</strong><p>END'den önce <code>DEFINE_…</code>, kullanırken <code>CALL</code>. Girdi/çıktı yazmaçları: SI, DI, DX, CX, AX.</p></div><div class="ds-deck__card"><strong>Sayılar</strong><p>SCAN_NUM → CX (işaretli); PRINT_NUM AX'i işaretli, PRINT_NUM_UNS işaretsiz yazar.</p></div><div class="ds-deck__card"><strong>PTHIS</strong><p>Dizge CALL'dan hemen sonra; prosedür dönüş adresini dizgenin sonrasına taşır.</p></div><div class="ds-deck__card"><strong>CALL / RET</strong><p>CALL dönüş adresini iter ve atlar; RET adresi çekip döner. Prosedür kodu bir kez bulunur.</p></div></div>
+</section>
+
+<section class="ds-deck__slide" data-title="Alıştırmalar" data-section="Özet">
+  <p class="ds-deck__kicker">Özet</p>
+  <h2>Alıştırmalar</h2>
+<ol class="ds-deck__small"><li>Ekranın ortasına (sütun 35, satır 12) “MERKEZ” yazan programı makrolarla yazın.</li><li>Kullanıcıdan iki sayı okuyup toplamını yazdıran programı yazın.</li><li><code>PRINT</code> makrosu 10 kez kullanılırsa dizgeler ve döngü kodu kaç kez bulunur? PRINT_STRING ile karşılaştırın.</li><li>AX = 8000h iken PRINT_NUM ve PRINT_NUM_UNS ne yazar?</li><li><code>DEFINE_PTHIS</code>, <code>ORG 100h</code>'nin hemen altına yazılırsa ne olur?</li><li>Kullanıcının adını GET_STRING ile alıp “Merhaba, ad!” yazdırın.</li></ol>
+<details class="ds-deck__answers"><summary>İpuçları / cevaplar</summary><ol><li><code>GOTOXY 35, 12</code> ardından <code>PRINT 'MERKEZ'</code>, <code>RET</code>.</li><li><code>CALL scan_num</code> → <code>MOV BX,CX</code> → <code>CALL scan_num</code> → <code>MOV AX,BX</code>, <code>ADD AX,CX</code>, <code>CALL print_num</code>; DEFINE_SCAN_NUM, DEFINE_PRINT_NUM, DEFINE_PRINT_NUM_UNS.</li><li>PRINT: 10 kopya (her biri kendi dizgesi ve döngüsüyle). PRINT_STRING: döngü 1 kez, 10 dizge + 10 × (LEA + CALL).</li><li>PRINT_NUM: −32768, PRINT_NUM_UNS: 32768.</li><li>Program başlarken doğrudan PTHIS'in koduna girer; yığında geçerli dizge adresi olmadığından anlamsız çıktı veya kilitlenme.</li><li><code>LEA DI,ad / MOV DX,20 / CALL get_string</code>, <code>PRINT 'Merhaba, '</code>, <code>LEA SI,ad / CALL print_string</code>, <code>PUTC '!'</code>.</li></ol></details>
+</section>
+
+<section class="ds-deck__slide" data-title="Kaynaklar" data-section="Özet">
+  <p class="ds-deck__kicker">Özet</p>
+  <h2>Kaynaklar</h2>
+<ul><li>emu8086 yardım belgeleri: “emu8086.inc — library of common functions” ve “Macros” sayfaları.</li><li>emu8086 kurulumundaki <code>Inc/emu8086.inc</code> dosyası (makro ve prosedürlerin kaynak kodu).</li><li>B. B. Brey, <em>The Intel Microprocessors</em>, 8. baskı, Pearson, 2009 — prosedürler ve makrolar.</li><li>A. S. Tanenbaum, <em>Modern Operating Systems</em>, 3. baskı, Pearson, 2008 (kaynak sunumda faydalanılmıştır).</li></ul>
+</section>
+
+<section class="ds-deck__slide ds-deck__slide--title" data-title="Son" data-section="">
+  <h1>Son</h1>
+  <div class="ds-deck__subtitle">Bölüm 5: emu8086.inc Kütüphanesi</div>
+  <small>Sonraki bölüm: Bölüm 6: Aritmetik ve Mantıksal İşlemler</small>
+</section>
+
+
+      </div>
+
+      <div class="ds-deck__bar">
+        <button class="ds-deck__button" type="button" id="ds-deck-prev" aria-label="Önceki slayt">←</button>
+        <span class="ds-deck__counter" id="ds-deck-counter">1 / 1</span>
+        <button class="ds-deck__button" type="button" id="ds-deck-next" aria-label="Sonraki slayt">→</button>
+        <span class="ds-deck__section" id="ds-deck-section">Sercan KÜLCÜ, Tüm hakları saklıdır.</span>
+        <select class="ds-deck__select" id="ds-deck-jump" aria-label="Slayta git"></select>
+        <button class="ds-deck__button" type="button" id="ds-deck-full" aria-label="Tam ekran">⛶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="deck/deck.js"></script>
+<script src="deck/Bolum_05_Kutuphane.js"></script>
