@@ -13,26 +13,6 @@ Data structures provide systematic ways to organize, store, and access data. Cho
 
 ---
 
-## Announcements  
-
-There are currently no announcements.
-
----
-
-## Course resources  
-
-- **books**  
-  [Data Structures and Algorithms in Java by Goodrich](https://bcs.wiley.com/he-bcs/Books?action=index&itemId=1118771338&bcsId=8635) | 
-  [Data Structures and Algorithms Made Easy](https://www.amazon.com/gp/product/819324527X) | 
-  [Algorithms Unlocked](https://www.amazon.com/gp/product/0262518805)
-
-- **github**  
-  [The Algorithms](https://github.com/TheAlgorithms/Java) | 
-  [DSA Bootcamp](https://github.com/kunal-kushwaha/DSA-Bootcamp-Java) | 
-  [Awesome leetcode resources](https://github.com/ashishps1/awesome-leetcode-resources)
-
----
-
 ## Past Exams  
 
 - **2025-2026**  
@@ -66,7 +46,6 @@ There are currently no announcements.
 Data structures are the backbone of computer science, serving as the fundamental building blocks that enable us to efficiently store, organize, and manipulate data. Each data structure has its own unique characteristics, advantages, and trade-offs, making them suitable for different scenarios and requirements. Understanding these structures is crucial for writing efficient code and solving complex computational problems.
 
 - [🖼️Sunum-Giriş (HTML)](../files/data_structures/slides/Bolum_01_Giris.html)  
-- [🕹️Data Structures (HTML)](../files/data_structures/slides/Bolum_01_Intro.html)  
 - [🗒️Lecture Notes (PDF)](../files/data_structures/Chapter_01_Introduction.pdf)  
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src)  
 
