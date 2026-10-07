@@ -5,170 +5,358 @@ permalink: /files/data_structures/slides/Bolum_09_Map.html
 excerpt: "Interactive Map simulator with set, get, has, delete, iteration, insertion-order visualization, and safe rendering."
 ---
 
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/sim.css">
 <style>
-.ds-map,.ds-map *,.ds-map *::before,.ds-map *::after{box-sizing:border-box}
-.ds-map{
-  width:min(1140px,100%);margin:0 auto 2rem;color:var(--global-text-color);
-  --ds-surface:color-mix(in srgb,var(--global-link-color) 2.5%,var(--global-bg-color));
-  --ds-surface-strong:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
-  --ds-border:color-mix(in srgb,var(--global-link-color) 38%,var(--global-border-color));
-  --ds-shadow:0 8px 24px rgba(15,23,42,.065);
-  --ds-shadow-soft:0 3px 10px rgba(15,23,42,.045)
+.ds-map {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 6px;
+  line-height: 1.3;
 }
-.ds-map__hero,.ds-map__panel,.ds-map__visual,.ds-map__contacts,.ds-map__code-panel,.ds-map__card,.ds-map__status{
-  border:1.5px solid var(--ds-border);background:var(--ds-surface)
+
+/* ---------- controls ---------- */
+.ds-map__panel {
+  display: grid;
+  gap: 6px;
+  padding: 6px 10px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
 }
-.ds-map__hero{padding:1.35rem;border-radius:16px;background:var(--ds-surface-strong);box-shadow:var(--ds-shadow)}
-.ds-map__hero h1{margin:0 0 .55rem;text-align:center;color:var(--global-text-color);font-size:clamp(1.65rem,4vw,2.3rem)}
-.ds-map__hero p{width:100%;margin:0;max-width:none;line-height:1.65;text-align:justify;text-justify:inter-word;opacity:.86}
-.ds-map__metrics,.ds-map__stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem}
-.ds-map__metrics{margin-top:1rem}.ds-map__metric,.ds-map__stat{padding:.8rem;border:1.5px solid var(--ds-border);border-radius:10px;background:var(--ds-surface);box-shadow:var(--ds-shadow-soft)}
-.ds-map__metric strong,.ds-map__stat strong{display:block;margin-bottom:.15rem}
-.ds-map__section{margin-top:1.4rem}.ds-map__section h2{margin:0 0 .7rem;color:var(--global-text-color);font-size:1.2rem}
-.ds-map__panel{display:grid;gap:.8rem;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow-soft)}
-.ds-map__group{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.6rem;align-items:end}
-.ds-map__field{display:grid;gap:.3rem}.ds-map__field label,.ds-map__speed label{font-size:.86rem;font-weight:800}
-.ds-map input{width:100%;min-height:42px;padding:.55rem .65rem;border:1.5px solid var(--ds-border);border-radius:9px;background:var(--ds-surface);color:var(--global-text-color);font:inherit}
-.ds-map input:focus-visible,.ds-map button:focus-visible{outline:3px solid color-mix(in srgb,var(--global-link-color) 30%,transparent);outline-offset:2px}
-.ds-map__btn{min-height:42px;padding:.55rem .75rem;border:1px solid var(--global-link-color);border-radius:9px;background:var(--global-link-color);color:#fff;font:inherit;font-weight:800;cursor:pointer}
-.ds-map__btn:hover:not(:disabled){filter:brightness(1.08)}
-.ds-map__btn--secondary{border-color:var(--ds-border);background:var(--ds-surface);color:var(--global-text-color)}
-.ds-map__btn--danger{border-color:#b91c1c;background:#b91c1c}.ds-map__btn:disabled{cursor:not-allowed;opacity:.5}
-.ds-map__speed{display:grid;grid-template-columns:minmax(140px,auto) 1fr auto;gap:.65rem;align-items:center}.ds-map__speed output{min-width:70px;text-align:right;font-size:.85rem;font-weight:800}
-.ds-map__visual{margin-top:1rem;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow)}
-.ds-map__visual h3{margin:0 0 .65rem;font-size:1rem}
-.ds-map__row{min-height:120px;display:flex;align-items:center;gap:.5rem;overflow:auto;padding:.4rem}
-.ds-map__entry{flex:0 0 180px;min-height:88px;padding:.7rem;border:2px solid color-mix(in srgb,var(--global-link-color) 85%,var(--global-border-color));border-radius:10px;background:var(--ds-surface)}
-.ds-map__entry.is-checking{background:#fef3c7;border-color:#d97706}.ds-map__entry.is-found{background:#dcfce7;border-color:#15803d}
-.ds-map__entry .key{display:block;font-weight:800;overflow-wrap:anywhere}.ds-map__entry .value{display:block;opacity:.68;overflow-wrap:anywhere}.ds-map__entry .position{display:block;margin-top:.3rem;font-size:.74rem;opacity:.58}
-.ds-map__arrow{font-size:1.35rem;font-weight:800;opacity:.55}.ds-map__empty{width:100%;text-align:center;opacity:.55}
-.ds-map__status{min-height:3rem;margin:.8rem 0 0;padding:.85rem;border-radius:10px;box-shadow:var(--ds-shadow-soft);font-weight:800}
-.ds-map__status.is-success{color:#15803d}.ds-map__status.is-error{color:#b91c1c}
-.ds-map__stats{margin-top:.8rem}.ds-map__stat strong{font-size:.75rem;opacity:.65}
-.ds-map__lower{display:grid;grid-template-columns:minmax(350px,1fr) minmax(300px,1fr);gap:.8rem;margin-top:.8rem}
-.ds-map__contacts,.ds-map__code-panel{padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft);min-width:0}
-.ds-map__contacts h3,.ds-map__code-panel h3{margin:0 0 .6rem;font-size:1rem}
-.ds-map__contact-list{display:grid;gap:.55rem;max-height:360px;overflow:auto}
-.ds-map__contact{display:grid;grid-template-columns:1fr auto;gap:.6rem;align-items:center;padding:.7rem;border:1.5px solid var(--ds-border);border-radius:9px;background:var(--ds-surface-strong)}
-.ds-map__contact strong,.ds-map__contact span{display:block;overflow-wrap:anywhere}.ds-map__contact span{opacity:.65}
-.ds-map__contact button{min-height:36px;padding:.4rem .65rem;border:1px solid #b91c1c;border-radius:8px;background:#b91c1c;color:#fff;font-weight:800;cursor:pointer}
-.ds-map__code{padding:.9rem;border-radius:10px;background:#0f172a;color:#e2e8f0;overflow:auto}.ds-map__code pre{margin:0;white-space:pre-wrap;font-family:Consolas,Monaco,monospace;font-size:.84rem}
-.ds-map__history{margin-top:1rem}.ds-map__history ol{max-height:180px;margin:0;padding-left:1.4rem;overflow:auto}.ds-map__history li{margin:.3rem 0;font-size:.88rem}
-.ds-map__cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}.ds-map__card{padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}
-.ds-map__card h3{margin:0 0 .45rem;color:var(--global-text-color);font-size:1rem}.ds-map__card p{margin:0;font-size:.9rem;line-height:1.55;opacity:.78}
-.ds-map__table-wrap{overflow:auto}.ds-map table{width:100%;border-collapse:collapse;font-size:.88rem}.ds-map th,.ds-map td{padding:.65rem;border:1.5px solid var(--ds-border);text-align:left}.ds-map th{background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color))}
-@media(max-width:800px){.ds-map__hero p{text-align:left}.ds-map__lower{grid-template-columns:1fr}.ds-map__metrics,.ds-map__stats,.ds-map__cards{grid-template-columns:repeat(2,minmax(0,1fr))}.ds-map__speed{grid-template-columns:1fr}.ds-map__speed output{text-align:left}}
-@media(max-width:520px){.ds-map__metrics,.ds-map__stats,.ds-map__cards,.ds-map__group{grid-template-columns:1fr}.ds-map__contact{grid-template-columns:1fr}}
-@media(prefers-color-scheme:dark){.ds-map{--ds-surface:var(--global-bg-color);--ds-surface-strong:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));--ds-border:color-mix(in srgb,var(--global-border-color) 85%,var(--global-text-color));--ds-shadow:none;--ds-shadow-soft:none}}
-@media(prefers-reduced-motion:reduce){.ds-map *,.ds-map *::before,.ds-map *::after{transition-duration:.001ms!important;animation-duration:.001ms!important}}
-@media(prefers-color-scheme:dark){
-  :root:not([data-theme="light"]) .ds-map__entry.is-checking{background:#451a03;border-color:#f59e0b;color:#fef3c7}
-  :root:not([data-theme="light"]) .ds-map__entry.is-found{background:#052e16;border-color:#22c55e;color:#dcfce7}
+
+.ds-map__group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  align-items: end;
 }
-:root[data-theme="dark"] .ds-map__entry.is-checking{background:#451a03;border-color:#f59e0b;color:#fef3c7}
-:root[data-theme="dark"] .ds-map__entry.is-found{background:#052e16;border-color:#22c55e;color:#dcfce7}
-@media(prefers-color-scheme:light){
-  :root:not([data-theme="dark"]) .ds-map__code{background:#1e293b}
+
+.ds-map__field {
+  display: grid;
+  gap: 2px;
+  width: 140px;
 }
-:root[data-theme="light"] .ds-map__code{background:#1e293b}
+
+.ds-map__field--wide { width: 160px; }
+.ds-map__field input { width: 100%; }
+
+.ds-map__field label,
+
+
+
+
+/* ---------- insertion order ---------- */
+.ds-map__visual {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+}
+
+.ds-map__visual .ds-sim__caption { margin: 0; line-height: 1.25; }
+
+.ds-map__row {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.ds-map__entry {
+  flex: 0 1 112px;
+  min-width: 0;
+  height: 48px;
+  padding: 3px 6px;
+  border: 2px solid var(--ds-link);
+  border-radius: 8px;
+  background: var(--ds-node);
+  line-height: 1.15;
+  overflow: hidden;
+  transition: background .18s ease, border-color .18s ease;
+}
+
+.ds-map__entry span {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-map__entry .key { font-size: 12.5px; font-weight: 800; }
+.ds-map__entry .value { color: var(--ds-muted); font-size: 11px; }
+.ds-map__entry .position { color: var(--ds-muted); font-size: 10.5px; font-weight: 700; }
+
+.ds-map__entry.is-checking {
+  border-color: #e9a23b;
+  background: var(--ds-hot);
+}
+
+.ds-map__entry.is-found {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+}
+
+.ds-map__entry.is-checking .value,
+.ds-map__entry.is-found .value { color: var(--ds-text); }
+
+.ds-map__arrow {
+  flex: none;
+  color: var(--ds-muted);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.ds-map__empty {
+  margin: 0;
+  color: var(--ds-muted);
+  font-size: 13px;
+}
+
+/* ---------- directory, result, history ---------- */
+.ds-map__lower {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 6px;
+}
+
+.ds-map__contacts,
+.ds-map__result-panel,
+.ds-map__history {
+  min-height: 0;
+  padding: 5px 8px;
+  overflow: hidden;
+}
+
+.ds-map__contacts { display: grid; grid-template-rows: auto minmax(0, 1fr); }
+
+.ds-map__contact-list {
+  min-height: 0;
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.ds-map__contact {
+  height: 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: center;
+  padding: 0 2px 0 6px;
+  border: 1px solid var(--ds-border);
+  border-radius: 6px;
+  background: var(--ds-surface);
+  font-size: 12px;
+}
+
+.ds-map__contact div {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-map__contact strong { font-weight: 800; }
+.ds-map__contact span { color: var(--ds-muted); }
+
+.ds-map__body .ds-map__contact button {
+  height: 20px;
+  padding: 0 8px;
+  font-size: 11px;
+}
+
+.ds-map__side {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 6px;
+}
+
+.ds-map__result-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.ds-map__code {
+  min-height: 0;
+  padding: 4px 6px;
+  border-radius: 8px;
+  background: var(--ds-surface-strong);
+  overflow: hidden;
+}
+
+.ds-map__code pre {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ds-text);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 10.5px;
+  line-height: 12.5px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ds-map__history ol {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.ds-map__history li {
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- footer: status and stats ---------- */
+.ds-map__footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  height: 44px;
+}
+
+.ds-map__status {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  line-height: 1.25;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.ds-map__status.is-success { color: var(--ds-good); }
+.ds-map__status.is-error { color: var(--ds-bad); }
+
+.ds-map__stat {
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-map__stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-map * { transition-duration: .001ms !important; }
+}
 </style>
 
-<div class="ds-map">
-  <section class="ds-map__hero">
-    <h1>Map Simulator</h1>
-    <p>A Map stores unique keys associated with values. Calling <code>set(key, value)</code> inserts a new entry or updates an existing key. JavaScript Maps preserve insertion order during iteration.</p>
-    <div class="ds-map__metrics">
-      <div class="ds-map__metric"><strong>Set</strong>Average O(1)</div>
-      <div class="ds-map__metric"><strong>Get</strong>Average O(1)</div>
-      <div class="ds-map__metric"><strong>Has</strong>Average O(1)</div>
-      <div class="ds-map__metric"><strong>Delete</strong>Average O(1)</div>
-    </div>
-  </section>
+<div class="ds-deck ds-sim" id="ds-sim" lang="en">
+  <div class="ds-deck__screen" id="ds-sim-screen">
+    <div class="ds-deck__stage" id="ds-sim-stage">
+      <div class="ds-sim__body ds-map__body">
+        <div class="ds-sim__head">
+          <p class="ds-deck__kicker">Chapter 9 · Maps and Hash Tables</p>
+          <h1 class="ds-sim__title">Map Simulator</h1>
+        </div>
 
-  <section class="ds-map__section">
-    <h2>Map operations</h2>
-    <div class="ds-map__panel">
-      <div class="ds-map__group">
-        <div class="ds-map__field"><label for="ds-map-key">Contact name (key)</label><input id="ds-map-key" type="text" value="Ada Lovelace" maxlength="40"></div>
-        <div class="ds-map__field"><label for="ds-map-email">Email (value)</label><input id="ds-map-email" type="email" value="ada@example.com" maxlength="64"></div>
-        <button class="ds-map__btn" id="ds-map-set" type="button">Set / Update</button>
-        <button class="ds-map__btn" id="ds-map-get" type="button">Get</button>
-        <button class="ds-map__btn" id="ds-map-has" type="button">Has</button>
-        <button class="ds-map__btn" id="ds-map-delete" type="button">Delete</button>
+        <div class="ds-sim__root ds-map">
+          <div class="ds-map__panel">
+            <div class="ds-map__group">
+              <div class="ds-map__field"><label for="ds-map-key">Contact name (key)</label><input id="ds-map-key" type="text" value="Ada Lovelace" maxlength="40"></div>
+              <div class="ds-map__field ds-map__field--wide"><label for="ds-map-email">Email (value)</label><input id="ds-map-email" type="email" value="ada@example.com" maxlength="64"></div>
+              <button class="is-primary" id="ds-map-set" type="button">Set / Update</button>
+              <button id="ds-map-get" type="button">Get</button>
+              <button id="ds-map-has" type="button">Has</button>
+              <button class="is-danger" id="ds-map-delete" type="button">Delete</button>
+              <button class="is-danger" id="ds-map-clear" type="button">Clear</button>
+            </div>
+
+            <div class="ds-map__group">
+              <button id="ds-map-iterate" type="button">Iterate Entries</button>
+              <button id="ds-map-keys" type="button">Show Keys</button>
+              <button id="ds-map-values" type="button">Show Values</button>
+              <button id="ds-map-example" type="button">Load Example</button>
+              <button class="is-danger" id="ds-map-cancel" type="button">Cancel Animation</button>
+            </div>
+          </div>
+
+          <div class="ds-map__visual ds-sim__panel">
+            <p class="ds-sim__caption">Map insertion order</p>
+            <div id="ds-map-row" class="ds-map__row" aria-label="Map entries in insertion order"></div>
+          </div>
+
+          <div class="ds-map__lower">
+            <div class="ds-map__contacts ds-sim__panel">
+              <p class="ds-sim__caption">Contact directory</p>
+              <div id="ds-map-contact-list" class="ds-map__contact-list"></div>
+            </div>
+
+            <div class="ds-map__side">
+              <div class="ds-map__result-panel ds-sim__panel">
+                <p class="ds-sim__caption">Operation result</p>
+                <div id="ds-map-result" class="ds-map__code"><pre>—</pre></div>
+              </div>
+              <div class="ds-map__history ds-sim__panel"><p class="ds-sim__caption">Operation history</p><ol id="ds-map-history"><li>No operations yet.</li></ol></div>
+            </div>
+          </div>
+
+          <div class="ds-map__footer">
+            <p id="ds-map-status" class="ds-map__status ds-sim__status" role="status" aria-live="polite">Example Map loaded. Choose an operation.</p>
+            <div class="ds-map__stat"><strong>Map size</strong><span id="ds-map-size">0</span></div>
+            <div class="ds-map__stat"><strong>Current key</strong><span id="ds-map-current">—</span></div>
+            <div class="ds-map__stat"><strong>Last result</strong><span id="ds-map-result-stat">—</span></div>
+            <div class="ds-map__stat"><strong>Iteration order</strong><span>Insertion order</span></div>
+          </div>
+        </div>
       </div>
 
-      <div class="ds-map__group">
-        <button class="ds-map__btn" id="ds-map-iterate" type="button">Iterate Entries</button>
-        <button class="ds-map__btn" id="ds-map-keys" type="button">Show Keys</button>
-        <button class="ds-map__btn" id="ds-map-values" type="button">Show Values</button>
-        <button class="ds-map__btn" id="ds-map-example" type="button">Load Example</button>
-        <button class="ds-map__btn ds-map__btn--danger" id="ds-map-clear" type="button">Clear</button>
-        <button class="ds-map__btn ds-map__btn--secondary" id="ds-map-cancel" type="button">Cancel Animation</button>
-      </div>
-
-      <div class="ds-map__speed">
-        <label for="ds-map-speed">Animation speed</label>
-        <input id="ds-map-speed" type="range" min="100" max="1000" step="100" value="400">
-        <output id="ds-map-speed-output">400 ms</output>
+      <div class="ds-deck__bar">
+        <span class="ds-deck__section">Sercan KÜLCÜ, Tüm hakları saklıdır.</span>
+        <button class="ds-deck__button" type="button" id="ds-sim-full" aria-label="Full screen">⛶</button>
       </div>
     </div>
-
-    <div class="ds-map__visual">
-      <h3>Map insertion order</h3>
-      <div id="ds-map-row" class="ds-map__row" aria-label="Map entries in insertion order"></div>
-      <p id="ds-map-status" class="ds-map__status" role="status" aria-live="polite">Example Map loaded. Choose an operation.</p>
-      <div class="ds-map__stats">
-        <div class="ds-map__stat"><strong>Map size</strong><span id="ds-map-size">0</span></div>
-        <div class="ds-map__stat"><strong>Current key</strong><span id="ds-map-current">—</span></div>
-        <div class="ds-map__stat"><strong>Last result</strong><span id="ds-map-result-stat">—</span></div>
-        <div class="ds-map__stat"><strong>Iteration order</strong><span>Insertion order</span></div>
-      </div>
-    </div>
-
-    <div class="ds-map__lower">
-      <div class="ds-map__contacts">
-        <h3>Contact directory</h3>
-        <div id="ds-map-contact-list" class="ds-map__contact-list"></div>
-        <div class="ds-map__history"><h3>Operation history</h3><ol id="ds-map-history"><li>No operations yet.</li></ol></div>
-      </div>
-
-      <div class="ds-map__code-panel">
-        <h3>Current Map content</h3>
-        <div class="ds-map__code"><pre id="ds-map-code">new Map()</pre></div>
-        <h3 style="margin-top:1rem">Operation result</h3>
-        <div id="ds-map-result" class="ds-map__code"><pre>—</pre></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="ds-map__section">
-    <h2>Map concepts</h2>
-    <div class="ds-map__cards">
-      <article class="ds-map__card"><h3>Unique keys</h3><p>A Map can contain only one entry for a given key. Setting the same key again replaces its value without changing the Map size.</p></article>
-      <article class="ds-map__card"><h3>Insertion order</h3><p>Updating an existing key does not move it to the end. Deleting and then inserting it again creates a new insertion position.</p></article>
-      <article class="ds-map__card"><h3>Map versus Object</h3><p>Maps accept keys of any type, provide a direct size property, and are designed for frequent insertion, lookup, and deletion.</p></article>
-      <article class="ds-map__card"><h3>Safe rendering</h3><p>User-supplied names and emails are rendered with DOM text nodes rather than interpreted as HTML or inline JavaScript.</p></article>
-    </div>
-  </section>
-
-  <section class="ds-map__section">
-    <h2>Core JavaScript Map API</h2>
-    <div class="ds-map__panel ds-map__table-wrap">
-      <table>
-        <thead><tr><th>Method / property</th><th>Purpose</th></tr></thead>
-        <tbody>
-          <tr><td>map.set(key, value)</td><td>Insert or update an entry; returns the Map.</td></tr>
-          <tr><td>map.get(key)</td><td>Return the value or undefined.</td></tr>
-          <tr><td>map.has(key)</td><td>Test whether a key exists.</td></tr>
-          <tr><td>map.delete(key)</td><td>Remove an entry and return a Boolean.</td></tr>
-          <tr><td>map.size</td><td>Return the number of entries.</td></tr>
-          <tr><td>map.clear()</td><td>Remove all entries.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+  </div>
 </div>
 
+<script src="deck/sim.js"></script>
 <script>
 (function () {
   "use strict";
@@ -179,10 +367,9 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
   function q(id){return root.querySelector("#"+id);}
 
   var el={
-    key:q("ds-map-key"),email:q("ds-map-email"),speed:q("ds-map-speed"),speedOutput:q("ds-map-speed-output"),
-    row:q("ds-map-row"),status:q("ds-map-status"),size:q("ds-map-size"),current:q("ds-map-current"),
+    key:q("ds-map-key"),email:q("ds-map-email"),row:q("ds-map-row"),status:q("ds-map-status"),size:q("ds-map-size"),current:q("ds-map-current"),
     resultStat:q("ds-map-result-stat"),contactList:q("ds-map-contact-list"),history:q("ds-map-history"),
-    mapCode:q("ds-map-code"),result:q("ds-map-result")
+    result:q("ds-map-result")
   };
 
   var btn={
@@ -190,6 +377,11 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
     iterate:q("ds-map-iterate"),keys:q("ds-map-keys"),values:q("ds-map-values"),
     example:q("ds-map-example"),clear:q("ds-map-clear"),cancel:q("ds-map-cancel")
   };
+
+  /* the 800x600 stage shows at most MAX entries and LOG_SIZE history rows */
+  var MAX=6;
+  var DELAY=400;
+  var LOG_SIZE=3;
 
   var contacts=new Map();
   var token=0;
@@ -218,7 +410,7 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
 
   function delay(){
     if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return 0;
-    return Number(el.speed.value);
+    return DELAY;
   }
 
   function wait(ms,t){
@@ -232,11 +424,12 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
 
   function addLog(text){
     logs.unshift(text);
-    logs=logs.slice(0,10);
+    logs=logs.slice(0,LOG_SIZE);
     el.history.innerHTML="";
     logs.forEach(function(item){
       var li=document.createElement("li");
       li.textContent=item;
+      li.title=item;
       el.history.appendChild(li);
     });
   }
@@ -246,6 +439,8 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
     var pre=document.createElement("pre");
     pre.textContent=text;
     el.result.appendChild(pre);
+    /* keep the newest output line visible in the fixed-height box */
+    el.result.scrollTop=el.result.scrollHeight;
     el.resultStat.textContent=text.length>24?text.slice(0,23)+"…":text;
   }
 
@@ -262,6 +457,7 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
       contacts.forEach(function(value,key){
         var entry=document.createElement("div");
         entry.className="ds-map__entry"+(highlightKey===key && highlightKind?" "+highlightKind:"");
+        entry.title=key+" → "+value.email+" · insertion position "+index;
 
         var k=document.createElement("span");
         k.className="key"; k.textContent=key;
@@ -270,7 +466,7 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
         v.className="value"; v.textContent=value.email;
 
         var pos=document.createElement("span");
-        pos.className="position"; pos.textContent="insertion position "+index;
+        pos.className="position"; pos.textContent="position "+index;
 
         entry.appendChild(k); entry.appendChild(v); entry.appendChild(pos);
         el.row.appendChild(entry);
@@ -297,14 +493,16 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
         item.className="ds-map__contact";
 
         var info=document.createElement("div");
+        info.title=key+" · "+value.email;
         var name=document.createElement("strong");
         name.textContent=key;
         var email=document.createElement("span");
-        email.textContent=value.email;
+        email.textContent=" "+value.email;
         info.appendChild(name); info.appendChild(email);
 
         var remove=document.createElement("button");
         remove.type="button";
+        remove.className="is-danger";
         remove.textContent="Delete";
         remove.addEventListener("click",function(){deleteByKey(key);});
 
@@ -315,13 +513,6 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
 
     el.size.textContent=String(contacts.size);
     el.current.textContent=highlightKey===null?"—":String(highlightKey);
-
-    var lines=["const contacts = new Map(["];
-    contacts.forEach(function(value,key){
-      lines.push("  ["+JSON.stringify(key)+", { email: "+JSON.stringify(value.email)+" }],");
-    });
-    lines.push("]);");
-    el.mapCode.textContent=lines.join("\n");
 
     if(btn.cancel.disabled){
       var emptyMap=contacts.size===0;
@@ -400,6 +591,7 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
       var key=readKey();
       var email=readEmail();
       var existed=contacts.has(key);
+      if(!existed && contacts.size>=MAX) throw new Error("Map is full: this simulator holds at most "+MAX+" entries.");
 
       if(existed) await animateSearch(key,true);
 
@@ -541,9 +733,6 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
     setStatus("Animation cancelled.");
   });
 
-  el.speed.addEventListener("input",function(){
-    el.speedOutput.textContent=el.speed.value+" ms";
-  });
 
   btn.example.click();
   btn.cancel.disabled=true;

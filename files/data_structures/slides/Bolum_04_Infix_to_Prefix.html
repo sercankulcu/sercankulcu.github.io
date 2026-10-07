@@ -5,511 +5,347 @@ permalink: /files/data_structures/slides/Bolum_04_Infix_to_Prefix.html
 excerpt: "Compact interactive infix-to-prefix simulator."
 ---
 
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/sim.css">
 <style>
-.prefix-sim,
-.prefix-sim *,
-.prefix-sim *::before,
-.prefix-sim *::after { box-sizing: border-box; }
-
 .prefix-sim {
-  --sim-bg: var(--global-bg-color, #ffffff);
-  --sim-text: var(--global-text-color, #2f3437);
-  --sim-accent: var(--global-link-color, #2a7ae2);
-  --sim-border: var(--global-border-color, #d9dee3);
-  --sim-soft: color-mix(in srgb, var(--sim-accent) 6%, var(--sim-bg));
-  --sim-softer: color-mix(in srgb, var(--sim-accent) 2.5%, var(--sim-bg));
-  --sim-ok: #15803d;
-  --sim-warn: #d97706;
-  --sim-danger: #b91c1c;
-
-  width: min(780px, calc(100vw - 18px));
-  height: min(548px, calc(100vh - 58px));
-  min-height: 470px;
-  margin: 6px auto 0;
-  padding: 10px;
-  color: var(--sim-text);
-  font-family: inherit;
-  overflow: hidden;
-}
-
-.prefix-shell {
   height: 100%;
   display: grid;
-  grid-template-rows: auto auto auto 1fr auto;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
   gap: 8px;
 }
 
-.prefix-title {
-  margin: 0;
-  color: var(--sim-text);
-  text-align: center;
-  font-size: 1.45rem;
-  line-height: 1.15;
-}
-
 .prefix-controls {
-  padding: 8px;
-  border: 1px solid var(--sim-border);
-  border-radius: 10px;
-  background: var(--sim-softer);
+  padding: 6px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
 }
 
 .prefix-row {
-  display: grid;
-  grid-template-columns: minmax(250px, 2.4fr) repeat(6, minmax(0, 1fr));
-  gap: 5px;
+  display: flex;
+  gap: 6px;
   align-items: end;
 }
 
 .prefix-field {
+  flex: 1;
+  min-width: 0;
   display: grid;
   gap: 2px;
-  min-width: 0;
-}
-
-.prefix-field label {
-  display: block;
-  margin: 0 !important;
-  padding: 0;
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
 }
 
 .prefix-field input {
   width: 100%;
-  height: 31px;
-  min-height: 31px;
-  margin: 0 !important;
-  padding: 3px 7px;
-  border: 1px solid var(--sim-border);
-  border-radius: 6px;
-  background: var(--sim-bg);
-  color: var(--sim-text);
-  font: inherit;
-  line-height: 1;
-  vertical-align: top;
-}
-
-.prefix-btn {
-  height: 31px;
-  min-height: 31px;
-  margin: 0 !important;
-  padding: 0 5px;
-  border: 1px solid var(--sim-accent);
-  border-radius: 6px;
-  background: var(--sim-accent);
-  color: #fff;
-  font: inherit;
-  font-size: 10.5px;
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: end;
-  appearance: none;
-  -webkit-appearance: none;
-  transition: transform .12s ease, filter .12s ease;
-}
-
-.prefix-btn:hover:not(:disabled) {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
-}
-
-.prefix-btn:disabled {
-  cursor: not-allowed;
-  opacity: .45;
-}
-
-.prefix-btn.success {
-  background: var(--sim-ok);
-  border-color: var(--sim-ok);
-}
-
-.prefix-btn.danger {
-  background: var(--sim-danger);
-  border-color: var(--sim-danger);
+  font-family: Consolas, Monaco, monospace;
 }
 
 .prefix-tokens {
-  min-height: 47px;
   padding: 6px 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
   flex-wrap: nowrap;
-  border: 1px solid var(--sim-border);
-  border-radius: 10px;
-  background: var(--sim-bg);
   overflow: hidden;
 }
 
 .prefix-token {
-  min-width: 31px;
-  height: 31px;
-  padding: 0 6px;
+  flex: 0 1 auto;
+  min-width: 34px;
+  height: 32px;
+  padding: 0 7px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--sim-border);
-  border-radius: 6px;
-  background: var(--sim-soft);
+  border: 2px solid var(--ds-link);
+  border-radius: 8px;
+  background: var(--ds-node);
   font-family: Consolas, Monaco, monospace;
-  font-size: 11px;
+  font-size: 15px;
   font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
   transition: transform .15s ease, background .15s ease, border-color .15s ease;
 }
 
 .prefix-token.current {
-  background: #fef3c7;
-  border-color: var(--sim-warn);
-  color: #4a3100;
+  border-color: #e9a23b;
+  background: var(--ds-hot);
   transform: translateY(-2px);
 }
 
 .prefix-token.processed {
-  background: #dcfce7;
-  border-color: var(--sim-ok);
-  color: #14532d;
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
 }
 
 .prefix-stage {
   min-height: 0;
   display: grid;
-  grid-template-columns: 190px minmax(0, 1fr);
-  gap: 8px;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 10px;
 }
 
 .prefix-stack-panel,
 .prefix-process {
-  min-height: 0;
-  border: 1px solid var(--sim-border);
-  border-radius: 10px;
-  background: var(--sim-bg);
   overflow: hidden;
 }
 
 .prefix-stack-panel {
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   padding: 8px;
 }
 
-.prefix-mini-title {
-  margin: 0 0 5px;
-  text-align: center;
-  font-size: 10px;
-  font-weight: 800;
-  opacity: .65;
-  text-transform: uppercase;
-  letter-spacing: .03em;
-}
+.prefix-stack-panel .ds-sim__caption { text-align: center; }
 
 .prefix-stack {
+  width: 140px;
   min-height: 0;
-  padding: 7px;
+  margin: 0 auto;
+  padding: 6px;
   display: flex;
   flex-direction: column-reverse;
   justify-content: flex-start;
-  gap: 5px;
-  border: 3px solid color-mix(in srgb, var(--sim-text) 45%, var(--sim-border));
+  gap: 4px;
+  border: 3px solid var(--ds-link);
   border-top: 0;
-  border-radius: 0 0 8px 8px;
-  background: color-mix(in srgb, var(--sim-text) 3%, var(--sim-bg));
+  border-radius: 0 0 10px 10px;
+  background: var(--ds-surface);
   overflow: hidden;
 }
 
 .prefix-stack-item {
-  min-height: 31px;
-  padding: 3px 6px;
+  flex: 0 1 28px;
+  min-height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--sim-accent);
-  border-radius: 6px;
-  background: var(--sim-soft);
+  border: 2px solid var(--ds-link);
+  border-radius: 8px;
+  background: var(--ds-node);
   font-family: Consolas, Monaco, monospace;
-  font-size: 11px;
+  font-size: 15px;
   font-weight: 800;
+  overflow: hidden;
 }
 
 .prefix-stack-item.top {
-  background: #fef3c7;
-  border-color: var(--sim-warn);
-  color: #4a3100;
+  border-color: #e9a23b;
+  background: var(--ds-hot);
 }
 
 .prefix-stack-empty {
   margin: auto;
-  text-align: center;
-  font-size: 11px;
-  opacity: .55;
+  color: var(--ds-muted);
+  font-size: 14px;
 }
 
 .prefix-stack-top {
-  margin-top: 5px;
-  text-align: center;
-  color: var(--sim-accent);
-  font-size: 10px;
+  margin-top: 6px;
+  color: var(--ds-link);
+  font-size: 13px;
   font-weight: 800;
+  text-align: center;
 }
 
 .prefix-process {
   display: grid;
-  grid-template-rows: auto 1fr auto auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
 }
 
-.prefix-message {
-  min-height: 37px;
+.prefix-message,
+.prefix-status {
   padding: 7px 10px;
-  border-bottom: 1px solid var(--sim-border);
-  background: var(--sim-softer);
-  font-size: 11px;
+  background: var(--ds-surface-strong);
+  font-size: 14px;
   font-weight: 700;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+.prefix-message { border-bottom: 1.5px solid var(--ds-border); }
+.prefix-status { border-top: 1.5px solid var(--ds-border); }
+
+.prefix-status.success { color: var(--ds-good); }
+.prefix-status.error { color: var(--ds-bad); }
+.prefix-status.warning { color: var(--ds-accent); }
 
 .prefix-output-area {
   min-height: 0;
   display: grid;
-  place-content: center;
+  align-content: center;
   gap: 8px;
   padding: 8px 10px;
+  overflow: hidden;
 }
 
 .prefix-output-box {
-  width: min(430px, 100%);
-  padding: 7px 9px;
-  border: 1px solid var(--sim-border);
-  border-radius: 7px;
-  background: var(--sim-softer);
+  padding: 5px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
 }
 
-.prefix-output-box strong {
+.prefix-output-box strong,
+.prefix-result strong {
   display: block;
-  margin-bottom: 3px;
-  font-size: 9px;
-  opacity: .6;
+  color: var(--ds-muted);
+  font-size: 11px;
+  letter-spacing: .06em;
   text-transform: uppercase;
-  letter-spacing: .03em;
 }
 
 .prefix-value {
-  min-height: 25px;
-  overflow-wrap: anywhere;
+  min-height: 21px;
   font-family: Consolas, Monaco, monospace;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .prefix-result {
-  padding: 7px 10px;
-  border-top: 1px solid var(--sim-border);
-  background: color-mix(in srgb, var(--sim-ok) 6%, var(--sim-bg));
-}
-
-.prefix-result strong {
-  display: block;
-  margin-bottom: 3px;
-  color: var(--sim-ok);
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: .03em;
-}
-
-.prefix-status {
-  min-height: 31px;
   padding: 6px 10px;
-  border-top: 1px solid var(--sim-border);
-  background: var(--sim-softer);
-  font-size: 11px;
-  font-weight: 700;
-  text-align: center;
+  border-top: 1.5px solid var(--ds-border);
+  background: color-mix(in srgb, var(--ds-good) 8%, var(--ds-bg));
 }
 
-.prefix-status.success { color: var(--sim-ok); }
-.prefix-status.error { color: var(--sim-danger); }
-.prefix-status.warning { color: var(--sim-warn); }
+.prefix-result strong { color: var(--ds-good); }
 
 .prefix-footer {
   display: grid;
-  grid-template-columns: 1.5fr repeat(3, .8fr);
-  gap: 5px;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 6px;
 }
 
 .prefix-stat {
-  min-width: 0;
-  padding: 5px 7px;
-  border: 1px solid var(--sim-border);
-  border-radius: 7px;
-  background: var(--sim-softer);
-  font-size: 10.5px;
-  line-height: 1.2;
+  padding: 4px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .prefix-stat strong {
   display: block;
-  margin-bottom: 2px;
-  font-size: 9px;
-  opacity: .6;
+  color: var(--ds-muted);
+  font-size: 11px;
+  letter-spacing: .06em;
   text-transform: uppercase;
-  letter-spacing: .03em;
-}
-
-@media (max-width: 700px) {
-  .prefix-sim {
-    width: calc(100vw - 10px);
-    height: auto;
-    min-height: 0;
-    overflow: visible;
-  }
-
-  .prefix-shell { grid-template-rows: auto; }
-
-  .prefix-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .prefix-field { grid-column: 1 / -1; }
-
-  .prefix-stage {
-    grid-template-columns: 1fr;
-  }
-
-  .prefix-stack-panel { min-height: 180px; }
-  .prefix-process { min-height: 230px; }
-
-  .prefix-tokens {
-    justify-content: flex-start;
-    overflow-x: auto;
-  }
-
-  .prefix-footer {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-height: 620px) and (min-width: 701px) {
-  .prefix-sim {
-    height: calc(100vh - 48px);
-    padding-top: 4px;
-  }
-
-  .prefix-title { font-size: 1.25rem; }
-  .prefix-controls { padding: 6px; }
-  .prefix-btn, .prefix-field input { height: 28px; min-height: 28px; }
-  .prefix-tokens { min-height: 41px; padding-top: 4px; padding-bottom: 4px; }
-  .prefix-token { height: 27px; min-width: 28px; }
-  .prefix-stack-item { min-height: 27px; }
-  .prefix-status { min-height: 27px; padding: 5px 8px; }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .prefix-token.current,
-  :root:not([data-theme="light"]) .prefix-stack-item.top {
-    background: #451a03;
-    color: #fef3c7;
-    border-color: #f59e0b;
-  }
-
-  :root:not([data-theme="light"]) .prefix-token.processed {
-    background: #052e16;
-    color: #dcfce7;
-    border-color: #22c55e;
-  }
-}
-
-:root[data-theme="dark"] .prefix-token.current,
-:root[data-theme="dark"] .prefix-stack-item.top {
-  background: #451a03;
-  color: #fef3c7;
-  border-color: #f59e0b;
-}
-
-:root[data-theme="dark"] .prefix-token.processed {
-  background: #052e16;
-  color: #dcfce7;
-  border-color: #22c55e;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .prefix-sim *,
-  .prefix-sim *::before,
-  .prefix-sim *::after {
-    transition-duration: .001ms !important;
-    animation-duration: .001ms !important;
-  }
+  .prefix-sim * { transition-duration: .001ms !important; }
 }
 </style>
 
-<div class="prefix-sim">
-  <div class="prefix-shell">
-    <h1 class="prefix-title">Infix to Prefix Simulator</h1>
-
-    <div class="prefix-controls">
-      <div class="prefix-row">
-        <div class="prefix-field">
-          <label for="prefix-input">Infix expression</label>
-          <input id="prefix-input" type="text" value="A + B * C" spellcheck="false">
+<div class="ds-deck ds-sim" id="ds-sim" lang="en">
+  <div class="ds-deck__screen" id="ds-sim-screen">
+    <div class="ds-deck__stage" id="ds-sim-stage">
+      <div class="ds-sim__body">
+        <div class="ds-sim__head">
+          <p class="ds-deck__kicker">Chapter 4 · Stacks</p>
+          <h1 class="ds-sim__title">Infix to Prefix Simulator</h1>
         </div>
-        <button class="prefix-btn" id="prefix-convert" type="button">Convert</button>
-        <button class="prefix-btn" id="prefix-example" type="button">Example</button>
-        <button class="prefix-btn" id="prefix-prev" type="button">Previous</button>
-        <button class="prefix-btn" id="prefix-next" type="button">Next</button>
-        <button class="prefix-btn success" id="prefix-auto" type="button">Auto Run</button>
-        <button class="prefix-btn danger" id="prefix-reset" type="button">Reset</button>
-        <button class="prefix-btn danger" id="prefix-cancel" type="button">Cancel</button>
-      </div>
-    </div>
 
-    <div class="prefix-tokens" id="prefix-tokens" aria-label="Expression tokens"></div>
-
-    <div class="prefix-stage">
-      <div class="prefix-stack-panel">
-        <div class="prefix-mini-title">Operator Stack</div>
-        <div class="prefix-stack" id="prefix-stack"></div>
-        <div class="prefix-stack-top" id="prefix-stack-top">TOP</div>
-      </div>
-
-      <div class="prefix-process">
-        <div class="prefix-message" id="prefix-message">Ready.</div>
-
-        <div class="prefix-output-area">
-          <div class="prefix-output-box">
-            <strong>Scan</strong>
-            <div class="prefix-value" id="prefix-scan">—</div>
+        <div class="ds-sim__root prefix-sim">
+          <div class="prefix-controls">
+            <div class="prefix-row">
+              <div class="prefix-field">
+                <label for="prefix-input">Infix expression</label>
+                <input id="prefix-input" type="text" value="A + B * C" maxlength="40" spellcheck="false">
+              </div>
+              <button id="prefix-convert" type="button">Convert</button>
+              <button id="prefix-example" type="button">Example</button>
+              <button id="prefix-prev" type="button">Previous</button>
+              <button id="prefix-next" type="button">Next</button>
+              <button class="is-primary" id="prefix-auto" type="button">Auto Run</button>
+              <button class="is-danger" id="prefix-reset" type="button">Reset</button>
+              <button class="is-danger" id="prefix-cancel" type="button">Cancel</button>
+            </div>
           </div>
-          <div class="prefix-output-box">
-            <strong>Temporary output</strong>
-            <div class="prefix-value" id="prefix-temp">—</div>
+
+          <div class="prefix-tokens ds-sim__panel" id="prefix-tokens" aria-label="Expression tokens"></div>
+
+          <div class="prefix-stage">
+            <div class="prefix-stack-panel ds-sim__panel">
+              <p class="ds-sim__caption">Operator Stack</p>
+              <div class="prefix-stack" id="prefix-stack"></div>
+              <div class="prefix-stack-top" id="prefix-stack-top">TOP</div>
+            </div>
+
+            <div class="prefix-process ds-sim__panel">
+              <div class="prefix-message" id="prefix-message">Ready.</div>
+
+              <div class="prefix-output-area">
+                <div class="prefix-output-box">
+                  <strong>Scan</strong>
+                  <div class="prefix-value" id="prefix-scan">—</div>
+                </div>
+                <div class="prefix-output-box">
+                  <strong>Temporary output</strong>
+                  <div class="prefix-value" id="prefix-temp">—</div>
+                </div>
+              </div>
+
+              <div class="prefix-result">
+                <strong>Prefix result</strong>
+                <div class="prefix-value" id="prefix-result">—</div>
+              </div>
+
+              <div class="prefix-status" id="prefix-status" aria-live="polite">Convert the expression to create the steps.</div>
+            </div>
+          </div>
+
+          <div class="prefix-footer">
+            <div class="prefix-stat"><strong>Operation</strong><span id="prefix-operation">Idle</span></div>
+            <div class="prefix-stat"><strong>Step</strong><span id="prefix-step">0 / 0</span></div>
+            <div class="prefix-stat"><strong>Tokens</strong><span id="prefix-count">0</span></div>
+            <div class="prefix-stat"><strong>Stack ops</strong><span id="prefix-ops">0</span></div>
           </div>
         </div>
-
-        <div class="prefix-result">
-          <strong>Prefix result</strong>
-          <div class="prefix-value" id="prefix-result">—</div>
-        </div>
-
-        <div class="prefix-status" id="prefix-status" aria-live="polite">
-          Convert the expression to create the steps.
-        </div>
       </div>
-    </div>
 
-    <div class="prefix-footer">
-      <div class="prefix-stat"><strong>Operation</strong><span id="prefix-operation">Idle</span></div>
-      <div class="prefix-stat"><strong>Step</strong><span id="prefix-step">0 / 0</span></div>
-      <div class="prefix-stat"><strong>Tokens</strong><span id="prefix-count">0</span></div>
-      <div class="prefix-stat"><strong>Stack ops</strong><span id="prefix-ops">0</span></div>
+      <div class="ds-deck__bar">
+        <span class="ds-deck__section">Sercan KÜLCÜ, Tüm hakları saklıdır.</span>
+        <button class="ds-deck__button" type="button" id="ds-sim-full" aria-label="Full screen">⛶</button>
+      </div>
     </div>
   </div>
 </div>
 
+<script src="deck/sim.js"></script>
 <script>
 (() => {
   "use strict";

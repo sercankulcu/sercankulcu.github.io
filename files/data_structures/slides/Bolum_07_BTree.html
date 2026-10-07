@@ -5,267 +5,187 @@ permalink: /files/data_structures/slides/Bolum_07_BTree.html
 excerpt: "Compact interactive B-Tree simulator."
 ---
 
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/sim.css">
 <style>
-.btree-sim,
-.btree-sim *,
-.btree-sim *::before,
-.btree-sim *::after { box-sizing: border-box; }
-
 .btree-sim {
-  --sim-bg: var(--global-bg-color, #ffffff);
-  --sim-text: var(--global-text-color, #2f3437);
-  --sim-accent: var(--global-link-color, #2a7ae2);
-  --sim-border: var(--global-border-color, #d9dee3);
-  --sim-soft: color-mix(in srgb, var(--sim-accent) 6%, var(--sim-bg));
-  --sim-softer: color-mix(in srgb, var(--sim-accent) 2.5%, var(--sim-bg));
-  --sim-ok: #15803d;
-  --sim-warn: #d97706;
-  --sim-danger: #b91c1c;
-  --sim-visit: #7c3aed;
-
-  width: min(780px, calc(100vw - 18px));
-  height: min(548px, calc(100vh - 58px));
-  min-height: 470px;
-  margin: 6px auto 0;
-  padding: 10px;
-  color: var(--sim-text);
-  font-family: inherit;
-  overflow: hidden;
-}
-
-.btree-shell {
   height: 100%;
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 8px;
-}
-
-.btree-title {
-  margin: 0;
-  color: var(--sim-text);
-  text-align: center;
-  font-size: 1.45rem;
-  line-height: 1.15;
 }
 
 .btree-controls {
   display: grid;
   gap: 6px;
-  padding: 8px;
-  border: 1px solid var(--sim-border);
-  border-radius: 10px;
-  background: var(--sim-softer);
+  padding: 8px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
 }
 
 .btree-row {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
   align-items: end;
 }
 
 .btree-field {
   display: grid;
-  grid-column: span 2;
   gap: 2px;
-  min-width: 0;
+  width: 92px;
 }
 
-.btree-field label {
-  display: block;
-  margin: 0 !important;
-  padding: 0;
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-}
+.btree-field--wide { width: 150px; }
 
 .btree-field input,
-.btree-field select {
-  width: 100%;
-  height: 31px;
-  min-height: 31px;
-  margin: 0 !important;
-  padding: 3px 6px;
-  border: 1px solid var(--sim-border);
-  border-radius: 6px;
-  background: var(--sim-bg);
-  color: var(--sim-text);
-  font: inherit;
-  line-height: 1;
-  vertical-align: top;
-}
-
-.btree-btn {
-  height: 31px;
-  min-height: 31px;
-  margin: 0 !important;
-  padding: 0 6px;
-  border: 1px solid var(--sim-accent);
-  border-radius: 6px;
-  background: var(--sim-accent);
-  color: #fff;
-  font: inherit;
-  font-size: 10.5px;
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: end;
-  appearance: none;
-  -webkit-appearance: none;
-  transition: transform .12s ease, filter .12s ease;
-}
-
-.btree-btn:hover:not(:disabled) {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
-}
-
-.btree-btn:disabled {
-  cursor: not-allowed;
-  opacity: .45;
-}
-
-.btree-btn.success {
-  background: var(--sim-ok);
-  border-color: var(--sim-ok);
-}
-
-.btree-btn.danger {
-  background: var(--sim-danger);
-  border-color: var(--sim-danger);
-}
-
-.span2 { grid-column: span 2; }
+.btree-field select { width: 100%; }
 
 .btree-stage {
   min-height: 0;
   display: grid;
-  grid-template-rows: 1fr auto;
-  border: 1px solid var(--sim-border);
-  border-radius: 10px;
-  background: var(--sim-bg);
+  grid-template-rows: minmax(0, 1fr) auto;
   overflow: hidden;
 }
 
 .btree-canvas {
   min-height: 0;
   overflow: hidden;
-  background:
-    radial-gradient(circle at center, color-mix(in srgb, var(--sim-accent) 3%, transparent), transparent 65%);
 }
 
 .btree-svg {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: 270px;
 }
 
 .btree-edge {
-  stroke: color-mix(in srgb, var(--sim-text) 38%, var(--sim-border));
-  stroke-width: 2.1;
+  stroke: var(--ds-link);
+  stroke-width: 2.2;
   stroke-linecap: round;
 }
 
 .btree-edge.active {
-  stroke: var(--sim-warn);
+  stroke: #e9a23b;
   stroke-width: 3.5;
 }
 
 .btree-node-box {
-  fill: var(--sim-bg);
-  stroke: var(--sim-accent);
+  fill: var(--ds-node);
+  stroke: var(--ds-link);
   stroke-width: 2.3;
   rx: 6;
+  transition: fill .15s ease, stroke .15s ease;
 }
 
 .btree-node.checking .btree-node-box {
-  fill: #fef3c7;
-  stroke: var(--sim-warn);
+  fill: var(--ds-hot);
+  stroke: #e9a23b;
   stroke-width: 3.6;
 }
 
 .btree-node.found .btree-node-box,
 .btree-node.changed .btree-node-box {
-  fill: #dcfce7;
-  stroke: var(--sim-ok);
+  fill: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  stroke: var(--ds-good);
   stroke-width: 3.6;
 }
 
 .btree-node.removing .btree-node-box {
-  fill: #fee2e2;
-  stroke: var(--sim-danger);
+  fill: color-mix(in srgb, var(--ds-bad) 18%, var(--ds-bg));
+  stroke: var(--ds-bad);
   stroke-width: 3.6;
 }
 
 .btree-node.visited .btree-node-box {
-  fill: color-mix(in srgb, var(--sim-visit) 16%, var(--sim-bg));
-  stroke: var(--sim-visit);
+  fill: color-mix(in srgb, var(--ds-link) 38%, var(--ds-bg));
+  stroke: var(--ds-link);
   stroke-width: 3.6;
 }
 
 .btree-key-line {
-  stroke: color-mix(in srgb, var(--sim-text) 32%, var(--sim-border));
+  stroke: color-mix(in srgb, var(--ds-link) 55%, var(--ds-bg));
   stroke-width: 1.2;
 }
 
 .btree-key-text {
-  fill: var(--sim-text);
-  font-size: 10.5px;
+  fill: var(--ds-text);
+  font-size: 14px;
   font-weight: 800;
   text-anchor: middle;
   dominant-baseline: middle;
 }
 
 .btree-depth-label {
-  fill: var(--sim-text);
-  font-size: 9px;
-  opacity: .42;
+  fill: var(--ds-muted);
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .btree-status {
-  min-height: 34px;
   padding: 7px 10px;
-  border-top: 1px solid var(--sim-border);
-  background: var(--sim-softer);
-  font-size: 11px;
+  border-top: 1.5px solid var(--ds-border);
+  background: var(--ds-surface-strong);
+  font-size: 14px;
   font-weight: 700;
+  line-height: 1.3;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.btree-status.success { color: var(--sim-ok); }
-.btree-status.error { color: var(--sim-danger); }
-.btree-status.warning { color: var(--sim-warn); }
+.btree-status.success { color: var(--ds-good); }
+.btree-status.error { color: var(--ds-bad); }
+.btree-status.warning { color: color-mix(in srgb, #e9a23b 70%, var(--ds-text)); }
 
 .btree-footer {
   display: grid;
-  grid-template-columns: 1.35fr repeat(5, .72fr);
-  gap: 5px;
+  grid-template-columns: 1.35fr repeat(4, .72fr) 1.6fr;
+  gap: 6px;
 }
 
 .btree-stat {
   min-width: 0;
-  padding: 5px 7px;
-  border: 1px solid var(--sim-border);
-  border-radius: 7px;
-  background: var(--sim-softer);
-  font-size: 10.5px;
-  line-height: 1.2;
+  padding: 4px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
   overflow: hidden;
 }
 
 .btree-stat strong {
   display: block;
-  margin-bottom: 2px;
-  font-size: 9px;
-  opacity: .6;
+  color: var(--ds-muted);
+  font-size: 11px;
+  letter-spacing: .06em;
   text-transform: uppercase;
-  letter-spacing: .03em;
 }
 
 .btree-stat span {
@@ -275,140 +195,75 @@ excerpt: "Compact interactive B-Tree simulator."
   white-space: nowrap;
 }
 
-@media (max-width: 700px) {
-  .btree-sim {
-    width: calc(100vw - 10px);
-    height: auto;
-    min-height: 0;
-    overflow: visible;
-  }
-
-  .btree-shell { grid-template-rows: auto; }
-  .btree-row { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-  .btree-field, .span2 { grid-column: span 2; }
-  .btree-svg { min-height: 390px; }
-  .btree-footer { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-@media (max-height: 620px) and (min-width: 701px) {
-  .btree-sim {
-    height: calc(100vh - 48px);
-    padding-top: 4px;
-  }
-
-  .btree-title { font-size: 1.25rem; }
-  .btree-controls { padding: 6px; gap: 5px; }
-  .btree-btn, .btree-field input, .btree-field select {
-    height: 28px;
-    min-height: 28px;
-  }
-  .btree-svg { min-height: 230px; }
-  .btree-status { min-height: 29px; padding: 5px 8px; }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .btree-node.checking .btree-node-box {
-    fill: #451a03;
-    stroke: #f59e0b;
-  }
-  :root:not([data-theme="light"]) .btree-node.found .btree-node-box,
-  :root:not([data-theme="light"]) .btree-node.changed .btree-node-box {
-    fill: #052e16;
-    stroke: #22c55e;
-  }
-  :root:not([data-theme="light"]) .btree-node.removing .btree-node-box {
-    fill: #450a0a;
-    stroke: #ef4444;
-  }
-  :root:not([data-theme="light"]) .btree-node.visited .btree-node-box {
-    fill: #2e1065;
-    stroke: #a78bfa;
-  }
-}
-
-:root[data-theme="dark"] .btree-node.checking .btree-node-box {
-  fill: #451a03;
-  stroke: #f59e0b;
-}
-:root[data-theme="dark"] .btree-node.found .btree-node-box,
-:root[data-theme="dark"] .btree-node.changed .btree-node-box {
-  fill: #052e16;
-  stroke: #22c55e;
-}
-:root[data-theme="dark"] .btree-node.removing .btree-node-box {
-  fill: #450a0a;
-  stroke: #ef4444;
-}
-:root[data-theme="dark"] .btree-node.visited .btree-node-box {
-  fill: #2e1065;
-  stroke: #a78bfa;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .btree-sim *,
-  .btree-sim *::before,
-  .btree-sim *::after {
-    transition-duration: .001ms !important;
-    animation-duration: .001ms !important;
-  }
+  .btree-sim * { transition-duration: .001ms !important; }
 }
 </style>
 
-<div class="btree-sim">
-  <div class="btree-shell">
-    <h1 class="btree-title">B-Tree Simulator</h1>
-
-    <div class="btree-controls">
-      <div class="btree-row">
-        <div class="btree-field">
-          <label for="btree-degree">Minimum degree (t)</label>
-          <select id="btree-degree">
-            <option value="2">2 · max 3 keys</option>
-            <option value="3">3 · max 5 keys</option>
-            <option value="4">4 · max 7 keys</option>
-          </select>
+<div class="ds-deck ds-sim" id="ds-sim" lang="en">
+  <div class="ds-deck__screen" id="ds-sim-screen">
+    <div class="ds-deck__stage" id="ds-sim-stage">
+      <div class="ds-sim__body">
+        <div class="ds-sim__head">
+          <p class="ds-deck__kicker">Chapter 7 · Trees</p>
+          <h1 class="ds-sim__title">B-Tree Simulator</h1>
         </div>
 
-        <div class="btree-field">
-          <label for="btree-value">Value</label>
-          <input id="btree-value" type="number" value="42" inputmode="numeric">
+        <div class="ds-sim__root btree-sim">
+          <div class="btree-controls">
+            <div class="btree-row">
+              <div class="btree-field btree-field--wide">
+                <label for="btree-degree">Minimum degree (t)</label>
+                <select id="btree-degree">
+                  <option value="2">2 · max 3 keys</option>
+                  <option value="3">3 · max 5 keys</option>
+                  <option value="4">4 · max 7 keys</option>
+                </select>
+              </div>
+              <div class="btree-field">
+                <label for="btree-value">Value</label>
+                <input id="btree-value" type="number" value="42" inputmode="numeric">
+              </div>
+              <button class="is-primary" id="btree-insert" type="button">Insert</button>
+              <button id="btree-search" type="button">Search</button>
+              <button class="is-danger" id="btree-delete" type="button">Delete</button>
+              <button id="btree-traverse" type="button">Sorted Traversal</button>
+            </div>
+            <div class="btree-row">
+              <button id="btree-load" type="button">Load Example</button>
+              <button id="btree-random" type="button">Random</button>
+              <button class="is-danger" id="btree-reset" type="button">Reset</button>
+              <button class="is-danger" id="btree-cancel" type="button">Cancel</button>
+            </div>
+          </div>
+
+          <div class="btree-stage ds-sim__panel">
+            <div class="btree-canvas">
+              <svg id="btree-svg" class="btree-svg" viewBox="0 0 740 290" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Interactive B-Tree"></svg>
+            </div>
+            <div class="btree-status" id="btree-status" aria-live="polite">Example B-Tree loaded.</div>
+          </div>
+
+          <div class="btree-footer">
+            <div class="btree-stat"><strong>Operation</strong><span id="btree-operation">Idle</span></div>
+            <div class="btree-stat"><strong>Keys</strong><span id="btree-keys">0 / 15</span></div>
+            <div class="btree-stat"><strong>Nodes</strong><span id="btree-nodes">0</span></div>
+            <div class="btree-stat"><strong>Height</strong><span id="btree-height">0</span></div>
+            <div class="btree-stat"><strong>Changes</strong><span id="btree-changes">0</span></div>
+            <div class="btree-stat"><strong>Result</strong><span id="btree-result">—</span></div>
+          </div>
         </div>
-
-        <button class="btree-btn success span2" id="btree-insert" type="button">Insert</button>
-        <button class="btree-btn span2" id="btree-search" type="button">Search</button>
-        <button class="btree-btn danger span2" id="btree-delete" type="button">Delete</button>
-        <button class="btree-btn span2" id="btree-traverse" type="button">Sorted Traversal</button>
       </div>
 
-      <div class="btree-row">
-        <button class="btree-btn success span2" id="btree-load" type="button">Load Example</button>
-        <button class="btree-btn success span2" id="btree-random" type="button">Random</button>
-        <button class="btree-btn danger span2" id="btree-reset" type="button">Reset</button>
-        <button class="btree-btn danger span2" id="btree-cancel" type="button">Cancel</button>
+      <div class="ds-deck__bar">
+        <span class="ds-deck__section">Sercan KÜLCÜ, Tüm hakları saklıdır.</span>
+        <button class="ds-deck__button" type="button" id="ds-sim-full" aria-label="Full screen">⛶</button>
       </div>
-    </div>
-
-    <div class="btree-stage">
-      <div class="btree-canvas">
-        <svg id="btree-svg" class="btree-svg" viewBox="0 0 740 290" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Interactive B-Tree"></svg>
-      </div>
-
-      <div class="btree-status" id="btree-status" aria-live="polite">
-        Example B-Tree loaded.
-      </div>
-    </div>
-
-    <div class="btree-footer">
-      <div class="btree-stat"><strong>Operation</strong><span id="btree-operation">Idle</span></div>
-      <div class="btree-stat"><strong>Keys</strong><span id="btree-keys">0 / 15</span></div>
-      <div class="btree-stat"><strong>Nodes</strong><span id="btree-nodes">0</span></div>
-      <div class="btree-stat"><strong>Height</strong><span id="btree-height">0</span></div>
-      <div class="btree-stat"><strong>Changes</strong><span id="btree-changes">0</span></div>
-      <div class="btree-stat"><strong>Result</strong><span id="btree-result">—</span></div>
     </div>
   </div>
 </div>
 
+<script src="deck/sim.js"></script>
 <script>
 (() => {
   "use strict";
@@ -885,14 +740,15 @@ excerpt: "Compact interactive B-Tree simulator."
       });
       text.textContent = "B-Tree is empty.";
       el.svg.appendChild(text);
+      el.svg.setAttribute("viewBox", "0 0 740 290");
       updateStats();
       return;
     }
 
     const positions = layoutTree();
     const nodes = tree.allNodes();
-    const keyWidth = 29;
-    const nodeHeight = 34;
+    const keyWidth = 36;
+    const nodeHeight = 36;
 
     for (let d = 0; d <= tree.height(); d++) {
       const sample = nodes.find(node => {
@@ -990,7 +846,23 @@ excerpt: "Compact interactive B-Tree simulator."
       el.svg.appendChild(group);
     });
 
+    fitView();
     updateStats();
+  }
+
+  // the viewBox always covers the whole drawing, so the tree shrinks instead of overflowing
+  function fitView() {
+    let box;
+    try {
+      box = el.svg.getBBox();
+    } catch (error) {
+      return;
+    }
+    const x0 = Math.min(0, box.x - 6);
+    const y0 = Math.min(0, box.y - 6);
+    const x1 = Math.max(740, box.x + box.width + 6);
+    const y1 = Math.max(290, box.y + box.height + 6);
+    el.svg.setAttribute("viewBox", `${x0} ${y0} ${x1 - x0} ${y1 - y0}`);
   }
 
   async function pause(localToken) {

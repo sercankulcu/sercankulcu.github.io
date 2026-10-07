@@ -5,186 +5,402 @@ permalink: /files/data_structures/slides/Bolum_08_Priority_Queue.html
 excerpt: "Interactive stable priority queue simulator implemented with a binary max heap, including enqueue, dequeue, priority updates, logical service order, and synchronized visualization."
 ---
 
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/sim.css">
 <style>
-.ds-pq,.ds-pq *,.ds-pq *::before,.ds-pq *::after{box-sizing:border-box}
-.ds-pq{
-  width:min(1180px,100%);margin:0 auto 2rem;color:var(--global-text-color);
-  --ds-surface:color-mix(in srgb,var(--global-link-color) 2.5%,var(--global-bg-color));
-  --ds-surface-strong:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
-  --ds-border:color-mix(in srgb,var(--global-link-color) 38%,var(--global-border-color));
-  --ds-shadow:0 8px 24px rgba(15,23,42,.065);
-  --ds-shadow-soft:0 3px 10px rgba(15,23,42,.045)
+.ds-pq {
+  position: relative;
+  height: 100%;
+  line-height: 1.3;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 6px;
 }
-.ds-pq__hero,.ds-pq__panel,.ds-pq__visual,.ds-pq__service-panel,.ds-pq__table-panel,.ds-pq__log-panel,.ds-pq__card,.ds-pq__status{
-  border:1.5px solid var(--ds-border);background:var(--ds-surface)
+
+/* ---------- controls ---------- */
+.ds-pq__panel {
+  display: grid;
+  gap: 6px;
+  padding: 6px 10px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
 }
-.ds-pq__hero{padding:1.35rem;border-radius:16px;background:var(--ds-surface-strong);box-shadow:var(--ds-shadow)}
-.ds-pq__hero h1{margin:0 0 .55rem;text-align:center;color:var(--global-text-color);font-size:clamp(1.65rem,4vw,2.3rem)}
-.ds-pq__hero p{width:100%;margin:0;max-width:none;line-height:1.65;text-align:justify;text-justify:inter-word;opacity:.86}
-.ds-pq__metrics,.ds-pq__stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem}
-.ds-pq__metrics{margin-top:1rem}
-.ds-pq__metric,.ds-pq__stat{padding:.8rem;border:1.5px solid var(--ds-border);border-radius:10px;background:var(--ds-surface);box-shadow:var(--ds-shadow-soft)}
-.ds-pq__metric strong,.ds-pq__stat strong{display:block;margin-bottom:.15rem}
-.ds-pq__section{margin-top:1.4rem}.ds-pq__section h2{margin:0 0 .7rem;color:var(--global-text-color);font-size:1.2rem}
-.ds-pq__panel{display:grid;gap:.8rem;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow-soft)}
-.ds-pq__group{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;align-items:end}
-.ds-pq__field{display:grid;gap:.3rem}.ds-pq__field label,.ds-pq__speed label{font-size:.86rem;font-weight:800}
-.ds-pq input{width:100%;min-height:42px;padding:.55rem .65rem;border:1.5px solid var(--ds-border);border-radius:9px;background:var(--ds-surface);color:var(--global-text-color);font:inherit}
-.ds-pq input:focus-visible,.ds-pq button:focus-visible{outline:3px solid color-mix(in srgb,var(--global-link-color) 30%,transparent);outline-offset:2px}
-.ds-pq__btn{min-height:42px;padding:.55rem .75rem;border:1px solid var(--global-link-color);border-radius:9px;background:var(--global-link-color);color:#fff;font:inherit;font-weight:800;cursor:pointer}
-.ds-pq__btn:hover:not(:disabled){filter:brightness(1.08)}
-.ds-pq__btn--secondary{border-color:var(--ds-border);background:var(--ds-surface);color:var(--global-text-color)}
-.ds-pq__btn--danger{border-color:#b91c1c;background:#b91c1c}.ds-pq__btn:disabled{cursor:not-allowed;opacity:.5}
-.ds-pq__speed{display:grid;grid-template-columns:minmax(140px,auto) 1fr auto;gap:.65rem;align-items:center}.ds-pq__speed output{min-width:70px;text-align:right;font-size:.85rem;font-weight:800}
 
-.ds-pq__service-panel{margin-top:1rem;padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft);overflow:auto}
-.ds-pq__service-panel h3{margin:0 0 .65rem;font-size:1rem}
-.ds-pq__service-order{display:flex;align-items:center;gap:.45rem;min-width:max-content}
-.ds-pq__service-item{min-width:116px;padding:.65rem;border:2px solid color-mix(in srgb,var(--global-link-color) 85%,var(--global-border-color));border-radius:9px;background:var(--ds-surface);text-align:center;font-weight:800}
-.ds-pq__service-item small{display:block;margin-top:.12rem;font-weight:600;opacity:.62}
-.ds-pq__service-item.is-front{background:#dcfce7;border-color:#15803d}.ds-pq__arrow{font-size:1.25rem;font-weight:800;opacity:.55}
-
-.ds-pq__visual{margin-top:1rem;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow);overflow:auto}
-.ds-pq__canvas{min-width:780px}.ds-pq__svg{display:block;width:100%;height:auto;min-height:500px}
-.ds-pq__edge{stroke:color-mix(in srgb,var(--global-text-color) 40%,var(--global-border-color));stroke-width:2.2}
-.ds-pq__edge.is-active{stroke:#e11d48;stroke-width:4}
-.ds-pq__node circle{fill:var(--ds-surface);stroke:color-mix(in srgb,var(--global-link-color) 85%,var(--global-border-color));stroke-width:2.6}
-.ds-pq__node text.value{fill:var(--global-text-color);font-weight:800;text-anchor:middle;dominant-baseline:middle}
-.ds-pq__node text.meta{fill:var(--global-text-color);font-size:11px;text-anchor:middle;opacity:.58}
-.ds-pq__node.is-checking circle{fill:#fef3c7;stroke:#d97706}.ds-pq__node.is-found circle{fill:#dcfce7;stroke:#15803d}
-.ds-pq__status{min-height:3rem;margin:.8rem 0 0;padding:.85rem;border-radius:10px;box-shadow:var(--ds-shadow-soft);font-weight:800}
-.ds-pq__status.is-success{color:#15803d}.ds-pq__status.is-error{color:#b91c1c}
-.ds-pq__stats{margin-top:.8rem}.ds-pq__stat strong{font-size:.75rem;opacity:.65}
-
-.ds-pq__lower{display:grid;grid-template-columns:minmax(420px,1.2fr) minmax(280px,.8fr);gap:.8rem;margin-top:.8rem}
-.ds-pq__table-panel,.ds-pq__log-panel{min-width:0;padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}
-.ds-pq__table-panel h3,.ds-pq__log-panel h3{margin:0 0 .6rem;font-size:1rem}
-.ds-pq__scroll{overflow:auto}.ds-pq table{width:100%;border-collapse:collapse;font-size:.88rem}
-.ds-pq th,.ds-pq td{padding:.6rem;border:1.5px solid var(--ds-border);text-align:left}.ds-pq th{background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color))}
-.ds-pq__log-panel ol{max-height:280px;margin:0;padding-left:1.4rem;overflow:auto}.ds-pq__log-panel li{margin:.3rem 0;font-size:.88rem}
-
-.ds-pq__cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
-.ds-pq__card{padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}
-.ds-pq__card h3{margin:0 0 .45rem;color:var(--global-text-color);font-size:1rem}.ds-pq__card p{margin:0;font-size:.9rem;line-height:1.55;opacity:.78}
-
-@media(max-width:850px){
-  .ds-pq__hero p{text-align:left}
-  .ds-pq__lower{grid-template-columns:1fr}
-  .ds-pq__metrics,.ds-pq__stats,.ds-pq__cards{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .ds-pq__speed{grid-template-columns:1fr}.ds-pq__speed output{text-align:left}
+.ds-pq__group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  align-items: end;
 }
-@media(max-width:520px){.ds-pq__metrics,.ds-pq__stats,.ds-pq__cards,.ds-pq__group{grid-template-columns:1fr}}
-@media(prefers-color-scheme:dark){.ds-pq{--ds-surface:var(--global-bg-color);--ds-surface-strong:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));--ds-border:color-mix(in srgb,var(--global-border-color) 85%,var(--global-text-color));--ds-shadow:none;--ds-shadow-soft:none}}
-@media(prefers-reduced-motion:reduce){.ds-pq *,.ds-pq *::before,.ds-pq *::after{transition-duration:.001ms!important;animation-duration:.001ms!important}}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .ds-pq__node.is-checking circle { fill: #451a03; stroke: #f59e0b; }
-  :root:not([data-theme="light"]) .ds-pq__node.is-found circle { fill: #052e16; stroke: #22c55e; }
+
+.ds-pq__field {
+  display: grid;
+  gap: 2px;
+  width: 66px;
 }
-:root[data-theme="dark"] .ds-pq__node.is-checking circle { fill: #451a03; stroke: #f59e0b; }
-:root[data-theme="dark"] .ds-pq__node.is-found circle { fill: #052e16; stroke: #22c55e; }
+
+.ds-pq__field label,
+
+.ds-pq__field--text { width: 104px; }
+.ds-pq__field--wide { width: 84px; }
+.ds-pq__field input { width: 100%; }
+
+
+
+
+/* ---------- main area ---------- */
+.ds-pq__main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 264px;
+  gap: 6px;
+}
+
+.ds-pq__visual {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.ds-pq__service-panel {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border-bottom: 1.5px solid var(--ds-border);
+  background: var(--ds-surface);
+}
+
+.ds-pq__service-panel .ds-sim__caption { margin: 0; line-height: 1.25; }
+
+.ds-pq__service-order {
+  height: 46px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+.ds-pq__service-empty { color: var(--ds-muted); }
+
+.ds-pq__service-item {
+  flex: 0 0 80px;
+  height: 46px;
+  padding: 3px 4px;
+  border: 2px solid var(--ds-link);
+  border-radius: 8px;
+  background: var(--ds-node);
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  overflow: hidden;
+}
+
+.ds-pq__service-item span,
+.ds-pq__service-item small {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-pq__service-item small {
+  color: var(--ds-muted);
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.ds-pq__service-item.is-front {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+}
+
+.ds-pq__service-item.is-more {
+  flex-basis: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  border-color: var(--ds-border);
+  background: var(--ds-surface);
+  color: var(--ds-muted);
+}
+
+.ds-pq__arrow {
+  flex: none;
+  color: var(--ds-muted);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.ds-pq__canvas {
+  position: relative;
+  min-height: 0;
+}
+
+.ds-pq__svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ds-pq__empty-text {
+  fill: var(--ds-muted);
+  font-size: 14px;
+  text-anchor: middle;
+}
+
+.ds-pq__edge {
+  stroke: var(--ds-link);
+  stroke-width: 2;
+}
+
+.ds-pq__edge.is-active {
+  stroke: #e9a23b;
+  stroke-width: 4;
+}
+
+.ds-pq__node circle {
+  fill: var(--ds-node);
+  stroke: var(--ds-link);
+  stroke-width: 2.4;
+  transition: fill .18s ease, stroke .18s ease;
+}
+
+.ds-pq__node text.value {
+  fill: var(--ds-text);
+  font-size: 15px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.ds-pq__node text.meta {
+  fill: var(--ds-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.ds-pq__node.is-checking circle {
+  fill: var(--ds-hot);
+  stroke: #e9a23b;
+}
+
+.ds-pq__node.is-found circle {
+  fill: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  stroke: var(--ds-good);
+}
+
+/* ---------- side: heap array and history ---------- */
+.ds-pq__side {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 6px;
+}
+
+.ds-pq__table-panel,
+.ds-pq__log-panel {
+  min-height: 0;
+  padding: 5px 8px;
+  overflow: hidden;
+}
+
+.ds-pq__table-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 11.5px;
+}
+
+.ds-pq__table-panel th,
+.ds-pq__table-panel td {
+  height: 14px;
+  padding: 0 4px;
+  border: 1px solid var(--ds-border);
+  line-height: 13px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-pq__table-panel th {
+  background: var(--ds-surface-strong);
+  color: var(--ds-muted);
+  font-size: 11px;
+}
+
+.ds-pq__table-panel col.c-index { width: 40px; }
+.ds-pq__table-panel col.c-priority { width: 50px; }
+.ds-pq__table-panel col.c-arrival { width: 56px; }
+.ds-pq__table-panel col.c-parent { width: 42px; }
+
+.ds-pq__log-panel ol {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.ds-pq__log-panel li {
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- footer: status and stats ---------- */
+.ds-pq__footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  height: 44px;
+}
+
+.ds-pq__status {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  line-height: 1.25;
+  overflow: hidden;
+}
+
+.ds-pq__status.is-success { color: var(--ds-good); }
+.ds-pq__status.is-error { color: var(--ds-bad); }
+
+.ds-pq__stat {
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-pq__stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-pq * { transition-duration: .001ms !important; }
+}
 </style>
 
-<div class="ds-pq">
-  <section class="ds-pq__hero">
-    <h1>Priority Queue Simulator</h1>
-    <p>A priority queue removes the most important item rather than the oldest item. This simulator uses a stable binary max heap: larger priority numbers are served first, while items with equal priority preserve FIFO insertion order.</p>
-    <div class="ds-pq__metrics">
-      <div class="ds-pq__metric"><strong>Enqueue</strong>O(log n)</div>
-      <div class="ds-pq__metric"><strong>Dequeue</strong>O(log n)</div>
-      <div class="ds-pq__metric"><strong>Peek</strong>O(1)</div>
-      <div class="ds-pq__metric"><strong>Stable ties</strong>FIFO</div>
-    </div>
-  </section>
+<div class="ds-deck ds-sim" id="ds-sim" lang="en">
+  <div class="ds-deck__screen" id="ds-sim-screen">
+    <div class="ds-deck__stage" id="ds-sim-stage">
+      <div class="ds-sim__body">
+        <div class="ds-sim__head">
+          <p class="ds-deck__kicker">Chapter 8 · Priority Queues and Heaps</p>
+          <h1 class="ds-sim__title">Priority Queue Simulator</h1>
+        </div>
 
-  <section class="ds-pq__section">
-    <h2>Priority queue operations</h2>
-    <div class="ds-pq__panel">
-      <div class="ds-pq__group">
-        <div class="ds-pq__field"><label for="ds-pq-value">Value</label><input id="ds-pq-value" type="text" value="Task A" maxlength="24"></div>
-        <div class="ds-pq__field"><label for="ds-pq-priority">Priority</label><input id="ds-pq-priority" type="number" min="0" max="99" value="5"></div>
-        <button class="ds-pq__btn" id="ds-pq-enqueue" type="button">Enqueue</button>
-        <button class="ds-pq__btn" id="ds-pq-random" type="button">Enqueue Random</button>
-        <button class="ds-pq__btn" id="ds-pq-dequeue" type="button">Dequeue</button>
-        <button class="ds-pq__btn" id="ds-pq-peek" type="button">Peek</button>
-      </div>
+        <div class="ds-sim__root ds-pq">
+          <div class="ds-pq__panel">
+            <div class="ds-pq__group">
+              <div class="ds-pq__field ds-pq__field--text"><label for="ds-pq-value">Value</label><input id="ds-pq-value" type="text" value="Task A" maxlength="24"></div>
+              <div class="ds-pq__field"><label for="ds-pq-priority">Priority</label><input id="ds-pq-priority" type="number" min="0" max="99" value="5"></div>
+              <button class="is-primary" id="ds-pq-enqueue" type="button">Enqueue</button>
+              <button id="ds-pq-random" type="button">Enqueue Random</button>
+              <button class="is-danger" id="ds-pq-dequeue" type="button">Dequeue</button>
+              <button id="ds-pq-peek" type="button">Peek</button>
+            </div>
 
-      <div class="ds-pq__group">
-        <div class="ds-pq__field"><label for="ds-pq-index">Heap index</label><input id="ds-pq-index" type="number" min="0" value="0"></div>
-        <div class="ds-pq__field"><label for="ds-pq-new-priority">New priority</label><input id="ds-pq-new-priority" type="number" min="0" max="99" value="8"></div>
-        <button class="ds-pq__btn" id="ds-pq-change" type="button">Change Priority</button>
-        <button class="ds-pq__btn" id="ds-pq-example" type="button">Load Example</button>
-        <button class="ds-pq__btn ds-pq__btn--danger" id="ds-pq-clear" type="button">Clear</button>
-        <button class="ds-pq__btn ds-pq__btn--secondary" id="ds-pq-cancel" type="button">Cancel Animation</button>
-      </div>
+            <div class="ds-pq__group">
+              <div class="ds-pq__field ds-pq__field--wide"><label for="ds-pq-index">Heap index</label><input id="ds-pq-index" type="number" min="0" value="0"></div>
+              <div class="ds-pq__field ds-pq__field--wide"><label for="ds-pq-new-priority">New priority</label><input id="ds-pq-new-priority" type="number" min="0" max="99" value="8"></div>
+              <button id="ds-pq-change" type="button">Change Priority</button>
+              <button id="ds-pq-example" type="button">Load Example</button>
+              <button class="is-danger" id="ds-pq-clear" type="button">Clear</button>
+              <button class="is-danger" id="ds-pq-cancel" type="button">Cancel Animation</button>
+            </div>
+          </div>
 
-      <div class="ds-pq__speed">
-        <label for="ds-pq-speed">Animation speed</label>
-        <input id="ds-pq-speed" type="range" min="100" max="1000" step="100" value="400">
-        <output id="ds-pq-speed-output">400 ms</output>
-      </div>
-    </div>
+          <div class="ds-pq__main">
+            <div class="ds-pq__visual ds-sim__panel">
+              <div class="ds-pq__service-panel">
+                <p class="ds-sim__caption">Logical service order</p>
+                <div id="ds-pq-service-order" class="ds-pq__service-order"></div>
+              </div>
+              <div class="ds-pq__canvas"><svg id="ds-pq-svg" class="ds-pq__svg" viewBox="0 0 470 230" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Priority queue binary heap"></svg></div>
+            </div>
 
-    <div class="ds-pq__service-panel">
-      <h3>Logical service order</h3>
-      <div id="ds-pq-service-order" class="ds-pq__service-order"></div>
-    </div>
+            <div class="ds-pq__side">
+              <div class="ds-pq__table-panel ds-sim__panel">
+                <p class="ds-sim__caption">Heap array</p>
+                <table>
+                  <colgroup><col class="c-index"><col><col class="c-priority"><col class="c-arrival"><col class="c-parent"></colgroup>
+                  <thead><tr><th>Index</th><th>Value</th><th>Priority</th><th>Arrival #</th><th>Parent</th></tr></thead>
+                  <tbody id="ds-pq-body"></tbody>
+                </table>
+              </div>
 
-    <div class="ds-pq__visual">
-      <div class="ds-pq__canvas"><svg id="ds-pq-svg" class="ds-pq__svg" viewBox="0 0 1000 500" role="img" aria-label="Priority queue binary heap"></svg></div>
-      <p id="ds-pq-status" class="ds-pq__status" role="status" aria-live="polite">Example priority queue loaded. Choose an operation.</p>
+              <div class="ds-pq__log-panel ds-sim__panel">
+                <p class="ds-sim__caption">Operation history</p>
+                <ol id="ds-pq-log"><li>No operations yet.</li></ol>
+              </div>
+            </div>
+          </div>
 
-      <div class="ds-pq__stats">
-        <div class="ds-pq__stat"><strong>Queue size</strong><span id="ds-pq-size">0</span></div>
-        <div class="ds-pq__stat"><strong>Highest priority</strong><span id="ds-pq-highest">—</span></div>
-        <div class="ds-pq__stat"><strong>Comparisons</strong><span id="ds-pq-comparisons">0</span></div>
-        <div class="ds-pq__stat"><strong>Swaps</strong><span id="ds-pq-swaps">0</span></div>
-      </div>
-    </div>
-
-    <div class="ds-pq__lower">
-      <div class="ds-pq__table-panel">
-        <h3>Heap array</h3>
-        <div class="ds-pq__scroll">
-          <table>
-            <thead><tr><th>Index</th><th>Value</th><th>Priority</th><th>Arrival #</th><th>Parent</th></tr></thead>
-            <tbody id="ds-pq-body"></tbody>
-          </table>
+          <div class="ds-pq__footer">
+            <p id="ds-pq-status" class="ds-pq__status ds-sim__status" role="status" aria-live="polite">Example priority queue loaded. Choose an operation.</p>
+            <div class="ds-pq__stat"><strong>Queue size</strong><span id="ds-pq-size">0</span></div>
+            <div class="ds-pq__stat"><strong>Highest priority</strong><span id="ds-pq-highest">—</span></div>
+            <div class="ds-pq__stat"><strong>Comparisons</strong><span id="ds-pq-comparisons">0</span></div>
+            <div class="ds-pq__stat"><strong>Swaps</strong><span id="ds-pq-swaps">0</span></div>
+          </div>
         </div>
       </div>
 
-      <div class="ds-pq__log-panel">
-        <h3>Operation history</h3>
-        <ol id="ds-pq-log"><li>No operations yet.</li></ol>
+      <div class="ds-deck__bar">
+        <span class="ds-deck__section">Sercan KÜLCÜ, Tüm hakları saklıdır.</span>
+        <button class="ds-deck__button" type="button" id="ds-sim-full" aria-label="Full screen">⛶</button>
       </div>
     </div>
-  </section>
-
-  <section class="ds-pq__section">
-    <h2>Priority queue concepts</h2>
-    <div class="ds-pq__cards">
-      <article class="ds-pq__card"><h3>Heap ordering</h3><p>Each parent has higher service precedence than its children. Therefore, the next item to serve is always stored at index 0.</p></article>
-      <article class="ds-pq__card"><h3>Stable equal priorities</h3><p>When priorities are equal, the smaller arrival number wins. This preserves first-in, first-out behavior among tied items.</p></article>
-      <article class="ds-pq__card"><h3>Logical versus physical order</h3><p>The heap array is not fully sorted. The service-order row uses a sorted copy only to show the order in which items would leave.</p></article>
-      <article class="ds-pq__card"><h3>Common applications</h3><p>Priority queues appear in CPU scheduling, event simulation, Dijkstra's algorithm, A* search, bandwidth management, and emergency processing.</p></article>
-    </div>
-  </section>
-
-  <section class="ds-pq__section">
-    <h2>Binary heap relationships</h2>
-    <div class="ds-pq__panel ds-pq__scroll">
-      <table>
-        <thead><tr><th>Relationship</th><th>Formula / rule</th></tr></thead>
-        <tbody>
-          <tr><td>Parent</td><td>floor((i − 1) / 2)</td></tr>
-          <tr><td>Left child</td><td>2i + 1</td></tr>
-          <tr><td>Right child</td><td>2i + 2</td></tr>
-          <tr><td>Stable comparison</td><td>Higher priority first; earlier arrival breaks ties.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+  </div>
 </div>
 
+<script src="deck/sim.js"></script>
 <script>
 (function () {
   "use strict";
@@ -197,7 +413,7 @@ excerpt: "Interactive stable priority queue simulator implemented with a binary 
   var ns="http://www.w3.org/2000/svg";
   var el={
     value:q("ds-pq-value"),priority:q("ds-pq-priority"),index:q("ds-pq-index"),newPriority:q("ds-pq-new-priority"),
-    speed:q("ds-pq-speed"),speedOutput:q("ds-pq-speed-output"),service:q("ds-pq-service-order"),svg:q("ds-pq-svg"),
+    service:q("ds-pq-service-order"),svg:q("ds-pq-svg"),
     status:q("ds-pq-status"),size:q("ds-pq-size"),highest:q("ds-pq-highest"),comparisons:q("ds-pq-comparisons"),
     swaps:q("ds-pq-swaps"),body:q("ds-pq-body"),log:q("ds-pq-log")
   };
@@ -206,6 +422,12 @@ excerpt: "Interactive stable priority queue simulator implemented with a binary 
     enqueue:q("ds-pq-enqueue"),random:q("ds-pq-random"),dequeue:q("ds-pq-dequeue"),peek:q("ds-pq-peek"),
     change:q("ds-pq-change"),example:q("ds-pq-example"),clear:q("ds-pq-clear"),cancel:q("ds-pq-cancel")
   };
+
+  /* the 800x600 stage holds a heap of at most MAX items (4 levels) and LOG_SIZE history rows */
+  var MAX=10;
+  var DELAY=400;
+  var LOG_SIZE=3;
+  var NODE_R=17;
 
   var heap=[];
   var arrival=0;
@@ -250,7 +472,7 @@ excerpt: "Interactive stable priority queue simulator implemented with a binary 
 
   function delay(){
     if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return 0;
-    return Number(el.speed.value);
+    return DELAY;
   }
 
   function wait(ms,t){
@@ -266,23 +488,35 @@ excerpt: "Interactive stable priority queue simulator implemented with a binary 
 
   function addLog(text){
     logs.unshift(text);
-    logs=logs.slice(0,12);
+    logs=logs.slice(0,LOG_SIZE);
     el.log.innerHTML="";
     logs.forEach(function(item){
       var li=document.createElement("li");
       li.textContent=item;
+      li.title=item;
       el.log.appendChild(li);
     });
   }
 
-  function positions(){
-    return heap.map(function(_,i){
-      var level=Math.floor(Math.log2(i+1));
-      var first=Math.pow(2,level)-1;
-      var pos=i-first;
-      var count=Math.pow(2,level);
-      return {x:(pos+1)*1000/(count+1),y:60+level*96};
-    });
+  /* node positions in the drawing area's own pixels; the viewBox always contains them */
+  function positions(width,height){
+    var levels=Math.floor(Math.log2(heap.length))+1;
+    var top=NODE_R+6;
+    var bottom=NODE_R+18;
+    var gap=levels>1?Math.max(2*NODE_R+8,Math.min(80,(height-top-bottom)/(levels-1))):0;
+    var used=top+bottom+gap*(levels-1);
+    var offset=Math.max(0,(height-used)/2);
+
+    return {
+      height:Math.max(height,used),
+      points:heap.map(function(_,i){
+        var level=Math.floor(Math.log2(i+1));
+        var first=Math.pow(2,level)-1;
+        var pos=i-first;
+        var count=Math.pow(2,level);
+        return {x:(pos+0.5)*width/count,y:offset+top+level*gap};
+      })
+    };
   }
 
   function logicalOrder(){
@@ -293,57 +527,79 @@ excerpt: "Interactive stable priority queue simulator implemented with a binary 
     });
   }
 
+  function serviceItem(item,front){
+    var d=document.createElement("div");
+    d.className="ds-pq__service-item"+(front?" is-front":"");
+    d.title=safeText(item.value)+" · priority "+item.priority+" · arrival #"+item.order;
+    var name=document.createElement("span");
+    name.textContent=safeText(item.value);
+    var p=document.createElement("small");
+    p.textContent="priority "+item.priority;
+    var a=document.createElement("small");
+    a.textContent="arrival #"+item.order;
+    d.appendChild(name); d.appendChild(p); d.appendChild(a);
+    return d;
+  }
+
   function render(){
     var logical=logicalOrder();
     el.service.innerHTML="";
 
     if(!logical.length){
       var empty=document.createElement("span");
+      empty.className="ds-pq__service-empty";
       empty.textContent="The priority queue is empty.";
-      empty.style.opacity=".6";
       el.service.appendChild(empty);
     } else {
-      logical.forEach(function(item,i){
-        var d=document.createElement("div");
-        d.className="ds-pq__service-item"+(i===0?" is-front":"");
-        var name=document.createElement("span");
-        name.textContent=safeText(item.value);
-        var p=document.createElement("small");
-        p.textContent="priority "+item.priority;
-        var a=document.createElement("small");
-        a.textContent="arrival #"+item.order;
-        d.appendChild(name); d.appendChild(p); d.appendChild(a);
-        el.service.appendChild(d);
+      /* each item takes 80px plus an arrow; items that do not fit are summarised as "+k more" */
+      var fit=Math.max(1,Math.floor(((el.service.clientWidth||470)+20)/100));
+      var shown=logical.length>fit?fit-1:logical.length;
 
-        if(i<logical.length-1){
+      for(var s=0;s<shown;s++){
+        el.service.appendChild(serviceItem(logical[s],s===0));
+
+        if(s<logical.length-1){
           var arrow=document.createElement("span");
           arrow.className="ds-pq__arrow";
           arrow.textContent="→";
           el.service.appendChild(arrow);
         }
-      });
+      }
+
+      if(shown<logical.length){
+        var more=document.createElement("div");
+        more.className="ds-pq__service-item is-more";
+        more.textContent="+"+(logical.length-shown)+" more";
+        el.service.appendChild(more);
+      }
     }
 
     el.body.innerHTML="";
     heap.forEach(function(item,i){
       var tr=document.createElement("tr");
       [i,item.value,item.priority,item.order,i?parent(i):"—"].forEach(function(v){
-        var td=document.createElement("td"); td.textContent=String(v); tr.appendChild(td);
+        var td=document.createElement("td"); td.textContent=String(v); td.title=String(v); tr.appendChild(td);
       });
       el.body.appendChild(tr);
     });
 
     while(el.svg.lastChild) el.svg.removeChild(el.svg.lastChild);
 
+    var box=el.svg.parentNode;
+    var width=box.clientWidth||470;
+    var height=box.clientHeight||230;
+
     if(!heap.length){
+      el.svg.setAttribute("viewBox","0 0 "+width+" "+height);
       var text=document.createElementNS(ns,"text");
-      text.setAttribute("x","500"); text.setAttribute("y","240"); text.setAttribute("text-anchor","middle");
-      text.setAttribute("fill","currentColor"); text.textContent="The priority queue is empty.";
+      text.setAttribute("x",String(width/2)); text.setAttribute("y",String(height/2));
+      text.setAttribute("class","ds-pq__empty-text");
+      text.textContent="The priority queue is empty.";
       el.svg.appendChild(text);
     } else {
-      var p=positions();
-      var levels=Math.floor(Math.log2(heap.length))+1;
-      el.svg.setAttribute("viewBox","0 0 1000 "+Math.max(500,100+levels*96));
+      var layout=positions(width,height);
+      var p=layout.points;
+      el.svg.setAttribute("viewBox","0 0 "+width+" "+layout.height);
 
       for(var i=1;i<heap.length;i++){
         var par=parent(i);
@@ -360,16 +616,15 @@ excerpt: "Interactive stable priority queue simulator implemented with a binary 
         g.setAttribute("transform","translate("+p[j].x+" "+p[j].y+")");
 
         var circle=document.createElementNS(ns,"circle");
-        circle.setAttribute("r","27");
+        circle.setAttribute("r",String(NODE_R));
 
         var value=document.createElementNS(ns,"text");
         value.setAttribute("class","value");
-        value.setAttribute("y","-3");
         value.textContent=String(heap[j].priority);
 
         var meta=document.createElementNS(ns,"text");
         meta.setAttribute("class","meta");
-        meta.setAttribute("y","43");
+        meta.setAttribute("y",String(NODE_R+12));
         meta.textContent="i="+j+" · #"+heap[j].order;
 
         g.appendChild(circle); g.appendChild(value); g.appendChild(meta); el.svg.appendChild(g);
@@ -436,6 +691,7 @@ excerpt: "Interactive stable priority queue simulator implemented with a binary 
     try{
       var value=readValue();
       var priority=readPriority(el.priority,"Priority");
+      if(heap.length>=MAX) throw new Error("Priority queue is full: maximum "+MAX+" items.");
 
       token++; disable(true); clearMarks();
       var item={value:value,priority:priority,order:++arrival};
@@ -546,9 +802,6 @@ excerpt: "Interactive stable priority queue simulator implemented with a binary 
     token++; clearMarks(); disable(false); render(); setStatus("Animation cancelled.");
   });
 
-  el.speed.addEventListener("input",function(){
-    el.speedOutput.textContent=el.speed.value+" ms";
-  });
 
   (async function init(){
     await btn.example.click();
