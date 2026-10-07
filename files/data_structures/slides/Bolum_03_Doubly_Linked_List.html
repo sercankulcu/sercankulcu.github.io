@@ -1,0 +1,529 @@
+---
+layout: without-sidebar
+title: "Doubly Linked List Simulator"
+permalink: /files/data_structures/slides/Bolum_03_Doubly_Linked_List.html
+excerpt: "Interactive doubly linked list simulator: prev/next links, head and tail pointers, O(1) operations at both ends, nearest-end access, forward and backward traversal, and step-by-step reversal."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/sim.css">
+<style>
+.dll-sim {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.dll-controls {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.dll-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.dll-field {
+  display: grid;
+  gap: 2px;
+  width: 92px;
+}
+
+.dll-field input { width: 100%; }
+
+.dll-stage {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.dll-canvas {
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 8px 6px;
+  overflow: hidden;
+}
+
+.dll-list {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.dll-null {
+  flex: 0 0 auto;
+  color: var(--ds-muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.dll-wrap {
+  min-width: 0;
+  flex: 0 1 88px;
+  display: grid;
+  gap: 3px;
+  justify-items: center;
+}
+
+.dll-end {
+  min-height: 18px;
+  color: var(--ds-link);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.dll-end.is-new { color: var(--ds-good); }
+
+.dll-node {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) 22px;
+  overflow: hidden;
+  border: 2px solid var(--ds-link);
+  border-radius: 8px;
+  background: var(--ds-node);
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease, border-color .18s ease, opacity .18s ease;
+}
+
+.dll-ptr,
+.dll-data {
+  min-width: 0;
+  height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.dll-ptr {
+  background: color-mix(in srgb, var(--ds-link) 9%, var(--ds-bg));
+  color: var(--ds-link);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.dll-ptr.is-prev { border-right: 1.5px solid var(--ds-link); }
+.dll-ptr.is-next { border-left: 1.5px solid var(--ds-link); }
+.dll-ptr small { color: var(--ds-muted); font-size: 8.5px; font-weight: 700; }
+.dll-ptr.is-swapped { background: var(--ds-hot); }
+
+.dll-data {
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.dll-index {
+  color: var(--ds-muted);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dll-link {
+  flex: 0 0 auto;
+  display: grid;
+  color: var(--ds-link);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: .9;
+  text-align: center;
+}
+
+.dll-link span.is-hot { color: #d4851a; }
+
+.dll-node.checking {
+  border-color: #e9a23b;
+  background: var(--ds-hot);
+  transform: translateY(-5px) scale(1.03);
+}
+
+.dll-node.found {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  transform: translateY(-5px) scale(1.03);
+}
+
+.dll-node.removing {
+  border-color: var(--ds-bad);
+  background: color-mix(in srgb, var(--ds-bad) 18%, var(--ds-bg));
+  opacity: .75;
+}
+
+.dll-node.done {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 13%, var(--ds-bg));
+}
+
+.dll-node.selected { box-shadow: 0 0 0 3px color-mix(in srgb, var(--ds-link) 30%, transparent); }
+
+.dll-empty {
+  color: var(--ds-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.dll-status {
+  padding: 8px 10px;
+  border-top: 1.5px solid var(--ds-border);
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dll-status.error { color: var(--ds-bad); }
+.dll-status.success { color: var(--ds-good); }
+
+.dll-footer {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 6px;
+}
+
+.dll-stat {
+  min-width: 0;
+  padding: 4px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dll-stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dll-sim * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-deck ds-sim" id="ds-sim" lang="en">
+  <div class="ds-deck__screen" id="ds-sim-screen">
+    <div class="ds-deck__stage" id="ds-sim-stage">
+      <div class="ds-sim__body">
+        <div class="ds-sim__head">
+          <p class="ds-deck__kicker">Chapter 3 · Linked Lists</p>
+          <h1 class="ds-sim__title">Doubly Linked List Simulator</h1>
+        </div>
+
+        <div class="ds-sim__root dll-sim">
+          <div class="dll-controls">
+            <div class="dll-row">
+              <div class="dll-field"><label for="dll-value">Value</label><input id="dll-value" type="number" value="50" inputmode="numeric"></div>
+              <button class="is-primary" id="dll-add-head" type="button">Add Head</button>
+              <button class="is-primary" id="dll-add-tail" type="button">Add Tail</button>
+              <button class="is-danger" id="dll-remove-head" type="button">Remove Head</button>
+              <button class="is-danger" id="dll-remove-tail" type="button">Remove Tail</button>
+            </div>
+
+            <div class="dll-row">
+              <div class="dll-field"><label for="dll-index">Index</label><input id="dll-index" type="number" min="0" value="0" inputmode="numeric"></div>
+              <button id="dll-access" type="button">Access</button>
+              <button class="is-primary" id="dll-add-index" type="button">Add at Index</button>
+              <button class="is-danger" id="dll-remove-index" type="button">Remove at Index</button>
+              <button class="is-danger" id="dll-clear" type="button">Clear</button>
+            </div>
+
+            <div class="dll-row">
+              <div class="dll-field"><label for="dll-search-value">Search</label><input id="dll-search-value" type="number" value="18" inputmode="numeric"></div>
+              <button id="dll-search" type="button">Linear Search</button>
+              <button id="dll-forward" type="button">Traverse →</button>
+              <button id="dll-backward" type="button">Traverse ←</button>
+              <button id="dll-reverse" type="button">Reverse</button>
+              <button class="is-danger" id="dll-cancel" type="button">Cancel</button>
+            </div>
+          </div>
+
+          <div class="dll-stage ds-sim__panel">
+            <div class="dll-canvas"><div class="dll-list" id="dll-list"></div></div>
+            <div class="dll-status" id="dll-status" aria-live="polite">Ready.</div>
+          </div>
+
+          <div class="dll-footer">
+            <div class="dll-stat"><strong>Operation</strong><span id="dll-op">Idle</span></div>
+            <div class="dll-stat"><strong>Visited</strong><span id="dll-visits">0</span></div>
+            <div class="dll-stat"><strong>Link changes</strong><span id="dll-changes">0</span></div>
+            <div class="dll-stat"><strong>Length</strong><span id="dll-length">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-deck__bar">
+        <span class="ds-deck__section">Sercan KÜLCÜ, Tüm hakları saklıdır.</span>
+        <button class="ds-deck__button" type="button" id="ds-sim-full" aria-label="Full screen">⛶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="deck/sim.js"></script>
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const e = {
+    value: $("dll-value"), index: $("dll-index"), searchValue: $("dll-search-value"),
+    addHead: $("dll-add-head"), addTail: $("dll-add-tail"), removeHead: $("dll-remove-head"), removeTail: $("dll-remove-tail"),
+    access: $("dll-access"), addIndex: $("dll-add-index"), removeIndex: $("dll-remove-index"), clear: $("dll-clear"),
+    search: $("dll-search"), forward: $("dll-forward"), backward: $("dll-backward"), reverse: $("dll-reverse"), cancel: $("dll-cancel"),
+    list: $("dll-list"), status: $("dll-status"), op: $("dll-op"), visits: $("dll-visits"), changes: $("dll-changes"), length: $("dll-length")
+  };
+  const MAX = 7, STEP = 420;
+  let data = [24, 51, 18, 73, 42];
+  let token = 0, running = false, visits = 0, changes = 0;
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const all = () => [e.addHead, e.addTail, e.removeHead, e.removeTail, e.access, e.addIndex, e.removeIndex, e.clear, e.search, e.forward, e.backward, e.reverse];
+
+  function status(text, type = "") { e.status.textContent = text; e.status.className = "dll-status" + (type ? " " + type : ""); }
+  function updateStats() { e.visits.textContent = visits; e.changes.textContent = changes; e.length.textContent = data.length; }
+  function resetStats(name = "Idle") { visits = 0; changes = 0; e.op.textContent = name; updateStats(); }
+  function setRunning(v) { running = v; all().forEach(b => b.disabled = v); e.cancel.disabled = !v; }
+  function integer(inp) { const n = Number(inp.value); return Number.isInteger(n) ? n : null; }
+  const has = (list, i) => Array.isArray(list) && list.includes(i);
+
+  /* states: checking, found, removing, done, selected: indis listeleri
+     links: {i: "next" | "prev" | "both"} vurgulanan bağ (i ile i+1 arası)
+     ptrs: {i: [önceki komşu metni, sonraki komşu metni]} (ters çevirmede alan içerikleri)
+     swapped: alanları yer değiştirmiş düğümler; ends: {head, tail} (indis); newEnds: HEAD/TAIL yeni yerinde */
+  function render(st = {}) {
+    e.list.innerHTML = ""; updateStats();
+    const n = data.length;
+    if (!n) { const x = document.createElement("div"); x.className = "dll-empty"; x.textContent = "HEAD = TAIL = null · list is empty."; e.list.appendChild(x); return; }
+    const head = st.ends ? st.ends.head : 0, tail = st.ends ? st.ends.tail : n - 1;
+    const nul = () => { const x = document.createElement("div"); x.className = "dll-null"; x.textContent = "∅"; return x; };
+    e.list.appendChild(nul());
+    data.forEach((value, i) => {
+      const wrap = document.createElement("div"); wrap.className = "dll-wrap";
+      const end = document.createElement("div"); end.className = "dll-end" + (st.newEnds ? " is-new" : "");
+      end.textContent = [i === head ? "HEAD" : "", i === tail ? "TAIL" : ""].filter(Boolean).join(" · ") || " ";
+      const node = document.createElement("div"); node.className = "dll-node";
+      ["checking", "found", "removing", "done", "selected"].forEach(c => { if (has(st[c], i)) node.classList.add(c); });
+      const left = i > 0 ? data[i - 1] : null, right = i < n - 1 ? data[i + 1] : null;
+      const [pv, nv] = st.ptrs && st.ptrs[i] ? st.ptrs[i] : [left, right];
+      const ptr = (cls, label, v) => { const p = document.createElement("div"); p.className = "dll-ptr " + cls + (has(st.swapped, i) ? " is-swapped" : "");
+        p.innerHTML = `<small>${label}</small>${v === null ? "∅" : v}`; return p; };
+      const d = document.createElement("div"); d.className = "dll-data"; d.textContent = value;
+      node.append(ptr("is-prev", "prev", pv), d, ptr("is-next", "next", nv));
+      node.addEventListener("click", () => { if (running) return; e.index.value = i; e.value.value = data[i]; render({ selected: [i] }); status(`Node ${i} selected.`); });
+      const idx = document.createElement("div"); idx.className = "dll-index"; idx.textContent = `index ${i}`;
+      wrap.append(end, node, idx); e.list.appendChild(wrap);
+      if (i < n - 1) {
+        const l = document.createElement("div"); l.className = "dll-link";
+        const hot = st.links ? st.links[i] : null;
+        l.innerHTML = `<span class="${hot === "next" || hot === "both" ? "is-hot" : ""}">→</span><span class="${hot === "prev" || hot === "both" ? "is-hot" : ""}">←</span>`;
+        e.list.appendChild(l);
+      }
+    });
+    e.list.appendChild(nul());
+  }
+
+  async function pause(t, ms = STEP) { await wait(ms); if (t !== token) throw new Error("cancelled"); }
+  async function show(t, st, text, ms) { if (text) status(text); render(st); await pause(t, ms); }
+  function begin(name) { token++; resetStats(name); setRunning(true); return token; }
+  function finish(t, msg, type = "") { if (t !== token) return; setRunning(false); e.op.textContent = "Idle"; status(msg, type); render(); }
+  function fail(t, err) { if (err?.message === "cancelled" || t !== token) return; setRunning(false); e.op.textContent = "Idle"; status("Operation stopped.", "error"); render(); }
+  function ensure() { if (!data.length) { status("The list is empty.", "error"); return false; } return true; }
+  function room() { if (data.length >= MAX) { status(`Maximum ${MAX} nodes fit on the stage.`, "error"); return false; } return true; }
+  function readValue() { const v = integer(e.value); if (v === null) status("Enter an integer value.", "error"); return v; }
+
+  /* indise en yakın uçtan yürür: baştan next ile ya da sondan prev ile */
+  async function walkTo(t, idx, verb) {
+    const n = data.length, fromHead = idx <= (n - 1) / 2;
+    if (fromHead) {
+      for (let i = 0; i <= idx; i++) { visits++; await show(t, { checking: [i], links: i > 0 ? { [i - 1]: "next" } : null }, `${verb}: index ${idx} is closer to HEAD · following next (${i})`); }
+    } else {
+      for (let i = n - 1; i >= idx; i--) { visits++; await show(t, { checking: [i], links: i < n - 1 ? { [i]: "prev" } : null }, `${verb}: index ${idx} is closer to TAIL · following prev (${i})`); }
+    }
+    return fromHead ? idx + 1 : n - idx;
+  }
+
+  async function addHead() {
+    if (!room()) return; const v = readValue(); if (v === null) return;
+    const t = begin("Add Head");
+    try {
+      data.unshift(v); changes += data.length > 1 ? 3 : 1;
+      await show(t, { found: [0], links: data.length > 1 ? { 0: "both" } : null }, data.length > 1 ? `new.next = head, head.prev = new, head = new` : "head = tail = new node");
+      finish(t, `Added ${v} at the head in O(1).`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function addTail() {
+    if (!room()) return; const v = readValue(); if (v === null) return;
+    const t = begin("Add Tail");
+    try {
+      if (data.length) await show(t, { checking: [data.length - 1] }, "TAIL is already known: no walk needed");
+      data.push(v); const n = data.length; changes += n > 1 ? 3 : 1;
+      await show(t, { found: [n - 1], links: n > 1 ? { [n - 2]: "both" } : null }, n > 1 ? `tail.next = new, new.prev = tail, tail = new` : "head = tail = new node");
+      finish(t, `Added ${v} at the tail in O(1).`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function removeHead() {
+    if (!ensure()) return; const old = data[0], t = begin("Remove Head");
+    try {
+      await show(t, { removing: [0], links: data.length > 1 ? { 0: "prev" } : null }, data.length > 1 ? "head = head.next, head.prev = null" : "head = tail = null");
+      data.shift(); changes += data.length ? 2 : 1;
+      finish(t, `Removed head ${old} in O(1).`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function removeTail() {
+    if (!ensure()) return; const n = data.length, old = data[n - 1], t = begin("Remove Tail");
+    try {
+      await show(t, { removing: [n - 1], links: n > 1 ? { [n - 2]: "next" } : null }, n > 1 ? "tail = tail.prev, tail.next = null · no walk, O(1)" : "head = tail = null");
+      data.pop(); changes += data.length ? 2 : 1;
+      finish(t, `Removed tail ${old} in O(1) (a singly linked list needs O(n) here).`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function access() {
+    if (!ensure()) return; const idx = integer(e.index);
+    if (idx === null || idx < 0 || idx >= data.length) { status("Index is out of range.", "error"); return; }
+    const t = begin("Access");
+    try {
+      const steps = await walkTo(t, idx, "Access");
+      await show(t, { found: [idx] }, `index ${idx} = ${data[idx]}`);
+      finish(t, `Value at index ${idx} is ${data[idx]} (${steps} node(s) visited).`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function addIndex() {
+    if (!room()) return; const idx = integer(e.index), n = data.length;
+    if (idx === null || idx < 0 || idx > n) { status(`Index must be 0–${n}.`, "error"); return; }
+    if (idx === 0) return addHead(); if (idx === n) return addTail();
+    const v = readValue(); if (v === null) return;
+    const t = begin("Add at Index");
+    try {
+      await walkTo(t, idx, "Insert");
+      await show(t, { checking: [idx - 1, idx], links: { [idx - 1]: "both" } }, `Inserting ${v} between ${data[idx - 1]} and ${data[idx]}`);
+      data.splice(idx, 0, v); changes += 4;
+      await show(t, { found: [idx], links: { [idx - 1]: "both", [idx]: "both" } }, "4 links: new.prev, new.next, left.next, right.prev");
+      finish(t, `Inserted ${v} at index ${idx}.`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function removeIndex() {
+    if (!ensure()) return; const idx = integer(e.index), n = data.length;
+    if (idx === null || idx < 0 || idx >= n) { status("Index is out of range.", "error"); return; }
+    if (idx === 0) return removeHead(); if (idx === n - 1) return removeTail();
+    const old = data[idx], t = begin("Remove at Index");
+    try {
+      await walkTo(t, idx, "Remove");
+      await show(t, { removing: [idx], checking: [idx - 1, idx + 1], links: { [idx - 1]: "both", [idx]: "both" } }, `node.prev.next = node.next, node.next.prev = node.prev`);
+      data.splice(idx, 1); changes += 2;
+      await show(t, { found: [idx - 1, idx], links: { [idx - 1]: "both" } }, `${data[idx - 1]} ⇄ ${data[idx]} are now linked directly`);
+      finish(t, `Removed ${old} from index ${idx} (2 link changes).`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function linearSearch() {
+    if (!ensure()) return; const target = integer(e.searchValue);
+    if (target === null) { status("Enter an integer to search.", "error"); return; }
+    const t = begin("Linear Search");
+    try {
+      for (let i = 0; i < data.length; i++) {
+        visits++; await show(t, { checking: [i], links: i > 0 ? { [i - 1]: "next" } : null }, `Comparing ${data[i]} with ${target}`);
+        if (data[i] === target) { await show(t, { found: [i] }, `Found ${target} at index ${i}`); finish(t, `Found ${target} at index ${i}.`, "success"); return; }
+      }
+      finish(t, `${target} not found.`, "error");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function traverse(forward) {
+    if (!ensure()) return; const t = begin(forward ? "Traverse →" : "Traverse ←"); const out = [], n = data.length;
+    try {
+      for (let k = 0; k < n; k++) {
+        const i = forward ? k : n - 1 - k; out.push(data[i]); visits++;
+        const links = forward ? (i > 0 ? { [i - 1]: "next" } : null) : (i < n - 1 ? { [i]: "prev" } : null);
+        await show(t, { checking: [i], done: forward ? [...Array(i).keys()] : [...Array(n - i - 1).keys()].map(j => n - 1 - j), links }, `${forward ? "HEAD → next" : "TAIL → prev"}: ${out.join(" → ")}`);
+      }
+      finish(t, `${forward ? "Forward" : "Backward"} traversal: ${out.join(" → ")}`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function reverse() {
+    if (!ensure()) return; const t = begin("Reverse"), n = data.length, SLOW = 650;
+    /* her düğümde prev ve next alanları yer değiştirir; düğümler yerinde kalır, en sonda HEAD ile TAIL değişir */
+    const ptrs = {}; data.forEach((_, i) => { ptrs[i] = [i > 0 ? data[i - 1] : null, i < n - 1 ? data[i + 1] : null]; });
+    const swapped = [];
+    try {
+      await show(t, { ptrs: { ...ptrs } }, "curr = head", SLOW);
+      for (let i = 0; i < n; i++) {
+        visits++;
+        await show(t, { checking: [i], done: swapped.slice(), swapped: swapped.slice(), ptrs: { ...ptrs } }, `curr = ${data[i]}: swap curr.prev and curr.next`, SLOW);
+        ptrs[i] = [ptrs[i][1], ptrs[i][0]]; swapped.push(i); changes += 2;
+        await show(t, { found: [i], done: swapped.slice(0, -1), swapped: swapped.slice(), ptrs: { ...ptrs } }, `${data[i]}: prev = ${ptrs[i][0] === null ? "null" : ptrs[i][0]}, next = ${ptrs[i][1] === null ? "null" : ptrs[i][1]} · curr = curr.prev (old next)`, SLOW);
+      }
+      await show(t, { done: swapped.slice(), swapped: swapped.slice(), ptrs: { ...ptrs }, ends: { head: n - 1, tail: 0 }, newEnds: true }, "swap HEAD and TAIL", SLOW);
+      data.reverse(); changes += 2;
+      await show(t, { found: data.map((_, i) => i) }, `Redrawn from the new head: ${data.join(" → ")}`, SLOW);
+      finish(t, `Reversed in O(n): ${changes} pointer changes, no node moved.`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  function clear() { token++; data = []; resetStats(); setRunning(false); render(); status("List cleared: head = tail = null."); }
+  function cancel() { if (!running) return; token++; setRunning(false); e.op.textContent = "Idle"; render(); status("Animation cancelled."); }
+
+  e.addHead.addEventListener("click", addHead); e.addTail.addEventListener("click", addTail);
+  e.removeHead.addEventListener("click", removeHead); e.removeTail.addEventListener("click", removeTail);
+  e.access.addEventListener("click", access); e.addIndex.addEventListener("click", addIndex); e.removeIndex.addEventListener("click", removeIndex);
+  e.clear.addEventListener("click", clear); e.search.addEventListener("click", linearSearch);
+  e.forward.addEventListener("click", () => traverse(true)); e.backward.addEventListener("click", () => traverse(false));
+  e.reverse.addEventListener("click", reverse); e.cancel.addEventListener("click", cancel);
+  e.cancel.disabled = true; resetStats(); render();
+})();
+</script>
