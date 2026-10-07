@@ -5,225 +5,401 @@ permalink: /files/data_structures/slides/Bolum_12_Disjoint_Set_Union.html
 excerpt: "Interactive Disjoint Set Union simulator with path compression, union by rank, connectivity tests, component views, and responsive SVG visualization."
 ---
 
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/sim.css">
 <style>
-.ds-dsu,.ds-dsu *,.ds-dsu *::before,.ds-dsu *::after{box-sizing:border-box}
-.ds-dsu{
-  width:min(1200px,100%);margin:0 auto 2rem;color:var(--global-text-color);
-  --ds-surface:color-mix(in srgb,var(--global-link-color) 2.5%,var(--global-bg-color));
-  --ds-surface-strong:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
-  --ds-border:color-mix(in srgb,var(--global-link-color) 38%,var(--global-border-color));
-  --ds-shadow:0 8px 24px rgba(15,23,42,.065);
-  --ds-shadow-soft:0 3px 10px rgba(15,23,42,.045)
+.ds-dsu {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 8px;
 }
-.ds-dsu__hero,.ds-dsu__panel,.ds-dsu__visual,.ds-dsu__trace,.ds-dsu__components,.ds-dsu__table-panel,.ds-dsu__code-panel,.ds-dsu__card,.ds-dsu__status{
-  border:1.5px solid var(--ds-border);background:var(--ds-surface)
-}
-.ds-dsu__hero{padding:1.35rem;border-radius:16px;background:var(--ds-surface-strong);box-shadow:var(--ds-shadow)}
-.ds-dsu__hero h1{margin:0 0 .55rem;text-align:center;color:var(--global-text-color);font-size:clamp(1.65rem,4vw,2.3rem)}
-.ds-dsu__hero p{width:100%;margin:0;max-width:none;line-height:1.65;text-align:justify;text-justify:inter-word;opacity:.86}
-.ds-dsu__metrics,.ds-dsu__stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem}
-.ds-dsu__metrics{margin-top:1rem}.ds-dsu__metric,.ds-dsu__stat{padding:.8rem;border:1.5px solid var(--ds-border);border-radius:10px;background:var(--ds-surface);box-shadow:var(--ds-shadow-soft)}
-.ds-dsu__metric strong,.ds-dsu__stat strong{display:block;margin-bottom:.15rem}
-.ds-dsu__section{margin-top:1.4rem}.ds-dsu__section h2{margin:0 0 .7rem;color:var(--global-text-color);font-size:1.2rem}
-.ds-dsu__panel{display:grid;gap:.8rem;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow-soft)}
-.ds-dsu__group{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;align-items:end}
-.ds-dsu__field{display:grid;gap:.3rem}.ds-dsu__field label,.ds-dsu__speed label{font-size:.86rem;font-weight:800}
-.ds-dsu input,.ds-dsu select{width:100%;min-height:42px;padding:.55rem .65rem;border:1.5px solid var(--ds-border);border-radius:9px;background:var(--ds-surface);color:var(--global-text-color);font:inherit}
-.ds-dsu input:focus-visible,.ds-dsu select:focus-visible,.ds-dsu button:focus-visible{outline:3px solid color-mix(in srgb,var(--global-link-color) 30%,transparent);outline-offset:2px}
-.ds-dsu__btn{min-height:42px;padding:.55rem .75rem;border:1px solid var(--global-link-color);border-radius:9px;background:var(--global-link-color);color:#fff;font:inherit;font-weight:800;cursor:pointer}
-.ds-dsu__btn:hover:not(:disabled){filter:brightness(1.08)}
-.ds-dsu__btn--secondary{border-color:var(--ds-border);background:var(--ds-surface);color:var(--global-text-color)}
-.ds-dsu__btn--danger{border-color:#b91c1c;background:#b91c1c}.ds-dsu__btn:disabled{cursor:not-allowed;opacity:.5}
-.ds-dsu__speed{display:grid;grid-template-columns:minmax(140px,auto) 1fr auto;gap:.65rem;align-items:center}.ds-dsu__speed output{min-width:70px;text-align:right;font-size:.85rem;font-weight:800}
 
-.ds-dsu__visual{margin-top:1rem;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow);overflow:auto}
-.ds-dsu__canvas{min-width:780px}.ds-dsu__svg{display:block;width:100%;height:auto;min-height:540px}
-.ds-dsu__edge{stroke:color-mix(in srgb,var(--global-text-color) 40%,var(--global-border-color));stroke-width:3;marker-end:url(#ds-dsu-arrow)}
-.ds-dsu__edge.is-active{stroke:#e11d48;stroke-width:5}
-.ds-dsu__node circle{fill:var(--ds-surface);stroke:color-mix(in srgb,var(--global-link-color) 85%,var(--global-border-color));stroke-width:3}
-.ds-dsu__node text.value{font-weight:800;fill:var(--global-text-color);text-anchor:middle;dominant-baseline:middle}
-.ds-dsu__node text.meta{font-size:11px;fill:var(--global-text-color);text-anchor:middle;opacity:.62}
-.ds-dsu__node.is-root circle{fill:color-mix(in srgb,var(--global-link-color) 13%,var(--global-bg-color));stroke:var(--global-link-color);stroke-width:5}
-.ds-dsu__node.is-checking circle{fill:#fef3c7;stroke:#d97706;stroke-width:5}
-.ds-dsu__node.is-found circle{fill:#dcfce7;stroke:#15803d;stroke-width:5}
-
-.ds-dsu__status{min-height:3rem;margin:.8rem 0 0;padding:.85rem;border-radius:10px;box-shadow:var(--ds-shadow-soft);font-weight:800}
-.ds-dsu__status.is-success{color:#15803d}.ds-dsu__status.is-error{color:#b91c1c}
-.ds-dsu__stats{margin-top:.8rem}.ds-dsu__stat strong{font-size:.75rem;opacity:.65}
-.ds-dsu__results{display:grid;grid-template-columns:minmax(340px,1fr) minmax(320px,1fr);gap:.8rem;margin-top:.8rem}
-.ds-dsu__trace,.ds-dsu__components,.ds-dsu__table-panel,.ds-dsu__code-panel{padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft);min-width:0}
-.ds-dsu__trace h3,.ds-dsu__components h3,.ds-dsu__table-panel h3,.ds-dsu__code-panel h3{margin:0 0 .55rem;font-size:1rem}
-.ds-dsu__output{min-height:44px;padding:.6rem;border-radius:8px;background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color));font-family:Consolas,Monaco,monospace;overflow-wrap:anywhere}
-.ds-dsu__component-list{display:flex;flex-wrap:wrap;gap:.55rem}
-.ds-dsu__component{padding:.55rem .7rem;border:1.5px solid var(--ds-border);border-radius:8px;background:var(--ds-surface-strong);font-weight:800}
-.ds-dsu__lower{display:grid;grid-template-columns:minmax(420px,1.1fr) minmax(300px,.9fr);gap:.8rem;margin-top:.8rem}
-.ds-dsu__scroll{overflow:auto;max-height:360px}.ds-dsu table{width:100%;border-collapse:collapse;font-size:.88rem}.ds-dsu th,.ds-dsu td{padding:.6rem;border:1.5px solid var(--ds-border);text-align:left}.ds-dsu th{background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color))}
-.ds-dsu__code{padding:.9rem;border-radius:10px;background:#0f172a;color:#e2e8f0;overflow:auto}.ds-dsu__code pre{margin:0;white-space:pre-wrap;font-family:Consolas,Monaco,monospace;font-size:.84rem}
-.ds-dsu__cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}.ds-dsu__card{padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}
-.ds-dsu__card h3{margin:0 0 .45rem;color:var(--global-text-color);font-size:1rem}.ds-dsu__card p{margin:0;font-size:.9rem;line-height:1.55;opacity:.78}
-
-@media(max-width:850px){.ds-dsu__hero p{text-align:left}.ds-dsu__metrics,.ds-dsu__stats,.ds-dsu__cards,.ds-dsu__results,.ds-dsu__lower{grid-template-columns:repeat(2,minmax(0,1fr))}.ds-dsu__speed{grid-template-columns:1fr}.ds-dsu__speed output{text-align:left}}
-@media(max-width:650px){.ds-dsu__metrics,.ds-dsu__stats,.ds-dsu__cards,.ds-dsu__results,.ds-dsu__lower,.ds-dsu__group{grid-template-columns:1fr}}
-@media(prefers-color-scheme:dark){.ds-dsu{--ds-surface:var(--global-bg-color);--ds-surface-strong:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));--ds-border:color-mix(in srgb,var(--global-border-color) 85%,var(--global-text-color));--ds-shadow:none;--ds-shadow-soft:none}}
-@media(prefers-reduced-motion:reduce){.ds-dsu *,.ds-dsu *::before,.ds-dsu *::after{transition-duration:.001ms!important;animation-duration:.001ms!important}}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .ds-dsu__node.is-checking circle { fill: #451a03; stroke: #f59e0b; }
-  :root:not([data-theme="light"]) .ds-dsu__node.is-found circle { fill: #052e16; stroke: #22c55e; }
+/* ---------- controls ---------- */
+.ds-dsu__panel {
+  display: grid;
+  gap: 5px;
+  padding: 6px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
 }
-:root[data-theme="dark"] .ds-dsu__node.is-checking circle { fill: #451a03; stroke: #f59e0b; }
-:root[data-theme="dark"] .ds-dsu__node.is-found circle { fill: #052e16; stroke: #22c55e; }
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) .ds-dsu__code { background: #1e293b; }
+
+.ds-dsu__group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  align-items: center;
 }
-:root[data-theme="light"] .ds-dsu__code { background: #1e293b; }
+
+.ds-dsu__group button { padding: 0 10px; }
+
+.ds-dsu__field {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.ds-dsu__field input { width: 64px; }
+.ds-dsu__field select { width: 64px; }
+
+/* ---------- main area ---------- */
+.ds-dsu__main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 8px;
+}
+
+.ds-dsu__left {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto auto;
+  gap: 6px;
+}
+
+.ds-dsu__visual {
+  min-height: 0;
+  padding: 2px;
+  overflow: hidden;
+}
+
+.ds-dsu__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ds-dsu__edge {
+  stroke: var(--ds-link);
+  stroke-width: 3;
+  marker-end: url(#ds-dsu-arrow);
+}
+
+.ds-dsu__edge.is-active {
+  stroke: #e9a23b;
+  stroke-width: 5;
+}
+
+.ds-dsu__arrow { fill: var(--ds-link); }
+
+.ds-dsu__empty {
+  font-size: 28px;
+  font-weight: 700;
+  fill: var(--ds-muted);
+}
+
+.ds-dsu__node circle {
+  fill: var(--ds-node);
+  stroke: var(--ds-link);
+  stroke-width: 3;
+}
+
+.ds-dsu__node text.value {
+  font-size: 26px;
+  font-weight: 800;
+  fill: var(--ds-text);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.ds-dsu__node text.meta {
+  font-size: 18px;
+  font-weight: 700;
+  fill: var(--ds-muted);
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: var(--ds-bg);
+  stroke-width: 6px;
+  stroke-linejoin: round;
+}
+
+.ds-dsu__node.is-root circle {
+  fill: color-mix(in srgb, var(--ds-link) 30%, var(--ds-bg));
+  stroke: var(--ds-link);
+  stroke-width: 5;
+}
+
+.ds-dsu__node.is-checking circle {
+  fill: var(--ds-hot);
+  stroke: #e9a23b;
+  stroke-width: 5;
+}
+
+.ds-dsu__node.is-found circle {
+  fill: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  stroke: var(--ds-good);
+  stroke-width: 5;
+}
+
+.ds-dsu__stats {
+  display: flex;
+  gap: 6px;
+}
+
+.ds-dsu__stat {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  padding: 2px 7px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.ds-dsu__stat strong {
+  color: var(--ds-muted);
+  font-size: 11px;
+}
+
+.ds-dsu__status {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-dsu__status.is-success { color: var(--ds-good); }
+.ds-dsu__status.is-error { color: var(--ds-bad); }
+
+.ds-dsu__results {
+  display: grid;
+  grid-template-columns: .8fr 1.2fr;
+  gap: 6px;
+}
+
+.ds-dsu__trace {
+  min-width: 0;
+  height: 76px;
+  padding: 5px 8px;
+  overflow: hidden;
+}
+
+.ds-dsu .ds-sim__caption {
+  margin: 0 0 2px;
+  line-height: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-dsu__output {
+  height: 45px;
+  font-size: 12.5px;
+  line-height: 15px;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.ds-dsu__output.is-code { font-family: Consolas, Monaco, monospace; }
+
+/* ---------- components and table ---------- */
+.ds-dsu__right {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 6px;
+}
+
+.ds-dsu__components,
+.ds-dsu__table-panel {
+  min-height: 0;
+  padding: 6px 8px;
+  overflow: hidden;
+}
+
+.ds-dsu__component-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.ds-dsu__component {
+  max-width: 100%;
+  padding: 1px 7px;
+  border: 1.5px solid var(--ds-link);
+  border-radius: 7px;
+  background: var(--ds-node);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 17px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-dsu__table-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.ds-dsu__table-panel th,
+.ds-dsu__table-panel td {
+  max-width: 90px;
+  padding: 0 2px;
+  border: 1px solid var(--ds-border);
+  line-height: 13px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-dsu__table-panel td {
+  height: 15px;
+  white-space: nowrap;
+}
+
+.ds-dsu__table-panel th {
+  background: var(--ds-surface-strong);
+  font-size: 10px;
+  font-weight: 800;
+  vertical-align: bottom;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-dsu * { transition-duration: .001ms !important; animation-duration: .001ms !important; }
+}
 </style>
 
-<div class="ds-dsu">
-  <section class="ds-dsu__hero">
-    <h1>Disjoint Set Union Simulator</h1>
-    <p>Disjoint Set Union—also called Union-Find—maintains a collection of non-overlapping sets. It answers which component an element belongs to and efficiently merges two components using path compression and union by rank.</p>
-    <div class="ds-dsu__metrics">
-      <div class="ds-dsu__metric"><strong>Make Set</strong>O(1)</div>
-      <div class="ds-dsu__metric"><strong>Find</strong>Amortized O(α(n))</div>
-      <div class="ds-dsu__metric"><strong>Union</strong>Amortized O(α(n))</div>
-      <div class="ds-dsu__metric"><strong>Optimizations</strong>Rank + compression</div>
-    </div>
-  </section>
+<div class="ds-deck ds-sim" id="ds-sim" lang="en">
+  <div class="ds-deck__screen" id="ds-sim-screen">
+    <div class="ds-deck__stage" id="ds-sim-stage">
+      <div class="ds-sim__body">
+        <div class="ds-sim__head">
+          <p class="ds-deck__kicker">Chapter 12 · Sets</p>
+          <h1 class="ds-sim__title">Disjoint Set Union Simulator</h1>
+        </div>
 
-  <section class="ds-dsu__section">
-    <h2>Union-Find operations</h2>
-    <div class="ds-dsu__panel">
-      <div class="ds-dsu__group">
-        <div class="ds-dsu__field"><label for="ds-dsu-value">New element</label><input id="ds-dsu-value" type="number" value="6"></div>
-        <button class="ds-dsu__btn" id="ds-dsu-make" type="button">Make Set</button>
-        <div class="ds-dsu__field"><label for="ds-dsu-first">First element</label><select id="ds-dsu-first"></select></div>
-        <div class="ds-dsu__field"><label for="ds-dsu-second">Second element</label><select id="ds-dsu-second"></select></div>
-        <button class="ds-dsu__btn" id="ds-dsu-union" type="button">Union</button>
-        <button class="ds-dsu__btn" id="ds-dsu-connected" type="button">Connected?</button>
-      </div>
+        <div class="ds-sim__root ds-dsu">
+          <div class="ds-dsu__panel">
+            <div class="ds-dsu__group">
+              <div class="ds-dsu__field"><label for="ds-dsu-value">New element</label><input id="ds-dsu-value" type="number" value="6"></div>
+              <button class="is-primary" id="ds-dsu-make" type="button">Make Set</button>
+              <button id="ds-dsu-example" type="button">Load</button>
+              <button id="ds-dsu-random" type="button">Random Unions</button>
+              <button class="is-danger" id="ds-dsu-reset" type="button">Reset</button>
+              <button class="is-danger" id="ds-dsu-cancel" type="button">Cancel</button>
+            </div>
+            <div class="ds-dsu__group">
+              <div class="ds-dsu__field"><label for="ds-dsu-first">First element</label><select id="ds-dsu-first"></select></div>
+              <div class="ds-dsu__field"><label for="ds-dsu-second">Second element</label><select id="ds-dsu-second"></select></div>
+              <button class="is-primary" id="ds-dsu-union" type="button">Union</button>
+              <button id="ds-dsu-connected" type="button">Connected?</button>
+            </div>
+            <div class="ds-dsu__group">
+              <div class="ds-dsu__field"><label for="ds-dsu-find-value">Element to find</label><select id="ds-dsu-find-value"></select></div>
+              <button class="is-primary" id="ds-dsu-find" type="button">Find Representative</button>
+              <button id="ds-dsu-compress" type="button">Compress Paths</button>
+            </div>
+          </div>
 
-      <div class="ds-dsu__group">
-        <div class="ds-dsu__field"><label for="ds-dsu-find-value">Element to find</label><select id="ds-dsu-find-value"></select></div>
-        <button class="ds-dsu__btn" id="ds-dsu-find" type="button">Find Representative</button>
-        <button class="ds-dsu__btn" id="ds-dsu-compress" type="button">Compress Paths</button>
-        <button class="ds-dsu__btn" id="ds-dsu-example" type="button">Load</button>
-        <button class="ds-dsu__btn" id="ds-dsu-random" type="button">Random Unions</button>
-        <button class="ds-dsu__btn ds-dsu__btn--danger" id="ds-dsu-reset" type="button">Reset</button>
-        <button class="ds-dsu__btn ds-dsu__btn--secondary" id="ds-dsu-cancel" type="button">Cancel</button>
-      </div>
+          <div class="ds-dsu__main">
+            <div class="ds-dsu__left">
+              <div class="ds-dsu__visual ds-sim__panel">
+                <svg id="ds-dsu-svg" class="ds-dsu__svg" viewBox="0 0 1000 540" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Disjoint Set Union forest">
+                  <defs>
+                    <marker id="ds-dsu-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                      <path class="ds-dsu__arrow" d="M0,0 L8,4 L0,8 Z"></path>
+                    </marker>
+                  </defs>
+                </svg>
+              </div>
 
-      <div class="ds-dsu__speed">
-        <label for="ds-dsu-speed">Animation speed</label>
-        <input id="ds-dsu-speed" type="range" min="100" max="1000" step="100" value="400">
-        <output id="ds-dsu-speed-output">400 ms</output>
-      </div>
-    </div>
+              <div class="ds-dsu__stats">
+                <div class="ds-dsu__stat"><strong>Elements</strong><span id="ds-dsu-elements">0</span></div>
+                <div class="ds-dsu__stat"><strong>Components</strong><span id="ds-dsu-component-count">0</span></div>
+                <div class="ds-dsu__stat"><strong>Maximum depth</strong><span id="ds-dsu-max-depth">0</span></div>
+                <div class="ds-dsu__stat"><strong>Parent rewrites</strong><span id="ds-dsu-rewrites">0</span></div>
+              </div>
 
-    <div class="ds-dsu__visual">
-      <div class="ds-dsu__canvas">
-        <svg id="ds-dsu-svg" class="ds-dsu__svg" viewBox="0 0 1000 540" role="img" aria-label="Disjoint Set Union forest">
-          <defs>
-            <marker id="ds-dsu-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
-              <path d="M0,0 L8,4 L0,8 Z" fill="currentColor"></path>
-            </marker>
-          </defs>
-        </svg>
-      </div>
+              <p id="ds-dsu-status" class="ds-dsu__status ds-sim__status" role="status" aria-live="polite">Example Union-Find forest loaded. Choose an operation.</p>
 
-      <p id="ds-dsu-status" class="ds-dsu__status" role="status" aria-live="polite">Example Union-Find forest loaded. Choose an operation.</p>
+              <div class="ds-dsu__results">
+                <div class="ds-dsu__trace ds-sim__panel">
+                  <p class="ds-sim__caption">Find path</p>
+                  <div id="ds-dsu-path" class="ds-dsu__output is-code">—</div>
+                </div>
+                <div class="ds-dsu__trace ds-sim__panel">
+                  <p class="ds-sim__caption">Last operation</p>
+                  <div id="ds-dsu-result" class="ds-dsu__output">—</div>
+                </div>
+              </div>
+            </div>
 
-      <div class="ds-dsu__stats">
-        <div class="ds-dsu__stat"><strong>Elements</strong><span id="ds-dsu-elements">0</span></div>
-        <div class="ds-dsu__stat"><strong>Components</strong><span id="ds-dsu-component-count">0</span></div>
-        <div class="ds-dsu__stat"><strong>Maximum depth</strong><span id="ds-dsu-max-depth">0</span></div>
-        <div class="ds-dsu__stat"><strong>Parent rewrites</strong><span id="ds-dsu-rewrites">0</span></div>
-      </div>
-    </div>
+            <div class="ds-dsu__right">
+              <div class="ds-dsu__components ds-sim__panel">
+                <p class="ds-sim__caption">Current components</p>
+                <div id="ds-dsu-component-list" class="ds-dsu__component-list"></div>
+              </div>
 
-    <div class="ds-dsu__results">
-      <div class="ds-dsu__trace">
-        <h3>Find path</h3>
-        <div id="ds-dsu-path" class="ds-dsu__output">—</div>
-        <h3 style="margin-top:1rem">Last operation</h3>
-        <div id="ds-dsu-result" class="ds-dsu__output">—</div>
-      </div>
-
-      <div class="ds-dsu__components">
-        <h3>Current components</h3>
-        <div id="ds-dsu-component-list" class="ds-dsu__component-list"></div>
-      </div>
-    </div>
-
-    <div class="ds-dsu__lower">
-      <div class="ds-dsu__table-panel">
-        <h3>Parent, rank, and size table</h3>
-        <div class="ds-dsu__scroll">
-          <table>
-            <thead><tr><th>Element</th><th>Parent</th><th>Representative</th><th>Rank</th><th>Component size</th></tr></thead>
-            <tbody id="ds-dsu-body"></tbody>
-          </table>
+              <div class="ds-dsu__table-panel ds-sim__panel">
+                <p class="ds-sim__caption">Parent, rank, and size table</p>
+                <table>
+                  <thead><tr><th>Element</th><th>Parent</th><th>Representative</th><th>Rank</th><th>Component size</th></tr></thead>
+                  <tbody id="ds-dsu-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="ds-dsu__code-panel">
-        <h3>Optimized operations</h3>
-        <div class="ds-dsu__code"><pre>find(x):
-  if parent[x] != x:
-    parent[x] = find(parent[x])
-  return parent[x]
-
-union(a, b):
-  rootA = find(a)
-  rootB = find(b)
-
-  attach lower-rank root
-  below higher-rank root
-
-  if ranks are equal:
-    choose one root
-    increase its rank</pre></div>
+      <div class="ds-deck__bar">
+        <span class="ds-deck__section">Sercan KÜLCÜ, Tüm hakları saklıdır.</span>
+        <button class="ds-deck__button" type="button" id="ds-sim-full" aria-label="Full screen">⛶</button>
       </div>
     </div>
-  </section>
-
-  <section class="ds-dsu__section">
-    <h2>Union-Find concepts</h2>
-    <div class="ds-dsu__cards">
-      <article class="ds-dsu__card"><h3>Disjoint components</h3><p>Every element belongs to exactly one component. Each component is represented by a rooted parent tree.</p></article>
-      <article class="ds-dsu__card"><h3>Path compression</h3><p>Find rewrites parent links along the search path to point directly to the representative, flattening future searches.</p></article>
-      <article class="ds-dsu__card"><h3>Union by rank</h3><p>The lower-rank root is attached below the higher-rank root. Equal ranks require one rank increment.</p></article>
-      <article class="ds-dsu__card"><h3>Typical applications</h3><p>Union-Find is used in Kruskal's minimum spanning tree algorithm, connectivity queries, image segmentation, and dynamic grouping.</p></article>
-    </div>
-  </section>
-
-  <section class="ds-dsu__section">
-    <h2>Terminology</h2>
-    <div class="ds-dsu__panel ds-dsu__scroll">
-      <table>
-        <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
-        <tbody>
-          <tr><td>Representative</td><td>The root element that identifies a component.</td></tr>
-          <tr><td>Parent</td><td>The next element followed toward the representative.</td></tr>
-          <tr><td>Rank</td><td>An upper-bound estimate of tree height used for merging.</td></tr>
-          <tr><td>Component size</td><td>The number of elements represented by a root.</td></tr>
-          <tr><td>α(n)</td><td>The inverse Ackermann function, which grows extremely slowly.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+  </div>
 </div>
 
+<script src="deck/sim.js"></script>
 <script>
 (function(){
   "use strict";
 
   var root=document.querySelector(".ds-dsu");if(!root)return;
   function q(id){return root.querySelector("#"+id);}
+  /* sabit animasyon gecikmesi (ms) */
+  var DELAY=400;
   var ns="http://www.w3.org/2000/svg";
+  /* 800x600 sahneye sığması için en fazla eleman sayısı */
+  var MAX_ELEMENTS=10;
 
   var el={
     value:q("ds-dsu-value"),first:q("ds-dsu-first"),second:q("ds-dsu-second"),findValue:q("ds-dsu-find-value"),
-    speed:q("ds-dsu-speed"),speedOutput:q("ds-dsu-speed-output"),svg:q("ds-dsu-svg"),status:q("ds-dsu-status"),
+    svg:q("ds-dsu-svg"),status:q("ds-dsu-status"),
     elements:q("ds-dsu-elements"),componentCount:q("ds-dsu-component-count"),maxDepth:q("ds-dsu-max-depth"),
     rewrites:q("ds-dsu-rewrites"),path:q("ds-dsu-path"),result:q("ds-dsu-result"),
     componentList:q("ds-dsu-component-list"),body:q("ds-dsu-body")
@@ -284,7 +460,7 @@ union(a, b):
 
   function delay(){
     if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return 0;
-    return Number(el.speed.value);
+    return DELAY;
   }
 
   function wait(ms,t){return new Promise(function(resolve){setTimeout(function(){resolve(t===token);},ms);});}
@@ -371,12 +547,25 @@ union(a, b):
         arr.forEach(function(x,i){
           var spread=Math.min(150,70*arr.length);
           var xpos=cx+(i-(arr.length-1)/2)*(spread/Math.max(1,arr.length-1));
-          nodes.push({value:x,x:xpos,y:70+d*95,depth:d});
+          /* çok sayıda kök varsa tekil kümelerin alt etiketleri iki satıra kaydırılır */
+          var shift=roots.length>5&&ri%2===1?1:0;
+          nodes.push({value:x,x:xpos,y:70+d*95,depth:d,shift:shift});
         });
       });
     });
     parent.forEach(function(p,x){if(p!==x)edges.push({from:x,to:p,key:x+"->"+p});});
     return{nodes:nodes,edges:edges};
+  }
+
+  /* çizimi kapsayan viewBox: orman ne kadar büyürse büyüsün panele sığar */
+  function fitView(nodes){
+    if(!nodes.length){el.svg.setAttribute("viewBox","250 150 500 200");return;}
+    var minX=Infinity,maxX=-Infinity,maxY=0;
+    nodes.forEach(function(n){minX=Math.min(minX,n.x);maxX=Math.max(maxX,n.x);maxY=Math.max(maxY,n.y);});
+    var x0=minX-80,w=maxX-minX+160,h=maxY+90-10;
+    if(w<560){x0-=(560-w)/2;w=560;}
+    if(h<240)h=240;
+    el.svg.setAttribute("viewBox",x0+" 10 "+w+" "+h);
   }
 
   function renderTable(){
@@ -396,23 +585,27 @@ union(a, b):
     var defs=document.createElementNS(ns,"defs");
     var marker=document.createElementNS(ns,"marker");
     marker.setAttribute("id","ds-dsu-arrow");marker.setAttribute("markerWidth","8");marker.setAttribute("markerHeight","8");marker.setAttribute("refX","7");marker.setAttribute("refY","4");marker.setAttribute("orient","auto");
-    var path=document.createElementNS(ns,"path");path.setAttribute("d","M0,0 L8,4 L0,8 Z");path.setAttribute("fill","#94a3b8");
+    var path=document.createElementNS(ns,"path");path.setAttribute("d","M0,0 L8,4 L0,8 Z");path.setAttribute("class","ds-dsu__arrow");
     marker.appendChild(path);defs.appendChild(marker);el.svg.appendChild(defs);
 
     if(!parent.size){
+      fitView([]);
       var empty=document.createElementNS(ns,"text");
       empty.setAttribute("x","500");empty.setAttribute("y","250");empty.setAttribute("text-anchor","middle");
-      empty.setAttribute("fill","currentColor");empty.textContent="No disjoint sets.";
+      empty.setAttribute("class","ds-dsu__empty");empty.textContent="No disjoint sets.";
       el.svg.appendChild(empty);
     }else{
       var data=layout();
+      fitView(data.nodes);
       data.edges.forEach(function(edge){
         var a=data.nodes.find(function(n){return n.value===edge.from;});
         var b=data.nodes.find(function(n){return n.value===edge.to;});
         if(!a||!b)return;
+        /* ok ucu ebeveyn dairesinin kenarında durur, böylece görünür kalır */
+        var dx=b.x-a.x,dy=b.y-a.y,len=Math.sqrt(dx*dx+dy*dy)||1,ux=dx/len,uy=dy/len;
         var line=document.createElementNS(ns,"line");
-        line.setAttribute("x1",String(a.x));line.setAttribute("y1",String(a.y));
-        line.setAttribute("x2",String(b.x));line.setAttribute("y2",String(b.y));
+        line.setAttribute("x1",String(a.x+ux*25));line.setAttribute("y1",String(a.y+uy*25));
+        line.setAttribute("x2",String(b.x-ux*31));line.setAttribute("y2",String(b.y-uy*31));
         line.setAttribute("class","ds-dsu__edge"+(activeEdges.has(edge.key)?" is-active":""));
         el.svg.appendChild(line);
       });
@@ -425,11 +618,17 @@ union(a, b):
         g.setAttribute("transform","translate("+item.x+" "+item.y+")");
 
         var c=document.createElementNS(ns,"circle");c.setAttribute("r","25");
-        var t=document.createElementNS(ns,"text");t.setAttribute("class","value");t.setAttribute("y","-2");t.textContent=String(item.value);
-        var m=document.createElementNS(ns,"text");m.setAttribute("class","meta");m.setAttribute("y","43");
-        m.textContent=parent.get(item.value)===item.value?"root · rank "+rank.get(item.value):"parent "+parent.get(item.value);
-
-        g.appendChild(c);g.appendChild(t);g.appendChild(m);el.svg.appendChild(g);
+        var t=document.createElementNS(ns,"text");t.setAttribute("class","value");t.setAttribute("y","1");t.textContent=String(item.value);
+        g.appendChild(c);g.appendChild(t);
+        /* yalnızca köklerde etiket: çocuklu kökte düğümün üstünde, tekil kümede altında
+           (kenarların geçmediği yerler); ebeveyn bilgisi tabloda gösterilir */
+        if(parent.get(item.value)===item.value){
+          var m=document.createElementNS(ns,"text");m.setAttribute("class","meta");
+          m.setAttribute("y",String(size.get(item.value)>1?-36:(item.shift?66:46)));
+          m.textContent="root · rank "+rank.get(item.value);
+          g.appendChild(m);
+        }
+        el.svg.appendChild(g);
       });
     }
 
@@ -474,6 +673,7 @@ union(a, b):
   btn.make.addEventListener("click",function(){
     try{
       var x=readValue();
+      if(!has(x)&&parent.size>=MAX_ELEMENTS){setStatus("Element limit reached ("+MAX_ELEMENTS+" elements).","is-error");return;}
       if(!makeSet(x)){setStatus(x+" already exists.","is-error");return;}
       updateSelects();render();
       el.result.textContent="Created singleton set { "+x+" }.";
@@ -560,7 +760,6 @@ union(a, b):
     token++;clearMarks();disable(false);render();setStatus("Animation cancelled.");
   });
 
-  el.speed.addEventListener("input",function(){el.speedOutput.textContent=el.speed.value+" ms";});
 
   loadExample();
   btn.cancel.disabled=true;

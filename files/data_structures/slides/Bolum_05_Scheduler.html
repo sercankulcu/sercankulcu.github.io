@@ -5,474 +5,348 @@ permalink: /files/data_structures/slides/Bolum_05_Scheduler.html
 excerpt: "Compact interactive Round Robin scheduler simulator."
 ---
 
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/sim.css">
 <style>
-.scheduler-sim,
-.scheduler-sim *,
-.scheduler-sim *::before,
-.scheduler-sim *::after { box-sizing: border-box; }
-
 .scheduler-sim {
-  --sim-bg: var(--global-bg-color, #ffffff);
-  --sim-text: var(--global-text-color, #2f3437);
-  --sim-accent: var(--global-link-color, #2a7ae2);
-  --sim-border: var(--global-border-color, #d9dee3);
-  --sim-soft: color-mix(in srgb, var(--sim-accent) 6%, var(--sim-bg));
-  --sim-softer: color-mix(in srgb, var(--sim-accent) 2.5%, var(--sim-bg));
-  --sim-ok: #15803d;
-  --sim-warn: #d97706;
-  --sim-danger: #b91c1c;
-
-  width: min(780px, calc(100vw - 18px));
-  height: min(548px, calc(100vh - 58px));
-  min-height: 470px;
-  margin: 6px auto 0;
-  padding: 10px;
-  color: var(--sim-text);
-  font-family: inherit;
-  overflow: hidden;
-}
-
-.scheduler-shell {
   height: 100%;
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 8px;
-}
-
-.scheduler-title {
-  margin: 0;
-  color: var(--sim-text);
-  text-align: center;
-  font-size: 1.45rem;
-  line-height: 1.15;
 }
 
 .scheduler-controls {
   display: grid;
   gap: 6px;
-  padding: 8px;
-  border: 1px solid var(--sim-border);
-  border-radius: 10px;
-  background: var(--sim-softer);
+  padding: 8px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
 }
 
 .scheduler-row {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
   align-items: end;
 }
 
 .scheduler-field {
   display: grid;
-  grid-column: span 2;
   gap: 2px;
-  min-width: 0;
+  width: 84px;
 }
 
-.scheduler-field label {
-  display: block;
-  margin: 0 !important;
-  padding: 0;
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.scheduler-field input {
-  width: 100%;
-  height: 31px;
-  min-height: 31px;
-  margin: 0 !important;
-  padding: 3px 6px;
-  border: 1px solid var(--sim-border);
-  border-radius: 6px;
-  background: var(--sim-bg);
-  color: var(--sim-text);
-  font: inherit;
-  line-height: 1;
-  vertical-align: top;
-}
-
-.scheduler-btn {
-  height: 31px;
-  min-height: 31px;
-  margin: 0 !important;
-  padding: 0 6px;
-  border: 1px solid var(--sim-accent);
-  border-radius: 6px;
-  background: var(--sim-accent);
-  color: #fff;
-  font: inherit;
-  font-size: 10.8px;
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: end;
-  appearance: none;
-  -webkit-appearance: none;
-  transition: transform .12s ease, filter .12s ease;
-}
-
-.scheduler-btn:hover:not(:disabled) {
-  filter: brightness(1.08);
-  transform: translateY(-1px);
-}
-
-.scheduler-btn:disabled {
-  cursor: not-allowed;
-  opacity: .45;
-}
-
-.scheduler-btn.success {
-  background: var(--sim-ok);
-  border-color: var(--sim-ok);
-}
-
-.scheduler-btn.danger {
-  background: var(--sim-danger);
-  border-color: var(--sim-danger);
-}
-
-.span2 { grid-column: span 2; }
+.scheduler-field input { width: 100%; }
 
 .scheduler-stage {
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(210px, .55fr);
-  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 10px;
 }
 
 .scheduler-queue-panel,
 .scheduler-current-panel {
-  min-height: 0;
-  border: 1px solid var(--sim-border);
-  border-radius: 10px;
-  background: var(--sim-bg);
   overflow: hidden;
 }
 
 .scheduler-queue-panel {
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
 .scheduler-panel-title {
   margin: 0;
-  padding: 7px 10px 4px;
+  padding: 8px 10px 0;
   text-align: center;
-  color: var(--sim-accent);
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .03em;
 }
 
 .scheduler-queue-wrap {
   min-height: 0;
   display: grid;
   place-items: center;
-  padding: 8px;
+  padding: 6px 8px;
 }
 
 .scheduler-queue {
   width: 100%;
-  min-height: 158px;
-  padding: 12px 10px;
+  min-height: 150px;
+  padding: 12px 8px;
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 5px;
   overflow: hidden;
-  border: 4px solid color-mix(in srgb, var(--sim-accent) 78%, var(--sim-border));
-  border-left-width: 10px;
-  border-right-width: 10px;
+  border: 4px solid var(--ds-link);
+  border-left-width: 6px;
+  border-right-width: 6px;
   border-radius: 10px;
-  background: color-mix(in srgb, var(--sim-accent) 5%, var(--sim-bg));
+  background: var(--ds-surface);
 }
 
 .scheduler-process {
   flex: 1 1 0;
-  min-width: 66px;
+  min-width: 0;
   max-width: 92px;
-  min-height: 84px;
-  padding: 6px;
+  min-height: 92px;
+  padding: 6px 4px;
   display: grid;
   align-content: center;
   gap: 3px;
-  border: 2px solid var(--sim-accent);
+  border: 2px solid var(--ds-link);
   border-radius: 8px;
-  background: var(--sim-soft);
+  background: var(--ds-node);
   text-align: center;
-  font-size: 11px;
+  font-size: 16px;
   font-weight: 800;
   transition: transform .18s ease, background .18s ease, border-color .18s ease;
 }
 
 .scheduler-process small {
-  font-size: 8.8px;
+  color: var(--ds-muted);
+  font-size: 11px;
   font-weight: 700;
-  opacity: .58;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .scheduler-process.front {
-  background: #fef3c7;
-  border-color: var(--sim-warn);
-  color: #4a3100;
+  border-color: #e9a23b;
+  background: var(--ds-hot);
   transform: translateY(-3px);
 }
 
 .scheduler-process.complete {
-  background: #dcfce7;
-  border-color: var(--sim-ok);
-  color: #14532d;
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
 }
 
 .scheduler-empty {
   width: 100%;
+  color: var(--ds-muted);
   text-align: center;
-  font-size: 12px;
-  opacity: .55;
+  font-size: 14px;
 }
 
 .scheduler-queue-labels {
   display: flex;
   justify-content: space-between;
-  padding: 4px 10px 7px;
-  color: var(--sim-accent);
-  font-size: 9px;
+  padding: 0 12px 8px;
+  color: var(--ds-link);
+  font-size: 12px;
   font-weight: 800;
+  letter-spacing: .06em;
 }
 
 .scheduler-current-panel {
   display: grid;
-  grid-template-rows: auto 1fr auto auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
 }
 
 .scheduler-current {
   min-height: 0;
-  margin: 8px;
+  margin: 6px 10px 8px;
   padding: 8px;
   display: grid;
   place-content: center;
   gap: 5px;
-  border: 2px dashed var(--sim-border);
-  border-radius: 8px;
-  background: var(--sim-softer);
+  border: 2px dashed var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
   text-align: center;
+  transition: background .18s ease, border-color .18s ease;
 }
 
 .scheduler-current.running {
   border-style: solid;
-  border-color: var(--sim-danger);
-  background: color-mix(in srgb, var(--sim-danger) 8%, var(--sim-bg));
+  border-color: #e9a23b;
+  background: var(--ds-hot);
 }
 
 .scheduler-current-name {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 900;
 }
 
 .scheduler-current-meta {
-  font-size: 10.5px;
+  color: var(--ds-muted);
+  font-size: 13px;
   font-weight: 700;
-  opacity: .7;
 }
 
 .scheduler-progress {
   height: 10px;
-  margin: 0 10px 7px;
+  margin: 0 10px 8px;
   overflow: hidden;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--sim-text) 8%, var(--sim-bg));
+  background: var(--ds-surface-strong);
 }
 
 .scheduler-progress-bar {
   height: 100%;
   width: 0;
-  background: var(--sim-accent);
+  background: var(--ds-link);
   transition: width .18s ease;
 }
 
 .scheduler-status {
-  min-height: 34px;
-  padding: 7px 10px;
-  border-top: 1px solid var(--sim-border);
-  background: var(--sim-softer);
-  font-size: 11px;
+  height: 58px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1.5px solid var(--ds-border);
+  background: var(--ds-surface-strong);
+  font-size: 14px;
   font-weight: 700;
+  line-height: 1.3;
   text-align: center;
+  overflow: hidden;
 }
 
-.scheduler-status.success { color: var(--sim-ok); }
-.scheduler-status.error { color: var(--sim-danger); }
-.scheduler-status.warning { color: var(--sim-warn); }
+.scheduler-status.success { color: var(--ds-good); }
+.scheduler-status.error { color: var(--ds-bad); }
+.scheduler-status.warning { color: color-mix(in srgb, #e9a23b 60%, var(--ds-text)); }
 
 .scheduler-footer {
   display: grid;
-  grid-template-columns: 1.4fr repeat(4, .75fr);
-  gap: 5px;
+  grid-template-columns: 1.4fr repeat(4, 1fr);
+  gap: 6px;
 }
 
 .scheduler-stat {
   min-width: 0;
-  padding: 5px 7px;
-  border: 1px solid var(--sim-border);
-  border-radius: 7px;
-  background: var(--sim-softer);
-  font-size: 10.5px;
-  line-height: 1.2;
+  padding: 4px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .scheduler-stat strong {
   display: block;
-  margin-bottom: 2px;
-  font-size: 9px;
-  opacity: .6;
+  color: var(--ds-muted);
+  font-size: 11px;
+  letter-spacing: .06em;
   text-transform: uppercase;
-  letter-spacing: .03em;
-}
-
-@media (max-width: 700px) {
-  .scheduler-sim {
-    width: calc(100vw - 10px);
-    height: auto;
-    min-height: 0;
-    overflow: visible;
-  }
-
-  .scheduler-shell { grid-template-rows: auto; }
-  .scheduler-row { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-  .scheduler-field, .span2 { grid-column: span 2; }
-  .scheduler-stage { grid-template-columns: 1fr; }
-  .scheduler-queue { overflow-x: auto; }
-  .scheduler-process { flex: 0 0 74px; }
-  .scheduler-current-panel { min-height: 190px; }
-  .scheduler-footer { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-@media (max-height: 620px) and (min-width: 701px) {
-  .scheduler-sim {
-    height: calc(100vh - 48px);
-    padding-top: 4px;
-  }
-
-  .scheduler-title { font-size: 1.25rem; }
-  .scheduler-controls { padding: 6px; gap: 5px; }
-  .scheduler-btn, .scheduler-field input { height: 28px; min-height: 28px; }
-  .scheduler-queue { min-height: 135px; }
-  .scheduler-process { min-height: 72px; }
-  .scheduler-status { min-height: 29px; padding: 5px 8px; }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .scheduler-process.front {
-    background: #451a03;
-    color: #fef3c7;
-    border-color: #f59e0b;
-  }
-
-  :root:not([data-theme="light"]) .scheduler-process.complete {
-    background: #052e16;
-    color: #dcfce7;
-    border-color: #22c55e;
-  }
-}
-
-:root[data-theme="dark"] .scheduler-process.front {
-  background: #451a03;
-  color: #fef3c7;
-  border-color: #f59e0b;
-}
-
-:root[data-theme="dark"] .scheduler-process.complete {
-  background: #052e16;
-  color: #dcfce7;
-  border-color: #22c55e;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scheduler-sim *,
-  .scheduler-sim *::before,
-  .scheduler-sim *::after {
-    transition-duration: .001ms !important;
-    animation-duration: .001ms !important;
-  }
+  .scheduler-sim * { transition-duration: .001ms !important; }
 }
 </style>
 
-<div class="scheduler-sim">
-  <div class="scheduler-shell">
-    <h1 class="scheduler-title">Round Robin Scheduler</h1>
+<div class="ds-deck ds-sim" id="ds-sim" lang="en">
+  <div class="ds-deck__screen" id="ds-sim-screen">
+    <div class="ds-deck__stage" id="ds-sim-stage">
+      <div class="ds-sim__body">
+        <div class="ds-sim__head">
+          <p class="ds-deck__kicker">Chapter 5 · Queues</p>
+          <h1 class="ds-sim__title">Round Robin Scheduler</h1>
+        </div>
 
-    <div class="scheduler-controls">
-      <div class="scheduler-row">
-        <div class="scheduler-field">
-          <label for="scheduler-burst">Burst</label>
-          <input id="scheduler-burst" type="number" min="1" max="20" value="6" inputmode="numeric">
+        <div class="ds-sim__root scheduler-sim">
+          <div class="scheduler-controls">
+            <div class="scheduler-row">
+              <div class="scheduler-field">
+                <label for="scheduler-burst">Burst</label>
+                <input id="scheduler-burst" type="number" min="1" max="20" value="6" inputmode="numeric">
+              </div>
+              <div class="scheduler-field">
+                <label for="scheduler-quantum">Quantum</label>
+                <input id="scheduler-quantum" type="number" min="1" max="10" value="2" inputmode="numeric">
+              </div>
+              <button class="is-primary" id="scheduler-add" type="button">Add Process</button>
+              <button id="scheduler-random" type="button">Add Random</button>
+              <button id="scheduler-step" type="button">Run Quantum</button>
+              <button id="scheduler-example" type="button">Load Example</button>
+            </div>
+
+            <div class="scheduler-row">
+              <button class="is-primary" id="scheduler-auto" type="button">Auto Run</button>
+              <button class="is-danger" id="scheduler-pause" type="button">Pause</button>
+              <button class="is-danger" id="scheduler-reset" type="button">Reset</button>
+            </div>
+          </div>
+
+          <div class="scheduler-stage">
+            <div class="scheduler-queue-panel ds-sim__panel">
+              <p class="scheduler-panel-title ds-sim__caption">Ready Queue</p>
+
+              <div class="scheduler-queue-wrap">
+                <div class="scheduler-queue" id="scheduler-queue"></div>
+              </div>
+
+              <div class="scheduler-queue-labels">
+                <span>FRONT</span>
+                <span>REAR</span>
+              </div>
+            </div>
+
+            <div class="scheduler-current-panel ds-sim__panel">
+              <p class="scheduler-panel-title ds-sim__caption">Current Process</p>
+
+              <div class="scheduler-current" id="scheduler-current">
+                <div class="scheduler-current-name" id="scheduler-current-name">CPU Idle</div>
+                <div class="scheduler-current-meta" id="scheduler-current-meta">—</div>
+              </div>
+
+              <div class="scheduler-progress">
+                <div class="scheduler-progress-bar" id="scheduler-progress"></div>
+              </div>
+
+              <div class="scheduler-status" id="scheduler-status" aria-live="polite">
+                Ready.
+              </div>
+            </div>
+          </div>
+
+          <div class="scheduler-footer">
+            <div class="scheduler-stat"><strong>Operation</strong><span id="scheduler-operation">Idle</span></div>
+            <div class="scheduler-stat"><strong>Time</strong><span id="scheduler-time">0</span></div>
+            <div class="scheduler-stat"><strong>Ready</strong><span id="scheduler-ready">0</span></div>
+            <div class="scheduler-stat"><strong>Completed</strong><span id="scheduler-completed">0</span></div>
+            <div class="scheduler-stat"><strong>Quantum</strong><span id="scheduler-quantum-stat">2</span></div>
+          </div>
         </div>
-        <div class="scheduler-field">
-          <label for="scheduler-quantum">Quantum</label>
-          <input id="scheduler-quantum" type="number" min="1" max="10" value="2" inputmode="numeric">
-        </div>
-        <button class="scheduler-btn success span2" id="scheduler-add" type="button">Add Process</button>
-        <button class="scheduler-btn success span2" id="scheduler-random" type="button">Add Random</button>
-        <button class="scheduler-btn span2" id="scheduler-step" type="button">Run Quantum</button>
-        <button class="scheduler-btn success span2" id="scheduler-example" type="button">Load Example</button>
       </div>
 
-      <div class="scheduler-row">
-        <button class="scheduler-btn success span2" id="scheduler-auto" type="button">Auto Run</button>
-        <button class="scheduler-btn danger span2" id="scheduler-pause" type="button">Pause</button>
-        <button class="scheduler-btn danger span2" id="scheduler-reset" type="button">Reset</button>
+      <div class="ds-deck__bar">
+        <span class="ds-deck__section">Sercan KÜLCÜ, Tüm hakları saklıdır.</span>
+        <button class="ds-deck__button" type="button" id="ds-sim-full" aria-label="Full screen">⛶</button>
       </div>
-    </div>
-
-    <div class="scheduler-stage">
-      <div class="scheduler-queue-panel">
-        <div class="scheduler-panel-title">Ready Queue</div>
-
-        <div class="scheduler-queue-wrap">
-          <div class="scheduler-queue" id="scheduler-queue"></div>
-        </div>
-
-        <div class="scheduler-queue-labels">
-          <span>FRONT</span>
-          <span>REAR</span>
-        </div>
-      </div>
-
-      <div class="scheduler-current-panel">
-        <div class="scheduler-panel-title">Current Process</div>
-
-        <div class="scheduler-current" id="scheduler-current">
-          <div class="scheduler-current-name" id="scheduler-current-name">CPU Idle</div>
-          <div class="scheduler-current-meta" id="scheduler-current-meta">—</div>
-        </div>
-
-        <div class="scheduler-progress">
-          <div class="scheduler-progress-bar" id="scheduler-progress"></div>
-        </div>
-
-        <div class="scheduler-status" id="scheduler-status" aria-live="polite">
-          Ready.
-        </div>
-      </div>
-    </div>
-
-    <div class="scheduler-footer">
-      <div class="scheduler-stat"><strong>Operation</strong><span id="scheduler-operation">Idle</span></div>
-      <div class="scheduler-stat"><strong>Time</strong><span id="scheduler-time">0</span></div>
-      <div class="scheduler-stat"><strong>Ready</strong><span id="scheduler-ready">0</span></div>
-      <div class="scheduler-stat"><strong>Completed</strong><span id="scheduler-completed">0</span></div>
-      <div class="scheduler-stat"><strong>Quantum</strong><span id="scheduler-quantum-stat">2</span></div>
     </div>
   </div>
 </div>
 
+<script src="deck/sim.js"></script>
 <script>
 (() => {
   "use strict";

@@ -5,168 +5,428 @@ permalink: /files/data_structures/slides/Bolum_11_Directed_Graph.html
 excerpt: "Interactive directed graph simulator with indegree, outdegree, BFS, DFS, topological sorting, cycle detection, adjacency views, and responsive SVG visualization."
 ---
 
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/sim.css">
 <style>
-.ds-dgraph,.ds-dgraph *,.ds-dgraph *::before,.ds-dgraph *::after{box-sizing:border-box}
-.ds-dgraph{
-  width:min(1220px,100%);margin:0 auto 2rem;color:var(--global-text-color);
-  --ds-surface:color-mix(in srgb,var(--global-link-color) 2.5%,var(--global-bg-color));
-  --ds-surface-strong:color-mix(in srgb,var(--global-link-color) 7%,var(--global-bg-color));
-  --ds-border:color-mix(in srgb,var(--global-link-color) 38%,var(--global-border-color));
-  --ds-shadow:0 8px 24px rgba(15,23,42,.065);
-  --ds-shadow-soft:0 3px 10px rgba(15,23,42,.045)
+.ds-dgraph {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 8px;
 }
-.ds-dgraph__hero,.ds-dgraph__panel,.ds-dgraph__visual,.ds-dgraph__status,.ds-dgraph__result,.ds-dgraph__repr,.ds-dgraph__card{
-  border:1.5px solid var(--ds-border);background:var(--ds-surface)
+
+/* ---------- controls ---------- */
+.ds-dgraph__panel {
+  display: grid;
+  gap: 5px;
+  padding: 6px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
 }
-.ds-dgraph__hero{padding:1.35rem;border-radius:16px;background:var(--ds-surface-strong);box-shadow:var(--ds-shadow)}
-.ds-dgraph__hero h1{margin:0 0 .55rem;text-align:center;color:var(--global-text-color);font-size:clamp(1.65rem,4vw,2.3rem)}
-.ds-dgraph__hero p{margin:0;line-height:1.65;text-align:justify;opacity:.86}
-.ds-dgraph__metrics,.ds-dgraph__stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem}
-.ds-dgraph__metrics{margin-top:1rem}.ds-dgraph__metric,.ds-dgraph__stat{padding:.75rem;border:1.5px solid var(--ds-border);border-radius:10px;background:var(--ds-surface)}
-.ds-dgraph__metric strong,.ds-dgraph__stat strong{display:block;margin-bottom:.15rem}
-.ds-dgraph__section{margin-top:1.4rem}.ds-dgraph__section h2{margin:0 0 .7rem;font-size:1.2rem}
-.ds-dgraph__panel{display:grid;gap:.8rem;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow-soft)}
-.ds-dgraph__group{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;align-items:end}
-.ds-dgraph__field{display:grid;gap:.3rem}.ds-dgraph__field label,.ds-dgraph__speed label{font-size:.86rem;font-weight:800}
-.ds-dgraph input,.ds-dgraph select{width:100%;min-height:42px;padding:.55rem .65rem;border:1.5px solid var(--ds-border);border-radius:9px;background:var(--ds-surface);color:var(--global-text-color);font:inherit}
-.ds-dgraph input:focus-visible,.ds-dgraph select:focus-visible,.ds-dgraph button:focus-visible{outline:3px solid color-mix(in srgb,var(--global-link-color) 30%,transparent);outline-offset:2px}
-.ds-dgraph__btn{min-height:42px;padding:.55rem .75rem;border:1px solid var(--global-link-color);border-radius:9px;background:var(--global-link-color);color:#fff;font:inherit;font-weight:800;cursor:pointer}
-.ds-dgraph__btn--secondary{border-color:var(--ds-border);background:var(--ds-surface);color:var(--global-text-color)}
-.ds-dgraph__btn--danger{border-color:#b91c1c;background:#b91c1c}
-.ds-dgraph__btn:disabled{opacity:.5;cursor:not-allowed}
-.ds-dgraph__speed{display:grid;grid-template-columns:140px 1fr auto;gap:.65rem;align-items:center}
-.ds-dgraph__visual{margin-top:1rem;padding:1rem;border-radius:14px;box-shadow:var(--ds-shadow);overflow:auto}
-.ds-dgraph__canvas{min-width:800px}.ds-dgraph__svg{display:block;width:100%;height:auto;min-height:540px;touch-action:none}
-.ds-dgraph__edge{stroke:color-mix(in srgb,var(--global-text-color) 40%,var(--global-border-color));stroke-width:3;marker-end:url(#ds-dgraph-arrow)}
-.ds-dgraph__edge.is-active{stroke:#e11d48;stroke-width:5}
-.ds-dgraph__node circle{fill:var(--ds-surface);stroke:color-mix(in srgb,var(--global-link-color) 85%,var(--global-border-color));stroke-width:3}
-.ds-dgraph__node text.label{font-weight:800;fill:var(--global-text-color);text-anchor:middle;dominant-baseline:middle}
-.ds-dgraph__node text.meta{font-size:11px;fill:var(--global-text-color);text-anchor:middle;opacity:.62}
-.ds-dgraph__node.is-queued circle{fill:#fef3c7;stroke:#d97706;stroke-width:5}
-.ds-dgraph__node.is-visited circle{fill:#dcfce7;stroke:#15803d;stroke-width:5}
-.ds-dgraph__node.is-current circle{fill:#dcfce7;stroke:#15803d;stroke-width:6}
-.ds-dgraph__node.is-dragging circle{stroke:#f97316;stroke-width:5}
-.ds-dgraph__status{margin-top:.8rem;padding:.85rem;border-radius:10px;font-weight:800}
-.ds-dgraph__status.is-success{color:#15803d}.ds-dgraph__status.is-error{color:#b91c1c}
-.ds-dgraph__results,.ds-dgraph__representations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;margin-top:.8rem}
-.ds-dgraph__result,.ds-dgraph__repr{padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft);min-width:0}
-.ds-dgraph__result h3,.ds-dgraph__repr h3{margin:0 0 .55rem;font-size:1rem}
-.ds-dgraph__output{min-height:44px;padding:.6rem;border-radius:8px;background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color));font-family:Consolas,Monaco,monospace;overflow-wrap:anywhere}
-.ds-dgraph__frontier{display:flex;flex-wrap:wrap;gap:.45rem;min-height:45px;padding:.5rem;border-radius:8px;background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color))}
-.ds-dgraph__frontier span{padding:.4rem .65rem;border:1.5px solid var(--ds-border);border-radius:7px;background:var(--ds-surface-strong);font-weight:800}
-.ds-dgraph__scroll{overflow:auto;max-height:360px}.ds-dgraph__adj-list{margin:0;padding-left:1.4rem}.ds-dgraph__adj-list li{margin:.35rem 0;font-family:Consolas,Monaco,monospace}
-.ds-dgraph table{border-collapse:collapse;font-size:.88rem}.ds-dgraph th,.ds-dgraph td{min-width:38px;padding:.45rem;text-align:center;border:1.5px solid var(--ds-border)}.ds-dgraph th{background:color-mix(in srgb,var(--global-text-color) 5%,var(--global-bg-color))}
-.ds-dgraph__cards{display:grid;grid-template-columns:repeat(2,1fr);gap:.8rem}.ds-dgraph__card{padding:1rem;border-radius:12px;box-shadow:var(--ds-shadow-soft)}
-.ds-dgraph__card h3{margin:0 0 .45rem}.ds-dgraph__card p{margin:0;line-height:1.55;opacity:.78}
-@media(max-width:820px){.ds-dgraph__hero p{text-align:left}.ds-dgraph__metrics,.ds-dgraph__stats,.ds-dgraph__cards,.ds-dgraph__results,.ds-dgraph__representations{grid-template-columns:repeat(2,1fr)}.ds-dgraph__speed{grid-template-columns:1fr}}
-@media(max-width:620px){.ds-dgraph__metrics,.ds-dgraph__stats,.ds-dgraph__cards,.ds-dgraph__results,.ds-dgraph__representations,.ds-dgraph__group{grid-template-columns:1fr}}
-@media(prefers-color-scheme:dark){.ds-dgraph{--ds-surface:var(--global-bg-color);--ds-surface-strong:color-mix(in srgb,var(--global-link-color) 5%,var(--global-bg-color));--ds-border:color-mix(in srgb,var(--global-border-color) 85%,var(--global-text-color));--ds-shadow:none;--ds-shadow-soft:none}}
-@media(prefers-reduced-motion:reduce){.ds-dgraph *,.ds-dgraph *::before,.ds-dgraph *::after{transition-duration:.001ms!important;animation-duration:.001ms!important}}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .ds-dgraph__node.is-queued circle { fill: #451a03; stroke: #f59e0b; }
-  :root:not([data-theme="light"]) .ds-dgraph__node.is-visited circle { fill: #1e1b4b; stroke: #818cf8; }
-  :root:not([data-theme="light"]) .ds-dgraph__node.is-current circle { fill: #451a03; stroke: #f59e0b; }
+
+.ds-dgraph__group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 5px;
+  align-items: center;
 }
-:root[data-theme="dark"] .ds-dgraph__node.is-queued circle { fill: #451a03; stroke: #f59e0b; }
-:root[data-theme="dark"] .ds-dgraph__node.is-visited circle { fill: #1e1b4b; stroke: #818cf8; }
-:root[data-theme="dark"] .ds-dgraph__node.is-current circle { fill: #451a03; stroke: #f59e0b; }
+
+.ds-dgraph__group button { padding: 0 10px; }
+
+.ds-dgraph__field {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.ds-dgraph__field input { width: 70px; }
+.ds-dgraph__field select {
+  width: 80px;
+  min-width: 78px;
+}
+
+/* ---------- main area ---------- */
+.ds-dgraph__main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 205px;
+  gap: 8px;
+}
+
+.ds-dgraph__left {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto auto;
+  gap: 6px;
+}
+
+.ds-dgraph__visual {
+  min-height: 0;
+  padding: 2px;
+  overflow: hidden;
+}
+
+.ds-dgraph__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.ds-dgraph__edge {
+  stroke: var(--ds-link);
+  stroke-width: 3.5;
+  marker-end: url(#ds-dgraph-arrow);
+}
+
+.ds-dgraph__edge.is-active {
+  stroke: #e9a23b;
+  stroke-width: 5.5;
+}
+
+.ds-dgraph__arrow { fill: var(--ds-link); }
+
+.ds-dgraph__node { cursor: grab; }
+
+.ds-dgraph__node circle {
+  fill: var(--ds-node);
+  stroke: var(--ds-link);
+  stroke-width: 3;
+}
+
+.ds-dgraph__node text.label {
+  font-size: 30px;
+  font-weight: 800;
+  fill: var(--ds-text);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.ds-dgraph__node text.meta {
+  font-size: 22px;
+  font-weight: 700;
+  fill: var(--ds-muted);
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: var(--ds-bg);
+  stroke-width: 6px;
+  stroke-linejoin: round;
+}
+
+.ds-dgraph__node.is-queued circle {
+  fill: color-mix(in srgb, var(--ds-hot) 60%, var(--ds-bg));
+  stroke: #e9a23b;
+  stroke-width: 5;
+  stroke-dasharray: 9 5;
+}
+
+.ds-dgraph__node.is-current circle {
+  fill: var(--ds-hot);
+  stroke: #e9a23b;
+  stroke-width: 7;
+}
+
+.ds-dgraph__node.is-visited circle {
+  fill: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  stroke: var(--ds-good);
+  stroke-width: 5;
+}
+
+.ds-dgraph__node.is-dragging circle {
+  stroke: var(--ds-accent);
+  stroke-width: 5;
+}
+
+.ds-dgraph__stats {
+  display: flex;
+  gap: 6px;
+}
+
+.ds-dgraph__stat {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  padding: 2px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.ds-dgraph__stat strong {
+  color: var(--ds-muted);
+  font-size: 11.5px;
+}
+
+.ds-dgraph__status {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-dgraph__status.is-success { color: var(--ds-good); }
+.ds-dgraph__status.is-error { color: var(--ds-bad); }
+
+.ds-dgraph__results {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 6px;
+}
+
+.ds-dgraph__result {
+  min-width: 0;
+  height: 74px;
+  padding: 5px 8px;
+  overflow: hidden;
+}
+
+.ds-dgraph .ds-sim__caption {
+  line-height: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-dgraph__result .ds-sim__caption { margin: 0 0 2px; }
+
+.ds-dgraph__output {
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12.5px;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-dgraph__step {
+  height: 32px;
+  font-size: 13px;
+  line-height: 16px;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.ds-dgraph__frontier-row {
+  margin-top: 3px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.ds-dgraph__frontier-row .ds-sim__caption {
+  flex: none;
+  margin: 0;
+}
+
+.ds-dgraph__frontier {
+  min-width: 0;
+  height: 22px;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.ds-dgraph__frontier span {
+  flex: none;
+  max-width: 70px;
+  padding: 1px 7px;
+  border: 1.5px solid #e9a23b;
+  border-radius: 7px;
+  background: var(--ds-hot);
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 17px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- representations ---------- */
+.ds-dgraph__right {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 6px;
+}
+
+.ds-dgraph__repr {
+  min-height: 0;
+  padding: 6px 8px;
+  overflow: hidden;
+}
+
+.ds-dgraph__scroll { overflow: hidden; }
+
+.ds-dgraph__adj-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ds-dgraph__adj-list li {
+  margin: 0;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 11.5px;
+  line-height: 15px;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-dgraph__scroll table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 11.5px;
+}
+
+.ds-dgraph__scroll th,
+.ds-dgraph__scroll td {
+  height: 15px;
+  padding: 0 1px;
+  border: 1px solid var(--ds-border);
+  line-height: 13px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.ds-dgraph__scroll th {
+  background: var(--ds-surface-strong);
+  font-weight: 800;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-dgraph * { transition-duration: .001ms !important; animation-duration: .001ms !important; }
+}
 </style>
 
-<div class="ds-dgraph">
-  <section class="ds-dgraph__hero">
-    <h1>Directed Graph Simulator</h1>
-    <p>A directed graph stores edges with orientation: an edge from A to B does not automatically create an edge from B to A. This simulator focuses on directed traversal, indegree/outdegree, adjacency representations, and topological sorting of directed acyclic graphs.</p>
-    <div class="ds-dgraph__metrics">
-      <div class="ds-dgraph__metric"><strong>BFS / DFS</strong>O(V + E)</div>
-      <div class="ds-dgraph__metric"><strong>Topological sort</strong>O(V + E)</div>
-      <div class="ds-dgraph__metric"><strong>Edge type</strong>Directed</div>
-      <div class="ds-dgraph__metric"><strong>Topo requirement</strong>DAG</div>
-    </div>
-  </section>
+<div class="ds-deck ds-sim" id="ds-sim" lang="en">
+  <div class="ds-deck__screen" id="ds-sim-screen">
+    <div class="ds-deck__stage" id="ds-sim-stage">
+      <div class="ds-sim__body">
+        <div class="ds-sim__head">
+          <p class="ds-deck__kicker">Chapter 11 · Graphs</p>
+          <h1 class="ds-sim__title">Directed Graph Simulator</h1>
+        </div>
 
-  <section class="ds-dgraph__section">
-    <h2>Graph editing and traversal</h2>
-    <div class="ds-dgraph__panel">
-      <div class="ds-dgraph__group">
-        <div class="ds-dgraph__field"><label for="ds-dgraph-label">New vertex label</label><input id="ds-dgraph-label" type="text" value="A" maxlength="8"></div>
-        <button class="ds-dgraph__btn" id="ds-dgraph-add" type="button">Add</button>
-        <button class="ds-dgraph__btn" id="ds-dgraph-remove" type="button">Remove Vertex</button>
-        <div class="ds-dgraph__field"><label for="ds-dgraph-from">From</label><select id="ds-dgraph-from"></select></div>
-        <div class="ds-dgraph__field"><label for="ds-dgraph-to">To</label><select id="ds-dgraph-to"></select></div>
-        <button class="ds-dgraph__btn" id="ds-dgraph-edge" type="button">Add / Remove Edge</button>
+        <div class="ds-sim__root ds-dgraph">
+          <div class="ds-dgraph__panel">
+            <div class="ds-dgraph__group">
+              <div class="ds-dgraph__field"><label for="ds-dgraph-label">New vertex label</label><input id="ds-dgraph-label" type="text" value="A" maxlength="8"></div>
+              <button class="is-primary" id="ds-dgraph-add" type="button">Add</button>
+              <button class="is-danger" id="ds-dgraph-remove" type="button">Remove Vertex</button>
+              <button id="ds-dgraph-example" type="button">Load DAG</button>
+              <button id="ds-dgraph-cycle-example" type="button">Load Cycle</button>
+              <button class="is-danger" id="ds-dgraph-clear" type="button">Clear</button>
+            </div>
+            <div class="ds-dgraph__group">
+              <div class="ds-dgraph__field"><label for="ds-dgraph-from">From</label><select id="ds-dgraph-from"></select></div>
+              <div class="ds-dgraph__field"><label for="ds-dgraph-to">To</label><select id="ds-dgraph-to"></select></div>
+              <button id="ds-dgraph-edge" type="button">Add / Remove Edge</button>
+            </div>
+            <div class="ds-dgraph__group">
+              <div class="ds-dgraph__field"><label for="ds-dgraph-start">Traversal start</label><select id="ds-dgraph-start"></select></div>
+              <button class="is-primary" id="ds-dgraph-bfs" type="button">BFS</button>
+              <button class="is-primary" id="ds-dgraph-dfs" type="button">DFS</button>
+              <button class="is-primary" id="ds-dgraph-topo" type="button">Topological Sort</button>
+              <button id="ds-dgraph-cycle" type="button">Detect Cycle</button>
+              <button class="is-danger" id="ds-dgraph-cancel" type="button">Cancel</button>
+            </div>
+          </div>
+
+          <div class="ds-dgraph__main">
+            <div class="ds-dgraph__left">
+              <div class="ds-dgraph__visual ds-sim__panel">
+                <svg id="ds-dgraph-svg" class="ds-dgraph__svg" viewBox="0 0 1000 540" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Interactive directed graph"></svg>
+              </div>
+
+              <p id="ds-dgraph-status" class="ds-dgraph__status ds-sim__status" role="status">Directed acyclic graph example loaded.</p>
+
+              <div class="ds-dgraph__stats">
+                <div class="ds-dgraph__stat"><strong>Vertices</strong><span id="ds-dgraph-v">0</span></div>
+                <div class="ds-dgraph__stat"><strong>Edges</strong><span id="ds-dgraph-e">0</span></div>
+                <div class="ds-dgraph__stat"><strong>Sources</strong><span id="ds-dgraph-sources">0</span></div>
+                <div class="ds-dgraph__stat"><strong>Sinks</strong><span id="ds-dgraph-sinks">0</span></div>
+              </div>
+
+              <div class="ds-dgraph__results">
+                <div class="ds-dgraph__result ds-sim__panel">
+                  <p class="ds-sim__caption">Traversal / topological order</p>
+                  <div id="ds-dgraph-order" class="ds-dgraph__output">—</div>
+                  <div class="ds-dgraph__frontier-row">
+                    <p class="ds-sim__caption">Frontier</p>
+                    <div id="ds-dgraph-frontier" class="ds-dgraph__frontier"></div>
+                  </div>
+                </div>
+                <div class="ds-dgraph__result ds-sim__panel">
+                  <p class="ds-sim__caption">Current step</p>
+                  <div id="ds-dgraph-step" class="ds-dgraph__step">—</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="ds-dgraph__right">
+              <div class="ds-dgraph__repr ds-sim__panel"><p class="ds-sim__caption">Adjacency list</p><div id="ds-dgraph-list" class="ds-dgraph__scroll"></div></div>
+              <div class="ds-dgraph__repr ds-sim__panel"><p class="ds-sim__caption">Adjacency matrix</p><div id="ds-dgraph-matrix" class="ds-dgraph__scroll"></div></div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="ds-dgraph__group">
-        <div class="ds-dgraph__field"><label for="ds-dgraph-start">Traversal start</label><select id="ds-dgraph-start"></select></div>
-        <button class="ds-dgraph__btn" id="ds-dgraph-bfs" type="button">BFS</button>
-        <button class="ds-dgraph__btn" id="ds-dgraph-dfs" type="button">DFS</button>
-        <button class="ds-dgraph__btn" id="ds-dgraph-topo" type="button">Topological Sort</button>
-        <button class="ds-dgraph__btn" id="ds-dgraph-cycle" type="button">Detect Cycle</button>
-        <button class="ds-dgraph__btn" id="ds-dgraph-example" type="button">Load DAG</button>
-        <button class="ds-dgraph__btn" id="ds-dgraph-cycle-example" type="button">Load Cycle</button>
-        <button class="ds-dgraph__btn ds-dgraph__btn--danger" id="ds-dgraph-clear" type="button">Clear</button>
-        <button class="ds-dgraph__btn ds-dgraph__btn--secondary" id="ds-dgraph-cancel" type="button">Cancel</button>
-      </div>
-
-      <div class="ds-dgraph__speed">
-        <label for="ds-dgraph-speed">Animation speed</label>
-        <input id="ds-dgraph-speed" type="range" min="100" max="1000" step="100" value="350">
-        <output id="ds-dgraph-speed-output">350 ms</output>
+      <div class="ds-deck__bar">
+        <span class="ds-deck__section">Sercan KÜLCÜ, Tüm hakları saklıdır.</span>
+        <button class="ds-deck__button" type="button" id="ds-sim-full" aria-label="Full screen">⛶</button>
       </div>
     </div>
-
-    <div class="ds-dgraph__visual">
-      <div class="ds-dgraph__canvas"><svg id="ds-dgraph-svg" class="ds-dgraph__svg" viewBox="0 0 1000 540" role="img" aria-label="Interactive directed graph"></svg></div>
-      <p id="ds-dgraph-status" class="ds-dgraph__status" role="status">Directed acyclic graph example loaded.</p>
-
-      <div class="ds-dgraph__stats">
-        <div class="ds-dgraph__stat"><strong>Vertices</strong><span id="ds-dgraph-v">0</span></div>
-        <div class="ds-dgraph__stat"><strong>Edges</strong><span id="ds-dgraph-e">0</span></div>
-        <div class="ds-dgraph__stat"><strong>Sources</strong><span id="ds-dgraph-sources">0</span></div>
-        <div class="ds-dgraph__stat"><strong>Sinks</strong><span id="ds-dgraph-sinks">0</span></div>
-      </div>
-    </div>
-
-    <div class="ds-dgraph__results">
-      <div class="ds-dgraph__result">
-        <h3>Traversal / topological order</h3>
-        <div id="ds-dgraph-order" class="ds-dgraph__output">—</div>
-        <h3 style="margin-top:1rem">Frontier</h3>
-        <div id="ds-dgraph-frontier" class="ds-dgraph__frontier"></div>
-      </div>
-
-      <div class="ds-dgraph__result">
-        <h3>Current step</h3>
-        <div id="ds-dgraph-step" class="ds-dgraph__output">—</div>
-      </div>
-    </div>
-
-    <div class="ds-dgraph__representations">
-      <div class="ds-dgraph__repr"><h3>Adjacency list</h3><div id="ds-dgraph-list" class="ds-dgraph__scroll"></div></div>
-      <div class="ds-dgraph__repr"><h3>Adjacency matrix</h3><div id="ds-dgraph-matrix" class="ds-dgraph__scroll"></div></div>
-    </div>
-  </section>
-
-  <section class="ds-dgraph__section">
-    <h2>Directed graph concepts</h2>
-    <div class="ds-dgraph__cards">
-      <article class="ds-dgraph__card"><h3>Indegree and outdegree</h3><p>Indegree counts incoming edges; outdegree counts outgoing edges. A source has indegree 0, while a sink has outdegree 0.</p></article>
-      <article class="ds-dgraph__card"><h3>Direction matters</h3><p>A → B and B → A are different edges. Reachability therefore depends on edge orientation.</p></article>
-      <article class="ds-dgraph__card"><h3>Topological sort</h3><p>Kahn's algorithm repeatedly removes vertices with indegree 0. A complete ordering exists only for a directed acyclic graph.</p></article>
-      <article class="ds-dgraph__card"><h3>Cycle detection</h3><p>If Kahn's algorithm cannot process every vertex, at least one directed cycle prevents a topological ordering.</p></article>
-    </div>
-  </section>
+  </div>
 </div>
 
+<script src="deck/sim.js"></script>
 <script>
 (function(){
   "use strict";
   var root=document.querySelector(".ds-dgraph");if(!root)return;
   function q(id){return root.querySelector("#"+id);}
+  /* sabit animasyon gecikmesi (ms) */
+  var DELAY=350;
   var ns="http://www.w3.org/2000/svg";
+  /* 800x600 sahneye sığması için en fazla köşe sayısı */
+  var MAX_VERTICES=8;
 
   var el={label:q("ds-dgraph-label"),from:q("ds-dgraph-from"),to:q("ds-dgraph-to"),start:q("ds-dgraph-start"),
-    speed:q("ds-dgraph-speed"),speedOut:q("ds-dgraph-speed-output"),svg:q("ds-dgraph-svg"),status:q("ds-dgraph-status"),
+    svg:q("ds-dgraph-svg"),status:q("ds-dgraph-status"),
     v:q("ds-dgraph-v"),e:q("ds-dgraph-e"),sources:q("ds-dgraph-sources"),sinks:q("ds-dgraph-sinks"),
     order:q("ds-dgraph-order"),frontier:q("ds-dgraph-frontier"),step:q("ds-dgraph-step"),list:q("ds-dgraph-list"),matrix:q("ds-dgraph-matrix")};
   var btn={add:q("ds-dgraph-add"),edge:q("ds-dgraph-edge"),remove:q("ds-dgraph-remove"),bfs:q("ds-dgraph-bfs"),
@@ -181,11 +441,28 @@ excerpt: "Interactive directed graph simulator with indegree, outdegree, BFS, DF
   function indegree(id){var n=0;edges.forEach(function(k){if(Number(k.split("->")[1])===id)n++;});return n;}
   function outdegree(id){var n=0;edges.forEach(function(k){if(Number(k.split("->")[0])===id)n++;});return n;}
   function setStatus(t,type){el.status.textContent=t;el.status.classList.remove("is-success","is-error");if(type)el.status.classList.add(type);}
-  function delay(){return Number(el.speed.value);}
+  function delay(){return DELAY;}
   function wait(ms,t){return new Promise(function(r){setTimeout(function(){r(t===token);},ms);});}
   function clearStates(){states={};activeEdge="";}
   function disable(s){Object.keys(btn).forEach(function(k){btn[k].disabled=s&&k!=="cancel";});btn.cancel.disabled=!s;[el.from,el.to,el.start].forEach(function(x){x.disabled=s;});}
   function uniqueLabel(raw){var base=raw.trim()||("V"+nextId),x=base,n=2;while(vertices.some(function(v){return v.label===x;})){x=base+n;n++;}return x;}
+  /* viewBox köşelerin kapsayan kutusuna oturur (sürükleme sırasında sabit kalır) */
+  function fitView(){
+    if(dragId!==null)return;
+    if(!vertices.length){el.svg.setAttribute("viewBox","0 0 1000 540");return;}
+    var minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+    vertices.forEach(function(v){minX=Math.min(minX,v.x);maxX=Math.max(maxX,v.x);minY=Math.min(minY,v.y);maxY=Math.max(maxY,v.y);});
+    var x0=minX-85,w=maxX-minX+170,y0=minY-45,h=maxY-minY+125;
+    if(w<560){x0-=(560-w)/2;w=560;}
+    if(h<300){y0-=(300-h)/2;h=300;}
+    el.svg.setAttribute("viewBox",x0+" "+y0+" "+w+" "+h);
+  }
+
+  /* sürüklenen köşe hem 1000x540 alanda hem de görünen viewBox içinde kalır */
+  function clampX(x){var b=el.svg.viewBox.baseVal;return Math.max(Math.max(35,b.x+35),Math.min(Math.min(965,b.x+b.width-35),x));}
+  function clampY(y){var b=el.svg.viewBox.baseVal;return Math.max(Math.max(35,b.y+35),Math.min(Math.min(505,b.y+b.height-35),y));}
+  /* ölçeklenmiş sahnede fare konumunu SVG viewBox koordinatlarına çevirir */
+  function svgPoint(ev){var pt=el.svg.createSVGPoint();pt.x=ev.clientX;pt.y=ev.clientY;return pt.matrixTransform(el.svg.getScreenCTM().inverse());}
 
   function updateSelects(){
     var old=[el.from.value,el.to.value,el.start.value];
@@ -215,6 +492,8 @@ excerpt: "Interactive directed graph simulator with indegree, outdegree, BFS, DF
     el.matrix.innerHTML="";
     if(!vertices.length)return;
     var table=document.createElement("table"),thead=document.createElement("thead"),trh=document.createElement("tr"),blank=document.createElement("th");
+    /* sabit hücre genişliği: matris panelden taşmaz */
+    table.style.width=((vertices.length+1)*20)+"px";
     blank.textContent="";trh.appendChild(blank);
     vertices.forEach(function(v){var th=document.createElement("th");th.textContent=v.label;trh.appendChild(th);});
     thead.appendChild(trh);table.appendChild(thead);
@@ -229,16 +508,17 @@ excerpt: "Interactive directed graph simulator with indegree, outdegree, BFS, DF
 
   function render(){
     while(el.svg.lastChild)el.svg.removeChild(el.svg.lastChild);
+    fitView();
     var defs=document.createElementNS(ns,"defs"),marker=document.createElementNS(ns,"marker"),path=document.createElementNS(ns,"path");
     marker.setAttribute("id","ds-dgraph-arrow");marker.setAttribute("markerWidth","8");marker.setAttribute("markerHeight","8");marker.setAttribute("refX","7");marker.setAttribute("refY","4");marker.setAttribute("orient","auto");
-    path.setAttribute("d","M0,0 L8,4 L0,8 Z");path.setAttribute("fill","#94a3b8");marker.appendChild(path);defs.appendChild(marker);el.svg.appendChild(defs);
+    path.setAttribute("d","M0,0 L8,4 L0,8 Z");path.setAttribute("class","ds-dgraph__arrow");marker.appendChild(path);defs.appendChild(marker);el.svg.appendChild(defs);
 
     edges.forEach(function(k){
       var p=k.split("->").map(Number),a=getVertex(p[0]),b=getVertex(p[1]);if(!a||!b)return;
       var dx=b.x-a.x,dy=b.y-a.y,len=Math.sqrt(dx*dx+dy*dy)||1,ux=dx/len,uy=dy/len;
       var line=document.createElementNS(ns,"line");
-      line.setAttribute("x1",String(a.x+ux*30));line.setAttribute("y1",String(a.y+uy*30));
-      line.setAttribute("x2",String(b.x-ux*34));line.setAttribute("y2",String(b.y-uy*34));
+      line.setAttribute("x1",String(a.x+ux*34));line.setAttribute("y1",String(a.y+uy*34));
+      line.setAttribute("x2",String(b.x-ux*40));line.setAttribute("y2",String(b.y-uy*40));
       line.setAttribute("class","ds-dgraph__edge"+(activeEdge===k?" is-active":""));
       el.svg.appendChild(line);
     });
@@ -248,12 +528,12 @@ excerpt: "Interactive directed graph simulator with indegree, outdegree, BFS, DF
       if(states[v.id])cls+=" "+states[v.id];
       if(dragId===v.id)cls+=" is-dragging";
       g.setAttribute("class",cls);g.setAttribute("transform","translate("+v.x+" "+v.y+")");
-      var c=document.createElementNS(ns,"circle");c.setAttribute("r","28");
-      var t=document.createElementNS(ns,"text");t.setAttribute("class","label");t.setAttribute("y","-2");t.textContent=v.label;
-      var m=document.createElementNS(ns,"text");m.setAttribute("class","meta");m.setAttribute("y","44");m.textContent="in "+indegree(v.id)+" · out "+outdegree(v.id);
+      var c=document.createElementNS(ns,"circle");c.setAttribute("r","32");
+      var t=document.createElementNS(ns,"text");t.setAttribute("class","label");t.setAttribute("y","1");t.textContent=v.label;
+      var m=document.createElementNS(ns,"text");m.setAttribute("class","meta");m.setAttribute("y","56");m.textContent="in "+indegree(v.id)+" · out "+outdegree(v.id);
       g.appendChild(c);g.appendChild(t);g.appendChild(m);el.svg.appendChild(g);
       g.addEventListener("pointerdown",function(ev){dragId=v.id;g.setPointerCapture(ev.pointerId);render();});
-      g.addEventListener("pointermove",function(ev){if(dragId!==v.id)return;var r=el.svg.getBoundingClientRect();v.x=Math.max(35,Math.min(965,(ev.clientX-r.left)*1000/r.width));v.y=Math.max(35,Math.min(505,(ev.clientY-r.top)*540/r.height));render();});
+      g.addEventListener("pointermove",function(ev){if(dragId!==v.id)return;var p=svgPoint(ev);v.x=clampX(p.x);v.y=clampY(p.y);render();});
       g.addEventListener("pointerup",function(){dragId=null;render();});g.addEventListener("pointercancel",function(){dragId=null;render();});
     });
 
@@ -321,6 +601,7 @@ excerpt: "Interactive directed graph simulator with indegree, outdegree, BFS, DF
   }
 
   btn.add.addEventListener("click",function(){
+    if(vertices.length>=MAX_VERTICES){setStatus("Vertex limit reached ("+MAX_VERTICES+" vertices).","is-error");return;}
     var a=(vertices.length%10)/10*Math.PI*2;vertices.push({id:nextId++,label:uniqueLabel(el.label.value),x:500+Math.cos(a)*220,y:270+Math.sin(a)*180});
     updateSelects();render();setStatus("Vertex added.","is-success");
   });
@@ -359,7 +640,6 @@ excerpt: "Interactive directed graph simulator with indegree, outdegree, BFS, DF
   btn.cycleExample.addEventListener("click",loadCycle);
   btn.clear.addEventListener("click",function(){token++;vertices=[];edges=new Set();nextId=0;clearStates();updateSelects();el.order.textContent="—";el.step.textContent="—";renderFrontier([]);render();setStatus("Graph cleared.");});
   btn.cancel.addEventListener("click",function(){token++;clearStates();disable(false);renderFrontier([]);render();setStatus("Animation cancelled.");});
-  el.speed.addEventListener("input",function(){el.speedOut.textContent=el.speed.value+" ms";});
 
   loadDag();btn.cancel.disabled=true;
 })();
