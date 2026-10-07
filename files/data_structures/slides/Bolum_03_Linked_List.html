@@ -157,6 +157,18 @@ excerpt: "Compact interactive singly linked list simulator."
   line-height: 1;
 }
 
+.ll-arrow.is-back { color: var(--ds-good); }
+.ll-arrow.is-broken { color: var(--ds-muted); letter-spacing: -1px; }
+
+.ll-tag {
+  color: var(--ds-text);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.ll-tag b { color: #c77a12; }
+
 .ll-node.checking {
   border-color: #e9a23b;
   background: var(--ds-hot);
@@ -321,8 +333,9 @@ excerpt: "Compact interactive singly linked list simulator."
   function render(states={}){
     e.list.innerHTML=""; e.length.textContent=data.length;
     if(!data.length){ const x=document.createElement("div"); x.className="ll-empty"; x.textContent="Linked list is empty."; e.list.appendChild(x); return; }
-    const head=document.createElement("div"); head.className="ll-endpoint"; head.textContent="HEAD"; e.list.appendChild(head);
-    const firstArrow=document.createElement("div"); firstArrow.className="ll-arrow"; firstArrow.textContent="→"; e.list.appendChild(firstArrow);
+    const rev=states.rev;
+    const endpoint=(txt,arrow)=>{ const h=document.createElement("div"); h.className="ll-endpoint"; h.textContent=txt; const a=document.createElement("div"); a.className="ll-arrow"; a.textContent=arrow; return [h,a]; };
+    if(!rev||rev.headAt!=="right"){ const [h,a]=endpoint("HEAD","→"); e.list.append(h,a); }
     data.forEach((value,i)=>{
       const wrap=document.createElement("div"); wrap.className="ll-node-wrap";
       const node=document.createElement("div"); node.className="ll-node"; node.dataset.index=i;
@@ -332,17 +345,21 @@ excerpt: "Compact interactive singly linked list simulator."
       if(states.sorted?.includes(i)) node.classList.add("sorted");
       if(states.moving?.includes(i)) node.classList.add("moving");
       const d=document.createElement("div"); d.className="ll-data"; d.textContent=value;
-      const n=document.createElement("div"); n.className="ll-next"; n.textContent=i===data.length-1?"NULL":"next";
+      const n=document.createElement("div"); n.className="ll-next"; n.textContent=rev?rev.nextTxt[i]:(i===data.length-1?"NULL":"next");
       node.append(d,n);
       node.addEventListener("click",()=>{ if(running)return; e.index.value=i; e.value.value=data[i]; render({selected:[i]}); status(`Node ${i} selected.`); });
       const idx=document.createElement("div"); idx.className="ll-index"; idx.textContent=`index ${i}`;
-      wrap.append(node,idx); e.list.appendChild(wrap);
-      if(i<data.length-1){ const a=document.createElement("div"); a.className="ll-arrow"; a.textContent="→"; e.list.appendChild(a); }
+      wrap.append(node,idx);
+      if(rev){ const tag=document.createElement("div"); tag.className="ll-tag"; tag.innerHTML=rev.tags[i]?`<b>${rev.tags[i]}</b>`:"&nbsp;"; wrap.append(tag); }
+      e.list.appendChild(wrap);
+      if(i<data.length-1){ const a=document.createElement("div"); a.className="ll-arrow"; const g=rev?rev.gaps[i]:"next";
+        a.textContent=g==="back"?"←":g==="broken"?"⋯":"→"; if(g==="back")a.classList.add("is-back"); if(g==="broken")a.classList.add("is-broken"); e.list.appendChild(a); }
     });
+    if(rev&&rev.headAt==="right"){ const [h,a]=endpoint("HEAD","←"); e.list.append(a,h); }
   }
 
-  async function pause(t){ await wait(280); if(t!==token) throw new Error("cancelled"); }
-  async function animate(t,states,text){ if(text)status(text); render(states); await pause(t); }
+  async function pause(t,ms=280){ await wait(ms); if(t!==token) throw new Error("cancelled"); }
+  async function animate(t,states,text,ms){ if(text)status(text); render(states); await pause(t,ms); }
   function begin(name){ token++; resetStats(name); setRunning(true); return token; }
   function finish(t,msg,type=""){ if(t!==token)return; setRunning(false); e.op.textContent="Idle"; status(msg,type); render(); }
   function fail(t,err){ if(err?.message==="cancelled"||t!==token)return; setRunning(false); e.op.textContent="Idle"; status("Operation stopped.","error"); render(); }
@@ -358,7 +375,29 @@ excerpt: "Compact interactive singly linked list simulator."
   async function removeIndex(){ if(!ensure())return; const idx=integer(e.index); if(idx===null||idx<0||idx>=data.length){status("Index is out of range.","error");return;} const old=data[idx],t=begin("Remove at Index"); try{ for(let i=0;i<=idx;i++){visits++;updateStats();await animate(t,{checking:[i]},`Visiting node ${i}`);} await animate(t,{found:[idx]},`Removing node ${idx}`);data.splice(idx,1);changes++;updateStats();finish(t,`Removed ${old} from index ${idx}.`,"success"); }catch(err){fail(t,err);} }
   async function linearSearch(){ if(!ensure())return; const target=integer(e.searchValue); if(target===null){status("Enter an integer to search.","error");return;} const t=begin("Linear Search"); try{ for(let i=0;i<data.length;i++){visits++;updateStats();await animate(t,{checking:[i]},`Comparing ${data[i]} with ${target}`); if(data[i]===target){await animate(t,{found:[i]},`Found ${target} at index ${i}`);finish(t,`Found ${target} at index ${i}.`,"success");return;}} finish(t,`${target} not found.`,"error"); }catch(err){fail(t,err);} }
   async function traverse(){ if(!ensure())return; const t=begin("Traverse"); try{ for(let i=0;i<data.length;i++){visits++;updateStats();await animate(t,{checking:[i]},`Visiting node ${i}: ${data[i]}`);} finish(t,"Traversal complete.","success"); }catch(err){fail(t,err);} }
-  async function reverse(){ if(!ensure())return; const t=begin("Reverse"); try{ for(let i=0;i<data.length;i++){visits++;updateStats();await animate(t,{checking:[i]},`Reversing link at node ${i}`);} data.reverse();changes=data.length;updateStats();await animate(t,{found:data.map((_,i)=>i)},"Links reversed");finish(t,"Linked list reversed.","success"); }catch(err){fail(t,err);} }
+  async function reverse(){ if(!ensure())return; const t=begin("Reverse"); const n=data.length, STEP=650;
+    /* düğümler yerinde kalır; yalnızca bağlar (next) döner: prev ← curr, curr ilerler */
+    const gaps=Array(Math.max(0,n-1)).fill("next"), nextTxt=data.map((_,i)=>i===n-1?"NULL":"next");
+    const name=i=>i<0||i>=n?"null":data[i];
+    const view=(prev,curr,next,headAt="left")=>{ const tags={}; const add=(i,l)=>{ if(i>=0&&i<n) tags[i]=tags[i]?tags[i]+", "+l:l; }; add(prev,"prev"); add(curr,"curr"); add(next,"next"); return {gaps:gaps.slice(),nextTxt:nextTxt.slice(),tags,headAt}; };
+    try{
+      let prev=-1, curr=0;
+      await animate(t,{rev:view(prev,curr,-2)},"prev = null, curr = head",STEP);
+      while(curr<n){
+        const next=curr+1<n?curr+1:-1;
+        visits++; updateStats();
+        await animate(t,{checking:[curr],rev:view(prev,curr,next)},`next = curr.next → ${name(next)}`,STEP);
+        nextTxt[curr]=prev<0?"NULL":"←"; if(curr>0) gaps[curr-1]="back"; if(curr<n-1) gaps[curr]="broken";
+        changes++; updateStats();
+        await animate(t,{found:[curr],rev:view(prev,curr,next)},`curr.next = prev → ${data[curr]} now points to ${name(prev)}`,STEP);
+        prev=curr; curr=next<0?n:next;
+        await animate(t,{rev:view(prev,curr<n?curr:-1,-2)},`prev = curr (${name(prev)}), curr = next (${curr<n?data[curr]:"null"})`,STEP);
+      }
+      await animate(t,{found:[n-1],rev:view(prev,-1,-2,"right")},`curr is null → head = prev (${data[n-1]})`,STEP);
+      data.reverse(); updateStats();
+      await animate(t,{found:data.map((_,i)=>i)},`Redrawn from the new head: ${data.join(" → ")}`,STEP);
+      finish(t,`Linked list reversed with ${changes} link changes, O(n).`,"success");
+    }catch(err){fail(t,err);} }
   async function sort(){ if(!ensure())return; const t=begin("Bubble Sort"); try{ const sorted=[]; for(let end=data.length-1;end>0;end--){let changed=false;for(let i=0;i<end;i++){visits++;updateStats();await animate(t,{checking:[i,i+1],sorted},`Comparing ${data[i]} and ${data[i+1]}`); if(data[i]>data[i+1]){[data[i],data[i+1]]=[data[i+1],data[i]];changes++;changed=true;updateStats();render({found:[i,i+1],sorted});status(`Swapped node values ${i} and ${i+1}`);await pause(t);}}sorted.push(end);if(!changed)break;} await animate(t,{sorted:data.map((_,i)=>i)},"Values sorted");finish(t,"Linked list values sorted.","success"); }catch(err){fail(t,err);} }
   function clear(){ token++;data=[];resetStats();setRunning(false);render();status("Linked list cleared."); }
   function cancel(){ if(!running)return;token++;setRunning(false);e.op.textContent="Idle";render();status("Animation cancelled."); }
