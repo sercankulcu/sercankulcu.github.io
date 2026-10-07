@@ -722,7 +722,7 @@ excerpt: "Compact interactive Binary Search Tree simulator."
       let parent = null;
 
       while (current && current.value !== value) {
-        await showPathStep(t, current, `Searching for ${value}...`, parent);
+        await showPathStep(t, current, `Compare ${value} with ${current.value}.`, parent);
         parent = current;
         current = value < current.value ? current.left : current.right;
       }
@@ -734,36 +734,62 @@ excerpt: "Compact interactive Binary Search Tree simulator."
         return;
       }
 
-      await showPathStep(t, current, `Found ${value}. Preparing deletion...`, parent);
+      await showPathStep(t, current, `Found ${value}.`, parent);
       marks.checking.clear();
       marks.removing.add(current.id);
       render();
-      await pause(t);
 
-      if (!current.left) {
-        replaceNode(current, current.right);
-      } else if (!current.right) {
-        replaceNode(current, current.left);
+      const target = current;
+      let message;
+
+      if (!target.left && !target.right) {
+        setStatus(`Case 1: ${value} is a leaf, so it is simply removed.`);
+        await pause(t);
+        replaceNode(target, null);
+        message = `Deleted leaf ${value}.`;
+      } else if (!target.left || !target.right) {
+        const child = target.left || target.right;
+        marks.found.add(child.id);
+        marks.activeEdges.add(edgeKey(target, child));
+        render();
+        setStatus(`Case 2: ${value} has one child (${child.value}); the child takes its place.`);
+        await pause(t);
+        replaceNode(target, child);
+        message = `Deleted ${value}; ${child.value} moved up to its place.`;
       } else {
-        let successorParent = current;
-        let successor = current.right;
+        setStatus(`Case 3: two children. Find inorder successor (min of right subtree).`);
+        await pause(t);
+
+        let successorParent = target;
+        let successor = target.right;
+        marks.checking.add(successor.id);
+        marks.activeEdges.add(edgeKey(target, successor));
+        pathLength++;
+        render();
+        setStatus(`Go right once to ${successor.value}, then go left as far as possible.`);
+        await pause(t);
 
         while (successor.left) {
           successorParent = successor;
           successor = successor.left;
 
-          marks.removing.clear();
           marks.checking.clear();
           marks.checking.add(successor.id);
           marks.activeEdges.add(edgeKey(successorParent, successor));
           pathLength++;
           render();
-          setStatus(`Finding inorder successor: ${successor.value}.`);
+          setStatus(`Go left to ${successor.value}.`);
           await pause(t);
         }
 
+        marks.checking.clear();
+        marks.found.add(successor.id);
+        render();
+        setStatus(`Successor = ${successor.value}. Copy it into ${value}'s node, then unlink its old node.`);
+        await pause(t);
+
         const successorValue = successor.value;
-        current.value = successorValue;
+        target.value = successorValue;
 
         if (successor.parent.left === successor) {
           successor.parent.left = successor.right;
@@ -774,11 +800,16 @@ excerpt: "Compact interactive Binary Search Tree simulator."
         if (successor.right) {
           successor.right.parent = successor.parent;
         }
+
+        clearMarks();
+        marks.found.add(target.id);
+        render();
+        message = `Deleted ${value}; replaced by inorder successor ${successorValue}.`;
       }
 
       clearMarks();
       lastResult = value;
-      finish(t, `Deleted ${value}.`, "success");
+      finish(t, message, "success");
     } catch (error) {
       fail(t, error);
     }
@@ -866,7 +897,7 @@ excerpt: "Compact interactive Binary Search Tree simulator."
     return out;
   }
 
-  async function animateTraversal(order, name) {
+  async function animateTraversal(kind, name) {
     if (!root) {
       setStatus("Tree is empty.", "error");
       return;
@@ -877,18 +908,82 @@ excerpt: "Compact interactive Binary Search Tree simulator."
     try {
       const result = [];
 
-      for (const node of order) {
-        if (node.parent) {
-          marks.activeEdges.add(edgeKey(node.parent, node));
-        }
+      /* cursor = node whose call is active; orange edges = current recursion path */
+      async function step(node, message) {
+        marks.checking.clear();
+        marks.checking.add(node.id);
+        render();
+        setStatus(`${name}: ${message}`);
+        await pause(t);
+      }
 
+      async function visit(node, why) {
+        marks.checking.clear();
+        marks.checking.add(node.id);
         marks.visited.add(node.id);
         pathLength++;
         result.push(node.value);
         lastResult = result.join(" → ");
         render();
-        setStatus(`${name}: visiting ${node.value}...`);
+        setStatus(`${name}: visit ${node.value}${why}.`);
         await pause(t);
+      }
+
+      async function walk(node) {
+        if (node.parent) marks.activeEdges.add(edgeKey(node.parent, node));
+        const leaf = !node.left && !node.right;
+
+        if (kind === "pre") {
+          await visit(node, " (node before its subtrees)");
+        } else if (kind === "in" && !node.left) {
+          await visit(node, " (left subtree empty)");
+        } else if (kind === "post" && leaf) {
+          await visit(node, " (leaf, no subtrees)");
+        } else {
+          await step(node, `at ${node.value}, go to ${node.left ? "left" : "right"} subtree first.`);
+        }
+
+        if (node.left) {
+          await walk(node.left);
+          if (kind === "in") await visit(node, " (left subtree done)");
+        }
+
+        if (node.right) {
+          if (kind === "post" && node.left) await step(node, `back at ${node.value}, now right subtree.`);
+          await walk(node.right);
+        }
+
+        if (kind === "post" && !leaf) await visit(node, " (both subtrees done)");
+        if (node.parent) marks.activeEdges.delete(edgeKey(node.parent, node));
+      }
+
+      if (kind === "level") {
+        const queue = [root];
+        const names = q => q.length ? q.map(n => n.value).join(" ") : "empty";
+
+        while (queue.length) {
+          const node = queue.shift();
+          const added = [node.left, node.right].filter(Boolean);
+          added.forEach(child => {
+            queue.push(child);
+            marks.activeEdges.add(edgeKey(node, child));
+          });
+          marks.checking.clear();
+          marks.checking.add(node.id);
+          marks.visited.add(node.id);
+          pathLength++;
+          result.push(node.value);
+          lastResult = result.join(" → ");
+          render();
+          setStatus(
+            `${name}: dequeue ${node.value}` +
+            (added.length ? `, enqueue ${added.map(n => n.value).join(", ")}` : "") +
+            `. Queue: ${names(queue)}`
+          );
+          await pause(t);
+        }
+      } else {
+        await walk(root);
       }
 
       clearMarks();
@@ -997,10 +1092,10 @@ excerpt: "Compact interactive Binary Search Tree simulator."
   el.del.addEventListener("click", deleteValue);
   el.min.addEventListener("click", () => findExtreme("min"));
   el.max.addEventListener("click", () => findExtreme("max"));
-  el.inorder.addEventListener("click", () => animateTraversal(inorder(root), "Inorder"));
-  el.preorder.addEventListener("click", () => animateTraversal(preorder(root), "Preorder"));
-  el.postorder.addEventListener("click", () => animateTraversal(postorder(root), "Postorder"));
-  el.levelorder.addEventListener("click", () => animateTraversal(levelOrder(), "Level Order"));
+  el.inorder.addEventListener("click", () => animateTraversal("in", "Inorder"));
+  el.preorder.addEventListener("click", () => animateTraversal("pre", "Preorder"));
+  el.postorder.addEventListener("click", () => animateTraversal("post", "Postorder"));
+  el.levelorder.addEventListener("click", () => animateTraversal("level", "Level Order"));
   el.load.addEventListener("click", loadExample);
   el.random.addEventListener("click", randomTree);
   el.reset.addEventListener("click", resetTree);

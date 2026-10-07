@@ -627,6 +627,19 @@ excerpt: "Interactive hash table simulator using separate chaining, automatic re
     });
   }
 
+  function needsResize(){
+    return el.resize.value==="on" && count/buckets.length>0.75;
+  }
+
+  /* doubles the capacity once (one insertion can cross the threshold only once) */
+  function resizeIfNeeded(){
+    if(!needsResize()) return false;
+    var old=buckets.length;
+    rehash(old*2);
+    addLog("Resized table from "+old+" to "+(old*2)+" buckets.");
+    return true;
+  }
+
   btn.insert.addEventListener("click",async function(){
     try{
       var key=readKey();
@@ -648,14 +661,21 @@ excerpt: "Interactive hash table simulator using separate chaining, automatic re
       var result=await scanChain(index,key,t);
       if(result.cancelled) return;
 
+      var message;
       if(result.index>=0){
+        var oldValue=buckets[index][result.index].value;
         buckets[index][result.index].value=value;
+        markedBucket=index;
+        markedEntry=result.index;
+        markKind="is-found";
+        render();
         setSteps([
           'Hash "'+key+'" to bucket '+index+".",
           "Compare keys in the chain.",
-          "Existing key found; update its value."
+          "Existing key found; replace its value (size stays "+count+")."
         ]);
         addLog('Updated "'+key+'" in bucket '+index+".");
+        message='Updated key "'+key+'": '+oldValue+" → "+value+".";
       }else{
         var collision=buckets[index].length>0;
         buckets[index].push({key:key,value:value});
@@ -667,30 +687,35 @@ excerpt: "Interactive hash table simulator using separate chaining, automatic re
 
         setSteps([
           'Hash "'+key+'" to bucket '+index+".",
-          collision ? "Collision detected; append to the existing chain." : "Bucket is empty.",
+          collision ? "Collision; key not in the chain, so append to it." : "Bucket is empty.",
           "Store the new key-value entry."
         ]);
 
         addLog('Inserted "'+key+'" into bucket '+index+".");
+        message='Inserted key "'+key+'" into bucket '+index+".";
       }
 
-      if(el.resize.value==="on" && count/buckets.length>0.75){
+      /* let the student see where the entry landed before any resize moves it;
+         if the animation is cancelled here, the Cancel handler finishes the resize */
+      if(needsResize()){
+        setStatus(message+" Load factor "+(count/buckets.length).toFixed(2)+" > 0.75.");
+        if(!(await wait(delay()*2,t))) return;
         var old=buckets.length;
-        rehash(old*2);
-        clearMarks();
-        render();
+        resizeIfNeeded();
         setSteps([
-          "Load factor exceeded 0.75.",
-          "Double capacity from "+old+" to "+(old*2)+".",
-          "Rehash every existing entry."
+          "Load factor "+(count/old).toFixed(2)+" exceeded 0.75.",
+          "Double capacity from "+old+" to "+buckets.length+".",
+          "Rehash every entry with mod "+buckets.length+"."
         ]);
-        addLog("Resized table from "+old+" to "+(old*2)+" buckets.");
+        el.formula.textContent="Rehash: every key → rolling hash mod "+buckets.length+" (was mod "+old+")";
+        el.formula.title=el.formula.textContent;
+        message+=" Table resized from "+old+" to "+buckets.length+" buckets.";
       }
 
       clearMarks();
-      render();
       disable(false);
-      setStatus('Stored key "'+key+'".',"is-success");
+      render();
+      setStatus(message,"is-success");
     }catch(error){
       disable(false);
       setStatus(error.message,"is-error");
@@ -731,8 +756,8 @@ excerpt: "Interactive hash table simulator using separate chaining, automatic re
       }
 
       clearMarks();
-      render();
       disable(false);
+      render();
     }catch(error){
       disable(false);
       setStatus(error.message,"is-error");
@@ -774,8 +799,8 @@ excerpt: "Interactive hash table simulator using separate chaining, automatic re
       }
 
       clearMarks();
-      render();
       disable(false);
+      render();
     }catch(error){
       disable(false);
       setStatus(error.message,"is-error");
@@ -798,6 +823,7 @@ excerpt: "Interactive hash table simulator using separate chaining, automatic re
       var index=hash(pair[0]);
       buckets[index].push({key:pair[0],value:pair[1]});
       count++;
+      resizeIfNeeded();
     });
 
     setSteps(["Loaded five example entries."]);
@@ -829,8 +855,9 @@ excerpt: "Interactive hash table simulator using separate chaining, automatic re
     token++;
     clearMarks();
     disable(false);
+    var resized=resizeIfNeeded();
     render();
-    setStatus("Animation cancelled.");
+    setStatus(resized?"Animation cancelled; the pending resize to "+buckets.length+" buckets was completed.":"Animation cancelled.");
   });
 
   el.capacity.addEventListener("change",function(){
@@ -844,7 +871,7 @@ excerpt: "Interactive hash table simulator using separate chaining, automatic re
 
 
   init(8);
-  btn.example.click();
   btn.cancel.disabled=true;
+  btn.example.click();
 })();
 </script>

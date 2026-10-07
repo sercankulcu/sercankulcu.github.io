@@ -312,10 +312,12 @@ excerpt: "Compact interactive queue simulator."
   let running = false;
   let checks = 0;
   let changes = 0;
+  let cancelHook = null;
 
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
   function integer(input) {
+    if (String(input.value).trim() === "") return null;
     const value = Number(input.value);
     return Number.isInteger(value) ? value : null;
   }
@@ -409,6 +411,7 @@ excerpt: "Compact interactive queue simulator."
 
   function finish(localToken, message, type = "") {
     if (localToken !== token) return;
+    cancelHook = null;
     setRunning(false);
     el.operation.textContent = "Idle";
     setStatus(message, type);
@@ -417,6 +420,7 @@ excerpt: "Compact interactive queue simulator."
 
   function fail(localToken, error) {
     if (error?.message === "cancelled" || localToken !== token) return;
+    cancelHook = null;
     setRunning(false);
     el.operation.textContent = "Idle";
     setStatus("Operation stopped.", "error");
@@ -554,6 +558,8 @@ excerpt: "Compact interactive queue simulator."
   async function fillExample() {
     const example = [12, 27, 35, 48, 63, 79];
     const t = begin("Fill Example");
+    const previous = queue.slice();
+    cancelHook = () => { queue = previous; changes = 0; };
 
     try {
       queue = [];
@@ -604,6 +610,8 @@ excerpt: "Compact interactive queue simulator."
   function cancel() {
     if (!running) return;
     token++;
+    if (cancelHook) cancelHook();
+    cancelHook = null;
     setRunning(false);
     el.operation.textContent = "Idle";
     render();

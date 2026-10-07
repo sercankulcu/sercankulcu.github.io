@@ -411,7 +411,7 @@ excerpt: "Interactive Disjoint Set Union simulator with path compression, union 
     reset:q("ds-dsu-reset"),cancel:q("ds-dsu-cancel")
   };
 
-  var parent=new Map(),rank=new Map(),size=new Map(),token=0,marked={},activeEdges=new Set(),rewriteCount=0;
+  var parent=new Map(),rank=new Map(),size=new Map(),token=0,marked={},activeEdges=new Set(),rewriteCount=0,lastRewrites=[];
 
   function has(x){return parent.has(x);}
   function rootNoCompress(x){
@@ -469,6 +469,7 @@ excerpt: "Interactive Disjoint Set Union simulator with path compression, union 
     Object.keys(btn).forEach(function(k){btn[k].disabled=state&&k!=="cancel";});
     btn.cancel.disabled=!state;
     [el.first,el.second,el.findValue].forEach(function(x){x.disabled=state;});
+    if(!state)updateButtons();
   }
 
   function readValue(){
@@ -643,26 +644,32 @@ excerpt: "Interactive Disjoint Set Union simulator with path compression, union 
   }
 
   async function animateFind(x,compress){
-    token++;var t=token;disable(true);clearMarks();
+    token++;var t=token;disable(true);clearMarks();lastRewrites=[];
     var p=pathToRoot(x);
     el.path.textContent=p.join(" → ");
 
     for(var i=0;i<p.length;i++){
       marked[p[i]]="is-checking";
       if(i>0)activeEdges.add(p[i-1]+"->"+p[i]);
+      setStatus(i===0?"Find("+x+"): start at "+x+" and follow parent pointers.":"parent["+p[i-1]+"] = "+p[i]+(i===p.length-1?" (a root: parent["+p[i]+"] = "+p[i]+").":"."));
       render();
       if(!(await wait(delay(),t)))return null;
     }
 
     var r=p[p.length-1];
-    marked[r]="is-found";render();
+    marked[r]="is-found";setStatus("Find("+x+") = "+r+".");render();
     if(!(await wait(delay(),t)))return null;
 
+    /* path compression: the recursive find rewrites parents while unwinding,
+       so the node closest to the root changes first; the root's direct child is already done */
     if(compress){
-      for(var j=0;j<p.length-1;j++){
-        if(parent.get(p[j])!==r){
-          parent.set(p[j],r);rewriteCount++;
-        }
+      for(var j=p.length-3;j>=0;j--){
+        var old=parent.get(p[j]);
+        parent.set(p[j],r);rewriteCount++;lastRewrites.push(p[j]+": "+old+" → "+r);
+        clearMarks();marked[r]="is-found";marked[p[j]]="is-checking";activeEdges.add(p[j]+"->"+r);
+        setStatus("Path compression: parent["+p[j]+"] changes from "+old+" to the root "+r+".");
+        render();
+        if(!(await wait(delay(),t)))return null;
       }
     }
 
@@ -672,6 +679,7 @@ excerpt: "Interactive Disjoint Set Union simulator with path compression, union 
 
   btn.make.addEventListener("click",function(){
     try{
+      clearMarks();
       var x=readValue();
       if(!has(x)&&parent.size>=MAX_ELEMENTS){setStatus("Element limit reached ("+MAX_ELEMENTS+" elements).","is-error");return;}
       if(!makeSet(x)){setStatus(x+" already exists.","is-error");return;}
@@ -686,7 +694,7 @@ excerpt: "Interactive Disjoint Set Union simulator with path compression, union 
     var x=Number(el.findValue.value);
     var r=await animateFind(x,true);
     if(r===null)return;
-    el.result.textContent="Representative("+x+") = "+r+". Path compressed.";
+    el.result.textContent="Representative("+x+") = "+r+". "+(lastRewrites.length?"Parents rewritten: "+lastRewrites.join(", ")+".":"No parent changed: every node on the path already pointed to the root.");
     setStatus("Representative found.","is-success");
   });
 
@@ -698,9 +706,18 @@ excerpt: "Interactive Disjoint Set Union simulator with path compression, union 
     var ra=await animateFind(a,true);if(ra===null)return;
     var rb=await animateFind(b,true);if(rb===null)return;
 
+    var rkA=rank.get(ra),rkB=rank.get(rb);
     var result=unionRoots(a,b);
+    clearMarks();
+    if(result.merged){
+      activeEdges.add(result.attached+"->"+result.root);marked[result.root]="is-found";marked[result.attached]="is-checking";
+      el.result.textContent=(rkA===rkB?"Equal ranks ("+rkA+"): root "+result.attached+" now points to "+result.root+", whose rank becomes "+rank.get(result.root)+".":
+        "rank("+result.root+") = "+Math.max(rkA,rkB)+" > rank("+result.attached+") = "+Math.min(rkA,rkB)+": the lower-rank root "+result.attached+" now points to "+result.root+"; ranks unchanged.");
+    }else{
+      marked[ra]="is-found";
+      el.result.textContent="Find("+a+") = Find("+b+") = "+ra+": already in the same set, nothing to merge.";
+    }
     render();
-    el.result.textContent=result.merged?("Merged components. Root "+result.attached+" now points to "+result.root+"."):"Elements were already connected.";
     setStatus(result.merged?"Union complete.":"Already in the same component.",result.merged?"is-success":"is-error");
   });
 
@@ -748,7 +765,7 @@ excerpt: "Interactive Disjoint Set Union simulator with path compression, union 
       var a=values[Math.floor(Math.random()*values.length)],b=values[Math.floor(Math.random()*values.length)];
       if(a!==b)unionRoots(a,b);
     }
-    render();el.result.textContent="Applied random union operations.";setStatus("Random unions complete.","is-success");
+    clearMarks();el.path.textContent="—";render();el.result.textContent="Applied random union operations.";setStatus("Random unions complete.","is-success");
   });
 
   btn.reset.addEventListener("click",function(){

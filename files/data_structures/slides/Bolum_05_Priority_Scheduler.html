@@ -428,7 +428,8 @@ excerpt: "Compact interactive priority scheduler simulator."
   let nextId = 1;
   let running = false;
   let token = 0;
-  let promotedId = null;
+  let promotedIds = new Set();
+  let pausedId = null;
 
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -498,7 +499,7 @@ excerpt: "Compact interactive priority scheduler simulator."
       node.className = "priority-process";
 
       if (index === 0) node.classList.add("front");
-      if (process.id === promotedId) node.classList.add("promoted");
+      if (promotedIds.has(process.id)) node.classList.add("promoted");
 
       const name = document.createElement("div");
       name.textContent = process.name;
@@ -591,7 +592,8 @@ excerpt: "Compact interactive priority scheduler simulator."
     current = null;
     elapsed = 0;
     nextId = 1;
-    promotedId = null;
+    promotedIds = new Set();
+    pausedId = null;
 
     addProcess(5, 0, false);
     addProcess(4, 1, false);
@@ -623,12 +625,9 @@ excerpt: "Compact interactive priority scheduler simulator."
 
   function applyAging() {
     const threshold = readAging();
-    if (threshold === 0) {
-      promotedId = null;
-      return;
-    }
-
-    promotedId = null;
+    const promotedNow = [];
+    promotedIds = new Set();
+    if (threshold === 0) return promotedNow;
 
     for (let level = 2; level >= 1; level--) {
       const stay = [];
@@ -639,7 +638,8 @@ excerpt: "Compact interactive priority scheduler simulator."
           process.wait = 0;
           process.priority = level - 1;
           promote.push(process);
-          promotedId = process.id;
+          promotedIds.add(process.id);
+          promotedNow.push(process);
         } else {
           stay.push(process);
         }
@@ -651,10 +651,17 @@ excerpt: "Compact interactive priority scheduler simulator."
         queues[level - 1].push(...promote);
       }
     }
+
+    return promotedNow;
+  }
+
+  function agingNote(list) {
+    if (!list.length) return "";
+    return " Aging: " + list.map(p => `${p.name} → ${names[p.priority]}`).join(", ") + ".";
   }
 
   async function runQuantum(localToken) {
-    applyAging();
+    const agedBefore = applyAging();
 
     const queueIndex = highestReadyQueue();
 
@@ -671,11 +678,18 @@ excerpt: "Compact interactive priority scheduler simulator."
     current = queues[queueIndex].shift();
     current.wait = 0;
     current.priority = queueIndex;
-    promotedId = null;
     el.operation.textContent = "Run Quantum";
-    render();
 
-    const slice = Math.min(quantum, current.remaining);
+    /* A process resumed after Pause keeps the part of its quantum it already used. */
+    let used = current.id === pausedId ? (current.sliceUsed || 0) : 0;
+    pausedId = null;
+    if (used >= quantum) used = 0;
+    const slice = Math.min(quantum - used, current.remaining);
+    render();
+    setStatus(
+      `Run ${current.name} from ${names[queueIndex]} (highest non-empty).` +
+      agingNote(agedBefore)
+    );
 
     for (let tick = 0; tick < slice; tick++) {
       await wait(DELAY);
@@ -683,12 +697,15 @@ excerpt: "Compact interactive priority scheduler simulator."
       if (localToken !== token) throw new Error("cancelled");
 
       current.remaining--;
+      current.sliceUsed = used + tick + 1;
       elapsed++;
       ageWaitingProcesses(1);
-      applyAging();
+      const aged = applyAging();
       render();
-      setStatus(`${current.name} running: ${current.remaining} remaining.`);
+      setStatus(`${current.name} running: ${current.remaining} remaining.` + agingNote(aged));
     }
+
+    current.sliceUsed = 0;
 
     if (current.remaining <= 0) {
       const finished = current;
@@ -772,6 +789,7 @@ excerpt: "Compact interactive priority scheduler simulator."
     running = false;
 
     if (current) {
+      pausedId = current.id;
       queues[current.priority].unshift(current);
       current = null;
     }
@@ -790,7 +808,8 @@ excerpt: "Compact interactive priority scheduler simulator."
     current = null;
     elapsed = 0;
     nextId = 1;
-    promotedId = null;
+    promotedIds = new Set();
+    pausedId = null;
     setRunning(false);
     el.operation.textContent = "Idle";
     render();

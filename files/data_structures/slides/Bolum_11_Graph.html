@@ -455,9 +455,12 @@ excerpt: "Interactive undirected graph simulator with vertex and edge editing, B
     Object.keys(btn).forEach(function(k){btn[k].disabled=state&&k!=="cancel";});
     btn.cancel.disabled=!state;
     el.from.disabled=state;el.to.disabled=state;el.start.disabled=state;
+    if(!state)updateButtons();
   }
 
   function clearStates(){nodeStates={};activeEdge="";}
+
+  function labelOf(id){var v=getVertex(id);return v?v.label:String(id);}
 
   function uniqueLabel(raw){
     var base=raw.trim()||("V"+nextId),label=base,n=2;
@@ -615,14 +618,20 @@ excerpt: "Interactive undirected graph simulator with vertex and edge editing, B
     disable(true);clearStates();
     var seen=new Set([startId]),queue=[startId],order=[];
     el.frontierTitle.textContent="Queue";
-    renderFrontier(queue);
+    el.path.textContent="—";
+    nodeStates[startId]="is-queued";
+    setStatus("BFS: enqueue start vertex "+labelOf(startId)+" and mark it discovered.");
+    render();renderFrontier(queue);
+    if(!(await wait(delay(),t)))return;
 
     while(queue.length){
       var current=queue.shift();
       nodeStates[current]="is-queued";render();renderFrontier(queue);
+      setStatus("Dequeue "+labelOf(current)+".");
       if(!(await wait(delay(),t)))return;
 
       nodeStates[current]="is-visited";order.push(current);
+      setStatus("Visit "+labelOf(current)+": scan its neighbors in adjacency-list order.");
       el.path.textContent=order.map(function(id){return getVertex(id).label;}).join(" → ");
       render();
       if(!(await wait(delay(),t)))return;
@@ -634,6 +643,7 @@ excerpt: "Interactive undirected graph simulator with vertex and edge editing, B
           seen.add(n);queue.push(n);
           nodeStates[n]="is-queued";
           activeEdge=edgeKey(current,n);
+          setStatus("Neighbor "+labelOf(n)+" of "+labelOf(current)+" is new: mark it and enqueue it.");
           render();renderFrontier(queue);
           if(!(await wait(delay(),t)))return;
         }
@@ -641,9 +651,9 @@ excerpt: "Interactive undirected graph simulator with vertex and edge editing, B
       activeEdge="";
     }
 
-    renderFrontier([]);
+    render();renderFrontier([]);
     disable(false);
-    setStatus("BFS complete.","is-ok");
+    setStatus("BFS complete: "+order.length+" of "+vertices.length+" vertices reached from "+labelOf(startId)+".","is-ok");
   }
 
   async function dfs(startId){
@@ -651,15 +661,18 @@ excerpt: "Interactive undirected graph simulator with vertex and edge editing, B
     disable(true);clearStates();
     var seen=new Set(),order=[],stack=[];
     el.frontierTitle.textContent="Recursion stack";
+    el.path.textContent="—";
 
     async function visit(id,parent){
       seen.add(id);stack.push(id);
       nodeStates[id]="is-queued";
       if(parent!==null)activeEdge=edgeKey(parent,id);
+      setStatus(parent===null?"DFS: call dfs("+labelOf(id)+").":"Unvisited neighbor of "+labelOf(parent)+": call dfs("+labelOf(id)+").");
       render();renderFrontier(stack);
       if(!(await wait(delay(),t)))return false;
 
       nodeStates[id]="is-visited";order.push(id);
+      setStatus("Visit "+labelOf(id)+": scan its neighbors in adjacency-list order.");
       el.path.textContent=order.map(function(x){return getVertex(x).label;}).join(" → ");
       render();
       if(!(await wait(delay(),t)))return false;
@@ -672,14 +685,16 @@ excerpt: "Interactive undirected graph simulator with vertex and edge editing, B
       }
 
       stack.pop();activeEdge="";
+      setStatus("All neighbors of "+labelOf(id)+" done: return"+(stack.length?" to "+labelOf(stack[stack.length-1]):"")+".");
       render();renderFrontier(stack);
+      if(stack.length&&!(await wait(delay(),t)))return false;
       return true;
     }
 
-    await visit(startId,null);
+    if(!(await visit(startId,null)))return;
     renderFrontier([]);
     disable(false);
-    setStatus("DFS complete.","is-ok");
+    setStatus("DFS complete: "+order.length+" of "+vertices.length+" vertices reached from "+labelOf(startId)+".","is-ok");
   }
 
   btn.add.addEventListener("click",function(){
@@ -717,13 +732,16 @@ excerpt: "Interactive undirected graph simulator with vertex and edge editing, B
     if(!vertices.length)return;
     token++;var t=token;disable(true);clearStates();
     var comps=componentSets(),labels=[];
+    el.path.textContent="—";renderFrontier([]);
     for(var i=0;i<comps.length;i++){
+      setStatus("Component "+(i+1)+": BFS from the first unvisited vertex "+labelOf(comps[i][0])+".");
       for(var j=0;j<comps[i].length;j++){
         nodeStates[comps[i][j]]="is-queued";render();
         if(!(await wait(delay(),t)))return;
         nodeStates[comps[i][j]]="is-visited";render();
       }
       labels.push("{ "+comps[i].map(function(id){return getVertex(id).label;}).join(", ")+" }");
+      el.path.textContent=labels.join("   ");
     }
     el.path.textContent=labels.join("   ");
     disable(false);setStatus(comps.length+" connected component(s).","is-ok");

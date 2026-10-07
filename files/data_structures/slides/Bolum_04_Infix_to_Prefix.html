@@ -68,14 +68,14 @@ excerpt: "Compact interactive infix-to-prefix simulator."
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   flex-wrap: nowrap;
   overflow: hidden;
 }
 
 .prefix-token {
   flex: 0 1 auto;
-  min-width: 34px;
+  min-width: 28px;
   height: 32px;
   padding: 0 7px;
   display: inline-flex;
@@ -284,7 +284,7 @@ excerpt: "Compact interactive infix-to-prefix simulator."
             <div class="prefix-row">
               <div class="prefix-field">
                 <label for="prefix-input">Infix expression</label>
-                <input id="prefix-input" type="text" value="A + B * C" maxlength="40" spellcheck="false">
+                <input id="prefix-input" type="text" value="A + B * C" maxlength="48" spellcheck="false">
               </div>
               <button id="prefix-convert" type="button">Convert</button>
               <button id="prefix-example" type="button">Example</button>
@@ -376,7 +376,7 @@ excerpt: "Compact interactive infix-to-prefix simulator."
   };
 
   const DELAY = 300;
-  const MAX_TOKENS = 16;
+  const MAX_TOKENS = 22;
   const examples = [
     "A + B * C",
     "( A + B ) * C",
@@ -392,12 +392,13 @@ excerpt: "Compact interactive infix-to-prefix simulator."
   let frameIndex = 0;
   let running = false;
   let tokenId = 0;
+  let convertedInput = null;
 
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-  const operators = new Set(["+", "-", "*", "/", "^"]);
+  const operators = new Set(["+", "-", "*", "/", "%", "^"]);
 
   function precedence(op) {
-    return ({ "+": 1, "-": 1, "*": 2, "/": 2, "^": 3 })[op] || 0;
+    return ({ "+": 1, "-": 1, "*": 2, "/": 2, "%": 2, "^": 3 })[op] || 0;
   }
 
   function isOperand(token) {
@@ -405,17 +406,17 @@ excerpt: "Compact interactive infix-to-prefix simulator."
   }
 
   function tokenize(expression) {
-    const compact = expression.trim();
-    if (!compact) return null;
+    const text = expression.trim();
+    if (!text) return { error: "Enter an infix expression." };
 
-    const found = compact.match(/[A-Za-z_][A-Za-z0-9_]*|\d+(?:\.\d+)?|[()+\-*/^]/g);
-    if (!found) return null;
+    const found = text.match(/[A-Za-z_][A-Za-z0-9_]*|\d+(?:\.\d+)?|[()+\-*/%^]/g) || [];
 
     const rebuilt = found.join("").replace(/\s+/g, "");
-    const original = compact.replace(/\s+/g, "");
+    const original = text.replace(/\s+/g, "");
 
-    if (rebuilt !== original || found.length > MAX_TOKENS) return null;
-    return found;
+    if (rebuilt !== original) return { error: "Use only operands, + - * / % ^ and parentheses." };
+    if (found.length > MAX_TOKENS) return { error: `Use at most ${MAX_TOKENS} tokens.` };
+    return { list: found };
   }
 
   function validate(list) {
@@ -424,24 +425,27 @@ excerpt: "Compact interactive infix-to-prefix simulator."
 
     for (const token of list) {
       if (isOperand(token)) {
-        if (!expectOperand) return false;
+        if (!expectOperand) return `Missing operator before ${token}.`;
         expectOperand = false;
       } else if (token === "(") {
-        if (!expectOperand) return false;
+        if (!expectOperand) return "Missing operator before (.";
         balance++;
       } else if (token === ")") {
-        if (expectOperand || balance <= 0) return false;
+        if (balance <= 0) return "Unbalanced parentheses: extra ).";
+        if (expectOperand) return "Missing operand before ).";
         balance--;
         expectOperand = false;
       } else if (operators.has(token)) {
-        if (expectOperand) return false;
+        if (expectOperand) return `Missing operand before ${token}.`;
         expectOperand = true;
       } else {
-        return false;
+        return `Unknown token ${token}.`;
       }
     }
 
-    return balance === 0 && !expectOperand;
+    if (expectOperand) return "Expression ends without an operand.";
+    if (balance !== 0) return "Unbalanced parentheses: missing ).";
+    return "";
   }
 
   function shouldPop(top, current) {
@@ -464,7 +468,7 @@ excerpt: "Compact interactive infix-to-prefix simulator."
     const result = [];
     let stackOps = 0;
 
-    const snapshot = (currentIndex, message, final = false) => {
+    const snapshot = (currentIndex, message, final = false, view = "reversed") => {
       result.push({
         currentIndex,
         stack: [...stack],
@@ -472,11 +476,13 @@ excerpt: "Compact interactive infix-to-prefix simulator."
         stackOps,
         message,
         final,
+        view,
         prefix: final ? [...output].reverse() : []
       });
     };
 
-    snapshot(-1, "Ready to scan from right to left.");
+    snapshot(-1, "Step 1: reverse the infix expression and swap ( and ).", false, "original");
+    snapshot(-1, "Step 2: scan the reversed expression left to right.");
 
     for (let i = 0; i < reversed.length; i++) {
       const current = reversed[i];
@@ -496,25 +502,38 @@ excerpt: "Compact interactive infix-to-prefix simulator."
 
       if (current === ")") {
         while (stack.length && stack[stack.length - 1] !== "(") {
-          output.push(stack.pop());
+          const top = stack.pop();
+          output.push(top);
           stackOps++;
+          snapshot(i, `) : pop ${top} to output.`);
         }
 
         if (!stack.length) throw new Error("Mismatched parentheses.");
         stack.pop();
         stackOps++;
-        snapshot(i, "Closing parenthesis → pop until matching parenthesis.");
+        snapshot(i, ") : pop the matching ( and discard both.");
         continue;
       }
 
       while (stack.length && shouldPop(stack[stack.length - 1], current)) {
+        const top = stack[stack.length - 1];
+        const reason = precedence(top) > precedence(current)
+          ? `${top} has higher precedence than ${current}`
+          : "^ and ^: equal precedence, right-assoc.";
         output.push(stack.pop());
         stackOps++;
+        snapshot(i, `${reason} → pop ${top}.`);
       }
+
+      const top = stack[stack.length - 1];
+      let reason = "Stack is empty";
+      if (top === "(") reason = "Top is (";
+      else if (top && precedence(top) < precedence(current)) reason = `${current} has higher precedence than ${top}`;
+      else if (top) reason = `${top} and ${current}: equal precedence, left-assoc.`;
 
       stack.push(current);
       stackOps++;
-      snapshot(i, `Operator ${current} processed.`);
+      snapshot(i, `${reason} → push ${current}.`);
     }
 
     while (stack.length) {
@@ -522,10 +541,10 @@ excerpt: "Compact interactive infix-to-prefix simulator."
       if (top === "(" || top === ")") throw new Error("Mismatched parentheses.");
       output.push(top);
       stackOps++;
-      snapshot(reversed.length, `Pop ${top} from stack.`);
+      snapshot(reversed.length, `End of input: pop ${top} to output.`);
     }
 
-    snapshot(reversed.length, "Conversion complete.", true);
+    snapshot(reversed.length, "Step 3: reverse the temporary output → prefix.", true);
 
     return { reversed, frames: result };
   }
@@ -549,11 +568,13 @@ excerpt: "Compact interactive infix-to-prefix simulator."
   function render() {
     const frame = currentFrame();
 
+    const shown = frame.view === "original" ? tokens : scanTokens;
+
     el.tokens.innerHTML = "";
-    scanTokens.forEach((token, index) => {
+    shown.forEach((token, index) => {
       const node = document.createElement("div");
       node.className = "prefix-token";
-      if (index === frame.currentIndex && frame.currentIndex < scanTokens.length) {
+      if (index === frame.currentIndex && frame.currentIndex < shown.length) {
         node.classList.add("current");
       } else if (frame.currentIndex >= 0 && index < frame.currentIndex) {
         node.classList.add("processed");
@@ -581,7 +602,7 @@ excerpt: "Compact interactive infix-to-prefix simulator."
     }
 
     el.message.textContent = frame.message;
-    el.scan.textContent = scanTokens.length ? scanTokens.join(" ") : "—";
+    el.scan.textContent = shown.length ? shown.join(" ") : "—";
     el.temp.textContent = frame.output.length ? frame.output.join(" ") : "—";
     el.result.textContent = frame.final && frame.prefix.length
       ? frame.prefix.join(" ")
@@ -597,15 +618,17 @@ excerpt: "Compact interactive infix-to-prefix simulator."
   }
 
   function convertExpression(message = "Steps created.") {
-    const parsed = tokenize(el.input.value);
+    const scanned = tokenize(el.input.value);
 
-    if (!parsed) {
-      setStatus(`Use at most ${MAX_TOKENS} valid tokens.`, "error");
+    if (scanned.error) {
+      setStatus(scanned.error, "error");
       return false;
     }
 
-    if (!validate(parsed)) {
-      setStatus("Invalid infix expression.", "error");
+    const parsed = scanned.list;
+    const problem = validate(parsed);
+    if (problem) {
+      setStatus(`Invalid infix expression. ${problem}`, "error");
       return false;
     }
 
@@ -614,6 +637,7 @@ excerpt: "Compact interactive infix-to-prefix simulator."
       tokens = parsed;
       scanTokens = built.reversed;
       frames = built.frames;
+      convertedInput = el.input.value;
       frameIndex = 0;
       tokenId++;
       running = false;
@@ -656,7 +680,7 @@ excerpt: "Compact interactive infix-to-prefix simulator."
   }
 
   async function autoRun() {
-    if (!frames.length && !convertExpression()) return;
+    if ((!frames.length || el.input.value !== convertedInput) && !convertExpression()) return;
 
     if (frameIndex >= frames.length - 1) {
       frameIndex = 0;

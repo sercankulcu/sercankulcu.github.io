@@ -444,6 +444,8 @@ excerpt: "Interactive directed graph simulator with indegree, outdegree, BFS, DF
   function delay(){return DELAY;}
   function wait(ms,t){return new Promise(function(r){setTimeout(function(){r(t===token);},ms);});}
   function clearStates(){states={};activeEdge="";}
+  function labelOf(id){var v=getVertex(id);return v?v.label:String(id);}
+  function orderText(order){return order.map(labelOf).join(" → ");}
   function disable(s){Object.keys(btn).forEach(function(k){btn[k].disabled=s&&k!=="cancel";});btn.cancel.disabled=!s;[el.from,el.to,el.start].forEach(function(x){x.disabled=s;});}
   function uniqueLabel(raw){var base=raw.trim()||("V"+nextId),x=base,n=2;while(vertices.some(function(v){return v.label===x;})){x=base+n;n++;}return x;}
   /* viewBox köşelerin kapsayan kutusuna oturur (sürükleme sırasında sabit kalır) */
@@ -545,27 +547,34 @@ excerpt: "Interactive directed graph simulator with indegree, outdegree, BFS, DF
 
   async function bfs(start){
     token++;var t=token;disable(true);clearStates();var seen=new Set([start]),queue=[start],order=[];
-    renderFrontier(queue);
+    el.order.textContent="—";states[start]="is-queued";el.step.textContent="Enqueue start vertex "+labelOf(start)+".";
+    setStatus("BFS running: follow outgoing edges only.");
+    renderFrontier(queue);render();if(!(await wait(delay(),t)))return;
     while(queue.length){
-      var u=queue.shift();states[u]="is-current";el.step.textContent="Visit "+getVertex(u).label+".";render();if(!(await wait(delay(),t)))return;
-      states[u]="is-visited";order.push(u);el.order.textContent=order.map(function(id){return getVertex(id).label;}).join(" → ");
+      var u=queue.shift();states[u]="is-current";el.step.textContent="Dequeue and visit "+labelOf(u)+".";renderFrontier(queue);render();if(!(await wait(delay(),t)))return;
+      states[u]="is-visited";order.push(u);el.order.textContent=orderText(order);
       var outs=outNeighbors(u);
-      for(var i=0;i<outs.length;i++){var v=outs[i];if(!seen.has(v)){seen.add(v);queue.push(v);states[v]="is-queued";activeEdge=edgeKey(u,v);renderFrontier(queue);render();if(!(await wait(delay(),t)))return;}}
-      activeEdge="";renderFrontier(queue);
+      for(var i=0;i<outs.length;i++){var v=outs[i];if(!seen.has(v)){seen.add(v);queue.push(v);states[v]="is-queued";activeEdge=edgeKey(u,v);el.step.textContent="Edge "+labelOf(u)+" → "+labelOf(v)+": "+labelOf(v)+" is new, enqueue it.";renderFrontier(queue);render();if(!(await wait(delay(),t)))return;}}
+      activeEdge="";renderFrontier(queue);render();
     }
-    disable(false);setStatus("BFS complete.","is-success");
+    el.step.textContent="Queue is empty.";
+    disable(false);setStatus("BFS complete: "+order.length+" of "+vertices.length+" vertices reachable from "+labelOf(start)+".","is-success");
   }
 
   async function dfs(start){
     token++;var t=token;disable(true);clearStates();var seen=new Set(),order=[],stack=[];
+    el.order.textContent="—";setStatus("DFS running (recursive): follow outgoing edges only.");
     async function visit(u,parent){
-      seen.add(u);stack.push(u);states[u]="is-current";if(parent!==null)activeEdge=edgeKey(parent,u);renderFrontier(stack);render();if(!(await wait(delay(),t)))return false;
-      states[u]="is-visited";order.push(u);el.order.textContent=order.map(function(id){return getVertex(id).label;}).join(" → ");
+      seen.add(u);stack.push(u);states[u]="is-current";if(parent!==null)activeEdge=edgeKey(parent,u);
+      el.step.textContent=parent===null?"Call dfs("+labelOf(u)+").":"Edge "+labelOf(parent)+" → "+labelOf(u)+": call dfs("+labelOf(u)+").";
+      renderFrontier(stack);render();if(!(await wait(delay(),t)))return false;
+      states[u]="is-visited";order.push(u);el.order.textContent=orderText(order);
       var outs=outNeighbors(u);
       for(var i=0;i<outs.length;i++)if(!seen.has(outs[i])){if(!(await visit(outs[i],u)))return false;}
-      stack.pop();activeEdge="";renderFrontier(stack);render();return true;
+      stack.pop();activeEdge="";el.step.textContent="All outgoing edges of "+labelOf(u)+" done: return"+(stack.length?" to "+labelOf(stack[stack.length-1]):"")+".";
+      renderFrontier(stack);render();if(stack.length&&!(await wait(delay(),t)))return false;return true;
     }
-    await visit(start,null);disable(false);setStatus("DFS complete.","is-success");
+    if(!(await visit(start,null)))return;disable(false);setStatus("DFS complete: "+order.length+" of "+vertices.length+" vertices reachable from "+labelOf(start)+".","is-success");
   }
 
   function topoData(){
@@ -583,21 +592,29 @@ excerpt: "Interactive directed graph simulator with indegree, outdegree, BFS, DF
     token++;var t=token;disable(true);clearStates();
     var deg=new Map();vertices.forEach(function(v){deg.set(v.id,indegree(v.id));});
     var queue=vertices.filter(function(v){return deg.get(v.id)===0;}).map(function(v){return v.id;}),order=[];
-    renderFrontier(queue);
+    queue.forEach(function(id){states[id]="is-queued";});
+    el.order.textContent="—";setStatus("Kahn's algorithm: repeatedly remove a vertex with indegree 0.");
+    el.step.textContent=queue.length?"Enqueue all vertices with indegree 0: "+queue.map(labelOf).join(", ")+".":"No vertex has indegree 0.";
+    renderFrontier(queue);render();if(!(await wait(delay(),t)))return;
     while(queue.length){
-      var u=queue.shift();states[u]="is-current";el.step.textContent="Remove "+getVertex(u).label+" (indegree 0).";render();if(!(await wait(delay(),t)))return;
-      states[u]="is-visited";order.push(u);el.order.textContent=order.map(function(id){return getVertex(id).label;}).join(" → ");
+      var u=queue.shift();states[u]="is-current";el.step.textContent="Dequeue "+labelOf(u)+" (indegree 0) and append it to the order.";renderFrontier(queue);render();if(!(await wait(delay(),t)))return;
+      states[u]="is-visited";order.push(u);el.order.textContent=orderText(order);
       var outs=outNeighbors(u);
       for(var i=0;i<outs.length;i++){
-        var v=outs[i];activeEdge=edgeKey(u,v);deg.set(v,deg.get(v)-1);el.step.textContent="Decrease indegree of "+getVertex(v).label+" to "+deg.get(v)+".";render();if(!(await wait(delay(),t)))return;
-        if(deg.get(v)===0){queue.push(v);states[v]="is-queued";}
-        renderFrontier(queue);
+        var v=outs[i];activeEdge=edgeKey(u,v);deg.set(v,deg.get(v)-1);el.step.textContent="Remove edge "+labelOf(u)+" → "+labelOf(v)+": indegree of "+labelOf(v)+" becomes "+deg.get(v)+".";
+        if(deg.get(v)===0){queue.push(v);states[v]="is-queued";el.step.textContent+=" Enqueue "+labelOf(v)+".";}
+        renderFrontier(queue);render();if(!(await wait(delay(),t)))return;
       }
-      activeEdge="";
+      activeEdge="";render();
     }
     disable(false);
-    if(order.length===vertices.length)setStatus("Topological sort complete.","is-success");
-    else setStatus("Cycle detected: a complete topological ordering is impossible.","is-error");
+    if(order.length===vertices.length){el.step.textContent="Queue is empty and every vertex was removed.";setStatus("Topological sort complete.","is-success");}
+    else{
+      var left=vertices.filter(function(v){return order.indexOf(v.id)<0;}).map(function(v){return v.label;});
+      el.order.textContent=(order.length?orderText(order):"—")+"  (incomplete)";
+      el.step.textContent="Queue empty; still indegree > 0: "+left.join(", ")+".";
+      setStatus("Cycle detected: a complete topological ordering is impossible.","is-error");
+    }
   }
 
   btn.add.addEventListener("click",function(){
@@ -621,7 +638,9 @@ excerpt: "Interactive directed graph simulator with indegree, outdegree, BFS, DF
   btn.bfs.addEventListener("click",function(){if(vertices.length)bfs(Number(el.start.value));});
   btn.dfs.addEventListener("click",function(){if(vertices.length)dfs(Number(el.start.value));});
   btn.topo.addEventListener("click",function(){if(vertices.length)topo();});
-  btn.cycle.addEventListener("click",function(){var d=topoData();el.order.textContent=d.acyclic?"No directed cycle.":"Directed cycle detected.";setStatus(d.acyclic?"Graph is acyclic.":"Graph contains a directed cycle.",d.acyclic?"is-success":"is-error");});
+  btn.cycle.addEventListener("click",function(){var d=topoData();clearStates();render();renderFrontier([]);el.order.textContent=d.acyclic?"No directed cycle.":"Directed cycle detected.";
+    el.step.textContent=d.acyclic?"Kahn removed all "+vertices.length+" vertices.":"Kahn removed only "+d.order.length+" of "+vertices.length+" vertices: a cycle blocks the rest.";
+    setStatus(d.acyclic?"Graph is acyclic.":"Graph contains a directed cycle.",d.acyclic?"is-success":"is-error");});
 
   function loadDag(){
     token++;vertices=[];edges=new Set();nextId=0;clearStates();

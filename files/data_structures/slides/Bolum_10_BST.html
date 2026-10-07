@@ -531,99 +531,176 @@ excerpt: "Interactive Binary Search Tree simulator with insertion, search, delet
     metrics();
   }
 
-  async function animatePath(path,finalNode){
+  function begin(){
     token++;
-    var t=token;
     disable(true);
+    clearMarks();
     lastComparisons=0;
+    return token;
+  }
 
+  function finish(){
+    disable(false);
+    render();
+  }
+
+  /* walks the path one node at a time; every visited node is one key comparison */
+  async function animatePath(path,t){
     for(var i=0;i<path.length;i++){
       clearMarks();
       marked[String(path[i].value)]="is-checking";
       if(i>0)activeEdge=path[i-1].value+"->"+path[i].value;
-      if(finalNode&&path[i]===finalNode&&i===path.length-1)marked[String(path[i].value)]="is-found";
       lastComparisons=i+1;
       showText(el.path,path.slice(0,i+1).map(function(n){return n.value;}).join(" → "));
       render();
       if(!(await wait(delay(),t)))return false;
     }
-
-    disable(false);
     return true;
   }
 
+  /* shows the answer node (which need not be the last node on the path) */
+  async function showAnswer(node,t){
+    if(!node)return true;
+    marked[String(node.value)]="is-found";
+    render();
+    return await wait(delay(),t);
+  }
+
   async function animateTraversal(nodes,label){
-    token++;
-    var t=token,visited=[];
-    disable(true);clearMarks();lastComparisons=0;
+    var t=begin(),visited=[];
 
     for(var i=0;i<nodes.length;i++){
       marked[String(nodes[i].value)]="is-visited";
       visited.push(nodes[i].value);
       showText(el.traversal,visited.join(" → "));
-      lastComparisons=i+1;
       render();
       if(!(await wait(delay(),t)))return false;
     }
 
-    disable(false);
+    finish();
     setStatus(label+" traversal complete.","is-success");
     return true;
   }
 
   btn.insert.addEventListener("click",async function(){
     try{
-      var value=readValue();
-      if(!tree.trace(value).found&&tree.traverse("in").length>=MAX_NODES)throw new Error("Tree is full: this simulator holds at most "+MAX_NODES+" nodes.");
-      var result=tree.insert(value);
-      await animatePath(result.path,result.path[result.path.length-1]||null);
-      clearMarks();render();
-      setStatus(result.inserted?"Inserted "+value+".":value+" already exists.",result.inserted?"is-success":"is-error");
+      var value=readValue(),before=tree.trace(value);
+      if(!before.found&&tree.traverse("in").length>=MAX_NODES)throw new Error("Tree is full: this simulator holds at most "+MAX_NODES+" nodes.");
+      var t=begin();
+      if(!(await animatePath(before.path,t)))return;
+      if(before.found){
+        marked[String(value)]="is-found";finish();
+        setStatus(value+" already exists; a BST stores each key once.","is-error");
+        return;
+      }
+      var parent=before.path[before.path.length-1]||null;
+      tree.insert(value);
+      clearMarks();
+      marked[String(value)]="is-found";
+      if(parent)activeEdge=parent.value+"->"+value;
+      finish();
+      setStatus(parent?"Inserted "+value+" as the "+(value<parent.value?"left":"right")+" child of "+parent.value+".":"Inserted "+value+" as the root.","is-success");
     }catch(error){disable(false);setStatus(error.message,"is-error");}
   });
 
   btn.search.addEventListener("click",async function(){
     try{
       var value=readValue(),result=tree.trace(value);
-      await animatePath(result.path,result.found?result.node:null);
-      setStatus(result.found?"Found "+value+".":value+" was not found.",result.found?"is-success":"is-error");
+      var t=begin();
+      if(!(await animatePath(result.path,t)))return;
+      if(result.found)marked[String(value)]="is-found";
+      finish();
+      setStatus(result.found?"Found "+value+".":value+" was not found (reached an empty subtree).",result.found?"is-success":"is-error");
     }catch(error){disable(false);setStatus(error.message,"is-error");}
   });
 
   btn.delete.addEventListener("click",async function(){
     try{
       var value=readValue(),before=tree.trace(value);
-      await animatePath(before.path,before.found?before.node:null);
-      if(!before.found){setStatus(value+" was not found.","is-error");return;}
-      tree.delete(value);clearMarks();render();setStatus("Deleted "+value+".","is-success");
+      var t=begin();
+      if(!(await animatePath(before.path,t)))return;
+      if(!before.found){finish();setStatus(value+" was not found.","is-error");return;}
+
+      var node=before.node,message;
+      marked[String(value)]="is-found";
+      render();
+
+      if(node.left&&node.right){
+        /* two children: the inorder successor is the leftmost node of the right subtree */
+        setStatus("Two children: successor = leftmost node of the right subtree.");
+        if(!(await wait(delay(),t)))return;
+        var prev=node,s=node.right;
+        while(true){
+          clearMarks();
+          marked[String(value)]="is-found";
+          marked[String(s.value)]="is-checking";
+          activeEdge=prev.value+"->"+s.value;
+          render();
+          if(!(await wait(delay(),t)))return;
+          if(!s.left)break;
+          prev=s;s=s.left;
+        }
+        setStatus("Successor is "+s.value+": copy "+s.value+" into "+value+"'s node, then remove the old "+s.value+".");
+        if(!(await wait(delay(),t)))return;
+        message="Deleted "+value+" (two children): successor "+s.value+" took its place.";
+        tree.delete(value);
+        clearMarks();
+        marked[String(s.value)]="is-found";
+      }else if(node.left||node.right){
+        var child=node.left||node.right;
+        message="Deleted "+value+" (one child): child "+child.value+" took its place.";
+        tree.delete(value);
+        clearMarks();
+        marked[String(child.value)]="is-found";
+      }else{
+        message="Deleted "+value+" (leaf): it was simply removed.";
+        tree.delete(value);
+        clearMarks();
+      }
+      finish();
+      setStatus(message,"is-success");
     }catch(error){disable(false);setStatus(error.message,"is-error");}
   });
 
   btn.min.addEventListener("click",async function(){
     var r=tree.minimum();
     if(!r.node){setStatus("Tree is empty.","is-error");return;}
-    await animatePath(r.path,r.node);setStatus("Minimum is "+r.node.value+".","is-success");
+    var t=begin();
+    if(!(await animatePath(r.path,t)))return;
+    marked[String(r.node.value)]="is-found";finish();
+    setStatus("Minimum is "+r.node.value+" (no left child).","is-success");
   });
 
   btn.max.addEventListener("click",async function(){
     var r=tree.maximum();
     if(!r.node){setStatus("Tree is empty.","is-error");return;}
-    await animatePath(r.path,r.node);setStatus("Maximum is "+r.node.value+".","is-success");
+    var t=begin();
+    if(!(await animatePath(r.path,t)))return;
+    marked[String(r.node.value)]="is-found";finish();
+    setStatus("Maximum is "+r.node.value+" (no right child).","is-success");
   });
 
+  /* predecessor = last node where the search turned right (the largest key smaller than
+     the value); this covers both "max of the left subtree" and "go up to an ancestor" */
   btn.predecessor.addEventListener("click",async function(){
     try{
       var value=readValue(),r=tree.predecessor(value);
-      await animatePath(r.path,r.node);
-      setStatus(r.node?"Predecessor of "+value+" is "+r.node.value+".":"No predecessor exists.",r.node?"is-success":"is-error");
+      var t=begin();
+      if(!(await animatePath(r.path,t)))return;
+      if(!(await showAnswer(r.node,t)))return;
+      finish();
+      setStatus(r.node?"Predecessor of "+value+" is "+r.node.value+" (largest key smaller than "+value+").":"No predecessor exists: no key is smaller than "+value+".",r.node?"is-success":"is-error");
     }catch(error){disable(false);setStatus(error.message,"is-error");}
   });
 
   btn.successor.addEventListener("click",async function(){
     try{
       var value=readValue(),r=tree.successor(value);
-      await animatePath(r.path,r.node);
-      setStatus(r.node?"Successor of "+value+" is "+r.node.value+".":"No successor exists.",r.node?"is-success":"is-error");
+      var t=begin();
+      if(!(await animatePath(r.path,t)))return;
+      if(!(await showAnswer(r.node,t)))return;
+      finish();
+      setStatus(r.node?"Successor of "+value+" is "+r.node.value+" (smallest key larger than "+value+").":"No successor exists: no key is larger than "+value+".",r.node?"is-success":"is-error");
     }catch(error){disable(false);setStatus(error.message,"is-error");}
   });
 

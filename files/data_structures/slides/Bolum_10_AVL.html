@@ -137,6 +137,12 @@ excerpt: "Interactive AVL Tree simulator with insertion, deletion, search, rotat
   stroke: var(--ds-good);
 }
 
+.avl-node.is-bad circle {
+  fill: color-mix(in srgb, var(--ds-bad) 22%, var(--ds-bg));
+  stroke: var(--ds-bad);
+  stroke-width: 3;
+}
+
 .avl-empty {
   fill: var(--ds-muted);
   font-size: 15px;
@@ -300,18 +306,42 @@ excerpt: "Interactive AVL Tree simulator with insertion, deletion, search, rotat
 
   function Node(value){this.value=value;this.left=null;this.right=null;this.height=1;}
 
-  function AVL(){this.root=null;this.rotations=0;this.events=[];}
+  /* every operation is computed at once and recorded as frames (snapshots with
+     marks and a message); the UI plays the frames, so Cancel never leaves a half-done tree */
+  function AVL(){this.root=null;this.rotations=0;this.events=[];this.frames=[];}
+
+  function marks(){
+    var m={};
+    for(var i=0;i<arguments.length;i+=2)if(arguments[i])m[String(arguments[i].value)]=arguments[i+1];
+    return m;
+  }
 
   AVL.prototype.h=function(n){return n?n.height:0;};
   AVL.prototype.bf=function(n){return n?this.h(n.left)-this.h(n.right):0;};
   AVL.prototype.update=function(n){n.height=1+Math.max(this.h(n.left),this.h(n.right));};
+
+  AVL.prototype.copy=function(n){
+    if(!n)return null;
+    var c=new Node(n.value);c.height=n.height;c.left=this.copy(n.left);c.right=this.copy(n.right);
+    return c;
+  };
+
+  AVL.prototype.frame=function(msg,m,edge,path){
+    this.frames.push({root:this.copy(this.root),marks:m||{},edge:edge||"",msg:msg,path:path,events:this.events.length,rotations:this.rotations});
+  };
+
+  /* replaces the child pointer that pointed to old (or the root) with node */
+  AVL.prototype.link=function(parent,old,node){
+    if(!parent)this.root=node;
+    else if(parent.left===old)parent.left=node;
+    else parent.right=node;
+  };
 
   AVL.prototype.rotateRight=function(y){
     var x=y.left,t=x.right;
     x.right=y;y.left=t;
     this.update(y);this.update(x);
     this.rotations++;
-    this.events.push("Right rotation at "+y.value+" (LL repair).");
     return x;
   };
 
@@ -320,78 +350,106 @@ excerpt: "Interactive AVL Tree simulator with insertion, deletion, search, rotat
     y.left=x;x.right=t;
     this.update(x);this.update(y);
     this.rotations++;
-    this.events.push("Left rotation at "+x.value+" (RR repair).");
     return y;
   };
 
-  AVL.prototype.rebalance=function(n){
+  /* called bottom-up on every node of the access path: update the height, and if
+     |BF| = 2 apply the LL / RR / LR / RL repair at this (lowest unbalanced) node */
+  AVL.prototype.rebalance=function(n,parent){
     this.update(n);
     var b=this.bf(n);
 
-    if(b>1){
-      if(this.bf(n.left)<0){
-        this.events.push("LR case at "+n.value+".");
-        n.left=this.rotateLeft(n.left);
-      }
-      return this.rotateRight(n);
+    if(b>=-1&&b<=1){
+      this.frame("Update "+n.value+": h="+n.height+", BF="+b+" (balanced).",marks(n,"is-checking"));
+      return n;
     }
 
-    if(b<-1){
-      if(this.bf(n.right)>0){
-        this.events.push("RL case at "+n.value+".");
-        n.right=this.rotateRight(n.right);
-      }
-      return this.rotateLeft(n);
+    var heavyLeft=b>1,c=heavyLeft?n.left:n.right,cb=this.bf(c);
+    var kind=heavyLeft?(cb<0?"LR":"LL"):(cb>0?"RL":"RR");
+    var inner=null;
+    if(kind==="LR")inner=c.right;
+    if(kind==="RL")inner=c.left;
+    this.frame(n.value+" is unbalanced (BF="+b+"): "+kind+" case.",marks(n,"is-bad",c,"is-checking",inner,"is-checking"));
+
+    if(kind==="LR"){
+      n.left=this.rotateLeft(c);
+      this.events.push("LR at "+n.value+": left rotation at "+c.value+".");
+      this.frame("LR step 1: left rotation at "+c.value+" (now an LL shape).",marks(n,"is-bad",n.left,"is-checking"));
+    }else if(kind==="RL"){
+      n.right=this.rotateRight(c);
+      this.events.push("RL at "+n.value+": right rotation at "+c.value+".");
+      this.frame("RL step 1: right rotation at "+c.value+" (now an RR shape).",marks(n,"is-bad",n.right,"is-checking"));
     }
 
-    return n;
+    var r=heavyLeft?this.rotateRight(n):this.rotateLeft(n);
+    this.link(parent,n,r);
+    var dir=heavyLeft?"right":"left";
+    this.events.push(kind+" at "+n.value+": "+dir+" rotation at "+n.value+".");
+    this.frame((kind==="LR"||kind==="RL"?kind+" step 2: ":kind+": ")+dir+" rotation at "+n.value+" → "+r.value+" is subtree root.",marks(r,"is-found"));
+    return r;
+  };
+
+  /* BST descent shared by insert and delete; returns the visited nodes */
+  AVL.prototype.descend=function(value){
+    var path=[],n=this.root;
+    while(n){
+      var edge=path.length?path[path.length-1].value+"->"+n.value:"";
+      path.push(n);
+      var text=path.map(function(x){return x.value;}).join(" → ");
+      if(value===n.value){this.frame("Found "+value+".",marks(n,"is-found"),edge,text);break;}
+      var goLeft=value<n.value;
+      this.frame("Compare "+value+" with "+n.value+": go "+(goLeft?"left":"right")+".",marks(n,"is-checking"),edge,text);
+      n=goLeft?n.left:n.right;
+    }
+    return path;
   };
 
   AVL.prototype.insert=function(value){
-    this.events=[];
-    var inserted=false,self=this;
+    this.events=[];this.frames=[];
+    var path=this.descend(value);
+    var last=path[path.length-1]||null;
+    if(last&&last.value===value)return false;
 
-    function put(n){
-      if(!n){inserted=true;return new Node(value);}
-      if(value<n.value)n.left=put(n.left);
-      else if(value>n.value)n.right=put(n.right);
-      else return n;
-      return self.rebalance(n);
-    }
+    var leaf=new Node(value);
+    if(!last)this.root=leaf;
+    else if(value<last.value)last.left=leaf;
+    else last.right=leaf;
+    this.frame(last?"Insert "+value+" as the "+(value<last.value?"left":"right")+" child of "+last.value+"; walk back up.":"Insert "+value+" as the root.",marks(leaf,"is-found"),last?last.value+"->"+value:"");
 
-    this.root=put(this.root);
-    return inserted;
+    for(var i=path.length-1;i>=0;i--)this.rebalance(path[i],path[i-1]||null);
+    return true;
   };
 
   AVL.prototype.delete=function(value){
-    this.events=[];
-    var deleted=false,self=this;
+    this.events=[];this.frames=[];
+    var path=this.descend(value);
+    var n=path[path.length-1]||null;
+    if(!n||n.value!==value)return false;
+    path.pop();
+    var parent=path[path.length-1]||null,chain;
 
-    function removeMin(x){
-      if(!x.left)return x.right;
-      x.left=removeMin(x.left);
-      return self.rebalance(x);
-    }
-
-    function remove(n){
-      if(!n)return null;
-
-      if(value<n.value)n.left=remove(n.left);
-      else if(value>n.value)n.right=remove(n.right);
-      else{
-        deleted=true;
-        if(!n.left||!n.right)return n.left||n.right;
-        var s=n.right;
-        while(s.left)s=s.left;
-        n.value=s.value;
-        n.right=removeMin(n.right);
+    if(n.left&&n.right){
+      this.frame(value+" has two children: find its inorder successor.",marks(n,"is-found"));
+      var sp=[n],s=n.right;
+      while(true){
+        this.frame(s.left?"Successor search: go left from "+s.value+".":"Inorder successor is "+s.value+" (leftmost in the right subtree).",marks(n,"is-found",s,"is-checking"),sp[sp.length-1].value+"->"+s.value);
+        if(!s.left)break;
+        sp.push(s);s=s.left;
       }
-
-      return n?self.rebalance(n):null;
+      var sParent=sp[sp.length-1];
+      n.value=s.value;
+      this.link(sParent,s,s.right);
+      this.frame("Copy "+s.value+" into "+value+"'s node, unlink the old "+s.value+"; walk back up.",marks(n,"is-found"));
+      chain=path.concat(sp);
+    }else{
+      var child=n.left||n.right;
+      this.link(parent,n,child);
+      this.frame(child?"Remove "+value+" (one child): "+child.value+" takes its place; walk back up.":"Remove leaf "+value+"; walk back up.",marks(child,"is-found"));
+      chain=path;
     }
 
-    this.root=remove(this.root);
-    return deleted;
+    for(var i=chain.length-1;i>=0;i--)this.rebalance(chain[i],chain[i-1]||null);
+    return true;
   };
 
   AVL.prototype.search=function(value){
@@ -488,6 +546,9 @@ excerpt: "Interactive AVL Tree simulator with insertion, deletion, search, rotat
   var DELAY=400;
 
   var token=0,marked={},activeEdge="";
+  /* frame being played (null = draw the live tree) */
+  var view=null;
+  function shownRoot(){return view?view.root:tree.root;}
 
   /* drawing geometry (SVG user units); the viewBox follows the tree's extent,
      so a large tree is scaled down instead of overflowing the panel */
@@ -535,7 +596,7 @@ excerpt: "Interactive AVL Tree simulator with insertion, deletion, search, rotat
       if(depth>maxDepth)maxDepth=depth;
       place(node.right,depth+1,node);
     }
-    place(tree.root,0,null);
+    place(shownRoot(),0,null);
     return{nodes:nodes,edges:edges,width:PAD*2+Math.max(0,rank-1)*SX,height:TOP+maxDepth*SY+BOTTOM};
   }
 
@@ -548,17 +609,17 @@ excerpt: "Interactive AVL Tree simulator with insertion, deletion, search, rotat
       maxBf=Math.max(maxBf,Math.abs(tree.bf(n)));
       walk(n.left,d+1);walk(n.right,d+1);
     }
-    walk(tree.root,1);
+    walk(shownRoot(),1);
     el.nodes.textContent=String(count);
     el.height.textContent=String(height);
     el.maxBf.textContent=String(maxBf);
-    el.rotations.textContent=String(tree.rotations);
+    el.rotations.textContent=String(view?view.rotations:tree.rotations);
   }
 
   function render(){
     while(el.svg.lastChild)el.svg.removeChild(el.svg.lastChild);
 
-    if(!tree.root){
+    if(!shownRoot()){
       el.svg.setAttribute("viewBox","0 0 "+MIN_W+" "+MIN_H);
       var empty=document.createElementNS(ns,"text");
       empty.setAttribute("x",String(MIN_W/2));empty.setAttribute("y",String(MIN_H/2));
@@ -601,25 +662,26 @@ excerpt: "Interactive AVL Tree simulator with insertion, deletion, search, rotat
     metrics();
   }
 
-  function showEvents(){
+  function showEvents(count){
+    var events=count===undefined?tree.events:tree.events.slice(0,count);
     el.events.innerHTML="";
-    if(!tree.events.length){
+    if(!events.length){
       var li=document.createElement("li");
       li.textContent="No rotation was required.";
       el.events.appendChild(li);
       return;
     }
 
-    var shown=tree.events.length>EVENT_ROWS?tree.events.slice(0,EVENT_ROWS-1):tree.events;
+    var shown=events.length>EVENT_ROWS?events.slice(0,EVENT_ROWS-1):events;
     shown.forEach(function(event){
       var li=document.createElement("li");
       li.textContent=event;
       li.title=event;
       el.events.appendChild(li);
     });
-    if(shown.length<tree.events.length){
+    if(shown.length<events.length){
       var more=document.createElement("li");
-      more.textContent="… "+(tree.events.length-shown.length)+" more";
+      more.textContent="… "+(events.length-shown.length)+" more";
       el.events.appendChild(more);
     }
   }
@@ -645,6 +707,28 @@ excerpt: "Interactive AVL Tree simulator with insertion, deletion, search, rotat
     return true;
   }
 
+  /* plays recorded frames; the tree itself is already in its final state */
+  async function play(frames,t){
+    for(var i=0;i<frames.length;i++){
+      var f=frames[i];
+      view=f;marked=f.marks;activeEdge=f.edge;
+      if(f.path!==undefined)el.path.textContent=f.path;
+      setStatus(f.msg);
+      showEvents(f.events);
+      render();
+      if(!(await wait(delay(),t)))return false;
+    }
+    view=null;
+    return true;
+  }
+
+  function finish(){
+    view=null;
+    showEvents();
+    disable(false);
+    render();
+  }
+
   async function animateTraversal(nodes,label){
     token++;
     var t=token,visited=[];
@@ -667,59 +751,51 @@ excerpt: "Interactive AVL Tree simulator with insertion, deletion, search, rotat
   btn.insert.addEventListener("click",async function(){
     try{
       var value=readValue();
-      var before=tree.search(value);
-
-      if(before.found){
-        await animatePath(before.path,before.node);
-        setStatus(value+" already exists.","is-bad");
-        return;
-      }
-
-      tree.insert(value);
-      showEvents();
-      clearMarks();render();
-
-      var after=tree.search(value);
-      await animatePath(after.path,after.node);
-      setStatus("Inserted "+value+".","is-ok");
-    }catch(error){disable(false);setStatus(error.message,"is-bad");}
+      token++;
+      var t=token;
+      disable(true);
+      var inserted=tree.insert(value);
+      if(!(await play(tree.frames,t)))return;
+      clearMarks();
+      marked[String(value)]="is-found";
+      finish();
+      setStatus(inserted?"Inserted "+value+"; every BF is now in {-1, 0, +1}.":value+" already exists.",inserted?"is-ok":"is-bad");
+    }catch(error){view=null;disable(false);setStatus(error.message,"is-bad");}
   });
 
   btn.search.addEventListener("click",async function(){
     try{
       var value=readValue(),r=tree.search(value);
-      await animatePath(r.path,r.found?r.node:null);
+      if(!(await animatePath(r.path,r.found?r.node:null)))return;
       setStatus(r.found?"Found "+value+".":value+" was not found.",r.found?"is-ok":"is-bad");
     }catch(error){disable(false);setStatus(error.message,"is-bad");}
   });
 
   btn.delete.addEventListener("click",async function(){
     try{
-      var value=readValue(),before=tree.search(value);
-      await animatePath(before.path,before.found?before.node:null);
-
-      if(!before.found){
-        setStatus(value+" was not found.","is-bad");
-        return;
-      }
-
-      tree.delete(value);
-      showEvents();clearMarks();render();
-      setStatus("Deleted "+value+".","is-ok");
-    }catch(error){disable(false);setStatus(error.message,"is-bad");}
+      var value=readValue();
+      token++;
+      var t=token;
+      disable(true);
+      var deleted=tree.delete(value);
+      if(!(await play(tree.frames,t)))return;
+      clearMarks();
+      finish();
+      setStatus(deleted?"Deleted "+value+"; heights and BFs were rechecked up to the root.":value+" was not found.",deleted?"is-ok":"is-bad");
+    }catch(error){view=null;disable(false);setStatus(error.message,"is-bad");}
   });
 
   btn.min.addEventListener("click",async function(){
     var r=tree.minimum();
     if(!r.node){setStatus("Tree is empty.","is-bad");return;}
-    await animatePath(r.path,r.node);
+    if(!(await animatePath(r.path,r.node)))return;
     setStatus("Minimum is "+r.node.value+".","is-ok");
   });
 
   btn.max.addEventListener("click",async function(){
     var r=tree.maximum();
     if(!r.node){setStatus("Tree is empty.","is-bad");return;}
-    await animatePath(r.path,r.node);
+    if(!(await animatePath(r.path,r.node)))return;
     setStatus("Maximum is "+r.node.value+".","is-ok");
   });
 
@@ -735,6 +811,7 @@ excerpt: "Interactive AVL Tree simulator with insertion, deletion, search, rotat
 
   function load(values){
     token++;
+    view=null;
     tree=new AVL();
     values.forEach(function(v){tree.insert(v);});
     clearMarks();el.path.textContent="—";showEvents();disable(false);render();
@@ -757,6 +834,7 @@ excerpt: "Interactive AVL Tree simulator with insertion, deletion, search, rotat
 
   btn.reset.addEventListener("click",function(){
     token++;
+    view=null;
     tree=new AVL();
     clearMarks();
     el.path.textContent="—";
@@ -767,11 +845,11 @@ excerpt: "Interactive AVL Tree simulator with insertion, deletion, search, rotat
   });
 
   btn.cancel.addEventListener("click",function(){
+    var playing=view!==null;
     token++;
     clearMarks();
-    disable(false);
-    render();
-    setStatus("Animation cancelled.");
+    finish();
+    setStatus(playing?"Animation cancelled; the final tree is shown.":"Animation cancelled.");
   });
 
   load([40,20,60,10,30,50,70]);

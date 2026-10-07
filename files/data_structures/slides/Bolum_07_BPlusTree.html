@@ -99,6 +99,12 @@ excerpt: "Compact interactive B+ Tree simulator."
   fill: none;
 }
 
+.bplus-leaf-link.active {
+  stroke: #e9a23b;
+  stroke-width: 3.5;
+  stroke-dasharray: none;
+}
+
 .bplus-node-box {
   fill: var(--ds-node);
   stroke: var(--ds-link);
@@ -329,6 +335,8 @@ excerpt: "Compact interactive B+ Tree simulator."
   let token = 0;
   let running = false;
   let lastResult = "—";
+  /* the tree before the running operation; Cancel puts it back */
+  let saved = null;
 
   let marks = {
     checking: new Set(),
@@ -358,9 +366,15 @@ excerpt: "Compact interactive B+ Tree simulator."
     constructor(order) {
       this.order = order;
       this.maxKeys = order - 1;
+      /* minimum fill for every node except the root */
+      this.minLeafKeys = Math.ceil((order - 1) / 2);
+      this.minIndexKeys = Math.ceil(order / 2) - 1;
       this.root = null;
       this.splitCount = 0;
       this.changeLog = [];
+      /* when recording, every algorithm step saves a snapshot frame for the animation */
+      this.recording = false;
+      this.frames = [];
     }
 
     clearLog() {
@@ -374,6 +388,60 @@ excerpt: "Compact interactive B+ Tree simulator."
       });
     }
 
+    clone() {
+      const copy = new BPlusTree(this.order);
+      const map = new Map();
+      function walk(node, parent) {
+        const c = Object.create(BPlusNode.prototype);
+        c.id = node.id;
+        c.leaf = node.leaf;
+        c.keys = node.keys.slice();
+        c.parent = parent;
+        c.next = null;
+        map.set(node, c);
+        c.children = node.children.map(child => walk(child, c));
+        return c;
+      }
+      copy.root = this.root ? walk(this.root, null) : null;
+      map.forEach((c, node) => {
+        c.next = node.next ? map.get(node.next) || null : null;
+      });
+      copy.splitCount = this.splitCount;
+      copy.changeLog = this.changeLog.slice();
+      return copy;
+    }
+
+    /* m: { checking, found, changed, removing: [nodes], edges: [[parent, child]] } */
+    snap(message, m = {}) {
+      if (!this.recording) return;
+      const ids = list => (list || []).filter(Boolean).map(node => node.id);
+      this.frames.push({
+        tree: this.clone(),
+        message,
+        marks: {
+          checking: ids(m.checking),
+          found: ids(m.found),
+          changed: ids(m.changed),
+          removing: ids(m.removing),
+          edges: (m.edges || []).map(([a, b]) => `${a.id}-${b.id}`)
+        }
+      });
+    }
+
+    childIndex(node, value) {
+      let i = 0;
+      while (i < node.keys.length && value >= node.keys[i]) i++;
+      return i;
+    }
+
+    /* where value falls among the separators: equal keys go right */
+    where(node, i, value) {
+      const k = node.keys;
+      if (i === 0) return `${value} < ${k[0]}`;
+      if (i === k.length) return `${value} ≥ ${k[k.length - 1]}`;
+      return `${k[i - 1]} ≤ ${value} < ${k[i]}`;
+    }
+
     findLeaf(value) {
       const path = [];
       let node = this.root;
@@ -382,15 +450,21 @@ excerpt: "Compact interactive B+ Tree simulator."
 
       while (!node.leaf) {
         path.push(node);
-
-        let i = 0;
-        while (i < node.keys.length && value >= node.keys[i]) i++;
-
-        node = node.children[i];
+        node = node.children[this.childIndex(node, value)];
       }
 
       path.push(node);
       return { leaf: node, path };
+    }
+
+    /* the descent from the root to the leaf, one frame per index node */
+    snapDescent(value) {
+      let node = this.root;
+      while (node && !node.leaf) {
+        const i = this.childIndex(node, value);
+        this.snap(`Index [${node.keys.join(", ")}]: ${this.where(node, i, value)} → child ${i}.`, { checking: [node], edges: [[node, node.children[i]]] });
+        node = node.children[i];
+      }
     }
 
     search(value) {
@@ -415,11 +489,14 @@ excerpt: "Compact interactive B+ Tree simulator."
         this.root = new BPlusNode(true);
         this.root.keys.push(value);
         this.log("new root", [this.root]);
+        this.snap(`Empty tree: create a root leaf [${value}].`, { found: [this.root] });
         return true;
       }
 
       const located = this.search(value);
       if (located.found) return false;
+
+      this.snapDescent(value);
 
       const leaf = located.leaf;
       let index = 0;
@@ -427,9 +504,10 @@ excerpt: "Compact interactive B+ Tree simulator."
       leaf.keys.splice(index, 0, value);
 
       if (leaf.keys.length > this.maxKeys) {
+        this.snap(`Insert ${value}: leaf has ${leaf.keys.length} keys > max ${this.maxKeys} → split the leaf.`, { removing: [leaf] });
         this.splitLeaf(leaf);
       } else {
-        this.refreshSeparatorsUpward(leaf.parent);
+        this.snap(`Insert ${value} into leaf [${leaf.keys.join(", ")}]; no overflow.`, { found: [leaf] });
       }
 
       return true;
@@ -448,10 +526,11 @@ excerpt: "Compact interactive B+ Tree simulator."
 
       this.splitCount++;
       this.log("leaf split", [leaf, right]);
-      this.insertIntoParent(leaf, separator, right);
+      this.insertIntoParent(leaf, separator, right, `Leaf split: ${separator} COPIED up (stays in the right leaf)`);
     }
 
-    insertIntoParent(left, separator, right) {
+    /* what: the split that produced right, for the status line */
+    insertIntoParent(left, separator, right, what) {
       if (!left.parent) {
         const newRoot = new BPlusNode(false);
         newRoot.keys = [separator];
@@ -460,6 +539,7 @@ excerpt: "Compact interactive B+ Tree simulator."
         right.parent = newRoot;
         this.root = newRoot;
         this.log("new root", [newRoot]);
+        this.snap(`${what}, into a new root; height +1.`, { changed: [newRoot, left, right] });
         return;
       }
 
@@ -471,9 +551,10 @@ excerpt: "Compact interactive B+ Tree simulator."
       right.parent = parent;
 
       if (parent.children.length > this.order) {
+        this.snap(`${what}; parent has ${parent.children.length} > ${this.order} children → split.`, { changed: [left, right], removing: [parent] });
         this.splitInternal(parent);
       } else {
-        this.refreshSeparatorsUpward(parent);
+        this.snap(`${what}, into the parent [${parent.keys.join(", ")}].`, { changed: [left, right, parent] });
       }
     }
 
@@ -495,7 +576,7 @@ excerpt: "Compact interactive B+ Tree simulator."
 
       this.splitCount++;
       this.log("internal split", [node, right]);
-      this.insertIntoParent(node, promote, right);
+      this.insertIntoParent(node, promote, right, `Index split: middle key ${promote} PUSHED up (leaves this level)`);
     }
 
     smallestKey(node) {
@@ -506,26 +587,6 @@ excerpt: "Compact interactive B+ Tree simulator."
       }
 
       return current && current.keys.length ? current.keys[0] : null;
-    }
-
-    refreshNodeSeparators(node) {
-      if (!node || node.leaf) return;
-
-      const keys = [];
-      for (let i = 1; i < node.children.length; i++) {
-        const separator = this.smallestKey(node.children[i]);
-        if (separator !== null) keys.push(separator);
-      }
-      node.keys = keys;
-    }
-
-    refreshSeparatorsUpward(node) {
-      let current = node;
-
-      while (current) {
-        this.refreshNodeSeparators(current);
-        current = current.parent;
-      }
     }
 
     allRecords() {
@@ -573,47 +634,25 @@ excerpt: "Compact interactive B+ Tree simulator."
       return this.root ? height : 0;
     }
 
+    /* the start leaf is found by a root-to-leaf descent, then the leaves are walked through their links */
     range(start, end) {
-      if (!this.root) return { leaves: [], values: [] };
+      if (!this.root) return { scans: [], values: [], path: [] };
 
       const located = this.findLeaf(start);
       let leaf = located.leaf;
-      const leaves = [];
+      const scans = [];
       const values = [];
 
       while (leaf) {
-        let touched = false;
-
-        for (const key of leaf.keys) {
-          if (key >= start && key <= end) {
-            values.push(key);
-            touched = true;
-          }
-
-          if (key > end) {
-            if (touched) leaves.push(leaf);
-            return { leaves, values, path: located.path };
-          }
-        }
-
-        if (touched) leaves.push(leaf);
-
-        if (leaf.keys.length && leaf.keys[leaf.keys.length - 1] > end) break;
+        const hits = leaf.keys.filter(key => key >= start && key <= end);
+        const stop = leaf.keys.some(key => key > end) || !leaf.next;
+        values.push(...hits);
+        scans.push({ leaf, hits, stop });
+        if (stop) break;
         leaf = leaf.next;
       }
 
-      return { leaves, values, path: located.path };
-    }
-
-    rebuild(values) {
-      BPlusNode.nextId = 1;
-      const replacement = new BPlusTree(this.order);
-
-      values.forEach(value => replacement.insert(value));
-
-      this.root = replacement.root;
-      this.splitCount = replacement.splitCount;
-      this.changeLog = replacement.changeLog;
+      return { scans, values, path: located.path };
     }
 
     delete(value) {
@@ -622,10 +661,147 @@ excerpt: "Compact interactive B+ Tree simulator."
       const located = this.search(value);
       if (!located.found) return false;
 
-      const values = this.allRecords().filter(key => key !== value);
-      this.rebuild(values);
-      this.log("rebuild after delete", this.root ? [this.root] : []);
+      this.snapDescent(value);
+
+      const leaf = located.leaf;
+      this.snap(`Remove record ${value} from leaf [${leaf.keys.join(", ")}].`, { removing: [leaf] });
+      leaf.keys.splice(leaf.keys.indexOf(value), 1);
+      this.log("remove record", [leaf]);
+
+      if (leaf === this.root) {
+        if (!leaf.keys.length) {
+          this.root = null;
+          this.snap("The last record was removed: the tree is now empty.");
+        } else {
+          this.snap(`Removed ${value}; the root leaf may hold any number of keys.`, { changed: [leaf] });
+        }
+        return true;
+      }
+
+      if (leaf.keys.length >= this.minLeafKeys) {
+        this.snap(`Removed ${value}; leaf still has ≥ ${this.minLeafKeys} key(s), no underflow.`, { changed: [leaf] });
+      } else {
+        this.rebalance(leaf);
+      }
+
+      this.fixSeparator(value);
       return true;
+    }
+
+    /* an index key equal to the deleted record is replaced by the smallest key of its right subtree */
+    fixSeparator(value) {
+      this.allNodes().forEach(node => {
+        if (node.leaf) return;
+        const i = node.keys.indexOf(value);
+        if (i < 0) return;
+        const replacement = this.smallestKey(node.children[i + 1]);
+        node.keys[i] = replacement;
+        this.log("separator update", [node]);
+        this.snap(`Index key ${value} is no longer a record: replace it with ${replacement}.`, { changed: [node] });
+      });
+    }
+
+    rebalance(node) {
+      if (node === this.root) {
+        if (!node.leaf && node.keys.length === 0) {
+          this.root = node.children[0];
+          this.root.parent = null;
+          this.log("root shrink", [this.root]);
+          this.snap("The root index has a single child left: it becomes the root; height −1.", { changed: [this.root] });
+        }
+        return;
+      }
+
+      const min = node.leaf ? this.minLeafKeys : this.minIndexKeys;
+      if (node.keys.length >= min) return;
+
+      const kind = node.leaf ? "Leaf" : "Index node";
+      const parent = node.parent;
+      const idx = parent.children.indexOf(node);
+      const left = idx > 0 ? parent.children[idx - 1] : null;
+      const right = idx < parent.children.length - 1 ? parent.children[idx + 1] : null;
+      this.snap(`${kind} has ${node.keys.length} key(s) < minimum ${min}: underflow.`, { removing: [node], checking: [left, right] });
+
+      if (node.leaf) {
+        if (left && left.keys.length > min) {
+          const moved = left.keys.pop();
+          node.keys.unshift(moved);
+          parent.keys[idx - 1] = node.keys[0];
+          this.log("borrow left", [parent, node, left]);
+          this.snap(`Borrow ${moved} from the left leaf; parent separator becomes ${node.keys[0]}.`, { changed: [parent, node, left] });
+          return;
+        }
+
+        if (right && right.keys.length > min) {
+          const moved = right.keys.shift();
+          node.keys.push(moved);
+          parent.keys[idx] = right.keys[0];
+          this.log("borrow right", [parent, node, right]);
+          this.snap(`Borrow ${moved} from the right leaf; parent separator becomes ${right.keys[0]}.`, { changed: [parent, node, right] });
+          return;
+        }
+
+        if (left) {
+          const separator = parent.keys[idx - 1];
+          left.keys.push(...node.keys);
+          left.next = node.next;
+          parent.keys.splice(idx - 1, 1);
+          parent.children.splice(idx, 1);
+          this.log("merge", [parent, left]);
+          this.snap(`Merge with the left leaf; separator ${separator} is deleted from the parent.`, { changed: [parent, left] });
+        } else {
+          const separator = parent.keys[idx];
+          node.keys.push(...right.keys);
+          node.next = right.next;
+          parent.keys.splice(idx, 1);
+          parent.children.splice(idx + 1, 1);
+          this.log("merge", [parent, node]);
+          this.snap(`Merge with the right leaf; separator ${separator} is deleted from the parent.`, { changed: [parent, node] });
+        }
+
+        this.rebalance(parent);
+        return;
+      }
+
+      if (left && left.keys.length > min) {
+        const down = parent.keys[idx - 1];
+        const child = left.children.pop();
+        node.keys.unshift(down);
+        node.children.unshift(child);
+        child.parent = node;
+        parent.keys[idx - 1] = left.keys.pop();
+        this.log("borrow left", [parent, node, left]);
+        this.snap(`Rotate: ${down} moves down, ${parent.keys[idx - 1]} moves up from the left sibling.`, { changed: [parent, node, left] });
+        return;
+      }
+
+      if (right && right.keys.length > min) {
+        const down = parent.keys[idx];
+        const child = right.children.shift();
+        node.keys.push(down);
+        node.children.push(child);
+        child.parent = node;
+        parent.keys[idx] = right.keys.shift();
+        this.log("borrow right", [parent, node, right]);
+        this.snap(`Rotate: ${down} moves down, ${parent.keys[idx]} moves up from the right sibling.`, { changed: [parent, node, right] });
+        return;
+      }
+
+      const target = left || node;
+      const source = left ? node : right;
+      const at = left ? idx - 1 : idx;
+      const separator = parent.keys[at];
+      target.keys.push(separator, ...source.keys);
+      source.children.forEach(child => {
+        child.parent = target;
+      });
+      target.children.push(...source.children);
+      parent.keys.splice(at, 1);
+      parent.children.splice(at + 1, 1);
+      this.log("merge", [parent, target]);
+      this.snap(`Merge index nodes; separator ${separator} moves down between them.`, { changed: [parent, target] });
+
+      this.rebalance(parent);
     }
   }
 
@@ -651,6 +827,7 @@ excerpt: "Compact interactive B+ Tree simulator."
 
   function setStatus(text, type = "") {
     el.status.textContent = text;
+    el.status.title = text;
     el.status.className = "bplus-status" + (type ? " " + type : "");
   }
 
@@ -805,7 +982,8 @@ excerpt: "Compact interactive B+ Tree simulator."
 
       const path = svgElement("path", {
         d: `M ${a.x + aw / 2} ${a.y + 22} C ${a.x + aw / 2 + 8} ${a.y + 34}, ${b.x - bw / 2 - 8} ${b.y + 34}, ${b.x - bw / 2} ${b.y + 22}`,
-        class: "bplus-leaf-link"
+        class: "bplus-leaf-link" +
+          (marks.activeEdges.has(`link-${leftLeaf.id}-${rightLeaf.id}`) ? " active" : "")
       });
       el.svg.appendChild(path);
     }
@@ -885,6 +1063,7 @@ excerpt: "Compact interactive B+ Tree simulator."
 
   function begin(operation) {
     token++;
+    saved = tree;
     clearMarks();
     lastResult = "—";
     el.operation.textContent = operation;
@@ -896,6 +1075,7 @@ excerpt: "Compact interactive B+ Tree simulator."
   function finish(localToken, message, type = "") {
     if (localToken !== token) return;
 
+    saved = null;
     running = false;
     setRunning(false);
     el.operation.textContent = "Idle";
@@ -906,6 +1086,8 @@ excerpt: "Compact interactive B+ Tree simulator."
   function fail(localToken, error) {
     if (error?.message === "cancelled" || localToken !== token) return;
 
+    if (saved) tree = saved;
+    saved = null;
     running = false;
     setRunning(false);
     el.operation.textContent = "Idle";
@@ -945,6 +1127,36 @@ excerpt: "Compact interactive B+ Tree simulator."
     });
   }
 
+  /* plays the recorded algorithm steps; the real tree is replaced only after the last step */
+  async function playFrames(localToken, frames) {
+    for (const frame of frames) {
+      tree = frame.tree;
+      clearMarks();
+      frame.marks.checking.forEach(id => marks.checking.add(id));
+      frame.marks.found.forEach(id => marks.found.add(id));
+      frame.marks.changed.forEach(id => marks.changed.add(id));
+      frame.marks.removing.forEach(id => marks.removing.add(id));
+      frame.marks.edges.forEach(key => marks.activeEdges.add(key));
+      render();
+      setStatus(frame.message);
+      await pause(localToken);
+    }
+  }
+
+  function workingCopy() {
+    const work = tree.clone();
+    work.recording = true;
+    work.frames = [];
+    return work;
+  }
+
+  function commit(work) {
+    work.recording = false;
+    work.frames = [];
+    tree = work;
+    saved = null;
+  }
+
   async function insertValue() {
     const value = integer(el.value);
 
@@ -962,9 +1174,9 @@ excerpt: "Compact interactive B+ Tree simulator."
 
     try {
       const lookup = tree.search(value);
-      await animatePath(t, lookup.path);
 
       if (lookup.found) {
+        await animatePath(t, lookup.path);
         marks.found.add(lookup.leaf.id);
         lastResult = "duplicate";
         render();
@@ -974,17 +1186,12 @@ excerpt: "Compact interactive B+ Tree simulator."
         return;
       }
 
-      tree.insert(value);
-      applyChangeMarks();
+      const work = workingCopy();
+      work.insert(value);
+      await playFrames(t, work.frames);
+
+      commit(work);
       lastResult = value;
-      render();
-
-      if (tree.changeLog.length) {
-        const changes = tree.changeLog.map(item => item.type).join(", ");
-        setStatus(`Inserted ${value}. ${changes}.`);
-        await pause(t);
-      }
-
       clearMarks();
       finish(t, `Inserted ${value}.`, "success");
     } catch (error) {
@@ -1021,7 +1228,7 @@ excerpt: "Compact interactive B+ Tree simulator."
       } else {
         lastResult = "not found";
         clearMarks();
-        finish(t, `${value} not found.`, "error");
+        finish(t, `${value} not found (records live only in the leaves).`, "error");
       }
     } catch (error) {
       fail(t, error);
@@ -1045,33 +1252,23 @@ excerpt: "Compact interactive B+ Tree simulator."
 
     try {
       const lookup = tree.search(value);
-      await animatePath(t, lookup.path);
 
       if (!lookup.found) {
+        await animatePath(t, lookup.path);
         clearMarks();
         lastResult = "not found";
         finish(t, `${value} not found.`, "error");
         return;
       }
 
-      marks.removing.add(lookup.leaf.id);
-      render();
-      setStatus(`Removing record ${value}...`);
-      await pause(t);
+      const work = workingCopy();
+      work.delete(value);
+      await playFrames(t, work.frames);
 
-      tree.delete(value);
-      clearMarks();
-
-      if (tree.root) {
-        marks.changed.add(tree.root.id);
-      }
-
+      commit(work);
       lastResult = value;
-      render();
-      await pause(t);
-
       clearMarks();
-      finish(t, `Deleted ${value}; separators and leaf links rebuilt.`, "success");
+      finish(t, `Deleted ${value}.`, "success");
     } catch (error) {
       fail(t, error);
     }
@@ -1088,14 +1285,17 @@ excerpt: "Compact interactive B+ Tree simulator."
     try {
       const result = [];
       let leaf = tree.firstLeaf();
+      let previous = null;
 
       while (leaf) {
         marks.visited.add(leaf.id);
+        if (previous) marks.activeEdges.add(`link-${previous.id}-${leaf.id}`);
         result.push(...leaf.keys);
         lastResult = result.join(" → ");
         render();
-        setStatus(`Leaf [${leaf.keys.join(", ")}]`);
+        setStatus(`Leaf [${leaf.keys.join(", ")}]` + (leaf.next ? " → follow the next link" : " → last leaf"));
         await pause(t);
+        previous = leaf;
         leaf = leaf.next;
       }
 
@@ -1132,16 +1332,24 @@ excerpt: "Compact interactive B+ Tree simulator."
       const result = tree.range(start, end);
       await animatePath(t, result.path || []);
 
-      for (const leaf of result.leaves) {
-        marks.range.add(leaf.id);
+      let previous = null;
+      for (const scan of result.scans) {
+        const leaf = scan.leaf;
+        if (scan.hits.length) marks.range.add(leaf.id);
+        else marks.visited.add(leaf.id);
+        if (previous) marks.activeEdges.add(`link-${previous.id}-${leaf.id}`);
         render();
-        setStatus(`Scanning linked leaf [${leaf.keys.join(", ")}]...`);
+        const found = scan.hits.length ? `takes ${scan.hits.join(", ")}` : "nothing in range";
+        const next = scan.stop
+          ? (leaf.next ? `; a key > ${end} → stop.` : "; last leaf → stop.")
+          : "; follow the next link.";
+        setStatus(`Leaf [${leaf.keys.join(", ")}]: ${found}${next}`);
         await pause(t);
+        previous = leaf;
       }
 
       lastResult = result.values.length ? result.values.join(" → ") : "none";
       render();
-      await pause(t);
 
       clearMarks();
       finish(
@@ -1158,6 +1366,7 @@ excerpt: "Compact interactive B+ Tree simulator."
 
   function loadValues(values, message) {
     token++;
+    saved = null;
     running = false;
     BPlusNode.nextId = 1;
     tree = new BPlusTree(order());
@@ -1192,6 +1401,7 @@ excerpt: "Compact interactive B+ Tree simulator."
 
   function resetTree() {
     token++;
+    saved = null;
     running = false;
     BPlusNode.nextId = 1;
     tree = new BPlusTree(order());
@@ -1207,12 +1417,14 @@ excerpt: "Compact interactive B+ Tree simulator."
     if (!running) return;
 
     token++;
+    if (saved) tree = saved;
+    saved = null;
     running = false;
     clearMarks();
     setRunning(false);
     el.operation.textContent = "Idle";
     render();
-    setStatus("Animation cancelled.");
+    setStatus("Animation cancelled; the tree is unchanged.");
   }
 
   el.insert.addEventListener("click", insertValue);

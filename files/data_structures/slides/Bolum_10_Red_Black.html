@@ -2,7 +2,7 @@
 layout: without-sidebar
 title: "Red-Black Tree Simulator"
 permalink: /files/data_structures/slides/Bolum_10_Red_Black.html
-excerpt: "Interactive Left-Leaning Red-Black Tree simulator with insertion, deletion, search, rotations, recoloring, validation, and responsive SVG visualization."
+excerpt: "Interactive red-black tree simulator: step-by-step insertion fix-up (uncle red: recolor; uncle black: rotate), deletion with sibling cases, search and validation."
 ---
 
 <!-- ds-guard:begin -->
@@ -302,71 +302,59 @@ excerpt: "Interactive Left-Leaning Red-Black Tree simulator with insertion, dele
 
   var RED=true,BLACK=false;
 
-  function Node(value,color){this.value=value;this.color=color===undefined?RED:color;this.left=null;this.right=null;}
+  /* classic red-black tree (null children are the black NIL leaves). Every operation
+     is computed at once and recorded as frames that the UI plays back */
+  function Node(value,color){this.value=value;this.color=color===undefined?RED:color;this.left=null;this.right=null;this.parent=null;}
 
-  function LLRB(){this.root=null;this.rotations=0;this.events=[];}
+  function RBTree(){this.root=null;this.rotations=0;this.events=[];this.frames=[];}
 
-  LLRB.prototype.isRed=function(n){return !!n&&n.color===RED;};
+  function marks(){
+    var m={};
+    for(var i=0;i<arguments.length;i++)if(arguments[i])m[String(arguments[i].value)]="is-checking";
+    return m;
+  }
 
-  LLRB.prototype.rotateLeft=function(h){
-    var x=h.right;h.right=x.left;x.left=h;x.color=h.color;h.color=RED;
-    this.rotations++;this.events.push("Rotate left at "+h.value+".");return x;
+  function name(n){return n?String(n.value):"NIL";}
+
+  RBTree.prototype.isRed=function(n){return !!n&&n.color===RED;};
+
+  RBTree.prototype.copy=function(n,parent){
+    if(!n)return null;
+    var c=new Node(n.value,n.color);c.parent=parent||null;
+    c.left=this.copy(n.left,c);c.right=this.copy(n.right,c);
+    return c;
   };
 
-  LLRB.prototype.rotateRight=function(h){
-    var x=h.left;h.left=x.right;x.right=h;x.color=h.color;h.color=RED;
-    this.rotations++;this.events.push("Rotate right at "+h.value+".");return x;
+  RBTree.prototype.frame=function(msg,m,edge,path){
+    this.frames.push({root:this.copy(this.root,null),marks:m||{},edge:edge||"",msg:msg,path:path,events:this.events.length,rotations:this.rotations});
   };
 
-  LLRB.prototype.flipColors=function(h){
-    h.color=!h.color;if(h.left)h.left.color=!h.left.color;if(h.right)h.right.color=!h.right.color;
-    this.events.push("Flip colors at "+h.value+".");
+  RBTree.prototype.replace=function(u,v){
+    if(!u.parent)this.root=v;
+    else if(u===u.parent.left)u.parent.left=v;
+    else u.parent.right=v;
+    if(v)v.parent=u.parent;
   };
 
-  LLRB.prototype.fix=function(h){
-    if(this.isRed(h.right)&&!this.isRed(h.left))h=this.rotateLeft(h);
-    if(this.isRed(h.left)&&this.isRed(h.left.left))h=this.rotateRight(h);
-    if(this.isRed(h.left)&&this.isRed(h.right))this.flipColors(h);
-    return h;
+  RBTree.prototype.rotateLeft=function(x){
+    var y=x.right;
+    x.right=y.left;if(y.left)y.left.parent=x;
+    this.replace(x,y);
+    y.left=x;x.parent=y;
+    this.rotations++;
   };
 
-  LLRB.prototype.insert=function(value){
-    this.events=[];var inserted=false,self=this;
-    function put(h){
-      if(!h){inserted=true;return new Node(value);}
-      if(value<h.value)h.left=put(h.left);
-      else if(value>h.value)h.right=put(h.right);
-      else return h;
-      return self.fix(h);
-    }
-    this.root=put(this.root);if(this.root)this.root.color=BLACK;return inserted;
+  RBTree.prototype.rotateRight=function(x){
+    var y=x.left;
+    x.left=y.right;if(y.right)y.right.parent=x;
+    this.replace(x,y);
+    y.right=x;x.parent=y;
+    this.rotations++;
   };
 
-  LLRB.prototype.moveRedLeft=function(h){
-    this.flipColors(h);
-    if(h.right&&this.isRed(h.right.left)){
-      h.right=this.rotateRight(h.right);h=this.rotateLeft(h);this.flipColors(h);
-    }
-    return h;
-  };
+  RBTree.prototype.rotate=function(x,dir){if(dir==="left")this.rotateLeft(x);else this.rotateRight(x);};
 
-  LLRB.prototype.moveRedRight=function(h){
-    this.flipColors(h);
-    if(h.left&&this.isRed(h.left.left)){
-      h=this.rotateRight(h);this.flipColors(h);
-    }
-    return h;
-  };
-
-  LLRB.prototype.minNode=function(h){while(h&&h.left)h=h.left;return h;};
-
-  LLRB.prototype.deleteMin=function(h){
-    if(!h.left)return null;
-    if(!this.isRed(h.left)&&!this.isRed(h.left.left))h=this.moveRedLeft(h);
-    h.left=this.deleteMin(h.left);return this.fix(h);
-  };
-
-  LLRB.prototype.search=function(value){
+  RBTree.prototype.search=function(value){
     var path=[],n=this.root;
     while(n){
       path.push(n);
@@ -376,76 +364,187 @@ excerpt: "Interactive Left-Leaning Red-Black Tree simulator with insertion, dele
     return{found:false,node:null,path:path};
   };
 
-  LLRB.prototype.delete=function(value){
-    this.events=[];
-    if(!this.search(value).found)return false;
-    var self=this;
-    if(!this.isRed(this.root.left)&&!this.isRed(this.root.right))this.root.color=RED;
-
-    function remove(h){
-      if(value<h.value){
-        if(h.left){
-          if(!self.isRed(h.left)&&!self.isRed(h.left.left))h=self.moveRedLeft(h);
-          h.left=remove(h.left);
-        }
-      }else{
-        if(self.isRed(h.left))h=self.rotateRight(h);
-        if(value===h.value&&!h.right)return null;
-        if(h.right){
-          if(!self.isRed(h.right)&&!self.isRed(h.right.left))h=self.moveRedRight(h);
-          if(value===h.value){
-            var x=self.minNode(h.right);
-            h.value=x.value;
-            h.right=self.deleteMin(h.right);
-          }else{
-            h.right=remove(h.right);
-          }
-        }
-      }
-      return self.fix(h);
+  RBTree.prototype.descend=function(value){
+    var path=[],n=this.root;
+    while(n){
+      var edge=path.length?path[path.length-1].value+"->"+n.value:"";
+      path.push(n);
+      var text=path.map(function(x){return x.value;}).join(" → ");
+      if(value===n.value){this.frame("Found "+value+".",marks(n),edge,text);break;}
+      var goLeft=value<n.value;
+      this.frame("Compare "+value+" with "+n.value+": go "+(goLeft?"left":"right")+".",marks(n),edge,text);
+      n=goLeft?n.left:n.right;
     }
-
-    this.root=remove(this.root);if(this.root)this.root.color=BLACK;return true;
+    return path;
   };
 
-  LLRB.prototype.minimum=function(){
+  RBTree.prototype.insert=function(value){
+    this.events=[];this.frames=[];
+    var path=this.descend(value),p=path[path.length-1]||null;
+    if(p&&p.value===value)return false;
+
+    var x=new Node(value,RED);x.parent=p;
+    if(!p)this.root=x;
+    else if(value<p.value)p.left=x;
+    else p.right=x;
+    this.frame(p?"Insert "+value+" as a red "+(value<p.value?"left":"right")+" child of "+p.value+".":"Insert "+value+" as a red root.",marks(x),p?p.value+"->"+value:"");
+    this.fixInsert(x);
+    return true;
+  };
+
+  /* x is red; while its parent is also red, look at the uncle u */
+  RBTree.prototype.fixInsert=function(x){
+    while(x!==this.root&&this.isRed(x.parent)){
+      var p=x.parent,g=p.parent,pLeft=p===g.left,u=pLeft?g.right:g.left;
+      this.frame("Red "+x.value+" has red parent "+p.value+"; uncle "+name(u)+" is "+(this.isRed(u)?"red":"black")+".",marks(x,p,u));
+
+      if(this.isRed(u)){
+        p.color=BLACK;u.color=BLACK;g.color=RED;
+        this.events.push("Uncle "+u.value+" red: recolor "+p.value+", "+u.value+", "+g.value+".");
+        this.frame("Uncle red: "+p.value+", "+u.value+" black, "+g.value+" red; go up to "+g.value+".",marks(g));
+        x=g;
+        continue;
+      }
+
+      if(pLeft!==(x===p.left)){
+        var d1=pLeft?"left":"right";
+        this.rotate(p,d1);
+        this.events.push("Triangle: "+d1+" rotation at "+p.value+".");
+        this.frame("Uncle black, triangle: "+d1+" rotation at "+p.value+" makes a line.",marks(p,x));
+        x=p;p=x.parent;
+      }
+
+      var d2=pLeft?"right":"left";
+      this.rotate(g,d2);
+      p.color=BLACK;g.color=RED;
+      this.events.push("Line: "+d2+" rotation at "+g.value+"; recolor "+p.value+", "+g.value+".");
+      this.frame("Uncle black, line: "+d2+" rotation at "+g.value+"; "+p.value+" black, "+g.value+" red.",marks(p,g));
+    }
+
+    if(this.isRed(this.root)){
+      this.root.color=BLACK;
+      this.events.push("Recolor root "+this.root.value+" black.");
+      this.frame("The root must be black: recolor "+this.root.value+" black.",marks(this.root));
+    }
+  };
+
+  RBTree.prototype.delete=function(value){
+    this.events=[];this.frames=[];
+    var path=this.descend(value),z=path[path.length-1]||null;
+    if(!z||z.value!==value)return false;
+
+    /* y is the node that is physically removed: z itself, or z's inorder successor */
+    var y=z;
+    if(z.left&&z.right){
+      this.frame(value+" has two children: find its inorder successor.",marks(z));
+      y=z.right;
+      while(true){
+        this.frame(y.left?"Successor search: go left from "+y.value+".":"Successor is "+y.value+": copy it into "+value+"'s node.",marks(z,y),y.parent.value+"->"+y.value);
+        if(!y.left)break;
+        y=y.left;
+      }
+      z.value=y.value;
+    }
+
+    var x=y.left||y.right,xParent=y.parent,removedColor=y.color,label=y===z?String(value):"the old "+y.value;
+    this.replace(y,x);
+    if(removedColor===RED){
+      this.frame("Remove "+label+": it was red, so no property is broken.",marks(x));
+      return true;
+    }
+    if(this.isRed(x)){
+      x.color=BLACK;
+      this.events.push("Removed black "+label+": child "+x.value+" turns black.");
+      this.frame("Remove black "+label+"; its red child "+x.value+" turns black.",marks(x));
+      return true;
+    }
+    this.frame("Remove black "+label+": "+name(x)+" is now double black.",marks(x,xParent));
+    this.fixDelete(x,xParent);
+    return true;
+  };
+
+  /* x carries an extra black; the four cases look at x's sibling w */
+  RBTree.prototype.fixDelete=function(x,xParent){
+    while(x!==this.root&&!this.isRed(x)){
+      var left=x===xParent.left,w=left?xParent.right:xParent.left;
+      var toward=left?"left":"right",away=left?"right":"left";
+
+      if(this.isRed(w)){
+        w.color=BLACK;xParent.color=RED;this.rotate(xParent,toward);
+        this.events.push("Case 1: sibling "+w.value+" red; "+toward+" rotation at "+xParent.value+".");
+        this.frame("Case 1, sibling "+w.value+" red: recolor, "+toward+" rotation at "+xParent.value+".",marks(w,xParent,x));
+        w=left?xParent.right:xParent.left;
+      }
+
+      var near=left?w.left:w.right,far=left?w.right:w.left;
+      if(!this.isRed(near)&&!this.isRed(far)){
+        w.color=RED;
+        this.events.push("Case 2: sibling "+w.value+" black, black children: recolor red.");
+        this.frame("Case 2: sibling "+w.value+" and its children black; "+w.value+" red, move up.",marks(w,xParent));
+        x=xParent;xParent=x.parent;
+        continue;
+      }
+
+      if(!this.isRed(far)){
+        near.color=BLACK;w.color=RED;this.rotate(w,away);
+        this.events.push("Case 3: "+away+" rotation at sibling "+w.value+".");
+        this.frame("Case 3: sibling's far child black: "+away+" rotation at "+w.value+".",marks(near,w));
+        w=near;far=left?w.right:w.left;
+      }
+
+      w.color=xParent.color;xParent.color=BLACK;if(far)far.color=BLACK;
+      this.rotate(xParent,toward);
+      this.events.push("Case 4: "+toward+" rotation at "+xParent.value+"; done.");
+      this.frame("Case 4: far child red: recolor, "+toward+" rotation at "+xParent.value+".",marks(w,xParent,far));
+      x=this.root;xParent=null;
+    }
+
+    if(x&&x.color===RED){
+      x.color=BLACK;
+      this.frame("Recolor "+x.value+" black; the extra black is absorbed.",marks(x));
+    }
+  };
+
+  RBTree.prototype.minimum=function(){
     var path=[],n=this.root;
     while(n){path.push(n);if(!n.left)break;n=n.left;}
     return{node:n,path:path};
   };
 
-  LLRB.prototype.maximum=function(){
+  RBTree.prototype.maximum=function(){
     var path=[],n=this.root;
     while(n){path.push(n);if(!n.right)break;n=n.right;}
     return{node:n,path:path};
   };
 
-  LLRB.prototype.inorder=function(){
+  RBTree.prototype.inorder=function(){
     var out=[];
     function walk(n){if(!n)return;walk(n.left);out.push(n);walk(n.right);}
     walk(this.root);return out;
   };
 
-  LLRB.prototype.validate=function(){
-    if(this.root&&this.isRed(this.root))return{valid:false,message:"Root is red."};
+  /* checks BST order, a black root, no red node with a red child, equal black height */
+  RBTree.prototype.validate=function(start){
+    var top=start===undefined?this.root:start;
+    if(top&&this.isRed(top))return{valid:false,message:"Root is red."};
     var self=this;
-    function walk(n){
+    function walk(n,min,max){
       if(!n)return{valid:true,bh:1};
+      if(n.value<=min||n.value>=max)return{valid:false,message:"BST ordering violation at "+n.value+"."};
       if(self.isRed(n)&&(self.isRed(n.left)||self.isRed(n.right)))return{valid:false,message:"Red-red violation at "+n.value+"."};
-      if(self.isRed(n.right))return{valid:false,message:"Right-leaning red link at "+n.value+"."};
-      var l=walk(n.left);if(!l.valid)return l;
-      var r=walk(n.right);if(!r.valid)return r;
+      var l=walk(n.left,min,n.value);if(!l.valid)return l;
+      var r=walk(n.right,n.value,max);if(!r.valid)return r;
       if(l.bh!==r.bh)return{valid:false,message:"Black-height mismatch at "+n.value+"."};
       return{valid:true,bh:l.bh+(self.isRed(n)?0:1)};
     }
-    var result=walk(this.root);
+    var result=walk(top,-Infinity,Infinity);
     return result.valid?{valid:true,message:"All Red-Black properties are satisfied.",bh:Math.max(0,result.bh-1)}:result;
   };
 
   var root=document.getElementById("ds-sim");if(!root)return;
   function q(id){return root.querySelector("#"+id);}
   var ns="http://www.w3.org/2000/svg";
-  var tree=new LLRB();
+  var tree=new RBTree();
 
   var el={
     value:q("ds-rb-value"),
@@ -463,6 +562,9 @@ excerpt: "Interactive Left-Leaning Red-Black Tree simulator with insertion, dele
   var DELAY=400;
 
   var token=0,marked={},activeEdge="";
+  /* frame being played (null = draw the live tree) */
+  var view=null;
+  function shownRoot(){return view?view.root:tree.root;}
 
   /* drawing geometry (SVG user units); the viewBox follows the tree's extent,
      so a large tree is scaled down instead of overflowing the panel */
@@ -510,25 +612,25 @@ excerpt: "Interactive Left-Leaning Red-Black Tree simulator with insertion, dele
       if(depth>maxDepth)maxDepth=depth;
       place(node.right,depth+1,node);
     }
-    place(tree.root,0,null);
+    place(shownRoot(),0,null);
     return{nodes:nodes,edges:edges,width:PAD*2+Math.max(0,rank-1)*SX,height:TOP+maxDepth*SY+BOTTOM};
   }
 
   function metrics(){
     var count=0,height=0;
     function walk(n,d){if(!n)return;count++;if(d>height)height=d;walk(n.left,d+1);walk(n.right,d+1);}
-    walk(tree.root,1);
+    walk(shownRoot(),1);
     el.nodes.textContent=String(count);
     el.height.textContent=String(height);
-    var v=tree.validate();
+    var v=tree.validate(shownRoot());
     el.blackHeight.textContent=v.valid?String(v.bh):"—";
-    el.rotations.textContent=String(tree.rotations);
+    el.rotations.textContent=String(view?view.rotations:tree.rotations);
   }
 
   function render(){
     while(el.svg.lastChild)el.svg.removeChild(el.svg.lastChild);
 
-    if(!tree.root){
+    if(!shownRoot()){
       el.svg.setAttribute("viewBox","0 0 "+MIN_W+" "+MIN_H);
       var empty=document.createElementNS(ns,"text");
       empty.setAttribute("x",String(MIN_W/2));empty.setAttribute("y",String(MIN_H/2));
@@ -561,17 +663,18 @@ excerpt: "Interactive Left-Leaning Red-Black Tree simulator with insertion, dele
     metrics();
   }
 
-  function showEvents(){
+  function showEvents(count){
+    var events=count===undefined?tree.events:tree.events.slice(0,count);
     el.events.innerHTML="";
-    if(!tree.events.length){
+    if(!events.length){
       var li=document.createElement("li");li.textContent="No balancing event required.";el.events.appendChild(li);return;
     }
-    var shown=tree.events.length>EVENT_ROWS?tree.events.slice(0,EVENT_ROWS-1):tree.events;
+    var shown=events.length>EVENT_ROWS?events.slice(0,EVENT_ROWS-1):events;
     shown.forEach(function(event){
       var li=document.createElement("li");li.textContent=event;li.title=event;el.events.appendChild(li);
     });
-    if(shown.length<tree.events.length){
-      var more=document.createElement("li");more.textContent="… "+(tree.events.length-shown.length)+" more";el.events.appendChild(more);
+    if(shown.length<events.length){
+      var more=document.createElement("li");more.textContent="… "+(events.length-shown.length)+" more";el.events.appendChild(more);
     }
   }
 
@@ -603,43 +706,73 @@ excerpt: "Interactive Left-Leaning Red-Black Tree simulator with insertion, dele
     disable(false);setStatus("Inorder traversal complete.","is-ok");return true;
   }
 
+  /* plays recorded frames; the tree itself is already in its final state */
+  async function play(frames,t){
+    for(var i=0;i<frames.length;i++){
+      var f=frames[i];
+      view=f;marked=f.marks;activeEdge=f.edge;
+      if(f.path!==undefined)el.path.textContent=f.path;
+      setStatus(f.msg);
+      showEvents(f.events);
+      render();
+      if(!(await wait(delay(),t)))return false;
+    }
+    view=null;
+    return true;
+  }
+
+  function finish(){
+    view=null;
+    showEvents();
+    disable(false);
+    render();
+  }
+
   btn.insert.addEventListener("click",async function(){
     try{
       var value=readValue();
-      var before=tree.search(value);
-      if(before.found){await animatePath(before.path,before.node);setStatus(value+" already exists.","is-bad");return;}
+      token++;
+      var t=token;
+      disable(true);
       var inserted=tree.insert(value);
-      showEvents();clearMarks();render();
-      var after=tree.search(value);await animatePath(after.path,after.node);
-      setStatus(inserted?"Inserted "+value+".":"Insert failed.",inserted?"is-ok":"is-bad");
-    }catch(error){disable(false);setStatus(error.message,"is-bad");}
+      if(!(await play(tree.frames,t)))return;
+      clearMarks();
+      marked[String(value)]="is-checking";
+      finish();
+      setStatus(inserted?"Inserted "+value+"; all red-black properties hold.":value+" already exists.",inserted?"is-ok":"is-bad");
+    }catch(error){view=null;disable(false);setStatus(error.message,"is-bad");}
   });
 
   btn.search.addEventListener("click",async function(){
     try{
       var value=readValue(),r=tree.search(value);
-      await animatePath(r.path,r.found?r.node:null);
+      if(!(await animatePath(r.path,r.found?r.node:null)))return;
       setStatus(r.found?"Found "+value+".":value+" was not found.",r.found?"is-ok":"is-bad");
     }catch(error){disable(false);setStatus(error.message,"is-bad");}
   });
 
   btn.delete.addEventListener("click",async function(){
     try{
-      var value=readValue(),before=tree.search(value);
-      await animatePath(before.path,before.found?before.node:null);
-      if(!before.found){setStatus(value+" was not found.","is-bad");return;}
-      tree.delete(value);showEvents();clearMarks();render();setStatus("Deleted "+value+".","is-ok");
-    }catch(error){disable(false);setStatus(error.message,"is-bad");}
+      var value=readValue();
+      token++;
+      var t=token;
+      disable(true);
+      var deleted=tree.delete(value);
+      if(!(await play(tree.frames,t)))return;
+      clearMarks();
+      finish();
+      setStatus(deleted?"Deleted "+value+"; all red-black properties hold.":value+" was not found.",deleted?"is-ok":"is-bad");
+    }catch(error){view=null;disable(false);setStatus(error.message,"is-bad");}
   });
 
   btn.min.addEventListener("click",async function(){
     var r=tree.minimum();if(!r.node){setStatus("Tree is empty.","is-bad");return;}
-    await animatePath(r.path,r.node);setStatus("Minimum is "+r.node.value+".","is-ok");
+    if(!(await animatePath(r.path,r.node)))return;setStatus("Minimum is "+r.node.value+".","is-ok");
   });
 
   btn.max.addEventListener("click",async function(){
     var r=tree.maximum();if(!r.node){setStatus("Tree is empty.","is-bad");return;}
-    await animatePath(r.path,r.node);setStatus("Maximum is "+r.node.value+".","is-ok");
+    if(!(await animatePath(r.path,r.node)))return;setStatus("Maximum is "+r.node.value+".","is-ok");
   });
 
   btn.inorder.addEventListener("click",function(){animateInorder(tree.inorder());});
@@ -651,7 +784,7 @@ excerpt: "Interactive Left-Leaning Red-Black Tree simulator with insertion, dele
   });
 
   function load(values){
-    token++;tree=new LLRB();
+    token++;view=null;tree=new RBTree();
     values.forEach(function(v){tree.insert(v);});
     clearMarks();el.path.textContent="—";showEvents();disable(false);render();
   }
@@ -671,11 +804,12 @@ excerpt: "Interactive Left-Leaning Red-Black Tree simulator with insertion, dele
   });
 
   btn.reset.addEventListener("click",function(){
-    token++;tree=new LLRB();clearMarks();el.path.textContent="—";showEvents();disable(false);render();setStatus("Tree cleared.");
+    token++;view=null;tree=new RBTree();clearMarks();el.path.textContent="—";showEvents();disable(false);render();setStatus("Tree cleared.");
   });
 
   btn.cancel.addEventListener("click",function(){
-    token++;clearMarks();disable(false);render();setStatus("Animation cancelled.");
+    var playing=view!==null;
+    token++;clearMarks();finish();setStatus(playing?"Animation cancelled; the final tree is shown.":"Animation cancelled.");
   });
 
   load([40,20,60,10,30,50,70]);
