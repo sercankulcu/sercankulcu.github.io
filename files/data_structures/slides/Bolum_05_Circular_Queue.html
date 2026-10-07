@@ -1,0 +1,822 @@
+---
+layout: without-sidebar
+title: "Circular Queue Simulator"
+permalink: /files/data_structures/slides/Bolum_05_Circular_Queue.html
+excerpt: "Interactive circular queue simulator: array-based ring buffer with bas and boyut, index wrap-around with modulo, full/empty detection, and growing the array by copying in queue order."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/sim.css">
+<style>
+.ds-cq {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 6px;
+  line-height: 1.3;
+}
+
+/* ---------- controls ---------- */
+.ds-cq__panel {
+  display: grid;
+  gap: 6px;
+  padding: 6px 10px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.ds-cq__group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.ds-cq__field {
+  display: grid;
+  gap: 2px;
+  width: 78px;
+}
+
+.ds-cq__field--wide { width: 196px; }
+.ds-cq__field input,
+.ds-cq__field select { width: 100%; }
+
+/* ---------- main area ---------- */
+.ds-cq__main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  gap: 6px;
+}
+
+.ds-cq__ring {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5px 6px;
+}
+
+.ds-cq__ring .ds-sim__caption { align-self: flex-start; }
+
+.ds-cq__ring svg {
+  width: 100%;
+  max-width: 222px;
+  height: auto;
+}
+
+.ds-cq__sector { stroke: var(--ds-border); stroke-width: 1.5; fill: var(--ds-surface); transition: fill .18s ease; }
+.ds-cq__sector.is-full { fill: var(--ds-node); stroke: var(--ds-link); }
+.ds-cq__sector.is-hot { fill: var(--ds-hot); stroke: #e9a23b; }
+.ds-cq__sector.is-bas { stroke: var(--ds-accent); stroke-width: 3.5; }
+.ds-cq__ringtext { fill: var(--ds-text); font: 800 14px Consolas, Monaco, monospace; text-anchor: middle; dominant-baseline: central; }
+.ds-cq__ringidx { fill: var(--ds-muted); font: 700 10.5px system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; }
+.ds-cq__ringcenter { fill: var(--ds-text); font: 700 12.5px system-ui, sans-serif; text-anchor: middle; }
+.ds-cq__ringcenter.is-muted { fill: var(--ds-muted); font-weight: 600; font-size: 11px; }
+
+.ds-cq__right {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 6px;
+}
+
+.ds-cq__array {
+  padding: 5px 8px 4px;
+}
+
+.ds-cq__rows {
+  display: grid;
+  gap: 2px;
+}
+
+.ds-cq__row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: center;
+}
+
+.ds-cq__rowname {
+  color: var(--ds-muted);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ds-cq__cells {
+  display: flex;
+  gap: 3px;
+}
+
+.ds-cq__cell {
+  flex: 0 0 var(--cell-width, 44px);
+  display: grid;
+  grid-template-rows: 13px 32px 15px;
+  justify-items: center;
+  align-items: center;
+}
+
+.ds-cq__idx {
+  color: var(--ds-muted);
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.ds-cq__box {
+  width: 100%;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 7px;
+  background: var(--ds-surface);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 14px;
+  font-weight: 800;
+  transition: background .18s ease, border-color .18s ease;
+}
+
+.ds-cq__box.is-full { border-color: var(--ds-link); background: var(--ds-node); }
+.ds-cq__box.is-hot { border-color: #e9a23b; background: var(--ds-hot); }
+.ds-cq__box.is-bas { box-shadow: inset 0 0 0 2px var(--ds-accent); }
+
+.ds-cq__mark {
+  font-size: 10.5px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.ds-cq__mark.is-bas { color: var(--ds-accent); }
+.ds-cq__mark.is-son { color: var(--ds-muted); }
+
+.ds-cq__calc {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 5px 10px;
+}
+
+.ds-cq__calc .ds-sim__caption { margin: 0; }
+
+.ds-cq__formula {
+  min-height: 22px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: var(--ds-surface-strong);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12.5px;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-cq__code {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 5px 8px;
+  overflow: hidden;
+}
+
+.ds-cq__lines {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: ln;
+  overflow-y: auto;
+  position: relative;
+}
+
+.ds-cq__lines li {
+  counter-increment: ln;
+  padding: 0 6px 0 30px;
+  position: relative;
+  border-radius: 5px;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  line-height: 17px;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-cq__lines li::before {
+  content: counter(ln);
+  position: absolute;
+  left: 4px;
+  width: 18px;
+  color: var(--ds-muted);
+  text-align: right;
+}
+
+.ds-cq__lines li.is-current { background: var(--ds-hot); }
+.ds-cq__lines li.is-current::before { content: "▶"; color: #e9a23b; }
+
+/* ---------- footer ---------- */
+.ds-cq__footer {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(4, minmax(0, 0.8fr));
+  gap: 6px;
+  height: 44px;
+}
+
+.ds-cq__status {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  line-height: 1.25;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.ds-cq__status.is-success { color: var(--ds-good); }
+.ds-cq__status.is-error { color: var(--ds-bad); }
+
+.ds-cq__stat {
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-cq__stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-family: system-ui, sans-serif;
+  font-size: 11px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-cq * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-deck ds-sim" id="ds-sim" lang="en">
+  <div class="ds-deck__screen" id="ds-sim-screen">
+    <div class="ds-deck__stage" id="ds-sim-stage">
+      <div class="ds-sim__body">
+        <div class="ds-sim__head">
+          <p class="ds-deck__kicker">Chapter 5 · Queues</p>
+          <h1 class="ds-sim__title">Circular Queue Simulator</h1>
+        </div>
+
+        <div class="ds-sim__root ds-cq">
+          <div class="ds-cq__panel">
+            <div class="ds-cq__group">
+              <div class="ds-cq__field"><label for="ds-cq-value">Value</label><input id="ds-cq-value" type="text" value="50" maxlength="3"></div>
+              <button class="is-primary" id="ds-cq-enqueue" type="button">Enqueue · ekle</button>
+              <button id="ds-cq-dequeue" type="button">Dequeue · cikar</button>
+              <button id="ds-cq-peek" type="button">Peek · ilk</button>
+              <button class="is-danger" id="ds-cq-cancel" type="button">Cancel Animation</button>
+            </div>
+            <div class="ds-cq__group">
+              <div class="ds-cq__field"><label for="ds-cq-cap">Capacity N</label><select id="ds-cq-cap"><option value="4">4</option><option value="5" selected>5</option><option value="6">6</option><option value="8">8</option></select></div>
+              <div class="ds-cq__field ds-cq__field--wide"><label for="ds-cq-full">When the queue is full</label><select id="ds-cq-full"><option value="throw" selected>throw "dolu"</option><option value="grow">grow: buyut(2 · N)</option></select></div>
+              <button id="ds-cq-example" type="button">Slide Example</button>
+              <button class="is-danger" id="ds-cq-clear" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div class="ds-cq__main">
+            <div class="ds-cq__ring ds-sim__panel">
+              <p class="ds-sim__caption">Ring view</p>
+              <svg id="ds-cq-ring" viewBox="0 0 240 240" role="img" aria-label="Circular queue as a ring"></svg>
+            </div>
+
+            <div class="ds-cq__right">
+              <div class="ds-cq__array ds-sim__panel">
+                <p class="ds-sim__caption">Array view</p>
+                <div id="ds-cq-rows" class="ds-cq__rows"></div>
+              </div>
+              <div class="ds-cq__calc ds-sim__panel">
+                <p class="ds-sim__caption">Step</p>
+                <div id="ds-cq-formula" class="ds-cq__formula">Choose an operation.</div>
+              </div>
+              <div class="ds-cq__code ds-sim__panel">
+                <p id="ds-cq-codetitle" class="ds-sim__caption">Code</p>
+                <ol id="ds-cq-code" class="ds-cq__lines"></ol>
+              </div>
+            </div>
+          </div>
+
+          <div class="ds-cq__footer">
+            <p id="ds-cq-status" class="ds-cq__status ds-sim__status" role="status" aria-live="polite">Choose an operation.</p>
+            <div class="ds-cq__stat"><strong>bas</strong><span id="ds-cq-bas">0</span></div>
+            <div class="ds-cq__stat"><strong>boyut</strong><span id="ds-cq-boyut">0</span></div>
+            <div class="ds-cq__stat"><strong>dizi.length</strong><span id="ds-cq-n">5</span></div>
+            <div class="ds-cq__stat"><strong title="son = (bas + boyut) % dizi.length">son</strong><span id="ds-cq-son">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-deck__bar">
+        <span class="ds-deck__section">Sercan KÜLCÜ, Tüm hakları saklıdır.</span>
+        <button class="ds-deck__button" type="button" id="ds-sim-full" aria-label="Full screen">⛶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="deck/sim.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var root = document.querySelector(".ds-cq");
+  if (!root) return;
+
+  function q(id) { return root.querySelector("#" + id); }
+
+  var el = {
+    value: q("ds-cq-value"), cap: q("ds-cq-cap"), full: q("ds-cq-full"), ring: q("ds-cq-ring"), rows: q("ds-cq-rows"),
+    formula: q("ds-cq-formula"), code: q("ds-cq-code"), codeTitle: q("ds-cq-codetitle"), status: q("ds-cq-status"),
+    bas: q("ds-cq-bas"), boyut: q("ds-cq-boyut"), n: q("ds-cq-n"), son: q("ds-cq-son")
+  };
+
+  var btn = {
+    enqueue: q("ds-cq-enqueue"), dequeue: q("ds-cq-dequeue"), peek: q("ds-cq-peek"),
+    example: q("ds-cq-example"), clear: q("ds-cq-clear"), cancel: q("ds-cq-cancel")
+  };
+
+  /* Java code shown on the Chapter 5 slides (15, 16 and 19) */
+  var CODE = {
+    ekle: [
+      "public void ekle(E oge) {",
+      "  if (doluMu())",
+      "    throw new IllegalStateException(\"dolu\");",
+      "  int son = (bas + boyut) % dizi.length;",
+      "  dizi[son] = oge;",
+      "  boyut++;",
+      "}"
+    ],
+    ekleBuyut: [
+      "public void ekle(E oge) {",
+      "  if (boyut == dizi.length) buyut(2 * dizi.length);",
+      "  dizi[(bas + boyut) % dizi.length] = oge;",
+      "  boyut++;",
+      "}",
+      "private void buyut(int yeniKap) {",
+      "  E[] yeni = (E[]) new Object[yeniKap];",
+      "  for (int k = 0; k < boyut; k++)",
+      "    yeni[k] = dizi[(bas + k) % dizi.length];",
+      "  dizi = yeni;",
+      "  bas = 0;",
+      "}"
+    ],
+    cikar: [
+      "public E cikar() {",
+      "  if (bosMu())",
+      "    throw new IllegalStateException(\"boş\");",
+      "  E oge = dizi[bas];",
+      "  dizi[bas] = null;           \/\/ referansı bırak",
+      "  bas = (bas + 1) % dizi.length;",
+      "  boyut--;",
+      "  return oge;",
+      "}"
+    ],
+    ilk: [
+      "public E ilk() {",
+      "  return bosMu() ? null : dizi[bas];",
+      "}"
+    ]
+  };
+
+  var MAX_CAP = 16;
+  var DELAY = 650;
+
+  var dizi = [];
+  var bas = 0;
+  var boyut = 0;
+  var yeni = null;          /* new array while buyut() copies */
+  var hot = -1;             /* highlighted index in dizi */
+  var hotNew = -1;          /* highlighted index in yeni */
+  var token = 0;
+  var codeName = "ekle";
+  var saved = null;
+
+  function N() { return dizi.length; }
+  function son() { return N() ? (bas + boyut) % N() : 0; }
+
+  function setStatus(text, type) {
+    el.status.textContent = text;
+    el.status.classList.remove("is-success", "is-error");
+    if (type) el.status.classList.add(type);
+  }
+
+  function setFormula(text) {
+    el.formula.textContent = text;
+    el.formula.title = text;
+  }
+
+  function delay() {
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return 0;
+    return DELAY;
+  }
+
+  function wait(t) {
+    return new Promise(function (resolve) { setTimeout(function () { resolve(t === token); }, delay()); });
+  }
+
+  function busy(state) {
+    Object.keys(btn).forEach(function (k) { btn[k].disabled = state && k !== "cancel"; });
+    btn.cancel.disabled = !state;
+    el.cap.disabled = state;
+    el.full.disabled = state;
+    el.value.disabled = state;
+  }
+
+  function showCode(name, line) {
+    if (name !== codeName || !el.code.children.length) {
+      codeName = name;
+      el.code.innerHTML = "";
+      CODE[name].forEach(function (text) {
+        var li = document.createElement("li");
+        li.textContent = text;
+        el.code.appendChild(li);
+      });
+      el.codeTitle.textContent = name === "ekleBuyut" ? "Code · ekle() with buyut()" : "Code · " + name + "()";
+    }
+    Array.prototype.forEach.call(el.code.children, function (li, i) {
+      li.classList.toggle("is-current", i + 1 === line);
+    });
+    /* keep the current line visible inside the code panel (without scrolling the page) */
+    var cur = el.code.children[line - 1];
+    if (!cur) { el.code.scrollTop = 0; return; }
+    if (cur.offsetTop < el.code.scrollTop) el.code.scrollTop = cur.offsetTop;
+    else if (cur.offsetTop + cur.offsetHeight > el.code.scrollTop + el.code.clientHeight)
+      el.code.scrollTop = cur.offsetTop + cur.offsetHeight - el.code.clientHeight;
+  }
+
+  /* ---------- drawing ---------- */
+  var SVGNS = "http://www.w3.org/2000/svg";
+
+  function svg(tag, attrs, text) {
+    var e = document.createElementNS(SVGNS, tag);
+    Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+
+  function polar(r, a) { return [120 + r * Math.sin(a), 120 - r * Math.cos(a)]; }
+
+  function renderRing() {
+    var n = N();
+    el.ring.innerHTML = "";
+    var R1 = 100, R0 = 52, gap = n > 8 ? 0.012 : 0.02;
+    for (var i = 0; i < n; i++) {
+      var a0 = (2 * Math.PI * i) / n + gap, a1 = (2 * Math.PI * (i + 1)) / n - gap;
+      var p1 = polar(R1, a0), p2 = polar(R1, a1), p3 = polar(R0, a1), p4 = polar(R0, a0);
+      var large = a1 - a0 > Math.PI ? 1 : 0;
+      var d = "M" + p1 + " A" + R1 + "," + R1 + " 0 " + large + " 1 " + p2 + " L" + p3 + " A" + R0 + "," + R0 + " 0 " + large + " 0 " + p4 + " Z";
+      var cls = "ds-cq__sector";
+      if (dizi[i] !== null) cls += " is-full";
+      if (i === hot) cls += " is-hot";
+      if (boyut > 0 && i === bas && !yeni) cls += " is-bas";
+      el.ring.appendChild(svg("path", { d: d, "class": cls }));
+      var mid = (a0 + a1) / 2;
+      var t = polar((R0 + R1) / 2, mid);
+      if (dizi[i] !== null) el.ring.appendChild(svg("text", { x: t[0], y: t[1], "class": "ds-cq__ringtext", style: n > 8 ? "font-size:11px" : "" }, String(dizi[i])));
+      var l = polar(R1 + 11, mid);
+      el.ring.appendChild(svg("text", { x: l[0], y: l[1], "class": "ds-cq__ringidx" }, String(i)));
+    }
+    el.ring.appendChild(svg("text", { x: 120, y: 112, "class": "ds-cq__ringcenter" }, "boyut = " + boyut));
+    el.ring.appendChild(svg("text", { x: 120, y: 130, "class": "ds-cq__ringcenter is-muted" }, "red edge = bas"));
+  }
+
+  function cellRow(name, arr, opts) {
+    var row = document.createElement("div");
+    row.className = "ds-cq__row";
+    var label = document.createElement("span");
+    label.className = "ds-cq__rowname";
+    label.textContent = name;
+    var cells = document.createElement("div");
+    cells.className = "ds-cq__cells";
+    arr.forEach(function (v, i) {
+      var cell = document.createElement("div");
+      cell.className = "ds-cq__cell";
+      var idx = document.createElement("span");
+      idx.className = "ds-cq__idx";
+      idx.textContent = String(i);
+      var box = document.createElement("div");
+      box.className = "ds-cq__box" + (v !== null ? " is-full" : "") + (i === opts.hot ? " is-hot" : "") + (i === opts.bas ? " is-bas" : "");
+      box.textContent = v === null ? "" : String(v);
+      var mark = document.createElement("span");
+      var marks = [];
+      if (i === opts.bas) marks.push("▲bas");
+      if (i === opts.son) marks.push("▲son");
+      mark.className = "ds-cq__mark " + (i === opts.bas ? "is-bas" : "is-son");
+      mark.textContent = marks.join(" ");
+      cell.appendChild(idx); cell.appendChild(box); cell.appendChild(mark);
+      cells.appendChild(cell);
+    });
+    row.appendChild(label); row.appendChild(cells);
+    return row;
+  }
+
+  function render() {
+    var widest = Math.max(N(), yeni ? yeni.length : 0);
+    var width = Math.min(46, Math.floor((470 - 44 - (widest - 1) * 3) / widest));
+    el.rows.style.setProperty("--cell-width", width + "px");
+    el.rows.innerHTML = "";
+    var full = boyut === N();
+    el.rows.appendChild(cellRow("dizi", dizi, {
+      hot: hot,
+      bas: boyut > 0 && !yeni ? bas : -1,
+      son: !yeni && !full ? son() : -1
+    }));
+    if (yeni) el.rows.appendChild(cellRow("yeni", yeni, { hot: hotNew, bas: -1, son: -1 }));
+    renderRing();
+
+    el.bas.textContent = String(bas);
+    el.boyut.textContent = String(boyut);
+    el.n.textContent = String(N());
+    el.son.textContent = String(son());
+
+    if (!btn.cancel.disabled) return;
+    btn.dequeue.disabled = boyut === 0;
+    btn.peek.disabled = boyut === 0;
+    btn.clear.disabled = boyut === 0 && N() === Number(el.cap.value);
+  }
+
+  /* ---------- state ---------- */
+  function emptyArray(n) { var a = []; for (var i = 0; i < n; i++) a.push(null); return a; }
+
+  function snapshot() { return { dizi: dizi.slice(), bas: bas, boyut: boyut }; }
+  function restore(s) { dizi = s.dizi.slice(); bas = s.bas; boyut = s.boyut; }
+
+  function readValue() {
+    var v = String(el.value.value).trim();
+    if (!v) throw new Error("Enter a value (up to 3 characters).");
+    return v;
+  }
+
+  function nextValue(v) {
+    var n = Number(v);
+    if (Number.isInteger(n)) return String(n + 10);
+    if (/^[A-Y]$/.test(v)) return String.fromCharCode(v.charCodeAt(0) + 1);
+    return v;
+  }
+
+  function finish(message, type) {
+    hot = -1; hotNew = -1; yeni = null;
+    busy(false);
+    render();
+    setStatus(message, type);
+  }
+
+  /* ---------- operations ---------- */
+  async function enqueue() {
+    var v;
+    try { v = readValue(); } catch (e) { setStatus(e.message, "is-error"); return; }
+    var grow = el.full.value === "grow";
+    if (grow && boyut === N() && N() * 2 > MAX_CAP) { setStatus("This simulator grows the array up to " + MAX_CAP + " cells.", "is-error"); return; }
+
+    token++;
+    var t = token;
+    saved = snapshot();
+    busy(true);
+    setStatus("ekle(" + v + ")…");
+
+    if (!grow) {
+      showCode("ekle", 2);
+      setFormula("doluMu(): boyut " + boyut + " == " + N() + "? " + (boyut === N() ? "yes" : "no"));
+      render();
+      if (!(await wait(t))) return;
+      if (boyut === N()) {
+        showCode("ekle", 3);
+        setFormula("throw new IllegalStateException(\"dolu\"); the array is unchanged.");
+        render();
+        if (!(await wait(t))) return;
+        finish("Queue is full: ekle(" + v + ") throws \"dolu\". Choose \"grow\" to double the array instead.", "is-error");
+        return;
+      }
+      var s = son();
+      showCode("ekle", 4);
+      setFormula("son = (bas + boyut) % dizi.length = (" + bas + " + " + boyut + ") % " + N() + " = " + s + (bas + boyut >= N() ? "  → wrapped to the start" : ""));
+      hot = s;
+      render();
+      if (!(await wait(t))) return;
+      dizi[s] = v;
+      showCode("ekle", 5);
+      setFormula("dizi[" + s + "] = " + v + "; the other elements do not move.");
+      render();
+      if (!(await wait(t))) return;
+      boyut++;
+      showCode("ekle", 6);
+      setFormula("boyut++ → " + boyut + (boyut === N() ? "  (queue is now full)" : ""));
+      render();
+      if (!(await wait(t))) return;
+      el.value.value = nextValue(v);
+      finish("ekle(" + v + ") wrote to dizi[" + s + "] in O(1).", "is-success");
+      return;
+    }
+
+    /* grow version: ekle() calls buyut() when the array is full */
+    showCode("ekleBuyut", 2);
+    setFormula("boyut " + boyut + " == dizi.length " + N() + "? " + (boyut === N() ? "yes → buyut(" + 2 * N() + ")" : "no"));
+    render();
+    if (!(await wait(t))) return;
+    var grew = false;
+    if (boyut === N()) {
+      grew = true;
+      showCode("ekleBuyut", 7);
+      yeni = emptyArray(2 * N());
+      setFormula("E[] yeni = new Object[" + yeni.length + "]");
+      render();
+      if (!(await wait(t))) return;
+      for (var k = 0; k < boyut; k++) {
+        var from = (bas + k) % N();
+        showCode("ekleBuyut", 9);
+        hot = from; hotNew = k;
+        yeni[k] = dizi[from];
+        setFormula("k = " + k + ": yeni[" + k + "] = dizi[(" + bas + " + " + k + ") % " + N() + "] = dizi[" + from + "] = " + dizi[from] + (bas + k >= N() ? "  (wrapped)" : ""));
+        render();
+        if (!(await wait(t))) return;
+      }
+      showCode("ekleBuyut", 10);
+      dizi = yeni; yeni = null; hot = -1; hotNew = -1;
+      setFormula("dizi = yeni: elements are now in queue order (Arrays.copyOf would keep the wrapped order).");
+      render();
+      if (!(await wait(t))) return;
+      showCode("ekleBuyut", 11);
+      bas = 0;
+      setFormula("bas = 0: the front element is now dizi[0].");
+      render();
+      if (!(await wait(t))) return;
+    }
+    var j = son();
+    showCode("ekleBuyut", 3);
+    hot = j;
+    dizi[j] = v;
+    setFormula("dizi[(" + bas + " + " + boyut + ") % " + N() + "] = dizi[" + j + "] = " + v);
+    render();
+    if (!(await wait(t))) return;
+    boyut++;
+    showCode("ekleBuyut", 4);
+    setFormula("boyut++ → " + boyut);
+    render();
+    if (!(await wait(t))) return;
+    el.value.value = nextValue(v);
+    finish(grew ? "Array doubled to " + N() + " cells (O(n) copy), then ekle(" + v + ") → dizi[" + j + "]. Amortized O(1)." : "ekle(" + v + ") wrote to dizi[" + j + "].", "is-success");
+  }
+
+  async function dequeue() {
+    token++;
+    var t = token;
+    saved = snapshot();
+    busy(true);
+    setStatus("cikar()…");
+
+    showCode("cikar", 2);
+    setFormula("bosMu(): boyut = " + boyut + (boyut === 0 ? " → empty" : " ≠ 0 → continue"));
+    render();
+    if (!(await wait(t))) return;
+    if (boyut === 0) {
+      showCode("cikar", 3);
+      setFormula("throw new IllegalStateException(\"boş\")");
+      render();
+      if (!(await wait(t))) return;
+      finish("Queue is empty: cikar() throws \"boş\".", "is-error");
+      return;
+    }
+    var b = bas;
+    var oge = dizi[b];
+    showCode("cikar", 4);
+    hot = b;
+    setFormula("oge = dizi[" + b + "] = " + oge + "  (the oldest element)");
+    render();
+    if (!(await wait(t))) return;
+    dizi[b] = null;
+    showCode("cikar", 5);
+    setFormula("dizi[" + b + "] = null: the slot is free and will be reused.");
+    render();
+    if (!(await wait(t))) return;
+    bas = (b + 1) % N();
+    hot = -1;
+    showCode("cikar", 6);
+    setFormula("bas = (" + b + " + 1) % " + N() + " = " + bas + (b + 1 === N() ? "  → bas wrapped to the start" : ""));
+    render();
+    if (!(await wait(t))) return;
+    boyut--;
+    showCode("cikar", 7);
+    setFormula("boyut-- → " + boyut);
+    render();
+    if (!(await wait(t))) return;
+    showCode("cikar", 8);
+    setFormula("return " + oge);
+    render();
+    if (!(await wait(t))) return;
+    finish("cikar() returned " + oge + " in O(1); no element was shifted.", "is-success");
+  }
+
+  async function peek() {
+    token++;
+    var t = token;
+    saved = snapshot();
+    busy(true);
+    showCode("ilk", 2);
+    hot = boyut ? bas : -1;
+    setFormula(boyut ? "ilk() = dizi[bas] = dizi[" + bas + "] = " + dizi[bas] : "bosMu() → return null");
+    render();
+    if (!(await wait(t))) return;
+    finish(boyut ? "ilk() returned " + dizi[bas] + " without removing it." : "ilk() returned null: the queue is empty.", boyut ? "is-success" : "is-error");
+  }
+
+  /* slide 17 start state: N = 5, bas = 2, boyut = 2 (30, 40) */
+  function loadExample() {
+    token++;
+    el.cap.value = "5";
+    dizi = [null, null, "30", "40", null];
+    bas = 2; boyut = 2;
+    yeni = null; hot = -1; hotNew = -1;
+    el.value.value = "50";
+    busy(false);
+    showCode(el.full.value === "grow" ? "ekleBuyut" : "ekle", 0);
+    setFormula("Slide 17: N = 5, bas = 2, boyut = 2. Try ekle(50), ekle(60), ekle(70), ekle(80).");
+    render();
+    setStatus("Slide example loaded: the next writes wrap around to dizi[0] and dizi[1].", "is-success");
+  }
+
+  function clearAll() {
+    token++;
+    dizi = emptyArray(Number(el.cap.value));
+    bas = 0; boyut = 0;
+    yeni = null; hot = -1; hotNew = -1;
+    el.value.value = "10";
+    busy(false);
+    showCode(el.full.value === "grow" ? "ekleBuyut" : "ekle", 0);
+    setFormula("Empty queue: bas = 0, boyut = 0.");
+    render();
+    setStatus("Empty queue with capacity " + N() + ".");
+  }
+
+  btn.enqueue.addEventListener("click", enqueue);
+  btn.dequeue.addEventListener("click", dequeue);
+  btn.peek.addEventListener("click", peek);
+  btn.example.addEventListener("click", loadExample);
+  btn.clear.addEventListener("click", clearAll);
+
+  btn.cancel.addEventListener("click", function () {
+    token++;
+    if (saved) restore(saved);
+    yeni = null; hot = -1; hotNew = -1;
+    busy(false);
+    showCode(codeName, 0);
+    setFormula("Animation cancelled.");
+    render();
+    setStatus("Animation cancelled; the queue was restored to its state before the operation.");
+  });
+
+  el.value.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !btn.enqueue.disabled) enqueue();
+  });
+
+  el.cap.addEventListener("change", clearAll);
+  el.full.addEventListener("change", function () {
+    showCode(el.full.value === "grow" ? "ekleBuyut" : "ekle", 0);
+    setStatus(el.full.value === "grow" ? "When full, ekle() doubles the array with buyut()." : "When full, ekle() throws \"dolu\".");
+  });
+
+  btn.cancel.disabled = true;
+  loadExample();
+})();
+</script>

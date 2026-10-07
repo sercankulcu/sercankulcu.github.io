@@ -1,0 +1,725 @@
+---
+layout: without-sidebar
+title: "Open Addressing Simulator"
+permalink: /files/data_structures/slides/Bolum_09_Open_Addressing.html
+excerpt: "Interactive open addressing simulator: linear probing, quadratic probing and double hashing with step-by-step probe sequences, DEFUNCT markers for deletion, and load factor."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/sim.css">
+<style>
+.ds-oa {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  gap: 6px;
+  line-height: 1.3;
+}
+
+/* ---------- controls ---------- */
+.ds-oa__panel {
+  display: grid;
+  gap: 6px;
+  padding: 6px 10px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.ds-oa__group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.ds-oa__field {
+  display: grid;
+  gap: 2px;
+  width: 92px;
+}
+
+.ds-oa__field--wide { width: 168px; }
+.ds-oa__field input,
+.ds-oa__field select { width: 100%; }
+
+/* ---------- formula ---------- */
+.ds-oa__formula-box {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 5px 10px;
+}
+
+.ds-oa__formula-box .ds-sim__caption { margin: 0; }
+
+.ds-oa__formula {
+  min-height: 22px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: var(--ds-surface-strong);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12.5px;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- table ---------- */
+.ds-oa__table {
+  padding: 6px 8px 4px;
+}
+
+.ds-oa__slots {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.ds-oa__slot {
+  flex: 0 0 var(--slot-width, 44px);
+  display: grid;
+  grid-template-rows: 15px 40px 18px;
+  justify-items: center;
+  align-items: center;
+}
+
+.ds-oa__index {
+  color: var(--ds-muted);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.ds-oa__slot.is-home .ds-oa__index {
+  color: var(--ds-accent);
+}
+
+.ds-oa__cell {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 8px;
+  background: var(--ds-surface);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 15px;
+  font-weight: 800;
+  transition: background .18s ease, border-color .18s ease;
+}
+
+.ds-oa__cell.is-full {
+  border-color: var(--ds-link);
+  background: var(--ds-node);
+}
+
+.ds-oa__cell.is-defunct {
+  border-style: dashed;
+  color: var(--ds-bad);
+}
+
+.ds-oa__cell.is-visited { border-color: #e9a23b; }
+
+.ds-oa__cell.is-checking {
+  border-color: #e9a23b;
+  background: var(--ds-hot);
+}
+
+.ds-oa__cell.is-found {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+}
+
+.ds-oa__cell.is-candidate {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ds-good) 60%, transparent);
+}
+
+.ds-oa__order {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #e9a23b;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+}
+
+.ds-oa__order:empty { background: none; }
+
+.ds-oa__legend {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 3px;
+  color: var(--ds-muted);
+  font-size: 11.5px;
+}
+
+.ds-oa__legend span::before {
+  content: "";
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 5px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 3px;
+  vertical-align: -2px;
+}
+
+.ds-oa__legend .is-full::before { border-color: var(--ds-link); background: var(--ds-node); }
+.ds-oa__legend .is-defunct::before { border-style: dashed; border-color: var(--ds-bad); }
+.ds-oa__legend .is-probe::before { border-color: #e9a23b; background: var(--ds-hot); }
+.ds-oa__legend .is-home::before { border-color: var(--ds-accent); }
+
+/* ---------- trace and history ---------- */
+.ds-oa__main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 230px;
+  gap: 6px;
+}
+
+.ds-oa__trace,
+.ds-oa__log {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 5px 8px;
+  overflow: hidden;
+}
+
+.ds-oa__steps,
+.ds-oa__log ol {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.ds-oa__steps li {
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  line-height: 17px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-oa__steps li.is-last { color: var(--ds-text); font-weight: 700; }
+
+.ds-oa__log li {
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- footer ---------- */
+.ds-oa__footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  height: 44px;
+}
+
+.ds-oa__status {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  line-height: 1.25;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.ds-oa__status.is-success { color: var(--ds-good); }
+.ds-oa__status.is-error { color: var(--ds-bad); }
+
+.ds-oa__stat {
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-oa__stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-oa__stat.is-warn span { color: var(--ds-bad); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-oa * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-deck ds-sim" id="ds-sim" lang="en">
+  <div class="ds-deck__screen" id="ds-sim-screen">
+    <div class="ds-deck__stage" id="ds-sim-stage">
+      <div class="ds-sim__body">
+        <div class="ds-sim__head">
+          <p class="ds-deck__kicker">Chapter 9 · Maps and Hash Tables</p>
+          <h1 class="ds-sim__title">Open Addressing Simulator</h1>
+        </div>
+
+        <div class="ds-sim__root ds-oa">
+          <div class="ds-oa__panel">
+            <div class="ds-oa__group">
+              <div class="ds-oa__field"><label for="ds-oa-key">Key (integer)</label><input id="ds-oa-key" type="number" value="57" min="-999" max="999" step="1"></div>
+              <button class="is-primary" id="ds-oa-insert" type="button">Insert</button>
+              <button id="ds-oa-search" type="button">Search</button>
+              <button class="is-danger" id="ds-oa-delete" type="button">Delete</button>
+              <button id="ds-oa-random" type="button">Insert Random</button>
+              <button class="is-danger" id="ds-oa-cancel" type="button">Cancel Animation</button>
+            </div>
+
+            <div class="ds-oa__group">
+              <div class="ds-oa__field ds-oa__field--wide"><label for="ds-oa-method">Probing</label><select id="ds-oa-method"><option value="linear" selected>Linear: f(i) = i</option><option value="quadratic">Quadratic: f(i) = i²</option><option value="double">Double hashing: f(i) = i·h₂(k)</option></select></div>
+              <div class="ds-oa__field"><label for="ds-oa-size">Table size N</label><select id="ds-oa-size"><option value="7">7</option><option value="11">11</option><option value="13" selected>13</option><option value="17">17</option></select></div>
+              <button id="ds-oa-example" type="button">Load Example</button>
+              <button class="is-danger" id="ds-oa-clear" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div class="ds-oa__formula-box ds-sim__panel">
+            <p class="ds-sim__caption">Probe formula</p>
+            <div id="ds-oa-formula" class="ds-oa__formula">h(k, i) = (h(k) + i) mod 13</div>
+          </div>
+
+          <div class="ds-oa__table ds-sim__panel">
+            <div id="ds-oa-slots" class="ds-oa__slots" aria-label="Hash table slots"></div>
+            <div class="ds-oa__legend"><span class="is-full">occupied</span><span class="is-defunct">✗ DEFUNCT (deleted)</span><span class="is-probe">probed (number = probe order)</span><span class="is-home">home slot h(k)</span></div>
+          </div>
+
+          <div class="ds-oa__main">
+            <div class="ds-oa__trace ds-sim__panel"><p class="ds-sim__caption">Probe sequence</p><ol id="ds-oa-steps" class="ds-oa__steps"><li>No operation yet.</li></ol></div>
+            <div class="ds-oa__log ds-sim__panel"><p class="ds-sim__caption">History</p><ol id="ds-oa-log"><li>No operations yet.</li></ol></div>
+          </div>
+
+          <div class="ds-oa__footer">
+            <p id="ds-oa-status" class="ds-oa__status ds-sim__status" role="status" aria-live="polite">Choose an operation.</p>
+            <div class="ds-oa__stat"><strong>Keys n</strong><span id="ds-oa-count">0</span></div>
+            <div class="ds-oa__stat" id="ds-oa-load-box"><strong>Load factor λ</strong><span id="ds-oa-load">0.00</span></div>
+            <div class="ds-oa__stat"><strong>✗ markers</strong><span id="ds-oa-defunct">0</span></div>
+            <div class="ds-oa__stat"><strong>Last probes</strong><span id="ds-oa-probes">–</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-deck__bar">
+        <span class="ds-deck__section">Sercan KÜLCÜ, Tüm hakları saklıdır.</span>
+        <button class="ds-deck__button" type="button" id="ds-sim-full" aria-label="Full screen">⛶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="deck/sim.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var root = document.querySelector(".ds-oa");
+  if (!root) return;
+
+  function q(id) { return root.querySelector("#" + id); }
+
+  var el = {
+    key: q("ds-oa-key"), method: q("ds-oa-method"), size: q("ds-oa-size"), formula: q("ds-oa-formula"),
+    slots: q("ds-oa-slots"), steps: q("ds-oa-steps"), log: q("ds-oa-log"), status: q("ds-oa-status"),
+    count: q("ds-oa-count"), load: q("ds-oa-load"), loadBox: q("ds-oa-load-box"), defunct: q("ds-oa-defunct"), probes: q("ds-oa-probes")
+  };
+
+  var btn = {
+    insert: q("ds-oa-insert"), search: q("ds-oa-search"), del: q("ds-oa-delete"), random: q("ds-oa-random"),
+    example: q("ds-oa-example"), clear: q("ds-oa-clear"), cancel: q("ds-oa-cancel")
+  };
+
+  /* slide example (Chapter 9): N = 13, keys inserted in this order */
+  var EXAMPLE = [18, 41, 22, 44, 59, 32, 31, 73];
+  var DEFUNCT = "DEFUNCT";
+  var DELAY = 550;
+  var LOG_SIZE = 8;
+
+  var table = [];
+  var N = 13;
+  var token = 0;
+  var logs = [];
+  var marks = {};      /* slot index -> {order, state} for the running operation */
+  var home = -1;
+  var candidate = -1;
+
+  function mod(a, n) { return ((a % n) + n) % n; }
+
+  /* second hash: R - (k mod R); R = 7 as on the slides (5 when N = 7), so the step is 1..R and never 0 */
+  function radix() { return N === 7 ? 5 : 7; }
+  function h2(k) { return radix() - mod(k, radix()); }
+
+  function method() { return el.method.value; }
+
+  function offsetText(i, k) {
+    if (method() === "linear") return String(i);
+    if (method() === "quadratic") return i + "²";
+    return i + "·" + h2(k);
+  }
+
+  function offset(i, k) {
+    if (method() === "linear") return i;
+    if (method() === "quadratic") return i * i;
+    return i * h2(k);
+  }
+
+  function formulaText(k) {
+    var head = "h(k) = k mod " + N;
+    if (k !== undefined) head = "h(" + k + ") = " + k + " mod " + N + " = " + mod(k, N);
+    if (method() === "linear") return head + "  ·  j = (h + i) mod " + N;
+    if (method() === "quadratic") return head + "  ·  j = (h + i²) mod " + N;
+    var d = "h₂(k) = " + radix() + " − (k mod " + radix() + ")";
+    if (k !== undefined) d = "h₂(" + k + ") = " + radix() + " − " + mod(k, radix()) + " = " + h2(k);
+    return head + "  ·  " + d + "  ·  j = (h + i·h₂) mod " + N;
+  }
+
+  function init(size) {
+    N = size;
+    table = [];
+    for (var i = 0; i < N; i++) table.push(null);
+  }
+
+  function count() { return table.filter(function (x) { return x !== null && x !== DEFUNCT; }).length; }
+  function defunctCount() { return table.filter(function (x) { return x === DEFUNCT; }).length; }
+
+  function setStatus(text, type) {
+    el.status.textContent = text;
+    el.status.classList.remove("is-success", "is-error");
+    if (type) el.status.classList.add(type);
+  }
+
+  function delay() {
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return 0;
+    return DELAY;
+  }
+
+  function wait(ms, t) {
+    return new Promise(function (resolve) { setTimeout(function () { resolve(t === token); }, ms); });
+  }
+
+  function busy(state) {
+    Object.keys(btn).forEach(function (k) { btn[k].disabled = state && k !== "cancel"; });
+    btn.cancel.disabled = !state;
+    el.method.disabled = state;
+    el.size.disabled = state;
+    el.key.disabled = state;
+  }
+
+  function clearMarks() { marks = {}; home = -1; candidate = -1; }
+
+  function setSteps(lines) {
+    el.steps.innerHTML = "";
+    lines.forEach(function (line, i) { addStep(line, i === lines.length - 1); });
+  }
+
+  function addStep(text, last) {
+    var prev = el.steps.querySelector(".is-last");
+    if (prev) prev.classList.remove("is-last");
+    var li = document.createElement("li");
+    li.textContent = text;
+    li.title = text;
+    if (last !== false) li.className = "is-last";
+    el.steps.appendChild(li);
+    el.steps.scrollTop = el.steps.scrollHeight;
+  }
+
+  function addLog(text) {
+    logs.unshift(text);
+    logs = logs.slice(0, LOG_SIZE);
+    el.log.innerHTML = "";
+    logs.forEach(function (item) {
+      var li = document.createElement("li");
+      li.textContent = item;
+      li.title = item;
+      el.log.appendChild(li);
+    });
+  }
+
+  function render() {
+    el.slots.innerHTML = "";
+    var width = Math.min(48, Math.floor((720 - (N - 1) * 4) / N));
+    el.slots.style.setProperty("--slot-width", width + "px");
+
+    table.forEach(function (value, i) {
+      var slot = document.createElement("div");
+      slot.className = "ds-oa__slot" + (i === home ? " is-home" : "");
+
+      var idx = document.createElement("span");
+      idx.className = "ds-oa__index";
+      idx.textContent = i === home ? i + " h" : String(i);
+
+      var cell = document.createElement("div");
+      var cls = "ds-oa__cell";
+      if (value === DEFUNCT) cls += " is-defunct";
+      else if (value !== null) cls += " is-full";
+      if (marks[i]) cls += " " + marks[i].state;
+      if (i === candidate) cls += " is-candidate";
+      cell.className = cls;
+      cell.textContent = value === DEFUNCT ? "✗" : (value === null ? "" : String(value));
+      cell.title = "Slot " + i + ": " + (value === DEFUNCT ? "DEFUNCT (deleted)" : (value === null ? "empty" : value));
+
+      var order = document.createElement("span");
+      order.className = "ds-oa__order";
+      order.textContent = marks[i] ? String(marks[i].order) : "";
+
+      slot.appendChild(idx); slot.appendChild(cell); slot.appendChild(order);
+      el.slots.appendChild(slot);
+    });
+
+    var n = count();
+    var lambda = n / N;
+    el.count.textContent = String(n);
+    el.load.textContent = lambda.toFixed(2);
+    el.loadBox.classList.toggle("is-warn", lambda > 0.5);
+    el.loadBox.title = lambda > 0.5 ? "Open addressing should keep λ ≤ 0.5" : "";
+    el.defunct.textContent = String(defunctCount());
+
+    if (!btn.cancel.disabled) return;
+    btn.del.disabled = n === 0;
+    btn.clear.disabled = n === 0 && defunctCount() === 0;
+  }
+
+  function readKey() {
+    var raw = String(el.key.value).trim();
+    if (!/^-?\d{1,3}$/.test(raw)) throw new Error("Enter an integer key between -999 and 999.");
+    return Number(raw);
+  }
+
+  /* findSlot (yuvaBul): probes like the slides. Stops at an empty slot or the key;
+     remembers the first empty/DEFUNCT slot as the insertion candidate. */
+  async function findSlot(k, t, forInsert) {
+    var h = mod(k, N);
+    var uygun = -1;
+    home = h;
+    marks = {};
+    candidate = -1;
+    el.formula.textContent = formulaText(k);
+    el.formula.title = el.formula.textContent;
+    setSteps([formulaText(k).split("  ·  ").slice(0, method() === "double" ? 2 : 1).join(", ")]);
+    render();
+    if (!(await wait(delay(), t))) return null;
+
+    for (var i = 0; i < N; i++) {
+      var j = mod(h + offset(i, k), N);
+      var cell = table[j];
+      var line = "i = " + i + ": j = (" + h + " + " + offsetText(i, k) + ") mod " + N + " = " + j + " → ";
+      marks[j] = { order: i + 1, state: "is-checking" };
+
+      if (cell === null) {
+        if (uygun === -1) uygun = j;
+        addStep(line + "empty: stop.");
+        if (forInsert) candidate = uygun;
+        render();
+        if (!(await wait(delay(), t))) return null;
+        marks[j].state = "is-visited";
+        return { found: -1, uygun: uygun, probes: i + 1 };
+      }
+      if (cell === DEFUNCT) {
+        if (uygun === -1) { uygun = j; if (forInsert) candidate = j; }
+        addStep(line + "✗ DEFUNCT: keep probing" + (forInsert && uygun === j ? " (first free slot = " + j + ")." : "."));
+      } else if (cell === k) {
+        marks[j].state = "is-found";
+        addStep(line + cell + " == " + k + ": found.");
+        render();
+        if (!(await wait(delay(), t))) return null;
+        return { found: j, uygun: uygun, probes: i + 1 };
+      } else {
+        addStep(line + "occupied (" + cell + "), next i.");
+      }
+      render();
+      if (!(await wait(delay(), t))) return null;
+      marks[j].state = "is-visited";
+    }
+    addStep("All " + N + " probes used.");
+    render();
+    return { found: -1, uygun: uygun, probes: N };
+  }
+
+  async function run(kind) {
+    var k;
+    try { k = readKey(); } catch (e) { setStatus(e.message, "is-error"); return; }
+
+    token++;
+    var t = token;
+    busy(true);
+    el.probes.textContent = "…";
+    setStatus((kind === "insert" ? "Inserting " : kind === "search" ? "Searching for " : "Deleting ") + k + "…");
+
+    var r = await findSlot(k, t, kind === "insert");
+    if (!r) return;
+    el.probes.textContent = String(r.probes);
+
+    if (kind === "insert") {
+      if (r.found >= 0) {
+        setStatus("Key " + k + " is already in slot " + r.found + " (" + r.probes + " probes).", "is-error");
+        addLog("insert " + k + ": already present");
+      } else if (r.uygun === -1) {
+        setStatus("No free slot on the probe sequence of " + k + (count() < N ? " (quadratic probing does not reach every slot)." : " (table full)."), "is-error");
+        addStep("No free slot: insertion fails.");
+        addLog("insert " + k + ": no free slot");
+      } else {
+        var reused = table[r.uygun] === DEFUNCT;
+        table[r.uygun] = k;
+        marks[r.uygun] = { order: marks[r.uygun] ? marks[r.uygun].order : r.probes, state: "is-found" };
+        candidate = -1;
+        addStep("table[" + r.uygun + "] = " + k + (reused ? " (reuses ✗ slot)." : "."));
+        var lambda = count() / N;
+        setStatus("Inserted " + k + " into slot " + r.uygun + " after " + r.probes + " probe" + (r.probes > 1 ? "s" : "") + "." +
+          (lambda > 0.5 ? " λ = " + lambda.toFixed(2) + " > 0.5: probes get longer." : ""), "is-success");
+        addLog("insert " + k + " → slot " + r.uygun + " (" + r.probes + " probes)");
+      }
+    } else if (kind === "search") {
+      if (r.found >= 0) {
+        setStatus("Found " + k + " in slot " + r.found + " after " + r.probes + " probe" + (r.probes > 1 ? "s" : "") + ".", "is-success");
+        addLog("search " + k + " → slot " + r.found);
+      } else {
+        setStatus(k + " is not in the table (" + r.probes + " probes).", "is-error");
+        addLog("search " + k + ": not found");
+      }
+    } else {
+      if (r.found >= 0) {
+        table[r.found] = DEFUNCT;
+        addStep("table[" + r.found + "] = ✗ DEFUNCT (not null: keeps probe chains intact).");
+        setStatus("Deleted " + k + ": slot " + r.found + " now holds a DEFUNCT marker.", "is-success");
+        addLog("delete " + k + " → slot " + r.found + " = ✗");
+      } else {
+        setStatus(k + " is not in the table; nothing deleted.", "is-error");
+        addLog("delete " + k + ": not found");
+      }
+    }
+
+    render();
+    busy(false);
+    render();
+  }
+
+  function insertDirect(k) {
+    var h = mod(k, N);
+    var uygun = -1;
+    for (var i = 0; i < N; i++) {
+      var j = mod(h + offset(i, k), N);
+      if (table[j] === k) return true;
+      if (table[j] === null || table[j] === DEFUNCT) {
+        if (uygun === -1) uygun = j;
+        if (table[j] === null) break;
+      }
+    }
+    if (uygun < 0) return false;
+    table[uygun] = k;
+    return true;
+  }
+
+  function reset(message) {
+    token++;
+    init(Number(el.size.value));
+    clearMarks();
+    busy(false);
+    el.formula.textContent = formulaText();
+    el.formula.title = el.formula.textContent;
+    el.probes.textContent = "–";
+    render();
+    if (message) setStatus(message);
+  }
+
+  btn.insert.addEventListener("click", function () { run("insert"); });
+  btn.search.addEventListener("click", function () { run("search"); });
+  btn.del.addEventListener("click", function () { run("delete"); });
+
+  btn.random.addEventListener("click", function () {
+    el.key.value = String(Math.floor(Math.random() * 100));
+    run("insert");
+  });
+
+  btn.example.addEventListener("click", function () {
+    reset();
+    var skipped = EXAMPLE.filter(function (k) { return !insertDirect(k); });
+    logs = [];
+    addLog("Loaded example: " + EXAMPLE.join(", "));
+    setSteps(["Example keys inserted in order: " + EXAMPLE.join(", ") + "."]);
+    render();
+    var name = el.method.options[el.method.selectedIndex].text.split(":")[0].toLowerCase();
+    if (skipped.length) {
+      addStep("No free slot for " + skipped.join(", ") + ".");
+      setStatus("Example loaded (" + name + ", N = " + N + "); no free slot for " + skipped.join(", ") + ".", "is-error");
+    } else {
+      setStatus("Example loaded with " + name + " probing, N = " + N + ".", "is-success");
+    }
+  });
+
+  btn.clear.addEventListener("click", function () {
+    reset("Table cleared.");
+    logs = [];
+    el.log.innerHTML = "<li>No operations yet.</li>";
+    setSteps(["Table cleared."]);
+  });
+
+  btn.cancel.addEventListener("click", function () {
+    token++;
+    clearMarks();
+    busy(false);
+    render();
+    setStatus("Animation cancelled; the table was not changed.");
+  });
+
+  el.key.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !btn.insert.disabled) run("insert");
+  });
+
+  /* changing N or the probing method rebuilds the table, so reload the example */
+  el.size.addEventListener("change", function () { btn.example.click(); });
+  el.method.addEventListener("change", function () { btn.example.click(); });
+
+  init(13);
+  btn.cancel.disabled = true;
+  btn.example.click();
+})();
+</script>

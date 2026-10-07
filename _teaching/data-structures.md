@@ -86,6 +86,7 @@ A queue follows the First-In-First-Out (FIFO) principle, similar to a line of pe
 - 🕹️Simulators:
   - [Queue Simulator (HTML)](../files/data_structures/slides/Bolum_05_Queue.html)
   - [Deque Simulator (HTML)](../files/data_structures/slides/Bolum_05_Deque.html)
+  - [Circular Queue Simulator (HTML)](../files/data_structures/slides/Bolum_05_Circular_Queue.html)
 - 🕹️Applications:
   - [Scheduler](../files/data_structures/slides/Bolum_05_Scheduler.html)
   - [Priority Scheduler](../files/data_structures/slides/Bolum_05_Priority_Scheduler.html)
@@ -146,6 +147,7 @@ A hash table is a data structure that implements an associative array abstract d
 - 🕹️Simulators:
   - [Hash Table Simulator (HTML)](../files/data_structures/slides/Bolum_09_Hash_Table.html)
   - [Map Simulator (HTML)](../files/data_structures/slides/Bolum_09_Map.html)
+  - [Open Addressing Simulator (HTML)](../files/data_structures/slides/Bolum_09_Open_Addressing.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders09/src)
 
 ---
