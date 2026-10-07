@@ -180,6 +180,8 @@ A graph is a versatile data structure consisting of vertices (or nodes) connecte
   - [Graph Simulator (HTML)](../files/data_structures/slides/Bolum_11_Graph.html)
   - [Directed Graph Simulator (HTML)](../files/data_structures/slides/Bolum_11_Directed_Graph.html)
   - [Dijkstra Simulator (HTML)](../files/data_structures/slides/Bolum_11_Dijkstra.html)
+- 🕹️Applications:
+  - [Course Prerequisite Planner (HTML)](../files/data_structures/slides/Bolum_11_Course_Planner.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders11/src)  
 
 ---
