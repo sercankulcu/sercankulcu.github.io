@@ -437,6 +437,8 @@ excerpt: "Interactive stable priority queue simulator implemented with a binary 
   var marked={};
   var activeEdges={};
   var logs=[];
+  /* state before the running operation; Cancel restores it so the heap is never left half-done */
+  var saved=null;
 
   function parent(i){ return Math.floor((i-1)/2); }
   function left(i){ return 2*i+1; }
@@ -466,6 +468,7 @@ excerpt: "Interactive stable priority queue simulator implemented with a binary 
 
   function setStatus(text,type){
     el.status.textContent=text;
+    el.status.title=text;
     el.status.classList.remove("is-success","is-error");
     if(type) el.status.classList.add(type);
   }
@@ -637,77 +640,119 @@ excerpt: "Interactive stable priority queue simulator implemented with a binary 
     el.swaps.textContent=String(swaps);
   }
 
-  async function highlightPair(a,b){
-    marked={}; activeEdges={};
-    marked[a]="is-checking"; marked[b]="is-checking";
-    var child=Math.max(a,b),par=parent(child);
-    if(par===Math.min(a,b)) activeEdges[par+"-"+child]=true;
-    render();
-    return await wait(delay(),token);
+  function cloneItems(list){
+    return list.map(function(item){ return {value:item.value,priority:item.priority,order:item.order}; });
   }
 
-  async function siftUp(start){
+  function label(item){ return item.value+" (p"+item.priority+")"; }
+
+  /* why a should or should not be served before b */
+  function why(a,b){
+    if(a.priority!==b.priority) return "p"+a.priority+(a.priority>b.priority?" > ":" < ")+"p"+b.priority;
+    return "tie, #"+a.order+(a.order<b.order?" before #":" after #")+b.order;
+  }
+
+  /* one animation step: draw, show the message, wait; false when the step was cancelled */
+  async function step(t,message){
+    render();
+    if(message) setStatus(message);
+    return await wait(delay(),t);
+  }
+
+  function markEdge(a,b){
+    var child=Math.max(a,b),par=parent(child);
+    if(par===Math.min(a,b)) activeEdges[par+"-"+child]=true;
+  }
+
+  function begin(){
+    token++;
+    saved={heap:cloneItems(heap),arrival:arrival,comparisons:comparisons,swaps:swaps};
+    comparisons=0; swaps=0;
+    clearMarks(); disable(true);
+    return token;
+  }
+
+  function finish(t,message,logText){
+    if(t!==token) return false;
+    saved=null;
+    clearMarks(); render(); disable(false);
+    if(logText) addLog(logText);
+    setStatus(message,"is-success");
+    return true;
+  }
+
+  async function siftUp(t,start){
     var i=start;
 
     while(i>0){
       var p=parent(i);
       comparisons++;
-
-      if(!(await highlightPair(i,p))) return false;
-      if(!higher(heap[i],heap[p])) break;
+      var up=higher(heap[i],heap[p]);
+      clearMarks(); marked[i]="is-checking"; marked[p]="is-checking"; markEdge(i,p);
+      if(!(await step(t,"Up-heap: "+label(heap[i])+" vs parent "+label(heap[p])+": "+why(heap[i],heap[p])+(up?" → swap.":" → stop.")))) return false;
+      if(!up) return true;
 
       var tmp=heap[i]; heap[i]=heap[p]; heap[p]=tmp; swaps++;
-      i=p; render();
-
-      if(!(await wait(delay(),token))) return false;
+      i=p;
+      clearMarks(); marked[i]="is-found";
+      if(!(await step(t,"Swapped: "+label(heap[i])+" moved up to index "+i+"."))) return false;
     }
 
-    return true;
+    clearMarks(); marked[0]="is-found";
+    return await step(t,label(heap[0])+" reached the root: it is served next.");
   }
 
-  async function siftDown(start){
+  async function siftDown(t,start){
     var i=start;
 
     while(true){
-      var l=left(i),r=right(i),best=i;
+      var l=left(i),r=right(i);
+      if(l>=heap.length){
+        clearMarks(); marked[i]="is-found";
+        return await step(t,"Down-heap: "+label(heap[i])+" (i="+i+") has no children → stop.");
+      }
 
-      if(l<heap.length){ comparisons++; if(higher(heap[l],heap[best])) best=l; }
-      if(r<heap.length){ comparisons++; if(higher(heap[r],heap[best])) best=r; }
-
-      if(best===i) break;
-
-      if(!(await highlightPair(i,best))) return false;
+      var best=l,text;
+      if(r<heap.length){
+        comparisons++;
+        if(higher(heap[r],heap[l])) best=r;
+        text="higher child "+label(heap[best]);
+      } else {
+        text="only child "+label(heap[l]);
+      }
+      comparisons++;
+      var down=higher(heap[best],heap[i]);
+      clearMarks(); marked[i]="is-checking"; marked[best]="is-checking"; markEdge(i,best);
+      if(!(await step(t,"Down-heap: "+text+" vs "+label(heap[i])+": "+why(heap[best],heap[i])+(down?" → swap.":" → stop.")))) return false;
+      if(!down) return true;
 
       var tmp=heap[i]; heap[i]=heap[best]; heap[best]=tmp; swaps++;
-      i=best; render();
-
-      if(!(await wait(delay(),token))) return false;
+      i=best;
+      clearMarks(); marked[i]="is-found";
+      if(!(await step(t,"Swapped: "+label(heap[i])+" moved down to index "+i+"."))) return false;
     }
-
-    return true;
   }
 
   btn.enqueue.addEventListener("click",async function(){
+    var value,priority;
     try{
-      var value=readValue();
-      var priority=readPriority(el.priority,"Priority");
+      value=readValue();
+      priority=readPriority(el.priority,"Priority");
       if(heap.length>=MAX) throw new Error("Priority queue is full: maximum "+MAX+" items.");
-
-      token++; disable(true); clearMarks();
-      var item={value:value,priority:priority,order:++arrival};
-      heap.push(item); render();
-
-      await siftUp(heap.length-1);
-      clearMarks(); render(); disable(false);
-
-      addLog("Enqueued "+value+" with priority "+priority+".");
-      setStatus("Enqueued "+value+".","is-success");
     }catch(error){
-      disable(false); setStatus(error.message,"is-error");
+      setStatus(error.message,"is-error"); return;
     }
+
+    var t=begin();
+    var item={value:value,priority:priority,order:++arrival};
+    heap.push(item);
+    clearMarks(); marked[heap.length-1]="is-found";
+    if(!(await step(t,"Add "+label(item)+", arrival #"+item.order+", at the end of the array: index "+(heap.length-1)+"."))) return;
+    if(!(await siftUp(t,heap.length-1))) return;
+    finish(t,"Enqueued "+value+": "+comparisons+" comparison(s), "+swaps+" swap(s).","Enqueued "+value+" with priority "+priority+".");
   });
 
-  btn.random.addEventListener("click",async function(){
+  btn.random.addEventListener("click",function(){
     var names=["Build","Render","Compile","Upload","Backup","Index","Parse","Sync"];
     el.value.value=names[Math.floor(Math.random()*names.length)];
     el.priority.value=String(Math.floor(Math.random()*10)+1);
@@ -717,61 +762,68 @@ excerpt: "Interactive stable priority queue simulator implemented with a binary 
   btn.dequeue.addEventListener("click",async function(){
     if(!heap.length){ setStatus("Priority queue is empty.","is-error"); return; }
 
-    token++; disable(true); clearMarks();
-    marked[0]="is-found"; render(); await wait(delay(),token);
-
+    var t=begin();
     var removed=heap[0];
-    var last=heap.pop();
+    marked[0]="is-found";
+    if(!(await step(t,"The root "+label(removed)+" has the highest priority: remove it."))) return;
 
-    if(heap.length){
-      heap[0]=last; render();
-      await siftDown(0);
+    if(heap.length>1){
+      var lastIndex=heap.length-1;
+      clearMarks(); marked[0]="is-checking"; marked[lastIndex]="is-checking";
+      if(!(await step(t,"Move the last item "+label(heap[lastIndex])+" (i="+lastIndex+") to the root."))) return;
+      heap[0]=heap.pop();
+      clearMarks(); marked[0]="is-found";
+      if(!(await step(t,label(heap[0])+" is now at the root; restore the heap with down-heap."))) return;
+      if(!(await siftDown(t,0))) return;
+    } else {
+      heap.pop();
     }
 
-    clearMarks(); render(); disable(false);
-    addLog("Dequeued "+removed.value+" (priority "+removed.priority+").");
-    setStatus("Dequeued "+removed.value+".","is-success");
+    finish(t,"Dequeued "+removed.value+": "+comparisons+" comparison(s), "+swaps+" swap(s).","Dequeued "+removed.value+" (priority "+removed.priority+").");
   });
 
   btn.peek.addEventListener("click",async function(){
     if(!heap.length){ setStatus("Priority queue is empty.","is-error"); return; }
 
     token++; clearMarks(); marked[0]="is-found"; render();
-    setStatus("Next: "+heap[0].value+" with priority "+heap[0].priority+".","is-success");
-    await wait(delay(),token); clearMarks(); render();
+    var t=token;
+    setStatus("Next: "+heap[0].value+" with priority "+heap[0].priority+" (the root, O(1)).","is-success");
+    if(await wait(delay(),t)){ clearMarks(); render(); }
   });
 
   btn.change.addEventListener("click",async function(){
+    var index,newPriority;
     try{
-      var index=Number(el.index.value);
-      if(!Number.isInteger(index)||index<0||index>=heap.length) throw new Error("Heap index is out of range.");
-
-      var newPriority=readPriority(el.newPriority,"New priority");
-      var oldPriority=heap[index].priority;
-      var itemName=heap[index].value;
-
-      token++; disable(true); clearMarks();
-      marked[index]="is-found"; render(); await wait(delay(),token);
-
-      heap[index].priority=newPriority;
-
-      if(newPriority>oldPriority){
-        await siftUp(index);
-      } else if(newPriority<oldPriority){
-        await siftDown(index);
-      }
-
-      clearMarks(); render(); disable(false);
-      addLog("Changed "+itemName+" priority from "+oldPriority+" to "+newPriority+".");
-      setStatus("Priority updated.","is-success");
+      index=Number(el.index.value);
+      if(el.index.value.trim()===""||!Number.isInteger(index)||index<0||index>=heap.length) throw new Error("Heap index is out of range.");
+      newPriority=readPriority(el.newPriority,"New priority");
     }catch(error){
-      disable(false); setStatus(error.message,"is-error");
+      setStatus(error.message,"is-error"); return;
     }
+
+    var t=begin();
+    var item=heap[index];
+    var oldPriority=item.priority;
+    marked[index]="is-found";
+    if(!(await step(t,"Change "+item.value+" at index "+index+": priority "+oldPriority+" → "+newPriority+"."))) return;
+
+    item.priority=newPriority;
+
+    if(newPriority>oldPriority){
+      if(!(await step(t,"Priority increased: the item can only move up → up-heap."))) return;
+      if(!(await siftUp(t,index))) return;
+    } else if(newPriority<oldPriority){
+      if(!(await step(t,"Priority decreased: the item can only move down → down-heap."))) return;
+      if(!(await siftDown(t,index))) return;
+    }
+
+    finish(t,newPriority===oldPriority?"Priority unchanged; the heap is unchanged.":"Priority updated: "+comparisons+" comparison(s), "+swaps+" swap(s).",
+      "Changed "+item.value+" priority from "+oldPriority+" to "+newPriority+".");
   });
 
   btn.example.addEventListener("click",async function(){
-    token++; disable(true); clearMarks();
-    heap=[]; arrival=0; comparisons=0; swaps=0; logs=[];
+    var t=begin();
+    heap=[]; arrival=0;
 
     var items=[
       {value:"Render",priority:8},
@@ -783,29 +835,35 @@ excerpt: "Interactive stable priority queue simulator implemented with a binary 
     ];
 
     for(var i=0;i<items.length;i++){
-      heap.push({value:items[i].value,priority:items[i].priority,order:++arrival});
-      await siftUp(heap.length-1);
+      var item={value:items[i].value,priority:items[i].priority,order:++arrival};
+      heap.push(item);
+      clearMarks(); marked[heap.length-1]="is-found";
+      if(!(await step(t,"Example: enqueue "+label(item)+", arrival #"+item.order+"."))) return;
+      if(!(await siftUp(t,heap.length-1))) return;
     }
 
-    clearMarks(); render(); disable(false);
-    addLog("Loaded example priority queue.");
-    setStatus("Example priority queue loaded.","is-success");
+    if(t!==token) return;
+    logs=[];
+    finish(t,"Example priority queue loaded.","Loaded example priority queue.");
   });
 
   btn.clear.addEventListener("click",function(){
-    token++; heap=[]; arrival=0; comparisons=0; swaps=0; logs=[]; clearMarks(); disable(false);
+    token++; saved=null; heap=[]; arrival=0; comparisons=0; swaps=0; logs=[]; clearMarks(); disable(false);
     el.log.innerHTML="<li>No operations yet.</li>";
     render(); setStatus("Priority queue cleared.");
   });
 
   btn.cancel.addEventListener("click",function(){
-    token++; clearMarks(); disable(false); render(); setStatus("Animation cancelled.");
+    token++;
+    if(saved){
+      heap=saved.heap; arrival=saved.arrival; comparisons=saved.comparisons; swaps=saved.swaps;
+      saved=null;
+    }
+    clearMarks(); disable(false); render();
+    setStatus("Animation cancelled; the queue is back to its state before the operation.");
   });
 
-
-  (async function init(){
-    await btn.example.click();
-    btn.cancel.disabled=true;
-  })();
+  render();
+  btn.example.click();
 })();
 </script>

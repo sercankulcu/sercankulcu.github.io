@@ -299,7 +299,26 @@ excerpt: "Interactive Splay Tree simulator with insertion, search, deletion, spl
 
   function Node(value){this.value=value;this.left=null;this.right=null;this.parent=null;}
 
-  function SplayTree(){this.root=null;this.rotations=0;this.events=[];}
+  /* every operation is computed at once and recorded as frames (snapshots with marks
+     and a message); the UI plays the frames, so Cancel never leaves a half-done tree */
+  function SplayTree(){this.root=null;this.rotations=0;this.events=[];this.frames=[];}
+
+  function marks(){
+    var m={};
+    for(var i=0;i<arguments.length;i+=2)if(arguments[i])m[String(arguments[i].value)]=arguments[i+1];
+    return m;
+  }
+
+  SplayTree.prototype.copy=function(n,parent){
+    if(!n)return null;
+    var c=new Node(n.value);c.parent=parent||null;
+    c.left=this.copy(n.left,c);c.right=this.copy(n.right,c);
+    return c;
+  };
+
+  SplayTree.prototype.frame=function(msg,m,edge,path){
+    this.frames.push({root:this.copy(this.root,null),marks:m||{},edge:edge||"",msg:msg,path:path,events:this.events.length,rotations:this.rotations});
+  };
 
   SplayTree.prototype.rotateLeft=function(x){
     var y=x.right;if(!y)return;
@@ -309,7 +328,7 @@ excerpt: "Interactive Splay Tree simulator with insertion, search, deletion, spl
     else if(x===x.parent.left)x.parent.left=y;
     else x.parent.right=y;
     y.left=x;x.parent=y;
-    this.rotations++;this.events.push("Rotate left at "+x.value+".");
+    this.rotations++;
   };
 
   SplayTree.prototype.rotateRight=function(x){
@@ -320,28 +339,43 @@ excerpt: "Interactive Splay Tree simulator with insertion, search, deletion, spl
     else if(x===x.parent.left)x.parent.left=y;
     else x.parent.right=y;
     y.right=x;x.parent=y;
-    this.rotations++;this.events.push("Rotate right at "+x.value+".");
+    this.rotations++;
   };
 
-  SplayTree.prototype.splay=function(x){
+  /* rotation at n that lifts its child c */
+  SplayTree.prototype.lift=function(n,c){
+    if(c===n.left){this.rotateRight(n);return "right";}
+    this.rotateLeft(n);return "left";
+  };
+
+  /* moves x up until its parent is stop (null = until x is the root);
+     the step is chosen from x, its parent p and grandparent g */
+  SplayTree.prototype.splay=function(x,stop){
     if(!x)return;
-    while(x.parent){
-      var p=x.parent,g=p.parent;
-      if(!g){
-        this.events.push("Zig at "+x.value+".");
-        if(x===p.left)this.rotateRight(p);else this.rotateLeft(p);
-      }else if(x===p.left&&p===g.left){
-        this.events.push("Zig-Zig left-left for "+x.value+".");
-        this.rotateRight(g);this.rotateRight(p);
-      }else if(x===p.right&&p===g.right){
-        this.events.push("Zig-Zig right-right for "+x.value+".");
-        this.rotateLeft(g);this.rotateLeft(p);
-      }else if(x===p.right&&p===g.left){
-        this.events.push("Zig-Zag left-right for "+x.value+".");
-        this.rotateLeft(p);this.rotateRight(g);
+    stop=stop||null;
+    var top=stop?"a child of "+stop.value:"the root";
+    while(x.parent!==stop){
+      var p=x.parent,g=p.parent,d;
+      if(g===stop){
+        d=this.lift(p,x);
+        this.events.push("Zig: "+d+" rotation at "+p.value+".");
+        this.frame("Zig ("+p.value+" is "+top+"): "+d+" rotation at "+p.value+".",marks(x,"is-found",p,"is-checking"));
+      }else if((x===p.left)===(p===g.left)){
+        var side=x===p.left?"left-left":"right-right";
+        d=this.lift(g,p);
+        this.events.push("Zig-zig "+side+": "+d+" rotation at "+g.value+".");
+        this.frame("Zig-zig "+side+": first "+d+" rotation at grandparent "+g.value+".",marks(x,"is-found",g,"is-checking"));
+        d=this.lift(p,x);
+        this.events.push("Zig-zig "+side+": "+d+" rotation at "+p.value+".");
+        this.frame("Zig-zig: then "+d+" rotation at parent "+p.value+".",marks(x,"is-found",p,"is-checking"));
       }else{
-        this.events.push("Zig-Zag right-left for "+x.value+".");
-        this.rotateRight(p);this.rotateLeft(g);
+        var kind=x===p.right?"left-right":"right-left";
+        d=this.lift(p,x);
+        this.events.push("Zig-zag "+kind+": "+d+" rotation at "+p.value+".");
+        this.frame("Zig-zag "+kind+": first "+d+" rotation at parent "+p.value+".",marks(x,"is-found",p,"is-checking"));
+        d=this.lift(g,x);
+        this.events.push("Zig-zag "+kind+": "+d+" rotation at "+g.value+".");
+        this.frame("Zig-zag: then "+d+" rotation at grandparent "+g.value+".",marks(x,"is-found",g,"is-checking"));
       }
     }
   };
@@ -356,75 +390,110 @@ excerpt: "Interactive Splay Tree simulator with insertion, search, deletion, spl
     return{found:false,node:null,last:last,path:path};
   };
 
-  SplayTree.prototype.insert=function(value){
-    this.events=[];
-    if(!this.root){this.root=new Node(value);return{inserted:true,node:this.root,path:[this.root]};}
-    var current=this.root,parent=null,path=[];
-    while(current){
-      path.push(current);parent=current;
-      if(value===current.value){this.splay(current);return{inserted:false,node:current,path:path};}
-      current=value<current.value?current.left:current.right;
+  /* BST search that records one frame per comparison */
+  SplayTree.prototype.descend=function(value){
+    var path=[],n=this.root;
+    while(n){
+      var edge=path.length?path[path.length-1].value+"->"+n.value:"";
+      path.push(n);
+      var text=path.map(function(x){return x.value;}).join(" → ");
+      if(value===n.value){this.frame("Found "+value+".",marks(n,"is-found"),edge,text);return{found:true,node:n,last:n,path:path};}
+      var goLeft=value<n.value;
+      this.frame("Compare "+value+" with "+n.value+": go "+(goLeft?"left":"right")+".",marks(n,"is-checking"),edge,text);
+      n=goLeft?n.left:n.right;
     }
-    var node=new Node(value);node.parent=parent;
-    if(value<parent.value)parent.left=node;else parent.right=node;
-    path.push(node);this.splay(node);
-    return{inserted:true,node:node,path:path};
+    return{found:false,node:null,last:path[path.length-1]||null,path:path};
+  };
+
+  SplayTree.prototype.reset=function(){this.events=[];this.frames=[];};
+
+  SplayTree.prototype.insert=function(value){
+    this.reset();
+    var r=this.descend(value);
+    if(r.found){
+      if(r.node.parent)this.frame("Already present: splay "+value+" to the root.",marks(r.node,"is-found"));
+      this.splay(r.node);
+      return{inserted:false,node:r.node,path:r.path};
+    }
+    var node=new Node(value),parent=r.last;
+    node.parent=parent;
+    if(!parent)this.root=node;
+    else if(value<parent.value)parent.left=node;
+    else parent.right=node;
+    this.frame(parent?"Insert "+value+" as the "+(value<parent.value?"left":"right")+" child of "+parent.value+"; splay it.":"Insert "+value+" as the root.",marks(node,"is-found"),parent?parent.value+"->"+value:"");
+    this.splay(node);
+    return{inserted:true,node:node,path:r.path};
   };
 
   SplayTree.prototype.access=function(value){
-    this.events=[];
-    var result=this.trace(value);
-    if(result.found)this.splay(result.node);
-    else if(result.last){
-      this.events.push("Target absent; splay last visited node "+result.last.value+".");
-      this.splay(result.last);
+    this.reset();
+    var r=this.descend(value);
+    if(r.found){
+      if(r.node.parent)this.frame("Splay "+value+" to the root.",marks(r.node,"is-found"));
+      this.splay(r.node);
+    }else if(r.last){
+      this.events.push("Target absent; splay last visited node "+r.last.value+".");
+      this.frame(value+" is absent: splay the last visited node "+r.last.value+".",marks(r.last,"is-found"));
+      this.splay(r.last);
     }
-    return result;
+    return r;
   };
 
+  /* splay the key to the root, remove it, then join the two subtrees: the maximum of
+     the left subtree is splayed up (it ends with no right child) and gets the right subtree */
   SplayTree.prototype.delete=function(value){
-    this.events=[];
-    var found=this.trace(value);
-    if(!found.found){
-      if(found.last)this.splay(found.last);
-      return{deleted:false,path:found.path};
+    this.reset();
+    var r=this.descend(value);
+    if(!r.found){
+      if(r.last){
+        this.events.push("Target absent; splay last visited node "+r.last.value+".");
+        this.frame(value+" is absent: splay the last visited node "+r.last.value+".",marks(r.last,"is-found"));
+        this.splay(r.last);
+      }
+      return{deleted:false,path:r.path};
     }
 
-    this.splay(found.node);
-    var left=this.root.left,right=this.root.right;
-    if(left)left.parent=null;
-    if(right)right.parent=null;
-    this.root.left=null;this.root.right=null;
+    var x=r.node;
+    if(x.parent)this.frame("Splay "+value+" to the root first.",marks(x,"is-found"));
+    this.splay(x);
 
+    var left=x.left,right=x.right;
     if(!left){
       this.root=right;
-    }else{
-      this.root=left;
-      var max=left;
-      while(max.right)max=max.right;
-      this.splay(max);
-      this.root.right=right;
-      if(right)right.parent=this.root;
+      if(right)right.parent=null;
+      this.frame("No left subtree: "+value+"'s right subtree becomes the tree.",marks(right,"is-found"));
+      return{deleted:true,path:r.path};
     }
 
-    return{deleted:true,path:found.path};
+    var max=left;
+    while(max.right)max=max.right;
+    this.frame("Remove root "+value+": splay the left subtree's maximum "+max.value+" up.",marks(x,"is-checking",max,"is-found"));
+    this.splay(max,x);
+
+    this.root=max;max.parent=null;
+    max.right=right;if(right)right.parent=max;
+    this.frame("Delete "+value+"; "+max.value+" becomes the root and gets the right subtree.",marks(max,"is-found"));
+    return{deleted:true,path:r.path};
   };
 
-  SplayTree.prototype.minimum=function(){
-    this.events=[];
+  SplayTree.prototype.extreme=function(goLeft){
+    this.reset();
     var path=[],n=this.root;
     if(!n)return{node:null,path:path};
-    while(n){path.push(n);if(!n.left)break;n=n.left;}
-    this.splay(n);return{node:n,path:path};
+    while(true){
+      var edge=path.length?path[path.length-1].value+"->"+n.value:"";
+      path.push(n);
+      var next=goLeft?n.left:n.right,text=path.map(function(x){return x.value;}).join(" → ");
+      this.frame(next?"Go "+(goLeft?"left":"right")+" from "+n.value+".":n.value+" has no "+(goLeft?"left":"right")+" child: it is the "+(goLeft?"minimum":"maximum")+".",marks(n,next?"is-checking":"is-found"),edge,text);
+      if(!next)break;
+      n=next;
+    }
+    this.splay(n);
+    return{node:n,path:path};
   };
 
-  SplayTree.prototype.maximum=function(){
-    this.events=[];
-    var path=[],n=this.root;
-    if(!n)return{node:null,path:path};
-    while(n){path.push(n);if(!n.right)break;n=n.right;}
-    this.splay(n);return{node:n,path:path};
-  };
+  SplayTree.prototype.minimum=function(){return this.extreme(true);};
+  SplayTree.prototype.maximum=function(){return this.extreme(false);};
 
   SplayTree.prototype.traverse=function(type){
     var out=[];
@@ -472,6 +541,9 @@ excerpt: "Interactive Splay Tree simulator with insertion, search, deletion, spl
   var DELAY=400;
 
   var token=0,marked={},activeEdge="";
+  /* frame being played (null = draw the live tree) */
+  var view=null;
+  function shownRoot(){return view?view.root:tree.root;}
 
   /* drawing geometry (SVG user units); the viewBox follows the tree's extent,
      so a large or degenerate tree is scaled down instead of overflowing the panel */
@@ -519,7 +591,7 @@ excerpt: "Interactive Splay Tree simulator with insertion, search, deletion, spl
       if(depth>maxDepth)maxDepth=depth;
       place(node.right,depth+1,node);
     }
-    place(tree.root,0,null);
+    place(shownRoot(),0,null);
     return{nodes:nodes,edges:edges,width:PAD*2+Math.max(0,rank-1)*SX,height:TOP+maxDepth*SY+BOTTOM};
   }
 
@@ -530,17 +602,17 @@ excerpt: "Interactive Splay Tree simulator with insertion, search, deletion, spl
       count++;if(d>height)height=d;
       walk(n.left,d+1);walk(n.right,d+1);
     }
-    walk(tree.root,1);
+    walk(shownRoot(),1);
     el.nodes.textContent=String(count);
     el.height.textContent=String(height);
-    el.root.textContent=tree.root?String(tree.root.value):"—";
-    el.rotations.textContent=String(tree.rotations);
+    el.root.textContent=shownRoot()?String(shownRoot().value):"—";
+    el.rotations.textContent=String(view?view.rotations:tree.rotations);
   }
 
   function render(){
     while(el.svg.lastChild)el.svg.removeChild(el.svg.lastChild);
 
-    if(!tree.root){
+    if(!shownRoot()){
       el.svg.setAttribute("viewBox","0 0 "+MIN_W+" "+MIN_H);
       var empty=document.createElementNS(ns,"text");
       empty.setAttribute("x",String(MIN_W/2));empty.setAttribute("y",String(MIN_H/2));
@@ -583,39 +655,54 @@ excerpt: "Interactive Splay Tree simulator with insertion, search, deletion, spl
     metrics();
   }
 
-  function showEvents(){
+  function showEvents(count){
+    var events=count===undefined?tree.events:tree.events.slice(0,count);
     el.events.innerHTML="";
-    if(!tree.events.length){
+    if(!events.length){
       var li=document.createElement("li");li.textContent="No splay event was required.";el.events.appendChild(li);return;
     }
-    var shown=tree.events.length>EVENT_ROWS?tree.events.slice(0,EVENT_ROWS-1):tree.events;
+    var shown=events.length>EVENT_ROWS?events.slice(0,EVENT_ROWS-1):events;
     shown.forEach(function(event){
       var li=document.createElement("li");li.textContent=event;li.title=event;el.events.appendChild(li);
     });
-    if(shown.length<tree.events.length){
-      var more=document.createElement("li");more.textContent="… "+(tree.events.length-shown.length)+" more";el.events.appendChild(more);
+    if(shown.length<events.length){
+      var more=document.createElement("li");more.textContent="… "+(events.length-shown.length)+" more";el.events.appendChild(more);
     }
   }
 
-  async function animatePath(path,finalNode){
+  /* plays recorded frames; the tree itself is already in its final state */
+  async function play(frames,t){
+    for(var i=0;i<frames.length;i++){
+      var f=frames[i];
+      view=f;marked=f.marks;activeEdge=f.edge;
+      if(f.path!==undefined)el.path.textContent=f.path;
+      setStatus(f.msg);
+      showEvents(f.events);
+      render();
+      if(!(await wait(delay(),t)))return false;
+    }
+    view=null;
+    return true;
+  }
+
+  function finish(){
+    view=null;
+    showEvents();
+    disable(false);
+    render();
+  }
+
+  /* runs one tree operation (already applied) and plays its frames */
+  async function run(operation){
     token++;
     var t=token;
     disable(true);
-
-    for(var i=0;i<path.length;i++){
-      clearMarks();
-      marked[String(path[i].value)]="is-checking";
-      if(i>0)activeEdge=path[i-1].value+"->"+path[i].value;
-      if(finalNode&&path[i]===finalNode&&i===path.length-1)marked[String(path[i].value)]="is-found";
-
-      el.path.textContent=path.slice(0,i+1).map(function(n){return n.value;}).join(" → ");
-      render();
-
-      if(!(await wait(delay(),t)))return false;
-    }
-
-    disable(false);
-    return true;
+    var result=operation();
+    if(!(await play(tree.frames,t)))return null;
+    clearMarks();
+    if(tree.root)marked[String(tree.root.value)]="is-found";
+    finish();
+    return result;
   }
 
   async function animateTraversal(nodes,label){
@@ -640,75 +727,41 @@ excerpt: "Interactive Splay Tree simulator with insertion, search, deletion, spl
   btn.insert.addEventListener("click",async function(){
     try{
       var value=readValue();
-      var before=tree.trace(value);
-
-      await animatePath(before.path,before.found?before.node:null);
-      var result=tree.insert(value);
-      showEvents();clearMarks();render();
-
-      if(tree.root){
-        marked[String(tree.root.value)]="is-found";
-        render();
-        await wait(delay(),token);
-        clearMarks();render();
-      }
-
-      setStatus(result.inserted?"Inserted and splayed "+value+".":value+" already existed and was splayed.",result.inserted?"is-ok":"is-bad");
-    }catch(error){disable(false);setStatus(error.message,"is-bad");}
+      var result=await run(function(){return tree.insert(value);});
+      if(!result)return;
+      setStatus(result.inserted?"Inserted "+value+" and splayed it to the root.":value+" already existed; it was splayed to the root.",result.inserted?"is-ok":"is-bad");
+    }catch(error){view=null;disable(false);setStatus(error.message,"is-bad");}
   });
 
   btn.search.addEventListener("click",async function(){
     try{
       var value=readValue();
-      var before=tree.trace(value);
-
-      await animatePath(before.path,before.found?before.node:before.last);
-      var result=tree.access(value);
-      showEvents();clearMarks();render();
-
-      if(tree.root){
-        marked[String(tree.root.value)]="is-found";
-        render();
-        await wait(delay(),token);
-        clearMarks();render();
-      }
-
-      setStatus(result.found?"Found "+value+" and splayed it to the root.":value+" was not found; last visited node was splayed.",result.found?"is-ok":"is-bad");
-    }catch(error){disable(false);setStatus(error.message,"is-bad");}
+      var result=await run(function(){return tree.access(value);});
+      if(!result)return;
+      setStatus(result.found?"Found "+value+" and splayed it to the root.":result.last?value+" was not found; last visited "+result.last.value+" is now the root.":"Tree is empty.",result.found?"is-ok":"is-bad");
+    }catch(error){view=null;disable(false);setStatus(error.message,"is-bad");}
   });
 
   btn.delete.addEventListener("click",async function(){
     try{
       var value=readValue();
-      var before=tree.trace(value);
-
-      await animatePath(before.path,before.found?before.node:before.last);
-      var result=tree.delete(value);
-      showEvents();clearMarks();render();
-
-      setStatus(result.deleted?"Deleted "+value+".":value+" was not found.",result.deleted?"is-ok":"is-bad");
-    }catch(error){disable(false);setStatus(error.message,"is-bad");}
+      var result=await run(function(){return tree.delete(value);});
+      if(!result)return;
+      setStatus(result.deleted?"Deleted "+value+".":tree.root?value+" was not found; last visited "+tree.root.value+" was splayed.":value+" was not found.",result.deleted?"is-ok":"is-bad");
+    }catch(error){view=null;disable(false);setStatus(error.message,"is-bad");}
   });
 
   btn.min.addEventListener("click",async function(){
     if(!tree.root){setStatus("Tree is empty.","is-bad");return;}
-    var preview=[],n=tree.root;
-    while(n){preview.push(n);if(!n.left)break;n=n.left;}
-    await animatePath(preview,n);
-    var r=tree.minimum();
-    showEvents();clearMarks();render();
-    if(tree.root){marked[String(tree.root.value)]="is-found";render();await wait(delay(),token);clearMarks();render();}
+    var r=await run(function(){return tree.minimum();});
+    if(!r)return;
     setStatus("Minimum "+r.node.value+" was splayed to the root.","is-ok");
   });
 
   btn.max.addEventListener("click",async function(){
     if(!tree.root){setStatus("Tree is empty.","is-bad");return;}
-    var preview=[],n=tree.root;
-    while(n){preview.push(n);if(!n.right)break;n=n.right;}
-    await animatePath(preview,n);
-    var r=tree.maximum();
-    showEvents();clearMarks();render();
-    if(tree.root){marked[String(tree.root.value)]="is-found";render();await wait(delay(),token);clearMarks();render();}
+    var r=await run(function(){return tree.maximum();});
+    if(!r)return;
     setStatus("Maximum "+r.node.value+" was splayed to the root.","is-ok");
   });
 
@@ -723,6 +776,7 @@ excerpt: "Interactive Splay Tree simulator with insertion, search, deletion, spl
 
   function load(values){
     token++;
+    view=null;
     tree=new SplayTree();
     values.forEach(function(v){tree.insert(v);});
     clearMarks();el.path.textContent="—";showEvents();disable(false);render();
@@ -745,6 +799,7 @@ excerpt: "Interactive Splay Tree simulator with insertion, search, deletion, spl
 
   btn.reset.addEventListener("click",function(){
     token++;
+    view=null;
     tree=new SplayTree();
     clearMarks();
     el.path.textContent="—";
@@ -755,11 +810,11 @@ excerpt: "Interactive Splay Tree simulator with insertion, search, deletion, spl
   });
 
   btn.cancel.addEventListener("click",function(){
+    var playing=view!==null;
     token++;
     clearMarks();
-    disable(false);
-    render();
-    setStatus("Animation cancelled.");
+    finish();
+    setStatus(playing?"Animation cancelled; the final tree is shown.":"Animation cancelled.");
   });
 
   load([50,30,70,20,40,60,80]);

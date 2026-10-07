@@ -300,6 +300,8 @@ excerpt: "Compact interactive B-Tree simulator."
   let running = false;
   let structuralChanges = 0;
   let lastResult = "—";
+  /* the tree before the running operation; Cancel puts it back */
+  let saved = null;
 
   let marks = {
     checking: new Set(),
@@ -327,6 +329,9 @@ excerpt: "Compact interactive B-Tree simulator."
       this.t = t;
       this.root = null;
       this.changeLog = [];
+      /* when recording, every algorithm step saves a snapshot frame for the animation */
+      this.recording = false;
+      this.frames = [];
     }
 
     log(type, nodes = []) {
@@ -338,6 +343,39 @@ excerpt: "Compact interactive B-Tree simulator."
 
     clearLog() {
       this.changeLog = [];
+    }
+
+    clone() {
+      const copy = new BTree(this.t);
+      function walk(node) {
+        const c = Object.create(BNode.prototype);
+        c.id = node.id;
+        c.leaf = node.leaf;
+        c.keys = node.keys.slice();
+        c.children = node.children.map(walk);
+        return c;
+      }
+      copy.root = this.root ? walk(this.root) : null;
+      copy.changeLog = this.changeLog.slice();
+      return copy;
+    }
+
+    /* m: { checking, found, changed, removing: [nodes], edges: [[parent, child]] } */
+    snap(message, m = {}) {
+      if (!this.recording) return;
+      const ids = list => (list || []).filter(Boolean).map(node => node.id);
+      this.frames.push({
+        tree: this.clone(),
+        message,
+        changes: this.changeLog.length,
+        marks: {
+          checking: ids(m.checking),
+          found: ids(m.found),
+          changed: ids(m.changed),
+          removing: ids(m.removing),
+          edges: (m.edges || []).map(([a, b]) => `${a.id}-${b.id}`)
+        }
+      });
     }
 
     search(value) {
@@ -361,6 +399,15 @@ excerpt: "Compact interactive B-Tree simulator."
       return { found: false, node: null, index: -1, path };
     }
 
+    /* where value falls among the node's keys, for the status line */
+    where(node, i, value) {
+      const k = node.keys;
+      if (!k.length) return `${value}`;
+      if (i === 0) return `${value} < ${k[0]}`;
+      if (i === k.length) return `${value} > ${k[k.length - 1]}`;
+      return `${k[i - 1]} < ${value} < ${k[i]}`;
+    }
+
     insert(value) {
       this.clearLog();
 
@@ -368,6 +415,7 @@ excerpt: "Compact interactive B-Tree simulator."
         this.root = new BNode(true);
         this.root.keys.push(value);
         this.log("new root", [this.root]);
+        this.snap(`Empty tree: create a root leaf [${value}].`, { found: [this.root] });
         return true;
       }
 
@@ -377,11 +425,13 @@ excerpt: "Compact interactive B-Tree simulator."
 
       if (this.root.keys.length === maxKeys) {
         const oldRoot = this.root;
+        this.snap(`Root [${oldRoot.keys.join(", ")}] is full (2t−1 = ${maxKeys} keys): split it first.`, { removing: [oldRoot] });
         const newRoot = new BNode(false);
         newRoot.children.push(oldRoot);
         this.root = newRoot;
-        this.splitChild(newRoot, 0);
+        const split = this.splitChild(newRoot, 0);
         this.log("new root", [newRoot]);
+        this.snap(`Median ${split.median} moves up into a new root; the height grows by 1.`, { changed: [newRoot, split.left, split.right] });
       }
 
       this.insertNonFull(this.root, value);
@@ -398,19 +448,26 @@ excerpt: "Compact interactive B-Tree simulator."
           i--;
         }
         node.keys[i + 1] = value;
+        this.snap(`Leaf is not full: insert ${value} in sorted order → [${node.keys.join(", ")}].`, { found: [node] });
         return;
       }
 
       while (i >= 0 && value < node.keys[i]) i--;
       i++;
 
-      if (node.children[i].keys.length === 2 * this.t - 1) {
-        this.splitChild(node, i);
+      let child = node.children[i];
+      this.snap(`Node [${node.keys.join(", ")}]: ${this.where(node, i, value)} → go to child ${i}.`, { checking: [node], edges: [[node, child]] });
+
+      if (child.keys.length === 2 * this.t - 1) {
+        this.snap(`Child [${child.keys.join(", ")}] is full (2t−1 keys): split it before descending.`, { checking: [node], removing: [child] });
+        const split = this.splitChild(node, i);
+        this.snap(`Median ${split.median} moves up into the parent; the child splits in two.`, { changed: [node, split.left, split.right] });
 
         if (value > node.keys[i]) i++;
+        child = node.children[i];
       }
 
-      this.insertNonFull(node.children[i], value);
+      this.insertNonFull(child, value);
     }
 
     splitChild(parent, index) {
@@ -430,6 +487,7 @@ excerpt: "Compact interactive B-Tree simulator."
       parent.keys.splice(index, 0, median);
       parent.children.splice(index + 1, 0, right);
       this.log("split", [parent, full, right]);
+      return { median, left: full, right };
     }
 
     delete(value) {
@@ -442,14 +500,20 @@ excerpt: "Compact interactive B-Tree simulator."
       if (this.root && this.root.keys.length === 0) {
         if (this.root.leaf) {
           this.root = null;
+          this.snap("The last key was removed: the tree is now empty.");
         } else {
-          const oldRoot = this.root;
-          this.root = this.root.children[0] || null;
-          this.log("root shrink", [oldRoot, this.root]);
+          this.shrinkRoot();
         }
       }
 
       return true;
+    }
+
+    shrinkRoot() {
+      const oldRoot = this.root;
+      this.root = this.root.children[0] || null;
+      this.log("root shrink", [oldRoot, this.root]);
+      this.snap("The root has no keys left: its only child becomes the root; height −1.", { changed: [this.root] });
     }
 
     findKey(node, value) {
@@ -459,12 +523,15 @@ excerpt: "Compact interactive B-Tree simulator."
     }
 
     remove(node, value) {
+      const t = this.t;
       const index = this.findKey(node, value);
 
       if (index < node.keys.length && node.keys[index] === value) {
         if (node.leaf) {
+          this.snap(`${value} is in a leaf: remove it directly.`, { removing: [node] });
           node.keys.splice(index, 1);
           this.log("remove key", [node]);
+          this.snap(`Removed ${value} → leaf [${node.keys.join(", ")}].`, { changed: [node] });
         } else {
           this.removeFromInternal(node, index);
         }
@@ -473,40 +540,60 @@ excerpt: "Compact interactive B-Tree simulator."
 
       if (node.leaf) return;
 
+      let child = node.children[index];
+      this.snap(`Node [${node.keys.join(", ")}]: ${this.where(node, index, value)} → go to child ${index}.`, { checking: [node], edges: [[node, child]] });
+
       const wasLastChild = index === node.keys.length;
 
-      if (node.children[index].keys.length < this.t) {
+      if (child.keys.length < t) {
+        this.snap(`Child [${child.keys.join(", ")}] has only t−1 = ${t - 1} key(s): fix it before descending.`, { checking: [node], removing: [child] });
         this.fill(node, index);
       }
 
       if (wasLastChild && index > node.keys.length) {
-        this.remove(node.children[index - 1], value);
+        child = node.children[index - 1];
       } else {
-        this.remove(node.children[index], value);
+        child = node.children[index];
       }
+
+      if (node === this.root && node.keys.length === 0) this.shrinkRoot();
+
+      this.remove(child, value);
     }
 
     removeFromInternal(node, index) {
+      const t = this.t;
       const value = node.keys[index];
+      const leftChild = node.children[index];
+      const rightChild = node.children[index + 1];
 
-      if (node.children[index].keys.length >= this.t) {
-        const predecessor = this.getPredecessor(node.children[index]);
+      if (leftChild.keys.length >= t) {
+        const predecessor = this.getPredecessor(leftChild);
+        this.snap(`${value} is in an internal node; left child has ≥ t keys → use predecessor ${predecessor}.`, { removing: [node], checking: [leftChild] });
         node.keys[index] = predecessor;
         this.log("replace by predecessor", [node]);
-        this.remove(node.children[index], predecessor);
+        this.snap(`${value} replaced by ${predecessor}; now delete ${predecessor} from the left subtree.`, { changed: [node], edges: [[node, leftChild]] });
+        this.remove(leftChild, predecessor);
         return;
       }
 
-      if (node.children[index + 1].keys.length >= this.t) {
-        const successor = this.getSuccessor(node.children[index + 1]);
+      if (rightChild.keys.length >= t) {
+        const successor = this.getSuccessor(rightChild);
+        this.snap(`${value} is in an internal node; right child has ≥ t keys → use successor ${successor}.`, { removing: [node], checking: [rightChild] });
         node.keys[index] = successor;
         this.log("replace by successor", [node]);
-        this.remove(node.children[index + 1], successor);
+        this.snap(`${value} replaced by ${successor}; now delete ${successor} from the right subtree.`, { changed: [node], edges: [[node, rightChild]] });
+        this.remove(rightChild, successor);
         return;
       }
 
+      this.snap(`${value} is internal and both children have t−1 keys: merge them around ${value}.`, { removing: [node], checking: [leftChild, rightChild] });
       this.merge(node, index);
-      this.remove(node.children[index], value);
+      this.snap(`Merged into [${leftChild.keys.join(", ")}]; continue deleting ${value} there.`, { changed: [node, leftChild] });
+
+      if (node === this.root && node.keys.length === 0) this.shrinkRoot();
+
+      this.remove(leftChild, value);
     }
 
     getPredecessor(node) {
@@ -532,18 +619,18 @@ excerpt: "Compact interactive B-Tree simulator."
         return;
       }
 
-      if (index !== node.keys.length) {
-        this.merge(node, index);
-      } else {
-        this.merge(node, index - 1);
-      }
+      const mergeAt = index !== node.keys.length ? index : index - 1;
+      const separator = node.keys[mergeAt];
+      this.merge(node, mergeAt);
+      this.snap(`Siblings have t−1 keys too: merge with a sibling; ${separator} moves down from the parent.`, { changed: [node, node.children[mergeAt]] });
     }
 
     borrowFromPrevious(node, index) {
       const child = node.children[index];
       const sibling = node.children[index - 1];
+      const down = node.keys[index - 1];
 
-      child.keys.unshift(node.keys[index - 1]);
+      child.keys.unshift(down);
 
       if (!child.leaf) {
         child.children.unshift(sibling.children.pop());
@@ -551,13 +638,15 @@ excerpt: "Compact interactive B-Tree simulator."
 
       node.keys[index - 1] = sibling.keys.pop();
       this.log("borrow left", [node, child, sibling]);
+      this.snap(`Borrow via the parent: ${down} moves down, ${node.keys[index - 1]} moves up from the left sibling.`, { changed: [node, child, sibling] });
     }
 
     borrowFromNext(node, index) {
       const child = node.children[index];
       const sibling = node.children[index + 1];
+      const down = node.keys[index];
 
-      child.keys.push(node.keys[index]);
+      child.keys.push(down);
 
       if (!child.leaf) {
         child.children.push(sibling.children.shift());
@@ -565,6 +654,7 @@ excerpt: "Compact interactive B-Tree simulator."
 
       node.keys[index] = sibling.keys.shift();
       this.log("borrow right", [node, child, sibling]);
+      this.snap(`Borrow via the parent: ${down} moves down, ${node.keys[index]} moves up from the right sibling.`, { changed: [node, child, sibling] });
     }
 
     merge(node, index) {
@@ -647,6 +737,7 @@ excerpt: "Compact interactive B-Tree simulator."
 
   function setStatus(text, type = "") {
     el.status.textContent = text;
+    el.status.title = text;
     el.status.className = "btree-status" + (type ? " " + type : "");
   }
 
@@ -872,6 +963,7 @@ excerpt: "Compact interactive B-Tree simulator."
 
   function begin(operation) {
     token++;
+    saved = tree;
     clearMarks();
     structuralChanges = 0;
     lastResult = "—";
@@ -883,6 +975,7 @@ excerpt: "Compact interactive B-Tree simulator."
 
   function finish(localToken, message, type = "") {
     if (localToken !== token) return;
+    saved = null;
     running = false;
     setRunning(false);
     el.operation.textContent = "Idle";
@@ -892,6 +985,8 @@ excerpt: "Compact interactive B-Tree simulator."
 
   function fail(localToken, error) {
     if (error?.message === "cancelled" || localToken !== token) return;
+    if (saved) tree = saved;
+    saved = null;
     running = false;
     setRunning(false);
     el.operation.textContent = "Idle";
@@ -937,6 +1032,38 @@ excerpt: "Compact interactive B-Tree simulator."
     });
   }
 
+  /* plays the recorded algorithm steps; the real tree is replaced only after the last step */
+  async function playFrames(localToken, frames) {
+    for (const frame of frames) {
+      tree = frame.tree;
+      clearMarks();
+      frame.marks.checking.forEach(id => marks.checking.add(id));
+      frame.marks.found.forEach(id => marks.found.add(id));
+      frame.marks.changed.forEach(id => marks.changed.add(id));
+      frame.marks.removing.forEach(id => marks.removing.add(id));
+      frame.marks.edges.forEach(key => marks.activeEdges.add(key));
+      structuralChanges = frame.changes;
+      render();
+      setStatus(frame.message);
+      await pause(localToken);
+    }
+  }
+
+  function workingCopy() {
+    const work = tree.clone();
+    work.recording = true;
+    work.frames = [];
+    return work;
+  }
+
+  function commit(work) {
+    work.recording = false;
+    work.frames = [];
+    tree = work;
+    saved = null;
+    structuralChanges = work.changeLog.length;
+  }
+
   async function insertValue() {
     const value = readValue();
 
@@ -953,29 +1080,22 @@ excerpt: "Compact interactive B-Tree simulator."
     const t = begin("Insert");
 
     try {
-      const lookup = await animateSearchPath(t, value, true);
-
-      if (lookup.found) {
+      if (tree.search(value).found) {
+        const lookup = await animateSearchPath(t, value, true);
         clearMarks();
         lastResult = "duplicate";
-        finish(t, `${value} already exists.`, "error");
+        finish(t, `${value} already exists (found in [${lookup.node.keys.join(", ")}]).`, "error");
         return;
       }
 
-      clearMarks();
-      tree.insert(value);
-      applyChangeMarks();
+      const work = workingCopy();
+      work.insert(value);
+      await playFrames(t, work.frames);
+
+      commit(work);
       lastResult = value;
-      render();
-
-      if (structuralChanges) {
-        const types = tree.changeLog.map(item => item.type).join(", ");
-        setStatus(`Inserted ${value}. Structural change: ${types}.`);
-        await pause(t);
-      }
-
       clearMarks();
-      finish(t, `Inserted ${value}.`, "success");
+      finish(t, `Inserted ${value}.` + (structuralChanges ? ` Splits on the way down: ${work.changeLog.filter(item => item.type === "split").length}.` : ""), "success");
     } catch (error) {
       fail(t, error);
     }
@@ -1002,10 +1122,10 @@ excerpt: "Compact interactive B-Tree simulator."
 
       if (result.found) {
         lastResult = value;
-        finish(t, `Found ${value}.`, "success");
+        finish(t, `Found ${value} (${result.path.length} node(s) visited).`, "success");
       } else {
         lastResult = "not found";
-        finish(t, `${value} not found.`, "error");
+        finish(t, `${value} not found (${result.path.length} node(s) visited).`, "error");
       }
     } catch (error) {
       fail(t, error);
@@ -1028,33 +1148,20 @@ excerpt: "Compact interactive B-Tree simulator."
     const t = begin("Delete");
 
     try {
-      const lookup = await animateSearchPath(t, value, true);
-
-      if (!lookup.found) {
+      if (!tree.search(value).found) {
+        await animateSearchPath(t, value, false);
         clearMarks();
         lastResult = "not found";
         finish(t, `${value} not found.`, "error");
         return;
       }
 
-      marks.found.clear();
-      marks.removing.add(lookup.node.id);
-      render();
-      setStatus(`Deleting ${value}...`);
-      await pause(t);
+      const work = workingCopy();
+      work.delete(value);
+      await playFrames(t, work.frames);
 
-      clearMarks();
-      tree.delete(value);
-      applyChangeMarks();
+      commit(work);
       lastResult = value;
-      render();
-
-      if (structuralChanges) {
-        const types = tree.changeLog.map(item => item.type).join(", ");
-        setStatus(`Deleted ${value}. Structural change: ${types}.`);
-        await pause(t);
-      }
-
       clearMarks();
       finish(t, `Deleted ${value}.`, "success");
     } catch (error) {
@@ -1093,6 +1200,7 @@ excerpt: "Compact interactive B-Tree simulator."
 
   function loadValues(values, message) {
     token++;
+    saved = null;
     running = false;
     BNode.nextId = 1;
     tree = new BTree(degree());
@@ -1128,6 +1236,7 @@ excerpt: "Compact interactive B-Tree simulator."
 
   function resetTree() {
     token++;
+    saved = null;
     running = false;
     BNode.nextId = 1;
     tree = new BTree(degree());
@@ -1143,12 +1252,15 @@ excerpt: "Compact interactive B-Tree simulator."
   function cancel() {
     if (!running) return;
     token++;
+    if (saved) tree = saved;
+    saved = null;
     running = false;
+    structuralChanges = 0;
     clearMarks();
     setRunning(false);
     el.operation.textContent = "Idle";
     render();
-    setStatus("Animation cancelled.");
+    setStatus("Animation cancelled; the tree is unchanged.");
   }
 
   el.insert.addEventListener("click", insertValue);

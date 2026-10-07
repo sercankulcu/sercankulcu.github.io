@@ -68,14 +68,14 @@ excerpt: "Compact interactive infix-to-postfix simulator."
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   flex-wrap: nowrap;
   overflow: hidden;
 }
 
 .postfix-token {
   flex: 0 1 auto;
-  min-width: 34px;
+  min-width: 28px;
   height: 32px;
   padding: 0 7px;
   display: inline-flex;
@@ -284,7 +284,7 @@ excerpt: "Compact interactive infix-to-postfix simulator."
             <div class="postfix-row">
               <div class="postfix-field">
                 <label for="postfix-input">Infix expression</label>
-                <input id="postfix-input" type="text" value="A + B * C" maxlength="40" spellcheck="false">
+                <input id="postfix-input" type="text" value="A + B * C" maxlength="48" spellcheck="false">
               </div>
               <button id="postfix-convert" type="button">Convert</button>
               <button id="postfix-example" type="button">Example</button>
@@ -376,7 +376,7 @@ excerpt: "Compact interactive infix-to-postfix simulator."
   };
 
   const DELAY = 300;
-  const MAX_TOKENS = 16;
+  const MAX_TOKENS = 22;
   const examples = [
     "A + B * C",
     "( A + B ) * C",
@@ -391,12 +391,13 @@ excerpt: "Compact interactive infix-to-postfix simulator."
   let frameIndex = 0;
   let running = false;
   let tokenId = 0;
+  let convertedInput = null;
 
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-  const operators = new Set(["+", "-", "*", "/", "^"]);
+  const operators = new Set(["+", "-", "*", "/", "%", "^"]);
 
   function precedence(op) {
-    return ({ "+": 1, "-": 1, "*": 2, "/": 2, "^": 3 })[op] || 0;
+    return ({ "+": 1, "-": 1, "*": 2, "/": 2, "%": 2, "^": 3 })[op] || 0;
   }
 
   function isOperand(token) {
@@ -405,16 +406,16 @@ excerpt: "Compact interactive infix-to-postfix simulator."
 
   function tokenize(expression) {
     const text = expression.trim();
-    if (!text) return null;
+    if (!text) return { error: "Enter an infix expression." };
 
-    const found = text.match(/[A-Za-z_][A-Za-z0-9_]*|\d+(?:\.\d+)?|[()+\-*/^]/g);
-    if (!found) return null;
+    const found = text.match(/[A-Za-z_][A-Za-z0-9_]*|\d+(?:\.\d+)?|[()+\-*/%^]/g) || [];
 
     const rebuilt = found.join("").replace(/\s+/g, "");
     const original = text.replace(/\s+/g, "");
 
-    if (rebuilt !== original || found.length > MAX_TOKENS) return null;
-    return found;
+    if (rebuilt !== original) return { error: "Use only operands, + - * / % ^ and parentheses." };
+    if (found.length > MAX_TOKENS) return { error: `Use at most ${MAX_TOKENS} tokens.` };
+    return { list: found };
   }
 
   function validate(list) {
@@ -423,24 +424,27 @@ excerpt: "Compact interactive infix-to-postfix simulator."
 
     for (const token of list) {
       if (isOperand(token)) {
-        if (!expectOperand) return false;
+        if (!expectOperand) return `Missing operator before ${token}.`;
         expectOperand = false;
       } else if (token === "(") {
-        if (!expectOperand) return false;
+        if (!expectOperand) return "Missing operator before (.";
         balance++;
       } else if (token === ")") {
-        if (expectOperand || balance <= 0) return false;
+        if (balance <= 0) return "Unbalanced parentheses: extra ).";
+        if (expectOperand) return "Missing operand before ).";
         balance--;
         expectOperand = false;
       } else if (operators.has(token)) {
-        if (expectOperand) return false;
+        if (expectOperand) return `Missing operand before ${token}.`;
         expectOperand = true;
       } else {
-        return false;
+        return `Unknown token ${token}.`;
       }
     }
 
-    return balance === 0 && !expectOperand;
+    if (expectOperand) return "Expression ends without an operand.";
+    if (balance !== 0) return "Unbalanced parentheses: missing ).";
+    return "";
   }
 
   function shouldPop(top, current) {
@@ -489,25 +493,38 @@ excerpt: "Compact interactive infix-to-postfix simulator."
 
       if (current === ")") {
         while (stack.length && stack[stack.length - 1] !== "(") {
-          output.push(stack.pop());
+          const top = stack.pop();
+          output.push(top);
           stackOps++;
+          snapshot(i, `) : pop ${top} to output.`);
         }
 
         if (!stack.length) throw new Error("Mismatched parentheses.");
         stack.pop();
         stackOps++;
-        snapshot(i, "Closing parenthesis → pop until matching parenthesis.");
+        snapshot(i, ") : pop the matching ( and discard both.");
         continue;
       }
 
       while (stack.length && shouldPop(stack[stack.length - 1], current)) {
+        const top = stack[stack.length - 1];
+        const reason = precedence(top) > precedence(current)
+          ? `${top} has higher precedence than ${current}`
+          : `${top} and ${current}: equal precedence, left-assoc.`;
         output.push(stack.pop());
         stackOps++;
+        snapshot(i, `${reason} → pop ${top}.`);
       }
+
+      const top = stack[stack.length - 1];
+      let reason = "Stack is empty";
+      if (top === "(") reason = "Top is (";
+      else if (top && precedence(top) < precedence(current)) reason = `${current} has higher precedence than ${top}`;
+      else if (top) reason = "^ is right-associative, no pop";
 
       stack.push(current);
       stackOps++;
-      snapshot(i, `Operator ${current} processed.`);
+      snapshot(i, `${reason} → push ${current}.`);
     }
 
     while (stack.length) {
@@ -515,7 +532,7 @@ excerpt: "Compact interactive infix-to-postfix simulator."
       if (top === "(" || top === ")") throw new Error("Mismatched parentheses.");
       output.push(top);
       stackOps++;
-      snapshot(list.length, `Pop ${top} from stack.`);
+      snapshot(list.length, `End of input: pop ${top} to output.`);
     }
 
     snapshot(list.length, "Conversion complete.", true);
@@ -592,21 +609,24 @@ excerpt: "Compact interactive infix-to-postfix simulator."
   }
 
   function convertExpression(message = "Steps created.") {
-    const parsed = tokenize(el.input.value);
+    const scanned = tokenize(el.input.value);
 
-    if (!parsed) {
-      setStatus(`Use at most ${MAX_TOKENS} valid tokens.`, "error");
+    if (scanned.error) {
+      setStatus(scanned.error, "error");
       return false;
     }
 
-    if (!validate(parsed)) {
-      setStatus("Invalid infix expression.", "error");
+    const parsed = scanned.list;
+    const problem = validate(parsed);
+    if (problem) {
+      setStatus(`Invalid infix expression. ${problem}`, "error");
       return false;
     }
 
     try {
       tokens = parsed;
       frames = buildFrames(parsed);
+      convertedInput = el.input.value;
       frameIndex = 0;
       tokenId++;
       running = false;
@@ -649,7 +669,7 @@ excerpt: "Compact interactive infix-to-postfix simulator."
   }
 
   async function autoRun() {
-    if (!frames.length && !convertExpression()) return;
+    if ((!frames.length || el.input.value !== convertedInput) && !convertExpression()) return;
 
     if (frameIndex >= frames.length - 1) {
       frameIndex = 0;

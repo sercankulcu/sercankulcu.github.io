@@ -137,6 +137,12 @@ excerpt: "Interactive binary heap simulator with max/min heap modes, insertion, 
   background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
 }
 
+.heap-cell.is-sorted {
+  border-style: dashed;
+  border-color: var(--ds-good);
+  color: var(--ds-muted);
+}
+
 .heap-index {
   display: block;
   margin-top: 1px;
@@ -198,6 +204,15 @@ excerpt: "Interactive binary heap simulator with max/min heap modes, insertion, 
   fill: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
   stroke: var(--ds-good);
 }
+
+.heap-edge.is-out { opacity: .2; }
+
+.heap-node.is-sorted circle {
+  stroke: var(--ds-good);
+  stroke-dasharray: 5 3;
+}
+
+.heap-node.is-sorted text.value { fill: var(--ds-muted); }
 
 .heap-empty-text {
   fill: var(--ds-muted);
@@ -359,11 +374,22 @@ excerpt: "Interactive binary heap simulator with max/min heap modes, insertion, 
   var token = 0;
   var marked = {};
   var activeEdges = {};
+  /* during Heap Sort only heap[0..heapSize-1] is still a heap; the rest is the sorted part */
+  var heapSize = -1;
+  /* heap type the current array is ordered for (the select may already show the new one) */
+  var heapType = el.type.value;
+  /* state before the running operation; Cancel restores it so the heap is never left half-done */
+  var saved = null;
 
   function parent(i){ return Math.floor((i-1)/2); }
   function left(i){ return 2*i+1; }
   function right(i){ return 2*i+2; }
-  function better(a,b){ return el.type.value === "max" ? a > b : a < b; }
+  function isMax(){ return el.type.value === "max"; }
+  function better(a,b){ return isMax() ? a > b : a < b; }
+  function childWord(){ return isMax() ? "larger" : "smaller"; }
+  function rootWord(){ return isMax() ? "maximum" : "minimum"; }
+  /* "a > b" when a must move above b, otherwise the relation that stops the sift */
+  function rel(a,b){ return a + (better(a,b) ? (isMax() ? " > " : " < ") : (isMax() ? " ≤ " : " ≥ ")) + b; }
 
   function readInt(input,label){
     if(input.value.trim()==="") throw new Error(label+" is required.");
@@ -374,7 +400,7 @@ excerpt: "Interactive binary heap simulator with max/min heap modes, insertion, 
 
   function parseValues(){
     var parts=el.values.value.split(",").map(function(x){return x.trim();}).filter(Boolean);
-    if(!parts.length || parts.length>31) throw new Error("Enter between 1 and 31 values.");
+    if(!parts.length || parts.length>MAX_SIZE) throw new Error("Enter between 1 and "+MAX_SIZE+" values.");
     var values=parts.map(Number);
     if(values.some(function(x){return !Number.isInteger(x);})){ throw new Error("Every value must be an integer."); }
     return values;
@@ -382,6 +408,7 @@ excerpt: "Interactive binary heap simulator with max/min heap modes, insertion, 
 
   function setStatus(text,type){
     el.status.textContent=text;
+    el.status.title=text;
     el.status.classList.remove("is-success","is-error");
     if(type) el.status.classList.add(type);
   }
@@ -406,6 +433,8 @@ excerpt: "Interactive binary heap simulator with max/min heap modes, insertion, 
     activeEdges={};
   }
 
+  function inHeap(i){ return heapSize<0 || i<heapSize; }
+
   /* the drawing area grows with the number of levels; the SVG scales it to fit */
   function viewSize(){
     var levels=heap.length?Math.floor(Math.log2(heap.length))+1:1;
@@ -423,6 +452,11 @@ excerpt: "Interactive binary heap simulator with max/min heap modes, insertion, 
     });
   }
 
+  function cls(i){
+    if(marked[i]) return " "+marked[i];
+    return inHeap(i)?"":" is-sorted";
+  }
+
   function render(){
     el.array.innerHTML="";
     if(!heap.length){
@@ -438,7 +472,7 @@ excerpt: "Interactive binary heap simulator with max/min heap modes, insertion, 
         var wrap=document.createElement("div");
         wrap.className="heap-cell-wrap";
         var cell=document.createElement("div");
-        cell.className="heap-cell"+(marked[i]?" "+marked[i]:"");
+        cell.className="heap-cell"+cls(i);
         cell.textContent=String(v);
         var idx=document.createElement("span");
         idx.className="heap-index";
@@ -465,13 +499,13 @@ excerpt: "Interactive binary heap simulator with max/min heap modes, insertion, 
         var line=document.createElementNS(ns,"line");
         line.setAttribute("x1",String(p[par].x)); line.setAttribute("y1",String(p[par].y));
         line.setAttribute("x2",String(p[i].x)); line.setAttribute("y2",String(p[i].y));
-        line.setAttribute("class","heap-edge"+(activeEdges[par+"-"+i]?" is-active":""));
+        line.setAttribute("class","heap-edge"+(activeEdges[par+"-"+i]?" is-active":(inHeap(i)?"":" is-out")));
         el.svg.appendChild(line);
       }
 
       for(var j=0;j<heap.length;j++){
         var g=document.createElementNS(ns,"g");
-        g.setAttribute("class","heap-node"+(marked[j]?" "+marked[j]:""));
+        g.setAttribute("class","heap-node"+cls(j));
         g.setAttribute("transform","translate("+p[j].x+" "+p[j].y+")");
 
         var c=document.createElementNS(ns,"circle"); c.setAttribute("r","24");
@@ -481,98 +515,163 @@ excerpt: "Interactive binary heap simulator with max/min heap modes, insertion, 
       }
     }
 
-    el.size.textContent=String(heap.length);
-    el.height.textContent=heap.length?String(Math.floor(Math.log2(heap.length))+1):"0";
+    var n=heapSize<0?heap.length:heapSize;
+    el.size.textContent=String(n);
+    /* height = number of edges on the longest root-to-leaf path = floor(log2 n) */
+    el.height.textContent=n?String(Math.floor(Math.log2(n))):"0";
     el.comparisons.textContent=String(comparisons);
     el.swaps.textContent=String(swaps);
   }
 
-  async function highlightPair(a,b){
-    marked={}; activeEdges={};
-    if(a>=0) marked[a]="is-checking";
-    if(b>=0) marked[b]="is-checking";
-    if(a>=0 && b>=0){
-      var child=Math.max(a,b), par=parent(child);
-      if(par===Math.min(a,b)) activeEdges[par+"-"+child]=true;
-    }
+  /* one animation step: draw, show the message, wait; false when the step was cancelled */
+  async function step(t,message){
     render();
-    return await wait(getDelay(),token);
+    if(message) setStatus(message);
+    return await wait(getDelay(),t);
   }
 
-  async function siftUp(start){
-    var i=start;
-    var path=[i];
+  function markEdge(a,b){
+    var child=Math.max(a,b), par=parent(child);
+    if(par===Math.min(a,b)) activeEdges[par+"-"+child]=true;
+  }
+
+  function begin(){
+    token++;
+    saved={
+      heap:heap.slice(), type:heapType, comparisons:comparisons, swaps:swaps,
+      path:el.path.textContent, sort:el.sortResult.textContent
+    };
+    heapSize=-1; comparisons=0; swaps=0;
+    clearMarks(); disable(true);
+    el.path.textContent="—";
+    return token;
+  }
+
+  function finish(t,message,type){
+    if(t!==token) return;
+    saved=null; heapSize=-1; heapType=el.type.value;
+    clearMarks(); disable(false); render();
+    setStatus(message,type);
+  }
+
+  async function siftUp(t,start){
+    var i=start, path=[i];
+    el.path.textContent=String(i);
     while(i>0){
       var p=parent(i);
       comparisons++;
-      if(!(await highlightPair(i,p))) return false;
-      if(!better(heap[i],heap[p])) break;
+      clearMarks(); marked[i]="is-checking"; marked[p]="is-checking"; markEdge(i,p);
+      var up=better(heap[i],heap[p]);
+      if(!(await step(t,"Up-heap: compare "+heap[i]+" (i="+i+") with parent "+heap[p]+" (i="+p+"): "+rel(heap[i],heap[p])+(up?" → swap.":" → stop.")))) return false;
+      if(!up) return true;
       var tmp=heap[i]; heap[i]=heap[p]; heap[p]=tmp; swaps++;
-      i=p; path.push(i); render();
-      if(!(await wait(getDelay(),token))) return false;
+      i=p; path.push(i); el.path.textContent=path.join(" → ");
+      clearMarks(); marked[i]="is-found";
+      if(!(await step(t,"Swapped: "+heap[i]+" moved up to index "+i+"."))) return false;
     }
-    el.path.textContent=path.join(" → ");
-    return true;
+    clearMarks(); marked[0]="is-found";
+    return await step(t,heap[0]+" reached the root: up-heap ends.");
   }
 
-  async function siftDown(start){
+  /* down-heap inside heap[0..n-1]; prefix names the phase (build / sort) in the messages */
+  async function siftDown(t,start,n,prefix){
     var i=start, path=[i];
+    prefix=prefix||"Down-heap";
+    el.path.textContent=String(i);
     while(true){
-      var l=left(i), r=right(i), best=i;
-      if(l<heap.length){ comparisons++; if(better(heap[l],heap[best])) best=l; }
-      if(r<heap.length){ comparisons++; if(better(heap[r],heap[best])) best=r; }
-      if(best===i) break;
-
-      if(!(await highlightPair(i,best))) return false;
+      var l=left(i), r=right(i);
+      if(l>=n){
+        clearMarks(); marked[i]="is-found";
+        return await step(t,prefix+": "+heap[i]+" (i="+i+") has no children → stop.");
+      }
+      var best=l, text;
+      if(r<n){
+        comparisons++;
+        if(better(heap[r],heap[l])) best=r;
+        text=childWord()+" child of "+heap[i]+" is "+heap[best]+" (of "+heap[l]+", "+heap[r]+")";
+      } else {
+        text="only child of "+heap[i]+" is "+heap[l];
+      }
+      comparisons++;
+      var down=better(heap[best],heap[i]);
+      clearMarks(); marked[i]="is-checking"; marked[best]="is-checking"; markEdge(i,best);
+      if(!(await step(t,prefix+": "+text+"; "+rel(heap[best],heap[i])+(down?" → swap.":" → stop.")))) return false;
+      if(!down) return true;
       var tmp=heap[i]; heap[i]=heap[best]; heap[best]=tmp; swaps++;
-      i=best; path.push(i); render();
-      if(!(await wait(getDelay(),token))) return false;
+      i=best; path.push(i); el.path.textContent=path.join(" → ");
+      clearMarks(); marked[i]="is-found";
+      if(!(await step(t,prefix+": swapped, "+heap[i]+" moved down to index "+i+"."))) return false;
     }
-    el.path.textContent=path.join(" → ");
+  }
+
+  /* bottom-up build: down-heap every internal node from floor(n/2)-1 down to 0 */
+  async function buildHeap(t,values){
+    heap=values.slice();
+    var start=Math.floor(heap.length/2)-1;
+    if(start<0){
+      clearMarks(); marked[0]="is-found";
+      return await step(t,"A single value is already a heap.");
+    }
+    if(!(await step(t,"Build heap (bottom-up): down-heap indices "+start+" … 0; leaves "+(start+1)+"…"+(heap.length-1)+" are already heaps."))) return false;
+    for(var i=start;i>=0;i--){
+      if(!(await siftDown(t,i,heap.length,"Build, i="+i))) return false;
+    }
     return true;
   }
 
-  async function buildHeap(values){
-    token++; disable(true); clearMarks(); comparisons=0; swaps=0; heap=values.slice(); render();
-    var currentToken=token;
-    for(var i=Math.floor(heap.length/2)-1;i>=0;i--){
-      if(currentToken!==token) return;
-      await siftDown(i);
-    }
-    clearMarks(); render(); disable(false);
+  async function runBuild(values,message){
+    var t=begin();
+    if(await buildHeap(t,values)) finish(t,message,"is-success");
   }
 
   btn.insert.addEventListener("click",async function(){
+    var value;
     try{
-      var value=readInt(el.value,"Value");
+      value=readInt(el.value,"Value");
       if(heap.length>=MAX_SIZE) throw new Error("Heap is full: maximum "+MAX_SIZE+" values.");
-      token++; disable(true); clearMarks(); heap.push(value); el.path.textContent=String(heap.length-1); render();
-      await siftUp(heap.length-1); clearMarks(); render(); disable(false);
-      setStatus("Inserted "+value+".","is-success");
-    }catch(error){ disable(false); setStatus(error.message,"is-error"); }
+    }catch(error){ setStatus(error.message,"is-error"); return; }
+    var t=begin();
+    heap.push(value);
+    clearMarks(); marked[heap.length-1]="is-found";
+    if(!(await step(t,"Place "+value+" at the first free position: index "+(heap.length-1)+"."))) return;
+    if(!(await siftUp(t,heap.length-1))) return;
+    finish(t,"Inserted "+value+": "+comparisons+" comparison(s), "+swaps+" swap(s).","is-success");
   });
 
   btn.extract.addEventListener("click",async function(){
     if(!heap.length){ setStatus("Heap is empty.","is-error"); return; }
-    token++; disable(true); clearMarks();
-    marked[0]="is-found"; render(); await wait(getDelay(),token);
+    var t=begin();
     var rootValue=heap[0];
-    var last=heap.pop();
-    if(heap.length){ heap[0]=last; render(); await siftDown(0); }
-    clearMarks(); render(); disable(false);
-    setStatus("Extracted root "+rootValue+".","is-success");
+    marked[0]="is-found";
+    if(!(await step(t,"The root "+rootValue+" is the "+rootWord()+": remove it."))) return;
+    if(heap.length===1){
+      heap.pop();
+      finish(t,"Extracted root "+rootValue+". The heap is now empty.","is-success");
+      return;
+    }
+    var lastIndex=heap.length-1;
+    clearMarks(); marked[0]="is-checking"; marked[lastIndex]="is-checking";
+    if(!(await step(t,"Move the last element "+heap[lastIndex]+" (i="+lastIndex+") to the root."))) return;
+    heap[0]=heap.pop();
+    clearMarks(); marked[0]="is-found";
+    if(!(await step(t,heap[0]+" is now at the root; restore the heap with down-heap."))) return;
+    if(!(await siftDown(t,0,heap.length))) return;
+    finish(t,"Extracted root "+rootValue+": "+comparisons+" comparison(s), "+swaps+" swap(s).","is-success");
   });
 
   btn.peek.addEventListener("click",async function(){
     if(!heap.length){ setStatus("Heap is empty.","is-error"); return; }
     token++; clearMarks(); marked[0]="is-found"; render();
-    el.path.textContent="0"; setStatus("Root value is "+heap[0]+".","is-success");
-    await wait(getDelay(),token); clearMarks(); render();
+    var t=token;
+    el.path.textContent="0"; setStatus("Root value is "+heap[0]+" (the "+rootWord()+"), read in O(1).","is-success");
+    if(await wait(getDelay(),t)){ clearMarks(); render(); }
   });
 
   btn.build.addEventListener("click",async function(){
-    try{ await buildHeap(parseValues()); setStatus("Heap built from the provided values.","is-success"); }
-    catch(error){ disable(false); setStatus(error.message,"is-error"); }
+    var values;
+    try{ values=parseValues(); }
+    catch(error){ setStatus(error.message,"is-error"); return; }
+    await runBuild(values,"Heap built bottom-up from the provided values.");
   });
 
   btn.random.addEventListener("click",async function(){
@@ -582,59 +681,60 @@ excerpt: "Interactive binary heap simulator with max/min heap modes, insertion, 
       if(!used[v]){ used[v]=true; values.push(v); }
     }
     el.values.value=values.join(", ");
-    await buildHeap(values);
-    setStatus("Random heap generated.","is-success");
+    await runBuild(values,"Random heap generated.");
   });
 
+  /* in-place heap sort: swap the root with the last heap element, shrink the heap, down-heap */
   btn.sort.addEventListener("click",async function(){
     if(!heap.length){ setStatus("Heap is empty.","is-error"); return; }
-    token++; disable(true);
-    var working=heap.slice(), result=[], type=el.type.value;
-    var currentToken=token;
-
-    function localBetter(a,b){ return type==="max"?a>b:a<b; }
-    function localDown(arr,start){
-      var i=start;
-      while(true){
-        var l=2*i+1,r=2*i+2,best=i;
-        if(l<arr.length && localBetter(arr[l],arr[best])) best=l;
-        if(r<arr.length && localBetter(arr[r],arr[best])) best=r;
-        if(best===i) break;
-        var tmp=arr[i]; arr[i]=arr[best]; arr[best]=tmp; i=best;
-      }
+    var t=begin();
+    var order=isMax()?"ascending":"descending";
+    el.sortResult.textContent="—";
+    heapSize=heap.length;
+    if(!(await step(t,"Heap Sort: repeatedly swap the root with the last heap element, then down-heap."))) return;
+    for(var end=heap.length-1;end>0;end--){
+      clearMarks(); marked[0]="is-checking"; marked[end]="is-checking";
+      if(!(await step(t,"Swap root "+heap[0]+" with the last heap element "+heap[end]+" (i="+end+")."))) return;
+      var tmp=heap[0]; heap[0]=heap[end]; heap[end]=tmp; swaps++;
+      heapSize=end;
+      clearMarks(); marked[end]="is-found";
+      if(!(await step(t,heap[end]+" is in its final place (i="+end+"); the heap shrinks to "+end+" element(s)."))) return;
+      if(!(await siftDown(t,0,end,"Sort, heap size "+end))) return;
     }
-
-    while(working.length){
-      if(currentToken!==token) return;
-      clearMarks(); marked[0]="is-found"; render();
-      if(!(await wait(getDelay(),token))) return;
-      result.push(working[0]);
-      working[0]=working[working.length-1]; working.pop(); localDown(working,0);
-      el.sortResult.textContent=result.join(" → ");
-    }
-    clearMarks(); render(); disable(false);
-    setStatus("Heap Sort completed. Result follows extraction order.","is-success");
+    heapSize=0;
+    var result=heap.slice();
+    el.sortResult.textContent=result.join(" → ");
+    clearMarks();
+    if(!(await step(t,"Sorted ("+order+"): "+result.join(", ")))) return;
+    if(!(await wait(getDelay()*3,t))) return;
+    heap=saved.heap.slice();
+    finish(t,"Heap Sort done: "+order+", "+comparisons+" comparisons, "+swaps+" swaps. Original heap shown again.","is-success");
   });
 
   btn.reset.addEventListener("click",function(){
-    token++; heap=[]; comparisons=0; swaps=0; clearMarks();
+    token++; saved=null; heap=[]; heapSize=-1; heapType=el.type.value; comparisons=0; swaps=0; clearMarks();
     el.path.textContent="—"; el.sortResult.textContent="—"; disable(false); render(); setStatus("Heap cleared.");
   });
 
   btn.cancel.addEventListener("click",function(){
-    token++; clearMarks(); disable(false); render(); setStatus("Animation cancelled.");
+    token++;
+    if(saved){
+      heap=saved.heap; el.type.value=saved.type; heapType=saved.type;
+      comparisons=saved.comparisons; swaps=saved.swaps;
+      el.path.textContent=saved.path; el.sortResult.textContent=saved.sort;
+      saved=null;
+    }
+    heapSize=-1; clearMarks(); disable(false); render();
+    setStatus("Animation cancelled; the heap is back to its state before the operation.");
   });
 
   el.type.addEventListener("change",async function(){
-    if(heap.length){ await buildHeap(heap.slice()); }
-    setStatus(el.type.value==="max"?"Max Heap mode active.":"Min Heap mode active.");
+    var label=el.type.value==="max"?"Max Heap":"Min Heap";
+    if(heap.length){ await runBuild(heap.slice(),label+" mode: array rebuilt bottom-up."); }
+    else { heapType=el.type.value; setStatus(label+" mode active."); }
   });
 
-
-  (async function init(){
-    await buildHeap([45,20,35,10,15,30,25]);
-    setStatus("Example max heap loaded. Choose an operation.");
-    btn.cancel.disabled=true;
-  })();
+  render();
+  runBuild([45,20,35,10,15,30,25],"Example "+(isMax()?"max":"min")+" heap loaded. Choose an operation.");
 })();
 </script>

@@ -130,6 +130,15 @@ excerpt: "Compact interactive Stock Span simulator."
   background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
 }
 
+.span-day.compare .span-bar {
+  border-style: dashed;
+  border-color: #c77a12;
+}
+
+.span-stack-item.compare {
+  box-shadow: inset 0 0 0 2px #c77a12;
+}
+
 .span-day-label {
   position: absolute;
   bottom: -20px;
@@ -368,7 +377,7 @@ excerpt: "Compact interactive Stock Span simulator."
     comparisons: $("span-comparisons")
   };
 
-  const DELAY = 300;
+  const DELAY = 550;
   const MAX = 10;
 
   let prices = [];
@@ -385,21 +394,32 @@ excerpt: "Compact interactive Stock Span simulator."
   }
 
   function parsePrices(text) {
-    const values = text
-      .split(",")
-      .map(x => Number(x.trim()))
-      .filter(x => Number.isFinite(x) && x > 0);
+    const parts = text.split(",").map(x => x.trim()).filter(x => x !== "");
+    const values = parts.map(Number);
 
+    if (values.some(x => !Number.isFinite(x) || Math.round(x) <= 0)) return null;
     if (!values.length || values.length > MAX) return null;
     return values.map(Math.round);
   }
 
   function buildFrames(values) {
+    /* her karşılaştırma ve her push ayrı bir adım: pop döngüsü görünür olsun */
     const result = [];
     const stack = [];
     const spans = Array(values.length).fill(null);
     let totalPops = 0;
     let totalComparisons = 0;
+
+    const snap = (i, message, extra = {}) => result.push(Object.assign({
+      day: i + 1,
+      stack: [...stack],
+      spans: [...spans],
+      pops: totalPops,
+      comparisons: totalComparisons,
+      current: i,
+      compare: null,
+      message
+    }, extra));
 
     result.push({
       day: 0,
@@ -407,39 +427,36 @@ excerpt: "Compact interactive Stock Span simulator."
       spans: [...spans],
       pops: 0,
       comparisons: 0,
+      compare: null,
       message: "Ready."
     });
 
     for (let i = 0; i < values.length; i++) {
-      let popped = 0;
-      let comparisons = 0;
+      const p = values[i];
 
       while (stack.length) {
-        comparisons++;
+        const top = stack[stack.length - 1];
         totalComparisons++;
-        if (values[stack[stack.length - 1]] <= values[i]) {
+        if (values[top] <= p) {
+          snap(i, `Day ${i + 1} (${p}): top D${top + 1}=${values[top]} ≤ ${p} → pop`, { compare: top });
           stack.pop();
-          popped++;
           totalPops++;
         } else {
+          snap(i, `Day ${i + 1} (${p}): top D${top + 1}=${values[top]} > ${p} → stop`, { compare: top });
           break;
         }
       }
 
-      spans[i] = stack.length ? i - stack[stack.length - 1] : i + 1;
-      stack.push(i);
-
-      result.push({
-        day: i + 1,
-        stack: [...stack],
-        spans: [...spans],
-        pops: totalPops,
-        comparisons: totalComparisons,
-        current: i,
-        message:
-          `Day ${i + 1}: price ${values[i]}, span ${spans[i]}` +
-          (popped ? `, popped ${popped}.` : ".")
-      });
+      if (stack.length) {
+        const top = stack[stack.length - 1];
+        spans[i] = i - top;
+        stack.push(i);
+        snap(i, `Day ${i + 1}: span = ${i} − ${top} = ${spans[i]}, push D${i + 1}`);
+      } else {
+        spans[i] = i + 1;
+        stack.push(i);
+        snap(i, `Day ${i + 1}: stack empty → span = ${i + 1}, push D${i + 1}`);
+      }
     }
 
     return result;
@@ -466,6 +483,7 @@ excerpt: "Compact interactive Stock Span simulator."
       day.className = "span-day";
 
       if (frame.current === i) day.classList.add("current");
+      if (frame.compare === i) day.classList.add("compare");
       if (frame.spans[i] !== null) day.classList.add("done");
 
       const priceLabel = document.createElement("div");
@@ -500,6 +518,7 @@ excerpt: "Compact interactive Stock Span simulator."
         const item = document.createElement("div");
         item.className = "span-stack-item";
         if (pos === frame.stack.length - 1) item.classList.add("top");
+        if (frame.compare === index) item.classList.add("compare");
 
         const main = document.createElement("span");
         main.textContent = `D${index + 1}: ${prices[index]}`;
@@ -573,7 +592,7 @@ excerpt: "Compact interactive Stock Span simulator."
     render();
 
     if (step === frames.length - 1) {
-      setStatus("All spans computed.", "success");
+      setStatus(currentFrame().message + " · all spans computed.", "success");
     } else {
       setStatus(currentFrame().message);
     }
@@ -604,7 +623,7 @@ excerpt: "Compact interactive Stock Span simulator."
       running = false;
       setRunning(false);
       el.operation.textContent = "Idle";
-      setStatus("All spans computed.", "success");
+      setStatus(currentFrame().message + " · all spans computed.", "success");
     } catch (error) {
       if (error?.message !== "cancelled") {
         running = false;

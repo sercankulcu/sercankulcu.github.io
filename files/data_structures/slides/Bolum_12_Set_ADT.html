@@ -248,7 +248,8 @@ excerpt: "Interactive Set ADT simulator with unique elements, membership, union,
 
   var A=new Set(),B=new Set(),token=0,markSet="",markValue=null,markKind="";
 
-  function readValue(){var v=Number(el.value.value);if(!Number.isFinite(v))throw new Error("Enter a valid number.");return v;}
+  function readValue(){var raw=String(el.value.value).trim(),v=Number(raw);if(raw===""||!Number.isFinite(v))throw new Error("Enter a valid number.");return v;}
+  function clearMark(){markSet="";markValue=null;markKind="";}
   function delay(){return DELAY;}
   function wait(ms,t){return new Promise(function(r){setTimeout(function(){r(t===token);},ms);});}
   function disable(s){Object.keys(btn).forEach(function(k){btn[k].disabled=s&&k!=="cancel";});btn.cancel.disabled=!s;}
@@ -274,40 +275,41 @@ excerpt: "Interactive Set ADT simulator with unique elements, membership, union,
     el.sizeUnion.textContent=String(u.size);el.sizeInter.textContent=String(i.size);
   }
 
+  /* returns true/false, or null when the animation was cancelled */
   async function animateMembership(set,name,value){
     token++;var t=token;disable(true);
     for(const v of set){
       markSet=name;markValue=v;markKind="is-checking";render();
-      if(!(await wait(delay(),t)))return false;
-      if(v===value){markKind="is-found";render();await wait(delay(),t);disable(false);return true;}
+      if(!(await wait(delay(),t)))return null;
+      if(v===value){markKind="is-found";render();disable(false);return true;}
     }
-    markSet="";markValue=null;markKind="";render();disable(false);return false;
+    clearMark();render();disable(false);return false;
   }
 
-  btn.addA.addEventListener("click",function(){try{var v=readValue(),before=A.size;if(isFull(A,v)){setStatus("Set A is full ("+MAX_SIZE+" elements).");return;}A.add(v);render();setStatus(before===A.size?v+" already exists in A.":"Added "+v+" to A.");}catch(e){setStatus(e.message);}});
-  btn.addB.addEventListener("click",function(){try{var v=readValue(),before=B.size;if(isFull(B,v)){setStatus("Set B is full ("+MAX_SIZE+" elements).");return;}B.add(v);render();setStatus(before===B.size?v+" already exists in B.":"Added "+v+" to B.");}catch(e){setStatus(e.message);}});
-  btn.delA.addEventListener("click",function(){try{var v=readValue();setStatus(A.delete(v)?"Deleted "+v+" from A.":v+" was not in A.");render();}catch(e){setStatus(e.message);}});
-  btn.delB.addEventListener("click",function(){try{var v=readValue();setStatus(B.delete(v)?"Deleted "+v+" from B.":v+" was not in B.");render();}catch(e){setStatus(e.message);}});
+  btn.addA.addEventListener("click",function(){clearMark();render();try{var v=readValue(),before=A.size;if(isFull(A,v)){setStatus("Set A is full ("+MAX_SIZE+" elements).");return;}A.add(v);render();setStatus(before===A.size?v+" already exists in A.":"Added "+v+" to A.");}catch(e){setStatus(e.message);}});
+  btn.addB.addEventListener("click",function(){clearMark();render();try{var v=readValue(),before=B.size;if(isFull(B,v)){setStatus("Set B is full ("+MAX_SIZE+" elements).");return;}B.add(v);render();setStatus(before===B.size?v+" already exists in B.":"Added "+v+" to B.");}catch(e){setStatus(e.message);}});
+  btn.delA.addEventListener("click",function(){clearMark();render();try{var v=readValue();setStatus(A.delete(v)?"Deleted "+v+" from A.":v+" was not in A.");render();}catch(e){setStatus(e.message);}});
+  btn.delB.addEventListener("click",function(){clearMark();render();try{var v=readValue();setStatus(B.delete(v)?"Deleted "+v+" from B.":v+" was not in B.");render();}catch(e){setStatus(e.message);}});
 
-  btn.hasA.addEventListener("click",async function(){try{var v=readValue(),ok=await animateMembership(A,"A",v);el.result.textContent="A.has("+v+") = "+ok;setStatus(ok?v+" is in A.":v+" is not in A.");}catch(e){setStatus(e.message);}});
-  btn.hasB.addEventListener("click",async function(){try{var v=readValue(),ok=await animateMembership(B,"B",v);el.result.textContent="B.has("+v+") = "+ok;setStatus(ok?v+" is in B.":v+" is not in B.");}catch(e){setStatus(e.message);}});
+  btn.hasA.addEventListener("click",async function(){try{var v=readValue(),ok=await animateMembership(A,"A",v);if(ok===null)return;el.result.textContent="A.has("+v+") = "+ok;setStatus(ok?v+" is in A.":v+" is not in A.");}catch(e){setStatus(e.message);}});
+  btn.hasB.addEventListener("click",async function(){try{var v=readValue(),ok=await animateMembership(B,"B",v);if(ok===null)return;el.result.textContent="B.has("+v+") = "+ok;setStatus(ok?v+" is in B.":v+" is not in B.");}catch(e){setStatus(e.message);}});
 
-  btn.union.addEventListener("click",function(){var r=new Set(A);B.forEach(function(x){r.add(x);});el.result.textContent="A ∪ B = "+setToText(r);setStatus("Union computed.");});
-  btn.inter.addEventListener("click",function(){var r=new Set(Array.from(A).filter(function(x){return B.has(x);}));el.result.textContent="A ∩ B = "+setToText(r);setStatus("Intersection computed.");});
-  btn.diffAB.addEventListener("click",function(){var r=new Set(Array.from(A).filter(function(x){return !B.has(x);}));el.result.textContent="A − B = "+setToText(r);setStatus("Difference A − B computed.");});
-  btn.diffBA.addEventListener("click",function(){var r=new Set(Array.from(B).filter(function(x){return !A.has(x);}));el.result.textContent="B − A = "+setToText(r);setStatus("Difference B − A computed.");});
-  btn.sym.addEventListener("click",function(){var r=new Set();A.forEach(function(x){if(!B.has(x))r.add(x);});B.forEach(function(x){if(!A.has(x))r.add(x);});el.result.textContent="A △ B = "+setToText(r);setStatus("Symmetric difference computed.");});
-  btn.subset.addEventListener("click",function(){var ok=Array.from(A).every(function(x){return B.has(x);});el.result.textContent="A ⊆ B = "+ok;setStatus(ok?"A is a subset of B.":"A is not a subset of B.");});
-  btn.equal.addEventListener("click",function(){var ok=A.size===B.size&&Array.from(A).every(function(x){return B.has(x);});el.result.textContent="A = B = "+ok;setStatus(ok?"A and B are equal.":"A and B are different.");});
+  btn.union.addEventListener("click",function(){clearMark();render();var r=new Set(A);B.forEach(function(x){r.add(x);});el.result.textContent="A ∪ B = "+setToText(r);setStatus("Union computed.");});
+  btn.inter.addEventListener("click",function(){clearMark();render();var r=new Set(Array.from(A).filter(function(x){return B.has(x);}));el.result.textContent="A ∩ B = "+setToText(r);setStatus("Intersection computed.");});
+  btn.diffAB.addEventListener("click",function(){clearMark();render();var r=new Set(Array.from(A).filter(function(x){return !B.has(x);}));el.result.textContent="A − B = "+setToText(r);setStatus("Difference A − B computed.");});
+  btn.diffBA.addEventListener("click",function(){clearMark();render();var r=new Set(Array.from(B).filter(function(x){return !A.has(x);}));el.result.textContent="B − A = "+setToText(r);setStatus("Difference B − A computed.");});
+  btn.sym.addEventListener("click",function(){clearMark();render();var r=new Set();A.forEach(function(x){if(!B.has(x))r.add(x);});B.forEach(function(x){if(!A.has(x))r.add(x);});el.result.textContent="A △ B = "+setToText(r);setStatus("Symmetric difference computed.");});
+  btn.subset.addEventListener("click",function(){clearMark();render();var ok=Array.from(A).every(function(x){return B.has(x);});el.result.textContent="A ⊆ B = "+ok;setStatus(ok?"A is a subset of B.":"A is not a subset of B.");});
+  btn.equal.addEventListener("click",function(){clearMark();render();var ok=A.size===B.size&&Array.from(A).every(function(x){return B.has(x);});el.result.textContent="A = B = "+ok;setStatus(ok?"A and B are equal.":"A and B are different.");});
 
-  btn.iterate.addEventListener("click",async function(){token++;var t=token,seen=[];disable(true);
+  btn.iterate.addEventListener("click",async function(){token++;var t=token,seen=[];disable(true);clearMark();el.result.textContent=A.size?"Iteration:":"Iteration: A is empty.";render();
     for(const v of A){markSet="A";markValue=v;markKind="is-checking";seen.push(v);el.result.textContent="Iteration: "+seen.join(" → ");render();if(!(await wait(delay(),t)))return;}
     markSet="";markValue=null;markKind="";render();disable(false);setStatus("Iteration over A complete.");});
 
-  btn.example.addEventListener("click",function(){token++;A=new Set([1,2,3,5,8]);B=new Set([3,4,5,6,8]);markSet="";markValue=null;render();el.result.textContent="—";setStatus("Example sets loaded.");});
-  btn.random.addEventListener("click",function(){token++;A=new Set();B=new Set();for(var i=0;i<7;i++)A.add(Math.floor(Math.random()*15)+1);for(var j=0;j<7;j++)B.add(Math.floor(Math.random()*15)+1);render();el.result.textContent="—";setStatus("Random sets generated.");});
-  btn.clear.addEventListener("click",function(){token++;A.clear();B.clear();render();el.result.textContent="—";setStatus("Both sets cleared.");});
-  btn.cancel.addEventListener("click",function(){token++;markSet="";markValue=null;markKind="";disable(false);render();setStatus("Animation cancelled.");});
+  btn.example.addEventListener("click",function(){token++;A=new Set([1,2,3,5,8]);B=new Set([3,4,5,6,8]);clearMark();render();el.result.textContent="—";setStatus("Example sets loaded.");});
+  btn.random.addEventListener("click",function(){token++;clearMark();A=new Set();B=new Set();for(var i=0;i<7;i++)A.add(Math.floor(Math.random()*15)+1);for(var j=0;j<7;j++)B.add(Math.floor(Math.random()*15)+1);render();el.result.textContent="—";setStatus("Random sets generated.");});
+  btn.clear.addEventListener("click",function(){token++;clearMark();A.clear();B.clear();render();el.result.textContent="—";setStatus("Both sets cleared.");});
+  btn.cancel.addEventListener("click",function(){token++;clearMark();disable(false);render();setStatus("Animation cancelled.");});
 
   btn.example.click();btn.cancel.disabled=true;
 })();

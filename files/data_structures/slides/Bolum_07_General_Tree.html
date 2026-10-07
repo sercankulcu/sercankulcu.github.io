@@ -744,21 +744,43 @@ excerpt: "Compact interactive general tree simulator."
 
     try {
       const visitedLabels = [];
+      const queue = name === "BFS" ? [root] : null;
+      let previous = null;
 
       for (let i = 0; i < order.length; i++) {
         if (localToken !== token) throw new Error("cancelled");
 
         const node = order[i];
         highlight.visited.add(node.id);
-
-        if (node.parent && highlight.visited.has(node.parent.id)) {
-          highlight.activeEdges.add(edgeKey(node.parent, node));
-        }
-
         visitedLabels.push(node.label);
         el.result.textContent = visitedLabels.join(" → ");
+
+        let message;
+
+        if (queue) {
+          /* BFS: dequeue the front, enqueue its children (left to right). */
+          queue.shift();
+          queue.push(...node.children);
+          node.children.forEach(child => highlight.activeEdges.add(edgeKey(node, child)));
+          message = `BFS: dequeue ${node.label}` +
+            (node.children.length ? `, enqueue ${node.children.map(c => c.label).join(", ")}` : "") +
+            `. Queue: ${queue.length ? queue.map(n => n.label).join(" ") : "empty"}`;
+        } else {
+          /* DFS preorder: orange edges = current recursion path from the root. */
+          highlight.activeEdges.clear();
+          for (let n = node; n.parent; n = n.parent) {
+            highlight.activeEdges.add(edgeKey(n.parent, n));
+          }
+          message = !node.parent
+            ? `DFS: visit root ${node.label}, then its children left to right.`
+            : node.parent === previous
+              ? `DFS: visit ${node.label} (first child of ${node.parent.label}).`
+              : `DFS: back up to ${node.parent.label}, visit its next child ${node.label}.`;
+        }
+
+        previous = node;
         render();
-        setStatus(`${name}: visiting ${node.label}...`);
+        setStatus(message);
         await wait(DELAY);
       }
 

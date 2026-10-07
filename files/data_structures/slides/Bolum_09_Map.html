@@ -504,6 +504,7 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
         remove.type="button";
         remove.className="is-danger";
         remove.textContent="Delete";
+        remove.disabled=!btn.cancel.disabled;
         remove.addEventListener("click",function(){deleteByKey(key);});
 
         item.appendChild(info); item.appendChild(remove);
@@ -524,11 +525,23 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
     }
   }
 
-  async function animateSearch(key,found){
+  /* every animated operation owns a token; Cancel (or a newer operation) bumps it,
+     and the older operation must then stop without touching the Map */
+  function begin(){
     token++;
-    var t=token;
     disable(true);
+    render();
+    return token;
+  }
 
+  function finish(){
+    disable(false);
+    render();
+  }
+
+  /* the visual is an insertion-ordered list of entries, so a key is located by
+     comparing it with each stored key in order */
+  async function animateSearch(key,found,t){
     var keys=Array.from(contacts.keys());
 
     for(var i=0;i<keys.length;i++){
@@ -541,24 +554,17 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
       if(keys[i]===key){
         highlightKind=found?"is-found":"is-checking";
         render();
-        await wait(delay(),t);
-        disable(false);
-        return true;
+        return await wait(delay(),t);
       }
     }
 
     highlightKey=null;
     highlightKind="";
     render();
-    disable(false);
     return true;
   }
 
-  async function animateIteration(mode){
-    token++;
-    var t=token;
-    disable(true);
-
+  async function animateIteration(mode,t){
     var output=[];
     var entries=Array.from(contacts.entries());
 
@@ -581,8 +587,6 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
 
     highlightKey=null;
     highlightKind="";
-    render();
-    disable(false);
     return true;
   }
 
@@ -593,22 +597,22 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
       var existed=contacts.has(key);
       if(!existed && contacts.size>=MAX) throw new Error("Map is full: this simulator holds at most "+MAX+" entries.");
 
-      if(existed) await animateSearch(key,true);
+      var t=begin();
+      if(!(await animateSearch(key,existed,t))) return;
 
       contacts.set(key,{email:email});
       highlightKey=key;
       highlightKind="is-found";
       render();
       showResult('map.set("'+key+'", value)');
+      addLog((existed?"Updated ":"Inserted ")+key+".");
+      setStatus(existed?"Updated "+key+"; it keeps its insertion position.":"Inserted "+key+" at the end of the insertion order.","is-success");
 
-      await wait(delay(),token);
+      if(!(await wait(delay(),t))) return;
 
       highlightKey=null;
       highlightKind="";
-      render();
-
-      addLog((existed?"Updated ":"Inserted ")+key+".");
-      setStatus((existed?"Updated ":"Inserted ")+key+".","is-success");
+      finish();
     }catch(error){
       disable(false);
       setStatus(error.message,"is-error");
@@ -619,7 +623,8 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
     try{
       var key=readKey();
       var found=contacts.has(key);
-      await animateSearch(key,found);
+      var t=begin();
+      if(!(await animateSearch(key,found,t))) return;
 
       if(found){
         var value=contacts.get(key).email;
@@ -631,69 +636,60 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
         setStatus('Key "'+key+'" was not found.',"is-error");
         addLog("Get missed "+key+".");
       }
-    }catch(error){setStatus(error.message,"is-error");}
+      finish();
+    }catch(error){disable(false);setStatus(error.message,"is-error");}
   });
 
   btn.has.addEventListener("click",async function(){
     try{
       var key=readKey();
       var found=contacts.has(key);
-      await animateSearch(key,found);
+      var t=begin();
+      if(!(await animateSearch(key,found,t))) return;
       showResult(String(found));
       setStatus('Has("'+key+'") = '+found+".",found?"is-success":"is-error");
       addLog("Has "+key+" → "+found+".");
-    }catch(error){setStatus(error.message,"is-error");}
+      finish();
+    }catch(error){disable(false);setStatus(error.message,"is-error");}
   });
 
   async function deleteByKey(key){
-    if(!contacts.has(key)){
-      setStatus('Key "'+key+'" was not found.',"is-error");
-      return;
-    }
+    var found=contacts.has(key);
+    var t=begin();
+    if(!(await animateSearch(key,found,t))) return;
 
-    await animateSearch(key,true);
-    contacts.delete(key);
-    highlightKey=null;
-    highlightKind="";
-    render();
-    showResult("true");
-    addLog("Deleted "+key+".");
-    setStatus("Deleted "+key+".","is-success");
+    if(found){
+      contacts.delete(key);
+      highlightKey=null;
+      highlightKind="";
+      showResult("true");
+      addLog("Deleted "+key+".");
+      setStatus("Deleted "+key+".","is-success");
+    }else{
+      showResult("false");
+      setStatus('Key "'+key+'" was not found.',"is-error");
+    }
+    finish();
   }
 
   btn.delete.addEventListener("click",async function(){
     try{
-      var key=readKey();
-      if(!contacts.has(key)){
-        await animateSearch(key,false);
-        showResult("false");
-        setStatus('Key "'+key+'" was not found.',"is-error");
-        return;
-      }
-      await deleteByKey(key);
-    }catch(error){setStatus(error.message,"is-error");}
+      await deleteByKey(readKey());
+    }catch(error){disable(false);setStatus(error.message,"is-error");}
   });
 
-  btn.iterate.addEventListener("click",async function(){
+  async function iterate(mode,done,logText){
     if(!contacts.size){setStatus("Map is empty.","is-error");return;}
-    await animateIteration("entries");
-    setStatus("Entries iterated in insertion order.","is-success");
-    addLog("Iterated entries.");
-  });
+    var t=begin();
+    if(!(await animateIteration(mode,t))) return;
+    finish();
+    setStatus(done,"is-success");
+    addLog(logText);
+  }
 
-  btn.keys.addEventListener("click",async function(){
-    if(!contacts.size){setStatus("Map is empty.","is-error");return;}
-    await animateIteration("keys");
-    setStatus("Keys shown in insertion order.","is-success");
-    addLog("Iterated keys.");
-  });
-
-  btn.values.addEventListener("click",async function(){
-    if(!contacts.size){setStatus("Map is empty.","is-error");return;}
-    await animateIteration("values");
-    setStatus("Values shown in insertion order.","is-success");
-    addLog("Iterated values.");
-  });
+  btn.iterate.addEventListener("click",function(){iterate("entries","Entries iterated in insertion order.","Iterated entries.");});
+  btn.keys.addEventListener("click",function(){iterate("keys","Keys shown in insertion order.","Iterated keys.");});
+  btn.values.addEventListener("click",function(){iterate("values","Values shown in insertion order.","Iterated values.");});
 
   btn.example.addEventListener("click",function(){
     token++;
@@ -734,7 +730,7 @@ excerpt: "Interactive Map simulator with set, get, has, delete, iteration, inser
   });
 
 
-  btn.example.click();
   btn.cancel.disabled=true;
+  btn.example.click();
 })();
 </script>

@@ -439,9 +439,18 @@ excerpt: "Interactive Dijkstra algorithm simulator with weighted undirected grap
   };
 
   var vertices=[],edgeMap=new Map(),nextId=0,token=0,dragId=null,activeEdge="",pathEdges=new Set();
-  var currentId=null,queued=new Set(),settledSet=new Set(),dist=new Map(),prev=new Map(),relaxCount=0,lastSource=null;
+  var currentId=null,queued=new Set(),settledSet=new Set(),dist=new Map(),prev=new Map(),relaxCount=0,lastSource=null,pathNodes=new Set();
 
   function edgeKey(a,b){return a<b?a+"-"+b:b+"-"+a;}
+  function labelOf(id){var v=getVertex(id);return v?v.label:String(id);}
+  function fmt(d){return Number.isFinite(d)?String(d):"∞";}
+
+  /* any change to the graph makes the previous run's distances and predecessors invalid */
+  function resetRun(){
+    activeEdge="";pathEdges.clear();pathNodes.clear();currentId=null;queued=new Set();settledSet=new Set();
+    dist=new Map();prev=new Map();relaxCount=0;lastSource=null;
+    el.step.textContent="—";el.path.textContent="—";renderPQ([]);
+  }
   function getVertex(id){var n=Number(id);return vertices.find(function(v){return v.id===n;})||null;}
 
   function neighbors(id){
@@ -600,16 +609,7 @@ excerpt: "Interactive Dijkstra algorithm simulator with weighted undirected grap
     renderTable();
   }
 
-  function pathHasVertex(id){
-    if(lastSource===null)return false;
-    var target=Number(el.target.value),guard=0;
-    while(target!==undefined&&guard<vertices.length+2){
-      if(target===id)return true;
-      if(!prev.has(target))break;
-      target=prev.get(target);guard++;
-    }
-    return id===lastSource;
-  }
+  function pathHasVertex(id){return pathNodes.has(id);}
 
   function reconstruct(target){
     if(lastSource===null||!dist.has(target)||!Number.isFinite(dist.get(target)))return[];
@@ -623,20 +623,29 @@ excerpt: "Interactive Dijkstra algorithm simulator with weighted undirected grap
 
   async function runDijkstra(source){
     token++;var t=token;disable(true);
-    activeEdge="";pathEdges.clear();currentId=null;queued=new Set();settledSet=new Set();dist=new Map();prev=new Map();relaxCount=0;lastSource=source;
+    resetRun();lastSource=source;
     vertices.forEach(function(v){dist.set(v.id,Infinity);});
     dist.set(source,0);
 
     var pq=[{id:source,d:0}];
-    queued.add(source);renderPQ(pq);render();
+    queued.add(source);
+    el.step.textContent="dist["+labelOf(source)+"] = 0, all others ∞. Push "+labelOf(source)+" : 0.";
+    setStatus("Dijkstra running from "+labelOf(source)+".");
+    renderPQ(pq);render();
+    if(!(await wait(delay(),t)))return;
 
     while(pq.length){
       pq.sort(function(a,b){return a.d-b.d;});
       var item=pq.shift();
-      if(item.d!==dist.get(item.id)||settledSet.has(item.id)){renderPQ(pq);continue;}
+      if(item.d!==dist.get(item.id)||settledSet.has(item.id)){
+        el.step.textContent="Pop "+labelOf(item.id)+" : "+item.d+" is stale (dist = "+fmt(dist.get(item.id))+"). Skip it.";
+        renderPQ(pq);render();
+        if(!(await wait(delay(),t)))return;
+        continue;
+      }
 
       currentId=item.id;queued.delete(item.id);
-      el.step.textContent="Settle "+getVertex(item.id).label+" with distance "+item.d+".";
+      el.step.textContent="Pop min "+labelOf(item.id)+" : "+item.d+". Settle it; its distance is final.";
       renderPQ(pq);render();
       if(!(await wait(delay(),t)))return;
 
@@ -650,15 +659,15 @@ excerpt: "Interactive Dijkstra algorithm simulator with weighted undirected grap
         if(settledSet.has(edge.id))continue;
 
         activeEdge=edge.key;
-        var cand=dist.get(item.id)+edge.weight;
-        el.step.textContent="Relax "+getVertex(item.id).label+" → "+getVertex(edge.id).label+": "+dist.get(item.id)+" + "+edge.weight+" = "+cand+".";
+        var cand=dist.get(item.id)+edge.weight,better=cand<dist.get(edge.id);
+        el.step.textContent="Relax "+labelOf(item.id)+" → "+labelOf(edge.id)+": "+dist.get(item.id)+" + "+edge.weight+" = "+cand+(better?" < ":" ≥ ")+fmt(dist.get(edge.id))+(better?".":", no change.");
         render();
         if(!(await wait(delay(),t)))return;
 
-        if(cand<dist.get(edge.id)){
+        if(better){
           dist.set(edge.id,cand);prev.set(edge.id,item.id);relaxCount++;
           pq.push({id:edge.id,d:cand});queued.add(edge.id);
-          el.step.textContent="Updated "+getVertex(edge.id).label+" to distance "+cand+".";
+          el.step.textContent="dist["+labelOf(edge.id)+"] = "+cand+", prev["+labelOf(edge.id)+"] = "+labelOf(item.id)+". Push "+labelOf(edge.id)+" : "+cand+".";
           renderPQ(pq);render();
           if(!(await wait(delay(),t)))return;
         }
@@ -666,26 +675,29 @@ excerpt: "Interactive Dijkstra algorithm simulator with weighted undirected grap
       activeEdge="";currentId=null;render();
     }
 
-    renderPQ([]);disable(false);setStatus("Dijkstra completed.","is-success");
+    var reached=vertices.filter(function(v){return Number.isFinite(dist.get(v.id));}).length;
+    el.step.textContent="Priority queue is empty.";
+    renderPQ([]);disable(false);
+    setStatus("Dijkstra completed: "+reached+" of "+vertices.length+" vertices reachable"+(reached<vertices.length?" (others stay ∞).":"."),"is-success");
   }
 
   btn.add.addEventListener("click",function(){
     if(vertices.length>=MAX_VERTICES){setStatus("Vertex limit reached ("+MAX_VERTICES+" vertices).","is-error");return;}
     var angle=(vertices.length%10)/10*Math.PI*2;
     vertices.push({id:nextId++,label:uniqueLabel(el.label.value),x:500+Math.cos(angle)*210,y:270+Math.sin(angle)*180});
-    updateSelects();render();setStatus("Vertex added.","is-success");
+    resetRun();updateSelects();render();setStatus("Vertex added.","is-success");
   });
 
   btn.edge.addEventListener("click",function(){
-    var a=Number(el.from.value),b=Number(el.to.value),w=Number(el.weight.value);
+    var a=Number(el.from.value),b=Number(el.to.value),raw=String(el.weight.value).trim(),w=Number(raw);
     if(a===b){setStatus("Self-loops are not allowed.","is-error");return;}
-    if(!Number.isFinite(w)||w<0){setStatus("Weight must be non-negative.","is-error");return;}
-    edgeMap.set(edgeKey(a,b),w);render();setStatus("Edge added or updated.","is-success");
+    if(raw===""||!Number.isInteger(w)||w<0||w>99){setStatus("Weight must be an integer 0–99 (no negative weights).","is-error");return;}
+    edgeMap.set(edgeKey(a,b),w);resetRun();render();setStatus("Edge added or updated.","is-success");
   });
 
   btn.removeEdge.addEventListener("click",function(){
     var key=edgeKey(Number(el.from.value),Number(el.to.value));
-    if(edgeMap.delete(key)){render();setStatus("Edge removed.","is-success");}
+    if(edgeMap.delete(key)){resetRun();render();setStatus("Edge removed.","is-success");}
     else setStatus("Edge does not exist.","is-error");
   });
 
@@ -696,7 +708,7 @@ excerpt: "Interactive Dijkstra algorithm simulator with weighted undirected grap
     Array.from(edgeMap.keys()).forEach(function(key){
       var p=key.split("-").map(Number);if(p[0]===id||p[1]===id)edgeMap.delete(key);
     });
-    updateSelects();render();setStatus("Vertex removed.","is-success");
+    resetRun();updateSelects();render();setStatus("Vertex removed.","is-success");
   });
 
   btn.run.addEventListener("click",function(){if(vertices.length)runDijkstra(Number(el.source.value));});
@@ -704,7 +716,7 @@ excerpt: "Interactive Dijkstra algorithm simulator with weighted undirected grap
   btn.showPath.addEventListener("click",function(){
     if(lastSource===null){setStatus("Run Dijkstra first.","is-error");return;}
     var target=Number(el.target.value),path=reconstruct(target);
-    pathEdges.clear();
+    pathEdges.clear();pathNodes=new Set(path);
 
     if(!path.length){
       el.path.textContent="No path.";
@@ -717,7 +729,7 @@ excerpt: "Interactive Dijkstra algorithm simulator with weighted undirected grap
   });
 
   function loadExample(){
-    token++;vertices=[];edgeMap=new Map();nextId=0;activeEdge="";pathEdges.clear();currentId=null;queued=new Set();settledSet=new Set();dist=new Map();prev=new Map();relaxCount=0;lastSource=null;
+    token++;vertices=[];edgeMap=new Map();nextId=0;activeEdge="";pathEdges.clear();pathNodes.clear();currentId=null;queued=new Set();settledSet=new Set();dist=new Map();prev=new Map();relaxCount=0;lastSource=null;
     var data=[["A",130,170],["B",330,90],["C",520,170],["D",300,360],["E",560,360],["F",820,230]];
     data.forEach(function(d){vertices.push({id:nextId++,label:d[0],x:d[1],y:d[2]});});
     [[0,1,4],[0,3,7],[1,2,3],[1,3,2],[2,4,4],[2,5,6],[3,4,3],[4,5,2]].forEach(function(e){edgeMap.set(edgeKey(e[0],e[1]),e[2]);});
@@ -727,7 +739,7 @@ excerpt: "Interactive Dijkstra algorithm simulator with weighted undirected grap
   btn.example.addEventListener("click",loadExample);
 
   btn.random.addEventListener("click",function(){
-    token++;vertices=[];edgeMap=new Map();nextId=0;activeEdge="";pathEdges.clear();currentId=null;queued=new Set();settledSet=new Set();dist=new Map();prev=new Map();relaxCount=0;lastSource=null;
+    token++;vertices=[];edgeMap=new Map();nextId=0;activeEdge="";pathEdges.clear();pathNodes.clear();currentId=null;queued=new Set();settledSet=new Set();dist=new Map();prev=new Map();relaxCount=0;lastSource=null;
     var n=8;
     for(var i=0;i<n;i++){
       var a=i/n*Math.PI*2;vertices.push({id:nextId++,label:String.fromCharCode(65+i),x:500+Math.cos(a)*220,y:270+Math.sin(a)*180});
@@ -741,12 +753,13 @@ excerpt: "Interactive Dijkstra algorithm simulator with weighted undirected grap
   });
 
   btn.reset.addEventListener("click",function(){
-    token++;vertices=[];edgeMap=new Map();nextId=0;activeEdge="";pathEdges.clear();currentId=null;queued=new Set();settledSet=new Set();dist=new Map();prev=new Map();relaxCount=0;lastSource=null;
+    token++;vertices=[];edgeMap=new Map();nextId=0;activeEdge="";pathEdges.clear();pathNodes.clear();currentId=null;queued=new Set();settledSet=new Set();dist=new Map();prev=new Map();relaxCount=0;lastSource=null;
     updateSelects();el.step.textContent="—";el.path.textContent="—";renderPQ([]);render();setStatus("Graph cleared.");
   });
 
   btn.cancel.addEventListener("click",function(){
-    token++;activeEdge="";currentId=null;queued=new Set();disable(false);renderPQ([]);render();setStatus("Animation cancelled.");
+    token++;activeEdge="";currentId=null;queued=new Set();lastSource=null;pathEdges.clear();pathNodes.clear();disable(false);renderPQ([]);render();
+    el.step.textContent="Cancelled: the table shows tentative values only.";setStatus("Animation cancelled.");
   });
 
 

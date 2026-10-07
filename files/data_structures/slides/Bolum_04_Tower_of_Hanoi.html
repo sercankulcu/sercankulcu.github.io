@@ -388,7 +388,7 @@ excerpt: "Compact interactive Tower of Hanoi simulator."
   function resetPuzzle() {
     token++;
     running = false;
-    diskCount = Math.max(1, Math.min(6, Number(el.disks.value) || 3));
+    diskCount = Math.max(1, Math.min(6, Math.floor(Number(el.disks.value)) || 3));
     el.disks.value = diskCount;
 
     towers = [[], [], []];
@@ -442,7 +442,7 @@ excerpt: "Compact interactive Tower of Hanoi simulator."
 
     const diskIndex = towers[from].length - 1;
     render({ moving: `${from}:${diskIndex}`, target: to });
-    setStatus(`Moving ${names[from]} → ${names[to]}...`);
+    setStatus(`Move ${solutionIndex + 1}: disk ${towers[from][diskIndex]} ${names[from]} → ${names[to]}...`);
     await wait(DELAY);
 
     if (localToken !== token) throw new Error("cancelled");
@@ -533,9 +533,19 @@ excerpt: "Compact interactive Tower of Hanoi simulator."
     selectedTower = null;
     el.mode.textContent = "Auto Solve";
 
-    towers = stateAtStep(solutionIndex);
+    /* elle yapılan hamleler çözüm dizisinin dışında kalır; bunu öğrenciye açıkça söyle */
+    const expected = stateAtStep(solutionIndex);
+    const offPath = towers.some((t, i) => t.join(",") !== expected[i].join(","));
+    towers = expected;
     moveCount = solutionIndex;
+    lastMoved = null;
     render();
+
+    if (offPath) {
+      setStatus("Manual moves discarded: restarting from the initial state.", "warning");
+      await wait(DELAY * 3);
+      if (localToken !== token) return;
+    }
 
     try {
       while (solutionIndex < solution.length) {
