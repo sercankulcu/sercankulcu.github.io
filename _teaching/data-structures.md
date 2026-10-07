@@ -90,7 +90,6 @@ A list is an abstract data type representing an ordered sequence of elements. It
 
 - [🖼️Sunum-Liste (HTML)](../files/data_structures/slides/Bolum_06_Liste.html)
 - [📝Çalışma Soruları (HTML)](../files/data_structures/slides/Bolum_06_Liste_Calisma_Sorulari.html)  
-- [🖼️Sunum-Sorular (HTML)](../files/data_structures/slides/Bolum_06_Sorular.html)
 - [🕹️List ADT Simulator (HTML)](../files/data_structures/slides/Bolum_06_List_ADT.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders06/src)
 
