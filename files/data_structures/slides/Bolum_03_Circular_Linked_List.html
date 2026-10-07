@@ -1,0 +1,498 @@
+---
+layout: without-sidebar
+title: "Circular Linked List Simulator"
+permalink: /files/data_structures/slides/Bolum_03_Circular_Linked_List.html
+excerpt: "Interactive circular linked list simulator: a ring of nodes with only a LAST pointer, O(1) insertion at both ends, rotation, do-while traversal and the Josephus problem."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/deck.css">
+<link rel="stylesheet" href="deck/sim.css">
+<style>
+.cll-sim {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.cll-controls {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.cll-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.cll-field {
+  display: grid;
+  gap: 2px;
+  width: 92px;
+}
+
+.cll-field.is-small { width: 64px; }
+.cll-field input { width: 100%; }
+
+.cll-stage {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.cll-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.cll-svg .cll-edge {
+  fill: none;
+  stroke: var(--ds-link);
+  stroke-width: 2.2;
+}
+
+.cll-svg .cll-edge.is-hot { stroke: #e9a23b; stroke-width: 3.4; }
+.cll-svg .cll-edge.is-new { stroke: var(--ds-good); stroke-width: 3.4; }
+.cll-svg .cll-edge.is-dead { stroke: var(--ds-bad); stroke-dasharray: 5 4; }
+.cll-svg .cll-ah { fill: var(--ds-link); }
+.cll-svg .cll-ah-hot { fill: #e9a23b; }
+.cll-svg .cll-ah-new { fill: var(--ds-good); }
+.cll-svg .cll-ah-dead { fill: var(--ds-bad); }
+
+.cll-svg .cll-node circle {
+  fill: var(--ds-node);
+  stroke: var(--ds-link);
+  stroke-width: 2.2;
+  transition: fill .18s ease, stroke .18s ease;
+}
+
+.cll-svg .cll-node text {
+  fill: var(--ds-text);
+  font: 800 15px system-ui, sans-serif;
+}
+
+.cll-svg .cll-node.checking circle { fill: var(--ds-hot); stroke: #e9a23b; }
+.cll-svg .cll-node.found circle { fill: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg)); stroke: var(--ds-good); }
+.cll-svg .cll-node.removing circle { fill: color-mix(in srgb, var(--ds-bad) 18%, var(--ds-bg)); stroke: var(--ds-bad); }
+.cll-svg .cll-node.done circle { fill: color-mix(in srgb, var(--ds-good) 13%, var(--ds-bg)); stroke: var(--ds-good); }
+.cll-svg .cll-node.selected circle { stroke-width: 4; }
+
+.cll-svg .cll-tag {
+  fill: var(--ds-link);
+  font: 800 12px system-ui, sans-serif;
+  paint-order: stroke;
+  stroke: var(--ds-bg);
+  stroke-width: 3px;
+}
+
+.cll-svg .cll-tag.is-last { fill: var(--ds-accent); }
+.cll-svg .cll-idx { fill: var(--ds-muted); font: 700 10px system-ui, sans-serif; }
+.cll-svg .cll-badge { fill: #e9a23b; stroke: var(--ds-bg); stroke-width: 2; }
+.cll-svg .cll-count { fill: #fff; font: 800 12px system-ui, sans-serif; }
+.cll-svg .cll-empty { fill: var(--ds-muted); font: 14px system-ui, sans-serif; }
+
+.cll-status {
+  padding: 8px 10px;
+  border-top: 1.5px solid var(--ds-border);
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cll-status.error { color: var(--ds-bad); }
+.cll-status.success { color: var(--ds-good); }
+
+.cll-footer {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 6px;
+}
+
+.cll-stat {
+  min-width: 0;
+  padding: 4px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cll-stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cll-sim * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-deck ds-sim" id="ds-sim" lang="en">
+  <div class="ds-deck__screen" id="ds-sim-screen">
+    <div class="ds-deck__stage" id="ds-sim-stage">
+      <div class="ds-sim__body">
+        <div class="ds-sim__head">
+          <p class="ds-deck__kicker">Chapter 3 · Linked Lists</p>
+          <h1 class="ds-sim__title">Circular Linked List Simulator</h1>
+        </div>
+
+        <div class="ds-sim__root cll-sim">
+          <div class="cll-controls">
+            <div class="cll-row">
+              <div class="cll-field"><label for="cll-value">Value</label><input id="cll-value" type="number" value="50" inputmode="numeric"></div>
+              <button class="is-primary" id="cll-add-first" type="button">Add First</button>
+              <button class="is-primary" id="cll-add-last" type="button">Add Last</button>
+              <button class="is-danger" id="cll-remove-first" type="button">Remove First</button>
+              <button class="is-danger" id="cll-remove-last" type="button">Remove Last</button>
+            </div>
+
+            <div class="cll-row">
+              <div class="cll-field"><label for="cll-index">Index</label><input id="cll-index" type="number" min="0" value="2" inputmode="numeric"></div>
+              <button class="is-primary" id="cll-add-index" type="button">Add at Index</button>
+              <button class="is-danger" id="cll-remove-index" type="button">Remove at Index</button>
+              <button id="cll-rotate" type="button">Rotate</button>
+              <button class="is-danger" id="cll-clear" type="button">Clear</button>
+            </div>
+
+            <div class="cll-row">
+              <div class="cll-field"><label for="cll-search-value">Search</label><input id="cll-search-value" type="number" value="18" inputmode="numeric"></div>
+              <button id="cll-search" type="button">Search</button>
+              <button id="cll-traverse" type="button">Traverse</button>
+              <div class="cll-field is-small"><label for="cll-k">k</label><input id="cll-k" type="number" min="1" value="3" inputmode="numeric"></div>
+              <button id="cll-josephus" type="button">Josephus</button>
+              <button class="is-danger" id="cll-cancel" type="button">Cancel</button>
+            </div>
+          </div>
+
+          <div class="cll-stage ds-sim__panel">
+            <svg class="cll-svg" id="cll-svg" viewBox="0 0 740 210" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Circular linked list drawn as a ring of nodes"></svg>
+            <div class="cll-status" id="cll-status" aria-live="polite">Ready.</div>
+          </div>
+
+          <div class="cll-footer">
+            <div class="cll-stat"><strong>Operation</strong><span id="cll-op">Idle</span></div>
+            <div class="cll-stat"><strong>Visited</strong><span id="cll-visits">0</span></div>
+            <div class="cll-stat"><strong>Link changes</strong><span id="cll-changes">0</span></div>
+            <div class="cll-stat"><strong>Length</strong><span id="cll-length">0</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-deck__bar">
+        <span class="ds-deck__section">Sercan KÜLCÜ, Tüm hakları saklıdır.</span>
+        <button class="ds-deck__button" type="button" id="ds-sim-full" aria-label="Full screen">⛶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="deck/sim.js"></script>
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const e = {
+    value: $("cll-value"), index: $("cll-index"), searchValue: $("cll-search-value"), k: $("cll-k"),
+    addFirst: $("cll-add-first"), addLast: $("cll-add-last"), removeFirst: $("cll-remove-first"), removeLast: $("cll-remove-last"),
+    addIndex: $("cll-add-index"), removeIndex: $("cll-remove-index"), rotate: $("cll-rotate"), clear: $("cll-clear"),
+    search: $("cll-search"), traverse: $("cll-traverse"), josephus: $("cll-josephus"), cancel: $("cll-cancel"),
+    svg: $("cll-svg"), status: $("cll-status"), op: $("cll-op"), visits: $("cll-visits"), changes: $("cll-changes"), length: $("cll-length")
+  };
+  const MAX = 10, STEP = 450, SLOW = 650;
+  const CX = 370, CY = 106, R = 22;
+  /* data[0] = head (last.next), data[n-1] = last; offset: döndürmede düğümler yerinde kalsın diye açı kayması */
+  let data = [24, 51, 18, 73, 42];
+  let offset = 0, token = 0, running = false, visits = 0, changes = 0;
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const buttons = () => [e.addFirst, e.addLast, e.removeFirst, e.removeLast, e.addIndex, e.removeIndex, e.rotate, e.clear, e.search, e.traverse, e.josephus];
+
+  function status(text, type = "") { e.status.textContent = text; e.status.className = "cll-status" + (type ? " " + type : ""); }
+  function updateStats() { e.visits.textContent = visits; e.changes.textContent = changes; e.length.textContent = data.length; }
+  function resetStats(name = "Idle") { visits = 0; changes = 0; e.op.textContent = name; updateStats(); }
+  function setRunning(v) { running = v; buttons().forEach(b => b.disabled = v); e.cancel.disabled = !v; }
+  function integer(inp) { const n = Number(inp.value); return Number.isInteger(n) ? n : null; }
+  const has = (list, i) => Array.isArray(list) && list.includes(i);
+  const f = x => Math.round(x * 10) / 10;
+
+  function positions(n) {
+    const rx = n <= 1 ? 0 : Math.min(320, 80 + 30 * n), ry = n <= 1 ? 0 : Math.min(56, 28 + 5 * n);
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      const a = (-90 + offset + i * 360 / n) * Math.PI / 180;
+      out.push({ x: CX + rx * Math.cos(a), y: CY + ry * Math.sin(a), a });
+    }
+    return out;
+  }
+
+  /* st: checking, found, removing, done, selected (indisler); edges: {i: "hot"|"new"|"dead"} i → i+1 bağı;
+     counts: {i: "1"} düğüm yanındaki sayaç; lastAt: LAST etiketinin indisi (varsayılan n-1) */
+  function render(st = {}) {
+    updateStats();
+    const n = data.length, p = positions(n);
+    let s = '<defs>' + ["", "-hot", "-new", "-dead"].map(k => `<marker id="cll-ah${k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="cll-ah${k}" d="M0 0 L10 5 L0 10z"/></marker>`).join("") + '</defs>';
+    if (!n) { e.svg.innerHTML = s + `<text class="cll-empty" x="${CX}" y="${CY}" text-anchor="middle">LAST = null · the list is empty</text>`; return; }
+    const out = (q, d) => { const dx = q.x - CX, dy = q.y - CY, L = Math.hypot(dx, dy) || 1; return { x: q.x + dx / L * d, y: q.y + dy / L * d }; };
+    for (let i = 0; i < n; i++) {
+      const kind = st.edges && st.edges[i] ? st.edges[i] : "", cls = "cll-edge" + (kind ? " is-" + kind : ""), mk = `url(#cll-ah${kind ? "-" + kind : ""})`;
+      const a = p[i], b = p[(i + 1) % n];
+      if (n === 1) {
+        s += `<path class="${cls}" d="M${f(a.x + R * .7)} ${f(a.y - R * .7)} C ${f(a.x + 80)} ${f(a.y - 70)}, ${f(a.x + 80)} ${f(a.y + 70)}, ${f(a.x + R * .75)} ${f(a.y + R * .75)}" marker-end="${mk}"/>`;
+        continue;
+      }
+      const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, c = out(mid, n === 2 ? 40 : 16);
+      const from = (q, d) => { const dx = c.x - q.x, dy = c.y - q.y, L = Math.hypot(dx, dy) || 1; return { x: q.x + dx / L * d, y: q.y + dy / L * d }; };
+      const s1 = from(a, R + 1), s2 = from(b, R + 3);
+      s += `<path class="${cls}" d="M${f(s1.x)} ${f(s1.y)} Q ${f(c.x)} ${f(c.y)} ${f(s2.x)} ${f(s2.y)}" marker-end="${mk}"/>`;
+    }
+    const lastAt = st.lastAt === undefined ? n - 1 : st.lastAt, headAt = (lastAt + 1) % n;
+    data.forEach((v, i) => {
+      const q = p[i], cls = ["checking", "found", "removing", "done", "selected"].filter(c => has(st[c], i)).join(" ");
+      s += `<g class="cll-node ${cls}" data-i="${i}" style="cursor:pointer"><circle cx="${f(q.x)}" cy="${f(q.y)}" r="${R}"/><text x="${f(q.x)}" y="${f(q.y + 5)}" text-anchor="middle">${v}</text></g>`;
+      const inner = out(q, n === 1 ? 0 : -(R + 11));
+      s += `<text class="cll-idx" x="${f(n === 1 ? q.x : inner.x)}" y="${f(n === 1 ? q.y + R + 14 : inner.y + 3)}" text-anchor="middle">${i}</text>`;
+      const tags = [];
+      if (i === lastAt) tags.push("LAST");
+      if (i === headAt) tags.push("head");
+      if (tags.length) {
+        const t = n === 1 ? { x: q.x, y: q.y - R - 10 } : out(q, R + 16);
+        s += `<text class="cll-tag ${i === lastAt ? "is-last" : ""}" x="${f(t.x)}" y="${f(t.y + 4)}" text-anchor="middle">${tags.join(" · ")}</text>`;
+      }
+    });
+    /* sayaç rozetleri en son çizilir: komşu düğüm ya da ok altında kalmaz */
+    if (st.counts) Object.keys(st.counts).forEach(k => {
+      const q = p[Number(k)]; if (!q) return;
+      const x = q.x - R + 2, y = q.y - R + 2;
+      s += `<circle class="cll-badge" cx="${f(x)}" cy="${f(y)}" r="10"/><text class="cll-count" x="${f(x)}" y="${f(y + 4.5)}" text-anchor="middle">${st.counts[k]}</text>`;
+    });
+    e.svg.innerHTML = s;
+    e.svg.querySelectorAll(".cll-node").forEach(g => g.addEventListener("click", () => {
+      if (running) return; const i = Number(g.dataset.i); e.index.value = i; e.value.value = data[i]; render({ selected: [i] }); status(`Node ${i} selected.`);
+    }));
+  }
+
+  async function pause(t, ms = STEP) { await wait(ms); if (t !== token) throw new Error("cancelled"); }
+  async function show(t, st, text, ms) { if (text) status(text); render(st); await pause(t, ms); }
+  function begin(name) { token++; resetStats(name); setRunning(true); return token; }
+  function finish(t, msg, type = "") { if (t !== token) return; setRunning(false); e.op.textContent = "Idle"; status(msg, type); render(); }
+  function fail(t, err) { if (err?.message === "cancelled" || t !== token) return; setRunning(false); e.op.textContent = "Idle"; status("Operation stopped.", "error"); render(); }
+  function ensure() { if (!data.length) { status("The list is empty.", "error"); return false; } return true; }
+  function room() { if (data.length >= MAX) { status(`Maximum ${MAX} nodes fit on the stage.`, "error"); return false; } return true; }
+  function readValue() { const v = integer(e.value); if (v === null) status("Enter an integer value.", "error"); return v; }
+
+  /* baştan (last.next) next ile idx. düğüme yürür */
+  async function walk(t, idx, why) {
+    for (let i = 0; i <= idx; i++) { visits++; await show(t, { checking: [i], edges: i > 0 ? { [i - 1]: "hot" } : null }, `${why} · p = ${i === 0 ? "last.next" : "p.next"} (${data[i]})`); }
+  }
+
+  async function addFirst() {
+    if (!room()) return; const v = readValue(); if (v === null) return;
+    const t = begin("Add First");
+    try {
+      offset = 0;
+      if (!data.length) { data.push(v); changes++; await show(t, { found: [0], edges: { 0: "new" } }, "new.next = new, last = new (a single node points to itself)"); }
+      else {
+        const n = data.length;
+        await show(t, { checking: [n - 1, 0] }, "LAST is known: head = last.next, no walk needed");
+        data.unshift(v); changes += 2;
+        await show(t, { found: [0], edges: { 0: "new", [n]: "new" } }, "new.next = last.next, last.next = new");
+      }
+      finish(t, `Added ${v} as the new head in O(1). LAST did not change.`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function addLast() {
+    if (!room()) return; const v = readValue(); if (v === null) return;
+    const t = begin("Add Last");
+    try {
+      offset = 0;
+      if (!data.length) { data.push(v); changes++; await show(t, { found: [0], edges: { 0: "new" } }, "new.next = new, last = new"); }
+      else {
+        const n = data.length;
+        await show(t, { checking: [n - 1, 0] }, "LAST is known: no walk needed");
+        data.push(v); changes += 2;
+        await show(t, { found: [n], edges: { [n - 1]: "new", [n]: "new" }, lastAt: n - 1 }, "new.next = last.next, last.next = new");
+        changes++;
+        await show(t, { found: [n], edges: { [n - 1]: "new", [n]: "new" } }, "last = new");
+      }
+      finish(t, `Added ${v} as the new LAST in O(1).`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function removeFirst() {
+    if (!ensure()) return; const old = data[0], t = begin("Remove First");
+    try {
+      offset = 0; const n = data.length;
+      if (n === 1) { await show(t, { removing: [0] }, "only one node: last = null"); data = []; changes++; }
+      else {
+        await show(t, { removing: [0], edges: { [n - 1]: "dead" } }, `head = last.next (${old}) is removed`);
+        data.shift(); changes++;
+        await show(t, { found: [n - 2], edges: { [n - 2]: "new" } }, "last.next = head.next");
+      }
+      finish(t, `Removed head ${old} in O(1).`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function removeLast() {
+    if (!ensure()) return; const n = data.length, old = data[n - 1], t = begin("Remove Last");
+    try {
+      offset = 0;
+      if (n === 1) { await show(t, { removing: [0] }, "only one node: last = null"); data = []; changes++; }
+      else {
+        await walk(t, n - 2, "Find the node before LAST (O(n))");
+        await show(t, { removing: [n - 1], checking: [n - 2], edges: { [n - 2]: "dead", [n - 1]: "dead" } }, `p.next = last.next, then last = p (${data[n - 2]})`);
+        data.pop(); changes += 2;
+        await show(t, { found: [n - 2], edges: { [n - 2]: "new" } }, `LAST = ${data[n - 2]}`);
+      }
+      finish(t, n === 1 ? `Removed ${old}; the list is now empty (last = null).` : `Removed LAST ${old}. The predecessor had to be found by walking: O(n).`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function addIndex() {
+    if (!room()) return; const idx = integer(e.index), n = data.length;
+    if (idx === null || idx < 0 || idx > n) { status(`Index must be 0–${n}.`, "error"); return; }
+    if (idx === 0) return addFirst(); if (idx === n) return addLast();
+    const v = readValue(); if (v === null) return;
+    const t = begin("Add at Index");
+    try {
+      offset = 0;
+      await walk(t, idx - 1, `Walk to index ${idx - 1}`);
+      data.splice(idx, 0, v); changes += 2;
+      await show(t, { found: [idx], edges: { [idx - 1]: "new", [idx]: "new" } }, "new.next = p.next, p.next = new");
+      finish(t, `Inserted ${v} at index ${idx}.`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function removeIndex() {
+    if (!ensure()) return; const idx = integer(e.index), n = data.length;
+    if (idx === null || idx < 0 || idx >= n) { status("Index is out of range.", "error"); return; }
+    if (idx === 0) return removeFirst(); if (idx === n - 1) return removeLast();
+    const old = data[idx], t = begin("Remove at Index");
+    try {
+      offset = 0;
+      await walk(t, idx - 1, `Walk to index ${idx - 1}`);
+      await show(t, { removing: [idx], checking: [idx - 1], edges: { [idx - 1]: "dead", [idx]: "dead" } }, "p.next = p.next.next");
+      data.splice(idx, 1); changes++;
+      await show(t, { found: [idx - 1], edges: { [idx - 1]: "new" } }, `${data[idx - 1]} now points to ${data[idx % data.length]}`);
+      finish(t, `Removed ${old} from index ${idx}.`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function rotate() {
+    if (!ensure()) return; const t = begin("Rotate"), n = data.length;
+    try {
+      if (n === 1) { finish(t, "A single node: rotation changes nothing.", "success"); return; }
+      await show(t, { checking: [n - 1, 0] }, `last = last.next → ${data[0]}`, SLOW);
+      offset += 360 / n; data.push(data.shift()); changes++;
+      await show(t, { found: [n - 1] }, `LAST = ${data[n - 1]}, head = ${data[0]} · no node moved`, SLOW);
+      finish(t, "Rotated by one position in O(1): only the LAST pointer moved.", "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function traverse() {
+    if (!ensure()) return; const t = begin("Traverse"), n = data.length, seen = [];
+    try {
+      for (let i = 0; i < n; i++) {
+        visits++; seen.push(data[i]);
+        await show(t, { checking: [i], done: [...Array(i).keys()], edges: i > 0 ? { [i - 1]: "hot" } : null }, `do { print ${data[i]}; p = p.next } · ${seen.join(" → ")}`);
+      }
+      await show(t, { found: [0], done: [...Array(n).keys()], edges: { [n - 1]: "hot" } }, "while (p != head): back at the head, stop", SLOW);
+      finish(t, `Traversal: ${seen.join(" → ")} (→ back to ${data[0]})`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function search() {
+    if (!ensure()) return; const target = integer(e.searchValue);
+    if (target === null) { status("Enter an integer to search.", "error"); return; }
+    const t = begin("Search"), n = data.length;
+    try {
+      for (let i = 0; i < n; i++) {
+        visits++; await show(t, { checking: [i], edges: i > 0 ? { [i - 1]: "hot" } : null }, `Comparing ${data[i]} with ${target}`);
+        if (data[i] === target) { await show(t, { found: [i] }, `Found ${target} at index ${i}`); finish(t, `Found ${target} at index ${i}.`, "success"); return; }
+      }
+      await show(t, { checking: [0], edges: { [n - 1]: "hot" } }, "Back at the head: every node was checked once");
+      finish(t, `${target} not found (stopped after one full lap).`, "error");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function josephus() {
+    if (!ensure()) return; const k = integer(e.k);
+    if (k === null || k < 1 || k > 20) { status("k must be between 1 and 20.", "error"); return; }
+    const t = begin("Josephus"), order = [];
+    try {
+      offset = 0;
+      let p = data.length - 1;
+      await show(t, { checking: [p] }, `Start before the head (p = LAST) and count k = ${k}`, SLOW);
+      while (data.length > 1) {
+        let c = (p + 1) % data.length;
+        for (let cnt = 1; cnt <= k; cnt++) {
+          visits++;
+          await show(t, { checking: [c], counts: { [c]: String(cnt) }, edges: { [p]: "hot" } }, `count ${cnt} → ${data[c]}`);
+          if (cnt < k) { p = c; c = (c + 1) % data.length; }
+        }
+        const victim = data[c];
+        await show(t, { removing: [c], checking: [p], edges: { [p]: "dead", [c]: "dead" } }, `${victim} leaves the ring: p.next = p.next.next`, SLOW);
+        data.splice(c, 1); order.push(victim); changes++;
+        if (c < p) p--;
+        if (p >= data.length) p = data.length - 1;
+        await show(t, { done: [], edges: { [p]: "new" } }, `Removed so far: ${order.join(", ")}`);
+      }
+      await show(t, { found: [0], edges: { 0: "new" } }, `Survivor: ${data[0]}`, SLOW);
+      finish(t, `Josephus (k = ${k}): out ${order.join(" → ")} · survivor ${data[0]}`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  function clear() { token++; data = []; offset = 0; resetStats(); setRunning(false); render(); status("List cleared: last = null."); }
+  function cancel() { if (!running) return; token++; setRunning(false); e.op.textContent = "Idle"; render(); status("Animation cancelled."); }
+
+  e.addFirst.addEventListener("click", addFirst); e.addLast.addEventListener("click", addLast);
+  e.removeFirst.addEventListener("click", removeFirst); e.removeLast.addEventListener("click", removeLast);
+  e.addIndex.addEventListener("click", addIndex); e.removeIndex.addEventListener("click", removeIndex);
+  e.rotate.addEventListener("click", rotate); e.clear.addEventListener("click", clear);
+  e.search.addEventListener("click", search); e.traverse.addEventListener("click", traverse);
+  e.josephus.addEventListener("click", josephus); e.cancel.addEventListener("click", cancel);
+  e.cancel.disabled = true; resetStats(); render();
+})();
+</script>
