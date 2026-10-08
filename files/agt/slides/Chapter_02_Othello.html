@@ -8,38 +8,67 @@ excerpt: "Interactive Othello game with heuristic and Minimax alpha-beta compute
 <link rel="stylesheet" href="deck/oyun.css">
 
 <style>
-.agt-othello { text-align: center; }
-
-.agt-othello .controls-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+.agt-othello .oth-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 236px;
+  gap: 14px;
+  height: 100%;
 }
 
-.agt-othello .controls-row label {
+.agt-othello .panel {
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-bg);
+}
+
+.agt-othello .board-area { display: grid; place-items: center; }
+
+.agt-othello .controls { display: flex; flex-direction: column; gap: 10px; }
+
+.agt-othello .field label {
+  display: block;
+  margin-bottom: 3px;
   color: var(--ds-muted);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
 }
 
-.agt-othello .controls-row select { max-width: 100%; }
+.agt-othello .field select,
+.agt-othello .restart-btn { width: 100%; }
 
-.agt-othello .board-wrap {
-  max-width: 100%;
-  overflow-x: auto;
-  padding-bottom: 4px;
+.agt-othello .check { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+
+.agt-othello .counts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.agt-othello .counts div { padding: 6px 8px; border: 2px solid transparent; border-radius: 10px; background: var(--ds-surface-strong); text-align: center; }
+.agt-othello .counts div.is-turn { border-color: var(--ds-link); }
+.agt-othello .counts b { display: block; font-size: 22px; line-height: 1.2; }
+.agt-othello .counts span { color: var(--ds-muted); font-size: 12px; font-weight: 700; }
+.agt-othello .counts i { display: inline-block; width: 12px; height: 12px; margin-right: 5px; border-radius: 50%; vertical-align: -1px; box-shadow: 0 0 0 1px #6b7280; }
+
+.agt-othello .status {
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: var(--ds-surface-strong);
+  font-weight: 700;
+  line-height: 1.35;
 }
+
+.agt-othello .status.is-over { color: var(--ds-accent); }
+
+.agt-othello .score { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: auto; }
+.agt-othello .score div { padding: 5px 4px; border-radius: 10px; background: var(--ds-surface-strong); text-align: center; }
+.agt-othello .score b { display: block; font-size: 18px; line-height: 1.2; }
+.agt-othello .score span { color: var(--ds-muted); font-size: 12px; font-weight: 700; }
 
 /* green felt board with black / white discs: game colours */
 .agt-othello .board {
-  --oc: min(56px, calc((100vw - 90px) / 8));
   display: grid;
-  grid-template-columns: repeat(8, var(--oc));
-  grid-template-rows: repeat(8, var(--oc));
-  width: max-content;
-  margin: 16px auto;
+  grid-template-columns: repeat(8, 54px);
+  grid-template-rows: repeat(8, 54px);
   border: 4px solid #14532d;
   border-radius: 6px;
 }
@@ -47,15 +76,17 @@ excerpt: "Interactive Othello game with heuristic and Minimax alpha-beta compute
 .agt-othello .cell {
   position: relative;
   display: flex;
-  width: var(--oc);
-  height: var(--oc);
+  width: 54px;
+  height: 54px;
   align-items: center;
   justify-content: center;
   border: 1px solid #0b3d1f;
   background-color: #15803d;
-  cursor: pointer;
-  font-weight: bold;
+  cursor: default;
 }
+
+.agt-othello .cell.can { cursor: pointer; }
+.agt-othello .cell.can:focus-visible { outline: 3px solid #ffd700; outline-offset: -3px; }
 
 .agt-othello .black,
 .agt-othello .white {
@@ -66,662 +97,400 @@ excerpt: "Interactive Othello game with heuristic and Minimax alpha-beta compute
 }
 
 .agt-othello .black { background-color: #111; }
-
 .agt-othello .white { background-color: #f8f8f8; }
+.agt-othello .cell.last::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+}
 
 .agt-othello .highlight-move {
-  z-index: 5;
-  width: 80%;
-  height: 80%;
+  display: grid;
+  width: 70%;
+  height: 70%;
+  place-items: center;
   border: 3px solid #ffd700;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,255,0,.8) 0%, rgba(255,215,0,.6) 70%, transparent 100%);
-  box-shadow: 0 0 10px rgba(255,215,0,.8);
-}
-
-.agt-othello .score {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 15;
-  display: flex;
-  width: 60%;
-  height: 60%;
-  align-items: center;
-  justify-content: center;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: rgba(0,0,0,.7);
-  color: #ffd700;
+  background: rgba(255, 215, 0, .25);
+  color: #fff;
   font-size: 15px;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px #000;
-  pointer-events: all;
-  user-select: none;
+  font-weight: 800;
+  text-shadow: 0 1px 2px #000;
 }
 
-.agt-othello .selected {
-  border: 4px solid #ffd700 !important;
-  background-color: rgba(255,215,0,.4) !important;
-  box-shadow: 0 0 15px rgba(255,215,0,1) !important;
-}
-
-.agt-othello .selected .highlight-move {
-  border: 4px solid #ff8c00;
-  background: radial-gradient(circle, rgba(255,215,0,1) 0%, rgba(255,165,0,.8) 70%, transparent 100%);
-  box-shadow: 0 0 15px rgba(255,140,0,1);
-}
-
-.agt-othello .status {
-  margin: 4px 0 10px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: var(--ds-surface-strong);
-  color: var(--ds-text);
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.agt-othello .agt-oyun__back { display: block; }
-
-@media (max-width: 560px) {
-  .agt-othello .score { font-size: 12px; }
-  .agt-othello .highlight-move { border-width: 2px; }
-}
+.agt-othello .cell.can:hover .highlight-move { background: rgba(255, 215, 0, .6); }
+.agt-othello .highlight-move.best { border-color: #fff; }
 </style>
 
-<div class="agt-othello agt-oyun">
-  <p class="agt-oyun__kicker">Bölüm 2 · Oyun</p>
-  <h1>Othello</h1>
+<div class="agt-othello agt-oyun agt-oyun--stage">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 2 · Oyun</p><h1>Othello</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="oth-help">?</button>
+    <a class="agt-oyun__back" href="Bolum_02_Oyun_Kuramina_Giris.html">← Bölüm 2</a>
+  </header>
 
-  <div class="controls-row">
-    <label for="othelloAiMode">AI Mode:</label>
-    <select id="othelloAiMode">
-      <option value="simple">🧩 Simple (Heuristic)</option>
-      <option value="smart">🧠 Smart (Minimax + Alpha-Beta)</option>
-    </select>
+  <div class="agt-oyun__body">
+    <div class="oth-layout">
+      <section class="panel board-area"><div class="board" role="grid" aria-label="Othello board"></div></section>
+
+      <aside class="panel controls">
+        <div class="field">
+          <label for="othelloAiMode">Computer</label>
+          <select id="othelloAiMode">
+            <option value="simple">Simple (heuristic)</option>
+            <option value="smart">Smart (Minimax + alpha-beta)</option>
+          </select>
+        </div>
+        <label class="check"><input type="checkbox" id="othelloScores" checked> Show move scores</label>
+        <button class="restart-btn is-primary" type="button">Restart Game</button>
+        <div class="counts">
+          <div class="c-black"><b class="n-black">2</b><span><i style="background:#111"></i>Black (you)</span></div>
+          <div class="c-white"><b class="n-white">2</b><span><i style="background:#f8f8f8"></i>White (AI)</span></div>
+        </div>
+        <div class="status" aria-live="polite"></div>
+        <div class="score">
+          <div><b class="s-w">0</b><span>Won</span></div>
+          <div><b class="s-d">0</b><span>Tied</span></div>
+          <div><b class="s-l">0</b><span>Lost</span></div>
+        </div>
+      </aside>
+    </div>
   </div>
 
-  <div class="board-wrap">
-    <div class="board"></div>
-  </div>
-
-  <div class="status"></div>
-  <button class="restart-btn is-primary" type="button">Restart Game</button>
-  <a class="agt-oyun__back" href="Bolum_02_Oyun_Kuramina_Giris.html">← Bölüm 2 sunumu</a>
+  <dialog class="agt-oyun__dialog" id="oth-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>How to play</h2>
+    <ol>
+      <li>You play Black and move first; the computer plays White.</li>
+      <li>Place a disc on an empty square so that one or more white discs lie in a straight line (horizontal, vertical or diagonal) between the new disc and another black disc. All of those discs flip to black.</li>
+      <li>Legal moves are marked with a gold ring. A player without a legal move must pass; the game ends when neither side can move, and the player with more discs wins.</li>
+      <li>The small red dot marks the computer's last move.</li>
+    </ol>
+    <h3>Move scores</h3>
+    <p>With <b>Show move scores</b> on, each ring shows how good that move looks for you (higher is better, the best one has a white ring):</p>
+    <ul>
+      <li><b>Simple</b>: discs flipped plus a bonus for corners (+15) and edges (+5) and a penalty for squares next to a corner (−15).</li>
+      <li><b>Smart</b>: a short Minimax look-ahead (your move, then two more plies) relative to your worst move, using the same evaluation as the Smart computer.</li>
+    </ul>
+    <h3>Computer opponents</h3>
+    <ul>
+      <li><b>Simple</b> picks the move with the best one-move heuristic score.</li>
+      <li><b>Smart</b> searches five plies with Minimax and alpha-beta pruning. Its evaluation counts discs, rewards corners (100), edges (15) and mobility (8 per legal move) and punishes squares next to corners (50).</li>
+    </ul>
+    <h3>Game-theory connection</h3>
+    <p>Othello is a two-player, zero-sum game of perfect information. Its 8×8 version was shown by computation in 2023 to be a draw under perfect play. Comparing the two opponents shows how a deeper search and a better evaluation function change the quality of decisions.</p>
+  </dialog>
 </div>
 
 <script>
-(() => {
-  const root = document.querySelector('.agt-othello');
+(function () {
+  var root = document.querySelector('.agt-othello');
   if (!root) return;
 
-  const SIZE = 8;
-  const DEPTH = 5;
-  const directions = [
-    [1,0],[-1,0],[0,1],[0,-1],
-    [1,1],[1,-1],[-1,1],[-1,-1]
-  ];
+  var SIZE = 8;
+  var DEPTH = 5;
+  var directions = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+  var CORNERS = [[0, 0], [0, 7], [7, 0], [7, 7]];
+  var NEIGHBORS = [[0, 1], [1, 0], [1, 1], [0, 6], [1, 7], [1, 6], [7, 1], [6, 0], [6, 1], [7, 6], [6, 7], [6, 6]];
 
-  const boardDiv = root.querySelector('.board');
-  const statusDiv = root.querySelector('.status');
-  const aiModeSelect = root.querySelector('#othelloAiMode');
-  const restartBtn = root.querySelector('.restart-btn');
+  var boardDiv = root.querySelector('.board');
+  var statusDiv = root.querySelector('.status');
+  var aiModeSelect = root.querySelector('#othelloAiMode');
+  var scoresBox = root.querySelector('#othelloScores');
+  var restartBtn = root.querySelector('.restart-btn');
 
-  let board = [];
-  let currentPlayer = 'black';
-  let aiMode = 'simple';
-  let gameId = 0;
+  var board = [];
+  var currentPlayer = 'black';
+  var gameId = 0;
+  var over = false;
+  var last = null;
+  var tally = { w: 0, d: 0, l: 0 };
+  var cells = [];
 
-  function createBoard() {
-    boardDiv.innerHTML = '';
-    board = Array.from({ length: SIZE }, () => Array(SIZE).fill(null));
-
-    board[3][3] = 'white';
-    board[3][4] = 'black';
-    board[4][3] = 'black';
-    board[4][4] = 'white';
-
-    for (let r = 0; r < SIZE; r++) {
-      for (let c = 0; c < SIZE; c++) {
-        const cell = document.createElement('div');
+  function buildCells() {
+    for (var r = 0; r < SIZE; r++) {
+      for (var c = 0; c < SIZE; c++) {
+        var cell = document.createElement('div');
         cell.className = 'cell';
         cell.dataset.row = r;
         cell.dataset.col = c;
-        cell.addEventListener('click', handleMove);
+        cell.setAttribute('role', 'gridcell');
         boardDiv.appendChild(cell);
+        cells.push(cell);
       }
     }
-
-    updateBoard();
-    updateHighlights();
-    updateStatus();
+    boardDiv.addEventListener('click', function (e) {
+      var cell = e.target.closest('.cell');
+      if (cell) handleMove(+cell.dataset.row, +cell.dataset.col);
+    });
+    boardDiv.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var cell = e.target.closest('.cell');
+      if (!cell) return;
+      e.preventDefault();
+      handleMove(+cell.dataset.row, +cell.dataset.col);
+    });
   }
 
-  function updateBoard() {
-    root.querySelectorAll('.cell').forEach(cell => {
-      const r = cell.dataset.row;
-      const c = cell.dataset.col;
+  function newBoard() {
+    var b = [];
+    for (var r = 0; r < SIZE; r++) b.push(Array(SIZE).fill(null));
+    b[3][3] = 'white';
+    b[3][4] = 'black';
+    b[4][3] = 'black';
+    b[4][4] = 'white';
+    return b;
+  }
 
+  function say(text, end) {
+    statusDiv.textContent = text;
+    statusDiv.classList.toggle('is-over', !!end);
+  }
+
+  function render() {
+    var hints = {};
+    if (!over && currentPlayer === 'black') hints = hintScores();
+    var best = -Infinity;
+    Object.keys(hints).forEach(function (k) { best = Math.max(best, hints[k]); });
+    cells.forEach(function (cell) {
+      var r = +cell.dataset.row, c = +cell.dataset.col, key = r + ',' + c;
       cell.innerHTML = '';
-      cell.classList.remove('highlight', 'selected');
-
-      const existingScore = cell.querySelector('.score');
-      const existingMove = cell.querySelector('.highlight-move');
-      if (existingScore) existingScore.remove();
-      if (existingMove) existingMove.remove();
-
+      var can = key in hints;
+      cell.className = 'cell' + (can ? ' can' : '') + (last && last[0] === r && last[1] === c ? ' last' : '');
+      cell.tabIndex = can ? 0 : -1;
+      cell.setAttribute('aria-label', 'Row ' + (r + 1) + ', column ' + (c + 1) + ': ' + (board[r][c] || (can ? 'legal move' : 'empty')));
       if (board[r][c]) {
-        const piece = document.createElement('div');
+        var piece = document.createElement('div');
         piece.className = board[r][c];
         cell.appendChild(piece);
+      } else if (can) {
+        var ring = document.createElement('div');
+        ring.className = 'highlight-move' + (scoresBox.checked && hints[key] === best ? ' best' : '');
+        if (scoresBox.checked) ring.textContent = hints[key];
+        cell.appendChild(ring);
       }
     });
-  }
-
-  function updateHighlights() {
-    root.querySelectorAll('.cell').forEach(cell => {
-      const r = parseInt(cell.dataset.row);
-      const c = parseInt(cell.dataset.col);
-
-      cell.classList.remove('selected');
-
-      const existingScore = cell.querySelector('.score');
-      const existingMove = cell.querySelector('.highlight-move');
-      if (existingScore) existingScore.remove();
-      if (existingMove) existingMove.remove();
-
-      if (
-        currentPlayer === 'black' &&
-        !board[r][c] &&
-        isValidMove(board, r, c, currentPlayer)
-      ) {
-        const moveIndicator = document.createElement('div');
-        moveIndicator.className = 'highlight-move';
-        cell.appendChild(moveIndicator);
-
-        const score = calculateMoveScore(board, r, c, currentPlayer);
-        const scoreDiv = document.createElement('div');
-        scoreDiv.className = 'score';
-        scoreDiv.dataset.row = r;
-        scoreDiv.dataset.col = c;
-        scoreDiv.textContent = Math.max(0, score);
-
-        scoreDiv.addEventListener('click', event => {
-          event.stopPropagation();
-          handleMove({ target: cell });
-        });
-
-        cell.appendChild(scoreDiv);
-      }
-    });
+    var n = countPieces(board);
+    root.querySelector('.n-black').textContent = n.black;
+    root.querySelector('.n-white').textContent = n.white;
+    root.querySelector('.c-black').classList.toggle('is-turn', !over && currentPlayer === 'black');
+    root.querySelector('.c-white').classList.toggle('is-turn', !over && currentPlayer === 'white');
+    root.querySelector('.s-w').textContent = tally.w;
+    root.querySelector('.s-d').textContent = tally.d;
+    root.querySelector('.s-l').textContent = tally.l;
   }
 
   function isCornerNeighbor(r, c) {
-    const corners = [[0,0],[0,7],[7,0],[7,7]];
-
-    for (const [cr, cc] of corners) {
-      if (
-        Math.abs(r - cr) <= 1 &&
-        Math.abs(c - cc) <= 1 &&
-        !(r === cr && c === cc)
-      ) {
-        return true;
-      }
-    }
-
-    return false;
+    return NEIGHBORS.some(function (p) { return p[0] === r && p[1] === c; });
   }
 
-  function calculateMoveScore(b, r, c, player) {
-    if (aiMode === 'simple') {
-      const flips = countFlips(b, r, c, player);
-      let bonus = 0;
-      let penalty = 0;
-      let score = flips;
-
-      if (isCornerNeighbor(r, c)) {
-        penalty -= 15;
-      } else if ((r === 0 || r === 7) && (c === 0 || c === 7)) {
-        bonus += 15;
-      } else if (r === 0 || r === 7 || c === 0 || c === 7) {
-        bonus += 5;
-      }
-
-      return score + bonus + penalty;
-    }
-
-    const tempBoard = cloneBoard(b);
-    makeMove(tempBoard, r, c, player);
-    const rawScore = minimax(
-      tempBoard,
-      2,
-      false,
-      -Infinity,
-      Infinity,
-      opposite(player)
-    );
-
-    const allMoves = getValidMoves(b, player);
-    let minScore = Infinity;
-
-    for (const move of allMoves) {
-      const tempB = cloneBoard(b);
-      makeMove(tempB, move[0], move[1], player);
-
-      const moveScore = minimax(
-        tempB,
-        2,
-        false,
-        -Infinity,
-        Infinity,
-        opposite(player)
-      );
-
-      if (moveScore < minScore) minScore = moveScore;
-    }
-
-    const normalized = rawScore - minScore;
-    return Math.max(0, Math.round(normalized));
+  function heuristicScore(b, r, c, player) {
+    var score = countFlips(b, r, c, player);
+    if (isCornerNeighbor(r, c)) score -= 15;
+    else if ((r === 0 || r === 7) && (c === 0 || c === 7)) score += 15;
+    else if (r === 0 || r === 7 || c === 0 || c === 7) score += 5;
+    return score;
   }
 
-  function handleMove(e) {
-    if (currentPlayer !== 'black') return;
-
-    /* clicks can land on the disc or move-ring inside the cell */
-    const targetCell = e.target.closest('.cell');
-    if (!targetCell) return;
-
-    const r = parseInt(targetCell.dataset.row);
-    const c = parseInt(targetCell.dataset.col);
-
-    if (!isValidMove(board, r, c, currentPlayer)) return;
-
-    root.querySelectorAll('.cell').forEach(cell => {
-      cell.classList.remove('selected');
+  /* scores for the human (black) moves, higher is better for black */
+  function hintScores() {
+    var moves = getValidMoves(board, 'black'), out = {};
+    if (!moves.length) return out;
+    if (aiModeSelect.value === 'simple') {
+      moves.forEach(function (m) { out[m[0] + ',' + m[1]] = Math.max(0, heuristicScore(board, m[0], m[1], 'black')); });
+      return out;
+    }
+    var vals = moves.map(function (m) {
+      var t = cloneBoard(board);
+      makeMove(t, m[0], m[1], 'black');
+      return -minimax(t, 2, true, -Infinity, Infinity, 'white');
     });
+    var worst = Math.min.apply(null, vals);
+    moves.forEach(function (m, i) { out[m[0] + ',' + m[1]] = Math.round(vals[i] - worst); });
+    return out;
+  }
 
-    targetCell.classList.add('selected');
-
-    makeMove(board, r, c, currentPlayer);
+  function handleMove(r, c) {
+    if (over || currentPlayer !== 'black') return;
+    if (!isValidMove(board, r, c, 'black')) return;
+    makeMove(board, r, c, 'black');
+    last = null;
     currentPlayer = 'white';
-
-    updateBoard();
-    updateStatus();
-
-    const id = gameId;
-    setTimeout(() => {
-      if (id === gameId) aiMove();
-    }, 400);
+    render();
+    say('Computer is thinking...');
+    var id = gameId;
+    setTimeout(function () { if (id === gameId) aiMove(); }, 400);
   }
 
   function aiMove() {
-    if (currentPlayer !== 'white') return;
+    if (over || currentPlayer !== 'white') return;
     if (!hasValidMove(board, 'white')) {
+      if (!hasValidMove(board, 'black')) { endGame(); return; }
       currentPlayer = 'black';
-
-      if (!hasValidMove(board, 'black')) {
-        endGame();
-        return;
-      }
-
-      updateBoard();
-      updateHighlights();
-      updateStatus();
+      render();
+      say('White has no legal move and passes. Your turn.');
       return;
     }
-
-    const mode = aiModeSelect.value;
-    aiMode = mode;
-
-    const move = mode === 'simple'
-      ? bestHeuristicMove(board, 'white')
-      : bestMinimaxMove(board, DEPTH, 'white');
-
-    if (move) {
-      makeMove(board, move[0], move[1], 'white');
+    var move = aiModeSelect.value === 'simple' ? bestHeuristicMove(board, 'white') : bestMinimaxMove(board, DEPTH, 'white');
+    makeMove(board, move[0], move[1], 'white');
+    last = move;
+    if (hasValidMove(board, 'black')) {
+      currentPlayer = 'black';
+      render();
+      say('Your turn (Black).');
+      return;
     }
-
-    currentPlayer = 'black';
-
-    if (!hasValidMove(board, 'black')) {
-      currentPlayer = 'white';
-
-      if (!hasValidMove(board, 'white')) {
-        updateBoard();
-        endGame();
-        return;
-      }
-    }
-
-    updateBoard();
-    updateHighlights();
-    updateStatus();
-
-    /* black must pass: the computer moves again */
-    if (currentPlayer === 'white') {
-      const id = gameId;
-      setTimeout(() => {
-        if (id === gameId) aiMove();
-      }, 400);
-    }
+    if (!hasValidMove(board, 'white')) { endGame(); return; }
+    currentPlayer = 'white';
+    render();
+    say('You have no legal move and must pass. Computer moves again...');
+    var id = gameId;
+    setTimeout(function () { if (id === gameId) aiMove(); }, 700);
   }
 
   function bestHeuristicMove(b, player) {
-    let best = null;
-    let bestScore = -Infinity;
-
-    for (let r = 0; r < SIZE; r++) {
-      for (let c = 0; c < SIZE; c++) {
-        if (isValidMove(b, r, c, player)) {
-          const score = calculateMoveScore(b, r, c, player);
-
-          if (score > bestScore) {
-            bestScore = score;
-            best = [r, c];
-          }
-        }
-      }
-    }
-
+    var best = null, bestScore = -Infinity;
+    getValidMoves(b, player).forEach(function (m) {
+      var s = heuristicScore(b, m[0], m[1], player);
+      if (s > bestScore) { bestScore = s; best = m; }
+    });
     return best;
   }
 
   function bestMinimaxMove(b, depth, player) {
-    let bestVal = -Infinity;
-    let bestMove = null;
-
-    for (const move of getValidMoves(b, player)) {
-      const newBoard = cloneBoard(b);
-      makeMove(newBoard, move[0], move[1], player);
-
-      const value = minimax(
-        newBoard,
-        depth - 1,
-        false,
-        -Infinity,
-        Infinity,
-        opposite(player)
-      );
-
-      if (value > bestVal) {
-        bestVal = value;
-        bestMove = move;
-      }
-    }
-
+    var bestVal = -Infinity, bestMove = null;
+    getValidMoves(b, player).forEach(function (m) {
+      var nb = cloneBoard(b);
+      makeMove(nb, m[0], m[1], player);
+      var v = minimax(nb, depth - 1, false, bestVal, Infinity, opposite(player));
+      if (v > bestVal || !bestMove) { bestVal = v; bestMove = m; }
+    });
     return bestMove;
   }
 
+  /* values are from White's point of view; maximizing === (player === 'white') */
   function minimax(b, depth, maximizing, alpha, beta, player) {
-    if (depth === 0 || isGameOver(b)) return evaluateBoard(b);
-
-    const moves = getValidMoves(b, player);
-    if (moves.length === 0) return evaluateBoard(b);
-
-    if (maximizing) {
-      let maxEval = -Infinity;
-
-      for (const move of moves) {
-        const newBoard = cloneBoard(b);
-        makeMove(newBoard, move[0], move[1], player);
-
-        const evaluation = minimax(
-          newBoard,
-          depth - 1,
-          false,
-          alpha,
-          beta,
-          opposite(player)
-        );
-
-        maxEval = Math.max(maxEval, evaluation);
-        alpha = Math.max(alpha, evaluation);
-
-        if (beta <= alpha) break;
+    var moves = getValidMoves(b, player);
+    if (!moves.length) {
+      if (!hasValidMove(b, opposite(player))) {
+        var n = countPieces(b);
+        return (n.white - n.black) * 1000;
       }
-
-      return maxEval;
+      if (depth === 0) return evaluateBoard(b);
+      return minimax(b, depth - 1, !maximizing, alpha, beta, opposite(player));
     }
-
-    let minEval = Infinity;
-
-    for (const move of moves) {
-      const newBoard = cloneBoard(b);
-      makeMove(newBoard, move[0], move[1], player);
-
-      const evaluation = minimax(
-        newBoard,
-        depth - 1,
-        true,
-        alpha,
-        beta,
-        opposite(player)
-      );
-
-      minEval = Math.min(minEval, evaluation);
-      beta = Math.min(beta, evaluation);
-
+    if (depth === 0) return evaluateBoard(b);
+    var best = maximizing ? -Infinity : Infinity;
+    for (var i = 0; i < moves.length; i++) {
+      var nb = cloneBoard(b);
+      makeMove(nb, moves[i][0], moves[i][1], player);
+      var v = minimax(nb, depth - 1, !maximizing, alpha, beta, opposite(player));
+      if (maximizing) { best = Math.max(best, v); alpha = Math.max(alpha, v); }
+      else { best = Math.min(best, v); beta = Math.min(beta, v); }
       if (beta <= alpha) break;
     }
-
-    return minEval;
+    return best;
   }
 
-  function cloneBoard(b) {
-    return b.map(row => [...row]);
-  }
+  function cloneBoard(b) { return b.map(function (row) { return row.slice(); }); }
 
   function evaluateBoard(b) {
-    const { black, white } = countPieces(b);
-    let score = white - black;
-
-    score += cornerBonus(b, 'white') - cornerBonus(b, 'black');
-    score += edgeBonus(b, 'white') - edgeBonus(b, 'black');
-    score += mobilityBonus(b, 'white') - mobilityBonus(b, 'black');
-    score += cornerNeighborPenalty(b, 'white') - cornerNeighborPenalty(b, 'black');
-
-    return score;
+    var n = countPieces(b);
+    return n.white - n.black +
+      cornerBonus(b, 'white') - cornerBonus(b, 'black') +
+      edgeBonus(b, 'white') - edgeBonus(b, 'black') +
+      getValidMoves(b, 'white').length * 8 - getValidMoves(b, 'black').length * 8 -
+      cornerNeighborPenalty(b, 'white') + cornerNeighborPenalty(b, 'black');
   }
 
   function cornerBonus(b, player) {
-    const corners = [[0,0],[0,7],[7,0],[7,7]];
-
-    return corners.reduce(
-      (sum, [r, c]) => sum + (b[r][c] === player ? 100 : 0),
-      0
-    );
+    return CORNERS.reduce(function (s, p) { return s + (b[p[0]][p[1]] === player ? 100 : 0); }, 0);
   }
 
   function edgeBonus(b, player) {
-    let score = 0;
-
-    for (let r = 0; r < SIZE; r++) {
-      if (b[0][r] === player && ![0,7].includes(r)) score += 15;
-      if (b[7][r] === player && ![0,7].includes(r)) score += 15;
+    var score = 0;
+    for (var k = 1; k < 7; k++) {
+      if (b[0][k] === player) score += 15;
+      if (b[7][k] === player) score += 15;
+      if (b[k][0] === player) score += 15;
+      if (b[k][7] === player) score += 15;
     }
-
-    for (let c = 0; c < SIZE; c++) {
-      if (b[c][0] === player && ![0,7].includes(c)) score += 15;
-      if (b[c][7] === player && ![0,7].includes(c)) score += 15;
-    }
-
     return score;
   }
 
-  function mobilityBonus(b, player) {
-    return getValidMoves(b, player).length * 8;
-  }
-
   function cornerNeighborPenalty(b, player) {
-    let penalty = 0;
-
-    const neighbors = [
-      [0,1],[1,0],[1,1], [0,6],[1,7],[1,6],
-      [7,1],[6,0],[6,1], [7,6],[6,7],[6,6]
-    ];
-
-    for (const [r, c] of neighbors) {
-      if (b[r][c] === player) penalty += 50;
-    }
-
-    return -penalty;
+    return NEIGHBORS.reduce(function (s, p) { return s + (b[p[0]][p[1]] === player ? 50 : 0); }, 0);
   }
 
   function getValidMoves(b, player) {
-    const moves = [];
-
-    for (let r = 0; r < SIZE; r++) {
-      for (let c = 0; c < SIZE; c++) {
-        if (isValidMove(b, r, c, player)) {
-          moves.push([r, c]);
-        }
-      }
-    }
-
+    var moves = [];
+    for (var r = 0; r < SIZE; r++) for (var c = 0; c < SIZE; c++) if (isValidMove(b, r, c, player)) moves.push([r, c]);
     return moves;
   }
 
   function isValidMove(b, r, c, player) {
-    if (b[r][c]) return false;
-
-    for (const [dr, dc] of directions) {
-      let nr = r + dr;
-      let nc = c + dc;
-      let foundOpponent = false;
-
-      while (
-        inBounds(nr, nc) &&
-        b[nr][nc] === opposite(player)
-      ) {
-        nr += dr;
-        nc += dc;
-        foundOpponent = true;
-      }
-
-      if (
-        foundOpponent &&
-        inBounds(nr, nc) &&
-        b[nr][nc] === player
-      ) {
-        return true;
-      }
-    }
-
-    return false;
+    return !b[r][c] && countFlips(b, r, c, player) > 0;
   }
 
   function makeMove(b, r, c, player) {
     b[r][c] = player;
-
-    for (const [dr, dc] of directions) {
-      const cellsToFlip = [];
-      let nr = r + dr;
-      let nc = c + dc;
-
-      while (
-        inBounds(nr, nc) &&
-        b[nr][nc] === opposite(player)
-      ) {
-        cellsToFlip.push([nr, nc]);
-        nr += dr;
-        nc += dc;
-      }
-
-      if (inBounds(nr, nc) && b[nr][nc] === player) {
-        for (const [fr, fc] of cellsToFlip) {
-          b[fr][fc] = player;
-        }
-      }
-    }
+    directions.forEach(function (d) {
+      var flip = [], nr = r + d[0], nc = c + d[1];
+      while (inBounds(nr, nc) && b[nr][nc] === opposite(player)) { flip.push([nr, nc]); nr += d[0]; nc += d[1]; }
+      if (flip.length && inBounds(nr, nc) && b[nr][nc] === player) flip.forEach(function (f) { b[f[0]][f[1]] = player; });
+    });
   }
 
   function countFlips(b, r, c, player) {
-    let total = 0;
-
-    for (const [dr, dc] of directions) {
-      let nr = r + dr;
-      let nc = c + dc;
-      let count = 0;
-
-      while (
-        inBounds(nr, nc) &&
-        b[nr][nc] === opposite(player)
-      ) {
-        count++;
-        nr += dr;
-        nc += dc;
-      }
-
-      if (inBounds(nr, nc) && b[nr][nc] === player) {
-        total += count;
-      }
+    var total = 0;
+    for (var k = 0; k < 8; k++) {
+      var dr = directions[k][0], dc = directions[k][1], nr = r + dr, nc = c + dc, count = 0;
+      while (inBounds(nr, nc) && b[nr][nc] === opposite(player)) { count++; nr += dr; nc += dc; }
+      if (count && inBounds(nr, nc) && b[nr][nc] === player) total += count;
     }
-
     return total;
   }
 
-  function opposite(player) {
-    return player === 'black' ? 'white' : 'black';
-  }
-
-  function inBounds(r, c) {
-    return r >= 0 && r < SIZE && c >= 0 && c < SIZE;
-  }
-
-  function hasValidMove(b, player) {
-    return getValidMoves(b, player).length > 0;
-  }
+  function opposite(player) { return player === 'black' ? 'white' : 'black'; }
+  function inBounds(r, c) { return r >= 0 && r < SIZE && c >= 0 && c < SIZE; }
+  function hasValidMove(b, player) { return getValidMoves(b, player).length > 0; }
 
   function countPieces(b) {
-    let black = 0;
-    let white = 0;
-
-    for (let r = 0; r < SIZE; r++) {
-      for (let c = 0; c < SIZE; c++) {
-        if (b[r][c] === 'black') black++;
-        else if (b[r][c] === 'white') white++;
-      }
-    }
-
-    return { black, white };
-  }
-
-  function isGameOver(b) {
-    return !hasValidMove(b, 'black') && !hasValidMove(b, 'white');
-  }
-
-  function updateStatus() {
-    const { black, white } = countPieces(board);
-
-    statusDiv.textContent = isGameOver(board)
-      ? `Game Over! Black: ${black}  White: ${white}`
-      : `Turn: ${currentPlayer === 'black' ? 'Black (You)' : 'White (Computer)'} | Black: ${black}  White: ${white}`;
+    var black = 0, white = 0;
+    b.forEach(function (row) { row.forEach(function (v) { if (v === 'black') black++; else if (v === 'white') white++; }); });
+    return { black: black, white: white };
   }
 
   function endGame() {
-    const { black, white } = countPieces(board);
-    let result = "It's a Tie!";
-
-    if (black > white) result = 'You Win! 🎉';
-    else if (white > black) result = 'Computer Wins 🤖';
-
-    statusDiv.textContent = `Game Over! ${result}`;
+    over = true;
+    var n = countPieces(board);
+    var result;
+    if (n.black > n.white) { tally.w++; result = 'You win ' + n.black + '–' + n.white + '!'; }
+    else if (n.white > n.black) { tally.l++; result = 'Computer wins ' + n.white + '–' + n.black + '.'; }
+    else { tally.d++; result = "It's a tie, " + n.black + '–' + n.white + '.'; }
+    render();
+    say('Game over. ' + result, true);
   }
 
   function resetGame() {
     gameId++;
+    board = newBoard();
     currentPlayer = 'black';
-    aiMode = aiModeSelect.value;
-    createBoard();
+    over = false;
+    last = null;
+    render();
+    say('Your turn (Black). Gold rings mark legal moves.');
   }
 
-  aiModeSelect.addEventListener('change', () => {
-    aiMode = aiModeSelect.value;
-    updateHighlights();
-  });
+  aiModeSelect.addEventListener('change', render);
+  scoresBox.addEventListener('change', render);
   restartBtn.addEventListener('click', resetGame);
 
-  createBoard();
+  buildCells();
+  resetGame();
 })();
 </script>
+<script src="deck/oyun.js"></script>
