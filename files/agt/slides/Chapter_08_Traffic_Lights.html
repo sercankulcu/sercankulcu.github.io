@@ -2,476 +2,337 @@
 layout: without-sidebar
 title: "Four-Way Traffic Simulation"
 permalink: /files/agt/slides/Chapter_08_Traffic_Lights.html
-excerpt: "Interactive four-way traffic-light simulation with rotating green phases, random vehicle arrivals, pause/reset controls, and responsive scaling."
+excerpt: "Interactive four-way traffic-light simulation with fixed-cycle and queue-adaptive signal control, random vehicle arrivals, queues and waiting-time statistics."
 ---
 
 <link rel="stylesheet" href="deck/oyun.css">
-
 <style>
 /* oyuna özgü renkler (çim, asfalt, lambalar) kavşağın kendisidir; koyu temada biraz koyulaşır */
-.agt-traffic-lights{
-  --tl-grass:#4caf50;
-  --tl-road:#333;
-  --tl-housing:#222
-}
-
-html[data-theme="dark"] .agt-traffic-lights{
-  --tl-grass:#2f7a33;
-  --tl-road:#2a2a2a;
-  --tl-housing:#111
-}
-
-.agt-traffic-lights .hero{
-  margin-bottom:14px;
-  text-align:center
-}
-
-.agt-traffic-lights .hero p{
-  max-width:720px;
-  margin:0 auto;
-  color:var(--ds-muted);
-  line-height:1.6
-}
-
-.agt-traffic-lights .controls{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  flex-wrap:wrap;
-  margin:14px 0
-}
-
-.agt-traffic-lights .status{
-  width:min(600px,100%);
-  margin:0 auto 14px;
-  padding:10px 12px;
-  border:1.5px solid var(--ds-border);
-  border-radius:10px;
-  background:var(--ds-surface-strong);
-  text-align:center;
-  color:var(--ds-text)
-}
-
-.agt-traffic-lights .simulation-frame{
-  position:relative;
-  width:min(600px,100%);
-  margin:0 auto;
-  overflow:hidden;
-  border:1.5px solid var(--ds-border);
-  border-radius:14px;
-  background:var(--tl-grass)
-}
-
-.agt-traffic-lights .simulation{
-  position:absolute;
-  top:0;
-  left:0;
-  width:600px;
-  height:600px;
-  background:var(--tl-grass);
-  transform-origin:top left
-}
-
-.agt-traffic-lights .road{
-  position:absolute;
-  background:var(--tl-road)
-}
-
-.agt-traffic-lights .road-h{
-  width:100%;
-  height:100px;
-  top:250px
-}
-
-.agt-traffic-lights .road-v{
-  width:100px;
-  height:100%;
-  left:250px
-}
-
-.agt-traffic-lights .traffic-light{
-  position:absolute;
-  display:flex;
-  width:30px;
-  height:90px;
-  padding:5px;
-  flex-direction:column;
-  justify-content:space-around;
-  align-items:center;
-  background:var(--tl-housing);
-  border-radius:6px;
-  box-shadow:0 2px 8px rgba(0,0,0,.35)
-}
-
-.agt-traffic-lights .light{
-  width:25px;
-  height:25px;
-  border-radius:50%;
-  opacity:.3
-}
-
-.agt-traffic-lights .red{background:#f00}
-.agt-traffic-lights .yellow{background:#ff0}
-.agt-traffic-lights .green{background:#0f0}
-
-.agt-traffic-lights .car{
-  position:absolute;
-  width:40px;
-  height:20px;
-  border-radius:4px;
-  transition:left .1s linear,top .1s linear
-}
-
-.agt-traffic-lights .explanation{
-  width:min(760px,100%);
-  margin:18px auto 0;
-  padding:14px 16px;
-  border:1.5px solid var(--ds-border);
-  border-radius:12px;
-  background:var(--ds-bg)
-}
-
-.agt-traffic-lights .explanation h2{margin-top:0}
-
-.agt-traffic-lights .explanation p,
-.agt-traffic-lights .explanation li{line-height:1.6}
-
-.agt-traffic-lights .explanation ul{margin-bottom:0}
-
-@media(max-width:600px){
-  .agt-traffic-lights .control-btn{flex:1 1 100px}
-}
+.agt-traffic-lights{--tl-grass:#4caf50;--tl-road:#333;--tl-housing:#222;--tl-mark:rgba(255,255,255,.75)}
+html[data-theme="dark"] .agt-traffic-lights{--tl-grass:#2f7a33;--tl-road:#2a2a2a;--tl-housing:#111;--tl-mark:rgba(255,255,255,.6)}
+.agt-traffic-lights .tl-layout{display:flex;gap:14px;height:100%}
+.agt-traffic-lights .simulation-frame{position:relative;flex:none;width:504px;height:504px;overflow:hidden;border:1.5px solid var(--ds-border);border-radius:12px;background:var(--tl-grass)}
+.agt-traffic-lights .simulation{position:absolute;top:0;left:0;width:600px;height:600px;background:var(--tl-grass);transform:scale(.835);transform-origin:top left}
+.agt-traffic-lights .road{position:absolute;background:var(--tl-road)}
+.agt-traffic-lights .road-h{left:0;width:600px;height:100px;top:250px}
+.agt-traffic-lights .road-v{top:0;width:100px;height:600px;left:250px}
+.agt-traffic-lights .mark{position:absolute;background:var(--tl-mark)}
+.agt-traffic-lights .mark-h{height:2px;top:299px;background:repeating-linear-gradient(90deg,var(--tl-mark) 0 18px,transparent 18px 32px)}
+.agt-traffic-lights .mark-v{width:2px;left:299px;background:repeating-linear-gradient(180deg,var(--tl-mark) 0 18px,transparent 18px 32px)}
+.agt-traffic-lights .traffic-light{position:absolute;display:flex;width:26px;height:72px;padding:3px;flex-direction:column;justify-content:space-around;align-items:center;background:var(--tl-housing);border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.agt-traffic-lights .light{width:19px;height:19px;border-radius:50%;opacity:.25}
+.agt-traffic-lights .light.is-on{opacity:1;box-shadow:0 0 8px currentColor}
+.agt-traffic-lights .red{background:#f00;color:#f00}
+.agt-traffic-lights .yellow{background:#ff0;color:#ff0}
+.agt-traffic-lights .green{background:#0f0;color:#0f0}
+.agt-traffic-lights .tl-q{position:absolute;min-width:30px;padding:1px 6px;border-radius:999px;background:rgba(0,0,0,.65);color:#fff;font:700 15px/1.4 sans-serif;text-align:center}
+.agt-traffic-lights .car{position:absolute;width:40px;height:20px;border-radius:4px;border:1px solid rgba(0,0,0,.45)}
+.agt-traffic-lights .tl-side{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.agt-traffic-lights .tl-status{padding:8px 10px;border:1.5px solid var(--ds-border);border-radius:10px;background:var(--ds-surface-strong);font-size:14px;line-height:1.35}
+.agt-traffic-lights .tl-status b{font-size:16px}
+.agt-traffic-lights .tl-label{display:block;margin-bottom:2px;font-size:13px;font-weight:700;color:var(--ds-muted)}
+.agt-traffic-lights select{width:100%;font-size:14px}
+.agt-traffic-lights .tl-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.agt-traffic-lights .tl-btns button{padding:0 6px;font-size:14px}
+.agt-traffic-lights .tl-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.agt-traffic-lights .tl-metric{padding:5px 4px;border:1.5px solid var(--ds-border);border-radius:10px;background:var(--ds-bg);color:var(--ds-muted);font-size:12px;text-align:center;line-height:1.25}
+.agt-traffic-lights .tl-metric b{display:block;margin-top:1px;color:var(--ds-text);font-size:18px}
+.agt-traffic-lights table.tl-queues{width:100%;font-size:13px}
+.agt-traffic-lights .tl-queues th,.agt-traffic-lights .tl-queues td{padding:2px 4px;text-align:center}
+.agt-traffic-lights .tl-queues tr.is-green td:first-child{color:var(--ds-good);font-weight:700}
 </style>
 
-<main class="agt-traffic-lights agt-oyun">
-  <header class="hero">
-    <p class="agt-oyun__kicker">Bölüm 8 · Simülasyon</p>
-    <h1>Four-Way Traffic Simulation</h1>
-    <p>
-      Observe how vehicles arriving from four directions move through an intersection
-      controlled by rotating traffic lights. Cars appear at random intervals, and the
-      green light changes to the next direction approximately every 5–7 seconds.
-    </p>
+<div class="agt-traffic-lights agt-oyun agt-oyun--stage">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 8 · Simülasyon</p><h1>Four-Way Traffic Simulation</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="tl-help">?</button>
+    <a class="agt-oyun__back" href="Bolum_08_Ag_Tasarimi.html">← Bölüm 8</a>
   </header>
-
-  <div class="controls">
-    <button class="control-btn is-primary pause-btn" type="button">Pause</button>
-    <button class="control-btn reset-btn" type="button">Reset</button>
-    <button class="control-btn add-car-btn" type="button">Add Car</button>
-  </div>
-
-  <div class="status">
-    <strong>Active green:</strong> <span class="green-direction">North</span>
-    · <strong>Cars:</strong> <span class="car-count">0</span>
-  </div>
-
-  <div class="simulation-frame">
-    <div class="simulation">
-      <div class="road road-h"></div>
-      <div class="road road-v"></div>
-
-      <div class="traffic-light" style="top:155px;left:215px;">
-        <div class="light red"></div>
-        <div class="light yellow"></div>
-        <div class="light green"></div>
+  <div class="agt-oyun__body">
+    <div class="tl-layout">
+      <div class="simulation-frame">
+        <div class="simulation">
+          <div class="road road-h"></div>
+          <div class="road road-v"></div>
+          <div class="mark mark-h" style="left:0;width:250px"></div>
+          <div class="mark mark-h" style="left:350px;width:250px"></div>
+          <div class="mark mark-v" style="top:0;height:250px"></div>
+          <div class="mark mark-v" style="top:350px;height:250px"></div>
+          <div class="mark" style="left:246px;top:300px;width:3px;height:50px"></div>
+          <div class="mark" style="left:351px;top:250px;width:3px;height:50px"></div>
+          <div class="mark" style="left:300px;top:351px;width:50px;height:3px"></div>
+          <div class="mark" style="left:250px;top:246px;width:50px;height:3px"></div>
+          <div class="traffic-light" data-dir="north" style="left:358px;top:360px"><div class="light red"></div><div class="light yellow"></div><div class="light green"></div></div>
+          <div class="traffic-light" data-dir="east" style="left:214px;top:358px"><div class="light red"></div><div class="light yellow"></div><div class="light green"></div></div>
+          <div class="traffic-light" data-dir="south" style="left:216px;top:170px"><div class="light red"></div><div class="light yellow"></div><div class="light green"></div></div>
+          <div class="traffic-light" data-dir="west" style="left:360px;top:172px"><div class="light red"></div><div class="light yellow"></div><div class="light green"></div></div>
+          <span class="tl-q" data-q="north" style="left:394px;top:545px">0</span>
+          <span class="tl-q" data-q="east" style="left:20px;top:360px">0</span>
+          <span class="tl-q" data-q="south" style="left:176px;top:30px">0</span>
+          <span class="tl-q" data-q="west" style="left:545px;top:212px">0</span>
+        </div>
       </div>
-
-      <div class="traffic-light" style="top:215px;right:155px;">
-        <div class="light red"></div>
-        <div class="light yellow"></div>
-        <div class="light green"></div>
-      </div>
-
-      <div class="traffic-light" style="bottom:155px;right:215px;">
-        <div class="light red"></div>
-        <div class="light yellow"></div>
-        <div class="light green"></div>
-      </div>
-
-      <div class="traffic-light" style="bottom:215px;left:155px;">
-        <div class="light red"></div>
-        <div class="light yellow"></div>
-        <div class="light green"></div>
+      <div class="tl-side">
+        <div class="tl-status" role="status">Green: <b class="green-direction">North</b> · <span class="phase-left"></span></div>
+        <label><span class="tl-label">Signal controller</span>
+          <select class="controller-select">
+            <option value="fixed">Fixed cycle (6 s green)</option>
+            <option value="adaptive">Queue-adaptive</option>
+          </select>
+        </label>
+        <label><span class="tl-label">Arrival rate</span>
+          <select class="rate-select">
+            <option value="3">Light traffic</option>
+            <option value="1.6" selected>Medium traffic</option>
+            <option value="0.9">Heavy traffic</option>
+          </select>
+        </label>
+        <div class="tl-btns">
+          <button class="pause-btn is-primary" type="button">Pause</button>
+          <button class="reset-btn" type="button">Reset</button>
+          <button class="add-car-btn" type="button">Add car</button>
+        </div>
+        <div class="tl-stats">
+          <div class="tl-metric">Cars on road<b class="car-count">0</b></div>
+          <div class="tl-metric">Cars passed<b class="passed-count">0</b></div>
+          <div class="tl-metric">Avg. wait (s)<b class="avg-wait">0.0</b></div>
+          <div class="tl-metric">Max wait (s)<b class="max-wait">0.0</b></div>
+        </div>
+        <table class="tl-queues">
+          <thead><tr><th>Approach</th><th>Queue</th><th>Passed</th><th>Avg. wait</th></tr></thead>
+          <tbody class="queue-rows"></tbody>
+        </table>
+        <div class="tl-metric">Simulated time<b class="sim-time">0 s</b></div>
       </div>
     </div>
   </div>
 
-  <section class="explanation">
-    <h2>How the Simulation Works</h2>
-    <p>
-      Each traffic light represents one direction: north, east, south, or west.
-      Only one direction has a green light at a time, while the other three remain red.
-    </p>
+  <dialog class="agt-oyun__dialog" id="tl-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>How the simulation works</h2>
+    <p>Cars arrive at random from four directions and cross a signalised intersection. Only one approach has a green light at a time; the other three are red.</p>
     <ul>
-      <li>The green phase rotates clockwise every 5–7 seconds.</li>
-      <li>Vehicles appear at random intervals of roughly 1–5 seconds.</li>
-      <li>Cars move when their direction has a green light.</li>
-      <li>Once a car enters the intersection, it continues until it leaves the crossing.</li>
-      <li><strong>Pause</strong> stops or resumes the simulation.</li>
-      <li><strong>Reset</strong> removes all cars and restores North as the first green direction.</li>
-      <li><strong>Add Car</strong> immediately creates a vehicle from a random direction.</li>
+      <li>Each phase is <b>green → yellow (1.5 s) → all-red (0.8 s)</b>, so the intersection clears before the next direction starts.</li>
+      <li>Cars stop at the white stop line on red or yellow and queue behind each other. A car that has already passed the stop line continues until it leaves the crossing.</li>
+      <li>The number in the black badge at each approach is its current queue.</li>
+      <li><b>Pause</b> stops or resumes the simulation, <b>Reset</b> removes all cars and statistics, <b>Add car</b> creates a car from a random direction.</li>
     </ul>
-  </section>
-
-  <a class="agt-oyun__back" href="Bolum_08_Ag_Tasarimi.html">← Bölüm 8 sunumu</a>
-</main>
+    <h3>Signal controllers</h3>
+    <ul>
+      <li><b>Fixed cycle:</b> green rotates North → East → South → West, 6 seconds each, regardless of traffic.</li>
+      <li><b>Queue-adaptive:</b> after a minimum green of 3 s, the light switches as soon as the current approach is empty or another approach has a queue at least 3 cars longer; it then gives green to the longest queue (maximum green 12 s).</li>
+    </ul>
+    <h3>Reading the statistics</h3>
+    <p><b>Wait</b> is the time a car spends stopped. Average and maximum wait are computed over cars that have left the intersection. Compare the two controllers under the same arrival rate: the adaptive controller usually lowers average waiting time, but can make an approach with few cars wait longer — an efficiency-versus-fairness trade-off.</p>
+    <h3>What this shows</h3>
+    <p>An intersection is a shared resource. Drivers would each prefer a green light; the signal is a coordination mechanism that resolves the conflict. Different allocation rules (round-robin vs. demand-based) give different total delay and different distributions of delay across approaches, the same questions mechanism design asks about any shared resource.</p>
+  </dialog>
+</div>
 
 <script>
 (() => {
-  const root=document.querySelector('.agt-traffic-lights');
-  if(!root)return;
+  const root = document.querySelector('.agt-traffic-lights');
+  if (!root) return;
 
-  const frame=root.querySelector('.simulation-frame');
-  const simulation=root.querySelector('.simulation');
-  const trafficLights=[...root.querySelectorAll('.traffic-light')];
-  const pauseBtn=root.querySelector('.pause-btn');
-  const resetBtn=root.querySelector('.reset-btn');
-  const addCarBtn=root.querySelector('.add-car-btn');
-  const greenDirectionEl=root.querySelector('.green-direction');
-  const carCountEl=root.querySelector('.car-count');
+  const simulation = root.querySelector('.simulation');
+  const pauseBtn = root.querySelector('.pause-btn');
+  const resetBtn = root.querySelector('.reset-btn');
+  const addCarBtn = root.querySelector('.add-car-btn');
+  const controllerSel = root.querySelector('.controller-select');
+  const rateSel = root.querySelector('.rate-select');
+  const greenEl = root.querySelector('.green-direction');
+  const phaseLeftEl = root.querySelector('.phase-left');
+  const carCountEl = root.querySelector('.car-count');
+  const passedEl = root.querySelector('.passed-count');
+  const avgWaitEl = root.querySelector('.avg-wait');
+  const maxWaitEl = root.querySelector('.max-wait');
+  const queueRows = root.querySelector('.queue-rows');
+  const simTimeEl = root.querySelector('.sim-time');
 
-  const directions=['north','east','south','west'];
-  const labels=['North','East','South','West'];
-  const colors=['#FF0000','#00FF00','#0000FF','#FFFF00','#FF00FF','#00FFFF'];
+  const DIRS = ['north', 'east', 'south', 'west'];
+  const LABELS = { north: 'North', east: 'East', south: 'South', west: 'West' };
+  const COLORS = ['#e53935', '#1e88e5', '#fdd835', '#8e24aa', '#00acc1', '#fb8c00', '#f5f5f5'];
+  const LIGHTS = {};
+  root.querySelectorAll('.traffic-light').forEach(el => { LIGHTS[el.dataset.dir] = el.querySelectorAll('.light'); });
+  const QBADGE = {};
+  root.querySelectorAll('[data-q]').forEach(el => { QBADGE[el.dataset.q] = el; });
 
-  let currentGreen=0;
-  let cars=[];
-  let paused=false;
-  let lightTimer=null;
-  let carTimer=null;
-  let generation=0;
+  const SPEED = 120;
+  const CAR_LEN = 40;
+  const GAP = 8;
+  const STOP = 245;
+  const YELLOW = 1.5;
+  const ALLRED = 0.8;
+  const FIXED_GREEN = 6;
+  const MIN_GREEN = 3;
+  const MAX_GREEN = 12;
 
-  function fitSimulation(){
-    const width=Math.min(frame.clientWidth,600);
-    const scale=width/600;
+  let cars, paused, time, nextArrival, green, phase, phaseTime, stats;
 
-    frame.style.height=`${600*scale}px`;
-    simulation.style.transform=`scale(${scale})`;
+  function place(car) {
+    const p = car.p;
+    let cx, cy, rot;
+    if (car.dir === 'east') { cx = p; cy = 325; rot = 0; }
+    else if (car.dir === 'west') { cx = 600 - p; cy = 275; rot = 180; }
+    else if (car.dir === 'north') { cx = 325; cy = 600 - p; rot = 270; }
+    else { cx = 275; cy = p; rot = 90; }
+    car.el.style.transform = `translate(${(cx - 20).toFixed(1)}px,${(cy - 10).toFixed(1)}px) rotate(${rot}deg)`;
   }
 
-  function updateStatus(){
-    greenDirectionEl.textContent=labels[currentGreen];
-    carCountEl.textContent=String(cars.length);
+  function createCar(dir) {
+    const same = cars.filter(c => c.dir === dir);
+    const lastCar = same.reduce((m, c) => (m === null || c.p < m.p ? c : m), null);
+    if (lastCar && lastCar.p < -25 + CAR_LEN + GAP) return false;
+    const el = document.createElement('div');
+    el.className = 'car';
+    el.style.left = '0';
+    el.style.top = '0';
+    el.style.backgroundColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+    simulation.appendChild(el);
+    const car = { el, dir, p: -25, wait: 0, passedLine: false };
+    cars.push(car);
+    place(car);
+    return true;
   }
 
-  function applyLights(){
-    trafficLights.forEach((light,index)=>{
-      const lights=light.querySelectorAll('.light');
+  function waitingCount(dir) {
+    return cars.filter(c => c.dir === dir && !c.passedLine).length;
+  }
 
-      lights.forEach(item=>{
-        item.style.opacity='.3';
-      });
+  function chooseNextGreen() {
+    if (controllerSel.value === 'fixed') return (green + 1) % 4;
+    let best = (green + 1) % 4, bq = -1;
+    for (let k = 1; k <= 4; k++) {
+      const d = (green + k) % 4;
+      const q = waitingCount(DIRS[d]);
+      if (q > bq) { bq = q; best = d; }
+    }
+    return best;
+  }
 
-      if(index===currentGreen){
-        lights[2].style.opacity='1';
-      }else{
-        lights[0].style.opacity='1';
+  function updatePhase(dt) {
+    phaseTime += dt;
+    if (phase === 'green') {
+      let end;
+      if (controllerSel.value === 'fixed') end = phaseTime >= FIXED_GREEN;
+      else {
+        const mine = waitingCount(DIRS[green]);
+        const other = Math.max(...DIRS.filter((_, i) => i !== green).map(waitingCount));
+        end = phaseTime >= MAX_GREEN || (phaseTime >= MIN_GREEN && (mine === 0 && other > 0 || other >= mine + 3));
       }
-    });
-
-    updateStatus();
-  }
-
-  function scheduleLightChange(token){
-    clearTimeout(lightTimer);
-    if(paused)return;
-
-    lightTimer=window.setTimeout(()=>{
-      if(token!==generation||paused)return;
-
-      currentGreen=(currentGreen+1)%4;
-      applyLights();
-      scheduleLightChange(token);
-    },5000+Math.random()*2000);
-  }
-
-  function createCar(direction){
-    const element=document.createElement('div');
-    element.className='car';
-    element.style.backgroundColor=
-      colors[Math.floor(Math.random()*colors.length)];
-
-    let x;
-    let y;
-    let rotation;
-
-    switch(direction){
-      case 'north':
-        x=280;
-        y=600;
-        rotation=270;
-        break;
-
-      case 'east':
-        x=0;
-        y=280;
-        rotation=0;
-        break;
-
-      case 'south':
-        x=280;
-        y=0;
-        rotation=90;
-        break;
-
-      default:
-        x=600;
-        y=280;
-        rotation=180;
+      if (end) { phase = 'yellow'; phaseTime = 0; }
+    } else if (phase === 'yellow' && phaseTime >= YELLOW) {
+      phase = 'allred'; phaseTime = 0;
+    } else if (phase === 'allred' && phaseTime >= ALLRED) {
+      green = chooseNextGreen(); phase = 'green'; phaseTime = 0;
     }
-
-    element.style.left=`${x}px`;
-    element.style.top=`${y}px`;
-    element.style.transform=`rotate(${rotation}deg)`;
-
-    simulation.appendChild(element);
-
-    cars.push({
-      element,
-      direction,
-      x,
-      y
-    });
-
-    updateStatus();
   }
 
-  function scheduleRandomCar(token){
-    clearTimeout(carTimer);
-    if(paused)return;
-
-    carTimer=window.setTimeout(()=>{
-      if(token!==generation||paused)return;
-
-      createCar(
-        directions[Math.floor(Math.random()*4)]
-      );
-
-      scheduleRandomCar(token);
-    },1000+Math.random()*4000);
-  }
-
-  function moveCars(){
-    if(!paused){
-      for(let i=cars.length-1;i>=0;i--){
-        const car=cars[i];
-
-        const light=
-          trafficLights[
-            directions.indexOf(car.direction)
-          ];
-
-        const isGreen=
-          light.querySelector('.green').style.opacity==='1';
-
-        const inIntersection=
-          car.x>220 &&
-          car.x<340 &&
-          car.y>220 &&
-          car.y<340;
-
-        if(isGreen||inIntersection){
-          switch(car.direction){
-            case 'north':
-              car.y-=2;
-              break;
-
-            case 'east':
-              car.x+=2;
-              break;
-
-            case 'south':
-              car.y+=2;
-              break;
-
-            case 'west':
-              car.x-=2;
-              break;
-          }
-
-          car.element.style.left=`${car.x}px`;
-          car.element.style.top=`${car.y}px`;
-
-          if(
-            car.x<-50 ||
-            car.x>650 ||
-            car.y<-50 ||
-            car.y>650
-          ){
-            car.element.remove();
-            cars.splice(i,1);
-          }
-        }
+  function step(dt) {
+    time += dt;
+    updatePhase(dt);
+    if (time >= nextArrival) {
+      createCar(DIRS[Math.floor(Math.random() * 4)]);
+      const mean = parseFloat(rateSel.value) || 1.6;
+      nextArrival = time + mean * (0.4 + Math.random() * 1.2);
+    }
+    for (const dir of DIRS) {
+      const lane = cars.filter(c => c.dir === dir).sort((a, b) => b.p - a.p);
+      let limit = Infinity;
+      const isGreen = phase === 'green' && DIRS[green] === dir;
+      for (const car of lane) {
+        let target = car.p + SPEED * dt;
+        if (target + 20 > limit) target = limit - 20;
+        if (!car.passedLine && !isGreen && target + 20 > STOP) target = Math.min(target, Math.max(car.p, STOP - 20));
+        target = Math.max(car.p, target);
+        car.v = (target - car.p) / dt;
+        if (car.v < SPEED * 0.2 && car.p > -25) car.wait += dt;
+        car.p = target;
+        if (!car.passedLine && car.p + 20 > STOP) car.passedLine = true;
+        limit = car.p - 20 - GAP;
       }
-
-      updateStatus();
     }
-
-    window.requestAnimationFrame(moveCars);
-  }
-
-  function setPaused(value){
-    paused=value;
-    pauseBtn.textContent=paused?'Resume':'Pause';
-
-    if(paused){
-      clearTimeout(lightTimer);
-      clearTimeout(carTimer);
-    }else{
-      scheduleLightChange(generation);
-      scheduleRandomCar(generation);
+    for (let i = cars.length - 1; i >= 0; i--) {
+      const car = cars[i];
+      if (car.p > 625) {
+        car.el.remove();
+        cars.splice(i, 1);
+        stats.passed++;
+        stats.totalWait += car.wait;
+        stats.maxWait = Math.max(stats.maxWait, car.wait);
+        stats.byDir[car.dir].passed++;
+        stats.byDir[car.dir].wait += car.wait;
+      } else place(car);
     }
   }
 
-  function resetSimulation(){
-    generation++;
-
-    clearTimeout(lightTimer);
-    clearTimeout(carTimer);
-
-    cars.forEach(car=>{
-      car.element.remove();
+  function render() {
+    const g = DIRS[green];
+    greenEl.textContent = phase === 'allred' ? 'none (all red)' : LABELS[g];
+    let left;
+    if (phase === 'green') left = controllerSel.value === 'fixed' ? `green, ${Math.max(0, FIXED_GREEN - phaseTime).toFixed(1)} s left` : `green for ${phaseTime.toFixed(1)} s`;
+    else left = phase === 'yellow' ? 'yellow' : 'clearing';
+    phaseLeftEl.textContent = left;
+    DIRS.forEach((d, i) => {
+      const L = LIGHTS[d];
+      const on = i === green ? (phase === 'green' ? 2 : phase === 'yellow' ? 1 : 0) : 0;
+      L.forEach((el, k) => el.classList.toggle('is-on', k === on));
+      QBADGE[d].textContent = waitingCount(d);
     });
-
-    cars=[];
-    currentGreen=0;
-    paused=false;
-
-    pauseBtn.textContent='Pause';
-
-    applyLights();
-    scheduleLightChange(generation);
-    scheduleRandomCar(generation);
+    carCountEl.textContent = cars.length;
+    passedEl.textContent = stats.passed;
+    avgWaitEl.textContent = stats.passed ? (stats.totalWait / stats.passed).toFixed(1) : '0.0';
+    maxWaitEl.textContent = stats.maxWait.toFixed(1);
+    simTimeEl.textContent = Math.floor(time) + ' s';
+    queueRows.innerHTML = DIRS.map((d, i) => {
+      const s = stats.byDir[d];
+      return `<tr class="${i === green && phase === 'green' ? 'is-green' : ''}"><td>${LABELS[d]}</td><td>${waitingCount(d)}</td><td>${s.passed}</td><td>${s.passed ? (s.wait / s.passed).toFixed(1) : '—'}</td></tr>`;
+    }).join('');
   }
 
-  pauseBtn.addEventListener(
-    'click',
-    ()=>setPaused(!paused)
-  );
+  function reset() {
+    if (cars) cars.forEach(c => c.el.remove());
+    cars = [];
+    time = 0;
+    nextArrival = 0.5;
+    green = 0;
+    phase = 'green';
+    phaseTime = 0;
+    stats = { passed: 0, totalWait: 0, maxWait: 0, byDir: {} };
+    DIRS.forEach(d => { stats.byDir[d] = { passed: 0, wait: 0 }; });
+    setPaused(false);
+    render();
+  }
 
-  resetBtn.addEventListener(
-    'click',
-    resetSimulation
-  );
+  function setPaused(v) {
+    paused = v;
+    pauseBtn.textContent = paused ? 'Resume' : 'Pause';
+  }
 
-  addCarBtn.addEventListener(
-    'click',
-    ()=>{
-      createCar(
-        directions[Math.floor(Math.random()*4)]
-      );
+  let last = null;
+  function loop(t) {
+    if (last !== null && !paused) {
+      const dt = Math.min(0.05, (t - last) / 1000);
+      if (dt > 0) { step(dt); render(); }
     }
-  );
+    last = t;
+    requestAnimationFrame(loop);
+  }
 
-  window.addEventListener(
-    'resize',
-    fitSimulation
-  );
+  pauseBtn.addEventListener('click', () => setPaused(!paused));
+  resetBtn.addEventListener('click', reset);
+  addCarBtn.addEventListener('click', () => {
+    const start = Math.floor(Math.random() * 4);
+    for (let k = 0; k < 4; k++) if (createCar(DIRS[(start + k) % 4])) break;
+    render();
+  });
+  controllerSel.addEventListener('change', reset);
+  rateSel.addEventListener('change', reset);
+  /* hook for automated checks: advance the simulation without animation frames */
+  root.simStep = (seconds) => { for (let s = 0; s < seconds; s += 0.05) step(0.05); render(); };
 
-  fitSimulation();
-  applyLights();
-  scheduleLightChange(generation);
-  scheduleRandomCar(generation);
-  moveCars();
+  reset();
+  requestAnimationFrame(loop);
 })();
 </script>
+<script src="deck/oyun.js"></script>

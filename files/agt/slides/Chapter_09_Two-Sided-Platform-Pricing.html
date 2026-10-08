@@ -126,9 +126,9 @@ html[data-theme="dark"] .agt-two-sided .ts-btn{color:#111827}
 <p>You run a platform that serves two user groups (Side A and Side B). Set a fee for each side with the sliders and press <b>Run market</b>. A negative fee is a <b>subsidy</b>: the platform pays users of that side to join. The metrics show how many users of each side join, the platform profit (fee A × users A + fee B × users B) and total activity.</p>
 <p>The <b>profit map</b> shows the profit of every fee pair: the horizontal axis is fee A (−5 … 10), the vertical axis fee B (−5 at the bottom, 10 at the top). Darker cells mean higher profit, red cells mean a loss. The framed cell is your current pair, the dot marks the most profitable pair.</p>
 <h3>Model</h3>
-<p>Participation on each side depends on its own fee and on the number of users on the other side (cross-side network effect e):</p>
-<p>users A = base A − 7·fee A + e·users B &nbsp;&nbsp; users B = base B − 6·fee B + e·users A</p>
-<p>Both equations hold at the same time (a participation equilibrium), each side clamped to 0…100 users. The level sets e = 0.18, 0.32 or 0.48.</p>
+<p>Participation on each side depends on its own fee and on the number of users on the other side (cross-side network effects):</p>
+<p>users A = base A − s<sub>A</sub>·fee A + e<sub>A</sub>·users B<br>users B = base B − s<sub>B</sub>·fee B + e<sub>B</sub>·users A</p>
+<p>Both equations hold at the same time (a participation equilibrium), each side clamped to 0…100 users. Side A (riders, buyers, viewers) is very price-sensitive (s<sub>A</sub> = 11–13 users per unit of fee), side B (drivers, sellers, creators) less so (s<sub>B</sub> = 5) but side B cares a lot about how many side-A users there are. The level sets (e<sub>A</sub>, e<sub>B</sub>) = (0.10, 0.30), (0.15, 0.60) or (0.20, 0.85).</p>
 <h3>Why this is game theory</h3>
 <p>Two-sided platforms often subsidize one side of a market to attract the other. The best price on each side depends not only on direct willingness to pay but also on cross-side network effects.</p>
 <h3>Scenarios</h3>
@@ -167,19 +167,19 @@ html[data-theme="dark"] .agt-two-sided .ts-btn{color:#111827}
 
   function params(){
     const s=scenario.value;
-    const effect=[0,.18,.32,.48][+level.value];
-    const base=s==='ride'?[80,55]:s==='market'?[75,60]:[90,45];
-    return {base:base,effect:effect};
+    const e=[[0,0],[.1,.3],[.15,.6],[.2,.85]][+level.value];
+    const sc={ride:{base:[50,30],s:[12,5]},market:{base:[45,35],s:[11,5]},social:{base:[60,20],s:[13,5]}}[s];
+    return {base:sc.base,sens:sc.s,eA:e[0],eB:e[1]};
   }
   const clamp=v=>Math.max(0,Math.min(100,v));
 
   /* participation equilibrium: both sides respond to each other; fixed-point iteration (e<1 so it converges) */
   function calc(a,b){
     const p=params();
-    let ua=clamp(p.base[0]-7*a),ub=clamp(p.base[1]-6*b);
-    for(let k=0;k<200;k++){
-      const na=clamp(p.base[0]-7*a+p.effect*ub);
-      const nb=clamp(p.base[1]-6*b+p.effect*na);
+    let ua=clamp(p.base[0]-p.sens[0]*a),ub=clamp(p.base[1]-p.sens[1]*b);
+    for(let k=0;k<300;k++){
+      const na=clamp(p.base[0]-p.sens[0]*a+p.eA*ub);
+      const nb=clamp(p.base[1]-p.sens[1]*b+p.eB*na);
       if(Math.abs(na-ua)<1e-9&&Math.abs(nb-ub)<1e-9){ua=na;ub=nb;break;}
       ua=na;ub=nb;
     }
@@ -268,7 +268,7 @@ html[data-theme="dark"] .agt-two-sided .ts-btn{color:#111827}
     root.querySelectorAll('.name-b').forEach(e=>{e.textContent=n[1];});
     $('.name-a-fee').textContent=n[0]+' fee (side A)';
     $('.name-b-fee').textContent=n[1]+' fee (side B)';
-    desc.textContent=descs[scenario.value]+' Network effect e = '+params().effect+'.';
+    desc.textContent=descs[scenario.value]+' Network effects: A←B '+params().eA+', B←A '+params().eB+'.';
     syncMode();
     buildMap();
     if(mode.value==='demo')applyBest('Computer');
