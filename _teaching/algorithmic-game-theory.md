@@ -13,39 +13,6 @@ Algorithmic game theory studies strategic interaction through the lens of comput
 
 ---
 
-## Announcements
-
-  [✍️ 2025 Vize & Final](../files/agt/slides/agt_odev_2025.html) | 
-  [Proje Listesi](../files/agt/slides/projeler_2025.html)
-
----
-
-## Resources
-
-- **course webpages**  
-  [📖 Nisarg Shah CSC304](https://www.cs.toronto.edu/~nisarg/teaching/304f19/) | 
-  [📖 Michael Dinitz 601.436/636](https://www.cs.jhu.edu/~mdinitz/classes/AGT/Spring2022/) | 
-  [📄 Tim Roughgarden’s CS364](https://timroughgarden.org/f13/f13.html) | 
-  [📄 Ariel Procaccia CMU 15-896](https://www.cs.cmu.edu/~arielpro/15896s16/schedule.html) | 
-  [📄 Martin Hoefer AGT](https://algo.cs.uni-frankfurt.de/lehre/agt/winter2223/agt2223.shtml)
-
-- **books**  
-  [📕 Game Theory, Alive (PDF)](../files/agt/Game_Theory_Alive.pdf) | 
-  [📕 Algorithmic Game Theory (PDF)](../files/agt/Algorithmic_Game_Theory_Cambridge.pdf) | 
-  [📕 Networks, Crowds, and Markets (PDF)](../files/agt/Networks,_Crowds_and_Markets.pdf) | 
-  [📕 Games, Puzzles, and Computation](../files/agt/Games_Puzzles_and_Computation.pdf) | 
-  [📕 Algoritmik Oyun Kuramı](https://iksadyayinevi.com/wp-content/uploads/2023/07/ALGORITMIK-OYUN-KURAMI.pdf)
-
-- **tools**  
-  [🎮 React JS Games Gallery](https://reactjsexample.com/tag/games/) | 
-  [🔧 Gambit Project – Open-Source Tools](https://gambit.sourceforge.net/) | 
-  [🧠 Nashpy – Python Library](https://nashpy.readthedocs.io/en/stable/)
-
-- **youtube**  
-  [🎥 Game Theory 101](https://www.youtube.com/watch?v=IotsMu1J8fA&list=PL102B69CCA6049B6C)
-
----
-
 ## Preliminary Materials: 
 
 * [Prerequisites for Algorithmic Game Theory (HTML)](../files/agt/Algorithmic_Game_Theory_Prerequisites.html)
@@ -60,14 +27,13 @@ Game theory is a mathematical framework used to analyze and understand strategic
 
 - [🖼️Slides (HTML)](../files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri.html)
 - [📝Çalışma Soruları (HTML)](../files/agt/slides/Bolum_01_Oyun_Kurami_Temelleri_Calisma_Sorulari.html)
-- [🕹️Guess the Average Game (HTML)](../files/agt/slides/Chapter_01_Guess_Avarage.html)
-- [🕹️TicTacToe Game (HTML)](../files/agt/slides/Chapter_01_TicTacToe.html)
-- [🕹️Nim Game (HTML)](../files/agt/slides/Chapter_01_Nim.html)
-- [🕹️Don't Say 21 Game (HTML)](../files/agt/slides/Chapter_01_Dont-Say-21.html)
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_01_Game_Theory_Fundamentals.pdf) | 
-  [Real World Applications](../files/agt/slides/Chapter_01_Real_World_Applications.html) | 
-  [Gerçek Dünya Uygulamaları](../files/agt/slides/Bolum_01_Gercek_Dunya_Uygulamalari.html)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+#### 🕹️ Games
+
+- [Guess the Average Game](../files/agt/slides/Chapter_01_Guess_Avarage.html)
+- [TicTacToe Game](../files/agt/slides/Chapter_01_TicTacToe.html)
+- [Nim Game](../files/agt/slides/Chapter_01_Nim.html)
+- [Don't Say 21 Game](../files/agt/slides/Chapter_01_Dont-Say-21.html)
 
 ---
 
@@ -77,12 +43,13 @@ Algorithmic game theory is an interdisciplinary field that combines concepts fro
 
 - [🖼️Slides (HTML)](../files/agt/slides/Bolum_02_Oyun_Kuramina_Giris.html)
 - [📝Çalışma Soruları (HTML)](../files/agt/slides/Bolum_02_Oyun_Kuramina_Giris_Calisma_Sorulari.html)
-- [🕹️Othello Game (HTML)](../files/agt/slides/Chapter_02_Othello.html)
-- [🕹️Hex Game (HTML)](../files/agt/slides/Chapter_02_Hex.html)
-- [🕹️Reversi Game (HTML)](../files/agt/slides/Chapter_02_Reversi.html)
-- [🕹️Connect Four Game (HTML)](../files/agt/slides/Chapter_02_Connect-Four.html)
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_02_Introduction_to_Algorithmic_Game_Theory.pdf)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+#### 🕹️ Games
+
+- [Othello Game](../files/agt/slides/Chapter_02_Othello.html)
+- [Hex Game](../files/agt/slides/Chapter_02_Hex.html)
+- [Reversi Game](../files/agt/slides/Chapter_02_Reversi.html)
+- [Connect Four Game](../files/agt/slides/Chapter_02_Connect-Four.html)
 
 ---
 
@@ -92,16 +59,16 @@ Nash equilibrium is a central concept in game theory that captures the notion of
 
 - [🖼️Slides (HTML)](../files/agt/slides/Bolum_03_Nash_Dengesi.html)
 - [📝Çalışma Soruları (HTML)](../files/agt/slides/Bolum_03_Nash_Dengesi_Calisma_Sorulari.html)
-- [🕹️Prisoner's Dilemma (HTML)](../files/agt/slides/Chapter_03_Prisoners_Dilemma.html)
-- [🕹️Matrix Nash (HTML)](../files/agt/slides/Chapter_03_Matrix-Nash.html)
-- [🕹️Rock–Paper–Scissors Game (HTML)](../files/agt/slides/Chapter_03_Rock_Scissors_Paper.html)
-- [🕹️Colonel Blotto Game (HTML)](../files/agt/slides/Chapter_03_Colonel-Blotto.html)
-- [🕹️Fox and Geese Game (HTML)](../files/agt/slides/Chapter_03_Fox-and-Geese.html)
-- [🕹️Nine Mens Morris Game (HTML)](../files/agt/slides/Chapter_03_Nine-Mens-Morris.html)
-- [🕹️Chess game (HTML)](../files/agt/slides/Chapter_03_Chess.html)
-- [Computational Complexity of Equilibria](../files/agt/slides/Chapter_03_Computational_Complexity_of_Equilibria.html)
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_03_Nash_Equilibrium_and_Strategic_Behavior.pdf)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+#### 🕹️ Games
+
+- [Prisoner's Dilemma](../files/agt/slides/Chapter_03_Prisoners_Dilemma.html)
+- [Matrix Nash](../files/agt/slides/Chapter_03_Matrix-Nash.html)
+- [Rock–Paper–Scissors Game](../files/agt/slides/Chapter_03_Rock_Scissors_Paper.html)
+- [Colonel Blotto Game](../files/agt/slides/Chapter_03_Colonel-Blotto.html)
+- [Fox and Geese Game](../files/agt/slides/Chapter_03_Fox-and-Geese.html)
+- [Nine Mens Morris Game](../files/agt/slides/Chapter_03_Nine-Mens-Morris.html)
+- [Chess game](../files/agt/slides/Chapter_03_Chess.html)
 
 ---
 
@@ -111,13 +78,13 @@ Mechanism design is a field of study within game theory and economics that focus
 
 - [🖼️Slides (HTML)](../files/agt/slides/Bolum_04_Mekanizma.html)
 - [📝Çalışma Soruları (HTML)](../files/agt/slides/Bolum_04_Mekanizma_Calisma_Sorulari.html)
-- [🕹️Poker Game (HTML)](../files/agt/slides/Chapter_04_Poker/index.html)
-- [🕹️Stable Matching (HTML)](../files/agt/slides/Chapter_04_Stable-Matching.html)
-- [🕹️Ultimatum Game (HTML)](../files/agt/slides/Chapter_04_Ultimatum-Game.html)
-- [🕹️Incentive Compatibility (HTML)](../files/agt/slides/Chapter_04_Incentive-Compatibility-Lab.html)
-- [Bayesian Games](../files/agt/slides/Chapter_04_Bayesian_Games.html)
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_04_Mechanism_Design_and_Incentives.pdf)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+#### 🕹️ Games
+
+- [Poker Game](../files/agt/slides/Chapter_04_Poker/index.html)
+- [Stable Matching](../files/agt/slides/Chapter_04_Stable-Matching.html)
+- [Ultimatum Game](../files/agt/slides/Chapter_04_Ultimatum-Game.html)
+- [Incentive Compatibility](../files/agt/slides/Chapter_04_Incentive-Compatibility-Lab.html)
 
 ---
 
@@ -127,14 +94,15 @@ Auctions and market design are closely related fields that utilize principles fr
 
 - [🖼️Slides (HTML)](../files/agt/slides/Bolum_05_Acik_Arttirma.html)
 - [📝Çalışma Soruları (HTML)](../files/agt/slides/Bolum_05_Acik_Arttirma_Calisma_Sorulari.html)
-- [English Auction Simulator](../files/agt/slides/Chapter_05_english-auction-simulator.html) | 
-  [Dutch Auction Simulator](../files/agt/slides/Chapter_05_dutch-auction-simulator.html) | 
-  [First-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_first-price-auction-simulator.html) | 
-  [Second-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_second-price-sealed-bid-auction.html)
-- [🕹️Double Auction Market (HTML)](../files/agt/slides/Chapter_05_Double-Auction-Market-Simulator.html)
-- [🕹️Monopoly Game (HTML)](../files/agt/slides/Chapter_05_Monopoly/index.html)
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_05_Auctions_and_Market_Design.pdf)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+#### 🕹️ Games
+
+- [English Auction Simulator](../files/agt/slides/Chapter_05_english-auction-simulator.html)
+- [Dutch Auction Simulator](../files/agt/slides/Chapter_05_dutch-auction-simulator.html)
+- [First-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_first-price-auction-simulator.html)
+- [Second-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_second-price-sealed-bid-auction.html)
+- [Double Auction Market](../files/agt/slides/Chapter_05_Double-Auction-Market-Simulator.html)
+- [Monopoly Game](../files/agt/slides/Chapter_05_Monopoly/index.html)
 
 ---
 
@@ -144,11 +112,12 @@ Social choice theory is a branch of economics and political science that studies
 
 - [🖼️Slides (HTML)](../files/agt/slides/Bolum_06_Oylama.html)
 - [📝Çalışma Soruları (HTML)](../files/agt/slides/Bolum_06_Oylama_Calisma_Sorulari.html)
-- [🕹️Facility Location Mechanism (HTML)](../files/agt/slides/Chapter_06_Facility_Location.html)
-- [🕹️Voting Rules (HTML)](../files/agt/slides/Chapter_06_Voting-Rules.html)
-- [🕹️Condorcet Voting (HTML)](../files/agt/slides/Chapter_06_Condorcet-Voting-Paradox.html)
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_06_Social_Choice_and_Voting_Systems.pdf)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+#### 🕹️ Games
+
+- [Facility Location Mechanism](../files/agt/slides/Chapter_06_Facility_Location.html)
+- [Voting Rules](../files/agt/slides/Chapter_06_Voting-Rules.html)
+- [Condorcet Voting](../files/agt/slides/Chapter_06_Condorcet-Voting-Paradox.html)
 
 ---
 
@@ -158,11 +127,12 @@ Multi-agent systems refer to scenarios where multiple self-interested agents int
 
 - [🖼️Slides (HTML)](../files/agt/slides/Bolum_07_Coklu_Ajan.html)
 - [📝Çalışma Soruları (HTML)](../files/agt/slides/Bolum_07_Coklu_Ajan_Calisma_Sorulari.html)
-- [🕹️Checkers Game (HTML)](../files/agt/slides/Chapter_07_Checkers.html)
-- [🕹️Public Goods Game (HTML)](../files/agt/slides/Chapter_07_Public-Goods-Game.html)
-- [🕹️Shapley Coalition Game (HTML)](../files/agt/slides/Chapter_07_Shapley-Coalition-Game.html)
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_13_Multi_Agent_Systems.pdf)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+#### 🕹️ Games
+
+- [Checkers Game](../files/agt/slides/Chapter_07_Checkers.html)
+- [Public Goods Game](../files/agt/slides/Chapter_07_Public-Goods-Game.html)
+- [Shapley Coalition Game](../files/agt/slides/Chapter_07_Shapley-Coalition-Game.html)
 
 ---
 
@@ -172,12 +142,13 @@ In algorithmic game theory, network design and routing are studied with a focus 
 
 - [🖼️Slides (HTML)](../files/agt/slides/Bolum_08_Ag_Tasarimi.html)
 - [📝Çalışma Soruları (HTML)](../files/agt/slides/Bolum_08_Ag_Tasarimi_Calisma_Sorulari.html)
-- [🕹️Traffic lights simulator (HTML)](../files/agt/slides/Chapter_08_Traffic_Lights.html)
-- [🕹️Selfish Routing (HTML)](../files/agt/slides/Chapter_08_Selfish-Routing.html) 
-- [🕹️Braess Paradox (HTML)](../files/agt/slides/Chapter_08_Braess-Paradox-Visualizer.html) 
-- [🕹️Network Formation (HTML)](../files/agt/slides/Chapter_08_Network-Formation.html) 
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_08_Network_Design_and_Routing.pdf)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+#### 🕹️ Games
+
+- [Traffic lights simulator](../files/agt/slides/Chapter_08_Traffic_Lights.html)
+- [Selfish Routing](../files/agt/slides/Chapter_08_Selfish-Routing.html)
+- [Braess Paradox](../files/agt/slides/Chapter_08_Braess-Paradox-Visualizer.html)
+- [Network Formation](../files/agt/slides/Chapter_08_Network-Formation.html)
 
 ---
 
@@ -187,10 +158,11 @@ In algorithmic game theory, online platforms are studied as environments where s
 
 - [🖼️Slides (HTML)](../files/agt/slides/Bolum_09_Cevrimici_Platform.html)
 - [📝Çalışma Soruları (HTML)](../files/agt/slides/Bolum_09_Cevrimici_Platform_Calisma_Sorulari.html)
-- [🕹️Two Sided Platform Pricing (HTML)](../files/agt/slides/Chapter_09_Two-Sided-Platform-Pricing.html) 
-- [🕹️Sponsored Search Ad Auction (HTML)](../files/agt/slides/Chapter_09_Sponsored-Search-Ad-Auction-Game.html) 
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_11_Online_Platforms.pdf)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+#### 🕹️ Games
+
+- [Two Sided Platform Pricing](../files/agt/slides/Chapter_09_Two-Sided-Platform-Pricing.html)
+- [Sponsored Search Ad Auction](../files/agt/slides/Chapter_09_Sponsored-Search-Ad-Auction-Game.html)
 
 ---
 
@@ -200,10 +172,11 @@ Algorithmic fairness studies how decisions and resource allocations affect diffe
 
 - [🖼️Slides (HTML)](../files/agt/slides/Bolum_10_Algoritmik_Etik.html)
 - [📝Çalışma Soruları (HTML)](../files/agt/slides/Bolum_10_Algoritmik_Etik_Calisma_Sorulari.html)
-- [🕹️Backgammon Game (HTML)](../files/agt/slides/Chapter_10_Backgammon.html)
-- [🕹️Fair Division Game (HTML)](../files/agt/slides/Chapter_10_Fair-Division-Game.html)
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_07_Algorithmic_Fairness_and_Ethics.pdf)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+#### 🕹️ Games
+
+- [Backgammon Game](../files/agt/slides/Chapter_10_Backgammon.html)
+- [Fair Division Game](../files/agt/slides/Chapter_10_Fair-Division-Game.html)
 
 ---
 
@@ -213,9 +186,10 @@ Price of Anarchy (PoA) is a measure that quantifies the loss of efficiency in a 
 
 - [🖼️Slides (HTML)](../files/agt/slides/Bolum_11_Anarsi.html)
 - [📝Çalışma Soruları (HTML)](../files/agt/slides/Bolum_11_Anarsi_Calisma_Sorulari.html)
-- [🕹️Load Balancing Price of Anarchy (HTML)](../files/agt/slides/Chapter_11_Load-Balancing-Price-of-Anarchy-Game.html) 
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_09_Price_of_Anarchy_and_Efficiency.pdf)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+#### 🕹️ Games
+
+- [Load Balancing Price of Anarchy](../files/agt/slides/Chapter_11_Load-Balancing-Price-of-Anarchy-Game.html)
 
 ---
 
@@ -225,12 +199,12 @@ Learning and adaptation play a significant role in algorithmic game theory by ad
 
 - [🖼️Slides (HTML)](../files/agt/slides/Bolum_12_Ogrenme.html)
 - [📝Çalışma Soruları (HTML)](../files/agt/slides/Bolum_12_Ogrenme_Calisma_Sorulari.html)
-- [🕹️Multi Armed Bandit](../files/agt/slides/Chapter_12_Multi-Armed-Bandit.html)
-- [🕹️Repeated Prisoners Dilemma](../files/agt/slides/Chapter_12_Repeated-Prisoners-Dilemma-Tournament.html)
-- [🕹️Replicator Dynamics](../files/agt/slides/Chapter_12_Replicator-Dynamics.html)
-- [Reinforcement Learning](../files/agt/slides/Chapter_12_Reinforcement_Learning.html)
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_10_Learning_and_Adaptation.pdf)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+#### 🕹️ Games
+
+- [Multi Armed Bandit](../files/agt/slides/Chapter_12_Multi-Armed-Bandit.html)
+- [Repeated Prisoners Dilemma](../files/agt/slides/Chapter_12_Repeated-Prisoners-Dilemma-Tournament.html)
+- [Replicator Dynamics](../files/agt/slides/Chapter_12_Replicator-Dynamics.html)
 
 ---
 
@@ -240,14 +214,15 @@ Decision-making is a central concept that focuses on how self-interested agents 
 
 - [🖼️Slides (HTML)](../files/agt/slides/Bolum_13_Karar_Alma.html)
 - [📝Çalışma Soruları (HTML)](../files/agt/slides/Bolum_13_Karar_Alma_Calisma_Sorulari.html)
-- [🕹️Bayesian Decision Lab](../files/agt/slides/Chapter_13_Bayesian-Decision-Lab.html)
-- [🕹️Blackjack Game](../files/agt/slides/Chapter_13_Blackjack.html)
-- [🕹️HOKM Game](../files/agt/slides/Chapter_13_Hokm.html)
-- [🕹️Mangala Game](../files/agt/slides/Chapter_13_Mangala.html)
-- [🕹️Minesweeper Game](../files/agt/slides/Chapter_13_Minesweeper.html)
-- [🕹️Pişti Game](../files/agt/slides/Chapter_13_Pisti.html)
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_12_Decision_Making.pdf)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+#### 🕹️ Games
+
+- [Bayesian Decision Lab](../files/agt/slides/Chapter_13_Bayesian-Decision-Lab.html)
+- [Blackjack Game](../files/agt/slides/Chapter_13_Blackjack.html)
+- [HOKM Game](../files/agt/slides/Chapter_13_Hokm.html)
+- [Mangala Game](../files/agt/slides/Chapter_13_Mangala.html)
+- [Minesweeper Game](../files/agt/slides/Chapter_13_Minesweeper.html)
+- [Pişti Game](../files/agt/slides/Chapter_13_Pisti.html)
 
 ---
 
@@ -257,8 +232,8 @@ Algorithmic game theory is a rapidly evolving field that continues to explore ne
 
 - [🖼️Slides (HTML)](../files/agt/slides/Bolum_14_Gelecek.html)
 - [📝Çalışma Soruları (HTML)](../files/agt/slides/Bolum_14_Gelecek_Calisma_Sorulari.html)
-- [🕹️Age of Çotanak (HTML)](../files/agt/slides/Chapter_14_Age-of-Cotanak.html) 
-- [🕹️AI Agent Strategy Tournement (HTML)](../files/agt/slides/Chapter_14_Ai-Agent-Strategy-Tournament.html) 
-- [Student Projects](../files/agt/slides/Chapter_14_Student_Projects.html)
-- [🗒️Lecture Notes (PDF)](../files/agt/Chapter_14_Future_Directions.pdf)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/agt/tree/main)
+
+#### 🕹️ Games
+
+- [Age of Çotanak](../files/agt/slides/Chapter_14_Age-of-Cotanak.html)
+- [AI Agent Strategy Tournament](../files/agt/slides/Chapter_14_Ai-Agent-Strategy-Tournament.html)
