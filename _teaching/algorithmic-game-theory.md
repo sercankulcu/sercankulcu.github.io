@@ -81,7 +81,7 @@ Mechanism design is a field of study within game theory and economics that focus
 
 #### 🕹️ Games
 
-- [Poker Game](../files/agt/slides/Chapter_04_Poker/index.html)
+- [Poker Game](../files/agt/slides/Chapter_04_Poker.html)
 - [Stable Matching](../files/agt/slides/Chapter_04_Stable-Matching.html)
 - [Ultimatum Game](../files/agt/slides/Chapter_04_Ultimatum-Game.html)
 - [Incentive Compatibility](../files/agt/slides/Chapter_04_Incentive-Compatibility-Lab.html)
@@ -102,7 +102,7 @@ Auctions and market design are closely related fields that utilize principles fr
 - [First-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_first-price-auction-simulator.html)
 - [Second-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_second-price-sealed-bid-auction.html)
 - [Double Auction Market](../files/agt/slides/Chapter_05_Double-Auction-Market-Simulator.html)
-- [Monopoly Game](../files/agt/slides/Chapter_05_Monopoly/index.html)
+- [Monopoly Game](../files/agt/slides/Chapter_05_Monopoly.html)
 
 ---
 
