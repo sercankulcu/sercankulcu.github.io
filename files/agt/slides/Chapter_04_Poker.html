@@ -1,0 +1,2832 @@
+---
+layout: without-sidebar
+title: "The Poker Game"
+permalink: /files/agt/slides/Chapter_04_Poker.html
+excerpt: "Interactive Texas Hold'em poker game with computer opponents, betting controls, speed settings, and table options."
+---
+
+<!-- Poker engine: jsholdem (sourceforge.net/projects/jsholdem) with the JS/CSS front end of tansey/js_poker (github.com/tansey/js_poker), via JS/CSS Poker (15 Jan 2024). Cards, table and dealer button are drawn with CSS. -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.agt-poker { --pk-good: color-mix(in srgb, var(--ds-good) 82%, #000); }
+html[data-theme="dark"] .agt-poker { --pk-good: var(--ds-good); }
+
+/* header: Name / Speed controls sit next to ? */
+.agt-poker #setup-options { display: flex; flex: none; align-items: center; gap: 6px; }
+.agt-poker .setup-button {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 32px; padding: 0 12px;
+  border: 1.5px solid var(--ds-border); border-radius: 999px;
+  background: var(--ds-bg); color: var(--ds-text);
+  font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap;
+}
+.agt-poker #name-button:hover { border-color: var(--ds-link); }
+.agt-poker #speed-button { cursor: default; padding-right: 4px; }
+.agt-poker #speed-options { min-height: 26px; padding: 0 4px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+
+/* the original 850 x 570 table, scaled to fit the stage body */
+.agt-poker .poker-stage {
+  position: absolute; left: 4px; top: 2px;
+  width: 850px; height: 570px;
+  transform: scale(.88); transform-origin: 0 0;
+}
+.agt-poker .poker-table { position: absolute; left: 50px; top: 0; width: 745px; height: 411px; }
+.agt-poker .poker-table::before {
+  content: ""; position: absolute; left: 14px; top: 44px; width: 717px; height: 326px;
+  box-sizing: border-box; border: 16px solid #262626; border-radius: 163px;
+  background: radial-gradient(ellipse at 50% 45%, #22a12a 0%, #1a8a22 45%, #0f5e16 100%);
+  box-shadow: 0 0 0 2px #8a8a8a, 0 6px 14px rgba(0, 0, 0, .35), inset 0 0 0 2px #4a4a4a, inset 0 0 28px rgba(0, 0, 0, .55);
+}
+.agt-poker .seat { position: absolute; width: 150px; height: 150px; }
+.agt-poker #button {
+  position: absolute; width: 22px; height: 22px; box-sizing: border-box;
+  border: 2px solid #374151; border-radius: 50%;
+  background: radial-gradient(circle, #fff 55%, #e5e7eb 100%); color: #111;
+  font: 800 11px/18px Arial, sans-serif; text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .5);
+}
+.agt-poker #button::after { content: "D"; }
+.agt-poker .name-chips { position: absolute; top: 65px; width: 140px; height: 33px; border-radius: 4px; background: #4b5563; color: #fff; font-size: 14px; line-height: 1.15; text-align: center; }
+.agt-poker .player-name { width: 100%; border-radius: 4px 4px 0 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+/* winner highlight: the engine paints pure red behind white text; use a darker red */
+.agt-poker .player-name[style*="background-color: red"] { background-color: #b91c1c !important; color: #fff !important; }
+
+/* playing cards */
+.agt-poker .card { width: 50px; height: 73px; box-sizing: border-box; border-radius: 4px; opacity: 0; user-select: none; }
+.agt-poker .card[data-face] { box-shadow: 0 0 0 1px rgba(0, 0, 0, .45), 0 2px 4px rgba(0, 0, 0, .35); }
+.agt-poker .card[data-face="back"] {
+  border: 3px solid #fff;
+  background:
+    repeating-linear-gradient(45deg, #c62828 0 2px, transparent 2px 6px),
+    repeating-linear-gradient(-45deg, #c62828 0 2px, #fff 2px 6px);
+}
+.agt-poker .card[data-face="up"] { background: #fff; color: #111; }
+.agt-poker .card[data-red] { color: #c8102e; }
+.agt-poker .pk-idx, .agt-poker .pk-pip { position: absolute; font-family: "Segoe UI Symbol", "DejaVu Sans", "Arial Unicode MS", Arial, sans-serif; line-height: 1; }
+.agt-poker .pk-idx { top: 3px; left: 4px; display: flex; flex-direction: column; align-items: center; font-size: 13px; }
+.agt-poker .pk-idx b { font: 800 16px/1 Arial, Helvetica, sans-serif; letter-spacing: -1px; }
+.agt-poker .pk-pip { right: 5px; bottom: 4px; font-size: 30px; }
+.agt-poker .holecards .card:hover { scale: 1.5; translate: 0 -20%; z-index: 3; }
+.agt-poker .holecards { position: absolute; top: 3px; left: 20px; width: 102px; height: 73px; }
+.agt-poker .holecard1 { position: absolute; left: 0; }
+.agt-poker .holecard2 { position: absolute; left: 50px; }
+.agt-poker .bet { position: absolute; top: 0; left: 40px; color: #fff; font-size: 13px; font-weight: 700; white-space: nowrap; text-shadow: -1px 0 1px #000, 0 1px 1px #000, 1px 0 1px #000, 0 -1px 1px #000; }
+
+.agt-poker #seat0 { left:0; top:330px; }     .agt-poker .seat0-button { left:185px; top:410px; } .agt-poker #seat0 .bet { top:-20px; }
+.agt-poker #seat1 { left:-50px; top:155px; } .agt-poker .seat1-button { left:135px; top:235px; } .agt-poker #seat1 .bet { top:100px; }
+.agt-poker #seat2 { left:0; top:0; }         .agt-poker .seat2-button { left:185px; top:80px; }  .agt-poker #seat2 .bet { top:100px; }
+.agt-poker #seat3 { left:200px; top:0; }     .agt-poker .seat3-button { left:230px; top:80px; }  .agt-poker #seat3 .bet { top:100px; }
+.agt-poker #seat4 { left:400px; top:0; }     .agt-poker .seat4-button { left:430px; top:80px; }  .agt-poker #seat4 .bet { top:100px; }
+.agt-poker #seat5 { left:600px; top:0; }     .agt-poker .seat5-button { left:630px; top:80px; }  .agt-poker #seat5 .bet { top:100px; }
+.agt-poker #seat6 { left:650px; top:155px; } .agt-poker .seat6-button { left:680px; top:235px; } .agt-poker #seat6 .bet { top:100px; }
+.agt-poker #seat7 { left:600px; top:330px; } .agt-poker .seat7-button { left:630px; top:410px; } .agt-poker #seat7 .bet { top:-20px; }
+.agt-poker #seat8 { left:400px; top:330px; } .agt-poker .seat8-button { left:430px; top:410px; } .agt-poker #seat8 .bet { top:-20px; }
+.agt-poker #seat9 { left:200px; top:330px; } .agt-poker .seat9-button { left:230px; top:410px; } .agt-poker #seat9 .bet { top:-20px; }
+
+.agt-poker #board { position: absolute; top: 168px; left: 250px; }
+.agt-poker #board::before {
+  content: ""; position: absolute; top: -10px; left: 0; width: 258px; height: 73px; border-radius: 4px;
+  background: repeating-linear-gradient(90deg, rgba(0, 0, 0, .14) 0 50px, transparent 50px 52px);
+}
+.agt-poker #pot { position: absolute; top: 245px; left: 300px; width: 180px; color: #fff; font-size: 16px; font-weight: 700; text-align: center; text-shadow: 0 1px 2px #000; }
+.agt-poker .boardcard { position: absolute; top: -10px; left: 0; }
+.agt-poker #flop2 { left:52px; } .agt-poker #flop3 { left:104px; } .agt-poker #turn { left:156px; } .agt-poker #river { left:208px; }
+.agt-poker #burn1 { left:280px; rotate:-18deg; } .agt-poker #burn2 { left:290px; } .agt-poker #burn3 { left:300px; rotate:15deg; }
+
+/* bottom strip: actions + quick raises on the left, game response on the right */
+.agt-poker #action-options { position: absolute; top: 444px; left: 10px; width: 400px; height: 46px; }
+.agt-poker .action-button {
+  position: absolute; top: 0; left: 0;
+  display: flex; align-items: center; height: 44px; padding: 0 18px;
+  border: 1.5px solid var(--ds-border); border-radius: 999px;
+  background: var(--ds-bg); color: var(--ds-text);
+  font-size: 19px; font-weight: 700; white-space: nowrap; cursor: pointer;
+}
+.agt-poker #call-button { left: 110px; }
+.agt-poker .action-button:hover { border-color: var(--ds-link); }
+.agt-poker #quick-raises {
+  position: absolute; top: 500px; left: 10px; width: 410px; height: 66px; box-sizing: border-box;
+  padding: 6px 8px 0; border: 1.5px solid var(--ds-border); border-radius: 12px;
+  background: var(--ds-surface-strong); color: var(--ds-text);
+  font-size: 18px; font-weight: 700; text-align: center; overflow: hidden;
+}
+.agt-poker #quick-raises table { margin: 0 auto; border: 0; }
+.agt-poker #quick-raises td { padding: 0; border: 0; }
+.agt-poker #quick-raises a:link, .agt-poker #quick-raises a:visited { color: var(--ds-link); text-decoration: none; }
+.agt-poker #quick-raises a:hover { text-decoration: underline; }
+.agt-poker #game-response {
+  position: absolute; top: 444px; left: 432px; width: 410px; height: 122px; box-sizing: border-box;
+  padding: 6px 10px; border: 1.5px solid var(--ds-border); border-radius: 12px;
+  background: var(--ds-bg); color: var(--ds-text);
+  font-size: 16px; line-height: 1.3; text-align: center; overflow: hidden;
+}
+.agt-poker #game-response table { margin: 0 auto; border: 0; }
+.agt-poker #game-response td { padding: 0; border: 0; }
+.agt-poker #game-response font { font-size: inherit; }
+.agt-poker #game-response font[size="+2"] { font-size: 19px; }
+.agt-poker #game-response font[size="+3"] { font-size: 22px; }
+.agt-poker #game-response font[size="+4"] { font-size: 21px; }
+.agt-poker #game-response a { color: var(--ds-link); }
+/* engine colours: pure red / green are unreadable on one of the two themes */
+.agt-poker font[color="red"] { color: var(--ds-bad); }
+.agt-poker font[color="green"] { color: var(--pk-good); }
+
+/* engine modal (number of opponents, alerts): covers the game area */
+.agt-poker #modal-box {
+  position: absolute; z-index: 20; inset: 0; display: none; overflow: hidden;
+  padding: 80px 20px 0; border-radius: 12px;
+  background: var(--ds-bg); color: var(--ds-text); font-size: 16px; text-align: center;
+}
+.agt-poker #modal-box table { margin: 0 auto; border: 0; }
+.agt-poker #modal-box td { border: 0; }
+.agt-poker #modal-box font[size="+4"] { font-size: 34px; line-height: 1.6; }
+.agt-poker #modal-box font[size="+2"] { font-size: 22px; }
+.agt-poker #modal-box font[color="red"] { color: var(--ds-accent); }
+.agt-poker #modal-box a:link, .agt-poker #modal-box a:visited { color: var(--ds-link); text-decoration: none; }
+.agt-poker #modal-box a:hover { text-decoration: underline; }
+.agt-poker #modal-box input[type="button"] { margin-top: 14px; padding: 0 20px; font-weight: 700; cursor: pointer; }
+.agt-poker .agt-oyun__head a.agt-oyun__back { color: color-mix(in srgb, var(--ds-text) 80%, var(--ds-bg)); }
+.agt-poker-help table td { white-space: nowrap; }
+</style>
+
+<div class="agt-poker agt-oyun agt-oyun--stage">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles">
+      <p class="agt-oyun__kicker">Bölüm 4 · Oyun</p>
+      <h1>The Poker Game</h1>
+    </div>
+    <div id="setup-options">
+      <div id="name-button" class="setup-button" role="button" tabindex="0">Name</div>
+      <div id="speed-button" class="setup-button">
+        Speed
+        <select id="speed-options" aria-label="Game speed">
+          <option value="0">1</option>
+          <option value="1">2</option>
+          <option value="2">3</option>
+          <option value="3">4</option>
+          <option value="4">5</option>
+        </select>
+      </div>
+    </div>
+    <button type="button" class="agt-oyun__help" aria-controls="poker-help">?</button>
+    <a class="agt-oyun__back" href="Bolum_04_Mekanizma.html">← Bölüm 4</a>
+  </header>
+
+  <div class="agt-oyun__body">
+  <div class="poker-stage">
+    <div id="poker_table" class="poker-table">
+      <div id="seat0" class="seat"><div class="holecards"><div class="card holecard1"></div><div class="card holecard2"></div></div><div class="name-chips"><div class="player-name"></div><div class="chips"></div></div><div class="bet"></div></div>
+      <div id="seat1" class="seat"><div class="holecards"><div class="card holecard1"></div><div class="card holecard2"></div></div><div class="name-chips"><div class="player-name"></div><div class="chips"></div></div><div class="bet"></div></div>
+      <div id="seat2" class="seat"><div class="holecards"><div class="card holecard1"></div><div class="card holecard2"></div></div><div class="name-chips"><div class="player-name"></div><div class="chips"></div></div><div class="bet"></div></div>
+      <div id="seat3" class="seat"><div class="holecards"><div class="card holecard1"></div><div class="card holecard2"></div></div><div class="name-chips"><div class="player-name"></div><div class="chips"></div></div><div class="bet"></div></div>
+      <div id="seat4" class="seat"><div class="holecards"><div class="card holecard1"></div><div class="card holecard2"></div></div><div class="name-chips"><div class="player-name"></div><div class="chips"></div></div><div class="bet"></div></div>
+      <div id="seat5" class="seat"><div class="holecards"><div class="card holecard1"></div><div class="card holecard2"></div></div><div class="name-chips"><div class="player-name"></div><div class="chips"></div></div><div class="bet"></div></div>
+      <div id="seat6" class="seat"><div class="holecards"><div class="card holecard1"></div><div class="card holecard2"></div></div><div class="name-chips"><div class="player-name"></div><div class="chips"></div></div><div class="bet"></div></div>
+      <div id="seat7" class="seat"><div class="holecards"><div class="card holecard1"></div><div class="card holecard2"></div></div><div class="name-chips"><div class="player-name"></div><div class="chips"></div></div><div class="bet"></div></div>
+      <div id="seat8" class="seat"><div class="holecards"><div class="card holecard1"></div><div class="card holecard2"></div></div><div class="name-chips"><div class="player-name"></div><div class="chips"></div></div><div class="bet"></div></div>
+      <div id="seat9" class="seat"><div class="holecards"><div class="card holecard1"></div><div class="card holecard2"></div></div><div class="name-chips"><div class="player-name"></div><div class="chips"></div></div><div class="bet"></div></div>
+      <div id="board">
+        <div id="flop1" class="card boardcard"></div>
+        <div id="flop2" class="card boardcard"></div>
+        <div id="flop3" class="card boardcard"></div>
+        <div id="turn" class="card boardcard"></div>
+        <div id="river" class="card boardcard"></div>
+        <div id="burn1" class="card boardcard"></div>
+        <div id="burn2" class="card boardcard"></div>
+        <div id="burn3" class="card boardcard"></div>
+      </div>
+
+      <div id="pot">
+        <div id="current-pot"></div>
+        <div id="total-pot"></div>
+      </div>
+    </div>
+
+    <div id="button" class="seat6-button" aria-label="Dealer button"></div>
+
+    <div id="action-options">
+      <div id="fold-button" class="action-button" role="button"></div>
+      <div id="call-button" class="action-button" role="button"></div>
+    </div>
+
+    <div id="quick-raises">Quick Raises</div>
+    <div id="game-response" aria-live="polite">Game response</div>
+  </div>
+  <div id="modal-box"></div>
+  </div>
+
+  <dialog class="agt-oyun__dialog agt-poker-help" id="poker-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>How to play</h2>
+    <p>Texas Hold'em against 1–9 computer opponents. Everyone starts with $500. Choose the number of opponents at the start, then play hand after hand until you are bust or the last player with chips.</p>
+
+    <h3>A hand</h3>
+    <ol>
+      <li>Each player gets two private hole cards. The two players after the dealer button post the <b>small</b> and <b>big blind</b>, forced bets that start the pot.</li>
+      <li>Betting round: every player <b>calls</b> (matches the current bet), <b>raises</b> (bets more) or <b>folds</b> (gives up the hand). If nobody has bet, calling is a <b>check</b>.</li>
+      <li>The <b>flop</b> (three shared cards), the <b>turn</b> (a fourth) and the <b>river</b> (a fifth) are dealt face up, each followed by a betting round.</li>
+      <li>At the showdown the best five-card hand made from a player's two hole cards and the five shared cards wins the pot.</li>
+    </ol>
+
+    <h3>Controls</h3>
+    <ul>
+      <li><b>Call / Check</b> and <b>Fold</b> buttons below the table, or the keys <b>C</b> and <b>F</b>.</li>
+      <li><b>Quick raises</b>: click an amount (or <i>All In!</i>) to raise.</li>
+      <li>After a hand, <b>Go on</b> deals the next one and <b>Restart</b> starts a new game; <i>details</i> lists what everyone bet and won.</li>
+      <li><b>Name</b> sets your player name; <b>Speed</b> (1 slow – 5 fast) sets how quickly the computer players act.</li>
+      <li>Hover a card to enlarge it.</li>
+    </ul>
+
+    <h3>Hand ranking (best to worst)</h3>
+    <table>
+      <tr><th>Hand</th><th>Meaning</th><th>Example</th></tr>
+      <tr><td>Straight flush</td><td>five in sequence, same suit</td><td>9 8 7 6 5 ♥&#xFE0E;</td></tr>
+      <tr><td>Four of a kind</td><td>four of one rank</td><td>Q Q Q Q</td></tr>
+      <tr><td>Full house</td><td>three of one rank + a pair</td><td>7 7 7 K K</td></tr>
+      <tr><td>Flush</td><td>five of the same suit</td><td>A J 8 4 3 ♠&#xFE0E;</td></tr>
+      <tr><td>Straight</td><td>five in sequence</td><td>6 5 4 3 2</td></tr>
+      <tr><td>Three of a kind</td><td>three of one rank</td><td>4 4 4</td></tr>
+      <tr><td>Two pair</td><td>two different pairs</td><td>J J 3 3</td></tr>
+      <tr><td>One pair</td><td>two of one rank</td><td>10 10</td></tr>
+      <tr><td>High card</td><td>none of the above</td><td>A …</td></tr>
+    </table>
+
+    <h3>Why poker in a game-theory course?</h3>
+    <p>Poker is a game of <b>incomplete information</b>: players act on private cards and must reason about the others' beliefs. Bluffing and calling bluffs are mixed strategies, and a predictable player is exploitable. Betting works as signalling, and the pot rules decide what each action is worth.</p>
+
+    <p class="agt-oyun__muted">The game engine is the open-source <a href="https://sourceforge.net/projects/js-css-poker/" target="_blank" rel="noopener">JS/CSS Poker</a> (jsholdem + <a href="https://github.com/tansey/js_poker" target="_blank" rel="noopener">tansey/js_poker</a>), version 15 Jan 2024.</p>
+  </dialog>
+</div>
+
+<script>
+"use strict";
+
+var START_DATE;
+
+var NUM_ROUNDS;
+
+var STOP_AUTOPLAY = 0;
+
+var RUN_EM = 0;
+
+var STARTING_BANKROLL = 500;
+
+var SMALL_BLIND;
+
+var BIG_BLIND;
+
+var BG_HILITE = "gold";
+
+var global_speed = 1;
+
+var HUMAN_WINS_AGAIN;
+
+var HUMAN_GOES_ALL_IN;
+
+var cards = new Array(52);
+
+var players;
+
+var board, deck_index, button_index;
+
+var current_bettor_index, current_bet_amount, current_min_raise;
+
+function leave_pseudo_alert() {
+ gui_write_modal_box("");
+}
+
+function my_pseudo_alert(text) {
+ var html = "<html><body topmargin=2 bottommargin=0 bgcolor=" + BG_HILITE + " onload='document.f.y.focus();'>" + "<font size=+2>" + String(text).replace(/\n/g, "<br>") + "</font><form name=f><input name=y type=button value='  OK  ' " + "onclick='parent.leave_pseudo_alert()'></form></body></html>";
+ gui_write_modal_box(html);
+}
+
+function player(name, bankroll, carda, cardb, status, total_bet, subtotal_bet) {
+ this.name = name;
+ this.bankroll = bankroll;
+ this.carda = carda;
+ this.cardb = cardb;
+ this.status = status;
+ this.total_bet = total_bet;
+ this.subtotal_bet = subtotal_bet;
+}
+
+function init() {
+ gui_hide_poker_table();
+ gui_hide_log_window();
+ gui_hide_setup_option_buttons();
+ gui_hide_fold_call_click();
+ gui_hide_guick_raise();
+ gui_hide_dealer_button();
+ gui_hide_game_response();
+ make_deck();
+ new_game();
+}
+
+function make_deck() {
+ var i;
+ var j = 0;
+ for (i = 2; i < 15; i++) {
+  cards[j++] = "h" + i;
+  cards[j++] = "d" + i;
+  cards[j++] = "c" + i;
+  cards[j++] = "s" + i;
+ }
+}
+
+function handle_how_many_reply(opponents) {
+ gui_write_modal_box("");
+ write_settings_frame();
+ new_game_continues(opponents);
+ gui_show_game_response();
+}
+
+function ask_how_many_opponents() {
+ var quick_values = [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
+ var asking = "<b><font size=+4 color=red>" + "So, how many opponents do you want?" + "</font></b><br>";
+ for (var i = 0; i < 9; i++) {
+  if (quick_values[i]) {
+   asking += "<font size=+4>" + "<a href='javascript:parent.handle_how_many_reply(" + quick_values[i] + ")'>" + quick_values[i] + " </a></font>" + "&nbsp;&nbsp;&nbsp;";
+  }
+ }
+ var html9 = "<td><table align=center><tr><td align=center>";
+ var html10 = asking + "</td></tr></table></td></tr></table></body></html>";
+ gui_write_modal_box(html9 + html10);
+}
+
+function initialize_game() {
+ gui_hide_poker_table();
+ gui_hide_dealer_button();
+ gui_hide_fold_call_click();
+ gui_show_poker_table();
+}
+
+function clear_player_cards(count) {
+ count = count + 1;
+ for (var pl = 0; pl < count; ++pl) {
+  gui_set_player_cards("", "", pl);
+  gui_set_player_name("", pl);
+  gui_set_bet("", pl);
+  gui_set_bankroll("", pl);
+ }
+}
+
+function new_game() {
+ START_DATE = new Date;
+ NUM_ROUNDS = 0;
+ HUMAN_WINS_AGAIN = 0;
+ initialize_game();
+ ask_how_many_opponents();
+}
+
+function new_game_continues(req_no_opponents) {
+ var my_players = [ new player("惠辰國", 0, "", "", "", 0, 0), new player("Jani Sointula", 0, "", "", "", 0, 0), new player("Annette Obrestad", 0, "", "", "", 0, 0), new player("Ricardo Chauriye", 0, "", "", "", 0, 0), new player("Jennifer Shahade", 0, "", "", "", 0, 0), new player("Theo Jørgensen", 0, "", "", "", 0, 0), new player("Marek Židlický", 0, "", "", "", 0, 0), new player("Brzęczyszczykiewicz", 0, "", "", "", 0, 0), new player("Chris Moneymaker", 0, "", "", "", 0, 0) ];
+ players = new Array(req_no_opponents + 1);
+ var player_name = getLocalStorage("playername");
+ if (!player_name) {
+  player_name = "You";
+ }
+ players[0] = new player(player_name, 0, "", "", "", 0, 0);
+ my_players.sort(compRan);
+ var i;
+ for (i = 1; i < players.length; i++) {
+  players[i] = my_players[i - 1];
+ }
+ clear_player_cards(my_players.length);
+ reset_player_statuses(0);
+ clear_bets();
+ for (i = 0; i < players.length; i++) {
+  players[i].bankroll = STARTING_BANKROLL;
+ }
+ button_index = Math.floor(Math.random() * players.length);
+ new_round();
+}
+
+function number_of_active_players() {
+ var num_playing = 0;
+ var i;
+ for (i = 0; i < players.length; i++) {
+  if (has_money(i)) {
+   num_playing += 1;
+  }
+ }
+ return num_playing;
+}
+
+function new_round() {
+ RUN_EM = 0;
+ NUM_ROUNDS++;
+ gui_hide_fold_call_click();
+ var num_playing = number_of_active_players();
+ if (num_playing < 2) {
+  gui_setup_fold_call_click("Start a new game", 0, new_game, new_game);
+  return;
+ }
+ HUMAN_GOES_ALL_IN = 0;
+ reset_player_statuses(1);
+ clear_bets();
+ clear_pot();
+ current_min_raise = 0;
+ collect_cards();
+ button_index = get_next_player_position(button_index, 1);
+ var i;
+ for (i = 0; i < players.length; i++) {
+  write_player(i, 0, 0);
+ }
+ for (i = 0; i < board.length; i++) {
+  if (i > 4) {
+   continue;
+  }
+  board[i] = "";
+  gui_lay_board_card(i, board[i]);
+ }
+ for (i = 0; i < 3; i++) {
+  board[i] = "";
+  gui_burn_board_card(i, board[i]);
+ }
+ var message = "<tr><td><font size=+2><b>New round</b></font>";
+ gui_write_game_response(message);
+ gui_hide_guick_raise();
+ shuffle();
+ blinds_and_deal();
+}
+
+function collect_cards() {
+ board = new Array(6);
+ for (var i = 0; i < players.length; i++) {
+  players[i].carda = "";
+  players[i].cardb = "";
+ }
+}
+
+function new_shuffle() {
+ function get_random_int(max) {
+  return Math.floor(Math.random() * max);
+ }
+ var len = cards.length;
+ for (var i = 0; i < len; ++i) {
+  var j = i + get_random_int(len - i);
+  var tmp = cards[i];
+  cards[i] = cards[j];
+  cards[j] = tmp;
+ }
+}
+
+function shuffle() {
+ new_shuffle();
+ deck_index = 0;
+}
+
+function blinds_and_deal() {
+ SMALL_BLIND = 5;
+ BIG_BLIND = 10;
+ var num_playing = number_of_active_players();
+ if (num_playing == 3) {
+  SMALL_BLIND = 10;
+  BIG_BLIND = 20;
+ } else if (num_playing < 3) {
+  SMALL_BLIND = 25;
+  BIG_BLIND = 50;
+ }
+ var small_blind = get_next_player_position(button_index, 1);
+ the_bet_function(small_blind, SMALL_BLIND);
+ write_player(small_blind, 0, 0);
+ var big_blind = get_next_player_position(small_blind, 1);
+ the_bet_function(big_blind, BIG_BLIND);
+ write_player(big_blind, 0, 0);
+ players[big_blind].status = "OPTION";
+ current_bettor_index = get_next_player_position(big_blind, 1);
+ deal_and_write_a();
+}
+
+function unroll_player(starting_player, player_pos, final_call) {
+ var next_player = get_next_player_position(player_pos, 1);
+ write_player(player_pos, 0, 0);
+ if (starting_player == next_player) {
+  setTimeout(final_call, 550 * global_speed);
+ } else {
+  setTimeout(unroll_player, 550 * global_speed, starting_player, next_player, final_call);
+ }
+}
+
+function deal_and_write_a() {
+ var current_player;
+ var start_player;
+ start_player = current_player = get_next_player_position(button_index, 1);
+ do {
+  players[current_player].carda = cards[deck_index++];
+  current_player = get_next_player_position(current_player, 1);
+ } while (current_player != start_player);
+ current_player = get_next_player_position(button_index, 1);
+ unroll_player(current_player, current_player, deal_and_write_b);
+}
+
+function delay_for_main() {
+ setTimeout(main, 1e3);
+}
+
+function deal_and_write_b() {
+ var current_player = button_index;
+ for (var i = 0; i < players.length; i++) {
+  current_player = get_next_player_position(current_player, 1);
+  if (players[current_player].cardb) {
+   break;
+  }
+  players[current_player].cardb = cards[deck_index++];
+ }
+ current_player = get_next_player_position(button_index, 1);
+ unroll_player(current_player, current_player, delay_for_main);
+}
+
+function go_to_betting() {
+ if (get_num_betting() > 1) {
+  setTimeout(main, 1e3 * global_speed);
+ } else {
+  setTimeout(ready_for_next_card, 1e3 * global_speed);
+ }
+}
+
+function unroll_table(last_pos, current_pos, final_call) {
+ gui_lay_board_card(current_pos, board[current_pos]);
+ if (current_pos == last_pos) {
+  setTimeout(final_call, 150 * global_speed);
+ } else {
+  setTimeout(unroll_table, 150 * global_speed, last_pos, current_pos + 1, final_call);
+ }
+}
+
+function deal_flop() {
+ var burn = cards[deck_index++];
+ burn = "blinded";
+ gui_burn_board_card(0, burn);
+ var message = "<tr><td><font size=+2><b>Dealing flop</b></font>";
+ gui_write_game_response(message);
+ for (var i = 0; i < 3; i++) {
+  board[i] = cards[deck_index++];
+ }
+ setTimeout(unroll_table, 1e3, 2, 0, go_to_betting);
+}
+
+function deal_fourth() {
+ var burn = cards[deck_index++];
+ burn = "blinded";
+ gui_burn_board_card(1, burn);
+ var message = "<tr><td><font size=+2><b>Dealing turn</b></font>";
+ gui_write_game_response(message);
+ board[3] = cards[deck_index++];
+ setTimeout(unroll_table, 1e3, 3, 3, go_to_betting);
+}
+
+function deal_fifth() {
+ var burn = cards[deck_index++];
+ burn = "blinded";
+ gui_burn_board_card(2, burn);
+ var message = "<tr><td><font size=+2><b>Dealing river</b></font>";
+ gui_write_game_response(message);
+ board[4] = cards[deck_index++];
+ setTimeout(unroll_table, 1e3, 4, 4, go_to_betting);
+}
+
+function main() {
+ gui_hide_guick_raise();
+ var increment_bettor_index = 0;
+ if (players[current_bettor_index].status == "BUST" || players[current_bettor_index].status == "FOLD") {
+  increment_bettor_index = 1;
+ } else if (!has_money(current_bettor_index)) {
+  players[current_bettor_index].status = "CALL";
+  increment_bettor_index = 1;
+ } else if (players[current_bettor_index].status == "CALL" && players[current_bettor_index].subtotal_bet == current_bet_amount) {
+  increment_bettor_index = 1;
+ } else {
+  players[current_bettor_index].status = "";
+  if (current_bettor_index == 0) {
+   var call_button_text = "<u>C</u>all";
+   var fold_button_text = "<font color=red><u>F</u>old</font>";
+   var to_call = current_bet_amount - players[0].subtotal_bet;
+   if (to_call > players[0].bankroll) {
+    to_call = players[0].bankroll;
+   }
+   call_button_text += " $" + to_call;
+   var that_is_not_the_key_you_are_looking_for;
+   if (to_call == 0) {
+    call_button_text = "<u>C</u>heck";
+    fold_button_text = 0;
+    that_is_not_the_key_you_are_looking_for = function(key) {
+     if (key == 67) {
+      human_call();
+     } else {
+      return true;
+     }
+     return false;
+    };
+   } else {
+    that_is_not_the_key_you_are_looking_for = function(key) {
+     if (key == 67) {
+      human_call();
+     } else if (key == 70) {
+      human_fold();
+     } else {
+      return true;
+     }
+     return false;
+    };
+   }
+   var ret_function = function(key_event) {
+    actual_function(key_event.keyCode, key_event);
+   };
+   var actual_function = function(key, key_event) {
+    if (that_is_not_the_key_you_are_looking_for(key)) {
+     return;
+    }
+    gui_disable_shortcut_keys(ret_function);
+    if (key_event != null) {
+     key_event.preventDefault();
+    }
+   };
+   var do_fold = function() {
+    actual_function(70, null);
+   };
+   var do_call = function() {
+    actual_function(67, null);
+   };
+   gui_enable_shortcut_keys(ret_function);
+   gui_setup_fold_call_click(fold_button_text, call_button_text, do_fold, do_call);
+   var quick_values = new Array(6);
+   if (to_call < players[0].bankroll) {
+    quick_values[0] = current_min_raise;
+   }
+   var quick_start = quick_values[0];
+   if (quick_start < 20) {
+    quick_start = 20;
+   } else {
+    quick_start = current_min_raise + 20;
+   }
+   var i;
+   for (i = 0; i < 5; i++) {
+    if (quick_start + 20 * i < players[0].bankroll) {
+     quick_values[i + 1] = quick_start + 20 * i;
+    }
+   }
+   var bet_or_raise = "Bet";
+   if (to_call > 0) {
+    bet_or_raise = "Raise";
+   }
+   var quick_bets = "<b>Quick " + bet_or_raise + "s</b><br>";
+   for (i = 0; i < 6; i++) {
+    if (quick_values[i]) {
+     quick_bets += "<a href='javascript:parent.handle_human_bet(" + quick_values[i] + ")'>" + quick_values[i] + "</a>" + "&nbsp;&nbsp;&nbsp;";
+    }
+   }
+   quick_bets += "<a href='javascript:parent.handle_human_bet(" + players[0].bankroll + ")'>All In!</a>";
+   var html9 = "<td><table align=center><tr><td align=center>";
+   var html10 = quick_bets + "</td></tr></table></td></tr></table></body></html>";
+   gui_write_guick_raise(html9 + html10);
+   var hi_lite_color = gui_get_theme_mode_highlite_color();
+   var message = "<tr><td><font size=+2><b>Current raise: " + current_bet_amount + "</b><br> You need <font color=" + hi_lite_color + " size=+3>" + to_call + "</font> more to call.</font></td></tr>";
+   gui_write_game_response(message);
+   write_player(0, 1, 0);
+   return;
+  } else {
+   write_player(current_bettor_index, 1, 0);
+   setTimeout(bet_from_bot, 777 * global_speed, current_bettor_index);
+   return;
+  }
+ }
+ var can_break = true;
+ for (var j = 0; j < players.length; j++) {
+  var s = players[j].status;
+  if (s == "OPTION") {
+   can_break = false;
+   break;
+  }
+  if (s != "BUST" && s != "FOLD") {
+   if (has_money(j) && players[j].subtotal_bet < current_bet_amount) {
+    can_break = false;
+    break;
+   }
+  }
+ }
+ if (increment_bettor_index) {
+  current_bettor_index = get_next_player_position(current_bettor_index, 1);
+ }
+ if (can_break) {
+  setTimeout(ready_for_next_card, 999 * global_speed);
+ } else {
+  setTimeout(main, 999 * global_speed);
+ }
+}
+
+var global_pot_remainder = 0;
+
+function handle_end_of_round() {
+ var candidates = new Array(players.length);
+ var allocations = new Array(players.length);
+ var winning_hands = new Array(players.length);
+ var my_total_bets_per_player = new Array(players.length);
+ var i;
+ var still_active_candidates = 0;
+ for (i = 0; i < candidates.length; i++) {
+  allocations[i] = 0;
+  my_total_bets_per_player[i] = players[i].total_bet;
+  if (players[i].status != "FOLD" && players[i].status != "BUST") {
+   candidates[i] = players[i];
+   still_active_candidates += 1;
+  }
+ }
+ var my_total_pot_size = get_pot_size();
+ var my_best_hand_name = "";
+ var best_hand_players;
+ var current_pot_to_split = 0;
+ var pot_remainder = 0;
+ if (global_pot_remainder) {
+  gui_log_to_history("transferring global pot remainder " + global_pot_remainder);
+  pot_remainder = global_pot_remainder;
+  my_total_pot_size += global_pot_remainder;
+  global_pot_remainder = 0;
+ }
+ while (my_total_pot_size > pot_remainder + .9 && still_active_candidates) {
+  var winners = get_winners(candidates);
+  if (!best_hand_players) {
+   best_hand_players = winners;
+  }
+  if (!winners) {
+   my_pseudo_alert("No winners for the pot ");
+   pot_remainder = my_total_pot_size;
+   my_total_pot_size = 0;
+   break;
+  }
+  var lowest_winner_bet = my_total_pot_size * 2;
+  var num_winners = 0;
+  for (i = 0; i < winners.length; i++) {
+   if (!winners[i]) {
+    continue;
+   }
+   if (!my_best_hand_name) {
+    my_best_hand_name = winners[i]["hand_name"];
+   }
+   num_winners++;
+   if (my_total_bets_per_player[i] < lowest_winner_bet) {
+    lowest_winner_bet = my_total_bets_per_player[i];
+   }
+  }
+  current_pot_to_split = pot_remainder;
+  pot_remainder = 0;
+  for (i = 0; i < players.length; i++) {
+   if (lowest_winner_bet >= my_total_bets_per_player[i]) {
+    current_pot_to_split += my_total_bets_per_player[i];
+    my_total_bets_per_player[i] = 0;
+   } else {
+    current_pot_to_split += lowest_winner_bet;
+    my_total_bets_per_player[i] -= lowest_winner_bet;
+   }
+  }
+  var share = Math.floor(current_pot_to_split / num_winners);
+  pot_remainder = current_pot_to_split - share * num_winners;
+  for (i = 0; i < winners.length; i++) {
+   if (my_total_bets_per_player[i] < .01) {
+    candidates[i] = null;
+   }
+   if (!winners[i]) {
+    continue;
+   }
+   my_total_pot_size -= share;
+   allocations[i] += share;
+   winning_hands[i] = winners[i].hand_name;
+  }
+  for (i = 0; i < candidates.length; i++) {
+   if (candidates[i] == null) {
+    continue;
+   }
+   still_active_candidates += 1;
+  }
+  if (still_active_candidates == 0) {
+   pot_remainder = my_total_pot_size;
+  }
+  gui_log_to_history("End of iteration");
+ }
+ global_pot_remainder = pot_remainder;
+ pot_remainder = 0;
+ var winner_text = "";
+ var human_loses = 0;
+ for (i = 0; i < allocations.length; i++) {
+  if (allocations[i] > 0) {
+   var a_string = "" + allocations[i];
+   var dot_index = a_string.indexOf(".");
+   if (dot_index > 0) {
+    a_string = "" + a_string + "00";
+    allocations[i] = a_string.substring(0, dot_index + 3) - 0;
+   }
+   winner_text += winning_hands[i] + " gives " + allocations[i] + " to " + players[i].name + ". ";
+   players[i].bankroll += allocations[i];
+   if (best_hand_players[i]) {
+    write_player(i, 2, 1);
+   } else {
+    write_player(i, 1, 1);
+   }
+  } else {
+   if (!has_money(i) && players[i].status != "BUST") {
+    players[i].status = "BUST";
+    if (i == 0) {
+     human_loses = 1;
+    }
+   }
+   if (players[i].status != "FOLD") {
+    write_player(i, 0, 1);
+   }
+  }
+ }
+ if (allocations[0] > 5) {
+  HUMAN_WINS_AGAIN++;
+ } else {
+  HUMAN_WINS_AGAIN = 0;
+ }
+ var detail = "";
+ for (i = 0; i < players.length; i++) {
+  if (players[i].total_bet == 0 && players[i].status == "BUST") {
+   continue;
+  }
+  detail += players[i].name + " bet " + players[i].total_bet + " & got " + allocations[i] + ".\\n";
+ }
+ detail = " (<a href='javascript:alert(\"" + detail + "\")'>details</a>)";
+ var quit_text = "<font color=red>Restart</font>";
+ var quit_func = new_game;
+ var continue_text = "<font color=green>Go on</font>";
+ var continue_func = new_round;
+ if (players[0].status == "BUST" && !human_loses) {
+  continue_text = 0;
+  quit_func = function() {
+   parent.STOP_AUTOPLAY = 1;
+  };
+  setTimeout(autoplay_new_round, 1500 + 1100 * global_speed);
+ }
+ var num_playing = number_of_active_players();
+ if (num_playing < 2) {
+  for (i = 0; i < players.length; i++) {
+   if (has_money(i)) {
+    players[i].bankroll += pot_remainder;
+    pot_remainder = 0;
+   }
+  }
+ }
+ if (pot_remainder) {
+  var local_text = "There is " + pot_remainder + " put into next pot\n";
+  detail += local_text;
+ }
+ var hi_lite_color = gui_get_theme_mode_highlite_color();
+ var html = "<html><body topmargin=2 bottommargin=0 bgcolor=" + BG_HILITE + " onload='document.f.c.focus();'><table><tr><td>" + get_pot_size_html() + "</td></tr></table><br><font size=+2 color=" + hi_lite_color + "><b>Winning: " + winner_text + "</b></font>" + detail + "<br>";
+ gui_write_game_response(html);
+ gui_setup_fold_call_click(quit_text, continue_text, quit_func, continue_func);
+ var elapsed_milliseconds = new Date - START_DATE;
+ var elapsed_time = makeTimeString(elapsed_milliseconds);
+ if (human_loses == 1) {
+  var ending = NUM_ROUNDS == 1 ? "1 deal." : NUM_ROUNDS + " deals.";
+  my_pseudo_alert("Sorry, you busted " + players[0].name + ".\n\n" + elapsed_time + ", " + ending);
+ } else {
+  num_playing = number_of_active_players();
+  if (num_playing < 2) {
+   var end_msg = "GAME OVER!";
+   var over_ending = NUM_ROUNDS == 1 ? "1 deal." : NUM_ROUNDS + " deals.";
+   if (has_money(0)) {
+    end_msg += "\n\nYOU WIN " + players[0].name.toUpperCase() + "!!!";
+   } else {
+    end_msg += "\n\nSorry, you lost.";
+   }
+   my_pseudo_alert(end_msg + "\n\nThis game lasted " + elapsed_time + ", " + over_ending);
+  }
+ }
+}
+
+function autoplay_new_round() {
+ if (STOP_AUTOPLAY > 0) {
+  STOP_AUTOPLAY = 0;
+  new_game();
+ } else {
+  new_round();
+ }
+}
+
+function ready_for_next_card() {
+ var num_betting = get_num_betting();
+ var i;
+ for (i = 0; i < players.length; i++) {
+  players[i].total_bet += players[i].subtotal_bet;
+ }
+ clear_bets();
+ if (board[4]) {
+  handle_end_of_round();
+  return;
+ }
+ current_min_raise = BIG_BLIND;
+ reset_player_statuses(2);
+ if (players[button_index].status == "FOLD") {
+  players[get_next_player_position(button_index, -1)].status = "OPTION";
+ } else {
+  players[button_index].status = "OPTION";
+ }
+ current_bettor_index = get_next_player_position(button_index, 1);
+ var show_cards = 0;
+ if (num_betting < 2) {
+  show_cards = 1;
+ }
+ if (!RUN_EM) {
+  for (i = 0; i < players.length; i++) {
+   if (players[i].status != "BUST" && players[i].status != "FOLD") {
+    write_player(i, 0, show_cards);
+   }
+  }
+ }
+ if (num_betting < 2) {
+  RUN_EM = 1;
+ }
+ if (!board[0]) {
+  deal_flop();
+ } else if (!board[3]) {
+  deal_fourth();
+ } else if (!board[4]) {
+  deal_fifth();
+ }
+}
+
+function the_bet_function(player_index, bet_amount) {
+ if (players[player_index].status == "FOLD") {
+  return 0;
+ } else if (bet_amount >= players[player_index].bankroll) {
+  bet_amount = players[player_index].bankroll;
+  var old_current_bet = current_bet_amount;
+  if (players[player_index].subtotal_bet + bet_amount > current_bet_amount) {
+   current_bet_amount = players[player_index].subtotal_bet + bet_amount;
+  }
+  var new_current_min_raise = current_bet_amount - old_current_bet;
+  if (new_current_min_raise > current_min_raise) {
+   current_min_raise = new_current_min_raise;
+  }
+  players[player_index].status = "CALL";
+ } else if (bet_amount + players[player_index].subtotal_bet == current_bet_amount) {
+  players[player_index].status = "CALL";
+ } else if (current_bet_amount > players[player_index].subtotal_bet + bet_amount) {
+  if (player_index == 0) {
+   my_pseudo_alert("The current bet to match is " + current_bet_amount + "\nYou must bet a total of at least " + (current_bet_amount - players[player_index].subtotal_bet) + " or fold.");
+  }
+  return 0;
+ } else if (bet_amount + players[player_index].subtotal_bet > current_bet_amount && get_pot_size() > 0 && bet_amount + players[player_index].subtotal_bet - current_bet_amount < current_min_raise) {
+  if (player_index == 0) {
+   my_pseudo_alert("Minimum raise is currently " + current_min_raise + ".");
+  }
+  return 0;
+ } else {
+  players[player_index].status = "CALL";
+  var previous_current_bet = current_bet_amount;
+  current_bet_amount = players[player_index].subtotal_bet + bet_amount;
+  if (get_pot_size() > 0) {
+   current_min_raise = current_bet_amount - previous_current_bet;
+   if (current_min_raise < BIG_BLIND) {
+    current_min_raise = BIG_BLIND;
+   }
+  }
+ }
+ players[player_index].subtotal_bet += bet_amount;
+ players[player_index].bankroll -= bet_amount;
+ var current_pot_size = get_pot_size();
+ gui_write_basic_general(current_pot_size);
+ return 1;
+}
+
+function human_call() {
+ gui_hide_fold_call_click();
+ players[0].status = "CALL";
+ current_bettor_index = get_next_player_position(0, 1);
+ the_bet_function(0, current_bet_amount - players[0].subtotal_bet);
+ write_player(0, 0, 0);
+ main();
+}
+
+function handle_human_bet(bet_amount) {
+ if (bet_amount < 0 || isNaN(bet_amount)) bet_amount = 0;
+ var to_call = current_bet_amount - players[0].subtotal_bet;
+ bet_amount += to_call;
+ var is_ok_bet = the_bet_function(0, bet_amount);
+ if (is_ok_bet) {
+  players[0].status = "CALL";
+  current_bettor_index = get_next_player_position(0, 1);
+  write_player(0, 0, 0);
+  main();
+  gui_hide_guick_raise();
+ } else {
+  return;
+ }
+}
+
+function human_fold() {
+ players[0].status = "FOLD";
+ gui_hide_fold_call_click();
+ current_bettor_index = get_next_player_position(0, 1);
+ write_player(0, 0, 0);
+ var current_pot_size = get_pot_size();
+ gui_write_basic_general(current_pot_size);
+ main();
+}
+
+function bet_from_bot(x) {
+ var b = 0;
+ var n = current_bet_amount - players[x].subtotal_bet;
+ if (!board[0]) b = bot_get_preflop_bet(); else b = bot_get_postflop_bet();
+ if (b >= players[x].bankroll) {
+  players[x].status = "";
+ } else if (b < n) {
+  b = 0;
+  players[x].status = "FOLD";
+ } else if (b == n) {
+  players[x].status = "CALL";
+ } else if (b > n) {
+  if (b - n < current_min_raise) {
+   b = n;
+   players[x].status = "CALL";
+  } else {
+   players[x].status = "";
+  }
+ }
+ if (the_bet_function(x, b) == 0) {
+  players[x].status = "FOLD";
+  the_bet_function(x, 0);
+ }
+ write_player(current_bettor_index, 0, 0);
+ current_bettor_index = get_next_player_position(current_bettor_index, 1);
+ main();
+}
+
+function write_player(n, hilite, show_cards) {
+ var carda = "";
+ var cardb = "";
+ var name_background_color = "";
+ var name_font_color = "";
+ if (hilite == 1) {
+  name_background_color = BG_HILITE;
+  name_font_color = "black";
+ } else if (hilite == 2) {
+  name_background_color = "red";
+ }
+ if (players[n].status == "FOLD") {
+  name_font_color = "black";
+  name_background_color = "gray";
+ }
+ if (players[n].status == "BUST") {
+  name_font_color = "white";
+  name_background_color = "black";
+ }
+ gui_hilite_player(name_background_color, name_font_color, n);
+ var show_folded = false;
+ if (players[0].status == "BUST" || players[0].status == "FOLD") {
+  show_cards = 1;
+ }
+ if (players[n].carda) {
+  if (players[n].status == "FOLD") {
+   carda = "";
+   show_folded = true;
+  } else {
+   carda = "blinded";
+  }
+  if (n == 0 || show_cards && players[n].status != "FOLD") {
+   carda = players[n].carda;
+  }
+ }
+ if (players[n].cardb) {
+  if (players[n].status == "FOLD") {
+   cardb = "";
+   show_folded = true;
+  } else {
+   cardb = "blinded";
+  }
+  if (n == 0 || show_cards && players[n].status != "FOLD") {
+   cardb = players[n].cardb;
+  }
+ }
+ if (n == button_index) {
+  gui_place_dealer_button(n);
+ }
+ var bet_text = "TO BE OVERWRITTEN";
+ var allin = "Bet:";
+ if (players[n].status == "FOLD") {
+  bet_text = "FOLDED (" + (players[n].subtotal_bet + players[n].total_bet) + ")";
+  if (n == 0) {
+   HUMAN_GOES_ALL_IN = 0;
+  }
+ } else if (players[n].status == "BUST") {
+  bet_text = "BUSTED";
+  if (n == 0) {
+   HUMAN_GOES_ALL_IN = 0;
+  }
+ } else if (!has_money(n)) {
+  bet_text = "ALL IN (" + (players[n].subtotal_bet + players[n].total_bet) + ")";
+  if (n == 0) {
+   HUMAN_GOES_ALL_IN = 1;
+  }
+ } else {
+  bet_text = allin + "$" + players[n].subtotal_bet + " (" + (players[n].subtotal_bet + players[n].total_bet) + ")";
+ }
+ gui_set_player_name(players[n].name, n);
+ gui_set_bet(bet_text, n);
+ gui_set_bankroll(players[n].bankroll, n);
+ gui_set_player_cards(carda, cardb, n, show_folded);
+}
+
+function make_readable_rank(r) {
+ if (r < 11) {
+  return r;
+ } else if (r == 11) {
+  return "J";
+ } else if (r == 12) {
+  return "Q";
+ } else if (r == 13) {
+  return "K";
+ } else if (r == 14) {
+  return "A";
+ }
+}
+
+function get_pot_size() {
+ var p = 0;
+ for (var i = 0; i < players.length; i++) {
+  p += players[i].total_bet + players[i].subtotal_bet;
+ }
+ return p;
+}
+
+function get_pot_size_html() {
+ return "<font size=+4><b>TOTAL POT: " + get_pot_size() + "</b></font>";
+}
+
+function clear_bets() {
+ for (var i = 0; i < players.length; i++) {
+  players[i].subtotal_bet = 0;
+ }
+ current_bet_amount = 0;
+}
+
+function clear_pot() {
+ for (var i = 0; i < players.length; i++) {
+  players[i].total_bet = 0;
+ }
+}
+
+function reset_player_statuses(type) {
+ for (var i = 0; i < players.length; i++) {
+  if (type == 0) {
+   players[i].status = "";
+  } else if (type == 1 && players[i].status != "BUST") {
+   players[i].status = "";
+  } else if (type == 2 && players[i].status != "FOLD" && players[i].status != "BUST") {
+   players[i].status = "";
+  }
+ }
+}
+
+function get_num_betting() {
+ var n = 0;
+ for (var i = 0; i < players.length; i++) {
+  if (players[i].status != "FOLD" && players[i].status != "BUST" && has_money(i)) {
+   n++;
+  }
+ }
+ return n;
+}
+
+function change_name() {
+ var name = prompt("What is your name?", getLocalStorage("playername") || "");
+ if (!name) {
+  return;
+ }
+ if (!players) {
+  my_pseudo_alert("Too early to get a name");
+  return;
+ }
+ if (name.length > 14) {
+  my_pseudo_alert("Too long, I will call you Sue");
+  name = "Sue";
+ }
+ players[0].name = name;
+ write_player(0, 0, 0);
+ setLocalStorage("playername", name);
+}
+
+function write_settings_frame() {
+ var default_speed = 2;
+ var speed_i = getLocalStorage("gamespeed");
+ if (speed_i == "") {
+  speed_i = default_speed;
+ }
+ if (speed_i == null || speed_i != 0 && speed_i != 1 && speed_i != 2 && speed_i != 3 && speed_i != 4) {
+  speed_i = default_speed;
+ }
+ set_speed(speed_i);
+ gui_setup_option_buttons(change_name, set_raw_speed);
+}
+
+function index2speed(index) {
+ var speeds = [ "2", "1", ".6", ".3", "0.01" ];
+ return speeds[index];
+}
+
+function set_speed(index) {
+ global_speed = index2speed(index);
+ setLocalStorage("gamespeed", index);
+ gui_set_selected_speed_option(index);
+}
+
+function set_raw_speed(selector_index) {
+ if (selector_index < 1 || selector_index > 5) {
+  my_pseudo_alert("Cannot set speed to " + selector_index);
+  selector_index = 3;
+ }
+ var index = selector_index - 1;
+ set_speed(index);
+}
+
+function get_next_player_position(i, delta) {
+ var j = 0;
+ var step = 1;
+ if (delta < 0) step = -1;
+ var loop_on = 0;
+ do {
+  i += step;
+  if (i >= players.length) {
+   i = 0;
+  } else {
+   if (i < 0) {
+    i = players.length - 1;
+   }
+  }
+  loop_on = 0;
+  if (players[i].status == "BUST") loop_on = 1;
+  if (players[i].status == "FOLD") loop_on = 1;
+  if (++j < delta) loop_on = 1;
+ } while (loop_on);
+ return i;
+}
+
+function getLocalStorage(key) {
+ try {
+  return window.localStorage.getItem(key);
+ } catch (e) {
+  return null;
+ }
+}
+
+function setLocalStorage(key, value) {
+ try {
+  window.localStorage.setItem(key, value);
+ } catch (e) {}
+}
+
+function has_money(i) {
+ if (players[i].bankroll >= .01) {
+  return true;
+ }
+ return false;
+}
+
+function compRan() {
+ return .5 - Math.random();
+}
+
+function my_local_subtime(invalue, fractionizer) {
+ var quotient = 0;
+ var remainder = invalue;
+ if (invalue > fractionizer) {
+  quotient = Math.floor(invalue / fractionizer);
+  remainder = invalue - quotient * fractionizer;
+ }
+ return [ quotient, remainder ];
+}
+
+function getTimeText(string, number, text) {
+ if (number == 0) return string;
+ if (string.length > 0) {
+  string += " ";
+ }
+ if (number == 1) {
+  string = string + "1 " + text;
+ } else {
+  string = string + number + " " + text + "s";
+ }
+ return string;
+}
+
+function makeTimeString(milliseconds) {
+ var _MS_PER_SECOND = 1e3;
+ var _MS_PER_MINUTE = 1e3 * 60;
+ var _MS_PER_HOUR = _MS_PER_MINUTE * 60;
+ var _MS_PER_DAY = 1e3 * 60 * 60 * 24;
+ var _MS_PER_WEEK = _MS_PER_DAY * 7;
+ var weeks = 0;
+ var days = 0;
+ var hours = 0;
+ var minutes = 0;
+ var seconds = 0;
+ [weeks, milliseconds] = my_local_subtime(milliseconds, _MS_PER_WEEK);
+ [days, milliseconds] = my_local_subtime(milliseconds, _MS_PER_DAY);
+ [hours, milliseconds] = my_local_subtime(milliseconds, _MS_PER_HOUR);
+ [minutes, milliseconds] = my_local_subtime(milliseconds, _MS_PER_MINUTE);
+ [seconds, milliseconds] = my_local_subtime(milliseconds, _MS_PER_SECOND);
+ var string = "";
+ string = getTimeText(string, weeks, "week");
+ string = getTimeText(string, days, "day");
+ string = getTimeText(string, hours, "hour");
+ string = getTimeText(string, minutes, "minute");
+ string = getTimeText(string, seconds, "second");
+ return string;
+}
+
+var tests = [ "straight_flush", "four_of_a_kind", "full_house", "flush", "straight", "three_of_a_kind", "two_pair", "one_pair", "hi_card" ];
+
+function get_winners(my_players) {
+ var winners;
+ for (var i = 0; i < tests.length; i++) {
+  winners = winners_helper(my_players, tests[i]);
+  if (winners) {
+   break;
+  }
+ }
+ return winners;
+}
+
+function execute_test(string, player) {
+ if (string === "test_straight_flush") {
+  return test_straight_flush(player);
+ }
+ if (string === "test_four_of_a_kind") {
+  return test_four_of_a_kind(player);
+ }
+ if (string === "test_full_house") {
+  return test_full_house(player);
+ }
+ if (string === "test_flush") {
+  return test_flush(player);
+ }
+ if (string === "test_straight") {
+  return test_straight(player);
+ }
+ if (string === "test_three_of_a_kind") {
+  return test_three_of_a_kind(player);
+ }
+ if (string === "test_two_pair") {
+  return test_two_pair(player);
+ }
+ if (string === "test_one_pair") {
+  return test_one_pair(player);
+ }
+ if (string === "test_hi_card") {
+  return test_hi_card(player);
+ }
+ alert("execute_test() cannot tokenize " + string);
+}
+
+function execute_compare(string, hand_in, best_hand) {
+ if (string === "compare_straight_flush") {
+  return compare_straight_flush(hand_in, best_hand);
+ }
+ if (string === "compare_four_of_a_kind") {
+  return compare_four_of_a_kind(hand_in, best_hand);
+ }
+ if (string === "compare_full_house") {
+  return compare_full_house(hand_in, best_hand);
+ }
+ if (string === "compare_flush") {
+  return compare_flush(hand_in, best_hand);
+ }
+ if (string === "compare_straight") {
+  return compare_straight(hand_in, best_hand);
+ }
+ if (string === "compare_three_of_a_kind") {
+  return compare_three_of_a_kind(hand_in, best_hand);
+ }
+ if (string === "compare_two_pair") {
+  return compare_two_pair(hand_in, best_hand);
+ }
+ if (string === "compare_one_pair") {
+  return compare_one_pair(hand_in, best_hand);
+ }
+ if (string === "compare_hi_card") {
+  return compare_hi_card(hand_in, best_hand);
+ }
+ alert("execute_compare() cannot tokenize " + string);
+}
+
+function winners_helper(my_players, test) {
+ var best;
+ var winners = new Array(my_players.length);
+ for (var i = 0; i < my_players.length; i++) {
+  if (!my_players[i]) {
+   continue;
+  }
+  var a = execute_test("test_" + test, my_players[i]);
+  var num_needed = a["num_needed"];
+  if (num_needed > 0 || num_needed == 0 && num_needed != "0") {
+   continue;
+  }
+  if (typeof best === "undefined") {
+   best = a;
+   winners = new Array(my_players.length);
+   winners[i] = a;
+  } else {
+   var comp = execute_compare("compare_" + test, a, best);
+   if (comp == "a") {
+    best = a;
+    winners = new Array(my_players.length);
+    winners[i] = a;
+   } else if (comp == "b") {} else if (comp == "c") {
+    winners[i] = a;
+   }
+  }
+ }
+ for (i = 0; i < winners.length; i++) {
+  if (winners[i]) {
+   return winners;
+  }
+ }
+ return null;
+}
+
+function test_straight_flush(player) {
+ var my_cards = group_cards(player);
+ var the_suit = get_predominant_suit(my_cards);
+ var working_cards = new Array(8);
+ var working_index = 0;
+ for (var i = 0; i < 7; i++) {
+  if (get_suit(my_cards[i]) == the_suit) {
+   var my_rank = get_rank(my_cards[i]);
+   working_cards[working_index++] = my_rank;
+   if (my_rank == 14) {
+    working_cards[7] = 1;
+   }
+  }
+ }
+ for (i = 0; i < working_cards.length; i++) {
+  if (working_cards[i] == null) {
+   working_cards[i] = -1;
+  }
+ }
+ working_cards.sort(compNum);
+ var absolute_longest_stretch = 0;
+ var absolute_hi_card = 0;
+ var current_longest_stretch = 1;
+ var current_hi_card = 0;
+ for (i = 0; i < 8; i++) {
+  var a = working_cards[i];
+  var b = working_cards[i + 1];
+  if (a && b && a - b == 1) {
+   current_longest_stretch++;
+   if (current_hi_card < 1) current_hi_card = a;
+  } else if (a) {
+   if (current_longest_stretch > absolute_longest_stretch) {
+    absolute_longest_stretch = current_longest_stretch;
+    if (current_hi_card < 1) current_hi_card = a;
+    absolute_hi_card = current_hi_card;
+   }
+   current_longest_stretch = 1;
+   current_hi_card = 0;
+  }
+ }
+ var num_mine = 0;
+ for (i = 0; i < absolute_longest_stretch; i++) {
+  if (the_suit + (absolute_hi_card - i) == player.carda || the_suit + (absolute_hi_card - i) == player.cardb) num_mine++;
+ }
+ var hash_result = {};
+ hash_result["straight_hi"] = absolute_hi_card;
+ hash_result["num_needed"] = 5 - absolute_longest_stretch;
+ hash_result["num_mine"] = num_mine;
+ hash_result["hand_name"] = "Straight Flush";
+ return hash_result;
+}
+
+function compare_straight_flush(a, b) {
+ return compare_straight(a, b);
+}
+
+function test_four_of_a_kind(player) {
+ var i;
+ var my_cards = group_cards(player);
+ var ranks = new Array(13);
+ for (i = 0; i < 13; i++) {
+  ranks[i] = 0;
+ }
+ for (i = 0; i < my_cards.length; i++) {
+  ranks[get_rank(my_cards[i]) - 2]++;
+ }
+ var four = "";
+ var kicker = "";
+ for (i = 0; i < 13; i++) {
+  if (ranks[i] == 4) {
+   four = i + 2;
+  } else if (ranks[i] > 0) {
+   kicker = i + 2;
+  }
+ }
+ var num_mine = 0;
+ if (get_rank(player.carda) == four) {
+  num_mine++;
+ }
+ if (get_rank(player.cardb) == four) {
+  num_mine++;
+ }
+ var num_needed = 4;
+ if (four) {
+  num_needed = 0;
+ }
+ var hash_result = {};
+ hash_result["rank"] = four;
+ hash_result["kicker"] = kicker;
+ hash_result["num_needed"] = num_needed;
+ hash_result["num_mine"] = num_mine;
+ hash_result["hand_name"] = "Four of a Kind";
+ return hash_result;
+}
+
+function compare_four_of_a_kind(a, b) {
+ var rank_a = a["rank"];
+ var rank_b = b["rank"];
+ if (rank_a > rank_b) return "a"; else if (rank_b > rank_a) return "b"; else {
+  var kicker_a = a["kicker"];
+  var kicker_b = b["kicker"];
+  if (kicker_a > kicker_b) return "a"; else if (kicker_b > kicker_a) return "b"; else return "c";
+ }
+}
+
+function test_full_house(player) {
+ var my_cards = group_cards(player);
+ var ranks = new Array(13);
+ var i;
+ for (i = 0; i < 13; i++) {
+  ranks[i] = 0;
+ }
+ for (i = 0; i < my_cards.length; i++) {
+  ranks[get_rank(my_cards[i]) - 2]++;
+ }
+ var three = "";
+ var two = "";
+ for (i = 0; i < 13; i++) {
+  if (ranks[i] == 3) {
+   if (three > two) {
+    two = three;
+   }
+   three = i + 2;
+  } else if (ranks[i] == 2) {
+   two = i + 2;
+  }
+ }
+ var num_needed = 5;
+ var major_rank = "";
+ var num_mine_major = 0;
+ if (three) {
+  num_needed -= 3;
+  major_rank = three;
+  if (get_rank(player.carda) == three) num_mine_major += 1;
+  if (get_rank(player.cardb) == three) num_mine_major += 1;
+ }
+ var hash_result = {};
+ hash_result["major_rank"] = major_rank;
+ hash_result["num_mine_major"] = num_mine_major;
+ var minor_rank = "";
+ var num_mine_minor = 0;
+ if (two) {
+  num_needed -= 2;
+  minor_rank = two;
+  if (get_rank(player.carda) == two) num_mine_minor += 1;
+  if (get_rank(player.cardb) == two) num_mine_minor += 1;
+ }
+ hash_result["minor_rank"] = minor_rank;
+ hash_result["num_mine_minor"] = num_mine_minor;
+ hash_result["num_mine"] = num_mine_minor + num_mine_major;
+ hash_result["num_needed"] = num_needed;
+ hash_result["hand_name"] = "Full House";
+ return hash_result;
+}
+
+function compare_full_house(a, b) {
+ var major_a = a["major_rank"];
+ var major_b = b["major_rank"];
+ if (major_a > major_b) return "a"; else if (major_b > major_a) return "b"; else {
+  var minor_a = a["minor_rank"];
+  var minor_b = b["minor_rank"];
+  if (minor_a > minor_b) return "a"; else if (minor_b > minor_a) return "b"; else return "c";
+ }
+}
+
+function test_flush(player) {
+ var i;
+ var my_cards = group_cards(player);
+ var the_suit = get_predominant_suit(my_cards);
+ var working_cards = new Array(7);
+ var working_index = 0;
+ var num_in_flush = 0;
+ for (i = 0; i < my_cards.length; i++) {
+  if (get_suit(my_cards[i]) == the_suit) {
+   num_in_flush++;
+   working_cards[working_index++] = get_rank(my_cards[i]);
+  }
+ }
+ for (i = 0; i < working_cards.length; i++) {
+  if (working_cards[i] == null) {
+   working_cards[i] = -1;
+  }
+ }
+ working_cards.sort(compNum);
+ var hash_result = {};
+ var num_mine = 0;
+ for (i = 0; i < 5; i++) {
+  var s = working_cards[i];
+  if (!s) s = "";
+  hash_result["flush_" + i] = s;
+  if (the_suit + working_cards[i] == player.carda || the_suit + working_cards[i] == player.cardb) num_mine++;
+ }
+ hash_result["num_needed"] = 5 - num_in_flush;
+ hash_result["num_mine"] = num_mine;
+ hash_result["suit"] = the_suit;
+ hash_result["hand_name"] = "Flush";
+ return hash_result;
+}
+
+function compare_flush(a, b) {
+ for (var i = 0; i < 5; i++) {
+  var flush_a = a["flush_" + i];
+  var flush_b = b["flush_" + i];
+  if (flush_a > flush_b) {
+   return "a";
+  } else if (flush_b > flush_a) {
+   return "b";
+  }
+ }
+ return "c";
+}
+
+function test_straight(player) {
+ var i;
+ var my_cards = group_cards(player);
+ var working_cards = new Array(8);
+ var ranks = new Array(13);
+ for (i = 0; i < 7; i++) {
+  var my_rank = get_rank(my_cards[i]);
+  if (ranks[my_rank - 2]) continue; else ranks[my_rank - 2] = 1;
+  working_cards[i] = my_rank;
+  if (my_rank == 14) {
+   working_cards[7] = 1;
+  }
+ }
+ for (i = 0; i < working_cards.length; i++) {
+  if (working_cards[i] == null) {
+   working_cards[i] = -1;
+  }
+ }
+ working_cards.sort(compNum);
+ var absolute_longest_stretch = 0;
+ var absolute_hi_card = 0;
+ var current_longest_stretch = 1;
+ var current_hi_card = 0;
+ for (i = 0; i < 8; i++) {
+  var a = working_cards[i];
+  var b = working_cards[i + 1];
+  if (a && b && a - b == 1) {
+   current_longest_stretch++;
+   if (current_hi_card < 1) {
+    current_hi_card = a;
+   }
+  } else if (a) {
+   if (current_longest_stretch > absolute_longest_stretch) {
+    absolute_longest_stretch = current_longest_stretch;
+    if (current_hi_card < 1) {
+     current_hi_card = a;
+    }
+    absolute_hi_card = current_hi_card;
+   }
+   current_longest_stretch = 1;
+   current_hi_card = 0;
+  }
+ }
+ var num_mine = 0;
+ for (i = 0; i < absolute_longest_stretch; i++) {
+  if (absolute_hi_card - i == get_rank(player.carda) || absolute_hi_card - i == get_rank(player.cardb)) {
+   num_mine++;
+  }
+ }
+ var hash_result = {};
+ hash_result["straight_hi"] = absolute_hi_card;
+ hash_result["num_needed"] = 5 - absolute_longest_stretch;
+ hash_result["num_mine"] = num_mine;
+ hash_result["hand_name"] = "Straight";
+ return hash_result;
+}
+
+function compare_straight(a, b) {
+ var hi_a = a["straight_hi"];
+ var hi_b = b["straight_hi"];
+ if (hi_a > hi_b) {
+  return "a";
+ } else if (hi_b > hi_a) {
+  return "b";
+ } else {
+  return "c";
+ }
+}
+
+function test_three_of_a_kind(player) {
+ var i;
+ var my_cards = group_cards(player);
+ var ranks = new Array(13);
+ for (i = 0; i < 13; i++) {
+  ranks[i] = 0;
+ }
+ for (i = 0; i < my_cards.length; i++) {
+  ranks[get_rank(my_cards[i]) - 2]++;
+ }
+ var three = "";
+ var kicker_1 = "";
+ var kicker_2 = "";
+ for (i = 0; i < 13; i++) {
+  if (ranks[i] == 3) {
+   three = i + 2;
+  } else if (ranks[i] == 1) {
+   kicker_2 = kicker_1;
+   kicker_1 = i + 2;
+  } else if (ranks[i] > 1) {
+   kicker_1 = i + 2;
+   kicker_2 = i + 2;
+  }
+ }
+ var num_mine = 0;
+ if (get_rank(player.carda) == three) {
+  num_mine++;
+ }
+ if (get_rank(player.cardb) == three) {
+  num_mine++;
+ }
+ var num_needed = 3;
+ if (three) {
+  num_needed = 0;
+ }
+ var hash_result = {};
+ hash_result["rank"] = three;
+ hash_result["num_needed"] = num_needed;
+ hash_result["num_mine"] = num_mine;
+ hash_result["kicker_1"] = kicker_1;
+ hash_result["kicker_2"] = kicker_2;
+ hash_result["hand_name"] = "Three of a Kind";
+ return hash_result;
+}
+
+function compare_three_of_a_kind(a, b) {
+ var rank_a = a["rank"];
+ var rank_b = b["rank"];
+ if (rank_a > rank_b) {
+  return "a";
+ }
+ if (rank_b > rank_a) {
+  return "b";
+ }
+ var kicker_a = a["kicker_1"];
+ var kicker_b = b["kicker_1"];
+ if (kicker_a > kicker_b) {
+  return "a";
+ }
+ if (kicker_b > kicker_a) {
+  return "b";
+ }
+ kicker_a = a["kicker_2"];
+ kicker_b = b["kicker_2"];
+ if (kicker_a > kicker_b) {
+  return "a";
+ }
+ if (kicker_b > kicker_a) {
+  return "b";
+ }
+ return "c";
+}
+
+function test_two_pair(player) {
+ var i;
+ var my_cards = group_cards(player);
+ var ranks = new Array(13);
+ for (i = 0; i < 13; i++) ranks[i] = 0;
+ for (i = 0; i < my_cards.length; i++) ranks[get_rank(my_cards[i]) - 2]++;
+ var first = "";
+ var second = "";
+ var kicker = "";
+ for (i = 12; i > -1; i--) {
+  if (ranks[i] == 2) {
+   if (!first) {
+    first = i + 2;
+   } else if (!second) {
+    second = i + 2;
+   } else if (!kicker) {
+    kicker = i + 2;
+   } else {
+    break;
+   }
+  } else if (!kicker && ranks[i] > 0) {
+   kicker = i + 2;
+  }
+ }
+ var num_mine = 0;
+ if (get_rank(player.carda) == first || get_rank(player.carda) == second) {
+  num_mine++;
+ }
+ if (get_rank(player.cardb) == first || get_rank(player.cardb) == second) {
+  num_mine++;
+ }
+ var num_needed = 2;
+ if (second) num_needed = 0; else if (first) num_needed = 1; else num_needed = 2;
+ var hash_result = {};
+ hash_result["rank_1"] = first;
+ hash_result["rank_2"] = second;
+ hash_result["num_needed"] = num_needed;
+ hash_result["num_mine"] = num_mine;
+ hash_result["kicker"] = kicker;
+ hash_result["hand_name"] = "Two Pair";
+ return hash_result;
+}
+
+function compare_two_pair(a, b) {
+ var rank_a = a["rank_1"];
+ var rank_b = b["rank_1"];
+ if (rank_a > rank_b) {
+  return "a";
+ }
+ if (rank_b > rank_a) {
+  return "b";
+ }
+ rank_a = a["rank_2"];
+ rank_b = b["rank_2"];
+ if (rank_a > rank_b) {
+  return "a";
+ }
+ if (rank_b > rank_a) {
+  return "b";
+ }
+ var kicker_a = a["kicker"];
+ var kicker_b = b["kicker"];
+ if (kicker_a > kicker_b) {
+  return "a";
+ }
+ if (kicker_b > kicker_a) {
+  return "b";
+ }
+ return "c";
+}
+
+function test_one_pair(player) {
+ var i;
+ var my_cards = group_cards(player);
+ var ranks = new Array(13);
+ for (i = 0; i < 13; i++) {
+  ranks[i] = 0;
+ }
+ for (i = 0; i < my_cards.length; i++) {
+  ranks[get_rank(my_cards[i]) - 2]++;
+ }
+ var pair = 0;
+ var kicker_1 = "";
+ var kicker_2 = "";
+ var kicker_3 = "";
+ for (i = 0; i < 13; i++) {
+  if (ranks[i] == 2) {
+   pair = i + 2;
+  } else if (ranks[i] == 1) {
+   kicker_3 = kicker_2;
+   kicker_2 = kicker_1;
+   kicker_1 = i + 2;
+  } else if (ranks[i] > 2) {
+   kicker_1 = i + 2;
+   kicker_2 = i + 2;
+   kicker_3 = i + 2;
+  }
+ }
+ var num_mine = 0;
+ if (get_rank(player.carda) == pair) num_mine++;
+ if (get_rank(player.cardb) == pair) num_mine++;
+ var num_needed = 1;
+ if (pair) num_needed = 0;
+ var hash_result = {};
+ hash_result["rank"] = pair;
+ hash_result["num_needed"] = num_needed;
+ hash_result["num_mine"] = num_mine;
+ hash_result["kicker_1"] = kicker_1;
+ hash_result["kicker_2"] = kicker_2;
+ hash_result["kicker_3"] = kicker_3;
+ hash_result["hand_name"] = "One Pair";
+ return hash_result;
+}
+
+function compare_one_pair(a, b) {
+ var rank_a = a["rank"];
+ var rank_b = b["rank"];
+ if (rank_a > rank_b) {
+  return "a";
+ }
+ if (rank_b > rank_a) {
+  return "b";
+ }
+ var kicker_a = a["kicker_1"];
+ var kicker_b = b["kicker_1"];
+ if (kicker_a > kicker_b) {
+  return "a";
+ }
+ if (kicker_b > kicker_a) {
+  return "b";
+ }
+ kicker_a = a["kicker_2"];
+ kicker_b = b["kicker_2"];
+ if (kicker_a > kicker_b) {
+  return "a";
+ }
+ if (kicker_b > kicker_a) {
+  return "b";
+ }
+ kicker_a = a["kicker_3"];
+ kicker_b = b["kicker_3"];
+ if (kicker_a > kicker_b) {
+  return "a";
+ }
+ if (kicker_b > kicker_a) {
+  return "b";
+ }
+ return "c";
+}
+
+function test_hi_card(player) {
+ var i;
+ var my_cards = group_cards(player);
+ var working_cards = new Array(my_cards.length);
+ for (i = 0; i < working_cards.length; i++) {
+  working_cards[i] = get_rank(my_cards[i]);
+ }
+ for (i = 0; i < working_cards.length; i++) {
+  if (working_cards[i] == null) {
+   working_cards[i] = -1;
+  }
+ }
+ working_cards.sort(compNum);
+ var hash_result = {};
+ for (i = 0; i < 5; i++) {
+  if (!working_cards[i]) {
+   working_cards[i] = "";
+  }
+  hash_result["hi_card_" + i] = working_cards[i];
+ }
+ hash_result["num_needed"] = 0;
+ hash_result["hand_name"] = "High Card";
+ return hash_result;
+}
+
+function compare_hi_card(a, b) {
+ for (var i = 0; i < 5; i++) {
+  var hi_a = a["hi_card_" + i];
+  var hi_b = b["hi_card_" + i];
+  if (hi_a > hi_b) return "a";
+  if (hi_b > hi_a) return "b";
+ }
+ return "c";
+}
+
+function get_suit(card) {
+ if (card) {
+  return card.substring(0, 1);
+ }
+ return "";
+}
+
+function get_rank(card) {
+ if (card) {
+  return card.substring(1) - 0;
+ }
+ return "";
+}
+
+function get_predominant_suit(my_cards) {
+ var suit_count = [ 0, 0, 0, 0 ];
+ for (var i = 0; i < my_cards.length; i++) {
+  var s = get_suit(my_cards[i]);
+  if (s == "c") suit_count[0]++; else if (s == "s") suit_count[1]++; else if (s == "h") suit_count[2]++; else if (s == "d") suit_count[3]++;
+ }
+ var suit_index = 0;
+ if (suit_count[1] > suit_count[suit_index]) suit_index = 1;
+ if (suit_count[2] > suit_count[suit_index]) suit_index = 2;
+ if (suit_count[3] > suit_count[suit_index]) suit_index = 3;
+ if (suit_index == 0) return "c";
+ if (suit_index == 1) return "s";
+ if (suit_index == 2) return "h";
+ if (suit_index == 3) return "d";
+ return "";
+}
+
+function group_cards(player) {
+ var c = new Array(7);
+ for (var i = 0; i < 5; i++) {
+  c[i] = board[i];
+ }
+ c[5] = player.carda;
+ c[6] = player.cardb;
+ return c;
+}
+
+function compNum(a, b) {
+ return b - a;
+}
+
+var P, HCONF, ID_CONF, CALL_LEVEL, BET_LEVEL, POT_LEVEL, BANKROLL;
+
+var CALL, SMALL, MED, BIG, ALLIN;
+
+var RANKA, RANKB;
+
+var FOLD = 0;
+
+function bot_get_preflop_bet() {
+ var num_players_playing_the_hand = internal_setup();
+ if ((HUMAN_GOES_ALL_IN || HUMAN_WINS_AGAIN > 1) && (HCONF > 60 || RANKA == RANKB || RANKA > 13 || RANKB > 13)) {
+  var other_making_stand = 0;
+  for (var i = 1; i < players.length; i++) {
+   if (players[i].bankroll < 1 && players[i].status != "BUST") {
+    other_making_stand = 1;
+   }
+  }
+  if (other_making_stand < 1) {
+   if (BET_LEVEL > 70) {
+    return internal_what_do_x("40:CALL,60:ALLIN");
+   }
+   return internal_what_do_x("15:MED,40:SMALL,45:CALL");
+  }
+  if (HCONF > 75) {
+   return internal_what_do_x("15:MED,40:SMALL,45:CALL");
+  }
+ }
+ if (HCONF > 99) {
+  if (POT_LEVEL > 75) return internal_what_do_x("60:ALLIN,10:BIG,20:MED,5:SMALL,5:CALL");
+  if (num_players_playing_the_hand < 4) return internal_what_do_x("2:BIG,15:MED,33:SMALL,50:CALL");
+  return internal_what_do_x("2:ALLIN,8:BIG,40:MED,40:SMALL,10:CALL");
+ }
+ if (HCONF > 90) {
+  if (POT_LEVEL > 50) return internal_what_do_x("15:ALLIN,35:BIG,30:MED,15:SMALL,5:CALL");
+  if (num_players_playing_the_hand > 3) return internal_what_do_x("5:ALLIN,15:BIG,35:MED,35:SMALL,10:CALL");
+  return internal_what_do_x("2:ALLIN,6:BIG,15:MED,55:SMALL,22:CALL");
+ }
+ if (HCONF > 80) {
+  if (POT_LEVEL > 50) {
+   if (ID_CONF == "LO") return internal_what_do_x("100:ALLIN");
+   return internal_what_do_x("100:CALL");
+  }
+  return internal_what_do_x("5:ALLIN,15:BIG,15:MED,30:SMALL,35:CALL");
+ }
+ if (P.subtotal_bet > 0 && CALL_LEVEL < 40) {
+  if (HCONF > 20 || RANKA > 10 || RANKB > 10) return internal_what_do_x("5:SMALL,95:CALL");
+ }
+ if (HCONF > 70) {
+  if (POT_LEVEL > 75) {
+   if (ID_CONF == "LO") return internal_what_do_x("100:ALLIN");
+   return internal_what_do_x("100:CALL");
+  }
+  if (POT_LEVEL > 50) {
+   if (ID_CONF == "LO") return internal_what_do_x("50:ALLIN,50:BIG");
+   return internal_what_do_x("100:CALL");
+  }
+  if (num_players_playing_the_hand > 3) return internal_what_do_x("5:ALLIN,15:BIG,30:MED,30:SMALL,20:CALL");
+  return internal_what_do_x("2:ALLIN,7:BIG,35:MED,36:SMALL,20:CALL");
+ }
+ if (HCONF > 60) {
+  if (POT_LEVEL > 75) {
+   if (ID_CONF == "LO") return internal_what_do_x("100:ALLIN");
+   if (CALL_LEVEL < 70) return CALL;
+   if (ID_CONF == "HI") return internal_what_do_x("25:CALL");
+   return internal_what_do_x("34:CALL");
+  }
+  if (POT_LEVEL > 50) {
+   if (ID_CONF == "LO") return internal_what_do_x("75:ALLIN,25:BIG");
+   if (CALL_LEVEL < 70) return CALL;
+   return internal_what_do_x("65:CALL");
+  }
+  if (num_players_playing_the_hand > 3) return internal_what_do_x("3:ALLIN,17:BIG,30:MED,30:SMALL,20:CALL");
+  return internal_what_do_x("1:ALLIN,2:BIG,7:MED,40:SMALL,50:CALL");
+ }
+ if (HCONF > 50) {
+  if (POT_LEVEL > 75) {
+   if (CALL_LEVEL < 40) return CALL;
+   return FOLD;
+  }
+  if (POT_LEVEL > 50) {
+   if (CALL_LEVEL < 40) return CALL;
+   return internal_what_do_x("1:ALLIN,8:CALL");
+  }
+  return internal_what_do_x("1:ALLIN,1:BIG,5:MED,20:SMALL,73:CALL");
+ }
+ if (HCONF > 40) {
+  if (BET_LEVEL > 40) {
+   if (CALL_LEVEL < 40) return CALL;
+   return FOLD;
+  }
+  if (BET_LEVEL > 30) {
+   if (CALL_LEVEL < 30) return CALL;
+   if (ID_CONF == "LO") return internal_what_do_x("24:CALL");
+   return internal_what_do_x("37:CALL");
+  }
+  return internal_what_do_x("1:ALLIN,1:BIG,19:SMALL,79:CALL");
+ }
+ if (HCONF > 30) {
+  if (BET_LEVEL > 40) {
+   if (CALL_LEVEL < 30) return CALL;
+   return FOLD;
+  }
+  if (BET_LEVEL > 30) {
+   if (CALL_LEVEL < 30) return internal_what_do_x("15:SMALL,85:CALL");
+   if (ID_CONF == "LO") return internal_what_do_x("1:CALL");
+   return internal_what_do_x("20:CALL");
+  }
+  return internal_what_do_x("1:ALLIN,1:BIG,9:SMALL,89:CALL");
+ }
+ if (HCONF > 20) {
+  if (BET_LEVEL > 30) {
+   if (CALL_LEVEL < 30) return CALL;
+   return FOLD;
+  }
+  if (BET_LEVEL > 20) {
+   if (CALL_LEVEL < 20) return CALL;
+   if (ID_CONF == "LO") return internal_what_do_x("1:CALL");
+   return internal_what_do_x("20:CALL");
+  }
+  return internal_what_do_x("1:ALLIN,99:CALL");
+ }
+ if (CALL_LEVEL > 20) return FOLD;
+ if (CALL_LEVEL > 10) {
+  if (ID_CONF == "LO") return internal_what_do_x("20:CALL");
+  return internal_what_do_x("1:MED,40:CALL");
+ }
+ if (CALL_LEVEL > 5) {
+  if (ID_CONF == "LO") return internal_what_do_x("1:BIG,15:CALL");
+  return internal_what_do_x("35:CALL");
+ }
+ if (ID_CONF == "LO") return internal_what_do_x("1:ALLIN,79:CALL");
+ return CALL;
+}
+
+var hole_rankings = "AA:100,KK:96,QQ:95,JJ:93,AKs:94," + "TT:86,AQs:85,AJs:84,KQs:84,AK:85," + "99:76,JTs:75,QJs:75,KJs:74,ATs:74,AQ:73," + "T9s:66,KQ:66,88:66,QTs:65,98s:64,J9s:65,AJ:65,KTs:65," + "77:56,87s:55,Q9s:55,T8s:54,KJ:55,QJ:54,JT:54,76s:53,97s:53,Axs:54,65s:53," + "66:46,AT:46,55:45,86s:44,KT:45,QT:44,54s:45,K9s:45,J8s:44,75s:43," + "44:36,J9:35,64s:33,T9:34,53s:33,33:35,98:34,43s:34,22:34,Kxs:34,T7s:33,Q8s:33," + "87:26,A9:26,Q9:25,76:25,42s:23,32s:23,96s:23,85s:22,J8:22,J7s:22,65:22,54:22,74s:21,K9:22,T8:21,";
+
+function internal_get_hole_ranking() {
+ var player = players[current_bettor_index];
+ var a = player.carda;
+ var b = player.cardb;
+ var n_rank_a = get_rank(a);
+ var n_rank_b = get_rank(b);
+ if (n_rank_b > n_rank_a) {
+  a = player.cardb;
+  b = player.carda;
+  n_rank_a = get_rank(a);
+  n_rank_b = get_rank(b);
+ }
+ var r_rank_a = internal_my_make_readable_rank(n_rank_a);
+ var r_rank_b = internal_my_make_readable_rank(n_rank_b);
+ var suited = "";
+ if (get_suit(a) == get_suit(b)) suited = "s";
+ var h = "";
+ if (n_rank_a == n_rank_b) h = "" + r_rank_a + "" + r_rank_b; else h = "" + r_rank_a + "" + r_rank_b + suited;
+ var q = internal_lookup_hole_ranking(h);
+ if (!q) {
+  h = "" + r_rank_a + "x" + suited;
+  q = internal_lookup_hole_ranking(h);
+ }
+ return q;
+}
+
+function internal_my_make_readable_rank(r) {
+ var rank = make_readable_rank(r);
+ if (rank == 10) rank = "T";
+ return rank;
+}
+
+function internal_lookup_hole_ranking(h) {
+ var i = hole_rankings.indexOf(h + ":");
+ if (i < 0) return 0;
+ var j = hole_rankings.indexOf(",", i);
+ var r = hole_rankings.substring(i + h.length + 1, j);
+ return r - 0;
+}
+
+function bot_get_postflop_bet() {
+ var dummy = internal_setup();
+ var ROUND = 3;
+ if (board[4]) ROUND = 5; else if (board[3]) ROUND = 4;
+ if (P.subtotal_bet > 0) {
+  if (HCONF > 20 || RANKA > 10 || RANKB > 10) {
+   if (CALL_LEVEL < 40 && ROUND < 4 || CALL_LEVEL < 30 && ROUND < 5) return CALL;
+  }
+ }
+ var VERDICT = "";
+ var STRAIGHT_FLUSH = test_straight_flush(P);
+ var FOUR_OF_A_KIND = test_four_of_a_kind(P);
+ var FULL_HOUSE = test_full_house(P);
+ var FLUSH = test_flush(P);
+ var STRAIGHT = test_straight(P);
+ var THREE_OF_A_KIND = test_three_of_a_kind(P);
+ var TWO_PAIR = test_two_pair(P);
+ var ONE_PAIR = test_one_pair(P);
+ var FLUSH_DRAW = 0;
+ if (ROUND < 5) {
+  if (FLUSH["num_needed"] == 1) {
+   var suit = FLUSH["suit"];
+   if (P.carda.substring(0, 1) == suit || P.cardb.substring(0, 1) == suit) FLUSH_DRAW = 1;
+  }
+ }
+ if (STRAIGHT_FLUSH["num_needed"] < 1) {
+  if (STRAIGHT_FLUSH["num_mine"] > 0) VERDICT = "GREAT"; else VERDICT = "PLAY BOARD";
+ }
+ if (VERDICT == "" && FOUR_OF_A_KIND["num_needed"] < 1) {
+  if (FOUR_OF_A_KIND["num_mine"] > 0) VERDICT = "GREAT"; else {
+   VERDICT = "PLAY BOARD";
+  }
+ }
+ if (VERDICT == "" && FULL_HOUSE["num_needed"] < 1) {
+  if (FULL_HOUSE["num_mine"] > 0) VERDICT = "GREAT"; else VERDICT = "PLAY BOARD";
+ }
+ if (VERDICT == "" && FLUSH["num_needed"] < 1) {
+  var num_mine = FLUSH["num_mine"];
+  if (num_mine > 1) VERDICT = "GREAT"; else if (num_mine > 0) {
+   var rank = 0;
+   if (P.carda.substring(0, 1) == FLUSH["suit"]) rank = RANKA; else rank = RANKB;
+   if (rank < 11) VERDICT = "GOOD"; else VERDICT = "GREAT";
+  } else VERDICT = "MAYBE";
+ }
+ if (VERDICT == "" && STRAIGHT["num_needed"] < 1) {
+  if (STRAIGHT["num_mine"] > 0) VERDICT = "GREAT"; else VERDICT = "PLAY BOARD";
+  if (internal_exists_flush_potential() < 3) VERDICT = "MAYBE";
+ }
+ if (VERDICT == "" && THREE_OF_A_KIND["num_needed"] < 1) {
+  if (THREE_OF_A_KIND["num_mine"] > 0) VERDICT = "GREAT"; else {
+   var k1 = THREE_OF_A_KIND["kicker_1"];
+   var k2 = THREE_OF_A_KIND["kicker_2"];
+   if (k1 == RANKA && k2 == RANKB || k1 == RANKB && k2 == RANKA) VERDICT = "GREAT"; else if (k1 == RANKA || k1 == RANKB) VERDICT = "GOOD"; else if (k1 > 11 && k2 > 9) VERDICT = "GOOD"; else VERDICT = "MAYBE";
+  }
+  if (internal_exists_flush_potential() < 3) {
+   VERDICT = "MAYBE";
+  }
+  if (internal_exists_straight_potential() < 2) {
+   VERDICT = "MAYBE";
+  }
+ }
+ if (VERDICT == "" && TWO_PAIR["num_needed"] < 1) {
+  num_mine = TWO_PAIR["num_mine"];
+  if (num_mine > 1) {
+   if (RANKA == RANKB) {
+    VERDICT = "GOOD";
+   } else {
+    VERDICT = "GREAT";
+   }
+  } else if (num_mine > 0) {
+   if (ROUND < 4) {
+    VERDICT = "GREAT";
+   } else {
+    rank = TWO_PAIR["rank_1"];
+    if (rank != RANKA && rank != RANKB) {
+     rank = TWO_PAIR["rank_2"];
+    }
+    if (rank < 10) {
+     VERDICT = "MAYBE";
+    } else {
+     VERDICT = "GOOD";
+    }
+   }
+  } else {
+   var kick = TWO_PAIR["kicker"];
+   if (kick == RANKA || kick == RANKB || kick > 10) {
+    VERDICT = "PLAY BOARD";
+   } else {
+    VERDICT = "MAYBE";
+   }
+  }
+  if (internal_exists_flush_potential() < 3) {
+   VERDICT = "MAYBE";
+  }
+  if (internal_exists_straight_potential() < 2) {
+   VERDICT = "MAYBE";
+  }
+ }
+ if (VERDICT == "" && ONE_PAIR["num_needed"] < 1) {
+  if (ONE_PAIR["num_mine"] > 0) {
+   var my_rank = ONE_PAIR["rank"];
+   var num_overcards = 0;
+   for (var i = 0; i < board.length; i++) {
+    if (board[i] && get_rank(board[i]) > my_rank) num_overcards++;
+   }
+   if (num_overcards < 1) {
+    VERDICT = "GOOD";
+    if (my_rank > 11) {
+     VERDICT = "GREAT";
+    }
+   } else if (num_overcards < 2) {
+    VERDICT = "MAYBE";
+    if (my_rank > 7) {
+     VERDICT = "GOOD";
+    }
+   } else {
+    VERDICT = "MAYBE";
+   }
+   if (internal_exists_flush_potential() < 3) {
+    VERDICT = "MAYBE";
+   }
+   if (internal_exists_straight_potential() < 2) {
+    VERDICT = "MAYBE";
+   }
+  }
+ }
+ if ((HUMAN_GOES_ALL_IN || HUMAN_WINS_AGAIN > 1) && (VERDICT == "GREAT" || VERDICT == "GOOD" || VERDICT == "MAYBE" || RANKA == RANKB)) {
+  var other_making_stand = 0;
+  for (var index = 1; index < players.length; index++) {
+   if (players[index].bankroll < 1 && players[index].status != "BUST") {
+    other_making_stand = 1;
+   }
+   break;
+  }
+  if (other_making_stand < 1) {
+   if (BET_LEVEL > 70) {
+    return internal_what_do_x("40:CALL,60:ALLIN");
+   }
+   return internal_what_do_x("10:MED,40:SMALL,50:CALL");
+  }
+  if (VERDICT == "GREAT" || VERDICT == "GOOD") {
+   return internal_what_do_x("10:MED,40:SMALL,50:CALL");
+  }
+ }
+ if (VERDICT == "GREAT") {
+  if (ROUND < 5) {
+   return internal_what_do_x("5:ALLIN,5:BIG,25:MED,45:SMALL,20:CALL");
+  }
+  return internal_what_do_x("30:ALLIN,40:BIG,30:MED");
+ }
+ if (VERDICT == "GOOD") {
+  if (ROUND < 4) {
+   if (BET_LEVEL > 79) {
+    if (CALL_LEVEL < 70 || FLUSH_DRAW) return CALL;
+    return internal_what_do_x("59:CALL");
+   }
+   if (P.subtotal_bet > 0) return internal_what_do_x("1:ALLIN,2:BIG,5:MED,20:SMALL,72:CALL");
+   return internal_what_do_x("3:ALLIN,40:BIG,42:MED,10:SMALL,5:CALL");
+  }
+  if (BET_LEVEL < 50) {
+   if (P.subtotal_bet > 0) return internal_what_do_x("1:BIG,3:MED,21:SMALL,75:CALL");
+   return internal_what_do_x("10:BIG,20:MED,50:SMALL,20:CALL");
+  }
+  if (BET_LEVEL < 80) {
+   if (CALL_LEVEL < 50) return CALL;
+   return internal_what_do_x("65:CALL");
+  }
+  if (CALL_LEVEL < 70) return CALL;
+  if (ROUND < 5) return internal_what_do_x("35:CALL");
+  return internal_what_do_x("25:CALL");
+ }
+ if (VERDICT == "MAYBE") {
+  if (BET_LEVEL < 50) {
+   if (CALL > 0) return internal_what_do_x("5:MED,15:SMALL,80:CALL");
+   return internal_what_do_x("5:BIG,20:MED,50:SMALL,25:CALL");
+  }
+  if (BET_LEVEL < 70) {
+   if (ROUND < 4 && FLUSH_DRAW) return CALL;
+   if (CALL_LEVEL < 40) return CALL;
+   if (ID_CONF == "LO") {
+    if (ROUND < 4) return internal_what_do_x("35:CALL");
+    if (ROUND < 5) return internal_what_do_x("65:CALL");
+    return internal_what_do_x("89:CALL");
+   }
+   if (ROUND < 4) return internal_what_do_x("61:CALL");
+   if (ROUND < 5) return internal_what_do_x("31:CALL");
+   return internal_what_do_x("19:CALL");
+  }
+  if (CALL_LEVEL < 40) return CALL;
+  if (ROUND < 4) {
+   if (CALL_LEVEL < 50) return CALL;
+   return internal_what_do_x("50:CALL");
+  }
+  return internal_what_do_x("11:CALL");
+ }
+ if (FLUSH_DRAW) {
+  if (ROUND < 4) return internal_what_do_x("20:MED,40:SMALL,40:CALL");
+  if (ROUND < 5) {
+   if (CALL < 1) return internal_what_do_x("10:MED,90:SMALL");
+   if (CALL_LEVEL < 40) return CALL;
+   return internal_what_do_x("33:CALL");
+  }
+ }
+ if (VERDICT == "PLAY BOARD") {
+  return CALL;
+ }
+ var hi_rank = RANKA;
+ if (RANKA < RANKB) {
+  hi_rank = RANKB;
+ }
+ if (HCONF > 80) {
+  if (CALL < 1) {
+   if (ROUND < 5) return internal_what_do_x("10:MED,80:SMALL,10:CALL");
+   return internal_what_do_x("20:MED,70:SMALL,10:CALL");
+  }
+  if (CALL_LEVEL < 50) return CALL;
+  if (CALL_LEVEL < 70 && ROUND < 5) return CALL;
+  if (CALL_LEVEL < 80 && ROUND < 4) return CALL;
+  return FOLD;
+ }
+ if (HCONF > 70) {
+  if (CALL < 1) {
+   if (ROUND < 5) return internal_what_do_x("10:MED,75:SMALL,15:CALL");
+   return internal_what_do_x("10:MED,80:SMALL,10:CALL");
+  }
+  if (CALL_LEVEL < 40) return CALL;
+  if (CALL_LEVEL < 50) return internal_what_do_x("50:CALL");
+  return FOLD;
+ }
+ if (hi_rank > 13 || HCONF > 50) {
+  if (CALL < 1) {
+   if (ROUND < 5) return internal_what_do_x("5:MED,75:SMALL,20:CALL");
+   return internal_what_do_x("5:MED,75:SMALL,20:CALL");
+  }
+  if (CALL_LEVEL < 30) return CALL;
+  if (CALL_LEVEL < 40 && ROUND < 4) return CALL;
+  return FOLD;
+ }
+ if (CALL < 1) {
+  if (ROUND < 5) return internal_what_do_x("20:SMALL,80:CALL");
+  return internal_what_do_x("5:MED,70:SMALL,25:CALL");
+ }
+ if (CALL_LEVEL < 20) return CALL;
+ if (CALL_LEVEL < 30) return internal_what_do_x("10:SMALL,20:CALL");
+ return FOLD;
+}
+
+function internal_exists_flush_potential() {
+ var the_hash = test_flush(new player);
+ return the_hash["num_needed"];
+}
+
+function internal_exists_straight_potential() {
+ var the_hash = test_straight(new player);
+ return the_hash["num_needed"];
+}
+
+function internal_setup() {
+ P = players[current_bettor_index];
+ CALL = current_bet_amount - P.subtotal_bet;
+ RANKA = get_rank(P.carda);
+ RANKB = get_rank(P.cardb);
+ HCONF = internal_get_hole_ranking();
+ CALL_LEVEL = internal_get_bet_level(CALL);
+ BET_LEVEL = internal_get_bet_level(current_bet_amount);
+ POT_LEVEL = internal_get_pot_level();
+ BANKROLL = P.bankroll;
+ var total_bankrolls = get_pot_size();
+ var number_of_players_in_game = 0;
+ var num_players_playing_the_hand = 0;
+ for (var i = 0; i < players.length; i++) {
+  total_bankrolls += players[i].bankroll;
+  if (players[i].status != "BUST") {
+   number_of_players_in_game++;
+   if (players[i].status != "FOLD") {
+    num_players_playing_the_hand++;
+   }
+  }
+ }
+ ID_CONF = "MID";
+ var avg_bankroll = total_bankrolls / number_of_players_in_game;
+ if (BANKROLL < avg_bankroll / 2) ID_CONF = "LO";
+ if (BANKROLL > avg_bankroll * 1.5) ID_CONF = "HI";
+ SMALL = CALL + BIG_BLIND * 2;
+ if (POT_LEVEL > 40) SMALL += 5;
+ if (number_of_players_in_game > 3) {
+  MED = CALL + BIG_BLIND * 4;
+  BIG = CALL + BIG_BLIND * 10;
+ } else {
+  SMALL += 5;
+  MED = internal_round5(CALL + .1 * BANKROLL);
+  BIG = internal_round5(CALL + .2 * BANKROLL);
+ }
+ ALLIN = BANKROLL;
+ return num_players_playing_the_hand;
+}
+
+function internal_tokenize_string(string) {
+ if (string === "FOLD") {
+  return FOLD;
+ }
+ if (string === "CALL") {
+  return CALL;
+ }
+ if (string === "SMALL") {
+  return SMALL;
+ }
+ if (string === "MED") {
+  return MED;
+ }
+ if (string === "BIG") {
+  return BIG;
+ }
+ if (string === "ALLIN") {
+  return ALLIN;
+ }
+ alert("internal_tokenize_string() cannot tokenize " + string);
+}
+
+function internal_what_do_x(q, r) {
+ q += ",";
+ if (!r) r = Math.random();
+ var p = 0;
+ while (1) {
+  var a = q.indexOf(":");
+  var b = q.indexOf(",", a);
+  if (a < 0 || b < 0) {
+   return FOLD;
+  }
+  var probability = (q.substring(0, a) - 0) / 100;
+  var action = q.substring(a + 1, b);
+  q = q.substring(b + 1);
+  p += probability;
+  if (r <= p) {
+   return internal_tokenize_string(action);
+  }
+ }
+}
+
+function internal_round5(n) {
+ if (n < 5) return 5;
+ var s = "" + n;
+ var i = s.indexOf(".");
+ if (i > 0) s = s.substring(0, i);
+ n = s - 0;
+ while (n % 5 != 0) n++;
+ return n;
+}
+
+function internal_get_bet_level(b) {
+ var size = b / P.bankroll;
+ if (size <= .015 || b <= 5) return 5;
+ if (size <= .02 || b <= 10) return 10;
+ if (size <= .03 || b <= 15) return 20;
+ if (size <= .06 || b <= 30) return 30;
+ if (size <= .12 || b <= 60) return 40;
+ if (size <= .21 || b <= 100) return 50;
+ if (size <= .35 || b <= 150) return 70;
+ if (size <= .41 || b <= 200) return 80;
+ return 100;
+}
+
+function internal_get_pot_level() {
+ var p = get_pot_size();
+ var b = players[current_bettor_index].bankroll;
+ if (p > .5 * b) {
+  return 100;
+ }
+ if (p > .25 * b) {
+  return 51;
+ }
+ return 1;
+}
+
+var GUI_RANKS = {
+ 11: "J",
+ 12: "Q",
+ 13: "K",
+ 14: "A"
+};
+
+var GUI_SUITS = {
+ c: "♣︎",
+ d: "♦︎",
+ h: "♥︎",
+ s: "♠︎"
+};
+
+function internal_get_a_class_named(curr, searched_name) {
+ for (var i = 0; i < curr.childNodes.length; i++) {
+  if (curr.childNodes[i].className === searched_name) {
+   return curr.childNodes[i];
+  }
+ }
+ return null;
+}
+
+function internal_seat(seat) {
+ return document.getElementById("seat" + seat);
+}
+
+function internal_setCard(diva, card, folded) {
+ var opacity = 1;
+ if (typeof card === "undefined" || card === "") {
+  diva.removeAttribute("data-face");
+  diva.removeAttribute("data-red");
+  diva.removeAttribute("aria-label");
+  diva.innerHTML = "";
+  diva.style.opacity = 0;
+  return;
+ }
+ if (card === "blinded") {
+  diva.setAttribute("data-face", "back");
+  diva.removeAttribute("data-red");
+  diva.setAttribute("aria-label", "hidden card");
+  diva.innerHTML = "";
+ } else {
+  if (folded) {
+   opacity = .5;
+  }
+  var suit = card.substring(0, 1);
+  var rank = parseInt(card.substring(1), 10);
+  var r = GUI_RANKS[rank] || String(rank);
+  var s = GUI_SUITS[suit] || "?";
+  diva.setAttribute("data-face", "up");
+  if (suit === "h" || suit === "d") {
+   diva.setAttribute("data-red", "");
+  } else {
+   diva.removeAttribute("data-red");
+  }
+  diva.setAttribute("aria-label", r + s.charAt(0));
+  diva.innerHTML = '<span class="pk-idx"><b>' + r + "</b>" + s + '</span><span class="pk-pip">' + s + "</span>";
+ }
+ diva.style.opacity = opacity;
+}
+
+function internal_clickin_helper(button, button_text, func_on_click) {
+ if (button_text === 0) {
+  button.style.visibility = "hidden";
+ } else {
+  button.style.visibility = "visible";
+  button.innerHTML = button_text;
+  button.onclick = func_on_click;
+ }
+}
+
+function gui_hide_poker_table() {
+ document.getElementById("poker_table").style.visibility = "hidden";
+}
+
+function gui_show_poker_table() {
+ document.getElementById("poker_table").style.visibility = "visible";
+}
+
+function gui_set_player_name(name, seat) {
+ var seatloc = internal_seat(seat);
+ var chipsdiv = internal_get_a_class_named(seatloc, "name-chips");
+ var namediv = internal_get_a_class_named(chipsdiv, "player-name");
+ seatloc.style.visibility = name === "" ? "hidden" : "visible";
+ namediv.textContent = name;
+}
+
+function gui_hilite_player(hilite_color, name_color, seat) {
+ var seatloc = internal_seat(seat);
+ var chipsdiv = internal_get_a_class_named(seatloc, "name-chips");
+ var namediv = internal_get_a_class_named(chipsdiv, "player-name");
+ namediv.style.color = name_color === "" ? chipsdiv.style.color : name_color;
+ namediv.style.backgroundColor = hilite_color === "" ? chipsdiv.style.backgroundColor : hilite_color;
+}
+
+function gui_set_bankroll(amount, seat) {
+ var chipsdiv = internal_get_a_class_named(internal_seat(seat), "name-chips");
+ var namediv = internal_get_a_class_named(chipsdiv, "chips");
+ if (!isNaN(amount) && amount != "") {
+  amount = "$" + amount;
+ }
+ namediv.textContent = amount;
+}
+
+function gui_set_bet(bet, seat) {
+ internal_get_a_class_named(internal_seat(seat), "bet").textContent = bet;
+}
+
+function gui_set_player_cards(card_a, card_b, seat, folded) {
+ var cardsdiv = internal_get_a_class_named(internal_seat(seat), "holecards");
+ internal_setCard(internal_get_a_class_named(cardsdiv, "card holecard1"), card_a, folded);
+ internal_setCard(internal_get_a_class_named(cardsdiv, "card holecard2"), card_b, folded);
+}
+
+function gui_lay_board_card(n, the_card) {
+ var ids = [ "flop1", "flop2", "flop3", "turn", "river" ];
+ internal_setCard(document.getElementById(ids[n]), the_card);
+}
+
+function gui_burn_board_card(n, the_card) {
+ var ids = [ "burn1", "burn2", "burn3" ];
+ internal_setCard(document.getElementById(ids[n]), the_card);
+}
+
+function gui_write_basic_general(pot_size) {
+ document.getElementById("total-pot").innerHTML = "Total pot: " + pot_size;
+}
+
+function gui_log_to_history(text_to_write) {}
+
+function gui_hide_log_window() {}
+
+function gui_place_dealer_button(seat) {
+ var button = document.getElementById("button");
+ button.style.visibility = seat < 0 ? "hidden" : "visible";
+ button.className = "seat" + seat + "-button";
+}
+
+function gui_hide_dealer_button() {
+ gui_place_dealer_button(-3);
+}
+
+function gui_hide_fold_call_click() {
+ internal_clickin_helper(document.getElementById("fold-button"), 0, 0);
+ internal_clickin_helper(document.getElementById("call-button"), 0, 0);
+ gui_disable_shortcut_keys();
+}
+
+function gui_setup_fold_call_click(show_fold, call_text, fold_func, call_func) {
+ internal_clickin_helper(document.getElementById("fold-button"), show_fold, fold_func);
+ internal_clickin_helper(document.getElementById("call-button"), call_text, call_func);
+}
+
+function gui_set_selected_speed_option(index) {
+ document.getElementById("speed-options").value = index;
+}
+
+function gui_setup_option_buttons(name_func, speed_func) {
+ var name_button = document.getElementById("name-button");
+ name_button.style.visibility = "visible";
+ name_button.onclick = name_func;
+ var speed = document.getElementById("speed-button");
+ speed.style.visibility = "visible";
+ speed.onchange = function() {
+  var sel = document.getElementById("speed-options");
+  speed_func(sel.options[sel.selectedIndex].text);
+ };
+}
+
+function gui_hide_setup_option_buttons() {
+ document.getElementById("name-button").style.visibility = "hidden";
+ document.getElementById("speed-button").style.visibility = "hidden";
+}
+
+function gui_hide_game_response() {
+ document.getElementById("game-response").style.visibility = "hidden";
+}
+
+function gui_show_game_response() {
+ document.getElementById("game-response").style.visibility = "visible";
+}
+
+function gui_write_game_response(text) {
+ document.getElementById("game-response").innerHTML = text;
+}
+
+function gui_write_guick_raise(text) {
+ var response = document.getElementById("quick-raises");
+ if (text === "") {
+  response.style.visibility = "hidden";
+ } else {
+  response.style.visibility = "visible";
+  response.innerHTML = text;
+ }
+}
+
+function gui_hide_guick_raise() {
+ gui_write_guick_raise("");
+}
+
+function gui_write_modal_box(text) {
+ var modal = document.getElementById("modal-box");
+ if (text === "") {
+  modal.style.display = "none";
+ } else {
+  modal.innerHTML = text;
+  modal.style.display = "block";
+  var focus = modal.querySelector('input[type="button"], a');
+  if (focus) {
+   focus.focus({
+    preventScroll: true
+   });
+  }
+ }
+}
+
+function gui_enable_shortcut_keys(func) {
+ document.addEventListener("keydown", func);
+}
+
+function gui_disable_shortcut_keys(func) {
+ document.removeEventListener("keydown", func);
+}
+
+function gui_get_theme_mode_highlite_color() {
+ return "red";
+}
+</script>
+
+<script>
+(function () {
+  function startPoker() {
+    if (typeof window.init === 'function') {
+      window.init();
+    }
+  }
+  var nameBtn = document.getElementById('name-button');
+  nameBtn.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); nameBtn.click(); }
+  });
+  if (document.readyState === 'complete') {
+    startPoker();
+  } else {
+    window.addEventListener('load', startPoker, { once: true });
+  }
+})();
+</script>
+<script src="deck/oyun.js"></script>
