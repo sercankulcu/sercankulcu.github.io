@@ -34,6 +34,13 @@ Computers process data by following precise instructions and help solve practica
 - [🖥️Sunum - Hesaplama (HTML)](../files/computer/slides/Bolum_01_Hesaplama_Hesaplamali_Dusunme.html)
 - [📝Çalışma Soruları - Hesaplama (HTML)](../files/computer/slides/Bolum_01_Hesaplama_Hesaplamali_Dusunme_Calisma_Sorulari.html)
 
+#### 🕹️ Simulators
+- [Number Base Converter](../files/computer/slides/Chapter_01_Number-Base-Converter.html)
+- [Logic Gates](../files/computer/slides/Chapter_01_Logic-Gates.html)
+- [Simple CPU (Fetch–Decode–Execute)](../files/computer/slides/Chapter_01_Simple-CPU.html)
+- [Packet Journey](../files/computer/slides/Chapter_01_Packet-Journey.html)
+- [Turing Machine](../files/computer/slides/Chapter_01_Turing-Machine.html)
+
 ---
 
 ## Chapter 2: Operating Systems
@@ -44,6 +51,9 @@ An operating system manages hardware resources and provides services for applica
 - [📝Çalışma Soruları - İşletim Sistemleri (HTML)](../files/computer/slides/Bolum_02_Isletim_Sistemleri_Calisma_Sorulari.html)
 - [🖥️Sunum - Windows (HTML)](../files/computer/slides/Bolum_02_Windows.html)
 - [📝Çalışma Soruları - Windows (HTML)](../files/computer/slides/Bolum_02_Windows_Calisma_Sorulari.html)
+
+#### 🕹️ Simulators
+- [CPU Scheduler](../files/computer/slides/Chapter_02_CPU-Scheduler.html)
 
 ---
 
@@ -58,6 +68,9 @@ Office applications help users create documents, analyze data, and present infor
 - [🖥️Sunum - PowerPoint (HTML)](../files/computer/slides/Bolum_03_PowerPoint.html)
 - [📝Çalışma Soruları - PowerPoint (HTML)](../files/computer/slides/Bolum_03_PowerPoint_Calisma_Sorulari.html)
 
+#### 🕹️ Simulators
+- [Excel Cell References](../files/computer/slides/Chapter_03_Excel-References.html)
+
 ---
 
 ## Chapter 4: Introduction to Programming and Algorithms
@@ -70,6 +83,11 @@ Programming turns problem-solving steps into instructions that a computer can ex
 - [📝Çalışma Soruları - Algoritmalar (HTML)](../files/computer/slides/Bolum_04_Algoritmalar_Calisma_Sorulari.html)
 - [🖥️Sunum - Akış Diyagramları (HTML)](../files/computer/slides/Bolum_04_Akis_Diyagramlari.html)
 - [📝Çalışma Soruları - Akış Diyagramları (HTML)](../files/computer/slides/Bolum_04_Akis_Diyagramlari_Calisma_Sorulari.html)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders04/src)
+
+#### 🕹️ Simulators
+- [Sorting Algorithm Visualizer](../files/computer/slides/Chapter_04_Sorting-Visualizer.html)
+- [Flowchart Runner](../files/computer/slides/Chapter_04_Flowchart-Runner.html)
 
 ---
 
@@ -79,6 +97,7 @@ A Java program is written as plain-text source code, compiled to bytecode, and e
 
 - [🖥️Sunum - Java'ya Giriş ve İlk Program (HTML)](../files/computer/slides/Bolum_05_Java_ve_Ilk_Program.html)
 - [📝Çalışma Soruları - Java'ya Giriş ve İlk Program (HTML)](../files/computer/slides/Bolum_05_Java_ve_Ilk_Program_Calisma_Sorulari.html)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders05/src)
 
 ---
 
@@ -88,6 +107,10 @@ Variables store values that a program uses and modifies. This chapter covers Jav
 
 - [🖥️Sunum - Değişkenler, Veri Tipleri ve Operatörler (HTML)](../files/computer/slides/Bolum_06_Degiskenler_ve_Operatorler.html)
 - [📝Çalışma Soruları - Değişkenler, Veri Tipleri ve Operatörler (HTML)](../files/computer/slides/Bolum_06_Degiskenler_ve_Operatorler_Calisma_Sorulari.html)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders06/src)
+
+#### 🕹️ Simulators
+- [Expression Evaluator](../files/computer/slides/Chapter_06_Expression-Evaluator.html)
 
 ---
 
@@ -97,6 +120,7 @@ Conditional statements allow a program to choose between different actions. This
 
 - [🖥️Sunum - Koşullu İfadeler (HTML)](../files/computer/slides/Bolum_07_Kosullu_Ifadeler.html)
 - [📝Çalışma Soruları - Koşullu İfadeler (HTML)](../files/computer/slides/Bolum_07_Kosullu_Ifadeler_Calisma_Sorulari.html)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders07/src)
 
 ---
 
@@ -106,6 +130,10 @@ Loops repeat a block of code while a condition remains true or for a known numbe
 
 - [🖥️Sunum - Döngüler (HTML)](../files/computer/slides/Bolum_08_Donguler.html)
 - [📝Çalışma Soruları - Döngüler (HTML)](../files/computer/slides/Bolum_08_Donguler_Calisma_Sorulari.html)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders08/src)
+
+#### 🕹️ Simulators
+- [Loop Tracer](../files/computer/slides/Chapter_08_Loop-Tracer.html)
 
 ---
 
@@ -115,6 +143,7 @@ Methods divide a program into reusable operations. This chapter covers method de
 
 - [🖥️Sunum - Metotlar (HTML)](../files/computer/slides/Bolum_09_Metotlar.html)
 - [📝Çalışma Soruları - Metotlar (HTML)](../files/computer/slides/Bolum_09_Metotlar_Calisma_Sorulari.html)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders09/src)
 
 ---
 
@@ -124,6 +153,10 @@ Arrays store a fixed number of values of the same type and provide indexed acces
 
 - [🖥️Sunum - Diziler (HTML)](../files/computer/slides/Bolum_10_Diziler.html)
 - [📝Çalışma Soruları - Diziler (HTML)](../files/computer/slides/Bolum_10_Diziler_Calisma_Sorulari.html)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders10/src)
+
+#### 🕹️ Simulators
+- [Array Lab](../files/computer/slides/Chapter_10_Array-Lab.html)
 
 ---
 
@@ -133,6 +166,7 @@ Strings represent sequences of characters and are used to process textual data. 
 
 - [🖥️Sunum - Dizgiler (HTML)](../files/computer/slides/Bolum_11_Dizgiler.html)
 - [📝Çalışma Soruları - Dizgiler (HTML)](../files/computer/slides/Bolum_11_Dizgiler_Calisma_Sorulari.html)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders11/src)
 
 ---
 
@@ -142,3 +176,7 @@ A recursive method solves a problem by calling itself with a smaller input. This
 
 - [🖥️Sunum - Özyineleme (HTML)](../files/computer/slides/Bolum_12_Ozyineleme.html)
 - [📝Çalışma Soruları - Özyineleme (HTML)](../files/computer/slides/Bolum_12_Ozyineleme_Calisma_Sorulari.html)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders12/src)
+
+#### 🕹️ Simulators
+- [Recursion Visualizer](../files/computer/slides/Chapter_12_Recursion-Visualizer.html)

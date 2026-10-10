@@ -1,0 +1,512 @@
+---
+layout: without-sidebar
+title: "Dizi Laboratuvarı"
+permalink: /files/computer/slides/Chapter_10_Array-Lab.html
+excerpt: "Dizi hücreleri ve indisler: okuma/yazma, ArrayIndexOutOfBoundsException, doğrusal arama, en büyük/en küçük, toplam/ortalama, ters çevirme ve dizi[i] = dizi[dizi[i]] izleme alıştırması adım adım."
+---
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.cx-al, .cx-al-dlg { --ds-accent:#b45309; --ds-link:#0369a1; }
+html[data-theme="dark"] .agt-oyun, html[data-theme="dark"] .cx-al-dlg { --ds-accent:#f59e57; --ds-link:#7cc4e8; }
+.cx-al .al-grid { display:grid; grid-template-columns:200px minmax(0,1fr); gap:10px; height:100%; }
+.cx-al .card { min-width:0; min-height:0; padding:8px 10px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.cx-al .side { display:flex; flex-direction:column; gap:6px; }
+.cx-al .cap { display:block; margin:0 0 2px; color:var(--ds-muted); font-size:11.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.cx-al select, .cx-al .arr-in { width:100%; min-height:31px; font-size:13.5px; }
+.cx-al .arr-in { font-family:ui-monospace, Consolas, monospace; }
+.cx-al .row2 { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.cx-al .row2 button { min-height:31px; padding:0 6px; font-size:13.5px; }
+.cx-al .mini { display:grid; grid-template-columns:auto 1fr; gap:4px 6px; align-items:center; font-size:13px; }
+.cx-al .mini input { width:100%; min-height:28px !important; padding:0 6px !important; font-size:14px !important; }
+.cx-al .speed { display:flex; align-items:center; gap:6px; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.cx-al .speed input { flex:1; min-width:0; }
+.cx-al .check { display:flex; align-items:center; gap:6px; font-size:13.5px; font-weight:700; cursor:pointer; }
+.cx-al .score { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:auto; }
+.cx-al .score div { padding:3px; border-radius:10px; background:var(--ds-surface-strong); text-align:center; color:var(--ds-muted); font-size:11.5px; font-weight:700; }
+.cx-al .score b { display:block; color:var(--ds-text); font-size:18px; }
+.cx-al .main { display:flex; flex-direction:column; gap:7px; min-height:0; }
+.cx-al .strip { position:relative; flex:none; height:128px; padding:4px 8px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); }
+.cx-al .strip .name { position:absolute; top:4px; left:10px; color:var(--ds-muted); font:700 12.5px ui-monospace, Consolas, monospace; }
+.cx-al .cells { display:flex; justify-content:center; gap:6px; margin-top:24px; }
+.cx-al .cellw { display:flex; flex-direction:column; align-items:center; width:46px; }
+.cx-al .ptr { height:18px; color:var(--ds-accent); font:800 12px ui-monospace, Consolas, monospace; white-space:nowrap; }
+.cx-al .cell { display:grid; place-items:center; width:46px; height:44px; border:2px solid var(--ds-link); border-radius:8px; background:var(--ds-node); font:800 18px ui-monospace, Consolas, monospace; transition:background .25s, border-color .25s; }
+.cx-al .cell.rd { border-color:var(--ds-link); box-shadow:0 0 0 3px color-mix(in srgb, var(--ds-link) 35%, transparent); }
+.cx-al .cell.wr { border-color:var(--ds-accent); background:var(--ds-hot); }
+.cx-al .cell.ok { border-color:var(--ds-good); background:color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg)); }
+.cx-al .cell.dim { opacity:.45; }
+.cx-al .cell.ghost { border:2px dashed var(--ds-bad); background:color-mix(in srgb, var(--ds-bad) 12%, var(--ds-bg)); color:var(--ds-bad); }
+.cx-al .idx { margin-top:3px; color:var(--ds-muted); font:700 12px ui-monospace, Consolas, monospace; }
+.cx-al .ghostw .idx { color:var(--ds-bad); }
+.cx-al .len { position:absolute; right:10px; top:4px; color:var(--ds-muted); font:700 12.5px ui-monospace, Consolas, monospace; }
+.cx-al .mid { display:grid; grid-template-columns:minmax(0,1fr) 170px; gap:7px; }
+.cx-al .code { margin:0; padding:5px 0; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); font:13px/1.5 ui-monospace, Consolas, monospace; list-style:none; counter-reset:ln; overflow:hidden; }
+.cx-al .code li { padding-right:8px; white-space:pre; counter-increment:ln; }
+.cx-al .code li::before { content:counter(ln); display:inline-block; width:24px; margin-right:8px; color:var(--ds-muted); font-size:11px; text-align:right; }
+.cx-al .code li.is-cur { background:var(--ds-hot); box-shadow:inset 4px 0 0 var(--ds-accent); }
+.cx-al .vars { padding:5px 8px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); font:13.5px/1.5 ui-monospace, Consolas, monospace; }
+.cx-al .vars div { display:flex; justify-content:space-between; gap:6px; }
+.cx-al .vars div.is-chg b { color:var(--ds-accent); }
+.cx-al .ctl { display:flex; gap:6px; }
+.cx-al .ctl button { min-height:32px; padding:0 12px; font-size:14px; }
+.cx-al .ctl .no { margin-left:auto; align-self:center; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.cx-al .why { margin:0; min-height:44px; padding:5px 10px; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:13.5px; line-height:1.35; }
+.cx-al .why .qrow { display:inline-flex; gap:6px; margin-left:6px; vertical-align:middle; }
+.cx-al .why .qrow input { width:80px; min-height:28px !important; font-family:ui-monospace, Consolas, monospace; }
+.cx-al .why .qrow button { min-height:28px; padding:0 10px; font-size:13px; }
+.cx-al .out { flex:1; min-height:44px; margin:0; padding:6px 8px; overflow:auto; border-radius:10px; background:#1f2430; color:#e6edf3; font:13.5px/1.4 ui-monospace, Consolas, monospace; white-space:pre-wrap; }
+.cx-al .out .ex { color:#ff9b8f; }
+.cx-al .manual { display:none; }
+.cx-al.is-manual .manual { display:block; }
+.cx-al.is-manual .auto { display:none; }
+</style>
+
+<div class="cx-al agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 10 · Simülasyon</p><h1>Dizi Laboratuvarı</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="al-help" aria-label="Açıklama ve kullanım">?</button>
+    <a class="agt-oyun__back" href="Bolum_10_Diziler.html">← Bölüm 10</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="al-grid">
+      <aside class="card side">
+        <div>
+          <label class="cap" for="alAlg">Alıştırma</label>
+          <select id="alAlg"></select>
+        </div>
+        <div>
+          <label class="cap" for="alArr">Dizi öğeleri (en çok 10)</label>
+          <input class="arr-in" id="alArr" type="text" spellcheck="false" autocomplete="off" value="8, 3, 6, 2">
+        </div>
+        <div class="row2">
+          <button type="button" id="alApply">Uygula</button>
+          <button type="button" id="alRand">Rastgele</button>
+        </div>
+        <div class="auto" id="alTargetBox">
+          <div class="mini"><label for="alTarget">hedef =</label><input id="alTarget" type="number" step="1" value="6"></div>
+        </div>
+        <div class="manual">
+          <span class="cap">Elle erişim</span>
+          <div class="mini">
+            <label for="alIdx">indis</label><input id="alIdx" type="number" step="1" value="2">
+            <label for="alVal">değer</label><input id="alVal" type="number" step="1" value="9">
+          </div>
+          <div class="row2" style="margin-top:5px">
+            <button type="button" id="alRead" class="is-primary" aria-label="dizi[indis] değerini oku">Oku</button>
+            <button type="button" id="alWrite" class="is-primary" aria-label="dizi[indis] hücresine değeri yaz">Yaz</button>
+          </div>
+        </div>
+        <div class="auto">
+          <label class="speed">Hız <input type="range" id="alSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı"></label>
+        </div>
+        <label class="check auto"><input type="checkbox" id="alQuiz"> Kendini dene</label>
+        <div class="score auto" aria-live="polite">
+          <div>Doğru<b id="alOk">0</b></div>
+          <div>Soru<b id="alAll">0</b></div>
+        </div>
+      </aside>
+
+      <section class="main">
+        <div class="strip" aria-label="Dizi hücreleri">
+          <span class="name">int[] dizi</span><span class="len" id="alLen"></span>
+          <div class="cells" id="alCells"></div>
+        </div>
+        <div class="mid">
+          <ol class="code" id="alCode" aria-label="Java kodu"></ol>
+          <div><span class="cap">Değişkenler</span><div class="vars" id="alVars" aria-live="polite"></div></div>
+        </div>
+        <div class="ctl auto">
+          <button type="button" id="alBack" aria-label="Bir adım geri">◀ Geri</button>
+          <button type="button" id="alStep" class="is-primary" aria-label="Bir adım ileri">Adım ▶</button>
+          <button type="button" id="alPlay" aria-label="Oynat veya duraklat">Oynat</button>
+          <button type="button" id="alReset" aria-label="Başa dön">Sıfırla</button>
+          <span class="no" id="alNo"></span>
+        </div>
+        <p class="why" id="alWhy" aria-live="polite"></p>
+        <pre class="out" id="alOut" aria-label="Program çıktısı"></pre>
+      </section>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog cx-al-dlg" id="al-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Dizi Laboratuvarı</h2>
+    <p><b>Amaç:</b> Dizinin bellekte yan yana duran <b>hücrelerden</b> oluştuğunu, her öğeye <b>indis</b> (0'dan <code>length − 1</code>'e) ile erişildiğini ve klasik dizi algoritmalarının adım adım nasıl çalıştığını görmek.</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li>Öğeleri virgülle yazıp <b>Uygula</b>'ya basın ya da <b>Rastgele</b> dizi oluşturun.</li>
+      <li><b>Elle okuma/yazma</b>: bir indis girip <b>Oku</b> ya da <b>Yaz</b>'a basın. Geçersiz indis (negatif ya da <code>length</code> ve üstü) <code>ArrayIndexOutOfBoundsException</code> fırlatır; kesik çizgili kırmızı hücre, var olmayan konumu gösterir.</li>
+      <li>Diğer alıştırmalarda <b>Adım ▶</b> ile ilerleyin: okunan hücre mavi halkalı, yazılan hücre turuncu, bulunan hücre yeşil görünür; işaretçiler (i, sol, sag) hücrelerin üstündedir. Klavyede → / ← da çalışır.</li>
+      <li><b>Kendini dene</b>: karşılaştırma sonuçlarını ve yazılacak değerleri tahmin edin.</li>
+    </ol>
+    <h3>Hatırlatma</h3>
+    <ul>
+      <li>Geçerli indisler <code>0 … dizi.length − 1</code>; döngü koşulu <code>i &lt; dizi.length</code> olmalıdır, <code>&lt;=</code> bir tur fazla döner.</li>
+      <li><code>dizi[i] = dizi[dizi[i]]</code> ifadesinde önce iç indis <code>dizi[i]</code> okunur, sonra o konumdaki öğe; önceki turlarda değişmiş hücreler yeni değerleriyle okunur.</li>
+      <li>Hata iletisi biçimi Java 11 ve sonrasınındır (<code>Index 4 out of bounds for length 4</code>); Java 8 yalnızca indisi yazar.</li>
+    </ul>
+    <p>İlgili sunum: <a href="Bolum_10_Diziler.html">Bölüm 10 · Diziler</a> (Dizi ve İndis, Sınır Dışı Hatası, Toplam ve Ortalama, En Küçük ve En Büyük, Ters Çevirme, Doğrusal Arama).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /*CORE-BEGIN*/
+  var Core = (function () {
+    function fmtD(v) {
+      if (v !== v) return "NaN";
+      if (v === 0) return (1 / v < 0) ? "-0.0" : "0.0";
+      var a = Math.abs(v);
+      if (a >= 1e-3 && a < 1e7) { var s = String(v); return s.indexOf(".") < 0 ? s + ".0" : s; }
+      var p = v.toExponential().split("e"), m = p[0];
+      if (m.indexOf(".") < 0) m += ".0";
+      return m + "E" + parseInt(p[1], 10);
+    }
+    function aStr(a) { return "[" + a.join(", ") + "]"; }
+    function exMsg(i, n) { return "Exception in thread \"main\" java.lang.ArrayIndexOutOfBoundsException: Index " + i + " out of bounds for length " + n; }
+
+    function Tracer(a0) {
+      var a = a0.slice(), vars = [], out = "", ev = [];
+      function find(n) { for (var i = 0; i < vars.length; i++) if (vars[i][0] === n) return i; return -1; }
+      var T = {
+        a: a,
+        set: function (n, v) { var i = find(n); if (i < 0) vars.push([n, v]); else vars[i][1] = v; return T; },
+        drop: function (n) { var i = find(n); if (i >= 0) vars.splice(i, 1); return T; },
+        print: function (s) { out += s; return T; },
+        ev: function (line, why, o) {
+          o = o || {};
+          ev.push({ line: line, why: why, a: a.slice(), vars: vars.map(function (v) { return v.slice(); }), out: out,
+            hl: o.hl || {}, ptr: o.ptr || {}, ghost: o.ghost === undefined ? null : o.ghost, chg: o.chg || null, q: o.q || null, err: !!o.err });
+          return T;
+        },
+        get events() { return ev; },
+        get out() { return out; }
+      };
+      return T;
+    }
+    function H() { var o = {}; for (var i = 0; i < arguments.length; i += 2) if (arguments[i] !== null) o[arguments[i]] = arguments[i + 1]; return o; }
+
+    var ALGS = [
+      { id: "elle", ad: "Elle okuma / yazma", manual: true, code: function (a) { return ["int[] dizi = {" + a.join(", ") + "};", "// dizi.length = " + a.length, "// geçerli indisler: 0 … " + (a.length - 1)]; } },
+      {
+        id: "ara", ad: "Doğrusal arama", target: true,
+        code: function (a, h) { return ["int[] dizi = {" + a.join(", ") + "};", "int hedef = " + h + ";", "int konum = -1;", "for (int i = 0; i < dizi.length; i++) {", "    if (dizi[i] == hedef) { konum = i; break; }", "}", "System.out.println(konum);"]; },
+        run: function (T, h) {
+          var a = T.a, n = a.length, i, konum = -1;
+          T.set("hedef", h).set("konum", -1).ev(2, "hedef = " + h + "; konum = -1 (henüz bulunmadı anlamında).", { chg: "konum" });
+          for (i = 0; ; i++) {
+            T.set("i", i);
+            var c = i < n;
+            T.ev(3, "Koşul: i < dizi.length → " + i + " < " + n + " → " + c + (c ? "." : ": dizinin sonuna gelindi."), { chg: "i", ptr: c ? H(i, "i") : {}, q: { k: "b", text: "i < dizi.length → " + i + " < " + n + " ?", a: c } });
+            if (!c) break;
+            var eq = a[i] === h;
+            T.ev(4, "dizi[" + i + "] == hedef → " + a[i] + " == " + h + " → " + eq + (eq ? ": BULUNDU." : ": sonraki öğeye geçilir."), { hl: H(i, eq ? "ok" : "rd"), ptr: H(i, "i"), q: { k: "b", text: "dizi[" + i + "] == hedef → " + a[i] + " == " + h + " ?", a: eq } });
+            if (eq) { konum = i; T.set("konum", i).ev(4, "konum = " + i + "; break ile döngüden çıkılır (kalan öğelere bakılmaz).", { hl: H(i, "ok"), ptr: H(i, "i"), chg: "konum" }); break; }
+          }
+          T.drop("i").print(konum + "\n").ev(6, "println(konum) → " + konum + (konum < 0 ? " (−1: hedef dizide yok; " + n + " karşılaştırma yapıldı)." : " (" + (konum + 1) + " karşılaştırma yapıldı)."), { hl: konum >= 0 ? H(konum, "ok") : {} });
+        }
+      },
+      {
+        id: "minmax", ad: "En büyük ve en küçük",
+        code: function (a) { return ["int[] dizi = {" + a.join(", ") + "};", "int enBuyuk = dizi[0], enKucuk = dizi[0];", "for (int i = 1; i < dizi.length; i++) {", "    if (dizi[i] > enBuyuk) enBuyuk = dizi[i];", "    if (dizi[i] < enKucuk) enKucuk = dizi[i];", "}", "System.out.println(enBuyuk + \" \" + enKucuk);"]; },
+        run: function (T) {
+          var a = T.a, n = a.length, b = a[0], k = a[0], ib = 0, ik = 0;
+          T.set("enBuyuk", b).set("enKucuk", k).ev(1, "İkisi de ilk öğeyle başlar: dizi[0] = " + b + ". (0 ile başlatmak tüm öğeler negatifken yanlış olurdu.)", { hl: H(0, "rd"), chg: "enBuyuk" });
+          for (var i = 1; ; i++) {
+            T.set("i", i);
+            var c = i < n;
+            T.ev(2, "Koşul: i < dizi.length → " + i + " < " + n + " → " + c + ".", { chg: "i", ptr: c ? H(i, "i") : {} });
+            if (!c) break;
+            var g = a[i] > b, ptr = H(i, "i");
+            T.ev(3, "dizi[" + i + "] > enBuyuk → " + a[i] + " > " + b + " → " + g + (g ? ": yeni en büyük." : "."), { hl: H(i, "rd"), ptr: ptr, q: { k: "b", text: "dizi[" + i + "] > enBuyuk → " + a[i] + " > " + b + " ?", a: g } });
+            if (g) { b = a[i]; ib = i; T.set("enBuyuk", b).ev(3, "enBuyuk = " + b + ".", { hl: H(i, "ok"), ptr: ptr, chg: "enBuyuk" }); }
+            var l = a[i] < k;
+            T.ev(4, "dizi[" + i + "] < enKucuk → " + a[i] + " < " + k + " → " + l + (l ? ": yeni en küçük." : "."), { hl: H(i, "rd"), ptr: ptr, q: { k: "b", text: "dizi[" + i + "] < enKucuk → " + a[i] + " < " + k + " ?", a: l } });
+            if (l) { k = a[i]; ik = i; T.set("enKucuk", k).ev(4, "enKucuk = " + k + ".", { hl: H(i, "ok"), ptr: ptr, chg: "enKucuk" }); }
+          }
+          var hl = {}; hl[ik] = "ok"; hl[ib] = "ok";
+          T.drop("i").print(b + " " + k + "\n").ev(6, "println → \"" + b + " " + k + "\". " + (n - 1) + " turda her öğe bir kez incelendi.", { hl: hl, ptr: ib === ik ? H(ib, "max/min") : H(ib, "max", ik, "min") });
+        }
+      },
+      {
+        id: "toplam", ad: "Toplam ve ortalama",
+        code: function (a) { return ["int[] dizi = {" + a.join(", ") + "};", "int toplam = 0;", "for (int i = 0; i < dizi.length; i++) {", "    toplam += dizi[i];", "}", "double ortalama = (double) toplam / dizi.length;", "System.out.println(toplam + \" \" + ortalama);"]; },
+        run: function (T) {
+          var a = T.a, n = a.length, t = 0;
+          T.set("toplam", 0).ev(1, "Biriktirici toplam = 0.", { chg: "toplam" });
+          for (var i = 0; ; i++) {
+            T.set("i", i);
+            var c = i < n;
+            T.ev(2, "Koşul: i < dizi.length → " + i + " < " + n + " → " + c + ".", { chg: "i", ptr: c ? H(i, "i") : {} });
+            if (!c) break;
+            var o = t; t = (t + a[i]) | 0;
+            T.ev(3, "dizi[" + i + "] = " + a[i] + " okunur.", { hl: H(i, "rd"), ptr: H(i, "i"), q: { k: "n", text: "toplam += dizi[" + i + "] → toplamın yeni değeri?", a: t } });
+            T.set("toplam", t).ev(3, "toplam += dizi[" + i + "] → " + o + " + " + a[i] + " = " + t + ".", { hl: H(i, "rd"), ptr: H(i, "i"), chg: "toplam" });
+          }
+          T.drop("i");
+          var ort = t / n;
+          T.set("ortalama", fmtD(ort)).ev(5, "(double) toplam / dizi.length → " + t + ".0 / " + n + " = " + fmtD(ort) + ". (double) dönüşümü olmasaydı tam sayı bölmesi " + Math.trunc(t / n) + " verirdi.", { chg: "ortalama" });
+          T.print(t + " " + fmtD(ort) + "\n").ev(6, "println → \"" + t + " " + fmtD(ort) + "\".");
+        }
+      },
+      {
+        id: "ters", ad: "Ters çevirme (iki işaretçi)",
+        code: function (a) { return ["int[] dizi = {" + a.join(", ") + "};", "int sol = 0, sag = dizi.length - 1;", "while (sol < sag) {", "    int gecici = dizi[sol];", "    dizi[sol] = dizi[sag];", "    dizi[sag] = gecici;", "    sol++; sag--;", "}", "System.out.println(Arrays.toString(dizi));"]; },
+        run: function (T) {
+          var a = T.a, s = 0, g = a.length - 1;
+          T.set("sol", s).set("sag", g).ev(1, "sol ilk, sag son öğeyi gösterir.", { ptr: H(s, "sol", g, "sag"), chg: "sol" });
+          for (;;) {
+            var c = s < g, p = s === g ? H(s, "sol=sag") : H(s, "sol", g, "sag");
+            T.ev(2, "Koşul: sol < sag → " + s + " < " + g + " → " + c + (c ? "." : ": işaretçiler buluştu ya da geçti, iş bitti."), { ptr: p, q: { k: "b", text: "sol < sag → " + s + " < " + g + " ?", a: c } });
+            if (!c) break;
+            var gec = a[s];
+            T.set("gecici", gec).ev(3, "gecici = dizi[" + s + "] = " + gec + " (üzerine yazılmadan önce saklanır).", { hl: H(s, "rd"), ptr: p, chg: "gecici" });
+            a[s] = a[g]; T.ev(4, "dizi[" + s + "] = dizi[" + g + "] → " + a[g] + ".", { hl: H(s, "wr", g, "rd"), ptr: p });
+            a[g] = gec; T.ev(5, "dizi[" + g + "] = gecici → " + gec + ". Takas tamam.", { hl: H(g, "wr", s, "wr"), ptr: p });
+            T.drop("gecici");
+            s++; g--; T.set("sol", s).set("sag", g).ev(6, "sol++ → " + s + ", sag-- → " + g + ".", { ptr: s === g ? H(s, "sol=sag") : H(s, "sol", g, "sag"), chg: "sol" });
+          }
+          T.print(aStr(a) + "\n").ev(8, "Arrays.toString(dizi) → " + aStr(a) + ". " + Math.floor(a.length / 2) + " takas yapıldı.");
+        }
+      },
+      {
+        id: "dd", ad: "İzleme: dizi[i] = dizi[dizi[i]]",
+        code: function (a) { return ["int[] dizi = {" + a.join(", ") + "};", "for (int i = 0; i < dizi.length; i++) {", "    dizi[i] = dizi[dizi[i]];", "}", "System.out.println(Arrays.toString(dizi));"]; },
+        run: function (T) {
+          var a = T.a, n = a.length;
+          for (var i = 0; ; i++) {
+            T.set("i", i);
+            var c = i < n;
+            T.ev(1, (i === 0 ? "Başlangıç i = 0. " : "") + "Koşul: i < dizi.length → " + i + " < " + n + " → " + c + ".", { chg: "i", ptr: c ? H(i, "i") : {} });
+            if (!c) break;
+            var j = a[i], ok = j >= 0 && j < n, w = ok ? a[j] : null;
+            T.ev(2, "İç indis okunur: dizi[i] = dizi[" + i + "] = " + j + ".", { hl: H(i, "rd"), ptr: H(i, "i"), q: ok ? { k: "n", text: "dizi[" + i + "] hücresine hangi değer yazılacak?", a: w } : null });
+            if (!ok) {
+              T.print(exMsg(j, n) + "\n").ev(2, "dizi[" + j + "] okunmak isteniyor ama " + j + " geçerli bir indis değil (0 … " + (n - 1) + "): ArrayIndexOutOfBoundsException! Program burada durur.", { hl: H(i, "rd"), ptr: H(i, "i"), ghost: j, err: true });
+              return;
+            }
+            T.ev(2, "Sonra dizi[" + j + "] okunur = " + w + (j < i ? " (bu hücre önceki bir turda değişmişti!)" : "") + ".", { hl: H(j, "rd"), ptr: j === i ? H(i, "i") : H(i, "i", j, "dizi[i]") });
+            a[i] = w;
+            T.ev(2, "dizi[" + i + "] = " + w + " yazılır.", { hl: H(i, "wr"), ptr: H(i, "i") });
+          }
+          T.drop("i").print(aStr(a) + "\n").ev(4, "Arrays.toString(dizi) → " + aStr(a) + ".");
+        }
+      },
+      {
+        id: "fazla", ad: "Bir tur fazla: i <= length",
+        code: function (a) { return ["int[] dizi = {" + a.join(", ") + "};", "for (int i = 0; i <= dizi.length; i++) {", "    System.out.println(dizi[i]);", "}"]; },
+        run: function (T) {
+          var a = T.a, n = a.length;
+          for (var i = 0; ; i++) {
+            T.set("i", i);
+            var c = i <= n;
+            T.ev(1, "Koşul: i <= dizi.length → " + i + " <= " + n + " → " + c + (c && i === n ? " — DİKKAT: " + n + " geçerli bir indis değil!" : "."), { chg: "i", ptr: c && i < n ? H(i, "i") : {}, ghost: c && i === n ? i : null, q: { k: "b", text: "i <= dizi.length → " + i + " <= " + n + " ?", a: c } });
+            if (!c) break;
+            if (i === n) {
+              T.print(exMsg(i, n) + "\n").ev(2, "dizi[" + i + "] okunmak isteniyor: son geçerli indis " + (n - 1) + ". ArrayIndexOutOfBoundsException; program durur. Doğrusu: i < dizi.length.", { ghost: i, err: true });
+              return;
+            }
+            T.print(a[i] + "\n").ev(2, "println(dizi[" + i + "]) → " + a[i] + ".", { hl: H(i, "rd"), ptr: H(i, "i") });
+          }
+        }
+      }
+    ];
+
+    function trace(alg, a, h) { var T = Tracer(a); alg.run(T, h); return { events: T.events, out: T.out }; }
+    return { ALGS: ALGS, trace: trace, exMsg: exMsg, aStr: aStr };
+  })();
+  /*CORE-END*/
+
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector(".cx-al");
+  var A = null, arr = [8, 3, 6, 2], R = null, k = 0, timer = null, answered = {}, ok = 0, all = 0, man = null;
+
+  Core.ALGS.forEach(function (al, i) { var o = document.createElement("option"); o.value = i; o.textContent = al.ad; E("alAlg").appendChild(o); });
+
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  function parseArr() {
+    var p = E("alArr").value.split(/[,;\s]+/).filter(Boolean).map(function (x) { return parseInt(x, 10); }).filter(function (x) { return !isNaN(x); });
+    p = p.slice(0, 10).map(function (x) { return Math.max(-999, Math.min(999, x)); });
+    if (!p.length) p = [8, 3, 6, 2];
+    arr = p; E("alArr").value = p.join(", ");
+  }
+  function rand() {
+    var n = 4 + Math.floor(Math.random() * 4), p = [];
+    for (var i = 0; i < n; i++) p.push(A.id === "dd" ? Math.floor(Math.random() * n) : 1 + Math.floor(Math.random() * 20));
+    arr = p; E("alArr").value = p.join(", ");
+    if (A.target) E("alTarget").value = Math.random() < 0.7 ? p[Math.floor(Math.random() * n)] : 21;
+    compute();
+  }
+  function setCode(lines) { E("alCode").innerHTML = lines.map(function (l) { return "<li>" + esc(l) + "</li>"; }).join(""); }
+
+  function compute() {
+    stop();
+    A = Core.ALGS[E("alAlg").value];
+    root.classList.toggle("is-manual", !!A.manual);
+    E("alTargetBox").style.display = A.target ? "" : "none";
+    if (A.manual) {
+      man = { a: arr.slice(), out: "", hl: {}, ghost: null, why: "Bir indis girip Oku ya da Yaz düğmesine basın. Geçerli indisler 0 … " + (arr.length - 1) + "." };
+      setCode(A.code(man.a));
+      drawManual();
+      return;
+    }
+    var h = parseInt(E("alTarget").value, 10); if (isNaN(h)) h = 0;
+    R = Core.trace(A, arr, h);
+    setCode(A.code(arr, h));
+    k = 0; answered = {};
+    draw();
+  }
+
+  function drawCells(a, hl, ptr, ghost) {
+    var n = a.length, h = "", gi = ghost;
+    function cw(i, val, cls, isGhost) {
+      return '<div class="cellw' + (isGhost ? " ghostw" : "") + '"><span class="ptr">' + (ptr[i] !== undefined ? esc(ptr[i]) + " ↓" : "") + '</span><div class="cell ' + cls + '">' + val + '</div><span class="idx">[' + i + "]</span></div>";
+    }
+    if (gi !== null && gi < 0) h += cw(gi, "?", "ghost", true);
+    for (var i = 0; i < n; i++) h += cw(i, a[i], hl[i] || "", false);
+    if (gi !== null && gi >= n) h += cw(gi, "?", "ghost", true);
+    E("alCells").innerHTML = h;
+    E("alLen").textContent = "dizi.length = " + n;
+  }
+  function drawVars(vars, chg) {
+    E("alVars").innerHTML = vars.length ? vars.map(function (v) { return '<div class="' + (v[0] === chg ? "is-chg" : "") + '"><span>' + v[0] + "</span><b>" + esc(v[1]) + "</b></div>"; }).join("") : '<span class="agt-oyun__muted" style="font-size:12.5px">—</span>';
+  }
+  function drawOut(s) {
+    E("alOut").innerHTML = esc(s).replace(/(Exception in thread[^\n]*)/g, '<span class="ex">$1</span>');
+    E("alOut").scrollTop = E("alOut").scrollHeight;
+  }
+  function needQ() { var e = R && R.events[k]; return !!(e && e.q && E("alQuiz").checked && !answered[k] && !A.manual); }
+
+  function draw() {
+    var e = R.events[k], q = needQ();
+    [].forEach.call(E("alCode").children, function (li, i) { li.classList.toggle("is-cur", i === e.line); });
+    drawCells(e.a, e.hl, e.ptr, q && e.q.k === "b" && e.ghost !== null ? null : e.ghost);
+    drawVars(e.vars, e.chg);
+    if (q) {
+      E("alWhy").innerHTML = "<b>Tahmin:</b> " + esc(e.q.text) + '<span class="qrow">' + (e.q.k === "b"
+        ? '<button type="button" data-a="true">true</button><button type="button" data-a="false">false</button>'
+        : '<input type="number" id="alQIn" aria-label="Tahmininiz"><button type="button" data-a="num">Kontrol</button>') + "</span>";
+      var f = E("alWhy").querySelector("input, button"); if (f && root.contains(document.activeElement)) f.focus();
+    } else E("alWhy").innerHTML = (e.err ? '<b class="agt-oyun__bad">Hata:</b> ' : "") + esc(e.why);
+    drawOut(e.out);
+    E("alNo").textContent = "Adım " + (k + 1) + " / " + R.events.length;
+    E("alBack").disabled = E("alReset").disabled = k === 0;
+    E("alStep").disabled = q || k >= R.events.length - 1;
+    E("alPlay").disabled = E("alStep").disabled && !timer;
+    E("alPlay").textContent = timer ? "Duraklat" : "Oynat";
+  }
+  function answer(val) {
+    var e = R.events[k], good = e.q.k === "b" ? (val === "true") === e.q.a : Number(val) === e.q.a;
+    if (e.q.k === "n" && (val === "" || isNaN(Number(val)))) return;
+    answered[k] = true; all++; if (good) ok++;
+    E("alOk").textContent = ok; E("alAll").textContent = all;
+    draw();
+    E("alWhy").innerHTML = (good ? '<b class="agt-oyun__good">Doğru!</b> ' : '<b class="agt-oyun__bad">Yanlış</b> (doğrusu ' + e.q.a + "). ") + esc(e.why);
+    E("alStep").focus();
+  }
+  E("alWhy").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-a]"); if (!b) return;
+    answer(b.getAttribute("data-a") === "num" ? E("alQIn").value.trim() : b.getAttribute("data-a"));
+  });
+  E("alWhy").addEventListener("keydown", function (ev) { if (ev.key === "Enter" && ev.target.id === "alQIn") answer(ev.target.value.trim()); });
+
+  /* elle okuma / yazma */
+  function drawManual() {
+    drawCells(man.a, man.hl, {}, man.ghost);
+    drawVars([["dizi.length", man.a.length]], null);
+    E("alWhy").innerHTML = man.why;
+    drawOut(man.out);
+  }
+  function access(write) {
+    var i = parseInt(E("alIdx").value, 10), v = parseInt(E("alVal").value, 10), n = man.a.length;
+    if (isNaN(i)) return;
+    if (isNaN(v)) v = 0;
+    man.hl = {}; man.ghost = null;
+    var stmt = write ? "dizi[" + i + "] = " + v + ";" : "System.out.println(dizi[" + i + "]);";
+    if (i < 0 || i >= n) {
+      man.ghost = Math.max(-1, Math.min(n, i));
+      man.out += "> " + stmt + "\n" + Core.exMsg(i, n) + "\n";
+      man.why = '<b class="agt-oyun__bad">Sınır dışı!</b> ' + i + " geçerli bir indis değil; geçerli aralık 0 … " + (n - 1) + " (dizi.length = " + n + "). Java bunu çalışma zamanında yakalar ve ArrayIndexOutOfBoundsException fırlatır.";
+    } else if (write) {
+      var old = man.a[i]; man.a[i] = v; man.hl[i] = "wr";
+      man.out += "> " + stmt + "\n";
+      man.why = "dizi[" + i + "] hücresine " + v + " yazıldı (eski değer " + old + " silindi). Erişim indisle doğrudan yapılır; diğer hücreler etkilenmez.";
+    } else {
+      man.hl[i] = "rd";
+      man.out += "> " + stmt + "\n" + man.a[i] + "\n";
+      man.why = "dizi[" + i + "] okundu → " + man.a[i] + ". " + (i === n - 1 ? "Bu son öğe: indisi length − 1 = " + (n - 1) + "." : i === 0 ? "İlk öğenin indisi 0'dır." : "");
+    }
+    setCode(A.code(man.a));
+    drawManual();
+  }
+  E("alRead").addEventListener("click", function () { access(false); });
+  E("alWrite").addEventListener("click", function () { access(true); });
+
+  function go(d) { k = Math.max(0, Math.min(R.events.length - 1, k + d)); draw(); }
+  function stop() { clearInterval(timer); timer = null; }
+  function delay() { return [1500, 1050, 700, 420, 200][E("alSpeed").value - 1]; }
+  function play() {
+    if (timer) { stop(); draw(); return; }
+    if (k >= R.events.length - 1) k = 0;
+    timer = setInterval(function () {
+      if (needQ() || k >= R.events.length - 1) { stop(); draw(); return; }
+      go(1);
+      if (needQ()) { stop(); draw(); }
+    }, delay());
+    draw();
+  }
+
+  E("alAlg").addEventListener("change", function () {
+    A = Core.ALGS[E("alAlg").value];
+    if (A.id === "dd" && arr.some(function (x) { return x < 0 || x >= arr.length; })) { arr = [2, 0, 3, 1]; E("alArr").value = "2, 0, 3, 1"; }
+    compute();
+  });
+  E("alApply").addEventListener("click", function () { parseArr(); compute(); });
+  E("alArr").addEventListener("keydown", function (e) { if (e.key === "Enter") { parseArr(); compute(); } });
+  E("alRand").addEventListener("click", rand);
+  E("alTarget").addEventListener("change", compute);
+  E("alStep").addEventListener("click", function () { stop(); go(1); });
+  E("alBack").addEventListener("click", function () { stop(); go(-1); });
+  E("alReset").addEventListener("click", function () { stop(); k = 0; answered = {}; draw(); });
+  E("alPlay").addEventListener("click", play);
+  E("alSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("alQuiz").addEventListener("change", function () { if (!A.manual) draw(); });
+  root.addEventListener("keydown", function (ev) {
+    if (A.manual || /INPUT|SELECT|TEXTAREA/.test(ev.target.tagName)) return;
+    if (ev.key === "ArrowRight" && !needQ()) { stop(); go(1); ev.preventDefault(); }
+    else if (ev.key === "ArrowLeft") { stop(); go(-1); ev.preventDefault(); }
+  });
+
+  E("alAlg").value = "1";
+  compute();
+})();
+</script>
+<script src="deck/oyun.js"></script>

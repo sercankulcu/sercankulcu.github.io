@@ -240,9 +240,9 @@ html[data-theme="dark"] .agt-oyun, html[data-theme="dark"] #c01c-help { --ds-acc
       view.done = 'ÇÖZ'; view.hot = { CU: 1 };
       if (!isIns(S.ir)) return fault('Çöz: IR’deki <code>' + S.ir + '</code> bir veri; CPU onu komut sanar ve geçersiz komut hatası verir. (HALT bu yüzden gereklidir.)');
       var c = S.ir;
-      view.cu = ['Çöz: ' + txt(c), 'opcode ' + OPC[c.op] + ' · adres ' + bits12(c.a)];
+      view.cu = ['Çöz: ' + txt(c), 'opcode ' + OPC[c.op] + (c.a !== undefined ? ' · adres ' + c.a : '')];
       view.text = '<b>Çöz:</b> kontrol birimi IR’yi ayırır: opcode <code>' + OPC[c.op] + '</code> = <code>' + c.op + '</code>' +
-        (c.a !== undefined ? ', adres <code>' + c.a + '</code>' : '') + ' → ' + MEANING[c.op].replace(/\ba\b/g, c.a) + '.';
+        (c.a !== undefined ? ', adres <code>' + c.a + '</code>' : '') + ' → ' + MEANING[c.op].replace(/\ba\b/g, c.a) + '. Makine kodu: <code>' + OPC[c.op] + ' ' + bits12(c.a) + '</code>.';
       S.phase = 2;
       return true;
     }
@@ -346,8 +346,8 @@ html[data-theme="dark"] .agt-oyun, html[data-theme="dark"] #c01c-help { --ds-acc
       if (view.cell && view.cell.a === adr) cls += ' ' + view.cell.k;
       s += '<rect class="' + cls + '" x="338" y="' + y + '" width="168" height="21.6" rx="4"/>' +
         '<text class="ad" x="344" y="' + (y + 15) + '">' + adr + '</text><text class="ct" x="386" y="' + (y + 15.5) + '">' + txt(c) + '</text>' +
-        (prog().tags[adr] ? '<text class="tag" x="501" y="' + (y + 15) + '">' + prog().tags[adr] + '</text>' : '') +
-        (adr === S.pc && !S.halted ? '<text class="pcm" x="335" y="' + (y + 15) + '">PC</text>' : '');
+        (prog().tags[adr] ? '<text class="tag" x="501" y="' + (y + 15) + '">' + prog().tags[adr] + '</text>' :
+          (adr === S.pc && !S.halted ? '<text class="pcm" x="501" y="' + (y + 15) + '">← PC</text>' : ''));
     }
     var svg = E('c01c-svg');
     svg.innerHTML = s;
@@ -390,7 +390,7 @@ html[data-theme="dark"] .agt-oyun, html[data-theme="dark"] #c01c-help { --ds-acc
     E('c01c-q').innerHTML = 'Tahmin et: <code>' + txt(S.ir) + '</code> çalışınca <b>' + p.what + '</b> kaç olur?';
     E('c01c-qin').value = ''; E('c01c-fb').textContent = ''; E('c01c-fb').className = 'fb';
     E('c01c-check').disabled = false;
-    view.text = 'Kendini dene: <code>' + txt(S.ir) + '</code> çözüldü. Çalıştırmadan önce ' + p.what + ' değerini tahmin et ve <b>Kontrol</b>’e bas.';
+    view.text += '<br>Kendini dene: çalıştırmadan önce <b>' + p.what + '</b> değerini tahmin et ve <b>Kontrol</b>’e bas.';
     renderSide();
     E('c01c-qin').focus();
   }
@@ -413,12 +413,12 @@ html[data-theme="dark"] .agt-oyun, html[data-theme="dark"] #c01c-help { --ds-acc
   function stop() { if (timer) { clearInterval(timer); timer = null; } }
   function doStep() {
     if (needQuiz()) { stop(); askQuiz(); return; }
+    var wasExec = S.phase === 2;
     step();
-    if (S.phase !== 2) { quiz = quiz && quiz.done ? quiz : null; }
+    if (!wasExec && S.phase === 1) { quiz = null; E('c01c-qbox').hidden = true; }
     if (S.halted) stop();
     render(true);
-    if (!quizOn || (quiz && quiz.done && S.phase === 1)) { E('c01c-qbox').hidden = !quizOn || !quiz; }
-    if (needQuiz() && timer) { stop(); askQuiz(); }
+    if (needQuiz()) { stop(); askQuiz(); }
   }
   function reset() {
     stop(); load();
