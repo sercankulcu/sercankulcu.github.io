@@ -40,7 +40,7 @@ html[data-theme="dark"] .agt-oyun.pj-root, html[data-theme="dark"] #pj-help { --
 .pj-root .pj-bar select, .pj-root .pj-bar input:not([type="checkbox"]):not([type="range"]) { min-height: 32px; font-size: 14px; }
 .pj-root .pj-lbl { display: inline-flex; align-items: center; gap: 5px; color: var(--ds-muted); font-size: 12.5px; font-weight: 700; }
 .pj-root .pj-lbl input[type="range"] { width: 80px; }
-.pj-root #pjMsg { width: 150px; font-family: ui-monospace, Consolas, monospace; }
+.pj-root #pjMsg { width: 118px; font-family: ui-monospace, Consolas, monospace; }
 .pj-root .pj-score { margin-left: auto; padding: 4px 10px; border-radius: 999px; background: var(--ds-surface-strong); font-size: 13px; font-weight: 700; }
 .pj-root .pj-phases { display: flex; gap: 4px; }
 .pj-root .pj-phases span { flex: 1; padding: 3px 4px; border: 1.5px solid var(--ds-border); border-radius: 999px; background: var(--ds-bg); color: var(--ds-muted); font-size: 12px; font-weight: 700; text-align: center; white-space: nowrap; }
@@ -85,7 +85,7 @@ html[data-theme="dark"] .agt-oyun.pj-root, html[data-theme="dark"] #pj-help { --
 .pj-root .lost { fill: var(--ds-bad); font-size: 12.5px; font-weight: 800; }
 </style>
 
-<div class="pj-root agt-oyun agt-oyun--stage" id="pjRoot">
+<div class="pj-root agt-oyun agt-oyun--stage" id="pjRoot" lang="tr">
   <header class="agt-oyun__head">
     <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 1 · Simülasyon</p><h1>Bir Web İsteğinin Yolculuğu</h1></div>
     <button type="button" class="agt-oyun__help" aria-controls="pj-help">?</button>
@@ -106,9 +106,9 @@ html[data-theme="dark"] .agt-oyun.pj-root, html[data-theme="dark"] #pj-help { --
       <div class="pj-bar">
         <label class="pj-lbl">Önbellek
           <select id="pjCache" aria-label="Önbellek durumu">
-            <option value="none">Hiçbir önbellekte kayıt yok</option>
-            <option value="resolver">Çözümleyici önbelleğinde var</option>
-            <option value="browser">Tarayıcı önbelleğinde var</option>
+            <option value="none">Hiçbir yerde kayıt yok</option>
+            <option value="resolver">Çözümleyicide var</option>
+            <option value="browser">Tarayıcıda var</option>
           </select>
         </label>
         <label class="pj-lbl">İleti <input type="text" id="pjMsg" maxlength="20" value="MERHABA DÜNYA!" aria-label="Gönderilecek ileti (en çok 20 karakter)"></label>
@@ -253,6 +253,7 @@ html[data-theme="dark"] .agt-oyun.pj-root, html[data-theme="dark"] #pj-help { --
     return { phase: phase, dur: 1.3, text: text, apply: function (v, p) {
       v.scene = "dns"; v.on = {}; v.on[a] = 1; v.on[b] = 1;
       v.msg = { a: a, b: b, p: ease(p), text: label, cls: cls || "" };
+      if (p >= 1 && (b === "coz" || b === "tar")) v.bub[b] = { text: label, cls: cls === "is-ans" ? "is-good" : "" };
       if (extra) extra(v, p);
     } };
   }
@@ -297,7 +298,7 @@ html[data-theme="dark"] .agt-oyun.pj-root, html[data-theme="dark"] #pj-help { --
       }
     }
     steps.push(moveStep(0, "tar", "web", "bağlan: " + IP, "Tarayıcı artık IP adresini bildiği için <b>" + IP + "</b> adresindeki web sunucusuna bağlanır. Şimdi iletinin kendisi gönderilecek.",
-      "", function (v, p) { v.webLink = p >= 1; }));
+      "", function (v, p) { v.webLink = p >= 1; if (p >= 1) v.bub.web = { text: "bağlantı kuruldu", cls: "is-good" }; }));
 
     var n = chunks.length, pk = traffic.packets;
     steps.push({ phase: 1, dur: 0.6, text: "İleti tek parça gönderilmez: <b>" + n + " pakete</b> bölünür. Her paketin başlığında sıra numarası, kaynak ve hedef adresi vardır (ör. #1: " + SRC_IP + " → " + IP + ", sıra no 1).",
@@ -305,7 +306,7 @@ html[data-theme="dark"] .agt-oyun.pj-root, html[data-theme="dark"] #pj-help { --
     var byPath = { R2: [], R3: [] };
     pk.forEach(function (p) { byPath[p.path].push("#" + p.n); });
     var pathTxt = ["R2", "R3"].filter(function (r) { return byPath[r].length; }).map(function (r) {
-      return byPath[r].join(", ") + " R1 → " + r + " → R4";
+      return byPath[r].join(", ") + ": R1 → " + r + " → R4";
     }).join("; ");
     steps.push({ phase: 2, dur: traffic.T * 1.15, quiz: { q: "Paketlerin hepsi aynı yolu mu izler?", options: ["Hayır, her paketin yolu ayrı seçilebilir", "Evet, hepsi aynı yolu izler"], answer: 0 },
       text: "Paketler bağımsız yolculuk eder: " + pathTxt + ". Yönlendiriciler her paket için o anki en uygun yolu seçer.",
@@ -361,14 +362,14 @@ html[data-theme="dark"] .agt-oyun.pj-root, html[data-theme="dark"] #pj-help { --
     ["kok", "tld", "yet"].forEach(function (k) { h += line(DN.coz, DN[k], v.on[k] ? "is-on" : ""); });
     h += line(DN.tar, DN.web, (v.webLink ? "" : "is-dash ") + (v.on.web ? "is-on" : ""));
     Object.keys(DN).forEach(function (k) { h += node(k, DN[k], v.on[k]); });
-    h += '<g class="cache"><rect x="270" y="132" width="150" height="38" rx="8"/><text x="345" y="147" text-anchor="middle" style="font-weight:700">çözümleyici önbelleği</text>' +
+    h += '<g class="cache"><rect x="250" y="132" width="190" height="38" rx="8"/><text x="345" y="147" text-anchor="middle" style="font-weight:700">çözümleyici önbelleği</text>' +
       '<text x="345" y="163" text-anchor="middle">' + esc(v.cache) + '</text></g>';
     Object.keys(v.bub).forEach(function (k) {
       var n = DN[k], b = v.bub[k];
-      var y = k === "coz" ? n.y - 33 : n.y + 41;
+      var y = k === "web" ? n.y + 41 : n.y - 33;
       h += '<text class="bub ' + (b.cls || "") + '" x="' + n.x + '" y="' + y + '" text-anchor="middle">' + esc(b.text) + '</text>';
     });
-    if (v.msg) {
+    if (v.msg && v.msg.p < 1) {
       var a = DN[v.msg.a], b2 = DN[v.msg.b], p = v.msg.p;
       h += pill(a.x + (b2.x - a.x) * p, a.y + (b2.y - a.y) * p, v.msg.text, v.msg.cls);
     }
