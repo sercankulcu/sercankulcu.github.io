@@ -1,0 +1,510 @@
+---
+layout: without-sidebar
+title: "Sıralama Algoritmaları Görselleştirici"
+permalink: /files/computer/slides/Chapter_04_Sorting-Visualizer.html
+excerpt: "Seçimli, kabarcık, eklemeli ve birleştirme sıralamasını çubuklar, sözde kod, karşılaştırma ve takas sayaçlarıyla adım adım gösteren görselleştirici."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.so-sim.agt-oyun { --ds-accent:#b45309; --ds-link:#0369a1; }
+html[data-theme="dark"] .agt-oyun { --ds-accent:#f59e57; --ds-link:#7cc4e8; }
+#so-help { --ds-accent:#b45309; }
+html[data-theme="dark"] #so-help { --ds-accent:#f59e57; }
+
+.so-sim .so-wrap { display: flex; flex-direction: column; gap: 8px; height: 100%; }
+.so-sim .bar-row { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; }
+.so-sim .bar-row label { display: flex; align-items: center; gap: 5px; color: var(--ds-muted); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+.so-sim .bar-row select { min-height: 32px; font-size: 14px; }
+.so-sim .bar-row input[type="range"] { width: 92px; }
+.so-sim .bar-row b { min-width: 18px; color: var(--ds-text); font-variant-numeric: tabular-nums; }
+.so-sim .bar-row button { min-height: 32px; padding: 0 11px; font-size: 14px; }
+.so-sim .bar-row .grow { flex: 1; }
+.so-sim .so-main { display: grid; grid-template-columns: minmax(0, 1fr) 262px; gap: 10px; flex: 1; min-height: 0; }
+.so-sim .panel { min-width: 0; min-height: 0; padding: 8px 10px; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.so-sim .vis { display: flex; flex-direction: column; gap: 6px; }
+.so-sim svg { display: block; width: 100%; height: 252px; }
+.so-sim svg .bar { fill: var(--ds-node); stroke: var(--ds-link); stroke-width: 1; }
+.so-sim svg .bar.done { fill: color-mix(in srgb, var(--ds-good) 35%, var(--ds-bg)); stroke: var(--ds-good); }
+.so-sim svg .bar.cmp { fill: color-mix(in srgb, var(--ds-warn) 55%, var(--ds-bg)); stroke: var(--ds-warn); stroke-width: 2; }
+.so-sim svg .bar.swp { fill: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-bg)); stroke: var(--ds-bad); stroke-width: 2; }
+.so-sim svg .bar.mark { fill: color-mix(in srgb, var(--ds-link) 45%, var(--ds-bg)); stroke: var(--ds-link); stroke-width: 2.5; }
+.so-sim svg .bar.dim { opacity: .35; }
+.so-sim svg .hole { fill: none; stroke: var(--ds-muted); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.so-sim svg .band { fill: var(--ds-surface-strong); }
+.so-sim svg .band2 { fill: color-mix(in srgb, var(--ds-accent) 9%, var(--ds-bg)); }
+.so-sim svg text { fill: var(--ds-text); font-size: 11px; font-weight: 700; text-anchor: middle; font-family: ui-monospace, Consolas, monospace; }
+.so-sim svg text.idx { fill: var(--ds-muted); font-weight: 400; }
+.so-sim svg text.ptr { fill: var(--ds-accent); font-size: 11.5px; }
+.so-sim svg .keyb { fill: color-mix(in srgb, var(--ds-link) 45%, var(--ds-bg)); stroke: var(--ds-link); stroke-width: 2.5; }
+.so-sim svg .tmp { fill: color-mix(in srgb, var(--ds-accent) 30%, var(--ds-bg)); stroke: var(--ds-accent); stroke-width: 1; }
+.so-sim .msg { flex: 1; min-height: 0; margin: 0; padding: 6px 10px; overflow: hidden; border-radius: 10px; background: var(--ds-surface-strong); font-size: 14px; line-height: 1.4; }
+.so-sim .msg.q { box-shadow: inset 0 0 0 2px var(--ds-accent); }
+.so-sim .legend { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; color: var(--ds-muted); font-size: 12px; }
+.so-sim .legend i { display: inline-block; width: 11px; height: 11px; margin-right: 4px; border: 1.5px solid; border-radius: 2px; vertical-align: -1px; }
+.so-sim .side { display: flex; flex-direction: column; gap: 8px; }
+.so-sim .code { flex: 1; min-height: 0; margin: 0; padding: 4px 0; overflow: hidden; border: 1.5px solid var(--ds-border); border-radius: 8px; background: var(--ds-surface); font-family: ui-monospace, Consolas, monospace; font-size: 12px; line-height: 1.55; }
+.so-sim .code div { padding: 0 8px; white-space: pre; }
+.so-sim .code div.on { background: var(--ds-hot); font-weight: 800; box-shadow: inset 3px 0 0 var(--ds-accent); }
+.so-sim .cap { margin: 0; color: var(--ds-muted); font-size: 11.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.so-sim .counters { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.so-sim .counters div { padding: 4px 2px; border-radius: 10px; background: var(--ds-surface-strong); color: var(--ds-muted); font-size: 11.5px; font-weight: 700; text-align: center; }
+.so-sim .counters b { display: block; color: var(--ds-text); font-size: 19px; font-variant-numeric: tabular-nums; }
+.so-sim .play { display: flex; align-items: center; gap: 7px; }
+.so-sim .play button { min-height: 34px; padding: 0 12px; font-size: 14px; }
+.so-sim .play label { display: flex; align-items: center; gap: 5px; color: var(--ds-muted); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+.so-sim .play input[type="range"] { width: 80px; }
+.so-sim .play .pred { display: none; gap: 6px; }
+.so-sim .play .pred.on { display: flex; }
+.so-sim .play .pred button { border-color: var(--ds-accent); }
+.so-sim .score { margin-left: auto; color: var(--ds-muted); font-size: 13px; font-weight: 700; white-space: nowrap; }
+</style>
+
+<div class="so-sim agt-oyun agt-oyun--stage">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 4 · Simülasyon</p><h1>Sıralama Algoritmaları Görselleştirici</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="so-help">?</button>
+    <a class="agt-oyun__back" href="Bolum_04_Algoritmalar.html">← Bölüm 4</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="so-wrap">
+      <div class="bar-row">
+        <label>Algoritma
+          <select id="soAlg">
+            <option value="sel">Seçimli sıralama</option>
+            <option value="bub">Kabarcık sıralaması</option>
+            <option value="ins">Eklemeli sıralama</option>
+            <option value="mer">Birleştirme sıralaması</option>
+          </select>
+        </label>
+        <label>Boyut <input type="range" id="soN" min="5" max="40" value="10" aria-label="Dizi boyutu"> <b id="soNv">10</b></label>
+        <label>Düzen
+          <select id="soOrder">
+            <option value="rnd">Rastgele</option>
+            <option value="asc">Sıralı</option>
+            <option value="desc">Ters sıralı</option>
+            <option value="near">Neredeyse sıralı</option>
+          </select>
+        </label>
+        <span class="grow"></span>
+        <button type="button" id="soNew" class="is-primary">Yeni dizi</button>
+      </div>
+
+      <div class="so-main">
+        <section class="panel vis">
+          <svg id="soSvg" viewBox="0 0 480 252" role="img" aria-label="Dizi çubuk grafiği"></svg>
+          <p class="legend">
+            <span><i style="border-color:var(--ds-warn);background:color-mix(in srgb,var(--ds-warn) 55%,var(--ds-bg))"></i>karşılaştırılan</span>
+            <span><i style="border-color:var(--ds-bad);background:color-mix(in srgb,var(--ds-bad) 55%,var(--ds-bg))"></i>takas / yazma</span>
+            <span><i style="border-color:var(--ds-link);background:color-mix(in srgb,var(--ds-link) 45%,var(--ds-bg))"></i><span id="soMarkName">enK</span></span>
+            <span><i style="border-color:var(--ds-good);background:color-mix(in srgb,var(--ds-good) 35%,var(--ds-bg))"></i>yerine oturdu</span>
+          </p>
+          <p class="msg" id="soMsg" aria-live="polite"></p>
+        </section>
+        <aside class="panel side">
+          <p class="cap">Sözde kod</p>
+          <div class="code" id="soCode"></div>
+          <div class="counters">
+            <div>Karşılaştırma<b id="soCmp">0</b></div>
+            <div><span id="soSwName">Takas</span><b id="soSw">0</b></div>
+            <div>Adım<b id="soStep">0</b></div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="play">
+        <button type="button" id="soReset" aria-label="Başa dön">⏮ Başa</button>
+        <button type="button" id="soBack" aria-label="Bir adım geri">◀ Geri</button>
+        <button type="button" id="soFwd" class="is-primary" aria-label="Bir adım ileri">Adım ▶</button>
+        <button type="button" id="soPlay" aria-label="Oynat">Oynat</button>
+        <label>Hız <input type="range" id="soSpeed" min="1" max="10" value="5" aria-label="Oynatma hızı"></label>
+        <label><input type="checkbox" id="soPredict"> Tahmin et</label>
+        <span class="pred" id="soPred"><button type="button" id="soYes" aria-label="Tahmin: koşul doğru">Doğru</button><button type="button" id="soNo" aria-label="Tahmin: koşul yanlış">Yanlış</button></span>
+        <span class="score" id="soScore"></span>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="so-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Sıralama görselleştirici</h2>
+    <p><b>Amaç:</b> Sunumdaki sıralama algoritmalarının her adımda hangi öğeleri karşılaştırdığını ve nasıl yer değiştirdiğini izlemek; karşılaştırma ve takas sayılarını algoritmalar ve başlangıç düzenleri arasında karşılaştırmak.</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li>Algoritmayı, dizi boyutunu (5–40) ve başlangıç düzenini seçin; <b>Yeni dizi</b> yeni rastgele değerler üretir.</li>
+      <li><b>Adım ▶</b> bir adım ilerler, <b>◀ Geri</b> bir adım geri alır, <b>Oynat</b> sona kadar kendiliğinden yürütür. Sağdaki sözde kodda o adımda çalışan satır vurgulanır.</li>
+      <li><b>Tahmin et</b> işaretliyken her karşılaştırmada durulur: koşulun <b>Doğru</b> mu <b>Yanlış</b> mı çıkacağını tahmin edin; puanınız sağ altta tutulur.</li>
+    </ol>
+    <h3>Ne gözlenmeli?</h3>
+    <table>
+      <tr><th>Algoritma</th><th>Karşılaştırma</th><th>İpucu</th></tr>
+      <tr><td>Seçimli</td><td>her zaman n(n−1)/2</td><td>takas en fazla n−1</td></tr>
+      <tr><td>Kabarcık</td><td>sıralı dizide n−1</td><td>değişim olmayan turda durur</td></tr>
+      <tr><td>Eklemeli</td><td>sıralı dizide n−1</td><td>ters sıralıda en kötü durum</td></tr>
+      <tr><td>Birleştirme</td><td>≈ n log₂ n</td><td>yardımcı dizi: ek bellek O(n)</td></tr>
+    </table>
+    <p>Eklemeli sıralamada ikinci sayaç <b>kaydırma</b> (dizi[j+1] = dizi[j]) sayısını, birleştirme sıralamasında geçici diziden diziye <b>yazma</b> sayısını gösterir.</p>
+    <p>İlgili sunum: <a href="Bolum_04_Algoritmalar.html">Bölüm 4 · Algoritmalar</a> (Seçimli, Kabarcık ve Eklemeli Sıralama Adım Adım; Sıralama Karşılaştırması).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  /* yalnızca sercankulcu.github.io adresinde (ve yerel önizlemede) çalışır (© Sercan Külcü) */
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+  var E = function (id) { return document.getElementById(id); };
+
+  var CODE = {
+    sel: ["i = 0'dan n-2'ye kadar",
+          "  enK = i",
+          "  j = i+1'den n-1'e kadar",
+          "    eğer dizi[j] < dizi[enK] ise enK = j",
+          "  dizi[i] ile dizi[enK] yer değiştir"],
+    bub: ["tur = 0",
+          "tekrarla",
+          "  degisti = yanlış",
+          "  j = 0'dan n-2-tur'a kadar",
+          "    eğer dizi[j] > dizi[j+1] ise",
+          "      dizi[j] ile dizi[j+1] yer değiştir",
+          "      degisti = doğru",
+          "  tur = tur + 1",
+          "degisti yanlış olana kadar"],
+    ins: ["i = 1'den n-1'e kadar",
+          "  anahtar = dizi[i]",
+          "  j = i - 1",
+          "  j >= 0 ve dizi[j] > anahtar iken",
+          "    dizi[j+1] = dizi[j]",
+          "    j = j - 1",
+          "  dizi[j+1] = anahtar"],
+    mer: ["birlestirmeSirala(sol, sag)",
+          "  eğer sol < sag ise",
+          "    orta = (sol + sag) / 2",
+          "    birlestirmeSirala(sol, orta)",
+          "    birlestirmeSirala(orta+1, sag)",
+          "    birlestir(sol, orta, sag)",
+          "birlestir(sol, orta, sag)",
+          "  i = sol, j = orta+1, gecici = []",
+          "  i <= orta ve j <= sag iken",
+          "    eğer dizi[i] <= dizi[j] ise",
+          "      gecici'ye dizi[i] ekle, i = i+1",
+          "    değilse gecici'ye dizi[j] ekle, j = j+1",
+          "  kalanları gecici'ye ekle",
+          "  gecici'yi dizi[sol..sag]'a kopyala"]
+  };
+  var SWNAME = { sel: "Takas", bub: "Takas", ins: "Kaydırma", mer: "Yazma" };
+  var MARKNAME = { sel: "enK (aday en küçük)", bub: "son tur", ins: "anahtar", mer: "geçici dizi" };
+
+  /* ---------- karelerin üretimi ---------- */
+  function build(alg, a0) {
+    var a = a0.slice(), n = a.length, F = [], cmp = 0, sw = 0, done = {};
+    function doneList() { return Object.keys(done).map(Number); }
+    function push(o) {
+      o.arr = a.slice(); o.cmp = cmp; o.sw = sw; o.done = doneList();
+      F.push(o);
+    }
+    function v(i) { return a[i]; }
+    if (alg === "sel") {
+      push({ line: -1, msg: "Başlangıç dizisi (n = " + n + "). Seçimli sıralama, sıralanmamış bölümdeki en küçük öğeyi bulup bölümün başına koyar." });
+      for (var i = 0; i < n - 1; i++) {
+        var enK = i;
+        push({ line: 1, mark: enK, lo: i, msg: "i = " + i + ": sıralanmamış bölüm " + i + "…" + (n - 1) + ". Aday en küçük: dizi[" + i + "] = " + v(i) + "." });
+        for (var j = i + 1; j < n; j++) {
+          cmp++;
+          var c = a[j] < a[enK];
+          push({ line: 3, cmpI: [j, enK], mark: enK, lo: i, cond: c,
+            q: "dizi[" + j + "] = " + v(j) + " < dizi[enK] = " + v(enK) + " ?",
+            msg: "j = " + j + ": " + v(j) + " < " + v(enK) + " → " + (c ? "doğru: yeni aday, enK = " + j + "." : "yanlış: enK = " + enK + " kalır.") });
+          if (c) enK = j;
+        }
+        if (enK !== i) {
+          var t = a[i]; a[i] = a[enK]; a[enK] = t; sw++;
+          done[i] = 1;
+          push({ line: 4, swp: [i, enK], lo: i, msg: "dizi[" + i + "] ile dizi[" + enK + "] yer değiştirdi: " + v(i) + " " + i + ". konuma oturdu." });
+        } else {
+          done[i] = 1;
+          push({ line: 4, mark: i, lo: i, msg: "enK = i = " + i + ": en küçük (" + v(i) + ") zaten yerinde; kendisiyle takas sayılmaz." });
+        }
+      }
+      done[n - 1] = 1;
+      push({ line: -1, msg: "Dizi sıralandı. " + cmp + " karşılaştırma = n(n−1)/2 = " + (n * (n - 1) / 2) + "; " + sw + " takas (en fazla n−1 = " + (n - 1) + ")." });
+    }
+    if (alg === "bub") {
+      var tur = 0, degisti;
+      push({ line: 0, msg: "tur = 0. Komşu çiftler soldan sağa karşılaştırılacak; her turda kalanların en büyüğü sona taşınır." });
+      do {
+        degisti = false;
+        push({ line: 2, msg: (tur + 1) + ". geçiş: degisti = yanlış; j = 0…" + (n - 2 - tur) + "." });
+        for (var j2 = 0; j2 <= n - 2 - tur; j2++) {
+          cmp++;
+          var c2 = a[j2] > a[j2 + 1];
+          push({ line: 4, cmpI: [j2, j2 + 1], cond: c2, hi: n - 1 - tur,
+            q: "dizi[" + j2 + "] = " + v(j2) + " > dizi[" + (j2 + 1) + "] = " + v(j2 + 1) + " ?",
+            msg: "j = " + j2 + ": " + v(j2) + " > " + v(j2 + 1) + " → " + (c2 ? "doğru: yer değiştirecekler." : "yanlış: sıra doğru, dokunulmaz.") });
+          if (c2) {
+            var t2 = a[j2]; a[j2] = a[j2 + 1]; a[j2 + 1] = t2; sw++; degisti = true;
+            push({ line: 5, swp: [j2, j2 + 1], hi: n - 1 - tur, msg: "Takas: dizi[" + j2 + "] = " + v(j2) + ", dizi[" + (j2 + 1) + "] = " + v(j2 + 1) + "; degisti = doğru." });
+          }
+        }
+        done[n - 1 - tur] = 1;
+        tur++;
+        push({ line: 7, msg: "Geçiş bitti: " + v(n - tur) + " yerine oturdu. tur = " + tur + "; degisti = " + (degisti ? (tur < n - 1 ? "doğru → yeni geçiş." : "doğru, ama kalan tek öğe zaten yerinde: dur.") : "yanlış → dizi sıralı, dur.") });
+      } while (degisti && tur < n - 1);
+      for (var k = 0; k < n; k++) done[k] = 1;
+      push({ line: 8, msg: "Dizi sıralandı: " + tur + " geçiş, " + cmp + " karşılaştırma, " + sw + " takas." + (sw === 0 ? " Hiç takas olmadı: sıralı dizide tek geçiş yeter (O(n))." : "") });
+    }
+    if (alg === "ins") {
+      done[0] = 1;
+      push({ line: -1, sortedTo: 0, msg: "Soldaki bölüm (yalnızca dizi[0]) sıralı kabul edilir. Sıradaki her öğe anahtar olarak alınıp sıralı bölüme eklenecek." });
+      for (var i3 = 1; i3 < n; i3++) {
+        var key = a[i3];
+        a[i3] = null;
+        push({ line: 1, key: key, keyAt: i3, sortedTo: i3 - 1, msg: "i = " + i3 + ": anahtar = dizi[" + i3 + "] = " + key + " alınır, yeri boşalır. Sol bölüm 0…" + (i3 - 1) + " sıralı." });
+        var j3 = i3 - 1;
+        push({ line: 2, key: key, keyAt: j3 + 1, sortedTo: i3 - 1, msg: "j = " + j3 + "." });
+        while (true) {
+          if (j3 < 0) {
+            push({ line: 3, key: key, keyAt: 0, sortedTo: i3 - 1, msg: "j = −1: j >= 0 yanlış, döngü biter (dizi[j] karşılaştırılmaz)." });
+            break;
+          }
+          cmp++;
+          var c3 = a[j3] > key;
+          push({ line: 3, cmpI: [j3], key: key, keyAt: j3 + 1, sortedTo: i3 - 1, cond: c3,
+            q: "dizi[" + j3 + "] = " + a[j3] + " > anahtar = " + key + " ?",
+            msg: "dizi[" + j3 + "] = " + a[j3] + " > " + key + " → " + (c3 ? "doğru: " + a[j3] + " bir sağa kayacak." : "yanlış: anahtarın yeri bulundu.") });
+          if (!c3) break;
+          a[j3 + 1] = a[j3]; a[j3] = null; sw++;
+          push({ line: 4, swp: [j3 + 1], key: key, keyAt: j3, sortedTo: i3 - 1, msg: "dizi[" + (j3 + 1) + "] = dizi[" + j3 + "] = " + a[j3 + 1] + " (bir sağa kaydırma)." });
+          j3--;
+          push({ line: 5, key: key, keyAt: j3 + 1, sortedTo: i3 - 1, msg: "j = " + j3 + "." });
+        }
+        a[j3 + 1] = key;
+        push({ line: 6, swp: [j3 + 1], sortedTo: i3, msg: "dizi[" + (j3 + 1) + "] = anahtar = " + key + ". Artık 0…" + i3 + " sıralı." });
+      }
+      for (var k3 = 0; k3 < n; k3++) done[k3] = 1;
+      push({ line: -1, msg: "Dizi sıralandı: " + cmp + " karşılaştırma, " + sw + " kaydırma." });
+    }
+    if (alg === "mer") {
+      push({ line: -1, msg: "Birleştirme sıralaması: diziyi ikiye böl, her yarıyı sırala, sıralı yarıları birleştir. Böl-ve-yönet yaklaşımı." });
+      var ms = function (l, r) {
+        push({ line: 0, lo: l, hi: r, msg: "birlestirmeSirala(" + l + ", " + r + ") çağrıldı." });
+        if (!(l < r)) {
+          push({ line: 1, lo: l, hi: r, msg: "sol = sag = " + l + ": tek öğe zaten sıralıdır, geri dön." });
+          return;
+        }
+        var m = Math.floor((l + r) / 2);
+        push({ line: 2, lo: l, hi: r, mid: m, msg: "orta = (" + l + " + " + r + ") / 2 = " + m + " (tam sayı bölme). Sol yarı " + l + "…" + m + ", sağ yarı " + (m + 1) + "…" + r + "." });
+        push({ line: 3, lo: l, hi: m, msg: "Önce sol yarı: birlestirmeSirala(" + l + ", " + m + ")." });
+        ms(l, m);
+        push({ line: 4, lo: m + 1, hi: r, msg: "Sonra sağ yarı: birlestirmeSirala(" + (m + 1) + ", " + r + ")." });
+        ms(m + 1, r);
+        push({ line: 5, lo: l, hi: r, mid: m, msg: "İki yarı sıralı; birlestir(" + l + ", " + m + ", " + r + ")." });
+        var i4 = l, j4 = m + 1, tmp = [];
+        push({ line: 7, lo: l, hi: r, mid: m, tmp: tmp.slice(), ptr: [i4, j4], msg: "i = " + i4 + ", j = " + j4 + ", gecici boş." });
+        while (i4 <= m && j4 <= r) {
+          cmp++;
+          var c4 = a[i4] <= a[j4];
+          push({ line: 9, lo: l, hi: r, mid: m, tmp: tmp.slice(), ptr: [i4, j4], cmpI: [i4, j4], cond: c4,
+            q: "dizi[" + i4 + "] = " + a[i4] + " <= dizi[" + j4 + "] = " + a[j4] + " ?",
+            msg: a[i4] + " <= " + a[j4] + " → " + (c4 ? "doğru: soldan " + a[i4] + " eklenir." : "yanlış: sağdan " + a[j4] + " eklenir.") });
+          if (c4) { tmp.push(a[i4]); i4++; push({ line: 10, lo: l, hi: r, mid: m, tmp: tmp.slice(), ptr: [i4, j4], msg: "gecici = [" + tmp.join(", ") + "], i = " + i4 + "." }); }
+          else { tmp.push(a[j4]); j4++; push({ line: 11, lo: l, hi: r, mid: m, tmp: tmp.slice(), ptr: [i4, j4], msg: "gecici = [" + tmp.join(", ") + "], j = " + j4 + "." }); }
+        }
+        var rest = [];
+        while (i4 <= m) { rest.push(a[i4]); tmp.push(a[i4++]); }
+        while (j4 <= r) { rest.push(a[j4]); tmp.push(a[j4++]); }
+        push({ line: 12, lo: l, hi: r, mid: m, tmp: tmp.slice(), msg: rest.length ? "Bir yarı bitti; kalanlar (" + rest.join(", ") + ") karşılaştırmasız eklenir: gecici = [" + tmp.join(", ") + "]." : "Kalan öğe yok." });
+        for (var k4 = 0; k4 < tmp.length; k4++) { a[l + k4] = tmp[k4]; sw++; }
+        var wr = []; for (var k5 = l; k5 <= r; k5++) wr.push(k5);
+        push({ line: 13, lo: l, hi: r, swp: wr, msg: "gecici dizi[" + l + ".." + r + "] aralığına kopyalandı (" + tmp.length + " yazma). Bu aralık artık sıralı." });
+      };
+      ms(0, n - 1);
+      for (var k6 = 0; k6 < n; k6++) done[k6] = 1;
+      push({ line: -1, msg: "Dizi sıralandı: " + cmp + " karşılaştırma, " + sw + " yazma. n log₂ n ≈ " + Math.round(n * Math.log2(n)) + "." });
+    }
+    return F;
+  }
+
+  /* ---------- durum ---------- */
+  var arr = [], frames = [], pos = 0, timer = null, answered = {}, pending = false, score = { ok: 0, n: 0 };
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function newArray() {
+    var n = +E("soN").value, ord = E("soOrder").value, a = [];
+    for (var i = 0; i < n; i++) a.push(rnd(5, 99));
+    if (ord === "asc") a.sort(function (x, y) { return x - y; });
+    if (ord === "desc") a.sort(function (x, y) { return y - x; });
+    if (ord === "near") {
+      a.sort(function (x, y) { return x - y; });
+      for (var k = 0; k < Math.max(1, Math.round(n / 8)); k++) { var p = rnd(0, n - 2); var t = a[p]; a[p] = a[p + 1]; a[p + 1] = t; }
+    }
+    arr = a;
+    rebuild();
+  }
+  function rebuild() {
+    stop();
+    var alg = E("soAlg").value;
+    frames = build(alg, arr);
+    pos = 0; answered = {}; pending = false;
+    E("soCode").innerHTML = CODE[alg].map(function (l, i) { return '<div data-l="' + i + '">' + esc(l) + "</div>"; }).join("");
+    E("soSwName").textContent = SWNAME[alg];
+    E("soMarkName").textContent = MARKNAME[alg];
+    draw();
+  }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  /* ---------- çizim ---------- */
+  var W = 480, H = 252;
+  function draw() {
+    var f = frames[pos], alg = E("soAlg").value, a = f.arr, n = a.length;
+    var showQ = pending;
+    var top = 18, base = alg === "mer" ? 168 : 214, maxH = base - top - 4;
+    var bw = (W - 8) / n, gap = Math.max(1, bw * 0.14), x0 = 4;
+    var mx = 99, h = "";
+    var inS = function (list, i) { return list && list.indexOf(i) >= 0; };
+    if (f.lo !== undefined && f.hi !== undefined && alg === "mer") {
+      h += '<rect class="band" x="' + (x0 + f.lo * bw) + '" y="' + (top - 6) + '" width="' + ((f.hi - f.lo + 1) * bw) + '" height="' + (base - top + 22) + '" rx="4"/>';
+      if (f.mid !== undefined) h += '<rect class="band2" x="' + (x0 + (f.mid + 1) * bw) + '" y="' + (top - 6) + '" width="' + ((f.hi - f.mid) * bw) + '" height="' + (base - top + 22) + '" rx="4"/>';
+    } else if (alg === "sel" && f.lo !== undefined) {
+      h += '<rect class="band" x="' + (x0 + f.lo * bw) + '" y="' + (top - 6) + '" width="' + ((n - f.lo) * bw) + '" height="' + (base - top + 22) + '" rx="4"/>';
+    } else if (alg === "bub" && f.hi !== undefined) {
+      h += '<rect class="band" x="' + x0 + '" y="' + (top - 6) + '" width="' + ((f.hi + 1) * bw) + '" height="' + (base - top + 22) + '" rx="4"/>';
+    } else if (alg === "ins" && f.sortedTo !== undefined) {
+      h += '<rect class="band" x="' + x0 + '" y="' + (top - 6) + '" width="' + ((f.sortedTo + 1) * bw) + '" height="' + (base - top + 22) + '" rx="4"/>';
+    }
+    var small = n <= 20;
+    for (var i = 0; i < n; i++) {
+      var x = x0 + i * bw + gap / 2, w = bw - gap;
+      if (a[i] === null) {
+        h += '<rect class="hole" x="' + x + '" y="' + (base - 24) + '" width="' + w + '" height="24" rx="2"/>';
+      } else {
+        var bh = Math.max(3, a[i] / mx * maxH), cls = "bar";
+        if (inS(f.done, i)) cls += " done";
+        if (f.mark === i) cls += " mark";
+        if (inS(f.cmpI, i)) cls += " cmp";
+        if (!showQ && inS(f.swp, i)) cls += " swp";
+        if (alg === "mer" && f.lo !== undefined && (i < f.lo || i > f.hi) && pos > 0 && pos < frames.length - 1) cls += " dim";
+        h += '<rect class="' + cls + '" x="' + x + '" y="' + (base - bh) + '" width="' + w + '" height="' + bh + '" rx="2"/>';
+        if (small) h += '<text x="' + (x + w / 2) + '" y="' + (base - bh - 3) + '">' + a[i] + '</text>';
+      }
+      if (small) h += '<text class="idx" x="' + (x + w / 2) + '" y="' + (base + 12) + '">' + i + '</text>';
+    }
+    var lab = [];
+    if (alg === "sel" && f.lo !== undefined && f.line >= 1) lab.push([f.lo, "i"]);
+    if (alg === "sel" && f.cmpI) lab.push([f.cmpI[0], "j"]);
+    if (alg === "bub" && f.cmpI) lab.push([f.cmpI[0], "j"]);
+    if (alg === "ins" && f.keyAt !== undefined && f.cmpI) lab.push([f.cmpI[0], "j"]);
+    if (alg === "mer" && f.ptr) { if (f.ptr[0] <= f.mid) lab.push([f.ptr[0], "i"]); if (f.ptr[1] <= f.hi) lab.push([f.ptr[1], "j"]); }
+    lab.forEach(function (p) { var cx = x0 + p[0] * bw + bw / 2; h += '<text class="ptr" x="' + cx + '" y="' + (base + 25) + '">▲' + p[1] + '</text>'; });
+    if (alg === "ins" && f.key !== undefined) {
+      var kx = x0 + f.keyAt * bw + bw / 2;
+      h += '<text x="' + Math.min(W - 48, Math.max(48, kx)) + '" y="10" style="fill:var(--ds-link)">anahtar = ' + f.key + '</text>';
+      h += '<text class="ptr" x="' + kx + '" y="' + (base - 30) + '" style="fill:var(--ds-link)">▼</text>';
+    }
+    if (alg === "mer") {
+      h += '<text class="idx" x="30" y="' + (base + 40) + '" style="text-anchor:start">gecici:</text>';
+      if (f.tmp) {
+        var tw = Math.min(bw, 40);
+        f.tmp.forEach(function (val, k) {
+          var tx = x0 + (f.lo + k) * bw + gap / 2, th = Math.max(3, val / mx * 36);
+          h += '<rect class="tmp" x="' + tx + '" y="' + (H - 4 - th) + '" width="' + (bw - gap) + '" height="' + th + '" rx="2"/>';
+          if (small) h += '<text x="' + (tx + (bw - gap) / 2) + '" y="' + (H - 6 - th) + '">' + val + '</text>';
+        });
+      }
+    }
+    E("soSvg").innerHTML = h;
+    E("soCode").querySelectorAll("div").forEach(function (d) { d.classList.toggle("on", +d.dataset.l === f.line); });
+    E("soCmp").textContent = showQ ? frames[pos - 1 >= 0 ? pos - 1 : 0].cmp : f.cmp;
+    E("soSw").textContent = f.sw;
+    E("soStep").textContent = pos + " / " + (frames.length - 1);
+    var m = E("soMsg");
+    m.classList.toggle("q", showQ);
+    m.innerHTML = showQ ? "<b>Tahmin:</b> " + esc(f.q) + " Koşul doğru mu, yanlış mı?" : esc(f.msg);
+    E("soPred").classList.toggle("on", showQ);
+    E("soFwd").disabled = pos >= frames.length - 1 && !pending || pending;
+    E("soBack").disabled = pos === 0 && !pending;
+    E("soPlay").disabled = E("soPredict").checked || pos >= frames.length - 1;
+    E("soPlay").textContent = timer ? "Duraklat" : "Oynat";
+    E("soPlay").setAttribute("aria-label", timer ? "Duraklat" : "Oynat");
+    E("soScore").textContent = score.n ? "Tahmin: " + score.ok + " / " + score.n : "";
+  }
+
+  /* ---------- oynatma ---------- */
+  function fwd() {
+    if (pending || pos >= frames.length - 1) return;
+    pos++;
+    if (E("soPredict").checked && frames[pos].q && !answered[pos]) pending = true;
+    draw();
+  }
+  function back() {
+    stop();
+    if (pending) { pending = false; pos--; }
+    else if (pos > 0) pos--;
+    draw();
+  }
+  function answer(guess) {
+    if (!pending) return;
+    var f = frames[pos], ok = guess === f.cond;
+    score.n++; if (ok) score.ok++;
+    answered[pos] = true; pending = false;
+    draw();
+    E("soMsg").innerHTML = '<b style="color:var(--ds-' + (ok ? "good" : "bad") + ')">' + (ok ? "Doğru tahmin." : "Yanlış tahmin.") + "</b> " + esc(f.msg);
+    E("soFwd").focus();
+  }
+  var DELAYS = [1400, 1000, 700, 480, 320, 200, 120, 70, 35, 12];
+  function play() {
+    if (timer) { stop(); draw(); return; }
+    if (pos >= frames.length - 1) return;
+    timer = setTimeout(tick, 0);
+    draw();
+  }
+  function tick() {
+    if (pos >= frames.length - 1) { stop(); draw(); return; }
+    pos++;
+    draw();
+    timer = setTimeout(tick, DELAYS[+E("soSpeed").value - 1]);
+  }
+  function stop() { if (timer) clearTimeout(timer); timer = null; }
+
+  E("soN").addEventListener("input", function () { E("soNv").textContent = this.value; });
+  E("soN").addEventListener("change", newArray);
+  E("soOrder").addEventListener("change", newArray);
+  E("soNew").addEventListener("click", newArray);
+  E("soAlg").addEventListener("change", rebuild);
+  E("soFwd").addEventListener("click", fwd);
+  E("soBack").addEventListener("click", back);
+  E("soReset").addEventListener("click", function () { stop(); pos = 0; pending = false; draw(); });
+  E("soPlay").addEventListener("click", play);
+  E("soPredict").addEventListener("change", function () { stop(); if (!this.checked) pending = false; draw(); });
+  E("soYes").addEventListener("click", function () { answer(true); });
+  E("soNo").addEventListener("click", function () { answer(false); });
+
+  newArray();
+  if (location.hostname !== "sercankulcu.github.io") window.__so = { build: build };
+})();
+</script>
+<script src="deck/oyun.js"></script>

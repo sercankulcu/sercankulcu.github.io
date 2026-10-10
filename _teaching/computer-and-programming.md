@@ -13,6 +13,8 @@ Modern computing encompasses a vast ecosystem of interconnected technologies and
 
 ---
 
+* [Prerequisites for Computer Fundamentals and Introduction to Programming (HTML)](../files/computer/Computer_and_Programming_Prerequisites.html)
+* [Important People in Computing and Programming (HTML)](../files/computer/Computer_and_Programming_Important_People.html)
 * [Terim Sözlüğü / Glossary (HTML)](../files/computer/sozluk.html)
 
 ---

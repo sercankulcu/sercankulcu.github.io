@@ -1,0 +1,542 @@
+---
+layout: without-sidebar
+title: "Bir Web İsteğinin Yolculuğu"
+permalink: /files/computer/slides/Chapter_01_Packet-Journey.html
+excerpt: "DNS çözümlemesi, iletinin paketlere bölünmesi, yönlendiriciler üzerinden farklı yollar, kayıp paket, yeniden gönderme ve alıcıda sıralamayı adım adım gösteren simülatör."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.pj-root, #pj-help { --ds-accent: #b45309; --ds-link: #0369a1; }
+html[data-theme="dark"] .agt-oyun.pj-root, html[data-theme="dark"] #pj-help { --ds-accent: #f59e57; --ds-link: #7cc4e8; }
+
+.pj-root .pj-wrap { display: flex; flex-direction: column; gap: 6px; height: 100%; }
+.pj-root .pj-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.pj-root .pj-bar button { min-height: 32px; padding: 0 12px; font-size: 14px; }
+.pj-root .pj-bar select, .pj-root .pj-bar input:not([type="checkbox"]):not([type="range"]) { min-height: 32px; font-size: 14px; }
+.pj-root .pj-lbl { display: inline-flex; align-items: center; gap: 5px; color: var(--ds-muted); font-size: 12.5px; font-weight: 700; }
+.pj-root .pj-lbl input[type="range"] { width: 80px; }
+.pj-root #pjMsg { width: 150px; font-family: ui-monospace, Consolas, monospace; }
+.pj-root .pj-score { margin-left: auto; padding: 4px 10px; border-radius: 999px; background: var(--ds-surface-strong); font-size: 13px; font-weight: 700; }
+.pj-root .pj-phases { display: flex; gap: 4px; }
+.pj-root .pj-phases span { flex: 1; padding: 3px 4px; border: 1.5px solid var(--ds-border); border-radius: 999px; background: var(--ds-bg); color: var(--ds-muted); font-size: 12px; font-weight: 700; text-align: center; white-space: nowrap; }
+.pj-root .pj-phases span.is-on { border-color: var(--ds-accent); background: var(--ds-surface-strong); color: var(--ds-accent); }
+.pj-root .pj-phases span.is-done { color: var(--ds-text); }
+.pj-root .pj-stage { flex: none; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.pj-root .pj-stage svg { display: block; width: 100%; height: 282px; }
+.pj-root .pj-info { flex: 1; min-height: 0; padding: 8px 12px; border-radius: 12px; background: var(--ds-surface-strong); font-size: 14.5px; line-height: 1.4; overflow: hidden; }
+.pj-root .pj-info .pj-count { float: right; margin-left: 10px; color: var(--ds-muted); font-size: 12.5px; font-weight: 700; }
+.pj-root .pj-quiz { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.pj-root .pj-quiz button { min-height: 30px; padding: 0 12px; font-size: 13.5px; }
+.pj-root .pj-ok { color: var(--ds-good); font-weight: 700; }
+.pj-root .pj-no { color: var(--ds-bad); font-weight: 700; }
+
+.pj-root svg text { font-family: inherit; }
+.pj-root .n rect { fill: var(--ds-bg); stroke: var(--ds-border); stroke-width: 1.5; }
+.pj-root .n.is-on rect { fill: var(--ds-surface-strong); stroke: var(--ds-accent); stroke-width: 2.5; }
+.pj-root .n .t { fill: var(--ds-text); font-size: 14px; font-weight: 800; }
+.pj-root .n .s { fill: var(--ds-muted); font-size: 11px; font-weight: 600; }
+.pj-root .r circle { fill: var(--ds-node); stroke: var(--ds-link); stroke-width: 2; }
+.pj-root .r.is-on circle { stroke: var(--ds-accent); stroke-width: 3; }
+.pj-root .r text { fill: var(--ds-text); font-size: 13px; font-weight: 800; }
+.pj-root .ln { stroke: var(--ds-border); stroke-width: 2; fill: none; }
+.pj-root .ln.is-dash { stroke-dasharray: 6 5; }
+.pj-root .ln.is-on { stroke: var(--ds-link); stroke-width: 2.5; }
+.pj-root .msg rect { fill: var(--ds-link); }
+.pj-root .msg text { fill: var(--ds-bg); font-size: 12.5px; font-weight: 800; }
+.pj-root .msg.is-ans rect { fill: var(--ds-good); }
+.pj-root .msg.is-bad rect { fill: var(--ds-bad); }
+.pj-root .bub { fill: var(--ds-muted); font-size: 12px; font-weight: 700; }
+.pj-root .bub.is-bad { fill: var(--ds-bad); }
+.pj-root .bub.is-good { fill: var(--ds-good); }
+.pj-root .cache rect { fill: var(--ds-surface); stroke: var(--ds-border); stroke-dasharray: 4 3; }
+.pj-root .cache text { fill: var(--ds-text); font-size: 11.5px; }
+.pj-root .pk rect { fill: var(--ds-node); stroke: var(--ds-link); stroke-width: 1.8; }
+.pj-root .pk text { fill: var(--ds-text); font-family: ui-monospace, Consolas, monospace; font-size: 12px; font-weight: 700; }
+.pj-root .pk.is-re rect { stroke: var(--ds-good); stroke-width: 2.4; }
+.pj-root .pk.is-sorted rect { stroke: var(--ds-good); }
+.pj-root .slot { fill: none; stroke: var(--ds-border); stroke-dasharray: 4 3; }
+.pj-root .lbl { fill: var(--ds-muted); font-size: 12px; font-weight: 700; }
+.pj-root .big { fill: var(--ds-text); font-family: ui-monospace, Consolas, monospace; font-size: 14px; font-weight: 800; }
+.pj-root .lost { fill: var(--ds-bad); font-size: 12.5px; font-weight: 800; }
+</style>
+
+<div class="pj-root agt-oyun agt-oyun--stage" id="pjRoot">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 1 · Simülasyon</p><h1>Bir Web İsteğinin Yolculuğu</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="pj-help">?</button>
+    <a class="agt-oyun__back" href="Bolum_01_Internet.html">← Bölüm 1</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="pj-wrap">
+      <div class="pj-bar">
+        <button type="button" id="pjBack" aria-label="Bir adım geri">← Geri</button>
+        <button type="button" class="is-primary" id="pjStep" aria-label="Bir adım ileri">Adım →</button>
+        <button type="button" id="pjPlay" aria-label="Oynat veya duraklat">▶ Oynat</button>
+        <button type="button" id="pjReset" aria-label="Başa dön">Sıfırla</button>
+        <label class="pj-lbl">Hız <input type="range" id="pjSpeed" min="1" max="5" value="3" aria-label="Animasyon hızı"></label>
+        <label class="pj-lbl"><input type="checkbox" id="pjQuiz"> Kendini dene</label>
+        <span class="pj-score" id="pjScore" aria-live="polite">Doğru: 0 / 0</span>
+      </div>
+      <div class="pj-bar">
+        <label class="pj-lbl">Önbellek
+          <select id="pjCache" aria-label="Önbellek durumu">
+            <option value="none">Hiçbir önbellekte kayıt yok</option>
+            <option value="resolver">Çözümleyici önbelleğinde var</option>
+            <option value="browser">Tarayıcı önbelleğinde var</option>
+          </select>
+        </label>
+        <label class="pj-lbl">İleti <input type="text" id="pjMsg" maxlength="20" value="MERHABA DÜNYA!" aria-label="Gönderilecek ileti (en çok 20 karakter)"></label>
+        <label class="pj-lbl">Paket boyu
+          <select id="pjSize" aria-label="Paket başına karakter sayısı">
+            <option value="3">3</option><option value="4" selected>4</option><option value="5">5</option>
+          </select>
+        </label>
+        <label class="pj-lbl"><input type="checkbox" id="pjLoss" checked> Bir paket kaybolsun</label>
+        <button type="button" id="pjNew" aria-label="Yolları ve gecikmeleri yeniden rastgele seç">Yeni senaryo</button>
+      </div>
+      <div class="pj-phases" id="pjPhases" aria-hidden="true">
+        <span>1 · DNS çözümlemesi</span><span>2 · Paketlere bölme</span><span>3 · Yolculuk</span><span>4 · Kayıp ve yeniden gönderme</span><span>5 · Sıralama</span>
+      </div>
+      <div class="pj-stage"><svg id="pjSvg" viewBox="0 0 764 282" role="img" aria-label="Ağ şeması"></svg></div>
+      <div class="pj-info" id="pjInfo" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="pj-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Bir web isteğinin yolculuğu</h2>
+    <p><b>Amaç:</b> Tarayıcıya bir adres yazıldığında önce alan adının IP adresinin nasıl bulunduğunu (DNS), sonra iletinin paketlere bölünüp yönlendiriciler üzerinden nasıl taşındığını ve alıcıda nasıl yeniden birleştirildiğini izlemek.</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ul>
+      <li><b>Adım →</b> bir sonraki olayı canlandırır, <b>← Geri</b> bir önceki duruma döner, <b>Oynat</b> adımları kendiliğinden yürütür. Klavyede → ve ← tuşları da çalışır.</li>
+      <li><b>Önbellek</b>: kaydın hiçbir yerde olmadığı, çözümleyicinin önbelleğinde olduğu ya da tarayıcının önbelleğinde olduğu durumları karşılaştırın.</li>
+      <li><b>İleti</b> ve <b>Paket boyu</b>: iletiyi ve her pakete kaç karakter düşeceğini seçin. <b>Bir paket kaybolsun</b> işaretliyse paketlerden biri yoğun bir yönlendiricide kaybolur.</li>
+      <li><b>Yeni senaryo</b>: paketlerin yollarını ve gecikmelerini yeniden rastgele seçer.</li>
+      <li><b>Kendini dene</b>: bazı adımlardan önce bir soru sorulur; doğru yanıtlar sayılır.</li>
+    </ul>
+    <h3>Ne görülüyor?</h3>
+    <ol>
+      <li><b>DNS çözümlemesi:</b> tarayıcı önbelleği → DNS çözümleyicisi → kök sunucu → üst düzey alan (.tr) sunucusu → yetkili sunucu. Yanıt TTL süresince önbellekte tutulur.</li>
+      <li><b>Paketlere bölme:</b> her paketin başlığında sıra numarası, kaynak ve hedef adresi vardır.</li>
+      <li><b>Yolculuk:</b> yönlendiriciler her paket için o anki uygun yolu seçer; paketler farklı yollardan gidip sırasız varabilir.</li>
+      <li><b>Kayıp ve yeniden gönderme:</b> TCP eksik sıra numarasını fark eder, paket yeniden gönderilir.</li>
+      <li><b>Sıralama:</b> alıcı tamponundaki paketler sıra numarasına göre dizilir ve ileti birleştirilir.</li>
+    </ol>
+    <p>İlgili sunum: <a href="Bolum_01_Internet.html">Bölüm 1 · İnternet</a> (“DNS Çözümlemesi Adım Adım”, “Veri Paketlere Bölünerek İletilir”, “Bir Web İsteğinin Yolculuğu”).</p>
+  </dialog>
+</div>
+
+<script>
+(function () {
+  /* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+  /* yalnızca sercankulcu.github.io adresinde (ve yerel önizlemede) çalışır (© Sercan Külcü) */
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /* motor: başla */
+  var HOST_NAME = "www.ornek.edu.tr", IP = "203.0.113.10", SRC_IP = "192.168.1.10";
+
+  function splitMessage(msg, size) {
+    var out = [];
+    for (var i = 0; i < msg.length; i += size) out.push(msg.slice(i, i + size));
+    return out;
+  }
+
+  /* Paketlerin yolları, gecikmeleri, varış zamanları ve (varsa) kaybolan paket */
+  function makeTraffic(chunks, loss, rnd) {
+    var n = chunks.length, best = null;
+    for (var attempt = 0; attempt < 200; attempt++) {
+      var pk = chunks.map(function (d, i) {
+        var segs = [0.45 + rnd() * 0.2, 0.6 + rnd() * 1.1, 0.6 + rnd() * 1.1, 0.45 + rnd() * 0.2];
+        var depart = i * 0.45;
+        return { n: i + 1, data: d, path: rnd() < 0.5 ? "R2" : "R3", segs: segs, depart: depart,
+          arrive: depart + segs[0] + segs[1] + segs[2] + segs[3], lost: false };
+      });
+      var lostIdx = loss && n >= 2 ? Math.floor(rnd() * n) : -1;
+      if (lostIdx >= 0) { pk[lostIdx].lost = true; pk[lostIdx].lostAt = pk[lostIdx].depart + pk[lostIdx].segs[0] + pk[lostIdx].segs[1]; }
+      var order = arrivalOrder(pk);
+      var paths = {};
+      pk.forEach(function (p) { paths[p.path] = 1; });
+      var inversions = 0;
+      for (var a = 1; a < order.length; a++) if (order[a] < order[a - 1]) inversions++;
+      best = { packets: pk, order: order, lost: lostIdx };
+      var okPaths = n < 2 || (paths.R2 && paths.R3);
+      var okOrder = order.length < 2 || inversions > 0;
+      if (okPaths && okOrder) break;
+    }
+    if (best.lost >= 0) {
+      var segs2 = [0.45 + rnd() * 0.2, 0.6 + rnd() * 0.6, 0.6 + rnd() * 0.6, 0.45 + rnd() * 0.2];
+      best.re = { n: best.lost + 1, data: chunks[best.lost], path: rnd() < 0.5 ? "R2" : "R3", segs: segs2,
+        dur: segs2[0] + segs2[1] + segs2[2] + segs2[3] };
+    }
+    var T = 0;
+    best.packets.forEach(function (p) { T = Math.max(T, p.lost ? p.lostAt : p.arrive); });
+    best.T = T + 0.25;
+    return best;
+  }
+
+  /* kaybolmayan paketlerin varış sırası (sıra numaraları) */
+  function arrivalOrder(pk) {
+    return pk.filter(function (p) { return !p.lost; })
+      .sort(function (a, b) { return a.arrive - b.arrive; })
+      .map(function (p) { return p.n; });
+  }
+
+  /* alıcı: tampondaki paketleri sıra numarasına göre dizip birleştirir */
+  function assemble(buffer) {
+    return buffer.slice().sort(function (a, b) { return a.n - b.n; }).map(function (p) { return p.data; }).join("");
+  }
+  /* motor: bitti */
+
+  if (typeof document === "undefined") return;
+  var E = function (id) { return document.getElementById(id); };
+  var svg = E("pjSvg");
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function vis(s) { return s.replace(/ /g, "␣"); }
+
+  /* ---------- sahne geometrisi ---------- */
+  var DN = {
+    tar: { x: 95, y: 92, t: "Tarayıcı", s: "önbellek + işletim sistemi" },
+    coz: { x: 345, y: 92, t: "Çözümleyici", s: "İSS veya kurum DNS’i" },
+    kok: { x: 640, y: 38, t: "Kök (.)", s: "kök sunucu" },
+    tld: { x: 640, y: 122, t: ".tr sunucusu", s: "üst düzey alan (TLD)" },
+    yet: { x: 640, y: 206, t: "ornek.edu.tr", s: "yetkili sunucu" },
+    web: { x: 95, y: 236, t: "Web sunucusu", s: IP }
+  };
+  var NW = 150, NH = 50;
+  var NP = { G: { x: 70, y: 98 }, R1: { x: 215, y: 98 }, R2: { x: 375, y: 36 }, R3: { x: 375, y: 160 }, R4: { x: 535, y: 98 }, A: { x: 684, y: 98 } };
+  var ROW_Y = 208, BUF_Y = 256, SLOT_X0 = 170, SLOT_W = 80;
+  function route(path) { return [NP.G, NP.R1, NP[path], NP.R4, NP.A]; }
+  function along(pts, segs, tt) {
+    for (var i = 0; i < segs.length; i++) {
+      if (tt <= segs[i]) { var f = tt / segs[i]; return { x: pts[i].x + (pts[i + 1].x - pts[i].x) * f, y: pts[i].y + (pts[i + 1].y - pts[i].y) * f }; }
+      tt -= segs[i];
+    }
+    return { x: pts[pts.length - 1].x, y: pts[pts.length - 1].y, done: true };
+  }
+  function ease(p) { return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
+
+  /* ---------- senaryo ---------- */
+  var rngSeed = 1;
+  function rnd() { rngSeed = (rngSeed * 1103515245 + 12345) % 2147483648; return rngSeed / 2147483648; }
+  var steps = [], traffic = null, chunks = [], msgText = "";
+
+  function quizDns(correct) {
+    return { q: "Çözümleyici bu soruyu şimdi hangi sunucuya gönderir?", options: ["Kök sunucu", ".tr sunucusu (TLD)", "ornek.edu.tr yetkili sunucusu", "Web sunucusu"], answer: correct };
+  }
+  function moveStep(phase, a, b, label, text, cls, extra) {
+    return { phase: phase, dur: 1.3, text: text, apply: function (v, p) {
+      v.scene = "dns"; v.on = {}; v.on[a] = 1; v.on[b] = 1;
+      v.msg = { a: a, b: b, p: ease(p), text: label, cls: cls || "" };
+      if (extra) extra(v, p);
+    } };
+  }
+
+  function build() {
+    msgText = E("pjMsg").value.replace(/\s+/g, " ");
+    if (!msgText.trim()) msgText = "MERHABA DÜNYA!";
+    var size = +E("pjSize").value;
+    chunks = splitMessage(msgText, size);
+    traffic = makeTraffic(chunks, E("pjLoss").checked, rnd);
+    var cache = E("pjCache").value;
+    steps = [];
+    steps.push({ phase: 0, dur: 0.5, text: "Kullanıcı adres çubuğuna <b>https://" + HOST_NAME + "</b> yazar. Bağlanmak için bu adın IP adresi gerekir.",
+      apply: function (v) { v.scene = "dns"; v.on = { tar: 1 }; v.bub.tar = { text: HOST_NAME + " ?" }; } });
+    var qBrowser = { q: "Tarayıcı IP adresini önce nerede arar?", options: ["Kendi önbelleğinde (ve işletim sisteminde)", "Kök sunucuda", "Web sunucusunda", "Yetkili sunucuda"], answer: 0 };
+    if (cache === "browser") {
+      steps.push({ phase: 0, dur: 0.6, quiz: qBrowser, text: "Tarayıcı ve işletim sistemi önce kendi önbelleklerine bakar: <b>kayıt var</b> (" + IP + "). Hiçbir DNS sunucusuna sorulmaz.",
+        apply: function (v) { v.on = { tar: 1 }; v.bub.tar = { text: "önbellekte var: " + IP, cls: "is-good" }; } });
+    } else {
+      steps.push({ phase: 0, dur: 0.6, quiz: qBrowser, text: "Tarayıcı ve işletim sistemi önce kendi önbelleklerine bakar: <b>kayıt yok</b>.",
+        apply: function (v) { v.on = { tar: 1 }; v.bub.tar = { text: "önbellekte yok", cls: "is-bad" }; } });
+      if (cache === "resolver") {
+        steps.push(moveStep(0, "tar", "coz", HOST_NAME + "?", "Soru, ağ ayarlarındaki DNS çözümleyicisine gönderilir (genellikle İSS’nin sunucusu).",
+          "", function (v, p) { if (p >= 1) v.bub.coz = { text: "önbellekte var", cls: "is-good" }; }));
+        var s = moveStep(0, "coz", "tar", IP, "Çözümleyici bu adı kısa süre önce çözmüştü; kayıt <b>önbelleğinde</b> (TTL dolmadı). Kök, .tr ve yetkili sunuculara hiç sorulmadan hemen yanıt verir.",
+          "is-ans", function (v, p) { if (p >= 1) v.bub.tar = { text: IP, cls: "is-good" }; });
+        s.quiz = { q: "Çözümleyicinin önbelleğinde kayıt var. Şimdi ne olur?", options: ["Hemen yanıtlar", "Yine de kök sunucuya sorar", "Tarayıcıya hata döner"], answer: 0 };
+        steps.push(s);
+      } else {
+        steps.push(moveStep(0, "tar", "coz", HOST_NAME + "?", "Soru, ağ ayarlarındaki DNS çözümleyicisine gönderilir (genellikle İSS’nin sunucusu). Çözümleyicinin önbelleğinde de kayıt yok."));
+        var q1 = moveStep(0, "coz", "kok", HOST_NAME + "?", "Çözümleyici en tepeden başlar: soruyu <b>kök sunucuya</b> gönderir.");
+        q1.quiz = quizDns(0); steps.push(q1);
+        steps.push(moveStep(0, "kok", "coz", "→ .tr’ye sor", "Kök sunucu adı bilmez ama “.tr sunucularına sor” der."));
+        var q2 = moveStep(0, "coz", "tld", HOST_NAME + "?", "Çözümleyici soruyu <b>.tr sunucusuna</b> (üst düzey alan, TLD) yöneltir.");
+        q2.quiz = quizDns(1); steps.push(q2);
+        steps.push(moveStep(0, "tld", "coz", "→ ornek.edu.tr’ye sor", ".tr sunucusu da tam adresi bilmez: “ornek.edu.tr’nin yetkili sunucusuna sor” der."));
+        var q3 = moveStep(0, "coz", "yet", HOST_NAME + "?", "Çözümleyici soruyu <b>ornek.edu.tr’nin yetkili sunucusuna</b> gönderir.");
+        q3.quiz = quizDns(2); steps.push(q3);
+        steps.push(moveStep(0, "yet", "coz", IP, "Yetkili sunucu kaydı bilir ve yanıtlar: <b>" + IP + "</b>.", "is-ans"));
+        steps.push(moveStep(0, "coz", "tar", IP, "Çözümleyici yanıtı tarayıcıya iletir ve bir süre (TTL) <b>önbelleğinde saklar</b>; sonraki soru hemen yanıtlanır.",
+          "is-ans", function (v, p) { if (p >= 1) { v.cache = HOST_NAME + " → " + IP + " (TTL)"; v.bub.tar = { text: IP, cls: "is-good" }; } }));
+      }
+    }
+    steps.push(moveStep(0, "tar", "web", "bağlan: " + IP, "Tarayıcı artık IP adresini bildiği için <b>" + IP + "</b> adresindeki web sunucusuna bağlanır. Şimdi iletinin kendisi gönderilecek.",
+      "", function (v, p) { v.webLink = p >= 1; }));
+
+    var n = chunks.length, pk = traffic.packets;
+    steps.push({ phase: 1, dur: 0.6, text: "İleti tek parça gönderilmez: <b>" + n + " pakete</b> bölünür. Her paketin başlığında sıra numarası, kaynak ve hedef adresi vardır (ör. #1: " + SRC_IP + " → " + IP + ", sıra no 1).",
+      apply: function (v) { v.scene = "net"; v.split = true; v.on = { G: 1 }; } });
+    var byPath = { R2: [], R3: [] };
+    pk.forEach(function (p) { byPath[p.path].push("#" + p.n); });
+    var pathTxt = ["R2", "R3"].filter(function (r) { return byPath[r].length; }).map(function (r) {
+      return byPath[r].join(", ") + " R1 → " + r + " → R4";
+    }).join("; ");
+    steps.push({ phase: 2, dur: traffic.T * 1.15, quiz: { q: "Paketlerin hepsi aynı yolu mu izler?", options: ["Hayır, her paketin yolu ayrı seçilebilir", "Evet, hepsi aynı yolu izler"], answer: 0 },
+      text: "Paketler bağımsız yolculuk eder: " + pathTxt + ". Yönlendiriciler her paket için o anki en uygun yolu seçer.",
+      apply: function (v, p) { v.on = { G: 1 }; v.t = p * traffic.T; } });
+    var orderTxt = traffic.order.map(function (k) { return "#" + k; }).join(", ");
+    var lostP = traffic.lost >= 0 ? pk[traffic.lost] : null;
+    steps.push({ phase: 2, dur: 0.3, text: "Paketler <b>sırasız</b> geldi: " + orderTxt + "." +
+        (lostP ? " <b>#" + lostP.n + "</b> yoğun bir yönlendiricide (" + lostP.path + ") <b>kayboldu</b>." : " Tampondaki sıra, varış sırasıdır."),
+      apply: function (v) { v.on = { A: 1 }; } });
+    if (lostP) {
+      var opts = pk.map(function (p) { return "#" + p.n; });
+      steps.push({ phase: 3, dur: 1.6, quiz: { q: "Alıcı tamponuna bakın: hangi paket eksik?", options: opts, answer: traffic.lost },
+        text: "TCP eksik sıra numarasını fark eder: “<b>#" + lostP.n + " gelmedi, yeniden gönder</b>”. Bu istek alıcıdan gönderene gider.",
+        apply: function (v, p) { v.on = { A: 1, G: 1 }; v.req = ease(p); } });
+      steps.push({ phase: 3, dur: traffic.re.dur * 1.15, text: "<b>#" + lostP.n + "</b> yeniden gönderilir (bu kez " + traffic.re.path + " yolundan: R1 → " + traffic.re.path + " → R4).",
+        apply: function (v, p) { v.on = { G: 1 }; v.req = null; v.reT = p * traffic.re.dur; } });
+    }
+    steps.push({ phase: 4, dur: 1.4, quiz: { q: "Alıcı paketleri neye göre sıralar?", options: ["Sıra numarasına göre", "Varış zamanına göre", "Geldikleri yola göre", "Paket boyuna göre"], answer: 0 },
+      text: "Tüm paketler geldi. Alıcı onları <b>sıra numarasına</b> göre dizer.",
+      apply: function (v, p) { v.on = { A: 1 }; v.sortP = ease(p); } });
+    steps.push({ phase: 4, dur: 0.5, text: "İleti birleştirildi: “<b>" + esc(assemble(pk)) + "</b>”. Uygulama katmanı veriyi tek parça olarak alır; kayıp, sırasızlık ve yeniden gönderme kullanıcıdan gizlenmiştir.",
+      apply: function (v) { v.on = { A: 1 }; v.assembled = true; } });
+  }
+
+  /* ---------- görünüm ---------- */
+  function baseView() { return { scene: "dns", on: {}, bub: {}, msg: null, cache: "—", webLink: false, split: false, t: null, req: null, reT: null, sortP: null, assembled: false }; }
+  function viewAt(k, p) {
+    var v = baseView();
+    for (var i = 0; i < k; i++) { v.msg = null; steps[i].apply(v, 1); }
+    if (p !== null && k < steps.length) { v.msg = null; steps[k].apply(v, p); }
+    return v;
+  }
+
+  function node(id, n, on) {
+    return '<g class="n' + (on ? " is-on" : "") + '"><rect x="' + (n.x - NW / 2) + '" y="' + (n.y - NH / 2) + '" width="' + NW + '" height="' + NH + '" rx="10"/>' +
+      '<text class="t" x="' + n.x + '" y="' + (n.y - 3) + '" text-anchor="middle">' + esc(n.t) + '</text>' +
+      '<text class="s" x="' + n.x + '" y="' + (n.y + 14) + '" text-anchor="middle">' + esc(n.s) + '</text></g>';
+  }
+  function line(a, b, cls) { return '<line class="ln ' + (cls || "") + '" x1="' + a.x + '" y1="' + a.y + '" x2="' + b.x + '" y2="' + b.y + '"/>'; }
+  function pill(x, y, text, cls) {
+    var w = text.length * 7.2 + 18;
+    return '<g class="msg ' + (cls || "") + '"><rect x="' + (x - w / 2) + '" y="' + (y - 12) + '" width="' + w + '" height="24" rx="12"/>' +
+      '<text x="' + x + '" y="' + (y + 4.5) + '" text-anchor="middle">' + esc(text) + '</text></g>';
+  }
+  function packet(x, y, p, cls) {
+    return '<g class="pk ' + (cls || "") + '"><rect x="' + (x - 34) + '" y="' + (y - 12) + '" width="68" height="24" rx="6"/>' +
+      '<text x="' + x + '" y="' + (y + 4.5) + '" text-anchor="middle">#' + p.n + " " + esc(vis(p.data)) + '</text></g>';
+  }
+
+  function drawDns(v) {
+    var h = "";
+    h += line(DN.tar, DN.coz, v.on.tar && v.on.coz ? "is-on" : "");
+    ["kok", "tld", "yet"].forEach(function (k) { h += line(DN.coz, DN[k], v.on[k] ? "is-on" : ""); });
+    h += line(DN.tar, DN.web, (v.webLink ? "" : "is-dash ") + (v.on.web ? "is-on" : ""));
+    Object.keys(DN).forEach(function (k) { h += node(k, DN[k], v.on[k]); });
+    h += '<g class="cache"><rect x="270" y="132" width="150" height="38" rx="8"/><text x="345" y="147" text-anchor="middle" style="font-weight:700">çözümleyici önbelleği</text>' +
+      '<text x="345" y="163" text-anchor="middle">' + esc(v.cache) + '</text></g>';
+    Object.keys(v.bub).forEach(function (k) {
+      var n = DN[k], b = v.bub[k];
+      var y = k === "coz" ? n.y - 33 : n.y + 41;
+      h += '<text class="bub ' + (b.cls || "") + '" x="' + n.x + '" y="' + y + '" text-anchor="middle">' + esc(b.text) + '</text>';
+    });
+    if (v.msg) {
+      var a = DN[v.msg.a], b2 = DN[v.msg.b], p = v.msg.p;
+      h += pill(a.x + (b2.x - a.x) * p, a.y + (b2.y - a.y) * p, v.msg.text, v.msg.cls);
+    }
+    return h;
+  }
+
+  function slotX(i) { return SLOT_X0 + i * SLOT_W; }
+
+  function drawNet(v) {
+    var h = "", pk = traffic.packets;
+    [["G", "R1"], ["R1", "R2"], ["R1", "R3"], ["R2", "R4"], ["R3", "R4"], ["R4", "A"], ["R2", "R3"]].forEach(function (e) { h += line(NP[e[0]], NP[e[1]], e[0] === "R2" && e[1] === "R3" ? "is-dash" : ""); });
+    h += node("G", { x: NP.G.x, y: NP.G.y, t: "Tarayıcı", s: "gönderen" }, v.on.G).replace('width="150"', 'width="120"').replace('x="' + (NP.G.x - 75) + '"', 'x="' + (NP.G.x - 60) + '"');
+    h += node("A", { x: NP.A.x, y: NP.A.y, t: "Web sunucusu", s: "alıcı · " + IP }, v.on.A).replace('width="150"', 'width="140"').replace('x="' + (NP.A.x - 75) + '"', 'x="' + (NP.A.x - 70) + '"');
+    ["R1", "R2", "R3", "R4"].forEach(function (r) {
+      h += '<g class="r"><circle cx="' + NP[r].x + '" cy="' + NP[r].y + '" r="20"/><text x="' + NP[r].x + '" y="' + (NP[r].y + 4.5) + '" text-anchor="middle">' + r + '</text></g>';
+    });
+    h += '<text class="lbl" x="12" y="' + (ROW_Y + 4) + '">' + (v.assembled ? "birleşen ileti:" : "gönderen:") + '</text>';
+    h += '<text class="lbl" x="12" y="' + (BUF_Y + 4) + '">alıcı tamponu:</text>';
+    for (var i = 0; i < pk.length; i++) h += '<rect class="slot" x="' + (slotX(i) - 36) + '" y="' + (BUF_Y - 14) + '" width="72" height="28" rx="6"/>';
+    if (!v.split) {
+      h += '<text class="big" x="' + (SLOT_X0 - 36) + '" y="' + (ROW_Y + 5) + '">“' + esc(msgText) + '”</text>';
+      return h;
+    }
+    if (v.assembled) h += '<text class="big" x="' + (SLOT_X0 - 36) + '" y="' + (ROW_Y + 5) + '">“' + esc(assemble(pk)) + '”</text>';
+
+    var t = v.t, arrived = [], moving = "";
+    pk.forEach(function (p, i) {
+      if (t === null || t < p.depart) { moving += packet(slotX(i), ROW_Y, p); return; }
+      var tt = t - p.depart;
+      if (p.lost) {
+        if (t < p.lostAt) { var q = along(route(p.path), p.segs, tt); moving += packet(q.x, q.y, p); }
+        else {
+          var R = NP[p.path];
+          h += '<text class="lost" x="' + (R.x + 26) + '" y="' + (R.y + 4) + '">✗ #' + p.n + ' kayboldu</text>';
+        }
+        return;
+      }
+      if (t < p.arrive) { var q2 = along(route(p.path), p.segs, tt); moving += packet(q2.x, q2.y, p); }
+      else arrived.push(p);
+    });
+    arrived.sort(function (a, b) { return a.arrive - b.arrive; });
+    if (traffic.re && v.reT !== null) {
+      if (v.reT < traffic.re.dur) { var q3 = along(route(traffic.re.path), traffic.re.segs, v.reT); moving += packet(q3.x, q3.y, traffic.re, "is-re"); }
+      else arrived.push({ n: traffic.re.n, data: traffic.re.data, re: true });
+    }
+    if (v.req !== null && traffic.re) {
+      var back = route(pk[traffic.lost].path === "R2" ? "R3" : "R2").slice().reverse();
+      var qq = along(back, [1, 1, 1, 1], v.req * 4);
+      moving += pill(qq.x, qq.y - 20, "#" + traffic.re.n + " gelmedi!", "is-bad");
+    }
+    arrived.forEach(function (p, i) {
+      var x = slotX(i);
+      if (v.sortP !== null) x = slotX(i) + (slotX(p.n - 1) - slotX(i)) * v.sortP;
+      h += packet(x, BUF_Y, p, (p.re ? "is-re" : "") + (v.sortP === 1 ? " is-sorted" : ""));
+    });
+    return h + moving;
+  }
+
+  function draw(v) { svg.innerHTML = v.scene === "dns" ? drawDns(v) : drawNet(v); }
+
+  /* ---------- denetim ---------- */
+  var cur = 0, raf = null, timer = null, playing = false, quizAt = -1, answered = {}, score = 0, asked = 0;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function speed() { return [0.5, 0.75, 1, 1.5, 2.5][+E("pjSpeed").value - 1]; }
+
+  function setInfo(html, k) {
+    var count = '<span class="pj-count">Adım ' + k + " / " + steps.length + "</span>";
+    E("pjInfo").innerHTML = count + html;
+  }
+  function phaseUI(ph) {
+    var spans = E("pjPhases").children;
+    for (var i = 0; i < spans.length; i++) { spans[i].classList.toggle("is-on", i === ph); spans[i].classList.toggle("is-done", i < ph); }
+  }
+  function refresh() {
+    draw(viewAt(cur, null));
+    var ph = cur === 0 ? 0 : steps[cur - 1].phase;
+    phaseUI(cur === 0 ? -1 : ph);
+    if (cur === 0) setInfo("Başlamak için <b>Adım →</b> ya da <b>Oynat</b>’a basın. Önce alan adının IP adresi bulunacak (DNS), sonra ileti paketler hâlinde gönderilecek.", 0);
+    else setInfo(steps[cur - 1].text + (cur === steps.length ? " <b>Son.</b>" : ""), cur);
+    E("pjBack").disabled = cur === 0 && !raf;
+    E("pjStep").disabled = cur >= steps.length;
+    E("pjPlay").textContent = playing ? "❚❚ Duraklat" : "▶ Oynat";
+    E("pjScore").textContent = "Doğru: " + score + " / " + asked;
+  }
+  function stopAll() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = null; clearTimeout(timer); timer = null; quizAt = -1;
+  }
+  function forward() {
+    if (raf || quizAt >= 0) return;
+    if (cur >= steps.length) { playing = false; refresh(); return; }
+    var s = steps[cur];
+    if (E("pjQuiz").checked && s.quiz && !answered[cur]) { showQuiz(cur); return; }
+    run();
+  }
+  function run() {
+    var k = cur, s = steps[k], D = reduce ? 1 : s.dur * 1000 / speed(), t0 = null;
+    phaseUI(s.phase);
+    setInfo(s.text, k + 1);
+    E("pjBack").disabled = false;
+    function frame(ts) {
+      if (t0 === null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / D);
+      draw(viewAt(k, p));
+      if (p < 1) { raf = requestAnimationFrame(frame); return; }
+      raf = null; cur = k + 1; refresh();
+      if (playing) timer = setTimeout(forward, reduce ? 300 : 900 / speed());
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  function showQuiz(k) {
+    quizAt = k;
+    var q = steps[k].quiz;
+    var html = "<b>Soru:</b> " + esc(q.q) + '<div class="pj-quiz">' + q.options.map(function (o, i) {
+      return '<button type="button" data-i="' + i + '">' + esc(o) + "</button>";
+    }).join("") + "</div>";
+    setInfo(html, k);
+    var first = E("pjInfo").querySelector("button");
+    if (first) first.focus();
+  }
+  E("pjInfo").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-i]");
+    if (!b || quizAt < 0) return;
+    var k = quizAt, q = steps[k].quiz, ok = +b.dataset.i === q.answer;
+    asked++; if (ok) score++;
+    answered[k] = true; quizAt = -1;
+    refresh();
+    var fb = ok ? '<span class="pj-ok">Doğru!</span> ' : '<span class="pj-no">Yanlış.</span> Doğru yanıt: <b>' + esc(q.options[q.answer]) + "</b>. ";
+    run();
+    E("pjInfo").innerHTML = E("pjInfo").innerHTML.replace('</span>', '</span>' + fb);
+    E("pjStep").focus();
+  });
+
+  function reset(rebuild) {
+    stopAll(); playing = false; cur = 0; answered = {};
+    if (rebuild) build();
+    refresh();
+  }
+  E("pjStep").addEventListener("click", function () {
+    playing = false; clearTimeout(timer);
+    if (raf || quizAt >= 0) { E("pjPlay").textContent = "▶ Oynat"; return; }
+    forward();
+    E("pjPlay").textContent = "▶ Oynat";
+  });
+  E("pjBack").addEventListener("click", function () {
+    var wasAnim = !!raf || quizAt >= 0;
+    stopAll(); playing = false;
+    if (!wasAnim && cur > 0) cur--;
+    refresh();
+  });
+  E("pjPlay").addEventListener("click", function () {
+    if (playing) { playing = false; clearTimeout(timer); refresh(); return; }
+    if (cur >= steps.length) { cur = 0; answered = {}; }
+    playing = true; refresh(); forward();
+    if (raf || quizAt >= 0) E("pjPlay").textContent = "❚❚ Duraklat";
+  });
+  E("pjReset").addEventListener("click", function () { reset(false); });
+  E("pjNew").addEventListener("click", function () { rngSeed = (Date.now() % 100000) + 7; reset(true); });
+  ["pjCache", "pjSize", "pjLoss"].forEach(function (id) { E(id).addEventListener("change", function () { reset(true); }); });
+  E("pjMsg").addEventListener("change", function () { reset(true); });
+  E("pjRoot").addEventListener("keydown", function (ev) {
+    var tag = ev.target.tagName;
+    if (tag === "INPUT" && ev.target.type !== "checkbox" && ev.target.type !== "range" || tag === "SELECT" || tag === "TEXTAREA") return;
+    if (ev.target.type === "range") return;
+    if (ev.key === "ArrowRight") { ev.preventDefault(); E("pjStep").click(); }
+    else if (ev.key === "ArrowLeft") { ev.preventDefault(); E("pjBack").click(); }
+  });
+  reset(true);
+})();
+</script>
+<script src="deck/oyun.js"></script>
