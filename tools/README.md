@@ -1,13 +1,15 @@
 # tools
 
 *Programming with C* ders notlarından **türetilmiş çıktıları** üreten betikler:
-dizin sayfası, PDF kitap ve notların içindeki adımlayıcı figürler.
+dizin sayfası, PDF kitap ve notların içindeki adımlayıcı figürler. Ayrıca
+`deck.js` kullanan HTML sunumlardan (computer, data_structures, agt) PDF üreten
+betik.
 
 Site bu klasöre bağımlı değildir. Jekyll onu yok sayar (`_config.yml` →
 `exclude`) ve **ders sayfasından buraya bağlantı verilmez** — burası yazarın
 mutfağı, öğrencinin değil.
 
-Python 3.9+ yeter. Yalnızca kitap üreteci dış paket ister:
+Python 3.9+ yeter. Yalnızca kitap ve sunum PDF üreteçleri dış paket ister:
 
 ```bash
 pip install -r tools/requirements.txt
@@ -70,6 +72,40 @@ değişirse ders sayfasındaki "781 pages, 9.7 MB" ifadesini elle güncelleyin.
 Sayfa düzeni `book/book.css` içindedir. Bölüm tespiti PDF metninden yapıldığı
 için `letter-spacing` kullanan başlıklarda karşılaştırmadan önce boşluklar
 atılır — `finalize.py` içindeki normalizasyonu kaldırmayın.
+
+## Sunum PDF'leri
+
+```bash
+python tools/make_slide_pdf.py computer                     # dersin tüm sunumları
+python tools/make_slide_pdf.py computer Bolum_10_Diziler    # yalnızca verilenler
+python tools/make_slide_pdf.py data_structures --stale      # PDF'i sunumundan eski olanlar
+```
+
+`files/<ders>/slides/` altındaki `deck.js` sunumlarını `files/<ders>/pdf/`
+altına PDF olarak basar; çalışma soruları ve simülatörler atlanır. Her slayt ve
+her animasyon adımı ayrı bir sayfadır (800×600). Chrome ya da Edge gerekir
+(`playwright` sistemdeki tarayıcıyı kullanır).
+
+Betik sunumu `deck.js`'in kendi "ileri" düğmesiyle baştan sona gezer, her
+durumda etkin slaydın anlık hâlini toplar ve sonunda hepsini **tek seferde**
+basar. Her durumu ayrı ayrı basıp birleştirmek yazı tiplerini her sayfaya
+yeniden gömer ve dosyayı ~4 kat büyütür — denendi.
+
+Sayfalar yerel dosyalardan basılır, yani commitlenmemiş değişiklikler de
+girer. Yerel dosyada sitenin teması (yazı tipi, `--global-*` renkleri) olmadığı
+için `assets/css/main.css` canlı siteden eklenir; çevrimdışıysanız
+`--no-theme` verin (yazı tipi farklı çıkar). Yerel sunucu dosyaları gzip'le
+gönderir: büyük sunumlar sıkıştırmasız gönderilince Chrome bağlantıyı
+koparabiliyor.
+
+Her sunum için basılan sayfa sayısı, sunumdaki adım sayısıyla karşılaştırılır;
+tutmazsa betik hata koduyla çıkar. `--stale`, PDF'i olmayan ya da HTML'i
+PDF'inden sonra değişmiş (dosya zamanı veya son commit) sunumları seçer.
+Sunumu güncelledikten sonra:
+
+```bash
+python tools/make_slide_pdf.py <ders> --stale
+```
 
 ## Figürler
 
