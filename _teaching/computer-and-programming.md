@@ -21,6 +21,7 @@ There are currently no announcements.
 
 ## Course resources
 
+- Terim Sözlüğü / Glossary [(HTML)](../files/computer/sozluk.html)
 - Çukurova Üniversitesi - Enformatik Bölümü [(website)](https://enformatik.cu.edu.tr/cu/Dersler/compulsory-courses/temel-bilgi-teknolojileri-kullanimi/)
 - Cody — introductory coding exercises [(website)](https://f.eba.gov.tr/cody/)
 - Blockly — visual exercises for algorithms [(website)](https://blockly.games/)
@@ -119,8 +120,8 @@ A Java program is written as plain-text source code, compiled to bytecode, and e
 
 Variables store values that a program uses and modifies. This chapter covers Java primitive types, declarations, assignments, type conversion, arithmetic, comparison, and logical operators, as well as reading input with `Scanner` and formatted output with `printf`.
 
-- [🖥️Sunum - Değişkenler, Veri Türleri ve Operatörler (HTML)](../files/computer/slides/Bolum_06_Degiskenler_ve_Operatorler.html)
-- [📝Çalışma Soruları - Değişkenler, Veri Türleri ve Operatörler (HTML)](../files/computer/slides/Bolum_06_Degiskenler_ve_Operatorler_Calisma_Sorulari.html)
+- [🖥️Sunum - Değişkenler, Veri Tipleri ve Operatörler (HTML)](../files/computer/slides/Bolum_06_Degiskenler_ve_Operatorler.html)
+- [📝Çalışma Soruları - Değişkenler, Veri Tipleri ve Operatörler (HTML)](../files/computer/slides/Bolum_06_Degiskenler_ve_Operatorler_Calisma_Sorulari.html)
 
 ---
 
