@@ -9,13 +9,45 @@
     frame.className = "agt-oyun-frame";
     stage.parentNode.insertBefore(frame, stage);
     frame.appendChild(stage);
+    function isFull() { return document.fullscreenElement === frame; }
     function fit() {
+      if (isFull()) {
+        /* tam ekran: sahne pencereye sığacak kadar büyür ve ortalanır */
+        var s = Math.min(window.innerWidth / W, window.innerHeight / H);
+        var x = (window.innerWidth - W * s) / 2, y = (window.innerHeight - H * s) / 2;
+        stage.style.transform = "translate(" + x + "px," + y + "px) scale(" + s + ")";
+        frame.style.height = "";
+        return;
+      }
       var scale = Math.min(1, frame.clientWidth / W);
       stage.style.transform = scale < 1 ? "scale(" + scale + ")" : "";
       frame.style.height = (H * scale) + "px";
     }
     if (window.ResizeObserver) new ResizeObserver(fit).observe(frame);
     window.addEventListener("resize", fit);
+
+    /* ⛶ düğmesi: sahneyi tam ekrana alır (Esc ya da düğmeyle çıkılır) */
+    var head = stage.querySelector(".agt-oyun__head");
+    if (head && frame.requestFullscreen) {
+      var full = document.createElement("button");
+      full.type = "button";
+      full.className = "agt-oyun__full";
+      full.textContent = "⛶";
+      var help = head.querySelector(".agt-oyun__help");
+      head.insertBefore(full, help || null);
+      var label = function () {
+        var t = isFull() ? "Tam ekrandan çık" : "Tam ekran";
+        full.setAttribute("aria-label", t);
+        full.title = t;
+        full.setAttribute("aria-pressed", String(isFull()));
+      };
+      full.addEventListener("click", function () {
+        if (isFull()) document.exitFullscreen();
+        else frame.requestFullscreen().catch(function () {});
+      });
+      document.addEventListener("fullscreenchange", function () { label(); fit(); });
+      label();
+    }
     fit();
   });
 
