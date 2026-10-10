@@ -1,0 +1,521 @@
+---
+layout: without-sidebar
+title: "Süreç Zamanlama"
+permalink: /files/computer/slides/Chapter_02_CPU-Scheduler.html
+excerpt: "FCFS, SJF, döner sıralı (round robin) ve öncelikli zamanlamayı düzenlenebilir süreç tablosu, Gantt çizelgesi animasyonu ve bekleme/tamamlanma süreleriyle gösteren simülatör."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.cs-root, #cs-help { --ds-accent: #b45309; --ds-link: #0369a1; }
+html[data-theme="dark"] .agt-oyun.cs-root, html[data-theme="dark"] #cs-help { --ds-accent: #f59e57; --ds-link: #7cc4e8; }
+
+.cs-root .cs-wrap { display: flex; flex-direction: column; gap: 6px; height: 100%; }
+.cs-root .cs-top { display: grid; grid-template-columns: 214px minmax(0, 1fr); gap: 8px; flex: none; height: 238px; }
+.cs-root .panel { min-width: 0; min-height: 0; padding: 8px 10px; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.cs-root .side { display: flex; flex-direction: column; gap: 6px; }
+.cs-root .cap { display: block; margin: 0 0 2px; color: var(--ds-muted); font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.cs-root .side select { width: 100%; min-height: 32px; font-size: 14px; }
+.cs-root .qrow { display: flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 700; }
+.cs-root .qrow input { width: 64px; min-height: 30px; }
+.cs-root .qrow.is-off { opacity: .45; }
+.cs-root .desc { margin: 0; color: var(--ds-muted); font-size: 12.5px; line-height: 1.35; }
+.cs-root .side .addrow { display: flex; gap: 6px; margin-top: auto; }
+.cs-root .side .addrow button { flex: 1; min-height: 30px; padding: 0 6px; font-size: 13px; }
+
+.cs-root table.pt { width: 100%; font-size: 13.5px; table-layout: fixed; }
+.cs-root table.pt th { padding: 3px 4px; font-size: 11.5px; line-height: 1.15; }
+.cs-root table.pt td { height: 27px; padding: 1px 4px; text-align: center; font-variant-numeric: tabular-nums; }
+.cs-root table.pt td input { width: 100%; min-height: 23px; height: 23px; padding: 0 4px; border-radius: 6px; font-size: 13.5px; text-align: center; }
+.cs-root table.pt td.pid { font-weight: 800; }
+.cs-root table.pt td.pid i { display: inline-block; width: 10px; height: 10px; margin-right: 5px; border-radius: 3px; vertical-align: -1px; }
+.cs-root table.pt td.res { font-weight: 700; }
+.cs-root table.pt tr.avg td { background: var(--ds-surface-strong); font-weight: 800; }
+.cs-root table.pt tr.is-run td.pid { color: var(--ds-accent); }
+.cs-root table.pt .del { width: 24px; min-width: 0; min-height: 22px; height: 22px; padding: 0; font-size: 13px; line-height: 1; }
+
+.cs-root .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; flex: none; }
+.cs-root .bar button { min-height: 32px; padding: 0 12px; font-size: 14px; }
+.cs-root .lbl { display: inline-flex; align-items: center; gap: 5px; color: var(--ds-muted); font-size: 12.5px; font-weight: 700; }
+.cs-root .lbl input[type="range"] { width: 80px; }
+.cs-root .score { margin-left: auto; padding: 4px 10px; border-radius: 999px; background: var(--ds-surface-strong); font-size: 13px; font-weight: 700; }
+
+.cs-root .gantt { flex: none; padding: 4px 8px; }
+.cs-root .gantt svg { display: block; width: 100%; height: 88px; }
+.cs-root .gantt text { font-family: inherit; }
+.cs-root .gantt .ax { stroke: var(--ds-border); stroke-width: 1.5; }
+.cs-root .gantt .tk { fill: var(--ds-muted); font-size: 11px; }
+.cs-root .gantt .gl { fill: var(--ds-muted); font-size: 11.5px; font-weight: 700; }
+.cs-root .gantt .seg { stroke-width: 2; }
+.cs-root .gantt .sl { fill: var(--ds-text); font-size: 13px; font-weight: 800; }
+.cs-root .gantt .idle { fill: var(--ds-surface); stroke: var(--ds-border); stroke-dasharray: 4 3; }
+.cs-root .gantt .cur { stroke: var(--ds-accent); stroke-width: 2; }
+
+.cs-root .qline { display: flex; flex: none; align-items: center; gap: 8px; min-height: 30px; font-size: 13.5px; font-weight: 700; white-space: nowrap; overflow: hidden; }
+.cs-root .qline .k { color: var(--ds-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+.cs-root .chip { display: inline-block; min-width: 34px; padding: 2px 8px; border: 2px solid var(--ds-border); border-radius: 8px; background: var(--ds-bg); text-align: center; }
+.cs-root .chip.is-cpu { border-color: var(--ds-accent); }
+.cs-root .rem { color: var(--ds-muted); font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.cs-root .info { flex: 1; min-height: 0; padding: 7px 12px; border-radius: 12px; background: var(--ds-surface-strong); font-size: 14px; line-height: 1.38; overflow: hidden; }
+.cs-root .info .cnt { float: right; margin-left: 8px; color: var(--ds-muted); font-size: 12px; font-weight: 700; }
+.cs-root .info .quiz { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-left: 6px; }
+.cs-root .info .quiz button { min-height: 28px; padding: 0 12px; font-size: 13.5px; }
+.cs-root .ok { color: var(--ds-good); font-weight: 700; }
+.cs-root .no { color: var(--ds-bad); font-weight: 700; }
+</style>
+
+<div class="cs-root agt-oyun agt-oyun--stage" id="csRoot">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 2 · Simülasyon</p><h1>Süreç Zamanlama</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="cs-help">?</button>
+    <a class="agt-oyun__back" href="Bolum_02_Isletim_Sistemleri.html">← Bölüm 2</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="cs-wrap">
+      <div class="cs-top">
+        <aside class="panel side">
+          <div>
+            <label class="cap" for="csAlg">Algoritma</label>
+            <select id="csAlg">
+              <option value="fcfs">FCFS · ilk gelen ilk hizmet alır</option>
+              <option value="sjf">SJF · en kısa iş önce</option>
+              <option value="rr">Döner sıralı (round robin)</option>
+              <option value="pri">Öncelikli</option>
+            </select>
+          </div>
+          <label class="qrow" id="csQRow">Zaman dilimi <input type="number" id="csQ" min="1" max="6" value="2" aria-label="Zaman dilimi (ms)"> ms</label>
+          <div>
+            <label class="cap" for="csPreset">Örnek</label>
+            <select id="csPreset">
+              <option value="slide">Sunum: P1 5, P2 3, P3 2 ms</option>
+              <option value="ex">Alıştırma: P1 4, P2 2, P3 3 ms</option>
+              <option value="arr">Farklı varış zamanları</option>
+              <option value="idle">CPU boşta kalır</option>
+              <option value="rand">Rastgele</option>
+            </select>
+          </div>
+          <p class="desc" id="csDesc"></p>
+          <div class="addrow">
+            <button type="button" id="csAdd" aria-label="Tabloya süreç ekle">+ Süreç</button>
+          </div>
+        </aside>
+        <section class="panel">
+          <table class="pt" id="csTable">
+            <colgroup><col style="width:52px"><col><col><col><col><col><col><col style="width:32px"></colgroup>
+            <thead><tr><th>Süreç</th><th>Varış (ms)</th><th>Süre (ms)</th><th>Öncelik</th><th>Bitiş</th><th>Tamamlanma süresi</th><th>Bekleme süresi</th><th><span class="agt-oyun__muted" aria-label="Sil">×</span></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </section>
+      </div>
+
+      <div class="bar">
+        <button type="button" id="csBack" aria-label="Bir adım geri">← Geri</button>
+        <button type="button" class="is-primary" id="csStep" aria-label="Bir adım ileri">Adım →</button>
+        <button type="button" id="csPlay" aria-label="Oynat veya duraklat">▶ Oynat</button>
+        <button type="button" id="csReset" aria-label="Başa dön">Sıfırla</button>
+        <button type="button" id="csAll" aria-label="Sonucu hemen göster">Sonuca git</button>
+        <label class="lbl">Hız <input type="range" id="csSpeed" min="1" max="5" value="3" aria-label="Animasyon hızı"></label>
+        <label class="lbl"><input type="checkbox" id="csQuiz"> Kendini dene</label>
+        <span class="score" id="csScore" aria-live="polite">Doğru: 0 / 0</span>
+      </div>
+
+      <div class="panel gantt"><svg id="csGantt" viewBox="0 0 740 88" role="img" aria-label="CPU zaman çizelgesi (Gantt)"></svg></div>
+      <div class="qline" id="csQueue"></div>
+      <div class="info" id="csInfo" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="cs-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Süreç zamanlama</h2>
+    <p><b>Amaç:</b> Zamanlayıcının hazır kuyruğundaki süreçlerden hangisine, ne zaman CPU vereceğini farklı algoritmalarla karşılaştırmak ve Gantt çizelgesinden bekleme ve tamamlanma sürelerini hesaplamak.</p>
+    <h3>Algoritmalar</h3>
+    <ul>
+      <li><b>FCFS</b> (first come, first served): hazır kuyruğuna ilk gelen süreç önce çalışır; işi bitene kadar CPU’yu bırakmaz.</li>
+      <li><b>SJF</b> (shortest job first): CPU boşalınca hazır süreçlerden süresi en kısa olan seçilir (kesmesiz).</li>
+      <li><b>Döner sıralı (round robin)</b>: her süreç sırayla en çok bir <b>zaman dilimi</b> kadar çalışır; işi bitmezse kuyruğun sonuna gider ve bağlam değiştirilir. Aynı anda gelen yeni süreç, kuyruğa zaman dilimi dolan süreçten önce girer.</li>
+      <li><b>Öncelikli</b>: CPU boşalınca öncelik değeri en küçük olan (en yüksek öncelikli) süreç seçilir (kesmesiz).</li>
+    </ul>
+    <p>Eşitlikte önce varış zamanı, sonra süreç numarası belirleyicidir.</p>
+    <h3>Hesaplar</h3>
+    <ul>
+      <li><b>Bitiş</b>: sürecin işini bitirdiği an.</li>
+      <li><b>Tamamlanma süresi</b> = bitiş − varış.</li>
+      <li><b>Bekleme süresi</b> = tamamlanma süresi − CPU süresi (hazır kuyruğunda geçen toplam süre).</li>
+    </ul>
+    <h3>Nasıl kullanılır?</h3>
+    <ul>
+      <li>Tablodaki varış, süre ve öncelik değerlerini değiştirin; <b>+ Süreç</b> ile en çok 6 süreç ekleyin, × ile silin.</li>
+      <li><b>Adım →</b> bir sonraki CPU dağıtımını canlandırır, <b>← Geri</b> geri alır, <b>Oynat</b> sona kadar yürütür, <b>Sonuca git</b> tüm çizelgeyi gösterir. Klavyede → ve ← tuşları da çalışır.</li>
+      <li><b>Kendini dene</b>: kuyrukta birden çok süreç varken zamanlayıcının hangisini seçeceğini siz tahmin edersiniz.</li>
+    </ul>
+    <p>İlgili sunum: <a href="Bolum_02_Isletim_Sistemleri.html">Bölüm 2 · İşletim Sistemleri</a> (“Süreç Yönetimi”, “Zaman Paylaşımı: Döner Sıralı CPU Dağıtımı”).</p>
+  </dialog>
+</div>
+
+<script>
+(function () {
+  /* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+  /* yalnızca sercankulcu.github.io adresinde (ve yerel önizlemede) çalışır (© Sercan Külcü) */
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /* motor: başla */
+  /* procs: [{id, arr, burst, pri}] — tamsayı ms. Dönüş: CPU dağıtımları (segs) ve süreç sonuçları. */
+  function schedule(procs, alg, q) {
+    var n = procs.length, rem = {}, admitted = {}, queue = [], segs = [], finish = {}, t = 0, done = 0, guard = 0;
+    var order = procs.map(function (p, i) { return i; }).sort(function (a, b) { return procs[a].arr - procs[b].arr || a - b; });
+    procs.forEach(function (p) { rem[p.id] = p.burst; });
+    function admit(now) {
+      var got = [];
+      order.forEach(function (i) { var p = procs[i]; if (!admitted[p.id] && p.arr <= now) { admitted[p.id] = true; queue.push(p.id); got.push(p.id); } });
+      return got;
+    }
+    function byId(id) { for (var i = 0; i < n; i++) if (procs[i].id === id) return procs[i]; }
+    function pick() {
+      if (alg === "fcfs" || alg === "rr") return 0;
+      var best = 0;
+      for (var i = 1; i < queue.length; i++) {
+        var a = byId(queue[i]), b = byId(queue[best]);
+        var ka = alg === "sjf" ? a.burst : a.pri, kb = alg === "sjf" ? b.burst : b.pri;
+        if (ka < kb) best = i;
+      }
+      return best;
+    }
+    function remCopy() { var o = {}; for (var k in rem) o[k] = rem[k]; return o; }
+    while (done < n && guard++ < 10000) {
+      var arrivedNow = admit(t);
+      if (!queue.length) {
+        var next = Infinity;
+        procs.forEach(function (p) { if (!admitted[p.id]) next = Math.min(next, p.arr); });
+        segs.push({ pid: null, start: t, end: next, queueBefore: [], queueAfter: [], rem: remCopy(), arrivals: [] });
+        t = next;
+        continue;
+      }
+      var seg = { pid: null, start: t, queueBefore: queue.slice(), arrivedAtStart: arrivedNow, arrivals: [] };
+      var idx = pick(), pid = queue.splice(idx, 1)[0];
+      seg.pid = pid;
+      var slice = 0;
+      while (true) {
+        rem[pid]--; slice++; t++;
+        if (rem[pid] === 0) { finish[pid] = t; done++; seg.finished = true; seg.arrivals = seg.arrivals.concat(admit(t)); break; }
+        if (alg === "rr" && slice === q) { seg.arrivals = seg.arrivals.concat(admit(t)); queue.push(pid); seg.preempted = true; break; }
+        seg.arrivals = seg.arrivals.concat(admit(t));
+      }
+      seg.end = t; seg.queueAfter = queue.slice(); seg.rem = remCopy();
+      segs.push(seg);
+    }
+    var res = procs.map(function (p) {
+      var f = finish[p.id];
+      return { id: p.id, finish: f, turnaround: f - p.arr, waiting: f - p.arr - p.burst };
+    });
+    var avgW = res.reduce(function (s, r) { return s + r.waiting; }, 0) / n;
+    var avgT = res.reduce(function (s, r) { return s + r.turnaround; }, 0) / n;
+    return { segs: segs, res: res, end: t, avgWaiting: avgW, avgTurnaround: avgT };
+  }
+  /* motor: bitti */
+
+  if (typeof document === "undefined") return;
+  var E = function (id) { return document.getElementById(id); };
+  var COLORS = ["var(--ds-link)", "var(--ds-accent)", "var(--ds-good)", "var(--ds-warn)", "var(--ds-bad)", "color-mix(in srgb, var(--ds-link) 50%, var(--ds-good))"];
+  var DESC = {
+    fcfs: "Hazır kuyruğuna ilk gelen önce çalışır ve işi bitene kadar CPU’da kalır. Uzun bir süreç arkasındakileri bekletebilir.",
+    sjf: "CPU boşalınca hazır süreçlerden süresi en kısa olan seçilir (kesmesiz). Ortalama beklemeyi azaltır; uzun işler gecikebilir.",
+    rr: "Her süreç sırayla en çok bir zaman dilimi çalışır; bitmezse kuyruğun sonuna gider ve bağlam değiştirilir.",
+    pri: "CPU boşalınca öncelik değeri en küçük (en yüksek öncelikli) süreç seçilir (kesmesiz). Düşük öncelikliler uzun bekleyebilir."
+  };
+  var PRESETS = {
+    slide: { alg: "rr", q: 2, procs: [[0, 5, 2], [0, 3, 1], [0, 2, 3]] },
+    ex: { alg: "rr", q: 2, procs: [[0, 4, 2], [0, 2, 3], [0, 3, 1]] },
+    arr: { procs: [[0, 7, 3], [2, 4, 1], [4, 1, 4], [5, 4, 2]] },
+    idle: { procs: [[0, 3, 2], [6, 2, 1], [7, 4, 3]] }
+  };
+  var procs = [], result = null, cur = 0, raf = null, timer = null, playing = false, quizAt = -1, answered = {}, score = 0, asked = 0, fb = "";
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function speed() { return [0.5, 0.75, 1, 1.6, 2.6][+E("csSpeed").value - 1]; }
+  function alg() { return E("csAlg").value; }
+  function q() { var v = Math.round(+E("csQ").value); if (!(v >= 1)) v = 1; if (v > 6) v = 6; return v; }
+  function colorOf(id) { for (var i = 0; i < procs.length; i++) if (procs[i].id === id) return COLORS[i % COLORS.length]; return "var(--ds-muted)"; }
+  function fmt(x) { return (Math.round(x * 100) / 100).toString().replace(".", ","); }
+  function list(a) { return a.length ? a.join(", ") : "boş"; }
+
+  function setProcs(rows) { procs = rows.map(function (r, i) { return { id: "P" + (i + 1), arr: r[0], burst: r[1], pri: r[2] }; }); }
+  function applyPreset() {
+    var v = E("csPreset").value;
+    if (v === "rand") {
+      var n = 3 + Math.floor(Math.random() * 3), rows = [];
+      for (var i = 0; i < n; i++) rows.push([i === 0 ? 0 : Math.floor(Math.random() * 8), 1 + Math.floor(Math.random() * 7), 1 + Math.floor(Math.random() * 5)]);
+      setProcs(rows);
+    } else {
+      var p = PRESETS[v];
+      setProcs(p.procs);
+      if (p.alg) { E("csAlg").value = p.alg; E("csQ").value = p.q; }
+    }
+    recompute();
+  }
+
+  function recompute() {
+    stopAll(); playing = false;
+    result = schedule(procs, alg(), q());
+    cur = 0; answered = {}; fb = "";
+    E("csDesc").textContent = DESC[alg()];
+    E("csQRow").classList.toggle("is-off", alg() !== "rr");
+    E("csQ").disabled = alg() !== "rr";
+    buildTable();
+    refresh();
+  }
+
+  function buildTable() {
+    E("csTable").tBodies[0].innerHTML = procs.map(function (p, i) {
+      function inp(f, min, max, lab) { return '<td><input type="number" data-i="' + i + '" data-f="' + f + '" min="' + min + '" max="' + max + '" value="' + p[f] + '" aria-label="' + p.id + " " + lab + '"></td>'; }
+      return '<tr data-id="' + p.id + '"><td class="pid"><i style="background:' + colorOf(p.id) + '"></i>' + p.id + "</td>" +
+        inp("arr", 0, 30, "varış") + inp("burst", 1, 12, "süre") + inp("pri", 0, 9, "öncelik") +
+        '<td class="res" data-r="finish"></td><td class="res" data-r="turnaround"></td><td class="res" data-r="waiting"></td>' +
+        '<td><button type="button" class="del" data-del="' + i + '" aria-label="' + p.id + ' sil"' + (procs.length <= 1 ? " disabled" : "") + ">×</button></td></tr>";
+    }).join("") + '<tr class="avg"><td colspan="5" style="text-align:right">Ortalama</td><td id="csAvgT">—</td><td id="csAvgW">—</td><td></td></tr>';
+    E("csAdd").disabled = procs.length >= 6;
+  }
+
+  /* k adım tamamlandıysa (p: o an oynayan adımın ilerlemesi) */
+  function finishedBy(time) {
+    var f = {};
+    result.res.forEach(function (r) { if (r.finish <= time) f[r.id] = r; });
+    return f;
+  }
+  function drawGantt(k, p) {
+    var W = 740, X0 = 30, X1 = 730, Y = 22, H = 34, T = Math.max(1, result.end), sx = (X1 - X0) / T;
+    var h = '<text class="gl" x="' + X0 + '" y="14">CPU zaman çizelgesi (Gantt)</text>';
+    var shown = result.segs.slice(0, k + (p !== null ? 1 : 0));
+    var now = 0;
+    shown.forEach(function (s, i) {
+      var end = (i === k && p !== null) ? s.start + (s.end - s.start) * p : s.end;
+      now = end;
+      var x = X0 + s.start * sx, w = Math.max(0, (end - s.start) * sx);
+      if (s.pid === null) {
+        h += '<rect class="idle" x="' + x + '" y="' + Y + '" width="' + w + '" height="' + H + '" rx="4"/>';
+        if (w > 30) h += '<text class="tk" x="' + (x + w / 2) + '" y="' + (Y + H / 2 + 4) + '" text-anchor="middle">boş</text>';
+      } else {
+        var c = colorOf(s.pid);
+        h += '<rect class="seg" x="' + x + '" y="' + Y + '" width="' + w + '" height="' + H + '" rx="4" style="fill:color-mix(in srgb, ' + c + ' 28%, var(--ds-bg));stroke:' + c + '"/>';
+        if (w > 20) h += '<text class="sl" x="' + (x + w / 2) + '" y="' + (Y + H / 2 + 5) + '" text-anchor="middle">' + s.pid + "</text>";
+      }
+    });
+    h += '<line class="ax" x1="' + X0 + '" y1="' + (Y + H + 4) + '" x2="' + X1 + '" y2="' + (Y + H + 4) + '"/>';
+    var stepT = 1;
+    while (stepT * sx < 22) stepT = stepT === 1 ? 2 : stepT === 2 ? 5 : stepT * 2;
+    for (var t = 0; t <= T; t += stepT) {
+      var tx = X0 + t * sx;
+      h += '<line class="ax" x1="' + tx + '" y1="' + (Y + H + 1) + '" x2="' + tx + '" y2="' + (Y + H + 8) + '"/>' +
+        '<text class="tk" x="' + tx + '" y="' + (Y + H + 20) + '" text-anchor="middle">' + t + "</text>";
+    }
+    h += '<text class="tk" x="' + (X1 + 2) + '" y="' + (Y + H + 32) + '" text-anchor="end">ms</text>';
+    if (shown.length && k < result.segs.length || p !== null) {
+      var cx = X0 + now * sx;
+      h += '<line class="cur" x1="' + cx + '" y1="' + (Y - 4) + '" x2="' + cx + '" y2="' + (Y + H + 6) + '"/>';
+    }
+    E("csGantt").innerHTML = h;
+    return now;
+  }
+
+  function refreshTable(time, running) {
+    var f = finishedBy(time), all = Object.keys(f).length === procs.length;
+    var rows = E("csTable").tBodies[0].rows;
+    for (var i = 0; i < procs.length; i++) {
+      var r = f[procs[i].id];
+      rows[i].classList.toggle("is-run", procs[i].id === running);
+      ["finish", "turnaround", "waiting"].forEach(function (key) { rows[i].querySelector('[data-r="' + key + '"]').textContent = r ? r[key] : "—"; });
+    }
+    E("csAvgT").textContent = all ? fmt(result.avgTurnaround) : "—";
+    E("csAvgW").textContent = all ? fmt(result.avgWaiting) : "—";
+  }
+
+  function queueLine(cpu, queue, rem) {
+    var h = '<span class="k">CPU</span>' + (cpu ? '<span class="chip is-cpu" style="background:color-mix(in srgb, ' + colorOf(cpu) + ' 28%, var(--ds-bg))">' + cpu + "</span>" : '<span class="chip">—</span>');
+    h += '<span class="k">Hazır kuyruğu</span>' + (queue.length ? queue.map(function (id) { return '<span class="chip">' + id + "</span>"; }).join("") : '<span class="agt-oyun__muted">boş</span>');
+    h += '<span class="rem">Kalan süre: ' + procs.map(function (p) { return p.id + ": " + rem[p.id]; }).join(" · ") + "</span>";
+    E("csQueue").innerHTML = h;
+  }
+
+  function reasonText(s) {
+    var a = alg(), p = procs.filter(function (x) { return x.id === s.pid; })[0];
+    if (a === "fcfs") return "kuyrukta en önce gelen o";
+    if (a === "rr") return "kuyruğun başındaki o; en çok " + q() + " ms çalışabilir";
+    if (a === "sjf") return "hazır süreçler arasında süresi en kısa (" + p.burst + " ms)";
+    return "öncelik değeri en küçük (" + p.pri + "; küçük sayı = yüksek öncelik)";
+  }
+  function startText(s) {
+    if (s.pid === null) return "t = " + s.start + "–" + s.end + ": hazır kuyruğu boş; CPU boşta bekler. Sonraki süreç t = " + s.end + " anında gelir.";
+    var arr = s.arrivedAtStart && s.arrivedAtStart.length ? s.arrivedAtStart.join(", ") + " hazır kuyruğuna girdi. " : "";
+    return "t = " + s.start + ": " + arr + "Hazır kuyruğu: " + list(s.queueBefore) + ". Zamanlayıcı <b>" + s.pid + "</b>’i seçti: " + reasonText(s) + ".";
+  }
+  function endText(s) {
+    if (s.pid === null) return startText(s);
+    var t = "t = " + s.start + "–" + s.end + ": CPU <b>" + s.pid + "</b>’de. ";
+    if (s.arrivals.length) t += "Bu arada " + s.arrivals.map(function (id) { var p = procs.filter(function (x) { return x.id === id; })[0]; return id + " (t = " + p.arr + ")"; }).join(", ") + " geldi. ";
+    if (s.finished) t += "<b>" + s.pid + "</b> işini bitirdi (t = " + s.end + ") ve sistemden çıkar.";
+    else if (s.preempted) t += "Zaman dilimi doldu; " + s.pid + " kuyruğun sonuna gider (kalan " + s.rem[s.pid] + " ms). Bağlam değiştirilir.";
+    return t;
+  }
+  function finalText() {
+    var byF = result.res.slice().sort(function (a, b) { return a.finish - b.finish; });
+    return "Bitiş: " + byF.map(function (r) { return r.id + " = " + r.finish; }).join(", ") + " ms. Ortalama bekleme süresi <b>" + fmt(result.avgWaiting) +
+      " ms</b>, ortalama tamamlanma süresi <b>" + fmt(result.avgTurnaround) + " ms</b>. Başka bir algoritma seçip karşılaştırın.";
+  }
+  function setInfo(html, k) { E("csInfo").innerHTML = '<span class="cnt">Adım ' + k + " / " + result.segs.length + "</span>" + fb + html; }
+
+  function remAt(k) {
+    if (k === 0) { var o = {}; procs.forEach(function (p) { o[p.id] = p.burst; }); return o; }
+    return result.segs[k - 1].rem;
+  }
+  function refresh() {
+    var time = drawGantt(cur, null);
+    if (cur === 0) {
+      refreshTable(0, null);
+      queueLine(null, [], remAt(0));
+      setInfo("Başlamak için <b>Adım →</b> ya da <b>Oynat</b>’a basın. Her adım, zamanlayıcının CPU’yu bir sürece vermesini gösterir.", 0);
+    } else {
+      var s = result.segs[cur - 1];
+      refreshTable(s.end, null);
+      queueLine(null, s.queueAfter, s.rem);
+      setInfo(endText(s) + (cur === result.segs.length ? " " + finalText() : ""), cur);
+    }
+    E("csBack").disabled = cur === 0;
+    E("csStep").disabled = cur >= result.segs.length;
+    E("csAll").disabled = cur >= result.segs.length;
+    E("csPlay").textContent = playing ? "❚❚ Duraklat" : "▶ Oynat";
+    E("csScore").textContent = "Doğru: " + score + " / " + asked;
+  }
+  function stopAll() { if (raf) cancelAnimationFrame(raf); raf = null; clearTimeout(timer); timer = null; quizAt = -1; }
+
+  function forward() {
+    if (raf || quizAt >= 0) return;
+    if (cur >= result.segs.length) { playing = false; refresh(); return; }
+    var s = result.segs[cur];
+    if (E("csQuiz").checked && s.pid !== null && s.queueBefore.length > 1 && !answered[cur]) { showQuiz(); return; }
+    run();
+  }
+  function run() {
+    var k = cur, s = result.segs[k], D = reduce ? 1 : Math.max(500, (s.end - s.start) * 380) / speed(), t0 = null;
+    var q0 = s.queueBefore.filter(function (id) { return id !== s.pid; });
+    queueLine(s.pid, q0, remAt(k));
+    setInfo(startText(s), k + 1);
+    fb = "";
+    E("csBack").disabled = false;
+    function frame(ts) {
+      if (t0 === null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / D);
+      var time = drawGantt(k, p);
+      refreshTable(Math.floor(time + 1e-9), s.pid);
+      if (s.pid) {
+        var r = {}; for (var key in remAt(k)) r[key] = remAt(k)[key];
+        r[s.pid] = remAt(k)[s.pid] - Math.floor((time - s.start) + 1e-9);
+        queueLine(s.pid, q0, r);
+      }
+      if (p < 1) { raf = requestAnimationFrame(frame); return; }
+      raf = null; cur = k + 1; refresh();
+      if (playing) timer = setTimeout(forward, reduce ? 300 : 1100 / speed());
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  function showQuiz() {
+    quizAt = cur;
+    var s = result.segs[cur];
+    queueLine(null, s.queueBefore, remAt(cur));
+    setInfo("<b>t = " + s.start + ":</b> Hazır kuyruğu: " + list(s.queueBefore) + ". Zamanlayıcı CPU’yu hangi sürece verir?" +
+      '<span class="quiz">' + s.queueBefore.map(function (id) { return '<button type="button" data-p="' + id + '">' + id + "</button>"; }).join("") + "</span>", cur);
+    var b = E("csInfo").querySelector("button"); if (b) b.focus();
+  }
+  E("csInfo").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-p]");
+    if (!b || quizAt < 0) return;
+    var s = result.segs[quizAt], ok = b.dataset.p === s.pid;
+    asked++; if (ok) score++;
+    answered[quizAt] = true; quizAt = -1;
+    E("csScore").textContent = "Doğru: " + score + " / " + asked;
+    fb = ok ? '<span class="ok">Doğru!</span> ' : '<span class="no">Yanlış.</span> ';
+    run();
+    E("csStep").focus();
+  });
+
+  E("csStep").addEventListener("click", function () {
+    playing = false; clearTimeout(timer);
+    E("csPlay").textContent = "▶ Oynat";
+    if (raf || quizAt >= 0) return;
+    forward();
+  });
+  E("csBack").addEventListener("click", function () {
+    var wasAnim = !!raf || quizAt >= 0;
+    stopAll(); playing = false; fb = "";
+    if (!wasAnim && cur > 0) cur--;
+    refresh();
+  });
+  E("csPlay").addEventListener("click", function () {
+    if (playing) { playing = false; clearTimeout(timer); refresh(); return; }
+    if (cur >= result.segs.length) { cur = 0; answered = {}; }
+    playing = true; refresh(); forward();
+    if (raf || quizAt >= 0) E("csPlay").textContent = "❚❚ Duraklat";
+  });
+  E("csReset").addEventListener("click", function () { stopAll(); playing = false; cur = 0; answered = {}; fb = ""; refresh(); });
+  E("csAll").addEventListener("click", function () { stopAll(); playing = false; fb = ""; cur = result.segs.length; refresh(); });
+  E("csAlg").addEventListener("change", recompute);
+  E("csQ").addEventListener("change", function () { E("csQ").value = q(); recompute(); });
+  E("csPreset").addEventListener("change", applyPreset);
+  E("csAdd").addEventListener("click", function () {
+    if (procs.length >= 6) return;
+    var last = procs[procs.length - 1];
+    procs.push({ id: "P" + (procs.length + 1), arr: last ? last.arr : 0, burst: 3, pri: 2 });
+    recompute();
+  });
+  E("csTable").addEventListener("change", function (ev) {
+    var inp = ev.target.closest("input[data-f]");
+    if (!inp) return;
+    var i = +inp.dataset.i, f = inp.dataset.f, lim = { arr: [0, 30], burst: [1, 12], pri: [0, 9] }[f];
+    var v = Math.round(+inp.value);
+    if (!isFinite(v)) v = lim[0];
+    v = Math.min(lim[1], Math.max(lim[0], v));
+    procs[i][f] = v;
+    recompute();
+    var again = E("csTable").querySelector('input[data-i="' + i + '"][data-f="' + f + '"]');
+    if (again) again.focus();
+  });
+  E("csTable").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-del]");
+    if (!b || procs.length <= 1) return;
+    procs.splice(+b.dataset.del, 1);
+    procs.forEach(function (p, i) { p.id = "P" + (i + 1); });
+    recompute();
+  });
+  E("csRoot").addEventListener("keydown", function (ev) {
+    var tag = ev.target.tagName;
+    if (tag === "INPUT" && ev.target.type !== "checkbox" || tag === "SELECT") return;
+    if (ev.key === "ArrowRight") { ev.preventDefault(); E("csStep").click(); }
+    else if (ev.key === "ArrowLeft") { ev.preventDefault(); E("csBack").click(); }
+  });
+  applyPreset();
+})();
+</script>
+<script src="deck/oyun.js"></script>

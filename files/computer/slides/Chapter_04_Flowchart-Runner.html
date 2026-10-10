@@ -1,0 +1,448 @@
+---
+layout: without-sidebar
+title: "Akış Diyagramı Yürütücü"
+permalink: /files/computer/slides/Chapter_04_Flowchart-Runner.html
+excerpt: "Hazır akış diyagramlarını adım adım çalıştıran araç: etkin kutu ve ok vurgusu, değişken tablosu, çıktı alanı ve karar tahmini."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.fc-sim.agt-oyun { --ds-accent:#b45309; --ds-link:#0369a1; }
+html[data-theme="dark"] .agt-oyun { --ds-accent:#f59e57; --ds-link:#7cc4e8; }
+#fc-help { --ds-accent:#b45309; }
+html[data-theme="dark"] #fc-help { --ds-accent:#f59e57; }
+
+.fc-sim .fc-layout { display: grid; grid-template-columns: 410px minmax(0, 1fr); gap: 12px; height: 100%; }
+.fc-sim .panel { min-width: 0; min-height: 0; padding: 8px 10px; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.fc-sim .diagram { display: flex; align-items: center; justify-content: center; }
+.fc-sim .diagram svg { display: block; width: 100%; height: 100%; }
+.fc-sim svg .box { fill: var(--ds-bg); stroke: var(--ds-link); stroke-width: 1.8; }
+.fc-sim svg .box.on { fill: var(--ds-hot); stroke: var(--ds-accent); stroke-width: 3; }
+.fc-sim svg .box.seen { fill: var(--ds-surface-strong); }
+.fc-sim svg .txt { fill: var(--ds-text); font-size: 13.5px; font-family: system-ui, sans-serif; text-anchor: middle; }
+.fc-sim svg .line { fill: none; stroke: var(--ds-muted); stroke-width: 1.6; }
+.fc-sim svg .line.on { stroke: var(--ds-accent); stroke-width: 3; }
+.fc-sim svg .ah { fill: var(--ds-muted); }
+.fc-sim svg .ahon { fill: var(--ds-accent); }
+.fc-sim svg .lbl { fill: var(--ds-muted); font-size: 12px; font-weight: 700; font-family: system-ui, sans-serif; }
+.fc-sim svg .dot { fill: var(--ds-muted); }
+.fc-sim .side { display: flex; flex-direction: column; gap: 7px; }
+.fc-sim .cap { margin: 0; color: var(--ds-muted); font-size: 11.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.fc-sim select { width: 100%; min-height: 32px; font-size: 14px; }
+.fc-sim .inputs { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.fc-sim .inputs label { display: flex; align-items: center; gap: 4px; font-family: ui-monospace, Consolas, monospace; font-size: 14px; font-weight: 700; }
+.fc-sim .inputs input { width: 64px; min-height: 30px; padding: 0 6px; font-size: 14px; }
+.fc-sim .inputs button { min-height: 30px; padding: 0 10px; font-size: 13.5px; }
+.fc-sim .ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.fc-sim .ctl button { min-height: 32px; padding: 0 10px; font-size: 13.5px; }
+.fc-sim .ctl label { display: flex; align-items: center; gap: 5px; color: var(--ds-muted); font-size: 12.5px; font-weight: 700; }
+.fc-sim .ctl input[type="range"] { width: 70px; }
+.fc-sim .pred { display: none; gap: 6px; }
+.fc-sim .pred.on { display: flex; }
+.fc-sim .pred button { border-color: var(--ds-accent); }
+.fc-sim .msg { min-height: 62px; margin: 0; padding: 6px 10px; border-radius: 10px; background: var(--ds-surface-strong); font-size: 14px; line-height: 1.4; }
+.fc-sim .msg.q { box-shadow: inset 0 0 0 2px var(--ds-accent); }
+.fc-sim .msg.bad { color: var(--ds-bad); font-weight: 700; }
+.fc-sim .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex: 1; min-height: 0; }
+.fc-sim .two > div { display: flex; flex-direction: column; gap: 3px; min-height: 0; }
+.fc-sim table { width: 100%; font-size: 14px; font-family: ui-monospace, Consolas, monospace; }
+.fc-sim th, .fc-sim td { padding: 3px 7px; text-align: left; }
+.fc-sim td.chg { background: var(--ds-hot); font-weight: 800; }
+.fc-sim .vars { flex: 1; min-height: 0; overflow: hidden; }
+.fc-sim .out { flex: 1; min-height: 0; margin: 0; padding: 5px 8px; overflow: hidden; border: 1.5px solid var(--ds-border); border-radius: 8px; background: var(--ds-surface); font-family: ui-monospace, Consolas, monospace; font-size: 14px; line-height: 1.4; white-space: pre-wrap; }
+.fc-sim .out .new { color: var(--ds-accent); font-weight: 800; }
+.fc-sim .foot { display: flex; justify-content: space-between; color: var(--ds-muted); font-size: 12.5px; font-weight: 700; }
+</style>
+
+<div class="fc-sim agt-oyun agt-oyun--stage">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 4 · Simülasyon</p><h1>Akış Diyagramı Yürütücü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="fc-help">?</button>
+    <a class="agt-oyun__back" href="Bolum_04_Akis_Diyagramlari.html">← Bölüm 4</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="fc-layout">
+      <section class="panel diagram"><svg id="fcSvg" role="img" aria-label="Akış diyagramı"></svg></section>
+      <aside class="panel side">
+        <select id="fcEx" aria-label="Örnek akış diyagramı">
+          <option value="max">İki sayının büyüğünü bul</option>
+          <option value="sum">1'den n'e toplam</option>
+          <option value="fact">Faktöriyel (n!)</option>
+          <option value="grade">Harf notu</option>
+          <option value="prime">Asal mı?</option>
+        </select>
+        <div class="inputs" id="fcInputs"></div>
+        <div class="ctl">
+          <button type="button" id="fcReset" aria-label="Başa dön">⏮</button>
+          <button type="button" id="fcBack" aria-label="Bir adım geri">◀ Geri</button>
+          <button type="button" id="fcFwd" class="is-primary" aria-label="Bir adım ileri">Adım ▶</button>
+          <button type="button" id="fcPlay" aria-label="Oynat">Oynat</button>
+          <label>Hız <input type="range" id="fcSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı"></label>
+        </div>
+        <div class="ctl">
+          <label><input type="checkbox" id="fcPredict"> Kararları tahmin et</label>
+          <span class="pred" id="fcPred"><button type="button" id="fcYes" aria-label="Tahmin: Evet">Evet</button><button type="button" id="fcNo" aria-label="Tahmin: Hayır">Hayır</button></span>
+        </div>
+        <p class="msg" id="fcMsg" aria-live="polite"></p>
+        <div class="two">
+          <div><p class="cap">Değişkenler</p><div class="vars"><table><thead><tr><th>Ad</th><th>Değer</th></tr></thead><tbody id="fcVars"></tbody></table></div></div>
+          <div><p class="cap">Çıktı (ekran)</p><pre class="out" id="fcOut"></pre></div>
+        </div>
+        <div class="foot"><span id="fcStep"></span><span id="fcScore"></span></div>
+      </aside>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="fc-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Akış diyagramı yürütücü</h2>
+    <p><b>Amaç:</b> Bir akış diyagramının bilgisayar tarafından nasıl “yürütüldüğünü” görmek: hangi kutunun çalıştığı, hangi okun izlendiği, değişkenlerin ve ekran çıktısının nasıl değiştiği.</p>
+    <table>
+      <tr><th>Simge</th><th>Görev</th></tr>
+      <tr><td>Oval</td><td>Başla / Bitir</td></tr>
+      <tr><td>Dikdörtgen</td><td>İşlem (hesaplama, atama)</td></tr>
+      <tr><td>Eşkenar dörtgen</td><td>Karar: Evet / Hayır iki çıkış</td></tr>
+      <tr><td>Paralelkenar</td><td>Giriş / çıkış (oku, yaz)</td></tr>
+    </table>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li>Bir örnek seçin ve giriş değerlerini yazın (Enter ya da <b>Uygula</b>).</li>
+      <li><b>Adım ▶</b> ile bir sonraki kutuya geçin; izlenen ok ve çalışan kutu turuncu görünür. <b>◀ Geri</b> bir adım geri alır, <b>Oynat</b> kendiliğinden yürütür.</li>
+      <li>Değişken tablosunda o adımda değişen değer vurgulanır; <i>yaz</i> kutuları çıktı alanına satır ekler.</li>
+      <li><b>Kararları tahmin et</b> işaretliyse her karar kutusunda durulur; Evet mi Hayır mı yoluna gidileceğini tahmin edin.</li>
+    </ol>
+    <p>Döngülü örneklerde geri dönen ok (tekrar) aynı kararı yeniden sordurur; koşulu değiştiren işlem (i = i + 1) olmasaydı döngü bitmezdi. 1'den n'e toplamda i sayaç, toplam biriktiricidir.</p>
+    <p>İlgili sunumlar: <a href="Bolum_04_Akis_Diyagramlari.html">Bölüm 4 · Akış Diyagramları</a> ve <a href="Bolum_04_Algoritmalar.html">Bölüm 4 · Algoritmalar</a> (asal sayı, faktöriyel).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  /* yalnızca sercankulcu.github.io adresinde (ve yerel önizlemede) çalışır (© Sercan Külcü) */
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+  var E = function (id) { return document.getElementById(id); };
+  function N(type, x, y, w, h, text, o) { o = o || {}; o.type = type; o.x = x; o.y = y; o.w = w; o.h = h; o.text = text; return o; }
+  function ED(f, t, d, lab, lx, ly, anchor) { return { f: f, t: t, d: d, lab: lab, lx: lx, ly: ly, anchor: anchor }; }
+  function yn(c) { return c ? "doğru → Evet" : "yanlış → Hayır"; }
+
+  /* döngülü iki örnek (toplam, faktöriyel) aynı yerleşimi kullanır */
+  function loopChart(t) {
+    return {
+      vb: [420, 345], dots: [],
+      nodes: {
+        s: N("term", 160, 22, 110, 28, "Başla", { next: "r" }),
+        r: N("io", 160, 70, 180, 32, "n değerini oku", { next: "p1", run: function (S) { S.set("n", S.inp.n); return "Giriş kutusu: kullanıcı " + S.inp.n + " girer → n = " + S.inp.n + "."; } }),
+        p1: N("proc", 160, 122, 180, 30, t.init, { next: "d", run: t.initRun }),
+        d: N("dec", 160, 190, 150, 60, "i <= n ?", { yes: "p2", no: "o", test: function (v) { return v.i <= v.n; }, q: function (v) { return "i <= n ? (i = " + v.i + ", n = " + v.n + ")"; }, why: function (v, c) { return "Karar: " + v.i + " <= " + v.n + " → " + yn(c) + (c ? ", döngü gövdesine gir." : ", döngüden çık."); } }),
+        p2: N("proc", 160, 256, 180, 30, t.body, { next: "p3", run: t.bodyRun }),
+        p3: N("proc", 160, 312, 180, 30, "i = i + 1", { next: "d", run: function (S) { var o = S.v.i; S.set("i", o + 1); return "i = " + o + " + 1 = " + (o + 1) + ". Geri dönen ok yeniden karara götürür."; } }),
+        o: N("io", 330, 256, 140, 32, t.out, { next: "e", run: t.outRun }),
+        e: N("term", 330, 312, 100, 28, "Bitir")
+      },
+      edges: [
+        ED("s", "r", "M160 36 L160 54"), ED("r", "p1", "M160 86 L160 107"), ED("p1", "d", "M160 137 L160 160"),
+        ED("d", "p2", "M160 220 L160 241", "Evet", 168, 235, "start"), ED("p2", "p3", "M160 271 L160 297"),
+        ED("p3", "d", "M70 312 L24 312 L24 190 L85 190", "tekrar", 30, 300, "start"),
+        ED("d", "o", "M235 190 L330 190 L330 240", "Hayır", 245, 182, "start"), ED("o", "e", "M330 272 L330 298")
+      ],
+      start: "s"
+    };
+  }
+
+  var EX = {
+    max: {
+      inputs: [["a", 4, -999, 999], ["b", 9, -999, 999]],
+      vb: [420, 365], dots: [[210, 296]],
+      nodes: {
+        s: N("term", 210, 24, 110, 28, "Başla", { next: "r" }),
+        r: N("io", 210, 76, 190, 32, "a, b değerlerini oku", { next: "d", run: function (S) { S.set("a", S.inp.a); S.set("b", S.inp.b); return "Giriş kutusu: kullanıcı " + S.inp.a + " ve " + S.inp.b + " girer → a = " + S.inp.a + ", b = " + S.inp.b + "."; } }),
+        d: N("dec", 210, 150, 160, 64, "a > b ?", { yes: "oa", no: "ob", test: function (v) { return v.a > v.b; }, q: function (v) { return "a > b ? (a = " + v.a + ", b = " + v.b + ")"; }, why: function (v, c) { return "Karar: " + v.a + " > " + v.b + " → " + yn(c) + " yolu izlenir."; } }),
+        oa: N("io", 90, 232, 120, 32, "a yaz", { next: "e", run: function (S) { S.print(S.v.a); return "Çıkış kutusu: ekrana " + S.v.a + " yazılır. Hayır dalındaki kutu bu çalıştırmada hiç çalışmaz."; } }),
+        ob: N("io", 330, 232, 120, 32, "b yaz", { next: "e", run: function (S) { S.print(S.v.b); return "Çıkış kutusu: ekrana " + S.v.b + " yazılır. Evet dalındaki kutu bu çalıştırmada hiç çalışmaz."; } }),
+        e: N("term", 210, 344, 110, 28, "Bitir")
+      },
+      edges: [
+        ED("s", "r", "M210 38 L210 60"), ED("r", "d", "M210 92 L210 118"),
+        ED("d", "oa", "M130 150 L90 150 L90 216", "Evet", 124, 142, "end"),
+        ED("d", "ob", "M290 150 L330 150 L330 216", "Hayır", 296, 142, "start"),
+        ED("oa", "e", "M90 248 L90 296 L210 296 L210 330"), ED("ob", "e", "M330 248 L330 296 L210 296 L210 330")
+      ],
+      start: "s",
+      end: function (v) { return "Bitir kutusuna ulaşıldı. Eşit sayılarda (a = b) a > b yanlış olur ve b yazılır; ikisi aynı değer olduğundan sonuç yine doğrudur."; }
+    },
+    sum: (function () {
+      var c = loopChart({
+        init: "toplam = 0, i = 1", body: "toplam = toplam + i", out: "toplamı yaz",
+        initRun: function (S) { S.set("toplam", 0); S.set("i", 1); return "İşlem kutusu: biriktirici toplam = 0, sayaç i = 1."; },
+        bodyRun: function (S) { var o = S.v.toplam; S.set("toplam", o + S.v.i); return "toplam = " + o + " + " + S.v.i + " = " + (o + S.v.i) + "."; },
+        outRun: function (S) { S.print(S.v.toplam); return "Çıkış kutusu: ekrana " + S.v.toplam + " yazılır."; }
+      });
+      c.inputs = [["n", 4, 0, 30]];
+      c.end = function (v) { return "Bitir. Gövde " + v.n + " kez çalıştı; sonuç formülle de doğrulanır: n(n+1)/2 = " + (v.n * (v.n + 1) / 2) + "."; };
+      return c;
+    })(),
+    fact: (function () {
+      var c = loopChart({
+        init: "sonuc = 1, i = 2", body: "sonuc = sonuc × i", out: "sonuc değerini yaz",
+        initRun: function (S) { S.set("sonuc", 1n); S.set("i", 2); return "İşlem kutusu: sonuc = 1 (çarpmanın etkisiz öğesi), i = 2."; },
+        bodyRun: function (S) { var o = S.v.sonuc, r = o * BigInt(S.v.i); S.set("sonuc", r); return "sonuc = " + o + " × " + S.v.i + " = " + r + "."; },
+        outRun: function (S) { S.print(S.v.sonuc); return "Çıkış kutusu: ekrana " + S.v.n + "! = " + S.v.sonuc + " yazılır."; }
+      });
+      c.inputs = [["n", 5, 0, 20]];
+      c.end = function (v) { return "Bitir. " + (v.n < 2 ? "n < 2 olduğundan döngü hiç çalışmadı; 0! = 1! = 1." : "Gövde " + (v.n - 1) + " kez çalıştı (i = 2…" + v.n + ")."); };
+      return c;
+    })(),
+    grade: {
+      inputs: [["not", 72, 0, 100]],
+      vb: [420, 462], dots: [[150, 408]],
+      nodes: {
+        s: N("term", 150, 22, 110, 28, "Başla", { next: "r" }),
+        r: N("io", 150, 68, 180, 32, "not değerini oku", { next: "d1", run: function (S) { S.set("not", S.inp.not); return "Giriş kutusu: kullanıcı " + S.inp.not + " girer → not = " + S.inp.not + "."; } }),
+        d1: gradeDec(85, "aa", "d2"), d2: gradeDec(70, "bb", "d3"), d3: gradeDec(60, "cc", "ff"),
+        aa: gradeOut(330, 130, "AA"), bb: gradeOut(330, 212, "BB"), cc: gradeOut(330, 294, "CC"), ff: gradeOut(150, 368, "FF"),
+        e: N("term", 150, 440, 100, 28, "Bitir")
+      },
+      edges: [
+        ED("s", "r", "M150 36 L150 52"), ED("r", "d1", "M150 84 L150 102"),
+        ED("d1", "aa", "M230 130 L281 130", "Evet", 236, 122, "start"), ED("d1", "d2", "M150 158 L150 184", "Hayır", 158, 176, "start"),
+        ED("d2", "bb", "M230 212 L281 212", "Evet", 236, 204, "start"), ED("d2", "d3", "M150 240 L150 266", "Hayır", 158, 258, "start"),
+        ED("d3", "cc", "M230 294 L281 294", "Evet", 236, 286, "start"), ED("d3", "ff", "M150 322 L150 352", "Hayır", 158, 342, "start"),
+        ED("aa", "e", "M379 130 L404 130 L404 408 L150 408 L150 426"), ED("bb", "e", "M379 212 L404 212 L404 408 L150 408 L150 426"),
+        ED("cc", "e", "M379 294 L404 294 L404 408 L150 408 L150 426"), ED("ff", "e", "M150 384 L150 426")
+      ],
+      start: "s",
+      end: function (v) { return "Bitir. Koşullar yukarıdan aşağı sırayla denendi; ilk doğru koşulun dalı çalıştı, sonraki kararlar hiç sorulmadı."; }
+    },
+    prime: {
+      inputs: [["n", 29, 0, 10000]],
+      vb: [420, 472], dots: [[150, 432]],
+      nodes: {
+        s: N("term", 150, 20, 110, 28, "Başla", { next: "r" }),
+        r: N("io", 150, 64, 170, 32, "n değerini oku", { next: "d0", run: function (S) { S.set("n", S.inp.n); return "Giriş kutusu: kullanıcı " + S.inp.n + " girer → n = " + S.inp.n + "."; } }),
+        d0: N("dec", 150, 120, 124, 52, "n < 2 ?", { yes: "o1", no: "p1", test: function (v) { return v.n < 2; }, q: function (v) { return "n < 2 ? (n = " + v.n + ")"; }, why: function (v, c) { return "Karar: " + v.n + " < 2 → " + yn(c) + (c ? ": 0 ve 1 asal değildir." : ": bölen aramaya geç."); } }),
+        p1: N("proc", 150, 178, 120, 28, "i = 2", { next: "d1", run: function (S) { S.set("i", 2); return "İşlem kutusu: ilk aday bölen i = 2."; } }),
+        d1: N("dec", 150, 240, 150, 56, "i × i <= n ?", { yes: "d2", no: "o2", test: function (v) { return v.i * v.i <= v.n; }, q: function (v) { return "i × i <= n ? (i = " + v.i + ", n = " + v.n + ")"; }, why: function (v, c) { return "Karar: " + v.i + " × " + v.i + " = " + (v.i * v.i) + " <= " + v.n + " → " + yn(c) + (c ? ": i bölen olabilir, dene." : ": i artık √n'yi geçti, aramaya gerek yok."); } }),
+        d2: N("dec", 150, 320, 156, 56, "n % i == 0 ?", { yes: "o3", no: "p2", test: function (v) { return v.n % v.i === 0; }, q: function (v) { return "n % i == 0 ? (n = " + v.n + ", i = " + v.i + ")"; }, why: function (v, c) { return "Karar: " + v.n + " % " + v.i + " = " + (v.n % v.i) + " → " + yn(c) + (c ? ": " + v.i + " bir bölen, n asal değil." : ": " + v.i + " bölen değil, sıradaki adayı dene."); } }),
+        p2: N("proc", 150, 392, 120, 28, "i = i + 1", { next: "d1", run: function (S) { var o = S.v.i; S.set("i", o + 1); return "i = " + o + " + 1 = " + (o + 1) + ". Geri dönen ok yeniden karara götürür."; } }),
+        o1: primeOut(330, 120, "asal değil"), o2: primeOut(330, 240, "asal"), o3: primeOut(330, 320, "asal değil"),
+        e: N("term", 150, 452, 100, 28, "Bitir")
+      },
+      edges: [
+        ED("s", "r", "M150 34 L150 48"), ED("r", "d0", "M150 80 L150 94"),
+        ED("d0", "o1", "M212 120 L271 120", "Evet", 218, 112, "start"), ED("d0", "p1", "M150 146 L150 164", "Hayır", 158, 158, "start"),
+        ED("p1", "d1", "M150 192 L150 212"),
+        ED("d1", "d2", "M150 268 L150 292", "Evet", 158, 284, "start"), ED("d1", "o2", "M225 240 L271 240", "Hayır", 229, 232, "start"),
+        ED("d2", "o3", "M228 320 L271 320", "Evet", 232, 312, "start"), ED("d2", "p2", "M150 348 L150 378", "Hayır", 158, 366, "start"),
+        ED("p2", "d1", "M90 392 L24 392 L24 240 L75 240", "tekrar", 30, 380, "start"),
+        ED("o1", "e", "M389 120 L408 120 L408 432 L150 432 L150 438"), ED("o2", "e", "M389 240 L408 240 L408 432 L150 432 L150 438"),
+        ED("o3", "e", "M389 320 L408 320 L408 432 L150 432 L150 438")
+      ],
+      start: "s",
+      end: function (v) { return v.i === undefined ? "Bitir." : "Bitir. Bölen adayı olarak " + (v.i - 1 < 2 ? "hiçbir sayı" : "2…" + Math.min(v.i, Math.floor(Math.sqrt(v.n))) + " arası") + " denendi; √" + v.n + " ≈ " + (Math.round(Math.sqrt(v.n) * 100) / 100).toString().replace(".", ",") + " sınırı yeter."; }
+    }
+  };
+  function gradeDec(t, yes, no) {
+    return N("dec", 150, { 85: 130, 70: 212, 60: 294 }[t], 160, 56, "not >= " + t + " ?", { yes: yes, no: no,
+      test: function (v) { return v.not >= t; }, q: function (v) { return "not >= " + t + " ? (not = " + v.not + ")"; },
+      why: function (v, c) { return "Karar: " + v.not + " >= " + t + " → " + yn(c) + "."; } });
+  }
+  function gradeOut(x, y, g) { return N("io", x, y, 110, 32, '"' + g + '" yaz', { next: "e", run: function (S) { S.print(g); return "Çıkış kutusu: ekrana " + g + " yazılır."; } }); }
+  function primeOut(x, y, s) { return N("io", x, y, 130, 32, '"' + s + '" yaz', { next: "e", run: function (S) { S.print(s); return "Çıkış kutusu: ekrana \"" + s + "\" yazılır."; } }); }
+
+  /* ---------- yürütme: tüm adımlar önceden üretilir ---------- */
+  function execute(ex, inp) {
+    var F = [], v = {}, order = [], out = [], cur = ex.start, cond = null, changed = [];
+    var S = { v: v, inp: inp,
+      set: function (k, val) { if (order.indexOf(k) < 0) order.push(k); v[k] = val; changed.push(k); },
+      print: function (x) { out.push(String(x)); } };
+    function snap(o) {
+      o.vars = order.map(function (k) { return [k, String(v[k])]; });
+      o.changed = changed.slice(); o.out = out.slice();
+      F.push(o); changed = [];
+    }
+    snap({ node: cur, edge: -1, msg: "Yürütme Başla kutusundan başlar. Henüz hiçbir değişken yok." });
+    for (var guard = 0; guard < 2000; guard++) {
+      var nd = ex.nodes[cur];
+      var nx = nd.type === "dec" ? (cond ? nd.yes : nd.no) : nd.next;
+      var ei = -1;
+      for (var i = 0; i < ex.edges.length; i++) if (ex.edges[i].f === cur && ex.edges[i].t === nx) { ei = i; break; }
+      cur = nx; nd = ex.nodes[cur];
+      if (nd.type === "dec") {
+        var q = nd.q(v);
+        cond = nd.test(v);
+        snap({ node: cur, edge: ei, msg: nd.why(v, cond), q: q, cond: cond });
+      } else if (nd.type === "term") {
+        snap({ node: cur, edge: ei, msg: ex.end(v), end: true });
+        return F;
+      } else {
+        var m = nd.run(S);
+        snap({ node: cur, edge: ei, msg: m });
+      }
+    }
+    return F;
+  }
+
+  /* ---------- çizim ---------- */
+  var exKey = "max", ex = EX.max, frames = [], pos = 0, timer = null, pending = false, answered = {}, score = { ok: 0, n: 0 }, seenNodes = {};
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function shape(id, nd) {
+    var x = nd.x, y = nd.y, w = nd.w / 2, h = nd.h / 2, s;
+    if (nd.type === "term") s = '<rect class="box" x="' + (x - w) + '" y="' + (y - h) + '" width="' + nd.w + '" height="' + nd.h + '" rx="' + h + '"/>';
+    else if (nd.type === "proc") s = '<rect class="box" x="' + (x - w) + '" y="' + (y - h) + '" width="' + nd.w + '" height="' + nd.h + '" rx="2"/>';
+    else if (nd.type === "io") s = '<polygon class="box" points="' + [(x - w + 12) + "," + (y - h), (x + w) + "," + (y - h), (x + w - 12) + "," + (y + h), (x - w) + "," + (y + h)].join(" ") + '"/>';
+    else s = '<polygon class="box" points="' + [x + "," + (y - h), (x + w) + "," + y, x + "," + (y + h), (x - w) + "," + y].join(" ") + '"/>';
+    return '<g data-n="' + id + '">' + s + '<text class="txt" x="' + x + '" y="' + (y + 5) + '">' + esc(nd.text) + '</text></g>';
+  }
+  function drawChart() {
+    var h = '<defs><marker id="fcA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10z"/></marker>' +
+      '<marker id="fcH" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="ahon" d="M0 0 L10 5 L0 10z"/></marker></defs>';
+    ex.edges.forEach(function (e, i) {
+      h += '<path class="line" data-e="' + i + '" d="' + e.d + '" marker-end="url(#fcA)"/>';
+    });
+    ex.edges.forEach(function (e) {
+      if (e.lab) h += '<text class="lbl" x="' + e.lx + '" y="' + e.ly + '" text-anchor="' + (e.anchor || "middle") + '">' + e.lab + '</text>';
+    });
+    (ex.dots || []).forEach(function (d) { h += '<circle class="dot" cx="' + d[0] + '" cy="' + d[1] + '" r="4"/>'; });
+    Object.keys(ex.nodes).forEach(function (id) { h += shape(id, ex.nodes[id]); });
+    var svg = E("fcSvg");
+    svg.setAttribute("viewBox", "0 0 " + ex.vb[0] + " " + ex.vb[1]);
+    svg.innerHTML = h;
+  }
+  function draw() {
+    var f = frames[pos], showQ = pending;
+    seenNodes = {};
+    for (var k = 0; k <= pos; k++) seenNodes[frames[k].node] = 1;
+    E("fcSvg").querySelectorAll("g[data-n]").forEach(function (g) {
+      var id = g.getAttribute("data-n"), b = g.querySelector(".box");
+      b.classList.toggle("on", id === f.node);
+      b.classList.toggle("seen", id !== f.node && !!seenNodes[id]);
+    });
+    E("fcSvg").querySelectorAll("path[data-e]").forEach(function (p) {
+      var on = +p.getAttribute("data-e") === f.edge;
+      p.classList.toggle("on", on);
+      p.setAttribute("marker-end", on ? "url(#fcH)" : "url(#fcA)");
+      if (on) p.parentNode.appendChild(p);
+    });
+    var m = E("fcMsg");
+    m.className = "msg" + (showQ ? " q" : "");
+    m.innerHTML = showQ ? "<b>Tahmin:</b> " + esc(f.q) + " Evet mi, Hayır mı?" : esc(f.msg);
+    E("fcVars").innerHTML = f.vars.length ? f.vars.map(function (r) {
+      var c = f.changed.indexOf(r[0]) >= 0 ? ' class="chg"' : "";
+      return "<tr><td" + c + ">" + esc(r[0]) + "</td><td" + c + ">" + esc(r[1]) + "</td></tr>";
+    }).join("") : '<tr><td colspan="2" style="color:var(--ds-muted)">(henüz yok)</td></tr>';
+    var prevLen = pos > 0 ? frames[pos - 1].out.length : 0;
+    var lines = f.out.slice(-9);
+    var off = f.out.length - lines.length;
+    E("fcOut").innerHTML = lines.map(function (l, i) { return (i + off >= prevLen ? '<span class="new">' + esc(l) + "</span>" : esc(l)); }).join("\n");
+    E("fcStep").textContent = "Adım " + pos + " / " + (frames.length - 1);
+    E("fcScore").textContent = score.n ? "Tahmin: " + score.ok + " / " + score.n : "";
+    E("fcPred").classList.toggle("on", showQ);
+    E("fcFwd").disabled = pending || pos >= frames.length - 1;
+    E("fcBack").disabled = pos === 0;
+    E("fcPlay").disabled = E("fcPredict").checked || pos >= frames.length - 1;
+    E("fcPlay").textContent = timer ? "Duraklat" : "Oynat";
+    E("fcPlay").setAttribute("aria-label", timer ? "Duraklat" : "Oynat");
+  }
+
+  /* ---------- giriş ---------- */
+  function buildInputs() {
+    E("fcInputs").innerHTML = ex.inputs.map(function (p) {
+      return '<label>' + p[0] + ' = <input type="number" data-k="' + p[0] + '" value="' + p[1] + '" min="' + p[2] + '" max="' + p[3] + '" step="1" aria-label="' + p[0] + ' giriş değeri (' + p[2] + '…' + p[3] + ')"></label>';
+    }).join("") + '<button type="button" id="fcApply">Uygula</button>';
+    E("fcApply").addEventListener("click", restart);
+    E("fcInputs").querySelectorAll("input").forEach(function (i) {
+      i.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); restart(); } });
+    });
+  }
+  function readInputs() {
+    var inp = {}, bad = null;
+    ex.inputs.forEach(function (p) {
+      var el = E("fcInputs").querySelector('[data-k="' + p[0] + '"]'), v = Number(el.value);
+      if (el.value.trim() === "" || !Number.isInteger(v) || v < p[2] || v > p[3]) bad = bad || p[0] + " için " + p[2] + " ile " + p[3] + " arasında bir tam sayı girin.";
+      inp[p[0]] = v;
+    });
+    return bad ? { err: bad } : inp;
+  }
+  function restart() {
+    stop();
+    var inp = readInputs();
+    if (inp.err) { var m = E("fcMsg"); m.className = "msg bad"; m.textContent = inp.err; return; }
+    frames = execute(ex, inp);
+    pos = 0; pending = false; answered = {};
+    draw();
+  }
+  function selectEx() {
+    exKey = E("fcEx").value; ex = EX[exKey];
+    buildInputs(); drawChart(); restart();
+  }
+
+  /* ---------- oynatma ---------- */
+  function fwd() {
+    if (pending || pos >= frames.length - 1) return;
+    pos++;
+    if (E("fcPredict").checked && frames[pos].q && !answered[pos]) pending = true;
+    draw();
+  }
+  function back() { stop(); pending = false; if (pos > 0) pos--; draw(); }
+  function answer(g) {
+    if (!pending) return;
+    var f = frames[pos], ok = g === f.cond;
+    score.n++; if (ok) score.ok++;
+    answered[pos] = true; pending = false;
+    draw();
+    E("fcMsg").innerHTML = '<b style="color:var(--ds-' + (ok ? "good" : "bad") + ')">' + (ok ? "Doğru tahmin." : "Yanlış tahmin.") + "</b> " + esc(f.msg);
+    E("fcFwd").focus();
+  }
+  var DELAYS = [1600, 1100, 700, 400, 180];
+  function play() {
+    if (timer) { stop(); draw(); return; }
+    if (pos >= frames.length - 1) return;
+    timer = setTimeout(tick, 0); draw();
+  }
+  function tick() {
+    if (pos >= frames.length - 1) { stop(); draw(); return; }
+    pos++; draw();
+    timer = setTimeout(tick, DELAYS[+E("fcSpeed").value - 1]);
+  }
+  function stop() { if (timer) clearTimeout(timer); timer = null; }
+
+  E("fcEx").addEventListener("change", selectEx);
+  E("fcFwd").addEventListener("click", fwd);
+  E("fcBack").addEventListener("click", back);
+  E("fcReset").addEventListener("click", function () { stop(); pos = 0; pending = false; draw(); });
+  E("fcPlay").addEventListener("click", play);
+  E("fcPredict").addEventListener("change", function () { stop(); if (!this.checked) pending = false; draw(); });
+  E("fcYes").addEventListener("click", function () { answer(true); });
+  E("fcNo").addEventListener("click", function () { answer(false); });
+
+  selectEx();
+  if (location.hostname !== "sercankulcu.github.io") window.__fc = { EX: EX, execute: execute };
+})();
+</script>
+<script src="deck/oyun.js"></script>

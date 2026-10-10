@@ -1,0 +1,382 @@
+---
+layout: without-sidebar
+title: "Turing Makinesi"
+permalink: /files/computer/slides/Chapter_01_Turing-Machine.html
+excerpt: "Bant, okuma/yazma başlığı ve geçiş kurallarıyla çalışan Turing makinesi simülatörü; ikili sayıya 1 ekleme ve diğer hazır makineler, adım adım izleme ve tahmin modu."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.tm-root, #tm-help { --ds-accent: #b45309; --ds-link: #0369a1; }
+html[data-theme="dark"] .agt-oyun.tm-root, html[data-theme="dark"] #tm-help { --ds-accent: #f59e57; --ds-link: #7cc4e8; }
+
+.tm-root .tm-layout { display: grid; grid-template-columns: 214px minmax(0, 1fr); gap: 12px; height: 100%; }
+.tm-root .panel { min-width: 0; min-height: 0; padding: 10px 12px; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.tm-root .side { display: flex; flex-direction: column; gap: 8px; }
+.tm-root .cap { display: block; margin: 0 0 3px; color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.tm-root .side select { width: 100%; font-size: 14px; }
+.tm-root .tm-in { display: flex; gap: 6px; }
+.tm-root .tm-in input { flex: 1; min-width: 0; width: 100%; font-family: ui-monospace, Consolas, monospace; font-size: 15px; }
+.tm-root .tm-in button { padding: 0 10px; font-size: 14px; }
+.tm-root .tm-ex { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.tm-root .tm-ex button { min-height: 26px; padding: 0 8px; font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; }
+.tm-root .tm-err { min-height: 16px; margin: 2px 0 0; color: var(--ds-bad); font-size: 12px; font-weight: 700; }
+.tm-root .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.tm-root .btns button { padding: 0 6px; font-size: 14px; }
+.tm-root .row { display: flex; align-items: center; gap: 6px; color: var(--ds-muted); font-size: 13px; font-weight: 700; }
+.tm-root .row input[type="range"] { flex: 1; }
+.tm-root .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: auto; }
+.tm-root .stats div { padding: 5px 6px; border-radius: 10px; background: var(--ds-surface-strong); color: var(--ds-muted); font-size: 11.5px; font-weight: 700; text-align: center; }
+.tm-root .stats b { display: block; color: var(--ds-text); font-size: 18px; }
+
+.tm-root .main { display: flex; flex-direction: column; gap: 8px; }
+.tm-root .tape-box { position: relative; flex: none; height: 118px; overflow: hidden; border-radius: 10px; background: var(--ds-surface); }
+.tm-root .tape-box .tcap { position: absolute; top: 6px; left: 10px; color: var(--ds-muted); font-size: 12px; font-weight: 700; }
+.tm-root .tape-box .tval { position: absolute; top: 6px; right: 10px; color: var(--ds-text); font-size: 13px; font-weight: 700; }
+.tm-root .strip { position: absolute; top: 58px; left: 0; display: flex; transition: transform .35s ease; }
+.tm-root .cell { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border: 1.5px solid var(--ds-border); margin-right: -1.5px; background: var(--ds-bg); font-family: ui-monospace, Consolas, monospace; font-size: 22px; font-weight: 800; color: var(--ds-text); transition: background .3s; }
+.tm-root .cell.is-blank { color: var(--ds-muted); font-weight: 400; }
+.tm-root .cell.is-head { border-color: var(--ds-accent); border-width: 2.5px; position: relative; z-index: 1; }
+.tm-root .cell.is-wrote { background: var(--ds-hot); }
+.tm-root .head { position: absolute; top: 24px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; color: var(--ds-accent); font-size: 13px; font-weight: 800; white-space: nowrap; }
+.tm-root .head::after { content: ""; width: 0; height: 0; margin-top: 2px; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 10px solid var(--ds-accent); }
+.tm-root .tm-reduce .strip, .tm-root .tm-reduce .cell { transition: none; }
+
+.tm-root .info { flex: none; min-height: 62px; padding: 8px 12px; border-radius: 10px; background: var(--ds-surface-strong); font-size: 14.5px; line-height: 1.4; }
+.tm-root .info .ok { color: var(--ds-good); font-weight: 700; }
+.tm-root .info .no { color: var(--ds-bad); font-weight: 700; }
+.tm-root .tbl-cap { display: flex; justify-content: space-between; color: var(--ds-muted); font-size: 12px; font-weight: 700; }
+.tm-root table.rules { width: 100%; font-size: 14.5px; table-layout: fixed; }
+.tm-root table.rules th { padding: 4px 6px; font-size: 12px; text-align: center; }
+.tm-root table.rules td { padding: 3px 6px; text-align: center; font-family: ui-monospace, Consolas, monospace; }
+.tm-root table.rules td.note { font-family: inherit; font-size: 12.5px; color: var(--ds-muted); text-align: left; }
+.tm-root table.rules tr.is-active td { background: var(--ds-hot); font-weight: 800; }
+.tm-root table.rules tr.is-active td.note { color: var(--ds-text); }
+.tm-root table.rules tr.is-pick td { cursor: pointer; }
+.tm-root table.rules tr.is-pick:hover td, .tm-root table.rules tr.is-pick:focus td { background: var(--ds-surface-strong); }
+.tm-root table.rules tr:focus { outline: 3px solid color-mix(in srgb, var(--ds-link) 30%, transparent); outline-offset: -3px; }
+</style>
+
+<div class="tm-root agt-oyun agt-oyun--stage" id="tmRoot">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 1 · Simülasyon</p><h1>Turing Makinesi</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="tm-help">?</button>
+    <a class="agt-oyun__back" href="Bolum_01_Hesaplama_Hesaplamali_Dusunme.html">← Bölüm 1</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="tm-layout">
+      <aside class="panel side">
+        <div>
+          <label class="cap" for="tmMachine">Makine</label>
+          <select id="tmMachine"></select>
+        </div>
+        <div>
+          <label class="cap" for="tmInput">Bant girişi</label>
+          <div class="tm-in">
+            <input type="text" id="tmInput" maxlength="14" spellcheck="false" autocomplete="off">
+            <button type="button" id="tmLoad" aria-label="Girişi banda yükle">Yükle</button>
+          </div>
+          <div class="tm-ex" id="tmEx" aria-label="Örnek girişler"></div>
+          <p class="tm-err" id="tmErr" aria-live="polite"></p>
+        </div>
+        <div class="btns">
+          <button type="button" id="tmBack" aria-label="Bir adım geri">← Geri</button>
+          <button type="button" class="is-primary" id="tmStep" aria-label="Bir adım ileri">Adım →</button>
+          <button type="button" id="tmPlay" aria-label="Oynat veya duraklat">▶ Oynat</button>
+          <button type="button" id="tmReset" aria-label="Başa dön">Sıfırla</button>
+        </div>
+        <label class="row">Hız <input type="range" id="tmSpeed" min="1" max="5" value="3" aria-label="Çalışma hızı"></label>
+        <label class="row"><input type="checkbox" id="tmGuess"> Kendini dene: kuralı sen seç</label>
+        <div class="stats">
+          <div>Adım<b id="tmCount">0</b></div>
+          <div>Doğru tahmin<b id="tmScore">0 / 0</b></div>
+        </div>
+      </aside>
+
+      <section class="panel main">
+        <div class="tape-box" id="tmTapeBox">
+          <span class="tcap">bant</span><span class="tval" id="tmVal"></span>
+          <div class="head" id="tmHead">durum: q0</div>
+          <div class="strip" id="tmStrip"></div>
+        </div>
+        <div class="info" id="tmInfo" aria-live="polite"></div>
+        <div class="tbl-cap"><span>Geçiş kuralları: (durum, okunan) → yaz, git, yeni durum</span><span id="tmTblHint"></span></div>
+        <table class="rules" id="tmRules">
+          <colgroup><col style="width:34px"><col style="width:70px"><col style="width:70px"><col style="width:52px"><col style="width:58px"><col style="width:80px"><col></colgroup>
+          <thead><tr><th>#</th><th>Durum</th><th>Okunan</th><th>Yaz</th><th>Git</th><th>Yeni durum</th><th>Anlamı</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="tm-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Turing makinesi</h2>
+    <p><b>Amaç:</b> Algoritmik hesaplamayı açıklayan soyut modeli adım adım izlemek. Makinenin her adımı yalnızca <b>(durum, okunan simge)</b> çiftine göre geçiş kuralları tablosundan belirlenir.</p>
+    <h3>Parçalar</h3>
+    <ul>
+      <li><b>Bant:</b> hücrelere bölünmüş, iki yönde uzayan bellek; boş hücre □ ile gösterilir.</li>
+      <li><b>Okuma/yazma başlığı:</b> bir hücreyi okur, yeni simge yazar, sola ya da sağa kayar veya durur.</li>
+      <li><b>Durum:</b> makinenin o anki “aklında tuttuğu” bilgi (q0, q1, …). <b>DUR</b> durumuna gelince makine durur.</li>
+      <li><b>Geçiş kuralı:</b> (durum, okunan) → yaz, git, yeni durum. Etkin kural tabloda vurgulanır.</li>
+    </ul>
+    <h3>Nasıl kullanılır?</h3>
+    <ul>
+      <li>Bir <b>makine</b> seçin, bant girişini yazıp <b>Yükle</b>’ye basın (ya da örneklerden birini seçin).</li>
+      <li><b>Adım →</b> bir kural uygular, <b>← Geri</b> geri alır, <b>Oynat</b> makine durana kadar çalıştırır. Klavyede → ve ← tuşları da çalışır.</li>
+      <li><b>Kendini dene</b> açıkken her adımdan önce uygulanacak kuralı tabloda siz seçersiniz (tıklayın ya da satıra gelip Enter’a basın); doğru tahminler sayılır.</li>
+    </ul>
+    <h3>Hazır makineler</h3>
+    <ul>
+      <li><b>İkili sayıya 1 ekle</b>: sunumdaki 111 + 1 = 1000 örneği; alıştırmadaki 1011 girişini de deneyin.</li>
+      <li><b>İkili sayıdan 1 çıkar</b>, <b>Bitleri tersine çevir</b>, <b>Tekli toplama</b> (111+11 → 11111) ve <b>Eşlik denetimi</b> (1’lerin sayısı çift mi tek mi?).</li>
+    </ul>
+    <p>İlgili sunum: <a href="Bolum_01_Hesaplama_Hesaplamali_Dusunme.html">Bölüm 1 · Hesaplama ve Hesaplamalı Düşünme</a> (“Evrensel Turing Makinesi”, “Turing Makinesi Adım Adım: 111 + 1”).</p>
+  </dialog>
+</div>
+
+<script>
+(function () {
+  /* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+  /* yalnızca sercankulcu.github.io adresinde (ve yerel önizlemede) çalışır (© Sercan Külcü) */
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /* motor: başla */
+  var B = "□", HALT = "DUR";
+  var MOVE_TXT = { L: "sola", R: "sağa", N: "dur" };
+  function binVal(s) { var t = s.replace(/□/g, ""); return t ? parseInt(t, 2) : 0; }
+  var MACHINES = [
+    { id: "inc", name: "İkili sayıya 1 ekle (sunum)", alphabet: "01", start: "right", input: "111", examples: ["111", "1011", "1001", "0"],
+      rules: [["q0", "1", "0", "L", "q0", "1 yerine 0 yaz; elde 1 devam ediyor"],
+              ["q0", "0", "1", "N", HALT, "0 yerine 1 yaz; elde bitti"],
+              ["q0", B, "1", "N", HALT, "boş hücreye 1 yaz; sayı bir basamak uzar"]],
+      value: function (s) { return s + " (ikili) = " + binVal(s); } },
+    { id: "dec", name: "İkili sayıdan 1 çıkar", alphabet: "01", start: "right", input: "1000", examples: ["1000", "110", "1011", "1"],
+      rules: [["q0", "0", "1", "L", "q0", "0 yerine 1 yaz; soldan ödünç al"],
+              ["q0", "1", "0", "N", HALT, "1 yerine 0 yaz; ödünç ödendi"],
+              ["q0", B, B, "N", HALT, "sola boş hücre: sayı 0’dı, sonuç geçersiz"]],
+      value: function (s) { return s + " (ikili) = " + binVal(s); } },
+    { id: "not", name: "Bitleri tersine çevir", alphabet: "01", start: "left", input: "10110", examples: ["10110", "0000", "1"],
+      rules: [["q0", "0", "1", "R", "q0", "0 → 1, sağa geç"],
+              ["q0", "1", "0", "R", "q0", "1 → 0, sağa geç"],
+              ["q0", B, B, "N", HALT, "girişin sonu; dur"]],
+      value: function (s) { return s; } },
+    { id: "add", name: "Tekli toplama (111+11)", alphabet: "1+", start: "left", input: "111+11", examples: ["111+11", "1+1", "+11", "11+"],
+      rules: [["q0", "1", "1", "R", "q0", "ilk sayının sonuna kadar sağa git"],
+              ["q0", "+", "1", "R", "q1", "+ yerine 1 yaz (sayılar birleşir)"],
+              ["q0", B, B, "N", HALT, "+ yok; toplanacak ikinci sayı yok"],
+              ["q1", "1", "1", "R", "q1", "ikinci sayının sonuna kadar sağa git"],
+              ["q1", B, B, "L", "q2", "sona gelindi; bir sola dön"],
+              ["q2", "1", B, "N", HALT, "fazladan eklenen bir 1’i sil"]],
+      value: function (s) { var k = (s.match(/1/g) || []).length; return s.indexOf("+") >= 0 ? s : s + " (" + k + " tane 1)"; } },
+    { id: "par", name: "Eşlik denetimi (1’ler çift mi?)", alphabet: "01", start: "left", input: "10110", examples: ["10110", "1001", "111", "0"],
+      rules: [["çift", "0", "0", "R", "çift", "0 sayıyı değiştirmez"],
+              ["çift", "1", "1", "R", "tek", "bir 1 daha: tek oldu"],
+              ["tek", "0", "0", "R", "tek", "0 sayıyı değiştirmez"],
+              ["tek", "1", "1", "R", "çift", "bir 1 daha: çift oldu"],
+              ["çift", B, "Ç", "N", HALT, "sonuç: 1’lerin sayısı çift (Ç)"],
+              ["tek", B, "T", "N", HALT, "sonuç: 1’lerin sayısı tek (T)"]],
+      value: function (s) { return s; } }
+  ];
+  MACHINES.forEach(function (m) { m.startState = m.rules[0][0]; });
+
+  function validInput(m, s) {
+    if (!s.length) return "Giriş boş olamaz.";
+    for (var i = 0; i < s.length; i++) if (m.alphabet.indexOf(s[i]) < 0) return "Yalnızca şu simgeler: " + m.alphabet.split("").join(" ");
+    return "";
+  }
+  function load(m, s) {
+    var tape = {};
+    for (var i = 0; i < s.length; i++) tape[i] = s[i];
+    return { tape: tape, head: m.start === "right" ? s.length - 1 : 0, state: m.startState, steps: 0, halted: false, error: false, last: -1, wrote: null };
+  }
+  function read(cfg, i) { return cfg.tape[i] === undefined ? B : cfg.tape[i]; }
+  function findRule(m, state, sym) {
+    for (var i = 0; i < m.rules.length; i++) if (m.rules[i][0] === state && m.rules[i][1] === sym) return i;
+    return -1;
+  }
+  function step(m, cfg) {
+    var sym = read(cfg, cfg.head), k = findRule(m, cfg.state, sym);
+    var n = { tape: Object.assign({}, cfg.tape), head: cfg.head, state: cfg.state, steps: cfg.steps, halted: false, error: false, last: k, wrote: null, read: sym, from: cfg.head };
+    if (k < 0) { n.halted = true; n.error = true; return n; }
+    var r = m.rules[k];
+    if (r[2] === B) delete n.tape[cfg.head]; else n.tape[cfg.head] = r[2];
+    n.wrote = cfg.head;
+    n.head += r[3] === "L" ? -1 : r[3] === "R" ? 1 : 0;
+    n.state = r[4];
+    n.steps++;
+    if (n.state === HALT) n.halted = true;
+    return n;
+  }
+  function tapeText(cfg) {
+    var ks = Object.keys(cfg.tape).map(Number);
+    if (!ks.length) return "";
+    var lo = Math.min.apply(null, ks), hi = Math.max.apply(null, ks), s = "";
+    for (var i = lo; i <= hi; i++) s += read(cfg, i);
+    return s;
+  }
+  function runAll(m, s, limit) {
+    var c = load(m, s);
+    while (!c.halted && c.steps < (limit || 500)) c = step(m, c);
+    return c;
+  }
+  /* motor: bitti */
+
+  if (typeof document === "undefined") return;
+  var E = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  var LO = -12, HI = 32, CELL = 42.5;
+  var m = MACHINES[0], hist = [], cfg = null, timer = null, playing = false, score = 0, asked = 0, feedback = "";
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce) E("tmRoot").classList.add("tm-reduce");
+
+  E("tmMachine").innerHTML = MACHINES.map(function (x, i) { return '<option value="' + i + '">' + esc(x.name) + "</option>"; }).join("");
+
+  function speed() { return [0.5, 0.75, 1, 1.6, 2.6][+E("tmSpeed").value - 1]; }
+  function guessing() { return E("tmGuess").checked && !cfg.halted; }
+
+  function renderRules() {
+    var pick = guessing();
+    E("tmRules").tBodies[0].innerHTML = m.rules.map(function (r, i) {
+      var act = cfg.last === i && !pick;
+      return '<tr data-i="' + i + '" class="' + (act ? "is-active" : "") + (pick ? " is-pick" : "") + '"' + (pick ? ' tabindex="0" role="button" aria-label="Kural ' + (i + 1) + '"' : "") + ">" +
+        "<td>" + (i + 1) + "</td><td>" + esc(r[0]) + "</td><td>" + esc(r[1]) + "</td><td>" + esc(r[2]) + "</td><td>" + MOVE_TXT[r[3]] + "</td><td>" + esc(r[4]) + '</td><td class="note">' + esc(r[5]) + "</td></tr>";
+    }).join("");
+    E("tmTblHint").textContent = pick ? "Uygulanacak kuralı seçin" : "";
+  }
+
+  function render() {
+    var cells = "";
+    for (var i = LO; i <= HI; i++) {
+      var s = read(cfg, i);
+      cells += '<div class="cell' + (s === B ? " is-blank" : "") + (i === cfg.head ? " is-head" : "") + (i === cfg.wrote ? " is-wrote" : "") + '">' + esc(s) + "</div>";
+    }
+    var strip = E("tmStrip");
+    strip.innerHTML = cells;
+    var boxW = E("tmTapeBox").clientWidth || 520;
+    strip.style.transform = "translateX(" + (boxW / 2 - (cfg.head - LO) * CELL - 22) + "px)";
+    E("tmHead").textContent = cfg.halted && !cfg.error ? HALT : "durum: " + cfg.state;
+    var t = tapeText(cfg);
+    E("tmVal").textContent = "Bantta: " + (t ? m.value(t) : "(boş)");
+    E("tmCount").textContent = cfg.steps;
+    E("tmScore").textContent = score + " / " + asked;
+    renderRules();
+    var info;
+    if (cfg.last === -1 && !cfg.halted && !cfg.steps) {
+      info = "Başlangıç: başlık " + (m.start === "right" ? "en sağdaki" : "en soldaki") + " simgede, durum <b>" + esc(cfg.state) + "</b>. " +
+        (guessing() ? "Okunan simge <b>" + esc(read(cfg, cfg.head)) + "</b>: hangi kural uygulanır? Tabloda seçin." : "<b>Adım →</b> ile ilk kuralı uygulayın.");
+    } else if (cfg.error) {
+      info = '<span class="no">Durum ' + esc(cfg.state) + " ve okunan " + esc(cfg.read) + " için kural yok:</span> makine durur (giriş beklenen biçimde değil).";
+    } else {
+      var r = m.rules[cfg.last];
+      info = "Okunan <b>" + esc(cfg.read) + "</b>, durum <b>" + esc(r[0]) + "</b> → kural " + (cfg.last + 1) + ": <b>" + esc(r[2]) + "</b> yaz, " +
+        (r[3] === "N" ? "başlık yerinde kalır" : "başlık " + MOVE_TXT[r[3]] + " kayar") + ", yeni durum <b>" + esc(r[4]) + "</b>. <span style=\"color:var(--ds-muted)\">(" + esc(r[5]) + ")</span>";
+      if (cfg.halted) info += " <b>Makine durdu</b>: " + cfg.steps + " adım. Her adımı yalnızca (durum, okunan simge) belirledi.";
+      else if (guessing()) info += " Sıradaki okunan: <b>" + esc(read(cfg, cfg.head)) + "</b>; kuralı seçin.";
+    }
+    E("tmInfo").innerHTML = feedback + info;
+    E("tmBack").disabled = !hist.length;
+    E("tmStep").disabled = cfg.halted;
+    E("tmPlay").disabled = cfg.halted;
+    E("tmPlay").textContent = playing ? "❚❚ Duraklat" : "▶ Oynat";
+  }
+
+  function stop() { playing = false; clearTimeout(timer); timer = null; }
+  function doStep() {
+    if (cfg.halted) { stop(); render(); return; }
+    if (cfg.head <= LO + 1 || cfg.head >= HI - 1) { stop(); E("tmErr").textContent = "Bant görüntü sınırına gelindi."; render(); return; }
+    hist.push(cfg);
+    cfg = step(m, cfg);
+    render();
+    if (cfg.halted) stop();
+    if (playing) schedule();
+  }
+  function schedule() { clearTimeout(timer); timer = setTimeout(function () { if (!playing) return; if (guessing()) { render(); return; } feedback = ""; doStep(); }, reduce ? 250 : 900 / speed()); }
+  function pickRule(i) {
+    if (!guessing()) return;
+    var want = findRule(m, cfg.state, read(cfg, cfg.head));
+    asked++;
+    if (i === want) { score++; feedback = '<span class="ok">Doğru!</span> '; }
+    else feedback = '<span class="no">Yanlış.</span> ' + (want < 0 ? "Uygun kural yoktu. " : "Doğrusu kural " + (want + 1) + ". ");
+    doStep();
+    var row = E("tmRules").querySelector("tr[tabindex]");
+    if (row) row.focus(); else E("tmReset").focus();
+  }
+
+  function loadInput(s) {
+    stop();
+    s = s.replace(/\s+/g, "").replace(/_/g, "");
+    var err = validInput(m, s);
+    E("tmErr").textContent = err;
+    if (err) return;
+    E("tmInput").value = s;
+    hist = []; feedback = "";
+    cfg = load(m, s);
+    render();
+  }
+  function selectMachine() {
+    m = MACHINES[+E("tmMachine").value];
+    E("tmEx").innerHTML = m.examples.map(function (x) { return '<button type="button" data-v="' + esc(x) + '" aria-label="Örnek giriş ' + esc(x) + '">' + esc(x) + "</button>"; }).join("");
+    E("tmInput").setAttribute("aria-label", "Bant girişi (" + m.alphabet.split("").join(", ") + ")");
+    loadInput(m.input);
+  }
+
+  E("tmMachine").addEventListener("change", selectMachine);
+  E("tmLoad").addEventListener("click", function () { loadInput(E("tmInput").value); });
+  E("tmInput").addEventListener("keydown", function (ev) { if (ev.key === "Enter") { ev.preventDefault(); loadInput(E("tmInput").value); } });
+  E("tmEx").addEventListener("click", function (ev) { var b = ev.target.closest("button"); if (b) loadInput(b.dataset.v); });
+  E("tmStep").addEventListener("click", function () {
+    stop(); feedback = "";
+    if (guessing()) { render(); E("tmInfo").insertAdjacentHTML("afterbegin", "<b>Kendini dene açık:</b> önce tabloda kuralı seçin. "); return; }
+    doStep();
+  });
+  E("tmBack").addEventListener("click", function () { stop(); feedback = ""; if (hist.length) cfg = hist.pop(); render(); });
+  E("tmPlay").addEventListener("click", function () {
+    if (playing) { stop(); render(); return; }
+    playing = true; feedback = ""; render();
+    if (!guessing()) doStep();
+  });
+  E("tmReset").addEventListener("click", function () { loadInput(E("tmInput").value || m.input); });
+  E("tmGuess").addEventListener("change", function () { feedback = ""; render(); });
+  E("tmRules").addEventListener("click", function (ev) { var tr = ev.target.closest("tr[data-i]"); if (tr) pickRule(+tr.dataset.i); });
+  E("tmRules").addEventListener("keydown", function (ev) {
+    var tr = ev.target.closest("tr[data-i]");
+    if (tr && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); pickRule(+tr.dataset.i); }
+  });
+  E("tmRoot").addEventListener("keydown", function (ev) {
+    var tag = ev.target.tagName;
+    if (tag === "INPUT" && ev.target.type === "text" || tag === "SELECT" || ev.target.type === "range") return;
+    if (ev.key === "ArrowRight") { ev.preventDefault(); E("tmStep").click(); }
+    else if (ev.key === "ArrowLeft") { ev.preventDefault(); E("tmBack").click(); }
+  });
+  window.addEventListener("resize", function () { if (cfg) render(); });
+  selectMachine();
+})();
+</script>
+<script src="deck/oyun.js"></script>

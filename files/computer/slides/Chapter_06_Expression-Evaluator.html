@@ -1,0 +1,674 @@
+---
+layout: without-sidebar
+title: "İfade Değerlendirici"
+permalink: /files/computer/slides/Chapter_06_Expression-Evaluator.html
+excerpt: "Java int/double ifadelerini işlem önceliğine göre adım adım indirger: ifade ağacı, tam sayı bölmesi, kalan, tip yükseltme, açık dönüşüm, önek/sonek artırma ve kendini dene modu."
+---
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.cx-ee, .cx-ee-dlg { --ds-accent:#b45309; --ds-link:#0369a1; }
+html[data-theme="dark"] .agt-oyun, html[data-theme="dark"] .cx-ee-dlg { --ds-accent:#f59e57; --ds-link:#7cc4e8; }
+.cx-ee .ee-grid { display:grid; grid-template-columns:218px minmax(0,1fr); gap:10px; height:100%; }
+.cx-ee .card { min-width:0; min-height:0; padding:9px 11px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.cx-ee .side { display:flex; flex-direction:column; gap:7px; }
+.cx-ee .cap { display:block; margin:0 0 2px; color:var(--ds-muted); font-size:11.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.cx-ee select, .cx-ee .expr-in { width:100%; min-height:32px; font-size:14px; }
+.cx-ee .expr-in { font-family:ui-monospace, Consolas, monospace; }
+.cx-ee .vars { display:grid; grid-template-columns:auto 1fr; gap:4px 6px; align-items:center; font-family:ui-monospace, Consolas, monospace; font-size:13.5px; }
+.cx-ee .vars input { width:100%; min-height:28px !important; padding:0 6px !important; font-size:13.5px !important; }
+.cx-ee .tabs { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.cx-ee .tabs button { min-height:30px; padding:0 6px; font-size:13.5px; }
+.cx-ee .tabs button[aria-pressed="true"] { border-color:var(--ds-link); background:var(--ds-link); color:#fff; }
+html[data-theme="dark"] .cx-ee .tabs button[aria-pressed="true"] { color:#111827; }
+.cx-ee .score { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:auto; }
+.cx-ee .score div { padding:4px; border-radius:10px; background:var(--ds-surface-strong); text-align:center; color:var(--ds-muted); font-size:11.5px; font-weight:700; }
+.cx-ee .score b { display:block; color:var(--ds-text); font-size:19px; }
+.cx-ee .main { display:flex; flex-direction:column; gap:7px; }
+.cx-ee .cur { display:flex; align-items:center; gap:10px; min-height:44px; padding:4px 12px; border-radius:10px; background:var(--ds-surface-strong); font-family:ui-monospace, Consolas, monospace; font-size:21px; font-weight:700; white-space:nowrap; overflow:hidden; }
+.cx-ee .cur .lab { color:var(--ds-muted); font-family:inherit; font-size:12px; font-weight:800; }
+.cx-ee mark { padding:0 3px; border-radius:5px; background:var(--ds-hot); color:inherit; box-shadow:inset 0 -2px 0 var(--ds-accent); }
+.cx-ee .err { color:var(--ds-bad); }
+.cx-ee .tree { flex:none; height:178px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); }
+.cx-ee .tree svg { display:block; width:100%; height:100%; }
+.cx-ee .tree .nd rect { fill:var(--ds-node); stroke:var(--ds-link); stroke-width:1.5; }
+.cx-ee .tree .nd text { fill:var(--ds-text); font:700 14px ui-monospace, Consolas, monospace; text-anchor:middle; dominant-baseline:central; }
+.cx-ee .tree .nd.is-done rect { fill:var(--ds-bg); stroke:var(--ds-border); }
+.cx-ee .tree .nd.is-done .op { fill:var(--ds-muted); }
+.cx-ee .tree .nd.is-cur rect { fill:var(--ds-hot); stroke:var(--ds-accent); stroke-width:2.5; }
+.cx-ee .tree .val { fill:var(--ds-accent); font:800 13px ui-monospace, Consolas, monospace; text-anchor:middle; }
+.cx-ee .tree .typ { fill:var(--ds-muted); font:600 10.5px ui-monospace, Consolas, monospace; text-anchor:middle; }
+.cx-ee .tree line { stroke:var(--ds-border); stroke-width:1.5; }
+.cx-ee .ctl { display:flex; align-items:center; gap:6px; }
+.cx-ee .ctl button { min-height:32px; padding:0 11px; font-size:14px; }
+.cx-ee .ctl label { display:flex; align-items:center; gap:5px; margin-left:auto; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.cx-ee .ctl input[type=range] { width:90px; }
+.cx-ee .why { min-height:42px; margin:0; padding:6px 10px; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:14px; line-height:1.35; }
+.cx-ee .chain { flex:1; min-height:0; margin:0; padding:4px 8px; overflow:auto; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); font-family:ui-monospace, Consolas, monospace; font-size:14px; line-height:1.55; list-style:none; }
+.cx-ee .chain li { white-space:nowrap; color:var(--ds-muted); }
+.cx-ee .chain li .n { display:inline-block; width:26px; color:var(--ds-muted); font-size:11.5px; }
+.cx-ee .chain li.is-now { color:var(--ds-text); font-weight:700; }
+.cx-ee .quiz { display:none; flex-direction:column; gap:6px; }
+.cx-ee.is-quiz .quiz { display:flex; }
+.cx-ee .quiz .row { display:flex; gap:6px; align-items:center; }
+.cx-ee .quiz input { flex:1; min-width:0; font-family:ui-monospace, Consolas, monospace; }
+.cx-ee .quiz .fb { min-height:20px; margin:0; font-size:13.5px; font-weight:700; }
+.cx-ee .good { color:var(--ds-good); }
+.cx-ee .bad { color:var(--ds-bad); }
+.cx-ee.is-quiz .watch-only { display:none; }
+</style>
+
+<div class="cx-ee agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 6 · Simülasyon</p><h1>İfade Değerlendirici</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="ee-help" aria-label="Açıklama ve kullanım">?</button>
+    <a class="agt-oyun__back" href="Bolum_06_Degiskenler_ve_Operatorler.html">← Bölüm 6</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="ee-grid">
+      <aside class="card side">
+        <div class="tabs" role="group" aria-label="Kip">
+          <button type="button" id="eeModeWatch" aria-pressed="true">İzle</button>
+          <button type="button" id="eeModeQuiz" aria-pressed="false">Kendini dene</button>
+        </div>
+        <div class="watch-only">
+          <label class="cap" for="eeEx">Hazır örnek</label>
+          <select id="eeEx"></select>
+        </div>
+        <div class="watch-only">
+          <label class="cap" for="eeIn">İfade (Java)</label>
+          <input class="expr-in" id="eeIn" type="text" spellcheck="false" autocomplete="off" aria-label="Değerlendirilecek Java ifadesi">
+          <button type="button" class="is-primary" id="eeGo" style="width:100%;margin-top:5px">Değerlendir</button>
+        </div>
+        <div class="quiz">
+          <span class="cap">Soru</span>
+          <button type="button" id="eeNewQ" class="is-primary">Yeni soru</button>
+        </div>
+        <div>
+          <span class="cap">Değişkenler</span>
+          <div class="vars">
+            <label for="eeX">int x =</label><input id="eeX" type="number" step="1" value="5">
+            <label for="eeY">int y =</label><input id="eeY" type="number" step="1" value="3">
+            <label for="eeD">double d =</label><input id="eeD" type="number" step="any" value="2.5">
+          </div>
+        </div>
+        <p class="agt-oyun__muted" style="margin:0;font-size:12px;line-height:1.35">Desteklenen: tam sayı ve ondalıklı sabitler, x y d, + − * / %, birli −, (int) (double), ++ −−, parantez.</p>
+        <div class="score" aria-live="polite">
+          <div>Doğru<b id="eeOk">0</b></div>
+          <div>Soru<b id="eeAll">0</b></div>
+        </div>
+      </aside>
+
+      <section class="card main">
+        <div class="quiz">
+          <div class="cur"><span class="lab">SORU</span><span id="eeQ"></span></div>
+          <div class="row">
+            <label class="cap" for="eeAns" style="margin:0">println çıktısı</label>
+            <input id="eeAns" type="text" spellcheck="false" autocomplete="off" placeholder="ör. 3, 3.5, 7.0 ya da hata">
+            <button type="button" id="eeCheck" class="is-primary">Kontrol et</button>
+          </div>
+          <p class="fb" id="eeFb" aria-live="polite"></p>
+        </div>
+        <div class="cur watch-only"><span class="lab">ŞİMDİ</span><span id="eeCur"></span></div>
+        <div class="tree" id="eeTree" role="img" aria-label="İfade ağacı"></div>
+        <div class="ctl">
+          <button type="button" id="eeBack" aria-label="Bir adım geri">◀ Geri</button>
+          <button type="button" id="eeStep" class="is-primary" aria-label="Bir adım ileri">Adım ▶</button>
+          <button type="button" id="eePlay" aria-label="Oynat veya duraklat">Oynat</button>
+          <button type="button" id="eeReset" aria-label="Başa dön">Sıfırla</button>
+          <label>Hız <input type="range" id="eeSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı"></label>
+        </div>
+        <p class="why" id="eeWhy" aria-live="polite"></p>
+        <ol class="chain" id="eeChain" aria-label="İndirgeme zinciri"></ol>
+      </section>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog cx-ee-dlg" id="ee-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>İfade Değerlendirici</h2>
+    <p><b>Amaç:</b> Bir Java ifadesinin değerinin nasıl bulunduğunu adım adım görmek. Java önce <b>işlem önceliğine</b> göre ifade ağacını kurar, sonra işlenenleri <b>soldan sağa</b> değerlendirir.</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li>Hazır bir örnek seçin ya da kutuya kendi ifadenizi yazıp <b>Değerlendir</b>'e basın.</li>
+      <li><b>Adım ▶</b> her seferinde tek bir alt ifadeyi indirger; vurgulanan kısım bir sonraki adımda hesaplanacak olandır. <b>Oynat</b> adımları otomatik ilerletir, <b>Geri</b> bir adım döner. Klavyede → / ← tuşları da çalışır.</li>
+      <li>Ağaçta her düğümün altında hesaplanan değer ve tipi (<code>int</code> / <code>double</code>) görünür.</li>
+      <li><b>Kendini dene</b> kipinde <code>System.out.println(ifade)</code> çıktısını tahmin edin: double sonuçlar <code>7.0</code> gibi yazılır; istisna fırlatacaksa <code>hata</code> yazın.</li>
+    </ol>
+    <h3>Kurallar özeti</h3>
+    <ul>
+      <li>Öncelik: sonek <code>x++</code> → önek <code>++x</code>, birli <code>-</code>, açık dönüşüm <code>(double)</code> → <code>* / %</code> → <code>+ -</code>. Aynı öncelikte soldan sağa.</li>
+      <li>İki <code>int</code> arasında <code>/</code> <b>tam sayı bölmesidir</b>: kesirli kısım atılır (<code>17 / 5</code> → 3). <code>%</code> kalanı verir, işareti bölünenin işaretidir.</li>
+      <li>İşlenenlerden biri <code>double</code> ise diğeri de <b>tip yükseltme</b> ile double olur (<code>7 / 2.0</code> → 3.5).</li>
+      <li><code>(double) 7 / 2</code> önce dönüşüm yapar (3.5); <code>(double) (7 / 2)</code> önce böler (3.0).</li>
+      <li><code>x++</code> eski değeri verir sonra artırır; <code>++x</code> önce artırır, yeni değeri verir.</li>
+      <li>int bölmesinde sıfıra bölme <code>ArithmeticException</code> fırlatır; double bölmesinde <code>Infinity</code> ya da <code>NaN</code> çıkar. int taşması sessizce sarar.</li>
+    </ul>
+    <p>İlgili sunum: <a href="Bolum_06_Degiskenler_ve_Operatorler.html">Bölüm 6 · Değişkenler, Veri Tipleri ve Operatörler</a> (İşlem Önceliği, İfade Ağacı, Tip Dönüşümü, Artırma ve Azaltma).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /*CORE-BEGIN*/
+  var Core = (function () {
+    function fmtD(v) {
+      if (v !== v) return "NaN";
+      if (v === Infinity) return "Infinity";
+      if (v === -Infinity) return "-Infinity";
+      if (v === 0) return (1 / v < 0) ? "-0.0" : "0.0";
+      var a = Math.abs(v);
+      if (a >= 1e-3 && a < 1e7) {
+        var s = String(v);
+        if (s.indexOf(".") < 0) s += ".0";
+        return s;
+      }
+      var p = v.toExponential().split("e"), m = p[0];
+      if (m.indexOf(".") < 0) m += ".0";
+      return m + "E" + parseInt(p[1], 10);
+    }
+    function fmt(t, v) { return t === "int" ? String(v) : fmtD(v); }
+
+    function SynErr(msg) { this.msg = msg; }
+
+    function tokenize(src) {
+      var toks = [], i = 0, m;
+      while (i < src.length) {
+        var c = src[i], rest = src.slice(i);
+        if (/\s/.test(c)) { i++; continue; }
+        if ((m = /^(\d+\.\d*|\.\d+)([dD])?|^(\d+)([dD])?/.exec(rest)) && /[0-9.]/.test(c)) {
+          if (/^[A-Za-z_]/.test(src.slice(i + m[0].length))) throw new SynErr("Geçersiz sayı: " + rest.match(/^[\w.]+/)[0]);
+          if (m[1] !== undefined || m[4]) toks.push({ k: "num", t: "double", v: parseFloat(m[1] !== undefined ? m[1] : m[3]), text: m[0] });
+          else {
+            if (m[3].length > 1 && m[3][0] === "0") throw new SynErr("Baştaki 0 desteklenmiyor (Java'da " + m[3] + " sekizli sayı olur).");
+            toks.push({ k: "num", t: "int", v: Number(m[3]), text: m[3] });
+          }
+          i += m[0].length; continue;
+        }
+        if ((m = /^[A-Za-z_]\w*/.exec(rest))) { toks.push({ k: "id", text: m[0] }); i += m[0].length; continue; }
+        if (rest.slice(0, 2) === "++" || rest.slice(0, 2) === "--") { toks.push({ k: "op", text: rest.slice(0, 2) }); i += 2; continue; }
+        if ("+-*/%()".indexOf(c) >= 0) { toks.push({ k: "op", text: c }); i++; continue; }
+        throw new SynErr("Desteklenmeyen karakter: " + c);
+      }
+      return toks;
+    }
+
+    function parse(src, varTypes) {
+      var toks = tokenize(src), p = 0, id = 0;
+      function peek(o) { var t = toks[p + (o || 0)]; return t ? t.text : null; }
+      function node(o) { o.id = id++; return o; }
+      function expect(x) { if (peek() !== x) throw new SynErr("'" + x + "' bekleniyordu" + (peek() ? ", '" + peek() + "' bulundu." : ".")); p++; }
+      function isVar(t) { return t && t.k === "id" && varTypes.hasOwnProperty(t.text); }
+      function add() {
+        var l = mul();
+        while (peek() === "+" || peek() === "-") { var op = toks[p++].text; l = node({ k: "bin", op: op, l: l, r: mul() }); }
+        return l;
+      }
+      function mul() {
+        var l = unary();
+        while (peek() === "*" || peek() === "/" || peek() === "%") { var op = toks[p++].text; l = node({ k: "bin", op: op, l: l, r: unary() }); }
+        return l;
+      }
+      function unary() {
+        var t = peek();
+        if (t === "++" || t === "--") {
+          p++;
+          if (!isVar(toks[p])) throw new SynErr(t + " yalnızca bir değişkene uygulanabilir.");
+          var nm = toks[p++].text;
+          if (peek() === "++" || peek() === "--") throw new SynErr("++/-- aynı değişkene iki kez uygulanamaz.");
+          return node({ k: "pre", op: t, name: nm });
+        }
+        if (t === "-" || t === "+") {
+          p++;
+          var nx = toks[p];
+          if (t === "-" && nx && nx.k === "num" && nx.t === "int" && nx.v === 2147483648) { p++; return node({ k: "num", t: "int", v: -2147483648, text: "-2147483648" }); }
+          return node({ k: "neg", op: t, e: unary() });
+        }
+        if (t === "(" && (peek(1) === "int" || peek(1) === "double") && peek(2) === ")") {
+          var to = peek(1); p += 3;
+          return node({ k: "cast", to: to, e: unary() });
+        }
+        return postfix();
+      }
+      function postfix() {
+        var t = toks[p];
+        if (isVar(t) && (peek(1) === "++" || peek(1) === "--")) {
+          p += 2;
+          if (peek() === "++" || peek() === "--") throw new SynErr("x++ sonucuna yeniden ++/-- uygulanamaz.");
+          return node({ k: "post", op: toks[p - 1].text, name: t.text });
+        }
+        return primary();
+      }
+      function primary() {
+        var t = toks[p];
+        if (!t) throw new SynErr("İfade eksik bitti.");
+        if (t.k === "num") {
+          p++;
+          if (t.t === "int" && t.v > 2147483647) throw new SynErr("int sabiti çok büyük: " + t.text);
+          if (!isFinite(t.v)) throw new SynErr("double sabiti çok büyük.");
+          return node({ k: "num", t: t.t, v: t.v, text: t.text });
+        }
+        if (t.k === "id") {
+          if (!varTypes.hasOwnProperty(t.text)) throw new SynErr("Tanımsız ad: " + t.text + " (yalnızca x, y, d).");
+          p++;
+          if (peek() === "(") throw new SynErr("Metot çağrısı desteklenmiyor.");
+          return node({ k: "var", name: t.text });
+        }
+        if (t.text === "(") {
+          p++;
+          var e = add();
+          expect(")");
+          return node({ k: "par", e: e });
+        }
+        throw new SynErr("Beklenmeyen simge: '" + t.text + "'");
+      }
+      if (!toks.length) throw new SynErr("İfade boş.");
+      var root = add();
+      if (p < toks.length) throw new SynErr("Fazladan simge: '" + toks[p].text + "'");
+      return root;
+    }
+
+    var STOP = {};
+    var PREC = { "+": 1, "-": 1, "*": 2, "/": 2, "%": 2 };
+
+    function d2i(v) {
+      if (v !== v) return 0;
+      if (v >= 2147483647) return 2147483647;
+      if (v <= -2147483648) return -2147483648;
+      return Math.trunc(v) | 0;
+    }
+
+    /* İfadeyi Java kurallarıyla değerlendirir; her indirgeme bir adımdır. */
+    function run(src, vars0, types) {
+      var root = parse(src, types);
+      var vars = {}, k;
+      for (k in vars0) vars[k] = types[k] === "int" ? (vars0[k] | 0) : +vars0[k];
+      var red = {}, steps = [], parent = {};
+      (function link(n, par) {
+        parent[n.id] = par;
+        if (n.k === "num") red[n.id] = { v: n.v, t: n.t };
+        ["l", "r", "e"].forEach(function (c) { if (n[c]) link(n[c], n); });
+      })(root, null);
+      function copy(o) { var r = {}; for (var q in o) r[q] = o[q]; return r; }
+      function snap(n, why, extra) {
+        steps.push({ hi: n.id, html: render(root, red, n.id), why: why, red: copy(red), vars: copy(vars), err: extra || null });
+      }
+      function val(n) { return red[n.id]; }
+      function setv(n, v, t) { red[n.id] = { v: v, t: t }; }
+      function show(n) { var r = val(n); return fmt(r.t, r.v); }
+      function precNote(n) {
+        var pa = parent[n.id];
+        while (pa && pa.k === "par") pa = parent[pa.id];
+        if (!pa || pa.k !== "bin") return "";
+        if (PREC[n.op] > PREC[pa.op]) return " (" + n.op + " önceliği " + pa.op + " operatöründen yüksek, önce o hesaplanır)";
+        if (PREC[n.op] === PREC[pa.op] && pa.l === n) return " (aynı öncelik: soldan sağa)";
+        return "";
+      }
+      function ev(n) {
+        var a, b, r, t, why;
+        switch (n.k) {
+          case "num": return;
+          case "par": ev(n.e); red[n.id] = val(n.e); return;
+          case "var":
+            snap(n, "Değişken okunur: " + n.name + " = " + fmt(types[n.name], vars[n.name]) + ".");
+            setv(n, vars[n.name], types[n.name]); return;
+          case "post": case "pre":
+            var old = vars[n.name], t2 = types[n.name], nw = n.op === "++" ? old + 1 : old - 1;
+            if (t2 === "int") nw = nw | 0;
+            if (n.k === "post") snap(n, "Sonek " + n.name + n.op + ": önce eski değer kullanılır (" + fmt(t2, old) + "), sonra " + n.name + " " + fmt(t2, nw) + " olur.");
+            else snap(n, "Önek " + n.op + n.name + ": önce " + n.name + " " + fmt(t2, nw) + " olur, ifadede yeni değer (" + fmt(t2, nw) + ") kullanılır.");
+            vars[n.name] = nw;
+            setv(n, n.k === "post" ? old : nw, t2); return;
+          case "neg":
+            ev(n.e); a = val(n.e);
+            r = n.op === "+" ? a.v : (a.t === "int" ? (-a.v) | 0 : -a.v);
+            snap(n, "Birli " + n.op + ": " + n.op + show(n.e) + " → " + fmt(a.t, r) + (a.t === "int" && n.op === "-" && a.v === -2147483648 ? " (taşma: −(−2147483648) yine −2147483648)" : "") + ".");
+            setv(n, r, a.t); return;
+          case "cast":
+            ev(n.e); a = val(n.e);
+            if (n.to === "double") {
+              why = a.t === "double" ? "(double) dönüşümü: değer zaten double, değişmez." : "Açık dönüşüm (double): int " + show(n.e) + " → double " + fmtD(a.v) + ". Bu bir genişletme dönüşümüdür.";
+              snap(n, why); setv(n, a.v, "double");
+            } else {
+              r = a.t === "int" ? a.v : d2i(a.v);
+              why = a.t === "int" ? "(int) dönüşümü: değer zaten int, değişmez." : "Açık dönüşüm (int): double " + show(n.e) + " → int " + r + ". Daraltma: kesirli kısım atılır (yuvarlanmaz).";
+              snap(n, why); setv(n, r, "int");
+            }
+            return;
+          case "bin":
+            ev(n.l); ev(n.r);
+            a = val(n.l); b = val(n.r);
+            if (a.t !== b.t) {
+              var lo = a.t === "int" ? n.l : n.r, hiN = a.t === "int" ? n.r : n.l;
+              snap(lo, "Tip yükseltme: " + n.op + " operatörünün diğer işleneni double (" + show(hiN) + "), bu yüzden int " + show(lo) + " → double " + fmtD(val(lo).v) + " olur.");
+              setv(lo, val(lo).v, "double");
+              a = val(n.l); b = val(n.r);
+            }
+            t = a.t;
+            var A = fmt(t, a.v), B = fmt(t, b.v), pn = precNote(n);
+            if (t === "int") {
+              if ((n.op === "/" || n.op === "%") && b.v === 0) {
+                snap(n, "int işleminde sıfıra bölme: " + A + " " + n.op + " 0 hesaplanamaz.", "Exception in thread \"main\" java.lang.ArithmeticException: / by zero");
+                throw STOP;
+              }
+              var math;
+              if (n.op === "+") { math = a.v + b.v; r = math | 0; }
+              else if (n.op === "-") { math = a.v - b.v; r = math | 0; }
+              else if (n.op === "*") { math = a.v * b.v; r = Math.imul(a.v, b.v); }
+              else if (n.op === "/") { math = Math.trunc(a.v / b.v); r = math | 0; }
+              else { r = (a.v % b.v) | 0; math = r; }
+              if (n.op === "/") why = "Tam sayı bölmesi: " + A + " / " + B + " = " + r + (a.v % b.v !== 0 ? " (gerçek bölüm " + (a.v / b.v).toLocaleString("tr-TR", { maximumFractionDigits: 4 }) + "; kesirli kısım atılır)" : "") + "";
+              else if (n.op === "%") why = "Kalan: " + A + " % " + B + " = " + r + " (" + A + " = " + B + "·" + Math.trunc(a.v / b.v) + (r < 0 ? " − " + (-r) : " + " + r) + "; kalanın işareti bölünenin işaretidir)";
+              else why = "int işlem: " + A + " " + n.op + " " + B + " = " + r;
+              if (math !== r) why += " — TAŞMA: matematiksel sonuç " + math + " int aralığına sığmaz, değer sarar";
+              snap(n, why + pn + ".");
+              setv(n, r, "int");
+            } else {
+              if (n.op === "+") r = a.v + b.v; else if (n.op === "-") r = a.v - b.v; else if (n.op === "*") r = a.v * b.v;
+              else if (n.op === "/") r = a.v / b.v; else r = a.v % b.v;
+              why = "double işlem: " + A + " " + n.op + " " + B + " = " + fmtD(r);
+              if (n.op === "/" && b.v === 0) why += " (double bölmesinde sıfıra bölme istisna fırlatmaz)";
+              snap(n, why + pn + ".");
+              setv(n, r, "double");
+            }
+            return;
+        }
+      }
+      try { ev(root); } catch (ex) { if (ex !== STOP) throw ex; }
+      var res = red[root.id] ? red[root.id] : null;
+      var last = steps.length && steps[steps.length - 1].err ? steps[steps.length - 1] : null;
+      var fin = { hi: -1, html: res ? fmt(res.t, res.v) : "", why: "", red: copy(red), vars: copy(vars), err: null };
+      return { root: root, steps: steps, final: fin, result: res, error: last ? last.err : null, out: last ? "hata" : fmt(res.t, res.v), vars: vars };
+    }
+
+    function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+    function render(n, red, hi) {
+      var s;
+      if (red[n.id] && n.k !== "num" || (n.k === "num" && red[n.id] && red[n.id].t !== n.t)) s = esc(fmt(red[n.id].t, red[n.id].v));
+      else switch (n.k) {
+        case "num": s = esc(n.t === "double" ? fmtD(n.v) : String(n.v)); break;
+        case "var": s = n.name; break;
+        case "pre": s = n.op + n.name; break;
+        case "post": s = n.name + n.op; break;
+        case "neg": s = n.op + render(n.e, red, hi); break;
+        case "cast": s = "(" + n.to + ") " + render(n.e, red, hi); break;
+        case "par": s = "(" + render(n.e, red, hi) + ")"; break;
+        case "bin": s = render(n.l, red, hi) + " " + n.op + " " + render(n.r, red, hi); break;
+      }
+      return n.id === hi ? "<mark>" + s + "</mark>" : s;
+    }
+
+    return { run: run, parse: parse, fmt: fmt, fmtD: fmtD, render: render, SynErr: SynErr };
+  })();
+  /*CORE-END*/
+
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector(".cx-ee");
+  var TYPES = { x: "int", y: "int", d: "double" };
+  var EXAMPLES = [
+    ["5 + 3 * 2", "Öncelik: * önce"],
+    ["(5 + 3) * 2", "Parantez önceliği değiştirir"],
+    ["10 - 4 - 3", "Soldan sağa"],
+    ["17 / 5", "Tam sayı bölmesi"],
+    ["17 % 5", "Kalan"],
+    ["-17 % 5", "Negatif kalan"],
+    ["7 / 2.0", "Tip yükseltme"],
+    ["(double) 7 / 2", "Önce dönüşüm"],
+    ["(double) (7 / 2)", "Önce bölme"],
+    ["7 / 2 * 2.0", "Bölme önce, sonra yükseltme"],
+    ["1 / 2 + 1 / 2.0", "İki farklı bölme"],
+    ["(int) 9.8 + (int) -9.8", "Daraltma: kesme"],
+    ["x / y * 2.0 + x % y", "Karma ifade (x=7, y=2)", { x: 7, y: 2 }],
+    ["x++ + ++x", "Sonek ve önek (x=5)", { x: 5 }],
+    ["x-- - --x", "Azaltma (x=5)", { x: 5 }],
+    ["d * 2 + x / 2", "double ve int (x=5, d=2.5)", { x: 5, d: 2.5 }],
+    ["2147483647 + 1", "int taşması"],
+    ["5 / 0", "int sıfıra bölme"],
+    ["5.0 / 0", "double sıfıra bölme"]
+  ];
+  EXAMPLES.forEach(function (ex, i) {
+    var o = document.createElement("option");
+    o.value = i; o.textContent = ex[0] + "  —  " + ex[1];
+    E("eeEx").appendChild(o);
+  });
+
+  var R = null, k = 0, timer = null, quiz = false, qAnswered = false, ok = 0, all = 0;
+
+  function getVars() {
+    var x = parseInt(E("eeX").value, 10), y = parseInt(E("eeY").value, 10), d = parseFloat(E("eeD").value);
+    if (!(Math.abs(x) <= 2147483647)) x = 0;
+    if (!(Math.abs(y) <= 2147483647)) y = 0;
+    if (!isFinite(d)) d = 0;
+    return { x: x, y: y, d: d };
+  }
+  function setVars(v) {
+    if (!v) return;
+    if (v.x !== undefined) E("eeX").value = v.x;
+    if (v.y !== undefined) E("eeY").value = v.y;
+    if (v.d !== undefined) E("eeD").value = v.d;
+  }
+
+  function load(src) {
+    stop();
+    try { R = Core.run(src, getVars(), TYPES); R.src = src; }
+    catch (e) {
+      if (!(e instanceof Core.SynErr)) throw e;
+      R = null;
+      E("eeCur").innerHTML = '<span class="err">Derleme hatası</span>';
+      E("eeTree").innerHTML = "";
+      E("eeChain").innerHTML = "";
+      E("eeWhy").innerHTML = '<span class="err">' + e.msg + "</span>";
+      buttons();
+      return;
+    }
+    k = 0;
+    draw();
+  }
+
+  function total() { return R ? R.steps.length : 0; }
+  function stateAt(i) { return i < R.steps.length ? R.steps[i] : R.final; }
+
+  function draw() {
+    if (!R) return;
+    var st = stateAt(k), hidden = quiz && !qAnswered;
+    E("eeCur").innerHTML = st.html || "";
+    var vs = " &nbsp;<span class=\"lab\">x=" + st.vars.x + " y=" + st.vars.y + " d=" + Core.fmtD(st.vars.d) + "</span>";
+    if (k >= R.steps.length) E("eeCur").innerHTML = "<span>" + R.final.html + '</span> <span class="lab">' + R.result.t + "</span>" + vs;
+    else E("eeCur").innerHTML = st.html + vs;
+    drawTree(hidden ? { red: numsOnly(), hi: -1 } : st);
+    var lines = [];
+    for (var i = 0; i <= k && i < R.steps.length; i++) lines.push('<li' + (i === k ? ' class="is-now"' : "") + '><span class="n">' + (i + 1) + "</span>" + R.steps[i].html + "</li>");
+    if (k >= R.steps.length && !R.error) lines.push('<li class="is-now"><span class="n">=</span>' + R.final.html + "</li>");
+    if (hidden) lines = ['<li><span class="n"></span>Önce tahmininizi yazın; sonra adımları izleyin.</li>'];
+    E("eeChain").innerHTML = lines.join("");
+    E("eeChain").scrollTop = E("eeChain").scrollHeight;
+    var why;
+    if (hidden) why = "Tahmininizi yazıp Kontrol et'e basın.";
+    else if (k < R.steps.length) {
+      why = "<b>Adım " + (k + 1) + "/" + R.steps.length + ":</b> " + R.steps[k].why;
+      if (R.steps[k].err && k === R.steps.length - 1) why += '<br><span class="err">' + R.steps[k].err + "</span>";
+    } else why = R.steps.length ? "<b>Sonuç:</b> " + R.final.html + " (" + R.result.t + "). println çıktısı: <code>" + R.final.html + "</code>" + sideNote() : "<b>Sonuç:</b> sabit değer, indirgenecek bir şey yok.";
+    E("eeWhy").innerHTML = why;
+    buttons();
+  }
+  function sideNote() {
+    var v0 = getVars(), s = [];
+    if (R.vars.x !== v0.x) s.push("x = " + R.vars.x);
+    if (R.vars.y !== v0.y) s.push("y = " + R.vars.y);
+    if (R.vars.d !== v0.d) s.push("d = " + Core.fmtD(R.vars.d));
+    return s.length ? ". Yan etki: ifadeden sonra " + s.join(", ") + "." : ".";
+  }
+  function numsOnly() { var r = {}; (function w(n) { if (n.k === "num") r[n.id] = { v: n.v, t: n.t }; ["l", "r", "e"].forEach(function (c) { if (n[c]) w(n[c]); }); })(R.root); return r; }
+
+  function drawTree(st) {
+    var nodes = [], edges = [], leaf = 0, maxD = 0;
+    function lay(n, d) {
+      while (n.k === "par") n = n.e;
+      var kids = [n.l, n.r, n.e].filter(Boolean).map(function (c) { return lay(c, d + 1); });
+      var x = kids.length ? kids.reduce(function (s, c) { return s + c.x; }, 0) / kids.length : leaf++;
+      var o = { n: n, x: x, d: d };
+      maxD = Math.max(maxD, d);
+      nodes.push(o);
+      kids.forEach(function (c) { edges.push([o, c]); });
+      return o;
+    }
+    lay(R.root, 0);
+    var W = Math.max(leaf * 74, 300), H = (maxD + 1) * 56 + 8, sx = W / leaf;
+    function px(o) { return (o.x + 0.5) * sx; }
+    function py(o) { return 22 + o.d * 56; }
+    var s = '<svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="xMidYMid meet" aria-hidden="true">';
+    edges.forEach(function (e) { s += '<line x1="' + px(e[0]) + '" y1="' + py(e[0]) + '" x2="' + px(e[1]) + '" y2="' + py(e[1]) + '"/>'; });
+    nodes.forEach(function (o) {
+      var n = o.n, lab;
+      if (n.k === "num") lab = n.t === "double" ? Core.fmtD(n.v) : String(n.v);
+      else if (n.k === "var") lab = n.name;
+      else if (n.k === "pre") lab = n.op + n.name;
+      else if (n.k === "post") lab = n.name + n.op;
+      else if (n.k === "neg") lab = n.op;
+      else if (n.k === "cast") lab = "(" + n.to + ")";
+      else lab = n.op;
+      var r = st.red[n.id], done = !!r && n.k !== "num", cur = st.hi === n.id;
+      var w = Math.max(30, lab.length * 9 + 14);
+      s += '<g class="nd' + (done ? " is-done" : "") + (cur ? " is-cur" : "") + '"><rect x="' + (px(o) - w / 2) + '" y="' + (py(o) - 13) + '" width="' + w + '" height="26" rx="8"/>' +
+        '<text class="op" x="' + px(o) + '" y="' + py(o) + '">' + lab.replace(/</g, "&lt;") + "</text></g>";
+      if (r && (done || r.t !== n.t)) s += '<text class="val" x="' + px(o) + '" y="' + (py(o) + 27) + '">' + Core.fmt(r.t, r.v) + '</text><text class="typ" x="' + px(o) + '" y="' + (py(o) + 39) + '">' + r.t + "</text>";
+      else if (n.k === "num") s += '<text class="typ" x="' + px(o) + '" y="' + (py(o) + 24) + '">' + n.t + "</text>";
+    });
+    E("eeTree").innerHTML = s + "</svg>";
+  }
+
+  function buttons() {
+    var lock = !R || (quiz && !qAnswered);
+    E("eeBack").disabled = lock || k === 0;
+    E("eeStep").disabled = lock || k >= total() || (R && R.error && k >= total() - 1);
+    E("eePlay").disabled = E("eeStep").disabled;
+    E("eeReset").disabled = lock || k === 0;
+    E("eePlay").textContent = timer ? "Duraklat" : "Oynat";
+  }
+  function maxK() { return R.error ? total() - 1 : total(); }
+  function step(d) { if (!R) return; k = Math.max(0, Math.min(maxK(), k + d)); draw(); }
+  function stop() { clearInterval(timer); timer = null; }
+  function delay() { return [1600, 1200, 850, 550, 300][E("eeSpeed").value - 1]; }
+  function play() {
+    if (timer) { stop(); buttons(); return; }
+    if (k >= maxK()) k = 0;
+    timer = setInterval(function () { if (k >= maxK()) { stop(); buttons(); return; } step(1); }, delay());
+    draw();
+  }
+
+  /* Kendini dene: soru üretici */
+  function ri(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  var TEMPL = [
+    function () { return ri(2, 9) + " + " + ri(2, 9) + " * " + ri(2, 9); },
+    function () { return ri(10, 40) + " / " + ri(2, 9); },
+    function () { return ri(10, 40) + " % " + ri(2, 9); },
+    function () { return "-" + ri(10, 30) + " % " + ri(3, 7); },
+    function () { return ri(5, 25) + " / " + ri(2, 4) + ".0"; },
+    function () { return "(double) " + ri(5, 25) + " / " + ri(2, 4); },
+    function () { return "(double) (" + ri(5, 25) + " / " + ri(2, 4) + ")"; },
+    function () { return ri(5, 19) + " / " + ri(2, 4) + " * 2.0"; },
+    function () { return "(" + ri(2, 9) + " + " + ri(2, 9) + ") / " + ri(2, 5); },
+    function () { return ri(20, 40) + " - " + ri(2, 9) + " - " + ri(2, 9); },
+    function () { return ri(2, 9) + " * " + ri(2, 9) + " % " + ri(3, 7); },
+    function () { return "1 / " + ri(2, 5) + " + 1.0 / " + [2, 4, 5][ri(0, 2)]; },
+    function () { return "(int) " + ri(2, 9) + "." + ri(1, 9) + " * " + ri(2, 4); },
+    function () { return "x++ + x"; },
+    function () { return "++x * 2"; },
+    function () { return "x++ + ++x"; },
+    function () { return "x / y + x % y"; },
+    function () { return "x / 2 + d"; }
+  ];
+  function newQ() {
+    var src = TEMPL[ri(0, TEMPL.length - 1)]();
+    setVars({ x: ri(3, 12), y: ri(2, 5), d: [0.5, 1.5, 2.5][ri(0, 2)] });
+    qAnswered = false;
+    E("eeQ").textContent = src;
+    E("eeAns").value = "";
+    E("eeFb").textContent = "";
+    E("eeIn").value = src;
+    load(src);
+    E("eeAns").focus();
+  }
+  function check() {
+    if (!R || qAnswered) return;
+    var a = E("eeAns").value.trim().replace(",", ".");
+    if (!a) { E("eeFb").innerHTML = '<span class="bad">Bir tahmin yazın.</span>'; return; }
+    var good = R.error ? /^(hata|istisna|exception|arithmeticexception)/i.test(a) : a === R.out;
+    var msg;
+    all++;
+    if (good) { ok++; msg = '<span class="good">Doğru! Çıktı: ' + R.out + "</span>"; }
+    else if (!R.error && R.result.t === "double" && parseFloat(a) === R.result.v) msg = '<span class="bad">Değer doğru ama tip double: println ' + R.out + " yazdırır.</span>";
+    else msg = '<span class="bad">Yanlış. Doğru çıktı: ' + (R.error ? "ArithmeticException (hata)" : R.out) + "</span>";
+    E("eeFb").innerHTML = msg + " — adımları izleyin.";
+    E("eeOk").textContent = ok; E("eeAll").textContent = all;
+    qAnswered = true;
+    k = 0; draw();
+    E("eeStep").focus();
+  }
+
+  function setMode(q) {
+    quiz = q;
+    root.classList.toggle("is-quiz", q);
+    E("eeModeWatch").setAttribute("aria-pressed", String(!q));
+    E("eeModeQuiz").setAttribute("aria-pressed", String(q));
+    if (q) newQ(); else { qAnswered = true; pick(); }
+  }
+  function pick() {
+    var ex = EXAMPLES[E("eeEx").value];
+    setVars(ex[2] || { x: 5, y: 3, d: 2.5 });
+    E("eeIn").value = ex[0];
+    load(ex[0]);
+  }
+
+  E("eeEx").addEventListener("change", pick);
+  E("eeGo").addEventListener("click", function () { load(E("eeIn").value); });
+  E("eeIn").addEventListener("keydown", function (e) { if (e.key === "Enter") load(E("eeIn").value); });
+  ["eeX", "eeY", "eeD"].forEach(function (id) { E(id).addEventListener("change", function () { load(quiz && R ? R.src : E("eeIn").value); }); });
+  E("eeStep").addEventListener("click", function () { stop(); step(1); });
+  E("eeBack").addEventListener("click", function () { stop(); step(-1); });
+  E("eeReset").addEventListener("click", function () { stop(); k = 0; draw(); });
+  E("eePlay").addEventListener("click", play);
+  E("eeSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("eeModeWatch").addEventListener("click", function () { setMode(false); });
+  E("eeModeQuiz").addEventListener("click", function () { setMode(true); });
+  E("eeNewQ").addEventListener("click", newQ);
+  E("eeCheck").addEventListener("click", check);
+  E("eeAns").addEventListener("keydown", function (e) { if (e.key === "Enter") check(); });
+  root.addEventListener("keydown", function (e) {
+    if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+    if (e.key === "ArrowRight") { stop(); step(1); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { stop(); step(-1); e.preventDefault(); }
+  });
+
+  qAnswered = true;
+  pick();
+})();
+</script>
+<script src="deck/oyun.js"></script>

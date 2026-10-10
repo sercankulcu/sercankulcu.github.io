@@ -1,0 +1,481 @@
+---
+layout: without-sidebar
+title: "Sayı Tabanı Dönüştürücü"
+permalink: /files/computer/slides/Chapter_01_Number-Base-Converter.html
+excerpt: "Onluk, ikili, sekizli ve onaltılık tabanlar arasında etkileşimli dönüştürücü: bit kutuları, adım adım bölme-kalan yöntemi, ikiye tümleyen ve kendini dene modu."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.agt-oyun.c01b, #c01b-help { --ds-accent:#b45309; --ds-link:#0369a1; }
+html[data-theme="dark"] .agt-oyun, html[data-theme="dark"] #c01b-help { --ds-accent:#f59e57; --ds-link:#7cc4e8; }
+.c01b .bar { display:flex; align-items:center; gap:8px; flex-wrap:nowrap; margin:0 0 8px; }
+.c01b .seg { display:inline-flex; border:1.5px solid var(--ds-border); border-radius:999px; overflow:hidden; background:var(--ds-bg); }
+.c01b .seg button { min-height:30px; padding:0 12px; border:0; border-radius:0; font-size:14px; background:transparent; }
+.c01b .seg button[aria-pressed="true"] { background:var(--ds-link); color:#fff; }
+html[data-theme="dark"] .c01b .seg button[aria-pressed="true"] { color:#111827; }
+.c01b .bar .grow { flex:1; }
+.c01b .score { color:var(--ds-muted); font-size:14px; font-weight:700; white-space:nowrap; }
+.c01b .score b { color:var(--ds-text); }
+.c01b .panel { padding:9px 12px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.c01b .bits { display:flex; justify-content:center; gap:4px; }
+.c01b .bitcol { display:flex; flex-direction:column; align-items:center; gap:2px; }
+.c01b .bitcol.nib { margin-left:10px; }
+.c01b .bit { width:52px; min-width:0; height:44px; min-height:0; padding:0; border:2px solid var(--ds-border); border-radius:8px;
+  background:var(--ds-surface); color:var(--ds-muted); font:700 22px/1 ui-monospace,Consolas,monospace; }
+.c01b .w16 .bit { width:40px; height:40px; font-size:19px; }
+.c01b .bit.on { border-color:var(--ds-link); background:var(--ds-node); color:var(--ds-text); }
+.c01b .bit.sign { box-shadow:inset 0 -4px 0 var(--ds-accent); }
+.c01b .bit:disabled { opacity:1; cursor:default; }
+.c01b .wt { color:var(--ds-muted); font:600 11px/1.1 ui-monospace,Consolas,monospace; white-space:nowrap; }
+.c01b .w16 .wt { font-size:9.5px; }
+.c01b .wt.neg { color:var(--ds-accent); }
+.c01b .place { margin:6px 0 0; min-height:20px; font:600 14px/1.4 ui-monospace,Consolas,monospace; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.c01b .place .acc { color:var(--ds-accent); }
+.c01b .fields { display:grid; grid-template-columns:150px 1fr 120px 120px; gap:10px; margin:8px 0; }
+.c01b .fields label { display:block; color:var(--ds-muted); font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+.c01b .fields input { width:100%; font-family:ui-monospace,Consolas,monospace; font-size:16px !important; font-weight:700; }
+.c01b .fields input.bad { border-color:var(--ds-bad) !important; color:var(--ds-bad); }
+.c01b .steps { display:flex; flex-direction:column; gap:5px; height:252px; }
+.c01b .steps .bar { margin:0; }
+.c01b .steps select { min-height:30px; font-size:14px; }
+.c01b .steps input[type=range] { width:80px; }
+.c01b .small { color:var(--ds-muted); font-size:13px; font-weight:700; }
+.c01b .res { display:flex; align-items:center; gap:8px; font-weight:700; }
+.c01b .res .digits { font:800 20px/1 ui-monospace,Consolas,monospace; letter-spacing:.06em; color:var(--ds-accent); }
+.c01b ol.list { flex:1; min-height:0; margin:0; padding:6px 10px 6px 28px; overflow:hidden; border-radius:10px; background:var(--ds-surface);
+  columns:2; column-gap:22px; font:600 13px/1.4 ui-monospace,Consolas,monospace; }
+.c01b ol.list.three { columns:3; }
+.c01b ol.list.one { columns:1; }
+.c01b ol.list li { break-inside:avoid; }
+.c01b ol.list li.cur { color:var(--ds-accent); }
+.c01b ol.list li.wide { column-span:all; font-family:inherit; }
+.c01b .quiz { display:flex; flex-direction:column; gap:10px; height:310px; }
+.c01b .quiz .q { margin:0; font-size:18px; font-weight:700; }
+.c01b .quiz .q .num { color:var(--ds-accent); font-family:ui-monospace,Consolas,monospace; }
+.c01b .quiz .ans { display:flex; gap:8px; align-items:center; }
+.c01b .quiz .ans input { width:220px; font-family:ui-monospace,Consolas,monospace; font-size:18px !important; font-weight:700; }
+.c01b .quiz .fb { min-height:48px; margin:0; padding:8px 12px; border-radius:10px; background:var(--ds-surface-strong); font-weight:600; line-height:1.4; }
+.c01b .quiz .fb.ok { color:var(--ds-good); }
+.c01b .quiz .fb.no { color:var(--ds-bad); }
+.c01b .quiz .fb code { color:var(--ds-text); font-weight:700; }
+.c01b .status { margin:8px 0 0; min-height:22px; padding:6px 10px; border-radius:10px; background:var(--ds-surface-strong); font-size:14px; font-weight:600; line-height:1.35; }
+.c01b .status.err { color:var(--ds-bad); }
+.c01b [hidden] { display:none !important; }
+</style>
+
+<div class="c01b agt-oyun agt-oyun--stage">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 1 · Simülasyon</p><h1>Sayı Tabanı Dönüştürücü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="c01b-help">?</button>
+    <a class="agt-oyun__back" href="Bolum_01_Bilgisayarlar.html">← Bölüm 1</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="bar">
+      <span class="small">Genişlik</span>
+      <span class="seg" role="group" aria-label="Bit sayısı">
+        <button type="button" data-n="8" aria-pressed="true">8 bit</button><button type="button" data-n="16" aria-pressed="false">16 bit</button>
+      </span>
+      <span class="small">Gösterim</span>
+      <span class="seg" role="group" aria-label="İşaretli veya işaretsiz">
+        <button type="button" data-s="0" aria-pressed="true">İşaretsiz</button><button type="button" data-s="1" aria-pressed="false">İşaretli (ikiye tümleyen)</button>
+      </span>
+      <span class="grow"></span>
+      <span class="seg" role="group" aria-label="Mod">
+        <button type="button" data-m="explore" aria-pressed="true">Keşfet</button><button type="button" data-m="quiz" aria-pressed="false">Kendini dene</button>
+      </span>
+    </div>
+
+    <div class="panel">
+      <div class="bits" id="c01b-bits"></div>
+      <p class="place" id="c01b-place" aria-live="polite"></p>
+    </div>
+
+    <div id="c01b-explore">
+      <div class="fields">
+        <div><label for="c01b-dec">Onluk (10)</label><input id="c01b-dec" inputmode="numeric" autocomplete="off" spellcheck="false"></div>
+        <div><label for="c01b-bin">İkili (2)</label><input id="c01b-bin" autocomplete="off" spellcheck="false"></div>
+        <div><label for="c01b-oct">Sekizli (8)</label><input id="c01b-oct" autocomplete="off" spellcheck="false"></div>
+        <div><label for="c01b-hex">Onaltılık (16)</label><input id="c01b-hex" autocomplete="off" spellcheck="false"></div>
+      </div>
+      <div class="panel steps">
+        <div class="bar">
+          <label class="small" for="c01b-base">Adım adım: onluktan</label>
+          <select id="c01b-base">
+            <option value="2">ikiliye (÷ 2)</option>
+            <option value="8">sekizliye (÷ 8)</option>
+            <option value="16">onaltılığa (÷ 16)</option>
+          </select>
+          <button type="button" class="is-primary" id="c01b-step" aria-label="Sonraki adım">Adım</button>
+          <button type="button" id="c01b-play" aria-label="Oynat veya duraklat">Oynat</button>
+          <button type="button" id="c01b-reset" aria-label="Adımları sıfırla">Sıfırla</button>
+          <span class="grow"></span>
+          <label class="small" for="c01b-speed">Hız</label>
+          <input type="range" id="c01b-speed" min="1" max="5" value="3" aria-label="Oynatma hızı">
+        </div>
+        <div class="res"><span class="small">Sonuç:</span><span class="digits" id="c01b-res">—</span></div>
+        <ol class="list" id="c01b-list"></ol>
+      </div>
+    </div>
+
+    <div id="c01b-quiz" class="panel quiz" hidden>
+      <div class="bar">
+        <span class="small" id="c01b-qkind">Soru</span>
+        <span class="grow"></span>
+        <span class="score">Doğru <b id="c01b-ok">0</b> / <b id="c01b-tot">0</b></span>
+      </div>
+      <p class="q" id="c01b-q"></p>
+      <div class="ans">
+        <input id="c01b-qin" autocomplete="off" spellcheck="false" aria-label="Cevabın">
+        <button type="button" class="is-primary" id="c01b-check">Kontrol et</button>
+        <button type="button" id="c01b-new">Yeni soru</button>
+      </div>
+      <p class="fb" id="c01b-fb" aria-live="polite"></p>
+    </div>
+
+    <p class="status" id="c01b-status" aria-live="polite"></p>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="c01b-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Sayı Tabanı Dönüştürücü</h2>
+    <p><b>Amaç:</b> Aynı bit dizisinin onluk, ikili, sekizli ve onaltılık tabanlarda nasıl yazıldığını görmek; onluktan diğer tabanlara <b>bölme–kalan</b> yöntemini adım adım izlemek; işaretli sayıların <b>ikiye tümleyen</b> gösterimini anlamak.</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ul>
+      <li><b>Bit kutuları:</b> bir kutuya tıkla (ya da Tab ile gelip Boşluk/Enter'a bas): bit 0 ↔ 1 olur. Kutunun altındaki sayı o basamağın değeridir (2<sup>k</sup>).</li>
+      <li><b>Alanlar:</b> herhangi bir tabana sayı yaz; diğerleri hemen güncellenir. Sığmayan değer taşma uyarısı verir.</li>
+      <li><b>8 / 16 bit:</b> n bit, işaretsiz olarak 0 ile 2<sup>n</sup>−1 arasını gösterir.</li>
+      <li><b>İşaretli (ikiye tümleyen):</b> en soldaki bitin değeri −2<sup>n−1</sup> olur (8 bitte −128). Aralık −128 … 127'dir. Negatif bir sayı için: |x| ikiliye çevrilir, bitler ters çevrilir, 1 eklenir.</li>
+      <li><b>Adım adım:</b> hedef tabanı seç, <b>Adım</b> ya da <b>Oynat</b> ile bölmeleri izle. Kalanlar <b>alttan üste</b> okunur.</li>
+      <li><b>Kendini dene:</b> sistem soru sorar; cevabını alana yaz ya da bit kutularına gir, <b>Kontrol et</b>. Doğru sayısı tutulur.</li>
+    </ul>
+    <h3>Kısa yollar</h3>
+    <p>Bir onaltılık basamak 4 bite, bir sekizli basamak 3 bite karşılık gelir: 0010 1101₂ = 2D₁₆; 101 101₂ = 55₈.</p>
+    <p>İlgili sunumlar: <a href="Bolum_01_Bilgisayarlar.html">Bölüm 1 · Bilgisayarlar</a> (ikili sayılar, ikiye tümleyen, taşma) ve <a href="Bolum_01_Temel_Kavramlar.html">Bölüm 1 · Temel Kavramlar</a> (onluktan ikiliye dönüşüm).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  /* yalnızca sercankulcu.github.io adresinde (ve yerel önizlemede) çalışır (© Sercan Külcü) */
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector('.c01b');
+  var HEX = '0123456789ABCDEF';
+  var SUB = { 2: '₂', 8: '₈', 10: '₁₀', 16: '₁₆' };
+  var BASEAD = { 2: 'ikili', 8: 'sekizli', 16: 'onaltılık' };
+  var n = 8, signed = false, U = 45, mode = 'explore';
+  var steps = [], shown = 0, timer = null;
+  var quiz = null, qok = 0, qtot = 0, locked = false;
+
+  function pow2(k) { return Math.pow(2, k); }
+  function maxU() { return pow2(n) - 1; }
+  function val(u) { return signed && u >= pow2(n - 1) ? u - pow2(n) : u; }
+  function fromVal(v) { return v < 0 ? v + pow2(n) : v; }
+  function binStr(u, w) { var s = u.toString(2); while (s.length < (w || n)) s = '0' + s; return s; }
+  function group(s, k) { var out = ''; for (var i = 0; i < s.length; i++) { if (i && (s.length - i) % k === 0) out += ' '; out += s[i]; } return out; }
+  function hexStr(u) { var s = u.toString(16).toUpperCase(); while (s.length < n / 4) s = '0' + s; return s; }
+  function octStr(u) { return u.toString(8); }
+  function sgn(v) { return v < 0 ? '−' + (-v) : String(v); }
+
+  function setStatus(t, err) { E('c01b-status').innerHTML = t; E('c01b-status').classList.toggle('err', !!err); }
+
+  /* ---------- bit kutuları ---------- */
+  function renderBits() {
+    var html = '', bitsLocked = mode === 'quiz' && locked;
+    for (var i = n - 1; i >= 0; i--) {
+      var on = (U >> i) & 1;
+      var neg = signed && i === n - 1;
+      var w = neg ? '−' + pow2(i) : String(pow2(i));
+      html += '<div class="bitcol' + (i < n - 1 && (i + 1) % 4 === 0 ? ' nib' : '') + '">' +
+        '<button type="button" class="bit' + (on ? ' on' : '') + (neg ? ' sign' : '') + '" data-i="' + i + '" aria-pressed="' + (on ? 'true' : 'false') + '"' +
+        (bitsLocked ? ' disabled' : '') + ' aria-label="Bit ' + i + ', basamak değeri ' + w + ', şu an ' + on + '">' + on + '</button>' +
+        '<span class="wt' + (neg ? ' neg' : '') + '">' + w + '</span></div>';
+    }
+    var box = E('c01b-bits');
+    var focusI = document.activeElement && document.activeElement.classList.contains('bit') ? document.activeElement.dataset.i : null;
+    box.className = 'bits' + (n === 16 ? ' w16' : '');
+    box.innerHTML = html;
+    if (focusI !== null) { var f = box.querySelector('.bit[data-i="' + focusI + '"]'); if (f) f.focus(); }
+  }
+
+  function placeText(u) {
+    var terms = [];
+    for (var i = n - 1; i >= 0; i--) {
+      if ((u >> i) & 1) terms.push(signed && i === n - 1 ? '<span class="acc">−' + pow2(i) + '</span>' : String(pow2(i)));
+    }
+    var v = val(u);
+    var lhs = group(binStr(u), 4) + SUB[2] + ' = ';
+    if (!terms.length) return lhs + '0' + SUB[10] + ' (tüm bitler 0)';
+    var s = terms.join(' + ').replace(/\+ <span class="acc">−/g, '<span class="acc">− ');
+    return lhs + s + (terms.length > 1 ? ' = ' + sgn(v) : '') + SUB[10];
+  }
+
+  /* ---------- alanlar ---------- */
+  function renderFields(except) {
+    var f = { dec: sgn(val(U)).replace('−', '-'), bin: group(binStr(U), 4), oct: octStr(U), hex: hexStr(U) };
+    ['dec', 'bin', 'oct', 'hex'].forEach(function (k) {
+      var el = E('c01b-' + k);
+      if (k !== except) { el.value = f[k]; el.classList.remove('bad'); }
+    });
+  }
+
+  function parseField(k, raw) {
+    var s = raw.replace(/[\s_]/g, '');
+    if (s === '') return { err: 'Bir sayı yaz.' };
+    var u;
+    if (k === 'dec') {
+      if (!/^[-+−]?\d+$/.test(s)) return { err: 'Onluk sayı yalnızca 0–9 rakamlarından (ve başta − işaretinden) oluşur.' };
+      var v = parseInt(s.replace('−', '-'), 10);
+      var lo = signed ? -pow2(n - 1) : 0, hi = signed ? pow2(n - 1) - 1 : maxU();
+      if (v < 0 && !signed) return { err: 'İşaretsiz gösterimde negatif sayı yoktur. Negatif sayılar için <b>İşaretli (ikiye tümleyen)</b> seç.' };
+      if (v < lo || v > hi) return { err: 'Taşma: ' + n + ' bit ' + (signed ? 'işaretli' : 'işaretsiz') + ' olarak yalnızca ' + sgn(lo) + ' … ' + hi + ' aralığını gösterir.' };
+      u = fromVal(v);
+    } else if (k === 'bin') {
+      if (!/^[01]+$/.test(s)) return { err: 'İkili sayıda yalnızca 0 ve 1 rakamları kullanılır.' };
+      s = s.replace(/^0+(?=.)/, '');
+      if (s.length > n) return { err: 'Bu sayı ' + s.length + ' bit gerektirir; ' + n + ' bite sığmaz (taşma).' };
+      u = parseInt(s, 2);
+    } else if (k === 'oct') {
+      if (!/^[0-7]+$/.test(s)) return { err: 'Sekizli sistemde rakamlar 0–7 arasıdır (8 ve 9 yoktur).' };
+      u = parseInt(s, 8);
+      if (u > maxU()) return { err: 'Bu değer ' + n + ' bite sığmaz (en çok ' + octStr(maxU()) + SUB[8] + ').' };
+    } else {
+      if (!/^[0-9a-fA-F]+$/.test(s)) return { err: 'Onaltılık rakamlar 0–9 ve A–F’dir (A=10 … F=15).' };
+      u = parseInt(s, 16);
+      if (u > maxU()) return { err: 'Bu değer ' + n + ' bite sığmaz (en çok ' + hexStr(maxU()) + SUB[16] + ').' };
+    }
+    return { u: u };
+  }
+
+  /* ---------- adım adım bölme–kalan ---------- */
+  function digitsOf(rems, b) { return rems.slice().reverse().map(function (r) { return HEX[r]; }).join(''); }
+
+  function divSteps(x, b, out, note) {
+    var rems = [], q = x;
+    do {
+      var r = q % b, nq = Math.floor(q / b);
+      rems.push(r);
+      out.push({ t: q + ' ÷ ' + b + ' = ' + nq + ', kalan ' + r + (b === 16 && r > 9 ? ' (' + HEX[r] + ')' : ''),
+        r: digitsOf(rems, b), why: (rems.length === 1 ? 'İlk kalan en sağdaki basamaktır. ' : '') + q + ' sayısını ' + b + '’ye böl: bölüm ' + nq + ', kalan ' + r + '. ' + (nq ? 'Bölüm 0 olana kadar devam.' : 'Bölüm 0 oldu, bölme bitti.') + (note || '') });
+      q = nq;
+    } while (q > 0);
+    return digitsOf(rems, b);
+  }
+
+  function buildSteps() {
+    var b = +E('c01b-base').value, v = val(U), out = [];
+    if (b === 2 && v < 0) {
+      var m = -v, mb = binStr(m);
+      out.push({ t: 'x = ' + sgn(v) + ' < 0 → önce |x| = ' + m, r: '', wide: true, why: 'Negatif sayı: önce mutlak değeri ikiliye çevrilir, sonra ikiye tümleyen alınır (ters çevir + 1).' });
+      var d = divSteps(m, 2, out);
+      out.push({ t: n + ' bite tamamla: +' + m + ' = ' + group(mb, 4), r: group(mb, 4), wide: true, why: 'Kalanlar alttan üste okunur ve soldan 0 ile ' + n + ' bite tamamlanır: ' + d + ' → ' + mb + '.' });
+      var inv = mb.split('').map(function (c) { return c === '1' ? '0' : '1'; }).join('');
+      out.push({ t: 'Ters çevir (birler tümleyeni): ' + group(inv, 4), r: group(inv, 4), wide: true, why: 'Tüm bitler ters çevrilir (0 ↔ 1). Buna birler tümleyeni denir.' });
+      out.push({ t: '1 ekle: ' + group(inv, 4) + ' + 1 = ' + group(binStr(U), 4), r: group(binStr(U), 4) + SUB[2], wide: true, why: 'Birler tümleyenine 1 eklenir: ' + sgn(v) + ' = ' + binStr(U) + SUB[2] + '. En soldaki 1 sayının negatif olduğunu gösterir.' });
+      return out;
+    }
+    var x = U;
+    if (v < 0) {
+      out.push({ t: 'x = ' + sgn(v) + ' → bit dizisi ' + group(binStr(U), 4) + ' (işaretsiz değeri ' + U + ')', r: '', wide: true,
+        why: 'Negatif sayıların ' + BASEAD[b] + ' yazımı, ikiye tümleyen bit dizisinin karşılığıdır. Bu bit dizisi işaretsiz okunursa ' + U + ' olur; bölme bu sayıyla yapılır.' });
+    }
+    var d = divSteps(x, b, out);
+    if (b === 2) {
+      out.push({ t: 'Kalanlar alttan üste: ' + d + SUB[2] + ' → ' + n + ' bitte ' + group(binStr(U), 4), r: group(binStr(U), 4) + SUB[2], wide: true,
+        why: 'Kalanlar alttan üste okunur. ' + n + ' bitlik kutuya yazmak için soldan 0 eklenir.' });
+    } else {
+      var k = b === 16 ? 4 : 3, bs = binStr(U), pad = bs;
+      while (pad.length % k) pad = '0' + pad;
+      var grp = group(pad, k), dig = grp.split(' ').map(function (g) { return HEX[parseInt(g, 2)]; }).join(' ');
+      out.push({ t: 'Kalanlar alttan üste: ' + d + SUB[b] + ' · Kısa yol: ' + grp + ' → ' + dig, r: d + SUB[b], wide: true,
+        why: 'Kalanlar alttan üste okunur: ' + d + SUB[b] + '. Denetim: bir ' + BASEAD[b] + ' basamak ' + k + ' bittir; bitler sağdan ' + k + '’lü gruplanınca aynı sonuç çıkar.' });
+    }
+    return out;
+  }
+
+  function renderSteps() {
+    var list = E('c01b-list');
+    list.className = 'list' + (steps.length > 13 ? ' three' : steps.length > 6 ? '' : ' one');
+    list.innerHTML = steps.slice(0, shown).map(function (s, i) {
+      return '<li class="' + (s.wide ? 'wide ' : '') + (i === shown - 1 ? 'cur' : '') + '">' + s.t + '</li>';
+    }).join('');
+    E('c01b-res').textContent = shown ? (steps[shown - 1].r || '…') : '—';
+    E('c01b-step').disabled = shown >= steps.length;
+    E('c01b-play').textContent = timer ? 'Duraklat' : 'Oynat';
+    if (mode === 'explore') {
+      if (shown === 0) setStatus('Bit kutularına tıkla ya da bir alana sayı yaz. Dönüşümü izlemek için <b>Adım</b> ya da <b>Oynat</b>’a bas (' + steps.length + ' adım).');
+      else setStatus('Adım ' + shown + '/' + steps.length + ': ' + steps[shown - 1].why);
+    }
+  }
+
+  function stopPlay() { if (timer) { clearInterval(timer); timer = null; } }
+  function resetSteps() { stopPlay(); steps = buildSteps(); shown = 0; renderSteps(); }
+  function stepOnce() { if (shown < steps.length) shown++; if (shown >= steps.length) stopPlay(); renderSteps(); }
+  function speedMs() { return [1600, 1200, 850, 550, 300][+E('c01b-speed').value - 1]; }
+  function togglePlay() {
+    if (timer) { stopPlay(); renderSteps(); return; }
+    if (shown >= steps.length) shown = 0;
+    timer = setInterval(stepOnce, speedMs());
+    stepOnce();
+  }
+
+  function renderAll(except) {
+    renderBits();
+    E('c01b-place').innerHTML = mode === 'quiz' ? '&nbsp;' : placeText(U);
+    if (mode === 'explore') { renderFields(except); resetSteps(); }
+  }
+
+  /* ---------- kendini dene ---------- */
+  function rnd(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function newQuestion() {
+    var kinds = ['d2b', 'b2d', 'h2b', 'b2h', 'b2o'];
+    var k = kinds[rnd(0, kinds.length - 1)];
+    var lo = signed ? -pow2(n - 1) : 0, hi = signed ? pow2(n - 1) - 1 : maxU();
+    var v = rnd(lo, hi);
+    if (signed && (k === 'd2b' || k === 'b2d') && Math.random() < 0.6 && v >= 0) v = -rnd(1, pow2(n - 1));
+    if (!signed && n === 8 && Math.random() < 0.5) v = rnd(1, 99);
+    var u = fromVal(v);
+    quiz = { k: k, u: u, done: false };
+    var q = '';
+    if (k === 'd2b') { q = '<span class="num">' + sgn(v) + SUB[10] + '</span> sayısını ' + n + ' bit' + (signed ? ' ikiye tümleyen' : '') + ' olarak bit kutularına gir.'; locked = false; U = 0; }
+    else if (k === 'h2b') { q = '<span class="num">' + hexStr(u) + SUB[16] + '</span> sayısını bit kutularına gir.'; locked = false; U = 0; }
+    else { locked = true; U = u;
+      if (k === 'b2d') q = 'Bit kutularındaki dizinin ' + (signed ? '<b>işaretli</b> (ikiye tümleyen) ' : '') + 'onluk değeri nedir?';
+      else if (k === 'b2h') q = 'Bit kutularındaki dizinin onaltılık yazımı nedir?';
+      else q = 'Bit kutularındaki dizinin sekizli yazımı nedir?';
+    }
+    var kindName = { d2b: 'Onluk → ikili', h2b: 'Onaltılık → ikili', b2d: 'İkili → onluk', b2h: 'İkili → onaltılık', b2o: 'İkili → sekizli' }[k];
+    E('c01b-qkind').textContent = kindName + ' · ' + n + ' bit' + (signed ? ' · işaretli' : '');
+    E('c01b-q').innerHTML = q;
+    var needIn = locked;
+    E('c01b-qin').hidden = !needIn;
+    E('c01b-qin').value = '';
+    E('c01b-fb').className = 'fb';
+    E('c01b-fb').innerHTML = needIn ? 'Cevabını yaz ve <b>Kontrol et</b>’e bas.' : 'Bitlere tıklayarak sayıyı oluştur, sonra <b>Kontrol et</b>’e bas.';
+    E('c01b-check').disabled = false;
+    renderAll();
+    setStatus('Kendini dene: ' + kindName.toLowerCase() + ' dönüşümü. İpucu: basamak değerleri kutuların altında.');
+    if (needIn) E('c01b-qin').focus();
+  }
+
+  function checkQuestion() {
+    if (!quiz || quiz.done) return;
+    var k = quiz.k, u = quiz.u, ok, given = E('c01b-qin').value.replace(/[\s_]/g, '');
+    if (k === 'd2b' || k === 'h2b') ok = U === u;
+    else if (!given) { E('c01b-fb').className = 'fb'; E('c01b-fb').textContent = 'Önce bir cevap yaz.'; return; }
+    else if (k === 'b2d') ok = /^[-+−]?\d+$/.test(given) && parseInt(given.replace('−', '-'), 10) === val(u);
+    else if (k === 'b2h') ok = /^[0-9a-f]+$/i.test(given) && parseInt(given, 16) === u;
+    else ok = /^[0-7]+$/.test(given) && parseInt(given, 8) === u;
+    quiz.done = true; qtot++; if (ok) qok++;
+    E('c01b-ok').textContent = qok; E('c01b-tot').textContent = qtot;
+    var sol = { d2b: '<code>' + group(binStr(u), 4) + SUB[2] + '</code>', h2b: '<code>' + group(binStr(u), 4) + SUB[2] + '</code> (her onaltılık basamak 4 bit)',
+      b2d: '<code>' + sgn(val(u)) + SUB[10] + '</code>', b2h: '<code>' + hexStr(u) + SUB[16] + '</code> (4’lü grupla: ' + group(binStr(u), 4) + ')',
+      b2o: '<code>' + octStr(u) + SUB[8] + '</code> (sağdan 3’lü grupla)' }[k];
+    E('c01b-fb').className = 'fb ' + (ok ? 'ok' : 'no');
+    E('c01b-fb').innerHTML = (ok ? '✓ Doğru! ' : '✗ Yanlış. ') + 'Cevap: ' + sol + '<br><span style="color:var(--ds-text)">' + placeText(u) + '</span>';
+    E('c01b-check').disabled = true;
+    E('c01b-new').focus();
+  }
+
+  /* ---------- olaylar ---------- */
+  E('c01b-bits').addEventListener('click', function (e) {
+    var b = e.target.closest('.bit');
+    if (!b || b.disabled) return;
+    var i = +b.dataset.i;
+    U = (U ^ pow2(i)) >>> 0;
+    renderAll();
+    if (mode === 'explore') {
+      var v = val(U);
+      setStatus('Bit ' + i + ' değişti (basamak değeri ' + (signed && i === n - 1 ? '−' : '') + pow2(i) + '). Yeni değer: ' + sgn(v) + SUB[10] + ' = ' + hexStr(U) + SUB[16] + '.' + (signed && i === n - 1 ? ' En soldaki bit işaret bitidir: 1 ise sayı negatiftir.' : ''));
+    }
+  });
+
+  ['dec', 'bin', 'oct', 'hex'].forEach(function (k) {
+    var el = E('c01b-' + k);
+    el.addEventListener('input', function () {
+      var r = parseField(k, el.value);
+      if (r.err) { el.classList.add('bad'); stopPlay(); setStatus(r.err, true); return; }
+      el.classList.remove('bad');
+      U = r.u;
+      renderAll(k);
+    });
+    el.addEventListener('blur', function () { if (!el.classList.contains('bad')) renderFields(); });
+    el.addEventListener('keydown', function (e) { if (e.key === 'Escape') { renderFields(); setStatus('Geri alındı.'); } });
+  });
+
+  root.querySelectorAll('[data-n]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var nn = +btn.dataset.n;
+      if (nn === n) return;
+      var v = val(U), note = '';
+      n = nn;
+      if (nn === 16) U = fromVal(v);
+      else { var nu = U & 0xFF; if (nu !== U || (signed && val(nu) !== v)) note = ' Üst 8 bit atıldı; değer değişti.'; U = nu; }
+      root.querySelectorAll('[data-n]').forEach(function (b) { b.setAttribute('aria-pressed', String(+b.dataset.n === n)); });
+      if (mode === 'quiz') newQuestion(); else { renderAll(); setStatus(n + ' bit: işaretsiz 0 … ' + maxU() + ', işaretli −' + pow2(n - 1) + ' … ' + (pow2(n - 1) - 1) + '.' + note); }
+    });
+  });
+
+  root.querySelectorAll('[data-s]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      signed = btn.dataset.s === '1';
+      root.querySelectorAll('[data-s]').forEach(function (b) { b.setAttribute('aria-pressed', String((b.dataset.s === '1') === signed)); });
+      if (mode === 'quiz') { newQuestion(); return; }
+      renderAll();
+      setStatus(signed ? 'İşaretli: en soldaki bitin değeri −' + pow2(n - 1) + '. Aynı bit dizisi artık ' + sgn(val(U)) + ' olarak okunuyor.' : 'İşaretsiz: tüm basamak değerleri pozitif. Bit dizisi ' + U + ' olarak okunuyor.');
+    });
+  });
+
+  root.querySelectorAll('[data-m]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (btn.dataset.m === mode) return;
+      mode = btn.dataset.m;
+      root.querySelectorAll('[data-m]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.m === mode)); });
+      stopPlay();
+      E('c01b-explore').hidden = mode !== 'explore';
+      E('c01b-quiz').hidden = mode !== 'quiz';
+      if (mode === 'quiz') { newQuestion(); }
+      else { locked = false; quiz = null; renderAll(); }
+    });
+  });
+
+  E('c01b-base').addEventListener('change', resetSteps);
+  E('c01b-step').addEventListener('click', function () { stopPlay(); stepOnce(); });
+  E('c01b-play').addEventListener('click', togglePlay);
+  E('c01b-reset').addEventListener('click', resetSteps);
+  E('c01b-speed').addEventListener('input', function () { if (timer) { stopPlay(); timer = setInterval(stepOnce, speedMs()); } });
+  E('c01b-check').addEventListener('click', checkQuestion);
+  E('c01b-new').addEventListener('click', newQuestion);
+  E('c01b-qin').addEventListener('keydown', function (e) { if (e.key === 'Enter') checkQuestion(); });
+
+  renderAll();
+})();
+</script>
+<script src="deck/oyun.js"></script>

@@ -1,0 +1,458 @@
+---
+layout: without-sidebar
+title: "Basit CPU: Getir–Çöz–Çalıştır"
+permalink: /files/computer/slides/Chapter_01_Simple-CPU.html
+excerpt: "PC, IR, ACC ve 16 bellek hücreli basit bir CPU; LOAD, ADD, SUB, STORE, JMP, JZ, HALT komutlarıyla getir–çöz–çalıştır döngüsünü ve veri, adres, kontrol yollarını adım adım gösteren simülasyon."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.agt-oyun.c01c, #c01c-help { --ds-accent:#b45309; --ds-link:#0369a1; }
+html[data-theme="dark"] .agt-oyun, html[data-theme="dark"] #c01c-help { --ds-accent:#f59e57; --ds-link:#7cc4e8; }
+.c01c .main { display:grid; grid-template-columns:512px minmax(0,1fr); gap:10px; height:418px; }
+.c01c .panel { min-width:0; min-height:0; padding:6px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.c01c svg.cpu { display:block; width:100%; height:100%; }
+.c01c .side { display:flex; flex-direction:column; gap:7px; padding:8px 10px; }
+.c01c .side label.cap, .c01c .cap { display:block; color:var(--ds-muted); font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+.c01c .side select { width:100%; min-height:32px; font-size:14px; }
+.c01c .row { display:flex; gap:6px; align-items:center; }
+.c01c .row > button { flex:1; min-height:32px; padding:0 8px; font-size:14px; }
+.c01c .row input[type=number] { width:64px; min-height:30px; font-size:15px; }
+.c01c .row input[type=range] { flex:1; min-width:0; }
+.c01c .check { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:700; cursor:pointer; }
+.c01c .stat { margin:0; color:var(--ds-muted); font-size:13px; font-weight:700; }
+.c01c .stat b { color:var(--ds-text); }
+.c01c .quiz { display:flex; flex-direction:column; gap:6px; margin-top:auto; padding:8px; border-radius:10px; background:var(--ds-surface-strong); }
+.c01c .quiz p { margin:0; font-size:13.5px; font-weight:700; line-height:1.35; }
+.c01c .quiz input { width:90px; min-height:30px; font-family:ui-monospace,Consolas,monospace; font-size:15px; font-weight:700; }
+.c01c .quiz .fb.ok { color:var(--ds-good); } .c01c .quiz .fb.no { color:var(--ds-bad); }
+.c01c .status { margin:8px 0 0; min-height:70px; padding:6px 10px; border-radius:10px; background:var(--ds-surface-strong); font-size:14px; font-weight:600; line-height:1.4; }
+.c01c .status code { font-family:ui-monospace,Consolas,monospace; font-weight:800; color:var(--ds-accent); }
+.c01c [hidden] { display:none !important; }
+/* SVG */
+.c01c .box { fill:var(--ds-surface); stroke:var(--ds-border); stroke-width:2; }
+.c01c .reg { fill:var(--ds-bg); stroke:var(--ds-border); stroke-width:1.5; transition:fill .25s; }
+.c01c .reg.hot { fill:var(--ds-hot); stroke:var(--ds-accent); stroke-width:2.5; }
+.c01c .ttl { fill:var(--ds-text); font:800 15px system-ui,sans-serif; }
+.c01c .lbl { fill:var(--ds-muted); font:800 12px system-ui,sans-serif; }
+.c01c .val { fill:var(--ds-text); font:800 15px ui-monospace,Consolas,monospace; text-anchor:end; }
+.c01c .val.big { font-size:22px; }
+.c01c .cu1 { fill:var(--ds-text); font:700 12.5px system-ui,sans-serif; }
+.c01c .cu2 { fill:var(--ds-muted); font:700 11px ui-monospace,Consolas,monospace; }
+.c01c .mid { text-anchor:middle; }
+.c01c .pill { fill:var(--ds-bg); stroke:var(--ds-border); stroke-width:1.5; }
+.c01c .pill.on { fill:var(--ds-accent); stroke:var(--ds-accent); }
+.c01c .pillt { fill:var(--ds-muted); font:800 11px system-ui,sans-serif; text-anchor:middle; }
+.c01c .pillt.on { fill:var(--ds-bg); }
+.c01c .bus { stroke:var(--ds-border); stroke-width:4; }
+.c01c .bus.on { stroke:var(--ds-accent); stroke-width:6; }
+.c01c .busl { fill:var(--ds-muted); font:700 11px system-ui,sans-serif; text-anchor:middle; }
+.c01c .busl.on { fill:var(--ds-accent); }
+.c01c .ah { fill:var(--ds-border); }
+.c01c .pkt rect { fill:var(--ds-link); }
+.c01c .pkt text { fill:var(--ds-bg); font:800 12px ui-monospace,Consolas,monospace; text-anchor:middle; }
+.c01c .pkt { transition-property:transform; transition-timing-function:ease-in-out; }
+.c01c .cell { fill:var(--ds-bg); stroke:var(--ds-border); stroke-width:1; }
+.c01c .cell.pc { stroke:var(--ds-link); stroke-width:2.5; }
+.c01c .cell.rd { fill:color-mix(in srgb, var(--ds-link) 22%, var(--ds-bg)); }
+.c01c .cell.wr { fill:var(--ds-hot); }
+.c01c .cell.data { fill:var(--ds-surface-strong); }
+.c01c .cell.data.rd { fill:color-mix(in srgb, var(--ds-link) 22%, var(--ds-bg)); }
+.c01c .cell.data.wr { fill:var(--ds-hot); }
+.c01c .ad { fill:var(--ds-muted); font:700 12px ui-monospace,Consolas,monospace; }
+.c01c .ct { fill:var(--ds-text); font:800 13px ui-monospace,Consolas,monospace; }
+.c01c .tag { fill:var(--ds-muted); font:700 11px system-ui,sans-serif; text-anchor:end; }
+.c01c .pcm { fill:var(--ds-link); font:800 11px system-ui,sans-serif; text-anchor:end; }
+</style>
+
+<div class="c01c agt-oyun agt-oyun--stage">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 1 · Simülasyon</p><h1>Basit CPU: Getir–Çöz–Çalıştır</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="c01c-help">?</button>
+    <a class="agt-oyun__back" href="Bolum_01_Bilgisayarlar.html">← Bölüm 1</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="main">
+      <div class="panel"><svg class="cpu" id="c01c-svg" viewBox="0 0 520 426" role="img" aria-label="CPU, yollar ve bellek şeması"></svg></div>
+      <div class="panel side">
+        <div>
+          <label class="cap" for="c01c-prog">Örnek program</label>
+          <select id="c01c-prog">
+            <option value="sum">İki sayıyı topla (12 + 8)</option>
+            <option value="diff">İki sayının farkı (12 − 8)</option>
+            <option value="loop">1 + 2 + … + n (döngü)</option>
+          </select>
+        </div>
+        <div class="row" id="c01c-nrow" hidden>
+          <label class="cap" for="c01c-n" style="margin:0">n =</label>
+          <input type="number" id="c01c-n" min="1" max="9" value="5">
+          <span class="stat">(1–9)</span>
+        </div>
+        <div class="row">
+          <button type="button" class="is-primary" id="c01c-step" aria-label="Bir adım ilerle">Adım</button>
+          <button type="button" id="c01c-play" aria-label="Oynat veya duraklat">Oynat</button>
+        </div>
+        <div class="row">
+          <button type="button" id="c01c-reset" aria-label="Programı baştan yükle">Sıfırla</button>
+          <button type="button" id="c01c-run" aria-label="Programı sona kadar çalıştır">Sona git</button>
+        </div>
+        <div class="row"><label class="cap" for="c01c-speed" style="margin:0">Hız</label><input type="range" id="c01c-speed" min="1" max="5" value="3" aria-label="Oynatma hızı"></div>
+        <label class="check"><input type="checkbox" id="c01c-quiz"> Kendini dene</label>
+        <p class="stat">Komut: <b id="c01c-count">0</b> · Adım: <b id="c01c-steps">0</b><span id="c01c-score" hidden> · Doğru <b id="c01c-ok">0</b>/<b id="c01c-tot">0</b></span></p>
+        <div class="quiz" id="c01c-qbox" hidden>
+          <p id="c01c-q"></p>
+          <div class="row">
+            <input id="c01c-qin" inputmode="numeric" autocomplete="off" aria-label="Tahminin">
+            <button type="button" class="is-primary" id="c01c-check">Kontrol</button>
+          </div>
+          <p class="fb" id="c01c-fb" aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
+    <p class="status" id="c01c-status" aria-live="polite"></p>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="c01c-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Basit CPU: Getir–Çöz–Çalıştır</h2>
+    <p><b>Amaç:</b> Depolanan program kavramını ve CPU'nun her komutu <b>getir → çöz → çalıştır</b> döngüsüyle nasıl işlediğini adım adım görmek. Program komutları ve veriler aynı bellekte durur (von Neumann mimarisi).</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ul>
+      <li>Bir <b>örnek program</b> seç. <b>Adım</b> her basışta döngünün bir aşamasını yürütür; <b>Oynat</b> kendiliğinden ilerler, <b>Hız</b> kaydırıcısı süreyi ayarlar. <b>Sona git</b> programı bir anda bitirir; <b>Sıfırla</b> belleği ve yazmaçları baştan yükler.</li>
+      <li><b>Getir:</b> PC'deki adres <b>adres yoluna</b> çıkar, <b>kontrol yolunda</b> OKU sinyali gider, komut <b>veri yoluyla</b> IR'ye gelir; PC bir artar.</li>
+      <li><b>Çöz:</b> kontrol birimi IR'deki komutu opcode (işlem kodu) ve adres olarak ayırır.</li>
+      <li><b>Çalıştır:</b> bellek okunur/yazılır, ALU hesaplar ya da dallanma komutu PC'yi değiştirir.</li>
+      <li><b>Kendini dene:</b> her “çalıştır” aşamasından önce ACC, bellek ya da PC'nin yeni değerini tahmin edersin; doğru sayısı tutulur.</li>
+    </ul>
+    <h3>Yazmaçlar</h3>
+    <p><b>PC</b> (program sayacı): sıradaki komutun adresi. <b>IR</b> (komut yazmacı): getirilen komut. <b>ACC</b> (akümülatör): hesaplamaların biriktiği yazmaç.</p>
+    <h3>Komut kümesi</h3>
+    <table>
+      <tr><th>Komut</th><th>Opcode</th><th>Anlamı</th></tr>
+      <tr><td>LOAD a</td><td>0001</td><td>ACC ← bellek[a]</td></tr>
+      <tr><td>ADD a</td><td>0010</td><td>ACC ← ACC + bellek[a]</td></tr>
+      <tr><td>SUB a</td><td>0100</td><td>ACC ← ACC − bellek[a]</td></tr>
+      <tr><td>STORE a</td><td>0011</td><td>bellek[a] ← ACC</td></tr>
+      <tr><td>JMP a</td><td>0101</td><td>PC ← a (koşulsuz dallanma)</td></tr>
+      <tr><td>JZ a</td><td>0110</td><td>ACC = 0 ise PC ← a (koşullu dallanma)</td></tr>
+      <tr><td>HALT</td><td>0000</td><td>dur</td></tr>
+    </table>
+    <p>Kodlar varsayımsaldır: 16 bitlik komutun ilk 4 biti opcode, son 12 biti adrestir (ör. ADD 1005 → 0010 001111101101). HALT, LOAD, ADD, STORE kodları sunumdakiyle aynıdır; SUB, JMP, JZ bu simülasyon için eklenmiştir.</p>
+    <p>İlgili sunum: <a href="Bolum_01_Bilgisayarlar.html">Bölüm 1 · Bilgisayarlar</a> (Getir–Çöz–Çalıştır Döngüsü, Veri Yolları, Komutların Kodlanması) ve <a href="Bolum_01_Donanim.html">Bölüm 1 · Donanım</a>.</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  /* yalnızca sercankulcu.github.io adresinde (ve yerel önizlemede) çalışır (© Sercan Külcü) */
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+  var E = function (id) { return document.getElementById(id); };
+  var BASE = 1000, SIZE = 16;
+  var OPC = { HALT: '0000', LOAD: '0001', ADD: '0010', STORE: '0011', SUB: '0100', JMP: '0101', JZ: '0110' };
+  var MEANING = { LOAD: 'bellek[a] değerini ACC’ye yükle', ADD: 'bellek[a] değerini ACC’ye ekle', SUB: 'bellek[a] değerini ACC’den çıkar',
+    STORE: 'ACC’yi bellek[a] hücresine yaz', JMP: 'PC’yi a yap (koşulsuz dallanma)', JZ: 'ACC = 0 ise PC’yi a yap (koşullu dallanma)', HALT: 'programı durdur' };
+
+  function I(op, a) { return { op: op, a: a }; }
+  var PROGRAMS = {
+    sum: { cells: [I('LOAD', 1004), I('ADD', 1005), I('STORE', 1006), I('HALT'), 12, 8, 0], tags: { 1004: 'a', 1005: 'b', 1006: 'sonuç' }, result: 1006,
+      intro: 'Program bellekte: 1000–1003 komutlar, 1004–1006 veriler. Başlangıç: PC = 1000 (ilk komutun adresi), ACC = 0.' },
+    diff: { cells: [I('LOAD', 1004), I('SUB', 1005), I('STORE', 1006), I('HALT'), 12, 8, 0], tags: { 1004: 'a', 1005: 'b', 1006: 'fark' }, result: 1006,
+      intro: '<code>int fark = a - b;</code> satırının karşılığı: LOAD / SUB / STORE. Başlangıç: PC = 1000, ACC = 0.' },
+    loop: { cells: function (n) { return [I('LOAD', 1011), I('ADD', 1010), I('STORE', 1011), I('LOAD', 1010), I('SUB', 1012), I('STORE', 1010), I('JZ', 1008), I('JMP', 1000), I('HALT'), 0, n, 0, 1]; },
+      tags: { 1010: 'sayaç (n)', 1011: 'toplam', 1012: 'sabit 1' }, result: 1011,
+      intro: 'Döngü: toplam ← toplam + sayaç; sayaç ← sayaç − 1; sayaç 0 değilse JMP ile başa dön, 0 ise JZ ile HALT’a atla.' }
+  };
+
+  var S, view, timer = null, quizOn = false, quiz = null, qok = 0, qtot = 0;
+
+  function prog() { return PROGRAMS[E('c01c-prog').value]; }
+  function nVal() { var n = parseInt(E('c01c-n').value, 10); return isNaN(n) ? 5 : Math.max(1, Math.min(9, n)); }
+
+  function load() {
+    var p = prog(), cells = typeof p.cells === 'function' ? p.cells(nVal()) : p.cells, mem = [];
+    for (var i = 0; i < SIZE; i++) { var c = cells[i]; mem.push(c === undefined ? 0 : (typeof c === 'object' ? I(c.op, c.a) : c)); }
+    S = { mem: mem, pc: BASE, acc: 0, ir: null, phase: 0, halted: false, count: 0, steps: 0 };
+    view = { done: null, hot: {}, cu: ['Başlangıç', 'PC = 1000, ACC = 0'], text: p.intro };
+    quiz = null;
+  }
+
+  function isIns(c) { return c !== null && typeof c === 'object'; }
+  function txt(c) { return isIns(c) ? c.op + (c.a !== undefined ? ' ' + c.a : '') : String(c); }
+  function rd(a) { return S.mem[a - BASE]; }
+  function okAddr(a) { return a >= BASE && a < BASE + SIZE; }
+  function bits12(a) { var s = (a || 0).toString(2); while (s.length < 12) s = '0' + s; return s; }
+
+  /* çalıştır aşamasının sonucunu önceden hesapla (tahmin sorusu için) */
+  function predict() {
+    var c = S.ir, a = c.a;
+    if (c.op === 'LOAD') return { what: 'ACC', v: rd(a) };
+    if (c.op === 'ADD') return { what: 'ACC', v: S.acc + rd(a) };
+    if (c.op === 'SUB') return { what: 'ACC', v: S.acc - rd(a) };
+    if (c.op === 'STORE') return { what: 'bellek[' + a + ']', v: S.acc };
+    if (c.op === 'JMP') return { what: 'PC', v: a };
+    if (c.op === 'JZ') return { what: 'PC', v: S.acc === 0 ? a : S.pc };
+    return null;
+  }
+
+  /* ---------- tek adım ---------- */
+  function step() {
+    if (S.halted) return false;
+    S.steps++;
+    view = { hot: {}, cu: ['', ''] };
+    if (S.phase === 0) {
+      var at = S.pc;
+      if (!okAddr(at)) return fault('PC = ' + at + ' bellek dışında; CPU durdu.');
+      S.ir = rd(at); S.pc = at + 1; S.phase = 1;
+      view.done = 'GETİR'; view.addr = at; view.ctrl = 'OKU'; view.data = { v: txt(S.ir), dir: 'in' }; view.cell = { a: at, k: 'rd' };
+      view.hot = { IR: 1, PC: 1 };
+      view.cu = ['Getir: komut ' + at + ' adresinden', 'IR ← bellek[' + at + '], PC ← ' + S.pc];
+      view.text = '<b>Getir:</b> PC’deki <code>' + at + '</code> adres yoluna çıkar, kontrol yolunda <code>OKU</code> sinyali gider; ' +
+        (isIns(S.ir) ? 'komut <code>' + txt(S.ir) + '</code>' : 'hücredeki <code>' + S.ir + '</code>') + ' veri yoluyla <b>IR</b>’ye gelir. PC bir artar → <code>' + S.pc + '</code>.';
+      return true;
+    }
+    if (S.phase === 1) {
+      view.done = 'ÇÖZ'; view.hot = { CU: 1 };
+      if (!isIns(S.ir)) return fault('Çöz: IR’deki <code>' + S.ir + '</code> bir veri; CPU onu komut sanar ve geçersiz komut hatası verir. (HALT bu yüzden gereklidir.)');
+      var c = S.ir;
+      view.cu = ['Çöz: ' + txt(c), 'opcode ' + OPC[c.op] + ' · adres ' + bits12(c.a)];
+      view.text = '<b>Çöz:</b> kontrol birimi IR’yi ayırır: opcode <code>' + OPC[c.op] + '</code> = <code>' + c.op + '</code>' +
+        (c.a !== undefined ? ', adres <code>' + c.a + '</code>' : '') + ' → ' + MEANING[c.op].replace(/\ba\b/g, c.a) + '.';
+      S.phase = 2;
+      return true;
+    }
+    return execute();
+  }
+
+  function execute() {
+    var c = S.ir, a = c.a, v;
+    view.done = 'ÇALIŞTIR';
+    S.phase = 0;
+    view.cu = ['Çalıştır: ' + txt(c), ''];
+    if (c.op === 'LOAD' || c.op === 'ADD' || c.op === 'SUB') {
+      if (!okAddr(a)) return fault('Adres ' + a + ' bellek dışında.');
+      v = rd(a);
+      view.addr = a; view.ctrl = 'OKU'; view.data = { v: String(v), dir: 'in' }; view.cell = { a: a, k: 'rd' };
+      var old = S.acc;
+      if (c.op === 'LOAD') { S.acc = v; view.hot = { ACC: 1 }; view.cu[1] = 'ACC ← bellek[' + a + ']'; }
+      else {
+        S.acc = c.op === 'ADD' ? old + v : old - v;
+        view.hot = { ACC: 1, ALU: 1 }; view.alu = old + (c.op === 'ADD' ? ' + ' : ' − ') + v + ' = ' + S.acc;
+        view.cu[1] = 'ALU: ' + (c.op === 'ADD' ? 'topla' : 'çıkar') + ', ACC ← sonuç';
+      }
+      view.text = '<b>Çalıştır:</b> adres yolunda <code>' + a + '</code>, kontrol yolunda <code>OKU</code>; bellek[' + a + '] = <code>' + v + '</code> veri yoluyla gelir' +
+        (c.op === 'LOAD' ? ' ve ACC’ye yüklenir → ACC = <code>' + S.acc + '</code>.' :
+          '; ALU ' + (c.op === 'ADD' ? 'toplar' : 'çıkarır') + ': ' + view.alu + ' → ACC = <code>' + S.acc + '</code>.');
+    } else if (c.op === 'STORE') {
+      if (!okAddr(a)) return fault('Adres ' + a + ' bellek dışında.');
+      S.mem[a - BASE] = S.acc;
+      view.addr = a; view.ctrl = 'YAZ'; view.data = { v: String(S.acc), dir: 'out' }; view.cell = { a: a, k: 'wr' }; view.hot = { ACC: 1 };
+      view.cu[1] = 'bellek[' + a + '] ← ACC';
+      view.text = '<b>Çalıştır:</b> adres yolunda <code>' + a + '</code>, kontrol yolunda <code>YAZ</code>; ACC’deki <code>' + S.acc + '</code> veri yoluyla belleğe gider → bellek[' + a + '] = <code>' + S.acc + '</code>.';
+    } else if (c.op === 'JMP') {
+      S.pc = a; view.hot = { PC: 1 }; view.cu[1] = 'PC ← ' + a;
+      view.text = '<b>Çalıştır:</b> koşulsuz dallanma: PC ← <code>' + a + '</code>. Sıradaki komut ' + a + ' adresinden getirilecek (bellek erişimi yok).';
+    } else if (c.op === 'JZ') {
+      if (S.acc === 0) {
+        S.pc = a; view.hot = { PC: 1, ACC: 1 }; view.cu[1] = 'ACC = 0 → PC ← ' + a;
+        view.text = '<b>Çalıştır:</b> ACC = <code>0</code> olduğu için dallanma yapılır: PC ← <code>' + a + '</code>.';
+      } else {
+        view.hot = { ACC: 1 }; view.cu[1] = 'ACC ≠ 0 → dallanma yok';
+        view.text = '<b>Çalıştır:</b> ACC = <code>' + S.acc + '</code> ≠ 0; dallanma yok. PC <code>' + S.pc + '</code> olarak kalır, sıradaki komutla devam edilir.';
+      }
+    } else {
+      S.halted = true; view.cu[1] = 'CPU durdu';
+      var p = prog();
+      view.text = '<b>HALT:</b> CPU durur. Sonuç: bellek[' + p.result + '] = <code>' + rd(p.result) + '</code>' +
+        (E('c01c-prog').value === 'loop' ? ' (1 + … + ' + nVal() + ' = ' + (nVal() * (nVal() + 1) / 2) + ')' : '') + '. Toplam ' + (S.count + 1) + ' komut, ' + S.steps + ' adım.';
+    }
+    S.count++;
+    if (S.count > 2000) return fault('Çok fazla komut çalıştı; sonsuz döngü olabilir.');
+    return true;
+  }
+
+  function fault(msg) {
+    S.halted = true; view.done = view.done || null; view.cu = ['Hata', 'CPU durdu'];
+    view.text = '<b>Dur:</b> ' + msg;
+    return false;
+  }
+
+  /* ---------- çizim ---------- */
+  function packet(id, label, x0, x1, y, delay) {
+    return '<g class="pkt" data-x0="' + x0 + '" data-x1="' + x1 + '" data-y="' + y + '" data-d="' + delay + '" style="transform:translate(' + x0 + 'px,' + (y - 11) + 'px)">' +
+      '<rect width="70" height="22" rx="6"/><text x="35" y="15.5">' + label + '</text></g>';
+  }
+  function reg(key, y, h, label, value, big) {
+    return '<rect class="reg' + (view.hot[key] ? ' hot' : '') + '" x="18" y="' + y + '" width="180" height="' + h + '" rx="8"/>' +
+      '<text class="lbl" x="28" y="' + (y + h / 2 + 4) + '">' + label + '</text>' +
+      '<text class="val' + (big ? ' big' : '') + '" x="188" y="' + (y + h / 2 + (big ? 8 : 5)) + '">' + value + '</text>';
+  }
+  function draw(animate) {
+    var s = '<defs><marker id="c01c-ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path class="ah" d="M0 0 L10 5 L0 10 Z"/></marker></defs>';
+    /* CPU */
+    s += '<rect class="box" x="8" y="6" width="200" height="414" rx="12"/><text class="ttl" x="20" y="27">CPU</text>';
+    s += '<rect class="reg' + (view.hot.CU ? ' hot' : '') + '" x="18" y="36" width="180" height="70" rx="8"/>' +
+      '<text class="lbl" x="28" y="54">Kontrol birimi</text><text class="cu1" x="28" y="76">' + (view.cu[0] || '') + '</text><text class="cu2" x="28" y="96">' + (view.cu[1] || '') + '</text>';
+    s += reg('IR', 114, 40, 'IR', S.ir === null ? '—' : txt(S.ir));
+    s += reg('PC', 162, 40, 'PC', S.pc);
+    s += reg('ACC', 210, 50, 'ACC', S.acc, true);
+    s += '<path class="reg' + (view.hot.ALU ? ' hot' : '') + '" d="M28 270 H188 L168 344 H48 Z"/><text class="lbl mid" x="108" y="296">ALU</text>' +
+      '<text class="cu1 mid" x="108" y="324">' + (view.hot.ALU && view.alu ? view.alu : '+ − AND OR') + '</text>';
+    [['GETİR', 18, 56], ['ÇÖZ', 80, 46], ['ÇALIŞTIR', 132, 66]].forEach(function (p) {
+      var on = view.done === p[0];
+      s += '<rect class="pill' + (on ? ' on' : '') + '" x="' + p[1] + '" y="358" width="' + p[2] + '" height="24" rx="12"/><text class="pillt' + (on ? ' on' : '') + '" x="' + (p[1] + p[2] / 2) + '" y="374">' + p[0] + '</text>';
+    });
+    s += '<text class="lbl" x="18" y="406">' + (S.halted ? 'Durdu' : 'Sıradaki: ' + ['GETİR', 'ÇÖZ', 'ÇALIŞTIR'][S.phase]) + '</text>';
+    /* yollar */
+    var buses = [['adres yolu', 70, view.addr !== undefined, 'end'], ['kontrol yolu', 130, !!view.ctrl, 'end'], ['veri yolu', 190, !!view.data, 'both']];
+    buses.forEach(function (b) {
+      s += '<line class="bus' + (b[2] ? ' on' : '') + '" x1="' + (b[3] === 'both' ? 214 : 210) + '" y1="' + b[1] + '" x2="324" y2="' + b[1] + '" marker-end="url(#c01c-ah)"' + (b[3] === 'both' ? ' marker-start="url(#c01c-ah)"' : '') + '/>' +
+        '<text class="busl' + (b[2] ? ' on' : '') + '" x="269" y="' + (b[1] - 18) + '">' + b[0] + '</text>';
+    });
+    s += '<text class="busl" x="269" y="226">tek yönlü: adres</text><text class="busl" x="269" y="240">çift yönlü: veri</text>';
+    if (view.addr !== undefined) s += packet('a', view.addr, 212, 252, 70, 0);
+    if (view.ctrl) s += packet('c', view.ctrl, 212, 252, 130, 0.15);
+    if (view.data) s += view.data.dir === 'in' ? packet('d', view.data.v, 252, 212, 190, 0.5) : packet('d', view.data.v, 212, 252, 190, 0.5);
+    /* bellek */
+    s += '<rect class="box" x="330" y="6" width="184" height="414" rx="12"/><text class="ttl" x="342" y="27">Bellek</text><text class="tag" x="506" y="27">adres · içerik</text>';
+    for (var i = 0; i < SIZE; i++) {
+      var adr = BASE + i, c = S.mem[i], y = 36 + i * 23.6, cls = 'cell' + (isIns(c) ? '' : ' data');
+      if (adr === S.pc && !S.halted) cls += ' pc';
+      if (view.cell && view.cell.a === adr) cls += ' ' + view.cell.k;
+      s += '<rect class="' + cls + '" x="338" y="' + y + '" width="168" height="21.6" rx="4"/>' +
+        '<text class="ad" x="344" y="' + (y + 15) + '">' + adr + '</text><text class="ct" x="386" y="' + (y + 15.5) + '">' + txt(c) + '</text>' +
+        (prog().tags[adr] ? '<text class="tag" x="501" y="' + (y + 15) + '">' + prog().tags[adr] + '</text>' : '') +
+        (adr === S.pc && !S.halted ? '<text class="pcm" x="335" y="' + (y + 15) + '">PC</text>' : '');
+    }
+    var svg = E('c01c-svg');
+    svg.innerHTML = s;
+    if (animate) {
+      var dur = Math.min(0.7, speedMs() / 2600);
+      var pk = svg.querySelectorAll('.pkt');
+      pk.forEach(function (g) { g.getBoundingClientRect(); });
+      requestAnimationFrame(function () {
+        pk.forEach(function (g) {
+          g.style.transitionDuration = dur + 's';
+          g.style.transitionDelay = (g.dataset.d * dur * 1.4) + 's';
+          g.style.transform = 'translate(' + g.dataset.x1 + 'px,' + (g.dataset.y - 11) + 'px)';
+        });
+      });
+    } else {
+      svg.querySelectorAll('.pkt').forEach(function (g) { g.style.transform = 'translate(' + g.dataset.x1 + 'px,' + (g.dataset.y - 11) + 'px)'; });
+    }
+  }
+
+  function renderSide() {
+    E('c01c-count').textContent = S.count;
+    E('c01c-steps').textContent = S.steps;
+    E('c01c-step').disabled = S.halted || !!(quiz && !quiz.done);
+    E('c01c-run').disabled = S.halted;
+    E('c01c-play').disabled = S.halted;
+    E('c01c-play').textContent = timer ? 'Duraklat' : 'Oynat';
+    E('c01c-score').hidden = !quizOn;
+    E('c01c-nrow').hidden = E('c01c-prog').value !== 'loop';
+    E('c01c-status').innerHTML = view.text || '';
+  }
+
+  function render(animate) { draw(animate); renderSide(); }
+
+  /* ---------- kendini dene ---------- */
+  function needQuiz() { return quizOn && !S.halted && S.phase === 2 && isIns(S.ir) && S.ir.op !== 'HALT' && !(quiz && quiz.done); }
+  function askQuiz() {
+    var p = predict();
+    quiz = { what: p.what, v: p.v, done: false };
+    E('c01c-qbox').hidden = false;
+    E('c01c-q').innerHTML = 'Tahmin et: <code>' + txt(S.ir) + '</code> çalışınca <b>' + p.what + '</b> kaç olur?';
+    E('c01c-qin').value = ''; E('c01c-fb').textContent = ''; E('c01c-fb').className = 'fb';
+    E('c01c-check').disabled = false;
+    view.text = 'Kendini dene: <code>' + txt(S.ir) + '</code> çözüldü. Çalıştırmadan önce ' + p.what + ' değerini tahmin et ve <b>Kontrol</b>’e bas.';
+    renderSide();
+    E('c01c-qin').focus();
+  }
+  function checkQuiz() {
+    if (!quiz || quiz.done) return;
+    var g = E('c01c-qin').value.trim().replace('−', '-');
+    if (!/^-?\d+$/.test(g)) { E('c01c-fb').className = 'fb no'; E('c01c-fb').textContent = 'Bir tam sayı yaz.'; return; }
+    var ok = parseInt(g, 10) === quiz.v;
+    quiz.done = true; qtot++; if (ok) qok++;
+    E('c01c-ok').textContent = qok; E('c01c-tot').textContent = qtot;
+    E('c01c-fb').className = 'fb ' + (ok ? 'ok' : 'no');
+    E('c01c-fb').textContent = ok ? '✓ Doğru: ' + quiz.what + ' = ' + quiz.v : '✗ Yanlış: ' + quiz.what + ' = ' + quiz.v;
+    E('c01c-check').disabled = true;
+    doStep();
+    E('c01c-step').focus();
+  }
+
+  /* ---------- denetim ---------- */
+  function speedMs() { return [2200, 1500, 1000, 600, 300][+E('c01c-speed').value - 1]; }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+  function doStep() {
+    if (needQuiz()) { stop(); askQuiz(); return; }
+    step();
+    if (S.phase !== 2) { quiz = quiz && quiz.done ? quiz : null; }
+    if (S.halted) stop();
+    render(true);
+    if (!quizOn || (quiz && quiz.done && S.phase === 1)) { E('c01c-qbox').hidden = !quizOn || !quiz; }
+    if (needQuiz() && timer) { stop(); askQuiz(); }
+  }
+  function reset() {
+    stop(); load();
+    E('c01c-qbox').hidden = true;
+    render(false);
+  }
+
+  E('c01c-step').addEventListener('click', function () { stop(); doStep(); });
+  E('c01c-play').addEventListener('click', function () {
+    if (timer) { stop(); renderSide(); return; }
+    timer = setInterval(doStep, speedMs());
+    doStep();
+    renderSide();
+  });
+  E('c01c-reset').addEventListener('click', reset);
+  E('c01c-run').addEventListener('click', function () {
+    stop();
+    var guard = 0;
+    while (!S.halted && guard++ < 10000) step();
+    quiz = null; E('c01c-qbox').hidden = true;
+    render(false);
+  });
+  E('c01c-speed').addEventListener('input', function () { if (timer) { stop(); timer = setInterval(doStep, speedMs()); } });
+  E('c01c-prog').addEventListener('change', reset);
+  E('c01c-n').addEventListener('change', function () { E('c01c-n').value = nVal(); reset(); });
+  E('c01c-quiz').addEventListener('change', function () {
+    quizOn = this.checked;
+    if (!quizOn) { quiz = null; E('c01c-qbox').hidden = true; renderSide(); }
+    else if (needQuiz()) { stop(); askQuiz(); } else renderSide();
+  });
+  E('c01c-check').addEventListener('click', checkQuiz);
+  E('c01c-qin').addEventListener('keydown', function (e) { if (e.key === 'Enter') checkQuiz(); });
+
+  reset();
+})();
+</script>
+<script src="deck/oyun.js"></script>

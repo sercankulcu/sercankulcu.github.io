@@ -1,0 +1,544 @@
+---
+layout: without-sidebar
+title: "Döngü İzleyici"
+permalink: /files/computer/slides/Chapter_08_Loop-Tracer.html
+excerpt: "for, while, do-while ve iç içe döngüleri tur tur izler: değişken tablosu, koşul değerlendirmesi, çıktı, continue/break ve i×j ızgarası; parametreler değiştirilebilir."
+---
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.cx-lt, .cx-lt-dlg { --ds-accent:#b45309; --ds-link:#0369a1; }
+html[data-theme="dark"] .agt-oyun, html[data-theme="dark"] .cx-lt-dlg { --ds-accent:#f59e57; --ds-link:#7cc4e8; }
+.cx-lt .lt-grid { display:grid; grid-template-columns:196px minmax(0,1fr); gap:10px; height:100%; }
+.cx-lt .card { min-width:0; min-height:0; padding:8px 10px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.cx-lt .side { display:flex; flex-direction:column; gap:7px; }
+.cx-lt .cap { display:block; margin:0 0 2px; color:var(--ds-muted); font-size:11.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.cx-lt select { width:100%; min-height:32px; font-size:13.5px; }
+.cx-lt .params { display:grid; grid-template-columns:1fr 70px; gap:4px 6px; align-items:center; font-size:13px; }
+.cx-lt .params input { width:100%; min-height:28px !important; padding:0 6px !important; font-size:14px !important; }
+.cx-lt .btns { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.cx-lt .btns button { min-height:32px; padding:0 6px; font-size:14px; }
+.cx-lt .speed { display:flex; align-items:center; gap:6px; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.cx-lt .speed input { flex:1; min-width:0; }
+.cx-lt .check { display:flex; align-items:center; gap:6px; font-size:13.5px; font-weight:700; cursor:pointer; }
+.cx-lt .score { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.cx-lt .score div { padding:3px; border-radius:10px; background:var(--ds-surface-strong); text-align:center; color:var(--ds-muted); font-size:11.5px; font-weight:700; }
+.cx-lt .score b { display:block; color:var(--ds-text); font-size:18px; }
+.cx-lt .stepno { margin-top:auto; color:var(--ds-muted); font-size:12.5px; font-weight:700; text-align:center; }
+.cx-lt .main { display:grid; grid-template-rows:auto auto minmax(0,1fr); gap:7px; min-height:0; }
+.cx-lt .top { display:grid; grid-template-columns:minmax(0,1fr) 196px; gap:7px; }
+.cx-lt .code { margin:0; padding:5px 0; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); font:13.5px/1.5 ui-monospace, Consolas, monospace; list-style:none; counter-reset:ln; overflow:hidden; }
+.cx-lt .code li { padding:0 8px 0 0; white-space:pre; counter-increment:ln; }
+.cx-lt .code li::before { content:counter(ln); display:inline-block; width:26px; margin-right:8px; color:var(--ds-muted); font-size:11px; text-align:right; }
+.cx-lt .code li.is-cur { background:var(--ds-hot); box-shadow:inset 4px 0 0 var(--ds-accent); }
+.cx-lt .state { display:flex; flex-direction:column; gap:6px; }
+.cx-lt .vars { margin:0; padding:5px 8px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); font:14px/1.5 ui-monospace, Consolas, monospace; }
+.cx-lt .vars div { display:flex; justify-content:space-between; gap:8px; }
+.cx-lt .vars div.is-chg b { color:var(--ds-accent); }
+.cx-lt .vars .none { color:var(--ds-muted); font-family:inherit; font-size:12.5px; }
+.cx-lt .cond { padding:5px 8px; border-radius:10px; background:var(--ds-surface-strong); font:13.5px/1.4 ui-monospace, Consolas, monospace; min-height:48px; }
+.cx-lt .cond .t { color:var(--ds-good); font-weight:800; }
+.cx-lt .cond .f { color:var(--ds-bad); font-weight:800; }
+.cx-lt .cond .q { color:var(--ds-warn); font-weight:800; }
+.cx-lt .qbtns { display:flex; gap:6px; margin-top:4px; }
+.cx-lt .qbtns button { flex:1; min-height:28px; font-size:13px; font-family:ui-monospace, Consolas, monospace; }
+.cx-lt .why { margin:0; min-height:40px; padding:5px 10px; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:13.5px; line-height:1.35; }
+.cx-lt .bottom { display:grid; grid-template-columns:minmax(0,1fr) 196px; gap:7px; min-height:0; }
+.cx-lt .pane { display:flex; flex-direction:column; min-height:0; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); overflow:hidden; }
+.cx-lt .pane > .cap { margin:0; padding:4px 8px 2px; }
+.cx-lt .scroll { flex:1; min-height:0; overflow:auto; padding:0 8px 6px; }
+.cx-lt table.trace { width:100%; font:13px ui-monospace, Consolas, monospace; text-align:center; }
+.cx-lt table.trace th, .cx-lt table.trace td { padding:2px 6px; }
+.cx-lt table.trace th { position:sticky; top:0; font-size:12px; }
+.cx-lt table.trace tr.is-last td { background:var(--ds-hot); }
+.cx-lt table.trace td.t { color:var(--ds-good); font-weight:700; }
+.cx-lt table.trace td.f { color:var(--ds-bad); font-weight:700; }
+.cx-lt .out { flex:1; min-height:0; margin:0; padding:6px 8px; overflow:auto; background:#1f2430; color:#e6edf3; font:14px/1.4 ui-monospace, Consolas, monospace; white-space:pre; }
+.cx-lt .ij { border-collapse:separate; border-spacing:3px; margin:2px auto 0; font:13px ui-monospace, Consolas, monospace; }
+.cx-lt .ij th { padding:0 4px; border:0; background:none; color:var(--ds-muted); font-size:11.5px; font-weight:700; }
+.cx-lt .ij td { width:32px; height:28px; padding:0; border:1.5px solid var(--ds-border); border-radius:6px; background:var(--ds-bg); text-align:center; font-weight:700; }
+.cx-lt .ij td.out { border-color:var(--ds-good); background:color-mix(in srgb, var(--ds-good) 18%, var(--ds-bg)); }
+.cx-lt .ij td.sp { border-style:dotted; background:var(--ds-surface-strong); color:var(--ds-muted); }
+.cx-lt .ij td.skip { border-color:var(--ds-warn); background:color-mix(in srgb, var(--ds-warn) 18%, var(--ds-bg)); color:var(--ds-warn); }
+.cx-lt .ij td.brk { border-color:var(--ds-bad); background:color-mix(in srgb, var(--ds-bad) 20%, var(--ds-bg)); color:var(--ds-bad); }
+.cx-lt .ij td.dead { border-style:dashed; opacity:.45; }
+.cx-lt .ij td.is-cur { box-shadow:0 0 0 3px var(--ds-accent); }
+.cx-lt .legend { display:flex; flex-wrap:wrap; gap:4px 10px; padding:2px 8px 4px; color:var(--ds-muted); font-size:11.5px; font-weight:700; }
+.cx-lt .legend i { display:inline-block; width:11px; height:11px; margin-right:3px; border:1.5px solid; border-radius:3px; vertical-align:-1px; }
+</style>
+
+<div class="cx-lt agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 8 · Simülasyon</p><h1>Döngü İzleyici</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="lt-help" aria-label="Açıklama ve kullanım">?</button>
+    <a class="agt-oyun__back" href="Bolum_08_Donguler.html">← Bölüm 8</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="lt-grid">
+      <aside class="card side">
+        <div>
+          <label class="cap" for="ltProg">Program</label>
+          <select id="ltProg"></select>
+        </div>
+        <div>
+          <span class="cap">Parametreler</span>
+          <div class="params" id="ltParams"></div>
+        </div>
+        <div class="btns">
+          <button type="button" id="ltBack" aria-label="Bir adım geri">◀ Geri</button>
+          <button type="button" id="ltStep" class="is-primary" aria-label="Bir adım ileri">Adım ▶</button>
+          <button type="button" id="ltPlay" aria-label="Oynat veya duraklat">Oynat</button>
+          <button type="button" id="ltReset" aria-label="Başa dön">Sıfırla</button>
+        </div>
+        <label class="speed">Hız <input type="range" id="ltSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı"></label>
+        <label class="check"><input type="checkbox" id="ltQuiz"> Kendini dene</label>
+        <p class="agt-oyun__muted" style="margin:0;font-size:12px;line-height:1.35">Kendini dene açıkken her koşul değerlendirmesinde sonucu (true / false) siz tahmin edersiniz.</p>
+        <div class="score" aria-live="polite">
+          <div>Doğru<b id="ltOk">0</b></div>
+          <div>Soru<b id="ltAll">0</b></div>
+        </div>
+        <div class="stepno" id="ltNo"></div>
+      </aside>
+
+      <section class="main">
+        <div class="top">
+          <ol class="code" id="ltCode" aria-label="Java kodu"></ol>
+          <div class="state">
+            <div><span class="cap">Değişkenler</span><div class="vars" id="ltVars" aria-live="polite"></div></div>
+            <div><span class="cap">Koşul</span><div class="cond" id="ltCond" aria-live="polite"></div></div>
+          </div>
+        </div>
+        <p class="why" id="ltWhy" aria-live="polite"></p>
+        <div class="bottom">
+          <div class="pane">
+            <span class="cap" id="ltTabCap">İzleme tablosu</span>
+            <div class="legend" id="ltLegend" hidden>
+              <span><i style="border-color:var(--ds-good);background:color-mix(in srgb,var(--ds-good) 18%,var(--ds-bg))"></i>yazıldı</span>
+              <span><i style="border-color:var(--ds-warn);background:color-mix(in srgb,var(--ds-warn) 18%,var(--ds-bg))"></i>continue: atlandı</span>
+              <span><i style="border-color:var(--ds-bad);background:color-mix(in srgb,var(--ds-bad) 20%,var(--ds-bg))"></i>break</span>
+              <span><i style="border-color:var(--ds-border);border-style:dashed"></i>hiç çalışmadı</span>
+            </div>
+            <div class="scroll" id="ltTab"></div>
+          </div>
+          <div class="pane">
+            <span class="cap">Çıktı (konsol)</span>
+            <pre class="out" id="ltOut" aria-label="Program çıktısı" aria-live="polite"></pre>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog cx-lt-dlg" id="lt-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Döngü İzleyici</h2>
+    <p><b>Amaç:</b> Bir döngünün her turunda neler olduğunu kod izleme ile görmek: başlangıç, koşul, gövde ve güncelleme hangi sırayla çalışır, değişkenler nasıl değişir, çıktıya ne yazılır.</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li>Soldan bir program seçin; parametreleri (n, başlangıç değeri, koşul sınırı…) değiştirince kod ve iz yeniden hesaplanır.</li>
+      <li><b>Adım ▶</b> bir sonraki işlemi çalıştırır; o anda çalışan satır vurgulanır, sağda değişkenler (değişen değer renkli) ve koşulun değerlendirilmesi görünür. <b>Geri</b>, <b>Oynat</b>, <b>Sıfırla</b> ve hız ayarı vardır; klavyede → / ← da çalışır.</li>
+      <li>Tek döngülerde alttaki <b>izleme tablosu</b> her koşul denetimini bir satır olarak tutar. İç içe döngülerde bunun yerine <b>ızgara</b> görünür: her hücre bir iç döngü turudur (yazıldı, continue ile atlandı, break, hiç çalışmadı).</li>
+      <li><b>Kendini dene</b>: her koşul denetiminde sonucu tahmin edin; doğru tahminler sayılır.</li>
+    </ol>
+    <h3>Hatırlatma</h3>
+    <ul>
+      <li><code>for</code>: başlangıç bir kez → koşul → gövde → güncelleme → koşul … Koşul false olunca döngü biter.</li>
+      <li><code>while</code> koşulu önce denetler (gövde hiç çalışmayabilir); <code>do-while</code> gövdeyi en az bir kez çalıştırır.</li>
+      <li><code>continue</code> o turun kalanını atlar (for'da güncelleme yine yapılır); <code>break</code> yalnızca içinde bulunduğu döngüden çıkar.</li>
+    </ul>
+    <p>İlgili sunum: <a href="Bolum_08_Donguler.html">Bölüm 8 · Döngüler</a> (Kod İzleme, break ve continue, Basamak Sayısı, İç İçe Döngü, Desen Problemleri).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /*CORE-BEGIN*/
+  var Core = (function () {
+    /* İzleyici: her çağrı bir adım (olay) üretir ve tüm durumu kopyalar. */
+    function Tracer(code) {
+      var st = { vars: [], out: "", rows: [], grid: null, cur: null }, ev = [], prevVals = {};
+      function snap(line, why, extra) {
+        var e = { line: line, why: why, vars: st.vars.map(function (v) { return v.slice(); }), out: st.out, rows: st.rows.length,
+          grid: st.grid ? { rl: st.grid.rl, cl: st.grid.cl, c: st.grid.c.map(function (r) { return r.map(function (x) { return x.slice(); }); }) } : null,
+          cur: st.cur ? st.cur.slice() : null, chg: extra && extra.chg || null, cond: extra && extra.cond || null };
+        ev.push(e);
+        if (ev.length > 1500) throw new Error("çok uzun");
+      }
+      function find(n) { for (var i = 0; i < st.vars.length; i++) if (st.vars[i][0] === n) return i; return -1; }
+      var T = {
+        set: function (n, v, line, why) { var i = find(n); if (i < 0) st.vars.push([n, v]); else st.vars[i][1] = v; snap(line, why, { chg: n }); },
+        setq: function (n, v) { var i = find(n); if (i < 0) st.vars.push([n, v]); else st.vars[i][1] = v; },
+        drop: function (n) { var i = find(n); if (i >= 0) st.vars.splice(i, 1); },
+        cond: function (line, expr, sub, val, why) { snap(line, why || ("Koşul denetlenir: " + expr + " → " + sub + " → " + val + (val ? ", döngü gövdesine girilir." : ", döngü biter.")), { cond: { expr: expr, sub: sub, val: val } }); },
+        print: function (line, s, why) { st.out += s; snap(line, why); },
+        step: function (line, why) { snap(line, why); },
+        row: function (r) { st.rows.push(r); if (ev.length) ev[ev.length - 1].rows = st.rows.length; },
+        grid: function (rl, cl) { st.grid = { rl: rl, cl: cl, c: rl.map(function () { return cl.map(function () { return ["", ""]; }); }) }; },
+        cell: function (r, c, s, t) { st.grid.c[r][c] = [s, t === undefined ? "" : String(t)]; },
+        cur: function (r, c) { st.cur = r === null ? null : [r, c]; },
+        get rowsAll() { return st.rows; },
+        get events() { return ev; },
+        get out() { return st.out; }
+      };
+      return T;
+    }
+
+    var PROGS = [
+      {
+        id: "toplam", ad: "1'den n'ye toplam (for)",
+        params: [{ k: "n", ad: "n", min: 0, max: 15, v: 5 }, { k: "bas", ad: "başlangıç i", min: -3, max: 10, v: 1 }],
+        code: function (p) { return ["int n = " + p.n + ";", "int toplam = 0;", "for (int i = " + p.bas + "; i <= n; i++) {", "    toplam += i;", "}", "System.out.println(toplam);"]; },
+        cols: ["koşul no", "i", "i <= n", "toplam"],
+        run: function (p, T) {
+          T.set("n", p.n, 0, "n değişkeni " + p.n + " değeriyle tanımlanır.");
+          var toplam = 0; T.set("toplam", 0, 1, "Biriktirici toplam 0 ile başlar (toplamanın etkisiz elemanı).");
+          var i = p.bas; T.set("i", i, 2, "Başlangıç: int i = " + i + ". Bu kısım yalnızca bir kez çalışır.");
+          var k = 0;
+          for (;;) {
+            var c = i <= p.n; k++;
+            T.cond(2, "i <= n", i + " <= " + p.n, c); T.row([k, i, c, toplam]);
+            if (!c) break;
+            var old = toplam; toplam += i;
+            T.set("toplam", toplam, 3, "Gövde: toplam += i → " + old + " + " + i + " = " + toplam + ".");
+            i++; T.set("i", i, 2, "Güncelleme: i++ → i = " + i + ". Ardından koşul yeniden denetlenir.");
+          }
+          T.drop("i");
+          T.print(5, toplam + "\n", "Döngüden çıkıldı (i artık kapsam dışında). println(toplam) → " + toplam + (k === 1 ? " — koşul ilk denetimde false olduğu için gövde hiç çalışmadı." : "."));
+        }
+      },
+      {
+        id: "fakt", ad: "Faktöriyel (while)",
+        params: [{ k: "sayi", ad: "sayi", min: 0, max: 12, v: 5 }],
+        code: function (p) { return ["int sayi = " + p.sayi + ";", "int faktoriyel = 1;", "while (sayi > 1) {", "    faktoriyel *= sayi;", "    sayi--;", "}", "System.out.println(faktoriyel);"]; },
+        cols: ["koşul no", "sayi", "sayi > 1", "faktoriyel"],
+        run: function (p, T) {
+          var s = p.sayi, f = 1, k = 0;
+          T.set("sayi", s, 0, "sayi = " + s + ".");
+          T.set("faktoriyel", 1, 1, "Çarpım biriktiricisi 1 ile başlar (çarpmanın etkisiz elemanı).");
+          for (;;) {
+            var c = s > 1; k++;
+            T.cond(2, "sayi > 1", s + " > 1", c, "while koşulu her turdan önce denetlenir: sayi > 1 → " + s + " > 1 → " + c + "."); T.row([k, s, c, f]);
+            if (!c) break;
+            var o = f; f *= s;
+            T.set("faktoriyel", f, 3, "faktoriyel *= sayi → " + o + " * " + s + " = " + f + ".");
+            s--; T.set("sayi", s, 4, "sayi-- → sayi = " + s + ". Koşul değişkeni değişmeseydi döngü sonsuz olurdu.");
+          }
+          T.print(6, f + "\n", "Döngü bitti. println(faktoriyel) → " + f + ".");
+        }
+      },
+      {
+        id: "basamak", ad: "Basamak sayısı (do-while)",
+        params: [{ k: "sayi", ad: "sayi", min: -999999999, max: 999999999, v: -507 }],
+        code: function (p) { return ["int sayi = " + p.sayi + ";", "long kalan = sayi;", "if (kalan < 0) kalan = -kalan;", "int basamak = 0;", "do {", "    basamak++;", "    kalan /= 10;", "} while (kalan > 0);", "System.out.println(basamak);"]; },
+        cols: ["koşul no", "basamak", "kalan", "kalan > 0"],
+        run: function (p, T) {
+          var kalan = p.sayi, b = 0, k = 0;
+          T.set("sayi", p.sayi, 0, "sayi = " + p.sayi + ".");
+          T.set("kalan", kalan, 1, "kalan = sayi (long). Asıl sayı bozulmasın diye kopyasıyla çalışılır.");
+          if (kalan < 0) { kalan = -kalan; T.set("kalan", kalan, 2, "kalan < 0 → true: işaret atılır, kalan = " + kalan + "."); }
+          else T.step(2, "kalan < 0 → false: kalan değişmez.");
+          T.set("basamak", 0, 3, "Sayaç basamak = 0.");
+          T.step(4, "do-while: gövde koşuldan ÖNCE çalışır; en az bir tur garanti.");
+          for (;;) {
+            b++; T.set("basamak", b, 5, "basamak++ → " + b + ".");
+            var o = kalan; kalan = Math.trunc(kalan / 10);
+            T.set("kalan", kalan, 6, "kalan /= 10 → " + o + " / 10 = " + kalan + " (tam sayı bölmesi son basamağı atar).");
+            var c = kalan > 0; k++;
+            T.cond(7, "kalan > 0", kalan + " > 0", c, "Koşul turun SONUNDA denetlenir: kalan > 0 → " + kalan + " > 0 → " + c + (c ? ", yeni tur." : ", döngü biter.")); T.row([k, b, kalan, c]);
+            if (!c) break;
+          }
+          T.print(8, b + "\n", "println(basamak) → " + b + (p.sayi === 0 ? ". sayi = 0 için de 1 basamak: do-while gövdesi bir kez çalıştı." : "."));
+        }
+      },
+      {
+        id: "cb", ad: "continue ve break (tek döngü)",
+        params: [{ k: "n", ad: "üst sınır", min: 1, max: 20, v: 10 }, { k: "m", ad: "atla: i % ? == 0", min: 1, max: 9, v: 3 }, { k: "b", ad: "kır: i == ?", min: 1, max: 25, v: 8 }],
+        code: function (p) { return ["for (int i = 1; i <= " + p.n + "; i++) {", "    if (i % " + p.m + " == 0) continue;", "    if (i == " + p.b + ") break;", "    System.out.print(i + \" \");", "}", "System.out.println(\"| bitti\");"]; },
+        cols: ["koşul no", "i", "i <= " + "n", "olay"],
+        run: function (p, T) {
+          var i = 1, k = 0;
+          T.set("i", 1, 0, "Başlangıç: i = 1.");
+          for (;;) {
+            var c = i <= p.n; k++;
+            T.cond(0, "i <= " + p.n, i + " <= " + p.n, c);
+            if (!c) { T.row([k, i, c, "çıkış"]); break; }
+            var m = i % p.m === 0;
+            if (m) {
+              T.row([k, i, c, "continue"]);
+              T.step(1, "i % " + p.m + " == 0 → " + i + " % " + p.m + " = 0 → true: continue! Gövdenin kalanı atlanır, doğrudan güncellemeye (i++) gidilir.");
+            } else {
+              T.step(1, "i % " + p.m + " == 0 → " + (i % p.m) + " == 0 → false: devam.");
+              if (i === p.b) {
+                T.row([k, i, c, "break"]);
+                T.step(2, "i == " + p.b + " → true: break! Döngü hemen sona erer; güncelleme de yapılmaz.");
+                break;
+              }
+              T.step(2, "i == " + p.b + " → false.");
+              T.row([k, i, c, "yazıldı"]);
+              T.print(3, i + " ", "print: \"" + i + " \" yazılır.");
+            }
+            i++; T.set("i", i, 0, "Güncelleme: i++ → i = " + i + ".");
+          }
+          T.drop("i");
+          T.print(5, "| bitti\n", "Döngüden sonraki satır: println(\"| bitti\").");
+        }
+      },
+      {
+        id: "ic", ad: "İç içe döngü: continue / break", grid: true,
+        params: [{ k: "n", ad: "satır n (i)", min: 1, max: 6, v: 4 }, { k: "m", ad: "sütun m (j)", min: 1, max: 7, v: 5 }, { k: "s", ad: "sınır (i*j > ?)", min: 0, max: 40, v: 8 }],
+        code: function (p) { return ["int n = " + p.n + ", m = " + p.m + ";", "for (int i = 1; i <= n; i++) {", "    for (int j = 1; j <= m; j++) {", "        if (j == i) continue;", "        if (i * j > " + p.s + ") break;", "        System.out.print(i * j + \" \");", "    }", "    System.out.println();", "}"]; },
+        run: function (p, T) {
+          var rl = [], cl = [], i, j;
+          for (i = 1; i <= p.n; i++) rl.push("i=" + i);
+          for (j = 1; j <= p.m; j++) cl.push("j=" + j);
+          T.grid(rl, cl);
+          T.setq("n", p.n); T.set("m", p.m, 0, "n = " + p.n + " satır (dış döngü), m = " + p.m + " sütun (iç döngü).");
+          i = 1; T.set("i", 1, 1, "Dış döngü başlangıcı: i = 1.");
+          for (;;) {
+            var c = i <= p.n;
+            T.cond(1, "i <= n", i + " <= " + p.n, c, "Dış koşul: i <= n → " + i + " <= " + p.n + " → " + c + (c ? "." : ": dış döngü biter."));
+            if (!c) break;
+            j = 1; T.set("j", 1, 2, "İç döngü her dış turda baştan başlar: j = 1.");
+            for (;;) {
+              var cj = j <= p.m;
+              T.cur(cj ? i - 1 : null, j - 1);
+              T.cond(2, "j <= m", j + " <= " + p.m, cj, "İç koşul: j <= m → " + j + " <= " + p.m + " → " + cj + (cj ? "." : ": iç döngü biter, dış döngüye dönülür."));
+              if (!cj) break;
+              if (j === i) {
+                T.cell(i - 1, j - 1, "skip", "→");
+                T.step(3, "j == i → " + j + " == " + i + " → true: continue. Bu hücre atlanır; iç döngü j++ ile sürer.");
+              } else {
+                T.step(3, "j == i → " + j + " == " + i + " → false.");
+                if (i * j > p.s) {
+                  T.cell(i - 1, j - 1, "brk", "✕");
+                  for (var q = j; q < p.m; q++) T.cell(i - 1, q, "dead", "");
+                  T.step(4, "i * j > " + p.s + " → " + (i * j) + " > " + p.s + " → true: break. YALNIZCA iç döngü biter; satırın kalan hücreleri hiç çalışmaz.");
+                  break;
+                }
+                T.step(4, "i * j > " + p.s + " → " + (i * j) + " > " + p.s + " → false.");
+                T.cell(i - 1, j - 1, "out", i * j);
+                T.print(5, (i * j) + " ", "print: \"" + (i * j) + " \" yazılır.");
+              }
+              j++; T.set("j", j, 2, "İç güncelleme: j++ → j = " + j + ".");
+            }
+            T.cur(null); T.drop("j");
+            T.print(7, "\n", "println(): satır sonu. Dış döngünün bu turu bitti.");
+            i++; T.set("i", i, 1, "Dış güncelleme: i++ → i = " + i + ".");
+          }
+          T.cur(null); T.drop("i");
+          T.step(8, "Program bitti. İç döngü toplam çalışma: her dış tur için j sıfırdan yeniden başladı.");
+        }
+      },
+      {
+        id: "piramit", ad: "Yıldız piramidi (iç içe)", grid: true,
+        params: [{ k: "n", ad: "n (satır)", min: 1, max: 6, v: 4 }],
+        code: function (p) { return ["int n = " + p.n + ";", "for (int satir = 1; satir <= n; satir++) {", "    for (int bosluk = 0; bosluk < n - satir; bosluk++)", "        System.out.print(\" \");", "    for (int yildiz = 0; yildiz < 2 * satir - 1; yildiz++)", "        System.out.print(\"*\");", "    System.out.println();", "}"]; },
+        run: function (p, T) {
+          var n = p.n, rl = [], cl = [], s, b, y, col;
+          for (s = 1; s <= n; s++) rl.push("satir=" + s);
+          for (s = 1; s <= 2 * n - 1; s++) cl.push(String(s));
+          T.grid(rl, cl);
+          T.set("n", n, 0, "n = " + n + ": piramit " + n + " satır, en geniş satır 2n − 1 = " + (2 * n - 1) + " karakter.");
+          s = 1; T.set("satir", 1, 1, "Dış döngü: satir = 1.");
+          for (;;) {
+            var c = s <= n;
+            T.cond(1, "satir <= n", s + " <= " + n, c, "Dış koşul: satir <= n → " + s + " <= " + n + " → " + c + (c ? "." : ": program biter."));
+            if (!c) break;
+            col = 0;
+            b = 0; T.set("bosluk", 0, 2, "Boşluk döngüsü: bosluk = 0; bu satırda n − satir = " + (n - s) + " boşluk yazılacak.");
+            for (;;) {
+              var cb = b < n - s;
+              T.cur(cb ? s - 1 : null, col);
+              T.cond(2, "bosluk < n - satir", b + " < " + (n - s), cb);
+              if (!cb) break;
+              T.cell(s - 1, col++, "sp", "␣");
+              T.print(3, " ", "print(\" \"): bir boşluk.");
+              b++; T.set("bosluk", b, 2, "bosluk++ → " + b + ".");
+            }
+            T.drop("bosluk");
+            y = 0; T.set("yildiz", 0, 4, "Yıldız döngüsü: yildiz = 0; bu satırda 2 * satir − 1 = " + (2 * s - 1) + " yıldız.");
+            for (;;) {
+              var cy = y < 2 * s - 1;
+              T.cur(cy ? s - 1 : null, col);
+              T.cond(4, "yildiz < 2 * satir - 1", y + " < " + (2 * s - 1), cy);
+              if (!cy) break;
+              T.cell(s - 1, col++, "out", "*");
+              T.print(5, "*", "print(\"*\").");
+              y++; T.set("yildiz", y, 4, "yildiz++ → " + y + ".");
+            }
+            T.drop("yildiz"); T.cur(null);
+            T.print(6, "\n", "println(): satır " + s + " tamamlandı.");
+            s++; T.set("satir", s, 1, "satir++ → " + s + ".");
+          }
+          T.drop("satir");
+          T.step(7, "Program bitti.");
+        }
+      }
+    ];
+
+    function trace(prog, p) {
+      var T = Tracer();
+      prog.run(p, T);
+      return { events: T.events, rows: T.rowsAll, out: T.out, code: prog.code(p) };
+    }
+    return { PROGS: PROGS, trace: trace };
+  })();
+  /*CORE-END*/
+
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector(".cx-lt");
+  var P = null, R = null, k = 0, timer = null, answered = {}, ok = 0, all = 0;
+
+  Core.PROGS.forEach(function (pr, i) {
+    var o = document.createElement("option"); o.value = i; o.textContent = pr.ad; E("ltProg").appendChild(o);
+  });
+
+  function buildParams() {
+    P = Core.PROGS[E("ltProg").value];
+    E("ltParams").innerHTML = P.params.map(function (q) {
+      return '<label for="ltp_' + q.k + '">' + q.ad + '</label><input type="number" id="ltp_' + q.k + '" min="' + q.min + '" max="' + q.max + '" step="1" value="' + q.v + '">';
+    }).join("");
+    P.params.forEach(function (q) { E("ltp_" + q.k).addEventListener("change", compute); });
+    compute();
+  }
+  function params() {
+    var p = {};
+    P.params.forEach(function (q) {
+      var el = E("ltp_" + q.k), v = parseInt(el.value, 10);
+      if (isNaN(v)) v = q.v;
+      v = Math.max(q.min, Math.min(q.max, v));
+      el.value = v; p[q.k] = v;
+    });
+    return p;
+  }
+  function compute() {
+    stop();
+    R = Core.trace(P, params());
+    k = 0; answered = {};
+    E("ltCode").innerHTML = R.code.map(function (l) { return "<li>" + l.replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</li>"; }).join("");
+    E("ltLegend").hidden = !P.grid;
+    E("ltTabCap").textContent = P.grid ? (P.id === "piramit" ? "Izgara: satır × karakter konumu" : "Izgara: i × j (her hücre bir iç tur)") : "İzleme tablosu (her koşul denetimi bir satır)";
+    draw();
+  }
+
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  function needQ() { var e = R.events[k]; return E("ltQuiz").checked && e.cond && !answered[k]; }
+
+  function draw() {
+    var e = R.events[k];
+    [].forEach.call(E("ltCode").children, function (li, i) { li.classList.toggle("is-cur", i === e.line); });
+    E("ltVars").innerHTML = e.vars.length ? e.vars.map(function (v) {
+      return '<div class="' + (v[0] === e.chg ? "is-chg" : "") + '"><span>' + v[0] + "</span><b>" + v[1] + "</b></div>";
+    }).join("") : '<span class="none">(kapsamda değişken yok)</span>';
+    var q = needQ();
+    if (e.cond) {
+      E("ltCond").innerHTML = esc(e.cond.expr) + "<br>→ " + esc(e.cond.sub) + " → " + (q ? '<span class="q">?</span><div class="qbtns"><button type="button" data-a="1">true</button><button type="button" data-a="0">false</button></div>' : '<span class="' + (e.cond.val ? "t" : "f") + '">' + e.cond.val + "</span>");
+    } else E("ltCond").innerHTML = '<span class="agt-oyun__muted" style="font-family:inherit;font-size:12.5px">Bu adımda koşul denetlenmiyor.</span>';
+    E("ltWhy").innerHTML = q ? "<b>Tahmin edin:</b> " + esc(e.cond.sub) + " koşulu true mu, false mu?" : esc(e.why);
+    var out = q ? R.events[k - 1 >= 0 ? k - 1 : 0].out : e.out;
+    E("ltOut").textContent = out;
+    E("ltOut").scrollTop = E("ltOut").scrollHeight;
+    if (e.grid) drawGrid(e); else drawRows(q ? Math.max(0, e.rows - 1) : e.rows);
+    E("ltNo").textContent = "Adım " + (k + 1) + " / " + R.events.length;
+    buttons(q);
+    if (q) { var b = E("ltCond").querySelector("button"); if (b && root.contains(document.activeElement)) b.focus(); }
+  }
+  function drawRows(n) {
+    var h = '<table class="trace"><thead><tr>' + P.cols.map(function (c) { return "<th>" + esc(c) + "</th>"; }).join("") + "</tr></thead><tbody>";
+    for (var i = 0; i < n; i++) {
+      h += '<tr class="' + (i === n - 1 ? "is-last" : "") + '">' + R.rows[i].map(function (v) {
+        return typeof v === "boolean" ? '<td class="' + (v ? "t" : "f") + '">' + v + "</td>" : "<td>" + esc(v) + "</td>";
+      }).join("") + "</tr>";
+    }
+    E("ltTab").innerHTML = h + "</tbody></table>";
+    var last = E("ltTab").querySelector("tr.is-last");
+    if (last) E("ltTab").scrollTop = last.offsetTop - E("ltTab").clientHeight + 40;
+  }
+  function drawGrid(e) {
+    var g = e.grid, h = '<table class="ij"><tr><th></th>' + g.cl.map(function (c) { return "<th>" + c + "</th>"; }).join("") + "</tr>";
+    g.c.forEach(function (row, r) {
+      h += "<tr><th>" + g.rl[r] + "</th>" + row.map(function (x, c) {
+        var cur = e.cur && e.cur[0] === r && e.cur[1] === c;
+        return '<td class="' + x[0] + (cur ? " is-cur" : "") + '">' + esc(x[1]) + "</td>";
+      }).join("") + "</tr>";
+    });
+    E("ltTab").innerHTML = h + "</table>";
+  }
+
+  function buttons(q) {
+    E("ltBack").disabled = k === 0;
+    E("ltReset").disabled = k === 0;
+    E("ltStep").disabled = q || k >= R.events.length - 1;
+    E("ltPlay").disabled = E("ltStep").disabled && !timer;
+    E("ltPlay").textContent = timer ? "Duraklat" : "Oynat";
+  }
+  function go(d) { k = Math.max(0, Math.min(R.events.length - 1, k + d)); draw(); }
+  function stop() { clearInterval(timer); timer = null; }
+  function delay() { return [1500, 1000, 650, 380, 160][E("ltSpeed").value - 1]; }
+  function play() {
+    if (timer) { stop(); buttons(needQ()); return; }
+    if (k >= R.events.length - 1) k = 0;
+    timer = setInterval(function () {
+      if (needQ()) { stop(); buttons(true); return; }
+      if (k >= R.events.length - 1) { stop(); buttons(false); return; }
+      go(1);
+      if (needQ()) stop(), buttons(true);
+    }, delay());
+    draw();
+  }
+
+  E("ltCond").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-a]");
+    if (!b) return;
+    var e = R.events[k], guess = b.getAttribute("data-a") === "1";
+    answered[k] = true; all++;
+    if (guess === e.cond.val) ok++;
+    E("ltOk").textContent = ok; E("ltAll").textContent = all;
+    draw();
+    E("ltWhy").innerHTML = (guess === e.cond.val ? '<b class="agt-oyun__good">Doğru!</b> ' : '<b class="agt-oyun__bad">Yanlış.</b> ') + esc(e.why);
+    E("ltStep").focus();
+  });
+  E("ltProg").addEventListener("change", buildParams);
+  E("ltStep").addEventListener("click", function () { stop(); go(1); });
+  E("ltBack").addEventListener("click", function () { stop(); go(-1); });
+  E("ltReset").addEventListener("click", function () { stop(); k = 0; answered = {}; draw(); });
+  E("ltPlay").addEventListener("click", play);
+  E("ltSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("ltQuiz").addEventListener("change", function () { draw(); });
+  root.addEventListener("keydown", function (ev) {
+    if (/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName)) return;
+    if (ev.key === "ArrowRight" && !needQ()) { stop(); go(1); ev.preventDefault(); }
+    else if (ev.key === "ArrowLeft") { stop(); go(-1); ev.preventDefault(); }
+  });
+
+  buildParams();
+})();
+</script>
+<script src="deck/oyun.js"></script>
