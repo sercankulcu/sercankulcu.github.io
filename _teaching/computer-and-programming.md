@@ -13,43 +13,7 @@ Modern computing encompasses a vast ecosystem of interconnected technologies and
 
 ---
 
-## Announcements
-
-There are currently no announcements.
-
----
-
-## Course resources
-
-- Terim Sözlüğü / Glossary [(HTML)](../files/computer/sozluk.html)
-- Çukurova Üniversitesi - Enformatik Bölümü [(website)](https://enformatik.cu.edu.tr/cu/Dersler/compulsory-courses/temel-bilgi-teknolojileri-kullanimi/)
-- Cody — introductory coding exercises [(website)](https://f.eba.gov.tr/cody/)
-- Blockly — visual exercises for algorithms [(website)](https://blockly.games/)
-- Eclipse IDE for Java Development [(website)](https://www.eclipse.org/downloads/packages/installer)
-
----
-
-## Past Exams  
-
-- **2025-2026**  
-  [vize](../files/computer/2025-2026-computer-vize-cevaplar.pdf) | 
-  [final](../files/computer/2025-2026-computer-final-cevaplar.pdf) | 
-  [but](../files/computer/2025-2026-computer-butunleme-cevaplar.pdf)
-
-- **2024-2025**  
-  [vize-a](../files/computer/2024-2025-computer-vize-a-cevaplar.pdf) | 
-  [vize-b](../files/computer/2024-2025-computer-vize-b-cevaplar.pdf) | 
-  [final-a](../files/computer/2024-2025-computer-final-a-cevaplar.pdf) | 
-  [final-b](../files/computer/2024-2025-computer-final-b-cevaplar.pdf) | 
-  [but-a](../files/computer/2024-2025-computer-butunleme-a-cevaplar.pdf) | 
-  [but-b](../files/computer/2024-2025-computer-butunleme-b-cevaplar.pdf) | 
-  [but-c](../files/computer/2024-2025-computer-butunleme-c-cevaplar.pdf) | 
-  [but-d](../files/computer/2024-2025-computer-butunleme-d-cevaplar.pdf)
-
-- **2023-2024**  
-  [vize](../files/computer/2023-2024-computer-vize-cevaplar.pdf) | 
-  [telafi](../files/computer/2023-2024-computer-telafi-cevaplar.pdf) | 
-  [final](../files/computer/2023-2024-computer-final-cevaplar.pdf) | 
+* [Terim Sözlüğü / Glossary (HTML)](../files/computer/sozluk.html)
 
 ---
 
