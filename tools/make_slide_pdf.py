@@ -11,7 +11,8 @@ hali toplanir, sonra hepsi tek belgede tek seferde basilir. Boylece yazi
 tipleri dosyaya bir kez gomulur.
 
 Sayfalar yerel dosyalardan basilir (henuz yayimlanmamis degisiklikler de
-girer); site temasi (yazi tipi, --global-* renkleri) canli siteden eklenir.
+girer); her sayfa, canli sitedeki sayfa duzeninin (tema, sarmalayicilar, MathJax)
+icine yerlestirilir. Boylece deck.js'in otomatik sigdirmasi yayimdaki olculeri gorur.
 Chrome ya da Edge ve Python paketi playwright gerekir.
 """
 import argparse, functools, gzip, http.server, os, re, subprocess, sys, threading
@@ -19,7 +20,9 @@ import argparse, functools, gzip, http.server, os, re, subprocess, sys, threadin
 sys.stdout.reconfigure(encoding='utf-8', errors='replace', line_buffering=True)
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
-THEME_CSS = 'https://sercankulcu.github.io/assets/css/main.css'
+SITE = 'https://sercankulcu.github.io'
+# sayfa duzeni (tema, .page__content sarmalayicisi, MathJax) bu yayimlanmis sunumdan alinir
+SHELL_URL = SITE + '/files/computer/slides/Bolum_01_Bilgisayarlar.html'
 
 PRINT_CSS = """
 @page { size: 800px 600px; margin: 0; }
@@ -27,6 +30,8 @@ PRINT_CSS = """
 html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
 .pdf-page { width: 800px; height: 600px; overflow: hidden; break-after: page; position: relative; }
 .pdf-page:last-child { break-after: auto; }
+#main, #main .page, #main .page__inner-wrap, #main .page__content { margin: 0 !important; padding: 0 !important;
+  width: 800px !important; max-width: none !important; float: none !important; }
 .pdf-page .ds-deck { width: 800px !important; margin: 0 !important; }
 .pdf-page .ds-deck__screen { position: relative !important; width: 800px !important; height: 600px !important; }
 .pdf-page .ds-deck__stage { position: absolute !important; top: 0; left: 0; transform: none !important;
@@ -62,12 +67,19 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     TYPES = {'html': 'text/html; charset=utf-8', 'css': 'text/css', 'js': 'application/javascript',
              'svg': 'image/svg+xml', 'png': 'image/png', 'jpg': 'image/jpeg', 'webp': 'image/webp'}
 
+    SHELL = None  # (once, sonra): verilirse her .html bu iki parcanin arasina konur
+
     def do_GET(self):
         path = self.translate_path(self.path.split('?')[0].split('#')[0])
         if not os.path.isfile(path):
             return super().do_GET()
         with open(path, 'rb') as f:
-            data = gzip.compress(f.read())
+            data = f.read()
+        if self.SHELL and path.lower().endswith('.html'):
+            # Jekyll'in yaptigi gibi: on bilgi atilir, icerik sayfa duzeninin icine girer
+            data = re.sub(rb'\A---\r?\n.*?\r?\n---\r?\n', b'', data, count=1, flags=re.S)
+            data = self.SHELL[0] + data + self.SHELL[1]
+        data = gzip.compress(data)
         self.send_response(200)
         self.send_header('Content-Type', self.TYPES.get(path.rsplit('.', 1)[-1].lower(), 'application/octet-stream'))
         self.send_header('Content-Encoding', 'gzip')
@@ -77,6 +89,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def log_message(self, *a):
         pass
+
+
+def fetch_shell(url=SHELL_URL):
+    """Yayimdaki sayfanin icerik oncesi ve sonrasi; site koku goreli adresler mutlak yapilir."""
+    import urllib.request
+    html = urllib.request.urlopen(url, timeout=30).read()
+    html = re.sub(rb'''((?:href|src)=["'])/(?!/)''', lambda m: m.group(1) + SITE.encode() + b'/', html)
+    a = re.search(rb'<section class="page__content"[^>]*>', html)
+    b = html.rfind(b'</section><footer class="page__meta">')
+    if not a or b < a.end():
+        sys.exit('Sayfa duzeni okunamadi: ' + url)
+    return html[:a.end()], html[b:]
 
 
 def decks(slides):
@@ -116,13 +140,9 @@ def launch(p):
     sys.exit('Chrome ya da Edge bulunamadi (ya da "playwright install chromium" calistirin).')
 
 
-def render(page, url, theme):
+def render(page, url):
     page.goto(url, wait_until='networkidle')
     page.wait_for_selector('#ds-deck-next', state='attached')
-    if theme:
-        # yerel dosyada site temasi yok: ana stil dosyasini basa ekle (deck.css sonra gelsin)
-        page.evaluate("""(u) => new Promise(r => { const l = document.createElement('link');
-            l.rel = 'stylesheet'; l.href = u; l.onload = l.onerror = r; document.head.prepend(l); })""", theme)
     page.add_style_tag(content='*,*::before,*::after{animation:none!important;transition:none!important}')
     expected = page.evaluate(EXPECTED)
     snaps = []
@@ -136,7 +156,9 @@ def render(page, url, theme):
     page.evaluate("""(html) => {
         document.querySelectorAll('body link[rel="stylesheet"], body style').forEach(s => document.head.appendChild(s));
         document.querySelectorAll('body script').forEach(s => s.remove());
-        document.body.innerHTML = html; }""", ''.join(snaps))
+        /* temanin .page__content gibi ust sarmalayicilarla yazdigi kurallar PDF'te de gecerli kalsin */
+        document.body.innerHTML = '<div id="main"><article class="page page--without-sidebar"><div class="page__inner-wrap">' +
+          '<section class="page__content">' + html + '</section></div></article></div>'; }""", ''.join(snaps))
     page.add_style_tag(content=PRINT_CSS)
     page.emulate_media(media='screen')
     page.wait_for_timeout(500)
@@ -149,7 +171,7 @@ def main():
     ap.add_argument('names', nargs='*', help='sunum dosya adlari (.html olmadan); verilmezse tumu')
     ap.add_argument('--stale', action='store_true', help='yalnizca PDF\'i olmayan ya da sunumundan eski olanlar')
     ap.add_argument('--out', help='cikti klasoru (varsayilan files/<ders>/pdf)')
-    ap.add_argument('--no-theme', action='store_true', help='canli site temasini ekleme (cevrimdisi)')
+    ap.add_argument('--no-theme', action='store_true', help='canli site duzenini kullanma (cevrimdisi)')
     a = ap.parse_args()
 
     slides = os.path.join(REPO, 'files', a.course, 'slides')
@@ -171,13 +193,13 @@ def main():
     srv = http.server.ThreadingHTTPServer(('127.0.0.1', 0), functools.partial(Handler, directory=slides))
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     base = 'http://127.0.0.1:%d' % srv.server_address[1]
-    theme = None if a.no_theme else THEME_CSS
+    Handler.SHELL = None if a.no_theme else fetch_shell()
     bad = 0
     with sync_playwright() as p:
         browser = launch(p)
         for n in names:
-            page = browser.new_page(viewport={'width': 800, 'height': 600})
-            snaps, expected = render(page, '%s/%s.html#1' % (base, n), theme)
+            page = browser.new_page(viewport={'width': 1280, 'height': 900})
+            snaps, expected = render(page, '%s/%s.html#1' % (base, n))
             out = os.path.join(pdfdir, n + '.pdf')
             page.pdf(path=out, width='800px', height='600px', print_background=True,
                      margin={'top': '0', 'right': '0', 'bottom': '0', 'left': '0'}, prefer_css_page_size=True)

@@ -92,9 +92,11 @@ basar. Her durumu ayrı ayrı basıp birleştirmek yazı tiplerini her sayfaya
 yeniden gömer ve dosyayı ~4 kat büyütür — denendi.
 
 Sayfalar yerel dosyalardan basılır, yani commitlenmemiş değişiklikler de
-girer. Yerel dosyada sitenin teması (yazı tipi, `--global-*` renkleri) olmadığı
-için `assets/css/main.css` canlı siteden eklenir; çevrimdışıysanız
-`--no-theme` verin (yazı tipi farklı çıkar). Yerel sunucu dosyaları gzip'le
+girer. Yerel dosyada sitenin sayfa düzeni yoktur. Bu yüzden canlı siteden bir
+sunumun düzeni alınır (tema, `.page__content` sarmalayıcısı, MathJax) ve yerel
+içerik, Jekyll'deki gibi ön bilgisi atılarak bunun içine konur. Böylece
+`deck.js`'in otomatik sığdırması da yayımdaki ölçüleri görür. Çevrimdışıysanız
+`--no-theme` verin; o zaman yazılar küçük çıkar ve sığdırma farklı olur. Yerel sunucu dosyaları gzip'le
 gönderir: büyük sunumlar sıkıştırmasız gönderilince Chrome bağlantıyı
 koparabiliyor.
 
