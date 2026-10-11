@@ -1,5 +1,5 @@
 /* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
-/* Algoritmik Oyun Kuramı oyunları: 800×600 sahneyi ölçekler, ? düğmesiyle açıklama penceresini açar. */
+/* Bilgisayar ve Programlamaya Giriş simülatörleri: 800×600 sahneyi ölçekler, ? düğmesiyle açıklama penceresini açar. */
 (function () {
   var stages = Array.prototype.slice.call(document.querySelectorAll(".agt-oyun--stage"));
   var W = 800, H = 600;

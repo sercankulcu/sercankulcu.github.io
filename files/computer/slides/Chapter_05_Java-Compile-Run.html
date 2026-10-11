@@ -1,0 +1,922 @@
+---
+layout: without-sidebar
+title: "Java Derleme ve Çalıştırma"
+permalink: /files/computer/slides/Chapter_05_Java-Compile-Run.html
+excerpt: "Kaynak kod → javac → .class (bytecode) → JVM → çıktı hattını adım adım izler: gerçek javac iletileriyle derleme hataları, çalışma zamanı ve mantık hataları, print/println ve kaçış dizileri; kod düzenlenebilir."
+---
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.cx-jc, .cx-jc-dlg { --ds-accent:#b45309; --ds-link:#0369a1; }
+html[data-theme="dark"] .agt-oyun, html[data-theme="dark"] .cx-jc-dlg { --ds-accent:#f59e57; --ds-link:#7cc4e8; }
+.cx-jc [hidden] { display:none !important; }
+.cx-jc .jc-grid { display:grid; grid-template-columns:178px minmax(0,1fr); gap:10px; height:100%; }
+.cx-jc .card { min-width:0; min-height:0; padding:8px 10px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.cx-jc .side { display:flex; flex-direction:column; gap:6px; }
+.cx-jc .cap { display:block; margin:0 0 2px; color:var(--ds-muted); font-size:11.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.cx-jc select { width:100%; min-height:30px; font-size:13px; }
+.cx-jc .file { width:100%; min-height:28px !important; padding:0 6px !important; font:13px ui-monospace, Consolas, monospace !important; }
+.cx-jc .amac { margin:0; color:var(--ds-muted); font-size:12px; line-height:1.3; }
+.cx-jc .linkbtn { min-height:24px; padding:0 8px; font-size:12px; }
+.cx-jc .btns { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.cx-jc .btns button { min-height:31px; padding:0 6px; font-size:13.5px; }
+.cx-jc .speed { display:flex; align-items:center; gap:6px; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.cx-jc .speed input { flex:1; min-width:0; }
+.cx-jc .check { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; cursor:pointer; }
+.cx-jc .score { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.cx-jc .score div { padding:3px; border-radius:10px; background:var(--ds-surface-strong); text-align:center; color:var(--ds-muted); font-size:11.5px; font-weight:700; }
+.cx-jc .score b { display:block; color:var(--ds-text); font-size:17px; }
+.cx-jc .stepno { margin-top:auto; color:var(--ds-muted); font-size:12px; font-weight:700; text-align:center; }
+.cx-jc .main { display:grid; grid-template-rows:54px 206px minmax(0,1fr) auto; gap:6px; min-height:0; min-width:0; }
+.cx-jc .pipe { width:100%; height:54px; }
+.cx-jc .pipe rect { fill:var(--ds-bg); stroke:var(--ds-border); stroke-width:1.5; }
+.cx-jc .pipe text { fill:var(--ds-text); font-size:12px; font-weight:700; text-anchor:middle; }
+.cx-jc .pipe text.sub { fill:var(--ds-muted); font:11px ui-monospace, Consolas, monospace; }
+.cx-jc .pipe path { fill:none; stroke:var(--ds-muted); stroke-width:1.5; }
+.cx-jc .pipe .ar { fill:var(--ds-muted); stroke:none; }
+.cx-jc .pipe .s-cur rect { fill:var(--ds-hot); stroke:var(--ds-accent); stroke-width:2.5; }
+.cx-jc .pipe .s-ok rect { fill:color-mix(in srgb, var(--ds-good) 14%, var(--ds-bg)); stroke:var(--ds-good); }
+.cx-jc .pipe .s-bad rect { fill:color-mix(in srgb, var(--ds-bad) 16%, var(--ds-bg)); stroke:var(--ds-bad); stroke-width:2.5; }
+.cx-jc .pipe .s-bad text { fill:var(--ds-bad); }
+.cx-jc .pipe .s-skip { opacity:.4; }
+.cx-jc .pipe .s-skip rect { stroke-dasharray:4 3; }
+.cx-jc .mid { display:grid; grid-template-columns:minmax(0,1fr) 224px; gap:6px; min-height:0; }
+.cx-jc .pane { display:flex; flex-direction:column; min-height:0; min-width:0; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); overflow:hidden; }
+.cx-jc .pane > .cap { margin:0; padding:3px 8px 1px; display:flex; justify-content:space-between; gap:6px; }
+.cx-jc .pane > .cap span { text-transform:none; letter-spacing:0; font-weight:700; }
+.cx-jc .ed, .cx-jc .code { flex:1; min-height:0; overflow:auto; font:12px/18px ui-monospace, Consolas, monospace; }
+.cx-jc .ed { display:grid; grid-template-columns:26px max-content; align-content:start; }
+.cx-jc .ed .gut { margin:0; padding:0 4px 0 0; color:var(--ds-muted); font:11px/18px ui-monospace, Consolas, monospace; text-align:right; white-space:pre; user-select:none; }
+.cx-jc .ed .fix { margin:0; padding:0 0 0 4px; color:var(--ds-muted); font:inherit; white-space:pre; }
+.cx-jc .ed textarea { display:block; min-width:100%; margin:0; padding:0 0 0 4px; border:0; border-radius:0; outline:1.5px dashed var(--ds-link); outline-offset:-1px; background:var(--ds-bg); color:var(--ds-text); font:inherit; line-height:18px; white-space:pre; overflow:hidden; resize:none; min-height:18px; }
+.cx-jc .ed textarea:focus-visible { outline:2px solid var(--ds-link); }
+.cx-jc .code { margin:0; padding:0; list-style:none; counter-reset:ln; }
+.cx-jc .code li { padding:0 8px 0 0; white-space:pre; counter-increment:ln; }
+.cx-jc .code li::before { content:counter(ln); display:inline-block; width:22px; margin-right:8px; color:var(--ds-muted); font-size:11px; text-align:right; }
+.cx-jc .code li.is-cur { background:var(--ds-hot); box-shadow:inset 4px 0 0 var(--ds-accent); }
+.cx-jc .code li.is-err { background:color-mix(in srgb, var(--ds-bad) 16%, var(--ds-bg)); box-shadow:inset 4px 0 0 var(--ds-bad); }
+.cx-jc .bc { flex:1; min-height:0; overflow:auto; padding:0 6px 4px; font:11.5px/16px ui-monospace, Consolas, monospace; }
+.cx-jc .bc .magic { color:var(--ds-muted); }
+.cx-jc .bc div { white-space:pre; }
+.cx-jc .bc .off { display:inline-block; width:24px; color:var(--ds-muted); text-align:right; margin-right:6px; }
+.cx-jc .bc .op { color:var(--ds-link); font-weight:700; }
+.cx-jc .bc div.is-cur { background:var(--ds-hot); }
+.cx-jc .bc .none { color:var(--ds-muted); font-family:system-ui, sans-serif; font-size:12px; white-space:normal; }
+.cx-jc .locals { padding:3px 8px; border-top:1.5px solid var(--ds-border); font:12px ui-monospace, Consolas, monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cx-jc .term { flex:1; min-height:0; margin:0; padding:5px 8px; overflow:auto; background:#1f2430; color:#e6edf3; font:12.5px/1.35 ui-monospace, Consolas, monospace; white-space:pre; tab-size:8; }
+.cx-jc .term .cmd { color:#9fd3ff; }
+.cx-jc .term .err { color:#ff9b8e; }
+.cx-jc .term .mut { color:#9aa5b1; font-style:italic; }
+.cx-jc .term .iv { display:inline-block; width:0; overflow:visible; color:#f5c26b; }
+.cx-jc .termcap label { display:flex; align-items:center; gap:4px; text-transform:none; letter-spacing:0; font-weight:700; cursor:pointer; }
+.cx-jc .why { margin:0; min-height:44px; padding:5px 10px; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:13px; line-height:1.35; }
+.cx-jc .why code { font-size:12.5px; }
+.cx-jc .qbtns { display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; }
+.cx-jc .qbtns button { min-height:27px; padding:0 10px; font-size:12.5px; }
+.cx-jc .qbtns button.mono { font-family:ui-monospace, Consolas, monospace; font-weight:600; white-space:pre; }
+</style>
+
+<div class="cx-jc agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 5 · Simülasyon</p><h1>Java Derleme ve Çalıştırma</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="jc-help" aria-label="Açıklama ve kullanım">?</button>
+    <a class="agt-oyun__back" href="Bolum_05_Java_ve_Ilk_Program.html">← Bölüm 5</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="jc-grid">
+      <aside class="card side">
+        <div>
+          <label class="cap" for="jcProg">Program</label>
+          <select id="jcProg"></select>
+        </div>
+        <p class="amac" id="jcAmac"></p>
+        <button type="button" class="linkbtn" id="jcOrig" aria-label="Programın özgün koduna dön">↺ Özgün kod</button>
+        <div>
+          <label class="cap" for="jcFile">Dosya adı</label>
+          <input type="text" class="file" id="jcFile" spellcheck="false" autocomplete="off">
+        </div>
+        <div class="btns">
+          <button type="button" id="jcBack" aria-label="Bir adım geri">◀ Geri</button>
+          <button type="button" id="jcStep" class="is-primary" aria-label="Bir adım ileri">Adım ▶</button>
+          <button type="button" id="jcPlay" aria-label="Oynat veya duraklat">Oynat</button>
+          <button type="button" id="jcEdit" aria-label="Düzenleme kipine dön">Düzenle</button>
+        </div>
+        <label class="speed">Hız <input type="range" id="jcSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı"></label>
+        <label class="check"><input type="checkbox" id="jcQuiz"> Kendini dene</label>
+        <p class="agt-oyun__muted" style="margin:0;font-size:11.5px;line-height:1.3">Açıkken derlemeden önce hata türünü, her print/println adımında da çıktıyı tahmin edersiniz.</p>
+        <div class="score" aria-live="polite">
+          <div>Doğru<b id="jcOk">0</b></div>
+          <div>Soru<b id="jcAll">0</b></div>
+        </div>
+        <div class="stepno" id="jcNo"></div>
+      </aside>
+
+      <section class="main">
+        <svg class="pipe" id="jcPipe" viewBox="0 0 580 54" role="img" aria-label="Derleme hattı: yaz, derle, bytecode, çalıştır, çıktı"></svg>
+        <div class="mid">
+          <div class="pane">
+            <span class="cap"><span id="jcSrcCap">Kaynak kod</span><span id="jcMod"></span></span>
+            <div class="ed" id="jcEd">
+              <pre class="gut" id="jcGut" aria-hidden="true"></pre>
+              <div>
+                <pre class="fix" id="jcTop"></pre>
+                <textarea id="jcTa" spellcheck="false" autocomplete="off" wrap="off" aria-label="main metodunun gövdesi (düzenlenebilir)"></textarea>
+                <pre class="fix">    }
+}</pre>
+              </div>
+            </div>
+            <ol class="code" id="jcCode" aria-label="Java kodu" hidden></ol>
+          </div>
+          <div class="pane">
+            <span class="cap"><span id="jcBcCap">.class · bytecode</span></span>
+            <div class="bc" id="jcBc"></div>
+            <div class="locals" id="jcLoc"></div>
+          </div>
+        </div>
+        <div class="pane">
+          <span class="cap termcap">Terminal<label><input type="checkbox" id="jcInv"> ⇥ ↵ göster</label></span>
+          <pre class="term" id="jcTerm" aria-label="Terminal" aria-live="polite"></pre>
+        </div>
+        <div class="why" id="jcWhy" aria-live="polite"></div>
+      </section>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog cx-jc-dlg" id="jc-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Java Derleme ve Çalıştırma</h2>
+    <p><b>Amaç:</b> Bir Java programının yolculuğunu adım adım görmek: kaynak kod (<code>.java</code>) → <code>javac</code> derleyicisi → bytecode (<code>.class</code>) → <code>java</code> komutuyla JVM → konsol çıktısı. Hata türlerini (derleme, çalışma zamanı, mantık) ayırt etmeyi öğrenmek.</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li>Soldan hazır bir program seçin. <code>main</code> metodunun gövdesi (kesik çizgili alan) ve dosya adı düzenlenebilir; <b>↺ Özgün kod</b> değişiklikleri geri alır.</li>
+      <li><b>Adım ▶</b> hattı başlatır: dosya kaydedilir, <code>javac</code> çalışır. Hata varsa terminalde gerçek <code>javac</code> biçiminde ileti (dosya:satır, açıklama, <code>^</code> işareti) görünür ve <code>.class</code> üretilmez. Hata yoksa bytecode listesi gelir; <code>java</code> komutuyla JVM her deyimi çalıştırır, ilgili bytecode komutları vurgulanır, çıktı terminale yazılır.</li>
+      <li><b>⇥ ↵ göster</b> sekme ve satır sonu karakterlerini görünür yapar (<code>\t</code>, <code>\n</code>, <code>println</code> farkı).</li>
+      <li><b>Kendini dene</b>: derlemeden önce programın sonucunu (derleme hatası / çalışma zamanı hatası / mantık hatası / hatasız) ve her yazdırma deyiminin çıktısını tahmin edin.</li>
+    </ol>
+    <h3>Sınırlar</h3>
+    <p>Bu gerçek bir derleyici değildir; küçük bir alt kümeyi tanır: satır başına bir deyim; <code>System.out.println(…)</code>, <code>System.out.print(…)</code>, <code>int</code>/<code>String</code> değişken tanımı ve atama; <code>+ - * / %</code>, parantez, <code>\n \t \" \' \\</code> kaçış dizileri. Hata iletileri ve bytecode, JDK 21 <code>javac</code>/<code>javap</code>/<code>java</code> çıktılarıyla karşılaştırılarak doğrulanmıştır. Alt kümenin dışındaki bir satırda simülatör uyarı verir. Bytecode listesi sadeleştirilmiştir (sabit havuzu numaraları gösterilmez).</p>
+    <p>İlgili sunum: <a href="Bolum_05_Java_ve_Ilk_Program.html">Bölüm 5 · Java ve İlk Program</a> (Derleme Hattı Adım Adım, Bytecode ve JVM, Kaçış Dizileri, Hata Türleri, Sık Derleme Hataları).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /*CORE-BEGIN*/
+  var Core = (function () {
+    /* Sınırlı bir Java alt kümesi için "derleyici": main gövdesinde satır başına bir deyim.
+       Desteklenen: System.out.println(ifade); System.out.print(ifade); System.out.println();
+       int ad = ifade;  String ad = ifade;  ad = ifade;  // yorum
+       İfade: int ve dizgi sabitleri, değişkenler, + - * / %, tekli -, parantez.
+       Hata iletileri JDK 21 javac biçimindedir (testlerle doğrulandı). */
+    var KW = ("abstract assert boolean break byte case catch char class const continue default do double else enum extends final finally float for goto if implements import instanceof int interface long native new package private protected public return short static strictfp super switch synchronized this throw throws transient try void volatile while true false null var record yield sealed permits").split(" ");
+    var PS_REAL = ["print", "println", "printf", "format", "write", "append", "flush", "close", "checkError", "writeBytes", "equals", "hashCode", "toString", "getClass", "notify", "notifyAll", "wait", "charset"];
+    var SYS_REAL = ["out", "err", "in", "lineSeparator", "currentTimeMillis", "nanoTime", "exit", "gc", "getProperty", "getenv", "arraycopy", "identityHashCode", "console", "setOut", "setErr", "setIn", "load", "loadLibrary", "mapLibraryName", "getProperties", "setProperty", "clearProperty", "getLogger", "runFinalization", "getSecurityManager", "setSecurityManager", "inheritedChannel", "setProperties", "Logger"];
+    var ESC = { n: "\n", t: "\t", "\"": "\"", "'": "'", "\\": "\\" };
+
+    function Unsup(line, why) { this.line = line; this.why = why; }
+    function isIdStart(c) { return /[A-Za-z_$\u00C0-\uFFFF]/.test(c); }
+    function isIdPart(c) { return /[A-Za-z0-9_$\u00C0-\uFFFF]/.test(c); }
+
+    /* bir satırı belirteçlere ayırır; sözcük hatalarını errs'e ekler */
+    function lex(s, ln, errs) {
+      var toks = [], i = 0, n = s.length;
+      while (i < n) {
+        var c = s[i];
+        if (c === " ") { i++; continue; }
+        if (c === "/" && s[i + 1] === "/") break;
+        if (c === "/" && s[i + 1] === "*") throw new Unsup(ln, "/* */ açıklaması");
+        if (c === "\"") {
+          var j = i + 1, v = "", closed = false, bad = [];
+          while (j < n) {
+            var d = s[j];
+            if (d === "\"") { closed = true; break; }
+            if (d === "\\") {
+              var e = s[j + 1];
+              if (e === undefined) break;
+              if (ESC.hasOwnProperty(e)) v += ESC[e];
+              else if (/[bfrs0-7u]/.test(e)) throw new Unsup(ln, "\\" + e + " kaçış dizisi");
+              else bad.push(j + 1);
+              j += 2; continue;
+            }
+            v += d; j++;
+          }
+          bad.forEach(function (col) { errs.push({ line: ln, col: col, msg: "illegal escape character" }); });
+          if (!closed) { errs.push({ line: ln, col: i, msg: "unclosed string literal" }); toks.dead = true; return toks; }
+          toks.push({ t: "str", v: v, col: i, end: j + 1, raw: s.slice(i, j + 1), bad: bad.length > 0 });
+          i = j + 1; continue;
+        }
+        if (/[0-9]/.test(c)) {
+          var k = i; while (k < n && /[0-9]/.test(s[k])) k++;
+          if (k < n && (isIdPart(s[k]) || s[k] === ".")) throw new Unsup(ln, "int dışındaki sayı yazımı (" + s.slice(i, k + 1) + "…)");
+          var raw = s.slice(i, k);
+          if (raw.length > 1 && raw[0] === "0") throw new Unsup(ln, "0 ile başlayan (sekizlik) sayı");
+          toks.push({ t: "int", raw: raw, col: i, end: k }); i = k; continue;
+        }
+        if (isIdStart(c)) {
+          var m = i; while (m < n && isIdPart(s[m])) m++;
+          toks.push({ t: "id", v: s.slice(i, m), col: i, end: m }); i = m; continue;
+        }
+        if ("();+-*/%=.,".indexOf(c) >= 0) { toks.push({ t: "op", v: c, col: i, end: i + 1 }); i++; continue; }
+        throw new Unsup(ln, "'" + c + "' karakteri");
+      }
+      return toks;
+    }
+
+    function ParseErr(e) { this.e = e; }
+
+    /* tek satırlık deyimi çözümler */
+    function parseLine(toks, ln, lineLen) {
+      var p = 0;
+      function pk(o) { return toks[p + (o || 0)]; }
+      function isOp(t, v) { return t && t.t === "op" && t.v === v; }
+      function unsup(w) { throw new Unsup(ln, w || "bu satırın biçimi"); }
+      function perr(col, msg) { throw new ParseErr({ line: ln, col: col, msg: msg }); }
+      function lastEnd() { return toks[p - 1].end; }
+
+      function primary() {
+        var t = pk();
+        if (!t) unsup("satır ifadenin ortasında bitiyor");
+        if (isOp(t, ")") || isOp(t, ";")) perr(t.col, "illegal start of expression");
+        if (isOp(t, "-")) {
+          p++;
+          var nx = pk();
+          if (nx && nx.t === "int" && nx.raw === "2147483648") { p++; return { k: "lit", ty: "int", v: -2147483648, col: t.col, neglit: true }; }
+          var o = primary();
+          return { k: "neg", e: o, col: t.col };
+        }
+        if (isOp(t, "(")) {
+          p++;
+          var inner = expr();
+          if (!isOp(pk(), ")")) unsup("kapanmayan parantez");
+          p++;
+          return { k: "par", e: inner, col: t.col };
+        }
+        if (t.t === "int") {
+          p++;
+          if (t.raw.length > 10 || Number(t.raw) > 2147483647) perr(t.col, "integer number too large");
+          return { k: "lit", ty: "int", v: Number(t.raw), col: t.col };
+        }
+        if (t.t === "str") { p++; return { k: "lit", ty: "String", v: t.v, col: t.col, raw: t.raw }; }
+        if (t.t === "id") {
+          if (KW.indexOf(t.v) >= 0 || t.v === "System" || t.v === "args" || t.v === "String") unsup("'" + t.v + "' sözcüğünün ifade içinde kullanımı");
+          p++;
+          if (isOp(pk(), "(") || isOp(pk(), ".")) unsup("ifade içinde metot çağrısı / nokta");
+          return { k: "id", name: t.v, col: t.col };
+        }
+        unsup();
+      }
+      function term() {
+        var l = primary();
+        while (isOp(pk(), "*") || isOp(pk(), "/") || isOp(pk(), "%")) {
+          var o = toks[p++]; var r = primary();
+          l = { k: "bin", op: o.v, l: l, r: r, col: o.col };
+        }
+        return l;
+      }
+      function expr() {
+        var l = term();
+        while (isOp(pk(), "+") || isOp(pk(), "-")) {
+          var o = toks[p++]; var r = term();
+          l = { k: "bin", op: o.v, l: l, r: r, col: o.col };
+        }
+        return l;
+      }
+      function semi() {
+        var t = pk();
+        if (!t) perr(lastEnd(), "';' expected");
+        if (isOp(t, ";")) { p++; if (pk()) unsup("aynı satırda birden çok deyim"); return; }
+        if (isOp(t, ")") && isOp(pk(1), ";") && !pk(2)) perr(t.col, "';' expected");
+        unsup();
+      }
+
+      var t0 = pk();
+      if (t0.t === "id" && (t0.v === "System" || t0.v === "system") && isOp(pk(1), ".")) {
+        var recv = toks[p], dot1 = toks[p + 1], fld = pk(2);
+        if (!fld || fld.t !== "id" || !isOp(pk(3), ".")) unsup();
+        var dot2 = pk(3), meth = pk(4);
+        if (!meth || meth.t !== "id" || !isOp(pk(5), "(")) unsup();
+        p += 6;
+        var args = [];
+        if (isOp(pk(), ")")) p++;
+        else {
+          args.push(expr());
+          var c = pk();
+          if (isOp(c, ")")) p++;
+          else if (isOp(c, ";") && !pk(1)) perr(c.col, "')' or ',' expected");
+          else if (isOp(c, ",")) unsup("birden çok argüman");
+          else unsup();
+        }
+        semi();
+        if (recv.v === "System" && fld.v !== "out" && SYS_REAL.indexOf(fld.v) >= 0) unsup("System." + fld.v);
+        if (meth.v !== "print" && meth.v !== "println" && PS_REAL.indexOf(meth.v) >= 0) unsup(meth.v + " metodu");
+        if (meth.v === "print" && !args.length) unsup("argümansız print()");
+        return { k: "call", sys: recv.v, recvCol: recv.col, dot1: dot1.col, fld: fld.v, dot2: dot2.col, m: meth.v, args: args };
+      }
+      if (t0.t === "id" && pk(1) && pk(1).t === "id") {
+        var ty = t0.v, nm = pk(1);
+        if (KW.indexOf(ty) >= 0 && ty !== "int") unsup("'" + ty + "' tipi");
+        if (KW.indexOf(nm.v) >= 0 || nm.v === "args" || nm.v === "System" || nm.v === "String") unsup("'" + nm.v + "' değişken adı");
+        p += 2;
+        if (!isOp(pk(), "=")) unsup("ilk değer verilmeyen tanım");
+        p++;
+        var init = expr();
+        semi();
+        return { k: "decl", ty: ty, tyCol: t0.col, name: nm.v, col: nm.col, init: init };
+      }
+      if (t0.t === "id" && isOp(pk(1), "=")) {
+        if (KW.indexOf(t0.v) >= 0 || t0.v === "args" || t0.v === "System" || t0.v === "String") unsup();
+        p += 2;
+        var rhs = expr();
+        semi();
+        return { k: "asg", name: t0.v, col: t0.col, e: rhs };
+      }
+      unsup();
+    }
+
+    function strOf(ty) { return ty; }
+    function posOf(e) { return e.k === "par" ? posOf(e.e) : e.col; }
+
+    /* derleme: { lines, diags (javac biçiminde metin), ok, stmts, code (bytecode) } */
+    function compile(cls, file, body) {
+      var src = ["public class " + cls + " {", "    public static void main(String[] args) {"];
+      body.forEach(function (l) { src.push(l); });
+      src.push("    }", "}");
+      var errs = [], stmts = [], unsup = null;
+      try {
+        body.forEach(function (l, i) {
+          var ln = i + 3, lerrs = [];
+          var toks = lex(l, ln, lerrs);
+          lerrs.forEach(function (e) { errs.push(e); });
+          if (toks.dead) return;
+          if (!toks.length) return;
+          try {
+            var st = parseLine(toks, ln, l.length);
+            st.line = ln;
+            if (!lerrs.length) stmts.push(st);
+          } catch (x) {
+            if (x instanceof ParseErr) { if (!lerrs.length) errs.push(x.e); }
+            else throw x;
+          }
+        });
+      } catch (x) {
+        if (x instanceof Unsup) unsup = { line: x.line, why: x.why };
+        else throw x;
+      }
+      var res = { src: src, cls: cls, file: file, unsup: unsup, errs: errs, stmts: stmts, phase: "parse" };
+      if (unsup) return res;
+      if (errs.length) return fin(res);
+      res.phase = "attr";
+      if (file !== cls + ".java") errs.push({ line: 1, col: 7, msg: "class " + cls + " is public, should be declared in a file named " + cls + ".java" });
+      var vars = {}, slot = 1;
+      function err(line, col, msg, extra) { errs.push({ line: line, col: col, msg: msg, extra: extra || [] }); }
+      function attr(e, ln) {
+        if (e.k === "lit") return e.ty;
+        if (e.k === "par") return (e.ty = attr(e.e, ln));
+        if (e.k === "id") {
+          var v = vars[e.name];
+          if (!v) { err(ln, e.col, "cannot find symbol", ["  symbol:   variable " + e.name, "  location: class " + cls]); return (e.ty = null); }
+          e.v = v; return (e.ty = v.ty);
+        }
+        if (e.k === "neg") {
+          var t = attr(e.e, ln);
+          if (t === "String") { err(ln, e.col, "bad operand type String for unary operator '-'"); t = null; }
+          return (e.ty = t);
+        }
+        var a = attr(e.l, ln), b = attr(e.r, ln);
+        if (a === null || b === null) return (e.ty = null);
+        if (e.op === "+") return (e.ty = (a === "String" || b === "String") ? "String" : "int");
+        if (a === "int" && b === "int") return (e.ty = "int");
+        err(ln, e.col, "bad operand types for binary operator '" + e.op + "'", ["  first type:  " + a, "  second type: " + b]);
+        return (e.ty = null);
+      }
+      stmts.forEach(function (s) {
+        var ln = s.line;
+        if (s.k === "call") {
+          var at = s.args.map(function (a) { return attr(a, ln); });
+          var argOk = at.every(function (t) { return t !== null; });
+          if (s.sys === "system") { err(ln, s.dot1, "package system does not exist"); return; }
+          if (s.fld !== "out") { err(ln, s.dot1, "cannot find symbol", ["  symbol:   variable " + s.fld, "  location: class System"]); return; }
+          if (!argOk) return;
+          if (s.m !== "print" && s.m !== "println") err(ln, s.dot2, "cannot find symbol", ["  symbol:   method " + s.m + "(" + at.join(",") + ")", "  location: variable out of type PrintStream"]);
+          s.at = at[0] || null;
+        } else if (s.k === "decl") {
+          var dty = s.ty;
+          if (dty !== "int" && dty !== "String") { err(ln, s.tyCol, "cannot find symbol", ["  symbol:   class " + dty, "  location: class " + cls]); dty = null; }
+          var dup = vars.hasOwnProperty(s.name);
+          if (dup) err(ln, s.col, "variable " + s.name + " is already defined in method main(String[])");
+          var it = attr(s.init, ln);
+          if (dty && it && it !== dty) err(ln, posOf(s.init), "incompatible types: " + it + " cannot be converted to " + dty);
+          if (!dup) { vars[s.name] = { ty: dty, slot: slot++, name: s.name }; }
+          s.v = vars[s.name];
+        } else if (s.k === "asg") {
+          var v = vars[s.name];
+          if (!v) err(ln, s.col, "cannot find symbol", ["  symbol:   variable " + s.name, "  location: class " + cls]);
+          var rt = attr(s.e, ln);
+          if (v && v.ty && rt && rt !== v.ty) err(ln, posOf(s.e), "incompatible types: " + rt + " cannot be converted to " + v.ty);
+          s.v = v;
+        }
+      });
+      if (errs.length) return fin(res);
+      res.ok = true;
+      res.vars = vars;
+      res.code = gen(stmts);
+      return res;
+
+      function fin(r) {
+        var out = [];
+        r.errs.forEach(function (e) {
+          out.push(file + ":" + e.line + ": error: " + e.msg);
+          out.push(src[e.line - 1]);
+          out.push(new Array(e.col + 1).join(" ") + "^");
+          (e.extra || []).forEach(function (x) { out.push(x); });
+        });
+        out.push(r.errs.length + (r.errs.length === 1 ? " error" : " errors"));
+        r.diag = out.join("\n");
+        r.ok = false;
+        return r;
+      }
+    }
+
+    /* sabit katlama (javac gibi): sıfıra bölme katlanmaz */
+    function cval(e) {
+      if (e.k === "lit") return { v: e.v };
+      if (e.k === "par") return cval(e.e);
+      if (e.k === "id") return null;
+      if (e.k === "neg") { var a = cval(e.e); return a ? { v: (-a.v) | 0 } : null; }
+      var l = cval(e.l), r = cval(e.r);
+      if (!l || !r) return null;
+      if (e.ty === "String") return { v: jstr(l.v) + jstr(r.v) };
+      return arith(e.op, l.v, r.v, true);
+    }
+    function jstr(v) { return typeof v === "number" ? String(v) : v; }
+    function arith(op, a, b, cst) {
+      if ((op === "/" || op === "%") && b === 0) return cst ? null : { ex: true };
+      var v;
+      if (op === "+") v = (a + b) | 0;
+      else if (op === "-") v = (a - b) | 0;
+      else if (op === "*") v = Math.imul(a, b);
+      else if (op === "/") v = (a / b) | 0;
+      else v = a % b;
+      if (v === 0) v = 0;
+      return { v: v };
+    }
+    function jesc(s) {
+      return s.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/\t/g, "\\t").replace(/"/g, "\\\"");
+    }
+
+    /* bytecode üretimi: { off, op, arg, jp (javap yorumu), line } */
+    function gen(stmts) {
+      var code = [], off = 0;
+      function I(op, arg, size, jp, ln) { code.push({ off: off, op: op, arg: arg || "", jp: jp || "", line: ln }); off += size; }
+      function pushInt(v, ln) {
+        if (v >= -1 && v <= 5) I("iconst_" + (v < 0 ? "m1" : v), "", 1, "", ln);
+        else if (v >= -128 && v <= 127) I("bipush", String(v), 2, "", ln);
+        else if (v >= -32768 && v <= 32767) I("sipush", String(v), 3, "", ln);
+        else I("ldc", String(v), 2, "int " + v, ln);
+      }
+      function load(v, ln) { var p = v.ty === "int" ? "i" : "a"; if (v.slot <= 3) I(p + "load_" + v.slot, v.name, 1, "", ln); else I(p + "load", v.slot + " (" + v.name + ")", 2, "", ln); }
+      function store(v, ln) { var p = v.ty === "int" ? "i" : "a"; if (v.slot <= 3) I(p + "store_" + v.slot, v.name, 1, "", ln); else I(p + "store", v.slot + " (" + v.name + ")", 2, "", ln); }
+      function collect(e) {
+        if (e.k === "par") return collect(e.e);
+        if (e.k === "bin" && e.op === "+" && e.ty === "String") return collect(e.l).concat(collect(e.r));
+        return [e];
+      }
+      function emit(e, ln) {
+        var c = cval(e);
+        if (c) {
+          if (typeof c.v === "number") pushInt(c.v, ln);
+          else I("ldc", "\"" + jesc(c.v) + "\"", 2, "String " + jesc(c.v).replace(/'/g, "\\'"), ln);
+          return;
+        }
+        if (e.k === "par") return emit(e.e, ln);
+        if (e.k === "id") return load(e.v, ln);
+        if (e.k === "neg") { emit(e.e, ln); I("ineg", "", 1, "", ln); return; }
+        if (e.ty === "String") {
+          var parts = collect(e), types = [];
+          parts.forEach(function (x) { if (!cval(x)) { emit(x, ln); types.push(x.ty); } });
+          I("invokedynamic", "makeConcatWithConstants(" + types.map(function (t) { return t === "int" ? "int" : "String"; }).join(", ") + ")", 5,
+            "makeConcatWithConstants:(" + types.map(function (t) { return t === "int" ? "I" : "Ljava/lang/String;"; }).join("") + ")Ljava/lang/String;", ln);
+          return;
+        }
+        emit(e.l, ln); emit(e.r, ln);
+        I({ "+": "iadd", "-": "isub", "*": "imul", "/": "idiv", "%": "irem" }[e.op], "", 1, "", ln);
+      }
+      stmts.forEach(function (s) {
+        var ln = s.line;
+        if (s.k === "call") {
+          I("getstatic", "System.out", 3, "Field java/lang/System.out:Ljava/io/PrintStream;", ln);
+          if (s.args.length) emit(s.args[0], ln);
+          var d = s.args.length ? (s.at === "int" ? "I" : "Ljava/lang/String;") : "";
+          I("invokevirtual", s.m + "(" + (s.args.length ? (s.at === "int" ? "int" : "String") : "") + ")", 3, "Method java/io/PrintStream." + s.m + ":(" + d + ")V", ln);
+        } else if (s.k === "decl" || s.k === "asg") {
+          emit(s.k === "decl" ? s.init : s.e, ln);
+          store(s.v, ln);
+        }
+      });
+      I("return", "", 1, "", 0);
+      return code;
+    }
+
+    /* çalıştırma: her deyim bir adım; { line, out (eklenen), vars, ex } */
+    function run(res) {
+      var mem = {}, steps = [];
+      function ev(e) {
+        if (e.k === "lit") return e.v;
+        if (e.k === "par") return ev(e.e);
+        if (e.k === "id") return mem[e.name];
+        if (e.k === "neg") return (-ev(e.e)) | 0;
+        var a = ev(e.l), b = ev(e.r);
+        if (e.ty === "String") return jstr(a) + jstr(b);
+        var r = arith(e.op, a, b, false);
+        if (r.ex) throw { ex: true };
+        return r.v;
+      }
+      for (var i = 0; i < res.stmts.length; i++) {
+        var s = res.stmts[i], st = { line: s.line, out: "", s: s };
+        try {
+          if (s.k === "call") {
+            var v = s.args.length ? jstr(ev(s.args[0])) : "";
+            st.out = v + (s.m === "println" ? "\n" : "");
+            st.val = v;
+          } else {
+            var val = ev(s.k === "decl" ? s.init : s.e);
+            mem[s.name] = val; st.set = s.name;
+          }
+        } catch (x) {
+          if (!x || !x.ex) throw x;
+          st.ex = "Exception in thread \"main\" java.lang.ArithmeticException: / by zero\n\tat " + res.cls + ".main(" + res.file + ":" + s.line + ")";
+        }
+        st.mem = JSON.parse(JSON.stringify(mem));
+        steps.push(st);
+        if (st.ex) break;
+      }
+      return steps;
+    }
+
+    /* kendini dene için çıktı seçenekleri: doğru + yanılgılara dayalı çeldiriciler */
+    function choices(s, val) {
+      var right = val + (s.m === "println" ? "\n" : ""), c = [right];
+      function add(x) { if (c.indexOf(x) < 0) c.push(x); }
+      var a = s.args[0];
+      if (a) {
+        var raws = [];
+        (function walk(e) { if (e.k === "lit" && e.raw) raws.push(e); else if (e.l) { walk(e.l); walk(e.r); } else if (e.e) walk(e.e); })(a);
+        if (raws.some(function (r) { return r.raw.slice(1, -1) !== r.v; })) {
+          /* kaçış dizisi yorumlanmamış gibi */
+          var rawv = val; raws.forEach(function (r) { rawv = rawv.split(r.v).join(r.raw.slice(1, -1)); });
+          add(rawv + (s.m === "println" ? "\n" : ""));
+        }
+        /* dizgi birleştirmede soldan sağa yerine önce sayıların toplanması / ya da tersi */
+        if (a.ty === "String") {
+          var alt = (function f(e) {
+            if (e.k === "par") return f(e.e);
+            if (e.k === "bin" && e.op === "+" && e.ty === "String") {
+              var p = flat(e), out = "", acc = null;
+              p.forEach(function (x) { var v = val0(x); if (typeof v === "number") acc = (acc === null ? 0 : acc) + v; else { if (acc !== null) out += acc; acc = null; out += v; } });
+              if (acc !== null) out += acc;
+              return out;
+            }
+            return null;
+          })(a);
+          if (alt !== null) add(alt + (s.m === "println" ? "\n" : ""));
+          var alt2 = flat(a).map(function (x) { return jstr(val0(x)); }).join("");
+          add(alt2 + (s.m === "println" ? "\n" : ""));
+        }
+      }
+      add(val + (s.m === "println" ? "" : "\n"));
+      return c.slice(0, 4);
+      function flat(e) { if (e.k === "par") return flat(e.e); if (e.k === "bin" && e.op === "+") return flat(e.l).concat(flat(e.r)); return [e]; }
+      function val0(e) { try { return evalSafe(e); } catch (x) { return "?"; } }
+    }
+    var CURMEM = {};
+    function evalSafe(e) {
+      if (e.k === "lit") return e.v;
+      if (e.k === "par") return evalSafe(e.e);
+      if (e.k === "id") return CURMEM[e.name];
+      if (e.k === "neg") return (-evalSafe(e.e)) | 0;
+      var a = evalSafe(e.l), b = evalSafe(e.r);
+      if (e.ty === "String") return jstr(a) + jstr(b);
+      var r = arith(e.op, a, b, false); if (r.ex) throw 0; return r.v;
+    }
+
+    return { compile: compile, run: run, choices: function (s, val, mem) { CURMEM = mem || {}; return choices(s, val); } };
+  })();
+  /*CORE-END*/
+
+  var I8 = "        ";
+  var PROGS = [
+    { ad: "Merhaba (hatasız)", cls: "Merhaba", body: ['System.out.println("Merhaba, Java!");'], amac: "İlk program: hat baştan sona hatasız işler." },
+    { ad: "print ve println", cls: "Yazdir", body: ['System.out.print("Bir ");', 'System.out.print("iki ");', 'System.out.println("üç");', 'System.out.println("dört");', 'System.out.println();', 'System.out.println("son");'], amac: "print imleci aynı satırda bırakır; println satır sonu ekler." },
+    { ad: "Kaçış dizileri", cls: "Kacis", body: ['System.out.println("Ad\\tNot");', 'System.out.println("Ali\\t85");', 'System.out.println("\\"Java\\" dili");', 'System.out.print("Satır 1\\nSatır 2\\n");'], amac: "\\t sekme, \\n satır sonu, \\\" tırnak yazar." },
+    { ad: "Dizgi birleştirme", cls: "Birlestir", body: ['int a = 3;', 'int b = 4;', 'System.out.println("a + b = " + a + b);', 'System.out.println("a + b = " + (a + b));', 'System.out.println(a + b + " = a + b");'], amac: "+ soldan sağa işler: dizgiden sonra gelen sayı metne eklenir." },
+    { ad: "Hata: eksik ;", cls: "Hata1", body: ['System.out.println("Merhaba")'], amac: "Söz dizimi hatası: deyim ; ile bitmeli." },
+    { ad: "Hata: system (küçük harf)", cls: "Selam", body: ['system.out.println("Merhaba");'], amac: "Java büyük/küçük harfe duyarlıdır." },
+    { ad: "Hata: printn", cls: "Selam", body: ['System.out.printn("Merhaba");'], amac: "Metot adı yanlış yazılmış." },
+    { ad: "Hata: tanımsız değişken", cls: "Toplam", body: ['int toplam = 10;', 'System.out.println(Toplam);'], amac: "toplam ile Toplam farklı adlardır." },
+    { ad: "Hata: tip uyuşmazlığı", cls: "Hata2", body: ['int sayi = "42";'], amac: "Dizgi bir int değişkene konamaz." },
+    { ad: "Hata: kapanmayan dizgi", cls: "Selam", body: ['System.out.println("Merhaba);'], amac: "Açılan tırnak kapanmamış." },
+    { ad: "Hata: dosya adı ≠ sınıf adı", cls: "Selam", file: "Merhaba.java", body: ['System.out.println("Merhaba");'], amac: "public class Selam, Merhaba.java dosyasında duruyor." },
+    { ad: "Çalışma zamanı: sıfıra bölme", cls: "Hata3", body: ['int a = 10;', 'int b = 0;', 'System.out.println("Bölüm:");', 'System.out.println(a / b);'], amac: "Derlenir, ama çalışırken tam sayı sıfıra bölünür." },
+    { ad: "Mantık: ortalama", cls: "Hata4", body: ['int a = 70;', 'int b = 90;', 'System.out.println(a + b / 2);'], amac: "Amaç: 70 ile 90'ın ortalamasını yazmak.", beklenen: "80\n" },
+    { ad: "Boş program (kendin yaz)", cls: "Deneme", body: ['// main gövdesine kendi deyimlerinizi yazın', 'System.out.println("Merhaba");'], amac: "Kendi deyimlerinizi yazıp hattı izleyin." }
+  ];
+
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector(".cx-jc");
+  var P = null, mode = "edit", EV = [], k = 0, timer = null, answered = {}, ok = 0, all = 0, RES = null;
+  var STG = [["1 Yaz", ""], ["2 Derle", "javac"], ["3 Bytecode", ".class"], ["4 Çalıştır", "java"], ["5 Çıktı", "konsol"]];
+
+  PROGS.forEach(function (pr, i) { var o = document.createElement("option"); o.value = i; o.textContent = pr.ad; E("jcProg").appendChild(o); });
+
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function bodyLines() { return E("jcTa").value.replace(/\t/g, "    ").replace(/\r/g, "").split("\n"); }
+  function origText() { return P.body.map(function (l) { return I8 + l; }).join("\n"); }
+  function fileName() { return E("jcFile").value.trim(); }
+
+  function load() {
+    stop();
+    P = PROGS[E("jcProg").value];
+    E("jcTa").value = origText();
+    E("jcFile").value = P.file || (P.cls + ".java");
+    E("jcAmac").textContent = P.amac;
+    toEdit();
+  }
+  function fitTa() {
+    var ls = bodyLines();
+    var ta = E("jcTa");
+    ta.style.height = (Math.max(1, ls.length) * 18) + "px";
+    ta.style.width = (Math.max.apply(null, ls.map(function (l) { return l.length; }).concat([20])) + 2) + "ch";
+    var n = ls.length + 4, g = [];
+    for (var i = 1; i <= n; i++) g.push(i);
+    E("jcGut").textContent = g.join("\n");
+    E("jcTop").textContent = "public class " + P.cls + " {\n    public static void main(String[] args) {";
+    var mod = E("jcTa").value !== origText() || fileName() !== (P.file || P.cls + ".java");
+    E("jcMod").textContent = mod ? "değiştirildi" : "";
+  }
+  function toEdit() {
+    stop(); mode = "edit"; EV = []; k = 0; answered = {};
+    E("jcEd").hidden = false; E("jcCode").hidden = true;
+    E("jcSrcCap").textContent = "Kaynak kod · " + (fileName() || "?") + " (düzenlenebilir)";
+    fitTa();
+    pipe([0, 0, 0, 0, 0]);
+    E("jcBc").innerHTML = '<div class="none">Henüz derlenmedi: .class dosyası yok.</div>';
+    E("jcLoc").textContent = "";
+    E("jcTerm").innerHTML = '<span class="mut">(terminal boş)</span>';
+    E("jcWhy").innerHTML = "Kesik çizgili alandaki kodu düzenleyebilirsiniz. Hazır olunca <b>Adım ▶</b> ile derleme hattını başlatın.";
+    E("jcNo").textContent = "Düzenleme kipi";
+    buttons(false);
+  }
+
+  /* hat şeması: durum 0 bekliyor, 1 şu an, 2 tamam, 3 hata, 4 atlandı */
+  function pipe(st) {
+    var cls = ["", "s-cur", "s-ok", "s-bad", "s-skip"], h = "";
+    STG.forEach(function (s, i) {
+      var x = i * 118 + 2, sub = i === 0 ? (fileName() || "?") : i === 2 ? (RES ? RES.cls : P.cls) + ".class" : i === 3 ? "java " + (RES ? RES.cls : P.cls) : s[1];
+      if (i === 1) sub = "javac " + (fileName() || "?");
+      if (sub.length > 15) sub = sub.slice(0, 14) + "…";
+      h += '<g class="' + cls[st[i]] + '"><rect x="' + x + '" y="3" width="102" height="48" rx="9"></rect>' +
+        '<text x="' + (x + 51) + '" y="22">' + s[0] + (st[i] === 2 ? " ✓" : st[i] === 3 ? " ✗" : "") + '</text>' +
+        '<text class="sub" x="' + (x + 51) + '" y="40">' + esc(sub) + "</text></g>";
+      if (i < 4) h += '<path d="M' + (x + 104) + ' 27 H' + (x + 112) + '"></path><polygon class="ar" points="' + (x + 116) + ',27 ' + (x + 110) + ',23 ' + (x + 110) + ',31"></polygon>';
+    });
+    E("jcPipe").innerHTML = h;
+  }
+
+  function explain(e) {
+    var m = e.msg, x = (e.extra || [])[0] || "";
+    if (m === "';' expected") return "<b>Söz dizimi hatası:</b> her deyim noktalı virgülle (<code>;</code>) biter. <code>^</code> işareti <code>;</code> beklenen yeri gösterir: deyimin sonuna <code>;</code> ekleyin.";
+    if (/^'\)' or ','/.test(m)) return "<b>Söz dizimi hatası:</b> açılan parantez kapanmamış; argümandan sonra <code>)</code> bekleniyordu.";
+    if (m === "illegal start of expression") return "<b>Söz dizimi hatası:</b> burada bir değer (ifade) bekleniyordu, ama <code>)</code> ya da <code>;</code> geldi.";
+    if (m === "unclosed string literal") return "<b>Söz dizimi hatası:</b> dizgi kapanmamış; açılış tırnağı satır sonuna kadar kapanmadı. Metnin içinde tırnak gerekiyorsa <code>\\\"</code> yazılır.";
+    if (m === "illegal escape character") return "<b>Geçersiz kaçış dizisi:</b> <code>\\</code> işaretinden sonra <code>n</code>, <code>t</code>, <code>\"</code>, <code>'</code>, <code>\\</code> gibi tanımlı bir karakter gelmeli. Ters eğik çizginin kendisi için <code>\\\\</code> yazılır.";
+    if (m === "integer number too large") return "<b>Sabit çok büyük:</b> int en çok 2147483647 olabilir.";
+    if (m === "package system does not exist") return "<b>Büyük/küçük harf:</b> <code>System</code> büyük S ile yazılır. Derleyici küçük harfli <code>system</code>'i bir paket adı sandı.";
+    if (m === "cannot find symbol") {
+      if (/method/.test(x)) return "<b>Bulunamayan metot:</b> <code>System.out</code> üzerinde böyle bir metot yok; doğrusu <code>print</code> ya da <code>println</code>. Metot adları da büyük/küçük harfe duyarlıdır.";
+      if (/class System/.test(e.extra[1])) return "<b>Bulunamayan üye:</b> System sınıfında böyle bir alan yok; doğrusu küçük harfle <code>out</code>.";
+      if (/class /.test(x)) return "<b>Bulunamayan tip:</b> tip adları büyük/küçük harfe duyarlıdır: <code>String</code> büyük S, <code>int</code> küçük harf.";
+      var nm = x.split("variable ")[1], near = null;
+      RES.stmts.forEach(function (s) { if (s.k === "decl" && s.name !== nm && s.name.toLowerCase() === nm.toLowerCase()) near = s.name; });
+      return "<b>Tanımsız değişken:</b> <code>" + esc(nm) + "</code> adında bir değişken yok" + (near ? "; tanımlı olan <code>" + esc(near) + "</code>. Büyük/küçük harf farkı ayrı ad demektir." : " (hiç tanımlanmamış ya da kullanıldığı satırdan sonra tanımlanmış).");
+    }
+    if (/^incompatible types/.test(m)) return "<b>Tip hatası:</b> değerin tipi değişkenin tipine uymuyor; tipler derleme sırasında denetlenir. <code>\"42\"</code> bir dizgidir, <code>42</code> bir int.";
+    if (/already defined/.test(m)) return "<b>Aynı ad iki kez:</b> aynı kapsamda aynı adlı ikinci değişken tanımlanamaz. Değeri değiştirmek için tipi yazmadan atayın: <code>x = …;</code>";
+    if (/bad operand type/.test(m)) return "<b>Tip hatası:</b> bu operatör dizgiyle kullanılamaz; dizgilerde yalnızca <code>+</code> (birleştirme) tanımlıdır.";
+    if (/should be declared in a file named/.test(m)) return "<b>Dosya adı:</b> public sınıfın adı dosya adıyla aynı olmalı: dosya <code>" + esc(RES.cls) + ".java</code> olmalı.";
+    return "";
+  }
+
+  function vis(s) {
+    var h = esc(s);
+    if (E("jcInv").checked) h = h.replace(/\t/g, '<i class="iv">⇥</i>\t').replace(/\n/g, '<i class="iv">↵</i>\n');
+    return h;
+  }
+  function visBtn(s) { return s.replace(/\t/g, "⇥").replace(/\n/g, "↵\n").replace(/↵\n$/, "↵"); }
+
+  /* adımları üret */
+  function build() {
+    var file = fileName();
+    if (!/^[A-Za-z_$][A-Za-z0-9_$]*\.java$/.test(file)) { E("jcWhy").innerHTML = '<b class="agt-oyun__bad">Dosya adı geçersiz.</b> Biçim: <code>Ad.java</code> (boşluksuz, harfle başlar).'; return false; }
+    var lines = bodyLines();
+    if (lines.length > 40) { E("jcWhy").innerHTML = '<b class="agt-oyun__bad">En çok 40 satır.</b>'; return false; }
+    RES = Core.compile(P.cls, file, lines);
+    if (RES.unsup) {
+      E("jcWhy").innerHTML = '<b class="agt-oyun__bad">Simülatör ' + RES.unsup.line + '. satırı tanımıyor</b> (' + esc(RES.unsup.why) + "). Desteklenen deyimler: <code>System.out.println(…);</code> <code>System.out.print(…);</code> <code>int x = …;</code> <code>String s = …;</code> <code>x = …;</code> — satır başına bir deyim. Gerçek javac bu satırı farklı değerlendirebilir.";
+      return false;
+    }
+    var term = [], ev = [], cls = RES.cls;
+    var steps = RES.ok ? Core.run(RES) : [];
+    var lastEx = steps.length && steps[steps.length - 1].ex;
+    var outAll = steps.map(function (s) { return s.out; }).join("");
+    var kind = !RES.ok ? 0 : lastEx ? 1 : (P.beklenen && outAll !== P.beklenen) ? 2 : 3;
+    function add(o) { o.term = term.slice(); ev.push(o); }
+    add({ st: [1, 0, 0, 0, 0], why: "<b>1. Yaz:</b> kaynak kod düz metin olarak <code>" + esc(file) + "</code> dosyasına kaydedildi. Dosya adı, içindeki <code>public</code> sınıfın adıyla (<code>" + esc(cls) + "</code>) aynı olmalıdır." });
+    term.push(["cmd", "> javac " + file + "\n"]);
+    add({ st: [2, 1, 0, 0, 0], why: "<b>2. Derle:</b> JDK'daki derleyici <code>javac</code> tüm dosyayı, program çalışmadan <i>önce</i> denetler: söz dizimi, adlar, tipler.", quiz: { t: "tur", kind: kind } });
+    if (!RES.ok) {
+      term.push(["err", RES.diag + "\n"]);
+      var lines2 = {}; RES.errs.forEach(function (e) { lines2[e.line] = 1; });
+      var first = RES.errs[0];
+      add({ st: [2, 3, 4, 4, 4], err: lines2, why: '<b class="agt-oyun__bad">Derleme hatası</b> (' + first.line + ". satır). " + explain(first) + (RES.errs.length > 1 ? " Toplam " + RES.errs.length + " hata; her zaman ilkinden başlayın." : "") + " <b>.class üretilmedi</b>, program çalıştırılamaz.", end: true });
+      return (EV = ev);
+    }
+    term.push(["mut", "(javac hiçbir şey yazmadı: hata yok)\n"]);
+    add({ st: [2, 2, 0, 0, 0], why: "Derleme başarılı. <code>javac</code> başarıda sessizdir; hata iletisi yoksa her şey yolunda demektir." });
+    add({ st: [2, 2, 1, 0, 0], bc: true, why: "<b>3. Bytecode:</b> aynı klasörde <code>" + esc(cls) + ".class</code> oluştu. İçinde işlemciye özel makine kodu değil, JVM için <b>bytecode</b> var; aynı dosya Windows, Linux ve macOS'ta çalışır. İlk dört bayt her .class dosyasında <code>CA FE BA BE</code>." });
+    term.push(["cmd", "> java " + cls + "\n"]);
+    add({ st: [2, 2, 2, 1, 0], bc: true, why: "<b>4. Çalıştır:</b> <code>java " + esc(cls) + "</code> JVM'yi başlatır (uzantı yazılmaz). JVM sınıfı yükler, bytecode'u doğrular ve <code>main</code> metodunu çalıştırmaya başlar." });
+    steps.forEach(function (s, i) {
+      var st = s.s, why;
+      if (s.ex) {
+        term.push(["err", s.ex + "\n"]);
+        add({ st: [2, 2, 2, 3, 4], bc: true, line: s.line, mem: s.mem, why: '<b class="agt-oyun__bad">Çalışma zamanı hatası:</b> kod derlendi, ama ' + s.line + ". satırda tam sayı sıfıra bölündü. JVM bir <b>istisna</b> (<code>ArithmeticException</code>) fırlattı ve program durdu; sonraki satırlar hiç çalışmadı.", end: true });
+        return;
+      }
+      if (st.k === "call") {
+        why = "<code>" + st.m + "</code>: " + (s.val === "" && st.m === "println" ? "argümansız println yalnızca satır sonu yazar." : (st.m === "println" ? "değeri yazar ve satır sonuna geçer." : "değeri yazar; imleç aynı satırda kalır."));
+        if (/\t/.test(s.val)) why += " <code>\\t</code> imleci bir sonraki sekme durağına (8'in katı sütun) taşır.";
+        if (/\n/.test(s.val)) why += " Metindeki <code>\\n</code> satır sonu karakteridir.";
+        if (st.args[0] && st.args[0].ty === "String" && st.args[0].k === "bin") why += " <code>+</code> soldan sağa işlenir: bir taraf dizgiyse sayı metne eklenir.";
+        var q = { t: "cikti", ch: Core.choices(st, s.val, steps[i - 1] ? steps[i - 1].mem : {}), right: s.out };
+        term.push(["out", s.out]);
+        add({ st: [2, 2, 2, 1, 0], bc: true, line: s.line, mem: s.mem, why: why, quiz: q });
+      } else {
+        add({ st: [2, 2, 2, 1, 0], bc: true, line: s.line, mem: s.mem, chg: s.set, why: "<code>" + esc(s.set) + "</code> = " + esc(typeof s.mem[s.set] === "string" ? '"' + s.mem[s.set] + '"' : s.mem[s.set]) + ": değer, main metodunun çerçevesindeki yerel değişkene (bytecode'da numaralı yuva) yazılır." });
+      }
+    });
+    if (!lastEx) {
+      var w = kind === 2 ? '<b class="agt-oyun__bad">Mantık hatası:</b> program hatasız bitti ama sonuç yanlış: beklenen <code>' + esc(P.beklenen.trim()) + "</code>, çıktı <code>" + esc(outAll.trim()) + "</code>. " + (P.cls === "Hata4" ? "<code>/</code> önce yapılır: 70 + 45. Düzeltme: <code>(a + b) / 2</code>." : "") : "<b>5. Çıktı:</b> main bitti, JVM kapandı. Program hatasız çalıştı." + (P.beklenen ? " Çıktı beklenenle aynı." : "");
+      add({ st: [2, 2, 2, 2, kind === 2 ? 3 : 2], bc: true, mem: steps.length ? steps[steps.length - 1].mem : {}, why: w, end: true });
+    }
+    return (EV = ev);
+  }
+
+  function needQ() { var e = EV[k]; return E("jcQuiz").checked && e && e.quiz && !answered[k]; }
+  var TUR = ["Derleme hatası", "Çalışma zamanı hatası", "Mantık hatası", "Hatasız çalışır"];
+
+  function draw() {
+    if (mode !== "run") return;
+    var e = EV[k], q = needQ();
+    var codeL = RES.src;
+    E("jcCode").innerHTML = codeL.map(function (l, i) {
+      var c = e.err && e.err[i + 1] ? "is-err" : (e.line === i + 1 ? "is-cur" : "");
+      return '<li class="' + c + '">' + esc(l) + "</li>";
+    }).join("");
+    var cur = E("jcCode").querySelector(".is-cur, .is-err");
+    if (cur) { var box = E("jcCode"); if (cur.offsetTop < box.scrollTop || cur.offsetTop > box.scrollTop + box.clientHeight - 20) box.scrollTop = cur.offsetTop - 40; }
+    pipe(e.st);
+    /* terminal: soru bekliyorsa bu adımın çıktısı henüz gösterilmez */
+    var term = q && e.quiz.t === "cikti" ? e.term.slice(0, -1) : e.term;
+    var h = term.map(function (t) { return t[0] === "out" ? vis(t[1]) : '<span class="' + t[0] + '">' + esc(t[1]) + "</span>"; }).join("");
+    if (q && e.quiz.t === "tur") h = h + '<span class="mut">(javac çalışıyor…)</span>';
+    E("jcTerm").innerHTML = h || '<span class="mut">(terminal boş)</span>';
+    E("jcTerm").scrollTop = E("jcTerm").scrollHeight;
+    if (e.bc) {
+      var bh = '<div class="magic">CA FE BA BE 00 00 00 41  <span style="font-family:system-ui">(sürüm 65 = Java 21)</span></div><div class="magic">main:</div>';
+      RES.code.forEach(function (c) {
+        var on = e.line && c.line === e.line && !(q && e.quiz.t === "cikti" && false);
+        bh += '<div class="' + (on ? "is-cur" : "") + '" title="' + esc(c.jp) + '"><span class="off">' + c.off + '</span><span class="op">' + c.op + "</span> " + esc(c.arg) + "</div>";
+      });
+      E("jcBc").innerHTML = bh;
+      var on1 = E("jcBc").querySelector(".is-cur");
+      if (on1) E("jcBc").scrollTop = on1.offsetTop - 50;
+      E("jcBcCap").textContent = RES.cls + ".class · bytecode";
+    } else {
+      E("jcBc").innerHTML = '<div class="none">' + (e.st[1] === 3 ? "Derleme hatası: .class dosyası oluşmadı." : "Henüz .class dosyası yok.") + "</div>";
+      E("jcBcCap").textContent = ".class · bytecode";
+    }
+    var mem = e.mem || {}, names = Object.keys(mem);
+    E("jcLoc").innerHTML = e.mem ? "yerel: " + (names.length ? names.map(function (n) { var v = mem[n]; var s = esc(n) + " = " + esc(typeof v === "string" ? '"' + v.replace(/\n/g, "\\n").replace(/\t/g, "\\t") + '"' : v); return n === e.chg ? "<b style=\"color:var(--ds-accent)\">" + s + "</b>" : s; }).join(" · ") : "(yok)") : "";
+    if (q) {
+      if (e.quiz.t === "tur") {
+        E("jcWhy").innerHTML = "<b>Tahmin edin:</b> bu program ne olur?" + (P.beklenen ? " (Amaç: " + esc(P.amac.replace(/^Amaç: /, "")) + ")" : "") + '<div class="qbtns">' + TUR.map(function (t, i) { return '<button type="button" data-q="' + i + '">' + t + "</button>"; }).join("") + "</div>";
+      } else {
+        E("jcWhy").innerHTML = "<b>Tahmin edin:</b> bu deyim konsola ne yazar? (⇥ sekme, ↵ satır sonu)" + '<div class="qbtns">' + e.quiz.order.map(function (i) { var c = e.quiz.ch[i]; return '<button type="button" class="mono" data-q="' + i + '">' + esc(visBtn(c) || "(hiçbir şey)") + "</button>"; }).join("") + "</div>";
+      }
+    } else E("jcWhy").innerHTML = (e.fb || "") + e.why;
+    E("jcNo").textContent = "Adım " + (k + 1) + " / " + EV.length;
+    buttons(q);
+    if (q) { var b = E("jcWhy").querySelector("button"); if (b && root.contains(document.activeElement)) b.focus(); }
+  }
+
+  function buttons(q) {
+    var run = mode === "run";
+    E("jcBack").disabled = !run || k === 0;
+    E("jcStep").disabled = run && (q || k >= EV.length - 1);
+    E("jcStep").textContent = run ? "Adım ▶" : "Derle ▶";
+    E("jcPlay").disabled = run && E("jcStep").disabled && !timer;
+    E("jcPlay").textContent = timer ? "Duraklat" : "Oynat";
+    E("jcEdit").disabled = !run;
+  }
+  function start() {
+    if (!build()) return false;
+    EV.forEach(function (e) { if (e.quiz && e.quiz.t === "cikti") { var o = e.quiz.ch.map(function (_, i) { return i; }); o.sort(function () { return Math.random() - 0.5; }); e.quiz.order = o; } });
+    mode = "run"; k = 0; answered = {};
+    E("jcEd").hidden = true; E("jcCode").hidden = false;
+    E("jcSrcCap").textContent = "Kaynak kod · " + fileName();
+    draw();
+    return true;
+  }
+  function go(d) {
+    if (mode !== "run") { if (d > 0) start(); return; }
+    k = Math.max(0, Math.min(EV.length - 1, k + d)); draw();
+  }
+  function stop() { clearInterval(timer); timer = null; }
+  function delay() { return [1700, 1150, 750, 450, 200][E("jcSpeed").value - 1]; }
+  function play() {
+    if (timer) { stop(); buttons(needQ()); return; }
+    if (mode !== "run" && !start()) return;
+    if (k >= EV.length - 1) k = 0;
+    timer = setInterval(function () {
+      if (needQ() || k >= EV.length - 1) { stop(); buttons(needQ()); return; }
+      go(1);
+      if (needQ()) { stop(); buttons(true); }
+    }, delay());
+    draw();
+  }
+
+  E("jcWhy").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-q]");
+    if (!b || !needQ()) return;
+    var e = EV[k], a = +b.getAttribute("data-q"), good;
+    answered[k] = true; all++;
+    if (e.quiz.t === "tur") {
+      good = a === e.quiz.kind;
+      e.fb = (good ? '<b class="agt-oyun__good">Doğru!</b> ' : '<b class="agt-oyun__bad">Yanlış.</b> ') + "Cevap: <b>" + TUR[e.quiz.kind] + "</b>. ";
+    } else {
+      good = e.quiz.ch[a] === e.quiz.right;
+      e.fb = (good ? '<b class="agt-oyun__good">Doğru!</b> ' : '<b class="agt-oyun__bad">Yanlış.</b> Doğrusu: <code>' + esc(visBtn(e.quiz.right)) + "</code>. ");
+    }
+    if (good) ok++;
+    E("jcOk").textContent = ok; E("jcAll").textContent = all;
+    draw();
+    E("jcStep").focus();
+  });
+  E("jcProg").addEventListener("change", load);
+  E("jcOrig").addEventListener("click", function () { E("jcTa").value = origText(); E("jcFile").value = P.file || (P.cls + ".java"); toEdit(); });
+  E("jcTa").addEventListener("input", fitTa);
+  E("jcFile").addEventListener("input", function () { if (mode === "run") toEdit(); else { fitTa(); pipe([0, 0, 0, 0, 0]); E("jcSrcCap").textContent = "Kaynak kod · " + (fileName() || "?") + " (düzenlenebilir)"; } });
+  E("jcStep").addEventListener("click", function () { stop(); go(1); });
+  E("jcBack").addEventListener("click", function () { stop(); go(-1); });
+  E("jcEdit").addEventListener("click", function () { toEdit(); E("jcTa").focus(); });
+  E("jcPlay").addEventListener("click", play);
+  E("jcSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("jcQuiz").addEventListener("change", function () { if (mode === "run") draw(); });
+  E("jcInv").addEventListener("change", function () { if (mode === "run") draw(); });
+  root.addEventListener("keydown", function (ev) {
+    if (/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName)) return;
+    if (ev.key === "ArrowRight" && !needQ()) { stop(); go(1); ev.preventDefault(); }
+    else if (ev.key === "ArrowLeft") { stop(); go(-1); ev.preventDefault(); }
+  });
+
+  load();
+})();
+</script>
+<script src="deck/oyun.js"></script>

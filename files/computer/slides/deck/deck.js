@@ -1,5 +1,5 @@
 /* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
-/* Veri Yapıları sunumları: gezinme, ölçekleme ve demolar */
+/* Bilgisayar ve Programlamaya Giriş sunumları: gezinme, ölçekleme ve demolar */
 (function () {
   /* yalnızca sercankulcu.github.io adresinde (ve yerel önizlemede) çalışır (© Sercan Külcü) */
   if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;

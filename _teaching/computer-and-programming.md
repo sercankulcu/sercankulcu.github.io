@@ -80,6 +80,8 @@ Office applications help users create documents, analyze data, and present infor
 
 #### 🕹️ Simulators
 - [Excel Cell References](../files/computer/slides/Chapter_03_Excel-References.html)
+- [Word Styles and Table of Contents](../files/computer/slides/Chapter_03_Word-Styles.html)
+- [PowerPoint Animation Timeline](../files/computer/slides/Chapter_03_PowerPoint-Animation.html)
 
 ---
 
@@ -113,6 +115,9 @@ A Java program is written as plain-text source code, compiled to bytecode, and e
 - [📝Çalışma Soruları - Java'ya Giriş ve İlk Program (HTML)](../files/computer/slides/Bolum_05_Java_ve_Ilk_Program_Calisma_Sorulari.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders05/src)
 
+#### 🕹️ Simulators
+- [Java Compile and Run](../files/computer/slides/Chapter_05_Java-Compile-Run.html)
+
 ---
 
 ## Chapter 6: Variables, Data Types, and Operators
@@ -137,6 +142,9 @@ Conditional statements allow a program to choose between different actions. This
 - [📄Sunum - Koşullu İfadeler (PDF)](../files/computer/pdf/Bolum_07_Kosullu_Ifadeler.pdf)
 - [📝Çalışma Soruları - Koşullu İfadeler (HTML)](../files/computer/slides/Bolum_07_Kosullu_Ifadeler_Calisma_Sorulari.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders07/src)
+
+#### 🕹️ Simulators
+- [Decision Tracer](../files/computer/slides/Chapter_07_Decision-Tracer.html)
 
 ---
 
@@ -163,6 +171,9 @@ Methods divide a program into reusable operations. This chapter covers method de
 - [📝Çalışma Soruları - Metotlar (HTML)](../files/computer/slides/Bolum_09_Metotlar_Calisma_Sorulari.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders09/src)
 
+#### 🕹️ Simulators
+- [Method Call Stack](../files/computer/slides/Chapter_09_Method-Call-Stack.html)
+
 ---
 
 ## Chapter 10: Arrays
@@ -187,6 +198,9 @@ Strings represent sequences of characters and are used to process textual data. 
 - [📄Sunum - Dizgiler (PDF)](../files/computer/pdf/Bolum_11_Dizgiler.pdf)
 - [📝Çalışma Soruları - Dizgiler (HTML)](../files/computer/slides/Bolum_11_Dizgiler_Calisma_Sorulari.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/computer-programming-java/tree/main/Ders11/src)
+
+#### 🕹️ Simulators
+- [String Lab](../files/computer/slides/Chapter_11_String-Lab.html)
 
 ---
 

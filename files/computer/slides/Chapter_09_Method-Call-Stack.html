@@ -1,0 +1,515 @@
+---
+layout: without-sidebar
+title: "Metot Çağrı Yığını"
+permalink: /files/computer/slides/Chapter_09_Method-Call-Stack.html
+excerpt: "Metot çağrılarını çağrı yığını üzerinde adım adım izler: değere göre parametre aktarımı, dönüş değeri, yerel kapsam, aşırı yükleme seçimi, takas (swap) tuzağı ve iç içe çağrılar."
+---
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.cx-mc, .cx-mc-dlg { --ds-accent:#b45309; --ds-link:#0369a1; }
+html[data-theme="dark"] .agt-oyun, html[data-theme="dark"] .cx-mc-dlg { --ds-accent:#f59e57; --ds-link:#7cc4e8; }
+.cx-mc .mc-grid { display:grid; grid-template-columns:178px minmax(0,1fr); gap:10px; height:100%; }
+.cx-mc .card { min-width:0; min-height:0; padding:8px 10px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.cx-mc .side { display:flex; flex-direction:column; gap:7px; }
+.cx-mc .cap { display:block; margin:0 0 2px; color:var(--ds-muted); font-size:11.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.cx-mc select { width:100%; min-height:30px; font-size:13px; }
+.cx-mc .params { display:grid; grid-template-columns:1fr 70px; gap:4px 6px; align-items:center; font-size:13px; }
+.cx-mc .params input, .cx-mc .params select { width:100%; min-height:28px !important; padding:0 6px !important; font-size:13.5px !important; }
+.cx-mc .params .wide { grid-column:1 / -1; }
+.cx-mc .btns { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.cx-mc .btns button { min-height:31px; padding:0 6px; font-size:13.5px; }
+.cx-mc .speed { display:flex; align-items:center; gap:6px; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.cx-mc .speed input { flex:1; min-width:0; }
+.cx-mc .check { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; cursor:pointer; }
+.cx-mc .score { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.cx-mc .score div { padding:3px; border-radius:10px; background:var(--ds-surface-strong); text-align:center; color:var(--ds-muted); font-size:11.5px; font-weight:700; }
+.cx-mc .score b { display:block; color:var(--ds-text); font-size:17px; }
+.cx-mc .stepno { margin-top:auto; color:var(--ds-muted); font-size:12px; font-weight:700; text-align:center; }
+.cx-mc .main { display:grid; grid-template-rows:minmax(0,1fr) auto 96px; gap:6px; min-height:0; min-width:0; }
+.cx-mc .top { display:grid; grid-template-columns:minmax(0,1fr) 250px; gap:6px; min-height:0; }
+.cx-mc .pane { display:flex; flex-direction:column; min-height:0; min-width:0; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); overflow:hidden; }
+.cx-mc .pane > .cap { margin:0; padding:3px 8px 1px; }
+.cx-mc .code { flex:1; min-height:0; margin:0; padding:2px 0; overflow:auto; font:12.5px/1.5 ui-monospace, Consolas, monospace; list-style:none; counter-reset:ln; }
+.cx-mc .code li { padding:0 8px 0 0; white-space:pre; counter-increment:ln; }
+.cx-mc .code li::before { content:counter(ln); display:inline-block; width:22px; margin-right:8px; color:var(--ds-muted); font-size:11px; text-align:right; }
+.cx-mc .code li.is-cur { background:var(--ds-hot); box-shadow:inset 4px 0 0 var(--ds-accent); }
+.cx-mc .code li.is-bad { background:color-mix(in srgb, var(--ds-bad) 18%, var(--ds-bg)); box-shadow:inset 4px 0 0 var(--ds-bad); }
+.cx-mc .code li.is-def { color:var(--ds-link); }
+.cx-mc .stack { flex:1; min-height:0; overflow:auto; display:flex; flex-direction:column-reverse; justify-content:flex-start; gap:5px; padding:4px 8px 8px; }
+.cx-mc .frame { flex:none; border:1.5px solid var(--ds-border); border-radius:9px; background:var(--ds-bg); font-size:12.5px; }
+.cx-mc .frame .fh { display:flex; justify-content:space-between; gap:6px; padding:2px 8px; border-bottom:1.5px solid var(--ds-border); background:var(--ds-surface-strong); border-radius:8px 8px 0 0; font:12px ui-monospace, Consolas, monospace; }
+.cx-mc .frame .fh b { color:var(--ds-text); }
+.cx-mc .frame .fh small { color:var(--ds-muted); font:11px system-ui, sans-serif; white-space:nowrap; }
+.cx-mc .frame .vs { padding:2px 8px 3px; font:12.5px/1.45 ui-monospace, Consolas, monospace; }
+.cx-mc .frame .vs div { display:grid; grid-template-columns:1fr auto auto; gap:8px; align-items:center; }
+.cx-mc .frame .vs .tag { color:var(--ds-muted); font:10.5px system-ui, sans-serif; }
+.cx-mc .frame .vs .none { color:var(--ds-muted); font:11.5px system-ui, sans-serif; }
+.cx-mc .frame .vs div.is-chg b { color:var(--ds-accent); }
+.cx-mc .frame.is-top { border-color:var(--ds-accent); box-shadow:0 0 0 2px color-mix(in srgb, var(--ds-accent) 25%, transparent); }
+.cx-mc .frame.is-top .fh { background:var(--ds-hot); }
+.cx-mc .frame.is-new { animation:mc-in .35s ease-out; }
+.cx-mc .frame.is-ret { border-style:dashed; opacity:.85; }
+.cx-mc .frame .rb { margin:0 8px 4px; padding:1px 8px; border-radius:8px; background:color-mix(in srgb, var(--ds-good) 16%, var(--ds-bg)); color:var(--ds-good); font:700 12px ui-monospace, Consolas, monospace; text-align:center; }
+.cx-mc .cerr { padding:6px 8px; border:1.5px solid var(--ds-bad); border-radius:9px; background:color-mix(in srgb, var(--ds-bad) 14%, var(--ds-bg)); color:var(--ds-bad); font:12px ui-monospace, Consolas, monospace; }
+@keyframes mc-in { from { transform:translateY(-14px); opacity:0; } to { transform:none; opacity:1; } }
+@media (prefers-reduced-motion: reduce) { .cx-mc .frame.is-new { animation:none; } }
+.cx-mc .why { margin:0; min-height:44px; padding:5px 10px; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:13px; line-height:1.35; }
+.cx-mc .qbtns { display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; }
+.cx-mc .qbtns button { min-height:26px; padding:0 10px; font:600 12.5px ui-monospace, Consolas, monospace; }
+.cx-mc .out { flex:1; min-height:0; margin:0; padding:4px 8px; overflow:auto; background:#1f2430; color:#e6edf3; font:13px/1.35 ui-monospace, Consolas, monospace; white-space:pre; }
+</style>
+
+<div class="cx-mc agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 9 · Simülasyon</p><h1>Metot Çağrı Yığını</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="mc-help" aria-label="Açıklama ve kullanım">?</button>
+    <a class="agt-oyun__back" href="Bolum_09_Metotlar.html">← Bölüm 9</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="mc-grid">
+      <aside class="card side">
+        <div>
+          <label class="cap" for="mcProg">Program</label>
+          <select id="mcProg"></select>
+        </div>
+        <div>
+          <span class="cap">Argümanlar</span>
+          <div class="params" id="mcParams"></div>
+        </div>
+        <div class="btns">
+          <button type="button" id="mcBack" aria-label="Bir adım geri">◀ Geri</button>
+          <button type="button" id="mcStep" class="is-primary" aria-label="Bir adım ileri">Adım ▶</button>
+          <button type="button" id="mcPlay" aria-label="Oynat veya duraklat">Oynat</button>
+          <button type="button" id="mcReset" aria-label="Başa dön">Sıfırla</button>
+        </div>
+        <label class="speed">Hız <input type="range" id="mcSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı"></label>
+        <label class="check"><input type="checkbox" id="mcQuiz"> Kendini dene</label>
+        <p class="agt-oyun__muted" style="margin:0;font-size:11.5px;line-height:1.3">Açıkken dönüş değerlerini, seçilen aşırı yüklemeyi ve çıktıyı tahmin edersiniz.</p>
+        <div class="score" aria-live="polite">
+          <div>Doğru<b id="mcOk">0</b></div>
+          <div>Soru<b id="mcAll">0</b></div>
+        </div>
+        <div class="stepno" id="mcNo"></div>
+      </aside>
+
+      <section class="main">
+        <div class="top">
+          <div class="pane"><span class="cap">Java kodu</span><ol class="code" id="mcCode" aria-label="Java kodu"></ol></div>
+          <div class="pane"><span class="cap" id="mcStCap">Çağrı yığını</span><div class="stack" id="mcStack" aria-live="polite"></div></div>
+        </div>
+        <div class="why" id="mcWhy" aria-live="polite"></div>
+        <div class="pane"><span class="cap">Çıktı (konsol)</span><pre class="out" id="mcOut" aria-label="Program çıktısı"></pre></div>
+      </section>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog cx-mc-dlg" id="mc-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Metot Çağrı Yığını</h2>
+    <p><b>Amaç:</b> Bir metot çağrıldığında neler olduğunu görmek: <b>çağrı yığınına</b> yeni bir çerçeve eklenir (push), argümanların <b>değerleri</b> parametrelere kopyalanır, yerel değişkenler o çerçevede yaşar; <code>return</code> ile değer çağırana döner ve çerçeve kaldırılır (pop).</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li>Soldan bir program seçin, argümanları değiştirin.</li>
+      <li><b>Adım ▶</b> / <b>◀ Geri</b> (klavyede → / ←), <b>Oynat</b>, <b>Sıfırla</b>. Sağda yığın aşağıdan yukarı büyür: en altta <code>main</code>, en üstte şu an çalışan metot (vurgulu). Her çerçevenin başlığında dönüş adresi (çağrının yapıldığı satır) yazar.</li>
+      <li><b>Kendini dene</b>: dönüş değerini, derleyicinin seçeceği aşırı yüklenmiş metodu ve çıktıyı tahmin edin.</li>
+    </ol>
+    <h3>Hatırlatma</h3>
+    <ul>
+      <li>Java ilkel tipleri <b>değere göre</b> aktarır: metot parametresini değiştirmek çağırandaki değişkeni değiştirmez (artir, swap tuzağı).</li>
+      <li>Yerel değişkenler yalnızca tanımlandıkları blokta görünür; blok bitince yok olur.</li>
+      <li>Aşırı yüklemede derleyici, argümanların sayısına ve tipine bakarak imzayı derleme sırasında seçer; yalnızca dönüş tipi farklı iki metot olamaz.</li>
+    </ul>
+    <p>Tüm programların çıktıları, her argüman kombinasyonu için gerçek Java (JDK 21) çıktısıyla karşılaştırılarak doğrulanmıştır.</p>
+    <p>İlgili sunum: <a href="Bolum_09_Metotlar.html">Bölüm 9 · Metotlar</a> (Çağrı Yığını, Değere Göre Aktarım, swap Tuzağı, Metot Aşırı Yükleme, Yerel Kapsam, ekok).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /*CORE-BEGIN*/
+  var Core = (function () {
+    function Stop() {}
+    function Tracer() {
+      var fr = [], out = "", ev = [];
+      function top() { return fr[fr.length - 1]; }
+      function snap(line, why, x) {
+        var e = { line: line, why: why, out: out, frames: fr.map(function (f) { return { fn: f.fn, sig: f.sig, back: f.back, vars: f.vars.map(function (v) { return v.slice(); }) }; }) };
+        for (var k in x || {}) e[k] = x[k];
+        ev.push(e);
+        if (ev.length > 500) throw new Error("çok uzun");
+      }
+      function find(f, n) { for (var i = 0; i < f.vars.length; i++) if (f.vars[i][0] === n) return i; return -1; }
+      var T = {
+        main: function (line, why) { fr.push({ fn: "main", sig: "main(String[] args)", back: "", vars: [] }); snap(line, why); },
+        call: function (fn, sig, names, vals, line, back, why, q) {
+          fr.push({ fn: fn, sig: sig, back: back, vars: names.map(function (n, i) { return [n, vals[i], "param"]; }) });
+          snap(line, why, { push: true, q: q });
+        },
+        set: function (n, v, line, why, tag, q) { var f = top(), i = find(f, n); if (i < 0) f.vars.push([n, v, tag || ""]); else f.vars[i][1] = v; snap(line, why, { chg: n, q: q }); },
+        setq: function (n, v, tag) { var f = top(), i = find(f, n); if (i < 0) f.vars.push([n, v, tag || ""]); else f.vars[i][1] = v; },
+        drop: function (n) { var f = top(), i = find(f, n); if (i >= 0) f.vars.splice(i, 1); },
+        ret: function (v, line, why, q) { snap(line, why, { ret: v, q: q }); fr.pop(); },
+        print: function (line, s, why, q) { out += s; snap(line, why, { q: q, printed: true }); },
+        step: function (line, why, q) { snap(line, why, { q: q }); },
+        error: function (line, msg, why) { snap(line, why, { cerr: msg }); throw new Stop(); },
+        get events() { return ev; }, get out() { return out; }
+      };
+      return T;
+    }
+    function opts(right, alts) {
+      var o = [String(right)];
+      function add(a) { a = String(a); if (o.indexOf(a) < 0) o.push(a); }
+      alts.forEach(add);
+      if (typeof right === "number") { var d = 1; while (o.length < 3) { add(right + d); if (o.length < 3) add(right - d); d++; } }
+      return { opts: o, ans: 0 };
+    }
+    function Q(text, right, alts) { var o = opts(right, alts); o.text = text; return o; }
+
+    var PROGS = [
+      {
+        id: "topla", ad: "topla(a, b): çağrı ve dönüş",
+        params: [{ k: "a", ad: "1. argüman", min: -99, max: 99, v: 5 }, { k: "b", ad: "2. argüman", min: -99, max: 99, v: 3 }],
+        code: function (p) { return ["static int topla(int a, int b) {", "    int sonuc = a + b;", "    return sonuc;", "}", "public static void main(String[] args) {", "    int toplam = topla(" + p.a + ", " + p.b + ");", "    System.out.println(toplam);", "}"]; },
+        run: function (p, T) {
+          var s = p.a + p.b;
+          T.main(4, "Program main'den başlar: çağrı yığınında yalnızca main'in çerçevesi var.");
+          T.step(5, "Atamanın sağ tarafı önce hesaplanmalı: topla(" + p.a + ", " + p.b + ") çağrılır. main burada bekler.");
+          T.call("topla", "topla(int a, int b)", ["a", "b"], [p.a, p.b], 0, "main · satır 6", "Yeni çerçeve açılır (push): argümanların değerleri " + p.a + " ve " + p.b + " parametreler a ve b'ye kopyalanır.");
+          T.set("sonuc", s, 1, "Yerel değişken sonuc = " + p.a + " + " + p.b + " = " + s + "; yalnızca topla'nın çerçevesinde yaşar.");
+          T.ret(s, 2, "return sonuc: " + s + " çağırana gönderilir; topla'nın çerçevesi kapanır (pop).", Q("topla hangi değeri döndürür?", s, [p.a * p.b, p.a, s + 1]));
+          T.set("toplam", s, 5, "Dönen değer çağrının yerine geçer: toplam = " + s + ". a, b ve sonuc artık yok.");
+          T.print(6, s + "\n", s + " yazılır.");
+        }
+      },
+      {
+        id: "ortalama", ad: "İç içe çağrı: ortalama → topla",
+        params: [{ k: "x", ad: "1. argüman", min: -99, max: 99, v: 9 }, { k: "y", ad: "2. argüman", min: -99, max: 99, v: 7 }],
+        code: function (p) { return ["static int topla(int a, int b) {", "    return a + b;", "}", "static int ortalama(int x, int y) {", "    int t = topla(x, y);", "    return t / 2;", "}", "public static void main(String[] args) {", "    int o = ortalama(" + p.x + ", " + p.y + ");", "    System.out.println(o);", "}"]; },
+        run: function (p, T) {
+          var t = p.x + p.y, o = (t / 2) | 0;
+          T.main(7, "main başlar.");
+          T.call("ortalama", "ortalama(int x, int y)", ["x", "y"], [p.x, p.y], 3, "main · satır 9", "main, ortalama(" + p.x + ", " + p.y + ")'yi çağırır: yeni çerçeve main'in üstüne konur, x = " + p.x + ", y = " + p.y + ".");
+          T.step(4, "ortalama da bir metot çağırıyor: topla(x, y) → x ve y'nin DEĞERLERİ (" + p.x + ", " + p.y + ") gönderilir.");
+          T.call("topla", "topla(int a, int b)", ["a", "b"], [p.x, p.y], 0, "ortalama · satır 5", "topla en üste: yığında 3 çerçeve. Yalnızca en üstteki çalışır; diğerleri kaldıkları satırda bekler.");
+          T.ret(t, 1, "return " + p.x + " + " + p.y + " = " + t + ": topla'nın çerçevesi kapanır (son giren ilk çıkar).", Q("topla hangi değeri döndürür?", t, [t / 2 | 0, p.x]));
+          T.set("t", t, 4, t + " çağrının yerine geçer: t = " + t + ". ortalama kaldığı yerden sürer.");
+          T.ret(o, 5, "return t / 2 → " + t + " / 2 = " + o + " (tam sayı bölmesi). ortalama'nın çerçevesi kapanır.", Q("ortalama hangi değeri döndürür?", o, [(t / 2).toFixed(1), t, o + 1]));
+          T.set("o", o, 8, "main'e dönüldü: o = " + o + ". x, y, t, a, b hiçbiri artık yok.");
+          T.print(9, o + "\n", o + " yazılır. Çerçeveler yığın gibi çalışır: son açılan ilk kapanır.");
+        }
+      },
+      {
+        id: "artir", ad: "Değere göre aktarım: artir(sayi)",
+        params: [{ k: "sayi", ad: "sayi", min: -99, max: 99, v: 5 }, { k: "bicim", ad: "artir", type: "sel", opts: ["void (değeri değiştirmeye çalışır)", "int döndürür (doğru yol)"], v: "void (değeri değiştirmeye çalışır)" }],
+        code: function (p) {
+          var r = p.bicim[0] === "i";
+          return r ? ["static int artir(int x) {", "    x++;", "    return x;", "}", "public static void main(String[] args) {", "    int sayi = " + p.sayi + ";", "    sayi = artir(sayi);", "    System.out.println(sayi);", "}"]
+            : ["static void artir(int x) {", "    x++;", "}", "public static void main(String[] args) {", "    int sayi = " + p.sayi + ";", "    artir(sayi);", "    System.out.println(sayi);", "}"];
+        },
+        run: function (p, T) {
+          var r = p.bicim[0] === "i", m = r ? 4 : 3, s = p.sayi;
+          T.main(m, "main başlar.");
+          T.set("sayi", s, m + 1, "main'de sayi = " + s + ": main çerçevesinde bir kutu.");
+          T.call("artir", "artir(int x)", ["x"], [s], 0, "main · satır " + (m + 3), "artir(sayi): gönderilen değişkenin kendisi değil, DEĞERİ (" + s + "). Yeni çerçevede ayrı bir kutu: x = " + s + " (kopya).");
+          T.set("x", s + 1, 1, "x++ → x = " + (s + 1) + ". Yalnızca artir'in kutusu değişti; main'deki sayi hâlâ " + s + ".");
+          if (r) {
+            T.ret(s + 1, 2, "return x: " + (s + 1) + " değeri çağırana gönderilir, çerçeve kapanır.");
+            T.set("sayi", s + 1, m + 2, "Dönen değer sayi'ye ATANIR: sayi = " + (s + 1) + ". Değişiklik ancak böyle main'e ulaşır.");
+            T.print(m + 3, (s + 1) + "\n", (s + 1) + " yazılır.", Q("println ne yazar?", s + 1, [s]));
+          } else {
+            T.ret(undefined, 2, "Metot biter (void: değer döndürmez); çerçeve ve içindeki x (" + (s + 1) + ") silinir.");
+            T.print(m + 3, s + "\n", s + " yazılır: Java'da ilkel tipler DEĞERE GÖRE aktarılır; metot yalnızca kopyayı değiştirdi.", Q("println ne yazar?", s, [s + 1]));
+          }
+        }
+      },
+      {
+        id: "swap", ad: "Takas tuzağı: swap(x, y)",
+        params: [{ k: "x", ad: "x", min: -99, max: 99, v: 3 }, { k: "y", ad: "y", min: -99, max: 99, v: 5 }],
+        code: function (p) { return ["static void swap(int a, int b) {", "    int t = a;", "    a = b;", "    b = t;", "}", "public static void main(String[] args) {", "    int x = " + p.x + ", y = " + p.y + ";", "    swap(x, y);", "    System.out.println(x + \" \" + y);", "}"]; },
+        run: function (p, T) {
+          T.main(5, "main başlar.");
+          T.setq("x", p.x); T.set("y", p.y, 6, "main'de x = " + p.x + " ve y = " + p.y + ": main çerçevesinde iki ayrı kutu.");
+          T.call("swap", "swap(int a, int b)", ["a", "b"], [p.x, p.y], 0, "main · satır 8", "swap(x, y): değerler (" + p.x + " ve " + p.y + ") kopyalanır. swap'in çerçevesinde iki yeni kutu: a = " + p.x + ", b = " + p.y + ". x ve y ile bağlantı yok.");
+          T.set("t", p.x, 1, "t = a → t = " + p.x + ": geçici kutu a'nın değerini saklar.");
+          T.set("a", p.y, 2, "a = b → a = " + p.y + ". Eski a değeri artık yalnızca t'de.");
+          T.set("b", p.x, 3, "b = t → b = " + p.x + ". swap'in kopyaları yer değiştirdi; main'deki x ve y'ye hiç dokunulmadı.");
+          T.ret(undefined, 4, "swap biter: çerçevesi (a, b, t) silinir. Takas edilen yalnızca kopyalardı.");
+          T.print(8, p.x + " " + p.y + "\n", p.x + " " + p.y + " yazılır. Gerçek takas için sonucu döndürmek ya da dizi kullanmak gerekir.", Q("println ne yazar?", p.x + " " + p.y, [p.y + " " + p.x]));
+        }
+      },
+      {
+        id: "alan", ad: "Aşırı yükleme: alan(...)",
+        params: [{ k: "c", ad: "çağrı", type: "sel", opts: ["alan(4)", "alan(3, 5)", "alan(7, 2)", "alan(-6)", "alan(2.5)"], v: "alan(4)" }],
+        code: function (p) { return ["static int alan(int kenar) {", "    return kenar * kenar;", "}", "static int alan(int en, int boy) {", "    return en * boy;", "}", "public static void main(String[] args) {", "    System.out.println(" + p.c + ");", "}"]; },
+        run: function (p, T) {
+          var args = p.c.slice(5, -1).split(", ");
+          var Qs = Q("Derleyici hangi alan metodunu seçer?", args.length === 2 ? "alan(int, int)" : args[0].indexOf(".") >= 0 ? "derleme hatası" : "alan(int)", ["alan(int)", "alan(int, int)", "derleme hatası"]);
+          T.main(6, "main başlar.");
+          if (args[0].indexOf(".") >= 0) {
+            T.step(7, "Derleyici argümanlara bakar: 1 tane double (" + args[0] + "). Tek parametreli aday alan(int); ama double → int otomatik dönüşmez (veri kaybı olur).", Qs);
+            T.error(7, "error: incompatible types: possible lossy conversion from double to int", "Hiçbir imza uymaz → derleme hatası; program hiç çalışmaz. Çözüm: alan((int) 2.5) ya da alan(double) diye üçüncü bir aşırı yükleme.");
+          }
+          if (args.length === 1) {
+            var k = +args[0];
+            T.step(7, "Derleyici argümanlara bakar: 1 tane int. Aynı adlı iki metot var; parametre sayısı ve tipi uyan alan(int) seçilir. Bu karar derlemede verilir.", Qs);
+            T.call("alan", "alan(int kenar)", ["kenar"], [k], 0, "main · satır 8", "Çalışma zamanında alan(int) çağrılır: kenar = " + k + ".");
+            T.ret(k * k, 1, "return kenar * kenar → " + k + " * " + k + " = " + k * k + ".");
+            T.print(7, k * k + "\n", k * k + " yazılır.");
+          } else {
+            var a = +args[0], b = +args[1];
+            T.step(7, "Derleyici argümanlara bakar: 2 int → alan(int, int) seçilir. Ad aynı, parametre listesi farklı: aşırı yükleme.", Qs);
+            T.call("alan", "alan(int en, int boy)", ["en", "boy"], [a, b], 3, "main · satır 8", "alan(int, int) çağrılır: en = " + a + ", boy = " + b + ".");
+            T.ret(a * b, 4, "return en * boy → " + a * b + ".");
+            T.print(7, a * b + "\n", a * b + " yazılır.");
+          }
+        }
+      },
+      {
+        id: "goster", ad: "Aşırı yükleme: int / double / String",
+        params: [{ k: "c", ad: "argüman", type: "sel", opts: ["7", "7.0", "\"7\"", "'A'", "7L", "3 + 0.5", "\"7\" + 1", "7 / 2"], v: "7" }],
+        code: function (p) { return ["static void goster(int x) {", "    System.out.println(\"int: \" + x);", "}", "static void goster(double x) {", "    System.out.println(\"double: \" + x);", "}", "static void goster(String x) {", "    System.out.println(\"String: \" + x);", "}", "public static void main(String[] args) {", "    goster(" + p.c + ");", "}"]; },
+        run: function (p, T) {
+          var D = {
+            "7": ["int", 7, "7 bir int sabiti: tam eşleşen goster(int) seçilir."],
+            "7.0": ["double", "7.0", "7.0 bir double sabiti: goster(double) seçilir."],
+            "\"7\"": ["String", "7", "\"7\" bir dizgi: goster(String) seçilir. Tırnak içindeki 7 sayı değildir."],
+            "'A'": ["int", 65, "'A' bir char; char için ayrı metot yok. char otomatik olarak int'e genişletilir (en yakın uyan) → goster(int); x = 65 (A'nın kodu)."],
+            "7L": ["double", "7.0", "7L bir long; long → int otomatik olmaz (daralma), long → double genişlemedir → goster(double)."],
+            "3 + 0.5": ["double", "3.5", "Önce ifade hesaplanır: int + double → double 3.5 → goster(double)."],
+            "\"7\" + 1": ["String", "71", "\"7\" + 1 dizgi birleştirmedir → \"71\" → goster(String)."],
+            "7 / 2": ["int", 3, "7 / 2 tam sayı bölmesidir → 3 (int) → goster(int)."]
+          }[p.c];
+          var line = { int: 0, double: 3, String: 6 }[D[0]];
+          T.main(9, "main başlar.");
+          T.step(10, D[2] + " Seçim derleme sırasında, argümanın TİPİNE bakılarak yapılır.", Q("Hangi goster seçilir?", "goster(" + D[0] + ")", ["goster(int)", "goster(double)", "goster(String)"]));
+          T.call("goster", "goster(" + D[0] + " x)", ["x"], [D[0] === "String" ? "\"" + D[1] + "\"" : D[1]], line, "main · satır 11", "goster(" + D[0] + ") çağrılır: x = " + (D[0] === "String" ? "\"" + D[1] + "\"" : D[1]) + ".");
+          T.print(line + 1, D[0] + ": " + D[1] + "\n", "\"" + D[0] + ": " + D[1] + "\" yazılır." + (D[0] === "double" ? " double değerler en az bir ondalık basamakla yazılır." : ""));
+          T.ret(undefined, line + 2, "void metot kapanış süslü parantezinde kendiliğinden döner.");
+          T.step(11, "main biter.");
+        }
+      },
+      {
+        id: "kapsam", ad: "Yerel kapsam: hesapla(n)",
+        params: [{ k: "n", ad: "argüman n", min: -20, max: 20, v: 3 }],
+        code: function (p) { return ["static int hesapla(int n) {", "    int sonuc = 0;", "    if (n > 0) {", "        int katki = n * 2;", "        sonuc += katki;", "    }", "    return sonuc;", "}", "public static void main(String[] args) {", "    System.out.println(hesapla(" + p.n + "));", "}"]; },
+        run: function (p, T) {
+          var n = p.n, s = 0;
+          T.main(8, "main başlar.");
+          T.step(9, "println'in argümanı için önce hesapla(" + n + ") çağrılır.");
+          T.call("hesapla", "hesapla(int n)", ["n"], [n], 0, "main · satır 10", "Metot kapsamı açılır: parametre n = " + n + " (parametre de yerel değişkendir).");
+          T.set("sonuc", 0, 1, "sonuc metot kapsamında: metodun sonuna kadar görünür.");
+          if (n > 0) {
+            T.step(2, n + " > 0 → true: if bloğuna girilir, yeni bir iç kapsam açılır.");
+            T.set("katki", n * 2, 3, "katki = " + n + " * 2 = " + n * 2 + ": yalnızca if bloğunun içinde var.", "blok");
+            s = n * 2;
+            T.set("sonuc", s, 4, "İç bloktan dış kapsamdaki sonuc'a erişilebilir: sonuc = 0 + " + s + " = " + s + ".");
+            T.drop("katki");
+            T.step(5, "Blok kapandı: katki yok oldu. Burada katki yazmak derleme hatası olurdu (cannot find symbol).");
+          } else T.step(2, n + " > 0 → false: blok atlanır; katki hiç oluşmaz.");
+          T.ret(s, 6, "return " + s + ": metot kapsamı da kapanır (n ve sonuc silinir).", Q("hesapla(" + n + ") ne döndürür?", s, [n, 0, n * 2]));
+          T.print(9, s + "\n", "Dönen " + s + " println'e argüman olur ve yazılır.");
+        }
+      },
+      {
+        id: "erken", ad: "Erken dönüş: yazdirPozitif",
+        params: [{ k: "a", ad: "1. çağrı", min: -99, max: 99, v: -3 }, { k: "b", ad: "2. çağrı", min: -99, max: 99, v: 7 }],
+        code: function (p) { return ["static void yazdirPozitif(int sayi) {", "    if (sayi <= 0) return;", "    System.out.println(sayi);", "}", "public static void main(String[] args) {", "    yazdirPozitif(" + p.a + ");", "    yazdirPozitif(" + p.b + ");", "}"]; },
+        run: function (p, T) {
+          T.main(4, "main başlar.");
+          [p.a, p.b].forEach(function (v, i) {
+            T.call("yazdirPozitif", "yazdirPozitif(int sayi)", ["sayi"], [v], 0, "main · satır " + (6 + i), (i ? "Yepyeni bir çerçeve: sayi = " + v + " (önceki çağrının sayi'si çoktan yok oldu)." : "Çerçeve açılır: sayi = " + v + "."));
+            if (v <= 0) T.ret(undefined, 1, v + " <= 0 → true → return; metot hemen biter, println'e hiç gelinmez.", Q(v + " için println çalışır mı?", "hayır", ["evet"]));
+            else {
+              T.step(1, v + " <= 0 → false → erken dönüş yok, devam.", Q(v + " için println çalışır mı?", "evet", ["hayır"]));
+              T.print(2, v + "\n", v + " yazılır.");
+              T.ret(undefined, 3, "Kapanış süslü parantezine gelindi: void metot burada kendiliğinden döner.");
+            }
+            if (!i) T.step(6, "main sonraki satırdan sürer.");
+          });
+          T.step(7, "main biter.");
+        }
+      },
+      {
+        id: "ekok", ad: "ekok → ebob: metot içinden çağrı",
+        params: [{ k: "a", ad: "a", min: 1, max: 999, v: 12 }, { k: "b", ad: "b", min: 1, max: 999, v: 18 }],
+        code: function (p) { return ["static int ebob(int a, int b) {", "    while (b != 0) {", "        int r = a % b;", "        a = b;", "        b = r;", "    }", "    return a;", "}", "static int ekok(int a, int b) {", "    return a / ebob(a, b) * b;", "}", "public static void main(String[] args) {", "    System.out.println(ekok(" + p.a + ", " + p.b + "));", "}"]; },
+        run: function (p, T) {
+          T.main(11, "main başlar.");
+          T.call("ekok", "ekok(int a, int b)", ["a", "b"], [p.a, p.b], 8, "main · satır 13", "main, ekok(" + p.a + ", " + p.b + ")'i çağırır: a = " + p.a + ", b = " + p.b + ".");
+          T.call("ebob", "ebob(int a, int b)", ["a", "b"], [p.a, p.b], 0, "ekok · satır 10", "İfadeyi hesaplamak için ekok, ebob(a, b)'yi çağırır: yığında 3 çerçeve. Adları aynı olsa da ebob'un a, b'si ayrı kutulardır.");
+          var a = p.a, b = p.b, g;
+          while (true) {
+            T.step(1, "Koşul: b != 0 → " + b + " != 0 → " + (b !== 0) + ".");
+            if (b === 0) break;
+            var r = a % b;
+            T.set("r", r, 2, "r = a % b = " + a + " % " + b + " = " + r + ".", "blok");
+            T.set("a", b, 3, "a = b → a = " + b + "."); a = b;
+            T.set("b", r, 4, "b = r → b = " + r + ". (ebob değişmez: ebob(" + a + ", " + r + "))"); b = r;
+            T.drop("r");
+          }
+          g = a;
+          T.ret(g, 6, "return " + g + ": ebob'un çerçevesi kapanır.", Q("ebob(" + p.a + ", " + p.b + ") ne döndürür?", g, [p.a * p.b, Math.min(p.a, p.b), 1]));
+          var l = (p.a / g | 0) * p.b;
+          T.step(9, "Çağrının yerine " + g + " geçer: " + p.a + " / " + g + " * " + p.b + " = " + (p.a / g | 0) + " * " + p.b + " = " + l + ". Önce bölmek, a * b'nin taşmasını önler.");
+          T.ret(l, 9, "return " + l + ": ekok'un çerçevesi kapanır.");
+          T.print(12, l + "\n", l + " yazılır. Metot başka bir metodu çağırarak işini kısalttı: kod tekrarı yok.", Q("Ne yazılır?", l, [p.a * p.b, g]));
+        }
+      }
+    ];
+    function trace(prog, p) {
+      var T = Tracer();
+      try { prog.run(p, T); } catch (x) { if (!(x instanceof Stop)) throw x; }
+      return { events: T.events, out: T.out, code: prog.code(p) };
+    }
+    return { PROGS: PROGS, trace: trace };
+  })();
+  /*CORE-END*/
+
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector(".cx-mc");
+  var P = null, R = null, k = 0, timer = null, answered = {}, ok = 0, all = 0, lastK = -1;
+
+  Core.PROGS.forEach(function (pr, i) { var o = document.createElement("option"); o.value = i; o.textContent = pr.ad; E("mcProg").appendChild(o); });
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  function buildParams() {
+    P = Core.PROGS[E("mcProg").value];
+    E("mcParams").innerHTML = P.params.map(function (q) {
+      if (q.type === "sel") return '<label class="wide" for="mcp_' + q.k + '">' + q.ad + '</label><select class="wide" id="mcp_' + q.k + '"' + (q.k === "c" ? ' style="font-family:ui-monospace,Consolas,monospace"' : "") + ">" + q.opts.map(function (o) { return "<option" + (o === q.v ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select>";
+      return '<label for="mcp_' + q.k + '">' + q.ad + '</label><input type="number" id="mcp_' + q.k + '" min="' + q.min + '" max="' + q.max + '" step="1" value="' + q.v + '">';
+    }).join("");
+    P.params.forEach(function (q) { E("mcp_" + q.k).addEventListener("change", compute); });
+    compute();
+  }
+  function params() {
+    var p = {};
+    P.params.forEach(function (q) {
+      var el = E("mcp_" + q.k);
+      if (q.type === "sel") p[q.k] = el.value;
+      else { var v = parseInt(el.value, 10); if (isNaN(v)) v = q.v; v = Math.max(q.min, Math.min(q.max, v)); el.value = v; p[q.k] = v; }
+    });
+    return p;
+  }
+  function compute() {
+    stop();
+    R = Core.trace(P, params());
+    k = 0; answered = {}; lastK = -1;
+    E("mcCode").innerHTML = R.code.map(function (l) { return '<li class="' + (/^(static|public static)/.test(l) ? "is-def" : "") + '">' + esc(l) + "</li>"; }).join("");
+    shuffleQs();
+    draw();
+  }
+
+  function needQ() { var e = R.events[k]; return E("mcQuiz").checked && e.q && !answered[k]; }
+  function fv(v) { return v === undefined ? "" : esc(v); }
+
+  function draw() {
+    var e = R.events[k], q = needQ();
+    [].forEach.call(E("mcCode").children, function (li, i) {
+      li.classList.toggle("is-cur", i === e.line && !e.cerr);
+      li.classList.toggle("is-bad", i === e.line && !!e.cerr);
+    });
+    var cur = E("mcCode").children[e.line];
+    if (cur) { var box = E("mcCode"); if (cur.offsetTop < box.scrollTop || cur.offsetTop > box.scrollTop + box.clientHeight - 24) box.scrollTop = cur.offsetTop - 40; }
+    var n = e.frames.length, h = "";
+    e.frames.forEach(function (f, i) {
+      var top = i === n - 1, cls = "frame" + (top ? " is-top" : "") + (top && e.push && k > lastK ? " is-new" : "") + (top && "ret" in e ? " is-ret" : "");
+      h += '<div class="' + cls + '"><div class="fh"><b>' + esc(f.sig) + "</b>" + (f.back ? "<small>↩ " + esc(f.back) + "</small>" : "<small>alt çerçeve</small>") + '</div><div class="vs">' +
+        (f.vars.length ? f.vars.map(function (v) {
+          return '<div class="' + (top && v[0] === e.chg ? "is-chg" : "") + '"><span>' + esc(v[0]) + '</span><span class="tag">' + (v[2] === "param" ? "parametre" : v[2] === "blok" ? "blok" : "") + "</span><b>" + fv(v[1]) + "</b></div>";
+        }).join("") : '<span class="none">(yerel değişken yok)</span>') + "</div>" +
+        (top && "ret" in e ? '<div class="rb">' + (q ? "return ?" : e.ret === undefined ? "return (void) — değer yok" : "return " + esc(e.ret)) + "</div>" : "") + "</div>";
+    });
+    if (e.cerr) h = '<div class="cerr">' + esc(e.cerr) + "</div>" + h;
+    E("mcStack").innerHTML = h;
+    E("mcStCap").textContent = "Çağrı yığını · " + n + " çerçeve";
+    lastK = k;
+    if (q) {
+      E("mcWhy").innerHTML = "<b>Tahmin edin:</b> " + esc(e.q.text) + '<div class="qbtns">' + e.q.order.map(function (i) { return '<button type="button" data-a="' + i + '">' + esc(e.q.opts[i]) + "</button>"; }).join("") + "</div>";
+    } else E("mcWhy").innerHTML = (e.fb || "") + esc(e.why);
+    var out = q && e.printed ? (R.events[k - 1] ? R.events[k - 1].out : "") : e.out;
+    E("mcOut").textContent = out;
+    E("mcOut").scrollTop = E("mcOut").scrollHeight;
+    E("mcNo").textContent = "Adım " + (k + 1) + " / " + R.events.length;
+    buttons(q);
+    if (q) { var b = E("mcWhy").querySelector("button"); if (b && root.contains(document.activeElement)) b.focus(); }
+  }
+  function buttons(q) {
+    E("mcBack").disabled = k === 0;
+    E("mcReset").disabled = k === 0;
+    E("mcStep").disabled = q || k >= R.events.length - 1;
+    E("mcPlay").disabled = E("mcStep").disabled && !timer;
+    E("mcPlay").textContent = timer ? "Duraklat" : "Oynat";
+  }
+  function go(d) { k = Math.max(0, Math.min(R.events.length - 1, k + d)); draw(); }
+  function stop() { clearInterval(timer); timer = null; }
+  function delay() { return [1800, 1250, 850, 500, 220][E("mcSpeed").value - 1]; }
+  function play() {
+    if (timer) { stop(); buttons(needQ()); return; }
+    if (k >= R.events.length - 1) { k = 0; lastK = -1; }
+    timer = setInterval(function () {
+      if (needQ() || k >= R.events.length - 1) { stop(); buttons(needQ()); return; }
+      go(1);
+      if (needQ()) { stop(); buttons(true); }
+    }, delay());
+    draw();
+  }
+  function shuffleQs() {
+    R.events.forEach(function (e) { if (e.q) { var o = e.q.opts.map(function (_, i) { return i; }); o.sort(function () { return Math.random() - 0.5; }); e.q.order = o; } });
+  }
+
+  E("mcWhy").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-a]");
+    if (!b || !needQ()) return;
+    var e = R.events[k], good = +b.getAttribute("data-a") === e.q.ans;
+    answered[k] = true; all++; if (good) ok++;
+    E("mcOk").textContent = ok; E("mcAll").textContent = all;
+    e.fb = good ? '<b class="agt-oyun__good">Doğru!</b> ' : '<b class="agt-oyun__bad">Yanlış.</b> Doğrusu: <code>' + esc(e.q.opts[e.q.ans]) + "</code>. ";
+    lastK = k;
+    draw();
+    E("mcStep").focus();
+  });
+  E("mcProg").addEventListener("change", buildParams);
+  E("mcStep").addEventListener("click", function () { stop(); go(1); });
+  E("mcBack").addEventListener("click", function () { stop(); go(-1); });
+  E("mcReset").addEventListener("click", function () { stop(); k = 0; lastK = -1; answered = {}; R.events.forEach(function (e) { e.fb = ""; }); draw(); });
+  E("mcPlay").addEventListener("click", play);
+  E("mcSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("mcQuiz").addEventListener("change", draw);
+  root.addEventListener("keydown", function (ev) {
+    if (/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName)) return;
+    if (ev.key === "ArrowRight" && !needQ()) { stop(); go(1); ev.preventDefault(); }
+    else if (ev.key === "ArrowLeft") { stop(); go(-1); ev.preventDefault(); }
+  });
+
+  buildParams();
+})();
+</script>
+<script src="deck/oyun.js"></script>
