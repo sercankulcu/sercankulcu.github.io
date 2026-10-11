@@ -15,7 +15,7 @@ girer); her sayfa, canli sitedeki sayfa duzeninin (tema, sarmalayicilar, MathJax
 icine yerlestirilir. Boylece deck.js'in otomatik sigdirmasi yayimdaki olculeri gorur.
 Chrome ya da Edge ve Python paketi playwright gerekir.
 """
-import argparse, functools, gzip, http.server, os, re, subprocess, sys, threading
+import argparse, os, re, subprocess, sys
 
 sys.stdout.reconfigure(encoding='utf-8', errors='replace', line_buffering=True)
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -62,33 +62,43 @@ EXPECTED = """() => [...document.querySelectorAll('.ds-deck__slide')]
   .reduce((n, s) => n + Math.max(1, s.querySelectorAll('.ds-deck__step').length), 0)"""
 
 
-class Handler(http.server.SimpleHTTPRequestHandler):
-    """Gzip'li sunucu: buyuk sunumlar sikistirmasiz gonderilince baglanti kopabiliyor."""
-    TYPES = {'html': 'text/html; charset=utf-8', 'css': 'text/css', 'js': 'application/javascript',
-             'svg': 'image/svg+xml', 'png': 'image/png', 'jpg': 'image/jpeg', 'webp': 'image/webp'}
+# Yerel dosyalar Playwright'in istek yakalamasiyla dogrudan tarayiciya verilir; yerel bir HTTP
+# sunucusu kullanilmaz (bu makinede 64 KB'tan buyuk yanitlarda baglanti ara sira kopuyordu).
+# Adres "localhost" olmali: ds-guard yalnizca sitenin kendi adresinde ve yerelde calisir.
+BASE = 'http://localhost:8765'
+TYPES = {'html': 'text/html; charset=utf-8', 'css': 'text/css', 'js': 'application/javascript',
+         'svg': 'image/svg+xml', 'png': 'image/png', 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg',
+         'webp': 'image/webp', 'gif': 'image/gif', 'json': 'application/json', 'woff2': 'font/woff2'}
 
-    SHELL = None  # (once, sonra): verilirse her .html bu iki parcanin arasina konur
 
-    def do_GET(self):
-        path = self.translate_path(self.path.split('?')[0].split('#')[0])
-        if not os.path.isfile(path):
-            return super().do_GET()
-        with open(path, 'rb') as f:
-            data = f.read()
-        if self.SHELL and path.lower().endswith('.html'):
-            # Jekyll'in yaptigi gibi: on bilgi atilir, icerik sayfa duzeninin icine girer
-            data = re.sub(rb'\A---\r?\n.*?\r?\n---\r?\n', b'', data, count=1, flags=re.S)
-            data = self.SHELL[0] + data + self.SHELL[1]
-        data = gzip.compress(data)
-        self.send_response(200)
-        self.send_header('Content-Type', self.TYPES.get(path.rsplit('.', 1)[-1].lower(), 'application/octet-stream'))
-        self.send_header('Content-Encoding', 'gzip')
-        self.send_header('Content-Length', str(len(data)))
-        self.end_headers()
-        self.wfile.write(data)
+def local_file(root, path, shell=None):
+    """Adresin yolundaki dosyanin icerigi ve turu (yoksa None). shell verilirse .html, Jekyll'in
+    yaptigi gibi on bilgisi atilarak yayimdaki sayfa duzeninin (once, sonra) arasina konur."""
+    import urllib.parse
+    rel = urllib.parse.unquote(path.split('?')[0].split('#')[0]).lstrip('/')
+    f = os.path.normpath(os.path.join(root, rel))
+    if not f.startswith(os.path.normpath(root)) or not os.path.isfile(f):
+        return None, None
+    with open(f, 'rb') as h:
+        data = h.read()
+    ext = f.rsplit('.', 1)[-1].lower()
+    if shell and ext == 'html':
+        data = re.sub(rb'\A---\r?\n.*?\r?\n---\r?\n', b'', data, count=1, flags=re.S)
+        data = shell[0] + data + shell[1]
+    return data, TYPES.get(ext, 'application/octet-stream')
 
-    def log_message(self, *a):
-        pass
+
+def serve(context, root, shell=None):
+    """BASE altindaki istekleri root klasorunden karsila (tarayici baglami icin)."""
+    import urllib.parse
+
+    def handle(route):
+        data, ctype = local_file(root, urllib.parse.urlsplit(route.request.url).path, shell)
+        if data is None:
+            route.fulfill(status=404, body='')
+        else:
+            route.fulfill(status=200, body=data, headers={'Content-Type': ctype})
+    context.route(BASE + '/**', handle)
 
 
 def fetch_shell(url=SHELL_URL):
@@ -190,19 +200,18 @@ def main():
         return
 
     from playwright.sync_api import sync_playwright
-    srv = http.server.ThreadingHTTPServer(('127.0.0.1', 0), functools.partial(Handler, directory=slides))
-    threading.Thread(target=srv.serve_forever, daemon=True).start()
-    base = 'http://127.0.0.1:%d' % srv.server_address[1]
-    Handler.SHELL = None if a.no_theme else fetch_shell()
+    shell = None if a.no_theme else fetch_shell()
     bad = 0
     with sync_playwright() as p:
         browser = launch(p)
+        context = browser.new_context(viewport={'width': 1280, 'height': 900})
+        serve(context, slides, shell)
         for n in names:
             # buyuk sunumlar ara sira yuklenemiyor (zaman asimi): birkac kez dene
             for attempt in range(3):
-                page = browser.new_page(viewport={'width': 1280, 'height': 900})
+                page = context.new_page()
                 try:
-                    snaps, expected = render(page, '%s/%s.html#1' % (base, n))
+                    snaps, expected = render(page, '%s/%s.html#1' % (BASE, n))
                     break
                 except Exception as e:
                     page.close()
@@ -218,7 +227,6 @@ def main():
                                                  os.path.getsize(out) // 1024))
             page.close()
         browser.close()
-    srv.shutdown()
     if bad:
         sys.exit('%d sunumda sayfa sayisi adim sayisiyla tutmadi.' % bad)
 

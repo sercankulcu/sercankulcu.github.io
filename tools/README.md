@@ -96,9 +96,11 @@ girer. Yerel dosyada sitenin sayfa düzeni yoktur. Bu yüzden canlı siteden bir
 sunumun düzeni alınır (tema, `.page__content` sarmalayıcısı, MathJax) ve yerel
 içerik, Jekyll'deki gibi ön bilgisi atılarak bunun içine konur. Böylece
 `deck.js`'in otomatik sığdırması da yayımdaki ölçüleri görür. Çevrimdışıysanız
-`--no-theme` verin; o zaman yazılar küçük çıkar ve sığdırma farklı olur. Yerel sunucu dosyaları gzip'le
-gönderir: büyük sunumlar sıkıştırmasız gönderilince Chrome bağlantıyı
-koparabiliyor.
+`--no-theme` verin; o zaman yazılar küçük çıkar ve sığdırma farklı olur. Yerel
+HTTP sunucusu kullanılmaz: dosyalar Playwright'ın istek yakalamasıyla
+(`http://localhost:8765/…` adresinden) doğrudan tarayıcıya verilir. Yerel sunucu
+bu makinede 64 KB'tan büyük yanıtlarda bağlantıyı ara sıra koparıyor, büyük
+sunumlar yarım yükleniyordu.
 
 Her sunum için basılan sayfa sayısı, sunumdaki adım sayısıyla karşılaştırılır;
 tutmazsa betik hata koduyla çıkar. `--stale`, PDF'i olmayan ya da HTML'i
