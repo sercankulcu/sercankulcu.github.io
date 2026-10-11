@@ -31,7 +31,7 @@ Game theory is a mathematical framework used to analyze and understand strategic
 
 #### 🕹️ Games
 
-- [Guess the Average Game](../files/agt/slides/Chapter_01_Guess_Avarage.html)
+- [Guess the Average Game](../files/agt/slides/Chapter_01_Guess_Average.html)
 - [TicTacToe Game](../files/agt/slides/Chapter_01_TicTacToe.html)
 - [Nim Game](../files/agt/slides/Chapter_01_Nim.html)
 - [Don't Say 21 Game](../files/agt/slides/Chapter_01_Dont-Say-21.html)
