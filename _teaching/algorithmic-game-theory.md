@@ -31,8 +31,9 @@ Game theory is a mathematical framework used to analyze and understand strategic
 
 #### 🕹️ Games
 
+- [Prisoner's Dilemma (play before the theory)](../files/agt/slides/Chapter_03_Prisoners_Dilemma.html)
 - [Guess the Average Game](../files/agt/slides/Chapter_01_Guess_Average.html)
-- [TicTacToe Game](../files/agt/slides/Chapter_01_TicTacToe.html)
+- [Minimax Tic-Tac-Toe](../files/agt/slides/Chapter_01_TicTacToe.html)
 - [Nim Game](../files/agt/slides/Chapter_01_Nim.html)
 - [Don't Say 21 Game](../files/agt/slides/Chapter_01_Dont-Say-21.html)
 
@@ -48,9 +49,6 @@ Algorithmic game theory is an interdisciplinary field that combines concepts fro
 
 #### 🕹️ Games
 
-- [Othello Game](../files/agt/slides/Chapter_02_Othello.html)
-- [Hex Game](../files/agt/slides/Chapter_02_Hex.html)
-- [Reversi Game](../files/agt/slides/Chapter_02_Reversi.html)
 - [Connect Four Game](../files/agt/slides/Chapter_02_Connect-Four.html)
 
 ---
@@ -66,12 +64,9 @@ Nash equilibrium is a central concept in game theory that captures the notion of
 #### 🕹️ Games
 
 - [Prisoner's Dilemma](../files/agt/slides/Chapter_03_Prisoners_Dilemma.html)
-- [Matrix Nash](../files/agt/slides/Chapter_03_Matrix-Nash.html)
-- [Rock–Paper–Scissors Game](../files/agt/slides/Chapter_03_Rock_Scissors_Paper.html)
-- [Colonel Blotto Game](../files/agt/slides/Chapter_03_Colonel-Blotto.html)
-- [Fox and Geese Game](../files/agt/slides/Chapter_03_Fox-and-Geese.html)
-- [Nine Mens Morris Game](../files/agt/slides/Chapter_03_Nine-Mens-Morris.html)
-- [Chess game](../files/agt/slides/Chapter_03_Chess.html)
+- [Matrix Game & Nash Equilibrium Lab](../files/agt/slides/Chapter_03_Matrix-Nash.html)
+- [Rock–Paper–Scissors](../files/agt/slides/Chapter_03_Rock_Scissors_Paper.html)
+- [Colonel Blotto](../files/agt/slides/Chapter_03_Colonel-Blotto.html)
 
 ---
 
@@ -85,10 +80,9 @@ Mechanism design is a field of study within game theory and economics that focus
 
 #### 🕹️ Games
 
-- [Poker Game](../files/agt/slides/Chapter_04_Poker.html)
 - [Stable Matching](../files/agt/slides/Chapter_04_Stable-Matching.html)
 - [Ultimatum Game](../files/agt/slides/Chapter_04_Ultimatum-Game.html)
-- [Incentive Compatibility](../files/agt/slides/Chapter_04_Incentive-Compatibility-Lab.html)
+- [Incentive Compatibility Lab](../files/agt/slides/Chapter_04_Incentive-Compatibility-Lab.html)
 
 ---
 
@@ -107,7 +101,6 @@ Auctions and market design are closely related fields that utilize principles fr
 - [First-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_first-price-auction-simulator.html)
 - [Second-Price Sealed-Bid Auction Simulator](../files/agt/slides/Chapter_05_second-price-sealed-bid-auction.html)
 - [Double Auction Market](../files/agt/slides/Chapter_05_Double-Auction-Market-Simulator.html)
-- [Monopoly Game](../files/agt/slides/Chapter_05_Monopoly.html)
 
 ---
 
@@ -121,9 +114,9 @@ Social choice theory is a branch of economics and political science that studies
 
 #### 🕹️ Games
 
-- [Facility Location Mechanism](../files/agt/slides/Chapter_06_Facility_Location.html)
-- [Voting Rules](../files/agt/slides/Chapter_06_Voting-Rules.html)
-- [Condorcet Voting](../files/agt/slides/Chapter_06_Condorcet-Voting-Paradox.html)
+- [Facility Location: Strategy-Proof Median](../files/agt/slides/Chapter_06_Facility_Location.html)
+- [Voting Rules and Manipulation](../files/agt/slides/Chapter_06_Voting-Rules.html)
+- [Condorcet and the Voting Paradox](../files/agt/slides/Chapter_06_Condorcet-Voting-Paradox.html)
 
 ---
 
@@ -137,9 +130,8 @@ Multi-agent systems refer to scenarios where multiple self-interested agents int
 
 #### 🕹️ Games
 
-- [Checkers Game](../files/agt/slides/Chapter_07_Checkers.html)
 - [Public Goods Game](../files/agt/slides/Chapter_07_Public-Goods-Game.html)
-- [Shapley Coalition Game](../files/agt/slides/Chapter_07_Shapley-Coalition-Game.html)
+- [Shapley Value Coalition Game](../files/agt/slides/Chapter_07_Shapley-Coalition-Game.html)
 
 ---
 
@@ -153,9 +145,8 @@ In algorithmic game theory, network design and routing are studied with a focus 
 
 #### 🕹️ Games
 
-- [Traffic lights simulator](../files/agt/slides/Chapter_08_Traffic_Lights.html)
 - [Selfish Routing](../files/agt/slides/Chapter_08_Selfish-Routing.html)
-- [Braess Paradox](../files/agt/slides/Chapter_08_Braess-Paradox-Visualizer.html)
+- [Braess's Paradox](../files/agt/slides/Chapter_08_Braess-Paradox-Visualizer.html)
 - [Network Formation](../files/agt/slides/Chapter_08_Network-Formation.html)
 
 ---
@@ -170,7 +161,7 @@ In algorithmic game theory, online platforms are studied as environments where s
 
 #### 🕹️ Games
 
-- [Two Sided Platform Pricing](../files/agt/slides/Chapter_09_Two-Sided-Platform-Pricing.html)
+- [Two-Sided Platform Pricing](../files/agt/slides/Chapter_09_Two-Sided-Platform-Pricing.html)
 - [Sponsored Search Ad Auction](../files/agt/slides/Chapter_09_Sponsored-Search-Ad-Auction-Game.html)
 
 ---
@@ -185,7 +176,6 @@ Algorithmic fairness studies how decisions and resource allocations affect diffe
 
 #### 🕹️ Games
 
-- [Backgammon Game](../files/agt/slides/Chapter_10_Backgammon.html)
 - [Fair Division Game](../files/agt/slides/Chapter_10_Fair-Division-Game.html)
 
 ---
@@ -200,7 +190,7 @@ Price of Anarchy (PoA) is a measure that quantifies the loss of efficiency in a 
 
 #### 🕹️ Games
 
-- [Load Balancing Price of Anarchy](../files/agt/slides/Chapter_11_Load-Balancing-Price-of-Anarchy-Game.html)
+- [Load Balancing and Price of Anarchy](../files/agt/slides/Chapter_11_Load-Balancing-Price-of-Anarchy-Game.html)
 
 ---
 
@@ -214,8 +204,8 @@ Learning and adaptation play a significant role in algorithmic game theory by ad
 
 #### 🕹️ Games
 
-- [Multi Armed Bandit](../files/agt/slides/Chapter_12_Multi-Armed-Bandit.html)
-- [Repeated Prisoners Dilemma](../files/agt/slides/Chapter_12_Repeated-Prisoners-Dilemma-Tournament.html)
+- [Multi-Armed Bandit](../files/agt/slides/Chapter_12_Multi-Armed-Bandit.html)
+- [Repeated Prisoner's Dilemma Tournament](../files/agt/slides/Chapter_12_Repeated-Prisoners-Dilemma-Tournament.html)
 - [Replicator Dynamics](../files/agt/slides/Chapter_12_Replicator-Dynamics.html)
 
 ---
@@ -231,11 +221,9 @@ Decision-making is a central concept that focuses on how self-interested agents 
 #### 🕹️ Games
 
 - [Bayesian Decision Lab](../files/agt/slides/Chapter_13_Bayesian-Decision-Lab.html)
-- [Blackjack Game](../files/agt/slides/Chapter_13_Blackjack.html)
-- [HOKM Game](../files/agt/slides/Chapter_13_Hokm.html)
-- [Mangala Game](../files/agt/slides/Chapter_13_Mangala.html)
-- [Minesweeper Game](../files/agt/slides/Chapter_13_Minesweeper.html)
-- [Pişti Game](../files/agt/slides/Chapter_13_Pisti.html)
+- [Blackjack Decision Lab](../files/agt/slides/Chapter_13_Blackjack.html)
+- [Poker: Hidden Information and Bluffing](../files/agt/slides/Chapter_13_Poker.html)
+- [Backgammon: Expected Value under Chance](../files/agt/slides/Chapter_13_Backgammon.html)
 
 ---
 
@@ -249,5 +237,23 @@ Algorithmic game theory is a rapidly evolving field that continues to explore ne
 
 #### 🕹️ Games
 
-- [Age of Çotanak](../files/agt/slides/Chapter_14_Age-of-Cotanak.html)
 - [AI Agent Strategy Tournament](../files/agt/slides/Chapter_14_Ai-Agent-Strategy-Tournament.html)
+
+---
+
+## 🎲 Extra Games
+
+More board and card games for practice outside class; most of them use minimax search, heuristics or reasoning under hidden information.
+
+- [Othello (Reversi)](../files/agt/slides/Chapter_02_Othello.html) · Chapter 2
+- [Hex](../files/agt/slides/Chapter_02_Hex.html) · Chapter 2
+- [Chess](../files/agt/slides/Chapter_03_Chess.html) · Chapter 3
+- [Nine Men's Morris](../files/agt/slides/Chapter_03_Nine-Mens-Morris.html) · Chapter 3
+- [Fox and Geese](../files/agt/slides/Chapter_03_Fox-and-Geese.html) · Chapter 3
+- [Monopoly](../files/agt/slides/Chapter_05_Monopoly.html) · Chapter 5
+- [Checkers](../files/agt/slides/Chapter_07_Checkers.html) · Chapter 7
+- [Mangala](../files/agt/slides/Chapter_13_Mangala.html) · Chapter 13
+- [Hokm](../files/agt/slides/Chapter_13_Hokm.html) · Chapter 13
+- [Pişti](../files/agt/slides/Chapter_13_Pisti.html) · Chapter 13
+- [Minesweeper](../files/agt/slides/Chapter_13_Minesweeper.html) · Chapter 13
+- [Age of Çotanak](../files/agt/slides/Chapter_14_Age-of-Cotanak.html) · Chapter 14

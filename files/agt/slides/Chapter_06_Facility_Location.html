@@ -2,7 +2,7 @@
 layout: without-sidebar
 title: "Facility Location Simulator"
 permalink: /files/agt/slides/Chapter_06_Facility_Location.html
-excerpt: "Interactive facility location simulator comparing random placement, K-Means clustering, and a greedy heuristic using customer-to-facility distances."
+excerpt: "Interactive simulator for placing one facility on a line with single-peaked preferences: compare the strategy-proof median (and Moulin's generalized median with phantoms) with the manipulable mean, find each agent's best misreport, and test yourself."
 ---
 
 <!-- ds-guard:begin -->
@@ -30,32 +30,87 @@ excerpt: "Interactive facility location simulator comparing random placement, K-
 
 <link rel="stylesheet" href="deck/oyun.css">
 <style>
-.agt-facility-location .lab { display:grid; grid-template-rows:minmax(0,1fr) auto; gap:10px; height:100%; }
-.agt-facility-location .facility-map { position:relative; min-height:0; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-surface); overflow:hidden; }
-.agt-facility-location .facility-map svg { position:absolute; inset:0; width:100%; height:100%; }
-.agt-facility-location .facility-map .customer { fill:var(--ds-link); }
-.agt-facility-location .facility-map .facility { fill:var(--ds-accent); stroke:var(--ds-bg); stroke-width:2; }
-.agt-facility-location .facility-map .assign { stroke:color-mix(in srgb,var(--ds-link) 45%,var(--ds-bg)); stroke-width:1; }
-.agt-facility-location .facility-map .assign.is-max { stroke:var(--ds-warn); stroke-width:2.4; stroke-dasharray:6 3; }
-.agt-facility-location .panel { display:grid; grid-template-columns:250px 170px minmax(0,1fr); gap:12px; padding:8px 12px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
-.agt-facility-location .fields { display:grid; grid-template-columns:1fr 1fr; gap:6px 8px; align-content:start; }
-.agt-facility-location label { display:grid; gap:2px; color:var(--ds-muted); font-size:13px; font-weight:700; }
-.agt-facility-location label.wide { grid-column:1 / -1; }
-.agt-facility-location input[type="number"], .agt-facility-location select { width:100%; min-height:32px; font-size:14px; }
-.agt-facility-location .col { display:flex; flex-direction:column; gap:6px; }
-.agt-facility-location .col button { width:100%; min-height:32px; padding:0 8px; font-size:14px; }
-.agt-facility-location .metrics { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
-.agt-facility-location .metric { padding:3px 4px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface-strong); color:var(--ds-muted); font-size:11.5px; font-weight:700; text-align:center; }
-.agt-facility-location .metric b { display:block; color:var(--ds-text); font-size:17px; line-height:1.2; }
-.agt-facility-location table { width:100%; font-size:13px; }
-.agt-facility-location th, .agt-facility-location td { padding:2px 8px; text-align:right; }
-.agt-facility-location th:first-child, .agt-facility-location td:first-child { text-align:left; }
-.agt-facility-location tr.is-current td { background:color-mix(in srgb,var(--ds-link) 14%,var(--ds-bg)); font-weight:800; }
-.agt-facility-location td.best { color:var(--ds-good); font-weight:800; }
-.agt-facility-location .legend { display:flex; flex-wrap:wrap; gap:2px 12px; margin:4px 0 0; color:var(--ds-muted); font-size:12.5px; }
-.agt-facility-location .legend i { display:inline-block; width:10px; height:10px; margin-right:5px; border-radius:50%; vertical-align:-1px; }
-.agt-facility-location .legend i.line { width:16px; height:0; border-top:2px dashed var(--ds-warn); border-radius:0; vertical-align:3px; }
+.agt-facility-location .lab { display:grid; grid-template-rows:auto minmax(0,1fr); gap:8px; height:100%; }
+.agt-facility-location .line-view { position:relative; height:150px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); overflow:hidden; touch-action:none; }
+.agt-facility-location .line-view svg { display:block; width:100%; height:100%; user-select:none; }
+.agt-facility-location svg .axis { stroke:var(--ds-muted); stroke-width:1.5; }
+.agt-facility-location svg .tick { stroke:var(--ds-muted); stroke-width:1; }
+.agt-facility-location svg .tlbl { fill:var(--ds-muted); font-size:11px; }
+.agt-facility-location svg .agent { fill:var(--ds-link); stroke:var(--ds-bg); stroke-width:2; cursor:ew-resize; }
+.agt-facility-location svg .agent.is-sel { stroke:var(--ds-accent); stroke-width:3; }
+.agt-facility-location svg .alab { fill:var(--ds-bg); font-size:12px; font-weight:800; pointer-events:none; }
+.agt-facility-location svg .report { fill:var(--ds-bg); stroke:var(--ds-bad); stroke-width:2.2; stroke-dasharray:4 3; cursor:ew-resize; }
+.agt-facility-location svg .rlab { fill:var(--ds-bad); font-size:12px; font-weight:800; pointer-events:none; }
+.agt-facility-location svg .lie { fill:none; stroke:var(--ds-bad); stroke-width:1.6; stroke-dasharray:5 4; }
+.agt-facility-location svg .cost { stroke:color-mix(in srgb,var(--ds-link) 40%,var(--ds-bg)); stroke-width:2; }
+.agt-facility-location svg .fac-line { stroke:var(--ds-accent); stroke-width:2; stroke-dasharray:6 4; }
+.agt-facility-location svg .fac { fill:var(--ds-accent); }
+.agt-facility-location svg .flab { fill:var(--ds-accent); font-size:13px; font-weight:800; }
+.agt-facility-location svg .opt-sum { fill:var(--ds-good); }
+.agt-facility-location svg .opt-max { fill:var(--ds-warn); }
+.agt-facility-location svg .olab-sum { fill:var(--ds-good); font-size:11.5px; font-weight:700; }
+.agt-facility-location svg .olab-max { fill:var(--ds-warn); font-size:11.5px; font-weight:700; }
+.agt-facility-location svg .phantom { fill:none; stroke:var(--ds-muted); stroke-width:1.6; }
+.agt-facility-location svg .plab { fill:var(--ds-muted); font-size:10.5px; }
+.agt-facility-location .cards { display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:8px; min-height:0; }
+.agt-facility-location .card { display:flex; flex-direction:column; gap:5px; min-height:0; padding:7px 10px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); font-size:13px; }
+.agt-facility-location .row { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; }
+.agt-facility-location .row[hidden] { display:none; }
+.agt-facility-location label { display:flex; align-items:center; gap:5px; color:var(--ds-muted); font-size:13px; font-weight:700; }
+.agt-facility-location input[type="number"], .agt-facility-location select, .agt-facility-location input[type="text"] { min-height:28px; font-size:13.5px; }
+.agt-facility-location .num-agents { width:48px; }
+.agt-facility-location .mechanism { width:150px; }
+.agt-facility-location .phantoms { width:120px; }
+.agt-facility-location .card button { min-height:28px; padding:0 9px; font-size:13px; }
+.agt-facility-location .note { min-height:34px; margin:0; color:var(--ds-muted); font-size:12.5px; line-height:1.35; }
+.agt-facility-location .note b { color:var(--ds-text); }
+.agt-facility-location table { width:100%; border-collapse:collapse; font-size:13px; }
+.agt-facility-location th, .agt-facility-location td { padding:1px 3px; text-align:center; }
+.agt-facility-location th:first-child, .agt-facility-location td:first-child { padding-left:0; color:var(--ds-muted); font-weight:700; text-align:left; white-space:nowrap; }
+.agt-facility-location .agents th { color:var(--ds-link); }
+.agt-facility-location .agents th.is-sel { color:var(--ds-accent); }
+.agt-facility-location .agents input { width:40px; min-height:24px; padding:0 2px; font-size:13px; text-align:center; -moz-appearance:textfield; appearance:textfield; }
+.agt-facility-location .agents input::-webkit-inner-spin-button, .agt-facility-location .agents input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+.agt-facility-location .agents td.is-lie { color:var(--ds-bad); font-weight:800; }
+.agt-facility-location .compare { border-top:1.5px solid var(--ds-border); }
+.agt-facility-location .compare th { color:var(--ds-muted); font-size:12px; }
+.agt-facility-location .compare tr.is-mech td { font-weight:800; }
+.agt-facility-location .compare tr.is-mech td:first-child { color:var(--ds-accent); }
+.agt-facility-location .compare td.best { color:var(--ds-good); font-weight:800; }
+.agt-facility-location .card h2 { margin:0; color:var(--ds-text); font-size:15px; }
+.agt-facility-location .liar-on { display:flex; align-items:center; gap:5px; color:var(--ds-text); font-weight:700; }
+.agt-facility-location .report-range { flex:1; min-width:0; }
+.agt-facility-location .report-val { min-width:28px; font-weight:800; color:var(--ds-bad); text-align:right; }
+.agt-facility-location .verdict { min-height:52px; margin:0; font-size:12.5px; line-height:1.38; }
+.agt-facility-location .verdict .gain { color:var(--ds-bad); font-weight:800; }
+.agt-facility-location .verdict .safe { color:var(--ds-good); font-weight:800; }
+.agt-facility-location .chart svg { display:block; width:100%; height:auto; }
+.agt-facility-location .chart .grid { stroke:color-mix(in srgb,var(--ds-border) 60%,var(--ds-bg)); stroke-width:1; }
+.agt-facility-location .chart .curve { fill:none; stroke:var(--ds-link); stroke-width:2; }
+.agt-facility-location .chart .gainseg { fill:none; stroke:var(--ds-bad); stroke-width:4; stroke-linecap:round; }
+.agt-facility-location .chart .truthc { stroke:var(--ds-good); stroke-width:1.4; stroke-dasharray:5 4; }
+.agt-facility-location .chart .truthx { stroke:var(--ds-muted); stroke-width:1; stroke-dasharray:3 3; }
+.agt-facility-location .chart .cur { fill:var(--ds-bad); stroke:var(--ds-bg); stroke-width:1.5; }
+.agt-facility-location .chart .clbl { fill:var(--ds-muted); font-size:10.5px; }
+.agt-facility-location .chart .clbl-g { fill:var(--ds-good); font-size:10.5px; font-weight:700; }
 .agt-facility-location .agt-oyun__head a.agt-oyun__back { color:color-mix(in srgb,var(--ds-text) 80%,var(--ds-bg)); }
+.agt-facility-location .agt-oyun__head .fl-quiz-open { width:auto; min-width:0; padding:0 14px; border-radius:999px; font-size:14px; font-weight:700; }
+#fl-quiz { --ds-good:#1f8a4c; --ds-bad:#c0392b; --ds-surface:color-mix(in srgb,var(--ds-link) 2.5%,var(--ds-bg)); }
+html[data-theme="dark"] #fl-quiz { --ds-good:#5ccf8c; --ds-bad:#f08a7e; }
+#fl-quiz .fl-q { margin:0 0 6px; padding:6px 10px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); }
+#fl-quiz .fl-q > p { margin:0 0 4px; font-weight:700; }
+#fl-quiz .fl-opts { display:flex; flex-wrap:wrap; gap:6px; }
+#fl-quiz .fl-opts button { min-height:30px; padding:0 12px; border:1.5px solid var(--ds-border); border-radius:999px; background:var(--ds-bg); color:var(--ds-text); font:inherit; font-size:14px; cursor:pointer; }
+#fl-quiz .fl-opts button:hover:not(:disabled) { border-color:var(--ds-link); }
+#fl-quiz .fl-opts button:disabled { cursor:default; }
+#fl-quiz .fl-opts button.right { border-color:var(--ds-good); box-shadow:inset 0 0 0 1px var(--ds-good); color:var(--ds-good); font-weight:700; }
+#fl-quiz .fl-opts button.wrong { border-color:var(--ds-bad); color:var(--ds-bad); text-decoration:line-through; }
+#fl-quiz .fl-fb { margin:4px 0 0; font-size:13.5px; line-height:1.4; }
+#fl-quiz .fl-fb:empty { display:none; }
+#fl-quiz .fl-fb b.ok { color:var(--ds-good); }
+#fl-quiz .fl-fb b.no { color:var(--ds-bad); }
+#fl-quiz .fl-quiz-foot { display:flex; align-items:center; gap:10px; margin:0; font-weight:700; }
+#fl-quiz .fl-quiz-foot button { min-height:30px; padding:0 12px; border:1.5px solid var(--ds-link); border-radius:999px; background:var(--ds-bg); color:var(--ds-link); font:inherit; font-size:14px; }
 </style>
 
 <div class="agt-facility-location agt-oyun agt-oyun--stage">
@@ -64,50 +119,57 @@ excerpt: "Interactive facility location simulator comparing random placement, K-
       <p class="agt-oyun__kicker">Bölüm 6 · Simülasyon</p>
       <h1>Facility Location Simulator</h1>
     </div>
+    <button type="button" class="agt-oyun__help fl-quiz-open" aria-controls="fl-quiz" aria-label="Test yourself">Test yourself</button>
     <button type="button" class="agt-oyun__help" aria-controls="fl-help">?</button>
     <a class="agt-oyun__back" href="Bolum_06_Oylama.html">← Bölüm 6</a>
   </header>
 
   <div class="agt-oyun__body">
     <div class="lab">
-      <div class="facility-map" aria-label="Map of customers and facilities"></div>
+      <div class="line-view" aria-label="Agents' ideal points and the facility on the line from 0 to 100 (drag the agents)"><svg viewBox="0 0 764 146" role="img"></svg></div>
 
-      <div class="panel">
-        <div class="fields">
-          <label>Facilities
-            <input class="num-facilities" type="number" min="1" max="10" value="5">
-          </label>
-          <label>Customers
-            <input class="num-customers" type="number" min="10" max="100" value="30">
-          </label>
-          <label class="wide">Algorithm
-            <select class="algorithm">
-              <option value="random">Random placement</option>
-              <option value="kmeans">K-means clustering</option>
-              <option value="greedy">Greedy farthest-point</option>
+      <div class="cards">
+        <div class="card">
+          <div class="row">
+            <label>Agents <input class="num-agents" type="number" min="3" max="7" value="5"></label>
+            <select class="mechanism" aria-label="Rule">
+                <option value="median">Median</option>
+                <option value="mean">Mean (average)</option>
+                <option value="gmedian">Generalized median (phantoms)</option>
+                <option value="midpoint">Midpoint of extremes</option>
+                <option value="leftmost">Leftmost</option>
+                <option value="dictator">Dictator (agent 1)</option>
             </select>
-          </label>
-        </div>
-
-        <div class="col">
-          <button class="run-simulation is-primary" type="button">Place facilities</button>
-          <button class="new-customers" type="button">New customers</button>
-          <div class="metrics">
-            <div class="metric">Avg dist.<b class="avg-value">—</b></div>
-            <div class="metric">Max dist.<b class="max-value">—</b></div>
+            <button class="randomize" type="button">Random</button>
+            <button class="example" type="button">Example</button>
           </div>
-        </div>
-
-        <div>
+          <div class="row phantom-row" hidden>
+            <label>Phantoms <input class="phantoms" type="text" value="50" spellcheck="false"></label>
+            <span class="agt-oyun__muted" style="font-size:12px">fixed points, at most n + 1, comma-separated</span>
+          </div>
+          <p class="note mech-note" aria-live="polite"></p>
+          <table class="agents"><thead></thead><tbody></tbody></table>
           <table class="compare">
-            <thead><tr><th>Same customers</th><th>Avg</th><th>Max</th></tr></thead>
+            <thead><tr><th>Location</th><th>t</th><th>Total cost</th><th>Max cost</th></tr></thead>
             <tbody></tbody>
           </table>
-          <p class="legend">
-            <span><i style="background:var(--ds-link)"></i>Customer</span>
-            <span><i style="background:var(--ds-accent)"></i>Facility</span>
-            <span><i class="line"></i>Longest trip</span>
-          </p>
+        </div>
+
+        <div class="card manip">
+          <h2>Manipulation</h2>
+          <div class="row">
+            <label class="liar-on"><input class="lie-on" type="checkbox"> Agent</label>
+            <select class="liar" aria-label="Agent who may misreport"></select>
+            <span style="font-size:12.5px;color:var(--ds-muted)">reports</span>
+            <input class="report-range" type="range" min="0" max="100" step="1" value="45" aria-label="Reported location">
+            <span class="report-val">45</span>
+          </div>
+          <div class="row">
+            <button class="best-lie is-primary" type="button">Find best lie</button>
+            <button class="truthful" type="button">Tell the truth</button>
+          </div>
+          <p class="verdict" aria-live="polite"></p>
+          <div class="chart"><svg viewBox="0 0 316 132" role="img" aria-label="Own cost of the selected agent for every report from 0 to 100"></svg></div>
         </div>
       </div>
     </div>
@@ -116,155 +178,469 @@ excerpt: "Interactive facility location simulator comparing random placement, K-
   <dialog class="agt-oyun__dialog" id="fl-help">
     <button type="button" class="agt-oyun__close">Kapat</button>
     <h2>How to play</h2>
-    <p>Customers (blue dots) are scattered on a map. Choose how many <b>facilities</b> (red dots) to open and an <b>algorithm</b> for placing them, then press <b>Place facilities</b>. Every customer uses its nearest facility (thin lines). Two objectives are reported:</p>
+    <p>One facility (a school, a hospital, a bus stop) is built somewhere on a road from 0 to 100. Every agent (blue disc) has an <b>ideal point</b> x<sub>i</sub> and pays the distance to the facility, <b>cost<sub>i</sub> = |x<sub>i</sub> − t|</b>. Agents only <i>report</i> their points, and a <b>rule</b> turns the reports into a location t.</p>
     <ul>
-      <li><b>Average distance</b> to the nearest facility, the <i>k-median</i> style objective (total travel cost).</li>
-      <li><b>Maximum distance</b>, the <i>k-center</i> objective (the worst-served customer); the dashed amber line marks that trip.</li>
-    </ul>
-    <p><b>Place facilities</b> keeps the current customers so the algorithms can be compared fairly; <b>New customers</b> draws a fresh map (it also happens when you change the number of customers). The table runs all three algorithms on the same customers and marks the best value in green. Distances are in map units (the map is 800 × 400).</p>
-
-    <h3>Algorithms</h3>
-    <ul>
-      <li><b>Random placement</b>: facilities are dropped uniformly at random, a baseline.</li>
-      <li><b>K-means clustering</b>: start from random customers, then alternate between assigning customers to the nearest centre and moving each centre to the mean of its customers (Lloyd's algorithm, 20 rounds). It targets the average squared distance, so it is usually good on the average.</li>
-      <li><b>Greedy farthest-point</b>: open the first facility at a random customer, then repeatedly open the next one at the customer farthest from all open facilities. This is Gonzalez's 2-approximation for the k-center (maximum distance) problem.</li>
+      <li>Drag the discs on the line or type the ideal points in the table. <b>Random</b> draws a new profile; <b>Example</b> loads 10, 30, 45, 80, 95.</li>
+      <li>The red triangle is the facility. Below the axis, the green diamond marks the point with the <b>minimum total cost</b> (a median) and the amber square the point with the <b>minimum maximum cost</b> (the midpoint of the two extreme agents). The table compares the rule with both.</li>
+      <li><b>Manipulation</b>: pick an agent and move the slider (or drag the dashed disc) to let it report a false location while everyone else tells the truth. The chart shows the agent's own <i>true</i> cost for every integer report from 0 to 100; the green dashed line is its cost when it tells the truth, and red stretches are <b>profitable lies</b>. <b>Find best lie</b> tries all 101 reports.</li>
     </ul>
 
-    <h3>Connection to the chapter</h3>
-    <p>Facility location is also a social-choice problem: on a line, placing one facility at the <b>median</b> of the reported locations is strategy-proof, because no agent can move the median toward itself by misreporting. Placing it at the mean is not. Compare the objectives: no single placement minimises both the average and the maximum distance.</p>
+    <h3>Rules</h3>
+    <ul>
+      <li><b>Median</b>: sort the reports and take the middle one. With an even number of agents there are two middle reports; this simulator always takes the <b>left median</b> (the n/2-th smallest report). Any point between the two middle reports minimises the total cost, and a fixed choice such as "always left" keeps the rule strategy-proof.</li>
+      <li><b>Mean</b>: the average report. An agent can drag the average towards itself by exaggerating, so it is <b>not</b> strategy-proof.</li>
+      <li><b>Generalized median</b> (Moulin, 1980): add fixed <i>phantom</i> points that nobody controls and take the (left) median of reports and phantoms together. Strategy-proof for every choice of phantoms; phantoms at 0 pull the result left, phantoms at 100 pull it right.</li>
+      <li><b>Midpoint of extremes</b>: halfway between the smallest and largest report. Optimal for the maximum cost, but the extreme agents can manipulate it.</li>
+      <li><b>Leftmost</b> and <b>Dictator</b>: strategy-proof too, but they ignore most of the agents.</li>
+    </ul>
+
+    <h3>Theory in brief</h3>
+    <p>On a line with distance costs, preferences are <b>single-peaked</b>: each agent prefers locations closer to its peak. Then the median voter's peak is a Condorcet winner (Black), and the median rule is <b>strategy-proof</b>: an agent left of the median can only move the median further right by reporting a point right of it, and reporting anything left of it changes nothing; the same holds on the other side. Moulin showed that the strategy-proof, anonymous rules that use only the reported peaks are exactly the generalized medians with n + 1 phantoms (n − 1 phantoms if the rule must also be Pareto-efficient), so the Gibbard–Satterthwaite impossibility disappears on single-peaked preferences. The median also minimises the total cost; for the maximum cost the best strategy-proof deterministic rule is a 2-approximation (the median achieves it), while the optimal midpoint can be manipulated (Procaccia and Tennenholtz).</p>
+
+    <h3>Keep exploring</h3>
+    <ul>
+      <li>Back to the slides: <a href="Bolum_06_Oylama.html#30">← Bölüm 6, slide #30 (Tek Tepeli Tercihler)</a>.</li>
+      <li>Strategy-proofness: <a href="Bolum_04_Mekanizma.html#27">← Bölüm 4, slide #27 (Tesis Yerleşimi: Ortalama mı, Medyan mı?)</a>.</li>
+    </ul>
+  </dialog>
+
+  <dialog class="agt-oyun__dialog" id="fl-quiz">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Test yourself</h2>
+    <p>Agents' ideal points are <b>10, 30, 45, 80, 95</b> (agents 1 to 5; press <b>Example</b> to load them). Cost = distance to the facility. Click an answer.</p>
+    <div class="fl-q">
+      <p>1. Where will the median rule put the facility?</p>
+      <div class="fl-opts"><button type="button">30</button><button type="button" data-ok>45</button><button type="button">52</button><button type="button">52.5</button></div>
+      <p class="fl-fb" aria-live="polite" data-why="Sorted reports 10, 30, 45, 80, 95: the middle (3rd) one is 45. The mean would be 52 and the midpoint 52.5."></p>
+    </div>
+    <div class="fl-q">
+      <p>2. Under the mean, can agent 3 (ideal point 45) gain by misreporting?</p>
+      <div class="fl-opts"><button type="button" data-ok>Yes: reporting 10 moves the facility to 45</button><button type="button">No: the mean is strategy-proof</button><button type="button">No: agent 3 is already the median</button></div>
+      <p class="fl-fb" aria-live="polite" data-why="Truthful mean = 260 / 5 = 52, cost 7. Reporting 10 gives (10 + 30 + 10 + 80 + 95) / 5 = 45, cost 0."></p>
+    </div>
+    <div class="fl-q">
+      <p>3. Under the median, agent 5 (ideal 95) reports 100 instead, or 50. What happens to its cost?</p>
+      <div class="fl-opts"><button type="button">It falls with 50</button><button type="button">It falls with 100</button><button type="button" data-ok>It never falls</button></div>
+      <p class="fl-fb" aria-live="polite" data-why="Reporting 100 leaves the median at 45 (cost 50). Reporting 50 still leaves 45, since 50 is above the 3rd value; to move the median the agent must report below 45, which only pushes it further away."></p>
+    </div>
+    <div class="fl-q">
+      <p>4. Four agents at 20, 40, 60, 90. Where does the (left) median put the facility, and where is the maximum cost smallest?</p>
+      <div class="fl-opts"><button type="button">50 and 55</button><button type="button" data-ok>40 and 55</button><button type="button">40 and 50</button><button type="button">60 and 55</button></div>
+      <p class="fl-fb" aria-live="polite" data-why="n = 4 is even: the left median is the 2nd smallest report, 40 (every point of [40, 60] has total cost 90). The midpoint of the extremes (20 + 90) / 2 = 55 gives maximum cost 35."></p>
+    </div>
+    <p class="fl-quiz-foot">Score: <span class="fl-score">0 / 4</span><button type="button" class="fl-quiz-reset">Try again</button></p>
   </dialog>
 </div>
 
 <script>
 (() => {
+  /* fl-core:begin */
+  const FL = (() => {
+    const leftMedian = a => { const s = a.slice().sort((p, q) => p - q); return s[Math.ceil(s.length / 2) - 1]; };
+    const rules = {
+      median: r => leftMedian(r),
+      mean: r => r.reduce((s, v) => s + v, 0) / r.length,
+      gmedian: (r, ph) => leftMedian(r.concat(ph)),
+      midpoint: r => (Math.min(...r) + Math.max(...r)) / 2,
+      leftmost: r => Math.min(...r),
+      dictator: r => r[0]
+    };
+    const outcome = (rule, reports, phantoms) => rules[rule](reports, phantoms || []);
+    const totalCost = (ideals, t) => ideals.reduce((s, x) => s + Math.abs(x - t), 0);
+    const maxCost = (ideals, t) => Math.max(...ideals.map(x => Math.abs(x - t)));
+    /* agent i's own cost for every integer report 0..100 (others truthful) and its best lie */
+    function lieAnalysis(rule, ideals, i, phantoms) {
+      const x = ideals[i];
+      const truthT = outcome(rule, ideals, phantoms);
+      const truthC = Math.abs(x - truthT);
+      const curve = [];
+      let best = { r: x, t: truthT, c: truthC };
+      for (let r = 0; r <= 100; r++) {
+        const rep = ideals.slice(); rep[i] = r;
+        const t = outcome(rule, rep, phantoms);
+        const c = Math.abs(x - t);
+        curve.push(c);
+        if (c < best.c - 1e-9 || (Math.abs(c - best.c) <= 1e-9 && best.c < truthC - 1e-9 && Math.abs(r - x) < Math.abs(best.r - x))) best = { r, t, c };
+      }
+      return { truthT, truthC, curve, best, gain: truthC - best.c };
+    }
+    return { leftMedian, outcome, totalCost, maxCost, lieAnalysis };
+  })();
+  /* fl-core:end */
+
   const root = document.querySelector('.agt-facility-location');
   if (!root) return;
 
-  const mapEl = root.querySelector('.facility-map');
-  const numFacilitiesInput = root.querySelector('.num-facilities');
-  const numCustomersInput = root.querySelector('.num-customers');
-  const algorithmSelect = root.querySelector('.algorithm');
-  const runButton = root.querySelector('.run-simulation');
-  const newButton = root.querySelector('.new-customers');
-  const avgEl = root.querySelector('.avg-value');
-  const maxEl = root.querySelector('.max-value');
+  const lineSvg = root.querySelector('.line-view svg');
+  const nInput = root.querySelector('.num-agents');
+  const ruleSel = root.querySelector('.mechanism');
+  const phRow = root.querySelector('.phantom-row');
+  const phInput = root.querySelector('.phantoms');
+  const note = root.querySelector('.mech-note');
+  const agentsHead = root.querySelector('.agents thead');
+  const agentsBody = root.querySelector('.agents tbody');
   const compareBody = root.querySelector('.compare tbody');
+  const lieOn = root.querySelector('.lie-on');
+  const liarSel = root.querySelector('.liar');
+  const range = root.querySelector('.report-range');
+  const rangeVal = root.querySelector('.report-val');
+  const verdict = root.querySelector('.verdict');
+  const chartSvg = root.querySelector('.chart svg');
 
-  const width = 800;
-  const height = 400;
-  const names = { random: 'Random', kmeans: 'K-means', greedy: 'Greedy' };
+  const EXAMPLE = [10, 30, 45, 80, 95];
+  const ruleText = {
+    median: 'Facility at the <b>median</b> report. Strategy-proof, and it minimises the total cost.',
+    mean: 'Facility at the <b>average</b> report. Minimises the sum of <i>squared</i> distances, but it is <b>not</b> strategy-proof.',
+    gmedian: '<b>Median of reports and phantoms</b> (Moulin). Strategy-proof for any phantoms; hollow rings mark them on the line.',
+    midpoint: '<b>Halfway</b> between the extreme reports. Minimises the maximum cost, but it is <b>not</b> strategy-proof.',
+    leftmost: 'Facility at the <b>leftmost</b> report. Strategy-proof, but it ignores everybody else.',
+    dictator: '<b>Agent 1</b> decides alone. Strategy-proof, but a dictatorship.'
+  };
 
-  let facilities = [];
-  let customers = [];
+  let ideals = EXAMPLE.slice();
+  let liar = 2;
+  let report = ideals[2];
 
-  function clampInput(input, fallback) {
-    const v = parseInt(input.value, 10);
-    const n = Number.isFinite(v) ? Math.min(+input.max, Math.max(+input.min, v)) : fallback;
-    input.value = n;
-    return n;
+  const fmt = v => String(Math.round(v * 100) / 100);
+  const clampInt = (v, lo, hi, fb) => { const n = Math.round(Number(v)); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : fb; };
+  const ordinal = k => k + (k % 10 === 1 && k !== 11 ? 'st' : k % 10 === 2 && k !== 12 ? 'nd' : k % 10 === 3 && k !== 13 ? 'rd' : 'th');
+
+  function phantoms() {
+    if (ruleSel.value !== 'gmedian') return [];
+    return phInput.value.split(/[,;\s]+/).filter(s => s !== '').map(Number).filter(Number.isFinite)
+      .map(v => Math.min(100, Math.max(0, v))).slice(0, ideals.length + 1);
+  }
+  function reports() {
+    const r = ideals.slice();
+    if (lieOn.checked) r[liar] = report;
+    return r;
   }
 
-  function randomPoints(n) {
-    return Array.from({ length: n }, () => ({ x: 10 + Math.random() * (width - 20), y: 10 + Math.random() * (height - 20) }));
+  /* ---------- tables and selects ---------- */
+  function buildAgents() {
+    const n = ideals.length;
+    agentsHead.innerHTML = '<tr><th>Agent</th>' + ideals.map((_, i) => '<th>' + (i + 1) + '</th>').join('') + '</tr>';
+    agentsBody.innerHTML =
+      '<tr class="r-ideal"><td>Ideal x</td>' + ideals.map((x, i) => '<td><input type="number" min="0" max="100" step="1" value="' + x + '" data-i="' + i + '" aria-label="Ideal point of agent ' + (i + 1) + '"></td>').join('') + '</tr>' +
+      '<tr class="r-report"><td>Report</td>' + ideals.map(() => '<td></td>').join('') + '</tr>' +
+      '<tr class="r-cost"><td title="Cost |x − t|">Cost</td>' + ideals.map(() => '<td></td>').join('') + '</tr>';
+    liarSel.innerHTML = ideals.map((_, i) => '<option value="' + i + '">' + (i + 1) + '</option>').join('');
+    if (liar >= n) liar = n - 1;
+    liarSel.value = String(liar);
   }
 
-  function distance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
-
-  function nearest(p, fs) {
-    let best = 0, bd = Infinity;
-    fs.forEach((f, j) => { const d = distance(p, f); if (d < bd) { bd = d; best = j; } });
-    return { j: best, d: bd };
+  function setIdeal(i, v) {
+    ideals[i] = v;
+    const inp = agentsBody.querySelector('input[data-i="' + i + '"]');
+    if (inp && Number(inp.value) !== v) inp.value = v;
   }
 
-  function pickDistinct(points, k) {
-    const idx = points.map((_, i) => i);
-    for (let i = idx.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [idx[i], idx[j]] = [idx[j], idx[i]];
+  /* ---------- drawing ---------- */
+  const X0 = 26, SC = 7.12, AX = 104;
+  const X = v => X0 + v * SC;
+  const toVal = px => clampInt((px - X0) / SC, 0, 100, 0);
+
+  function drawLine(t, rep, ph, tSum, tMax) {
+    const n = ideals.length;
+    let s = '';
+    s += '<line class="axis" x1="' + X(0) + '" y1="' + AX + '" x2="' + X(100) + '" y2="' + AX + '"/>';
+    for (let v = 0; v <= 100; v += 10) {
+      s += '<line class="tick" x1="' + X(v) + '" y1="' + (AX - 4) + '" x2="' + X(v) + '" y2="' + (AX + 4) + '"/>';
+      s += '<text class="tlbl" x="' + X(v) + '" y="' + (AX + 16) + '" text-anchor="middle">' + v + '</text>';
     }
-    return idx.slice(0, k).map(i => ({ x: points[i].x, y: points[i].y }));
-  }
-
-  function kMeans(points, k) {
-    let centroids = pickDistinct(points, k);
-    for (let it = 0; it < 20; it++) {
-      const sums = centroids.map(() => ({ x: 0, y: 0, n: 0 }));
-      points.forEach(p => { const s = sums[nearest(p, centroids).j]; s.x += p.x; s.y += p.y; s.n++; });
-      centroids = sums.map((s, j) => s.n ? { x: s.x / s.n, y: s.y / s.n } : centroids[j]);
+    /* stack agents that sit close together */
+    const ys = [];
+    const placed = [];
+    for (let i = 0; i < n; i++) {
+      let lvl = 0;
+      while (lvl < 3 && placed.some(p => p.lvl === lvl && Math.abs(p.x - ideals[i]) * SC < 22)) lvl++;
+      placed.push({ x: ideals[i], lvl });
+      ys[i] = 80 - 21 * lvl;
     }
-    return centroids;
-  }
-
-  function greedyHeuristic(points, k) {
-    const fs = [{ ...points[Math.floor(Math.random() * points.length)] }];
-    while (fs.length < k) {
-      let best = null, bd = -1;
-      points.forEach(p => { const d = nearest(p, fs).d; if (d > bd) { bd = d; best = p; } });
-      if (!best || bd <= 0) break;
-      fs.push({ x: best.x, y: best.y });
+    /* facility */
+    s += '<line class="fac-line" x1="' + X(t) + '" y1="18" x2="' + X(t) + '" y2="' + AX + '"/>';
+    /* cost segments */
+    for (let i = 0; i < n; i++) s += '<line class="cost" x1="' + X(ideals[i]) + '" y1="' + ys[i] + '" x2="' + X(t) + '" y2="' + ys[i] + '"/>';
+    /* phantoms */
+    ph.forEach(p => { s += '<circle class="phantom" cx="' + X(p) + '" cy="' + AX + '" r="6"/>'; });
+    /* lie */
+    const lying = lieOn.checked && rep[liar] !== ideals[liar];
+    if (lying) {
+      const xa = X(ideals[liar]), xb = X(rep[liar]), y = ys[liar];
+      const top = Math.max(4, y - 30);
+      s += '<path class="lie" d="M' + xa + ' ' + (y - 11) + ' Q' + ((xa + xb) / 2) + ' ' + top + ' ' + xb + ' ' + (y - 11) + '"/>';
     }
-    return fs;
+    for (let i = 0; i < n; i++) {
+      s += '<circle class="agent' + (i === liar && lieOn.checked ? ' is-sel' : '') + '" data-drag="ideal" data-i="' + i + '" cx="' + X(ideals[i]) + '" cy="' + ys[i] + '" r="10"/>';
+      s += '<text class="alab" x="' + X(ideals[i]) + '" y="' + (ys[i] + 4) + '" text-anchor="middle">' + (i + 1) + '</text>';
+    }
+    if (lieOn.checked) {
+      const xb = X(rep[liar]), y = ys[liar];
+      if (lying) {
+        s += '<circle class="report" data-drag="report" cx="' + xb + '" cy="' + y + '" r="10"/>';
+        s += '<text class="rlab" x="' + xb + '" y="' + (y + 4) + '" text-anchor="middle">' + (liar + 1) + '′</text>';
+      }
+    }
+    /* optimum markers below the axis */
+    const yo = 137;
+    const sumLeft = tSum <= tMax;
+    s += '<path class="opt-sum" d="M' + X(tSum) + ' ' + (yo - 7) + ' l6 6 l-6 6 l-6 -6 z"/>';
+    s += '<text class="olab-sum" x="' + (X(tSum) + (sumLeft ? -9 : 9)) + '" y="' + (yo + 4) + '" text-anchor="' + (sumLeft ? 'end' : 'start') + '">min total ' + fmt(tSum) + '</text>';
+    s += '<rect class="opt-max" x="' + (X(tMax) - 5) + '" y="' + (yo - 5) + '" width="10" height="10"/>';
+    s += '<text class="olab-max" x="' + (X(tMax) + (sumLeft ? 9 : -9)) + '" y="' + (yo + 4) + '" text-anchor="' + (sumLeft ? 'start' : 'end') + '">min max ' + fmt(tMax) + '</text>';
+    /* facility marker on top */
+    s += '<path class="fac" d="M' + (X(t) - 8) + ' 4 L' + (X(t) + 8) + ' 4 L' + X(t) + ' 18 Z"/>';
+    const right = t < 80;
+    s += '<text class="flab" x="' + (X(t) + (right ? 12 : -12)) + '" y="15" text-anchor="' + (right ? 'start' : 'end') + '">facility t = ' + fmt(t) + '</text>';
+    lineSvg.innerHTML = s;
   }
 
-  function place(alg, k) {
-    if (alg === 'kmeans') return kMeans(customers, k);
-    if (alg === 'greedy') return greedyHeuristic(customers, k);
-    return randomPoints(k);
-  }
-
-  function evaluate(fs) {
-    let total = 0, max = -1, maxI = -1;
-    customers.forEach((c, i) => {
-      const d = nearest(c, fs).d;
-      total += d;
-      if (d > max) { max = d; maxI = i; }
+  function drawChart(an, x, r) {
+    const L = 30, R = 308, T = 8, B = 108;
+    const ymax = Math.max(10, Math.ceil(Math.max(...an.curve, an.truthC) / 10) * 10);
+    const cx = v => L + v * (R - L) / 100;
+    const cy = c => B - c * (B - T) / ymax;
+    let s = '';
+    for (let v = 0; v <= 100; v += 25) {
+      s += '<line class="grid" x1="' + cx(v) + '" y1="' + T + '" x2="' + cx(v) + '" y2="' + B + '"/>';
+      s += '<text class="clbl" x="' + cx(v) + '" y="' + (B + 12) + '" text-anchor="middle">' + v + '</text>';
+    }
+    [0, ymax / 2, ymax].forEach(c => {
+      s += '<line class="grid" x1="' + L + '" y1="' + cy(c) + '" x2="' + R + '" y2="' + cy(c) + '"/>';
+      s += '<text class="clbl" x="' + (L - 4) + '" y="' + (cy(c) + 3.5) + '" text-anchor="end">' + fmt(c) + '</text>';
     });
-    return { avg: total / customers.length, max, maxI };
-  }
-
-  function draw(res) {
-    const W = mapEl.clientWidth || 760, H = mapEl.clientHeight || 380;
-    const s = Math.min(W / width, H / height);
-    const ox = (W - width * s) / 2, oy = (H - height * s) / 2;
-    const X = v => (ox + v * s).toFixed(1), Y = v => (oy + v * s).toFixed(1);
-    let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '">';
-    customers.forEach((c, i) => {
-      const f = facilities[nearest(c, facilities).j];
-      svg += '<line class="assign' + (i === res.maxI ? ' is-max' : '') + '" x1="' + X(c.x) + '" y1="' + Y(c.y) + '" x2="' + X(f.x) + '" y2="' + Y(f.y) + '"/>';
+    s += '<text class="clbl" x="' + R + '" y="' + (B + 23) + '" text-anchor="end">report of agent ' + (liar + 1) + ' →</text>';
+    s += '<text class="clbl" transform="translate(9 ' + ((T + B) / 2) + ') rotate(-90)" text-anchor="middle">own cost</text>';
+    s += '<line class="truthx" x1="' + cx(x) + '" y1="' + T + '" x2="' + cx(x) + '" y2="' + B + '"/>';
+    s += '<line class="truthc" x1="' + L + '" y1="' + cy(an.truthC) + '" x2="' + R + '" y2="' + cy(an.truthC) + '"/>';
+    s += '<text class="clbl-g" x="' + (R - 2) + '" y="' + (cy(an.truthC) - 4 < T + 8 ? cy(an.truthC) + 11 : cy(an.truthC) - 4) + '" text-anchor="end">truthful cost ' + fmt(an.truthC) + '</text>';
+    s += '<polyline class="curve" points="' + an.curve.map((c, v) => cx(v).toFixed(1) + ',' + cy(c).toFixed(1)).join(' ') + '"/>';
+    /* profitable reports */
+    let seg = [];
+    const flush = () => { if (seg.length) s += '<polyline class="gainseg" points="' + seg.join(' ') + '"/>'; seg = []; };
+    an.curve.forEach((c, v) => {
+      if (c < an.truthC - 1e-9) seg.push(cx(v).toFixed(1) + ',' + cy(c).toFixed(1)); else flush();
     });
-    customers.forEach(c => { svg += '<circle class="customer" cx="' + X(c.x) + '" cy="' + Y(c.y) + '" r="3.5"/>'; });
-    facilities.forEach(f => { svg += '<circle class="facility" cx="' + X(f.x) + '" cy="' + Y(f.y) + '" r="7.5"/>'; });
-    mapEl.innerHTML = svg + '</svg>';
+    flush();
+    s += '<circle class="cur" cx="' + cx(r) + '" cy="' + cy(an.curve[r]) + '" r="5"/>';
+    chartSvg.innerHTML = s;
   }
 
-  function compareAll(k, current) {
-    const rows = Object.keys(names).map(alg => ({ alg, r: alg === algorithmSelect.value ? current : evaluate(place(alg, k)) }));
-    const bestAvg = Math.min(...rows.map(x => x.r.avg));
-    const bestMax = Math.min(...rows.map(x => x.r.max));
-    compareBody.innerHTML = rows.map(x => '<tr' + (x.alg === algorithmSelect.value ? ' class="is-current"' : '') + '><td>' + names[x.alg] +
-      '</td><td' + (x.r.avg === bestAvg ? ' class="best"' : '') + '>' + x.r.avg.toFixed(1) +
-      '</td><td' + (x.r.max === bestMax ? ' class="best"' : '') + '>' + x.r.max.toFixed(1) + '</td></tr>').join('');
+  /* ---------- main update ---------- */
+  function update() {
+    const rule = ruleSel.value;
+    const n = ideals.length;
+    phRow.hidden = rule !== 'gmedian';
+    const ph = phantoms();
+    const rep = reports();
+    const t = FL.outcome(rule, rep, ph);
+    const tSum = FL.leftMedian(ideals);
+    const tMax = (Math.min(...ideals) + Math.max(...ideals)) / 2;
+
+    /* note */
+    let txt = ruleText[rule];
+    if ((rule === 'median' || rule === 'gmedian')) {
+      const m = n + ph.length;
+      if (m % 2 === 0) txt += ' ' + m + ' points (even): the <b>left median</b>, the ' + ordinal(m / 2) + ' smallest, is used.';
+    } else if (n % 2 === 0) {
+      txt += ' With n = ' + n + ' (even), every point between the two middle ideals minimises the total cost; the left one is shown.';
+    }
+    note.innerHTML = txt;
+
+    /* agent table */
+    const repCells = agentsBody.querySelectorAll('.r-report td');
+    const costCells = agentsBody.querySelectorAll('.r-cost td');
+    for (let i = 0; i < n; i++) {
+      const lie = rep[i] !== ideals[i];
+      repCells[i + 1].textContent = rep[i];
+      repCells[i + 1].className = lie ? 'is-lie' : '';
+      costCells[i + 1].textContent = fmt(Math.abs(ideals[i] - t));
+    }
+    agentsHead.querySelectorAll('th').forEach((th, k) => th.classList.toggle('is-sel', k === liar + 1 && lieOn.checked));
+
+    /* comparison (true costs) */
+    const rows = [
+      { name: ruleSel.options[ruleSel.selectedIndex].text.replace(/ \(.*\)$/, '') + (lieOn.checked && rep[liar] !== ideals[liar] ? ' (with lie)' : ''), t, mech: true },
+      { name: 'Median (min total)', t: tSum },
+      { name: 'Midpoint (min max)', t: tMax }
+    ].map(r => ({ ...r, sum: FL.totalCost(ideals, r.t), max: FL.maxCost(ideals, r.t) }));
+    const bs = Math.min(...rows.map(r => r.sum)), bm = Math.min(...rows.map(r => r.max));
+    compareBody.innerHTML = rows.map(r => '<tr' + (r.mech ? ' class="is-mech"' : '') + '><td>' + r.name + '</td><td>' + fmt(r.t) +
+      '</td><td' + (r.sum <= bs + 1e-9 ? ' class="best"' : '') + '>' + fmt(r.sum) +
+      '</td><td' + (r.max <= bm + 1e-9 ? ' class="best"' : '') + '>' + fmt(r.max) + '</td></tr>').join('');
+
+    /* manipulation */
+    const x = ideals[liar];
+    const r = lieOn.checked ? report : x;
+    range.value = r;
+    rangeVal.textContent = r;
+    const an = FL.lieAnalysis(rule, ideals, liar, ph);
+    const a = liar + 1;
+    let v = 'Truthful: t = ' + fmt(an.truthT) + ', agent ' + a + ' pays <b>' + fmt(an.truthC) + '</b>.';
+    if (lieOn.checked && r !== x) {
+      const c = an.curve[r];
+      const d = an.truthC - c;
+      v += ' Reporting ' + r + ': t = ' + fmt(t) + ', it pays <b>' + fmt(c) + '</b>' +
+        (d > 1e-9 ? ' <span class="gain">(gains ' + fmt(d) + ': a profitable lie)</span>.' : d < -1e-9 ? ' (worse by ' + fmt(-d) + ').' : ' (no change).');
+    }
+    if (an.gain > 1e-9) {
+      v += ' Best lie: report <b>' + an.best.r + '</b> → t = ' + fmt(an.best.t) + ', cost ' + fmt(an.best.c) + '. <span class="gain">Manipulable.</span>';
+    } else {
+      v += ' <span class="safe">No report from 0 to 100 lowers its cost.</span>';
+    }
+    verdict.innerHTML = v;
+    drawChart(an, x, r);
+    drawLine(t, rep, ph, tSum, tMax);
   }
 
-  function runSimulation(fresh) {
-    const k = clampInput(numFacilitiesInput, 5);
-    const n = clampInput(numCustomersInput, 30);
-    if (fresh || customers.length !== n) customers = randomPoints(n);
-    facilities = place(algorithmSelect.value, k);
-    const res = evaluate(facilities);
-    avgEl.textContent = res.avg.toFixed(1);
-    maxEl.textContent = res.max.toFixed(1);
-    draw(res);
-    compareAll(k, res);
+  /* ---------- events ---------- */
+  function setCount(n) {
+    while (ideals.length < n) ideals.push(clampInt(Math.random() * 100, 0, 100, 50));
+    ideals.length = n;
+    buildAgents();
+    if (lieOn.checked) report = Math.min(100, Math.max(0, report)); else report = ideals[liar];
   }
 
-  runButton.addEventListener('click', () => runSimulation(false));
-  newButton.addEventListener('click', () => runSimulation(true));
-  algorithmSelect.addEventListener('change', () => runSimulation(false));
-  numFacilitiesInput.addEventListener('change', () => runSimulation(false));
-  numCustomersInput.addEventListener('change', () => runSimulation(false));
+  nInput.addEventListener('change', () => {
+    const n = clampInt(nInput.value, 3, 7, 5);
+    nInput.value = n;
+    setCount(n);
+    update();
+  });
+  ruleSel.addEventListener('change', update);
+  phInput.addEventListener('input', update);
+  root.querySelector('.randomize').addEventListener('click', () => {
+    ideals = ideals.map(() => clampInt(Math.random() * 100, 0, 100, 50));
+    buildAgents();
+    lieOn.checked = false;
+    report = ideals[liar];
+    update();
+  });
+  root.querySelector('.example').addEventListener('click', () => {
+    ideals = EXAMPLE.slice();
+    nInput.value = 5;
+    liar = 2;
+    buildAgents();
+    lieOn.checked = false;
+    report = ideals[liar];
+    update();
+  });
+  agentsBody.addEventListener('change', e => {
+    const inp = e.target.closest('input[data-i]');
+    if (!inp) return;
+    const i = +inp.dataset.i;
+    const v = clampInt(inp.value, 0, 100, ideals[i]);
+    inp.value = v;
+    ideals[i] = v;
+    if (i === liar && !lieOn.checked) report = v;
+    update();
+  });
+  liarSel.addEventListener('change', () => {
+    liar = +liarSel.value;
+    report = ideals[liar];
+    update();
+  });
+  lieOn.addEventListener('change', () => {
+    if (!lieOn.checked) report = ideals[liar];
+    update();
+  });
+  range.addEventListener('input', () => {
+    report = clampInt(range.value, 0, 100, ideals[liar]);
+    lieOn.checked = true;
+    update();
+  });
+  root.querySelector('.best-lie').addEventListener('click', () => {
+    const an = FL.lieAnalysis(ruleSel.value, ideals, liar, phantoms());
+    lieOn.checked = true;
+    report = an.best.r;
+    update();
+  });
+  root.querySelector('.truthful').addEventListener('click', () => {
+    report = ideals[liar];
+    update();
+  });
 
-  runSimulation(true);
+  /* dragging on the line */
+  let drag = null;
+  function svgX(e) {
+    const m = lineSvg.getScreenCTM();
+    if (!m) return 0;
+    const p = lineSvg.createSVGPoint();
+    p.x = e.clientX; p.y = e.clientY;
+    return p.matrixTransform(m.inverse()).x;
+  }
+  lineSvg.addEventListener('pointerdown', e => {
+    const el = e.target.closest('[data-drag]');
+    if (!el) return;
+    drag = el.dataset.drag === 'report' ? { kind: 'report' } : { kind: 'ideal', i: +el.dataset.i };
+    try { lineSvg.setPointerCapture(e.pointerId); } catch (err) { /* synthetic pointer */ }
+    e.preventDefault();
+  });
+  lineSvg.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const v = toVal(svgX(e));
+    if (drag.kind === 'report') {
+      if (v === report) return;
+      report = v;
+    } else {
+      if (v === ideals[drag.i]) return;
+      setIdeal(drag.i, v);
+      if (drag.i === liar && !lieOn.checked) report = v;
+    }
+    update();
+  });
+  const endDrag = () => { drag = null; };
+  lineSvg.addEventListener('pointerup', endDrag);
+  lineSvg.addEventListener('pointercancel', endDrag);
+
+  buildAgents();
+  update();
+})();
+
+(() => {
+  const quiz = document.getElementById('fl-quiz');
+  if (!quiz) return;
+  const qs = Array.from(quiz.querySelectorAll('.fl-q'));
+  const scoreEl = quiz.querySelector('.fl-score');
+  let score = 0;
+  let answered = 0;
+
+  function showScore() {
+    scoreEl.textContent = score + ' / ' + qs.length + (answered === qs.length ? ' (done)' : '');
+  }
+
+  qs.forEach(q => {
+    const btns = Array.from(q.querySelectorAll('.fl-opts button'));
+    const fb = q.querySelector('.fl-fb');
+    btns.forEach(b => b.addEventListener('click', () => {
+      if (q.dataset.done) return;
+      q.dataset.done = '1';
+      const ok = b.hasAttribute('data-ok');
+      btns.forEach(x => {
+        x.disabled = true;
+        if (x.hasAttribute('data-ok')) x.classList.add('right');
+      });
+      if (!ok) b.classList.add('wrong');
+      if (ok) score++;
+      answered++;
+      fb.innerHTML = (ok ? '<b class="ok">Correct.</b> ' : '<b class="no">Not quite.</b> ') + fb.dataset.why;
+      showScore();
+    }));
+  });
+
+  quiz.querySelector('.fl-quiz-reset').addEventListener('click', () => {
+    score = 0;
+    answered = 0;
+    qs.forEach(q => {
+      delete q.dataset.done;
+      q.querySelector('.fl-fb').textContent = '';
+      q.querySelectorAll('.fl-opts button').forEach(x => {
+        x.disabled = false;
+        x.classList.remove('right', 'wrong');
+      });
+    });
+    showScore();
+  });
 })();
 </script>
 <script src="deck/oyun.js"></script>
