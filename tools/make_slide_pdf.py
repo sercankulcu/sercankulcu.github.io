@@ -198,8 +198,17 @@ def main():
     with sync_playwright() as p:
         browser = launch(p)
         for n in names:
-            page = browser.new_page(viewport={'width': 1280, 'height': 900})
-            snaps, expected = render(page, '%s/%s.html#1' % (base, n))
+            # buyuk sunumlar ara sira yuklenemiyor (zaman asimi): birkac kez dene
+            for attempt in range(3):
+                page = browser.new_page(viewport={'width': 1280, 'height': 900})
+                try:
+                    snaps, expected = render(page, '%s/%s.html#1' % (base, n))
+                    break
+                except Exception as e:
+                    page.close()
+                    if attempt == 2:
+                        raise
+                    print('%s: yeniden deneniyor (%s)' % (n, str(e).splitlines()[0][:80]))
             out = os.path.join(pdfdir, n + '.pdf')
             page.pdf(path=out, width='800px', height='600px', print_background=True,
                      margin={'top': '0', 'right': '0', 'bottom': '0', 'left': '0'}, prefer_css_page_size=True)
