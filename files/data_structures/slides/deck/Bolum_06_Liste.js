@@ -1,3 +1,4 @@
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
   /* ArrayList kapasite demosu: size / capacity, dolunca 1,5 kat büyütme */
   document.querySelectorAll('.ds-deck [data-demo="b06-grow"]').forEach(function (demo) {
     var box = demo.querySelector(".b06-cap");

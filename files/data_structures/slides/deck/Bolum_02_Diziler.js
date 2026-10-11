@@ -1,3 +1,4 @@
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
   /* Tic Tac Toe demosu: char[3][3] tahtası */
   document.querySelectorAll('.ds-deck [data-demo="b02-ttt"]').forEach(function (demo) {
     var grid = demo.querySelector(".b02-ttt");

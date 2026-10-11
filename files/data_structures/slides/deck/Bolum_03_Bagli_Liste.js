@@ -1,3 +1,4 @@
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
 (function () {
   document.querySelectorAll('[data-demo="b03-list"]').forEach(function (demo) {
     var box = demo.querySelector(".b03-list");
