@@ -111,6 +111,32 @@ Sunumu güncelledikten sonra:
 python tools/make_slide_pdf.py <ders> --stale
 ```
 
+## Göndermeden önce denetim
+
+```bash
+python tools/check_site.py computer data_structures agt algorithms           # dosya denetimleri, saniyeler
+python tools/check_site.py algorithms --browser                              # + tarayıcıda, ders başına birkaç dakika
+```
+
+Ders verilmezse `files/` altında `slides/` klasörü olan bütün dersler denetlenir.
+Hata varsa çıkış kodu 1'dir; uyarılar çıkış kodunu değiştirmez.
+
+- **Dosya denetimleri:**
+  - **Liquid:** Jekyll ön bilgili her sayfayı Liquid ile işler. Metinde `{{` ya da `{%`
+    geçerse (ör. Java'da `int[][] a = {{1, 2}}`) bütün Pages derlemesi durur; ilk
+    parantezi `&#123;` yazın.
+  - **Etiket dengesi:** `section`, `details`, `svg` ve `pre` açılış/kapanış sayıları.
+  - **Çoktan seçmeli:** Her soruda tam bir `data-ok` olmalı. Doğru şıkkın belirgin uzun
+    olduğu sorular ve sayfa genelinde doğru şıkkın en uzun olma oranı %40'ı aşarsa uyarı.
+  - **SVG kimlikleri:** Aynı `<marker>` kimliği birden çok çizimde tanımlanmışsa ok uçları
+    kaybolur, çünkü tarayıcı tanımı gizli adımdaki çizimden alır.
+  - **ds-guard** ve istenmeyen yönerge cümleleri.
+- **`--browser` ile ek olarak:** Sayfalar `make_slide_pdf.py` gibi canlı site düzeninin
+  içinde açılır.
+  - Her slayt, bütün adımları ve cevapları açıkken taşma için ölçülür. Otomatik
+    sığdırmanın %90'ın altına küçülttüğü slaytlar uyarı olarak listelenir.
+  - Konsol hatası, yüklenemeyen dosya ve kırık iç bağlantı aranır.
+
 ## Figürler
 
 ```bash
