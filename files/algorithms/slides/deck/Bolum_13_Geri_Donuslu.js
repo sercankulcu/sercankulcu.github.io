@@ -1,4 +1,4 @@
-/* Bölüm 13: N vezir geri dönüşlü arama deneme alanı */
+/* Bölüm 13: N vezir geri izleme deneme alanı */
 (function () {
   document.querySelectorAll('.ds-deck [data-demo="a13-vezir"]').forEach(function (demo) {
     var view = demo.querySelector(".a13-lab__view");

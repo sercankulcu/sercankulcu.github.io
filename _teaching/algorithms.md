@@ -137,9 +137,9 @@ Dynamic programming is a powerful technique for solving optimization problems by
 
 Approximation algorithms efficiently produce near-optimal solutions for optimization problems whose exact solutions may be computationally expensive. They are especially useful for NP-hard problems, for which no polynomial-time exact algorithm is currently known.
 
-- [🖼️Sunum-Yaklaştırma Algoritmaları (HTML)](../files/algorithms/slides/Bolum_07_Yakinsama.html)  
-- [📄Sunum-Yaklaştırma Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_07_Yakinsama.pdf)  
-- [📝Çalışma Soruları - Yaklaştırma Algoritmaları (HTML)](../files/algorithms/slides/Bolum_07_Yakinsama_Calisma_Sorulari.html)  
+- [🖼️Sunum-Yaklaşım Algoritmaları (HTML)](../files/algorithms/slides/Bolum_07_Yakinsama.html)  
+- [📄Sunum-Yaklaşım Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_07_Yakinsama.pdf)  
+- [📝Çalışma Soruları - Yaklaşım Algoritmaları (HTML)](../files/algorithms/slides/Bolum_07_Yakinsama_Calisma_Sorulari.html)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter07/src)
 
 ---
@@ -203,9 +203,9 @@ Greedy algorithms build a solution incrementally by choosing the locally best av
 
 Backtracking systematically explores a search space by extending partial candidates. When a partial candidate can no longer lead to a valid solution, the algorithm abandons that branch and returns to an earlier decision point.
 
-- [🖼️Sunum-Geri Dönüşlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_13_Geri_Donuslu.html)  
-- [📄Sunum-Geri Dönüşlü Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_13_Geri_Donuslu.pdf)  
-- [📝Çalışma Soruları - Geri Dönüşlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_13_Geri_Donuslu_Calisma_Sorulari.html)  
+- [🖼️Sunum-Geri İzleme Algoritmaları (HTML)](../files/algorithms/slides/Bolum_13_Geri_Donuslu.html)  
+- [📄Sunum-Geri İzleme Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_13_Geri_Donuslu.pdf)  
+- [📝Çalışma Soruları - Geri İzleme Algoritmaları (HTML)](../files/algorithms/slides/Bolum_13_Geri_Donuslu_Calisma_Sorulari.html)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter13/src)
 
 
