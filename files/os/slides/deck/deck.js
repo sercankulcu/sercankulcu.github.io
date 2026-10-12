@@ -273,7 +273,7 @@
     prev.disabled = current === 0;
     next.disabled = current === slides.length - 1;
     jump.value = current;
-    sectionLabel.textContent = slides[current].dataset.section || (current === 0 || current === slides.length - 1 ? "Sercan KÜLCÜ, Tüm hakları saklıdır." : "");
+    sectionLabel.textContent = slides[current].dataset.section || "Sercan KÜLCÜ, Tüm hakları saklıdır.";
     if (updateHash !== false) history.replaceState(null, "", "#" + slugs[current]);
   }
 
