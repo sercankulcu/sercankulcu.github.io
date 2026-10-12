@@ -1,5 +1,8 @@
-/* Veri Yapıları sunumları: gezinme, ölçekleme ve demolar */
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+/* Nesneye Yönelik Programlama (Java) sunumları: gezinme, ölçekleme ve demolar */
 (function () {
+  /* yalnızca sercankulcu.github.io adresinde (ve yerel önizlemede) çalışır (© Sercan Külcü) */
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
   const deck = document.getElementById("ds-deck");
   const screen = document.getElementById("ds-deck-screen");
   const stage = document.getElementById("ds-deck-stage");
@@ -21,7 +24,10 @@
     const isFull = document.fullscreenElement === screen;
     const width = isFull ? window.innerWidth : deck.clientWidth;
     const fluid = !isFull && width < FLUID_BELOW;
-    deck.classList.toggle("is-fluid", fluid);
+    if (deck.classList.contains("is-fluid") !== fluid) {
+      deck.classList.toggle("is-fluid", fluid);
+      refit();
+    }
     if (fluid) {
       screen.style.height = "";
       stage.style.transform = "";
@@ -38,6 +44,37 @@
   if (window.ResizeObserver) new ResizeObserver(fit).observe(deck);
   window.addEventListener("resize", fit);
   document.addEventListener("fullscreenchange", fit);
+
+  /* ---------- slide slugs (#slug in the address bar; old #N links still work) ----------
+     slug = data-id if given, else from data-title: Turkish letters → ASCII (ç→c ğ→g ı→i İ→i ö→o ş→s ü→u,
+     other accents dropped), lower case, every run of non [a-z0-9] → "-", leading/trailing "-" removed.
+     Repeats get -2, -3 …; an empty title → "slayt-N"; an all-digit slug gets "s-" (so it is never read as #N). */
+  function slugify(text) {
+    return String(text || "")
+      .replace(/[çÇğĞıİöÖşŞüÜ]/g, function (c) { return { "ç": "c", "Ç": "c", "ğ": "g", "Ğ": "g", "ı": "i", "İ": "i", "ö": "o", "Ö": "o", "ş": "s", "Ş": "s", "ü": "u", "Ü": "u" }[c]; })
+      .normalize("NFD").replace(/[̀-ͯ]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+  const slugs = (function () {
+    const used = {}, seen = {}, out = [];
+    slides.forEach(function (slide) { const id = (slide.dataset.id || "").trim(); if (id) used[id] = true; });
+    slides.forEach(function (slide, i) {
+      const id = (slide.dataset.id || "").trim();
+      if (id) { out.push(id); return; }
+      let base = slugify(slide.dataset.title);
+      if (!base) base = "slayt-" + (i + 1);
+      else if (/^\d+$/.test(base)) base = "s-" + base;
+      let k = seen[base] = (seen[base] || 0) + 1;
+      let slug = k === 1 ? base : base + "-" + k;
+      while (used[slug]) slug = base + "-" + (++k);
+      seen[base] = k;
+      used[slug] = true;
+      out.push(slug);
+    });
+    return out;
+  })();
 
   /* ---------- navigation ---------- */
   slides.forEach(function (slide, i) {
@@ -230,19 +267,77 @@
       slide.inert = !active;
     });
     stepSets[current].forEach(function (set) { setStep(set, atEnd ? set.steps.length - 1 : 0); });
+    if (slides[current].classList.contains("is-active")) autoFit(current);
     counter.textContent = (current + 1) + " / " + slides.length;
     progress.style.width = ((current + 1) / slides.length * 100) + "%";
     prev.disabled = current === 0;
     next.disabled = current === slides.length - 1;
     jump.value = current;
     sectionLabel.textContent = slides[current].dataset.section || "Sercan KÜLCÜ, Tüm hakları saklıdır.";
-    if (updateHash !== false) history.replaceState(null, "", "#" + (current + 1));
+    if (updateHash !== false) history.replaceState(null, "", "#" + slugs[current]);
   }
 
+  /* #N (1-based, as before) or #slug; unknown → first slide */
   function fromHash() {
-    const n = parseInt(location.hash.slice(1), 10);
-    return Number.isFinite(n) ? n - 1 : 0;
+    let h = location.hash.slice(1);
+    try { h = decodeURIComponent(h); } catch (e) { /* keep raw */ }
+    if (/^\d+$/.test(h)) return parseInt(h, 10) - 1;
+    let i = slugs.indexOf(h);
+    if (i < 0 && h) i = slugs.indexOf(slugify(h));
+    return i < 0 ? 0 : i;
   }
+
+  /* ---------- auto-fit: a slide taller than the stage is shrunk (at most 20 %) ----------
+     Measured once per slide over every step and with the answers (<details>) open, so the size does not
+     jump while stepping. CSS zoom on the slide's children keeps the layout (text simply gets smaller). */
+  const MIN_ZOOM = 0.8;
+  const zoomOf = {};
+  function setZoom(slide, z) {
+    Array.from(slide.children).forEach(function (c) { c.style.zoom = z < 1 ? String(z) : ""; });
+  }
+  function worstOverflow(i) {
+    const slide = slides[i];
+    const closed = Array.from(slide.querySelectorAll("details:not([open])"));
+    closed.forEach(function (d) { d.open = true; });
+    let worst = slide.scrollHeight - slide.clientHeight;
+    stepSets[i].forEach(function (set) {
+      const keep = set.index;
+      for (let k = 0; k < set.steps.length; k++) {
+        setStep(set, k);
+        worst = Math.max(worst, slide.scrollHeight - slide.clientHeight);
+      }
+      setStep(set, keep);
+    });
+    closed.forEach(function (d) { d.open = false; });
+    return worst;
+  }
+  function autoFit(i) {
+    const slide = slides[i];
+    if (deck.classList.contains("is-fluid")) { setZoom(slide, 1); return; }
+    if (zoomOf[i] !== undefined) { setZoom(slide, zoomOf[i]); return; }
+    setZoom(slide, 1);
+    let over = worstOverflow(i), z = 1;
+    if (over > 1) {
+      const cs = getComputedStyle(slide);
+      const room = slide.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+      /* first guess from the height ratio, then smaller in 2.5 % steps until it fits */
+      z = Math.max(MIN_ZOOM, Math.min(0.975, Math.ceil(room / (room + over) * 40) / 40));
+      for (;;) {
+        setZoom(slide, z);
+        over = worstOverflow(i);
+        if (over <= 1 || z <= MIN_ZOOM) break;
+        z = Math.max(MIN_ZOOM, Math.round((z - 0.025) * 1000) / 1000);
+      }
+    }
+    zoomOf[i] = z;
+  }
+  /* web fonts / images change heights: measure again once they are in */
+  function refit() {
+    for (const k in zoomOf) delete zoomOf[k];
+    if (slides[current].classList.contains("is-active")) autoFit(current);
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
+  window.addEventListener("load", refit);
 
   function toggleFullscreen() {
     if (document.fullscreenElement) document.exitFullscreen();
