@@ -13,31 +13,12 @@ An algorithm is a finite and well-defined sequence of steps for solving a proble
 
 ---
 
-## Past Exams  
+## Preliminary Materials  
 
-- **2025-2026**  
-  [vize](../files/algorithms/slides/2025-2026-algorithms-vize-cevaplar.pdf) | 
-  [final](../files/algorithms/slides/2025-2026-algorithms-final-cevaplar.pdf)
-
-- **2024-2025**  
-  [vize](../files/algorithms/slides/2024-2025-algorithms-vize-cevaplar.pdf) | 
-  [telafi](../files/algorithms/slides/2024-2025-algorithms-telafi-cevaplar.pdf) | 
-  [final](../files/algorithms/slides/2024-2025-algorithms-final-cevaplar.pdf) | 
-  [but](../files/algorithms/slides/2024-2025-algorithms-butunleme-cevaplar.pdf)
-
-- **2023-2024**  
-  [vize](../files/algorithms/slides/2023-2024-algorithms-vize-cevap.pdf) | 
-  [final A](../files/algorithms/slides/2023-2024-algorithms-final-a-cevap.pdf) | 
-  [final B](../files/algorithms/slides/2023-2024-algorithms-final-b-cevap.pdf) | 
-  [but](../files/algorithms/slides/2023-2024-algorithms-butunleme-cevap.pdf)
-
----
-
-## Preliminary Materials: 
-
-* Prerequisites for preparation [(HTML)](../files/algorithms/Algorithms_Prerequisites.html)
-* Key figures who have shaped the field [(HTML)](../files/algorithms/Algorithms_Important_People.html)
-* Practice Questions & Solutions [(HTML)](../files/algorithms/Algorithms_Questions_and_Solutions.html)
+* [Important People in Algorithms (HTML)](../files/algorithms/Algorithms_Important_People.html)
+* [Prerequisites for Algorithms (HTML)](../files/algorithms/Algorithms_Prerequisites.html)
+* [Terim Sözlüğü / Glossary (HTML)](../files/algorithms/sozluk.html)
+* [Practice Questions & Solutions (HTML)](../files/algorithms/Algorithms_Questions_and_Solutions.html)
 
 ---
 
@@ -47,8 +28,10 @@ Algorithms are the step-by-step procedures that form the core of computer scienc
 
 - [🖼️Sunum-Giriş (HTML)](../files/algorithms/slides/Bolum_01_01_Giris.html)
 - [📄Sunum-Giriş (PDF)](../files/algorithms/pdf/Bolum_01_01_Giris.pdf)  
+- [📝Çalışma Soruları - Giriş (HTML)](../files/algorithms/slides/Bolum_01_01_Giris_Calisma_Sorulari.html)  
 - [🖼️Sunum-Karmaşıklık (HTML)](../files/algorithms/slides/Bolum_01_02_Karmasiklik.html)
 - [📄Sunum-Karmaşıklık (PDF)](../files/algorithms/pdf/Bolum_01_02_Karmasiklik.pdf)  
+- [📝Çalışma Soruları - Karmaşıklık (HTML)](../files/algorithms/slides/Bolum_01_02_Karmasiklik_Calisma_Sorulari.html)  
 - [🕹️Run time analysis (HTML)](../files/algorithms/slides/Chapter_01_Algorithm_Complexity.html)
 - [🕹️Recurrence & Master Theorem (HTML)](../files/algorithms/slides/Chapter_01_Recurrence_Master_Theorem.html)
 - [🕹️Asymptotic Growth Explorer (HTML)](../files/algorithms/slides/Chapter_01_Asymptotic_Growth_Explorer.html)
@@ -62,6 +45,7 @@ Sorting algorithms are the architects of order, meticulously organizing data int
 
 - [🖼️Sunum-Sıralama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_02_Siralama.html)
 - [📄Sunum-Sıralama Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_02_Siralama.pdf)  
+- [📝Çalışma Soruları - Sıralama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_02_Siralama_Calisma_Sorulari.html)  
 - [🕹️Sorting Algorithms (HTML)](../files/algorithms/slides/Chapter_02_Sorting.html)
 - [🕹️Sorting Race (HTML)](../files/algorithms/slides/Chapter_02_Sorting_Race.html)
 - [🕹️Sorting Properties Lab (HTML)](../files/algorithms/slides/Chapter_02_Sorting_Properties_Lab.html)
@@ -75,6 +59,7 @@ Searching algorithms are the detectives of the data world, designed to track dow
 
 - [🖼️Sunum-Arama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_03_Arama.html)
 - [📄Sunum-Arama Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_03_Arama.pdf)  
+- [📝Çalışma Soruları - Arama Algoritmaları (HTML)](../files/algorithms/slides/Bolum_03_Arama_Calisma_Sorulari.html)  
 - [🕹️Search Algorithms (HTML)](../files/algorithms/slides/Chapter_03_Search.html)
 - [🕹️Hash & Interpolation Search (HTML)](../files/algorithms/slides/Chapter_03_Hash_Interpolation_Search.html)
 - [🕹️Exponential Search (HTML)](../files/algorithms/slides/Chapter_03_Exponential_Search.html)
@@ -89,12 +74,16 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
 - 🖼️Slides:
   - [🖼️Sunum-Çizge Gezinme (HTML)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme.html) 
   - [📄Sunum-Çizge Gezinme (PDF)](../files/algorithms/pdf/Bolum_04_01_Cizge_Gezinme.pdf)  
+  - [📝Çalışma Soruları - Çizge Gezinme (HTML)](../files/algorithms/slides/Bolum_04_01_Cizge_Gezinme_Calisma_Sorulari.html)  
   - [🖼️Sunum-Çizge En Kısa Yol (HTML)](../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol.html) 
   - [📄Sunum-Çizge En Kısa Yol (PDF)](../files/algorithms/pdf/Bolum_04_02_En_Kisa_Yol.pdf)  
+  - [📝Çalışma Soruları - Çizge En Kısa Yol (HTML)](../files/algorithms/slides/Bolum_04_02_En_Kisa_Yol_Calisma_Sorulari.html)  
   - [🖼️Sunum-Çizge Minimum Kapsayan (HTML)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan.html) 
   - [📄Sunum-Çizge Minimum Kapsayan (PDF)](../files/algorithms/pdf/Bolum_04_03_Min_Kapsayan.pdf)  
+  - [📝Çalışma Soruları - Çizge Minimum Kapsayan (HTML)](../files/algorithms/slides/Bolum_04_03_Min_Kapsayan_Calisma_Sorulari.html)  
   - [🖼️Sunum-Çizge Ağ Akış (HTML)](../files/algorithms/slides/Bolum_04_04_Ag_Akis.html) 
   - [📄Sunum-Çizge Ağ Akış (PDF)](../files/algorithms/pdf/Bolum_04_04_Ag_Akis.pdf)  
+  - [📝Çalışma Soruları - Çizge Ağ Akış (HTML)](../files/algorithms/slides/Bolum_04_04_Ag_Akis_Calisma_Sorulari.html)  
 - 🕹️Applications:
   - [🕹️BFS DFS (HTML)](../files/algorithms/slides/Chapter_04_Graph_Traversal.html)
   - [🕹️Travelling Salesman (HTML)](../files/algorithms/slides/Chapter_04_TSP.html)
@@ -114,16 +103,19 @@ Have you ever wondered how your computer or smartphone handles text so efficient
 
 - [🖼️Sunum-Dizgi Algoritmaları (1) (HTML)](../files/algorithms/slides/Bolum_05_Dizgi.html)  
 - [📄Sunum-Dizgi Algoritmaları (1) (PDF)](../files/algorithms/pdf/Bolum_05_Dizgi.pdf)  
+- [📝Çalışma Soruları - Dizgi Algoritmaları (1) (HTML)](../files/algorithms/slides/Bolum_05_Dizgi_Calisma_Sorulari.html)  
   - [🕹️Eşleme (HTML)](../files/algorithms/slides/Chapter_05_String_Matching.html)
   - [🕹️Sıkıştırma (HTML)](../files/algorithms/slides/Chapter_05_String_Compression.html)
 - [🖼️Sunum-Dizgi Algoritmaları (2) (HTML)](../files/algorithms/slides/Bolum_05_Dizgi_2.html)  
 - [📄Sunum-Dizgi Algoritmaları (2) (PDF)](../files/algorithms/pdf/Bolum_05_Dizgi_2.pdf)  
+- [📝Çalışma Soruları - Dizgi Algoritmaları (2) (HTML)](../files/algorithms/slides/Bolum_05_Dizgi_2_Calisma_Sorulari.html)  
   - [🕹️Sıralama (HTML)](../files/algorithms/slides/Chapter_05_String_Sorting.html)
   - [🕹️Ayrıştırma (HTML)](../files/algorithms/slides/Chapter_05_String_Parsing.html)
   - [🕹️Benzerlik (HTML)](../files/algorithms/slides/Chapter_05_String_Similarity.html)
   - [🕹️Dönüşüm (HTML)](../files/algorithms/slides/Chapter_05_String_Transformation.html)
 - [🖼️Sunum-Trie (HTML)](../files/algorithms/slides/Bolum_05_Tries.html)
 - [📄Sunum-Trie (PDF)](../files/algorithms/pdf/Bolum_05_Tries.pdf)  
+- [📝Çalışma Soruları - Trie (HTML)](../files/algorithms/slides/Bolum_05_Tries_Calisma_Sorulari.html)  
   - [🕹️Trie & Suffix Algorithms (HTML)](../files/algorithms/slides/Chapter_05_Trie_Suffix_Algorithms.html)
 - [🕹️Prefix Function & Z Algorithm (HTML)](../files/algorithms/slides/Chapter_05_Prefix_Z_Algorithms.html)
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter05/src)
@@ -136,6 +128,7 @@ Dynamic programming is a powerful technique for solving optimization problems by
 
 - [🖼️Sunum-Dinamik Programlama (HTML)](../files/algorithms/slides/Bolum_06_Dinamik.html)  
 - [📄Sunum-Dinamik Programlama (PDF)](../files/algorithms/pdf/Bolum_06_Dinamik.pdf)  
+- [📝Çalışma Soruları - Dinamik Programlama (HTML)](../files/algorithms/slides/Bolum_06_Dinamik_Calisma_Sorulari.html)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter06/src)
 
 ---
@@ -146,6 +139,7 @@ Approximation algorithms efficiently produce near-optimal solutions for optimiza
 
 - [🖼️Sunum-Yaklaştırma Algoritmaları (HTML)](../files/algorithms/slides/Bolum_07_Yakinsama.html)  
 - [📄Sunum-Yaklaştırma Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_07_Yakinsama.pdf)  
+- [📝Çalışma Soruları - Yaklaştırma Algoritmaları (HTML)](../files/algorithms/slides/Bolum_07_Yakinsama_Calisma_Sorulari.html)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter07/src)
 
 ---
@@ -156,6 +150,7 @@ Randomized algorithms incorporate random choices into their execution. Randomiza
 
 - [🖼️Sunum-Rastgele Algoritmalar (HTML)](../files/algorithms/slides/Bolum_08_Rastgele.html)  
 - [📄Sunum-Rastgele Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_08_Rastgele.pdf)  
+- [📝Çalışma Soruları - Rastgele Algoritmalar (HTML)](../files/algorithms/slides/Bolum_08_Rastgele_Calisma_Sorulari.html)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter08/src)
 
 ---
@@ -166,6 +161,7 @@ Online algorithms process input incrementally and make irrevocable decisions wit
 
 - [🖼️Sunum-Çevrimiçi Algoritmalar (HTML)](../files/algorithms/slides/Bolum_09_Cevrimici.html)  
 - [📄Sunum-Çevrimiçi Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_09_Cevrimici.pdf)  
+- [📝Çalışma Soruları - Çevrimiçi Algoritmalar (HTML)](../files/algorithms/slides/Bolum_09_Cevrimici_Calisma_Sorulari.html)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter09/src)
 
 ---
@@ -176,6 +172,7 @@ Parallel algorithms divide computation among multiple processing units to reduce
 
 - [🖼️Sunum-Paralel Algoritmalar (HTML)](../files/algorithms/slides/Bolum_10_Paralel.html)  
 - [📄Sunum-Paralel Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_10_Paralel.pdf)  
+- [📝Çalışma Soruları - Paralel Algoritmalar (HTML)](../files/algorithms/slides/Bolum_10_Paralel_Calisma_Sorulari.html)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter10/src)
 
 ---
@@ -186,6 +183,7 @@ The divide-and-conquer paradigm is an algorithmic design paradigm that breaks do
 
 - [🖼️Sunum-Böl Fethet Yaklaşımı (HTML)](../files/algorithms/slides/Bolum_11_Bol_Fethet.html)  
 - [📄Sunum-Böl Fethet Yaklaşımı (PDF)](../files/algorithms/pdf/Bolum_11_Bol_Fethet.pdf)  
+- [📝Çalışma Soruları - Böl Fethet Yaklaşımı (HTML)](../files/algorithms/slides/Bolum_11_Bol_Fethet_Calisma_Sorulari.html)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter11/src)
 
 ---
@@ -196,6 +194,7 @@ Greedy algorithms build a solution incrementally by choosing the locally best av
 
 - [🖼️Sunum-Açgözlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_12_Acgozlu.html)  
 - [📄Sunum-Açgözlü Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_12_Acgozlu.pdf)  
+- [📝Çalışma Soruları - Açgözlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_12_Acgozlu_Calisma_Sorulari.html)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter12/src)
 
 ---
@@ -206,6 +205,7 @@ Backtracking systematically explores a search space by extending partial candida
 
 - [🖼️Sunum-Geri Dönüşlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_13_Geri_Donuslu.html)  
 - [📄Sunum-Geri Dönüşlü Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_13_Geri_Donuslu.pdf)  
+- [📝Çalışma Soruları - Geri Dönüşlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_13_Geri_Donuslu_Calisma_Sorulari.html)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter13/src)
 
 
@@ -217,6 +217,7 @@ Branch and bound algorithms are a type of algorithm that solves optimization pro
 
 - [🖼️Sunum-Dal Sınır Algoritmaları (HTML)](../files/algorithms/slides/Bolum_14_Dal_Sinir.html)  
 - [📄Sunum-Dal Sınır Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_14_Dal_Sinir.pdf)  
+- [📝Çalışma Soruları - Dal Sınır Algoritmaları (HTML)](../files/algorithms/slides/Bolum_14_Dal_Sinir_Calisma_Sorulari.html)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter14/src)
 
 ## Supplementary Topics
