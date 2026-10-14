@@ -219,10 +219,3 @@ Branch and bound algorithms are a type of algorithm that solves optimization pro
 - [📝Çalışma Soruları - Dal Sınır Algoritmaları (HTML)](../files/algorithms/slides/Bolum_14_Dal_Sinir_Calisma_Sorulari.html)  
 - [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter14/src)
 
-## Supplementary Topics
-
- - [Amortized Analysis (HTML)](../files/algorithms/slides/Supplementary_Amortized_Analysis.html) 
- - [Bit Manipulation (HTML)](../files/algorithms/slides/Supplementary_Bit_Manipulation.html) 
- - [Matrix Algorithms (HTML)](../files/algorithms/slides/Supplementary_Matrix_Algorithms.html) 
- - [NP Completeness (HTML)](../files/algorithms/slides/Supplementary_NP_Completeness.html) 
- - [Number Theoretic Algorithms (HTML)](../files/algorithms/slides/Supplementary_Number_Theoretic_Algorithms.html)
