@@ -110,7 +110,7 @@ body:has(.osim) .page__meta{display:none}
 .osim .osim-sub{font-size:12px;font-weight:750;color:var(--o-muted);text-transform:uppercase;letter-spacing:.04em}
 .osim .osim-help dl{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;margin:0;font-size:13.5px}
 .osim .osim-help dt{font-weight:800}
-.osim .osim-help dd{margin:0}
+.osim .osim-help dd{margin:0;font-size:inherit}
 .osim .osim-legend{display:flex;flex-wrap:wrap;gap:6px;font-size:12.5px;font-weight:650}
 .osim .osim-legend span{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:7px}
 .osim kbd{font:inherit;font-size:12px;font-weight:750;padding:1px 5px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--o-line)}
@@ -606,29 +606,39 @@ function buildChips(){
 }
 var geo=null;
 function layoutLaneBoxes(){
-  var W=lanes.clientWidth,H=lanes.clientHeight,g=8;
-  var wUp=Math.round(W*0.2),wCpu=Math.round(W*0.15),wDn=Math.round(W*0.19);
-  var wRq=W-wUp-wCpu-wDn-3*g-14;
-  var x=0,boxes={};
-  [["up",wUp],["rq",wRq],["cpu",wCpu],["dn",wDn]].forEach(function(b){
-    boxes[b[0]]={x:x,w:b[1]};
-    var el=$("cs-l-"+b[0]);el.style.left=x+"px";el.style.width=b[1]+"px";
-    x+=b[1]+g+(b[0]==="rq"?14:0);
-  });
-  var ar=$("cs-arrow");ar.style.left=(boxes.rq.x+boxes.rq.w+3)+"px";ar.style.top=Math.round(H/2)+"px";
-  var ch=Math.round(clamp((H-44)*0.62,30,54)),cw=Math.round(ch*1.18);
+  var W=lanes.clientWidth,H=lanes.clientHeight,g=8,boxes={},ch,cw;
+  function put(k,x,w,y,h){
+    boxes[k]={x:x,w:w,y:y,h:h};
+    var el=$("cs-l-"+k);el.style.left=x+"px";el.style.width=w+"px";el.style.top=y+"px";el.style.height=h+"px";el.style.bottom="auto";
+  }
+  if(narrow.matches){
+    /* dar ekran: üstte Not arrived | Finished, altta Ready queue → CPU (kartlar kutulara sığsın) */
+    var h1=Math.round((H-g)*0.5),h2=H-g-h1,half=Math.floor((W-g)/2),wCpu=Math.round(W*0.3);
+    put("up",0,half,0,h1);put("dn",W-half,half,0,h1);
+    put("rq",0,W-wCpu-g-14,h1+g,h2);put("cpu",W-wCpu,wCpu,h1+g,h2);
+    ch=Math.round(clamp((h2-44)*0.62,30,54));cw=Math.round(ch*1.18);
+  }else{
+    var wUp=Math.round(W*0.2),wCpu2=Math.round(W*0.15),wDn=Math.round(W*0.19);
+    var wRq=W-wUp-wCpu2-wDn-3*g-14,x=0;
+    [["up",wUp],["rq",wRq],["cpu",wCpu2],["dn",wDn]].forEach(function(b){
+      put(b[0],x,b[1],0,H);
+      x+=b[1]+g+(b[0]==="rq"?14:0);
+    });
+    ch=Math.round(clamp((H-44)*0.62,30,54));cw=Math.round(ch*1.18);
+  }
+  var ar=$("cs-arrow");ar.style.left=(boxes.rq.x+boxes.rq.w+3)+"px";ar.style.top=Math.round(boxes.rq.y+boxes.rq.h/2)+"px";
   geo={W:W,H:H,b:boxes,ch:ch,cw:cw};
   chips.forEach(function(c){c.style.width=cw+"px";c.style.height=ch+"px";});
 }
 function gridPos(box,idx,count){
-  var pad=8,top=24,bottom=8,avail=geo.H-top-bottom,cw=geo.cw,ch=geo.ch;
+  var pad=8,top=24,bottom=8,avail=box.h-top-bottom,cw=geo.cw,ch=geo.ch;
   var rows=Math.max(1,Math.min(Math.floor((avail+4)/(ch+4)),Math.ceil(count/Math.max(1,Math.floor((box.w-2*pad+4)/(cw+4))))));
   var perRow=Math.ceil(count/rows);
   var sx=perRow>1?Math.min(cw+4,(box.w-2*pad-cw)/(perRow-1)):0;
   var r=Math.floor(idx/perRow),c=idx%perRow;
   var sy=rows>1?Math.min(ch+4,(avail-ch)/(rows-1)):0;
   var y0=top+(rows===1?(avail-ch)/2:0);
-  return [box.x+pad+c*sx,y0+r*sy];
+  return [box.x+pad+c*sx,box.y+y0+r*sy];
 }
 function placeChips(anim){
   if(!geo||!st.run){return;}
@@ -641,12 +651,12 @@ function placeChips(anim){
   var n=s.ready.length,pad=8,inner=b.rq.w-2*pad;
   var sp=n>1?Math.min(cw+6,(inner-cw)/(n-1)):0;
   s.ready.forEach(function(i,j){
-    pos[i]={xy:[b.rq.x+b.rq.w-pad-cw-j*sp,(geo.H-ch)/2+2],cls:"wait",sc:1};
+    pos[i]={xy:[b.rq.x+b.rq.w-pad-cw-j*sp,b.rq.y+(b.rq.h-ch)/2+2],cls:"wait",sc:1};
   });
-  if(s.cpu>=0){pos[s.cpu]={xy:[b.cpu.x+(b.cpu.w-cw*big)/2,(geo.H-ch*big)/2],cls:"run",sc:big};}
+  if(s.cpu>=0){pos[s.cpu]={xy:[b.cpu.x+(b.cpu.w-cw*big)/2,b.cpu.y+(b.cpu.h-ch*big)/2],cls:"run",sc:big};}
   var ev=s.ev;
   chips.forEach(function(el,i){
-    var p=pos[i]||{xy:[b.up.x+8,24],cls:"fut",sc:1};
+    var p=pos[i]||{xy:[b.up.x+8,b.up.y+24],cls:"fut",sc:1};
     el.classList.toggle("mv",!!anim);
     el.style.transform="translate("+Math.round(p.xy[0])+"px,"+Math.round(p.xy[1])+"px) scale("+p.sc+")";
     el.className="pchip"+(anim?" mv":"")+" "+p.cls+(ev.prev===i&&ev.cur!==i&&ev.fin.indexOf(i)<0&&s.k>0?" pre":"")+(ev.arr.indexOf(i)>=0&&s.k>0?" newin":"");
@@ -989,7 +999,7 @@ function fit(){
     if(over>0){root.style.setProperty("--osim-h",Math.max(420,h-over)+"px");}
   }
   var vz=$("cs-viz");
-  var lh=narrow.matches?150:Math.round(clamp(vz.clientHeight*0.34,120,230));
+  var lh=narrow.matches?300:Math.round(clamp(vz.clientHeight*0.34,120,230));
   lanes.style.height=lh+"px";
   var key=root.clientWidth+"x"+root.clientHeight+"x"+vz.clientWidth+"x"+vz.clientHeight;
   if(key!==lastFit){lastFit=key;rebuild();}

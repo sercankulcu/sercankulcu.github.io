@@ -1,0 +1,417 @@
+---
+layout: without-sidebar
+title: "Bölüm 4: İş Parçacıkları: Çalışma Soruları"
+permalink: /files/os/slides/Bolum_04_Is_Parcaciklari_Calisma_Sorulari.html
+excerpt: "İşletim Sistemleri dersi Bölüm 4 çalışma soruları ve cevapları: iş parçacıklarının paylaştığı ve paylaşmadığı öğeler, çok iş parçacıklı web sunucusu, eş zamanlılık ve paralellik, Amdahl yasası, N:1, 1:1 ve M:N modelleri, Pthreads ile oluşturma ve bekleme, Java start ve run, fork-join ve OpenMP, iş parçacığı havuzu boyutu, fork ve sinyallerle ilgili sorunlar, yarış durumu, TLS ve koşul değişkenleri."
+redirect_from:
+  - /files/os/slides/Bolum_04_Is_Parcaciklari_Sorular.html
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/deck.css">
+<style>
+  .ds-deck .ds-deck__slide > * { flex-shrink: 0; }
+  .ds-deck .dsq-q { margin: 0 0 8px; font-size: 16.5px; }
+  .ds-deck .dsq-two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .ds-deck .dsq-two--code { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+  .ds-deck .dsq-two--ans { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); }
+  .ds-deck .dsq-two > div > pre { font-size: 13px; }
+  .ds-deck .dsq-two > .ds-deck__answers { margin-top: 0; }
+  .ds-deck .dsq-fig { margin: 4px 0 0; }
+  .ds-deck .dsq-fig svg { display: block; margin: 0 auto; }
+  .ds-deck .ds-deck__answers p { margin: 4px 0; line-height: 1.4; }
+  .ds-deck .ds-deck__answers ul { margin: 4px 0; padding-left: 18px; line-height: 1.4; }
+  .ds-deck .ds-deck__answers pre { margin: 4px 0; padding: 6px 8px; font-size: 12.5px; line-height: 1.35; }
+  .ds-deck .ds-deck__answers svg { display: block; margin: 4px auto; }
+  .ds-deck .dsq-tbl { font-size: 13.5px; margin-top: 4px; }
+  .ds-deck .dsq-tbl td, .ds-deck .dsq-tbl th { padding: 2px 6px; text-align: center; }
+
+  .ds-deck .dsq-mc { margin: 0; }
+  .ds-deck .dsq-mc .dsq-q { font-size: 15.5px; }
+  .ds-deck .dsq-mc pre { font-size: 12.5px; padding: 6px 8px; margin: 0 0 6px; }
+  .ds-deck .dsq-opts { display: flex; flex-direction: column; gap: 5px; }
+  .ds-deck .dsq-opt {
+    display: flex; gap: 8px; align-items: baseline; width: 100%; padding: 5px 10px;
+    border: 1.5px solid var(--ds-border); border-radius: 10px; background: var(--ds-bg);
+    color: var(--ds-text); font: inherit; font-size: 15px; text-align: left; cursor: pointer;
+  }
+  .ds-deck .dsq-opt:hover:not(:disabled) { border-color: var(--ds-link); }
+  .ds-deck .dsq-opt b { color: var(--ds-muted); }
+  .ds-deck .dsq-opt:disabled { cursor: default; }
+  .ds-deck .dsq-opt.is-right { border-color: var(--ds-good); background: color-mix(in srgb, var(--ds-good) 18%, var(--ds-bg)); }
+  .ds-deck .dsq-opt.is-wrong { border-color: var(--ds-bad); background: color-mix(in srgb, var(--ds-bad) 16%, var(--ds-bg)); }
+  .ds-deck .dsq-why { display: none; margin: 6px 0 0; font-size: 14.5px; line-height: 1.4; }
+  .ds-deck .dsq-mc.is-done .dsq-why { display: block; }
+  .ds-deck .dsq-tr { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); grid-template-areas: "code steps" "code col"; row-gap: 8px; }
+  .ds-deck .dsq-tr > .ds-trace__code { grid-area: code; }
+  .ds-deck .dsq-tr > .ds-deck__steps { grid-area: steps; }
+  .ds-deck .dsq-tr > .ds-trace__col { grid-area: col; }
+  .ds-deck .dsq-tr .ds-deck__step svg { display: block; margin: 0 auto; }
+  .ds-deck .dsq-tr .ds-deck__stepnote { min-height: 40px; font-size: 14.5px; }
+  .ds-deck .dsq-tr .ds-trace__vars, .ds-deck .dsq-tr .ds-trace__out, .ds-deck .dsq-tr .ds-trace__stack { font-size: 13px; }
+  .ds-deck.is-fluid .dsq-tr { grid-template-areas: none; }
+  .ds-deck.is-fluid .dsq-tr > * { grid-area: auto !important; }
+  .ds-deck .dsq-mc--one { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  .ds-deck .dsq-mc--one pre { margin: 0; }
+  .ds-deck.is-fluid .dsq-mc--one { grid-template-columns: minmax(0, 1fr); }
+  .ds-deck .ds-deck__slide a { color: var(--ds-link); font-weight: 600; }
+  .ds-deck .dsq-tr .ds-trace__code { font-size: 12.5px; }
+  .ds-deck .dsq-tbl td.oq-on { background: var(--ds-hot); font-weight: 700; }
+  .ds-deck .ds-svg .oq-cell { fill: var(--ds-bg); stroke: var(--ds-link); stroke-width: 1.3; }
+  .ds-deck .ds-svg .oq-hot { fill: var(--ds-hot); stroke: var(--ds-accent); stroke-width: 2; }
+  .ds-deck .ds-svg .oq-dim { fill: color-mix(in srgb, var(--ds-muted) 14%, var(--ds-bg)); stroke: var(--ds-muted); stroke-width: 1.2; }
+  .ds-deck .ds-svg .oq-a { fill: color-mix(in srgb, var(--ds-link) 30%, var(--ds-bg)); stroke: var(--ds-link); stroke-width: 1.3; }
+  .ds-deck .ds-svg .oq-b { fill: color-mix(in srgb, var(--ds-good) 32%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 1.3; }
+  .ds-deck .ds-svg .oq-c { fill: color-mix(in srgb, var(--ds-accent) 26%, var(--ds-bg)); stroke: var(--ds-accent); stroke-width: 1.3; }
+  .ds-deck .ds-svg .oq-good { fill: color-mix(in srgb, var(--ds-good) 32%, var(--ds-bg)); stroke: var(--ds-good); stroke-width: 2; }
+  .ds-deck .ds-svg .oq-bad { fill: color-mix(in srgb, var(--ds-bad) 24%, var(--ds-bg)); stroke: var(--ds-bad); stroke-width: 2; }
+  .ds-deck .ds-svg .oq-t { fill: var(--ds-text); font: 600 12.5px system-ui, sans-serif; }
+  .ds-deck .ds-svg .oq-s { fill: var(--ds-muted); font: 11.5px system-ui, sans-serif; }
+  .ds-deck .ds-svg .oq-k { fill: var(--ds-accent); font: 700 12.5px system-ui, sans-serif; }
+  .ds-deck .ds-svg .oq-mono { fill: var(--ds-text); font: 600 12px ui-monospace, Consolas, monospace; }
+  .ds-deck .ds-svg .oq-ln { stroke: var(--ds-muted); stroke-width: 1.4; fill: none; }
+  .ds-deck .ds-svg .oq-lnhot { stroke: var(--ds-accent); stroke-width: 2.6; fill: none; }
+  .ds-deck .ds-svg .oq-ah { fill: var(--ds-muted); }
+  .ds-deck .ds-svg .oq-ahhot { fill: var(--ds-accent); }
+</style>
+
+<div class="ds-deck" id="ds-deck" lang="tr">
+  <div class="ds-deck__screen" id="ds-deck-screen" tabindex="0" aria-roledescription="sunum" aria-label="Bölüm 4: İş Parçacıkları: Çalışma Soruları sunumu">
+    <div class="ds-deck__stage" id="ds-deck-stage">
+      <div class="ds-deck__progress" aria-hidden="true"><span id="ds-deck-progress"></span></div>
+
+      <div class="ds-deck__viewport" aria-live="polite">
+
+        <section class="ds-deck__slide ds-deck__slide--title" data-title="Bölüm 4: İş Parçacıkları: Çalışma Soruları" data-section="">
+          <h1>Bölüm 4: İş Parçacıkları</h1>
+          <div class="ds-deck__subtitle">İşletim Sistemleri · Çalışma Soruları</div>
+          <div class="ds-deck__agenda" aria-label="Soruların konuları"><span>Temel kavramlar</span><span>Eş zamanlılık ve paralellik</span><span>Amdahl yasası</span><span>Eşleme modelleri</span><span>Pthreads ve Java</span><span>Örtük iş parçacığı</span><span>İş parçacığı sorunları</span><span>Koşul değişkenleri</span></div>
+          <small>Sercan KÜLCÜ</small>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 1: Hangisi Paylaşılmaz?" data-section="Temel Kavramlar">
+          <p class="ds-deck__kicker">Çoktan Seçmeli · Temel Kavramlar</p>
+          <h2>Soru 1: Hangisi Paylaşılmaz?</h2>
+          <div class="dsq-mc"><p class="dsq-q">Aynı süreçteki iki iş parçacığı düşünün. Aşağıdakilerden hangisi bu iki iş parçacığı arasında paylaşılmaz, her birine özeldir?</p><div class="dsq-opts"><button type="button" class="dsq-opt"><b>A)</b><span>Global ve static değişkenler (veri bölümü)</span></button><button type="button" class="dsq-opt"><b>B)</b><span>Öbekte malloc ile ayrılan veri</span></button><button type="button" class="dsq-opt" data-ok><b>C)</b><span>Yığın, program sayacı ve yazmaçlar</span></button><button type="button" class="dsq-opt"><b>D)</b><span>Açık dosya tanımlayıcıları</span></button></div><p class="dsq-why">C: Adres alanı (kod, veri, öbek) ve açık dosyalar, sinyal işleyicileri gibi kaynaklar sürece aittir; tüm iş parçacıklarınca paylaşılır. Her iş parçacığının ise kendi yürütme durumu vardır: program sayacı, yazmaçlar ve yığın. Yığın özeldir ama korunmaz: hatalı bir gösterici başka iş parçacığının yığınını bozabilir.</p></div>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 2: Çok İş Parçacıklı Web Sunucusu" data-section="Temel Kavramlar">
+          <p class="ds-deck__kicker">Hesaplama · Temel Kavramlar</p>
+          <h2>Soru 2: Çok İş Parçacıklı Web Sunucusu</h2>
+          <p class="dsq-q">Bir web sunucusunda isteklerin 2/3’ü önbellekten karşılanıyor ve 15 ms CPU sürüyor. 1/3’ünde ayrıca diskten okumak gerekiyor: 15 ms CPU + 75 ms disk beklemesi. Tek CPU var; disk aynı anda birçok isteğe hizmet verebiliyor. Sunucu tek iş parçacıklıysa ve çok iş parçacıklıysa saniyede kaç isteğe yanıt verir?</p>
+          <details class="ds-deck__answers">
+            <summary>Cevabı göster</summary>
+<ul>
+<li><b>Tek iş parçacığı:</b> disk beklenirken süreç bloke olur, CPU boşta kalır. Ortalama istek süresi 2/3 × 15 + 1/3 × 90 = 10 + 30 = 40 ms → <b>25 istek/s</b>.</li>
+<li><b>Çok iş parçacığı:</b> diski bekleyen işçi bloke olurken başka işçi CPU’yu kullanır; disk beklemesi örtüşür. Her istek yalnızca 15 ms CPU harcar → 1000 / 15 ≈ <b>66,7 istek/s</b>.</li>
+</ul>
+<p>Kazanç paralellikten değil (tek CPU), bloke eden çağrıların hesaplamayla örtüşmesinden gelir; kod yine sıralı ve okunaklı kalır. Aynı örtüşme olay güdümlü tek iş parçacığıyla da elde edilebilir ama kod karmaşıklaşır.</p>
+          </details>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 3: Amdahl Yasası" data-section="Çok Çekirdekli Programlama">
+          <p class="ds-deck__kicker">Adım Adım Çalıştırma · Çok Çekirdekli Programlama</p>
+          <h2>Soru 3: Amdahl Yasası</h2>
+          <p class="dsq-q">Bir programın çalışma süresinin %20’si paralelleştirilemiyor. 2, 4 ve 8 çekirdekte hızlanma ve verim nedir? Çekirdek sayısı sonsuza giderse üst sınır nedir?</p>
+          <div class="ds-trace dsq-tr">
+            <div class="ds-deck__steps">
+              <div class="ds-deck__step" data-line="1" data-vars="N=1; süre=1; hızlanma=1×"><svg class="ds-svg" viewBox="0 0 340 96" width="340" height="96" role="img" aria-label="Amdahl yasası süre çubukları"><text class="oq-s" x="4" y="7" text-anchor="start" dominant-baseline="central">tek çekirdek</text><rect class="oq-c" x="4" y="16" width="52.0" height="22" rx="3"/><rect class="oq-a" x="56.0" y="16" width="208.0" height="22" rx="3"/><text class="oq-t" x="30.0" y="27" text-anchor="middle" dominant-baseline="central">seri</text><text class="oq-t" x="160.0" y="27" text-anchor="middle" dominant-baseline="central">paralel 0,8</text><text class="oq-s" x="4" y="53" text-anchor="start" dominant-baseline="central">N = 1</text><rect class="oq-c" x="4" y="62" width="52.0" height="22" rx="3"/><rect class="oq-hot" x="56.0" y="62" width="208.0" height="22" rx="3"/><line class="oq-lnhot" x1="264.0" y1="56" x2="264.0" y2="90"/><text class="oq-k" x="270.0" y="73" text-anchor="start" dominant-baseline="central">süre 1 → 1×</text></svg><p class="ds-deck__stepnote">Tek çekirdekte süre %100: seri %20 + paralel %80.</p></div>
+              <div class="ds-deck__step" data-line="2,3,4" data-vars="N=2; süre=0,6; hızlanma=1,67×; verim=%83"><svg class="ds-svg" viewBox="0 0 340 96" width="340" height="96" role="img" aria-label="Amdahl yasası süre çubukları"><text class="oq-s" x="4" y="7" text-anchor="start" dominant-baseline="central">tek çekirdek</text><rect class="oq-c" x="4" y="16" width="52.0" height="22" rx="3"/><rect class="oq-a" x="56.0" y="16" width="208.0" height="22" rx="3"/><text class="oq-t" x="30.0" y="27" text-anchor="middle" dominant-baseline="central">seri</text><text class="oq-t" x="160.0" y="27" text-anchor="middle" dominant-baseline="central">paralel 0,8</text><text class="oq-s" x="4" y="53" text-anchor="start" dominant-baseline="central">N = 2</text><rect class="oq-c" x="4" y="62" width="52.0" height="22" rx="3"/><rect class="oq-hot" x="56.0" y="62" width="104.0" height="22" rx="3"/><line class="oq-lnhot" x1="160.00000000000003" y1="56" x2="160.00000000000003" y2="90"/><text class="oq-k" x="166.00000000000003" y="73" text-anchor="start" dominant-baseline="central">süre 0,6 → 1,67×</text></svg><p class="ds-deck__stepnote">0,2 + 0,8 / 2 = 0,6 → 1 / 0,6 ≈ 1,67×: çekirdek iki katına çıktı ama hızlanma 2 değil.</p></div>
+              <div class="ds-deck__step" data-line="2,3,4" data-vars="N=4; süre=0,4; hızlanma=2,5×; verim=%63"><svg class="ds-svg" viewBox="0 0 340 96" width="340" height="96" role="img" aria-label="Amdahl yasası süre çubukları"><text class="oq-s" x="4" y="7" text-anchor="start" dominant-baseline="central">tek çekirdek</text><rect class="oq-c" x="4" y="16" width="52.0" height="22" rx="3"/><rect class="oq-a" x="56.0" y="16" width="208.0" height="22" rx="3"/><text class="oq-t" x="30.0" y="27" text-anchor="middle" dominant-baseline="central">seri</text><text class="oq-t" x="160.0" y="27" text-anchor="middle" dominant-baseline="central">paralel 0,8</text><text class="oq-s" x="4" y="53" text-anchor="start" dominant-baseline="central">N = 4</text><rect class="oq-c" x="4" y="62" width="52.0" height="22" rx="3"/><rect class="oq-hot" x="56.0" y="62" width="52.0" height="22" rx="3"/><line class="oq-lnhot" x1="108.0" y1="56" x2="108.0" y2="90"/><text class="oq-k" x="114.0" y="73" text-anchor="start" dominant-baseline="central">süre 0,4 → 2,5×</text></svg><p class="ds-deck__stepnote">0,2 + 0,2 = 0,4 → 2,5×. Seri kısım artık sürenin yarısı.</p></div>
+              <div class="ds-deck__step" data-line="2,3,4" data-vars="N=8; süre=0,3; hızlanma=3,33×; verim=%42"><svg class="ds-svg" viewBox="0 0 340 96" width="340" height="96" role="img" aria-label="Amdahl yasası süre çubukları"><text class="oq-s" x="4" y="7" text-anchor="start" dominant-baseline="central">tek çekirdek</text><rect class="oq-c" x="4" y="16" width="52.0" height="22" rx="3"/><rect class="oq-a" x="56.0" y="16" width="208.0" height="22" rx="3"/><text class="oq-t" x="30.0" y="27" text-anchor="middle" dominant-baseline="central">seri</text><text class="oq-t" x="160.0" y="27" text-anchor="middle" dominant-baseline="central">paralel 0,8</text><text class="oq-s" x="4" y="53" text-anchor="start" dominant-baseline="central">N = 8</text><rect class="oq-c" x="4" y="62" width="52.0" height="22" rx="3"/><rect class="oq-hot" x="56.0" y="62" width="26.0" height="22" rx="3"/><line class="oq-lnhot" x1="82.00000000000001" y1="56" x2="82.00000000000001" y2="90"/><text class="oq-k" x="88.00000000000001" y="73" text-anchor="start" dominant-baseline="central">süre 0,3 → 3,33×</text></svg><p class="ds-deck__stepnote">0,2 + 0,1 = 0,3 → 3,33×; 8 çekirdeğin verimi %42. 4’ten 8’e geçmek yalnızca 1,33 kat kazandırdı.</p></div>
+              <div class="ds-deck__step" data-line="5" data-vars="N=∞; süre=0,2; hızlanma=5×"><svg class="ds-svg" viewBox="0 0 340 96" width="340" height="96" role="img" aria-label="Amdahl yasası süre çubukları"><text class="oq-s" x="4" y="7" text-anchor="start" dominant-baseline="central">tek çekirdek</text><rect class="oq-c" x="4" y="16" width="52.0" height="22" rx="3"/><rect class="oq-a" x="56.0" y="16" width="208.0" height="22" rx="3"/><text class="oq-t" x="30.0" y="27" text-anchor="middle" dominant-baseline="central">seri</text><text class="oq-t" x="160.0" y="27" text-anchor="middle" dominant-baseline="central">paralel 0,8</text><text class="oq-s" x="4" y="53" text-anchor="start" dominant-baseline="central">N → ∞</text><rect class="oq-c" x="4" y="62" width="52.0" height="22" rx="3"/><line class="oq-lnhot" x1="56.0" y1="56" x2="56.0" y2="90"/><text class="oq-k" x="62.0" y="73" text-anchor="start" dominant-baseline="central">süre 0,2 → 5×</text></svg><p class="ds-deck__stepnote">Paralel terim sıfıra gider, seri 0,2 kalır: <b>en fazla 5×</b>. Küçük görünen seri kısım ölçeklenmeyi sınırlar.</p></div>
+            </div>
+<pre class="ds-trace__code">S = 0,2 (seri), 1 − S = 0,8 (paralel)
+süre(N) = S + (1 − S) / N
+hızlanma(N) = 1 / süre(N)
+verim(N) = hızlanma(N) / N
+üst sınır (N → ∞) = 1 / S</pre>
+            <div class="ds-trace__col"><div class="ds-trace__vars"></div></div>
+          </div>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 4: Tek Çekirdekte Dört İş Parçacığı" data-section="Çok Çekirdekli Programlama">
+          <p class="ds-deck__kicker">Çoktan Seçmeli · Çok Çekirdekli Programlama</p>
+          <h2>Soru 4: Tek Çekirdekte Dört İş Parçacığı</h2>
+          <div class="dsq-mc"><p class="dsq-q">Tek çekirdekli bir makinede dört iş parçacığı zaman paylaşımıyla sırayla çalışıyor. Bu durum için hangisi doğrudur?</p><div class="dsq-opts"><button type="button" class="dsq-opt"><b>A)</b><span>Paraleldir ama eş zamanlı değildir</span></button><button type="button" class="dsq-opt" data-ok><b>B)</b><span>Eş zamanlıdır ama paralel değildir</span></button><button type="button" class="dsq-opt"><b>C)</b><span>Hem eş zamanlı hem paraleldir</span></button><button type="button" class="dsq-opt"><b>D)</b><span>Ne eş zamanlı ne paraleldir</span></button></div><p class="dsq-why">B: Dördü de aynı zaman aralığında ilerler (eş zamanlılık), ama herhangi bir anda yalnızca biri çalışır. Paralellik en az iki çekirdek gerektirir. Paralellik eş zamanlılığı gerektirir; tersi doğru değildir, bu yüzden A olanaksızdır.</p></div>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 5: Hedef Hızlanma İçin Seri Kısım" data-section="Çok Çekirdekli Programlama">
+          <p class="ds-deck__kicker">Hesaplama · Çok Çekirdekli Programlama</p>
+          <h2>Soru 5: Hedef Hızlanma İçin Seri Kısım</h2>
+          <div class="ds-deck__two dsq-two">
+            <div>
+<p class="dsq-q">16 çekirdekli bir sunucuda bir hesaplamanın en az 8 kat hızlanması isteniyor. Amdahl yasasına göre seri (paralelleştirilemeyen) kısım en fazla yüzde kaç olabilir? Seri kısım %10 olsaydı 16 çekirdekte hızlanma ne olurdu?</p>
+            </div>
+            <details class="ds-deck__answers">
+              <summary>Cevabı göster</summary>
+<p>8 = 1 / (S + (1 − S) / 16) ⇒ S + (1 − S) / 16 = 1/8 ⇒ 16S + 1 − S = 2 ⇒ 15S = 1 ⇒ <b>S = 1/15 ≈ %6,7</b>.</p>
+<p>Yani kodun en az %93,3’ü paralel olmalıdır. Kontrol: 1 / (0,0667 + 0,9333 / 16) = 1 / 0,125 = 8.</p>
+<p>S = %10 iken: 1 / (0,1 + 0,9 / 16) = 1 / 0,15625 = <b>6,4×</b> (verim %40). Hedefin yarısı bile olmayan bir seri kısım ölçeklenmeyi belirgin biçimde düşürür; gerçekte senkronizasyon ve iletişim yükü hızlanmayı daha da azaltır.</p>
+            </details>
+          </div>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 6: Çoktan Bire Modelde read()" data-section="İş Parçacığı Modelleri">
+          <p class="ds-deck__kicker">Çoktan Seçmeli · İş Parçacığı Modelleri</p>
+          <h2>Soru 6: Çoktan Bire Modelde read()</h2>
+          <div class="dsq-mc"><p class="dsq-q">Çoktan bire (N:1) modelde bir sürecin 8 kullanıcı düzeyi iş parçacığından biri bloke eden <code>read()</code> sistem çağrısı yaptı. Ne olur?</p><div class="dsq-opts"><button type="button" class="dsq-opt" data-ok><b>A)</b><span>Sürecin bütün iş parçacıkları bekler</span></button><button type="button" class="dsq-opt"><b>B)</b><span>Yalnızca çağıran bekler, diğer yedisi sürer</span></button><button type="button" class="dsq-opt"><b>C)</b><span>Çekirdek diğerlerini başka çekirdeklere dağıtır</span></button><button type="button" class="dsq-opt"><b>D)</b><span>Süreç sonlanır ve zombi olur</span></button></div><p class="dsq-why">A: Çekirdek bu süreçte tek bir çizelgelenebilir varlık (çekirdek iş parçacığı) görür; o bloke olunca kütüphane başka iş parçacığına geçemez. Aynı nedenle N:1 modeli çok çekirdekten yararlanamaz. B, 1:1 modelinin davranışıdır.</p></div>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 7: Geçiş Maliyeti ve Bloke Olma" data-section="İş Parçacığı Modelleri">
+          <p class="ds-deck__kicker">Hesaplama · İş Parçacığı Modelleri</p>
+          <h2>Soru 7: Geçiş Maliyeti ve Bloke Olma</h2>
+          <p class="dsq-q">Bir programda 1 000 000 iş parçacığı geçişi yapılıyor. Kullanıcı düzeyinde (N:1) bir geçiş 40 ns, çekirdek düzeyinde (1:1) 1,6 µs sürüyor. Geçişlere toplam ne kadar zaman gider? İş parçacıklarından biri 8 ms süren bir disk okuması yaptığında iki modelde ne olur?</p>
+          <details class="ds-deck__answers">
+            <summary>Cevabı göster</summary>
+<ul>
+<li>N:1: 10⁶ × 40 ns = <b>0,04 s</b>; 1:1: 10⁶ × 1,6 µs = <b>1,6 s</b> → 40 kat. Kullanıcı düzeyi geçişte tuzak yok, çekirdeğe girilmez.</li>
+<li>Disk okumasında N:1 modelde <b>tüm süreç 8 ms bekler</b>: çekirdek tek bir çekirdek iş parçacığı görür ve onu bloke eder.</li>
+<li>1:1 modelde yalnızca okuyan iş parçacığı bekler; diğerleri o 8 ms içinde (başka çekirdeklerde paralel olarak bile) çalışır.</li>
+</ul>
+<p>M:N modeli (Go, Java sanal iş parçacıkları) ikisinin üstünlüklerini birleştirmeye çalışır: ucuz geçiş ve bloke olmayan çalışma zamanı.</p>
+          </details>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 8: Java Sanal İş Parçacıkları" data-section="İş Parçacığı Modelleri">
+          <p class="ds-deck__kicker">Çoktan Seçmeli · İş Parçacığı Modelleri</p>
+          <h2>Soru 8: Java Sanal İş Parçacıkları</h2>
+          <div class="dsq-mc"><p class="dsq-q">Java 21’in sanal iş parçacıkları (<code>Thread.ofVirtual()</code>) hakkında hangisi doğrudur?</p><div class="dsq-opts"><button type="button" class="dsq-opt"><b>A)</b><span>Her biri bir çekirdek iş parçacığına kalıcı bağlı 1:1 iş parçacığıdır</span></button><button type="button" class="dsq-opt"><b>B)</b><span>Bloke eden G/Ç’de taşıyıcı iş parçacığını da bloke ederler</span></button><button type="button" class="dsq-opt"><b>C)</b><span>Çekirdek her birini ayrı ayrı tanır ve çizelgeler</span></button><button type="button" class="dsq-opt" data-ok><b>D)</b><span>Az sayıda taşıyıcı üzerinde çoğullanır: M:N modeli</span></button></div><p class="dsq-why">D: JVM çok sayıda sanal iş parçacığını az sayıda platform (taşıyıcı) iş parçacığına çoğullar. Bloke eden G/Ç’de sanal iş parçacığı taşıyıcısından indirilir (unmount), taşıyıcı başka sanal iş parçacığını çalıştırır. Çekirdek yalnızca taşıyıcıları görür; bu yüzden milyonlarca sanal iş parçacığı mümkündür.</p></div>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 9: Üç İş Parçacığıyla Toplam" data-section="İş Parçacığı Kütüphaneleri">
+          <p class="ds-deck__kicker">Adım Adım Çalıştırma · İş Parçacığı Kütüphaneleri</p>
+          <h2>Soru 9: Üç İş Parçacığıyla Toplam</h2>
+          <p class="dsq-q">Program ne yazdırır? Sonuç iş parçacıklarının çalışma sırasına bağlı mıdır? İkinci döngü (join) silinseydi ne olurdu?</p>
+          <div class="ds-trace dsq-tr">
+            <div class="ds-deck__steps">
+              <div class="ds-deck__step" data-line="9" data-vars="kismi=[0, 0, 0]" data-out=""><svg class="ds-svg" viewBox="0 0 340 90" width="340" height="90" role="img" aria-label="İş parçacıkları ve kismi dizisi"><rect class="oq-hot" x="4" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="43" y="18" text-anchor="middle" dominant-baseline="central">main</text><text class="oq-s" x="43" y="32" text-anchor="middle" dominant-baseline="central">çalışıyor</text><rect class="oq-dim" x="88" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="127" y="18" text-anchor="middle" dominant-baseline="central">T0</text><text class="oq-s" x="127" y="32" text-anchor="middle" dominant-baseline="central">yok</text><rect class="oq-dim" x="172" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="211" y="18" text-anchor="middle" dominant-baseline="central">T1</text><text class="oq-s" x="211" y="32" text-anchor="middle" dominant-baseline="central">yok</text><rect class="oq-dim" x="256" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="295" y="18" text-anchor="middle" dominant-baseline="central">T2</text><text class="oq-s" x="295" y="32" text-anchor="middle" dominant-baseline="central">yok</text><text class="oq-s" x="4" y="62" text-anchor="start" dominant-baseline="central">kismi:</text><text class="oq-s" x="77" y="52" text-anchor="middle" dominant-baseline="central">[0]</text><rect class="oq-cell" x="52" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="77" y="70" text-anchor="middle" dominant-baseline="central">0</text><text class="oq-s" x="133" y="52" text-anchor="middle" dominant-baseline="central">[1]</text><rect class="oq-cell" x="108" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="133" y="70" text-anchor="middle" dominant-baseline="central">0</text><text class="oq-s" x="189" y="52" text-anchor="middle" dominant-baseline="central">[2]</text><rect class="oq-cell" x="164" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="189" y="70" text-anchor="middle" dominant-baseline="central">0</text></svg><p class="ds-deck__stepnote">Süreç tek iş parçacığıyla (main) başlar; global <code>kismi</code> sıfırdır.</p></div>
+              <div class="ds-deck__step" data-line="10,11" data-vars="k=2; kismi=[0, 0, 0]" data-out=""><svg class="ds-svg" viewBox="0 0 340 90" width="340" height="90" role="img" aria-label="İş parçacıkları ve kismi dizisi"><rect class="oq-hot" x="4" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="43" y="18" text-anchor="middle" dominant-baseline="central">main</text><text class="oq-s" x="43" y="32" text-anchor="middle" dominant-baseline="central">çalışıyor</text><rect class="oq-cell" x="88" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="127" y="18" text-anchor="middle" dominant-baseline="central">T0</text><text class="oq-s" x="127" y="32" text-anchor="middle" dominant-baseline="central">hazır</text><rect class="oq-cell" x="172" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="211" y="18" text-anchor="middle" dominant-baseline="central">T1</text><text class="oq-s" x="211" y="32" text-anchor="middle" dominant-baseline="central">hazır</text><rect class="oq-cell" x="256" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="295" y="18" text-anchor="middle" dominant-baseline="central">T2</text><text class="oq-s" x="295" y="32" text-anchor="middle" dominant-baseline="central">hazır</text><text class="oq-s" x="4" y="62" text-anchor="start" dominant-baseline="central">kismi:</text><text class="oq-s" x="77" y="52" text-anchor="middle" dominant-baseline="central">[0]</text><rect class="oq-cell" x="52" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="77" y="70" text-anchor="middle" dominant-baseline="central">0</text><text class="oq-s" x="133" y="52" text-anchor="middle" dominant-baseline="central">[1]</text><rect class="oq-cell" x="108" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="133" y="70" text-anchor="middle" dominant-baseline="central">0</text><text class="oq-s" x="189" y="52" text-anchor="middle" dominant-baseline="central">[2]</text><rect class="oq-cell" x="164" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="189" y="70" text-anchor="middle" dominant-baseline="central">0</text></svg><p class="ds-deck__stepnote">Üç iş parçacığı oluşturulur; her birine ayrı bir <code>no[k]</code> adresi verilir. Hangisinin önce çalışacağına çizelgeleyici karar verir.</p></div>
+              <div class="ds-deck__step" data-line="13,14" data-vars="kismi=[0, 0, 0]" data-out=""><svg class="ds-svg" viewBox="0 0 340 90" width="340" height="90" role="img" aria-label="İş parçacıkları ve kismi dizisi"><rect class="oq-dim" x="4" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="43" y="18" text-anchor="middle" dominant-baseline="central">main</text><text class="oq-s" x="43" y="32" text-anchor="middle" dominant-baseline="central">bekliyor</text><rect class="oq-cell" x="88" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="127" y="18" text-anchor="middle" dominant-baseline="central">T0</text><text class="oq-s" x="127" y="32" text-anchor="middle" dominant-baseline="central">hazır</text><rect class="oq-hot" x="172" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="211" y="18" text-anchor="middle" dominant-baseline="central">T1</text><text class="oq-s" x="211" y="32" text-anchor="middle" dominant-baseline="central">çalışıyor</text><rect class="oq-cell" x="256" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="295" y="18" text-anchor="middle" dominant-baseline="central">T2</text><text class="oq-s" x="295" y="32" text-anchor="middle" dominant-baseline="central">hazır</text><text class="oq-s" x="4" y="62" text-anchor="start" dominant-baseline="central">kismi:</text><text class="oq-s" x="77" y="52" text-anchor="middle" dominant-baseline="central">[0]</text><rect class="oq-cell" x="52" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="77" y="70" text-anchor="middle" dominant-baseline="central">0</text><text class="oq-s" x="133" y="52" text-anchor="middle" dominant-baseline="central">[1]</text><rect class="oq-cell" x="108" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="133" y="70" text-anchor="middle" dominant-baseline="central">0</text><text class="oq-s" x="189" y="52" text-anchor="middle" dominant-baseline="central">[2]</text><rect class="oq-cell" x="164" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="189" y="70" text-anchor="middle" dominant-baseline="central">0</text></svg><p class="ds-deck__stepnote">main <code>pthread_join(t[0])</code>’da bloke olur. Bu çalıştırmada önce T1 seçildi.</p></div>
+              <div class="ds-deck__step" data-line="3,4,5" data-vars="k=1; kismi=[0, 26, 0]" data-out=""><svg class="ds-svg" viewBox="0 0 340 90" width="340" height="90" role="img" aria-label="İş parçacıkları ve kismi dizisi"><rect class="oq-dim" x="4" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="43" y="18" text-anchor="middle" dominant-baseline="central">main</text><text class="oq-s" x="43" y="32" text-anchor="middle" dominant-baseline="central">bekliyor</text><rect class="oq-hot" x="88" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="127" y="18" text-anchor="middle" dominant-baseline="central">T0</text><text class="oq-s" x="127" y="32" text-anchor="middle" dominant-baseline="central">çalışıyor</text><rect class="oq-b" x="172" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="211" y="18" text-anchor="middle" dominant-baseline="central">T1</text><text class="oq-s" x="211" y="32" text-anchor="middle" dominant-baseline="central">bitti</text><rect class="oq-cell" x="256" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="295" y="18" text-anchor="middle" dominant-baseline="central">T2</text><text class="oq-s" x="295" y="32" text-anchor="middle" dominant-baseline="central">hazır</text><text class="oq-s" x="4" y="62" text-anchor="start" dominant-baseline="central">kismi:</text><text class="oq-s" x="77" y="52" text-anchor="middle" dominant-baseline="central">[0]</text><rect class="oq-cell" x="52" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="77" y="70" text-anchor="middle" dominant-baseline="central">0</text><text class="oq-s" x="133" y="52" text-anchor="middle" dominant-baseline="central">[1]</text><rect class="oq-a" x="108" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="133" y="70" text-anchor="middle" dominant-baseline="central">26</text><text class="oq-s" x="189" y="52" text-anchor="middle" dominant-baseline="central">[2]</text><rect class="oq-cell" x="164" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="189" y="70" text-anchor="middle" dominant-baseline="central">0</text></svg><p class="ds-deck__stepnote">T1: 5 + 6 + 7 + 8 = 26. Her iş parçacığı yalnız kendi hücresine yazar: yarış yok.</p></div>
+              <div class="ds-deck__step" data-line="3,4,5" data-vars="k=0; kismi=[10, 26, 0]" data-out=""><svg class="ds-svg" viewBox="0 0 340 90" width="340" height="90" role="img" aria-label="İş parçacıkları ve kismi dizisi"><rect class="oq-dim" x="4" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="43" y="18" text-anchor="middle" dominant-baseline="central">main</text><text class="oq-s" x="43" y="32" text-anchor="middle" dominant-baseline="central">bekliyor</text><rect class="oq-b" x="88" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="127" y="18" text-anchor="middle" dominant-baseline="central">T0</text><text class="oq-s" x="127" y="32" text-anchor="middle" dominant-baseline="central">bitti</text><rect class="oq-b" x="172" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="211" y="18" text-anchor="middle" dominant-baseline="central">T1</text><text class="oq-s" x="211" y="32" text-anchor="middle" dominant-baseline="central">bitti</text><rect class="oq-hot" x="256" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="295" y="18" text-anchor="middle" dominant-baseline="central">T2</text><text class="oq-s" x="295" y="32" text-anchor="middle" dominant-baseline="central">çalışıyor</text><text class="oq-s" x="4" y="62" text-anchor="start" dominant-baseline="central">kismi:</text><text class="oq-s" x="77" y="52" text-anchor="middle" dominant-baseline="central">[0]</text><rect class="oq-a" x="52" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="77" y="70" text-anchor="middle" dominant-baseline="central">10</text><text class="oq-s" x="133" y="52" text-anchor="middle" dominant-baseline="central">[1]</text><rect class="oq-a" x="108" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="133" y="70" text-anchor="middle" dominant-baseline="central">26</text><text class="oq-s" x="189" y="52" text-anchor="middle" dominant-baseline="central">[2]</text><rect class="oq-cell" x="164" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="189" y="70" text-anchor="middle" dominant-baseline="central">0</text></svg><p class="ds-deck__stepnote">T0: 1 + 2 + 3 + 4 = 10.</p></div>
+              <div class="ds-deck__step" data-line="3,4,5" data-vars="k=2; kismi=[10, 26, 42]" data-out=""><svg class="ds-svg" viewBox="0 0 340 90" width="340" height="90" role="img" aria-label="İş parçacıkları ve kismi dizisi"><rect class="oq-dim" x="4" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="43" y="18" text-anchor="middle" dominant-baseline="central">main</text><text class="oq-s" x="43" y="32" text-anchor="middle" dominant-baseline="central">bekliyor</text><rect class="oq-b" x="88" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="127" y="18" text-anchor="middle" dominant-baseline="central">T0</text><text class="oq-s" x="127" y="32" text-anchor="middle" dominant-baseline="central">bitti</text><rect class="oq-b" x="172" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="211" y="18" text-anchor="middle" dominant-baseline="central">T1</text><text class="oq-s" x="211" y="32" text-anchor="middle" dominant-baseline="central">bitti</text><rect class="oq-b" x="256" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="295" y="18" text-anchor="middle" dominant-baseline="central">T2</text><text class="oq-s" x="295" y="32" text-anchor="middle" dominant-baseline="central">bitti</text><text class="oq-s" x="4" y="62" text-anchor="start" dominant-baseline="central">kismi:</text><text class="oq-s" x="77" y="52" text-anchor="middle" dominant-baseline="central">[0]</text><rect class="oq-a" x="52" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="77" y="70" text-anchor="middle" dominant-baseline="central">10</text><text class="oq-s" x="133" y="52" text-anchor="middle" dominant-baseline="central">[1]</text><rect class="oq-a" x="108" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="133" y="70" text-anchor="middle" dominant-baseline="central">26</text><text class="oq-s" x="189" y="52" text-anchor="middle" dominant-baseline="central">[2]</text><rect class="oq-a" x="164" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="189" y="70" text-anchor="middle" dominant-baseline="central">42</text></svg><p class="ds-deck__stepnote">T2: 9 + 10 + 11 + 12 = 42.</p></div>
+              <div class="ds-deck__step" data-line="13,14,15" data-vars="top=78; kismi=[10, 26, 42]" data-out=""><svg class="ds-svg" viewBox="0 0 340 90" width="340" height="90" role="img" aria-label="İş parçacıkları ve kismi dizisi"><rect class="oq-hot" x="4" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="43" y="18" text-anchor="middle" dominant-baseline="central">main</text><text class="oq-s" x="43" y="32" text-anchor="middle" dominant-baseline="central">çalışıyor</text><rect class="oq-b" x="88" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="127" y="18" text-anchor="middle" dominant-baseline="central">T0</text><text class="oq-s" x="127" y="32" text-anchor="middle" dominant-baseline="central">bitti</text><rect class="oq-b" x="172" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="211" y="18" text-anchor="middle" dominant-baseline="central">T1</text><text class="oq-s" x="211" y="32" text-anchor="middle" dominant-baseline="central">bitti</text><rect class="oq-b" x="256" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="295" y="18" text-anchor="middle" dominant-baseline="central">T2</text><text class="oq-s" x="295" y="32" text-anchor="middle" dominant-baseline="central">bitti</text><text class="oq-s" x="4" y="62" text-anchor="start" dominant-baseline="central">kismi:</text><text class="oq-s" x="77" y="52" text-anchor="middle" dominant-baseline="central">[0]</text><rect class="oq-a" x="52" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="77" y="70" text-anchor="middle" dominant-baseline="central">10</text><text class="oq-s" x="133" y="52" text-anchor="middle" dominant-baseline="central">[1]</text><rect class="oq-a" x="108" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="133" y="70" text-anchor="middle" dominant-baseline="central">26</text><text class="oq-s" x="189" y="52" text-anchor="middle" dominant-baseline="central">[2]</text><rect class="oq-a" x="164" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="189" y="70" text-anchor="middle" dominant-baseline="central">42</text><text class="oq-k" x="232" y="70" text-anchor="start" dominant-baseline="central">top = 78</text></svg><p class="ds-deck__stepnote">Üç join de döner; top = 10 + 26 + 42 = 78. Çalışma sırası ne olursa olsun join’ler hepsinin bittiğini garanti eder.</p></div>
+              <div class="ds-deck__step" data-line="17,18" data-vars="top=78" data-out="10 26 42 -&gt; 78"><svg class="ds-svg" viewBox="0 0 340 90" width="340" height="90" role="img" aria-label="İş parçacıkları ve kismi dizisi"><rect class="oq-hot" x="4" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="43" y="18" text-anchor="middle" dominant-baseline="central">main</text><text class="oq-s" x="43" y="32" text-anchor="middle" dominant-baseline="central">çalışıyor</text><rect class="oq-b" x="88" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="127" y="18" text-anchor="middle" dominant-baseline="central">T0</text><text class="oq-s" x="127" y="32" text-anchor="middle" dominant-baseline="central">bitti</text><rect class="oq-b" x="172" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="211" y="18" text-anchor="middle" dominant-baseline="central">T1</text><text class="oq-s" x="211" y="32" text-anchor="middle" dominant-baseline="central">bitti</text><rect class="oq-b" x="256" y="6" width="78" height="36" rx="6"/><text class="oq-t" x="295" y="18" text-anchor="middle" dominant-baseline="central">T2</text><text class="oq-s" x="295" y="32" text-anchor="middle" dominant-baseline="central">bitti</text><text class="oq-s" x="4" y="62" text-anchor="start" dominant-baseline="central">kismi:</text><text class="oq-s" x="77" y="52" text-anchor="middle" dominant-baseline="central">[0]</text><rect class="oq-a" x="52" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="77" y="70" text-anchor="middle" dominant-baseline="central">10</text><text class="oq-s" x="133" y="52" text-anchor="middle" dominant-baseline="central">[1]</text><rect class="oq-a" x="108" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="133" y="70" text-anchor="middle" dominant-baseline="central">26</text><text class="oq-s" x="189" y="52" text-anchor="middle" dominant-baseline="central">[2]</text><rect class="oq-a" x="164" y="58" width="50" height="24" rx="3"/><text class="oq-mono" x="189" y="70" text-anchor="middle" dominant-baseline="central">42</text><text class="oq-k" x="232" y="70" text-anchor="start" dominant-baseline="central">top = 78</text></svg><p class="ds-deck__stepnote">Çıktı her çalıştırmada aynıdır. join silinseydi main yarım toplamları okuyabilir, <code>main</code>’den dönüş ise tüm süreci iş parçacıklarıyla birlikte sonlandırırdı.</p></div>
+            </div>
+<pre class="ds-trace__code"><span class="kw">int</span> kismi[3];
+<span class="kw">void</span> *topla(<span class="kw">void</span> *arg) {
+  <span class="kw">int</span> k = *(<span class="kw">int</span> *)arg;
+  <span class="kw">for</span> (<span class="kw">int</span> i = 4*k + 1; i &lt;= 4*k + 4; i++)
+    kismi[k] += i;
+  <span class="kw">return</span> <span class="kw">NULL</span>;
+}
+<span class="kw">int</span> main(<span class="kw">void</span>) {
+  pthread_t t[3]; <span class="kw">int</span> no[3] = &#123;0, 1, 2};
+  <span class="kw">for</span> (<span class="kw">int</span> k = 0; k &lt; 3; k++)
+    pthread_create(&amp;t[k], <span class="kw">NULL</span>, topla, &amp;no[k]);
+  <span class="kw">int</span> top = 0;
+  <span class="kw">for</span> (<span class="kw">int</span> k = 0; k &lt; 3; k++) {
+    pthread_join(t[k], <span class="kw">NULL</span>);
+    top += kismi[k];
+  }
+  printf("%d %d %d -&gt; %d\n",
+         kismi[0], kismi[1], kismi[2], top);
+}</pre>
+            <div class="ds-trace__col"><div class="ds-trace__vars"></div><div class="ds-trace__out"></div></div>
+          </div>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 10: Döngü Değişkeninin Adresi" data-section="İş Parçacığı Kütüphaneleri">
+          <p class="ds-deck__kicker">Çoktan Seçmeli · İş Parçacığı Kütüphaneleri</p>
+          <h2>Soru 10: Döngü Değişkeninin Adresi</h2>
+          <div class="dsq-mc dsq-mc--one">
+            <div><p class="dsq-q">Programcı ekranda <code>0 1 2</code> görmeyi bekliyor. Hangisi doğrudur?</p><pre><span class="kw">void</span> *yaz(<span class="kw">void</span> *arg) {
+  printf("%d ", *(<span class="kw">int</span> *)arg);
+  <span class="kw">return</span> <span class="kw">NULL</span>;
+}
+<span class="kw">int</span> main(<span class="kw">void</span>) {
+  pthread_t t[3];
+  <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; 3; i++)
+    pthread_create(&amp;t[i], <span class="kw">NULL</span>, yaz, &amp;i);
+  <span class="kw">for</span> (<span class="kw">int</span> j = 0; j &lt; 3; j++)
+    pthread_join(t[j], <span class="kw">NULL</span>);
+  <span class="kw">return</span> 0;
+}</pre></div>
+            <div><div class="dsq-opts"><button type="button" class="dsq-opt"><b>A)</b><span>Her zaman 0 1 2 yazar; i değer olarak kopyalanır</span></button><button type="button" class="dsq-opt"><b>B)</b><span>Her zaman 3 3 3 yazar; döngü önce biter</span></button><button type="button" class="dsq-opt" data-ok><b>C)</b><span>Belirsizdir; üçü de aynı i adresini okur</span></button><button type="button" class="dsq-opt"><b>D)</b><span>Derlenmez; &amp;i türü void * değildir</span></button></div><p class="dsq-why">C: Üç iş parçacığı da aynı <code>i</code> değişkeninin adresini alır; okudukları anda i değişmiş olabilir: 1 1 3, 2 3 3 gibi çıktılar görülebilir. Döngüden sonra i’nin ömrü de bittiği için okuma tanımsız davranıştır. Çözüm: her iş parçacığına ayrı bellek (<code>int no[3]</code>, <code>&amp;no[i]</code>).</p></div>
+          </div>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 11: run() mı, start() mı?" data-section="İş Parçacığı Kütüphaneleri">
+          <p class="ds-deck__kicker">Kod Çıktısı · İş Parçacığı Kütüphaneleri</p>
+          <h2>Soru 11: run() mı, start() mı?</h2>
+          <div class="ds-deck__two dsq-two dsq-two--code">
+            <div>
+<p class="dsq-q">İş parçacığının adı <code>"isci"</code>. Program ne yazdırır? <code>t.run()</code> neden yeni bir iş parçacığı başlatmaz?</p><pre><span class="kw">public</span> <span class="kw">class</span> Ad {
+  <span class="kw">public</span> <span class="kw">static</span> <span class="kw">void</span> main(String[] a)
+      <span class="kw">throws</span> Exception {
+    Thread t = <span class="kw">new</span> Thread(() -&gt;
+      System.out.println("1: " +
+        Thread.currentThread().getName()),
+      "isci");
+    t.run();
+    t.start();
+    t.join();
+    System.out.println("2: " +
+      Thread.currentThread().getName());
+  }
+}</pre>
+            </div>
+            <details class="ds-deck__answers">
+              <summary>Cevabı göster</summary>
+<pre>1: main
+1: isci
+2: main</pre>
+<ul>
+<li><code>t.run()</code> sıradan bir metot çağrısıdır: lambda çağıranın, yani main iş parçacığının içinde çalışır → “1: main”.</li>
+<li><code>t.start()</code> yeni bir işletim sistemi iş parçacığı başlatır; lambda orada çalışır → “1: isci”.</li>
+<li><code>join</code> onun bitmesini beklediği için sıra kesindir; son satırı main yazar.</li>
+</ul>
+<p>Bir <code>Thread</code> nesnesi yalnızca bir kez <code>start</code> edilebilir; ikinci <code>start</code> <code>IllegalThreadStateException</code> fırlatır.</p>
+            </details>
+          </div>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 12: Fork-Join ile Toplam" data-section="Örtük İş Parçacığı">
+          <p class="ds-deck__kicker">Adım Adım Çalıştırma · Örtük İş Parçacığı</p>
+          <h2>Soru 12: Fork-Join ile Toplam</h2>
+          <p class="dsq-q">ESIK = 2 iken <code>invoke</code> hangi değeri döndürür? Görev ağacını çizin; her düğümün sonucunu yazın.</p>
+          <div class="ds-trace dsq-tr">
+            <div class="ds-deck__steps">
+              <div class="ds-deck__step" data-line="18,19" data-vars="görev=[0,8)"><svg class="ds-svg" viewBox="0 0 340 108" width="340" height="108" role="img" aria-label="Fork-join görev ağacı"><line class="oq-ln" x1="170" y1="26" x2="88" y2="40"/><line class="oq-ln" x1="170" y1="26" x2="252" y2="40"/><rect class="oq-hot" x="132" y="2" width="76" height="24" rx="5"/><text class="oq-mono" x="170" y="14" text-anchor="middle" dominant-baseline="central">[0,8) ?</text></svg><p class="ds-deck__stepnote">Kök görev 8 öğe: 8 − 0 &gt; ESIK → bölünür.</p></div>
+              <div class="ds-deck__step" data-line="9,10,11,12,13" data-vars="görev=[0,8); orta=4"><svg class="ds-svg" viewBox="0 0 340 108" width="340" height="108" role="img" aria-label="Fork-join görev ağacı"><line class="oq-ln" x1="170" y1="26" x2="88" y2="40"/><line class="oq-ln" x1="170" y1="26" x2="252" y2="40"/><line class="oq-ln" x1="88" y1="64" x2="44" y2="80"/><line class="oq-ln" x1="88" y1="64" x2="130" y2="80"/><line class="oq-ln" x1="252" y1="64" x2="210" y2="80"/><line class="oq-ln" x1="252" y1="64" x2="296" y2="80"/><rect class="oq-cell" x="132" y="2" width="76" height="24" rx="5"/><text class="oq-mono" x="170" y="14" text-anchor="middle" dominant-baseline="central">[0,8) ?</text><rect class="oq-hot" x="50" y="40" width="76" height="24" rx="5"/><text class="oq-mono" x="88" y="52" text-anchor="middle" dominant-baseline="central">[0,4) ?</text><rect class="oq-hot" x="214" y="40" width="76" height="24" rx="5"/><text class="oq-mono" x="252" y="52" text-anchor="middle" dominant-baseline="central">[4,8) ?</text></svg><p class="ds-deck__stepnote"><code>sol.fork()</code>: [0,4) havuzun kuyruğuna girer; boştaki bir işçi onu çalabilir. Aynı iş parçacığı [4,8)’i kendisi hesaplar.</p></div>
+              <div class="ds-deck__step" data-line="4,5,6,7" data-vars="görev=[6,8); s=9"><svg class="ds-svg" viewBox="0 0 340 108" width="340" height="108" role="img" aria-label="Fork-join görev ağacı"><line class="oq-ln" x1="170" y1="26" x2="88" y2="40"/><line class="oq-ln" x1="170" y1="26" x2="252" y2="40"/><line class="oq-ln" x1="88" y1="64" x2="44" y2="80"/><line class="oq-ln" x1="88" y1="64" x2="130" y2="80"/><line class="oq-ln" x1="252" y1="64" x2="210" y2="80"/><line class="oq-ln" x1="252" y1="64" x2="296" y2="80"/><rect class="oq-cell" x="132" y="2" width="76" height="24" rx="5"/><text class="oq-mono" x="170" y="14" text-anchor="middle" dominant-baseline="central">[0,8) ?</text><rect class="oq-cell" x="50" y="40" width="76" height="24" rx="5"/><text class="oq-mono" x="88" y="52" text-anchor="middle" dominant-baseline="central">[0,4) ?</text><rect class="oq-cell" x="214" y="40" width="76" height="24" rx="5"/><text class="oq-mono" x="252" y="52" text-anchor="middle" dominant-baseline="central">[4,8) ?</text><rect class="oq-cell" x="172" y="80" width="76" height="24" rx="5"/><text class="oq-mono" x="210" y="92" text-anchor="middle" dominant-baseline="central">[4,6) ?</text><rect class="oq-hot" x="258" y="80" width="76" height="24" rx="5"/><text class="oq-mono" x="296" y="92" text-anchor="middle" dominant-baseline="central">[6,8) = 9</text></svg><p class="ds-deck__stepnote">[4,8) de bölünür: [4,6) fork edilir, [6,8) doğrudan hesaplanır: 1 + 8 = 9.</p></div>
+              <div class="ds-deck__step" data-line="14" data-vars="görev=[4,8); sonuç=19"><svg class="ds-svg" viewBox="0 0 340 108" width="340" height="108" role="img" aria-label="Fork-join görev ağacı"><line class="oq-ln" x1="170" y1="26" x2="88" y2="40"/><line class="oq-ln" x1="170" y1="26" x2="252" y2="40"/><line class="oq-ln" x1="88" y1="64" x2="44" y2="80"/><line class="oq-ln" x1="88" y1="64" x2="130" y2="80"/><line class="oq-ln" x1="252" y1="64" x2="210" y2="80"/><line class="oq-ln" x1="252" y1="64" x2="296" y2="80"/><rect class="oq-cell" x="132" y="2" width="76" height="24" rx="5"/><text class="oq-mono" x="170" y="14" text-anchor="middle" dominant-baseline="central">[0,8) ?</text><rect class="oq-cell" x="50" y="40" width="76" height="24" rx="5"/><text class="oq-mono" x="88" y="52" text-anchor="middle" dominant-baseline="central">[0,4) ?</text><rect class="oq-hot" x="214" y="40" width="76" height="24" rx="5"/><text class="oq-mono" x="252" y="52" text-anchor="middle" dominant-baseline="central">[4,8) = 19</text><rect class="oq-b" x="172" y="80" width="76" height="24" rx="5"/><text class="oq-mono" x="210" y="92" text-anchor="middle" dominant-baseline="central">[4,6) = 10</text><rect class="oq-b" x="258" y="80" width="76" height="24" rx="5"/><text class="oq-mono" x="296" y="92" text-anchor="middle" dominant-baseline="central">[6,8) = 9</text></svg><p class="ds-deck__stepnote"><code>sol.join()</code>: [4,6) = 2 + 8 = 10 → [4,8) = 10 + 9 = 19.</p></div>
+              <div class="ds-deck__step" data-line="4,5,6,7,14" data-vars="görev=[0,4); sonuç=18"><svg class="ds-svg" viewBox="0 0 340 108" width="340" height="108" role="img" aria-label="Fork-join görev ağacı"><line class="oq-ln" x1="170" y1="26" x2="88" y2="40"/><line class="oq-ln" x1="170" y1="26" x2="252" y2="40"/><line class="oq-ln" x1="88" y1="64" x2="44" y2="80"/><line class="oq-ln" x1="88" y1="64" x2="130" y2="80"/><line class="oq-ln" x1="252" y1="64" x2="210" y2="80"/><line class="oq-ln" x1="252" y1="64" x2="296" y2="80"/><rect class="oq-cell" x="132" y="2" width="76" height="24" rx="5"/><text class="oq-mono" x="170" y="14" text-anchor="middle" dominant-baseline="central">[0,8) ?</text><rect class="oq-hot" x="50" y="40" width="76" height="24" rx="5"/><text class="oq-mono" x="88" y="52" text-anchor="middle" dominant-baseline="central">[0,4) = 18</text><rect class="oq-b" x="214" y="40" width="76" height="24" rx="5"/><text class="oq-mono" x="252" y="52" text-anchor="middle" dominant-baseline="central">[4,8) = 19</text><rect class="oq-b" x="6" y="80" width="76" height="24" rx="5"/><text class="oq-mono" x="44" y="92" text-anchor="middle" dominant-baseline="central">[0,2) = 9</text><rect class="oq-b" x="92" y="80" width="76" height="24" rx="5"/><text class="oq-mono" x="130" y="92" text-anchor="middle" dominant-baseline="central">[2,4) = 9</text><rect class="oq-b" x="172" y="80" width="76" height="24" rx="5"/><text class="oq-mono" x="210" y="92" text-anchor="middle" dominant-baseline="central">[4,6) = 10</text><rect class="oq-b" x="258" y="80" width="76" height="24" rx="5"/><text class="oq-mono" x="296" y="92" text-anchor="middle" dominant-baseline="central">[6,8) = 9</text></svg><p class="ds-deck__stepnote">[0,4) aynı yolla: [0,2) = 2 + 7 = 9, [2,4) = 1 + 8 = 9 → 18. Bu dal büyük olasılıkla başka bir işçide (iş çalma) çalıştı.</p></div>
+              <div class="ds-deck__step" data-line="14" data-vars="görev=[0,8); sonuç=37"><svg class="ds-svg" viewBox="0 0 340 108" width="340" height="108" role="img" aria-label="Fork-join görev ağacı"><line class="oq-ln" x1="170" y1="26" x2="88" y2="40"/><line class="oq-ln" x1="170" y1="26" x2="252" y2="40"/><line class="oq-ln" x1="88" y1="64" x2="44" y2="80"/><line class="oq-ln" x1="88" y1="64" x2="130" y2="80"/><line class="oq-ln" x1="252" y1="64" x2="210" y2="80"/><line class="oq-ln" x1="252" y1="64" x2="296" y2="80"/><rect class="oq-hot" x="132" y="2" width="76" height="24" rx="5"/><text class="oq-mono" x="170" y="14" text-anchor="middle" dominant-baseline="central">[0,8) = 37</text><rect class="oq-b" x="50" y="40" width="76" height="24" rx="5"/><text class="oq-mono" x="88" y="52" text-anchor="middle" dominant-baseline="central">[0,4) = 18</text><rect class="oq-b" x="214" y="40" width="76" height="24" rx="5"/><text class="oq-mono" x="252" y="52" text-anchor="middle" dominant-baseline="central">[4,8) = 19</text><rect class="oq-b" x="6" y="80" width="76" height="24" rx="5"/><text class="oq-mono" x="44" y="92" text-anchor="middle" dominant-baseline="central">[0,2) = 9</text><rect class="oq-b" x="92" y="80" width="76" height="24" rx="5"/><text class="oq-mono" x="130" y="92" text-anchor="middle" dominant-baseline="central">[2,4) = 9</text><rect class="oq-b" x="172" y="80" width="76" height="24" rx="5"/><text class="oq-mono" x="210" y="92" text-anchor="middle" dominant-baseline="central">[4,6) = 10</text><rect class="oq-b" x="258" y="80" width="76" height="24" rx="5"/><text class="oq-mono" x="296" y="92" text-anchor="middle" dominant-baseline="central">[6,8) = 9</text></svg><p class="ds-deck__stepnote">Kök: 18 + 19 = <b>37</b>. 7 görev, 4 yaprak. Hangi işçinin hangi görevi çalıştırdığı değişebilir; sonuç değişmez.</p></div>
+            </div>
+<pre class="ds-trace__code"><span class="kw">class</span> Toplam <span class="kw">extends</span> RecursiveTask&lt;Integer&gt; {
+  <span class="kw">static</span> <span class="kw">final</span> <span class="kw">int</span> ESIK = 2; <span class="cm">// + a, bas, son, kurucu</span>
+  <span class="kw">protected</span> Integer compute() {
+    <span class="kw">if</span> (son - bas &lt;= ESIK) {
+      <span class="kw">int</span> s = 0;
+      <span class="kw">for</span> (<span class="kw">int</span> i = bas; i &lt; son; i++) s += a[i];
+      <span class="kw">return</span> s;
+    }
+    <span class="kw">int</span> orta = (bas + son) / 2;
+    Toplam sol = <span class="kw">new</span> Toplam(a, bas, orta);
+    Toplam sag = <span class="kw">new</span> Toplam(a, orta, son);
+    sol.fork();
+    <span class="kw">int</span> sagSonuc = sag.compute();
+    <span class="kw">return</span> sol.join() + sagSonuc;
+  }
+}
+<span class="cm">// a = &#123;2, 7, 1, 8, 2, 8, 1, 8}</span>
+Toplam t = <span class="kw">new</span> Toplam(a, 0, 8);
+ForkJoinPool.commonPool().invoke(t);</pre>
+            <div class="ds-trace__col"><div class="ds-trace__vars"></div></div>
+          </div>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 13: OpenMP Paralel Bölge" data-section="Örtük İş Parçacığı">
+          <p class="ds-deck__kicker">Çoktan Seçmeli · Örtük İş Parçacığı</p>
+          <h2>Soru 13: OpenMP Paralel Bölge</h2>
+          <div class="dsq-mc dsq-mc--one">
+            <div><p class="dsq-q">Program <code>-fopenmp</code> ile derlenip çalıştırılıyor. Çıktı hakkında hangisi doğrudur?</p><pre>#include &lt;omp.h&gt;
+#include &lt;stdio.h&gt;
+<span class="kw">int</span> main(<span class="kw">void</span>) {
+  #pragma omp parallel num_threads(3)
+  printf("merhaba\n");
+  printf("bitti\n");
+  <span class="kw">return</span> 0;
+}</pre></div>
+            <div><div class="dsq-opts"><button type="button" class="dsq-opt"><b>A)</b><span>merhaba 1 kez, ardından bitti 1 kez</span></button><button type="button" class="dsq-opt" data-ok><b>B)</b><span>merhaba 3 kez, ardından bitti 1 kez</span></button><button type="button" class="dsq-opt"><b>C)</b><span>merhaba ve bitti 3’er kez, karışık sırada</span></button><button type="button" class="dsq-opt"><b>D)</b><span>merhaba çekirdek sayısı kadar, bitti 1 kez</span></button></div><p class="dsq-why">B: <code>#pragma omp parallel</code> yalnızca izleyen tek deyime uygulanır: 3 iş parçacıklı bir ekip oluşur, her biri “merhaba” yazar (sıra belirsiz). Bölgenin sonunda örtük bir bariyer vardır; ardından yalnızca ana iş parçacığı “bitti” yazar. <code>num_threads(3)</code> çekirdek sayısını geçersiz kılar.</p></div>
+          </div>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 14: Havuz Ne Kadar Büyük Olmalı?" data-section="Örtük İş Parçacığı">
+          <p class="ds-deck__kicker">Hesaplama · Örtük İş Parçacığı</p>
+          <h2>Soru 14: Havuz Ne Kadar Büyük Olmalı?</h2>
+          <div class="ds-deck__two dsq-two">
+            <div>
+<p class="dsq-q">8 çekirdekli bir makinede iki havuz kuruluyor: biri yalnızca hesap yapan görüntü sıkıştırma görevleri için, diğeri her isteğinde 5 ms hesap yapıp 45 ms veritabanı yanıtı bekleyen görevler için. Havuz boyutlarını nasıl seçersiniz?</p>
+            </div>
+            <details class="ds-deck__answers">
+              <summary>Cevabı göster</summary>
+<ul>
+<li><b>CPU’ya bağlı:</b> yaklaşık çekirdek sayısı kadar, <b>8</b> (ya da 9). Fazlası paralellik kazandırmaz; yalnızca bağlam değiştirme ve önbellek çekişmesi ekler.</li>
+<li><b>G/Ç’ye bağlı:</b> kaba kural N<sub>iş</sub> ≈ N<sub>çekirdek</sub> × (1 + bekleme / hesap) = 8 × (1 + 45 / 5) = <b>80</b>. Bir iş parçacığı beklerken diğer 9’u o çekirdeği kullanabilir.</li>
+</ul>
+<p>Havuz eş zamanlı iş parçacığı sayısını sınırlar ve oluşturma maliyetini bir kez öder; boyut ölçümle ayarlanmalıdır: çok büyük havuz bellek tüketir, çok küçük havuz CPU’yu boş bırakır.</p>
+            </details>
+          </div>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 15: İş Parçacıklı Süreçte fork()" data-section="İş Parçacığı Sorunları">
+          <p class="ds-deck__kicker">Çoktan Seçmeli · İş Parçacığı Sorunları</p>
+          <h2>Soru 15: İş Parçacıklı Süreçte fork()</h2>
+          <div class="dsq-mc"><p class="dsq-q">8 iş parçacıklı bir süreçteki bir iş parçacığı <code>fork()</code> çağırıyor (POSIX/Linux). Çocuk süreçle ilgili hangisi doğrudur?</p><div class="dsq-opts"><button type="button" class="dsq-opt"><b>A)</b><span>Çocukta 8 iş parçacığının hepsi kopyalanmış olarak çalışır</span></button><button type="button" class="dsq-opt"><b>B)</b><span>Çocukta hiç iş parçacığı yoktur, süreç hemen sonlanır</span></button><button type="button" class="dsq-opt"><b>C)</b><span>fork çok iş parçacıklı süreçlerde her zaman hata döndürür</span></button><button type="button" class="dsq-opt" data-ok><b>D)</b><span>Çocukta yalnızca çağıran iş parçacığı vardır</span></button></div><p class="dsq-why">D: Adres alanının tamamı kopyalanır, iş parçacıklarından yalnızca biri. Başka bir iş parçacığının tuttuğu bir mutex (ör. malloc içindeki) çocukta sonsuza dek kilitli kalabilir. Bu yüzden fork’tan hemen sonra exec önerilir; çoğu zaman <code>posix_spawn</code> daha iyi bir seçimdir.</p></div>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 16: Kaybolan Artırmalar" data-section="İş Parçacığı Sorunları">
+          <p class="ds-deck__kicker">Klasik Soru · İş Parçacığı Sorunları</p>
+          <h2>Soru 16: Kaybolan Artırmalar</h2>
+          <p class="dsq-q">Paylaşılan <code>sayac</code> 0’dır. T1 ve T2 <code>sayac++</code>’ı ikişer kez çalıştırıyor; her artırma iki adımdır: oku (r = sayac) ve yaz (sayac = r + 1). Adımlar şu sırayla işlerse son değer nedir: T1.oku, T1.yaz, T2.oku, T1.oku, T2.yaz, T1.yaz, T2.oku, T2.yaz? Bütün sıralamalarda olası son değerler nelerdir?</p>
+          <details class="ds-deck__answers">
+            <summary>Cevabı göster</summary>
+<table class="ds-deck__table dsq-tbl"><thead><tr><th>adım</th><th>T1.oku</th><th>T1.yaz</th><th>T2.oku</th><th>T1.oku</th><th>T2.yaz</th><th>T1.yaz</th><th>T2.oku</th><th>T2.yaz</th></tr></thead><tbody><tr><td>r</td><td>r1 = 0</td><td></td><td>r2 = 1</td><td>r1 = 1</td><td></td><td></td><td>r2 = 2</td><td></td></tr><tr><td>sayac</td><td>0</td><td>1</td><td>1</td><td>1</td><td>2</td><td>2</td><td>2</td><td class="oq-on">3</td></tr></tbody></table>
+<p>Son değer <b>3</b>: T1 ve T2 aynı 1 değerini okuyup ikisi de 2 yazdığı için bir artırma kayboldu. 70 olası sıralamanın tamamında sonuç <b>2, 3 ya da 4</b>’tür; en az 2’dir, çünkü her iş parçacığının son yazması kendi ilk yazmasından sonraki bir okumaya dayanır. 4 ancak artırma atomik yapılırsa (mutex, <code>atomic_fetch_add</code>) garanti edilir.</p>
+          </details>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 17: Her İş Parçacığına Ayrı Kopya" data-section="İş Parçacığı Sorunları">
+          <p class="ds-deck__kicker">Çoktan Seçmeli · İş Parçacığı Sorunları</p>
+          <h2>Soru 17: Her İş Parçacığına Ayrı Kopya</h2>
+          <div class="dsq-mc"><p class="dsq-q">Her iş parçacığının kendi hata kodunu tutacağı ama tüm fonksiyonlardan global gibi erişilebilen bir değişken gerekiyor (C’deki <code>errno</code> gibi). Hangisi kullanılır?</p><div class="dsq-opts"><button type="button" class="dsq-opt" data-ok><b>A)</b><span>İş parçacığına yerel depolama (_Thread_local)</span></button><button type="button" class="dsq-opt"><b>B)</b><span>static global değişken</span></button><button type="button" class="dsq-opt"><b>C)</b><span>Öbekte tek bir malloc ile ayrılan ortak değişken</span></button><button type="button" class="dsq-opt"><b>D)</b><span>Fonksiyonun yerel (yığın) değişkeni</span></button></div><p class="dsq-why">A: TLS değişkeni her iş parçacığında ayrı bir kopya olarak bulunur ve iş parçacığının ömrü boyunca yaşar. Global ve öbek değişkeni paylaşılır; yerel değişken fonksiyon dönünce kaybolur ve diğer fonksiyonlar ona erişemez. Bugünkü C kütüphanelerinde <code>errno</code> zaten iş parçacığına yereldir.</p></div>
+        </section>
+
+        <section class="ds-deck__slide" data-title="Soru 18: Neden while, Neden if Değil?" data-section="Senkronizasyona Giriş">
+          <p class="ds-deck__kicker">Çoktan Seçmeli · Senkronizasyona Giriş</p>
+          <h2>Soru 18: Neden while, Neden if Değil?</h2>
+          <div class="dsq-mc"><p class="dsq-q">Birden çok tüketicinin olduğu tek hücreli tamponda tüketici <code>while (buffer == 0) pthread_cond_wait(&amp;condc, &amp;m);</code> yerine <code>if</code> ile bekleseydi ne olabilirdi?</p><div class="dsq-opts"><button type="button" class="dsq-opt"><b>A)</b><span>pthread_cond_wait kilidi bırakmadığı için iki iş parçacığı da kilitlenir</span></button><button type="button" class="dsq-opt"><b>B)</b><span>Üretici hiçbir zaman uyandırılamaz</span></button><button type="button" class="dsq-opt" data-ok><b>C)</b><span>Uyanınca koşul yeniden sınanmaz; boş tampondan okunabilir</span></button><button type="button" class="dsq-opt"><b>D)</b><span>Mutex gereksiz hâle gelir ve kaldırılabilir</span></button></div><p class="dsq-why">C: Sinyalle uyanan tüketici kilidi yeniden alana kadar başka bir tüketici ürünü almış olabilir; ayrıca sahte (spurious) uyanmalar mümkündür. <code>while</code> koşulu yeniden sınar. A yanlıştır: <code>pthread_cond_wait</code> beklerken kilidi atomik olarak bırakır, uyanınca yeniden alır.</p></div>
+        </section>
+
+        <section class="ds-deck__slide ds-deck__slide--title" data-title="Son" data-section="">
+          <h1>Son</h1>
+          <div class="ds-deck__subtitle">Bölüm 4: İş Parçacıkları: Çalışma Soruları</div>
+          <small>Konu anlatımı: <a href="Bolum_04_Is_Parcaciklari.html">İş parçacıkları sunumu</a> · <a href="../sozluk.html">Terim sözlüğü</a></small>
+        </section>
+
+      </div>
+
+      <div class="ds-deck__bar">
+        <button class="ds-deck__button" type="button" id="ds-deck-prev" aria-label="Önceki slayt">←</button>
+        <span class="ds-deck__counter" id="ds-deck-counter">1 / 1</span>
+        <button class="ds-deck__button" type="button" id="ds-deck-next" aria-label="Sonraki slayt">→</button>
+        <span class="ds-deck__section" id="ds-deck-section">Sercan KÜLCÜ, Tüm hakları saklıdır.</span>
+        <select class="ds-deck__select" id="ds-deck-jump" aria-label="Slayta git"></select>
+        <button class="ds-deck__button" type="button" id="ds-deck-full" aria-label="Tam ekran">⛶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="deck/deck.js"></script>
+<script src="deck/calisma.js"></script>
