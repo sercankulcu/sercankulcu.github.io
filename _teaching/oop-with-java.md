@@ -11,71 +11,13 @@ location: "Giresun, Turkey"
 ![object oriented programming](/images/teaching/teaching-object-oriented-programming.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
 Java is one of the most popular programming languages, extensively used in various fields such as web development, mobile app development, and game development. It encompasses key concepts like classes, objects, inheritance, polymorphism, encapsulation, and abstraction, which form the foundation of its Object-Oriented Programming (OOP) paradigm. These principles enable developers to create modular, reusable, and efficient code, fostering better software design and maintainability. Java's platform independence, achieved through the Java Virtual Machine (JVM), allows applications to run on any device equipped with a JVM, making it a versatile choice for cross-platform development. Additionally, Java's extensive standard library provides a wide range of tools and functionalities, simplifying many common programming tasks and enhancing productivity.
 
+---
+
 ## Preliminary Materials
 
 * [Important People in Java and OOP (HTML)](../files/java/Java_Important_People.html)
 * [Prerequisites for Java (HTML)](../files/java/Java_Prerequisites.html)
 * [Terim Sözlüğü / Glossary (HTML)](../files/java/sozluk.html)
-
----
-
-## Ders Öğretim Planı
-[Ders Öğretim Planı (PDF)](../files/java/slides/Bolum_00_Ders_Ogretim_Planı.pdf)
-
----
-
-## Announcements
-
----
-
-## The resources:
-
-- **website**  
-  [Dev Java](https://dev.java/learn/) | 
-  [Oracle Java Tutorials](https://docs.oracle.com/javase/tutorial/) | 
-  [Reddit – r/learnjava](https://www.reddit.com/r/learnjava/)
-
-- **tools**  
-  [Eclipse IDE](https://www.eclipse.org/downloads/packages/) | 
-  [IntelliJ IDEA](https://www.jetbrains.com/idea/) | 
-  [Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack)
-
-- **youtube**  
-  [Java Youtube](https://www.youtube.com/java) | 
-  [Kodlama Vakti](https://www.youtube.com/watch?v=zERL__bD4NI&list=PLEcJSEQK_cD5KHgg9sXumeg659hAr2j4W) | 
-  [Turkcell Geleceği Yazanlar](https://gelecegiyazanlar.turkcell.com.tr/konu/java) | 
-  [Patika.dev](https://app.patika.dev/)
-
-- **pdf**  
-  [Think Java (PDF)](https://greenteapress.com/wp/think-java-2e/) | 
-  [Java Notlar, Oğuz Aslantürk (pdf)](../files/java/java_notes_by_oa.pdf)
-
----
-
-## Past Exams:
-
-- **2025-2026**  
-  [vize](../files/java/slides/2025-2026-java-vize-cevaplar.pdf) | 
-  [final](../files/java/slides/2025-2026-java-final-cevaplar.pdf) | 
-
-- **2024-2025**  
-  [vize](../files/java/slides/2024-2025-java-vize-cevaplar.pdf) | 
-  [vize (HTML)](../files/java/slides/2024-2025-java-vize-cevaplar.html) | 
-  [final](../files/java/slides/2024-2025-java-final-cevaplar.pdf) | 
-  [final (HTML)](../files/java/slides/2024-2025-java-final-cevaplar.html) |
-  [but](../files/java/slides/2024-2025-java-butunleme-cevaplar.pdf)
-
-- **2023-2024**  
-  [vize](../files/java/slides/2023-2024-java-vize-cevap.pdf) | 
-  [telafi](../files/java/slides/2023-2024-java-telafi-cevap.pdf) | 
-  [final-a](../files/java/slides/2023-2024-java-final-a-cevap.pdf) | 
-  [final-b](../files/java/slides/2023-2024-java-final-b-cevap.pdf) | 
-  [final-c](../files/java/slides/2023-2024-java-final-c-cevap.pdf) | 
-  [final-d](../files/java/slides/2023-2024-java-final-d-cevap.pdf) | 
-  [but-a](../files/java/slides/2023-2024-java-butunleme-a-cevap.pdf) | 
-  [but-b](../files/java/slides/2023-2024-java-butunleme-b-cevap.pdf) | 
-  [but-c](../files/java/slides/2023-2024-java-butunleme-c-cevap.pdf) | 
-  [but-d](../files/java/slides/2023-2024-java-butunleme-d-cevap.pdf)
 
 ---
 
@@ -187,7 +129,6 @@ Exception handling is a critical aspect of Java programming, providing a powerfu
 - [📝Çalışma Soruları - Hata Ayıklama ve İstisnalar (HTML)](../files/java/slides/Bolum_06_Hata_Ayiklama_Calisma_Sorulari.html)  
 - [🕹️Exception Flow (HTML)](../files/java/slides/Chapter_06_Exception-Flow.html)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders06/src)  
-- [🖋️Interview Exception Handling (pdf)](../files/java/Chapter_06_Interview_Exception_Handling.pdf)  
 
 ---
 
@@ -212,7 +153,6 @@ Graphical user interfaces (GUIs) are a ubiquitous feature of modern software app
 - [📝Çalışma Soruları - Grafikler (HTML)](../files/java/slides/Bolum_08_Grafikler_Calisma_Sorulari.html)  
 - [🕹️Swing Layouts (HTML)](../files/java/slides/Chapter_08_Swing-Layouts.html)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders08/src)  
-- [🖋️Interview Swing (pdf)](../files/java/Chapter_08_Interview_Swing.pdf)  
 
 ---
 
@@ -248,6 +188,4 @@ Testing and debugging are critical aspects of Java programming, providing a powe
 - [📄Sunum-Test ve Hata Ayıklama (PDF)](../files/java/pdf/Bolum_11_Test.pdf)  
 - [📝Çalışma Soruları - Test ve Hata Ayıklama (HTML)](../files/java/slides/Bolum_11_Test_Calisma_Sorulari.html)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders11/src)  
-- [🖋️Interview Garbage Collectors (pdf)](../files/java/Interview_Garbage_Collectors.pdf)  
-- [🖋️Interview Questions (pdf)](../files/java/Interview_Questions.pdf)  
 
