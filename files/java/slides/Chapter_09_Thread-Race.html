@@ -1,0 +1,353 @@
+---
+layout: without-sidebar
+title: "İş Parçacığı Yarışı"
+permalink: /files/java/slides/Chapter_09_Thread-Race.html
+excerpt: "İki iş parçacığının paylaşılan bir sayaçta sayac++ (oku, artır, yaz) adımlarını araya sokarak kayıp güncelleme oluşturmasını; synchronized ve AtomicInteger ile bunun nasıl önlendiğini elle seçilen ya da rastgele sıralamalarla gösterir."
+---
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.jv-tr, .jv-tr-dlg { --ds-accent:#a61b1b; --ds-link:var(--global-link-color, #2563eb); }
+html[data-theme="dark"] .jv-tr, html[data-theme="dark"] .jv-tr-dlg { --ds-accent:#f07a7a; }
+.jv-tr .grid { display:grid; grid-template-columns:172px minmax(0,1fr); gap:10px; height:100%; }
+.jv-tr .side { display:flex; flex-direction:column; gap:6px; min-height:0; padding:8px 9px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.jv-tr .cap { display:block; margin:0 0 2px; color:var(--ds-muted); font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
+.jv-tr select { width:100%; min-height:29px; padding:0 4px; font-size:13px; }
+.jv-tr .two { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.jv-tr .two button, .jv-tr .one { min-height:29px; padding:0 4px; font-size:13px; }
+.jv-tr .tbtn { min-height:34px; font-size:14px; }
+.jv-tr .tbtn.t1 { border-color:var(--ds-link); color:var(--ds-link); }
+.jv-tr .tbtn.t2 { border-color:var(--ds-accent); color:var(--ds-accent); }
+.jv-tr .speed { display:flex; align-items:center; gap:6px; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.jv-tr .speed input { flex:1; min-width:0; }
+.jv-tr .score { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:auto; }
+.jv-tr .score div { padding:2px; border-radius:10px; background:var(--ds-surface-strong); text-align:center; color:var(--ds-muted); font-size:12px; font-weight:700; }
+.jv-tr .score b { display:block; color:var(--ds-text); font-size:16px; }
+.jv-tr .main { display:grid; grid-template-rows:174px 150px minmax(0,1fr) auto; gap:6px; min-height:0; min-width:0; }
+.jv-tr .row { display:grid; gap:6px; min-height:0; }
+.jv-tr .pane { position:relative; min-height:0; min-width:0; overflow:hidden; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); }
+.jv-tr .pane > .cap { margin:0; padding:2px 8px 0; }
+.jv-tr .code { margin:0; padding:0 8px; font:12px/14.5px ui-monospace, Consolas, monospace; font-variant-ligatures:none; white-space:pre; }
+.jv-tr .code .c { color:var(--ds-muted); }
+.jv-tr .code .k { color:var(--ds-accent); font-weight:700; }
+.jv-tr .mem { display:flex; flex-direction:column; align-items:center; gap:4px; padding:4px 8px; text-align:center; }
+.jv-tr .cell { min-width:110px; padding:2px 10px; border:2px solid var(--ds-text); border-radius:10px; background:var(--ds-bg); font:700 34px/1.15 ui-monospace, Consolas, monospace; transition:background .3s; }
+.jv-tr .cell.is-w { background:var(--ds-hot); }
+.jv-tr .cell.is-r { background:var(--ds-node); }
+.jv-tr .facts { width:100%; display:grid; grid-template-columns:1fr auto; gap:3px 8px; font-size:12px; text-align:left; }
+.jv-tr .facts span { color:var(--ds-muted); }
+.jv-tr .facts b { font-family:ui-monospace, Consolas, monospace; }
+.jv-tr .facts .bad { color:var(--ds-bad); }
+.jv-tr .facts .good { color:var(--ds-good); }
+.jv-tr .th { display:flex; flex-direction:column; gap:3px; padding:3px 8px; }
+.jv-tr .th.t1 { border-color:var(--ds-link); }
+.jv-tr .th.t2 { border-color:var(--ds-accent); }
+.jv-tr .thead { display:flex; justify-content:space-between; align-items:center; gap:6px; font-size:12.5px; }
+.jv-tr .thead b { font-size:14px; }
+.jv-tr .t1 .thead b { color:var(--ds-link); }
+.jv-tr .t2 .thead b { color:var(--ds-accent); }
+.jv-tr .st { padding:0 6px; border-radius:6px; background:var(--ds-surface-strong); font:700 12px ui-monospace, Consolas, monospace; }
+.jv-tr .st.is-blocked { background:color-mix(in srgb, var(--ds-bad) 18%, var(--ds-bg)); color:var(--ds-bad); }
+.jv-tr .st.is-done { background:color-mix(in srgb, var(--ds-good) 18%, var(--ds-bg)); color:var(--ds-good); }
+.jv-tr .reg { font:12.5px ui-monospace, Consolas, monospace; }
+.jv-tr .reg b { padding:0 6px; border:1.5px solid var(--ds-border); border-radius:6px; background:var(--ds-bg); }
+.jv-tr .ops { margin:0; padding:0; list-style:none; font:12px/17px ui-monospace, Consolas, monospace; }
+.jv-tr .ops li { margin:0; padding:0 6px; border-radius:5px; color:var(--ds-muted); }
+.jv-tr .ops li.is-next { background:var(--ds-surface-strong); color:var(--ds-text); box-shadow:inset 3px 0 0 var(--ds-border); }
+.jv-tr .t1 .ops li.is-next { box-shadow:inset 3px 0 0 var(--ds-link); }
+.jv-tr .t2 .ops li.is-next { box-shadow:inset 3px 0 0 var(--ds-accent); }
+.jv-tr .ops li.is-done { text-decoration:line-through; }
+.jv-tr .log { margin:0; padding:0 8px; list-style:none; font:12px/16px ui-monospace, Consolas, monospace; }
+.jv-tr .log li { margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.jv-tr .log .l1 { color:var(--ds-link); }
+.jv-tr .log .l2 { color:var(--ds-accent); }
+.jv-tr .log .lost { color:var(--ds-bad); font-weight:700; }
+.jv-tr .hist { display:flex; align-items:flex-end; gap:6px; height:58px; padding:0 8px; }
+.jv-tr .hist div { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; font:12px ui-monospace, Consolas, monospace; }
+.jv-tr .hist i { display:block; width:100%; min-height:1px; border-radius:3px 3px 0 0; background:var(--ds-link); }
+.jv-tr .hist div.is-ok i { background:var(--ds-good); }
+.jv-tr .hist small { color:var(--ds-muted); font-size:12px; line-height:1.1; }
+.jv-tr .empty { margin:14px 8px 0; color:var(--ds-muted); font-size:12px; text-align:center; }
+.jv-tr .why { margin:0; min-height:46px; padding:4px 10px; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:13px; line-height:1.35; }
+.jv-tr [hidden] { display:none !important; }
+</style>
+
+<div class="jv-tr agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 9 · Simülatör</p><h1>İş Parçacığı Yarışı</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="tr-help" aria-label="Açıklama ve kullanım">?</button>
+    <a class="agt-oyun__back" href="Bolum_09_Is_Parcaciklari.html">← Bölüm 9</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="grid">
+      <aside class="side">
+        <div>
+          <label class="cap" for="trMode">Sayaç</label>
+          <select id="trMode">
+            <option value="u">korumasız (deger++)</option>
+            <option value="s">synchronized</option>
+            <option value="a">AtomicInteger</option>
+          </select>
+        </div>
+        <div>
+          <label class="cap" for="trK">Her iş parçacığı</label>
+          <select id="trK"><option value="1">1 kez artırır</option><option value="2" selected>2 kez artırır</option><option value="3">3 kez artırır</option></select>
+        </div>
+        <div class="two">
+          <button type="button" class="tbtn t1" id="trT1" aria-label="T1 bir adım çalışsın">T1 ▶</button>
+          <button type="button" class="tbtn t2" id="trT2" aria-label="T2 bir adım çalışsın">T2 ▶</button>
+        </div>
+        <div class="two">
+          <button type="button" id="trRand" aria-label="Rastgele bir iş parçacığı bir adım çalışsın">Rastgele</button>
+          <button type="button" id="trRun" aria-label="Sona kadar rastgele çalıştır">Bitir</button>
+        </div>
+        <label class="speed">Hız <input type="range" id="trSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı"></label>
+        <button type="button" class="one" id="trReset" aria-label="Başa dön">Sıfırla</button>
+        <button type="button" class="one" id="trExp" aria-label="1000 rastgele çalıştırma yap">1000 deney</button>
+        <div>
+          <label class="cap" for="trTask">Görev</label>
+          <select id="trTask">
+            <option value="0">serbest</option>
+            <option value="1">kayıp güncelleme yarat</option>
+            <option value="2">en küçük sonucu bul</option>
+          </select>
+        </div>
+        <div class="score" aria-live="polite">
+          <div>Başarılı<b id="trOk">0</b></div>
+          <div>Deneme<b id="trAll">0</b></div>
+        </div>
+      </aside>
+
+      <section class="main">
+        <div class="row" style="grid-template-columns:minmax(0,1fr) 196px">
+          <div class="pane"><span class="cap">Java kodu</span><pre class="code" id="trCode" aria-label="Java kodu"></pre></div>
+          <div class="pane mem"><span class="cap" style="padding:0">Paylaşılan bellek</span><code style="font-size:12px">deger</code><div class="cell" id="trCell">0</div><div class="facts" id="trFacts"></div></div>
+        </div>
+        <div class="row" style="grid-template-columns:1fr 1fr">
+          <div class="pane th t1" id="trTh1"></div>
+          <div class="pane th t2" id="trTh2"></div>
+        </div>
+        <div class="row" style="grid-template-columns:minmax(0,1fr) 196px">
+          <div class="pane"><span class="cap">Araya girme sırası (son 4)</span><ol class="log" id="trLog"></ol></div>
+          <div class="pane"><span class="cap" id="trHistCap">1000 deney</span><div id="trHist"><p class="empty">henüz deney yok</p></div></div>
+        </div>
+        <div class="why" id="trWhy" aria-live="polite"></div>
+      </section>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog jv-tr-dlg" id="tr-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>İş Parçacığı Yarışı</h2>
+    <p><b>Amaç:</b> İki iş parçacığı aynı nesnedeki <code>deger</code> alanını artırdığında neden bazı artışların kaybolabildiğini (<b>yarış durumu</b>) ve <code>synchronized</code> ile <code>AtomicInteger</code>'ın bunu nasıl önlediğini görmek.</p>
+    <h3>Neden kaybolur?</h3>
+    <p><code>deger++</code> tek bir işlem değildir: değer bellekten okunur (<code>r = deger</code>), iş parçacığının kendi kopyasında artırılır (<code>r = r + 1</code>) ve belleğe yazılır (<code>deger = r</code>). İki iş parçacığı aynı eski değeri okuyup ikisi de yazarsa ikinci yazma birincinin artışını ezer: <b>kayıp güncelleme</b>. İş parçacıkları hangi sırayla çalışacağını seçemez; sırayı zamanlayıcı belirler.</p>
+    <h3>Düzeltmeler</h3>
+    <ul>
+      <li><b>synchronized</b>: metoda giren iş parçacığı nesnenin kilidini (monitör) alır. Kilit doluyken öbürü <code>BLOCKED</code> durumunda bekler; oku-artır-yaz bölünmeden tamamlanır.</li>
+      <li><b>AtomicInteger</b>: <code>incrementAndGet()</code> kilitsiz çalışır. Burada kavramsal olarak bir <code>compareAndSet</code> döngüsü gösterilir: okunan değer hâlâ bellekteyse yeni değer yazılır, değilse yeniden okunur. JVM bunu çoğu işlemcide tek bir atomik makine komutuyla yapar.</li>
+    </ul>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li><b>T1 ▶</b> ve <b>T2 ▶</b> ile hangi iş parçacığının bir adım çalışacağını siz seçersiniz (klavyede 1 ve 2). <b>Rastgele</b> bir adım, <b>Bitir</b> rastgele bir sıralamayla bitirir.</li>
+      <li><b>1000 deney</b>, seçili sayaçla 1000 rastgele sıralama yapıp son değerlerin dağılımını çizer (yeşil çubuk: beklenen 2k).</li>
+      <li><b>Görev</b>: korumasız sayaçta bir kayıp güncelleme yaratın ya da elde edilebilecek en küçük sonuca ulaşın. Her biri k kez artıran iki iş parçacığında olası sonuçlar k = 1 için 1–2, k ≥ 2 için 2–2k'dır (bütün sıralamalar denenerek bulunmuştur).</li>
+    </ol>
+    <p>Gerçek bir Java 8 çalıştırmasında, her biri 100000 kez artıran iki iş parçacığı korumasız sayaçta beş denemede 194246 ile 199180 arasında sonuçlar verdi; aynı döngüde <code>synchronized</code> ve <code>AtomicInteger</code> sayaçları her seferinde 200000 oldu.</p>
+    <p>İlgili sunum: <a href="Bolum_09_Is_Parcaciklari.html">Bölüm 9 · İş Parçacıkları</a> (Yarış Durumu, sayac++ Neden Kaybolur?, synchronized ve Monitör, Yarışı Önlemek).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  var OPS = {
+    u: ["r = deger      // oku", "r = r + 1      // artır", "deger = r      // yaz"],
+    s: ["kilidi al", "r = deger      // oku", "r = r + 1      // artır", "deger = r      // yaz", "kilidi bırak"],
+    a: ["v = deger.get()", "compareAndSet(v, v + 1)"]
+  };
+  var CODE = {
+    u: ['class Sayac {', '  int deger = 0;', '  void artir() {', '    <span class="k">deger++;</span>  <span class="c">// oku → artır → yaz</span>', '  }', '}', 'Runnable is = () -&gt; {  <span class="c">// s: ortak Sayac</span>', '  for (int i = 0; i &lt; K; i++) s.artir();', '};', 'new Thread(is).start(); new Thread(is).start();'],
+    s: ['class Sayac {', '  int deger = 0;', '  <span class="k">synchronized</span> void artir() {', '    deger++;  <span class="c">// kilit tutulurken</span>', '  }', '}', 'Runnable is = () -&gt; {  <span class="c">// s: ortak Sayac</span>', '  for (int i = 0; i &lt; K; i++) s.artir();', '};', 'new Thread(is).start(); new Thread(is).start();'],
+    a: ['class Sayac {', '  <span class="k">AtomicInteger</span> deger = new AtomicInteger();', '  void artir() {', '    deger.<span class="k">incrementAndGet()</span>;', '  }', '}', 'Runnable is = () -&gt; {  <span class="c">// s: ortak Sayac</span>', '  for (int i = 0; i &lt; K; i++) s.artir();', '};', 'new Thread(is).start(); new Thread(is).start();']
+  };
+
+  /* ---------- model ---------- */
+  function State(mode, k) {
+    return { mode: mode, k: k, mem: 0, ver: 0, lock: -1, lost: 0, cas: 0, t: [0, 1].map(function () { return { i: 0, pc: 0, r: null, rv: 0 }; }) };
+  }
+  function enabled(S, j) {
+    var t = S.t[j];
+    if (t.i >= S.k) return false;
+    if (S.mode === "s" && t.pc === 0 && S.lock >= 0 && S.lock !== j) return false;
+    return true;
+  }
+  function finished(S) { return S.t[0].i >= S.k && S.t[1].i >= S.k; }
+  /* bir adım: açıklama ve günlük satırı döndürür */
+  function step(S, j) {
+    var t = S.t[j], n = "T" + (j + 1), o = (j ? "T1" : "T2"), op = OPS[S.mode][t.pc], res = { j: j, kind: "", log: "", why: "" };
+    if (S.mode === "u" || (S.mode === "s" && t.pc >= 1 && t.pc <= 3)) {
+      var p = S.mode === "u" ? t.pc : t.pc - 1;
+      if (p === 0) { t.r = S.mem; t.rv = S.ver; res.kind = "r"; res.log = n + ": r = deger → r = " + t.r; res.why = n + " belleği okur: kendi kopyası r = " + t.r + ". Bundan sonra " + o + " deger'i değiştirse de " + n + "'nin r'si eski kalır."; }
+      else if (p === 1) { t.r++; res.log = n + ": r = r + 1 → r = " + t.r; res.why = n + " yalnızca kendi kopyasını artırır: r = " + t.r + ". Bellekteki deger hâlâ " + S.mem + "."; }
+      else {
+        var lost = S.ver !== t.rv;
+        if (lost) S.lost++;
+        S.mem = t.r; S.ver++; res.kind = "w";
+        res.log = n + ": deger = r → deger = " + t.r + (lost ? "   ← kayıp güncelleme" : "");
+        res.lost = lost;
+        res.why = n + " belleğe " + t.r + " yazar." + (lost ? " <b>Kayıp güncelleme:</b> " + n + " okuduktan sonra " + o + " deger'i değiştirmişti; o artış ezildi." : "");
+      }
+      t.pc++;
+    } else if (S.mode === "s") {
+      if (t.pc === 0) { S.lock = j; res.log = n + ": kilidi aldı"; res.why = n + " synchronized metoda girer ve nesnenin kilidini alır. " + o + " artık artir'e giremez; denerse BLOCKED olur."; t.pc++; }
+      else { S.lock = -1; res.log = n + ": kilidi bıraktı"; res.why = n + " metottan çıkar, kilidi bırakır. Bekleyen varsa artık o girebilir. Okuma ile yazma arasına kimse giremedi."; t.pc++; }
+    } else {
+      if (t.pc === 0) { t.r = S.mem; t.rv = S.ver; res.kind = "r"; res.log = n + ": v = deger.get() → v = " + t.r; res.why = n + " değeri okur: v = " + t.r + "."; t.pc = 1; }
+      else if (S.mem === t.r) { S.mem = t.r + 1; S.ver++; res.kind = "w"; res.log = n + ": CAS(" + t.r + ", " + (t.r + 1) + ") başarılı → deger = " + S.mem; res.why = "compareAndSet: bellekte hâlâ " + t.r + " var, okunduğundan beri değişmemiş → tek hamlede " + (t.r + 1) + " yazılır."; t.pc = 2; }
+      else { S.cas++; res.log = n + ": CAS(" + t.r + ", " + (t.r + 1) + ") başarısız, deger = " + S.mem; res.why = "compareAndSet başarısız: bellekte " + t.r + " değil " + S.mem + " var (" + o + " araya girdi). Hiçbir şey yazılmaz; " + n + " yeniden okuyacak. Artış kaybolmaz."; t.pc = 0; }
+    }
+    if (t.pc >= OPS[S.mode].length) { t.pc = 0; t.i++; t.r = null; if (t.i >= S.k) res.why += " " + n + " " + S.k + " artışını bitirdi (TERMINATED)."; }
+    return res;
+  }
+  function randomRun(mode, k) {
+    var S = State(mode, k), g = 0;
+    while (!finished(S) && g++ < 1000) {
+      var en = [0, 1].filter(function (j) { return enabled(S, j); });
+      step(S, en[Math.floor(Math.random() * en.length)]);
+    }
+    return S.mem;
+  }
+
+  /* ---------- arayüz ---------- */
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector(".jv-tr");
+  var S, log = [], last = null, timer = null, ok = 0, all = 0, scored = false;
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  function reset() {
+    stop();
+    S = State(E("trMode").value, +E("trK").value);
+    log = []; last = null; scored = false;
+    E("trCode").innerHTML = CODE[S.mode].join("\n").replace("K;", S.k + ";");
+    E("trHist").innerHTML = '<p class="empty">henüz deney yok</p>';
+    E("trHistCap").textContent = "1000 deney";
+    draw("İki iş parçacığı da başlamaya hazır (RUNNABLE). Sırayı siz seçin: <b>T1 ▶</b> / <b>T2 ▶</b>, ya da <b>Rastgele</b>." + (E("trTask").value !== "0" && S.mode !== "u" ? " Görevler korumasız sayaç içindir." : ""));
+  }
+  function thHtml(j) {
+    var t = S.t[j], ops = OPS[S.mode], st, cls = "st";
+    if (t.i >= S.k) { st = "TERMINATED"; cls += " is-done"; }
+    else if (!enabled(S, j)) { st = "BLOCKED"; cls += " is-blocked"; }
+    else st = "RUNNABLE";
+    var h = '<div class="thead"><b>T' + (j + 1) + '</b><span>tur ' + Math.min(t.i + 1, S.k) + " / " + S.k + '</span><span class="' + cls + '">' + st + "</span></div>";
+    h += '<div class="reg">' + (S.mode === "a" ? "v" : "r") + " (kendi kopyası): <b>" + (t.r === null ? "–" : t.r) + "</b>" + (S.mode === "s" && S.lock === j ? " · kilit bende" : "") + "</div>";
+    h += '<ol class="ops">' + ops.map(function (o, p) { var c = t.i >= S.k ? "is-done" : p === t.pc ? "is-next" : p < t.pc ? "is-done" : ""; return '<li class="' + c + '">' + esc(o) + "</li>"; }).join("") + "</ol>";
+    return h;
+  }
+  function draw(why) {
+    E("trTh1").innerHTML = thHtml(0); E("trTh2").innerHTML = thHtml(1);
+    var c = E("trCell"); c.textContent = S.mem; c.className = "cell" + (last && last.kind === "w" ? " is-w" : last && last.kind === "r" ? " is-r" : "");
+    var exp = 2 * S.k, fin = finished(S);
+    var f = "<span>beklenen</span><b>" + exp + "</b><span>kayıp güncelleme</span><b class=\"" + (S.lost ? "bad" : "") + "\">" + S.lost + "</b>";
+    if (S.mode === "s") f += "<span>kilit</span><b>" + (S.lock < 0 ? "boş" : "T" + (S.lock + 1)) + "</b>";
+    else if (S.mode === "a") f += "<span>başarısız CAS</span><b>" + S.cas + "</b>";
+    else f += "<span>sonuç</span><b class=\"" + (fin ? (S.mem === exp ? "good" : "bad") : "") + "\">" + (fin ? S.mem : "…") + "</b>";
+    E("trFacts").innerHTML = f;
+    E("trLog").innerHTML = log.slice(-4).map(function (l) { return '<li class="l' + (l.j + 1) + (l.lost ? " lost" : "") + '">' + esc(l.log) + "</li>"; }).join("") || '<li class="c" style="color:var(--ds-muted)">henüz adım yok</li>';
+    E("trT1").disabled = !enabled(S, 0) || !!timer; E("trT2").disabled = !enabled(S, 1) || !!timer;
+    E("trRand").disabled = fin || !!timer;
+    E("trRun").textContent = timer ? "Duraklat" : "Bitir";
+    E("trRun").disabled = fin && !timer;
+    E("trT1").textContent = S.t[0].i >= S.k ? "T1 bitti" : enabled(S, 0) ? "T1 ▶" : "T1 bekler";
+    E("trT2").textContent = S.t[1].i >= S.k ? "T2 bitti" : enabled(S, 1) ? "T2 ▶" : "T2 bekler";
+    if (fin && !scored) { why = (why ? why + " " : "") + finishText(); }
+    E("trWhy").innerHTML = why;
+  }
+  function finishText() {
+    scored = true;
+    var exp = 2 * S.k, txt = "<b>Bitti:</b> deger = " + S.mem + " (beklenen " + exp + ").";
+    if (S.mem < exp) txt += " " + (exp - S.mem) + " artış kayboldu.";
+    var task = E("trTask").value;
+    if (task !== "0" && S.mode === "u") {
+      var target = task === "1" ? S.mem < exp : S.mem === (S.k >= 2 ? 2 : 1), dirty = log.some(function (l) { return l.rand; });
+      if (dirty) txt += " Görev için sıralamayı elle seçmek gerekir (rastgele adım kullanıldı).";
+      else {
+        all++; if (target) ok++; E("trOk").textContent = ok; E("trAll").textContent = all;
+        txt += target ? ' <b class="agt-oyun__good">Görev başarılı!</b>' : ' <b class="agt-oyun__bad">Görev olmadı.</b>' + (task === "2" ? " En küçük sonuç " + (S.k >= 2 ? 2 : 1) + "." : "");
+      }
+    }
+    return txt;
+  }
+  function act(j, rand) {
+    if (finished(S) || !enabled(S, j)) return;
+    var r = step(S, j); r.rand = !!rand; log.push(r); last = r;
+    draw(r.why);
+  }
+  function randStep() { var en = [0, 1].filter(function (j) { return enabled(S, j); }); if (en.length) act(en[Math.floor(Math.random() * en.length)], true); }
+  function stop() { clearInterval(timer); timer = null; }
+  function run() {
+    if (timer) { stop(); draw(E("trWhy").innerHTML); return; }
+    timer = setInterval(function () { if (finished(S)) { stop(); draw(E("trWhy").innerHTML); return; } randStep(); }, [1300, 900, 600, 350, 150][E("trSpeed").value - 1]);
+    draw(E("trWhy").innerHTML);
+  }
+  function experiment() {
+    var mode = S.mode, k = S.k, cnt = {}, N = 1000;
+    for (var i = 0; i < N; i++) { var v = randomRun(mode, k); cnt[v] = (cnt[v] || 0) + 1; }
+    var lo = k >= 2 ? 2 : 1, hi = 2 * k, mx = 0, h = "";
+    for (var v2 = lo; v2 <= hi; v2++) mx = Math.max(mx, cnt[v2] || 0);
+    for (v2 = lo; v2 <= hi; v2++) {
+      var c = cnt[v2] || 0;
+      h += '<div class="' + (v2 === hi ? "is-ok" : "") + '"><small>' + c + '</small><i style="height:' + Math.round(34 * c / Math.max(1, mx)) + 'px"></i>' + v2 + "</div>";
+    }
+    E("trHist").innerHTML = '<div class="hist">' + h + "</div>";
+    E("trHistCap").textContent = "1000 deney · sonuç";
+    var bad = N - (cnt[hi] || 0);
+    E("trWhy").innerHTML = "1000 rastgele sıralama: " + (bad ? bad + " tanesinde sonuç " + hi + "'den küçük çıktı (kayıp güncelleme)." : "hepsinde sonuç " + hi + "; hiçbir artış kaybolmadı.") + (mode === "u" ? " Gerçek JVM'de adımlar çok daha kalabalık araya girer." : "");
+  }
+
+  E("trT1").addEventListener("click", function () { act(0); });
+  E("trT2").addEventListener("click", function () { act(1); });
+  E("trRand").addEventListener("click", randStep);
+  E("trRun").addEventListener("click", run);
+  E("trReset").addEventListener("click", reset);
+  E("trExp").addEventListener("click", experiment);
+  E("trMode").addEventListener("change", reset);
+  E("trK").addEventListener("change", reset);
+  E("trTask").addEventListener("change", reset);
+  E("trSpeed").addEventListener("change", function () { if (timer) { stop(); run(); } });
+  root.addEventListener("keydown", function (ev) {
+    if (/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName) || timer) return;
+    if (ev.key === "1") { act(0); ev.preventDefault(); }
+    else if (ev.key === "2") { act(1); ev.preventDefault(); }
+  });
+
+  reset();
+})();
+</script>
+<script src="deck/oyun.js"></script>

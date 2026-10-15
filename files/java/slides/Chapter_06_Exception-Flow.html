@@ -1,0 +1,574 @@
+---
+layout: without-sidebar
+title: "İstisna Akışı"
+permalink: /files/java/slides/Chapter_06_Exception-Flow.html
+excerpt: "Bir istisnanın çağrı yığını boyunca nasıl yayıldığını, try/catch/finally bloklarının hangi sırayla çalıştığını, kontrol edilen ve edilmeyen istisnaları ve try-with-resources kapanış sırasını hazır Java senaryolarında adım adım gösterir; çıktı tahmin modu içerir."
+---
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.jv-ex, .jv-ex-dlg { --ds-accent:#a61b1b; --ds-link:var(--global-link-color, #2563eb); }
+html[data-theme="dark"] .jv-ex, html[data-theme="dark"] .jv-ex-dlg { --ds-accent:#f07a7a; }
+.jv-ex .grid { display:grid; grid-template-columns:158px minmax(0,1fr); gap:10px; height:100%; }
+.jv-ex .side { display:flex; flex-direction:column; gap:6px; min-height:0; padding:8px 9px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.jv-ex .cap { display:block; margin:0 0 2px; color:var(--ds-muted); font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
+.jv-ex select { width:100%; min-height:30px; padding:0 4px; font-size:12.5px; }
+.jv-ex .btns { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+.jv-ex .btns button { min-height:30px; padding:0 4px; font-size:13px; }
+.jv-ex .speed { display:flex; align-items:center; gap:6px; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.jv-ex .speed input { flex:1; min-width:0; }
+.jv-ex .check { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; cursor:pointer; }
+.jv-ex .score { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.jv-ex .score div { padding:2px; border-radius:10px; background:var(--ds-surface-strong); text-align:center; color:var(--ds-muted); font-size:12px; font-weight:700; }
+.jv-ex .score b { display:block; color:var(--ds-text); font-size:16px; }
+.jv-ex .stepno { margin-top:auto; color:var(--ds-muted); font-size:12px; font-weight:700; text-align:center; }
+.jv-ex .main { display:grid; grid-template-rows:minmax(0,1fr) 132px; gap:6px; min-height:0; min-width:0; }
+.jv-ex .top { display:grid; grid-template-columns:minmax(0,1fr) 176px; gap:6px; min-height:0; }
+.jv-ex .pane { display:flex; flex-direction:column; min-height:0; min-width:0; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); overflow:hidden; }
+.jv-ex .pane > .cap { display:flex; align-items:center; gap:6px; margin:0; padding:2px 8px 1px; }
+.jv-ex .code { flex:1; min-height:0; margin:0; padding:1px 0; overflow:hidden; font:12px/14.5px ui-monospace, Consolas, monospace; font-variant-ligatures:none; list-style:none; counter-reset:ln; }
+.jv-ex .code li { margin:0; padding:0 6px 0 0; line-height:14.5px; white-space:pre; counter-increment:ln; }
+.jv-ex .code li::before { content:counter(ln); display:inline-block; width:20px; margin-right:6px; color:var(--ds-muted); text-align:right; }
+.jv-ex .code li.is-cur { background:var(--ds-hot); box-shadow:inset 4px 0 0 var(--ds-accent); }
+.jv-ex .code li.is-exc { background:color-mix(in srgb, var(--ds-bad) 20%, var(--ds-bg)); box-shadow:inset 4px 0 0 var(--ds-bad); }
+.jv-ex .code li.is-done { color:var(--ds-muted); }
+.jv-ex .right { display:flex; flex-direction:column; gap:6px; min-height:0; }
+.jv-ex .stackp { flex:none; }
+.jv-ex .exbox { margin:2px 6px 4px; padding:2px 6px; border:1.5px dashed var(--ds-border); border-radius:8px; color:var(--ds-muted); font-size:12px; line-height:1.3; }
+.jv-ex .exbox.is-fly { border-style:solid; border-color:var(--ds-bad); background:color-mix(in srgb, var(--ds-bad) 14%, var(--ds-bg)); color:var(--ds-bad); font-weight:700; }
+.jv-ex .exbox.is-caught { border-style:solid; border-color:var(--ds-good); background:color-mix(in srgb, var(--ds-good) 12%, var(--ds-bg)); color:var(--ds-good); font-weight:700; }
+.jv-ex .stack { display:flex; flex-direction:column-reverse; gap:4px; padding:0 6px 6px; min-height:40px; }
+.jv-ex .frame { padding:2px 6px; border:1.5px solid var(--ds-border); border-radius:8px; background:var(--ds-bg); font:12px/1.3 ui-monospace, Consolas, monospace; }
+.jv-ex .frame b { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.jv-ex .frame .meta { display:flex; justify-content:space-between; gap:4px; color:var(--ds-muted); font:12px system-ui, sans-serif; }
+.jv-ex .frame .blk { padding:0 5px; border-radius:6px; background:var(--ds-surface-strong); color:var(--ds-text); font-weight:700; }
+.jv-ex .frame .blk.b-catch { background:color-mix(in srgb, var(--ds-good) 18%, var(--ds-bg)); }
+.jv-ex .frame .blk.b-finally { background:color-mix(in srgb, var(--ds-link) 20%, var(--ds-bg)); }
+.jv-ex .frame.is-top { border-color:var(--ds-accent); box-shadow:0 0 0 2px color-mix(in srgb, var(--ds-accent) 22%, transparent); }
+.jv-ex .frame.is-hit { border-color:var(--ds-bad); background:color-mix(in srgb, var(--ds-bad) 12%, var(--ds-bg)); }
+.jv-ex .frame.is-dying { border-style:dashed; border-color:var(--ds-bad); opacity:.75; }
+.jv-ex .frame.is-ret { border-style:dashed; }
+.jv-ex .none { color:var(--ds-muted); font-size:12px; text-align:center; }
+.jv-ex .why { flex:1; min-height:0; margin:0; padding:5px 8px; overflow:hidden; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:12.5px; line-height:1.35; }
+.jv-ex .why code { font-size:12px; }
+.jv-ex .out { flex:1; min-height:0; margin:0; padding:1px 8px; overflow:hidden; background:var(--ds-bg); font:12px/15px ui-monospace, Consolas, monospace; font-variant-ligatures:none; white-space:pre-wrap; overflow-wrap:anywhere; }
+.jv-ex .out .e { color:var(--ds-bad); }
+.jv-ex .out .muted { color:var(--ds-muted); font-family:system-ui, sans-serif; }
+.jv-ex .gbtn { min-height:22px; padding:0 9px; border-radius:7px; font:700 12px system-ui, sans-serif; }
+.jv-ex .gbtn[aria-pressed="true"] { border-color:var(--ds-link); background:var(--ds-link); color:var(--ds-bg); }
+.jv-ex .gbtn.is-pick { margin-left:auto; border-color:var(--ds-accent); color:var(--ds-accent); }
+.jv-ex [hidden] { display:none !important; }
+</style>
+
+<div class="jv-ex agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 6 · Simülatör</p><h1>İstisna Akışı</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="ex-help" aria-label="Açıklama ve kullanım">?</button>
+    <a class="agt-oyun__back" href="Bolum_06_Hata_Ayiklama.html">← Bölüm 6</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="grid">
+      <aside class="side">
+        <div>
+          <label class="cap" for="exScen">Senaryo</label>
+          <select id="exScen"></select>
+        </div>
+        <div>
+          <label class="cap" for="exVar" id="exVarCap">Değer</label>
+          <select id="exVar"></select>
+        </div>
+        <div class="btns">
+          <button type="button" id="exBack" aria-label="Bir adım geri">◀ Geri</button>
+          <button type="button" id="exStep" class="is-primary" aria-label="Bir adım ileri">Adım ▶</button>
+          <button type="button" id="exPlay" aria-label="Oynat veya duraklat">Oynat</button>
+          <button type="button" id="exReset" aria-label="Başa dön">Sıfırla</button>
+        </div>
+        <label class="speed">Hız <input type="range" id="exSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı"></label>
+        <label class="check"><input type="checkbox" id="exGuess"> Çıktı ne olur?</label>
+        <div class="score" aria-live="polite">
+          <div>Doğru<b id="exOk">0</b></div>
+          <div>Soru<b id="exAll">0</b></div>
+        </div>
+        <div class="stepno" id="exNo"></div>
+      </aside>
+
+      <section class="main">
+        <div class="top">
+          <div class="pane"><span class="cap" id="exFile" lang="en" style="text-transform:none;letter-spacing:0">Java kodu</span><ol class="code" id="exCode" aria-label="Java kodu"></ol></div>
+          <div class="right">
+            <div class="pane stackp"><span class="cap" id="exStCap">Çağrı yığını</span><div class="exbox" id="exBox"></div><div class="stack" id="exStack" aria-live="polite"></div></div>
+            <div class="why" id="exWhy" aria-live="polite"></div>
+          </div>
+        </div>
+        <div class="pane">
+          <span class="cap"><span id="exOutCap">Çıktı (konsol)</span><span id="exG" hidden><button type="button" class="gbtn" data-g="0" aria-pressed="true">A</button> <button type="button" class="gbtn" data-g="1" aria-pressed="false">B</button> <button type="button" class="gbtn" data-g="2" aria-pressed="false">C</button></span><button type="button" class="gbtn is-pick" id="exPick" hidden>Bu çıktıyı seç</button></span>
+          <pre class="out" id="exOut" aria-label="Program çıktısı"></pre>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog jv-ex-dlg" id="ex-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>İstisna Akışı</h2>
+    <p><b>Amaç:</b> Bir istisna fırlatıldığında hangi satırların atlandığını, istisnanın <b>çağrı yığını</b> boyunca hangi metotlardan geçerek yayıldığını ve <code>try</code>, <code>catch</code>, <code>finally</code> bloklarının hangi sırayla çalıştığını görmek.</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li>Soldan bir senaryo ve değer ya da sürüm seçin. <b>Adım ▶</b> / <b>◀ Geri</b> (klavyede → / ←), <b>Oynat</b>, <b>Sıfırla</b>.</li>
+      <li>Ortadaki kodda o anki satır vurgulanır; kırmızı satır istisnanın fırlatıldığı yerdir. Sağda yığın aşağıdan yukarı büyür; her çerçevede o metodun içinde bulunduğu blok (<code>try</code>, <code>catch</code>, <code>finally</code>) yazar. Kesik çizgili çerçeve, istisna yüzünden yığından atılmak üzere olan metottur.</li>
+      <li><b>Çıktı ne olur?</b> açıkken program çalışmadan önce A, B, C adaylarına bakıp doğru çıktıyı seçersiniz.</li>
+    </ol>
+    <h3>Kurallar</h3>
+    <ul>
+      <li>İstisna fırlatılınca o bloktaki kalan satırlar çalışmaz. JVM içten dışa doğru, tipi uyan ilk <code>catch</code> bloğunu arar; bulamadığı her metot yığından atılır.</li>
+      <li><code>finally</code> her durumda çalışır: blok normal bitse de, <code>return</code> ile çıkılsa da, istisna yakalanmadan geçse de.</li>
+      <li><code>catch</code> blokları yukarıdan aşağı denenir; alt sınıf üst sınıftan önce yazılmalıdır, yoksa derleme hatası olur.</li>
+      <li><b>Kontrol edilen</b> (checked) istisnalar (<code>IOException</code> gibi) ya yakalanmalı ya da <code>throws</code> ile bildirilmelidir; derleyici bunu denetler. <code>RuntimeException</code> alt sınıfları <b>kontrol edilmeyen</b> istisnalardır.</li>
+      <li>Hiçbir yerde yakalanmayan istisnayı JVM yakalar, izleme listesini (stack trace) standart hata akışına yazar ve programı sonlandırır.</li>
+      <li><code>try</code>-with-resources kaynakları açılış sırasının <b>tersiyle</b> kapatır; kapanış, <code>catch</code> ve <code>finally</code> bloklarından önce olur.</li>
+    </ul>
+    <p>Her senaryonun her sürümü <code>javac --release 8</code> ile derlenip Java 8 ve Java 21'de çalıştırılmıştır; gösterilen çıktılar, izleme listesi satır numaraları ve derleyici iletileri bu çalıştırmalardan alınmıştır.</p>
+    <p>İlgili sunum: <a href="Bolum_06_Hata_Ayiklama.html">Bölüm 6 · Hata Ayıklama ve İstisnalar</a> (try-catch Akışı, finally ve return, try-with-resources, Kontrol Edilen İstisna, Yayılım).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /* ---------- izleyici: senaryo betikleri adım listesi üretir ---------- */
+  function Tracer() {
+    var st = [], out = [], ev = [], ex = null, caught = null;
+    function top() { return st[st.length - 1]; }
+    function snap(line, why, x) {
+      var e = { line: line, why: why, out: out.slice(), ex: ex, caught: caught, frames: st.map(function (f) { return { n: f.n, b: f.b, ln: f.ln, info: f.info }; }) };
+      for (var k in x || {}) e[k] = x[k];
+      ev.push(e);
+    }
+    function mv(line) { if (top()) top().ln = line; }
+    return {
+      main: function (line, why) { st.push({ n: "main", b: "", ln: line, info: "" }); snap(line, why); },
+      call: function (n, info, line, why) { st.push({ n: n, b: "", ln: line, info: info }); snap(line, why, { push: true }); },
+      at: function (line, why, x) { mv(line); snap(line, why, x); },
+      blk: function (b, line, why) { mv(line); top().b = b; if (b !== "catch") caught = null; snap(line, why); },
+      out: function (line, text, why) { mv(line); out.push({ t: text }); snap(line, why); },
+      thr: function (type, msg, line, why) { mv(line); ex = { t: type, m: msg }; caught = null; snap(line, why, { hit: true }); },
+      leave: function (line, why) { mv(line); snap(line, why, { dying: true }); st.pop(); },
+      ret: function (line, val, why) { mv(line); snap(line, why, { ret: val }); st.pop(); },
+      ctch: function (line, why) { mv(line); caught = ex; ex = null; top().b = "catch"; snap(line, why); },
+      uncaught: function (lines, why) { ex = null; st.length = 0; lines.forEach(function (l) { out.push({ t: l, e: true }); }); snap(-1, why, { fin: true }); },
+      cerr: function (lines, errs, why) { lines.forEach(function (l) { out.push({ t: l, e: true }); }); snap(errs, why, { compile: true, fin: true }); },
+      end: function (line, why) { mv(line); snap(line, why); st.length = 0; snap(-1, "Program sona erdi.", { fin: true }); },
+      get events() { return ev; }
+    };
+  }
+  var TRACE = function (k) { return "\tat " + k; };
+
+  var SCEN = [
+    {
+      id: "yayilim", ad: "Yayılım: c → b → main", file: "Yayilim.java", vcap: "b(x) argümanı", vars: ["0", "2"],
+      code: function (v) {
+        return ["public class Yayilim {", "  static void c(int x) {", '    System.out.println("c başladı");', "    int y = 10 / x;", '    System.out.println("c bitti");', "  }", "  static void b(int x) {", "    try { c(x); }", '    finally { System.out.println("b: finally"); }', '    System.out.println("b bitti");', "  }", "  public static void main(String[] args) {", "    try { b(" + v + "); }", "    catch (ArithmeticException e) {", '      System.out.println("main: " + e.getMessage());', "    }", '    System.out.println("main bitti");', "  }", "}"];
+      },
+      run: function (v, T) {
+        T.main(12, "Program main'den başlar: yığında yalnızca main var.");
+        T.blk("try", 13, "main try bloğuna girer ve b(" + v + ") çağrılır.");
+        T.call("b", "x = " + v, 7, "b'nin çerçevesi yığına eklenir (x = " + v + ").");
+        T.blk("try", 8, "b de bir try bloğuna girip c(x)'i çağırır. Bu try'ın catch'i yok, yalnızca finally'si var.");
+        T.call("c", "x = " + v, 2, "c'nin çerçevesi en üste konur. c'de hiç try yok.");
+        T.out(3, "c başladı", "\"c başladı\" yazılır.");
+        if (v === "0") {
+          T.thr("ArithmeticException", "/ by zero", 4, "10 / 0: tam sayı sıfıra bölünemez. JVM bir ArithmeticException nesnesi oluşturur ve fırlatır; bu satırdan sonrası çalışmaz.");
+          T.leave(4, "c'de onu yakalayacak catch yok: istisna c'den dışarı fırlar, c'nin çerçevesi yığından atılır. \"c bitti\" hiç yazılmaz.");
+          T.blk("finally", 9, "İstisna b'deki try'a ulaştı. catch yok ama finally var: istisna yolda olsa da finally çalışır.");
+          T.out(9, "b: finally", "\"b: finally\" yazılır.");
+          T.leave(9, "finally bitti, istisna hâlâ yakalanmadı: b'den de dışarı fırlar. \"b bitti\" atlanır.");
+          T.ctch(14, "main'deki catch ArithmeticException tipini kabul ediyor: istisna burada yakalanır, akış catch bloğuna geçer.");
+          T.out(15, "main: / by zero", "e.getMessage() istisnanın iletisini verir: \"/ by zero\".");
+          T.blk("", 17, "Yakalandıktan sonra program normal akışına döner.");
+          T.out(17, "main bitti", "\"main bitti\" yazılır.");
+          T.end(18, "main biter; program normal sonlanır (çıkış kodu 0).");
+        } else {
+          T.at(4, "10 / 2 = 5: bölme sorunsuz, y = 5.");
+          T.out(5, "c bitti", "\"c bitti\" yazılır.");
+          T.ret(6, undefined, "c normal biter, çerçevesi yığından kalkar; b kaldığı yerden sürer.");
+          T.blk("finally", 9, "try bloğu normal bitti. finally istisna olmasa da çalışır.");
+          T.out(9, "b: finally", "\"b: finally\" yazılır.");
+          T.blk("", 10, "try-finally bitti, sonraki satıra geçilir.");
+          T.out(10, "b bitti", "\"b bitti\" yazılır.");
+          T.ret(11, undefined, "b normal döner.");
+          T.at(14, "İstisna olmadığı için main'deki catch bloğu atlanır.");
+          T.blk("", 17, "try-catch sonrasına geçilir.");
+          T.out(17, "main bitti", "\"main bitti\" yazılır.");
+          T.end(18, "Program normal sonlanır.");
+        }
+      },
+      guess: function (v) {
+        return v === "0" ? [["c başladı", "b: finally", "main: / by zero", "main bitti"], ["c başladı", "main: / by zero", "b: finally", "main bitti"], ["c başladı", "main: / by zero", "main bitti"]]
+          : [["c başladı", "c bitti", "b: finally", "b bitti", "main bitti"], ["c başladı", "c bitti", "b bitti", "main bitti"], ["c başladı", "c bitti", "b bitti", "b: finally", "main bitti"]];
+      }
+    },
+    {
+      id: "finally", ad: "finally ve return", file: "FinallyDonus.java", vcap: "f(x) argümanı", vars: ["5", "0"],
+      code: function (v) {
+        return ["public class FinallyDonus {", "  static int f(int x) {", "    try {", '      System.out.println("try: x = " + x);', "      return 10 / x;", "    } catch (ArithmeticException e) {", '      System.out.println("catch: " + e.getMessage());', "      return -1;", "    } finally {", '      System.out.println("finally");', "    }", "  }", "  public static void main(String[] args) {", '    System.out.println("sonuç: " + f(' + v + "));", "  }", "}"];
+      },
+      run: function (v, T) {
+        var x = +v;
+        T.main(13, "main başlar.");
+        T.at(14, "println'in argümanı önce hesaplanır: \"sonuç: \" + f(" + x + "). println henüz çalışmadı; önce f çağrılır.");
+        T.call("f", "x = " + x, 2, "f'nin çerçevesi açılır (x = " + x + ").");
+        T.blk("try", 3, "try bloğuna girilir.");
+        T.out(4, "try: x = " + x, "\"try: x = " + x + "\" yazılır.");
+        if (x !== 0) {
+          T.at(5, "return 10 / " + x + ": dönüş değeri " + 10 / x + " hazırlanır. Ama metot hemen dönmez: önce finally çalışmalıdır.", { pend: 10 / x });
+          T.blk("finally", 9, "return bekletilir, finally çalışır.");
+          T.out(10, "finally", "\"finally\" yazılır.");
+          T.ret(12, 10 / x, "finally bitti; bekleyen return " + 10 / x + " şimdi tamamlanır, f'nin çerçevesi kalkar.");
+          T.out(14, "sonuç: " + 10 / x, "f(" + x + ") yerine " + 10 / x + " gelir; birleşen dizgi yazılır.");
+        } else {
+          T.thr("ArithmeticException", "/ by zero", 5, "10 / 0 → ArithmeticException. return hiç tamamlanmaz.");
+          T.ctch(6, "Aynı try'ın catch'i bu tipi yakalar; akış catch bloğuna geçer.");
+          T.out(7, "catch: / by zero", "\"catch: / by zero\" yazılır.");
+          T.at(8, "return -1 hazırlanır; yine önce finally çalışmalıdır.", { pend: -1 });
+          T.blk("finally", 9, "return bekletilir, finally çalışır.");
+          T.out(10, "finally", "\"finally\" yazılır.");
+          T.ret(12, -1, "finally bitti; bekleyen return -1 tamamlanır.");
+          T.out(14, "sonuç: -1", "f(0) yerine -1 gelir; birleşen dizgi yazılır.");
+        }
+        T.end(15, "Program normal sonlanır.");
+      },
+      guess: function (v) {
+        return v === "5" ? [["try: x = 5", "finally", "sonuç: 2"], ["try: x = 5", "sonuç: 2"], ["try: x = 5", "sonuç: 2", "finally"]]
+          : [["try: x = 0", "catch: / by zero", "finally", "sonuç: -1"], ["try: x = 0", "catch: / by zero", "sonuç: -1"], ["try: x = 0", "finally", "catch: / by zero", "sonuç: -1"]];
+      }
+    },
+    {
+      id: "catch", ad: "Hangi catch çalışır?", file: "HangiCatch.java", vcap: "s dizgisi · catch sırası", vars: ["\"2\" · alt sınıf önce", "\"4x2\" · alt sınıf önce", "\"7\" · alt sınıf önce", "\"4x2\" · üst sınıf önce"],
+      code: function (v) {
+        var s = v.split('"')[1], bad = v.indexOf("üst") >= 0;
+        var nfe = ["    } catch (NumberFormatException e) {", '      System.out.println("sayı değil: " + s);'];
+        var rte = ["    } catch (RuntimeException e) {", "      String ad = e.getClass().getSimpleName();", '      System.out.println("başka: " + ad);'];
+        return ["public class HangiCatch {", "  public static void main(String[] args) {", "    int[] dizi = new int[3];", '    String s = "' + s + '";', "    try {", "      int n = Integer.parseInt(s);", "      dizi[n] = 1;", '      System.out.println("yazıldı: " + n);'].concat(bad ? rte.concat(nfe) : nfe.concat(rte), ["    }", '    System.out.println("son");', "  }", "}"]);
+      },
+      run: function (v, T) {
+        var s = v.split('"')[1];
+        if (v.indexOf("üst") >= 0) {
+          T.cerr(["HangiCatch.java:12: error: exception NumberFormatException has already been caught", "1 error"], [12], "Derleme hatası: NumberFormatException, RuntimeException'ın alt sınıfıdır. İlk catch hepsini yakaladığından ikinci catch'e hiç ulaşılamaz. Alt sınıf önce yazılmalı.");
+          return;
+        }
+        T.main(2, "main başlar.");
+        T.at(3, "3 öğeli dizi: geçerli indisler 0, 1, 2.");
+        T.at(4, "s = \"" + s + "\".");
+        T.blk("try", 5, "try bloğuna girilir.");
+        if (s === "4x2") {
+          T.thr("NumberFormatException", 'For input string: "4x2"', 6, "parseInt sayı olmayan karakter görünce NumberFormatException fırlatır; n hiç atanmaz.");
+          T.ctch(9, "catch blokları yukarıdan aşağı denenir. İlki NumberFormatException: tip eşleşti.");
+          T.out(10, "sayı değil: 4x2", "\"sayı değil: 4x2\" yazılır. İkinci catch atlanır.");
+        } else {
+          T.at(6, "parseInt(\"" + s + "\") → n = " + s + ".");
+          if (s === "2") {
+            T.at(7, "dizi[2] = 1: geçerli indis.");
+            T.out(8, "yazıldı: 2", "\"yazıldı: 2\" yazılır.");
+            T.at(9, "try istisnasız bitti: hiçbir catch çalışmaz.");
+          } else {
+            T.thr("ArrayIndexOutOfBoundsException", "", 7, "dizi[7]: dizinin uzunluğu 3 → ArrayIndexOutOfBoundsException. Satır 8 atlanır.");
+            T.at(9, "İlk catch: NumberFormatException. Bu istisna o tipten değil → atlanır.");
+            T.ctch(11, "İkinci catch: RuntimeException. ArrayIndexOutOfBoundsException onun alt sınıfı → eşleşti.");
+            T.at(12, "ad = \"ArrayIndexOutOfBoundsException\" (sınıfın kısa adı).");
+            T.out(13, "başka: ArrayIndexOutOfBoundsException", "Satır yazılır.");
+          }
+        }
+        T.blk("", 15, "try-catch sonrasına geçilir.");
+        T.out(15, "son", "\"son\" yazılır.");
+        T.end(16, "Program normal sonlanır.");
+      },
+      guess: function (v) {
+        var C = "(derleme hatası: program çalışmaz)";
+        if (v.indexOf("üst") >= 0) return [[C], ["sayı değil: 4x2", "son"], ["başka: NumberFormatException", "son"]];
+        var s = v.split('"')[1];
+        if (s === "2") return [["yazıldı: 2", "son"], ["yazıldı: 2"], ["başka: ArrayIndexOutOfBoundsException", "son"]];
+        if (s === "4x2") return [["sayı değil: 4x2", "son"], ["başka: NumberFormatException", "son"], ["sayı değil: 4x2", "başka: NumberFormatException", "son"]];
+        return [["başka: ArrayIndexOutOfBoundsException", "son"], ["yazıldı: 7", "son"], ["sayı değil: 7", "son"]];
+      }
+    },
+    {
+      id: "yakalanmayan", ad: "Yakalanmayan istisna", file: "Yakalanmayan.java", vcap: "adet", vars: ["0", "2"],
+      code: function (v) {
+        return ["public class Yakalanmayan {", "  static int bol(int a, int b) {", "    return a / b;", "  }", "  static int ortalama(int toplam, int adet) {", "    try {", "      return bol(toplam, adet);", "    } finally {", '      System.out.println("ortalama: finally");', "    }", "  }", "  public static void main(String[] args) {", '    System.out.println("başla");', "    System.out.println(ortalama(10, " + v + "));", '    System.out.println("bitti");', "  }", "}"];
+      },
+      run: function (v, T) {
+        var a = +v;
+        T.main(12, "main başlar.");
+        T.out(13, "başla", "\"başla\" yazılır.");
+        T.at(14, "println'den önce argümanı hesaplanır: ortalama(10, " + a + ").");
+        T.call("ortalama", "toplam = 10, adet = " + a, 5, "ortalama'nın çerçevesi açılır.");
+        T.blk("try", 6, "try bloğuna girilir (catch yok, finally var).");
+        T.at(7, "bol(10, " + a + ") çağrılır; dönüş değeri beklenir.");
+        T.call("bol", "a = 10, b = " + a, 2, "bol en üstte. Yığında 3 çerçeve var.");
+        if (a === 0) {
+          T.thr("ArithmeticException", "/ by zero", 3, "10 / 0 → ArithmeticException.");
+          T.leave(3, "bol'da try yok: istisna bol'dan çıkar, çerçeve atılır.");
+          T.blk("finally", 8, "ortalama'daki try'ın catch'i yok; finally yine de çalışır.");
+          T.out(9, "ortalama: finally", "\"ortalama: finally\" yazılır.");
+          T.leave(9, "finally bitti, istisna yakalanmadı: ortalama'dan da çıkar.");
+          T.leave(14, "main'de de catch yok: istisna main'den de çıkar. \"bitti\" hiç yazılmaz.");
+          T.uncaught(['Exception in thread "main" java.lang.ArithmeticException: / by zero', TRACE("Yakalanmayan.bol(Yakalanmayan.java:3)"), TRACE("Yakalanmayan.ortalama(Yakalanmayan.java:7)"), TRACE("Yakalanmayan.main(Yakalanmayan.java:14)")],
+            "JVM istisnayı yakalar, izleme listesini standart hata akışına yazar ve programı sonlandırır (çıkış kodu 1). Liste istisnanın geçtiği çerçeveleri içten dışa sıralar.");
+        } else {
+          T.ret(3, 10 / a, "10 / " + a + " = " + 10 / a + " döner; bol'un çerçevesi kalkar.");
+          T.at(7, "return " + 10 / a + " hazır; ama önce finally çalışır.", { pend: 10 / a });
+          T.blk("finally", 8, "finally çalışır.");
+          T.out(9, "ortalama: finally", "\"ortalama: finally\" yazılır.");
+          T.ret(11, 10 / a, "Bekleyen return " + 10 / a + " tamamlanır.");
+          T.out(14, String(10 / a), "println " + 10 / a + " yazar.");
+          T.out(15, "bitti", "\"bitti\" yazılır.");
+          T.end(16, "Program normal sonlanır.");
+        }
+      },
+      guess: function (v) {
+        var X = 'Exception in thread "main" java.lang.ArithmeticException: / by zero';
+        return v === "0" ? [["başla", "ortalama: finally", "!" + X], ["başla", "!" + X], ["başla", "ortalama: finally", "!" + X, "bitti"]]
+          : [["başla", "ortalama: finally", "5", "bitti"], ["başla", "5", "ortalama: finally", "bitti"], ["başla", "5", "bitti"]];
+      }
+    },
+    {
+      id: "checked", ad: "Kontrol edilen istisna", file: "Kontrollu.java", vcap: "Sürüm", vars: ["throws + try/catch", "oku'da throws yok", "main'de try/catch yok", "main de throws bildirir"],
+      code: function (v) {
+        var i = this.vars.indexOf(v);
+        var head = ["import java.io.IOException;", "", "public class Kontrollu {", "  static String oku(String ad)" + (i === 1 ? "" : " throws IOException") + " {", '    if (!ad.endsWith(".txt"))', '      throw new IOException("desteklenmiyor: " + ad);', '    return ad + " okundu";', "  }"];
+        if (i <= 1) return head.concat(["  public static void main(String[] args) {", "    try {", '      System.out.println(oku("not.txt"));', '      System.out.println(oku("resim.png"));', "    } catch (IOException e) {", '      System.out.println("hata: " + e.getMessage());', "    }", '    System.out.println("son");', "  }", "}"]);
+        if (i === 2) return head.concat(["  public static void main(String[] args) {", '    System.out.println(oku("not.txt"));', '    System.out.println(oku("resim.png"));', '    System.out.println("son");', "  }", "}"]);
+        return head.concat(["  public static void main(String[] args)", "      throws IOException {", '    System.out.println(oku("not.txt"));', '    System.out.println(oku("resim.png"));', '    System.out.println("son");', "  }", "}"]);
+      },
+      run: function (v, T) {
+        var i = this.vars.indexOf(v);
+        if (i === 1) {
+          T.cerr(["Kontrollu.java:6: error: unreported exception IOException; must be caught or declared to be thrown", "Kontrollu.java:13: error: exception IOException is never thrown in body of corresponding try statement", "2 errors"], [6, 13],
+            "Derleme hatası: IOException kontrol edilen bir istisnadır. oku onu fırlatıyor ama ne yakalıyor ne de throws ile bildiriyor. Bildirilmediği için main'deki catch de geçersiz sayılır.");
+          return;
+        }
+        if (i === 2) {
+          T.cerr(["Kontrollu.java:10: error: unreported exception IOException; must be caught or declared to be thrown", "Kontrollu.java:11: error: unreported exception IOException; must be caught or declared to be thrown", "2 errors"], [10, 11],
+            "Derleme hatası: oku throws IOException diyor; onu çağıran main ya yakalamalı (try/catch) ya da kendisi throws ile bildirmeli.");
+          return;
+        }
+        var L = i === 0 ? { m: 9, a: 11, b: 12 } : { m: 9, a: 11, b: 12 };
+        T.main(L.m, i === 0 ? "Derlendi: oku istisnayı throws ile bildiriyor, main çağrıları try/catch içine almış." : "Derlendi: main de throws IOException diyerek sorumluluğu kendi çağıranına (JVM'e) bırakıyor.");
+        if (i === 0) T.blk("try", 10, "try bloğuna girilir.");
+        T.at(L.a, "oku(\"not.txt\") çağrılır.");
+        T.call("oku", 'ad = "not.txt"', 4, "oku'nun çerçevesi açılır.");
+        T.at(5, "\"not.txt\" .txt ile bitiyor: koşul false.");
+        T.ret(7, '"not.txt okundu"', "Dizgi döner, çerçeve kalkar.");
+        T.out(L.a, "not.txt okundu", "\"not.txt okundu\" yazılır.");
+        T.at(L.b, "oku(\"resim.png\") çağrılır.");
+        T.call("oku", 'ad = "resim.png"', 4, "oku yeniden çağrıldı (yeni çerçeve).");
+        T.at(5, "\"resim.png\" .txt ile bitmiyor: koşul true.");
+        T.thr("IOException", "desteklenmiyor: resim.png", 6, "IOException fırlatılır. Bu bir kontrol edilen (checked) istisnadır.");
+        T.leave(6, "oku'da catch yok (throws ile bildirdi): istisna çağırana geçer.");
+        if (i === 0) {
+          T.ctch(13, "main'deki catch IOException'ı yakalar. Satır 12'nin println'i hiç çalışmadı.");
+          T.out(14, "hata: desteklenmiyor: resim.png", "İleti yazılır.");
+          T.blk("", 16, "try-catch sonrasına geçilir.");
+          T.out(16, "son", "\"son\" yazılır.");
+          T.end(17, "Program normal sonlanır.");
+        } else {
+          T.leave(L.b, "main yakalamıyor, yalnızca bildiriyor: istisna main'den de çıkar. \"son\" yazılmaz.");
+          T.uncaught(['Exception in thread "main" java.io.IOException: desteklenmiyor: resim.png', TRACE("Kontrollu.oku(Kontrollu.java:6)"), TRACE("Kontrollu.main(Kontrollu.java:12)")], "JVM izleme listesini standart hata akışına yazar, program 1 çıkış koduyla biter.");
+        }
+      },
+      guess: function (v) {
+        var i = this.vars.indexOf(v), C = "(derleme hatası: program çalışmaz)", X = 'Exception in thread "main" java.io.IOException: desteklenmiyor: resim.png', ok = ["not.txt okundu", "hata: desteklenmiyor: resim.png", "son"];
+        if (i === 0) return [ok, ["hata: desteklenmiyor: resim.png", "son"], ["not.txt okundu", "hata: desteklenmiyor: resim.png"]];
+        if (i === 3) return [["not.txt okundu", "!" + X], [C], ["not.txt okundu", "!" + X, "son"]];
+        return [[C], ok, ["not.txt okundu", "!" + X]];
+      }
+    },
+    {
+      id: "twr", ad: "try-with-resources", file: "Kaynaklar.java", vcap: "Gövde", vars: ["istisna fırlatır", "normal biter"],
+      code: function (v) {
+        return ["public class Kaynaklar {", "  static class Kaynak implements AutoCloseable {", "    String ad;", "    Kaynak(String ad) {", "      this.ad = ad;", '      System.out.println(ad + " açıldı");', "    }", "    public void close() {", '      System.out.println(ad + " kapandı");', "    }", "  }", "  public static void main(String[] args) {", '    try (Kaynak a = new Kaynak("A");', '         Kaynak b = new Kaynak("B")) {', '      System.out.println("gövde");', v === "normal biter" ? '      System.out.println("iş tamam");' : '      throw new IllegalStateException("hata");', "    } catch (IllegalStateException e) {", '      System.out.println("catch: " + e.getMessage());', "    } finally {", '      System.out.println("finally");', "    }", "  }", "}"];
+      },
+      run: function (v, T) {
+        var th = v !== "normal biter";
+        T.main(12, "main başlar.");
+        T.at(13, "Kaynaklar soldan sağa açılır: önce a.");
+        T.call("Kaynak(\"A\")", "yapıcı", 4, "Yapıcı çalışır.");
+        T.out(6, "A açıldı", "\"A açıldı\" yazılır.");
+        T.ret(7, undefined, "a hazır.");
+        T.at(14, "Sonra b.");
+        T.call("Kaynak(\"B\")", "yapıcı", 4, "Yapıcı çalışır.");
+        T.out(6, "B açıldı", "\"B açıldı\" yazılır.");
+        T.ret(7, undefined, "b hazır. İki kaynak açık.");
+        T.blk("try", 15, "Gövdeye girilir.");
+        T.out(15, "gövde", "\"gövde\" yazılır.");
+        if (th) T.thr("IllegalStateException", "hata", 16, "Gövde bir istisna fırlatır.");
+        else T.out(16, "iş tamam", "\"iş tamam\" yazılır; gövde normal biter.");
+        T.at(14, (th ? "catch'e geçmeden ÖNCE" : "Gövdeden çıkarken") + " kaynaklar açılışın TERSİ sırasıyla kapatılır: önce b.close().");
+        T.call("b.close()", 'ad = "B"', 8, "b kapatılıyor.");
+        T.out(9, "B kapandı", "\"B kapandı\" yazılır.");
+        T.ret(10, undefined, "Sonra a.close().");
+        T.call("a.close()", 'ad = "A"', 8, "a kapatılıyor.");
+        T.out(9, "A kapandı", "\"A kapandı\" yazılır.");
+        T.ret(10, undefined, "İki kaynak da kapandı.");
+        if (th) {
+          T.ctch(17, "Kaynaklar kapandıktan sonra istisna catch'e ulaşır.");
+          T.out(18, "catch: hata", "\"catch: hata\" yazılır.");
+        } else T.at(17, "İstisna yok: catch atlanır.");
+        T.blk("finally", 19, "En son finally çalışır.");
+        T.out(20, "finally", "\"finally\" yazılır.");
+        T.end(22, "Program normal sonlanır.");
+      },
+      guess: function (v) {
+        var a = ["A açıldı", "B açıldı", "gövde"];
+        return v !== "normal biter" ? [a.concat(["B kapandı", "A kapandı", "catch: hata", "finally"]), a.concat(["A kapandı", "B kapandı", "catch: hata", "finally"]), a.concat(["catch: hata", "B kapandı", "A kapandı", "finally"])]
+          : [a.concat(["iş tamam", "B kapandı", "A kapandı", "finally"]), a.concat(["iş tamam", "A kapandı", "B kapandı", "finally"]), a.concat(["iş tamam", "finally", "B kapandı", "A kapandı"])];
+      }
+    }
+  ];
+
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector(".jv-ex");
+  var S = null, V = null, R = null, k = 0, timer = null, ok = 0, all = 0, G = null, gSel = 0, lastK = -1;
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  SCEN.forEach(function (s, i) { var o = document.createElement("option"); o.value = i; o.textContent = s.ad; E("exScen").appendChild(o); });
+
+  function pickScen() {
+    S = SCEN[E("exScen").value];
+    E("exVarCap").textContent = S.vcap;
+    E("exVar").innerHTML = S.vars.map(function (v, i) { return '<option value="' + i + '">' + esc(v) + "</option>"; }).join("");
+    E("exFile").textContent = S.file;
+    compute();
+  }
+  function compute() {
+    stop();
+    V = S.vars[E("exVar").value];
+    var T = Tracer(); S.run(V, T);
+    R = { ev: T.events, code: S.code(V) };
+    E("exCode").innerHTML = R.code.map(function (l) { return "<li>" + (l ? esc(l) : " ") + "</li>"; }).join("");
+    k = 0; lastK = -1;
+    setupGuess();
+    draw();
+  }
+  function setupGuess() {
+    G = null;
+    if (!E("exGuess").checked) return;
+    var c = S.guess(V), order = [0, 1, 2].sort(function () { return Math.random() - 0.5; });
+    G = { opts: order.map(function (i) { return c[i]; }), right: order.indexOf(0), done: false };
+    gSel = 0;
+  }
+  function outHtml(lines) {
+    var max = 8, sh = lines.slice(-max);
+    return sh.map(function (l) { return l.e ? '<span class="e">' + esc(l.t) + "</span>" : esc(l.t); }).join("\n");
+  }
+  function draw() {
+    var e = R.ev[k], gq = G && !G.done;
+    var errs = e.compile ? e.line : [];
+    [].forEach.call(E("exCode").children, function (li, i) {
+      var n = i + 1;
+      li.classList.toggle("is-cur", !gq && n === e.line && !e.hit);
+      li.classList.toggle("is-exc", !gq && ((n === e.line && e.hit) || errs.indexOf(n) >= 0));
+    });
+    var fr = e.frames, n = fr.length, h = "";
+    fr.forEach(function (f, i) {
+      var t = i === n - 1, cls = "frame" + (t ? " is-top" : "") + (t && e.hit ? " is-hit" : "") + (t && e.dying ? " is-dying" : "") + (t && "ret" in e ? " is-ret" : "");
+      var tail = t && "ret" in e ? (e.ret === undefined ? "döner" : "return " + e.ret) : t && "pend" in e ? "bekleyen: " + e.pend : f.info;
+      h += '<div class="' + cls + '"><b>' + esc(f.n) + '</b><div class="meta"><span>satır ' + f.ln + "</span>" + (f.b ? '<span class="blk b-' + f.b + '">' + f.b + "</span>" : "") + "</div>" + (tail ? '<div class="meta"><span>' + esc(tail) + "</span></div>" : "") + "</div>";
+    });
+    E("exStack").innerHTML = gq ? '<p class="none">tahmin bekleniyor</p>' : (h || '<p class="none">' + (e.compile ? "program derlenmedi" : "yığın boş") + "</p>");
+    E("exStCap").textContent = "Çağrı yığını · " + (gq ? 0 : n);
+    var box = E("exBox");
+    box.className = "exbox";
+    if (!gq && e.ex) { box.className += " is-fly"; box.textContent = "⚡ " + e.ex.t + (e.ex.m ? ": " + e.ex.m : ""); }
+    else if (!gq && e.caught) { box.className += " is-caught"; box.textContent = "✓ yakalandı: " + e.caught.t; }
+    else box.textContent = "uçuşta istisna yok";
+    if (gq) {
+      E("exWhy").innerHTML = "<b>Tahmin edin:</b> Bu program ne yazar? Çıktı adayları A, B ve C sekmelerinde.";
+      E("exG").hidden = false; E("exPick").hidden = false;
+      [].forEach.call(E("exG").children, function (b, i) { b.setAttribute("aria-pressed", String(i === gSel)); });
+      E("exOutCap").textContent = "Aday";
+      E("exOut").innerHTML = G.opts[gSel].map(function (l) { return l[0] === "!" ? '<span class="e">' + esc(l.slice(1)) + "</span>" : l[0] === "(" ? '<span class="muted">' + esc(l) + "</span>" : esc(l); }).join("\n");
+    } else {
+      E("exWhy").innerHTML = (G && G.fb && k === 0 ? G.fb : "") + esc(e.why);
+      E("exG").hidden = true; E("exPick").hidden = true;
+      E("exOutCap").textContent = e.compile ? "Derleyici (javac)" : "Çıktı (konsol)";
+      E("exOut").innerHTML = outHtml(e.out);
+    }
+    E("exNo").textContent = "Adım " + (k + 1) + " / " + R.ev.length;
+    lastK = k;
+    buttons();
+  }
+  function buttons() {
+    var gq = G && !G.done;
+    E("exBack").disabled = k === 0 || gq;
+    E("exReset").disabled = k === 0 && !timer;
+    E("exStep").disabled = gq || k >= R.ev.length - 1;
+    E("exPlay").disabled = gq || (k >= R.ev.length - 1 && !timer);
+    E("exPlay").textContent = timer ? "Duraklat" : "Oynat";
+  }
+  function go(d) { k = Math.max(0, Math.min(R.ev.length - 1, k + d)); draw(); }
+  function stop() { clearInterval(timer); timer = null; }
+  function delay() { return [1900, 1300, 900, 550, 250][E("exSpeed").value - 1]; }
+  function play() {
+    if (timer) { stop(); buttons(); return; }
+    if (k >= R.ev.length - 1) k = 0;
+    timer = setInterval(function () { if (k >= R.ev.length - 1) { stop(); buttons(); return; } go(1); }, delay());
+    buttons();
+  }
+
+  E("exG").addEventListener("click", function (ev) { var b = ev.target.closest("button[data-g]"); if (!b) return; gSel = +b.getAttribute("data-g"); draw(); });
+  E("exPick").addEventListener("click", function () {
+    if (!G || G.done) return;
+    var good = gSel === G.right;
+    all++; if (good) ok++;
+    E("exOk").textContent = ok; E("exAll").textContent = all;
+    G.done = true;
+    G.fb = good ? '<b class="agt-oyun__good">Doğru!</b> ' : '<b class="agt-oyun__bad">Yanlış.</b> Doğrusu ' + "ABC"[G.right] + ". ";
+    draw();
+    E("exStep").focus();
+  });
+  E("exScen").addEventListener("change", pickScen);
+  E("exVar").addEventListener("change", compute);
+  E("exStep").addEventListener("click", function () { stop(); go(1); });
+  E("exBack").addEventListener("click", function () { stop(); go(-1); });
+  E("exReset").addEventListener("click", function () { stop(); k = 0; draw(); });
+  E("exPlay").addEventListener("click", play);
+  E("exSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("exGuess").addEventListener("change", function () { compute(); });
+  root.addEventListener("keydown", function (ev) {
+    if (/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName)) return;
+    if (G && !G.done) return;
+    if (ev.key === "ArrowRight") { stop(); go(1); ev.preventDefault(); }
+    else if (ev.key === "ArrowLeft") { stop(); go(-1); ev.preventDefault(); }
+  });
+
+  pickScen();
+})();
+</script>
+<script src="deck/oyun.js"></script>

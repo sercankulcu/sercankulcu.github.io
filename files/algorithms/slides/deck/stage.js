@@ -3,6 +3,8 @@
 (function () {
   var stages = Array.prototype.slice.call(document.querySelectorAll(".algo-stage--stage"));
   var W = 800, H = 600;
+  /* kaydırma çubuğunun yeri sabit: çubuk açılıp kapanınca genişlik ve ölçek salınmasın */
+  if (stages.length) document.documentElement.style.scrollbarGutter = "stable";
 
   stages.forEach(function (stage) {
     var frame = document.createElement("div");

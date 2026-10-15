@@ -1,0 +1,460 @@
+---
+layout: without-sidebar
+title: "Akış Boru Hattı"
+permalink: /files/java/slides/Chapter_07_Stream-Pipeline.html
+excerpt: "Java Stream API boru hattını öğe öğe izler: kaynak, filter, map, sorted, limit ve son işlem (collect, forEach, findFirst); tembel değerlendirme, sorted'ın bütün öğeleri beklemesi ve limit ile kısa devre."
+---
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.jv-sp, .jv-sp-dlg { --ds-accent:#a61b1b; --ds-link:var(--global-link-color, #2563eb); }
+html[data-theme="dark"] .jv-sp, html[data-theme="dark"] .jv-sp-dlg { --ds-accent:#f07a7a; }
+.jv-sp .sp-grid { display:grid; grid-template-columns:196px minmax(0,1fr); gap:8px; height:100%; }
+.jv-sp .card { min-width:0; min-height:0; padding:7px 9px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.jv-sp .side { display:flex; flex-direction:column; gap:4px; }
+.jv-sp .row2 { display:grid; grid-template-columns:1fr; gap:4px; }
+.jv-sp .cap { display:block; margin:0 0 1px; color:var(--ds-muted); font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
+.jv-sp select, .jv-sp input[type="text"], .jv-sp input[type="number"] { width:100%; min-height:27px !important; padding:0 6px !important; font-size:13px !important; }
+.jv-sp input.is-bad { border-color:var(--ds-bad) !important; }
+.jv-sp .op { display:grid; grid-template-columns:76px minmax(0,1fr); gap:4px; align-items:center; }
+.jv-sp .op label { display:flex; align-items:center; gap:4px; font:700 12.5px ui-monospace, Consolas, monospace; cursor:pointer; }
+.jv-sp .btns { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:2px; }
+.jv-sp .btns button { min-height:29px; padding:0 4px; font-size:13px; }
+.jv-sp .speed { display:flex; align-items:center; gap:6px; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.jv-sp .speed input { flex:1; min-width:0; }
+.jv-sp .check { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; cursor:pointer; }
+.jv-sp .score { display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; }
+.jv-sp .score div { padding:2px; border-radius:9px; background:var(--ds-surface-strong); text-align:center; color:var(--ds-muted); font-size:12px; font-weight:700; }
+.jv-sp .score b { display:block; color:var(--ds-text); font-size:15px; }
+.jv-sp .err { margin:0; min-height:16px; color:var(--ds-bad); font-size:12px; font-weight:700; }
+.jv-sp .main { display:grid; grid-template-rows:auto minmax(0,1fr) auto auto; gap:6px; min-width:0; min-height:0; }
+.jv-sp .pane { min-width:0; min-height:0; padding:3px 8px 5px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); overflow:hidden; }
+.jv-sp .code { margin:0; padding:0; list-style:none; counter-reset:ln; font:12px/1.4 ui-monospace, Consolas, monospace; }
+.jv-sp .code li { margin:0; padding:0 4px 0 0; white-space:pre; counter-increment:ln; }
+.jv-sp .code li::before { content:counter(ln); display:inline-block; width:14px; margin-right:6px; color:var(--ds-muted); font-size:12px; text-align:right; }
+.jv-sp .code li.is-cur { background:var(--ds-hot); box-shadow:inset 3px 0 0 var(--ds-accent); }
+.jv-sp .lane { display:flex; align-items:stretch; gap:0; height:100%; min-height:0; }
+.jv-sp .arrow { flex:none; align-self:center; width:12px; color:var(--ds-muted); font-weight:800; text-align:center; }
+.jv-sp .box { flex:1; display:flex; flex-direction:column; min-width:0; border:1.5px solid var(--ds-border); border-radius:9px; background:var(--ds-bg); overflow:hidden; }
+.jv-sp .box .bh { padding:1px 5px; border-bottom:1.5px solid var(--ds-border); background:var(--ds-surface-strong); text-align:center; }
+.jv-sp .box .bh b { display:block; font:700 12.5px ui-monospace, Consolas, monospace; }
+.jv-sp .box .bh small { display:block; color:var(--ds-muted); font:12px ui-monospace, Consolas, monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.jv-sp .box.is-act { border-color:var(--ds-accent); box-shadow:0 0 0 2px color-mix(in srgb, var(--ds-accent) 22%, transparent); }
+.jv-sp .box.is-act .bh { background:var(--ds-hot); }
+.jv-sp .box.is-term .bh { background:var(--ds-node); }
+.jv-sp .bb { flex:1; display:flex; flex-direction:column; align-items:center; gap:1px; padding:3px 2px; min-height:0; font-size:12px; text-align:center; }
+.jv-sp .chip { display:inline-block; min-width:30px; padding:0 4px; border:1.5px solid var(--ds-border); border-radius:999px; background:var(--ds-surface); font:700 12px/1.2 ui-monospace, Consolas, monospace; text-align:center; }
+.jv-sp .chip.c { border-color:var(--ds-accent); background:var(--ds-hot); }
+.jv-sp .chip.d { opacity:.4; }
+.jv-sp .chip.n { border-style:dashed; color:var(--ds-muted); }
+.jv-sp .chip.ok { border-color:var(--ds-good); color:var(--ds-good); }
+.jv-sp .chip.no { border-color:var(--ds-bad); color:var(--ds-bad); text-decoration:line-through; }
+.jv-sp .big { font:700 15px ui-monospace, Consolas, monospace; }
+.jv-sp .mut { color:var(--ds-muted); font-size:12px; line-height:1.3; }
+.jv-sp .why { margin:0; min-height:48px; padding:4px 10px; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:13px; line-height:1.36; }
+.jv-sp .qbtns { display:flex; flex-wrap:wrap; gap:5px; margin-top:3px; }
+.jv-sp .qbtns button { min-height:25px; padding:0 10px; font:600 12.5px ui-monospace, Consolas, monospace; }
+.jv-sp .bottom { display:grid; grid-template-columns:minmax(0,1fr) 200px; gap:6px; }
+.jv-sp .log, .jv-sp .out { margin:0; height:72px; font:12px/1.45 ui-monospace, Consolas, monospace; white-space:pre; overflow:hidden; }
+.jv-sp .log span { display:block; color:var(--ds-muted); overflow:hidden; text-overflow:ellipsis; }
+.jv-sp .out { white-space:pre-wrap; overflow-wrap:anywhere; }
+.jv-sp .log span:last-child { color:var(--ds-text); font-weight:700; }
+</style>
+
+<div class="jv-sp agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 7 · Simülatör</p><h1>Akış Boru Hattı (<span lang="en">Stream API</span>)</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="sp-help" aria-label="Açıklama ve kullanım">?</button>
+    <a class="agt-oyun__back" href="Bolum_07_Giris_Cikis.html">← Bölüm 7</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="sp-grid">
+      <aside class="card side">
+        <div>
+          <label class="cap" for="spPre">Hazır örnek</label>
+          <select id="spPre"></select>
+        </div>
+        <div>
+          <label class="cap" for="spSrc">Kaynak liste</label>
+          <input type="text" id="spSrc" spellcheck="false" autocomplete="off" aria-label="Kaynak liste: virgülle ayrılmış 1 ile 8 arası tam sayı (0–99)">
+        </div>
+        <div class="op"><label><input type="checkbox" id="spF"> filter</label><select id="spFv" aria-label="filter koşulu"></select></div>
+        <div class="op"><label><input type="checkbox" id="spM"> map</label><select id="spMv" aria-label="map dönüşümü"></select></div>
+        <div class="op"><label><input type="checkbox" id="spS"> sorted</label><select id="spSv" aria-label="Sıralama yönü"><option value="a">artan</option><option value="d">azalan</option></select></div>
+        <div class="op"><label><input type="checkbox" id="spL"> limit</label><input type="number" id="spLv" min="1" max="8" aria-label="limit değeri"></div>
+        <div><label class="cap" for="spT">Son işlem</label><select id="spT"></select></div>
+        <div class="btns">
+          <button type="button" id="spBack" aria-label="Bir adım geri">◀ Geri</button>
+          <button type="button" id="spStep" class="is-primary" aria-label="Bir adım ileri">Adım ▶</button>
+          <button type="button" id="spPlay" aria-label="Oynat veya duraklat">Oynat</button>
+          <button type="button" id="spReset" aria-label="Başa dön">Sıfırla</button>
+        </div>
+        <div class="row2"><label class="speed">Hız <input type="range" id="spSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı"></label>
+        <label class="check"><input type="checkbox" id="spQuiz"> Kendini dene</label></div>
+        <div class="score" aria-live="polite">
+          <div>Adım<b id="spNo">1</b></div>
+          <div>Doğru<b id="spOk">0</b></div>
+          <div>Soru<b id="spAll">0</b></div>
+        </div>
+      </aside>
+
+      <section class="main">
+        <div class="pane"><span class="cap">Java kodu</span><ol class="code" id="spCode" aria-label="Java kodu"></ol></div>
+        <div class="lane" id="spLane" aria-live="polite"></div>
+        <div class="why" id="spWhy" aria-live="polite"></div>
+        <div class="bottom">
+          <div class="pane"><span class="cap">Olaylar (son 4)</span><div class="log" id="spLog"></div></div>
+          <div class="pane"><span class="cap">Çıktı</span><pre class="out" id="spOut" aria-label="Program çıktısı"></pre></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog jv-sp-dlg" id="sp-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Akış Boru Hattı (Stream API)</h2>
+    <p><b>Amaç:</b> Bir <code>Stream</code> boru hattının öğeleri nasıl işlediğini görmek. Boru hattı bir kaynaktan (<code>liste.stream()</code>), sıfır ya da daha fazla <b>ara işlemden</b> (<code>filter</code>, <code>map</code>, <code>sorted</code>, <code>limit</code>) ve tek bir <b>son işlemden</b> (<code>collect</code>, <code>forEach</code>, <code>findFirst</code>) oluşur.</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li>Bir hazır örnek seçin ya da kaynak listeyi (en çok 8 sayı, 0–99), ara işlemleri ve son işlemi kendiniz belirleyin.</li>
+      <li><b>Adım ▶</b> / <b>◀ Geri</b> (klavyede → / ←), <b>Oynat</b>, <b>Sıfırla</b>. Ortadaki şeritte her kutu bir işlemdir; o anda çalışan kutu vurgulanır. Altta son dört olay ve programın çıktısı görünür.</li>
+      <li><b>Kendini dene</b> açıkken bazı adımlarda (ilk <code>map</code> sonucu, kaynağın durup durmayacağı, sonuç) tahmin edersiniz.</li>
+    </ol>
+    <h3>Gözlenecekler</h3>
+    <ul>
+      <li><b>Tembel değerlendirme:</b> ara işlemler yalnızca boru hattını tarif eder. Son işlem çağrılmadan hiçbir öğe işlenmez (son işlem: <i>yok</i>).</li>
+      <li><b>Öğe öğe ilerleme:</b> öğeler önce bütünüyle filtrelenip sonra bütünüyle dönüştürülmez; her öğe kaynaktan çekilir ve boru hattında tek başına sonuna kadar (ya da elenene kadar) ilerler. <code>forEach</code> ile çıktının öğe öğe oluştuğu görülür.</li>
+      <li><b>sorted</b> durum tutan bir işlemdir: bütün öğeler gelmeden sıralayamaz, bu yüzden öğeleri biriktirir ve kaynak bitince sıralı olarak aşağı gönderir.</li>
+      <li><b>Kısa devre:</b> <code>limit(k)</code> k öğe geçtikten, <code>findFirst()</code> ilk öğeyi bulduktan sonra kaynaktan yeni öğe çekilmez. Araya <code>sorted</code> girerse kaynak yine de sonuna kadar okunur.</li>
+    </ul>
+    <p>Olayların sırası ve çıktılar, aynı boru hattının lambdalarına ve <code>peek</code> çağrılarına kayıt eklenerek <code>javac --release 8</code> + <code>java</code> ile doğrulanmıştır.</p>
+    <p>İlgili sunum: <a href="Bolum_07_Giris_Cikis.html">Bölüm 7 · Giriş Çıkış</a> · <a href="Bolum_07_Giris_Cikis.html#akis-api-si-java-util-stream">Akış API'si</a>.</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  "use strict";
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /*CORE-BEGIN*/
+  var Core = (function () {
+    var FILT = { gt6: ["n -> n > 6", function (n) { return n > 6; }, "n > 6"], gt10: ["n -> n > 10", function (n) { return n > 10; }, "n > 10"],
+      lt10: ["n -> n < 10", function (n) { return n < 10; }, "n < 10"], even: ["n -> n % 2 == 0", function (n) { return n % 2 === 0; }, "n % 2 == 0"],
+      odd: ["n -> n % 2 == 1", function (n) { return n % 2 === 1; }, "n % 2 == 1"] };
+    var MAPS = { x2: ["n -> n * 2", function (n) { return n * 2; }, "n * 2"], sq: ["n -> n * n", function (n) { return n * n; }, "n * n"],
+      p1: ["n -> n + 1", function (n) { return n + 1; }, "n + 1"], m10: ["n -> n % 10", function (n) { return n % 10; }, "n % 10"] };
+    var TERMS = { collect: "collect(Collectors.toList())", forEach: "forEach(System.out::println)", findFirst: "findFirst()", none: "yok (tembel)" };
+    function list(a) { return "[" + a.join(", ") + "]"; }
+    /* c = {src:[..], f:key|null, m:key|null, s:'a'|'d'|null, l:k|null, t:'collect'|'forEach'|'findFirst'|'none'} */
+    function code(c) {
+      var L = [], ln = {};
+      L.push("List<Integer> liste = Arrays.asList(" + c.src.join(", ") + ");");
+      var head = c.t === "collect" ? "List<Integer> sonuc = liste.stream()" : c.t === "findFirst" ? "Optional<Integer> ilk = liste.stream()" : c.t === "none" ? "Stream<Integer> akis = liste.stream()" : "liste.stream()";
+      ln.src = L.length; L.push(head);
+      if (c.f) { ln.filter = L.length; L.push("        .filter(" + FILT[c.f][0] + ")"); }
+      if (c.m) { ln.map = L.length; L.push("        .map(" + MAPS[c.m][0] + ")"); }
+      if (c.s) { ln.sorted = L.length; L.push("        .sorted(" + (c.s === "d" ? "Comparator.reverseOrder()" : "") + ")"); }
+      if (c.l) { ln.limit = L.length; L.push("        .limit(" + c.l + ")"); }
+      if (c.t !== "none") { ln.term = L.length; L.push("        ." + TERMS[c.t] + ";"); }
+      else L[L.length - 1] += ";";
+      if (c.t === "collect") { ln.print = L.length; L.push("System.out.println(sonuc);"); }
+      else if (c.t === "findFirst") { ln.print = L.length; L.push("System.out.println(ilk);"); }
+      else if (c.t === "none") { ln.print = L.length; L.push("// son işlem yok"); }
+      return { lines: L, ln: ln };
+    }
+    function Q(text, right, alts) {
+      var o = [String(right)];
+      alts.forEach(function (a) { a = String(a); if (o.indexOf(a) < 0 && o.length < 4) o.push(a); });
+      return { text: text, opts: o, ans: 0 };
+    }
+    /* expected result of the whole pipeline (computed eagerly, for checking and quiz options) */
+    function eager(c, opt) {
+      opt = opt || {};
+      var a = c.src.slice();
+      if (c.f) a = a.filter(FILT[c.f][1]);
+      if (c.m) a = a.map(MAPS[c.m][1]);
+      if (c.s && !opt.noSort) a.sort(function (x, y) { return c.s === "d" ? y - x : x - y; });
+      if (c.l && !opt.noLimit) a = a.slice(0, c.l);
+      return a;
+    }
+    function run(c) {
+      var C = code(c), ln = C.ln, ev = [], st = {
+        src: c.src.map(function (v) { return { v: v, s: "w" }; }), act: null, cur: {}, buf: [], emit: -1, lc: 0, res: [], printed: [], found: null, log: [], out: "", ended: false, cancel: false, fp: 0, fn: 0
+      }, tok = [], qMap = false;
+      function snap(line, act, why, q) {
+        st.act = act;
+        ev.push({ line: line, act: act, why: why, q: q || null, st: JSON.parse(JSON.stringify(st)) });
+      }
+      function log(s) { st.log.push(s); }
+      snap(ln.src, null, c.t === "none"
+        ? "Kaynak ve ara işlemler tanımlandı. Ara işlemler yalnızca boru hattını tarif eder; son işlem olmadığı için hiçbir öğe işlenmez (tembel değerlendirme)."
+        : "liste.stream() bir akış oluşturur; ara işlemler bu satırda yalnızca boru hattını tarif eder. Öğeler, son işlem " + c.t + " çalışınca tek tek akmaya başlar.");
+      if (c.t === "none") {
+        st.ended = true; log("hiçbir öğe işlenmedi");
+        snap(ln.print, null, "Program biter: filter ve map'e verilen lambdalar bir kez bile çağrılmadı. Bir akışı çalıştıran, son işlemdir.");
+        return { ev: ev, tok: tok, out: "", code: C };
+      }
+      function cancelled() { return (c.l && st.lc >= c.l) || (c.t === "findFirst" && st.found !== null); }
+      function down(v, from) {
+        if (c.l) {
+          st.lc++; st.cur.limit = v; tok.push("L:" + v); log("limit " + st.lc + "/" + c.l + " → " + v);
+          snap(ln.limit, "limit", v + " limit'ten geçer (" + st.lc + ". öğe / en çok " + c.l + ")." + (st.lc >= c.l ? " Sınıra ulaşıldı: limit bundan sonra yukarıya \"dur\" der." : ""));
+        }
+        st.cur.term = v;
+        if (c.t === "collect") {
+          st.res.push(v); log("collect ← " + v);
+          snap(ln.term, "term", v + " sonuç listesine eklenir: " + list(st.res) + ".");
+        } else if (c.t === "forEach") {
+          st.printed.push(v); st.out += v + "\n"; log("forEach → println(" + v + ")");
+          snap(ln.term, "term", v + " hemen yazdırılır. Çıktı, öğeler boru hattının sonuna ulaştıkça öğe öğe oluşur.");
+        } else {
+          st.found = v; log("findFirst ← " + v);
+          snap(ln.term, "term", "findFirst ilk öğeyi buldu: " + v + ". Bu bir kısa devre son işlemidir; başka öğeye gerek yok.");
+        }
+        void from;
+      }
+      for (var i = 0; i < st.src.length; i++) {
+        if (!c.s && cancelled()) {
+          for (var j = i; j < st.src.length; j++) st.src[j].s = "n";
+          log("kaynak durdu: " + (st.src.length - i) + " öğe çekilmedi");
+          var nx = st.src[i].v;
+          snap(ln.src, "src", (c.t === "findFirst" && !c.l ? "findFirst sonucu buldu" : "limit doldu") + ": kaynaktan yeni öğe çekilmez. " + nx + (st.src.length - i > 1 ? " ve sonrakiler" : "") + " hiç işlenmez (kısa devre).",
+            Q("Kaynaktaki sıradaki öğe (" + nx + ") çekilir mi?", "Hayır", ["Evet"]));
+          st.cancel = true;
+          break;
+        }
+        var e = st.src[i]; e.s = "c"; if (i > 0 && st.src[i - 1].s === "c") st.src[i - 1].s = "d";
+        for (var b = 0; b < i; b++) st.src[b].s = "d";
+        var v = e.v; st.cur = { src: v };
+        tok.push("P:" + v); log("çek " + v);
+        snap(ln.src, "src", "Kaynaktan sıradaki öğe çekilir: " + v + ".");
+        if (c.f) {
+          var okf = FILT[c.f][1](v); tok.push("F:" + v); st.cur.filter = { v: v, ok: okf };
+          if (okf) st.fp++; else st.fn++;
+          log("filter(" + v + ") → " + okf);
+          snap(ln.filter, "filter", v + " için " + FILT[c.f][2] + " → " + okf + (okf ? ": öğe geçer, aşağı iner." : ": öğe elenir; sıradaki öğe çekilir."));
+          if (!okf) continue;
+        }
+        if (c.m) {
+          var w = MAPS[c.m][1](v); tok.push("M:" + v); st.cur.map = { v: v, w: w };
+          log("map(" + v + ") → " + w);
+          snap(ln.map, "map", v + " dönüştürülür: " + MAPS[c.m][2] + " = " + w + ".", qMap ? null : Q("map(" + v + ") hangi değeri verir?", w, [v, w + 1, w * 2]));
+          qMap = true;
+          v = w;
+        }
+        if (c.s) {
+          st.buf.push(v); st.cur.sorted = v; log("sorted ← " + v + " (bekler)");
+          snap(ln.sorted, "sorted", "sorted, " + v + " öğesini biriktirir. Bütün öğeleri görmeden sıralayamaz; bu yüzden şimdilik hiçbir şeyi aşağı göndermez.");
+          continue;
+        }
+        down(v);
+      }
+      for (var z = 0; z < st.src.length; z++) if (st.src[z].s === "c") st.src[z].s = "d";
+      if (c.s) {
+        st.buf.sort(function (x, y) { return c.s === "d" ? y - x : x - y; });
+        st.emit = 0; st.cur = {};
+        log("sorted: sırala → " + list(st.buf));
+        snap(ln.sorted, "sorted", "Kaynak bitti. sorted biriktirdiği öğeleri " + (c.s === "d" ? "azalan" : "artan") + " sıraya dizer: " + list(st.buf) + ". Şimdi sırayla aşağı gönderir.");
+        for (var s = 0; s < st.buf.length; s++) {
+          if (cancelled()) {
+            log("sorted durdu: " + (st.buf.length - s) + " öğe gönderilmedi");
+            snap(ln.sorted, "sorted", "Aşağıdaki işlem yeterince öğe aldı; sorted kalan " + (st.buf.length - s) + " öğeyi göndermez. Kaynak ise sonuna kadar okunmuştu.");
+            break;
+          }
+          st.emit = s + 1; tok.push("S:" + st.buf[s]); st.cur = { sorted: st.buf[s] };
+          log("sorted → " + st.buf[s]);
+          snap(ln.sorted, "sorted", "sorted sıradaki öğeyi gönderir: " + st.buf[s] + ".");
+          down(st.buf[s]);
+        }
+      }
+      st.ended = true; st.cur = {};
+      var out;
+      if (c.t === "collect") { out = list(st.res); st.out = out + "\n"; log("println → " + out); }
+      else if (c.t === "findFirst") { out = st.found === null ? "Optional.empty" : "Optional[" + st.found + "]"; st.out = out + "\n"; log("println → " + out); }
+      var R = eager(c), finalQ = null;
+      if (c.t === "collect") finalQ = Q("println ne yazar?", out, [list(eager(c, { noSort: true })), list(eager(c, { noLimit: true })), list(c.src.slice(0, c.l || c.src.length))]);
+      else if (c.t === "findFirst") finalQ = Q("println ne yazar?", out, [R.length ? R[0] : "null", "Optional[" + c.src[0] + "]", "Optional.empty"]);
+      snap(c.t === "forEach" ? ln.term : ln.print, null, c.t === "forEach" ? "Son işlem bitti: " + st.printed.length + " öğe yazdırıldı." :
+        "Son işlem bitti; sonuç yazdırılır: " + out + ".", finalQ);
+      return { ev: ev, tok: tok, out: st.out, code: C };
+    }
+    return { FILT: FILT, MAPS: MAPS, TERMS: TERMS, code: code, run: run, eager: eager };
+  })();
+  /*CORE-END*/
+
+  var root = document.querySelector(".jv-sp");
+  if (!root) return;
+  function E(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  var PRE = [
+    ["filter → map → collect", "5, 12, 8, 3, 20, 15, 7", "gt6", "x2", null, null, "collect"],
+    ["Kısa devre: limit(2)", "5, 12, 8, 3, 20, 15, 7", "gt6", "x2", null, 2, "collect"],
+    ["Öğe öğe: forEach", "4, 9, 2, 7, 6", "even", "sq", null, null, "forEach"],
+    ["sorted bütün öğeleri bekler", "5, 12, 8, 3, 20, 15, 7", "gt6", "x2", "a", 3, "collect"],
+    ["Azalan sıra + limit", "31, 7, 18, 42, 25, 9", null, null, "d", 3, "collect"],
+    ["findFirst: ilk eşleşen", "3, 8, 11, 14, 5, 22", "gt10", "p1", null, null, "findFirst"],
+    ["findFirst: eşleşen yok", "3, 8, 1, 7", "gt10", null, null, null, "findFirst"],
+    ["Son işlem yok: tembellik", "5, 12, 8, 3", "gt6", "x2", null, null, "none"]
+  ];
+  E("spPre").innerHTML = '<option value="-1">— kendi boru hattım —</option>' + PRE.map(function (p, i) { return '<option value="' + i + '">' + esc(p[0]) + "</option>"; }).join("");
+  function opts(sel, M) { sel.innerHTML = Object.keys(M).map(function (k) { return '<option value="' + k + '">' + esc(M[k][2] || M[k]) + "</option>"; }).join(""); }
+  opts(E("spFv"), Core.FILT); opts(E("spMv"), Core.MAPS);
+  E("spT").innerHTML = Object.keys(Core.TERMS).map(function (k) { return '<option value="' + k + '">' + esc(Core.TERMS[k]) + "</option>"; }).join("");
+
+  var R = null, ev = [], k = 0, timer = null, answered = {}, ok = 0, all = 0;
+
+  function cfg() {
+    var raw = E("spSrc").value.split(",").map(function (s) { return s.trim(); }).filter(function (s) { return s !== ""; });
+    var bad = raw.length < 1 || raw.length > 8 || raw.some(function (s) { return !/^\d{1,2}$/.test(s); });
+    var lv = +E("spLv").value, lbad = E("spL").checked && !(lv >= 1 && lv <= 8 && Math.floor(lv) === lv);
+    E("spSrc").classList.toggle("is-bad", bad); E("spLv").classList.toggle("is-bad", lbad);
+    cfg.err = bad ? "Kaynak: 1–8 tam sayı (0–99), virgülle ayrılmış." : lbad ? "limit: 1 ile 8 arası bir tam sayı." : "";
+    if (bad || lbad) return null;
+    return { src: raw.map(Number), f: E("spF").checked ? E("spFv").value : null, m: E("spM").checked ? E("spMv").value : null,
+      s: E("spS").checked ? E("spSv").value : null, l: E("spL").checked ? lv : null, t: E("spT").value };
+  }
+  function build() {
+    stop();
+    E("spFv").disabled = !E("spF").checked; E("spMv").disabled = !E("spM").checked; E("spSv").disabled = !E("spS").checked; E("spLv").disabled = !E("spL").checked;
+    var c = cfg();
+    if (!c) { ev = []; E("spLane").innerHTML = ""; E("spWhy").textContent = "Girdiyi düzeltin: " + cfg.err; E("spCode").innerHTML = ""; buttons(false); return; }
+    R = Core.run(c); R.c = c; ev = R.ev; k = 0; answered = {};
+    ev.forEach(function (e) { e.fb = ""; if (e.q) e.q.order = e.q.opts.map(function (_, i) { return i; }).sort(function () { return Math.random() - 0.5; }); });
+    E("spCode").innerHTML = R.code.lines.map(function (l) { return "<li>" + esc(l) + "</li>"; }).join("");
+    draw();
+  }
+  function needQ() { var e = ev[k]; return E("spQuiz").checked && e && e.q && !answered[k]; }
+
+  function chip(v, cls) { return '<span class="chip' + (cls ? " " + cls : "") + '">' + esc(v) + "</span>"; }
+  function box(key, title, sub, body, act, term) {
+    return '<div class="box' + (act === key ? " is-act" : "") + (term ? " is-term" : "") + '"><div class="bh"><b>' + esc(title) + "</b>" + (sub ? "<small>" + esc(sub) + "</small>" : "") + '</div><div class="bb">' + body + "</div></div>";
+  }
+  function lane(st, act) {
+    var c = R.c, h = [], cur = st.cur;
+    h.push(box("src", "kaynak", "liste", st.src.map(function (x) { return chip(x.v, x.s === "w" ? "" : x.s); }).join(""), act));
+    if (c.f) {
+      var f = act === "filter" && cur.filter ? chip(cur.filter.v, cur.filter.ok ? "ok" : "no") + '<span class="mut">' + (cur.filter.ok ? "✓ geçer" : "✗ elenir") + "</span>" : "";
+      h.push(box("filter", "filter", Core.FILT[c.f][2], f + '<span class="mut" style="margin-top:auto">geçen ' + st.fp + "<br>elenen " + st.fn + "</span>", act));
+    }
+    if (c.m) {
+      var m = act === "map" && cur.map ? chip(cur.map.v) + '<span class="mut">↓</span>' + chip(cur.map.w, "c") : "";
+      h.push(box("map", "map", Core.MAPS[c.m][2], m, act));
+    }
+    if (c.s) {
+      var sb = st.buf.map(function (x, i) { return chip(x, st.emit >= 0 ? (i < st.emit - 1 ? "d" : i === st.emit - 1 ? "c" : "") : (act === "sorted" && i === st.buf.length - 1 ? "c" : "")); }).join("");
+      h.push(box("sorted", "sorted", (c.s === "d" ? "azalan" : "artan") + (st.emit >= 0 ? " · sıralı" : ""), sb || '<span class="mut">boş</span>', act));
+    }
+    if (c.l) {
+      var lb = '<span class="big">' + st.lc + " / " + c.l + "</span>" + (act === "limit" && cur.limit !== undefined ? chip(cur.limit, "c") : "") + (st.lc >= c.l ? '<span class="mut">doldu</span>' : "");
+      h.push(box("limit", "limit", "en çok " + c.l, lb, act));
+    }
+    var tb, tt = { collect: "collect", forEach: "forEach", findFirst: "findFirst", none: "son işlem yok" }[c.t];
+    if (c.t === "collect") tb = (st.res.map(function (x, i) { return chip(x, act === "term" && i === st.res.length - 1 ? "c" : ""); }).join("") || '<span class="mut">[ ]</span>');
+    else if (c.t === "forEach") tb = st.printed.map(function (x, i) { return chip(x, act === "term" && i === st.printed.length - 1 ? "c" : ""); }).join("") || '<span class="mut">henüz yok</span>';
+    else if (c.t === "findFirst") tb = st.found !== null ? chip(st.found, "c") : '<span class="mut">' + (st.ended ? "Optional.empty" : "aranıyor") + "</span>";
+    else tb = '<span class="mut">hiçbir öğe<br>işlenmedi</span>';
+    h.push(box("term", tt, c.t === "collect" ? "toList()" : c.t === "forEach" ? "println" : c.t === "findFirst" ? "Optional" : "", tb, act, true));
+    return h.join('<span class="arrow" aria-hidden="true">›</span>');
+  }
+
+  function draw() {
+    if (!ev.length) return;
+    var e = ev[k], q = needQ(), st = q && k > 0 ? ev[k - 1].st : e.st;
+    Array.prototype.forEach.call(E("spCode").children, function (li, i) { li.classList.toggle("is-cur", i === e.line); });
+    E("spLane").innerHTML = lane(st, q ? (k > 0 ? ev[k - 1].act : null) : e.act);
+    if (q) E("spWhy").innerHTML = "<b>Tahmin edin:</b> " + esc(e.q.text) + '<div class="qbtns">' + e.q.order.map(function (i) { return '<button type="button" data-a="' + i + '">' + esc(e.q.opts[i]) + "</button>"; }).join("") + "</div>";
+    else E("spWhy").innerHTML = (e.fb || "") + esc(e.why);
+    E("spLog").innerHTML = st.log.slice(-4).map(function (l) { return "<span>" + esc(l) + "</span>"; }).join("");
+    E("spOut").textContent = st.out.replace(/\n$/, "").split("\n").slice(-4).join("\n");
+    E("spNo").textContent = (k + 1) + "/" + ev.length;
+    buttons(q);
+    if (q) { var b = E("spWhy").querySelector("button"); if (b && root.contains(document.activeElement)) b.focus(); }
+  }
+  function buttons(q) {
+    E("spBack").disabled = k === 0;
+    E("spReset").disabled = k === 0;
+    E("spStep").disabled = q || k >= ev.length - 1;
+    E("spPlay").disabled = E("spStep").disabled && !timer;
+    E("spPlay").textContent = timer ? "Duraklat" : "Oynat";
+  }
+  function go(d) { k = Math.max(0, Math.min(ev.length - 1, k + d)); draw(); }
+  function stop() { clearInterval(timer); timer = null; }
+  function delay() { return [1800, 1200, 800, 450, 200][E("spSpeed").value - 1]; }
+  function play() {
+    if (timer) { stop(); buttons(needQ()); return; }
+    if (k >= ev.length - 1) k = 0;
+    timer = setInterval(function () {
+      if (needQ() || k >= ev.length - 1) { stop(); buttons(needQ()); return; }
+      go(1);
+      if (needQ()) { stop(); buttons(true); }
+    }, delay());
+    draw();
+  }
+  function loadPreset(i) {
+    var p = PRE[i];
+    E("spSrc").value = p[1];
+    E("spF").checked = !!p[2]; if (p[2]) E("spFv").value = p[2];
+    E("spM").checked = !!p[3]; if (p[3]) E("spMv").value = p[3];
+    E("spS").checked = !!p[4]; if (p[4]) E("spSv").value = p[4];
+    E("spL").checked = !!p[5]; E("spLv").value = p[5] || 3;
+    E("spT").value = p[6];
+    build();
+  }
+
+  E("spWhy").addEventListener("click", function (evt) {
+    var b = evt.target.closest("button[data-a]");
+    if (!b || !needQ()) return;
+    var e = ev[k], good = +b.getAttribute("data-a") === e.q.ans;
+    answered[k] = true; all++; if (good) ok++;
+    E("spOk").textContent = ok; E("spAll").textContent = all;
+    e.fb = good ? '<b class="agt-oyun__good">Doğru!</b> ' : '<b class="agt-oyun__bad">Yanlış.</b> Doğrusu: <code>' + esc(e.q.opts[e.q.ans]) + "</code>. ";
+    draw();
+    E("spStep").focus();
+  });
+  E("spPre").addEventListener("change", function () { var i = +E("spPre").value; if (i >= 0) loadPreset(i); });
+  ["spF", "spFv", "spM", "spMv", "spS", "spSv", "spL", "spT"].forEach(function (id) { E(id).addEventListener("change", function () { E("spPre").value = "-1"; build(); }); });
+  ["spSrc", "spLv"].forEach(function (id) { E(id).addEventListener("input", function () { E("spPre").value = "-1"; build(); }); });
+  E("spStep").addEventListener("click", function () { stop(); go(1); });
+  E("spBack").addEventListener("click", function () { stop(); go(-1); });
+  E("spReset").addEventListener("click", function () { stop(); k = 0; answered = {}; ev.forEach(function (e) { e.fb = ""; }); draw(); });
+  E("spPlay").addEventListener("click", play);
+  E("spSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("spQuiz").addEventListener("change", draw);
+  root.addEventListener("keydown", function (evt) {
+    if (/INPUT|SELECT|TEXTAREA/.test(evt.target.tagName)) return;
+    if (evt.key === "ArrowRight" && !needQ()) { stop(); go(1); evt.preventDefault(); }
+    else if (evt.key === "ArrowLeft") { stop(); go(-1); evt.preventDefault(); }
+  });
+
+  E("spPre").value = "0";
+  loadPreset(0);
+})();
+</script>
+<script src="deck/oyun.js"></script>

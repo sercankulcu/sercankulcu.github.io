@@ -1,0 +1,499 @@
+---
+layout: without-sidebar
+title: "Yığın ve Heap Gezgini"
+permalink: /files/java/slides/Chapter_04_Heap-Stack-Explorer.html
+excerpt: "Küçük Java programlarını satır satır izler: yığındaki çerçeveler ve yerel değişkenler, heap'teki nesneler, referans okları, takma ad, null, NullPointerException ve çöp toplamaya uygun hale gelen nesneler."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.jv-hs, .jv-hs-dlg { --ds-accent:#a61b1b; }
+html[data-theme="dark"] .jv-hs, html[data-theme="dark"] .jv-hs-dlg { --ds-accent:#f07a7a; }
+.jv-hs .hs-wrap { display:grid; grid-template-rows:34px minmax(0,1fr) 80px; gap:8px; height:100%; }
+.jv-hs .bar { display:flex; align-items:center; gap:6px; min-width:0; }
+.jv-hs .bar select { width:214px; min-height:32px; font-size:13.5px; }
+.jv-hs .bar button { min-height:32px; padding:0 11px; font-size:13.5px; white-space:nowrap; }
+.jv-hs .bar #hsPlay { width:84px; }
+.jv-hs .bar #hsStep { width:80px; }
+.jv-hs .bar input[type="range"] { width:64px; }
+.jv-hs .bar .check { display:flex; align-items:center; gap:5px; margin-left:4px; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.jv-hs .bar .score { margin-left:auto; color:var(--ds-muted); font-size:13px; font-weight:700; white-space:nowrap; }
+.jv-hs .bar .score b { color:var(--ds-text); }
+.jv-hs .mid { display:grid; grid-template-columns:342px minmax(0,1fr); gap:8px; min-height:0; }
+.jv-hs .pane { display:flex; flex-direction:column; min-height:0; min-width:0; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-bg); overflow:hidden; }
+.jv-hs .cap { display:flex; justify-content:space-between; margin:0; padding:3px 8px 2px; color:var(--ds-muted); font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; background:var(--ds-surface-strong); }
+.jv-hs .cap span:last-child { text-transform:none; letter-spacing:0; }
+.jv-hs .code { flex:1; min-height:0; margin:0; padding:3px 0; overflow:hidden; font:12px/1.5 ui-monospace, Consolas, monospace; list-style:none; counter-reset:ln; }
+.jv-hs .code li { margin:0; padding:0 4px 0 0; line-height:1.5; white-space:pre; counter-increment:ln; }
+.jv-hs .code li::before { content:counter(ln); display:inline-block; width:22px; margin-right:7px; color:var(--ds-muted); font-size:12px; text-align:right; }
+.jv-hs .code li.is-cur { background:var(--ds-hot); box-shadow:inset 4px 0 0 var(--ds-accent); }
+.jv-hs .code li.is-bad { background:color-mix(in srgb, var(--ds-bad) 20%, var(--ds-bg)); box-shadow:inset 4px 0 0 var(--ds-bad); }
+.jv-hs .mem { flex:1; min-height:0; width:100%; display:block; }
+.jv-hs .mem text { font:12px ui-monospace, Consolas, monospace; fill:var(--ds-text); }
+.jv-hs .mem .lbl { font:800 12px system-ui, sans-serif; fill:var(--ds-muted); letter-spacing:.05em; }
+.jv-hs .mem .fr { fill:var(--ds-surface); stroke:var(--ds-border); stroke-width:1.5; }
+.jv-hs .mem .fr.top { stroke:var(--ds-accent); stroke-width:2; }
+.jv-hs .mem .fh { fill:var(--ds-surface-strong); }
+.jv-hs .mem .fr.top + .fh { fill:var(--ds-hot); }
+.jv-hs .mem .ob { fill:var(--ds-node); stroke:var(--ds-link); stroke-width:1.5; }
+.jv-hs .mem .ob.dead { fill:var(--ds-bg); stroke:var(--ds-muted); stroke-dasharray:5 4; }
+.jv-hs .mem .oh { fill:color-mix(in srgb, var(--ds-link) 22%, var(--ds-bg)); }
+.jv-hs .mem g.dead { opacity:.6; }
+.jv-hs .mem g.dead .oh { fill:var(--ds-surface-strong); }
+.jv-hs .mem .sep { stroke:var(--ds-border); stroke-width:1; }
+.jv-hs .mem .hot { fill:var(--ds-accent); font-weight:700; }
+.jv-hs .mem .mut { fill:var(--ds-muted); }
+.jv-hs .mem .gc { font:700 12px system-ui, sans-serif; fill:var(--ds-bad); }
+.jv-hs .mem .dot { fill:var(--ds-link); }
+.jv-hs .mem .dot.h { fill:var(--ds-accent); }
+.jv-hs .mem .ar { fill:none; stroke:var(--ds-link); stroke-width:1.6; }
+.jv-hs .mem .ar.h { stroke:var(--ds-accent); stroke-width:2.4; }
+.jv-hs .mem .ar.d { stroke:var(--ds-muted); stroke-dasharray:4 3; }
+.jv-hs .mem .ah { fill:var(--ds-link); }
+.jv-hs .mem .ah.h { fill:var(--ds-accent); }
+.jv-hs .mem .ah.d { fill:var(--ds-muted); }
+.jv-hs .mem .err { fill:color-mix(in srgb, var(--ds-bad) 14%, var(--ds-bg)); stroke:var(--ds-bad); stroke-width:1.5; }
+.jv-hs .mem .errt { font:700 12px ui-monospace, Consolas, monospace; fill:var(--ds-bad); }
+.jv-hs .bot { display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:8px; min-height:0; }
+.jv-hs .why { margin:0; padding:5px 10px; overflow:hidden; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:13px; line-height:1.33; }
+.jv-hs .qbtns { display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; }
+.jv-hs .qbtns button { min-height:24px; padding:0 10px; font:600 12.5px ui-monospace, Consolas, monospace; }
+.jv-hs .out { flex:1; min-height:0; display:flex; flex-direction:column; justify-content:flex-end; margin:0; padding:1px 8px 2px; overflow:hidden; background:var(--ds-surface); font:12px/1.25 ui-monospace, Consolas, monospace; white-space:pre-wrap; word-break:break-all; }
+.jv-hs .out .ex { color:var(--ds-bad); }
+</style>
+
+<div class="jv-hs agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 4 · Simülatör</p><h1>Yığın ve Heap Gezgini</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="hs-help" aria-label="Açıklama ve kullanım">?</button>
+    <a class="agt-oyun__back" href="Bolum_04_Nesne_Sinif.html">← Bölüm 4</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="hs-wrap">
+      <div class="bar">
+        <select id="hsProg" aria-label="Program seç"></select>
+        <button type="button" id="hsBack" aria-label="Bir adım geri">◀</button>
+        <button type="button" id="hsStep" class="is-primary" aria-label="Bir adım ileri">Adım ▶</button>
+        <button type="button" id="hsPlay" aria-label="Oynat veya duraklat">Oynat</button>
+        <button type="button" id="hsReset" aria-label="Başa dön">Sıfırla</button>
+        <input type="range" id="hsSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı" title="Hız">
+        <label class="check"><input type="checkbox" id="hsQuiz"> Kendini dene</label>
+        <span class="score" aria-live="polite">Doğru <b id="hsOk">0</b> / <b id="hsAll">0</b></span>
+      </div>
+      <div class="mid">
+        <div class="pane"><p class="cap"><span>Java kodu</span><span id="hsNo"></span></p><ol class="code" id="hsCode" aria-label="Java kodu"></ol></div>
+        <div class="pane"><p class="cap"><span>Bellek</span><span id="hsMemCap"></span></p><svg class="mem" id="hsMem" viewBox="0 0 414 372" role="img" aria-label="Yığın ve heap görünümü"></svg></div>
+      </div>
+      <div class="bot">
+        <div class="why" id="hsWhy" aria-live="polite"></div>
+        <div class="pane"><p class="cap"><span>Çıktı (konsol)</span></p><div class="out" id="hsOut" aria-label="Program çıktısı"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog jv-hs-dlg" id="hs-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Yığın ve Heap Gezgini</h2>
+    <p><b>Amaç:</b> Java'da değişkenlerin ve nesnelerin bellekte nerede durduğunu görmek. Her metot çağrısı <b>yığında</b> bir <b>çerçeve</b> açar; yerel değişkenler ve parametreler bu çerçevede yaşar. <code>new</code> ile oluşturulan her nesne <b>heap</b>'tedir. Sınıf tipindeki bir değişken nesnenin kendisini değil, ona giden <b>referansı</b> (oku) tutar.</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li>Soldaki listeden bir program seçin.</li>
+      <li><b>Adım ▶</b> / <b>◀</b> (klavyede → / ←), <b>Oynat</b>, <b>Sıfırla</b>. Sarı satır şu an çalışan satırdır; bellekte son değişen değer ve ok kırmızı vurgulanır.</li>
+      <li><b>Kendini dene</b> açıkken çıktıyı ve çöp toplanabilecek nesneleri tahmin edersiniz; doğru sayısı üstte tutulur.</li>
+    </ol>
+    <h3>Görünüm</h3>
+    <ul>
+      <li>Sol sütun yığındır: en altta <code>main</code>, en üstte (kırmızı çerçeveli) şu an çalışan metot. Yapıcı çalışırken kendi çerçevesinde <code>this</code> referansı görünür.</li>
+      <li>Sağda heap: her nesne sınıf adı ve sıra numarasıyla (#1, #2…) gösterilir. Numaralar yalnızca anlatım içindir; Java nesne adresini göstermez.</li>
+      <li>Kesik çizgili soluk nesne: hiçbir canlı referansla ulaşılamıyor, yani <b>çöp toplamaya uygun</b>. Çöp toplayıcının onu ne zaman sileceği belli değildir; ama programın ona bir daha erişme yolu yoktur.</li>
+    </ul>
+    <h3>Hatırlatma</h3>
+    <ul>
+      <li><code>b = a;</code> nesneyi değil referansı kopyalar: iki değişken aynı nesneyi gösterir (<b>takma ad</b>). Birinden yapılan değişiklik ötekinden de görünür.</li>
+      <li>Java her şeyi <b>değere göre</b> aktarır; referans tipinde aktarılan değer referanstır. Metot nesnenin alanlarını değiştirebilir, ama parametreye yeni nesne atamak çağıranın değişkenini değiştirmez.</li>
+      <li>Nesne dizisinin öğeleri referanstır ve başlangıçta <code>null</code> olur; <code>null</code> üzerinden alan ya da metot kullanmak <code>NullPointerException</code> fırlatır.</li>
+      <li>Başka nesneleri gösteren bir nesne de, kendisine ulaşan yol kalmadıysa çöp toplamaya uygundur.</li>
+    </ul>
+    <p>Programların çıktıları <code>javac --release 8</code> ile derlenip Java 8 üzerinde çalıştırılarak doğrulanmıştır.</p>
+    <p>İlgili sunum: <a href="Bolum_04_Nesne_Sinif.html">Bölüm 4 · Nesne ve Sınıflar</a> (Referanslar, new Araba(...): Adım Adım, Referans Atama, null ve NullPointerException).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /*CORE-BEGIN*/
+  var Core = (function () {
+    function Stop() {}
+    function R(id) { return { r: id }; }
+    function Tracer() {
+      var S = { fr: [], heap: [], out: "" }, ev = [];
+      function top() { return S.fr[S.fr.length - 1]; }
+      function obj(id) { for (var i = 0; i < S.heap.length; i++) if (S.heap[i].id === id) return S.heap[i]; return null; }
+      function snap(line, why, x) {
+        var e = JSON.parse(JSON.stringify(S));
+        e.line = line; e.why = why;
+        for (var k in x || {}) e[k] = x[k];
+        ev.push(e);
+      }
+      var T = {
+        main: function (line, why) { S.fr.push({ sig: "main(String[] args)", v: [] }); snap(line, why); },
+        push: function (sig, vars) { S.fr.push({ sig: sig, v: vars }); },
+        pop: function () { S.fr.pop(); },
+        set: function (name, val, type) {
+          var f = top();
+          for (var i = 0; i < f.v.length; i++) if (f.v[i][1] === name) { f.v[i][2] = val; return; }
+          f.v.push([type, name, val]);
+        },
+        get: function (name) { var f = top(); for (var i = 0; i < f.v.length; i++) if (f.v[i][1] === name) return f.v[i][2]; },
+        alloc: function (cls, fields, slot) { var id = S.heap.length + 1; S.heap.push({ id: id, cls: cls, f: fields, slot: slot }); return id; },
+        setf: function (id, name, val) { var o = obj(id); o.f.forEach(function (f) { if (f[0] === name) f[1] = val; }); },
+        getf: function (id, name) { var o = obj(id), v; o.f.forEach(function (f) { if (f[0] === name) v = f[1]; }); return v; },
+        print: function (s) { S.out += s; },
+        snap: snap,
+        error: function (line, msg, why) { S.out += msg; snap(line, why, { err: true }); throw new Stop(); },
+        get events() { return ev; }, get out() { return S.out; }
+      };
+      return T;
+    }
+    function Q(text, right, alts) {
+      var o = [String(right)];
+      alts.forEach(function (a) { a = String(a); if (o.indexOf(a) < 0) o.push(a); });
+      return { text: text, opts: o, ans: 0 };
+    }
+    var NOKTA = ["class Nokta {", "    int x, y;", "    Nokta(int a, int b) { x = a; y = b; }", "}"];
+    /* Ayrıntılı new: nesne ayrılır (alanlar 0), yapıcı çerçevesi açılır, alanlar atanır, çerçeve kapanır. */
+    function yeniNokta(T, a, b, slot, line, intro) {
+      var id = T.alloc("Nokta", [["x", 0], ["y", 0]], slot);
+      T.push("Nokta(int a, int b)", [["Nokta", "this", R(id)], ["int", "a", a], ["int", "b", b]]);
+      T.snap(2, intro + " heap'te yeni bir Nokta nesnesi (#" + id + ") ayrılır; alanları önce varsayılan değer 0 olur. Ardından yapıcı çağrılır: çerçevesinde this (yeni nesneyi gösterir), a = " + a + ", b = " + b + ".", { hl: { o: id } });
+      T.setf(id, "x", a); T.setf(id, "y", b);
+      T.snap(2, "x = a; y = b; → this'in gösterdiği nesnenin alanları " + a + " ve " + b + " olur.", { hl: { o: id, f: "x" } });
+      T.pop();
+      return id;
+    }
+    function yeniKisa(T, cls, fields, slot) { return T.alloc(cls, fields, slot); }
+
+    var PROGS = [
+      {
+        ad: "Takma ad: Nokta b = a",
+        code: NOKTA.concat(["public class Main {", "    public static void main(String[] args) {", "        Nokta a = new Nokta(1, 2);", "        Nokta b = a;", "        b.x = 5;", "        System.out.println(a.x);", "        b = new Nokta(3, 4);", "        a = null;", "        System.out.println(b.x);", "    }", "}"]),
+        run: function (T) {
+          T.main(5, "Program main'den başlar: yığında main'in çerçevesi açılır; heap henüz boş.");
+          var n1 = yeniNokta(T, 1, 2, [0, 0], 6, "new Nokta(1, 2):");
+          T.set("a", R(n1), "Nokta");
+          T.snap(6, "Yapıcı biter, çerçevesi kapanır. new ifadesinin değeri nesnenin referansıdır; bu referans a'ya yazılır. a nesnenin kendisi değil, ona giden bir oktur.", { hl: { v: "a" } });
+          T.set("b", R(n1), "Nokta");
+          T.snap(7, "b = a: kopyalanan nesne değil REFERANSTIR. a ve b artık aynı nesneyi gösterir (takma ad); heap'te hâlâ tek Nokta var.", { hl: { v: "b" }, q: Q("Heap'te şu an kaç Nokta nesnesi var?", 1, [2, 0]) });
+          T.setf(n1, "x", 5);
+          T.snap(8, "b.x = 5: b'nin gösterdiği nesnenin x alanı 5 olur. a da aynı nesneyi gösterdiği için değişiklik a'dan da görünür.", { hl: { o: n1, f: "x" } });
+          T.print("5\n");
+          T.snap(9, "a.x okunur: a'nın gösterdiği nesnenin x'i 5. Takma ad yüzünden 1 değil 5 yazılır.", { q: Q("System.out.println(a.x) ne yazar?", 5, [1, 2]), printed: true });
+          var n2 = yeniKisa(T, "Nokta", [["x", 3], ["y", 4]], [1, 0]);
+          T.set("b", R(n2), "Nokta");
+          T.snap(10, "new Nokta(3, 4): ikinci nesne (#" + n2 + ") oluşturulur, yapıcı alanları 3 ve 4 yapar; b artık bu nesneyi gösterir. a hâlâ #" + n1 + "'i gösteriyor.", { hl: { v: "b" } });
+          T.set("a", null, "Nokta");
+          T.snap(11, "a = null: a hiçbir nesneyi göstermez. #" + n1 + "'e ulaşan referans kalmadı; nesne çöp toplamaya uygun hale gelir (kesik çizgili).", { hl: { v: "a" }, q: Q("Hangi nesne çöp toplamaya uygun hale gelir?", "#1 (x = 5)", ["#2 (x = 3)", "hiçbiri"]) });
+          T.print("3\n");
+          T.snap(12, "b.x → 3 yazılır.", { printed: true, q: Q("System.out.println(b.x) ne yazar?", 3, [5, 1]) });
+          T.snap(13, "main biter. Yerel değişkenler a ve b çerçeveyle birlikte yok olur; program sonlanır.");
+        }
+      },
+      {
+        ad: "Metoda referans aktarımı",
+        code: NOKTA.concat(["public class Main {", "    static void tasi(Nokta p) {", "        p.x = 10;", "        p = new Nokta(0, 0);", "        p.y = 99;", "    }", "    public static void main(String[] args) {", "        Nokta a = new Nokta(1, 2);", "        tasi(a);", "        System.out.println(a.x + \" \" + a.y);", "    }", "}"]),
+        run: function (T) {
+          T.main(10, "main başlar.");
+          var n1 = yeniKisa(T, "Nokta", [["x", 1], ["y", 2]], [0, 0]);
+          T.set("a", R(n1), "Nokta");
+          T.snap(11, "new Nokta(1, 2): heap'te #1 oluşur (x = 1, y = 2); referansı a'ya yazılır.", { hl: { v: "a" } });
+          T.push("tasi(Nokta p)", [["Nokta", "p", R(n1)]]);
+          T.snap(5, "tasi(a): a'nın DEĞERİ, yani referans, p'ye kopyalanır. Yeni çerçevedeki p ile main'deki a aynı nesneyi gösterir.", { hl: { v: "p" } });
+          T.setf(n1, "x", 10);
+          T.snap(6, "p.x = 10: p'nin gösterdiği nesne değişir. Bu, a'nın da gösterdiği nesnedir; değişiklik metot bitince de kalır.", { hl: { o: n1, f: "x" } });
+          var n2 = yeniKisa(T, "Nokta", [["x", 0], ["y", 0]], [1, 0]);
+          T.set("p", R(n2), "Nokta");
+          T.snap(7, "p = new Nokta(0, 0): yalnızca p (kopya) yeni nesneyi (#2) gösterir. main'deki a etkilenmez; hâlâ #1'i gösterir.", { hl: { v: "p" }, q: Q("main'deki a şimdi hangi nesneyi gösteriyor?", "#1", ["#2", "null"]) });
+          T.setf(n2, "y", 99);
+          T.snap(8, "p.y = 99: değişen #2'dir; #1'e dokunulmaz.", { hl: { o: n2, f: "y" } });
+          T.pop();
+          T.snap(12, "tasi biter, çerçevesi kapanır; p yok olur. #2'yi gösteren referans kalmadı: çöp toplamaya uygun.", { q: Q("tasi bitince hangi nesne çöp toplamaya uygun olur?", "#2 (0, 99)", ["#1 (10, 2)", "hiçbiri"]) });
+          T.print("10 2\n");
+          T.snap(13, "a.x + \" \" + a.y → \"10 2\". Alan değişikliği kaldı, parametreye yapılan atama ise çağırana yansımadı.", { printed: true, q: Q("Ne yazılır?", "10 2", ["1 2", "0 99", "10 99"]) });
+        }
+      },
+      {
+        ad: "Nesne dizisi, null ve NPE",
+        code: NOKTA.concat(["public class Main {", "    public static void main(String[] args) {", "        Nokta[] d = new Nokta[3];", "        d[0] = new Nokta(1, 1);", "        d[1] = d[0];", "        d[1].x = 7;", "        System.out.println(d[0].x);", "        System.out.println(d[2]);", "        d[0] = null;", "        d[1] = null;", "        d[2].x = 4;", "    }", "}"]),
+        run: function (T) {
+          T.main(5, "main başlar.");
+          var ar = yeniKisa(T, "Nokta[]", [["[0]", null], ["[1]", null], ["[2]", null]], [0, 0]);
+          T.set("d", R(ar), "Nokta[]");
+          T.snap(6, "new Nokta[3]: heap'te 3 öğeli bir dizi nesnesi oluşur. Öğeler Nokta değil, Nokta REFERANSIDIR ve başlangıçta null'dır; henüz hiç Nokta yok.", { hl: { v: "d" }, q: Q("Bu satırdan sonra heap'te kaç Nokta nesnesi var?", 0, [3, 1]) });
+          var n = yeniKisa(T, "Nokta", [["x", 1], ["y", 1]], [1, 0]);
+          T.setf(ar, "[0]", R(n));
+          T.snap(7, "d[0] = new Nokta(1, 1): Nokta nesnesi (#2) oluşur; referansı dizinin 0. öğesine yazılır.", { hl: { o: ar, f: "[0]" } });
+          T.setf(ar, "[1]", R(n));
+          T.snap(8, "d[1] = d[0]: referans kopyalanır; dizinin iki öğesi aynı Nokta'yı gösterir.", { hl: { o: ar, f: "[1]" } });
+          T.setf(n, "x", 7);
+          T.snap(9, "d[1].x = 7: ortak nesnenin x'i 7 olur.", { hl: { o: n, f: "x" } });
+          T.print("7\n");
+          T.snap(10, "d[0].x → 7 (d[0] ile d[1] aynı nesne).", { printed: true, q: Q("Ne yazılır?", 7, [1, 0]) });
+          T.print("null\n");
+          T.snap(11, "d[2] hiç atanmadı: değeri null. println(null referans) \"null\" yazar; bu satır hata vermez.", { printed: true, q: Q("System.out.println(d[2]) ne yazar?", "null", ["0", "NullPointerException"]) });
+          T.setf(ar, "[0]", null);
+          T.snap(12, "d[0] = null: yalnızca bir referans silindi. #2'ye d[1] üzerinden hâlâ ulaşılıyor; çöp değil.", { hl: { o: ar, f: "[0]" }, q: Q("#2 şimdi çöp toplamaya uygun mu?", "hayır", ["evet"]) });
+          T.setf(ar, "[1]", null);
+          T.snap(13, "d[1] = null: #2'ye ulaşan son yol da gitti; çöp toplamaya uygun.", { hl: { o: ar, f: "[1]" } });
+          T.error(14, "Exception in thread \"main\" java.lang.NullPointerException\n\tat Main.main(Main.java:15)\n", "d[2] null; null üzerinden alana erişmek NullPointerException fırlatır ve program bu satırda sonlanır.");
+        }
+      },
+      {
+        ad: "Metot içinde oluşan nesneler",
+        code: NOKTA.concat(["public class Main {", "    static Nokta yap(int k) {", "        Nokta t = new Nokta(k, k);", "        Nokta u = new Nokta(0, 0);", "        return t;", "    }", "    public static void main(String[] args) {", "        Nokta a = yap(4);", "        a = yap(6);", "        System.out.println(a.x);", "    }", "}"]),
+        run: function (T) {
+          T.main(10, "main başlar.");
+          var slots = [[0, 0], [1, 0], [0, 1], [1, 1]], si = 0, first;
+          [4, 6].forEach(function (k, i) {
+            T.push("yap(int k)", [["int", "k", k]]);
+            T.snap(5, "yap(" + k + ") çağrılır: yeni çerçeve, k = " + k + ".");
+            var t = yeniKisa(T, "Nokta", [["x", k], ["y", k]], slots[si++]);
+            T.set("t", R(t), "Nokta");
+            T.snap(6, "t = new Nokta(" + k + ", " + k + "): nesne heap'te (#" + t + "); referansı yerel t'de.", { hl: { v: "t" } });
+            var u = yeniKisa(T, "Nokta", [["x", 0], ["y", 0]], slots[si++]);
+            T.set("u", R(u), "Nokta");
+            T.snap(7, "u = new Nokta(0, 0): #" + u + ". Nesneler metodun değil heap'in malıdır; metot bitince silinmezler.", { hl: { v: "u" } });
+            T.snap(8, "return t: döndürülen, t'deki referanstır (#" + t + ").");
+            T.pop();
+            T.set("a", R(t), "Nokta");
+            if (!i) {
+              first = t;
+              T.snap(11, "yap biter; t ve u çerçeveyle yok olur. #" + t + " a'ya atandığı için yaşar; #" + u + "'ye ulaşan yol kalmadı → çöp toplamaya uygun.", { hl: { v: "a" }, q: Q("İlk çağrıdan sonra çöp toplamaya uygun nesne hangisi?", "#" + u + " (0, 0)", ["#" + t + " (4, 4)", "hiçbiri"]) });
+            } else {
+              T.snap(12, "a artık #" + t + "'i gösterir. Eski #" + first + " ile bu çağrıdaki #" + u + " sahipsiz kaldı.", { hl: { v: "a" }, q: Q("Heap'te toplam kaç nesne çöp toplamaya uygun?", 3, [2, 1, 4]) });
+            }
+          });
+          T.print("6\n");
+          T.snap(13, "a.x → 6 yazılır.", { printed: true, q: Q("Ne yazılır?", 6, [4, 0]) });
+        }
+      },
+      {
+        ad: "Bağlı düğümler: bas.sonraki",
+        code: ["class Dugum {", "    int deger;", "    Dugum sonraki;", "    Dugum(int d) { deger = d; }", "}", "public class Main {", "    public static void main(String[] args) {", "        Dugum bas = new Dugum(1);", "        bas.sonraki = new Dugum(2);", "        bas.sonraki.sonraki = new Dugum(3);", "        bas.sonraki = bas.sonraki.sonraki;", "        System.out.println(bas.sonraki.deger);", "        Dugum son = bas.sonraki;", "        bas = null;", "    }", "}"],
+        run: function (T) {
+          T.main(6, "main başlar.");
+          var d1 = yeniKisa(T, "Dugum", [["deger", 1], ["sonraki", null]], [0, 0]);
+          T.set("bas", R(d1), "Dugum");
+          T.snap(7, "new Dugum(1): referans alanı sonraki varsayılan olarak null; bas bu düğümü gösterir.", { hl: { v: "bas" } });
+          var d2 = yeniKisa(T, "Dugum", [["deger", 2], ["sonraki", null]], [1, 0]);
+          T.setf(d1, "sonraki", R(d2));
+          T.snap(8, "bas.sonraki = new Dugum(2): ok bu kez heap'teki bir nesnenin alanından çıkar: #1 → #2.", { hl: { o: d1, f: "sonraki" } });
+          var d3 = yeniKisa(T, "Dugum", [["deger", 3], ["sonraki", null]], [0, 1]);
+          T.setf(d2, "sonraki", R(d3));
+          T.snap(9, "bas.sonraki.sonraki: önce bas.sonraki (#2) bulunur, onun sonraki alanına #3 yazılır. Zincir: bas → #1 → #2 → #3.", { hl: { o: d2, f: "sonraki" } });
+          T.setf(d1, "sonraki", R(d3));
+          T.snap(10, "Sağ taraf önce: bas.sonraki.sonraki = #3. #1'in sonraki alanı artık #3'ü gösterir. #2'ye ulaşan yol kalmadı; #2 kendisi #3'ü gösterse de çöp toplamaya uygundur.", { hl: { o: d1, f: "sonraki" }, q: Q("Hangi düğüm çöp toplamaya uygun hale gelir?", "#2", ["#3", "#1", "hiçbiri"]) });
+          T.print("3\n");
+          T.snap(11, "bas.sonraki.deger → 3.", { printed: true, q: Q("Ne yazılır?", 3, [2, 1]) });
+          T.set("son", R(d3), "Dugum");
+          T.snap(12, "son = bas.sonraki: son da #3'ü gösterir.", { hl: { v: "son" } });
+          T.set("bas", null, "Dugum");
+          T.snap(13, "bas = null: #1'e ulaşılamaz → çöp toplamaya uygun. #3 ise son üzerinden hâlâ erişilebilir.", { hl: { v: "bas" }, q: Q("Şimdi hangi düğüm hâlâ erişilebilir?", "#3", ["#1", "#2", "hiçbiri"]) });
+        }
+      }
+    ];
+    function trace(prog) {
+      var T = Tracer();
+      try { prog.run(T); } catch (x) { if (!(x instanceof Stop)) throw x; }
+      return { events: T.events, out: T.out, code: prog.code };
+    }
+    /* Erişilebilirlik: yığındaki referanslardan başlayıp heap içinde izlenir. */
+    function live(e) {
+      var seen = {}, st = [];
+      e.fr.forEach(function (f) { f.v.forEach(function (v) { if (v[2] && v[2].r) st.push(v[2].r); }); });
+      while (st.length) {
+        var id = st.pop(); if (seen[id]) continue; seen[id] = true;
+        e.heap.forEach(function (o) { if (o.id === id) o.f.forEach(function (f) { if (f[1] && f[1].r) st.push(f[1].r); }); });
+      }
+      return seen;
+    }
+    return { PROGS: PROGS, trace: trace, live: live };
+  })();
+  /*CORE-END*/
+
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector(".jv-hs");
+  var P = null, RS = null, k = 0, timer = null, answered = {}, ok = 0, all = 0;
+  var NS = "http://www.w3.org/2000/svg";
+
+  Core.PROGS.forEach(function (pr, i) { var o = document.createElement("option"); o.value = i; o.textContent = pr.ad; E("hsProg").appendChild(o); });
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+
+  function load() {
+    stop();
+    P = Core.PROGS[E("hsProg").value];
+    RS = Core.trace(P);
+    k = 0; answered = {};
+    RS.events.forEach(function (e) {
+      if (e.q) { var o = e.q.opts.map(function (_, i) { return i; }); o.sort(function () { return Math.random() - 0.5; }); e.q.order = o; }
+    });
+    E("hsCode").innerHTML = RS.code.map(function (l) { return "<li>" + esc(l) + "</li>"; }).join("");
+    draw();
+  }
+  function needQ() { var e = RS.events[k]; return E("hsQuiz").checked && e.q && !answered[k]; }
+
+  /* ---- bellek çizimi ---- */
+  var W = 414, H = 372, SX = 6, SW = 150, HX = 182, BW = 102, CG = 22, RH = 118, HY = 22;
+  function val(v) { return v === null ? "null" : typeof v === "object" ? "" : String(v); }
+  function drawMem(e, q) {
+    var alive = Core.live(e), h = [], arrows = [], pos = {};
+    h.push('<defs><marker id="hsAh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>' +
+      '<marker id="hsAhH" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah h" d="M0,0 L10,5 L0,10 z"/></marker>' +
+      '<marker id="hsAhD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah d" d="M0,0 L10,5 L0,10 z"/></marker></defs>');
+    h.push('<text class="lbl" x="' + SX + '" y="14">YIĞIN</text><text class="lbl" x="' + HX + '" y="14">HEAP</text>');
+    h.push('<line class="sep" x1="' + (HX - 14) + '" y1="4" x2="' + (HX - 14) + '" y2="' + (H - 4) + '"/>');
+    var hl = e.hl || {};
+    /* heap nesneleri */
+    e.heap.forEach(function (o) {
+      var x = HX + o.slot[0] * (BW + CG), y = HY + 8 + o.slot[1] * RH, hh = 20 + 20 * o.f.length, dead = !alive[o.id];
+      pos[o.id] = { x: x, y: y, h: hh, dead: dead };
+      h.push('<g class="' + (dead ? "dead" : "") + '"><rect class="ob' + (dead ? " dead" : "") + '" x="' + x + '" y="' + y + '" width="' + BW + '" height="' + hh + '" rx="7"/>' +
+        '<rect class="oh" x="' + (x + 1) + '" y="' + (y + 1) + '" width="' + (BW - 2) + '" height="18" rx="6"/>' +
+        '<text x="' + (x + 7) + '" y="' + (y + 14) + '" font-weight="700">' + esc(o.cls) + '</text><text class="mut" x="' + (x + BW - 7) + '" y="' + (y + 14) + '" text-anchor="end">#' + o.id + "</text>");
+      o.f.forEach(function (f, i) {
+        var ry = y + 20 + i * 20, isH = hl.o === o.id && hl.f === f[0];
+        h.push('<line class="sep" x1="' + x + '" y1="' + ry + '" x2="' + (x + BW) + '" y2="' + ry + '"/>' +
+          '<text x="' + (x + 7) + '" y="' + (ry + 14) + '"' + (isH ? ' class="hot"' : "") + ">" + esc(f[0]) + "</text>");
+        if (f[1] && f[1].r) {
+          h.push('<circle class="dot' + (isH ? " h" : "") + '" cx="' + (x + BW - 14) + '" cy="' + (ry + 10) + '" r="3.5"/>');
+          arrows.push({ sx: x + BW - 14, sy: ry + 10, to: f[1].r, hot: isH, dead: dead, heap: true });
+        } else h.push('<text x="' + (x + BW - 7) + '" y="' + (ry + 14) + '" text-anchor="end"' + (isH ? ' class="hot"' : f[1] === null ? ' class="mut"' : "") + ">" + esc(val(f[1])) + "</text>");
+      });
+      if (dead) h.push('<text class="gc" x="' + x + '" y="' + (y + hh + 14) + '">çöp toplanabilir</text>');
+      h.push("</g>");
+    });
+    /* yığın: main en altta */
+    var y = H - 6, n = e.fr.length;
+    e.fr.forEach(function (f, i) {
+      var rows = Math.max(1, f.v.length), hh = 21 + 20 * rows, top = i === n - 1;
+      y -= hh;
+      h.push('<rect class="fr' + (top ? " top" : "") + '" x="' + SX + '" y="' + y + '" width="' + SW + '" height="' + hh + '" rx="7"/>' +
+        '<rect class="fh" x="' + (SX + 1.5) + '" y="' + (y + 1.5) + '" width="' + (SW - 3) + '" height="18" rx="6"' + (top ? ' style="fill:var(--ds-hot)"' : "") + "/>" +
+        '<text x="' + (SX + 6) + '" y="' + (y + 14) + '" font-weight="700">' + esc(f.sig) + "</text>");
+      if (!f.v.length) h.push('<text class="mut" x="' + (SX + 8) + '" y="' + (y + 35) + '" style="font-family:system-ui,sans-serif">(yerel değişken yok)</text>');
+      f.v.forEach(function (v, j) {
+        var ry = y + 21 + j * 20, isH = top && hl.v === v[1];
+        h.push('<text x="' + (SX + 7) + '" y="' + (ry + 14) + '"' + (isH ? ' class="hot"' : "") + '><tspan class="mut">' + esc(v[0]) + "</tspan> " + esc(v[1]) + "</text>");
+        if (v[2] && v[2].r) {
+          h.push('<circle class="dot' + (isH ? " h" : "") + '" cx="' + (SX + SW - 14) + '" cy="' + (ry + 10) + '" r="3.5"/>');
+          arrows.push({ sx: SX + SW - 14, sy: ry + 10, to: v[2].r, hot: isH });
+        } else h.push('<text x="' + (SX + SW - 8) + '" y="' + (ry + 14) + '" text-anchor="end"' + (isH ? ' class="hot"' : v[2] === null ? ' class="mut"' : "") + ">" + esc(val(v[2])) + "</text>");
+      });
+      y -= 6;
+    });
+    /* oklar */
+    arrows.forEach(function (a) {
+      var t = pos[a.to]; if (!t) return;
+      var d, tx, ty;
+      if (t.x > a.sx + 16) { tx = t.x; ty = t.y + 10; d = "M" + a.sx + "," + a.sy + " C" + (a.sx + 40) + "," + a.sy + " " + (tx - 40) + "," + ty + " " + (tx - 1) + "," + ty; }
+      else { tx = t.x + BW; ty = t.y + 10; d = "M" + a.sx + "," + a.sy + " C" + (a.sx + 34) + "," + (a.sy + 30) + " " + (tx + 40) + "," + ty + " " + (tx + 1) + "," + ty; }
+      var c = a.hot ? " h" : a.dead ? " d" : "";
+      h.push('<path class="ar' + c + '" d="' + d + '" marker-end="url(#' + (a.hot ? "hsAhH" : a.dead ? "hsAhD" : "hsAh") + ')"/>');
+    });
+    if (e.err && !q) {
+      h.push('<rect class="err" x="' + HX + '" y="' + (H - 40) + '" width="' + (W - HX - 4) + '" height="34" rx="7"/><text class="errt" x="' + (HX + 10) + '" y="' + (H - 18) + '">NullPointerException</text>');
+    }
+    E("hsMem").innerHTML = h.join("");
+    var nd = e.heap.filter(function (o) { return !alive[o.id]; }).length;
+    E("hsMemCap").textContent = e.fr.length + " çerçeve · " + e.heap.length + " nesne" + (nd ? " (" + nd + " çöp)" : "");
+  }
+
+  function draw() {
+    var e = RS.events[k], q = needQ();
+    [].forEach.call(E("hsCode").children, function (li, i) {
+      li.classList.toggle("is-cur", i === e.line && !e.err);
+      li.classList.toggle("is-bad", i === e.line && !!e.err);
+    });
+    drawMem(q && !e.printed ? RS.events[Math.max(0, k - 1)] : e, q);
+    if (q) {
+      E("hsWhy").innerHTML = "<b>Tahmin edin:</b> " + esc(e.q.text) + '<div class="qbtns">' + e.q.order.map(function (i) { return '<button type="button" data-a="' + i + '">' + esc(e.q.opts[i]) + "</button>"; }).join("") + "</div>";
+    } else E("hsWhy").innerHTML = (e.fb || "") + esc(e.why);
+    var out = q && e.printed ? (RS.events[k - 1] ? RS.events[k - 1].out : "") : e.out;
+    var lines = out.replace(/\n$/, "").split("\n");
+    E("hsOut").innerHTML = out ? lines.slice(-4).map(function (l) { return '<div' + (/Exception|\tat /.test(l) ? ' class="ex"' : "") + ">" + esc(l.replace(/\t/g, "    ")) + "</div>"; }).join("") : "";
+    E("hsNo").textContent = "Adım " + (k + 1) + " / " + RS.events.length;
+    E("hsBack").disabled = k === 0;
+    E("hsReset").disabled = k === 0;
+    E("hsStep").disabled = q || k >= RS.events.length - 1;
+    E("hsPlay").disabled = E("hsStep").disabled && !timer;
+    E("hsPlay").textContent = timer ? "Duraklat" : "Oynat";
+    if (q) { var b = E("hsWhy").querySelector("button"); if (b && root.contains(document.activeElement)) b.focus(); }
+  }
+  function go(d) { k = Math.max(0, Math.min(RS.events.length - 1, k + d)); draw(); }
+  function stop() { clearInterval(timer); timer = null; }
+  function delay() { return [2000, 1400, 950, 600, 300][E("hsSpeed").value - 1]; }
+  function play() {
+    if (timer) { stop(); draw(); return; }
+    if (k >= RS.events.length - 1) k = 0;
+    timer = setInterval(function () {
+      if (needQ() || k >= RS.events.length - 1) { stop(); draw(); return; }
+      go(1);
+      if (needQ()) { stop(); draw(); }
+    }, delay());
+    draw();
+  }
+
+  E("hsWhy").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-a]");
+    if (!b || !needQ()) return;
+    var e = RS.events[k], good = +b.getAttribute("data-a") === e.q.ans;
+    answered[k] = true; all++; if (good) ok++;
+    E("hsOk").textContent = ok; E("hsAll").textContent = all;
+    e.fb = good ? '<b class="agt-oyun__good">Doğru!</b> ' : '<b class="agt-oyun__bad">Yanlış.</b> Doğrusu: <code>' + esc(e.q.opts[e.q.ans]) + "</code>. ";
+    draw();
+    E("hsStep").focus();
+  });
+  E("hsProg").addEventListener("change", load);
+  E("hsStep").addEventListener("click", function () { stop(); go(1); });
+  E("hsBack").addEventListener("click", function () { stop(); go(-1); });
+  E("hsReset").addEventListener("click", function () { stop(); k = 0; answered = {}; RS.events.forEach(function (e) { e.fb = ""; }); draw(); });
+  E("hsPlay").addEventListener("click", play);
+  E("hsSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("hsQuiz").addEventListener("change", draw);
+  root.addEventListener("keydown", function (ev) {
+    if (/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName) && ev.target.type !== "checkbox") return;
+    if (ev.key === "ArrowRight" && !needQ()) { stop(); go(1); ev.preventDefault(); }
+    else if (ev.key === "ArrowLeft") { stop(); go(-1); ev.preventDefault(); }
+  });
+
+  load();
+})();
+</script>
+<script src="deck/oyun.js"></script>

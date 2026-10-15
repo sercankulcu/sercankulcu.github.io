@@ -1,0 +1,408 @@
+---
+layout: without-sidebar
+title: "Dizgi Havuzu"
+permalink: /files/java/slides/Chapter_05_String-Pool.html
+excerpt: "Dizgi sabitlerinin havuzda paylaşılması, == ile equals farkı, new String ve intern, derleme zamanı sabitleri, + ile yeni nesne üreten değiştirilemez String ve aynı tamponu büyüten StringBuilder, bellek üzerinde satır satır."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.jv-sp, .jv-sp-dlg { --ds-accent:#a61b1b; }
+html[data-theme="dark"] .jv-sp, html[data-theme="dark"] .jv-sp-dlg { --ds-accent:#f07a7a; }
+.jv-sp .sp-wrap { display:grid; grid-template-rows:34px minmax(0,1fr) 80px; gap:8px; height:100%; }
+.jv-sp .bar { display:flex; align-items:center; gap:6px; min-width:0; }
+.jv-sp .bar select { width:214px; min-height:32px; font-size:13.5px; }
+.jv-sp .bar button { min-height:32px; padding:0 11px; font-size:13.5px; white-space:nowrap; }
+.jv-sp .bar #spPlay { width:84px; }
+.jv-sp .bar #spStep { width:80px; }
+.jv-sp .bar input[type="range"] { width:64px; }
+.jv-sp .bar .check { display:flex; align-items:center; gap:5px; margin-left:4px; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.jv-sp .bar .score { margin-left:auto; color:var(--ds-muted); font-size:13px; font-weight:700; white-space:nowrap; }
+.jv-sp .bar .score b { color:var(--ds-text); }
+.jv-sp .mid { display:grid; grid-template-columns:376px minmax(0,1fr); gap:8px; min-height:0; }
+.jv-sp .pane { display:flex; flex-direction:column; min-height:0; min-width:0; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-bg); overflow:hidden; }
+.jv-sp .cap { display:flex; justify-content:space-between; margin:0; padding:3px 8px 2px; color:var(--ds-muted); font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; background:var(--ds-surface-strong); }
+.jv-sp .cap span:last-child { text-transform:none; letter-spacing:0; }
+.jv-sp .code { flex:1; min-height:0; margin:0; padding:3px 0; overflow:hidden; font:12px/1.5 ui-monospace, Consolas, monospace; list-style:none; counter-reset:ln; }
+.jv-sp .code li { margin:0; padding:0 4px 0 0; line-height:1.5; white-space:pre; counter-increment:ln; }
+.jv-sp .code li::before { content:counter(ln); display:inline-block; width:22px; margin-right:7px; color:var(--ds-muted); font-size:12px; text-align:right; }
+.jv-sp .code li.is-cur { background:var(--ds-hot); box-shadow:inset 4px 0 0 var(--ds-accent); }
+.jv-sp .mem { flex:1; min-height:0; width:100%; display:block; }
+.jv-sp .mem text { font:12px ui-monospace, Consolas, monospace; fill:var(--ds-text); }
+.jv-sp .mem .lbl { font:800 12px system-ui, sans-serif; fill:var(--ds-muted); letter-spacing:.05em; }
+.jv-sp .mem .fr { fill:var(--ds-surface); stroke:var(--ds-accent); stroke-width:2; }
+.jv-sp .mem .fh { fill:var(--ds-hot); }
+.jv-sp .mem .pool { fill:color-mix(in srgb, var(--ds-good) 8%, var(--ds-bg)); stroke:var(--ds-good); stroke-width:1.5; stroke-dasharray:6 4; }
+.jv-sp .mem .poollbl { font:800 12px system-ui, sans-serif; fill:var(--ds-good); }
+.jv-sp .mem .ob { fill:var(--ds-node); stroke:var(--ds-link); stroke-width:1.5; }
+.jv-sp .mem .ob.new { stroke:var(--ds-accent); stroke-width:2.4; }
+.jv-sp .mem g.dead { opacity:.55; }
+.jv-sp .mem g.dead .ob { fill:var(--ds-bg); stroke:var(--ds-muted); stroke-dasharray:5 4; }
+.jv-sp .mem .cell { fill:var(--ds-bg); stroke:var(--ds-border); stroke-width:1; }
+.jv-sp .mem .cell.used { fill:color-mix(in srgb, var(--ds-link) 22%, var(--ds-bg)); }
+.jv-sp .mem .sep { stroke:var(--ds-border); stroke-width:1; }
+.jv-sp .mem .hot { fill:var(--ds-accent); font-weight:700; }
+.jv-sp .mem .mut { fill:var(--ds-muted); }
+.jv-sp .mem .gc { font:700 12px system-ui, sans-serif; fill:var(--ds-bad); }
+.jv-sp .mem .dot { fill:var(--ds-link); }
+.jv-sp .mem .dot.h { fill:var(--ds-accent); }
+.jv-sp .mem .ar { fill:none; stroke:var(--ds-link); stroke-width:1.6; }
+.jv-sp .mem .ar.h { stroke:var(--ds-accent); stroke-width:2.4; }
+.jv-sp .mem .ah { fill:var(--ds-link); }
+.jv-sp .mem .ah.h { fill:var(--ds-accent); }
+.jv-sp .bot { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:8px; min-height:0; }
+.jv-sp .why { margin:0; padding:5px 10px; overflow:hidden; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:13px; line-height:1.33; }
+.jv-sp .qbtns { display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; }
+.jv-sp .qbtns button { min-height:24px; padding:0 10px; font:600 12.5px ui-monospace, Consolas, monospace; }
+.jv-sp .out { flex:1; min-height:0; display:flex; flex-direction:column; justify-content:flex-end; margin:0; padding:1px 8px 2px; overflow:hidden; background:var(--ds-surface); font:12px/1.25 ui-monospace, Consolas, monospace; white-space:pre-wrap; word-break:break-all; }
+</style>
+
+<div class="jv-sp agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 5 · Simülatör</p><h1>Dizgi Havuzu ve StringBuilder</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="sp-help" aria-label="Açıklama ve kullanım">?</button>
+    <a class="agt-oyun__back" href="Bolum_05_Dizgi.html">← Bölüm 5</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="sp-wrap">
+      <div class="bar">
+        <select id="spProg" aria-label="Program seç"></select>
+        <button type="button" id="spBack" aria-label="Bir adım geri">◀</button>
+        <button type="button" id="spStep" class="is-primary" aria-label="Bir adım ileri">Adım ▶</button>
+        <button type="button" id="spPlay" aria-label="Oynat veya duraklat">Oynat</button>
+        <button type="button" id="spReset" aria-label="Başa dön">Sıfırla</button>
+        <input type="range" id="spSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı" title="Hız">
+        <label class="check"><input type="checkbox" id="spQuiz"> Kendini dene</label>
+        <span class="score" aria-live="polite">Doğru <b id="spOk">0</b> / <b id="spAll">0</b></span>
+      </div>
+      <div class="mid">
+        <div class="pane"><p class="cap"><span>Java kodu</span><span id="spNo"></span></p><ol class="code" id="spCode" aria-label="Java kodu"></ol></div>
+        <div class="pane"><p class="cap"><span>Bellek</span><span id="spMemCap"></span></p><svg class="mem" id="spMem" viewBox="0 0 370 372" role="img" aria-label="Yığın, heap ve dizgi havuzu"></svg></div>
+      </div>
+      <div class="bot">
+        <div class="why" id="spWhy" aria-live="polite"></div>
+        <div class="pane"><p class="cap"><span>Çıktı (konsol)</span></p><div class="out" id="spOut" aria-label="Program çıktısı"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog jv-sp-dlg" id="sp-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Dizgi Havuzu ve StringBuilder</h2>
+    <p><b>Amaç:</b> Java'nın dizgileri bellekte nasıl tuttuğunu görmek. Kaynak koddaki <code>"Java"</code> gibi <b>dizgi sabitleri</b> heap'teki özel bir bölgede, <b>dizgi havuzunda</b> tutulur ve içeriği aynı sabitler tek bir nesneyi paylaşır. <code>String</code> <b>değiştirilemez</b>: her "değişiklik" yeni bir nesne üretir. <code>StringBuilder</code> ise aynı tamponu yerinde değiştirir.</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li>Listeden bir program seçin; <b>Adım ▶</b> / <b>◀</b> (klavyede → / ←), <b>Oynat</b>, <b>Sıfırla</b>.</li>
+      <li>Solda yığındaki <code>main</code> çerçevesi, sağda heap: yeşil kesik çerçeveli bölge dizgi havuzudur. Yeni oluşan nesne kırmızı kenarlı, ulaşılamayan nesne soluk ve kesik çizgilidir (çöp toplamaya uygun).</li>
+      <li><b>Kendini dene</b> açıkken her <code>println</code> çıktısını önceden tahmin edersiniz.</li>
+    </ol>
+    <h3>Hatırlatma</h3>
+    <ul>
+      <li><code>==</code> iki referansın <b>aynı nesneyi</b> gösterip göstermediğine bakar; <code>equals</code> içerikleri karşılaştırır. Dizgileri her zaman <code>equals</code> ile karşılaştırın.</li>
+      <li><code>new String("Java")</code> havuzdaki sabitten bağımsız, yeni bir nesne oluşturur. <code>s.intern()</code> havuzdaki eşini döndürür.</li>
+      <li>Derleme zamanında hesaplanabilen ifadeler (<code>"Ja" + "va"</code>, <code>final</code> değişkenle birleştirme) tek bir sabite dönüşür ve havuza gider; değişkenle çalışma zamanında yapılan <code>+</code> yeni nesne üretir.</li>
+      <li><code>s.toUpperCase()</code> gibi metotlar <code>s</code>'yi değiştirmez; sonucu kullanmak için atamak gerekir: <code>s = s.toUpperCase();</code></li>
+      <li><code>StringBuilder</code>'ın bir uzunluğu (<code>length</code>) ve tampon büyüklüğü (<code>capacity</code>) vardır; <code>new StringBuilder("Ja")</code> için kapasite 16 + 2 = 18'dir. Döngüde birleştirme için <code>String +</code> yerine <code>StringBuilder</code> kullanılır.</li>
+    </ul>
+    <p>Nesne numaraları (#1, #2…) yalnızca anlatım içindir. Bir sabitin havuza tam olarak ne zaman eklendiği JVM'e bağlıdır; burada ilk kullanıldığı satırda gösterilir. Tüm çıktılar <code>javac --release 8</code> ile derlenip Java 8 üzerinde çalıştırılarak doğrulanmıştır.</p>
+    <p>İlgili sunum: <a href="Bolum_05_Dizgi.html">Bölüm 5 · Dizgi</a> (== ile Karşılaştırma, Dizgi Havuzu, Havuz: Adım Adım, Değiştirilemez (Immutable), StringBuilder).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /*CORE-BEGIN*/
+  var Core = (function () {
+    function R(id) { return { r: id }; }
+    function Tracer() {
+      var S = { v: [], heap: [], out: "" }, ev = [], pc = 0, hc = 0;
+      function obj(id) { for (var i = 0; i < S.heap.length; i++) if (S.heap[i].id === id) return S.heap[i]; }
+      var T = {
+        /* havuzdaki sabit: varsa aynısı döner */
+        lit: function (s) { for (var i = 0; i < S.heap.length; i++) if (S.heap[i].pool && S.heap[i].val === s) return S.heap[i].id; var id = S.heap.length + 1; S.heap.push({ id: id, kind: "str", val: s, pool: true, slot: pc++ }); return id; },
+        str: function (s) { var id = S.heap.length + 1; S.heap.push({ id: id, kind: "str", val: s, pool: false, slot: hc++ }); return id; },
+        sb: function (s, cap) { var id = S.heap.length + 1; S.heap.push({ id: id, kind: "sb", val: s, cap: cap, pool: false, slot: hc }); hc += 6; return id; },
+        val: function (id) { return obj(id).val; },
+        setsb: function (id, s) { obj(id).val = s; },
+        set: function (name, val, type) { for (var i = 0; i < S.v.length; i++) if (S.v[i][1] === name) { S.v[i][2] = val; return; } S.v.push([type, name, val]); },
+        drop: function (name) { S.v = S.v.filter(function (v) { return v[1] !== name; }); },
+        get: function (name) { for (var i = 0; i < S.v.length; i++) if (S.v[i][1] === name) return S.v[i][2]; },
+        print: function (s) { S.out += s + "\n"; },
+        snap: function (line, why, x) { var e = JSON.parse(JSON.stringify(S)); e.line = line; e.why = why; for (var k in x || {}) e[k] = x[k]; ev.push(e); },
+        get events() { return ev; }, get out() { return S.out; }
+      };
+      return T;
+    }
+    function Q(text, right, alts) { var o = [String(right)]; alts.forEach(function (a) { a = String(a); if (o.indexOf(a) < 0) o.push(a); }); return { text: text, opts: o, ans: 0 }; }
+    function wrap(body) { return ["public class Main {", "    public static void main(String[] args) {"].concat(body.map(function (l) { return "        " + l; }), ["    }", "}"]); }
+    function TF(b) { return b ? "true" : "false"; }
+    var PROGS = [
+      {
+        ad: "Sabitler, new String ve intern",
+        code: wrap(["String a = \"Java\";", "String b = \"Java\";", "String c = new String(\"Java\");", "System.out.println(a == b);", "System.out.println(a == c);", "System.out.println(a.equals(c));", "String d = c.intern();", "System.out.println(a == d);"]),
+        run: function (T) {
+          T.snap(1, "main başlar; heap'te henüz dizgi yok.");
+          var p = T.lit("Java"); T.set("a", R(p), "String");
+          T.snap(2, "\"Java\" bir dizgi sabiti: havuzda bir String nesnesi (#" + p + ") olur, a onu gösterir.", { hl: ["a"], nw: p });
+          T.set("b", R(T.lit("Java")), "String");
+          T.snap(3, "Aynı sabit yeniden kullanılır: havuzda zaten \"Java\" var, yeni nesne oluşmaz. b de #" + p + "'i gösterir.", { hl: ["b"], q: Q("Havuzda kaç tane \"Java\" nesnesi var?", 1, [2, 0]) });
+          var n = T.str("Java"); T.set("c", R(n), "String");
+          T.snap(4, "new String(\"Java\"): içerik aynı olsa da havuzun DIŞINDA yepyeni bir nesne (#" + n + "). new her zaman yeni nesne demektir.", { hl: ["c"], nw: n });
+          T.print("true"); T.snap(5, "a == b → true: iki referans da AYNI nesneyi (#" + p + ") gösteriyor.", { hl: ["a", "b"], q: Q("a == b ne yazar?", "true", ["false"]), printed: true });
+          T.print("false"); T.snap(6, "a == c → false: içerikler aynı ama nesneler farklı (#" + p + " ve #" + n + "). == içeriğe değil, referansa bakar.", { hl: ["a", "c"], q: Q("a == c ne yazar?", "false", ["true"]), printed: true });
+          T.print("true"); T.snap(7, "a.equals(c) → true: equals karakterleri tek tek karşılaştırır. Dizgiler her zaman equals ile karşılaştırılır.", { hl: ["a", "c"], q: Q("a.equals(c) ne yazar?", "true", ["false"]), printed: true });
+          T.set("d", R(p), "String");
+          T.snap(8, "c.intern(): havuzda \"Java\" içerikli nesne varsa onu döndürür → #" + p + ". d artık havuzdaki nesneyi gösterir.", { hl: ["d"], q: Q("d hangi nesneyi gösterir?", "#" + p + " (havuz)", ["#" + n + " (new)", "yeni bir nesne"]) });
+          T.print("true"); T.snap(9, "a == d → true: ikisi de havuzdaki aynı nesne.", { hl: ["a", "d"], q: Q("a == d ne yazar?", "true", ["false"]), printed: true });
+        }
+      },
+      {
+        ad: "Değiştirilemezlik: + ve toUpperCase",
+        code: wrap(["String s = \"Ja\";", "String t = s;", "s = s + \"va\";", "System.out.println(t);", "System.out.println(s == \"Java\");", "s.toUpperCase();", "System.out.println(s);", "s = s.toUpperCase();", "System.out.println(s);"]),
+        run: function (T) {
+          T.snap(1, "main başlar.");
+          var ja = T.lit("Ja"); T.set("s", R(ja), "String");
+          T.snap(2, "s havuzdaki \"Ja\" sabitini (#" + ja + ") gösterir.", { hl: ["s"], nw: ja });
+          T.set("t", R(ja), "String");
+          T.snap(3, "t = s: referans kopyalanır; t de #" + ja + "'i gösterir.", { hl: ["t"] });
+          var va = T.lit("va"), j = T.str("Java"); T.set("s", R(j), "String");
+          T.snap(4, "s + \"va\": #" + ja + " DEĞİŞMEZ. Çalışma zamanında yeni bir String (#" + j + ", \"Java\") üretilir; havuzda değil, sıradan heap'te. s artık onu gösterir, t hâlâ \"Ja\"yı.", { hl: ["s"], nw: j });
+          T.print("Ja"); T.snap(5, "t \"Ja\"yı gösteriyor: String değiştirilemez olduğu için s üzerinden yapılan işlem t'yi etkilemedi.", { hl: ["t"], q: Q("System.out.println(t) ne yazar?", "Ja", ["Java"]), printed: true });
+          var lj = T.lit("Java");
+          T.print("false"); T.snap(6, "\"Java\" sabiti havuza girer (#" + lj + "). s ise + ile üretilmiş #" + j + "'yi gösteriyor: farklı nesneler → false.", { hl: ["s"], nw: lj, q: Q("s == \"Java\" ne yazar?", "false", ["true"]), printed: true });
+          var up = T.str("JAVA");
+          T.snap(7, "s.toUpperCase() yeni bir nesne (#" + up + ", \"JAVA\") döndürür; ama sonuç hiçbir değişkene atanmadı. Nesne hemen erişilemez hale gelir; s değişmedi.", { nw: up });
+          T.print("Java"); T.snap(8, "s hâlâ \"Java\".", { hl: ["s"], q: Q("System.out.println(s) ne yazar?", "Java", ["JAVA", "Ja"]), printed: true });
+          var up2 = T.str("JAVA"); T.set("s", R(up2), "String");
+          T.snap(9, "s = s.toUpperCase(): yeni nesne (#" + up2 + ") bu kez s'ye atanır. Eski #" + j + "'ye ulaşan referans kalmadı.", { hl: ["s"], nw: up2 });
+          T.print("JAVA"); T.snap(10, "\"JAVA\" yazılır. Dizgi \"değiştirmek\" aslında yeni nesne oluşturup referansı ona çevirmektir.", { hl: ["s"], q: Q("Ne yazılır?", "JAVA", ["Java"]), printed: true });
+        }
+      },
+      {
+        ad: "Derleme zamanı sabitleri",
+        code: wrap(["String a = \"Java\";", "String b = \"Ja\" + \"va\";", "String k = \"Ja\";", "String c = k + \"va\";", "final String f = \"Ja\";", "String d = f + \"va\";", "System.out.println(a == b);", "System.out.println(a == c);", "System.out.println(a == d);", "System.out.println(a == c.intern());"]),
+        run: function (T) {
+          T.snap(1, "main başlar.");
+          var p = T.lit("Java"); T.set("a", R(p), "String");
+          T.snap(2, "a havuzdaki \"Java\"yı (#" + p + ") gösterir.", { hl: ["a"], nw: p });
+          T.set("b", R(p), "String");
+          T.snap(3, "\"Ja\" + \"va\" iki sabitin birleşimi: derleyici bunu derlerken \"Java\" sabitine çevirir. Çalışma zamanında birleştirme yok; b de #" + p + ".", { hl: ["b"], q: Q("b hangi nesneyi gösterir?", "#" + p + " (havuzdaki \"Java\")", ["yeni bir nesne"]) });
+          var ja = T.lit("Ja"); T.set("k", R(ja), "String");
+          T.snap(4, "k havuzdaki \"Ja\"yı (#" + ja + ") gösterir. k bir değişken; değeri derleyici için sabit değildir.", { hl: ["k"], nw: ja });
+          T.lit("va"); var c = T.str("Java"); T.set("c", R(c), "String");
+          T.snap(5, "k + \"va\" çalışma zamanında hesaplanır → yeni nesne (#" + c + "), havuzun dışında.", { hl: ["c"], nw: c });
+          T.set("f", R(ja), "String");
+          T.snap(6, "final String f = \"Ja\": sabit bir ifadeyle ilk değer alan final değişken, derleme zamanı sabitidir.", { hl: ["f"] });
+          T.set("d", R(p), "String");
+          T.snap(7, "f + \"va\" derleme zamanında \"Java\" olur → havuzdaki #" + p + ". Yeni nesne yok.", { hl: ["d"], q: Q("d hangi nesneyi gösterir?", "#" + p + " (havuzdaki \"Java\")", ["yeni bir nesne"]) });
+          T.print("true"); T.snap(8, "a == b → true (aynı havuz nesnesi).", { hl: ["a", "b"], q: Q("a == b ne yazar?", "true", ["false"]), printed: true });
+          T.print("false"); T.snap(9, "a == c → false: c çalışma zamanında üretildi.", { hl: ["a", "c"], q: Q("a == c ne yazar?", "false", ["true"]), printed: true });
+          T.print("true"); T.snap(10, "a == d → true: d derleme zamanı sabiti.", { hl: ["a", "d"], q: Q("a == d ne yazar?", "true", ["false"]), printed: true });
+          T.print("true"); T.snap(11, "c.intern() havuzdaki eşini (#" + p + ") verir → true.", { hl: ["a", "c"], q: Q("a == c.intern() ne yazar?", "true", ["false"]), printed: true });
+        }
+      },
+      {
+        ad: "StringBuilder: aynı tampon",
+        code: wrap(["StringBuilder sb = new StringBuilder(\"Ja\");", "StringBuilder r = sb;", "sb.append(\"va\");", "sb.append('!');", "System.out.println(r);", "String s = sb.toString();", "sb.reverse();", "System.out.println(sb);", "System.out.println(s);", "System.out.println(sb.capacity());"]),
+        run: function (T) {
+          T.snap(1, "main başlar.");
+          T.lit("Ja"); var b = T.sb("Ja", 18); T.set("sb", R(b), "StringBuilder");
+          T.snap(2, "new StringBuilder(\"Ja\"): heap'te değiştirilebilir bir tampon (#" + b + "). Kapasite = 16 + 2 = 18 karakter; şimdilik 2'si dolu.", { hl: ["sb"], nw: b });
+          T.set("r", R(b), "StringBuilder");
+          T.snap(3, "r = sb: ikisi aynı StringBuilder nesnesini gösterir.", { hl: ["r"] });
+          T.lit("va"); T.setsb(b, "Java");
+          T.snap(4, "sb.append(\"va\"): YENİ nesne oluşmaz; aynı tamponun boş hücrelerine yazılır. Uzunluk 4.", { hl: ["sb"], ch: b });
+          T.setsb(b, "Java!");
+          T.snap(5, "sb.append('!'): yine aynı nesne; uzunluk 5, kapasite hâlâ 18.", { hl: ["sb"], ch: b });
+          T.print("Java!"); T.snap(6, "r aynı nesneyi gösterdiği için değişikliği görür: \"Java!\".", { hl: ["r"], q: Q("System.out.println(r) ne yazar?", "Java!", ["Ja", "Java"]), printed: true });
+          var s = T.str("Java!"); T.set("s", R(s), "String");
+          T.snap(7, "sb.toString(): tamponun o anki içeriğinin kopyası olan yeni, değiştirilemez bir String (#" + s + ").", { hl: ["s"], nw: s });
+          T.setsb(b, "!avaJ");
+          T.snap(8, "sb.reverse(): tampon yerinde ters çevrilir. s ayrı bir nesne olduğu için etkilenmez.", { hl: ["sb"], ch: b });
+          T.print("!avaJ"); T.snap(9, "\"!avaJ\" yazılır.", { hl: ["sb"], q: Q("System.out.println(sb) ne yazar?", "!avaJ", ["Java!"]), printed: true });
+          T.print("Java!"); T.snap(10, "s, toString() anındaki kopya: \"Java!\".", { hl: ["s"], q: Q("System.out.println(s) ne yazar?", "Java!", ["!avaJ"]), printed: true });
+          T.print("18"); T.snap(11, "capacity() → 18: 5 karakter için tampon yeterli, büyütmeye gerek olmadı.", { hl: ["sb"], q: Q("sb.capacity() ne yazar?", 18, [5, 16]), printed: true });
+        }
+      },
+      {
+        ad: "Döngüde String birleştirme",
+        code: wrap(["String s = \"\";", "for (int i = 0; i < 3; i++) {", "    s = s + i;", "}", "System.out.println(s);"]),
+        run: function (T) {
+          T.snap(1, "main başlar.");
+          var e = T.lit(""); T.set("s", R(e), "String");
+          T.snap(2, "s boş dizgi sabitini (\"\") gösterir.", { hl: ["s"], nw: e });
+          var cur = "";
+          for (var i = 0; i < 3; i++) {
+            T.set("i", i, "int");
+            T.snap(3, (i ? "i++ → " + i + ". " : "i = 0. ") + i + " < 3 → true.", { hl: ["i"] });
+            cur += i; var n = T.str(cur); T.set("s", R(n), "String");
+            T.snap(4, "s + i: \"" + cur.slice(0, -1) + "\" değişmez; yepyeni bir nesne (#" + n + ", \"" + cur + "\") üretilir." + (i ? " Bir önceki ara sonuç çöpe kaldı." : ""), { hl: ["s"], nw: n, q: i === 2 ? Q("Döngü boyunca kaç yeni String nesnesi üretildi?", 3, [1, 2]) : null });
+          }
+          T.set("i", 3, "int");
+          T.snap(3, "i++ → 3. 3 < 3 → false: döngü biter (i yalnızca döngünün içinde tanımlı).", { hl: ["i"] });
+          T.drop("i");
+          T.print("012"); T.snap(6, "\"012\" yazılır. Her turda yeni nesne: n tur için n ara nesne ve n kez kopyalama. Uzun döngülerde StringBuilder tek tamponla bu israfı önler.", { q: Q("Ne yazılır?", "012", ["3", "0 1 2"]), printed: true });
+        }
+      }
+    ];
+    function trace(prog) {
+      var T = Tracer(); prog.run(T);
+      return { events: T.events, out: T.out, code: prog.code };
+    }
+    return { PROGS: PROGS, trace: trace, TF: TF };
+  })();
+  /*CORE-END*/
+
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector(".jv-sp");
+  var RS = null, k = 0, timer = null, answered = {}, ok = 0, all = 0;
+  Core.PROGS.forEach(function (pr, i) { var o = document.createElement("option"); o.value = i; o.textContent = pr.ad; E("spProg").appendChild(o); });
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+
+  function load() {
+    stop();
+    RS = Core.trace(Core.PROGS[E("spProg").value]);
+    k = 0; answered = {};
+    RS.events.forEach(function (e) { if (e.q) { var o = e.q.opts.map(function (_, i) { return i; }); o.sort(function () { return Math.random() - 0.5; }); e.q.order = o; } });
+    E("spCode").innerHTML = RS.code.map(function (l) { return "<li>" + esc(l) + "</li>"; }).join("");
+    draw();
+  }
+  function needQ() { var e = RS.events[k]; return E("spQuiz").checked && e.q && !answered[k]; }
+
+  /* ---- bellek ---- */
+  var W = 370, H = 372, SX = 6, SW = 128, HX = 154, BW = 66, CG = 7, PY = 30, HY = 156;
+  function drawMem(e) {
+    var h = [], arrows = [], pos = {}, live = {}, hl = e.hl || [];
+    e.v.forEach(function (v) { if (v[2] && v[2].r) live[v[2].r] = true; });
+    h.push('<defs><marker id="spAh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>' +
+      '<marker id="spAhH" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="ah h" d="M0,0 L10,5 L0,10 z"/></marker></defs>');
+    h.push('<text class="lbl" x="' + SX + '" y="14">YIĞIN</text><text class="lbl" x="' + HX + '" y="14">HEAP</text>');
+    h.push('<rect class="pool" x="' + (HX - 4) + '" y="' + (PY - 10) + '" width="' + (W - HX) + '" height="' + (HY - PY - 4) + '" rx="9"/><text class="poollbl" x="' + (W - 8) + '" y="' + (PY + 4) + '" text-anchor="end">dizgi havuzu</text>');
+    var ps = 0;
+    e.heap.forEach(function (o) {
+      var x, y, w, hh = 34, dead = !o.pool && !live[o.id];
+      if (o.pool) { x = HX + (o.slot % 3) * (BW + CG); y = PY + 12 + Math.floor(o.slot / 3) * 44; w = BW; }
+      else if (o.kind === "sb") { x = HX; y = HY + 6 + Math.floor(o.slot / 3) * 50; w = W - HX - 4; hh = 64; }
+      else { x = HX + (o.slot % 3) * (BW + CG); y = HY + 6 + Math.floor(o.slot / 3) * 50; w = BW; }
+      pos[o.id] = { x: x, y: y, h: hh };
+      var nw = e.nw === o.id || e.ch === o.id;
+      h.push('<g class="' + (dead ? "dead" : "") + '"><rect class="ob' + (nw ? " new" : "") + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + hh + '" rx="7"/>');
+      if (o.kind === "str") {
+        h.push('<text class="mut" x="' + (x + 5) + '" y="' + (y + 13) + '">#' + o.id + "</text><text x=\"" + (x + w / 2) + '" y="' + (y + 28) + '" text-anchor="middle" font-weight="700">' + esc('"' + o.val + '"') + "</text>");
+        if (dead) h.push('<text class="gc" x="' + x + '" y="' + (y + hh + 13) + '">çöp</text>');
+      } else {
+        h.push('<text class="mut" x="' + (x + 5) + '" y="' + (y + 13) + '">#' + o.id + ' StringBuilder</text>' +
+          '<text class="mut" x="' + (x + 7) + '" y="' + (y + 58) + '" style="font-family:system-ui,sans-serif">length ' + o.val.length + " · capacity " + o.cap + "</text>");
+        var cw = (w - 14) / o.cap;
+        for (var i = 0; i < o.cap; i++) {
+          var cx = x + 7 + i * cw;
+          h.push('<rect class="cell' + (i < o.val.length ? " used" : "") + '" x="' + cx + '" y="' + (y + 20) + '" width="' + cw + '" height="24"/>');
+          if (i < o.val.length) h.push('<text x="' + (cx + cw / 2) + '" y="' + (y + 36) + '" text-anchor="middle" font-weight="700">' + esc(o.val[i]) + "</text>");
+        }
+      }
+      h.push("</g>");
+    });
+    /* yığın: main çerçevesi en altta */
+    var rows = Math.max(1, e.v.length), fh = 21 + 20 * rows, y = H - 6 - fh;
+    h.push('<rect class="fr" x="' + SX + '" y="' + y + '" width="' + SW + '" height="' + fh + '" rx="7"/><rect class="fh" x="' + (SX + 1.5) + '" y="' + (y + 1.5) + '" width="' + (SW - 3) + '" height="18" rx="6"/><text x="' + (SX + 6) + '" y="' + (y + 14) + '" font-weight="700">main</text>');
+    if (!e.v.length) h.push('<text class="mut" x="' + (SX + 8) + '" y="' + (y + 35) + '" style="font-family:system-ui,sans-serif">(yerel yok)</text>');
+    e.v.forEach(function (v, j) {
+      var ry = y + 21 + j * 20, isH = hl.indexOf(v[1]) >= 0, t = v[0] === "StringBuilder" ? "SB" : v[0];
+      h.push('<text x="' + (SX + 6) + '" y="' + (ry + 14) + '"' + (isH ? ' class="hot"' : "") + '><tspan class="mut">' + esc(t) + "</tspan> " + esc(v[1]) + "</text>");
+      if (v[2] && v[2].r) { h.push('<circle class="dot' + (isH ? " h" : "") + '" cx="' + (SX + SW - 12) + '" cy="' + (ry + 10) + '" r="3.5"/>'); arrows.push({ sx: SX + SW - 12, sy: ry + 10, to: v[2].r, hot: isH }); }
+      else h.push('<text x="' + (SX + SW - 7) + '" y="' + (ry + 14) + '" text-anchor="end"' + (isH ? ' class="hot"' : "") + ">" + esc(v[2]) + "</text>");
+    });
+    arrows.forEach(function (a) {
+      var t = pos[a.to]; if (!t) return;
+      var tx = t.x - 1, ty = t.y + Math.min(17, t.h / 2);
+      h.push('<path class="ar' + (a.hot ? " h" : "") + '" d="M' + a.sx + "," + a.sy + " C" + (a.sx + 30) + "," + a.sy + " " + (tx - 30) + "," + ty + " " + tx + "," + ty + '" marker-end="url(#' + (a.hot ? "spAhH" : "spAh") + ')"/>');
+    });
+    E("spMem").innerHTML = h.join("");
+    var np = e.heap.filter(function (o) { return o.pool; }).length, nd = e.heap.filter(function (o) { return !o.pool && !live[o.id]; }).length;
+    E("spMemCap").textContent = np + " havuzda · " + (e.heap.length - np) + " heap'te" + (nd ? " (" + nd + " çöp)" : "");
+  }
+
+  function draw() {
+    var e = RS.events[k], q = needQ(), shown = q ? RS.events[k - 1] || e : e;
+    [].forEach.call(E("spCode").children, function (li, i) { li.classList.toggle("is-cur", i === e.line); });
+    drawMem(q && !e.printed ? shown : e);
+    if (q) E("spWhy").innerHTML = "<b>Tahmin edin:</b> " + esc(e.q.text) + '<div class="qbtns">' + e.q.order.map(function (i) { return '<button type="button" data-a="' + i + '">' + esc(e.q.opts[i]) + "</button>"; }).join("") + "</div>";
+    else E("spWhy").innerHTML = (e.fb || "") + esc(e.why);
+    var out = q && e.printed ? shown.out : e.out;
+    E("spOut").innerHTML = out ? out.replace(/\n$/, "").split("\n").slice(-4).map(function (l) { return "<div>" + esc(l) + "</div>"; }).join("") : "";
+    E("spNo").textContent = "Adım " + (k + 1) + " / " + RS.events.length;
+    E("spBack").disabled = k === 0;
+    E("spReset").disabled = k === 0;
+    E("spStep").disabled = q || k >= RS.events.length - 1;
+    E("spPlay").disabled = E("spStep").disabled && !timer;
+    E("spPlay").textContent = timer ? "Duraklat" : "Oynat";
+    if (q) { var b = E("spWhy").querySelector("button"); if (b && root.contains(document.activeElement)) b.focus(); }
+  }
+  function go(d) { k = Math.max(0, Math.min(RS.events.length - 1, k + d)); draw(); }
+  function stop() { clearInterval(timer); timer = null; }
+  function delay() { return [2000, 1400, 950, 600, 300][E("spSpeed").value - 1]; }
+  function play() {
+    if (timer) { stop(); draw(); return; }
+    if (k >= RS.events.length - 1) k = 0;
+    timer = setInterval(function () {
+      if (needQ() || k >= RS.events.length - 1) { stop(); draw(); return; }
+      go(1);
+      if (needQ()) { stop(); draw(); }
+    }, delay());
+    draw();
+  }
+  E("spWhy").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-a]");
+    if (!b || !needQ()) return;
+    var e = RS.events[k], good = +b.getAttribute("data-a") === e.q.ans;
+    answered[k] = true; all++; if (good) ok++;
+    E("spOk").textContent = ok; E("spAll").textContent = all;
+    e.fb = good ? '<b class="agt-oyun__good">Doğru!</b> ' : '<b class="agt-oyun__bad">Yanlış.</b> Doğrusu: <code>' + esc(e.q.opts[e.q.ans]) + "</code>. ";
+    draw();
+    E("spStep").focus();
+  });
+  E("spProg").addEventListener("change", load);
+  E("spStep").addEventListener("click", function () { stop(); go(1); });
+  E("spBack").addEventListener("click", function () { stop(); go(-1); });
+  E("spReset").addEventListener("click", function () { stop(); k = 0; answered = {}; RS.events.forEach(function (e) { e.fb = ""; }); draw(); });
+  E("spPlay").addEventListener("click", play);
+  E("spSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("spQuiz").addEventListener("change", draw);
+  root.addEventListener("keydown", function (ev) {
+    if (/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName) && ev.target.type !== "checkbox") return;
+    if (ev.key === "ArrowRight" && !needQ()) { stop(); go(1); ev.preventDefault(); }
+    else if (ev.key === "ArrowLeft") { stop(); go(-1); ev.preventDefault(); }
+  });
+
+  load();
+})();
+</script>
+<script src="deck/oyun.js"></script>

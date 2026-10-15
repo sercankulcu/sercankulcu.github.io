@@ -1,0 +1,434 @@
+---
+layout: without-sidebar
+title: "Dinamik Bağlama"
+permalink: /files/java/slides/Chapter_04_Dynamic-Dispatch.html
+excerpt: "Hayvan, Kedi, Kopek ve Kangal hiyerarşisinde referans tipi ile nesne tipini ayırır: derleyicinin metot araması, çalışma zamanında dinamik bağlama, aşırı yüklemenin derleme zamanında seçilmesi, statik metotlar, aşağı dönüşüm ve super çağrısı."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.jv-dd, .jv-dd-dlg { --ds-accent:#a61b1b; }
+html[data-theme="dark"] .jv-dd, html[data-theme="dark"] .jv-dd-dlg { --ds-accent:#f07a7a; }
+.jv-dd .dd-wrap { display:grid; grid-template-rows:34px minmax(0,1fr) 56px 34px; gap:8px; height:100%; }
+.jv-dd .comp { display:flex; align-items:center; gap:6px; font:600 13.5px ui-monospace, Consolas, monospace; white-space:nowrap; }
+.jv-dd .comp select { min-height:32px; padding:0 6px; font:600 13.5px ui-monospace, Consolas, monospace; }
+.jv-dd .comp #ddRt, .jv-dd .comp #ddOt { width:94px; }
+.jv-dd .comp #ddCall { width:230px; }
+.jv-dd .comp button { min-height:32px; margin-left:auto; padding:0 14px; font:700 13.5px system-ui, sans-serif; }
+.jv-dd .mid { display:grid; grid-template-columns:minmax(0,1fr) 352px; gap:8px; min-height:0; }
+.jv-dd .pane { display:flex; flex-direction:column; min-height:0; min-width:0; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-bg); overflow:hidden; }
+.jv-dd .cap { display:flex; justify-content:space-between; margin:0; padding:3px 8px 2px; color:var(--ds-muted); font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; background:var(--ds-surface-strong); }
+.jv-dd .cap span:last-child { text-transform:none; letter-spacing:0; }
+.jv-dd .right { display:grid; grid-template-rows:auto auto minmax(0,1fr); gap:6px; min-height:0; }
+.jv-dd .code { margin:0; padding:2px 0 3px; overflow:hidden; font:12px/1.5 ui-monospace, Consolas, monospace; list-style:none; counter-reset:ln; }
+.jv-dd .code li { margin:0; padding:0 4px 0 0; line-height:1.5; white-space:pre; counter-increment:ln; }
+.jv-dd .code li::before { content:counter(ln); display:inline-block; width:20px; margin-right:7px; color:var(--ds-muted); font-size:12px; text-align:right; }
+.jv-dd .code.nonum li::before { content:""; width:6px; margin-right:0; }
+.jv-dd .code li.is-cur { background:var(--ds-hot); box-shadow:inset 4px 0 0 var(--ds-accent); }
+.jv-dd .code li.is-bad { background:color-mix(in srgb, var(--ds-bad) 20%, var(--ds-bg)); box-shadow:inset 4px 0 0 var(--ds-bad); }
+.jv-dd #ddMeth { height:132px; }
+.jv-dd .out { flex:1; min-height:0; display:flex; flex-direction:column; justify-content:flex-end; margin:0; padding:2px 8px 3px; overflow:hidden; background:var(--ds-surface); font:12px/1.35 ui-monospace, Consolas, monospace; white-space:pre-wrap; word-break:break-all; }
+.jv-dd .out .ex { color:var(--ds-bad); font-weight:700; }
+.jv-dd .hier { flex:1; min-height:0; width:100%; display:block; }
+.jv-dd .hier text { font:12px ui-monospace, Consolas, monospace; fill:var(--ds-text); }
+.jv-dd .hier .bx { fill:var(--ds-surface); stroke:var(--ds-border); stroke-width:1.5; }
+.jv-dd .hier .bh { fill:var(--ds-surface-strong); }
+.jv-dd .hier .bx.dyn { fill:color-mix(in srgb, var(--ds-accent) 9%, var(--ds-bg)); stroke:var(--ds-accent); stroke-width:2.2; }
+.jv-dd .hier .ring { fill:none; stroke:var(--ds-link); stroke-width:2.2; stroke-dasharray:6 3; }
+.jv-dd .hier .tag { font:700 12px system-ui, sans-serif; }
+.jv-dd .hier .tag.s { fill:var(--ds-link); }
+.jv-dd .hier .tag.d { fill:var(--ds-accent); }
+.jv-dd .hier .ov { font:12px system-ui, sans-serif; fill:var(--ds-muted); }
+.jv-dd .hier .inh { fill:none; stroke:var(--ds-muted); stroke-width:1.5; }
+.jv-dd .hier .tri { fill:var(--ds-bg); stroke:var(--ds-muted); stroke-width:1.5; }
+.jv-dd .hier .rowc { fill:color-mix(in srgb, var(--ds-link) 18%, var(--ds-bg)); }
+.jv-dd .hier .rowr { fill:color-mix(in srgb, var(--ds-accent) 18%, var(--ds-bg)); }
+.jv-dd .hier .rowx { fill:var(--ds-hot); }
+.jv-dd .hier .miss { font:700 12px system-ui, sans-serif; fill:var(--ds-muted); }
+.jv-dd .hier .hc { fill:color-mix(in srgb, var(--ds-link) 30%, var(--ds-bg)); }
+.jv-dd .hier .hr { fill:color-mix(in srgb, var(--ds-accent) 26%, var(--ds-bg)); }
+.jv-dd .hier .b { font-weight:700; }
+.jv-dd .why { margin:0; padding:5px 10px; overflow:hidden; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:13px; line-height:1.33; }
+.jv-dd .qbtns { display:flex; flex-wrap:wrap; gap:5px; margin-top:3px; }
+.jv-dd .qbtns button { min-height:24px; padding:0 10px; font:600 12.5px ui-monospace, Consolas, monospace; }
+.jv-dd .ctl { display:flex; align-items:center; gap:6px; }
+.jv-dd .ctl button { min-height:32px; padding:0 12px; font-size:13.5px; white-space:nowrap; }
+.jv-dd .ctl #ddPlay { width:86px; }
+.jv-dd .ctl input[type="range"] { width:70px; }
+.jv-dd .ctl .check { display:flex; align-items:center; gap:5px; margin-left:6px; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.jv-dd .ctl .score { margin-left:auto; color:var(--ds-muted); font-size:13px; font-weight:700; white-space:nowrap; }
+.jv-dd .ctl .score b { color:var(--ds-text); }
+.jv-dd-dlg pre { margin:4px 0 8px; padding:6px 10px; border-radius:8px; background:var(--ds-surface-strong); font-size:13px; line-height:1.4; overflow:auto; }
+</style>
+
+<div class="jv-dd agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 4 · Simülatör</p><h1>Dinamik Bağlama: Hangi Metot Çalışır?</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="dd-help" aria-label="Açıklama ve kullanım">?</button>
+    <a class="agt-oyun__back" href="Bolum_04_Cok_Bicimlilik.html">← Bölüm 4</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="dd-wrap">
+      <div class="comp">
+        <select id="ddRt" aria-label="Referans tipi"></select><span>r = new</span><select id="ddOt" aria-label="Nesne tipi"></select><span>();</span>
+        <select id="ddCall" aria-label="Çağrı"></select>
+        <button type="button" id="ddRand" aria-label="Rastgele senaryo">Rastgele</button>
+      </div>
+      <div class="mid">
+        <div class="pane"><p class="cap"><span>Sınıf hiyerarşisi</span><span id="ddPhase"></span></p><svg class="hier" id="ddHier" viewBox="0 0 400 372" role="img" aria-label="Sınıf hiyerarşisi ve metot araması"></svg></div>
+        <div class="right">
+          <div class="pane"><p class="cap"><span>Main.java</span><span id="ddNo"></span></p><ol class="code" id="ddMain" aria-label="main metodu"></ol></div>
+          <div class="pane" id="ddMeth"><p class="cap"><span>Çalışan metot</span><span id="ddMethCap"></span></p><ol class="code nonum" id="ddMethCode" aria-label="Çalışan metodun kodu"></ol></div>
+          <div class="pane"><p class="cap"><span id="ddOutCap">Çıktı (konsol)</span></p><div class="out" id="ddOut" aria-label="Çıktı"></div></div>
+        </div>
+      </div>
+      <div class="why" id="ddWhy" aria-live="polite"></div>
+      <div class="ctl">
+        <button type="button" id="ddBack" aria-label="Bir adım geri">◀ Geri</button>
+        <button type="button" id="ddStep" class="is-primary" aria-label="Bir adım ileri">Adım ▶</button>
+        <button type="button" id="ddPlay" aria-label="Oynat veya duraklat">Oynat</button>
+        <button type="button" id="ddReset" aria-label="Başa dön">Sıfırla</button>
+        <input type="range" id="ddSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı" title="Hız">
+        <label class="check"><input type="checkbox" id="ddQuiz"> Kendini dene</label>
+        <span class="score" aria-live="polite">Doğru <b id="ddOk">0</b> / <b id="ddAll">0</b></span>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog jv-dd-dlg" id="dd-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Dinamik Bağlama: Hangi Metot Çalışır?</h2>
+    <p><b>Amaç:</b> <code>Hayvan r = new Kopek();</code> gibi bir satırda iki tip vardır: değişkenin <b>referans tipi</b> (bildirilen tip, <code>Hayvan</code>) ve nesnenin <b>nesne tipi</b> (gerçek tip, <code>Kopek</code>). Bir çağrı iki aşamada çözülür: derleyici referans tipine bakıp "bu metot var mı?" diye sorar; JVM çalışma zamanında nesne tipine bakıp "hangi sürüm?" diye sorar.</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li>Üstte referans tipini, nesne tipini ve çağrıyı seçin (ya da <b>Rastgele</b>).</li>
+      <li><b>Adım ▶</b> / <b>◀ Geri</b> (klavyede → / ←), <b>Oynat</b>, <b>Sıfırla</b>. Hiyerarşide kesik mavi çerçeve referans tipini, kırmızı çerçeve nesne tipini gösterir; mavi satırlar derleyicinin, kırmızı satırlar JVM'nin aramasıdır.</li>
+      <li><b>Kendini dene</b>: kodun derlenip derlenmeyeceğini, hangi sürümün çalışacağını ve çıktıyı tahmin edin.</li>
+    </ol>
+    <h3>Kurallar</h3>
+    <ul>
+      <li>Atama yalnızca nesne tipi referans türünün alt türüyse derlenir (<code>Hayvan r = new Kopek();</code> geçerli, <code>Kopek r = new Hayvan();</code> değil).</li>
+      <li>Derleyici metodu referans tipinden başlayıp yukarı doğru arar; bulamazsa nesne ne olursa olsun derleme hatası verir.</li>
+      <li>Örnek metotları <b>dinamik bağlanır</b>: JVM aramaya nesnenin gerçek sınıfından başlar ve aşağıdan yukarı ilk bulduğu sürümü çalıştırır. Üst sınıftaki bir metodun içinden yapılan <code>ad()</code> çağrısı da (<code>this.ad()</code>) böyle çözülür.</li>
+      <li><code>static</code> metotlar ve aşırı yüklenmiş sürümler arasındaki seçim dinamik değildir: derleyici <b>referans tipine</b> göre seçer.</li>
+      <li><code>super.sesCikar()</code> dinamik bağlanmaz: doğrudan üst sınıfın sürümü çalışır.</li>
+      <li><code>(Kopek) r</code> aşağı dönüşümü derlenir ama çalışma zamanında denetlenir; nesne bir <code>Kopek</code> değilse <code>ClassCastException</code> fırlatılır. Akraba olmayan tipler arasında (<code>Kedi</code> → <code>Kopek</code>) dönüşüm hiç derlenmez.</li>
+    </ul>
+    <h3>Sınıflar</h3>
+    <pre id="ddSrc"></pre>
+    <p>Her referans tipi, nesne tipi ve çağrı birleşimi (180 durum) <code>javac --release 8</code> ile derlenip Java 8 üzerinde çalıştırılarak doğrulanmıştır; derleyici iletileri ve çıktılar gerçek sonuçlardır.</p>
+    <p>İlgili sunumlar: <a href="Bolum_04_Cok_Bicimlilik.html">Bölüm 4 · Çok Biçimlilik</a> (Referans Tipi ve Nesne Tipi, Dinamik Bağlama, Metot Arama: Aşağıdan Yukarı, Neler Dinamik Bağlanmaz?, Aşırı Yükleme Derleme Zamanında) ve <a href="Bolum_04_Kalitim.html">Bölüm 4 · Kalıtım</a> (super Anahtar Kelimesi, Metodu Geçersiz Kılma).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /*CORE-BEGIN*/
+  var Core = (function () {
+    function P(s) { return ["    System.out.println(\"" + s + "\");"]; }
+    /* m: ad → { st: statik mi, ov: @Override, src: gövde satırları, sig: imza } */
+    var CL = {
+      Object: { sup: null, m: {} },
+      Hayvan: { sup: "Object", m: {
+        ad: { sig: "String ad()", body: ["    return \"hayvan\";"] },
+        sesCikar: { sig: "void sesCikar()", body: P("Hayvan sesi"), out: "Hayvan sesi" },
+        kos: { sig: "void kos()", body: P("Hayvan koşuyor"), out: "Hayvan koşuyor" },
+        uyu: { sig: "void uyu()", body: P("Zzz"), out: "Zzz" },
+        tanit: { sig: "void tanit()", body: ["    System.out.println(\"Ben bir \" + ad());"] },
+        bilgi: { sig: "static void bilgi()", st: true, body: P("Hayvan.bilgi"), out: "Hayvan.bilgi" } } },
+      Kedi: { sup: "Hayvan", m: {
+        ad: { sig: "String ad()", ov: true, body: ["    return \"kedi\";"] },
+        sesCikar: { sig: "void sesCikar()", ov: true, body: P("Miyav!"), out: "Miyav!" },
+        tirmala: { sig: "void tirmala()", body: P("Kedi tırmalıyor"), out: "Kedi tırmalıyor" } } },
+      Kopek: { sup: "Hayvan", m: {
+        ad: { sig: "String ad()", ov: true, body: ["    return \"köpek\";"] },
+        sesCikar: { sig: "void sesCikar()", ov: true, body: P("Hav hav!"), out: "Hav hav!" },
+        kos: { sig: "void kos()", ov: true, body: P("Köpek koşuyor"), out: "Köpek koşuyor" },
+        havla: { sig: "void havla()", body: P("Köpek havlıyor"), out: "Köpek havlıyor" },
+        bilgi: { sig: "static void bilgi()", st: true, body: P("Kopek.bilgi"), out: "Kopek.bilgi" } } },
+      Kangal: { sup: "Kopek", m: {
+        sesCikar: { sig: "void sesCikar()", ov: true, body: ["    super.sesCikar();"].concat(P("(gür sesle)")) } } },
+      Veteriner: { sup: "Object", m: {
+        "muayene(Hayvan)": { sig: "static void muayene(Hayvan h)", st: true, body: P("Hayvan muayenesi"), out: "Hayvan muayenesi" },
+        "muayene(Kopek)": { sig: "static void muayene(Kopek k)", st: true, body: P("Köpek muayenesi"), out: "Köpek muayenesi" } } }
+    };
+    var ORDER = ["Hayvan", "Kedi", "Kopek", "Kangal", "Veteriner"];
+    var RT = ["Object", "Hayvan", "Kedi", "Kopek", "Kangal"], OT = ["Hayvan", "Kedi", "Kopek", "Kangal"];
+    var CALLS = ["r.sesCikar();", "r.kos();", "r.uyu();", "r.tanit();", "r.havla();", "r.tirmala();", "((Kopek) r).havla();", "r.bilgi();", "Veteriner.muayene(r);"];
+    function head(c) { return "class " + c + (CL[c].sup && CL[c].sup !== "Object" ? " extends " + CL[c].sup : "") + " {"; }
+    function mlines(c, n) { var m = CL[c].m[n]; return (m.ov ? ["@Override"] : []).concat([m.sig + " {"], m.body, ["}"]); }
+    /* Tüm sınıfların kaynak kodu (Main.java'nın başı) */
+    function source() {
+      var L = [];
+      ORDER.forEach(function (c) {
+        L.push(head(c));
+        Object.keys(CL[c].m).forEach(function (n) { mlines(c, n).forEach(function (l) { L.push("    " + l); }); });
+        L.push("}");
+      });
+      return L;
+    }
+    var SRC = source();
+    function mainCode(rt, ot, ci) { return ["public class Main {", "    public static void main(String[] args) {", "        " + rt + " r = new " + ot + "();", "        " + CALLS[ci], "    }", "}"]; }
+    function sub(a, b) { for (var c = a; c; c = CL[c].sup) if (c === b) return true; return false; }
+    function chain(c) { var r = []; for (; c; c = CL[c].sup) r.push(c); return r; }
+    function lookup(start, n) { var p = []; for (var c = start; c; c = CL[c].sup) { p.push(c); if (CL[c].m[n]) return { path: p, cls: c }; } return { path: p, cls: null }; }
+    function Q(text, right, alts) { var o = [String(right)]; alts.forEach(function (a) { a = String(a); if (o.indexOf(a) < 0) o.push(a); }); return { text: text, opts: o, ans: 0 }; }
+    var YES = "Evet, derlenir", NO = "Hayır, derleme hatası";
+
+    function trace(rt, ot, ci) {
+      var ev = [], out = "", base = { rt: rt, ot: ot };
+      function ad(o) { var e = { out: out }; for (var k in base) e[k] = base[k]; for (k in o) e[k] = o[k]; ev.push(e); return e; }
+      function err(lines, why, q, line) { out = lines.join("\n") + "\n"; return ad({ line: line, why: why, cerr: true, q: q, ph: "derleme" }); }
+      var name = CALLS[ci].replace(/^.*\.(\w+)\(.*$/, "$1");
+      ad({ line: 2, ph: "", why: "r'nin referans tipi " + rt + ", oluşturulan nesnenin tipi " + ot + ". Derleyici yalnızca referans tipini bilir; JVM ise çalışma zamanında nesnenin gerçek tipine bakar." });
+      if (!sub(ot, rt)) {
+        err(["error: incompatible types: " + ot + " cannot be converted to " + rt], ot + ", " + rt + "'nin alt tipi değil (her " + ot + " bir " + rt + " değildir). Alt tipten üst tipe atama serbesttir; tersi derlenmez.", Q("Bu kod derlenir mi?", NO, [YES]), 2);
+        return { events: ev, out: out };
+      }
+      ad({ line: 2, ph: "derleme", why: "Atama geçerli: " + (ot === rt ? "tipler aynı." : "her " + ot + " bir " + rt + "'dir; alt tipten üst tipe dönüşüm kendiliğinden olur.") });
+      var stat = rt, castNote = "";
+      if (ci === 6) {
+        if (!sub(rt, "Kopek") && !sub("Kopek", rt)) {
+          err(["error: incompatible types: " + rt + " cannot be converted to Kopek"], rt + " ile Kopek akraba değil (biri ötekinin alt tipi değil): böyle bir dönüşüm hiçbir zaman başarılı olamayacağından derlenmez.", Q("Bu kod derlenir mi?", NO, [YES]), 3);
+          return { events: ev, out: out };
+        }
+        stat = "Kopek";
+        castNote = sub(rt, "Kopek") ? "(Kopek) dönüşümü burada yukarı doğru; her zaman geçerli. " : "(Kopek) r aşağı dönüşüm: derleyici kabul eder ama çalışma zamanında denetlenecek. ";
+      }
+      if (ci === 8) {
+        var cand = [];
+        if (sub(rt, "Hayvan")) cand.push("muayene(Hayvan)");
+        if (sub(rt, "Kopek")) cand.push("muayene(Kopek)");
+        if (!cand.length) {
+          err(["error: no suitable method found for muayene(Object)", "    method Veteriner.muayene(Hayvan) is not applicable", "    method Veteriner.muayene(Kopek) is not applicable"], "Aşırı yüklenmiş sürümler argümanın REFERANS tipine göre seçilir: r'nin tipi Object; Object ne Hayvan'a ne Kopek'e kendiliğinden dönüşür. Uyan sürüm yok.", Q("Bu kod derlenir mi?", NO, [YES]), 3);
+          return { events: ev, out: out };
+        }
+        var pick = cand[cand.length - 1];
+        ad({ line: 3, ph: "derleme", crow: [["Veteriner", pick]], cpath: ["Veteriner"], why: "Aşırı yükleme: derleyici argümanın referans tipine (" + rt + ") uyan sürümleri arar: " + cand.join(", ") + (cand.length > 1 ? ". En özel olan muayene(Kopek) seçilir." : ". Nesnenin " + ot + " olması hesaba katılmaz.") , q: Q("Derleyici hangi muayene sürümünü seçer?", pick, ["muayene(Hayvan)", "muayene(Kopek)", "derleme hatası"]) });
+        ad({ line: 3, ph: "çalışma", run: ["Veteriner", pick], mline: 1, why: "Statik metot: çalışma zamanında yeniden seçim yapılmaz; derleyicinin seçtiği " + pick + " çalışır." });
+        out += CL.Veteriner.m[pick].out + "\n";
+        ad({ line: 3, ph: "çalışma", run: ["Veteriner", pick], mline: 1, printed: true, why: "\"" + CL.Veteriner.m[pick].out + "\" yazılır. Aşırı yükleme derleme zamanında, referans tipine göre çözülür." });
+        return { events: ev, out: out };
+      }
+      var L = lookup(stat, name);
+      if (!L.cls) {
+        err(["error: cannot find symbol", "  symbol:   method " + name + "()", "  location: variable r of type " + rt], "Derleyici " + name + "() metodunu " + rt + "'den başlayıp yukarı doğru arar (" + L.path.join(" → ") + ") ve bulamaz. Nesnenin gerçekte " + ot + " olması önemli değil: derleyici yalnızca referans tipini görür.", Q("Bu kod derlenir mi?", NO, [YES]), 3);
+        ev[ev.length - 1].cpath = L.path; ev[ev.length - 1].cmiss = name;
+        return { events: ev, out: out };
+      }
+      var m = CL[L.cls].m[name];
+      ad({ line: 3, ph: "derleme", cpath: L.path, crow: [[L.cls, name]], q: Q("Bu kod derlenir mi?", YES, [NO]),
+        why: castNote + "Derleyici " + name + "() metodunu " + stat + " tipinden başlayıp yukarı doğru arar: " + L.cls + "'ta bulur → çağrı derlenir." + (m.st ? "" : " Hangi sürümün çalışacağına henüz karar verilmez.") });
+      if (ci === 6 && !sub(ot, "Kopek")) {
+        out += "Exception in thread \"main\" java.lang.ClassCastException: " + ot + " cannot be cast to Kopek\n\tat Main.main(Main.java:" + (SRC.length + 4) + ")\n";
+        ad({ line: 3, ph: "çalışma", rex: true, why: "Çalışma zamanında dönüşüm denetlenir: nesne bir " + ot + ", Kopek değil → ClassCastException fırlatılır; havla() hiç çağrılmaz.", q: Q("Çalışma zamanında ne olur?", "ClassCastException", ["Köpek havlıyor"]) });
+        return { events: ev, out: out };
+      }
+      if (m.st) {
+        ad({ line: 3, ph: "çalışma", run: [L.cls, name], mline: 1, crow: [[L.cls, name]], cpath: L.path, q: Q("Hangi bilgi() çalışır?", L.cls + ".bilgi", ["Hayvan.bilgi", "Kopek.bilgi"]),
+          why: "bilgi() statiktir: dinamik bağlama yok. Sürümü derleyici referans tipine (" + rt + ") göre seçti: " + L.cls + ".bilgi(). Nesnenin " + ot + " olması bir şey değiştirmez." });
+        out += m.out + "\n";
+        ad({ line: 3, ph: "çalışma", run: [L.cls, name], mline: 1, printed: true, why: "\"" + m.out + "\" yazılır. Statik metotları sınıf adıyla çağırmak (" + L.cls + ".bilgi()) bu karışıklığı önler." });
+        return { events: ev, out: out };
+      }
+      var D = lookup(ot, name);
+      ad({ line: 3, ph: "çalışma", rpath: D.path, rrow: [[D.cls, name]], q: Q("Hangi sınıfın " + name + "() sürümü çalışır?", D.cls, chain(ot).filter(function (c) { return c !== "Object"; })),
+        why: "JVM aramaya nesnenin gerçek sınıfından (" + ot + ") başlar ve yukarı çıkar: " + D.path.map(function (c) { return c === D.cls ? c + " ✓" : c + " ✗"; }).join(" → ") + ". İlk bulunan " + D.cls + "." + name + "() çalışır (dinamik bağlama)." });
+      var cur = [D.cls, name];
+      if (name === "tanit") {
+        var A = lookup(ot, "ad"), s = "Ben bir " + ({ Hayvan: "hayvan", Kedi: "kedi", Kopek: "köpek" })[A.cls];
+        ad({ line: 3, ph: "çalışma", run: cur, mline: 1, rpath: A.path, rrow: [[A.cls, "ad"]], q: Q("ad() çağrısı hangi sınıfın sürümüne gider?", A.cls, chain(ot).filter(function (c) { return c !== "Object"; })),
+          why: "tanit() Hayvan'da yazılı ama içindeki ad() aslında this.ad(): this'in gösterdiği nesne " + ot + ". Arama yine gerçek sınıftan başlar → " + A.cls + ".ad()." });
+        ad({ line: 3, ph: "çalışma", run: [A.cls, "ad"], mline: 1, rrow: [[A.cls, "ad"]], why: A.cls + ".ad() → \"" + s.slice(8) + "\" döner." });
+        out += s + "\n";
+        ad({ line: 3, ph: "çalışma", run: cur, mline: 1, printed: true, q: Q("Ne yazılır?", s, ["Ben bir hayvan", "Ben bir köpek", "Ben bir kedi"]), why: "\"" + s + "\" yazılır. Üst sınıftaki kod bile alt sınıfın geçersiz kıldığı metodu çağırır." });
+        return { events: ev, out: out };
+      }
+      if (D.cls === "Kangal") {
+        ad({ line: 3, ph: "çalışma", run: cur, mline: 1, crow: [["Kopek", "sesCikar"]], why: "super.sesCikar(): super çağrısı dinamik bağlanmaz; doğrudan bir üst sınıfın (Kopek) sürümüne gider." });
+        out += "Hav hav!\n";
+        ad({ line: 3, ph: "çalışma", run: ["Kopek", "sesCikar"], mline: 1, printed: true, why: "Kopek.sesCikar() \"Hav hav!\" yazar ve Kangal'daki metoda dönülür." });
+        out += "(gür sesle)\n";
+        ad({ line: 3, ph: "çalışma", run: cur, mline: 2, printed: true, q: Q("Çıktının son satırı ne?", "(gür sesle)", ["Hav hav!", "Hayvan sesi"]), why: "\"(gür sesle)\" yazılır. Alt sınıf, üst sınıfın davranışını super ile kullanıp genişletti." });
+        return { events: ev, out: out };
+      }
+      var mo = CL[D.cls].m[name];
+      out += mo.out + "\n";
+      ad({ line: 3, ph: "çalışma", run: cur, mline: 1, printed: true, why: "\"" + mo.out + "\" yazılır." + (D.cls !== L.cls ? " Derleyici " + L.cls + "'taki metodu görmüştü; çalışan ise " + D.cls + "'in sürümü." : "") });
+      return { events: ev, out: out };
+    }
+    return { CL: CL, RT: RT, OT: OT, CALLS: CALLS, SRC: SRC, trace: trace, mainCode: mainCode, mlines: mlines, head: head };
+  })();
+  /*CORE-END*/
+
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector(".jv-dd");
+  var RS = null, code = [], k = 0, timer = null, answered = {}, ok = 0, all = 0;
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function fill(sel, list, v) { list.forEach(function (x, i) { var o = document.createElement("option"); o.value = i; o.textContent = x; sel.appendChild(o); }); sel.value = v; }
+  fill(E("ddRt"), Core.RT, 1); fill(E("ddOt"), Core.OT, 2); fill(E("ddCall"), Core.CALLS, 0);
+  E("ddSrc").textContent = Core.SRC.join("\n");
+
+  /* ---- hiyerarşi geometrisi ---- */
+  var RH = 17, HH = 21;
+  var G = {
+    Object: { x: 260, y: 4, w: 108 },
+    Hayvan: { x: 108, y: 50, w: 184 },
+    Kedi: { x: 6, y: 202, w: 180 },
+    Kopek: { x: 214, y: 202, w: 180 },
+    Kangal: { x: 214, y: 332, w: 180 },
+    Veteriner: { x: 6, y: 300, w: 180 }
+  };
+  Object.keys(G).forEach(function (c) { var g = G[c]; g.n = Object.keys(Core.CL[c].m); g.h = HH + RH * g.n.length; });
+  function rowLabel(c, n) {
+    var m = Core.CL[c].m[n];
+    if (c === "Veteriner") return "static " + n;
+    return m.sig;
+  }
+  function drawHier(e) {
+    var h = [];
+    h.push('<defs><marker id="ddTri" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto"><path class="tri" d="M1,1 L11,6 L1,11 z"/></marker></defs>');
+    function up(c, p) { var a = G[c], b = G[p]; var x1 = a.x + a.w / 2, x2 = Math.max(b.x + 16, Math.min(b.x + b.w - 16, x1)); var my = (a.y + b.y + b.h) / 2; h.push('<path class="inh" d="M' + x1 + "," + a.y + " L" + x1 + "," + my + " L" + x2 + "," + my + " L" + x2 + "," + (b.y + b.h + 1) + '" marker-end="url(#ddTri)"/>'); }
+    up("Hayvan", "Object"); up("Kedi", "Hayvan"); up("Kopek", "Hayvan"); up("Kangal", "Kopek");
+    var cp = e.cpath || [], rp = e.rpath || [];
+    function has(list, c, n) { return (list || []).some(function (x) { return x[0] === c && x[1] === n; }); }
+    Object.keys(G).forEach(function (c) {
+      var g = G[c], dyn = c === e.ot, st = c === e.rt;
+      h.push('<rect class="bx' + (dyn ? " dyn" : "") + '" x="' + g.x + '" y="' + g.y + '" width="' + g.w + '" height="' + g.h + '" rx="7"/>');
+      var hc = rp.indexOf(c) >= 0 ? "hr" : cp.indexOf(c) >= 0 ? "hc" : "bh";
+      h.push('<rect class="' + hc + '" x="' + (g.x + 1.5) + '" y="' + (g.y + 1.5) + '" width="' + (g.w - 3) + '" height="' + (HH - 3) + '" rx="6"/>');
+      h.push('<text class="b" x="' + (g.x + g.w / 2) + '" y="' + (g.y + 15) + '" text-anchor="middle">' + c + "</text>");
+      if (c === e.cmiss || (e.cmiss && cp.indexOf(c) >= 0)) h.push('<text class="miss" x="' + (g.x + g.w - 6) + '" y="' + (g.y + 15) + '" text-anchor="end">✗</text>');
+      g.n.forEach(function (n, i) {
+        var y = g.y + HH + i * RH, run = e.run && e.run[0] === c && e.run[1] === n, rr = has(e.rrow, c, n), cr = has(e.crow, c, n);
+        if (run || rr || cr) h.push('<rect class="' + (run ? "rowx" : rr ? "rowr" : "rowc") + '" x="' + (g.x + 2) + '" y="' + y + '" width="' + (g.w - 4) + '" height="' + RH + '"/>');
+        h.push('<text x="' + (g.x + 7) + '" y="' + (y + 13) + '"' + (run || rr || cr ? ' class="b"' : "") + ">" + esc(rowLabel(c, n)) + "</text>");
+        if (Core.CL[c].m[n].ov) h.push('<text class="ov" x="' + (g.x + g.w - 6) + '" y="' + (y + 13) + '" text-anchor="end">@Override</text>');
+      });
+      if (st) h.push('<rect class="ring" x="' + (g.x - 4) + '" y="' + (g.y - 4) + '" width="' + (g.w + 8) + '" height="' + (g.h + 8) + '" rx="9"/>');
+    });
+    h.push('<rect class="ring" x="8" y="7" width="16" height="11" rx="3"/><text x="30" y="17"><tspan class="tag s">referans tipi:</tspan> ' + e.rt + "</text>" +
+      '<rect class="bx dyn" x="8" y="27" width="16" height="11" rx="3"/><text x="30" y="37"><tspan class="tag d">nesne tipi:</tspan> ' + e.ot + "</text>");
+    E("ddHier").innerHTML = h.join("");
+  }
+
+  function load() {
+    stop();
+    var rt = Core.RT[E("ddRt").value], ot = Core.OT[E("ddOt").value], ci = +E("ddCall").value;
+    RS = Core.trace(rt, ot, ci); code = Core.mainCode(rt, ot, ci);
+    k = 0; answered = {};
+    RS.events.forEach(function (e) { if (e.q) { var o = e.q.opts.map(function (_, i) { return i; }); o.sort(function () { return Math.random() - 0.5; }); e.q.order = o; } });
+    E("ddMain").innerHTML = code.map(function (l) { return "<li>" + esc(l) + "</li>"; }).join("");
+    draw();
+  }
+  function needQ() { var e = RS.events[k]; return E("ddQuiz").checked && e.q && !answered[k]; }
+
+  function draw() {
+    var cur = RS.events[k], q = needQ(), e = q ? RS.events[k - 1] || cur : cur;
+    [].forEach.call(E("ddMain").children, function (li, i) {
+      li.classList.toggle("is-cur", i === cur.line && !(e.cerr || e.rex));
+      li.classList.toggle("is-bad", i === cur.line && !!(e.cerr || e.rex));
+    });
+    drawHier(e);
+    if (e.run) {
+      var lines = Core.mlines(e.run[0], e.run[1]), off = Core.CL[e.run[0]].m[e.run[1]].ov ? 1 : 0;
+      var src = [Core.head(e.run[0])].concat(lines.map(function (l) { return "    " + l; }), ["}"]);
+      E("ddMethCode").innerHTML = src.map(function (l, i) { return '<li class="' + (i === e.mline + off + 1 ? "is-cur" : "") + '">' + esc(l) + "</li>"; }).join("");
+      E("ddMethCap").textContent = e.run[0] + "." + e.run[1].replace(/\(.*/, "") + "()";
+    } else { E("ddMethCode").innerHTML = ""; E("ddMethCap").textContent = ""; }
+    E("ddPhase").textContent = e.ph === "derleme" ? "derleme zamanı (derleyici)" : e.ph === "çalışma" ? "çalışma zamanı (JVM)" : "";
+    if (q) {
+      E("ddWhy").innerHTML = "<b>Tahmin edin:</b> " + esc(cur.q.text) + '<div class="qbtns">' + cur.q.order.map(function (i) { return '<button type="button" data-a="' + i + '">' + esc(cur.q.opts[i]) + "</button>"; }).join("") + "</div>";
+    } else E("ddWhy").innerHTML = (cur.fb || "") + esc(cur.why);
+    var out = e.out;
+    E("ddOutCap").textContent = e.cerr ? "Derleyici (javac)" : "Çıktı (konsol)";
+    E("ddOut").innerHTML = out ? out.replace(/\n$/, "").split("\n").slice(-4).map(function (l) { return "<div" + (e.cerr || /Exception|\tat /.test(l) ? ' class="ex"' : "") + ">" + esc(l.replace(/\t/g, "    ")) + "</div>"; }).join("") : "";
+    E("ddNo").textContent = "Adım " + (k + 1) + " / " + RS.events.length;
+    E("ddBack").disabled = k === 0;
+    E("ddReset").disabled = k === 0;
+    E("ddStep").disabled = q || k >= RS.events.length - 1;
+    E("ddPlay").disabled = E("ddStep").disabled && !timer;
+    E("ddPlay").textContent = timer ? "Duraklat" : "Oynat";
+    if (q) { var b = E("ddWhy").querySelector("button"); if (b && root.contains(document.activeElement)) b.focus(); }
+  }
+  function go(d) { k = Math.max(0, Math.min(RS.events.length - 1, k + d)); draw(); }
+  function stop() { clearInterval(timer); timer = null; }
+  function delay() { return [2200, 1600, 1100, 700, 350][E("ddSpeed").value - 1]; }
+  function play() {
+    if (timer) { stop(); draw(); return; }
+    if (k >= RS.events.length - 1) k = 0;
+    timer = setInterval(function () {
+      if (needQ() || k >= RS.events.length - 1) { stop(); draw(); return; }
+      go(1);
+      if (needQ()) { stop(); draw(); }
+    }, delay());
+    draw();
+  }
+  function rnd(n) { return Math.floor(Math.random() * n); }
+  function random() {
+    var ot = rnd(4), r = Math.random(), rt;
+    if (r < 0.45) rt = 1;
+    else if (r < 0.8) { var ch = []; for (var c = Core.OT[ot]; c && c !== "Object"; c = Core.CL[c].sup) ch.push(Core.RT.indexOf(c)); rt = ch[rnd(ch.length)]; }
+    else rt = rnd(5);
+    var old = [E("ddRt").value, E("ddOt").value, E("ddCall").value].join();
+    E("ddRt").value = rt; E("ddOt").value = ot; E("ddCall").value = rnd(Core.CALLS.length);
+    if ([E("ddRt").value, E("ddOt").value, E("ddCall").value].join() === old) E("ddCall").value = (+E("ddCall").value + 1) % Core.CALLS.length;
+    load();
+  }
+
+  E("ddWhy").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-a]");
+    if (!b || !needQ()) return;
+    var e = RS.events[k], good = +b.getAttribute("data-a") === e.q.ans;
+    answered[k] = true; all++; if (good) ok++;
+    E("ddOk").textContent = ok; E("ddAll").textContent = all;
+    e.fb = good ? '<b class="agt-oyun__good">Doğru!</b> ' : '<b class="agt-oyun__bad">Yanlış.</b> Doğrusu: <code>' + esc(e.q.opts[e.q.ans]) + "</code>. ";
+    draw();
+    E("ddStep").focus();
+  });
+  ["ddRt", "ddOt", "ddCall"].forEach(function (id) { E(id).addEventListener("change", load); });
+  E("ddRand").addEventListener("click", random);
+  E("ddStep").addEventListener("click", function () { stop(); go(1); });
+  E("ddBack").addEventListener("click", function () { stop(); go(-1); });
+  E("ddReset").addEventListener("click", function () { stop(); k = 0; answered = {}; RS.events.forEach(function (e) { e.fb = ""; }); draw(); });
+  E("ddPlay").addEventListener("click", play);
+  E("ddSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("ddQuiz").addEventListener("change", draw);
+  root.addEventListener("keydown", function (ev) {
+    if (/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName) && ev.target.type !== "checkbox") return;
+    if (ev.key === "ArrowRight" && !needQ()) { stop(); go(1); ev.preventDefault(); }
+    else if (ev.key === "ArrowLeft") { stop(); go(-1); ev.preventDefault(); }
+  });
+
+  load();
+})();
+</script>
+<script src="deck/oyun.js"></script>
