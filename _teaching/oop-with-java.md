@@ -96,7 +96,6 @@ As a versatile and widely-used programming language, Java provides a powerful to
 - [📄Sunum-Akış Diyagramları (PDF)](../files/java/pdf/Bolum_01_Akis_Diyagramlari.pdf)  
 - [📝Çalışma Soruları - Akış Diyagramları (HTML)](../files/java/slides/Bolum_01_Akis_Diyagramlari_Calisma_Sorulari.html)  
 - [🕹️ASCII Table (HTML)](../files/java/slides/Chapter_01_ASCII-Table.html)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_01_Introduction.pdf)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders01/src)  
 
 ---
@@ -112,7 +111,6 @@ Understanding the fundamental syntax and data types of Java is essential for bui
 - [📄Sunum-Söz Dizimi Kuralları (PDF)](../files/java/pdf/Bolum_02_Soz_Dizimi_Kurallari.pdf)  
 - [📝Çalışma Soruları - Söz Dizimi Kuralları (HTML)](../files/java/slides/Bolum_02_Soz_Dizimi_Kurallari_Calisma_Sorulari.html)  
 - [🕹️Primitive Types Lab (HTML)](../files/java/slides/Chapter_02_Primitive-Types-Lab.html)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_02_Basic_Syntax_and_Data_Types.pdf)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders02/src)  
 
 ---
@@ -131,7 +129,6 @@ Control structures, which include conditional statements and loops, provide a po
 - [📄Sunum-Özyineleme (PDF)](../files/java/pdf/Bolum_03_Ozyineleme.pdf)  
 - [📝Çalışma Soruları - Özyineleme (HTML)](../files/java/slides/Bolum_03_Ozyineleme_Calisma_Sorulari.html)  
 - [🕹️Pass-by-Value Lab (HTML)](../files/java/slides/Chapter_03_Pass-By-Value-Lab.html)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_03_Control_Structures.pdf)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders03/src)  
 
 ---
@@ -158,7 +155,6 @@ Object-oriented programming (OOP) is a powerful paradigm for structuring and org
 - [🕹️Heap & Stack Explorer (HTML)](../files/java/slides/Chapter_04_Heap-Stack-Explorer.html)  
 - [🕹️Access Modifiers & Encapsulation (HTML)](../files/java/slides/Chapter_04_Access-Modifiers.html)  
 - [🕹️Dynamic Dispatch (HTML)](../files/java/slides/Chapter_04_Dynamic-Dispatch.html)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_04_Object_Oriented_Programming.pdf)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders04/src)  
 
 ---
@@ -178,7 +174,6 @@ Arrays and collections are essential data structures in Java programming, provid
 - [📝Çalışma Soruları - Dizgi (HTML)](../files/java/slides/Bolum_05_Dizgi_Calisma_Sorulari.html)  
 - [🕹️Collections Internals (HTML)](../files/java/slides/Chapter_05_Collections-Internals.html)  
 - [🕹️String Pool & StringBuilder (HTML)](../files/java/slides/Chapter_05_String-Pool.html)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_05_Arrays_And_Collections.pdf)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders05/src)  
 
 ---
@@ -191,7 +186,6 @@ Exception handling is a critical aspect of Java programming, providing a powerfu
 - [📄Sunum-Hata Ayıklama ve İstisnalar (PDF)](../files/java/pdf/Bolum_06_Hata_Ayiklama.pdf)  
 - [📝Çalışma Soruları - Hata Ayıklama ve İstisnalar (HTML)](../files/java/slides/Bolum_06_Hata_Ayiklama_Calisma_Sorulari.html)  
 - [🕹️Exception Flow (HTML)](../files/java/slides/Chapter_06_Exception-Flow.html)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_06_Exception_Handling.pdf)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders06/src)  
 - [🖋️Interview Exception Handling (pdf)](../files/java/Chapter_06_Interview_Exception_Handling.pdf)  
 
@@ -205,7 +199,6 @@ Working with files and input/output (I/O) operations is a fundamental aspect of 
 - [📄Sunum-Giriş Çıkış (PDF)](../files/java/pdf/Bolum_07_Giris_Cikis.pdf)  
 - [📝Çalışma Soruları - Giriş Çıkış (HTML)](../files/java/slides/Bolum_07_Giris_Cikis_Calisma_Sorulari.html)  
 - [🕹️Stream Pipeline (HTML)](../files/java/slides/Chapter_07_Stream-Pipeline.html)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_07_Working_With_Files_And_Input_Output.pdf)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders07/src)  
 
 ---
@@ -218,7 +211,6 @@ Graphical user interfaces (GUIs) are a ubiquitous feature of modern software app
 - [📄Sunum-Grafikler (PDF)](../files/java/pdf/Bolum_08_Grafikler.pdf)  
 - [📝Çalışma Soruları - Grafikler (HTML)](../files/java/slides/Bolum_08_Grafikler_Calisma_Sorulari.html)  
 - [🕹️Swing Layouts (HTML)](../files/java/slides/Chapter_08_Swing-Layouts.html)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_08_Working_With_GUI_Applications.pdf)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders08/src)  
 - [🖋️Interview Swing (pdf)](../files/java/Chapter_08_Interview_Swing.pdf)  
 
@@ -232,7 +224,6 @@ Concurrency and multithreading are essential concepts in Java programming, provi
 - [📄Sunum-İş Parçacıkları (PDF)](../files/java/pdf/Bolum_09_Is_Parcaciklari.pdf)  
 - [📝Çalışma Soruları - İş Parçacıkları (HTML)](../files/java/slides/Bolum_09_Is_Parcaciklari_Calisma_Sorulari.html)  
 - [🕹️Thread Race (HTML)](../files/java/slides/Chapter_09_Thread-Race.html)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_09_Concurrency_And_Multithreading.pdf)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders09/src)  
 
 ---
@@ -245,7 +236,6 @@ Working with databases is a fundamental aspect of Java programming, providing a 
 - [📄Sunum-Veri Tabanı (PDF)](../files/java/pdf/Bolum_10_Veri_Tabani.pdf)  
 - [📝Çalışma Soruları - Veri Tabanı (HTML)](../files/java/slides/Bolum_10_Veri_Tabani_Calisma_Sorulari.html)  
 - [🕹️Student Management (java)](https://github.com/sercankulcu/StudentManagement)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_10_Working_With_Databases.pdf)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders10/src)  
 
 ---
@@ -257,7 +247,6 @@ Testing and debugging are critical aspects of Java programming, providing a powe
 - [🖼️Sunum-Test ve Hata Ayıklama (HTML)](../files/java/slides/Bolum_11_Test.html)  
 - [📄Sunum-Test ve Hata Ayıklama (PDF)](../files/java/pdf/Bolum_11_Test.pdf)  
 - [📝Çalışma Soruları - Test ve Hata Ayıklama (HTML)](../files/java/slides/Bolum_11_Test_Calisma_Sorulari.html)  
-- [🗒️Lecture Notes (pdf)](../files/java/Chapter_11_Testing_And_Debugging.pdf)  
 - [💻Code Examples (java)](https://github.com/sercankulcu/object-oriented-programming-java/tree/main/Ders11/src)  
 - [🖋️Interview Garbage Collectors (pdf)](../files/java/Interview_Garbage_Collectors.pdf)  
 - [🖋️Interview Questions (pdf)](../files/java/Interview_Questions.pdf)  
