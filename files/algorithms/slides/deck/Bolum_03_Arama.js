@@ -104,7 +104,7 @@
         dizi = (op === "uni" ? UNI : SKEW).slice();
         input.value = op === "uni" ? 65 : 15;
         render(null); log.innerHTML = "";
-        status.textContent = op === "uni" ? "Düzgün dağılımlı dizi yüklendi." : "Çarpık dizi yüklendi (son eleman 500). Ara değer aramayı 15 ile deneyin.";
+        status.textContent = op === "uni" ? "Düzgün dağılımlı dizi yüklendi." : "Çarpık dizi yüklendi (son eleman 500). Ara değer arama için zor bir örnek: 15.";
         return;
       }
       run(op);

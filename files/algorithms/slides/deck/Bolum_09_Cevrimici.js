@@ -85,7 +85,7 @@
         input.value = "1 2 3 4 1 2 5 1 2 3 4 5"; pol = "FIFO";
         draw();
         var s3 = run(parse(), 3, "FIFO")[11].faults, s4 = run(parse(), 4, "FIFO")[11].faults;
-        status.innerHTML += " · FIFO: k = 3 → " + s3 + ", k = 4 → " + s4 + " hata (Belady anomalisi). k'yı değiştirerek deneyin.";
+        status.innerHTML += " · FIFO: k = 3 → " + s3 + ", k = 4 → " + s4 + " hata (Belady anomalisi).";
         return;
       }
       pol = b.dataset.pol;

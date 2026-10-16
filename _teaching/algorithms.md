@@ -13,7 +13,7 @@ An algorithm is a finite and well-defined sequence of steps for solving a proble
 
 ---
 
-## Preliminary Materials  
+## Preliminary Materials
 
 * [Important People in Algorithms (HTML)](../files/algorithms/Algorithms_Important_People.html)
 * [Prerequisites for Algorithms (HTML)](../files/algorithms/Algorithms_Prerequisites.html)
@@ -34,7 +34,7 @@ Algorithms are the step-by-step procedures that form the core of computer scienc
 - [🕹️Run time analysis (HTML)](../files/algorithms/slides/Chapter_01_Algorithm_Complexity.html)
 - [🕹️Recurrence & Master Theorem (HTML)](../files/algorithms/slides/Chapter_01_Recurrence_Master_Theorem.html)
 - [🕹️Asymptotic Growth Explorer (HTML)](../files/algorithms/slides/Chapter_01_Asymptotic_Growth_Explorer.html)
-- [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter01/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter01/src)
 
 ---
 
@@ -48,7 +48,7 @@ Sorting algorithms are the architects of order, meticulously organizing data int
 - [🕹️Sorting Algorithms (HTML)](../files/algorithms/slides/Chapter_02_Sorting.html)
 - [🕹️Sorting Race (HTML)](../files/algorithms/slides/Chapter_02_Sorting_Race.html)
 - [🕹️Sorting Properties Lab (HTML)](../files/algorithms/slides/Chapter_02_Sorting_Properties_Lab.html)
-- [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter02/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter02/src)
 
 ---
 
@@ -62,7 +62,7 @@ Searching algorithms are the detectives of the data world, designed to track dow
 - [🕹️Search Algorithms (HTML)](../files/algorithms/slides/Chapter_03_Search.html)
 - [🕹️Hash & Interpolation Search (HTML)](../files/algorithms/slides/Chapter_03_Hash_Interpolation_Search.html)
 - [🕹️Exponential Search (HTML)](../files/algorithms/slides/Chapter_03_Exponential_Search.html)
-- [💻Code Examples (Github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter03/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter03/src)
 
 ---
 
@@ -83,16 +83,15 @@ Graphs, composed of nodes and edges, are ubiquitous in various domains, includin
   - [🖼️Sunum-Çizge Ağ Akış (HTML)](../files/algorithms/slides/Bolum_04_04_Ag_Akis.html) 
   - [📄Sunum-Çizge Ağ Akış (PDF)](../files/algorithms/pdf/Bolum_04_04_Ag_Akis.pdf)  
   - [📝Çalışma Soruları - Çizge Ağ Akış (HTML)](../files/algorithms/slides/Bolum_04_04_Ag_Akis_Calisma_Sorulari.html)  
-- 🕹️Applications:
-  - [🕹️BFS DFS (HTML)](../files/algorithms/slides/Chapter_04_Graph_Traversal.html)
-  - [🕹️Travelling Salesman (HTML)](../files/algorithms/slides/Chapter_04_TSP.html)
-  - [🕹️A* Pathfinding (HTML)](../files/algorithms/slides/Chapter_04_AStar.html)
-  - [🕹️Shortest Path (HTML)](../files/algorithms/slides/Chapter_04_Shortest_Path.html) 
-  - [🕹️MST Simulator (HTML)](../files/algorithms/slides/Chapter_04_MST.html)
-  - [🕹️Network Flow (HTML)](../files/algorithms/slides/Chapter_04_Network_Flow.html)
-  - [🕹️Topological Sort, SCC & Articulation Points (HTML)](../files/algorithms/slides/Chapter_04_Graph_Structure_Algorithms.html)
-  - [🕹️Bipartite, Cycle & Bridge Explorer (HTML)](../files/algorithms/slides/Chapter_04_Bipartite_Cycle_Bridge.html)
-- [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src)
+- [🕹️🕹️BFS DFS (HTML)](../files/algorithms/slides/Chapter_04_Graph_Traversal.html)
+- [🕹️🕹️Travelling Salesman (HTML)](../files/algorithms/slides/Chapter_04_TSP.html)
+- [🕹️🕹️A* Pathfinding (HTML)](../files/algorithms/slides/Chapter_04_AStar.html)
+- [🕹️🕹️Shortest Path (HTML)](../files/algorithms/slides/Chapter_04_Shortest_Path.html)
+- [🕹️🕹️MST Simulator (HTML)](../files/algorithms/slides/Chapter_04_MST.html)
+- [🕹️🕹️Network Flow (HTML)](../files/algorithms/slides/Chapter_04_Network_Flow.html)
+- [🕹️🕹️Topological Sort, SCC & Articulation Points (HTML)](../files/algorithms/slides/Chapter_04_Graph_Structure_Algorithms.html)
+- [🕹️🕹️Bipartite, Cycle & Bridge Explorer (HTML)](../files/algorithms/slides/Chapter_04_Bipartite_Cycle_Bridge.html)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter04/src)
 
 ---
 
@@ -117,7 +116,7 @@ Have you ever wondered how your computer or smartphone handles text so efficient
 - [📝Çalışma Soruları - Trie (HTML)](../files/algorithms/slides/Bolum_05_Tries_Calisma_Sorulari.html)  
   - [🕹️Trie & Suffix Algorithms (HTML)](../files/algorithms/slides/Chapter_05_Trie_Suffix_Algorithms.html)
 - [🕹️Prefix Function & Z Algorithm (HTML)](../files/algorithms/slides/Chapter_05_Prefix_Z_Algorithms.html)
-- [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter05/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter05/src)
 
 ---
 
@@ -128,7 +127,7 @@ Dynamic programming is a powerful technique for solving optimization problems by
 - [🖼️Sunum-Dinamik Programlama (HTML)](../files/algorithms/slides/Bolum_06_Dinamik.html)  
 - [📄Sunum-Dinamik Programlama (PDF)](../files/algorithms/pdf/Bolum_06_Dinamik.pdf)  
 - [📝Çalışma Soruları - Dinamik Programlama (HTML)](../files/algorithms/slides/Bolum_06_Dinamik_Calisma_Sorulari.html)  
-- [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter06/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter06/src)
 
 ---
 
@@ -139,7 +138,7 @@ Approximation algorithms efficiently produce near-optimal solutions for optimiza
 - [🖼️Sunum-Yaklaşım Algoritmaları (HTML)](../files/algorithms/slides/Bolum_07_Yakinsama.html)  
 - [📄Sunum-Yaklaşım Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_07_Yakinsama.pdf)  
 - [📝Çalışma Soruları - Yaklaşım Algoritmaları (HTML)](../files/algorithms/slides/Bolum_07_Yakinsama_Calisma_Sorulari.html)  
-- [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter07/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter07/src)
 
 ---
 
@@ -150,7 +149,7 @@ Randomized algorithms incorporate random choices into their execution. Randomiza
 - [🖼️Sunum-Rastgele Algoritmalar (HTML)](../files/algorithms/slides/Bolum_08_Rastgele.html)  
 - [📄Sunum-Rastgele Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_08_Rastgele.pdf)  
 - [📝Çalışma Soruları - Rastgele Algoritmalar (HTML)](../files/algorithms/slides/Bolum_08_Rastgele_Calisma_Sorulari.html)  
-- [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter08/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter08/src)
 
 ---
 
@@ -161,7 +160,7 @@ Online algorithms process input incrementally and make irrevocable decisions wit
 - [🖼️Sunum-Çevrimiçi Algoritmalar (HTML)](../files/algorithms/slides/Bolum_09_Cevrimici.html)  
 - [📄Sunum-Çevrimiçi Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_09_Cevrimici.pdf)  
 - [📝Çalışma Soruları - Çevrimiçi Algoritmalar (HTML)](../files/algorithms/slides/Bolum_09_Cevrimici_Calisma_Sorulari.html)  
-- [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter09/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter09/src)
 
 ---
 
@@ -172,7 +171,7 @@ Parallel algorithms divide computation among multiple processing units to reduce
 - [🖼️Sunum-Paralel Algoritmalar (HTML)](../files/algorithms/slides/Bolum_10_Paralel.html)  
 - [📄Sunum-Paralel Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_10_Paralel.pdf)  
 - [📝Çalışma Soruları - Paralel Algoritmalar (HTML)](../files/algorithms/slides/Bolum_10_Paralel_Calisma_Sorulari.html)  
-- [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter10/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter10/src)
 
 ---
 
@@ -183,7 +182,7 @@ The divide-and-conquer paradigm is an algorithmic design paradigm that breaks do
 - [🖼️Sunum-Böl Fethet Yaklaşımı (HTML)](../files/algorithms/slides/Bolum_11_Bol_Fethet.html)  
 - [📄Sunum-Böl Fethet Yaklaşımı (PDF)](../files/algorithms/pdf/Bolum_11_Bol_Fethet.pdf)  
 - [📝Çalışma Soruları - Böl Fethet Yaklaşımı (HTML)](../files/algorithms/slides/Bolum_11_Bol_Fethet_Calisma_Sorulari.html)  
-- [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter11/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter11/src)
 
 ---
 
@@ -194,7 +193,7 @@ Greedy algorithms build a solution incrementally by choosing the locally best av
 - [🖼️Sunum-Açgözlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_12_Acgozlu.html)  
 - [📄Sunum-Açgözlü Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_12_Acgozlu.pdf)  
 - [📝Çalışma Soruları - Açgözlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_12_Acgozlu_Calisma_Sorulari.html)  
-- [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter12/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter12/src)
 
 ---
 
@@ -205,7 +204,7 @@ Backtracking systematically explores a search space by extending partial candida
 - [🖼️Sunum-Geri İzleme Algoritmaları (HTML)](../files/algorithms/slides/Bolum_13_Geri_Donuslu.html)  
 - [📄Sunum-Geri İzleme Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_13_Geri_Donuslu.pdf)  
 - [📝Çalışma Soruları - Geri İzleme Algoritmaları (HTML)](../files/algorithms/slides/Bolum_13_Geri_Donuslu_Calisma_Sorulari.html)  
-- [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter13/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter13/src)
 
 
 ---
@@ -217,5 +216,5 @@ Branch and bound algorithms are a type of algorithm that solves optimization pro
 - [🖼️Sunum-Dal Sınır Algoritmaları (HTML)](../files/algorithms/slides/Bolum_14_Dal_Sinir.html)  
 - [📄Sunum-Dal Sınır Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_14_Dal_Sinir.pdf)  
 - [📝Çalışma Soruları - Dal Sınır Algoritmaları (HTML)](../files/algorithms/slides/Bolum_14_Dal_Sinir_Calisma_Sorulari.html)  
-- [💻Code Examples (github)](https://github.com/sercankulcu/algorithms/tree/main/Chapter14/src)
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter14/src)
 

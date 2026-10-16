@@ -13,7 +13,7 @@ Data structures provide systematic ways to organize, store, and access data. Cho
 
 ---
 
-## Preliminary Materials  
+## Preliminary Materials
 
 * [Important People in Data Structures (HTML)](../files/data_structures/Data_Structures_Important_People.html)
 * [Prerequisites for Data Structures (HTML)](../files/data_structures/Data_Structures_Prerequisites.html)
@@ -27,7 +27,7 @@ Data structures are the backbone of computer science, serving as the fundamental
 
 - [🖼️Sunum-Giriş (HTML)](../files/data_structures/slides/Bolum_01_Giris.html)  
 - [📄Sunum-Giriş (PDF)](../files/data_structures/pdf/Bolum_01_Giris.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/data_structures/slides/Bolum_01_Giris_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Giriş (HTML)](../files/data_structures/slides/Bolum_01_Giris_Calisma_Sorulari.html)  
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src)  
 
 ---
@@ -38,7 +38,7 @@ Arrays are like the bread and butter of programming. An array is the most fundam
 
 - [🖼️Sunum-Diziler (HTML)](../files/data_structures/slides/Bolum_02_Diziler.html)  
 - [📄Sunum-Diziler (PDF)](../files/data_structures/pdf/Bolum_02_Diziler.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/data_structures/slides/Bolum_02_Diziler_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Diziler (HTML)](../files/data_structures/slides/Bolum_02_Diziler_Calisma_Sorulari.html)  
 - [🕹️Array Simulator (HTML)](../files/data_structures/slides/Bolum_02_Arrays.html)  
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders02/src)  
 
@@ -48,13 +48,12 @@ Arrays are like the bread and butter of programming. An array is the most fundam
 
 Linked lists are dynamic and flexible data structures that consist of nodes connected through pointers. A linked list is like a chain of connected nodes, where each node contains both data and a reference (or link) to the next node in the sequence. Unlike arrays, linked lists don't require contiguous memory allocation, making them more flexible for insertions and deletions. They're particularly useful when you need to frequently add or remove elements from the middle of the data structure. However, they sacrifice random access capability, as you must traverse from the beginning to reach any particular element. 
 
-- [🖼️Sunum-Bağlı-Liste (HTML)](../files/data_structures/slides/Bolum_03_Bagli_Liste.html)  
-- [📄Sunum-Bağlı-Liste (PDF)](../files/data_structures/pdf/Bolum_03_Bagli_Liste.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/data_structures/slides/Bolum_03_Bagli_Liste_Calisma_Sorulari.html)  
-- 🕹️Simulators:
-  - [Linked List Simulator (HTML)](../files/data_structures/slides/Bolum_03_Linked_List.html)
-  - [Doubly Linked List Simulator (HTML)](../files/data_structures/slides/Bolum_03_Doubly_Linked_List.html)
-  - [Circular Linked List Simulator (HTML)](../files/data_structures/slides/Bolum_03_Circular_Linked_List.html)
+- [🖼️Sunum-Bağlı Liste (HTML)](../files/data_structures/slides/Bolum_03_Bagli_Liste.html)  
+- [📄Sunum-Bağlı Liste (PDF)](../files/data_structures/pdf/Bolum_03_Bagli_Liste.pdf)  
+- [📝Çalışma Soruları - Bağlı Liste (HTML)](../files/data_structures/slides/Bolum_03_Bagli_Liste_Calisma_Sorulari.html)  
+- [🕹️Linked List Simulator (HTML)](../files/data_structures/slides/Bolum_03_Linked_List.html)
+- [🕹️Doubly Linked List Simulator (HTML)](../files/data_structures/slides/Bolum_03_Doubly_Linked_List.html)
+- [🕹️Circular Linked List Simulator (HTML)](../files/data_structures/slides/Bolum_03_Circular_Linked_List.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders03/src)  
 
 ---
@@ -65,13 +64,12 @@ A stack operates on the Last-In-First-Out (LIFO) principle, much like a stack of
 
 - [🖼️Sunum-Yığın (HTML)](../files/data_structures/slides/Bolum_04_Yigin.html)  
 - [📄Sunum-Yığın (PDF)](../files/data_structures/pdf/Bolum_04_Yigin.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/data_structures/slides/Bolum_04_Yigin_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Yığın (HTML)](../files/data_structures/slides/Bolum_04_Yigin_Calisma_Sorulari.html)  
 - [🕹️Stack Simulator (HTML)](../files/data_structures/slides/Bolum_04_Stack.html)  
-- 🕹️Applications:
-  - [Hanoi Towers](../files/data_structures/slides/Bolum_04_Tower_of_Hanoi.html)
-  - [Stock Span](../files/data_structures/slides/Bolum_04_Stock_Span.html)
-  - [Infix to Prefix](../files/data_structures/slides/Bolum_04_Infix_to_Prefix.html)
-  - [Infix to Postfix](../files/data_structures/slides/Bolum_04_Infix_to_Postfix.html)
+- [🕹️Hanoi Towers (HTML)](../files/data_structures/slides/Bolum_04_Tower_of_Hanoi.html)
+- [🕹️Stock Span (HTML)](../files/data_structures/slides/Bolum_04_Stock_Span.html)
+- [🕹️Infix to Prefix (HTML)](../files/data_structures/slides/Bolum_04_Infix_to_Prefix.html)
+- [🕹️Infix to Postfix (HTML)](../files/data_structures/slides/Bolum_04_Infix_to_Postfix.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders04/src)  
 
 ---
@@ -82,14 +80,12 @@ A queue follows the First-In-First-Out (FIFO) principle, similar to a line of pe
 
 - [🖼️Sunum-Kuyruk (HTML)](../files/data_structures/slides/Bolum_05_Kuyruk.html)  
 - [📄Sunum-Kuyruk (PDF)](../files/data_structures/pdf/Bolum_05_Kuyruk.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/data_structures/slides/Bolum_05_Kuyruk_Calisma_Sorulari.html)  
-- 🕹️Simulators:
-  - [Queue Simulator (HTML)](../files/data_structures/slides/Bolum_05_Queue.html)
-  - [Deque Simulator (HTML)](../files/data_structures/slides/Bolum_05_Deque.html)
-  - [Circular Queue Simulator (HTML)](../files/data_structures/slides/Bolum_05_Circular_Queue.html)
-- 🕹️Applications:
-  - [Scheduler](../files/data_structures/slides/Bolum_05_Scheduler.html)
-  - [Priority Scheduler](../files/data_structures/slides/Bolum_05_Priority_Scheduler.html)
+- [📝Çalışma Soruları - Kuyruk (HTML)](../files/data_structures/slides/Bolum_05_Kuyruk_Calisma_Sorulari.html)  
+- [🕹️Queue Simulator (HTML)](../files/data_structures/slides/Bolum_05_Queue.html)
+- [🕹️Deque Simulator (HTML)](../files/data_structures/slides/Bolum_05_Deque.html)
+- [🕹️Circular Queue Simulator (HTML)](../files/data_structures/slides/Bolum_05_Circular_Queue.html)
+- [🕹️Scheduler (HTML)](../files/data_structures/slides/Bolum_05_Scheduler.html)
+- [🕹️Priority Scheduler (HTML)](../files/data_structures/slides/Bolum_05_Priority_Scheduler.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders05/src)  
 
 ---
@@ -100,7 +96,7 @@ A list is an abstract data type representing an ordered sequence of elements. It
 
 - [🖼️Sunum-Liste (HTML)](../files/data_structures/slides/Bolum_06_Liste.html)
 - [📄Sunum-Liste (PDF)](../files/data_structures/pdf/Bolum_06_Liste.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/data_structures/slides/Bolum_06_Liste_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Liste (HTML)](../files/data_structures/slides/Bolum_06_Liste_Calisma_Sorulari.html)  
 - [🕹️List ADT Simulator (HTML)](../files/data_structures/slides/Bolum_06_List_ADT.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders06/src)
 
@@ -112,12 +108,11 @@ A tree is a hierarchical data structure composed of nodes connected by edges, si
 
 - [🖼️Sunum-Ağaçlar (HTML)](../files/data_structures/slides/Bolum_07_Agac.html)  
 - [📄Sunum-Ağaçlar (PDF)](../files/data_structures/pdf/Bolum_07_Agac.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/data_structures/slides/Bolum_07_Agac_Calisma_Sorulari.html)  
-- 🕹️Simulators:
-  - [General Tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_General_Tree.html)  
-  - [Binary Search Tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_Tree.html)  
-  - [B-tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_BTree.html)  
-  - [B-plus-tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_BPlusTree.html)  
+- [📝Çalışma Soruları - Ağaçlar (HTML)](../files/data_structures/slides/Bolum_07_Agac_Calisma_Sorulari.html)  
+- [🕹️General Tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_General_Tree.html)
+- [🕹️Binary Search Tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_Tree.html)
+- [🕹️B-tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_BTree.html)
+- [🕹️B-plus-tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_BPlusTree.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders07/src)  
 
 ---
@@ -128,10 +123,9 @@ A heap is a specialized tree-based data structure that satisfies the heap proper
 
 - [🖼️Sunum-Öncelikli Kuyruk (HTML)](../files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk.html)
 - [📄Sunum-Öncelikli Kuyruk (PDF)](../files/data_structures/pdf/Bolum_08_Oncelikli_Kuyruk.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk_Calisma_Sorulari.html)  
-- 🕹️Simulators:
-  - [Heap Simulator (HTML)](../files/data_structures/slides/Bolum_08_Heap.html)
-  - [Priority Queue Simulator (HTML)](../files/data_structures/slides/Bolum_08_Priority_Queue.html)
+- [📝Çalışma Soruları - Öncelikli Kuyruk (HTML)](../files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk_Calisma_Sorulari.html)  
+- [🕹️Heap Simulator (HTML)](../files/data_structures/slides/Bolum_08_Heap.html)
+- [🕹️Priority Queue Simulator (HTML)](../files/data_structures/slides/Bolum_08_Priority_Queue.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders08/src)
 
 ---
@@ -143,11 +137,10 @@ A hash table is a data structure that implements an associative array abstract d
 
 - [🖼️Sunum-Hash Tabloları (HTML)](../files/data_structures/slides/Bolum_09_Hash_Tablosu.html)
 - [📄Sunum-Hash Tabloları (PDF)](../files/data_structures/pdf/Bolum_09_Hash_Tablosu.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/data_structures/slides/Bolum_09_Hash_Tablosu_Calisma_Sorulari.html)  
-- 🕹️Simulators:
-  - [Hash Table Simulator (HTML)](../files/data_structures/slides/Bolum_09_Hash_Table.html)
-  - [Map Simulator (HTML)](../files/data_structures/slides/Bolum_09_Map.html)
-  - [Open Addressing Simulator (HTML)](../files/data_structures/slides/Bolum_09_Open_Addressing.html)
+- [📝Çalışma Soruları - Hash Tabloları (HTML)](../files/data_structures/slides/Bolum_09_Hash_Tablosu_Calisma_Sorulari.html)  
+- [🕹️Hash Table Simulator (HTML)](../files/data_structures/slides/Bolum_09_Hash_Table.html)
+- [🕹️Map Simulator (HTML)](../files/data_structures/slides/Bolum_09_Map.html)
+- [🕹️Open Addressing Simulator (HTML)](../files/data_structures/slides/Bolum_09_Open_Addressing.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders09/src)
 
 ---
@@ -159,12 +152,11 @@ A search tree, particularly a Binary Search Tree (BST), is a binary tree data st
 
 - [🖼️Sunum-Arama Ağaçları (HTML)](../files/data_structures/slides/Bolum_10_Arama_Agaclari.html)  
 - [📄Sunum-Arama Ağaçları (PDF)](../files/data_structures/pdf/Bolum_10_Arama_Agaclari.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/data_structures/slides/Bolum_10_Arama_Agaclari_Calisma_Sorulari.html)  
-- 🕹️Simulators:  
-  - [BST Simulator (HTML)](../files/data_structures/slides/Bolum_10_BST.html)  
-  - [Red-Black Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_Red_Black.html)  
-  - [AVL Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_AVL.html)  
-  - [Splay Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_Splay.html)  
+- [📝Çalışma Soruları - Arama Ağaçları (HTML)](../files/data_structures/slides/Bolum_10_Arama_Agaclari_Calisma_Sorulari.html)  
+- [🕹️BST Simulator (HTML)](../files/data_structures/slides/Bolum_10_BST.html)
+- [🕹️Red-Black Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_Red_Black.html)
+- [🕹️AVL Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_AVL.html)
+- [🕹️Splay Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_Splay.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders10/src)  
 
 ---
@@ -175,13 +167,11 @@ A graph is a versatile data structure consisting of vertices (or nodes) connecte
 
 - [🖼️Sunum-Çizge (HTML)](../files/data_structures/slides/Bolum_11_Cizge.html)  
 - [📄Sunum-Çizge (PDF)](../files/data_structures/pdf/Bolum_11_Cizge.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/data_structures/slides/Bolum_11_Cizge_Calisma_Sorulari.html)  
-- 🕹️Simulators:
-  - [Graph Simulator (HTML)](../files/data_structures/slides/Bolum_11_Graph.html)
-  - [Directed Graph Simulator (HTML)](../files/data_structures/slides/Bolum_11_Directed_Graph.html)
-  - [Dijkstra Simulator (HTML)](../files/data_structures/slides/Bolum_11_Dijkstra.html)
-- 🕹️Applications:
-  - [Course Prerequisite Planner (HTML)](../files/data_structures/slides/Bolum_11_Course_Planner.html)
+- [📝Çalışma Soruları - Çizge (HTML)](../files/data_structures/slides/Bolum_11_Cizge_Calisma_Sorulari.html)  
+- [🕹️Graph Simulator (HTML)](../files/data_structures/slides/Bolum_11_Graph.html)
+- [🕹️Directed Graph Simulator (HTML)](../files/data_structures/slides/Bolum_11_Directed_Graph.html)
+- [🕹️Dijkstra Simulator (HTML)](../files/data_structures/slides/Bolum_11_Dijkstra.html)
+- [🕹️Course Prerequisite Planner (HTML)](../files/data_structures/slides/Bolum_11_Course_Planner.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders11/src)  
 
 ---
@@ -192,9 +182,8 @@ A set is a collection of distinct elements where order doesn't matter and duplic
 
 - [🖼️Sunum-Kümeler (HTML)](../files/data_structures/slides/Bolum_12_Kumeler.html)  
 - [📄Sunum-Kümeler (PDF)](../files/data_structures/pdf/Bolum_12_Kumeler.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/data_structures/slides/Bolum_12_Kumeler_Calisma_Sorulari.html)  
-- 🕹️Simulators:
-  - [Set ADT Simulator (HTML)](../files/data_structures/slides/Bolum_12_Set_ADT.html)
-  - [Disjoint Set Union Simulator (HTML)](../files/data_structures/slides/Bolum_12_Disjoint_Set_Union.html)  
+- [📝Çalışma Soruları - Kümeler (HTML)](../files/data_structures/slides/Bolum_12_Kumeler_Calisma_Sorulari.html)  
+- [🕹️Set ADT Simulator (HTML)](../files/data_structures/slides/Bolum_12_Set_ADT.html)
+- [🕹️Disjoint Set Union Simulator (HTML)](../files/data_structures/slides/Bolum_12_Disjoint_Set_Union.html)
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src)  
 

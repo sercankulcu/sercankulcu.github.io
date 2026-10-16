@@ -27,7 +27,7 @@ As the bridge between hardware and software, operating systems serve as the foun
 
 - [🖼️Sunum-Giriş (HTML)](../files/os/slides/Bolum_01_Giris.html)  
 - [📄Sunum-Giriş (PDF)](../files/os/pdf/Bolum_01_Giris.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_01_Giris_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Giriş (HTML)](../files/os/slides/Bolum_01_Giris_Calisma_Sorulari.html)  
 - [💻Code Examples, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter01/src)  
 - [💻Code Examples, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab01)  
 
@@ -39,7 +39,7 @@ The design and organization of an operating system's internal components and mec
 
 - [🖼️Sunum-İşletim Sistemi Yapıları (HTML)](../files/os/slides/Bolum_02_Yapilar.html)  
 - [📄Sunum-İşletim Sistemi Yapıları (PDF)](../files/os/pdf/Bolum_02_Yapilar.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_02_Yapilar_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - İşletim Sistemi Yapıları (HTML)](../files/os/slides/Bolum_02_Yapilar_Calisma_Sorulari.html)  
 - [💻Code Examples, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter02/src)  
 - [💻Code Examples, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab02)  
 
@@ -51,7 +51,7 @@ Processes serve as the cornerstone of multi-tasking and concurrency, enabling mu
 
 - [🖼️Sunum-Süreçler (HTML)](../files/os/slides/Bolum_03_Surecler.html)  
 - [📄Sunum-Süreçler (PDF)](../files/os/pdf/Bolum_03_Surecler.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_03_Surecler_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Süreçler (HTML)](../files/os/slides/Bolum_03_Surecler_Calisma_Sorulari.html)  
 - [💻Code Examples, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter03/src)  
 - [💻Code Examples, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab03)  
 
@@ -63,7 +63,7 @@ Threads, as lightweight execution units within a process, provide a powerful mec
 
 - [🖼️Sunum-İş Parçacıkları (HTML)](../files/os/slides/Bolum_04_Is_Parcaciklari.html)  
 - [📄Sunum-İş Parçacıkları (PDF)](../files/os/pdf/Bolum_04_Is_Parcaciklari.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_04_Is_Parcaciklari_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - İş Parçacıkları (HTML)](../files/os/slides/Bolum_04_Is_Parcaciklari_Calisma_Sorulari.html)  
 - [💻Code Examples, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter04/src)  
 - [💻Code Examples, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab04)  
 
@@ -75,7 +75,7 @@ CPU scheduling is a critical component of any operating system, responsible for 
 
 - [🖼️Sunum-CPU Çizelgeleme (HTML)](../files/os/slides/Bolum_05_Cizelgeleme.html)  
 - [📄Sunum-CPU Çizelgeleme (PDF)](../files/os/pdf/Bolum_05_Cizelgeleme.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_05_Cizelgeleme_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - CPU Çizelgeleme (HTML)](../files/os/slides/Bolum_05_Cizelgeleme_Calisma_Sorulari.html)  
 - [🕹️CPU Scheduling Simulator (HTML)](../files/os/slides/Chapter_05_CPU_Scheduling.html)  
 - [💻Code Examples, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter05/src)  
 - [💻Code Examples, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab05)  
@@ -88,7 +88,7 @@ In a multi-threaded or multi-process environment, synchronization mechanisms pro
 
 - [🖼️Sunum-Senkronizasyon (HTML)](../files/os/slides/Bolum_06_Senkronizasyon.html)  
 - [📄Sunum-Senkronizasyon (PDF)](../files/os/pdf/Bolum_06_Senkronizasyon.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_06_Senkronizasyon_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Senkronizasyon (HTML)](../files/os/slides/Bolum_06_Senkronizasyon_Calisma_Sorulari.html)  
 - [🕹️Synchronization Lab (HTML)](../files/os/slides/Chapter_06_Synchronization_Lab.html)  
 - [💻Code Examples, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter06/src)  
 - [💻Code Examples, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab06)  
@@ -101,7 +101,7 @@ A deadlock occurs when a set of processes or threads waits indefinitely for reso
 
 - [🖼️Sunum-Kilitlenme (HTML)](../files/os/slides/Bolum_07_Kilitlenme.html)  
 - [📄Sunum-Kilitlenme (PDF)](../files/os/pdf/Bolum_07_Kilitlenme.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_07_Kilitlenme_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Kilitlenme (HTML)](../files/os/slides/Bolum_07_Kilitlenme_Calisma_Sorulari.html)  
 - [🕹️Deadlock & Banker's Algorithm Simulator (HTML)](../files/os/slides/Chapter_07_Deadlock_Bankers.html)  
 - [💻Code Examples, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter07/src)  
 - [💻Code Examples, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab07)  
@@ -114,7 +114,7 @@ Memory management, which involves the allocation, monitoring, and protection of 
 
 - [🖼️Sunum-Bellek Yönetimi (HTML)](../files/os/slides/Bolum_08_Bellek_Yonetimi.html)  
 - [📄Sunum-Bellek Yönetimi (PDF)](../files/os/pdf/Bolum_08_Bellek_Yonetimi.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_08_Bellek_Yonetimi_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Bellek Yönetimi (HTML)](../files/os/slides/Bolum_08_Bellek_Yonetimi_Calisma_Sorulari.html)  
 - [🕹️Memory Allocation Simulator (HTML)](../files/os/slides/Chapter_08_Memory_Allocation.html)  
 - [💻Code Examples, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter08/src)  
 - [💻Code Examples, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab08)  
@@ -127,7 +127,7 @@ Virtual memory gives each process an isolated virtual address space and maps vir
 
 - [🖼️Sunum-Sanal Bellek (HTML)](../files/os/slides/Bolum_09_Sanal_Bellek.html)  
 - [📄Sunum-Sanal Bellek (PDF)](../files/os/pdf/Bolum_09_Sanal_Bellek.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_09_Sanal_Bellek_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Sanal Bellek (HTML)](../files/os/slides/Bolum_09_Sanal_Bellek_Calisma_Sorulari.html)  
 - [🕹️Page Replacement Simulator (HTML)](../files/os/slides/Chapter_09_Page_Replacement.html)  
 - [🕹️Paging & Address Translation Visualizer (HTML)](../files/os/slides/Chapter_09_Address_Translation.html)  
 - [💻Code Examples, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter09/src)  
@@ -141,7 +141,7 @@ File systems organize named data and metadata and provide abstractions for stori
 
 - [🖼️Sunum-Dosya Sistemleri (HTML)](../files/os/slides/Bolum_10_Dosya_Sistemleri.html)  
 - [📄Sunum-Dosya Sistemleri (PDF)](../files/os/pdf/Bolum_10_Dosya_Sistemleri.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_10_Dosya_Sistemleri_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Dosya Sistemleri (HTML)](../files/os/slides/Bolum_10_Dosya_Sistemleri_Calisma_Sorulari.html)  
 - [💻Code Examples, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter10/src)  
 - [💻Code Examples, C (GitHub)](https://github.com/sercankulcu/operating-systems-labs/tree/main/lab10)  
 
@@ -153,7 +153,7 @@ The operating system manages communication between applications and hardware or 
 
 - [🖼️Sunum-Giriş/Çıkış (HTML)](../files/os/slides/Bolum_11_Giris_Cikis.html)  
 - [📄Sunum-Giriş/Çıkış (PDF)](../files/os/pdf/Bolum_11_Giris_Cikis.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_11_Giris_Cikis_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Giriş/Çıkış (HTML)](../files/os/slides/Bolum_11_Giris_Cikis_Calisma_Sorulari.html)  
 - [🕹️Disk Scheduling Simulator (HTML)](../files/os/slides/Chapter_11_Disk_Scheduling.html)  
 - [🕹️Interrupt, DMA & I/O Flow Visualizer (HTML)](../files/os/slides/Chapter_11_IO_Interrupt_DMA.html)  
 - [💻Code Examples, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter11/src)  
@@ -167,7 +167,7 @@ Multiprocessor systems introduce challenges involving parallel scheduling, cache
 
 - [🖼️Sunum-Çok İşlemcili Sistemler (HTML)](../files/os/slides/Bolum_12_Cok_Islemcili_Sistemler.html)  
 - [📄Sunum-Çok İşlemcili Sistemler (PDF)](../files/os/pdf/Bolum_12_Cok_Islemcili_Sistemler.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_12_Cok_Islemcili_Sistemler_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Çok İşlemcili Sistemler (HTML)](../files/os/slides/Bolum_12_Cok_Islemcili_Sistemler_Calisma_Sorulari.html)  
 - [🕹️Multicore Scheduling & Load Balancing Simulator (HTML)](../files/os/slides/Chapter_12_Multicore_Scheduling.html)  
 - [💻Code Examples, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter12/src)  
 
@@ -179,7 +179,7 @@ Security is a critical concern in modern computing environments, and operating s
 
 - [🖼️Sunum-Güvenlik (HTML)](../files/os/slides/Bolum_13_Guvenlik.html)  
 - [📄Sunum-Güvenlik (PDF)](../files/os/pdf/Bolum_13_Guvenlik.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_13_Guvenlik_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Güvenlik (HTML)](../files/os/slides/Bolum_13_Guvenlik_Calisma_Sorulari.html)  
 - [🕹️OS Protection & Permissions Lab (HTML)](../files/os/slides/Chapter_13_Permissions_Security.html)  
 - [💻Code Examples, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter13/src)  
 
@@ -191,7 +191,7 @@ With the growing demand for multimedia applications such as audio and video play
 
 - [🖼️Sunum-Çoklu Ortam Sistemleri (HTML)](../files/os/slides/Bolum_14_Coklu_Ortam.html)  
 - [📄Sunum-Çoklu Ortam Sistemleri (PDF)](../files/os/pdf/Bolum_14_Coklu_Ortam.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_14_Coklu_Ortam_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Çoklu Ortam Sistemleri (HTML)](../files/os/slides/Bolum_14_Coklu_Ortam_Calisma_Sorulari.html)  
 - [💻Code Examples, Java (GitHub)](https://github.com/sercankulcu/operating-systems-java/tree/main/Chapter14/src)  
 
 ---
@@ -202,7 +202,7 @@ Operating system design involves the careful consideration of a wide range of fa
 
 - [🖼️Sunum-İşletim Sistemi Tasarımı (HTML)](../files/os/slides/Bolum_15_Isletim_Sistemi_Tasarimi.html)  
 - [📄Sunum-İşletim Sistemi Tasarımı (PDF)](../files/os/pdf/Bolum_15_Isletim_Sistemi_Tasarimi.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_15_Isletim_Sistemi_Tasarimi_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - İşletim Sistemi Tasarımı (HTML)](../files/os/slides/Bolum_15_Isletim_Sistemi_Tasarimi_Calisma_Sorulari.html)  
 - [🕹️Real-Time Scheduling Simulator (HTML)](../files/os/slides/Chapter_15_Real_Time_Scheduling.html)  
 
 ---
@@ -212,6 +212,6 @@ Operating system design involves the careful consideration of a wide range of fa
 **UNIX - Linux**
 - [🖼️Sunum-Linux (HTML)](../files/os/slides/Bolum_16_Linux.html)  
 - [📄Sunum-Linux (PDF)](../files/os/pdf/Bolum_16_Linux.pdf)  
-- [📝Çalışma Soruları (HTML)](../files/os/slides/Bolum_16_Linux_Calisma_Sorulari.html)  
+- [📝Çalışma Soruları - Linux (HTML)](../files/os/slides/Bolum_16_Linux_Calisma_Sorulari.html)  
 - [🕹️Linux Process Explorer (HTML)](../files/os/slides/Chapter_16_Linux_Process_Explorer.html)  
 
