@@ -1,0 +1,485 @@
+---
+layout: without-sidebar
+title: "Bayrak Laboratuvarı"
+permalink: /files/microprocessors/slides/Chapter_06_Flags-Lab.html
+excerpt: "8086'da ADD, ADC, SUB, SBB, INC, DEC, NEG ve CMP sonrası CF, PF, AF, ZF, SF ve OF bayrakları: bit bit toplama/çıkarma, elde ve ödünç zinciri, işaretsiz ve işaretli yorum, taşmanın nedeni."
+---
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.mp-fl, .mp-fl-dlg { --ds-accent:#a61b1b; --ds-link:var(--global-link-color, #2563eb); }
+html[data-theme="dark"] .mp-fl, html[data-theme="dark"] .mp-fl-dlg { --ds-accent:#f07a7a; }
+.mp-fl .grid { display:grid; grid-template-columns:192px minmax(0,1fr); gap:10px; height:100%; }
+.mp-fl .side { display:flex; flex-direction:column; gap:6px; min-height:0; padding:8px 10px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.mp-fl .cap { display:block; margin:0 0 2px; color:var(--ds-muted); font-size:12px; font-weight:800; letter-spacing:.05em; }
+.mp-fl select, .mp-fl .in { width:100%; min-height:30px !important; font-size:14px !important; }
+.mp-fl .in { font-family:ui-monospace, Consolas, monospace; }
+.mp-fl .seg { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.mp-fl .seg button, .mp-fl .row2 button { min-height:30px; padding:0 6px; font-size:13.5px; }
+.mp-fl .seg button[aria-pressed="true"] { border-color:var(--ds-link); background:var(--ds-node); }
+.mp-fl .row2 { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.mp-fl .check { display:flex; align-items:center; gap:6px; font-size:13.5px; font-weight:700; cursor:pointer; }
+.mp-fl .speed { display:flex; align-items:center; gap:6px; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.mp-fl .speed input { flex:1; min-width:0; }
+.mp-fl .err { min-height:16px; color:var(--ds-bad); font-size:12px; font-weight:700; line-height:1.25; }
+.mp-fl .score { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:auto; }
+.mp-fl .score div { padding:3px; border-radius:10px; background:var(--ds-surface-strong); text-align:center; color:var(--ds-muted); font-size:12px; font-weight:700; }
+.mp-fl .score b { display:block; color:var(--ds-text); font-size:18px; }
+.mp-fl .main { display:flex; flex-direction:column; gap:7px; min-width:0; min-height:0; }
+.mp-fl .code { display:flex; flex-wrap:wrap; gap:4px 18px; margin:0; padding:5px 10px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); font:700 14px/1.4 ui-monospace, Consolas, monospace; }
+.mp-fl .code .c { color:var(--ds-muted); font-weight:400; }
+.mp-fl .code .op { color:var(--ds-link); }
+.mp-fl .bits { padding:4px 8px 6px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); }
+.mp-fl .brow { display:flex; align-items:center; height:30px; font:700 16px ui-monospace, Consolas, monospace; }
+.mp-fl .brow.idx { height:16px; color:var(--ds-muted); font-size:12px; }
+.mp-fl .brow.car { height:24px; color:var(--ds-accent); font-size:12.5px; }
+.mp-fl .brow.res { border-top:2px solid var(--ds-text); }
+.mp-fl .lab { flex:none; width:56px; color:var(--ds-muted); font-size:12.5px; font-weight:800; }
+.mp-fl .out { flex:none; width:30px; text-align:center; }
+.mp-fl .cell { flex:none; width:30px; text-align:center; border-radius:5px; }
+.mp-fl.w16 .cell { width:22px; }
+.mp-fl.w16 .brow { font-size:15px; }
+.mp-fl .cell.nib { margin-left:5px; }
+.mp-fl .cell.cur { background:var(--ds-hot); }
+.mp-fl .cell.mark, .mp-fl .out.mark { outline:2px solid var(--ds-accent); outline-offset:-2px; }
+.mp-fl .cell.dim { opacity:.25; }
+.mp-fl .val { flex:1; min-width:0; padding-left:10px; color:var(--ds-muted); font-size:12.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mp-fl .flags { display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:6px; }
+.mp-fl .flag { min-width:0; padding:4px 6px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-bg); text-align:center; }
+.mp-fl .flag .n { color:var(--ds-muted); font-size:12.5px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mp-fl .flag .v { font:800 26px/1.15 ui-monospace, Consolas, monospace; }
+.mp-fl .flag .s { color:var(--ds-muted); font-size:12px; line-height:1.2; min-height:29px; }
+.mp-fl .flag.on { border-color:var(--ds-accent); background:var(--ds-hot); }
+.mp-fl .flag.cur { box-shadow:0 0 0 3px color-mix(in srgb, var(--ds-link) 40%, transparent); }
+.mp-fl .flag.hid .v { color:var(--ds-muted); }
+.mp-fl .interp { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.mp-fl .interp div { min-width:0; padding:5px 9px; border-radius:10px; background:var(--ds-surface-strong); font-size:13.5px; line-height:1.35; }
+.mp-fl .interp b { font-family:ui-monospace, Consolas, monospace; }
+.mp-fl .ctl { display:flex; align-items:center; gap:6px; }
+.mp-fl .ctl button { min-height:32px; padding:0 12px; font-size:14px; }
+.mp-fl .ctl .no { margin-left:auto; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.mp-fl .why { flex:1; min-height:0; margin:0; padding:7px 11px; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:14.5px; line-height:1.45; overflow:hidden; }
+.mp-fl .why .q { display:flex; flex-wrap:wrap; align-items:center; gap:5px; margin-top:4px; }
+.mp-fl .why .q button { min-height:28px; padding:0 9px; font:700 13px ui-monospace, Consolas, monospace; }
+.mp-fl .why .q button[aria-pressed="true"] { border-color:var(--ds-accent); background:var(--ds-hot); }
+.mp-fl .why .q button.is-primary { font-family:inherit; }
+.mp-fl .good { color:var(--ds-good); font-weight:800; }
+.mp-fl .bad { color:var(--ds-bad); font-weight:800; }
+</style>
+
+<div class="mp-fl agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 6 · Simülatör</p><h1>Bayrak Laboratuvarı</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="fl-help" aria-label="Açıklama ve kullanım">?</button>
+    <a class="agt-oyun__back" href="Bolum_06_Aritmetik_Mantik.html">← Bölüm 6</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="grid">
+      <aside class="side">
+        <div><label class="cap" for="flOp">Komut</label>
+          <select id="flOp">
+            <option>ADD</option><option>ADC</option><option>SUB</option><option>SBB</option>
+            <option>INC</option><option>DEC</option><option>NEG</option><option>CMP</option>
+          </select></div>
+        <div><span class="cap">Boyut</span>
+          <div class="seg" role="group" aria-label="İşlenen boyutu">
+            <button type="button" id="flW8" aria-pressed="true">8 bit</button>
+            <button type="button" id="flW16" aria-pressed="false">16 bit</button>
+          </div></div>
+        <div><label class="cap" for="flA">Hedef (A)</label><input class="in" id="flA" type="text" spellcheck="false" autocomplete="off" value="64h"></div>
+        <div><label class="cap" for="flB">Kaynak (B)</label><input class="in" id="flB" type="text" spellcheck="false" autocomplete="off" value="32h"></div>
+        <label class="check"><input type="checkbox" id="flCf"> CF (komuttan önce)</label>
+        <div class="row2">
+          <button type="button" id="flApply">Uygula</button>
+          <button type="button" id="flRand">Rastgele</button>
+        </div>
+        <select id="flEx" aria-label="Hazır örnek"><option value="">Hazır örnek seç…</option></select>
+        <label class="speed">Hız <input type="range" id="flSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı"></label>
+        <label class="check"><input type="checkbox" id="flQuiz"> Kendini dene</label>
+        <div class="score"><div>Doğru<b id="flOk">0</b></div><div>Yanlış<b id="flBad">0</b></div></div>
+      </aside>
+
+      <div class="main">
+        <div class="code" id="flCode" aria-label="Çalıştırılan komutlar"></div>
+        <div class="bits" id="flBits" aria-label="Bit bit işlem"></div>
+        <div class="flags" id="flFlags"></div>
+        <div class="interp"><div id="flU"></div><div id="flS"></div></div>
+        <div class="ctl">
+          <button type="button" id="flBack" aria-label="Bir adım geri">◀</button>
+          <button type="button" id="flStep" class="is-primary" aria-label="Bir adım ileri">Adım ▶</button>
+          <button type="button" id="flPlay" aria-label="Oynat ya da duraklat">Oynat</button>
+          <button type="button" id="flEnd" aria-label="Sona git">Sona git</button>
+          <button type="button" id="flReset" aria-label="Başa dön">Sıfırla</button>
+          <span class="no" id="flNo"></span>
+        </div>
+        <div class="why" id="flWhy" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog mp-fl-dlg" id="fl-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Bayrak Laboratuvarı</h2>
+    <p><b>Amaç:</b> 8086'nın aritmetik komutlarından sonra altı durum bayrağının (CF, PF, AF, ZF, SF, OF) neden 0 ya da 1 olduğunu bit düzeyinde görmek.</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li>Komutu ve boyutu (8 bit: AL, 16 bit: AX) seçin; işlenenleri onaltılık (<code>0C8h</code>), ikili (<code>11001000b</code>) ya da onluk (<code>200</code>, <code>-56</code>) yazıp <b>Uygula</b>'ya basın.</li>
+      <li><b>CF (komuttan önce)</b>: ADC ve SBB bu değeri elde/ödünç girişi olarak kullanır; INC ve DEC CF'yi değiştirmediği için bu değer aynen kalır.</li>
+      <li><b>Adım ▶</b> (ya da →) sütunları sağdan sola tek tek hesaplar; üstteki satır her bite giren elde (ya da ödünç) bitidir. Ardından her bayrak gerekçesiyle açılır.</li>
+      <li><b>Kendini dene</b>: bitler hesaplandıktan sonra altı bayrağı tahmin edin; doğru ve yanlışlar sayılır.</li>
+    </ol>
+    <h3>Kurallar</h3>
+    <ul>
+      <li><b>CF</b>: en anlamlı bitten dışarı elde (toplama) ya da ödünç (çıkarma). İşaretsiz yorumda sonuç aralığa sığmadı demektir.</li>
+      <li><b>OF</b>: en anlamlı bite giren elde ile çıkan elde farklı. İşaretli yorumda sonuç aralığa (8 bit: −128…127, 16 bit: −32768…32767) sığmadı demektir.</li>
+      <li><b>AF</b>: bit 3'ten bit 4'e elde ya da ödünç. <b>SF</b>: sonucun en anlamlı biti. <b>ZF</b>: sonuç sıfır. <b>PF</b>: sonucun düşük baytında çift sayıda 1.</li>
+      <li>SUB, SBB, CMP, DEC ve NEG çıkarmadır: hedef − kaynak (NEG için 0 − işlenen). CMP sonucu saklamaz, yalnızca bayrakları ayarlar.</li>
+      <li>INC ve DEC CF'ye dokunmaz. NEG'de CF, işlenen sıfır değilse 1 olur.</li>
+    </ul>
+    <p>Gösterilen bütün sonuçlar 8086 bayrak kurallarına göre hesaplanır ve bir 8086 yorumlayıcısıyla karşılaştırılarak sınanmıştır.</p>
+    <p>İlgili sunum: <a href="Bolum_06_Aritmetik_Mantik.html">Bölüm 6 · Aritmetik ve Mantık Komutları</a> (Bayraklar Tablosu, CF mi OF mi?, ADD ile Bayraklar Adım Adım, INC, DEC, NOT, NEG).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /*CORE-BEGIN*/
+  var Core = (function () {
+    var SUBS = { SUB: 1, SBB: 1, DEC: 1, NEG: 1, CMP: 1 };
+    function mask(w) { return w === 8 ? 0xFF : 0xFFFF; }
+    function signed(v, w) { return v >= (1 << (w - 1)) ? v - (1 << w) : v; }
+    function ones(v) { var c = 0; while (v) { c += v & 1; v >>>= 1; } return c; }
+    /* op: ADD ADC SUB SBB INC DEC NEG CMP; a: hedef, b: kaynak, cf: komuttan önceki CF */
+    function alu(op, w, a, b, cf) {
+      var sub = !!SUBS[op], x = a, y = b, cin = 0;
+      if (op === "ADC" || op === "SBB") cin = cf;
+      if (op === "INC" || op === "DEC") y = 1;
+      if (op === "NEG") { x = 0; y = a; }
+      var c = cin, cIn = [], cOut = [], r = 0;
+      for (var i = 0; i < w; i++) {
+        var ai = (x >> i) & 1, bi = (y >> i) & 1;
+        cIn[i] = c;
+        r |= (ai ^ bi ^ c) << i;
+        c = sub ? (((1 - ai) & bi) | ((1 - (ai ^ bi)) & c)) : ((ai & bi) | (c & (ai ^ bi)));
+        cOut[i] = c;
+      }
+      var f = {
+        CF: (op === "INC" || op === "DEC") ? cf : c,
+        PF: ones(r & 0xFF) % 2 === 0 ? 1 : 0,
+        AF: cOut[3],
+        ZF: r === 0 ? 1 : 0,
+        SF: (r >> (w - 1)) & 1,
+        OF: cIn[w - 1] ^ cOut[w - 1]
+      };
+      return { op: op, w: w, a: a, b: b, x: x, y: y, cin: cin, cfIn: cf, sub: sub, r: r, cIn: cIn, cOut: cOut, f: f, store: op !== "CMP" };
+    }
+    return { alu: alu, mask: mask, signed: signed, ones: ones };
+  })();
+  /*CORE-END*/
+
+  var root = document.querySelector(".mp-fl");
+  function E(id) { return document.getElementById(id); }
+  var FL = ["CF", "PF", "AF", "ZF", "SF", "OF"];
+  var NAMES = { CF: "elde", PF: "eşlik", AF: "yardımcı elde", ZF: "sıfır", SF: "işaret", OF: "taşma" };
+  var EXAMPLES = [
+    ["ADD", 8, 0x64, 0x32, 0, "64h + 32h (100 + 50)"],
+    ["ADD", 8, 0xFF, 0x01, 0, "0FFh + 01h"],
+    ["ADD", 8, 0xC8, 0x64, 0, "0C8h + 64h"],
+    ["ADD", 8, 0x80, 0x80, 0, "80h + 80h"],
+    ["SUB", 8, 0x07, 0x09, 0, "7 − 9"],
+    ["CMP", 8, 0x80, 0x01, 0, "CMP 80h, 1"],
+    ["INC", 8, 0x7F, 0, 0, "INC 7Fh"],
+    ["INC", 8, 0xFF, 0, 0, "INC 0FFh (CF korunur)"],
+    ["NEG", 8, 0x80, 0, 0, "NEG 80h"],
+    ["ADC", 16, 0xFFFF, 0x0000, 1, "ADC 0FFFFh, 0 (CF = 1)"],
+    ["SBB", 16, 0x0000, 0x0000, 1, "SBB 0, 0 (CF = 1)"]
+  ];
+  var w = 8, op = "ADD", A = 0x64, B = 0x32, CF0 = 0, R = null, k = 0, timer = null;
+  var score = { ok: 0, bad: 0 }, guess = {}, answered = false;
+
+  function hx(v, wd) {
+    var s = v.toString(16).toUpperCase(); while (s.length < wd / 4) s = "0" + s;
+    return (/^[A-F]/.test(s) ? "0" : "") + s + "h";
+  }
+  function sgn(v) { return v < 0 ? "−" + (-v) : String(v); }
+  function parseNum(t, wd) {
+    t = String(t).trim().replace(/\s+/g, "").replace(/_/g, "");
+    var v, m;
+    if ((m = /^(-?)([01]+)b$/i.exec(t))) v = parseInt(m[2], 2) * (m[1] ? -1 : 1);
+    else if ((m = /^(-?)([0-9][0-9a-f]*)h$/i.exec(t)) || (m = /^(-?)0x([0-9a-f]+)$/i.exec(t))) v = parseInt(m[2], 16) * (m[1] ? -1 : 1);
+    else if (/^-?[0-9]+$/.test(t)) v = parseInt(t, 10);
+    else return { err: "“" + t + "” sayı değil (ör. 0C8h, 1010b, 200, -56)." };
+    var max = (1 << wd) - 1, min = -(1 << (wd - 1));
+    if (v > max || v < min) return { err: t + " " + wd + " bite sığmaz (" + min + " … " + max + ")." };
+    return { v: v & max };
+  }
+  function needB() { return op !== "INC" && op !== "DEC" && op !== "NEG"; }
+  function reg() { return w === 8 ? "AL" : "AX"; }
+  function regB() { return w === 8 ? "BL" : "BX"; }
+
+  function compute() {
+    stop();
+    R = Core.alu(op, w, A, B, CF0);
+    k = 0; answered = false; guess = {};
+    root.classList.toggle("w16", w === 16);
+    E("flB").disabled = !needB();
+    draw();
+  }
+  function nSteps() { return 1 + w + 6 + 1; }        /* kur, w sütun, 6 bayrak, özet */
+  var ORDER = ["CF", "AF", "OF", "SF", "ZF", "PF"];
+  function colsDone() { return Math.min(Math.max(k, 0), w); }
+  function flagsShown() { return Math.max(0, Math.min(6, k - w)); }
+  function needQ() { return E("flQuiz").checked && k === w && !answered; }
+
+  function drawCode() {
+    var L = [];
+    if (op === "ADC" || op === "SBB" || op === "INC" || op === "DEC") L.push([CF0 ? "STC" : "CLC", "CF = " + CF0]);
+    L.push(["MOV " + reg() + ", " + hx(A, w), ""]);
+    if (needB()) L.push(["MOV " + regB() + ", " + hx(B, w), ""]);
+    var ins = op + " " + reg() + (needB() ? ", " + regB() : "");
+    L.push([ins, op === "CMP" ? "sonuç saklanmaz" : "sonuç " + reg() + "'ye"]);
+    E("flCode").innerHTML = L.map(function (l, i) {
+      return "<span" + (i === L.length - 1 ? ' class="op"' : "") + ">" + l[0] + (l[1] ? ' <span class="c">; ' + l[1] + "</span>" : "") + "</span>";
+    }).join("");
+  }
+  function bitRow(cls, label, val, outTxt, opts) {
+    opts = opts || {};
+    var h = '<div class="brow ' + cls + '"><span class="lab">' + label + '</span><span class="out' + (opts.outMark ? " mark" : "") + '">' + outTxt + "</span>";
+    for (var i = w - 1; i >= 0; i--) {
+      var c = "cell" + (i % 4 === 3 && i !== w - 1 ? " nib" : "");
+      var shown = opts.shown ? opts.shown(i) : true;
+      if (opts.cur === i) c += " cur";
+      if (opts.mark && opts.mark.indexOf(i) >= 0) c += " mark";
+      if (!shown) c += " dim";
+      h += '<span class="' + c + '">' + (shown ? (typeof val === "function" ? val(i) : (val >> i) & 1) : "·") + "</span>";
+    }
+    return h + '<span class="val">' + (opts.txt || "") + "</span></div>";
+  }
+  function vtxt(v) { return w === 16 ? hx(v, w) : hx(v, w) + " = " + v + " / " + sgn(Core.signed(v, w)); }
+  function drawBits() {
+    var d = colsDone(), cur = k >= 1 && k <= w ? k - 1 : -1, fs = flagsShown(), focus = fs > 0 ? ORDER[fs - 1] : null;
+    var mk = [], outMark = false, carryMark = [];
+    if (focus === "CF") outMark = true;
+    if (focus === "AF") carryMark = [4];
+    if (focus === "OF") { carryMark = [w - 1]; outMark = true; }
+    if (focus === "SF") mk = [w - 1];
+    if (focus === "ZF") { mk = []; for (var j = 0; j < w; j++) mk.push(j); }
+    if (focus === "PF") { mk = []; for (j = 0; j < 8; j++) mk.push(j); }
+    var cname = R.sub ? "ödünç" : "elde";
+    var h = '<div class="brow idx"><span class="lab">bit</span><span class="out"></span>';
+    for (var i = w - 1; i >= 0; i--) h += '<span class="cell' + (i % 4 === 3 && i !== w - 1 ? " nib" : "") + '">' + i + "</span>";
+    h += '<span class="val"></span></div>';
+    /* üst satır: her bite giren elde/ödünç (bit i'ye giren = cIn[i]) */
+    h += bitRow("car", cname, function (i) { return R.cIn[i]; }, d >= w ? String(R.cOut[w - 1]) : "·",
+      { shown: function (i) { return i === 0 ? d >= 0 : d >= i; }, mark: carryMark, outMark: outMark, cur: cur,
+        txt: (op === "ADC" || op === "SBB") ? (w === 8 ? "giriş = CF = " : "CF: ") + R.cin : "" });
+    var xl = op === "NEG" ? "0" : reg(), yl = op === "NEG" ? "− " + reg() : (R.sub ? "− " : "+ ") + (needB() ? regB() : "1");
+    h += bitRow("", xl, R.x, "", { txt: op === "NEG" ? "0" : vtxt(R.x) });
+    h += bitRow("", yl, R.y, "", { txt: vtxt(R.y) });
+    h += bitRow("res", op === "CMP" ? "fark" : "= " + reg(), R.r, "", {
+      shown: function (i) { return i < d; }, cur: cur, mark: mk,
+      txt: d >= w ? vtxt(R.r) : "" });
+    E("flBits").innerHTML = h;
+  }
+  function flagShort(f) {
+    var F = R.f, msb = w - 1;
+    switch (f) {
+      case "CF": return (op === "INC" || op === "DEC") ? "değişmedi" : (R.sub ? "bit " + msb + " ödünç " : "bit " + msb + " elde ") + R.cOut[msb];
+      case "PF": return Core.ones(R.r & 0xFF) + " tane 1";
+      case "AF": return "bit 3→4: " + R.cOut[3];
+      case "ZF": return R.r === 0 ? "sonuç 0" : "sonuç ≠ 0";
+      case "SF": return "bit " + msb + " = " + F.SF;
+      case "OF": return "giren " + R.cIn[msb] + ", çıkan " + R.cOut[msb];
+    }
+  }
+  function drawFlags() {
+    var fs = flagsShown(), h = "";
+    FL.forEach(function (f) {
+      var shown = ORDER.indexOf(f) < fs, v = R.f[f];
+      h += '<div class="flag' + (shown ? (v ? " on" : "") : " hid") + (fs > 0 && ORDER[fs - 1] === f ? " cur" : "") + '" aria-label="' + f + " (" + NAMES[f] + ") " + (shown ? v : "gizli") + '">' +
+        '<div class="n" title="' + NAMES[f] + '">' + f + '</div><div class="v">' + (shown ? v : "?") + '</div><div class="s">' + (shown ? flagShort(f) : "") + "</div></div>";
+    });
+    E("flFlags").innerHTML = h;
+  }
+  function drawInterp() {
+    var d = colsDone() >= w, m = Core.mask(w), su = Core.signed;
+    var xs = R.x, ys = R.y, ux, sx, sym = R.sub ? " − " : " + ";
+    var cinT = R.cin ? (R.sub ? " − 1" : " + 1") : "";
+    var exactU = R.sub ? xs - ys - R.cin : xs + ys + R.cin;
+    var exactS = R.sub ? su(xs, w) - su(ys, w) - R.cin : su(xs, w) + su(ys, w) + R.cin;
+    var maxU = m, minS = -(1 << (w - 1)), maxS = (1 << (w - 1)) - 1;
+    var fitU = exactU >= 0 && exactU <= maxU, fitS = exactS >= minS && exactS <= maxS;
+    ux = "<b>İşaretsiz:</b> " + xs + sym + ys + cinT + " = " + sgn(exactU);
+    sx = "<b>İşaretli:</b> " + sgn(su(xs, w)) + sym + (su(ys, w) < 0 ? "(" + sgn(su(ys, w)) + ")" : su(ys, w)) + cinT + " = " + sgn(exactS);
+    if (d) {
+      ux += fitU ? ' → 0…' + maxU + ' aralığına sığar' : ' → <span class="bad">sığmaz</span>, kalan ' + R.r;
+      sx += fitS ? ' → ' + minS + '…' + maxS + ' aralığına sığar' : ' → <span class="bad">sığmaz</span>, kalan ' + sgn(su(R.r, w));
+      if (op === "INC" || op === "DEC") ux += " (CF'ye yansımaz)";
+    }
+    E("flU").innerHTML = ux; E("flS").innerHTML = sx;
+  }
+  function flagWhy(f) {
+    var F = R.f, msb = w - 1, m = Core.mask(w), su = Core.signed, rng = w === 8 ? "−128…127" : "−32768…32767";
+    switch (f) {
+      case "CF":
+        if (op === "INC" || op === "DEC") return "<b>CF = " + F.CF + "</b>: " + op + " CF'yi değiştirmez; komuttan önceki değer kaldı. (Bit " + msb + "'den çıkan " + (R.sub ? "ödünç" : "elde") + " " + R.cOut[msb] + " olsa da CF'ye yazılmaz.)";
+        if (op === "NEG") return "<b>CF = " + F.CF + "</b>: NEG, 0 − işlenen hesaplar; işlenen " + (A ? "sıfır olmadığı için ödünç alınır" : "sıfır olduğu için ödünç alınmaz") + ".";
+        if (R.sub) return "<b>CF = " + F.CF + "</b>: bit " + msb + "'den " + (F.CF ? "ödünç alındı" : "ödünç alınmadı") + ". İşaretsiz yorumda " + R.x + (F.CF ? " < " : " ≥ ") + (R.y + R.cin) + (R.cin ? " (kaynak + giriş CF)" : "") + ".";
+        return "<b>CF = " + F.CF + "</b>: bit " + msb + "'den dışarı " + (F.CF ? "elde çıktı; işaretsiz toplam " + (R.x + R.y + R.cin) + " > " + m + " olduğu için sığmadı." : "elde çıkmadı; işaretsiz toplam " + (R.x + R.y + R.cin) + " ≤ " + m + ".");
+      case "AF":
+        return "<b>AF = " + F.AF + "</b>: düşük dört bitte (bit 3'ten bit 4'e) " + (R.sub ? (F.AF ? "ödünç alındı" : "ödünç alınmadı") : (F.AF ? "elde oluştu" : "elde oluşmadı")) + ". Bu bayrağı yalnızca BCD düzeltme komutları kullanır.";
+      case "OF":
+        var why = "bit " + msb + "'ye giren " + (R.sub ? "ödünç" : "elde") + " " + R.cIn[msb] + ", çıkan " + R.cOut[msb] + (F.OF ? " → farklı" : " → aynı");
+        var sx = su(R.x, w), sy = su(R.y, w), sr = su(R.r, w), sem = "";
+        if (F.OF) {
+          if (!R.sub) sem = sx >= 0 ? "İki pozitif sayının toplamı negatif çıktı." : "İki negatif sayının toplamı pozitif çıktı.";
+          else sem = sx >= 0 ? "Pozitiften negatif çıkarılınca sonuç negatif çıktı." : "Negatiften pozitif çıkarılınca sonuç pozitif çıktı.";
+          if (op === "INC" || op === "DEC" || op === "NEG") sem = "İşaretli sonuç " + rng + " aralığına sığmadı.";
+        } else sem = "İşaretli sonuç " + rng + " aralığına sığdı.";
+        return "<b>OF = " + F.OF + "</b>: " + why + ". " + sem;
+      case "SF":
+        return "<b>SF = " + F.SF + "</b>: sonucun en anlamlı biti (bit " + msb + "). İşaretli yorumda sonuç " + (F.SF ? "negatif" : "negatif değil") + " (" + sgn(su(R.r, w)) + ").";
+      case "ZF":
+        return "<b>ZF = " + F.ZF + "</b>: sonuç " + (F.ZF ? "sıfır" : "sıfır değil (" + hx(R.r, w) + ")") + "." + (op === "CMP" && F.ZF ? " CMP sonrası ZF = 1 ise iki işlenen eşittir." : "");
+      case "PF":
+        var lo = R.r & 0xFF, bs = lo.toString(2); while (bs.length < 8) bs = "0" + bs;
+        return "<b>PF = " + F.PF + "</b>: düşük bayt " + bs.slice(0, 4) + " " + bs.slice(4) + "b içinde " + Core.ones(lo) + " tane 1 var (" + (F.PF ? "çift" : "tek") + ")." + (w === 16 ? " Üst bayta bakılmaz." : "");
+    }
+  }
+  function drawWhy() {
+    var t;
+    if (k === 0) t = "<b>" + op + "</b> " + (op === "NEG" ? "işlenenin ikiye tümleyenini alır: 0 − " + reg() + "." :
+      op === "INC" ? reg() + "'ye 1 ekler." : op === "DEC" ? reg() + "'den 1 çıkarır." :
+      op === "CMP" ? reg() + " − " + regB() + " hesaplar; sonucu saklamaz, yalnızca bayrakları ayarlar." :
+      op === "ADC" ? reg() + " + " + regB() + " + CF hesaplar." : op === "SBB" ? reg() + " − " + regB() + " − CF hesaplar." :
+      op === "ADD" ? reg() + " + " + regB() + " hesaplar." : reg() + " − " + regB() + " hesaplar.") + " İşlemci yalnızca bitlerle çalışır; sütunlar sağdan sola hesaplanır.";
+    else if (k <= w) {
+      var i = k - 1, ai = (R.x >> i) & 1, bi = (R.y >> i) & 1, c = R.cIn[i], s = (R.r >> i) & 1, co = R.cOut[i];
+      var cn = R.sub ? "ödünç" : "elde";
+      t = "Bit " + i + ": " + ai + (R.sub ? " − " : " + ") + bi + (R.sub ? " − " : " + ") + c + " (giren " + cn + ") → sonuç biti <b>" + s + "</b>, sonraki bite " + cn + " <b>" + co + "</b>.";
+      if (i === 3) t += " Bu " + cn + " AF'yi belirler.";
+      if (i === w - 1) t += " En anlamlı bit: çıkan " + cn + " CF'yi, giren ile çıkanın farkı OF'yi belirler.";
+    } else if (k <= w + 6) t = flagWhy(ORDER[k - w - 1]);
+    else {
+      var on = FL.filter(function (f) { return R.f[f]; });
+      t = "<b>Sonuç:</b> " + (R.store ? reg() + " = " + hx(R.r, w) : "CMP sonucu saklamaz, " + reg() + " = " + hx(A, w) + " kaldı") + ". " +
+        FL.map(function (f) { return f + " = " + R.f[f]; }).join(", ") + "." + (on.length ? " Bayrak penceresinde 1 olanlar: " + on.join(", ") + "." : "");
+    }
+    if (needQ()) {
+      t = "Bitler hesaplandı. Altı bayrağın değerini tahmin et (1 olanları işaretle):<div class=\"q\" role=\"group\" aria-label=\"Bayrak tahmini\">" +
+        FL.map(function (f) { return '<button type="button" data-f="' + f + '" aria-pressed="' + (guess[f] ? "true" : "false") + '">' + f + " = " + (guess[f] ? 1 : 0) + "</button>"; }).join("") +
+        '<button type="button" class="is-primary" data-check="1">Kontrol et</button></div>';
+    }
+    E("flWhy").innerHTML = t;
+  }
+  function draw() {
+    drawCode(); drawBits(); drawFlags(); drawInterp(); drawWhy();
+    E("flNo").textContent = "Adım " + k + " / " + (nSteps() - 1);
+    E("flBack").disabled = k === 0;
+    E("flStep").disabled = k >= nSteps() - 1 || needQ();
+    E("flEnd").disabled = k >= nSteps() - 1 || needQ();
+    E("flPlay").textContent = timer ? "Duraklat" : "Oynat";
+    E("flOk").textContent = score.ok; E("flBad").textContent = score.bad;
+  }
+  E("flWhy").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button"); if (!b) return;
+    if (b.getAttribute("data-f")) { var f = b.getAttribute("data-f"); guess[f] = guess[f] ? 0 : 1; drawWhy(); E("flWhy").querySelector('[data-f="' + f + '"]').focus(); return; }
+    if (b.getAttribute("data-check")) {
+      var wrong = FL.filter(function (f) { return (guess[f] || 0) !== R.f[f]; });
+      if (wrong.length) score.bad++; else score.ok++;
+      answered = true; k = w + 6 + 1; draw();
+      E("flWhy").innerHTML = (wrong.length ? '<span class="bad">Yanlış: ' + wrong.join(", ") + ".</span> " : '<span class="good">Hepsi doğru!</span> ') +
+        FL.map(function (f) { return f + " = " + R.f[f]; }).join(", ") + ". Gerekçeler için ◀ ile bayrak adımlarına dönebilirsin.";
+      E("flStep").focus();
+    }
+  });
+
+  function go(d) { k = Math.max(0, Math.min(nSteps() - 1, k + d)); if (k > w && E("flQuiz").checked && !answered) k = w; draw(); }
+  function stop() { clearInterval(timer); timer = null; }
+  function delay() { return [1500, 1000, 650, 380, 180][E("flSpeed").value - 1]; }
+  function play() {
+    if (timer) { stop(); draw(); return; }
+    if (k >= nSteps() - 1) k = 0;
+    timer = setInterval(function () {
+      if (needQ() || k >= nSteps() - 1) { stop(); draw(); return; }
+      go(1);
+      if (needQ()) { stop(); draw(); }
+    }, delay());
+    draw();
+  }
+  function setW(n) {
+    w = n; E("flW8").setAttribute("aria-pressed", String(n === 8)); E("flW16").setAttribute("aria-pressed", String(n === 16));
+  }
+  function flErr(t) { if (t) { stop(); E("flWhy").innerHTML = '<span class="bad">' + t + "</span>"; } }
+  function apply() {
+    flErr("");
+    var pa = parseNum(E("flA").value, w), pb = needB() ? parseNum(E("flB").value, w) : { v: 0 };
+    if (pa.err || pb.err) { flErr(pa.err || pb.err); return; }
+    A = pa.v; B = pb.v; CF0 = E("flCf").checked ? 1 : 0; E("flEx").value = "";
+    compute();
+  }
+  function syncInputs() { E("flA").value = hx(A, w); E("flB").value = hx(B, w); E("flCf").checked = !!CF0; E("flOp").value = op; }
+  function rand() {
+    var m = Core.mask(w), pick = Math.random();
+    A = Math.floor(Math.random() * (m + 1)); B = Math.floor(Math.random() * (m + 1));
+    if (pick < 0.15) B = A;
+    else if (pick < 0.3) { A = (m >> 1) - Math.floor(Math.random() * 4); B = Math.floor(Math.random() * 8) + 1; }
+    CF0 = Math.random() < 0.5 ? 1 : 0;
+    E("flEx").value = ""; syncInputs(); flErr(""); compute();
+  }
+  EXAMPLES.forEach(function (x, i) { var o = document.createElement("option"); o.value = i; o.textContent = x[5]; E("flEx").appendChild(o); });
+  E("flEx").addEventListener("change", function () {
+    if (E("flEx").value === "") return;
+    var x = EXAMPLES[+E("flEx").value]; op = x[0]; setW(x[1]); A = x[2]; B = x[3]; CF0 = x[4];
+    syncInputs(); flErr(""); compute();
+  });
+  E("flOp").addEventListener("change", function () { op = E("flOp").value; apply(); });
+  E("flW8").addEventListener("click", function () { if (w === 8) return; setW(8); A &= 0xFF; B &= 0xFF; syncInputs(); apply(); });
+  E("flW16").addEventListener("click", function () { if (w === 16) return; setW(16); syncInputs(); apply(); });
+  E("flApply").addEventListener("click", apply);
+  ["flA", "flB"].forEach(function (id) { E(id).addEventListener("keydown", function (e) { if (e.key === "Enter") apply(); }); });
+  E("flCf").addEventListener("change", apply);
+  E("flRand").addEventListener("click", rand);
+  E("flStep").addEventListener("click", function () { stop(); go(1); });
+  E("flBack").addEventListener("click", function () { stop(); go(-1); });
+  E("flEnd").addEventListener("click", function () { stop(); k = nSteps() - 1; if (E("flQuiz").checked && !answered) k = w; draw(); });
+  E("flReset").addEventListener("click", function () { stop(); k = 0; answered = false; guess = {}; draw(); });
+  E("flPlay").addEventListener("click", play);
+  E("flSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("flQuiz").addEventListener("change", function () { stop(); k = 0; answered = false; guess = {}; draw(); });
+  root.addEventListener("keydown", function (ev) {
+    if (/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName)) return;
+    if (ev.key === "ArrowRight" && !needQ()) { stop(); go(1); ev.preventDefault(); }
+    else if (ev.key === "ArrowLeft") { stop(); go(-1); ev.preventDefault(); }
+  });
+  compute();
+})();
+</script>
+<script src="deck/oyun.js"></script>

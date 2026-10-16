@@ -1,0 +1,569 @@
+---
+layout: without-sidebar
+title: "Yazmaç Gezgini"
+permalink: /files/microprocessors/slides/Chapter_02_Register-Explorer.html
+excerpt: "8086 yazmaçları adım adım: AX = AH:AL gibi 16 ve 8 bitlik ilişki, işaretçi, indis ve kesim yazmaçları, MOV ile hangi baytların değiştiği, ADD/SUB/INC/DEC/CMP/NEG sonrası bayrak yazmacının bitleri ve geçersiz işlenen bileşimleri."
+---
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.mp-re, .mp-re-dlg { --ds-accent:#a61b1b; --ds-link:var(--global-link-color, #2563eb); }
+html[data-theme="dark"] .mp-re, html[data-theme="dark"] .mp-re-dlg { --ds-accent:#f07a7a; }
+.mp-re { --mono:ui-monospace, "Cascadia Code", Consolas, monospace; }
+.mp-re .grid { display:grid; grid-template-columns:440px minmax(0, 1fr); gap:10px; height:100%; }
+.mp-re .col { display:flex; flex-direction:column; gap:7px; min-width:0; min-height:0; }
+.mp-re .card { padding:6px 10px 8px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.mp-re .cap { display:block; margin:0 0 3px; color:var(--ds-muted); font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
+.mp-re .gpr { display:grid; grid-template-columns:34px auto 1fr; align-items:end; gap:2px 6px; }
+.mp-re .rname { padding-bottom:2px; font:800 15px var(--mono); }
+.mp-re .bytes { display:flex; gap:8px; }
+.mp-re .byte { padding:1px 3px 3px; border:1.5px solid transparent; border-radius:7px; transition:background .25s, border-color .25s; }
+.mp-re .byte .bl { display:flex; justify-content:space-between; color:var(--ds-muted); font:700 12px/14px var(--mono); }
+.mp-re .byte .bl b { color:var(--ds-text); }
+.mp-re .byte.chg { border-color:var(--ds-accent); background:var(--ds-hot); }
+.mp-re .bits { display:flex; gap:1px; }
+.mp-re .bit { display:grid; place-items:center; width:16px; height:20px; border:1px solid var(--ds-border); border-radius:3px; background:var(--ds-surface); color:var(--ds-muted); font:700 12.5px var(--mono); }
+.mp-re .bit.nib { margin-left:4px; }
+.mp-re .bit.on { border-color:var(--ds-link); background:var(--ds-node); color:var(--ds-text); }
+.mp-re .bit.flip { box-shadow:inset 0 -3px 0 var(--ds-accent); }
+.mp-re .hexv { padding-bottom:2px; font:700 15px var(--mono); text-align:right; white-space:nowrap; }
+.mp-re .hexv small { display:block; color:var(--ds-muted); font:600 12px var(--mono); }
+.mp-re .tiles { display:grid; grid-template-columns:repeat(4, 1fr); gap:5px; }
+.mp-re .tile { padding:2px 7px 3px; border:1.5px solid var(--ds-border); border-radius:8px; background:var(--ds-surface); transition:background .25s, border-color .25s; }
+.mp-re .tile .tn { gap:4px; display:flex; justify-content:space-between; align-items:baseline; font:800 14px var(--mono); }
+.mp-re .tile .tn span { color:var(--ds-link); }
+.mp-re .tile .td { overflow:hidden; color:var(--ds-muted); font-size:12px; line-height:15px; white-space:nowrap; text-overflow:ellipsis; }
+.mp-re .tile.chg { border-color:var(--ds-accent); background:var(--ds-hot); }
+.mp-re .tile.chg .tn span, .mp-re .tile.chg .td { color:var(--ds-text); }
+.mp-re #reSeg { grid-template-columns:repeat(5, 1fr); }
+.mp-re .flags { display:flex; gap:2px; justify-content:center; }
+.mp-re .fcol { display:flex; flex-direction:column; align-items:center; width:23px; }
+.mp-re .fcol.nib { margin-left:5px; }
+.mp-re .fcol .fn { color:var(--ds-muted); font:600 12px/14px var(--mono); }
+.mp-re .fcol .fb { display:grid; place-items:center; width:22px; height:22px; border:1px solid var(--ds-border); border-radius:4px; background:var(--ds-surface); color:var(--ds-muted); font:700 13px var(--mono); }
+.mp-re .fcol.used .fb { border-color:var(--ds-link); }
+.mp-re .fcol.used.on .fb { background:var(--ds-node); color:var(--ds-text); }
+.mp-re .fcol.fixed .fb { border-style:dashed; opacity:.75; }
+.mp-re .fcol .fl { height:14px; font:800 12px/14px var(--mono); }
+.mp-re .fcol.flip .fb { border-color:var(--ds-accent); background:var(--ds-hot); color:var(--ds-text); }
+.mp-re .fhead { display:flex; justify-content:space-between; align-items:baseline; }
+.mp-re .fhead b { font:700 14px var(--mono); }
+.mp-re .row { display:flex; gap:6px; align-items:center; }
+.mp-re .row select { flex:1; min-width:0; min-height:30px; padding:0 6px; font-size:13.5px; }
+.mp-re .code { flex:none; height:162px; margin:0; padding:4px 0; overflow:hidden; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); font:13.5px/19px var(--mono); list-style:none; }
+.mp-re .code li { margin:0; line-height:19px; display:flex; gap:8px; padding:0 8px; white-space:pre; }
+.mp-re .code li .ln { width:16px; color:var(--ds-muted); font-size:12px; text-align:right; }
+.mp-re .code li.done { color:var(--ds-muted); }
+.mp-re .code li.cur { background:var(--ds-hot); box-shadow:inset 4px 0 0 var(--ds-accent); color:var(--ds-text); }
+.mp-re .code li.err { text-decoration:underline wavy var(--ds-bad); text-decoration-thickness:1px; }
+.mp-re .ctl button { min-height:30px; padding:0 9px; font-size:13px; white-space:nowrap; }
+.mp-re .ctl .no { margin-left:auto; color:var(--ds-muted); font-size:12.5px; font-weight:700; white-space:nowrap; }
+.mp-re .free input { flex:1; min-width:0; min-height:30px !important; padding:0 8px !important; font:14px var(--mono) !important; }
+.mp-re .free button { min-height:30px; padding:0 10px; font-size:13.5px; }
+.mp-re .opts { display:flex; gap:10px; align-items:center; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.mp-re .opts label { display:flex; gap:5px; align-items:center; cursor:pointer; }
+.mp-re .opts input[type=range] { width:64px; }
+.mp-re .opts .score { margin-left:auto; white-space:nowrap; }
+.mp-re .opts .score b { color:var(--ds-text); }
+.mp-re .why { flex:1; min-height:0; margin:0; padding:5px 10px; overflow:hidden; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:13.5px; line-height:18px; }
+.mp-re .why code { padding:0 3px; border-radius:4px; background:var(--ds-bg); color:var(--ds-text); font:13px var(--mono); }
+.mp-re .why .qrow { display:flex; gap:6px; margin-top:5px; }
+.mp-re .why .qrow input { width:110px; min-height:28px !important; font:14px var(--mono) !important; }
+.mp-re .why .qrow button { min-height:28px; padding:0 10px; font-size:13px; }
+.mp-re-dlg code { font-size:.95em; }
+</style>
+
+<div class="mp-re agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 2 · Simülatör</p><h1>Yazmaç Gezgini</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="re-help" aria-label="Açıklama ve kullanım">?</button>
+    <a class="agt-oyun__back" href="Bolum_02_8086_Yazmaclar.html">← Bölüm 2</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="grid">
+      <div class="col">
+        <section class="card" aria-label="Genel amaçlı yazmaçlar">
+          <span class="cap">Genel amaçlı yazmaçlar · AX = AH : AL</span>
+          <div class="gpr" id="reGpr"></div>
+        </section>
+        <section class="card" aria-label="İşaretçi, indis ve kesim yazmaçları">
+          <span class="cap">İşaretçi ve indis yazmaçları</span>
+          <div class="tiles" id="rePtr"></div>
+          <span class="cap" style="margin-top:5px">Kesim yazmaçları ve komut işaretçisi</span>
+          <div class="tiles" id="reSeg"></div>
+        </section>
+        <section class="card" aria-label="Bayrak yazmacı">
+          <div class="fhead"><span class="cap">Bayrak yazmacı (FLAGS)</span><b id="reFlagsHex"></b></div>
+          <div class="flags" id="reFlags"></div>
+        </section>
+      </div>
+
+      <div class="col">
+        <div class="row">
+          <label class="cap" for="reProg" style="margin:0">Program</label>
+          <select id="reProg"></select>
+        </div>
+        <ol class="code" id="reCode" aria-label="Assembly kodu"></ol>
+        <div class="row ctl">
+          <button type="button" id="reBack" aria-label="Bir komut geri">◀ Geri</button>
+          <button type="button" id="reStep" class="is-primary" aria-label="Sıradaki komutu çalıştır">Adım ▶</button>
+          <button type="button" id="rePlay" aria-label="Oynat veya duraklat">Oynat</button>
+          <button type="button" id="reReset" aria-label="Başa dön">Sıfırla</button>
+          <span class="no" id="reNo"></span>
+        </div>
+        <div class="row free">
+          <input id="reCmd" type="text" spellcheck="false" autocomplete="off" placeholder="MOV BH, 7Fh" aria-label="Çalıştırılacak komut">
+          <button type="button" id="reRun" aria-label="Yazılan komutu sıradaki komut olarak çalıştır">Çalıştır</button>
+        </div>
+        <div class="opts">
+          <label>Hız <input type="range" id="reSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı"></label>
+          <label><input type="checkbox" id="reQuiz"> Kendini dene</label>
+          <span class="score" aria-live="polite">Doğru <b id="reOk">0</b> / <b id="reAll">0</b></span>
+        </div>
+        <p class="why" id="reWhy" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog mp-re-dlg" id="re-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Yazmaç Gezgini</h2>
+    <p><b>Amaç:</b> 8086'nın yazmaç kümesini tek ekranda görmek: genel amaçlı yazmaçların 16 ve 8 bitlik kullanımı, işaretçi, indis ve kesim yazmaçları, komut işaretçisi (IP) ve bayrak yazmacının bitleri.</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ul>
+      <li>Bir <b>program</b> seçip <b>Adım ▶</b> ile komutları tek tek çalıştırın (klavyede → ve ←). Değişen bayt ya da yazmaç turuncu çerçeveyle, değişen bitler alt çizgiyle gösterilir.</li>
+      <li>Kutuya kendi komutunuzu yazıp <b>Çalıştır</b>'a basın: komut, o anki adımın ardına eklenir ve çalıştırılır. Desteklenen komutlar: <code>MOV</code>, <code>XCHG</code>, <code>ADD</code>, <code>SUB</code>, <code>CMP</code>, <code>INC</code>, <code>DEC</code>, <code>NEG</code>, <code>CLC</code>, <code>STC</code>, <code>CMC</code>, <code>CLD</code>, <code>STD</code>, <code>CLI</code>, <code>STI</code>. İşlenenler yazmaç ya da anlık değerdir (bellek işleneni yoktur).</li>
+      <li>Sayılar: <code>1234h</code> (harfle başlayan onaltılık sayının başına 0: <code>0FFh</code>), <code>1010b</code>, <code>65</code>, <code>-1</code>, <code>'A'</code>.</li>
+      <li><b>Kendini dene</b> açıkken her komuttan önce hedef yazmacın yeni değeri (CMP'de ZF) sorulur.</li>
+    </ul>
+    <h3>Hatırlatma</h3>
+    <ul>
+      <li>AX, BX, CX ve DX'in yüksek ve düşük baytları ayrı yazmaç gibi kullanılır: <code>AX = AH : AL</code>. AL'ye yazmak AH'yi değiştirmez; AX'e yazmak ikisini birden değiştirir. <code>MOV DL, -1</code> yalnız DL'yi FFh yapar, işaret genişletme yapılmaz.</li>
+      <li>SP, BP, SI, DI, kesim yazmaçları ve IP yalnız 16 bitlik kullanılır. Kesim yazmacına anlık değer ya da başka bir kesim yazmacı doğrudan aktarılamaz, CS hedef olamaz; IP hiçbir komutta işlenen olarak yazılamaz.</li>
+      <li>Bayrak yazmacında kullanılan bitler: OF (11), DF (10), IF (9), TF (8), SF (7), ZF (6), AF (4), PF (2), CF (0). 8086'da 15–12. bitler ve 1. bit hep 1, 5. ve 3. bitler hep 0 okunur (kesik çizgili kutular).</li>
+      <li>MOV ve XCHG bayrakları değiştirmez. INC ve DEC CF'yi değiştirmez. NEG'de işlenen sıfır değilse CF = 1 olur. PF yalnız sonucun düşük baytındaki 1'lerin sayısına bakar (çiftse 1).</li>
+      <li>IP her komuttan sonra komutun bayt uzunluğu kadar artar (ör. <code>MOV AX, 1234h</code> 3 bayt, <code>MOV AL, 5</code> 2 bayt, <code>INC CX</code> 1 bayt). Geçersiz komut çalıştırılmaz, yazmaçlar değişmez. Başlangıç değerleri (CS = DS = ES = SS = 0700h, IP = 0100h, SP = FFFEh, IF = 1, diğer bayraklar 0) bir .COM programının başlangıcına benzer.</li>
+    </ul>
+    <p>İlgili sunum: <a href="Bolum_02_8086_Yazmaclar.html">Bölüm 2 · 8086 Yazmaçlar</a> (AX = AH : AL, İşaretçi ve İndis Yazmaçları, Kesim Yazmaçları ve IP, Bayrak Yazmacı, Geçersiz İşlenen Bileşimleri).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /*CORE-BEGIN*/
+  var Core = (function () {
+    var R16 = ["AX", "BX", "CX", "DX", "SP", "BP", "SI", "DI"];
+    var R8 = { AL: ["AX", 0], AH: ["AX", 8], BL: ["BX", 0], BH: ["BX", 8], CL: ["CX", 0], CH: ["CX", 8], DL: ["DX", 0], DH: ["DX", 8] };
+    var SREG = ["CS", "DS", "ES", "SS"];
+    var FLAGS = [["OF", 11], ["DF", 10], ["IF", 9], ["TF", 8], ["SF", 7], ["ZF", 6], ["AF", 4], ["PF", 2], ["CF", 0]];
+    var FLAGNAME = { OF: "taşma", DF: "yön", IF: "kesme", TF: "tuzak", SF: "işaret", ZF: "sıfır", AF: "yardımcı elde", PF: "eşlik", CF: "elde" };
+
+    function init() {
+      return {
+        r: { AX: 0, BX: 0, CX: 0, DX: 0, SP: 0xFFFE, BP: 0, SI: 0, DI: 0, CS: 0x0700, DS: 0x0700, ES: 0x0700, SS: 0x0700, IP: 0x0100 },
+        f: { OF: 0, DF: 0, IF: 1, TF: 0, SF: 0, ZF: 0, AF: 0, PF: 0, CF: 0 }
+      };
+    }
+    function clone(st) { var n = init(), k; for (k in st.r) n.r[k] = st.r[k]; for (k in st.f) n.f[k] = st.f[k]; return n; }
+    function hex(v, w) { return v.toString(16).toUpperCase().padStart(w === 8 ? 2 : 4, "0") + "h"; }
+    function sgn(v, w) { var s = w === 8 ? 0x80 : 0x8000; return v & s ? v - (s << 1) : v; }
+    function flagsWord(f) { var w = 0xF002; FLAGS.forEach(function (x) { if (f[x[0]]) w |= 1 << x[1]; }); return w; }
+    function parity(v) { v &= 0xFF; var c = 0; while (v) { c += v & 1; v >>= 1; } return c % 2 === 0 ? 1 : 0; }
+
+    function num(t) {
+      var neg = false, s = t, v;
+      if (/^'.'$/.test(s)) return { v: s.charCodeAt(1) };
+      if (s[0] === "-") { neg = true; s = s.slice(1); }
+      if (/^[0-9][0-9a-f]*h$/i.test(s)) v = parseInt(s.slice(0, -1), 16);
+      else if (/^[01]+b$/i.test(s)) v = parseInt(s.slice(0, -1), 2);
+      else if (/^[0-9]+d?$/i.test(s)) v = parseInt(s, 10);
+      else if (/^[a-f][0-9a-f]*h$/i.test(s)) return { err: "“" + t + "” onaltılık sayı ise harfle başladığı için başına 0 yazılmalı: 0" + s + "." };
+      else return null;
+      return { v: neg ? -v : v, neg: neg };
+    }
+    function opnd(t) {
+      var u = t.toUpperCase();
+      if (R16.indexOf(u) >= 0) return { k: "r16", n: u, w: 16 };
+      if (R8[u]) return { k: "r8", n: u, w: 8 };
+      if (SREG.indexOf(u) >= 0) return { k: "sreg", n: u, w: 16 };
+      if (u === "IP") return { k: "ip", n: u };
+      if (u === "FLAGS") return { k: "flags", n: u };
+      if (/\[|PTR/.test(u)) return { k: "mem", n: t };
+      var x = num(t.trim());
+      if (x && x.err) return { k: "bad", err: x.err };
+      if (x) return { k: "imm", v: x.v, neg: x.neg, t: t };
+      return { k: "bad", err: "“" + t + "” tanınmadı: yazmaç adı ya da sayı olmalı." };
+    }
+    function get(st, o) { if (o.k === "r8") { var m = R8[o.n]; return (st.r[m[0]] >> m[1]) & 0xFF; } return st.r[o.n]; }
+    function put(st, o, v) {
+      if (o.k === "r8") { var m = R8[o.n]; st.r[m[0]] = m[1] ? (st.r[m[0]] & 0x00FF) | (v << 8) : (st.r[m[0]] & 0xFF00) | v; }
+      else st.r[o.n] = v & 0xFFFF;
+    }
+    function fits(v, w) { return w === 8 ? v >= -128 && v <= 255 : v >= -32768 && v <= 65535; }
+    function full(o) { return o.k === "r8" ? R8[o.n][0] : o.n; }
+    function half(o) { return o.k === "r8" ? (R8[o.n][1] ? "yüksek" : "düşük") : null; }
+
+    /* MASM/emu8086 kodlamasıyla komut uzunluğu (bayt) */
+    function length(op, a, b) {
+      if (!a) return 1;
+      if (op === "MOV") { if (b.k === "imm") return a.w === 8 ? 2 : 3; return 2; }
+      if (op === "XCHG") return a.w === 16 && (a.n === "AX" || b.n === "AX") ? 1 : 2;
+      if (op === "INC" || op === "DEC") return a.w === 16 ? 1 : 2;
+      if (op === "NEG") return 2;
+      if (b.k !== "imm") return 2;
+      if (a.n === "AL") return 2;
+      if (a.n === "AX") return 3;
+      if (a.w === 8) return 3;
+      var v = b.v & 0xFFFF;
+      return v <= 0x7F || v >= 0xFF80 ? 3 : 4;
+    }
+
+    function alu(op, a, b, w, f) {
+      var mask = w === 8 ? 0xFF : 0xFFFF, sign = w === 8 ? 0x80 : 0x8000, r, res, nf = {};
+      if (op === "ADD" || op === "INC") {
+        r = a + b; res = r & mask;
+        nf.CF = r > mask ? 1 : 0;
+        nf.OF = (a ^ res) & (b ^ res) & sign ? 1 : 0;
+      } else {
+        r = a - b; res = r & mask;
+        nf.CF = a < b ? 1 : 0;
+        nf.OF = (a ^ b) & (a ^ res) & sign ? 1 : 0;
+      }
+      nf.AF = (a ^ b ^ res) & 0x10 ? 1 : 0;
+      nf.SF = res & sign ? 1 : 0;
+      nf.ZF = res === 0 ? 1 : 0;
+      nf.PF = parity(res);
+      if (op === "INC" || op === "DEC") nf.CF = f.CF;
+      return { res: res, f: nf };
+    }
+
+    function err(line, msg) { return { ok: false, line: line, why: msg }; }
+
+    /* bir komutu çalıştırır: { ok, st, why, dest, flags, len } ya da { ok:false, why } */
+    function exec(st0, line) {
+      var src = line.split(";")[0].trim();
+      if (!src) return err(line, "Boş satır.");
+      var m = src.match(/^([A-Za-z]+)\s*(.*)$/);
+      if (!m) return err(line, "Komut tanınmadı.");
+      var op = m[1].toUpperCase(), args = m[2] ? m[2].split(",").map(function (x) { return x.trim(); }) : [];
+      var ZERO = ["CLC", "STC", "CMC", "CLD", "STD", "CLI", "STI"];
+      var ONE = ["INC", "DEC", "NEG"], TWO = ["MOV", "XCHG", "ADD", "SUB", "CMP"];
+      if (ZERO.indexOf(op) < 0 && ONE.indexOf(op) < 0 && TWO.indexOf(op) < 0)
+        return err(line, op + " bu simülatörde desteklenmiyor. Desteklenenler: MOV, XCHG, ADD, SUB, CMP, INC, DEC, NEG, CLC, STC, CMC, CLD, STD, CLI, STI.");
+      var need = ZERO.indexOf(op) >= 0 ? 0 : ONE.indexOf(op) >= 0 ? 1 : 2;
+      if (args.length !== need || args.some(function (x) { return !x; })) return err(line, op + " " + need + " işlenen ister" + (need ? " (" + (need === 2 ? "hedef, kaynak" : "hedef") + ")." : "; işlenen almaz."));
+      var A = args[0] ? opnd(args[0]) : null, B = args[1] ? opnd(args[1]) : null;
+      var both = [A, B].filter(Boolean), i;
+      for (i = 0; i < both.length; i++) {
+        var o = both[i];
+        if (o.k === "bad") return err(line, o.err);
+        if (o.k === "ip") return err(line, "IP hiçbir komutta işlenen olarak yazılamaz; yalnız atlama, çağırma ve dönüş komutları IP'yi değiştirir.");
+        if (o.k === "flags") return err(line, "FLAGS işlenen olarak yazılamaz; bayraklar komutların yan etkisiyle ya da PUSHF/POPF, LAHF/SAHF ile değişir.");
+        if (o.k === "mem") return err(line, "Bu simülatörde bellek işleneni yoktur; yalnız yazmaç ve anlık değer kullanılır.");
+      }
+      var st = clone(st0), why = "", dest = [], fl = null, a, b, v, r;
+      if (A && A.k === "imm") return err(line, "Hedef işlenen anlık değer olamaz: sayıya yazılmaz.");
+
+      if (op === "MOV") {
+        if (A.k === "sreg") {
+          if (A.n === "CS") return err(line, "CS hedef olamaz: kod kesimi yalnız uzak atlama, çağırma ve dönüşlerle değişir.");
+          if (B.k === "imm") return err(line, "Kesim yazmacına anlık değer doğrudan yüklenemez. Önce genel yazmaca: MOV AX, " + B.t + " ve sonra MOV " + A.n + ", AX.");
+          if (B.k === "sreg") return err(line, "Kesim yazmacından kesim yazmacına doğrudan aktarım yoktur; bir genel yazmaç üzerinden aktarılır.");
+          if (B.k === "r8") return err(line, "Boyutlar uyuşmuyor: " + A.n + " 16 bit, " + B.n + " 8 bit.");
+          v = get(st, B); put(st, A, v); dest = [A.n];
+          why = A.n + " ← " + B.n + " = " + hex(v, 16) + ". Kesim yazmacı yalnız 16 bitlik genel yazmaçtan (ya da bellekten) yüklenir.";
+        } else {
+          if (B.k === "imm") {
+            if (!fits(B.v, A.w)) return err(line, B.t + " değeri " + A.w + " bitlik " + A.n + " yazmacına sığmaz (" + (A.w === 8 ? "−128 … 255" : "−32768 … 65535") + ").");
+            v = B.v & (A.w === 8 ? 0xFF : 0xFFFF);
+          } else {
+            if (B.w !== A.w) return err(line, "Boyutlar uyuşmuyor: " + A.n + " " + A.w + " bit, " + B.n + " " + B.w + " bit. MOV'da iki işlenen aynı boyda olmalı.");
+            v = get(st, B);
+          }
+          put(st, A, v); dest = [A.n];
+          why = A.n + " ← " + (B.k === "imm" ? (B.neg ? B.t + " (ikiye tümleyen " + hex(v, A.w) + ")" : hex(v, A.w)) : B.n + " = " + hex(v, A.w)) + ". ";
+          if (A.k === "r8") why += "Yalnız " + full(A) + "'in " + half(A) + " baytı (" + A.n + ") değişti; diğer yarısı aynı kaldı → " + full(A) + " = " + hex(st.r[full(A)], 16) + "." + (B.neg ? " İşaret genişletme yapılmaz." : "");
+          else if (/^[ABCD]X$/.test(A.n)) why += "16 bitlik yazma iki baytı birden değiştirir: " + A.n[0] + "H = " + hex(v >> 8, 8) + ", " + A.n[0] + "L = " + hex(v & 0xFF, 8) + ".";
+          else why += A.n + " yalnız 16 bitlik kullanılır" + (B.k === "sreg" ? "; kesim yazmacı genel yazmaca kopyalanabilir." : ".");
+          if (B.k === "sreg" && A.k !== "r16") return err(line, "Kesim yazmacı yalnız 16 bitlik yazmaca aktarılır.");
+        }
+        why += " MOV bayrakları değiştirmez.";
+      } else if (op === "XCHG") {
+        if (A.k === "sreg" || B.k === "sreg") return err(line, "XCHG kesim yazmaçlarıyla kullanılamaz.");
+        if (B.k === "imm") return err(line, "XCHG iki konumun içeriğini takas eder; anlık değerle takas olmaz.");
+        if (A.w !== B.w) return err(line, "Boyutlar uyuşmuyor: " + A.n + " " + A.w + " bit, " + B.n + " " + B.w + " bit.");
+        a = get(st, A); b = get(st, B); put(st, A, b); put(st, B, a); dest = [A.n, B.n];
+        why = A.n + " ↔ " + B.n + ": " + hex(a, A.w) + " ile " + hex(b, A.w) + " yer değiştirdi.";
+        if (A.k === "r8") why += " " + full(A) + " = " + hex(st.r[full(A)], 16) + (full(A) !== full(B) ? ", " + full(B) + " = " + hex(st.r[full(B)], 16) : "") + ".";
+        why += " Bayraklar değişmez.";
+      } else if (TWO.indexOf(op) >= 0 || ONE.indexOf(op) >= 0) {
+        if (A.k === "sreg") return err(line, op + " kesim yazmaçlarıyla kullanılamaz; aritmetik yalnız genel, işaretçi ve indis yazmaçlarında yapılır.");
+        if (B && B.k === "sreg") return err(line, op + " kesim yazmacını kaynak olarak kullanamaz.");
+        var w = A.w, mask = w === 8 ? 0xFF : 0xFFFF;
+        a = get(st, A);
+        if (B) {
+          if (B.k === "imm") { if (!fits(B.v, w)) return err(line, B.t + " değeri " + w + " bite sığmaz."); b = B.v & mask; }
+          else { if (B.w !== w) return err(line, "Boyutlar uyuşmuyor: " + A.n + " " + w + " bit, " + B.n + " " + B.w + " bit."); b = get(st, B); }
+        }
+        if (op === "NEG") { r = alu("SUB", 0, a, w, st.f); r.f.CF = a !== 0 ? 1 : 0; }
+        else r = alu(op === "CMP" ? "SUB" : op, a, op === "INC" || op === "DEC" ? 1 : b, w, st.f);
+        if (op !== "CMP") { put(st, A, r.res); dest = [A.n]; }
+        fl = r.f; for (var k in fl) st.f[k] = fl[k];
+        var sym = op === "ADD" || op === "INC" ? " + " : " − ", bb = op === "INC" || op === "DEC" ? 1 : b;
+        if (op === "NEG") why = A.n + " ← 0 − " + hex(a, w) + " = " + hex(r.res, w) + " (işaretli " + sgn(a, w) + " → " + sgn(r.res, w) + "). ";
+        else if (op === "CMP") why = A.n + " − " + hex(bb, w) + " = " + hex(r.res, w) + " hesaplanır ama sonuç yazılmaz; yalnız bayraklar değişir. ";
+        else why = A.n + " ← " + hex(a, w) + sym + hex(bb, w) + " = " + hex(r.res, w) + ". ";
+        var nt = [];
+        if (op !== "NEG") nt.push("işaretsiz " + a + sym + bb + " = " + (op === "ADD" || op === "INC" ? a + bb : a - bb) + (r.f.CF && (op === "ADD" || op === "SUB" || op === "CMP") ? (op === "ADD" ? " (sığmaz: CF = 1)" : " (ödünç: CF = 1)") : ""));
+        if (op !== "NEG") nt.push("işaretli " + sgn(a, w) + sym + sgn(bb, w) + " = " + (op === "ADD" || op === "INC" ? sgn(a, w) + sgn(bb, w) : sgn(a, w) - sgn(bb, w)) + (r.f.OF ? " (sığmaz: OF = 1)" : ""));
+        if (op === "NEG") nt.push(a !== 0 ? "işlenen sıfır olmadığından CF = 1" : "işlenen sıfır, CF = 0");
+        if (op === "NEG" && r.f.OF) nt.push(hex(a, w) + " en küçük negatif sayı: NEG sonrası yine kendisi, OF = 1");
+        if (op === "INC" || op === "DEC") nt.push("CF değişmez");
+        why += nt.join("; ") + ".";
+      } else {
+        var z = { CLC: ["CF", 0, "elde bayrağı temizlendi"], STC: ["CF", 1, "elde bayrağı kuruldu"], CMC: ["CF", 1 - st.f.CF, "elde bayrağı tersine çevrildi"],
+          CLD: ["DF", 0, "dizgi komutları adresleri artırır"], STD: ["DF", 1, "dizgi komutları adresleri azaltır"],
+          CLI: ["IF", 0, "maskelenebilir kesmeler kabul edilmez"], STI: ["IF", 1, "maskelenebilir kesmeler kabul edilir"] }[op];
+        st.f[z[0]] = z[1]; fl = {}; fl[z[0]] = z[1];
+        why = z[0] + " ← " + z[1] + ": " + z[2] + ". Yalnız bu bit değişti.";
+      }
+      var len = length(op, A, B);
+      st.r.IP = (st.r.IP + len) & 0xFFFF;
+      return { ok: true, line: line, st: st, why: why, dest: dest, flags: fl, len: len, op: op, A: A };
+    }
+
+    /* programı baştan çalıştırır: states[0] başlangıç; adım i, states[i] → states[i+1] */
+    function run(lines) {
+      var st = init(), out = [{ st: st, res: null }];
+      lines.forEach(function (ln) {
+        var r = exec(st, ln);
+        if (r.ok) st = r.st;
+        out.push({ st: st, res: r });
+      });
+      return out;
+    }
+
+    var PROGS = [
+      { ad: "AX = AH : AL (MOV)", code: ["MOV AX, 1234h", "MOV AL, 0FFh", "MOV AH, 56h", "MOV BX, AX", "MOV CL, BH", "XCHG AH, AL", "MOV DX, 0", "MOV DL, -1"] },
+      { ad: "İşaretçi, indis ve kesim yazmaçları", code: ["MOV AX, 0B800h", "MOV DS, AX", "MOV ES, AX", "MOV SI, 0100h", "MOV DI, SI", "MOV BP, SP", "MOV BX, CS", "XCHG SI, BX"] },
+      { ad: "Bayraklar: ADD ve SUB", code: ["MOV AL, 7Fh", "ADD AL, 1", "MOV AL, 0FFh", "ADD AL, 1", "SUB AL, 1", "MOV AL, 6Ah", "ADD AL, 5Ch", "SUB AL, 0D0h"] },
+      { ad: "INC, DEC, CMP ve NEG", code: ["MOV CX, 0FFFFh", "STC", "INC CX", "DEC CX", "MOV BX, 5", "CMP BX, 7", "NEG BX", "CMP BX, 0FFFBh"] },
+      { ad: "Kontrol bayrakları", code: ["STC", "CMC", "CMC", "STD", "CLI", "CLD", "STI", "CLC"] },
+      { ad: "Geçersiz işlenen bileşimleri", code: ["MOV DS, 1234h", "MOV AX, 1234h", "MOV DS, AX", "MOV ES, DS", "MOV CS, AX", "MOV AL, BX", "MOV IP, 0200h", "MOV BL, 300"] }
+    ];
+
+    return { init: init, exec: exec, run: run, hex: hex, sgn: sgn, flagsWord: flagsWord, FLAGS: FLAGS, FLAGNAME: FLAGNAME, R8: R8, PROGS: PROGS, full: full };
+  })();
+  /*CORE-END*/
+
+  var E = function (id) { return document.getElementById(id); };
+  var root = document.querySelector(".mp-re");
+  var lines = [], S = [], k = 0, timer = null, answered = {}, ok = 0, all = 0, flash = null;
+  var GPR = ["AX", "BX", "CX", "DX"];
+  var PTR = [["SP", "yığın işaretçisi"], ["BP", "taban işaretçisi"], ["SI", "kaynak indisi"], ["DI", "hedef indisi"]];
+  var SEG = [["CS", "kod kesimi"], ["DS", "veri kesimi"], ["ES", "ek kesim"], ["SS", "yığın kesimi"]];
+  var ROWS = 8;
+
+  Core.PROGS.forEach(function (p, i) { var o = document.createElement("option"); o.value = i; o.textContent = p.ad; E("reProg").appendChild(o); });
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+
+  /* yazmaç alanlarını bir kez kur */
+  (function build() {
+    var h = "";
+    GPR.forEach(function (n) {
+      h += '<span class="rname">' + n + "</span><div class=\"bytes\">";
+      [["H", 8], ["L", 0]].forEach(function (p) {
+        h += '<div class="byte" id="b' + n[0] + p[0] + '"><div class="bl"><span>' + n[0] + p[0] + '</span><b id="v' + n[0] + p[0] + '"></b></div><div class="bits">';
+        for (var i = 7; i >= 0; i--) h += '<span class="bit' + (i === 3 ? " nib" : "") + '" id="t' + n + (p[1] + i) + '"></span>';
+        h += "</div></div>";
+      });
+      h += '</div><div class="hexv" id="h' + n + '"></div>';
+    });
+    E("reGpr").innerHTML = h;
+    function tiles(list, id, extra) {
+      E(id).innerHTML = list.map(function (t) { return '<div class="tile" id="x' + t[0] + '"><div class="tn">' + t[0] + '<span id="v' + t[0] + '"></span></div><div class="td">' + t[1] + "</div></div>"; }).join("") + (extra || "");
+    }
+    tiles(PTR, "rePtr");
+    tiles(SEG.concat([["IP", "komut işaretçisi"]]), "reSeg");
+    var f = "";
+    for (var b = 15; b >= 0; b--) {
+      var nm = null; Core.FLAGS.forEach(function (x) { if (x[1] === b) nm = x[0]; });
+      f += '<div class="fcol' + (nm ? " used" : " fixed") + (b === 11 || b === 7 || b === 3 ? " nib" : "") + '" id="f' + b + '"' + (nm ? ' title="' + nm + ": " + Core.FLAGNAME[nm] + ' bayrağı"' : ' title="8086\'da sabit bit"') + '><span class="fn">' + b + '</span><span class="fb"></span><span class="fl">' + (nm || "") + "</span></div>";
+    }
+    E("reFlags").innerHTML = f;
+  })();
+
+  function cur() { return S[k].st; }
+  function prev() { return k > 0 ? S[k - 1].st : null; }
+
+  function drawRegs() {
+    var st = cur(), p = prev(), res = k > 0 ? S[k].res : null, chg = {};
+    if (p && res && res.ok) {
+      Object.keys(st.r).forEach(function (n) { if (st.r[n] !== p.r[n] && n !== "IP") chg[n] = true; });
+      (res.dest || []).forEach(function (d) { chg[Core.R8[d] ? d : d] = true; });
+    }
+    GPR.forEach(function (n) {
+      var v = st.r[n], pv = p ? p.r[n] : v;
+      ["H", "L"].forEach(function (half, j) {
+        var byte = j ? v & 0xFF : v >> 8, pb = j ? pv & 0xFF : pv >> 8, nm = n[0] + half;
+        E("v" + nm).textContent = Core.hex(byte, 8);
+        var touched = res && res.ok && (res.dest.indexOf(nm) >= 0 || res.dest.indexOf(n) >= 0);
+        E("b" + nm).classList.toggle("chg", !!touched);
+        for (var i = 0; i < 8; i++) {
+          var bit = (byte >> i) & 1, el = E("t" + n + (j ? i : 8 + i));
+          el.textContent = bit; el.classList.toggle("on", !!bit); el.classList.toggle("flip", !!(touched && ((pb >> i) & 1) !== bit));
+        }
+      });
+      E("h" + n).innerHTML = Core.hex(v, 16) + "<small>" + v + "</small>";
+    });
+    PTR.concat(SEG).forEach(function (t) {
+      E("v" + t[0]).textContent = Core.hex(st.r[t[0]], 16);
+      E("x" + t[0]).classList.toggle("chg", !!(res && res.ok && res.dest.indexOf(t[0]) >= 0));
+    });
+    E("vIP").textContent = Core.hex(st.r.IP, 16);
+    E("xIP").classList.toggle("chg", !!(res && res.ok));
+    E("xIP").querySelector(".td").textContent = res && res.ok ? "IP += " + res.len + " bayt" : "komut işaretçisi";
+    var fw = Core.flagsWord(st.f), pw = p ? Core.flagsWord(p.f) : fw;
+    for (var b = 15; b >= 0; b--) {
+      var el = E("f" + b), bit = (fw >> b) & 1;
+      el.querySelector(".fb").textContent = bit;
+      el.classList.toggle("on", !!bit);
+      el.classList.toggle("flip", !!(res && res.ok && res.flags && ((pw >> b) & 1) !== bit));
+    }
+    E("reFlagsHex").textContent = "FLAGS = " + Core.hex(fw, 16);
+  }
+
+  function drawCode() {
+    var first = Math.max(0, Math.min(k - 3, lines.length - ROWS));
+    var h = "";
+    for (var i = first; i < Math.min(lines.length, first + ROWS); i++) {
+      var r = S[i + 1].res, cls = i === k ? "cur" : i < k ? "done" : "";
+      if (i < k && r && !r.ok) cls += " err";
+      h += '<li class="' + cls + '"><span class="ln">' + (i + 1) + "</span>" + esc(lines[i]) + "</li>";
+    }
+    if (k >= lines.length) h += lines.length - first < ROWS ? '<li class="cur"><span class="ln"></span>; program bitti</li>' : "";
+    E("reCode").innerHTML = h;
+  }
+
+  /* sıradaki komut için tahmin sorusu */
+  function question() {
+    if (!E("reQuiz").checked || k >= lines.length || answered[k]) return null;
+    var r = S[k + 1].res;
+    if (!r.ok) return null;
+    if (r.op === "CMP") return { text: "<code>" + esc(lines[k]) + "</code> → ZF kaç olur? (0 / 1)", a: r.st.f.ZF, kind: "bit" };
+    if (!r.dest.length) return null;
+    var d = r.dest[0], reg = Core.R8[d] ? Core.R8[d][0] : d;
+    return { text: "<code>" + esc(lines[k]) + "</code> → " + reg + " kaç olur? (onaltılık)", a: r.st.r[reg], kind: "hex", reg: reg };
+  }
+  function parseHex(s) {
+    s = s.trim().replace(/^0x/i, "").replace(/h$/i, "");
+    return /^[0-9a-f]{1,4}$/i.test(s) ? parseInt(s, 16) : NaN;
+  }
+
+  function draw() {
+    drawRegs(); drawCode();
+    var q = question(), why = E("reWhy");
+    if (q) {
+      why.innerHTML = (flash ? flash + "<br>" : "") + "<b>Tahmin:</b> " + q.text + '<span class="qrow"><input id="reQIn" aria-label="Tahmininiz" autocomplete="off"><button type="button" id="reQOk">Kontrol</button></span>';
+      if (root.contains(document.activeElement) || document.activeElement === document.body) E("reQIn").focus();
+    } else if (flash) {
+      why.innerHTML = flash;
+    } else if (k === 0) {
+      why.innerHTML = "Başlangıç durumu. <b>Adım ▶</b> ile sıradaki komut çalıştırılır; değişen baytlar ve bayraklar turuncu görünür.";
+    } else {
+      var r = S[k].res;
+      why.innerHTML = (r.ok ? "<b>" + esc(r.line) + "</b> — " : '<b class="agt-oyun__bad">Geçersiz: ' + esc(r.line) + "</b> — ") + esc(r.why) + (r.ok ? "" : " Komut çalıştırılmadı; yazmaçlar değişmedi.");
+    }
+    E("reNo").textContent = k + " / " + lines.length;
+    E("reBack").disabled = E("reReset").disabled = k === 0;
+    E("reStep").disabled = !!q || k >= lines.length;
+    E("rePlay").disabled = E("reStep").disabled && !timer;
+    E("rePlay").textContent = timer ? "Duraklat" : "Oynat";
+  }
+  function answer() {
+    var q = question(); if (!q) return;
+    var raw = E("reQIn").value, v = q.kind === "bit" ? (/^[01]$/.test(raw.trim()) ? +raw.trim() : NaN) : parseHex(raw);
+    if (isNaN(v)) { E("reQIn").focus(); return; }
+    answered[k] = true; all++; var good = v === q.a; if (good) ok++;
+    E("reOk").textContent = ok; E("reAll").textContent = all;
+    k++;
+    flash = (good ? '<b class="agt-oyun__good">Doğru!</b> ' : '<b class="agt-oyun__bad">Yanlış</b> (doğrusu ' + (q.kind === "bit" ? q.a : Core.hex(q.a, 16)) + "). ") + "<b>" + esc(S[k].res.line) + "</b> — " + esc(S[k].res.why);
+    draw(); flash = null;
+    E("reStep").focus();
+  }
+  E("reWhy").addEventListener("click", function (e) { if (e.target.id === "reQOk") answer(); });
+  E("reWhy").addEventListener("keydown", function (e) { if (e.key === "Enter" && e.target.id === "reQIn") answer(); });
+
+  function load(code) { stop(); lines = code.slice(); S = Core.run(lines); k = 0; answered = {}; draw(); }
+  function go(d) { k = Math.max(0, Math.min(lines.length, k + d)); draw(); }
+  function stop() { clearInterval(timer); timer = null; }
+  function play() {
+    if (timer) { stop(); draw(); return; }
+    if (k >= lines.length) k = 0;
+    timer = setInterval(function () {
+      if (question() || k >= lines.length) { stop(); draw(); return; }
+      go(1);
+      if (question() || k >= lines.length) { stop(); draw(); }
+    }, [1700, 1200, 850, 500, 250][E("reSpeed").value - 1]);
+    draw();
+  }
+  function runCmd() {
+    var t = E("reCmd").value.trim(); if (!t) return;
+    stop();
+    var test = Core.exec(S[k].st, t);
+    if (!test.ok) { flash = '<b class="agt-oyun__bad">Geçersiz: ' + esc(t) + "</b> — " + esc(test.why) + " Komut eklenmedi."; draw(); flash = null; E("reCmd").select(); return; }
+    lines = lines.slice(0, k).concat([t], lines.slice(k));
+    S = Core.run(lines);
+    Object.keys(answered).forEach(function (i) { if (+i >= k) delete answered[i]; });
+    answered[k] = true;
+    k++;
+    draw();
+    E("reCmd").value = "";
+  }
+
+  E("reProg").addEventListener("change", function () { load(Core.PROGS[E("reProg").value].code); });
+  E("reStep").addEventListener("click", function () { stop(); go(1); });
+  E("reBack").addEventListener("click", function () { stop(); go(-1); });
+  E("reReset").addEventListener("click", function () { stop(); k = 0; answered = {}; draw(); });
+  E("rePlay").addEventListener("click", play);
+  E("reSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("reQuiz").addEventListener("change", draw);
+  E("reRun").addEventListener("click", runCmd);
+  E("reCmd").addEventListener("keydown", function (e) { if (e.key === "Enter") runCmd(); });
+  root.addEventListener("keydown", function (e) {
+    if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+    if (e.key === "ArrowRight" && !question()) { stop(); go(1); e.preventDefault(); }
+    else if (e.key === "ArrowLeft") { stop(); go(-1); e.preventDefault(); }
+  });
+
+  load(Core.PROGS[0].code);
+})();
+</script>
+<script src="deck/oyun.js"></script>

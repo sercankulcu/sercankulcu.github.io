@@ -1,0 +1,524 @@
+---
+layout: without-sidebar
+title: "Koşullu Atlamalar"
+permalink: /files/microprocessors/slides/Chapter_07_Jump-Conditions.html
+excerpt: "8086'da CMP a, b sonrası bayraklar ve her koşullu atlamanın (JE, JNE, JA, JAE, JB, JBE, JG, JGE, JL, JLE, JC, JO, JS, JP…) atlayıp atlamadığı; işaretli ve işaretsiz karşılaştırma farkı; LOOP, DEC + JNZ ve CMP + Jcc döngülerinin adım adım izlenmesi."
+---
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.mp-jc, .mp-jc-dlg { --ds-accent:#a61b1b; --ds-link:var(--global-link-color, #2563eb); }
+html[data-theme="dark"] .mp-jc, html[data-theme="dark"] .mp-jc-dlg { --ds-accent:#f07a7a; }
+.mp-jc .grid { display:grid; grid-template-columns:174px minmax(0,1fr); gap:10px; height:100%; }
+.mp-jc .side { display:flex; flex-direction:column; gap:6px; min-height:0; padding:8px 10px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.mp-jc .cap { display:block; margin:0 0 2px; color:var(--ds-muted); font-size:12px; font-weight:800; letter-spacing:.05em; }
+.mp-jc select, .mp-jc .in { width:100%; min-height:30px !important; font-size:14px !important; }
+.mp-jc .in { font-family:ui-monospace, Consolas, monospace; }
+.mp-jc .seg { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.mp-jc .seg button, .mp-jc .row2 button { min-height:30px; padding:0 4px; font-size:13.5px; }
+.mp-jc .seg button[aria-pressed="true"] { border-color:var(--ds-link); background:var(--ds-node); }
+.mp-jc .tabs button[aria-selected="true"] { border-color:var(--ds-accent); background:var(--ds-hot); }
+.mp-jc .row2 { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.mp-jc .check { display:flex; align-items:center; gap:6px; font-size:13.5px; font-weight:700; cursor:pointer; }
+.mp-jc .speed { display:flex; align-items:center; gap:6px; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.mp-jc .speed input { flex:1; min-width:0; }
+.mp-jc .score { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:auto; }
+.mp-jc .score div { padding:3px; border-radius:10px; background:var(--ds-surface-strong); text-align:center; color:var(--ds-muted); font-size:12px; font-weight:700; }
+.mp-jc .score b { display:block; color:var(--ds-text); font-size:18px; }
+.mp-jc .hide { display:none !important; }
+.mp-jc .pane { display:flex; flex-direction:column; gap:6px; min-height:0; }
+.mp-jc .main { display:flex; flex-direction:column; gap:7px; min-width:0; min-height:0; }
+.mp-jc .code { display:flex; flex-wrap:wrap; gap:4px 18px; padding:5px 10px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); font:700 14px/1.4 ui-monospace, Consolas, monospace; }
+.mp-jc .code .op { color:var(--ds-link); }
+.mp-jc .code .c { color:var(--ds-muted); font-weight:400; }
+.mp-jc .interp { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.mp-jc .interp div { min-width:0; padding:4px 9px; border-radius:10px; background:var(--ds-surface-strong); font-size:13.5px; line-height:1.35; }
+.mp-jc .interp b { font-family:ui-monospace, Consolas, monospace; }
+.mp-jc .flags { display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:6px; }
+.mp-jc .flag { display:flex; align-items:center; justify-content:center; gap:8px; min-width:0; padding:3px 6px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-bg); }
+.mp-jc .flag .n { color:var(--ds-muted); font-size:13px; font-weight:800; }
+.mp-jc .flag .v { font:800 20px/1.2 ui-monospace, Consolas, monospace; }
+.mp-jc .flag.on { border-color:var(--ds-accent); background:var(--ds-hot); }
+.mp-jc .flag.mk { box-shadow:0 0 0 3px color-mix(in srgb, var(--ds-link) 40%, transparent); }
+.mp-jc .tbl { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.mp-jc .col { min-width:0; }
+.mp-jc .col h3 { margin:0 0 2px; color:var(--ds-muted); font-size:12px; font-weight:800; letter-spacing:.04em; }
+.mp-jc .jr { display:grid; grid-template-columns:86px minmax(0,1fr) 56px; align-items:center; gap:6px; height:25px; margin-bottom:2px; padding:0 6px; border:1.5px solid var(--ds-border); border-radius:7px; background:var(--ds-bg); font-size:13px; }
+.mp-jc .jr .m { font:800 12.5px ui-monospace, Consolas, monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mp-jc .jr .cd { color:var(--ds-muted); font:600 12px ui-monospace, Consolas, monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mp-jc .jr .r { font-weight:800; text-align:right; white-space:nowrap; }
+.mp-jc .jr.yes { border-color:var(--ds-good); background:color-mix(in srgb, var(--ds-good) 14%, var(--ds-bg)); }
+.mp-jc .jr.yes .r { color:var(--ds-good); }
+.mp-jc .jr.no .r { color:var(--ds-muted); }
+.mp-jc .jr.cur { box-shadow:0 0 0 3px color-mix(in srgb, var(--ds-accent) 45%, transparent); }
+.mp-jc .ctl { display:flex; align-items:center; gap:6px; }
+.mp-jc .ctl button { min-height:32px; padding:0 12px; font-size:14px; }
+.mp-jc .ctl .no { margin-left:auto; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.mp-jc .why { flex:1; min-height:52px; margin:0; padding:6px 11px; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:14px; line-height:1.4; overflow:hidden; }
+.mp-jc .why .q { display:inline-flex; gap:6px; margin-left:6px; vertical-align:middle; }
+.mp-jc .why .q button { min-height:28px; padding:0 10px; font-size:13.5px; }
+.mp-jc .good { color:var(--ds-good); font-weight:800; }
+.mp-jc .bad { color:var(--ds-bad); font-weight:800; }
+.mp-jc code { font-family:ui-monospace, Consolas, monospace; }
+/* döngü izleme */
+.mp-jc .lp { display:grid; grid-template-columns:minmax(0,1fr) 200px; gap:8px; }
+.mp-jc .src { margin:0; padding:5px 0; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); font:14px/1.55 ui-monospace, Consolas, monospace; list-style:none; counter-reset:ln; }
+.mp-jc .src li { padding-right:8px; white-space:pre; counter-increment:ln; }
+.mp-jc .src li::before { content:counter(ln); display:inline-block; width:24px; margin-right:8px; color:var(--ds-muted); font-size:12px; text-align:right; }
+.mp-jc .src li.is-cur { background:var(--ds-hot); box-shadow:inset 4px 0 0 var(--ds-accent); }
+.mp-jc .src .c { color:var(--ds-muted); }
+.mp-jc .regs { display:flex; flex-direction:column; gap:5px; }
+.mp-jc .rg { display:flex; justify-content:space-between; align-items:baseline; padding:3px 9px; border:1.5px solid var(--ds-border); border-radius:9px; background:var(--ds-bg); font:700 14px ui-monospace, Consolas, monospace; }
+.mp-jc .rg span { color:var(--ds-muted); font-size:12.5px; }
+.mp-jc .rg.chg { border-color:var(--ds-accent); background:var(--ds-hot); }
+.mp-jc .fl4 { display:grid; grid-template-columns:repeat(4, 1fr); gap:4px; }
+.mp-jc .fl4 div { padding:2px 0; border:1.5px solid var(--ds-border); border-radius:8px; background:var(--ds-bg); text-align:center; font:800 14px ui-monospace, Consolas, monospace; }
+.mp-jc .fl4 div span { display:block; color:var(--ds-muted); font-size:12px; }
+.mp-jc .fl4 div.chg { border-color:var(--ds-accent); }
+.mp-jc .log { flex:none; height:84px; margin:0; padding:5px 9px; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); font:13px/1.5 ui-monospace, Consolas, monospace; overflow:hidden; }
+.mp-jc .log div { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mp-jc .log div:last-child { color:var(--ds-accent); font-weight:700; }
+</style>
+
+<div class="mp-jc agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 7 · Simülatör</p><h1>Koşullu Atlamalar</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="jc-help" aria-label="Açıklama ve kullanım">?</button>
+    <a class="agt-oyun__back" href="Bolum_07_Akis_Kontrol.html">← Bölüm 7</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="grid">
+      <aside class="side">
+        <div class="seg tabs" role="tablist" aria-label="Bölüm seçimi">
+          <button type="button" role="tab" id="jcT1" aria-selected="true" aria-controls="jcP1">Atlamalar</button>
+          <button type="button" role="tab" id="jcT2" aria-selected="false" aria-controls="jcP2">Döngü</button>
+        </div>
+        <div class="pane" id="jcS1">
+          <div><span class="cap">Boyut</span>
+            <div class="seg" role="group" aria-label="İşlenen boyutu">
+              <button type="button" id="jcW8" aria-pressed="true">8 bit</button>
+              <button type="button" id="jcW16" aria-pressed="false">16 bit</button>
+            </div></div>
+          <div><label class="cap" for="jcA">a (hedef)</label><input class="in" id="jcA" type="text" spellcheck="false" autocomplete="off" value="0FBh"></div>
+          <div><label class="cap" for="jcB">b (kaynak)</label><input class="in" id="jcB" type="text" spellcheck="false" autocomplete="off" value="3"></div>
+          <div class="row2">
+            <button type="button" id="jcApply">Uygula</button>
+            <button type="button" id="jcRand">Rastgele</button>
+          </div>
+          <select id="jcEx" aria-label="Hazır örnek"><option value="">Hazır örnek seç…</option></select>
+        </div>
+        <div class="pane hide" id="jcS2">
+          <div><label class="cap" for="jcProg">Program</label>
+            <select id="jcProg">
+              <option value="loop">LOOP ile toplam</option>
+              <option value="dec">DEC + JNZ ile 2ⁿ</option>
+              <option value="cmp">CMP + Jcc sayaç</option>
+            </select></div>
+          <div id="jcNBox"><label class="cap" for="jcN" id="jcNLab">CX başlangıcı (1–8)</label><input class="in" id="jcN" type="number" min="1" max="8" step="1" value="4"></div>
+          <div id="jcJBox" class="hide"><label class="cap" for="jcJ">Atlama komutu</label>
+            <select id="jcJ"><option>JL</option><option>JB</option><option>JLE</option><option>JBE</option><option>JNE</option></select></div>
+          <button type="button" id="jcApply2">Uygula</button>
+        </div>
+        <label class="speed">Hız <input type="range" id="jcSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı"></label>
+        <label class="check"><input type="checkbox" id="jcQuiz"> Kendini dene</label>
+        <div class="score"><div>Doğru<b id="jcOk">0</b></div><div>Yanlış<b id="jcBad">0</b></div></div>
+      </aside>
+
+      <div class="main">
+        <div class="pane" id="jcP1" role="tabpanel" aria-labelledby="jcT1">
+          <div class="code" id="jcCode"></div>
+          <div class="interp"><div id="jcU"></div><div id="jcSg"></div></div>
+          <div class="flags" id="jcFlags"></div>
+          <div class="tbl" id="jcTbl"></div>
+        </div>
+        <div class="pane hide" id="jcP2" role="tabpanel" aria-labelledby="jcT2">
+          <div class="lp">
+            <ol class="src" id="jcSrc"></ol>
+            <div class="regs" id="jcRegs"></div>
+          </div>
+          <div class="log" id="jcLog" aria-label="Son adımlar"></div>
+        </div>
+        <div class="ctl">
+          <button type="button" id="jcBack" aria-label="Bir adım geri">◀</button>
+          <button type="button" id="jcStep" class="is-primary" aria-label="Bir adım ileri">Adım ▶</button>
+          <button type="button" id="jcPlay" aria-label="Oynat ya da duraklat">Oynat</button>
+          <button type="button" id="jcEnd" aria-label="Sona git">Sona git</button>
+          <button type="button" id="jcReset" aria-label="Başa dön">Sıfırla</button>
+          <span class="no" id="jcNo"></span>
+        </div>
+        <div class="why" id="jcWhy" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog mp-jc-dlg" id="jc-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Koşullu Atlamalar</h2>
+    <p><b>Amaç:</b> <code>CMP a, b</code> komutunun ayarladığı bayraklardan her koşullu atlamanın nasıl karar verdiğini ve işaretli (G/L) ile işaretsiz (A/B) ailelerin aynı bitler için neden farklı sonuç verebildiğini görmek; küçük döngülerde CX'in ve bayrakların değişimini izlemek.</p>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li><b>CMP + Jcc</b>: a ve b'yi onaltılık (<code>0FBh</code>), ikili (<code>1010b</code>) ya da onluk (<code>-5</code>) yazın. <b>Adım ▶</b> (ya da →) önce bayrakları, sonra atlamaları tek tek açar; satırdaki koşul, bakılan bayraklarla birlikte gösterilir.</li>
+      <li><b>Döngü</b>: bir program seçin, başlangıç değerini ayarlayıp komutları adım adım çalıştırın. Sağda yazmaçlar ve bayraklar, altta son adımlar görünür.</li>
+      <li><b>Kendini dene</b>: her atlama için önce “atlar” ya da “atlamaz” tahmini istenir.</li>
+    </ol>
+    <h3>Kurallar</h3>
+    <ul>
+      <li>CMP a, b, a − b'yi hesaplar, sonucu saklamaz; yalnızca CF, ZF, SF, OF, PF, AF'yi ayarlar.</li>
+      <li>İşaretsiz: JA (CF = 0 ve ZF = 0), JAE = JNB = JNC (CF = 0), JB = JNAE = JC (CF = 1), JBE (CF = 1 ya da ZF = 1).</li>
+      <li>İşaretli: JG (ZF = 0 ve SF = OF), JGE (SF = OF), JL (SF ≠ OF), JLE (ZF = 1 ya da SF ≠ OF). Taşma olunca SF'nin işareti ters çıkar; bu yüzden SF ile OF birlikte değerlendirilir.</li>
+      <li>LOOP önce CX'i 1 azaltır, CX ≠ 0 ise atlar ve bayrakları değiştirmez. DEC CX + JNZ aynı işi yapar ama ZF, SF, OF, PF, AF'yi değiştirir (CF korunur). CX = 0 iken LOOP'a girilirse CX FFFFh olur ve gövde 65.536 kez çalışır.</li>
+      <li>8086'da koşullu atlamalar 2 bayttır ve yalnızca −128…+127 bayt uzağa gidebilir.</li>
+    </ul>
+    <p>Bayrak ve atlama sonuçları ile döngü izleri bir 8086 yorumlayıcısıyla karşılaştırılarak sınanmıştır.</p>
+    <p>İlgili sunum: <a href="Bolum_07_Akis_Kontrol.html">Bölüm 7 · Program Akış Kontrolü</a> (Tek Bir Bayrağı Test Eden Atlamalar, CMP Komutu, İşaretli ve İşaretsiz Sayılar İçin Atlamalar, Neden SF = OF?, Döngü Komutları).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+
+  /*CORE-BEGIN*/
+  var Core = (function () {
+    function ones(v) { var c = 0; while (v) { c += v & 1; v >>>= 1; } return c; }
+    function signed(v, w) { return v >= (1 << (w - 1)) ? v - (1 << w) : v; }
+    /* 8086 ADD/SUB/CMP/INC/DEC bayrakları (bit bit elde/ödünç zinciri) */
+    function alu(op, w, a, b, cf) {
+      var sub = op === "SUB" || op === "CMP" || op === "DEC", y = (op === "INC" || op === "DEC") ? 1 : b, c = 0, cin7 = 0, af = 0, r = 0;
+      for (var i = 0; i < w; i++) {
+        var ai = (a >> i) & 1, bi = (y >> i) & 1;
+        if (i === w - 1) cin7 = c;
+        r |= (ai ^ bi ^ c) << i;
+        c = sub ? (((1 - ai) & bi) | ((1 - (ai ^ bi)) & c)) : ((ai & bi) | (c & (ai ^ bi)));
+        if (i === 3) af = c;
+      }
+      return { r: r, f: { CF: (op === "INC" || op === "DEC") ? cf : c, PF: ones(r & 0xFF) % 2 === 0 ? 1 : 0, AF: af, ZF: r === 0 ? 1 : 0, SF: (r >> (w - 1)) & 1, OF: cin7 ^ c } };
+    }
+    var JCC = {
+      JE: function (f) { return f.ZF === 1; }, JNE: function (f) { return f.ZF === 0; },
+      JA: function (f) { return f.CF === 0 && f.ZF === 0; }, JAE: function (f) { return f.CF === 0; },
+      JB: function (f) { return f.CF === 1; }, JBE: function (f) { return f.CF === 1 || f.ZF === 1; },
+      JG: function (f) { return f.ZF === 0 && f.SF === f.OF; }, JGE: function (f) { return f.SF === f.OF; },
+      JL: function (f) { return f.SF !== f.OF; }, JLE: function (f) { return f.ZF === 1 || f.SF !== f.OF; },
+      JO: function (f) { return f.OF === 1; }, JNO: function (f) { return f.OF === 0; },
+      JS: function (f) { return f.SF === 1; }, JNS: function (f) { return f.SF === 0; },
+      JP: function (f) { return f.PF === 1; }, JNP: function (f) { return f.PF === 0; },
+      JC: function (f) { return f.CF === 1; }, JNC: function (f) { return f.CF === 0; },
+      JZ: function (f) { return f.ZF === 1; }, JNZ: function (f) { return f.ZF === 0; }
+    };
+    /* küçük programlar: [etiket, komut, işlenenler] */
+    function program(kind, n, j) {
+      if (kind === "loop") return [["", "MOV", "CX", n], ["", "MOV", "AX", 0], ["tekrar", "ADD", "AX", "CX"], ["", "LOOP", "tekrar"], ["", "HLT"]];
+      if (kind === "dec") return [["", "MOV", "CX", n], ["", "MOV", "AX", 1], ["tekrar", "ADD", "AX", "AX"], ["", "DEC", "CX"], ["", "JNZ", "tekrar"], ["", "HLT"]];
+      return [["", "MOV", "BX", n], ["", "MOV", "AX", 0], ["tekrar", "ADD", "AX", "BX"], ["", "INC", "BX"], ["", "CMP", "BX", 2], ["", j, "tekrar"], ["", "HLT"]];
+    }
+    /* programı çalıştırır; her adım: {pc, next, R, F, jump} */
+    function trace(P, maxSteps) {
+      var R = { AX: 0, BX: 0, CX: 0 }, F = { CF: 0, ZF: 0, SF: 0, OF: 0, PF: 0, AF: 0 }, pc = 0, out = [], lab = {};
+      P.forEach(function (l, i) { if (l[0]) lab[l[0]] = i; });
+      function val(x) { return typeof x === "number" ? x & 0xFFFF : R[x]; }
+      for (var s = 0; s < (maxSteps || 200); s++) {
+        var L = P[pc], op = L[1], next = pc + 1, jump = null, x;
+        if (op === "HLT") { out.push({ pc: pc, next: pc, R: clone(R), F: clone(F), jump: null, halt: true }); break; }
+        if (op === "MOV") R[L[2]] = val(L[3]);
+        else if (op === "ADD" || op === "CMP") { x = alu(op, 16, R[L[2]], val(L[3]), F.CF); F = x.f; if (op === "ADD") R[L[2]] = x.r; }
+        else if (op === "INC" || op === "DEC") { x = alu(op, 16, R[L[2]], 1, F.CF); F = x.f; R[L[2]] = x.r; }
+        else if (op === "LOOP") { R.CX = (R.CX - 1) & 0xFFFF; jump = R.CX !== 0; if (jump) next = lab[L[2]]; }
+        else { jump = JCC[op](F); if (jump) next = lab[L[2]]; }
+        out.push({ pc: pc, next: next, R: clone(R), F: clone(F), jump: jump });
+        pc = next;
+      }
+      return out;
+    }
+    function clone(o) { var c = {}; for (var k in o) c[k] = o[k]; return c; }
+    return { alu: alu, JCC: JCC, signed: signed, program: program, trace: trace };
+  })();
+  /*CORE-END*/
+
+  var root = document.querySelector(".mp-jc");
+  function E(id) { return document.getElementById(id); }
+  var FL = ["CF", "ZF", "SF", "OF", "PF", "AF"];
+  /* [komut (eş anlamlılar), koşul metni, bakılan bayraklar, karşılaştırma anlamı] */
+  var ROWS = [
+    ["JE", "JE/JZ", "ZF=1", ["ZF"], "="], ["JNE", "JNE/JNZ", "ZF=0", ["ZF"], "≠"],
+    ["JA", "JA/JNBE", "CF=0 ve ZF=0", ["CF", "ZF"], "u>"], ["JAE", "JAE/JNB/JNC", "CF=0", ["CF"], "u≥"],
+    ["JB", "JB/JNAE/JC", "CF=1", ["CF"], "u<"], ["JBE", "JBE/JNA", "CF=1 veya ZF=1", ["CF", "ZF"], "u≤"],
+    ["JP", "JP/JPE", "PF=1", ["PF"], ""], ["JNP", "JNP/JPO", "PF=0", ["PF"], ""],
+    ["JG", "JG/JNLE", "ZF=0 ve SF=OF", ["ZF", "SF", "OF"], "s>"], ["JGE", "JGE/JNL", "SF=OF", ["SF", "OF"], "s≥"],
+    ["JL", "JL/JNGE", "SF≠OF", ["SF", "OF"], "s<"], ["JLE", "JLE/JNG", "ZF=1 veya SF≠OF", ["ZF", "SF", "OF"], "s≤"],
+    ["JO", "JO", "OF=1", ["OF"], ""], ["JNO", "JNO", "OF=0", ["OF"], ""],
+    ["JS", "JS", "SF=1", ["SF"], ""], ["JNS", "JNS", "SF=0", ["SF"], ""]
+  ];
+  var EXAMPLES = [
+    [8, 0xFB, 3, "0FBh ile 3 (−5 / 251)"], [8, 7, 7, "7 ile 7"], [8, 5, 7, "5 ile 7"], [8, 0x7F, 0x80, "7Fh ile 80h (taşma)"],
+    [8, 0x80, 1, "80h ile 1 (taşma)"], [16, 0xFFFF, 1, "0FFFFh ile 1"], [16, 1000, 0xFC18, "1000 ile −1000"]
+  ];
+  var tab = 1, w = 8, A = 0xFB, B = 3, C = null, k = 0, timer = null, score = { ok: 0, bad: 0 }, asked = {}, msg = "";
+  var prog = "loop", N = { loop: 4, dec: 4, cmp: -3 }, J = "JL", P = null, T = null;
+
+  function hx(v, wd) { var s = v.toString(16).toUpperCase(); while (s.length < wd / 4) s = "0" + s; return (/^[A-F]/.test(s) ? "0" : "") + s + "h"; }
+  function sgn(v) { return v < 0 ? "−" + (-v) : String(v); }
+  function parseNum(t, wd) {
+    t = String(t).trim().replace(/\s+/g, "");
+    var v, m;
+    if ((m = /^(-?)([01]+)b$/i.exec(t))) v = parseInt(m[2], 2) * (m[1] ? -1 : 1);
+    else if ((m = /^(-?)([0-9][0-9a-f]*)h$/i.exec(t)) || (m = /^(-?)0x([0-9a-f]+)$/i.exec(t))) v = parseInt(m[2], 16) * (m[1] ? -1 : 1);
+    else if (/^-?[0-9]+$/.test(t)) v = parseInt(t, 10);
+    else return { err: "“" + t + "” sayı değil (ör. 0FBh, 1010b, -5)." };
+    var max = (1 << wd) - 1, min = -(1 << (wd - 1));
+    if (v > max || v < min) return { err: t + " " + wd + " bite sığmaz (" + min + " … " + max + ")." };
+    return { v: v & max };
+  }
+  function ra() { return w === 8 ? "AL" : "AX"; }
+  function rb() { return w === 8 ? "BL" : "BX"; }
+
+  /* ---------- 1. sekme: CMP + Jcc ---------- */
+  function nSteps() { return tab === 1 ? 2 + ROWS.length : T.length + 1; }
+  function compute() { stop(); C = Core.alu("CMP", w, A, B, 0); k = 0; asked = {}; msg = ""; draw(); }
+  function rowIdx() { return k - 2; }
+  /* Kendini dene: bir sonraki satır/atlama açılmadan önce sorulur */
+  function pendingQ() {
+    if (!E("jcQuiz").checked) return null;
+    if (tab === 1) { var i = k - 1; if (k >= 1 && i < ROWS.length && !asked["r" + i]) return { id: "r" + i, row: i, ans: Core.JCC[ROWS[i][0]](C.f) }; return null; }
+    var s = T[k]; if (s && s.jump !== null && !asked["s" + k]) return { id: "s" + k, ans: s.jump, ins: P[s.pc] };
+    return null;
+  }
+  function semantic(rel) {
+    var ua = A, ub = B, sa = Core.signed(A, w), sb = Core.signed(B, w);
+    var cmp = rel.charAt(0) === "s" ? [sa, sb] : [ua, ub], o = rel.replace(/^[us]/, "");
+    var res = o === "=" ? cmp[0] === cmp[1] : o === "≠" ? cmp[0] !== cmp[1] : o === ">" ? cmp[0] > cmp[1] : o === "≥" ? cmp[0] >= cmp[1] : o === "<" ? cmp[0] < cmp[1] : cmp[0] <= cmp[1];
+    return { txt: (rel.charAt(0) === "s" ? "işaretli " : rel.charAt(0) === "u" ? "işaretsiz " : "") + sgn(cmp[0]) + " " + o + " " + sgn(cmp[1]) + " ? → " + (res ? "evet" : "hayır"), res: res };
+  }
+  function draw1() {
+    E("jcCode").innerHTML = "<span>MOV " + ra() + ", " + hx(A, w) + "</span><span>MOV " + rb() + ", " + hx(B, w) + '</span><span class="op">CMP ' + ra() + ", " + rb() +
+      ' <span class="c">; ' + ra() + " − " + rb() + " = " + (k >= 1 ? hx(C.r, w) : "?") + " (saklanmaz)</span></span>";
+    var sa = Core.signed(A, w), sb = Core.signed(B, w);
+    function rel(x, y) { return x === y ? "=" : x > y ? ">" : "<"; }
+    E("jcU").innerHTML = "<b>İşaretsiz:</b> a = " + A + ", b = " + B + " → a " + rel(A, B) + " b";
+    E("jcSg").innerHTML = "<b>İşaretli:</b> a = " + sgn(sa) + ", b = " + sgn(sb) + " → a " + rel(sa, sb) + " b";
+    var ri = rowIdx(), mk = ri >= 0 && ri < ROWS.length ? ROWS[ri][3] : [];
+    E("jcFlags").innerHTML = FL.map(function (f) {
+      var v = C.f[f];
+      return '<div class="flag' + (k >= 1 && v ? " on" : "") + (mk.indexOf(f) >= 0 ? " mk" : "") + '" aria-label="' + f + " " + (k >= 1 ? v : "gizli") + '"><span class="n">' + f + '</span><span class="v">' + (k >= 1 ? v : "?") + "</span></div>";
+    }).join("");
+    var cols = [[0, 8, "İşaretsiz, eşitlik ve eşlik"], [8, 16, "İşaretli, taşma ve işaret"]], h = "";
+    cols.forEach(function (c) {
+      h += '<div class="col"><h3>' + c[2] + "</h3>";
+      for (var i = c[0]; i < c[1]; i++) {
+        var R = ROWS[i], on = k >= 2 + i, j = Core.JCC[R[0]](C.f);
+        h += '<div class="jr' + (on ? (j ? " yes" : " no") : "") + (ri === i ? " cur" : "") + '"><span class="m">' + R[1] + '</span><span class="cd">' + R[2] + '</span><span class="r">' + (on ? (j ? "atlar" : "atlamaz") : "…") + "</span></div>";
+      }
+      h += "</div>";
+    });
+    E("jcTbl").innerHTML = h;
+    var t;
+    if (k === 0) t = "<b>CMP " + ra() + ", " + rb() + "</b> bir çıkarma yapar (" + hx(A, w) + " − " + hx(B, w) + ") ama sonucu yazmaz; koşullu atlamalar yalnızca bayraklara bakar.";
+    else if (k === 1) t = "Fark " + hx(C.r, w) + ": CF = " + C.f.CF + (C.f.CF ? " (işaretsiz a < b, ödünç alındı)" : " (ödünç yok)") + ", ZF = " + C.f.ZF + ", SF = " + C.f.SF + ", OF = " + C.f.OF +
+      (C.f.OF ? " — işaretli taşma: SF tek başına ters işaret verir." : ".");
+    else {
+      var R2 = ROWS[ri], j2 = Core.JCC[R2[0]](C.f);
+      t = "<b>" + R2[1] + "</b>: " + R2[2] + " → " + R2[3].map(function (f) { return f + " = " + C.f[f]; }).join(", ") + " → <b>" + (j2 ? "atlar" : "atlamaz") + "</b>.";
+      if (R2[4]) t += " Anlamı: " + semantic(R2[4]).txt + ".";
+      if (R2[0] === "JA" || R2[0] === "JG") {
+        var ja = Core.JCC.JA(C.f), jg = Core.JCC.JG(C.f);
+        if (ja !== jg) t += " JA ile JG burada farklı karar veriyor: aynı bitler işaretsiz ve işaretli olarak farklı sayılardır.";
+      }
+    }
+    return t;
+  }
+
+  /* ---------- 2. sekme: döngü izleme ---------- */
+  function lineTxt(L) {
+    var ops = L.slice(2).map(function (x) { return typeof x === "number" ? (x < 0 ? String(x) : String(x)) : x; });
+    return L[1] + (ops.length ? " " + ops.join(", ") : "");
+  }
+  function buildProg() {
+    P = Core.program(prog, N[prog], J);
+    T = Core.trace(P, 400);
+    k = 0; asked = {}; msg = "";
+  }
+  function srcHtml(cur) {
+    return P.map(function (L, i) {
+      var lab = L[0] ? L[0] + ":" : "";
+      return '<li class="' + (i === cur ? "is-cur" : "") + '">' + (lab ? lab + " " : "    ") + lineTxt(L) + "</li>";
+    }).join("");
+  }
+  function draw2() {
+    /* k = 0: hiçbir komut çalışmadı; k = i: i komut çalıştı */
+    var st = k > 0 ? T[k - 1] : null, nextPc = st ? st.next : 0, prev = k > 1 ? T[k - 2] : null;
+    var R = st ? st.R : { AX: 0, BX: 0, CX: 0 }, F = st ? st.F : { CF: 0, ZF: 0, SF: 0, OF: 0 }, pR = prev ? prev.R : { AX: 0, BX: 0, CX: 0 }, pF = prev ? prev.F : { CF: 0, ZF: 0, SF: 0, OF: 0 };
+    var done = st && st.halt;
+    E("jcSrc").innerHTML = srcHtml(done ? st.pc : nextPc);
+    var regs = prog === "cmp" ? ["AX", "BX"] : ["AX", "CX"], h = "";
+    regs.forEach(function (r) {
+      h += '<div class="rg' + (st && R[r] !== pR[r] ? " chg" : "") + '"><b>' + r + "</b><b>" + hx(R[r], 16) + "</b><span>" + sgn(Core.signed(R[r], 16)) + (Core.signed(R[r], 16) < 0 ? " / " + R[r] : "") + "</span></div>";
+    });
+    h += '<div class="fl4">' + ["ZF", "SF", "OF", "CF"].map(function (f) { return '<div class="' + (st && F[f] !== pF[f] ? "chg" : "") + '"><span>' + f + "</span>" + F[f] + "</div>"; }).join("") + "</div>";
+    E("jcRegs").innerHTML = h;
+    var lg = [];
+    for (var i = Math.max(0, k - 4); i < k; i++) lg.push("<div>" + (i + 1) + ". " + lineTxt(P[T[i].pc]) + logTail(T[i], i) + "</div>");
+    E("jcLog").innerHTML = lg.join("") || "<div>Henüz komut çalışmadı.</div>";
+    if (k === 0) return {
+      loop: "CX sayaç olarak kullanılır: gövde (ADD AX, CX) her turda çalışır, LOOP CX'i azaltır ve CX ≠ 0 iken başa döner. Sonuç: AX = CX + (CX − 1) + … + 1.",
+      dec: "DEC CX + JNZ, LOOP ile aynı sayıda tur döner; farkı DEC'in ZF, SF, OF, PF, AF'yi değiştirmesidir. Her turda AX ikiye katlanır.",
+      cmp: "BX işaretli bir sayaçtır (" + N.cmp + " … 1). CMP BX, 2 sonrası " + J + " " + (/^J[LG]/.test(J) ? "işaretli" : /^J[AB]/.test(J) ? "işaretsiz" : "eşitlik") + " karşılaştırmaya göre karar verir."
+    }[prog];
+    return whyStep(st, k - 1);
+  }
+  function logTail(s, i) {
+    var op = P[s.pc][1];
+    if (op === "LOOP") return " → CX = " + s.R.CX + (s.jump ? ", atladı" : ", geçti");
+    if (s.jump !== null) return s.jump ? " → atladı" : " → geçti";
+    if (op === "HLT") return " → dur";
+    if (op === "CMP") return " → ZF=" + s.F.ZF + " SF=" + s.F.SF + " OF=" + s.F.OF + " CF=" + s.F.CF;
+    var r = P[s.pc][2]; return " → " + r + " = " + hx(s.R[r], 16);
+  }
+  function whyStep(s, i) {
+    var L = P[s.pc], op = L[1];
+    if (s.halt) {
+      var turns = T.filter(function (x) { return P[x.pc][1] === "ADD"; }).length;
+      return "<b>Program bitti.</b> Gövde " + turns + " kez çalıştı; AX = " + hx(s.R.AX, 16) + " (" + sgn(Core.signed(s.R.AX, 16)) + ").";
+    }
+    if (op === "MOV") return L[2] + " ← " + L[3] + ".";
+    if (op === "ADD") return L[2] + " ← " + L[2] + " + " + L[3] + " = " + hx(s.R[L[2]], 16) + ". ADD bayrakları ayarlar (ZF = " + s.F.ZF + ", SF = " + s.F.SF + ").";
+    if (op === "INC" || op === "DEC") return L[2] + " = " + hx(s.R[L[2]], 16) + " (" + sgn(Core.signed(s.R[L[2]], 16)) + "). " + op + " ZF'yi ayarlar: ZF = " + s.F.ZF + "; CF değişmez.";
+    if (op === "CMP") return "CMP BX, 2: BX − 2 = " + sgn(Core.signed(s.R.BX, 16)) + " − 2. ZF = " + s.F.ZF + ", SF = " + s.F.SF + ", OF = " + s.F.OF + ", CF = " + s.F.CF +
+      (s.F.CF ? " (işaretsiz BX < 2)" : " (işaretsiz " + s.R.BX + " ≥ 2)") + ".";
+    if (op === "LOOP") return "LOOP: CX ← CX − 1 = " + s.R.CX + ". " + (s.jump ? "CX ≠ 0 → tekrar etiketine atlar." : "CX = 0 → döngüden çıkar.") + " Bayraklar değişmedi.";
+    var cond = { JNZ: "ZF = 0", JL: "SF ≠ OF", JB: "CF = 1", JLE: "ZF = 1 veya SF ≠ OF", JBE: "CF = 1 veya ZF = 1", JNE: "ZF = 0" }[op];
+    var t = op + ": " + cond + " → " + (s.jump ? "<b>atlar</b>" : "<b>atlamaz</b>") + ".";
+    if (op === "JB" || op === "JBE") t += " İşaretsiz yorumda BX = " + s.R.BX + (Core.signed(s.R.BX, 16) < 0 ? " (çok büyük bir sayı); negatif sayaç için JB yanlış ailedir." : ".");
+    if (op === "JL" || op === "JLE") t += " İşaretli yorumda BX = " + sgn(Core.signed(s.R.BX, 16)) + ".";
+    return t;
+  }
+
+  function draw() {
+    var q = pendingQ(), t = tab === 1 ? draw1() : draw2();
+    if (q) {
+      var what = tab === 1 ? "<b>" + ROWS[q.row][1] + "</b> (" + ROWS[q.row][2] + ") atlar mı?" : "Sıradaki <b>" + lineTxt(q.ins) + "</b> atlar mı?";
+      t = (tab === 2 && k > 0 ? t + "<br>" : "") + what + '<span class="q"><button type="button" data-a="1">Atlar</button><button type="button" data-a="0">Atlamaz</button></span>';
+    }
+    E("jcWhy").innerHTML = msg + t;
+    E("jcNo").textContent = "Adım " + k + " / " + (nSteps() - 1);
+    E("jcBack").disabled = k === 0;
+    E("jcStep").disabled = k >= nSteps() - 1 || !!q;
+    E("jcEnd").disabled = k >= nSteps() - 1 || !!q;
+    E("jcPlay").textContent = timer ? "Duraklat" : "Oynat";
+    E("jcOk").textContent = score.ok; E("jcBad").textContent = score.bad;
+  }
+  E("jcWhy").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-a]"), q = pendingQ(); if (!b || !q) return;
+    var g = b.getAttribute("data-a") === "1", ok = g === q.ans;
+    if (ok) score.ok++; else score.bad++;
+    asked[q.id] = true;
+    k++;
+    var nm = tab === 1 ? ROWS[q.row][1] : lineTxt(q.ins);
+    msg = (ok ? '<span class="good">Doğru:</span> ' : '<span class="bad">Yanlış:</span> ') + nm + ' ' + (q.ans ? 'atlar' : 'atlamaz') + '. ';
+    draw(); msg = "";
+    E("jcStep").focus();
+  });
+  function go(d) {
+    if (d > 0 && pendingQ()) return;
+    k = Math.max(0, Math.min(nSteps() - 1, k + d)); draw();
+  }
+  function stop() { clearInterval(timer); timer = null; }
+  function delay() { return [1600, 1100, 700, 420, 220][E("jcSpeed").value - 1]; }
+  function play() {
+    if (timer) { stop(); draw(); return; }
+    if (k >= nSteps() - 1) k = 0;
+    timer = setInterval(function () {
+      if (pendingQ() || k >= nSteps() - 1) { stop(); draw(); return; }
+      go(1);
+      if (pendingQ() || k >= nSteps() - 1) { stop(); draw(); }
+    }, delay());
+    draw();
+  }
+  function err(t) { stop(); E("jcWhy").innerHTML = '<span class="bad">' + t + "</span>"; }
+  function setW(n) { w = n; E("jcW8").setAttribute("aria-pressed", String(n === 8)); E("jcW16").setAttribute("aria-pressed", String(n === 16)); }
+  function sync() { E("jcA").value = hx(A, w); E("jcB").value = hx(B, w); }
+  function apply() {
+    var a = parseNum(E("jcA").value, w), b = parseNum(E("jcB").value, w);
+    if (a.err || b.err) { err(a.err || b.err); return; }
+    A = a.v; B = b.v; E("jcEx").value = ""; compute();
+  }
+  function rand() {
+    var m = w === 8 ? 0xFF : 0xFFFF, p = Math.random();
+    A = Math.floor(Math.random() * (m + 1)); B = p < 0.2 ? A : Math.floor(Math.random() * (m + 1));
+    E("jcEx").value = ""; sync(); compute();
+  }
+  function setTab(n) {
+    stop(); tab = n;
+    E("jcT1").setAttribute("aria-selected", String(n === 1)); E("jcT2").setAttribute("aria-selected", String(n === 2));
+    E("jcS1").classList.toggle("hide", n !== 1); E("jcP1").classList.toggle("hide", n !== 1);
+    E("jcS2").classList.toggle("hide", n !== 2); E("jcP2").classList.toggle("hide", n !== 2);
+    if (n === 1) compute(); else { buildProg(); draw(); }
+  }
+  function syncProg() {
+    E("jcJBox").classList.toggle("hide", prog !== "cmp");
+    var n = E("jcN");
+    if (prog === "cmp") { E("jcNLab").textContent = "BX başlangıcı (−6…1)"; n.min = -6; n.max = 1; }
+    else { E("jcNLab").textContent = "CX başlangıcı (1–8)"; n.min = 1; n.max = 8; }
+    n.value = N[prog];
+  }
+  function apply2() {
+    var v = parseInt(E("jcN").value, 10), lo = prog === "cmp" ? -6 : 1, hi = prog === "cmp" ? 1 : 8;
+    if (isNaN(v) || v < lo || v > hi) { err("Başlangıç değeri " + lo + " ile " + hi + " arasında olmalı."); return; }
+    N[prog] = v; J = E("jcJ").value; stop(); buildProg(); draw();
+  }
+  EXAMPLES.forEach(function (x, i) { var o = document.createElement("option"); o.value = i; o.textContent = x[3]; E("jcEx").appendChild(o); });
+  E("jcEx").addEventListener("change", function () {
+    if (E("jcEx").value === "") return;
+    var x = EXAMPLES[+E("jcEx").value]; setW(x[0]); A = x[1]; B = x[2]; sync(); compute();
+  });
+  E("jcT1").addEventListener("click", function () { setTab(1); });
+  E("jcT2").addEventListener("click", function () { setTab(2); });
+  E("jcW8").addEventListener("click", function () { if (w === 8) return; setW(8); A &= 0xFF; B &= 0xFF; sync(); compute(); });
+  E("jcW16").addEventListener("click", function () { if (w === 16) return; setW(16); sync(); compute(); });
+  E("jcApply").addEventListener("click", apply);
+  ["jcA", "jcB"].forEach(function (id) { E(id).addEventListener("keydown", function (e) { if (e.key === "Enter") apply(); }); });
+  E("jcRand").addEventListener("click", rand);
+  E("jcProg").addEventListener("change", function () { prog = E("jcProg").value; syncProg(); apply2(); });
+  E("jcJ").addEventListener("change", apply2);
+  E("jcN").addEventListener("change", apply2);
+  E("jcApply2").addEventListener("click", apply2);
+  E("jcStep").addEventListener("click", function () { stop(); go(1); });
+  E("jcBack").addEventListener("click", function () { stop(); go(-1); });
+  E("jcEnd").addEventListener("click", function () { stop(); while (k < nSteps() - 1 && !pendingQ()) k++; draw(); });
+  E("jcReset").addEventListener("click", function () { stop(); k = 0; asked = {}; draw(); });
+  E("jcPlay").addEventListener("click", play);
+  E("jcSpeed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  E("jcQuiz").addEventListener("change", function () { stop(); k = 0; asked = {}; draw(); });
+  root.addEventListener("keydown", function (ev) {
+    if (/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName)) return;
+    if (ev.key === "ArrowRight") { stop(); go(1); ev.preventDefault(); }
+    else if (ev.key === "ArrowLeft") { stop(); go(-1); ev.preventDefault(); }
+  });
+  syncProg(); compute();
+})();
+</script>
+<script src="deck/oyun.js"></script>

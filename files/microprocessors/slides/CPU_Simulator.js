@@ -1,6 +1,7 @@
 /* CPU Simulator: 8-bit accumulator CPU, five-phase micro-steps */
 (function () {
 'use strict';
+if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
 if (!document.getElementById('cpu-sim')) return;
 const $ = id => document.getElementById(id);
 const EXAMPLES = {
@@ -230,8 +231,11 @@ function assemble() {
 }
 
 function message(t, error = false) {
-  $('message').textContent = t;
-  $('message').classList.toggle('error', error);
+  for (const id of ['message', 'editMsg']) {
+    $(id).textContent = t;
+    $(id).classList.toggle('error', error);
+  }
+  $('message').title = t;
 }
 
 function micro() {
@@ -429,7 +433,7 @@ function micro() {
     if (op === 'IN') s.input.shift();
     if (p.halt) s.halted = true;
     s.count++;
-    s.trace.push(String(s.at).padStart(3, '0') + '  ' + s.ir.text.padEnd(10) + ' ACC=' + fmt(s.acc) + ' Z' + s.z + ' N' + s.n + ' C' + s.c);
+    s.trace.push(String(s.at).padStart(3, '0') + ' ' + s.ir.text.padEnd(9) + 'ACC=' + fmt(s.acc));
     if (s.trace.length > 100) s.trace.shift();
     s.text = 'Committed ' + s.ir.text + '. ' + (s.halted ? 'CPU halted.' : p.store ? 'RAM[' + p.store[0] + '] ← ' + p.store[1] + '.' : 'Next PC = ' + s.pc + '.');
   }
@@ -478,6 +482,19 @@ function run() {
   tick();
 }
 
+const LIST_ROWS = 7;
+
+/* keep only the newest items that fit in a short fixed-size box */
+function tail(items, max) {
+  let out = '';
+  for (let i = items.length - 1; i >= 0; i--) {
+    const next = items[i] + (out ? '  ' + out : '');
+    if (next.length > max) return '… ' + out;
+    out = next;
+  }
+  return out;
+}
+
 function render() {
   if (!s) return;
   for (const id of ['Program', 'PC', 'IR', 'Control', 'RAM', 'ACC', 'Operand', 'ALU', 'Flags', 'Output']) $('n' + id).classList.toggle('active', s.active.includes(id));
@@ -486,8 +503,8 @@ function render() {
   $('vPC').textContent = fmt(s.pc);
   $('vIR').textContent = s.ir ? s.ir.text : '—';
   $('vControl').textContent = ['FETCH', 'DECODE', 'OPERAND', 'EXECUTE', 'WRITE BACK'][s.last] || 'READY';
-  $('vMAR').textContent = 'MAR: ' + fmt(s.mar);
-  $('vMDR').textContent = 'MDR: ' + fmt(s.mdr);
+  $('vMAR').textContent = fmt(s.mar);
+  $('vMDR').textContent = fmt(s.mdr);
   const ramStart = Math.floor((s.mar ?? selected) / 8) * 8;
   for (let i = 0; i < 8; i++) {
     const address = ramStart + i;
@@ -499,25 +516,32 @@ function render() {
   $('vACC').textContent = fmt(s.acc);
   $('vOperand').textContent = fmt(s.operand);
   $('vResult').textContent = s.pending?.result === undefined ? '—' : fmt(s.pending.result);
-  $('vFlags').textContent = 'Z ' + s.z + ' · N ' + s.n + ' · C ' + s.c;
+  $('vFlags').textContent = 'Z ' + s.z + '  N ' + s.n + '  C ' + s.c;
   $('vOutput').textContent = fmt(s.output.at(-1));
-  $('status').textContent = dirty ? 'Reassemble' : s.fault ? 'Fault' : s.halted ? 'Halted' : s.waiting ? 'Waiting' : running ? 'Running' : 'Paused';
-  $('explanation').textContent = s.text;
+  $('status').textContent = dirty ? 'Reassemble' : s.fault ? 'Fault' : s.halted ? 'Halted' : s.waiting ? 'Waiting' : running ? 'Running' : s.ticks ? 'Paused' : 'Ready';
+  const help = $('exampleHelp').textContent;
+  $('explanation').textContent = s.ticks === 0 && !s.fault && !s.waiting && help && !dirty ? help + ' Press Micro-step to begin.' : s.text;
   [...$('phases').children].forEach((el, i) => el.classList.toggle('active', i === s.last));
   $('count').textContent = s.count;
   $('ticks').textContent = s.ticks;
   $('binary').textContent = s.acc.toString(2).padStart(8, '0');
   $('signed').textContent = s.acc > 127 ? s.acc - 256 : s.acc;
-  $('output').textContent = s.output.length ? s.output.map(fmt).join('  ') : 'No output yet.';
+  $('output').textContent = s.output.length ? tail(s.output.map(fmt), 24) : 'No output yet.';
+  $('output').title = s.output.map(fmt).join('  ');
   $('queued').textContent = 'Input queue: ' + (s.input.length ? s.input.map(fmt).join(', ') : 'empty');
-  $('trace').textContent = s.trace.join('\n') || 'Waiting for the first instruction.';
-  $('trace').scrollTop = $('trace').scrollHeight;
+  $('queued').title = $('queued').textContent;
+  $('trace').textContent = s.trace.slice(-3).join('\n') || 'Waiting for the first\ninstruction.';
+  /* listing: a fixed window of rows around the current instruction */
+  const cur = s.phase === 0 ? s.pc : s.at;
+  const first = Math.max(0, Math.min(cur - 2, program.length - LIST_ROWS));
   $('listing').replaceChildren();
-  program.forEach((ins, i) => {
+  program.slice(first, first + LIST_ROWS).forEach((ins, k) => {
+    const i = first + k;
     const row = document.createElement('tr');
-    row.className = i === (s.phase === 0 ? s.pc : s.at) ? 'current' : '';
+    row.className = i === cur ? 'current' : '';
     const td = document.createElement('td'),
       bt = document.createElement('button');
+    bt.type = 'button';
     bt.className = 'break' + (breaks.has(i) ? ' set' : '');
     bt.textContent = breaks.has(i) ? '●' : '○';
     bt.setAttribute('aria-label', 'Toggle breakpoint at ' + i);
@@ -535,16 +559,23 @@ function render() {
     }
     $('listing').append(row);
   });
+  $('listHead').textContent = program.length > LIST_ROWS ? 'Instruction · ' + first + '–' + (first + LIST_ROWS - 1) + ' / ' + program.length : 'Instruction';
   $('memory').replaceChildren();
-  $('memory').style.gridTemplateColumns = $('format').value === 'bin' ? 'repeat(4,1fr)' : 'repeat(8,1fr)';
+  $('memory').classList.toggle('is-bin', $('format').value === 'bin');
   let start = Number($('page').value) || 0;
   for (let i = start; i < start + 32; i++) {
+    if (i % 8 === 0) {
+      const lab = document.createElement('span');
+      lab.className = 'rowlab';
+      lab.textContent = addr(i);
+      $('memory').append(lab);
+    }
     const bt = document.createElement('button');
+    bt.type = 'button';
     bt.className = 'cell' + (s.changed === i ? ' changed' : '') + (selected === i ? ' selected' : '');
     bt.setAttribute('aria-label', 'RAM address ' + i + ', value ' + s.ram[i]);
-    const sm = document.createElement('small');
-    sm.textContent = addr(i);
-    bt.append(sm, document.createTextNode(fmt(s.ram[i])));
+    bt.title = 'Address ' + addr(i);
+    bt.textContent = fmt(s.ram[i]);
     bt.onclick = () => {
       selected = i;
       $('memValue').value = s.ram[i];
@@ -580,7 +611,11 @@ $('back').onclick = () => {
   render();
 };
 $('reset').onclick = reset;
-$('assemble').onclick = assemble;
+$('assemble').onclick = () => {
+  assemble();
+  if (!dirty) closeEditor();
+};
+$('assembleStage').onclick = assemble;
 $('format').onchange = render;
 $('page').onchange = render;
 $('speed').oninput = () => {
@@ -618,6 +653,38 @@ $('queue').onclick = () => {
     message(e.message, true);
   }
 };
+
+/* source editor: a dialog outside the 800x600 stage */
+const editor = $('cpu-editor');
+document.body.appendChild(editor);
+
+function closeEditor() {
+  if (editor.open) editor.close();
+}
+$('edit').onclick = () => {
+  pause();
+  render();
+  editor.showModal();
+  $('source').focus();
+};
+editor.addEventListener('click', e => {
+  const r = editor.getBoundingClientRect();
+  const outside = e.target === editor && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom);
+  if (outside || e.target.closest('.agt-oyun__close')) closeEditor();
+});
+
+/* keyboard: → micro-step, Shift + → instruction, ← back */
+$('cpu-sim').addEventListener('keydown', e => {
+  if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+  if (e.key === 'ArrowRight') {
+    e.preventDefault();
+    if (e.shiftKey) instruction();
+    else micro();
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    $('back').click();
+  }
+});
 
 function example() {
   const ex = EXAMPLES[$('example').value];
