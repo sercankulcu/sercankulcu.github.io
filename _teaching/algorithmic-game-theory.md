@@ -26,6 +26,7 @@ Algorithmic game theory studies strategic interaction through the lens of comput
 The mathematics the course actually uses, reviewed with game examples: probability and expected value, summation and argmax, reading a payoff matrix, best responses, solving the indifference equation and reading a game tree.
 
 - [🖼️Sunum-Hazırlık (HTML)](../files/agt/slides/Bolum_00_Hazirlik.html)
+- [📄Sunum-Hazırlık (PDF)](../files/agt/pdf/Bolum_00_Hazirlik.pdf)
 - [📝Çalışma Soruları - Hazırlık (HTML)](../files/agt/slides/Bolum_00_Hazirlik_Calisma_Sorulari.html)
 
 ---
