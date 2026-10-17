@@ -21,6 +21,15 @@ Algorithmic game theory studies strategic interaction through the lens of comput
 
 ---
 
+## Chapter 0: Preparation
+
+The mathematics the course actually uses, reviewed with game examples: probability and expected value, summation and argmax, reading a payoff matrix, best responses, solving the indifference equation and reading a game tree.
+
+- [🖼️Sunum-Hazırlık (HTML)](../files/agt/slides/Bolum_00_Hazirlik.html)
+- [📝Çalışma Soruları - Hazırlık (HTML)](../files/agt/slides/Bolum_00_Hazirlik_Calisma_Sorulari.html)
+
+---
+
 ## Chapter 1: Game Theory Fundamentals
 
 Game theory is a mathematical framework used to analyze and understand strategic interactions between rational decision-makers. It provides a systematic way of studying situations where the outcome of one person's decision depends on the actions of others.
