@@ -38,7 +38,7 @@
       var help = head.querySelector(".agt-oyun__help");
       head.insertBefore(full, help || null);
       var label = function () {
-        var t = isFull() ? "Tam ekrandan çık" : "Tam ekran";
+        var t = isFull() ? "Tam ekrandan çık / Exit full screen" : "Tam ekran / Full screen";
         full.setAttribute("aria-label", t);
         full.title = t;
         full.setAttribute("aria-pressed", String(isFull()));
@@ -58,7 +58,7 @@
     var dlg = document.getElementById(btn.getAttribute("aria-controls"));
     if (!dlg) return;
     btn.setAttribute("aria-haspopup", "dialog");
-    if (!btn.getAttribute("aria-label")) btn.setAttribute("aria-label", "Açıklama ve kurallar");
+    if (!btn.getAttribute("aria-label")) btn.setAttribute("aria-label", "Açıklama ve kurallar / About and rules");
     /* dialog sahnenin dışında, belgenin kökünde dursun: ölçeklenmesin */
     document.body.appendChild(dlg);
     btn.addEventListener("click", function () {
