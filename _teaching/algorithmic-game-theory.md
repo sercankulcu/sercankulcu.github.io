@@ -81,6 +81,7 @@ Nash equilibrium is a profile of strategies in which no player gains by deviatin
 
 - [🖼️Sunum-Nash Dengesi (HTML)](../files/agt/slides/Bolum_03_Nash_Dengesi.html)
 - [📄Sunum-Nash Dengesi (PDF)](../files/agt/pdf/Bolum_03_Nash_Dengesi.pdf)
+- [📖Ders Notu - Nash Dengesi (HTML)](../files/agt/notlar/Bolum_03_Nash_Dengesi_Ders_Notu.html)
 - [📝Çalışma Soruları - Nash Dengesi (HTML)](../files/agt/slides/Bolum_03_Nash_Dengesi_Calisma_Sorulari.html)
 
 - [🕹️Prisoner's Dilemma (HTML)](../files/agt/slides/Chapter_03_Prisoners_Dilemma.html)
