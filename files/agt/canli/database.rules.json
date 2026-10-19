@@ -1,0 +1,75 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "rooms": {
+      "$kod": {
+        ".read": "auth != null && data.child('meta/sahip').val() === auth.uid",
+        ".write": "auth != null && !newData.exists() && (data.child('meta/sahip').val() === auth.uid || data.child('meta/olusturma').val() < now - 86400000)",
+        "meta": {
+          ".read": "auth != null",
+          ".write": "auth != null && (data.exists() ? data.child('sahip').val() === auth.uid : newData.child('sahip').val() === auth.uid)",
+          ".validate": "$kod.matches(/^[0-9]{4}$/) && newData.hasChildren(['oyun', 'durum', 'tur', 'sahip', 'olusturma'])",
+          "oyun": { ".validate": "newData.isString() && newData.val().matches(/^(ortalama|artirma|ikilem|oylama)$/) && (!data.exists() || data.val() === newData.val())" },
+          "durum": { ".validate": "newData.isString() && newData.val().matches(/^(bekliyor|acik|kapali|sonuc)$/)" },
+          "tur": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 1000" },
+          "sahip": { ".validate": "newData.isString() && newData.val() === auth.uid" },
+          "olusturma": { ".validate": "newData.isNumber() && newData.val() <= now + 60000" },
+          "ayar": {
+            "mod": { ".validate": "newData.isString() && newData.val().matches(/^(grup4|sinif)$/)" },
+            "tekrar": { ".validate": "newData.isBoolean()" },
+            "adaylar": {
+              "$i": { ".validate": "$i.matches(/^[0-2]$/) && newData.isString() && newData.val().length >= 1 && newData.val().length <= 20" }
+            },
+            "$diger": { ".validate": false }
+          },
+          "$diger": { ".validate": false }
+        },
+        "players": {
+          ".read": "auth != null",
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && root.child('rooms/' + $kod + '/meta').exists()",
+            ".validate": "newData.hasChildren(['ad', 'katilma'])",
+            "ad": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 24" },
+            "katilma": { ".validate": "newData.isNumber()" },
+            "$diger": { ".validate": false }
+          }
+        },
+        "answers": {
+          "$tur": {
+            "$uid": {
+              ".read": "auth != null && auth.uid === $uid",
+              ".write": "auth != null && auth.uid === $uid && newData.exists() && root.child('rooms/' + $kod + '/meta/durum').val() === 'acik' && root.child('rooms/' + $kod + '/players/' + $uid).exists() && !root.child('rooms/' + $kod + '/results/' + $tur).exists()",
+              ".validate": "newData.hasChild('zaman') && (newData.hasChild('sayi') || newData.hasChild('teklif') || newData.hasChild('secim') || newData.hasChild('sira'))",
+              "zaman": { ".validate": "newData.isNumber()" },
+              "sayi": { ".validate": "root.child('rooms/' + $kod + '/meta/oyun').val() === 'ortalama' && newData.isNumber() && newData.val() >= 0 && newData.val() <= 90" },
+              "teklif": { ".validate": "root.child('rooms/' + $kod + '/meta/oyun').val() === 'artirma' && newData.isNumber() && newData.val() >= 0 && newData.val() <= 200" },
+              "secim": { ".validate": "root.child('rooms/' + $kod + '/meta/oyun').val() === 'ikilem' && newData.isString() && newData.val().matches(/^(S|I)$/)" },
+              "sira": { ".validate": "root.child('rooms/' + $kod + '/meta/oyun').val() === 'oylama' && newData.isString() && newData.val().matches(/^(012|021|102|120|201|210)$/)" },
+              "$diger": { ".validate": false }
+            }
+          }
+        },
+        "private": {
+          "$uid": {
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": "auth != null && root.child('rooms/' + $kod + '/meta/sahip').val() === auth.uid",
+            ".validate": "newData.hasChildren(['deger', 'tur'])",
+            "deger": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100" },
+            "tur": { ".validate": "newData.isNumber()" },
+            "$diger": { ".validate": false }
+          }
+        },
+        "pairs": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('rooms/' + $kod + '/meta/sahip').val() === auth.uid"
+        },
+        "results": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('rooms/' + $kod + '/meta/sahip').val() === auth.uid"
+        },
+        "$diger": { ".validate": false }
+      }
+    }
+  }
+}

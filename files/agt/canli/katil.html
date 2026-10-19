@@ -1,0 +1,343 @@
+---
+layout: without-sidebar
+title: "Canlı Oyuna Katıl / Join a Live Game"
+permalink: /files/agt/canli/katil.html
+excerpt: "Algoritmik Oyun Kuramı canlı sınıf oyunlarına telefonla katılma sayfası: oda kodu ve isteğe bağlı takma adla, hesap açmadan."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="canli.css">
+
+<div class="canli canli--ogrenci" id="uygulama">
+  <header class="ust">
+    <b id="ustOyun">Canlı Oyun</b>
+    <span class="rozet test" id="testRozet" hidden>Test</span>
+    <span class="bosluk"></span>
+    <span id="ustKim"></span>
+  </header>
+
+  <main id="ekran" aria-live="polite">
+    <p class="durum-yazi">Bağlanıyor…</p>
+  </main>
+</div>
+
+<script src="firebase-config.js"></script>
+<script src="canli.js"></script>
+<script>
+(function () {
+  'use strict';
+  var C = window.Canli;
+  var $ = function (id) { return document.getElementById(id); };
+  /* uygulama sitenin sayfa düzeninden çıkarılıp belgenin köküne taşınır: tüm pencereyi kaplasın */
+  document.body.appendChild($('uygulama'));
+  document.documentElement.style.overflow = 'hidden';
+  var e = C.kacis, b = C.bicim;
+  var DEPO = 'canli-ogrenci';
+  var K = null, kod = null, uid = null, meta = null, oyuncular = {};
+  var cevap = null, ozel = null, es = null, sonuc = null;
+  var duzenle = false, secim = [], mesaj = '', sonAnahtar = '';
+  var metaAbone = null, oyuncuAbone = null, turAbone = [], dinlenenTur = null;
+
+  /* test modunda bütün sekmeler aynı localStorage'ı paylaşır: her sekme (öğrenci) kendi sessionStorage'ını kullanır */
+  function depo(v) {
+    try {
+      var d = K && K.tur === 'test' ? sessionStorage : localStorage;
+      if (v === undefined) return JSON.parse(d.getItem(DEPO)) || {};
+      d.setItem(DEPO, JSON.stringify(v));
+    } catch (err) { return {}; }
+  }
+  function ekran(html) { $('ekran').innerHTML = html; }
+  function urlOda() {
+    var m = /[?&]oda=(\d{4})(&|$)/.exec(location.search);
+    return m ? m[1] : null;
+  }
+
+  C.baglan().then(function (k) {
+    if (!k) {
+      ekran('<h1>Kurulum tamamlanmadı</h1><p>Canlı oyunlar henüz bu sitede etkin değil. Öğretmeninize haber verin.</p><p><a href="KURULUM">Kurulum kılavuzu</a></p>');
+      return;
+    }
+    K = k; uid = K.uid;
+    $('testRozet').hidden = K.tur !== 'test';
+    var d = depo(), oda = urlOda();
+    if (oda && d.kod === oda) {
+      K.get('rooms/' + oda + '/players/' + uid).then(function (p) {
+        if (p) { kod = oda; dinle(); } else girisFormu(oda, d.ad);
+      }, function () { girisFormu(oda, d.ad); });
+    } else girisFormu(oda, d.ad);
+  }, function (err) {
+    console.error(err);
+    ekran('<h1>Bağlantı kurulamadı</h1><p class="hata">' + e(err && (err.code || err.message) || err) + '</p>');
+  });
+
+  /* ---------- katılma ---------- */
+  function girisFormu(oda, eskiAd, hata) {
+    $('ustOyun').textContent = 'Canlı Oyun';
+    $('ustKim').textContent = '';
+    ekran('<h1>Oyuna katıl</h1>' +
+      '<form id="katilForm" class="alan" novalidate>' +
+      (oda ? '<p class="buyuk" aria-label="Oda kodu ' + oda + '">Oda ' + oda + '</p>' :
+        '<label for="odaGir">Oda kodu</label><input id="odaGir" class="kod-giris" inputmode="numeric" autocomplete="off" maxlength="4" pattern="[0-9]*" placeholder="0000">') +
+      '<label for="adGir">Takma ad <span class="ipucu">(isteğe bağlı)</span></label>' +
+      '<input id="adGir" type="text" maxlength="24" autocomplete="off" value="' + e(eskiAd || '') + '" placeholder="Öğrenci">' +
+      '<p class="hata" id="girisHata" role="alert">' + e(hata || '') + '</p>' +
+      '<button type="submit" class="birincil" id="katilBtn">Katıl</button>' +
+      '<p class="ipucu orta">Yalnızca takma ad saklanır; gerçek adınızı yazmanız gerekmez.</p>' +
+      '</form>');
+    $('katilForm').addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var k = oda || ($('odaGir').value || '').trim();
+      var a = ($('adGir').value || '').trim().slice(0, 24);
+      if (!/^\d{4}$/.test(k)) { $('girisHata').textContent = 'Oda kodu 4 haneli bir sayıdır.'; return; }
+      $('katilBtn').disabled = true;
+      K.get('rooms/' + k + '/meta').then(function (m) {
+        if (!m) { girisFormu(oda, a, 'Bu kodla açık bir oda yok.'); return; }
+        return K.get('rooms/' + k + '/players').then(function (p) {
+          var ad = a || 'Öğrenci ' + (Object.keys(p || {}).length + 1);
+          return K.set('rooms/' + k + '/players/' + uid, { ad: ad, katilma: Date.now() }).then(function () {
+            depo({ kod: k, ad: a });
+            kod = k;
+            dinle();
+          });
+        });
+      }).catch(function (err) {
+        console.error(err);
+        girisFormu(oda, a, 'Katılınamadı: ' + (err && (err.code || err.message) || err));
+      });
+    });
+    var ilk = oda ? $('adGir') : $('odaGir');
+    if (ilk) ilk.focus();
+  }
+
+  /* ---------- dinleme ---------- */
+  function dinle() {
+    metaAbone = K.on('rooms/' + kod + '/meta', function (m) {
+      if (!m) { kapandi(); return; }
+      if (dinlenenTur !== m.tur) turDinle(m, m.tur);
+      if (!meta || meta.durum !== m.durum || meta.tur !== m.tur) { duzenle = false; mesaj = ''; }
+      meta = m;
+      ciz();
+    });
+    oyuncuAbone = K.on('rooms/' + kod + '/players', function (p) { oyuncular = p || {}; if (meta) ciz(); });
+  }
+
+  function turDinle(m, t) {
+    turAbone.forEach(function (f) { f(); });
+    turAbone = [];
+    dinlenenTur = t;
+    cevap = ozel = es = sonuc = null;
+    secim = [];
+    var yol = 'rooms/' + kod + '/';
+    turAbone.push(K.on(yol + 'answers/' + t + '/' + uid, function (v) { cevap = v; if (meta) ciz(); }));
+    turAbone.push(K.on(yol + 'results/' + t, function (v) { sonuc = v; if (meta) ciz(); }));
+    if (m.oyun === 'artirma') turAbone.push(K.on(yol + 'private/' + uid, function (v) { ozel = v; if (meta) ciz(); }));
+    if (m.oyun === 'ikilem') turAbone.push(K.on(yol + 'pairs/' + t + '/' + uid, function (v) { es = v; if (meta) ciz(); }));
+  }
+
+  function kapandi() {
+    [metaAbone, oyuncuAbone].concat(turAbone).forEach(function (f) { if (f) f(); });
+    turAbone = []; meta = null; dinlenenTur = null; sonAnahtar = '';
+    $('ustOyun').textContent = 'Canlı Oyun';
+    ekran('<h1>Oda kapandı</h1><p class="durum-yazi">Öğretmen bu odayı kapattı.</p><button type="button" class="birincil" id="yeniOda">Başka odaya katıl</button>');
+    $('yeniOda').addEventListener('click', function () { kod = null; girisFormu(null, depo().ad); });
+  }
+
+  /* ---------- çizim ---------- */
+  function adOf(u) {
+    if (u === C.PC) return 'bilgisayar (Tit-for-Tat)';
+    return (oyuncular[u] && oyuncular[u].ad) || 'Öğrenci';
+  }
+  function ozelGecerli() { return ozel && ozel.tur === meta.tur; }
+
+  function ciz() {
+    var anahtar = JSON.stringify([meta, cevap, ozelGecerli() ? ozel : null, es, es ? adOf(es) : '', sonuc ? 1 : 0, duzenle, secim, mesaj,
+      oyuncular[uid] && oyuncular[uid].ad]);
+    if (anahtar === sonAnahtar) return;
+    sonAnahtar = anahtar;
+    var o = C.OYUNLAR[meta.oyun];
+    $('ustOyun').textContent = o.ad;
+    $('ustKim').textContent = 'Oda ' + kod + ' · ' + adOf(uid);
+    var d = meta.durum;
+    if (d === 'bekliyor') {
+      ekran('<h1 class="orta">' + e(o.ad) + '</h1><p class="durum-yazi">Tur ' + meta.tur + ' bekleniyor…</p>' +
+        '<p class="ipucu orta">Öğretmen turu başlatınca soru burada görünür.</p>');
+    } else if (d === 'acik') {
+      if (cevap && !duzenle) gonderildi(true); else form();
+    } else if (d === 'kapali') {
+      if (cevap) gonderildi(false);
+      else ekran('<h1 class="orta">Cevaplar kapandı</h1><p class="durum-yazi">Bu turda cevap vermedin. Sonraki turu bekle.</p>');
+    } else sonucCiz();
+  }
+
+  function cevapMetni(c) {
+    if (!c) return '–';
+    if (meta.oyun === 'ortalama') return b(c.sayi);
+    if (meta.oyun === 'artirma') return b(c.teklif) + ' TL';
+    if (meta.oyun === 'ikilem') return C.SECIM_AD[c.secim];
+    return e(C.siraMetni(c.sira, adaylar()));
+  }
+
+  function adaylar() {
+    var a = C.dizi(meta.ayar && meta.ayar.adaylar);
+    return a.length === 3 ? a : ['A', 'B', 'C'];
+  }
+
+  function gonderildi(acik) {
+    ekran('<h1 class="orta">' + (acik ? 'Cevabın gönderildi' : 'Cevaplar kapandı') + '</h1>' +
+      '<div class="kart iyi orta"><p class="ipucu">Cevabın</p><p class="buyuk">' + cevapMetni(cevap) + '</p></div>' +
+      '<p class="durum-yazi">Sonuçlar bekleniyor…</p>' +
+      (acik ? '<button type="button" id="degistir">Değiştir</button>' : ''));
+    if (acik) $('degistir').addEventListener('click', function () {
+      duzenle = true;
+      secim = meta.oyun === 'oylama' && cevap.sira ? cevap.sira.split('').map(Number) : [];
+      ciz();
+    });
+  }
+
+  function gonder(veri) {
+    veri.zaman = Date.now();
+    mesaj = '';
+    K.set('rooms/' + kod + '/answers/' + meta.tur + '/' + uid, veri).then(function () {
+      duzenle = false; ciz();
+    }, function (err) {
+      console.error(err);
+      mesaj = 'Gönderilemedi: cevaplar kapanmış olabilir.';
+      ciz();
+    });
+  }
+
+  function sayiFormu(baslik, ust, eskisi) {
+    return baslik + '<form id="sayiForm" class="alan" novalidate>' +
+      '<label for="sayiGir">' + ust + '</label>' +
+      '<input id="sayiGir" type="text" inputmode="decimal" autocomplete="off" value="' + (eskisi == null ? '' : e(String(eskisi).replace('.', ','))) + '">' +
+      '<p class="hata" id="formHata" role="alert">' + e(mesaj) + '</p>' +
+      '<button type="submit" class="birincil">Gönder</button></form>';
+  }
+
+  function sayiBagla(alan, max) {
+    $('sayiForm').addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var v = C.sayiOku($('sayiGir').value);
+      if (!(v >= 0 && v <= max)) { $('formHata').textContent = '0 ile ' + max + ' arasında bir sayı yaz (ondalık için virgül).'; return; }
+      var o = {}; o[alan] = Math.round(v * 100) / 100;
+      gonder(o);
+    });
+    $('sayiGir').focus();
+  }
+
+  function form() {
+    var m = meta;
+    if (m.oyun === 'ortalama') {
+      ekran(sayiFormu('<h1>Bir sayı seç</h1><p class="soru-metni">0 ile 90 arasında bir sayı yaz (tam ya da ondalıklı). Tüm sayıların <b>ortalamasının 2/3\'üne</b> en yakın sayı kazanır; eşitlikte kazanç paylaşılır.</p>',
+        'Sayın (0–90)', cevap && cevap.sayi));
+      sayiBagla('sayi', C.ORT_MAX);
+    } else if (m.oyun === 'artirma') {
+      if (!ozelGecerli()) { ekran('<p class="durum-yazi">Değerin hazırlanıyor…</p>'); return; }
+      ekran(sayiFormu('<div class="kart orta"><p class="ipucu">Nesnenin sana değeri</p><p class="buyuk">Değerin ' + b(ozel.deger) + ' TL</p></div>' +
+        '<p class="soru-metni">Kapalı zarfa teklifini yaz. En yüksek teklif kazanır. Sonuç iki kuralla hesaplanır: <b>birinci fiyat</b> (kendi teklifini ödersin) ve <b>ikinci fiyat</b> (ikinci en yüksek teklifi ödersin). Kazanç = değer − ödenen fiyat.</p>',
+        'Teklifin (0–200 TL)', cevap && cevap.teklif));
+      sayiBagla('teklif', C.TEKLIF_MAX);
+    } else if (m.oyun === 'ikilem') {
+      if (!es) { ekran('<p class="durum-yazi">Eşleşme bekleniyor…</p>'); return; }
+      ekran('<h1>Rakibin: ' + e(adOf(es)) + '</h1>' +
+        '<p class="soru-metni">Rakibinin seçimini bilmeden seç. Hücrede (sen, rakip) kazanç = −(hapis yılı): büyük sayı iyidir.</p>' +
+        '<table class="mini"><tr><th></th><th>Rakip Sessiz</th><th>Rakip İhanet</th></tr>' +
+        '<tr><th>Sen Sessiz</th><td>(−1, −1)</td><td>(−3, 0)</td></tr><tr><th>Sen İhanet</th><td>(0, −3)</td><td>(−2, −2)</td></tr></table>' +
+        '<p class="hata" role="alert">' + e(mesaj) + '</p>' +
+        '<div class="iki"><button type="button" id="secS" class="birincil">Sessiz</button><button type="button" id="secI">İhanet</button></div>');
+      $('secS').addEventListener('click', function () { gonder({ secim: 'S' }); });
+      $('secI').addEventListener('click', function () { gonder({ secim: 'I' }); });
+    } else {
+      var A = adaylar();
+      ekran('<h1>Adayları sırala</h1><p class="soru-metni">En çok tercih ettiğin adaydan başlayarak sırayla dokun.</p>' +
+        '<div class="adaylar">' + A.map(function (a, i) {
+          var yer = secim.indexOf(i);
+          return '<button type="button" data-aday="' + i + '" aria-pressed="' + (yer >= 0) + '"' + (yer >= 0 ? ' disabled' : '') + '>' + e(a) + '</button>';
+        }).join('') + '</div>' +
+        '<ol class="sira-listesi" aria-label="Sıralaman">' + [0, 1, 2].map(function (k) {
+          var c = secim[k];
+          return '<li class="' + (c != null ? 'dolu' : '') + '"><span>' + (k + 1) + '.</span> ' + (c != null ? e(A[c]) : '') + '</li>';
+        }).join('') + '</ol>' +
+        '<p class="hata" role="alert">' + e(mesaj) + '</p>' +
+        '<div class="alt-dugmeler"><button type="button" id="sifirla">Sıfırla</button><button type="button" id="oyGonder" class="birincil"' + (secim.length === 3 ? '' : ' disabled') + '>Gönder</button></div>');
+      Array.prototype.forEach.call(document.querySelectorAll('[data-aday]'), function (btn) {
+        btn.addEventListener('click', function () {
+          secim.push(+btn.getAttribute('data-aday'));
+          if (secim.length === 2) [0, 1, 2].forEach(function (c) { if (secim.indexOf(c) < 0) secim.push(c); });
+          ciz();
+          if ($('oyGonder') && !$('oyGonder').disabled) $('oyGonder').focus();
+          else { var s = document.querySelector('[data-aday]:not([disabled])'); if (s) s.focus(); }
+        });
+      });
+      $('sifirla').addEventListener('click', function () { secim = []; ciz(); });
+      $('oyGonder').addEventListener('click', function () { gonder({ sira: secim.join('') }); });
+    }
+  }
+
+  /* ---------- sonuç ---------- */
+  function satir(etiket, deger) { return '<dt>' + etiket + '</dt><dd>' + deger + '</dd>'; }
+  function adlar(ids) { return C.dizi(ids).map(function (u) { return e((sonuc.adlar && sonuc.adlar[u]) || 'Öğrenci'); }).join(', '); }
+
+  function sonucCiz() {
+    if (!sonuc) { ekran('<p class="durum-yazi">Sonuçlar hesaplanıyor…</p>'); return; }
+    if (!sonuc.n) { ekran('<h1 class="orta">Tur ' + meta.tur + '</h1><p class="durum-yazi">Bu turda hiç cevap gelmedi.</p>'); return; }
+    var k = sonuc.kisi && sonuc.kisi[uid], m = meta.oyun, h = '';
+    if (m === 'ortalama') {
+      var kaz = C.dizi(sonuc.kazananlar);
+      if (k) h += '<div class="kart orta ' + (k.kazandi ? 'iyi' : 'kotu') + '"><p class="buyuk">' + (k.kazandi ? (kaz.length > 1 ? 'Kazancı paylaştın!' : 'Kazandın!') : 'Bu tur kazanamadın') + '</p>' +
+        (k.kazandi && kaz.length > 1 ? '<p>' + kaz.length + ' kişi eşit uzaklıkta.</p>' : '') + '</div>';
+      h += '<dl class="satirlar kart">' + (k ? satir('Senin sayın', b(k.sayi)) : '') +
+        satir('Ortalama', b(sonuc.ortalama)) + satir('Hedef (2/3 × ortalama)', b(sonuc.hedef)) +
+        (k ? satir('Hedefe uzaklığın', b(k.fark)) : '') +
+        satir(kaz.length > 1 ? 'Kazananlar' : 'Kazanan', adlar(kaz) + ' (' + kaz.map(function (u) { return b(sonuc.kisi[u].sayi); }).join(', ') + ')') + '</dl>';
+    } else if (m === 'artirma') {
+      if (k) {
+        var kural = function (ad, x) {
+          return '<div class="kart ' + (x.kazandi ? 'iyi' : '') + '"><b>' + ad + '</b>: ' +
+            (x.kazandi ? 'kazandın, ' + b(x.fiyat) + ' TL ödersin.<br>Kazancın: <b>' + b(x.kazanc) + ' TL</b>' : 'kaybettin. Kazancın: <b>0 TL</b>') + '</div>';
+        };
+        h += '<dl class="satirlar kart">' + satir('Değerin', b(k.deger) + ' TL') + satir('Teklifin', b(k.teklif) + ' TL') +
+          satir(sonuc.mod === 'sinif' ? 'Açık artırma' : 'Grubun', sonuc.mod === 'sinif' ? 'tüm sınıf (' + k.boy + ' kişi)' : k.grup + '. grup (' + k.boy + ' kişi)') + '</dl>' +
+          kural('Birinci fiyat', k.birinci) + kural('İkinci fiyat', k.ikinci);
+      } else h += '<p class="durum-yazi">Bu turda teklif vermedin.</p>';
+      h += '<p class="ipucu orta">Satıcı geliri: birinci fiyat ' + b(sonuc.gelir.birinci) + ' TL, ikinci fiyat ' + b(sonuc.gelir.ikinci) + ' TL</p>';
+    } else if (m === 'ikilem') {
+      if (k) {
+        h += '<div class="kart orta ' + (k.kazanc >= -1 ? 'iyi' : 'kotu') + '"><p>Sen: <b>' + C.SECIM_AD[k.secim] + '</b> · Rakibin (' + e(k.rakip === C.PC ? 'bilgisayar' : (sonuc.adlar && sonuc.adlar[k.rakip]) || 'Öğrenci') + '): <b>' + C.SECIM_AD[k.rakipSecim] + '</b></p>' +
+          '<p class="buyuk">Kazancın ' + b(k.kazanc) + '</p><p>' + (k.kazanc === 0 ? 'serbest' : -k.kazanc + ' yıl hapis') + '</p></div>' +
+          '<dl class="satirlar kart">' + satir('Toplam kazancın', b(k.toplam)) + satir('Sınıf ortalaması', b(sonuc.ortKazanc)) + satir('Herkes sessiz kalsaydı', b(sonuc.herkesSessiz)) + '</dl>';
+      } else h += '<p class="durum-yazi">Bu turda seçim yapmadın.</p><dl class="satirlar kart">' + satir('Sınıf ortalaması', b(sonuc.ortKazanc)) + '</dl>';
+    } else {
+      var A = C.dizi(sonuc.adaylar);
+      var ad = function (l) { l = C.dizi(l); return l.length ? l.map(function (i) { return e(A[i]); }).join(' = ') : '–'; };
+      var cd = sonuc.condorcet !== null && sonuc.condorcet !== undefined ? e(A[sonuc.condorcet]) : (sonuc.dongu ? 'yok (döngü)' : 'yok');
+      if (k) h += '<div class="kart orta"><p class="ipucu">Senin sıralaman</p><p class="buyuk" style="font-size:30px">' + e(C.siraMetni(k.sira, A)) + '</p></div>';
+      h += '<dl class="satirlar kart">' + satir('Condorcet kazananı', cd) + satir('Çoğulluk', ad(sonuc.cogulluk.kazananlar)) +
+        satir('Borda sayımı', ad(sonuc.borda.kazananlar)) + satir('Anında ikinci tur', ad(sonuc.irv.kazananlar)) + satir('Seçmen', sonuc.n) + '</dl>';
+    }
+    ekran('<h1 class="orta">Tur ' + meta.tur + ' sonucu</h1>' + h);
+  }
+})();
+</script>
