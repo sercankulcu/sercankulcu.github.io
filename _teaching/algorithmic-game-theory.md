@@ -45,6 +45,9 @@ Before strategic interaction comes the single decision maker. Expected utility a
 - [🕹️Blackjack Decision Lab (HTML)](../files/agt/slides/Chapter_13_Blackjack.html)
 - [🕹️Poker: Hidden Information and Bluffing (HTML)](../files/agt/slides/Chapter_13_Poker.html)
 - [🕹️Backgammon: Expected Value under Chance (HTML)](../files/agt/slides/Chapter_13_Backgammon.html)
+- [🕹️Minesweeper: Reasoning under Uncertainty (HTML)](../files/agt/slides/Chapter_13_Minesweeper.html)
+- [🕹️Pişti: Hidden Information (HTML)](../files/agt/slides/Chapter_13_Pisti.html)
+- [🕹️Hokm: Trump Choice and Partnerships (HTML)](../files/agt/slides/Chapter_13_Hokm.html)
 
 ---
 
@@ -61,6 +64,13 @@ What a game is and how it is written down: players, strategies, payoffs and info
 - [🕹️Nim Game (HTML)](../files/agt/slides/Chapter_01_Nim.html)
 - [🕹️Don't Say 21 Game (HTML)](../files/agt/slides/Chapter_01_Dont-Say-21.html)
 - [🕹️Connect Four Game (HTML)](../files/agt/slides/Chapter_02_Connect-Four.html)
+- [🕹️Hex: Strategy Stealing (HTML)](../files/agt/slides/Chapter_02_Hex.html)
+- [🕹️Othello (Reversi) (HTML)](../files/agt/slides/Chapter_02_Othello.html)
+- [🕹️Mangala (HTML)](../files/agt/slides/Chapter_13_Mangala.html)
+- [🕹️Chess (HTML)](../files/agt/slides/Chapter_03_Chess.html)
+- [🕹️Checkers (HTML)](../files/agt/slides/Chapter_07_Checkers.html)
+- [🕹️Fox and Geese (HTML)](../files/agt/slides/Chapter_03_Fox-and-Geese.html)
+- [🕹️Nine Men's Morris (HTML)](../files/agt/slides/Chapter_03_Nine-Mens-Morris.html)
 
 ---
 
@@ -108,6 +118,7 @@ Auctions are the most widely used mechanisms for allocating goods and setting pr
 - [🕹️Dutch Auction Simulator (HTML)](../files/agt/slides/Chapter_05_dutch-auction-simulator.html)
 - [🕹️First-Price Sealed-Bid Auction Simulator (HTML)](../files/agt/slides/Chapter_05_first-price-auction-simulator.html)
 - [🕹️Double Auction Market (HTML)](../files/agt/slides/Chapter_05_Double-Auction-Market-Simulator.html)
+- [🕹️Monopoly: Property Auctions and Trading (optional) (HTML)](../files/agt/slides/Chapter_05_Monopoly.html)
 
 ---
 
@@ -229,22 +240,4 @@ Open problems at the edge of the field: AI agents and algorithmic collusion, mec
 - [📝Çalışma Soruları - Gelecek Yönelimler (HTML)](../files/agt/slides/Bolum_14_Gelecek_Calisma_Sorulari.html)
 
 - [🕹️AI Agent Strategy Tournament (HTML)](../files/agt/slides/Chapter_14_Ai-Agent-Strategy-Tournament.html)
-
----
-
-## 🎲 Extra Games
-
-More board and card games for practice outside class; most of them use minimax search, heuristics or reasoning under hidden information.
-
-- [Minesweeper](../files/agt/slides/Chapter_13_Minesweeper.html) · Chapter 1
-- [Pişti](../files/agt/slides/Chapter_13_Pisti.html) · Chapter 1
-- [Hokm](../files/agt/slides/Chapter_13_Hokm.html) · Chapter 1
-- [Othello (Reversi)](../files/agt/slides/Chapter_02_Othello.html) · Chapter 2
-- [Hex](../files/agt/slides/Chapter_02_Hex.html) · Chapter 2
-- [Mangala](../files/agt/slides/Chapter_13_Mangala.html) · Chapter 2
-- [Chess](../files/agt/slides/Chapter_03_Chess.html) · Chapter 2
-- [Checkers](../files/agt/slides/Chapter_07_Checkers.html) · Chapter 2
-- [Fox and Geese](../files/agt/slides/Chapter_03_Fox-and-Geese.html) · Chapter 2
-- [Nine Men's Morris](../files/agt/slides/Chapter_03_Nine-Mens-Morris.html) · Chapter 2
-- [Monopoly](../files/agt/slides/Chapter_05_Monopoly.html) · Chapter 5
-- [Age of Çotanak](../files/agt/slides/Chapter_14_Age-of-Cotanak.html) · Chapter 14
+- [🕹️Age of Çotanak: Territory Strategy and AI Evaluation (optional) (HTML)](../files/agt/slides/Chapter_14_Age-of-Cotanak.html)
