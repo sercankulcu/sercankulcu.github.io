@@ -30,6 +30,7 @@ The mathematics the course actually uses, reviewed with game examples: set and f
 
 - [🖼️Sunum-Hazırlık (HTML)](../files/agt/slides/Bolum_00_Hazirlik.html)
 - [📄Sunum-Hazırlık (PDF)](../files/agt/pdf/Bolum_00_Hazirlik.pdf)
+- [📖Ders Notu - Hazırlık (HTML)](../files/agt/notlar/Bolum_00_Hazirlik_Ders_Notu.html)
 - [📝Çalışma Soruları - Hazırlık (HTML)](../files/agt/slides/Bolum_00_Hazirlik_Calisma_Sorulari.html)
 
 ---
@@ -40,6 +41,7 @@ Before strategic interaction comes the single decision maker. Expected utility a
 
 - [🖼️Sunum-Karar Kuramı (HTML)](../files/agt/slides/Bolum_01_Karar_Kurami.html)
 - [📄Sunum-Karar Kuramı (PDF)](../files/agt/pdf/Bolum_01_Karar_Kurami.pdf)
+- [📖Ders Notu - Karar Kuramı (HTML)](../files/agt/notlar/Bolum_01_Karar_Kurami_Ders_Notu.html)
 - [📝Çalışma Soruları - Karar Kuramı (HTML)](../files/agt/slides/Bolum_01_Karar_Kurami_Calisma_Sorulari.html)
 
 - [🕹️Bayesian Decision Lab (HTML)](../files/agt/slides/Chapter_13_Bayesian-Decision-Lab.html)
@@ -58,6 +60,7 @@ What a game is and how it is written down: players, strategies, payoffs and info
 
 - [🖼️Sunum-Oyunlar ve Temsiller (HTML)](../files/agt/slides/Bolum_02_Oyunlar_ve_Temsiller.html)
 - [📄Sunum-Oyunlar ve Temsiller (PDF)](../files/agt/pdf/Bolum_02_Oyunlar_ve_Temsiller.pdf)
+- [📖Ders Notu - Oyunlar ve Temsiller (HTML)](../files/agt/notlar/Bolum_02_Oyunlar_ve_Temsiller_Ders_Notu.html)
 - [📝Çalışma Soruları - Oyunlar ve Temsiller (HTML)](../files/agt/slides/Bolum_02_Oyunlar_ve_Temsiller_Calisma_Sorulari.html)
 
 - [🕹️Guess 2/3 of the Average (HTML)](../files/agt/slides/Chapter_01_Guess_Average.html)
@@ -99,6 +102,7 @@ Mechanism design reverses the question: given a goal, which rules make self-inte
 
 - [🖼️Sunum-Mekanizma Tasarımı (HTML)](../files/agt/slides/Bolum_04_Mekanizma.html)
 - [📄Sunum-Mekanizma Tasarımı (PDF)](../files/agt/pdf/Bolum_04_Mekanizma.pdf)
+- [📖Ders Notu - Mekanizma Tasarımı (HTML)](../files/agt/notlar/Bolum_04_Mekanizma_Ders_Notu.html)
 - [📝Çalışma Soruları - Mekanizma Tasarımı (HTML)](../files/agt/slides/Bolum_04_Mekanizma_Calisma_Sorulari.html)
 
 - [🕹️Ultimatum Game (HTML)](../files/agt/slides/Chapter_04_Ultimatum-Game.html)
@@ -113,6 +117,7 @@ Auctions are the most widely used mechanisms for allocating goods and setting pr
 
 - [🖼️Sunum-Açık Artırmalar (HTML)](../files/agt/slides/Bolum_05_Acik_Arttirma.html)
 - [📄Sunum-Açık Artırmalar (PDF)](../files/agt/pdf/Bolum_05_Acik_Arttirma.pdf)
+- [📖Ders Notu - Açık Artırmalar (HTML)](../files/agt/notlar/Bolum_05_Acik_Arttirma_Ders_Notu.html)
 - [📝Çalışma Soruları - Açık Artırmalar (HTML)](../files/agt/slides/Bolum_05_Acik_Arttirma_Calisma_Sorulari.html)
 
 - [🕹️Second-Price Sealed-Bid Auction Simulator (HTML)](../files/agt/slides/Chapter_05_second-price-sealed-bid-auction.html)
@@ -130,6 +135,7 @@ Digital platforms bring self-interested users together and set the rules they pl
 
 - [🖼️Sunum-Çevrimiçi Platformlar (HTML)](../files/agt/slides/Bolum_06_Cevrimici_Platform.html)
 - [📄Sunum-Çevrimiçi Platformlar (PDF)](../files/agt/pdf/Bolum_06_Cevrimici_Platform.pdf)
+- [📖Ders Notu - Çevrimiçi Platformlar (HTML)](../files/agt/notlar/Bolum_06_Cevrimici_Platform_Ders_Notu.html)
 - [📝Çalışma Soruları - Çevrimiçi Platformlar (HTML)](../files/agt/slides/Bolum_06_Cevrimici_Platform_Calisma_Sorulari.html)
 
 - [🕹️Two-Sided Platform Pricing (HTML)](../files/agt/slides/Chapter_09_Two-Sided-Platform-Pricing.html)
