@@ -10,10 +10,10 @@
 
   /* ---------- sabitler ---------- */
   C.OYUNLAR = {
-    ortalama: { ad: '2/3 Ortalaması', en: '2/3 of the Average', bolum: 2 },
-    artirma: { ad: 'Kapalı Zarf Açık Artırma', en: 'Sealed-Bid Auction', bolum: 5 },
-    ikilem: { ad: 'Mahkûmun İkilemi', en: "Prisoner's Dilemma", bolum: 3 },
-    oylama: { ad: 'Condorcet Oylaması', en: 'Condorcet Voting', bolum: 7 }
+    ortalama: { ad: '2/3 Ortalaması', bolum: 2 },
+    artirma: { ad: 'Kapalı Zarf Açık Artırma', bolum: 5 },
+    ikilem: { ad: 'Mahkûmun İkilemi', bolum: 3 },
+    oylama: { ad: 'Condorcet Oylaması', bolum: 7 }
   };
   C.SIRA = ['ortalama', 'artirma', 'ikilem', 'oylama'];
   C.ORT_MAX = 90;        /* Bölüm 2: 0 ile 90 arasında bir sayı */

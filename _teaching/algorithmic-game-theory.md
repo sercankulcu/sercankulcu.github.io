@@ -13,20 +13,20 @@ Algorithmic game theory studies strategic interaction through the lens of comput
 
 ---
 
-## Preliminary Materials
+## Başlangıç Kaynakları
 
-* [Important People in Algorithmic Game Theory (HTML)](../files/agt/Algorithmic_Game_Theory_Important_People.html)
-* [Prerequisites for Algorithmic Game Theory (HTML)](../files/agt/Algorithmic_Game_Theory_Prerequisites.html)
-* [Terim Sözlüğü / Glossary (HTML)](../files/agt/sozluk.html)
-* [Canlı Sınıf Oyunları / Live Class Games (HTML)](../files/agt/canli/)
+* [Algoritmik Oyun Kuramında Önemli İsimler (HTML)](../files/agt/Algorithmic_Game_Theory_Important_People.html)
+* [Algoritmik Oyun Kuramı İçin Ön Bilgiler (HTML)](../files/agt/Algorithmic_Game_Theory_Prerequisites.html)
+* [Terim Sözlüğü (HTML)](../files/agt/sozluk.html)
+* [Canlı Sınıf Oyunları (HTML)](../files/agt/canli/)
 
 ---
 
-## Part I: Tools and Foundations
+## Kısım I: Araçlar ve Temeller
 
-### Chapter 0: Preparation
+### Bölüm 0: Hazırlık
 
-The mathematics the course actually uses, reviewed with game examples: set and function notation, summation, max and argmax, probability and expected value, the idea of a mixed strategy, reading a payoff matrix, best responses, solving the indifference equation and backward induction on a game tree.
+Derste gerçekten kullanılan matematik, oyun örnekleri üzerinden yeniden ele alınır: küme ve fonksiyon gösterimi, toplam sembolü, max ve argmax, olasılık ve beklenen değer, karışık strateji fikri, kazanç matrisinin okunması, en iyi tepki, kayıtsızlık denkleminin çözümü ve oyun ağacında geriye doğru çıkarım.
 
 - [🖼️Sunum-Hazırlık (HTML)](../files/agt/slides/Bolum_00_Hazirlik.html)
 - [📄Sunum-Hazırlık (PDF)](../files/agt/pdf/Bolum_00_Hazirlik.pdf)
@@ -35,225 +35,225 @@ The mathematics the course actually uses, reviewed with game examples: set and f
 
 ---
 
-### Chapter 1: Decision Theory
+### Bölüm 1: Karar Kuramı
 
-Before strategic interaction comes the single decision maker. Expected utility and the von Neumann–Morgenstern axioms, the uniqueness of the utility scale, the Allais and Ellsberg paradoxes, risk attitudes and certainty equivalents, criteria for decisions under uncertainty, Bayesian decisions, backward induction on decision trees and the value of information.
+Stratejik etkileşimden önce tek bir karar verici incelenir. Beklenen fayda ve von Neumann–Morgenstern aksiyomları, fayda ölçeğinin hangi dönüşümlere kadar tek olduğu, Allais ve Ellsberg paradoksları, risk tutumları ve kesinlik eşdeğeri, belirsizlik altında karar ölçütleri, Bayesçi karar, karar ağaçlarında geriye doğru çıkarım ve bilginin değeri bu bölümün konularıdır.
 
 - [🖼️Sunum-Karar Kuramı (HTML)](../files/agt/slides/Bolum_01_Karar_Kurami.html)
 - [📄Sunum-Karar Kuramı (PDF)](../files/agt/pdf/Bolum_01_Karar_Kurami.pdf)
 - [📖Ders Notu - Karar Kuramı (HTML)](../files/agt/notlar/Bolum_01_Karar_Kurami_Ders_Notu.html)
 - [📝Çalışma Soruları - Karar Kuramı (HTML)](../files/agt/slides/Bolum_01_Karar_Kurami_Calisma_Sorulari.html)
 
-- [🕹️Bayesian Decision Lab (HTML)](../files/agt/slides/Chapter_13_Bayesian-Decision-Lab.html)
-- [🕹️Blackjack Decision Lab (HTML)](../files/agt/slides/Chapter_13_Blackjack.html)
-- [🕹️Poker: Hidden Information and Bluffing (HTML)](../files/agt/slides/Chapter_13_Poker.html)
-- [🕹️Backgammon: Expected Value under Chance (HTML)](../files/agt/slides/Chapter_13_Backgammon.html)
-- [🕹️Minesweeper: Reasoning under Uncertainty (HTML)](../files/agt/slides/Chapter_13_Minesweeper.html)
-- [🕹️Pişti: Hidden Information (HTML)](../files/agt/slides/Chapter_13_Pisti.html)
-- [🕹️Hokm: Trump Choice and Partnerships (HTML)](../files/agt/slides/Chapter_13_Hokm.html)
+- [🕹️Bayesçi Karar Laboratuvarı (HTML)](../files/agt/slides/Chapter_13_Bayesian-Decision-Lab.html)
+- [🕹️Blackjack Karar Laboratuvarı (HTML)](../files/agt/slides/Chapter_13_Blackjack.html)
+- [🕹️Poker Oyunu (HTML)](../files/agt/slides/Chapter_13_Poker.html)
+- [🕹️Tavla YZ (HTML)](../files/agt/slides/Chapter_13_Backgammon.html)
+- [🕹️Mayın Tarlası (HTML)](../files/agt/slides/Chapter_13_Minesweeper.html)
+- [🕹️Pişti (HTML)](../files/agt/slides/Chapter_13_Pisti.html)
+- [🕹️Hokm (HTML)](../files/agt/slides/Chapter_13_Hokm.html)
 
 ---
 
-### Chapter 2: Games and Their Representations
+### Bölüm 2: Oyunlar ve Temsiller
 
-What a game is and how it is written down: players, strategies, payoffs and information; normal and extensive forms; a classification of games; the Prisoner's Dilemma and Pareto optimality; a catalogue of classic 2×2 games; the 2/3-of-the-average game and level-k reasoning; combinatorial games and minimax; sequential games, backward induction, subgame perfect equilibrium and the grim trigger strategy.
+Bir oyunun ne olduğu ve nasıl yazıldığı: oyuncular, stratejiler, kazançlar ve bilgi; normal form ve genişletilmiş form; oyunların sınıflandırılması; Mahkûmun İkilemi ve Pareto optimallik; klasik 2×2 oyunlar; 2/3 ortalaması oyunu ve seviye-k düşünme; kombinatoryal oyunlar ve minimaks; sıralı oyunlar, geriye doğru çıkarım, alt oyun mükemmel denge ve tetik stratejisi.
 
 - [🖼️Sunum-Oyunlar ve Temsiller (HTML)](../files/agt/slides/Bolum_02_Oyunlar_ve_Temsiller.html)
 - [📄Sunum-Oyunlar ve Temsiller (PDF)](../files/agt/pdf/Bolum_02_Oyunlar_ve_Temsiller.pdf)
 - [📖Ders Notu - Oyunlar ve Temsiller (HTML)](../files/agt/notlar/Bolum_02_Oyunlar_ve_Temsiller_Ders_Notu.html)
 - [📝Çalışma Soruları - Oyunlar ve Temsiller (HTML)](../files/agt/slides/Bolum_02_Oyunlar_ve_Temsiller_Calisma_Sorulari.html)
 
-- [🕹️Guess 2/3 of the Average (HTML)](../files/agt/slides/Chapter_01_Guess_Average.html)
-- [🕹️Minimax Tic-Tac-Toe (HTML)](../files/agt/slides/Chapter_01_TicTacToe.html)
-- [🕹️Nim Game (HTML)](../files/agt/slides/Chapter_01_Nim.html)
-- [🕹️Don't Say 21 Game (HTML)](../files/agt/slides/Chapter_01_Dont-Say-21.html)
-- [🕹️Connect Four Game (HTML)](../files/agt/slides/Chapter_02_Connect-Four.html)
-- [🕹️Hex: Strategy Stealing (HTML)](../files/agt/slides/Chapter_02_Hex.html)
-- [🕹️Othello (Reversi) (HTML)](../files/agt/slides/Chapter_02_Othello.html)
+- [🕹️2/3 Ortalaması Oyunu (HTML)](../files/agt/slides/Chapter_01_Guess_Average.html)
+- [🕹️Minimaks XOX (HTML)](../files/agt/slides/Chapter_01_TicTacToe.html)
+- [🕹️Nim (HTML)](../files/agt/slides/Chapter_01_Nim.html)
+- [🕹️21'i Söyleme (HTML)](../files/agt/slides/Chapter_01_Dont-Say-21.html)
+- [🕹️Dörtlü Bağla (HTML)](../files/agt/slides/Chapter_02_Connect-Four.html)
+- [🕹️Hex (HTML)](../files/agt/slides/Chapter_02_Hex.html)
+- [🕹️Othello (HTML)](../files/agt/slides/Chapter_02_Othello.html)
 - [🕹️Mangala (HTML)](../files/agt/slides/Chapter_13_Mangala.html)
-- [🕹️Chess (HTML)](../files/agt/slides/Chapter_03_Chess.html)
-- [🕹️Checkers (HTML)](../files/agt/slides/Chapter_07_Checkers.html)
-- [🕹️Fox and Geese (HTML)](../files/agt/slides/Chapter_03_Fox-and-Geese.html)
-- [🕹️Nine Men's Morris (HTML)](../files/agt/slides/Chapter_03_Nine-Mens-Morris.html)
+- [🕹️Satranç (YZ'ye karşı) (HTML)](../files/agt/slides/Chapter_03_Chess.html)
+- [🕹️Dama (HTML)](../files/agt/slides/Chapter_07_Checkers.html)
+- [🕹️Tilki ve Kazlar (HTML)](../files/agt/slides/Chapter_03_Fox-and-Geese.html)
+- [🕹️Dokuz Taş (HTML)](../files/agt/slides/Chapter_03_Nine-Mens-Morris.html)
 
 ---
 
-### Chapter 3: Nash Equilibrium and Strategic Behavior
+### Bölüm 3: Nash Dengesi ve Stratejik Davranış
 
-Nash equilibrium is a profile of strategies in which no player gains by deviating alone. The chapter covers best responses, Cournot and Bertrand competition, iterated elimination of dominated strategies, mixed equilibria and the indifference principle, Nash's existence theorem, equilibrium selection, correlated equilibrium, minimax in zero-sum games, security games and the PPAD complexity of computing equilibria.
+Nash dengesi, hiçbir oyuncunun tek başına sapmakla kazançlı çıkamadığı strateji profilidir. Bölümde en iyi tepki, Cournot ve Bertrand rekabeti, baskın stratejilerin art arda elenmesi, karışık strateji dengeleri ve kayıtsızlık ilkesi, Nash'in varlık teoremi, denge seçimi, korelasyonlu denge, sıfır toplamlı oyunlarda minimaks, güvenlik oyunları ve denge hesaplamanın PPAD karmaşıklığı ele alınır.
 
 - [🖼️Sunum-Nash Dengesi (HTML)](../files/agt/slides/Bolum_03_Nash_Dengesi.html)
 - [📄Sunum-Nash Dengesi (PDF)](../files/agt/pdf/Bolum_03_Nash_Dengesi.pdf)
 - [📖Ders Notu - Nash Dengesi (HTML)](../files/agt/notlar/Bolum_03_Nash_Dengesi_Ders_Notu.html)
 - [📝Çalışma Soruları - Nash Dengesi (HTML)](../files/agt/slides/Bolum_03_Nash_Dengesi_Calisma_Sorulari.html)
 
-- [🕹️Prisoner's Dilemma (HTML)](../files/agt/slides/Chapter_03_Prisoners_Dilemma.html)
-- [🕹️Matrix Game & Nash Equilibrium Lab (HTML)](../files/agt/slides/Chapter_03_Matrix-Nash.html)
-- [🕹️Rock–Paper–Scissors (HTML)](../files/agt/slides/Chapter_03_Rock_Scissors_Paper.html)
-- [🕹️Colonel Blotto (HTML)](../files/agt/slides/Chapter_03_Colonel-Blotto.html)
+- [🕹️Mahkûmun İkilemi Simülatörü (HTML)](../files/agt/slides/Chapter_03_Prisoners_Dilemma.html)
+- [🕹️Matris Oyunu ve Nash Dengesi Laboratuvarı (HTML)](../files/agt/slides/Chapter_03_Matrix-Nash.html)
+- [🕹️Taş Kağıt Makas (HTML)](../files/agt/slides/Chapter_03_Rock_Scissors_Paper.html)
+- [🕹️Albay Blotto (HTML)](../files/agt/slides/Chapter_03_Colonel-Blotto.html)
 
 ---
 
-## Part II: Mechanisms
+## Kısım II: Mekanizmalar
 
-### Chapter 4: Mechanism Design and Incentives
+### Bölüm 4: Mekanizma Tasarımı ve Teşvikler
 
-Mechanism design reverses the question: given a goal, which rules make self-interested participants act toward it? Social choice functions, the revelation principle, incentive compatibility and individual rationality, Myerson's lemma, the VCG mechanism, Gale–Shapley stable matching, the median mechanism, top trading cycles and Bayesian games.
+Mekanizma tasarımı soruyu tersine çevirir: Hedef belli olduğunda, kendi çıkarını gözeten katılımcıları bu hedefe doğru davranmaya hangi kurallar yöneltir? Sosyal seçim fonksiyonları, açıklama ilkesi, teşvik uyumluluğu ve bireysel rasyonellik, Myerson lemması, VCG mekanizması, Gale–Shapley kararlı eşleştirme, medyan mekanizması, en iyi takas döngüleri (TTC) ve Bayesçi oyunlar.
 
 - [🖼️Sunum-Mekanizma Tasarımı (HTML)](../files/agt/slides/Bolum_04_Mekanizma.html)
 - [📄Sunum-Mekanizma Tasarımı (PDF)](../files/agt/pdf/Bolum_04_Mekanizma.pdf)
 - [📖Ders Notu - Mekanizma Tasarımı (HTML)](../files/agt/notlar/Bolum_04_Mekanizma_Ders_Notu.html)
 - [📝Çalışma Soruları - Mekanizma Tasarımı (HTML)](../files/agt/slides/Bolum_04_Mekanizma_Calisma_Sorulari.html)
 
-- [🕹️Ultimatum Game (HTML)](../files/agt/slides/Chapter_04_Ultimatum-Game.html)
-- [🕹️Stable Matching (HTML)](../files/agt/slides/Chapter_04_Stable-Matching.html)
-- [🕹️Incentive Compatibility Lab (HTML)](../files/agt/slides/Chapter_04_Incentive-Compatibility-Lab.html)
+- [🕹️Ültimatom Oyunu (HTML)](../files/agt/slides/Chapter_04_Ultimatum-Game.html)
+- [🕹️Kararlı Eşleştirme Simülatörü (HTML)](../files/agt/slides/Chapter_04_Stable-Matching.html)
+- [🕹️Teşvik Uyumluluğu Laboratuvarı (HTML)](../files/agt/slides/Chapter_04_Incentive-Compatibility-Lab.html)
 
 ---
 
-### Chapter 5: Auctions and Market Design
+### Bölüm 5: Açık Artırmalar ve Piyasa Tasarımı
 
-Auctions are the most widely used mechanisms for allocating goods and setting prices. The four basic formats (English, Dutch, first-price and second-price sealed-bid), equilibrium bidding strategies, revenue equivalence and the role of information, and double-sided markets where both buyers and sellers submit offers.
+Açık artırmalar, malların dağıtılmasında ve fiyatların belirlenmesinde en yaygın kullanılan mekanizmalardır. Dört temel biçim (İngiliz, Hollanda, birinci fiyat ve ikinci fiyat kapalı zarf), denge teklif stratejileri, gelir eşdeğerliği ve bilginin rolü, alıcıların da satıcıların da teklif verdiği çift taraflı açık artırma piyasaları.
 
 - [🖼️Sunum-Açık Artırmalar (HTML)](../files/agt/slides/Bolum_05_Acik_Arttirma.html)
 - [📄Sunum-Açık Artırmalar (PDF)](../files/agt/pdf/Bolum_05_Acik_Arttirma.pdf)
 - [📖Ders Notu - Açık Artırmalar (HTML)](../files/agt/notlar/Bolum_05_Acik_Arttirma_Ders_Notu.html)
 - [📝Çalışma Soruları - Açık Artırmalar (HTML)](../files/agt/slides/Bolum_05_Acik_Arttirma_Calisma_Sorulari.html)
 
-- [🕹️Second-Price Sealed-Bid Auction Simulator (HTML)](../files/agt/slides/Chapter_05_second-price-sealed-bid-auction.html)
-- [🕹️English Auction Simulator (HTML)](../files/agt/slides/Chapter_05_english-auction-simulator.html)
-- [🕹️Dutch Auction Simulator (HTML)](../files/agt/slides/Chapter_05_dutch-auction-simulator.html)
-- [🕹️First-Price Sealed-Bid Auction Simulator (HTML)](../files/agt/slides/Chapter_05_first-price-auction-simulator.html)
-- [🕹️Double Auction Market (HTML)](../files/agt/slides/Chapter_05_Double-Auction-Market-Simulator.html)
-- [🕹️Monopoly: Property Auctions and Trading (optional) (HTML)](../files/agt/slides/Chapter_05_Monopoly.html)
+- [🕹️Vickrey Açık Artırması (HTML)](../files/agt/slides/Chapter_05_second-price-sealed-bid-auction.html)
+- [🕹️İngiliz Açık Artırması (HTML)](../files/agt/slides/Chapter_05_english-auction-simulator.html)
+- [🕹️Hollanda Açık Artırması (HTML)](../files/agt/slides/Chapter_05_dutch-auction-simulator.html)
+- [🕹️Birinci Fiyat Kapalı Zarf Açık Artırması (HTML)](../files/agt/slides/Chapter_05_first-price-auction-simulator.html)
+- [🕹️Çift Taraflı Açık Artırma Piyasası (HTML)](../files/agt/slides/Chapter_05_Double-Auction-Market-Simulator.html)
+- [🕹️Monopoly (isteğe bağlı) (HTML)](../files/agt/slides/Chapter_05_Monopoly.html)
 
 ---
 
-### Chapter 6: Online Platforms
+### Bölüm 6: Çevrimiçi Platformlar
 
-Digital platforms bring self-interested users together and set the rules they play by. Two-sided markets, network effects and critical mass, two-sided pricing, sponsored search auctions (GSP and VCG), online allocation with budgets, reputation systems and competition between platforms.
+Dijital platformlar kendi çıkarını gözeten kullanıcıları bir araya getirir ve aralarındaki oyunun kurallarını koyar. İki taraflı pazarlar, ağ etkisi ve kritik kitle, iki taraflı fiyatlandırma, sponsorlu arama açık artırmaları (GSP ve VCG), bütçe kısıtlı çevrimiçi tahsis, itibar sistemleri ve platformlar arası rekabet.
 
 - [🖼️Sunum-Çevrimiçi Platformlar (HTML)](../files/agt/slides/Bolum_06_Cevrimici_Platform.html)
 - [📄Sunum-Çevrimiçi Platformlar (PDF)](../files/agt/pdf/Bolum_06_Cevrimici_Platform.pdf)
 - [📖Ders Notu - Çevrimiçi Platformlar (HTML)](../files/agt/notlar/Bolum_06_Cevrimici_Platform_Ders_Notu.html)
 - [📝Çalışma Soruları - Çevrimiçi Platformlar (HTML)](../files/agt/slides/Bolum_06_Cevrimici_Platform_Calisma_Sorulari.html)
 
-- [🕹️Two-Sided Platform Pricing (HTML)](../files/agt/slides/Chapter_09_Two-Sided-Platform-Pricing.html)
-- [🕹️Sponsored Search Ad Auction (HTML)](../files/agt/slides/Chapter_09_Sponsored-Search-Ad-Auction-Game.html)
+- [🕹️İki Taraflı Platform Fiyatlama (HTML)](../files/agt/slides/Chapter_09_Two-Sided-Platform-Pricing.html)
+- [🕹️Sponsorlu Arama Açık Artırması (HTML)](../files/agt/slides/Chapter_09_Sponsored-Search-Ad-Auction-Game.html)
 
 ---
 
-### Chapter 7: Social Choice and Voting Systems
+### Bölüm 7: Sosyal Seçim ve Oylama Sistemleri
 
-Social choice studies how individual preferences are aggregated into a collective decision. Majority, plurality, Borda, approval, instant-runoff and Condorcet rules counted on the same profile, the Condorcet cycle, strategic voting, and the theorems of Arrow, Gibbard–Satterthwaite and May.
+Sosyal seçim, bireysel tercihlerin ortak bir karara nasıl dönüştürüldüğünü inceler. Aynı tercih profili üzerinde sayılan çoğunluk, çoğulluk, Borda, onay, anında ikinci tur ve Condorcet kuralları, Condorcet döngüsü, stratejik oy ile Arrow, Gibbard–Satterthwaite ve May teoremleri.
 
 - [🖼️Sunum-Oylama (HTML)](../files/agt/slides/Bolum_07_Oylama.html)
 - [📄Sunum-Oylama (PDF)](../files/agt/pdf/Bolum_07_Oylama.pdf)
 - [📖Ders Notu - Oylama (HTML)](../files/agt/notlar/Bolum_07_Oylama_Ders_Notu.html)
 - [📝Çalışma Soruları - Oylama (HTML)](../files/agt/slides/Bolum_07_Oylama_Calisma_Sorulari.html)
 
-- [🕹️Voting Rules and Manipulation (HTML)](../files/agt/slides/Chapter_06_Voting-Rules.html)
-- [🕹️Condorcet and the Voting Paradox (HTML)](../files/agt/slides/Chapter_06_Condorcet-Voting-Paradox.html)
-- [🕹️Facility Location: Strategy-Proof Median (HTML)](../files/agt/slides/Chapter_06_Facility_Location.html)
+- [🕹️Oylama Kuralları ve Manipülasyon (HTML)](../files/agt/slides/Chapter_06_Voting-Rules.html)
+- [🕹️Condorcet Paradoksu (HTML)](../files/agt/slides/Chapter_06_Condorcet-Voting-Paradox.html)
+- [🕹️Tesis Yerleşimi (HTML)](../files/agt/slides/Chapter_06_Facility_Location.html)
 
 ---
 
-## Part III: Networks and Efficiency
+## Kısım III: Ağlar ve Verimlilik
 
-### Chapter 8: Network Design and Routing
+### Bölüm 8: Ağ Tasarımı ve Yönlendirme
 
-When every driver or packet picks its own route, the outcome can differ from what a central planner would choose. Routing basics, selfish routing, Wardrop equilibrium versus the system optimum, Braess's paradox, congestion games and Rosenthal's potential, and network formation games.
+Her sürücü ya da paket kendi yolunu seçtiğinde ortaya çıkan sonuç, merkezi bir planlayıcının seçeceğinden farklı olabilir. Yönlendirmenin temelleri, bencil yönlendirme, Wardrop dengesi ile sistem optimumunun karşılaştırılması, Braess paradoksu, tıkanıklık oyunları ve Rosenthal potansiyeli, ağ oluşturma oyunları.
 
 - [🖼️Sunum-Ağ Tasarımı ve Yönlendirme (HTML)](../files/agt/slides/Bolum_08_Ag_Tasarimi.html)
 - [📄Sunum-Ağ Tasarımı ve Yönlendirme (PDF)](../files/agt/pdf/Bolum_08_Ag_Tasarimi.pdf)
 - [📖Ders Notu - Ağ Tasarımı ve Yönlendirme (HTML)](../files/agt/notlar/Bolum_08_Ag_Tasarimi_Ders_Notu.html)
 - [📝Çalışma Soruları - Ağ Tasarımı ve Yönlendirme (HTML)](../files/agt/slides/Bolum_08_Ag_Tasarimi_Calisma_Sorulari.html)
 
-- [🕹️Braess's Paradox (HTML)](../files/agt/slides/Chapter_08_Braess-Paradox-Visualizer.html)
-- [🕹️Selfish Routing (HTML)](../files/agt/slides/Chapter_08_Selfish-Routing.html)
-- [🕹️Network Formation (HTML)](../files/agt/slides/Chapter_08_Network-Formation.html)
+- [🕹️Braess Paradoksu (HTML)](../files/agt/slides/Chapter_08_Braess-Paradox-Visualizer.html)
+- [🕹️Bencil Yönlendirme ve PoA (HTML)](../files/agt/slides/Chapter_08_Selfish-Routing.html)
+- [🕹️Ağ Oluşturma Oyunu (HTML)](../files/agt/slides/Chapter_08_Network-Formation.html)
 
 ---
 
-### Chapter 9: Price of Anarchy and Efficiency
+### Bölüm 9: Anarşinin Bedeli ve Verimlilik
 
-The Price of Anarchy measures how much efficiency is lost to selfish behavior by comparing the worst equilibrium with the optimum; the Price of Stability does the same for the best equilibrium. Ratios on two-road and Pigou networks, the 4/3 bound for linear latencies, smoothness, the Braess network, load balancing, the logarithmic bound on the Price of Stability, congestion tolls and other interventions.
+Anarşinin Bedeli, en kötü dengeyi optimumla karşılaştırarak bencil davranış yüzünden ne kadar verim kaybedildiğini ölçer; İstikrarın Bedeli aynı karşılaştırmayı en iyi denge için yapar. İki yollu ağda ve Pigou ağında bu oranlar, doğrusal gecikmelerde 4/3 sınırı, pürüzsüzlük, Braess ağı, yük dengeleme, İstikrarın Bedeli için logaritmik sınır, tıkanıklık ücreti ve öteki müdahaleler.
 
 - [🖼️Sunum-Anarşinin Bedeli (HTML)](../files/agt/slides/Bolum_09_Anarsi.html)
 - [📄Sunum-Anarşinin Bedeli (PDF)](../files/agt/pdf/Bolum_09_Anarsi.pdf)
 - [📖Ders Notu - Anarşinin Bedeli (HTML)](../files/agt/notlar/Bolum_09_Anarsi_Ders_Notu.html)
 - [📝Çalışma Soruları - Anarşinin Bedeli (HTML)](../files/agt/slides/Bolum_09_Anarsi_Calisma_Sorulari.html)
 
-- [🕹️Load Balancing and Price of Anarchy (HTML)](../files/agt/slides/Chapter_11_Load-Balancing-Price-of-Anarchy-Game.html)
+- [🕹️Yük Dengeleme ve PoA (HTML)](../files/agt/slides/Chapter_11_Load-Balancing-Price-of-Anarchy-Game.html)
 
 ---
 
-## Part IV: Cooperation and Society
+## Kısım IV: İşbirliği ve Toplum
 
-### Chapter 10: Multi-Agent Systems
+### Bölüm 10: Çoklu Ajan Sistemleri
 
-Multi-agent systems consist of autonomous agents that cooperate or compete in a shared environment. Agent properties, cooperation and competition, task allocation with the contract net, coalitional games, the Shapley value, the core, and free riding in public goods.
+Çoklu ajan sistemleri, ortak bir ortamda işbirliği yapan ya da birbiriyle rekabet eden özerk ajanlardan oluşur. Ajanların özellikleri, işbirliği ve rekabet, sözleşme ağıyla görev dağıtımı, koalisyon oyunları, Shapley değeri, çekirdek ve kamu mallarında beleşçilik.
 
 - [🖼️Sunum-Çoklu Ajan Sistemleri (HTML)](../files/agt/slides/Bolum_10_Coklu_Ajan.html)
 - [📄Sunum-Çoklu Ajan Sistemleri (PDF)](../files/agt/pdf/Bolum_10_Coklu_Ajan.pdf)
 - [📖Ders Notu - Çoklu Ajan Sistemleri (HTML)](../files/agt/notlar/Bolum_10_Coklu_Ajan_Ders_Notu.html)
 - [📝Çalışma Soruları - Çoklu Ajan Sistemleri (HTML)](../files/agt/slides/Bolum_10_Coklu_Ajan_Calisma_Sorulari.html)
 
-- [🕹️Shapley Value Coalition Game (HTML)](../files/agt/slides/Chapter_07_Shapley-Coalition-Game.html)
+- [🕹️Shapley Koalisyon Oyunu (HTML)](../files/agt/slides/Chapter_07_Shapley-Coalition-Game.html)
 
 ---
 
-### Chapter 11: Algorithmic Fairness and Ethics
+### Bölüm 11: Algoritmik Adalet ve Etik
 
-Algorithmic decisions and allocations affect individuals and groups differently. Fairness criteria computed from the confusion matrix (demographic parity, equalized odds, predictive parity, calibration) and why they cannot all hold at once; fair division with cut-and-choose, proportionality and envy-freeness; ethical principles and algorithmic auditing.
+Algoritmik kararlar ve dağıtımlar bireyleri ve grupları farklı biçimlerde etkiler. Karışıklık matrisinden hesaplanan adalet ölçütleri (demografik eşitlik, eşitlenmiş olasılıklar, tahmin eşitliği, kalibrasyon) ve bu ölçütlerin neden aynı anda sağlanamadığı; kes-ve-seç, orantılılık ve kıskançsızlık ile adil bölüşüm; etik ilkeler ve algoritmik denetim.
 
 - [🖼️Sunum-Algoritmik Adalet ve Etik (HTML)](../files/agt/slides/Bolum_11_Algoritmik_Etik.html)
 - [📄Sunum-Algoritmik Adalet ve Etik (PDF)](../files/agt/pdf/Bolum_11_Algoritmik_Etik.pdf)
 - [📖Ders Notu - Algoritmik Adalet ve Etik (HTML)](../files/agt/notlar/Bolum_11_Algoritmik_Etik_Ders_Notu.html)
 - [📝Çalışma Soruları - Algoritmik Adalet ve Etik (HTML)](../files/agt/slides/Bolum_11_Algoritmik_Etik_Calisma_Sorulari.html)
 
-- [🕹️Fair Division Game (HTML)](../files/agt/slides/Chapter_10_Fair-Division-Game.html)
+- [🕹️Adil Bölüşüm Oyunu (HTML)](../files/agt/slides/Chapter_10_Fair-Division-Game.html)
 
 ---
 
-### Chapter 12: Behavioral and Collective Decisions
+### Bölüm 12: Davranışsal ve Kolektif Karar
 
-Real people deviate from the rational model, and groups face dilemmas that individuals do not. Bounded rationality, prospect theory, loss aversion and framing, the tragedy of the commons and best-response dynamics, institutional remedies such as taxes, quotas and sanctions, public goods experiments and social welfare criteria.
+Gerçek insanlar rasyonel modelden sapar; gruplar da tek tek bireylerin karşılaşmadığı ikilemlerle yüz yüze gelir. Sınırlı rasyonellik, beklenti kuramı, kayıptan kaçınma ve çerçeveleme, ortak mallar trajedisi ve en iyi tepki dinamiği, vergi, kota ve yaptırım gibi kurumsal çözümler, kamu malı deneyleri ve sosyal refah ölçütleri.
 
 - [🖼️Sunum-Davranışsal ve Kolektif Karar (HTML)](../files/agt/slides/Bolum_12_Kolektif_Karar.html)
 - [📄Sunum-Davranışsal ve Kolektif Karar (PDF)](../files/agt/pdf/Bolum_12_Kolektif_Karar.pdf)
 - [📖Ders Notu - Davranışsal ve Kolektif Karar (HTML)](../files/agt/notlar/Bolum_12_Kolektif_Karar_Ders_Notu.html)
 - [📝Çalışma Soruları - Davranışsal ve Kolektif Karar (HTML)](../files/agt/slides/Bolum_12_Kolektif_Karar_Calisma_Sorulari.html)
 
-- [🕹️Public Goods Game (HTML)](../files/agt/slides/Chapter_07_Public-Goods-Game.html)
+- [🕹️Kamu Malı Oyunu (HTML)](../files/agt/slides/Chapter_07_Public-Goods-Game.html)
 
 ---
 
-## Part V: Dynamics and the Future
+## Kısım V: Dinamikler ve Gelecek
 
-### Chapter 13: Learning and Adaptation
+### Bölüm 13: Öğrenme ve Adaptasyon
 
-How do agents reach equilibrium, or fail to, when they learn from experience? Best-response dynamics, fictitious play, regret and multiplicative weights, multi-armed bandits (ε-greedy and UCB), replicator dynamics and the repeated Prisoner's Dilemma.
+Deneyimden öğrenen ajanlar dengeye nasıl ulaşır, ya da neden ulaşamaz? En iyi tepki dinamiği, kurgusal oyun, pişmanlık ve çarpımsal ağırlıklar, çok kollu haydut problemleri (ε-açgözlü ve UCB), replikatör dinamiği ve tekrarlı Mahkûmun İkilemi.
 
 - [🖼️Sunum-Öğrenme ve Adaptasyon (HTML)](../files/agt/slides/Bolum_13_Ogrenme.html)
 - [📄Sunum-Öğrenme ve Adaptasyon (PDF)](../files/agt/pdf/Bolum_13_Ogrenme.pdf)
 - [📖Ders Notu - Öğrenme ve Adaptasyon (HTML)](../files/agt/notlar/Bolum_13_Ogrenme_Ders_Notu.html)
 - [📝Çalışma Soruları - Öğrenme ve Adaptasyon (HTML)](../files/agt/slides/Bolum_13_Ogrenme_Calisma_Sorulari.html)
 
-- [🕹️Multi-Armed Bandit (HTML)](../files/agt/slides/Chapter_12_Multi-Armed-Bandit.html)
-- [🕹️Repeated Prisoner's Dilemma Tournament (HTML)](../files/agt/slides/Chapter_12_Repeated-Prisoners-Dilemma-Tournament.html)
-- [🕹️Replicator Dynamics (HTML)](../files/agt/slides/Chapter_12_Replicator-Dynamics.html)
+- [🕹️Çok Kollu Haydut Öğrenme Oyunu (HTML)](../files/agt/slides/Chapter_12_Multi-Armed-Bandit.html)
+- [🕹️Tekrarlı Mahkûmun İkilemi Turnuvası (HTML)](../files/agt/slides/Chapter_12_Repeated-Prisoners-Dilemma-Tournament.html)
+- [🕹️Replikatör Dinamiği ve Evrimsel Oyun Laboratuvarı (HTML)](../files/agt/slides/Chapter_12_Replicator-Dynamics.html)
 
 ---
 
-### Chapter 14: Future Directions
+### Bölüm 14: Gelecek Yönelimler
 
-Open problems at the edge of the field: AI agents and algorithmic collusion, mechanisms learned from data and their sample complexity, differential privacy, transaction fee mechanisms and MEV in blockchains. The chapter ends with a map of the course and the project guidelines.
+Alanın sınırındaki açık problemler: yapay zekâ ajanları ve algoritmik danışıklılık, veriden öğrenilen mekanizmalar ve örneklem karmaşıklıkları, diferansiyel mahremiyet, blokzincirlerde işlem ücreti mekanizmaları ve MEV. Bölüm, dersin genel haritası ve proje yönergeleriyle kapanır.
 
 - [🖼️Sunum-Gelecek Yönelimler (HTML)](../files/agt/slides/Bolum_14_Gelecek.html)
 - [📄Sunum-Gelecek Yönelimler (PDF)](../files/agt/pdf/Bolum_14_Gelecek.pdf)
 - [📖Ders Notu - Gelecek Yönelimler (HTML)](../files/agt/notlar/Bolum_14_Gelecek_Ders_Notu.html)
 - [📝Çalışma Soruları - Gelecek Yönelimler (HTML)](../files/agt/slides/Bolum_14_Gelecek_Calisma_Sorulari.html)
 
-- [🕹️AI Agent Strategy Tournament (HTML)](../files/agt/slides/Chapter_14_Ai-Agent-Strategy-Tournament.html)
-- [🕹️Age of Çotanak: Territory Strategy and AI Evaluation (optional) (HTML)](../files/agt/slides/Chapter_14_Age-of-Cotanak.html)
+- [🕹️YZ Ajanı Strateji Turnuvası (HTML)](../files/agt/slides/Chapter_14_Ai-Agent-Strategy-Tournament.html)
+- [🕹️Age of Çotanak (isteğe bağlı) (HTML)](../files/agt/slides/Chapter_14_Age-of-Cotanak.html)
