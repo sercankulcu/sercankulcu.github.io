@@ -149,6 +149,7 @@ Social choice studies how individual preferences are aggregated into a collectiv
 
 - [🖼️Sunum-Oylama (HTML)](../files/agt/slides/Bolum_07_Oylama.html)
 - [📄Sunum-Oylama (PDF)](../files/agt/pdf/Bolum_07_Oylama.pdf)
+- [📖Ders Notu - Oylama (HTML)](../files/agt/notlar/Bolum_07_Oylama_Ders_Notu.html)
 - [📝Çalışma Soruları - Oylama (HTML)](../files/agt/slides/Bolum_07_Oylama_Calisma_Sorulari.html)
 
 - [🕹️Voting Rules and Manipulation (HTML)](../files/agt/slides/Chapter_06_Voting-Rules.html)
@@ -165,6 +166,7 @@ When every driver or packet picks its own route, the outcome can differ from wha
 
 - [🖼️Sunum-Ağ Tasarımı ve Yönlendirme (HTML)](../files/agt/slides/Bolum_08_Ag_Tasarimi.html)
 - [📄Sunum-Ağ Tasarımı ve Yönlendirme (PDF)](../files/agt/pdf/Bolum_08_Ag_Tasarimi.pdf)
+- [📖Ders Notu - Ağ Tasarımı ve Yönlendirme (HTML)](../files/agt/notlar/Bolum_08_Ag_Tasarimi_Ders_Notu.html)
 - [📝Çalışma Soruları - Ağ Tasarımı ve Yönlendirme (HTML)](../files/agt/slides/Bolum_08_Ag_Tasarimi_Calisma_Sorulari.html)
 
 - [🕹️Braess's Paradox (HTML)](../files/agt/slides/Chapter_08_Braess-Paradox-Visualizer.html)
@@ -179,6 +181,7 @@ The Price of Anarchy measures how much efficiency is lost to selfish behavior by
 
 - [🖼️Sunum-Anarşinin Bedeli (HTML)](../files/agt/slides/Bolum_09_Anarsi.html)
 - [📄Sunum-Anarşinin Bedeli (PDF)](../files/agt/pdf/Bolum_09_Anarsi.pdf)
+- [📖Ders Notu - Anarşinin Bedeli (HTML)](../files/agt/notlar/Bolum_09_Anarsi_Ders_Notu.html)
 - [📝Çalışma Soruları - Anarşinin Bedeli (HTML)](../files/agt/slides/Bolum_09_Anarsi_Calisma_Sorulari.html)
 
 - [🕹️Load Balancing and Price of Anarchy (HTML)](../files/agt/slides/Chapter_11_Load-Balancing-Price-of-Anarchy-Game.html)
@@ -193,6 +196,7 @@ Multi-agent systems consist of autonomous agents that cooperate or compete in a 
 
 - [🖼️Sunum-Çoklu Ajan Sistemleri (HTML)](../files/agt/slides/Bolum_10_Coklu_Ajan.html)
 - [📄Sunum-Çoklu Ajan Sistemleri (PDF)](../files/agt/pdf/Bolum_10_Coklu_Ajan.pdf)
+- [📖Ders Notu - Çoklu Ajan Sistemleri (HTML)](../files/agt/notlar/Bolum_10_Coklu_Ajan_Ders_Notu.html)
 - [📝Çalışma Soruları - Çoklu Ajan Sistemleri (HTML)](../files/agt/slides/Bolum_10_Coklu_Ajan_Calisma_Sorulari.html)
 
 - [🕹️Shapley Value Coalition Game (HTML)](../files/agt/slides/Chapter_07_Shapley-Coalition-Game.html)
@@ -205,6 +209,7 @@ Algorithmic decisions and allocations affect individuals and groups differently.
 
 - [🖼️Sunum-Algoritmik Adalet ve Etik (HTML)](../files/agt/slides/Bolum_11_Algoritmik_Etik.html)
 - [📄Sunum-Algoritmik Adalet ve Etik (PDF)](../files/agt/pdf/Bolum_11_Algoritmik_Etik.pdf)
+- [📖Ders Notu - Algoritmik Adalet ve Etik (HTML)](../files/agt/notlar/Bolum_11_Algoritmik_Etik_Ders_Notu.html)
 - [📝Çalışma Soruları - Algoritmik Adalet ve Etik (HTML)](../files/agt/slides/Bolum_11_Algoritmik_Etik_Calisma_Sorulari.html)
 
 - [🕹️Fair Division Game (HTML)](../files/agt/slides/Chapter_10_Fair-Division-Game.html)
@@ -217,6 +222,7 @@ Real people deviate from the rational model, and groups face dilemmas that indiv
 
 - [🖼️Sunum-Davranışsal ve Kolektif Karar (HTML)](../files/agt/slides/Bolum_12_Kolektif_Karar.html)
 - [📄Sunum-Davranışsal ve Kolektif Karar (PDF)](../files/agt/pdf/Bolum_12_Kolektif_Karar.pdf)
+- [📖Ders Notu - Davranışsal ve Kolektif Karar (HTML)](../files/agt/notlar/Bolum_12_Kolektif_Karar_Ders_Notu.html)
 - [📝Çalışma Soruları - Davranışsal ve Kolektif Karar (HTML)](../files/agt/slides/Bolum_12_Kolektif_Karar_Calisma_Sorulari.html)
 
 - [🕹️Public Goods Game (HTML)](../files/agt/slides/Chapter_07_Public-Goods-Game.html)
@@ -231,6 +237,7 @@ How do agents reach equilibrium, or fail to, when they learn from experience? Be
 
 - [🖼️Sunum-Öğrenme ve Adaptasyon (HTML)](../files/agt/slides/Bolum_13_Ogrenme.html)
 - [📄Sunum-Öğrenme ve Adaptasyon (PDF)](../files/agt/pdf/Bolum_13_Ogrenme.pdf)
+- [📖Ders Notu - Öğrenme ve Adaptasyon (HTML)](../files/agt/notlar/Bolum_13_Ogrenme_Ders_Notu.html)
 - [📝Çalışma Soruları - Öğrenme ve Adaptasyon (HTML)](../files/agt/slides/Bolum_13_Ogrenme_Calisma_Sorulari.html)
 
 - [🕹️Multi-Armed Bandit (HTML)](../files/agt/slides/Chapter_12_Multi-Armed-Bandit.html)
@@ -245,6 +252,7 @@ Open problems at the edge of the field: AI agents and algorithmic collusion, mec
 
 - [🖼️Sunum-Gelecek Yönelimler (HTML)](../files/agt/slides/Bolum_14_Gelecek.html)
 - [📄Sunum-Gelecek Yönelimler (PDF)](../files/agt/pdf/Bolum_14_Gelecek.pdf)
+- [📖Ders Notu - Gelecek Yönelimler (HTML)](../files/agt/notlar/Bolum_14_Gelecek_Ders_Notu.html)
 - [📝Çalışma Soruları - Gelecek Yönelimler (HTML)](../files/agt/slides/Bolum_14_Gelecek_Calisma_Sorulari.html)
 
 - [🕹️AI Agent Strategy Tournament (HTML)](../files/agt/slides/Chapter_14_Ai-Agent-Strategy-Tournament.html)
