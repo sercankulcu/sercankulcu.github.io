@@ -1,0 +1,1534 @@
+---
+layout: without-sidebar
+title: "B+ Ağacı Simülatörü"
+permalink: /files/data_structures/slides/Bolum_10_BPlusTree.html
+redirect_from:
+  - /files/data_structures/slides/Bolum_07_BPlusTree.html
+excerpt: "Yaprak bölünmesi, yaprak bağları ve aralık aramasıyla ekleme, arama ve silmeyi gösteren etkileşimli B+ ağacı simülatörü."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+/* ---------- 800x600 stage (agt-oyun) ---------- */
+.ds-st { font-size: 15px; line-height: 1.3; }
+:where(.ds-st) .agt-oyun__body { display: flex; flex-direction: column; }
+:where(.ds-st) .ds-sim__root { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+:where(.ds-st) .agt-oyun__body button {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 12px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 999px;
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: none;
+  transition: border-color .18s ease, background .18s ease;
+}
+:where(.ds-st) .agt-oyun__body button:hover:not(:disabled) { border-color: var(--ds-link); }
+:where(.ds-st) .agt-oyun__body button:disabled { opacity: .4; cursor: default; }
+:where(.ds-st) .agt-oyun__body button.is-primary { border-color: var(--ds-link); background: var(--ds-link); color: var(--ds-bg); }
+:where(.ds-st) .agt-oyun__body button.is-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--ds-link) 85%, var(--ds-text)); }
+:where(.ds-st) .agt-oyun__body button.is-danger { border-color: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-border)); color: var(--ds-bad); }
+:where(.ds-st) .agt-oyun__body input,
+:where(.ds-st) .agt-oyun__body select {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+  box-shadow: none;
+}
+:where(.ds-st) .agt-oyun__body input[type="checkbox"],
+:where(.ds-st) .agt-oyun__body input[type="radio"] { width: auto; height: auto; padding: 0; }
+:where(.ds-st) .agt-oyun__body label {
+  margin: 0;
+  padding: 0;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.ds-st .ds-sim__panel {
+  min-height: 0;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-bg);
+}
+.ds-st .ds-sim__status {
+  padding: 6px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+}
+.ds-st .ds-sim__caption {
+  margin: 0 0 4px;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+:where(.ds-st) .agt-oyun__body li { margin: 0; }
+
+.bplus-sim {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.bplus-controls {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.bplus-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.bplus-field {
+  display: grid;
+  gap: 2px;
+  width: 92px;
+}
+
+.bplus-field input,
+.bplus-field select { width: 100%; }
+
+.bplus-stage {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.bplus-canvas {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.bplus-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.bplus-edge {
+  stroke: var(--ds-link);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.bplus-edge.active {
+  stroke: var(--ds-warn);
+  stroke-width: 3.5;
+}
+
+.bplus-leaf-link {
+  stroke: var(--ds-muted);
+  stroke-width: 2.5;
+  stroke-dasharray: 6 4;
+  fill: none;
+}
+
+.bplus-leaf-link.active {
+  stroke: var(--ds-warn);
+  stroke-width: 3.5;
+  stroke-dasharray: none;
+}
+
+.bplus-node-box {
+  fill: var(--ds-node);
+  stroke: var(--ds-link);
+  stroke-width: 2.3;
+  rx: 6;
+  transition: fill .15s ease, stroke .15s ease;
+}
+
+.bplus-node.leaf .bplus-node-box {
+  fill: var(--ds-bg);
+}
+
+.bplus-node.checking .bplus-node-box {
+  fill: var(--ds-hot);
+  stroke: var(--ds-warn);
+  stroke-width: 3.6;
+}
+
+.bplus-node.found .bplus-node-box,
+.bplus-node.changed .bplus-node-box {
+  fill: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  stroke: var(--ds-good);
+  stroke-width: 3.6;
+}
+
+.bplus-node.removing .bplus-node-box {
+  fill: color-mix(in srgb, var(--ds-bad) 18%, var(--ds-bg));
+  stroke: var(--ds-bad);
+  stroke-width: 3.6;
+}
+
+.bplus-node.range .bplus-node-box {
+  fill: color-mix(in srgb, var(--ds-good) 14%, var(--ds-bg));
+  stroke: var(--ds-good);
+  stroke-width: 3.6;
+  stroke-dasharray: 7 3;
+}
+
+.bplus-node.visited .bplus-node-box {
+  fill: color-mix(in srgb, var(--ds-link) 38%, var(--ds-bg));
+  stroke: var(--ds-link);
+  stroke-width: 3.6;
+}
+
+.bplus-key-line {
+  stroke: color-mix(in srgb, var(--ds-link) 55%, var(--ds-bg));
+  stroke-width: 1.2;
+}
+
+.bplus-key-text {
+  fill: var(--ds-text);
+  font-size: 14px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.bplus-node-label {
+  fill: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.bplus-status {
+  padding: 7px 10px;
+  border-top: 1.5px solid var(--ds-border);
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bplus-status.success { color: var(--ds-good); }
+.bplus-status.error { color: var(--ds-bad); }
+.bplus-status.warning { color: color-mix(in srgb, var(--ds-warn) 70%, var(--ds-text)); }
+
+.bplus-footer {
+  display: grid;
+  grid-template-columns: 1.35fr repeat(4, .72fr) 1.6fr;
+  gap: 6px;
+}
+
+.bplus-stat {
+  min-width: 0;
+  padding: 4px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  overflow: hidden;
+}
+
+.bplus-stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.bplus-stat span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bplus-sim * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-st agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 10 · Simülasyon</p><h1>B+ Ağacı Simülatörü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="bplus-help" aria-label="Simülatör hakkında">?</button>
+    <a class="agt-oyun__back" href="Bolum_10_Arama_Agaclari.html">← Bölüm 10</a>
+  </header>
+
+  <div class="agt-oyun__body">
+
+        <div class="ds-sim__root bplus-sim">
+          <div class="bplus-controls">
+            <div class="bplus-row">
+              <div class="bplus-field">
+                <label for="bplus-order">En çok çocuk</label>
+                <select id="bplus-order">
+                  <option value="3">3</option>
+                  <option value="4" selected>4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                </select>
+              </div>
+              <div class="bplus-field">
+                <label for="bplus-value">Değer</label>
+                <input id="bplus-value" type="number" value="42" inputmode="numeric">
+              </div>
+              <button class="is-primary" id="bplus-insert" type="button">Ekle</button>
+              <button id="bplus-search" type="button">Ara</button>
+              <button class="is-danger" id="bplus-delete" type="button">Sil</button>
+              <button id="bplus-traverse" type="button">Yaprak gezinmesi</button>
+            </div>
+            <div class="bplus-row">
+              <div class="bplus-field">
+                <label for="bplus-range-start">Aralık başı</label>
+                <input id="bplus-range-start" type="number" value="20" inputmode="numeric">
+              </div>
+              <div class="bplus-field">
+                <label for="bplus-range-end">Aralık sonu</label>
+                <input id="bplus-range-end" type="number" value="70" inputmode="numeric">
+              </div>
+              <button id="bplus-range" type="button">Aralık ara</button>
+              <button id="bplus-load" type="button">Örnek yükle</button>
+              <button id="bplus-random" type="button">Rastgele</button>
+              <button class="is-danger" id="bplus-reset" type="button">Sıfırla</button>
+              <button class="is-danger" id="bplus-cancel" type="button">Durdur</button>
+            </div>
+          </div>
+
+          <div class="bplus-stage ds-sim__panel">
+            <div class="bplus-canvas">
+              <svg id="bplus-svg" class="bplus-svg" viewBox="0 0 740 275" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Etkileşimli B+ ağacı"></svg>
+            </div>
+            <div class="bplus-status" id="bplus-status" aria-live="polite">Örnek B+ ağacı yüklendi.</div>
+          </div>
+
+          <div class="bplus-footer">
+            <div class="bplus-stat"><strong>İşlem</strong><span id="bplus-operation">Boşta</span></div>
+            <div class="bplus-stat"><strong>Kayıt</strong><span id="bplus-records">0 / 15</span></div>
+            <div class="bplus-stat"><strong>Düğüm</strong><span id="bplus-nodes">0</span></div>
+            <div class="bplus-stat"><strong>Yükseklik</strong><span id="bplus-height">0</span></div>
+            <div class="bplus-stat"><strong>Bölünme</strong><span id="bplus-splits">0</span></div>
+            <div class="bplus-stat"><strong>Sonuç</strong><span id="bplus-result">—</span></div>
+          </div>
+        </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="bplus-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>B+ Ağacı Simülatörü</h2>
+    <p>B+ ağacında tüm kayıtlar yapraklarda durur; iç düğümler yalnızca aramayı yönlendiren ayırıcı anahtarları tutar. Yapraklar soldan sağa bağlıdır; böylece bir anahtar aralığı ağaçta geri yukarı çıkmadan okunabilir.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li><b>En çok çocuk</b> ağacın derecesini belirler; değiştirmek ağacı yeniden kurar.</li>
+      <li>Bir <b>Değer</b> yazıp <b>Ekle</b>, <b>Ara</b> ya da <b>Sil</b> düğmesine basın. <b>Yaprak gezinmesi</b> yaprak bağlarını izler.</li>
+      <li><b>Aralık ara</b>, <b>Aralık başı</b> için ilk yaprağı bulur, sonra bağları <b>Aralık sonu</b>na kadar izler.</li>
+      <li><b>Örnek yükle</b>, <b>Rastgele</b> ve <b>Sıfırla</b> ağacın tamamını değiştirir (en çok 15 kayıt); <b>Durdur</b> animasyonu keser.</li>
+    </ul>
+    <h3>Notlar</h3>
+    <ul>
+      <li>Eşit anahtarlar sağa gider: bir ayırıcı anahtarın araması onun sağ alt ağacında sürer.</li>
+      <li>Dolu bir yaprak ikiye bölünür ve sağ yaprağın ilk anahtarının bir <em>kopyası</em> yukarı çıkar; dolu bir iç düğüm bölünür ve ortadaki anahtarı yukarı <em>taşınır</em>.</li>
+      <li>Silme bir düğümü fazla boşaltırsa düğüm bir kardeşten ödünç alır ya da onunla birleşir; ebeveynin ayırıcıları güncellenir.</li>
+      <li>Arama, ekleme ve silme O(log n) düğüm ziyaret eder; k sonuçlu bir aralık sorgusu O(log n + k) sürer.</li>
+    </ul>
+  </dialog>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+  const NS = "http://www.w3.org/2000/svg";
+
+  const el = {
+    order: $("bplus-order"),
+    value: $("bplus-value"),
+    rangeStart: $("bplus-range-start"),
+    rangeEnd: $("bplus-range-end"),
+    insert: $("bplus-insert"),
+    search: $("bplus-search"),
+    del: $("bplus-delete"),
+    traverse: $("bplus-traverse"),
+    range: $("bplus-range"),
+    load: $("bplus-load"),
+    random: $("bplus-random"),
+    reset: $("bplus-reset"),
+    cancel: $("bplus-cancel"),
+    svg: $("bplus-svg"),
+    status: $("bplus-status"),
+    operation: $("bplus-operation"),
+    records: $("bplus-records"),
+    nodes: $("bplus-nodes"),
+    height: $("bplus-height"),
+    splits: $("bplus-splits"),
+    result: $("bplus-result")
+  };
+
+  const MAX_RECORDS = 15;
+  const DELAY = 280;
+
+  let tree = null;
+  let token = 0;
+  let running = false;
+  let lastResult = "—";
+  /* the tree before the running operation; Cancel puts it back */
+  let saved = null;
+
+  let marks = {
+    checking: new Set(),
+    found: new Set(),
+    range: new Set(),
+    visited: new Set(),
+    changed: new Set(),
+    removing: new Set(),
+    activeEdges: new Set()
+  };
+
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  class BPlusNode {
+    constructor(leaf = true) {
+      this.id = BPlusNode.nextId++;
+      this.leaf = leaf;
+      this.keys = [];
+      this.children = [];
+      this.parent = null;
+      this.next = null;
+    }
+  }
+  BPlusNode.nextId = 1;
+
+  class BPlusTree {
+    constructor(order) {
+      this.order = order;
+      this.maxKeys = order - 1;
+      /* minimum fill for every node except the root */
+      this.minLeafKeys = Math.ceil((order - 1) / 2);
+      this.minIndexKeys = Math.ceil(order / 2) - 1;
+      this.root = null;
+      this.splitCount = 0;
+      this.changeLog = [];
+      /* when recording, every algorithm step saves a snapshot frame for the animation */
+      this.recording = false;
+      this.frames = [];
+    }
+
+    clearLog() {
+      this.changeLog = [];
+    }
+
+    log(type, nodes = []) {
+      this.changeLog.push({
+        type,
+        nodeIds: nodes.filter(Boolean).map(node => node.id)
+      });
+    }
+
+    clone() {
+      const copy = new BPlusTree(this.order);
+      const map = new Map();
+      function walk(node, parent) {
+        const c = Object.create(BPlusNode.prototype);
+        c.id = node.id;
+        c.leaf = node.leaf;
+        c.keys = node.keys.slice();
+        c.parent = parent;
+        c.next = null;
+        map.set(node, c);
+        c.children = node.children.map(child => walk(child, c));
+        return c;
+      }
+      copy.root = this.root ? walk(this.root, null) : null;
+      map.forEach((c, node) => {
+        c.next = node.next ? map.get(node.next) || null : null;
+      });
+      copy.splitCount = this.splitCount;
+      copy.changeLog = this.changeLog.slice();
+      return copy;
+    }
+
+    /* m: { checking, found, changed, removing: [nodes], edges: [[parent, child]] } */
+    snap(message, m = {}) {
+      if (!this.recording) return;
+      const ids = list => (list || []).filter(Boolean).map(node => node.id);
+      this.frames.push({
+        tree: this.clone(),
+        message,
+        marks: {
+          checking: ids(m.checking),
+          found: ids(m.found),
+          changed: ids(m.changed),
+          removing: ids(m.removing),
+          edges: (m.edges || []).map(([a, b]) => `${a.id}-${b.id}`)
+        }
+      });
+    }
+
+    childIndex(node, value) {
+      let i = 0;
+      while (i < node.keys.length && value >= node.keys[i]) i++;
+      return i;
+    }
+
+    /* where value falls among the separators: equal keys go right */
+    where(node, i, value) {
+      const k = node.keys;
+      if (i === 0) return `${value} < ${k[0]}`;
+      if (i === k.length) return `${value} ≥ ${k[k.length - 1]}`;
+      return `${k[i - 1]} ≤ ${value} < ${k[i]}`;
+    }
+
+    findLeaf(value) {
+      const path = [];
+      let node = this.root;
+
+      if (!node) return { leaf: null, path };
+
+      while (!node.leaf) {
+        path.push(node);
+        node = node.children[this.childIndex(node, value)];
+      }
+
+      path.push(node);
+      return { leaf: node, path };
+    }
+
+    /* the descent from the root to the leaf, one frame per index node */
+    snapDescent(value) {
+      let node = this.root;
+      while (node && !node.leaf) {
+        const i = this.childIndex(node, value);
+        this.snap(`İndeks [${node.keys.join(", ")}]: ${this.where(node, i, value)} → ${i}. çocuk.`, { checking: [node], edges: [[node, node.children[i]]] });
+        node = node.children[i];
+      }
+    }
+
+    search(value) {
+      const foundLeaf = this.findLeaf(value);
+      const leaf = foundLeaf.leaf;
+
+      if (!leaf) {
+        return { found: false, leaf: null, path: foundLeaf.path };
+      }
+
+      return {
+        found: leaf.keys.includes(value),
+        leaf,
+        path: foundLeaf.path
+      };
+    }
+
+    insert(value) {
+      this.clearLog();
+
+      if (!this.root) {
+        this.root = new BPlusNode(true);
+        this.root.keys.push(value);
+        this.log("new root", [this.root]);
+        this.snap(`Ağaç boş: kök yaprak [${value}] oluşturulur.`, { found: [this.root] });
+        return true;
+      }
+
+      const located = this.search(value);
+      if (located.found) return false;
+
+      this.snapDescent(value);
+
+      const leaf = located.leaf;
+      let index = 0;
+      while (index < leaf.keys.length && leaf.keys[index] < value) index++;
+      leaf.keys.splice(index, 0, value);
+
+      if (leaf.keys.length > this.maxKeys) {
+        this.snap(`${value} eklenir: yaprakta ${leaf.keys.length} anahtar > en çok ${this.maxKeys} → yaprak bölünür.`, { removing: [leaf] });
+        this.splitLeaf(leaf);
+      } else {
+        this.snap(`${value}, [${leaf.keys.join(", ")}] yaprağına eklenir; taşma yok.`, { found: [leaf] });
+      }
+
+      return true;
+    }
+
+    splitLeaf(leaf) {
+      const right = new BPlusNode(true);
+      const splitIndex = Math.ceil(leaf.keys.length / 2);
+
+      right.keys = leaf.keys.splice(splitIndex);
+      right.next = leaf.next;
+      leaf.next = right;
+
+      right.parent = leaf.parent;
+      const separator = right.keys[0];
+
+      this.splitCount++;
+      this.log("leaf split", [leaf, right]);
+      this.insertIntoParent(leaf, separator, right, `Yaprak bölünmesi: ${separator} yukarı KOPYALANIR (sağ yaprakta da kalır)`);
+    }
+
+    /* what: the split that produced right, for the status line */
+    insertIntoParent(left, separator, right, what) {
+      if (!left.parent) {
+        const newRoot = new BPlusNode(false);
+        newRoot.keys = [separator];
+        newRoot.children = [left, right];
+        left.parent = newRoot;
+        right.parent = newRoot;
+        this.root = newRoot;
+        this.log("new root", [newRoot]);
+        this.snap(`${what} → yeni kök oluşur; yükseklik +1.`, { changed: [newRoot, left, right] });
+        return;
+      }
+
+      const parent = left.parent;
+      const leftIndex = parent.children.indexOf(left);
+
+      parent.keys.splice(leftIndex, 0, separator);
+      parent.children.splice(leftIndex + 1, 0, right);
+      right.parent = parent;
+
+      if (parent.children.length > this.order) {
+        this.snap(`${what}; ebeveynin ${parent.children.length} > ${this.order} çocuğu var → bölünür.`, { changed: [left, right], removing: [parent] });
+        this.splitInternal(parent);
+      } else {
+        this.snap(`${what} → ebeveyn [${parent.keys.join(", ")}].`, { changed: [left, right, parent] });
+      }
+    }
+
+    splitInternal(node) {
+      const right = new BPlusNode(false);
+      const middle = Math.floor(node.keys.length / 2);
+      const promote = node.keys[middle];
+
+      right.keys = node.keys.slice(middle + 1);
+      right.children = node.children.slice(middle + 1);
+      right.children.forEach(child => {
+        child.parent = right;
+      });
+
+      node.keys = node.keys.slice(0, middle);
+      node.children = node.children.slice(0, middle + 1);
+
+      right.parent = node.parent;
+
+      this.splitCount++;
+      this.log("internal split", [node, right]);
+      this.insertIntoParent(node, promote, right, `İndeks bölünmesi: ortadaki anahtar ${promote} yukarı TAŞINIR (bu seviyeden çıkar)`);
+    }
+
+    smallestKey(node) {
+      let current = node;
+
+      while (current && !current.leaf) {
+        current = current.children[0];
+      }
+
+      return current && current.keys.length ? current.keys[0] : null;
+    }
+
+    allRecords() {
+      const result = [];
+      let leaf = this.firstLeaf();
+
+      while (leaf) {
+        result.push(...leaf.keys);
+        leaf = leaf.next;
+      }
+
+      return result;
+    }
+
+    firstLeaf() {
+      let node = this.root;
+      if (!node) return null;
+
+      while (!node.leaf) node = node.children[0];
+      return node;
+    }
+
+    allNodes() {
+      const out = [];
+
+      function walk(node) {
+        if (!node) return;
+        out.push(node);
+        node.children.forEach(walk);
+      }
+
+      walk(this.root);
+      return out;
+    }
+
+    height() {
+      let height = 0;
+      let node = this.root;
+
+      while (node && !node.leaf) {
+        height++;
+        node = node.children[0];
+      }
+
+      return this.root ? height : 0;
+    }
+
+    /* the start leaf is found by a root-to-leaf descent, then the leaves are walked through their links */
+    range(start, end) {
+      if (!this.root) return { scans: [], values: [], path: [] };
+
+      const located = this.findLeaf(start);
+      let leaf = located.leaf;
+      const scans = [];
+      const values = [];
+
+      while (leaf) {
+        const hits = leaf.keys.filter(key => key >= start && key <= end);
+        const stop = leaf.keys.some(key => key > end) || !leaf.next;
+        values.push(...hits);
+        scans.push({ leaf, hits, stop });
+        if (stop) break;
+        leaf = leaf.next;
+      }
+
+      return { scans, values, path: located.path };
+    }
+
+    delete(value) {
+      this.clearLog();
+
+      const located = this.search(value);
+      if (!located.found) return false;
+
+      this.snapDescent(value);
+
+      const leaf = located.leaf;
+      this.snap(`${value} kaydı [${leaf.keys.join(", ")}] yaprağından silinir.`, { removing: [leaf] });
+      leaf.keys.splice(leaf.keys.indexOf(value), 1);
+      this.log("remove record", [leaf]);
+
+      if (leaf === this.root) {
+        if (!leaf.keys.length) {
+          this.root = null;
+          this.snap("Son kayıt silindi: ağaç artık boş.");
+        } else {
+          this.snap(`${value} silindi; kök yaprak istediği sayıda anahtar tutabilir.`, { changed: [leaf] });
+        }
+        return true;
+      }
+
+      if (leaf.keys.length >= this.minLeafKeys) {
+        this.snap(`${value} silindi; yaprakta hâlâ ≥ ${this.minLeafKeys} anahtar var, alt taşma yok.`, { changed: [leaf] });
+      } else {
+        this.rebalance(leaf);
+      }
+
+      this.fixSeparator(value);
+      return true;
+    }
+
+    /* an index key equal to the deleted record is replaced by the smallest key of its right subtree */
+    fixSeparator(value) {
+      this.allNodes().forEach(node => {
+        if (node.leaf) return;
+        const i = node.keys.indexOf(value);
+        if (i < 0) return;
+        const replacement = this.smallestKey(node.children[i + 1]);
+        node.keys[i] = replacement;
+        this.log("separator update", [node]);
+        this.snap(`İndeks anahtarı ${value} artık bir kayıt değil: yerine ${replacement} konur.`, { changed: [node] });
+      });
+    }
+
+    rebalance(node) {
+      if (node === this.root) {
+        if (!node.leaf && node.keys.length === 0) {
+          this.root = node.children[0];
+          this.root.parent = null;
+          this.log("root shrink", [this.root]);
+          this.snap("Kök indeksin tek çocuğu kaldı: o çocuk kök olur; yükseklik −1.", { changed: [this.root] });
+        }
+        return;
+      }
+
+      const min = node.leaf ? this.minLeafKeys : this.minIndexKeys;
+      if (node.keys.length >= min) return;
+
+      const kind = node.leaf ? "Yaprak" : "İndeks düğümü";
+      const parent = node.parent;
+      const idx = parent.children.indexOf(node);
+      const left = idx > 0 ? parent.children[idx - 1] : null;
+      const right = idx < parent.children.length - 1 ? parent.children[idx + 1] : null;
+      this.snap(`${kind}: ${node.keys.length} anahtar < minimum ${min}: alt taşma.`, { removing: [node], checking: [left, right] });
+
+      if (node.leaf) {
+        if (left && left.keys.length > min) {
+          const moved = left.keys.pop();
+          node.keys.unshift(moved);
+          parent.keys[idx - 1] = node.keys[0];
+          this.log("borrow left", [parent, node, left]);
+          this.snap(`Sol yapraktan ${moved} ödünç alınır; ebeveyndeki ayırıcı ${node.keys[0]} olur.`, { changed: [parent, node, left] });
+          return;
+        }
+
+        if (right && right.keys.length > min) {
+          const moved = right.keys.shift();
+          node.keys.push(moved);
+          parent.keys[idx] = right.keys[0];
+          this.log("borrow right", [parent, node, right]);
+          this.snap(`Sağ yapraktan ${moved} ödünç alınır; ebeveyndeki ayırıcı ${right.keys[0]} olur.`, { changed: [parent, node, right] });
+          return;
+        }
+
+        if (left) {
+          const separator = parent.keys[idx - 1];
+          left.keys.push(...node.keys);
+          left.next = node.next;
+          parent.keys.splice(idx - 1, 1);
+          parent.children.splice(idx, 1);
+          this.log("merge", [parent, left]);
+          this.snap(`Sol yaprakla birleştirilir; ayırıcı ${separator} ebeveynden silinir.`, { changed: [parent, left] });
+        } else {
+          const separator = parent.keys[idx];
+          node.keys.push(...right.keys);
+          node.next = right.next;
+          parent.keys.splice(idx, 1);
+          parent.children.splice(idx + 1, 1);
+          this.log("merge", [parent, node]);
+          this.snap(`Sağ yaprakla birleştirilir; ayırıcı ${separator} ebeveynden silinir.`, { changed: [parent, node] });
+        }
+
+        this.rebalance(parent);
+        return;
+      }
+
+      if (left && left.keys.length > min) {
+        const down = parent.keys[idx - 1];
+        const child = left.children.pop();
+        node.keys.unshift(down);
+        node.children.unshift(child);
+        child.parent = node;
+        parent.keys[idx - 1] = left.keys.pop();
+        this.log("borrow left", [parent, node, left]);
+        this.snap(`Döndürme: ${down} aşağı iner, sol kardeşten ${parent.keys[idx - 1]} yukarı çıkar.`, { changed: [parent, node, left] });
+        return;
+      }
+
+      if (right && right.keys.length > min) {
+        const down = parent.keys[idx];
+        const child = right.children.shift();
+        node.keys.push(down);
+        node.children.push(child);
+        child.parent = node;
+        parent.keys[idx] = right.keys.shift();
+        this.log("borrow right", [parent, node, right]);
+        this.snap(`Döndürme: ${down} aşağı iner, sağ kardeşten ${parent.keys[idx]} yukarı çıkar.`, { changed: [parent, node, right] });
+        return;
+      }
+
+      const target = left || node;
+      const source = left ? node : right;
+      const at = left ? idx - 1 : idx;
+      const separator = parent.keys[at];
+      target.keys.push(separator, ...source.keys);
+      source.children.forEach(child => {
+        child.parent = target;
+      });
+      target.children.push(...source.children);
+      parent.keys.splice(at, 1);
+      parent.children.splice(at + 1, 1);
+      this.log("merge", [parent, target]);
+      this.snap(`İndeks düğümleri birleştirilir; ayırıcı ${separator} aralarına iner.`, { changed: [parent, target] });
+
+      this.rebalance(parent);
+    }
+  }
+
+  function order() {
+    const value = Number(el.order.value);
+    return [3, 4, 5, 6].includes(value) ? value : 4;
+  }
+
+  function integer(input) {
+    const value = Number(input.value);
+    return Number.isInteger(value) ? value : null;
+  }
+
+  function clearMarks() {
+    marks.checking.clear();
+    marks.found.clear();
+    marks.range.clear();
+    marks.visited.clear();
+    marks.changed.clear();
+    marks.removing.clear();
+    marks.activeEdges.clear();
+  }
+
+  function setStatus(text, type = "") {
+    el.status.textContent = text;
+    el.status.title = text;
+    el.status.className = "bplus-status" + (type ? " " + type : "");
+  }
+
+  function setRunning(value) {
+    running = value;
+
+    [
+      el.insert, el.search, el.del, el.traverse, el.range,
+      el.load, el.random, el.reset, el.order
+    ].forEach(control => control.disabled = value);
+
+    el.cancel.disabled = !value;
+  }
+
+  function updateStats() {
+    const records = tree ? tree.allRecords() : [];
+    const nodes = tree ? tree.allNodes() : [];
+
+    el.records.textContent = `${records.length} / ${MAX_RECORDS}`;
+    el.nodes.textContent = nodes.length;
+    el.height.textContent = tree && tree.root ? tree.height() : 0;
+    el.splits.textContent = tree ? tree.splitCount : 0;
+    el.result.textContent = lastResult;
+  }
+
+  function subtreeWeight(node) {
+    if (!node) return 1;
+    if (node.leaf) return Math.max(1, node.keys.length);
+
+    return node.children.reduce((sum, child) => sum + subtreeWeight(child), 0);
+  }
+
+  function layoutTree() {
+    const positions = new Map();
+    if (!tree || !tree.root) return positions;
+
+    const h = Math.max(1, tree.height());
+    const topY = 32;
+    const bottomY = 236;
+    const gapY = h ? (bottomY - topY) / h : 0;
+    const margin = 34;
+    const totalWidth = 740 - margin * 2;
+
+    function walk(node, depth, left, right) {
+      const x = (left + right) / 2;
+      positions.set(node.id, { x, y: topY + depth * gapY });
+
+      if (node.leaf || !node.children.length) return;
+
+      const weights = node.children.map(subtreeWeight);
+      const total = weights.reduce((a, b) => a + b, 0) || 1;
+      let cursor = left;
+
+      node.children.forEach((child, index) => {
+        const span = (right - left) * (weights[index] / total);
+        walk(child, depth + 1, cursor, cursor + span);
+        cursor += span;
+      });
+    }
+
+    walk(tree.root, 0, margin, margin + totalWidth);
+    return positions;
+  }
+
+  function svgElement(name, attrs = {}) {
+    const node = document.createElementNS(NS, name);
+    Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value));
+    return node;
+  }
+
+  function nodeClass(node) {
+    const classes = ["bplus-node"];
+
+    if (node.leaf) classes.push("leaf");
+    if (marks.checking.has(node.id)) classes.push("checking");
+    if (marks.found.has(node.id)) classes.push("found");
+    if (marks.range.has(node.id)) classes.push("range");
+    if (marks.visited.has(node.id)) classes.push("visited");
+    if (marks.changed.has(node.id)) classes.push("changed");
+    if (marks.removing.has(node.id)) classes.push("removing");
+
+    return classes.join(" ");
+  }
+
+  function render() {
+    el.svg.innerHTML = "";
+
+    if (!tree || !tree.root) {
+      const text = svgElement("text", {
+        x: 370,
+        y: 135,
+        "text-anchor": "middle",
+        fill: "currentColor",
+        opacity: ".55",
+        "font-size": "14"
+      });
+      text.textContent = "B+ ağacı boş.";
+      el.svg.appendChild(text);
+      el.svg.setAttribute("viewBox", "0 0 740 275");
+      updateStats();
+      return;
+    }
+
+    const positions = layoutTree();
+    const nodes = tree.allNodes();
+    const keyWidth = 36;
+    const nodeHeight = 34;
+
+    nodes.forEach(parent => {
+      if (parent.leaf) return;
+      const p = positions.get(parent.id);
+      const parentWidth = Math.max(keyWidth, parent.keys.length * keyWidth);
+
+      parent.children.forEach((child, index) => {
+        const c = positions.get(child.id);
+        if (!c) return;
+
+        const anchor = parent.children.length > 1
+          ? p.x - parentWidth / 2 + (parentWidth * index) / (parent.children.length - 1)
+          : p.x;
+
+        const line = svgElement("line", {
+          x1: anchor,
+          y1: p.y + nodeHeight / 2,
+          x2: c.x,
+          y2: c.y - nodeHeight / 2,
+          class: "bplus-edge" +
+            (marks.activeEdges.has(`${parent.id}-${child.id}`) ? " active" : "")
+        });
+
+        el.svg.appendChild(line);
+      });
+    });
+
+    /* Leaf links: purely SVG-coordinate based, no DOM pixel measurements. */
+    const leaves = [];
+    let leaf = tree.firstLeaf();
+    while (leaf) {
+      leaves.push(leaf);
+      leaf = leaf.next;
+    }
+
+    for (let i = 0; i < leaves.length - 1; i++) {
+      const leftLeaf = leaves[i];
+      const rightLeaf = leaves[i + 1];
+      const a = positions.get(leftLeaf.id);
+      const b = positions.get(rightLeaf.id);
+      if (!a || !b) continue;
+
+      const aw = Math.max(keyWidth, leftLeaf.keys.length * keyWidth);
+      const bw = Math.max(keyWidth, rightLeaf.keys.length * keyWidth);
+
+      const path = svgElement("path", {
+        d: `M ${a.x + aw / 2} ${a.y + 22} C ${a.x + aw / 2 + 8} ${a.y + 34}, ${b.x - bw / 2 - 8} ${b.y + 34}, ${b.x - bw / 2} ${b.y + 22}`,
+        class: "bplus-leaf-link" +
+          (marks.activeEdges.has(`link-${leftLeaf.id}-${rightLeaf.id}`) ? " active" : "")
+      });
+      el.svg.appendChild(path);
+    }
+
+    nodes.forEach(node => {
+      const p = positions.get(node.id);
+      const width = Math.max(keyWidth, node.keys.length * keyWidth);
+      const x = p.x - width / 2;
+      const y = p.y - nodeHeight / 2;
+
+      const group = svgElement("g", { class: nodeClass(node) });
+
+      const rect = svgElement("rect", {
+        x,
+        y,
+        width,
+        height: nodeHeight,
+        class: "bplus-node-box"
+      });
+      group.appendChild(rect);
+
+      node.keys.forEach((key, index) => {
+        if (index > 0) {
+          const separator = svgElement("line", {
+            x1: x + index * keyWidth,
+            y1: y,
+            x2: x + index * keyWidth,
+            y2: y + nodeHeight,
+            class: "bplus-key-line"
+          });
+          group.appendChild(separator);
+        }
+
+        const text = svgElement("text", {
+          x: x + index * keyWidth + keyWidth / 2,
+          y: p.y + 1,
+          class: "bplus-key-text"
+        });
+        text.textContent = key;
+        group.appendChild(text);
+      });
+
+      const label = svgElement("text", {
+        x: p.x,
+        y: y - 5,
+        class: "bplus-node-label"
+      });
+      label.textContent = node.leaf ? "yaprak" : "indeks";
+      group.appendChild(label);
+
+      el.svg.appendChild(group);
+    });
+
+    fitView();
+    updateStats();
+  }
+
+  /* the viewBox always covers the whole drawing, so the tree shrinks instead of overflowing */
+  function fitView() {
+    let box;
+    try {
+      box = el.svg.getBBox();
+    } catch (error) {
+      return;
+    }
+    const x0 = Math.min(0, box.x - 6);
+    const y0 = Math.min(0, box.y - 6);
+    const x1 = Math.max(740, box.x + box.width + 6);
+    const y1 = Math.max(275, box.y + box.height + 6);
+    el.svg.setAttribute("viewBox", `${x0} ${y0} ${x1 - x0} ${y1 - y0}`);
+  }
+
+  async function pause(localToken) {
+    await wait(DELAY);
+    if (localToken !== token) throw new Error("cancelled");
+  }
+
+  function begin(operation) {
+    token++;
+    saved = tree;
+    clearMarks();
+    lastResult = "—";
+    el.operation.textContent = operation;
+    setRunning(true);
+    render();
+    return token;
+  }
+
+  function finish(localToken, message, type = "") {
+    if (localToken !== token) return;
+
+    saved = null;
+    running = false;
+    setRunning(false);
+    el.operation.textContent = "Boşta";
+    setStatus(message, type);
+    render();
+  }
+
+  function fail(localToken, error) {
+    if (error?.message === "cancelled" || localToken !== token) return;
+
+    if (saved) tree = saved;
+    saved = null;
+    running = false;
+    setRunning(false);
+    el.operation.textContent = "Boşta";
+    setStatus("İşlem durdu.", "error");
+    render();
+  }
+
+  async function animatePath(localToken, path) {
+    let previous = null;
+
+    for (const node of path) {
+      marks.checking.clear();
+      marks.checking.add(node.id);
+
+      if (previous) {
+        marks.activeEdges.add(`${previous.id}-${node.id}`);
+      }
+
+      render();
+      setStatus(
+        node.leaf
+          ? `Yaprak [${node.keys.join(", ")}] inceleniyor...`
+          : `İndeks [${node.keys.join(", ")}] inceleniyor...`
+      );
+      await pause(localToken);
+      previous = node;
+    }
+
+    marks.checking.clear();
+  }
+
+  function applyChangeMarks() {
+    clearMarks();
+
+    tree.changeLog.forEach(entry => {
+      entry.nodeIds.forEach(id => marks.changed.add(id));
+    });
+  }
+
+  /* plays the recorded algorithm steps; the real tree is replaced only after the last step */
+  async function playFrames(localToken, frames) {
+    for (const frame of frames) {
+      tree = frame.tree;
+      clearMarks();
+      frame.marks.checking.forEach(id => marks.checking.add(id));
+      frame.marks.found.forEach(id => marks.found.add(id));
+      frame.marks.changed.forEach(id => marks.changed.add(id));
+      frame.marks.removing.forEach(id => marks.removing.add(id));
+      frame.marks.edges.forEach(key => marks.activeEdges.add(key));
+      render();
+      setStatus(frame.message);
+      await pause(localToken);
+    }
+  }
+
+  function workingCopy() {
+    const work = tree.clone();
+    work.recording = true;
+    work.frames = [];
+    return work;
+  }
+
+  function commit(work) {
+    work.recording = false;
+    work.frames = [];
+    tree = work;
+    saved = null;
+  }
+
+  async function insertValue() {
+    const value = integer(el.value);
+
+    if (value === null) {
+      setStatus("Bir tam sayı girin.", "error");
+      return;
+    }
+
+    if (tree.allRecords().length >= MAX_RECORDS) {
+      setStatus(`En çok ${MAX_RECORDS} kayıt.`, "error");
+      return;
+    }
+
+    const t = begin("Ekleme");
+
+    try {
+      const lookup = tree.search(value);
+
+      if (lookup.found) {
+        await animatePath(t, lookup.path);
+        marks.found.add(lookup.leaf.id);
+        lastResult = "tekrar";
+        render();
+        await pause(t);
+        clearMarks();
+        finish(t, `${value} zaten var.`, "error");
+        return;
+      }
+
+      const work = workingCopy();
+      work.insert(value);
+      await playFrames(t, work.frames);
+
+      commit(work);
+      lastResult = value;
+      clearMarks();
+      finish(t, `${value} eklendi.`, "success");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  async function searchValue() {
+    const value = integer(el.value);
+
+    if (value === null) {
+      setStatus("Bir tam sayı girin.", "error");
+      return;
+    }
+
+    if (!tree.root) {
+      setStatus("B+ ağacı boş.", "error");
+      return;
+    }
+
+    const t = begin("Arama");
+
+    try {
+      const result = tree.search(value);
+      await animatePath(t, result.path);
+
+      if (result.found) {
+        marks.found.add(result.leaf.id);
+        lastResult = value;
+        render();
+        await pause(t);
+        clearMarks();
+        finish(t, `${value} bir yaprak düğümde bulundu.`, "success");
+      } else {
+        lastResult = "yok";
+        clearMarks();
+        finish(t, `${value} bulunamadı (kayıtlar yalnızca yapraklarda durur).`, "error");
+      }
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  async function deleteValue() {
+    const value = integer(el.value);
+
+    if (value === null) {
+      setStatus("Bir tam sayı girin.", "error");
+      return;
+    }
+
+    if (!tree.root) {
+      setStatus("B+ ağacı boş.", "error");
+      return;
+    }
+
+    const t = begin("Silme");
+
+    try {
+      const lookup = tree.search(value);
+
+      if (!lookup.found) {
+        await animatePath(t, lookup.path);
+        clearMarks();
+        lastResult = "yok";
+        finish(t, `${value} bulunamadı.`, "error");
+        return;
+      }
+
+      const work = workingCopy();
+      work.delete(value);
+      await playFrames(t, work.frames);
+
+      commit(work);
+      lastResult = value;
+      clearMarks();
+      finish(t, `${value} silindi.`, "success");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  async function traverseLeaves() {
+    if (!tree.root) {
+      setStatus("B+ ağacı boş.", "error");
+      return;
+    }
+
+    const t = begin("Yaprak gezinmesi");
+
+    try {
+      const result = [];
+      let leaf = tree.firstLeaf();
+      let previous = null;
+
+      while (leaf) {
+        marks.visited.add(leaf.id);
+        if (previous) marks.activeEdges.add(`link-${previous.id}-${leaf.id}`);
+        result.push(...leaf.keys);
+        lastResult = result.join(" → ");
+        render();
+        setStatus(`Yaprak [${leaf.keys.join(", ")}]` + (leaf.next ? " → sonraki bağ izlenir" : " → son yaprak"));
+        await pause(t);
+        previous = leaf;
+        leaf = leaf.next;
+      }
+
+      clearMarks();
+      lastResult = result.join(" → ");
+      finish(t, `Yaprak sırası: ${lastResult}`, "success");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  async function rangeSearch() {
+    const start = integer(el.rangeStart);
+    const end = integer(el.rangeEnd);
+
+    if (start === null || end === null) {
+      setStatus("Aralık için tam sayılar girin.", "error");
+      return;
+    }
+
+    if (start > end) {
+      setStatus("Aralık başı ≤ aralık sonu olmalı.", "error");
+      return;
+    }
+
+    if (!tree.root) {
+      setStatus("B+ ağacı boş.", "error");
+      return;
+    }
+
+    const t = begin("Aralık arama");
+
+    try {
+      const result = tree.range(start, end);
+      await animatePath(t, result.path || []);
+
+      let previous = null;
+      for (const scan of result.scans) {
+        const leaf = scan.leaf;
+        if (scan.hits.length) marks.range.add(leaf.id);
+        else marks.visited.add(leaf.id);
+        if (previous) marks.activeEdges.add(`link-${previous.id}-${leaf.id}`);
+        render();
+        const found = scan.hits.length ? `alınan: ${scan.hits.join(", ")}` : "aralıkta değer yok";
+        const next = scan.stop
+          ? (leaf.next ? `; bir anahtar > ${end} → durulur.` : "; son yaprak → durulur.")
+          : "; sonraki bağ izlenir.";
+        setStatus(`Yaprak [${leaf.keys.join(", ")}]: ${found}${next}`);
+        await pause(t);
+        previous = leaf;
+      }
+
+      lastResult = result.values.length ? result.values.join(" → ") : "yok";
+      render();
+
+      clearMarks();
+      finish(
+        t,
+        result.values.length
+          ? `Aralık [${start}, ${end}]: ${result.values.join(" → ")}`
+          : `[${start}, ${end}] aralığında kayıt yok.`,
+        result.values.length ? "success" : "warning"
+      );
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  function loadValues(values, message) {
+    token++;
+    saved = null;
+    running = false;
+    BPlusNode.nextId = 1;
+    tree = new BPlusTree(order());
+
+    values.slice(0, MAX_RECORDS).forEach(value => tree.insert(value));
+
+    tree.clearLog();
+    lastResult = "—";
+    clearMarks();
+    setRunning(false);
+    el.operation.textContent = "Boşta";
+    render();
+    setStatus(message, "success");
+  }
+
+  function loadExample() {
+    loadValues(
+      [10, 20, 5, 6, 12, 30, 7, 17, 3, 4, 15, 25],
+      `Örnek B+ ağacı yüklendi (derece ${order()}).`
+    );
+  }
+
+  function randomTree() {
+    const values = new Set();
+
+    while (values.size < 12) {
+      values.add(Math.floor(Math.random() * 90) + 10);
+    }
+
+    loadValues([...values], `Rastgele B+ ağacı yüklendi (derece ${order()}).`);
+  }
+
+  function resetTree() {
+    token++;
+    saved = null;
+    running = false;
+    BPlusNode.nextId = 1;
+    tree = new BPlusTree(order());
+    lastResult = "—";
+    clearMarks();
+    setRunning(false);
+    el.operation.textContent = "Boşta";
+    render();
+    setStatus("B+ ağacı temizlendi.");
+  }
+
+  function cancel() {
+    if (!running) return;
+
+    token++;
+    if (saved) tree = saved;
+    saved = null;
+    running = false;
+    clearMarks();
+    setRunning(false);
+    el.operation.textContent = "Boşta";
+    render();
+    setStatus("Animasyon durduruldu; ağaç değişmedi.");
+  }
+
+  el.insert.addEventListener("click", insertValue);
+  el.search.addEventListener("click", searchValue);
+  el.del.addEventListener("click", deleteValue);
+  el.traverse.addEventListener("click", traverseLeaves);
+  el.range.addEventListener("click", rangeSearch);
+  el.load.addEventListener("click", loadExample);
+  el.random.addEventListener("click", randomTree);
+  el.reset.addEventListener("click", resetTree);
+  el.cancel.addEventListener("click", cancel);
+
+  el.order.addEventListener("change", loadExample);
+
+  el.cancel.disabled = true;
+  loadExample();
+})();
+</script>
+<script src="deck/oyun.js"></script>

@@ -1,0 +1,962 @@
+---
+layout: without-sidebar
+title: "Öncelikli Kuyruk Simülatörü"
+permalink: /files/data_structures/slides/Bolum_11_Priority_Queue.html
+redirect_from:
+  - /files/data_structures/slides/Bolum_08_Priority_Queue.html
+excerpt: "İkili max-heap ile gerçeklenmiş kararlı öncelikli kuyruk simülatörü: ekleme (enqueue), çıkarma (dequeue), öncelik güncelleme, mantıksal hizmet sırası ve eşzamanlı görselleştirme."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+/* ---------- 800x600 stage (agt-oyun) ---------- */
+.ds-st { font-size: 15px; line-height: 1.3; }
+:where(.ds-st) .agt-oyun__body { display: flex; flex-direction: column; }
+:where(.ds-st) .ds-sim__root { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+:where(.ds-st) .agt-oyun__body button {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 12px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 999px;
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: none;
+  transition: border-color .18s ease, background .18s ease;
+}
+:where(.ds-st) .agt-oyun__body button:hover:not(:disabled) { border-color: var(--ds-link); }
+:where(.ds-st) .agt-oyun__body button:disabled { opacity: .4; cursor: default; }
+:where(.ds-st) .agt-oyun__body button.is-primary { border-color: var(--ds-link); background: var(--ds-link); color: var(--ds-bg); }
+:where(.ds-st) .agt-oyun__body button.is-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--ds-link) 85%, var(--ds-text)); }
+:where(.ds-st) .agt-oyun__body button.is-danger { border-color: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-border)); color: var(--ds-bad); }
+:where(.ds-st) .agt-oyun__body input,
+:where(.ds-st) .agt-oyun__body select {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+  box-shadow: none;
+}
+:where(.ds-st) .agt-oyun__body input[type="checkbox"],
+:where(.ds-st) .agt-oyun__body input[type="radio"] { width: auto; height: auto; padding: 0; }
+:where(.ds-st) .agt-oyun__body label {
+  margin: 0;
+  padding: 0;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.ds-st .ds-sim__panel {
+  min-height: 0;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-bg);
+}
+.ds-st .ds-sim__status {
+  padding: 6px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+}
+.ds-st .ds-sim__caption {
+  margin: 0 0 4px;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+:where(.ds-st) .agt-oyun__body li { margin: 0; }
+
+.ds-pq {
+  position: relative;
+  height: 100%;
+  line-height: 1.3;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 6px;
+}
+
+/* ---------- controls ---------- */
+.ds-pq__panel {
+  display: grid;
+  gap: 6px;
+  padding: 6px 10px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.ds-pq__group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.ds-pq__field {
+  display: grid;
+  gap: 2px;
+  width: 66px;
+}
+
+.ds-pq__field--text { width: 104px; }
+.ds-pq__field--wide { width: 84px; }
+.ds-pq__field input { width: 100%; }
+
+
+
+
+/* ---------- main area ---------- */
+.ds-pq__main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 6px;
+}
+
+.ds-pq__visual {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.ds-pq__service-panel {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border-bottom: 1.5px solid var(--ds-border);
+  background: var(--ds-surface);
+}
+
+.ds-pq__service-panel .ds-sim__caption { margin: 0; line-height: 1.25; }
+
+.ds-pq__service-order {
+  height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  font-size: 13px;
+}
+
+.ds-pq__service-empty { color: var(--ds-muted); }
+
+.ds-pq__service-item {
+  flex: 0 0 80px;
+  height: 54px;
+  padding: 3px 4px;
+  border: 2px solid var(--ds-link);
+  border-radius: 8px;
+  background: var(--ds-node);
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  overflow: hidden;
+}
+
+.ds-pq__service-item span,
+.ds-pq__service-item small {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-pq__service-item small {
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ds-pq__service-item.is-front {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+}
+
+.ds-pq__service-item.is-more {
+  flex-basis: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  border-color: var(--ds-border);
+  background: var(--ds-surface);
+  color: var(--ds-muted);
+}
+
+.ds-pq__arrow {
+  flex: none;
+  color: var(--ds-muted);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.ds-pq__canvas {
+  position: relative;
+  min-height: 0;
+}
+
+.ds-pq__svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ds-pq__empty-text {
+  fill: var(--ds-muted);
+  font-size: 14px;
+  text-anchor: middle;
+}
+
+.ds-pq__edge {
+  stroke: var(--ds-link);
+  stroke-width: 2;
+}
+
+.ds-pq__edge.is-active {
+  stroke: var(--ds-warn);
+  stroke-width: 4;
+}
+
+.ds-pq__node circle {
+  fill: var(--ds-node);
+  stroke: var(--ds-link);
+  stroke-width: 2.4;
+  transition: fill .18s ease, stroke .18s ease;
+}
+
+.ds-pq__node text.value {
+  fill: var(--ds-text);
+  font-size: 15px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.ds-pq__node text.meta {
+  fill: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.ds-pq__node.is-checking circle {
+  fill: var(--ds-hot);
+  stroke: var(--ds-warn);
+}
+
+.ds-pq__node.is-found circle {
+  fill: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  stroke: var(--ds-good);
+}
+
+/* ---------- side: heap array and history ---------- */
+.ds-pq__side {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 6px;
+}
+
+.ds-pq__table-panel,
+.ds-pq__log-panel {
+  min-height: 0;
+  padding: 5px 8px;
+  overflow: hidden;
+}
+
+.ds-pq__table-panel table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 12px;
+}
+
+.ds-pq__table-panel th,
+.ds-pq__table-panel td {
+  height: 14px;
+  padding: 0 4px;
+  border: 1px solid var(--ds-border);
+  line-height: 13px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-pq__table-panel th {
+  background: var(--ds-surface-strong);
+  color: var(--ds-muted);
+  font-size: 12px;
+}
+
+.ds-pq__table-panel col.c-index { width: 38px; }
+.ds-pq__table-panel col.c-priority { width: 58px; }
+.ds-pq__table-panel col.c-arrival { width: 54px; }
+.ds-pq__table-panel col.c-parent { width: 62px; }
+
+.ds-pq__log-panel ol {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.ds-pq__log-panel li {
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- footer: status and stats ---------- */
+.ds-pq__footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  height: 44px;
+}
+
+.ds-st .ds-pq__status {
+  margin: 0;
+  padding: 3px 10px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  line-height: 1.25;
+  overflow: hidden;
+}
+
+.ds-pq__status.is-success { color: var(--ds-good); }
+.ds-pq__status.is-error { color: var(--ds-bad); }
+
+.ds-pq__stat {
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-pq__stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-pq * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-st agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 11 · Simülasyon</p><h1>Öncelikli Kuyruk Simülatörü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="ds-pq-help" aria-label="Bu simülatör hakkında">?</button>
+    <a class="agt-oyun__back" href="Bolum_11_Oncelikli_Kuyruk.html">← Bölüm 11</a>
+  </header>
+
+  <div class="agt-oyun__body">
+
+        <div class="ds-sim__root ds-pq">
+          <div class="ds-pq__panel">
+            <div class="ds-pq__group">
+              <div class="ds-pq__field ds-pq__field--text"><label for="ds-pq-value">Değer</label><input id="ds-pq-value" type="text" value="Görev A" maxlength="24"></div>
+              <div class="ds-pq__field"><label for="ds-pq-priority">Öncelik</label><input id="ds-pq-priority" type="number" min="0" max="99" value="5"></div>
+              <button class="is-primary" id="ds-pq-enqueue" type="button">Ekle</button>
+              <button id="ds-pq-random" type="button">Rastgele Ekle</button>
+              <button class="is-danger" id="ds-pq-dequeue" type="button">Çıkar</button>
+              <button id="ds-pq-peek" type="button">Bak</button>
+            </div>
+
+            <div class="ds-pq__group">
+              <div class="ds-pq__field ds-pq__field--wide"><label for="ds-pq-index">Heap indisi</label><input id="ds-pq-index" type="number" min="0" value="0"></div>
+              <div class="ds-pq__field ds-pq__field--wide"><label for="ds-pq-new-priority">Yeni öncelik</label><input id="ds-pq-new-priority" type="number" min="0" max="99" value="8"></div>
+              <button id="ds-pq-change" type="button">Önceliği Değiştir</button>
+              <button id="ds-pq-example" type="button">Örneği Yükle</button>
+              <button class="is-danger" id="ds-pq-clear" type="button">Temizle</button>
+              <button class="is-danger" id="ds-pq-cancel" type="button">İptal</button>
+            </div>
+          </div>
+
+          <div class="ds-pq__main">
+            <div class="ds-pq__visual ds-sim__panel">
+              <div class="ds-pq__service-panel">
+                <p class="ds-sim__caption">Hizmet sırası</p>
+                <div id="ds-pq-service-order" class="ds-pq__service-order"></div>
+              </div>
+              <div class="ds-pq__canvas"><svg id="ds-pq-svg" class="ds-pq__svg" viewBox="0 0 470 230" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Öncelikli kuyruğun ikili heap'i"></svg></div>
+            </div>
+
+            <div class="ds-pq__side">
+              <div class="ds-pq__table-panel ds-sim__panel">
+                <p class="ds-sim__caption">Heap dizisi</p>
+                <table>
+                  <colgroup><col class="c-index"><col><col class="c-priority"><col class="c-arrival"><col class="c-parent"></colgroup>
+                  <thead><tr><th>İndis</th><th>Değer</th><th>Öncelik</th><th>Geliş #</th><th>Ebeveyn</th></tr></thead>
+                  <tbody id="ds-pq-body"></tbody>
+                </table>
+              </div>
+
+              <div class="ds-pq__log-panel ds-sim__panel">
+                <p class="ds-sim__caption">İşlem geçmişi</p>
+                <ol id="ds-pq-log"><li>Henüz işlem yok.</li></ol>
+              </div>
+            </div>
+          </div>
+
+          <div class="ds-pq__footer">
+            <p id="ds-pq-status" class="ds-pq__status ds-sim__status" role="status" aria-live="polite">Örnek öncelikli kuyruk yüklendi. Bir işlem seçin.</p>
+            <div class="ds-pq__stat"><strong>Kuyruk boyutu</strong><span id="ds-pq-size">0</span></div>
+            <div class="ds-pq__stat"><strong>En yüksek öncelik</strong><span id="ds-pq-highest">—</span></div>
+            <div class="ds-pq__stat"><strong>Karşılaştırma</strong><span id="ds-pq-comparisons">0</span></div>
+            <div class="ds-pq__stat"><strong>Takas</strong><span id="ds-pq-swaps">0</span></div>
+          </div>
+        </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="ds-pq-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Öncelikli Kuyruk Simülatörü</h2>
+    <p>Öncelikli kuyruk, geliş sırası ne olursa olsun önce en yüksek öncelikli öğeye hizmet verir. Burada önceliğe göre düzenlenmiş bir max-heap kullanılır; eşit önceliklerde önce gelen (geliş numarası küçük olan) öğe önce hizmet alır.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>Bir <b>Değer</b> ve <b>Öncelik</b> (0–99) yazıp <b>Ekle</b> (enqueue) düğmesine basın ya da <b>Rastgele Ekle</b>'yi kullanın. En fazla 10 öğe sığar.</li>
+      <li><b>Çıkar</b> (dequeue) en yüksek öncelikli öğeyi siler; <b>Bak</b> (peek) onu yalnızca gösterir.</li>
+      <li><b>Önceliği Değiştir</b>, <b>Heap indisi</b> alanındaki konumda duran öğeye <b>Yeni öncelik</b> değerini verir ve heap'i yukarı ya da aşağı süzerek onarır.</li>
+      <li><b>Örneği Yükle</b> örnek kuyruğu geri getirir, <b>Temizle</b> kuyruğu boşaltır, <b>İptal</b> çalışan işlemi durdurur ve kuyruğu önceki durumuna getirir.</li>
+    </ul>
+    <h3>Ekranı okuma</h3>
+    <ul>
+      <li><b>Hizmet sırası</b>: öğelerin kuyruktan çıkarılacağı mantıksal sıra.</li>
+      <li>Ağaç ve <b>Heap dizisi</b> aynı veridir: i. öğenin ebeveyni ⌊(i − 1) / 2⌋ indisindedir.</li>
+      <li><b>İşlem geçmişi</b> son işlemleri listeler.</li>
+    </ul>
+    <h3>Karmaşıklık</h3>
+    <table>
+      <tr><th>İşlem</th><th>Zaman</th></tr>
+      <tr><td>bakma (peek)</td><td>O(1)</td></tr>
+      <tr><td>ekleme, çıkarma, öncelik değiştirme</td><td>O(log n)</td></tr>
+    </table>
+  </dialog>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var root = document.querySelector(".ds-pq");
+  if (!root) return;
+
+  function q(id){ return root.querySelector("#"+id); }
+
+  var ns="http://www.w3.org/2000/svg";
+  var el={
+    value:q("ds-pq-value"),priority:q("ds-pq-priority"),index:q("ds-pq-index"),newPriority:q("ds-pq-new-priority"),
+    service:q("ds-pq-service-order"),svg:q("ds-pq-svg"),
+    status:q("ds-pq-status"),size:q("ds-pq-size"),highest:q("ds-pq-highest"),comparisons:q("ds-pq-comparisons"),
+    swaps:q("ds-pq-swaps"),body:q("ds-pq-body"),log:q("ds-pq-log")
+  };
+
+  var btn={
+    enqueue:q("ds-pq-enqueue"),random:q("ds-pq-random"),dequeue:q("ds-pq-dequeue"),peek:q("ds-pq-peek"),
+    change:q("ds-pq-change"),example:q("ds-pq-example"),clear:q("ds-pq-clear"),cancel:q("ds-pq-cancel")
+  };
+
+  /* the 800x600 stage holds a heap of at most MAX items (4 levels) and LOG_SIZE history rows */
+  var MAX=10;
+  var DELAY=400;
+  var LOG_SIZE=3;
+  var NODE_R=17;
+
+  var heap=[];
+  var arrival=0;
+  var comparisons=0;
+  var swaps=0;
+  var token=0;
+  var marked={};
+  var activeEdges={};
+  var logs=[];
+  /* state before the running operation; Cancel restores it so the heap is never left half-done */
+  var saved=null;
+
+  function parent(i){ return Math.floor((i-1)/2); }
+  function left(i){ return 2*i+1; }
+  function right(i){ return 2*i+2; }
+
+  function higher(a,b){
+    if(a.priority!==b.priority) return a.priority>b.priority;
+    return a.order<b.order;
+  }
+
+  function readPriority(input,label){
+    if(input.value.trim()==="") throw new Error(label+" gerekli.");
+    var n=Number(input.value);
+    if(!Number.isInteger(n)||n<0||n>99) throw new Error(label+" 0 ile 99 arasında bir tam sayı olmalı.");
+    return n;
+  }
+
+  function readValue(){
+    var v=el.value.value.trim();
+    if(!v) throw new Error("Değer gerekli.");
+    return v;
+  }
+
+  function safeText(value){
+    return String(value);
+  }
+
+  function setStatus(text,type){
+    el.status.textContent=text;
+    el.status.title=text;
+    el.status.classList.remove("is-success","is-error");
+    if(type) el.status.classList.add(type);
+  }
+
+  function delay(){
+    if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return 0;
+    return DELAY;
+  }
+
+  function wait(ms,t){
+    return new Promise(function(resolve){ setTimeout(function(){ resolve(t===token); },ms); });
+  }
+
+  function disable(state){
+    Object.keys(btn).forEach(function(k){ btn[k].disabled=state && k!=="cancel"; });
+    btn.cancel.disabled=!state;
+  }
+
+  function clearMarks(){ marked={}; activeEdges={}; }
+
+  function addLog(text){
+    logs.unshift(text);
+    logs=logs.slice(0,LOG_SIZE);
+    el.log.innerHTML="";
+    logs.forEach(function(item){
+      var li=document.createElement("li");
+      li.textContent=item;
+      li.title=item;
+      el.log.appendChild(li);
+    });
+  }
+
+  /* node positions in the drawing area's own pixels; the viewBox always contains them */
+  function positions(width,height){
+    var levels=Math.floor(Math.log2(heap.length))+1;
+    var top=NODE_R+6;
+    var bottom=NODE_R+18;
+    var gap=levels>1?Math.max(2*NODE_R+8,Math.min(80,(height-top-bottom)/(levels-1))):0;
+    var used=top+bottom+gap*(levels-1);
+    var offset=Math.max(0,(height-used)/2);
+
+    return {
+      height:Math.max(height,used),
+      points:heap.map(function(_,i){
+        var level=Math.floor(Math.log2(i+1));
+        var first=Math.pow(2,level)-1;
+        var pos=i-first;
+        var count=Math.pow(2,level);
+        return {x:(pos+0.5)*width/count,y:offset+top+level*gap};
+      })
+    };
+  }
+
+  function logicalOrder(){
+    return heap.slice().sort(function(a,b){
+      if(higher(a,b)) return -1;
+      if(higher(b,a)) return 1;
+      return 0;
+    });
+  }
+
+  function serviceItem(item,front){
+    var d=document.createElement("div");
+    d.className="ds-pq__service-item"+(front?" is-front":"");
+    d.title=safeText(item.value)+" · öncelik "+item.priority+" · geliş #"+item.order;
+    var name=document.createElement("span");
+    name.textContent=safeText(item.value);
+    var p=document.createElement("small");
+    p.textContent="öncelik "+item.priority;
+    var a=document.createElement("small");
+    a.textContent="geliş #"+item.order;
+    d.appendChild(name); d.appendChild(p); d.appendChild(a);
+    return d;
+  }
+
+  function render(){
+    var logical=logicalOrder();
+    el.service.innerHTML="";
+
+    if(!logical.length){
+      var empty=document.createElement("span");
+      empty.className="ds-pq__service-empty";
+      empty.textContent="Öncelikli kuyruk boş.";
+      el.service.appendChild(empty);
+    } else {
+      /* each item takes 80px plus an arrow; items that do not fit are summarised as "+k more" */
+      var fit=Math.max(1,Math.floor(((el.service.clientWidth||470)+20)/100));
+      var shown=logical.length>fit?fit-1:logical.length;
+
+      for(var s=0;s<shown;s++){
+        el.service.appendChild(serviceItem(logical[s],s===0));
+
+        if(s<logical.length-1){
+          var arrow=document.createElement("span");
+          arrow.className="ds-pq__arrow";
+          arrow.textContent="→";
+          el.service.appendChild(arrow);
+        }
+      }
+
+      if(shown<logical.length){
+        var more=document.createElement("div");
+        more.className="ds-pq__service-item is-more";
+        more.textContent="+"+(logical.length-shown)+" daha";
+        el.service.appendChild(more);
+      }
+    }
+
+    el.body.innerHTML="";
+    heap.forEach(function(item,i){
+      var tr=document.createElement("tr");
+      [i,item.value,item.priority,item.order,i?parent(i):"—"].forEach(function(v){
+        var td=document.createElement("td"); td.textContent=String(v); td.title=String(v); tr.appendChild(td);
+      });
+      el.body.appendChild(tr);
+    });
+
+    while(el.svg.lastChild) el.svg.removeChild(el.svg.lastChild);
+
+    var box=el.svg.parentNode;
+    var width=box.clientWidth||470;
+    var height=box.clientHeight||230;
+
+    if(!heap.length){
+      el.svg.setAttribute("viewBox","0 0 "+width+" "+height);
+      var text=document.createElementNS(ns,"text");
+      text.setAttribute("x",String(width/2)); text.setAttribute("y",String(height/2));
+      text.setAttribute("class","ds-pq__empty-text");
+      text.textContent="Öncelikli kuyruk boş.";
+      el.svg.appendChild(text);
+    } else {
+      var layout=positions(width,height);
+      var p=layout.points;
+      el.svg.setAttribute("viewBox","0 0 "+width+" "+layout.height);
+
+      for(var i=1;i<heap.length;i++){
+        var par=parent(i);
+        var line=document.createElementNS(ns,"line");
+        line.setAttribute("x1",String(p[par].x)); line.setAttribute("y1",String(p[par].y));
+        line.setAttribute("x2",String(p[i].x)); line.setAttribute("y2",String(p[i].y));
+        line.setAttribute("class","ds-pq__edge"+(activeEdges[par+"-"+i]?" is-active":""));
+        el.svg.appendChild(line);
+      }
+
+      for(var j=0;j<heap.length;j++){
+        var g=document.createElementNS(ns,"g");
+        g.setAttribute("class","ds-pq__node"+(marked[j]?" "+marked[j]:""));
+        g.setAttribute("transform","translate("+p[j].x+" "+p[j].y+")");
+
+        var circle=document.createElementNS(ns,"circle");
+        circle.setAttribute("r",String(NODE_R));
+
+        var value=document.createElementNS(ns,"text");
+        value.setAttribute("class","value");
+        value.textContent=String(heap[j].priority);
+
+        var meta=document.createElementNS(ns,"text");
+        meta.setAttribute("class","meta");
+        meta.setAttribute("y",String(NODE_R+12));
+        meta.textContent="i="+j+" · #"+heap[j].order;
+
+        g.appendChild(circle); g.appendChild(value); g.appendChild(meta); el.svg.appendChild(g);
+      }
+    }
+
+    el.size.textContent=String(heap.length);
+    el.highest.textContent=heap.length?String(heap[0].priority):"—";
+    el.comparisons.textContent=String(comparisons);
+    el.swaps.textContent=String(swaps);
+  }
+
+  function cloneItems(list){
+    return list.map(function(item){ return {value:item.value,priority:item.priority,order:item.order}; });
+  }
+
+  function label(item){ return item.value+" (p"+item.priority+")"; }
+
+  /* why a should or should not be served before b */
+  function why(a,b){
+    if(a.priority!==b.priority) return "p"+a.priority+(a.priority>b.priority?" > ":" < ")+"p"+b.priority;
+    return "eşit öncelik, geliş #"+a.order+(a.order<b.order?" < #":" > #")+b.order;
+  }
+
+  /* one animation step: draw, show the message, wait; false when the step was cancelled */
+  async function step(t,message){
+    render();
+    if(message) setStatus(message);
+    return await wait(delay(),t);
+  }
+
+  function markEdge(a,b){
+    var child=Math.max(a,b),par=parent(child);
+    if(par===Math.min(a,b)) activeEdges[par+"-"+child]=true;
+  }
+
+  function begin(){
+    token++;
+    saved={heap:cloneItems(heap),arrival:arrival,comparisons:comparisons,swaps:swaps};
+    comparisons=0; swaps=0;
+    clearMarks(); disable(true);
+    return token;
+  }
+
+  function finish(t,message,logText){
+    if(t!==token) return false;
+    saved=null;
+    clearMarks(); render(); disable(false);
+    if(logText) addLog(logText);
+    setStatus(message,"is-success");
+    return true;
+  }
+
+  async function siftUp(t,start){
+    var i=start;
+
+    while(i>0){
+      var p=parent(i);
+      comparisons++;
+      var up=higher(heap[i],heap[p]);
+      clearMarks(); marked[i]="is-checking"; marked[p]="is-checking"; markEdge(i,p);
+      if(!(await step(t,"Up-heap: "+label(heap[i])+" ile ebeveyn "+label(heap[p])+": "+why(heap[i],heap[p])+(up?" → takas.":" → dur.")))) return false;
+      if(!up) return true;
+
+      var tmp=heap[i]; heap[i]=heap[p]; heap[p]=tmp; swaps++;
+      i=p;
+      clearMarks(); marked[i]="is-found";
+      if(!(await step(t,"Takas: "+label(heap[i])+" yukarı çıktı (i="+i+")."))) return false;
+    }
+
+    clearMarks(); marked[0]="is-found";
+    return await step(t,label(heap[0])+" köke ulaştı: sıradaki hizmet onun.");
+  }
+
+  async function siftDown(t,start){
+    var i=start;
+
+    while(true){
+      var l=left(i),r=right(i);
+      if(l>=heap.length){
+        clearMarks(); marked[i]="is-found";
+        return await step(t,"Down-heap: "+label(heap[i])+" (i="+i+") çocuksuz → dur.");
+      }
+
+      var best=l,text;
+      if(r<heap.length){
+        comparisons++;
+        if(higher(heap[r],heap[l])) best=r;
+        text="üstün çocuk "+label(heap[best]);
+      } else {
+        text="tek çocuk "+label(heap[l]);
+      }
+      comparisons++;
+      var down=higher(heap[best],heap[i]);
+      clearMarks(); marked[i]="is-checking"; marked[best]="is-checking"; markEdge(i,best);
+      if(!(await step(t,"Down-heap: "+text+" ile "+label(heap[i])+": "+why(heap[best],heap[i])+(down?" → takas.":" → dur.")))) return false;
+      if(!down) return true;
+
+      var tmp=heap[i]; heap[i]=heap[best]; heap[best]=tmp; swaps++;
+      i=best;
+      clearMarks(); marked[i]="is-found";
+      if(!(await step(t,"Takas: "+label(heap[i])+" aşağı indi (i="+i+")."))) return false;
+    }
+  }
+
+  btn.enqueue.addEventListener("click",async function(){
+    var value,priority;
+    try{
+      value=readValue();
+      priority=readPriority(el.priority,"Öncelik");
+      if(heap.length>=MAX) throw new Error("Öncelikli kuyruk dolu: en fazla "+MAX+" öğe.");
+    }catch(error){
+      setStatus(error.message,"is-error"); return;
+    }
+
+    var t=begin();
+    var item={value:value,priority:priority,order:++arrival};
+    heap.push(item);
+    clearMarks(); marked[heap.length-1]="is-found";
+    if(!(await step(t,label(item)+", geliş #"+item.order+", dizinin sonuna eklenir: indis "+(heap.length-1)+"."))) return;
+    if(!(await siftUp(t,heap.length-1))) return;
+    finish(t,value+" eklendi: "+comparisons+" karşılaştırma, "+swaps+" takas.",value+" eklendi (öncelik "+priority+").");
+  });
+
+  btn.random.addEventListener("click",function(){
+    var names=["Kurulum","Çizim","Derleme","Yükleme","Yedek","Dizin","Analiz","Eşitleme"];
+    el.value.value=names[Math.floor(Math.random()*names.length)];
+    el.priority.value=String(Math.floor(Math.random()*10)+1);
+    btn.enqueue.click();
+  });
+
+  btn.dequeue.addEventListener("click",async function(){
+    if(!heap.length){ setStatus("Öncelikli kuyruk boş.","is-error"); return; }
+
+    var t=begin();
+    var removed=heap[0];
+    marked[0]="is-found";
+    if(!(await step(t,"Kök "+label(removed)+" en yüksek öncelikli: çıkarılır."))) return;
+
+    if(heap.length>1){
+      var lastIndex=heap.length-1;
+      clearMarks(); marked[0]="is-checking"; marked[lastIndex]="is-checking";
+      if(!(await step(t,"Son öğe "+label(heap[lastIndex])+" (i="+lastIndex+") köke taşınır."))) return;
+      heap[0]=heap.pop();
+      clearMarks(); marked[0]="is-found";
+      if(!(await step(t,label(heap[0])+" artık kökte; heap down-heap ile onarılır."))) return;
+      if(!(await siftDown(t,0))) return;
+    } else {
+      heap.pop();
+    }
+
+    finish(t,removed.value+" çıkarıldı: "+comparisons+" karşılaştırma, "+swaps+" takas.",removed.value+" çıkarıldı (öncelik "+removed.priority+").");
+  });
+
+  btn.peek.addEventListener("click",async function(){
+    if(!heap.length){ setStatus("Öncelikli kuyruk boş.","is-error"); return; }
+
+    token++; clearMarks(); marked[0]="is-found"; render();
+    var t=token;
+    setStatus("Sıradaki: "+heap[0].value+", öncelik "+heap[0].priority+" (kök, O(1)).","is-success");
+    if(await wait(delay(),t)){ clearMarks(); render(); }
+  });
+
+  btn.change.addEventListener("click",async function(){
+    var index,newPriority;
+    try{
+      index=Number(el.index.value);
+      if(el.index.value.trim()===""||!Number.isInteger(index)||index<0||index>=heap.length) throw new Error("Heap indisi aralık dışında.");
+      newPriority=readPriority(el.newPriority,"Yeni öncelik");
+    }catch(error){
+      setStatus(error.message,"is-error"); return;
+    }
+
+    var t=begin();
+    var item=heap[index];
+    var oldPriority=item.priority;
+    marked[index]="is-found";
+    if(!(await step(t,"İndis "+index+" konumundaki "+item.value+": öncelik "+oldPriority+" → "+newPriority+"."))) return;
+
+    item.priority=newPriority;
+
+    if(newPriority>oldPriority){
+      if(!(await step(t,"Öncelik arttı: öğe yalnızca yukarı çıkabilir → up-heap."))) return;
+      if(!(await siftUp(t,index))) return;
+    } else if(newPriority<oldPriority){
+      if(!(await step(t,"Öncelik azaldı: öğe yalnızca aşağı inebilir → down-heap."))) return;
+      if(!(await siftDown(t,index))) return;
+    }
+
+    finish(t,newPriority===oldPriority?"Öncelik aynı; heap değişmedi.":"Öncelik güncellendi: "+comparisons+" karşılaştırma, "+swaps+" takas.",
+      item.value+" önceliği: "+oldPriority+" → "+newPriority+".");
+  });
+
+  btn.example.addEventListener("click",async function(){
+    var t=begin();
+    heap=[]; arrival=0;
+
+    var items=[
+      {value:"Çizim",priority:8},
+      {value:"Derleme",priority:5},
+      {value:"Yedek",priority:8},
+      {value:"E-posta",priority:3},
+      {value:"Dizin",priority:5},
+      {value:"Eşitleme",priority:7}
+    ];
+
+    for(var i=0;i<items.length;i++){
+      var item={value:items[i].value,priority:items[i].priority,order:++arrival};
+      heap.push(item);
+      clearMarks(); marked[heap.length-1]="is-found";
+      if(!(await step(t,"Örnek: "+label(item)+" eklenir, geliş #"+item.order+"."))) return;
+      if(!(await siftUp(t,heap.length-1))) return;
+    }
+
+    if(t!==token) return;
+    logs=[];
+    finish(t,"Örnek öncelikli kuyruk yüklendi.","Örnek öncelikli kuyruk yüklendi.");
+  });
+
+  btn.clear.addEventListener("click",function(){
+    token++; saved=null; heap=[]; arrival=0; comparisons=0; swaps=0; logs=[]; clearMarks(); disable(false);
+    el.log.innerHTML="<li>Henüz işlem yok.</li>";
+    render(); setStatus("Öncelikli kuyruk temizlendi.");
+  });
+
+  btn.cancel.addEventListener("click",function(){
+    token++;
+    if(saved){
+      heap=saved.heap; arrival=saved.arrival; comparisons=saved.comparisons; swaps=saved.swaps;
+      saved=null;
+    }
+    clearMarks(); disable(false); render();
+    setStatus("Animasyon iptal edildi; kuyruk işlemden önceki durumuna döndü.");
+  });
+
+  render();
+  btn.example.click();
+})();
+</script>
+<script src="deck/oyun.js"></script>

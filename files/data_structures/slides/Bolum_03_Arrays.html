@@ -1,0 +1,742 @@
+---
+layout: without-sidebar
+title: "Dizi Simülatörü"
+permalink: /files/data_structures/slides/Bolum_03_Arrays.html
+redirect_from:
+  - /files/data_structures/slides/Bolum_02_Arrays.html
+excerpt: "Erişim, ekleme, silme, doğrusal arama ve kabarcık sıralaması için etkileşimli dizi simülatörü."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+/* ortak simülatör kontrolleri (agt-oyun sahnesi) */
+.ds-st { font-size: 15px; }
+.ds-st .agt-oyun__body { display: flex; flex-direction: column; }
+.ds-st .ds-sim__root { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+:where(.ds-st) .agt-oyun__body button {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 12px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 999px;
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease;
+}
+:where(.ds-st) .agt-oyun__body button.is-primary { border-color: var(--ds-link); background: var(--ds-link); color: var(--ds-bg); }
+:where(.ds-st) .agt-oyun__body button.is-danger { border-color: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-border)); color: var(--ds-bad); }
+:where(.ds-st) .agt-oyun__body input,
+:where(.ds-st) .agt-oyun__body select {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+}
+:where(.ds-st) .agt-oyun__body label { margin: 0; padding: 0; color: var(--ds-muted); font-size: 12px; font-weight: 700; }
+.ds-st .ds-sim__panel { min-height: 0; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.ds-st .ds-sim__caption { margin: 0 0 4px; color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+
+.ds-array-sim {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.sim-controls {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.sim-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.sim-field {
+  display: grid;
+  gap: 2px;
+  width: 92px;
+}
+
+.sim-field-size { width: 72px; }
+
+.sim-field input { width: 100%; }
+
+.sim-stage {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.sim-array-area {
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 10px 6px;
+  overflow: hidden;
+}
+
+.sim-array {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.sim-cell-wrap {
+  min-width: 0;
+  flex: 0 1 54px;
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+}
+
+.sim-index {
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+.ds-array-sim button.sim-cell {
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--ds-link);
+  border-radius: 8px;
+  background: var(--ds-node);
+  color: var(--ds-text);
+  font-size: 16px;
+  font-weight: 800;
+  transition: transform .18s ease, background .18s ease, border-color .18s ease, opacity .18s ease, box-shadow .18s ease;
+}
+
+.ds-array-sim button.sim-cell:hover { transform: translateY(-2px); }
+
+.ds-array-sim button.sim-cell.checking {
+  border-color: var(--ds-warn);
+  background: var(--ds-hot);
+  transform: translateY(-5px) scale(1.04);
+}
+
+.ds-array-sim button.sim-cell.found {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  transform: translateY(-5px) scale(1.05);
+}
+
+.ds-array-sim button.sim-cell.selected {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ds-link) 30%, transparent);
+  transform: translateY(-4px);
+}
+
+.ds-array-sim button.sim-cell.sorted {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 13%, var(--ds-bg));
+}
+
+.ds-array-sim button.sim-cell.moving {
+  opacity: .38;
+  transform: scale(.88);
+}
+
+.sim-empty {
+  color: var(--ds-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.sim-status {
+  padding: 8px 10px;
+  border-top: 1.5px solid var(--ds-border);
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sim-status.success { color: var(--ds-good); }
+.sim-status.error { color: var(--ds-bad); }
+
+.sim-footer {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 6px;
+}
+
+.sim-stat {
+  min-width: 0;
+  padding: 4px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sim-stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-array-sim * { transition-duration: .001ms !important; animation-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-st arr-st agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 3 · Simülasyon</p><h1>Dizi Simülatörü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="arr-help" aria-label="Yardım">?</button>
+    <a class="agt-oyun__back" href="Bolum_03_Diziler.html">← Bölüm 3</a>
+  </header>
+
+  <div class="agt-oyun__body">
+
+    <div class="ds-sim__root ds-array-sim">
+      <div class="sim-controls">
+        <div class="sim-row">
+          <div class="sim-field sim-field-size">
+            <label for="arr-size">Boyut</label>
+            <input id="arr-size" type="number" min="1" max="12" value="8" inputmode="numeric">
+          </div>
+          <button class="is-primary" id="arr-create" type="button">Rastgele Dizi</button>
+          <button id="arr-shuffle" type="button">Karıştır</button>
+          <button class="is-danger" id="arr-clear" type="button">Temizle</button>
+        </div>
+
+        <div class="sim-row">
+          <div class="sim-field">
+            <label for="arr-index">İndis</label>
+            <input id="arr-index" type="number" min="0" value="0" inputmode="numeric">
+          </div>
+          <div class="sim-field">
+            <label for="arr-value">Değer</label>
+            <input id="arr-value" type="number" value="50" inputmode="numeric">
+          </div>
+          <button id="arr-access" type="button">Eriş</button>
+          <button id="arr-set" type="button">Ata</button>
+          <button class="is-primary" id="arr-insert" type="button">Ekle</button>
+          <button class="is-danger" id="arr-delete" type="button">Sil</button>
+        </div>
+
+        <div class="sim-row">
+          <div class="sim-field">
+            <label for="arr-search">Aranan</label>
+            <input id="arr-search" type="number" value="50" inputmode="numeric">
+          </div>
+          <button id="arr-search-btn" type="button">Doğrusal Arama</button>
+          <button id="arr-traverse" type="button">Gez</button>
+          <button id="arr-reverse" type="button">Ters Çevir</button>
+          <button id="arr-sort" type="button">Kabarcık Sıralaması</button>
+          <button class="is-danger" id="arr-cancel" type="button">İptal</button>
+        </div>
+      </div>
+
+      <div class="sim-stage ds-sim__panel">
+        <div class="sim-array-area">
+          <div class="sim-array" id="arr-view"></div>
+        </div>
+        <div class="sim-status" id="arr-status" aria-live="polite">Hazır.</div>
+      </div>
+
+      <div class="sim-footer">
+        <div class="sim-stat"><strong>İşlem</strong><span id="stat-operation">Boşta</span></div>
+        <div class="sim-stat"><strong>Karşılaştırma</strong><span id="stat-comparisons">0</span></div>
+        <div class="sim-stat"><strong>Takas / kaydırma</strong><span id="stat-swaps">0</span></div>
+        <div class="sim-stat"><strong>Uzunluk</strong><span id="stat-length">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="arr-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Dizi Simülatörü</h2>
+    <p>Dizi öğelerini bellekte bitişik tutar; bu yüzden her öğeye indisiyle doğrudan erişilir. Ortaya ekleme ya da ortadan silme, sonraki öğelerin kaymasını gerektirir.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li><b>Boyut</b> + <b>Rastgele Dizi</b> 1–12 rastgele değer üretir; <b>Karıştır</b> ve <b>Temizle</b> dizinin tamamını değiştirir.</li>
+      <li><b>İndis</b> / <b>Değer</b>: <b>Eriş</b> okur, <b>Ata</b> üzerine yazar, <b>Ekle</b> öğeleri sağa kaydırıp ekler, <b>Sil</b> öğeyi çıkarıp sonrakileri sola kaydırır.</li>
+      <li><b>Doğrusal Arama</b>, <b>Gez</b>, <b>Ters Çevir</b> ve <b>Kabarcık Sıralaması</b> canlandırılır; <b>İptal</b> canlandırmayı durdurur ve diziyi eski hâline getirir.</li>
+      <li>Bir hücreye tıklamak, indisini ve değerini giriş kutularına kopyalar.</li>
+    </ul>
+    <h3>Maliyetler</h3>
+    <table><tr><th>İşlem</th><th>Süre</th></tr>
+      <tr><td>Erişim / atama</td><td>O(1)</td></tr>
+      <tr><td>i indisine ekleme / i indisinden silme</td><td>O(n − i) kaydırma</td></tr>
+      <tr><td>Doğrusal arama, gezinme</td><td>O(n)</td></tr>
+      <tr><td>Ters çevirme</td><td>O(n), n/2 takas</td></tr>
+      <tr><td>Kabarcık sıralaması</td><td>O(n²) karşılaştırma</td></tr></table>
+    <p>Alt satırdaki sayaçlar, çalışan işlemin karşılaştırma ve takas/kaydırma sayılarını gösterir.</p>
+  </dialog>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+
+  const els = {
+    size: $("arr-size"),
+    create: $("arr-create"),
+    shuffle: $("arr-shuffle"),
+    clear: $("arr-clear"),
+    index: $("arr-index"),
+    value: $("arr-value"),
+    access: $("arr-access"),
+    set: $("arr-set"),
+    insert: $("arr-insert"),
+    del: $("arr-delete"),
+    searchValue: $("arr-search"),
+    search: $("arr-search-btn"),
+    traverse: $("arr-traverse"),
+    reverse: $("arr-reverse"),
+    sort: $("arr-sort"),
+    cancel: $("arr-cancel"),
+    view: $("arr-view"),
+    status: $("arr-status"),
+    operation: $("stat-operation"),
+    comparisons: $("stat-comparisons"),
+    swaps: $("stat-swaps"),
+    length: $("stat-length")
+  };
+
+  let data = [];
+  let token = 0;
+  let running = false;
+  let comparisons = 0;
+  let swaps = 0;
+  let snapshot = null;
+
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  function setStatus(text, type = "") {
+    els.status.textContent = text;
+    els.status.className = "sim-status" + (type ? " " + type : "");
+  }
+
+  function setOperation(name) {
+    els.operation.textContent = name;
+  }
+
+  function updateStats() {
+    els.comparisons.textContent = comparisons;
+    els.swaps.textContent = swaps;
+    els.length.textContent = data.length;
+  }
+
+  function resetStats(name = "Boşta") {
+    comparisons = 0;
+    swaps = 0;
+    setOperation(name);
+    updateStats();
+  }
+
+  function validInteger(input) {
+    const n = Number(input.value);
+    return Number.isInteger(n) ? n : null;
+  }
+
+  function setRunning(value) {
+    running = value;
+    const controls = [
+      els.create, els.shuffle, els.clear, els.access, els.set,
+      els.insert, els.del, els.search, els.traverse, els.reverse, els.sort
+    ];
+    controls.forEach(b => b.disabled = value);
+    els.cancel.disabled = !value;
+  }
+
+  function render(states = {}) {
+    els.view.innerHTML = "";
+    els.length.textContent = data.length;
+
+    if (!data.length) {
+      const empty = document.createElement("div");
+      empty.className = "sim-empty";
+      empty.textContent = "Dizi boş.";
+      els.view.appendChild(empty);
+      return;
+    }
+
+    data.forEach((value, i) => {
+      const wrap = document.createElement("div");
+      wrap.className = "sim-cell-wrap";
+
+      const cell = document.createElement("button");
+      cell.type = "button";
+      cell.className = "sim-cell";
+      cell.textContent = value;
+      cell.title = "İndis " + i;
+      cell.dataset.index = i;
+
+      if (states.checking?.includes(i)) cell.classList.add("checking");
+      if (states.found?.includes(i)) cell.classList.add("found");
+      if (states.selected?.includes(i)) cell.classList.add("selected");
+      if (states.sorted?.includes(i)) cell.classList.add("sorted");
+      if (states.moving?.includes(i)) cell.classList.add("moving");
+
+      cell.addEventListener("click", () => {
+        if (running) return;
+        els.index.value = i;
+        els.value.value = data[i];
+        render({ selected: [i] });
+        setStatus(`İndis ${i} seçildi.`);
+      });
+
+      const index = document.createElement("div");
+      index.className = "sim-index";
+      index.textContent = i;
+
+      wrap.append(cell, index);
+      els.view.appendChild(wrap);
+    });
+  }
+
+  async function pause(localToken) {
+    await wait(280);
+    if (localToken !== token) throw new Error("cancelled");
+  }
+
+  async function animateState(localToken, states, text) {
+    if (text) setStatus(text);
+    render(states);
+    await pause(localToken);
+  }
+
+  function randomValue() {
+    return Math.floor(Math.random() * 90) + 10;
+  }
+
+  function ensureArray() {
+    if (!data.length) {
+      setStatus("Önce bir dizi oluşturun.", "error");
+      return false;
+    }
+    return true;
+  }
+
+  function begin(name) {
+    token++;
+    snapshot = data.slice();
+    resetStats(name);
+    setRunning(true);
+    return token;
+  }
+
+  function end(localToken, message, type = "") {
+    if (localToken !== token) return;
+    setRunning(false);
+    setOperation("Boşta");
+    setStatus(message, type);
+    render();
+  }
+
+  function fail(localToken, err) {
+    if (err?.message === "cancelled") return;
+    if (localToken !== token) return;
+    setRunning(false);
+    setOperation("Boşta");
+    setStatus("İşlem durduruldu.", "error");
+    render();
+  }
+
+  function createRandom() {
+    token++;
+    const size = Math.max(1, Math.min(12, Math.floor(Number(els.size.value)) || 8));
+    els.size.value = size;
+    data = Array.from({ length: size }, randomValue);
+    resetStats();
+    setRunning(false);
+    render();
+    setStatus(`${size} öğeli dizi oluşturuldu.`, "success");
+  }
+
+  function shuffle() {
+    if (!ensureArray()) return;
+    token++;
+    for (let i = data.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [data[i], data[j]] = [data[j], data[i]];
+    }
+    resetStats();
+    render();
+    setStatus("Dizi karıştırıldı.", "success");
+  }
+
+  function clearArray() {
+    token++;
+    data = [];
+    resetStats();
+    setRunning(false);
+    render();
+    setStatus("Dizi temizlendi.");
+  }
+
+  async function access() {
+    if (!ensureArray()) return;
+    const i = validInteger(els.index);
+    if (i === null || i < 0 || i >= data.length) {
+      setStatus("İndis aralık dışında.", "error");
+      return;
+    }
+    const t = begin("Erişim");
+    try {
+      await animateState(t, { found: [i] }, `Erişiliyor: indis ${i} → ${data[i]}`);
+      end(t, `İndis ${i} değeri: ${data[i]}.`, "success");
+    } catch (e) { fail(t, e); }
+  }
+
+  async function setValue() {
+    if (!ensureArray()) return;
+    const i = validInteger(els.index);
+    const v = validInteger(els.value);
+    if (i === null || i < 0 || i >= data.length) {
+      setStatus("İndis aralık dışında.", "error");
+      return;
+    }
+    if (v === null) {
+      setStatus("Tam sayı bir değer girin.", "error");
+      return;
+    }
+    const t = begin("Atama");
+    try {
+      await animateState(t, { selected: [i] }, `İndis ${i} güncelleniyor...`);
+      data[i] = v;
+      await animateState(t, { found: [i] }, `İndis ${i} = ${v}`);
+      end(t, `İndis ${i} güncellendi.`, "success");
+    } catch (e) { fail(t, e); }
+  }
+
+  async function insertValue() {
+    if (data.length >= 12) {
+      setStatus("En fazla 12 öğe olabilir.", "error");
+      return;
+    }
+    const i = validInteger(els.index);
+    const v = validInteger(els.value);
+    if (i === null || i < 0 || i > data.length) {
+      setStatus(`İndis 0 ile ${data.length} arasında olmalı.`, "error");
+      return;
+    }
+    if (v === null) {
+      setStatus("Tam sayı bir değer girin.", "error");
+      return;
+    }
+
+    const t = begin("Ekleme");
+    try {
+      data.push(v);
+      for (let k = data.length - 1; k > i; k--) {
+        data[k] = data[k - 1];
+        swaps++;
+        updateStats();
+        await animateState(t, { checking: [k - 1], moving: [k] }, `Kaydırma: indis ${k - 1} → ${k}`);
+      }
+      data[i] = v;
+      await animateState(t, { found: [i] }, `${v} eklendi: indis ${i}.`);
+      end(t, `${v} eklendi: indis ${i}.`, "success");
+    } catch (e) { fail(t, e); }
+  }
+
+  async function deleteValue() {
+    if (!ensureArray()) return;
+    const i = validInteger(els.index);
+    if (i === null || i < 0 || i >= data.length) {
+      setStatus("İndis aralık dışında.", "error");
+      return;
+    }
+
+    const removed = data[i];
+    const t = begin("Silme");
+    try {
+      await animateState(t, { found: [i] }, `İndis ${i} siliniyor...`);
+      for (let k = i; k < data.length - 1; k++) {
+        data[k] = data[k + 1];
+        swaps++;
+        updateStats();
+        await animateState(t, { checking: [k + 1], moving: [k] }, `Kaydırma: indis ${k + 1} → ${k}`);
+      }
+      data.pop();
+      render();
+      end(t, `${removed} silindi: indis ${i}.`, "success");
+    } catch (e) { fail(t, e); }
+  }
+
+  async function linearSearch() {
+    if (!ensureArray()) return;
+    const target = validInteger(els.searchValue);
+    if (target === null) {
+      setStatus("Aranacak tam sayıyı girin.", "error");
+      return;
+    }
+
+    const t = begin("Doğrusal Arama");
+    try {
+      for (let i = 0; i < data.length; i++) {
+        comparisons++;
+        updateStats();
+        await animateState(t, { checking: [i] }, `Karşılaştırma: indis ${i} ile ${target}`);
+        if (data[i] === target) {
+          await animateState(t, { found: [i] }, `${target} bulundu: indis ${i}.`);
+          end(t, `${target} bulundu: indis ${i}.`, "success");
+          return;
+        }
+      }
+      end(t, `${target} bulunamadı.`, "error");
+    } catch (e) { fail(t, e); }
+  }
+
+  async function traverse() {
+    if (!ensureArray()) return;
+    const t = begin("Gezinme");
+    try {
+      for (let i = 0; i < data.length; i++) {
+        await animateState(t, { checking: [i] }, `Ziyaret: indis ${i} → ${data[i]}`);
+      }
+      end(t, "Gezinme tamamlandı.", "success");
+    } catch (e) { fail(t, e); }
+  }
+
+  async function reverseArray() {
+    if (!ensureArray()) return;
+    const t = begin("Ters Çevirme");
+    try {
+      let left = 0, right = data.length - 1;
+      while (left < right) {
+        await animateState(t, { checking: [left, right] }, `Takas: indis ${left} ↔ ${right}`);
+        [data[left], data[right]] = [data[right], data[left]];
+        swaps++;
+        updateStats();
+        render({ found: [left, right] });
+        await pause(t);
+        left++;
+        right--;
+      }
+      end(t, "Dizi ters çevrildi.", "success");
+    } catch (e) { fail(t, e); }
+  }
+
+  async function bubbleSort() {
+    if (!ensureArray()) return;
+    const t = begin("Kabarcık Sıralaması");
+    try {
+      const sorted = [];
+      for (let endIndex = data.length - 1; endIndex > 0; endIndex--) {
+        let changed = false;
+        for (let i = 0; i < endIndex; i++) {
+          comparisons++;
+          updateStats();
+          await animateState(t, { checking: [i, i + 1], sorted }, `Karşılaştırma: ${data[i]} ile ${data[i + 1]}`);
+          if (data[i] > data[i + 1]) {
+            [data[i], data[i + 1]] = [data[i + 1], data[i]];
+            swaps++;
+            changed = true;
+            updateStats();
+            render({ found: [i, i + 1], sorted });
+            setStatus(`Takas edildi: indis ${i} ↔ ${i + 1}`);
+            await pause(t);
+          }
+        }
+        sorted.push(endIndex);
+        render({ sorted });
+        if (!changed) break;
+      }
+      render({ sorted: data.map((_, i) => i) });
+      await pause(t);
+      end(t, "Dizi sıralandı.", "success");
+    } catch (e) { fail(t, e); }
+  }
+
+  function cancel() {
+    if (!running) return;
+    token++;
+    /* iptal: yarım kalan kaydırma/takas bırakılmaz, dizi işlem öncesine döner */
+    const changed = snapshot && snapshot.join(",") !== data.join(",");
+    if (snapshot) data = snapshot;
+    snapshot = null;
+    setRunning(false);
+    setOperation("Boşta");
+    render();
+    setStatus(changed ? "Canlandırma iptal edildi; dizi eski hâline getirildi." : "Canlandırma iptal edildi.");
+  }
+
+  els.create.addEventListener("click", createRandom);
+  els.shuffle.addEventListener("click", shuffle);
+  els.clear.addEventListener("click", clearArray);
+  els.access.addEventListener("click", access);
+  els.set.addEventListener("click", setValue);
+  els.insert.addEventListener("click", insertValue);
+  els.del.addEventListener("click", deleteValue);
+  els.search.addEventListener("click", linearSearch);
+  els.traverse.addEventListener("click", traverse);
+  els.reverse.addEventListener("click", reverseArray);
+  els.sort.addEventListener("click", bubbleSort);
+  els.cancel.addEventListener("click", cancel);
+
+
+  els.cancel.disabled = true;
+  createRandom();
+})();
+</script>
+<script src="deck/oyun.js"></script>

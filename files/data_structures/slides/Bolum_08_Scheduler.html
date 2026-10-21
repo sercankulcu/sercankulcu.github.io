@@ -1,0 +1,776 @@
+---
+layout: without-sidebar
+title: "Round Robin Çizelgeleyici"
+permalink: /files/data_structures/slides/Bolum_08_Scheduler.html
+redirect_from:
+  - /files/data_structures/slides/Bolum_05_Scheduler.html
+excerpt: "FIFO hazır kuyruğu, ayarlanabilir quantum ve süreç ölçümleriyle etkileşimli round robin çizelgeleyici simülatörü."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+/* ---------- 800x600 stage (agt-oyun) ---------- */
+.ds-st { font-size: 15px; line-height: 1.3; }
+:where(.ds-st) .agt-oyun__body { display: flex; flex-direction: column; }
+:where(.ds-st) .ds-sim__root { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+:where(.ds-st) .agt-oyun__body button {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 12px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 999px;
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: none;
+  transition: border-color .18s ease, background .18s ease;
+}
+:where(.ds-st) .agt-oyun__body button:hover:not(:disabled) { border-color: var(--ds-link); }
+:where(.ds-st) .agt-oyun__body button:disabled { opacity: .4; cursor: default; }
+:where(.ds-st) .agt-oyun__body button.is-primary { border-color: var(--ds-link); background: var(--ds-link); color: var(--ds-bg); }
+:where(.ds-st) .agt-oyun__body button.is-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--ds-link) 85%, var(--ds-text)); }
+:where(.ds-st) .agt-oyun__body button.is-danger { border-color: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-border)); color: var(--ds-bad); }
+:where(.ds-st) .agt-oyun__body input,
+:where(.ds-st) .agt-oyun__body select {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+  box-shadow: none;
+}
+:where(.ds-st) .agt-oyun__body input[type="checkbox"],
+:where(.ds-st) .agt-oyun__body input[type="radio"] { width: auto; height: auto; padding: 0; }
+:where(.ds-st) .agt-oyun__body label {
+  margin: 0;
+  padding: 0;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.ds-st .ds-sim__panel {
+  min-height: 0;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-bg);
+}
+.ds-st .ds-sim__status {
+  padding: 6px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+}
+.ds-st .ds-sim__caption {
+  margin: 0 0 4px;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+:where(.ds-st) .agt-oyun__body li { margin: 0; }
+
+.scheduler-sim {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.scheduler-controls {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.scheduler-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.scheduler-field {
+  display: grid;
+  gap: 2px;
+  width: 84px;
+}
+
+.scheduler-field input { width: 100%; }
+
+.scheduler-stage {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 10px;
+}
+
+.scheduler-queue-panel,
+.scheduler-current-panel {
+  overflow: hidden;
+}
+
+.scheduler-queue-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.scheduler-panel-title {
+  margin: 0;
+  padding: 8px 10px 0;
+  text-align: center;
+}
+
+.scheduler-queue-wrap {
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 6px 8px;
+}
+
+.scheduler-queue {
+  width: 100%;
+  min-height: 150px;
+  padding: 12px 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow: hidden;
+  border: 4px solid var(--ds-link);
+  border-left-width: 6px;
+  border-right-width: 6px;
+  border-radius: 10px;
+  background: var(--ds-surface);
+}
+
+.scheduler-process {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 92px;
+  min-height: 92px;
+  padding: 6px 4px;
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  border: 2px solid var(--ds-link);
+  border-radius: 8px;
+  background: var(--ds-node);
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.scheduler-process small {
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.scheduler-process.front {
+  border-color: var(--ds-warn);
+  background: var(--ds-hot);
+  transform: translateY(-3px);
+}
+
+.scheduler-process.complete {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+}
+
+.scheduler-empty {
+  width: 100%;
+  color: var(--ds-muted);
+  text-align: center;
+  font-size: 14px;
+}
+
+.scheduler-queue-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 12px 8px;
+  color: var(--ds-link);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .06em;
+}
+
+.scheduler-current-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+}
+
+.scheduler-current {
+  min-height: 0;
+  margin: 6px 10px 8px;
+  padding: 8px;
+  display: grid;
+  place-content: center;
+  gap: 5px;
+  border: 2px dashed var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  text-align: center;
+  transition: background .18s ease, border-color .18s ease;
+}
+
+.scheduler-current.running {
+  border-style: solid;
+  border-color: var(--ds-warn);
+  background: var(--ds-hot);
+}
+
+.scheduler-current-name {
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.scheduler-current-meta {
+  color: var(--ds-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.scheduler-progress {
+  height: 10px;
+  margin: 0 10px 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--ds-surface-strong);
+}
+
+.scheduler-progress-bar {
+  height: 100%;
+  width: 0;
+  background: var(--ds-link);
+  transition: width .18s ease;
+}
+
+.scheduler-status {
+  height: 58px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1.5px solid var(--ds-border);
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  overflow: hidden;
+}
+
+.scheduler-status.success { color: var(--ds-good); }
+.scheduler-status.error { color: var(--ds-bad); }
+.scheduler-status.warning { color: color-mix(in srgb, var(--ds-warn) 60%, var(--ds-text)); }
+
+.scheduler-footer {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(4, 1fr);
+  gap: 6px;
+}
+
+.scheduler-stat {
+  min-width: 0;
+  padding: 4px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scheduler-stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scheduler-sim * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-st agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 8 · Simülasyon</p><h1>Round Robin Çizelgeleyici</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="scheduler-help" aria-label="Yardım">?</button>
+    <a class="agt-oyun__back" href="Bolum_08_Kuyruk.html">← Bölüm 8</a>
+  </header>
+
+  <div class="agt-oyun__body">
+
+        <div class="ds-sim__root scheduler-sim">
+          <div class="scheduler-controls">
+            <div class="scheduler-row">
+              <div class="scheduler-field">
+                <label for="scheduler-burst">Süre</label>
+                <input id="scheduler-burst" type="number" min="1" max="20" value="6" inputmode="numeric">
+              </div>
+              <div class="scheduler-field">
+                <label for="scheduler-quantum">Quantum</label>
+                <input id="scheduler-quantum" type="number" min="1" max="10" value="2" inputmode="numeric">
+              </div>
+              <button class="is-primary" id="scheduler-add" type="button">Süreç Ekle</button>
+              <button id="scheduler-random" type="button">Rastgele Ekle</button>
+              <button id="scheduler-step" type="button">Bir Quantum Çalıştır</button>
+              <button id="scheduler-example" type="button">Örnek Yükle</button>
+            </div>
+
+            <div class="scheduler-row">
+              <button class="is-primary" id="scheduler-auto" type="button">Otomatik Çalıştır</button>
+              <button class="is-danger" id="scheduler-pause" type="button">Duraklat</button>
+              <button class="is-danger" id="scheduler-reset" type="button">Sıfırla</button>
+            </div>
+          </div>
+
+          <div class="scheduler-stage">
+            <div class="scheduler-queue-panel ds-sim__panel">
+              <p class="scheduler-panel-title ds-sim__caption">Hazır kuyruğu</p>
+
+              <div class="scheduler-queue-wrap">
+                <div class="scheduler-queue" id="scheduler-queue"></div>
+              </div>
+
+              <div class="scheduler-queue-labels">
+                <span>ÖN</span>
+                <span>ARKA</span>
+              </div>
+            </div>
+
+            <div class="scheduler-current-panel ds-sim__panel">
+              <p class="scheduler-panel-title ds-sim__caption">Çalışan süreç</p>
+
+              <div class="scheduler-current" id="scheduler-current">
+                <div class="scheduler-current-name" id="scheduler-current-name">CPU boşta</div>
+                <div class="scheduler-current-meta" id="scheduler-current-meta">—</div>
+              </div>
+
+              <div class="scheduler-progress">
+                <div class="scheduler-progress-bar" id="scheduler-progress"></div>
+              </div>
+
+              <div class="scheduler-status" id="scheduler-status" aria-live="polite">
+                Hazır.
+              </div>
+            </div>
+          </div>
+
+          <div class="scheduler-footer">
+            <div class="scheduler-stat"><strong>İşlem</strong><span id="scheduler-operation">Boşta</span></div>
+            <div class="scheduler-stat"><strong>Zaman</strong><span id="scheduler-time">0</span></div>
+            <div class="scheduler-stat"><strong>Hazır</strong><span id="scheduler-ready">0</span></div>
+            <div class="scheduler-stat"><strong>Biten</strong><span id="scheduler-completed">0</span></div>
+            <div class="scheduler-stat"><strong>Quantum</strong><span id="scheduler-quantum-stat">2</span></div>
+          </div>
+        </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="scheduler-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Round Robin Çizelgeleyici</h2>
+    <p>FIFO bir hazır kuyruğu üzerine kurulu CPU çizelgeleyicisi. Kuyruğun önündeki (ÖN) süreç en fazla bir <b>quantum</b> (zaman dilimi) boyunca çalışır; hâlâ süreye ihtiyacı varsa yeniden arkaya (ARKA) enqueue edilir, yoksa tamamlanır.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li><b>Süre</b> (burst, toplam CPU süresi, 1–20) değerini girip <b>Süreç Ekle</b> düğmesine basın ya da <b>Rastgele Ekle</b> kullanın. Simülatöre en fazla 6 süreç sığar.</li>
+      <li><b>Quantum</b> (1–10) bir zaman diliminin uzunluğudur.</li>
+      <li><b>Bir Quantum Çalıştır</b> bir dilimi yürütür; <b>Otomatik Çalıştır</b> tüm süreçler bitene dek devam eder; <b>Duraklat</b> durdurur; <b>Sıfırla</b> kuyruğu boşaltır.</li>
+      <li><b>Örnek Yükle</b> hazır bir iş yükü yükler.</li>
+    </ul>
+    <h3>Ekranı okuma</h3>
+    <ul>
+      <li><b>Hazır kuyruğu</b>: CPU'yu bekleyen süreçler; ön solda, arka sağda.</li>
+      <li><b>Çalışan süreç</b>: çalışmakta olan süreç, kalan süresi ve bir ilerleme çubuğu.</li>
+      <li>Alt satır son işlemi, saati, hazır ve biten süreç sayısını ve quantum değerini gösterir.</li>
+    </ul>
+    <h3>Notlar</h3>
+    <ul>
+      <li>Her süreç CPU'yu düzenli olarak alır, bu yüzden hiçbir süreç aç kalmaz; iki sıra arasındaki bekleme en fazla (süreç sayısı − 1) × quantum olur.</li>
+      <li>Büyük bir quantum Round Robin'i FCFS gibi davrandırır; çok küçük bir quantum çok sayıda bağlam değişimine yol açar.</li>
+      <li>Duraklatmadan sonra devam eden süreç, quantum'unun önceden kullandığı kısmını korur.</li>
+      <li>Her dequeue ve enqueue O(1)'dir.</li>
+    </ul>
+  </dialog>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+
+  const el = {
+    burst: $("scheduler-burst"),
+    quantum: $("scheduler-quantum"),
+    add: $("scheduler-add"),
+    random: $("scheduler-random"),
+    step: $("scheduler-step"),
+    example: $("scheduler-example"),
+    auto: $("scheduler-auto"),
+    pause: $("scheduler-pause"),
+    reset: $("scheduler-reset"),
+    queue: $("scheduler-queue"),
+    current: $("scheduler-current"),
+    currentName: $("scheduler-current-name"),
+    currentMeta: $("scheduler-current-meta"),
+    progress: $("scheduler-progress"),
+    status: $("scheduler-status"),
+    operation: $("scheduler-operation"),
+    time: $("scheduler-time"),
+    ready: $("scheduler-ready"),
+    completed: $("scheduler-completed"),
+    quantumStat: $("scheduler-quantum-stat")
+  };
+
+  const DELAY = 330;
+  const MAX_PROCESSES = 6;
+
+  let processes = [];
+  let completed = [];
+  let current = null;
+  let elapsed = 0;
+  let nextId = 1;
+  let running = false;
+  let token = 0;
+  let pausedId = null;
+
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  function readBurst() {
+    const value = Number(el.burst.value);
+    return Number.isInteger(value) && value >= 1 && value <= 20 ? value : null;
+  }
+
+  function readQuantum() {
+    let value = Number(el.quantum.value);
+    if (!Number.isInteger(value)) value = 2;
+    value = Math.max(1, Math.min(10, value));
+    el.quantum.value = value;
+    return value;
+  }
+
+  function setStatus(text, type = "") {
+    el.status.textContent = text;
+    el.status.className = "scheduler-status" + (type ? " " + type : "");
+  }
+
+  function updateStats() {
+    el.time.textContent = elapsed;
+    el.ready.textContent = processes.length;
+    el.completed.textContent = completed.length;
+    el.quantumStat.textContent = readQuantum();
+  }
+
+  function setRunning(value) {
+    running = value;
+    [el.add, el.random, el.step, el.example, el.auto, el.reset]
+      .forEach(button => button.disabled = value);
+    el.pause.disabled = !value;
+  }
+
+  function render() {
+    el.queue.innerHTML = "";
+
+    if (!processes.length) {
+      const empty = document.createElement("div");
+      empty.className = "scheduler-empty";
+      empty.textContent = completed.length ? "Hazır kuyruğu boş." : "Süreç yok.";
+      el.queue.appendChild(empty);
+    } else {
+      processes.forEach((process, index) => {
+        const node = document.createElement("div");
+        node.className = "scheduler-process";
+        if (index === 0) node.classList.add("front");
+
+        const name = document.createElement("div");
+        name.textContent = process.name;
+
+        const remaining = document.createElement("small");
+        remaining.textContent = `Kalan: ${process.remaining}`;
+
+        const burst = document.createElement("small");
+        burst.textContent = `Süre: ${process.burst}`;
+
+        node.append(name, remaining, burst);
+        el.queue.appendChild(node);
+      });
+    }
+
+    if (current) {
+      el.current.classList.add("running");
+      el.currentName.textContent = current.name;
+      el.currentMeta.textContent = `Kalan ${current.remaining} / ${current.burst}`;
+
+      const used = current.burst - current.remaining;
+      const pct = current.burst ? (used / current.burst) * 100 : 0;
+      el.progress.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+    } else {
+      el.current.classList.remove("running");
+      el.currentName.textContent = "CPU boşta";
+      el.currentMeta.textContent = "—";
+      el.progress.style.width = "0%";
+    }
+
+    updateStats();
+  }
+
+  function addProcess(burst, message = true) {
+    if (processes.length + completed.length + (current ? 1 : 0) >= MAX_PROCESSES) {
+      setStatus(`En fazla ${MAX_PROCESSES} süreç.`, "error");
+      return false;
+    }
+
+    const process = {
+      id: nextId,
+      name: `P${nextId}`,
+      burst,
+      remaining: burst
+    };
+
+    nextId++;
+    processes.push(process);
+    render();
+
+    if (message) setStatus(`${process.name} eklendi, süre ${burst}.`, "success");
+    return true;
+  }
+
+  function addFromInput() {
+    const burst = readBurst();
+    if (burst === null) {
+      setStatus("Süre 1 ile 20 arasında bir tam sayı olmalı.", "error");
+      return;
+    }
+    addProcess(burst);
+  }
+
+  function addRandom() {
+    const burst = Math.floor(Math.random() * 9) + 2;
+    el.burst.value = burst;
+    addProcess(burst);
+  }
+
+  function loadExample() {
+    token++;
+    running = false;
+    processes = [];
+    completed = [];
+    current = null;
+    elapsed = 0;
+    nextId = 1;
+    pausedId = null;
+
+    [5, 3, 7, 4].forEach(burst => addProcess(burst, false));
+    el.operation.textContent = "Boşta";
+    setRunning(false);
+    render();
+    setStatus("Örnek iş yükü yüklendi.", "success");
+  }
+
+  async function runQuantum(localToken) {
+    if (!processes.length) {
+      if (completed.length) {
+        setStatus("Tüm süreçler tamamlandı.", "success");
+      } else {
+        setStatus("Önce bir süreç ekleyin.", "warning");
+      }
+      return false;
+    }
+
+    const quantum = readQuantum();
+    current = processes.shift();
+    el.operation.textContent = "Bir quantum";
+
+    /* A process resumed after Pause keeps the part of its quantum it already used. */
+    let used = current.id === pausedId ? (current.sliceUsed || 0) : 0;
+    pausedId = null;
+    if (used >= quantum) used = 0;
+    const slice = Math.min(quantum - used, current.remaining);
+    render();
+    setStatus(`${current.name} önden dequeue edildi, ${slice} zaman birimi çalışacak.`);
+
+    for (let tick = 0; tick < slice; tick++) {
+      await wait(DELAY);
+
+      if (localToken !== token) throw new Error("cancelled");
+
+      current.remaining--;
+      current.sliceUsed = used + tick + 1;
+      elapsed++;
+      render();
+      setStatus(`${current.name} çalışıyor: kalan ${current.remaining}.`);
+    }
+
+    current.sliceUsed = 0;
+
+    if (current.remaining <= 0) {
+      const finished = current;
+      current = null;
+      completed.push(finished);
+      render();
+      setStatus(`${finished.name} tamamlandı, zaman ${elapsed}.`, "success");
+    } else {
+      const unfinished = current;
+      current = null;
+      processes.push(unfinished);
+      render();
+      setStatus(`${unfinished.name} arkaya döndü, kalan ${unfinished.remaining}.`);
+    }
+
+    return true;
+  }
+
+  async function oneStep() {
+    if (running) return;
+
+    token++;
+    const localToken = token;
+    setRunning(true);
+
+    try {
+      await runQuantum(localToken);
+    } catch (error) {
+      if (error?.message !== "cancelled") {
+        setStatus("İşlem durduruldu.", "error");
+      }
+    } finally {
+      if (localToken === token) {
+        setRunning(false);
+        el.operation.textContent = "Boşta";
+        render();
+      }
+    }
+  }
+
+  async function autoRun() {
+    if (!processes.length) {
+      if (completed.length) setStatus("Tüm süreçler tamamlandı.", "success");
+      else setStatus("Önce bir süreç ekleyin.", "warning");
+      return;
+    }
+
+    token++;
+    const localToken = token;
+    setRunning(true);
+    el.operation.textContent = "Otomatik";
+
+    try {
+      while (processes.length) {
+        await runQuantum(localToken);
+        if (localToken !== token) throw new Error("cancelled");
+      }
+
+      if (localToken !== token) return;
+      setStatus(`Tüm süreçler tamamlandı, zaman ${elapsed}.`, "success");
+    } catch (error) {
+      if (error?.message !== "cancelled") {
+        setStatus("İşlem durduruldu.", "error");
+      }
+    } finally {
+      if (localToken === token) {
+        setRunning(false);
+        el.operation.textContent = "Boşta";
+        current = null;
+        render();
+      }
+    }
+  }
+
+  function pause() {
+    if (!running) return;
+
+    token++;
+    running = false;
+
+    if (current) {
+      pausedId = current.id;
+      processes.unshift(current);
+      current = null;
+    }
+
+    setRunning(false);
+    el.operation.textContent = "Boşta";
+    render();
+    setStatus("Çizelgeleyici duraklatıldı.");
+  }
+
+  function reset() {
+    token++;
+    running = false;
+    processes = [];
+    completed = [];
+    current = null;
+    elapsed = 0;
+    nextId = 1;
+    pausedId = null;
+    setRunning(false);
+    el.operation.textContent = "Boşta";
+    render();
+    setStatus("Çizelgeleyici sıfırlandı.");
+  }
+
+  el.add.addEventListener("click", addFromInput);
+  el.random.addEventListener("click", addRandom);
+  el.step.addEventListener("click", oneStep);
+  el.example.addEventListener("click", loadExample);
+  el.auto.addEventListener("click", autoRun);
+  el.pause.addEventListener("click", pause);
+  el.reset.addEventListener("click", reset);
+  el.quantum.addEventListener("change", () => {
+    updateStats();
+    setStatus(`Quantum: ${readQuantum()}.`);
+  });
+
+  el.pause.disabled = true;
+  loadExample();
+})();
+</script>
+<script src="deck/oyun.js"></script>

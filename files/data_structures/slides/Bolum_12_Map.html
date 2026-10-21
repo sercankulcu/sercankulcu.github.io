@@ -1,0 +1,818 @@
+---
+layout: without-sidebar
+title: "Eşleme Simülatörü"
+permalink: /files/data_structures/slides/Bolum_12_Map.html
+redirect_from:
+  - /files/data_structures/slides/Bolum_09_Map.html
+excerpt: "set, get, has, delete, gezinme, ekleme sırası görselleştirmesi ve güvenli gösterimle etkileşimli eşleme (Map) simülatörü."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+/* 800x600 agt-oyun sahnesi: ortak simülatör denetimleri */
+.ds-sim.agt-oyun { font-size: 15px; }
+.ds-sim .ds-sim__body { display: flex; flex-direction: column; gap: 8px; line-height: 1.3; }
+.ds-sim .ds-sim__root { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+.ds-sim .ds-sim__body button {
+  height: 34px;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 12px;
+  font-size: 14px;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: none;
+}
+.ds-sim .ds-sim__body button.is-danger {
+  border-color: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-border));
+  color: var(--ds-bad);
+}
+.ds-sim .ds-sim__body input,
+.ds-sim .ds-sim__body select {
+  height: 34px;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 8px;
+  font-size: 14px;
+  box-shadow: none;
+}
+.ds-sim .ds-sim__body input[type="checkbox"],
+.ds-sim .ds-sim__body input[type="radio"] { width: auto; height: auto; padding: 0; }
+.ds-sim .ds-sim__body input[type="range"] { padding: 0; border: 0; background: none; }
+.ds-sim .ds-sim__body label {
+  margin: 0 !important;
+  padding: 0;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.ds-sim .ds-sim__panel {
+  min-height: 0;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-bg);
+}
+.ds-sim .ds-sim__status {
+  margin: 0;
+  padding: 6px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+}
+.ds-sim .ds-sim__status.is-ok { color: var(--ds-good); }
+.ds-sim .ds-sim__status.is-bad { color: var(--ds-bad); }
+.ds-sim .ds-sim__caption {
+  margin: 0 0 4px;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.ds-map {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 6px;
+  line-height: 1.3;
+}
+
+/* ---------- controls ---------- */
+.ds-map__panel {
+  display: grid;
+  gap: 6px;
+  padding: 6px 10px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.ds-map__group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.ds-map__field {
+  display: grid;
+  gap: 2px;
+  width: 140px;
+}
+
+.ds-map__field--wide { width: 160px; }
+.ds-map__field input { width: 100%; }
+
+/* ---------- insertion order ---------- */
+.ds-map__visual {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+}
+
+.ds-map__visual .ds-sim__caption { margin: 0; line-height: 1.25; }
+
+.ds-map__row {
+  height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.ds-map__entry {
+  flex: 0 1 112px;
+  min-width: 0;
+  height: 54px;
+  padding: 3px 6px;
+  border: 2px solid var(--ds-link);
+  border-radius: 8px;
+  background: var(--ds-node);
+  line-height: 1.15;
+  overflow: hidden;
+  transition: background .18s ease, border-color .18s ease;
+}
+
+.ds-map__entry span {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-map__entry .key { font-size: 12.5px; font-weight: 800; }
+.ds-map__entry .value { color: var(--ds-muted); font-size: 12px; }
+.ds-map__entry .position { color: var(--ds-muted); font-size: 12px; font-weight: 700; }
+
+.ds-map__entry.is-checking {
+  border-color: var(--ds-warn);
+  background: var(--ds-hot);
+}
+
+.ds-map__entry.is-found {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+}
+
+.ds-map__entry.is-checking .value,
+.ds-map__entry.is-found .value { color: var(--ds-text); }
+
+.ds-map__arrow {
+  flex: none;
+  color: var(--ds-muted);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.ds-map__empty {
+  margin: 0;
+  color: var(--ds-muted);
+  font-size: 13px;
+}
+
+/* ---------- directory, result, history ---------- */
+.ds-map__lower {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 6px;
+}
+
+.ds-map__contacts,
+.ds-map__result-panel,
+.ds-map__history {
+  min-height: 0;
+  padding: 5px 8px;
+  overflow: hidden;
+}
+
+.ds-map__contacts { display: grid; grid-template-rows: auto minmax(0, 1fr); }
+
+.ds-map__contact-list {
+  min-height: 0;
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.ds-map__contact {
+  height: 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: center;
+  padding: 0 2px 0 6px;
+  border: 1px solid var(--ds-border);
+  border-radius: 6px;
+  background: var(--ds-surface);
+  font-size: 12px;
+}
+
+.ds-map__contact div {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-map__contact strong { font-weight: 800; }
+.ds-map__contact span { color: var(--ds-muted); }
+
+.ds-map__body .ds-map__contact button {
+  height: 20px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.ds-map__side {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 6px;
+}
+
+.ds-map__result-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.ds-map__code {
+  min-height: 0;
+  padding: 4px 6px;
+  border-radius: 8px;
+  background: var(--ds-surface-strong);
+  overflow: hidden;
+}
+
+.ds-map__code pre {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ds-text);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  line-height: 12.5px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ds-map__history ol {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.ds-map__history li {
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- footer: status and stats ---------- */
+.ds-map__footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  height: 44px;
+}
+
+.ds-map__status {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  line-height: 1.25;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.ds-map__status.is-success { color: var(--ds-good); }
+.ds-map__status.is-error { color: var(--ds-bad); }
+
+.ds-map__stat {
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-map__stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-map * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-sim agt-oyun agt-oyun--stage" id="ds-sim" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 12 · Simülasyon</p><h1>Eşleme Simülatörü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="ds-map-help" aria-label="Bu simülatör hakkında">?</button>
+    <a class="agt-oyun__back" href="Bolum_12_Hash_Tablosu.html">← Bölüm 12</a>
+  </header>
+
+  <div class="agt-oyun__body ds-sim__body ds-map__body">
+    <div class="ds-sim__root ds-map">
+      <div class="ds-map__panel">
+        <div class="ds-map__group">
+          <div class="ds-map__field"><label for="ds-map-key">Kişi adı (anahtar)</label><input id="ds-map-key" type="text" value="Ada Lovelace" maxlength="40"></div>
+          <div class="ds-map__field ds-map__field--wide"><label for="ds-map-email">E-posta (değer)</label><input id="ds-map-email" type="email" value="ada@example.com" maxlength="64"></div>
+          <button class="is-primary" id="ds-map-set" type="button">Ekle / Güncelle</button>
+          <button id="ds-map-get" type="button">Getir</button>
+          <button id="ds-map-has" type="button">Var mı?</button>
+          <button class="is-danger" id="ds-map-delete" type="button">Sil</button>
+          <button class="is-danger" id="ds-map-clear" type="button">Temizle</button>
+        </div>
+
+        <div class="ds-map__group">
+          <button id="ds-map-iterate" type="button">Girdileri Gez</button>
+          <button id="ds-map-keys" type="button">Anahtarları Göster</button>
+          <button id="ds-map-values" type="button">Değerleri Göster</button>
+          <button id="ds-map-example" type="button">Örneği Yükle</button>
+          <button class="is-danger" id="ds-map-cancel" type="button">İptal</button>
+        </div>
+      </div>
+
+      <div class="ds-map__visual ds-sim__panel">
+        <p class="ds-sim__caption">Ekleme sırası</p>
+        <div id="ds-map-row" class="ds-map__row" aria-label="Eşleme girdileri, ekleme sırasıyla"></div>
+      </div>
+
+      <div class="ds-map__lower">
+        <div class="ds-map__contacts ds-sim__panel">
+          <p class="ds-sim__caption">Kişi rehberi</p>
+          <div id="ds-map-contact-list" class="ds-map__contact-list"></div>
+        </div>
+
+        <div class="ds-map__side">
+          <div class="ds-map__result-panel ds-sim__panel">
+            <p class="ds-sim__caption">İşlem sonucu</p>
+            <div id="ds-map-result" class="ds-map__code"><pre>—</pre></div>
+          </div>
+          <div class="ds-map__history ds-sim__panel"><p class="ds-sim__caption">İşlem geçmişi</p><ol id="ds-map-history"><li>Henüz işlem yok.</li></ol></div>
+        </div>
+      </div>
+
+      <div class="ds-map__footer">
+        <p id="ds-map-status" class="ds-map__status ds-sim__status" role="status" aria-live="polite">Örnek eşleme yüklendi. Bir işlem seçin.</p>
+        <div class="ds-map__stat"><strong>Eşleme boyutu</strong><span id="ds-map-size">0</span></div>
+        <div class="ds-map__stat"><strong>Güncel anahtar</strong><span id="ds-map-current">—</span></div>
+        <div class="ds-map__stat"><strong>Son sonuç</strong><span id="ds-map-result-stat">—</span></div>
+        <div class="ds-map__stat"><strong>Gezinme sırası</strong><span>Ekleme sırası</span></div>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="ds-map-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Eşleme Simülatörü</h2>
+    <p>Eşleme (map), benzersiz anahtarları değerlerle ilişkilendirerek saklar. <code>set(key, value)</code> yeni bir girdi ekler ya da var olan anahtarı günceller. JavaScript <code>Map</code> nesneleri gezinme sırasında ekleme sırasını korur.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>Bir kişi adı (anahtar) ve e-posta (değer) yazıp <b>Ekle / Güncelle</b> (set), <b>Getir</b> (get), <b>Var mı?</b> (has) ya da <b>Sil</b> (delete) düğmesini seçin. Animasyon, anahtarı saklanan her girdiyle ekleme sırasına göre karşılaştırır.</li>
+      <li><b>Girdileri Gez</b>, <b>Anahtarları Göster</b> ve <b>Değerleri Göster</b> eşlemeyi ekleme sırasıyla gezer; çıktı sonuç kutusunda görünür.</li>
+      <li>Simülatör en fazla 6 girdi tutar. <b>İptal</b>, çalışan işlemi eşlemeyi değiştirmeden durdurur.</li>
+    </ul>
+    <h3>Eşleme kavramları</h3>
+    <ul>
+      <li><b>Benzersiz anahtarlar:</b> eşlemede bir anahtar için yalnızca bir girdi bulunur. Aynı anahtar yeniden eklenirse boyut değişmez, yalnızca değeri değişir.</li>
+      <li><b>Ekleme sırası:</b> var olan bir anahtarı güncellemek onu sona taşımaz. Anahtarı silip yeniden eklemek ise yeni bir ekleme konumu oluşturur.</li>
+      <li><b>Map ve Object:</b> <code>Map</code> her tipten anahtarı kabul eder, doğrudan bir <code>size</code> özelliği sunar ve sık ekleme, arama ve silme için tasarlanmıştır.</li>
+      <li><b>Güvenli gösterim:</b> kullanıcının girdiği adlar ve e-postalar metin düğümü olarak gösterilir; hiçbir zaman HTML ya da JavaScript olarak yorumlanmaz.</li>
+    </ul>
+    <h3>Temel JavaScript Map API'si</h3>
+    <table>
+      <thead><tr><th>Metot / özellik</th><th>Amaç</th></tr></thead>
+      <tbody>
+        <tr><td><code>map.set(key, value)</code></td><td>Girdi ekler ya da günceller; Map'i döndürür.</td></tr>
+        <tr><td><code>map.get(key)</code></td><td>Değeri ya da <code>undefined</code> döndürür.</td></tr>
+        <tr><td><code>map.has(key)</code></td><td>Anahtarın var olup olmadığını sınar.</td></tr>
+        <tr><td><code>map.delete(key)</code></td><td>Girdiyi siler ve Boolean döndürür.</td></tr>
+        <tr><td><code>map.size</code></td><td>Girdi sayısını döndürür.</td></tr>
+        <tr><td><code>map.clear()</code></td><td>Tüm girdileri siler.</td></tr>
+      </tbody>
+    </table>
+  </dialog>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var root=document.querySelector(".ds-map");
+  if(!root) return;
+
+  function q(id){return root.querySelector("#"+id);}
+
+  var el={
+    key:q("ds-map-key"),email:q("ds-map-email"),row:q("ds-map-row"),status:q("ds-map-status"),size:q("ds-map-size"),current:q("ds-map-current"),
+    resultStat:q("ds-map-result-stat"),contactList:q("ds-map-contact-list"),history:q("ds-map-history"),
+    result:q("ds-map-result")
+  };
+
+  var btn={
+    set:q("ds-map-set"),get:q("ds-map-get"),has:q("ds-map-has"),delete:q("ds-map-delete"),
+    iterate:q("ds-map-iterate"),keys:q("ds-map-keys"),values:q("ds-map-values"),
+    example:q("ds-map-example"),clear:q("ds-map-clear"),cancel:q("ds-map-cancel")
+  };
+
+  /* the 800x600 stage shows at most MAX entries and LOG_SIZE history rows */
+  var MAX=6;
+  var DELAY=400;
+  var LOG_SIZE=3;
+
+  var contacts=new Map();
+  var token=0;
+  var highlightKey=null;
+  var highlightKind="";
+  var logs=[];
+
+  function readKey(){
+    var key=el.key.value.trim();
+    if(!key) throw new Error("Kişi adı gerekli.");
+    return key;
+  }
+
+  function readEmail(){
+    var email=el.email.value.trim();
+    if(!email) throw new Error("E-posta gerekli.");
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Geçerli bir e-posta adresi girin.");
+    return email;
+  }
+
+  function setStatus(text,type){
+    el.status.textContent=text;
+    el.status.classList.remove("is-success","is-error");
+    if(type) el.status.classList.add(type);
+  }
+
+  function delay(){
+    if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return 0;
+    return DELAY;
+  }
+
+  function wait(ms,t){
+    return new Promise(function(resolve){setTimeout(function(){resolve(t===token);},ms);});
+  }
+
+  function disable(state){
+    Object.keys(btn).forEach(function(k){btn[k].disabled=state && k!=="cancel";});
+    btn.cancel.disabled=!state;
+  }
+
+  function addLog(text){
+    logs.unshift(text);
+    logs=logs.slice(0,LOG_SIZE);
+    el.history.innerHTML="";
+    logs.forEach(function(item){
+      var li=document.createElement("li");
+      li.textContent=item;
+      li.title=item;
+      el.history.appendChild(li);
+    });
+  }
+
+  function showResult(text){
+    el.result.innerHTML="";
+    var pre=document.createElement("pre");
+    pre.textContent=text;
+    el.result.appendChild(pre);
+    /* keep the newest output line visible in the fixed-height box */
+    el.result.scrollTop=el.result.scrollHeight;
+    el.resultStat.textContent=text.length>24?text.slice(0,23)+"…":text;
+  }
+
+  function render(){
+    el.row.innerHTML="";
+
+    if(!contacts.size){
+      var empty=document.createElement("p");
+      empty.className="ds-map__empty";
+      empty.textContent="Eşleme boş.";
+      el.row.appendChild(empty);
+    } else {
+      var index=0;
+      contacts.forEach(function(value,key){
+        var entry=document.createElement("div");
+        entry.className="ds-map__entry"+(highlightKey===key && highlightKind?" "+highlightKind:"");
+        entry.title=key+" → "+value.email+" · ekleme konumu "+index;
+
+        var k=document.createElement("span");
+        k.className="key"; k.textContent=key;
+
+        var v=document.createElement("span");
+        v.className="value"; v.textContent=value.email;
+
+        var pos=document.createElement("span");
+        pos.className="position"; pos.textContent="konum "+index;
+
+        entry.appendChild(k); entry.appendChild(v); entry.appendChild(pos);
+        el.row.appendChild(entry);
+
+        if(index<contacts.size-1){
+          var arrow=document.createElement("span");
+          arrow.className="ds-map__arrow";
+          arrow.textContent="→";
+          el.row.appendChild(arrow);
+        }
+        index++;
+      });
+    }
+
+    el.contactList.innerHTML="";
+    if(!contacts.size){
+      var p=document.createElement("p");
+      p.className="ds-map__empty";
+      p.textContent="Kişi yok.";
+      el.contactList.appendChild(p);
+    } else {
+      contacts.forEach(function(value,key){
+        var item=document.createElement("article");
+        item.className="ds-map__contact";
+
+        var info=document.createElement("div");
+        info.title=key+" · "+value.email;
+        var name=document.createElement("strong");
+        name.textContent=key;
+        var email=document.createElement("span");
+        email.textContent=" "+value.email;
+        info.appendChild(name); info.appendChild(email);
+
+        var remove=document.createElement("button");
+        remove.type="button";
+        remove.className="is-danger";
+        remove.textContent="Sil";
+        remove.disabled=!btn.cancel.disabled;
+        remove.addEventListener("click",function(){deleteByKey(key);});
+
+        item.appendChild(info); item.appendChild(remove);
+        el.contactList.appendChild(item);
+      });
+    }
+
+    el.size.textContent=String(contacts.size);
+    el.current.textContent=highlightKey===null?"—":String(highlightKey);
+
+    if(btn.cancel.disabled){
+      var emptyMap=contacts.size===0;
+      btn.delete.disabled=emptyMap;
+      btn.clear.disabled=emptyMap;
+      btn.iterate.disabled=emptyMap;
+      btn.keys.disabled=emptyMap;
+      btn.values.disabled=emptyMap;
+    }
+  }
+
+  /* every animated operation owns a token; Cancel (or a newer operation) bumps it,
+     and the older operation must then stop without touching the Map */
+  function begin(){
+    token++;
+    disable(true);
+    render();
+    return token;
+  }
+
+  function finish(){
+    disable(false);
+    render();
+  }
+
+  /* the visual is an insertion-ordered list of entries, so a key is located by
+     comparing it with each stored key in order */
+  async function animateSearch(key,found,t){
+    var keys=Array.from(contacts.keys());
+
+    for(var i=0;i<keys.length;i++){
+      highlightKey=keys[i];
+      highlightKind="is-checking";
+      render();
+
+      if(!(await wait(delay(),t))) return false;
+
+      if(keys[i]===key){
+        highlightKind=found?"is-found":"is-checking";
+        render();
+        return await wait(delay(),t);
+      }
+    }
+
+    highlightKey=null;
+    highlightKind="";
+    render();
+    return true;
+  }
+
+  async function animateIteration(mode,t){
+    var output=[];
+    var entries=Array.from(contacts.entries());
+
+    for(var i=0;i<entries.length;i++){
+      var key=entries[i][0];
+      var value=entries[i][1];
+
+      highlightKey=key;
+      highlightKind="is-checking";
+      render();
+
+      if(mode==="entries") output.push(key+" → "+value.email);
+      if(mode==="keys") output.push(key);
+      if(mode==="values") output.push(value.email);
+
+      showResult(output.join("\n"));
+
+      if(!(await wait(delay(),t))) return false;
+    }
+
+    highlightKey=null;
+    highlightKind="";
+    return true;
+  }
+
+  btn.set.addEventListener("click",async function(){
+    try{
+      var key=readKey();
+      var email=readEmail();
+      var existed=contacts.has(key);
+      if(!existed && contacts.size>=MAX) throw new Error("Eşleme dolu: bu simülatör en fazla "+MAX+" girdi tutar.");
+
+      var t=begin();
+      if(!(await animateSearch(key,existed,t))) return;
+
+      contacts.set(key,{email:email});
+      highlightKey=key;
+      highlightKind="is-found";
+      render();
+      showResult('map.set("'+key+'", value)');
+      addLog(key+(existed?" güncellendi.":" eklendi."));
+      setStatus(existed?key+" güncellendi; ekleme konumu değişmez.":key+" ekleme sırasının sonuna eklendi.","is-success");
+
+      if(!(await wait(delay(),t))) return;
+
+      highlightKey=null;
+      highlightKind="";
+      finish();
+    }catch(error){
+      disable(false);
+      setStatus(error.message,"is-error");
+    }
+  });
+
+  btn.get.addEventListener("click",async function(){
+    try{
+      var key=readKey();
+      var found=contacts.has(key);
+      var t=begin();
+      if(!(await animateSearch(key,found,t))) return;
+
+      if(found){
+        var value=contacts.get(key).email;
+        showResult(value);
+        setStatus('get "'+value+'" döndürdü.',"is-success");
+        addLog("get: "+key+".");
+      }else{
+        showResult("undefined");
+        setStatus('"'+key+'" anahtarı bulunamadı.',"is-error");
+        addLog("get: "+key+" bulunamadı.");
+      }
+      finish();
+    }catch(error){disable(false);setStatus(error.message,"is-error");}
+  });
+
+  btn.has.addEventListener("click",async function(){
+    try{
+      var key=readKey();
+      var found=contacts.has(key);
+      var t=begin();
+      if(!(await animateSearch(key,found,t))) return;
+      showResult(String(found));
+      setStatus('has("'+key+'") = '+found+".",found?"is-success":"is-error");
+      addLog("has: "+key+" → "+found+".");
+      finish();
+    }catch(error){disable(false);setStatus(error.message,"is-error");}
+  });
+
+  async function deleteByKey(key){
+    var found=contacts.has(key);
+    var t=begin();
+    if(!(await animateSearch(key,found,t))) return;
+
+    if(found){
+      contacts.delete(key);
+      highlightKey=null;
+      highlightKind="";
+      showResult("true");
+      addLog(key+" silindi.");
+      setStatus(key+" silindi.","is-success");
+    }else{
+      showResult("false");
+      setStatus('"'+key+'" anahtarı bulunamadı.',"is-error");
+    }
+    finish();
+  }
+
+  btn.delete.addEventListener("click",async function(){
+    try{
+      await deleteByKey(readKey());
+    }catch(error){disable(false);setStatus(error.message,"is-error");}
+  });
+
+  async function iterate(mode,done,logText){
+    if(!contacts.size){setStatus("Eşleme boş.","is-error");return;}
+    var t=begin();
+    if(!(await animateIteration(mode,t))) return;
+    finish();
+    setStatus(done,"is-success");
+    addLog(logText);
+  }
+
+  btn.iterate.addEventListener("click",function(){iterate("entries","Girdiler ekleme sırasıyla gezildi.","Girdiler gezildi.");});
+  btn.keys.addEventListener("click",function(){iterate("keys","Anahtarlar ekleme sırasıyla gösterildi.","Anahtarlar gezildi.");});
+  btn.values.addEventListener("click",function(){iterate("values","Değerler ekleme sırasıyla gösterildi.","Değerler gezildi.");});
+
+  btn.example.addEventListener("click",function(){
+    token++;
+    contacts=new Map([
+      ["Ada Lovelace",{email:"ada@example.com"}],
+      ["Alan Turing",{email:"alan@example.com"}],
+      ["Grace Hopper",{email:"grace@example.com"}],
+      ["Donald Knuth",{email:"donald@example.com"}]
+    ]);
+    logs=[];
+    highlightKey=null;
+    highlightKind="";
+    render();
+    showResult("Örnek eşleme yüklendi.");
+    addLog("Örnek eşleme yüklendi.");
+    setStatus("Örnek eşleme yüklendi.","is-success");
+  });
+
+  btn.clear.addEventListener("click",function(){
+    token++;
+    contacts.clear();
+    logs=[];
+    highlightKey=null;
+    highlightKind="";
+    el.history.innerHTML="<li>Henüz işlem yok.</li>";
+    render();
+    showResult("map.clear()");
+    setStatus("Eşleme temizlendi.");
+  });
+
+  btn.cancel.addEventListener("click",function(){
+    token++;
+    highlightKey=null;
+    highlightKind="";
+    disable(false);
+    render();
+    setStatus("Animasyon iptal edildi.");
+  });
+
+
+  btn.cancel.disabled=true;
+  btn.example.click();
+})();
+</script>
+<script src="deck/oyun.js"></script>

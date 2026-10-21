@@ -1,0 +1,874 @@
+---
+layout: without-sidebar
+title: "Yönsüz Çizge Simülatörü"
+permalink: /files/data_structures/slides/Bolum_14_Graph.html
+redirect_from:
+  - /files/data_structures/slides/Bolum_11_Graph.html
+excerpt: "Düğüm ve kenar düzenleme, BFS, DFS, bağlantılı bileşenler, komşuluk listesi ve matrisi görünümleri ile SVG görselleştirmesiyle etkileşimli yönsüz çizge simülatörü."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+/* 800x600 agt-oyun sahnesi: ortak simülatör denetimleri */
+.ds-sim.agt-oyun { font-size: 15px; }
+.ds-sim .ds-sim__body { display: flex; flex-direction: column; gap: 8px; line-height: 1.3; }
+.ds-sim .ds-sim__root { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+.ds-sim .ds-sim__body button {
+  height: 34px;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 12px;
+  font-size: 14px;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: none;
+}
+.ds-sim .ds-sim__body button.is-danger {
+  border-color: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-border));
+  color: var(--ds-bad);
+}
+.ds-sim .ds-sim__body input,
+.ds-sim .ds-sim__body select {
+  height: 34px;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 8px;
+  font-size: 14px;
+  box-shadow: none;
+}
+.ds-sim .ds-sim__body input[type="checkbox"],
+.ds-sim .ds-sim__body input[type="radio"] { width: auto; height: auto; padding: 0; }
+.ds-sim .ds-sim__body input[type="range"] { padding: 0; border: 0; background: none; }
+.ds-sim .ds-sim__body label {
+  margin: 0 !important;
+  padding: 0;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.ds-sim .ds-sim__panel {
+  min-height: 0;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-bg);
+}
+.ds-sim .ds-sim__status {
+  margin: 0;
+  padding: 6px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+}
+.ds-sim .ds-sim__status.is-ok { color: var(--ds-good); }
+.ds-sim .ds-sim__status.is-bad { color: var(--ds-bad); }
+.ds-sim .ds-sim__caption {
+  margin: 0 0 4px;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.graph-sim {
+  position: relative;
+  height: 100%;
+  line-height: 1.35;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 8px;
+}
+
+.graph-controls {
+  display: grid;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.graph-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.graph-controls button {
+  padding: 0 10px;
+}
+
+.graph-field {
+  display: grid;
+  gap: 2px;
+}
+
+.graph-field label {
+  white-space: nowrap;
+}
+
+.graph-field input {
+  width: 92px;
+}
+
+.graph-field select {
+  width: 96px;
+}
+
+.graph-main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 8px;
+}
+
+.graph-left {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  gap: 6px;
+}
+
+.graph-visual {
+  min-height: 0;
+  padding: 2px;
+  overflow: hidden;
+}
+
+.graph-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+.graph-edge {
+  stroke: var(--ds-link);
+  stroke-width: 5;
+}
+
+.graph-edge.is-active {
+  stroke: var(--ds-warn);
+  stroke-width: 10;
+}
+
+.graph-node {
+  cursor: grab;
+}
+
+.graph-node circle {
+  fill: var(--ds-node);
+  stroke: var(--ds-link);
+  stroke-width: 5;
+  transition: fill .18s ease, stroke .18s ease;
+}
+
+.graph-node text {
+  fill: var(--ds-text);
+  font-size: 32px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+.graph-node.is-queued circle {
+  fill: var(--ds-hot);
+  stroke: var(--ds-warn);
+}
+
+.graph-node.is-visited circle {
+  fill: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  stroke: var(--ds-good);
+}
+
+.graph-node.is-dragging {
+  cursor: grabbing;
+}
+
+.graph-node.is-dragging circle {
+  stroke: var(--ds-accent);
+  stroke-width: 8;
+}
+
+.graph-status {
+  margin: 0;
+  font-size: 13.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.graph-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.graph-stat {
+  min-width: 0;
+  height: 28px;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.graph-stat strong {
+  color: var(--ds-muted);
+  font-size: 12px;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+}
+
+.graph-side {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 6px;
+}
+
+.graph-box {
+  min-height: 0;
+  padding: 6px 8px;
+  overflow: hidden;
+}
+
+.graph-box .ds-sim__caption + .ds-sim__caption,
+.graph-path + .ds-sim__caption {
+  margin-top: 6px;
+}
+
+.graph-path {
+  height: 42px;
+  padding: 4px 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border-radius: 8px;
+  background: var(--ds-surface-strong);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.graph-frontier {
+  height: 52px;
+  padding: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 4px;
+  border-radius: 8px;
+  background: var(--ds-surface-strong);
+  overflow: hidden;
+}
+
+.graph-frontier span {
+  max-width: 80px;
+  height: 20px;
+  padding: 0 7px;
+  border: 1.5px solid var(--ds-warn);
+  border-radius: 6px;
+  background: var(--ds-hot);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 17px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.graph-repr {
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.graph-repr > div {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.graph-adj-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.graph-adj-list li {
+  height: 16px;
+  margin: 0;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.graph-matrix table {
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.graph-matrix th,
+.graph-matrix td {
+  width: 15px;
+  height: 15px;
+  padding: 0;
+  border: 1px solid var(--ds-border);
+  line-height: 13px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.graph-matrix th {
+  background: var(--ds-surface-strong);
+  color: var(--ds-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .graph-sim * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-sim agt-oyun agt-oyun--stage" id="ds-sim" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 14 · Simülasyon</p><h1>Yönsüz Çizge Simülatörü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="ds-graph-help" aria-label="Bu simülatör hakkında">?</button>
+    <a class="agt-oyun__back" href="Bolum_14_Cizge.html">← Bölüm 14</a>
+  </header>
+
+  <div class="agt-oyun__body ds-sim__body">
+    <div class="ds-sim__root graph-sim">
+      <div class="graph-controls">
+        <div class="graph-row">
+          <div class="graph-field"><label for="ds-graph-label">Yeni düğüm</label><input id="ds-graph-label" type="text" value="A" maxlength="8"></div>
+          <button class="is-primary" id="ds-graph-add" type="button">Düğüm Ekle</button>
+          <button class="is-danger" id="ds-graph-remove" type="button">Düğümü Sil</button>
+          <div class="graph-field"><label for="ds-graph-from">Kenar ucu 1</label><select id="ds-graph-from"></select></div>
+          <div class="graph-field"><label for="ds-graph-to">Kenar ucu 2</label><select id="ds-graph-to"></select></div>
+          <button id="ds-graph-toggle" type="button">Kenar Ekle / Sil</button>
+        </div>
+        <div class="graph-row">
+          <div class="graph-field"><label for="ds-graph-start">Başlangıç</label><select id="ds-graph-start"></select></div>
+          <button id="ds-graph-bfs" type="button">BFS</button>
+          <button id="ds-graph-dfs" type="button">DFS</button>
+          <button id="ds-graph-components" type="button">Bağlantılı Bileşenler</button>
+          <button id="ds-graph-example" type="button">Yükle</button>
+          <button id="ds-graph-random" type="button">Rastgele</button>
+          <button class="is-danger" id="ds-graph-clear" type="button">Temizle</button>
+          <button class="is-danger" id="ds-graph-cancel" type="button">İptal</button>
+        </div>
+      </div>
+
+      <div class="graph-main">
+        <div class="graph-left">
+          <div class="graph-visual ds-sim__panel">
+            <svg id="ds-graph-svg" class="graph-svg" viewBox="0 0 1000 520" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Etkileşimli yönsüz çizge"></svg>
+          </div>
+          <p id="ds-graph-status" class="ds-sim__status graph-status" role="status" aria-live="polite">Örnek çizge yüklendi. Düğümleri sürükleyin ya da bir işlem seçin.</p>
+          <div class="graph-stats">
+            <div class="graph-stat"><strong>Düğüm</strong><span id="ds-graph-vertices">0</span></div>
+            <div class="graph-stat"><strong>Kenar</strong><span id="ds-graph-edges">0</span></div>
+            <div class="graph-stat"><strong>Bileşen</strong><span id="ds-graph-component-count">0</span></div>
+            <div class="graph-stat"><strong>Yoğunluk</strong><span id="ds-graph-density">0,00</span></div>
+          </div>
+        </div>
+
+        <div class="graph-side">
+          <div class="graph-box ds-sim__panel">
+            <p class="ds-sim__caption">Gezinme sırası</p>
+            <div id="ds-graph-path" class="graph-path">—</div>
+            <p class="ds-sim__caption" id="ds-graph-frontier-title">Sınır</p>
+            <div id="ds-graph-frontier" class="graph-frontier"></div>
+          </div>
+          <div class="graph-box ds-sim__panel">
+            <div class="graph-repr">
+              <div><p class="ds-sim__caption">Komşuluk listesi</p><div id="ds-graph-list"></div></div>
+              <div class="graph-matrix"><p class="ds-sim__caption">Komşuluk matrisi</p><div id="ds-graph-matrix"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="ds-graph-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Yönsüz Çizge Simülatörü</h2>
+    <p>Çizge, kenarlarla birbirine bağlanan düğümlerden oluşur. Bu simülatör basit bir yönsüz çizge kullanır: kenarların yönü yoktur, öz döngüler reddedilir ve aynı kenar iki kez eklenemez.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>Düğüm ekleyin ya da silin; iki uç seçip <b>Kenar Ekle / Sil</b> ile kenarı ekleyin ya da kaldırın. Çizimi düzenlemek için düğümleri sürükleyin.</li>
+      <li>Bir başlangıç düğümü seçip <b>BFS</b> ya da <b>DFS</b> çalıştırın; gezinme sırası ve güncel sınır (kuyruk ya da yığın) sağda gösterilir. <b>Bağlantılı Bileşenler</b> her bileşeni renklendirir.</li>
+      <li>Komşuluk listesi ve komşuluk matrisi her değişiklikte güncellenir.</li>
+    </ul>
+    <h3>Çizge kavramları</h3>
+    <ul>
+      <li><b>Genişlik öncelikli arama:</b> BFS kuyruk kullanır ve düğümleri uzaklık katmanlarına göre keşfeder. Ağırlıksız çizgede kenar sayısıyla ölçülen en kısa yolları bulur.</li>
+      <li><b>Derinlik öncelikli arama:</b> DFS özyineleme ya da yığın kullanır; geri dönmeden önce bir dalı olabildiğince derine izler.</li>
+      <li><b>Bağlantısız çizgeler:</b> tek bir başlangıç düğümünden yapılan gezinme yalnızca o düğümün bağlantılı bileşenini ziyaret eder. Bağlantılı Bileşenler, henüz ziyaret edilmemiş her düğümden yeniden tarama başlatır.</li>
+      <li><b>İki gösterim:</b> komşuluk listesi seyrek çizgelerde az yer kaplar; matris kenar sınamasını sabit sürede yapar ama karesel alan gerektirir.</li>
+    </ul>
+    <h3>Gösterimlerin karşılaştırması</h3>
+    <table>
+      <thead><tr><th>İşlem</th><th>Komşuluk listesi</th><th>Komşuluk matrisi</th></tr></thead>
+      <tbody>
+        <tr><td>Alan</td><td>O(V + E)</td><td>O(V²)</td></tr>
+        <tr><td>Kenar sınama</td><td>O(derece)</td><td>O(1)</td></tr>
+        <tr><td>Komşuları gezme</td><td>O(derece)</td><td>O(V)</td></tr>
+        <tr><td>En uygun kullanım</td><td>Seyrek çizgeler</td><td>Yoğun çizgeler</td></tr>
+      </tbody>
+    </table>
+  </dialog>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var root=document.getElementById("ds-sim");if(!root)return;
+  function q(id){return root.querySelector("#"+id);}
+  var ns="http://www.w3.org/2000/svg";
+
+  var el={
+    label:q("ds-graph-label"),from:q("ds-graph-from"),to:q("ds-graph-to"),start:q("ds-graph-start"),
+    svg:q("ds-graph-svg"),
+    status:q("ds-graph-status"),vertices:q("ds-graph-vertices"),edges:q("ds-graph-edges"),
+    componentCount:q("ds-graph-component-count"),density:q("ds-graph-density"),path:q("ds-graph-path"),
+    frontier:q("ds-graph-frontier"),frontierTitle:q("ds-graph-frontier-title"),list:q("ds-graph-list"),matrix:q("ds-graph-matrix")
+  };
+
+  var btn={
+    add:q("ds-graph-add"),toggle:q("ds-graph-toggle"),remove:q("ds-graph-remove"),
+    bfs:q("ds-graph-bfs"),dfs:q("ds-graph-dfs"),components:q("ds-graph-components"),
+    example:q("ds-graph-example"),random:q("ds-graph-random"),clear:q("ds-graph-clear"),cancel:q("ds-graph-cancel")
+  };
+
+  /* animation step in ms (the original slider default) */
+  var DELAY=400;
+  /* the adjacency list and matrix panels fit at most this many vertices */
+  var MAX_VERTICES=8;
+  /* vertex radius in SVG units (viewBox 0 0 1000 520) */
+  var R=40;
+
+  var vertices=[],edges=new Set(),nextId=0,token=0,nodeStates={},activeEdge="",dragId=null;
+
+  function edgeKey(a,b){return a<b?a+"-"+b:b+"-"+a;}
+
+  function getVertex(id){
+    var n=Number(id);
+    for(var i=0;i<vertices.length;i++)if(vertices[i].id===n)return vertices[i];
+    return null;
+  }
+
+  function neighbors(id){
+    var out=[];
+    edges.forEach(function(key){
+      var p=key.split("-"),a=Number(p[0]),b=Number(p[1]);
+      if(a===id)out.push(b);
+      else if(b===id)out.push(a);
+    });
+    out.sort(function(a,b){
+      var ia=vertices.findIndex(function(v){return v.id===a;});
+      var ib=vertices.findIndex(function(v){return v.id===b;});
+      return ia-ib;
+    });
+    return out;
+  }
+
+  function setStatus(text,type){
+    el.status.textContent=text;
+    el.status.title=text;
+    el.status.classList.remove("is-ok","is-bad");
+    if(type)el.status.classList.add(type);
+  }
+
+  function delay(){
+    if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)return 0;
+    return DELAY;
+  }
+
+  function wait(ms,t){return new Promise(function(resolve){setTimeout(function(){resolve(t===token);},ms);});}
+
+  function disable(state){
+    Object.keys(btn).forEach(function(k){btn[k].disabled=state&&k!=="cancel";});
+    btn.cancel.disabled=!state;
+    el.from.disabled=state;el.to.disabled=state;el.start.disabled=state;
+    if(!state)updateButtons();
+  }
+
+  function clearStates(){nodeStates={};activeEdge="";}
+
+  function labelOf(id){var v=getVertex(id);return v?v.label:String(id);}
+
+  function uniqueLabel(raw){
+    var base=raw.trim()||("V"+nextId),label=base,n=2;
+    while(vertices.some(function(v){return v.label===label;})){label=base+n;n++;}
+    return label;
+  }
+
+  function updateSelects(){
+    var current={from:el.from.value,to:el.to.value,start:el.start.value};
+    [el.from,el.to,el.start].forEach(function(select){
+      select.innerHTML="";
+      vertices.forEach(function(v){
+        var o=document.createElement("option");
+        o.value=String(v.id);o.textContent=v.label+" (#"+v.id+")";select.appendChild(o);
+      });
+    });
+
+    if(vertices.length){
+      el.from.value=vertices.some(function(v){return String(v.id)===current.from;})?current.from:String(vertices[0].id);
+      el.to.value=vertices.some(function(v){return String(v.id)===current.to;})?current.to:String(vertices[Math.min(1,vertices.length-1)].id);
+      el.start.value=vertices.some(function(v){return String(v.id)===current.start;})?current.start:String(vertices[0].id);
+    }
+
+    updateButtons();
+  }
+
+  function updateButtons(){
+    if(!btn.cancel.disabled)return;
+    var empty=!vertices.length,few=vertices.length<2;
+    btn.remove.disabled=empty;
+    btn.bfs.disabled=empty;
+    btn.dfs.disabled=empty;
+    btn.components.disabled=empty;
+    btn.clear.disabled=empty;
+    btn.toggle.disabled=few;
+  }
+
+  function componentSets(){
+    var seen=new Set(),all=[];
+    vertices.forEach(function(v){
+      if(seen.has(v.id))return;
+      var comp=[],queue=[v.id];
+      seen.add(v.id);
+      while(queue.length){
+        var id=queue.shift();
+        comp.push(id);
+        neighbors(id).forEach(function(n){
+          if(!seen.has(n)){seen.add(n);queue.push(n);}
+        });
+      }
+      all.push(comp);
+    });
+    return all;
+  }
+
+  function renderFrontier(items){
+    el.frontier.innerHTML="";
+    items.forEach(function(id){
+      var v=getVertex(id),span=document.createElement("span");
+      span.textContent=v?v.label:String(id);
+      el.frontier.appendChild(span);
+    });
+  }
+
+  function renderRepresentations(){
+    el.list.innerHTML="";
+    var ul=document.createElement("ul");ul.className="graph-adj-list";
+    vertices.forEach(function(v){
+      var li=document.createElement("li");
+      var labels=neighbors(v.id).map(function(id){return getVertex(id).label;});
+      li.textContent=v.label+" → "+(labels.length?labels.join(", "):"∅");
+      li.title=li.textContent;
+      ul.appendChild(li);
+    });
+    el.list.appendChild(ul);
+
+    el.matrix.innerHTML="";
+    if(!vertices.length)return;
+    var table=document.createElement("table"),thead=document.createElement("thead"),trh=document.createElement("tr");
+    table.style.width=((vertices.length+1)*16)+"px";
+    var blank=document.createElement("th");blank.textContent="";trh.appendChild(blank);
+    vertices.forEach(function(v){var th=document.createElement("th");th.textContent=v.label;th.title=v.label;trh.appendChild(th);});
+    thead.appendChild(trh);table.appendChild(thead);
+    var tbody=document.createElement("tbody");
+    vertices.forEach(function(v1){
+      var tr=document.createElement("tr"),th=document.createElement("th");th.textContent=v1.label;th.title=v1.label;tr.appendChild(th);
+      vertices.forEach(function(v2){
+        var td=document.createElement("td");
+        td.textContent=v1.id===v2.id?"0":(edges.has(edgeKey(v1.id,v2.id))?"1":"0");
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);el.matrix.appendChild(table);
+  }
+
+  /* pointer position in SVG units; getScreenCTM includes the stage's scale transform */
+  function svgPoint(event){
+    var pt=el.svg.createSVGPoint();
+    pt.x=event.clientX;pt.y=event.clientY;
+    return pt.matrixTransform(el.svg.getScreenCTM().inverse());
+  }
+
+  function render(){
+    while(el.svg.lastChild)el.svg.removeChild(el.svg.lastChild);
+
+    edges.forEach(function(key){
+      var p=key.split("-"),a=getVertex(p[0]),b=getVertex(p[1]);
+      if(!a||!b)return;
+      var line=document.createElementNS(ns,"line");
+      line.setAttribute("x1",String(a.x));line.setAttribute("y1",String(a.y));
+      line.setAttribute("x2",String(b.x));line.setAttribute("y2",String(b.y));
+      line.setAttribute("class","graph-edge"+(activeEdge===key?" is-active":""));
+      el.svg.appendChild(line);
+    });
+
+    vertices.forEach(function(v){
+      var g=document.createElementNS(ns,"g");
+      var state=nodeStates[v.id]||"";
+      g.setAttribute("class","graph-node"+(state?" "+state:"")+(dragId===v.id?" is-dragging":""));
+      g.setAttribute("transform","translate("+v.x+" "+v.y+")");
+      g.setAttribute("data-id",String(v.id));
+
+      var c=document.createElementNS(ns,"circle");c.setAttribute("r",String(R));
+      var t=document.createElementNS(ns,"text");t.setAttribute("y","1");t.textContent=v.label;
+      /* long labels get a smaller font so they stay inside the circle */
+      if(v.label.length>2)t.style.fontSize=(v.label.length>4?18:24)+"px";
+      if(v.label.length>5){t.setAttribute("textLength","68");t.setAttribute("lengthAdjust","spacingAndGlyphs");}
+      g.appendChild(c);g.appendChild(t);el.svg.appendChild(g);
+
+      g.addEventListener("pointerdown",function(event){
+        dragId=v.id;g.setPointerCapture(event.pointerId);render();
+      });
+      g.addEventListener("pointermove",function(event){
+        if(dragId!==v.id)return;
+        var p=svgPoint(event);
+        v.x=Math.max(R+5,Math.min(1000-R-5,p.x));v.y=Math.max(R+5,Math.min(520-R-5,p.y));render();
+      });
+      g.addEventListener("pointerup",function(){dragId=null;render();});
+      g.addEventListener("pointercancel",function(){dragId=null;render();});
+    });
+
+    el.vertices.textContent=String(vertices.length);
+    el.edges.textContent=String(edges.size);
+    el.componentCount.textContent=String(componentSets().length);
+    var possible=vertices.length>1?vertices.length*(vertices.length-1)/2:0;
+    el.density.textContent=possible?(edges.size/possible).toFixed(2).replace(".",","):"0,00";
+
+    renderRepresentations();
+    updateButtons();
+  }
+
+  async function bfs(startId){
+    token++;var t=token;
+    disable(true);clearStates();
+    var seen=new Set([startId]),queue=[startId],order=[];
+    el.frontierTitle.textContent="Kuyruk";
+    el.path.textContent="—";
+    nodeStates[startId]="is-queued";
+    setStatus("BFS: başlangıç düğümü "+labelOf(startId)+" kuyruğa eklenir ve keşfedildi olarak işaretlenir.");
+    render();renderFrontier(queue);
+    if(!(await wait(delay(),t)))return;
+
+    while(queue.length){
+      var current=queue.shift();
+      nodeStates[current]="is-queued";render();renderFrontier(queue);
+      setStatus(labelOf(current)+" kuyruktan çıkarılır.");
+      if(!(await wait(delay(),t)))return;
+
+      nodeStates[current]="is-visited";order.push(current);
+      setStatus(labelOf(current)+" ziyaret edilir: komşuları komşuluk listesi sırasıyla taranır.");
+      el.path.textContent=order.map(function(id){return getVertex(id).label;}).join(" → ");
+      render();
+      if(!(await wait(delay(),t)))return;
+
+      var nsList=neighbors(current);
+      for(var i=0;i<nsList.length;i++){
+        var n=nsList[i];
+        if(!seen.has(n)){
+          seen.add(n);queue.push(n);
+          nodeStates[n]="is-queued";
+          activeEdge=edgeKey(current,n);
+          setStatus(labelOf(current)+" düğümünün komşusu "+labelOf(n)+" yeni: işaretlenir ve kuyruğa eklenir.");
+          render();renderFrontier(queue);
+          if(!(await wait(delay(),t)))return;
+        }
+      }
+      activeEdge="";
+    }
+
+    render();renderFrontier([]);
+    disable(false);
+    setStatus("BFS tamamlandı: "+labelOf(startId)+" düğümünden "+vertices.length+" düğümün "+order.length+" tanesine ulaşıldı.","is-ok");
+  }
+
+  async function dfs(startId){
+    token++;var t=token;
+    disable(true);clearStates();
+    var seen=new Set(),order=[],stack=[];
+    el.frontierTitle.textContent="Özyineleme yığını";
+    el.path.textContent="—";
+
+    async function visit(id,parent){
+      seen.add(id);stack.push(id);
+      nodeStates[id]="is-queued";
+      if(parent!==null)activeEdge=edgeKey(parent,id);
+      setStatus(parent===null?"DFS: dfs("+labelOf(id)+") çağrılır.":labelOf(parent)+" düğümünün ziyaret edilmemiş komşusu: dfs("+labelOf(id)+") çağrılır.");
+      render();renderFrontier(stack);
+      if(!(await wait(delay(),t)))return false;
+
+      nodeStates[id]="is-visited";order.push(id);
+      setStatus(labelOf(id)+" ziyaret edilir: komşuları komşuluk listesi sırasıyla taranır.");
+      el.path.textContent=order.map(function(x){return getVertex(x).label;}).join(" → ");
+      render();
+      if(!(await wait(delay(),t)))return false;
+
+      var nsList=neighbors(id);
+      for(var i=0;i<nsList.length;i++){
+        if(!seen.has(nsList[i])){
+          if(!(await visit(nsList[i],id)))return false;
+        }
+      }
+
+      stack.pop();activeEdge="";
+      setStatus(labelOf(id)+" düğümünün tüm komşuları bitti: geri dön"+(stack.length?" ("+labelOf(stack[stack.length-1])+")":"")+".");
+      render();renderFrontier(stack);
+      if(stack.length&&!(await wait(delay(),t)))return false;
+      return true;
+    }
+
+    if(!(await visit(startId,null)))return;
+    renderFrontier([]);
+    disable(false);
+    setStatus("DFS tamamlandı: "+labelOf(startId)+" düğümünden "+vertices.length+" düğümün "+order.length+" tanesine ulaşıldı.","is-ok");
+  }
+
+  btn.add.addEventListener("click",function(){
+    if(vertices.length>=MAX_VERTICES){setStatus("Sahneye en fazla "+MAX_VERTICES+" düğüm sığar.","is-bad");return;}
+    var angle=(vertices.length%10)/10*Math.PI*2;
+    var r=170+(vertices.length%3)*35;
+    var y=Math.max(R+5,Math.min(520-R-5,260+Math.sin(angle)*r));
+    vertices.push({id:nextId++,label:uniqueLabel(el.label.value),x:500+Math.cos(angle)*r,y:y});
+    updateSelects();render();setStatus("Düğüm eklendi.","is-ok");
+  });
+
+  btn.toggle.addEventListener("click",function(){
+    var a=Number(el.from.value),b=Number(el.to.value);
+    if(a===b){setStatus("Öz döngüye izin verilmez.","is-bad");return;}
+    var key=edgeKey(a,b);
+    if(edges.has(key)){edges.delete(key);setStatus("Kenar silindi.","is-ok");}
+    else{edges.add(key);setStatus("Kenar eklendi.","is-ok");}
+    render();
+  });
+
+  btn.remove.addEventListener("click",function(){
+    var id=Number(el.from.value);
+    vertices=vertices.filter(function(v){return v.id!==id;});
+    Array.from(edges).forEach(function(key){
+      var p=key.split("-").map(Number);
+      if(p[0]===id||p[1]===id)edges.delete(key);
+    });
+    updateSelects();render();setStatus("Düğüm silindi.","is-ok");
+  });
+
+  btn.bfs.addEventListener("click",function(){if(vertices.length)bfs(Number(el.start.value));});
+  btn.dfs.addEventListener("click",function(){if(vertices.length)dfs(Number(el.start.value));});
+
+  btn.components.addEventListener("click",async function(){
+    if(!vertices.length)return;
+    token++;var t=token;disable(true);clearStates();
+    var comps=componentSets(),labels=[];
+    el.frontierTitle.textContent="Sınır";el.path.textContent="—";renderFrontier([]);
+    for(var i=0;i<comps.length;i++){
+      setStatus("Bileşen "+(i+1)+": ziyaret edilmemiş ilk düğüm "+labelOf(comps[i][0])+" düğümünden BFS.");
+      for(var j=0;j<comps[i].length;j++){
+        nodeStates[comps[i][j]]="is-queued";render();
+        if(!(await wait(delay(),t)))return;
+        nodeStates[comps[i][j]]="is-visited";render();
+      }
+      labels.push("{ "+comps[i].map(function(id){return getVertex(id).label;}).join(", ")+" }");
+      el.path.textContent=labels.join("   ");
+    }
+    el.path.textContent=labels.join("   ");
+    disable(false);setStatus(comps.length+" bağlantılı bileşen.","is-ok");
+  });
+
+  function loadExample(){
+    token++;vertices=[];edges=new Set();nextId=0;clearStates();
+    var data=[
+      ["A",180,120],["B",420,90],["C",690,120],["D",260,330],["E",520,300],["F",800,340]
+    ];
+    data.forEach(function(d){vertices.push({id:nextId++,label:d[0],x:d[1],y:d[2]});});
+    [[0,1],[0,3],[1,2],[1,4],[2,4],[2,5],[3,4],[4,5]].forEach(function(e){edges.add(edgeKey(e[0],e[1]));});
+    updateSelects();el.frontierTitle.textContent="Sınır";el.path.textContent="—";renderFrontier([]);render();setStatus("Örnek çizge yüklendi.","is-ok");
+  }
+
+  btn.example.addEventListener("click",loadExample);
+
+  btn.random.addEventListener("click",function(){
+    token++;vertices=[];edges=new Set();nextId=0;clearStates();
+    var count=8;
+    for(var i=0;i<count;i++){
+      var angle=i/count*Math.PI*2;
+      vertices.push({id:nextId++,label:String.fromCharCode(65+i),x:500+Math.cos(angle)*210,y:260+Math.sin(angle)*180});
+    }
+    for(var a=0;a<count;a++){
+      for(var b=a+1;b<count;b++){
+        if(Math.random()<0.28)edges.add(edgeKey(a,b));
+      }
+    }
+    updateSelects();el.frontierTitle.textContent="Sınır";el.path.textContent="—";renderFrontier([]);render();setStatus("Rastgele çizge üretildi.","is-ok");
+  });
+
+  btn.clear.addEventListener("click",function(){
+    token++;vertices=[];edges=new Set();nextId=0;clearStates();
+    updateSelects();el.frontierTitle.textContent="Sınır";el.path.textContent="—";renderFrontier([]);render();setStatus("Çizge temizlendi.");
+  });
+
+  btn.cancel.addEventListener("click",function(){
+    token++;clearStates();disable(false);el.frontierTitle.textContent="Sınır";renderFrontier([]);render();setStatus("Animasyon iptal edildi.");
+  });
+
+  loadExample();
+  btn.cancel.disabled=true;
+})();
+</script>
+<script src="deck/oyun.js"></script>

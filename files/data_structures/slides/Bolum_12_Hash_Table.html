@@ -1,0 +1,967 @@
+---
+layout: without-sidebar
+title: "Hash Tablosu Simülatörü"
+permalink: /files/data_structures/slides/Bolum_12_Hash_Table.html
+redirect_from:
+  - /files/data_structures/slides/Bolum_09_Hash_Table.html
+excerpt: "Ayrı zincirleme, otomatik büyütme, adım adım hash hesabı, çakışma görselleştirmesi ve işlem adımlarıyla etkileşimli hash tablosu simülatörü."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+/* ---------- 800x600 stage (agt-oyun) ---------- */
+.ds-st { font-size: 15px; line-height: 1.3; }
+:where(.ds-st) .agt-oyun__body { display: flex; flex-direction: column; }
+:where(.ds-st) .ds-sim__root { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+:where(.ds-st) .agt-oyun__body button {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 12px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 999px;
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: none;
+  transition: border-color .18s ease, background .18s ease;
+}
+:where(.ds-st) .agt-oyun__body button:hover:not(:disabled) { border-color: var(--ds-link); }
+:where(.ds-st) .agt-oyun__body button:disabled { opacity: .4; cursor: default; }
+:where(.ds-st) .agt-oyun__body button.is-primary { border-color: var(--ds-link); background: var(--ds-link); color: var(--ds-bg); }
+:where(.ds-st) .agt-oyun__body button.is-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--ds-link) 85%, var(--ds-text)); }
+:where(.ds-st) .agt-oyun__body button.is-danger { border-color: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-border)); color: var(--ds-bad); }
+:where(.ds-st) .agt-oyun__body input,
+:where(.ds-st) .agt-oyun__body select {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+  box-shadow: none;
+}
+:where(.ds-st) .agt-oyun__body input[type="checkbox"],
+:where(.ds-st) .agt-oyun__body input[type="radio"] { width: auto; height: auto; padding: 0; }
+:where(.ds-st) .agt-oyun__body label {
+  margin: 0;
+  padding: 0;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.ds-st .ds-sim__panel {
+  min-height: 0;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-bg);
+}
+.ds-st .ds-sim__status {
+  padding: 6px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+}
+.ds-st .ds-sim__caption {
+  margin: 0 0 4px;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+:where(.ds-st) .agt-oyun__body li { margin: 0; }
+
+.ds-hash {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 6px;
+  line-height: 1.3;
+}
+
+/* ---------- controls ---------- */
+.ds-hash__panel {
+  display: grid;
+  gap: 6px;
+  padding: 6px 10px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.ds-hash__group {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.ds-hash__field {
+  display: grid;
+  gap: 2px;
+  width: 108px;
+}
+
+.ds-hash__field--wide { width: 150px; }
+.ds-hash__field input,
+.ds-hash__field select { width: 100%; }
+
+/* ---------- hash calculation ---------- */
+.ds-hash__hash-box {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 5px 10px;
+}
+
+.ds-hash__hash-box .ds-sim__caption { margin: 0; }
+
+.ds-hash__formula {
+  height: 32px;
+  padding: 1px 8px;
+  border-radius: 8px;
+  background: var(--ds-surface-strong);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 12px;
+  line-height: 15px;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+
+
+
+/* ---------- buckets and side panels ---------- */
+.ds-hash__main {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 230px;
+  gap: 6px;
+}
+
+.ds-hash__buckets {
+  min-height: 0;
+  padding: 6px;
+  overflow: hidden;
+}
+
+.ds-hash__grid {
+  --chip-width: 90px;
+  height: 100%;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 4px 6px;
+}
+
+.ds-hash__bucket {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px 2px 2px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 8px;
+  background: var(--ds-surface);
+  overflow: hidden;
+  transition: background .18s ease, border-color .18s ease;
+}
+
+.ds-hash__bucket h3 {
+  flex: 0 0 26px;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: 1.5px solid var(--ds-link);
+  border-radius: 6px;
+  background: var(--ds-node);
+  color: var(--ds-text);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.ds-hash__bucket.is-checking {
+  border-color: var(--ds-warn);
+  background: var(--ds-hot);
+}
+
+.ds-hash__bucket.is-found {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+}
+
+.ds-hash__chain {
+  min-width: 0;
+  flex: 1;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.ds-hash__entry {
+  flex: 0 0 var(--chip-width);
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 5px;
+  border: 1.5px solid var(--ds-link);
+  border-radius: 6px;
+  background: var(--ds-node);
+  font-size: 12px;
+  line-height: 13px;
+  overflow: hidden;
+}
+
+.ds-hash__entry strong,
+.ds-hash__entry span {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-hash__entry strong { font-size: 12px; }
+.ds-hash__entry span { color: var(--ds-muted); }
+
+.ds-hash__grid.is-compact .ds-hash__entry {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+.ds-hash__grid.is-compact .ds-hash__entry strong { flex: none; max-width: 100%; }
+.ds-hash__grid.is-compact .ds-hash__entry span { min-width: 0; }
+
+.ds-hash__entry.is-more {
+  flex-basis: 30px;
+  align-items: center;
+  padding: 0;
+  border-style: dashed;
+  border-color: var(--ds-border);
+  background: var(--ds-surface);
+  color: var(--ds-muted);
+  font-weight: 800;
+}
+
+.ds-hash__entry.is-checking {
+  border-color: var(--ds-warn);
+  background: var(--ds-hot);
+}
+
+.ds-hash__entry.is-found {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+}
+
+.ds-hash__entry.is-checking span,
+.ds-hash__entry.is-found span { color: var(--ds-text); }
+
+.ds-hash__empty {
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-style: italic;
+}
+
+.ds-hash__side {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 6px;
+}
+
+.ds-hash__trace,
+.ds-hash__log {
+  min-height: 0;
+  padding: 5px 8px;
+  overflow: hidden;
+}
+
+.ds-hash__steps,
+.ds-hash__log ol {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.ds-hash__steps { height: 48px; }
+
+.ds-hash__steps li,
+.ds-hash__log li {
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- footer: status and stats ---------- */
+.ds-hash__footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  height: 44px;
+}
+
+.ds-st .ds-hash__status {
+  margin: 0;
+  padding: 3px 10px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  line-height: 1.25;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.ds-hash__status.is-success { color: var(--ds-good); }
+.ds-hash__status.is-error { color: var(--ds-bad); }
+
+.ds-hash__stat {
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ds-hash__stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-hash * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-st agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 12 · Simülasyon</p><h1>Hash Tablosu Simülatörü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="ds-hash-help" aria-label="Bu simülatör hakkında">?</button>
+    <a class="agt-oyun__back" href="Bolum_12_Hash_Tablosu.html">← Bölüm 12</a>
+  </header>
+
+  <div class="agt-oyun__body">
+
+        <div class="ds-sim__root ds-hash">
+          <div class="ds-hash__panel">
+            <div class="ds-hash__group">
+              <div class="ds-hash__field"><label for="ds-hash-key">Anahtar</label><input id="ds-hash-key" type="text" value="ad" maxlength="32"></div>
+              <div class="ds-hash__field"><label for="ds-hash-value">Değer</label><input id="ds-hash-value" type="text" value="Ada" maxlength="48"></div>
+              <button class="is-primary" id="ds-hash-insert" type="button">Ekle / Güncelle</button>
+              <button id="ds-hash-lookup" type="button">Ara</button>
+              <button class="is-danger" id="ds-hash-delete" type="button">Sil</button>
+              <button id="ds-hash-random" type="button">Rastgele Ekle</button>
+            </div>
+
+            <div class="ds-hash__group">
+              <div class="ds-hash__field"><label for="ds-hash-capacity">Kapasite</label><select id="ds-hash-capacity"><option value="4">4</option><option value="8" selected>8</option><option value="12">12</option><option value="16">16</option></select></div>
+              <div class="ds-hash__field ds-hash__field--wide"><label for="ds-hash-resize">Otomatik büyütme</label><select id="ds-hash-resize"><option value="on" selected>Açık (λ &gt; 0,75)</option><option value="off">Kapalı</option></select></div>
+              <button id="ds-hash-example" type="button">Örneği Yükle</button>
+              <button class="is-danger" id="ds-hash-clear" type="button">Temizle</button>
+              <button class="is-danger" id="ds-hash-cancel" type="button">İptal</button>
+            </div>
+          </div>
+
+          <div class="ds-hash__hash-box ds-sim__panel">
+            <p class="ds-sim__caption">Hash hesabı</p>
+            <div id="ds-hash-formula" class="ds-hash__formula">hash(anahtar) = FNV tarzı kayan hash mod kapasite</div>
+          </div>
+
+          <div class="ds-hash__main">
+            <div class="ds-hash__buckets ds-sim__panel">
+              <div id="ds-hash-table" class="ds-hash__grid" aria-label="Hash tablosu kovaları"></div>
+            </div>
+
+            <div class="ds-hash__side">
+              <div class="ds-hash__trace ds-sim__panel"><p class="ds-sim__caption">İşlem adımları</p><ol id="ds-hash-steps" class="ds-hash__steps"><li>Henüz işlem yok.</li></ol></div>
+              <div class="ds-hash__log ds-sim__panel"><p class="ds-sim__caption">Geçmiş</p><ol id="ds-hash-log"><li>Henüz işlem yok.</li></ol></div>
+            </div>
+          </div>
+
+          <div class="ds-hash__footer">
+            <p id="ds-hash-status" class="ds-hash__status ds-sim__status" role="status" aria-live="polite">Örnek hash tablosu yüklendi. Bir işlem seçin.</p>
+            <div class="ds-hash__stat"><strong>Öğe</strong><span id="ds-hash-items">0</span></div>
+            <div class="ds-hash__stat"><strong>Kapasite</strong><span id="ds-hash-cap">8</span></div>
+            <div class="ds-hash__stat"><strong>Yük faktörü</strong><span id="ds-hash-load">0,00</span></div>
+            <div class="ds-hash__stat"><strong>Dolu kova</strong><span id="ds-hash-occupied">0</span></div>
+          </div>
+        </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="ds-hash-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Hash Tablosu Simülatörü</h2>
+    <p><b>Ayrı zincirleme</b> kullanan hash tablosu: anahtar hash'lenerek bir kova indisine dönüştürülür ve her kova oraya düşen girdilerin zincirini (listesini) tutar.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>Bir <b>Anahtar</b> ve <b>Değer</b> yazın. <b>Ekle / Güncelle</b> girdiyi ekler ya da var olan anahtarın değerini değiştirir; <b>Ara</b> ve <b>Sil</b> yalnızca anahtarı kullanır; <b>Rastgele Ekle</b> rastgele bir girdi ekler. En fazla 12 girdi sığar.</li>
+      <li><b>Kapasite</b>, <b>Temizle</b> sonrasındaki başlangıç kova sayısını belirler. <b>Otomatik büyütme</b>, yük faktörü 0,75'i aştığında kapasiteyi iki katına çıkarır.</li>
+      <li><b>Örneği Yükle</b> örnek tabloyu geri getirir; <b>İptal</b> çalışan işlemi durdurur ve tabloyu geri yükler.</li>
+    </ul>
+    <h3>Hash fonksiyonu</h3>
+    <p>FNV-1a tarzı kayan hash: 2166136261'den başlanır; her karakterin kodu XOR'lanır ve sonuç 16777619 ile çarpılır (32 bit). Kova indisi <code>hash mod kapasite</code> olur.</p>
+    <h3>Notlar</h3>
+    <ul>
+      <li>İki anahtar aynı kovaya düştüğünde <b>çakışma</b> olur; yeni girdi, anahtarı zincirde bulunmadığı anlaşıldıktan sonra zincirin sonuna eklenir.</li>
+      <li><b>Yük faktörü</b> λ = öğe sayısı / kapasite, ortalama zincir uzunluğudur.</li>
+      <li>Büyütme her girdiyi yeniden hash'ler (rehashing), çünkü indis kapasiteye bağlıdır.</li>
+    </ul>
+    <h3>Karmaşıklık</h3>
+    <p>Ekleme, arama ve silme ortalama O(1 + λ) sürer; tüm anahtarlar tek kovaya düşerse O(n)'ye kötüleşir. Büyütme O(n) tutar ama seyrek olur; bu yüzden ekleme amortize O(1) kalır.</p>
+  </dialog>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var root=document.querySelector(".ds-hash");
+  if(!root) return;
+
+  function q(id){return root.querySelector("#"+id);}
+
+  var el={
+    key:q("ds-hash-key"),value:q("ds-hash-value"),capacity:q("ds-hash-capacity"),resize:q("ds-hash-resize"),
+    formula:q("ds-hash-formula"),
+    table:q("ds-hash-table"),status:q("ds-hash-status"),items:q("ds-hash-items"),cap:q("ds-hash-cap"),
+    load:q("ds-hash-load"),occupied:q("ds-hash-occupied"),steps:q("ds-hash-steps"),log:q("ds-hash-log")
+  };
+
+  var btn={
+    insert:q("ds-hash-insert"),lookup:q("ds-hash-lookup"),delete:q("ds-hash-delete"),
+    example:q("ds-hash-example"),random:q("ds-hash-random"),clear:q("ds-hash-clear"),cancel:q("ds-hash-cancel")
+  };
+
+  /* the 800x600 stage holds at most MAX_ITEMS entries, so automatic resizing stops at 24 buckets */
+  var MAX_ITEMS=12;
+  var DELAY=400;
+  var LOG_SIZE=7;
+  var FORMULA_PARTS=8;
+
+  var buckets=[];
+  var count=0;
+  var token=0;
+  var markedBucket=-1;
+  var markedEntry=-1;
+  var markKind="";
+  var logs=[];
+
+  function init(capacity){
+    var cap=capacity||Number(el.capacity.value);
+    buckets=[];
+    for(var i=0;i<cap;i++) buckets.push([]);
+    count=0;
+  }
+
+  function hash(key,capacity){
+    var cap=capacity||buckets.length;
+    var h=2166136261>>>0;
+
+    for(var i=0;i<key.length;i++){
+      h^=key.codePointAt(i);
+      h=Math.imul(h,16777619)>>>0;
+    }
+
+    return h%cap;
+  }
+
+  function readKey(){
+    var k=el.key.value.trim();
+    if(!k) throw new Error("Anahtar gerekli.");
+    return k;
+  }
+
+  function setStatus(text,type){
+    el.status.textContent=text;
+    el.status.classList.remove("is-success","is-error");
+    if(type) el.status.classList.add(type);
+  }
+
+  function delay(){
+    if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return 0;
+    return DELAY;
+  }
+
+  function wait(ms,t){
+    return new Promise(function(resolve){setTimeout(function(){resolve(t===token);},ms);});
+  }
+
+  function disable(state){
+    Object.keys(btn).forEach(function(k){btn[k].disabled=state && k!=="cancel";});
+    btn.cancel.disabled=!state;
+    el.capacity.disabled=state;
+    el.resize.disabled=state;
+  }
+
+  function clearMarks(){
+    markedBucket=-1;
+    markedEntry=-1;
+    markKind="";
+  }
+
+  function addLog(text){
+    logs.unshift(text);
+    logs=logs.slice(0,LOG_SIZE);
+    el.log.innerHTML="";
+    logs.forEach(function(item){
+      var li=document.createElement("li");
+      li.textContent=item;
+      li.title=item;
+      el.log.appendChild(li);
+    });
+  }
+
+  function setSteps(lines){
+    el.steps.innerHTML="";
+    lines.forEach(function(line){
+      var li=document.createElement("li");
+      li.textContent=line;
+      li.title=line;
+      el.steps.appendChild(li);
+    });
+  }
+
+  function entryChip(item,j,state){
+    var entry=document.createElement("div");
+    entry.className="ds-hash__entry"+state;
+    entry.title=item.key+" = "+item.value+" · zincir konumu "+j;
+
+    var key=document.createElement("strong");
+    key.textContent=item.key;
+    var value=document.createElement("span");
+    value.textContent=item.value;
+
+    entry.appendChild(key); entry.appendChild(value);
+    return entry;
+  }
+
+  function render(){
+    el.table.innerHTML="";
+
+    /* buckets are laid out top-down in up to three columns; long chains show "+k" */
+    var n=buckets.length;
+    var cols=Math.max(1,Math.ceil(n/8));
+    var rows=Math.ceil(n/cols);
+    var chipWidth=cols===1?90:(cols===2?70:64);
+    var colWidth=((el.table.clientWidth||505)-(cols-1)*6)/cols;
+    var maxChips=Math.max(1,Math.floor((colWidth-36+4)/(chipWidth+4)));
+
+    el.table.style.gridTemplateColumns="repeat("+cols+",minmax(0,1fr))";
+    el.table.style.gridTemplateRows="repeat("+rows+",minmax(0,1fr))";
+    el.table.style.setProperty("--chip-width",chipWidth+"px");
+    el.table.classList.toggle("is-compact",rows>6);
+
+    buckets.forEach(function(bucket,i){
+      var box=document.createElement("section");
+      box.className="ds-hash__bucket"+(markedBucket===i && markKind?" "+markKind:"");
+      box.setAttribute("aria-label","Kova "+i);
+
+      var title=document.createElement("h3");
+      title.textContent=String(i);
+      title.title="Kova "+i;
+      box.appendChild(title);
+
+      var chain=document.createElement("div");
+      chain.className="ds-hash__chain";
+
+      if(!bucket.length){
+        var empty=document.createElement("span");
+        empty.className="ds-hash__empty";
+        empty.textContent="Boş";
+        chain.appendChild(empty);
+      }else{
+        var shown=bucket.length>maxChips?maxChips-1:bucket.length;
+        var start=0;
+        if(markedBucket===i && markedEntry>=shown) start=markedEntry-shown+1;
+
+        for(var j=start;j<start+shown;j++){
+          var state=markedBucket===i && markedEntry===j && markKind ? " "+markKind : "";
+          chain.appendChild(entryChip(bucket[j],j,state));
+        }
+
+        if(shown<bucket.length){
+          var more=document.createElement("div");
+          more.className="ds-hash__entry is-more";
+          more.textContent="+"+(bucket.length-shown);
+          more.title=bucket.filter(function(_,k){return k<start||k>=start+shown;}).map(function(item){return item.key;}).join(", ");
+          chain.appendChild(more);
+        }
+      }
+
+      box.appendChild(chain);
+      el.table.appendChild(box);
+    });
+
+    el.items.textContent=String(count);
+    el.cap.textContent=String(buckets.length);
+    el.load.textContent=(count/buckets.length).toFixed(2).replace(".",",");
+
+    var occupied=0;
+    buckets.forEach(function(b){if(b.length) occupied++;});
+    el.occupied.textContent=String(occupied);
+
+    if(!btn.cancel.disabled) return;
+    btn.delete.disabled=count===0;
+    btn.clear.disabled=count===0;
+  }
+
+  async function showHash(key,index,t){
+    var parts=[];
+    for(var i=0;i<key.length;i++) parts.push(key[i]+":"+key.codePointAt(i));
+    if(parts.length>FORMULA_PARTS) parts=parts.slice(0,FORMULA_PARTS).concat(["…"]);
+
+    el.formula.textContent='"'+key+'" → ['+parts.join(", ")+"] → kayan hash mod "+buckets.length+" = "+index;
+    el.formula.title=el.formula.textContent;
+    setSteps([
+      'Anahtar "'+key+'" okunur.',
+      "Kayan hash hesaplanır.",
+      "Kova "+index+" seçilir."
+    ]);
+
+    markedBucket=index;
+    markedEntry=-1;
+    markKind="is-checking";
+    render();
+
+    return await wait(delay(),t);
+  }
+
+  async function scanChain(index,key,t){
+    var bucket=buckets[index];
+
+    for(var i=0;i<bucket.length;i++){
+      markedBucket=index;
+      markedEntry=i;
+      markKind="is-checking";
+      render();
+
+      if(!(await wait(delay(),t))) return {cancelled:true,index:-1};
+      if(bucket[i].key===key){
+        markedEntry=i;
+        markKind="is-found";
+        render();
+        await wait(delay(),t);
+        return {cancelled:false,index:i};
+      }
+    }
+
+    return {cancelled:false,index:-1};
+  }
+
+  function rehash(newCapacity){
+    var entries=[];
+    buckets.forEach(function(bucket){bucket.forEach(function(item){entries.push(item);});});
+
+    buckets=[];
+    for(var i=0;i<newCapacity;i++) buckets.push([]);
+
+    entries.forEach(function(item){
+      buckets[hash(item.key,newCapacity)].push(item);
+    });
+  }
+
+  function needsResize(){
+    return el.resize.value==="on" && count/buckets.length>0.75;
+  }
+
+  /* doubles the capacity once (one insertion can cross the threshold only once) */
+  function resizeIfNeeded(){
+    if(!needsResize()) return false;
+    var old=buckets.length;
+    rehash(old*2);
+    addLog("Tablo büyütüldü: "+old+" → "+(old*2)+" kova.");
+    return true;
+  }
+
+  btn.insert.addEventListener("click",async function(){
+    try{
+      var key=readKey();
+      var value=el.value.value.trim();
+      if(!value) throw new Error("Değer gerekli.");
+      if(count>=MAX_ITEMS && !buckets[hash(key)].some(function(item){return item.key===key;})){
+        throw new Error("Tablo dolu: bu simülatör en fazla "+MAX_ITEMS+" öğe tutar.");
+      }
+
+      token++;
+      var t=token;
+      disable(true);
+      clearMarks();
+
+      var index=hash(key);
+
+      if(!(await showHash(key,index,t))) return;
+
+      var result=await scanChain(index,key,t);
+      if(result.cancelled) return;
+
+      var message;
+      if(result.index>=0){
+        var oldValue=buckets[index][result.index].value;
+        buckets[index][result.index].value=value;
+        markedBucket=index;
+        markedEntry=result.index;
+        markKind="is-found";
+        render();
+        setSteps([
+          '"'+key+'" hash → kova '+index+".",
+          "Zincirdeki anahtarlar karşılaştırılır.",
+          "Anahtar zaten var; değeri değiştirilir (boyut "+count+" kalır)."
+        ]);
+        addLog('"'+key+'" güncellendi (kova '+index+").");
+        message='"'+key+'" anahtarı güncellendi: '+oldValue+" → "+value+".";
+      }else{
+        var collision=buckets[index].length>0;
+        buckets[index].push({key:key,value:value});
+        count++;
+        markedBucket=index;
+        markedEntry=buckets[index].length-1;
+        markKind="is-found";
+        render();
+
+        setSteps([
+          '"'+key+'" hash → kova '+index+".",
+          collision ? "Çakışma; anahtar zincirde yok, sona eklenir." : "Kova boş.",
+          "Yeni anahtar-değer girdisi saklanır."
+        ]);
+
+        addLog('"'+key+'" eklendi (kova '+index+").");
+        message='"'+key+'" anahtarı eklendi (kova '+index+").";
+      }
+
+      /* let the student see where the entry landed before any resize moves it;
+         if the animation is cancelled here, the Cancel handler finishes the resize */
+      if(needsResize()){
+        setStatus(message+" Yük faktörü "+(count/buckets.length).toFixed(2).replace(".",",")+" > 0,75.");
+        if(!(await wait(delay()*2,t))) return;
+        var old=buckets.length;
+        resizeIfNeeded();
+        setSteps([
+          "Yük faktörü "+(count/old).toFixed(2).replace(".",",")+" > 0,75 oldu.",
+          "Kapasite iki katına çıkar: "+old+" → "+buckets.length+".",
+          "Her girdi mod "+buckets.length+" ile yeniden hash'lenir."
+        ]);
+        el.formula.textContent="Yeniden hash: her anahtar → kayan hash mod "+buckets.length+" (önce mod "+old+")";
+        el.formula.title=el.formula.textContent;
+        message+=" Tablo büyütüldü: "+old+" → "+buckets.length+" kova.";
+      }
+
+      clearMarks();
+      disable(false);
+      render();
+      setStatus(message,"is-success");
+    }catch(error){
+      disable(false);
+      setStatus(error.message,"is-error");
+    }
+  });
+
+  btn.lookup.addEventListener("click",async function(){
+    try{
+      var key=readKey();
+
+      token++;
+      var t=token;
+      disable(true);
+      clearMarks();
+
+      var index=hash(key);
+      if(!(await showHash(key,index,t))) return;
+
+      var result=await scanChain(index,key,t);
+      if(result.cancelled) return;
+
+      if(result.index>=0){
+        setSteps([
+          '"'+key+'" hash → kova '+index+".",
+          "Zincirdeki girdiler karşılaştırılır.",
+          "Bulundu: zincir konumu "+result.index+"."
+        ]);
+        setStatus('Bulundu: "'+key+'" = '+buckets[index][result.index].value+".","is-success");
+        addLog('"'+key+'" arandı (kova '+index+").");
+      }else{
+        setSteps([
+          '"'+key+'" hash → kova '+index+".",
+          "Zincirin tüm girdileri karşılaştırılır.",
+          "Eşleşen anahtar yok."
+        ]);
+        setStatus('"'+key+'" anahtarı bulunamadı.',"is-error");
+        addLog('"'+key+'" bulunamadı (kova '+index+").");
+      }
+
+      clearMarks();
+      disable(false);
+      render();
+    }catch(error){
+      disable(false);
+      setStatus(error.message,"is-error");
+    }
+  });
+
+  btn.delete.addEventListener("click",async function(){
+    try{
+      var key=readKey();
+
+      token++;
+      var t=token;
+      disable(true);
+      clearMarks();
+
+      var index=hash(key);
+      if(!(await showHash(key,index,t))) return;
+
+      var result=await scanChain(index,key,t);
+      if(result.cancelled) return;
+
+      if(result.index>=0){
+        buckets[index].splice(result.index,1);
+        count--;
+        setSteps([
+          '"'+key+'" hash → kova '+index+".",
+          "Zincirde eşleşen girdi bulunur.",
+          "Girdi zincirden çıkarılır."
+        ]);
+        addLog('"'+key+'" silindi (kova '+index+").");
+        setStatus('"'+key+'" anahtarı silindi.',"is-success");
+      }else{
+        setSteps([
+          '"'+key+'" hash → kova '+index+".",
+          "Seçilen zincir taranır.",
+          "Eşleşen anahtar yok."
+        ]);
+        setStatus('"'+key+'" anahtarı bulunamadı.',"is-error");
+      }
+
+      clearMarks();
+      disable(false);
+      render();
+    }catch(error){
+      disable(false);
+      setStatus(error.message,"is-error");
+    }
+  });
+
+  btn.example.addEventListener("click",function(){
+    token++;
+    init(Number(el.capacity.value));
+    logs=[];
+    clearMarks();
+
+    [
+      ["ad","Ada"],
+      ["şehir","Londra"],
+      ["rol","Mühendis"],
+      ["yıl","1843"],
+      ["dil","C"]
+    ].forEach(function(pair){
+      var index=hash(pair[0]);
+      buckets[index].push({key:pair[0],value:pair[1]});
+      count++;
+      resizeIfNeeded();
+    });
+
+    setSteps(["Beş örnek girdi yüklendi."]);
+    addLog("Örnek hash tablosu yüklendi.");
+    render();
+    setStatus("Örnek hash tablosu yüklendi.","is-success");
+  });
+
+  btn.random.addEventListener("click",function(){
+    var keys=["alfa","beta","gama","delta","omega","düğüm","kenar","heap","eşleme","küme"];
+    var key=keys[Math.floor(Math.random()*keys.length)]+Math.floor(Math.random()*50);
+    el.key.value=key;
+    el.value.value="değer-"+Math.floor(Math.random()*100);
+    btn.insert.click();
+  });
+
+  btn.clear.addEventListener("click",function(){
+    token++;
+    init(Number(el.capacity.value));
+    logs=[];
+    clearMarks();
+    el.log.innerHTML="<li>Henüz işlem yok.</li>";
+    setSteps(["Hash tablosu temizlendi."]);
+    render();
+    setStatus("Hash tablosu temizlendi.");
+  });
+
+  btn.cancel.addEventListener("click",function(){
+    token++;
+    clearMarks();
+    disable(false);
+    var resized=resizeIfNeeded();
+    render();
+    setStatus(resized?"Animasyon iptal edildi; bekleyen büyütme tamamlandı ("+buckets.length+" kova).":"Animasyon iptal edildi.");
+  });
+
+  el.capacity.addEventListener("change",function(){
+    token++;
+    init(Number(el.capacity.value));
+    logs=[];
+    clearMarks();
+    render();
+    setStatus("Kapasite değişti; tablo sıfırlandı.");
+  });
+
+
+  init(8);
+  btn.cancel.disabled=true;
+  btn.example.click();
+})();
+</script>
+<script src="deck/oyun.js"></script>

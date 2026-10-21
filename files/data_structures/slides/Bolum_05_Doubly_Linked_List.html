@@ -1,0 +1,583 @@
+---
+layout: without-sidebar
+title: "Çift Yönlü Bağlı Liste Simülatörü"
+permalink: /files/data_structures/slides/Bolum_05_Doubly_Linked_List.html
+redirect_from:
+  - /files/data_structures/slides/Bolum_03_Doubly_Linked_List.html
+excerpt: "Etkileşimli çift yönlü bağlı liste simülatörü: prev/next bağları, baş ve son işaretçileri, iki uçta O(1) işlemler, yakın uçtan erişim, ileri ve geri gezinme, adım adım ters çevirme."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+/* ortak simülatör kontrolleri (agt-oyun sahnesi) */
+.ds-st { font-size: 15px; }
+.ds-st .agt-oyun__body { display: flex; flex-direction: column; }
+.ds-st .ds-sim__root { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+:where(.ds-st) .agt-oyun__body button {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 12px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 999px;
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease;
+}
+:where(.ds-st) .agt-oyun__body button.is-primary { border-color: var(--ds-link); background: var(--ds-link); color: var(--ds-bg); }
+:where(.ds-st) .agt-oyun__body button.is-danger { border-color: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-border)); color: var(--ds-bad); }
+:where(.ds-st) .agt-oyun__body input,
+:where(.ds-st) .agt-oyun__body select {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+}
+:where(.ds-st) .agt-oyun__body label { margin: 0; padding: 0; color: var(--ds-muted); font-size: 12px; font-weight: 700; }
+.ds-st .ds-sim__panel { min-height: 0; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.ds-st .ds-sim__caption { margin: 0 0 4px; color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+
+.dll-sim {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.dll-controls {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.dll-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.dll-field {
+  display: grid;
+  gap: 2px;
+  width: 92px;
+}
+
+.dll-field input { width: 100%; }
+
+.dll-stage {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.dll-canvas {
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 8px 6px;
+  overflow: hidden;
+}
+
+.dll-list {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.dll-null {
+  flex: 0 0 auto;
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.dll-wrap {
+  min-width: 0;
+  flex: 0 1 100px;
+  display: grid;
+  gap: 3px;
+  justify-items: center;
+}
+
+.dll-end {
+  min-height: 18px;
+  color: var(--ds-link);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.dll-end.is-new { color: var(--ds-good); }
+
+.dll-node {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 30px;
+  overflow: hidden;
+  border: 2px solid var(--ds-link);
+  border-radius: 8px;
+  background: var(--ds-node);
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease, border-color .18s ease, opacity .18s ease;
+}
+
+.dll-ptr,
+.dll-data {
+  min-width: 0;
+  height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.dll-ptr {
+  background: color-mix(in srgb, var(--ds-link) 9%, var(--ds-bg));
+  color: var(--ds-link);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.dll-ptr.is-prev { border-right: 1.5px solid var(--ds-link); }
+.dll-ptr.is-next { border-left: 1.5px solid var(--ds-link); }
+.dll-ptr small { color: var(--ds-muted); font-size: 12px; font-weight: 700; }
+.dll-ptr.is-swapped { background: var(--ds-hot); }
+
+.dll-data {
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.dll-index {
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dll-link {
+  flex: 0 0 auto;
+  display: grid;
+  color: var(--ds-link);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: .9;
+  text-align: center;
+}
+
+.dll-link span.is-hot { color: var(--ds-warn); }
+
+.dll-node.checking {
+  border-color: var(--ds-warn);
+  background: var(--ds-hot);
+  transform: translateY(-5px) scale(1.03);
+}
+
+.dll-node.found {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  transform: translateY(-5px) scale(1.03);
+}
+
+.dll-node.removing {
+  border-color: var(--ds-bad);
+  background: color-mix(in srgb, var(--ds-bad) 18%, var(--ds-bg));
+  opacity: .75;
+}
+
+.dll-node.done {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 13%, var(--ds-bg));
+}
+
+.dll-node.selected { box-shadow: 0 0 0 3px color-mix(in srgb, var(--ds-link) 30%, transparent); }
+
+.dll-empty {
+  color: var(--ds-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.dll-status {
+  padding: 8px 10px;
+  border-top: 1.5px solid var(--ds-border);
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dll-status.error { color: var(--ds-bad); }
+.dll-status.success { color: var(--ds-good); }
+
+.dll-footer {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 6px;
+}
+
+.dll-stat {
+  min-width: 0;
+  padding: 4px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dll-stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dll-sim * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-st dll-st agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 5 · Simülasyon</p><h1>Çift Yönlü Bağlı Liste Simülatörü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="dll-help" aria-label="Yardım">?</button>
+    <a class="agt-oyun__back" href="Bolum_05_Bagli_Liste.html">← Bölüm 5</a>
+  </header>
+
+  <div class="agt-oyun__body">
+
+    <div class="ds-sim__root dll-sim">
+      <div class="dll-controls">
+        <div class="dll-row">
+          <div class="dll-field"><label for="dll-value">Değer</label><input id="dll-value" type="number" value="50" inputmode="numeric"></div>
+          <button class="is-primary" id="dll-add-head" type="button">Başa Ekle</button>
+          <button class="is-primary" id="dll-add-tail" type="button">Sona Ekle</button>
+          <button class="is-danger" id="dll-remove-head" type="button">Baştan Sil</button>
+          <button class="is-danger" id="dll-remove-tail" type="button">Sondan Sil</button>
+        </div>
+
+        <div class="dll-row">
+          <div class="dll-field"><label for="dll-index">İndis</label><input id="dll-index" type="number" min="0" value="0" inputmode="numeric"></div>
+          <button id="dll-access" type="button">Eriş</button>
+          <button class="is-primary" id="dll-add-index" type="button">İndise Ekle</button>
+          <button class="is-danger" id="dll-remove-index" type="button">İndisten Sil</button>
+          <button class="is-danger" id="dll-clear" type="button">Temizle</button>
+        </div>
+
+        <div class="dll-row">
+          <div class="dll-field"><label for="dll-search-value">Aranan</label><input id="dll-search-value" type="number" value="18" inputmode="numeric"></div>
+          <button id="dll-search" type="button">Doğrusal Arama</button>
+          <button id="dll-forward" type="button">Gez →</button>
+          <button id="dll-backward" type="button">Gez ←</button>
+          <button id="dll-reverse" type="button">Ters Çevir</button>
+          <button class="is-danger" id="dll-cancel" type="button">İptal</button>
+        </div>
+      </div>
+
+      <div class="dll-stage ds-sim__panel">
+        <div class="dll-canvas"><div class="dll-list" id="dll-list"></div></div>
+        <div class="dll-status" id="dll-status" aria-live="polite">Hazır.</div>
+      </div>
+
+      <div class="dll-footer">
+        <div class="dll-stat"><strong>İşlem</strong><span id="dll-op">Boşta</span></div>
+        <div class="dll-stat"><strong>Ziyaret</strong><span id="dll-visits">0</span></div>
+        <div class="dll-stat"><strong>Bağ değişimi</strong><span id="dll-changes">0</span></div>
+        <div class="dll-stat"><strong>Uzunluk</strong><span id="dll-length">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="dll-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Çift Yönlü Bağlı Liste Simülatörü</h2>
+    <p>Çift yönlü bağlı listenin her düğümünde hem <code>next</code> hem <code>prev</code> işaretçisi bulunur; liste <code>head</code> ve <code>tail</code> işaretçilerini tutar. Liste iki yönde de gezilebilir ve bir düğüm, öncülü aranmadan listeden ayrılabilir.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li><b>Değer</b>: <b>Başa Ekle</b>, <b>Sona Ekle</b>, <b>Baştan Sil</b>, <b>Sondan Sil</b> (en fazla 7 düğüm).</li>
+      <li><b>İndis</b>: <b>Eriş</b>, <b>İndise Ekle</b>, <b>İndisten Sil</b>; <b>Temizle</b> listeyi boşaltır.</li>
+      <li><b>Doğrusal Arama</b>, <b>Gez →</b> (baştan), <b>Gez ←</b> (sondan) ve <b>Ters Çevir</b> canlandırılır; <b>İptal</b> bunları durdurur.</li>
+      <li>Vurgulanan oklar hangi <code>next</code> / <code>prev</code> bağlarının değiştiğini gösterir.</li>
+    </ul>
+    <h3>Maliyetler</h3>
+    <table><tr><th>İşlem</th><th>Süre</th></tr>
+      <tr><td>Baş ya da sonda ekleme / silme</td><td>O(1)</td></tr>
+      <tr><td>i indisine erişim</td><td>Yakın uçtan O(min(i, n − i))</td></tr>
+      <tr><td>Arama</td><td>O(n)</td></tr>
+      <tr><td>Ters çevirme (her düğümde prev/next takası)</td><td>O(n)</td></tr></table>
+    <p>İkinci işaretçinin bedeli: düğüm başına daha fazla bellek ve her ekleme ya da silmede daha fazla bağ güncellemesi.</p>
+  </dialog>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const e = {
+    value: $("dll-value"), index: $("dll-index"), searchValue: $("dll-search-value"),
+    addHead: $("dll-add-head"), addTail: $("dll-add-tail"), removeHead: $("dll-remove-head"), removeTail: $("dll-remove-tail"),
+    access: $("dll-access"), addIndex: $("dll-add-index"), removeIndex: $("dll-remove-index"), clear: $("dll-clear"),
+    search: $("dll-search"), forward: $("dll-forward"), backward: $("dll-backward"), reverse: $("dll-reverse"), cancel: $("dll-cancel"),
+    list: $("dll-list"), status: $("dll-status"), op: $("dll-op"), visits: $("dll-visits"), changes: $("dll-changes"), length: $("dll-length")
+  };
+  const MAX = 7, STEP = 420;
+  let data = [24, 51, 18, 73, 42];
+  let token = 0, running = false, visits = 0, changes = 0;
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const all = () => [e.addHead, e.addTail, e.removeHead, e.removeTail, e.access, e.addIndex, e.removeIndex, e.clear, e.search, e.forward, e.backward, e.reverse];
+
+  function status(text, type = "") { e.status.textContent = text; e.status.className = "dll-status" + (type ? " " + type : ""); }
+  function updateStats() { e.visits.textContent = visits; e.changes.textContent = changes; e.length.textContent = data.length; }
+  function resetStats(name = "Boşta") { visits = 0; changes = 0; e.op.textContent = name; updateStats(); }
+  function setRunning(v) { running = v; all().forEach(b => b.disabled = v); e.cancel.disabled = !v; }
+  function integer(inp) { const n = Number(inp.value); return Number.isInteger(n) ? n : null; }
+  const has = (list, i) => Array.isArray(list) && list.includes(i);
+
+  /* states: checking, found, removing, done, selected: indis listeleri
+     links: {i: "next" | "prev" | "both"} vurgulanan bağ (i ile i+1 arası)
+     ptrs: {i: [önceki komşu metni, sonraki komşu metni]} (ters çevirmede alan içerikleri)
+     swapped: alanları yer değiştirmiş düğümler; ends: {head, tail} (indis); newEnds: HEAD/TAIL yeni yerinde */
+  function render(st = {}) {
+    e.list.innerHTML = ""; updateStats();
+    const n = data.length;
+    if (!n) { const x = document.createElement("div"); x.className = "dll-empty"; x.textContent = "HEAD = TAIL = null · liste boş."; e.list.appendChild(x); return; }
+    const head = st.ends ? st.ends.head : 0, tail = st.ends ? st.ends.tail : n - 1;
+    const nul = () => { const x = document.createElement("div"); x.className = "dll-null"; x.textContent = "∅"; return x; };
+    e.list.appendChild(nul());
+    data.forEach((value, i) => {
+      const wrap = document.createElement("div"); wrap.className = "dll-wrap";
+      const end = document.createElement("div"); end.className = "dll-end" + (st.newEnds ? " is-new" : "");
+      end.textContent = [i === head ? "HEAD" : "", i === tail ? "TAIL" : ""].filter(Boolean).join(" · ") || " ";
+      const node = document.createElement("div"); node.className = "dll-node";
+      ["checking", "found", "removing", "done", "selected"].forEach(c => { if (has(st[c], i)) node.classList.add(c); });
+      const left = i > 0 ? data[i - 1] : null, right = i < n - 1 ? data[i + 1] : null;
+      const [pv, nv] = st.ptrs && st.ptrs[i] ? st.ptrs[i] : [left, right];
+      const ptr = (cls, label, v) => { const p = document.createElement("div"); p.className = "dll-ptr " + cls + (has(st.swapped, i) ? " is-swapped" : "");
+        p.innerHTML = `<small>${label}</small>${v === null ? "∅" : v}`; return p; };
+      const d = document.createElement("div"); d.className = "dll-data"; d.textContent = value;
+      node.append(ptr("is-prev", "prev", pv), d, ptr("is-next", "next", nv));
+      node.addEventListener("click", () => { if (running) return; e.index.value = i; e.value.value = data[i]; render({ selected: [i] }); status(`Düğüm ${i} seçildi.`); });
+      const idx = document.createElement("div"); idx.className = "dll-index"; idx.textContent = `indis ${i}`;
+      wrap.append(end, node, idx); e.list.appendChild(wrap);
+      if (i < n - 1) {
+        const l = document.createElement("div"); l.className = "dll-link";
+        const hot = st.links ? st.links[i] : null;
+        l.innerHTML = `<span class="${hot === "next" || hot === "both" ? "is-hot" : ""}">→</span><span class="${hot === "prev" || hot === "both" ? "is-hot" : ""}">←</span>`;
+        e.list.appendChild(l);
+      }
+    });
+    e.list.appendChild(nul());
+  }
+
+  async function pause(t, ms = STEP) { await wait(ms); if (t !== token) throw new Error("cancelled"); }
+  async function show(t, st, text, ms) { if (text) status(text); render(st); await pause(t, ms); }
+  function begin(name) { token++; resetStats(name); setRunning(true); return token; }
+  function finish(t, msg, type = "") { if (t !== token) return; setRunning(false); e.op.textContent = "Boşta"; status(msg, type); render(); }
+  function fail(t, err) { if (err?.message === "cancelled" || t !== token) return; setRunning(false); e.op.textContent = "Boşta"; status("İşlem durduruldu.", "error"); render(); }
+  function ensure() { if (!data.length) { status("Liste boş.", "error"); return false; } return true; }
+  function room() { if (data.length >= MAX) { status(`Sahneye en fazla ${MAX} düğüm sığar.`, "error"); return false; } return true; }
+  function readValue() { const v = integer(e.value); if (v === null) status("Tam sayı bir değer girin.", "error"); return v; }
+
+  /* indise en yakın uçtan yürür: baştan next ile ya da sondan prev ile */
+  async function walkTo(t, idx, verb) {
+    const n = data.length, fromHead = idx <= (n - 1) / 2;
+    if (fromHead) {
+      for (let i = 0; i <= idx; i++) { visits++; await show(t, { checking: [i], links: i > 0 ? { [i - 1]: "next" } : null }, `${verb}: indis ${idx} HEAD'e daha yakın · next izleniyor (${i})`); }
+    } else {
+      for (let i = n - 1; i >= idx; i--) { visits++; await show(t, { checking: [i], links: i < n - 1 ? { [i]: "prev" } : null }, `${verb}: indis ${idx} TAIL'e daha yakın · prev izleniyor (${i})`); }
+    }
+    return fromHead ? idx + 1 : n - idx;
+  }
+
+  async function addHead() {
+    if (!room()) return; const v = readValue(); if (v === null) return;
+    const t = begin("Başa Ekle");
+    try {
+      data.unshift(v); changes += data.length > 1 ? 3 : 1;
+      await show(t, { found: [0], links: data.length > 1 ? { 0: "both" } : null }, data.length > 1 ? `new.next = head, head.prev = new, head = new` : "head = tail = yeni düğüm");
+      finish(t, `${v} başa O(1) sürede eklendi.`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function addTail() {
+    if (!room()) return; const v = readValue(); if (v === null) return;
+    const t = begin("Sona Ekle");
+    try {
+      if (data.length) await show(t, { checking: [data.length - 1] }, "TAIL zaten biliniyor: yürümeye gerek yok");
+      data.push(v); const n = data.length; changes += n > 1 ? 3 : 1;
+      await show(t, { found: [n - 1], links: n > 1 ? { [n - 2]: "both" } : null }, n > 1 ? `tail.next = new, new.prev = tail, tail = new` : "head = tail = yeni düğüm");
+      finish(t, `${v} sona O(1) sürede eklendi.`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function removeHead() {
+    if (!ensure()) return; const old = data[0], t = begin("Baştan Sil");
+    try {
+      await show(t, { removing: [0], links: data.length > 1 ? { 0: "prev" } : null }, data.length > 1 ? "head = head.next, head.prev = null" : "head = tail = null");
+      data.shift(); changes += data.length ? 2 : 1;
+      finish(t, `Baş düğüm ${old} O(1) sürede çıkarıldı.`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function removeTail() {
+    if (!ensure()) return; const n = data.length, old = data[n - 1], t = begin("Sondan Sil");
+    try {
+      await show(t, { removing: [n - 1], links: n > 1 ? { [n - 2]: "next" } : null }, n > 1 ? "tail = tail.prev, tail.next = null · yürüme yok, O(1)" : "head = tail = null");
+      data.pop(); changes += data.length ? 2 : 1;
+      finish(t, `Son düğüm ${old} O(1) sürede çıkarıldı (tek yönlü bağlı listede bu işlem O(n) gerektirir).`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function access() {
+    if (!ensure()) return; const idx = integer(e.index);
+    if (idx === null || idx < 0 || idx >= data.length) { status("İndis aralık dışında.", "error"); return; }
+    const t = begin("Erişim");
+    try {
+      const steps = await walkTo(t, idx, "Erişim");
+      await show(t, { found: [idx] }, `indis ${idx} = ${data[idx]}`);
+      finish(t, `İndis ${idx} değeri: ${data[idx]} (${steps} düğüm ziyaret edildi).`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function addIndex() {
+    if (!room()) return; const idx = integer(e.index), n = data.length;
+    if (idx === null || idx < 0 || idx > n) { status(`İndis 0–${n} arasında olmalı.`, "error"); return; }
+    if (idx === 0) return addHead(); if (idx === n) return addTail();
+    const v = readValue(); if (v === null) return;
+    const t = begin("İndise Ekle");
+    try {
+      await walkTo(t, idx, "Ekleme");
+      await show(t, { checking: [idx - 1, idx], links: { [idx - 1]: "both" } }, `${v} ekleniyor: ${data[idx - 1]} ile ${data[idx]} arasına`);
+      data.splice(idx, 0, v); changes += 4;
+      await show(t, { found: [idx], links: { [idx - 1]: "both", [idx]: "both" } }, "4 bağ: new.prev, new.next, left.next, right.prev");
+      finish(t, `${v} eklendi: indis ${idx}.`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function removeIndex() {
+    if (!ensure()) return; const idx = integer(e.index), n = data.length;
+    if (idx === null || idx < 0 || idx >= n) { status("İndis aralık dışında.", "error"); return; }
+    if (idx === 0) return removeHead(); if (idx === n - 1) return removeTail();
+    const old = data[idx], t = begin("İndisten Sil");
+    try {
+      await walkTo(t, idx, "Silme");
+      await show(t, { removing: [idx], checking: [idx - 1, idx + 1], links: { [idx - 1]: "both", [idx]: "both" } }, `node.prev.next = node.next, node.next.prev = node.prev`);
+      data.splice(idx, 1); changes += 2;
+      await show(t, { found: [idx - 1, idx], links: { [idx - 1]: "both" } }, `${data[idx - 1]} ⇄ ${data[idx]} artık doğrudan bağlı`);
+      finish(t, `${old} çıkarıldı: indis ${idx} (2 bağ değişimi).`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function linearSearch() {
+    if (!ensure()) return; const target = integer(e.searchValue);
+    if (target === null) { status("Aranacak tam sayıyı girin.", "error"); return; }
+    const t = begin("Doğrusal Arama");
+    try {
+      for (let i = 0; i < data.length; i++) {
+        visits++; await show(t, { checking: [i], links: i > 0 ? { [i - 1]: "next" } : null }, `Karşılaştırma: ${data[i]} ile ${target}`);
+        if (data[i] === target) { await show(t, { found: [i] }, `${target} bulundu: indis ${i}`); finish(t, `${target} bulundu: indis ${i}.`, "success"); return; }
+      }
+      finish(t, `${target} bulunamadı.`, "error");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function traverse(forward) {
+    if (!ensure()) return; const t = begin(forward ? "Gez →" : "Gez ←"); const out = [], n = data.length;
+    try {
+      for (let k = 0; k < n; k++) {
+        const i = forward ? k : n - 1 - k; out.push(data[i]); visits++;
+        const links = forward ? (i > 0 ? { [i - 1]: "next" } : null) : (i < n - 1 ? { [i]: "prev" } : null);
+        await show(t, { checking: [i], done: forward ? [...Array(i).keys()] : [...Array(n - i - 1).keys()].map(j => n - 1 - j), links }, `${forward ? "HEAD → next" : "TAIL → prev"}: ${out.join(" → ")}`);
+      }
+      finish(t, `${forward ? "İleri" : "Geri"} gezinme: ${out.join(" → ")}`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  async function reverse() {
+    if (!ensure()) return; const t = begin("Ters Çevir"), n = data.length, SLOW = 650;
+    /* her düğümde prev ve next alanları yer değiştirir; düğümler yerinde kalır, en sonda HEAD ile TAIL değişir */
+    const ptrs = {}; data.forEach((_, i) => { ptrs[i] = [i > 0 ? data[i - 1] : null, i < n - 1 ? data[i + 1] : null]; });
+    const swapped = [];
+    try {
+      await show(t, { ptrs: { ...ptrs } }, "curr = head", SLOW);
+      for (let i = 0; i < n; i++) {
+        visits++;
+        await show(t, { checking: [i], done: swapped.slice(), swapped: swapped.slice(), ptrs: { ...ptrs } }, `curr = ${data[i]}: curr.prev ile curr.next takas`, SLOW);
+        ptrs[i] = [ptrs[i][1], ptrs[i][0]]; swapped.push(i); changes += 2;
+        await show(t, { found: [i], done: swapped.slice(0, -1), swapped: swapped.slice(), ptrs: { ...ptrs } }, `${data[i]}: prev = ${ptrs[i][0] === null ? "null" : ptrs[i][0]}, next = ${ptrs[i][1] === null ? "null" : ptrs[i][1]} · curr = curr.prev (eski next)`, SLOW);
+      }
+      await show(t, { done: swapped.slice(), swapped: swapped.slice(), ptrs: { ...ptrs }, ends: { head: n - 1, tail: 0 }, newEnds: true }, "HEAD ile TAIL takas", SLOW);
+      data.reverse(); changes += 2;
+      await show(t, { found: data.map((_, i) => i) }, `Yeni baştan yeniden çizildi: ${data.join(" → ")}`, SLOW);
+      finish(t, `O(n) sürede ters çevrildi: ${changes} işaretçi değişimi, hiçbir düğüm yer değiştirmedi.`, "success");
+    } catch (err) { fail(t, err); }
+  }
+
+  function clear() { token++; data = []; resetStats(); setRunning(false); render(); status("Liste temizlendi: head = tail = null."); }
+  function cancel() { if (!running) return; token++; setRunning(false); e.op.textContent = "Boşta"; render(); status("Canlandırma iptal edildi."); }
+
+  e.addHead.addEventListener("click", addHead); e.addTail.addEventListener("click", addTail);
+  e.removeHead.addEventListener("click", removeHead); e.removeTail.addEventListener("click", removeTail);
+  e.access.addEventListener("click", access); e.addIndex.addEventListener("click", addIndex); e.removeIndex.addEventListener("click", removeIndex);
+  e.clear.addEventListener("click", clear); e.search.addEventListener("click", linearSearch);
+  e.forward.addEventListener("click", () => traverse(true)); e.backward.addEventListener("click", () => traverse(false));
+  e.reverse.addEventListener("click", reverse); e.cancel.addEventListener("click", cancel);
+  e.cancel.disabled = true; resetStats(); render();
+})();
+</script>
+<script src="deck/oyun.js"></script>

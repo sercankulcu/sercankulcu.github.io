@@ -1,0 +1,802 @@
+---
+layout: without-sidebar
+title: "Infix → Prefix Dönüştürücü"
+permalink: /files/data_structures/slides/Bolum_07_Infix_to_Prefix.html
+redirect_from:
+  - /files/data_structures/slides/Bolum_04_Infix_to_Prefix.html
+excerpt: "Ara ek (infix) ifadeyi ters çevirme yöntemi ve operatör yığınıyla adım adım önek (prefix) gösterime çeviren etkileşimli simülatör."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+/* ortak simülatör kontrolleri (agt-oyun sahnesi) */
+.ds-st { font-size: 15px; }
+.ds-st .agt-oyun__body { display: flex; flex-direction: column; }
+.ds-st .ds-sim__root { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+:where(.ds-st) .agt-oyun__body button {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 12px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 999px;
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease;
+}
+:where(.ds-st) .agt-oyun__body button.is-primary { border-color: var(--ds-link); background: var(--ds-link); color: var(--ds-bg); }
+:where(.ds-st) .agt-oyun__body button.is-danger { border-color: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-border)); color: var(--ds-bad); }
+:where(.ds-st) .agt-oyun__body input,
+:where(.ds-st) .agt-oyun__body select {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+}
+:where(.ds-st) .agt-oyun__body label { margin: 0; padding: 0; color: var(--ds-muted); font-size: 12px; font-weight: 700; }
+.ds-st .ds-sim__panel { min-height: 0; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.ds-st .ds-sim__caption { margin: 0 0 4px; color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+
+.prefix-sim {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.prefix-controls {
+  padding: 6px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.prefix-row {
+  display: flex;
+  gap: 6px;
+  align-items: end;
+}
+
+.prefix-field {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.prefix-field input {
+  width: 100%;
+  font-family: Consolas, Monaco, monospace;
+}
+
+.prefix-tokens {
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.prefix-token {
+  flex: 0 1 auto;
+  min-width: 28px;
+  height: 32px;
+  padding: 0 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--ds-link);
+  border-radius: 8px;
+  background: var(--ds-node);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.prefix-token.current {
+  border-color: var(--ds-warn);
+  background: var(--ds-hot);
+  transform: translateY(-2px);
+}
+
+.prefix-token.processed {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+}
+
+.prefix-stage {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.prefix-stack-panel,
+.prefix-process {
+  overflow: hidden;
+}
+
+.prefix-stack-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  padding: 8px;
+}
+
+.prefix-stack-panel .ds-sim__caption { text-align: center; }
+
+.prefix-stack {
+  width: 140px;
+  min-height: 0;
+  margin: 0 auto;
+  padding: 6px;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  gap: 4px;
+  border: 3px solid var(--ds-link);
+  border-top: 0;
+  border-radius: 0 0 10px 10px;
+  background: var(--ds-surface);
+  overflow: hidden;
+}
+
+.prefix-stack-item {
+  flex: 0 1 28px;
+  min-height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--ds-link);
+  border-radius: 8px;
+  background: var(--ds-node);
+  font-family: Consolas, Monaco, monospace;
+  font-size: 15px;
+  font-weight: 800;
+  overflow: hidden;
+}
+
+.prefix-stack-item.top {
+  border-color: var(--ds-warn);
+  background: var(--ds-hot);
+}
+
+.prefix-stack-empty {
+  margin: auto;
+  color: var(--ds-muted);
+  font-size: 14px;
+}
+
+.prefix-stack-top {
+  margin-top: 6px;
+  color: var(--ds-link);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.prefix-process {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+}
+
+.prefix-message,
+.prefix-status {
+  padding: 7px 10px;
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prefix-message { border-bottom: 1.5px solid var(--ds-border); }
+.prefix-status { border-top: 1.5px solid var(--ds-border); }
+
+.prefix-status.success { color: var(--ds-good); }
+.prefix-status.error { color: var(--ds-bad); }
+.prefix-status.warning { color: var(--ds-accent); }
+
+.prefix-output-area {
+  min-height: 0;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  padding: 8px 10px;
+  overflow: hidden;
+}
+
+.prefix-output-box {
+  padding: 5px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+}
+
+.prefix-output-box strong,
+.prefix-result strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.prefix-value {
+  min-height: 21px;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prefix-result {
+  padding: 6px 10px;
+  border-top: 1.5px solid var(--ds-border);
+  background: color-mix(in srgb, var(--ds-good) 8%, var(--ds-bg));
+}
+
+.prefix-result strong { color: var(--ds-good); }
+
+.prefix-footer {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 6px;
+}
+
+.prefix-stat {
+  padding: 4px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.prefix-stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prefix-sim * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-st prefix-st agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 7 · Simülasyon</p><h1>Infix → Prefix Dönüştürücü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="prefix-help" aria-label="Yardım">?</button>
+    <a class="agt-oyun__back" href="Bolum_07_Yigin.html">← Bölüm 7</a>
+  </header>
+
+  <div class="agt-oyun__body">
+
+    <div class="ds-sim__root prefix-sim">
+      <div class="prefix-controls">
+        <div class="prefix-row">
+          <div class="prefix-field">
+            <label for="prefix-input">Infix ifade</label>
+            <input id="prefix-input" type="text" value="A + B * C" maxlength="48" spellcheck="false">
+          </div>
+          <button id="prefix-convert" type="button">Dönüştür</button>
+          <button id="prefix-example" type="button">Örnek</button>
+          <button id="prefix-prev" type="button">Önceki</button>
+          <button id="prefix-next" type="button">Sonraki</button>
+          <button class="is-primary" id="prefix-auto" type="button">Oynat</button>
+          <button class="is-danger" id="prefix-reset" type="button">Sıfırla</button>
+          <button class="is-danger" id="prefix-cancel" type="button">İptal</button>
+        </div>
+      </div>
+
+      <div class="prefix-tokens ds-sim__panel" id="prefix-tokens" aria-label="İfadenin simgeleri"></div>
+
+      <div class="prefix-stage">
+        <div class="prefix-stack-panel ds-sim__panel">
+          <p class="ds-sim__caption">Operatör yığını</p>
+          <div class="prefix-stack" id="prefix-stack"></div>
+          <div class="prefix-stack-top" id="prefix-stack-top">Üst</div>
+        </div>
+
+        <div class="prefix-process ds-sim__panel">
+          <div class="prefix-message" id="prefix-message">Hazır.</div>
+
+          <div class="prefix-output-area">
+            <div class="prefix-output-box">
+              <strong>Taranan</strong>
+              <div class="prefix-value" id="prefix-scan">—</div>
+            </div>
+            <div class="prefix-output-box">
+              <strong>Ara çıktı</strong>
+              <div class="prefix-value" id="prefix-temp">—</div>
+            </div>
+          </div>
+
+          <div class="prefix-result">
+            <strong>Sonuç</strong>
+            <div class="prefix-value" id="prefix-result">—</div>
+          </div>
+
+          <div class="prefix-status" id="prefix-status" aria-live="polite">Adımları oluşturmak için ifadeyi dönüştürün.</div>
+        </div>
+      </div>
+
+      <div class="prefix-footer">
+        <div class="prefix-stat"><strong>İşlem</strong><span id="prefix-operation">Boşta</span></div>
+        <div class="prefix-stat"><strong>Adım</strong><span id="prefix-step">0 / 0</span></div>
+        <div class="prefix-stat"><strong>Simge</strong><span id="prefix-count">0</span></div>
+        <div class="prefix-stat"><strong>Yığın işlemi</strong><span id="prefix-ops">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="prefix-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Infix → Prefix Dönüştürücü</h2>
+    <p>Önek (prefix, Leh) gösterimde operatör, işlenenlerinden önce yazılır: <code>A + B * C</code> ifadesi <code>+ A * B C</code> olur. Böyle bir ifadeyi hesaplamak için parantez ya da öncelik kuralı gerekmez.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li>Tek harfli ya da sayısal işlenenler, <code>+ - * / % ^</code> ve parantezlerle bir ifade yazın (en fazla 22 simge), ardından <b>Dönüştür</b> düğmesine basın; <b>Örnek</b> hazır bir ifade yükler.</li>
+      <li><b>Sonraki</b> / <b>Önceki</b> dönüşümde adım adım ilerler; <b>Oynat</b> adımları kendiliğinden oynatır; <b>Sıfırla</b> başa döner; <b>İptal</b> oynatmayı durdurur.</li>
+    </ul>
+    <h3>Algoritma</h3>
+    <ol>
+      <li>İfadeyi ters çevirin ve <code>(</code> ile <code>)</code> karakterlerini yer değiştirin.</li>
+      <li>Ters ifadeyi postfix algoritmasıyla tarayın: işlenenler çıktıya gider, operatörler yığında bekler. Öncelikler eşitse yalnızca <code>^</code> için pop edilir; diğer operatörler push edilir (ters çevirmeden sonra birleşme yönleri değişir).</li>
+      <li>Prefix sonucu elde etmek için ara çıktıyı ters çevirin.</li>
+    </ol>
+    <p>Öncelik: <code>^</code> &gt; <code>* / %</code> &gt; <code>+ -</code>. Süre O(n).</p>
+  </dialog>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+
+  const el = {
+    input: $("prefix-input"),
+    convert: $("prefix-convert"),
+    example: $("prefix-example"),
+    prev: $("prefix-prev"),
+    next: $("prefix-next"),
+    auto: $("prefix-auto"),
+    reset: $("prefix-reset"),
+    cancel: $("prefix-cancel"),
+    tokens: $("prefix-tokens"),
+    stack: $("prefix-stack"),
+    stackTop: $("prefix-stack-top"),
+    message: $("prefix-message"),
+    scan: $("prefix-scan"),
+    temp: $("prefix-temp"),
+    result: $("prefix-result"),
+    status: $("prefix-status"),
+    operation: $("prefix-operation"),
+    step: $("prefix-step"),
+    count: $("prefix-count"),
+    ops: $("prefix-ops")
+  };
+
+  const DELAY = 300;
+  const MAX_TOKENS = 22;
+  const examples = [
+    "A + B * C",
+    "( A + B ) * C",
+    "A * ( B + C ) / D",
+    "A ^ B ^ C",
+    "( A + B ) * ( C - D )"
+  ];
+
+  let exampleIndex = 0;
+  let tokens = [];
+  let scanTokens = [];
+  let frames = [];
+  let frameIndex = 0;
+  let running = false;
+  let tokenId = 0;
+  let convertedInput = null;
+
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const operators = new Set(["+", "-", "*", "/", "%", "^"]);
+
+  function precedence(op) {
+    return ({ "+": 1, "-": 1, "*": 2, "/": 2, "%": 2, "^": 3 })[op] || 0;
+  }
+
+  function isOperand(token) {
+    return /^[A-Za-z0-9_]+(?:\.[0-9]+)?$/.test(token);
+  }
+
+  function tokenize(expression) {
+    const text = expression.trim();
+    if (!text) return { error: "Bir infix ifade girin." };
+
+    const found = text.match(/[A-Za-z_][A-Za-z0-9_]*|\d+(?:\.\d+)?|[()+\-*/%^]/g) || [];
+
+    const rebuilt = found.join("").replace(/\s+/g, "");
+    const original = text.replace(/\s+/g, "");
+
+    if (rebuilt !== original) return { error: "Yalnızca işlenen, + - * / % ^ ve parantez kullanın." };
+    if (found.length > MAX_TOKENS) return { error: `En fazla ${MAX_TOKENS} simge kullanın.` };
+    return { list: found };
+  }
+
+  function validate(list) {
+    let balance = 0;
+    let expectOperand = true;
+
+    for (const token of list) {
+      if (isOperand(token)) {
+        if (!expectOperand) return `${token} öncesinde operatör eksik.`;
+        expectOperand = false;
+      } else if (token === "(") {
+        if (!expectOperand) return "( öncesinde operatör eksik.";
+        balance++;
+      } else if (token === ")") {
+        if (balance <= 0) return "Dengesiz parantez: fazladan ).";
+        if (expectOperand) return ") öncesinde işlenen eksik.";
+        balance--;
+        expectOperand = false;
+      } else if (operators.has(token)) {
+        if (expectOperand) return `${token} öncesinde işlenen eksik.`;
+        expectOperand = true;
+      } else {
+        return `Bilinmeyen simge: ${token}.`;
+      }
+    }
+
+    if (expectOperand) return "İfade bir işlenenle bitmiyor.";
+    if (balance !== 0) return "Dengesiz parantez: ) eksik.";
+    return "";
+  }
+
+  function shouldPop(top, current) {
+    if (!operators.has(top)) return false;
+    const pt = precedence(top);
+    const pc = precedence(current);
+
+    /* Reversed-expression postfix conversion: */
+    /* original ^ becomes left-associative; other operators become right-associative. */
+    return pt > pc || (pt === pc && current === "^");
+  }
+
+  function buildFrames(list) {
+    const reversed = [...list]
+      .reverse()
+      .map(token => token === "(" ? ")" : token === ")" ? "(" : token);
+
+    const output = [];
+    const stack = [];
+    const result = [];
+    let stackOps = 0;
+
+    const snapshot = (currentIndex, message, final = false, view = "reversed") => {
+      result.push({
+        currentIndex,
+        stack: [...stack],
+        output: [...output],
+        stackOps,
+        message,
+        final,
+        view,
+        prefix: final ? [...output].reverse() : []
+      });
+    };
+
+    snapshot(-1, "Adım 1: infix ifadeyi ters çevir, ( ile ) yer değiştirsin.", false, "original");
+    snapshot(-1, "Adım 2: ters ifadeyi soldan sağa tara.");
+
+    for (let i = 0; i < reversed.length; i++) {
+      const current = reversed[i];
+
+      if (isOperand(current)) {
+        output.push(current);
+        snapshot(i, `İşlenen ${current} → çıktı.`);
+        continue;
+      }
+
+      if (current === "(") {
+        stack.push(current);
+        stackOps++;
+        snapshot(i, "Açılış parantezi → push.");
+        continue;
+      }
+
+      if (current === ")") {
+        while (stack.length && stack[stack.length - 1] !== "(") {
+          const top = stack.pop();
+          output.push(top);
+          stackOps++;
+          snapshot(i, `) : ${top} pop edilip çıktıya yazılır.`);
+        }
+
+        if (!stack.length) throw new Error("Parantezler eşleşmiyor.");
+        stack.pop();
+        stackOps++;
+        snapshot(i, ") : eşleşen ( pop edilir, ikisi de atılır.");
+        continue;
+      }
+
+      while (stack.length && shouldPop(stack[stack.length - 1], current)) {
+        const top = stack[stack.length - 1];
+        const reason = precedence(top) > precedence(current)
+          ? `${top} önceliği ${current} önceliğinden yüksek`
+          : "^ ve ^: eşit öncelik, sağdan birleşmeli";
+        output.push(stack.pop());
+        stackOps++;
+        snapshot(i, `${reason} → pop: ${top}.`);
+      }
+
+      const top = stack[stack.length - 1];
+      let reason = "Yığın boş";
+      if (top === "(") reason = "Üstte ( var";
+      else if (top && precedence(top) < precedence(current)) reason = `${current} önceliği ${top} önceliğinden yüksek`;
+      else if (top) reason = `${top} ve ${current}: eşit öncelik, soldan birleşmeli`;
+
+      stack.push(current);
+      stackOps++;
+      snapshot(i, `${reason} → push: ${current}.`);
+    }
+
+    while (stack.length) {
+      const top = stack.pop();
+      if (top === "(" || top === ")") throw new Error("Parantezler eşleşmiyor.");
+      output.push(top);
+      stackOps++;
+      snapshot(reversed.length, `Girdi bitti: ${top} pop edilip çıktıya yazılır.`);
+    }
+
+    snapshot(reversed.length, "Adım 3: ara çıktıyı ters çevir → prefix.", true);
+
+    return { reversed, frames: result };
+  }
+
+  function setStatus(text, type = "") {
+    el.status.textContent = text;
+    el.status.className = "prefix-status" + (type ? " " + type : "");
+  }
+
+  function setRunning(value) {
+    running = value;
+    [el.convert, el.example, el.prev, el.next, el.auto, el.reset]
+      .forEach(button => button.disabled = value);
+    el.cancel.disabled = !value;
+  }
+
+  function currentFrame() {
+    return frames[Math.max(0, Math.min(frameIndex, frames.length - 1))];
+  }
+
+  function render() {
+    const frame = currentFrame();
+
+    const shown = frame.view === "original" ? tokens : scanTokens;
+
+    el.tokens.innerHTML = "";
+    shown.forEach((token, index) => {
+      const node = document.createElement("div");
+      node.className = "prefix-token";
+      if (index === frame.currentIndex && frame.currentIndex < shown.length) {
+        node.classList.add("current");
+      } else if (frame.currentIndex >= 0 && index < frame.currentIndex) {
+        node.classList.add("processed");
+      }
+      node.textContent = token;
+      el.tokens.appendChild(node);
+    });
+
+    el.stack.innerHTML = "";
+    if (!frame.stack.length) {
+      const empty = document.createElement("div");
+      empty.className = "prefix-stack-empty";
+      empty.textContent = "Boş";
+      el.stack.appendChild(empty);
+      el.stackTop.textContent = "Üst";
+    } else {
+      frame.stack.forEach((operator, index) => {
+        const item = document.createElement("div");
+        item.className = "prefix-stack-item";
+        if (index === frame.stack.length - 1) item.classList.add("top");
+        item.textContent = operator;
+        el.stack.appendChild(item);
+      });
+      el.stackTop.textContent = `Üst = ${frame.stack[frame.stack.length - 1]}`;
+    }
+
+    el.message.textContent = frame.message;
+    el.scan.textContent = shown.length ? shown.join(" ") : "—";
+    el.temp.textContent = frame.output.length ? frame.output.join(" ") : "—";
+    el.result.textContent = frame.final && frame.prefix.length
+      ? frame.prefix.join(" ")
+      : "—";
+
+    el.step.textContent = `${frameIndex} / ${Math.max(0, frames.length - 1)}`;
+    el.count.textContent = tokens.length;
+    el.ops.textContent = frame.stackOps;
+
+    el.prev.disabled = running || frameIndex <= 0;
+    el.next.disabled = running || frameIndex >= frames.length - 1;
+    el.cancel.disabled = !running;
+  }
+
+  function convertExpression(message = "Adımlar oluşturuldu.") {
+    const scanned = tokenize(el.input.value);
+
+    if (scanned.error) {
+      setStatus(scanned.error, "error");
+      return false;
+    }
+
+    const parsed = scanned.list;
+    const problem = validate(parsed);
+    if (problem) {
+      setStatus(`Geçersiz infix ifade. ${problem}`, "error");
+      return false;
+    }
+
+    try {
+      const built = buildFrames(parsed);
+      tokens = parsed;
+      scanTokens = built.reversed;
+      frames = built.frames;
+      convertedInput = el.input.value;
+      frameIndex = 0;
+      tokenId++;
+      running = false;
+      el.operation.textContent = "Boşta";
+      setRunning(false);
+      render();
+      setStatus(message, "success");
+      return true;
+    } catch (error) {
+      setStatus(error.message || "Dönüşüm başarısız.", "error");
+      return false;
+    }
+  }
+
+  function example() {
+    exampleIndex = (exampleIndex + 1) % examples.length;
+    el.input.value = examples[exampleIndex];
+    convertExpression("Örnek yüklendi.");
+  }
+
+  function previous() {
+    if (running || frameIndex <= 0) return;
+    frameIndex--;
+    el.operation.textContent = "Önceki";
+    render();
+    setStatus(currentFrame().message);
+  }
+
+  function next() {
+    if (running || frameIndex >= frames.length - 1) return;
+    frameIndex++;
+    el.operation.textContent = "Sonraki";
+    render();
+
+    if (currentFrame().final) {
+      setStatus(`Prefix: ${currentFrame().prefix.join(" ")}`, "success");
+    } else {
+      setStatus(currentFrame().message);
+    }
+  }
+
+  async function autoRun() {
+    if ((!frames.length || el.input.value !== convertedInput) && !convertExpression()) return;
+
+    if (frameIndex >= frames.length - 1) {
+      frameIndex = 0;
+      render();
+    }
+
+    tokenId++;
+    const localToken = tokenId;
+    running = true;
+    el.operation.textContent = "Oynatma";
+    setRunning(true);
+
+    try {
+      while (frameIndex < frames.length - 1) {
+        await wait(DELAY);
+        if (localToken !== tokenId) throw new Error("cancelled");
+        frameIndex++;
+        render();
+        setStatus(currentFrame().message);
+      }
+
+      if (localToken !== tokenId) return;
+      running = false;
+      setRunning(false);
+      el.operation.textContent = "Boşta";
+      setStatus(`Prefix: ${currentFrame().prefix.join(" ")}`, "success");
+    } catch (error) {
+      if (error?.message !== "cancelled") {
+        running = false;
+        setRunning(false);
+        el.operation.textContent = "Boşta";
+        setStatus("İşlem durduruldu.", "error");
+      }
+    }
+  }
+
+  function reset() {
+    tokenId++;
+    running = false;
+    frameIndex = 0;
+    el.operation.textContent = "Boşta";
+    setRunning(false);
+    render();
+    setStatus("Simülasyon sıfırlandı.");
+  }
+
+  function cancel() {
+    if (!running) return;
+    tokenId++;
+    running = false;
+    setRunning(false);
+    el.operation.textContent = "Boşta";
+    render();
+    setStatus("Oynatma iptal edildi.");
+  }
+
+  el.convert.addEventListener("click", () => convertExpression());
+  el.example.addEventListener("click", example);
+  el.prev.addEventListener("click", previous);
+  el.next.addEventListener("click", next);
+  el.auto.addEventListener("click", autoRun);
+  el.reset.addEventListener("click", reset);
+  el.cancel.addEventListener("click", cancel);
+
+  convertExpression("Hazır.");
+})();
+</script>
+<script src="deck/oyun.js"></script>

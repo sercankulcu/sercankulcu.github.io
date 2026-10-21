@@ -1,0 +1,688 @@
+---
+layout: without-sidebar
+title: "Kuyruk Simülatörü"
+permalink: /files/data_structures/slides/Bolum_08_Queue.html
+redirect_from:
+  - /files/data_structures/slides/Bolum_05_Queue.html
+excerpt: "Enqueue, dequeue, ön ve arka okuma, arama, taşma ve alt taşma durumlarını gösteren etkileşimli kuyruk simülatörü."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+<style>
+/* ortak simülatör kontrolleri (agt-oyun sahnesi) */
+.ds-st { font-size: 15px; }
+.ds-st .agt-oyun__body { display: flex; flex-direction: column; }
+.ds-st .ds-sim__root { flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+:where(.ds-st) .agt-oyun__body button {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 12px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 999px;
+  background: var(--ds-surface);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease;
+}
+:where(.ds-st) .agt-oyun__body button.is-primary { border-color: var(--ds-link); background: var(--ds-link); color: var(--ds-bg); }
+:where(.ds-st) .agt-oyun__body button.is-danger { border-color: color-mix(in srgb, var(--ds-bad) 55%, var(--ds-border)); color: var(--ds-bad); }
+:where(.ds-st) .agt-oyun__body input,
+:where(.ds-st) .agt-oyun__body select {
+  height: 34px;
+  min-height: 0;
+  margin: 0;
+  padding: 0 8px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-bg);
+  color: var(--ds-text);
+  font: inherit;
+  font-size: 14px;
+}
+:where(.ds-st) .agt-oyun__body label { margin: 0; padding: 0; color: var(--ds-muted); font-size: 12px; font-weight: 700; }
+.ds-st .ds-sim__panel { min-height: 0; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.ds-st .ds-sim__caption { margin: 0 0 4px; color: var(--ds-muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+
+.queue-sim {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.queue-controls {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 12px;
+  background: var(--ds-surface);
+}
+
+.queue-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: end;
+}
+
+.queue-field {
+  display: grid;
+  gap: 2px;
+  width: 92px;
+}
+
+.queue-field input { width: 100%; }
+
+.queue-stage {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.queue-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 14px 0;
+  color: var(--ds-link);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.queue-track-wrap {
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 8px 10px;
+}
+
+.queue-track {
+  width: 100%;
+  min-height: 150px;
+  padding: 16px 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  overflow: hidden;
+  border: 4px solid var(--ds-link);
+  border-left-width: 10px;
+  border-right-width: 10px;
+  border-radius: 10px;
+  background: var(--ds-surface);
+}
+
+.queue-item {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 90px;
+  min-height: 84px;
+  padding: 6px 4px;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  place-items: center;
+  border: 2px solid var(--ds-link);
+  border-radius: 8px;
+  background: var(--ds-node);
+  font-size: 16px;
+  font-weight: 800;
+  overflow: hidden;
+  transition: transform .18s ease, opacity .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.queue-item span,
+.queue-item small {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.queue-item small {
+  color: var(--ds-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.queue-item.checking {
+  border-color: var(--ds-warn);
+  background: var(--ds-hot);
+  transform: translateY(-4px);
+}
+
+.queue-item.found {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  transform: translateY(-4px);
+}
+
+.queue-item.removing {
+  border-color: var(--ds-bad);
+  background: color-mix(in srgb, var(--ds-bad) 18%, var(--ds-bg));
+  transform: translateX(-8px);
+  opacity: .7;
+}
+
+.queue-item.adding {
+  border-color: var(--ds-good);
+  background: color-mix(in srgb, var(--ds-good) 22%, var(--ds-bg));
+  transform: translateX(4px);
+}
+
+.queue-empty {
+  width: 100%;
+  color: var(--ds-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.queue-status {
+  padding: 8px 10px;
+  border-top: 1.5px solid var(--ds-border);
+  background: var(--ds-surface-strong);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.queue-status.success { color: var(--ds-good); }
+.queue-status.error { color: var(--ds-bad); }
+.queue-status.warning { color: var(--ds-accent); }
+
+.queue-footer {
+  display: grid;
+  grid-template-columns: 1.6fr repeat(3, 1fr);
+  gap: 6px;
+}
+
+.queue-stat {
+  padding: 4px 10px;
+  border: 1.5px solid var(--ds-border);
+  border-radius: 10px;
+  background: var(--ds-surface);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.queue-stat strong {
+  display: block;
+  color: var(--ds-muted);
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .queue-sim * { transition-duration: .001ms !important; }
+}
+</style>
+
+<div class="ds-st queue-st agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 8 · Simülasyon</p><h1>Kuyruk Simülatörü</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="queue-help" aria-label="Yardım">?</button>
+    <a class="agt-oyun__back" href="Bolum_08_Kuyruk.html">← Bölüm 8</a>
+  </header>
+
+  <div class="agt-oyun__body">
+
+    <div class="ds-sim__root queue-sim">
+      <div class="queue-controls">
+        <div class="queue-row">
+          <div class="queue-field">
+            <label for="queue-value">Değer</label>
+            <input id="queue-value" type="number" value="50" inputmode="numeric">
+          </div>
+          <button class="is-primary" id="queue-enqueue" type="button">Enqueue</button>
+          <button id="queue-random" type="button">Rastgele Enqueue</button>
+          <button class="is-danger" id="queue-dequeue" type="button">Dequeue</button>
+          <button id="queue-front" type="button">Öne Bak</button>
+          <button id="queue-rear" type="button">Arkaya Bak</button>
+        </div>
+
+        <div class="queue-row">
+          <div class="queue-field">
+            <label for="queue-search-value">Aranan</label>
+            <input id="queue-search-value" type="number" value="50" inputmode="numeric">
+          </div>
+          <button id="queue-search" type="button">Ara</button>
+          <button id="queue-fill" type="button">Örnekle Doldur</button>
+          <button id="queue-empty-check" type="button">Boş mu?</button>
+          <button class="is-danger" id="queue-clear" type="button">Temizle</button>
+          <button class="is-danger" id="queue-cancel" type="button">İptal</button>
+        </div>
+      </div>
+
+      <div class="queue-stage ds-sim__panel">
+        <div class="queue-labels">
+          <span>ÖN</span>
+          <span>ARKA</span>
+        </div>
+
+        <div class="queue-track-wrap">
+          <div class="queue-track" id="queue-track"></div>
+        </div>
+
+        <div class="queue-status" id="queue-status" aria-live="polite">Hazır.</div>
+      </div>
+
+      <div class="queue-footer">
+        <div class="queue-stat"><strong>İşlem</strong><span id="queue-operation">Boşta</span></div>
+        <div class="queue-stat"><strong>Denetlenen</strong><span id="queue-checks">0</span></div>
+        <div class="queue-stat"><strong>Değişiklik</strong><span id="queue-changes">0</span></div>
+        <div class="queue-stat"><strong>Boyut</strong><span id="queue-size">0 / 8</span></div>
+      </div>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog" id="queue-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Kuyruk Simülatörü</h2>
+    <p>Kuyruk FIFO (ilk giren ilk çıkar) bir yapıdır: öğeler <b>arka</b> uçtan (<code>REAR</code>) girer, <b>ön</b> uçtan (<code>FRONT</code>) çıkar.</p>
+    <h3>Kullanım</h3>
+    <ul>
+      <li><b>Enqueue</b> değeri ekler, <b>Rastgele Enqueue</b> rastgele bir değer ekler; <b>Dequeue</b> öndeki öğeyi çıkarır.</li>
+      <li><b>Öne Bak</b> ve <b>Arkaya Bak</b> iki uçtaki değeri okur; <b>Boş mu?</b> boyutu denetler.</li>
+      <li>Kapasite 8'dir: dolu kuyruğa enqueue <i>taşma</i> (overflow), boş kuyruktan dequeue <i>alt taşma</i> (underflow) olur.</li>
+      <li><b>Ara</b> önden arkaya tarar; <b>Örnekle Doldur</b> örnek değerler yükler; <b>Temizle</b> kuyruğu boşaltır; <b>İptal</b> canlandırmayı durdurur.</li>
+    </ul>
+    <h3>Maliyetler</h3>
+    <table><tr><th>İşlem</th><th>Süre</th></tr>
+      <tr><td>Enqueue, dequeue, front, rear, isEmpty</td><td>O(1)</td></tr>
+      <tr><td>Arama</td><td>O(n)</td></tr></table>
+    <p>Tipik kullanımlar: yazıcı ve CPU çizelgeleme, tamponlar, genişlik öncelikli arama.</p>
+  </dialog>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+
+  const el = {
+    value: $("queue-value"),
+    searchValue: $("queue-search-value"),
+    enqueue: $("queue-enqueue"),
+    random: $("queue-random"),
+    dequeue: $("queue-dequeue"),
+    front: $("queue-front"),
+    rear: $("queue-rear"),
+    search: $("queue-search"),
+    fill: $("queue-fill"),
+    emptyCheck: $("queue-empty-check"),
+    clear: $("queue-clear"),
+    cancel: $("queue-cancel"),
+    track: $("queue-track"),
+    status: $("queue-status"),
+    operation: $("queue-operation"),
+    checks: $("queue-checks"),
+    changes: $("queue-changes"),
+    size: $("queue-size")
+  };
+
+  const MAX = 8;
+  const DELAY = 280;
+
+  let queue = [24, 51, 18, 73];
+  let token = 0;
+  let running = false;
+  let checks = 0;
+  let changes = 0;
+  let cancelHook = null;
+
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  function integer(input) {
+    if (String(input.value).trim() === "") return null;
+    const value = Number(input.value);
+    return Number.isInteger(value) ? value : null;
+  }
+
+  function setStatus(text, type = "") {
+    el.status.textContent = text;
+    el.status.className = "queue-status" + (type ? " " + type : "");
+  }
+
+  function updateStats() {
+    el.checks.textContent = checks;
+    el.changes.textContent = changes;
+    el.size.textContent = `${queue.length} / ${MAX}`;
+  }
+
+  function resetStats(operation = "Boşta") {
+    checks = 0;
+    changes = 0;
+    el.operation.textContent = operation;
+    updateStats();
+  }
+
+  function setRunning(value) {
+    running = value;
+    [
+      el.enqueue, el.random, el.dequeue, el.front, el.rear,
+      el.search, el.fill, el.emptyCheck, el.clear
+    ].forEach(button => button.disabled = value);
+    el.cancel.disabled = !value;
+  }
+
+  function render(states = {}) {
+    el.track.innerHTML = "";
+
+    if (!queue.length) {
+      const empty = document.createElement("div");
+      empty.className = "queue-empty";
+      empty.textContent = "Kuyruk boş.";
+      el.track.appendChild(empty);
+      updateStats();
+      return;
+    }
+
+    queue.forEach((value, index) => {
+      const item = document.createElement("div");
+      item.className = "queue-item";
+
+      if (states.checking?.includes(index)) item.classList.add("checking");
+      if (states.found?.includes(index)) item.classList.add("found");
+      if (states.removing?.includes(index)) item.classList.add("removing");
+      if (states.adding?.includes(index)) item.classList.add("adding");
+
+      const main = document.createElement("span");
+      main.textContent = value;
+
+      const small = document.createElement("small");
+      if (queue.length === 1) {
+        small.textContent = "ÖN / ARKA";
+      } else if (index === 0) {
+        small.textContent = "ÖN";
+      } else if (index === queue.length - 1) {
+        small.textContent = "ARKA";
+      } else {
+        small.textContent = `#${index}`;
+      }
+
+      item.append(main, small);
+      el.track.appendChild(item);
+    });
+
+    updateStats();
+  }
+
+  async function pause(localToken) {
+    await wait(DELAY);
+    if (localToken !== token) throw new Error("cancelled");
+  }
+
+  async function animate(localToken, states, message) {
+    if (message) setStatus(message);
+    render(states);
+    await pause(localToken);
+  }
+
+  function begin(operation) {
+    token++;
+    resetStats(operation);
+    setRunning(true);
+    return token;
+  }
+
+  function finish(localToken, message, type = "") {
+    if (localToken !== token) return;
+    cancelHook = null;
+    setRunning(false);
+    el.operation.textContent = "Boşta";
+    setStatus(message, type);
+    render();
+  }
+
+  function fail(localToken, error) {
+    if (error?.message === "cancelled" || localToken !== token) return;
+    cancelHook = null;
+    setRunning(false);
+    el.operation.textContent = "Boşta";
+    setStatus("İşlem durduruldu.", "error");
+    render();
+  }
+
+  function hasSpace() {
+    if (queue.length >= MAX) {
+      setStatus(`Taşma (overflow): en fazla ${MAX} öğe.`, "error");
+      return false;
+    }
+    return true;
+  }
+
+  function hasItems() {
+    if (!queue.length) {
+      setStatus("Alt taşma (underflow): kuyruk boş.", "error");
+      return false;
+    }
+    return true;
+  }
+
+  async function enqueueValue(value, operation = "Enqueue") {
+    if (!hasSpace()) return;
+    if (!Number.isInteger(value)) {
+      setStatus("Tam sayı bir değer girin.", "error");
+      return;
+    }
+
+    const t = begin(operation);
+
+    try {
+      queue.push(value);
+      changes++;
+      updateStats();
+      await animate(
+        t,
+        { adding: [queue.length - 1] },
+        `${value} arkaya ekleniyor...`
+      );
+      finish(t, `${value} enqueue edildi.`, "success");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  function enqueue() {
+    enqueueValue(integer(el.value));
+  }
+
+  function enqueueRandom() {
+    enqueueValue(Math.floor(Math.random() * 90) + 10, "Rastgele Enqueue");
+  }
+
+  async function dequeue() {
+    if (!hasItems()) return;
+
+    const value = queue[0];
+    const t = begin("Dequeue");
+
+    try {
+      await animate(t, { removing: [0] }, `Öndeki değer ${value} çıkarılıyor...`);
+      queue.shift();
+      changes++;
+      updateStats();
+      finish(t, `${value} dequeue edildi.`, "success");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  async function showFront() {
+    if (!hasItems()) return;
+
+    const value = queue[0];
+    const t = begin("Öne Bak");
+
+    try {
+      checks++;
+      updateStats();
+      await animate(t, { found: [0] }, `ÖN = ${value}`);
+      finish(t, `Öndeki değer: ${value}.`, "success");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  async function showRear() {
+    if (!hasItems()) return;
+
+    const index = queue.length - 1;
+    const value = queue[index];
+    const t = begin("Arkaya Bak");
+
+    try {
+      checks++;
+      updateStats();
+      await animate(t, { found: [index] }, `ARKA = ${value}`);
+      finish(t, `Arkadaki değer: ${value}.`, "success");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  async function search() {
+    if (!hasItems()) return;
+
+    const target = integer(el.searchValue);
+    if (target === null) {
+      setStatus("Aranacak tam sayıyı girin.", "error");
+      return;
+    }
+
+    const t = begin("Arama");
+
+    try {
+      for (let i = 0; i < queue.length; i++) {
+        checks++;
+        updateStats();
+        await animate(t, { checking: [i] }, `Karşılaştırma: ${queue[i]} ile ${target}...`);
+
+        if (queue[i] === target) {
+          await animate(t, { found: [i] }, `${target} bulundu: önden itibaren konum ${i}.`);
+          finish(t, `${target} bulundu: önden itibaren konum ${i}.`, "success");
+          return;
+        }
+      }
+
+      finish(t, `${target} bulunamadı.`, "error");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  async function fillExample() {
+    const example = [12, 27, 35, 48, 63, 79];
+    const t = begin("Örnekle Doldur");
+    const previous = queue.slice();
+    cancelHook = () => { queue = previous; changes = 0; };
+
+    try {
+      queue = [];
+      changes = 0;
+      render();
+
+      for (const value of example) {
+        queue.push(value);
+        changes++;
+        updateStats();
+        await animate(
+          t,
+          { adding: [queue.length - 1] },
+          `Enqueue: ${value}...`
+        );
+      }
+
+      finish(t, "Örnek kuyruk yüklendi.", "success");
+    } catch (error) {
+      fail(t, error);
+    }
+  }
+
+  function isEmpty() {
+    token++;
+    resetStats("Boş mu?");
+    setRunning(false);
+    render();
+
+    if (queue.length === 0) {
+      setStatus("Evet. Kuyruk boş.", "success");
+    } else {
+      setStatus(`Hayır. Kuyrukta ${queue.length} öğe var.`);
+    }
+
+    el.operation.textContent = "Boşta";
+  }
+
+  function clearQueue() {
+    token++;
+    queue = [];
+    resetStats();
+    setRunning(false);
+    render();
+    setStatus("Kuyruk temizlendi.");
+  }
+
+  function cancel() {
+    if (!running) return;
+    token++;
+    if (cancelHook) cancelHook();
+    cancelHook = null;
+    setRunning(false);
+    el.operation.textContent = "Boşta";
+    render();
+    setStatus("Canlandırma iptal edildi.");
+  }
+
+  el.enqueue.addEventListener("click", enqueue);
+  el.random.addEventListener("click", enqueueRandom);
+  el.dequeue.addEventListener("click", dequeue);
+  el.front.addEventListener("click", showFront);
+  el.rear.addEventListener("click", showRear);
+  el.search.addEventListener("click", search);
+  el.fill.addEventListener("click", fillExample);
+  el.emptyCheck.addEventListener("click", isEmpty);
+  el.clear.addEventListener("click", clearQueue);
+  el.cancel.addEventListener("click", cancel);
+
+  el.cancel.disabled = true;
+  resetStats();
+  render();
+})();
+</script>
+<script src="deck/oyun.js"></script>

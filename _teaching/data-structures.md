@@ -9,181 +9,207 @@ location: "Giresun, Turkey"
 ---
 
 ![data structure](/images/teaching/teaching-data-structures.webp){: .align-left width="200" style="float: left; margin-right: 10px;"} 
-Data structures provide systematic ways to organize, store, and access data. Choosing an appropriate structure directly affects the efficiency of operations such as searching, insertion, deletion, and traversal. This course examines arrays, linked lists, stacks, queues, lists, trees, priority queues and heaps, hash tables, search trees, graphs, and sets, with an emphasis on their implementations, complexity, and practical applications.
+Data structures provide systematic ways to organize, store, and access data. Choosing an appropriate structure directly affects the efficiency of operations such as searching, insertion, deletion, and traversal. This course examines algorithm analysis, arrays, recursion, linked lists, lists, stacks, queues, trees, search trees, priority queues and heaps, hash tables, sets and disjoint sets, and graphs, with an emphasis on their implementations, complexity, and practical applications.
 
 ---
 
-## Preliminary Materials
+## Başlangıç Kaynakları
 
-* [Important People in Data Structures (HTML)](../files/data_structures/Data_Structures_Important_People.html)
-* [Prerequisites for Data Structures (HTML)](../files/data_structures/Data_Structures_Prerequisites.html)
-* [Terim Sözlüğü / Glossary (HTML)](../files/data_structures/sozluk.html)
-
----
-
-## Chapter 1: Introduction  
-
-Data structures are the backbone of computer science, serving as the fundamental building blocks that enable us to efficiently store, organize, and manipulate data. Each data structure has its own unique characteristics, advantages, and trade-offs, making them suitable for different scenarios and requirements. Understanding these structures is crucial for writing efficient code and solving complex computational problems.
-
-- [🖼️Sunum-Giriş (HTML)](../files/data_structures/slides/Bolum_01_Giris.html)  
-- [📄Sunum-Giriş (PDF)](../files/data_structures/pdf/Bolum_01_Giris.pdf)  
-- [📝Çalışma Soruları - Giriş (HTML)](../files/data_structures/slides/Bolum_01_Giris_Calisma_Sorulari.html)  
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src)  
+* [Veri Yapılarında Önemli İsimler (HTML)](../files/data_structures/Data_Structures_Important_People.html)
+* [Veri Yapıları İçin Ön Bilgiler (HTML)](../files/data_structures/Data_Structures_Prerequisites.html)
+* [Terim Sözlüğü (HTML)](../files/data_structures/sozluk.html)
 
 ---
 
-## Chapter 2: Arrays  
+## Kısım I: Temeller
 
-Arrays are like the bread and butter of programming. An array is the most fundamental data structure, consisting of a collection of elements stored in contiguous memory locations. Think of it as a row of boxes, each containing a value, where you can instantly access any element using its index number. Arrays excel at random access operations and are perfect for situations where you know the size of your data in advance. However, they can be inefficient when it comes to insertions and deletions, as these operations might require shifting many elements.
+### Bölüm 1: Giriş
 
-- [🖼️Sunum-Diziler (HTML)](../files/data_structures/slides/Bolum_02_Diziler.html)  
-- [📄Sunum-Diziler (PDF)](../files/data_structures/pdf/Bolum_02_Diziler.pdf)  
-- [📝Çalışma Soruları - Diziler (HTML)](../files/data_structures/slides/Bolum_02_Diziler_Calisma_Sorulari.html)  
-- [🕹️Array Simulator (HTML)](../files/data_structures/slides/Bolum_02_Arrays.html)  
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders02/src)  
+Veri yapıları, verinin bellekte nasıl düzenleneceğini ve ona nasıl erişileceğini belirler. Bu bölümde verinin sayısal ortamda nasıl temsil edildiği, Java'daki ilkel ve referans tipler, referans kopyalama ve jenerikler ele alınır. Soyut veri tipi (hangi işlemlerin sunulduğu) ile veri yapısı (bu işlemlerin nasıl gerçeklendiği) arasındaki ayrım bir yığın örneğiyle gösterilir. Bölüm, veri yapısı seçimi ve dersteki temel yapıların kısa bir karşılaştırma tablosuyla kapanır.
 
----
-
-## Chapter 3: Linked Lists  
-
-Linked lists are dynamic and flexible data structures that consist of nodes connected through pointers. A linked list is like a chain of connected nodes, where each node contains both data and a reference (or link) to the next node in the sequence. Unlike arrays, linked lists don't require contiguous memory allocation, making them more flexible for insertions and deletions. They're particularly useful when you need to frequently add or remove elements from the middle of the data structure. However, they sacrifice random access capability, as you must traverse from the beginning to reach any particular element. 
-
-- [🖼️Sunum-Bağlı Liste (HTML)](../files/data_structures/slides/Bolum_03_Bagli_Liste.html)  
-- [📄Sunum-Bağlı Liste (PDF)](../files/data_structures/pdf/Bolum_03_Bagli_Liste.pdf)  
-- [📝Çalışma Soruları - Bağlı Liste (HTML)](../files/data_structures/slides/Bolum_03_Bagli_Liste_Calisma_Sorulari.html)  
-- [🕹️Linked List Simulator (HTML)](../files/data_structures/slides/Bolum_03_Linked_List.html)
-- [🕹️Doubly Linked List Simulator (HTML)](../files/data_structures/slides/Bolum_03_Doubly_Linked_List.html)
-- [🕹️Circular Linked List Simulator (HTML)](../files/data_structures/slides/Bolum_03_Circular_Linked_List.html)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders03/src)  
+- [🖼️Sunum-Giriş (HTML)](../files/data_structures/slides/Bolum_01_Giris.html)
+- [📄Sunum-Giriş (PDF)](../files/data_structures/pdf/Bolum_01_Giris.pdf)
+- [📝Çalışma Soruları - Giriş (HTML)](../files/data_structures/slides/Bolum_01_Giris_Calisma_Sorulari.html)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src)
 
 ---
 
-## Chapter 4: Stacks  
+### Bölüm 2: Algoritma Analizi
 
-A stack operates on the Last-In-First-Out (LIFO) principle, much like a stack of plates where you can only add or remove from the top. This data structure is fundamental in programming for managing function calls, handling undo operations, or parsing expressions. The key operations, push (add) and pop (remove), make it perfect for tracking state or handling recursion. Think of browsing history in a web browser, where each new page is pushed onto the stack, and hitting the back button pops the most recent page.
+Algoritma analizi, çözümleri uygulamadan önce karşılaştırmayı sağlar. Deneysel ölçüm ve katlama deneyi çalışma süresinin pratikte nasıl büyüdüğünü gösterir; ilkel işlemleri saymak ise makineden bağımsız bir ölçü verir. Büyük O, Büyük Omega ve Büyük Teta üst, alt ve sıkı sınırları anlatır; en iyi, ortalama ve en kötü durum ayrı ayrı incelenir. Döngü kalıpları, doğrusal ve ikili arama ile önek ortalamaları kodun yapısının karmaşıklığı nasıl belirlediğini gösterir. Alan karmaşıklığı, doğruluk ve sağlamlık da bu bölümdedir.
 
-- [🖼️Sunum-Yığın (HTML)](../files/data_structures/slides/Bolum_04_Yigin.html)  
-- [📄Sunum-Yığın (PDF)](../files/data_structures/pdf/Bolum_04_Yigin.pdf)  
-- [📝Çalışma Soruları - Yığın (HTML)](../files/data_structures/slides/Bolum_04_Yigin_Calisma_Sorulari.html)  
-- [🕹️Stack Simulator (HTML)](../files/data_structures/slides/Bolum_04_Stack.html)  
-- [🕹️Hanoi Towers (HTML)](../files/data_structures/slides/Bolum_04_Tower_of_Hanoi.html)
-- [🕹️Stock Span (HTML)](../files/data_structures/slides/Bolum_04_Stock_Span.html)
-- [🕹️Infix to Prefix (HTML)](../files/data_structures/slides/Bolum_04_Infix_to_Prefix.html)
-- [🕹️Infix to Postfix (HTML)](../files/data_structures/slides/Bolum_04_Infix_to_Postfix.html)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders04/src)  
+- [🖼️Sunum-Algoritma Analizi (HTML)](../files/data_structures/slides/Bolum_02_Algoritma_Analizi.html)
+- [📄Sunum-Algoritma Analizi (PDF)](../files/data_structures/pdf/Bolum_02_Algoritma_Analizi.pdf)
+- [📝Çalışma Soruları - Algoritma Analizi (HTML)](../files/data_structures/slides/Bolum_02_Algoritma_Analizi_Calisma_Sorulari.html)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src)
 
 ---
 
-## Chapter 5: Queues  
+### Bölüm 3: Diziler
 
-A queue follows the First-In-First-Out (FIFO) principle, similar to a line of people waiting for a service. Elements are added at one end (enqueue) and removed from the other end (dequeue), making it ideal for managing tasks that need to be processed in the order they were received. Queues are extensively used in scenarios like print job scheduling, handling requests in web servers, or managing any kind of service where maintaining order of arrival is important.
+Dizi, öğeleri bellekte bitişik yerleşen en temel veri yapısıdır; her öğeye indisiyle sabit sürede erişilir. Java'da dizi tanımlama, kopyalama, java.util.Arrays ve çok boyutlu diziler; ortalama, ortanca, mod ve tersine çevirme gibi temel dizi algoritmaları; matris işlemleri ve küçük bir XOX oyunu bu bölümde yer alır. Erişimin O(1), araya ekleme ve silmenin ise öğe kaydırma yüzünden O(n) olduğu gösterilir; seçimli ve eklemeli sıralama da dizi üzerinde incelenir.
 
-- [🖼️Sunum-Kuyruk (HTML)](../files/data_structures/slides/Bolum_05_Kuyruk.html)  
-- [📄Sunum-Kuyruk (PDF)](../files/data_structures/pdf/Bolum_05_Kuyruk.pdf)  
-- [📝Çalışma Soruları - Kuyruk (HTML)](../files/data_structures/slides/Bolum_05_Kuyruk_Calisma_Sorulari.html)  
-- [🕹️Queue Simulator (HTML)](../files/data_structures/slides/Bolum_05_Queue.html)
-- [🕹️Deque Simulator (HTML)](../files/data_structures/slides/Bolum_05_Deque.html)
-- [🕹️Circular Queue Simulator (HTML)](../files/data_structures/slides/Bolum_05_Circular_Queue.html)
-- [🕹️Scheduler (HTML)](../files/data_structures/slides/Bolum_05_Scheduler.html)
-- [🕹️Priority Scheduler (HTML)](../files/data_structures/slides/Bolum_05_Priority_Scheduler.html)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders05/src)  
+- [🖼️Sunum-Diziler (HTML)](../files/data_structures/slides/Bolum_03_Diziler.html)
+- [📄Sunum-Diziler (PDF)](../files/data_structures/pdf/Bolum_03_Diziler.pdf)
+- [📝Çalışma Soruları - Diziler (HTML)](../files/data_structures/slides/Bolum_03_Diziler_Calisma_Sorulari.html)
+- [🕹️Dizi Simülatörü (HTML)](../files/data_structures/slides/Bolum_03_Arrays.html)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders02/src)
 
 ---
 
-## Chapter 6: The List ADT and Java List Implementations
+### Bölüm 4: Özyineleme
 
-A list is an abstract data type representing an ordered sequence of elements. It can grow or shrink dynamically and supports operations such as insertion, deletion, access, and traversal. Lists may be implemented using dynamic arrays, linked structures, or other underlying representations. In Java, commonly used implementations include ArrayList and LinkedList, each offering different performance characteristics.
+Özyineleme, bir problemi taban durumuna ulaşana kadar aynı problemin daha küçük örneklerine indirger. Her özyinelemeli çağrı çağrı yığınında kendi çerçevesini alır; bir özyinelemeli metodu izlemek bu çerçevelerin eklenip çıkarılmasını izlemektir. Doğrusal özyineleme (toplam, tersine çevirme, hızlı üs alma), ikili özyineleme (Fibonacci, ikili arama), Hanoi Kuleleri ve geri izleme örnekleri (alt kümeler, permütasyonlar) adım adım incelenir. Yineleme bağıntıları özyinelemeli algoritmaların zaman ve alan maliyetini verir; kuyruk özyinelemesi ve döngüye çevirme ile bölüm tamamlanır.
+
+- [🖼️Sunum-Özyineleme (HTML)](../files/data_structures/slides/Bolum_04_Ozyineleme.html)
+- [📄Sunum-Özyineleme (PDF)](../files/data_structures/pdf/Bolum_04_Ozyineleme.pdf)
+- [📝Çalışma Soruları - Özyineleme (HTML)](../files/data_structures/slides/Bolum_04_Ozyineleme_Calisma_Sorulari.html)
+- [🕹️Hanoi Kuleleri Simülatörü (HTML)](../files/data_structures/slides/Bolum_04_Tower_of_Hanoi.html)
+
+---
+
+## Kısım II: Doğrusal Yapılar
+
+### Bölüm 5: Bağlı Listeler
+
+Bağlı liste, her biri veri ve bir sonraki düğüme referans taşıyan düğümlerden oluşur. Bitişik bellek gerektirmediği için başa ekleme ve silme sabit sürede yapılır; buna karşılık rastgele erişim yoktur ve bir öğeye ulaşmak için baştan gezinmek gerekir. Tek yönlü listede gezinme, ekleme, silme, tersine çevirme, tekrarları kaldırma ve sıralı listeleri birleştirme; çift yönlü listede bekçi düğümler; dairesel listede döngü tespiti ve döndürme bu bölümün konularıdır.
+
+- [🖼️Sunum-Bağlı Liste (HTML)](../files/data_structures/slides/Bolum_05_Bagli_Liste.html)
+- [📄Sunum-Bağlı Liste (PDF)](../files/data_structures/pdf/Bolum_05_Bagli_Liste.pdf)
+- [📝Çalışma Soruları - Bağlı Liste (HTML)](../files/data_structures/slides/Bolum_05_Bagli_Liste_Calisma_Sorulari.html)
+- [🕹️Bağlı Liste Simülatörü (HTML)](../files/data_structures/slides/Bolum_05_Linked_List.html)
+- [🕹️Çift Yönlü Bağlı Liste Simülatörü (HTML)](../files/data_structures/slides/Bolum_05_Doubly_Linked_List.html)
+- [🕹️Dairesel Bağlı Liste Simülatörü (HTML)](../files/data_structures/slides/Bolum_05_Circular_Linked_List.html)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders03/src)
+
+---
+
+### Bölüm 6: Liste ADT ve Java Koleksiyonları
+
+Liste, öğelerin sıralı bir dizisini temsil eden soyut veri tipidir; büyüyüp küçülebilir ve ekleme, silme, erişim ve gezinme işlemlerini destekler. Java'nın koleksiyon hiyerarşisi (Iterable, Collection, List), Iterator ve ListIterator ile gezinme ve gezinirken güvenli silme bu bölümde ele alınır. ArrayList'in dinamik dizi olarak büyümesi ve amortize analizi, LinkedList ile karşılaştırması, konumsal liste ADT'si, Vector, CopyOnWriteArrayList ve Arrays.asList de incelenir.
 
 - [🖼️Sunum-Liste (HTML)](../files/data_structures/slides/Bolum_06_Liste.html)
-- [📄Sunum-Liste (PDF)](../files/data_structures/pdf/Bolum_06_Liste.pdf)  
-- [📝Çalışma Soruları - Liste (HTML)](../files/data_structures/slides/Bolum_06_Liste_Calisma_Sorulari.html)  
-- [🕹️List ADT Simulator (HTML)](../files/data_structures/slides/Bolum_06_List_ADT.html)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders06/src)
+- [📄Sunum-Liste (PDF)](../files/data_structures/pdf/Bolum_06_Liste.pdf)
+- [📝Çalışma Soruları - Liste (HTML)](../files/data_structures/slides/Bolum_06_Liste_Calisma_Sorulari.html)
+- [🕹️Liste ADT Simülatörü (HTML)](../files/data_structures/slides/Bolum_06_List_ADT.html)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders06/src)
 
 ---
 
-## Chapter 7: Trees  
+### Bölüm 7: Yığınlar
 
-A tree is a hierarchical data structure composed of nodes connected by edges, similar to a family tree or organizational chart. Each node can have multiple children but only one parent, creating a branching structure that starts from a root node. Trees are invaluable for representing hierarchical relationships, such as file systems, HTML DOM, or category classifications. They provide efficient operations for insertion, deletion, and searching, particularly when balanced properly. The efficiency of tree operations depends heavily on the tree's height, making balance an important consideration in search-oriented tree structures.
+Yığın, son giren ilk çıkar (LIFO) ilkesiyle çalışır: ekleme (push) ve çıkarma (pop) yalnızca üstten yapılır. Yığın ADT'si, dizi ve bağlı liste ile gerçeklenmesi ve işlemlerin maliyeti ele alınır. Geri/ileri gezinme, çağrı yığını, parantez kontrolü, sonraki büyük öğe, en küçük öğeyi tutan yığın, Hanoi Kulelerinin yığınla çözümü ve stock span problemi yığının uygulamalarıdır. Infix, prefix ve postfix gösterimleri arasında dönüşüm ve postfix ifadelerin değerlendirilmesi bölümü tamamlar.
 
-- [🖼️Sunum-Ağaçlar (HTML)](../files/data_structures/slides/Bolum_07_Agac.html)  
-- [📄Sunum-Ağaçlar (PDF)](../files/data_structures/pdf/Bolum_07_Agac.pdf)  
-- [📝Çalışma Soruları - Ağaçlar (HTML)](../files/data_structures/slides/Bolum_07_Agac_Calisma_Sorulari.html)  
-- [🕹️General Tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_General_Tree.html)
-- [🕹️Binary Search Tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_Tree.html)
-- [🕹️B-tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_BTree.html)
-- [🕹️B-plus-tree Simulator (HTML)](../files/data_structures/slides/Bolum_07_BPlusTree.html)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders07/src)  
-
----
-
-## Chapter 8: Priority Queues and Heaps
-
-A heap is a specialized tree-based data structure that satisfies the heap property - in a max heap, for any given node, the parent's value is greater than or equal to its children's values (or less than or equal to in a min heap). Heaps are particularly efficient for implementing priority queues and finding the maximum/minimum element quickly. They're commonly used in algorithms like heap sort and in systems where you need to repeatedly find and remove the highest (or lowest) priority item.
-
-- [🖼️Sunum-Öncelikli Kuyruk (HTML)](../files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk.html)
-- [📄Sunum-Öncelikli Kuyruk (PDF)](../files/data_structures/pdf/Bolum_08_Oncelikli_Kuyruk.pdf)  
-- [📝Çalışma Soruları - Öncelikli Kuyruk (HTML)](../files/data_structures/slides/Bolum_08_Oncelikli_Kuyruk_Calisma_Sorulari.html)  
-- [🕹️Heap Simulator (HTML)](../files/data_structures/slides/Bolum_08_Heap.html)
-- [🕹️Priority Queue Simulator (HTML)](../files/data_structures/slides/Bolum_08_Priority_Queue.html)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders08/src)
+- [🖼️Sunum-Yığın (HTML)](../files/data_structures/slides/Bolum_07_Yigin.html)
+- [📄Sunum-Yığın (PDF)](../files/data_structures/pdf/Bolum_07_Yigin.pdf)
+- [📝Çalışma Soruları - Yığın (HTML)](../files/data_structures/slides/Bolum_07_Yigin_Calisma_Sorulari.html)
+- [🕹️Yığın Simülatörü (HTML)](../files/data_structures/slides/Bolum_07_Stack.html)
+- [🕹️Stock Span Simülatörü (HTML)](../files/data_structures/slides/Bolum_07_Stock_Span.html)
+- [🕹️Infix → Prefix Dönüştürücü (HTML)](../files/data_structures/slides/Bolum_07_Infix_to_Prefix.html)
+- [🕹️Infix → Postfix Dönüştürücü (HTML)](../files/data_structures/slides/Bolum_07_Infix_to_Postfix.html)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders04/src)
 
 ---
 
-## Chapter 9: Maps and Hash Tables
+### Bölüm 8: Kuyruklar ve Deque
 
-A hash table is a data structure that implements an associative array abstract data type, a structure that can map keys to values. Using a hash function to compute an index into an array of buckets or slots, hash tables provide rapid data access. Hash tables provide O(1) average-case insertion, deletion, and lookup when the hash function distributes keys effectively. In the worst case, these operations may take O(n) time. They're widely used in database indexing, caches, and implementing sets. However, they must handle collisions (when different keys hash to the same index) and may require resizing as they grow.
+Kuyruk, ilk giren ilk çıkar (FIFO) ilkesiyle çalışır: öğeler bir uçtan eklenir (enqueue), öbür uçtan çıkarılır (dequeue). Basit dizi kuyruğunun sorunu, dairesel kuyruk ve indis formülleri, dolu/boş ayrımı, kuyruğun büyütülmesi ve bağlı liste ile gerçekleme bu bölümdedir. İki uçtan da ekleme ve çıkarmaya izin veren deque, kayan pencere maksimumu gibi problemlerde kullanılır. Round robin çizelgeleme, Josephus problemi, ikilik sayıların üretilmesi ve iki yığınla kuyruk uygulama örnekleridir.
 
-
-- [🖼️Sunum-Hash Tabloları (HTML)](../files/data_structures/slides/Bolum_09_Hash_Tablosu.html)
-- [📄Sunum-Hash Tabloları (PDF)](../files/data_structures/pdf/Bolum_09_Hash_Tablosu.pdf)  
-- [📝Çalışma Soruları - Hash Tabloları (HTML)](../files/data_structures/slides/Bolum_09_Hash_Tablosu_Calisma_Sorulari.html)  
-- [🕹️Hash Table Simulator (HTML)](../files/data_structures/slides/Bolum_09_Hash_Table.html)
-- [🕹️Map Simulator (HTML)](../files/data_structures/slides/Bolum_09_Map.html)
-- [🕹️Open Addressing Simulator (HTML)](../files/data_structures/slides/Bolum_09_Open_Addressing.html)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders09/src)
-
----
-
-## Chapter 10: Search Trees  
-
-A search tree, particularly a Binary Search Tree (BST), is a binary tree data structure where each node's left subtree contains only nodes with keys less than the node's key, and the right subtree contains only nodes with keys greater than the node's key. This property makes them extremely efficient. Search, insertion, and deletion take O(h) time, where h is the height of the tree. This becomes O(log n) in a balanced tree but may degrade to O(n) in the worst case. They're fundamental in implementing databases, file systems, and for maintaining sorted data in a dynamic setting. They underpin many searching and sorting algorithms, making them indispensable for computer scientists and programmers alike.
-
-
-- [🖼️Sunum-Arama Ağaçları (HTML)](../files/data_structures/slides/Bolum_10_Arama_Agaclari.html)  
-- [📄Sunum-Arama Ağaçları (PDF)](../files/data_structures/pdf/Bolum_10_Arama_Agaclari.pdf)  
-- [📝Çalışma Soruları - Arama Ağaçları (HTML)](../files/data_structures/slides/Bolum_10_Arama_Agaclari_Calisma_Sorulari.html)  
-- [🕹️BST Simulator (HTML)](../files/data_structures/slides/Bolum_10_BST.html)
-- [🕹️Red-Black Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_Red_Black.html)
-- [🕹️AVL Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_AVL.html)
-- [🕹️Splay Tree Simulator (HTML)](../files/data_structures/slides/Bolum_10_Splay.html)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders10/src)  
+- [🖼️Sunum-Kuyruk (HTML)](../files/data_structures/slides/Bolum_08_Kuyruk.html)
+- [📄Sunum-Kuyruk (PDF)](../files/data_structures/pdf/Bolum_08_Kuyruk.pdf)
+- [📝Çalışma Soruları - Kuyruk (HTML)](../files/data_structures/slides/Bolum_08_Kuyruk_Calisma_Sorulari.html)
+- [🕹️Kuyruk Simülatörü (HTML)](../files/data_structures/slides/Bolum_08_Queue.html)
+- [🕹️Deque Simülatörü (HTML)](../files/data_structures/slides/Bolum_08_Deque.html)
+- [🕹️Dairesel Kuyruk Simülatörü (HTML)](../files/data_structures/slides/Bolum_08_Circular_Queue.html)
+- [🕹️Round Robin Çizelgeleyici (HTML)](../files/data_structures/slides/Bolum_08_Scheduler.html)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders05/src)
 
 ---
 
-## Chapter 11: Graphs  
+## Kısım III: Ağaçlar
 
-A graph is a versatile data structure consisting of vertices (or nodes) connected by edges, representing relationships between objects. Unlike trees, graphs can have cycles and multiple paths between nodes. They can be directed (edges have direction) or undirected, weighted or unweighted. Graphs are essential for modeling complex networks like social connections, road maps, computer networks, or any system where relationships between entities need to be represented and analyzed. They support various algorithms for traversal, shortest path finding, and network analysis. Understanding graph theory and traversal algorithms is essential for solving complex problems.
+### Bölüm 9: Ağaçlar
 
-- [🖼️Sunum-Çizge (HTML)](../files/data_structures/slides/Bolum_11_Cizge.html)  
-- [📄Sunum-Çizge (PDF)](../files/data_structures/pdf/Bolum_11_Cizge.pdf)  
-- [📝Çalışma Soruları - Çizge (HTML)](../files/data_structures/slides/Bolum_11_Cizge_Calisma_Sorulari.html)  
-- [🕹️Graph Simulator (HTML)](../files/data_structures/slides/Bolum_11_Graph.html)
-- [🕹️Directed Graph Simulator (HTML)](../files/data_structures/slides/Bolum_11_Directed_Graph.html)
-- [🕹️Dijkstra Simulator (HTML)](../files/data_structures/slides/Bolum_11_Dijkstra.html)
-- [🕹️Course Prerequisite Planner (HTML)](../files/data_structures/slides/Bolum_11_Course_Planner.html)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders11/src)  
+Ağaç, düğümlerin kenarlarla bağlandığı hiyerarşik bir yapıdır: bir kökten başlar, her düğümün tek ebeveyni ve birden çok çocuğu olabilir. Dosya sistemleri, kurum şemaları ve HTML belgeleri ağaçla temsil edilir. Derece, derinlik ve yükseklik gibi temel kavramlar, ikili ağaç türleri (dolu, tam, mükemmel) ve özellikleri, dizi ve bağlı gösterimler incelenir. Kök başta, kök ortada, kök sonda ve seviye sırası gezinmeleri hem özyinelemeli hem yığın ve kuyrukla gerçeklenir; ifade ağaçları ve özyinelemeli ağaç fonksiyonları (boyut, yükseklik, yaprak sayısı) uygulamalardır.
+
+- [🖼️Sunum-Ağaçlar (HTML)](../files/data_structures/slides/Bolum_09_Agac.html)
+- [📄Sunum-Ağaçlar (PDF)](../files/data_structures/pdf/Bolum_09_Agac.pdf)
+- [📝Çalışma Soruları - Ağaçlar (HTML)](../files/data_structures/slides/Bolum_09_Agac_Calisma_Sorulari.html)
+- [🕹️Genel Ağaç Simülatörü (HTML)](../files/data_structures/slides/Bolum_09_General_Tree.html)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders07/src)
 
 ---
 
-## Chapter 12: Sets  
+### Bölüm 10: Arama Ağaçları
 
-A set is a collection of distinct elements where order doesn't matter and duplicates are not allowed. Think of it as a mathematical set, perfect for maintaining a unique collection of items. Sets support operations like union, intersection, and difference, making them invaluable for comparing collections of data or removing duplicates. Sets are commonly implemented using hash tables for average-case constant-time operations or balanced search trees when sorted iteration and ordered operations are required. Sets are extensively used in database queries, finding unique values, and checking for membership in a collection.
+İkili arama ağacında (BST) her düğümün sol alt ağacındaki anahtarlar düğümünkinden küçük, sağ alt ağacındakiler büyüktür. Arama, ekleme ve silme O(h) sürer; h ağacın yüksekliğidir. Dengeli ağaçta bu O(log n) olur, en kötü durumda O(n)'ye düşer. BST'de arama, ekleme, ardıl ve öncül, üç durumlu silme ve aralık sorguları incelendikten sonra yüksekliği sınırlı tutan AVL, kırmızı-siyah ve splay ağaçları ele alınır. Diskteki veriler için B-ağacı ve B+ ağacı gibi çok yollu arama ağaçları düğüm başına çok sayıda anahtar tutarak ağacı sığ tutar.
 
-- [🖼️Sunum-Kümeler (HTML)](../files/data_structures/slides/Bolum_12_Kumeler.html)  
-- [📄Sunum-Kümeler (PDF)](../files/data_structures/pdf/Bolum_12_Kumeler.pdf)  
-- [📝Çalışma Soruları - Kümeler (HTML)](../files/data_structures/slides/Bolum_12_Kumeler_Calisma_Sorulari.html)  
-- [🕹️Set ADT Simulator (HTML)](../files/data_structures/slides/Bolum_12_Set_ADT.html)
-- [🕹️Disjoint Set Union Simulator (HTML)](../files/data_structures/slides/Bolum_12_Disjoint_Set_Union.html)
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src)  
+- [🖼️Sunum-Arama Ağaçları (HTML)](../files/data_structures/slides/Bolum_10_Arama_Agaclari.html)
+- [📄Sunum-Arama Ağaçları (PDF)](../files/data_structures/pdf/Bolum_10_Arama_Agaclari.pdf)
+- [📝Çalışma Soruları - Arama Ağaçları (HTML)](../files/data_structures/slides/Bolum_10_Arama_Agaclari_Calisma_Sorulari.html)
+- [🕹️İkili Arama Ağacı Simülatörü (HTML)](../files/data_structures/slides/Bolum_10_BST.html)
+- [🕹️İkili Arama Ağacı Gezinme Simülatörü (HTML)](../files/data_structures/slides/Bolum_10_Tree.html)
+- [🕹️Kırmızı-Siyah Ağaç Simülatörü (HTML)](../files/data_structures/slides/Bolum_10_Red_Black.html)
+- [🕹️AVL Ağacı Simülatörü (HTML)](../files/data_structures/slides/Bolum_10_AVL.html)
+- [🕹️Splay Ağacı Simülatörü (HTML)](../files/data_structures/slides/Bolum_10_Splay.html)
+- [🕹️B-Ağacı Simülatörü (HTML)](../files/data_structures/slides/Bolum_10_BTree.html)
+- [🕹️B+ Ağacı Simülatörü (HTML)](../files/data_structures/slides/Bolum_10_BPlusTree.html)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders10/src)
 
+---
+
+### Bölüm 11: Öncelikli Kuyruklar ve Heap
+
+Öncelikli kuyruk, her seferinde en yüksek (ya da en düşük) öncelikli öğeyi çıkaran soyut veri tipidir. Sırasız ve sıralı listeyle gerçeklemenin maliyetleri karşılaştırıldıktan sonra ikili heap incelenir: max-heap'te her ebeveyn çocuklarından büyük ya da onlara eşittir. Dizi gösterimi, yukarı ve aşağı yönlü düzeltmeyle (up-heap, down-heap) ekleme ve silme, uyarlanabilir öncelikli kuyruk, O(n) sürede heap oluşturma ve heap sort bu bölümdedir. Java'nın PriorityQueue sınıfı, k'ıncı en büyük öğe ve öncelikli çizelgeleyici uygulama örnekleridir.
+
+- [🖼️Sunum-Öncelikli Kuyruk (HTML)](../files/data_structures/slides/Bolum_11_Oncelikli_Kuyruk.html)
+- [📄Sunum-Öncelikli Kuyruk (PDF)](../files/data_structures/pdf/Bolum_11_Oncelikli_Kuyruk.pdf)
+- [📝Çalışma Soruları - Öncelikli Kuyruk (HTML)](../files/data_structures/slides/Bolum_11_Oncelikli_Kuyruk_Calisma_Sorulari.html)
+- [🕹️İkili Heap Simülatörü (HTML)](../files/data_structures/slides/Bolum_11_Heap.html)
+- [🕹️Öncelikli Kuyruk Simülatörü (HTML)](../files/data_structures/slides/Bolum_11_Priority_Queue.html)
+- [🕹️Öncelikli Çizelgeleyici Simülatörü (HTML)](../files/data_structures/slides/Bolum_11_Priority_Scheduler.html)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders08/src)
+
+---
+
+## Kısım IV: Eşlemeler, Kümeler ve Çizgeler
+
+### Bölüm 12: Eşlemeler ve Hash Tabloları
+
+Eşleme (map), anahtarları değerlere bağlayan soyut veri tipidir. Hash tablosu, bir hash fonksiyonuyla anahtardan bir kova indisi hesaplar ve iyi dağılan anahtarlarla ekleme, silme ve aramayı ortalamada O(1) sürede yapar; en kötü durumda bu O(n)'ye çıkabilir. İyi bir hash fonksiyonunun özellikleri, Java'daki equals/hashCode sözleşmesi, çakışmaları çözmek için ayrı zincirleme ve açık adresleme (doğrusal yoklama, karesel yoklama, çift hash), yük faktörü ve yeniden boyutlandırma bu bölümün konularıdır. Java HashMap'in iç yapısı ve iki toplam gibi uygulamalarla bölüm tamamlanır.
+
+- [🖼️Sunum-Hash Tabloları (HTML)](../files/data_structures/slides/Bolum_12_Hash_Tablosu.html)
+- [📄Sunum-Hash Tabloları (PDF)](../files/data_structures/pdf/Bolum_12_Hash_Tablosu.pdf)
+- [📝Çalışma Soruları - Hash Tabloları (HTML)](../files/data_structures/slides/Bolum_12_Hash_Tablosu_Calisma_Sorulari.html)
+- [🕹️Hash Tablosu Simülatörü (HTML)](../files/data_structures/slides/Bolum_12_Hash_Table.html)
+- [🕹️Eşleme Simülatörü (HTML)](../files/data_structures/slides/Bolum_12_Map.html)
+- [🕹️Açık Adresleme Simülatörü (HTML)](../files/data_structures/slides/Bolum_12_Open_Addressing.html)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders09/src)
+
+---
+
+### Bölüm 13: Kümeler ve Ayrık Kümeler
+
+Küme, birbirinden farklı öğelerin sırasız topluluğudur; tekrar eden öğe içermez. Birleşim, kesişim ve fark işlemleri, Java'nın Set arayüzü ve hash tabanlı, ağaç tabanlı ve bit vektörü ile gerçeklemeler karşılaştırılır; çoklu küme ve çoklu eşleme de ele alınır. Ayrık kümeler (union-find) yapısı, boyuta ya da rütbeye göre birleştirme ve yol kısaltmayla bağlantı sorgularını neredeyse sabit amortize sürede yanıtlar; bağlantılı bileşen sayma bunun bir uygulamasıdır.
+
+- [🖼️Sunum-Kümeler (HTML)](../files/data_structures/slides/Bolum_13_Kumeler.html)
+- [📄Sunum-Kümeler (PDF)](../files/data_structures/pdf/Bolum_13_Kumeler.pdf)
+- [📝Çalışma Soruları - Kümeler (HTML)](../files/data_structures/slides/Bolum_13_Kumeler_Calisma_Sorulari.html)
+- [🕹️Küme ADT Simülatörü (HTML)](../files/data_structures/slides/Bolum_13_Set_ADT.html)
+- [🕹️Ayrık Kümeler Simülatörü (HTML)](../files/data_structures/slides/Bolum_13_Disjoint_Set_Union.html)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders12/src)
+
+---
+
+### Bölüm 14: Çizgeler
+
+Çizge, nesneler arasındaki ilişkileri düğümler ve kenarlarla temsil eder. Ağaçlardan farklı olarak döngü ve iki düğüm arasında birden çok yol içerebilir; yönlü ya da yönsüz, ağırlıklı ya da ağırlıksız olabilir. Sosyal ağlar, yol haritaları ve bilgisayar ağları çizgeyle modellenir. Komşuluk matrisi ve komşuluk listesi gösterimleri, genişlik öncelikli (BFS) ve derinlik öncelikli (DFS) arama, bağlantılı bileşenler, iki parçalı çizgeler, topolojik sıralama ve yönlü döngü tespiti incelenir. Ağırlıksız en kısa yol ve Dijkstra algoritmasından sonra minimum kapsayan ağaç problemi ayrık kümelerle Kruskal, öncelikli kuyrukla Prim algoritması üzerinden çözülür.
+
+- [🖼️Sunum-Çizge (HTML)](../files/data_structures/slides/Bolum_14_Cizge.html)
+- [📄Sunum-Çizge (PDF)](../files/data_structures/pdf/Bolum_14_Cizge.pdf)
+- [📝Çalışma Soruları - Çizge (HTML)](../files/data_structures/slides/Bolum_14_Cizge_Calisma_Sorulari.html)
+- [🕹️Yönsüz Çizge Simülatörü (HTML)](../files/data_structures/slides/Bolum_14_Graph.html)
+- [🕹️Yönlü Çizge Simülatörü (HTML)](../files/data_structures/slides/Bolum_14_Directed_Graph.html)
+- [🕹️Dijkstra Algoritması Simülatörü (HTML)](../files/data_structures/slides/Bolum_14_Dijkstra.html)
+- [🕹️Ders Ön Koşul Planlayıcısı (HTML)](../files/data_structures/slides/Bolum_14_Course_Planner.html)
+- [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders11/src)
