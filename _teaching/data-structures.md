@@ -102,6 +102,7 @@ Yığın, son giren ilk çıkar (LIFO) ilkesiyle çalışır: ekleme (push) ve �
 
 - [🖼️Sunum-Yığın (HTML)](../files/data_structures/slides/Bolum_07_Yigin.html)
 - [📄Sunum-Yığın (PDF)](../files/data_structures/pdf/Bolum_07_Yigin.pdf)
+- [📖Ders Notu - Yığın (HTML)](../files/data_structures/notlar/Bolum_07_Yigin_Ders_Notu.html)
 - [📝Çalışma Soruları - Yığın (HTML)](../files/data_structures/slides/Bolum_07_Yigin_Calisma_Sorulari.html)
 - [🕹️Yığın Simülatörü (HTML)](../files/data_structures/slides/Bolum_07_Stack.html)
 - [🕹️Stock Span Simülatörü (HTML)](../files/data_structures/slides/Bolum_07_Stock_Span.html)
