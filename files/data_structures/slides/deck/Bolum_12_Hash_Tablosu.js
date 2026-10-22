@@ -1,5 +1,5 @@
 /* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
-/* Bölüm 9: açık adresleme deneme alanı */
+/* Bölüm 12: açık adresleme deneme alanı */
 (function () {
   document.querySelectorAll('[data-demo="b09-probe"]').forEach(function (demo) {
     var N = 11, DEL = {};

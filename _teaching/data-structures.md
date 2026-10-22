@@ -29,6 +29,7 @@ Veri yapıları, verinin bellekte nasıl düzenleneceğini ve ona nasıl erişil
 
 - [🖼️Sunum-Giriş (HTML)](../files/data_structures/slides/Bolum_01_Giris.html)
 - [📄Sunum-Giriş (PDF)](../files/data_structures/pdf/Bolum_01_Giris.pdf)
+- [📖Ders Notu - Giriş (HTML)](../files/data_structures/notlar/Bolum_01_Giris_Ders_Notu.html)
 - [📝Çalışma Soruları - Giriş (HTML)](../files/data_structures/slides/Bolum_01_Giris_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src)
 
@@ -40,6 +41,7 @@ Algoritma analizi, çözümleri uygulamadan önce karşılaştırmayı sağlar. 
 
 - [🖼️Sunum-Algoritma Analizi (HTML)](../files/data_structures/slides/Bolum_02_Algoritma_Analizi.html)
 - [📄Sunum-Algoritma Analizi (PDF)](../files/data_structures/pdf/Bolum_02_Algoritma_Analizi.pdf)
+- [📖Ders Notu - Algoritma Analizi (HTML)](../files/data_structures/notlar/Bolum_02_Algoritma_Analizi_Ders_Notu.html)
 - [📝Çalışma Soruları - Algoritma Analizi (HTML)](../files/data_structures/slides/Bolum_02_Algoritma_Analizi_Calisma_Sorulari.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders01/src)
 
@@ -51,6 +53,7 @@ Dizi, öğeleri bellekte bitişik yerleşen en temel veri yapısıdır; her öğ
 
 - [🖼️Sunum-Diziler (HTML)](../files/data_structures/slides/Bolum_03_Diziler.html)
 - [📄Sunum-Diziler (PDF)](../files/data_structures/pdf/Bolum_03_Diziler.pdf)
+- [📖Ders Notu - Diziler (HTML)](../files/data_structures/notlar/Bolum_03_Diziler_Ders_Notu.html)
 - [📝Çalışma Soruları - Diziler (HTML)](../files/data_structures/slides/Bolum_03_Diziler_Calisma_Sorulari.html)
 - [🕹️Dizi Simülatörü (HTML)](../files/data_structures/slides/Bolum_03_Arrays.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders02/src)
@@ -63,6 +66,7 @@ Dizi, öğeleri bellekte bitişik yerleşen en temel veri yapısıdır; her öğ
 
 - [🖼️Sunum-Özyineleme (HTML)](../files/data_structures/slides/Bolum_04_Ozyineleme.html)
 - [📄Sunum-Özyineleme (PDF)](../files/data_structures/pdf/Bolum_04_Ozyineleme.pdf)
+- [📖Ders Notu - Özyineleme (HTML)](../files/data_structures/notlar/Bolum_04_Ozyineleme_Ders_Notu.html)
 - [📝Çalışma Soruları - Özyineleme (HTML)](../files/data_structures/slides/Bolum_04_Ozyineleme_Calisma_Sorulari.html)
 - [🕹️Hanoi Kuleleri Simülatörü (HTML)](../files/data_structures/slides/Bolum_04_Tower_of_Hanoi.html)
 
@@ -76,6 +80,7 @@ Bağlı liste, her biri veri ve bir sonraki düğüme referans taşıyan düğü
 
 - [🖼️Sunum-Bağlı Liste (HTML)](../files/data_structures/slides/Bolum_05_Bagli_Liste.html)
 - [📄Sunum-Bağlı Liste (PDF)](../files/data_structures/pdf/Bolum_05_Bagli_Liste.pdf)
+- [📖Ders Notu - Bağlı Liste (HTML)](../files/data_structures/notlar/Bolum_05_Bagli_Liste_Ders_Notu.html)
 - [📝Çalışma Soruları - Bağlı Liste (HTML)](../files/data_structures/slides/Bolum_05_Bagli_Liste_Calisma_Sorulari.html)
 - [🕹️Bağlı Liste Simülatörü (HTML)](../files/data_structures/slides/Bolum_05_Linked_List.html)
 - [🕹️Çift Yönlü Bağlı Liste Simülatörü (HTML)](../files/data_structures/slides/Bolum_05_Doubly_Linked_List.html)
@@ -90,6 +95,7 @@ Liste, öğelerin sıralı bir dizisini temsil eden soyut veri tipidir; büyüy�
 
 - [🖼️Sunum-Liste (HTML)](../files/data_structures/slides/Bolum_06_Liste.html)
 - [📄Sunum-Liste (PDF)](../files/data_structures/pdf/Bolum_06_Liste.pdf)
+- [📖Ders Notu - Liste (HTML)](../files/data_structures/notlar/Bolum_06_Liste_Ders_Notu.html)
 - [📝Çalışma Soruları - Liste (HTML)](../files/data_structures/slides/Bolum_06_Liste_Calisma_Sorulari.html)
 - [🕹️Liste ADT Simülatörü (HTML)](../files/data_structures/slides/Bolum_06_List_ADT.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders06/src)
@@ -118,6 +124,7 @@ Kuyruk, ilk giren ilk çıkar (FIFO) ilkesiyle çalışır: öğeler bir uçtan 
 
 - [🖼️Sunum-Kuyruk (HTML)](../files/data_structures/slides/Bolum_08_Kuyruk.html)
 - [📄Sunum-Kuyruk (PDF)](../files/data_structures/pdf/Bolum_08_Kuyruk.pdf)
+- [📖Ders Notu - Kuyruk (HTML)](../files/data_structures/notlar/Bolum_08_Kuyruk_Ders_Notu.html)
 - [📝Çalışma Soruları - Kuyruk (HTML)](../files/data_structures/slides/Bolum_08_Kuyruk_Calisma_Sorulari.html)
 - [🕹️Kuyruk Simülatörü (HTML)](../files/data_structures/slides/Bolum_08_Queue.html)
 - [🕹️Deque Simülatörü (HTML)](../files/data_structures/slides/Bolum_08_Deque.html)
@@ -135,6 +142,7 @@ Ağaç, düğümlerin kenarlarla bağlandığı hiyerarşik bir yapıdır: bir k
 
 - [🖼️Sunum-Ağaçlar (HTML)](../files/data_structures/slides/Bolum_09_Agac.html)
 - [📄Sunum-Ağaçlar (PDF)](../files/data_structures/pdf/Bolum_09_Agac.pdf)
+- [📖Ders Notu - Ağaçlar (HTML)](../files/data_structures/notlar/Bolum_09_Agac_Ders_Notu.html)
 - [📝Çalışma Soruları - Ağaçlar (HTML)](../files/data_structures/slides/Bolum_09_Agac_Calisma_Sorulari.html)
 - [🕹️Genel Ağaç Simülatörü (HTML)](../files/data_structures/slides/Bolum_09_General_Tree.html)
 - [💻Kod Örnekleri (GitHub)](https://github.com/sercankulcu/data-structures-java/tree/main/Ders07/src)
@@ -147,6 +155,7 @@ Ağaç, düğümlerin kenarlarla bağlandığı hiyerarşik bir yapıdır: bir k
 
 - [🖼️Sunum-Arama Ağaçları (HTML)](../files/data_structures/slides/Bolum_10_Arama_Agaclari.html)
 - [📄Sunum-Arama Ağaçları (PDF)](../files/data_structures/pdf/Bolum_10_Arama_Agaclari.pdf)
+- [📖Ders Notu - Arama Ağaçları (HTML)](../files/data_structures/notlar/Bolum_10_Arama_Agaclari_Ders_Notu.html)
 - [📝Çalışma Soruları - Arama Ağaçları (HTML)](../files/data_structures/slides/Bolum_10_Arama_Agaclari_Calisma_Sorulari.html)
 - [🕹️İkili Arama Ağacı Simülatörü (HTML)](../files/data_structures/slides/Bolum_10_BST.html)
 - [🕹️İkili Arama Ağacı Gezinme Simülatörü (HTML)](../files/data_structures/slides/Bolum_10_Tree.html)
@@ -165,6 +174,7 @@ Ağaç, düğümlerin kenarlarla bağlandığı hiyerarşik bir yapıdır: bir k
 
 - [🖼️Sunum-Öncelikli Kuyruk (HTML)](../files/data_structures/slides/Bolum_11_Oncelikli_Kuyruk.html)
 - [📄Sunum-Öncelikli Kuyruk (PDF)](../files/data_structures/pdf/Bolum_11_Oncelikli_Kuyruk.pdf)
+- [📖Ders Notu - Öncelikli Kuyruk (HTML)](../files/data_structures/notlar/Bolum_11_Oncelikli_Kuyruk_Ders_Notu.html)
 - [📝Çalışma Soruları - Öncelikli Kuyruk (HTML)](../files/data_structures/slides/Bolum_11_Oncelikli_Kuyruk_Calisma_Sorulari.html)
 - [🕹️İkili Heap Simülatörü (HTML)](../files/data_structures/slides/Bolum_11_Heap.html)
 - [🕹️Öncelikli Kuyruk Simülatörü (HTML)](../files/data_structures/slides/Bolum_11_Priority_Queue.html)
@@ -181,6 +191,7 @@ Eşleme (map), anahtarları değerlere bağlayan soyut veri tipidir. Hash tablos
 
 - [🖼️Sunum-Hash Tabloları (HTML)](../files/data_structures/slides/Bolum_12_Hash_Tablosu.html)
 - [📄Sunum-Hash Tabloları (PDF)](../files/data_structures/pdf/Bolum_12_Hash_Tablosu.pdf)
+- [📖Ders Notu - Hash Tabloları (HTML)](../files/data_structures/notlar/Bolum_12_Hash_Tablosu_Ders_Notu.html)
 - [📝Çalışma Soruları - Hash Tabloları (HTML)](../files/data_structures/slides/Bolum_12_Hash_Tablosu_Calisma_Sorulari.html)
 - [🕹️Hash Tablosu Simülatörü (HTML)](../files/data_structures/slides/Bolum_12_Hash_Table.html)
 - [🕹️Eşleme Simülatörü (HTML)](../files/data_structures/slides/Bolum_12_Map.html)
@@ -195,6 +206,7 @@ Küme, birbirinden farklı öğelerin sırasız topluluğudur; tekrar eden öğe
 
 - [🖼️Sunum-Kümeler (HTML)](../files/data_structures/slides/Bolum_13_Kumeler.html)
 - [📄Sunum-Kümeler (PDF)](../files/data_structures/pdf/Bolum_13_Kumeler.pdf)
+- [📖Ders Notu - Kümeler (HTML)](../files/data_structures/notlar/Bolum_13_Kumeler_Ders_Notu.html)
 - [📝Çalışma Soruları - Kümeler (HTML)](../files/data_structures/slides/Bolum_13_Kumeler_Calisma_Sorulari.html)
 - [🕹️Küme ADT Simülatörü (HTML)](../files/data_structures/slides/Bolum_13_Set_ADT.html)
 - [🕹️Ayrık Kümeler Simülatörü (HTML)](../files/data_structures/slides/Bolum_13_Disjoint_Set_Union.html)
@@ -208,6 +220,7 @@ Küme, birbirinden farklı öğelerin sırasız topluluğudur; tekrar eden öğe
 
 - [🖼️Sunum-Çizge (HTML)](../files/data_structures/slides/Bolum_14_Cizge.html)
 - [📄Sunum-Çizge (PDF)](../files/data_structures/pdf/Bolum_14_Cizge.pdf)
+- [📖Ders Notu - Çizge (HTML)](../files/data_structures/notlar/Bolum_14_Cizge_Ders_Notu.html)
 - [📝Çalışma Soruları - Çizge (HTML)](../files/data_structures/slides/Bolum_14_Cizge_Calisma_Sorulari.html)
 - [🕹️Yönsüz Çizge Simülatörü (HTML)](../files/data_structures/slides/Bolum_14_Graph.html)
 - [🕹️Yönlü Çizge Simülatörü (HTML)](../files/data_structures/slides/Bolum_14_Directed_Graph.html)
