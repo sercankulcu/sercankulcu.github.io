@@ -236,6 +236,7 @@ Linux, dersin kavramlarını gerçek bir sistemde bir arada gösterir. Bu bölü
 
 - [🖼️Sunum-Linux (HTML)](../files/os/slides/Bolum_15_Linux.html)
 - [📄Sunum-Linux (PDF)](../files/os/pdf/Bolum_15_Linux.pdf)
+- [📖Ders Notu - Linux (HTML)](../files/os/notlar/Bolum_15_Linux_Ders_Notu.html)
 - [📝Çalışma Soruları - Linux (HTML)](../files/os/slides/Bolum_15_Linux_Calisma_Sorulari.html)
 
 - [🕹️Linux Süreç Gezgini (HTML)](../files/os/slides/Chapter_15_Linux_Process_Explorer.html)
