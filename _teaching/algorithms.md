@@ -120,101 +120,99 @@ Have you ever wondered how your computer or smartphone handles text so efficient
 
 ---
 
-## Chapter 6: Dynamic Programming
-
-Dynamic programming is a powerful technique for solving optimization problems by breaking them down into smaller subproblems. At its core, dynamic programming involves breaking down daunting tasks into smaller, more manageable subproblems, allowing us to systematically find optimal solutions. 
-
-- [🖼️Sunum-Dinamik Programlama (HTML)](../files/algorithms/slides/Bolum_06_Dinamik.html)  
-- [📄Sunum-Dinamik Programlama (PDF)](../files/algorithms/pdf/Bolum_06_Dinamik.pdf)  
-- [📝Çalışma Soruları - Dinamik Programlama (HTML)](../files/algorithms/slides/Bolum_06_Dinamik_Calisma_Sorulari.html)  
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter06/src)
-
----
-
-## Chapter 7: Approximation algorithms
-
-Approximation algorithms efficiently produce near-optimal solutions for optimization problems whose exact solutions may be computationally expensive. They are especially useful for NP-hard problems, for which no polynomial-time exact algorithm is currently known.
-
-- [🖼️Sunum-Yaklaşım Algoritmaları (HTML)](../files/algorithms/slides/Bolum_07_Yakinsama.html)  
-- [📄Sunum-Yaklaşım Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_07_Yakinsama.pdf)  
-- [📝Çalışma Soruları - Yaklaşım Algoritmaları (HTML)](../files/algorithms/slides/Bolum_07_Yakinsama_Calisma_Sorulari.html)  
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter07/src)
-
----
-
-## Chapter 8: Randomized algorithms
-
-Randomized algorithms incorporate random choices into their execution. Randomization may simplify an algorithm, improve its expected running time, or reduce sensitivity to adversarial inputs. Their guarantees may concern running time, correctness probability, or approximation quality.
-
-- [🖼️Sunum-Rastgele Algoritmalar (HTML)](../files/algorithms/slides/Bolum_08_Rastgele.html)  
-- [📄Sunum-Rastgele Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_08_Rastgele.pdf)  
-- [📝Çalışma Soruları - Rastgele Algoritmalar (HTML)](../files/algorithms/slides/Bolum_08_Rastgele_Calisma_Sorulari.html)  
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter08/src)
-
----
-
-## Chapter 9: Online algorithms
-
-Online algorithms process input incrementally and make irrevocable decisions without knowing future requests. Their performance is commonly evaluated through competitive analysis, which compares an online algorithm with an optimal offline algorithm that knows the complete input in advance.
-
-- [🖼️Sunum-Çevrimiçi Algoritmalar (HTML)](../files/algorithms/slides/Bolum_09_Cevrimici.html)  
-- [📄Sunum-Çevrimiçi Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_09_Cevrimici.pdf)  
-- [📝Çalışma Soruları - Çevrimiçi Algoritmalar (HTML)](../files/algorithms/slides/Bolum_09_Cevrimici_Calisma_Sorulari.html)  
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter09/src)
-
----
-
-## Chapter 10: Parallel algorithms
-
-Parallel algorithms divide computation among multiple processing units to reduce execution time, increase throughput, or process large datasets efficiently. Their design must consider dependencies, communication overhead, synchronization, workload balance, speedup, and scalability.
-
-- [🖼️Sunum-Paralel Algoritmalar (HTML)](../files/algorithms/slides/Bolum_10_Paralel.html)  
-- [📄Sunum-Paralel Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_10_Paralel.pdf)  
-- [📝Çalışma Soruları - Paralel Algoritmalar (HTML)](../files/algorithms/slides/Bolum_10_Paralel_Calisma_Sorulari.html)  
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter10/src)
-
----
-
-## Chapter 11: Divide-and-Conquer paradigm
+## Chapter 6: Divide-and-Conquer paradigm
 
 The divide-and-conquer paradigm is an algorithmic design paradigm that breaks down a problem into smaller subproblems of the same or related type, until these become simple enough to be solved directly. The solutions to the sub-problems are then combined to give a solution to the original problem.
 
-- [🖼️Sunum-Böl Fethet Yaklaşımı (HTML)](../files/algorithms/slides/Bolum_11_Bol_Fethet.html)  
-- [📄Sunum-Böl Fethet Yaklaşımı (PDF)](../files/algorithms/pdf/Bolum_11_Bol_Fethet.pdf)  
-- [📝Çalışma Soruları - Böl Fethet Yaklaşımı (HTML)](../files/algorithms/slides/Bolum_11_Bol_Fethet_Calisma_Sorulari.html)  
+- [🖼️Sunum-Böl Fethet Yaklaşımı (HTML)](../files/algorithms/slides/Bolum_06_Bol_Fethet.html)  
+- [📄Sunum-Böl Fethet Yaklaşımı (PDF)](../files/algorithms/pdf/Bolum_06_Bol_Fethet.pdf)  
+- [📝Çalışma Soruları - Böl Fethet Yaklaşımı (HTML)](../files/algorithms/slides/Bolum_06_Bol_Fethet_Calisma_Sorulari.html)  
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter11/src)
 
 ---
 
-## Chapter 12: Greedy algorithms
+## Chapter 7: Greedy algorithms
 
 Greedy algorithms build a solution incrementally by choosing the locally best available option at each step, without revisiting earlier decisions. They produce optimal solutions only when the problem satisfies suitable structural properties, such as the greedy-choice property and optimal substructure.
 
-- [🖼️Sunum-Açgözlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_12_Acgozlu.html)  
-- [📄Sunum-Açgözlü Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_12_Acgozlu.pdf)  
-- [📝Çalışma Soruları - Açgözlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_12_Acgozlu_Calisma_Sorulari.html)  
+- [🖼️Sunum-Açgözlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_07_Acgozlu.html)  
+- [📄Sunum-Açgözlü Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_07_Acgozlu.pdf)  
+- [📝Çalışma Soruları - Açgözlü Algoritmalar (HTML)](../files/algorithms/slides/Bolum_07_Acgozlu_Calisma_Sorulari.html)  
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter12/src)
 
 ---
 
-## Chapter 13: Backtracking algorithms
+## Chapter 8: Dynamic Programming
 
-Backtracking systematically explores a search space by extending partial candidates. When a partial candidate can no longer lead to a valid solution, the algorithm abandons that branch and returns to an earlier decision point.
+Dynamic programming is a powerful technique for solving optimization problems by breaking them down into smaller subproblems. At its core, dynamic programming involves breaking down daunting tasks into smaller, more manageable subproblems, allowing us to systematically find optimal solutions. 
 
-- [🖼️Sunum-Geri İzleme Algoritmaları (HTML)](../files/algorithms/slides/Bolum_13_Geri_Donuslu.html)  
-- [📄Sunum-Geri İzleme Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_13_Geri_Donuslu.pdf)  
-- [📝Çalışma Soruları - Geri İzleme Algoritmaları (HTML)](../files/algorithms/slides/Bolum_13_Geri_Donuslu_Calisma_Sorulari.html)  
-- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter13/src)
-
+- [🖼️Sunum-Dinamik Programlama (HTML)](../files/algorithms/slides/Bolum_08_Dinamik.html)  
+- [📄Sunum-Dinamik Programlama (PDF)](../files/algorithms/pdf/Bolum_08_Dinamik.pdf)  
+- [📝Çalışma Soruları - Dinamik Programlama (HTML)](../files/algorithms/slides/Bolum_08_Dinamik_Calisma_Sorulari.html)  
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter06/src)
 
 ---
 
-## Chapter 14: Branch-and-Bound algorithms
+## Chapter 9: Backtracking algorithms
+
+Backtracking systematically explores a search space by extending partial candidates. When a partial candidate can no longer lead to a valid solution, the algorithm abandons that branch and returns to an earlier decision point.
+
+- [🖼️Sunum-Geri İzleme Algoritmaları (HTML)](../files/algorithms/slides/Bolum_09_Geri_Donuslu.html)  
+- [📄Sunum-Geri İzleme Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_09_Geri_Donuslu.pdf)  
+- [📝Çalışma Soruları - Geri İzleme Algoritmaları (HTML)](../files/algorithms/slides/Bolum_09_Geri_Donuslu_Calisma_Sorulari.html)  
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter13/src)
+
+---
+
+## Chapter 10: Branch-and-Bound algorithms
 
 Branch and bound algorithms are a type of algorithm that solves optimization problems by breaking them down into smaller subproblems and using a bounding function to eliminate subproblems that cannot contain the optimal solution. It is an algorithm design paradigm for discrete and combinatorial optimization problems, as well as mathematical optimization. 
 
-- [🖼️Sunum-Dal Sınır Algoritmaları (HTML)](../files/algorithms/slides/Bolum_14_Dal_Sinir.html)  
-- [📄Sunum-Dal Sınır Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_14_Dal_Sinir.pdf)  
-- [📝Çalışma Soruları - Dal Sınır Algoritmaları (HTML)](../files/algorithms/slides/Bolum_14_Dal_Sinir_Calisma_Sorulari.html)  
+- [🖼️Sunum-Dal Sınır Algoritmaları (HTML)](../files/algorithms/slides/Bolum_10_Dal_Sinir.html)  
+- [📄Sunum-Dal Sınır Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_10_Dal_Sinir.pdf)  
+- [📝Çalışma Soruları - Dal Sınır Algoritmaları (HTML)](../files/algorithms/slides/Bolum_10_Dal_Sinir_Calisma_Sorulari.html)  
 - [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter14/src)
 
+---
+
+## Chapter 11: Approximation algorithms
+
+Approximation algorithms efficiently produce near-optimal solutions for optimization problems whose exact solutions may be computationally expensive. They are especially useful for NP-hard problems, for which no polynomial-time exact algorithm is currently known.
+
+- [🖼️Sunum-Yaklaşım Algoritmaları (HTML)](../files/algorithms/slides/Bolum_11_Yakinsama.html)  
+- [📄Sunum-Yaklaşım Algoritmaları (PDF)](../files/algorithms/pdf/Bolum_11_Yakinsama.pdf)  
+- [📝Çalışma Soruları - Yaklaşım Algoritmaları (HTML)](../files/algorithms/slides/Bolum_11_Yakinsama_Calisma_Sorulari.html)  
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter07/src)
+
+---
+
+## Chapter 12: Randomized algorithms
+
+Randomized algorithms incorporate random choices into their execution. Randomization may simplify an algorithm, improve its expected running time, or reduce sensitivity to adversarial inputs. Their guarantees may concern running time, correctness probability, or approximation quality.
+
+- [🖼️Sunum-Rastgele Algoritmalar (HTML)](../files/algorithms/slides/Bolum_12_Rastgele.html)  
+- [📄Sunum-Rastgele Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_12_Rastgele.pdf)  
+- [📝Çalışma Soruları - Rastgele Algoritmalar (HTML)](../files/algorithms/slides/Bolum_12_Rastgele_Calisma_Sorulari.html)  
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter08/src)
+
+---
+
+## Chapter 13: Online algorithms
+
+Online algorithms process input incrementally and make irrevocable decisions without knowing future requests. Their performance is commonly evaluated through competitive analysis, which compares an online algorithm with an optimal offline algorithm that knows the complete input in advance.
+
+- [🖼️Sunum-Çevrimiçi Algoritmalar (HTML)](../files/algorithms/slides/Bolum_13_Cevrimici.html)  
+- [📄Sunum-Çevrimiçi Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_13_Cevrimici.pdf)  
+- [📝Çalışma Soruları - Çevrimiçi Algoritmalar (HTML)](../files/algorithms/slides/Bolum_13_Cevrimici_Calisma_Sorulari.html)  
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter09/src)
+
+---
+
+## Chapter 14: Parallel algorithms
+
+Parallel algorithms divide computation among multiple processing units to reduce execution time, increase throughput, or process large datasets efficiently. Their design must consider dependencies, communication overhead, synchronization, workload balance, speedup, and scalability.
+
+- [🖼️Sunum-Paralel Algoritmalar (HTML)](../files/algorithms/slides/Bolum_14_Paralel.html)  
+- [📄Sunum-Paralel Algoritmalar (PDF)](../files/algorithms/pdf/Bolum_14_Paralel.pdf)  
+- [📝Çalışma Soruları - Paralel Algoritmalar (HTML)](../files/algorithms/slides/Bolum_14_Paralel_Calisma_Sorulari.html)  
+- [💻Code Examples (GitHub)](https://github.com/sercankulcu/algorithms/tree/main/Chapter10/src)
