@@ -1,0 +1,240 @@
+---
+layout: without-sidebar
+title: "Monte Carlo ile π Tahmini"
+permalink: /files/algorithms/slides/Chapter_12_Monte_Carlo_Pi.html
+excerpt: "Birim kareye atılan rastgele noktalarla π'yi tahmin eden ve hatanın 1/√n hızıyla küçülüşünü gösteren etkileşimli simülasyon."
+---
+
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/stage.css">
+
+<style>
+.algo-mcpi .algo-stage__body { display: flex; flex-direction: column; gap: 8px; }
+.algo-mcpi .mc-controls { flex: none; display: flex; align-items: center; gap: 8px; }
+.algo-mcpi .mc-controls button { padding: 0 12px; font-size: 14px; }
+.algo-mcpi .mc-controls #mc-run { min-width: 104px; }
+.algo-mcpi .mc-controls .mc-sep { width: 1.5px; height: 24px; background: var(--ds-border); }
+.algo-mcpi .mc-main { flex: 1; min-height: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; }
+.algo-mcpi .mc-square { height: 100%; aspect-ratio: 1 / 1; min-height: 0; overflow: hidden; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.algo-mcpi canvas { display: block; width: 100%; height: 100%; }
+.algo-mcpi .mc-side { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; }
+.algo-mcpi .mc-opts { flex: none; display: flex; align-items: center; gap: 8px; }
+.algo-mcpi .mc-opts label { display: inline-flex; align-items: center; gap: 6px; color: var(--ds-muted); font-size: 13px; font-weight: 700; }
+.algo-mcpi .mc-opts input { width: 88px; font-size: 14px; }
+.algo-mcpi .mc-opts select { font-size: 14px; }
+.algo-mcpi .mc-metrics { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.algo-mcpi .mc-metric { padding: 4px 8px; border: 1.5px solid var(--ds-border); border-radius: 10px; background: var(--ds-bg); text-align: center; }
+.algo-mcpi .mc-metric b { display: block; color: var(--ds-muted); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.algo-mcpi .mc-metric b .mc-pi { font-size: inherit; font-weight: inherit; color: inherit; text-transform: none; }
+.algo-mcpi .mc-metric > span { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.algo-mcpi .mc-metric.is-in > span { color: var(--ds-good); }
+.algo-mcpi .mc-metric.is-est > span { color: var(--ds-link); }
+.algo-mcpi .mc-chart { flex: 1; min-height: 0; overflow: hidden; border: 1.5px solid var(--ds-border); border-radius: 12px; background: var(--ds-bg); }
+.algo-mcpi .mc-legend { flex: none; display: flex; flex-wrap: wrap; gap: 2px 12px; color: var(--ds-muted); font-size: 12px; }
+.algo-mcpi .mc-legend span::before { content: ""; display: inline-block; width: 16px; margin-right: 5px; vertical-align: middle; }
+.algo-mcpi .mc-legend .is-est::before { border-top: 2.5px solid var(--ds-link); }
+.algo-mcpi .mc-legend .is-pi::before { border-top: 2px dashed var(--ds-text); }
+.algo-mcpi .mc-legend .is-band::before { height: 10px; background: var(--ds-hot); }
+.algo-mcpi .mc-legend .is-in::before { width: 9px; height: 9px; border-radius: 50%; background: var(--ds-good); }
+.algo-mcpi .mc-legend .is-out::before { width: 9px; height: 9px; border-radius: 50%; background: var(--ds-accent); }
+.algo-mcpi .mc-status { flex: none; margin: 0; overflow: hidden; font-size: 14px; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.algo-mcpi .mc-probe { position: absolute; width: 0; height: 0; overflow: hidden; transition: none !important; }
+</style>
+
+<div class="algo-mcpi algo-stage algo-stage--stage" lang="tr">
+  <header class="algo-stage__head">
+    <div class="algo-stage__titles"><p class="algo-stage__kicker">Bölüm 12 · Simülasyon</p><h1>Monte Carlo ile π Tahmini</h1></div>
+    <button type="button" class="algo-stage__help" aria-controls="mc-help">?</button>
+    <a class="algo-stage__back" href="Bolum_12_Rastgele.html">← Bölüm 12</a>
+  </header>
+
+  <div class="algo-stage__body">
+    <div class="mc-controls">
+      <button id="mc-add1" type="button" class="is-primary">1 nokta</button>
+      <button id="mc-add100" type="button" class="is-primary">100 nokta</button>
+      <button id="mc-add1000" type="button" class="is-primary">1000 nokta</button>
+      <span class="mc-sep" aria-hidden="true"></span>
+      <button id="mc-run" type="button">Sürekli at</button>
+      <button id="mc-reset" type="button">Sıfırla</button>
+    </div>
+
+    <div class="mc-main">
+      <div class="mc-square"><canvas id="mc-square" aria-label="Birim kare, çeyrek daire ve atılan noktalar"></canvas></div>
+      <div class="mc-side">
+        <div class="mc-opts">
+          <label for="mc-seed">Tohum <input id="mc-seed" type="number" min="0" max="4294967295" step="1" value="2024"></label>
+          <label for="mc-speed">Hız <select id="mc-speed"><option value="1">Yavaş</option><option value="10" selected>Normal</option><option value="100">Hızlı</option><option value="1000">Çok hızlı</option></select></label>
+        </div>
+        <div class="mc-metrics">
+          <div class="mc-metric"><b>Atılan</b><span id="mc-n">0</span></div>
+          <div class="mc-metric is-in"><b>İçeride</b><span id="mc-in">0</span></div>
+          <div class="mc-metric is-est"><b><span class="mc-pi">π</span> tahmini</b><span id="mc-est">–</span></div>
+          <div class="mc-metric"><b>Mutlak hata</b><span id="mc-err">–</span></div>
+        </div>
+        <div class="mc-chart"><canvas id="mc-chart" aria-label="π tahmininin nokta sayısına göre değişimi"></canvas></div>
+        <div class="mc-legend" aria-hidden="true">
+          <span class="is-in">içeride</span><span class="is-out">dışarıda</span>
+          <span class="is-est">tahmin</span><span class="is-pi">π</span><span class="is-band">π ± 1,64/√n</span>
+        </div>
+      </div>
+    </div>
+
+    <p id="mc-status" class="mc-status" role="status">Hazır.</p>
+    <span class="mc-probe" aria-hidden="true"></span>
+  </div>
+
+  <dialog class="algo-stage__dialog" id="mc-help" lang="tr"><button type="button" class="algo-stage__close">Kapat</button>
+    <h2>Monte Carlo ile π Tahmini</h2>
+    <p>Birim karenin içine düzgün dağılımlı rastgele noktalar atılır ve çeyrek dairenin içine düşenler sayılır. İçeride kalan noktaların oranı, π'nin bir tahminini verir.</p>
+    <h3>Yöntemin fikri</h3>
+    <p>Kenarı 1 olan karenin alanı 1'dir. Merkezi karenin köşesinde, yarıçapı 1 olan çeyrek dairenin alanı ise π/4'tür. Kareden düzgün seçilen bir (x, y) noktası x² + y² ≤ 1 olduğunda çeyrek dairenin içindedir ve bunun olasılığı iki alanın oranına, yani π/4'e eşittir. n nokta atıldığında içeride kalanların sayısı k ise k/n ≈ π/4 olur; buradan π ≈ 4 · k / n tahmini elde edilir.</p>
+    <h3>Monte Carlo türü bir algoritma</h3>
+    <p>n nokta için çalışma süresi önceden bellidir: Θ(n). Buna karşılık yanıt rastgeledir ve gerçek değerden sapabilir. Süresi belirli, sonucu yalnızca belli bir olasılıkla doğru (ya da yeterince yakın) olan algoritmalara Monte Carlo algoritması denir. Sonucu her zaman doğru, süresi rastgele olan Las Vegas algoritmalarından bu yönüyle ayrılır. π tahmininde hata iki yönlüdür: tahmin gerçek değerin hem üstünde hem altında kalabilir.</p>
+    <h3>Hata 1/√n hızıyla küçülür</h3>
+    <p>Her nokta, başarı olasılığı p = π/4 olan bir Bernoulli denemesidir. 4 · k / n tahmininin standart sapması 4 · √(p(1 − p) / n) ≈ 1,64 / √n'dir. Hata bu yüzden yaklaşık 1/√n hızıyla küçülür: doğruluğa bir ondalık basamak eklemek için yaklaşık 100 kat daha çok nokta gerekir. Grafikteki gölgeli bant π ± 1,64/√n aralığıdır; tahmin yaklaşık üçte iki olasılıkla bu bandın içinde kalır.</p>
+    <table>
+      <tr><th>n</th><th>Standart sapma ≈ 1,64/√n</th></tr>
+      <tr><td>100</td><td>0,16</td></tr>
+      <tr><td>10 000</td><td>0,016</td></tr>
+      <tr><td>1 000 000</td><td>0,0016</td></tr>
+    </table>
+    <h3>Kullanım</h3>
+    <ul>
+      <li><strong>1 nokta</strong>, <strong>100 nokta</strong> ve <strong>1000 nokta</strong> düğmeleri o kadar nokta atar. Tek nokta atıldığında son noktanın koordinatları ve x² + y² değeri durum satırında görünür, nokta karede halkayla işaretlenir.</li>
+      <li><strong>Sürekli at</strong> noktaları kesintisiz atar; çalışırken düğme <strong>Durdur</strong> olur. <strong>Hız</strong> her karede atılan nokta sayısını belirler: 1, 10, 100 ya da 1000.</li>
+      <li><strong>Tohum</strong>, sözde rastgele üretecin başlangıç değeridir. Aynı tohum her zaman aynı nokta dizisini verir. Tohum değiştiğinde ya da <strong>Sıfırla</strong> düğmesine basıldığında çalışma baştan başlar. Üreteç mulberry32'dir; sunumdaki Java örneği (new Random(2024)) başka bir üreteç kullandığından noktalar onunkilerle birebir aynı değildir.</li>
+      <li>Yeşil noktalar çeyrek dairenin içinde, kırmızı noktalar dışındadır. Grafiğin yatay ekseni nokta sayısını logaritmik ölçekte gösterir; kesikli yatay çizgi gerçek π değeridir.</li>
+      <li>En çok 100 000 nokta atılabilir.</li>
+    </ul>
+  </dialog>
+</div>
+
+<script>
+(function(){
+"use strict";
+var root=document.querySelector(".algo-mcpi");if(!root)return;
+function q(id){return root.querySelector("#"+id);}
+var MAX=100000;
+var sq=q("mc-square"),sctx=sq.getContext("2d"),ch=q("mc-chart"),cctx=ch.getContext("2d"),probe=root.querySelector(".mc-probe");
+var px=new Float32Array(MAX),py=new Float32Array(MAX),pin=new Uint8Array(MAX),est=new Float64Array(MAX+1);
+var n=0,inside=0,drawn=0,rng=null,seed=2024,running=false,raf=0,ringAt=-1,radius=0,SW=400,SH=400,CW=300,CH=200;
+var C={};
+
+function col(name){probe.style.color="var("+name+")";return getComputedStyle(probe).color;}
+function readColors(){C={bg:col("--ds-bg"),text:col("--ds-text"),muted:col("--ds-muted"),link:col("--ds-link"),border:col("--ds-border"),area:col("--ds-surface-strong"),good:col("--ds-good"),bad:col("--ds-accent"),band:col("--ds-hot")};}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function grp(v){return String(v).replace(/\B(?=(\d{3})+(?!\d))/g," ");}
+function dec(v,d){return v.toFixed(d).replace(".",",");}
+
+function fit(cv,ctx){var w=cv.clientWidth,h=cv.clientHeight,dpr=window.devicePixelRatio||1;cv.width=Math.max(1,Math.round(w*dpr));cv.height=Math.max(1,Math.round(h*dpr));ctx.setTransform(dpr,0,0,dpr,0,0);return [w,h];}
+function sizeAll(){var a=fit(sq,sctx);SW=a[0];SH=a[1];var b=fit(ch,cctx);CW=b[0];CH=b[1];}
+
+/* kare: kenar boşlukları */
+var PL=26,PB=24,PT=12,PR=12;
+function side(){return Math.min(SW-PL-PR,SH-PT-PB);}
+function X(x){return PL+x*side();}
+function Y(y){return PT+(1-y)*side();}
+function radFor(k){return k<300?3.2:k<3000?2:k<30000?1.3:0.9;}
+
+function drawPoints(from,to){var r=radius;[[1,C.good],[0,C.bad]].forEach(function(g){sctx.fillStyle=g[1];sctx.beginPath();for(var i=from;i<to;i++){if(pin[i]!==g[0])continue;var x=X(px[i]),y=Y(py[i]);if(r>=2){sctx.moveTo(x+r,y);sctx.arc(x,y,r,0,Math.PI*2);}else sctx.rect(x-r,y-r,2*r,2*r);}sctx.fill();});}
+function drawSquare(){var s=side();sctx.clearRect(0,0,SW,SH);sctx.fillStyle=C.bg;sctx.fillRect(0,0,SW,SH);
+sctx.fillStyle=C.area;sctx.beginPath();sctx.moveTo(X(0),Y(0));sctx.arc(X(0),Y(0),s,-Math.PI/2,0);sctx.closePath();sctx.fill();
+sctx.strokeStyle=C.border;sctx.lineWidth=1.5;sctx.strokeRect(X(0),Y(1),s,s);
+radius=radFor(n);drawPoints(0,n);drawn=n;
+sctx.strokeStyle=C.link;sctx.lineWidth=2;sctx.beginPath();sctx.arc(X(0),Y(0),s,-Math.PI/2,0);sctx.stroke();
+sctx.fillStyle=C.muted;sctx.font="12px system-ui, sans-serif";sctx.textAlign="center";sctx.textBaseline="top";
+sctx.fillText("0",X(0),Y(0)+5);sctx.fillText("1",X(1),Y(0)+5);sctx.fillText("x",X(0.5),Y(0)+5);
+sctx.textAlign="right";sctx.textBaseline="middle";sctx.fillText("1",X(0)-6,Y(1));sctx.fillText("y",X(0)-6,Y(0.5));
+if(ringAt>=0&&ringAt<n){sctx.strokeStyle=C.text;sctx.lineWidth=2;sctx.beginPath();sctx.arc(X(px[ringAt]),Y(py[ringAt]),9,0,Math.PI*2);sctx.stroke();}}
+function updateSquare(){if(ringAt>=0||radFor(n)!==radius||drawn>n){drawSquare();return;}
+drawPoints(drawn,n);drawn=n;
+sctx.strokeStyle=C.link;sctx.lineWidth=2;sctx.beginPath();sctx.arc(X(0),Y(0),side(),-Math.PI/2,0);sctx.stroke();}
+
+/* grafik: x ekseni log10(n), y ekseni tahmin */
+var GL=36,GR=10,GT=8,GB=20,YLO=Math.PI-0.9,YHI=Math.PI+0.9;
+function drawChart(){var w=CW-GL-GR,h=CH-GT-GB;cctx.clearRect(0,0,CW,CH);cctx.fillStyle=C.bg;cctx.fillRect(0,0,CW,CH);
+var dec10=Math.max(2,Math.ceil(Math.log10(Math.max(n,10))-1e-9)),xmax=Math.pow(10,dec10);
+function gx(k){return GL+Math.log10(k)/dec10*w;}
+function gy(v){return GT+(YHI-v)/(YHI-YLO)*h;}
+cctx.save();cctx.beginPath();cctx.rect(GL,GT,w,h);cctx.clip();
+/* bant */
+cctx.fillStyle=C.band;cctx.beginPath();var steps=Math.max(40,Math.round(w));var k,i;
+for(i=0;i<=steps;i++){k=Math.pow(10,dec10*i/steps);var y1=gy(Math.PI+1.64/Math.sqrt(k));if(i===0)cctx.moveTo(gx(k),y1);else cctx.lineTo(gx(k),y1);}
+for(i=steps;i>=0;i--){k=Math.pow(10,dec10*i/steps);cctx.lineTo(gx(k),gy(Math.PI-1.64/Math.sqrt(k)));}
+cctx.closePath();cctx.fill();
+/* ızgara */
+cctx.strokeStyle=C.border;cctx.lineWidth=1;cctx.globalAlpha=0.5;cctx.beginPath();
+for(i=0;i<=dec10;i++){var xx=Math.round(gx(Math.pow(10,i)))+0.5;cctx.moveTo(xx,GT);cctx.lineTo(xx,GT+h);}
+[2.5,3,3.5,4].forEach(function(v){var yy=Math.round(gy(v))+0.5;cctx.moveTo(GL,yy);cctx.lineTo(GL+w,yy);});cctx.stroke();cctx.globalAlpha=1;
+/* gerçek π */
+cctx.strokeStyle=C.text;cctx.lineWidth=1.5;cctx.setLineDash([5,4]);cctx.beginPath();cctx.moveTo(GL,gy(Math.PI));cctx.lineTo(GL+w,gy(Math.PI));cctx.stroke();cctx.setLineDash([]);
+/* tahmin */
+if(n>0){cctx.strokeStyle=C.link;cctx.lineWidth=2;cctx.lineJoin="round";cctx.beginPath();var last=-1;
+for(k=1;k<=n;k++){var xk=Math.round(gx(k)*2)/2;if(xk===last&&k!==n)continue;var yk=gy(est[k]);if(last<0)cctx.moveTo(xk,yk);else cctx.lineTo(xk,yk);last=xk;}
+cctx.stroke();cctx.fillStyle=C.link;cctx.beginPath();cctx.arc(gx(n),gy(est[n]),3,0,Math.PI*2);cctx.fill();}
+cctx.restore();
+cctx.strokeStyle=C.border;cctx.lineWidth=1.5;cctx.strokeRect(GL,GT,w,h);
+/* etiketler */
+cctx.fillStyle=C.muted;cctx.font="11px system-ui, sans-serif";cctx.textAlign="right";cctx.textBaseline="middle";
+[2.5,3,3.5,4].forEach(function(v){cctx.fillText(dec(v,1),GL-4,gy(v));});
+cctx.fillStyle=C.text;cctx.font="bold 12px system-ui, sans-serif";cctx.fillText("π",GL-4,gy(Math.PI));
+cctx.fillStyle=C.muted;cctx.font="11px system-ui, sans-serif";cctx.textBaseline="top";
+var stepL=dec10>4?2:1;for(i=0;i<=dec10;i+=stepL){cctx.textAlign=i===0?"left":i===dec10?"right":"center";cctx.fillText(grp(Math.pow(10,i)),gx(Math.pow(10,i)),GT+h+4);}}
+
+function metrics(){q("mc-n").textContent=grp(n);q("mc-in").textContent=grp(inside);
+if(n===0){q("mc-est").textContent="–";q("mc-err").textContent="–";return;}
+var e=4*inside/n;q("mc-est").textContent=dec(e,4);q("mc-err").textContent=dec(Math.abs(e-Math.PI),4);}
+function status(t){q("mc-status").textContent=t;}
+function setLimit(){var full=n>=MAX;["mc-add1","mc-add100","mc-add1000","mc-run"].forEach(function(id){q(id).disabled=full;});if(full){stop();status("Üst sınıra ulaşıldı: "+grp(MAX)+" nokta.");}}
+
+function add(k){var c=0;k=Math.min(k,MAX-n);for(var i=0;i<k;i++){var x=rng(),y=rng(),ins=x*x+y*y<=1;px[n]=x;py[n]=y;pin[n]=ins?1:0;if(ins){inside++;c++;}n++;est[n]=4*inside/n;}return c;}
+function render(){updateSquare();drawChart();metrics();}
+function addClick(k){var prevRing=ringAt;var c=add(k);
+if(k===1&&n>0){var i=n-1,x=px[i],y=py[i],s=x*x+y*y;ringAt=i;
+if(prevRing>=0)drawSquare();render();status("Son nokta ("+dec(x,4)+"; "+dec(y,4)+"): x² + y² = "+dec(s,4)+(pin[i]?" ≤ 1 → içeride.":" > 1 → dışarıda."));}
+else{ringAt=-1;if(prevRing>=0)drawSquare();render();status(grp(k)+" nokta atıldı; bu grupta içeride kalan: "+grp(c)+".");}
+setLimit();}
+
+function loop(){if(!running)return;var k=Number(q("mc-speed").value)||10;add(k);render();status("Sürekli atılıyor… n = "+grp(n)+", π ≈ "+dec(est[n],4));if(n>=MAX){setLimit();return;}raf=requestAnimationFrame(loop);}
+function start(){if(running||n>=MAX)return;if(ringAt>=0){ringAt=-1;drawSquare();}running=true;q("mc-run").textContent="Durdur";raf=requestAnimationFrame(loop);}
+function stop(){if(!running)return;running=false;cancelAnimationFrame(raf);q("mc-run").textContent="Sürekli at";if(n<MAX)status("Durduruldu: n = "+grp(n)+", π ≈ "+dec(est[n],4)+".");}
+
+function reset(){stop();var raw=q("mc-seed").value.trim(),v=Number(raw);
+if(raw===""||!Number.isFinite(v)||v<0||v>4294967295||Math.floor(v)!==v){status("Tohum 0 ile 4 294 967 295 arasında bir tam sayı olmalı; "+seed+" kullanılıyor.");q("mc-seed").value=seed;}else{seed=v;status("Hazır: tohum "+seed+".");}
+rng=mulberry32(seed>>>0);n=0;inside=0;drawn=0;ringAt=-1;est[0]=0;drawSquare();drawChart();metrics();setLimit();}
+
+q("mc-add1").addEventListener("click",function(){addClick(1);});
+q("mc-add100").addEventListener("click",function(){addClick(100);});
+q("mc-add1000").addEventListener("click",function(){addClick(1000);});
+q("mc-run").addEventListener("click",function(){if(running)stop();else start();});
+q("mc-reset").addEventListener("click",reset);
+q("mc-seed").addEventListener("change",reset);
+function redrawAll(){readColors();drawSquare();drawChart();}
+new MutationObserver(redrawAll).observe(document.documentElement,{attributes:true,attributeFilter:["class","data-theme"]});
+window.addEventListener("resize",function(){sizeAll();redrawAll();});
+sizeAll();readColors();reset();
+})();
+</script>
+<script src="deck/stage.js"></script>
