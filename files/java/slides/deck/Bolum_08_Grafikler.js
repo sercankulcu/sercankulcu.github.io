@@ -1,4 +1,4 @@
-/* Bölüm 8: Grafikler - Swing pencerelerinin tarayıcıdaki etkileşimli benzerleri */
+/* Bölüm 9: Grafikler - Swing pencerelerinin tarayıcıdaki etkileşimli benzerleri */
 (function () {
   var SVGNS = "http://www.w3.org/2000/svg";
 

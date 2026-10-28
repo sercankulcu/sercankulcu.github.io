@@ -1,4 +1,4 @@
-/* Bölüm 7: Giriş Çıkış - karakter kodlama ve ByteBuffer deneme alanları */
+/* Bölüm 8: Giriş Çıkış - karakter kodlama ve ByteBuffer deneme alanları */
 (function () {
   function hex(n) { var s = n.toString(16).toUpperCase(); return s.length < 2 ? "0" + s : s; }
   function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }

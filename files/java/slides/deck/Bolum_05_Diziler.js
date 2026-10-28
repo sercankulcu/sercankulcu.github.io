@@ -1,4 +1,4 @@
-/* Bölüm 5: Diziler - Tic Tac Toe demosu (char[3][3] tahtası) */
+/* Bölüm 3: Diziler - Tic Tac Toe demosu (char[3][3] tahtası) */
 (function () {
   document.querySelectorAll('.ds-deck [data-demo="j051-ttt"]').forEach(function (demo) {
     var grid = demo.querySelector(".j051-ttt");
