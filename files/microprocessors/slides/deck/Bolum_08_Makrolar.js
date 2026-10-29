@@ -59,9 +59,9 @@ document.querySelectorAll('.ds-deck [data-demo="m08-macro"]').forEach(function (
     expOut.innerHTML = out.join("\n");
     var one = sizeOf(m, args), proc = one + 1;
     var msg = "Bir kopya ≈ <b>" + one + " bayt</b>. " + n + " kullanım: makro ≈ <b>" + (one * n) + "</b> bayt, prosedür ≈ " + proc + " + " + n + " × 3 = <b>" + (proc + 3 * n) + "</b> bayt.";
-    if (sel.value === "power" && n > 1) msg += " Dikkat: LOCAL olmasaydı <i>powerloop</i> etiketi tekrar ederdi; burada benzersiz adlar (??0000, ??0001) gösteriliyor.";
+    if (sel.value === "power" && n > 1) msg += " LOCAL olmasaydı <i>powerloop</i> etiketi tekrar ederdi; burada benzersiz adlar (??0000, ??0001) gösteriliyor.";
     if (sel.value === "my" && args.some(function (x, i) { return i > 0 && /^(AX|BX)$/i.test(x) && ["AX", "BX"].indexOf(x.toUpperCase()) < i; }))
-      msg += " <b>Uyarı:</b> önceki satırda değişen bir yazmacı parametre olarak verdiniz; eski değeri okunmaz.";
+      msg += " Önceki satırda değişen bir yazmaç parametre olarak verildi; eski değeri okunmaz.";
     status.innerHTML = msg;
   }
 

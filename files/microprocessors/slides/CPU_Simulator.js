@@ -1,4 +1,4 @@
-/* CPU Simulator: 8-bit accumulator CPU, five-phase micro-steps */
+/* İşlemci Simülatörü: 8 bitlik akümülatörlü işlemci, beş aşamalı mikro adımlar */
 (function () {
 'use strict';
 if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
@@ -6,27 +6,27 @@ if (!document.getElementById('cpu-sim')) return;
 const $ = id => document.getElementById(id);
 const EXAMPLES = {
   sum: {
-    help: 'Accumulate 1 + 2 + 3 + 4 + 5. Expected output: 15. RAM[240] is the total; RAM[241] is the counter.',
-    code: `; Sum 1 to 5\n.DATA 240 0\n.DATA 241 1\nloop: LDA 240\nADDM 241\nSTA 240\nLDA 241\nADD 1\nSTA 241\nCMP 6\nJNZ loop\nLDA 240\nOUT\nHLT`
+    help: '1 + 2 + 3 + 4 + 5 toplanır. Beklenen çıktı: 15. RAM[240] toplamı, RAM[241] sayacı tutar.',
+    code: `; 1'den 5'e toplam\n.DATA 240 0\n.DATA 241 1\nloop: LDA 240\nADDM 241\nSTA 240\nLDA 241\nADD 1\nSTA 241\nCMP 6\nJNZ loop\nLDA 240\nOUT\nHLT`
   },
   arithmetic: {
-    help: 'Compute (5 + 9) × 2 using a shift, then store the result. Expected output: 28.',
+    help: '(5 + 9) × 2 kaydırmayla hesaplanır, sonuç belleğe yazılır. Beklenen çıktı: 28.',
     code: `LDI 5\nADD 9\nSHL\nSTA 200\nOUT\nHLT`
   },
   overflow: {
-    help: '250 + 10 wraps to 4 with carry. JC skips the fallback. Expected output: 4.',
+    help: '250 + 10 eldeyle 4\'e sarar. JC, yedek değeri yükleyen komutu atlar. Beklenen çıktı: 4.',
     code: `LDI 250\nADD 10\nJC carried\nLDI 0\ncarried: OUT\nHLT`
   },
   multiply: {
-    help: 'Multiply 7 × 6 by repeated addition. Expected output: 42.',
+    help: '7 × 6, art arda toplamayla çarpılır. Beklenen çıktı: 42.',
     code: `.DATA 240 0\n.DATA 241 6\nloop: LDA 240\nADD 7\nSTA 240\nLDA 241\nSUB 1\nSTA 241\nJNZ loop\nLDA 240\nOUT\nHLT`
   },
   input: {
-    help: 'Queue a number. Output is 1 if it equals 10; otherwise 0. IN waits until a byte is queued.',
+    help: 'Giriş kuyruğuna bir sayı eklenir. Sayı 10 ise çıktı 1, değilse 0 olur. IN, kuyruğa bayt eklenene kadar bekler.',
     code: `IN\nCMP 10\nJZ equal\nLDI 0\nJMP done\nequal: LDI 1\ndone: OUT\nHLT`
   },
   bits: {
-    help: 'Mask the low nibble, invert it with XOR, then shift right. Expected output: 5, 250, 125.',
+    help: 'Düşük nibble maskelenir, XOR ile ters çevrilir, sonra sağa kaydırılır. Beklenen çıktı: 5, 250, 125.',
     code: `LDI 0b10100101\nAND 0x0F\nOUT\nXOR 255\nOUT\nSHR\nOUT\nHLT`
   }
 };
@@ -57,9 +57,9 @@ const OPS = {
 };
 
 function number(t) {
-  if (!/^(?:\d+|0x[\da-f]+|0b[01]+)$/i.test(t)) throw Error('Invalid number: ' + t);
+  if (!/^(?:\d+|0x[\da-f]+|0b[01]+)$/i.test(t)) throw Error('Geçersiz sayı: ' + t);
   const n = Number(t);
-  if (!Number.isInteger(n) || n < 0 || n > 255) throw Error('Byte/address must be 0–255: ' + t);
+  if (!Number.isInteger(n) || n < 0 || n > 255) throw Error('Bayt/adres 0–255 aralığında olmalı: ' + t);
   return n;
 }
 
@@ -74,20 +74,20 @@ function compile(src) {
     let label = null;
     if (m) {
       label = m[1].toUpperCase();
-      if (Object.hasOwn(OPS, label)) throw Error('Line ' + (i + 1) + ': ' + m[1] + ' is an instruction name and cannot be a label');
-      if (Object.hasOwn(labels, label)) throw Error('Line ' + (i + 1) + ': duplicate label ' + m[1]);
+      if (Object.hasOwn(OPS, label)) throw Error('Satır ' + (i + 1) + ': ' + m[1] + ' bir komut adı, etiket olamaz');
+      if (Object.hasOwn(labels, label)) throw Error('Satır ' + (i + 1) + ': yinelenen etiket ' + m[1]);
       labels[label] = rows.length;
       s = s.slice(m[0].length).trim();
     }
     if (!s) return;
     const parts = s.replace(/,/g, ' ').split(/\s+/);
     if (parts[0].toUpperCase() === '.DATA') {
-      if (label) throw Error('Line ' + (i + 1) + ': a label cannot mark a .DATA line (labels name instructions)');
-      if (parts.length !== 3) throw Error('Line ' + (i + 1) + ': .DATA needs address and value');
+      if (label) throw Error('Satır ' + (i + 1) + ': .DATA satırına etiket konamaz (etiketler komutları adlandırır)');
+      if (parts.length !== 3) throw Error('Satır ' + (i + 1) + ': .DATA adres ve değer ister');
       try {
         data[number(parts[1])] = number(parts[2]);
       } catch (e) {
-        throw Error('Line ' + (i + 1) + ': ' + e.message);
+        throw Error('Satır ' + (i + 1) + ': ' + e.message);
       }
       return;
     }
@@ -97,24 +97,24 @@ function compile(src) {
       line: i + 1
     });
   });
-  if (!rows.length || rows.length > 256) throw Error('Use 1–256 instructions.');
+  if (!rows.length || rows.length > 256) throw Error('Program 1–256 komut içermeli.');
   const program = rows.map(r => {
-    if (!Object.hasOwn(OPS, r.op)) throw Error('Line ' + r.line + ': unknown instruction ' + r.op);
+    if (!Object.hasOwn(OPS, r.op)) throw Error('Satır ' + r.line + ': bilinmeyen komut ' + r.op);
     let kind = OPS[r.op];
-    if (r.args.length !== (kind === 'none' ? 0 : 1)) throw Error('Line ' + r.line + ': incorrect operand count');
+    if (r.args.length !== (kind === 'none' ? 0 : 1)) throw Error('Satır ' + r.line + ': işlenen sayısı yanlış');
     let arg = null;
     if (kind !== 'none') {
       const token = r.args[0].toUpperCase();
       if (kind === 'jump' && Object.hasOwn(labels, token)) arg = labels[token];
-      else if (kind === 'jump' && /^[A-Z_]\w*$/.test(token)) throw Error('Line ' + r.line + ': unknown label ' + r.args[0]);
+      else if (kind === 'jump' && /^[A-Z_]\w*$/.test(token)) throw Error('Satır ' + r.line + ': bilinmeyen etiket ' + r.args[0]);
       else {
         try {
           arg = number(r.args[0]);
         } catch (e) {
-          throw Error('Line ' + r.line + ': ' + e.message);
+          throw Error('Satır ' + r.line + ': ' + e.message);
         }
       }
-      if (kind === 'jump' && arg >= rows.length) throw Error('Line ' + r.line + ': jump outside program');
+      if (kind === 'jump' && arg >= rows.length) throw Error('Satır ' + r.line + ': atlama hedefi programın dışında');
     }
     return {
       op: r.op,
@@ -165,7 +165,7 @@ function fresh(data) {
     changed: null,
     active: [],
     wires: [],
-    text: 'Ready. Fetch the first instruction to begin.'
+    text: 'Hazır. İlk adımda ilk komut getirilir.'
   };
 }
 
@@ -183,13 +183,13 @@ function fmt(n) {
   return f === 'hex' ? '0x' + n.toString(16).toUpperCase().padStart(2, '0') : f === 'bin' ? n.toString(2).padStart(8, '0') : String(n);
 }
 
-/* addresses follow the chosen format too (binary values keep hex addresses) */
+/* adresler de seçilen biçimi izler (ikili gösterimde adresler onaltılık kalır) */
 function addr(n) {
   if (n === null || n === undefined) return '—';
   return $('format').value === 'dec' ? String(n) : '0x' + n.toString(16).toUpperCase().padStart(2, '0');
 }
 
-/* show the data-memory page the program actually uses */
+/* programın gerçekten kullandığı veri belleği sayfasını göster */
 function focusPage() {
   const first = program.find(ins => OPS[ins.op] === 'mem');
   const used = first ? first.arg : assembled.data.findIndex(v => v !== 0);
@@ -222,7 +222,7 @@ function assemble() {
     dirty = false;
     focusPage();
     reset();
-    message(program.length + ' instructions assembled. Ready.');
+    message(program.length + ' komut çevrildi. Hazır.');
   } catch (e) {
     dirty = true;
     message(e.message, true);
@@ -242,14 +242,14 @@ function micro() {
   if (!s || dirty || s.halted || s.fault) return false;
   if (s.phase === 0 && s.pc >= program.length) {
     s.fault = true;
-    s.text = 'PC is outside the program. Add HLT or a valid jump.';
+    s.text = 'PC programın dışında. HLT ya da geçerli bir atlama gerekir.';
     pause();
     render();
     return false;
   }
   if (s.phase === 2 && s.ir.op === 'IN' && !s.input.length) {
     s.waiting = true;
-    s.text = 'IN is waiting. Queue a byte, then continue.';
+    s.text = 'IN bekliyor. Kuyruğa bir bayt eklenince devam eder.';
     pause();
     render();
     return false;
@@ -271,16 +271,16 @@ function micro() {
     s.mdr = null;
     s.active = ['Program', 'PC', 'IR'];
     s.wires = ['Fetch', 'PC'];
-    s.text = 'IR ← program[' + s.at + ']; PC ← ' + s.pc + '. Fetched ' + s.ir.text + '.';
+    s.text = 'IR ← program[' + s.at + ']; PC ← ' + s.pc + '. Getirilen: ' + s.ir.text + '.';
   }
   if (phase === 1) {
     s.active = ['IR', 'Control'];
     s.wires = ['Decode'];
-    s.text = 'Decode ' + s.ir.op + ': ' + ({
-      imm: 'immediate operand',
-      mem: 'RAM address',
-      jump: 'branch target',
-      none: 'no explicit operand'
+    s.text = 'Çöz ' + s.ir.op + ': ' + ({
+      imm: 'anlık işlenen',
+      mem: 'RAM adresi',
+      jump: 'dallanma hedefi',
+      none: 'açık işlenen yok'
     } [OPS[s.ir.op]]) + '.';
   }
   if (phase === 2) {
@@ -293,7 +293,7 @@ function micro() {
       s.mar = arg;
       if (op === 'STA') {
         s.operand = s.acc;
-        s.text = 'MAR ← ' + arg + '; prepare ACC for a RAM write.';
+        s.text = 'MAR ← ' + arg + '; ACC, RAM\'e yazılmak üzere hazırlanır.';
         s.active = ['RAM', 'ACC'];
         s.wires = ['Address'];
       } else {
@@ -306,14 +306,14 @@ function micro() {
     } else if (op === 'IN') {
       s.operand = s.input[0];
       s.active = ['Operand'];
-      s.text = 'Latch the next input byte: ' + s.operand + '. It is consumed at write back.';
+      s.text = 'Sıradaki giriş baytı kilitlenir: ' + s.operand + '. Kuyruktan geri yaz adımında çıkar.';
     } else if (arg !== null) {
       s.operand = arg;
       s.active = ['IR', 'Operand'];
       s.wires = ['Immediate'];
-      s.text = 'Operand latch ← ' + arg + '.';
+      s.text = 'İşlenen kilidi ← ' + arg + '.';
     } else {
-      s.text = 'No operand transfer is needed for ' + op + '.';
+      s.text = op + ' için işlenen aktarımı gerekmez.';
       s.active = ['Control'];
     }
   }
@@ -390,13 +390,13 @@ function micro() {
         unary = ['NOT', 'SHL', 'SHR'].includes(op);
       s.active = load ? ['Operand', 'ALU'] : unary ? ['ACC', 'ALU'] : ['ACC', 'Operand', 'ALU'];
       s.wires = load ? ['Operand'] : unary ? ['Acc'] : ['Acc', 'Operand'];
-      s.text = op + ': result = ' + p.result + (raw !== p.result ? ' (wrapped from ' + raw + ')' : '') + '; pending flags Z=' + p.flags.z + ', N=' + p.flags.n + ', C=' + p.flags.c + '.';
+      s.text = op + ': sonuç = ' + p.result + (raw !== p.result ? ' (' + raw + ' değerinden sarıldı)' : '') + '; bekleyen bayraklar Z=' + p.flags.z + ', N=' + p.flags.n + ', C=' + p.flags.c + '.';
     } else if (OPS[op] === 'jump') {
       s.active = ['Control', 'Flags'];
-      s.text = op + ': branch ' + (p.taken ? 'taken → ' + arg : 'not taken') + '.';
+      s.text = op + ': ' + (p.taken ? 'atlanır → ' + arg : 'atlanmaz') + '.';
     } else {
       s.active = ['Control'];
-      s.text = op + ': ' + (op === 'STA' ? 'prepare RAM write' : op === 'OUT' ? 'prepare output' : op === 'HLT' ? 'prepare halt' : 'no state change') + '.';
+      s.text = op + ': ' + (op === 'STA' ? 'RAM\'e yazma hazırlanır' : op === 'OUT' ? 'çıkış hazırlanır' : op === 'HLT' ? 'durma hazırlanır' : 'durum değişmez') + '.';
     }
     s.pending = p;
   }
@@ -435,7 +435,7 @@ function micro() {
     s.count++;
     s.trace.push(String(s.at).padStart(3, '0') + ' ' + s.ir.text.padEnd(9) + 'ACC=' + fmt(s.acc));
     if (s.trace.length > 100) s.trace.shift();
-    s.text = 'Committed ' + s.ir.text + '. ' + (s.halted ? 'CPU halted.' : p.store ? 'RAM[' + p.store[0] + '] ← ' + p.store[1] + '.' : 'Next PC = ' + s.pc + '.');
+    s.text = s.ir.text + ' tamamlandı. ' + (s.halted ? 'İşlemci durdu.' : p.store ? 'RAM[' + p.store[0] + '] ← ' + p.store[1] + '.' : 'Sıradaki PC = ' + s.pc + '.');
   }
   s.ticks++;
   s.phase = (phase + 1) % 5;
@@ -462,7 +462,7 @@ function run() {
     if (!running) return;
     if (s.phase === 0 && breaks.has(s.pc) && s.pc !== skip) {
       pause();
-      s.text = 'Breakpoint before instruction ' + s.pc + '. Press Run to resume.';
+      s.text = s.pc + ' numaralı komuttan önce kesme noktası. Çalıştır ile devam eder.';
       render();
       return;
     }
@@ -473,7 +473,7 @@ function run() {
     skip = null;
     if (++budget >= 10000) {
       pause();
-      s.text = 'Paused after 10,000 micro-steps. Run to continue.';
+      s.text = '10.000 mikro adımdan sonra duraklatıldı. Çalıştır ile devam eder.';
       render();
       return;
     }
@@ -484,7 +484,7 @@ function run() {
 
 const LIST_ROWS = 7;
 
-/* keep only the newest items that fit in a short fixed-size box */
+/* kısa, sabit boyutlu kutuya sığan en yeni öğeleri tut */
 function tail(items, max) {
   let out = '';
   for (let i = items.length - 1; i >= 0; i--) {
@@ -499,10 +499,10 @@ function render() {
   if (!s) return;
   for (const id of ['Program', 'PC', 'IR', 'Control', 'RAM', 'ACC', 'Operand', 'ALU', 'Flags', 'Output']) $('n' + id).classList.toggle('active', s.active.includes(id));
   for (const id of ['Fetch', 'PC', 'Decode', 'Read', 'Operand', 'Acc', 'Write', 'Store', 'Out', 'Address', 'Immediate', 'Branch', 'Flags']) $('w' + id).classList.toggle('on', s.wires.includes(id));
-  $('vProgram').textContent = s.ir ? s.ir.text : 'slot 0';
+  $('vProgram').textContent = s.ir ? s.ir.text : 'konum 0';
   $('vPC').textContent = fmt(s.pc);
   $('vIR').textContent = s.ir ? s.ir.text : '—';
-  $('vControl').textContent = ['FETCH', 'DECODE', 'OPERAND', 'EXECUTE', 'WRITE BACK'][s.last] || 'READY';
+  $('vControl').textContent = ['GETİR', 'ÇÖZ', 'İŞLENEN', 'YÜRÜT', 'GERİ YAZ'][s.last] || 'HAZIR';
   $('vMAR').textContent = fmt(s.mar);
   $('vMDR').textContent = fmt(s.mdr);
   const ramStart = Math.floor((s.mar ?? selected) / 8) * 8;
@@ -518,20 +518,20 @@ function render() {
   $('vResult').textContent = s.pending?.result === undefined ? '—' : fmt(s.pending.result);
   $('vFlags').textContent = 'Z ' + s.z + '  N ' + s.n + '  C ' + s.c;
   $('vOutput').textContent = fmt(s.output.at(-1));
-  $('status').textContent = dirty ? 'Reassemble' : s.fault ? 'Fault' : s.halted ? 'Halted' : s.waiting ? 'Waiting' : running ? 'Running' : s.ticks ? 'Paused' : 'Ready';
+  $('status').textContent = dirty ? 'Yeniden çevir' : s.fault ? 'Hata' : s.halted ? 'Durdu' : s.waiting ? 'Bekliyor' : running ? 'Çalışıyor' : s.ticks ? 'Duraklatıldı' : 'Hazır';
   const help = $('exampleHelp').textContent;
-  $('explanation').textContent = s.ticks === 0 && !s.fault && !s.waiting && help && !dirty ? help + ' Press Micro-step to begin.' : s.text;
+  $('explanation').textContent = s.ticks === 0 && !s.fault && !s.waiting && help && !dirty ? help + ' Mikro adım ile başlanır.' : s.text;
   [...$('phases').children].forEach((el, i) => el.classList.toggle('active', i === s.last));
   $('count').textContent = s.count;
   $('ticks').textContent = s.ticks;
   $('binary').textContent = s.acc.toString(2).padStart(8, '0');
   $('signed').textContent = s.acc > 127 ? s.acc - 256 : s.acc;
-  $('output').textContent = s.output.length ? tail(s.output.map(fmt), 24) : 'No output yet.';
+  $('output').textContent = s.output.length ? tail(s.output.map(fmt), 24) : 'Henüz çıktı yok.';
   $('output').title = s.output.map(fmt).join('  ');
-  $('queued').textContent = 'Input queue: ' + (s.input.length ? s.input.map(fmt).join(', ') : 'empty');
+  $('queued').textContent = 'Giriş kuyruğu: ' + (s.input.length ? s.input.map(fmt).join(', ') : 'boş');
   $('queued').title = $('queued').textContent;
-  $('trace').textContent = s.trace.slice(-3).join('\n') || 'Waiting for the first\ninstruction.';
-  /* listing: a fixed window of rows around the current instruction */
+  $('trace').textContent = s.trace.slice(-3).join('\n') || 'İlk komut\nbekleniyor.';
+  /* liste: o anki komutun çevresinde sabit sayıda satır */
   const cur = s.phase === 0 ? s.pc : s.at;
   const first = Math.max(0, Math.min(cur - 2, program.length - LIST_ROWS));
   $('listing').replaceChildren();
@@ -544,7 +544,7 @@ function render() {
     bt.type = 'button';
     bt.className = 'break' + (breaks.has(i) ? ' set' : '');
     bt.textContent = breaks.has(i) ? '●' : '○';
-    bt.setAttribute('aria-label', 'Toggle breakpoint at ' + i);
+    bt.setAttribute('aria-label', i + ' numaralı komutta kesme noktasını aç/kapat');
     bt.setAttribute('aria-pressed', String(breaks.has(i)));
     bt.onclick = () => {
       breaks.has(i) ? breaks.delete(i) : breaks.add(i);
@@ -559,7 +559,7 @@ function render() {
     }
     $('listing').append(row);
   });
-  $('listHead').textContent = program.length > LIST_ROWS ? 'Instruction · ' + first + '–' + (first + LIST_ROWS - 1) + ' / ' + program.length : 'Instruction';
+  $('listHead').textContent = program.length > LIST_ROWS ? 'Komut · ' + first + '–' + (first + LIST_ROWS - 1) + ' / ' + program.length : 'Komut';
   $('memory').replaceChildren();
   $('memory').classList.toggle('is-bin', $('format').value === 'bin');
   let start = Number($('page').value) || 0;
@@ -573,8 +573,8 @@ function render() {
     const bt = document.createElement('button');
     bt.type = 'button';
     bt.className = 'cell' + (s.changed === i ? ' changed' : '') + (selected === i ? ' selected' : '');
-    bt.setAttribute('aria-label', 'RAM address ' + i + ', value ' + s.ram[i]);
-    bt.title = 'Address ' + addr(i);
+    bt.setAttribute('aria-label', 'RAM adresi ' + i + ', değer ' + s.ram[i]);
+    bt.title = 'Adres ' + addr(i);
     bt.textContent = fmt(s.ram[i]);
     bt.onclick = () => {
       selected = i;
@@ -583,7 +583,7 @@ function render() {
     };
     $('memory').append(bt);
   }
-  $('address').textContent = 'Address ' + addr(selected);
+  $('address').textContent = 'Adres ' + addr(selected);
   $('run').disabled = running || dirty || s.halted || s.fault;
   for (const id of ['micro', 'step']) $(id).disabled = running || dirty || s.halted || s.fault;
   $('back').disabled = running || dirty || !history.length;
@@ -624,7 +624,7 @@ $('speed').oninput = () => {
 $('source').oninput = () => {
   pause();
   dirty = true;
-  message('Source changed. Assemble & reset to apply it.');
+  message('Kaynak değişti. Uygulamak için Çevir ve sıfırla.');
   render();
 };
 $('memWrite').onclick = () => {
@@ -633,7 +633,7 @@ $('memWrite').onclick = () => {
     s.ram[selected] = value;
     s.changed = selected;
     history = [];
-    message('RAM[' + selected + '] updated. Reset restores .DATA values.');
+    message('RAM[' + selected + '] güncellendi. Sıfırla, .DATA değerlerini geri yükler.');
     render();
   } catch (e) {
     message(e.message, true);
@@ -647,14 +647,14 @@ $('queue').onclick = () => {
     s.waiting = false;
     history = [];
     $('input').value = '';
-    message('Queued ' + values.length + ' byte(s).');
+    message('Kuyruğa ' + values.length + ' bayt eklendi.');
     render();
   } catch (e) {
     message(e.message, true);
   }
 };
 
-/* source editor: a dialog outside the 800x600 stage */
+/* kaynak düzenleyici: 800x600 sahnenin dışında bir diyalog */
 const editor = $('cpu-editor');
 document.body.appendChild(editor);
 
@@ -673,7 +673,7 @@ editor.addEventListener('click', e => {
   if (outside || e.target.closest('.agt-oyun__close')) closeEditor();
 });
 
-/* keyboard: → micro-step, Shift + → instruction, ← back */
+/* klavye: → mikro adım, Shift + → komut, ← geri */
 $('cpu-sim').addEventListener('keydown', e => {
   if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
   if (e.key === 'ArrowRight') {
@@ -700,7 +700,7 @@ $('save').onclick = () => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'cpu-program.asm';
+  a.download = 'islemci-programi.asm';
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
@@ -709,19 +709,19 @@ $('file').onchange = async () => {
   const f = $('file').files[0];
   if (!f) return;
   if (f.size > 100000) {
-    message('Source file must be smaller than 100 KB.', true);
+    message('Kaynak dosya 100 KB\'tan küçük olmalı.', true);
     return;
   }
   try {
     const text = await f.text();
     pause();
     $('source').value = text;
-    $('exampleHelp').textContent = 'Imported program: ' + f.name;
+    $('exampleHelp').textContent = 'İçe aktarılan program: ' + f.name;
     dirty = true;
-    message('Imported. Assemble & reset to run.');
+    message('İçe aktarıldı. Çalıştırmak için Çevir ve sıfırla.');
     render();
   } catch (e) {
-    message('Could not read this file.', true);
+    message('Bu dosya okunamadı.', true);
   }
   $('file').value = '';
 };

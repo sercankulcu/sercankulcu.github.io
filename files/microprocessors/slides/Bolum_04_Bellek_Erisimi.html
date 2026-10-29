@@ -2,7 +2,7 @@
 layout: without-sidebar
 title: "Bölüm 4: Bellek Erişimi"
 permalink: /files/microprocessors/slides/Bolum_04_Bellek_Erisimi.html
-excerpt: "Mikroişlemciler dersi Bölüm 4 sunumu: adresleme modları, ileri kaydırma, etkin ve fiziksel adres, kesim öneki, byte ptr/word ptr, little-endian, MOV ve XCHG komutları, video belleği örneği ve sayı tabanları."
+excerpt: "Mikroişlemciler dersi Bölüm 4 sunumu: adresleme modları (dizgi, G/Ç ve göreceli mod dahil), ileri kaydırma, etkin ve fiziksel adres, kesim öneki, byte ptr/word ptr, little-endian, MOV ve XCHG komutları, video belleği örneği ve sayı tabanları."
 ---
 
 <!-- ds-guard:begin -->
@@ -221,6 +221,19 @@ excerpt: "Mikroişlemciler dersi Bölüm 4 sunumu: adresleme modları, ileri kay
 <tr><td>Tabanlı-indisli + yer değiştirme</td><td><code>MOV AL, [BX+SI+8]</code></td><td>DS:BX+SI+8</td></tr>
 </tbody></table>
 <p class="ds-deck__foot">İlk ikisi belleğe gitmez; geri kalanlar etkin adres (EA) hesaplar. Fiziksel adres = kesim × 10h + EA.</p>
+</section>
+
+<section class="ds-deck__slide" data-title="Dizgi, G/Ç ve Göreceli Mod" data-section="Adresleme Modları">
+  <p class="ds-deck__kicker">Adresleme Modları</p>
+  <h2>Dizgi, G/Ç ve Göreceli Mod</h2>
+<p class="ds-deck__small">Üç mod daha vardır: işlenen komutta hiç yazılmaz, bellekten ayrı bir adres alanında bulunur ya da adres IP'ye göre hesaplanır.</p>
+<div class="ds-deck__grid ds-deck__grid--3 ds-deck__small">
+<div class="ds-deck__card"><strong>Dizgi modu</strong>Dizgi komutlarının işlenenleri <b>örtüktür</b>: kaynak <code>DS:SI</code>, hedef <code>ES:DI</code>. Her işlemden sonra SI ve DI, DF = 0 iken artar, DF = 1 iken azalır (bayt ±1, sözcük ±2).<pre style="font-size:12.5px;margin:6px 0 0;padding:6px 8px"><span class="kw">MOVSB</span> <span class="cm">; ES:[DI] ← DS:[SI]</span></pre></div>
+<div class="ds-deck__card"><strong>G/Ç modu</strong>Portlar bellekten ayrı, 64 K'lık bir adres alanındadır. Veri yalnız <b>AL</b> ya da <b>AX</b> üzerinden geçer; port 0–255 ise numarası komutta, daha büyükse <b>DX</b>'te verilir.<pre style="font-size:12.5px;margin:6px 0 0;padding:6px 8px"><span class="kw">IN</span>  AL, 45h
+<span class="kw">OUT</span> DX, AX</pre></div>
+<div class="ds-deck__card"><strong>Göreceli mod</strong>Komutta hedefin kendisi değil, IP'ye eklenecek <b>işaretli uzaklık</b> bulunur: IP = sonraki komutun adresi + uzaklık. Kısa atlamalarda uzaklık 8 bittir (−128 … +127).<pre style="font-size:12.5px;margin:6px 0 0;padding:6px 8px"><span class="kw">JNZ</span> dongu <span class="cm">; 75 FA = −6</span></pre></div>
+</div>
+<p class="ds-deck__foot">Komut adları bitişik yazılır (<code>MOVSB</code>, <code>MOVS B</code> değil). OUT'ta önce port, sonra veri yazmacı gelir: <code>OUT 50h, AL</code>; <code>IN A, 45</code> 8085 yazımıdır.</p>
 </section>
 
 <section class="ds-deck__slide" data-title="Adresleme Modları: Kod İzleme" data-section="Adresleme Modları">
@@ -688,7 +701,7 @@ dizi <span class="dir">dw</span> 1234h, 5678h, 9ABCh</pre>
 <tr><td><strong>memory</strong></td><td><code>[BX]</code>, <code>[BX+SI+7]</code>, değişken…</td></tr>
 <tr><td><strong>immediate</strong></td><td><code>5</code>, <code>-24</code>, <code>3Fh</code>, <code>10001101b</code>…</td></tr>
 </tbody></table>
-<p class="ds-deck__foot">Dikkat: <code>MOV SREG, immediate</code> ve <code>MOV SREG, SREG</code> yoktur; değer önce bir genel yazmaca alınır.</p>
+<p class="ds-deck__foot"><code>MOV SREG, immediate</code> ve <code>MOV SREG, SREG</code> yoktur; değer önce bir genel yazmaca alınır.</p>
 </section>
 
 <section class="ds-deck__slide" data-title="MOV: Geçerli mi?" data-section="MOV Komutu">
@@ -705,9 +718,9 @@ dizi <span class="dir">dw</span> 1234h, 5678h, 9ABCh</pre>
 </tbody></table>
 <details class="ds-deck__answers"><summary>Cevaplar</summary><ol>
 <li>Geçersiz: bellekten belleğe MOV yok → <code>MOV AL,[SI]</code> · <code>MOV [BX],AL</code>.</li>
-<li>Geçersiz: kesimden kesime yok → <code>MOV AX,ES</code> · <code>MOV DS,AX</code>.</li>
+<li>Geçersiz: kesimden kesime yok → <code>MOV AX,ES</code> · <code>MOV DS,AX</code> ya da <code>PUSH ES</code> · <code>POP DS</code>.</li>
 <li>Geçersiz: kesime sabit atanamaz.</li>
-<li>Geçersiz: CS hedef olamaz (JMP FAR kullanılır).</li>
+<li>Geçersiz: CS hedef olamaz (JMP FAR kullanılır); IP de doğrudan yazılamaz (<code>MOV IP, AX</code> yerine <code>JMP AX</code>).</li>
 <li>Boyut belirsiz → <code>BYTE PTR</code> / <code>WORD PTR</code> gerekir.</li>
 <li>Geçerli (CS kaynak olabilir). 7. Geçerli (ama yığını bozabilir). 8. Geçersiz: boyutlar farklı. 9. Geçerli: <code>[BP+SI]</code>, kesim SS. 10. Geçersiz: hedef sabit olamaz.</li>
 </ol></details>

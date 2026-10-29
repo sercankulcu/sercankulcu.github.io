@@ -28,7 +28,7 @@
       var a = parse(q("a").value), b = one ? 0 : parse(q("b").value);
       var lim = n === 8 ? 255 : 65535, lo = n === 8 ? -128 : -32768;
       if (isNaN(a) || isNaN(b) || a < lo || a > lim || b < lo || b > lim) {
-        out.innerHTML = ""; status.innerHTML = n + " bitlik aralıkta değer girin (" + lo + " … " + lim + ").";
+        out.innerHTML = ""; status.innerHTML = n + " bitlik aralık dışında; değerler " + lo + " … " + lim + " arasında olmalı.";
         return;
       }
       a &= M; b &= M;
@@ -112,5 +112,61 @@
     }
     demo.querySelectorAll("input, select").forEach(function (el) { el.addEventListener("input", calc); el.addEventListener("change", calc); });
     calc();
+  });
+})();
+
+/* kaydırma / döndürme gezgini (Komut Kümesi sunumundan taşındı) */
+(function () {
+  function hex2(v) { return ("0" + (v & 0xFF).toString(16).toUpperCase()).slice(-2) + "h"; }
+  function bin8(v) { return ("0000000" + (v & 0xFF).toString(2)).slice(-8); }
+  function signed8(v) { v &= 0xFF; return v > 127 ? v - 256 : v; }
+  function parseHex(s) {
+    s = String(s || "").trim().replace(/h$/i, "");
+    if (!/^[0-9a-fA-F]{1,2}$/.test(s)) return null;
+    return parseInt(s, 16);
+  }
+  function bitsRow(label, v, extra, hot) {
+    var s = "<div class=\"m10-bits\"><em>" + label + "</em>";
+    var b = bin8(v);
+    for (var i = 0; i < 8; i++) {
+      if (i === 4) s += "<span class=\"gap\"></span>";
+      s += "<span" + (hot && hot[i] ? " class=\"is-hot\"" : "") + ">" + b[i] + "</span>";
+    }
+    return s + "<b>" + (extra || "") + "</b></div>";
+  }
+  document.querySelectorAll('.ds-deck [data-demo="m10-shift"]').forEach(function (demo) {
+    var inV = demo.querySelector('[data-in="v"]');
+    var out = demo.querySelector(".m10-out");
+    var status = demo.querySelector(".ds-deck__status");
+    var v = parseHex(inV.value) || 0, cf = 0;
+
+    function render(prev, hot) {
+      out.innerHTML = (prev !== null ? bitsRow("önce", prev, hex2(prev)) : "") +
+        bitsRow("AL", v, hex2(v) + " = " + v + " / " + signed8(v), hot) +
+        "<div class=\"m10-chips\"><span class=\"" + (cf ? "on" : "") + "\">CF = " + cf + "</span></div>";
+    }
+    inV.addEventListener("input", function () {
+      var x = parseHex(inV.value);
+      if (x === null) { status.innerHTML = "Geçerli değer: 00–FF arası onaltılı sayı."; return; }
+      v = x; render(null); status.innerHTML = "AL = <b>" + hex2(v) + "</b>. Bir komut düğmesi seçilince sonuç burada görünür.";
+    });
+    demo.addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-op]");
+      if (!b) return;
+      var o = b.dataset.op, prev = v, msb = (v >> 7) & 1, lsb = v & 1, hot = [0, 0, 0, 0, 0, 0, 0, 0], msg;
+      if (o === "cf") { cf ^= 1; render(null); status.innerHTML = "CF = <b>" + cf + "</b> (RCL/RCR bu biti içeri alır)."; return; }
+      if (o === "shl") { cf = msb; v = (v << 1) & 255; hot[7] = 1; msg = "Sola kaydırıldı, sağdan 0 girdi; çıkan b7 = " + msb + " → CF. Değer ×2 (mod 256)."; }
+      if (o === "shr") { cf = lsb; v = v >> 1; hot[0] = 1; msg = "Sağa kaydırıldı, soldan 0 girdi; çıkan b0 = " + lsb + " → CF. İşaretsiz ÷2."; }
+      if (o === "sar") { cf = lsb; v = (v >> 1) | (v & 0x80); hot[0] = 1; msg = "Aritmetik sağa kaydırma: işaret biti (" + msb + ") korundu. İşaretli ÷2: " + signed8(prev) + " → " + signed8(v) + "."; }
+      if (o === "rol") { cf = msb; v = ((v << 1) | msb) & 255; hot[7] = 1; msg = "b7 = " + msb + " hem b0'a hem CF'ye gitti."; }
+      if (o === "ror") { cf = lsb; v = (v >> 1) | (lsb << 7); hot[0] = 1; msg = "b0 = " + lsb + " hem b7'ye hem CF'ye gitti."; }
+      if (o === "rcl") { var c1 = cf; cf = msb; v = ((v << 1) | c1) & 255; hot[7] = 1; msg = "Eski CF (" + c1 + ") b0'a girdi, b7 (" + msb + ") CF'ye çıktı."; }
+      if (o === "rcr") { var c2 = cf; cf = lsb; v = (v >> 1) | (c2 << 7); hot[0] = 1; msg = "Eski CF (" + c2 + ") b7'ye girdi, b0 (" + lsb + ") CF'ye çıktı."; }
+      inV.value = hex2(v).slice(0, 2);
+      render(prev, hot);
+      status.innerHTML = "<b>" + o.toUpperCase() + " AL, 1</b>: " + msg;
+    });
+    render(null);
+    status.innerHTML = "AL = <b>" + hex2(v) + "</b>. Bir komut düğmesi seçilince sonuç burada görünür.";
   });
 })();

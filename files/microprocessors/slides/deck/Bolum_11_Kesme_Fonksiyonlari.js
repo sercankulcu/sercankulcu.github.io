@@ -1,4 +1,4 @@
-/* Bölüm 11: Kesme Fonksiyonları demoları (öznitelik gezgini, klavye gezgini, piksel adresi gezgini) */
+/* Kesme Fonksiyonları demoları (öznitelik gezgini, klavye gezgini, piksel adresi gezgini) */
 (function () {
   function hex(v, n) { var s = v.toString(16).toUpperCase(); while (s.length < n) s = "0" + s; return s + "h"; }
   var NAMES = ["siyah", "mavi", "yeşil", "camgöbeği", "kırmızı", "eflatun", "kahverengi", "açık gri",
@@ -38,7 +38,7 @@
       big.innerHTML = "BL = <b>" + hex(a, 2) + "</b>";
       status.innerHTML = "<code>mov ah, 09h</code> · <code>mov al, " + (code < 128 && code > 32 ? "'" + esc + "'" : hex(code & 255, 2)) +
         "</code> · <code>mov bh, 0</code> · <code>mov bl, " + hex(a, 2) + "</code> · <code>mov cx, 3</code> · <code>int 10h</code>" +
-        (code > 127 ? " — dikkat: bu karakter 7 bit ASCII dışında" : "");
+        (code > 127 ? " — bu karakter 7 bit ASCII dışında" : "");
     }
     [fg, bg, blink, ch].forEach(function (el) { el.addEventListener("input", update); el.addEventListener("change", update); });
     update();
@@ -67,7 +67,7 @@
     var oAl = demo.querySelector('[data-out="al"]');
     var oAx = demo.querySelector('[data-out="ax"]');
     var status = demo.querySelector(".ds-deck__status");
-    status.innerHTML = "Alana tıklayın ve bir tuşa basın.";
+    status.innerHTML = "Alan seçilip bir tuşa basılınca AH, AL ve AX gösterilir.";
     inp.addEventListener("keydown", function (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -150,6 +150,36 @@
       else { clear(); out.innerHTML = ""; status.innerHTML = "Ekran temizlendi (renk 0)."; }
     });
     clear();
-    show(100, 50, "Bir piksele tıklayın ya da köşegen çizdirin.");
+    show(100, 50, "Bir piksel seçilince ya da köşegen çizdirilince adres hesaplanır.");
+  });
+})();
+
+(function () {
+  function hex(n, w) { return n.toString(16).toUpperCase().padStart(w, "0"); }
+  function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  /* Metinden INT 10h / 0Eh koduna */
+  document.querySelectorAll('.ds-deck [data-demo="m05k-tty"]').forEach(function (demo) {
+    var input = demo.querySelector("input");
+    var pre = demo.querySelector(".m05k-tty-code");
+    var scr = demo.querySelector(".m05k-tty-scr");
+    var status = demo.querySelector(".ds-deck__status");
+    function render() {
+      var s = input.value, lines = ['<span class="kw">MOV</span> AH, 0Eh', ""], bad = 0;
+      for (var i = 0; i < s.length; i++) {
+        var code = s.charCodeAt(i);
+        if (code > 126 || code < 32) { bad++; continue; }
+        var lit = s[i] === "'" ? "27h" : "'" + esc(s[i]) + "'";
+        lines.push('<span class="kw">MOV</span> AL, ' + lit + ' <span class="cm">; ' + code + " = " + hex(code, 2) + "h</span>");
+        lines.push('<span class="kw">INT</span> 10h');
+      }
+      lines.push('<span class="kw">RET</span>');
+      pre.innerHTML = lines.join("\n");
+      scr.textContent = s.replace(/[^\x20-\x7e]/g, "") + "_";
+      status.innerHTML = bad ? "ASCII dışı " + bad + " karakter atlandı (ör. Türkçe harfler kod sayfasına bağlıdır)." :
+        "<b>" + (s.length * 2 + 2) + "</b> komut, " + s.length + " kesme çağrısı";
+    }
+    input.addEventListener("input", render);
+    render();
   });
 })();

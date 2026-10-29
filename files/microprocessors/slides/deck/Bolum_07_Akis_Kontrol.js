@@ -32,7 +32,7 @@
       var a = parseHex(at.value), t = parseHex(to.value);
       if (a === null || t === null) {
         res.innerHTML = "";
-        status.innerHTML = "Adresleri 1–4 haneli onaltılık girin (ör. <b>010C</b>).";
+        status.innerHTML = "Adresler 1–4 haneli onaltılık olmalı (ör. <b>010C</b>).";
         return;
       }
       var next = (a + len) & 0xFFFF;
@@ -44,7 +44,7 @@
       if (len === 2) {
         if (d < -128 || d > 127) {
           res.innerHTML = html;
-          status.innerHTML = "<b>Menzil dışı!</b> rel8 yalnızca −128…+127 olabilir. Ters koşul + JMP NEAR kullanın.";
+          status.innerHTML = "<b>Menzil dışı!</b> rel8 yalnızca −128…+127 olabilir. Çözüm: ters koşul + JMP NEAR.";
           return;
         }
         res.innerHTML = html + "<br>rel8 = " + hex(d & 0xFF, 2) + "h → makine kodu <b>" + code + " " + hex(d & 0xFF, 2) + "</b>";

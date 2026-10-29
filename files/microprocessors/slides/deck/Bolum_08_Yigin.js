@@ -36,7 +36,7 @@ document.querySelectorAll('.ds-deck [data-demo="m08-stack"]').forEach(function (
   function reset() {
     mem = {}; mem[TOP] = 0; sp = TOP; lines = ["; .COM: [FFFEh] = 0000h (DOS)"];
     writeReg("AX", 0x1212); writeReg("BX", 0x3434); writeReg("CX", 0x0008);
-    status.innerHTML = "SP = <b>FFFEh</b>. Bir PUSH ya da POP düğmesine basın.";
+    status.innerHTML = "SP = <b>FFFEh</b>. Bir PUSH ya da POP düğmesi seçilince yığın güncellenir.";
     draw();
   }
 
@@ -48,7 +48,7 @@ document.querySelectorAll('.ds-deck [data-demo="m08-stack"]').forEach(function (
     if (op === "push") {
       var v = readReg(r);
       if (v === null) { status.innerHTML = r + " geçerli bir 16 bit hex değer değil (ör. 12AB)."; return; }
-      if (((sp - 2) & 0xFFFF) < TOP - 2 * (CELLS - 1)) { status.innerHTML = "Gösterim alanı doldu (" + CELLS + " word). Gerçek yığın daha derine inebilir; önce POP yapın."; return; }
+      if (((sp - 2) & 0xFFFF) < TOP - 2 * (CELLS - 1)) { status.innerHTML = "Gösterim alanı doldu (" + CELLS + " word). Gerçek yığın daha derine inebilir; önce POP gerekir."; return; }
       sp = (sp - 2) & 0xFFFF; mem[sp] = v;
       lines.push("PUSH " + r + "  ; [" + hex4(sp) + "] ← " + hex4(v));
       status.innerHTML = "<b>PUSH " + r + "</b>: SP − 2 = " + hex4(sp) + ", sonra [SS:SP] ← " + hex4(v) + ".";

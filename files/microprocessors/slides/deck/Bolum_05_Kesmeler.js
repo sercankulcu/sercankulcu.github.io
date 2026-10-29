@@ -18,7 +18,7 @@
     var status = demo.querySelector(".ds-deck__status");
     function calc() {
       var t = input.value.trim().replace(/h$/i, "");
-      if (!/^[0-9a-f]{1,2}$/i.test(t)) { status.innerHTML = "00 ile FF arasında onaltılık bir değer girin."; out.innerHTML = ""; return; }
+      if (!/^[0-9a-f]{1,2}$/i.test(t)) { status.innerHTML = "Kesme tipi 00 ile FF arasında onaltılık bir değer olmalı."; out.innerHTML = ""; return; }
       var n = parseInt(t, 16), a = n * 4;
       var role = KNOWN[n] || (n < 0x20 ? "Intel tarafından ayrılmış / BIOS" : "DOS veya kullanıcı programlarına açık");
       out.innerHTML = '<table class="ds-deck__table" style="width:auto;font-size:15px">' +
@@ -34,30 +34,5 @@
       b.addEventListener("click", function () { input.value = b.dataset.n; calc(); });
     });
     calc();
-  });
-
-  /* Metinden INT 10h / 0Eh koduna */
-  document.querySelectorAll('.ds-deck [data-demo="m05k-tty"]').forEach(function (demo) {
-    var input = demo.querySelector("input");
-    var pre = demo.querySelector(".m05k-tty-code");
-    var scr = demo.querySelector(".m05k-tty-scr");
-    var status = demo.querySelector(".ds-deck__status");
-    function render() {
-      var s = input.value, lines = ['<span class="kw">MOV</span> AH, 0Eh', ""], bad = 0;
-      for (var i = 0; i < s.length; i++) {
-        var code = s.charCodeAt(i);
-        if (code > 126 || code < 32) { bad++; continue; }
-        var lit = s[i] === "'" ? "27h" : "'" + esc(s[i]) + "'";
-        lines.push('<span class="kw">MOV</span> AL, ' + lit + ' <span class="cm">; ' + code + " = " + hex(code, 2) + "h</span>");
-        lines.push('<span class="kw">INT</span> 10h');
-      }
-      lines.push('<span class="kw">RET</span>');
-      pre.innerHTML = lines.join("\n");
-      scr.textContent = s.replace(/[^\x20-\x7e]/g, "") + "_";
-      status.innerHTML = bad ? "ASCII dışı " + bad + " karakter atlandı (ör. Türkçe harfler kod sayfasına bağlıdır)." :
-        "<b>" + (s.length * 2 + 2) + "</b> komut, " + s.length + " kesme çağrısı";
-    }
-    input.addEventListener("input", render);
-    render();
   });
 })();

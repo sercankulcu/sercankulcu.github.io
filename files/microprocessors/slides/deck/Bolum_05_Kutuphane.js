@@ -55,7 +55,7 @@
       var n = parse(input.value);
       if (isNaN(n) || n < -32768 || n > 65535) {
         out.innerHTML = "";
-        status.innerHTML = "−32768 ile 65535 arasında bir değer girin (ör. -25, 1234, FFE7h).";
+        status.innerHTML = "Değer −32768 ile 65535 arasında olmalı (ör. -25, 1234, FFE7h).";
         return;
       }
       var ax = n & 0xFFFF, signed = ax >= 0x8000 ? ax - 0x10000 : ax;

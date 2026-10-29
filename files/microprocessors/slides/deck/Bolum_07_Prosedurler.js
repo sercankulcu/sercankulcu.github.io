@@ -35,7 +35,7 @@
     function reset() {
       ip = 0x0100; sp = 0xFFFE; stack = [0x0000]; ended = false;
       lines = ["Program 0100h'da başladı. DOS yığına 0000h itti."];
-      status.innerHTML = "Bir CALL ile başlayın.";
+      status.innerHTML = "Simülasyon bir CALL ile başlar.";
       render([]);
     }
     function call(target) {

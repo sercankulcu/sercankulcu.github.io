@@ -1,0 +1,767 @@
+---
+layout: without-sidebar
+title: "Port ile Aygıt Kontrolü"
+permalink: /files/microprocessors/slides/Chapter_10_IO-Ports.html
+redirect_from:
+  - /files/microprocessors/slides/Chapter_09_IO-Ports.html
+excerpt: "IN ve OUT ile port üzerinden sanal aygıt kontrolü: trafik lambaları (port 4), 8255 üzerinden 7 bölütlü gösterge ve hazır bitli step motor; AND/OR/XOR maskeleriyle tek biti açma, kapatma ve değiştirme."
+---
+<!-- ds-guard:begin -->
+<!--
+  Copyright (c) Sercan Külcü. Tüm hakları saklıdır.
+  Bu içerik yalnızca https://sercankulcu.github.io adresinde yayımlanır.
+-->
+<script>
+(function () {
+  var HOST = "sercankulcu.github.io";
+  var izinli = function (h) { return h === HOST || h === "localhost" || h === "127.0.0.1" || h === "[::1]"; };
+  var ok = izinli(location.hostname);
+  try { if (window.top !== window.self && !izinli(window.top.location.hostname)) ok = false; } catch (e) { ok = false; }
+  if (ok) return;
+  document.documentElement.style.visibility = "hidden";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.body.innerHTML = '<p style="max-width:560px;margin:60px auto;padding:0 16px;font:16px/1.6 system-ui,sans-serif;text-align:center">' +
+      'Bu içerik yalnızca <a href="https://' + HOST + '">' + HOST + '</a> adresinde görüntülenebilir.<br>' +
+      'This content is only available at <a href="https://' + HOST + '">' + HOST + '</a>.<br>&copy; Sercan Külcü</p>';
+    document.documentElement.style.visibility = "visible";
+  });
+})();
+</script>
+<!-- ds-guard:end -->
+
+<link rel="stylesheet" href="deck/oyun.css">
+
+<style>
+.mp-io, .mp-io-dlg { --ds-accent:#a61b1b; --ds-link:var(--global-link-color, #2563eb); }
+html[data-theme="dark"] .mp-io, html[data-theme="dark"] .mp-io-dlg { --ds-accent:#f07a7a; }
+.mp-sim .grid { display:grid; grid-template-columns:166px minmax(0,1fr); gap:8px; height:100%; }
+.mp-sim .card { min-width:0; min-height:0; padding:8px 9px; border:1.5px solid var(--ds-border); border-radius:12px; background:var(--ds-bg); }
+.mp-sim .side { display:flex; flex-direction:column; gap:7px; }
+.mp-sim .cap { display:block; margin:0 0 2px; color:var(--ds-muted); font-size:12px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
+.mp-sim select { width:100%; min-height:30px; padding:0 6px; font-size:13px; }
+.mp-sim .params { display:grid; grid-template-columns:1fr 66px; gap:4px 6px; align-items:center; font-size:13px; }
+.mp-sim .params:empty { display:none; }
+.mp-sim .params input, .mp-sim .params select { width:100%; min-height:27px !important; padding:0 5px !important; font-size:13px !important; font-family:ui-monospace, Consolas, monospace !important; }
+.mp-sim .params .wide { grid-column:1 / -1; }
+.mp-sim .btns { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.mp-sim .btns button { min-height:31px; padding:0 4px; font-size:13.5px; }
+.mp-sim .speed { display:flex; align-items:center; gap:6px; color:var(--ds-muted); font-size:12.5px; font-weight:700; }
+.mp-sim .speed input { flex:1; min-width:0; }
+.mp-sim .check { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; cursor:pointer; }
+.mp-sim .score { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.mp-sim .score div { padding:3px; border-radius:10px; background:var(--ds-surface-strong); text-align:center; color:var(--ds-muted); font-size:12px; font-weight:700; }
+.mp-sim .score b { display:block; color:var(--ds-text); font-size:16px; }
+.mp-sim .stepno { margin-top:auto; color:var(--ds-muted); font-size:12px; font-weight:700; text-align:center; }
+.mp-sim .main { display:grid; grid-template-rows:minmax(0,1fr) auto 70px; gap:6px; min-height:0; min-width:0; }
+.mp-sim .pane { display:flex; flex-direction:column; min-height:0; min-width:0; border:1.5px solid var(--ds-border); border-radius:10px; background:var(--ds-surface); overflow:hidden; }
+.mp-sim .pane > .cap { margin:0; padding:3px 8px 1px; }
+.mp-sim .code { flex:1; min-height:0; margin:0; padding:1px 0; overflow:hidden; font:12.5px/1.42 ui-monospace, Consolas, monospace; list-style:none; }
+.mp-sim .code li { display:flex; margin:0; padding:0 6px 0 0; white-space:pre; }
+.mp-sim .code li .of { flex:none; width:44px; padding-left:6px; color:var(--ds-muted); font-size:12px; }
+.mp-sim .code li .nx { flex:none; width:12px; color:var(--ds-link); font-weight:800; }
+.mp-sim .code li .tx { overflow:hidden; text-overflow:ellipsis; }
+.mp-sim .code li.is-cur { background:var(--ds-hot); box-shadow:inset 4px 0 0 var(--ds-accent); }
+.mp-sim .code li.is-head { color:var(--ds-muted); font:700 12px system-ui, sans-serif; padding-top:2px; }
+.mp-sim .code li .cm { color:var(--ds-muted); }
+.mp-sim .regs { display:flex; flex-wrap:nowrap; gap:4px; align-items:stretch; }
+.mp-sim .reg { flex:1; min-width:0; padding:2px 4px; border:1.5px solid var(--ds-border); border-radius:8px; background:var(--ds-bg); text-align:center; }
+.mp-sim .reg span { display:block; color:var(--ds-muted); font:700 12px system-ui, sans-serif; }
+.mp-sim .reg b { display:block; font:700 13.5px ui-monospace, Consolas, monospace; }
+.mp-sim .reg.is-chg { border-color:var(--ds-accent); background:var(--ds-hot); }
+.mp-sim .flags { flex:none; display:flex; flex-direction:column; padding:2px 5px; border:1.5px solid var(--ds-border); border-radius:8px; background:var(--ds-bg); }
+.mp-sim .flags .fh { display:flex; justify-content:space-between; color:var(--ds-muted); font:700 12px system-ui, sans-serif; }
+.mp-sim .flags .fh b { color:var(--ds-text); font:700 12.5px ui-monospace, Consolas, monospace; }
+.mp-sim .flags .fb { display:flex; gap:2px; }
+.mp-sim .flags .fb i { display:block; width:23px; font:700 12px ui-monospace, Consolas, monospace; font-style:normal; text-align:center; border-radius:4px; }
+.mp-sim .flags .fb i small { display:block; color:var(--ds-muted); font:700 12px system-ui, sans-serif; }
+.mp-sim .flags .fb i.on { color:var(--ds-accent); }
+.mp-sim .flags .fb i.is-chg { background:var(--ds-hot); }
+.mp-sim .why { margin:0; padding:4px 10px; overflow:hidden; border-left:4px solid var(--ds-accent); border-radius:8px; background:var(--ds-surface-strong); font-size:13px; line-height:1.35; }
+.mp-sim .qbtns { display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; }
+.mp-sim .qbtns button { min-height:26px; padding:0 10px; font:600 12.5px ui-monospace, Consolas, monospace; }
+.mp-sim .code.is-dense { font-size:12px; line-height:1.26; }
+.mp-io { --io-red:var(--ds-bad); --io-yel:var(--ds-warn); --io-grn:var(--ds-good); --io-off:color-mix(in srgb, var(--ds-text) 14%, var(--ds-bg)); }
+.mp-io .main { grid-template-rows:minmax(0,1fr) auto 62px; }
+.mp-io .top { display:grid; grid-template-columns:262px minmax(0,1fr); gap:6px; min-height:0; }
+.mp-io .dev { flex:1; min-height:0; display:flex; align-items:center; justify-content:center; padding:2px; }
+.mp-io .dev svg { width:100%; height:100%; }
+.mp-io .dev .road { fill:var(--io-off); opacity:.55; }
+.mp-io .dev .pole { fill:var(--ds-bg); stroke:var(--ds-border); stroke-width:1.5; }
+.mp-io .dev .lamp { stroke:var(--ds-border); stroke-width:1; fill:var(--io-off); }
+.mp-io .dev .lamp.r.on { fill:var(--io-red); } .mp-io .dev .lamp.y.on { fill:var(--io-yel); } .mp-io .dev .lamp.g.on { fill:var(--io-grn); }
+.mp-io .dev .seg { fill:var(--io-off); } .mp-io .dev .seg.on { fill:var(--io-red); }
+.mp-io .dev .lbl { fill:var(--ds-muted); font:12px ui-monospace, Consolas, monospace; }
+.mp-io .dev .lblb { fill:var(--ds-text); font:700 13px ui-monospace, Consolas, monospace; }
+.mp-io .dev .mag { fill:var(--io-off); stroke:var(--ds-border); stroke-width:1.5; } .mp-io .dev .mag.on { fill:var(--ds-accent); }
+.mp-io .dev .rotor { fill:var(--ds-node); stroke:var(--ds-link); stroke-width:2; }
+.mp-io .dev .st { font:700 13px system-ui, sans-serif; } .mp-io .dev .st.ok { fill:var(--ds-good); } .mp-io .dev .st.busy { fill:var(--ds-bad); }
+.mp-io .rp { padding:4px 8px; display:flex; flex-direction:column; gap:5px; font-size:13px; }
+.mp-io .bits { display:grid; grid-template-columns:44px repeat(var(--n), minmax(0,1fr)) 58px; gap:2px; align-items:center; }
+.mp-io .bits .nm { color:var(--ds-muted); font:700 12px system-ui, sans-serif; }
+.mp-io .bits .b { height:24px; border:1.5px solid var(--ds-border); border-radius:5px; background:var(--ds-bg); font:700 13px/21px ui-monospace, Consolas, monospace; text-align:center; padding:0; min-height:0; }
+.mp-io .bits .b.on { background:var(--ds-node); }
+.mp-io .bits .b.chg { border-color:var(--ds-accent); color:var(--ds-accent); }
+.mp-io .bits button.b { cursor:pointer; border-radius:5px; font-size:13px; }
+.mp-io .bits button.b.on { background:var(--ds-hot); border-color:var(--ds-accent); }
+.mp-io .bits .ix { color:var(--ds-muted); font:12px ui-monospace, Consolas, monospace; text-align:center; }
+.mp-io .bits .hx { font:700 13px ui-monospace, Consolas, monospace; text-align:right; }
+.mp-io .bits .ix.u { opacity:.5; }
+.mp-io .meta { display:flex; flex-wrap:wrap; gap:4px 10px; color:var(--ds-muted); font:12.5px ui-monospace, Consolas, monospace; }
+.mp-io .meta b { color:var(--ds-text); }
+.mp-io .ops { display:flex; flex-wrap:wrap; gap:5px; }
+.mp-io .ops button { min-height:28px; padding:0 9px; font:700 12.5px ui-monospace, Consolas, monospace; border-radius:8px; }
+.mp-io .ops button.k-out { border-color:var(--ds-accent); }
+.mp-io .log { margin:0; padding:3px 8px; font:12.5px/1.42 ui-monospace, Consolas, monospace; list-style:none; height:94px; overflow:hidden; }
+.mp-io .log li { margin:0; white-space:pre; overflow:hidden; text-overflow:ellipsis; }
+.mp-io .log li.is-last { background:var(--ds-hot); }
+.mp-io .log li .cm { color:var(--ds-muted); }
+.mp-io .task { padding:5px 7px; border-radius:8px; background:var(--ds-surface-strong); font-size:12.5px; line-height:1.35; min-height:58px; }
+.mp-io .side .btns.one { grid-template-columns:1fr; }
+</style>
+
+<div class="mp-io mp-sim agt-oyun agt-oyun--stage" lang="tr">
+  <header class="agt-oyun__head">
+    <div class="agt-oyun__titles"><p class="agt-oyun__kicker">Bölüm 10 · Simülasyon</p><h1>Port ile Aygıt Kontrolü: IN, OUT ve Maskeler</h1></div>
+    <button type="button" class="agt-oyun__help" aria-controls="io-help" aria-label="Açıklama ve kullanım">?</button>
+    <a class="agt-oyun__back" href="Bolum_10_Aygit_Kontrolu.html">← Bölüm 10</a>
+  </header>
+
+  <div class="agt-oyun__body">
+    <div class="grid">
+      <aside class="card side">
+        <div>
+          <label class="cap" for="ioDev">Aygıt</label>
+          <select id="ioDev">
+            <option value="tl">Trafik lambaları</option>
+            <option value="s7">7 bölütlü gösterge</option>
+            <option value="sm">Step motor</option>
+          </select>
+        </div>
+        <div>
+          <label class="cap" for="ioEx">Örnek program</label>
+          <select id="ioEx"></select>
+        </div>
+        <div class="btns">
+          <button type="button" id="ioStep" class="is-primary" aria-label="Örnek programın sonraki komutunu yürüt">Adım ▶</button>
+          <button type="button" id="ioPlay" aria-label="Örnek programı oynat veya duraklat">Oynat</button>
+          <button type="button" id="ioReset" aria-label="Aygıtı ve yazmaçları başlangıca döndür">Sıfırla</button>
+          <button type="button" id="ioUndo" aria-label="Son komutu geri al">◀ Geri</button>
+        </div>
+        <label class="speed">Hız <input type="range" id="ioSpeed" min="1" max="5" value="3" aria-label="Oynatma hızı"></label>
+        <label class="check"><input type="checkbox" id="ioQuiz"> Kendini dene</label>
+        <div class="task" id="ioTask" aria-live="polite"></div>
+        <div class="btns">
+          <button type="button" id="ioCheck" aria-label="Görevi kontrol et">Kontrol</button>
+          <button type="button" id="ioNew" aria-label="Yeni görev">Yeni görev</button>
+        </div>
+        <div class="score" aria-live="polite">
+          <div>Doğru<b id="ioOk">0</b></div>
+          <div>Görev<b id="ioAll">0</b></div>
+        </div>
+      </aside>
+
+      <section class="main">
+        <div class="top">
+          <div class="pane"><span class="cap" id="ioDevCap">Aygıt</span><div class="dev" id="ioView" aria-live="polite"></div></div>
+          <div class="pane">
+            <span class="cap">Yazmaç, maske ve komutlar</span>
+            <div class="rp">
+              <div class="bits" id="ioBits"></div>
+              <div class="meta" id="ioMeta"></div>
+              <div class="ops" id="ioOps" aria-label="Komutlar"></div>
+              <ol class="log" id="ioLog" aria-label="Yürütülen komutlar"></ol>
+            </div>
+          </div>
+        </div>
+        <div class="why" id="ioWhy" aria-live="polite"></div>
+      </section>
+    </div>
+  </div>
+
+  <dialog class="agt-oyun__dialog mp-io-dlg" id="io-help">
+    <button type="button" class="agt-oyun__close">Kapat</button>
+    <h2>Port ile Aygıt Kontrolü</h2>
+    <p><b>Amaç:</b> 8086'nın ayrı G/Ç adres uzayındaki portlara <code>OUT</code> ile veri yazıp <code>IN</code> ile durum okuyarak bir aygıtı denetlemek; porttaki her bitin bir lambaya, bölüte ya da mıknatısa karşılık geldiğini görmek. Veri yalnızca AL ya da AX üzerinden geçer; 255'ten büyük port numarası DX ile verilir.</p>
+    <h3>Tek bit nasıl değiştirilir?</h3>
+    <table>
+      <tr><th>İşlem</th><th>Komut</th><th>Etkisi</th></tr>
+      <tr><td>Aç</td><td><code>OR AX, maske</code></td><td>maskedeki 1 bitler 1 olur, diğerleri değişmez</td></tr>
+      <tr><td>Kapat</td><td><code>AND AX, NOT maske</code></td><td>maskedeki bitler 0 olur (ör. bit 4 için 0FFEFh)</td></tr>
+      <tr><td>Değiştir</td><td><code>XOR AX, maske</code></td><td>maskedeki bitler tersine döner</td></tr>
+      <tr><td>Sına</td><td><code>TEST AL, maske</code></td><td>yalnız bayraklar: bit 0 ise ZF = 1</td></tr>
+    </table>
+    <p>Mantık komutlarından sonra CF = OF = 0; ZF, SF ve PF sonuca göre ayarlanır. Yazmacı değiştirmek aygıtı değiştirmez: lamba ancak <code>OUT</code> ile porta yazılınca yanar.</p>
+    <h3>Aygıtlar</h3>
+    <ul>
+      <li><b>Trafik lambaları (emu8086, port 4)</b>: sözcüğün bit 0–11'i 12 lamba; direk k için bit 3k kırmızı, 3k+1 sarı, 3k+2 yeşil. Direkler: 0 sağ alt, 1 sağ üst, 2 sol üst, 3 sol alt.</li>
+      <li><b>7 bölütlü gösterge (8255 port A = 310h)</b>: gerçek donanım örneği; ortak katot, bit 0–6 = a–g, bit 7 = nokta. 8255'in önceden 80h ile (tüm portlar çıkış) programlandığı varsayılır. Port 255'ten büyük olduğu için önce <code>MOV DX, 310h</code>.</li>
+      <li><b>Step motor (emu8086, port 7)</b>: aynı port okunurken <b>durum</b>, yazılırken <b>veri</b> portudur. <code>IN AL, 7</code> ile bit 7 (hazır) okunur; <code>OUT 7, AL</code> bit 0–2 ile mıknatısları açar. Bu simülatörde her kabul edilen adımdan sonraki ilk okuma meşgul (00h), ikincisi hazır (80h) döner; meşgulken gönderilen bayt yok sayılır (adım kaçar). Gerçek programda yoklama <code>JZ</code> ile döngüye alınır.</li>
+    </ul>
+    <h3>Nasıl kullanılır?</h3>
+    <ol>
+      <li>Maske satırındaki bitlere tıklayın (ya da örnek programı <b>Adım ▶</b> / <b>Oynat</b> ile yürütün), sonra komut düğmelerine basın. Yürütülen komutlar emu8086 söz dizimiyle listelenir.</li>
+      <li><b>Kendini dene</b>: verilen görevi komutlarla yapın, <b>Kontrol</b>'e basın. Görev yalnız istenen biti değiştirmeli, diğer lambalara dokunmamalıdır.</li>
+    </ol>
+    <p>Yazmaç ve bayrak sonuçları ortak 8086 yorumlayıcısıyla karşılaştırılarak doğrulanmıştır.</p>
+    <p>İlgili sunum: <a href="Bolum_10_Aygit_Kontrolu.html">Bölüm 10 · Aygıt Kontrolü</a> (IN/OUT, trafik lambaları, step motor, 7 bölütlü gösterge).</p>
+  </dialog>
+</div>
+
+<script>
+/* Copyright (c) Sercan Külcü. Tüm hakları saklıdır. */
+(function () {
+  if (["sercankulcu.github.io", "localhost", "127.0.0.1", "[::1]"].indexOf(location.hostname) < 0) return;
+  /* ---- 8086 alt kümesi: çözümleyici, kodlayıcı, yürütücü (simülatörler için) ---- */
+  var X86 = (function () {
+    var R8 = ["al", "cl", "dl", "bl", "ah", "ch", "dh", "bh"];
+    var R16 = ["ax", "cx", "dx", "bx", "sp", "bp", "si", "di"];
+    var SR = ["es", "cs", "ss", "ds"];
+    var RMN = ["bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx"];
+    var ALU = ["add", "or", "adc", "sbb", "and", "sub", "xor", "cmp"];
+    var JCC = { jo: 0x70, jno: 0x71, jb: 0x72, jc: 0x72, jnae: 0x72, jnb: 0x73, jae: 0x73, jnc: 0x73, je: 0x74, jz: 0x74, jne: 0x75, jnz: 0x75,
+      jbe: 0x76, jna: 0x76, ja: 0x77, jnbe: 0x77, js: 0x78, jns: 0x79, jp: 0x7a, jpe: 0x7a, jnp: 0x7b, jpo: 0x7b, jl: 0x7c, jnge: 0x7c,
+      jge: 0x7d, jnl: 0x7d, jle: 0x7e, jng: 0x7e, jg: 0x7f, jnle: 0x7f };
+    var SIMPLE = { pushf: 0x9c, popf: 0x9d, iret: 0xcf, cli: 0xfa, sti: 0xfb, clc: 0xf8, stc: 0xf9, cmc: 0xf5, nop: 0x90, hlt: 0xf4, cld: 0xfc, std: 0xfd };
+    var F = { CF: 0, PF: 2, AF: 4, ZF: 6, SF: 7, TF: 8, IF: 9, DF: 10, OF: 11 };
+
+    function h(v, n) { var s = (v >>> 0).toString(16).toUpperCase(); while (s.length < (n || 4)) s = "0" + s; return s; }
+    function hx(v, n) { return h(v, n) + "h"; }
+
+    /* ---- ifade: sayı, karakter, etiket, + - * ( ) ---- */
+    function evalExpr(s, labels) {
+      var t = s.replace(/\s+/g, ""), i = 0, usedLabel = false;
+      function num() {
+        var m;
+        if (t[i] === "(") { i++; var v = add(); i++; return v; }
+        if (t[i] === "-") { i++; return -num(); }
+        if ((m = /^'(.)'/.exec(t.slice(i)))) { i += m[0].length; return m[1].charCodeAt(0); }
+        if ((m = /^[0-9][0-9a-f]*h(?![a-z0-9_])/i.exec(t.slice(i)))) { i += m[0].length; return parseInt(m[0].slice(0, -1), 16); }
+        if ((m = /^[01]+b(?![a-z0-9_])/i.exec(t.slice(i)))) { i += m[0].length; return parseInt(m[0].slice(0, -1), 2); }
+        if ((m = /^[0-9]+/.exec(t.slice(i)))) { i += m[0].length; return parseInt(m[0], 10); }
+        if ((m = /^(offset)?([a-z_][a-z0-9_]*)/i.exec(t.slice(i)))) {
+          i += m[0].length; var k = m[2].toLowerCase(); usedLabel = true;
+          if (labels && k in labels) return labels[k];
+          if (labels && labels.__pass1) return 0;
+          throw new Error("tanımsız: " + m[2]);
+        }
+        throw new Error("ifade: " + s);
+      }
+      function mul() { var v = num(); while (t[i] === "*") { i++; v *= num(); } return v; }
+      function add() { var v = mul(); while (t[i] === "+" || t[i] === "-") { var o = t[i++]; v = o === "+" ? v + mul() : v - mul(); } return v; }
+      var v = add();
+      if (i !== t.length) throw new Error("ifade: " + s);
+      return { v: v, lbl: usedLabel };
+    }
+
+    function parseOp(s, labels) {
+      var x = s.trim(), lo = x.toLowerCase(), size = 0, m;
+      if (R8.indexOf(lo) >= 0) return { t: "r", w: 0, n: R8.indexOf(lo), s: lo };
+      if (R16.indexOf(lo) >= 0) return { t: "r", w: 1, n: R16.indexOf(lo), s: lo };
+      if (SR.indexOf(lo) >= 0) return { t: "sr", w: 1, n: SR.indexOf(lo), s: lo };
+      if ((m = /^(byte|word)\s+ptr\s+/i.exec(x))) { size = m[1].toLowerCase() === "byte" ? 1 : 2; x = x.slice(m[0].length); lo = x.toLowerCase(); }
+      var seg = -1;
+      if ((m = /^(es|cs|ss|ds)\s*:\s*/i.exec(x))) { seg = SR.indexOf(m[1].toLowerCase()); x = x.slice(m[0].length); lo = x.toLowerCase(); }
+      if (x[0] === "[") {
+        var inner = x.replace(/\]\s*\[/g, "+").replace(/^\[|\]$/g, "").toLowerCase().replace(/\s+/g, "");
+        var regs = [], rest = inner.replace(/(^|[+])(bx|bp|si|di)(?=$|[+\-])/g, function (a, p, r) { regs.push(r); return p === "+" ? "" : ""; });
+        rest = rest.replace(/^\+/, "");
+        var disp = 0, direct = regs.length === 0;
+        if (rest) disp = evalExpr(rest, labels).v;
+        regs.sort();
+        var key = regs.join("+"), rm;
+        var map = { "bx+si": 0, "bx+di": 1, "bp+si": 2, "bp+di": 3, si: 4, di: 5, bp: 6, bx: 7, "": -1 };
+        if (!(key in map)) throw new Error("geçersiz adres: " + s);
+        rm = map[key];
+        return { t: "m", rm: rm, direct: direct, disp: disp & 0xffff, sdisp: disp, seg: seg, size: size, s: s.trim() };
+      }
+      if (seg >= 0) throw new Error("işlenen: " + s);
+      var e = evalExpr(x, labels);
+      return { t: "i", v: e.v, lbl: e.lbl, s: s.trim() };
+    }
+
+    /* ModR/M + yer değiştirme */
+    function modrm(reg, op) {
+      if (op.t === "r") return [0xc0 | (reg << 3) | op.n];
+      if (op.direct) return [0x00 | (reg << 3) | 6, op.disp & 0xff, op.disp >> 8];
+      var d = op.sdisp;
+      if (d === 0 && op.rm !== 6) return [(reg << 3) | op.rm];
+      if (d >= -128 && d <= 127) return [0x40 | (reg << 3) | op.rm, d & 0xff];
+      return [0x80 | (reg << 3) | op.rm, op.disp & 0xff, op.disp >> 8];
+    }
+    function pre(op) { return op.t === "m" && op.seg >= 0 ? [0x26 + 8 * op.seg] : []; }
+    function imm(v, w) { v &= w ? 0xffff : 0xff; return w ? [v & 0xff, v >> 8] : [v]; }
+    function fits8(v) { v &= 0xffff; return v <= 0x7f || v >= 0xff80; }
+    function opw(a, b) {
+      var w = a.t === "r" || a.t === "sr" ? a.w : b && (b.t === "r" || b.t === "sr") ? b.w : a.size ? a.size - 1 : b && b.size ? b.size - 1 : -1;
+      return w;
+    }
+
+    /* Bir komutun geçerli tüm kodlamaları (ilk öğe: assembler'ın seçtiği / en kısa) */
+    function encodeAll(mn, ops, addr, labels) {
+      var a = ops[0], b = ops[1], out = [], w, k;
+      function add(bytes, form) { out.push({ b: bytes, form: form }); }
+      if (SIMPLE[mn] !== undefined) { add([SIMPLE[mn]], "tek bayt"); return out; }
+      if (mn === "ret" || mn === "retn") { if (a) add([0xc2].concat(imm(a.v, 1)), "RET imm16"); else add([0xc3], "RET"); return out; }
+      if (mn === "int") { if (a.v === 3) add([0xcc], "INT 3"); add([0xcd, a.v & 0xff], "INT imm8"); return out; }
+      if (mn === "call") { add([0xe8].concat(imm(a.v - (addr + 3), 1)), "CALL rel16"); return out; }
+      if (mn === "jmp") {
+        var r8 = a.v - (addr + 2);
+        if (labels && !labels.__pass1 && r8 >= -128 && r8 <= 127 && a.v <= addr) add([0xeb, r8 & 0xff], "JMP rel8");
+        else add([0xe9].concat(imm(a.v - (addr + 3), 1)), "JMP rel16");
+        return out;
+      }
+      if (JCC[mn] !== undefined || mn === "loop" || mn === "jcxz") {
+        var r = a.v - (addr + 2);
+        if (labels && !labels.__pass1 && (r < -128 || r > 127)) throw new Error("atlama uzak");
+        add([mn === "loop" ? 0xe2 : mn === "jcxz" ? 0xe3 : JCC[mn], r & 0xff], "rel8"); return out;
+      }
+      if (mn === "push" || mn === "pop") {
+        var P = mn === "push";
+        if (a.t === "r" && a.w) add([(P ? 0x50 : 0x58) + a.n], "50h+r");
+        else if (a.t === "sr") add([(P ? 0x06 : 0x07) + 8 * a.n], "sreg");
+        if (a.t === "m" || (a.t === "r" && a.w)) add(pre(a).concat(P ? [0xff].concat(modrm(6, a)) : [0x8f].concat(modrm(0, a))), "r/m16");
+        return out;
+      }
+      if (mn === "inc" || mn === "dec") {
+        k = mn === "inc" ? 0 : 1;
+        if (a.t === "r" && a.w) add([(k ? 0x48 : 0x40) + a.n], "40h+r");
+        w = opw(a); add(pre(a).concat([0xfe | w]).concat(modrm(k, a)), "r/m");
+        return out;
+      }
+      if (["not", "neg", "mul", "imul", "div", "idiv"].indexOf(mn) >= 0) {
+        k = { not: 2, neg: 3, mul: 4, imul: 5, div: 6, idiv: 7 }[mn]; w = opw(a);
+        add(pre(a).concat([0xf6 | w]).concat(modrm(k, a)), "r/m"); return out;
+      }
+      if (mn === "in") {
+        if (b.t === "i") add([0xe4 | a.w, b.v & 0xff], "port imm8"); else add([0xec | a.w], "port DX");
+        return out;
+      }
+      if (mn === "out") {
+        if (a.t === "i") add([0xe6 | b.w, a.v & 0xff], "port imm8"); else add([0xee | b.w], "port DX");
+        return out;
+      }
+      if (mn === "test") {
+        if (b.t === "i") {
+          w = opw(a);
+          if (a.t === "r" && a.n === 0) add([0xa8 | w].concat(imm(b.v, w)), "akümülatör");
+          add(pre(a).concat([0xf6 | w]).concat(modrm(0, a)).concat(imm(b.v, w)), "r/m, imm");
+        } else {
+          var rr = b.t === "r" ? b : a, mm = b.t === "r" ? a : b;
+          add(pre(mm).concat([0x84 | rr.w]).concat(modrm(rr.n, mm)), "r/m, reg");
+        }
+        return out;
+      }
+      if (mn === "mov") {
+        if (a.t === "sr") { add(pre(b).concat([0x8e]).concat(modrm(a.n, b)), "8E"); return out; }
+        if (b.t === "sr") { add(pre(a).concat([0x8c]).concat(modrm(b.n, a)), "8C"); return out; }
+        if (b.t === "i") {
+          if (a.t === "r") { add([(a.w ? 0xb8 : 0xb0) + a.n].concat(imm(b.v, a.w)), "B0h+r"); add([0xc6 | a.w].concat(modrm(0, a)).concat(imm(b.v, a.w)), "C6/C7"); }
+          else { w = opw(a); add(pre(a).concat([0xc6 | w]).concat(modrm(0, a)).concat(imm(b.v, w)), "C6/C7"); }
+          return out;
+        }
+        if (a.t === "r" && b.t === "r") {
+          add([0x8a | a.w].concat(modrm(a.n, b)), "d=1");
+          add([0x88 | a.w].concat(modrm(b.n, a)), "d=0");
+          return out;
+        }
+        if (a.t === "r") {
+          if (a.n === 0 && b.direct) add(pre(b).concat([0xa0 | a.w, b.disp & 0xff, b.disp >> 8]), "akümülatör");
+          add(pre(b).concat([0x8a | a.w]).concat(modrm(a.n, b)), "d=1");
+        } else {
+          if (b.n === 0 && a.direct) add(pre(a).concat([0xa2 | b.w, a.disp & 0xff, a.disp >> 8]), "akümülatör");
+          add(pre(a).concat([0x88 | b.w]).concat(modrm(b.n, a)), "d=0");
+        }
+        out.sort(function (x, y) { return x.b.length - y.b.length; });
+        return out;
+      }
+      if ((k = ALU.indexOf(mn)) >= 0) {
+        if (b.t === "i") {
+          w = opw(a);
+          if (w === 1 && fits8(b.v)) add(pre(a).concat([0x83]).concat(modrm(k, a)).concat([b.v & 0xff]), "83 (imm8, işaret genişletilir)");
+          if (a.t === "r" && a.n === 0) add([k * 8 + 4 + w].concat(imm(b.v, w)), "akümülatör");
+          add(pre(a).concat([0x80 | w]).concat(modrm(k, a)).concat(imm(b.v, w)), w ? "81 (imm16)" : "80 (imm8)");
+          out.sort(function (x, y) { return x.b.length - y.b.length; });
+          return out;
+        }
+        if (a.t === "r" && b.t === "r") {
+          add([k * 8 + 2 + a.w].concat(modrm(a.n, b)), "d=1");
+          add([k * 8 + 0 + a.w].concat(modrm(b.n, a)), "d=0");
+          return out;
+        }
+        if (a.t === "r") add(pre(b).concat([k * 8 + 2 + a.w]).concat(modrm(a.n, b)), "d=1");
+        else add(pre(a).concat([k * 8 + 0 + b.w]).concat(modrm(b.n, a)), "d=0");
+        return out;
+      }
+      throw new Error("desteklenmeyen komut: " + mn);
+    }
+
+    function splitOps(s) {
+      var r = [], d = 0, cur = "", q = false;
+      for (var i = 0; i < s.length; i++) {
+        var c = s[i];
+        if (c === "'") q = !q;
+        if (!q && c === "[") d++;
+        if (!q && c === "]") d--;
+        if (!q && c === "," && !d) { r.push(cur); cur = ""; } else cur += c;
+      }
+      if (cur.trim()) r.push(cur);
+      return r;
+    }
+
+    /* Kaynak metni → komut listesi (iki geçiş). Satırlar: [etiket:] komut işlenenler ; açıklama */
+    function assemble(src, base) {
+      var lines = src.split("\n"), items = [];
+      lines.forEach(function (raw, li) {
+        var code = raw.replace(/;.*$/, "").trim(), lab = null, m;
+        if (!code) return;
+        if ((m = /^([a-z_][a-z0-9_]*)\s*:\s*/i.exec(code))) { lab = m[1].toLowerCase(); code = code.slice(m[0].length).trim(); }
+        if ((m = /^([a-z_][a-z0-9_]*)\s+(proc|endp)\b/i.exec(code))) { items.push({ li: li, lab: m[2].toLowerCase() === "proc" ? m[1].toLowerCase() : null, dir: true }); return; }
+        if (/^(end)\b/i.test(code)) return;
+        if ((m = /^org\s+(.+)$/i.exec(code))) { items.push({ li: li, org: evalExpr(m[1]).v, lab: lab, dir: true }); return; }
+        if (!code) { items.push({ li: li, lab: lab, dir: true }); return; }
+        m = /^([a-z]+)\s*(.*)$/i.exec(code);
+        items.push({ li: li, lab: lab, mn: m[1].toLowerCase(), ops: m[2] ? splitOps(m[2]) : [] });
+      });
+      var labels = {}, pass;
+      for (pass = 1; pass <= 3; pass++) {
+        var addr = base || 0, L = pass === 1 ? { __pass1: true } : labels, nl = {};
+        items.forEach(function (it) {
+          if (it.org !== undefined) addr = it.org;
+          if (it.lab) nl[it.lab] = addr;
+          if (it.dir) { it.addr = addr; return; }
+          var ops = it.ops.map(function (o) { return parseOp(o, L); });
+          var enc = encodeAll(it.mn, ops, addr, L);
+          it.addr = addr; it.bytes = enc[0].b; it.alts = enc; it.op = ops;
+          addr += it.bytes.length;
+        });
+        labels = nl;
+      }
+      return { items: items, labels: labels };
+    }
+
+    /* ---- yürütücü ---- */
+    function CPU() {
+      this.r = [0, 0, 0, 0, 0xfffe, 0, 0, 0];
+      this.s = [0x0700, 0x0700, 0x0700, 0x0700];
+      this.ip = 0x100; this.fl = 0xf202; this.und = 0;
+      this.mem = {}; this.ports = {}; this.out = ""; this.halted = false;
+    }
+    CPU.prototype.clone = function () {
+      var c = new CPU(); c.r = this.r.slice(); c.s = this.s.slice(); c.ip = this.ip; c.fl = this.fl; c.und = this.und;
+      c.mem = Object.assign({}, this.mem); c.ports = Object.assign({}, this.ports); c.out = this.out; c.halted = this.halted;
+      return c;
+    };
+    CPU.prototype.rb = function (seg, off) { var p = ((seg << 4) + (off & 0xffff)) & 0xfffff; return this.mem[p] || 0; };
+    CPU.prototype.wb = function (seg, off, v) { var p = ((seg << 4) + (off & 0xffff)) & 0xfffff; this.mem[p] = v & 0xff; };
+    CPU.prototype.rw = function (seg, off) { return this.rb(seg, off) | (this.rb(seg, off + 1) << 8); };
+    CPU.prototype.ww = function (seg, off, v) { this.wb(seg, off, v); this.wb(seg, off + 1, v >> 8); };
+    CPU.prototype.get = function (o, w) {
+      if (o.t === "r") return w ? this.r[o.n] : (o.n < 4 ? this.r[o.n] & 0xff : this.r[o.n - 4] >> 8);
+      if (o.t === "sr") return this.s[o.n];
+      if (o.t === "i") return o.v & (w ? 0xffff : 0xff);
+      var a = this.ea(o); return w ? this.rw(a.seg, a.off) : this.rb(a.seg, a.off);
+    };
+    CPU.prototype.set = function (o, w, v) {
+      if (o.t === "r") {
+        if (w) this.r[o.n] = v & 0xffff;
+        else if (o.n < 4) this.r[o.n] = (this.r[o.n] & 0xff00) | (v & 0xff);
+        else this.r[o.n - 4] = (this.r[o.n - 4] & 0xff) | ((v & 0xff) << 8);
+      } else if (o.t === "sr") this.s[o.n] = v & 0xffff;
+      else { var a = this.ea(o); if (w) this.ww(a.seg, a.off, v); else this.wb(a.seg, a.off, v); }
+    };
+    CPU.prototype.ea = function (o) {
+      var off = o.disp, seg = 3, R = this.r;
+      if (!o.direct) {
+        off = [R[3] + R[6], R[3] + R[7], R[5] + R[6], R[5] + R[7], R[6], R[7], R[5], R[3]][o.rm] + o.sdisp;
+        if (o.rm === 2 || o.rm === 3 || o.rm === 6) seg = 2;
+      }
+      if (o.seg >= 0) seg = o.seg;
+      return { seg: this.s[seg], off: off & 0xffff, sn: seg };
+    };
+    CPU.prototype.flag = function (n) { return (this.fl >> F[n]) & 1; };
+    CPU.prototype.setf = function (n, v) { if (v) this.fl |= 1 << F[n]; else this.fl &= ~(1 << F[n]); this.und &= ~(1 << F[n]); };
+    function par(v) { v &= 0xff; var c = 0; while (v) { c += v & 1; v >>= 1; } return c % 2 === 0; }
+    CPU.prototype.szp = function (r, w) {
+      var m = w ? 0xffff : 0xff; r &= m;
+      this.setf("ZF", r === 0); this.setf("SF", r & (w ? 0x8000 : 0x80)); this.setf("PF", par(r));
+    };
+    CPU.prototype.arith = function (k, a, b, w, keepCF) {
+      var m = w ? 0xffff : 0xff, sb = w ? 0x8000 : 0x80, c = 0, r;
+      if (k === 2 || k === 3) c = this.flag("CF");
+      if (k === 0 || k === 2) {
+        r = a + b + c;
+        if (!keepCF) this.setf("CF", r > m);
+        this.setf("OF", ((a ^ r) & (b ^ r) & sb) !== 0);
+      } else {
+        r = a - b - c;
+        if (!keepCF) this.setf("CF", r < 0);
+        this.setf("OF", ((a ^ b) & (a ^ r) & sb) !== 0);
+      }
+      this.setf("AF", ((a ^ b ^ r) & 0x10) !== 0);
+      this.szp(r, w);
+      return r & m;
+    };
+    CPU.prototype.logic = function (r, w) {
+      this.setf("CF", 0); this.setf("OF", 0); this.szp(r, w); this.und |= 1 << F.AF; return r & (w ? 0xffff : 0xff);
+    };
+    CPU.prototype.push = function (v) { this.r[4] = (this.r[4] - 2) & 0xffff; this.ww(this.s[2], this.r[4], v); };
+    CPU.prototype.pop = function () { var v = this.rw(this.s[2], this.r[4]); this.r[4] = (this.r[4] + 2) & 0xffff; return v; };
+    CPU.prototype.flagsWord = function () { return (this.fl & 0x0fd5) | 0xf002; };
+
+    return { R8: R8, R16: R16, SR: SR, RMN: RMN, ALU: ALU, JCC: JCC, F: F, h: h, hx: hx, evalExpr: evalExpr, parseOp: parseOp,
+      encodeAll: encodeAll, assemble: assemble, splitOps: splitOps, CPU: CPU, fits8: fits8 };
+  })();
+  /* ---- G/Ç aygıtları: durum, komut yürütme, örnekler, görevler ---- */
+  var IO = (function () {
+    var h = X86.h;
+    function hl(v, n) { var s = h(v, n); return (/^[A-F]/.test(s) ? "0" : "") + s + "h"; }
+    var POLE = ["sağ alt", "sağ üst", "sol üst", "sol alt"], COL = ["kırmızı", "sarı", "yeşil"];
+    var SEGN = ["a", "b", "c", "d", "e", "f", "g", "nokta"];
+    var DIG = [0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f];
+    var DEV = {
+      tl: { ad: "Trafik lambaları · port 4 (sözcük)", port: 4, w: 1, start: "Trafik lambaları: port 4'e yazılan sözcüğün bit 0–11'i 12 lambayı yakar. Maskeye bit seçip komutlara basın; lambalar yalnız OUT 4, AX ile değişir." },
+      s7: { ad: "7 bölütlü gösterge · 8255 port A (310h)", port: 0x310, w: 0, start: "7 bölütlü gösterge (ortak katot): bit 0–6 = a–g, bit 7 = nokta. Port 310h > 255 olduğu için önce MOV DX, 310h, sonra OUT DX, AL." },
+      sm: { ad: "Step motor · port 7 (durum ve veri)", port: 7, w: 0, start: "Step motor: IN AL, 7 durum okur (bit 7 = hazır); OUT 7, AL bit 0–2 ile mıknatısları açar. Motor her adımdan sonra kısa süre meşgul olur." }
+    };
+    function bitName(dev, b) {
+      if (dev === "tl") return b > 11 ? "bit " + b + " (kullanılmaz)" : POLE[(b / 3) | 0] + " " + COL[b % 3];
+      if (dev === "s7") return b === 7 ? "nokta" : SEGN[b] + " bölütü";
+      return b < 3 ? "mıknatıs " + b : b === 7 ? "hazır biti" : "bit " + b;
+    }
+    function bitsOf(m, n) { var r = []; for (var b = 0; b < n; b++) if ((m >> b) & 1) r.push(b); return r; }
+    function names(dev, m) { var n = DEV[dev].w ? 16 : 8; return bitsOf(m, n).map(function (b) { return bitName(dev, b); }).join(", "); }
+    function state(dev) { return { ax: 0, dx: 0, f: { ZF: 0, SF: 0, PF: 0, CF: 0, OF: 0 }, mask: dev === "tl" ? 0x0010 : dev === "s7" ? 0x80 : 0x06, ports: {}, log: [], busy: false, reads: 0, steps: 0, missed: 0 }; }
+    function clone(S) { var c = JSON.parse(JSON.stringify(S)); return c; }
+    var cpu = new X86.CPU();
+    function exec(S, dev, text) {
+      var m = /^([A-Z]+)\s+(.*)$/.exec(text), mn = m[1].toLowerCase(), ops = X86.splitOps(m[2]).map(function (o) { return X86.parseOp(o, {}); });
+      var a = ops[0], b = ops[1], w = DEV[dev].w, msg = "";
+      S.log.push({ t: text });
+      cpu.r[0] = S.ax; cpu.r[2] = S.dx;
+      function acc() { return w ? S.ax : S.ax & 0xff; }
+      function setAcc(v) { S.ax = w ? v & 0xffff : (S.ax & 0xff00) | (v & 0xff); }
+      function fl() { ["ZF", "SF", "PF", "CF", "OF"].forEach(function (k) { S.f[k] = cpu.flag(k); }); }
+      if (mn === "mov") {
+        if (a.s === "dx") { S.dx = b.v & 0xffff; return "DX ← " + hl(S.dx) + ": port numarası 255'ten büyük, bu yüzden DX ile verilir."; }
+        setAcc(b.v); return a.s.toUpperCase() + " ← " + hl(b.v, w ? 4 : 2) + (bitsOf(b.v, w ? 16 : 8).length ? " (1 olan bitler: " + names(dev, b.v) + ")" : "") + ". MOV bayrakları değiştirmez; aygıt henüz değişmedi.";
+      }
+      if (mn === "or" || mn === "and" || mn === "xor" || mn === "test") {
+        var x = acc(), y = b.v & (w ? 0xffff : 0xff), r = mn === "or" ? x | y : mn === "xor" ? x ^ y : x & y;
+        cpu.logic(r, w); fl();
+        if (mn === "test") return "TEST: " + hl(x, w ? 4 : 2) + " AND " + hl(y, w ? 4 : 2) + " = " + hl(r, w ? 4 : 2) + " (yazmaç değişmez) → ZF = " + S.f.ZF + (S.f.ZF ? ": sınanan bit(ler) 0." : ": sınanan bitlerden en az biri 1.");
+        setAcc(r);
+        var ch = x ^ r;
+        if (mn === "or") msg = "OR ile maskedeki bitler 1 yapıldı" + (ch ? " (" + names(dev, ch) + " açıldı)" : " (zaten 1'di)");
+        if (mn === "and") msg = "AND ile maskede 0 olan bitler 0 yapıldı" + (ch ? " (" + names(dev, ch) + " kapandı)" : " (zaten 0'dı)");
+        if (mn === "xor") msg = "XOR ile maskedeki bitler tersine döndü" + (ch ? " (" + names(dev, ch) + ")" : "");
+        return msg + "; diğer bitler aynen kaldı. Sonuç " + hl(r, w ? 4 : 2) + ", ZF = " + S.f.ZF + ", CF = OF = 0." + (ch ? " Aygıt ancak OUT ile değişir." : "");
+      }
+      if (mn === "out") {
+        var port = a.t === "i" ? a.v : S.dx, v = acc();
+        if (port !== DEV[dev].port) { S.ports[port] = v; return "OUT: port " + hl(port) + " ← " + hl(v, w ? 4 : 2) + ". Bu porta bağlı aygıt yok: önce MOV DX, 310h gerekir."; }
+        if (dev === "sm") {
+          if (S.busy) { S.missed++; return "OUT 7, AL: motor meşgulken gönderildi → bayt yok sayıldı, adım kaçtı. Önce IN AL, 7 ile bit 7'nin 1 olmasını bekleyin."; }
+          S.ports[7] = v; S.busy = true; S.reads = 0; S.steps++;
+          return "OUT 7, AL: mıknatıslar " + (v & 7).toString(2).padStart(3, "0") + "b → " + ((v & 7) ? names(dev, v & 7) + " açık" : "hepsi kapalı") + ". Motor hareket ediyor: bir süre meşgul.";
+        }
+        var old = S.ports[port]; S.ports[port] = v;
+        var dif = old === undefined ? v : old ^ v;
+        return "OUT: port " + (port > 255 ? hl(port) : port) + " ← " + hl(v, w ? 4 : 2) + ". " + (old === undefined ? "Aygıt ilk kez yazıldı." : dif ? "Değişen: " + names(dev, dif) + "." : "Port zaten bu değerdeydi.");
+      }
+      if (mn === "in") {
+        var st;
+        if (S.busy) { S.reads++; if (S.reads >= 2) S.busy = false; }
+        st = S.busy ? 0x00 : 0x80;
+        S.ax = (S.ax & 0xff00) | st;
+        return "IN AL, 7 → AL = " + hl(st, 2) + ": bit 7 = " + (st >> 7) + (st ? " → motor hazır, yeni adım gönderilebilir." : " → motor meşgul; yoklama döngüsü tekrar okur (JZ).") + " IN bayrakları değiştirmez.";
+      }
+      return "?";
+    }
+    function ops(dev, m) {
+      var w = DEV[dev].w, A = w ? "AX" : "AL", n = w ? 4 : 2, nm = (~m) & (w ? 0xffff : 0xff), r = [];
+      if (dev === "s7") r.push({ t: "MOV DX, 310h", tip: "port numarası DX'e", c: "8255 port A" });
+      if (dev === "sm") r.push({ t: "IN AL, 7", tip: "durum oku", c: "durum: bit 7 = hazır" }, { t: "TEST AL, 80h", tip: "hazır bitini sına", c: "ZF = 1 ise meşgul" });
+      r.push({ t: "MOV " + A + ", " + hl(m, n), tip: "maskeyi doğrudan yükle", c: "" });
+      r.push({ t: "OR " + A + ", " + hl(m, n), tip: "maskedeki bitleri aç", c: "aç" });
+      r.push({ t: "AND " + A + ", " + hl(nm, n), tip: "maskedeki bitleri kapat (NOT maske)", c: "kapat" });
+      if (dev !== "sm") r.push({ t: "XOR " + A + ", " + hl(m, n), tip: "maskedeki bitleri tersine çevir", c: "değiştir" });
+      if (dev === "tl") r.push({ t: "TEST AX, " + hl(m, n), tip: "bitleri sına (yalnız bayraklar)", c: "sına" });
+      r.push({ t: dev === "tl" ? "OUT 4, AX" : dev === "s7" ? "OUT DX, AL" : "OUT 7, AL", tip: "porta yaz: aygıt değişir", c: "aygıta yaz" });
+      r.forEach(function (o) { var b = bitsOf(m, w ? 16 : 8); if (o.c === "aç" || o.c === "kapat" || o.c === "değiştir") o.c = b.length === 1 ? bitName(dev, b[0]) + " " + o.c : o.c; });
+      return r;
+    }
+    function maskWhy(dev, m) {
+      var n = DEV[dev].w ? 4 : 2;
+      return "Maske = " + hl(m, n) + (bitsOf(m, 16).length ? " → " + names(dev, m) : " (boş)") + ". Kapatmak için kullanılacak tersi (NOT maske) = " + hl((~m) & (DEV[dev].w ? 0xffff : 0xff), n) + ".";
+    }
+    var EX = {
+      tl: [
+        { ad: "Hepsi kırmızı → sağ alt yeşil", prog: [["MOV AX, 0249h", "tümü kırmızı"], ["OUT 4, AX"], ["AND AX, 0FFFEh", "sağ alt kırmızı kapat"], ["OR AX, 0004h", "sağ alt yeşil aç"], ["OUT 4, AX"]] },
+        { ad: "Sarıyı yakıp söndür (XOR)", prog: [["MOV AX, 030Ch", "situation"], ["OUT 4, AX"], ["XOR AX, 0002h", "sağ alt sarı değiştir"], ["OUT 4, AX"], ["XOR AX, 0002h"], ["OUT 4, AX"]] },
+        { ad: "Lamba yanıyor mu? (TEST)", prog: [["MOV AX, 0861h", "s2"], ["OUT 4, AX"], ["TEST AX, 0020h", "sağ üst yeşil?"], ["TEST AX, 0004h", "sağ alt yeşil?"]] }
+      ],
+      s7: [
+        { ad: "3 ve nokta", prog: [["MOV DX, 310h", "8255 port A"], ["MOV AL, 4Fh", "3 = a b c d g"], ["OUT DX, AL"], ["OR AL, 80h", "nokta aç"], ["OUT DX, AL"], ["AND AL, 7Fh", "nokta kapat"], ["OUT DX, AL"]] },
+        { ad: "8'den b'yi söndür → 6", prog: [["MOV DX, 310h"], ["MOV AL, 7Fh", "8 = tüm bölütler"], ["OUT DX, AL"], ["AND AL, 0FDh", "b bölütü kapat"], ["OUT DX, AL"]] },
+        { ad: "DX unutulursa", prog: [["MOV AL, 06h", "1 = b c"], ["OUT DX, AL", "DX = 0000h!"], ["MOV DX, 310h"], ["OUT DX, AL"]] }
+      ],
+      sm: [
+        { ad: "Yoklayarak iki adım", prog: [["IN AL, 7", "hazır mı?"], ["TEST AL, 80h"], ["MOV AL, 06h", "110b"], ["OUT 7, AL"], ["IN AL, 7"], ["TEST AL, 80h", "ZF = 1: meşgul"], ["IN AL, 7"], ["TEST AL, 80h", "ZF = 0: hazır"], ["MOV AL, 04h", "100b"], ["OUT 7, AL"]] },
+        { ad: "Yoklamadan gönderme (hata)", prog: [["MOV AL, 06h"], ["OUT 7, AL"], ["MOV AL, 04h"], ["OUT 7, AL", "meşgulken!"]] }
+      ]
+    };
+    function rnd(n) { return Math.floor(Math.random() * n); }
+    function task(dev) {
+      if (dev === "tl") {
+        var pats = [0x030c, 0x069a, 0x0861, 0x04d3, 0x0249], p = pats[rnd(pats.length)], b = rnd(12), kind = rnd(3);
+        var on = (p >> b) & 1, t = kind === 2 ? p ^ (1 << b) : on ? p & ~(1 << b) : p | (1 << b);
+        var verb = kind === 2 ? "durumunu tersine çevirin (XOR)" : on ? "söndürün" : "yakın";
+        return { text: "Lambalar " + hl(p) + " durumunda. Yalnız " + bitName(dev, b) + " lambasını " + verb + "; diğer lambalara dokunmayın.", target: t,
+          start: function (S) { S.ax = p; S.ports[4] = p; S.log.push({ t: "MOV AX, " + hl(p) }, { t: "OUT 4, AX" }); S.mask = 0; },
+          check: function (S) { var v = S.ports[4]; if (v === t) return { ok: true, msg: "Port 4 = " + hl(t) + ": yalnız istenen bit değişti." }; if ((S.ax & 0xffff) === t) return { ok: false, msg: "AX doğru (" + hl(t) + ") ama aygıta yazılmadı: OUT 4, AX." }; return { ok: false, msg: "Port 4 = " + hl(v) + ", beklenen " + hl(t) + ". Değişen yanlış bitler: " + (names(dev, v ^ t) || "—") + "." }; } };
+      }
+      if (dev === "s7") {
+        var d = rnd(10), c = DIG[d], s = rnd(8), on2 = (c >> s) & 1, t2 = on2 ? c & ~(1 << s) : c | (1 << s);
+        return { text: "Göstergede " + d + " var (" + hl(c, 2) + "). Yalnız " + SEGN[s] + (s === 7 ? "yı" : " bölütünü") + " " + (on2 ? "söndürün" : "yakın") + "; diğer bölütler kalsın.", target: t2,
+          start: function (S) { S.dx = 0x310; S.ax = c; S.ports[0x310] = c; S.log.push({ t: "MOV DX, 310h" }, { t: "MOV AL, " + hl(c, 2) }, { t: "OUT DX, AL" }); S.mask = 0; },
+          check: function (S) { var v = S.ports[0x310]; if (v === t2) return { ok: true, msg: "Port A = " + hl(t2, 2) + "." }; if ((S.ax & 0xff) === t2) return { ok: false, msg: "AL doğru ama OUT DX, AL yapılmadı (DX = 310h olmalı)." }; return { ok: false, msg: "Port A = " + hl(v, 2) + ", beklenen " + hl(t2, 2) + "." }; } };
+      }
+      var vals = [0x06, 0x04, 0x03, 0x02, 0x01, 0x05], v3 = vals[rnd(vals.length)];
+      return { text: "Motor az önce bir adım attı (meşgul). Mıknatıslara " + v3.toString(2).padStart(3, "0") + "b gönderin; adım kaçmasın: önce durumu okuyun.", target: v3,
+        start: function (S) { S.ports[7] = 0; S.busy = true; S.reads = 0; S.steps = 1; S.log.push({ t: "OUT 7, AL", c: "önceki adım" }); S.mask = 0; },
+        check: function (S) { if (S.ports[7] === v3 && !S.missed) return { ok: true, msg: "Motor hazırken " + hl(v3, 2) + " gönderildi." }; if (S.missed) return { ok: false, msg: "Meşgulken OUT yapıldı: " + S.missed + " adım kaçtı; görev Sıfırla ile baştan başlar." }; return { ok: false, msg: "Port 7 henüz " + hl(S.ports[7] || 0, 2) + ". IN ile hazır olmayı bekleyip MOV AL, " + hl(v3, 2) + " / OUT 7, AL." }; } };
+    }
+    return { DEV: DEV, state: state, clone: clone, exec: exec, ops: ops, maskWhy: maskWhy, EX: EX, task: task, hl: hl, DIG: DIG };
+  })();
+  var E = function (id) { return document.getElementById("io" + id); };
+  var h = X86.h, dev = "tl", S, hist = [], ex = null, exPos = 0, timer = null, task = null, ok = 0, all = 0, lastOld = null;
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function fresh() { return IO.state(dev); }
+
+  /* ---- görünüm ---- */
+  var POLES = [{ x: 186, y: 170, n: "sağ alt" }, { x: 186, y: 30, n: "sağ üst" }, { x: 40, y: 30, n: "sol üst" }, { x: 40, y: 170, n: "sol alt" }];
+  var SEG = { a: "M44 14h52l-7 8H51z", b: "M98 16l0 58-8-6 0-46z", c: "M98 82v58l-8-8 0-44z", d: "M44 142h52l-7-8H51z", e: "M42 82v58l8-8 0-44z", f: "M42 16v58l8-6V22z", g: "M46 78l6-6h36l6 6-6 6H52z" };
+  function drawDev() {
+    var L = S.ports[IO.DEV[dev].port], v = L === undefined ? 0 : L, s = '<svg viewBox="0 0 250 260" role="img" aria-label="' + IO.DEV[dev].ad + '">';
+    if (dev === "tl") {
+      s += '<rect class="road" x="95" y="0" width="60" height="260"/><rect class="road" x="0" y="100" width="250" height="60"/>';
+      POLES.forEach(function (p, k) {
+        s += '<rect class="pole" x="' + (p.x - 4) + '" y="' + (p.y - 4) + '" width="32" height="74" rx="8"/>';
+        ["r", "y", "g"].forEach(function (c, j) { var b = 3 * k + j; s += '<circle class="lamp ' + c + ((v >> b) & 1 ? " on" : "") + '" cx="' + (p.x + 12) + '" cy="' + (p.y + 10 + j * 22) + '" r="9"><title>bit ' + b + "</title></circle>"; });
+        s += '<text class="lbl" x="' + (p.x + 12) + '" y="' + (p.y + 84) + '" text-anchor="middle">' + (3 * k) + "–" + (3 * k + 2) + "</text>";
+      });
+      s += '<text class="lblb" x="125" y="252" text-anchor="middle">port 4 = ' + (L === undefined ? "—" : h(v) + "h") + "</text>";
+    } else if (dev === "s7") {
+      s += '<g transform="translate(55,20)">';
+      "abcdefg".split("").forEach(function (c, i) { s += '<path class="seg' + ((v >> i) & 1 ? " on" : "") + '" d="' + SEG[c] + '"><title>' + c + " · bit " + i + "</title></path>"; });
+      s += '<circle class="seg' + ((v >> 7) & 1 ? " on" : "") + '" cx="112" cy="140" r="7"><title>nokta · bit 7</title></circle>';
+      "abcdefg".split("").forEach(function (c) { var m = { a: [70, 6], b: [112, 48], c: [112, 116], d: [70, 160], e: [28, 116], f: [28, 48], g: [70, 60] }[c]; s += '<text class="lbl" x="' + m[0] + '" y="' + (m[1] + 4) + '" text-anchor="middle">' + c + "</text>"; });
+      s += "</g>";
+      s += '<text class="lblb" x="125" y="212" text-anchor="middle">port A (310h) = ' + (L === undefined ? "—" : h(v, 2) + "h") + "</text>";
+      s += '<text class="lbl" x="125" y="234" text-anchor="middle">DX = ' + h(S.dx) + "h" + (S.dx === 0x310 ? " ✓" : " (port A değil)") + "</text>";
+    } else {
+      s += '<circle class="rotor" cx="125" cy="100" r="44"/>';
+      [0, 1, 2].forEach(function (i) { var a = (-90 + i * 120) * Math.PI / 180, x = 125 + 70 * Math.cos(a), y = 100 + 70 * Math.sin(a);
+        s += '<rect class="mag' + ((v >> i) & 1 ? " on" : "") + '" x="' + (x - 13) + '" y="' + (y - 13) + '" width="26" height="26" rx="5"><title>mıknatıs ' + i + '</title></rect><text class="lblb" x="' + x + '" y="' + (y + 5) + '" text-anchor="middle">' + i + "</text>"; });
+      s += '<text class="lblb" x="125" y="198" text-anchor="middle">veri (OUT 7) = ' + (L === undefined ? "—" : h(v, 2) + "h") + "</text>";
+      s += '<text class="st ' + (S.busy ? "busy" : "ok") + '" x="125" y="220" text-anchor="middle">durum (IN 7): ' + (S.busy ? "meşgul, bit 7 = 0" : "hazır, bit 7 = 1") + "</text>";
+      s += '<text class="lbl" x="125" y="242" text-anchor="middle">kabul edilen adım ' + S.steps + (S.missed ? " · kaçan " + S.missed : "") + "</text>";
+    }
+    E("View").innerHTML = s + "</svg>";
+    E("DevCap").textContent = IO.DEV[dev].ad;
+  }
+  function bitRow(name, v, n, cls, old, click) {
+    var s = '<span class="nm">' + name + "</span>";
+    for (var b = n - 1; b >= 0; b--) {
+      var on = (v >> b) & 1, ch = old !== null && old !== undefined && (((old ^ v) >> b) & 1);
+      s += click ? '<button type="button" class="b' + (on ? " on" : "") + '" data-bit="' + b + '" aria-label="Maske bit ' + b + '" aria-pressed="' + !!on + '">' + on + "</button>"
+        : '<span class="b' + (on ? " on" : "") + (ch ? " chg" : "") + '">' + on + "</span>";
+    }
+    return s + '<span class="hx">' + h(v, n / 4) + "h</span>";
+  }
+  function draw(why) {
+    var n = IO.DEV[dev].w ? 16 : 8, acc = IO.DEV[dev].w ? "AX" : "AL", av = n === 16 ? S.ax : S.ax & 0xff;
+    E("Bits").style.setProperty("--n", n);
+    var ix = '<span class="nm">bit</span>';
+    for (var b = n - 1; b >= 0; b--) ix += '<span class="ix' + (dev === "tl" && b > 11 ? " u" : "") + '">' + b.toString(16).toUpperCase() + "</span>";
+    E("Bits").innerHTML = ix + '<span></span>' + bitRow(acc, av, n, "", lastOld === null ? null : (n === 16 ? lastOld : lastOld & 0xff)) + bitRow("maske", S.mask, n, "", null, true);
+    E("Meta").innerHTML = ["ZF", "SF", "PF", "CF", "OF"].map(function (k) { return "<span>" + k + "=<b>" + S.f[k] + "</b></span>"; }).join("") + (dev === "s7" ? "<span>DX=<b>" + h(S.dx) + "h</b></span>" : "");
+    var ops = IO.ops(dev, S.mask);
+    E("Ops").innerHTML = ops.map(function (o, i) { return '<button type="button" data-op="' + i + '" class="' + (/^(OUT|IN)/.test(o.t) ? "k-out" : "") + '" title="' + esc(o.tip) + '">' + esc(o.t) + "</button>"; }).join("");
+    var lg = S.log.slice(-5);
+    E("Log").innerHTML = lg.map(function (l, i) { return '<li class="' + (i === lg.length - 1 ? "is-last" : "") + '">' + esc(l.t) + (l.c ? '<span class="cm">  ; ' + esc(l.c) + "</span>" : "") + "</li>"; }).join("") || '<li class="cm">(henüz komut yok)</li>';
+    drawDev();
+    if (why !== undefined) E("Why").innerHTML = why;
+    var exl = ex ? ex.prog.length : 0;
+    E("Step").disabled = !ex || exPos >= exl;
+    E("Play").disabled = E("Step").disabled && !timer;
+    E("Play").textContent = timer ? "Duraklat" : "Oynat";
+    E("Undo").disabled = !hist.length;
+    E("Reset").disabled = !hist.length && !S.log.length;
+  }
+  function exec(text, note) {
+    hist.push({ s: IO.clone(S), exPos: exPos });
+    lastOld = S.ax;
+    var r = IO.exec(S, dev, text);
+    if (note) S.log[S.log.length - 1].c = note;
+    draw(esc(r));
+  }
+  /* ---- örnek programlar ---- */
+  function fillEx() {
+    E("Ex").innerHTML = IO.EX[dev].map(function (x, i) { return '<option value="' + i + '">' + esc(x.ad) + "</option>"; }).join("");
+    ex = IO.EX[dev][0]; exPos = 0;
+  }
+  function reset(msg) {
+    stop(); S = fresh(); hist = []; exPos = 0; lastOld = null;
+    if (task) task.start(S);
+    draw(msg || esc(IO.DEV[dev].start));
+  }
+  function stepEx() { if (!ex || exPos >= ex.prog.length) return; var p = ex.prog[exPos]; exPos++; exec(p[0], p[1]); }
+  function stop() { clearInterval(timer); timer = null; }
+  function play() {
+    if (timer) { stop(); draw(); return; }
+    if (exPos >= ex.prog.length) reset();
+    timer = setInterval(function () { if (exPos >= ex.prog.length) { stop(); draw(); return; } stepEx(); }, [1800, 1250, 850, 500, 220][E("Speed").value - 1]);
+    draw();
+  }
+  /* ---- kendini dene ---- */
+  function newTask() { task = IO.task(dev); reset(); E("Task").innerHTML = "<b>Görev:</b> " + esc(task.text); }
+  function setQuiz() {
+    var on = E("Quiz").checked;
+    E("Check").disabled = E("New").disabled = !on;
+    if (on) newTask(); else { task = null; E("Task").innerHTML = "Kendini dene açıkken burada bir görev çıkar: komutlarla yapıp <b>Kontrol</b>'e basın."; reset(); }
+  }
+  E("Check").addEventListener("click", function () {
+    if (!task) return;
+    var r = task.check(S); all++; if (r.ok) ok++;
+    E("Ok").textContent = ok; E("All").textContent = all;
+    E("Why").innerHTML = (r.ok ? '<b class="agt-oyun__good">Doğru!</b> ' : '<b class="agt-oyun__bad">Henüz değil.</b> ') + esc(r.msg);
+    if (r.ok) E("Task").innerHTML = "<b>Görev tamam.</b> " + esc(task.text) + " · <b>Yeni görev</b> ile devam edin.";
+  });
+  E("New").addEventListener("click", newTask);
+  E("Quiz").addEventListener("change", setQuiz);
+
+  E("Ops").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-op]"); if (!b) return;
+    stop(); var o = IO.ops(dev, S.mask)[+b.getAttribute("data-op")]; exec(o.t, o.c);
+  });
+  E("Bits").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-bit]"); if (!b) return;
+    S.mask ^= 1 << +b.getAttribute("data-bit"); draw(esc(IO.maskWhy(dev, S.mask)));
+  });
+  E("Dev").addEventListener("change", function () { dev = E("Dev").value; fillEx(); if (E("Quiz").checked) newTask(); else reset(); });
+  E("Ex").addEventListener("change", function () { ex = IO.EX[dev][E("Ex").value]; reset(esc(ex.ad + ": Adım ▶ ile komutları sırayla yürütün.")); });
+  E("Step").addEventListener("click", function () { stop(); stepEx(); });
+  E("Play").addEventListener("click", play);
+  E("Reset").addEventListener("click", function () { reset(); });
+  E("Undo").addEventListener("click", function () { stop(); var x = hist.pop(); if (!x) return; S = x.s; exPos = x.exPos; lastOld = null; draw(esc("Son komut geri alındı.")); });
+  E("Speed").addEventListener("change", function () { if (timer) { stop(); play(); } });
+  document.querySelector(".mp-io").addEventListener("keydown", function (ev) {
+    if (/INPUT|SELECT|TEXTAREA/.test(ev.target.tagName) && ev.target.type !== "checkbox" && ev.target.type !== "range") return;
+    if (ev.key === "ArrowRight") { stop(); stepEx(); ev.preventDefault(); }
+    else if (ev.key === "ArrowLeft") { E("Undo").click(); ev.preventDefault(); }
+  });
+  fillEx(); setQuiz();
+})();
+</script>
+<script src="deck/oyun.js"></script>
