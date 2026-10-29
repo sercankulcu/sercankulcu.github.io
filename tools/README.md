@@ -1,7 +1,7 @@
 # tools
 
 *Programming with C* ders notlarından **türetilmiş çıktıları** üreten betikler:
-dizin sayfası, PDF kitap ve notların içindeki adımlayıcı figürler. Ayrıca
+PDF kitap ve notların içindeki adımlayıcı figürler. Ayrıca
 `deck.js` kullanan HTML sunumlardan (computer, data_structures, agt) PDF üreten
 betik.
 
@@ -17,38 +17,6 @@ pip install -r tools/requirements.txt
 
 Bütün betikler depo kökünden çalıştırılmak üzere yazılmıştır ve kendi
 konumlarından yolları kendileri bulur; mutlak yol gömülü değildir.
-
-## Dizin
-
-```bash
-python tools/make_index.py
-```
-
-`files/c/Index.html` dosyasını sıfırdan üretir: 56 nottaki `<code>` terimleri ve
-bölüm başlıkları taranır, her terim için *öğretildiği* hafta (koyu) ile
-*kullanıldığı* haftalar (soluk) listelenir. Terim ayıklama kuralları
-`index_terms.py` içindedir; tek başına çalıştırılırsa istatistik ve örnek döker:
-
-```bash
-python tools/index_terms.py
-```
-
-Bir terim yanlış haftaya bağlanıyorsa çare, notu değiştirmek değil,
-`index_terms.py` içindeki `DROP_EXACT` / `GENERIC` / `acceptable()` kurallarını
-düzeltmektir.
-
-"Öğretildiği hafta" iki aşamada bulunur. Önce terim bir bölüm başlığında veya
-hedefler kutusunda geçiyor mu diye bakılır; burada yalnızca *Worked example*
-başlığından öncesi sayılır, çünkü sonrası uygulamadır. Hiçbir başlıkta
-geçmiyorsa `dominant()` devreye girer: terimi açık ara en çok anlatan hafta
-aranır — en az 3 geçiş **ve** ikincinin en az iki katı. Sağlamayan terim
-sahipsiz kalır, çünkü koyu rakam "burada anlatılıyor" iddiasıdır ve yanlış
-işaretlemek boş bırakmaktan kötüdür. Bu sayım işlenen örnek bölümünü dışlar
-(orada işlev *kullanılır*, anlatılmaz) ama sonrasındaki "Common mistakes"
-bölümünü sayar.
-
-Betik ayrıca `week.css` içine dizin stillerini (bir kez) ekler ve her haftanın
-gezinme satırına Index bağlantısını koyar. İkisi de zaten varsa dokunmaz.
 
 ## Kitap
 

@@ -18,10 +18,6 @@ This is a complete course in C, designed to take a reader from no prior programm
 
 Every week is anchored to a worked example that is built and explained in the lecture notes. The examples form a chain rather than a set of isolated exercises: the growable array of week 19 becomes the reusable module of week 28, the library of week 29, the installable package of week 45, and the target of a foreign-language binding in week 46; the socket server of week 40 becomes the event loop of week 47. The embedded material in weeks 49-55 targets an ARM Cortex-M image running under QEMU, so every example can be built and run without physical hardware.
 
-## Ders Öğretim Planı  
-
-[Ders Öğretim Planı (HTML)](../files/c/Ders_Ogretim_Plani.html) · [🔎 Index](../files/c/Index.html)
-
 ---
 
 ## The book
