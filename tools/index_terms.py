@@ -11,6 +11,7 @@ for f in sorted(glob.glob(os.path.join(SITE, 'Week_*.html')),
                 key=lambda p: int(re.search(r'Week_(\d+)', p).group(1))):
     n = int(re.search(r'Week_(\d+)', f).group(1))
     s = io.open(f, encoding='utf-8').read()
+    s = re.sub(r'<!-- ds-guard:begin -->.*?<!-- ds-guard:end -->', '', s, flags=re.S)
     NOTES[n] = s
     TITLES[n] = re.sub('<[^>]+>', '', re.search(r'<h1>(.+?)</h1>', s, re.S).group(1)).strip()
 FILES = {n: os.path.basename(p) for n, p in

@@ -807,7 +807,7 @@ There are currently no announcements.
 - Priority inversion and how to avoid it
 - Choosing between a superloop, an RTOS, and an event-driven design
 
-**Worked example:** the same device firmware written first as a superloop and then as a set of FreeRTOS tasks running under the simulator, with the timing behavior of both compared.
+**Worked example:** the same device firmware written first as a superloop and then as a set of FreeRTOS tasks, both run under `qemu-system-arm`, with the timing behavior of both compared. The repository builds the superloop version directly; the FreeRTOS version needs the FreeRTOS kernel, which is not included and is fetched separately as the notes describe.
 
 [🗒️Lecture Notes (HTML)](../files/c/Week_54_Real_Time_Operating_Systems.html) · [💻 Code (GitHub)](https://github.com/sercankulcu/programming-with-c/tree/main/week54_real_time_operating_systems)
 

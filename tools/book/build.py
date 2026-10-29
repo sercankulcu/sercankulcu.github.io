@@ -4,7 +4,8 @@ import io, os, re, glob, sys, html
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 SITE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, 'build')
+# BOOK_BUILD_DIR yalnizca deneme icin: kitap HTML'ini baska bir klasore yazar.
+OUT = os.environ.get('BOOK_BUILD_DIR') or os.path.join(HERE, 'build')
 os.makedirs(OUT, exist_ok=True)
 
 PARTS = [(1, 14, 'Basic', 'The language itself'),
@@ -20,10 +21,16 @@ def part_of(n):
     return ''
 
 
+DS_GUARD_RE = re.compile(r'<!-- ds-guard:begin -->.*?<!-- ds-guard:end -->\n*', re.S)
+
+
 def load(n):
     f = glob.glob(os.path.join(SITE, 'files', 'c', 'Week_%02d_*' % n))[0]
     s = io.open(f, encoding='utf-8').read()
     body = s.split('---', 2)[-1]
+    # ds-guard yalnizca izinli adreste gosterir; kitap file:/// uzerinden basilir,
+    # orada sayfa gizlenirdi. Blogu kitaba hic tasima.
+    body = DS_GUARD_RE.sub('', body)
     title = re.sub('<[^>]+>', '', re.search(r'<h1>(.+?)</h1>', body, re.S).group(1)).strip()
     return body, title, os.path.basename(f)
 
