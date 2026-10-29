@@ -56,12 +56,13 @@ Stratejik etkileşimden önce tek bir karar verici incelenir. Beklenen fayda ve 
 
 ### Bölüm 2: Oyunlar ve Temsiller
 
-Bir oyunun ne olduğu ve nasıl yazıldığı: oyuncular, stratejiler, kazançlar ve bilgi; normal form ve genişletilmiş form; oyunların sınıflandırılması; Mahkûmun İkilemi ve Pareto optimallik; klasik 2×2 oyunlar; 2/3 ortalaması oyunu ve seviye-k düşünme; kombinatoryal oyunlar ve minimaks; sıralı oyunlar, geriye doğru çıkarım, alt oyun mükemmel denge ve tetik stratejisi.
+Bir oyunun ne olduğu ve nasıl yazıldığı: oyuncular, stratejiler, kazançlar ve bilgi; normal form ve genişletilmiş form; oyunların sınıflandırılması; Mahkûmun İkilemi ve Pareto optimallik; klasik 2×2 oyunlar; 2/3 ortalaması oyunu ve seviye-k düşünme; kombinatoryal oyunlar ve minimaks; minimaksı hızlandıran alfa-beta budaması, derinlik sınırlı arama ve değerlendirme fonksiyonları; sıralı oyunlar, geriye doğru çıkarım, alt oyun mükemmel denge ve tetik stratejisi.
 
 - [🖼️Sunum-Oyunlar ve Temsiller (HTML)](../files/agt/slides/Bolum_02_Oyunlar_ve_Temsiller.html)
 - [📄Sunum-Oyunlar ve Temsiller (PDF)](../files/agt/pdf/Bolum_02_Oyunlar_ve_Temsiller.pdf)
 - [📖Ders Notu - Oyunlar ve Temsiller (HTML)](../files/agt/notlar/Bolum_02_Oyunlar_ve_Temsiller_Ders_Notu.html)
 - [📝Çalışma Soruları - Oyunlar ve Temsiller (HTML)](../files/agt/slides/Bolum_02_Oyunlar_ve_Temsiller_Calisma_Sorulari.html)
+- [🖼️Sunum-Minimaks ve Alfa-Beta Budaması (HTML)](../files/agt/slides/Bolum_02_Minimaks_ve_Budama.html)
 
 - [🕹️2/3 Ortalaması Oyunu (HTML)](../files/agt/slides/Chapter_01_Guess_Average.html)
 - [🕹️Minimaks XOX (HTML)](../files/agt/slides/Chapter_01_TicTacToe.html)
